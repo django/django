@@ -135,11 +135,11 @@ class Advisor(models.Model):
 class Student(models.Model):
     name = models.CharField(max_length=255)
 
-    def __str__(self):
-        return self.name
-
     class Meta:
         ordering = ('name',)
+
+    def __str__(self):
+        return self.name
 
 
 class School(models.Model):

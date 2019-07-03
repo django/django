@@ -17,29 +17,20 @@ GeoDjango currently provides the following spatial database backends:
 * ``django.contrib.gis.db.backends.oracle``
 * ``django.contrib.gis.db.backends.spatialite``
 
-.. module:: django.contrib.gis.db.models
-    :synopsis: GeoDjango's database API.
-
 .. _mysql-spatial-limitations:
 
 MySQL Spatial Limitations
 -------------------------
 
-MySQL's spatial extensions only support bounding box operations
-(what MySQL calls minimum bounding rectangles, or MBR).  Specifically,
-`MySQL does not conform to the OGC standard
-<https://dev.mysql.com/doc/refman/en/spatial-relation-functions.html>`_:
+Before MySQL 5.6.1, spatial extensions only support bounding box operations
+(what MySQL calls minimum bounding rectangles, or MBR). Specifically, MySQL did
+not conform to the OGC standard. Django supports spatial functions operating on
+real geometries available in modern MySQL versions. However, the spatial
+functions are not as rich as other backends like PostGIS.
 
-    Currently, MySQL does not implement these functions
-    [``Contains``, ``Crosses``, ``Disjoint``, ``Intersects``, ``Overlaps``,
-    ``Touches``, ``Within``]
-    according to the specification.  Those that are implemented return
-    the same result as the corresponding MBR-based functions.
+.. versionchanged:: 3.0
 
-In other words, while spatial lookups such as :lookup:`contains <gis-contains>`
-are available in GeoDjango when using MySQL, the results returned are really
-equivalent to what would be returned when using :lookup:`bbcontains`
-on a different spatial backend.
+    Support for spatial functions operating on real geometries was added.
 
 .. warning::
 
@@ -268,8 +259,8 @@ to be in the units of the field.
     in your field definition.
 
 For example, let's say we have a ``SouthTexasCity`` model (from the
-`GeoDjango distance tests`__ ) on a *projected* coordinate system valid for cities
-in southern Texas::
+:source:`GeoDjango distance tests <tests/gis_tests/distapp/models.py>` ) on a
+*projected* coordinate system valid for cities in southern Texas::
 
     from django.contrib.gis.db import models
 
@@ -302,8 +293,6 @@ both. To specify the band index of a raster input on the right hand side, a
 
 Where the band with index 2 (the third band) of the raster ``rst`` would be
 used for the lookup.
-
-__ https://github.com/django/django/blob/master/tests/gis_tests/distapp/models.py
 
 .. _compatibility-table:
 
@@ -362,47 +351,45 @@ Lookup Type                        PostGIS    Oracle    MySQL [#]_   SpatiaLite 
 Database functions
 ------------------
 
-.. module:: django.contrib.gis.db.models.functions
-    :synopsis: GeoDjango's database functions.
-
 The following table provides a summary of what geography-specific database
 functions are available on each spatial backend.
 
-====================================  =======  ==============  ===========  ==========
-Function                              PostGIS  Oracle          MySQL        SpatiaLite
-====================================  =======  ==============  ===========  ==========
-:class:`Area`                         X        X               X            X
-:class:`AsGeoJSON`                    X                        X (≥ 5.7.5)  X
-:class:`AsGML`                        X        X                            X
-:class:`AsKML`                        X                                     X
-:class:`AsSVG`                        X                                     X
-:class:`Azimuth`                      X                                     X (LWGEOM)
+.. currentmodule:: django.contrib.gis.db.models.functions
+
+====================================  =======  ============== ============ =========== ==========
+Function                              PostGIS  Oracle         MariaDB      MySQL       SpatiaLite
+====================================  =======  ============== ============ =========== ==========
+:class:`Area`                         X        X              X            X           X
+:class:`AsGeoJSON`                    X                       X (≥ 10.2.4) X (≥ 5.7.5) X
+:class:`AsGML`                        X        X                                       X
+:class:`AsKML`                        X                                                X
+:class:`AsSVG`                        X                                                X
+:class:`Azimuth`                      X                                                X (LWGEOM)
 :class:`BoundingCircle`               X        X
-:class:`Centroid`                     X        X               X            X
-:class:`Difference`                   X        X               X            X
-:class:`Distance`                     X        X               X            X
-:class:`Envelope`                     X        X               X            X
-:class:`ForcePolygonCW`               X                                     X
-:class:`ForceRHR`                     X
-:class:`GeoHash`                      X                        X (≥ 5.7.5)  X (LWGEOM)
-:class:`Intersection`                 X        X               X            X
-:class:`IsValid`                      X        X               X (≥ 5.7.5)  X (LWGEOM)
-:class:`Length`                       X        X               X            X
-:class:`LineLocatePoint`              X                                     X
-:class:`MakeValid`                    X                                     X (LWGEOM)
+:class:`Centroid`                     X        X              X            X           X
+:class:`Difference`                   X        X              X            X           X
+:class:`Distance`                     X        X              X            X           X
+:class:`Envelope`                     X        X              X            X           X
+:class:`ForcePolygonCW`               X                                                X
+:class:`GeoHash`                      X                                    X (≥ 5.7.5) X (LWGEOM)
+:class:`Intersection`                 X        X              X            X           X
+:class:`IsValid`                      X        X                           X (≥ 5.7.5) X (LWGEOM)
+:class:`Length`                       X        X              X            X           X
+:class:`LineLocatePoint`              X                                                X
+:class:`MakeValid`                    X                                                X (LWGEOM)
 :class:`MemSize`                      X
-:class:`NumGeometries`                X        X               X            X
-:class:`NumPoints`                    X        X               X            X
-:class:`Perimeter`                    X        X                            X
-:class:`PointOnSurface`               X        X                            X
-:class:`Reverse`                      X        X                            X
-:class:`Scale`                        X                                     X
-:class:`SnapToGrid`                   X                                     X
-:class:`SymDifference`                X        X               X            X
-:class:`Transform`                    X        X                            X
-:class:`Translate`                    X                                     X
-:class:`Union`                        X        X               X            X
-====================================  =======  ==============  ===========  ==========
+:class:`NumGeometries`                X        X              X            X           X
+:class:`NumPoints`                    X        X              X            X           X
+:class:`Perimeter`                    X        X                                       X
+:class:`PointOnSurface`               X        X              X                        X
+:class:`Reverse`                      X        X                                       X
+:class:`Scale`                        X                                                X
+:class:`SnapToGrid`                   X                                                X
+:class:`SymDifference`                X        X              X            X           X
+:class:`Transform`                    X        X                                       X
+:class:`Translate`                    X                                                X
+:class:`Union`                        X        X              X            X           X
+====================================  =======  ============== ============ =========== ==========
 
 Aggregate Functions
 -------------------

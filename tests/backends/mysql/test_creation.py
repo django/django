@@ -43,3 +43,10 @@ class DatabaseCreationTests(SimpleTestCase):
         with self.patch_test_db_creation(self._execute_raise_access_denied):
             with self.assertRaises(SystemExit):
                 creation._create_test_db(verbosity=0, autoclobber=False, keepdb=False)
+
+    def test_clone_test_db_database_exists(self):
+        creation = DatabaseCreation(connection)
+        with self.patch_test_db_creation(self._execute_raise_database_exists):
+            with mock.patch.object(DatabaseCreation, '_clone_db') as _clone_db:
+                creation._clone_test_db('suffix', verbosity=0, keepdb=True)
+                _clone_db.assert_not_called()

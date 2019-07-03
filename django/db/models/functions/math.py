@@ -1,33 +1,12 @@
 import math
-import sys
 
-from django.db.models import (
-    DecimalField, FloatField, Func, IntegerField, Transform,
-)
+from django.db.models.expressions import Func
+from django.db.models.fields import FloatField, IntegerField
 from django.db.models.functions import Cast
-
-
-class DecimalInputMixin:
-
-    def as_postgresql(self, compiler, connection):
-        # Cast FloatField to DecimalField as PostgreSQL doesn't support the
-        # following function signatures:
-        # - LOG(double, double)
-        # - MOD(double, double)
-        output_field = DecimalField(decimal_places=sys.float_info.dig, max_digits=1000)
-        clone = self.copy()
-        clone.set_source_expressions([
-            Cast(expression, output_field) if isinstance(expression.output_field, FloatField)
-            else expression for expression in self.get_source_expressions()
-        ])
-        return clone.as_sql(compiler, connection)
-
-
-class OutputFieldMixin:
-
-    def _resolve_output_field(self):
-        has_decimals = any(isinstance(s.output_field, DecimalField) for s in self.get_source_expressions())
-        return DecimalField() if has_decimals else FloatField()
+from django.db.models.functions.mixins import (
+    FixDecimalInputMixin, NumericOutputFieldMixin,
+)
+from django.db.models.lookups import Transform
 
 
 class Abs(Transform):
@@ -35,30 +14,30 @@ class Abs(Transform):
     lookup_name = 'abs'
 
 
-class ACos(OutputFieldMixin, Transform):
+class ACos(NumericOutputFieldMixin, Transform):
     function = 'ACOS'
     lookup_name = 'acos'
 
 
-class ASin(OutputFieldMixin, Transform):
+class ASin(NumericOutputFieldMixin, Transform):
     function = 'ASIN'
     lookup_name = 'asin'
 
 
-class ATan(OutputFieldMixin, Transform):
+class ATan(NumericOutputFieldMixin, Transform):
     function = 'ATAN'
     lookup_name = 'atan'
 
 
-class ATan2(OutputFieldMixin, Func):
+class ATan2(NumericOutputFieldMixin, Func):
     function = 'ATAN2'
     arity = 2
 
-    def as_sqlite(self, compiler, connection):
-        if not getattr(connection.ops, 'spatialite', False) or connection.ops.spatial_version < (4, 3, 0):
+    def as_sqlite(self, compiler, connection, **extra_context):
+        if not getattr(connection.ops, 'spatialite', False) or connection.ops.spatial_version >= (5, 0, 0):
             return self.as_sql(compiler, connection)
         # This function is usually ATan2(y, x), returning the inverse tangent
-        # of y / x, but it's ATan2(x, y) on SpatiaLite 4.3+.
+        # of y / x, but it's ATan2(x, y) on SpatiaLite < 5.0.0.
         # Cast integers to float to avoid inconsistent/buggy behavior if the
         # arguments are mixed between integer and float or decimal.
         # https://www.gaia-gis.it/fossil/libspatialite/tktview?name=0f72cca3a2
@@ -67,39 +46,43 @@ class ATan2(OutputFieldMixin, Func):
             Cast(expression, FloatField()) if isinstance(expression.output_field, IntegerField)
             else expression for expression in self.get_source_expressions()[::-1]
         ])
-        return clone.as_sql(compiler, connection)
+        return clone.as_sql(compiler, connection, **extra_context)
 
 
 class Ceil(Transform):
     function = 'CEILING'
     lookup_name = 'ceil'
 
-    def as_oracle(self, compiler, connection):
-        return super().as_sql(compiler, connection, function='CEIL')
+    def as_oracle(self, compiler, connection, **extra_context):
+        return super().as_sql(compiler, connection, function='CEIL', **extra_context)
 
 
-class Cos(OutputFieldMixin, Transform):
+class Cos(NumericOutputFieldMixin, Transform):
     function = 'COS'
     lookup_name = 'cos'
 
 
-class Cot(OutputFieldMixin, Transform):
+class Cot(NumericOutputFieldMixin, Transform):
     function = 'COT'
     lookup_name = 'cot'
 
-    def as_oracle(self, compiler, connection):
-        return super().as_sql(compiler, connection, template='(1 / TAN(%(expressions)s))')
+    def as_oracle(self, compiler, connection, **extra_context):
+        return super().as_sql(compiler, connection, template='(1 / TAN(%(expressions)s))', **extra_context)
 
 
-class Degrees(OutputFieldMixin, Transform):
+class Degrees(NumericOutputFieldMixin, Transform):
     function = 'DEGREES'
     lookup_name = 'degrees'
 
-    def as_oracle(self, compiler, connection):
-        return super().as_sql(compiler, connection, template='((%%(expressions)s) * 180 / %s)' % math.pi)
+    def as_oracle(self, compiler, connection, **extra_context):
+        return super().as_sql(
+            compiler, connection,
+            template='((%%(expressions)s) * 180 / %s)' % math.pi,
+            **extra_context
+        )
 
 
-class Exp(OutputFieldMixin, Transform):
+class Exp(NumericOutputFieldMixin, Transform):
     function = 'EXP'
     lookup_name = 'exp'
 
@@ -109,49 +92,53 @@ class Floor(Transform):
     lookup_name = 'floor'
 
 
-class Ln(OutputFieldMixin, Transform):
+class Ln(NumericOutputFieldMixin, Transform):
     function = 'LN'
     lookup_name = 'ln'
 
 
-class Log(DecimalInputMixin, OutputFieldMixin, Func):
+class Log(FixDecimalInputMixin, NumericOutputFieldMixin, Func):
     function = 'LOG'
     arity = 2
 
-    def as_sqlite(self, compiler, connection):
+    def as_sqlite(self, compiler, connection, **extra_context):
         if not getattr(connection.ops, 'spatialite', False):
             return self.as_sql(compiler, connection)
         # This function is usually Log(b, x) returning the logarithm of x to
         # the base b, but on SpatiaLite it's Log(x, b).
         clone = self.copy()
         clone.set_source_expressions(self.get_source_expressions()[::-1])
-        return clone.as_sql(compiler, connection)
+        return clone.as_sql(compiler, connection, **extra_context)
 
 
-class Mod(DecimalInputMixin, OutputFieldMixin, Func):
+class Mod(FixDecimalInputMixin, NumericOutputFieldMixin, Func):
     function = 'MOD'
     arity = 2
 
 
-class Pi(OutputFieldMixin, Func):
+class Pi(NumericOutputFieldMixin, Func):
     function = 'PI'
     arity = 0
 
-    def as_oracle(self, compiler, connection):
-        return super().as_sql(compiler, connection, template=str(math.pi))
+    def as_oracle(self, compiler, connection, **extra_context):
+        return super().as_sql(compiler, connection, template=str(math.pi), **extra_context)
 
 
-class Power(OutputFieldMixin, Func):
+class Power(NumericOutputFieldMixin, Func):
     function = 'POWER'
     arity = 2
 
 
-class Radians(OutputFieldMixin, Transform):
+class Radians(NumericOutputFieldMixin, Transform):
     function = 'RADIANS'
     lookup_name = 'radians'
 
-    def as_oracle(self, compiler, connection):
-        return super().as_sql(compiler, connection, template='((%%(expressions)s) * %s / 180)' % math.pi)
+    def as_oracle(self, compiler, connection, **extra_context):
+        return super().as_sql(
+            compiler, connection,
+            template='((%%(expressions)s) * %s / 180)' % math.pi,
+            **extra_context
+        )
 
 
 class Round(Transform):
@@ -159,16 +146,21 @@ class Round(Transform):
     lookup_name = 'round'
 
 
-class Sin(OutputFieldMixin, Transform):
+class Sign(Transform):
+    function = 'SIGN'
+    lookup_name = 'sign'
+
+
+class Sin(NumericOutputFieldMixin, Transform):
     function = 'SIN'
     lookup_name = 'sin'
 
 
-class Sqrt(OutputFieldMixin, Transform):
+class Sqrt(NumericOutputFieldMixin, Transform):
     function = 'SQRT'
     lookup_name = 'sqrt'
 
 
-class Tan(OutputFieldMixin, Transform):
+class Tan(NumericOutputFieldMixin, Transform):
     function = 'TAN'
     lookup_name = 'tan'

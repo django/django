@@ -1,7 +1,7 @@
 import copy
 import inspect
 from bisect import bisect
-from collections import OrderedDict, defaultdict
+from collections import defaultdict
 
 from django.apps import apps
 from django.conf import settings
@@ -33,8 +33,6 @@ DEFAULT_NAMES = (
     'select_on_save', 'default_related_name', 'required_db_features',
     'required_db_vendor', 'base_manager_name', 'default_manager_name',
     'indexes', 'constraints',
-    # For backwards compatibility with Django 1.11. RemovedInDjango30Warning
-    'manager_inheritance_from_future',
 )
 
 
@@ -119,7 +117,7 @@ class Options:
         # concrete models, the concrete_model is always the class itself.
         self.concrete_model = None
         self.swappable = None
-        self.parents = OrderedDict()
+        self.parents = {}
         self.auto_created = False
 
         # List of all lookups defined in ForeignKey 'limit_choices_to' options

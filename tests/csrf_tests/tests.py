@@ -1,6 +1,7 @@
 import re
 
 from django.conf import settings
+from django.contrib.sessions.backends.cache import SessionStore
 from django.core.exceptions import ImproperlyConfigured
 from django.http import HttpRequest
 from django.middleware.csrf import (
@@ -24,8 +25,7 @@ class TestingHttpRequest(HttpRequest):
     """
     def __init__(self):
         super().__init__()
-        # A real session backend isn't needed.
-        self.session = {}
+        self.session = SessionStore()
 
     def is_secure(self):
         return getattr(self, '_is_secure_override', False)
@@ -441,12 +441,12 @@ class CsrfViewMiddlewareTestMixin:
 
     def test_post_data_read_failure(self):
         """
-        #20128 -- IOErrors during POST data reading should be caught and
-        treated as if the POST data wasn't there.
+        OSErrors during POST data reading are caught and treated as if the
+        POST data wasn't there (#20128).
         """
         class CsrfPostRequest(HttpRequest):
             """
-            HttpRequest that can raise an IOError when accessing POST data
+            HttpRequest that can raise an OSError when accessing POST data
             """
             def __init__(self, token, raise_error):
                 super().__init__()
@@ -464,7 +464,7 @@ class CsrfViewMiddlewareTestMixin:
                 self.raise_error = raise_error
 
             def _load_post_and_files(self):
-                raise IOError('error reading input data')
+                raise OSError('error reading input data')
 
             def _get_post(self):
                 if self.raise_error:
@@ -692,6 +692,19 @@ class CsrfViewMiddlewareUseSessionsTests(CsrfViewMiddlewareTestMixin, SimpleTest
         req = self._get_GET_no_csrf_cookie_request()
         ensure_csrf_cookie_view(req)
         self.assertTrue(req.session.get(CSRF_SESSION_KEY, False))
+
+    def test_session_modify(self):
+        """The session isn't saved if the CSRF cookie is unchanged."""
+        req = self._get_GET_no_csrf_cookie_request()
+        self.mw.process_view(req, ensure_csrf_cookie_view, (), {})
+        resp = ensure_csrf_cookie_view(req)
+        self.mw.process_response(req, resp)
+        self.assertIsNotNone(req.session.get(CSRF_SESSION_KEY))
+        req.session.modified = False
+        self.mw.process_view(req, ensure_csrf_cookie_view, (), {})
+        resp = ensure_csrf_cookie_view(req)
+        self.mw.process_response(req, resp)
+        self.assertFalse(req.session.modified)
 
     def test_ensures_csrf_cookie_with_middleware(self):
         """

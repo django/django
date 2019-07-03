@@ -5,9 +5,10 @@ from django.core.checks import Error, Warning
 from django.core.checks.model_checks import _check_lazy_references
 from django.core.exceptions import ImproperlyConfigured
 from django.db import connection, connections, models
+from django.db.models.functions import Lower
 from django.db.models.signals import post_init
 from django.test import SimpleTestCase
-from django.test.utils import isolate_apps, override_settings
+from django.test.utils import isolate_apps, override_settings, register_lookup
 
 
 def get_max_column_name_length():
@@ -116,6 +117,19 @@ class IndexTogetherTests(SimpleTestCase):
             ),
         ])
 
+    def test_pointing_to_fk(self):
+        class Foo(models.Model):
+            pass
+
+        class Bar(models.Model):
+            foo_1 = models.ForeignKey(Foo, on_delete=models.CASCADE, related_name='bar_1')
+            foo_2 = models.ForeignKey(Foo, on_delete=models.CASCADE, related_name='bar_2')
+
+            class Meta:
+                index_together = [['foo_1_id', 'foo_2']]
+
+        self.assertEqual(Bar.check(), [])
+
 
 # unique_together tests are very similar to index_together tests.
 @isolate_apps('invalid_models_tests')
@@ -203,6 +217,19 @@ class UniqueTogetherTests(SimpleTestCase):
             ),
         ])
 
+    def test_pointing_to_fk(self):
+        class Foo(models.Model):
+            pass
+
+        class Bar(models.Model):
+            foo_1 = models.ForeignKey(Foo, on_delete=models.CASCADE, related_name='bar_1')
+            foo_2 = models.ForeignKey(Foo, on_delete=models.CASCADE, related_name='bar_2')
+
+            class Meta:
+                unique_together = [['foo_1_id', 'foo_2']]
+
+        self.assertEqual(Bar.check(), [])
+
 
 @isolate_apps('invalid_models_tests')
 class IndexesTests(SimpleTestCase):
@@ -255,6 +282,19 @@ class IndexesTests(SimpleTestCase):
                 id='models.E016',
             ),
         ])
+
+    def test_pointing_to_fk(self):
+        class Foo(models.Model):
+            pass
+
+        class Bar(models.Model):
+            foo_1 = models.ForeignKey(Foo, on_delete=models.CASCADE, related_name='bar_1')
+            foo_2 = models.ForeignKey(Foo, on_delete=models.CASCADE, related_name='bar_2')
+
+            class Meta:
+                indexes = [models.Index(fields=['foo_1_id', 'foo_2'], name='index_name')]
+
+        self.assertEqual(Bar.check(), [])
 
 
 @isolate_apps('invalid_models_tests')
@@ -418,6 +458,21 @@ class FieldNamesTests(SimpleTestCase):
                 "'pk' is a reserved word that cannot be used as a field name.",
                 obj=Model._meta.get_field('pk'),
                 id='fields.E003',
+            )
+        ])
+
+    def test_db_column_clash(self):
+        class Model(models.Model):
+            foo = models.IntegerField()
+            bar = models.IntegerField(db_column='foo')
+
+        self.assertEqual(Model.check(), [
+            Error(
+                "Field 'bar' has column name 'foo' that is used by "
+                "another field.",
+                hint="Specify a 'db_column' for the field.",
+                obj=Model,
+                id='models.E007',
             )
         ])
 
@@ -616,7 +671,8 @@ class OtherModelTests(SimpleTestCase):
 
         self.assertEqual(Model.check(), [
             Error(
-                "'ordering' refers to the nonexistent field 'relation'.",
+                "'ordering' refers to the nonexistent field, related field, "
+                "or lookup 'relation'.",
                 obj=Model,
                 id='models.E015',
             ),
@@ -629,7 +685,8 @@ class OtherModelTests(SimpleTestCase):
 
         self.assertEqual(Model.check(), [
             Error(
-                "'ordering' refers to the nonexistent field 'missing_field'.",
+                "'ordering' refers to the nonexistent field, related field, "
+                "or lookup 'missing_field'.",
                 obj=Model,
                 id='models.E015',
             )
@@ -644,11 +701,95 @@ class OtherModelTests(SimpleTestCase):
 
         self.assertEqual(Model.check(), [
             Error(
-                "'ordering' refers to the nonexistent field 'missing_fk_field_id'.",
+                "'ordering' refers to the nonexistent field, related field, "
+                "or lookup 'missing_fk_field_id'.",
                 obj=Model,
                 id='models.E015',
             )
         ])
+
+    def test_ordering_pointing_to_missing_related_field(self):
+        class Model(models.Model):
+            test = models.IntegerField()
+
+            class Meta:
+                ordering = ('missing_related__id',)
+
+        self.assertEqual(Model.check(), [
+            Error(
+                "'ordering' refers to the nonexistent field, related field, "
+                "or lookup 'missing_related__id'.",
+                obj=Model,
+                id='models.E015',
+            )
+        ])
+
+    def test_ordering_pointing_to_missing_related_model_field(self):
+        class Parent(models.Model):
+            pass
+
+        class Child(models.Model):
+            parent = models.ForeignKey(Parent, models.CASCADE)
+
+            class Meta:
+                ordering = ('parent__missing_field',)
+
+        self.assertEqual(Child.check(), [
+            Error(
+                "'ordering' refers to the nonexistent field, related field, "
+                "or lookup 'parent__missing_field'.",
+                obj=Child,
+                id='models.E015',
+            )
+        ])
+
+    def test_ordering_pointing_to_non_related_field(self):
+        class Child(models.Model):
+            parent = models.IntegerField()
+
+            class Meta:
+                ordering = ('parent__missing_field',)
+
+        self.assertEqual(Child.check(), [
+            Error(
+                "'ordering' refers to the nonexistent field, related field, "
+                "or lookup 'parent__missing_field'.",
+                obj=Child,
+                id='models.E015',
+            )
+        ])
+
+    def test_ordering_pointing_to_two_related_model_field(self):
+        class Parent2(models.Model):
+            pass
+
+        class Parent1(models.Model):
+            parent2 = models.ForeignKey(Parent2, models.CASCADE)
+
+        class Child(models.Model):
+            parent1 = models.ForeignKey(Parent1, models.CASCADE)
+
+            class Meta:
+                ordering = ('parent1__parent2__missing_field',)
+
+        self.assertEqual(Child.check(), [
+            Error(
+                "'ordering' refers to the nonexistent field, related field, "
+                "or lookup 'parent1__parent2__missing_field'.",
+                obj=Child,
+                id='models.E015',
+            )
+        ])
+
+    def test_ordering_allows_registered_lookups(self):
+        class Model(models.Model):
+            test = models.CharField(max_length=100)
+
+            class Meta:
+                ordering = ('test__lower',)
+
+        with register_lookup(models.CharField, Lower):
+            self.assertEqual(Model.check(), [])
 
     def test_ordering_pointing_to_foreignkey_field(self):
         class Parent(models.Model):
@@ -771,12 +912,34 @@ class OtherModelTests(SimpleTestCase):
 
         self.assertEqual(Group.check(), [
             Error(
-                "The model has two many-to-many relations through "
+                "The model has two identical many-to-many relations through "
                 "the intermediate model 'invalid_models_tests.Membership'.",
                 obj=Group,
                 id='models.E003',
             )
         ])
+
+    def test_two_m2m_through_same_model_with_different_through_fields(self):
+        class Country(models.Model):
+            pass
+
+        class ShippingMethod(models.Model):
+            to_countries = models.ManyToManyField(
+                Country, through='ShippingMethodPrice',
+                through_fields=('method', 'to_country'),
+            )
+            from_countries = models.ManyToManyField(
+                Country, through='ShippingMethodPrice',
+                through_fields=('method', 'from_country'),
+                related_name='+',
+            )
+
+        class ShippingMethodPrice(models.Model):
+            method = models.ForeignKey(ShippingMethod, models.CASCADE)
+            to_country = models.ForeignKey(Country, models.CASCADE)
+            from_country = models.ForeignKey(Country, models.CASCADE)
+
+        self.assertEqual(ShippingMethod.check(), [])
 
     def test_missing_parent_link(self):
         msg = 'Add parent_link=True to invalid_models_tests.ParkingLot.parent.'
@@ -981,7 +1144,7 @@ class ConstraintsTests(SimpleTestCase):
             age = models.IntegerField()
 
             class Meta:
-                constraints = [models.CheckConstraint(models.Q(age__gte=18), 'is_adult')]
+                constraints = [models.CheckConstraint(check=models.Q(age__gte=18), name='is_adult')]
 
         errors = Model.check()
         warn = Warning(

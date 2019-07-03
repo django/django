@@ -24,17 +24,17 @@ class GeoFlexibleFieldLookupDict(FlexibleFieldLookupDict):
 class SpatiaLiteIntrospection(DatabaseIntrospection):
     data_types_reverse = GeoFlexibleFieldLookupDict()
 
-    def get_geometry_type(self, table_name, geo_col):
+    def get_geometry_type(self, table_name, description):
         with self.connection.cursor() as cursor:
             # Querying the `geometry_columns` table to get additional metadata.
             cursor.execute('SELECT coord_dimension, srid, geometry_type '
                            'FROM geometry_columns '
                            'WHERE f_table_name=%s AND f_geometry_column=%s',
-                           (table_name, geo_col))
+                           (table_name, description.name))
             row = cursor.fetchone()
             if not row:
                 raise Exception('Could not find a geometry column for "%s"."%s"' %
-                                (table_name, geo_col))
+                                (table_name, description.name))
 
             # OGRGeomType does not require GDAL and makes it easy to convert
             # from OGC geom type name to Django field.

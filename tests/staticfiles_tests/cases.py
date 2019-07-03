@@ -1,4 +1,3 @@
-import codecs
 import os
 import shutil
 import tempfile
@@ -24,7 +23,7 @@ class BaseStaticFilesMixin:
         )
 
     def assertFileNotFound(self, filepath):
-        with self.assertRaises(IOError):
+        with self.assertRaises(OSError):
             self._get_file(filepath)
 
     def render_template(self, template, **kwargs):
@@ -86,7 +85,7 @@ class CollectionTestCase(BaseStaticFilesMixin, SimpleTestCase):
     def _get_file(self, filepath):
         assert filepath, 'filepath is empty.'
         filepath = os.path.join(settings.STATIC_ROOT, filepath)
-        with codecs.open(filepath, "r", "utf-8") as f:
+        with open(filepath, encoding='utf-8') as f:
             return f.read()
 
 

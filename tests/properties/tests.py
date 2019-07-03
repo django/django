@@ -5,9 +5,9 @@ from .models import Person
 
 class PropertyTests(TestCase):
 
-    def setUp(self):
-        self.a = Person(first_name='John', last_name='Lennon')
-        self.a.save()
+    @classmethod
+    def setUpTestData(cls):
+        cls.a = Person.objects.create(first_name='John', last_name='Lennon')
 
     def test_getter(self):
         self.assertEqual(self.a.full_name, 'John Lennon')

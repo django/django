@@ -7,15 +7,16 @@
 # Grigory Fateyev (aka greg) <gfborn@gmail.com>, 2018
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Mingun <Alexander_Sergey@mail.ru>, 2014
+# SeryiMysh <vital@dorokhin.kz>, 2018
 # Алексей Борискин <sun.void@gmail.com>, 2012,2014
 # Дмитрий Шатера <mr.bobsans@gmail.com>, 2018
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-05-17 11:49+0200\n"
-"PO-Revision-Date: 2018-08-01 07:32+0000\n"
-"Last-Translator: Grigory Fateyev (aka greg) <gfborn@gmail.com>\n"
+"POT-Creation-Date: 2019-01-16 20:42+0100\n"
+"PO-Revision-Date: 2018-11-05 07:07+0000\n"
+"Last-Translator: SeryiMysh <vital@dorokhin.kz>\n"
 "Language-Team: Russian (http://www.transifex.com/django/django/language/"
 "ru/)\n"
 "MIME-Version: 1.0\n"
@@ -32,57 +33,57 @@ msgstr "Приведение значений к виду, понятному ч
 #. Translators: Ordinal format for 11 (11th), 12 (12th), and 13 (13th).
 msgctxt "ordinal 11, 12, 13"
 msgid "{}th"
-msgstr ""
+msgstr "{}-й"
 
 #. Translators: Ordinal format when value ends with 0, e.g. 80th.
 msgctxt "ordinal 0"
 msgid "{}th"
-msgstr ""
+msgstr "{}-й"
 
 #. Translators: Ordinal format when value ends with 1, e.g. 81st, except 11.
 msgctxt "ordinal 1"
 msgid "{}st"
-msgstr ""
+msgstr "{}-й"
 
 #. Translators: Ordinal format when value ends with 2, e.g. 82nd, except 12.
 msgctxt "ordinal 2"
 msgid "{}nd"
-msgstr ""
+msgstr "{}-й"
 
 #. Translators: Ordinal format when value ends with 3, e.g. 83th, except 13.
 msgctxt "ordinal 3"
 msgid "{}rd"
-msgstr ""
+msgstr "{}-й"
 
 #. Translators: Ordinal format when value ends with 4, e.g. 84th.
 msgctxt "ordinal 4"
 msgid "{}th"
-msgstr ""
+msgstr "{}-й"
 
 #. Translators: Ordinal format when value ends with 5, e.g. 85th.
 msgctxt "ordinal 5"
 msgid "{}th"
-msgstr ""
+msgstr "{}-й"
 
 #. Translators: Ordinal format when value ends with 6, e.g. 86th.
 msgctxt "ordinal 6"
 msgid "{}th"
-msgstr ""
+msgstr "{}-й"
 
 #. Translators: Ordinal format when value ends with 7, e.g. 87th.
 msgctxt "ordinal 7"
 msgid "{}th"
-msgstr ""
+msgstr "{}-й"
 
 #. Translators: Ordinal format when value ends with 8, e.g. 88th.
 msgctxt "ordinal 8"
 msgid "{}th"
-msgstr ""
+msgstr "{}-й"
 
 #. Translators: Ordinal format when value ends with 9, e.g. 89th.
 msgctxt "ordinal 9"
 msgid "{}th"
-msgstr ""
+msgstr "{}-й"
 
 #, python-format
 msgid "%(value).1f million"
@@ -302,8 +303,76 @@ msgstr "вчера"
 msgid "%(delta)s ago"
 msgstr "%(delta)s назад"
 
-#. Translators: 'naturaltime-past' strings will be included in
-#. '%(delta)s ago'
+#. Translators: please keep a non-breaking space (U+00A0) between count
+#. and time unit.
+#, python-format
+msgid "an hour ago"
+msgid_plural "%(count)s hours ago"
+msgstr[0] "%(count)s час назад"
+msgstr[1] "%(count)s часа назад"
+msgstr[2] "%(count)s часов назад"
+msgstr[3] "%(count)s часов назад"
+
+#. Translators: please keep a non-breaking space (U+00A0) between count
+#. and time unit.
+#, python-format
+msgid "a minute ago"
+msgid_plural "%(count)s minutes ago"
+msgstr[0] "%(count)s минуту назад"
+msgstr[1] "%(count)s минуты назад"
+msgstr[2] "%(count)s минут назад"
+msgstr[3] "%(count)s минут назад"
+
+#. Translators: please keep a non-breaking space (U+00A0) between count
+#. and time unit.
+#, python-format
+msgid "a second ago"
+msgid_plural "%(count)s seconds ago"
+msgstr[0] "%(count)s секунду назад"
+msgstr[1] "%(count)s секунды назад"
+msgstr[2] "%(count)s секунд назад"
+msgstr[3] "%(count)s секунд назад"
+
+msgid "now"
+msgstr "сейчас"
+
+#. Translators: please keep a non-breaking space (U+00A0) between count
+#. and time unit.
+#, python-format
+msgid "a second from now"
+msgid_plural "%(count)s seconds from now"
+msgstr[0] "через %(count)s секунду"
+msgstr[1] "через %(count)s секунды"
+msgstr[2] "через %(count)s секунд"
+msgstr[3] "через %(count)s секунд"
+
+#. Translators: please keep a non-breaking space (U+00A0) between count
+#. and time unit.
+#, python-format
+msgid "a minute from now"
+msgid_plural "%(count)s minutes from now"
+msgstr[0] "через %(count)s минуту"
+msgstr[1] "через %(count)s минуты"
+msgstr[2] "через %(count)s минут"
+msgstr[3] "через %(count)s минут"
+
+#. Translators: please keep a non-breaking space (U+00A0) between count
+#. and time unit.
+#, python-format
+msgid "an hour from now"
+msgid_plural "%(count)s hours from now"
+msgstr[0] "через %(count)s час"
+msgstr[1] "через %(count)s часа"
+msgstr[2] "через %(count)s часов"
+msgstr[3] "через %(count)s часов"
+
+#. Translators: delta will contain a string like '2 months' or '1 month, 2
+#. weeks'
+#, python-format
+msgid "%(delta)s from now"
+msgstr "через %(delta)s"
+
+#. Translators: 'naturaltime-past' strings will be included in '%(delta)s ago'
 #, python-format
 msgctxt "naturaltime-past"
 msgid "%d year"
@@ -344,61 +413,22 @@ msgstr[3] "%d дней"
 msgctxt "naturaltime-past"
 msgid "%d hour"
 msgid_plural "%d hours"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgstr[0] "%d час"
+msgstr[1] "%d часа"
+msgstr[2] "%d часов"
+msgstr[3] "%d часов"
 
 #, python-format
 msgctxt "naturaltime-past"
 msgid "%d minute"
 msgid_plural "%d minutes"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgstr[0] "%d минуту"
+msgstr[1] "%d минуты"
+msgstr[2] "%d минут"
+msgstr[3] "%d минут"
 
-msgid "now"
-msgstr "сейчас"
-
-#. Translators: please keep a non-breaking space (U+00A0)
-#. between count and time unit.
-#, python-format
-msgid "a second ago"
-msgid_plural "%(count)s seconds ago"
-msgstr[0] "%(count)s секунду назад"
-msgstr[1] "%(count)s секунды назад"
-msgstr[2] "%(count)s секунд назад"
-msgstr[3] "%(count)s секунд назад"
-
-#. Translators: please keep a non-breaking space (U+00A0)
-#. between count and time unit.
-#, python-format
-msgid "a minute ago"
-msgid_plural "%(count)s minutes ago"
-msgstr[0] "%(count)s минуту назад"
-msgstr[1] "%(count)s минуты назад"
-msgstr[2] "%(count)s минут назад"
-msgstr[3] "%(count)s минут назад"
-
-#. Translators: please keep a non-breaking space (U+00A0)
-#. between count and time unit.
-#, python-format
-msgid "an hour ago"
-msgid_plural "%(count)s hours ago"
-msgstr[0] "%(count)s час назад"
-msgstr[1] "%(count)s часа назад"
-msgstr[2] "%(count)s часов назад"
-msgstr[3] "%(count)s часов назад"
-
-#. Translators: delta will contain a string like '2 months' or '1 month, 2
-#. weeks'
-#, python-format
-msgid "%(delta)s from now"
-msgstr "через %(delta)s"
-
-#. Translators: 'naturaltime-future' strings will be included in
-#. '%(delta)s from now'
+#. Translators: 'naturaltime-future' strings will be included in '%(delta)s
+#. from now'
 #, python-format
 msgctxt "naturaltime-future"
 msgid "%d year"
@@ -452,33 +482,3 @@ msgstr[0] "%d минута"
 msgstr[1] "%d минуты"
 msgstr[2] "%d минут"
 msgstr[3] "%d минут"
-
-#. Translators: please keep a non-breaking space (U+00A0)
-#. between count and time unit.
-#, python-format
-msgid "a second from now"
-msgid_plural "%(count)s seconds from now"
-msgstr[0] "через %(count)s секунду"
-msgstr[1] "через %(count)s секунды"
-msgstr[2] "через %(count)s секунд"
-msgstr[3] "через %(count)s секунд"
-
-#. Translators: please keep a non-breaking space (U+00A0)
-#. between count and time unit.
-#, python-format
-msgid "a minute from now"
-msgid_plural "%(count)s minutes from now"
-msgstr[0] "через %(count)s минуту"
-msgstr[1] "через %(count)s минуты"
-msgstr[2] "через %(count)s минут"
-msgstr[3] "через %(count)s минут"
-
-#. Translators: please keep a non-breaking space (U+00A0)
-#. between count and time unit.
-#, python-format
-msgid "an hour from now"
-msgid_plural "%(count)s hours from now"
-msgstr[0] "через %(count)s час"
-msgstr[1] "через %(count)s часа"
-msgstr[2] "через %(count)s часов"
-msgstr[3] "через %(count)s часов"

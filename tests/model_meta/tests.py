@@ -27,7 +27,7 @@ class OptionsBaseTests(SimpleTestCase):
         return None if model == current_model else model
 
     def _details(self, current_model, relation):
-        direct = isinstance(relation, Field) or isinstance(relation, GenericForeignKey)
+        direct = isinstance(relation, (Field, GenericForeignKey))
         model = relation.model._meta.concrete_model
         if model == current_model:
             model = None

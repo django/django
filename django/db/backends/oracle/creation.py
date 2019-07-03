@@ -187,16 +187,32 @@ class DatabaseCreation(BaseDatabaseCreation):
     def _execute_test_db_creation(self, cursor, parameters, verbosity, keepdb=False):
         if verbosity >= 2:
             self.log('_create_test_db(): dbname = %s' % parameters['user'])
-        statements = [
-            """CREATE TABLESPACE %(tblspace)s
-               DATAFILE '%(datafile)s' SIZE %(size)s
-               REUSE AUTOEXTEND ON NEXT %(extsize)s MAXSIZE %(maxsize)s
-            """,
-            """CREATE TEMPORARY TABLESPACE %(tblspace_temp)s
-               TEMPFILE '%(datafile_tmp)s' SIZE %(size_tmp)s
-               REUSE AUTOEXTEND ON NEXT %(extsize_tmp)s MAXSIZE %(maxsize_tmp)s
-            """,
-        ]
+        if self._test_database_oracle_managed_files():
+            statements = [
+                """
+                CREATE TABLESPACE %(tblspace)s
+                DATAFILE SIZE %(size)s
+                AUTOEXTEND ON NEXT %(extsize)s MAXSIZE %(maxsize)s
+                """,
+                """
+                CREATE TEMPORARY TABLESPACE %(tblspace_temp)s
+                TEMPFILE SIZE %(size_tmp)s
+                AUTOEXTEND ON NEXT %(extsize_tmp)s MAXSIZE %(maxsize_tmp)s
+                """,
+            ]
+        else:
+            statements = [
+                """
+                CREATE TABLESPACE %(tblspace)s
+                DATAFILE '%(datafile)s' SIZE %(size)s REUSE
+                AUTOEXTEND ON NEXT %(extsize)s MAXSIZE %(maxsize)s
+                """,
+                """
+                CREATE TEMPORARY TABLESPACE %(tblspace_temp)s
+                TEMPFILE '%(datafile_tmp)s' SIZE %(size_tmp)s REUSE
+                AUTOEXTEND ON NEXT %(extsize_tmp)s MAXSIZE %(maxsize_tmp)s
+                """,
+            ]
         # Ignore "tablespace already exists" error when keepdb is on.
         acceptable_ora_err = 'ORA-01543' if keepdb else None
         self._execute_allow_fail_statements(cursor, statements, parameters, verbosity, acceptable_ora_err)
@@ -225,11 +241,14 @@ class DatabaseCreation(BaseDatabaseCreation):
         if not success and self._test_settings_get('PASSWORD') is None:
             set_password = 'ALTER USER %(user)s IDENTIFIED BY "%(password)s"'
             self._execute_statements(cursor, [set_password], parameters, verbosity)
-        # Most test-suites can be run without the create-view privilege. But some need it.
-        extra = "GRANT CREATE VIEW TO %(user)s"
-        success = self._execute_allow_fail_statements(cursor, [extra], parameters, verbosity, 'ORA-01031')
-        if not success and verbosity >= 2:
-            self.log('Failed to grant CREATE VIEW permission to test user. This may be ok.')
+        # Most test suites can be run without "create view" and
+        # "create materialized view" privileges. But some need it.
+        for object_type in ('VIEW', 'MATERIALIZED VIEW'):
+            extra = 'GRANT CREATE %(object_type)s TO %(user)s'
+            parameters['object_type'] = object_type
+            success = self._execute_allow_fail_statements(cursor, [extra], parameters, verbosity, 'ORA-01031')
+            if not success and verbosity >= 2:
+                self.log('Failed to grant CREATE %s permission to test user. This may be ok.' % object_type)
 
     def _execute_test_db_destruction(self, cursor, parameters, verbosity):
         if verbosity >= 2:
@@ -243,7 +262,7 @@ class DatabaseCreation(BaseDatabaseCreation):
     def _destroy_test_user(self, cursor, parameters, verbosity):
         if verbosity >= 2:
             self.log('_destroy_test_user(): user=%s' % parameters['user'])
-            self.log('Be patient.  This can take some time...')
+            self.log('Be patient. This can take some time...')
         statements = [
             'DROP USER %(user)s CASCADE',
         ]
@@ -358,6 +377,9 @@ class DatabaseCreation(BaseDatabaseCreation):
 
     def _test_database_tblspace_tmp_extsize(self):
         return self._test_settings_get('DATAFILE_TMP_EXTSIZE', default='25M')
+
+    def _test_database_oracle_managed_files(self):
+        return self._test_settings_get('ORACLE_MANAGED_FILES', default=False)
 
     def _get_test_db_name(self):
         """

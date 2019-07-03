@@ -2,7 +2,7 @@
 Django 2.1.1 release notes
 ==========================
 
-*Expected September 1, 2018*
+*August 31, 2018*
 
 Django 2.1.1 fixes several bugs in 2.1.
 
@@ -32,3 +32,20 @@ Bugfixes
 * Fixed a regression where a ``related_query_name`` reverse accessor wasn't set
   up when a ``GenericRelation`` is declared on an abstract base model
   (:ticket:`29653`).
+
+* Fixed the test client's JSON serialization of a request data dictionary for
+  structured content type suffixes (:ticket:`29662`).
+
+* Made the admin change view redirect to the changelist view after a POST if
+  the user has the 'view' permission (:ticket:`29663`).
+
+* Fixed admin change view crash for view-only users if the form has an extra
+  form field (:ticket:`29682`).
+
+* Fixed a regression in Django 2.0.5 where ``QuerySet.values()`` or
+  ``values_list()`` after combining querysets with ``extra()`` with
+  ``union()``, ``difference()``, or ``intersection()`` crashed due to
+  mismatching columns (:ticket:`29694`).
+
+* Fixed crash if ``InlineModelAdmin.has_add_permission()`` doesn't accept the
+  ``obj`` argument (:ticket:`29723`).

@@ -162,7 +162,7 @@ class AdminReadonlyField:
         if form._meta.labels and class_name in form._meta.labels:
             label = form._meta.labels[class_name]
         else:
-            label = label_for_field(field, form._meta.model, model_admin)
+            label = label_for_field(field, form._meta.model, model_admin, form=form)
 
         if form._meta.help_texts and class_name in form._meta.help_texts:
             help_text = form._meta.help_texts[class_name]
@@ -187,7 +187,7 @@ class AdminReadonlyField:
         if not self.is_first:
             attrs["class"] = "inline"
         label = self.field['label']
-        return format_html('<label{}>{}:</label>', flatatt(attrs), capfirst(label))
+        return format_html('<label{}>{}{}</label>', flatatt(attrs), capfirst(label), self.form.label_suffix)
 
     def contents(self):
         from django.contrib.admin.templatetags.admin_list import _boolean_icon
@@ -197,6 +197,12 @@ class AdminReadonlyField:
         except (AttributeError, ValueError, ObjectDoesNotExist):
             result_repr = self.empty_value_display
         else:
+            if field in self.form.fields:
+                widget = self.form[field].field.widget
+                # This isn't elegant but suffices for contrib.auth's
+                # ReadOnlyPasswordHashWidget.
+                if getattr(widget, 'read_only', False):
+                    return widget.render(field, value)
             if f is None:
                 if getattr(attr, 'boolean', False):
                     result_repr = _boolean_icon(value)
@@ -273,7 +279,13 @@ class InlineAdminFormSet:
                 continue
             if not self.has_change_permission or field_name in self.readonly_fields:
                 yield {
-                    'label': meta_labels.get(field_name) or label_for_field(field_name, self.opts.model, self.opts),
+                    'name': field_name,
+                    'label': meta_labels.get(field_name) or label_for_field(
+                        field_name,
+                        self.opts.model,
+                        self.opts,
+                        form=empty_form,
+                    ),
                     'widget': {'is_hidden': False},
                     'required': False,
                     'help_text': meta_help_texts.get(field_name) or help_text_for_field(field_name, self.opts.model),
@@ -282,8 +294,9 @@ class InlineAdminFormSet:
                 form_field = empty_form.fields[field_name]
                 label = form_field.label
                 if label is None:
-                    label = label_for_field(field_name, self.opts.model, self.opts)
+                    label = label_for_field(field_name, self.opts.model, self.opts, form=empty_form)
                 yield {
+                    'name': field_name,
                     'label': label,
                     'widget': form_field.widget,
                     'required': form_field.required,

@@ -9,15 +9,34 @@ for a list of all possible variables.
 import importlib
 import os
 import time
+import traceback
 import warnings
 from pathlib import Path
 
+import django
 from django.conf import global_settings
 from django.core.exceptions import ImproperlyConfigured
-from django.utils.deprecation import RemovedInDjango30Warning
+from django.utils.deprecation import RemovedInDjango31Warning
 from django.utils.functional import LazyObject, empty
 
 ENVIRONMENT_VARIABLE = "DJANGO_SETTINGS_MODULE"
+
+FILE_CHARSET_DEPRECATED_MSG = (
+    'The FILE_CHARSET setting is deprecated. Starting with Django 3.1, all '
+    'files read from disk must be UTF-8 encoded.'
+)
+
+
+class SettingsReference(str):
+    """
+    String subclass which references a current settings value. It's treated as
+    the value in memory but serializes to a settings.NAME attribute reference.
+    """
+    def __new__(self, value, setting_name):
+        return str.__new__(self, value)
+
+    def __init__(self, value, setting_name):
+        self.setting_name = setting_name
 
 
 class LazySettings(LazyObject):
@@ -85,6 +104,8 @@ class LazySettings(LazyObject):
             raise RuntimeError('Settings already configured.')
         holder = UserSettingsHolder(default_settings)
         for name, value in options.items():
+            if not name.isupper():
+                raise TypeError('Setting %r must be uppercase.' % name)
             setattr(holder, name, value)
         self._wrapped = holder
 
@@ -92,6 +113,20 @@ class LazySettings(LazyObject):
     def configured(self):
         """Return True if the settings have already been configured."""
         return self._wrapped is not empty
+
+    @property
+    def FILE_CHARSET(self):
+        stack = traceback.extract_stack()
+        # Show a warning if the setting is used outside of Django.
+        # Stack index: -1 this line, -2 the caller.
+        filename, _line_number, _function_name, _text = stack[-2]
+        if not filename.startswith(os.path.dirname(django.__file__)):
+            warnings.warn(
+                FILE_CHARSET_DEPRECATED_MSG,
+                RemovedInDjango31Warning,
+                stacklevel=2,
+            )
+        return self.__getattr__('FILE_CHARSET')
 
 
 class Settings:
@@ -125,8 +160,8 @@ class Settings:
         if not self.SECRET_KEY:
             raise ImproperlyConfigured("The SECRET_KEY setting must not be empty.")
 
-        if self.is_overridden('DEFAULT_CONTENT_TYPE'):
-            warnings.warn('The DEFAULT_CONTENT_TYPE setting is deprecated.', RemovedInDjango30Warning)
+        if self.is_overridden('FILE_CHARSET'):
+            warnings.warn(FILE_CHARSET_DEPRECATED_MSG, RemovedInDjango31Warning)
 
         if hasattr(time, 'tzset') and self.TIME_ZONE:
             # When we can, attempt to validate the timezone. If we can't find
@@ -165,14 +200,14 @@ class UserSettingsHolder:
         self.default_settings = default_settings
 
     def __getattr__(self, name):
-        if name in self._deleted:
+        if not name.isupper() or name in self._deleted:
             raise AttributeError
         return getattr(self.default_settings, name)
 
     def __setattr__(self, name, value):
         self._deleted.discard(name)
-        if name == 'DEFAULT_CONTENT_TYPE':
-            warnings.warn('The DEFAULT_CONTENT_TYPE setting is deprecated.', RemovedInDjango30Warning)
+        if name == 'FILE_CHARSET':
+            warnings.warn(FILE_CHARSET_DEPRECATED_MSG, RemovedInDjango31Warning)
         super().__setattr__(name, value)
 
     def __delattr__(self, name):
@@ -182,7 +217,7 @@ class UserSettingsHolder:
 
     def __dir__(self):
         return sorted(
-            s for s in list(self.__dict__) + dir(self.default_settings)
+            s for s in [*self.__dict__, *dir(self.default_settings)]
             if s not in self._deleted
         )
 

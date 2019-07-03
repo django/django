@@ -1,18 +1,20 @@
 """
 Oracle database backend for Django.
 
-Requires cx_Oracle: http://cx-oracle.sourceforge.net/
+Requires cx_Oracle: https://oracle.github.io/python-cx_Oracle/
 """
 import datetime
 import decimal
 import os
 import platform
+from contextlib import contextmanager
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.db import utils
 from django.db.backends.base.base import BaseDatabaseWrapper
-from django.utils.encoding import force_bytes, force_text
+from django.utils.asyncio import async_unsafe
+from django.utils.encoding import force_bytes, force_str
 from django.utils.functional import cached_property
 
 
@@ -56,6 +58,24 @@ from .operations import DatabaseOperations                  # NOQA isort:skip
 from .schema import DatabaseSchemaEditor                    # NOQA isort:skip
 from .utils import Oracle_datetime                          # NOQA isort:skip
 from .validation import DatabaseValidation                  # NOQA isort:skip
+
+
+@contextmanager
+def wrap_oracle_errors():
+    try:
+        yield
+    except Database.DatabaseError as e:
+        # cx_Oracle raises a cx_Oracle.DatabaseError exception with the
+        # following attributes and values:
+        #  code = 2091
+        #  message = 'ORA-02091: transaction rolled back
+        #            'ORA-02291: integrity constraint (TEST_DJANGOTEST.SYS
+        #               _C00102056) violated - parent key not found'
+        # Convert that case to Django's IntegrityError exception.
+        x = e.args[0]
+        if hasattr(x, 'code') and hasattr(x, 'message') and x.code == 2091 and 'ORA-02291' in x.message:
+            raise utils.IntegrityError(*tuple(e.args))
+        raise
 
 
 class _UninitializedOperatorsDescriptor:
@@ -149,8 +169,8 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     # The patterns below are used to generate SQL pattern lookup clauses when
     # the right-hand side of the lookup isn't a raw string (it might be an expression
     # or the result of a bilateral transformation).
-    # In those cases, special characters for LIKE operators (e.g. \, *, _) should be
-    # escaped on database side.
+    # In those cases, special characters for LIKE operators (e.g. \, %, _)
+    # should be escaped on the database side.
     #
     # Note: we use str.format() here for readability as '%' is used as a wildcard for
     # the LIKE operator.
@@ -183,7 +203,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         use_returning_into = self.settings_dict["OPTIONS"].get('use_returning_into', True)
-        self.features.can_return_id_from_insert = use_returning_into
+        self.features.can_return_columns_from_insert = use_returning_into
 
     def _dsn(self):
         settings_dict = self.settings_dict
@@ -194,7 +214,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         return settings_dict['NAME']
 
     def _connect_string(self):
-        return '%s/\\"%s\\"@%s' % (self.settings_dict['USER'], self.settings_dict['PASSWORD'], self._dsn())
+        return '%s/"%s"@%s' % (self.settings_dict['USER'], self.settings_dict['PASSWORD'], self._dsn())
 
     def get_connection_params(self):
         conn_params = self.settings_dict['OPTIONS'].copy()
@@ -202,6 +222,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             del conn_params['use_returning_into']
         return conn_params
 
+    @async_unsafe
     def get_new_connection(self, conn_params):
         return Database.connect(
             user=self.settings_dict['USER'],
@@ -250,26 +271,14 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         if not self.get_autocommit():
             self.commit()
 
+    @async_unsafe
     def create_cursor(self, name=None):
         return FormatStylePlaceholderCursor(self.connection)
 
     def _commit(self):
         if self.connection is not None:
-            try:
+            with wrap_oracle_errors():
                 return self.connection.commit()
-            except Database.DatabaseError as e:
-                # cx_Oracle raises a cx_Oracle.DatabaseError exception
-                # with the following attributes and values:
-                #  code = 2091
-                #  message = 'ORA-02091: transaction rolled back
-                #            'ORA-02291: integrity constraint (TEST_DJANGOTEST.SYS
-                #               _C00102056) violated - parent key not found'
-                # We convert that particular case to our IntegrityError exception
-                x = e.args[0]
-                if hasattr(x, 'code') and hasattr(x, 'message') \
-                   and x.code == 2091 and 'ORA-02291' in x.message:
-                    raise utils.IntegrityError(*tuple(e.args))
-                raise
 
     # Oracle doesn't support releasing savepoints. But we fake them when query
     # logging is enabled to keep query counts consistent with other backends.
@@ -301,16 +310,9 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             return True
 
     @cached_property
-    def oracle_full_version(self):
-        with self.temporary_connection():
-            return self.connection.version
-
-    @cached_property
     def oracle_version(self):
-        try:
-            return int(self.oracle_full_version.split('.')[0])
-        except ValueError:
-            return None
+        with self.temporary_connection():
+            return tuple(int(x) for x in self.connection.version.split('.'))
 
 
 class OracleParam:
@@ -343,7 +345,7 @@ class OracleParam:
         else:
             # To transmit to the database, we need Unicode if supported
             # To get size right, we must consider bytes.
-            self.force_bytes = force_text(param, cursor.charset, strings_only)
+            self.force_bytes = force_str(param, cursor.charset, strings_only)
             if isinstance(self.force_bytes, str):
                 # We could optimize by only converting up to 4000 bytes here
                 string_size = len(force_bytes(param, cursor.charset, strings_only))
@@ -388,17 +390,12 @@ class FormatStylePlaceholderCursor:
     Django uses "format" (e.g. '%s') style placeholders, but Oracle uses ":var"
     style. This fixes it -- but note that if you want to use a literal "%s" in
     a query, you'll need to use "%%s".
-
-    We also do automatic conversion between Unicode on the Python side and
-    UTF-8 -- for talking to Oracle -- in here.
     """
     charset = 'utf-8'
 
     def __init__(self, connection):
         self.cursor = connection.cursor()
         self.cursor.outputtypehandler = self._output_type_handler
-        # The default for cx_Oracle < 5.3 is 50.
-        self.cursor.arraysize = 100
 
     @staticmethod
     def _output_number_converter(value):
@@ -512,7 +509,8 @@ class FormatStylePlaceholderCursor:
     def execute(self, query, params=None):
         query, params = self._fix_for_params(query, params, unify_by_values=True)
         self._guess_input_sizes([params])
-        return self.cursor.execute(query, self._param_generator(params))
+        with wrap_oracle_errors():
+            return self.cursor.execute(query, self._param_generator(params))
 
     def executemany(self, query, params=None):
         if not params:
@@ -525,7 +523,8 @@ class FormatStylePlaceholderCursor:
         # more than once, we can't make it lazy by using a generator
         formatted = [firstparams] + [self._format_params(p) for p in params_iter]
         self._guess_input_sizes(formatted)
-        return self.cursor.executemany(query, [self._param_generator(p) for p in formatted])
+        with wrap_oracle_errors():
+            return self.cursor.executemany(query, [self._param_generator(p) for p in formatted])
 
     def close(self):
         try:

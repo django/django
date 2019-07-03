@@ -3,6 +3,7 @@ import os
 import stat
 import unittest
 from io import StringIO
+from pathlib import Path
 from subprocess import Popen
 from unittest import mock
 
@@ -132,6 +133,44 @@ class ExcludedLocaleCompilationTests(MessageCompilationTests):
         self.assertTrue(os.path.exists(self.MO_FILE % 'en'))
         self.assertFalse(os.path.exists(self.MO_FILE % 'fr'))
         self.assertFalse(os.path.exists(self.MO_FILE % 'it'))
+
+
+class IgnoreDirectoryCompilationTests(MessageCompilationTests):
+    # Reuse the exclude directory since it contains some locale fixtures.
+    work_subdir = 'exclude'
+    MO_FILE = '%s/%s/LC_MESSAGES/django.mo'
+    CACHE_DIR = Path('cache') / 'locale'
+    NESTED_DIR = Path('outdated') / 'v1' / 'locale'
+
+    def setUp(self):
+        super().setUp()
+        copytree('canned_locale', 'locale')
+        copytree('canned_locale', self.CACHE_DIR)
+        copytree('canned_locale', self.NESTED_DIR)
+
+    def assertAllExist(self, dir, langs):
+        self.assertTrue(all(Path(self.MO_FILE % (dir, lang)).exists() for lang in langs))
+
+    def assertNoneExist(self, dir, langs):
+        self.assertTrue(all(Path(self.MO_FILE % (dir, lang)).exists() is False for lang in langs))
+
+    def test_one_locale_dir_ignored(self):
+        call_command('compilemessages', ignore=['cache'], verbosity=0)
+        self.assertAllExist('locale', ['en', 'fr', 'it'])
+        self.assertNoneExist(self.CACHE_DIR, ['en', 'fr', 'it'])
+        self.assertAllExist(self.NESTED_DIR, ['en', 'fr', 'it'])
+
+    def test_multiple_locale_dirs_ignored(self):
+        call_command('compilemessages', ignore=['cache/locale', 'outdated'], verbosity=0)
+        self.assertAllExist('locale', ['en', 'fr', 'it'])
+        self.assertNoneExist(self.CACHE_DIR, ['en', 'fr', 'it'])
+        self.assertNoneExist(self.NESTED_DIR, ['en', 'fr', 'it'])
+
+    def test_ignores_based_on_pattern(self):
+        call_command('compilemessages', ignore=['*/locale'], verbosity=0)
+        self.assertAllExist('locale', ['en', 'fr', 'it'])
+        self.assertNoneExist(self.CACHE_DIR, ['en', 'fr', 'it'])
+        self.assertNoneExist(self.NESTED_DIR, ['en', 'fr', 'it'])
 
 
 class CompilationErrorHandling(MessageCompilationTests):

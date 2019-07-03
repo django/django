@@ -12,7 +12,8 @@ from .models import City
 class GeoFeedTest(TestCase):
     fixtures = ['initial']
 
-    def setUp(self):
+    @classmethod
+    def setUpTestData(cls):
         Site(id=settings.SITE_ID, domain="example.com", name="example.com").save()
 
     def assertChildNodes(self, elem, expected):

@@ -3,11 +3,17 @@ from decimal import Decimal
 from django.db.models import DecimalField
 from django.db.models.functions import Round
 from django.test import TestCase
+from django.test.utils import register_lookup
 
 from ..models import DecimalModel, FloatModel, IntegerModel
 
 
 class RoundTests(TestCase):
+
+    def test_null(self):
+        IntegerModel.objects.create()
+        obj = IntegerModel.objects.annotate(null_round=Round('normal')).first()
+        self.assertIsNone(obj.null_round)
 
     def test_decimal(self):
         DecimalModel.objects.create(n1=Decimal('-12.9'), n2=Decimal('0.6'))
@@ -40,11 +46,8 @@ class RoundTests(TestCase):
         self.assertEqual(obj.big_round, round(obj.big))
 
     def test_transform(self):
-        try:
-            DecimalField.register_lookup(Round)
+        with register_lookup(DecimalField, Round):
             DecimalModel.objects.create(n1=Decimal('2.0'), n2=Decimal('0'))
             DecimalModel.objects.create(n1=Decimal('-1.0'), n2=Decimal('0'))
-            objs = DecimalModel.objects.filter(n1__round__gt=0)
-            self.assertQuerysetEqual(objs, [Decimal('2.0')], lambda a: a.n1)
-        finally:
-            DecimalField._unregister_lookup(Round)
+            obj = DecimalModel.objects.filter(n1__round__gt=0).get()
+            self.assertEqual(obj.n1, Decimal('2.0'))

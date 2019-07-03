@@ -2,6 +2,7 @@
 Management utility to create superusers.
 """
 import getpass
+import os
 import sys
 
 from django.contrib.auth import get_user_model
@@ -138,6 +139,13 @@ class Command(BaseCommand):
                     user_data[PASSWORD_FIELD] = password
             else:
                 # Non-interactive mode.
+                # Use password from environment variable, if provided.
+                if PASSWORD_FIELD in user_data and 'DJANGO_SUPERUSER_PASSWORD' in os.environ:
+                    user_data[PASSWORD_FIELD] = os.environ['DJANGO_SUPERUSER_PASSWORD']
+                # Use username from environment variable, if not provided in
+                # options.
+                if username is None:
+                    username = os.environ.get('DJANGO_SUPERUSER_' + self.UserModel.USERNAME_FIELD.upper())
                 if username is None:
                     raise CommandError('You must use --%s with --noinput.' % self.UserModel.USERNAME_FIELD)
                 else:
@@ -147,11 +155,12 @@ class Command(BaseCommand):
 
                 user_data[self.UserModel.USERNAME_FIELD] = username
                 for field_name in self.UserModel.REQUIRED_FIELDS:
-                    if options[field_name]:
-                        field = self.UserModel._meta.get_field(field_name)
-                        user_data[field_name] = field.clean(options[field_name], None)
-                    else:
+                    env_var = 'DJANGO_SUPERUSER_' + field_name.upper()
+                    value = options[field_name] or os.environ.get(env_var)
+                    if not value:
                         raise CommandError('You must use --%s with --noinput.' % field_name)
+                    field = self.UserModel._meta.get_field(field_name)
+                    user_data[field_name] = field.clean(value, None)
 
             self.UserModel._default_manager.db_manager(database).create_superuser(**user_data)
             if options['verbosity'] >= 1:

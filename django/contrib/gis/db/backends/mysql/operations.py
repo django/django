@@ -29,22 +29,20 @@ class MySQLOperations(BaseSpatialOperations, DatabaseOperations):
 
     @cached_property
     def gis_operators(self):
-        MBREquals = 'MBREqual' if (
-            self.connection.mysql_is_mariadb or self.connection.mysql_version < (5, 7, 6)
-        ) else 'MBREquals'
         return {
             'bbcontains': SpatialOperator(func='MBRContains'),  # For consistency w/PostGIS API
             'bboverlaps': SpatialOperator(func='MBROverlaps'),  # ...
             'contained': SpatialOperator(func='MBRWithin'),  # ...
-            'contains': SpatialOperator(func='MBRContains'),
-            'disjoint': SpatialOperator(func='MBRDisjoint'),
-            'equals': SpatialOperator(func=MBREquals),
-            'exact': SpatialOperator(func=MBREquals),
-            'intersects': SpatialOperator(func='MBRIntersects'),
-            'overlaps': SpatialOperator(func='MBROverlaps'),
-            'same_as': SpatialOperator(func=MBREquals),
-            'touches': SpatialOperator(func='MBRTouches'),
-            'within': SpatialOperator(func='MBRWithin'),
+            'contains': SpatialOperator(func='ST_Contains'),
+            'crosses': SpatialOperator(func='ST_Crosses'),
+            'disjoint': SpatialOperator(func='ST_Disjoint'),
+            'equals': SpatialOperator(func='ST_Equals'),
+            'exact': SpatialOperator(func='ST_Equals'),
+            'intersects': SpatialOperator(func='ST_Intersects'),
+            'overlaps': SpatialOperator(func='ST_Overlaps'),
+            'same_as': SpatialOperator(func='ST_Equals'),
+            'touches': SpatialOperator(func='ST_Touches'),
+            'within': SpatialOperator(func='ST_Within'),
         }
 
     disallowed_aggregates = (
@@ -56,11 +54,12 @@ class MySQLOperations(BaseSpatialOperations, DatabaseOperations):
     def unsupported_functions(self):
         unsupported = {
             'AsGML', 'AsKML', 'AsSVG', 'Azimuth', 'BoundingCircle',
-            'ForcePolygonCW', 'ForceRHR', 'LineLocatePoint', 'MakeValid',
-            'MemSize', 'Perimeter', 'PointOnSurface', 'Reverse', 'Scale',
-            'SnapToGrid', 'Transform', 'Translate',
+            'ForcePolygonCW', 'GeometryDistance', 'LineLocatePoint',
+            'MakeValid', 'MemSize', 'Perimeter', 'PointOnSurface', 'Reverse',
+            'Scale', 'SnapToGrid', 'Transform', 'Translate',
         }
         if self.connection.mysql_is_mariadb:
+            unsupported.remove('PointOnSurface')
             unsupported.update({'GeoHash', 'IsValid'})
             if self.connection.mysql_version < (10, 2, 4):
                 unsupported.add('AsGeoJSON')

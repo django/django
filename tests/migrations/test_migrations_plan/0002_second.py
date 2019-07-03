@@ -15,6 +15,6 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(primary_key=True)),
             ],
         ),
-        migrations.RunSQL('SELECT * FROM migrations_book', 'SELECT * FROM migrations_salamander')
+        migrations.RunSQL(['SELECT * FROM migrations_book'], ['SELECT * FROM migrations_salamander'])
 
     ]

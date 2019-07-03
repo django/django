@@ -47,7 +47,7 @@ class LoadDataWithNaturalKeysTestCase(TestCase):
 
 
 class LoadDataWithNaturalKeysAndMultipleDatabasesTestCase(TestCase):
-    multi_db = True
+    databases = {'default', 'other'}
 
     def test_load_data_with_user_permissions(self):
         # Create test contenttypes for both databases
@@ -110,7 +110,7 @@ class UserManagerTestCase(TestCase):
         self.assertFalse(user.has_usable_password())
 
     def test_create_user_email_domain_normalize_rfc3696(self):
-        # According to  http://tools.ietf.org/html/rfc3696#section-3
+        # According to https://tools.ietf.org/html/rfc3696#section-3
         # the "@" symbol can be part of the local part of an email address
         returned = UserManager.normalize_email(r'Abc\@DEF@EXAMPLE.com')
         self.assertEqual(returned, r'Abc\@DEF@example.com')
@@ -156,7 +156,7 @@ class UserManagerTestCase(TestCase):
             self.assertIn(char, allowed_chars)
 
 
-class AbstractBaseUserTests(TestCase):
+class AbstractBaseUserTests(SimpleTestCase):
 
     def test_has_usable_password(self):
         """
@@ -333,6 +333,7 @@ class AnonymousUserTests(SimpleTestCase):
         self.assertIs(self.user.is_superuser, False)
         self.assertEqual(self.user.groups.all().count(), 0)
         self.assertEqual(self.user.user_permissions.all().count(), 0)
+        self.assertEqual(self.user.get_user_permissions(), set())
         self.assertEqual(self.user.get_group_permissions(), set())
 
     def test_str(self):
@@ -344,6 +345,14 @@ class AnonymousUserTests(SimpleTestCase):
 
     def test_hash(self):
         self.assertEqual(hash(self.user), 1)
+
+    def test_int(self):
+        msg = (
+            'Cannot cast AnonymousUser to int. Are you trying to use it in '
+            'place of User?'
+        )
+        with self.assertRaisesMessage(TypeError, msg):
+            int(self.user)
 
     def test_delete(self):
         with self.assertRaisesMessage(NotImplementedError, self.no_repr_msg):
@@ -360,3 +369,15 @@ class AnonymousUserTests(SimpleTestCase):
     def test_check_password(self):
         with self.assertRaisesMessage(NotImplementedError, self.no_repr_msg):
             self.user.check_password('password')
+
+
+class GroupTests(SimpleTestCase):
+    def test_str(self):
+        g = Group(name='Users')
+        self.assertEqual(str(g), 'Users')
+
+
+class PermissionTests(TestCase):
+    def test_str(self):
+        p = Permission.objects.get(codename='view_customemailfield')
+        self.assertEqual(str(p), 'auth_tests | custom email field | Can view custom email field')

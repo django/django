@@ -3,6 +3,8 @@ from unittest import mock
 from django.db import connections
 from django.test import TestCase, TransactionTestCase, override_settings
 
+from .models import Car
+
 
 class TestSerializedRollbackInhibitsPostMigrate(TransactionTestCase):
     """
@@ -32,9 +34,9 @@ class TestSerializedRollbackInhibitsPostMigrate(TransactionTestCase):
 
 
 @override_settings(DEBUG=True)  # Enable query logging for test_queries_cleared
-class TransactionTestCaseMultiDbTests(TestCase):
+class TransactionTestCaseDatabasesTests(TestCase):
     available_apps = []
-    multi_db = True
+    databases = {'default', 'other'}
 
     def test_queries_cleared(self):
         """
@@ -44,3 +46,17 @@ class TransactionTestCaseMultiDbTests(TestCase):
         """
         for alias in connections:
             self.assertEqual(len(connections[alias].queries_log), 0, 'Failed for alias %s' % alias)
+
+
+class DisallowedDatabaseQueriesTests(TransactionTestCase):
+    available_apps = ['test_utils']
+
+    def test_disallowed_database_queries(self):
+        message = (
+            "Database queries to 'other' are not allowed in this test. "
+            "Add 'other' to test_utils.test_transactiontestcase."
+            "DisallowedDatabaseQueriesTests.databases to ensure proper test "
+            "isolation and silence this failure."
+        )
+        with self.assertRaisesMessage(AssertionError, message):
+            Car.objects.using('other').get()

@@ -4,10 +4,14 @@ from django.contrib.postgres.indexes import (
     BrinIndex, BTreeIndex, GinIndex, GistIndex, HashIndex, SpGistIndex,
 )
 from django.db import connection
+from django.db.models import CharField
+from django.db.models.functions import Length
+from django.db.models.query_utils import Q
 from django.db.utils import NotSupportedError
 from django.test import skipUnlessDBFeature
+from django.test.utils import register_lookup
 
-from . import PostgreSQLTestCase
+from . import PostgreSQLSimpleTestCase, PostgreSQLTestCase
 from .models import CharFieldModel, IntegerArrayModel
 
 
@@ -26,8 +30,7 @@ class IndexTestMixin:
         self.assertEqual(kwargs, {'fields': ['title'], 'name': 'test_title_%s' % self.index_class.suffix})
 
 
-@skipUnlessDBFeature('has_brin_index_support')
-class BrinIndexTests(IndexTestMixin, PostgreSQLTestCase):
+class BrinIndexTests(IndexTestMixin, PostgreSQLSimpleTestCase):
     index_class = BrinIndex
 
     def test_suffix(self):
@@ -50,7 +53,7 @@ class BrinIndexTests(IndexTestMixin, PostgreSQLTestCase):
             BrinIndex(fields=['title'], name='test_title_brin', pages_per_range=0)
 
 
-class BTreeIndexTests(IndexTestMixin, PostgreSQLTestCase):
+class BTreeIndexTests(IndexTestMixin, PostgreSQLSimpleTestCase):
     index_class = BTreeIndex
 
     def test_suffix(self):
@@ -64,7 +67,7 @@ class BTreeIndexTests(IndexTestMixin, PostgreSQLTestCase):
         self.assertEqual(kwargs, {'fields': ['title'], 'name': 'test_title_btree', 'fillfactor': 80})
 
 
-class GinIndexTests(IndexTestMixin, PostgreSQLTestCase):
+class GinIndexTests(IndexTestMixin, PostgreSQLSimpleTestCase):
     index_class = GinIndex
 
     def test_suffix(self):
@@ -88,7 +91,7 @@ class GinIndexTests(IndexTestMixin, PostgreSQLTestCase):
         })
 
 
-class GistIndexTests(IndexTestMixin, PostgreSQLTestCase):
+class GistIndexTests(IndexTestMixin, PostgreSQLSimpleTestCase):
     index_class = GistIndex
 
     def test_suffix(self):
@@ -107,7 +110,7 @@ class GistIndexTests(IndexTestMixin, PostgreSQLTestCase):
         })
 
 
-class HashIndexTests(IndexTestMixin, PostgreSQLTestCase):
+class HashIndexTests(IndexTestMixin, PostgreSQLSimpleTestCase):
     index_class = HashIndex
 
     def test_suffix(self):
@@ -121,7 +124,7 @@ class HashIndexTests(IndexTestMixin, PostgreSQLTestCase):
         self.assertEqual(kwargs, {'fields': ['title'], 'name': 'test_title_hash', 'fillfactor': 80})
 
 
-class SpGistIndexTests(IndexTestMixin, PostgreSQLTestCase):
+class SpGistIndexTests(IndexTestMixin, PostgreSQLSimpleTestCase):
     index_class = SpGistIndex
 
     def test_suffix(self):
@@ -172,7 +175,36 @@ class SchemaTests(PostgreSQLTestCase):
             editor.remove_index(IntegerArrayModel, index)
         self.assertNotIn(index_name, self.get_constraints(IntegerArrayModel._meta.db_table))
 
-    @skipUnlessDBFeature('has_gin_pending_list_limit')
+    def test_partial_gin_index(self):
+        with register_lookup(CharField, Length):
+            index_name = 'char_field_gin_partial_idx'
+            index = GinIndex(fields=['field'], name=index_name, condition=Q(field__length=40))
+            with connection.schema_editor() as editor:
+                editor.add_index(CharFieldModel, index)
+            constraints = self.get_constraints(CharFieldModel._meta.db_table)
+            self.assertEqual(constraints[index_name]['type'], 'gin')
+            with connection.schema_editor() as editor:
+                editor.remove_index(CharFieldModel, index)
+            self.assertNotIn(index_name, self.get_constraints(CharFieldModel._meta.db_table))
+
+    def test_partial_gin_index_with_tablespace(self):
+        with register_lookup(CharField, Length):
+            index_name = 'char_field_gin_partial_idx'
+            index = GinIndex(
+                fields=['field'],
+                name=index_name,
+                condition=Q(field__length=40),
+                db_tablespace='pg_default',
+            )
+            with connection.schema_editor() as editor:
+                editor.add_index(CharFieldModel, index)
+                self.assertIn('TABLESPACE "pg_default" ', str(index.create_sql(CharFieldModel, editor)))
+            constraints = self.get_constraints(CharFieldModel._meta.db_table)
+            self.assertEqual(constraints[index_name]['type'], 'gin')
+            with connection.schema_editor() as editor:
+                editor.remove_index(CharFieldModel, index)
+            self.assertNotIn(index_name, self.get_constraints(CharFieldModel._meta.db_table))
+
     def test_gin_parameters(self):
         index_name = 'integer_array_gin_params'
         index = GinIndex(fields=['field'], name=index_name, fastupdate=True, gin_pending_list_limit=64)
@@ -185,17 +217,6 @@ class SchemaTests(PostgreSQLTestCase):
             editor.remove_index(IntegerArrayModel, index)
         self.assertNotIn(index_name, self.get_constraints(IntegerArrayModel._meta.db_table))
 
-    def test_gin_parameters_exception(self):
-        index_name = 'gin_options_exception'
-        index = GinIndex(fields=['field'], name=index_name, gin_pending_list_limit=64)
-        msg = 'GIN option gin_pending_list_limit requires PostgreSQL 9.5+.'
-        with self.assertRaisesMessage(NotSupportedError, msg):
-            with mock.patch('django.db.connection.features.has_gin_pending_list_limit', False):
-                with connection.schema_editor() as editor:
-                    editor.add_index(IntegerArrayModel, index)
-        self.assertNotIn(index_name, self.get_constraints(IntegerArrayModel._meta.db_table))
-
-    @skipUnlessDBFeature('has_brin_index_support')
     def test_brin_index(self):
         index_name = 'char_field_model_field_brin'
         index = BrinIndex(fields=['field'], name=index_name, pages_per_range=4)
@@ -208,7 +229,7 @@ class SchemaTests(PostgreSQLTestCase):
             editor.remove_index(CharFieldModel, index)
         self.assertNotIn(index_name, self.get_constraints(CharFieldModel._meta.db_table))
 
-    @skipUnlessDBFeature('has_brin_index_support', 'has_brin_autosummarize')
+    @skipUnlessDBFeature('has_brin_autosummarize')
     def test_brin_parameters(self):
         index_name = 'char_field_brin_params'
         index = BrinIndex(fields=['field'], name=index_name, autosummarize=True)
@@ -221,21 +242,11 @@ class SchemaTests(PostgreSQLTestCase):
             editor.remove_index(CharFieldModel, index)
         self.assertNotIn(index_name, self.get_constraints(CharFieldModel._meta.db_table))
 
-    def test_brin_index_not_supported(self):
-        index_name = 'brin_index_exception'
-        index = BrinIndex(fields=['field'], name=index_name)
-        with self.assertRaisesMessage(NotSupportedError, 'BRIN indexes require PostgreSQL 9.5+.'):
-            with mock.patch('django.db.connection.features.has_brin_index_support', False):
-                with connection.schema_editor() as editor:
-                    editor.add_index(CharFieldModel, index)
-        self.assertNotIn(index_name, self.get_constraints(CharFieldModel._meta.db_table))
-
-    @skipUnlessDBFeature('has_brin_index_support')
     def test_brin_autosummarize_not_supported(self):
         index_name = 'brin_options_exception'
         index = BrinIndex(fields=['field'], name=index_name, autosummarize=True)
         with self.assertRaisesMessage(NotSupportedError, 'BRIN option autosummarize requires PostgreSQL 10+.'):
-            with mock.patch('django.db.connection.features.has_brin_autosummarize', False):
+            with mock.patch('django.db.backends.postgresql.features.DatabaseFeatures.has_brin_autosummarize', False):
                 with connection.schema_editor() as editor:
                     editor.add_index(CharFieldModel, index)
         self.assertNotIn(index_name, self.get_constraints(CharFieldModel._meta.db_table))

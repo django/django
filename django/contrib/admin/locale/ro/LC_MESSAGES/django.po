@@ -1,7 +1,7 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Bogdan Mateescu, 2018
+# Bogdan Mateescu, 2018-2019
 # Daniel Ursache-Dogariu, 2011
 # Denis Darii <denis.darii@gmail.com>, 2011,2014
 # Ionel Cristian Mărieș <ionel.mc@gmail.com>, 2012
@@ -11,8 +11,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-05-21 14:16-0300\n"
-"PO-Revision-Date: 2018-05-28 07:39+0000\n"
+"POT-Creation-Date: 2019-01-16 20:42+0100\n"
+"PO-Revision-Date: 2019-01-18 12:02+0000\n"
 "Last-Translator: Bogdan Mateescu\n"
 "Language-Team: Romanian (http://www.transifex.com/django/django/language/"
 "ro/)\n"
@@ -114,7 +114,7 @@ msgid "object id"
 msgstr "id obiect"
 
 #. Translators: 'repr' means representation
-#. (https://docs.python.org/3/library/functions.html#repr)
+#. (https://docs.python.org/library/functions.html#repr)
 msgid "object repr"
 msgstr "repr obiect"
 
@@ -547,24 +547,8 @@ msgstr "Arată totul"
 msgid "Save"
 msgstr "Salvează"
 
-msgid "Popup closing..."
+msgid "Popup closing…"
 msgstr "Fereastra se închide..."
-
-#, python-format
-msgid "Change selected %(model)s"
-msgstr "Modifică %(model)s selectat"
-
-#, python-format
-msgid "View selected %(model)s"
-msgstr "Vizualizați %(model)s selectate"
-
-#, python-format
-msgid "Add another %(model)s"
-msgstr "Adaugă alt %(model)s"
-
-#, python-format
-msgid "Delete selected %(model)s"
-msgstr "Șterge %(model)s selectat"
 
 msgid "Search"
 msgstr "Caută"
@@ -594,6 +578,18 @@ msgstr "Salvează și vizualizează"
 
 msgid "Close"
 msgstr "Închide"
+
+#, python-format
+msgid "Change selected %(model)s"
+msgstr "Modifică %(model)s selectat"
+
+#, python-format
+msgid "Add another %(model)s"
+msgstr "Adaugă alt %(model)s"
+
+#, python-format
+msgid "Delete selected %(model)s"
+msgstr "Șterge %(model)s selectat"
 
 msgid "Thanks for spending some quality time with the Web site today."
 msgstr "Mulţumiri pentru timpul petrecut astăzi pe sit."

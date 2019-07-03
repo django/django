@@ -16,7 +16,7 @@ class JSONString(str):
 
 class JSONField(forms.CharField):
     default_error_messages = {
-        'invalid': _("'%(value)s' value must be valid JSON."),
+        'invalid': _('“%(value)s” value must be valid JSON.'),
     }
     widget = forms.Textarea
 

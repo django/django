@@ -2,7 +2,7 @@
 Django 1.11.16 release notes
 ============================
 
-*Expected September 1, 2018*
+*October 1, 2018*
 
 Django 1.11.16 fixes a data loss bug in 1.11.15.
 

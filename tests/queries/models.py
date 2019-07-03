@@ -67,10 +67,15 @@ class Annotation(models.Model):
         return self.name
 
 
+class DateTimePK(models.Model):
+    date = models.DateTimeField(primary_key=True, auto_now_add=True)
+
+
 class ExtraInfo(models.Model):
     info = models.CharField(max_length=100)
     note = models.ForeignKey(Note, models.CASCADE, null=True)
     value = models.IntegerField(null=True)
+    date = models.ForeignKey(DateTimePK, models.SET_NULL, null=True)
 
     class Meta:
         ordering = ['info']
@@ -591,6 +596,7 @@ class MyObject(models.Model):
 
 class Order(models.Model):
     id = models.IntegerField(primary_key=True)
+    name = models.CharField(max_length=12, null=True, default='')
 
     class Meta:
         ordering = ('pk',)
@@ -718,3 +724,8 @@ class RelatedIndividual(models.Model):
 
     class Meta:
         db_table = 'RelatedIndividual'
+
+
+class CustomDbColumn(models.Model):
+    custom_column = models.IntegerField(db_column='custom_name', null=True)
+    ip_address = models.GenericIPAddressField(null=True)

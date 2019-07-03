@@ -151,7 +151,7 @@ def inclusion_unlimited_args(one, two='hi', *args):
     return {
         "result": (
             "inclusion_unlimited_args - Expected result: %s" % (
-                ', '.join(str(arg) for arg in [one, two] + list(args))
+                ', '.join(str(arg) for arg in [one, two, *args])
             )
         )
     }
@@ -166,7 +166,7 @@ def inclusion_unlimited_args_from_template(one, two='hi', *args):
     return {
         "result": (
             "inclusion_unlimited_args_from_template - Expected result: %s" % (
-                ', '.join(str(arg) for arg in [one, two] + list(args))
+                ', '.join(str(arg) for arg in [one, two, *args])
             )
         )
     }
@@ -216,7 +216,7 @@ def inclusion_unlimited_args_kwargs(one, two='hi', *args, **kwargs):
     # Sort the dictionary by key to guarantee the order for testing.
     sorted_kwarg = sorted(kwargs.items(), key=operator.itemgetter(0))
     return {"result": "inclusion_unlimited_args_kwargs - Expected result: %s / %s" % (
-        ', '.join(str(arg) for arg in [one, two] + list(args)),
+        ', '.join(str(arg) for arg in [one, two, *args]),
         ', '.join('%s=%s' % (k, v) for (k, v) in sorted_kwarg)
     )}
 

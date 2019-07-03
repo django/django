@@ -4,11 +4,17 @@ from decimal import Decimal
 from django.db.models import DecimalField
 from django.db.models.functions import Cot
 from django.test import TestCase
+from django.test.utils import register_lookup
 
 from ..models import DecimalModel, FloatModel, IntegerModel
 
 
 class CotTests(TestCase):
+
+    def test_null(self):
+        IntegerModel.objects.create()
+        obj = IntegerModel.objects.annotate(null_cot=Cot('normal')).first()
+        self.assertIsNone(obj.null_cot)
 
     def test_decimal(self):
         DecimalModel.objects.create(n1=Decimal('-12.9'), n2=Decimal('0.6'))
@@ -41,11 +47,8 @@ class CotTests(TestCase):
         self.assertAlmostEqual(obj.big_cot, 1 / math.tan(obj.big))
 
     def test_transform(self):
-        try:
-            DecimalField.register_lookup(Cot)
+        with register_lookup(DecimalField, Cot):
             DecimalModel.objects.create(n1=Decimal('12.0'), n2=Decimal('0'))
             DecimalModel.objects.create(n1=Decimal('1.0'), n2=Decimal('0'))
-            objs = DecimalModel.objects.filter(n1__cot__gt=0)
-            self.assertQuerysetEqual(objs, [Decimal('1.0')], lambda a: a.n1)
-        finally:
-            DecimalField._unregister_lookup(Cot)
+            obj = DecimalModel.objects.filter(n1__cot__gt=0).get()
+            self.assertEqual(obj.n1, Decimal('1.0'))

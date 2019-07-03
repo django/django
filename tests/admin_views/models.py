@@ -55,6 +55,15 @@ class Article(models.Model):
     model_year_reversed.admin_order_field = '-date'
     model_year_reversed.short_description = ''
 
+    def property_year(self):
+        return self.date.year
+    property_year.admin_order_field = 'date'
+    model_property_year = property(property_year)
+
+    @property
+    def model_month(self):
+        return self.date.month
+
 
 class Book(models.Model):
     """
@@ -80,12 +89,12 @@ class Chapter(models.Model):
     content = models.TextField()
     book = models.ForeignKey(Book, models.CASCADE)
 
-    def __str__(self):
-        return self.title
-
     class Meta:
         # Use a utf-8 bytestring to ensure it works (see #11710)
         verbose_name = '¿Chapter?'
+
+    def __str__(self):
+        return self.title
 
 
 class ChapterXtra1(models.Model):
@@ -632,19 +641,16 @@ class Reservation(models.Model):
     price = models.IntegerField()
 
 
-DRIVER_CHOICES = (
-    ('bill', 'Bill G'),
-    ('steve', 'Steve J'),
-)
-
-RESTAURANT_CHOICES = (
-    ('indian', 'A Taste of India'),
-    ('thai', 'Thai Pography'),
-    ('pizza', 'Pizza Mama'),
-)
-
-
 class FoodDelivery(models.Model):
+    DRIVER_CHOICES = (
+        ('bill', 'Bill G'),
+        ('steve', 'Steve J'),
+    )
+    RESTAURANT_CHOICES = (
+        ('indian', 'A Taste of India'),
+        ('thai', 'Thai Pography'),
+        ('pizza', 'Pizza Mama'),
+    )
     reference = models.CharField(max_length=100)
     driver = models.CharField(max_length=100, choices=DRIVER_CHOICES, blank=True)
     restaurant = models.CharField(max_length=100, choices=RESTAURANT_CHOICES, blank=True)
@@ -858,12 +864,12 @@ class EmptyModelMixin(models.Model):
 
 
 class State(models.Model):
-    name = models.CharField(max_length=100)
+    name = models.CharField(max_length=100, verbose_name='State verbose_name')
 
 
 class City(models.Model):
     state = models.ForeignKey(State, models.CASCADE)
-    name = models.CharField(max_length=100)
+    name = models.CharField(max_length=100, verbose_name='City verbose_name')
 
     def get_absolute_url(self):
         return '/dummy/%s/' % self.pk
@@ -979,3 +985,9 @@ class Author(models.Model):
 class Authorship(models.Model):
     book = models.ForeignKey(Book, models.CASCADE)
     author = models.ForeignKey(Author, models.CASCADE)
+
+
+class UserProxy(User):
+    """Proxy a model with a different app_label."""
+    class Meta:
+        proxy = True

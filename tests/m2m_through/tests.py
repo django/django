@@ -1,12 +1,13 @@
-from datetime import datetime
+from datetime import date, datetime
 from operator import attrgetter
 
+from django.db import IntegrityError
 from django.test import TestCase
 
 from .models import (
     CustomMembership, Employee, Event, Friendship, Group, Ingredient,
     Invitation, Membership, Person, PersonSelfRefM2M, Recipe, RecipeIngredient,
-    Relationship,
+    Relationship, SymmetricalFriendship,
 )
 
 
@@ -56,52 +57,76 @@ class M2mThroughTests(TestCase):
             expected
         )
 
-    def test_cannot_use_add_on_m2m_with_intermediary_model(self):
-        msg = 'Cannot use add() on a ManyToManyField which specifies an intermediary model'
+    def test_add_on_m2m_with_intermediate_model(self):
+        self.rock.members.add(self.bob, through_defaults={'invite_reason': 'He is good.'})
+        self.assertSequenceEqual(self.rock.members.all(), [self.bob])
+        self.assertEqual(self.rock.membership_set.get().invite_reason, 'He is good.')
 
-        with self.assertRaisesMessage(AttributeError, msg):
-            self.rock.members.add(self.bob)
+    def test_add_on_m2m_with_intermediate_model_value_required(self):
+        self.rock.nodefaultsnonulls.add(self.jim, through_defaults={'nodefaultnonull': 1})
+        self.assertEqual(self.rock.testnodefaultsornulls_set.get().nodefaultnonull, 1)
 
-        self.assertQuerysetEqual(
-            self.rock.members.all(),
-            []
-        )
+    def test_add_on_m2m_with_intermediate_model_value_required_fails(self):
+        with self.assertRaises(IntegrityError):
+            self.rock.nodefaultsnonulls.add(self.jim)
 
-    def test_cannot_use_create_on_m2m_with_intermediary_model(self):
-        msg = 'Cannot use create() on a ManyToManyField which specifies an intermediary model'
+    def test_create_on_m2m_with_intermediate_model(self):
+        annie = self.rock.members.create(name='Annie', through_defaults={'invite_reason': 'She was just awesome.'})
+        self.assertSequenceEqual(self.rock.members.all(), [annie])
+        self.assertEqual(self.rock.membership_set.get().invite_reason, 'She was just awesome.')
 
-        with self.assertRaisesMessage(AttributeError, msg):
-            self.rock.members.create(name='Annie')
+    def test_create_on_m2m_with_intermediate_model_value_required(self):
+        self.rock.nodefaultsnonulls.create(name='Test', through_defaults={'nodefaultnonull': 1})
+        self.assertEqual(self.rock.testnodefaultsornulls_set.get().nodefaultnonull, 1)
 
-        self.assertQuerysetEqual(
-            self.rock.members.all(),
-            []
-        )
+    def test_create_on_m2m_with_intermediate_model_value_required_fails(self):
+        with self.assertRaises(IntegrityError):
+            self.rock.nodefaultsnonulls.create(name='Test')
 
-    def test_cannot_use_remove_on_m2m_with_intermediary_model(self):
+    def test_get_or_create_on_m2m_with_intermediate_model_value_required(self):
+        self.rock.nodefaultsnonulls.get_or_create(name='Test', through_defaults={'nodefaultnonull': 1})
+        self.assertEqual(self.rock.testnodefaultsornulls_set.get().nodefaultnonull, 1)
+
+    def test_get_or_create_on_m2m_with_intermediate_model_value_required_fails(self):
+        with self.assertRaises(IntegrityError):
+            self.rock.nodefaultsnonulls.get_or_create(name='Test')
+
+    def test_update_or_create_on_m2m_with_intermediate_model_value_required(self):
+        self.rock.nodefaultsnonulls.update_or_create(name='Test', through_defaults={'nodefaultnonull': 1})
+        self.assertEqual(self.rock.testnodefaultsornulls_set.get().nodefaultnonull, 1)
+
+    def test_update_or_create_on_m2m_with_intermediate_model_value_required_fails(self):
+        with self.assertRaises(IntegrityError):
+            self.rock.nodefaultsnonulls.update_or_create(name='Test')
+
+    def test_remove_on_m2m_with_intermediate_model(self):
         Membership.objects.create(person=self.jim, group=self.rock)
-        msg = 'Cannot use remove() on a ManyToManyField which specifies an intermediary model'
+        self.rock.members.remove(self.jim)
+        self.assertSequenceEqual(self.rock.members.all(), [])
 
-        with self.assertRaisesMessage(AttributeError, msg):
-            self.rock.members.remove(self.jim)
+    def test_remove_on_m2m_with_intermediate_model_multiple(self):
+        Membership.objects.create(person=self.jim, group=self.rock, invite_reason='1')
+        Membership.objects.create(person=self.jim, group=self.rock, invite_reason='2')
+        self.assertSequenceEqual(self.rock.members.all(), [self.jim, self.jim])
+        self.rock.members.remove(self.jim)
+        self.assertSequenceEqual(self.rock.members.all(), [])
 
-        self.assertQuerysetEqual(
-            self.rock.members.all(),
-            ['Jim'],
-            attrgetter("name")
-        )
-
-    def test_cannot_use_setattr_on_m2m_with_intermediary_model(self):
-        msg = 'Cannot set values on a ManyToManyField which specifies an intermediary model'
+    def test_set_on_m2m_with_intermediate_model(self):
         members = list(Person.objects.filter(name__in=['Bob', 'Jim']))
+        self.rock.members.set(members)
+        self.assertSequenceEqual(self.rock.members.all(), [self.bob, self.jim])
 
-        with self.assertRaisesMessage(AttributeError, msg):
-            self.rock.members.set(members)
+    def test_set_on_m2m_with_intermediate_model_value_required(self):
+        self.rock.nodefaultsnonulls.set([self.jim], through_defaults={'nodefaultnonull': 1})
+        self.assertEqual(self.rock.testnodefaultsornulls_set.get().nodefaultnonull, 1)
+        self.rock.nodefaultsnonulls.set([self.jim], through_defaults={'nodefaultnonull': 2})
+        self.assertEqual(self.rock.testnodefaultsornulls_set.get().nodefaultnonull, 1)
+        self.rock.nodefaultsnonulls.set([self.jim], through_defaults={'nodefaultnonull': 2}, clear=True)
+        self.assertEqual(self.rock.testnodefaultsornulls_set.get().nodefaultnonull, 2)
 
-        self.assertQuerysetEqual(
-            self.rock.members.all(),
-            []
-        )
+    def test_set_on_m2m_with_intermediate_model_value_required_fails(self):
+        with self.assertRaises(IntegrityError):
+            self.rock.nodefaultsnonulls.set([self.jim])
 
     def test_clear_removes_all_the_m2m_relationships(self):
         Membership.objects.create(person=self.jim, group=self.rock)
@@ -125,52 +150,23 @@ class M2mThroughTests(TestCase):
             attrgetter("name")
         )
 
-    def test_cannot_use_add_on_reverse_m2m_with_intermediary_model(self):
-        msg = 'Cannot use add() on a ManyToManyField which specifies an intermediary model'
+    def test_add_on_reverse_m2m_with_intermediate_model(self):
+        self.bob.group_set.add(self.rock)
+        self.assertSequenceEqual(self.bob.group_set.all(), [self.rock])
 
-        with self.assertRaisesMessage(AttributeError, msg):
-            self.bob.group_set.add(self.bob)
+    def test_create_on_reverse_m2m_with_intermediate_model(self):
+        funk = self.bob.group_set.create(name='Funk')
+        self.assertSequenceEqual(self.bob.group_set.all(), [funk])
 
-        self.assertQuerysetEqual(
-            self.bob.group_set.all(),
-            []
-        )
-
-    def test_cannot_use_create_on_reverse_m2m_with_intermediary_model(self):
-        msg = 'Cannot use create() on a ManyToManyField which specifies an intermediary model'
-
-        with self.assertRaisesMessage(AttributeError, msg):
-            self.bob.group_set.create(name='Funk')
-
-        self.assertQuerysetEqual(
-            self.bob.group_set.all(),
-            []
-        )
-
-    def test_cannot_use_remove_on_reverse_m2m_with_intermediary_model(self):
+    def test_remove_on_reverse_m2m_with_intermediate_model(self):
         Membership.objects.create(person=self.bob, group=self.rock)
-        msg = 'Cannot use remove() on a ManyToManyField which specifies an intermediary model'
+        self.bob.group_set.remove(self.rock)
+        self.assertSequenceEqual(self.bob.group_set.all(), [])
 
-        with self.assertRaisesMessage(AttributeError, msg):
-            self.bob.group_set.remove(self.rock)
-
-        self.assertQuerysetEqual(
-            self.bob.group_set.all(),
-            ['Rock'],
-            attrgetter('name')
-        )
-
-    def test_cannot_use_setattr_on_reverse_m2m_with_intermediary_model(self):
-        msg = 'Cannot set values on a ManyToManyField which specifies an intermediary model'
+    def test_set_on_reverse_m2m_with_intermediate_model(self):
         members = list(Group.objects.filter(name__in=['Rock', 'Roll']))
-
-        with self.assertRaisesMessage(AttributeError, msg):
-            self.bob.group_set.set(members)
-
-        self.assertQuerysetEqual(
-            self.bob.group_set.all(),
-            []
-        )
+        self.bob.group_set.set(members)
+        self.assertSequenceEqual(self.bob.group_set.all(), [self.rock, self.roll])
 
     def test_clear_on_reverse_removes_all_the_m2m_relationships(self):
         Membership.objects.create(person=self.jim, group=self.rock)
@@ -405,7 +401,7 @@ class M2mThroughReferentialTests(TestCase):
             attrgetter("name")
         )
 
-    def test_self_referential_symmetrical(self):
+    def test_self_referential_non_symmetrical_both(self):
         tony = PersonSelfRefM2M.objects.create(name="Tony")
         chris = PersonSelfRefM2M.objects.create(name="Chris")
         Friendship.objects.create(
@@ -441,6 +437,71 @@ class M2mThroughReferentialTests(TestCase):
             john.subordinates.all(),
             ['peter', 'mary', 'harry'],
             attrgetter('name')
+        )
+
+    def test_self_referential_symmetrical(self):
+        tony = PersonSelfRefM2M.objects.create(name='Tony')
+        chris = PersonSelfRefM2M.objects.create(name='Chris')
+        SymmetricalFriendship.objects.create(
+            first=tony, second=chris, date_friended=date.today(),
+        )
+        self.assertSequenceEqual(tony.sym_friends.all(), [chris])
+        # Manually created symmetrical m2m relation doesn't add mirror entry
+        # automatically.
+        self.assertSequenceEqual(chris.sym_friends.all(), [])
+        SymmetricalFriendship.objects.create(
+            first=chris, second=tony, date_friended=date.today()
+        )
+        self.assertSequenceEqual(chris.sym_friends.all(), [tony])
+
+    def test_add_on_symmetrical_m2m_with_intermediate_model(self):
+        tony = PersonSelfRefM2M.objects.create(name='Tony')
+        chris = PersonSelfRefM2M.objects.create(name='Chris')
+        date_friended = date(2017, 1, 3)
+        tony.sym_friends.add(chris, through_defaults={'date_friended': date_friended})
+        self.assertSequenceEqual(tony.sym_friends.all(), [chris])
+        self.assertSequenceEqual(chris.sym_friends.all(), [tony])
+        friendship = tony.symmetricalfriendship_set.get()
+        self.assertEqual(friendship.date_friended, date_friended)
+
+    def test_set_on_symmetrical_m2m_with_intermediate_model(self):
+        tony = PersonSelfRefM2M.objects.create(name='Tony')
+        chris = PersonSelfRefM2M.objects.create(name='Chris')
+        anne = PersonSelfRefM2M.objects.create(name='Anne')
+        kate = PersonSelfRefM2M.objects.create(name='Kate')
+        date_friended_add = date(2013, 1, 5)
+        date_friended_set = date.today()
+        tony.sym_friends.add(
+            anne, chris,
+            through_defaults={'date_friended': date_friended_add},
+        )
+        tony.sym_friends.set(
+            [anne, kate],
+            through_defaults={'date_friended': date_friended_set},
+        )
+        self.assertSequenceEqual(tony.sym_friends.all(), [anne, kate])
+        self.assertSequenceEqual(anne.sym_friends.all(), [tony])
+        self.assertSequenceEqual(kate.sym_friends.all(), [tony])
+        self.assertEqual(
+            kate.symmetricalfriendship_set.get().date_friended,
+            date_friended_set,
+        )
+        # Date is preserved.
+        self.assertEqual(
+            anne.symmetricalfriendship_set.get().date_friended,
+            date_friended_add,
+        )
+        # Recreate relationship.
+        tony.sym_friends.set(
+            [anne],
+            clear=True,
+            through_defaults={'date_friended': date_friended_set},
+        )
+        self.assertSequenceEqual(tony.sym_friends.all(), [anne])
+        self.assertSequenceEqual(anne.sym_friends.all(), [tony])
+        self.assertEqual(
+            anne.symmetricalfriendship_set.get().date_friended,
+            date_friended_set,
         )
 
 

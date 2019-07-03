@@ -2,7 +2,7 @@
 Django 2.0.9 release notes
 ==========================
 
-*Expected September 1, 2018*
+*October 1, 2018*
 
 Django 2.0.9 fixes a data loss bug in 2.0.8.
 

@@ -2,7 +2,7 @@
 #
 # Translators:
 # Akos Zsolt Hochrein <hoch.akos@gmail.com>, 2018
-# András Veres-Szentkirályi, 2016-2018
+# András Veres-Szentkirályi, 2016-2019
 # Attila Nagy <>, 2012
 # Dóra Szendrei <szendrgigi@gmail.com>, 2017
 # Jannis Leidel <jannis@leidel.info>, 2011
@@ -13,9 +13,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-05-17 11:49+0200\n"
-"PO-Revision-Date: 2018-05-26 09:24+0000\n"
-"Last-Translator: Akos Zsolt Hochrein <hoch.akos@gmail.com>\n"
+"POT-Creation-Date: 2019-01-16 20:42+0100\n"
+"PO-Revision-Date: 2019-04-17 07:38+0000\n"
+"Last-Translator: András Veres-Szentkirályi\n"
 "Language-Team: Hungarian (http://www.transifex.com/django/django/language/"
 "hu/)\n"
 "MIME-Version: 1.0\n"
@@ -143,6 +143,9 @@ msgstr "Felsőszorb"
 
 msgid "Hungarian"
 msgstr "Magyar"
+
+msgid "Armenian"
+msgstr "Örmény"
 
 msgid "Interlingua"
 msgstr "Interlingua"
@@ -622,6 +625,9 @@ msgstr "Nyers bináris adat"
 msgid "'%(value)s' is not a valid UUID."
 msgstr "'%(value)s' nem egy érvényes UUID."
 
+msgid "Universally unique identifier"
+msgstr "Univerzálisan egyedi azonosító"
+
 msgid "File"
 msgstr "Fájl"
 
@@ -1073,8 +1079,8 @@ msgstr "Ez nem egy érvényes IPv6 cím."
 
 #, python-format
 msgctxt "String to return when truncating text"
-msgid "%(truncated_text)s..."
-msgstr "%(truncated_text)s..."
+msgid "%(truncated_text)s…"
+msgstr "%(truncated_text)s…"
 
 msgid "or"
 msgstr "vagy"

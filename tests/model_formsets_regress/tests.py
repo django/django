@@ -8,8 +8,8 @@ from django.forms.utils import ErrorDict, ErrorList
 from django.test import TestCase
 
 from .models import (
-    Host, Manager, Network, ProfileNetwork, Restaurant, User, UserProfile,
-    UserSite,
+    Host, Manager, Network, ProfileNetwork, Restaurant, User, UserPreferences,
+    UserProfile, UserSite,
 )
 
 
@@ -171,6 +171,14 @@ class InlineFormsetTests(TestCase):
         # Testing the inline model's relation
         self.assertEqual(formset[0].instance.user_id, "guido")
 
+    def test_inline_model_with_primary_to_field(self):
+        """An inline model with a OneToOneField with to_field & primary key."""
+        FormSet = inlineformset_factory(User, UserPreferences, exclude=('is_superuser',))
+        user = User.objects.create(username='guido', serial=1337)
+        UserPreferences.objects.create(user=user, favorite_number=10)
+        formset = FormSet(instance=user)
+        self.assertEqual(formset[0].fields['user'].initial, 'guido')
+
     def test_inline_model_with_to_field_to_rel(self):
         """
         #13794 --- An inline model with a to_field to a related field of a
@@ -288,10 +296,12 @@ class FormsetTests(TestCase):
 
     def test_extraneous_query_is_not_run(self):
         Formset = modelformset_factory(Network, fields="__all__")
-        data = {'test-TOTAL_FORMS': '1',
-                'test-INITIAL_FORMS': '0',
-                'test-MAX_NUM_FORMS': '',
-                'test-0-name': 'Random Place'}
+        data = {
+            'test-TOTAL_FORMS': '1',
+            'test-INITIAL_FORMS': '0',
+            'test-MAX_NUM_FORMS': '',
+            'test-0-name': 'Random Place',
+        }
         with self.assertNumQueries(1):
             formset = Formset(data, prefix="test")
             formset.save()

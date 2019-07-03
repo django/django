@@ -22,6 +22,7 @@ UserModel = get_user_model()
 
 class ReadOnlyPasswordHashWidget(forms.Widget):
     template_name = 'auth/widgets/read_only_password_hash.html'
+    read_only = True
 
     def get_context(self, name, value, attrs):
         context = super().get_context(name, value, attrs)
@@ -60,6 +61,11 @@ class UsernameField(forms.CharField):
     def to_python(self, value):
         return unicodedata.normalize('NFKC', super().to_python(value))
 
+    def widget_attrs(self, widget):
+        attrs = super().widget_attrs(widget)
+        attrs['autocapitalize'] = 'none'
+        return attrs
+
 
 class UserCreationForm(forms.ModelForm):
     """
@@ -67,17 +73,17 @@ class UserCreationForm(forms.ModelForm):
     password.
     """
     error_messages = {
-        'password_mismatch': _("The two password fields didn't match."),
+        'password_mismatch': _('The two password fields didn’t match.'),
     }
     password1 = forms.CharField(
         label=_("Password"),
         strip=False,
-        widget=forms.PasswordInput,
+        widget=forms.PasswordInput(attrs={'autocomplete': 'new-password'}),
         help_text=password_validation.password_validators_help_text_html(),
     )
     password2 = forms.CharField(
         label=_("Password confirmation"),
-        widget=forms.PasswordInput,
+        widget=forms.PasswordInput(attrs={'autocomplete': 'new-password'}),
         strip=False,
         help_text=_("Enter the same password as before, for verification."),
     )
@@ -90,7 +96,10 @@ class UserCreationForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         if self._meta.model.USERNAME_FIELD in self.fields:
-            self.fields[self._meta.model.USERNAME_FIELD].widget.attrs.update({'autofocus': True})
+            self.fields[self._meta.model.USERNAME_FIELD].widget.attrs.update({
+                'autocomplete': 'username',
+                'autofocus': True,
+            })
 
     def clean_password2(self):
         password1 = self.cleaned_data.get("password1")
@@ -125,9 +134,9 @@ class UserChangeForm(forms.ModelForm):
     password = ReadOnlyPasswordHashField(
         label=_("Password"),
         help_text=_(
-            "Raw passwords are not stored, so there is no way to see this "
-            "user's password, but you can change the password using "
-            "<a href=\"{}\">this form</a>."
+            'Raw passwords are not stored, so there is no way to see this '
+            'user’s password, but you can change the password using '
+            '<a href="{}">this form</a>.'
         ),
     )
 
@@ -149,7 +158,7 @@ class UserChangeForm(forms.ModelForm):
         # Regardless of what the user provides, return the initial value.
         # This is done here, rather than on the field, because the
         # field does not have access to the initial value
-        return self.initial["password"]
+        return self.initial.get('password')
 
 
 class AuthenticationForm(forms.Form):
@@ -157,11 +166,11 @@ class AuthenticationForm(forms.Form):
     Base class for authenticating users. Extend this to get a form that accepts
     username/password logins.
     """
-    username = UsernameField(widget=forms.TextInput(attrs={'autofocus': True}))
+    username = UsernameField(widget=forms.TextInput(attrs={'autocomplete': 'username', 'autofocus': True}))
     password = forms.CharField(
         label=_("Password"),
         strip=False,
-        widget=forms.PasswordInput,
+        widget=forms.PasswordInput(attrs={'autocomplete': 'current-password'}),
     )
 
     error_messages = {
@@ -229,7 +238,11 @@ class AuthenticationForm(forms.Form):
 
 
 class PasswordResetForm(forms.Form):
-    email = forms.EmailField(label=_("Email"), max_length=254)
+    email = forms.EmailField(
+        label=_("Email"),
+        max_length=254,
+        widget=forms.EmailInput(attrs={'autocomplete': 'email'})
+    )
 
     def send_mail(self, subject_template_name, email_template_name,
                   context, from_email, to_email, html_email_template_name=None):
@@ -283,7 +296,7 @@ class PasswordResetForm(forms.Form):
                 'email': email,
                 'domain': domain,
                 'site_name': site_name,
-                'uid': urlsafe_base64_encode(force_bytes(user.pk)).decode(),
+                'uid': urlsafe_base64_encode(force_bytes(user.pk)),
                 'user': user,
                 'token': token_generator.make_token(user),
                 'protocol': 'https' if use_https else 'http',
@@ -301,18 +314,18 @@ class SetPasswordForm(forms.Form):
     password
     """
     error_messages = {
-        'password_mismatch': _("The two password fields didn't match."),
+        'password_mismatch': _('The two password fields didn’t match.'),
     }
     new_password1 = forms.CharField(
         label=_("New password"),
-        widget=forms.PasswordInput,
+        widget=forms.PasswordInput(attrs={'autocomplete': 'new-password'}),
         strip=False,
         help_text=password_validation.password_validators_help_text_html(),
     )
     new_password2 = forms.CharField(
         label=_("New password confirmation"),
         strip=False,
-        widget=forms.PasswordInput,
+        widget=forms.PasswordInput(attrs={'autocomplete': 'new-password'}),
     )
 
     def __init__(self, user, *args, **kwargs):
@@ -351,7 +364,7 @@ class PasswordChangeForm(SetPasswordForm):
     old_password = forms.CharField(
         label=_("Old password"),
         strip=False,
-        widget=forms.PasswordInput(attrs={'autofocus': True}),
+        widget=forms.PasswordInput(attrs={'autocomplete': 'current-password', 'autofocus': True}),
     )
 
     field_order = ['old_password', 'new_password1', 'new_password2']
@@ -374,18 +387,18 @@ class AdminPasswordChangeForm(forms.Form):
     A form used to change the password of a user in the admin interface.
     """
     error_messages = {
-        'password_mismatch': _("The two password fields didn't match."),
+        'password_mismatch': _('The two password fields didn’t match.'),
     }
     required_css_class = 'required'
     password1 = forms.CharField(
         label=_("Password"),
-        widget=forms.PasswordInput(attrs={'autofocus': True}),
+        widget=forms.PasswordInput(attrs={'autocomplete': 'new-password', 'autofocus': True}),
         strip=False,
         help_text=password_validation.password_validators_help_text_html(),
     )
     password2 = forms.CharField(
         label=_("Password (again)"),
-        widget=forms.PasswordInput,
+        widget=forms.PasswordInput(attrs={'autocomplete': 'new-password'}),
         strip=False,
         help_text=_("Enter the same password as before, for verification."),
     )

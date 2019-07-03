@@ -9,6 +9,15 @@ from ..models import DecimalModel, FloatModel, IntegerModel
 
 class ModTests(TestCase):
 
+    def test_null(self):
+        IntegerModel.objects.create(big=100)
+        obj = IntegerModel.objects.annotate(
+            null_mod_small=Mod('small', 'normal'),
+            null_mod_normal=Mod('normal', 'big'),
+        ).first()
+        self.assertIsNone(obj.null_mod_small)
+        self.assertIsNone(obj.null_mod_normal)
+
     def test_decimal(self):
         DecimalModel.objects.create(n1=Decimal('-9.9'), n2=Decimal('4.6'))
         obj = DecimalModel.objects.annotate(n_mod=Mod('n1', 'n2')).first()

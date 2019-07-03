@@ -12,11 +12,11 @@ from django.db import models
 class Publication(models.Model):
     title = models.CharField(max_length=30)
 
-    def __str__(self):
-        return self.title
-
     class Meta:
         ordering = ('title',)
+
+    def __str__(self):
+        return self.title
 
 
 class Tag(models.Model):
@@ -27,18 +27,38 @@ class Tag(models.Model):
         return self.name
 
 
+class NoDeletedArticleManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().exclude(headline='deleted')
+
+
 class Article(models.Model):
     headline = models.CharField(max_length=100)
     # Assign a string as name to make sure the intermediary model is
     # correctly created. Refs #20207
     publications = models.ManyToManyField(Publication, name='publications')
     tags = models.ManyToManyField(Tag, related_name='tags')
+    authors = models.ManyToManyField('User', through='UserArticle')
+
+    objects = NoDeletedArticleManager()
+
+    class Meta:
+        ordering = ('headline',)
 
     def __str__(self):
         return self.headline
 
-    class Meta:
-        ordering = ('headline',)
+
+class User(models.Model):
+    username = models.CharField(max_length=20, unique=True)
+
+    def __str__(self):
+        return self.username
+
+
+class UserArticle(models.Model):
+    user = models.ForeignKey(User, models.CASCADE, to_field='username')
+    article = models.ForeignKey(Article, models.CASCADE)
 
 
 # Models to test correct related_name inheritance

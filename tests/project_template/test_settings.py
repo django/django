@@ -3,11 +3,11 @@ import shutil
 import tempfile
 
 from django import conf
-from django.test import TestCase
+from django.test import SimpleTestCase
 from django.test.utils import extend_sys_path
 
 
-class TestStartProjectSettings(TestCase):
+class TestStartProjectSettings(SimpleTestCase):
     def setUp(self):
         self.temp_dir = tempfile.TemporaryDirectory()
         self.addCleanup(self.temp_dir.cleanup)

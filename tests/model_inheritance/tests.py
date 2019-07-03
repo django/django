@@ -1,11 +1,9 @@
-import unittest
 from operator import attrgetter
 
 from django.core.exceptions import FieldError, ValidationError
 from django.db import connection, models
 from django.test import SimpleTestCase, TestCase
 from django.test.utils import CaptureQueriesContext, isolate_apps
-from django.utils.version import PY36
 
 from .models import (
     Base, Chef, CommonInfo, GrandChild, GrandParent, ItalianRestaurant,
@@ -176,22 +174,35 @@ class ModelInheritanceTests(TestCase):
 
         self.assertIs(C._meta.parents[A], C._meta.get_field('a'))
 
-    @unittest.skipUnless(PY36, 'init_subclass is new in Python 3.6')
     @isolate_apps('model_inheritance')
     def test_init_subclass(self):
         saved_kwargs = {}
 
-        class A:
+        class A(models.Model):
             def __init_subclass__(cls, **kwargs):
                 super().__init_subclass__()
                 saved_kwargs.update(kwargs)
 
         kwargs = {'x': 1, 'y': 2, 'z': 3}
 
-        class B(A, models.Model, **kwargs):
+        class B(A, **kwargs):
             pass
 
         self.assertEqual(saved_kwargs, kwargs)
+
+    @isolate_apps('model_inheritance')
+    def test_set_name(self):
+        class ClassAttr:
+            called = None
+
+            def __set_name__(self_, owner, name):
+                self.assertIsNone(self_.called)
+                self_.called = (owner, name)
+
+        class A(models.Model):
+            attr = ClassAttr()
+
+        self.assertEqual(A.attr.called, (A, 'attr'))
 
 
 class ModelInheritanceDataTests(TestCase):

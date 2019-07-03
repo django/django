@@ -31,7 +31,7 @@ class InspectDBTests(PostgreSQLTestCase):
             [
                 'ints = django.contrib.postgres.fields.IntegerRangeField(blank=True, null=True)',
                 'bigints = django.contrib.postgres.fields.BigIntegerRangeField(blank=True, null=True)',
-                'floats = django.contrib.postgres.fields.FloatRangeField(blank=True, null=True)',
+                'decimals = django.contrib.postgres.fields.DecimalRangeField(blank=True, null=True)',
                 'timestamps = django.contrib.postgres.fields.DateTimeRangeField(blank=True, null=True)',
                 'dates = django.contrib.postgres.fields.DateRangeField(blank=True, null=True)',
             ],

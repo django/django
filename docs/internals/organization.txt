@@ -168,12 +168,12 @@ A new board is elected after each feature release of Django. The election
 process is managed by a returns officer nominated by the outgoing technical
 board. The election process works as follows:
 
-1. Candidates advertise their application for the technical board to the team.
+#. Candidates advertise their application for the technical board to the team.
 
    They must be committers already. There's no term limit for technical board
    members.
 
-2. Each team member can vote for zero to five people among the candidates.
+#. Each team member can vote for zero to five people among the candidates.
    Candidates are ranked by the total number of votes they received.
 
    In case of a tie, the person who joined the core team earlier wins.

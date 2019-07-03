@@ -38,7 +38,7 @@ All attributes should be considered read-only, unless stated otherwise.
 
 .. attribute:: HttpRequest.body
 
-    The raw HTTP request body as a byte string. This is useful for processing
+    The raw HTTP request body as a bytestring. This is useful for processing
     data in different ways than conventional HTML forms: binary images,
     XML payload etc. For processing conventional form data, use
     :attr:`HttpRequest.POST`.
@@ -167,6 +167,47 @@ All attributes should be considered read-only, unless stated otherwise.
     underscores in WSGI environment variables. It matches the behavior of
     Web servers like Nginx and Apache 2.4+.
 
+    :attr:`HttpRequest.headers` is a simpler way to access all HTTP-prefixed
+    headers, plus ``CONTENT_LENGTH`` and ``CONTENT_TYPE``.
+
+.. attribute:: HttpRequest.headers
+
+    .. versionadded:: 2.2
+
+    A case insensitive, dict-like object that provides access to all
+    HTTP-prefixed headers (plus ``Content-Length`` and ``Content-Type``) from
+    the request.
+
+    The name of each header is stylized with title-casing (e.g. ``User-Agent``)
+    when it's displayed. You can access headers case-insensitively::
+
+        >>> request.headers
+        {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6', ...}
+
+        >>> 'User-Agent' in request.headers
+        True
+        >>> 'user-agent' in request.headers
+        True
+
+        >>> request.headers['User-Agent']
+        Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6)
+        >>> request.headers['user-agent']
+        Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6)
+
+        >>> request.headers.get('User-Agent')
+        Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6)
+        >>> request.headers.get('user-agent')
+        Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6)
+
+    For use in, for example, Django templates, headers can also be looked up
+    using underscores in place of hyphens::
+
+        {{ request.headers.user_agent }}
+
+    .. versionchanged:: 3.0
+
+        Support for look ups using underscores was added.
+
 .. attribute:: HttpRequest.resolver_match
 
     An instance of :class:`~django.urls.ResolverMatch` representing the
@@ -286,23 +327,26 @@ Methods
 
 .. method:: HttpRequest.get_full_path_info()
 
-    .. versionadded:: 2.1
-
     Like :meth:`get_full_path`, but uses :attr:`path_info` instead of
     :attr:`path`.
 
     Example: ``"/minfo/music/bands/the_beatles/?print=true"``
 
-.. method:: HttpRequest.build_absolute_uri(location)
+.. method:: HttpRequest.build_absolute_uri(location=None)
 
     Returns the absolute URI form of ``location``. If no location is provided,
     the location will be set to ``request.get_full_path()``.
 
     If the location is already an absolute URI, it will not be altered.
     Otherwise the absolute URI is built using the server variables available in
-    this request.
+    this request. For example:
 
-    Example: ``"https://example.com/music/bands/the_beatles/?print=true"``
+    >>> request.build_absolute_uri()
+    'https://example.com/music/bands/the_beatles/?print=true'
+    >>> request.build_absolute_uri('/bands/')
+    'https://example.com/bands/'
+    >>> request.build_absolute_uri('https://example2.com/bands/')
+    'https://example2.com/bands/'
 
     .. note::
 
@@ -596,12 +640,18 @@ Usage
 Passing strings
 ~~~~~~~~~~~~~~~
 
-Typical usage is to pass the contents of the page, as a string, to the
-:class:`HttpResponse` constructor::
+Typical usage is to pass the contents of the page, as a string, bytestring,
+or :class:`memoryview`, to the :class:`HttpResponse` constructor::
 
     >>> from django.http import HttpResponse
     >>> response = HttpResponse("Here's the text of the Web page.")
     >>> response = HttpResponse("Text only, please.", content_type="text/plain")
+    >>> response = HttpResponse(b'Bytestrings are also accepted.')
+    >>> response = HttpResponse(memoryview(b'Memoryview as well.'))
+
+.. versionchanged:: 3.0
+
+    Support for :class:`memoryview` was added.
 
 But if you want to add content incrementally, you can use ``response`` as a
 file-like object::
@@ -700,20 +750,19 @@ Attributes
 Methods
 -------
 
-.. method:: HttpResponse.__init__(content='', content_type=None, status=200, reason=None, charset=None)
+.. method:: HttpResponse.__init__(content=b'', content_type=None, status=200, reason=None, charset=None)
 
     Instantiates an ``HttpResponse`` object with the given page content and
     content type.
 
-    ``content`` should be an iterator or a string. If it's an
-    iterator, it should return strings, and those strings will be
-    joined together to form the content of the response. If it is not
-    an iterator or a string, it will be converted to a string when
-    accessed.
+    ``content`` is most commonly an iterator, bytestring, :class:`memoryview`,
+    or string. Other types will be converted to a bytestring by encoding their
+    string representation. Iterators should return strings or bytestrings and
+    those will be joined together to form the content of the response.
 
     ``content_type`` is the MIME type optionally completed by a character set
     encoding and is used to fill the HTTP ``Content-Type`` header. If not
-    specified, it is formed by the :setting:`DEFAULT_CONTENT_TYPE` and
+    specified, it is formed by ``'text/html'`` and the
     :setting:`DEFAULT_CHARSET` settings, by default: "`text/html; charset=utf-8`".
 
     ``status`` is the :rfc:`HTTP status code <7231#section-6>` for the response.
@@ -724,6 +773,10 @@ Methods
     ``charset`` is the charset in which the response will be encoded. If not
     given it will be extracted from ``content_type``, and if that
     is unsuccessful, the :setting:`DEFAULT_CHARSET` setting will be used.
+
+    .. versionchanged:: 3.0
+
+        Support for :class:`memoryview` ``content`` was added.
 
 .. method:: HttpResponse.__setitem__(header, value)
 
@@ -767,31 +820,25 @@ Methods
     * Use ``httponly=True`` if you want to prevent client-side
       JavaScript from having access to the cookie.
 
-      HTTPOnly_ is a flag included in a Set-Cookie HTTP response
-      header. It is not part of the :rfc:`2109` standard for cookies,
-      and it isn't honored consistently by all browsers. However,
-      when it is honored, it can be a useful way to mitigate the
-      risk of a client-side script from accessing the protected cookie
+      HttpOnly_ is a flag included in a Set-Cookie HTTP response header. It's
+      part of the :rfc:`6265` standard for cookies and can be a useful way to
+      mitigate the risk of a client-side script accessing the protected cookie
       data.
     * Use ``samesite='Strict'`` or ``samesite='Lax'`` to tell the browser not
       to send this cookie when performing a cross-origin request. `SameSite`_
       isn't supported by all browsers, so it's not a replacement for Django's
       CSRF protection, but rather a defense in depth measure.
 
-    .. versionchanged:: 2.1
-
-        The ``samesite`` argument was added.
-
-    .. _HTTPOnly: https://www.owasp.org/index.php/HTTPOnly
+    .. _HttpOnly: https://www.owasp.org/index.php/HttpOnly
     .. _SameSite: https://www.owasp.org/index.php/SameSite
 
     .. warning::
 
-        Both :rfc:`2109` and :rfc:`6265` state that user agents should support
-        cookies of at least 4096 bytes. For many browsers this is also the
-        maximum size. Django will not raise an exception if there's an attempt
-        to store a cookie of more than 4096 bytes, but many browsers will not
-        set the cookie correctly.
+        :rfc:`6265` states that user agents should support cookies of at least
+        4096 bytes. For many browsers this is also the maximum size. Django
+        will not raise an exception if there's an attempt to store a cookie of
+        more than 4096 bytes, but many browsers will not set the cookie
+        correctly.
 
 .. method:: HttpResponse.set_signed_cookie(key, value, salt='', max_age=None, expires=None, path='/', domain=None, secure=None, httponly=False, samesite=None)
 
@@ -810,6 +857,12 @@ Methods
     Due to the way cookies work, ``path`` and ``domain`` should be the same
     values you used in ``set_cookie()`` -- otherwise the cookie may not be
     deleted.
+
+.. method:: HttpResponse.close()
+
+    This method is called at the end of the request directly by the WSGI
+    server, or when the WSGI server closes the file-like object, if
+    `wsgi.file_wrapper`_ is used for the request.
 
 .. method:: HttpResponse.write(content)
 
@@ -1060,21 +1113,17 @@ Attributes
     optimized for binary files. It uses `wsgi.file_wrapper`_ if provided by the
     wsgi server, otherwise it streams the file out in small chunks.
 
-    If ``as_attachment=True``, the ``Content-Disposition`` header is set, which
-    asks the browser to offer the file to the user as a download.
+    If ``as_attachment=True``, the ``Content-Disposition`` header is set to
+    ``attachment``, which asks the browser to offer the file to the user as a
+    download. Otherwise, a ``Content-Disposition`` header with a value of
+    ``inline`` (the browser default) will be set only if a filename is
+    available.
 
     If ``open_file`` doesn't have a name or if the name of ``open_file`` isn't
     appropriate, provide a custom file name using the ``filename``  parameter.
 
-    The ``Content-Length``, ``Content-Type``, and ``Content-Disposition``
-    headers are automatically set when they can be guessed from contents of
-    ``open_file``.
-
-    .. versionadded:: 2.1
-
-        The ``as_attachment`` and ``filename`` keywords argument were added.
-        Also, ``FileResponse`` sets the ``Content`` headers if it can guess
-        them.
+    The ``Content-Length`` and ``Content-Type`` headers are automatically set
+    when they can be guessed from contents of ``open_file``.
 
 .. _wsgi.file_wrapper: https://www.python.org/dev/peps/pep-3333/#optional-platform-specific-file-handling
 
@@ -1090,8 +1139,6 @@ Methods
 -------
 
 .. method:: FileResponse.set_headers(open_file)
-
-    .. versionadded:: 2.1
 
     This method is automatically called during the response initialization and
     set various headers (``Content-Length``, ``Content-Type``, and

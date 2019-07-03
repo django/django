@@ -236,7 +236,12 @@ to, or in lieu of custom ``field.clean()`` methods.
 .. class:: MaxValueValidator(limit_value, message=None)
 
     Raises a :exc:`~django.core.exceptions.ValidationError` with a code of
-    ``'max_value'`` if ``value`` is greater than ``limit_value``.
+    ``'max_value'`` if ``value`` is greater than ``limit_value``, which may be
+    a callable.
+
+    .. versionchanged:: 2.2
+
+        ``limit_value`` can now be a callable.
 
 ``MinValueValidator``
 ---------------------
@@ -244,7 +249,12 @@ to, or in lieu of custom ``field.clean()`` methods.
 .. class:: MinValueValidator(limit_value, message=None)
 
     Raises a :exc:`~django.core.exceptions.ValidationError` with a code of
-    ``'min_value'`` if ``value`` is less than ``limit_value``.
+    ``'min_value'`` if ``value`` is less than ``limit_value``, which may be a
+    callable.
+
+    .. versionchanged:: 2.2
+
+        ``limit_value`` can now be a callable.
 
 ``MaxLengthValidator``
 ----------------------
@@ -252,7 +262,12 @@ to, or in lieu of custom ``field.clean()`` methods.
 .. class:: MaxLengthValidator(limit_value, message=None)
 
     Raises a :exc:`~django.core.exceptions.ValidationError` with a code of
-    ``'max_length'`` if the length of ``value`` is greater than ``limit_value``.
+    ``'max_length'`` if the length of ``value`` is greater than
+    ``limit_value``, which may be a callable.
+
+    .. versionchanged:: 2.2
+
+        ``limit_value`` can now be a callable.
 
 ``MinLengthValidator``
 ----------------------
@@ -260,7 +275,12 @@ to, or in lieu of custom ``field.clean()`` methods.
 .. class:: MinLengthValidator(limit_value, message=None)
 
     Raises a :exc:`~django.core.exceptions.ValidationError` with a code of
-    ``'min_length'`` if the length of ``value`` is less than ``limit_value``.
+    ``'min_length'`` if the length of ``value`` is less than ``limit_value``,
+    which may be a callable.
+
+    .. versionchanged:: 2.2
+
+        ``limit_value`` can now be a callable.
 
 ``DecimalValidator``
 --------------------

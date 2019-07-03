@@ -15,6 +15,7 @@ class Tags:
     security = 'security'
     signals = 'signals'
     templates = 'templates'
+    translation = 'translation'
     urls = 'urls'
 
 

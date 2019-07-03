@@ -1,5 +1,4 @@
 import time
-from collections import OrderedDict
 from importlib import import_module
 
 from django.apps import apps
@@ -104,6 +103,7 @@ class Command(BaseCommand):
             )
 
         # If they supplied command line arguments, work out what they mean.
+        run_syncdb = options['run_syncdb']
         target_app_labels_only = True
         if options['app_label']:
             # Validate app_label.
@@ -112,7 +112,10 @@ class Command(BaseCommand):
                 apps.get_app_config(app_label)
             except LookupError as err:
                 raise CommandError(str(err))
-            if app_label not in executor.loader.migrated_apps:
+            if run_syncdb:
+                if app_label in executor.loader.migrated_apps:
+                    raise CommandError("Can't use run_syncdb with app '%s' as it has migrations." % app_label)
+            elif app_label not in executor.loader.migrated_apps:
                 raise CommandError("App '%s' does not have migrations." % app_label)
 
         if options['app_label'] and options['migration_name']:
@@ -152,15 +155,21 @@ class Command(BaseCommand):
                     self.stdout.write('    ' + message, style)
             return
 
+        # At this point, ignore run_syncdb if there aren't any apps to sync.
         run_syncdb = options['run_syncdb'] and executor.loader.unmigrated_apps
         # Print some useful info
         if self.verbosity >= 1:
             self.stdout.write(self.style.MIGRATE_HEADING("Operations to perform:"))
             if run_syncdb:
-                self.stdout.write(
-                    self.style.MIGRATE_LABEL("  Synchronize unmigrated apps: ") +
-                    (", ".join(sorted(executor.loader.unmigrated_apps)))
-                )
+                if options['app_label']:
+                    self.stdout.write(
+                        self.style.MIGRATE_LABEL("  Synchronize unmigrated app: %s" % app_label)
+                    )
+                else:
+                    self.stdout.write(
+                        self.style.MIGRATE_LABEL("  Synchronize unmigrated apps: ") +
+                        (", ".join(sorted(executor.loader.unmigrated_apps)))
+                    )
             if target_app_labels_only:
                 self.stdout.write(
                     self.style.MIGRATE_LABEL("  Apply all migrations: ") +
@@ -187,7 +196,10 @@ class Command(BaseCommand):
         if run_syncdb:
             if self.verbosity >= 1:
                 self.stdout.write(self.style.MIGRATE_HEADING("Synchronizing apps without migrations:"))
-            self.sync_apps(connection, executor.loader.unmigrated_apps)
+            if options['app_label']:
+                self.sync_apps(connection, [app_label])
+            else:
+                self.sync_apps(connection, executor.loader.unmigrated_apps)
 
         # Migrate!
         if self.verbosity >= 1:
@@ -249,33 +261,33 @@ class Command(BaseCommand):
             compute_time = self.verbosity > 1
             if action == "apply_start":
                 if compute_time:
-                    self.start = time.time()
+                    self.start = time.monotonic()
                 self.stdout.write("  Applying %s..." % migration, ending="")
                 self.stdout.flush()
             elif action == "apply_success":
-                elapsed = " (%.3fs)" % (time.time() - self.start) if compute_time else ""
+                elapsed = " (%.3fs)" % (time.monotonic() - self.start) if compute_time else ""
                 if fake:
                     self.stdout.write(self.style.SUCCESS(" FAKED" + elapsed))
                 else:
                     self.stdout.write(self.style.SUCCESS(" OK" + elapsed))
             elif action == "unapply_start":
                 if compute_time:
-                    self.start = time.time()
+                    self.start = time.monotonic()
                 self.stdout.write("  Unapplying %s..." % migration, ending="")
                 self.stdout.flush()
             elif action == "unapply_success":
-                elapsed = " (%.3fs)" % (time.time() - self.start) if compute_time else ""
+                elapsed = " (%.3fs)" % (time.monotonic() - self.start) if compute_time else ""
                 if fake:
                     self.stdout.write(self.style.SUCCESS(" FAKED" + elapsed))
                 else:
                     self.stdout.write(self.style.SUCCESS(" OK" + elapsed))
             elif action == "render_start":
                 if compute_time:
-                    self.start = time.time()
+                    self.start = time.monotonic()
                 self.stdout.write("  Rendering model states...", ending="")
                 self.stdout.flush()
             elif action == "render_success":
-                elapsed = " (%.3fs)" % (time.time() - self.start) if compute_time else ""
+                elapsed = " (%.3fs)" % (time.monotonic() - self.start) if compute_time else ""
                 self.stdout.write(self.style.SUCCESS(" DONE" + elapsed))
 
     def sync_apps(self, connection, app_labels):
@@ -295,16 +307,16 @@ class Command(BaseCommand):
 
         def model_installed(model):
             opts = model._meta
-            converter = connection.introspection.table_name_converter
+            converter = connection.introspection.identifier_converter
             return not (
                 (converter(opts.db_table) in tables) or
                 (opts.auto_created and converter(opts.auto_created._meta.db_table) in tables)
             )
 
-        manifest = OrderedDict(
-            (app_name, list(filter(model_installed, model_list)))
+        manifest = {
+            app_name: list(filter(model_installed, model_list))
             for app_name, model_list in all_models
-        )
+        }
 
         # Create the tables for each model
         if self.verbosity >= 1:
@@ -344,7 +356,7 @@ class Command(BaseCommand):
             action = 'IRREVERSIBLE'
             is_error = True
         else:
-            action = action.replace('\n', '')
+            action = str(action).replace('\n', '')
             is_error = False
         if action:
             action = ' -> ' + action

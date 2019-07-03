@@ -8,8 +8,8 @@ from django.test import TestCase
 from django.utils.translation import gettext_lazy
 
 from .models import (
-    Article, Category, Child, City, District, First, Parent, Record, Relation,
-    Reporter, School, Student, Third, ToFieldChild,
+    Article, Category, Child, ChildNullableParent, City, District, First,
+    Parent, Record, Relation, Reporter, School, Student, Third, ToFieldChild,
 )
 
 
@@ -522,6 +522,23 @@ class ManyToOneTests(TestCase):
         self.assertIsNot(c.parent, p)
         self.assertEqual(c.parent, p)
 
+    def test_save_nullable_fk_after_parent(self):
+        parent = Parent()
+        child = ChildNullableParent(parent=parent)
+        parent.save()
+        child.save()
+        child.refresh_from_db()
+        self.assertEqual(child.parent, parent)
+
+    def test_save_nullable_fk_after_parent_with_to_field(self):
+        parent = Parent(name='jeff')
+        child = ToFieldChild(parent=parent)
+        parent.save()
+        child.save()
+        child.refresh_from_db()
+        self.assertEqual(child.parent, parent)
+        self.assertEqual(child.parent_id, parent.name)
+
     def test_fk_to_bigautofield(self):
         ch = City.objects.create(name='Chicago')
         District.objects.create(city=ch, name='Far South')
@@ -666,3 +683,16 @@ class ManyToOneTests(TestCase):
         self.a.reporter_id = self.r2.pk
         self.a.save()
         self.assertEqual(self.a.reporter, self.r2)
+
+    def test_cached_foreign_key_with_to_field_not_cleared_by_save(self):
+        parent = Parent.objects.create(name='a')
+        child = ToFieldChild.objects.create(parent=parent)
+        with self.assertNumQueries(0):
+            self.assertIs(child.parent, parent)
+
+    def test_reverse_foreign_key_instance_to_field_caching(self):
+        parent = Parent.objects.create(name='a')
+        ToFieldChild.objects.create(parent=parent)
+        child = parent.to_field_children.get()
+        with self.assertNumQueries(0):
+            self.assertIs(child.parent, parent)

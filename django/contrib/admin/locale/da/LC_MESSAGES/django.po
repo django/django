@@ -3,7 +3,7 @@
 # Translators:
 # Christian Joergensen <christian@gmta.info>, 2012
 # Dimitris Glezos <glezos@transifex.com>, 2012
-# Erik Wognsen <r4mses@gmail.com>, 2013,2015-2018
+# Erik Wognsen <r4mses@gmail.com>, 2013,2015-2019
 # Finn Gruwier Larsen, 2011
 # Jannis Leidel <jannis@leidel.info>, 2011
 # valberg <valberg@orn.li>, 2014-2015
@@ -11,8 +11,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-05-21 14:16-0300\n"
-"PO-Revision-Date: 2018-05-28 21:25+0000\n"
+"POT-Creation-Date: 2019-01-16 20:42+0100\n"
+"PO-Revision-Date: 2019-01-18 07:26+0000\n"
 "Last-Translator: Erik Wognsen <r4mses@gmail.com>\n"
 "Language-Team: Danish (http://www.transifex.com/django/django/language/da/)\n"
 "MIME-Version: 1.0\n"
@@ -112,7 +112,7 @@ msgid "object id"
 msgstr "objekt-ID"
 
 #. Translators: 'repr' means representation
-#. (https://docs.python.org/3/library/functions.html#repr)
+#. (https://docs.python.org/library/functions.html#repr)
 msgid "object repr"
 msgstr "objekt repr"
 
@@ -538,24 +538,8 @@ msgstr "Vis alle"
 msgid "Save"
 msgstr "Gem"
 
-msgid "Popup closing..."
-msgstr "Popup lukker..."
-
-#, python-format
-msgid "Change selected %(model)s"
-msgstr "Redigér valgte %(model)s"
-
-#, python-format
-msgid "View selected %(model)s"
-msgstr "Vis valgte %(model)s"
-
-#, python-format
-msgid "Add another %(model)s"
-msgstr "Tilføj endnu en %(model)s"
-
-#, python-format
-msgid "Delete selected %(model)s"
-msgstr "Slet valgte %(model)s"
+msgid "Popup closing…"
+msgstr "Popup lukker…"
 
 msgid "Search"
 msgstr "Søg"
@@ -584,6 +568,18 @@ msgstr "Gem og vis"
 
 msgid "Close"
 msgstr "Luk"
+
+#, python-format
+msgid "Change selected %(model)s"
+msgstr "Redigér valgte %(model)s"
+
+#, python-format
+msgid "Add another %(model)s"
+msgstr "Tilføj endnu en %(model)s"
+
+#, python-format
+msgid "Delete selected %(model)s"
+msgstr "Slet valgte %(model)s"
 
 msgid "Thanks for spending some quality time with the Web site today."
 msgstr "Tak for den kvalitetstid du brugte på websitet i dag."

@@ -168,7 +168,7 @@ class FilterSyntaxTests(SimpleTestCase):
         Numbers as filter arguments should work
         """
         output = self.engine.render_to_string('filter-syntax19', {"var": "hello world"})
-        self.assertEqual(output, "hello ...")
+        self.assertEqual(output, "hello …")
 
     @setup({'filter-syntax20': '{{ ""|default_if_none:"was none" }}'})
     def test_filter_syntax20(self):

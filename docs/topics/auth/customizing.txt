@@ -95,19 +95,23 @@ a set of optional permission related :ref:`authorization methods
 
 The ``get_user`` method takes a ``user_id`` -- which could be a username,
 database ID or whatever, but has to be the primary key of your user object --
-and returns a user object.
+and returns a user object or ``None``.
 
 The ``authenticate`` method takes a ``request`` argument and credentials as
 keyword arguments. Most of the time, it'll just look like this::
 
-    class MyBackend:
+    from django.contrib.auth.backends import BaseBackend
+
+    class MyBackend(BaseBackend):
         def authenticate(self, request, username=None, password=None):
             # Check the username/password and return a user.
             ...
 
 But it could also authenticate a token, like so::
 
-    class MyBackend:
+    from django.contrib.auth.backends import BaseBackend
+
+    class MyBackend(BaseBackend):
         def authenticate(self, request, token=None):
             # Check the token and return a user.
             ...
@@ -132,10 +136,11 @@ variable defined in your ``settings.py`` file and creates a Django ``User``
 object the first time a user authenticates::
 
     from django.conf import settings
+    from django.contrib.auth.backends import BaseBackend
     from django.contrib.auth.hashers import check_password
     from django.contrib.auth.models import User
 
-    class SettingsBackend:
+    class SettingsBackend(BaseBackend):
         """
         Authenticate against the settings ADMIN_LOGIN and ADMIN_PASSWORD.
 
@@ -175,7 +180,8 @@ Handling authorization in custom backends
 Custom auth backends can provide their own permissions.
 
 The user model will delegate permission lookup functions
-(:meth:`~django.contrib.auth.models.User.get_group_permissions()`,
+(:meth:`~django.contrib.auth.models.User.get_user_permissions()`,
+:meth:`~django.contrib.auth.models.User.get_group_permissions()`,
 :meth:`~django.contrib.auth.models.User.get_all_permissions()`,
 :meth:`~django.contrib.auth.models.User.has_perm()`, and
 :meth:`~django.contrib.auth.models.User.has_module_perms()`) to any
@@ -190,11 +196,11 @@ exception in :meth:`~django.contrib.auth.models.User.has_perm()` or
 :meth:`~django.contrib.auth.models.User.has_module_perms()`, the authorization
 will immediately fail and Django won't check the backends that follow.
 
-The simple backend above could implement permissions for the magic admin
-fairly simply::
+A backend could implement permissions for the magic admin fairly simply::
 
-    class SettingsBackend:
-        ...
+    from django.contrib.auth.backends import BaseBackend
+
+    class MagicAdminBackend(BaseBackend):
         def has_perm(self, user_obj, perm, obj=None):
             return user_obj.username == settings.ADMIN_LOGIN
 
@@ -204,13 +210,8 @@ Notice that in addition to the same arguments given to the associated
 all take the user object, which may be an anonymous user, as an argument.
 
 A full authorization implementation can be found in the ``ModelBackend`` class
-in `django/contrib/auth/backends.py`_, which is the default backend and queries
-the ``auth_permission`` table most of the time. If you wish to provide
-custom behavior for only part of the backend API, you can take advantage of
-Python inheritance and subclass ``ModelBackend`` instead of implementing the
-complete API in a custom backend.
-
-.. _django/contrib/auth/backends.py: https://github.com/django/django/blob/master/django/contrib/auth/backends.py
+in :source:`django/contrib/auth/backends.py`, which is the default backend and
+queries the ``auth_permission`` table most of the time.
 
 .. _anonymous_auth:
 
@@ -273,27 +274,26 @@ Custom permissions
 To create custom permissions for a given model object, use the ``permissions``
 :ref:`model Meta attribute <meta-options>`.
 
-This example Task model creates three custom permissions, i.e., actions users
-can or cannot do with Task instances, specific to your application::
+This example ``Task`` model creates two custom permissions, i.e., actions users
+can or cannot do with ``Task`` instances, specific to your application::
 
     class Task(models.Model):
         ...
         class Meta:
-            permissions = (
-                ("view_task", "Can see available tasks"),
+            permissions = [
                 ("change_task_status", "Can change the status of tasks"),
                 ("close_task", "Can remove a task by setting its status as closed"),
-            )
+            ]
 
 The only thing this does is create those extra permissions when you run
 :djadmin:`manage.py migrate <migrate>` (the function that creates permissions
 is connected to the :data:`~django.db.models.signals.post_migrate` signal).
 Your code is in charge of checking the value of these permissions when a user
-is trying to access the functionality provided by the application (viewing
-tasks, changing the status of tasks, closing tasks.) Continuing the above
-example, the following checks if a user may view tasks::
+is trying to access the functionality provided by the application (changing the
+status of tasks or closing tasks.) Continuing the above example, the following
+checks if a user may close tasks::
 
-    user.has_perm('app.view_task')
+    user.has_perm('app.close_task')
 
 .. _extending-user:
 
@@ -514,18 +514,17 @@ different user model.
 Specifying a custom user model
 ------------------------------
 
-.. admonition:: Model design considerations
+When you start your project with a custom user model, stop to consider if this
+is the right choice for your project.
 
-    Think carefully before handling information not directly related to
-    authentication in your custom user model.
-
-    It may be better to store app-specific user information in a model
-    that has a relation with the user model. That allows each app to specify
-    its own user data requirements without risking conflicts with other
-    apps. On the other hand, queries to retrieve this related information
-    will involve a database join, which may have an effect on performance.
-
-Django expects your custom user model to meet some minimum requirements.
+Keeping all user related information in one model removes the need for
+additional or more complex database queries to retrieve related models. On the
+other hand, it may be more suitable to store app-specific user information in a
+model that has a relation with your custom user model. That allows each app to
+specify its own user data requirements without potentially conflicting or
+breaking assumptions by other apps. It also means that you would keep your user
+model as simple as possible, focused on authentication, and following the
+minimum requirements Django expects custom user models to meet.
 
 If you use the default authentication backend, then your model must have a
 single unique field that can be used for identification purposes. This can
@@ -728,7 +727,7 @@ providing two additional methods:
 
 .. class:: models.CustomUserManager
 
-    .. method:: models.CustomUserManager.create_user(*username_field*, password=None, \**other_fields)
+    .. method:: models.CustomUserManager.create_user(*username_field*, password=None, **other_fields)
 
         The prototype of ``create_user()`` should accept the username field,
         plus all required fields as arguments. For example, if your user model
@@ -739,7 +738,7 @@ providing two additional methods:
                 # create user here
                 ...
 
-    .. method:: models.CustomUserManager.create_superuser(*username_field*, password, \**other_fields)
+    .. method:: models.CustomUserManager.create_superuser(*username_field*, password, **other_fields)
 
         The prototype of ``create_superuser()`` should accept the username
         field, plus all required fields as arguments. For example, if your user
@@ -900,6 +899,15 @@ methods and attributes:
         Boolean. Designates that this user has all permissions without
         explicitly assigning them.
 
+    .. method:: models.PermissionsMixin.get_user_permissions(obj=None)
+
+        .. versionadded:: 3.0
+
+        Returns a set of permission strings that the user has directly.
+
+        If ``obj`` is passed in, only returns the user permissions for this
+        specific object.
+
     .. method:: models.PermissionsMixin.get_group_permissions(obj=None)
 
         Returns a set of permission strings that the user has, through their
@@ -920,8 +928,9 @@ methods and attributes:
 
         Returns ``True`` if the user has the specified permission, where
         ``perm`` is in the format ``"<app label>.<permission codename>"`` (see
-        :ref:`permissions <topic-authorization>`). If the user is inactive, this method will
-        always return ``False``.
+        :ref:`permissions <topic-authorization>`). If :attr:`.User.is_active`
+        and :attr:`~.User.is_superuser` are both ``True``, this method always
+        returns ``True``.
 
         If ``obj`` is passed in, this method won't check for a permission for
         the model, but for this specific object.
@@ -930,8 +939,9 @@ methods and attributes:
 
         Returns ``True`` if the user has each of the specified permissions,
         where each perm is in the format
-        ``"<app label>.<permission codename>"``. If the user is inactive,
-        this method will always return ``False``.
+        ``"<app label>.<permission codename>"``. If :attr:`.User.is_active` and
+        :attr:`~.User.is_superuser` are both ``True``, this method always
+        returns ``True``.
 
         If ``obj`` is passed in, this method won't check for permissions for
         the model, but for the specific object.
@@ -939,8 +949,9 @@ methods and attributes:
     .. method:: models.PermissionsMixin.has_module_perms(package_name)
 
         Returns ``True`` if the user has any permissions in the given package
-        (the Django app label). If the user is inactive, this method will
-        always return ``False``.
+        (the Django app label). If :attr:`.User.is_active` and
+        :attr:`~.User.is_superuser` are both ``True``, this method always
+        returns ``True``.
 
 .. admonition:: ``PermissionsMixin`` and ``ModelBackend``
 

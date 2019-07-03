@@ -3,14 +3,14 @@
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2014
 # Paras Nath Chaudhary <opnchaudhary@gmail.com>, 2012
-# Sagar Chalise <chalisesagar@gmail.com>, 2011-2012,2015
+# Sagar Chalise <chalisesagar@gmail.com>, 2011-2012,2015,2018
 # Sagar Chalise <chalisesagar@gmail.com>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-05-17 11:49+0200\n"
-"PO-Revision-Date: 2018-07-21 02:37+0000\n"
+"POT-Creation-Date: 2019-01-16 20:42+0100\n"
+"PO-Revision-Date: 2019-01-26 07:41+0000\n"
 "Last-Translator: Sagar Chalise <chalisesagar@gmail.com>\n"
 "Language-Team: Nepali (http://www.transifex.com/django/django/language/ne/)\n"
 "MIME-Version: 1.0\n"
@@ -138,6 +138,9 @@ msgstr "माथिल्लो सोर्बियन "
 
 msgid "Hungarian"
 msgstr "हन्गेरियन"
+
+msgid "Armenian"
+msgstr ""
 
 msgid "Interlingua"
 msgstr "ईन्टरलिन्गुवा"
@@ -463,7 +466,7 @@ msgstr "%(value)s' को मान True अथवा False हुनुपर�
 
 #, python-format
 msgid "'%(value)s' value must be either True, False, or None."
-msgstr ""
+msgstr "'%(value)s' को मान True, False अथवा None हुनुपर्दछ ।"
 
 msgid "Boolean (Either True or False)"
 msgstr "बुलियन (True अथवा False)"
@@ -587,6 +590,9 @@ msgstr "र बाइनरी डाटा"
 #, python-format
 msgid "'%(value)s' is not a valid UUID."
 msgstr "'%(value)s' मान्य  UUID होइन ।"
+
+msgid "Universally unique identifier"
+msgstr ""
 
 msgid "File"
 msgstr "फाइल"
@@ -749,6 +755,8 @@ msgid ""
 "%(datetime)s couldn't be interpreted in time zone %(current_timezone)s; it "
 "may be ambiguous or it may not exist."
 msgstr ""
+"%(datetime)s को व्याख्या  %(current_timezone)s समय तालिकामा मिलेन; यो नबुझिने "
+"अथवा नरहेको हुन सक्छ ।."
 
 msgid "Clear"
 msgstr "सबै खाली गर्नु होस ।"
@@ -1030,8 +1038,8 @@ msgstr "यो उपयुक्त IPv6 ठेगाना होइन ।"
 
 #, python-format
 msgctxt "String to return when truncating text"
-msgid "%(truncated_text)s..."
-msgstr "%(truncated_text)s..."
+msgid "%(truncated_text)s…"
+msgstr ""
 
 msgid "or"
 msgstr "अथवा"
@@ -1091,6 +1099,8 @@ msgid ""
 "required for security reasons, to ensure that your browser is not being "
 "hijacked by third parties."
 msgstr ""
+"यो सूचना तपाईँले 'Referer header' ब्राउजरले नपठाएको ले देख्दै हुनुहुन्छ । सुरक्षाको निम्ति "
+"HTTPS साइट चलाउँदा 'Referer header' वेब ब्राउजरले पठाउनु पर्ने अनिवार्य छ ।"
 
 msgid ""
 "If you have configured your browser to disable 'Referer' headers, please re-"
@@ -1178,13 +1188,16 @@ msgid "Index of %(directory)s"
 msgstr "%(directory)s को सूची"
 
 msgid "Django: the Web framework for perfectionists with deadlines."
-msgstr ""
+msgstr "ज्याङ्गो : वेब साइट र एप्लिकेसन बनाउन सहयोगी औजार "
 
 #, python-format
 msgid ""
 "View <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" "
 "target=\"_blank\" rel=\"noopener\">release notes</a> for Django %(version)s"
 msgstr ""
+"ज्याङ्गो %(version)s को परिवर्तन तथा विशेषता <a href=\"https://docs."
+"djangoproject.com/en/%(version)s/releases/\" target=\"_blank\" rel=\"noopener"
+"\">यहाँ हेर्नु होस</a>"
 
 msgid "The install worked successfully! Congratulations!"
 msgstr "बधाई छ । स्थापना भएको छ ।"

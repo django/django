@@ -213,10 +213,8 @@ Via the Python API
 
     Flatpages are represented by a standard
     :doc:`Django model </topics/db/models>`,
-    which lives in `django/contrib/flatpages/models.py`_. You can access
+    which lives in :source:`django/contrib/flatpages/models.py`. You can access
     flatpage objects via the :doc:`Django database API </topics/db/queries>`.
-
-.. _django/contrib/flatpages/models.py: https://github.com/django/django/blob/master/django/contrib/flatpages/models.py
 
 .. currentmodule:: django.contrib.flatpages
 

@@ -1,13 +1,13 @@
 from django.contrib.gis import admin
 from django.contrib.gis.geos import Point
-from django.test import TestCase, override_settings
+from django.test import SimpleTestCase, override_settings
 
 from .admin import UnmodifiableAdmin
 from .models import City, site
 
 
 @override_settings(ROOT_URLCONF='django.contrib.gis.tests.geoadmin.urls')
-class GeoAdminTest(TestCase):
+class GeoAdminTest(SimpleTestCase):
 
     def test_ensure_geographic_media(self):
         geoadmin = site._registry[City]

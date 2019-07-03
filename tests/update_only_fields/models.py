@@ -1,17 +1,16 @@
 
 from django.db import models
 
-GENDER_CHOICES = (
-    ('M', 'Male'),
-    ('F', 'Female'),
-)
-
 
 class Account(models.Model):
     num = models.IntegerField()
 
 
 class Person(models.Model):
+    GENDER_CHOICES = (
+        ('M', 'Male'),
+        ('F', 'Female'),
+    )
     name = models.CharField(max_length=20)
     gender = models.CharField(max_length=1, choices=GENDER_CHOICES)
     pid = models.IntegerField(null=True, default=None)

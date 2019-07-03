@@ -1,9 +1,11 @@
 import html.entities
 import re
 import unicodedata
+import warnings
 from gzip import GzipFile
 from io import BytesIO
 
+from django.utils.deprecation import RemovedInDjango40Warning
 from django.utils.functional import SimpleLazyObject, keep_lazy_text, lazy
 from django.utils.translation import gettext as _, gettext_lazy, pgettext
 
@@ -64,7 +66,7 @@ class Truncator(SimpleLazyObject):
         if truncate is None:
             truncate = pgettext(
                 'String to return when truncating text',
-                '%(truncated_text)s...')
+                '%(truncated_text)s…')
         if '%(truncated_text)s' in truncate:
             return truncate % {'truncated_text': text}
         # The truncation text didn't contain the %(truncated_text)s string
@@ -81,8 +83,7 @@ class Truncator(SimpleLazyObject):
         of characters.
 
         `truncate` specifies what should be used to notify that the string has
-        been truncated, defaulting to a translatable string of an ellipsis
-        (...).
+        been truncated, defaulting to a translatable string of an ellipsis.
         """
         self._setup()
         length = int(num)
@@ -123,7 +124,7 @@ class Truncator(SimpleLazyObject):
         """
         Truncate a string after a certain number of words. `truncate` specifies
         what should be used to notify that the string has been truncated,
-        defaulting to ellipsis (...).
+        defaulting to ellipsis.
         """
         self._setup()
         length = int(num)
@@ -281,25 +282,12 @@ def compress_string(s):
     return zbuf.getvalue()
 
 
-class StreamingBuffer:
-    def __init__(self):
-        self.vals = []
-
-    def write(self, val):
-        self.vals.append(val)
-
+class StreamingBuffer(BytesIO):
     def read(self):
-        if not self.vals:
-            return b''
-        ret = b''.join(self.vals)
-        self.vals = []
+        ret = self.getvalue()
+        self.seek(0)
+        self.truncate()
         return ret
-
-    def flush(self):
-        return
-
-    def close(self):
-        return
 
 
 # Like compress_string, but for iterators of strings.
@@ -372,6 +360,11 @@ _entity_re = re.compile(r"&(#?[xX]?(?:[0-9a-fA-F]+|\w{1,8}));")
 
 @keep_lazy_text
 def unescape_entities(text):
+    warnings.warn(
+        'django.utils.text.unescape_entities() is deprecated in favor of '
+        'html.unescape().',
+        RemovedInDjango40Warning, stacklevel=2,
+    )
     return _entity_re.sub(_replace_entity, str(text))
 
 
@@ -414,7 +407,7 @@ def slugify(value, allow_unicode=False):
 
 def camel_case_to_spaces(value):
     """
-    Split CamelCase and convert to lower case. Strip surrounding whitespace.
+    Split CamelCase and convert to lowercase. Strip surrounding whitespace.
     """
     return re_camel_case.sub(r' \1', value).strip().lower()
 

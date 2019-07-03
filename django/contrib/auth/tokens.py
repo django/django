@@ -28,7 +28,7 @@ class PasswordResetTokenGenerator:
             return False
         # Parse the token
         try:
-            ts_b36, hash = token.split("-")
+            ts_b36, _ = token.split("-")
         except ValueError:
             return False
 
@@ -55,12 +55,12 @@ class PasswordResetTokenGenerator:
         # timestamp is number of days since 2001-1-1.  Converted to
         # base 36, this gives us a 3 digit string until about 2121
         ts_b36 = int_to_base36(timestamp)
-        hash = salted_hmac(
+        hash_string = salted_hmac(
             self.key_salt,
             self._make_hash_value(user, timestamp),
             secret=self.secret,
         ).hexdigest()[::2]  # Limit to 20 characters to shorten the URL.
-        return "%s-%s" % (ts_b36, hash)
+        return "%s-%s" % (ts_b36, hash_string)
 
     def _make_hash_value(self, user, timestamp):
         """

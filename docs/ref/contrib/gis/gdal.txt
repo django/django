@@ -21,8 +21,8 @@ to raster (image) data.
     Although the module is named ``gdal``, GeoDjango only supports some of the
     capabilities of OGR and GDAL's raster features at this time.
 
-__ http://www.gdal.org/
-__ http://www.gdal.org/ogr_arch.html
+__ https://www.gdal.org/
+__ https://www.gdal.org/ogr_arch.html
 
 Overview
 ========
@@ -92,7 +92,7 @@ each feature in that layer.
 
     Returns the name of the data source.
 
-__ http://www.gdal.org/ogr_formats.html
+__ https://www.gdal.org/ogr_formats.html
 
 ``Layer``
 ---------
@@ -446,7 +446,7 @@ coordinate transformation::
     :class:`Feature.geom` attribute, when reading vector data from
     :class:`Layer` (which is in turn a part of a :class:`DataSource`).
 
-    __ http://www.gdal.org/classOGRGeometry.html
+    __ https://www.gdal.org/classOGRGeometry.html
 
     .. classmethod:: from_gml(gml_string)
 
@@ -1172,11 +1172,11 @@ blue.
 
         The name of the GDAL driver used to handle the input file. For ``GDALRaster``\s created
         from a file, the driver type is detected automatically. The creation of rasters from
-        scratch is a in-memory raster by default (``'MEM'``), but can be altered as
-        needed. For instance, use ``GTiff`` for a ``GeoTiff`` file. For a list of file types,
-        see also the `GDAL Raster Formats`__ list.
+        scratch is an in-memory raster by default (``'MEM'``), but can be
+        altered as needed. For instance, use ``GTiff`` for a ``GeoTiff`` file.
+        For a list of file types, see also the `GDAL Raster Formats`__ list.
 
-        __ http://www.gdal.org/formats_list.html
+        __ https://www.gdal.org/formats_list.html
 
         An in-memory raster is created through the following example:
 
@@ -1271,9 +1271,9 @@ blue.
 
     .. attribute:: scale
 
-        Pixel width and height used for georeferencing the raster, as a as a
-        point object with ``x`` and ``y``  members. See :attr:`geotransform`
-        for more information.
+        Pixel width and height used for georeferencing the raster, as a point
+        object with ``x`` and ``y``  members. See :attr:`geotransform` for more
+        information.
 
             >>> rst = GDALRaster({'width': 10, 'height': 20, 'srid': 4326})
             >>> rst.scale
@@ -1403,7 +1403,7 @@ blue.
         Returns a string with a summary of the raster. This is equivalent to
         the `gdalinfo`__ command line utility.
 
-        __ http://www.gdal.org/gdalinfo.html
+        __ https://www.gdal.org/gdalinfo.html
 
     .. attribute:: metadata
 
@@ -1732,7 +1732,7 @@ Key               Default  Usage
         ...    }
         ... })
 
-__ http://www.gdal.org/frmt_gtiff.html
+__ https://www.gdal.org/frmt_gtiff.html
 
 The ``band_input`` dictionary
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

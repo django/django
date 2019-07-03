@@ -298,10 +298,9 @@ class Command(BaseCommand):
                 continue
             if os.path.isdir(app_dir):
                 dirs.append(app_dir)
-        dirs.extend(list(fixture_dirs))
+        dirs.extend(fixture_dirs)
         dirs.append('')
-        dirs = [os.path.abspath(os.path.realpath(d)) for d in dirs]
-        return dirs
+        return [os.path.realpath(d) for d in dirs]
 
     def parse_name(self, fixture_name):
         """
@@ -327,7 +326,7 @@ class Command(BaseCommand):
             else:
                 raise CommandError(
                     "Problem installing fixture '%s': %s is not a known "
-                    "serialization format." % (''.join(parts[:-1]), parts[-1]))
+                    "serialization format." % ('.'.join(parts[:-1]), parts[-1]))
         else:
             ser_fmt = None
 

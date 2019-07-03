@@ -1,6 +1,6 @@
 """
 Doctest example from the official Python documentation.
-https://docs.python.org/3/library/doctest.html
+https://docs.python.org/library/doctest.html
 """
 
 

@@ -25,7 +25,6 @@ from django.utils.dateparse import (
     parse_date, parse_datetime, parse_duration, parse_time,
 )
 from django.utils.duration import duration_microseconds, duration_string
-from django.utils.encoding import force_bytes, smart_text
 from django.utils.functional import Promise, cached_property
 from django.utils.ipv6 import clean_ipv6_address
 from django.utils.itercompat import is_iterable
@@ -154,7 +153,7 @@ class Field(RegisterLookupMixin):
         self.unique_for_year = unique_for_year
         if isinstance(choices, collections.abc.Iterator):
             choices = list(choices)
-        self.choices = choices or []
+        self.choices = choices
         self.help_text = help_text
         self.db_index = db_index
         self.db_column = db_column
@@ -260,7 +259,7 @@ class Field(RegisterLookupMixin):
         for choices_group in self.choices:
             try:
                 group_name, group_choices = choices_group
-            except ValueError:
+            except (TypeError, ValueError):
                 # Containing non-pairs
                 break
             try:
@@ -444,7 +443,7 @@ class Field(RegisterLookupMixin):
             "unique_for_date": None,
             "unique_for_month": None,
             "unique_for_year": None,
-            "choices": [],
+            "choices": None,
             "help_text": '',
             "db_column": None,
             "db_tablespace": None,
@@ -599,7 +598,7 @@ class Field(RegisterLookupMixin):
             # Skip validation for non-editable fields.
             return
 
-        if self.choices and value not in self.empty_values:
+        if self.choices is not None and value not in self.empty_values:
             for option_key, option_value in self.choices:
                 if isinstance(option_value, (list, tuple)):
                     # This is an optgroup, so look inside the group for
@@ -733,17 +732,14 @@ class Field(RegisterLookupMixin):
         """
         self.set_attributes_from_name(name)
         self.model = cls
-        if private_only:
-            cls._meta.add_field(self, private=True)
-        else:
-            cls._meta.add_field(self)
+        cls._meta.add_field(self, private=private_only)
         if self.column:
             # Don't override classmethods with the descriptor. This means that
             # if you have a classmethod and a field with the same name, then
             # such fields can't be deferred (we don't have a check for this).
             if not getattr(cls, self.attname, None):
                 setattr(cls, self.attname, DeferredAttribute(self.attname))
-        if self.choices:
+        if self.choices is not None:
             setattr(cls, 'get_%s_display' % self.name,
                     partialmethod(cls._get_FIELD_display, field=self))
 
@@ -808,12 +804,12 @@ class Field(RegisterLookupMixin):
             return return_None
         return str  # return empty string
 
-    def get_choices(self, include_blank=True, blank_choice=BLANK_CHOICE_DASH, limit_choices_to=None):
+    def get_choices(self, include_blank=True, blank_choice=BLANK_CHOICE_DASH, limit_choices_to=None, ordering=()):
         """
         Return choices with a default blank choices included, for use
         as <select> choices for this field.
         """
-        if self.choices:
+        if self.choices is not None:
             choices = list(self.choices)
             if include_blank:
                 blank_defined = any(choice in ('', None) for choice, _ in self.flatchoices)
@@ -828,8 +824,8 @@ class Field(RegisterLookupMixin):
             else 'pk'
         )
         return (blank_choice if include_blank else []) + [
-            (choice_func(x), smart_text(x))
-            for x in rel_model._default_manager.complex_filter(limit_choices_to)
+            (choice_func(x), str(x))
+            for x in rel_model._default_manager.complex_filter(limit_choices_to).order_by(*ordering)
         ]
 
     def value_to_string(self, obj):
@@ -841,6 +837,8 @@ class Field(RegisterLookupMixin):
 
     def _get_flatchoices(self):
         """Flattened version of choices tuple."""
+        if self.choices is None:
+            return []
         flat = []
         for choice, value in self.choices:
             if isinstance(value, (list, tuple)):
@@ -855,16 +853,18 @@ class Field(RegisterLookupMixin):
 
     def formfield(self, form_class=None, choices_form_class=None, **kwargs):
         """Return a django.forms.Field instance for this field."""
-        defaults = {'required': not self.blank,
-                    'label': capfirst(self.verbose_name),
-                    'help_text': self.help_text}
+        defaults = {
+            'required': not self.blank,
+            'label': capfirst(self.verbose_name),
+            'help_text': self.help_text,
+        }
         if self.has_default():
             if callable(self.default):
                 defaults['initial'] = self.default
                 defaults['show_hidden_initial'] = True
             else:
                 defaults['initial'] = self.get_default()
-        if self.choices:
+        if self.choices is not None:
             # Fields with choices get special treatment.
             include_blank = (self.blank or
                              not (self.has_default() or 'initial' in kwargs))
@@ -899,7 +899,7 @@ class AutoField(Field):
 
     empty_strings_allowed = False
     default_error_messages = {
-        'invalid': _("'%(value)s' value must be an integer."),
+        'invalid': _('“%(value)s” value must be an integer.'),
     }
 
     def __init__(self, *args, **kwargs):
@@ -986,8 +986,8 @@ class BigAutoField(AutoField):
 class BooleanField(Field):
     empty_strings_allowed = False
     default_error_messages = {
-        'invalid': _("'%(value)s' value must be either True or False."),
-        'invalid_nullable': _("'%(value)s' value must be either True, False, or None."),
+        'invalid': _('“%(value)s” value must be either True or False.'),
+        'invalid_nullable': _('“%(value)s” value must be either True, False, or None.'),
     }
     description = _("Boolean (Either True or False)")
 
@@ -1017,7 +1017,7 @@ class BooleanField(Field):
         return self.to_python(value)
 
     def formfield(self, **kwargs):
-        if self.choices:
+        if self.choices is not None:
             include_blank = not (self.has_default() or 'initial' in kwargs)
             defaults = {'choices': self.get_choices(include_blank=include_blank)}
         else:
@@ -1143,10 +1143,10 @@ class DateTimeCheckMixin:
 class DateField(DateTimeCheckMixin, Field):
     empty_strings_allowed = False
     default_error_messages = {
-        'invalid': _("'%(value)s' value has an invalid date format. It must be "
-                     "in YYYY-MM-DD format."),
-        'invalid_date': _("'%(value)s' value has the correct format (YYYY-MM-DD) "
-                          "but it is an invalid date."),
+        'invalid': _('“%(value)s” value has an invalid date format. It must be '
+                     'in YYYY-MM-DD format.'),
+        'invalid_date': _('“%(value)s” value has the correct format (YYYY-MM-DD) '
+                          'but it is an invalid date.'),
     }
     description = _("Date (without time)")
 
@@ -1286,13 +1286,13 @@ class DateField(DateTimeCheckMixin, Field):
 class DateTimeField(DateField):
     empty_strings_allowed = False
     default_error_messages = {
-        'invalid': _("'%(value)s' value has an invalid format. It must be in "
-                     "YYYY-MM-DD HH:MM[:ss[.uuuuuu]][TZ] format."),
-        'invalid_date': _("'%(value)s' value has the correct format "
+        'invalid': _('“%(value)s” value has an invalid format. It must be in '
+                     'YYYY-MM-DD HH:MM[:ss[.uuuuuu]][TZ] format.'),
+        'invalid_date': _("“%(value)s” value has the correct format "
                           "(YYYY-MM-DD) but it is an invalid date."),
-        'invalid_datetime': _("'%(value)s' value has the correct format "
-                              "(YYYY-MM-DD HH:MM[:ss[.uuuuuu]][TZ]) "
-                              "but it is an invalid date/time."),
+        'invalid_datetime': _('“%(value)s” value has the correct format '
+                              '(YYYY-MM-DD HH:MM[:ss[.uuuuuu]][TZ]) '
+                              'but it is an invalid date/time.'),
     }
     description = _("Date (with time)")
 
@@ -1442,7 +1442,7 @@ class DateTimeField(DateField):
 class DecimalField(Field):
     empty_strings_allowed = False
     default_error_messages = {
-        'invalid': _("'%(value)s' value must be a decimal number."),
+        'invalid': _('“%(value)s” value must be a decimal number.'),
     }
     description = _("Decimal number")
 
@@ -1583,8 +1583,8 @@ class DurationField(Field):
     """
     empty_strings_allowed = False
     default_error_messages = {
-        'invalid': _("'%(value)s' value has an invalid format. It must be in "
-                     "[DD] [HH:[MM:]]ss[.uuuuuu] format.")
+        'invalid': _('“%(value)s” value has an invalid format. It must be in '
+                     '[DD] [[HH:]MM:]ss[.uuuuuu] format.')
     }
     description = _("Duration")
 
@@ -1709,7 +1709,7 @@ class FilePathField(Field):
 
     def formfield(self, **kwargs):
         return super().formfield(**{
-            'path': self.path,
+            'path': self.path() if callable(self.path) else self.path,
             'match': self.match,
             'recursive': self.recursive,
             'form_class': forms.FilePathField,
@@ -1725,7 +1725,7 @@ class FilePathField(Field):
 class FloatField(Field):
     empty_strings_allowed = False
     default_error_messages = {
-        'invalid': _("'%(value)s' value must be a float."),
+        'invalid': _('“%(value)s” value must be a float.'),
     }
     description = _("Floating point number")
 
@@ -1760,7 +1760,7 @@ class FloatField(Field):
 class IntegerField(Field):
     empty_strings_allowed = False
     default_error_messages = {
-        'invalid': _("'%(value)s' value must be an integer."),
+        'invalid': _('“%(value)s” value must be an integer.'),
     }
     description = _("Integer")
 
@@ -1774,7 +1774,7 @@ class IntegerField(Field):
         if self.max_length is not None:
             return [
                 checks.Warning(
-                    "'max_length' is ignored when used with IntegerField",
+                    "'max_length' is ignored when used with %s." % self.__class__.__name__,
                     hint="Remove 'max_length' from field",
                     obj=self,
                     id='fields.W122',
@@ -1789,13 +1789,25 @@ class IntegerField(Field):
         validators_ = super().validators
         internal_type = self.get_internal_type()
         min_value, max_value = connection.ops.integer_field_range(internal_type)
-        if (min_value is not None and not
-            any(isinstance(validator, validators.MinValueValidator) and
-                validator.limit_value >= min_value for validator in validators_)):
+        if min_value is not None and not any(
+            (
+                isinstance(validator, validators.MinValueValidator) and (
+                    validator.limit_value()
+                    if callable(validator.limit_value)
+                    else validator.limit_value
+                ) >= min_value
+            ) for validator in validators_
+        ):
             validators_.append(validators.MinValueValidator(min_value))
-        if (max_value is not None and not
-            any(isinstance(validator, validators.MaxValueValidator) and
-                validator.limit_value <= max_value for validator in validators_)):
+        if max_value is not None and not any(
+            (
+                isinstance(validator, validators.MaxValueValidator) and (
+                    validator.limit_value()
+                    if callable(validator.limit_value)
+                    else validator.limit_value
+                ) <= max_value
+            ) for validator in validators_
+        ):
             validators_.append(validators.MaxValueValidator(max_value))
         return validators_
 
@@ -1828,7 +1840,6 @@ class IntegerField(Field):
 
 
 class BigIntegerField(IntegerField):
-    empty_strings_allowed = False
     description = _("Big (8 byte) integer")
     MAX_BIGINT = 9223372036854775807
 
@@ -1956,8 +1967,8 @@ class GenericIPAddressField(Field):
 
 class NullBooleanField(BooleanField):
     default_error_messages = {
-        'invalid': _("'%(value)s' value must be either None, True or False."),
-        'invalid_nullable': _("'%(value)s' value must be either None, True or False."),
+        'invalid': _('“%(value)s” value must be either None, True or False.'),
+        'invalid_nullable': _('“%(value)s” value must be either None, True or False.'),
     }
     description = _("Boolean (Either True, False or None)")
 
@@ -2080,7 +2091,7 @@ class TextField(Field):
         # the value in the form field (to pass into widget for example).
         return super().formfield(**{
             'max_length': self.max_length,
-            **({} if self.choices else {'widget': forms.Textarea}),
+            **({} if self.choices is not None else {'widget': forms.Textarea}),
             **kwargs,
         })
 
@@ -2088,10 +2099,10 @@ class TextField(Field):
 class TimeField(DateTimeCheckMixin, Field):
     empty_strings_allowed = False
     default_error_messages = {
-        'invalid': _("'%(value)s' value has an invalid format. It must be in "
-                     "HH:MM[:ss[.uuuuuu]] format."),
-        'invalid_time': _("'%(value)s' value has the correct format "
-                          "(HH:MM[:ss[.uuuuuu]]) but it is an invalid time."),
+        'invalid': _('“%(value)s” value has an invalid format. It must be in '
+                     'HH:MM[:ss[.uuuuuu]] format.'),
+        'invalid_time': _('“%(value)s” value has the correct format '
+                          '(HH:MM[:ss[.uuuuuu]]) but it is an invalid time.'),
     }
     description = _("Time")
 
@@ -2250,6 +2261,21 @@ class BinaryField(Field):
         if self.max_length is not None:
             self.validators.append(validators.MaxLengthValidator(self.max_length))
 
+    def check(self, **kwargs):
+        return [*super().check(**kwargs), *self._check_str_default_value()]
+
+    def _check_str_default_value(self):
+        if self.has_default() and isinstance(self.default, str):
+            return [
+                checks.Error(
+                    "BinaryField's default cannot be a string. Use bytes "
+                    "content instead.",
+                    obj=self,
+                    id='fields.E170',
+                )
+            ]
+        return []
+
     def deconstruct(self):
         name, path, args, kwargs = super().deconstruct()
         if self.editable:
@@ -2280,20 +2306,20 @@ class BinaryField(Field):
 
     def value_to_string(self, obj):
         """Binary data is serialized as base64"""
-        return b64encode(force_bytes(self.value_from_object(obj))).decode('ascii')
+        return b64encode(self.value_from_object(obj)).decode('ascii')
 
     def to_python(self, value):
         # If it's a string, it should be base64-encoded data
         if isinstance(value, str):
-            return memoryview(b64decode(force_bytes(value)))
+            return memoryview(b64decode(value.encode('ascii')))
         return value
 
 
 class UUIDField(Field):
     default_error_messages = {
-        'invalid': _("'%(value)s' is not a valid UUID."),
+        'invalid': _('“%(value)s” is not a valid UUID.'),
     }
-    description = 'Universally unique identifier'
+    description = _('Universally unique identifier')
     empty_strings_allowed = False
 
     def __init__(self, verbose_name=None, **kwargs):
@@ -2308,6 +2334,10 @@ class UUIDField(Field):
     def get_internal_type(self):
         return "UUIDField"
 
+    def get_prep_value(self, value):
+        value = super().get_prep_value(value)
+        return self.to_python(value)
+
     def get_db_prep_value(self, value, connection, prepared=False):
         if value is None:
             return None
@@ -2320,8 +2350,9 @@ class UUIDField(Field):
 
     def to_python(self, value):
         if value is not None and not isinstance(value, uuid.UUID):
+            input_form = 'int' if isinstance(value, int) else 'hex'
             try:
-                return uuid.UUID(value)
+                return uuid.UUID(**{input_form: value})
             except (AttributeError, ValueError):
                 raise exceptions.ValidationError(
                     self.error_messages['invalid'],

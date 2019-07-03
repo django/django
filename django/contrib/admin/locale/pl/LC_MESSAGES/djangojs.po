@@ -3,18 +3,18 @@
 # Translators:
 # angularcircle, 2011
 # Jannis Leidel <jannis@leidel.info>, 2011
-# Janusz Harkot <jh@blueice.pl>, 2014-2015
+# Janusz Harkot <jh@trilab.pl>, 2014-2015
 # konryd <inactive+konryd@transifex.com>, 2011
-# m_aciek <maciej.olko@gmail.com>, 2016
-# Roman Barczyński <rombar@gmail.com>, 2012
+# m_aciek <maciej.olko@gmail.com>, 2016,2018
+# Roman Barczyński, 2012
 # Tomasz Kajtoch <tomekkaj@tomekkaj.pl>, 2016-2017
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-05-17 11:50+0200\n"
-"PO-Revision-Date: 2017-09-23 18:54+0000\n"
-"Last-Translator: Tomasz Kajtoch <tomekkaj@tomekkaj.pl>\n"
+"PO-Revision-Date: 2018-12-21 22:38+0000\n"
+"Last-Translator: m_aciek <maciej.olko@gmail.com>\n"
 "Language-Team: Polish (http://www.transifex.com/django/django/language/pl/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -77,10 +77,10 @@ msgstr "Kliknij, aby usunąć jednocześnie wszystkie wybrane %s."
 
 msgid "%(sel)s of %(cnt)s selected"
 msgid_plural "%(sel)s of %(cnt)s selected"
-msgstr[0] "Zaznaczono %(sel)s z %(cnt)s"
-msgstr[1] "Zaznaczono %(sel)s z %(cnt)s"
-msgstr[2] "Zaznaczono %(sel)s z %(cnt)s"
-msgstr[3] "Zaznaczono %(sel)s z %(cnt)s"
+msgstr[0] "Wybrano %(sel)s z %(cnt)s"
+msgstr[1] "Wybrano %(sel)s z %(cnt)s"
+msgstr[2] "Wybrano %(sel)s z %(cnt)s"
+msgstr[3] "Wybrano %(sel)s z %(cnt)s"
 
 msgid ""
 "You have unsaved changes on individual editable fields. If you run an "

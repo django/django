@@ -3,7 +3,7 @@
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011
 # lauris <lauris@runbox.com>, 2011
-# Matas Dailyda <matas@dailyda.com>, 2015-2018
+# Matas Dailyda <matas@dailyda.com>, 2015-2019
 # Nikolajus Krauklis <nikolajus@gmail.com>, 2013
 # Simonas Kazlauskas <simonas@kazlauskas.me>, 2012-2013
 # sirex <sirexas@gmail.com>, 2011
@@ -11,9 +11,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-05-21 14:16-0300\n"
-"PO-Revision-Date: 2018-05-28 01:29+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2019-01-16 20:42+0100\n"
+"PO-Revision-Date: 2019-01-18 10:32+0000\n"
+"Last-Translator: Matas Dailyda <matas@dailyda.com>\n"
 "Language-Team: Lithuanian (http://www.transifex.com/django/django/language/"
 "lt/)\n"
 "MIME-Version: 1.0\n"
@@ -115,7 +115,7 @@ msgid "object id"
 msgstr "objekto id"
 
 #. Translators: 'repr' means representation
-#. (https://docs.python.org/3/library/functions.html#repr)
+#. (https://docs.python.org/library/functions.html#repr)
 msgid "object repr"
 msgstr "objekto repr"
 
@@ -244,7 +244,7 @@ msgstr "Pakeisti %s"
 
 #, python-format
 msgid "View %s"
-msgstr ""
+msgstr "Peržiūrėti %s"
 
 msgid "Database error"
 msgstr "Duomenų bazės klaida"
@@ -544,24 +544,8 @@ msgstr "Rodyti visus"
 msgid "Save"
 msgstr "Išsaugoti"
 
-msgid "Popup closing..."
-msgstr "Langas užsidaro..."
-
-#, python-format
-msgid "Change selected %(model)s"
-msgstr "Keisti pasirinktus %(model)s"
-
-#, python-format
-msgid "View selected %(model)s"
-msgstr "Peržiūrėti pasirinktus %(model)s"
-
-#, python-format
-msgid "Add another %(model)s"
-msgstr "Pridėti dar vieną %(model)s"
-
-#, python-format
-msgid "Delete selected %(model)s"
-msgstr "Pašalinti pasirinktus %(model)s"
+msgid "Popup closing…"
+msgstr "Iškylantysis langas užsidaro..."
 
 msgid "Search"
 msgstr "Ieškoti"
@@ -592,6 +576,18 @@ msgstr "Išsaugoti ir peržiūrėti"
 
 msgid "Close"
 msgstr "Uždaryti"
+
+#, python-format
+msgid "Change selected %(model)s"
+msgstr "Keisti pasirinktus %(model)s"
+
+#, python-format
+msgid "Add another %(model)s"
+msgstr "Pridėti dar vieną %(model)s"
+
+#, python-format
+msgid "Delete selected %(model)s"
+msgstr "Pašalinti pasirinktus %(model)s"
 
 msgid "Thanks for spending some quality time with the Web site today."
 msgstr "Dėkui už šiandien tinklalapyje turiningai praleistą laiką."
@@ -706,7 +702,7 @@ msgstr "Pasirinkite %s kurį norite keisti"
 
 #, python-format
 msgid "Select %s to view"
-msgstr ""
+msgstr "Pasirinkti %s peržiūrai"
 
 msgid "Date:"
 msgstr "Data:"

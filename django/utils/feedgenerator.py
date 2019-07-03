@@ -19,7 +19,7 @@ Sample usage:
 ...     feed.write(fp, 'utf-8')
 
 For definitions of the different versions of RSS, see:
-http://web.archive.org/web/20110718035220/http://diveintomark.org/archives/2004/02/04/incompatible-rss
+https://web.archive.org/web/20110718035220/http://diveintomark.org/archives/2004/02/04/incompatible-rss
 """
 import datetime
 import email
@@ -47,7 +47,7 @@ def get_tag_uri(url, date):
     """
     Create a TagURI.
 
-    See http://web.archive.org/web/20110514113830/http://diveintomark.org/archives/2004/05/28/howto-atom-id
+    See https://web.archive.org/web/20110514113830/http://diveintomark.org/archives/2004/05/28/howto-atom-id
     """
     bits = urlparse(url)
     d = ''
@@ -198,8 +198,10 @@ class RssFeed(SyndicationFeed):
         handler.endElement("rss")
 
     def rss_attributes(self):
-        return {"version": self._version,
-                "xmlns:atom": "http://www.w3.org/2005/Atom"}
+        return {
+            'version': self._version,
+            'xmlns:atom': 'http://www.w3.org/2005/Atom',
+        }
 
     def write_items(self, handler):
         for item in self.items:
@@ -238,7 +240,7 @@ class RssUserland091Feed(RssFeed):
 
 
 class Rss201rev2Feed(RssFeed):
-    # Spec: http://blogs.law.harvard.edu/tech/rss
+    # Spec: https://cyber.harvard.edu/rss/rss.html
     _version = "2.0"
 
     def add_item_elements(self, handler, item):

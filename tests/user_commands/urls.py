@@ -1,5 +1,5 @@
-from django.conf.urls import url
+from django.urls import path
 
 urlpatterns = [
-    url(r'^some/url/$', lambda req:req, name='some_url'),
+    path('some/url/', lambda req:req, name='some_url'),
 ]

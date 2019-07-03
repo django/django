@@ -1,7 +1,9 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# jamie lu <www.ljm969087551@qq.com>, 2017
+# David <huangtao0202@gmail.com>, 2019
+# ausaki <www.ljm969087551@qq.com>, 2017
+# jamin M <lxxmbyx@163.com>, 2019
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Kevin Sze <leiarix@gmail.com>, 2012
 # Lele Long <schemacs@gmail.com>, 2011,2015
@@ -9,15 +11,15 @@
 # mozillazg <opensource.mozillazg@gmail.com>, 2016
 # pylemon <leeway1985@gmail.com>, 2012-2013
 # hizyn <zhangyanan5552@gmail.com>, 2016
-# Ziang Song <songziang@gmail.com>, 2011
+# ced773123cfad7b4e8b79ca80f736af9, 2011
 # Kevin Sze <leiarix@gmail.com>, 2012
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-09-24 13:46+0200\n"
-"PO-Revision-Date: 2017-12-28 06:11+0000\n"
-"Last-Translator: jamie lu <www.ljm969087551@qq.com>\n"
+"PO-Revision-Date: 2019-05-26 10:59+0000\n"
+"Last-Translator: jamin M <lxxmbyx@163.com>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/django/django/"
 "language/zh_CN/)\n"
 "MIME-Version: 1.0\n"
@@ -126,10 +128,10 @@ msgid "version"
 msgstr "版本"
 
 msgid "memory cost"
-msgstr "消耗内存"
+msgstr "内存花销"
 
 msgid "time cost"
-msgstr "消耗时间"
+msgstr "时间花销"
 
 msgid "parallelism"
 msgstr "对比"
@@ -178,7 +180,7 @@ msgid "user permissions"
 msgstr "用户权限"
 
 msgid "Specific permissions for this user."
-msgstr "为该用户声明权限。"
+msgstr "这个用户的特定权限。"
 
 msgid "username"
 msgstr "用户名"
@@ -199,7 +201,7 @@ msgid "email address"
 msgstr "电子邮件地址"
 
 msgid "staff status"
-msgstr "职员状态"
+msgstr "人员状态"
 
 msgid "Designates whether the user can log into this admin site."
 msgstr "指明用户是否可以登录到这个管理站点。"
@@ -210,7 +212,7 @@ msgstr "有效"
 msgid ""
 "Designates whether this user should be treated as active. Unselect this "
 "instead of deleting accounts."
-msgstr "指明用户是否被认为活跃的。以反选代替删除帐号。"
+msgstr "指明用户是否被认为是活跃的。以反选代替删除帐号。"
 
 msgid "date joined"
 msgstr "加入日期"
@@ -240,7 +242,7 @@ msgid "The password is too similar to the %(verbose_name)s."
 msgstr "密码跟 %(verbose_name)s 太相似了。"
 
 msgid "Your password can't be too similar to your other personal information."
-msgstr "你的密码不能与其他个人信息太相似。"
+msgstr "你的密码不能与你的其他个人信息太相似。"
 
 msgid "This password is too common."
 msgstr "这个密码太常见了。"
@@ -249,7 +251,7 @@ msgid "Your password can't be a commonly used password."
 msgstr "你的密码不能是大家都爱用的常见密码。"
 
 msgid "This password is entirely numeric."
-msgstr "这个密码全部是数字的。"
+msgstr "密码只包含数字。"
 
 msgid "Your password can't be entirely numeric."
 msgstr "你的密码不能全部为数字。"
@@ -269,10 +271,10 @@ msgid ""
 msgstr "请输入合法用户名。只能包含字母，数字和@/./+/-/_ 字符。"
 
 msgid "Logged out"
-msgstr "退出登录"
+msgstr "登出"
 
 msgid "Password reset"
-msgstr "密码重置"
+msgstr "重置密码"
 
 msgid "Password reset sent"
 msgstr "密码重置链接已经发送。"

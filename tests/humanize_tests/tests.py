@@ -31,10 +31,14 @@ class HumanizeTests(SimpleTestCase):
 
     def humanize_tester(self, test_list, result_list, method, normalize_result_func=escape):
         for test_content, result in zip(test_list, result_list):
-            t = Template('{%% load humanize %%}{{ test_content|%s }}' % method)
-            rendered = t.render(Context(locals())).strip()
-            self.assertEqual(rendered, normalize_result_func(result),
-                             msg="%s test failed, produced '%s', should've produced '%s'" % (method, rendered, result))
+            with self.subTest(test_content):
+                t = Template('{%% load humanize %%}{{ test_content|%s }}' % method)
+                rendered = t.render(Context(locals())).strip()
+                self.assertEqual(
+                    rendered,
+                    normalize_result_func(result),
+                    msg="%s test failed, produced '%s', should've produced '%s'" % (method, rendered, result)
+                )
 
     def test_ordinal(self):
         test_list = ('1', '2', '3', '4', '11', '12',
@@ -98,12 +102,13 @@ class HumanizeTests(SimpleTestCase):
         test_list = (
             '100', '1000000', '1200000', '1290000', '1000000000', '2000000000',
             '6000000000000', '1300000000000000', '3500000000000000000000',
-            '8100000000000000000000000000000000', None,
+            '8100000000000000000000000000000000', None, ('1' + '0' * 100),
+            ('1' + '0' * 104),
         )
         result_list = (
             '100', '1.0 million', '1.2 million', '1.3 million', '1.0 billion',
             '2.0 billion', '6.0 trillion', '1.3 quadrillion', '3.5 sextillion',
-            '8.1 decillion', None,
+            '8.1 decillion', None, '1.0 googol', ('1' + '0' * 104),
         )
         with translation.override('en'):
             self.humanize_tester(test_list, result_list, 'intword')
@@ -183,7 +188,9 @@ class HumanizeTests(SimpleTestCase):
             def utcoffset(self, dt):
                 return None
         test_list = [
+            'test',
             now,
+            now - datetime.timedelta(microseconds=1),
             now - datetime.timedelta(seconds=1),
             now - datetime.timedelta(seconds=30),
             now - datetime.timedelta(minutes=1, seconds=30),
@@ -205,6 +212,8 @@ class HumanizeTests(SimpleTestCase):
             now.replace(tzinfo=utc),
         ]
         result_list = [
+            'test',
+            'now',
             'now',
             'a second ago',
             '30\xa0seconds ago',
@@ -284,34 +293,53 @@ class HumanizeTests(SimpleTestCase):
         humanize.datetime = DocumentedMockDateTime
         try:
             for test_time_string, expected_natural_time in test_data:
-                test_time = datetime.datetime.strptime(test_time_string, time_format)
-                natural_time = humanize.naturaltime(test_time).replace('\xa0', ' ')
-                self.assertEqual(expected_natural_time, natural_time)
+                with self.subTest(test_time_string):
+                    test_time = datetime.datetime.strptime(test_time_string, time_format)
+                    natural_time = humanize.naturaltime(test_time).replace('\xa0', ' ')
+                    self.assertEqual(expected_natural_time, natural_time)
         finally:
             humanize.datetime = orig_humanize_datetime
 
-    def test_dative_inflection_for_timedelta(self):
-        """Translation may differ depending on the string it is inserted in."""
+    def test_inflection_for_timedelta(self):
+        """
+        Translation of '%d day'/'%d month'/… may differ depending on the context
+        of the string it is inserted in.
+        """
         test_list = [
+            # "%(delta)s ago" translations
             now - datetime.timedelta(days=1),
             now - datetime.timedelta(days=2),
             now - datetime.timedelta(days=30),
             now - datetime.timedelta(days=60),
             now - datetime.timedelta(days=500),
             now - datetime.timedelta(days=865),
+            # "%(delta)s from now" translations
+            now + datetime.timedelta(days=1),
+            now + datetime.timedelta(days=2),
+            now + datetime.timedelta(days=30),
+            now + datetime.timedelta(days=60),
+            now + datetime.timedelta(days=500),
+            now + datetime.timedelta(days=865),
         ]
         result_list = [
-            'vor 1\xa0Tag',
-            'vor 2\xa0Tagen',
-            'vor 1\xa0Monat',
-            'vor 2\xa0Monaten',
-            'vor 1\xa0Jahr, 4\xa0Monaten',
-            'vor 2\xa0Jahren, 4\xa0Monaten',
+            'před 1\xa0dnem',
+            'před 2\xa0dny',
+            'před 1\xa0měsícem',
+            'před 2\xa0měsíci',
+            'před 1\xa0rokem, 4\xa0měsíci',
+            'před 2\xa0lety, 4\xa0měsíci',
+            'za 1\xa0den',
+            'za 2\xa0dny',
+            'za 1\xa0měsíc',
+            'za 2\xa0měsíce',
+            'za 1\xa0rok, 4\xa0měsíce',
+            'za 2\xa0roky, 4\xa0měsíce',
         ]
 
         orig_humanize_datetime, humanize.datetime = humanize.datetime, MockDateTime
         try:
-            with translation.override('de'), self.settings(USE_L10N=True):
+            # Choose a language with different naturaltime-past/naturaltime-future translations
+            with translation.override('cs'), self.settings(USE_L10N=True):
                 self.humanize_tester(test_list, result_list, 'naturaltime')
         finally:
             humanize.datetime = orig_humanize_datetime

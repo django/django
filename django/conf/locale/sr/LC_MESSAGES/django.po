@@ -2,15 +2,16 @@
 #
 # Translators:
 # Branko Kokanovic <branko@kokanovic.org>, 2018
+# Igor Jerosimić, 2019
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Janos Guljas <janos@resenje.org>, 2011-2012
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-05-17 11:49+0200\n"
-"PO-Revision-Date: 2018-05-18 20:03+0000\n"
-"Last-Translator: Branko Kokanovic <branko@kokanovic.org>\n"
+"POT-Creation-Date: 2019-01-16 20:42+0100\n"
+"PO-Revision-Date: 2019-06-27 19:31+0000\n"
+"Last-Translator: Igor Jerosimić\n"
 "Language-Team: Serbian (http://www.transifex.com/django/django/language/"
 "sr/)\n"
 "MIME-Version: 1.0\n"
@@ -139,6 +140,9 @@ msgstr "горњолужичкосрпски"
 
 msgid "Hungarian"
 msgstr "мађарски"
+
+msgid "Armenian"
+msgstr "јерменски"
 
 msgid "Interlingua"
 msgstr "интерлингва"
@@ -618,6 +622,9 @@ msgstr "Сирови бинарни подаци"
 msgid "'%(value)s' is not a valid UUID."
 msgstr "'%(value)s' није валидан UUID."
 
+msgid "Universally unique identifier"
+msgstr "Универзално јединствени идентификатор"
+
 msgid "File"
 msgstr "Фајл"
 
@@ -1068,7 +1075,7 @@ msgstr "Ово није валидна IPv6 адреса."
 
 #, python-format
 msgctxt "String to return when truncating text"
-msgid "%(truncated_text)s..."
+msgid "%(truncated_text)s…"
 msgstr "%(truncated_text)s..."
 
 msgid "or"

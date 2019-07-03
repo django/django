@@ -108,3 +108,29 @@ msgstr "Es gibt %(num_comments)s Kommentare"
 msgctxt "other comment count"
 msgid "There are %(num_comments)s comments"
 msgstr "Andere: Es gibt %(num_comments)s Kommentare"
+
+#: tests.py:213
+msgid "{} good result"
+msgid_plural "{} good results"
+msgstr[0] "{} gutes Resultat"
+msgstr[1] "{} guten Resultate"
+
+#: tests.py:214
+msgctxt "Exclamation"
+msgid "{} good result"
+msgid_plural "{} good results"
+msgstr[0] "{} gutes Resultat!"
+msgstr[1] "{} guten Resultate!"
+
+#: tests.py:226
+msgid "Hi {name}, {num} good result"
+msgid_plural "Hi {name}, {num} good results"
+msgstr[0] "Hallo {name}, {num} gutes Resultat"
+msgstr[1] "Hallo {name}, {num} guten Resultate"
+
+#: tests.py:230
+msgctxt "Greeting"
+msgid "Hi {name}, {num} good result"
+msgid_plural "Hi {name}, {num} good results"
+msgstr[0] "Willkommen {name}, {num} gutes Resultat"
+msgstr[1] "Willkommen {name}, {num} guten Resultate"

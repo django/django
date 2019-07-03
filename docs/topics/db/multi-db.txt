@@ -729,7 +729,7 @@ In addition, some objects are automatically created just after
 - a default ``Site``,
 - a ``ContentType`` for each model (including those not stored in that
   database),
-- three ``Permission`` for each model (including those not stored in that
+- the ``Permission``\s for each model (including those not stored in that
   database).
 
 For common setups with multiple databases, it isn't useful to have these

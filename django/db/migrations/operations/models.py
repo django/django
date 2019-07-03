@@ -638,6 +638,7 @@ class AlterModelOptions(ModelOptionOperation):
     ALTER_OPTION_KEYS = [
         "base_manager_name",
         "default_manager_name",
+        "default_related_name",
         "get_latest_by",
         "managed",
         "ordering",
@@ -734,9 +735,7 @@ class AddIndex(IndexOperation):
 
     def state_forwards(self, app_label, state):
         model_state = state.models[app_label, self.model_name_lower]
-        indexes = list(model_state.options[self.option_name])
-        indexes.append(self.index.clone())
-        model_state.options[self.option_name] = indexes
+        model_state.options[self.option_name] = [*model_state.options[self.option_name], self.index.clone()]
         state.reload_model(app_label, self.model_name_lower, delay=True)
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
@@ -819,9 +818,8 @@ class AddConstraint(IndexOperation):
 
     def state_forwards(self, app_label, state):
         model_state = state.models[app_label, self.model_name_lower]
-        constraints = list(model_state.options[self.option_name])
-        constraints.append(self.constraint)
-        model_state.options[self.option_name] = constraints
+        model_state.options[self.option_name] = [*model_state.options[self.option_name], self.constraint]
+        state.reload_model(app_label, self.model_name_lower, delay=True)
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
         model = to_state.apps.get_model(app_label, self.model_name)
@@ -854,9 +852,10 @@ class RemoveConstraint(IndexOperation):
         model_state = state.models[app_label, self.model_name_lower]
         constraints = model_state.options[self.option_name]
         model_state.options[self.option_name] = [c for c in constraints if c.name != self.name]
+        state.reload_model(app_label, self.model_name_lower, delay=True)
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
-        model = from_state.apps.get_model(app_label, self.model_name)
+        model = to_state.apps.get_model(app_label, self.model_name)
         if self.allow_migrate_model(schema_editor.connection.alias, model):
             from_model_state = from_state.models[app_label, self.model_name_lower]
             constraint = from_model_state.get_constraint_by_name(self.name)

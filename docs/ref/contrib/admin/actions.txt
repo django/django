@@ -47,11 +47,11 @@ simple news application with an ``Article`` model::
 
     from django.db import models
 
-    STATUS_CHOICES = (
+    STATUS_CHOICES = [
         ('d', 'Draft'),
         ('p', 'Published'),
         ('w', 'Withdrawn'),
-    )
+    ]
 
     class Article(models.Model):
         title = models.CharField(max_length=100)
@@ -343,10 +343,8 @@ Conditionally enabling or disabling actions
     This returns a dictionary of actions allowed. The keys are action names, and
     the values are ``(function, name, short_description)`` tuples.
 
-    Most of the time you'll use this method to conditionally remove actions from
-    the list gathered by the superclass. For example, if I only wanted users
-    whose names begin with 'J' to be able to delete objects in bulk, I could do
-    the following::
+    For example, if you only want users whose names begin with 'J' to be able
+    to delete objects in bulk::
 
         class MyModelAdmin(admin.ModelAdmin):
             ...
@@ -362,8 +360,6 @@ Conditionally enabling or disabling actions
 
 Setting permissions for actions
 -------------------------------
-
-.. versionadded:: 2.1
 
 Actions may limit their availability to users with specific permissions by
 setting an ``allowed_permissions`` attribute on the action function::

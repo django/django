@@ -3,11 +3,17 @@ from decimal import Decimal
 from django.db.models import DecimalField
 from django.db.models.functions import Abs
 from django.test import TestCase
+from django.test.utils import register_lookup
 
 from ..models import DecimalModel, FloatModel, IntegerModel
 
 
 class AbsTests(TestCase):
+
+    def test_null(self):
+        IntegerModel.objects.create()
+        obj = IntegerModel.objects.annotate(null_abs=Abs('normal')).first()
+        self.assertIsNone(obj.null_abs)
 
     def test_decimal(self):
         DecimalModel.objects.create(n1=Decimal('-0.8'), n2=Decimal('1.2'))
@@ -40,11 +46,8 @@ class AbsTests(TestCase):
         self.assertEqual(obj.big, -obj.big_abs)
 
     def test_transform(self):
-        try:
-            DecimalField.register_lookup(Abs)
+        with register_lookup(DecimalField, Abs):
             DecimalModel.objects.create(n1=Decimal('-1.5'), n2=Decimal('0'))
             DecimalModel.objects.create(n1=Decimal('-0.5'), n2=Decimal('0'))
-            objs = DecimalModel.objects.filter(n1__abs__gt=1)
-            self.assertQuerysetEqual(objs, [Decimal('-1.5')], lambda a: a.n1)
-        finally:
-            DecimalField._unregister_lookup(Abs)
+            obj = DecimalModel.objects.filter(n1__abs__gt=1).get()
+            self.assertEqual(obj.n1, Decimal('-1.5'))

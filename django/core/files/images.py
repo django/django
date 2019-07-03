@@ -69,6 +69,10 @@ def get_image_dimensions(file_or_path, close=False):
                 # less bytes than expected. Skip and feed more data to the
                 # parser (ticket #24544).
                 pass
+            except RuntimeError:
+                # e.g. "RuntimeError: could not create decoder object" for
+                # WebP files. A different chunk_size may work.
+                pass
             if p.image:
                 return p.image.size
             chunk_size *= 2

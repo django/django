@@ -1,8 +1,8 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# charettes <charette.s@gmail.com>, 2012
-# Claude Paroz <claude@2xlibre.net>, 2013-2018
+# Simon Charette <charette.s@gmail.com>, 2012
+# Claude Paroz <claude@2xlibre.net>, 2013-2019
 # Claude Paroz <claude@2xlibre.net>, 2011
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Jean-Baptiste Mora, 2014
@@ -12,8 +12,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-05-17 11:49+0200\n"
-"PO-Revision-Date: 2018-05-18 12:50+0000\n"
+"POT-Creation-Date: 2019-01-16 20:42+0100\n"
+"PO-Revision-Date: 2019-01-18 17:30+0000\n"
 "Last-Translator: Claude Paroz <claude@2xlibre.net>\n"
 "Language-Team: French (http://www.transifex.com/django/django/language/fr/)\n"
 "MIME-Version: 1.0\n"
@@ -141,6 +141,9 @@ msgstr "Haut-sorabe"
 
 msgid "Hungarian"
 msgstr "Hongrois"
+
+msgid "Armenian"
+msgstr "Arménien"
 
 msgid "Interlingua"
 msgstr "Interlingua"
@@ -622,6 +625,9 @@ msgstr "Données binaires brutes"
 msgid "'%(value)s' is not a valid UUID."
 msgstr "La valeur « %(value)s » n'est pas un UUID valide."
 
+msgid "Universally unique identifier"
+msgstr "Identifiant unique universel"
+
 msgid "File"
 msgstr "Fichier"
 
@@ -1073,7 +1079,7 @@ msgstr "Ceci n'est pas une adresse IPv6 valide."
 
 #, python-format
 msgctxt "String to return when truncating text"
-msgid "%(truncated_text)s..."
+msgid "%(truncated_text)s…"
 msgstr "%(truncated_text)s…"
 
 msgid "or"

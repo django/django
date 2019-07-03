@@ -261,14 +261,13 @@ Enabling the sites framework
 
 To enable the sites framework, follow these steps:
 
-1. Add ``'django.contrib.sites'`` to your :setting:`INSTALLED_APPS`
-   setting.
+#. Add ``'django.contrib.sites'`` to your :setting:`INSTALLED_APPS` setting.
 
-2. Define a :setting:`SITE_ID` setting::
+#. Define a :setting:`SITE_ID` setting::
 
     SITE_ID = 1
 
-3. Run :djadmin:`migrate`.
+#. Run :djadmin:`migrate`.
 
 ``django.contrib.sites`` registers a
 :data:`~django.db.models.signals.post_migrate` signal handler which creates a

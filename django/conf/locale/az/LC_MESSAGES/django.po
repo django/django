@@ -9,8 +9,8 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-05-17 11:49+0200\n"
-"PO-Revision-Date: 2018-05-18 00:21+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"PO-Revision-Date: 2018-09-09 12:46+0000\n"
+"Last-Translator: Emin Mastizada <emin@linux.com>\n"
 "Language-Team: Azerbaijani (http://www.transifex.com/django/django/language/"
 "az/)\n"
 "MIME-Version: 1.0\n"
@@ -471,7 +471,7 @@ msgstr "'%(value)s' dəyəri True və ya False olmalıdır."
 
 #, python-format
 msgid "'%(value)s' value must be either True, False, or None."
-msgstr ""
+msgstr "'%(value)s' dəyəri True, False və ya None olmalıdır."
 
 msgid "Boolean (Either True or False)"
 msgstr "Bul (ya Doğru, ya Yalan)"
@@ -660,7 +660,7 @@ msgstr "Keçərli müddət daxil edin."
 
 #, python-brace-format
 msgid "The number of days must be between {min_days} and {max_days}."
-msgstr ""
+msgstr "Günlərin sayı {min_days} ilə {max_days} arasında olmalıdır."
 
 msgid "No file was submitted. Check the encoding type on the form."
 msgstr "Fayl göndərilməyib. Vərəqənin (\"form\") şifrələmə tipini yoxlayın."

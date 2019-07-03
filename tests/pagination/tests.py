@@ -2,10 +2,11 @@ import warnings
 from datetime import datetime
 
 from django.core.paginator import (
-    EmptyPage, InvalidPage, PageNotAnInteger, Paginator,
+    EmptyPage, InvalidPage, PageNotAnInteger, Paginator, QuerySetPaginator,
     UnorderedObjectListWarning,
 )
 from django.test import SimpleTestCase, TestCase
+from django.utils.deprecation import RemovedInDjango31Warning
 
 from .custom import ValidAdjacentNumsPaginator
 from .models import Article
@@ -297,12 +298,19 @@ class PaginationTests(SimpleTestCase):
         with self.assertRaises(EmptyPage):
             paginator.get_page(1)
 
+    def test_querysetpaginator_deprecation(self):
+        msg = 'The QuerySetPaginator alias of Paginator is deprecated.'
+        with self.assertWarnsMessage(RemovedInDjango31Warning, msg) as cm:
+            QuerySetPaginator([], 1)
+        self.assertEqual(cm.filename, __file__)
+
 
 class ModelPaginationTests(TestCase):
     """
     Test pagination with Django model instances
     """
-    def setUp(self):
+    @classmethod
+    def setUpTestData(cls):
         # Prepare a list of objects for pagination.
         for x in range(1, 10):
             a = Article(headline='Article %s' % x, pub_date=datetime(2005, 7, 29))

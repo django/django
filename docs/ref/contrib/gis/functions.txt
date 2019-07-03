@@ -20,25 +20,24 @@ get a ``NotImplementedError`` exception.
 
 Function's summary:
 
-==================  ========================   ======================  =======================  ==================  =====================
-Measurement         Relationships              Operations              Editors                  Output format       Miscellaneous
-==================  ========================   ======================  =======================  ==================  =====================
-:class:`Area`       :class:`Azimuth`           :class:`Difference`     :class:`ForcePolygonCW`  :class:`AsGeoJSON`  :class:`IsValid`
-:class:`Distance`   :class:`BoundingCircle`    :class:`Intersection`   :class:`ForceRHR`        :class:`AsGML`      :class:`MemSize`
-:class:`Length`     :class:`Centroid`          :class:`SymDifference`  :class:`MakeValid`       :class:`AsKML`      :class:`NumGeometries`
-:class:`Perimeter`  :class:`Envelope`          :class:`Union`          :class:`Reverse`         :class:`AsSVG`      :class:`NumPoints`
-..                  :class:`LineLocatePoint`                           :class:`Scale`           :class:`GeoHash`
-..                  :class:`PointOnSurface`                            :class:`SnapToGrid`
-..                                                                     :class:`Transform`
-..                                                                     :class:`Translate`
-==================  ========================   ======================  =======================  ==================  =====================
+=========================  ========================  ======================  =======================  ==================  =====================
+Measurement                Relationships             Operations              Editors                  Output format       Miscellaneous
+=========================  ========================  ======================  =======================  ==================  =====================
+:class:`Area`              :class:`Azimuth`          :class:`Difference`     :class:`ForcePolygonCW`  :class:`AsGeoJSON`  :class:`IsValid`
+:class:`Distance`          :class:`BoundingCircle`   :class:`Intersection`   :class:`MakeValid`       :class:`AsGML`      :class:`MemSize`
+:class:`GeometryDistance`  :class:`Centroid`         :class:`SymDifference`  :class:`Reverse`         :class:`AsKML`      :class:`NumGeometries`
+:class:`Length`            :class:`Envelope`         :class:`Union`          :class:`Scale`           :class:`AsSVG`      :class:`NumPoints`
+:class:`Perimeter`         :class:`LineLocatePoint`                          :class:`SnapToGrid`      :class:`GeoHash`
+..                         :class:`PointOnSurface`                           :class:`Transform`
+..                                                                           :class:`Translate`
+=========================  ========================  ======================  =======================  ==================  =====================
 
 ``Area``
 ========
 
 .. class:: Area(expression, **extra)
 
-*Availability*: `MySQL
+*Availability*: MariaDB, `MySQL
 <https://dev.mysql.com/doc/refman/en/gis-polygon-property-functions.html#function_area>`__,
 Oracle, `PostGIS <https://postgis.net/docs/ST_Area.html>`__, SpatiaLite
 
@@ -53,7 +52,7 @@ geographic SRSes.
 
 .. class:: AsGeoJSON(expression, bbox=False, crs=False, precision=8, **extra)
 
-*Availability*: `MySQL
+*Availability*: MariaDB (≥ 10.2.4), `MySQL
 <https://dev.mysql.com/doc/refman/en/spatial-geojson-functions.html#function_st-asgeojson>`__ (≥ 5.7.5),
 `PostGIS <https://postgis.net/docs/ST_AsGeoJSON.html>`__, SpatiaLite
 
@@ -182,7 +181,8 @@ south = ``π``; west = ``3π/2``.
 .. class:: BoundingCircle(expression, num_seg=48, **extra)
 
 *Availability*: `PostGIS <https://postgis.net/docs/ST_MinimumBoundingCircle.html>`__,
-`Oracle <https://docs.oracle.com/database/121/SPATL/sdo_geom-sdo_mbc.htm#SPATL1554>`_
+`Oracle <https://docs.oracle.com/en/database/oracle/oracle-database/18/spatl/
+SDO_GEOM-reference.html#GUID-82A61626-BB64-4793-B53D-A0DBEC91831A>`_
 
 Accepts a single geographic field or expression and returns the smallest circle
 polygon that can fully contain the geometry.
@@ -194,7 +194,7 @@ The ``num_seg`` parameter is used only on PostGIS.
 
 .. class:: Centroid(expression, **extra)
 
-*Availability*: `MySQL
+*Availability*: MariaDB, `MySQL
 <https://dev.mysql.com/doc/refman/en/gis-polygon-property-functions.html#function_st-centroid>`__,
 `PostGIS <https://postgis.net/docs/ST_Centroid.html>`__, Oracle, SpatiaLite
 
@@ -206,7 +206,7 @@ value of the geometry.
 
 .. class:: Difference(expr1, expr2, **extra)
 
-*Availability*: `MySQL
+*Availability*: MariaDB, `MySQL
 <https://dev.mysql.com/doc/refman/en/spatial-operator-functions.html#function_st-difference>`__,
 `PostGIS <https://postgis.net/docs/ST_Difference.html>`__, Oracle, SpatiaLite
 
@@ -219,7 +219,7 @@ geometry B.
 
 .. class:: Distance(expr1, expr2, spheroid=None, **extra)
 
-*Availability*: `MySQL
+*Availability*: MariaDB, `MySQL
 <https://dev.mysql.com/doc/refman/en/spatial-relation-functions-object-shapes.html#function_st-distance>`__,
 `PostGIS <https://postgis.net/docs/ST_Distance.html>`__, Oracle, SpatiaLite
 
@@ -265,10 +265,10 @@ queryset is calculated::
 
 .. class:: Envelope(expression, **extra)
 
-*Availability*: `MySQL
+*Availability*: MariaDB, `MySQL
 <https://dev.mysql.com/doc/refman/en/gis-general-property-functions.html#function_st-envelope>`__,
-`Oracle
-<https://docs.oracle.com/database/121/SPATL/sdo_geom-sdo_mbr.htm#GUID-646638D0-2C5F-490A-AF63-DE9B7A4C97C1__CHDJCEIH>`__,
+`Oracle <https://docs.oracle.com/en/database/oracle/oracle-database/18/spatl/
+SDO_GEOM-reference.html#GUID-646638D0-2C5F-490A-AF63-DE9B7A4C97C1__CHDJCEIH>`__,
 `PostGIS <https://postgis.net/docs/ST_Envelope.html>`__, SpatiaLite
 
 Accepts a single geographic field or expression and returns the geometry
@@ -283,8 +283,6 @@ representing the bounding box of the geometry.
 
 .. class:: ForcePolygonCW(expression, **extra)
 
-.. versionadded:: 2.1
-
 *Availability*: `PostGIS <https://postgis.net/docs/ST_ForcePolygonCW.html>`__,
 SpatiaLite
 
@@ -292,21 +290,6 @@ Accepts a single geographic field or expression and returns a modified version
 of the polygon/multipolygon in which all exterior rings are oriented clockwise
 and all interior rings are oriented counterclockwise. Non-polygonal geometries
 are returned unchanged.
-
-``ForceRHR``
-============
-
-.. class:: ForceRHR(expression, **extra)
-
-.. deprecated:: 2.1
-
-    Use :class:`ForcePolygonCW` instead.
-
-*Availability*: `PostGIS <https://postgis.net/docs/ST_ForceRHR.html>`__
-
-Accepts a single geographic field or expression and returns a modified version
-of the polygon/multipolygon in which all of the vertices follow the
-right-hand rule.
 
 ``GeoHash``
 ===========
@@ -325,12 +308,25 @@ result.
 
 __ https://en.wikipedia.org/wiki/Geohash
 
+``GeometryDistance``
+====================
+
+.. class:: GeometryDistance(expr1, expr2, **extra)
+
+.. versionadded:: 3.0
+
+*Availability*: `PostGIS <https://postgis.net/docs/geometry_distance_knn.html>`__
+
+Accepts two geographic fields or expressions and returns the distance between
+them. When used in an :meth:`~django.db.models.query.QuerySet.order_by` clause,
+it provides index-assisted nearest-neighbor result sets.
+
 ``Intersection``
 ================
 
 .. class:: Intersection(expr1, expr2, **extra)
 
-*Availability*: `MySQL
+*Availability*: MariaDB, `MySQL
 <https://dev.mysql.com/doc/refman/en/spatial-operator-functions.html#function_st-intersection>`__,
 `PostGIS <https://postgis.net/docs/ST_Intersection.html>`__, Oracle, SpatiaLite
 
@@ -354,7 +350,7 @@ Returns ``True`` if its value is a valid geometry and ``False`` otherwise.
 
 .. class:: Length(expression, spheroid=True, **extra)
 
-*Availability*: `MySQL
+*Availability*: MariaDB, `MySQL
 <https://dev.mysql.com/doc/refman/en/gis-linestring-property-functions.html#function_st-length>`__,
 Oracle, `PostGIS <https://postgis.net/docs/ST_Length.html>`__, SpatiaLite
 
@@ -408,7 +404,7 @@ Accepts a single geographic field or expression and returns the memory size
 
 .. class:: NumGeometries(expression, **extra)
 
-*Availability*: `MySQL
+*Availability*: MariaDB, `MySQL
 <https://dev.mysql.com/doc/refman/en/gis-geometrycollection-property-functions.html#function_st-numgeometries>`__,
 `PostGIS <https://postgis.net/docs/ST_NumGeometries.html>`__, Oracle,
 SpatiaLite
@@ -424,7 +420,7 @@ On MySQL, returns ``None`` for single geometries.
 
 .. class:: NumPoints(expression, **extra)
 
-*Availability*: `MySQL
+*Availability*: MariaDB, `MySQL
 <https://dev.mysql.com/doc/refman/en/gis-linestring-property-functions.html#function_st-numpoints>`__,
 `PostGIS <https://postgis.net/docs/ST_NPoints.html>`__, Oracle, SpatiaLite
 
@@ -450,7 +446,7 @@ geometry field as a :class:`~django.contrib.gis.measure.Distance` object.
 .. class:: PointOnSurface(expression, **extra)
 
 *Availability*: `PostGIS <https://postgis.net/docs/ST_PointOnSurface.html>`__,
-Oracle, SpatiaLite
+MariaDB, Oracle, SpatiaLite
 
 Accepts a single geographic field or expression and returns a ``Point`` geometry
 guaranteed to lie on the surface of the field; otherwise returns ``None``.
@@ -503,7 +499,7 @@ Number of Arguments  Description
 
 .. class:: SymDifference(expr1, expr2, **extra)
 
-*Availability*: `MySQL
+*Availability*: MariaDB, `MySQL
 <https://dev.mysql.com/doc/refman/en/spatial-operator-functions.html#function_st-symdifference>`__,
 `PostGIS <https://postgis.net/docs/ST_SymDifference.html>`__, Oracle,
 SpatiaLite
@@ -547,7 +543,7 @@ parameters.
 
 .. class:: Union(expr1, expr2, **extra)
 
-*Availability*: `MySQL
+*Availability*: MariaDB, `MySQL
 <https://dev.mysql.com/doc/refman/en/spatial-operator-functions.html#function_st-union>`__,
 `PostGIS <https://postgis.net/docs/ST_Union.html>`__, Oracle, SpatiaLite
 

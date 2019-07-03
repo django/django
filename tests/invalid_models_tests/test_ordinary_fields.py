@@ -40,7 +40,34 @@ class AutoFieldTests(SimpleTestCase):
 
 
 @isolate_apps('invalid_models_tests')
-class CharFieldTests(TestCase):
+class BinaryFieldTests(SimpleTestCase):
+
+    def test_valid_default_value(self):
+        class Model(models.Model):
+            field1 = models.BinaryField(default=b'test')
+            field2 = models.BinaryField(default=None)
+
+        for field_name in ('field1', 'field2'):
+            field = Model._meta.get_field(field_name)
+            self.assertEqual(field.check(), [])
+
+    def test_str_default_value(self):
+        class Model(models.Model):
+            field = models.BinaryField(default='test')
+
+        field = Model._meta.get_field('field')
+        self.assertEqual(field.check(), [
+            Error(
+                "BinaryField's default cannot be a string. Use bytes content "
+                "instead.",
+                obj=field,
+                id='fields.E170',
+            ),
+        ])
+
+
+@isolate_apps('invalid_models_tests')
+class CharFieldTests(SimpleTestCase):
 
     def test_valid_field(self):
         class Model(models.Model):
@@ -156,14 +183,14 @@ class CharFieldTests(TestCase):
                 self.display = display
 
             def __iter__(self):
-                return (x for x in [self.value, self.display])
+                return iter((self.value, self.display))
 
             def __len__(self):
                 return 2
 
         class Things:
             def __iter__(self):
-                return (x for x in [ThingItem(1, 2), ThingItem(3, 4)])
+                return iter((ThingItem(1, 2), ThingItem(3, 4)))
 
         class ThingWithIterableChoices(models.Model):
             thing = models.CharField(max_length=100, blank=True, choices=Things())
@@ -174,14 +201,20 @@ class CharFieldTests(TestCase):
         class Model(models.Model):
             field = models.CharField(max_length=10, choices=[(1, 2, 3), (1, 2, 3)])
 
-        field = Model._meta.get_field('field')
-        self.assertEqual(field.check(), [
-            Error(
-                "'choices' must be an iterable containing (actual value, human readable name) tuples.",
-                obj=field,
-                id='fields.E005',
-            ),
-        ])
+        class Model2(models.Model):
+            field = models.IntegerField(choices=[0])
+
+        for model in (Model, Model2):
+            with self.subTest(model.__name__):
+                field = model._meta.get_field('field')
+                self.assertEqual(field.check(), [
+                    Error(
+                        "'choices' must be an iterable containing (actual "
+                        "value, human readable name) tuples.",
+                        obj=field,
+                        id='fields.E005',
+                    ),
+                ])
 
     def test_choices_containing_lazy(self):
         class Model(models.Model):
@@ -306,7 +339,7 @@ class CharFieldTests(TestCase):
 
 
 @isolate_apps('invalid_models_tests')
-class DateFieldTests(TestCase):
+class DateFieldTests(SimpleTestCase):
     maxDiff = None
 
     def test_auto_now_and_auto_now_add_raise_error(self):
@@ -369,7 +402,7 @@ class DateFieldTests(TestCase):
 
 
 @isolate_apps('invalid_models_tests')
-class DateTimeFieldTests(TestCase):
+class DateTimeFieldTests(SimpleTestCase):
     maxDiff = None
 
     def test_fix_default_value(self):
@@ -598,7 +631,7 @@ class ImageFieldTests(SimpleTestCase):
             Error(
                 'Cannot use ImageField because Pillow is not installed.',
                 hint=('Get Pillow at https://pypi.org/project/Pillow/ '
-                      'or run command "pip install Pillow".'),
+                      'or run command "python -m pip install Pillow".'),
                 obj=field,
                 id='fields.E210',
             ),
@@ -611,21 +644,28 @@ class IntegerFieldTests(SimpleTestCase):
 
     def test_max_length_warning(self):
         class Model(models.Model):
-            value = models.IntegerField(max_length=2)
+            integer = models.IntegerField(max_length=2)
+            biginteger = models.BigIntegerField(max_length=2)
+            smallinteger = models.SmallIntegerField(max_length=2)
+            positiveinteger = models.PositiveIntegerField(max_length=2)
+            positivesmallinteger = models.PositiveSmallIntegerField(max_length=2)
 
-        field = Model._meta.get_field('value')
-        self.assertEqual(field.check(), [
-            DjangoWarning(
-                "'max_length' is ignored when used with IntegerField",
-                hint="Remove 'max_length' from field",
-                obj=field,
-                id='fields.W122',
-            )
-        ])
+        for field in Model._meta.get_fields():
+            if field.auto_created:
+                continue
+            with self.subTest(name=field.name):
+                self.assertEqual(field.check(), [
+                    DjangoWarning(
+                        "'max_length' is ignored when used with %s." % field.__class__.__name__,
+                        hint="Remove 'max_length' from field",
+                        obj=field,
+                        id='fields.W122',
+                    )
+                ])
 
 
 @isolate_apps('invalid_models_tests')
-class TimeFieldTests(TestCase):
+class TimeFieldTests(SimpleTestCase):
     maxDiff = None
 
     def test_fix_default_value(self):

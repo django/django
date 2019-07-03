@@ -1,9 +1,10 @@
 import unittest
+from io import StringIO
 from unittest import mock
 
 from django.core.exceptions import ImproperlyConfigured
 from django.db import DatabaseError, connection, connections
-from django.test import TestCase
+from django.test import TestCase, override_settings
 
 
 @unittest.skipUnless(connection.vendor == 'postgresql', 'PostgreSQL tests')
@@ -48,9 +49,10 @@ class Tests(TestCase):
         max_name_length = connection.ops.max_name_length()
         settings['NAME'] = 'a' + (max_name_length * 'a')
         msg = (
-            'Database names longer than %d characters are not supported by '
-            'PostgreSQL. Supply a shorter NAME in settings.DATABASES.'
-        ) % max_name_length
+            "The database name '%s' (%d characters) is longer than "
+            "PostgreSQL's limit of %s characters. Supply a shorter NAME in "
+            "settings.DATABASES."
+        ) % (settings['NAME'], max_name_length + 1, max_name_length)
         with self.assertRaisesMessage(ImproperlyConfigured, msg):
             DatabaseWrapper(settings).get_connection_params()
 
@@ -133,6 +135,12 @@ class Tests(TestCase):
         finally:
             new_connection.close()
 
+    def test_connect_no_is_usable_checks(self):
+        new_connection = connection.copy()
+        with mock.patch.object(new_connection, 'is_usable') as is_usable:
+            new_connection.connect()
+        is_usable.assert_not_called()
+
     def _select(self, val):
         with connection.cursor() as cursor:
             cursor.execute('SELECT %s', (val,))
@@ -169,3 +177,15 @@ class Tests(TestCase):
             self.assertEqual(psycopg2_version(), (4, 2, 1))
         with mock.patch('psycopg2.__version__', '4.2b0.dev1 (dt dec pq3 ext lo64)'):
             self.assertEqual(psycopg2_version(), (4, 2))
+
+    @override_settings(DEBUG=True)
+    def test_copy_cursors(self):
+        out = StringIO()
+        copy_expert_sql = 'COPY django_session TO STDOUT (FORMAT CSV, HEADER)'
+        with connection.cursor() as cursor:
+            cursor.copy_expert(copy_expert_sql, out)
+            cursor.copy_to(out, 'django_session')
+        self.assertEqual(
+            [q['sql'] for q in connection.queries],
+            [copy_expert_sql, 'COPY django_session TO STDOUT'],
+        )

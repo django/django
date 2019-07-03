@@ -1143,7 +1143,7 @@ class ModelStateTests(SimpleTestCase):
             size = models.IntegerField()
 
             class Meta:
-                constraints = [models.CheckConstraint(models.Q(size__gt=1), 'size_gt_1')]
+                constraints = [models.CheckConstraint(check=models.Q(size__gt=1), name='size_gt_1')]
 
         state = ModelState.from_model(ModelWithConstraints)
         model_constraints = ModelWithConstraints._meta.constraints

@@ -1,4 +1,3 @@
-import codecs
 import datetime
 import os
 import shutil
@@ -63,7 +62,7 @@ class TestFindStatic(TestDefaults, CollectionTestCase):
     """
     def _get_file(self, filepath):
         path = call_command('findstatic', filepath, all=False, verbosity=0, stdout=StringIO())
-        with codecs.open(path, "r", "utf-8") as f:
+        with open(path, encoding='utf-8') as f:
             return f.read()
 
     def test_all_files(self):
@@ -201,13 +200,13 @@ class TestCollectionVerbosity(CollectionTestCase):
         self.assertIn(self.staticfiles_copied_msg, output)
         self.assertIn(self.copying_msg, output)
 
-    @override_settings(STATICFILES_STORAGE='django.contrib.staticfiles.storage.CachedStaticFilesStorage')
+    @override_settings(STATICFILES_STORAGE='django.contrib.staticfiles.storage.ManifestStaticFilesStorage')
     def test_verbosity_1_with_post_process(self):
         stdout = StringIO()
         self.run_collectstatic(verbosity=1, stdout=stdout, post_process=True)
         self.assertNotIn(self.post_process_msg, stdout.getvalue())
 
-    @override_settings(STATICFILES_STORAGE='django.contrib.staticfiles.storage.CachedStaticFilesStorage')
+    @override_settings(STATICFILES_STORAGE='django.contrib.staticfiles.storage.ManifestStaticFilesStorage')
     def test_verbosity_2_with_post_process(self):
         stdout = StringIO()
         self.run_collectstatic(verbosity=2, stdout=stdout, post_process=True)

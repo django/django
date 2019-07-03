@@ -66,7 +66,7 @@ class ImageFieldTest(FormFieldAssertionsMixin, SimpleTestCase):
         with open(img_path, 'rb') as img_file:
             img_data = img_file.read()
         img_file = SimpleUploadedFile('1x1.txt', img_data)
-        with self.assertRaisesMessage(ValidationError, "File extension 'txt' is not allowed."):
+        with self.assertRaisesMessage(ValidationError, 'File extension “txt” is not allowed.'):
             f.clean(img_file)
 
     def test_widget_attrs_default_accept(self):

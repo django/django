@@ -1,7 +1,7 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Claude Paroz <claude@2xlibre.net>, 2013-2014,2018
+# Claude Paroz <claude@2xlibre.net>, 2013-2014,2018-2019
 # Claude Paroz <claude@2xlibre.net>, 2011
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Jean-Baptiste Mora, 2014
@@ -9,8 +9,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-05-17 11:49+0200\n"
-"PO-Revision-Date: 2018-05-18 13:00+0000\n"
+"POT-Creation-Date: 2019-01-16 20:42+0100\n"
+"PO-Revision-Date: 2019-03-02 14:04+0000\n"
 "Last-Translator: Claude Paroz <claude@2xlibre.net>\n"
 "Language-Team: French (http://www.transifex.com/django/django/language/fr/)\n"
 "MIME-Version: 1.0\n"
@@ -251,76 +251,56 @@ msgstr "hier"
 msgid "%(delta)s ago"
 msgstr "il y a %(delta)s"
 
-#. Translators: 'naturaltime-past' strings will be included in
-#. '%(delta)s ago'
+#. Translators: please keep a non-breaking space (U+00A0) between count
+#. and time unit.
 #, python-format
-msgctxt "naturaltime-past"
-msgid "%d year"
-msgid_plural "%d years"
-msgstr[0] "%d année"
-msgstr[1] "%d années"
+msgid "an hour ago"
+msgid_plural "%(count)s hours ago"
+msgstr[0] "il y a une heure"
+msgstr[1] "il y a %(count)s heures"
 
-#, python-format
-msgctxt "naturaltime-past"
-msgid "%d month"
-msgid_plural "%d months"
-msgstr[0] "%d mois"
-msgstr[1] "%d mois"
-
-#, python-format
-msgctxt "naturaltime-past"
-msgid "%d week"
-msgid_plural "%d weeks"
-msgstr[0] "%d semaine"
-msgstr[1] "%d semaines"
-
-#, python-format
-msgctxt "naturaltime-past"
-msgid "%d day"
-msgid_plural "%d days"
-msgstr[0] "%d jour"
-msgstr[1] "%d jours"
-
-#, python-format
-msgctxt "naturaltime-past"
-msgid "%d hour"
-msgid_plural "%d hours"
-msgstr[0] "%d heure"
-msgstr[1] "%d heures"
-
-#, python-format
-msgctxt "naturaltime-past"
-msgid "%d minute"
-msgid_plural "%d minutes"
-msgstr[0] "%d minute"
-msgstr[1] "%d minutes"
-
-msgid "now"
-msgstr "maintenant"
-
-#. Translators: please keep a non-breaking space (U+00A0)
-#. between count and time unit.
-#, python-format
-msgid "a second ago"
-msgid_plural "%(count)s seconds ago"
-msgstr[0] "il y a une seconde"
-msgstr[1] "il y a %(count)s secondes"
-
-#. Translators: please keep a non-breaking space (U+00A0)
-#. between count and time unit.
+#. Translators: please keep a non-breaking space (U+00A0) between count
+#. and time unit.
 #, python-format
 msgid "a minute ago"
 msgid_plural "%(count)s minutes ago"
 msgstr[0] "il y a une minute"
 msgstr[1] "il y a %(count)s minutes"
 
-#. Translators: please keep a non-breaking space (U+00A0)
-#. between count and time unit.
+#. Translators: please keep a non-breaking space (U+00A0) between count
+#. and time unit.
 #, python-format
-msgid "an hour ago"
-msgid_plural "%(count)s hours ago"
-msgstr[0] "il y a une heure"
-msgstr[1] "il y a %(count)s heures"
+msgid "a second ago"
+msgid_plural "%(count)s seconds ago"
+msgstr[0] "il y a une seconde"
+msgstr[1] "il y a %(count)s secondes"
+
+msgid "now"
+msgstr "maintenant"
+
+#. Translators: please keep a non-breaking space (U+00A0) between count
+#. and time unit.
+#, python-format
+msgid "a second from now"
+msgid_plural "%(count)s seconds from now"
+msgstr[0] "dans une seconde"
+msgstr[1] "dans %(count)s secondes"
+
+#. Translators: please keep a non-breaking space (U+00A0) between count
+#. and time unit.
+#, python-format
+msgid "a minute from now"
+msgid_plural "%(count)s minutes from now"
+msgstr[0] "dans une minute"
+msgstr[1] "dans %(count)s minutes"
+
+#. Translators: please keep a non-breaking space (U+00A0) between count
+#. and time unit.
+#, python-format
+msgid "an hour from now"
+msgid_plural "%(count)s hours from now"
+msgstr[0] "dans une heure"
+msgstr[1] "dans %(count)s heures"
 
 #. Translators: delta will contain a string like '2 months' or '1 month, 2
 #. weeks'
@@ -328,14 +308,57 @@ msgstr[1] "il y a %(count)s heures"
 msgid "%(delta)s from now"
 msgstr "dans %(delta)s"
 
-#. Translators: 'naturaltime-future' strings will be included in
-#. '%(delta)s from now'
+#. Translators: 'naturaltime-past' strings will be included in '%(delta)s ago'
+#, python-format
+msgctxt "naturaltime-past"
+msgid "%d year"
+msgid_plural "%d years"
+msgstr[0] "%d année"
+msgstr[1] "%d ans"
+
+#, python-format
+msgctxt "naturaltime-past"
+msgid "%d month"
+msgid_plural "%d months"
+msgstr[0] "%d mois"
+msgstr[1] "%d mois"
+
+#, python-format
+msgctxt "naturaltime-past"
+msgid "%d week"
+msgid_plural "%d weeks"
+msgstr[0] "%d semaine"
+msgstr[1] "%d semaines"
+
+#, python-format
+msgctxt "naturaltime-past"
+msgid "%d day"
+msgid_plural "%d days"
+msgstr[0] "%d jour"
+msgstr[1] "%d jours"
+
+#, python-format
+msgctxt "naturaltime-past"
+msgid "%d hour"
+msgid_plural "%d hours"
+msgstr[0] "%d heure"
+msgstr[1] "%d heures"
+
+#, python-format
+msgctxt "naturaltime-past"
+msgid "%d minute"
+msgid_plural "%d minutes"
+msgstr[0] "%d minute"
+msgstr[1] "%d minutes"
+
+#. Translators: 'naturaltime-future' strings will be included in '%(delta)s
+#. from now'
 #, python-format
 msgctxt "naturaltime-future"
 msgid "%d year"
 msgid_plural "%d years"
 msgstr[0] "%d année"
-msgstr[1] "%d années"
+msgstr[1] "%d ans"
 
 #, python-format
 msgctxt "naturaltime-future"
@@ -371,27 +394,3 @@ msgid "%d minute"
 msgid_plural "%d minutes"
 msgstr[0] "%d minute"
 msgstr[1] "%d minutes"
-
-#. Translators: please keep a non-breaking space (U+00A0)
-#. between count and time unit.
-#, python-format
-msgid "a second from now"
-msgid_plural "%(count)s seconds from now"
-msgstr[0] "dans une seconde"
-msgstr[1] "dans %(count)s secondes"
-
-#. Translators: please keep a non-breaking space (U+00A0)
-#. between count and time unit.
-#, python-format
-msgid "a minute from now"
-msgid_plural "%(count)s minutes from now"
-msgstr[0] "dans une minute"
-msgstr[1] "dans %(count)s minutes"
-
-#. Translators: please keep a non-breaking space (U+00A0)
-#. between count and time unit.
-#, python-format
-msgid "an hour from now"
-msgid_plural "%(count)s hours from now"
-msgstr[0] "dans une heure"
-msgstr[1] "dans %(count)s heures"

@@ -138,7 +138,7 @@ class InspectDBTestCase(TestCase):
         out = StringIO()
         call_command('inspectdb', table_name_filter=inspectdb_tables_only, stdout=out)
         output = out.getvalue()
-        error_message = "inspectdb generated an attribute name which is a python keyword"
+        error_message = "inspectdb generated an attribute name which is a Python keyword"
         # Recursive foreign keys should be set to 'self'
         self.assertIn("parent = models.ForeignKey('self', models.DO_NOTHING)", output)
         self.assertNotIn(
@@ -152,11 +152,11 @@ class InspectDBTestCase(TestCase):
             output,
         )
         self.assertIn(
-            "people_pk = models.ForeignKey(InspectdbPeople, models.DO_NOTHING, primary_key=True)",
+            'people_pk = models.OneToOneField(InspectdbPeople, models.DO_NOTHING, primary_key=True)',
             output,
         )
         self.assertIn(
-            "people_unique = models.ForeignKey(InspectdbPeople, models.DO_NOTHING, unique=True)",
+            'people_unique = models.OneToOneField(InspectdbPeople, models.DO_NOTHING)',
             output,
         )
 
@@ -184,7 +184,7 @@ class InspectDBTestCase(TestCase):
         out = StringIO()
         call_command('inspectdb', table_name_filter=special_table_only, stdout=out)
         output = out.getvalue()
-        base_name = 'field' if connection.features.uppercases_column_names else 'Field'
+        base_name = connection.introspection.identifier_converter('Field')
         self.assertIn("field = models.IntegerField()", output)
         self.assertIn("field_field = models.IntegerField(db_column='%s_')" % base_name, output)
         self.assertIn("field_field_0 = models.IntegerField(db_column='%s__')" % base_name, output)
@@ -215,7 +215,7 @@ class InspectDBTestCase(TestCase):
         call_command('inspectdb', 'inspectdb_uniquetogether', stdout=out)
         output = out.getvalue()
         self.assertIn("    unique_together = (('", output)
-        unique_together_match = re.findall(self.unique_re, output)
+        unique_together_match = self.unique_re.findall(output)
         # There should be one unique_together tuple.
         self.assertEqual(len(unique_together_match), 1)
         fields = unique_together_match[0]
@@ -244,7 +244,7 @@ class InspectDBTestCase(TestCase):
             )
             output = out.getvalue()
             self.assertIn('# A unique constraint could not be introspected.', output)
-            self.assertEqual(re.findall(self.unique_re, output), ["('id', 'people_unique')"])
+            self.assertEqual(self.unique_re.findall(output), ["('id', 'people_unique')"])
         finally:
             with connection.cursor() as c:
                 c.execute('DROP INDEX Findex')
@@ -285,7 +285,7 @@ class InspectDBTestCase(TestCase):
 
 
 class InspectDBTransactionalTests(TransactionTestCase):
-    available_apps = None
+    available_apps = ['inspectdb']
 
     def test_include_views(self):
         """inspectdb --include-views creates models for database views."""
@@ -309,3 +309,90 @@ class InspectDBTransactionalTests(TransactionTestCase):
         finally:
             with connection.cursor() as cursor:
                 cursor.execute('DROP VIEW inspectdb_people_view')
+
+    @skipUnlessDBFeature('can_introspect_materialized_views')
+    def test_include_materialized_views(self):
+        """inspectdb --include-views creates models for materialized views."""
+        with connection.cursor() as cursor:
+            cursor.execute(
+                'CREATE MATERIALIZED VIEW inspectdb_people_materialized AS '
+                'SELECT id, name FROM inspectdb_people'
+            )
+        out = StringIO()
+        view_model = 'class InspectdbPeopleMaterialized(models.Model):'
+        view_managed = 'managed = False  # Created from a view.'
+        try:
+            call_command('inspectdb', table_name_filter=inspectdb_tables_only, stdout=out)
+            no_views_output = out.getvalue()
+            self.assertNotIn(view_model, no_views_output)
+            self.assertNotIn(view_managed, no_views_output)
+            call_command('inspectdb', table_name_filter=inspectdb_tables_only, include_views=True, stdout=out)
+            with_views_output = out.getvalue()
+            self.assertIn(view_model, with_views_output)
+            self.assertIn(view_managed, with_views_output)
+        finally:
+            with connection.cursor() as cursor:
+                cursor.execute('DROP MATERIALIZED VIEW inspectdb_people_materialized')
+
+    @skipUnless(connection.vendor == 'postgresql', 'PostgreSQL specific SQL')
+    @skipUnlessDBFeature('supports_table_partitions')
+    def test_include_partitions(self):
+        """inspectdb --include-partitions creates models for partitions."""
+        with connection.cursor() as cursor:
+            cursor.execute('''\
+                CREATE TABLE inspectdb_partition_parent (name text not null)
+                PARTITION BY LIST (left(upper(name), 1))
+            ''')
+            cursor.execute('''\
+                CREATE TABLE inspectdb_partition_child
+                PARTITION OF inspectdb_partition_parent
+                FOR VALUES IN ('A', 'B', 'C')
+            ''')
+        out = StringIO()
+        partition_model_parent = 'class InspectdbPartitionParent(models.Model):'
+        partition_model_child = 'class InspectdbPartitionChild(models.Model):'
+        partition_managed = 'managed = False  # Created from a partition.'
+        try:
+            call_command('inspectdb', table_name_filter=inspectdb_tables_only, stdout=out)
+            no_partitions_output = out.getvalue()
+            self.assertIn(partition_model_parent, no_partitions_output)
+            self.assertNotIn(partition_model_child, no_partitions_output)
+            self.assertNotIn(partition_managed, no_partitions_output)
+            call_command('inspectdb', table_name_filter=inspectdb_tables_only, include_partitions=True, stdout=out)
+            with_partitions_output = out.getvalue()
+            self.assertIn(partition_model_parent, with_partitions_output)
+            self.assertIn(partition_model_child, with_partitions_output)
+            self.assertIn(partition_managed, with_partitions_output)
+        finally:
+            with connection.cursor() as cursor:
+                cursor.execute('DROP TABLE IF EXISTS inspectdb_partition_child')
+                cursor.execute('DROP TABLE IF EXISTS inspectdb_partition_parent')
+
+    @skipUnless(connection.vendor == 'postgresql', 'PostgreSQL specific SQL')
+    def test_foreign_data_wrapper(self):
+        with connection.cursor() as cursor:
+            cursor.execute('CREATE EXTENSION IF NOT EXISTS file_fdw')
+            cursor.execute('CREATE SERVER inspectdb_server FOREIGN DATA WRAPPER file_fdw')
+            cursor.execute('''\
+                CREATE FOREIGN TABLE inspectdb_iris_foreign_table (
+                    petal_length real,
+                    petal_width real,
+                    sepal_length real,
+                    sepal_width real
+                ) SERVER inspectdb_server OPTIONS (
+                    filename '/dev/null'
+                )
+            ''')
+        out = StringIO()
+        foreign_table_model = 'class InspectdbIrisForeignTable(models.Model):'
+        foreign_table_managed = 'managed = False'
+        try:
+            call_command('inspectdb', stdout=out)
+            output = out.getvalue()
+            self.assertIn(foreign_table_model, output)
+            self.assertIn(foreign_table_managed, output)
+        finally:
+            with connection.cursor() as cursor:
+                cursor.execute('DROP FOREIGN TABLE IF EXISTS inspectdb_iris_foreign_table')
+                cursor.execute('DROP SERVER IF EXISTS inspectdb_server')
+                cursor.execute('DROP EXTENSION IF EXISTS file_fdw')

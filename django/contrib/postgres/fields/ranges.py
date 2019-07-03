@@ -10,7 +10,8 @@ from .utils import AttributeSetter
 
 __all__ = [
     'RangeField', 'IntegerRangeField', 'BigIntegerRangeField',
-    'FloatRangeField', 'DateTimeRangeField', 'DateRangeField',
+    'DecimalRangeField', 'DateTimeRangeField', 'DateRangeField',
+    'FloatRangeField',
 ]
 
 
@@ -100,7 +101,23 @@ class BigIntegerRangeField(RangeField):
         return 'int8range'
 
 
+class DecimalRangeField(RangeField):
+    base_field = models.DecimalField
+    range_type = NumericRange
+    form_field = forms.DecimalRangeField
+
+    def db_type(self, connection):
+        return 'numrange'
+
+
 class FloatRangeField(RangeField):
+    system_check_deprecated_details = {
+        'msg': (
+            'FloatRangeField is deprecated and will be removed in Django 3.1.'
+        ),
+        'hint': 'Use DecimalRangeField instead.',
+        'id': 'fields.W902',
+    }
     base_field = models.FloatField
     range_type = NumericRange
     form_field = forms.FloatRangeField

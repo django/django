@@ -4,7 +4,7 @@ from datetime import date
 from decimal import Decimal
 
 from django import forms
-from django.core.exceptions import ImproperlyConfigured
+from django.core.exceptions import ImproperlyConfigured, ValidationError
 from django.db import models
 from django.forms.models import (
     BaseModelFormSet, _get_foreign_key, inlineformset_factory,
@@ -1740,6 +1740,12 @@ class ModelFormsetTest(TestCase):
             formset.errors,
             [{'id': ['Select a valid choice. That choice is not one of the available choices.']}],
         )
+
+    def test_initial_form_count_empty_data_raises_validation_error(self):
+        AuthorFormSet = modelformset_factory(Author, fields='__all__')
+        msg = 'ManagementForm data is missing or has been tampered with'
+        with self.assertRaisesMessage(ValidationError, msg):
+            AuthorFormSet({}).initial_form_count()
 
 
 class TestModelFormsetOverridesTroughFormMeta(TestCase):

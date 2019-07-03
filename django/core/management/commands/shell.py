@@ -88,7 +88,7 @@ class Command(BaseCommand):
 
         # Execute stdin if it has anything to read and exit.
         # Not supported on Windows due to select.select() limitations.
-        if sys.platform != 'win32' and select.select([sys.stdin], [], [], 0)[0]:
+        if sys.platform != 'win32' and not sys.stdin.isatty() and select.select([sys.stdin], [], [], 0)[0]:
             exec(sys.stdin.read())
             return
 

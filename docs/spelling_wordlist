@@ -24,6 +24,7 @@ arctangent
 arg
 args
 assistive
+async
 atomicity
 attr
 auth
@@ -78,7 +79,6 @@ bpython
 Bronn
 bugfix
 bugfixes
-buildbot
 builtin
 builtins
 bulleted
@@ -116,6 +116,7 @@ conf
 config
 contenttypes
 contrib
+coroutines
 covariance
 criticals
 cron
@@ -134,6 +135,7 @@ customizations
 Dahl
 Daly
 Danga
+Daphne
 Darussalam
 databrowse
 datafile
@@ -209,8 +211,6 @@ fieldsets
 filename
 filenames
 filesystem
-filesystems
-Firesheep
 fk
 flatpage
 flatpages
@@ -349,7 +349,6 @@ macOS
 Magee
 Mako
 manouche
-Marczewski
 Marino
 MBR
 memcache
@@ -376,7 +375,6 @@ modelforms
 modelformset
 modwsgi
 monkeypatched
-mssql
 multi
 Multi
 multicolumn
@@ -435,7 +433,6 @@ parameterized
 params
 parens
 parsers
-Paweł
 pdf
 PEM
 perl
@@ -756,6 +753,7 @@ utc
 UTF
 util
 utils
+Uvicorn
 uwsgi
 uWSGI
 validator

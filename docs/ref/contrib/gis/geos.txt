@@ -19,7 +19,7 @@ maintained by `Refractions Research`__ of Victoria, Canada.
 
 __ https://trac.osgeo.org/geos/
 __ https://sourceforge.net/projects/jts-topo-suite/
-__ http://www.opengeospatial.org/standards/sfs
+__ https://www.opengeospatial.org/standards/sfs
 __ http://www.refractions.net/
 
 Features
@@ -486,8 +486,6 @@ Topological Methods
     approximate a quarter circle (defaults is 8).
 
 .. method:: GEOSGeometry.buffer_with_style(width, quadsegs=8, end_cap_style=1, join_style=1, mitre_limit=5.0)
-
-    .. versionadded:: 2.1
 
     Same as :meth:`buffer`, but allows customizing the style of the buffer.
 

@@ -89,7 +89,7 @@ class DatabaseCreation(BaseDatabaseCreation):
 
         This takes into account the special cases of ":memory:" and "" for
         SQLite since the databases will be distinct despite having the same
-        TEST NAME. See http://www.sqlite.org/inmemorydb.html
+        TEST NAME. See https://www.sqlite.org/inmemorydb.html
         """
         test_database_name = self._get_test_db_name()
         sig = [self.connection.settings_dict['NAME']]

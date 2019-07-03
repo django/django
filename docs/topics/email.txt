@@ -259,7 +259,7 @@ All parameters are optional and can be set at any time prior to calling the
 * ``body``: The body text. This should be a plain text message.
 
 * ``from_email``: The sender's address. Both ``fred@example.com`` and
-  ``Fred <fred@example.com>`` forms are legal. If omitted, the
+  ``"Fred" <fred@example.com>`` forms are legal. If omitted, the
   :setting:`DEFAULT_FROM_EMAIL` setting is used.
 
 * ``to``: A list or tuple of recipient addresses.

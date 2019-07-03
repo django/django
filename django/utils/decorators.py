@@ -1,8 +1,6 @@
 "Functions that help with dynamically creating decorators for views."
 
-# For backwards compatibility in Django 2.0.
-from contextlib import ContextDecorator  # noqa
-from functools import WRAPPER_ASSIGNMENTS, partial, update_wrapper, wraps
+from functools import partial, update_wrapper, wraps
 
 
 class classonlymethod(classmethod):
@@ -111,16 +109,6 @@ def decorator_from_middleware(middleware_class):
     is created with no params passed.
     """
     return make_middleware_decorator(middleware_class)()
-
-
-# Unused, for backwards compatibility in Django 2.0.
-def available_attrs(fn):
-    """
-    Return the list of functools-wrappable attributes on a callable.
-    This was required as a workaround for http://bugs.python.org/issue3445
-    under Python 2.
-    """
-    return WRAPPER_ASSIGNMENTS
 
 
 def make_middleware_decorator(middleware_class):

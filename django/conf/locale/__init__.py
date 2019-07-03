@@ -228,7 +228,7 @@ LANG_INFO = {
         'bidi': False,
         'code': 'hi',
         'name': 'Hindi',
-        'name_local': 'Hindi',
+        'name_local': 'हिंदी',
     },
     'hr': {
         'bidi': False,
@@ -247,6 +247,12 @@ LANG_INFO = {
         'code': 'hu',
         'name': 'Hungarian',
         'name_local': 'Magyar',
+    },
+    'hy': {
+        'bidi': False,
+        'code': 'hy',
+        'name': 'Armenian',
+        'name_local': 'հայերեն',
     },
     'ia': {
         'bidi': False,

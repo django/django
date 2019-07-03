@@ -8,15 +8,16 @@
 # Jonathan Lindén, 2014
 # Mattias Hansson <mattias.gothenburg@gmail.com>, 2016
 # nip3o <n@niclasolofsson.se>, 2014
+# Petter Strandmark <petter.strandmark@gmail.com>, 2019
 # Samuel Linde <samuel@linde.im>, 2011
-# Thomas Lundqvist <thomas@biljettshop.se>, 2013,2016
+# Thomas Lundqvist, 2013,2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-09-24 13:46+0200\n"
-"PO-Revision-Date: 2017-09-24 14:24+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"PO-Revision-Date: 2019-01-28 13:46+0000\n"
+"Last-Translator: Petter Strandmark <petter.strandmark@gmail.com>\n"
 "Language-Team: Swedish (http://www.transifex.com/django/django/language/"
 "sv/)\n"
 "MIME-Version: 1.0\n"
@@ -76,6 +77,8 @@ msgid ""
 "Raw passwords are not stored, so there is no way to see this user's "
 "password, but you can change the password using <a href=\"{}\">this form</a>."
 msgstr ""
+"Lösenord lagras inte direkt, så det finns inget sätt att se denna användares "
+"lösenord, men du kan ändra lösenorden med <a href=\"{}\">detta formulär</a>."
 
 #, python-format
 msgid ""

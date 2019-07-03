@@ -45,7 +45,7 @@ W005 = Warning(
 W006 = Warning(
     "Your SECURE_CONTENT_TYPE_NOSNIFF setting is not set to True, "
     "so your pages will not be served with an "
-    "'x-content-type-options: nosniff' header. "
+    "'X-Content-Type-Options: nosniff' header. "
     "You should consider enabling this header to prevent the "
     "browser from identifying content types incorrectly.",
     id='security.W006',
@@ -54,7 +54,7 @@ W006 = Warning(
 W007 = Warning(
     "Your SECURE_BROWSER_XSS_FILTER setting is not set to True, "
     "so your pages will not be served with an "
-    "'x-xss-protection: 1; mode=block' header. "
+    "'X-XSS-Protection: 1; mode=block' header. "
     "You should consider enabling this header to activate the "
     "browser's XSS filtering and help prevent XSS attacks.",
     id='security.W007',

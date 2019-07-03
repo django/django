@@ -1,5 +1,6 @@
 """HTML utilities suitable for global use."""
 
+import html
 import json
 import re
 from html.parser import HTMLParser
@@ -7,14 +8,15 @@ from urllib.parse import (
     parse_qsl, quote, unquote, urlencode, urlsplit, urlunsplit,
 )
 
+from django.utils.encoding import punycode
 from django.utils.functional import Promise, keep_lazy, keep_lazy_text
 from django.utils.http import RFC3986_GENDELIMS, RFC3986_SUBDELIMS
-from django.utils.safestring import SafeData, SafeText, mark_safe
+from django.utils.safestring import SafeData, SafeString, mark_safe
 from django.utils.text import normalize_newlines
 
 # Configuration for urlize() function.
 TRAILING_PUNCTUATION_CHARS = '.,:;!'
-WRAPPING_PUNCTUATION = [('(', ')'), ('<', '>'), ('[', ']'), ('&lt;', '&gt;'), ('"', '"'), ('\'', '\'')]
+WRAPPING_PUNCTUATION = [('(', ')'), ('[', ']')]
 
 # List of possible strings used for bullets in bulleted lists.
 DOTS = ['&middot;', '*', '\u2022', '&#149;', '&bull;', '&#8226;']
@@ -24,16 +26,8 @@ word_split_re = re.compile(r'''([\s<>"']+)''')
 simple_url_re = re.compile(r'^https?://\[?\w', re.IGNORECASE)
 simple_url_2_re = re.compile(r'^www\.|^(?!http)\w[^@]+\.(com|edu|gov|int|mil|net|org)($|/.*)$', re.IGNORECASE)
 
-_html_escapes = {
-    ord('&'): '&amp;',
-    ord('<'): '&lt;',
-    ord('>'): '&gt;',
-    ord('"'): '&quot;',
-    ord("'"): '&#39;',
-}
 
-
-@keep_lazy(str, SafeText)
+@keep_lazy(str, SafeString)
 def escape(text):
     """
     Return the given text with ampersands, quotes and angle brackets encoded
@@ -43,7 +37,7 @@ def escape(text):
     This may result in double-escaping. If this is a concern, use
     conditional_escape() instead.
     """
-    return mark_safe(str(text).translate(_html_escapes))
+    return mark_safe(html.escape(str(text)))
 
 
 _js_escapes = {
@@ -65,7 +59,7 @@ _js_escapes = {
 _js_escapes.update((ord('%c' % z), '\\u%04X' % z) for z in range(32))
 
 
-@keep_lazy(str, SafeText)
+@keep_lazy(str, SafeString)
 def escapejs(value):
     """Hex encode characters for use in JavaScript strings."""
     return mark_safe(str(value).translate(_js_escapes))
@@ -133,8 +127,9 @@ def format_html_join(sep, format_string, args_generator):
                                                   for u in users))
     """
     return mark_safe(conditional_escape(sep).join(
-        format_html(format_string, *tuple(args))
-        for args in args_generator))
+        format_html(format_string, *args)
+        for args in args_generator
+    ))
 
 
 @keep_lazy_text
@@ -204,8 +199,8 @@ def smart_urlquote(url):
     def unquote_quote(segment):
         segment = unquote(segment)
         # Tilde is part of RFC3986 Unreserved Characters
-        # http://tools.ietf.org/html/rfc3986#section-2.3
-        # See also http://bugs.python.org/issue16285
+        # https://tools.ietf.org/html/rfc3986#section-2.3
+        # See also https://bugs.python.org/issue16285
         return quote(segment, safe=RFC3986_SUBDELIMS + RFC3986_GENDELIMS + '~')
 
     # Handle IDN before quoting.
@@ -216,7 +211,7 @@ def smart_urlquote(url):
         return unquote_quote(url)
 
     try:
-        netloc = netloc.encode('idna').decode('ascii')  # IDN -> ACE
+        netloc = punycode(netloc)  # IDN -> ACE
     except UnicodeError:  # invalid domain part
         return unquote_quote(url)
 
@@ -245,7 +240,7 @@ def urlize(text, trim_url_limit=None, nofollow=False, autoescape=False):
     leading punctuation (opening parens) and it'll still do the right thing.
 
     If trim_url_limit is not None, truncate the URLs in the link text longer
-    than this limit to trim_url_limit-3 characters and append an ellipsis.
+    than this limit to trim_url_limit - 1 characters and append an ellipsis.
 
     If nofollow is True, give the links a rel="nofollow" attribute.
 
@@ -256,25 +251,7 @@ def urlize(text, trim_url_limit=None, nofollow=False, autoescape=False):
     def trim_url(x, limit=trim_url_limit):
         if limit is None or len(x) <= limit:
             return x
-        return '%s...' % x[:max(0, limit - 3)]
-
-    def unescape(text, trail):
-        """
-        If input URL is HTML-escaped, unescape it so that it can be safely fed
-        to smart_urlquote. For example:
-        http://example.com?x=1&amp;y=&lt;2&gt; => http://example.com?x=1&y=<2>
-        """
-        unescaped = (text + trail).replace(
-            '&amp;', '&').replace('&lt;', '<').replace(
-            '&gt;', '>').replace('&quot;', '"').replace('&#39;', "'")
-        if trail and unescaped.endswith(trail):
-            # Remove trail for unescaped if it was not consumed by unescape
-            unescaped = unescaped[:-len(trail)]
-        elif trail == ';':
-            # Trail was consumed by unescape (as end-of-entity marker), move it to text
-            text += trail
-            trail = ''
-        return text, unescaped, trail
+        return '%s…' % x[:max(0, limit - 1)]
 
     def trim_punctuation(lead, middle, trail):
         """
@@ -285,14 +262,6 @@ def urlize(text, trim_url_limit=None, nofollow=False, autoescape=False):
         trimmed_something = True
         while trimmed_something:
             trimmed_something = False
-
-            # Trim trailing punctuation.
-            stripped = middle.rstrip(TRAILING_PUNCTUATION_CHARS)
-            if middle != stripped:
-                trail = middle[len(stripped):] + trail
-                middle = stripped
-                trimmed_something = True
-
             # Trim wrapping punctuation.
             for opening, closing in WRAPPING_PUNCTUATION:
                 if middle.startswith(opening):
@@ -305,6 +274,15 @@ def urlize(text, trim_url_limit=None, nofollow=False, autoescape=False):
                     middle = middle[:-len(closing)]
                     trail = closing + trail
                     trimmed_something = True
+            # Trim trailing punctuation (after trimming wrapping punctuation,
+            # as encoded entities contain ';'). Unescape entities to avoid
+            # breaking them by removing ';'.
+            middle_unescaped = html.unescape(middle)
+            stripped = middle_unescaped.rstrip(TRAILING_PUNCTUATION_CHARS)
+            if middle_unescaped != stripped:
+                trail = middle[len(stripped):] + trail
+                middle = middle[:len(stripped) - len(middle_unescaped)]
+                trimmed_something = True
         return lead, middle, trail
 
     def is_email_simple(value):
@@ -336,15 +314,13 @@ def urlize(text, trim_url_limit=None, nofollow=False, autoescape=False):
             url = None
             nofollow_attr = ' rel="nofollow"' if nofollow else ''
             if simple_url_re.match(middle):
-                middle, middle_unescaped, trail = unescape(middle, trail)
-                url = smart_urlquote(middle_unescaped)
+                url = smart_urlquote(html.unescape(middle))
             elif simple_url_2_re.match(middle):
-                middle, middle_unescaped, trail = unescape(middle, trail)
-                url = smart_urlquote('http://%s' % middle_unescaped)
+                url = smart_urlquote('http://%s' % html.unescape(middle))
             elif ':' not in middle and is_email_simple(middle):
                 local, domain = middle.rsplit('@', 1)
                 try:
-                    domain = domain.encode('idna').decode('ascii')
+                    domain = punycode(domain)
                 except UnicodeError:
                     continue
                 url = 'mailto:%s@%s' % (local, domain)
@@ -381,7 +357,7 @@ def avoid_wrapping(value):
 def html_safe(klass):
     """
     A decorator that defines the __html__ method. This helps non-Django
-    templates to detect classes whose __str__ methods return SafeText.
+    templates to detect classes whose __str__ methods return SafeString.
     """
     if '__html__' in klass.__dict__:
         raise ValueError(

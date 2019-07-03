@@ -267,7 +267,7 @@ A few notable improvements have been made to the :doc:`testing framework
 </topics/testing/index>`.
 
 Test performance improvements
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. currentmodule:: django.test
 

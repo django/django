@@ -37,6 +37,10 @@ class Command(BaseCommand):
             '--squashed-name',
             help='Sets the name of the new squashed migration.',
         )
+        parser.add_argument(
+            '--no-header', action='store_false', dest='include_header',
+            help='Do not add a header comment to the new squashed migration.',
+        )
 
     def handle(self, **options):
 
@@ -47,6 +51,7 @@ class Command(BaseCommand):
         migration_name = options['migration_name']
         no_optimize = options['no_optimize']
         squashed_name = options['squashed_name']
+        include_header = options['include_header']
         # Validate app_label.
         try:
             apps.get_app_config(app_label)
@@ -178,7 +183,7 @@ class Command(BaseCommand):
             new_migration.initial = True
 
         # Write out the new migration file
-        writer = MigrationWriter(new_migration)
+        writer = MigrationWriter(new_migration, include_header)
         with open(writer.path, "w", encoding='utf-8') as fh:
             fh.write(writer.as_string())
 

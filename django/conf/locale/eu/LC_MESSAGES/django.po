@@ -3,7 +3,7 @@
 # Translators:
 # Aitzol Naberan <anaberan@codesyntax.com>, 2013,2016
 # Ander Martínez <ander.basaundi@gmail.com>, 2013-2014
-# Eneko Illarramendi <eneko@illarra.com>, 2017
+# Eneko Illarramendi <eneko@illarra.com>, 2017-2019
 # Jannis Leidel <jannis@leidel.info>, 2011
 # jazpillaga <jazpillaga@codesyntax.com>, 2011
 # julen, 2011-2012
@@ -15,8 +15,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-12-01 21:10+0100\n"
-"PO-Revision-Date: 2018-01-26 20:48+0000\n"
+"POT-Creation-Date: 2019-01-16 20:42+0100\n"
+"PO-Revision-Date: 2019-01-22 10:02+0000\n"
 "Last-Translator: Eneko Illarramendi <eneko@illarra.com>\n"
 "Language-Team: Basque (http://www.transifex.com/django/django/language/eu/)\n"
 "MIME-Version: 1.0\n"
@@ -144,6 +144,9 @@ msgstr "Goi-sorbiera"
 
 msgid "Hungarian"
 msgstr "Hungariera"
+
+msgid "Armenian"
+msgstr "Armeniera"
 
 msgid "Interlingua"
 msgstr "Interlingua"
@@ -391,6 +394,9 @@ msgstr[1] ""
 "Ziurtatu balio honek gehienez %(limit_value)d karaktere dituela "
 "(%(show_value)d ditu)."
 
+msgid "Enter a number."
+msgstr "Idatzi zenbaki bat."
+
 #, python-format
 msgid "Ensure that there are no more than %(max)s digit in total."
 msgid_plural "Ensure that there are no more than %(max)s digits in total."
@@ -468,6 +474,10 @@ msgstr "Zenbaki osoa (handia 8 byte)"
 #, python-format
 msgid "'%(value)s' value must be either True or False."
 msgstr "'%(value)s' balioak True edo False izan behar du."
+
+#, python-format
+msgid "'%(value)s' value must be either True, False, or None."
+msgstr "'%(value)s' balioak True, False edo None izan behar du."
 
 msgid "Boolean (Either True or False)"
 msgstr "Boolearra (True edo False)"
@@ -557,7 +567,7 @@ msgstr "IP helbidea"
 
 #, python-format
 msgid "'%(value)s' value must be either None, True or False."
-msgstr "'%(value)s' balioak True, False edo None izan behar du."
+msgstr "'%(value)s' balioak None, True, edo False izan behar du."
 
 msgid "Boolean (Either True, False or None)"
 msgstr "Boolearra (True, False edo None)"
@@ -608,6 +618,9 @@ msgstr "Datu bitar gordinak"
 msgid "'%(value)s' is not a valid UUID."
 msgstr "'%(value)s' ez da baleko UUID bat."
 
+msgid "Universally unique identifier"
+msgstr "\"Universally unique identifier\""
+
 msgid "File"
 msgstr "Fitxategia"
 
@@ -649,9 +662,6 @@ msgstr "Eremu hau beharrezkoa da."
 msgid "Enter a whole number."
 msgstr "Idatzi zenbaki oso bat."
 
-msgid "Enter a number."
-msgstr "Idatzi zenbaki bat."
-
 msgid "Enter a valid date."
 msgstr "Idatzi baleko data bat."
 
@@ -663,6 +673,10 @@ msgstr "Idatzi baleko data/ordu bat."
 
 msgid "Enter a valid duration."
 msgstr "Idatzi baleko iraupen bat."
+
+#, python-brace-format
+msgid "The number of days must be between {min_days} and {max_days}."
+msgstr "Egun kopuruak {min_days} eta {max_days} artean egon behar du."
 
 msgid "No file was submitted. Check the encoding type on the form."
 msgstr "Ez da fitxategirik bidali. Egiaztatu formularioaren kodeketa-mota."
@@ -1053,8 +1067,8 @@ msgstr "Hau ez da baleko IPv6 helbide bat."
 
 #, python-format
 msgctxt "String to return when truncating text"
-msgid "%(truncated_text)s..."
-msgstr "%(truncated_text)s..."
+msgid "%(truncated_text)s…"
+msgstr "%(truncated_text)s…"
 
 msgid "or"
 msgstr "edo"

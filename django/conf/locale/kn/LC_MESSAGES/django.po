@@ -8,16 +8,16 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-11-15 16:15+0100\n"
-"PO-Revision-Date: 2017-11-16 01:13+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2019-01-16 20:42+0100\n"
+"PO-Revision-Date: 2019-01-18 00:44+0000\n"
+"Last-Translator: Ramiro Morales\n"
 "Language-Team: Kannada (http://www.transifex.com/django/django/language/"
 "kn/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: kn\n"
-"Plural-Forms: nplurals=1; plural=0;\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
 msgid "Afrikaans"
 msgstr ""
@@ -139,6 +139,9 @@ msgstr ""
 msgid "Hungarian"
 msgstr "ಹಂಗೇರಿಯನ್"
 
+msgid "Armenian"
+msgstr ""
+
 msgid "Interlingua"
 msgstr ""
 
@@ -159,6 +162,9 @@ msgstr "ಜಾಪನೀಸ್"
 
 msgid "Georgian"
 msgstr "ಜಾರ್ಜೆಯನ್ "
+
+msgid "Kabyle"
+msgstr ""
 
 msgid "Kazakh"
 msgstr ""
@@ -365,6 +371,7 @@ msgid_plural ""
 "Ensure this value has at least %(limit_value)d characters (it has "
 "%(show_value)d)."
 msgstr[0] ""
+msgstr[1] ""
 
 #, python-format
 msgid ""
@@ -374,16 +381,22 @@ msgid_plural ""
 "Ensure this value has at most %(limit_value)d characters (it has "
 "%(show_value)d)."
 msgstr[0] ""
+msgstr[1] ""
+
+msgid "Enter a number."
+msgstr "ಒಂದು ಸಂಖ್ಯೆಯನ್ನು ನಮೂದಿಸಿ."
 
 #, python-format
 msgid "Ensure that there are no more than %(max)s digit in total."
 msgid_plural "Ensure that there are no more than %(max)s digits in total."
 msgstr[0] ""
+msgstr[1] ""
 
 #, python-format
 msgid "Ensure that there are no more than %(max)s decimal place."
 msgid_plural "Ensure that there are no more than %(max)s decimal places."
 msgstr[0] ""
+msgstr[1] ""
 
 #, python-format
 msgid ""
@@ -391,6 +404,7 @@ msgid ""
 msgid_plural ""
 "Ensure that there are no more than %(max)s digits before the decimal point."
 msgstr[0] ""
+msgstr[1] ""
 
 #, python-format
 msgid ""
@@ -446,6 +460,10 @@ msgstr "ಬೃಹತ್ (೮ ಬೈಟ್) ಪೂರ್ಣ ಸಂಖ್ಯೆ"
 
 #, python-format
 msgid "'%(value)s' value must be either True or False."
+msgstr ""
+
+#, python-format
+msgid "'%(value)s' value must be either True, False, or None."
 msgstr ""
 
 msgid "Boolean (Either True or False)"
@@ -571,6 +589,9 @@ msgstr ""
 msgid "'%(value)s' is not a valid UUID."
 msgstr ""
 
+msgid "Universally unique identifier"
+msgstr ""
+
 msgid "File"
 msgstr ""
 
@@ -610,9 +631,6 @@ msgstr "ಈ ಸ್ಥಳವು ಅಗತ್ಯವಿರುತ್ತದೆ."
 msgid "Enter a whole number."
 msgstr "ಪೂರ್ಣಾಂಕವೊಂದನ್ನು ನಮೂದಿಸಿ."
 
-msgid "Enter a number."
-msgstr "ಒಂದು ಸಂಖ್ಯೆಯನ್ನು ನಮೂದಿಸಿ."
-
 msgid "Enter a valid date."
 msgstr "ಸರಿಯಾದ ದಿನಾಂಕವನ್ನು ನಮೂದಿಸಿ."
 
@@ -623,6 +641,10 @@ msgid "Enter a valid date/time."
 msgstr "ಸರಿಯಾದ ದಿನಾಂಕ/ಸಮಯವನ್ನು ನಮೂದಿಸಿ."
 
 msgid "Enter a valid duration."
+msgstr ""
+
+#, python-brace-format
+msgid "The number of days must be between {min_days} and {max_days}."
 msgstr ""
 
 msgid "No file was submitted. Check the encoding type on the form."
@@ -641,6 +663,7 @@ msgid "Ensure this filename has at most %(max)d character (it has %(length)d)."
 msgid_plural ""
 "Ensure this filename has at most %(max)d characters (it has %(length)d)."
 msgstr[0] ""
+msgstr[1] ""
 
 msgid "Please either submit a file or check the clear checkbox, not both."
 msgstr ""
@@ -682,11 +705,13 @@ msgstr ""
 msgid "Please submit %d or fewer forms."
 msgid_plural "Please submit %d or fewer forms."
 msgstr[0] ""
+msgstr[1] ""
 
 #, python-format
 msgid "Please submit %d or more forms."
 msgid_plural "Please submit %d or more forms."
 msgstr[0] ""
+msgstr[1] ""
 
 msgid "Order"
 msgstr "ಕ್ರಮ"
@@ -756,6 +781,7 @@ msgstr "ಹೌದು,ಇಲ್ಲ,ಇರಬಹುದು"
 msgid "%(size)d byte"
 msgid_plural "%(size)d bytes"
 msgstr[0] "%(size)d ಬೈಟ್‌ಗಳು"
+msgstr[1] "%(size)d ಬೈಟ್‌ಗಳು"
 
 #, python-format
 msgid "%s KB"
@@ -1010,7 +1036,7 @@ msgstr ""
 
 #, python-format
 msgctxt "String to return when truncating text"
-msgid "%(truncated_text)s..."
+msgid "%(truncated_text)s…"
 msgstr ""
 
 msgid "or"
@@ -1024,31 +1050,37 @@ msgstr ", "
 msgid "%d year"
 msgid_plural "%d years"
 msgstr[0] ""
+msgstr[1] ""
 
 #, python-format
 msgid "%d month"
 msgid_plural "%d months"
 msgstr[0] ""
+msgstr[1] ""
 
 #, python-format
 msgid "%d week"
 msgid_plural "%d weeks"
 msgstr[0] ""
+msgstr[1] ""
 
 #, python-format
 msgid "%d day"
 msgid_plural "%d days"
 msgstr[0] ""
+msgstr[1] ""
 
 #, python-format
 msgid "%d hour"
 msgid_plural "%d hours"
 msgstr[0] ""
+msgstr[1] ""
 
 #, python-format
 msgid "%d minute"
 msgid_plural "%d minutes"
 msgstr[0] ""
+msgstr[1] ""
 
 msgid "0 minutes"
 msgstr ""

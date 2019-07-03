@@ -4,11 +4,17 @@ from decimal import Decimal
 from django.db.models import DecimalField
 from django.db.models.functions import ATan
 from django.test import TestCase
+from django.test.utils import register_lookup
 
 from ..models import DecimalModel, FloatModel, IntegerModel
 
 
 class ATanTests(TestCase):
+
+    def test_null(self):
+        IntegerModel.objects.create()
+        obj = IntegerModel.objects.annotate(null_atan=ATan('normal')).first()
+        self.assertIsNone(obj.null_atan)
 
     def test_decimal(self):
         DecimalModel.objects.create(n1=Decimal('-12.9'), n2=Decimal('0.6'))
@@ -41,11 +47,8 @@ class ATanTests(TestCase):
         self.assertAlmostEqual(obj.big_atan, math.atan(obj.big))
 
     def test_transform(self):
-        try:
-            DecimalField.register_lookup(ATan)
+        with register_lookup(DecimalField, ATan):
             DecimalModel.objects.create(n1=Decimal('3.12'), n2=Decimal('0'))
             DecimalModel.objects.create(n1=Decimal('-5'), n2=Decimal('0'))
-            objs = DecimalModel.objects.filter(n1__atan__gt=0)
-            self.assertQuerysetEqual(objs, [Decimal('3.12')], lambda a: a.n1)
-        finally:
-            DecimalField._unregister_lookup(ATan)
+            obj = DecimalModel.objects.filter(n1__atan__gt=0).get()
+            self.assertEqual(obj.n1, Decimal('3.12'))

@@ -67,9 +67,10 @@ PostgreSQL
 ----------
 
 PostgreSQL is the most capable of all the databases here in terms of schema
-support; the only caveat is that adding columns with default values will
-cause a full rewrite of the table, for a time proportional to its size.
+support.
 
+The only caveat is that prior to PostgreSQL 11, adding columns with default
+values causes a full rewrite of the table, for a time proportional to its size.
 For this reason, it's recommended you always create new columns with
 ``null=True``, as this way they will be added immediately.
 
@@ -189,6 +190,10 @@ restrict to a single app. Restricting to a single app (either in
 ``makemigrations`` or ``migrate``) is a best-efforts promise, and not
 a guarantee; any other apps that need to be used to get dependencies correct
 will be.
+
+Apps without migrations must not have relations (``ForeignKey``,
+``ManyToManyField``, etc.) to apps with migrations. Sometimes it may work, but
+it's not supported.
 
 .. _migration-files:
 
@@ -666,7 +671,7 @@ for basic values, and doesn't specify import paths).
 
 Django can serialize the following:
 
-- ``int``, ``float``, ``bool``, ``str``, ``bytes``, ``None``
+- ``int``, ``float``, ``bool``, ``str``, ``bytes``, ``None``, ``NoneType``
 - ``list``, ``set``, ``tuple``, ``dict``
 - ``datetime.date``, ``datetime.time``, and ``datetime.datetime`` instances
   (include those that are timezone-aware)
@@ -682,15 +687,44 @@ Django can serialize the following:
 - Any class reference (must be in module's top-level scope)
 - Anything with a custom ``deconstruct()`` method (:ref:`see below <custom-deconstruct-method>`)
 
-.. versionchanged:: 2.1
+.. versionchanged:: 2.2
 
-    Serialization support for :class:`functools.partialmethod` was added.
+    Serialization support for ``NoneType`` was added.
 
 Django cannot serialize:
 
 - Nested classes
 - Arbitrary class instances (e.g. ``MyClass(4.3, 5.7)``)
 - Lambdas
+
+.. _custom-migration-serializers:
+
+Custom serializers
+------------------
+
+.. versionadded:: 2.2
+
+You can serialize other types by writing a custom serializer. For example, if
+Django didn't serialize :class:`~decimal.Decimal` by default, you could do
+this::
+
+    from decimal import Decimal
+
+    from django.db.migrations.serializer import BaseSerializer
+    from django.db.migrations.writer import MigrationWriter
+
+    class DecimalSerializer(BaseSerializer):
+        def serialize(self):
+            return repr(self.value), {'from decimal import Decimal'}
+
+    MigrationWriter.register_serializer(Decimal, DecimalSerializer)
+
+The first argument of ``MigrationWriter.register_serializer()`` is a type or
+iterable of types that should use the serializer.
+
+The ``serialize()`` method of your serializer must return a string of how the
+value should appear in migrations and a set of any imports that are needed in
+the migration.
 
 .. _custom-deconstruct-method:
 

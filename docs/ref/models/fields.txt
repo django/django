@@ -80,21 +80,21 @@ If a field has ``blank=False``, the field will be required.
 
 .. attribute:: Field.choices
 
-An iterable (e.g., a list or tuple) consisting itself of iterables of exactly
-two items (e.g. ``[(A, B), (A, B) ...]``) to use as choices for this field. If
-choices are given, they're enforced by :ref:`model validation
-<validating-objects>` and the default form widget will be a select box with
-these choices instead of the standard text field.
+A :term:`sequence` consisting itself of iterables of exactly two items (e.g.
+``[(A, B), (A, B) ...]``) to use as choices for this field. If choices are
+given, they're enforced by :ref:`model validation <validating-objects>` and the
+default form widget will be a select box with these choices instead of the
+standard text field.
 
 The first element in each tuple is the actual value to be set on the model,
 and the second element is the human-readable name. For example::
 
-    YEAR_IN_SCHOOL_CHOICES = (
+    YEAR_IN_SCHOOL_CHOICES = [
         ('FR', 'Freshman'),
         ('SO', 'Sophomore'),
         ('JR', 'Junior'),
         ('SR', 'Senior'),
-    )
+    ]
 
 Generally, it's best to define choices inside a model class, and to
 define a suitably-named constant for each value::
@@ -106,12 +106,12 @@ define a suitably-named constant for each value::
         SOPHOMORE = 'SO'
         JUNIOR = 'JR'
         SENIOR = 'SR'
-        YEAR_IN_SCHOOL_CHOICES = (
+        YEAR_IN_SCHOOL_CHOICES = [
             (FRESHMAN, 'Freshman'),
             (SOPHOMORE, 'Sophomore'),
             (JUNIOR, 'Junior'),
             (SENIOR, 'Senior'),
-        )
+        ]
         year_in_school = models.CharField(
             max_length=2,
             choices=YEAR_IN_SCHOOL_CHOICES,
@@ -130,7 +130,7 @@ will work anywhere that the ``Student`` model has been imported).
 You can also collect your available choices into named groups that can
 be used for organizational purposes::
 
-    MEDIA_CHOICES = (
+    MEDIA_CHOICES = [
         ('Audio', (
                 ('vinyl', 'Vinyl'),
                 ('cd', 'CD'),
@@ -142,7 +142,7 @@ be used for organizational purposes::
             )
         ),
         ('unknown', 'Unknown'),
-    )
+    ]
 
 The first element in each tuple is the name to apply to the group. The
 second element is an iterable of 2-tuples, with each 2-tuple containing
@@ -155,11 +155,14 @@ method to retrieve the human-readable name for the field's current value. See
 :meth:`~django.db.models.Model.get_FOO_display` in the database API
 documentation.
 
-Note that choices can be any iterable object -- not necessarily a list or tuple.
-This lets you construct choices dynamically. But if you find yourself hacking
-:attr:`~Field.choices` to be dynamic, you're probably better off using a proper
-database table with a :class:`ForeignKey`. :attr:`~Field.choices` is meant for
-static data that doesn't change much, if ever.
+Note that choices can be any sequence object -- not necessarily a list or
+tuple. This lets you construct choices dynamically. But if you find yourself
+hacking :attr:`~Field.choices` to be dynamic, you're probably better off using
+a proper database table with a :class:`ForeignKey`. :attr:`~Field.choices` is
+meant for static data that doesn't change much, if ever.
+
+.. note::
+    A new migration is created each time the order of ``choices`` changes.
 
 Unless :attr:`blank=False<Field.blank>` is set on the field along with a
 :attr:`~Field.default` then a label containing ``"---------"`` will be rendered
@@ -414,18 +417,21 @@ guaranteed to fit numbers from ``-9223372036854775808`` to
 ``BinaryField``
 ---------------
 
-.. class:: BinaryField(**options)
+.. class:: BinaryField(max_length=None, **options)
 
-A field to store raw binary data. It only supports ``bytes`` assignment. Be
-aware that this field has limited functionality. For example, it is not possible
-to filter a queryset on a ``BinaryField`` value.
+A field to store raw binary data. It can be assigned :class:`bytes`,
+:class:`bytearray`, or :class:`memoryview`.
 
 By default, ``BinaryField`` sets :attr:`~Field.editable` to ``False``, in which
 case it can't be included in a :class:`~django.forms.ModelForm`.
 
-.. versionchanged:: 2.1
+``BinaryField`` has one extra optional argument:
 
-    Older versions don't allow setting ``editable`` to ``True``.
+.. attribute:: BinaryField.max_length
+
+    The maximum length (in characters) of the field. The maximum length is
+    enforced in Django's validation using
+    :class:`~django.core.validators.MaxLengthValidator`.
 
 .. admonition:: Abusing ``BinaryField``
 
@@ -446,12 +452,6 @@ or :class:`~django.forms.NullBooleanSelect` if :attr:`null=True <Field.null>`.
 The default value of ``BooleanField`` is ``None`` when :attr:`Field.default`
 isn't defined.
 
-.. versionchanged:: 2.1
-
-    In older versions, this field doesn't permit ``null=True``, so you have to
-    use :class:`NullBooleanField` instead. Using the latter is now discouraged
-    as it's likely to be deprecated in a future version of Django.
-
 ``CharField``
 -------------
 
@@ -468,7 +468,8 @@ The default form widget for this field is a :class:`~django.forms.TextInput`.
 .. attribute:: CharField.max_length
 
     The maximum length (in characters) of the field. The max_length is enforced
-    at the database level and in Django's validation.
+    at the database level and in Django's validation using
+    :class:`~django.core.validators.MaxLengthValidator`.
 
 .. note::
 
@@ -551,7 +552,10 @@ The default form widget for this field is a single
 .. class:: DecimalField(max_digits=None, decimal_places=None, **options)
 
 A fixed-precision decimal number, represented in Python by a
-:class:`~decimal.Decimal` instance. Has two **required** arguments:
+:class:`~decimal.Decimal` instance. It validates the input using
+:class:`~django.core.validators.DecimalValidator`.
+
+Has two **required** arguments:
 
 .. attribute:: DecimalField.max_digits
 
@@ -603,8 +607,8 @@ SECOND(6)``. Otherwise a ``bigint`` of microseconds is used.
 
 .. class:: EmailField(max_length=254, **options)
 
-A :class:`CharField` that checks that the value is a valid email address. It
-uses :class:`~django.core.validators.EmailValidator` to validate the input.
+A :class:`CharField` that checks that the value is a valid email address using
+:class:`~django.core.validators.EmailValidator`.
 
 ``FileField``
 -------------
@@ -614,7 +618,7 @@ uses :class:`~django.core.validators.EmailValidator` to validate the input.
 A file-upload field.
 
 .. note::
-    The ``primary_key`` argument isn't supported and will raise a an error if
+    The ``primary_key`` argument isn't supported and will raise an error if
     used.
 
 Has two optional arguments:
@@ -686,17 +690,17 @@ The default form widget for this field is a
 Using a :class:`FileField` or an :class:`ImageField` (see below) in a model
 takes a few steps:
 
-1. In your settings file, you'll need to define :setting:`MEDIA_ROOT` as the
+#. In your settings file, you'll need to define :setting:`MEDIA_ROOT` as the
    full path to a directory where you'd like Django to store uploaded files.
    (For performance, these files are not stored in the database.) Define
    :setting:`MEDIA_URL` as the base public URL of that directory. Make sure
    that this directory is writable by the Web server's user account.
 
-2. Add the :class:`FileField` or :class:`ImageField` to your model, defining
+#. Add the :class:`FileField` or :class:`ImageField` to your model, defining
    the :attr:`~FileField.upload_to` option to specify a subdirectory of
    :setting:`MEDIA_ROOT` to use for uploaded files.
 
-3. All that will be stored in your database is a path to the file
+#. All that will be stored in your database is a path to the file
    (relative to :setting:`MEDIA_ROOT`). You'll most likely want to use the
    convenience :attr:`~django.db.models.fields.files.FieldFile.url` attribute
    provided by Django. For example, if your :class:`ImageField` is called
@@ -867,6 +871,23 @@ directory on the filesystem. Has three special arguments, of which the first is
     Required. The absolute filesystem path to a directory from which this
     :class:`FilePathField` should get its choices. Example: ``"/home/images"``.
 
+    ``path`` may also be a callable, such as a function to dynamically set the
+    path at runtime. Example::
+
+        import os
+        from django.conf import settings
+        from django.db import models
+
+        def images_path():
+            return os.path.join(settings.LOCAL_FILE_DIR, 'images')
+
+        class MyModel(models.Model):
+            file = models.FilePathField(path=images_path)
+
+    .. versionchanged:: 3.0
+
+        ``path`` can now be a callable.
+
 .. attribute:: FilePathField.match
 
     Optional. A regular expression, as a string, that :class:`FilePathField`
@@ -969,9 +990,15 @@ The default form widget for this field is a
 .. class:: IntegerField(**options)
 
 An integer. Values from ``-2147483648`` to ``2147483647`` are safe in all
-databases supported by Django. The default form widget for this field is a
-:class:`~django.forms.NumberInput` when :attr:`~django.forms.Field.localize`
-is ``False`` or :class:`~django.forms.TextInput` otherwise.
+databases supported by Django.
+
+It uses :class:`~django.core.validators.MinValueValidator` and
+:class:`~django.core.validators.MaxValueValidator` to validate the input based
+on the values that the default database supports.
+
+The default form widget for this field is a :class:`~django.forms.NumberInput`
+when :attr:`~django.forms.Field.localize` is ``False`` or
+:class:`~django.forms.TextInput` otherwise.
 
 ``GenericIPAddressField``
 -------------------------
@@ -1050,6 +1077,9 @@ It is often useful to automatically prepopulate a SlugField based on the value
 of some other value.  You can do this automatically in the admin using
 :attr:`~django.contrib.admin.ModelAdmin.prepopulated_fields`.
 
+It uses :class:`~django.core.validators.validate_slug` or
+:class:`~django.core.validators.validate_unicode_slug` for validation.
+
 .. attribute:: SlugField.allow_unicode
 
     If ``True``, the field accepts Unicode letters in addition to ASCII
@@ -1093,7 +1123,8 @@ The admin adds some JavaScript shortcuts.
 
 .. class:: URLField(max_length=200, **options)
 
-A :class:`CharField` for a URL.
+A :class:`CharField` for a URL, validated by
+:class:`~django.core.validators.URLValidator`.
 
 The default form widget for this field is a :class:`~django.forms.TextInput`.
 
@@ -1172,8 +1203,8 @@ Relationships defined this way on :ref:`abstract models
 <abstract-base-classes>` are resolved when the model is subclassed as a
 concrete model and are not relative to the abstract model's ``app_label``:
 
-.. snippet::
-    :filename: products/models.py
+.. code-block:: python
+    :caption: products/models.py
 
     from django.db import models
 
@@ -1183,8 +1214,8 @@ concrete model and are not relative to the abstract model's ``app_label``:
         class Meta:
             abstract = True
 
-.. snippet::
-    :filename: production/models.py
+.. code-block:: python
+    :caption: production/models.py
 
     from django.db import models
     from products.models import AbstractCar
@@ -1249,6 +1280,9 @@ relation works.
             blank=True,
             null=True,
         )
+
+    ``on_delete`` doesn't create a SQL constraint in the database. Support for
+    database-level cascade options :ticket:`may be implemented later <21961>`.
 
 The possible values for :attr:`~ForeignKey.on_delete` are found in
 :mod:`django.db.models`:
@@ -1454,10 +1488,9 @@ Behind the scenes, Django creates an intermediary join table to represent the
 many-to-many relationship. By default, this table name is generated using the
 name of the many-to-many field and the name of the table for the model that
 contains it. Since some databases don't support table names above a certain
-length, these table names will be automatically truncated to 64 characters and a
-uniqueness hash will be used. This means you might see table names like
-``author_books_9cdf4``; this is perfectly normal.  You can manually provide the
-name of the join table using the :attr:`~ManyToManyField.db_table` option.
+length, these table names will be automatically truncated and a uniqueness hash
+will be used, e.g. ``author_books_9cdf``. You can manually provide the name of
+the join table using the :attr:`~ManyToManyField.db_table` option.
 
 .. _manytomany-arguments:
 
@@ -1504,6 +1537,11 @@ that control how the relationship functions.
     add the descriptor for the reverse relationship, allowing
     :class:`ManyToManyField` relationships to be non-symmetrical.
 
+    .. versionchanged:: 3.0
+
+        Specifying ``symmetrical=True`` for recursive many-to-many
+        relationships using an intermediary model was allowed.
+
 .. attribute:: ManyToManyField.through
 
     Django will automatically generate a table to manage many-to-many
@@ -1515,6 +1553,16 @@ that control how the relationship functions.
     The most common use for this option is when you want to associate
     :ref:`extra data with a many-to-many relationship
     <intermediary-manytomany>`.
+
+    .. note::
+
+        Recursive relationships using an intermediary model and defined as
+        symmetrical (that is, with :attr:`symmetrical=True
+        <ManyToManyField.symmetrical>`, which is the default) can't determine
+        the reverse accessors names, as they would be the same. You need to set
+        a :attr:`~ForeignKey.related_name` to at least one of them. If you'd
+        prefer Django not to create a backwards relation, set ``related_name``
+        to ``'+'``.
 
     If you don't specify an explicit ``through`` model, there is still an
     implicit ``through`` model class you can use to directly access the table
@@ -1591,12 +1639,6 @@ that control how the relationship functions.
     foreign keys to the model, or you want to explicitly specify which two
     Django should use.
 
-    Recursive relationships using an intermediary model are always defined as
-    non-symmetrical -- that is, with :attr:`symmetrical=False <ManyToManyField.symmetrical>`
-    -- therefore, there is the concept of a "source" and a "target". In that
-    case ``'field1'`` will be treated as the "source" of the relationship and
-    ``'field2'`` as the "target".
-
 .. attribute:: ManyToManyField.db_table
 
     The name of the table to create for storing the many-to-many data. If this
@@ -1656,9 +1698,9 @@ related. This works exactly the same as it does for :class:`ForeignKey`,
 including all the options regarding :ref:`recursive <recursive-relationships>`
 and :ref:`lazy <lazy-relationships>` relationships.
 
-If you do not specify the :attr:`~ForeignKey.related_name` argument for
-the ``OneToOneField``, Django will use the lower-case name of the current model
-as default value.
+If you do not specify the :attr:`~ForeignKey.related_name` argument for the
+``OneToOneField``, Django will use the lowercase name of the current model as
+default value.
 
 With the following example::
 

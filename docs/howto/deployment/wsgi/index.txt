@@ -5,7 +5,7 @@ How to deploy with WSGI
 Django's primary deployment platform is WSGI_, the Python standard for web
 servers and applications.
 
-.. _WSGI: http://www.wsgi.org
+.. _WSGI: https://wsgi.readthedocs.io/en/latest/
 
 Django's :djadmin:`startproject` management command sets up a simple default
 WSGI configuration for you, which you can tweak as needed for your project,

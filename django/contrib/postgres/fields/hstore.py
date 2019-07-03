@@ -15,7 +15,7 @@ class HStoreField(CheckFieldDefaultMixin, Field):
     empty_strings_allowed = False
     description = _('Map of strings to strings/nulls')
     default_error_messages = {
-        'not_a_string': _('The value of "%(key)s" is not a string or null.'),
+        'not_a_string': _('The value of “%(key)s” is not a string or null.'),
     }
     _default_hint = ('dict', '{}')
 

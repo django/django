@@ -1,6 +1,5 @@
 import uuid
-
-from django.utils import lru_cache
+from functools import lru_cache
 
 
 class IntConverter:
@@ -58,7 +57,7 @@ def register_converter(converter, type_name):
     get_converters.cache_clear()
 
 
-@lru_cache.lru_cache(maxsize=None)
+@lru_cache(maxsize=None)
 def get_converters():
     return {**DEFAULT_CONVERTERS, **REGISTERED_CONVERTERS}
 

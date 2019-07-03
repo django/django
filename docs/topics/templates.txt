@@ -351,7 +351,7 @@ applications. This generic name was kept for backwards-compatibility.
 
 * ``'file_charset'``: the charset used to read template files on disk.
 
-  It defaults to the value of :setting:`FILE_CHARSET`.
+  It defaults to ``'utf-8'``.
 
 * ``'libraries'``: A dictionary of labels and dotted Python paths of template
   tag modules to register with the template engine. This can be used to add
@@ -385,7 +385,7 @@ Requires Jinja2_ to be installed:
 
 .. console::
 
-    $ pip install Jinja2
+    $ python -m pip install Jinja2
 
 Set :setting:`BACKEND <TEMPLATES-BACKEND>` to
 ``'django.template.backends.jinja2.Jinja2'`` to configure a Jinja2_ engine.
@@ -451,7 +451,7 @@ environment.
 
 For example, you can create ``myproject/jinja2.py`` with this content::
 
-    from django.contrib.staticfiles.storage import staticfiles_storage
+    from django.templatetags.static import static
     from django.urls import reverse
 
     from jinja2 import Environment
@@ -460,7 +460,7 @@ For example, you can create ``myproject/jinja2.py`` with this content::
     def environment(**options):
         env = Environment(**options)
         env.globals.update({
-            'static': staticfiles_storage.url,
+            'static': static,
             'url': reverse,
         })
         return env
@@ -514,7 +514,7 @@ fictional ``foobar`` template library::
 
         def from_string(self, template_code):
             try:
-              return Template(self.engine.from_string(template_code))
+                return Template(self.engine.from_string(template_code))
             except foobar.TemplateCompilationFailed as exc:
                 raise TemplateSyntaxError(exc.args)
 

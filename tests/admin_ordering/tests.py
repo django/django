@@ -34,9 +34,10 @@ class TestAdminOrdering(TestCase):
     in ModelAdmin rather that ordering defined in the model's inner Meta
     class.
     """
+    request_factory = RequestFactory()
 
-    def setUp(self):
-        self.request_factory = RequestFactory()
+    @classmethod
+    def setUpTestData(cls):
         Band.objects.bulk_create([
             Band(name='Aerosmith', bio='', rank=3),
             Band(name='Radiohead', bio='', rank=1),
@@ -92,12 +93,13 @@ class TestInlineModelAdminOrdering(TestCase):
     define in InlineModelAdmin.
     """
 
-    def setUp(self):
-        self.band = Band.objects.create(name='Aerosmith', bio='', rank=3)
+    @classmethod
+    def setUpTestData(cls):
+        cls.band = Band.objects.create(name='Aerosmith', bio='', rank=3)
         Song.objects.bulk_create([
-            Song(band=self.band, name='Pink', duration=235),
-            Song(band=self.band, name='Dude (Looks Like a Lady)', duration=264),
-            Song(band=self.band, name='Jaded', duration=214),
+            Song(band=cls.band, name='Pink', duration=235),
+            Song(band=cls.band, name='Dude (Looks Like a Lady)', duration=264),
+            Song(band=cls.band, name='Jaded', duration=214),
         ])
 
     def test_default_ordering(self):
@@ -119,10 +121,12 @@ class TestInlineModelAdminOrdering(TestCase):
 
 
 class TestRelatedFieldsAdminOrdering(TestCase):
-    def setUp(self):
-        self.b1 = Band.objects.create(name='Pink Floyd', bio='', rank=1)
-        self.b2 = Band.objects.create(name='Foo Fighters', bio='', rank=5)
+    @classmethod
+    def setUpTestData(cls):
+        cls.b1 = Band.objects.create(name='Pink Floyd', bio='', rank=1)
+        cls.b2 = Band.objects.create(name='Foo Fighters', bio='', rank=5)
 
+    def setUp(self):
         # we need to register a custom ModelAdmin (instead of just using
         # ModelAdmin) because the field creator tries to find the ModelAdmin
         # for the related model

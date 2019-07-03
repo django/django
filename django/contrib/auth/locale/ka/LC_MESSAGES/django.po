@@ -17,7 +17,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: ka\n"
-"Plural-Forms: nplurals=1; plural=0;\n"
+"Plural-Forms: nplurals=2; plural=(n!=1);\n"
 
 msgid "Personal info"
 msgstr "პირადი ინფორმაცია"
@@ -231,11 +231,15 @@ msgid_plural ""
 "characters."
 msgstr[0] ""
 "პაროლი ძალიან მოკლეა. მინიმუმ %(min_length)dსიმბოლოს უნდა შეიცავდეს."
+msgstr[1] ""
+"პაროლი ძალიან მოკლეა. მინიმუმ %(min_length)dსიმბოლოს უნდა შეიცავდეს."
 
 #, python-format
 msgid "Your password must contain at least %(min_length)d character."
 msgid_plural "Your password must contain at least %(min_length)d characters."
 msgstr[0] ""
+"პაროლი ძალიან მოკლეა. მინიმუმ %(min_length)d სიმბოლოს უნდა შეიცავდეს."
+msgstr[1] ""
 "პაროლი ძალიან მოკლეა. მინიმუმ %(min_length)d სიმბოლოს უნდა შეიცავდეს."
 
 #, python-format

@@ -29,15 +29,14 @@ pre {
 }
 
 /* Header for some code blocks. */
-.snippet-filename {
+.code-block-caption {
     background-color: #393939;
     color: white;
     margin: 0;
     padding: 0.5em;
     font: bold 90% monospace;
 }
-.snippet-filename + .highlight > pre,
-.snippet-filename + pre {
+.literal-block-wrapper pre {
     margin-top: 0;
 }
 

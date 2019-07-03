@@ -25,41 +25,39 @@ Overview
 The admin is enabled in the default project template used by
 :djadmin:`startproject`.
 
-For reference, here are the requirements:
+If you're not using the default project template, here are the requirements:
 
-1. Add ``'django.contrib.admin'`` to your :setting:`INSTALLED_APPS` setting.
+#. Add ``'django.contrib.admin'`` and its dependencies -
+   :mod:`django.contrib.auth`, :mod:`django.contrib.contenttypes`,
+   :mod:`django.contrib.messages`, and :mod:`django.contrib.sessions` - to your
+   :setting:`INSTALLED_APPS` setting.
 
-2. The admin has four dependencies - :mod:`django.contrib.auth`,
-   :mod:`django.contrib.contenttypes`,
-   :mod:`django.contrib.messages` and
-   :mod:`django.contrib.sessions`.  If these applications are not
-   in your :setting:`INSTALLED_APPS` list, add them.
+#. Configure a :class:`~django.template.backends.django.DjangoTemplates`
+   backend in your :setting:`TEMPLATES` setting with
+   ``django.contrib.auth.context_processors.auth`` and
+   ``django.contrib.messages.context_processors.messages`` in
+   the ``'context_processors'`` option of :setting:`OPTIONS
+   <TEMPLATES-OPTIONS>`.
 
-3. Add ``django.contrib.auth.context_processors.auth`` and
-   ``django.contrib.messages.context_processors.messages`` to
-   the ``'context_processors'`` option of the ``DjangoTemplates`` backend
-   defined in your :setting:`TEMPLATES` as well as
+#. If you've customized the :setting:`MIDDLEWARE` setting,
    :class:`django.contrib.auth.middleware.AuthenticationMiddleware` and
-   :class:`django.contrib.messages.middleware.MessageMiddleware` to
-   :setting:`MIDDLEWARE`. These are all active by default, so you only need to
-   do this if you've manually tweaked the settings.
+   :class:`django.contrib.messages.middleware.MessageMiddleware` must be
+   included.
 
-4. Determine which of your application's models should be editable in the
-   admin interface.
+5. :ref:`Hook the admin's URLs into your URLconf
+   <hooking-adminsite-to-urlconf>`.
 
-5. For each of those models, optionally create a ``ModelAdmin`` class that
-   encapsulates the customized admin functionality and options for that
-   particular model.
+After you've taken these steps, you'll be able to use the admin site by
+visiting the URL you hooked it into (``/admin/``, by default).
 
-6. Instantiate an ``AdminSite`` and tell it about each of your models and
-   ``ModelAdmin`` classes.
+If you need to create a user to login with, use the :djadmin:`createsuperuser`
+command. By default, logging in to the admin requires that the user has the
+:attr:`~.User.is_superuser` or :attr:`~.User.is_staff` attribute set to
+``True``.
 
-7. Hook the ``AdminSite`` instance into your URLconf.
-
-After you've taken these steps, you'll be able to use your Django admin site
-by visiting the URL you hooked it into (``/admin/``, by default). If you need
-to create a user to login with, you can use the :djadmin:`createsuperuser`
-command.
+Finally, determine which of your application's models should be editable in the
+admin interface. For each of those models, register them with the admin as
+described in :class:`ModelAdmin`.
 
 Other topics
 ------------
@@ -158,8 +156,6 @@ application and imports it.
     except it doesn't call :func:`~django.contrib.admin.autodiscover()`.
 
     .. attribute:: default_site
-
-        .. versionadded:: 2.1
 
         A dotted import path to the default admin site's class or to a callable
         that returns a site instance. Defaults to
@@ -756,14 +752,11 @@ subclass::
                   return self.first_name + ' ' + self.last_name
               full_name.admin_order_field = Concat('first_name', Value(' '), 'last_name')
 
-      .. versionadded:: 2.1
-
-          Support for expressions in ``admin_order_field`` was added.
-
     * Elements of ``list_display`` can also be properties. Please note however,
       that due to the way properties work in Python, setting
-      ``short_description`` on a property is only possible when using the
-      ``property()`` function and **not** with the ``@property`` decorator.
+      ``short_description`` or ``admin_order_field`` on a property is only
+      possible when using the ``property()`` function and **not** with the
+      ``@property`` decorator.
 
       For example::
 
@@ -774,6 +767,7 @@ subclass::
               def my_property(self):
                   return self.first_name + ' ' + self.last_name
               my_property.short_description = "Full name of the person"
+              my_property.admin_order_field = 'last_name'
 
               full_name = property(my_property)
 
@@ -1045,6 +1039,17 @@ subclass::
     If you need to specify a dynamic order (for example depending on user or
     language) you can implement a :meth:`~ModelAdmin.get_ordering` method.
 
+    .. admonition:: Performance considerations with ordering and sorting
+
+        To ensure a deterministic ordering of results, the changelist adds
+        ``pk`` to the ordering if it can't find a single or unique together set
+        of fields that provide total ordering.
+
+        For example, if the default ordering is by a non-unique ``name`` field,
+        then the changelist is sorted by ``name`` and ``pk``. This could
+        perform poorly if you have a lot of rows and don't have an index on
+        ``name`` and ``pk``.
+
 .. attribute:: ModelAdmin.paginator
 
     The paginator class to be used for pagination. By default,
@@ -1069,9 +1074,9 @@ subclass::
     slug (e.g. substituting dashes for spaces; lowercasing ASCII letters; and
     removing various English stop words such as 'a', 'an', 'as', and similar).
 
-    Fields are prepopulated on add forms but not on change forms. It's usually
-    undesired that slugs change after an object is created (which would cause
-    an object's URL to change if the slug is used in it).
+    Prepopulated fields aren't modified by JavaScript after a value has been
+    saved. It's usually undesired that slugs change (which would cause an
+    object's URL to change if the slug is used in it).
 
     ``prepopulated_fields`` doesn't accept ``DateTimeField``, ``ForeignKey``,
     ``OneToOneField``, and ``ManyToManyField`` fields.
@@ -1268,7 +1273,9 @@ subclass::
     word must be in at least one of ``search_fields``. For example, if
     ``search_fields`` is set to ``['first_name', 'last_name']`` and a user
     searches for ``john lennon``, Django will do the equivalent of this SQL
-    ``WHERE`` clause::
+    ``WHERE`` clause:
+
+    .. code-block:: sql
 
         WHERE (first_name ILIKE '%john%' OR last_name ILIKE '%john%')
         AND (first_name ILIKE '%lennon%' OR last_name ILIKE '%lennon%')
@@ -1280,10 +1287,6 @@ subclass::
     Beware that because query terms are split and ANDed as described earlier,
     searching with :lookup:`exact` only works with a single search word since
     two or more words can't all be an exact match unless all words are the same.
-
-    .. versionadded:: 2.1
-
-        The ability to specify a field lookup was added.
 
     Some (older) shortcuts for specifying a field lookup are also available.
     You can prefix a field in ``search_fields`` with the following characters
@@ -1314,8 +1317,6 @@ subclass::
     large number of rows.
 
 .. attribute:: ModelAdmin.sortable_by
-
-    .. versionadded:: 2.1
 
     By default, the change list page allows sorting by all model fields (and
     callables that have the ``admin_order_field`` property) specified in
@@ -1434,8 +1435,6 @@ templates used by the :class:`ModelAdmin` views:
     :meth:`.Model.delete`.
 
 .. method:: ModelAdmin.delete_queryset(request, queryset)
-
-    .. versionadded:: 2.1
 
     The ``delete_queryset()`` method is given the ``HttpRequest`` and a
     ``QuerySet`` of objects to be deleted. Override this method to customize
@@ -1597,8 +1596,6 @@ templates used by the :class:`ModelAdmin` views:
 
 .. method:: ModelAdmin.get_sortable_by(request)
 
-    .. versionadded:: 2.1
-
     The ``get_sortable_by()`` method is passed the ``HttpRequest`` and is
     expected to return a collection (e.g. ``list``, ``tuple``, or ``set``) of
     field names that will be sortable in the change list page.
@@ -1631,6 +1628,16 @@ templates used by the :class:`ModelAdmin` views:
     If you override this method, make sure that the returned inlines are
     instances of the classes defined in :attr:`inlines` or you might encounter
     a "Bad Request" error when adding related objects.
+
+.. method:: ModelAdmin.get_inlines(request, obj)
+
+    .. versionadded:: 3.0
+
+    The ``get_inlines`` method is given the ``HttpRequest`` and the
+    ``obj`` being edited (or ``None`` on an add form) and is expected to return
+    an iterable of inlines. You can override this method to dynamically add
+    inlines based on the request or model instance instead of specifying them
+    in :attr:`ModelAdmin.inlines`.
 
 .. method:: ModelAdmin.get_urls()
 
@@ -1886,8 +1893,6 @@ templates used by the :class:`ModelAdmin` views:
 
 .. method:: ModelAdmin.has_view_permission(request, obj=None)
 
-    .. versionadded:: 2.1
-
     Should return ``True`` if viewing ``obj`` is permitted, ``False`` otherwise.
     If obj is ``None``, should return ``True`` or ``False`` to indicate whether
     viewing of objects of this type is permitted in general (e.g., ``False``
@@ -2011,8 +2016,6 @@ templates used by the :class:`ModelAdmin` views:
 
 .. method:: ModelAdmin.get_deleted_objects(objs, request)
 
-    .. versionadded:: 2.1
-
     A hook for customizing the deletion process of the :meth:`delete_view` and
     the "delete selected" :doc:`action <actions>`.
 
@@ -2130,10 +2133,6 @@ To avoid conflicts with user-supplied scripts or libraries, Django's jQuery
 in your own admin JavaScript without including a second copy, you can use the
 ``django.jQuery`` object on changelist and add/edit views.
 
-.. versionchanged:: 2.1
-
-    jQuery was upgraded from 2.2.3 to 3.3.1.
-
 The :class:`ModelAdmin` class requires jQuery by default, so there is no need
 to add jQuery to your ``ModelAdmin``’s list of media resources unless you have
 a specific need. For example, if you require the jQuery library to be in the
@@ -2236,6 +2235,7 @@ adds some of its own (the shared features are actually defined in the
 - :attr:`~ModelAdmin.filter_vertical`
 - :attr:`~ModelAdmin.ordering`
 - :attr:`~ModelAdmin.prepopulated_fields`
+- :meth:`~ModelAdmin.get_fieldsets`
 - :meth:`~ModelAdmin.get_queryset`
 - :attr:`~ModelAdmin.radio_fields`
 - :attr:`~ModelAdmin.readonly_fields`
@@ -2359,7 +2359,8 @@ The ``InlineModelAdmin`` class adds or customizes:
 .. method:: InlineModelAdmin.get_formset(request, obj=None, **kwargs)
 
     Returns a :class:`~django.forms.models.BaseInlineFormSet` class for use in
-    admin add/change views. See the example for
+    admin add/change views. ``obj`` is the parent object being edited or
+    ``None`` when adding a new parent. See the example for
     :class:`ModelAdmin.get_formsets_with_inlines`.
 
 .. method:: InlineModelAdmin.get_extra(request, obj=None, **kwargs)
@@ -2413,10 +2414,6 @@ The ``InlineModelAdmin`` class adds or customizes:
     otherwise. ``obj`` is the parent object being edited or ``None`` when
     adding a new parent.
 
-    .. versionchanged:: 2.1
-
-        The ``obj`` argument was added.
-
 .. method:: InlineModelAdmin.has_change_permission(request, obj=None)
 
     Should return ``True`` if editing an inline object is permitted, ``False``
@@ -2426,6 +2423,10 @@ The ``InlineModelAdmin`` class adds or customizes:
 
     Should return ``True`` if deleting an inline object is permitted, ``False``
     otherwise. ``obj`` is the parent object being edited.
+
+.. note::
+    The ``obj`` argument passed to ``InlineModelAdmin`` methods is the parent
+    object being edited or ``None`` when adding a new parent.
 
 Working with a model with two or more foreign keys to the same parent model
 ---------------------------------------------------------------------------
@@ -2726,13 +2727,6 @@ app or per model. The following can:
 * ``search_form.html``
 * ``submit_line.html``
 
-.. versionchanged:: 2.1
-
-    The ability to override the ``actions.html``, ``change_form_object_tools.html``,
-    ``change_list_object_tools.html``, ``change_list_results.html``,
-    ``date_hierarchy.html``, ``pagination.html``, ``prepopulated_fields_js.html``,
-    ``search_form.html``, and ``submit_line.html`` templates was added.
-
 For those templates that cannot be overridden in this way, you may still
 override them for your entire project. Just place the new version in your
 ``templates/admin`` directory. This is particularly useful to create custom 404
@@ -2898,6 +2892,8 @@ Templates can override or extend base admin templates as described in
     abstract. and ``django.contrib.admin.sites.AlreadyRegistered`` if a model
     is already registered.
 
+.. _hooking-adminsite-to-urlconf:
+
 Hooking ``AdminSite`` instances into your URLconf
 -------------------------------------------------
 
@@ -2929,8 +2925,8 @@ instantiate any other Python class) and register your models and
 ``ModelAdmin`` subclasses with it instead of with the default site. Finally,
 update :file:`myproject/urls.py` to reference your :class:`AdminSite` subclass.
 
-.. snippet::
-    :filename: myapp/admin.py
+.. code-block:: python
+    :caption: myapp/admin.py
 
     from django.contrib.admin import AdminSite
 
@@ -2943,8 +2939,8 @@ update :file:`myproject/urls.py` to reference your :class:`AdminSite` subclass.
     admin_site.register(MyModel)
 
 
-.. snippet::
-    :filename: myproject/urls.py
+.. code-block:: python
+    :caption: myproject/urls.py
 
     from django.urls import path
 
@@ -2965,31 +2961,29 @@ put ``'django.contrib.admin.apps.SimpleAdminConfig'`` instead of
 Overriding the default admin site
 ---------------------------------
 
-.. versionadded:: 2.1
-
 You can override the default ``django.contrib.admin.site`` by setting the
 :attr:`~.SimpleAdminConfig.default_site` attribute of a custom ``AppConfig``
 to the dotted import path of either a ``AdminSite`` subclass or a callable that
 returns a site instance.
 
-.. snippet::
-    :filename: myproject/admin.py
+.. code-block:: python
+    :caption: myproject/admin.py
 
     from django.contrib import admin
 
     class MyAdminSite(admin.AdminSite):
         ...
 
-.. snippet::
-    :filename: myproject/apps.py
+.. code-block:: python
+    :caption: myproject/apps.py
 
     from django.contrib.admin.apps import AdminConfig
 
     class MyAdminConfig(AdminConfig):
         default_site = 'myproject.admin.MyAdminSite'
 
-.. snippet::
-    :filename: myproject/settings.py
+.. code-block:: python
+    :caption: myproject/settings.py
 
     INSTALLED_APPS = [
         ...

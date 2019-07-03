@@ -4,15 +4,17 @@
 # Antoni Aloy <aaloy@apsl.net>, 2014-2015,2017
 # Carles Barrobés <carles@barrobes.com>, 2011-2012,2014
 # duub qnnp, 2015
+# GerardoGa <ggarciamaristany@gmail.com>, 2018
+# Gil Obradors Via <gil.obradors@gmail.com>, 2019
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Roger Pons <rogerpons@gmail.com>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-09-19 16:40+0000\n"
-"Last-Translator: Antoni Aloy <aaloy@apsl.net>\n"
+"POT-Creation-Date: 2019-01-16 20:42+0100\n"
+"PO-Revision-Date: 2019-01-28 20:40+0000\n"
+"Last-Translator: Gil Obradors Via <gil.obradors@gmail.com>\n"
 "Language-Team: Catalan (http://www.transifex.com/django/django/language/"
 "ca/)\n"
 "MIME-Version: 1.0\n"
@@ -90,6 +92,15 @@ msgstr "Afegir un/a altre/a %(verbose_name)s."
 msgid "Remove"
 msgstr "Eliminar"
 
+msgid "Addition"
+msgstr "Afegeix"
+
+msgid "Change"
+msgstr "Modificar"
+
+msgid "Deletion"
+msgstr "Supressió"
+
 msgid "action time"
 msgstr "moment de l'acció"
 
@@ -103,7 +114,7 @@ msgid "object id"
 msgstr "id de l'objecte"
 
 #. Translators: 'repr' means representation
-#. (https://docs.python.org/3/library/functions.html#repr)
+#. (https://docs.python.org/library/functions.html#repr)
 msgid "object repr"
 msgstr "'repr' de l'objecte"
 
@@ -167,11 +178,11 @@ msgid ""
 msgstr "Premi \"Control\" o \"Command\" a un Mac per seleccionar-ne més d'un."
 
 #, python-brace-format
-msgid ""
-"The {name} \"{obj}\" was added successfully. You may edit it again below."
-msgstr ""
-"El  {name} \"{obj}\" s'ha afegit amb èxit. Pots editar-lo altra vegada a "
-"sota."
+msgid "The {name} \"{obj}\" was added successfully."
+msgstr "El {name} \"{obj}\" fou afegit amb èxit."
+
+msgid "You may edit it again below."
+msgstr "Hauria d'editar de nou a sota."
 
 #, python-brace-format
 msgid ""
@@ -182,14 +193,17 @@ msgstr ""
 "sota."
 
 #, python-brace-format
-msgid "The {name} \"{obj}\" was added successfully."
-msgstr "El {name} \"{obj}\" fou afegit amb èxit."
-
-#, python-brace-format
 msgid ""
 "The {name} \"{obj}\" was changed successfully. You may edit it again below."
 msgstr ""
 "El {name} \"{obj}\" fou canviat amb èxit. Pots editar-ho un altra vegada a "
+"sota."
+
+#, python-brace-format
+msgid ""
+"The {name} \"{obj}\" was added successfully. You may edit it again below."
+msgstr ""
+"El  {name} \"{obj}\" s'ha afegit amb èxit. Pots editar-lo altra vegada a "
 "sota."
 
 #, python-brace-format
@@ -212,7 +226,7 @@ msgstr ""
 "seleccionat cap element."
 
 msgid "No action selected."
-msgstr "no heu seleccionat cap acció"
+msgstr "No heu seleccionat cap acció."
 
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
@@ -229,6 +243,10 @@ msgstr "Afegir %s"
 #, python-format
 msgid "Change %s"
 msgstr "Modificar %s"
+
+#, python-format
+msgid "View %s"
+msgstr "Visualitza %s"
 
 msgid "Database error"
 msgstr "Error de base de dades"
@@ -339,7 +357,7 @@ msgid "Change password"
 msgstr "Canviar contrasenya"
 
 msgid "Please correct the error below."
-msgstr "Si us plau, corregiu els errors mostrats a sota."
+msgstr "Si us plau, corregeix l'error de sota"
 
 msgid "Please correct the errors below."
 msgstr "Si us plau, corregiu els errors mostrats a sota."
@@ -450,8 +468,8 @@ msgstr ""
 "N'esteu segur de voler esborrar els %(objects_name)s seleccionats? "
 "S'esborraran tots els objects següents i els seus elements relacionats:"
 
-msgid "Change"
-msgstr "Modificar"
+msgid "View"
+msgstr "Visualitza"
 
 msgid "Delete?"
 msgstr "Eliminar?"
@@ -470,8 +488,8 @@ msgstr "Models en l'aplicació %(name)s"
 msgid "Add"
 msgstr "Afegir"
 
-msgid "You don't have permission to edit anything."
-msgstr "No teniu permís per editar res."
+msgid "You don't have permission to view or edit anything."
+msgstr "No teniu permisos per veure o editar"
 
 msgid "Recent actions"
 msgstr "Accions recents"
@@ -527,20 +545,8 @@ msgstr "Mostrar tots"
 msgid "Save"
 msgstr "Desar"
 
-msgid "Popup closing..."
-msgstr "Tancant el contingut emergent..."
-
-#, python-format
-msgid "Change selected %(model)s"
-msgstr "Canviea el %(model)s seleccionat"
-
-#, python-format
-msgid "Add another %(model)s"
-msgstr "Afegeix un altre %(model)s"
-
-#, python-format
-msgid "Delete selected %(model)s"
-msgstr "Esborra el %(model)s seleccionat"
+msgid "Popup closing…"
+msgstr "Tancant finestra emergent..."
 
 msgid "Search"
 msgstr "Cerca"
@@ -563,6 +569,24 @@ msgstr "Desar i afegir-ne un de nou"
 
 msgid "Save and continue editing"
 msgstr "Desar i continuar editant"
+
+msgid "Save and view"
+msgstr "Desa i visualitza"
+
+msgid "Close"
+msgstr "Tanca"
+
+#, python-format
+msgid "Change selected %(model)s"
+msgstr "Canviea el %(model)s seleccionat"
+
+#, python-format
+msgid "Add another %(model)s"
+msgstr "Afegeix un altre %(model)s"
+
+#, python-format
+msgid "Delete selected %(model)s"
+msgstr "Esborra el %(model)s seleccionat"
 
 msgid "Thanks for spending some quality time with the Web site today."
 msgstr "Gràcies per passar una estona de qualitat al web durant el dia d'avui."
@@ -675,6 +699,10 @@ msgstr "Seleccioneu %s"
 #, python-format
 msgid "Select %s to change"
 msgstr "Seleccioneu %s per modificar"
+
+#, python-format
+msgid "Select %s to view"
+msgstr "Selecciona %sper a veure"
 
 msgid "Date:"
 msgstr "Data:"

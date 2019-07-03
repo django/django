@@ -13,7 +13,6 @@
     body>div { border-bottom:1px solid #ddd; }
     h1 { font-weight:normal; }
     h2 { margin-bottom:.8em; }
-    h2 span { font-size:80%; color:#666; font-weight:normal; }
     h3 { margin:1em 0 .5em 0; }
     h4 { margin:0 0 .5em 0; font-weight: normal; }
     code, pre { font-size: 100%; white-space: pre-wrap; }
@@ -31,13 +30,13 @@
     table.source th { color:#666; }
     table.source td { font-family:monospace; white-space:pre; border-bottom:1px solid #eee; }
     ul.traceback { list-style-type:none; color: #222; }
-    ul.traceback li.frame { padding-bottom:1em; color:#666; }
+    ul.traceback li.frame { padding-bottom:1em; color:#4f4f4f; }
     ul.traceback li.user { background-color:#e0e0e0; color:#000 }
     div.context { padding:10px 0; overflow:hidden; }
     div.context ol { padding-left:30px; margin:0 10px; list-style-position: inside; }
     div.context ol li { font-family:monospace; white-space:pre; color:#777; cursor:pointer; padding-left: 2px; }
     div.context ol li pre { display:inline; }
-    div.context ol.context-line li { color:#505050; background-color:#dfdfdf; padding: 3px 2px; }
+    div.context ol.context-line li { color:#464646; background-color:#dfdfdf; padding: 3px 2px; }
     div.context ol.context-line li span { position:absolute; right:32px; }
     .user div.context ol.context-line li { background-color:#bbb; color:#000; }
     .user div.context ol li { color:#666; }
@@ -58,9 +57,9 @@
     #requestinfo h3 { margin-bottom:-1em; }
     .error { background: #ffc; }
     .specific { color:#cc3300; font-weight:bold; }
-    h2 span.commands { font-size:.7em;}
+    h2 span.commands { font-size:.7em; font-weight:normal; }
     span.commands a:link {color:#5E5694;}
-    pre.exception_value { font-family: sans-serif; color: #666; font-size: 1.5em; margin: 10px 0 10px 0; }
+    pre.exception_value { font-family: sans-serif; color: #575757; font-size: 1.5em; margin: 10px 0 10px 0; }
     .append-bottom { margin-bottom: 10px; }
   </style>
   {% if not is_email %}
@@ -237,7 +236,7 @@
                 </ol>
               {% endif %}
               <ol start="{{ frame.lineno }}" class="context-line">
-                <li onclick="toggle('pre{{ frame.id }}', 'post{{ frame.id }}')"><pre>{{ frame.context_line }}</pre>{% if not is_email %} <span>...</span>{% endif %}</li>
+                <li onclick="toggle('pre{{ frame.id }}', 'post{{ frame.id }}')"><pre>{{ frame.context_line }}</pre>{% if not is_email %} <span>…</span>{% endif %}</li>
               </ol>
               {% if frame.post_context and not is_email  %}
                 <ol start='{{ frame.lineno|add:"1" }}' class="post-context" id="post{{ frame.id }}">

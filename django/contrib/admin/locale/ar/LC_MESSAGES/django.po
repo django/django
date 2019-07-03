@@ -1,7 +1,7 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Bashar Al-Abdulhadi, 2015-2016
+# Bashar Al-Abdulhadi, 2015-2016,2018
 # Bashar Al-Abdulhadi, 2014
 # Eyad Toma <d.eyad.t@gmail.com>, 2013
 # Jannis Leidel <jannis@leidel.info>, 2011
@@ -9,9 +9,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-09-23 18:54+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2019-01-16 20:42+0100\n"
+"PO-Revision-Date: 2019-01-18 00:36+0000\n"
+"Last-Translator: Ramiro Morales\n"
 "Language-Team: Arabic (http://www.transifex.com/django/django/language/ar/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -89,6 +89,15 @@ msgstr "إضافة سجل %(verbose_name)s آخر"
 msgid "Remove"
 msgstr "أزل"
 
+msgid "Addition"
+msgstr "إضافة"
+
+msgid "Change"
+msgstr "عدّل"
+
+msgid "Deletion"
+msgstr "حذف"
+
 msgid "action time"
 msgstr "وقت الإجراء"
 
@@ -102,7 +111,7 @@ msgid "object id"
 msgstr "معرف العنصر"
 
 #. Translators: 'repr' means representation
-#. (https://docs.python.org/3/library/functions.html#repr)
+#. (https://docs.python.org/library/functions.html#repr)
 msgid "object repr"
 msgstr "ممثل العنصر"
 
@@ -168,8 +177,10 @@ msgstr ""
 "أكثر من أختيار واحد."
 
 #, python-brace-format
-msgid ""
-"The {name} \"{obj}\" was added successfully. You may edit it again below."
+msgid "The {name} \"{obj}\" was added successfully."
+msgstr ""
+
+msgid "You may edit it again below."
 msgstr ""
 
 #, python-brace-format
@@ -179,12 +190,13 @@ msgid ""
 msgstr ""
 
 #, python-brace-format
-msgid "The {name} \"{obj}\" was added successfully."
+msgid ""
+"The {name} \"{obj}\" was changed successfully. You may edit it again below."
 msgstr ""
 
 #, python-brace-format
 msgid ""
-"The {name} \"{obj}\" was changed successfully. You may edit it again below."
+"The {name} \"{obj}\" was added successfully. You may edit it again below."
 msgstr ""
 
 #, python-brace-format
@@ -220,6 +232,10 @@ msgstr "أضف %s"
 #, python-format
 msgid "Change %s"
 msgstr "عدّل %s"
+
+#, python-format
+msgid "View %s"
+msgstr ""
 
 msgid "Database error"
 msgstr "خطـأ في قاعدة البيانات"
@@ -337,7 +353,7 @@ msgid "Change password"
 msgstr "غيّر كلمة المرور"
 
 msgid "Please correct the error below."
-msgstr "الرجاء تصحيح الخطأ أدناه."
+msgstr ""
 
 msgid "Please correct the errors below."
 msgstr "الرجاء تصحيح الأخطاء أدناه."
@@ -446,8 +462,8 @@ msgstr ""
 "أأنت متأكد أنك تريد حذف عناصر %(objects_name)s المحددة؟ جميع العناصر التالية "
 "والعناصر المرتبطة بها سيتم حذفها:"
 
-msgid "Change"
-msgstr "عدّل"
+msgid "View"
+msgstr ""
 
 msgid "Delete?"
 msgstr "احذفه؟"
@@ -466,8 +482,8 @@ msgstr "النماذج في تطبيق %(name)s"
 msgid "Add"
 msgstr "أضف"
 
-msgid "You don't have permission to edit anything."
-msgstr "ليست لديك الصلاحية لتعديل أي شيء."
+msgid "You don't have permission to view or edit anything."
+msgstr ""
 
 msgid "Recent actions"
 msgstr "آخر الإجراءات"
@@ -522,20 +538,8 @@ msgstr "أظهر الكل"
 msgid "Save"
 msgstr "احفظ"
 
-msgid "Popup closing..."
-msgstr "جاري الإغلاق..."
-
-#, python-format
-msgid "Change selected %(model)s"
-msgstr "تغيير %(model)s المختارة"
-
-#, python-format
-msgid "Add another %(model)s"
-msgstr "أضف %(model)s آخر"
-
-#, python-format
-msgid "Delete selected %(model)s"
-msgstr "حذف %(model)s المختارة"
+msgid "Popup closing…"
+msgstr ""
 
 msgid "Search"
 msgstr "ابحث"
@@ -562,6 +566,24 @@ msgstr "احفظ وأضف آخر"
 
 msgid "Save and continue editing"
 msgstr "احفظ واستمر بالتعديل"
+
+msgid "Save and view"
+msgstr ""
+
+msgid "Close"
+msgstr ""
+
+#, python-format
+msgid "Change selected %(model)s"
+msgstr "تغيير %(model)s المختارة"
+
+#, python-format
+msgid "Add another %(model)s"
+msgstr "أضف %(model)s آخر"
+
+#, python-format
+msgid "Delete selected %(model)s"
+msgstr "حذف %(model)s المختارة"
 
 msgid "Thanks for spending some quality time with the Web site today."
 msgstr "شكراً لك على قضائك بعض الوقت مع الموقع اليوم."
@@ -670,6 +692,10 @@ msgstr "اختر %s"
 #, python-format
 msgid "Select %s to change"
 msgstr "اختر %s لتغييره"
+
+#, python-format
+msgid "Select %s to view"
+msgstr ""
 
 msgid "Date:"
 msgstr "التاريخ:"

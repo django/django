@@ -258,11 +258,12 @@ class Ticket19102Tests(TestCase):
     Note that .values() is not tested here on purpose. .values().delete()
     doesn't work for non fast-path deletes at all.
     """
-    def setUp(self):
-        self.o1 = OrgUnit.objects.create(name='o1')
-        self.o2 = OrgUnit.objects.create(name='o2')
-        self.l1 = Login.objects.create(description='l1', orgunit=self.o1)
-        self.l2 = Login.objects.create(description='l2', orgunit=self.o2)
+    @classmethod
+    def setUpTestData(cls):
+        cls.o1 = OrgUnit.objects.create(name='o1')
+        cls.o2 = OrgUnit.objects.create(name='o2')
+        cls.l1 = Login.objects.create(description='l1', orgunit=cls.o1)
+        cls.l2 = Login.objects.create(description='l2', orgunit=cls.o2)
 
     @skipUnlessDBFeature("update_can_self_select")
     def test_ticket_19102_annotate(self):

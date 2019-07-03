@@ -343,14 +343,21 @@ class GetImageDimensionsTests(unittest.TestCase):
                 size = images.get_image_dimensions(fh)
                 self.assertEqual(size, (None, None))
 
+    def test_webp(self):
+        img_path = os.path.join(os.path.dirname(__file__), 'test.webp')
+        with open(img_path, 'rb') as fh:
+            size = images.get_image_dimensions(fh)
+        self.assertEqual(size, (540, 405))
+
 
 class FileMoveSafeTests(unittest.TestCase):
     def test_file_move_overwrite(self):
         handle_a, self.file_a = tempfile.mkstemp()
         handle_b, self.file_b = tempfile.mkstemp()
 
-        # file_move_safe should raise an IOError exception if destination file exists and allow_overwrite is False
-        with self.assertRaises(IOError):
+        # file_move_safe() raises OSError if the destination file exists and
+        # allow_overwrite is False.
+        with self.assertRaises(FileExistsError):
             file_move_safe(self.file_a, self.file_b, allow_overwrite=False)
 
         # should allow it and continue on if allow_overwrite is True

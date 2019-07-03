@@ -586,7 +586,6 @@ class NonAggregateAnnotationTestCase(TestCase):
             [{'jacob_name': 'Jacob Kaplan-Moss', 'james_name': 'James Bennett'}],
         )
 
-    @skipUnlessDBFeature('supports_subqueries_in_group_by')
     def test_annotation_filter_with_subquery(self):
         long_books_qs = Book.objects.filter(
             publisher=OuterRef('pk'),

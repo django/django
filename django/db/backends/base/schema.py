@@ -1,15 +1,13 @@
-import hashlib
 import logging
 from datetime import datetime
 
 from django.db.backends.ddl_references import (
     Columns, ForeignKeyName, IndexName, Statement, Table,
 )
-from django.db.backends.utils import split_identifier
+from django.db.backends.utils import names_digest, split_identifier
 from django.db.models import Index
 from django.db.transaction import TransactionManagementError, atomic
 from django.utils import timezone
-from django.utils.encoding import force_bytes
 
 logger = logging.getLogger('django.db.backends.schema')
 
@@ -63,25 +61,31 @@ class BaseDatabaseSchemaEditor:
     sql_rename_column = "ALTER TABLE %(table)s RENAME COLUMN %(old_column)s TO %(new_column)s"
     sql_update_with_default = "UPDATE %(table)s SET %(column)s = %(default)s WHERE %(column)s IS NULL"
 
-    sql_check = "CONSTRAINT %(name)s CHECK (%(check)s)"
-    sql_create_check = "ALTER TABLE %(table)s ADD %(check)s"
-    sql_delete_check = "ALTER TABLE %(table)s DROP CONSTRAINT %(name)s"
+    sql_unique_constraint = "UNIQUE (%(columns)s)"
+    sql_check_constraint = "CHECK (%(check)s)"
+    sql_delete_constraint = "ALTER TABLE %(table)s DROP CONSTRAINT %(name)s"
+    sql_constraint = "CONSTRAINT %(name)s %(constraint)s"
+
+    sql_create_check = "ALTER TABLE %(table)s ADD CONSTRAINT %(name)s CHECK (%(check)s)"
+    sql_delete_check = sql_delete_constraint
 
     sql_create_unique = "ALTER TABLE %(table)s ADD CONSTRAINT %(name)s UNIQUE (%(columns)s)"
-    sql_delete_unique = "ALTER TABLE %(table)s DROP CONSTRAINT %(name)s"
+    sql_delete_unique = sql_delete_constraint
 
     sql_create_fk = (
         "ALTER TABLE %(table)s ADD CONSTRAINT %(name)s FOREIGN KEY (%(column)s) "
         "REFERENCES %(to_table)s (%(to_column)s)%(deferrable)s"
     )
     sql_create_inline_fk = None
-    sql_delete_fk = "ALTER TABLE %(table)s DROP CONSTRAINT %(name)s"
+    sql_create_column_inline_fk = None
+    sql_delete_fk = sql_delete_constraint
 
-    sql_create_index = "CREATE INDEX %(name)s ON %(table)s (%(columns)s)%(extra)s"
+    sql_create_index = "CREATE INDEX %(name)s ON %(table)s (%(columns)s)%(extra)s%(condition)s"
+    sql_create_unique_index = "CREATE UNIQUE INDEX %(name)s ON %(table)s (%(columns)s)%(condition)s"
     sql_delete_index = "DROP INDEX %(name)s"
 
     sql_create_pk = "ALTER TABLE %(table)s ADD CONSTRAINT %(name)s PRIMARY KEY (%(columns)s)"
-    sql_delete_pk = "ALTER TABLE %(table)s DROP CONSTRAINT %(name)s"
+    sql_delete_pk = sql_delete_constraint
 
     sql_delete_procedure = 'DROP PROCEDURE %(procedure)s'
 
@@ -136,16 +140,62 @@ class BaseDatabaseSchemaEditor:
     def quote_name(self, name):
         return self.connection.ops.quote_name(name)
 
-    @classmethod
-    def _digest(cls, *args):
-        """
-        Generate a 32-bit digest of a set of arguments that can be used to
-        shorten identifying names.
-        """
-        h = hashlib.md5()
-        for arg in args:
-            h.update(force_bytes(arg))
-        return h.hexdigest()[:8]
+    def table_sql(self, model):
+        """Take a model and return its table definition."""
+        # Add any unique_togethers (always deferred, as some fields might be
+        # created afterwards, like geometry fields with some backends).
+        for fields in model._meta.unique_together:
+            columns = [model._meta.get_field(field).column for field in fields]
+            self.deferred_sql.append(self._create_unique_sql(model, columns))
+        # Create column SQL, add FK deferreds if needed.
+        column_sqls = []
+        params = []
+        for field in model._meta.local_fields:
+            # SQL.
+            definition, extra_params = self.column_sql(model, field)
+            if definition is None:
+                continue
+            # Check constraints can go on the column SQL here.
+            db_params = field.db_parameters(connection=self.connection)
+            if db_params['check']:
+                definition += ' ' + self.sql_check_constraint % db_params
+            # Autoincrement SQL (for backends with inline variant).
+            col_type_suffix = field.db_type_suffix(connection=self.connection)
+            if col_type_suffix:
+                definition += ' %s' % col_type_suffix
+            params.extend(extra_params)
+            # FK.
+            if field.remote_field and field.db_constraint:
+                to_table = field.remote_field.model._meta.db_table
+                to_column = field.remote_field.model._meta.get_field(field.remote_field.field_name).column
+                if self.sql_create_inline_fk:
+                    definition += ' ' + self.sql_create_inline_fk % {
+                        'to_table': self.quote_name(to_table),
+                        'to_column': self.quote_name(to_column),
+                    }
+                elif self.connection.features.supports_foreign_keys:
+                    self.deferred_sql.append(self._create_fk_sql(model, field, '_fk_%(to_table)s_%(to_column)s'))
+            # Add the SQL to our big list.
+            column_sqls.append('%s %s' % (
+                self.quote_name(field.column),
+                definition,
+            ))
+            # Autoincrement SQL (for backends with post table definition
+            # variant).
+            if field.get_internal_type() in ('AutoField', 'BigAutoField'):
+                autoinc_sql = self.connection.ops.autoinc_sql(model._meta.db_table, field.column)
+                if autoinc_sql:
+                    self.deferred_sql.extend(autoinc_sql)
+        constraints = [constraint.constraint_sql(model, self) for constraint in model._meta.constraints]
+        sql = self.sql_create_table % {
+            'table': self.quote_name(model._meta.db_table),
+            'definition': ', '.join(constraint for constraint in (*column_sqls, *constraints) if constraint),
+        }
+        if model._meta.db_tablespace:
+            tablespace_sql = self.connection.ops.tablespace_sql(model._meta.db_tablespace)
+            if tablespace_sql:
+                sql += ' ' + tablespace_sql
+        return sql, params
 
     # Field <-> database mapping functions
 
@@ -213,8 +263,9 @@ class BaseDatabaseSchemaEditor:
             'requires_literal_defaults must provide a prepare_default() method'
         )
 
-    def effective_default(self, field):
-        """Return a field's effective database default value."""
+    @staticmethod
+    def _effective_default(field):
+        # This method allows testing its logic without a connection.
         if field.has_default():
             default = field.get_default()
         elif not field.null and field.blank and field.empty_strings_allowed:
@@ -226,18 +277,18 @@ class BaseDatabaseSchemaEditor:
             default = datetime.now()
             internal_type = field.get_internal_type()
             if internal_type == 'DateField':
-                default = default.date
+                default = default.date()
             elif internal_type == 'TimeField':
-                default = default.time
+                default = default.time()
             elif internal_type == 'DateTimeField':
-                default = timezone.now
+                default = timezone.now()
         else:
             default = None
-        # If it's a callable, call it
-        if callable(default):
-            default = default()
-        # Convert the value so it can be sent to the database.
-        return field.get_db_prep_save(default, self.connection)
+        return default
+
+    def effective_default(self, field):
+        """Return a field's effective database default value."""
+        return field.get_db_prep_save(self._effective_default(field), self.connection)
 
     def quote_value(self, value):
         """
@@ -256,64 +307,11 @@ class BaseDatabaseSchemaEditor:
         Create a table and any accompanying indexes or unique constraints for
         the given `model`.
         """
-        # Create column SQL, add FK deferreds if needed
-        column_sqls = []
-        params = []
-        for field in model._meta.local_fields:
-            # SQL
-            definition, extra_params = self.column_sql(model, field)
-            if definition is None:
-                continue
-            # Check constraints can go on the column SQL here
-            db_params = field.db_parameters(connection=self.connection)
-            if db_params['check']:
-                definition += " CHECK (%s)" % db_params['check']
-            # Autoincrement SQL (for backends with inline variant)
-            col_type_suffix = field.db_type_suffix(connection=self.connection)
-            if col_type_suffix:
-                definition += " %s" % col_type_suffix
-            params.extend(extra_params)
-            # FK
-            if field.remote_field and field.db_constraint:
-                to_table = field.remote_field.model._meta.db_table
-                to_column = field.remote_field.model._meta.get_field(field.remote_field.field_name).column
-                if self.sql_create_inline_fk:
-                    definition += " " + self.sql_create_inline_fk % {
-                        "to_table": self.quote_name(to_table),
-                        "to_column": self.quote_name(to_column),
-                    }
-                elif self.connection.features.supports_foreign_keys:
-                    self.deferred_sql.append(self._create_fk_sql(model, field, "_fk_%(to_table)s_%(to_column)s"))
-            # Add the SQL to our big list
-            column_sqls.append("%s %s" % (
-                self.quote_name(field.column),
-                definition,
-            ))
-            # Autoincrement SQL (for backends with post table definition variant)
-            if field.get_internal_type() in ("AutoField", "BigAutoField"):
-                autoinc_sql = self.connection.ops.autoinc_sql(model._meta.db_table, field.column)
-                if autoinc_sql:
-                    self.deferred_sql.extend(autoinc_sql)
-
-        # Add any unique_togethers (always deferred, as some fields might be
-        # created afterwards, like geometry fields with some backends)
-        for fields in model._meta.unique_together:
-            columns = [model._meta.get_field(field).column for field in fields]
-            self.deferred_sql.append(self._create_unique_sql(model, columns))
-        constraints = [check.constraint_sql(model, self) for check in model._meta.constraints]
-        # Make the table
-        sql = self.sql_create_table % {
-            "table": self.quote_name(model._meta.db_table),
-            "definition": ", ".join((*column_sqls, *constraints)),
-        }
-        if model._meta.db_tablespace:
-            tablespace_sql = self.connection.ops.tablespace_sql(model._meta.db_tablespace)
-            if tablespace_sql:
-                sql += ' ' + tablespace_sql
+        sql, params = self.table_sql(model)
         # Prevent using [] as params, in the case a literal '%' is used in the definition
         self.execute(sql, params or None)
 
-        # Add any field index and index_together's (deferred as SQLite3 _remake_table needs it)
+        # Add any field index and index_together's (deferred as SQLite _remake_table needs it)
         self.deferred_sql.extend(self._model_indexes_sql(model))
 
         # Make M2M tables
@@ -339,7 +337,7 @@ class BaseDatabaseSchemaEditor:
 
     def add_index(self, model, index):
         """Add an index on a model."""
-        self.execute(index.create_sql(model, self))
+        self.execute(index.create_sql(model, self), params=None)
 
     def remove_index(self, model, index):
         """Remove an index from a model."""
@@ -347,11 +345,15 @@ class BaseDatabaseSchemaEditor:
 
     def add_constraint(self, model, constraint):
         """Add a check constraint to a model."""
-        self.execute(constraint.create_sql(model, self))
+        sql = constraint.create_sql(model, self)
+        if sql:
+            self.execute(sql)
 
     def remove_constraint(self, model, constraint):
         """Remove a check constraint from a model."""
-        self.execute(constraint.remove_sql(model, self))
+        sql = constraint.remove_sql(model, self)
+        if sql:
+            self.execute(sql)
 
     def alter_unique_together(self, model, old_unique_together, new_unique_together):
         """
@@ -386,8 +388,13 @@ class BaseDatabaseSchemaEditor:
             self.execute(self._create_index_sql(model, fields, suffix="_idx"))
 
     def _delete_composed_index(self, model, fields, constraint_kwargs, sql):
+        meta_constraint_names = {constraint.name for constraint in model._meta.constraints}
+        meta_index_names = {constraint.name for constraint in model._meta.indexes}
         columns = [model._meta.get_field(field).column for field in fields]
-        constraint_names = self._constraint_names(model, columns, **constraint_kwargs)
+        constraint_names = self._constraint_names(
+            model, columns, exclude=meta_constraint_names | meta_index_names,
+            **constraint_kwargs
+        )
         if len(constraint_names) != 1:
             raise ValueError("Found wrong number (%s) of constraints for %s(%s)" % (
                 len(constraint_names),
@@ -435,7 +442,23 @@ class BaseDatabaseSchemaEditor:
         # Check constraints can go on the column SQL here
         db_params = field.db_parameters(connection=self.connection)
         if db_params['check']:
-            definition += " CHECK (%s)" % db_params['check']
+            definition += " " + self.sql_check_constraint % db_params
+        if field.remote_field and self.connection.features.supports_foreign_keys and field.db_constraint:
+            constraint_suffix = '_fk_%(to_table)s_%(to_column)s'
+            # Add FK constraint inline, if supported.
+            if self.sql_create_column_inline_fk:
+                to_table = field.remote_field.model._meta.db_table
+                to_column = field.remote_field.model._meta.get_field(field.remote_field.field_name).column
+                definition += " " + self.sql_create_column_inline_fk % {
+                    'name': self._fk_constraint_name(model, field, constraint_suffix),
+                    'column': self.quote_name(field.column),
+                    'to_table': self.quote_name(to_table),
+                    'to_column': self.quote_name(to_column),
+                    'deferrable': self.connection.ops.deferrable_sql()
+                }
+            # Otherwise, add FK constraints later.
+            else:
+                self.deferred_sql.append(self._create_fk_sql(model, field, constraint_suffix))
         # Build the SQL and run it
         sql = self.sql_create_column % {
             "table": self.quote_name(model._meta.db_table),
@@ -454,9 +477,6 @@ class BaseDatabaseSchemaEditor:
             self.execute(sql, params)
         # Add an index, if required
         self.deferred_sql.extend(self._field_indexes_sql(model, field))
-        # Add any FK constraints later
-        if field.remote_field and self.connection.features.supports_foreign_keys and field.db_constraint:
-            self.deferred_sql.append(self._create_fk_sql(model, field, "_fk_%(to_table)s_%(to_column)s"))
         # Reset connection if required
         if self.connection.features.connection_persists_old_columns:
             self.connection.close()
@@ -476,7 +496,7 @@ class BaseDatabaseSchemaEditor:
         if field.remote_field:
             fk_names = self._constraint_names(model, [field.column], foreign_key=True)
             for fk_name in fk_names:
-                self.execute(self._delete_constraint_sql(self.sql_delete_fk, model, fk_name))
+                self.execute(self._delete_fk_sql(model, fk_name))
         # Delete the column
         sql = self.sql_delete_column % {
             "table": self.quote_name(model._meta.db_table),
@@ -547,11 +567,15 @@ class BaseDatabaseSchemaEditor:
                 ))
             for fk_name in fk_names:
                 fks_dropped.add((old_field.column,))
-                self.execute(self._delete_constraint_sql(self.sql_delete_fk, model, fk_name))
+                self.execute(self._delete_fk_sql(model, fk_name))
         # Has unique been removed?
         if old_field.unique and (not new_field.unique or self._field_became_primary_key(old_field, new_field)):
             # Find the unique constraint for this field
-            constraint_names = self._constraint_names(model, [old_field.column], unique=True, primary_key=False)
+            meta_constraint_names = {constraint.name for constraint in model._meta.constraints}
+            constraint_names = self._constraint_names(
+                model, [old_field.column], unique=True, primary_key=False,
+                exclude=meta_constraint_names,
+            )
             if strict and len(constraint_names) != 1:
                 raise ValueError("Found wrong number (%s) of unique constraints for %s.%s" % (
                     len(constraint_names),
@@ -559,7 +583,7 @@ class BaseDatabaseSchemaEditor:
                     old_field.column,
                 ))
             for constraint_name in constraint_names:
-                self.execute(self._delete_constraint_sql(self.sql_delete_unique, model, constraint_name))
+                self.execute(self._delete_unique_sql(model, constraint_name))
         # Drop incoming FK constraints if the field is a primary key or unique,
         # which might be a to_field target, and things are going to change.
         drop_foreign_keys = (
@@ -576,7 +600,7 @@ class BaseDatabaseSchemaEditor:
                     new_rel.related_model, [new_rel.field.column], foreign_key=True
                 )
                 for fk_name in rel_fk_names:
-                    self.execute(self._delete_constraint_sql(self.sql_delete_fk, new_rel.related_model, fk_name))
+                    self.execute(self._delete_fk_sql(new_rel.related_model, fk_name))
         # Removed an index? (no strict check, as multiple indexes are possible)
         # Remove indexes if db_index switched to False or a unique constraint
         # will now be used in lieu of an index. The following lines from the
@@ -592,16 +616,22 @@ class BaseDatabaseSchemaEditor:
             meta_index_names = {index.name for index in model._meta.indexes}
             # Retrieve only BTREE indexes since this is what's created with
             # db_index=True.
-            index_names = self._constraint_names(model, [old_field.column], index=True, type_=Index.suffix)
+            index_names = self._constraint_names(
+                model, [old_field.column], index=True, type_=Index.suffix,
+                exclude=meta_index_names,
+            )
             for index_name in index_names:
-                if index_name not in meta_index_names:
-                    # The only way to check if an index was created with
-                    # db_index=True or with Index(['field'], name='foo')
-                    # is to look at its name (refs #28053).
-                    self.execute(self._delete_constraint_sql(self.sql_delete_index, model, index_name))
+                # The only way to check if an index was created with
+                # db_index=True or with Index(['field'], name='foo')
+                # is to look at its name (refs #28053).
+                self.execute(self._delete_index_sql(model, index_name))
         # Change check constraints?
         if old_db_params['check'] != new_db_params['check'] and old_db_params['check']:
-            constraint_names = self._constraint_names(model, [old_field.column], check=True)
+            meta_constraint_names = {constraint.name for constraint in model._meta.constraints}
+            constraint_names = self._constraint_names(
+                model, [old_field.column], check=True,
+                exclude=meta_constraint_names,
+            )
             if strict and len(constraint_names) != 1:
                 raise ValueError("Found wrong number (%s) of check constraints for %s.%s" % (
                     len(constraint_names),
@@ -609,7 +639,7 @@ class BaseDatabaseSchemaEditor:
                     old_field.column,
                 ))
             for constraint_name in constraint_names:
-                self.execute(self._delete_constraint_sql(self.sql_delete_check, model, constraint_name))
+                self.execute(self._delete_check_sql(model, constraint_name))
         # Have they renamed the column?
         if old_field.column != new_field.column:
             self.execute(self._rename_field_sql(model._meta.db_table, old_field, new_field, new_type))
@@ -720,15 +750,7 @@ class BaseDatabaseSchemaEditor:
         # Changed to become primary key?
         if self._field_became_primary_key(old_field, new_field):
             # Make the new one
-            self.execute(
-                self.sql_create_pk % {
-                    "table": self.quote_name(model._meta.db_table),
-                    "name": self.quote_name(
-                        self._create_index_name(model._meta.db_table, [new_field.column], suffix="_pk")
-                    ),
-                    "columns": self.quote_name(new_field.column),
-                }
-            )
+            self.execute(self._create_primary_key_sql(model, new_field))
             # Update all referencing columns
             rels_to_update.extend(_related_non_m2m_objects(old_field, new_field))
         # Handle our type alters on the other end of rels from the PK stuff above
@@ -759,17 +781,8 @@ class BaseDatabaseSchemaEditor:
                     self.execute(self._create_fk_sql(rel.related_model, rel.field, "_fk"))
         # Does it have check constraints we need to add?
         if old_db_params['check'] != new_db_params['check'] and new_db_params['check']:
-            self.execute(
-                self.sql_create_check % {
-                    "table": self.quote_name(model._meta.db_table),
-                    "check": self.sql_check % {
-                        'name': self.quote_name(
-                            self._create_index_name(model._meta.db_table, [new_field.column], suffix='_check'),
-                        ),
-                        'check': new_db_params['check'],
-                    },
-                }
-            )
+            constraint_name = self._create_index_name(model._meta.db_table, [new_field.column], suffix='_check')
+            self.execute(self._create_check_sql(model, constraint_name, new_db_params['check']))
         # Drop the default if we need to
         # (Django usually does not use in-database defaults)
         if needs_database_default:
@@ -886,7 +899,7 @@ class BaseDatabaseSchemaEditor:
         and a unique digest and suffix.
         """
         _, table_name = split_identifier(table_name)
-        hash_suffix_part = '%s%s' % (self._digest(table_name, *column_names), suffix)
+        hash_suffix_part = '%s%s' % (names_digest(table_name, *column_names, length=8), suffix)
         max_length = self.connection.ops.max_name_length() or 200
         # If everything fits into max_length, use that name.
         index_name = '%s_%s_%s' % (table_name, '_'.join(column_names), hash_suffix_part)
@@ -918,7 +931,8 @@ class BaseDatabaseSchemaEditor:
         return ''
 
     def _create_index_sql(self, model, fields, *, name=None, suffix='', using='',
-                          db_tablespace=None, col_suffixes=(), sql=None, opclasses=()):
+                          db_tablespace=None, col_suffixes=(), sql=None, opclasses=(),
+                          condition=None):
         """
         Return the SQL statement to create the index for one or several fields.
         `sql` can be specified if the syntax differs from the standard (GIS
@@ -942,6 +956,14 @@ class BaseDatabaseSchemaEditor:
             using=using,
             columns=self._index_columns(table, columns, col_suffixes, opclasses),
             extra=tablespace_sql,
+            condition=(' WHERE ' + condition) if condition else '',
+        )
+
+    def _delete_index_sql(self, model, name):
+        return Statement(
+            self.sql_delete_index,
+            table=Table(model._meta.db_table, self.quote_name),
+            name=self.quote_name(name),
         )
 
     def _index_columns(self, table, columns, col_suffixes, opclasses):
@@ -995,46 +1017,119 @@ class BaseDatabaseSchemaEditor:
         }
 
     def _create_fk_sql(self, model, field, suffix):
-        from_table = model._meta.db_table
-        from_column = field.column
-        _, to_table = split_identifier(field.target_field.model._meta.db_table)
-        to_column = field.target_field.column
+        table = Table(model._meta.db_table, self.quote_name)
+        name = self._fk_constraint_name(model, field, suffix)
+        column = Columns(model._meta.db_table, [field.column], self.quote_name)
+        to_table = Table(field.target_field.model._meta.db_table, self.quote_name)
+        to_column = Columns(field.target_field.model._meta.db_table, [field.target_field.column], self.quote_name)
+        deferrable = self.connection.ops.deferrable_sql()
+        return Statement(
+            self.sql_create_fk,
+            table=table,
+            name=name,
+            column=column,
+            to_table=to_table,
+            to_column=to_column,
+            deferrable=deferrable,
+        )
 
+    def _fk_constraint_name(self, model, field, suffix):
         def create_fk_name(*args, **kwargs):
             return self.quote_name(self._create_index_name(*args, **kwargs))
 
-        return Statement(
-            self.sql_create_fk,
-            table=Table(from_table, self.quote_name),
-            name=ForeignKeyName(from_table, [from_column], to_table, [to_column], suffix, create_fk_name),
-            column=Columns(from_table, [from_column], self.quote_name),
-            to_table=Table(field.target_field.model._meta.db_table, self.quote_name),
-            to_column=Columns(field.target_field.model._meta.db_table, [to_column], self.quote_name),
-            deferrable=self.connection.ops.deferrable_sql(),
+        return ForeignKeyName(
+            model._meta.db_table,
+            [field.column],
+            split_identifier(field.target_field.model._meta.db_table)[1],
+            [field.target_field.column],
+            suffix,
+            create_fk_name,
         )
 
-    def _create_unique_sql(self, model, columns):
-        table = model._meta.db_table
+    def _delete_fk_sql(self, model, name):
+        return self._delete_constraint_sql(self.sql_delete_fk, model, name)
+
+    def _unique_sql(self, model, fields, name, condition=None):
+        if condition:
+            # Databases support conditional unique constraints via a unique
+            # index.
+            sql = self._create_unique_sql(model, fields, name=name, condition=condition)
+            if sql:
+                self.deferred_sql.append(sql)
+            return None
+        constraint = self.sql_unique_constraint % {
+            'columns': ', '.join(map(self.quote_name, fields)),
+        }
+        return self.sql_constraint % {
+            'name': self.quote_name(name),
+            'constraint': constraint,
+        }
+
+    def _create_unique_sql(self, model, columns, name=None, condition=None):
+        def create_unique_name(*args, **kwargs):
+            return self.quote_name(self._create_index_name(*args, **kwargs))
+
+        table = Table(model._meta.db_table, self.quote_name)
+        if name is None:
+            name = IndexName(model._meta.db_table, columns, '_uniq', create_unique_name)
+        else:
+            name = self.quote_name(name)
+        columns = Columns(table, columns, self.quote_name)
+        if condition:
+            return Statement(
+                self.sql_create_unique_index,
+                table=table,
+                name=name,
+                columns=columns,
+                condition=' WHERE ' + condition,
+            ) if self.connection.features.supports_partial_indexes else None
+        else:
+            return Statement(
+                self.sql_create_unique,
+                table=table,
+                name=name,
+                columns=columns,
+            )
+
+    def _delete_unique_sql(self, model, name, condition=None):
+        if condition:
+            return (
+                self._delete_constraint_sql(self.sql_delete_index, model, name)
+                if self.connection.features.supports_partial_indexes else None
+            )
+        return self._delete_constraint_sql(self.sql_delete_unique, model, name)
+
+    def _check_sql(self, name, check):
+        return self.sql_constraint % {
+            'name': self.quote_name(name),
+            'constraint': self.sql_check_constraint % {'check': check},
+        }
+
+    def _create_check_sql(self, model, name, check):
         return Statement(
-            self.sql_create_unique,
-            table=Table(table, self.quote_name),
-            name=IndexName(table, columns, '_uniq', self._create_index_name),
-            columns=Columns(table, columns, self.quote_name),
+            self.sql_create_check,
+            table=Table(model._meta.db_table, self.quote_name),
+            name=self.quote_name(name),
+            check=check,
         )
+
+    def _delete_check_sql(self, model, name):
+        return self._delete_constraint_sql(self.sql_delete_check, model, name)
 
     def _delete_constraint_sql(self, template, model, name):
-        return template % {
-            "table": self.quote_name(model._meta.db_table),
-            "name": self.quote_name(name),
-        }
+        return Statement(
+            template,
+            table=Table(model._meta.db_table, self.quote_name),
+            name=self.quote_name(name),
+        )
 
     def _constraint_names(self, model, column_names=None, unique=None,
                           primary_key=None, index=None, foreign_key=None,
-                          check=None, type_=None):
+                          check=None, type_=None, exclude=None):
         """Return all constraint names matching the columns and conditions."""
         if column_names is not None:
             column_names = [
-                self.connection.introspection.column_name_converter(name)
+                self.connection.introspection.identifier_converter(name)
                 for name in column_names
             ]
         with self.connection.cursor() as cursor:
@@ -1054,7 +1149,8 @@ class BaseDatabaseSchemaEditor:
                     continue
                 if type_ is not None and infodict['type'] != type_:
                     continue
-                result.append(name)
+                if not exclude or name not in exclude:
+                    result.append(name)
         return result
 
     def _delete_primary_key(self, model, strict=False):
@@ -1065,7 +1161,20 @@ class BaseDatabaseSchemaEditor:
                 model._meta.db_table,
             ))
         for constraint_name in constraint_names:
-            self.execute(self._delete_constraint_sql(self.sql_delete_pk, model, constraint_name))
+            self.execute(self._delete_primary_key_sql(model, constraint_name))
+
+    def _create_primary_key_sql(self, model, field):
+        return Statement(
+            self.sql_create_pk,
+            table=Table(model._meta.db_table, self.quote_name),
+            name=self.quote_name(
+                self._create_index_name(model._meta.db_table, [field.column], suffix="_pk")
+            ),
+            columns=Columns(model._meta.db_table, [field.column], self.quote_name),
+        )
+
+    def _delete_primary_key_sql(self, model, name):
+        return self._delete_constraint_sql(self.sql_delete_pk, model, name)
 
     def remove_procedure(self, procedure_name, param_types=()):
         sql = self.sql_delete_procedure % {

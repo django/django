@@ -6,15 +6,19 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-11-15 16:15+0100\n"
-"PO-Revision-Date: 2017-11-16 01:13+0000\n"
+"POT-Creation-Date: 2018-05-17 11:49+0200\n"
+"PO-Revision-Date: 2018-05-18 00:21+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Breton (http://www.transifex.com/django/django/language/br/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: br\n"
-"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+"Plural-Forms: nplurals=5; plural=((n%10 == 1) && (n%100 != 11) && (n%100 !"
+"=71) && (n%100 !=91) ? 0 :(n%10 == 2) && (n%100 != 12) && (n%100 !=72) && (n"
+"%100 !=92) ? 1 :(n%10 ==3 || n%10==4 || n%10==9) && (n%100 < 10 || n% 100 > "
+"19) && (n%100 < 70 || n%100 > 79) && (n%100 < 90 || n%100 > 99) ? 2 :(n != 0 "
+"&& n % 1000000 == 0) ? 3 : 4);\n"
 
 msgid "Afrikaans"
 msgstr "Afrikaneg"
@@ -156,6 +160,9 @@ msgstr "Japaneg"
 
 msgid "Georgian"
 msgstr "Jorjianeg"
+
+msgid "Kabyle"
+msgstr ""
 
 msgid "Kazakh"
 msgstr "kazak"
@@ -360,6 +367,9 @@ msgid_plural ""
 "%(show_value)d)."
 msgstr[0] ""
 msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+msgstr[4] ""
 
 #, python-format
 msgid ""
@@ -370,18 +380,30 @@ msgid_plural ""
 "%(show_value)d)."
 msgstr[0] ""
 msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+msgstr[4] ""
+
+msgid "Enter a number."
+msgstr "Merkit un niver."
 
 #, python-format
 msgid "Ensure that there are no more than %(max)s digit in total."
 msgid_plural "Ensure that there are no more than %(max)s digits in total."
 msgstr[0] ""
 msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+msgstr[4] ""
 
 #, python-format
 msgid "Ensure that there are no more than %(max)s decimal place."
 msgid_plural "Ensure that there are no more than %(max)s decimal places."
 msgstr[0] ""
 msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+msgstr[4] ""
 
 #, python-format
 msgid ""
@@ -390,6 +412,9 @@ msgid_plural ""
 "Ensure that there are no more than %(max)s digits before the decimal point."
 msgstr[0] ""
 msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+msgstr[4] ""
 
 #, python-format
 msgid ""
@@ -444,6 +469,10 @@ msgstr "Anterin bras (8 okted)"
 
 #, python-format
 msgid "'%(value)s' value must be either True or False."
+msgstr ""
+
+#, python-format
+msgid "'%(value)s' value must be either True, False, or None."
 msgstr ""
 
 msgid "Boolean (Either True or False)"
@@ -608,9 +637,6 @@ msgstr "Rekis eo leuniañ ar vaezienn."
 msgid "Enter a whole number."
 msgstr "Merkit un niver anterin."
 
-msgid "Enter a number."
-msgstr "Merkit un niver."
-
 msgid "Enter a valid date."
 msgstr "Merkit un deiziad reizh"
 
@@ -621,6 +647,10 @@ msgid "Enter a valid date/time."
 msgstr "Merkit un eur/deiziad reizh"
 
 msgid "Enter a valid duration."
+msgstr ""
+
+#, python-brace-format
+msgid "The number of days must be between {min_days} and {max_days}."
 msgstr ""
 
 msgid "No file was submitted. Check the encoding type on the form."
@@ -638,6 +668,9 @@ msgid_plural ""
 "Ensure this filename has at most %(max)d characters (it has %(length)d)."
 msgstr[0] ""
 msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+msgstr[4] ""
 
 msgid "Please either submit a file or check the clear checkbox, not both."
 msgstr "Kasit ur restr pe askit al log riñsañ; an eil pe egile"
@@ -678,12 +711,18 @@ msgid "Please submit %d or fewer forms."
 msgid_plural "Please submit %d or fewer forms."
 msgstr[0] ""
 msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+msgstr[4] ""
 
 #, python-format
 msgid "Please submit %d or more forms."
 msgid_plural "Please submit %d or more forms."
 msgstr[0] ""
 msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+msgstr[4] ""
 
 msgid "Order"
 msgstr "Urzh"
@@ -756,6 +795,9 @@ msgid "%(size)d byte"
 msgid_plural "%(size)d bytes"
 msgstr[0] "%(size)d okted"
 msgstr[1] "%(size)d okted"
+msgstr[2] "%(size)d okted"
+msgstr[3] "%(size)d okted"
+msgstr[4] "%(size)d okted"
 
 #, python-format
 msgid "%s KB"
@@ -1025,36 +1067,54 @@ msgid "%d year"
 msgid_plural "%d years"
 msgstr[0] "%d bloaz"
 msgstr[1] "%d bloaz"
+msgstr[2] "%d bloaz"
+msgstr[3] "%d bloaz"
+msgstr[4] "%d bloaz"
 
 #, python-format
 msgid "%d month"
 msgid_plural "%d months"
 msgstr[0] "%d miz"
 msgstr[1] "%d miz"
+msgstr[2] "%d miz"
+msgstr[3] "%d miz"
+msgstr[4] "%d miz"
 
 #, python-format
 msgid "%d week"
 msgid_plural "%d weeks"
 msgstr[0] "%d sizhun"
 msgstr[1] "%d sizhun"
+msgstr[2] "%d sizhun"
+msgstr[3] "%d sizhun"
+msgstr[4] "%d sizhun"
 
 #, python-format
 msgid "%d day"
 msgid_plural "%d days"
 msgstr[0] "%d deiz"
 msgstr[1] "%d deiz"
+msgstr[2] "%d deiz"
+msgstr[3] "%d deiz"
+msgstr[4] "%d deiz"
 
 #, python-format
 msgid "%d hour"
 msgid_plural "%d hours"
 msgstr[0] "%d eur"
 msgstr[1] "%d eur"
+msgstr[2] "%d eur"
+msgstr[3] "%d eur"
+msgstr[4] "%d eur"
 
 #, python-format
 msgid "%d minute"
 msgid_plural "%d minutes"
 msgstr[0] "%d munud"
 msgstr[1] "%d munud"
+msgstr[2] "%d munud"
+msgstr[3] "%d munud"
+msgstr[4] "%d munud"
 
 msgid "0 minutes"
 msgstr "0 munud"

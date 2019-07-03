@@ -55,7 +55,7 @@ version. To run it:
 
 .. console::
 
-    $ pip install closure
+    $ python -m pip install closure
     $ python django/contrib/admin/bin/compress.py
 
 Behind the scenes, ``compress.py`` is a front-end for Google's
@@ -145,8 +145,8 @@ Then run the tests with:
     $ npm test
 
 .. _Closure Compiler: https://developers.google.com/closure/compiler/
-.. _EditorConfig: http://editorconfig.org/
+.. _EditorConfig: https://editorconfig.org/
 .. _Java: https://www.java.com
-.. _jshint: http://jshint.com/
+.. _jshint: https://jshint.com/
 .. _node.js: https://nodejs.org/
 .. _qunit: https://qunitjs.com/

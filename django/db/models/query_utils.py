@@ -55,10 +55,8 @@ class Q(tree.Node):
     default = AND
     conditional = True
 
-    def __init__(self, *args, **kwargs):
-        connector = kwargs.pop('_connector', None)
-        negated = kwargs.pop('_negated', False)
-        super().__init__(children=list(args) + sorted(kwargs.items()), connector=connector, negated=negated)
+    def __init__(self, *args, _connector=None, _negated=False, **kwargs):
+        super().__init__(children=[*args, *sorted(kwargs.items())], connector=_connector, negated=_negated)
 
     def _combine(self, other, conn):
         if not isinstance(other, Q):
@@ -285,7 +283,7 @@ def check_rel_lookup_compatibility(model, target_opts, field):
     # If the field is a primary key, then doing a query against the field's
     # model is ok, too. Consider the case:
     # class Restaurant(models.Model):
-    #     place = OnetoOneField(Place, primary_key=True):
+    #     place = OneToOneField(Place, primary_key=True):
     # Restaurant.objects.filter(pk__in=Restaurant.objects.all()).
     # If we didn't have the primary key check, then pk__in (== place__in) would
     # give Place's opts as the target opts, but Restaurant isn't compatible

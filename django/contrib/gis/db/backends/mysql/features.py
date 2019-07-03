@@ -12,10 +12,14 @@ class DatabaseFeatures(BaseSpatialFeatures, MySQLDatabaseFeatures):
     supports_length_geodetic = False
     supports_area_geodetic = False
     supports_transform = False
-    supports_real_shape_operations = False
     supports_null_geometries = False
     supports_num_points_poly = False
 
     @cached_property
     def supports_empty_geometry_collection(self):
         return self.connection.mysql_version >= (5, 7, 5)
+
+    @cached_property
+    def supports_geometry_field_unique_index(self):
+        # Not supported in MySQL since https://dev.mysql.com/worklog/task/?id=11808
+        return self.connection.mysql_is_mariadb

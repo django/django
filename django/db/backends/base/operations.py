@@ -2,12 +2,13 @@ import datetime
 import decimal
 from importlib import import_module
 
+import sqlparse
+
 from django.conf import settings
-from django.core.exceptions import ImproperlyConfigured
 from django.db import NotSupportedError, transaction
 from django.db.backends import utils
 from django.utils import timezone
-from django.utils.encoding import force_text
+from django.utils.encoding import force_str
 
 
 class BaseDatabaseOperations:
@@ -217,10 +218,10 @@ class BaseDatabaseOperations:
     def limit_offset_sql(self, low_mark, high_mark):
         """Return LIMIT/OFFSET SQL clause."""
         limit, offset = self._get_limit_offset_params(low_mark, high_mark)
-        return '%s%s' % (
-            (' LIMIT %d' % limit) if limit else '',
-            (' OFFSET %d' % offset) if offset else '',
-        )
+        return ' '.join(sql for sql in (
+            ('LIMIT %d' % limit) if limit else None,
+            ('OFFSET %d' % offset) if offset else None,
+        ) if sql)
 
     def last_executed_query(self, cursor, sql, params):
         """
@@ -234,7 +235,7 @@ class BaseDatabaseOperations:
         """
         # Convert params to contain string values.
         def to_string(s):
-            return force_text(s, strings_only=True, errors='replace')
+            return force_str(s, strings_only=True, errors='replace')
         if isinstance(params, (list, tuple)):
             u_params = tuple(to_string(val) for val in params)
         elif params is None:
@@ -298,16 +299,10 @@ class BaseDatabaseOperations:
         cursor.execute() call and PEP 249 doesn't talk about this use case,
         the default implementation is conservative.
         """
-        try:
-            import sqlparse
-        except ImportError:
-            raise ImproperlyConfigured(
-                "The sqlparse package is required if you don't split your SQL "
-                "statements manually."
-            )
-        else:
-            return [sqlparse.format(statement, strip_comments=True)
-                    for statement in sqlparse.split(sql) if statement]
+        return [
+            sqlparse.format(statement, strip_comments=True)
+            for statement in sqlparse.split(sql) if statement
+        ]
 
     def process_clob(self, value):
         """
@@ -399,7 +394,7 @@ class BaseDatabaseOperations:
         to tables with foreign keys pointing the tables being truncated.
         PostgreSQL requires a cascade even if these tables are empty.
         """
-        raise NotImplementedError('subclasses of BaseDatabaseOperations must provide an sql_flush() method')
+        raise NotImplementedError('subclasses of BaseDatabaseOperations must provide a sql_flush() method')
 
     def execute_sql_flush(self, using, sql_list):
         """Execute a list of SQL statements to flush the database."""

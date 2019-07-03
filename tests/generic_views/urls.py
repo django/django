@@ -2,7 +2,7 @@ from django.contrib.auth import views as auth_views
 from django.contrib.auth.decorators import login_required
 from django.urls import path, re_path
 from django.views.decorators.cache import cache_page
-from django.views.generic import TemplateView
+from django.views.generic import TemplateView, dates
 
 from . import views
 from .models import Book
@@ -115,6 +115,7 @@ urlpatterns = [
     path('dates/booksignings/', views.BookSigningArchive.as_view()),
     path('dates/books/sortedbyname/', views.BookArchive.as_view(ordering='name')),
     path('dates/books/sortedbynamedec/', views.BookArchive.as_view(ordering='-name')),
+    path('dates/books/without_date_field/', views.BookArchiveWithoutDateField.as_view()),
 
 
     # ListView
@@ -168,6 +169,7 @@ urlpatterns = [
     # MonthArchiveView
     path('dates/books/<int:year>/<int:month>/', views.BookMonthArchive.as_view(month_format='%m')),
     path('dates/books/<int:year>/<month>/', views.BookMonthArchive.as_view()),
+    path('dates/books/without_month/<int:year>/', views.BookMonthArchive.as_view()),
     path('dates/books/<int:year>/<month>/allow_empty/', views.BookMonthArchive.as_view(allow_empty=True)),
     path('dates/books/<int:year>/<month>/allow_future/', views.BookMonthArchive.as_view(allow_future=True)),
     path('dates/books/<int:year>/<month>/paginated/', views.BookMonthArchive.as_view(paginate_by=30)),
@@ -181,6 +183,10 @@ urlpatterns = [
     path('dates/books/<int:year>/week/<int:week>/paginated/', views.BookWeekArchive.as_view(paginate_by=30)),
     path('dates/books/<int:year>/week/no_week/', views.BookWeekArchive.as_view()),
     path('dates/books/<int:year>/week/<int:week>/monday/', views.BookWeekArchive.as_view(week_format='%W')),
+    path(
+        'dates/books/<int:year>/week/<int:week>/unknown_week_format/',
+        views.BookWeekArchive.as_view(week_format='%T'),
+    ),
     path('dates/booksignings/<int:year>/week/<int:week>/', views.BookSigningWeekArchive.as_view()),
 
     # DayArchiveView
@@ -220,5 +226,7 @@ urlpatterns = [
     path('dates/booksignings/<int:year>/<month>/<int:day>/<int:pk>/', views.BookSigningDetail.as_view()),
 
     # Useful for testing redirects
-    path('accounts/login/', auth_views.LoginView.as_view())
+    path('accounts/login/', auth_views.LoginView.as_view()),
+
+    path('BaseDateListViewTest/', dates.BaseDateListView.as_view()),
 ]

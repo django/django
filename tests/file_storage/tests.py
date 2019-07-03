@@ -410,14 +410,15 @@ class FileStorageTests(SimpleTestCase):
 
         # Monkey-patch os.makedirs, to simulate a normal call, a raced call,
         # and an error.
-        def fake_makedirs(path):
+        def fake_makedirs(path, mode=0o777, exist_ok=False):
             if path == os.path.join(self.temp_dir, 'normal'):
-                real_makedirs(path)
+                real_makedirs(path, mode, exist_ok)
             elif path == os.path.join(self.temp_dir, 'raced'):
-                real_makedirs(path)
-                raise FileNotFoundError()
+                real_makedirs(path, mode, exist_ok)
+                if not exist_ok:
+                    raise FileExistsError()
             elif path == os.path.join(self.temp_dir, 'error'):
-                raise FileExistsError()
+                raise PermissionError()
             else:
                 self.fail('unexpected argument %r' % path)
 
@@ -432,8 +433,8 @@ class FileStorageTests(SimpleTestCase):
             with self.storage.open('raced/test.file') as f:
                 self.assertEqual(f.read(), b'saved with race')
 
-            # Exceptions aside from FileNotFoundError are raised.
-            with self.assertRaises(FileExistsError):
+            # Exceptions aside from FileExistsError are raised.
+            with self.assertRaises(PermissionError):
                 self.storage.save('error/test.file', ContentFile('not saved'))
         finally:
             os.makedirs = real_makedirs
@@ -482,9 +483,9 @@ class FileStorageTests(SimpleTestCase):
         f1 = ContentFile('chunks fails')
 
         def failing_chunks():
-            raise IOError
+            raise OSError
         f1.chunks = failing_chunks
-        with self.assertRaises(IOError):
+        with self.assertRaises(OSError):
             self.storage.save('error.file', f1)
 
     def test_delete_no_name(self):
@@ -544,8 +545,7 @@ class CustomStorage(FileSystemStorage):
         """
         Append numbers to duplicate files rather than underscores, like Trac.
         """
-        parts = name.split('.')
-        basename, ext = parts[0], parts[1:]
+        basename, *ext = name.split('.')
         number = 2
         while self.exists(name):
             name = '.'.join([basename, str(number)] + ext)
@@ -822,7 +822,7 @@ class FileFieldStorageTests(TestCase):
         # Create sample file
         temp_storage.save('tests/example.txt', ContentFile('some content'))
 
-        # Load it as python file object
+        # Load it as Python file object
         with open(temp_storage.path('tests/example.txt')) as file_obj:
             # Save it using storage and read its content
             temp_storage.save('tests/file_obj', file_obj)

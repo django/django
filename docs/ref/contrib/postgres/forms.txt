@@ -193,6 +193,17 @@ not greater than the upper bound. All of these fields use
     :class:`~django.contrib.postgres.fields.IntegerRangeField` and
     :class:`~django.contrib.postgres.fields.BigIntegerRangeField`.
 
+``DecimalRangeField``
+~~~~~~~~~~~~~~~~~~~~~
+
+.. class:: DecimalRangeField
+
+    .. versionadded:: 2.2
+
+    Based on :class:`~django.forms.DecimalField` and translates its input into
+    :class:`~psycopg2:psycopg2.extras.NumericRange`. Default for
+    :class:`~django.contrib.postgres.fields.DecimalRangeField`.
+
 ``FloatRangeField``
 ~~~~~~~~~~~~~~~~~~~
 
@@ -201,6 +212,10 @@ not greater than the upper bound. All of these fields use
     Based on :class:`~django.forms.FloatField` and translates its input into
     :class:`~psycopg2:psycopg2.extras.NumericRange`. Default for
     :class:`~django.contrib.postgres.fields.FloatRangeField`.
+
+    .. deprecated:: 2.2
+
+        Use :class:`DecimalRangeField` instead.
 
 ``DateTimeRangeField``
 ~~~~~~~~~~~~~~~~~~~~~~

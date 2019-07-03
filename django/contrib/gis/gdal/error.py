@@ -29,7 +29,7 @@ OGRERR_DICT = {
 }
 
 # CPL Error Codes
-# http://www.gdal.org/cpl__error_8h.html
+# https://www.gdal.org/cpl__error_8h.html
 CPLERR_DICT = {
     1: (GDALException, 'AppDefined'),
     2: (GDALException, 'OutOfMemory'),

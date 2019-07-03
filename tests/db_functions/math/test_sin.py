@@ -4,11 +4,17 @@ from decimal import Decimal
 from django.db.models import DecimalField
 from django.db.models.functions import Sin
 from django.test import TestCase
+from django.test.utils import register_lookup
 
 from ..models import DecimalModel, FloatModel, IntegerModel
 
 
 class SinTests(TestCase):
+
+    def test_null(self):
+        IntegerModel.objects.create()
+        obj = IntegerModel.objects.annotate(null_sin=Sin('normal')).first()
+        self.assertIsNone(obj.null_sin)
 
     def test_decimal(self):
         DecimalModel.objects.create(n1=Decimal('-12.9'), n2=Decimal('0.6'))
@@ -41,11 +47,8 @@ class SinTests(TestCase):
         self.assertAlmostEqual(obj.big_sin, math.sin(obj.big))
 
     def test_transform(self):
-        try:
-            DecimalField.register_lookup(Sin)
+        with register_lookup(DecimalField, Sin):
             DecimalModel.objects.create(n1=Decimal('5.4'), n2=Decimal('0'))
             DecimalModel.objects.create(n1=Decimal('0.1'), n2=Decimal('0'))
-            objs = DecimalModel.objects.filter(n1__sin__lt=0)
-            self.assertQuerysetEqual(objs, [Decimal('5.4')], lambda a: a.n1)
-        finally:
-            DecimalField._unregister_lookup(Sin)
+            obj = DecimalModel.objects.filter(n1__sin__lt=0).get()
+            self.assertEqual(obj.n1, Decimal('5.4'))

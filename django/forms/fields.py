@@ -5,6 +5,7 @@ Field classes.
 import copy
 import datetime
 import math
+import operator
 import os
 import re
 import uuid
@@ -1104,17 +1105,16 @@ class FilePathField(ChoiceField):
                             f = os.path.join(root, f)
                             self.choices.append((f, f.replace(path, "", 1)))
         else:
-            try:
-                for f in sorted(os.listdir(self.path)):
-                    if f == '__pycache__':
-                        continue
-                    full_file = os.path.join(self.path, f)
-                    if (((self.allow_files and os.path.isfile(full_file)) or
-                            (self.allow_folders and os.path.isdir(full_file))) and
-                            (self.match is None or self.match_re.search(f))):
-                        self.choices.append((full_file, f))
-            except OSError:
-                pass
+            choices = []
+            for f in os.scandir(self.path):
+                if f.name == '__pycache__':
+                    continue
+                if (((self.allow_files and f.is_file()) or
+                        (self.allow_folders and f.is_dir())) and
+                        (self.match is None or self.match_re.search(f.name))):
+                    choices.append((f.path, f.name))
+            choices.sort(key=operator.itemgetter(1))
+            self.choices.extend(choices)
 
         self.widget.choices = self.choices
 
@@ -1187,7 +1187,7 @@ class UUIDField(CharField):
 
     def prepare_value(self, value):
         if isinstance(value, uuid.UUID):
-            return value.hex
+            return str(value)
         return value
 
     def to_python(self, value):

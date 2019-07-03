@@ -2,9 +2,7 @@
 Unicode data
 ============
 
-Django natively supports Unicode data everywhere. Providing your database can
-somehow store the data, you can safely pass around strings to templates,
-models, and the database.
+Django supports Unicode data everywhere.
 
 This document tells you what you need to know if you're writing applications
 that use data or templates that are encoded in something other than ASCII.
@@ -30,10 +28,10 @@ able to store certain characters in the database, and information will be lost.
   for internal encoding.
 
 .. _MySQL manual: https://dev.mysql.com/doc/refman/en/charset-database.html
-.. _PostgreSQL manual: https://www.postgresql.org/docs/current/static/multibyte.html
-.. _Oracle manual: https://docs.oracle.com/database/121/NLSPG/toc.htm
-.. _section 2: https://docs.oracle.com/database/121/NLSPG/ch2charset.htm#NLSPG002
-.. _section 11: https://docs.oracle.com/database/121/NLSPG/ch11charsetmig.htm#NLSPG011
+.. _PostgreSQL manual: https://www.postgresql.org/docs/current/multibyte.html
+.. _Oracle manual: https://docs.oracle.com/en/database/oracle/oracle-database/18/nlspg/index.html
+.. _section 2: https://docs.oracle.com/en/database/oracle/oracle-database/18/nlspg/choosing-character-set.html
+.. _section 11: https://docs.oracle.com/en/database/oracle/oracle-database/18/nlspg/character-set-migration.html
 
 All of Django's database backends automatically convert strings into
 the appropriate encoding for talking to the database. They also automatically
@@ -110,7 +108,7 @@ Conversion functions
 The ``django.utils.encoding`` module contains a few functions that are handy
 for converting back and forth between strings and bytestrings.
 
-* ``smart_text(s, encoding='utf-8', strings_only=False, errors='strict')``
+* ``smart_str(s, encoding='utf-8', strings_only=False, errors='strict')``
   converts its input to a string. The ``encoding`` parameter
   specifies the input encoding. (For example, Django uses this internally
   when processing form input data, which might not be UTF-8 encoded.) The
@@ -120,24 +118,23 @@ for converting back and forth between strings and bytestrings.
   that are accepted by Python's ``str()`` function for its error
   handling.
 
-* ``force_text(s, encoding='utf-8', strings_only=False,
-  errors='strict')`` is identical to ``smart_text()`` in almost all
-  cases. The difference is when the first argument is a :ref:`lazy
-  translation <lazy-translations>` instance. While ``smart_text()``
-  preserves lazy translations, ``force_text()`` forces those objects to a
-  string (causing the translation to occur). Normally, you'll want
-  to use ``smart_text()``. However, ``force_text()`` is useful in
-  template tags and filters that absolutely *must* have a string to work
-  with, not just something that can be converted to a string.
+* ``force_str(s, encoding='utf-8', strings_only=False, errors='strict')`` is
+  identical to ``smart_str()`` in almost all cases. The difference is when the
+  first argument is a :ref:`lazy translation <lazy-translations>` instance.
+  While ``smart_str()`` preserves lazy translations, ``force_str()`` forces
+  those objects to a string (causing the translation to occur). Normally,
+  you'll want to use ``smart_str()``. However, ``force_str()`` is useful in
+  template tags and filters that absolutely *must* have a string to work with,
+  not just something that can be converted to a string.
 
 * ``smart_bytes(s, encoding='utf-8', strings_only=False, errors='strict')``
-  is essentially the opposite of ``smart_text()``. It forces the first
+  is essentially the opposite of ``smart_str()``. It forces the first
   argument to a bytestring. The ``strings_only`` parameter has the same
-  behavior as for ``smart_text()`` and ``force_text()``. This is
+  behavior as for ``smart_str()`` and ``force_str()``. This is
   slightly different semantics from Python's builtin ``str()`` function,
   but the difference is needed in a few places within Django's internals.
 
-Normally, you'll only need to use ``force_text()``. Call it as early as
+Normally, you'll only need to use ``force_str()``. Call it as early as
 possible on any input data that might be either a string or a bytestring, and
 from then on, you can treat the result as always being a string.
 
@@ -257,32 +254,19 @@ non-ASCII characters would have been removed in quoting in the first line.)
 
 .. _above: `URI and IRI handling`_
 
-The database API
-================
-
-You can pass either strings or UTF-8 bytestrings as arguments to
-``filter()`` methods and the like in the database API. The following two
-querysets are identical::
-
-    qs = People.objects.filter(name__contains='Å')
-    qs = People.objects.filter(name__contains=b'\xc3\x85') # UTF-8 encoding of Å
-
 Templates
 =========
 
-You can use either strings or UTF-8 bytestrings when creating templates
-manually::
+Use strings when creating templates manually::
 
     from django.template import Template
-    t1 = Template(b'This is a bytestring template.')
     t2 = Template('This is a string template.')
 
-But the common case is to read templates from the filesystem, and this creates
-a slight complication: not all filesystems store their data encoded as UTF-8.
-If your template files are not stored with a UTF-8 encoding, set the :setting:`FILE_CHARSET`
-setting to the encoding of the files on disk. When Django reads in a template
-file, it will convert the data from this encoding to Unicode. (:setting:`FILE_CHARSET`
-is set to ``'utf-8'`` by default.)
+But the common case is to read templates from the filesystem. If your template
+files are not stored with a UTF-8 encoding, adjust the :setting:`TEMPLATES`
+setting. The built-in :py:mod:`~django.template.backends.django` backend
+provides the ``'file_charset'`` option to change the encoding used to read
+files from disk.
 
 The :setting:`DEFAULT_CHARSET` setting controls the encoding of rendered templates.
 This is set to UTF-8 by default.
@@ -295,7 +279,7 @@ A couple of tips to remember when writing your own template tags and filters:
 * Always return strings from a template tag's ``render()`` method
   and from template filters.
 
-* Use ``force_text()`` in preference to ``smart_text()`` in these
+* Use ``force_str()`` in preference to ``smart_str()`` in these
   places. Tag rendering and filter calls occur as the template is being
   rendered, so there is no advantage to postponing the conversion of lazy
   translation objects into strings. It's easier to work solely with

@@ -8,7 +8,7 @@ from django.contrib.admin.tests import AdminSeleniumTestCase
 from django.contrib.admin.views.main import ALL_VAR, SEARCH_VAR
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
-from django.db import connection
+from django.db import connection, models
 from django.db.models import F
 from django.db.models.fields import Field, IntegerField
 from django.db.models.functions import Upper
@@ -16,7 +16,9 @@ from django.db.models.lookups import Contains, Exact
 from django.template import Context, Template, TemplateSyntaxError
 from django.test import TestCase, override_settings
 from django.test.client import RequestFactory
-from django.test.utils import CaptureQueriesContext
+from django.test.utils import (
+    CaptureQueriesContext, isolate_apps, register_lookup,
+)
 from django.urls import reverse
 from django.utils import formats
 
@@ -49,10 +51,11 @@ def build_tbody_html(pk, href, extra_fields):
 
 @override_settings(ROOT_URLCONF="admin_changelist.urls")
 class ChangeListTests(TestCase):
+    factory = RequestFactory()
 
-    def setUp(self):
-        self.factory = RequestFactory()
-        self.superuser = User.objects.create_superuser(username='super', email='a@b.com', password='xxx')
+    @classmethod
+    def setUpTestData(cls):
+        cls.superuser = User.objects.create_superuser(username='super', email='a@b.com', password='xxx')
 
     def _create_superuser(self, username):
         return User.objects.create_superuser(username=username, email='a@b.com', password='xxx')
@@ -480,8 +483,7 @@ class ChangeListTests(TestCase):
 
         m = ConcertAdmin(Concert, custom_site)
         m.search_fields = ['group__name__cc']
-        Field.register_lookup(Contains, 'cc')
-        try:
+        with register_lookup(Field, Contains, lookup_name='cc'):
             request = self.factory.get('/', data={SEARCH_VAR: 'Hype'})
             request.user = self.superuser
             cl = m.get_changelist_instance(request)
@@ -491,8 +493,6 @@ class ChangeListTests(TestCase):
             request.user = self.superuser
             cl = m.get_changelist_instance(request)
             self.assertCountEqual(cl.queryset, [])
-        finally:
-            Field._unregister_lookup(Contains, 'cc')
 
     def test_spanning_relations_with_custom_lookup_in_search_fields(self):
         hype = Group.objects.create(name='The Hype')
@@ -501,8 +501,7 @@ class ChangeListTests(TestCase):
         Membership.objects.create(music=vox, group=hype)
         # Register a custom lookup on IntegerField to ensure that field
         # traversing logic in ModelAdmin.get_search_results() works.
-        IntegerField.register_lookup(Exact, 'exactly')
-        try:
+        with register_lookup(IntegerField, Exact, lookup_name='exactly'):
             m = ConcertAdmin(Concert, custom_site)
             m.search_fields = ['group__members__age__exactly']
 
@@ -515,8 +514,6 @@ class ChangeListTests(TestCase):
             request.user = self.superuser
             cl = m.get_changelist_instance(request)
             self.assertCountEqual(cl.queryset, [])
-        finally:
-            IntegerField._unregister_lookup(Exact, 'exactly')
 
     def test_custom_lookup_with_pk_shortcut(self):
         self.assertEqual(CharPK._meta.pk.name, 'char_pk')  # Not equal to 'pk'.
@@ -942,6 +939,81 @@ class ChangeListTests(TestCase):
         OrderedObjectAdmin.ordering = ['id', 'bool']
         check_results_order(ascending=True)
 
+    @isolate_apps('admin_changelist')
+    def test_total_ordering_optimization(self):
+        class Related(models.Model):
+            unique_field = models.BooleanField(unique=True)
+
+            class Meta:
+                ordering = ('unique_field',)
+
+        class Model(models.Model):
+            unique_field = models.BooleanField(unique=True)
+            unique_nullable_field = models.BooleanField(unique=True, null=True)
+            related = models.ForeignKey(Related, models.CASCADE)
+            other_related = models.ForeignKey(Related, models.CASCADE)
+            related_unique = models.OneToOneField(Related, models.CASCADE)
+            field = models.BooleanField()
+            other_field = models.BooleanField()
+            null_field = models.BooleanField(null=True)
+
+            class Meta:
+                unique_together = {
+                    ('field', 'other_field'),
+                    ('field', 'null_field'),
+                    ('related', 'other_related_id'),
+                }
+
+        class ModelAdmin(admin.ModelAdmin):
+            def get_queryset(self, request):
+                return Model.objects.none()
+
+        request = self._mocked_authenticated_request('/', self.superuser)
+        site = admin.AdminSite(name='admin')
+        model_admin = ModelAdmin(Model, site)
+        change_list = model_admin.get_changelist_instance(request)
+        tests = (
+            ([], ['-pk']),
+            # Unique non-nullable field.
+            (['unique_field'], ['unique_field']),
+            (['-unique_field'], ['-unique_field']),
+            # Unique nullable field.
+            (['unique_nullable_field'], ['unique_nullable_field', '-pk']),
+            # Field.
+            (['field'], ['field', '-pk']),
+            # Related field introspection is not implemented.
+            (['related__unique_field'], ['related__unique_field', '-pk']),
+            # Related attname unique.
+            (['related_unique_id'], ['related_unique_id']),
+            # Related ordering introspection is not implemented.
+            (['related_unique'], ['related_unique', '-pk']),
+            # Composite unique.
+            (['field', '-other_field'], ['field', '-other_field']),
+            # Composite unique nullable.
+            (['-field', 'null_field'], ['-field', 'null_field', '-pk']),
+            # Composite unique nullable.
+            (['-field', 'null_field'], ['-field', 'null_field', '-pk']),
+            # Composite unique nullable.
+            (['-field', 'null_field'], ['-field', 'null_field', '-pk']),
+            # Composite unique and nullable.
+            (['-field', 'null_field', 'other_field'], ['-field', 'null_field', 'other_field']),
+            # Composite unique attnames.
+            (['related_id', '-other_related_id'], ['related_id', '-other_related_id']),
+            # Composite unique names.
+            (['related', '-other_related_id'], ['related', '-other_related_id', '-pk']),
+        )
+        # F() objects composite unique.
+        total_ordering = [F('field'), F('other_field').desc(nulls_last=True)]
+        # F() objects composite unique nullable.
+        non_total_ordering = [F('field'), F('null_field').desc(nulls_last=True)]
+        tests += (
+            (total_ordering, total_ordering),
+            (non_total_ordering, non_total_ordering + ['-pk']),
+        )
+        for ordering, expected in tests:
+            with self.subTest(ordering=ordering):
+                self.assertEqual(change_list._get_deterministic_ordering(ordering), expected)
+
     def test_dynamic_list_filter(self):
         """
         Regression tests for ticket #17646: dynamic list_filter support.
@@ -1043,7 +1115,7 @@ class GetAdminLogTests(TestCase):
             '{{ entry|safe }}'
             '{% endfor %}'
         )
-        self.assertEqual(t.render(Context({})), 'Added "<User: jondoe>".')
+        self.assertEqual(t.render(Context({})), 'Added “<User: jondoe>”.')
 
     def test_missing_args(self):
         msg = "'get_admin_log' statements require two arguments"

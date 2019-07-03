@@ -10,8 +10,7 @@ from django.contrib.gis.geos import (
 from django.contrib.gis.measure import Area
 from django.db import NotSupportedError, connection
 from django.db.models import Sum
-from django.test import TestCase, ignore_warnings, skipUnlessDBFeature
-from django.utils.deprecation import RemovedInDjango30Warning
+from django.test import TestCase, skipUnlessDBFeature
 
 from ..utils import FuncTestMixin, mysql, oracle, postgis, spatialite
 from .models import City, Country, CountryWebMercator, State, Track
@@ -27,7 +26,6 @@ class GISFunctionsTests(FuncTestMixin, TestCase):
     fixtures = ['initial']
 
     def test_asgeojson(self):
-        # Only PostGIS and SpatiaLite support GeoJSON.
         if not connection.features.has_AsGeoJSON_function:
             with self.assertRaises(NotSupportedError):
                 list(Country.objects.annotate(json=functions.AsGeoJSON('mpoly')))
@@ -86,6 +84,9 @@ class GISFunctionsTests(FuncTestMixin, TestCase):
         # SELECT ST_AsGeoJson("geoapp_city"."point", 5, 3) FROM "geoapp_city"
         # WHERE "geoapp_city"."name" = 'Chicago';
         # Finally, we set every available keyword.
+        # MariaDB doesn't limit the number of decimals in bbox.
+        if mysql and connection.mysql_is_mariadb:
+            chicago_json['bbox'] = [-87.650175, 41.850385, -87.650175, 41.850385]
         self.assertJSONEqual(
             City.objects.annotate(
                 geojson=functions.AsGeoJSON('point', bbox=True, crs=True, precision=5)
@@ -230,21 +231,6 @@ class GISFunctionsTests(FuncTestMixin, TestCase):
         st = State.objects.annotate(force_polygon_cw=functions.ForcePolygonCW('poly')).get(name='Foo')
         self.assertEqual(rhr_rings, st.force_polygon_cw.coords)
 
-    @skipUnlessDBFeature("has_ForceRHR_function")
-    @ignore_warnings(category=RemovedInDjango30Warning)
-    def test_force_rhr(self):
-        rings = (
-            ((0, 0), (5, 0), (0, 5), (0, 0)),
-            ((1, 1), (1, 3), (3, 1), (1, 1)),
-        )
-        rhr_rings = (
-            ((0, 0), (0, 5), (5, 0), (0, 0)),
-            ((1, 1), (3, 1), (1, 3), (1, 1)),
-        )
-        State.objects.create(name='Foo', poly=Polygon(*rings))
-        st = State.objects.annotate(force_rhr=functions.ForceRHR('poly')).get(name='Foo')
-        self.assertEqual(rhr_rings, st.force_rhr.coords)
-
     @skipUnlessDBFeature("has_GeoHash_function")
     def test_geohash(self):
         # Reference query:
@@ -255,6 +241,21 @@ class GISFunctionsTests(FuncTestMixin, TestCase):
         h2 = City.objects.annotate(geohash=functions.GeoHash('point', precision=5)).get(name='Houston')
         self.assertEqual(ref_hash, h1.geohash[:len(ref_hash)])
         self.assertEqual(ref_hash[:5], h2.geohash)
+
+    @skipUnlessDBFeature('has_GeometryDistance_function')
+    def test_geometry_distance(self):
+        point = Point(-90, 40, srid=4326)
+        qs = City.objects.annotate(distance=functions.GeometryDistance('point', point)).order_by('distance')
+        self.assertEqual([city.distance for city in qs], [
+            2.99091995527296,
+            5.33507274054713,
+            9.33852187483721,
+            9.91769193646233,
+            11.556465744884,
+            14.713098433352,
+            34.3635252198568,
+            276.987855073372,
+        ])
 
     @skipUnlessDBFeature("has_Intersection_function")
     def test_intersection(self):
@@ -361,24 +362,9 @@ class GISFunctionsTests(FuncTestMixin, TestCase):
 
     @skipUnlessDBFeature("has_PointOnSurface_function")
     def test_point_on_surface(self):
-        # Reference values.
-        if oracle:
-            # SELECT SDO_UTIL.TO_WKTGEOMETRY(SDO_GEOM.SDO_POINTONSURFACE(GEOAPP_COUNTRY.MPOLY, 0.05))
-            # FROM GEOAPP_COUNTRY;
-            ref = {'New Zealand': fromstr('POINT (174.616364 -36.100861)', srid=4326),
-                   'Texas': fromstr('POINT (-103.002434 36.500397)', srid=4326),
-                   }
-        else:
-            # Using GEOSGeometry to compute the reference point on surface values
-            # -- since PostGIS also uses GEOS these should be the same.
-            ref = {'New Zealand': Country.objects.get(name='New Zealand').mpoly.point_on_surface,
-                   'Texas': Country.objects.get(name='Texas').mpoly.point_on_surface
-                   }
-
         qs = Country.objects.annotate(point_on_surface=functions.PointOnSurface('mpoly'))
         for country in qs:
-            tol = 0.00001  # SpatiaLite might have WKT-translation-related precision issues
-            self.assertTrue(ref[country.name].equals_exact(country.point_on_surface, tol))
+            self.assertTrue(country.mpoly.intersection(country.point_on_surface))
 
     @skipUnlessDBFeature("has_Reverse_function")
     def test_reverse_geom(self):

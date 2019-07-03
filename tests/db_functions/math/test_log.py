@@ -9,6 +9,15 @@ from ..models import DecimalModel, FloatModel, IntegerModel
 
 class LogTests(TestCase):
 
+    def test_null(self):
+        IntegerModel.objects.create(big=100)
+        obj = IntegerModel.objects.annotate(
+            null_log_small=Log('small', 'normal'),
+            null_log_normal=Log('normal', 'big'),
+        ).first()
+        self.assertIsNone(obj.null_log_small)
+        self.assertIsNone(obj.null_log_normal)
+
     def test_decimal(self):
         DecimalModel.objects.create(n1=Decimal('12.9'), n2=Decimal('3.6'))
         obj = DecimalModel.objects.annotate(n_log=Log('n1', 'n2')).first()

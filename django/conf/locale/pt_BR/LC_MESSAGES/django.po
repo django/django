@@ -2,6 +2,7 @@
 #
 # Translators:
 # Allisson Azevedo <allisson@gmail.com>, 2014
+# amcorreia <mutley.sandro@gmail.com>, 2018
 # andrewsmedina <andrewsmedina@gmail.com>, 2014-2015
 # Arthur Silva <arxdsilva@gmail.com>, 2017
 # bruno.devpod <bruno.devpod@gmail.com>, 2014
@@ -9,6 +10,7 @@
 # Carlos Leite <caduado@gmail.com>, 2016
 # Filipe Cifali Stangler <cifali.filipe@gmail.com>, 2016
 # dudanogueira <dudanogueira@gmail.com>, 2012
+# dudanogueira <dudanogueira@gmail.com>, 2019
 # Elyézer Rezende <elyezermr@gmail.com>, 2013
 # Fábio C. Barrionuevo da Luz <bnafta@gmail.com>, 2014-2015
 # Felipe Rodrigues <bidu.pub@gmail.com>, 2016
@@ -28,9 +30,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-05-17 11:49+0200\n"
-"PO-Revision-Date: 2018-07-19 17:55+0000\n"
-"Last-Translator: Xico Petry <xico.petry@gmail.com>\n"
+"POT-Creation-Date: 2019-01-16 20:42+0100\n"
+"PO-Revision-Date: 2019-02-18 17:13+0000\n"
+"Last-Translator: dudanogueira <dudanogueira@gmail.com>\n"
 "Language-Team: Portuguese (Brazil) (http://www.transifex.com/django/django/"
 "language/pt_BR/)\n"
 "MIME-Version: 1.0\n"
@@ -158,6 +160,9 @@ msgstr "Sorábio Alto"
 
 msgid "Hungarian"
 msgstr "Húngaro"
+
+msgid "Armenian"
+msgstr "Armênio"
 
 msgid "Interlingua"
 msgstr "Interlíngua"
@@ -440,7 +445,7 @@ msgstr ""
 "permitidas são: '%(allowed_extensions)s'."
 
 msgid "Null characters are not allowed."
-msgstr "Caracteres nulos não são aceitos."
+msgstr "Caracteres nulos não são permitidos."
 
 msgid "and"
 msgstr "e"
@@ -629,6 +634,9 @@ msgstr "Dados binários bruto"
 #, python-format
 msgid "'%(value)s' is not a valid UUID."
 msgstr "'%(value)s' não é um UUID válido."
+
+msgid "Universally unique identifier"
+msgstr "Identificador único universal"
 
 msgid "File"
 msgstr "Arquivo"
@@ -1075,8 +1083,8 @@ msgstr "Este não é um endereço IPv6 válido."
 
 #, python-format
 msgctxt "String to return when truncating text"
-msgid "%(truncated_text)s..."
-msgstr " %(truncated_text)s..."
+msgid "%(truncated_text)s…"
+msgstr ""
 
 msgid "or"
 msgstr "ou"

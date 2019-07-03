@@ -15,9 +15,7 @@ def _get_all_permissions(opts):
     """
     Return (codename, name) for all permissions in the given opts.
     """
-    builtin = _get_builtin_permissions(opts)
-    custom = list(opts.permissions)
-    return builtin + custom
+    return [*_get_builtin_permissions(opts), *opts.permissions]
 
 
 def _get_builtin_permissions(opts):
@@ -62,7 +60,7 @@ def create_permissions(app_config, verbosity=2, interactive=True, using=DEFAULT_
     for klass in app_config.get_models():
         # Force looking up the content types in the current database
         # before creating foreign keys to them.
-        ctype = ContentType.objects.db_manager(using).get_for_model(klass)
+        ctype = ContentType.objects.db_manager(using).get_for_model(klass, for_concrete_model=False)
 
         ctypes.add(ctype)
         for perm in _get_all_permissions(klass._meta):
