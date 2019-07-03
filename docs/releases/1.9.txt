@@ -1403,6 +1403,8 @@ These features have reached the end of their deprecation cycle and are removed
 in Django 1.9. See :ref:`deprecated-features-1.7` for details, including how to
 remove usage of these features.
 
+* ``django.core.servers.FileWrapper`` is removed.
+
 * ``django.utils.dictconfig`` is removed.
 
 * ``django.utils.importlib`` is removed.
