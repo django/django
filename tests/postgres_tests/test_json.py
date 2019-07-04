@@ -393,6 +393,16 @@ class TestSerialization(PostgreSQLSimpleTestCase):
                 instance = list(serializers.deserialize('json', self.test_data % serialized))[0].object
                 self.assertEqual(instance.field, value)
 
+    def test_xml_serialization(self):
+        test_xml = """type="JSONField">{}</"""
+        for value, serialized in self.test_values:
+            with self.subTest(value=value):
+                instance = JSONModel(field=value)
+                data = serializers.serialize('xml', [instance], fields=["field"])
+                self.assertIn(test_xml.format(serialized), data)
+                new_instance = list(serializers.deserialize("xml", data))[0].object
+                self.assertEqual(new_instance.field, instance.field)
+
 
 class TestValidation(PostgreSQLSimpleTestCase):
 

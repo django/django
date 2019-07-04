@@ -2,6 +2,7 @@
 XML serializer.
 """
 
+import json
 from xml.dom import pulldom
 from xml.sax import handler
 from xml.sax.expatreader import ExpatParser as _ExpatParser
@@ -75,8 +76,13 @@ class Serializer(base.Serializer):
 
         # Get a "string version" of the object's data.
         if getattr(obj, field.name) is not None:
+            value = field.value_to_string(obj)
+            # Special case for JSONField since JSONField's value_to_string
+            # doesn't output string
+            if field.get_internal_type() == "JSONField":
+                value = json.dumps(value)
             try:
-                self.xml.characters(field.value_to_string(obj))
+                self.xml.characters(value)
             except UnserializableContentError:
                 raise ValueError("%s.%s (pk:%s) contains unserializable characters" % (
                     obj.__class__.__name__, field.name, obj.pk))
@@ -228,6 +234,11 @@ class Deserializer(base.Deserializer):
                     value = None
                 else:
                     value = field.to_python(getInnerText(field_node).strip())
+                    # Must treat special here since JSONField's to_python method
+                    # outputs string.
+                    if field_node.getAttribute("type") == "JSONField":
+                        value = json.loads(value)
+
                 data[field.name] = value
 
         obj = base.build_instance(Model, data, self.db)
