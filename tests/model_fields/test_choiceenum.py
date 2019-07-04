@@ -95,7 +95,7 @@ class TestStrChoiceEnumInDatabase(TestCase):
         self.assertEquals(foo.a, '1')
 
     def test_value_query(self):
-        foo = Foo.objects.create(a=self.StrEnum.ONE_PLUS_ONE, d=2.0)
+        Foo.objects.create(a=self.StrEnum.ONE_PLUS_ONE, d=2.0)
         bar = Foo.objects.get(a=self.StrEnum.ONE_PLUS_ONE)
         self.assertEquals(bar.a, self.StrEnum.ONE_PLUS_ONE)
         self.assertEquals(bar.a, '2')
