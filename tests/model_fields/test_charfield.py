@@ -29,7 +29,7 @@ class TestCharField(TestCase):
         self.assertEqual(p.title, 'Smile 😀')
 
     def test_assignment_from_choice_enum(self):
-        class Choices(str, models.ChoiceEnum):
+        class Choices(models.ChoiceStrEnum):
             C = 'Carnival!'
             F = 'Festival!'
         p = Post.objects.create(title=Choices.C, body=Choices.F)
@@ -39,7 +39,7 @@ class TestCharField(TestCase):
 
 class ValidationTests(SimpleTestCase):
 
-    class CharChoices(str, models.ChoiceEnum):
+    class CharChoices(models.ChoiceStrEnum):
         C = 'c', 'C'
         D = 'd'
 

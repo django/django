@@ -36,12 +36,13 @@ from django.utils.translation import gettext_lazy as _
 __all__ = [
     'AutoField', 'BLANK_CHOICE_DASH', 'BigAutoField', 'BigIntegerField',
     'BinaryField', 'BooleanField', 'CharField', 'ChoiceEnum', 'ChoiceIntEnum',
-    'CommaSeparatedIntegerField', 'DateField', 'DateTimeField', 'DecimalField',
-    'DurationField', 'EmailField', 'Empty', 'Field', 'FieldDoesNotExist',
-    'FilePathField', 'FloatField', 'GenericIPAddressField', 'IPAddressField',
-    'IntegerField', 'NOT_PROVIDED', 'NullBooleanField', 'PositiveIntegerField',
-    'PositiveSmallIntegerField', 'SlugField', 'SmallIntegerField', 'TextField',
-    'TimeField', 'URLField', 'UUIDField',
+    'ChoiceStrEnum', 'CommaSeparatedIntegerField', 'DateField',
+    'DateTimeField', 'DecimalField', 'DurationField', 'EmailField', 'Empty',
+    'Field', 'FieldDoesNotExist', 'FilePathField', 'FloatField',
+    'GenericIPAddressField', 'IPAddressField', 'IntegerField', 'NOT_PROVIDED',
+    'NullBooleanField', 'PositiveIntegerField', 'PositiveSmallIntegerField',
+    'SlugField', 'SmallIntegerField', 'TextField', 'TimeField', 'URLField',
+    'UUIDField',
 ]
 
 
@@ -59,25 +60,21 @@ BLANK_CHOICE_DASH = [("", "---------")]
 
 
 class ChoiceEnumMeta(EnumMeta):
-    """A metaclass to support ChoiceEnum"""
     def __new__(metacls, classname, bases, classdict):
-        choices = OrderedDict()
+        choices = {}
         for key in classdict._member_names:
-
-            source_value = classdict[key]
-            if isinstance(source_value, (list, tuple)):
+            value = classdict[key]
+            if isinstance(value, (list, tuple)):
                 try:
-                    val, display = source_value
-                except ValueError:
-                    raise ValueError(f"Invalid ChoiceEnum member '{key}'")
+                    value, display = value
+                except ValueError as e:
+                    raise ValueError('Invalid ChoiceEnum member %r' % key) from e
             else:
-                val = source_value
-                display = key.replace("_", " ").title()
-
-            choices[val] = display
-            # Use dict.__setitem__() to suppress defenses against
-            # double assignment in enum's classdict
-            dict.__setitem__(classdict, key, val)
+                display = key.replace('_', ' ').title()
+            choices[value] = display
+            # Use dict.__setitem__() to suppress defenses against double
+            # assignment in enum's classdict.
+            dict.__setitem__(classdict, key, value)
         cls = super().__new__(metacls, classname, bases, classdict)
         cls._choices = choices
         cls.choices = tuple(choices.items())
@@ -86,7 +83,7 @@ class ChoiceEnumMeta(EnumMeta):
 
 class ChoiceEnum(Enum, metaclass=ChoiceEnumMeta):
     """
-    A class suitable for using as an enum with translatable choices
+    A class suitable for using as an enum with translatable choices.
 
     The typical use is similar to the stdlib's enums, with three
     modifications:
@@ -99,7 +96,7 @@ class ChoiceEnum(Enum, metaclass=ChoiceEnumMeta):
 
     Thus, the definition of the Enum class can look like:
 
-    class YearInSchool(ChoiceEnum):
+    class YearInSchool(ChoiceStrEnum):
         FRESHMAN = 'FR', _('Freshman')
         SOPHOMORE = 'SO', _('Sophomore')
         JUNIOR = 'JR', _('Junior')
@@ -126,7 +123,7 @@ class ChoiceEnum(Enum, metaclass=ChoiceEnumMeta):
         return self._choices[self]
 
     @classmethod
-    def validate(cls, value, message=_("Invalid choice")):
+    def validate(cls, value, message=_('Invalid choice')):
         try:
             cls(value)
         except ValueError:
@@ -134,7 +131,12 @@ class ChoiceEnum(Enum, metaclass=ChoiceEnumMeta):
 
 
 class ChoiceIntEnum(int, ChoiceEnum):
-    """Included for symmetry with IntEnum"""
+    """Class for creating an enum int choices."""
+    pass
+
+
+class ChoiceStrEnum(str, ChoiceEnum):
+    """Class for creating an enum string choices."""
     pass
 
 

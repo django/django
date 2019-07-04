@@ -29,7 +29,7 @@ class TestChoiceEnumDefinition(SimpleTestCase):
 
     def test_simple_definition_str(self):
 
-        class MyEnum(str, models.ChoiceEnum):
+        class MyEnum(models.ChoiceStrEnum):
             ONE = '1', 'One'
             TWO = '2', 'Two'
 
@@ -38,7 +38,7 @@ class TestChoiceEnumDefinition(SimpleTestCase):
         self.assertSequenceEqual(MyEnum.choices, [('1', 'One'), ('2', 'Two')])
 
     def test_simple_definition_str_default_display(self):
-        class MyEnum(str, models.ChoiceEnum):
+        class MyEnum(models.ChoiceStrEnum):
             ONE = '1', 'One'
             ONE_PLUS_ONE = '2'
             THREE = '3'
@@ -59,7 +59,7 @@ class TestChoiceEnumValidation(SimpleTestCase):
         ONE = 1, 'One'
         TWO = 2, 'Two'
 
-    class StrEnum(str, models.ChoiceEnum):
+    class StrEnum(models.ChoiceStrEnum):
         ONE = '1', 'One'
         ONE_PLUS_ONE = '2'
         THREE = '3'
@@ -83,7 +83,7 @@ class TestChoiceEnumValidation(SimpleTestCase):
 
 class TestStrChoiceEnumInDatabase(TestCase):
 
-    class StrEnum(str, models.ChoiceEnum):
+    class StrEnum(models.ChoiceStrEnum):
         ONE = '1', 'One'
         ONE_PLUS_ONE = '2'
         THREE = '3'
