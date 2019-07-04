@@ -63,20 +63,6 @@ class SimpleIndexesTests(SimpleTestCase):
         with self.assertRaisesMessage(ValueError, 'Index.condition must be a Q instance.'):
             models.Index(condition='invalid', name='long_book_idx')
 
-    def test_max_name_length(self):
-        msg = 'Index names cannot be longer than 30 characters.'
-        with self.assertRaisesMessage(ValueError, msg):
-            models.Index(fields=['title'], name='looooooooooooong_index_name_idx')
-
-    def test_name_constraints(self):
-        msg = 'Index names cannot start with an underscore (_).'
-        with self.assertRaisesMessage(ValueError, msg):
-            models.Index(fields=['title'], name='_name_starting_with_underscore')
-
-        msg = 'Index names cannot start with a number (0-9).'
-        with self.assertRaisesMessage(ValueError, msg):
-            models.Index(fields=['title'], name='5name_starting_with_number')
-
     def test_name_auto_generation(self):
         index = models.Index(fields=['author'])
         index.set_name_with_model(Book)

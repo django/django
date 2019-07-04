@@ -313,6 +313,10 @@ Models
   ``<model>``.
 * **models.E032**: constraint name ``<constraint>`` is not unique amongst
   models: ``<model list>``.
+* **models.E033**: The index name ``<index>`` cannot start with an underscore
+  or a number.
+* **models.E034**: The index name ``<index>`` cannot be longer than
+  ``<max_length>`` characters.
 
 Security
 --------
