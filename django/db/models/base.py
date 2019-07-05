@@ -94,8 +94,16 @@ class ModelBase(type):
         new_class = super_new(cls, name, bases, new_attrs, **kwargs)
 
         abstract = getattr(attr_meta, 'abstract', False)
-        meta = attr_meta or getattr(new_class, 'Meta', None)
         base_meta = getattr(new_class, '_meta', None)
+        meta = attr_meta or (
+            getattr(new_class, 'Meta', None)
+            if getattr(base_meta, 'abstract', False) else
+            ([  # Check that other inherited classes might be abstract. Get first or none.
+                getattr(other_parent, 'Meta')
+                for other_parent in parents
+                if hasattr(other_parent, '_meta') and getattr(other_parent._meta, 'abstract', False)
+            ][:1] or [None])[0]
+        )
 
         app_label = None
 
