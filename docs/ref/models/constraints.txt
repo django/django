@@ -25,8 +25,11 @@ option.
     cannot normally specify a constraint on an abstract base class, since the
     :attr:`Meta.constraints <django.db.models.Options.constraints>` option is
     inherited by subclasses, with exactly the same values for the attributes
-    (including ``name``) each time. Instead, specify the ``constraints`` option
-    on subclasses directly, providing a unique name for each constraint.
+    (including ``name``) each time. To work around name collisions, part of the
+    name may contain ``'%(app_label)s'`` and ``'%(class)s'``, which are
+    replaced, respectively, by the lowercased app label and class name of the
+    concrete model. For example ``CheckConstraint(check=Q(age__gte=18),
+    name='%(app_label)s_%(class)s_is_adult')``.
 
 .. admonition:: Validation of Constraints
 
@@ -63,6 +66,10 @@ ensures the age field is never less than 18.
 
 The name of the constraint.
 
+.. versionchanged:: 3.0
+
+   Interpolation of  ``'%(app_label)s'`` and ``'%(class)s'`` was added.
+
 ``UniqueConstraint``
 ====================
 
@@ -88,6 +95,10 @@ date.
 .. attribute:: UniqueConstraint.name
 
 The name of the constraint.
+
+.. versionchanged:: 3.0
+
+   Interpolation of  ``'%(app_label)s'`` and ``'%(class)s'`` was added.
 
 ``condition``
 -------------

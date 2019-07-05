@@ -263,6 +263,11 @@ Models
 * Allowed symmetrical intermediate table for self-referential
   :class:`~django.db.models.ManyToManyField`.
 
+* The ``name`` attributes of :class:`~django.db.models.CheckConstraint`,
+  :class:`~django.db.models.UniqueConstraint`, and
+  :class:`~django.db.models.Index` now support app label and class
+  interpolation using the ``'%(app_label)s'`` and ``'%(class)s'`` placeholders.
+
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 

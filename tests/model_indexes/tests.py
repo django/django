@@ -134,13 +134,26 @@ class SimpleIndexesTests(SimpleTestCase):
 
     def test_name_set(self):
         index_names = [index.name for index in Book._meta.indexes]
-        self.assertCountEqual(index_names, ['model_index_title_196f42_idx', 'model_index_isbn_34f975_idx'])
+        self.assertCountEqual(
+            index_names,
+            [
+                'model_index_title_196f42_idx',
+                'model_index_isbn_34f975_idx',
+                'model_indexes_book_barcode_idx',
+            ],
+        )
 
     def test_abstract_children(self):
         index_names = [index.name for index in ChildModel1._meta.indexes]
-        self.assertEqual(index_names, ['model_index_name_440998_idx'])
+        self.assertEqual(
+            index_names,
+            ['model_index_name_440998_idx', 'model_indexes_childmodel1_idx'],
+        )
         index_names = [index.name for index in ChildModel2._meta.indexes]
-        self.assertEqual(index_names, ['model_index_name_b6c374_idx'])
+        self.assertEqual(
+            index_names,
+            ['model_index_name_b6c374_idx', 'model_indexes_childmodel2_idx'],
+        )
 
 
 class IndexesTests(TestCase):
