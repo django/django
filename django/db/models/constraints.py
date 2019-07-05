@@ -5,6 +5,10 @@ __all__ = ['CheckConstraint', 'UniqueConstraint']
 
 
 class BaseConstraint:
+    # The max length of the name of the constraint (restricted to 30 for
+    # cross-database compatibility with Oracle)
+    max_name_length = 30
+
     def __init__(self, name):
         self.name = name
 

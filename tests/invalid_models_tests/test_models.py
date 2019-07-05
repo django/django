@@ -1191,3 +1191,44 @@ class ConstraintsTests(SimpleTestCase):
         )
         expected = [] if connection.features.supports_table_check_constraints else [warn, warn]
         self.assertCountEqual(errors, expected)
+
+    @unittest.skipUnless(
+        connection.features.supports_table_check_constraints,
+        "The database doesn't have a table check constraints feature.",
+    )
+    def test_name_constraints(self):
+        class Model(models.Model):
+            class Meta:
+                constraints = [
+                    models.CheckConstraint(check=models.Q(id__gte=1), name='_constraint_name'),
+                    models.CheckConstraint(check=models.Q(id__gte=1), name='5constraint_name'),
+                ]
+
+        self.assertEqual(Model.check(), [
+            Error(
+                "The constraint name '%sconstraint_name' cannot start with an "
+                "underscore or a number." % prefix,
+                obj=Model,
+                id='models.E033',
+            ) for prefix in ('_', '5')
+        ])
+
+    @unittest.skipUnless(
+        connection.features.supports_table_check_constraints,
+        "The database doesn't have a table check constraints feature.",
+    )
+    def test_max_name_length(self):
+        constraint_name = 'x' * 31
+
+        class Model(models.Model):
+            class Meta:
+                constraints = [models.CheckConstraint(check=models.Q(id__gte=1), name=constraint_name)]
+
+        self.assertEqual(Model.check(), [
+            Error(
+                "The constraint name '%s' cannot be longer than 30 characters."
+                % constraint_name,
+                obj=Model,
+                id='models.E034',
+            ),
+        ])

@@ -1569,27 +1569,7 @@ class Model(metaclass=ModelBase):
     def _check_indexes(cls):
         """Check the fields and names of indexes."""
         errors = []
-        for index in cls._meta.indexes:
-            # Index name can't start with an underscore or a number, restricted
-            # for cross-database compatibility with Oracle.
-            if index.name[0] == '_' or index.name[0].isdigit():
-                errors.append(
-                    checks.Error(
-                        "The index name '%s' cannot start with an underscore "
-                        "or a number." % index.name,
-                        obj=cls,
-                        id='models.E033',
-                    ),
-                )
-            if len(index.name) > index.max_name_length:
-                errors.append(
-                    checks.Error(
-                        "The index name '%s' cannot be longer than %d "
-                        "characters." % (index.name, index.max_name_length),
-                        obj=cls,
-                        id='models.E034',
-                    ),
-                )
+        errors.extend(cls._check_object_identifiers(cls._meta.indexes, 'index'))
         fields = [field for index in cls._meta.indexes for field, _ in index.fields_orders]
         errors.extend(cls._check_local_fields(fields, 'indexes'))
         return errors
@@ -1814,6 +1794,7 @@ class Model(metaclass=ModelBase):
     @classmethod
     def _check_constraints(cls):
         errors = []
+        errors.extend(cls._check_object_identifiers(cls._meta.constraints, 'constraint'))
         for db in settings.DATABASES:
             if not router.allow_migrate_model(db, cls):
                 continue
@@ -1831,6 +1812,33 @@ class Model(metaclass=ModelBase):
                         obj=cls,
                         id='models.W027',
                     )
+                )
+        return errors
+
+    @classmethod
+    def _check_object_identifiers(cls, objs, option):
+        """Check the names of indexes/constraints."""
+        errors = []
+        for obj in objs:
+            # Index/Constraint name can't start with an underscore or a number, restricted
+            # for cross-database compatibility with Oracle.
+            if obj.name[0] == '_' or obj.name[0].isdigit():
+                errors.append(
+                    checks.Error(
+                        "The %s name '%s' cannot start with an underscore "
+                        "or a number." % (option, obj.name),
+                        obj=cls,
+                        id='models.E033',
+                    ),
+                )
+            if len(obj.name) > obj.max_name_length:
+                errors.append(
+                    checks.Error(
+                        "The %s name '%s' cannot be longer than %d "
+                        "characters." % (option, obj.name, obj.max_name_length),
+                        obj=cls,
+                        id='models.E034',
+                    ),
                 )
         return errors
 
