@@ -2160,6 +2160,15 @@ class StartApp(AdminScriptTestCase):
             "won't replace conflicting files."
         )
 
+    def test_app_path(self):
+        app_root = os.path.join(self.test_dir, 'app_parent')
+        test_app = os.path.join(app_root, 'test_app')
+
+        os.mkdir(app_root)
+        os.mkdir(test_app)
+
+        self.run_django_admin(['startapp', 'test_app', 'app_parent/test_app'])
+
 
 class DiffSettings(AdminScriptTestCase):
     """Tests for diffsettings management command."""

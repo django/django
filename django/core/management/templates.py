@@ -65,6 +65,7 @@ class TemplateCommand(BaseCommand):
         self.validate_name(name)
 
         # if some directory is given, make sure it's nicely expanded
+        app_path = name
         if target is None:
             top_dir = path.join(os.getcwd(), name)
             try:
@@ -76,6 +77,7 @@ class TemplateCommand(BaseCommand):
         else:
             if app_or_project == 'app':
                 self.validate_name(os.path.basename(target), 'directory')
+                app_path = target.replace('/', '.')
             top_dir = os.path.abspath(path.expanduser(target))
             if not os.path.exists(top_dir):
                 raise CommandError("Destination directory '%s' does not "
@@ -104,6 +106,7 @@ class TemplateCommand(BaseCommand):
             base_name: name,
             base_directory: top_dir,
             camel_case_name: camel_case_value,
+            'app_path': app_path,
             'docs_version': get_docs_version(),
             'django_version': django.__version__,
         }, autoescape=False)
