@@ -9,7 +9,9 @@ from urllib.error import HTTPError
 from urllib.parse import urlencode
 from urllib.request import urlopen
 
+from django.core.servers.basehttp import WSGIServer
 from django.test import LiveServerTestCase, override_settings
+from django.test.testcases import LiveServerThread, QuietWSGIRequestHandler
 
 from .models import Person
 
@@ -48,6 +50,15 @@ class LiveServerAddress(LiveServerBase):
     def test_live_server_url_is_class_property(self):
         self.assertIsInstance(self.live_server_url_test[0], str)
         self.assertEqual(self.live_server_url_test[0], self.live_server_url)
+
+
+class LiveServerSingleThread(LiveServerThread):
+    def _create_server(self):
+        return WSGIServer((self.host, self.port), QuietWSGIRequestHandler, allow_reuse_address=False)
+
+
+class SingleThreadLiveServerTestCase(LiveServerTestCase):
+    server_thread_class = LiveServerSingleThread
 
 
 class LiveServerViews(LiveServerBase):
@@ -160,6 +171,32 @@ class LiveServerViews(LiveServerBase):
     def test_environ(self):
         with self.urlopen('/environ_view/?%s' % urlencode({'q': 'тест'})) as f:
             self.assertIn(b"QUERY_STRING: 'q=%D1%82%D0%B5%D1%81%D1%82'", f.read())
+
+
+@override_settings(ROOT_URLCONF='servers.urls')
+class SingleTreadLiveServerViews(SingleThreadLiveServerTestCase):
+    available_apps = ['servers']
+
+    def test_closes_connection_with_content_length(self):
+        """
+        Contrast to
+        LiveServerViews.test_keep_alive_on_connection_with_content_length().
+        Persistent connections require threading server.
+        """
+        conn = HTTPConnection(
+            SingleTreadLiveServerViews.server_thread.host,
+            SingleTreadLiveServerViews.server_thread.port,
+            timeout=1,
+        )
+        try:
+            conn.request('GET', '/example_view/', headers={'Connection': 'keep-alive'})
+            response = conn.getresponse()
+            self.assertTrue(response.will_close)
+            self.assertEqual(response.read(), b'example view')
+            self.assertEqual(response.status, 200)
+            self.assertEqual(response.getheader('Connection'), 'close')
+        finally:
+            conn.close()
 
 
 class LiveServerDatabase(LiveServerBase):
