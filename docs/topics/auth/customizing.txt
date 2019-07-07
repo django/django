@@ -1162,12 +1162,13 @@ code would be required in the app's ``admin.py`` file::
         add_fieldsets = (
             (None, {
                 'classes': ('wide',),
-                'fields': ('email', 'date_of_birth', 'password1', 'password2')}
-            ),
+                'fields': ('email', 'date_of_birth', 'password1', 'password2'),
+            }),
         )
         search_fields = ('email',)
         ordering = ('email',)
         filter_horizontal = ()
+
 
     # Now register the new UserAdmin...
     admin.site.register(MyUser, UserAdmin)
