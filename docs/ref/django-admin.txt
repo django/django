@@ -483,9 +483,9 @@ fixture can be distributed over multiple directories, in multiple applications.
 
 Django will search in three locations for fixtures:
 
-1. In the ``fixtures`` directory of every installed application
-2. In any directory named in the :setting:`FIXTURE_DIRS` setting
-3. In the literal path named by the fixture
+#. In the ``fixtures`` directory of every installed application
+#. In any directory named in the :setting:`FIXTURE_DIRS` setting
+#. In the literal path named by the fixture
 
 Django will load any and all fixtures it finds in these locations that match
 the provided fixture names.

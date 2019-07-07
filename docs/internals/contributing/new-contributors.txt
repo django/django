@@ -139,7 +139,7 @@ some advice to make your work on Django more useful and rewarding.
 FAQ
 ===
 
-1. **This ticket I care about has been ignored for days/weeks/months! What can
+#. **This ticket I care about has been ignored for days/weeks/months! What can
    I do to get it committed?**
 
    First off, it's not personal. Django is entirely developed by volunteers
@@ -148,7 +148,7 @@ FAQ
    mailing list asking for review on the ticket, or to bring it up in the
    `#django-dev` IRC channel.
 
-2. **I'm sure my ticket is absolutely 100% perfect, can I mark it as RFC
+#. **I'm sure my ticket is absolutely 100% perfect, can I mark it as RFC
    myself?**
 
    Short answer: No. It's always better to get another set of eyes on a

@@ -137,8 +137,8 @@ your ``Library`` instance, to make it available to Django's template language::
 
 The ``Library.filter()`` method takes two arguments:
 
-1. The name of the filter -- a string.
-2. The compilation function -- a Python function (not the name of the
+#. The name of the filter -- a string.
+#. The compilation function -- a Python function (not the name of the
    function as a string).
 
 You can use ``register.filter()`` as a decorator instead::
@@ -211,7 +211,7 @@ passed around inside the template code:
 
 Template filter code falls into one of two situations:
 
-1. Your filter does not introduce any HTML-unsafe characters (``<``, ``>``,
+#. Your filter does not introduce any HTML-unsafe characters (``<``, ``>``,
    ``'``, ``"`` or ``&``) into the result that were not already present. In
    this case, you can let Django take care of all the auto-escaping
    handling for you. All you need to do is set the ``is_safe`` flag to ``True``
@@ -265,7 +265,7 @@ Template filter code falls into one of two situations:
    consequences (such as converting a boolean False to the string
    'False').
 
-2. Alternatively, your filter code can manually take care of any necessary
+#. Alternatively, your filter code can manually take care of any necessary
    escaping. This is necessary when you're introducing new HTML markup into
    the result. You want to mark the output as safe from further
    escaping so that your HTML markup isn't escaped further, so you'll need
@@ -899,9 +899,9 @@ above. Example::
 
 The ``tag()`` method takes two arguments:
 
-1. The name of the template tag -- a string. If this is left out, the
+#. The name of the template tag -- a string. If this is left out, the
    name of the compilation function will be used.
-2. The compilation function -- a Python function (not the name of the
+#. The compilation function -- a Python function (not the name of the
    function as a string).
 
 As with filter registration, it is also possible to use this as a decorator::
@@ -936,10 +936,10 @@ tag format that date-time:
 
 Initially, ``token.split_contents()`` will return three values:
 
-1. The tag name ``format_time``.
-2. The string ``'blog_entry.date_updated'`` (without the surrounding
+#. The tag name ``format_time``.
+#. The string ``'blog_entry.date_updated'`` (without the surrounding
    quotes).
-3. The formatting string ``'"%Y-%m-%d %I:%M %p"'``. The return value from
+#. The formatting string ``'"%Y-%m-%d %I:%M %p"'``. The return value from
    ``split_contents()`` will include the leading and trailing quotes for
    string literals like this.
 

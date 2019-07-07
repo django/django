@@ -49,12 +49,12 @@ tighter validation in response to reported problems (primarily with third-party
 applications, but to a certain extent also within Django itself). This comes in
 two parts:
 
-1. A new utility function, ``django.utils.http.is_safe_url``, is added; this
-function takes a URL and a hostname, and checks that the URL is either
-relative, or if absolute matches the supplied hostname. This function is
-intended for use whenever user-supplied redirect targets are accepted, to
-ensure that such redirects cannot lead to arbitrary third-party sites.
+#. A new utility function, ``django.utils.http.is_safe_url``, is added; this
+   function takes a URL and a hostname, and checks that the URL is either
+   relative, or if absolute matches the supplied hostname. This function is
+   intended for use whenever user-supplied redirect targets are accepted, to
+   ensure that such redirects cannot lead to arbitrary third-party sites.
 
-2. All of Django's own built-in views -- primarily in the authentication system
--- which allow user-supplied redirect targets now use ``is_safe_url`` to
-validate the supplied URL.
+#. All of Django's own built-in views -- primarily in the authentication system
+   -- which allow user-supplied redirect targets now use ``is_safe_url`` to
+   validate the supplied URL.

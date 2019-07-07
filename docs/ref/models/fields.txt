@@ -1931,11 +1931,11 @@ Field API reference
 
         Returns a 4-tuple with enough information to recreate the field:
 
-        1. The name of the field on the model.
-        2. The import path of the field (e.g. ``"django.db.models.IntegerField"``).
+        #. The name of the field on the model.
+        #. The import path of the field (e.g. ``"django.db.models.IntegerField"``).
            This should be the most portable version, so less specific may be better.
-        3. A list of positional arguments.
-        4. A dict of keyword arguments.
+        #. A list of positional arguments.
+        #. A dict of keyword arguments.
 
         This method must be added to fields prior to 1.7 to migrate its data
         using :doc:`/topics/migrations`.

@@ -216,8 +216,8 @@ Validation on a ``ModelForm``
 
 There are two main steps involved in validating a ``ModelForm``:
 
-1. :doc:`Validating the form </ref/forms/validation>`
-2. :ref:`Validating the model instance <validating-objects>`
+#. :doc:`Validating the form </ref/forms/validation>`
+#. :ref:`Validating the model instance <validating-objects>`
 
 Just like normal form validation, model form validation is triggered implicitly
 when calling :meth:`~django.forms.Form.is_valid()` or accessing the
@@ -426,7 +426,7 @@ and has led to serious exploits on major websites (e.g. `GitHub
 There are, however, two shortcuts available for cases where you can guarantee
 these security concerns do not apply to you:
 
-1. Set the ``fields`` attribute to the special value ``'__all__'`` to indicate
+#. Set the ``fields`` attribute to the special value ``'__all__'`` to indicate
    that all fields in the model should be used. For example::
 
        from django.forms import ModelForm
@@ -436,7 +436,7 @@ these security concerns do not apply to you:
                model = Author
                fields = '__all__'
 
-2. Set the ``exclude`` attribute of the ``ModelForm``’s inner ``Meta`` class to
+#. Set the ``exclude`` attribute of the ``ModelForm``’s inner ``Meta`` class to
    a list of fields to be excluded from the form.
 
    For example::

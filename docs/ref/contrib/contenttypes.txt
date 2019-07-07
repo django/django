@@ -142,14 +142,14 @@ Together,
 and :meth:`~django.contrib.contenttypes.models.ContentType.model_class` enable
 two extremely important use cases:
 
-1. Using these methods, you can write high-level generic code that
+#. Using these methods, you can write high-level generic code that
    performs queries on any installed model -- instead of importing and
    using a single specific model class, you can pass an ``app_label`` and
    ``model`` into a
    :class:`~django.contrib.contenttypes.models.ContentType` lookup at
    runtime, and then work with the model class or retrieve objects from it.
 
-2. You can relate another model to
+#. You can relate another model to
    :class:`~django.contrib.contenttypes.models.ContentType` as a way of
    tying instances of it to particular model classes, and use these methods
    to get access to those model classes.
@@ -268,16 +268,16 @@ model:
     There are three parts to setting up a
     :class:`~django.contrib.contenttypes.fields.GenericForeignKey`:
 
-    1. Give your model a :class:`~django.db.models.ForeignKey`
+    #. Give your model a :class:`~django.db.models.ForeignKey`
        to :class:`~django.contrib.contenttypes.models.ContentType`. The usual
        name for this field is "content_type".
 
-    2. Give your model a field that can store primary key values from the
+    #. Give your model a field that can store primary key values from the
        models you'll be relating to. For most models, this means a
        :class:`~django.db.models.PositiveIntegerField`. The usual name
        for this field is "object_id".
 
-    3. Give your model a
+    #. Give your model a
        :class:`~django.contrib.contenttypes.fields.GenericForeignKey`, and
        pass it the names of the two fields described above. If these fields
        are named "content_type" and "object_id", you can omit this -- those

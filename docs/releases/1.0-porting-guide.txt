@@ -564,15 +564,15 @@ following, replacing ``<app>`` in the code below with each app's name:
 
 Notes:
 
-1. It's important that you remember to use XML format in the first step of
+#. It's important that you remember to use XML format in the first step of
    this process. We are exploiting a feature of the XML data dumps that makes
    porting floats to decimals with SQLite possible.
 
-2. In the second step you will be asked to confirm that you are prepared to
+#. In the second step you will be asked to confirm that you are prepared to
    lose the data for the application(s) in question. Say yes; we'll restore
    this data in the third step, of course.
 
-3. ``DecimalField`` is not used in any of the apps shipped with Django prior
+#. ``DecimalField`` is not used in any of the apps shipped with Django prior
    to this change being made, so you do not need to worry about performing
    this procedure for any of the standard Django models.
 
@@ -719,10 +719,10 @@ a sequence of tuples.
 
 To update your code:
 
-1. Use ``django.utils.datastructures.SortedDict`` wherever you were
+#. Use ``django.utils.datastructures.SortedDict`` wherever you were
    using ``django.newforms.forms.SortedDictFromList``.
 
-2. Because ``django.utils.datastructures.SortedDict.copy`` doesn't
+#. Because ``django.utils.datastructures.SortedDict.copy`` doesn't
    return a deepcopy as ``SortedDictFromList.copy()`` did, you will need
    to update your code if you were relying on a deepcopy. Do this by using
    ``copy.deepcopy`` directly.

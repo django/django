@@ -661,13 +661,14 @@ attempting to match some types of strings.  These are triggered when using the
 :lookup:`iexact` or :lookup:`contains` filters in Querysets. The behavior
 splits into two cases:
 
-1. For substring matching, all matches are done case-insensitively. That is a
-filter such as ``filter(name__contains="aa")`` will match a name of ``"Aabb"``.
+#. For substring matching, all matches are done case-insensitively. That is a
+   filter such as ``filter(name__contains="aa")`` will match a name of
+   ``"Aabb"``.
 
-2. For strings containing characters outside the ASCII range, all exact string
-matches are performed case-sensitively, even when the case-insensitive options
-are passed into the query. So the :lookup:`iexact` filter will behave exactly
-the same as the :lookup:`exact` filter in these cases.
+#. For strings containing characters outside the ASCII range, all exact string
+   matches are performed case-sensitively, even when the case-insensitive
+   options are passed into the query. So the :lookup:`iexact` filter will
+   behave exactly the same as the :lookup:`exact` filter in these cases.
 
 Some possible workarounds for this are `documented at sqlite.org`_, but they
 aren't utilized by the default SQLite backend in Django, as incorporating them

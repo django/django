@@ -169,7 +169,7 @@ reason to be placed on the notification list.
 In broad terms, recipients of security notifications fall into three
 groups:
 
-1. Operating-system vendors and other distributors of Django who
+#. Operating-system vendors and other distributors of Django who
    provide a suitably-generic (i.e., *not* an individual's personal
    email address) contact address for reporting issues with their
    Django package, or for general security reporting. In either case,
@@ -179,11 +179,11 @@ groups:
    although private security trackers or security-response groups are
    strongly preferred.
 
-2. On a case-by-case basis, individual package maintainers who have
+#. On a case-by-case basis, individual package maintainers who have
    demonstrated a commitment to responding to and responsibly acting
    on these notifications.
 
-3. On a case-by-case basis, other entities who, in the judgment of the
+#. On a case-by-case basis, other entities who, in the judgment of the
    Django development team, need to be made aware of a pending
    security issue. Typically, membership in this group will consist of
    some of the largest and/or most likely to be severely impacted

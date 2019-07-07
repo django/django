@@ -625,7 +625,7 @@ Check if a value has changed from the last iteration of a loop.
 The ``{% ifchanged %}`` block tag is used within a loop. It has two possible
 uses.
 
-1. Checks its own rendered contents against its previous state and only
+#. Checks its own rendered contents against its previous state and only
    displays the content if it has changed. For example, this displays a list of
    days, only displaying the month if it changes::
 
@@ -636,7 +636,7 @@ uses.
             <a href="{{ date|date:"M/d"|lower }}/">{{ date|date:"j" }}</a>
         {% endfor %}
 
-2. If given one or more variables, check whether any variable has changed.
+#. If given one or more variables, check whether any variable has changed.
    For example, the following shows the date every time it changes, while
    showing the hour if either the hour or the date has changed::
 

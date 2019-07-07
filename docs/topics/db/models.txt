@@ -873,14 +873,14 @@ child models.
 
 There are three styles of inheritance that are possible in Django.
 
-1. Often, you will just want to use the parent class to hold information that
+#. Often, you will just want to use the parent class to hold information that
    you don't want to have to type out for each child model. This class isn't
    going to ever be used in isolation, so :ref:`abstract-base-classes` are
    what you're after.
-2. If you're subclassing an existing model (perhaps something from another
+#. If you're subclassing an existing model (perhaps something from another
    application entirely) and want each model to have its own database table,
    :ref:`multi-table-inheritance` is the way to go.
-3. Finally, if you only want to modify the Python-level behavior of a model,
+#. Finally, if you only want to modify the Python-level behavior of a model,
    without changing the models fields in any way, you can use
    :ref:`proxy-models`.
 

@@ -30,7 +30,7 @@ Installation
 
 To install the flatpages app, follow these steps:
 
-1. Install the :mod:`sites framework <django.contrib.sites>` by adding
+#. Install the :mod:`sites framework <django.contrib.sites>` by adding
    ``'django.contrib.sites'`` to your :setting:`INSTALLED_APPS` setting,
    if it's not already in there.
 
@@ -39,7 +39,7 @@ To install the flatpages app, follow these steps:
    ``SITE_ID = 1``, but if you're using the sites framework to manage
    multiple sites, it could be the ID of a different site.
 
-2. Add ``'django.contrib.flatpages'`` to your :setting:`INSTALLED_APPS`
+#. Add ``'django.contrib.flatpages'`` to your :setting:`INSTALLED_APPS`
    setting.
 
 Then either:

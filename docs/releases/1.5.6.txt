@@ -31,11 +31,11 @@ side effects will occur.
 Thus it is possible for an attacker to cause unexpected code
 execution, given the following conditions:
 
-1. One or more views are present which construct a URL based on user
+#. One or more views are present which construct a URL based on user
    input (commonly, a "next" parameter in a querystring indicating
    where to redirect upon successful completion of an action).
 
-2. One or more modules are known to an attacker to exist on the
+#. One or more modules are known to an attacker to exist on the
    server's Python import path, which perform code execution with side
    effects on importing.
 
@@ -67,11 +67,11 @@ the cookie.
 To remedy this, the caching framework will no longer cache such
 responses. The heuristic for this will be:
 
-1. If the incoming request did not submit any cookies, and
+#. If the incoming request did not submit any cookies, and
 
-2. If the response did send one or more cookies, and
+#. If the response did send one or more cookies, and
 
-3. If the ``Vary: Cookie`` header is set on the response, then the
+#. If the ``Vary: Cookie`` header is set on the response, then the
    response will not be cached.
 
 MySQL typecasting

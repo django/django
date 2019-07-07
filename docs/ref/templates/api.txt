@@ -17,23 +17,23 @@ Overview
 
 Using the template system in Python is a three-step process:
 
-1. You configure an :class:`Engine`.
-2. You compile template code into a :class:`Template`.
-3. You render the template with a :class:`Context`.
+#. You configure an :class:`Engine`.
+#. You compile template code into a :class:`Template`.
+#. You render the template with a :class:`Context`.
 
 Django projects generally rely on the :ref:`high level, backend agnostic APIs
 <template-engines>` for each of these steps instead of the template system's
 lower level APIs:
 
-1. For each :class:`~django.template.backends.django.DjangoTemplates` backend
+#. For each :class:`~django.template.backends.django.DjangoTemplates` backend
    in the :setting:`TEMPLATES` setting, Django instantiates an
    :class:`Engine`. :class:`~django.template.backends.django.DjangoTemplates`
    wraps :class:`Engine` and adapts it to the common template backend API.
-2. The :mod:`django.template.loader` module provides functions such as
+#. The :mod:`django.template.loader` module provides functions such as
    :func:`~django.template.loader.get_template` for loading templates. They
    return a ``django.template.backends.django.Template`` which wraps the
    actual :class:`django.template.Template`.
-3. The ``Template`` obtained in the previous step has a
+#. The ``Template`` obtained in the previous step has a
    :meth:`~django.template.backends.base.Template.render` method which
    marshals a context and possibly a request into a :class:`Context` and
    delegates the rendering to the underlying :class:`Template`.

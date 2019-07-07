@@ -69,11 +69,11 @@ to raise an error message about modifying nonexistent constraints.
 
 If you need to work around this, there are two methods available:
 
-1. Redirect the output of ``manage.py`` to a file, and edit the
+#. Redirect the output of ``manage.py`` to a file, and edit the
    generated SQL to use the correct constraint names before
    executing it.
 
-2. Examine the output of ``manage.py sqlall`` to see the new-style
+#. Examine the output of ``manage.py sqlall`` to see the new-style
    constraint names, and use that as a guide to rename existing
    constraints in your database.
 

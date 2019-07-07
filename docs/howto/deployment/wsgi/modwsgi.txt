@@ -208,15 +208,15 @@ static files in :setting:`STATIC_ROOT`, and then configuring your Web server to
 serve :setting:`STATIC_ROOT` at :setting:`STATIC_URL`), but here are three
 other approaches:
 
-1. Create a symbolic link to the admin static files from within your
+#. Create a symbolic link to the admin static files from within your
    document root (this may require ``+FollowSymLinks`` in your Apache
    configuration).
 
-2. Use an ``Alias`` directive, as demonstrated above, to alias the appropriate
+#. Use an ``Alias`` directive, as demonstrated above, to alias the appropriate
    URL (probably :setting:`STATIC_URL` + ``admin/``) to the actual location of
    the admin files.
 
-3. Copy the admin static files so that they live within your Apache
+#. Copy the admin static files so that they live within your Apache
    document root.
 
 Authenticating against Django's user database from Apache
