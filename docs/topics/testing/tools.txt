@@ -1336,7 +1336,7 @@ decorator::
             response = self.client.get('/')
             # ...
 
-The decorator can also be applied to test case classes::
+The decorator can also be applied to :class:`~django.test.TestCase` classes::
 
     from django.test import TestCase, modify_settings
 
