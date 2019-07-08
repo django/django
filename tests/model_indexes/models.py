@@ -10,8 +10,8 @@ class Book(models.Model):
 
     class Meta:
         indexes = [
-            models.indexes.Index(fields=['title']),
-            models.indexes.Index(fields=['isbn', 'id']),
+            models.Index(fields=['title']),
+            models.Index(fields=['isbn', 'id']),
         ]
 
 
@@ -20,7 +20,7 @@ class AbstractModel(models.Model):
 
     class Meta:
         abstract = True
-        indexes = [models.indexes.Index(fields=['name'])]
+        indexes = [models.Index(fields=['name'])]
 
 
 class ChildModel1(AbstractModel):

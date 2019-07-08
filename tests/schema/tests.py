@@ -8,7 +8,7 @@ from django.core.management.color import no_style
 from django.db import (
     DatabaseError, IntegrityError, OperationalError, connection,
 )
-from django.db.models import Model, Q
+from django.db.models import Index, Model, Q
 from django.db.models.constraints import CheckConstraint, UniqueConstraint
 from django.db.models.deletion import CASCADE, PROTECT
 from django.db.models.fields import (
@@ -19,7 +19,6 @@ from django.db.models.fields import (
 from django.db.models.fields.related import (
     ForeignKey, ForeignObject, ManyToManyField, OneToOneField,
 )
-from django.db.models.indexes import Index
 from django.db.transaction import TransactionManagementError, atomic
 from django.db.utils import DataError
 from django.test import (
