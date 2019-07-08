@@ -2161,13 +2161,21 @@ class StartApp(AdminScriptTestCase):
         )
 
     def test_app_path(self):
-        app_root = os.path.join(self.test_dir, 'app_parent')
-        test_app = os.path.join(app_root, 'test_app')
+        """
+        Ticket 30618: AppConfig.name should be a full python path when using the optional directory.
+        """
+        args = ['startapp', 'test_app', 'app_parent/test_app']
+        app_parent = os.path.join(self.test_dir, 'app_parent')
+        test_app = os.path.join(app_parent, 'test_app')
 
-        os.mkdir(app_root)
+        os.mkdir(app_parent)
         os.mkdir(test_app)
-
-        self.run_django_admin(['startapp', 'test_app', 'app_parent/test_app'])
+        self.run_django_admin(args)
+        with open(os.path.join(test_app, 'apps.py')) as f:
+            content = f.read()
+            self.assertIn("class TestAppConfig(AppConfig)", content)
+            self.assertIn("name = 'app_parent.test_app'", content)
+        shutil.rmtree(app_parent)
 
 
 class DiffSettings(AdminScriptTestCase):
