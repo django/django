@@ -372,7 +372,10 @@ class BaseExpression:
         identity = [self.__class__]
         for arg, value in arguments:
             if isinstance(value, fields.Field):
-                value = type(value)
+                if value.name and value.model:
+                    value = (value.model._meta.label, value.name)
+                else:
+                    value = type(value)
             else:
                 value = make_hashable(value)
             identity.append((arg, value))
