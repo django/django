@@ -21,7 +21,7 @@ from django.db.models.functions import (
 from django.db.models.sql import constants
 from django.db.models.sql.datastructures import Join
 from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
-from django.test.utils import Approximate
+from django.test.utils import Approximate, isolate_apps
 
 from .models import (
     UUID, UUIDPK, Company, Employee, Experiment, Number, RemoteEmployee,
@@ -898,6 +898,7 @@ class ExpressionsTests(TestCase):
         )
 
 
+@isolate_apps('expressions')
 class SimpleExpressionTests(SimpleTestCase):
 
     def test_equal(self):
@@ -911,6 +912,15 @@ class SimpleExpressionTests(SimpleTestCase):
             Expression(models.CharField())
         )
 
+        class TestModel(models.Model):
+            field = models.IntegerField()
+            other_field = models.IntegerField()
+
+        self.assertNotEqual(
+            Expression(TestModel._meta.get_field('field')),
+            Expression(TestModel._meta.get_field('other_field')),
+        )
+
     def test_hash(self):
         self.assertEqual(hash(Expression()), hash(Expression()))
         self.assertEqual(
@@ -920,6 +930,15 @@ class SimpleExpressionTests(SimpleTestCase):
         self.assertNotEqual(
             hash(Expression(models.IntegerField())),
             hash(Expression(models.CharField())),
+        )
+
+        class TestModel(models.Model):
+            field = models.IntegerField()
+            other_field = models.IntegerField()
+
+        self.assertNotEqual(
+            hash(Expression(TestModel._meta.get_field('field'))),
+            hash(Expression(TestModel._meta.get_field('other_field'))),
         )
 
 

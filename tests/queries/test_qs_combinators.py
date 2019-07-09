@@ -9,7 +9,7 @@ from .models import Number, ReservedName
 class QuerySetSetOperationTests(TestCase):
     @classmethod
     def setUpTestData(cls):
-        Number.objects.bulk_create(Number(num=i) for i in range(10))
+        Number.objects.bulk_create(Number(num=i, other_num=10 - i) for i in range(10))
 
     def number_transform(self, value):
         return value.num
@@ -251,3 +251,10 @@ class QuerySetSetOperationTests(TestCase):
         qs1 = Number.objects.all()
         qs2 = Number.objects.intersection(Number.objects.filter(num__gt=1))
         self.assertEqual(qs1.difference(qs2).count(), 2)
+
+    def test_order_by_same_type(self):
+        qs = Number.objects.all()
+        union = qs.union(qs)
+        numbers = list(range(10))
+        self.assertNumbersEqual(union.order_by('num'), numbers)
+        self.assertNumbersEqual(union.order_by('other_num'), reversed(numbers))
