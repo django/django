@@ -211,7 +211,9 @@ class Migration(migrations.Migration):
                 ('bigints', BigIntegerRangeField(null=True, blank=True)),
                 ('decimals', DecimalRangeField(null=True, blank=True)),
                 ('timestamps', DateTimeRangeField(null=True, blank=True)),
+                ('timestamps_inner', DateTimeRangeField(null=True, blank=True)),
                 ('dates', DateRangeField(null=True, blank=True)),
+                ('dates_inner', DateRangeField(null=True, blank=True)),
             ],
             options={
                 'required_db_vendor': 'postgresql'

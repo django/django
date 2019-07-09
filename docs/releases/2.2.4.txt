@@ -12,3 +12,9 @@ Bugfixes
 * Fixed a regression in Django 2.2 when ordering a ``QuerySet.union()``,
   ``intersection()``, or ``difference()`` by a field type present more than
   once results in the wrong ordering being used (:ticket:`30628`).
+
+* Fixed a migration crash on PostgreSQL when adding a check constraint
+  with a ``contains`` lookup on
+  :class:`~django.contrib.postgres.fields.DateRangeField` or
+  :class:`~django.contrib.postgres.fields.DateTimeRangeField`, if the right
+  hand side of an expression is the same type (:ticket:`30621`).
