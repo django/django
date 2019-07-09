@@ -1259,7 +1259,7 @@ files is:
 - ``app_directory`` -- the full path of the newly created app
 - ``camel_case_app_name`` -- the app name in camel case format
 - ``docs_version`` -- the version of the documentation: ``'dev'`` or ``'1.x'``
-- ``django_version`` -- the version of Django, e.g.``'2.0.3'``
+- ``django_version`` -- the version of Django, e.g. ``'2.0.3'``
 
 .. _render_warning:
 
@@ -1327,7 +1327,7 @@ The :class:`template context <django.template.Context>` used is:
 - ``project_directory`` -- the full path of the newly created project
 - ``secret_key`` -- a random key for the :setting:`SECRET_KEY` setting
 - ``docs_version`` -- the version of the documentation: ``'dev'`` or ``'1.x'``
-- ``django_version`` -- the version of Django, e.g.``'2.0.3'``
+- ``django_version`` -- the version of Django, e.g. ``'2.0.3'``
 
 Please also see the :ref:`rendering warning <render_warning>` as mentioned
 for :djadmin:`startapp`.
