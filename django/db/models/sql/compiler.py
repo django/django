@@ -722,6 +722,9 @@ class SQLCompiler:
 
             results = []
             for item in opts.ordering:
+                if isinstance(item, OrderBy):
+                    results.append((item, False))
+                    continue
                 results.extend(self.find_ordering_name(item, opts, alias,
                                                        order, already_seen))
             return results

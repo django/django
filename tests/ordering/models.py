@@ -54,6 +54,10 @@ class OrderedByFArticle(Article):
         ordering = (models.F('author').asc(nulls_first=True), 'id')
 
 
+class ChildArticle(Article):
+    pass
+
+
 class Reference(models.Model):
     article = models.ForeignKey(OrderedByAuthorArticle, models.CASCADE)
 
