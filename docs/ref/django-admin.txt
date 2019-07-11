@@ -1578,6 +1578,11 @@ field, you can use ``DJANGO_SUPERUSER_EMAIL`` environment variable.
     Support for using ``DJANGO_SUPERUSER_PASSWORD`` and
     ``DJANGO_SUPERUSER_<uppercase_field_name>`` environment variables was added.
 
+.. django-admin-option:: --noinput, --no-input
+
+Suppresses all user prompts. If a suppressed prompt cannot be resolved
+automatically, the command will exit with error code 1.
+
 .. django-admin-option:: --username USERNAME
 .. django-admin-option:: --email EMAIL
 
