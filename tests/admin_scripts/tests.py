@@ -2161,9 +2161,6 @@ class StartApp(AdminScriptTestCase):
         )
 
     def test_app_path(self):
-        """
-        Ticket 30618: AppConfig.name should be a full python path when using the optional directory.
-        """
         args = ['startapp', 'test_app', 'app_parent/test_app']
         app_parent = os.path.join(self.test_dir, 'app_parent')
         test_app = os.path.join(app_parent, 'test_app')
