@@ -1537,6 +1537,11 @@ the new superuser account. When run non-interactively, no password
 will be set, and the superuser account will not be able to log in until
 a password has been manually set for it.
 
+.. django-admin-option:: --noinput, --no-input
+
+Suppresses all user prompts. If a suppressed prompt cannot be resolved
+automatically, the command will exit with error code 1.
+
 .. django-admin-option:: --username USERNAME
 .. django-admin-option:: --email EMAIL
 
