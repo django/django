@@ -722,6 +722,8 @@ class SQLCompiler:
 
             results = []
             for item in opts.ordering:
+                if hasattr(item, 'resolve_expression') and not isinstance(item, OrderBy):
+                    item = item.desc() if descending else item.asc()
                 if isinstance(item, OrderBy):
                     results.append((item, False))
                     continue
