@@ -33,7 +33,7 @@ class Article(models.Model):
     class Meta:
         ordering = (
             '-pub_date',
-            'headline',
+            models.F('headline'),
             models.F('author__name').asc(),
             OrderBy(models.F('second_author__name')),
         )
