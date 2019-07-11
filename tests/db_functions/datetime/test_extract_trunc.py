@@ -273,6 +273,13 @@ class DateFunctionTests(TestCase):
         with self.assertRaisesMessage(ValueError, msg):
             list(DTModel.objects.annotate(extracted=Extract('duration', 'second')))
 
+    def test_extract_duration_unsupported_lookups(self):
+        msg = "Cannot extract component '%s' from DurationField 'duration'."
+        for lookup in ('year', 'iso_year', 'month', 'week', 'week_day', 'quarter'):
+            with self.subTest(lookup):
+                with self.assertRaisesMessage(ValueError, msg % lookup):
+                    DTModel.objects.annotate(extracted=Extract('duration', lookup))
+
     def test_extract_year_func(self):
         start_datetime = datetime(2015, 6, 15, 14, 30, 50, 321)
         end_datetime = datetime(2016, 6, 15, 14, 10, 50, 123)
