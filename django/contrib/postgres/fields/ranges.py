@@ -184,7 +184,7 @@ DateRangeField.register_lookup(DateTimeRangeContains)
 DateTimeRangeField.register_lookup(DateTimeRangeContains)
 
 
-class RangeContainedBy(models.Lookup):
+class RangeContainedBy(lookups.PostgresSimpleLookup):
     lookup_name = 'contained_by'
     type_mapping = {
         'integer': 'int4range',
@@ -193,17 +193,18 @@ class RangeContainedBy(models.Lookup):
         'date': 'daterange',
         'timestamp with time zone': 'tstzrange',
     }
+    operator = '<@'
 
-    def as_sql(self, qn, connection):
-        field = self.lhs.output_field
-        if isinstance(field, models.FloatField):
-            sql = '%s::numeric <@ %s::{}'.format(self.type_mapping[field.db_type(connection)])
-        else:
-            sql = '%s <@ %s::{}'.format(self.type_mapping[field.db_type(connection)])
-        lhs, lhs_params = self.process_lhs(qn, connection)
-        rhs, rhs_params = self.process_rhs(qn, connection)
-        params = lhs_params + rhs_params
-        return sql % (lhs, rhs), params
+    def process_rhs(self, compiler, connection):
+        rhs, rhs_params = super().process_rhs(compiler, connection)
+        cast_type = self.type_mapping[self.lhs.output_field.db_type(connection)]
+        return '%s::%s' % (rhs, cast_type), rhs_params
+
+    def process_lhs(self, compiler, connection):
+        lhs, lhs_params = super().process_lhs(compiler, connection)
+        if isinstance(self.lhs.output_field, models.FloatField):
+            lhs = '%s::numeric' % lhs
+        return lhs, lhs_params
 
     def get_prep_lookup(self):
         return RangeField().get_prep_value(self.rhs)
