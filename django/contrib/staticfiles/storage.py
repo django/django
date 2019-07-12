@@ -4,7 +4,6 @@ import os
 import posixpath
 import re
 import warnings
-from collections import OrderedDict
 from urllib.parse import unquote, urldefrag, urlsplit, urlunsplit
 
 from django.conf import settings
@@ -56,10 +55,11 @@ class HashedFilesMixin:
             (r"""(@import\s*["']\s*(.*?)["'])""", """@import url("%s")"""),
         )),
     )
+    keep_intermediate_files = True
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self._patterns = OrderedDict()
+        self._patterns = {}
         self.hashed_files = {}
         for extension, patterns in self.patterns:
             for pattern in patterns:
@@ -93,7 +93,7 @@ class HashedFilesMixin:
                 raise ValueError("The file '%s' could not be found with %r." % (filename, self))
             try:
                 content = self.open(filename)
-            except IOError:
+            except OSError:
                 # Handle directory paths and fragments
                 return name
         try:
@@ -208,7 +208,7 @@ class HashedFilesMixin:
 
     def post_process(self, paths, dry_run=False, **options):
         """
-        Post process the given OrderedDict of files (called from collectstatic).
+        Post process the given dictionary of files (called from collectstatic).
 
         Processing is actually two separate operations:
 
@@ -225,7 +225,7 @@ class HashedFilesMixin:
             return
 
         # where to store the new paths
-        hashed_files = OrderedDict()
+        hashed_files = {}
 
         # build a list of adjustable files
         adjustable_paths = [
@@ -298,8 +298,9 @@ class HashedFilesMixin:
                         self.delete(hashed_name)
                     # then save the processed result
                     content_file = ContentFile(content.encode())
-                    # Save intermediate file for reference
-                    saved_name = self._save(hashed_name, content_file)
+                    if self.keep_intermediate_files:
+                        # Save intermediate file for reference
+                        self._save(hashed_name, content_file)
                     hashed_name = self.hashed_name(name, content_file)
 
                     if self.exists(hashed_name):
@@ -371,6 +372,7 @@ class ManifestFilesMixin(HashedFilesMixin):
     manifest_version = '1.0'  # the manifest format standard
     manifest_name = 'staticfiles.json'
     manifest_strict = True
+    keep_intermediate_files = False
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -380,26 +382,26 @@ class ManifestFilesMixin(HashedFilesMixin):
         try:
             with self.open(self.manifest_name) as manifest:
                 return manifest.read().decode()
-        except IOError:
+        except OSError:
             return None
 
     def load_manifest(self):
         content = self.read_manifest()
         if content is None:
-            return OrderedDict()
+            return {}
         try:
-            stored = json.loads(content, object_pairs_hook=OrderedDict)
+            stored = json.loads(content)
         except json.JSONDecodeError:
             pass
         else:
             version = stored.get('version')
             if version == '1.0':
-                return stored.get('paths', OrderedDict())
+                return stored.get('paths', {})
         raise ValueError("Couldn't load manifest '%s' (version %s)" %
                          (self.manifest_name, self.manifest_version))
 
     def post_process(self, *args, **kwargs):
-        self.hashed_files = OrderedDict()
+        self.hashed_files = {}
         yield from super().post_process(*args, **kwargs)
         self.save_manifest()
 

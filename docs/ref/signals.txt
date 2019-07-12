@@ -39,8 +39,8 @@ model system.
 
     Model signals ``sender`` model can be lazily referenced when connecting a
     receiver by specifying its full application label. For example, an
-    ``Answer`` model defined in the ``polls`` application could be referenced
-    as ``'polls.Answer'``. This sort of reference can be quite handy when
+    ``Question`` model defined in the ``polls`` application could be referenced
+    as ``'polls.Question'``. This sort of reference can be quite handy when
     dealing with circular import dependencies and swappable models.
 
 ``pre_init``
@@ -60,26 +60,27 @@ Arguments sent with this signal:
     The model class that just had an instance created.
 
 ``args``
-    A list of positional arguments passed to ``__init__()``:
+    A list of positional arguments passed to ``__init__()``.
 
 ``kwargs``
-    A dictionary of keyword arguments passed to ``__init__()``:
+    A dictionary of keyword arguments passed to ``__init__()``.
 
-For example, the :doc:`tutorial </intro/tutorial01>` has this line::
+For example, the :doc:`tutorial </intro/tutorial02>` has this line::
 
-    p = Poll(question="What's up?", pub_date=datetime.now())
+    q = Question(question_text="What's new?", pub_date=timezone.now())
 
 The arguments sent to a :data:`pre_init` handler would be:
 
 ==========  ===============================================================
 Argument    Value
 ==========  ===============================================================
-``sender``  ``Poll`` (the class itself)
+``sender``  ``Question`` (the class itself)
 
 ``args``    ``[]`` (an empty list because there were no positional
-            arguments passed to ``__init__()``.)
+            arguments passed to ``__init__()``)
 
-``kwargs``  ``{'question': "What's up?", 'pub_date': datetime.now()}``
+``kwargs``  ``{'question_text': "What's new?",``
+            ``'pub_date': datetime.datetime(2012, 2, 26, 13, 0, 0, 775217, tzinfo=<UTC>)}``
 ==========  ===============================================================
 
 ``post_init``

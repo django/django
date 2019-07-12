@@ -1,10 +1,11 @@
 import datetime
+import operator
 import uuid
 from decimal import Decimal
 
 from django.core import checks, exceptions, serializers
 from django.core.serializers.json import DjangoJSONEncoder
-from django.db.models import Q
+from django.db.models import Count, Q
 from django.forms import CharField, Form, widgets
 from django.test.utils import isolate_apps
 from django.utils.html import escape
@@ -15,8 +16,18 @@ from .models import JSONModel, PostgreSQLModel
 try:
     from django.contrib.postgres import forms
     from django.contrib.postgres.fields import JSONField
+    from django.contrib.postgres.fields.jsonb import KeyTextTransform, KeyTransform
 except ImportError:
     pass
+
+
+class TestModelMetaOrdering(PostgreSQLSimpleTestCase):
+    def test_ordering_by_json_field_value(self):
+        class TestJSONModel(JSONModel):
+            class Meta:
+                ordering = ['field__value']
+
+        self.assertEqual(TestJSONModel.check(), [])
 
 
 class TestSaveLoad(PostgreSQLTestCase):
@@ -95,19 +106,19 @@ class TestSaveLoad(PostgreSQLTestCase):
 class TestQuerying(PostgreSQLTestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.objs = [
-            JSONModel.objects.create(field=None),
-            JSONModel.objects.create(field=True),
-            JSONModel.objects.create(field=False),
-            JSONModel.objects.create(field='yes'),
-            JSONModel.objects.create(field=7),
-            JSONModel.objects.create(field=[]),
-            JSONModel.objects.create(field={}),
-            JSONModel.objects.create(field={
+        cls.objs = JSONModel.objects.bulk_create([
+            JSONModel(field=None),
+            JSONModel(field=True),
+            JSONModel(field=False),
+            JSONModel(field='yes'),
+            JSONModel(field=7),
+            JSONModel(field=[]),
+            JSONModel(field={}),
+            JSONModel(field={
                 'a': 'b',
                 'c': 1,
             }),
-            JSONModel.objects.create(field={
+            JSONModel(field={
                 'a': 'b',
                 'c': 1,
                 'd': ['e', {'f': 'g'}],
@@ -116,13 +127,13 @@ class TestQuerying(PostgreSQLTestCase):
                 'j': None,
                 'k': {'l': 'm'},
             }),
-            JSONModel.objects.create(field=[1, [2]]),
-            JSONModel.objects.create(field={
+            JSONModel(field=[1, [2]]),
+            JSONModel(field={
                 'k': True,
                 'l': False,
             }),
-            JSONModel.objects.create(field={'foo': 'bar'}),
-        ]
+            JSONModel(field={'foo': 'bar'}),
+        ])
 
     def test_exact(self):
         self.assertSequenceEqual(
@@ -152,6 +163,27 @@ class TestQuerying(PostgreSQLTestCase):
         ]
         query = JSONModel.objects.filter(field__name__isnull=False).order_by('field__ord')
         self.assertSequenceEqual(query, [objs[4], objs[2], objs[3], objs[1], objs[0]])
+
+    def test_ordering_grouping_by_key_transform(self):
+        base_qs = JSONModel.objects.filter(field__d__0__isnull=False)
+        for qs in (
+            base_qs.order_by('field__d__0'),
+            base_qs.annotate(key=KeyTransform('0', KeyTransform('d', 'field'))).order_by('key'),
+        ):
+            self.assertSequenceEqual(qs, [self.objs[8]])
+        qs = JSONModel.objects.filter(field__isnull=False)
+        self.assertQuerysetEqual(
+            qs.values('field__d__0').annotate(count=Count('field__d__0')).order_by('count'),
+            [1, 10],
+            operator.itemgetter('count'),
+        )
+        self.assertQuerysetEqual(
+            qs.filter(field__isnull=False).annotate(
+                key=KeyTextTransform('f', KeyTransform('1', KeyTransform('d', 'field'))),
+            ).values('key').annotate(count=Count('key')).order_by('count'),
+            [(None, 0), ('g', 1)],
+            operator.itemgetter('key', 'count'),
+        )
 
     def test_deep_values(self):
         query = JSONModel.objects.values_list('field__k__l')
@@ -394,7 +426,7 @@ class TestFormField(PostgreSQLSimpleTestCase):
         field = forms.JSONField()
         with self.assertRaises(exceptions.ValidationError) as cm:
             field.clean('{some badly formed: json}')
-        self.assertEqual(cm.exception.messages[0], "'{some badly formed: json}' value must be valid JSON.")
+        self.assertEqual(cm.exception.messages[0], '“{some badly formed: json}” value must be valid JSON.')
 
     def test_formfield(self):
         model_field = JSONField()

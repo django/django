@@ -135,8 +135,8 @@ database to make sure they work as expected::
     Operations to perform:
       Apply all migrations: books
     Running migrations:
-      Rendering model states… DONE
-      Applying books.0003_auto… OK
+      Rendering model states... DONE
+      Applying books.0003_auto... OK
 
 Once the migration is applied, commit the migration and the models change
 to your version control system as a single commit - that way, when other
@@ -190,6 +190,10 @@ restrict to a single app. Restricting to a single app (either in
 ``makemigrations`` or ``migrate``) is a best-efforts promise, and not
 a guarantee; any other apps that need to be used to get dependencies correct
 will be.
+
+Apps without migrations must not have relations (``ForeignKey``,
+``ManyToManyField``, etc.) to apps with migrations. Sometimes it may work, but
+it's not supported.
 
 .. _migration-files:
 
@@ -683,10 +687,6 @@ Django can serialize the following:
 - Any class reference (must be in module's top-level scope)
 - Anything with a custom ``deconstruct()`` method (:ref:`see below <custom-deconstruct-method>`)
 
-.. versionchanged:: 2.1
-
-    Serialization support for :class:`functools.partialmethod` was added.
-
 .. versionchanged:: 2.2
 
     Serialization support for ``NoneType`` was added.
@@ -696,6 +696,35 @@ Django cannot serialize:
 - Nested classes
 - Arbitrary class instances (e.g. ``MyClass(4.3, 5.7)``)
 - Lambdas
+
+.. _custom-migration-serializers:
+
+Custom serializers
+------------------
+
+.. versionadded:: 2.2
+
+You can serialize other types by writing a custom serializer. For example, if
+Django didn't serialize :class:`~decimal.Decimal` by default, you could do
+this::
+
+    from decimal import Decimal
+
+    from django.db.migrations.serializer import BaseSerializer
+    from django.db.migrations.writer import MigrationWriter
+
+    class DecimalSerializer(BaseSerializer):
+        def serialize(self):
+            return repr(self.value), {'from decimal import Decimal'}
+
+    MigrationWriter.register_serializer(Decimal, DecimalSerializer)
+
+The first argument of ``MigrationWriter.register_serializer()`` is a type or
+iterable of types that should use the serializer.
+
+The ``serialize()`` method of your serializer must return a string of how the
+value should appear in migrations and a set of any imports that are needed in
+the migration.
 
 .. _custom-deconstruct-method:
 

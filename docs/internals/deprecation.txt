@@ -7,6 +7,31 @@ in a backward incompatible way, following their deprecation, as per the
 :ref:`deprecation policy <internal-release-deprecation-policy>`. More details
 about each item can often be found in the release notes of two versions prior.
 
+.. _deprecation-removed-in-4.0:
+
+4.0
+---
+
+See the :ref:`Django 3.0 release notes <deprecated-features-3.0>` for more
+details on these changes.
+
+* ``django.utils.http.urlquote()``, ``urlquote_plus()``, ``urlunquote()``, and
+  ``urlunquote_plus()`` will be removed.
+
+* ``django.utils.encoding.force_text()`` and ``smart_text()`` will be removed.
+
+* ``django.utils.translation.ugettext()``, ``ugettext_lazy()``,
+  ``ugettext_noop()``, ``ungettext()``, and ``ungettext_lazy()`` will be
+  removed.
+
+* ``django.views.i18n.set_language()`` will no longer set the user language in
+  ``request.session`` (key ``django.utils.translation.LANGUAGE_SESSION_KEY``).
+
+* ``alias=None`` will be required in the signature of
+  ``django.db.models.Expression.get_group_by_cols()`` subclasses.
+
+* ``django.utils.text.unescape_entities()`` will be removed.
+
 .. _deprecation-removed-in-3.1:
 
 3.1
@@ -28,6 +53,12 @@ details on these changes.
 
 * ``django.contrib.staticfiles.storage.CachedStaticFilesStorage`` will be
   removed.
+
+* ``RemoteUserBackend.configure_user()`` will require ``request`` as the first
+  positional argument.
+
+* Support for ``SimpleTestCase.allow_database_queries`` and
+  ``TransactionTestCase.multi_db`` will be removed.
 
 .. _deprecation-removed-in-3.0:
 
@@ -757,8 +788,6 @@ details on these changes.
   won't work after the upgrade.
 
 * The ``django.utils.encoding.StrAndUnicode`` mix-in will be removed.
-  Define a ``__str__`` method and apply the
-  :func:`~django.utils.encoding.python_2_unicode_compatible` decorator instead.
 
 .. _deprecation-removed-in-1.6:
 

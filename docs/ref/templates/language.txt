@@ -492,7 +492,7 @@ escaped:
 
 * ``<`` is converted to ``&lt;``
 * ``>`` is converted to ``&gt;``
-* ``'`` (single quote) is converted to ``&#39;``
+* ``'`` (single quote) is converted to ``&#x27;``
 * ``"`` (double quote) is converted to ``&quot;``
 * ``&`` is converted to ``&amp;``
 

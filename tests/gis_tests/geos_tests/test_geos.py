@@ -725,14 +725,6 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
         self.assertFalse(ls_not_closed.closed)
         self.assertTrue(ls_closed.closed)
 
-        if geos_version_tuple() >= (3, 5):
-            self.assertFalse(MultiLineString(ls_closed, ls_not_closed).closed)
-            self.assertTrue(MultiLineString(ls_closed, ls_closed).closed)
-
-        with mock.patch('django.contrib.gis.geos.libgeos.geos_version', lambda: b'3.4.9'):
-            with self.assertRaisesMessage(GEOSException, "MultiLineString.closed requires GEOS >= 3.5.0."):
-                MultiLineString().closed
-
     def test_srid(self):
         "Testing the SRID property and keyword."
         # Testing SRID keyword on Point

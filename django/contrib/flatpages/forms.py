@@ -9,7 +9,7 @@ class FlatpageForm(forms.ModelForm):
         label=_("URL"),
         max_length=100,
         regex=r'^[-\w/\.~]+$',
-        help_text=_("Example: '/about/contact/'. Make sure to have leading and trailing slashes."),
+        help_text=_('Example: “/about/contact/”. Make sure to have leading and trailing slashes.'),
         error_messages={
             "invalid": _(
                 "This value must contain only letters, numbers, dots, "
@@ -26,7 +26,7 @@ class FlatpageForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         if not self._trailing_slash_required():
             self.fields['url'].help_text = _(
-                "Example: '/about/contact'. Make sure to have a leading slash."
+                'Example: “/about/contact”. Make sure to have a leading slash.'
             )
 
     def _trailing_slash_required(self):

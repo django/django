@@ -18,7 +18,8 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: cs\n"
-"Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
+"Plural-Forms: nplurals=4; plural=(n == 1 && n % 1 == 0) ? 0 : (n >= 2 && n "
+"<= 4 && n % 1 == 0) ? 1: (n % 1 != 0 ) ? 2 : 3;\n"
 
 msgid "Personal info"
 msgstr "Osobní údaje"
@@ -233,6 +234,7 @@ msgid_plural ""
 msgstr[0] "Heslo je příliš krátké. Musí mít délku aspoň %(min_length)d znak."
 msgstr[1] "Heslo je příliš krátké. Musí mít délku aspoň %(min_length)d znaky."
 msgstr[2] "Heslo je příliš krátké. Musí mít délku aspoň %(min_length)d znaků."
+msgstr[3] "Heslo je příliš krátké. Musí mít délku aspoň %(min_length)d znaků."
 
 #, python-format
 msgid "Your password must contain at least %(min_length)d character."
@@ -240,6 +242,7 @@ msgid_plural "Your password must contain at least %(min_length)d characters."
 msgstr[0] "Heslo musí mít délku aspoň %(min_length)d znak."
 msgstr[1] "Heslo musí mít délku aspoň %(min_length)d znaky."
 msgstr[2] "Heslo musí mít délku aspoň %(min_length)d znaků."
+msgstr[3] "Heslo musí mít délku aspoň %(min_length)d znaků."
 
 #, python-format
 msgid "The password is too similar to the %(verbose_name)s."

@@ -5,8 +5,9 @@ PostgreSQL specific aggregation functions
 .. module:: django.contrib.postgres.aggregates
    :synopsis: PostgreSQL specific aggregation functions
 
-These functions are described in more detail in the `PostgreSQL docs
-<https://www.postgresql.org/docs/current/static/functions-aggregate.html>`_.
+These functions are available from the ``django.contrib.postgres.aggregates``
+module. They are described in more detail in the `PostgreSQL docs
+<https://www.postgresql.org/docs/current/functions-aggregate.html>`_.
 
 .. note::
 
@@ -89,7 +90,7 @@ General-purpose aggregation functions
 
 .. class:: JSONBAgg(expressions, filter=None, **extra)
 
-    Returns the input values as a ``JSON`` array. Requires PostgreSQL ≥ 9.5.
+    Returns the input values as a ``JSON`` array.
 
 ``StringAgg``
 -------------

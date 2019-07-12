@@ -265,6 +265,11 @@ transform do not change. For example::
     :ref:`setup the citext extension <create-postgresql-extensions>` in
     PostgreSQL before the first ``CreateModel`` migration operation.
 
+    If you're using an :class:`~django.contrib.postgres.fields.ArrayField`
+    of ``CIText`` fields, you must add ``'django.contrib.postgres'`` in your
+    :setting:`INSTALLED_APPS`, otherwise field values will appear as strings
+    like ``'{thoughts,django}'``.
+
     Several fields that use the mixin are provided:
 
 .. class:: CICharField(**options)
@@ -278,8 +283,8 @@ transform do not change. For example::
     ``max_length`` won't be enforced in the database since ``citext`` behaves
     similar to PostgreSQL's ``text`` type.
 
-    .. _citext: https://www.postgresql.org/docs/current/static/citext.html
-    .. _the performance considerations: https://www.postgresql.org/docs/current/static/citext.html#AEN178177
+    .. _citext: https://www.postgresql.org/docs/current/citext.html
+    .. _the performance considerations: https://www.postgresql.org/docs/current/citext.html#AEN178177
 
 ``HStoreField``
 ===============
@@ -576,12 +581,6 @@ To query for missing keys, use the ``isnull`` lookup::
     >>> Dog.objects.create(name='Shep', data={'breed': 'collie'})
     >>> Dog.objects.filter(data__owner__isnull=True)
     <QuerySet [<Dog: Shep>]>
-
-.. versionchanged:: 2.1
-
-    In older versions, using ``None`` as a  lookup value matches objects that
-    don't have the key rather than objects that have the key with a ``None``
-    value.
 
 .. warning::
 

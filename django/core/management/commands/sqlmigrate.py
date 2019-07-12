@@ -55,11 +55,14 @@ class Command(BaseCommand):
                 migration_name, app_label))
         targets = [(app_label, migration.name)]
 
-        # Show begin/end around output only for atomic migrations
-        self.output_transaction = migration.atomic
+        # Show begin/end around output for atomic migrations, if the database
+        # supports transactional DDL.
+        self.output_transaction = migration.atomic and connection.features.can_rollback_ddl
 
         # Make a plan that represents just the requested migrations and show SQL
         # for it
         plan = [(executor.loader.graph.nodes[targets[0]], options['backwards'])]
         sql_statements = executor.collect_sql(plan)
+        if not sql_statements and options['verbosity'] >= 1:
+            self.stderr.write('No operations found.')
         return '\n'.join(sql_statements)

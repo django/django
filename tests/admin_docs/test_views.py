@@ -105,7 +105,7 @@ class AdminDocViewTests(TestDataMixin, AdminDocsTestCase):
 
     def test_template_detail(self):
         response = self.client.get(reverse('django-admindocs-templates', args=['admin_doc/template_detail.html']))
-        self.assertContains(response, '<h1>Template: "admin_doc/template_detail.html"</h1>', html=True)
+        self.assertContains(response, '<h1>Template: <q>admin_doc/template_detail.html</q></h1>', html=True)
 
     def test_missing_docutils(self):
         utils.docutils_is_available = False
@@ -199,7 +199,7 @@ class TestModelDetailView(TestDataMixin, AdminDocsTestCase):
         """
         Methods with keyword arguments should have their arguments displayed.
         """
-        self.assertContains(self.response, "<td>suffix=&#39;ltd&#39;</td>")
+        self.assertContains(self.response, '<td>suffix=&#x27;ltd&#x27;</td>')
 
     def test_methods_with_multiple_arguments_display_arguments(self):
         """

@@ -26,7 +26,7 @@ need to write the parts that make your project unique.
 
 Let's say you were starting a new project that needed a polls app like the one
 we've been working on. How do you make this app reusable? Luckily, you're well
-on the way already. In :doc:`Tutorial 3 </intro/tutorial03>`, we saw how we
+on the way already. In :doc:`Tutorial 1 </intro/tutorial01>`, we saw how we
 could decouple polls from the project-level URLconf using an ``include``.
 In this tutorial, we'll take further steps to make the app easy to use in new
 projects and ready to publish for others to install and use.
@@ -219,8 +219,8 @@ this. For a small app like polls, this process isn't too difficult.
                'License :: OSI Approved :: BSD License',  # example license
                'Operating System :: OS Independent',
                'Programming Language :: Python',
-               'Programming Language :: Python :: 3.5',
                'Programming Language :: Python :: 3.6',
+               'Programming Language :: Python :: 3.7',
                'Topic :: Internet :: WWW/HTTP',
                'Topic :: Internet :: WWW/HTTP :: Dynamic Content',
            ],
@@ -256,7 +256,8 @@ this. For a small app like polls, this process isn't too difficult.
    new package, ``django-polls-0.1.tar.gz``.
 
 For more information on packaging, see Python's `Tutorial on Packaging and
-Distributing Projects <https://packaging.python.org/distributing/>`_.
+Distributing Projects
+<https://packaging.python.org/tutorials/packaging-projects/>`_.
 
 Using your own package
 ======================
@@ -279,14 +280,14 @@ working. We'll now fix this by installing our new ``django-polls`` package.
 #. To install the package, use pip (you already :ref:`installed it
    <installing-reusable-apps-prerequisites>`, right?)::
 
-    pip install --user django-polls/dist/django-polls-0.1.tar.gz
+    python -m pip install --user django-polls/dist/django-polls-0.1.tar.gz
 
 #. With luck, your Django project should now work correctly again. Run the
    server again to confirm this.
 
 #. To uninstall the package, use pip::
 
-    pip uninstall django-polls
+    python -m pip uninstall django-polls
 
 Publishing your app
 ===================
@@ -300,7 +301,7 @@ the world! If this wasn't just an example, you could now:
 
 * Post the package on a public repository, such as `the Python Package Index
   (PyPI)`_. `packaging.python.org <https://packaging.python.org>`_ has `a good
-  tutorial <https://packaging.python.org/distributing/#uploading-your-project-to-pypi>`_
+  tutorial <https://packaging.python.org/tutorials/packaging-projects/#uploading-the-distribution-archives>`_
   for doing this.
 
 Installing Python packages with virtualenv

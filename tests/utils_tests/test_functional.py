@@ -1,8 +1,7 @@
-import unittest
+from unittest import mock
 
 from django.test import SimpleTestCase
 from django.utils.functional import cached_property, lazy
-from django.utils.version import PY36
 
 
 class FunctionalTests(SimpleTestCase):
@@ -104,7 +103,6 @@ class FunctionalTests(SimpleTestCase):
         for attr in attrs:
             self.assertCachedPropertyWorks(attr, Class)
 
-    @unittest.skipUnless(PY36, '__set_name__ is new in Python 3.6')
     def test_cached_property_auto_name(self):
         """
         cached_property caches its value and behaves like a property
@@ -132,7 +130,6 @@ class FunctionalTests(SimpleTestCase):
         obj.other2
         self.assertFalse(hasattr(obj, 'different_name'))
 
-    @unittest.skipUnless(PY36, '__set_name__ is new in Python 3.6')
     def test_cached_property_reuse_different_names(self):
         """Disallow this case because the decorated function wouldn't be cached."""
         with self.assertRaises(RuntimeError) as ctx:
@@ -151,7 +148,6 @@ class FunctionalTests(SimpleTestCase):
             ))
         )
 
-    @unittest.skipUnless(PY36, '__set_name__ is new in Python 3.6')
     def test_cached_property_reuse_same_name(self):
         """
         Reusing a cached_property on different classes under the same name is
@@ -177,7 +173,6 @@ class FunctionalTests(SimpleTestCase):
         self.assertEqual(b.cp, 2)
         self.assertEqual(a.cp, 1)
 
-    @unittest.skipUnless(PY36, '__set_name__ is new in Python 3.6')
     def test_cached_property_set_name_not_called(self):
         cp = cached_property(lambda s: None)
 
@@ -188,29 +183,6 @@ class FunctionalTests(SimpleTestCase):
         msg = 'Cannot use cached_property instance without calling __set_name__() on it.'
         with self.assertRaisesMessage(TypeError, msg):
             Foo().cp
-
-    @unittest.skipIf(PY36, '__set_name__ is new in Python 3.6')
-    def test_cached_property_mangled_error(self):
-        msg = (
-            'cached_property does not work with mangled methods on '
-            'Python < 3.6 without the appropriate `name` argument.'
-        )
-        with self.assertRaisesMessage(ValueError, msg):
-            @cached_property
-            def __value(self):
-                pass
-        with self.assertRaisesMessage(ValueError, msg):
-            def func(self):
-                pass
-            cached_property(func, name='__value')
-
-    @unittest.skipIf(PY36, '__set_name__ is new in Python 3.6')
-    def test_cached_property_name_validation(self):
-        msg = "%s can't be used as the name of a cached_property."
-        with self.assertRaisesMessage(ValueError, msg % "'<lambda>'"):
-            cached_property(lambda x: None)
-        with self.assertRaisesMessage(ValueError, msg % 42):
-            cached_property(str, name=42)
 
     def test_lazy_equality(self):
         """
@@ -237,3 +209,12 @@ class FunctionalTests(SimpleTestCase):
         original_object = b'J\xc3\xbcst a str\xc3\xadng'
         lazy_obj = lazy(lambda: original_object, bytes)
         self.assertEqual(repr(original_object), repr(lazy_obj()))
+
+    def test_lazy_class_preparation_caching(self):
+        # lazy() should prepare the proxy class only once i.e. the first time
+        # it's used.
+        lazified = lazy(lambda: 0, int)
+        __proxy__ = lazified().__class__
+        with mock.patch.object(__proxy__, '__prepare_class__') as mocked:
+            lazified()
+            mocked.assert_not_called()

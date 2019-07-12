@@ -7,7 +7,6 @@ import threading
 from admin_scripts.tests import AdminScriptTestCase
 
 from django.conf import settings
-from django.conf.urls import include, url
 from django.contrib.auth.models import User
 from django.core.exceptions import ImproperlyConfigured, ViewDoesNotExist
 from django.http import (
@@ -18,7 +17,8 @@ from django.test import SimpleTestCase, TestCase, override_settings
 from django.test.utils import override_script_prefix
 from django.urls import (
     NoReverseMatch, Resolver404, ResolverMatch, URLPattern, URLResolver,
-    get_callable, get_resolver, get_urlconf, resolve, reverse, reverse_lazy,
+    get_callable, get_resolver, get_urlconf, include, path, re_path, resolve,
+    reverse, reverse_lazy,
 )
 from django.urls.resolvers import RegexPattern
 
@@ -180,6 +180,8 @@ test_data = (
     ('named_optional', '/optional/1/', [], {'arg1': 1}),
     ('named_optional', '/optional/1/2/', [1, 2], {}),
     ('named_optional', '/optional/1/2/', [], {'arg1': 1, 'arg2': 2}),
+    ('named_optional_terminated', '/optional/1/', [1], {}),
+    ('named_optional_terminated', '/optional/1/', [], {'arg1': 1}),
     ('named_optional_terminated', '/optional/1/2/', [1, 2], {}),
     ('named_optional_terminated', '/optional/1/2/', [], {'arg1': 1, 'arg2': 2}),
     ('hardcoded', '/hardcoded/', [], {}),
@@ -401,7 +403,7 @@ class ResolverTests(SimpleTestCase):
 
     def test_resolver_reverse_conflict(self):
         """
-        url() name arguments don't need to be unique. The last registered
+        URL pattern name arguments don't need to be unique. The last registered
         pattern takes precedence for conflicting names.
         """
         resolver = get_resolver('urlpatterns_reverse.named_urls_conflict')
@@ -411,7 +413,7 @@ class ResolverTests(SimpleTestCase):
             ('name-conflict', (), {}, 'conflict/'),
             # With an arg, the last URL in urlpatterns has precedence.
             ('name-conflict', ('arg',), {}, 'conflict-last/arg/'),
-            # With a kwarg, other url()s can be reversed.
+            # With a kwarg, other URL patterns can be reversed.
             ('name-conflict', (), {'first': 'arg'}, 'conflict-first/arg/'),
             ('name-conflict', (), {'middle': 'arg'}, 'conflict-middle/arg/'),
             ('name-conflict', (), {'last': 'arg'}, 'conflict-last/arg/'),
@@ -430,10 +432,10 @@ class ResolverTests(SimpleTestCase):
         TypeError from occurring later (#10834).
         """
         test_urls = ['', 'a', '\\', '.']
-        for path in test_urls:
-            with self.subTest(path=path):
+        for path_ in test_urls:
+            with self.subTest(path=path_):
                 with self.assertRaises(Resolver404):
-                    resolve(path)
+                    resolve(path_)
 
     def test_404_tried_urls_have_names(self):
         """
@@ -534,13 +536,11 @@ class ReverseLazySettingsTest(AdminScriptTestCase):
     import error.
     """
     def setUp(self):
+        super().setUp()
         self.write_settings(
             'settings.py',
             extra="from django.urls import reverse_lazy\nLOGIN_URL = reverse_lazy('login')",
         )
-
-    def tearDown(self):
-        self.remove_settings('settings.py')
 
     def test_lazy_in_settings(self):
         out, err = self.run_manage(['check'])
@@ -999,8 +999,11 @@ class RequestURLconfTests(SimpleTestCase):
         Test reversing an URL from the *default* URLconf from inside
         a response middleware.
         """
-        message = "Reverse for 'outer' not found."
-        with self.assertRaisesMessage(NoReverseMatch, message):
+        msg = (
+            "Reverse for 'outer' not found. 'outer' is not a valid view "
+            "function or pattern name."
+        )
+        with self.assertRaisesMessage(NoReverseMatch, msg):
             self.client.get('/second_test/')
 
     @override_settings(
@@ -1064,7 +1067,7 @@ class ErrorHandlerResolutionTests(SimpleTestCase):
                 self.assertEqual(self.callable_resolver.resolve_error_handler(code), handler)
 
 
-@override_settings(ROOT_URLCONF='urlpatterns_reverse.urls_without_full_import')
+@override_settings(ROOT_URLCONF='urlpatterns_reverse.urls_without_handlers')
 class DefaultErrorHandlerTests(SimpleTestCase):
 
     def test_default_handler(self):
@@ -1072,7 +1075,8 @@ class DefaultErrorHandlerTests(SimpleTestCase):
         response = self.client.get('/test/')
         self.assertEqual(response.status_code, 404)
 
-        with self.assertRaisesMessage(ValueError, "I don't think I'm getting good"):
+        msg = "I don't think I'm getting good value for this view"
+        with self.assertRaisesMessage(ValueError, msg):
             self.client.get('/bad_view/')
 
 
@@ -1094,15 +1098,15 @@ class NoRootUrlConfTests(SimpleTestCase):
 class ResolverMatchTests(SimpleTestCase):
 
     def test_urlpattern_resolve(self):
-        for path, url_name, app_name, namespace, view_name, func, args, kwargs in resolve_test_data:
-            with self.subTest(path=path):
+        for path_, url_name, app_name, namespace, view_name, func, args, kwargs in resolve_test_data:
+            with self.subTest(path=path_):
                 # Legacy support for extracting "function, args, kwargs".
-                match_func, match_args, match_kwargs = resolve(path)
+                match_func, match_args, match_kwargs = resolve(path_)
                 self.assertEqual(match_func, func)
                 self.assertEqual(match_args, args)
                 self.assertEqual(match_kwargs, kwargs)
                 # ResolverMatch capabilities.
-                match = resolve(path)
+                match = resolve(path_)
                 self.assertEqual(match.__class__, ResolverMatch)
                 self.assertEqual(match.url_name, url_name)
                 self.assertEqual(match.app_name, app_name)
@@ -1140,7 +1144,7 @@ class ErroneousViewTests(SimpleTestCase):
     def test_noncallable_view(self):
         # View is not a callable (explicit import; arbitrary Python object)
         with self.assertRaisesMessage(TypeError, 'view must be a callable'):
-            url(r'uncallable-object/$', views.uncallable)
+            path('uncallable-object/', views.uncallable)
 
     def test_invalid_regex(self):
         # Regex contains an error (refs #6170)
@@ -1194,9 +1198,9 @@ class ViewLoadingTests(SimpleTestCase):
 
 class IncludeTests(SimpleTestCase):
     url_patterns = [
-        url(r'^inner/$', views.empty_view, name='urlobject-view'),
-        url(r'^inner/(?P<arg1>[0-9]+)/(?P<arg2>[0-9]+)/$', views.empty_view, name='urlobject-view'),
-        url(r'^inner/\+\\\$\*/$', views.empty_view, name='urlobject-special-view'),
+        path('inner/', views.empty_view, name='urlobject-view'),
+        re_path(r'^inner/(?P<arg1>[0-9]+)/(?P<arg2>[0-9]+)/$', views.empty_view, name='urlobject-view'),
+        re_path(r'^inner/\+\\\$\*/$', views.empty_view, name='urlobject-special-view'),
     ]
     app_urls = URLObject('inc-app')
 

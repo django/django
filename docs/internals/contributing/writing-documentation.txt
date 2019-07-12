@@ -49,7 +49,7 @@ To build the documentation locally, install Sphinx:
 
 .. console::
 
-     $ pip install Sphinx
+     $ python -m pip install Sphinx
 
 Then from the ``docs`` directory, build the HTML:
 
@@ -207,6 +207,9 @@ documentation:
   (two colons). This has the benefit that if the code contains some invalid
   syntax, it won't be highlighted. Adding ``.. code-block:: python``, for
   example, will force highlighting despite invalid syntax.
+
+* To improve readability, use ``.. admonition:: Descriptive title`` rather than
+  ``.. note::``. Use these boxes sparingly.
 
 * Use these heading styles::
 

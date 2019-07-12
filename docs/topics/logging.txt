@@ -218,15 +218,15 @@ default logging configuration <default-logging-configuration>` using the
 following scheme.
 
 If the ``disable_existing_loggers`` key in the :setting:`LOGGING` dictConfig is
-set to ``True`` (which is the default) then all loggers from the default
-configuration will be disabled. Disabled loggers are not the same as removed;
-the logger will still exist, but will silently discard anything logged to it,
-not even propagating entries to a parent logger. Thus you should be very
-careful using ``'disable_existing_loggers': True``; it's probably not what you
-want. Instead, you can set ``disable_existing_loggers`` to ``False`` and
-redefine some or all of the default loggers; or you can set
-:setting:`LOGGING_CONFIG` to ``None`` and :ref:`handle logging config yourself
-<disabling-logging-configuration>`.
+set to ``True`` (which is the ``dictConfig`` default if the key is missing)
+then all loggers from the default configuration will be disabled. Disabled
+loggers are not the same as removed; the logger will still exist, but will
+silently discard anything logged to it, not even propagating entries to a
+parent logger. Thus you should be very careful using
+``'disable_existing_loggers': True``; it's probably not what you want. Instead,
+you can set ``disable_existing_loggers`` to ``False`` and redefine some or all
+of the default loggers; or you can set :setting:`LOGGING_CONFIG` to ``None``
+and :ref:`handle logging config yourself <disabling-logging-configuration>`.
 
 Logging is configured as part of the general Django ``setup()`` function.
 Therefore, you can be certain that loggers are always ready for use in your
@@ -241,6 +241,9 @@ However, to give you a taste of what is possible, here are several examples.
 
 First, here's a simple configuration which writes all logging from the
 :ref:`django-logger` logger to a local file::
+
+  .. code-block:: python
+    :caption: settings.py
 
     LOGGING = {
         'version': 1,
@@ -274,6 +277,9 @@ messages. With this config, however, you can also set the environment variable
 ``DJANGO_LOG_LEVEL=DEBUG`` to see all of Django's debug logging which is very
 verbose as it includes all database queries::
 
+  .. code-block:: python
+    :caption: settings.py
+
     import os
 
     LOGGING = {
@@ -293,6 +299,9 @@ verbose as it includes all database queries::
     }
 
 Finally, here's an example of a fairly complex logging setup::
+
+  .. code-block:: python
+    :caption: settings.py
 
     LOGGING = {
         'version': 1,
@@ -752,4 +761,5 @@ handlers are attached to the root logger to provide the behavior described
 above.
 
 See also :ref:`Configuring logging <configuring-logging>` to learn how you can
-complement or replace this default logging configuration.
+complement or replace this default logging configuration defined in
+:source:`django/utils/log.py`.

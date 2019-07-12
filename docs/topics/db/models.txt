@@ -154,20 +154,22 @@ ones:
     <Field.blank>`, the field will be required.
 
 :attr:`~Field.choices`
-    An iterable (e.g., a list or tuple) of 2-tuples to use as choices for
-    this field. If this is given, the default form widget will be a select box
-    instead of the standard text field and will limit choices to the choices
-    given.
+    A :term:`sequence` of 2-tuples to use as choices for this field. If this
+    is given, the default form widget will be a select box instead of the
+    standard text field and will limit choices to the choices given.
 
     A choices list looks like this::
 
-        YEAR_IN_SCHOOL_CHOICES = (
+        YEAR_IN_SCHOOL_CHOICES = [
             ('FR', 'Freshman'),
             ('SO', 'Sophomore'),
             ('JR', 'Junior'),
             ('SR', 'Senior'),
             ('GR', 'Graduate'),
-        )
+        ]
+
+    .. note::
+        A new migration is created each time the order of ``choices`` changes.
 
     The first element in each tuple is the value that will be stored in the
     database. The second element is displayed by the field's form widget.
@@ -511,37 +513,31 @@ the intermediate model::
     >>> beatles.members.all()
     <QuerySet [<Person: Ringo Starr>, <Person: Paul McCartney>]>
 
-Unlike normal many-to-many fields, you *can't* use ``add()``, ``create()``,
-or ``set()`` to create relationships::
+You can also use ``add()``, ``create()``, or ``set()`` to create relationships,
+as long as you specify ``through_defaults`` for any required fields::
 
-    >>> # The following statements will not work
-    >>> beatles.members.add(john)
-    >>> beatles.members.create(name="George Harrison")
-    >>> beatles.members.set([john, paul, ringo, george])
+    >>> beatles.members.add(john, through_defaults={'date_joined': date(1960, 8, 1)})
+    >>> beatles.members.create(name="George Harrison", through_defaults={'date_joined': date(1960, 8, 1)})
+    >>> beatles.members.set([john, paul, ringo, george], through_defaults={'date_joined': date(1960, 8, 1)})
 
-Why? You can't just create a relationship between a ``Person`` and a ``Group``
-- you need to specify all the detail for the relationship required by the
-``Membership`` model. The simple ``add``, ``create`` and assignment calls
-don't provide a way to specify this extra detail. As a result, they are
-disabled for many-to-many relationships that use an intermediate model.
-The only way to create this type of relationship is to create instances of the
-intermediate model.
+You may prefer to create instances of the intermediate model directly.
 
-The :meth:`~django.db.models.fields.related.RelatedManager.remove` method is
-disabled for similar reasons. For example, if the custom through table defined
-by the intermediate model does not enforce uniqueness on the
-``(model1, model2)`` pair, a ``remove()`` call would not provide enough
-information as to which intermediate model instance should be deleted::
+If the custom through table defined by the intermediate model does not enforce
+uniqueness on the ``(model1, model2)`` pair, allowing multiple values, the
+:meth:`~django.db.models.fields.related.RelatedManager.remove` call will
+remove all intermediate model instances::
 
     >>> Membership.objects.create(person=ringo, group=beatles,
     ...     date_joined=date(1968, 9, 4),
     ...     invite_reason="You've been gone for a month and we miss you.")
     >>> beatles.members.all()
     <QuerySet [<Person: Ringo Starr>, <Person: Paul McCartney>, <Person: Ringo Starr>]>
-    >>> # This will not work because it cannot tell which membership to remove
+    >>> # This deletes both of the intermediate model instances for Ringo Starr
     >>> beatles.members.remove(ringo)
+    >>> beatles.members.all()
+    <QuerySet [<Person: Paul McCartney>]>
 
-However, the :meth:`~django.db.models.fields.related.RelatedManager.clear`
+The :meth:`~django.db.models.fields.related.RelatedManager.clear`
 method can be used to remove all many-to-many relationships for an instance::
 
     >>> # Beatles have broken up
@@ -550,10 +546,9 @@ method can be used to remove all many-to-many relationships for an instance::
     >>> Membership.objects.all()
     <QuerySet []>
 
-Once you have established the many-to-many relationships by creating instances
-of your intermediate model, you can issue queries. Just as with normal
-many-to-many relationships, you can query using the attributes of the
-many-to-many-related model::
+Once you have established the many-to-many relationships, you can issue
+queries. Just as with normal many-to-many relationships, you can query using
+the attributes of the many-to-many-related model::
 
     # Find all the groups with a member whose name starts with 'Paul'
     >>> Group.objects.filter(members__name__startswith='Paul')

@@ -1,11 +1,13 @@
 import os
 from argparse import ArgumentParser
 from contextlib import contextmanager
-from unittest import TestSuite, TextTestRunner, defaultTestLoader
+from unittest import TestSuite, TextTestRunner, defaultTestLoader, skipUnless
 
+from django.db import connections
 from django.test import SimpleTestCase
 from django.test.runner import DiscoverRunner
 from django.test.utils import captured_stdout
+from django.utils.version import PY37
 
 
 @contextmanager
@@ -21,6 +23,13 @@ def change_cwd(directory):
 
 
 class DiscoverRunnerTests(SimpleTestCase):
+
+    @staticmethod
+    def get_test_methods_names(suite):
+        return [
+            t.__class__.__name__ + '.' + t._testMethodName
+            for t in suite._tests
+        ]
 
     def test_init_debug_mode(self):
         runner = DiscoverRunner()
@@ -69,6 +78,34 @@ class DiscoverRunnerTests(SimpleTestCase):
         ).build_suite(['test_runner_apps.sample']).countTestCases()
 
         self.assertEqual(count, 1)
+
+    @skipUnless(PY37, 'unittest -k option requires Python 3.7 and later')
+    def test_name_patterns(self):
+        all_test_1 = [
+            'DjangoCase1.test_1', 'DjangoCase2.test_1',
+            'SimpleCase1.test_1', 'SimpleCase2.test_1',
+            'UnittestCase1.test_1', 'UnittestCase2.test_1',
+        ]
+        all_test_2 = [
+            'DjangoCase1.test_2', 'DjangoCase2.test_2',
+            'SimpleCase1.test_2', 'SimpleCase2.test_2',
+            'UnittestCase1.test_2', 'UnittestCase2.test_2',
+        ]
+        all_tests = sorted([*all_test_1, *all_test_2, 'UnittestCase2.test_3_test'])
+        for pattern, expected in [
+            [['test_1'], all_test_1],
+            [['UnittestCase1'], ['UnittestCase1.test_1', 'UnittestCase1.test_2']],
+            [['*test'], ['UnittestCase2.test_3_test']],
+            [['test*'], all_tests],
+            [['test'], all_tests],
+            [['test_1', 'test_2'], sorted([*all_test_1, *all_test_2])],
+            [['test*1'], all_test_1],
+        ]:
+            with self.subTest(pattern):
+                suite = DiscoverRunner(
+                    test_name_patterns=pattern
+                ).build_suite(['test_runner_apps.simple'])
+                self.assertEqual(expected, self.get_test_methods_names(suite))
 
     def test_file_path(self):
         with change_cwd(".."):
@@ -169,7 +206,7 @@ class DiscoverRunnerTests(SimpleTestCase):
                       msg="Methods of Django cases should be reversed.")
         self.assertIn('test_2', suite[4].id(),
                       msg="Methods of simple cases should be reversed.")
-        self.assertIn('test_2', suite[8].id(),
+        self.assertIn('test_2', suite[9].id(),
                       msg="Methods of unittest cases should be reversed.")
 
     def test_overridable_get_test_runner_kwargs(self):
@@ -223,3 +260,47 @@ class DiscoverRunnerTests(SimpleTestCase):
         with captured_stdout() as stdout:
             runner.build_suite(['test_runner_apps.tagged.tests'])
             self.assertIn('Excluding test tag(s): bar, foo.\n', stdout.getvalue())
+
+
+class DiscoverRunnerGetDatabasesTests(SimpleTestCase):
+    runner = DiscoverRunner(verbosity=2)
+    skip_msg = 'Skipping setup of unused database(s): '
+
+    def get_databases(self, test_labels):
+        suite = self.runner.build_suite(test_labels)
+        with captured_stdout() as stdout:
+            databases = self.runner.get_databases(suite)
+        return databases, stdout.getvalue()
+
+    def test_mixed(self):
+        databases, output = self.get_databases(['test_runner_apps.databases.tests'])
+        self.assertEqual(databases, set(connections))
+        self.assertNotIn(self.skip_msg, output)
+
+    def test_all(self):
+        databases, output = self.get_databases(['test_runner_apps.databases.tests.AllDatabasesTests'])
+        self.assertEqual(databases, set(connections))
+        self.assertNotIn(self.skip_msg, output)
+
+    def test_default_and_other(self):
+        databases, output = self.get_databases([
+            'test_runner_apps.databases.tests.DefaultDatabaseTests',
+            'test_runner_apps.databases.tests.OtherDatabaseTests',
+        ])
+        self.assertEqual(databases, set(connections))
+        self.assertNotIn(self.skip_msg, output)
+
+    def test_default_only(self):
+        databases, output = self.get_databases(['test_runner_apps.databases.tests.DefaultDatabaseTests'])
+        self.assertEqual(databases, {'default'})
+        self.assertIn(self.skip_msg + 'other', output)
+
+    def test_other_only(self):
+        databases, output = self.get_databases(['test_runner_apps.databases.tests.OtherDatabaseTests'])
+        self.assertEqual(databases, {'other'})
+        self.assertIn(self.skip_msg + 'default', output)
+
+    def test_no_databases_required(self):
+        databases, output = self.get_databases(['test_runner_apps.databases.tests.NoDatabaseTests'])
+        self.assertEqual(databases, set())
+        self.assertIn(self.skip_msg + 'default, other', output)

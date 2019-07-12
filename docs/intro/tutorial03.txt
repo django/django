@@ -413,7 +413,7 @@ template (or templates) you would change it in ``polls/urls.py``::
     ...
 
 Namespacing URL names
-======================
+=====================
 
 The tutorial project has just one app, ``polls``. In real Django projects,
 there might be five, ten, twenty apps or more. How does Django differentiate

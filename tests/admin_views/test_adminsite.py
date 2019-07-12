@@ -1,10 +1,9 @@
-from django.conf.urls import url
 from django.contrib import admin
 from django.contrib.admin.actions import delete_selected
 from django.contrib.auth.models import User
 from django.test import SimpleTestCase, TestCase, override_settings
 from django.test.client import RequestFactory
-from django.urls import reverse
+from django.urls import path, reverse
 
 from .models import Article
 
@@ -13,7 +12,7 @@ site.register(User)
 site.register(Article)
 
 urlpatterns = [
-    url(r'^test_admin/admin/', site.urls),
+    path('test_admin/admin/', site.urls),
 ]
 
 

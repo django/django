@@ -10,7 +10,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
+"POT-Creation-Date: 2018-05-17 11:50+0200\n"
 "PO-Revision-Date: 2017-09-19 16:41+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Croatian (http://www.transifex.com/django/django/language/"
@@ -102,6 +102,21 @@ msgstr ""
 "Odabrali ste akciju, a niste napravili nikakve izmjene na pojedinim poljima. "
 "Vjerojatno tražite gumb Idi umjesto gumb Spremi."
 
+msgid "Now"
+msgstr "Sada"
+
+msgid "Midnight"
+msgstr "Ponoć"
+
+msgid "6 a.m."
+msgstr "6 ujutro"
+
+msgid "Noon"
+msgstr "Podne"
+
+msgid "6 p.m."
+msgstr "6 popodne"
+
 #, javascript-format
 msgid "Note: You are %s hour ahead of server time."
 msgid_plural "Note: You are %s hours ahead of server time."
@@ -116,26 +131,11 @@ msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
 
-msgid "Now"
-msgstr "Sada"
-
 msgid "Choose a Time"
 msgstr "Izaberite vrijeme"
 
 msgid "Choose a time"
 msgstr "Izaberite vrijeme"
-
-msgid "Midnight"
-msgstr "Ponoć"
-
-msgid "6 a.m."
-msgstr "6 ujutro"
-
-msgid "Noon"
-msgstr "Podne"
-
-msgid "6 p.m."
-msgstr "6 popodne"
 
 msgid "Cancel"
 msgstr "Odustani"

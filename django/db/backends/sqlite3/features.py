@@ -1,8 +1,4 @@
-import sys
-
-from django.db import utils
 from django.db.backends.base.features import BaseDatabaseFeatures
-from django.utils.functional import cached_property
 
 from .base import Database
 
@@ -17,15 +13,17 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_timezones = False
     max_query_params = 999
     supports_mixed_date_datetime_comparisons = False
-    autocommits_when_autocommit_is_off = sys.version_info < (3, 6)
+    can_introspect_autofield = True
     can_introspect_decimal_field = False
     can_introspect_duration_field = False
     can_introspect_positive_integer_field = True
     can_introspect_small_integer_field = True
+    introspected_big_auto_field_type = 'AutoField'
     supports_transactions = True
     atomic_transactions = False
     can_rollback_ddl = True
-    supports_atomic_references_rename = False
+    supports_atomic_references_rename = Database.sqlite_version_info >= (3, 26, 0)
+    can_create_inline_fk = False
     supports_paramstyle_pyformat = False
     supports_sequence_reset = False
     can_clone_databases = True
@@ -34,26 +32,12 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_cast_with_precision = False
     time_cast_precision = 3
     can_release_savepoints = True
-    supports_partial_indexes = Database.version_info >= (3, 8, 0)
     # Is "ALTER TABLE ... RENAME COLUMN" supported?
     can_alter_table_rename_column = Database.sqlite_version_info >= (3, 25, 0)
     supports_parentheses_in_compound = False
-
-    @cached_property
-    def supports_stddev(self):
-        """
-        Confirm support for STDDEV and related stats functions.
-
-        SQLite supports STDDEV as an extension package; so
-        connection.ops.check_expression_support() can't unilaterally
-        rule out support for STDDEV. Manually check whether the call works.
-        """
-        with self.connection.cursor() as cursor:
-            cursor.execute('CREATE TABLE STDDEV_TEST (X INT)')
-            try:
-                cursor.execute('SELECT STDDEV(*) FROM STDDEV_TEST')
-                has_support = True
-            except utils.DatabaseError:
-                has_support = False
-            cursor.execute('DROP TABLE STDDEV_TEST')
-        return has_support
+    # Deferred constraint checks can be emulated on SQLite < 3.20 but not in a
+    # reasonably performant way.
+    supports_pragma_foreign_key_check = Database.sqlite_version_info >= (3, 20, 0)
+    can_defer_constraint_checks = supports_pragma_foreign_key_check
+    supports_functions_in_partial_indexes = Database.sqlite_version_info >= (3, 15, 0)
+    supports_over_clause = Database.sqlite_version_info >= (3, 25, 0)

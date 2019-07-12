@@ -15,16 +15,16 @@ class PingGoogleTests(SitemapTestsBase):
     @mock.patch('django.contrib.sitemaps.urlopen')
     def test_something(self, urlopen):
         ping_google()
-        params = urlencode({'sitemap': 'http://example.com/sitemap-without-entries/sitemap.xml'})
+        params = urlencode({'sitemap': 'https://example.com/sitemap-without-entries/sitemap.xml'})
         full_url = 'https://www.google.com/webmasters/tools/ping?%s' % params
         urlopen.assert_called_with(full_url)
 
     def test_get_sitemap_full_url_global(self):
-        self.assertEqual(_get_sitemap_full_url(None), 'http://example.com/sitemap-without-entries/sitemap.xml')
+        self.assertEqual(_get_sitemap_full_url(None), 'https://example.com/sitemap-without-entries/sitemap.xml')
 
     @override_settings(ROOT_URLCONF='sitemaps_tests.urls.index_only')
     def test_get_sitemap_full_url_index(self):
-        self.assertEqual(_get_sitemap_full_url(None), 'http://example.com/simple/index.xml')
+        self.assertEqual(_get_sitemap_full_url(None), 'https://example.com/simple/index.xml')
 
     @override_settings(ROOT_URLCONF='sitemaps_tests.urls.empty')
     def test_get_sitemap_full_url_not_detected(self):
@@ -33,7 +33,13 @@ class PingGoogleTests(SitemapTestsBase):
             _get_sitemap_full_url(None)
 
     def test_get_sitemap_full_url_exact_url(self):
-        self.assertEqual(_get_sitemap_full_url('/foo.xml'), 'http://example.com/foo.xml')
+        self.assertEqual(_get_sitemap_full_url('/foo.xml'), 'https://example.com/foo.xml')
+
+    def test_get_sitemap_full_url_insecure(self):
+        self.assertEqual(
+            _get_sitemap_full_url('/foo.xml', sitemap_uses_https=False),
+            'http://example.com/foo.xml'
+        )
 
     @modify_settings(INSTALLED_APPS={'remove': 'django.contrib.sites'})
     def test_get_sitemap_full_url_no_sites(self):

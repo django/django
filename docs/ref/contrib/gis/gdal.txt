@@ -1172,9 +1172,9 @@ blue.
 
         The name of the GDAL driver used to handle the input file. For ``GDALRaster``\s created
         from a file, the driver type is detected automatically. The creation of rasters from
-        scratch is a in-memory raster by default (``'MEM'``), but can be altered as
-        needed. For instance, use ``GTiff`` for a ``GeoTiff`` file. For a list of file types,
-        see also the `GDAL Raster Formats`__ list.
+        scratch is an in-memory raster by default (``'MEM'``), but can be
+        altered as needed. For instance, use ``GTiff`` for a ``GeoTiff`` file.
+        For a list of file types, see also the `GDAL Raster Formats`__ list.
 
         __ https://www.gdal.org/formats_list.html
 
@@ -1271,9 +1271,9 @@ blue.
 
     .. attribute:: scale
 
-        Pixel width and height used for georeferencing the raster, as a as a
-        point object with ``x`` and ``y``  members. See :attr:`geotransform`
-        for more information.
+        Pixel width and height used for georeferencing the raster, as a point
+        object with ``x`` and ``y``  members. See :attr:`geotransform` for more
+        information.
 
             >>> rst = GDALRaster({'width': 10, 'height': 20, 'srid': 4326})
             >>> rst.scale

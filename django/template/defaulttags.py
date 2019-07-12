@@ -399,15 +399,16 @@ class SpacelessNode(Node):
 
 
 class TemplateTagNode(Node):
-    mapping = {'openblock': BLOCK_TAG_START,
-               'closeblock': BLOCK_TAG_END,
-               'openvariable': VARIABLE_TAG_START,
-               'closevariable': VARIABLE_TAG_END,
-               'openbrace': SINGLE_BRACE_START,
-               'closebrace': SINGLE_BRACE_END,
-               'opencomment': COMMENT_TAG_START,
-               'closecomment': COMMENT_TAG_END,
-               }
+    mapping = {
+        'openblock': BLOCK_TAG_START,
+        'closeblock': BLOCK_TAG_END,
+        'openvariable': VARIABLE_TAG_START,
+        'closevariable': VARIABLE_TAG_END,
+        'openbrace': SINGLE_BRACE_START,
+        'closebrace': SINGLE_BRACE_END,
+        'opencomment': COMMENT_TAG_START,
+        'closecomment': COMMENT_TAG_END,
+    }
 
     def __init__(self, tagtype):
         self.tagtype = tagtype

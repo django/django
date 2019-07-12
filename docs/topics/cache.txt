@@ -329,10 +329,6 @@ cross-process caching is possible. This obviously also means the local memory
 cache isn't particularly memory-efficient, so it's probably not a good choice
 for production environments. It's nice for development.
 
-.. versionchanged:: 2.1
-
-    Older versions use a pseudo-random culling strategy rather than LRU.
-
 Dummy caching (for development)
 -------------------------------
 
@@ -906,8 +902,6 @@ from the cache, not just the keys set by your application. ::
     >>> cache.clear()
 
 .. method:: cache.touch(key, timeout=DEFAULT_TIMEOUT, version=None)
-
-.. versionadded:: 2.1
 
 ``cache.touch()`` sets a new expiration for a key. For example, to update a key
 to expire 10 seconds from now::

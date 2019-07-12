@@ -8,12 +8,14 @@ from django.apps import apps
 from django.core import management
 from django.core.management import BaseCommand, CommandError, find_commands
 from django.core.management.utils import (
-    find_command, get_random_secret_key, popen_wrapper,
+    find_command, get_random_secret_key, is_ignored_path,
+    normalize_path_patterns, popen_wrapper,
 )
 from django.db import connection
 from django.test import SimpleTestCase, override_settings
 from django.test.utils import captured_stderr, extend_sys_path
 from django.utils import translation
+from django.utils.version import PY37
 
 from .management.commands import dance
 
@@ -217,10 +219,34 @@ class CommandTests(SimpleTestCase):
         management.call_command('subparser', 'foo', 12, stdout=out)
         self.assertIn('bar', out.getvalue())
 
+    def test_subparser_dest_args(self):
+        out = StringIO()
+        management.call_command('subparser_dest', 'foo', bar=12, stdout=out)
+        self.assertIn('bar', out.getvalue())
+
+    def test_subparser_dest_required_args(self):
+        out = StringIO()
+        management.call_command('subparser_required', 'foo_1', 'foo_2', bar=12, stdout=out)
+        self.assertIn('bar', out.getvalue())
+
     def test_subparser_invalid_option(self):
         msg = "Error: invalid choice: 'test' (choose from 'foo')"
         with self.assertRaisesMessage(CommandError, msg):
             management.call_command('subparser', 'test', 12)
+        if PY37:
+            # "required" option requires Python 3.7 and later.
+            msg = 'Error: the following arguments are required: subcommand'
+            with self.assertRaisesMessage(CommandError, msg):
+                management.call_command('subparser_dest', subcommand='foo', bar=12)
+        else:
+            msg = (
+                'Unknown option(s) for subparser_dest command: subcommand. '
+                'Valid options are: bar, force_color, help, no_color, '
+                'pythonpath, settings, skip_checks, stderr, stdout, '
+                'traceback, verbosity, version.'
+            )
+            with self.assertRaisesMessage(TypeError, msg):
+                management.call_command('subparser_dest', subcommand='foo', bar=12)
 
     def test_create_parser_kwargs(self):
         """BaseCommand.create_parser() passes kwargs to CommandParser."""
@@ -233,9 +259,6 @@ class CommandRunTests(AdminScriptTestCase):
     """
     Tests that need to run by simulating the command line, not by call_command.
     """
-    def tearDown(self):
-        self.remove_settings('settings.py')
-
     def test_script_prefix_set_in_commands(self):
         self.write_settings('settings.py', apps=['user_commands'], sdict={
             'ROOT_URLCONF': '"user_commands.urls"',
@@ -255,6 +278,16 @@ class CommandRunTests(AdminScriptTestCase):
         self.assertNoOutput(err)
         self.assertEqual(out.strip(), 'Set foo')
 
+    def test_skip_checks(self):
+        self.write_settings('settings.py', apps=['django.contrib.staticfiles', 'user_commands'], sdict={
+            # (staticfiles.E001) The STATICFILES_DIRS setting is not a tuple or
+            # list.
+            'STATICFILES_DIRS': '"foo"',
+        })
+        out, err = self.run_manage(['set_option', '--skip-checks', '--set', 'foo'])
+        self.assertNoOutput(err)
+        self.assertEqual(out.strip(), 'Set foo')
+
 
 class UtilsTests(SimpleTestCase):
 
@@ -268,3 +301,25 @@ class UtilsTests(SimpleTestCase):
         self.assertEqual(len(key), 50)
         for char in key:
             self.assertIn(char, 'abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*(-_=+)')
+
+    def test_is_ignored_path_true(self):
+        patterns = (
+            ['foo/bar/baz'],
+            ['baz'],
+            ['foo/bar/baz'],
+            ['*/baz'],
+            ['*'],
+            ['b?z'],
+            ['[abc]az'],
+            ['*/ba[!z]/baz'],
+        )
+        for ignore_patterns in patterns:
+            with self.subTest(ignore_patterns=ignore_patterns):
+                self.assertIs(is_ignored_path('foo/bar/baz', ignore_patterns=ignore_patterns), True)
+
+    def test_is_ignored_path_false(self):
+        self.assertIs(is_ignored_path('foo/bar/baz', ignore_patterns=['foo/bar/bat', 'bar', 'flub/blub']), False)
+
+    def test_normalize_path_patterns_truncates_wildcard_base(self):
+        expected = [os.path.normcase(p) for p in ['foo/bar', 'bar/*/']]
+        self.assertEqual(normalize_path_patterns(['foo/bar/*', 'bar/*/']), expected)

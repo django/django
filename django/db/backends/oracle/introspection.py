@@ -173,6 +173,22 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
             for row in cursor.fetchall()
         ]
 
+    def get_primary_key_column(self, cursor, table_name):
+        cursor.execute("""
+            SELECT
+                cols.column_name
+            FROM
+                user_constraints,
+                user_cons_columns cols
+            WHERE
+                user_constraints.constraint_name = cols.constraint_name AND
+                user_constraints.constraint_type = 'P' AND
+                user_constraints.table_name = UPPER(%s) AND
+                cols.position = 1
+        """, [table_name])
+        row = cursor.fetchone()
+        return self.identifier_converter(row[0]) if row else None
+
     def get_constraints(self, cursor, table_name):
         """
         Retrieve any constraints or keys (unique, pk, fk, check, index) across

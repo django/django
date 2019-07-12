@@ -141,7 +141,7 @@ class FileDescriptor:
 
     Assign a file object on assignment so you can do::
 
-        >>> with open('/path/to/hello.world', 'r') as f:
+        >>> with open('/path/to/hello.world') as f:
         ...     instance.file = File(f)
     """
     def __init__(self, field):
@@ -377,7 +377,7 @@ class ImageField(FileField):
                 checks.Error(
                     'Cannot use ImageField because Pillow is not installed.',
                     hint=('Get Pillow at https://pypi.org/project/Pillow/ '
-                          'or run command "pip install Pillow".'),
+                          'or run command "python -m pip install Pillow".'),
                     obj=self,
                     id='fields.E210',
                 )

@@ -108,6 +108,16 @@ class TestInline(TestDataMixin, TestCase):
         response = self.client.get(reverse('admin:admin_inlines_titlecollection_add'))
         self.assertContains(response, '<th class="column-title1 required">Title1</th>', html=True)
 
+    def test_custom_form_tabular_inline_extra_field_label(self):
+        response = self.client.get(reverse('admin:admin_inlines_outfititem_add'))
+        _, extra_field = list(response.context['inline_admin_formset'].fields())
+        self.assertEqual(extra_field['label'], 'Extra field')
+
+    def test_non_editable_custom_form_tabular_inline_extra_field_label(self):
+        response = self.client.get(reverse('admin:admin_inlines_chapter_add'))
+        _, extra_field = list(response.context['inline_admin_formset'].fields())
+        self.assertEqual(extra_field['label'], 'Extra field')
+
     def test_custom_form_tabular_inline_overridden_label(self):
         """
         SomeChildModelForm.__init__() overrides the label of a form field.
@@ -497,10 +507,10 @@ class TestInlineMedia(TestDataMixin, TestCase):
             response.context['inline_admin_formsets'][0].media._js,
             [
                 'admin/js/vendor/jquery/jquery.min.js',
-                'admin/js/jquery.init.js',
-                'admin/js/inlines.min.js',
                 'my_awesome_inline_scripts.js',
                 'custom_number.js',
+                'admin/js/jquery.init.js',
+                'admin/js/inlines.min.js',
             ]
         )
         self.assertContains(response, 'my_awesome_inline_scripts.js')
@@ -595,10 +605,10 @@ class TestInlinePermissions(TestCase):
         cls.user.user_permissions.add(permission)
 
         author = Author.objects.create(pk=1, name='The Author')
-        book = author.books.create(name='The inline Book')
+        cls.book = author.books.create(name='The inline Book')
         cls.author_change_url = reverse('admin:admin_inlines_author_change', args=(author.id,))
         # Get the ID of the automatically created intermediate model for the Author-Book m2m
-        author_book_auto_m2m_intermediate = Author.books.through.objects.get(author=author, book=book)
+        author_book_auto_m2m_intermediate = Author.books.through.objects.get(author=author, book=cls.book)
         cls.author_book_auto_m2m_intermediate_id = author_book_auto_m2m_intermediate.pk
 
         cls.holder = Holder2.objects.create(dummy=13)
@@ -636,6 +646,25 @@ class TestInlinePermissions(TestCase):
         self.assertNotContains(response, 'Add another Inner2')
         self.assertNotContains(response, 'id="id_inner2_set-TOTAL_FORMS"')
 
+    def test_inline_add_m2m_view_only_perm(self):
+        permission = Permission.objects.get(codename='view_book', content_type=self.book_ct)
+        self.user.user_permissions.add(permission)
+        response = self.client.get(reverse('admin:admin_inlines_author_add'))
+        # View-only inlines. (It could be nicer to hide the empty, non-editable
+        # inlines on the add page.)
+        self.assertIs(response.context['inline_admin_formset'].has_view_permission, True)
+        self.assertIs(response.context['inline_admin_formset'].has_add_permission, False)
+        self.assertIs(response.context['inline_admin_formset'].has_change_permission, False)
+        self.assertIs(response.context['inline_admin_formset'].has_delete_permission, False)
+        self.assertContains(response, '<h2>Author-book relationships</h2>')
+        self.assertContains(
+            response,
+            '<input type="hidden" name="Author_books-TOTAL_FORMS" value="0" '
+            'id="id_Author_books-TOTAL_FORMS">',
+            html=True,
+        )
+        self.assertNotContains(response, 'Add another Author-Book Relationship')
+
     def test_inline_add_m2m_add_perm(self):
         permission = Permission.objects.get(codename='add_book', content_type=self.book_ct)
         self.user.user_permissions.add(permission)
@@ -665,11 +694,39 @@ class TestInlinePermissions(TestCase):
         self.assertNotContains(response, 'id="id_Author_books-TOTAL_FORMS"')
         self.assertNotContains(response, 'id="id_Author_books-0-DELETE"')
 
+    def test_inline_change_m2m_view_only_perm(self):
+        permission = Permission.objects.get(codename='view_book', content_type=self.book_ct)
+        self.user.user_permissions.add(permission)
+        response = self.client.get(self.author_change_url)
+        # View-only inlines.
+        self.assertIs(response.context['inline_admin_formset'].has_view_permission, True)
+        self.assertIs(response.context['inline_admin_formset'].has_add_permission, False)
+        self.assertIs(response.context['inline_admin_formset'].has_change_permission, False)
+        self.assertIs(response.context['inline_admin_formset'].has_delete_permission, False)
+        self.assertContains(response, '<h2>Author-book relationships</h2>')
+        self.assertContains(
+            response,
+            '<input type="hidden" name="Author_books-TOTAL_FORMS" value="1" '
+            'id="id_Author_books-TOTAL_FORMS">',
+            html=True,
+        )
+        # The field in the inline is read-only.
+        self.assertContains(response, '<p>%s</p>' % self.book)
+        self.assertNotContains(
+            response,
+            '<input type="checkbox" name="Author_books-0-DELETE" id="id_Author_books-0-DELETE">',
+            html=True,
+        )
+
     def test_inline_change_m2m_change_perm(self):
         permission = Permission.objects.get(codename='change_book', content_type=self.book_ct)
         self.user.user_permissions.add(permission)
         response = self.client.get(self.author_change_url)
         # We have change perm on books, so we can add/change/delete inlines
+        self.assertIs(response.context['inline_admin_formset'].has_view_permission, True)
+        self.assertIs(response.context['inline_admin_formset'].has_add_permission, True)
+        self.assertIs(response.context['inline_admin_formset'].has_change_permission, True)
+        self.assertIs(response.context['inline_admin_formset'].has_delete_permission, True)
         self.assertContains(response, '<h2>Author-book relationships</h2>')
         self.assertContains(response, 'Add another Author-book relationship')
         self.assertContains(response, '<input type="hidden" id="id_Author_books-TOTAL_FORMS" '
@@ -967,6 +1024,24 @@ class SeleniumTests(AdminSeleniumTestCase):
         test_fields = ['#id_nonautopkbook_set-0-title', '#id_nonautopkbook_set-2-0-title']
         show_links = self.selenium.find_elements_by_link_text('SHOW')
         self.assertEqual(len(show_links), 3)
+        for show_index, field_name in enumerate(test_fields, 0):
+            self.wait_until_invisible(field_name)
+            show_links[show_index].click()
+            self.wait_until_visible(field_name)
+        hide_links = self.selenium.find_elements_by_link_text('HIDE')
+        self.assertEqual(len(hide_links), 2)
+        for hide_index, field_name in enumerate(test_fields, 0):
+            self.wait_until_visible(field_name)
+            hide_links[hide_index].click()
+            self.wait_until_invisible(field_name)
+
+    def test_added_stacked_inline_with_collapsed_fields(self):
+        self.admin_login(username='super', password='secret')
+        self.selenium.get(self.live_server_url + reverse('admin:admin_inlines_teacher_add'))
+        self.selenium.find_element_by_link_text('Add another Child').click()
+        test_fields = ['#id_child_set-0-name', '#id_child_set-1-name']
+        show_links = self.selenium.find_elements_by_link_text('SHOW')
+        self.assertEqual(len(show_links), 2)
         for show_index, field_name in enumerate(test_fields, 0):
             self.wait_until_invisible(field_name)
             show_links[show_index].click()

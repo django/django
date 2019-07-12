@@ -1,12 +1,13 @@
 import builtins
 import getpass
+import os
 import sys
 from datetime import date
 from io import StringIO
 from unittest import mock
 
 from django.apps import apps
-from django.contrib.auth import management
+from django.contrib.auth import get_permission_codename, management
 from django.contrib.auth.management import (
     create_permissions, get_default_username,
 )
@@ -23,6 +24,7 @@ from django.utils.translation import gettext_lazy as _
 
 from .models import (
     CustomUser, CustomUserNonUniqueUsername, CustomUserWithFK, Email,
+    UserProxy,
 )
 
 MOCK_INPUT_KEY_TO_PROMPTS = {
@@ -213,7 +215,7 @@ class ChangepasswordManagementCommandTestCase(TestCase):
 
 
 class MultiDBChangepasswordManagementCommandTestCase(TestCase):
-    multi_db = True
+    databases = {'default', 'other'}
 
     @mock.patch.object(changepassword.Command, '_get_pass', return_value='not qwerty')
     def test_that_changepassword_command_with_database_option_uses_given_db(self, mock_get_pass):
@@ -904,9 +906,64 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
 
         test(self)
 
+    @mock.patch.dict(os.environ, {
+        'DJANGO_SUPERUSER_PASSWORD': 'test_password',
+        'DJANGO_SUPERUSER_USERNAME': 'test_superuser',
+        'DJANGO_SUPERUSER_EMAIL': 'joe@somewhere.org',
+        'DJANGO_SUPERUSER_FIRST_NAME': 'ignored_first_name',
+    })
+    def test_environment_variable_non_interactive(self):
+        call_command('createsuperuser', interactive=False, stdout=StringIO())
+        user = User.objects.get(username='test_superuser')
+        self.assertEqual(user.email, 'joe@somewhere.org')
+        self.assertTrue(user.check_password('test_password'))
+        # Environment variables are ignored for non-required fields.
+        self.assertEqual(user.first_name, '')
+
+    @mock.patch.dict(os.environ, {
+        'DJANGO_SUPERUSER_USERNAME': 'test_superuser',
+        'DJANGO_SUPERUSER_EMAIL': 'joe@somewhere.org',
+    })
+    def test_ignore_environment_variable_non_interactive(self):
+        # Environment variables are ignored in non-interactive mode, if
+        # provided by a command line arguments.
+        call_command(
+            'createsuperuser',
+            interactive=False,
+            username='cmd_superuser',
+            email='cmd@somewhere.org',
+            stdout=StringIO(),
+        )
+        user = User.objects.get(username='cmd_superuser')
+        self.assertEqual(user.email, 'cmd@somewhere.org')
+        self.assertFalse(user.has_usable_password())
+
+    @mock.patch.dict(os.environ, {
+        'DJANGO_SUPERUSER_PASSWORD': 'test_password',
+        'DJANGO_SUPERUSER_USERNAME': 'test_superuser',
+        'DJANGO_SUPERUSER_EMAIL': 'joe@somewhere.org',
+    })
+    def test_ignore_environment_variable_interactive(self):
+        # Environment variables are ignored in interactive mode.
+        @mock_inputs({'password': 'cmd_password'})
+        def test(self):
+            call_command(
+                'createsuperuser',
+                interactive=True,
+                username='cmd_superuser',
+                email='cmd@somewhere.org',
+                stdin=MockTTY(),
+                stdout=StringIO(),
+            )
+            user = User.objects.get(username='cmd_superuser')
+            self.assertEqual(user.email, 'cmd@somewhere.org')
+            self.assertTrue(user.check_password('cmd_password'))
+
+        test(self)
+
 
 class MultiDBCreatesuperuserTestCase(TestCase):
-    multi_db = True
+    databases = {'default', 'other'}
 
     def test_createsuperuser_command_with_database_option(self):
         """
@@ -985,3 +1042,18 @@ class CreatePermissionsTests(TestCase):
         ContentType.objects.filter(app_label='auth', model='group').delete()
         # This fails with a foreign key constraint without the fix.
         create_permissions(apps.get_app_config('auth'), interactive=False, verbosity=0)
+
+    def test_permission_with_proxy_content_type_created(self):
+        """
+        A proxy model's permissions use its own content type rather than the
+        content type of the concrete model.
+        """
+        opts = UserProxy._meta
+        codename = get_permission_codename('add', opts)
+        self.assertTrue(
+            Permission.objects.filter(
+                content_type__model=opts.model_name,
+                content_type__app_label=opts.app_label,
+                codename=codename,
+            ).exists()
+        )

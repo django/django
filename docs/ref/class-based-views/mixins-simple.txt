@@ -83,7 +83,7 @@ Simple mixins
 
         The content type to use for the response. ``content_type`` is passed
         as a keyword argument to ``response_class``. Default is ``None`` --
-        meaning that Django uses :setting:`DEFAULT_CONTENT_TYPE`.
+        meaning that Django uses ``'text/html'``.
 
     **Methods**
 

@@ -1,13 +1,13 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Baptiste Darthenay <baptiste+transifex@darthenay.fr>, 2015-2017
+# Baptiste Darthenay <baptiste+transifex@darthenay.fr>, 2015-2017,2019
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-09-21 22:44+0000\n"
+"POT-Creation-Date: 2018-05-17 11:49+0200\n"
+"PO-Revision-Date: 2019-01-18 12:47+0000\n"
 "Last-Translator: Baptiste Darthenay <baptiste+transifex@darthenay.fr>\n"
 "Language-Team: Esperanto (http://www.transifex.com/django/django/language/"
 "eo/)\n"
@@ -21,8 +21,8 @@ msgid "PostgreSQL extensions"
 msgstr "PostgreSQL kromaĵoj"
 
 #, python-format
-msgid "Item %(nth)s in the array did not validate: "
-msgstr "Ero %(nth)s en la tabelo ne validiĝis:"
+msgid "Item %(nth)s in the array did not validate:"
+msgstr "Elemento %(nth)s en la tabelo ne estas valida:"
 
 msgid "Nested arrays must have the same length."
 msgstr "Ingitaj tabeloj devas havi la saman grandon."

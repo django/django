@@ -5,7 +5,7 @@ import uuid
 from copy import deepcopy
 
 from django.core.exceptions import FieldError
-from django.db import DatabaseError, connection, models, transaction
+from django.db import DatabaseError, connection, models
 from django.db.models import CharField, Q, TimeField, UUIDField
 from django.db.models.aggregates import (
     Avg, Count, Max, Min, StdDev, Sum, Variance,
@@ -21,11 +21,11 @@ from django.db.models.functions import (
 from django.db.models.sql import constants
 from django.db.models.sql.datastructures import Join
 from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
-from django.test.utils import Approximate
+from django.test.utils import Approximate, isolate_apps
 
 from .models import (
-    UUID, UUIDPK, Company, Employee, Experiment, Number, Result, SimulationRun,
-    Time,
+    UUID, UUIDPK, Company, Employee, Experiment, Number, RemoteEmployee,
+    Result, SimulationRun, Time,
 )
 
 
@@ -69,6 +69,10 @@ class BasicExpressionsTests(TestCase):
             companies,
             ['<Company: Example Inc.>', '<Company: Foobar Ltd.>', '<Company: Test GmbH>'],
         )
+
+    def test_annotate_values_count(self):
+        companies = Company.objects.annotate(foo=RawSQL('%s', ['value']))
+        self.assertEqual(companies.count(), 3)
 
     @unittest.skipIf(connection.vendor == 'oracle', "Oracle doesn't support using boolean type in SELECT")
     def test_filtering_on_annotate_that_uses_q(self):
@@ -237,12 +241,11 @@ class BasicExpressionsTests(TestCase):
             "foo",
         )
 
-        with transaction.atomic():
-            msg = "Joined field references are not permitted in this query"
-            with self.assertRaisesMessage(FieldError, msg):
-                Company.objects.exclude(
-                    ceo__firstname=F('point_of_contact__firstname')
-                ).update(name=F('point_of_contact__lastname'))
+        msg = "Joined field references are not permitted in this query"
+        with self.assertRaisesMessage(FieldError, msg):
+            Company.objects.exclude(
+                ceo__firstname=F('point_of_contact__firstname')
+            ).update(name=F('point_of_contact__lastname'))
 
     def test_object_update(self):
         # F expressions can be used to update attributes on single objects
@@ -265,7 +268,8 @@ class BasicExpressionsTests(TestCase):
 
     def test_object_create_with_aggregate(self):
         # Aggregates are not allowed when inserting new data
-        with self.assertRaisesMessage(FieldError, 'Aggregate functions are not allowed in this query'):
+        msg = 'Aggregate functions are not allowed in this query (num_employees=Max(Value(1))).'
+        with self.assertRaisesMessage(FieldError, msg):
             Company.objects.create(
                 name='Company', num_employees=Max(Value(1)), num_chairs=1,
                 ceo=Employee.objects.create(firstname="Just", lastname="Doit", salary=30),
@@ -281,10 +285,15 @@ class BasicExpressionsTests(TestCase):
 
         test_gmbh.point_of_contact = self.gmbh.ceo
         test_gmbh.save()
-        test_gmbh.name = F('ceo__last_name')
+        test_gmbh.name = F('ceo__lastname')
         msg = 'Joined field references are not permitted in this query'
         with self.assertRaisesMessage(FieldError, msg):
             test_gmbh.save()
+
+    def test_update_inherited_field_value(self):
+        msg = 'Joined field references are not permitted in this query'
+        with self.assertRaisesMessage(FieldError, msg):
+            RemoteEmployee.objects.update(adjusted_salary=F('salary') * 5)
 
     def test_object_update_unsaved_objects(self):
         # F expressions cannot be used to update attributes on objects which do
@@ -374,6 +383,29 @@ class BasicExpressionsTests(TestCase):
             Exists(Company.objects.filter(ceo=OuterRef('pk'))).desc()
         )
         self.assertSequenceEqual(mustermanns_by_seniority, [self.max, mary])
+
+    def test_order_by_multiline_sql(self):
+        raw_order_by = (
+            RawSQL('''
+                CASE WHEN num_employees > 1000
+                     THEN num_chairs
+                     ELSE 0 END
+            ''', []).desc(),
+            RawSQL('''
+                CASE WHEN num_chairs > 1
+                     THEN 1
+                     ELSE 0 END
+            ''', []).asc()
+        )
+        for qs in (
+            Company.objects.all(),
+            Company.objects.distinct(),
+        ):
+            with self.subTest(qs=qs):
+                self.assertSequenceEqual(
+                    qs.order_by(*raw_order_by),
+                    [self.example_inc, self.gmbh, self.foobar_ltd],
+                )
 
     def test_outerref(self):
         inner = Company.objects.filter(point_of_contact=OuterRef('pk'))
@@ -534,6 +566,38 @@ class BasicExpressionsTests(TestCase):
         outer = Company.objects.filter(pk__in=Subquery(inner.values('pk')))
         self.assertFalse(outer.exists())
 
+    def test_subquery_filter_by_aggregate(self):
+        Number.objects.create(integer=1000, float=1.2)
+        Employee.objects.create(salary=1000)
+        qs = Number.objects.annotate(
+            min_valuable_count=Subquery(
+                Employee.objects.filter(
+                    salary=OuterRef('integer'),
+                ).annotate(cnt=Count('salary')).filter(cnt__gt=0).values('cnt')[:1]
+            ),
+        )
+        self.assertEqual(qs.get().float, 1.2)
+
+    def test_aggregate_subquery_annotation(self):
+        with self.assertNumQueries(1) as ctx:
+            aggregate = Company.objects.annotate(
+                ceo_salary=Subquery(
+                    Employee.objects.filter(
+                        id=OuterRef('ceo_id'),
+                    ).values('salary')
+                ),
+            ).aggregate(
+                ceo_salary_gt_20=Count('pk', filter=Q(ceo_salary__gt=20)),
+            )
+        self.assertEqual(aggregate, {'ceo_salary_gt_20': 1})
+        # Aggregation over a subquery annotation doesn't annotate the subquery
+        # twice in the inner query.
+        sql = ctx.captured_queries[0]['sql']
+        self.assertLessEqual(sql.count('SELECT'), 3)
+        # GROUP BY isn't required to aggregate over a query that doesn't
+        # contain nested aggregates.
+        self.assertNotIn('GROUP BY', sql)
+
     def test_explicit_output_field(self):
         class FuncA(Func):
             output_field = models.CharField()
@@ -553,6 +617,17 @@ class BasicExpressionsTests(TestCase):
         inner = Company.objects.filter(num_employees=OuterRef('ceo__salary') + 2)
         outer = Company.objects.filter(pk__in=Subquery(inner.values('pk')))
         self.assertEqual(outer.get().name, 'Test GmbH')
+
+    def test_annotation_with_outerref(self):
+        gmbh_salary = Company.objects.annotate(
+            max_ceo_salary_raise=Subquery(
+                Company.objects.annotate(
+                    salary_raise=OuterRef('num_employees') + F('num_employees'),
+                ).order_by('-salary_raise').values('salary_raise')[:1],
+                output_field=models.IntegerField(),
+            ),
+        ).get(pk=self.gmbh.pk)
+        self.assertEqual(gmbh_salary.max_ceo_salary_raise, 2332)
 
     def test_pickle_expression(self):
         expr = Value(1, output_field=models.IntegerField())
@@ -823,6 +898,7 @@ class ExpressionsTests(TestCase):
         )
 
 
+@isolate_apps('expressions')
 class SimpleExpressionTests(SimpleTestCase):
 
     def test_equal(self):
@@ -836,6 +912,15 @@ class SimpleExpressionTests(SimpleTestCase):
             Expression(models.CharField())
         )
 
+        class TestModel(models.Model):
+            field = models.IntegerField()
+            other_field = models.IntegerField()
+
+        self.assertNotEqual(
+            Expression(TestModel._meta.get_field('field')),
+            Expression(TestModel._meta.get_field('other_field')),
+        )
+
     def test_hash(self):
         self.assertEqual(hash(Expression()), hash(Expression()))
         self.assertEqual(
@@ -845,6 +930,15 @@ class SimpleExpressionTests(SimpleTestCase):
         self.assertNotEqual(
             hash(Expression(models.IntegerField())),
             hash(Expression(models.CharField())),
+        )
+
+        class TestModel(models.Model):
+            field = models.IntegerField()
+            other_field = models.IntegerField()
+
+        self.assertNotEqual(
+            hash(Expression(TestModel._meta.get_field('field'))),
+            hash(Expression(TestModel._meta.get_field('other_field'))),
         )
 
 
@@ -1481,18 +1575,22 @@ class ReprTests(SimpleTestCase):
 
     def test_aggregates(self):
         self.assertEqual(repr(Avg('a')), "Avg(F(a))")
-        self.assertEqual(repr(Count('a')), "Count(F(a), distinct=False)")
-        self.assertEqual(repr(Count('*')), "Count('*', distinct=False)")
+        self.assertEqual(repr(Count('a')), "Count(F(a))")
+        self.assertEqual(repr(Count('*')), "Count('*')")
         self.assertEqual(repr(Max('a')), "Max(F(a))")
         self.assertEqual(repr(Min('a')), "Min(F(a))")
         self.assertEqual(repr(StdDev('a')), "StdDev(F(a), sample=False)")
         self.assertEqual(repr(Sum('a')), "Sum(F(a))")
         self.assertEqual(repr(Variance('a', sample=True)), "Variance(F(a), sample=True)")
 
+    def test_distinct_aggregates(self):
+        self.assertEqual(repr(Count('a', distinct=True)), "Count(F(a), distinct=True)")
+        self.assertEqual(repr(Count('*', distinct=True)), "Count('*', distinct=True)")
+
     def test_filtered_aggregates(self):
         filter = Q(a=1)
         self.assertEqual(repr(Avg('a', filter=filter)), "Avg(F(a), filter=(AND: ('a', 1)))")
-        self.assertEqual(repr(Count('a', filter=filter)), "Count(F(a), distinct=False, filter=(AND: ('a', 1)))")
+        self.assertEqual(repr(Count('a', filter=filter)), "Count(F(a), filter=(AND: ('a', 1)))")
         self.assertEqual(repr(Max('a', filter=filter)), "Max(F(a), filter=(AND: ('a', 1)))")
         self.assertEqual(repr(Min('a', filter=filter)), "Min(F(a), filter=(AND: ('a', 1)))")
         self.assertEqual(repr(StdDev('a', filter=filter)), "StdDev(F(a), filter=(AND: ('a', 1)), sample=False)")
@@ -1500,6 +1598,9 @@ class ReprTests(SimpleTestCase):
         self.assertEqual(
             repr(Variance('a', sample=True, filter=filter)),
             "Variance(F(a), filter=(AND: ('a', 1)), sample=True)"
+        )
+        self.assertEqual(
+            repr(Count('a', filter=filter, distinct=True)), "Count(F(a), distinct=True, filter=(AND: ('a', 1)))"
         )
 
 

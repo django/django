@@ -5,16 +5,16 @@
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Thanh Le Viet <lethanhx2k@gmail.com>, 2013
 # Tran <hongdiepkien@gmail.com>, 2011
-# Tran Van <vantxm@yahoo.co.uk>, 2011-2013,2016
+# Tran Van <vantxm@yahoo.co.uk>, 2011-2013,2016,2018
 # Vuong Nguyen <autalpha@gmail.com>, 2011
 # xgenvn <xgenvn@gmail.com>, 2014
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-09-23 18:54+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2019-01-16 20:42+0100\n"
+"PO-Revision-Date: 2019-01-18 00:36+0000\n"
+"Last-Translator: Ramiro Morales\n"
 "Language-Team: Vietnamese (http://www.transifex.com/django/django/language/"
 "vi/)\n"
 "MIME-Version: 1.0\n"
@@ -91,6 +91,15 @@ msgstr "Thêm một %(verbose_name)s "
 msgid "Remove"
 msgstr "Gỡ bỏ"
 
+msgid "Addition"
+msgstr ""
+
+msgid "Change"
+msgstr "Thay đổi"
+
+msgid "Deletion"
+msgstr ""
+
 msgid "action time"
 msgstr "Thời gian tác động"
 
@@ -98,13 +107,13 @@ msgid "user"
 msgstr ""
 
 msgid "content type"
-msgstr ""
+msgstr "kiểu nội dung"
 
 msgid "object id"
 msgstr "Mã đối tượng"
 
 #. Translators: 'repr' means representation
-#. (https://docs.python.org/3/library/functions.html#repr)
+#. (https://docs.python.org/library/functions.html#repr)
 msgid "object repr"
 msgstr "đối tượng repr"
 
@@ -137,7 +146,7 @@ msgstr "LogEntry Object"
 
 #, python-brace-format
 msgid "Added {name} \"{object}\"."
-msgstr ""
+msgstr "{name} \"{object}\" đã được thêm vào."
 
 msgid "Added."
 msgstr "Được thêm."
@@ -169,8 +178,10 @@ msgstr ""
 "Giữ phím \"Control\", hoặc \"Command\" trên Mac, để chọn nhiều hơn một."
 
 #, python-brace-format
-msgid ""
-"The {name} \"{obj}\" was added successfully. You may edit it again below."
+msgid "The {name} \"{obj}\" was added successfully."
+msgstr ""
+
+msgid "You may edit it again below."
 msgstr ""
 
 #, python-brace-format
@@ -180,12 +191,13 @@ msgid ""
 msgstr ""
 
 #, python-brace-format
-msgid "The {name} \"{obj}\" was added successfully."
+msgid ""
+"The {name} \"{obj}\" was changed successfully. You may edit it again below."
 msgstr ""
 
 #, python-brace-format
 msgid ""
-"The {name} \"{obj}\" was changed successfully. You may edit it again below."
+"The {name} \"{obj}\" was added successfully. You may edit it again below."
 msgstr ""
 
 #, python-brace-format
@@ -223,6 +235,10 @@ msgstr "Thêm %s"
 #, python-format
 msgid "Change %s"
 msgstr "Thay đổi %s"
+
+#, python-format
+msgid "View %s"
+msgstr ""
 
 msgid "Database error"
 msgstr "Cơ sở dữ liệu bị lỗi"
@@ -327,7 +343,7 @@ msgid "Enter a username and password."
 msgstr "Điền tên đăng nhập và mật khẩu."
 
 msgid "Change password"
-msgstr "Thay đổi mật khẩu"
+msgstr "Đổi mật khẩu"
 
 msgid "Please correct the error below."
 msgstr "Hãy sửa lỗi sai dưới đây"
@@ -439,8 +455,8 @@ msgstr ""
 "Bạn chắc chắn muốn xóa những lựa chọn %(objects_name)s? Tất cả những đối "
 "tượng sau và những đối tượng liên quan sẽ được xóa:"
 
-msgid "Change"
-msgstr "Thay đổi"
+msgid "View"
+msgstr ""
 
 msgid "Delete?"
 msgstr "Bạn muốn xóa?"
@@ -459,8 +475,8 @@ msgstr "Các mô models trong %(name)s"
 msgid "Add"
 msgstr "Thêm vào"
 
-msgid "You don't have permission to edit anything."
-msgstr "Bạn không được cấp quyền chỉnh sửa bất cứ cái gì."
+msgid "You don't have permission to view or edit anything."
+msgstr ""
 
 msgid "Recent actions"
 msgstr ""
@@ -516,20 +532,8 @@ msgstr "Hiện tất cả"
 msgid "Save"
 msgstr "Lưu lại"
 
-msgid "Popup closing..."
-msgstr "Đang đóng cửa sổ popup ..."
-
-#, python-format
-msgid "Change selected %(model)s"
+msgid "Popup closing…"
 msgstr ""
-
-#, python-format
-msgid "Add another %(model)s"
-msgstr "Thêm %(model)s khác"
-
-#, python-format
-msgid "Delete selected %(model)s"
-msgstr "Xóa %(model)s đã chọn"
 
 msgid "Search"
 msgstr "Tìm kiếm"
@@ -551,6 +555,24 @@ msgstr "Lưu và thêm mới"
 
 msgid "Save and continue editing"
 msgstr "Lưu và tiếp tục chỉnh sửa"
+
+msgid "Save and view"
+msgstr ""
+
+msgid "Close"
+msgstr ""
+
+#, python-format
+msgid "Change selected %(model)s"
+msgstr ""
+
+#, python-format
+msgid "Add another %(model)s"
+msgstr "Thêm %(model)s khác"
+
+#, python-format
+msgid "Delete selected %(model)s"
+msgstr "Xóa %(model)s đã chọn"
 
 msgid "Thanks for spending some quality time with the Web site today."
 msgstr "Cảm ơn bạn đã dành thời gian với website này"
@@ -659,6 +681,10 @@ msgstr "Chọn %s"
 #, python-format
 msgid "Select %s to change"
 msgstr "Chọn %s để thay đổi"
+
+#, python-format
+msgid "Select %s to view"
+msgstr ""
 
 msgid "Date:"
 msgstr "Ngày:"

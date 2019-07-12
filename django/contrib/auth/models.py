@@ -60,6 +60,7 @@ class Permission(models.Model):
         verbose_name=_('content type'),
     )
     codename = models.CharField(_('codename'), max_length=100)
+
     objects = PermissionManager()
 
     class Meta:
@@ -70,11 +71,7 @@ class Permission(models.Model):
                     'codename')
 
     def __str__(self):
-        return "%s | %s | %s" % (
-            self.content_type.app_label,
-            self.content_type,
-            self.name,
-        )
+        return '%s | %s' % (self.content_type, self.name)
 
     def natural_key(self):
         return (self.codename,) + self.content_type.natural_key()
@@ -162,11 +159,12 @@ class UserManager(BaseUserManager):
 
 
 # A few helper functions for common logic between User and AnonymousUser.
-def _user_get_all_permissions(user, obj):
+def _user_get_permissions(user, obj, from_name):
     permissions = set()
+    name = 'get_%s_permissions' % from_name
     for backend in auth.get_backends():
-        if hasattr(backend, "get_all_permissions"):
-            permissions.update(backend.get_all_permissions(user, obj))
+        if hasattr(backend, name):
+            permissions.update(getattr(backend, name)(user, obj))
     return permissions
 
 
@@ -236,20 +234,24 @@ class PermissionsMixin(models.Model):
     class Meta:
         abstract = True
 
+    def get_user_permissions(self, obj=None):
+        """
+        Return a list of permission strings that this user has directly.
+        Query all available auth backends. If an object is passed in,
+        return only permissions matching this object.
+        """
+        return _user_get_permissions(self, obj, 'user')
+
     def get_group_permissions(self, obj=None):
         """
         Return a list of permission strings that this user has through their
         groups. Query all available auth backends. If an object is passed in,
         return only permissions matching this object.
         """
-        permissions = set()
-        for backend in auth.get_backends():
-            if hasattr(backend, "get_group_permissions"):
-                permissions.update(backend.get_group_permissions(self, obj))
-        return permissions
+        return _user_get_permissions(self, obj, 'group')
 
     def get_all_permissions(self, obj=None):
-        return _user_get_all_permissions(self, obj)
+        return _user_get_permissions(self, obj, 'all')
 
     def has_perm(self, perm, obj=None):
         """
@@ -406,11 +408,14 @@ class AnonymousUser:
     def user_permissions(self):
         return self._user_permissions
 
+    def get_user_permissions(self, obj=None):
+        return _user_get_permissions(self, obj, 'user')
+
     def get_group_permissions(self, obj=None):
         return set()
 
     def get_all_permissions(self, obj=None):
-        return _user_get_all_permissions(self, obj=obj)
+        return _user_get_permissions(self, obj, 'all')
 
     def has_perm(self, perm, obj=None):
         return _user_has_perm(self, perm, obj=obj)

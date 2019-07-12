@@ -64,8 +64,7 @@ def _unsalt_cipher_token(token):
     token = token[CSRF_SECRET_LENGTH:]
     chars = CSRF_ALLOWED_CHARS
     pairs = zip((chars.index(x) for x in token), (chars.index(x) for x in salt))
-    secret = ''.join(chars[x - y] for x, y in pairs)  # Note negative values are ok
-    return secret
+    return ''.join(chars[x - y] for x, y in pairs)  # Note negative values are ok
 
 
 def _get_new_csrf_token():
@@ -293,7 +292,7 @@ class CsrfViewMiddleware(MiddlewareMixin):
             if request.method == "POST":
                 try:
                     request_csrf_token = request.POST.get('csrfmiddlewaretoken', '')
-                except IOError:
+                except OSError:
                     # Handle a broken connection before we've completed reading
                     # the POST data. process_view shouldn't raise any
                     # exceptions, so we'll ignore and serve the user a 403

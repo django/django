@@ -96,7 +96,7 @@ Imports
 
   .. console::
 
-      $ pip install isort
+      $ python -m pip install isort
       $ isort -rc .
 
   This runs ``isort`` recursively from your current directory, modifying any
@@ -258,17 +258,17 @@ Model style
   * ``def get_absolute_url()``
   * Any custom methods
 
-* If ``choices`` is defined for a given model field, define each choice as
-  a tuple of tuples, with an all-uppercase name as a class attribute on the
-  model. Example::
+* If ``choices`` is defined for a given model field, define each choice as a
+  list of tuples, with an all-uppercase name as a class attribute on the model.
+  Example::
 
     class MyModel(models.Model):
         DIRECTION_UP = 'U'
         DIRECTION_DOWN = 'D'
-        DIRECTION_CHOICES = (
+        DIRECTION_CHOICES = [
             (DIRECTION_UP, 'Up'),
             (DIRECTION_DOWN, 'Down'),
-        )
+        ]
 
 Use of ``django.conf.settings``
 ===============================

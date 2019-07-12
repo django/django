@@ -840,7 +840,9 @@ together. For example::
         Q(pub_date=date(2005, 5, 2)) | Q(pub_date=date(2005, 5, 6))
     )
 
-... roughly translates into the SQL::
+... roughly translates into the SQL:
+
+.. code-block:: sql
 
     SELECT * from polls WHERE question LIKE 'Who%'
         AND (pub_date = '2005-05-02' OR pub_date = '2005-05-06')
@@ -867,10 +869,8 @@ precede the definition of any keyword arguments. For example::
 
 .. seealso::
 
-    The `OR lookups examples`_ in the Django unit tests show some possible uses
-    of ``Q``.
-
-    .. _OR lookups examples: https://github.com/django/django/blob/master/tests/or_lookups/tests.py
+    The :source:`OR lookups examples <tests/or_lookups/tests.py>` in Django's
+    unit tests show some possible uses of ``Q``.
 
 Comparing objects
 =================

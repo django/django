@@ -1,12 +1,14 @@
 from math import ceil
 
 from django.db import IntegrityError, connection, models
+from django.db.models.deletion import Collector
 from django.db.models.sql.constants import GET_ITERATOR_CHUNK_SIZE
 from django.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
 
 from .models import (
     MR, A, Avatar, Base, Child, HiddenUser, HiddenUserProfile, M, M2MFrom,
-    M2MTo, MRNull, Parent, R, RChild, S, T, User, create_a, get_default_r,
+    M2MTo, MRNull, Origin, Parent, R, RChild, RChildChild, Referrer, S, T,
+    User, create_a, get_default_r,
 )
 
 
@@ -18,6 +20,13 @@ class OnDeleteTests(TestCase):
         a = create_a('auto')
         a.auto.delete()
         self.assertFalse(A.objects.filter(name='auto').exists())
+
+    def test_non_callable(self):
+        msg = 'on_delete must be callable.'
+        with self.assertRaisesMessage(TypeError, msg):
+            models.ForeignKey('self', on_delete=None)
+        with self.assertRaisesMessage(TypeError, msg):
+            models.OneToOneField('self', on_delete=None)
 
     def test_auto_nullable(self):
         a = create_a('auto_nullable')
@@ -369,6 +378,16 @@ class DeletionTests(TestCase):
         self.assertTrue(R.objects.filter(id=parent_id).exists())
         self.assertTrue(S.objects.filter(pk=parent_referent_id).exists())
 
+        childchild = RChildChild.objects.create()
+        parent_id = childchild.rchild_ptr.r_ptr_id
+        child_id = childchild.rchild_ptr_id
+        parent_referent_id = S.objects.create(r=childchild.rchild_ptr.r_ptr).pk
+        childchild.delete(keep_parents=True)
+        self.assertFalse(RChildChild.objects.filter(id=childchild.id).exists())
+        self.assertTrue(RChild.objects.filter(id=child_id).exists())
+        self.assertTrue(R.objects.filter(id=parent_id).exists())
+        self.assertTrue(S.objects.filter(pk=parent_referent_id).exists())
+
     def test_queryset_delete_returns_num_rows(self):
         """
         QuerySet.delete() should return the number of deleted rows and a
@@ -436,6 +455,39 @@ class DeletionTests(TestCase):
         with self.assertNumQueries(2):
             avatar.delete()
 
+    def test_only_referenced_fields_selected(self):
+        """
+        Only referenced fields are selected during cascade deletion SELECT
+        unless deletion signals are connected.
+        """
+        origin = Origin.objects.create()
+        expected_sql = str(
+            Referrer.objects.only(
+                # Both fields are referenced by SecondReferrer.
+                'id', 'unique_field',
+            ).filter(origin__in=[origin]).query
+        )
+        with self.assertNumQueries(2) as ctx:
+            origin.delete()
+        self.assertEqual(ctx.captured_queries[0]['sql'], expected_sql)
+
+        def receiver(instance, **kwargs):
+            pass
+
+        # All fields are selected if deletion signals are connected.
+        for signal_name in ('pre_delete', 'post_delete'):
+            with self.subTest(signal=signal_name):
+                origin = Origin.objects.create()
+                signal = getattr(models.signals, signal_name)
+                signal.connect(receiver, sender=Referrer)
+                with self.assertNumQueries(2) as ctx:
+                    origin.delete()
+                self.assertIn(
+                    connection.ops.quote_name('large_field'),
+                    ctx.captured_queries[0]['sql'],
+                )
+                signal.disconnect(receiver, sender=Referrer)
+
 
 class FastDeleteTests(TestCase):
 
@@ -470,6 +522,14 @@ class FastDeleteTests(TestCase):
         self.assertNumQueries(1, User.objects.filter(pk=u1.pk).delete)
         self.assertEqual(User.objects.count(), 1)
         self.assertTrue(User.objects.filter(pk=u2.pk).exists())
+
+    def test_fast_delete_instance_set_pk_none(self):
+        u = User.objects.create()
+        # User can be fast-deleted.
+        collector = Collector(using='default')
+        self.assertTrue(collector.can_fast_delete(u))
+        u.delete()
+        self.assertIsNone(u.pk)
 
     def test_fast_delete_joined_qs(self):
         a = Avatar.objects.create(desc='a')

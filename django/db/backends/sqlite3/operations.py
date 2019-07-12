@@ -1,6 +1,8 @@
 import datetime
 import decimal
 import uuid
+from functools import lru_cache
+from itertools import chain
 
 from django.conf import settings
 from django.core.exceptions import FieldError
@@ -11,6 +13,7 @@ from django.db.models.expressions import Col
 from django.utils import timezone
 from django.utils.dateparse import parse_date, parse_datetime, parse_time
 from django.utils.duration import duration_microseconds
+from django.utils.functional import cached_property
 
 
 class DatabaseOperations(BaseDatabaseOperations):
@@ -54,6 +57,11 @@ class DatabaseOperations(BaseDatabaseOperations):
                             'aggregations on date/time fields in sqlite3 '
                             'since date/time is saved as text.'
                         )
+        if isinstance(expression, aggregates.Aggregate) and len(expression.source_expressions) > 1:
+            raise utils.NotSupportedError(
+                "SQLite doesn't support DISTINCT on aggregate functions "
+                "accepting multiple arguments."
+            )
 
     def date_extract_sql(self, lookup_type, field_name):
         """
@@ -76,27 +84,29 @@ class DatabaseOperations(BaseDatabaseOperations):
     def time_trunc_sql(self, lookup_type, field_name):
         return "django_time_trunc('%s', %s)" % (lookup_type.lower(), field_name)
 
-    def _convert_tzname_to_sql(self, tzname):
-        return "'%s'" % tzname if settings.USE_TZ else 'NULL'
+    def _convert_tznames_to_sql(self, tzname):
+        if settings.USE_TZ:
+            return "'%s'" % tzname, "'%s'" % self.connection.timezone_name
+        return 'NULL', 'NULL'
 
     def datetime_cast_date_sql(self, field_name, tzname):
-        return "django_datetime_cast_date(%s, %s)" % (
-            field_name, self._convert_tzname_to_sql(tzname),
+        return 'django_datetime_cast_date(%s, %s, %s)' % (
+            field_name, *self._convert_tznames_to_sql(tzname),
         )
 
     def datetime_cast_time_sql(self, field_name, tzname):
-        return "django_datetime_cast_time(%s, %s)" % (
-            field_name, self._convert_tzname_to_sql(tzname),
+        return 'django_datetime_cast_time(%s, %s, %s)' % (
+            field_name, *self._convert_tznames_to_sql(tzname),
         )
 
     def datetime_extract_sql(self, lookup_type, field_name, tzname):
-        return "django_datetime_extract('%s', %s, %s)" % (
-            lookup_type.lower(), field_name, self._convert_tzname_to_sql(tzname),
+        return "django_datetime_extract('%s', %s, %s, %s)" % (
+            lookup_type.lower(), field_name, *self._convert_tznames_to_sql(tzname),
         )
 
     def datetime_trunc_sql(self, lookup_type, field_name, tzname):
-        return "django_datetime_trunc('%s', %s, %s)" % (
-            lookup_type.lower(), field_name, self._convert_tzname_to_sql(tzname),
+        return "django_datetime_trunc('%s', %s, %s, %s)" % (
+            lookup_type.lower(), field_name, *self._convert_tznames_to_sql(tzname),
         )
 
     def time_extract_sql(self, lookup_type, field_name):
@@ -158,21 +168,43 @@ class DatabaseOperations(BaseDatabaseOperations):
     def no_limit_value(self):
         return -1
 
+    def __references_graph(self, table_name):
+        query = """
+        WITH tables AS (
+            SELECT %s name
+            UNION
+            SELECT sqlite_master.name
+            FROM sqlite_master
+            JOIN tables ON (sql REGEXP %s || tables.name || %s)
+        ) SELECT name FROM tables;
+        """
+        params = (
+            table_name,
+            r'(?i)\s+references\s+("|\')?',
+            r'("|\')?\s*\(',
+        )
+        with self.connection.cursor() as cursor:
+            results = cursor.execute(query, params)
+            return [row[0] for row in results.fetchall()]
+
+    @cached_property
+    def _references_graph(self):
+        # 512 is large enough to fit the ~330 tables (as of this writing) in
+        # Django's test suite.
+        return lru_cache(maxsize=512)(self.__references_graph)
+
     def sql_flush(self, style, tables, sequences, allow_cascade=False):
-        sql = ['%s %s %s;' % (
+        if tables and allow_cascade:
+            # Simulate TRUNCATE CASCADE by recursively collecting the tables
+            # referencing the tables to be flushed.
+            tables = set(chain.from_iterable(self._references_graph(table) for table in tables))
+        # Note: No requirement for reset of auto-incremented indices (cf. other
+        # sql_flush() implementations). Just return SQL at this point
+        return ['%s %s %s;' % (
             style.SQL_KEYWORD('DELETE'),
             style.SQL_KEYWORD('FROM'),
             style.SQL_FIELD(self.quote_name(table))
         ) for table in tables]
-        # Note: No requirement for reset of auto-incremented indices (cf. other
-        # sql_flush() implementations). Just return SQL at this point
-        return sql
-
-    def execute_sql_flush(self, using, sql_list):
-        # To prevent possible violation of foreign key constraints, deactivate
-        # constraints outside of the transaction created in super().
-        with self.connection.constraint_checks_disabled():
-            super().execute_sql_flush(using, sql_list)
 
     def adapt_datetimefield_value(self, value):
         if value is None:

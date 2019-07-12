@@ -380,9 +380,7 @@ details.
 CSRF protection middleware
 --------------------------
 
-.. module:: django.middleware.csrf
-   :synopsis: Middleware adding protection against Cross Site Request
-              Forgeries.
+.. currentmodule:: django.middleware.csrf
 
 .. class:: CsrfViewMiddleware
 
@@ -393,8 +391,7 @@ fields to POST forms and checking requests for the correct value. See the
 ``X-Frame-Options`` middleware
 ------------------------------
 
-.. module:: django.middleware.clickjacking
-   :synopsis: Clickjacking protection
+.. currentmodule:: django.middleware.clickjacking
 
 .. class:: XFrameOptionsMiddleware
 
@@ -426,6 +423,10 @@ Here are some hints about the ordering of various Django middleware classes:
 
 #. :class:`~django.contrib.sessions.middleware.SessionMiddleware`
 
+   Before any middleware that may raise an an exception to trigger an error
+   view (such as :exc:`~django.core.exceptions.PermissionDenied`) if you're
+   using :setting:`CSRF_USE_SESSIONS`.
+
    After ``UpdateCacheMiddleware``: Modifies ``Vary`` header.
 
 #. :class:`~django.middleware.http.ConditionalGetMiddleware`
@@ -450,13 +451,14 @@ Here are some hints about the ordering of various Django middleware classes:
    Close to the top: it redirects when :setting:`APPEND_SLASH` or
    :setting:`PREPEND_WWW` are set to ``True``.
 
+   After ``SessionMiddleware`` if you're using :setting:`CSRF_USE_SESSIONS`.
+
 #. :class:`~django.middleware.csrf.CsrfViewMiddleware`
 
    Before any view middleware that assumes that CSRF attacks have been dealt
    with.
 
-   It must come after ``SessionMiddleware`` if you're using
-   :setting:`CSRF_USE_SESSIONS`.
+   After ``SessionMiddleware`` if you're using :setting:`CSRF_USE_SESSIONS`.
 
 #. :class:`~django.contrib.auth.middleware.AuthenticationMiddleware`
 

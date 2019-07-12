@@ -2,19 +2,20 @@
 #
 # Translators:
 # Baptiste Darthenay <baptiste+transifex@darthenay.fr>, 2012-2013
-# Baptiste Darthenay <baptiste+transifex@darthenay.fr>, 2013-2018
+# Baptiste Darthenay <baptiste+transifex@darthenay.fr>, 2013-2019
 # batisteo <bapdarth@yahoo·fr>, 2011
 # Dinu Gherman <gherman@darwin.in-berlin.de>, 2011
 # kristjan <kristjan.schmidt@googlemail.com>, 2011
 # Nikolay Korotkiy <sikmir@gmail.com>, 2017-2018
+# Robin van der Vliet <info@robinvandervliet.nl>, 2019
 # Adamo Mesha <adam.raizen@gmail.com>, 2012
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-05-17 11:49+0200\n"
-"PO-Revision-Date: 2018-07-30 21:46+0000\n"
-"Last-Translator: Baptiste Darthenay <baptiste+transifex@darthenay.fr>\n"
+"POT-Creation-Date: 2019-01-16 20:42+0100\n"
+"PO-Revision-Date: 2019-02-04 21:34+0000\n"
+"Last-Translator: Robin van der Vliet <info@robinvandervliet.nl>\n"
 "Language-Team: Esperanto (http://www.transifex.com/django/django/language/"
 "eo/)\n"
 "MIME-Version: 1.0\n"
@@ -142,6 +143,9 @@ msgstr "Suprasoraba"
 
 msgid "Hungarian"
 msgstr "Hungara"
+
+msgid "Armenian"
+msgstr "Armena"
 
 msgid "Interlingua"
 msgstr "Interlingvaa"
@@ -369,10 +373,10 @@ msgid_plural ""
 "Ensure this value has at least %(limit_value)d characters (it has "
 "%(show_value)d)."
 msgstr[0] ""
-"Certigu, ke tiu valuto havas %(limit_value)d karaktero (ĝi havas "
+"Certigu, ke tiu valoro havas %(limit_value)d signon (ĝi havas "
 "%(show_value)d)."
 msgstr[1] ""
-"Certigu, ke tiu valuto havas %(limit_value)d karakteroj (ĝi havas "
+"Certigu, ke tiu valoro havas %(limit_value)d signojn (ĝi havas "
 "%(show_value)d)."
 
 #, python-format
@@ -386,7 +390,7 @@ msgstr[0] ""
 "Certigu, ke tio valuto maksimume havas %(limit_value)d karakterojn (ĝi havas "
 "%(show_value)d)."
 msgstr[1] ""
-"Certigu, ke tio valuto maksimume havas %(limit_value)d karakterojn (ĝi havas "
+"Certigu, ke tiu valoro maksimume havas %(limit_value)d signojn (ĝi havas "
 "%(show_value)d)."
 
 msgid "Enter a number."
@@ -611,6 +615,9 @@ msgstr "Kruda binara datumo"
 msgid "'%(value)s' is not a valid UUID."
 msgstr "'%(value)s' ne estas valida UUID."
 
+msgid "Universally unique identifier"
+msgstr "Universe unika identigilo"
+
 msgid "File"
 msgstr "Dosiero"
 
@@ -685,7 +692,7 @@ msgstr[0] ""
 "Certigu, ke tio dosiernomo maksimume havas %(max)d karakteron (ĝi havas "
 "%(length)d)."
 msgstr[1] ""
-"Certigu, ke tio dosiernomo maksimume havas %(max)d karakterojn (ĝi havas "
+"Certigu, ke tiu dosiernomo maksimume havas %(max)d signojn (ĝi havas "
 "%(length)d)."
 
 msgid "Please either submit a file or check the clear checkbox, not both."
@@ -1059,8 +1066,8 @@ msgstr "Tiu ne estas valida IPv6-adreso."
 
 #, python-format
 msgctxt "String to return when truncating text"
-msgid "%(truncated_text)s..."
-msgstr "%(truncated_text)s..."
+msgid "%(truncated_text)s…"
+msgstr "%(truncated_text)s…"
 
 msgid "or"
 msgstr "aŭ"

@@ -481,17 +481,29 @@ You may want to "ping" Google when your sitemap changes, to let it know to
 reindex your site. The sitemaps framework provides a function to do just
 that: :func:`django.contrib.sitemaps.ping_google()`.
 
-.. function:: ping_google
+.. function:: ping_google(sitemap_url=None, ping_url=PING_URL, sitemap_uses_https=True)
 
-    :func:`ping_google` takes an optional argument, ``sitemap_url``,
-    which should be the absolute path to your site's sitemap (e.g.,
-    :file:`'/sitemap.xml'`). If this argument isn't provided,
-    :func:`ping_google` will attempt to figure out your
-    sitemap by performing a reverse looking in your URLconf.
+    ``ping_google`` takes these optional arguments:
+
+    * ``sitemap_url`` - The absolute path to your site's sitemap (e.g.,
+      :file:`'/sitemap.xml'`). If this argument isn't provided, ``ping_google``
+      will attempt to figure out your sitemap by performing a reverse lookup in
+      your URLconf.
+
+    * ``ping_url`` - Defaults to Google's Ping Tool:
+      https://www.google.com/webmasters/tools/ping.
+
+    * ``sitemap_uses_https`` - Set to ``False`` if your site uses ``http``
+      rather than ``https``.
 
     :func:`ping_google` raises the exception
     ``django.contrib.sitemaps.SitemapNotFound`` if it cannot determine your
     sitemap URL.
+
+    .. versionadded:: 2.2
+
+        The ``sitemap_uses_https`` argument was added. Older versions of
+        Django always use ``http`` for a sitemap's URL.
 
 .. admonition:: Register with Google first!
 
@@ -530,3 +542,9 @@ Once the sitemaps application is added to your project, you may also
 ping Google using the ``ping_google`` management command::
 
     python manage.py ping_google [/sitemap.xml]
+
+.. django-admin-option:: --sitemap-uses-http
+
+.. versionadded:: 2.2
+
+Use this option if your sitemap uses ``http`` rather than ``https``.

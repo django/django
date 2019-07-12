@@ -3,7 +3,6 @@ Form classes
 """
 
 import copy
-from collections import OrderedDict
 
 from django.core.exceptions import NON_FIELD_ERRORS, ValidationError
 # BoundField is imported for backwards compatibility in Django 1.9
@@ -12,6 +11,7 @@ from django.forms.fields import Field, FileField
 # pretty_name is imported for backwards compatibility in Django 1.9
 from django.forms.utils import ErrorDict, ErrorList, pretty_name  # NOQA
 from django.forms.widgets import Media, MediaDefiningClass
+from django.utils.datastructures import MultiValueDict
 from django.utils.functional import cached_property
 from django.utils.html import conditional_escape, html_safe
 from django.utils.safestring import mark_safe
@@ -31,12 +31,12 @@ class DeclarativeFieldsMetaclass(MediaDefiningClass):
             if isinstance(value, Field):
                 current_fields.append((key, value))
                 attrs.pop(key)
-        attrs['declared_fields'] = OrderedDict(current_fields)
+        attrs['declared_fields'] = dict(current_fields)
 
         new_class = super(DeclarativeFieldsMetaclass, mcs).__new__(mcs, name, bases, attrs)
 
         # Walk through the MRO.
-        declared_fields = OrderedDict()
+        declared_fields = {}
         for base in reversed(new_class.__mro__):
             # Collect fields from base class.
             if hasattr(base, 'declared_fields'):
@@ -51,11 +51,6 @@ class DeclarativeFieldsMetaclass(MediaDefiningClass):
         new_class.declared_fields = declared_fields
 
         return new_class
-
-    @classmethod
-    def __prepare__(metacls, name, bases, **kwds):
-        # Remember the order in which form fields are defined.
-        return OrderedDict()
 
 
 @html_safe
@@ -75,8 +70,8 @@ class BaseForm:
                  initial=None, error_class=ErrorList, label_suffix=None,
                  empty_permitted=False, field_order=None, use_required_attribute=None, renderer=None):
         self.is_bound = data is not None or files is not None
-        self.data = {} if data is None else data
-        self.files = {} if files is None else files
+        self.data = MultiValueDict() if data is None else data
+        self.files = MultiValueDict() if files is None else files
         self.auto_id = auto_id
         if prefix is not None:
             self.prefix = prefix
@@ -129,7 +124,7 @@ class BaseForm:
         """
         if field_order is None:
             return
-        fields = OrderedDict()
+        fields = {}
         for key in field_order:
             try:
                 fields[key] = self.fields.pop(key)
@@ -166,7 +161,7 @@ class BaseForm:
                 "Key '%s' not found in '%s'. Choices are: %s." % (
                     name,
                     self.__class__.__name__,
-                    ', '.join(sorted(f for f in self.fields)),
+                    ', '.join(sorted(self.fields)),
                 )
             )
         if name not in self._bound_fields_cache:
@@ -194,7 +189,7 @@ class BaseForm:
         return '%s-%s' % (self.prefix, field_name) if self.prefix else field_name
 
     def add_initial_prefix(self, field_name):
-        """Add a 'initial' prefix for checking dynamic initial values."""
+        """Add an 'initial' prefix for checking dynamic initial values."""
         return 'initial-%s' % self.add_prefix(field_name)
 
     def _html_output(self, normal_row, error_row, row_ender, help_text_html, errors_on_separate_row):

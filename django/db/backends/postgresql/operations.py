@@ -18,7 +18,7 @@ class DatabaseOperations(BaseDatabaseOperations):
         if internal_type in ("GenericIPAddressField", "IPAddressField", "TimeField", "UUIDField"):
             # PostgreSQL will resolve a union as type 'text' if input types are
             # 'unknown'.
-            # https://www.postgresql.org/docs/current/static/typeconv-union-case.html
+            # https://www.postgresql.org/docs/current/typeconv-union-case.html
             # These fields cannot be implicitly cast back in the default
             # PostgreSQL configuration so we need to explicitly cast them.
             # We must also remove components of the type within brackets:
@@ -27,7 +27,7 @@ class DatabaseOperations(BaseDatabaseOperations):
         return '%s'
 
     def date_extract_sql(self, lookup_type, field_name):
-        # https://www.postgresql.org/docs/current/static/functions-datetime.html#FUNCTIONS-DATETIME-EXTRACT
+        # https://www.postgresql.org/docs/current/functions-datetime.html#FUNCTIONS-DATETIME-EXTRACT
         if lookup_type == 'week_day':
             # For consistency across backends, we return Sunday=1, Saturday=7.
             return "EXTRACT('dow' FROM %s) + 1" % field_name
@@ -37,12 +37,19 @@ class DatabaseOperations(BaseDatabaseOperations):
             return "EXTRACT('%s' FROM %s)" % (lookup_type, field_name)
 
     def date_trunc_sql(self, lookup_type, field_name):
-        # https://www.postgresql.org/docs/current/static/functions-datetime.html#FUNCTIONS-DATETIME-TRUNC
+        # https://www.postgresql.org/docs/current/functions-datetime.html#FUNCTIONS-DATETIME-TRUNC
         return "DATE_TRUNC('%s', %s)" % (lookup_type, field_name)
+
+    def _prepare_tzname_delta(self, tzname):
+        if '+' in tzname:
+            return tzname.replace('+', '-')
+        elif '-' in tzname:
+            return tzname.replace('-', '+')
+        return tzname
 
     def _convert_field_to_tz(self, field_name, tzname):
         if settings.USE_TZ:
-            field_name = "%s AT TIME ZONE '%s'" % (field_name, tzname)
+            field_name = "%s AT TIME ZONE '%s'" % (field_name, self._prepare_tzname_delta(tzname))
         return field_name
 
     def datetime_cast_date_sql(self, field_name, tzname):
@@ -59,7 +66,7 @@ class DatabaseOperations(BaseDatabaseOperations):
 
     def datetime_trunc_sql(self, lookup_type, field_name, tzname):
         field_name = self._convert_field_to_tz(field_name, tzname)
-        # https://www.postgresql.org/docs/current/static/functions-datetime.html#FUNCTIONS-DATETIME-TRUNC
+        # https://www.postgresql.org/docs/current/functions-datetime.html#FUNCTIONS-DATETIME-TRUNC
         return "DATE_TRUNC('%s', %s)" % (lookup_type, field_name)
 
     def time_trunc_sql(self, lookup_type, field_name):
@@ -228,7 +235,7 @@ class DatabaseOperations(BaseDatabaseOperations):
             return cursor.query.decode()
         return None
 
-    def return_insert_id(self):
+    def return_insert_id(self, field):
         return "RETURNING %s", ()
 
     def bulk_insert_sql(self, fields, placeholder_rows):

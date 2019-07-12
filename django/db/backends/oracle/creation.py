@@ -44,7 +44,7 @@ class DatabaseCreation(BaseDatabaseCreation):
                             "Type 'yes' to delete it, or 'no' to cancel: " % parameters['user'])
                     if autoclobber or confirm == 'yes':
                         if verbosity >= 1:
-                            self.log("Destroying old test database for alias '%s'…" % self.connection.alias)
+                            self.log("Destroying old test database for alias '%s'..." % self.connection.alias)
                         try:
                             self._execute_test_db_destruction(cursor, parameters, verbosity)
                         except DatabaseError as e:
@@ -69,7 +69,7 @@ class DatabaseCreation(BaseDatabaseCreation):
 
             if self._test_user_create():
                 if verbosity >= 1:
-                    self.log('Creating test user…')
+                    self.log('Creating test user...')
                 try:
                     self._create_test_user(cursor, parameters, verbosity, keepdb)
                 except Exception as e:
@@ -84,10 +84,10 @@ class DatabaseCreation(BaseDatabaseCreation):
                     if autoclobber or confirm == 'yes':
                         try:
                             if verbosity >= 1:
-                                self.log('Destroying old test user…')
+                                self.log('Destroying old test user...')
                             self._destroy_test_user(cursor, parameters, verbosity)
                             if verbosity >= 1:
-                                self.log('Creating test user…')
+                                self.log('Creating test user...')
                             self._create_test_user(cursor, parameters, verbosity, keepdb)
                         except Exception as e:
                             self.log('Got an error recreating the test user: %s' % e)
@@ -143,14 +143,14 @@ class DatabaseCreation(BaseDatabaseCreation):
             if autoclobber or confirm == 'yes':
                 try:
                     if verbosity >= 1:
-                        self.log('Destroying old test user…')
+                        self.log('Destroying old test user...')
                     self._destroy_test_user(cursor, parameters, verbosity)
                 except Exception as e:
                     self.log('Got an error destroying the test user: %s' % e)
                     sys.exit(2)
                 try:
                     if verbosity >= 1:
-                        self.log("Destroying old test database for alias '%s'…" % self.connection.alias)
+                        self.log("Destroying old test database for alias '%s'..." % self.connection.alias)
                     self._execute_test_db_destruction(cursor, parameters, verbosity)
                 except Exception as e:
                     self.log('Got an error destroying the test database: %s' % e)
@@ -176,11 +176,11 @@ class DatabaseCreation(BaseDatabaseCreation):
         with self._maindb_connection.cursor() as cursor:
             if self._test_user_create():
                 if verbosity >= 1:
-                    self.log('Destroying test user…')
+                    self.log('Destroying test user...')
                 self._destroy_test_user(cursor, parameters, verbosity)
             if self._test_database_create():
                 if verbosity >= 1:
-                    self.log('Destroying test database tables…')
+                    self.log('Destroying test database tables...')
                 self._execute_test_db_destruction(cursor, parameters, verbosity)
         self._maindb_connection.close()
 
@@ -262,7 +262,7 @@ class DatabaseCreation(BaseDatabaseCreation):
     def _destroy_test_user(self, cursor, parameters, verbosity):
         if verbosity >= 2:
             self.log('_destroy_test_user(): user=%s' % parameters['user'])
-            self.log('Be patient. This can take some time…')
+            self.log('Be patient. This can take some time...')
         statements = [
             'DROP USER %(user)s CASCADE',
         ]

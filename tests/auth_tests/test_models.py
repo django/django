@@ -47,7 +47,7 @@ class LoadDataWithNaturalKeysTestCase(TestCase):
 
 
 class LoadDataWithNaturalKeysAndMultipleDatabasesTestCase(TestCase):
-    multi_db = True
+    databases = {'default', 'other'}
 
     def test_load_data_with_user_permissions(self):
         # Create test contenttypes for both databases
@@ -333,6 +333,7 @@ class AnonymousUserTests(SimpleTestCase):
         self.assertIs(self.user.is_superuser, False)
         self.assertEqual(self.user.groups.all().count(), 0)
         self.assertEqual(self.user.user_permissions.all().count(), 0)
+        self.assertEqual(self.user.get_user_permissions(), set())
         self.assertEqual(self.user.get_group_permissions(), set())
 
     def test_str(self):
@@ -368,3 +369,15 @@ class AnonymousUserTests(SimpleTestCase):
     def test_check_password(self):
         with self.assertRaisesMessage(NotImplementedError, self.no_repr_msg):
             self.user.check_password('password')
+
+
+class GroupTests(SimpleTestCase):
+    def test_str(self):
+        g = Group(name='Users')
+        self.assertEqual(str(g), 'Users')
+
+
+class PermissionTests(TestCase):
+    def test_str(self):
+        p = Permission.objects.get(codename='view_customemailfield')
+        self.assertEqual(str(p), 'auth_tests | custom email field | Can view custom email field')

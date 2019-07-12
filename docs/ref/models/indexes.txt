@@ -40,10 +40,6 @@ For example ``Index(fields=['headline', '-pub_date'])`` would create SQL with
 ``(headline, pub_date DESC)``. Index ordering isn't supported on MySQL. In that
 case, a descending index is created as a normal index.
 
-.. versionchanged:: 2.1
-
-    Older versions don't accept a tuple.
-
 ``name``
 --------
 
@@ -52,6 +48,22 @@ case, a descending index is created as a normal index.
 The name of the index. If ``name`` isn't provided Django will auto-generate a
 name. For compatibility with different databases, index names cannot be longer
 than 30 characters and shouldn't start with a number (0-9) or underscore (_).
+
+.. admonition:: Partial indexes in abstract base classes
+
+    You must always specify a unique name for an index. As such, you
+    cannot normally specify a partial index on an abstract base class, since
+    the :attr:`Meta.indexes <django.db.models.Options.indexes>` option is
+    inherited by subclasses, with exactly the same values for the attributes
+    (including ``name``) each time. To work around name collisions, part of the
+    name may contain ``'%(app_label)s'`` and ``'%(class)s'``, which are
+    replaced, respectively, by the lowercased app label and class name of the
+    concrete model. For example ``Index(fields=['title'],
+    name='%(app_label)s_%(class)s_title_index')``.
+
+.. versionchanged:: 3.0
+
+    Interpolation of  ``'%(app_label)s'`` and ``'%(class)s'`` was added.
 
 ``db_tablespace``
 -----------------
@@ -81,7 +93,7 @@ in the same tablespace as the table.
 .. versionadded:: 2.2
 
 The names of the `PostgreSQL operator classes
-<https://www.postgresql.org/docs/current/static/indexes-opclass.html>`_ to use for
+<https://www.postgresql.org/docs/current/indexes-opclass.html>`_ to use for
 this index. If you require a custom operator class, you must provide one for
 each field in the index.
 
@@ -109,7 +121,7 @@ indexes records with more than 400 pages.
 
 .. admonition:: Restrictions on PostgreSQL
 
-    PostgreSQL requires functions referenced in the condition to be be marked as
+    PostgreSQL requires functions referenced in the condition to be marked as
     IMMUTABLE. Django doesn't validate this but PostgreSQL will error. This
     means that functions such as :ref:`date-functions` and
     :class:`~django.db.models.functions.Concat` aren't accepted. If you store

@@ -1,6 +1,5 @@
 from django.db.backends.base.features import BaseDatabaseFeatures
 from django.db.utils import InterfaceError
-from django.utils.functional import cached_property
 
 
 class DatabaseFeatures(BaseDatabaseFeatures):
@@ -10,7 +9,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     has_select_for_update_skip_locked = True
     has_select_for_update_of = True
     select_for_update_of_column = True
-    can_return_id_from_insert = True
+    can_return_columns_from_insert = True
     can_introspect_autofield = True
     supports_subqueries_in_group_by = False
     supports_transactions = True
@@ -53,18 +52,9 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     """
     supports_callproc_kwargs = True
     supports_over_clause = True
+    supports_frame_range_fixed_distance = True
     supports_ignore_conflicts = False
     max_query_params = 2**16 - 1
     supports_partial_indexes = False
-
-    @cached_property
-    def has_fetch_offset_support(self):
-        return self.connection.oracle_version >= (12, 2)
-
-    @cached_property
-    def allow_sliced_subqueries_with_in(self):
-        return self.has_fetch_offset_support
-
-    @cached_property
-    def supports_slicing_ordering_in_compound(self):
-        return self.has_fetch_offset_support
+    supports_slicing_ordering_in_compound = True
+    allows_multiple_constraints_on_same_fields = False

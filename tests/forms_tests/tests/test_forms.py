@@ -995,7 +995,7 @@ Java</label></li>
         self.assertHTMLEqual(
             f.as_table(),
             """<tr><th>&lt;em&gt;Special&lt;/em&gt; Field:</th><td>
-<ul class="errorlist"><li>Something&#39;s wrong with &#39;Nothing to escape&#39;</li></ul>
+<ul class="errorlist"><li>Something&#x27;s wrong with &#x27;Nothing to escape&#x27;</li></ul>
 <input type="text" name="special_name" value="Nothing to escape" required></td></tr>
 <tr><th><em>Special</em> Field:</th><td>
 <ul class="errorlist"><li>'<b>Nothing to escape</b>' is a safe string</li></ul>
@@ -1008,10 +1008,10 @@ Java</label></li>
         self.assertHTMLEqual(
             f.as_table(),
             """<tr><th>&lt;em&gt;Special&lt;/em&gt; Field:</th><td>
-<ul class="errorlist"><li>Something&#39;s wrong with &#39;Should escape &lt; &amp; &gt; and
-&lt;script&gt;alert(&#39;xss&#39;)&lt;/script&gt;&#39;</li></ul>
+<ul class="errorlist"><li>Something&#x27;s wrong with &#x27;Should escape &lt; &amp; &gt; and
+&lt;script&gt;alert(&#x27;xss&#x27;)&lt;/script&gt;&#x27;</li></ul>
 <input type="text" name="special_name"
-value="Should escape &lt; &amp; &gt; and &lt;script&gt;alert(&#39;xss&#39;)&lt;/script&gt;" required></td></tr>
+value="Should escape &lt; &amp; &gt; and &lt;script&gt;alert(&#x27;xss&#x27;)&lt;/script&gt;" required></td></tr>
 <tr><th><em>Special</em> Field:</th><td>
 <ul class="errorlist"><li>'<b><i>Do not escape</i></b>' is a safe string</li></ul>
 <input type="text" name="special_safe_name" value="&lt;i&gt;Do not escape&lt;/i&gt;" required></td></tr>"""
@@ -2632,7 +2632,7 @@ Password: <input type="password" name="password" required>
             t.render(Context({'form': UserRegistration(auto_id=False)})),
             """<form>
 <p>Username: <input type="text" name="username" maxlength="10" required><br>
-Good luck picking a username that doesn&#39;t already exist.</p>
+Good luck picking a username that doesn&#x27;t already exist.</p>
 <p>Password1: <input type="password" name="password1" required></p>
 <p>Password2: <input type="password" name="password2" required></p>
 <input type="submit" required>
@@ -2872,8 +2872,14 @@ Good luck picking a username that doesn&#39;t already exist.</p>
         self.assertEqual(form.errors, {'name': ['bad value not allowed']})
         form = NameForm(data={'name': ['should be overly', 'long for the field names']})
         self.assertFalse(form.is_valid())
-        self.assertEqual(form.errors, {'name': ['Ensure this value has at most 10 characters (it has 16).',
-                                                'Ensure this value has at most 10 characters (it has 24).']})
+        self.assertEqual(
+            form.errors, {
+                'name': [
+                    'Ensure this value has at most 10 characters (it has 16).',
+                    'Ensure this value has at most 10 characters (it has 24).',
+                ],
+            }
+        )
         form = NameForm(data={'name': ['fname', 'lname']})
         self.assertTrue(form.is_valid())
         self.assertEqual(form.cleaned_data, {'name': 'fname lname'})
@@ -3664,6 +3670,11 @@ Good luck picking a username that doesn&#39;t already exist.</p>
         f = DataForm({'data': 'xyzzy'})
         self.assertTrue(f.is_valid())
         self.assertEqual(f.cleaned_data, {'data': 'xyzzy'})
+
+    def test_empty_data_files_multi_value_dict(self):
+        p = Person()
+        self.assertIsInstance(p.data, MultiValueDict)
+        self.assertIsInstance(p.files, MultiValueDict)
 
 
 class CustomRenderer(DjangoTemplates):

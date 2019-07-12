@@ -628,7 +628,7 @@ below.
 
 Also, you can give :class:`RequestContext` a list of additional processors,
 using the optional, third positional argument, ``processors``. In this
-example, the :class:`RequestContext` instance gets a ``ip_address`` variable::
+example, the :class:`RequestContext` instance gets an ``ip_address`` variable::
 
     from django.http import HttpResponse
     from django.template import RequestContext, Template
@@ -1026,9 +1026,8 @@ Loader methods
 
 .. admonition:: Building your own
 
-    For examples, `read the source code for Django's built-in loaders`_.
-
-.. _read the source code for Django's built-in loaders: https://github.com/django/django/tree/master/django/template/loaders
+    For examples, read the :source:`source code for Django's built-in loaders
+    <django/template/loaders>`.
 
 .. currentmodule:: django.template.base
 

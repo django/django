@@ -4,11 +4,12 @@ from os import path
 
 from django.conf import settings
 from django.test import (
-    RequestFactory, SimpleTestCase, TestCase, modify_settings,
+    RequestFactory, SimpleTestCase, TestCase, ignore_warnings, modify_settings,
     override_settings,
 )
 from django.test.selenium import SeleniumTestCase
 from django.urls import reverse
+from django.utils.deprecation import RemovedInDjango40Warning
 from django.utils.translation import (
     LANGUAGE_SESSION_KEY, get_language, override,
 )
@@ -36,13 +37,17 @@ class SetLanguageTests(TestCase):
         post_data = {'language': lang_code, 'next': '/'}
         response = self.client.post('/i18n/setlang/', post_data, HTTP_REFERER='/i_should_not_be_used/')
         self.assertRedirects(response, '/')
-        self.assertEqual(self.client.session[LANGUAGE_SESSION_KEY], lang_code)
+        with ignore_warnings(category=RemovedInDjango40Warning):
+            self.assertEqual(self.client.session[LANGUAGE_SESSION_KEY], lang_code)
         # The language is set in a cookie.
         language_cookie = self.client.cookies[settings.LANGUAGE_COOKIE_NAME]
         self.assertEqual(language_cookie.value, lang_code)
         self.assertEqual(language_cookie['domain'], '')
         self.assertEqual(language_cookie['path'], '/')
         self.assertEqual(language_cookie['max-age'], '')
+        self.assertEqual(language_cookie['httponly'], '')
+        self.assertEqual(language_cookie['samesite'], '')
+        self.assertEqual(language_cookie['secure'], '')
 
     def test_setlang_unsafe_next(self):
         """
@@ -53,7 +58,9 @@ class SetLanguageTests(TestCase):
         post_data = {'language': lang_code, 'next': '//unsafe/redirection/'}
         response = self.client.post('/i18n/setlang/', data=post_data)
         self.assertEqual(response.url, '/')
-        self.assertEqual(self.client.session[LANGUAGE_SESSION_KEY], lang_code)
+        self.assertEqual(self.client.cookies[settings.LANGUAGE_COOKIE_NAME].value, lang_code)
+        with ignore_warnings(category=RemovedInDjango40Warning):
+            self.assertEqual(self.client.session[LANGUAGE_SESSION_KEY], lang_code)
 
     def test_setlang_http_next(self):
         """
@@ -66,11 +73,15 @@ class SetLanguageTests(TestCase):
         # Insecure URL in POST data.
         response = self.client.post('/i18n/setlang/', data=post_data, secure=True)
         self.assertEqual(response.url, '/')
-        self.assertEqual(self.client.session[LANGUAGE_SESSION_KEY], lang_code)
+        self.assertEqual(self.client.cookies[settings.LANGUAGE_COOKIE_NAME].value, lang_code)
+        with ignore_warnings(category=RemovedInDjango40Warning):
+            self.assertEqual(self.client.session[LANGUAGE_SESSION_KEY], lang_code)
         # Insecure URL in HTTP referer.
         response = self.client.post('/i18n/setlang/', secure=True, HTTP_REFERER=non_https_next_url)
         self.assertEqual(response.url, '/')
-        self.assertEqual(self.client.session[LANGUAGE_SESSION_KEY], lang_code)
+        self.assertEqual(self.client.cookies[settings.LANGUAGE_COOKIE_NAME].value, lang_code)
+        with ignore_warnings(category=RemovedInDjango40Warning):
+            self.assertEqual(self.client.session[LANGUAGE_SESSION_KEY], lang_code)
 
     def test_setlang_redirect_to_referer(self):
         """
@@ -81,7 +92,9 @@ class SetLanguageTests(TestCase):
         post_data = {'language': lang_code}
         response = self.client.post('/i18n/setlang/', post_data, HTTP_REFERER='/i18n/')
         self.assertRedirects(response, '/i18n/', fetch_redirect_response=False)
-        self.assertEqual(self.client.session[LANGUAGE_SESSION_KEY], lang_code)
+        self.assertEqual(self.client.cookies[settings.LANGUAGE_COOKIE_NAME].value, lang_code)
+        with ignore_warnings(category=RemovedInDjango40Warning):
+            self.assertEqual(self.client.session[LANGUAGE_SESSION_KEY], lang_code)
 
     def test_setlang_default_redirect(self):
         """
@@ -92,7 +105,9 @@ class SetLanguageTests(TestCase):
         post_data = {'language': lang_code}
         response = self.client.post('/i18n/setlang/', post_data)
         self.assertRedirects(response, '/')
-        self.assertEqual(self.client.session[LANGUAGE_SESSION_KEY], lang_code)
+        self.assertEqual(self.client.cookies[settings.LANGUAGE_COOKIE_NAME].value, lang_code)
+        with ignore_warnings(category=RemovedInDjango40Warning):
+            self.assertEqual(self.client.session[LANGUAGE_SESSION_KEY], lang_code)
 
     def test_setlang_performs_redirect_for_ajax_if_explicitly_requested(self):
         """
@@ -102,7 +117,9 @@ class SetLanguageTests(TestCase):
         post_data = {'language': lang_code, 'next': '/'}
         response = self.client.post('/i18n/setlang/', post_data, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
         self.assertRedirects(response, '/')
-        self.assertEqual(self.client.session[LANGUAGE_SESSION_KEY], lang_code)
+        self.assertEqual(self.client.cookies[settings.LANGUAGE_COOKIE_NAME].value, lang_code)
+        with ignore_warnings(category=RemovedInDjango40Warning):
+            self.assertEqual(self.client.session[LANGUAGE_SESSION_KEY], lang_code)
 
     def test_setlang_doesnt_perform_a_redirect_to_referer_for_ajax(self):
         """
@@ -114,7 +131,9 @@ class SetLanguageTests(TestCase):
         headers = {'HTTP_REFERER': '/', 'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'}
         response = self.client.post('/i18n/setlang/', post_data, **headers)
         self.assertEqual(response.status_code, 204)
-        self.assertEqual(self.client.session[LANGUAGE_SESSION_KEY], lang_code)
+        self.assertEqual(self.client.cookies[settings.LANGUAGE_COOKIE_NAME].value, lang_code)
+        with ignore_warnings(category=RemovedInDjango40Warning):
+            self.assertEqual(self.client.session[LANGUAGE_SESSION_KEY], lang_code)
 
     def test_setlang_doesnt_perform_a_default_redirect_for_ajax(self):
         """
@@ -124,7 +143,9 @@ class SetLanguageTests(TestCase):
         post_data = {'language': lang_code}
         response = self.client.post('/i18n/setlang/', post_data, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
         self.assertEqual(response.status_code, 204)
-        self.assertEqual(self.client.session[LANGUAGE_SESSION_KEY], lang_code)
+        self.assertEqual(self.client.cookies[settings.LANGUAGE_COOKIE_NAME].value, lang_code)
+        with ignore_warnings(category=RemovedInDjango40Warning):
+            self.assertEqual(self.client.session[LANGUAGE_SESSION_KEY], lang_code)
 
     def test_setlang_unsafe_next_for_ajax(self):
         """
@@ -134,7 +155,16 @@ class SetLanguageTests(TestCase):
         post_data = {'language': lang_code, 'next': '//unsafe/redirection/'}
         response = self.client.post('/i18n/setlang/', post_data, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
         self.assertEqual(response.url, '/')
-        self.assertEqual(self.client.session[LANGUAGE_SESSION_KEY], lang_code)
+        self.assertEqual(self.client.cookies[settings.LANGUAGE_COOKIE_NAME].value, lang_code)
+
+    def test_session_language_deprecation(self):
+        msg = (
+            'The user language will no longer be stored in request.session '
+            'in Django 4.0. Read it from '
+            'request.COOKIES[settings.LANGUAGE_COOKIE_NAME] instead.'
+        )
+        with self.assertRaisesMessage(RemovedInDjango40Warning, msg):
+            self.client.session[LANGUAGE_SESSION_KEY]
 
     def test_setlang_reversal(self):
         self.assertEqual(reverse('set_language'), '/i18n/setlang/')
@@ -148,6 +178,9 @@ class SetLanguageTests(TestCase):
             'LANGUAGE_COOKIE_AGE': 3600 * 7 * 2,
             'LANGUAGE_COOKIE_DOMAIN': '.example.com',
             'LANGUAGE_COOKIE_PATH': '/test/',
+            'LANGUAGE_COOKIE_HTTPONLY': True,
+            'LANGUAGE_COOKIE_SAMESITE': 'Strict',
+            'LANGUAGE_COOKIE_SECURE': True,
         }
         with self.settings(**test_settings):
             post_data = {'language': 'pl', 'next': '/views/'}
@@ -157,18 +190,23 @@ class SetLanguageTests(TestCase):
             self.assertEqual(language_cookie['domain'], '.example.com')
             self.assertEqual(language_cookie['path'], '/test/')
             self.assertEqual(language_cookie['max-age'], 3600 * 7 * 2)
+            self.assertEqual(language_cookie['httponly'], True)
+            self.assertEqual(language_cookie['samesite'], 'Strict')
+            self.assertEqual(language_cookie['secure'], True)
 
     def test_setlang_decodes_http_referer_url(self):
         """
         The set_language view decodes the HTTP_REFERER URL.
         """
-        # The url() & view must exist for this to work as a regression test.
+        # The URL & view must exist for this to work as a regression test.
         self.assertEqual(reverse('with_parameter', kwargs={'parameter': 'x'}), '/test-setlang/x/')
         lang_code = self._get_inactive_language_code()
         encoded_url = '/test-setlang/%C3%A4/'  # (%C3%A4 decodes to ä)
         response = self.client.post('/i18n/setlang/', {'language': lang_code}, HTTP_REFERER=encoded_url)
         self.assertRedirects(response, encoded_url, fetch_redirect_response=False)
-        self.assertEqual(self.client.session[LANGUAGE_SESSION_KEY], lang_code)
+        self.assertEqual(self.client.cookies[settings.LANGUAGE_COOKIE_NAME].value, lang_code)
+        with ignore_warnings(category=RemovedInDjango40Warning):
+            self.assertEqual(self.client.session[LANGUAGE_SESSION_KEY], lang_code)
 
     @modify_settings(MIDDLEWARE={
         'append': 'django.middleware.locale.LocaleMiddleware',
@@ -178,7 +216,9 @@ class SetLanguageTests(TestCase):
             '/i18n/setlang/', data={'language': 'nl'},
             follow=True, HTTP_REFERER='/en/translated/'
         )
-        self.assertEqual(self.client.session[LANGUAGE_SESSION_KEY], 'nl')
+        self.assertEqual(self.client.cookies[settings.LANGUAGE_COOKIE_NAME].value, 'nl')
+        with ignore_warnings(category=RemovedInDjango40Warning):
+            self.assertEqual(self.client.session[LANGUAGE_SESSION_KEY], 'nl')
         self.assertRedirects(response, '/nl/vertaald/')
         # And reverse
         response = self.client.post(
@@ -435,6 +475,8 @@ class I18nSeleniumTests(SeleniumTestCase):
         self.assertEqual(elem.text, "1 Element")
         elem = self.selenium.find_element_by_id("ngettext_plur")
         self.assertEqual(elem.text, "455 Elemente")
+        elem = self.selenium.find_element_by_id("ngettext_onnonplural")
+        self.assertEqual(elem.text, "Bild")
         elem = self.selenium.find_element_by_id("pgettext")
         self.assertEqual(elem.text, "Kann")
         elem = self.selenium.find_element_by_id("npgettext_sing")

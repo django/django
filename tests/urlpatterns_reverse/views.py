@@ -7,11 +7,11 @@ from django.views.generic import RedirectView
 
 
 def empty_view(request, *args, **kwargs):
-    return HttpResponse('')
+    return HttpResponse()
 
 
 def absolute_kwargs_view(request, arg1=1, arg2=2):
-    return HttpResponse('')
+    return HttpResponse()
 
 
 def defaults_view(request, arg1, arg2):
@@ -27,7 +27,7 @@ def erroneous_view(request):
 
 
 def pass_resolver_match_view(request, *args, **kwargs):
-    response = HttpResponse('')
+    response = HttpResponse()
     response.resolver_match = request.resolver_match
     return response
 
@@ -37,7 +37,7 @@ uncallable = None  # neither a callable nor a string
 
 class ViewClass:
     def __call__(self, request, *args, **kwargs):
-        return HttpResponse('')
+        return HttpResponse()
 
 
 view_class_instance = ViewClass()

@@ -3,14 +3,15 @@
 # Translators:
 # Antoni Aloy <aaloy@apsl.net>, 2015,2017
 # duub qnnp, 2015
+# Gil Obradors Via <gil.obradors@gmail.com>, 2019
 # Roger Pons <rogerpons@gmail.com>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-09-21 22:44+0000\n"
-"Last-Translator: Antoni Aloy <aaloy@apsl.net>\n"
+"POT-Creation-Date: 2018-05-17 11:49+0200\n"
+"PO-Revision-Date: 2019-01-29 07:53+0000\n"
+"Last-Translator: Gil Obradors Via <gil.obradors@gmail.com>\n"
 "Language-Team: Catalan (http://www.transifex.com/django/django/language/"
 "ca/)\n"
 "MIME-Version: 1.0\n"
@@ -23,8 +24,8 @@ msgid "PostgreSQL extensions"
 msgstr "Extensions de PostgreSQL"
 
 #, python-format
-msgid "Item %(nth)s in the array did not validate: "
-msgstr "L'element %(nth)s de la matriu no valida:"
+msgid "Item %(nth)s in the array did not validate:"
+msgstr "L'element %(nth)s de la matriu no s'ha pogut validar:"
 
 msgid "Nested arrays must have the same length."
 msgstr "Les matrius niades han de tenir la mateixa longitud."

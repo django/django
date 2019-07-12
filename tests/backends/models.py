@@ -5,6 +5,10 @@ from django.contrib.contenttypes.models import ContentType
 from django.db import models
 
 
+class NonIntegerAutoField(models.Model):
+    creation_datetime = models.DateTimeField(primary_key=True)
+
+
 class Square(models.Model):
     root = models.IntegerField()
     square = models.PositiveIntegerField()

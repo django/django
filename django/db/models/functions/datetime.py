@@ -1,12 +1,12 @@
 from datetime import datetime
 
 from django.conf import settings
-from django.db.models import (
-    DateField, DateTimeField, DurationField, Field, Func, IntegerField,
-    TimeField, Transform, fields,
+from django.db.models.expressions import Func
+from django.db.models.fields import (
+    DateField, DateTimeField, DurationField, Field, IntegerField, TimeField,
 )
 from django.db.models.lookups import (
-    YearExact, YearGt, YearGte, YearLt, YearLte,
+    Transform, YearExact, YearGt, YearGte, YearLt, YearLte,
 )
 from django.utils import timezone
 
@@ -72,6 +72,14 @@ class Extract(TimezoneMixin, Transform):
         if type(field) == DateField and copy.lookup_name in ('hour', 'minute', 'second'):
             raise ValueError(
                 "Cannot extract time component '%s' from DateField '%s'. " % (copy.lookup_name, field.name)
+            )
+        if (
+            isinstance(field, DurationField) and
+            copy.lookup_name in ('year', 'iso_year', 'month', 'week', 'week_day', 'quarter')
+        ):
+            raise ValueError(
+                "Cannot extract component '%s' from DurationField '%s'."
+                % (copy.lookup_name, field.name)
             )
         return copy
 
@@ -157,7 +165,7 @@ ExtractIsoYear.register_lookup(YearLte)
 
 class Now(Func):
     template = 'CURRENT_TIMESTAMP'
-    output_field = fields.DateTimeField()
+    output_field = DateTimeField()
 
     def as_postgresql(self, compiler, connection, **extra_context):
         # PostgreSQL's CURRENT_TIMESTAMP means "the time at the start of the
@@ -170,8 +178,9 @@ class TruncBase(TimezoneMixin, Transform):
     kind = None
     tzinfo = None
 
-    def __init__(self, expression, output_field=None, tzinfo=None, **extra):
+    def __init__(self, expression, output_field=None, tzinfo=None, is_dst=None, **extra):
         self.tzinfo = tzinfo
+        self.is_dst = is_dst
         super().__init__(expression, output_field=output_field, **extra)
 
     def as_sql(self, compiler, connection):
@@ -222,7 +231,7 @@ class TruncBase(TimezoneMixin, Transform):
                 pass
             elif value is not None:
                 value = value.replace(tzinfo=None)
-                value = timezone.make_aware(value, self.tzinfo)
+                value = timezone.make_aware(value, self.tzinfo, is_dst=self.is_dst)
             elif not connection.features.has_zoneinfo_database:
                 raise ValueError(
                     'Database returned an invalid datetime value. Are time '
@@ -240,9 +249,12 @@ class TruncBase(TimezoneMixin, Transform):
 
 class Trunc(TruncBase):
 
-    def __init__(self, expression, kind, output_field=None, tzinfo=None, **extra):
+    def __init__(self, expression, kind, output_field=None, tzinfo=None, is_dst=None, **extra):
         self.kind = kind
-        super().__init__(expression, output_field=output_field, tzinfo=tzinfo, **extra)
+        super().__init__(
+            expression, output_field=output_field, tzinfo=tzinfo,
+            is_dst=is_dst, **extra
+        )
 
 
 class TruncYear(TruncBase):
@@ -285,7 +297,7 @@ class TruncTime(TruncBase):
     output_field = TimeField()
 
     def as_sql(self, compiler, connection):
-        # Cast to date rather than truncate to date.
+        # Cast to time rather than truncate to time.
         lhs, lhs_params = compiler.compile(self.lhs)
         tzname = timezone.get_current_timezone_name() if settings.USE_TZ else None
         sql = connection.ops.datetime_cast_time_sql(lhs, tzname)

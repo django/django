@@ -89,6 +89,7 @@ LANGUAGES = [
     ('hr', gettext_noop('Croatian')),
     ('hsb', gettext_noop('Upper Sorbian')),
     ('hu', gettext_noop('Hungarian')),
+    ('hy', gettext_noop('Armenian')),
     ('ia', gettext_noop('Interlingua')),
     ('id', gettext_noop('Indonesian')),
     ('io', gettext_noop('Ido')),
@@ -153,6 +154,9 @@ LANGUAGE_COOKIE_NAME = 'django_language'
 LANGUAGE_COOKIE_AGE = None
 LANGUAGE_COOKIE_DOMAIN = None
 LANGUAGE_COOKIE_PATH = '/'
+LANGUAGE_COOKIE_SECURE = False
+LANGUAGE_COOKIE_HTTPONLY = False
+LANGUAGE_COOKIE_SAMESITE = None
 
 
 # If you set this to True, Django will format dates, numbers and calendars
@@ -163,10 +167,8 @@ USE_L10N = False
 # notifications and other various emails.
 MANAGERS = ADMINS
 
-# Default content type and charset to use for all HttpResponse objects, if a
-# MIME type isn't manually specified. These are used to construct the
-# Content-Type header.
-DEFAULT_CONTENT_TYPE = 'text/html'
+# Default charset to use for all HttpResponse objects, if a MIME type isn't
+# manually specified. It's used to construct the Content-Type header.
 DEFAULT_CHARSET = 'utf-8'
 
 # Encoding of files read from disk (template and initial SQL files).
@@ -305,7 +307,7 @@ FILE_UPLOAD_TEMP_DIR = None
 
 # The numeric mode to set newly-uploaded files to. The value should be a mode
 # you'd pass directly to os.chmod; see https://docs.python.org/library/os.html#files-and-directories.
-FILE_UPLOAD_PERMISSIONS = None
+FILE_UPLOAD_PERMISSIONS = 0o644
 
 # The numeric mode to assign to newly-created directories, when uploading files.
 # The value should be a mode as you'd pass to os.chmod;
@@ -459,7 +461,7 @@ SESSION_COOKIE_DOMAIN = None
 SESSION_COOKIE_SECURE = False
 # The path of the session cookie.
 SESSION_COOKIE_PATH = '/'
-# Whether to use the non-RFC standard httpOnly flag (IE, FF3+, others)
+# Whether to use the HttpOnly flag.
 SESSION_COOKIE_HTTPONLY = True
 # Whether to set the flag restricting cookie leaks on cross-site requests.
 # This can be 'Lax', 'Strict', or None to disable the flag.

@@ -1,17 +1,18 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Igor Jerosimić, 2019
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Janos Guljas <janos@resenje.org>, 2011-2012
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-11-15 16:15+0100\n"
-"PO-Revision-Date: 2017-11-16 01:13+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2019-01-16 20:42+0100\n"
+"PO-Revision-Date: 2019-06-27 19:21+0000\n"
+"Last-Translator: Igor Jerosimić\n"
 "Language-Team: Serbian (Latin) (http://www.transifex.com/django/django/"
-"language/sr%40latin/)\n"
+"language/sr@latin/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -20,13 +21,13 @@ msgstr ""
 "%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 
 msgid "Afrikaans"
-msgstr ""
+msgstr "afrikanski"
 
 msgid "Arabic"
 msgstr "arapski"
 
 msgid "Asturian"
-msgstr ""
+msgstr "asturijski"
 
 msgid "Azerbaijani"
 msgstr "azerbejdžanski"
@@ -35,13 +36,13 @@ msgid "Bulgarian"
 msgstr "bugarski"
 
 msgid "Belarusian"
-msgstr ""
+msgstr "beloruski"
 
 msgid "Bengali"
 msgstr "bengalski"
 
 msgid "Breton"
-msgstr ""
+msgstr "bretonski"
 
 msgid "Bosnian"
 msgstr "bosanski"
@@ -71,13 +72,13 @@ msgid "English"
 msgstr "engleski"
 
 msgid "Australian English"
-msgstr ""
+msgstr "australijski engleski"
 
 msgid "British English"
 msgstr "britanski engleski"
 
 msgid "Esperanto"
-msgstr ""
+msgstr "esperanto"
 
 msgid "Spanish"
 msgstr "španski"
@@ -86,7 +87,7 @@ msgid "Argentinian Spanish"
 msgstr "argentinski španski"
 
 msgid "Colombian Spanish"
-msgstr ""
+msgstr "kolumbijski španski"
 
 msgid "Mexican Spanish"
 msgstr "meksički španski"
@@ -95,7 +96,7 @@ msgid "Nicaraguan Spanish"
 msgstr "nikaragvanski španski"
 
 msgid "Venezuelan Spanish"
-msgstr ""
+msgstr "venecuelanski španski"
 
 msgid "Estonian"
 msgstr "estonski"
@@ -119,7 +120,7 @@ msgid "Irish"
 msgstr "irski"
 
 msgid "Scottish Gaelic"
-msgstr ""
+msgstr "škotski galski"
 
 msgid "Galician"
 msgstr "galski"
@@ -139,6 +140,9 @@ msgstr ""
 msgid "Hungarian"
 msgstr "mađarski"
 
+msgid "Armenian"
+msgstr "jermenski"
+
 msgid "Interlingua"
 msgstr ""
 
@@ -146,7 +150,7 @@ msgid "Indonesian"
 msgstr "indonežanski"
 
 msgid "Ido"
-msgstr ""
+msgstr "ido"
 
 msgid "Icelandic"
 msgstr "islandski"
@@ -160,8 +164,11 @@ msgstr "japanski"
 msgid "Georgian"
 msgstr "gruzijski"
 
-msgid "Kazakh"
+msgid "Kabyle"
 msgstr ""
+
+msgid "Kazakh"
+msgstr "kazaški"
 
 msgid "Khmer"
 msgstr "kambodijski"
@@ -173,7 +180,7 @@ msgid "Korean"
 msgstr "korejski"
 
 msgid "Luxembourgish"
-msgstr ""
+msgstr "luksemburški"
 
 msgid "Lithuanian"
 msgstr "litvanski"
@@ -194,13 +201,13 @@ msgid "Marathi"
 msgstr ""
 
 msgid "Burmese"
-msgstr ""
+msgstr "burmanski"
 
 msgid "Norwegian Bokmål"
-msgstr ""
+msgstr "norveški književni"
 
 msgid "Nepali"
-msgstr ""
+msgstr "nepalski"
 
 msgid "Dutch"
 msgstr "holandski"
@@ -248,7 +255,7 @@ msgid "Swedish"
 msgstr "švedski"
 
 msgid "Swahili"
-msgstr ""
+msgstr "svahili"
 
 msgid "Tamil"
 msgstr "tamilski"
@@ -263,7 +270,7 @@ msgid "Turkish"
 msgstr "turski"
 
 msgid "Tatar"
-msgstr ""
+msgstr "tatarski"
 
 msgid "Udmurt"
 msgstr ""
@@ -284,25 +291,25 @@ msgid "Traditional Chinese"
 msgstr "starokineski"
 
 msgid "Messages"
-msgstr ""
+msgstr "Poruke"
 
 msgid "Site Maps"
-msgstr ""
+msgstr "Mape sajta"
 
 msgid "Static Files"
-msgstr ""
+msgstr "Statičke datoteke"
 
 msgid "Syndication"
 msgstr ""
 
 msgid "That page number is not an integer"
-msgstr ""
+msgstr "Zadati broj strane nije ceo broj"
 
 msgid "That page number is less than 1"
-msgstr ""
+msgstr "Zadati broj strane je manji od 1"
 
 msgid "That page contains no results"
-msgstr ""
+msgstr "Tražena strana ne sadrži rezultate"
 
 msgid "Enter a valid value."
 msgstr "Unesite ispravnu vrednost."
@@ -311,10 +318,10 @@ msgid "Enter a valid URL."
 msgstr "Unesite ispravan URL."
 
 msgid "Enter a valid integer."
-msgstr ""
+msgstr "Unesite ispravan ceo broj."
 
 msgid "Enter a valid email address."
-msgstr ""
+msgstr "Unesite ispravnu e-mail adresu."
 
 #. Translators: "letters" means latin letters: a-z and A-Z.
 msgid ""
@@ -374,6 +381,9 @@ msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
 
+msgid "Enter a number."
+msgstr "Unesite broj."
+
 #, python-format
 msgid "Ensure that there are no more than %(max)s digit in total."
 msgid_plural "Ensure that there are no more than %(max)s digits in total."
@@ -411,7 +421,7 @@ msgstr "i"
 
 #, python-format
 msgid "%(model_name)s with this %(field_labels)s already exists."
-msgstr ""
+msgstr "%(model_name)ssa poljem %(field_labels)sveć postoji."
 
 #, python-format
 msgid "Value %(value)r is not a valid choice."
@@ -450,6 +460,10 @@ msgstr "Veliki ceo broj"
 
 #, python-format
 msgid "'%(value)s' value must be either True or False."
+msgstr ""
+
+#, python-format
+msgid "'%(value)s' value must be either True, False, or None."
 msgstr ""
 
 msgid "Boolean (Either True or False)"
@@ -575,6 +589,9 @@ msgstr ""
 msgid "'%(value)s' is not a valid UUID."
 msgstr ""
 
+msgid "Universally unique identifier"
+msgstr ""
+
 msgid "File"
 msgstr "Fajl"
 
@@ -606,16 +623,13 @@ msgstr "Relacija više na više"
 #. characters will prevent the default label_suffix to be appended to the
 #. label
 msgid ":?.!"
-msgstr ""
+msgstr ":?.!"
 
 msgid "This field is required."
 msgstr "Ovo polje se mora popuniti."
 
 msgid "Enter a whole number."
 msgstr "Unesite ceo broj."
-
-msgid "Enter a number."
-msgstr "Unesite broj."
 
 msgid "Enter a valid date."
 msgstr "Unesite ispravan datum."
@@ -627,6 +641,10 @@ msgid "Enter a valid date/time."
 msgstr "Unesite ispravan datum/vreme."
 
 msgid "Enter a valid duration."
+msgstr ""
+
+#, python-brace-format
+msgid "The number of days must be between {min_days} and {max_days}."
 msgstr ""
 
 msgid "No file was submitted. Check the encoding type on the form."
@@ -668,11 +686,11 @@ msgid "Enter a complete value."
 msgstr ""
 
 msgid "Enter a valid UUID."
-msgstr ""
+msgstr "Unesite ispravan UUID."
 
 #. Translators: This is the default suffix added to form field labels
 msgid ":"
-msgstr ""
+msgstr ":"
 
 #, python-format
 msgid "(Hidden field %(name)s) %(error)s"
@@ -1016,12 +1034,12 @@ msgid "December"
 msgstr "Decembar"
 
 msgid "This is not a valid IPv6 address."
-msgstr ""
+msgstr "Ovo nije ispravna IPv6 adresa."
 
 #, python-format
 msgctxt "String to return when truncating text"
-msgid "%(truncated_text)s..."
-msgstr "%(truncated_text)s..."
+msgid "%(truncated_text)s…"
+msgstr ""
 
 msgid "or"
 msgstr "ili"
@@ -1073,10 +1091,10 @@ msgstr[1] ""
 msgstr[2] ""
 
 msgid "0 minutes"
-msgstr ""
+msgstr "0 minuta"
 
 msgid "Forbidden"
-msgstr ""
+msgstr "Zabranjeno"
 
 msgid "CSRF verification failed. Request aborted."
 msgstr ""

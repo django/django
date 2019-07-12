@@ -16,7 +16,10 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
     sql_rename_column = "ALTER TABLE %(table)s CHANGE %(old_column)s %(new_column)s %(type)s"
 
     sql_delete_unique = "ALTER TABLE %(table)s DROP INDEX %(name)s"
-
+    sql_create_column_inline_fk = (
+        ', ADD CONSTRAINT %(name)s FOREIGN KEY (%(column)s) '
+        'REFERENCES %(to_table)s(%(to_column)s)'
+    )
     sql_delete_fk = "ALTER TABLE %(table)s DROP FOREIGN KEY %(name)s"
 
     sql_delete_index = "DROP INDEX %(name)s ON %(table)s"
@@ -28,8 +31,9 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
 
     def quote_value(self, value):
         self.connection.ensure_connection()
+        # MySQLdb escapes to string, PyMySQL to bytes.
         quoted = self.connection.connection.escape(value, self.connection.connection.encoders)
-        if isinstance(value, str):
+        if isinstance(value, str) and isinstance(quoted, bytes):
             quoted = quoted.decode()
         return quoted
 

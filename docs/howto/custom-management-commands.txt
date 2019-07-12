@@ -49,10 +49,10 @@ look like this::
         help = 'Closes the specified poll for voting'
 
         def add_arguments(self, parser):
-            parser.add_argument('poll_id', nargs='+', type=int)
+            parser.add_argument('poll_ids', nargs='+', type=int)
 
         def handle(self, *args, **options):
-            for poll_id in options['poll_id']:
+            for poll_id in options['poll_ids']:
                 try:
                     poll = Poll.objects.get(pk=poll_id)
                 except Poll.DoesNotExist:
@@ -77,12 +77,12 @@ look like this::
         self.stdout.write("Unterminated line", ending='')
 
 The new custom command can be called using ``python manage.py closepoll
-<poll_id>``.
+<poll_ids>``.
 
 The ``handle()`` method takes one or more ``poll_ids`` and sets ``poll.opened``
 to ``False`` for each one. If the user referenced any nonexistent polls, a
 :exc:`CommandError` is raised. The ``poll.opened`` attribute does not exist in
-the :doc:`tutorial</intro/tutorial01>` and was added to
+the :doc:`tutorial</intro/tutorial02>` and was added to
 ``polls.models.Question`` for this example.
 
 .. _custom-commands-options:
@@ -97,7 +97,7 @@ options can be added in the :meth:`~BaseCommand.add_arguments` method like this:
     class Command(BaseCommand):
         def add_arguments(self, parser):
             # Positional arguments
-            parser.add_argument('poll_id', nargs='+', type=int)
+            parser.add_argument('poll_ids', nargs='+', type=int)
 
             # Named (optional) arguments
             parser.add_argument(
@@ -143,12 +143,6 @@ decorator on your :meth:`~BaseCommand.handle` method::
 
 Since translation deactivation requires access to configured settings, the
 decorator can't be used for commands that work without configured settings.
-
-.. versionchanged:: 2.1
-
-    The ``@no_translations`` decorator is new. In older versions, translations
-    are deactivated before running a command unless the command's
-    ``leave_locale_alone`` attribute (now removed) is set to ``True``.
 
 Testing
 =======

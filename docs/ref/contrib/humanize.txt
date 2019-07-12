@@ -57,7 +57,9 @@ e.g. with the ``'de'`` language:
 ===========
 
 Converts a large integer (or a string representation of an integer) to a
-friendly text representation. Works best for numbers over 1 million.
+friendly text representation. Translates ``1.0`` as a singular phrase and all
+other numeric values as plural, this may be incorrect for some languages. Works
+best for numbers over 1 million.
 
 Examples:
 
@@ -71,8 +73,13 @@ Values up to 10^100 (Googol) are supported.
 e.g. with the ``'de'`` language:
 
 * ``1000000`` becomes ``'1,0 Million'``.
-* ``1200000`` becomes ``'1,2 Million'``.
+* ``1200000`` becomes ``'1,2 Millionen'``.
 * ``1200000000`` becomes ``'1,2 Milliarden'``.
+
+.. versionchanged:: 3.0
+
+    All numeric values are now translated as plural, except ``1.0`` which is
+    translated as a singular phrase. This may be incorrect for some languages.
 
 .. templatefilter:: naturalday
 

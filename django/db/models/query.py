@@ -5,7 +5,7 @@ The main QuerySet implementation. This provides the public API for the ORM.
 import copy
 import operator
 import warnings
-from collections import OrderedDict, namedtuple
+from collections import namedtuple
 from functools import lru_cache
 from itertools import chain
 
@@ -25,9 +25,11 @@ from django.db.models.query_utils import FilteredRelation, InvalidQuery, Q
 from django.db.models.sql.constants import CURSOR, GET_ITERATOR_CHUNK_SIZE
 from django.db.utils import NotSupportedError
 from django.utils import timezone
-from django.utils.deprecation import RemovedInDjango30Warning
 from django.utils.functional import cached_property, partition
 from django.utils.version import get_version
+
+# The maximum number of results to fetch in a get() query.
+MAX_GET_RESULTS = 21
 
 # The maximum number of items to display in a QuerySet.__repr__
 REPR_OUTPUT_SIZE = 20
@@ -249,7 +251,7 @@ class QuerySet:
     def __repr__(self):
         data = list(self[:REPR_OUTPUT_SIZE + 1])
         if len(data) > REPR_OUTPUT_SIZE:
-            data[-1] = "…(remaining elements truncated)…"
+            data[-1] = "...(remaining elements truncated)..."
         return '<%s %r>' % (self.__class__.__name__, data)
 
     def __len__(self):
@@ -399,6 +401,10 @@ class QuerySet:
         clone = self.filter(*args, **kwargs)
         if self.query.can_filter() and not self.query.distinct_fields:
             clone = clone.order_by()
+        limit = None
+        if not clone.query.select_for_update or connections[clone.db].features.supports_select_for_update_with_limit:
+            limit = MAX_GET_RESULTS
+            clone.query.set_limits(high=limit)
         num = len(clone)
         if num == 1:
             return clone._result_cache[0]
@@ -408,8 +414,10 @@ class QuerySet:
                 self.model._meta.object_name
             )
         raise self.model.MultipleObjectsReturned(
-            "get() returned more than one %s -- it returned %s!" %
-            (self.model._meta.object_name, num)
+            'get() returned more than one %s -- it returned %s!' % (
+                self.model._meta.object_name,
+                num if not limit or num < limit else 'more than %s' % (limit - 1),
+            )
         )
 
     def create(self, **kwargs):
@@ -432,11 +440,11 @@ class QuerySet:
         Insert each of the instances into the database. Do *not* call
         save() on each of the instances, do not send any pre/post_save
         signals, and do not set the primary key attribute if it is an
-        autoincrement field (except if features.can_return_ids_from_bulk_insert=True).
+        autoincrement field (except if features.can_return_rows_from_bulk_insert=True).
         Multi-table models are not supported.
         """
         # When you bulk insert you don't get the primary keys back (if it's an
-        # autoincrement, except if can_return_ids_from_bulk_insert=True), so
+        # autoincrement, except if can_return_rows_from_bulk_insert=True), so
         # you can't insert into the child tables which references this. There
         # are two workarounds:
         # 1) This could be implemented if you didn't have an autoincrement pk
@@ -472,7 +480,7 @@ class QuerySet:
             if objs_without_pk:
                 fields = [f for f in fields if not isinstance(f, AutoField)]
                 ids = self._batched_insert(objs_without_pk, fields, batch_size, ignore_conflicts=ignore_conflicts)
-                if connection.features.can_return_ids_from_bulk_insert and not ignore_conflicts:
+                if connection.features.can_return_rows_from_bulk_insert and not ignore_conflicts:
                     assert len(ids) == len(objs_without_pk)
                 for obj_without_pk, pk in zip(objs_without_pk, ids):
                     obj_without_pk.pk = pk
@@ -607,22 +615,12 @@ class QuerySet:
                 ))
         return params
 
-    def _earliest_or_latest(self, *fields, field_name=None):
+    def _earliest(self, *fields):
         """
-        Return the latest object, according to the model's
-        'get_latest_by' option or optional given field_name.
+        Return the earliest object according to fields (if given) or by the
+        model's Meta.get_latest_by.
         """
-        if fields and field_name is not None:
-            raise ValueError('Cannot use both positional arguments and the field_name keyword argument.')
-
-        if field_name is not None:
-            warnings.warn(
-                'The field_name keyword argument to earliest() and latest() '
-                'is deprecated in favor of passing positional arguments.',
-                RemovedInDjango30Warning,
-            )
-            order_by = (field_name,)
-        elif fields:
+        if fields:
             order_by = fields
         else:
             order_by = getattr(self.model._meta, 'get_latest_by')
@@ -642,11 +640,11 @@ class QuerySet:
         obj.query.add_ordering(*order_by)
         return obj.get()
 
-    def earliest(self, *fields, field_name=None):
-        return self._earliest_or_latest(*fields, field_name=field_name)
+    def earliest(self, *fields):
+        return self._earliest(*fields)
 
-    def latest(self, *fields, field_name=None):
-        return self.reverse()._earliest_or_latest(*fields, field_name=field_name)
+    def latest(self, *fields):
+        return self.reverse()._earliest(*fields)
 
     def first(self):
         """Return the first object of a query or None if no match is found."""
@@ -736,7 +734,7 @@ class QuerySet:
         query = self.query.chain(sql.UpdateQuery)
         query.add_update_values(kwargs)
         # Clear any annotations so that they won't be present in subqueries.
-        query._annotations = None
+        query.annotations = {}
         with transaction.mark_for_rollback_on_error(using=self.db):
             rows = query.get_compiler(self.db).execute_sql(CURSOR)
         self._result_cache = None
@@ -755,7 +753,7 @@ class QuerySet:
         query = self.query.chain(sql.UpdateQuery)
         query.add_update_fields(values)
         # Clear any annotations so that they won't be present in subqueries.
-        query._annotations = None
+        query.annotations = {}
         self._result_cache = None
         return query.get_compiler(self.db).execute_sql(CURSOR)
     _update.alters_data = True
@@ -1025,7 +1023,7 @@ class QuerySet:
         with extra data or aggregations.
         """
         self._validate_values_are_expressions(args + tuple(kwargs.values()), method_name='annotate')
-        annotations = OrderedDict()  # To preserve ordering of args
+        annotations = {}
         for arg in args:
             # The default_alias property may raise a TypeError.
             try:
@@ -1196,7 +1194,7 @@ class QuerySet:
         ops = connections[self.db].ops
         batch_size = (batch_size or max(ops.bulk_batch_size(fields, objs), 1))
         inserted_ids = []
-        bulk_return = connections[self.db].features.can_return_ids_from_bulk_insert
+        bulk_return = connections[self.db].features.can_return_rows_from_bulk_insert
         for item in [objs[i:i + batch_size] for i in range(0, len(objs), batch_size)]:
             if bulk_return and not ignore_conflicts:
                 inserted_id = self._insert(
@@ -1558,7 +1556,7 @@ def prefetch_related_objects(model_instances, *related_lookups):
     while all_lookups:
         lookup = all_lookups.pop()
         if lookup.prefetch_to in done_queries:
-            if lookup.queryset:
+            if lookup.queryset is not None:
                 raise ValueError("'%s' lookup was already seen with a different queryset. "
                                  "You may need to adjust the ordering of your lookups." % lookup.prefetch_to)
 

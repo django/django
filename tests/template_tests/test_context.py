@@ -231,12 +231,10 @@ class RequestContextTests(SimpleTestCase):
         self.assertEqual(engine.from_string('{% include "child" only %}').render(ctx), 'none')
 
     def test_stack_size(self):
-        """
-        #7116 -- Optimize RequetsContext construction
-        """
+        """Optimized RequestContext construction (#7116)."""
         request = self.request_factory.get('/')
         ctx = RequestContext(request, {})
-        # The stack should now contain 3 items:
+        # The stack contains 4 items:
         # [builtins, supplied context, context processor, empty dict]
         self.assertEqual(len(ctx.dicts), 4)
 

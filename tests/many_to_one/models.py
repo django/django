@@ -20,11 +20,11 @@ class Article(models.Model):
     pub_date = models.DateField()
     reporter = models.ForeignKey(Reporter, models.CASCADE)
 
-    def __str__(self):
-        return self.headline
-
     class Meta:
         ordering = ('headline',)
+
+    def __str__(self):
+        return self.headline
 
 
 class City(models.Model):
@@ -68,6 +68,10 @@ class Parent(models.Model):
 class Child(models.Model):
     name = models.CharField(max_length=20)
     parent = models.ForeignKey(Parent, models.CASCADE)
+
+
+class ChildNullableParent(models.Model):
+    parent = models.ForeignKey(Parent, models.CASCADE, null=True)
 
 
 class ToFieldChild(models.Model):

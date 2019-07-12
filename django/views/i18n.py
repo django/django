@@ -47,12 +47,17 @@ def set_language(request):
                 if next_trans != next:
                     response = HttpResponseRedirect(next_trans)
             if hasattr(request, 'session'):
+                # Storing the language in the session is deprecated.
+                # (RemovedInDjango40Warning)
                 request.session[LANGUAGE_SESSION_KEY] = lang_code
             response.set_cookie(
                 settings.LANGUAGE_COOKIE_NAME, lang_code,
                 max_age=settings.LANGUAGE_COOKIE_AGE,
                 path=settings.LANGUAGE_COOKIE_PATH,
                 domain=settings.LANGUAGE_COOKIE_DOMAIN,
+                secure=settings.LANGUAGE_COOKIE_SECURE,
+                httponly=settings.LANGUAGE_COOKIE_HTTPONLY,
+                samesite=settings.LANGUAGE_COOKIE_SAMESITE,
             )
     return response
 
@@ -113,7 +118,7 @@ js_catalog_template = r"""
       if (typeof(value) == 'undefined') {
         return (count == 1) ? singular : plural;
       } else {
-        return value[django.pluralidx(count)];
+        return value.constructor === Array ? value[django.pluralidx(count)] : value;
       }
     };
 

@@ -3,15 +3,16 @@
 # Translators:
 # Antoni Aloy <aaloy@apsl.net>, 2011
 # Carles Barrobés <carles@barrobes.com>, 2012,2014
+# Gil Obradors Via <gil.obradors@gmail.com>, 2019
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Roger Pons <rogerpons@gmail.com>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2017-09-19 16:40+0000\n"
-"Last-Translator: Roger Pons <rogerpons@gmail.com>\n"
+"POT-Creation-Date: 2019-01-16 20:42+0100\n"
+"PO-Revision-Date: 2019-01-29 07:52+0000\n"
+"Last-Translator: Gil Obradors Via <gil.obradors@gmail.com>\n"
 "Language-Team: Catalan (http://www.transifex.com/django/django/language/"
 "ca/)\n"
 "MIME-Version: 1.0\n"
@@ -41,6 +42,9 @@ msgid ""
 msgstr ""
 "Aquest valor sols pot contenir lletres, nombres, punts, subratllats, guions, "
 "barres o accents."
+
+msgid "Example: '/about/contact'. Make sure to have a leading slash."
+msgstr "Exemple: '/quanta/contacte'. Assegura l'última barra inversa"
 
 msgid "URL is missing a leading slash."
 msgstr "La URL no comença amb \"/\"."

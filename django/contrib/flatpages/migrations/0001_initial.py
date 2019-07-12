@@ -18,8 +18,8 @@ class Migration(migrations.Migration):
                 ('enable_comments', models.BooleanField(default=False, verbose_name='enable comments')),
                 ('template_name', models.CharField(
                     help_text=(
-                        "Example: 'flatpages/contact_page.html'. If this isn't provided, the system will use "
-                        "'flatpages/default.html'."
+                        'Example: “flatpages/contact_page.html”. If this isn’t provided, the system will use '
+                        '“flatpages/default.html”.'
                     ), max_length=70, verbose_name='template name', blank=True
                 )),
                 ('registration_required', models.BooleanField(

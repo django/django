@@ -1,13 +1,13 @@
 from django.conf import settings
 from django.db import connection, models
 from django.db.models.query_utils import Q
-from django.test import SimpleTestCase, skipUnlessDBFeature
+from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
 from django.test.utils import isolate_apps
 
 from .models import Book, ChildModel1, ChildModel2
 
 
-class IndexesTests(SimpleTestCase):
+class SimpleIndexesTests(SimpleTestCase):
 
     def test_suffix(self):
         self.assertEqual(models.Index.suffix, 'idx')
@@ -62,20 +62,6 @@ class IndexesTests(SimpleTestCase):
     def test_condition_must_be_q(self):
         with self.assertRaisesMessage(ValueError, 'Index.condition must be a Q instance.'):
             models.Index(condition='invalid', name='long_book_idx')
-
-    def test_max_name_length(self):
-        msg = 'Index names cannot be longer than 30 characters.'
-        with self.assertRaisesMessage(ValueError, msg):
-            models.Index(fields=['title'], name='looooooooooooong_index_name_idx')
-
-    def test_name_constraints(self):
-        msg = 'Index names cannot start with an underscore (_).'
-        with self.assertRaisesMessage(ValueError, msg):
-            models.Index(fields=['title'], name='_name_starting_with_underscore')
-
-        msg = 'Index names cannot start with a number (0-9).'
-        with self.assertRaisesMessage(ValueError, msg):
-            models.Index(fields=['title'], name='5name_starting_with_number')
 
     def test_name_auto_generation(self):
         index = models.Index(fields=['author'])
@@ -148,46 +134,62 @@ class IndexesTests(SimpleTestCase):
 
     def test_name_set(self):
         index_names = [index.name for index in Book._meta.indexes]
-        self.assertCountEqual(index_names, ['model_index_title_196f42_idx', 'model_index_isbn_34f975_idx'])
+        self.assertCountEqual(
+            index_names,
+            [
+                'model_index_title_196f42_idx',
+                'model_index_isbn_34f975_idx',
+                'model_indexes_book_barcode_idx',
+            ],
+        )
 
     def test_abstract_children(self):
         index_names = [index.name for index in ChildModel1._meta.indexes]
-        self.assertEqual(index_names, ['model_index_name_440998_idx'])
+        self.assertEqual(
+            index_names,
+            ['model_index_name_440998_idx', 'model_indexes_childmodel1_idx'],
+        )
         index_names = [index.name for index in ChildModel2._meta.indexes]
-        self.assertEqual(index_names, ['model_index_name_b6c374_idx'])
+        self.assertEqual(
+            index_names,
+            ['model_index_name_b6c374_idx', 'model_indexes_childmodel2_idx'],
+        )
+
+
+class IndexesTests(TestCase):
 
     @skipUnlessDBFeature('supports_tablespaces')
     def test_db_tablespace(self):
-        with connection.schema_editor() as editor:
-            # Index with db_tablespace attribute.
-            for fields in [
-                # Field with db_tablespace specified on model.
-                ['shortcut'],
-                # Field without db_tablespace specified on model.
-                ['author'],
-                # Multi-column with db_tablespaces specified on model.
-                ['shortcut', 'isbn'],
-                # Multi-column without db_tablespace specified on model.
-                ['title', 'author'],
-            ]:
-                with self.subTest(fields=fields):
-                    index = models.Index(fields=fields, db_tablespace='idx_tbls2')
-                    self.assertIn('"idx_tbls2"', str(index.create_sql(Book, editor)).lower())
-            # Indexes without db_tablespace attribute.
-            for fields in [['author'], ['shortcut', 'isbn'], ['title', 'author']]:
-                with self.subTest(fields=fields):
-                    index = models.Index(fields=fields)
-                    # The DEFAULT_INDEX_TABLESPACE setting can't be tested
-                    # because it's evaluated when the model class is defined.
-                    # As a consequence, @override_settings doesn't work.
-                    if settings.DEFAULT_INDEX_TABLESPACE:
-                        self.assertIn(
-                            '"%s"' % settings.DEFAULT_INDEX_TABLESPACE,
-                            str(index.create_sql(Book, editor)).lower()
-                        )
-                    else:
-                        self.assertNotIn('TABLESPACE', str(index.create_sql(Book, editor)))
-            # Field with db_tablespace specified on the model and an index
-            # without db_tablespace.
-            index = models.Index(fields=['shortcut'])
-            self.assertIn('"idx_tbls"', str(index.create_sql(Book, editor)).lower())
+        editor = connection.schema_editor()
+        # Index with db_tablespace attribute.
+        for fields in [
+            # Field with db_tablespace specified on model.
+            ['shortcut'],
+            # Field without db_tablespace specified on model.
+            ['author'],
+            # Multi-column with db_tablespaces specified on model.
+            ['shortcut', 'isbn'],
+            # Multi-column without db_tablespace specified on model.
+            ['title', 'author'],
+        ]:
+            with self.subTest(fields=fields):
+                index = models.Index(fields=fields, db_tablespace='idx_tbls2')
+                self.assertIn('"idx_tbls2"', str(index.create_sql(Book, editor)).lower())
+        # Indexes without db_tablespace attribute.
+        for fields in [['author'], ['shortcut', 'isbn'], ['title', 'author']]:
+            with self.subTest(fields=fields):
+                index = models.Index(fields=fields)
+                # The DEFAULT_INDEX_TABLESPACE setting can't be tested because
+                # it's evaluated when the model class is defined. As a
+                # consequence, @override_settings doesn't work.
+                if settings.DEFAULT_INDEX_TABLESPACE:
+                    self.assertIn(
+                        '"%s"' % settings.DEFAULT_INDEX_TABLESPACE,
+                        str(index.create_sql(Book, editor)).lower()
+                    )
+                else:
+                    self.assertNotIn('TABLESPACE', str(index.create_sql(Book, editor)))
+        # Field with db_tablespace specified on the model and an index without
+        # db_tablespace.
+        index = models.Index(fields=['shortcut'])
+        self.assertIn('"idx_tbls"', str(index.create_sql(Book, editor)).lower())

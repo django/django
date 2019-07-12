@@ -154,16 +154,6 @@ server never attempts to interpret them. For instance, if a user uploads a
 
 Now is a good time to check your backup strategy for these files.
 
-:setting:`FILE_UPLOAD_PERMISSIONS`
-----------------------------------
-
-With the default file upload settings, files smaller than
-:setting:`FILE_UPLOAD_MAX_MEMORY_SIZE` may be stored with a different mode
-than larger files as described in :setting:`FILE_UPLOAD_PERMISSIONS`.
-
-Setting :setting:`FILE_UPLOAD_PERMISSIONS` ensures all files are uploaded with
-the same permissions.
-
 HTTPS
 =====
 

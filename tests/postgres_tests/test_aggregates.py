@@ -1,7 +1,8 @@
 import json
 
-from django.db.models.expressions import F, Value
-from django.test.testcases import skipUnlessDBFeature
+from django.db.models import CharField
+from django.db.models.expressions import F, OuterRef, Subquery, Value
+from django.db.models.functions import Cast, Concat, Substr
 from django.test.utils import Approximate
 
 from . import PostgreSQLTestCase
@@ -38,6 +39,12 @@ class TestGeneralAggregate(PostgreSQLTestCase):
             ((F('boolean_field'), F('char_field').desc()), ['Foo4', 'Foo2', 'Foo3', 'Foo1']),
             ('char_field', ['Foo1', 'Foo2', 'Foo3', 'Foo4']),
             ('-char_field', ['Foo4', 'Foo3', 'Foo2', 'Foo1']),
+            (Concat('char_field', Value('@')), ['Foo1', 'Foo2', 'Foo3', 'Foo4']),
+            (Concat('char_field', Value('@')).desc(), ['Foo4', 'Foo3', 'Foo2', 'Foo1']),
+            (
+                (Substr('char_field', 1, 1), F('integer_field'), Substr('char_field', 4, 1).desc()),
+                ['Foo3', 'Foo1', 'Foo2', 'Foo4'],
+            ),
         )
         for ordering, expected_output in ordering_test_cases:
             with self.subTest(ordering=ordering, expected_output=expected_output):
@@ -165,6 +172,10 @@ class TestGeneralAggregate(PostgreSQLTestCase):
             (F('char_field').desc(), 'Foo4;Foo3;Foo2;Foo1'),
             (F('char_field').asc(), 'Foo1;Foo2;Foo3;Foo4'),
             (F('char_field'), 'Foo1;Foo2;Foo3;Foo4'),
+            ('char_field', 'Foo1;Foo2;Foo3;Foo4'),
+            ('-char_field', 'Foo4;Foo3;Foo2;Foo1'),
+            (Concat('char_field', Value('@')), 'Foo1;Foo2;Foo3;Foo4'),
+            (Concat('char_field', Value('@')).desc(), 'Foo4;Foo3;Foo2;Foo1'),
         )
         for ordering, expected_output in ordering_test_cases:
             with self.subTest(ordering=ordering, expected_output=expected_output):
@@ -184,15 +195,43 @@ class TestGeneralAggregate(PostgreSQLTestCase):
         )
         self.assertEqual(values, {'arrayagg': [0, 1, 0, 2]})
 
-    @skipUnlessDBFeature('has_jsonb_agg')
     def test_json_agg(self):
         values = AggregateTestModel.objects.aggregate(jsonagg=JSONBAgg('char_field'))
         self.assertEqual(values, {'jsonagg': ['Foo1', 'Foo2', 'Foo4', 'Foo3']})
 
-    @skipUnlessDBFeature('has_jsonb_agg')
     def test_json_agg_empty(self):
         values = AggregateTestModel.objects.none().aggregate(jsonagg=JSONBAgg('integer_field'))
         self.assertEqual(values, json.loads('{"jsonagg": []}'))
+
+    def test_string_agg_array_agg_ordering_in_subquery(self):
+        stats = []
+        for i, agg in enumerate(AggregateTestModel.objects.order_by('char_field')):
+            stats.append(StatTestModel(related_field=agg, int1=i, int2=i + 1))
+            stats.append(StatTestModel(related_field=agg, int1=i + 1, int2=i))
+        StatTestModel.objects.bulk_create(stats)
+
+        for aggregate, expected_result in (
+            (
+                ArrayAgg('stattestmodel__int1', ordering='-stattestmodel__int2'),
+                [('Foo1', [0, 1]), ('Foo2', [1, 2]), ('Foo3', [2, 3]), ('Foo4', [3, 4])],
+            ),
+            (
+                StringAgg(
+                    Cast('stattestmodel__int1', CharField()),
+                    delimiter=';',
+                    ordering='-stattestmodel__int2',
+                ),
+                [('Foo1', '0;1'), ('Foo2', '1;2'), ('Foo3', '2;3'), ('Foo4', '3;4')],
+            ),
+        ):
+            with self.subTest(aggregate=aggregate.__class__.__name__):
+                subquery = AggregateTestModel.objects.filter(
+                    pk=OuterRef('pk'),
+                ).annotate(agg=aggregate).values('agg')
+                values = AggregateTestModel.objects.annotate(
+                    agg=Subquery(subquery),
+                ).order_by('char_field').values_list('char_field', 'agg')
+                self.assertEqual(list(values), expected_result)
 
 
 class TestAggregateDistinct(PostgreSQLTestCase):

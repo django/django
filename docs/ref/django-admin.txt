@@ -5,14 +5,10 @@
 ``django-admin`` is Django's command-line utility for administrative tasks.
 This document outlines all it can do.
 
-In addition, ``manage.py`` is automatically created in each Django project.
-``manage.py`` does the same thing as ``django-admin`` but takes care of a few
-things for you:
-
-* It puts your project's package on ``sys.path``.
-
-* It sets the :envvar:`DJANGO_SETTINGS_MODULE` environment variable so that
-  it points to your project's ``settings.py`` file.
+In addition, ``manage.py`` is automatically created in each Django project. It
+does the same thing as ``django-admin`` but also sets the
+:envvar:`DJANGO_SETTINGS_MODULE` environment variable so that it points to your
+project's ``settings.py`` file.
 
 The ``django-admin`` script should be on your system path if you installed
 Django via its ``setup.py`` utility. If it's not on your path, you can find it
@@ -172,6 +168,17 @@ Example usage::
     django-admin compilemessages --exclude=pt_BR --exclude=fr
     django-admin compilemessages -x pt_BR
     django-admin compilemessages -x pt_BR -x fr
+
+.. django-admin-option:: --ignore PATTERN, -i PATTERN
+
+.. versionadded:: 3.0
+
+Ignores directories matching the given :mod:`glob`-style pattern. Use
+multiple times to ignore more.
+
+Example usage::
+
+    django-admin compilemessages --ignore=cache --ignore=outdated/*/locale
 
 ``createcachetable``
 --------------------
@@ -431,8 +438,6 @@ If this option is provided, models are also created for partitions.
 Only support for PostgreSQL is implemented.
 
 .. django-admin-option:: --include-views
-
-.. versionadded:: 2.1
 
 If this option is provided, models are also created for database views.
 
@@ -776,6 +781,12 @@ Enables fixing of migration conflicts.
 Allows naming the generated migration(s) instead of using a generated name. The
 name must be a valid Python :ref:`identifier <python:identifiers>`.
 
+.. django-admin-option:: --no-header
+
+.. versionadded:: 2.2
+
+Generate migration files without Django version and timestamp header.
+
 .. django-admin-option:: --check
 
 Makes ``makemigrations`` exit with a non-zero status when model changes without
@@ -873,13 +884,32 @@ needed. You don't need to restart the server for code changes to take effect.
 However, some actions like adding files don't trigger a restart, so you'll
 have to restart the server in these cases.
 
-If you are using Linux and install `pyinotify`_, kernel signals will be used to
-autoreload the server (rather than polling file modification timestamps each
-second). This offers better scaling to large projects, reduction in response
-time to code modification, more robust change detection, and battery usage
-reduction.
+If you're using Linux or MacOS and install both `pywatchman`_ and the
+`Watchman`_ service, kernel signals will be used to autoreload the server
+(rather than polling file modification timestamps each second). This offers
+better performance on large projects, reduced response time after code changes,
+more robust change detection, and a reduction in power usage. Django supports
+``pywatchman`` 1.2.0 and higher.
 
-.. _pyinotify: https://pypi.org/project/pyinotify/
+.. admonition:: Large directories with many files may cause performance issues
+
+    When using Watchman with a project that includes large non-Python
+    directories like ``node_modules``, it's advisable to ignore this directory
+    for optimal performance. See the `watchman documentation`_ for information
+    on how to do this.
+
+.. admonition:: Watchman timeout
+
+    The default timeout of ``Watchman`` client is 5 seconds. You can change it
+    by setting the ``DJANGO_WATCHMAN_TIMEOUT`` environment variable.
+
+.. _Watchman: https://facebook.github.io/watchman/
+.. _pywatchman: https://pypi.org/project/pywatchman/
+.. _watchman documentation: https://facebook.github.io/watchman/docs/config.html#ignore_dirs
+
+.. versionchanged:: 2.2
+
+   Watchman support replaced support for `pyinotify`.
 
 When you start the server, and each time you change Python code while the
 server is running, the system check framework will check your entire Django
@@ -1055,12 +1085,17 @@ Shows all migrations in a project. You can choose from one of two formats:
 
 Lists all of the apps Django knows about, the migrations available for each
 app, and whether or not each migration is applied (marked by an ``[X]`` next to
-the migration name).
+the migration name). For a ``--verbosity`` of 2 and above, the applied
+datetimes are also shown.
 
 Apps without migrations are also listed, but have ``(no migrations)`` printed
 under them.
 
 This is the default output format.
+
+.. versionchanged:: 3.0
+
+    Output of the applied datetimes at verbosity 2 and above was added.
 
 .. django-admin-option:: --plan, -p
 
@@ -1156,6 +1191,12 @@ Suppresses all user prompts.
 Sets the name of the squashed migration. When omitted, the name is based on the
 first and last migration, with ``_squashed_`` in between.
 
+.. django-admin-option:: --no-header
+
+.. versionadded:: 2.2
+
+Generate squashed migration file without Django version and timestamp header.
+
 ``startapp``
 ------------
 
@@ -1164,10 +1205,9 @@ first and last migration, with ``_squashed_`` in between.
 Creates a Django app directory structure for the given app name in the current
 directory or the given destination.
 
-By default the directory created contains a ``models.py`` file and other app
-template files. (See the `source`_ for more details.) If only the app
-name is given, the app directory will be created in the current working
-directory.
+By default, :source:`the new directory <django/conf/app_template>` contains a
+``models.py`` file and other app template files. If only the app name is given,
+the app directory will be created in the current working directory.
 
 If the optional destination is provided, Django will use that existing
 directory rather than creating a new one. You can use '.' to denote the current
@@ -1219,7 +1259,7 @@ files is:
 - ``app_directory`` -- the full path of the newly created app
 - ``camel_case_app_name`` -- the app name in camel case format
 - ``docs_version`` -- the version of the documentation: ``'dev'`` or ``'1.x'``
-- ``django_version`` -- the version of Django, e.g.``'2.0.3'``
+- ``django_version`` -- the version of Django, e.g. ``'2.0.3'``
 
 .. _render_warning:
 
@@ -1239,8 +1279,6 @@ files is:
     byte-compile invalid ``*.py`` files, template files ending with ``.py-tpl``
     will be renamed to ``.py``.
 
-.. _source: https://github.com/django/django/tree/master/django/conf/app_template/
-
 ``startproject``
 ----------------
 
@@ -1249,9 +1287,9 @@ files is:
 Creates a Django project directory structure for the given project name in
 the current directory or the given destination.
 
-By default, the new directory contains ``manage.py`` and a project package
-(containing a ``settings.py`` and other files). See the `template source`_ for
-details.
+By default, :source:`the new directory <django/conf/project_template>` contains
+``manage.py`` and a project package (containing a ``settings.py`` and other
+files).
 
 If only the project name is given, both the project directory and project
 package will be named ``<projectname>`` and the project directory
@@ -1289,12 +1327,10 @@ The :class:`template context <django.template.Context>` used is:
 - ``project_directory`` -- the full path of the newly created project
 - ``secret_key`` -- a random key for the :setting:`SECRET_KEY` setting
 - ``docs_version`` -- the version of the documentation: ``'dev'`` or ``'1.x'``
-- ``django_version`` -- the version of Django, e.g.``'2.0.3'``
+- ``django_version`` -- the version of Django, e.g. ``'2.0.3'``
 
 Please also see the :ref:`rendering warning <render_warning>` as mentioned
 for :djadmin:`startapp`.
-
-.. _`template source`: https://github.com/django/django/tree/master/django/conf/project_template/
 
 ``test``
 --------
@@ -1325,7 +1361,7 @@ The ``test`` command receives options on behalf of the specified
 :option:`--testrunner`. These are the options of the default test runner:
 :class:`~django.test.runner.DiscoverRunner`.
 
-.. django-admin-option:: --keepdb, -k
+.. django-admin-option:: --keepdb
 
 Preserves the test database between test runs. This has the advantage of
 skipping both the create and destroy actions which can greatly decrease the
@@ -1373,7 +1409,7 @@ correctly:
 
 .. code-block:: console
 
-    $ pip install tblib
+    $ python -m pip install tblib
 
 This feature isn't available on Windows. It doesn't work with the Oracle
 database backend either.
@@ -1402,6 +1438,18 @@ May be specified multiple times and combined with :option:`test --exclude-tag`.
 
 Excludes tests :ref:`marked with the specified tags <topics-tagging-tests>`.
 May be specified multiple times and combined with :option:`test --tag`.
+
+.. django-admin-option:: -k TEST_NAME_PATTERNS
+
+.. versionadded:: 3.0
+
+Runs test methods and classes matching test name patterns, in the same way as
+:option:`unittest's -k option<unittest.-k>`. Can be specified multiple times.
+
+.. admonition:: Python 3.7 and later
+
+    This feature is only available for Python 3.7 and later.
+
 
 ``testserver``
 --------------
@@ -1512,9 +1560,28 @@ useful if you need to create an initial superuser account or if you need to
 programmatically generate superuser accounts for your site(s).
 
 When run interactively, this command will prompt for a password for
-the new superuser account. When run non-interactively, no password
-will be set, and the superuser account will not be able to log in until
-a password has been manually set for it.
+the new superuser account. When run non-interactively, you can provide
+a password by setting the ``DJANGO_SUPERUSER_PASSWORD`` environment variable.
+Otherwise, no password will be set, and the superuser account will not be able
+to log in until a password has been manually set for it.
+
+In non-interactive mode, the
+:attr:`~django.contrib.auth.models.CustomUser.USERNAME_FIELD` and required
+fields (listed in
+:attr:`~django.contrib.auth.models.CustomUser.REQUIRED_FIELDS`) fall back to
+``DJANGO_SUPERUSER_<uppercase_field_name>`` environment variables, unless they
+are overridden by a command line argument. For example, to provide an ``email``
+field, you can use ``DJANGO_SUPERUSER_EMAIL`` environment variable.
+
+.. versionchanged:: 3.0
+
+    Support for using ``DJANGO_SUPERUSER_PASSWORD`` and
+    ``DJANGO_SUPERUSER_<uppercase_field_name>`` environment variables was added.
+
+.. django-admin-option:: --noinput, --no-input
+
+Suppresses all user prompts. If a suppressed prompt cannot be resolved
+automatically, the command will exit with error code 1.
 
 .. django-admin-option:: --username USERNAME
 .. django-admin-option:: --email EMAIL
@@ -1688,6 +1755,19 @@ Example usage::
 Forces colorization of the command output if it would otherwise be disabled
 as discussed in :ref:`syntax-coloring`. For example, you may want to pipe
 colored output to another command.
+
+.. django-admin-option:: --skip-checks
+
+.. versionadded:: 3.0
+
+Skips running system checks prior to running the command. This option is only
+available if the
+:attr:`~django.core.management.BaseCommand.requires_system_checks` command
+attribute is set to ``True``.
+
+Example usage::
+
+    django-admin migrate --skip-checks
 
 Extra niceties
 ==============
@@ -1879,5 +1959,5 @@ Output redirection
 Note that you can redirect standard output and error streams as all commands
 support the ``stdout`` and ``stderr`` options. For example, you could write::
 
-    with open('/path/to/command_output') as f:
+    with open('/path/to/command_output', 'w') as f:
         management.call_command('dumpdata', stdout=f)

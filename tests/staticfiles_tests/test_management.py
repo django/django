@@ -1,4 +1,3 @@
-import codecs
 import datetime
 import os
 import shutil
@@ -63,7 +62,7 @@ class TestFindStatic(TestDefaults, CollectionTestCase):
     """
     def _get_file(self, filepath):
         path = call_command('findstatic', filepath, all=False, verbosity=0, stdout=StringIO())
-        with codecs.open(path, "r", "utf-8") as f:
+        with open(path, encoding='utf-8') as f:
             return f.read()
 
     def test_all_files(self):

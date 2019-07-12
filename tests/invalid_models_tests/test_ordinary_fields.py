@@ -2,7 +2,7 @@ import unittest
 
 from django.core.checks import Error, Warning as DjangoWarning
 from django.db import connection, models
-from django.test import SimpleTestCase, skipIfDBFeature
+from django.test import SimpleTestCase, TestCase, skipIfDBFeature
 from django.test.utils import isolate_apps, override_settings
 from django.utils.functional import lazy
 from django.utils.timezone import now
@@ -35,6 +35,33 @@ class AutoFieldTests(SimpleTestCase):
                 'AutoFields must set primary_key=True.',
                 obj=field,
                 id='fields.E100',
+            ),
+        ])
+
+
+@isolate_apps('invalid_models_tests')
+class BinaryFieldTests(SimpleTestCase):
+
+    def test_valid_default_value(self):
+        class Model(models.Model):
+            field1 = models.BinaryField(default=b'test')
+            field2 = models.BinaryField(default=None)
+
+        for field_name in ('field1', 'field2'):
+            field = Model._meta.get_field(field_name)
+            self.assertEqual(field.check(), [])
+
+    def test_str_default_value(self):
+        class Model(models.Model):
+            field = models.BinaryField(default='test')
+
+        field = Model._meta.get_field('field')
+        self.assertEqual(field.check(), [
+            Error(
+                "BinaryField's default cannot be a string. Use bytes content "
+                "instead.",
+                obj=field,
+                id='fields.E170',
             ),
         ])
 
@@ -156,14 +183,14 @@ class CharFieldTests(SimpleTestCase):
                 self.display = display
 
             def __iter__(self):
-                return (x for x in [self.value, self.display])
+                return iter((self.value, self.display))
 
             def __len__(self):
                 return 2
 
         class Things:
             def __iter__(self):
-                return (x for x in [ThingItem(1, 2), ThingItem(3, 4)])
+                return iter((ThingItem(1, 2), ThingItem(3, 4)))
 
         class ThingWithIterableChoices(models.Model):
             thing = models.CharField(max_length=100, blank=True, choices=Things())
@@ -604,7 +631,7 @@ class ImageFieldTests(SimpleTestCase):
             Error(
                 'Cannot use ImageField because Pillow is not installed.',
                 hint=('Get Pillow at https://pypi.org/project/Pillow/ '
-                      'or run command "pip install Pillow".'),
+                      'or run command "python -m pip install Pillow".'),
                 obj=field,
                 id='fields.E210',
             ),
@@ -680,7 +707,7 @@ class TimeFieldTests(SimpleTestCase):
 
 
 @isolate_apps('invalid_models_tests')
-class TextFieldTests(SimpleTestCase):
+class TextFieldTests(TestCase):
 
     @skipIfDBFeature('supports_index_on_text_field')
     def test_max_length_warning(self):

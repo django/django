@@ -215,11 +215,11 @@ class Price(models.Model):
     price = models.DecimalField(max_digits=10, decimal_places=2)
     quantity = models.PositiveIntegerField()
 
-    def __str__(self):
-        return "%s for %s" % (self.quantity, self.price)
-
     class Meta:
         unique_together = (('price', 'quantity'),)
+
+    def __str__(self):
+        return "%s for %s" % (self.quantity, self.price)
 
 
 class Triple(models.Model):

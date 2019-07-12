@@ -5,7 +5,8 @@ from urllib.parse import urlencode
 from django.core.exceptions import DisallowedHost
 from django.core.handlers.wsgi import LimitedStream, WSGIRequest
 from django.http import HttpRequest, RawPostDataException, UnreadablePostError
-from django.http.request import split_domain_port
+from django.http.multipartparser import MultiPartParserError
+from django.http.request import HttpHeaders, split_domain_port
 from django.test import RequestFactory, SimpleTestCase, override_settings
 from django.test.client import FakePayload
 
@@ -238,10 +239,12 @@ class RequestsTests(SimpleTestCase):
 
     def test_stream(self):
         payload = FakePayload('name=value')
-        request = WSGIRequest({'REQUEST_METHOD': 'POST',
-                               'CONTENT_TYPE': 'application/x-www-form-urlencoded',
-                               'CONTENT_LENGTH': len(payload),
-                               'wsgi.input': payload})
+        request = WSGIRequest({
+            'REQUEST_METHOD': 'POST',
+            'CONTENT_TYPE': 'application/x-www-form-urlencoded',
+            'CONTENT_LENGTH': len(payload),
+            'wsgi.input': payload},
+        )
         self.assertEqual(request.read(), b'name=value')
 
     def test_read_after_value(self):
@@ -250,10 +253,12 @@ class RequestsTests(SimpleTestCase):
         POST or body.
         """
         payload = FakePayload('name=value')
-        request = WSGIRequest({'REQUEST_METHOD': 'POST',
-                               'CONTENT_TYPE': 'application/x-www-form-urlencoded',
-                               'CONTENT_LENGTH': len(payload),
-                               'wsgi.input': payload})
+        request = WSGIRequest({
+            'REQUEST_METHOD': 'POST',
+            'CONTENT_TYPE': 'application/x-www-form-urlencoded',
+            'CONTENT_LENGTH': len(payload),
+            'wsgi.input': payload,
+        })
         self.assertEqual(request.POST, {'name': ['value']})
         self.assertEqual(request.body, b'name=value')
         self.assertEqual(request.read(), b'name=value')
@@ -264,10 +269,12 @@ class RequestsTests(SimpleTestCase):
         from request.
         """
         payload = FakePayload('name=value')
-        request = WSGIRequest({'REQUEST_METHOD': 'POST',
-                               'CONTENT_TYPE': 'application/x-www-form-urlencoded',
-                               'CONTENT_LENGTH': len(payload),
-                               'wsgi.input': payload})
+        request = WSGIRequest({
+            'REQUEST_METHOD': 'POST',
+            'CONTENT_TYPE': 'application/x-www-form-urlencoded',
+            'CONTENT_LENGTH': len(payload),
+            'wsgi.input': payload,
+        })
         self.assertEqual(request.read(2), b'na')
         with self.assertRaises(RawPostDataException):
             request.body
@@ -310,10 +317,12 @@ class RequestsTests(SimpleTestCase):
             'value',
             '--boundary--'
             '']))
-        request = WSGIRequest({'REQUEST_METHOD': 'POST',
-                               'CONTENT_TYPE': 'multipart/form-data; boundary=boundary',
-                               'CONTENT_LENGTH': len(payload),
-                               'wsgi.input': payload})
+        request = WSGIRequest({
+            'REQUEST_METHOD': 'POST',
+            'CONTENT_TYPE': 'multipart/form-data; boundary=boundary',
+            'CONTENT_LENGTH': len(payload),
+            'wsgi.input': payload,
+        })
         self.assertEqual(request.POST, {'name': ['value']})
         with self.assertRaises(RawPostDataException):
             request.body
@@ -334,10 +343,12 @@ class RequestsTests(SimpleTestCase):
             b'--boundary--'
             b''])
         payload = FakePayload(payload_data)
-        request = WSGIRequest({'REQUEST_METHOD': 'POST',
-                               'CONTENT_TYPE': 'multipart/related; boundary=boundary',
-                               'CONTENT_LENGTH': len(payload),
-                               'wsgi.input': payload})
+        request = WSGIRequest({
+            'REQUEST_METHOD': 'POST',
+            'CONTENT_TYPE': 'multipart/related; boundary=boundary',
+            'CONTENT_LENGTH': len(payload),
+            'wsgi.input': payload,
+        })
         self.assertEqual(request.POST, {})
         self.assertEqual(request.body, payload_data)
 
@@ -356,18 +367,22 @@ class RequestsTests(SimpleTestCase):
             'value',
             '--boundary--'
             '']))
-        request = WSGIRequest({'REQUEST_METHOD': 'POST',
-                               'CONTENT_TYPE': 'multipart/form-data; boundary=boundary',
-                               'CONTENT_LENGTH': 0,
-                               'wsgi.input': payload})
+        request = WSGIRequest({
+            'REQUEST_METHOD': 'POST',
+            'CONTENT_TYPE': 'multipart/form-data; boundary=boundary',
+            'CONTENT_LENGTH': 0,
+            'wsgi.input': payload,
+        })
         self.assertEqual(request.POST, {})
 
     def test_POST_binary_only(self):
         payload = b'\r\n\x01\x00\x00\x00ab\x00\x00\xcd\xcc,@'
-        environ = {'REQUEST_METHOD': 'POST',
-                   'CONTENT_TYPE': 'application/octet-stream',
-                   'CONTENT_LENGTH': len(payload),
-                   'wsgi.input': BytesIO(payload)}
+        environ = {
+            'REQUEST_METHOD': 'POST',
+            'CONTENT_TYPE': 'application/octet-stream',
+            'CONTENT_LENGTH': len(payload),
+            'wsgi.input': BytesIO(payload),
+        }
         request = WSGIRequest(environ)
         self.assertEqual(request.POST, {})
         self.assertEqual(request.FILES, {})
@@ -382,10 +397,12 @@ class RequestsTests(SimpleTestCase):
 
     def test_read_by_lines(self):
         payload = FakePayload('name=value')
-        request = WSGIRequest({'REQUEST_METHOD': 'POST',
-                               'CONTENT_TYPE': 'application/x-www-form-urlencoded',
-                               'CONTENT_LENGTH': len(payload),
-                               'wsgi.input': payload})
+        request = WSGIRequest({
+            'REQUEST_METHOD': 'POST',
+            'CONTENT_TYPE': 'application/x-www-form-urlencoded',
+            'CONTENT_LENGTH': len(payload),
+            'wsgi.input': payload,
+        })
         self.assertEqual(list(request), [b'name=value'])
 
     def test_POST_after_body_read(self):
@@ -393,10 +410,12 @@ class RequestsTests(SimpleTestCase):
         POST should be populated even if body is read first
         """
         payload = FakePayload('name=value')
-        request = WSGIRequest({'REQUEST_METHOD': 'POST',
-                               'CONTENT_TYPE': 'application/x-www-form-urlencoded',
-                               'CONTENT_LENGTH': len(payload),
-                               'wsgi.input': payload})
+        request = WSGIRequest({
+            'REQUEST_METHOD': 'POST',
+            'CONTENT_TYPE': 'application/x-www-form-urlencoded',
+            'CONTENT_LENGTH': len(payload),
+            'wsgi.input': payload,
+        })
         request.body  # evaluate
         self.assertEqual(request.POST, {'name': ['value']})
 
@@ -406,10 +425,12 @@ class RequestsTests(SimpleTestCase):
         the stream is read second.
         """
         payload = FakePayload('name=value')
-        request = WSGIRequest({'REQUEST_METHOD': 'POST',
-                               'CONTENT_TYPE': 'application/x-www-form-urlencoded',
-                               'CONTENT_LENGTH': len(payload),
-                               'wsgi.input': payload})
+        request = WSGIRequest({
+            'REQUEST_METHOD': 'POST',
+            'CONTENT_TYPE': 'application/x-www-form-urlencoded',
+            'CONTENT_LENGTH': len(payload),
+            'wsgi.input': payload,
+        })
         request.body  # evaluate
         self.assertEqual(request.read(1), b'n')
         self.assertEqual(request.POST, {'name': ['value']})
@@ -426,10 +447,12 @@ class RequestsTests(SimpleTestCase):
             'value',
             '--boundary--'
             '']))
-        request = WSGIRequest({'REQUEST_METHOD': 'POST',
-                               'CONTENT_TYPE': 'multipart/form-data; boundary=boundary',
-                               'CONTENT_LENGTH': len(payload),
-                               'wsgi.input': payload})
+        request = WSGIRequest({
+            'REQUEST_METHOD': 'POST',
+            'CONTENT_TYPE': 'multipart/form-data; boundary=boundary',
+            'CONTENT_LENGTH': len(payload),
+            'wsgi.input': payload,
+        })
         request.body  # evaluate
         # Consume enough data to mess up the parsing:
         self.assertEqual(request.read(13), b'--boundary\r\nC')
@@ -454,21 +477,43 @@ class RequestsTests(SimpleTestCase):
         })
         self.assertFalse(request.POST._mutable)
 
+    def test_multipart_without_boundary(self):
+        request = WSGIRequest({
+            'REQUEST_METHOD': 'POST',
+            'CONTENT_TYPE': 'multipart/form-data;',
+            'CONTENT_LENGTH': 0,
+            'wsgi.input': FakePayload(),
+        })
+        with self.assertRaisesMessage(MultiPartParserError, 'Invalid boundary in multipart: None'):
+            request.POST
+
+    def test_multipart_non_ascii_content_type(self):
+        request = WSGIRequest({
+            'REQUEST_METHOD': 'POST',
+            'CONTENT_TYPE': 'multipart/form-data; boundary = \xe0',
+            'CONTENT_LENGTH': 0,
+            'wsgi.input': FakePayload(),
+        })
+        msg = 'Invalid non-ASCII Content-Type in multipart: multipart/form-data; boundary = à'
+        with self.assertRaisesMessage(MultiPartParserError, msg):
+            request.POST
+
     def test_POST_connection_error(self):
         """
         If wsgi.input.read() raises an exception while trying to read() the
-        POST, the exception should be identifiable (not a generic IOError).
+        POST, the exception is identifiable (not a generic OSError).
         """
         class ExplodingBytesIO(BytesIO):
             def read(self, len=0):
-                raise IOError("kaboom!")
+                raise OSError('kaboom!')
 
         payload = b'name=value'
-        request = WSGIRequest({'REQUEST_METHOD': 'POST',
-                               'CONTENT_TYPE': 'application/x-www-form-urlencoded',
-                               'CONTENT_LENGTH': len(payload),
-                               'wsgi.input': ExplodingBytesIO(payload)})
-
+        request = WSGIRequest({
+            'REQUEST_METHOD': 'POST',
+            'CONTENT_TYPE': 'application/x-www-form-urlencoded',
+            'CONTENT_LENGTH': len(payload),
+            'wsgi.input': ExplodingBytesIO(payload),
+        })
         with self.assertRaises(UnreadablePostError):
             request.body
 
@@ -497,18 +542,19 @@ class RequestsTests(SimpleTestCase):
     def test_FILES_connection_error(self):
         """
         If wsgi.input.read() raises an exception while trying to read() the
-        FILES, the exception should be identifiable (not a generic IOError).
+        FILES, the exception is identifiable (not a generic OSError).
         """
         class ExplodingBytesIO(BytesIO):
             def read(self, len=0):
-                raise IOError("kaboom!")
+                raise OSError('kaboom!')
 
         payload = b'x'
-        request = WSGIRequest({'REQUEST_METHOD': 'POST',
-                               'CONTENT_TYPE': 'multipart/form-data; boundary=foo_',
-                               'CONTENT_LENGTH': len(payload),
-                               'wsgi.input': ExplodingBytesIO(payload)})
-
+        request = WSGIRequest({
+            'REQUEST_METHOD': 'POST',
+            'CONTENT_TYPE': 'multipart/form-data; boundary=foo_',
+            'CONTENT_LENGTH': len(payload),
+            'wsgi.input': ExplodingBytesIO(payload),
+        })
         with self.assertRaises(UnreadablePostError):
             request.FILES
 
@@ -806,3 +852,86 @@ class BuildAbsoluteURITests(SimpleTestCase):
         for location, expected_url in tests:
             with self.subTest(location=location):
                 self.assertEqual(request.build_absolute_uri(location=location), expected_url)
+
+
+class RequestHeadersTests(SimpleTestCase):
+    ENVIRON = {
+        # Non-headers are ignored.
+        'PATH_INFO': '/somepath/',
+        'REQUEST_METHOD': 'get',
+        'wsgi.input': BytesIO(b''),
+        'SERVER_NAME': 'internal.com',
+        'SERVER_PORT': 80,
+        # These non-HTTP prefixed headers are included.
+        'CONTENT_TYPE': 'text/html',
+        'CONTENT_LENGTH': '100',
+        # All HTTP-prefixed headers are included.
+        'HTTP_ACCEPT': '*',
+        'HTTP_HOST': 'example.com',
+        'HTTP_USER_AGENT': 'python-requests/1.2.0',
+    }
+
+    def test_base_request_headers(self):
+        request = HttpRequest()
+        request.META = self.ENVIRON
+        self.assertEqual(dict(request.headers), {
+            'Content-Type': 'text/html',
+            'Content-Length': '100',
+            'Accept': '*',
+            'Host': 'example.com',
+            'User-Agent': 'python-requests/1.2.0',
+        })
+
+    def test_wsgi_request_headers(self):
+        request = WSGIRequest(self.ENVIRON)
+        self.assertEqual(dict(request.headers), {
+            'Content-Type': 'text/html',
+            'Content-Length': '100',
+            'Accept': '*',
+            'Host': 'example.com',
+            'User-Agent': 'python-requests/1.2.0',
+        })
+
+    def test_wsgi_request_headers_getitem(self):
+        request = WSGIRequest(self.ENVIRON)
+        self.assertEqual(request.headers['User-Agent'], 'python-requests/1.2.0')
+        self.assertEqual(request.headers['user-agent'], 'python-requests/1.2.0')
+        self.assertEqual(request.headers['user_agent'], 'python-requests/1.2.0')
+        self.assertEqual(request.headers['Content-Type'], 'text/html')
+        self.assertEqual(request.headers['Content-Length'], '100')
+
+    def test_wsgi_request_headers_get(self):
+        request = WSGIRequest(self.ENVIRON)
+        self.assertEqual(request.headers.get('User-Agent'), 'python-requests/1.2.0')
+        self.assertEqual(request.headers.get('user-agent'), 'python-requests/1.2.0')
+        self.assertEqual(request.headers.get('Content-Type'), 'text/html')
+        self.assertEqual(request.headers.get('Content-Length'), '100')
+
+
+class HttpHeadersTests(SimpleTestCase):
+    def test_basic(self):
+        environ = {
+            'CONTENT_TYPE': 'text/html',
+            'CONTENT_LENGTH': '100',
+            'HTTP_HOST': 'example.com',
+        }
+        headers = HttpHeaders(environ)
+        self.assertEqual(sorted(headers), ['Content-Length', 'Content-Type', 'Host'])
+        self.assertEqual(headers, {
+            'Content-Type': 'text/html',
+            'Content-Length': '100',
+            'Host': 'example.com',
+        })
+
+    def test_parse_header_name(self):
+        tests = (
+            ('PATH_INFO', None),
+            ('HTTP_ACCEPT', 'Accept'),
+            ('HTTP_USER_AGENT', 'User-Agent'),
+            ('HTTP_X_FORWARDED_PROTO', 'X-Forwarded-Proto'),
+            ('CONTENT_TYPE', 'Content-Type'),
+            ('CONTENT_LENGTH', 'Content-Length'),
+        )
+        for header, expected in tests:
+            with self.subTest(header=header):
+                self.assertEqual(HttpHeaders.parse_header_name(header), expected)

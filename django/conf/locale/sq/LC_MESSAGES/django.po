@@ -2,14 +2,14 @@
 #
 # Translators:
 # Besnik <besnik@programeshqip.org>, 2011-2014
-# Besnik <besnik@programeshqip.org>, 2015-2018
+# Besnik <besnik@programeshqip.org>, 2015-2019
 # Jannis Leidel <jannis@leidel.info>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-05-17 11:49+0200\n"
-"PO-Revision-Date: 2018-05-18 09:14+0000\n"
+"POT-Creation-Date: 2019-01-16 20:42+0100\n"
+"PO-Revision-Date: 2019-03-30 10:51+0000\n"
 "Last-Translator: Besnik <besnik@programeshqip.org>\n"
 "Language-Team: Albanian (http://www.transifex.com/django/django/language/"
 "sq/)\n"
@@ -138,6 +138,9 @@ msgstr "Sorbiane e Sipërme"
 
 msgid "Hungarian"
 msgstr "Hungareze"
+
+msgid "Armenian"
+msgstr "Armenisht"
 
 msgid "Interlingua"
 msgstr "Interlingua"
@@ -495,7 +498,7 @@ msgid ""
 "'%(value)s' value has the correct format (YYYY-MM-DD) but it is an invalid "
 "date."
 msgstr ""
-"Vlera '%(value)s' ka format të saktë (YYYY-MM-DD) por është datë e "
+"Vlera '%(value)s' ka formatin e saktë (YYYY-MM-DD), por është datë e "
 "pavlefshme."
 
 msgid "Date (without time)"
@@ -514,7 +517,7 @@ msgid ""
 "'%(value)s' value has the correct format (YYYY-MM-DD HH:MM[:ss[.uuuuuu]]"
 "[TZ]) but it is an invalid date/time."
 msgstr ""
-"Vlera '%(value)s' ka format të saktë (YYYY-MM-DD HH:MM[:ss[.uuuuuu]][TZ]) "
+"Vlera '%(value)s' ka format të saktë (YYYY-MM-DD HH:MM[:ss[.uuuuuu]][TZ]), "
 "por është datë/kohë e pavlefshme."
 
 msgid "Date (with time)"
@@ -609,6 +612,9 @@ msgstr "Të dhëna dyore të papërpunuara"
 msgid "'%(value)s' is not a valid UUID."
 msgstr "'%(value)s' s’është UUID i vlefshëm."
 
+msgid "Universally unique identifier"
+msgstr "Identifikues universalisht unik"
+
 msgid "File"
 msgstr "Kartelë"
 
@@ -700,7 +706,7 @@ msgstr ""
 #, python-format
 msgid "Select a valid choice. %(value)s is not one of the available choices."
 msgstr ""
-"Përzgjidhni një zgjedhje të vlefshme. %(value)s s’është nga zgjedhjet e "
+"Përzgjidhni një zgjedhje të vlefshme. %(value)s s’është një nga zgjedhjet e "
 "mundshme."
 
 msgid "Enter a list of values."
@@ -1062,7 +1068,7 @@ msgstr "Kjo s’është adresë IPv6 e vlefshme."
 
 #, python-format
 msgctxt "String to return when truncating text"
-msgid "%(truncated_text)s..."
+msgid "%(truncated_text)s…"
 msgstr "%(truncated_text)s…"
 
 msgid "or"

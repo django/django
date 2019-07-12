@@ -1204,6 +1204,11 @@ class RequestMethodStringDataTests(SimpleTestCase):
         response = self.client.get('/json_response/')
         self.assertEqual(response.json(), {'key': 'value'})
 
+    def test_json_charset(self):
+        response = self.client.get('/json_response_latin1/')
+        self.assertEqual(response.charset, 'latin1')
+        self.assertEqual(response.json(), {'a': 'Å'})
+
     def test_json_structured_suffixes(self):
         valid_types = (
             'application/vnd.api+json',

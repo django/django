@@ -97,10 +97,8 @@ reasons:
   Django APIs or behaviors change.
 
 Django's documentation is kept in the same source control system as its code. It
-lives in the `docs`_ directory of our Git repository. Each document online is a
-separate text file in the repository.
-
-.. _docs: https://github.com/django/django/tree/master/docs
+lives in the :source:`docs` directory of our Git repository. Each document
+online is a separate text file in the repository.
 
 Where to get it
 ===============
@@ -165,7 +163,7 @@ You can get a local copy of the HTML documentation following a few easy steps:
 
   .. console::
 
-        $ pip install Sphinx
+        $ python -m pip install Sphinx
 
 * Then, just use the included ``Makefile`` to turn the documentation into
   HTML:

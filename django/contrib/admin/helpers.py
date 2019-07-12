@@ -187,7 +187,7 @@ class AdminReadonlyField:
         if not self.is_first:
             attrs["class"] = "inline"
         label = self.field['label']
-        return format_html('<label{}>{}:</label>', flatatt(attrs), capfirst(label))
+        return format_html('<label{}>{}{}</label>', flatatt(attrs), capfirst(label), self.form.label_suffix)
 
     def contents(self):
         from django.contrib.admin.templatetags.admin_list import _boolean_icon
@@ -280,7 +280,12 @@ class InlineAdminFormSet:
             if not self.has_change_permission or field_name in self.readonly_fields:
                 yield {
                     'name': field_name,
-                    'label': meta_labels.get(field_name) or label_for_field(field_name, self.opts.model, self.opts),
+                    'label': meta_labels.get(field_name) or label_for_field(
+                        field_name,
+                        self.opts.model,
+                        self.opts,
+                        form=empty_form,
+                    ),
                     'widget': {'is_hidden': False},
                     'required': False,
                     'help_text': meta_help_texts.get(field_name) or help_text_for_field(field_name, self.opts.model),
@@ -289,7 +294,7 @@ class InlineAdminFormSet:
                 form_field = empty_form.fields[field_name]
                 label = form_field.label
                 if label is None:
-                    label = label_for_field(field_name, self.opts.model, self.opts)
+                    label = label_for_field(field_name, self.opts.model, self.opts, form=empty_form)
                 yield {
                     'name': field_name,
                     'label': label,

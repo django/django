@@ -233,6 +233,32 @@ class ViewTest(SimpleTestCase):
             self.assertNotIn(attribute, dir(bare_view))
             self.assertIn(attribute, dir(view))
 
+    def test_overridden_setup(self):
+        class SetAttributeMixin:
+            def setup(self, request, *args, **kwargs):
+                self.attr = True
+                super().setup(request, *args, **kwargs)
+
+        class CheckSetupView(SetAttributeMixin, SimpleView):
+            def dispatch(self, request, *args, **kwargs):
+                assert hasattr(self, 'attr')
+                return super().dispatch(request, *args, **kwargs)
+
+        response = CheckSetupView.as_view()(self.rf.get('/'))
+        self.assertEqual(response.status_code, 200)
+
+    def test_not_calling_parent_setup_error(self):
+        class TestView(View):
+            def setup(self, request, *args, **kwargs):
+                pass  # Not calling super().setup()
+
+        msg = (
+            "TestView instance has no 'request' attribute. Did you override "
+            "setup() and forget to call super()?"
+        )
+        with self.assertRaisesMessage(AttributeError, msg):
+            TestView.as_view()(self.rf.get('/'))
+
     def test_direct_instantiation(self):
         """
         It should be possible to use the view by directly instantiating it

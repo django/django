@@ -7,7 +7,7 @@
 # jensadne <jensadne@pvv.ntnu.no>, 2014-2015
 # Jon <jon@kolonial.no>, 2015-2016
 # Jon <jon@kolonial.no>, 2014
-# Jon <jon@kolonial.no>, 2017-2018
+# Jon <jon@kolonial.no>, 2017-2019
 # Jon <jon@kolonial.no>, 2013
 # Jon <jon@kolonial.no>, 2011
 # Sigurd Gartmann <sigurdga-transifex@sigurdga.no>, 2012
@@ -16,8 +16,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-05-17 11:49+0200\n"
-"PO-Revision-Date: 2018-07-30 11:29+0000\n"
+"POT-Creation-Date: 2019-01-16 20:42+0100\n"
+"PO-Revision-Date: 2019-05-06 13:02+0000\n"
 "Last-Translator: Jon <jon@kolonial.no>\n"
 "Language-Team: Norwegian Bokmål (http://www.transifex.com/django/django/"
 "language/nb/)\n"
@@ -146,6 +146,9 @@ msgstr "Høysorbisk"
 
 msgid "Hungarian"
 msgstr "Ungarsk"
+
+msgid "Armenian"
+msgstr "Armensk"
 
 msgid "Interlingua"
 msgstr "Interlingua"
@@ -612,6 +615,9 @@ msgstr "Rå binærdata"
 msgid "'%(value)s' is not a valid UUID."
 msgstr "'%(value)s' er ikke en gyldig UUID."
 
+msgid "Universally unique identifier"
+msgstr "Universelt unik identifikator"
+
 msgid "File"
 msgstr "Fil"
 
@@ -1053,7 +1059,7 @@ msgstr "Dette er ikke en gyldig IPv6-adresse."
 
 #, python-format
 msgctxt "String to return when truncating text"
-msgid "%(truncated_text)s..."
+msgid "%(truncated_text)s…"
 msgstr "%(truncated_text)s…"
 
 msgid "or"

@@ -1,5 +1,8 @@
-from django.db.models import Func, IntegerField, Transform, Value, fields
+from django.db.models.expressions import Func, Value
+from django.db.models.fields import IntegerField
 from django.db.models.functions import Coalesce
+from django.db.models.lookups import Transform
+from django.db.utils import NotSupportedError
 
 
 class BytesToCharFieldConversionMixin:
@@ -16,6 +19,40 @@ class BytesToCharFieldConversionMixin:
             if self.output_field.get_internal_type() == 'CharField' and isinstance(value, bytes):
                 return value.decode()
         return super().convert_value(value, expression, connection)
+
+
+class MySQLSHA2Mixin:
+    def as_mysql(self, compiler, connection, **extra_content):
+        return super().as_sql(
+            compiler,
+            connection,
+            template='SHA2(%%(expressions)s, %s)' % self.function[3:],
+            **extra_content,
+        )
+
+
+class OracleHashMixin:
+    def as_oracle(self, compiler, connection, **extra_context):
+        return super().as_sql(
+            compiler,
+            connection,
+            template=(
+                "LOWER(RAWTOHEX(STANDARD_HASH(UTL_I18N.STRING_TO_RAW("
+                "%(expressions)s, 'AL32UTF8'), '%(function)s')))"
+            ),
+            **extra_context,
+        )
+
+
+class PostgreSQLSHAMixin:
+    def as_postgresql(self, compiler, connection, **extra_content):
+        return super().as_sql(
+            compiler,
+            connection,
+            template="ENCODE(DIGEST(%(expressions)s, '%(function)s'), 'hex')",
+            function=self.function.lower(),
+            **extra_content,
+        )
 
 
 class Chr(Transform):
@@ -65,10 +102,9 @@ class ConcatPair(Func):
     def coalesce(self):
         # null on either side results in null for expression, wrap with coalesce
         c = self.copy()
-        expressions = [
+        c.set_source_expressions([
             Coalesce(expression, Value('')) for expression in c.get_source_expressions()
-        ]
-        c.set_source_expressions(expressions)
+        ])
         return c
 
 
@@ -113,18 +149,18 @@ class Left(Func):
     def get_substr(self):
         return Substr(self.source_expressions[0], Value(1), self.source_expressions[1])
 
-    def use_substr(self, compiler, connection, **extra_context):
+    def as_oracle(self, compiler, connection, **extra_context):
         return self.get_substr().as_oracle(compiler, connection, **extra_context)
 
-    as_oracle = use_substr
-    as_sqlite = use_substr
+    def as_sqlite(self, compiler, connection, **extra_context):
+        return self.get_substr().as_sqlite(compiler, connection, **extra_context)
 
 
 class Length(Transform):
     """Return the number of characters in the expression."""
     function = 'LENGTH'
     lookup_name = 'length'
-    output_field = fields.IntegerField()
+    output_field = IntegerField()
 
     def as_mysql(self, compiler, connection, **extra_context):
         return super().as_sql(compiler, connection, function='CHAR_LENGTH', **extra_context)
@@ -147,6 +183,11 @@ class LPad(BytesToCharFieldConversionMixin, Func):
 class LTrim(Transform):
     function = 'LTRIM'
     lookup_name = 'ltrim'
+
+
+class MD5(OracleHashMixin, Transform):
+    function = 'MD5'
+    lookup_name = 'md5'
 
 
 class Ord(Transform):
@@ -183,6 +224,25 @@ class Replace(Func):
         super().__init__(expression, text, replacement, **extra)
 
 
+class Reverse(Transform):
+    function = 'REVERSE'
+    lookup_name = 'reverse'
+
+    def as_oracle(self, compiler, connection, **extra_context):
+        # REVERSE in Oracle is undocumented and doesn't support multi-byte
+        # strings. Use a special subquery instead.
+        return super().as_sql(
+            compiler, connection,
+            template=(
+                '(SELECT LISTAGG(s) WITHIN GROUP (ORDER BY n DESC) FROM '
+                '(SELECT LEVEL n, SUBSTR(%(expressions)s, LEVEL, 1) s '
+                'FROM DUAL CONNECT BY LEVEL <= LENGTH(%(expressions)s)) '
+                'GROUP BY %(expressions)s)'
+            ),
+            **extra_context
+        )
+
+
 class Right(Left):
     function = 'RIGHT'
 
@@ -199,6 +259,34 @@ class RTrim(Transform):
     lookup_name = 'rtrim'
 
 
+class SHA1(OracleHashMixin, PostgreSQLSHAMixin, Transform):
+    function = 'SHA1'
+    lookup_name = 'sha1'
+
+
+class SHA224(MySQLSHA2Mixin, PostgreSQLSHAMixin, Transform):
+    function = 'SHA224'
+    lookup_name = 'sha224'
+
+    def as_oracle(self, compiler, connection, **extra_context):
+        raise NotSupportedError('SHA224 is not supported on Oracle.')
+
+
+class SHA256(MySQLSHA2Mixin, OracleHashMixin, PostgreSQLSHAMixin, Transform):
+    function = 'SHA256'
+    lookup_name = 'sha256'
+
+
+class SHA384(MySQLSHA2Mixin, OracleHashMixin, PostgreSQLSHAMixin, Transform):
+    function = 'SHA384'
+    lookup_name = 'sha384'
+
+
+class SHA512(MySQLSHA2Mixin, OracleHashMixin, PostgreSQLSHAMixin, Transform):
+    function = 'SHA512'
+    lookup_name = 'sha512'
+
+
 class StrIndex(Func):
     """
     Return a positive integer corresponding to the 1-indexed position of the
@@ -207,7 +295,7 @@ class StrIndex(Func):
     """
     function = 'INSTR'
     arity = 2
-    output_field = fields.IntegerField()
+    output_field = IntegerField()
 
     def as_postgresql(self, compiler, connection, **extra_context):
         return super().as_sql(compiler, connection, function='STRPOS', **extra_context)

@@ -128,9 +128,13 @@ Use the ``django.test.Client`` class to make requests.
     The ``json_encoder`` argument allows setting a custom JSON encoder for
     the JSON serialization that's described in :meth:`post`.
 
-    .. versionchanged:: 2.1
+    The ``raise_request_exception`` argument allows controlling whether or not
+    exceptions raised during the request should also be raised in the test.
+    Defaults to ``True``.
 
-        The ``json_encoder`` argument was added.
+    .. versionadded:: 3.0
+
+        The ``raise_request_exception`` argument was added.
 
     Once you have a ``Client`` instance, you can call any of the following
     methods:
@@ -220,12 +224,6 @@ Use the ``django.test.Client`` class to make requests.
         and can be overridden by providing a ``json_encoder`` argument to
         :class:`Client`. This serialization also happens for :meth:`put`,
         :meth:`patch`, and :meth:`delete` requests.
-
-        .. versionchanged:: 2.1
-
-            The JSON serialization described above was added. In older versions,
-            you can call :func:`json.dumps` on ``data`` before passing it to
-            ``post()`` to achieve the same thing.
 
         .. versionchanged:: 2.2
 
@@ -486,6 +484,23 @@ Specifically, a ``Response`` object has the following attributes:
             :attr:`~django.template.response.SimpleTemplateResponse.context_data`
             may be a suitable alternative on responses with that attribute.
 
+    .. attribute:: exc_info
+
+        .. versionadded:: 3.0
+
+        A tuple of three values that provides information about the unhandled
+        exception, if any, that occurred during the view.
+
+        The values are (type, value, traceback), the same as returned by
+        Python's :func:`sys.exc_info`. Their meanings are:
+
+        - *type*: The type of the exception.
+        - *value*: The exception instance.
+        - *traceback*: A traceback object which encapsulates the call stack at
+          the point where the exception originally occurred.
+
+        If no exception occurred, then ``exc_info`` will be ``None``.
+
     .. method:: json(**kwargs)
 
         The body of the response, parsed as JSON. Extra keyword arguments are
@@ -554,9 +569,10 @@ content type of a response using ``response['Content-Type']``.
 Exceptions
 ----------
 
-If you point the test client at a view that raises an exception, that exception
-will be visible in the test case. You can then use a standard ``try ... except``
-block or :meth:`~unittest.TestCase.assertRaises` to test for exceptions.
+If you point the test client at a view that raises an exception and
+``Client.raise_request_exception`` is ``True``, that exception will be visible
+in the test case. You can then use a standard ``try ... except`` block or
+:meth:`~unittest.TestCase.assertRaises` to test for exceptions.
 
 The only exceptions that are not visible to the test client are
 :class:`~django.http.Http404`,
@@ -564,6 +580,11 @@ The only exceptions that are not visible to the test client are
 :class:`~django.core.exceptions.SuspiciousOperation`. Django catches these
 exceptions internally and converts them into the appropriate HTTP response
 codes. In these cases, you can check ``response.status_code`` in your test.
+
+If ``Client.raise_request_exception`` is ``False``, the test client will return a
+500 response as would be returned to a browser. The response has the attribute
+:attr:`~Response.exc_info` to provide information about the unhandled
+exception.
 
 Persistent state
 ----------------
@@ -722,14 +743,24 @@ A subclass of :class:`unittest.TestCase` that adds this functionality:
 If your tests make any database queries, use subclasses
 :class:`~django.test.TransactionTestCase` or :class:`~django.test.TestCase`.
 
-.. attribute:: SimpleTestCase.allow_database_queries
+.. attribute:: SimpleTestCase.databases
+
+    .. versionadded:: 2.2
 
     :class:`~SimpleTestCase` disallows database queries by default. This
     helps to avoid executing write queries which will affect other tests
     since each ``SimpleTestCase`` test isn't run in a transaction. If you
     aren't concerned about this problem, you can disable this behavior by
-    setting the ``allow_database_queries`` class attribute to ``True`` on
-    your test class.
+    setting the ``databases`` class attribute to ``'__all__'`` on your test
+    class.
+
+.. attribute:: SimpleTestCase.allow_database_queries
+
+    .. deprecated:: 2.2
+
+    This attribute is deprecated in favor of :attr:`databases`. The previous
+    behavior of ``allow_database_queries = True`` can be achieved by setting
+    ``databases = '__all__'``.
 
 .. warning::
 
@@ -889,7 +920,7 @@ Python path:
 
 .. console::
 
-    $ pip install selenium
+    $ python -m pip install selenium
 
 Then, add a ``LiveServerTestCase``-based test to your app's tests module
 (for example: ``myapp/tests.py``). For this example, we'll assume you're using
@@ -1101,8 +1132,8 @@ you can be certain that the outcome of a test will not be affected by another
 test or by the order of test execution.
 
 By default, fixtures are only loaded into the ``default`` database. If you are
-using multiple databases and set :attr:`multi_db=True
-<TransactionTestCase.multi_db>`, fixtures will be loaded into all databases.
+using multiple databases and set :attr:`TransactionTestCase.databases`,
+fixtures will be loaded into all specified databases.
 
 URLconf configuration
 ---------------------
@@ -1119,38 +1150,84 @@ particular URL. Decorate your test class or test method with
 Multi-database support
 ----------------------
 
-.. attribute:: TransactionTestCase.multi_db
+.. attribute:: TransactionTestCase.databases
+
+.. versionadded:: 2.2
 
 Django sets up a test database corresponding to every database that is
-defined in the :setting:`DATABASES` definition in your settings
-file. However, a big part of the time taken to run a Django TestCase
-is consumed by the call to ``flush`` that ensures that you have a
-clean database at the start of each test run. If you have multiple
-databases, multiple flushes are required (one for each database),
-which can be a time consuming activity -- especially if your tests
-don't need to test multi-database activity.
+defined in the :setting:`DATABASES` definition in your settings and referred to
+by at least one test through ``databases``.
+
+However, a big part of the time taken to run a Django ``TestCase`` is consumed
+by the call to ``flush`` that ensures that you have a clean database at the
+start of each test run. If you have multiple databases, multiple flushes are
+required (one for each database), which can be a time consuming activity --
+especially if your tests don't need to test multi-database activity.
 
 As an optimization, Django only flushes the ``default`` database at
 the start of each test run. If your setup contains multiple databases,
 and you have a test that requires every database to be clean, you can
-use the ``multi_db`` attribute on the test suite to request a full
-flush.
+use the ``databases`` attribute on the test suite to request extra databases
+to be flushed.
 
 For example::
 
-    class TestMyViews(TestCase):
-        multi_db = True
+    class TestMyViews(TransactionTestCase):
+        databases = {'default', 'other'}
 
         def test_index_page_view(self):
             call_some_test_code()
 
-This test case will flush *all* the test databases before running
-``test_index_page_view``.
+This test case will flush the ``default`` and ``other`` test databases before
+running ``test_index_page_view``. You can also use ``'__all__'`` to specify
+that all of the test databases must be flushed.
 
-The ``multi_db`` flag also affects into which databases the
-:attr:`TransactionTestCase.fixtures` are loaded. By default (when
-``multi_db=False``), fixtures are only loaded into the ``default`` database.
-If ``multi_db=True``, fixtures are loaded into all databases.
+The ``databases`` flag also controls which databases the
+:attr:`TransactionTestCase.fixtures` are loaded into. By default, fixtures are
+only loaded into the ``default`` database.
+
+Queries against databases not in ``databases`` will give assertion errors to
+prevent state leaking between tests.
+
+.. attribute:: TransactionTestCase.multi_db
+
+.. deprecated:: 2.2
+
+This attribute is deprecated in favor of :attr:`~TransactionTestCase.databases`.
+The previous behavior of ``multi_db = True`` can be achieved by setting
+``databases = '__all__'``.
+
+.. attribute:: TestCase.databases
+
+.. versionadded:: 2.2
+
+By default, only the ``default`` database will be wrapped in a transaction
+during a ``TestCase``'s execution and attempts to query other databases will
+result in assertion errors to prevent state leaking between tests.
+
+Use the ``databases`` class attribute on the test class to request transaction
+wrapping against non-``default`` databases.
+
+For example::
+
+    class OtherDBTests(TestCase):
+        databases = {'other'}
+
+        def test_other_db_query(self):
+            ...
+
+This test will only allow queries against the ``other`` database. Just like for
+:attr:`SimpleTestCase.databases` and :attr:`TransactionTestCase.databases`, the
+``'__all__'`` constant can be used to specify that the test should allow
+queries to all databases.
+
+.. attribute:: TestCase.multi_db
+
+.. deprecated:: 2.2
+
+This attribute is deprecated in favor of :attr:`~TestCase.databases`. The
+previous behavior of ``multi_db = True`` can be achieved by setting
+``databases = '__all__'``.
 
 .. _overriding-settings:
 
@@ -1283,23 +1360,6 @@ The decorator can also be applied to test case classes::
     decorator. For a given class, :func:`~django.test.modify_settings` is
     always applied after :func:`~django.test.override_settings`.
 
-.. admonition:: Considerations with Python 3.5
-
-    If using Python 3.5 (or older, if using an older version of Django), avoid
-    mixing  ``remove`` with ``append`` and ``prepend`` in
-    :func:`~django.test.modify_settings`. In some cases it matters whether a
-    value is first added and then removed or vice versa, and dictionary key
-    order isn't preserved until Python 3.6. Instead, apply the decorator twice
-    to guarantee the order of operations. For example, to ensure that
-    ``SessionMiddleware`` appears first in ``MIDDLEWARE``::
-
-        @modify_settings(MIDDLEWARE={
-            'remove': ['django.contrib.sessions.middleware.SessionMiddleware'],
-        )
-        @modify_settings(MIDDLEWARE={
-            'prepend': ['django.contrib.sessions.middleware.SessionMiddleware'],
-        })
-
 .. warning::
 
     The settings file contains some settings that are only consulted during
@@ -1392,8 +1452,6 @@ your test suite.
 
 .. method:: SimpleTestCase.assertWarnsMessage(expected_warning, expected_message, callable, *args, **kwargs)
             SimpleTestCase.assertWarnsMessage(expected_warning, expected_message)
-
-    .. versionadded:: 2.1
 
     Analogous to :meth:`SimpleTestCase.assertRaisesMessage` but for
     :meth:`~unittest.TestCase.assertWarnsRegex` instead of
@@ -1545,14 +1603,16 @@ your test suite.
     * The ordering of attributes of an HTML element is not significant.
     * Attributes without an argument are equal to attributes that equal in
       name and value (see the examples).
+    * Text, character references, and entity references that refer to the same
+      character are equivalent.
 
     The following examples are valid tests and don't raise any
     ``AssertionError``::
 
         self.assertHTMLEqual(
-            '<p>Hello <b>world!</p>',
+            '<p>Hello <b>&#x27;world&#x27;!</p>',
             '''<p>
-                Hello   <b>world! </b>
+                Hello   <b>&#39;world&#39;! </b>
             </p>'''
         )
         self.assertHTMLEqual(
@@ -1584,6 +1644,9 @@ your test suite.
     made on parsed content, hence only semantic differences are considered, not
     syntax differences. When invalid XML is passed in any parameter, an
     ``AssertionError`` is always raised, even if both string are identical.
+
+    XML declaration, document type, and comments are ignored. Only the root
+    element and its children are compared.
 
     Output in case of error can be customized with the ``msg`` argument.
 
@@ -1698,12 +1761,6 @@ class. Given::
 
 ``SampleTestCaseChild.test`` will be labeled with ``'slow'``, ``'core'``,
 ``'bar'``, and ``'foo'``.
-
-.. versionchanged:: 2.1
-
-   In older versions, tagged tests don't inherit tags from classes, and
-   tagged subclasses don't inherit tags from superclasses. For example,
-   ``SampleTestCaseChild.test`` is labeled only with ``'bar'``.
 
 Then you can choose which tests to run. For example, to run only fast tests:
 

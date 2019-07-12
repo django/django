@@ -5,14 +5,14 @@
 # Jirka Vejrazka <Jirka.Vejrazka@gmail.com>, 2011
 # Tomáš Ehrlich <tomas.ehrlich@gmail.com>, 2015
 # Vláďa Macek <macek@sandbox.cz>, 2013-2014
-# Vláďa Macek <macek@sandbox.cz>, 2015-2018
+# Vláďa Macek <macek@sandbox.cz>, 2015-2019
 # yedpodtrzitko <yed@vanyli.net>, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-05-21 14:16-0300\n"
-"PO-Revision-Date: 2018-07-15 18:01+0000\n"
+"POT-Creation-Date: 2019-01-16 20:42+0100\n"
+"PO-Revision-Date: 2019-02-19 07:56+0000\n"
 "Last-Translator: Vláďa Macek <macek@sandbox.cz>\n"
 "Language-Team: Czech (http://www.transifex.com/django/django/language/cs/)\n"
 "MIME-Version: 1.0\n"
@@ -113,7 +113,7 @@ msgid "object id"
 msgstr "id položky"
 
 #. Translators: 'repr' means representation
-#. (https://docs.python.org/3/library/functions.html#repr)
+#. (https://docs.python.org/library/functions.html#repr)
 msgid "object repr"
 msgstr "reprez. položky"
 
@@ -549,24 +549,8 @@ msgstr "Zobrazit vše"
 msgid "Save"
 msgstr "Uložit"
 
-msgid "Popup closing..."
+msgid "Popup closing…"
 msgstr "Vyskakovací okno se zavírá..."
-
-#, python-format
-msgid "Change selected %(model)s"
-msgstr "Změnit vybrané položky typu %(model)s"
-
-#, python-format
-msgid "View selected %(model)s"
-msgstr "Zobrazit vybranou položku typu %(model)s"
-
-#, python-format
-msgid "Add another %(model)s"
-msgstr "Přidat další %(model)s"
-
-#, python-format
-msgid "Delete selected %(model)s"
-msgstr "Odstranit vybrané položky typu %(model)s"
 
 msgid "Search"
 msgstr "Hledat"
@@ -597,6 +581,18 @@ msgstr "Uložit a zobrazit"
 
 msgid "Close"
 msgstr "Zavřít"
+
+#, python-format
+msgid "Change selected %(model)s"
+msgstr "Změnit vybrané položky typu %(model)s"
+
+#, python-format
+msgid "Add another %(model)s"
+msgstr "Přidat další %(model)s"
+
+#, python-format
+msgid "Delete selected %(model)s"
+msgstr "Odstranit vybrané položky typu %(model)s"
 
 msgid "Thanks for spending some quality time with the Web site today."
 msgstr "Děkujeme za čas strávený s tímto webem."

@@ -1,10 +1,10 @@
-import contextlib
 import copy
 from decimal import Decimal
 
 from django.apps.registry import Apps
 from django.db.backends.base.schema import BaseDatabaseSchemaEditor
 from django.db.backends.ddl_references import Statement
+from django.db.models import UniqueConstraint
 from django.db.transaction import atomic
 from django.db.utils import NotSupportedError
 
@@ -12,21 +12,27 @@ from django.db.utils import NotSupportedError
 class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
 
     sql_delete_table = "DROP TABLE %(table)s"
+    sql_create_fk = None
     sql_create_inline_fk = "REFERENCES %(to_table)s (%(to_column)s) DEFERRABLE INITIALLY DEFERRED"
     sql_create_unique = "CREATE UNIQUE INDEX %(name)s ON %(table)s (%(columns)s)"
     sql_delete_unique = "DROP INDEX %(name)s"
-    sql_foreign_key_constraint = None
 
     def __enter__(self):
         # Some SQLite schema alterations need foreign key constraints to be
-        # disabled. Enforce it here for the duration of the transaction.
-        self.connection.disable_constraint_checking()
-        self.connection.cursor().execute('PRAGMA legacy_alter_table = ON')
+        # disabled. Enforce it here for the duration of the schema edition.
+        if not self.connection.disable_constraint_checking():
+            raise NotSupportedError(
+                'SQLite schema editor cannot be used while foreign key '
+                'constraint checks are enabled. Make sure to disable them '
+                'before entering a transaction.atomic() context because '
+                'SQLite does not support disabling them in the middle of '
+                'a multi-statement transaction.'
+            )
         return super().__enter__()
 
     def __exit__(self, exc_type, exc_value, traceback):
+        self.connection.check_constraints()
         super().__exit__(exc_type, exc_value, traceback)
-        self.connection.cursor().execute('PRAGMA legacy_alter_table = OFF')
         self.connection.enable_constraint_checking()
 
     def quote_value(self, value):
@@ -77,11 +83,12 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         return False
 
     def alter_db_table(self, model, old_db_table, new_db_table, disable_constraints=True):
-        if disable_constraints and self._is_referenced_by_fk_constraint(old_db_table):
+        if (not self.connection.features.supports_atomic_references_rename and
+                disable_constraints and self._is_referenced_by_fk_constraint(old_db_table)):
             if self.connection.in_atomic_block:
                 raise NotSupportedError((
                     'Renaming the %r table while in a transaction is not '
-                    'supported on SQLite because it would break referential '
+                    'supported on SQLite < 3.26 because it would break referential '
                     'integrity. Try adding `atomic = False` to the Migration class.'
                 ) % old_db_table)
             self.connection.enable_constraint_checking()
@@ -95,11 +102,12 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         table_name = model._meta.db_table
         _, old_column_name = old_field.get_attname_column()
         if (new_field.name != old_field_name and
+                not self.connection.features.supports_atomic_references_rename and
                 self._is_referenced_by_fk_constraint(table_name, old_column_name, ignore_self=True)):
             if self.connection.in_atomic_block:
                 raise NotSupportedError((
                     'Renaming the %r.%r column while in a transaction is not '
-                    'supported on SQLite because it would break referential '
+                    'supported on SQLite < 3.26 because it would break referential '
                     'integrity. Try adding `atomic = False` to the Migration class.'
                 ) % (model._meta.db_table, old_field_name))
             with atomic(self.connection.alias):
@@ -132,11 +140,17 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         """
         Shortcut to transform a model from old_model into new_model
 
+        This follows the correct procedure to perform non-rename or column
+        addition operations based on SQLite's documentation
+
+        https://www.sqlite.org/lang_altertable.html#caution
+
         The essential steps are:
-          1. rename the model's existing table, e.g. "app_model" to "app_model__old"
-          2. create a table with the updated definition called "app_model"
-          3. copy the data from the old renamed table to the new table
-          4. delete the "app_model__old" table
+          1. Create a table with the updated definition called "new__app_model"
+          2. Copy the data from the existing "app_model" table to the new table
+          3. Drop the "app_model" table
+          4. Rename the "new__app_model" table to "app_model"
+          5. Restore any index of the previous "app_model" table.
         """
         # Self-referential fields must be recreated rather than copied from
         # the old model to ensure their remote_field.field_name doesn't refer
@@ -198,11 +212,6 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         # Work inside a new app registry
         apps = Apps()
 
-        # Provide isolated instances of the fields to the new model body so
-        # that the existing model's internals aren't interfered with when
-        # the dummy model is constructed.
-        body = copy.deepcopy(body)
-
         # Work out the new value of unique_together, taking renames into
         # account
         unique_together = [
@@ -226,7 +235,16 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
 
         constraints = list(model._meta.constraints)
 
-        # Construct a new model for the new state
+        # Provide isolated instances of the fields to the new model body so
+        # that the existing model's internals aren't interfered with when
+        # the dummy model is constructed.
+        body_copy = copy.deepcopy(body)
+
+        # Construct a new model with the new fields to allow self referential
+        # primary key to resolve to. This model won't ever be materialized as a
+        # table and solely exists for foreign key reference resolution purposes.
+        # This wouldn't be required if the schema editor was operating on model
+        # states instead of rendered models.
         meta_contents = {
             'app_label': model._meta.app_label,
             'db_table': model._meta.db_table,
@@ -237,41 +255,45 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             'apps': apps,
         }
         meta = type("Meta", (), meta_contents)
-        body['Meta'] = meta
-        body['__module__'] = model.__module__
+        body_copy['Meta'] = meta
+        body_copy['__module__'] = model.__module__
+        type(model._meta.object_name, model.__bases__, body_copy)
 
-        temp_model = type(model._meta.object_name, model.__bases__, body)
+        # Construct a model with a renamed table name.
+        body_copy = copy.deepcopy(body)
+        meta_contents = {
+            'app_label': model._meta.app_label,
+            'db_table': 'new__%s' % model._meta.db_table,
+            'unique_together': unique_together,
+            'index_together': index_together,
+            'indexes': indexes,
+            'constraints': constraints,
+            'apps': apps,
+        }
+        meta = type("Meta", (), meta_contents)
+        body_copy['Meta'] = meta
+        body_copy['__module__'] = model.__module__
+        new_model = type('New%s' % model._meta.object_name, model.__bases__, body_copy)
 
-        # We need to modify model._meta.db_table, but everything explodes
-        # if the change isn't reversed before the end of this method. This
-        # context manager helps us avoid that situation.
-        @contextlib.contextmanager
-        def altered_table_name(model, temporary_table_name):
-            original_table_name = model._meta.db_table
-            model._meta.db_table = temporary_table_name
-            yield
-            model._meta.db_table = original_table_name
+        # Create a new table with the updated schema.
+        self.create_model(new_model)
 
-        with altered_table_name(model, model._meta.db_table + "__old"):
-            # Rename the old table to make way for the new
-            self.alter_db_table(
-                model, temp_model._meta.db_table, model._meta.db_table,
-                disable_constraints=False,
-            )
-            # Create a new table with the updated schema.
-            self.create_model(temp_model)
+        # Copy data from the old table into the new table
+        self.execute("INSERT INTO %s (%s) SELECT %s FROM %s" % (
+            self.quote_name(new_model._meta.db_table),
+            ', '.join(self.quote_name(x) for x in mapping),
+            ', '.join(mapping.values()),
+            self.quote_name(model._meta.db_table),
+        ))
 
-            # Copy data from the old table into the new table
-            field_maps = list(mapping.items())
-            self.execute("INSERT INTO %s (%s) SELECT %s FROM %s" % (
-                self.quote_name(temp_model._meta.db_table),
-                ', '.join(self.quote_name(x) for x, y in field_maps),
-                ', '.join(y for x, y in field_maps),
-                self.quote_name(model._meta.db_table),
-            ))
+        # Delete the old table to make way for the new
+        self.delete_model(model, handle_autom2m=False)
 
-            # Delete the old table
-            self.delete_model(model, handle_autom2m=False)
+        # Rename the new table to take way for the old
+        self.alter_db_table(
+            new_model, new_model._meta.db_table, model._meta.db_table,
+            disable_constraints=False,
+        )
 
         # Run deferred SQL on correct table
         for sql in self.deferred_sql:
@@ -377,7 +399,13 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         self.delete_model(old_field.remote_field.through)
 
     def add_constraint(self, model, constraint):
-        self._remake_table(model)
+        if isinstance(constraint, UniqueConstraint) and constraint.condition:
+            super().add_constraint(model, constraint)
+        else:
+            self._remake_table(model)
 
     def remove_constraint(self, model, constraint):
-        self._remake_table(model)
+        if isinstance(constraint, UniqueConstraint) and constraint.condition:
+            super().remove_constraint(model, constraint)
+        else:
+            self._remake_table(model)

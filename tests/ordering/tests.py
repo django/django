@@ -1,12 +1,15 @@
 from datetime import datetime
 from operator import attrgetter
 
-from django.db.models import Count, DateTimeField, F, Max, OuterRef, Subquery
+from django.core.exceptions import FieldError
+from django.db.models import (
+    CharField, Count, DateTimeField, F, Max, OuterRef, Subquery, Value,
+)
 from django.db.models.functions import Upper
 from django.test import TestCase
 from django.utils.deprecation import RemovedInDjango31Warning
 
-from .models import Article, Author, OrderedByFArticle, Reference
+from .models import Article, Author, ChildArticle, OrderedByFArticle, Reference
 
 
 class OrderingTests(TestCase):
@@ -211,6 +214,15 @@ class OrderingTests(TestCase):
         qs1 = Article.objects.order_by(F('headline').asc())
         qs2 = qs1.reverse()
         self.assertQuerysetEqual(
+            qs2, [
+                'Article 4',
+                'Article 3',
+                'Article 2',
+                'Article 1',
+            ],
+            attrgetter('headline'),
+        )
+        self.assertQuerysetEqual(
             qs1, [
                 "Article 1",
                 "Article 2",
@@ -219,14 +231,29 @@ class OrderingTests(TestCase):
             ],
             attrgetter("headline")
         )
+
+    def test_reverse_meta_ordering_pure(self):
+        Article.objects.create(
+            headline='Article 5',
+            pub_date=datetime(2005, 7, 30),
+            author=self.author_1,
+            second_author=self.author_2,
+        )
+        Article.objects.create(
+            headline='Article 5',
+            pub_date=datetime(2005, 7, 30),
+            author=self.author_2,
+            second_author=self.author_1,
+        )
         self.assertQuerysetEqual(
-            qs2, [
-                "Article 4",
-                "Article 3",
-                "Article 2",
-                "Article 1",
-            ],
-            attrgetter("headline")
+            Article.objects.filter(headline='Article 5').reverse(),
+            ['Name 2', 'Name 1'],
+            attrgetter('author.name'),
+        )
+        self.assertQuerysetEqual(
+            Article.objects.filter(headline='Article 5'),
+            ['Name 1', 'Name 2'],
+            attrgetter('author.name'),
         )
 
     def test_no_reordering_after_slicing(self):
@@ -378,6 +405,36 @@ class OrderingTests(TestCase):
             attrgetter("headline")
         )
 
+    def test_order_by_constant_value(self):
+        # Order by annotated constant from selected columns.
+        qs = Article.objects.annotate(
+            constant=Value('1', output_field=CharField()),
+        ).order_by('constant', '-headline')
+        self.assertSequenceEqual(qs, [self.a4, self.a3, self.a2, self.a1])
+        # Order by annotated constant which is out of selected columns.
+        self.assertSequenceEqual(
+            qs.values_list('headline', flat=True), [
+                'Article 4',
+                'Article 3',
+                'Article 2',
+                'Article 1',
+            ],
+        )
+        # Order by constant.
+        qs = Article.objects.order_by(Value('1', output_field=CharField()), '-headline')
+        self.assertSequenceEqual(qs, [self.a4, self.a3, self.a2, self.a1])
+
+    def test_order_by_constant_value_without_output_field(self):
+        msg = 'Cannot resolve expression type, unknown output_field'
+        qs = Article.objects.annotate(constant=Value('1')).order_by('constant')
+        for ordered_qs in (
+            qs,
+            qs.values('headline'),
+            Article.objects.order_by(Value('1')),
+        ):
+            with self.subTest(ordered_qs=ordered_qs), self.assertRaisesMessage(FieldError, msg):
+                ordered_qs.first()
+
     def test_related_ordering_duplicate_table_reference(self):
         """
         An ordering referencing a model with an ordering referencing a model
@@ -405,10 +462,32 @@ class OrderingTests(TestCase):
             attrgetter('headline')
         )
 
+    def test_order_by_ptr_field_with_default_ordering_by_expression(self):
+        ca1 = ChildArticle.objects.create(
+            headline='h2',
+            pub_date=datetime(2005, 7, 27),
+            author=self.author_2,
+        )
+        ca2 = ChildArticle.objects.create(
+            headline='h2',
+            pub_date=datetime(2005, 7, 27),
+            author=self.author_1,
+        )
+        ca3 = ChildArticle.objects.create(
+            headline='h3',
+            pub_date=datetime(2005, 7, 27),
+            author=self.author_1,
+        )
+        ca4 = ChildArticle.objects.create(headline='h1', pub_date=datetime(2005, 7, 28))
+        articles = ChildArticle.objects.order_by('article_ptr')
+        self.assertSequenceEqual(articles, [ca4, ca2, ca1, ca3])
+
     def test_deprecated_values_annotate(self):
         msg = (
             "Article QuerySet won't use Meta.ordering in Django 3.1. Add "
-            ".order_by('-pub_date', 'headline') to retain the current query."
+            ".order_by('-pub_date', F(headline), OrderBy(F(author__name), "
+            "descending=False), OrderBy(F(second_author__name), "
+            "descending=False)) to retain the current query."
         )
         with self.assertRaisesMessage(RemovedInDjango31Warning, msg):
             list(Article.objects.values('author').annotate(Count('headline')))

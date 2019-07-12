@@ -283,4 +283,4 @@ security protection of the Web server, operating system and other components.
   accounted for in the design of your project.
 
 .. _LimitRequestBody: https://httpd.apache.org/docs/2.4/mod/core.html#limitrequestbody
-.. _Top 10 list: https://www.owasp.org/index.php/Top_10_2013-Top_10
+.. _Top 10 list: https://www.owasp.org/index.php/Top_10-2017_Top_10

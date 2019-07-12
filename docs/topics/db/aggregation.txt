@@ -354,8 +354,8 @@ If you need two annotations with two separate filters you can use the
 ``filter`` argument with any aggregate. For example, to generate a list of
 authors with a count of highly rated books::
 
-    >>> highly_rated = Count('books', filter=Q(books__rating__gte=7))
-    >>> Author.objects.annotate(num_books=Count('books'), highly_rated_books=highly_rated)
+    >>> highly_rated = Count('book', filter=Q(book__rating__gte=7))
+    >>> Author.objects.annotate(num_books=Count('book'), highly_rated_books=highly_rated)
 
 Each ``Author`` in the result set will have the ``num_books`` and
 ``highly_rated_books`` attributes.

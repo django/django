@@ -165,7 +165,7 @@ Identifier  Information
 ==========  ==============================================================
 
 .. _json: https://json.org/
-.. _PyYAML: https://www.pyyaml.org/
+.. _PyYAML: https://pyyaml.org/
 
 XML
 ---
@@ -367,7 +367,7 @@ Consider the following two models::
         birthdate = models.DateField()
 
         class Meta:
-            unique_together = (('first_name', 'last_name'),)
+            unique_together = [['first_name', 'last_name']]
 
     class Book(models.Model):
         name = models.CharField(max_length=100)
@@ -404,15 +404,14 @@ name::
             return self.get(first_name=first_name, last_name=last_name)
 
     class Person(models.Model):
-        objects = PersonManager()
-
         first_name = models.CharField(max_length=100)
         last_name = models.CharField(max_length=100)
-
         birthdate = models.DateField()
 
+        objects = PersonManager()
+
         class Meta:
-            unique_together = (('first_name', 'last_name'),)
+            unique_together = [['first_name', 'last_name']]
 
 Now books can use that natural key to refer to ``Person`` objects::
 
@@ -453,18 +452,17 @@ So how do you get Django to emit a natural key when serializing an object?
 Firstly, you need to add another method -- this time to the model itself::
 
     class Person(models.Model):
-        objects = PersonManager()
-
         first_name = models.CharField(max_length=100)
         last_name = models.CharField(max_length=100)
-
         birthdate = models.DateField()
+
+        objects = PersonManager()
+
+        class Meta:
+            unique_together = [['first_name', 'last_name']]
 
         def natural_key(self):
             return (self.first_name, self.last_name)
-
-        class Meta:
-            unique_together = (('first_name', 'last_name'),)
 
 That method should always return a natural key tuple -- in this
 example, ``(first name, last name)``. Then, when you call

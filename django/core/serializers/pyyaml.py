@@ -34,6 +34,9 @@ class DjangoSafeDumper(SafeDumper):
 
 DjangoSafeDumper.add_representer(decimal.Decimal, DjangoSafeDumper.represent_decimal)
 DjangoSafeDumper.add_representer(collections.OrderedDict, DjangoSafeDumper.represent_ordered_dict)
+# Workaround to represent dictionaries in insertion order.
+# See https://github.com/yaml/pyyaml/pull/143.
+DjangoSafeDumper.add_representer(dict, DjangoSafeDumper.represent_ordered_dict)
 
 
 class Serializer(PythonSerializer):

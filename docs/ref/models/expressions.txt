@@ -17,10 +17,6 @@ Django supports negation, addition, subtraction, multiplication, division,
 modulo arithmetic, and the power operator on query expressions, using Python
 constants, variables, and even other expressions.
 
-.. versionchanged:: 2.1
-
-    Support for negation was added.
-
 Some examples
 =============
 
@@ -185,7 +181,9 @@ instance and will be applied on each :meth:`~Model.save()`. For example::
     reporter.save()
 
 ``stories_filed`` will be updated twice in this case. If it's initially ``1``,
-the final value will be ``3``.
+the final value will be ``3``. This persistence can be avoided by reloading the
+model object after saving it, for example, by using
+:meth:`~Model.refresh_from_db()`.
 
 Using ``F()`` in filters
 ~~~~~~~~~~~~~~~~~~~~~~~~
@@ -241,7 +239,7 @@ For example, to sort companies that haven't been contacted (``last_contacted``
 is null) after companies that have been contacted::
 
     from django.db.models import F
-    Company.object.order_by(F('last_contacted').desc(nulls_last=True))
+    Company.objects.order_by(F('last_contacted').desc(nulls_last=True))
 
 .. _func-expressions:
 
@@ -264,7 +262,9 @@ or they can be used to build a library of database functions::
     queryset.annotate(field_lower=Lower('field'))
 
 But both cases will result in a queryset where each model is annotated with an
-extra attribute ``field_lower`` produced, roughly, from the following SQL::
+extra attribute ``field_lower`` produced, roughly, from the following SQL:
+
+.. code-block:: sql
 
     SELECT
         ...
@@ -373,13 +373,13 @@ some complex computations::
 
 The ``Aggregate`` API is as follows:
 
-.. class:: Aggregate(*expressions, output_field=None, filter=None, **extra)
+.. class:: Aggregate(*expressions, output_field=None, distinct=False, filter=None, **extra)
 
     .. attribute:: template
 
         A class attribute, as a format string, that describes the SQL that is
         generated for this aggregate. Defaults to
-        ``'%(function)s( %(expressions)s )'``.
+        ``'%(function)s(%(distinct)s%(expressions)s)'``.
 
     .. attribute:: function
 
@@ -391,6 +391,14 @@ The ``Aggregate`` API is as follows:
 
         Defaults to ``True`` since most aggregate functions can be used as the
         source expression in :class:`~django.db.models.expressions.Window`.
+
+    .. attribute:: allow_distinct
+
+        .. versionadded:: 2.2
+
+        A class attribute determining whether or not this aggregate function
+        allows passing a ``distinct`` keyword argument. If set to ``False``
+        (default), ``TypeError`` is raised if ``distinct=True`` is passed.
 
 The ``expressions`` positional arguments can include expressions or the names
 of model fields. They will be converted to a string and used as the
@@ -409,12 +417,21 @@ should define the desired ``output_field``. For example, adding an
 ``IntegerField()`` and a ``FloatField()`` together should probably have
 ``output_field=FloatField()`` defined.
 
+The ``distinct`` argument determines whether or not the aggregate function
+should be invoked for each distinct value of ``expressions`` (or set of
+values, for multiple ``expressions``). The argument is only supported on
+aggregates that have :attr:`~Aggregate.allow_distinct` set to ``True``.
+
 The ``filter`` argument takes a :class:`Q object <django.db.models.Q>` that's
 used to filter the rows that are aggregated. See :ref:`conditional-aggregation`
 and :ref:`filtering-on-annotations` for example usage.
 
 The ``**extra`` kwargs are ``key=value`` pairs that can be interpolated
 into the ``template`` attribute.
+
+.. versionadded:: 2.2
+
+    The ``allow_distinct`` attribute and ``distinct`` argument were added.
 
 Creating your own Aggregate Functions
 -------------------------------------
@@ -425,19 +442,18 @@ SQL that is generated. Here's a brief example::
 
     from django.db.models import Aggregate
 
-    class Count(Aggregate):
-        # supports COUNT(distinct field)
-        function = 'COUNT'
-        template = '%(function)s(%(distinct)s%(expressions)s)'
+    class Sum(Aggregate):
+        # Supports SUM(ALL field).
+        function = 'SUM'
+        template = '%(function)s(%(all_values)s%(expressions)s)'
+        allow_distinct = False
 
-        def __init__(self, expression, distinct=False, **extra):
+        def __init__(self, expression, all_values=False, **extra):
             super().__init__(
                 expression,
-                distinct='DISTINCT ' if distinct else '',
-                output_field=IntegerField(),
+                all_values='ALL ' if all_values else '',
                 **extra
             )
-
 
 ``Value()`` expressions
 -----------------------
@@ -961,12 +977,17 @@ calling the appropriate methods on the wrapped expression.
         A hook allowing the expression to coerce ``value`` into a more
         appropriate type.
 
-    .. method:: get_group_by_cols()
+    .. method:: get_group_by_cols(alias=None)
 
         Responsible for returning the list of columns references by
         this expression. ``get_group_by_cols()`` should be called on any
         nested expressions. ``F()`` objects, in particular, hold a reference
-        to a column.
+        to a column. The ``alias`` parameter will be ``None`` unless the
+        expression has been annotated and is used for grouping.
+
+        .. versionchanged:: 3.0
+
+            The ``alias`` parameter was added.
 
     .. method:: asc(nulls_first=False, nulls_last=False)
 

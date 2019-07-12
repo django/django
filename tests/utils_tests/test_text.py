@@ -1,8 +1,9 @@
 import json
 import sys
 
-from django.test import SimpleTestCase
+from django.test import SimpleTestCase, ignore_warnings
 from django.utils import text
+from django.utils.deprecation import RemovedInDjango40Warning
 from django.utils.functional import lazystr
 from django.utils.text import format_lazy
 from django.utils.translation import gettext_lazy, override
@@ -58,6 +59,7 @@ class TestUtilsText(SimpleTestCase):
         self.assertEqual('The quick brown fox jumped over the lazy dog.', truncator.chars(100)),
         self.assertEqual('The quick brown fox …', truncator.chars(21)),
         self.assertEqual('The quick brown fo.....', truncator.chars(23, '.....')),
+        self.assertEqual('.....', truncator.chars(4, '.....')),
 
         nfc = text.Truncator('o\xfco\xfco\xfco\xfc')
         nfd = text.Truncator('ou\u0308ou\u0308ou\u0308ou\u0308')
@@ -183,12 +185,15 @@ class TestUtilsText(SimpleTestCase):
         # interning the result may be useful, e.g. when fed to Path.
         self.assertEqual(sys.intern(text.slugify('a')), 'a')
 
+    @ignore_warnings(category=RemovedInDjango40Warning)
     def test_unescape_entities(self):
         items = [
             ('', ''),
             ('foo', 'foo'),
             ('&amp;', '&'),
+            ('&am;', '&am;'),
             ('&#x26;', '&'),
+            ('&#xk;', '&#xk;'),
             ('&#38;', '&'),
             ('foo &amp; bar', 'foo & bar'),
             ('foo & bar', 'foo & bar'),
@@ -196,6 +201,14 @@ class TestUtilsText(SimpleTestCase):
         for value, output in items:
             self.assertEqual(text.unescape_entities(value), output)
             self.assertEqual(text.unescape_entities(lazystr(value)), output)
+
+    def test_unescape_entities_deprecated(self):
+        msg = (
+            'django.utils.text.unescape_entities() is deprecated in favor of '
+            'html.unescape().'
+        )
+        with self.assertWarnsMessage(RemovedInDjango40Warning, msg):
+            text.unescape_entities('foo')
 
     def test_unescape_string_literal(self):
         items = [
@@ -237,7 +250,7 @@ class TestUtilsText(SimpleTestCase):
 
         # The format string can be lazy. (string comes from contrib.admin)
         s = format_lazy(
-            gettext_lazy("Added {name} \"{object}\"."),
+            gettext_lazy('Added {name} “{object}”.'),
             name='article', object='My first try',
         )
         with override('fr'):

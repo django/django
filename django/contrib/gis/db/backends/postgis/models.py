@@ -23,6 +23,15 @@ class PostGISGeometryColumns(models.Model):
         db_table = 'geometry_columns'
         managed = False
 
+    def __str__(self):
+        return '%s.%s - %dD %s field (SRID: %d)' % (
+            self.f_table_name,
+            self.f_geometry_column,
+            self.coord_dimension,
+            self.type,
+            self.srid,
+        )
+
     @classmethod
     def table_name_col(cls):
         """
@@ -38,11 +47,6 @@ class PostGISGeometryColumns(models.Model):
         geometry column.
         """
         return 'f_geometry_column'
-
-    def __str__(self):
-        return "%s.%s - %dD %s field (SRID: %d)" % \
-               (self.f_table_name, self.f_geometry_column,
-                self.coord_dimension, self.type, self.srid)
 
 
 class PostGISSpatialRefSys(models.Model, SpatialRefSysMixin):

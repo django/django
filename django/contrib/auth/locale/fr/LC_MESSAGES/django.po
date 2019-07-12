@@ -253,7 +253,7 @@ msgstr[1] ""
 msgid "The password is too similar to the %(verbose_name)s."
 msgstr "Le mot de passe est trop semblable au champ « %(verbose_name)s »."
 
-msgid "Your password can't be too similar to your other personal information."
+msgid "Your password can’t be too similar to your other personal information."
 msgstr ""
 "Votre mot de passe ne peut pas trop ressembler à vos autres informations "
 "personnelles."
@@ -261,14 +261,14 @@ msgstr ""
 msgid "This password is too common."
 msgstr "Ce mot de passe est trop courant."
 
-msgid "Your password can't be a commonly used password."
+msgid "Your password can’t be a commonly used password."
 msgstr ""
 "Votre mot de passe ne peut pas être un mot de passe couramment utilisé."
 
 msgid "This password is entirely numeric."
 msgstr "Ce mot de passe est entièrement numérique."
 
-msgid "Your password can't be entirely numeric."
+msgid "Your password can’t be entirely numeric."
 msgstr "Votre mot de passe ne peut pas être entièrement numérique."
 
 #, python-format

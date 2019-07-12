@@ -2,9 +2,9 @@ import threading
 from datetime import datetime, timedelta
 
 from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
-from django.db import DEFAULT_DB_ALIAS, DatabaseError, connections
+from django.db import DEFAULT_DB_ALIAS, DatabaseError, connections, models
 from django.db.models.manager import BaseManager
-from django.db.models.query import EmptyQuerySet, QuerySet
+from django.db.models.query import MAX_GET_RESULTS, EmptyQuerySet, QuerySet
 from django.test import (
     SimpleTestCase, TestCase, TransactionTestCase, skipUnlessDBFeature,
 )
@@ -357,6 +357,23 @@ class ModelTest(TestCase):
             # hash)
             hash(Article())
 
+    def test_missing_hash_not_inherited(self):
+        class NoHash(models.Model):
+            def __eq__(self, other):
+                return super.__eq__(other)
+
+        with self.assertRaisesMessage(TypeError, "unhashable type: 'NoHash'"):
+            hash(NoHash(id=1))
+
+    def test_specified_parent_hash_inherited(self):
+        class ParentHash(models.Model):
+            def __eq__(self, other):
+                return super.__eq__(other)
+
+            __hash__ = models.Model.__hash__
+
+        self.assertEqual(hash(ParentHash(id=1)), 1)
+
     def test_delete_and_access_field(self):
         # Accessing a field after it's deleted from a model reloads its value.
         pub_date = datetime.now()
@@ -369,6 +386,26 @@ class ModelTest(TestCase):
             self.assertEqual(article.headline, 'foo')
         # Fields that weren't deleted aren't reloaded.
         self.assertEqual(article.pub_date, new_pub_date)
+
+    def test_multiple_objects_max_num_fetched(self):
+        max_results = MAX_GET_RESULTS - 1
+        Article.objects.bulk_create(
+            Article(headline='Area %s' % i, pub_date=datetime(2005, 7, 28))
+            for i in range(max_results)
+        )
+        self.assertRaisesMessage(
+            MultipleObjectsReturned,
+            'get() returned more than one Article -- it returned %d!' % max_results,
+            Article.objects.get,
+            headline__startswith='Area',
+        )
+        Article.objects.create(headline='Area %s' % max_results, pub_date=datetime(2005, 7, 28))
+        self.assertRaisesMessage(
+            MultipleObjectsReturned,
+            'get() returned more than one Article -- it returned more than %d!' % max_results,
+            Article.objects.get,
+            headline__startswith='Area',
+        )
 
 
 class ModelLookupTest(TestCase):

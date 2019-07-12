@@ -3,7 +3,6 @@ Helper functions for creating Form classes from Django models
 and database field objects.
 """
 
-from collections import OrderedDict
 from itertools import chain
 
 from django.core.exceptions import (
@@ -49,8 +48,11 @@ def construct_instance(form, instance, fields=None, exclude=None):
             continue
         # Leave defaults for fields that aren't in POST data, except for
         # checkbox inputs because they don't appear in POST data if not checked.
-        if (f.has_default() and
-                form[f.name].field.widget.value_omitted_from_data(form.data, form.files, form.add_prefix(f.name))):
+        if (
+            f.has_default() and
+            form[f.name].field.widget.value_omitted_from_data(form.data, form.files, form.add_prefix(f.name)) and
+            cleaned_data.get(f.name) in form[f.name].field.empty_values
+        ):
             continue
         # Defer saving file-type fields until after the other fields, so a
         # callable upload_to can use the values from other fields.
@@ -84,7 +86,7 @@ def model_to_dict(instance, fields=None, exclude=None):
     for f in chain(opts.concrete_fields, opts.private_fields, opts.many_to_many):
         if not getattr(f, 'editable', False):
             continue
-        if fields and f.name not in fields:
+        if fields is not None and f.name not in fields:
             continue
         if exclude and f.name in exclude:
             continue
@@ -105,7 +107,7 @@ def fields_for_model(model, fields=None, exclude=None, widgets=None,
                      labels=None, help_texts=None, error_messages=None,
                      field_classes=None, *, apply_limit_choices_to=True):
     """
-    Return an ``OrderedDict`` containing form fields for the given model.
+    Return a dictionary containing form fields for the given model.
 
     ``fields`` is an optional list of field names. If provided, return only the
     named fields.
@@ -134,7 +136,7 @@ def fields_for_model(model, fields=None, exclude=None, widgets=None,
     ``apply_limit_choices_to`` is a boolean indicating if limit_choices_to
     should be applied to a field's queryset.
     """
-    field_list = []
+    field_dict = {}
     ignored = []
     opts = model._meta
     # Avoid circular import
@@ -178,15 +180,14 @@ def fields_for_model(model, fields=None, exclude=None, widgets=None,
         if formfield:
             if apply_limit_choices_to:
                 apply_limit_choices_to_to_formfield(formfield)
-            field_list.append((f.name, formfield))
+            field_dict[f.name] = formfield
         else:
             ignored.append(f.name)
-    field_dict = OrderedDict(field_list)
     if fields:
-        field_dict = OrderedDict(
-            [(f, field_dict.get(f)) for f in fields
-                if ((not exclude) or (exclude and f not in exclude)) and (f not in ignored)]
-        )
+        field_dict = {
+            f: field_dict.get(f) for f in fields
+            if (not exclude or f not in exclude) and f not in ignored
+        }
     return field_dict
 
 
@@ -475,7 +476,9 @@ def modelform_factory(model, form=ModelForm, fields=None, exclude=None,
                       labels=None, help_texts=None, error_messages=None,
                       field_classes=None):
     """
-    Return a ModelForm containing form fields for the given model.
+    Return a ModelForm containing form fields for the given model. You can
+    optionally pass a `form` argument to use as a starting point for
+    constructing the ModelForm.
 
     ``fields`` is an optional list of field names. If provided, include only
     the named fields in the returned fields. If omitted or '__all__', use all
@@ -958,8 +961,12 @@ class BaseInlineFormSet(BaseModelFormSet):
             kwargs = {
                 'label': getattr(form.fields.get(name), 'label', capfirst(self.fk.verbose_name))
             }
-            if self.fk.remote_field.field_name != self.fk.remote_field.model._meta.pk.name:
-                kwargs['to_field'] = self.fk.remote_field.field_name
+
+        # The InlineForeignKeyField assumes that the foreign key relation is
+        # based on the parent model's pk. If this isn't the case, set to_field
+        # to correctly resolve the initial form value.
+        if self.fk.remote_field.field_name != self.fk.remote_field.model._meta.pk.name:
+            kwargs['to_field'] = self.fk.remote_field.field_name
 
         # If we're adding a new object, ignore a parent's auto-generated key
         # as it will be regenerated on the save request.
@@ -1265,7 +1272,7 @@ class ModelMultipleChoiceField(ModelChoiceField):
         'list': _('Enter a list of values.'),
         'invalid_choice': _('Select a valid choice. %(value)s is not one of the'
                             ' available choices.'),
-        'invalid_pk_value': _('"%(pk)s" is not a valid value.')
+        'invalid_pk_value': _('“%(pk)s” is not a valid value.')
     }
 
     def __init__(self, queryset, **kwargs):

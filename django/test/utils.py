@@ -1,4 +1,3 @@
-import collections
 import logging
 import re
 import sys
@@ -152,9 +151,9 @@ def teardown_test_environment():
     del mail.outbox
 
 
-def setup_databases(verbosity, interactive, keepdb=False, debug_sql=False, parallel=0, **kwargs):
+def setup_databases(verbosity, interactive, keepdb=False, debug_sql=False, parallel=0, aliases=None, **kwargs):
     """Create the test databases."""
-    test_databases, mirrored_aliases = get_unique_databases_and_mirrors()
+    test_databases, mirrored_aliases = get_unique_databases_and_mirrors(aliases)
 
     old_names = []
 
@@ -238,7 +237,7 @@ def dependency_ordered(test_databases, dependencies):
     return ordered_test_databases
 
 
-def get_unique_databases_and_mirrors():
+def get_unique_databases_and_mirrors(aliases=None):
     """
     Figure out which databases actually need to be created.
 
@@ -250,6 +249,8 @@ def get_unique_databases_and_mirrors():
                       where all aliases share the same underlying database.
     - mirrored_aliases: mapping of mirror aliases to original aliases.
     """
+    if aliases is None:
+        aliases = connections
     mirrored_aliases = {}
     test_databases = {}
     dependencies = {}
@@ -262,7 +263,7 @@ def get_unique_databases_and_mirrors():
         if test_settings['MIRROR']:
             # If the database is marked as a test mirror, save the alias.
             mirrored_aliases[alias] = test_settings['MIRROR']
-        else:
+        elif alias in aliases:
             # Store a tuple with DB parameters that uniquely identify it.
             # If we have two aliases with the same values for that tuple,
             # we only need to create the test database once.
@@ -278,8 +279,7 @@ def get_unique_databases_and_mirrors():
                 if alias != DEFAULT_DB_ALIAS and connection.creation.test_db_signature() != default_sig:
                     dependencies[alias] = test_settings.get('DEPENDENCIES', [DEFAULT_DB_ALIAS])
 
-    test_databases = dependency_ordered(test_databases.items(), dependencies)
-    test_databases = collections.OrderedDict(test_databases)
+    test_databases = dict(dependency_ordered(test_databases.items(), dependencies))
     return test_databases, mirrored_aliases
 
 
@@ -306,8 +306,7 @@ def get_runner(settings, test_runner_class=None):
     else:
         test_module_name = '.'
     test_module = __import__(test_module_name, {}, {}, test_path[-1])
-    test_runner = getattr(test_module, test_path[-1])
-    return test_runner
+    return getattr(test_module, test_path[-1])
 
 
 class TestContextDecorator:
@@ -538,7 +537,8 @@ def compare_xml(want, got):
     """
     Try to do a 'xml-comparison' of want and got. Plain string comparison
     doesn't always work because, for example, attribute ordering should not be
-    important. Ignore comment nodes and leading and trailing whitespace.
+    important. Ignore comment nodes, document type node, and leading and
+    trailing whitespaces.
 
     Based on https://github.com/lxml/lxml/blob/master/src/lxml/doctestcompare.py
     """
@@ -576,7 +576,7 @@ def compare_xml(want, got):
 
     def first_node(document):
         for node in document.childNodes:
-            if node.nodeType != Node.COMMENT_NODE:
+            if node.nodeType not in (Node.COMMENT_NODE, Node.DOCUMENT_TYPE_NODE):
                 return node
 
     want = want.strip().replace('\\n', '\n')
@@ -594,10 +594,6 @@ def compare_xml(want, got):
     got_root = first_node(parseString(got))
 
     return check_element(want_root, got_root)
-
-
-def str_prefix(s):
-    return s % {'_': ''}
 
 
 class CaptureQueriesContext:
@@ -655,29 +651,6 @@ class ignore_warnings(TestContextDecorator):
 
     def disable(self):
         self.catch_warnings.__exit__(*sys.exc_info())
-
-
-@contextmanager
-def patch_logger(logger_name, log_level, log_kwargs=False):
-    """
-    Context manager that takes a named logger and the logging level
-    and provides a simple mock-like list of messages received.
-
-    Use unittest.assertLogs() if you only need Python 3 support. This
-    private API will be removed after Python 2 EOL in 2020 (#27753).
-    """
-    calls = []
-
-    def replacement(msg, *args, **kwargs):
-        call = msg % args
-        calls.append((call, kwargs) if log_kwargs else call)
-    logger = logging.getLogger(logger_name)
-    orig = getattr(logger, log_level)
-    setattr(logger, log_level, replacement)
-    try:
-        yield calls
-    finally:
-        setattr(logger, log_level, orig)
 
 
 # On OSes that don't provide tzset (Windows), we can't set the timezone
@@ -784,7 +757,7 @@ def require_jinja2(test_func):
     Django template engine for a test or skip it if Jinja2 isn't available.
     """
     test_func = skipIf(jinja2 is None, "this test requires jinja2")(test_func)
-    test_func = override_settings(TEMPLATES=[{
+    return override_settings(TEMPLATES=[{
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'APP_DIRS': True,
     }, {
@@ -792,7 +765,6 @@ def require_jinja2(test_func):
         'APP_DIRS': True,
         'OPTIONS': {'keep_trailing_newline': True},
     }])(test_func)
-    return test_func
 
 
 class override_script_prefix(TestContextDecorator):

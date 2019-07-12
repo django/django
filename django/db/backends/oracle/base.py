@@ -13,7 +13,8 @@ from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.db import utils
 from django.db.backends.base.base import BaseDatabaseWrapper
-from django.utils.encoding import force_bytes, force_text
+from django.utils.asyncio import async_unsafe
+from django.utils.encoding import force_bytes, force_str
 from django.utils.functional import cached_property
 
 
@@ -202,7 +203,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         use_returning_into = self.settings_dict["OPTIONS"].get('use_returning_into', True)
-        self.features.can_return_id_from_insert = use_returning_into
+        self.features.can_return_columns_from_insert = use_returning_into
 
     def _dsn(self):
         settings_dict = self.settings_dict
@@ -213,7 +214,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         return settings_dict['NAME']
 
     def _connect_string(self):
-        return '%s/\\"%s\\"@%s' % (self.settings_dict['USER'], self.settings_dict['PASSWORD'], self._dsn())
+        return '%s/"%s"@%s' % (self.settings_dict['USER'], self.settings_dict['PASSWORD'], self._dsn())
 
     def get_connection_params(self):
         conn_params = self.settings_dict['OPTIONS'].copy()
@@ -221,6 +222,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             del conn_params['use_returning_into']
         return conn_params
 
+    @async_unsafe
     def get_new_connection(self, conn_params):
         return Database.connect(
             user=self.settings_dict['USER'],
@@ -269,6 +271,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         if not self.get_autocommit():
             self.commit()
 
+    @async_unsafe
     def create_cursor(self, name=None):
         return FormatStylePlaceholderCursor(self.connection)
 
@@ -342,7 +345,7 @@ class OracleParam:
         else:
             # To transmit to the database, we need Unicode if supported
             # To get size right, we must consider bytes.
-            self.force_bytes = force_text(param, cursor.charset, strings_only)
+            self.force_bytes = force_str(param, cursor.charset, strings_only)
             if isinstance(self.force_bytes, str):
                 # We could optimize by only converting up to 4000 bytes here
                 string_size = len(force_bytes(param, cursor.charset, strings_only))

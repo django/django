@@ -69,8 +69,8 @@ Get your database running
 
 If you plan to use Django's database API functionality, you'll need to make
 sure a database server is running. Django supports many different database
-servers and is officially supported with PostgreSQL_, MySQL_, Oracle_ and
-SQLite_.
+servers and is officially supported with PostgreSQL_, MariaDB_, MySQL_, Oracle_
+and SQLite_.
 
 If you are developing a simple project or something you don't plan to deploy
 in a production environment, SQLite is generally the simplest option as it
@@ -89,7 +89,7 @@ database bindings are installed.
 * If you're using PostgreSQL, you'll need the `psycopg2`_ package. Refer to the
   :ref:`PostgreSQL notes <postgresql-notes>` for further details.
 
-* If you're using MySQL, you'll need a :ref:`DB API driver
+* If you're using MySQL or MariaDB, you'll need a :ref:`DB API driver
   <mysql-db-api-drivers>` like ``mysqlclient``. See :ref:`notes for the MySQL
   backend <mysql-notes>` for details.
 
@@ -116,6 +116,7 @@ If you're using Django's :doc:`testing framework</topics/testing/index>` to test
 database queries, Django will need permission to create a test database.
 
 .. _PostgreSQL: https://www.postgresql.org/
+.. _MariaDB: https://mariadb.org/
 .. _MySQL: https://www.mysql.com/
 .. _psycopg2: http://initd.org/psycopg/
 .. _SQLite: https://www.sqlite.org/
@@ -151,8 +152,11 @@ This is the recommended way to install Django.
    administrator privileges. The :doc:`contributing tutorial
    </intro/contributing>` walks through how to create a virtualenv.
 
-#. After you've created and activated a virtual environment, enter the command
-   ``pip install Django`` at the shell prompt.
+#. After you've created and activated a virtual environment, enter the command:
+
+   .. console::
+
+        $ python -m pip install Django
 
 .. _pip: https://pip.pypa.io/
 .. _virtualenv: https://virtualenv.pypa.io/
@@ -211,7 +215,7 @@ latest bug fixes and improvements, follow these instructions:
 
    .. console::
 
-        $ pip install -e django/
+        $ python -m pip install -e django/
 
    This will make Django's code importable, and will also make the
    ``django-admin`` utility command available. In other words, you're all

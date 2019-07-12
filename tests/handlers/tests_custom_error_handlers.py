@@ -1,7 +1,7 @@
-from django.conf.urls import url
 from django.core.exceptions import PermissionDenied
 from django.template.response import TemplateResponse
 from django.test import SimpleTestCase, modify_settings, override_settings
+from django.urls import path
 
 
 class MiddlewareAccessingContent:
@@ -25,7 +25,7 @@ def permission_denied_view(request):
 
 
 urlpatterns = [
-    url(r'^$', permission_denied_view),
+    path('', permission_denied_view),
 ]
 
 handler403 = template_response_error_handler

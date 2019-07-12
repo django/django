@@ -9,7 +9,9 @@ from urllib.error import HTTPError
 from urllib.parse import urlencode
 from urllib.request import urlopen
 
+from django.core.servers.basehttp import WSGIServer
 from django.test import LiveServerTestCase, override_settings
+from django.test.testcases import LiveServerThread, QuietWSGIRequestHandler
 
 from .models import Person
 
@@ -48,6 +50,15 @@ class LiveServerAddress(LiveServerBase):
     def test_live_server_url_is_class_property(self):
         self.assertIsInstance(self.live_server_url_test[0], str)
         self.assertEqual(self.live_server_url_test[0], self.live_server_url)
+
+
+class LiveServerSingleThread(LiveServerThread):
+    def _create_server(self):
+        return WSGIServer((self.host, self.port), QuietWSGIRequestHandler, allow_reuse_address=False)
+
+
+class SingleThreadLiveServerTestCase(LiveServerTestCase):
+    server_thread_class = LiveServerSingleThread
 
 
 class LiveServerViews(LiveServerBase):
@@ -111,6 +122,23 @@ class LiveServerViews(LiveServerBase):
         finally:
             conn.close()
 
+    def test_keep_alive_connection_clears_previous_request_data(self):
+        conn = HTTPConnection(LiveServerViews.server_thread.host, LiveServerViews.server_thread.port)
+        try:
+            conn.request('POST', '/method_view/', b'{}', headers={"Connection": "keep-alive"})
+            response = conn.getresponse()
+            self.assertFalse(response.will_close)
+            self.assertEqual(response.status, 200)
+            self.assertEqual(response.read(), b'POST')
+
+            conn.request('POST', '/method_view/', b'{}', headers={"Connection": "close"})
+            response = conn.getresponse()
+            self.assertFalse(response.will_close)
+            self.assertEqual(response.status, 200)
+            self.assertEqual(response.read(), b'POST')
+        finally:
+            conn.close()
+
     def test_404(self):
         with self.assertRaises(HTTPError) as err:
             self.urlopen('/')
@@ -145,6 +173,32 @@ class LiveServerViews(LiveServerBase):
             self.assertIn(b"QUERY_STRING: 'q=%D1%82%D0%B5%D1%81%D1%82'", f.read())
 
 
+@override_settings(ROOT_URLCONF='servers.urls')
+class SingleTreadLiveServerViews(SingleThreadLiveServerTestCase):
+    available_apps = ['servers']
+
+    def test_closes_connection_with_content_length(self):
+        """
+        Contrast to
+        LiveServerViews.test_keep_alive_on_connection_with_content_length().
+        Persistent connections require threading server.
+        """
+        conn = HTTPConnection(
+            SingleTreadLiveServerViews.server_thread.host,
+            SingleTreadLiveServerViews.server_thread.port,
+            timeout=1,
+        )
+        try:
+            conn.request('GET', '/example_view/', headers={'Connection': 'keep-alive'})
+            response = conn.getresponse()
+            self.assertTrue(response.will_close)
+            self.assertEqual(response.read(), b'example view')
+            self.assertEqual(response.status, 200)
+            self.assertEqual(response.getheader('Connection'), 'close')
+        finally:
+            conn.close()
+
+
 class LiveServerDatabase(LiveServerBase):
 
     def test_fixtures_loaded(self):
@@ -177,10 +231,10 @@ class LiveServerPort(LiveServerBase):
         TestCase = type("TestCase", (LiveServerBase,), {})
         try:
             TestCase.setUpClass()
-        except socket.error as e:
+        except OSError as e:
             if e.errno == errno.EADDRINUSE:
                 # We're out of ports, LiveServerTestCase correctly fails with
-                # a socket error.
+                # an OSError.
                 return
             # Unexpected error.
             raise
@@ -192,8 +246,7 @@ class LiveServerPort(LiveServerBase):
                 "Acquired duplicate server addresses for server threads: %s" % self.live_server_url
             )
         finally:
-            if hasattr(TestCase, 'server_thread'):
-                TestCase.server_thread.terminate()
+            TestCase.tearDownClass()
 
     def test_specified_port_bind(self):
         """LiveServerTestCase.port customizes the server's port."""
@@ -210,8 +263,7 @@ class LiveServerPort(LiveServerBase):
                 'Did not use specified port for LiveServerTestCase thread: %s' % TestCase.port
             )
         finally:
-            if hasattr(TestCase, 'server_thread'):
-                TestCase.server_thread.terminate()
+            TestCase.tearDownClass()
 
 
 class LiverServerThreadedTests(LiveServerBase):

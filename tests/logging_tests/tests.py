@@ -251,11 +251,10 @@ class AdminEmailHandlerTest(SimpleTestCase):
     def get_admin_email_handler(self, logger):
         # AdminEmailHandler does not get filtered out
         # even with DEBUG=True.
-        admin_email_handler = [
+        return [
             h for h in logger.handlers
             if h.__class__.__name__ == "AdminEmailHandler"
         ][0]
-        return admin_email_handler
 
     def test_fail_silently(self):
         admin_email_handler = self.get_admin_email_handler(self.logger)
@@ -439,6 +438,7 @@ class SettingsConfigTest(AdminScriptTestCase):
     a circular import error.
     """
     def setUp(self):
+        super().setUp()
         log_config = """{
     'version': 1,
     'handlers': {
@@ -449,9 +449,6 @@ class SettingsConfigTest(AdminScriptTestCase):
     }
 }"""
         self.write_settings('settings.py', sdict={'LOGGING': log_config})
-
-    def tearDown(self):
-        self.remove_settings('settings.py')
 
     def test_circular_dependency(self):
         # validate is just an example command to trigger settings configuration
@@ -518,6 +515,7 @@ class SettingsCustomLoggingTest(AdminScriptTestCase):
     callable in LOGGING_CONFIG (i.e., logging.config.fileConfig).
     """
     def setUp(self):
+        super().setUp()
         logging_conf = """
 [loggers]
 keys=root
@@ -537,13 +535,13 @@ format=%(message)s
         self.temp_file = NamedTemporaryFile()
         self.temp_file.write(logging_conf.encode())
         self.temp_file.flush()
-        sdict = {'LOGGING_CONFIG': '"logging.config.fileConfig"',
-                 'LOGGING': 'r"%s"' % self.temp_file.name}
-        self.write_settings('settings.py', sdict=sdict)
+        self.write_settings('settings.py', sdict={
+            'LOGGING_CONFIG': '"logging.config.fileConfig"',
+            'LOGGING': 'r"%s"' % self.temp_file.name,
+        })
 
     def tearDown(self):
         self.temp_file.close()
-        self.remove_settings('settings.py')
 
     def test_custom_logging(self):
         out, err = self.run_manage(['check'])

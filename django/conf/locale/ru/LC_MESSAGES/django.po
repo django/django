@@ -15,15 +15,15 @@
 # Mikhail Zholobov <legal90@gmail.com>, 2013
 # Nikolay Korotkiy <sikmir@gmail.com>, 2018
 # Вася Аникин <anikin.vasya@gmail.com>, 2017
-# Алексей Борискин <sun.void@gmail.com>, 2013-2017
+# Алексей Борискин <sun.void@gmail.com>, 2013-2017,2019
 # Дмитрий Шатера <mr.bobsans@gmail.com>, 2016,2018
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-05-17 11:49+0200\n"
-"PO-Revision-Date: 2018-07-23 14:39+0000\n"
-"Last-Translator: SeryiMysh <vital@dorokhin.kz>\n"
+"POT-Creation-Date: 2019-01-16 20:42+0100\n"
+"PO-Revision-Date: 2019-02-18 21:13+0000\n"
+"Last-Translator: Алексей Борискин <sun.void@gmail.com>\n"
 "Language-Team: Russian (http://www.transifex.com/django/django/language/"
 "ru/)\n"
 "MIME-Version: 1.0\n"
@@ -153,6 +153,9 @@ msgstr "Верхнелужицкий"
 
 msgid "Hungarian"
 msgstr "Венгерский"
+
+msgid "Armenian"
+msgstr "Армянский"
 
 msgid "Interlingua"
 msgstr "Интерлингва"
@@ -643,6 +646,9 @@ msgstr "Необработанные двоичные данные"
 msgid "'%(value)s' is not a valid UUID."
 msgstr "Значение '%(value)s' не является верным UUID-ом."
 
+msgid "Universally unique identifier"
+msgstr "Поле для UUID, универсального уникального идентификатора"
+
 msgid "File"
 msgstr "Файл"
 
@@ -1106,8 +1112,8 @@ msgstr "Значение не является корректным адресо
 
 #, python-format
 msgctxt "String to return when truncating text"
-msgid "%(truncated_text)s..."
-msgstr "%(truncated_text)s..."
+msgid "%(truncated_text)s…"
+msgstr "%(truncated_text)s…"
 
 msgid "or"
 msgstr "или"

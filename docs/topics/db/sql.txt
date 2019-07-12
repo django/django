@@ -190,7 +190,7 @@ of people with their ages calculated by the database::
 You can often avoid using raw SQL to compute annotations by instead using a
 :ref:`Func() expression <func-expressions>`.
 
-__ https://www.postgresql.org/docs/current/static/functions-datetime.html
+__ https://www.postgresql.org/docs/current/functions-datetime.html
 
 Passing parameters into ``raw()``
 ---------------------------------

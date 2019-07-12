@@ -1,13 +1,13 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Michael Wolf <milupo@sorbzilla.de>, 2016-2018
+# Michael Wolf <milupo@sorbzilla.de>, 2016-2019
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-05-17 11:49+0200\n"
-"PO-Revision-Date: 2018-05-26 11:17+0000\n"
+"POT-Creation-Date: 2019-01-16 20:42+0100\n"
+"PO-Revision-Date: 2019-03-04 13:50+0000\n"
 "Last-Translator: Michael Wolf <milupo@sorbzilla.de>\n"
 "Language-Team: Upper Sorbian (http://www.transifex.com/django/django/"
 "language/hsb/)\n"
@@ -137,6 +137,9 @@ msgstr "Hornjoserbšćina"
 
 msgid "Hungarian"
 msgstr "Madźaršćina"
+
+msgid "Armenian"
+msgstr "Armenšćina"
 
 msgid "Interlingua"
 msgstr "Interlingua"
@@ -623,6 +626,9 @@ msgstr "Hrube binarne daty"
 msgid "'%(value)s' is not a valid UUID."
 msgstr "'%(value)s' płaćiwy UUID njeje."
 
+msgid "Universally unique identifier"
+msgstr "Uniwerselnje jónkróćny identifikator"
+
 msgid "File"
 msgstr "Dataja"
 
@@ -1084,8 +1090,8 @@ msgstr "To płaćiwa IPv6-adresa njeje."
 
 #, python-format
 msgctxt "String to return when truncating text"
-msgid "%(truncated_text)s..."
-msgstr "%(truncated_text)s..."
+msgid "%(truncated_text)s…"
+msgstr "%(truncated_text)s…"
 
 msgid "or"
 msgstr "abo"

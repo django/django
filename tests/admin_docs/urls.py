@@ -1,18 +1,18 @@
-from django.conf.urls import include, url
 from django.contrib import admin
+from django.urls import include, path
 
 from . import views
 
 ns_patterns = ([
-    url(r'^xview/func/$', views.xview_dec(views.xview), name='func'),
+    path('xview/func/', views.xview_dec(views.xview), name='func'),
 ], 'test')
 
 urlpatterns = [
-    url(r'^admin/', admin.site.urls),
-    url(r'^admindocs/', include('django.contrib.admindocs.urls')),
-    url(r'^', include(ns_patterns, namespace='test')),
-    url(r'^xview/func/$', views.xview_dec(views.xview)),
-    url(r'^xview/class/$', views.xview_dec(views.XViewClass.as_view())),
-    url(r'^xview/callable_object/$', views.xview_dec(views.XViewCallableObject())),
-    url(r'^xview/callable_object_without_xview/$', views.XViewCallableObject()),
+    path('admin/', admin.site.urls),
+    path('admindocs/', include('django.contrib.admindocs.urls')),
+    path('', include(ns_patterns, namespace='test')),
+    path('xview/func/', views.xview_dec(views.xview)),
+    path('xview/class/', views.xview_dec(views.XViewClass.as_view())),
+    path('xview/callable_object/', views.xview_dec(views.XViewCallableObject())),
+    path('xview/callable_object_without_xview/', views.XViewCallableObject()),
 ]

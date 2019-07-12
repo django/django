@@ -54,6 +54,20 @@ class SimplifiedURLTests(SimpleTestCase):
         self.assertEqual(match.kwargs, {'pk': '1'})
         self.assertEqual(match.route, '^regex/(?P<pk>[0-9]+)/$')
 
+    def test_re_path_with_optional_parameter(self):
+        for url, kwargs in (
+            ('/regex_optional/1/2/', {'arg1': '1', 'arg2': '2'}),
+            ('/regex_optional/1/', {'arg1': '1'}),
+        ):
+            with self.subTest(url=url):
+                match = resolve(url)
+                self.assertEqual(match.url_name, 'regex_optional')
+                self.assertEqual(match.kwargs, kwargs)
+                self.assertEqual(
+                    match.route,
+                    r'^regex_optional/(?P<arg1>\d+)/(?:(?P<arg2>\d+)/)?',
+                )
+
     def test_path_lookup_with_inclusion(self):
         match = resolve('/included_urls/extra/something/')
         self.assertEqual(match.url_name, 'inner-extra')
@@ -107,7 +121,7 @@ class SimplifiedURLTests(SimpleTestCase):
         self.assertEqual(match.url_name, 'inner-extra')
         self.assertEqual(match.kwargs, {'extra': 'something'})
 
-    def test_path_inclusion_is_reversable(self):
+    def test_path_inclusion_is_reversible(self):
         url = reverse('inner-extra', kwargs={'extra': 'something'})
         self.assertEqual(url, '/included_urls/extra/something/')
 
@@ -198,7 +212,7 @@ class ConversionExceptionTests(SimpleTestCase):
         with self.assertRaises(Resolver404):
             resolve('/dynamic/abc/')
 
-    def test_resolve_type_error_propogates(self):
+    def test_resolve_type_error_propagates(self):
         @DynamicConverter.register_to_python
         def raises_type_error(value):
             raise TypeError('This type error propagates.')

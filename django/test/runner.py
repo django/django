@@ -17,6 +17,7 @@ from django.test.utils import (
     teardown_databases as _teardown_databases, teardown_test_environment,
 )
 from django.utils.datastructures import OrderedSet
+from django.utils.version import PY37
 
 try:
     import tblib.pickling_support
@@ -66,9 +67,9 @@ class DebugSQLTextTestResult(unittest.TextTestResult):
             self.stream.writeln(self.separator1)
             self.stream.writeln("%s: %s" % (flavour, self.getDescription(test)))
             self.stream.writeln(self.separator2)
-            self.stream.writeln("%s" % err)
+            self.stream.writeln(err)
             self.stream.writeln(self.separator2)
-            self.stream.writeln("%s" % sql_debug)
+            self.stream.writeln(sql_debug)
 
 
 class RemoteTestResult:
@@ -145,7 +146,7 @@ parallel test runner to handle this exception cleanly.
 
 In order to see the traceback, you should install tblib:
 
-    pip install tblib
+    python -m pip install tblib
 """.format(test, original_exc_txt))
             else:
                 print("""
@@ -391,6 +392,9 @@ class ParallelTestSuite(unittest.TestSuite):
 
         return result
 
+    def __iter__(self):
+        return iter(self.subsuites)
+
 
 class DiscoverRunner:
     """A Django test runner that uses unittest2 test discovery."""
@@ -404,7 +408,7 @@ class DiscoverRunner:
     def __init__(self, pattern=None, top_level=None, verbosity=1,
                  interactive=True, failfast=False, keepdb=False,
                  reverse=False, debug_mode=False, debug_sql=False, parallel=0,
-                 tags=None, exclude_tags=None, **kwargs):
+                 tags=None, exclude_tags=None, test_name_patterns=None, **kwargs):
 
         self.pattern = pattern
         self.top_level = top_level
@@ -418,6 +422,14 @@ class DiscoverRunner:
         self.parallel = parallel
         self.tags = set(tags or [])
         self.exclude_tags = set(exclude_tags or [])
+        self.test_name_patterns = None
+        if test_name_patterns:
+            # unittest does not export the _convert_select_pattern function
+            # that converts command-line arguments to patterns.
+            self.test_name_patterns = {
+                pattern if '*' in pattern else '*%s*' % pattern
+                for pattern in test_name_patterns
+            }
 
     @classmethod
     def add_arguments(cls, parser):
@@ -430,7 +442,7 @@ class DiscoverRunner:
             help='The test matching pattern. Defaults to test*.py.',
         )
         parser.add_argument(
-            '-k', '--keepdb', action='store_true',
+            '--keepdb', action='store_true',
             help='Preserves the test DB between runs.'
         )
         parser.add_argument(
@@ -458,6 +470,15 @@ class DiscoverRunner:
             '--exclude-tag', action='append', dest='exclude_tags',
             help='Do not run tests with the specified tag. Can be used multiple times.',
         )
+        if PY37:
+            parser.add_argument(
+                '-k', action='append', dest='test_name_patterns',
+                help=(
+                    'Only run test methods and classes that match the pattern '
+                    'or substring. Can be used multiple times. Same as '
+                    'unittest -k option.'
+                ),
+            )
 
     def setup_test_environment(self, **kwargs):
         setup_test_environment(debug=self.debug_mode)
@@ -467,6 +488,7 @@ class DiscoverRunner:
         suite = self.test_suite()
         test_labels = test_labels or ['.']
         extra_tests = extra_tests or []
+        self.test_loader.testNamePatterns = self.test_name_patterns
 
         discover_kwargs = {}
         if self.pattern is not None:
@@ -587,6 +609,27 @@ class DiscoverRunner:
     def suite_result(self, suite, result, **kwargs):
         return len(result.failures) + len(result.errors)
 
+    def _get_databases(self, suite):
+        databases = set()
+        for test in suite:
+            if isinstance(test, unittest.TestCase):
+                test_databases = getattr(test, 'databases', None)
+                if test_databases == '__all__':
+                    return set(connections)
+                if test_databases:
+                    databases.update(test_databases)
+            else:
+                databases.update(self._get_databases(test))
+        return databases
+
+    def get_databases(self, suite):
+        databases = self._get_databases(suite)
+        if self.verbosity >= 2:
+            unused_databases = [alias for alias in connections if alias not in databases]
+            if unused_databases:
+                print('Skipping setup of unused database(s): %s.' % ', '.join(sorted(unused_databases)))
+        return databases
+
     def run_tests(self, test_labels, extra_tests=None, **kwargs):
         """
         Run the unit tests for all the test labels in the provided list.
@@ -601,7 +644,8 @@ class DiscoverRunner:
         """
         self.setup_test_environment()
         suite = self.build_suite(test_labels, extra_tests)
-        old_config = self.setup_databases()
+        databases = self.get_databases(suite)
+        old_config = self.setup_databases(aliases=databases)
         run_failed = False
         try:
             self.run_checks()

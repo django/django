@@ -1342,83 +1342,83 @@ Available format strings:
 Format character  Description                               Example output
 ================  ========================================  =====================
 **Day**
-d                 Day of the month, 2 digits with           ``'01'`` to ``'31'``
+``d``             Day of the month, 2 digits with           ``'01'`` to ``'31'``
                   leading zeros.
-j                 Day of the month without leading          ``'1'`` to ``'31'``
+``j``             Day of the month without leading          ``'1'`` to ``'31'``
                   zeros.
-D                 Day of the week, textual, 3 letters.      ``'Fri'``
-l                 Day of the week, textual, long.           ``'Friday'``
-S                 English ordinal suffix for day of the     ``'st'``, ``'nd'``, ``'rd'`` or ``'th'``
+``D``             Day of the week, textual, 3 letters.      ``'Fri'``
+``l``             Day of the week, textual, long.           ``'Friday'``
+``S``             English ordinal suffix for day of the     ``'st'``, ``'nd'``, ``'rd'`` or ``'th'``
                   month, 2 characters.
-w                 Day of the week, digits without           ``'0'`` (Sunday) to ``'6'`` (Saturday)
+``w``             Day of the week, digits without           ``'0'`` (Sunday) to ``'6'`` (Saturday)
                   leading zeros.
-z                 Day of the year.                          ``0`` to ``365``
+``z``             Day of the year.                          ``0`` to ``365``
 **Week**
-W                 ISO-8601 week number of year, with        ``1``, ``53``
+``W``             ISO-8601 week number of year, with        ``1``, ``53``
                   weeks starting on Monday.
 **Month**
-m                 Month, 2 digits with leading zeros.       ``'01'`` to ``'12'``
-n                 Month without leading zeros.              ``'1'`` to ``'12'``
-M                 Month, textual, 3 letters.                ``'Jan'``
-b                 Month, textual, 3 letters, lowercase.     ``'jan'``
-E                 Month, locale specific alternative
+``m``             Month, 2 digits with leading zeros.       ``'01'`` to ``'12'``
+``n``             Month without leading zeros.              ``'1'`` to ``'12'``
+``M``             Month, textual, 3 letters.                ``'Jan'``
+``b``             Month, textual, 3 letters, lowercase.     ``'jan'``
+``E``             Month, locale specific alternative
                   representation usually used for long
                   date representation.                      ``'listopada'`` (for Polish locale, as opposed to ``'Listopad'``)
-F                 Month, textual, long.                     ``'January'``
-N                 Month abbreviation in Associated Press    ``'Jan.'``, ``'Feb.'``, ``'March'``, ``'May'``
+``F``             Month, textual, long.                     ``'January'``
+``N``             Month abbreviation in Associated Press    ``'Jan.'``, ``'Feb.'``, ``'March'``, ``'May'``
                   style. Proprietary extension.
-t                 Number of days in the given month.        ``28`` to ``31``
+``t``             Number of days in the given month.        ``28`` to ``31``
 **Year**
-y                 Year, 2 digits.                           ``'99'``
-Y                 Year, 4 digits.                           ``'1999'``
-L                 Boolean for whether it's a leap year.     ``True`` or ``False``
-o                 ISO-8601 week-numbering year,             ``'1999'``
+``y``             Year, 2 digits.                           ``'99'``
+``Y``             Year, 4 digits.                           ``'1999'``
+``L``             Boolean for whether it's a leap year.     ``True`` or ``False``
+``o``             ISO-8601 week-numbering year,             ``'1999'``
                   corresponding to the ISO-8601 week
                   number (W) which uses leap weeks. See Y
                   for the more common year format.
 **Time**
-g                 Hour, 12-hour format without leading      ``'1'`` to ``'12'``
+``g``             Hour, 12-hour format without leading      ``'1'`` to ``'12'``
                   zeros.
-G                 Hour, 24-hour format without leading      ``'0'`` to ``'23'``
+``G``             Hour, 24-hour format without leading      ``'0'`` to ``'23'``
                   zeros.
-h                 Hour, 12-hour format.                     ``'01'`` to ``'12'``
-H                 Hour, 24-hour format.                     ``'00'`` to ``'23'``
-i                 Minutes.                                  ``'00'`` to ``'59'``
-s                 Seconds, 2 digits with leading zeros.     ``'00'`` to ``'59'``
-u                 Microseconds.                             ``000000`` to ``999999``
-a                 ``'a.m.'`` or ``'p.m.'`` (Note that       ``'a.m.'``
+``h``             Hour, 12-hour format.                     ``'01'`` to ``'12'``
+``H``             Hour, 24-hour format.                     ``'00'`` to ``'23'``
+``i``             Minutes.                                  ``'00'`` to ``'59'``
+``s``             Seconds, 2 digits with leading zeros.     ``'00'`` to ``'59'``
+``u``             Microseconds.                             ``000000`` to ``999999``
+``a``             ``'a.m.'`` or ``'p.m.'`` (Note that       ``'a.m.'``
                   this is slightly different than PHP's
                   output, because this includes periods
                   to match Associated Press style.)
-A                 ``'AM'`` or ``'PM'``.                     ``'AM'``
-f                 Time, in 12-hour hours and minutes,       ``'1'``, ``'1:30'``
+``A``             ``'AM'`` or ``'PM'``.                     ``'AM'``
+``f``             Time, in 12-hour hours and minutes,       ``'1'``, ``'1:30'``
                   with minutes left off if they're zero.
                   Proprietary extension.
-P                 Time, in 12-hour hours, minutes and       ``'1 a.m.'``, ``'1:30 p.m.'``, ``'midnight'``, ``'noon'``, ``'12:30 p.m.'``
+``P``             Time, in 12-hour hours, minutes and       ``'1 a.m.'``, ``'1:30 p.m.'``, ``'midnight'``, ``'noon'``, ``'12:30 p.m.'``
                   'a.m.'/'p.m.', with minutes left off
                   if they're zero and the special-case
                   strings 'midnight' and 'noon' if
                   appropriate. Proprietary extension.
 **Timezone**
-e                 Timezone name. Could be in any format,
+``e``             Timezone name. Could be in any format,
                   or might return an empty string,          ``''``, ``'GMT'``, ``'-500'``, ``'US/Eastern'``, etc.
                   depending on the datetime.
-I                 Daylight Savings Time, whether it's       ``'1'`` or ``'0'``
+``I``             Daylight Savings Time, whether it's       ``'1'`` or ``'0'``
                   in effect or not.
-O                 Difference to Greenwich time in hours.    ``'+0200'``
-T                 Time zone of this machine.                ``'EST'``, ``'MDT'``
-Z                 Time zone offset in seconds. The          ``-43200`` to ``43200``
+``O``             Difference to Greenwich time in hours.    ``'+0200'``
+``T``             Time zone of this machine.                ``'EST'``, ``'MDT'``
+``Z``             Time zone offset in seconds. The          ``-43200`` to ``43200``
                   offset for timezones west of UTC is
                   always negative, and for those east of
                   UTC is always positive.
 **Date/Time**
-c                 ISO 8601 format. (Note: unlike others     ``2008-01-02T10:30:00.000123+02:00``,
+``c``             ISO 8601 format. (Note: unlike others     ``2008-01-02T10:30:00.000123+02:00``,
                   formatters, such as "Z", "O" or "r",      or ``2008-01-02T10:30:00.000123`` if the datetime is naive
                   the "c" formatter will not add timezone
                   offset if value is a naive datetime
                   (see :class:`datetime.tzinfo`).
-r                 :rfc:`5322` formatted date.               ``'Thu, 21 Dec 2000 16:01:07 +0200'``
-U                 Seconds since the Unix Epoch
+``r``             :rfc:`5322` formatted date.               ``'Thu, 21 Dec 2000 16:01:07 +0200'``
+``U``             Seconds since the Unix Epoch
                   (January 1 1970 00:00:00 UTC).
 ================  ========================================  =====================
 
@@ -1603,7 +1603,7 @@ Escapes a string's HTML. Specifically, it makes these replacements:
 
 * ``<`` is converted to ``&lt;``
 * ``>`` is converted to ``&gt;``
-* ``'`` (single quote) is converted to ``&#39;``
+* ``'`` (single quote) is converted to ``&#x27;``
 * ``"`` (double quote) is converted to ``&quot;``
 * ``&`` is converted to ``&amp;``
 
@@ -1792,8 +1792,6 @@ If ``value`` is the list ``['a', 'b', 'c']``, the output will be the string
 
 ``json_script``
 ---------------
-
-.. versionadded:: 2.1
 
 Safely outputs a Python object as JSON, wrapped in a ``<script>`` tag, ready
 for use with JavaScript.
@@ -1992,8 +1990,8 @@ If ``value`` is ``800-COLLECT``, the output will be ``800-2655328``.
 ``pluralize``
 -------------
 
-Returns a plural suffix if the value is not 1. By default, this suffix is
-``'s'``.
+Returns a plural suffix if the value is not ``1``, ``'1'``, or an object of
+length 1. By default, this suffix is ``'s'``.
 
 Example::
 
@@ -2434,8 +2432,9 @@ Django's built-in :tfilter:`escape` filter. The default value for
 
 .. note::
 
-    If ``urlize`` is applied to text that already contains HTML markup,
-    things won't work as expected. Apply this filter only to plain text.
+    If ``urlize`` is applied to text that already contains HTML markup, or to
+    email addresses that contain single quotes (``'``), things won't work as
+    expected. Apply this filter only to plain text.
 
 .. templatefilter:: urlizetrunc
 

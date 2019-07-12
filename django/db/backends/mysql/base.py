@@ -9,6 +9,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.db import utils
 from django.db.backends import utils as backend_utils
 from django.db.backends.base.base import BaseDatabaseWrapper
+from django.utils.asyncio import async_unsafe
 from django.utils.functional import cached_property
 
 try:
@@ -223,6 +224,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         kwargs.update(options)
         return kwargs
 
+    @async_unsafe
     def get_new_connection(self, conn_params):
         return Database.connect(**conn_params)
 
@@ -242,6 +244,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             with self.cursor() as cursor:
                 cursor.execute('; '.join(assignments))
 
+    @async_unsafe
     def create_cursor(self, name=None):
         cursor = self.connection.cursor()
         return CursorWrapper(cursor)
@@ -340,5 +343,4 @@ class DatabaseWrapper(BaseDatabaseWrapper):
 
     @cached_property
     def mysql_is_mariadb(self):
-        # MariaDB isn't officially supported.
         return 'mariadb' in self.mysql_server_info.lower()

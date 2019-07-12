@@ -1,5 +1,6 @@
-from django.db.models import Field, FloatField
+from django.db.models import CharField, Field, FloatField, TextField
 from django.db.models.expressions import CombinedExpression, Func, Value
+from django.db.models.functions import Cast, Coalesce
 from django.db.models.lookups import Lookup
 
 
@@ -45,8 +46,7 @@ class SearchVectorCombinable:
 
 class SearchVector(SearchVectorCombinable, Func):
     function = 'to_tsvector'
-    arg_joiner = ", ' ',"
-    template = '%(function)s(concat(%(expressions)s))'
+    arg_joiner = " || ' ' || "
     output_field = SearchVectorField()
     config = None
 
@@ -68,17 +68,26 @@ class SearchVector(SearchVectorCombinable, Func):
         return resolved
 
     def as_sql(self, compiler, connection, function=None, template=None):
+        clone = self.copy()
+        clone.set_source_expressions([
+            Coalesce(
+                expression
+                if isinstance(expression.output_field, (CharField, TextField))
+                else Cast(expression, TextField()),
+                Value('')
+            ) for expression in clone.get_source_expressions()
+        ])
         config_params = []
         if template is None:
-            if self.config:
-                config_sql, config_params = compiler.compile(self.config)
-                template = "%(function)s({}::regconfig, concat(%(expressions)s))".format(config_sql.replace('%', '%%'))
+            if clone.config:
+                config_sql, config_params = compiler.compile(clone.config)
+                template = '%(function)s({}::regconfig, %(expressions)s)'.format(config_sql.replace('%', '%%'))
             else:
-                template = self.template
-        sql, params = super().as_sql(compiler, connection, function=function, template=template)
+                template = clone.template
+        sql, params = super(SearchVector, clone).as_sql(compiler, connection, function=function, template=template)
         extra_params = []
-        if self.weight:
-            weight_sql, extra_params = compiler.compile(self.weight)
+        if clone.weight:
+            weight_sql, extra_params = compiler.compile(clone.weight)
             sql = 'setweight({}, {})'.format(sql, weight_sql)
         return sql, config_params + params + extra_params
 

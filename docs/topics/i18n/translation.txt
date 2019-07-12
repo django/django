@@ -2,7 +2,7 @@
 Translation
 ===========
 
-.. module:: django.utils.translation
+.. currentmodule:: django.utils.translation
 
 Overview
 ========
@@ -566,6 +566,13 @@ access to these tags, put ``{% load i18n %}`` toward the top of your template.
 As with all template tags, this tag needs to be loaded in all templates which
 use translations, even those templates that extend from other templates which
 have already loaded the ``i18n`` tag.
+
+.. warning::
+
+    Translated strings will not be escaped when rendered in a template.
+    This allows you to include HTML in translations, for example for emphasis,
+    but potentially dangerous characters (e.g. ``"``) will also be rendered
+    unchanged.
 
 .. templatetag:: trans
 
@@ -1778,10 +1785,6 @@ language choice in the user's session. It also saves the language choice in a
 cookie that is named ``django_language`` by default. (The name can be changed
 through the :setting:`LANGUAGE_COOKIE_NAME` setting.)
 
-.. versionchanged:: 2.1
-
-    In older versions, the cookie is only set if session support isn't enabled.
-
 After setting the language choice, Django looks for a ``next`` parameter in the
 ``POST`` or ``GET`` data. If that is found and Django considers it to be a safe
 URL (i.e. it doesn't point to a different host and uses a safe scheme), a
@@ -1828,20 +1831,8 @@ You may want to set the active language for the current session explicitly. Perh
 a user's language preference is retrieved from another system, for example.
 You've already been introduced to :func:`django.utils.translation.activate()`. That
 applies to the current thread only. To persist the language for the entire
-session, also modify :data:`~django.utils.translation.LANGUAGE_SESSION_KEY`
-in the session::
-
-    from django.utils import translation
-    user_language = 'fr'
-    translation.activate(user_language)
-    request.session[translation.LANGUAGE_SESSION_KEY] = user_language
-
-You would typically want to use both: :func:`django.utils.translation.activate()`
-will change the language for this thread, and modifying the session makes this
-preference persist in future requests.
-
-If you are not using sessions, the language will persist in a cookie, whose name
-is configured in :setting:`LANGUAGE_COOKIE_NAME`. For example::
+session in a cookie, set the :setting:`LANGUAGE_COOKIE_NAME` cookie on the
+response::
 
     from django.conf import settings
     from django.http import HttpResponse
@@ -1850,6 +1841,14 @@ is configured in :setting:`LANGUAGE_COOKIE_NAME`. For example::
     translation.activate(user_language)
     response = HttpResponse(...)
     response.set_cookie(settings.LANGUAGE_COOKIE_NAME, user_language)
+
+You would typically want to use both: :func:`django.utils.translation.activate()`
+changes the language for this thread, and setting the cookie makes this
+preference persist in future requests.
+
+.. versionchanged:: 3.0
+
+    In older versions, you could set the language in the current session.
 
 Using translations outside views and templates
 ----------------------------------------------
@@ -1904,7 +1903,10 @@ A number of settings can be used to adjust language cookie options:
 * :setting:`LANGUAGE_COOKIE_NAME`
 * :setting:`LANGUAGE_COOKIE_AGE`
 * :setting:`LANGUAGE_COOKIE_DOMAIN`
+* :setting:`LANGUAGE_COOKIE_HTTPONLY`
 * :setting:`LANGUAGE_COOKIE_PATH`
+* :setting:`LANGUAGE_COOKIE_SAMESITE`
+* :setting:`LANGUAGE_COOKIE_SECURE`
 
 Implementation notes
 ====================
@@ -1983,9 +1985,6 @@ following this algorithm:
   only performed when you are using the ``i18n_patterns`` function in your
   root URLconf. See :ref:`url-internationalization` for more information
   about the language prefix and how to internationalize URL patterns.
-
-* Failing that, it looks for the :data:`~django.utils.translation.LANGUAGE_SESSION_KEY`
-  key in the current user's session.
 
 * Failing that, it looks for a cookie.
 
@@ -2097,10 +2096,6 @@ be named using :term:`locale name` notation. E.g. ``de``, ``pt_BR``, ``es_AR``,
 etc. Untranslated strings for territorial language variants use the translations
 of the generic language. For example, untranslated ``pt_BR`` strings use ``pt``
 translations.
-
-.. versionchanged:: 2.1
-
-    Fallback to the generic language as described above was added.
 
 This way, you can write applications that include their own translations, and
 you can override base translations in your project. Or, you can just build

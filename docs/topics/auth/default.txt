@@ -115,7 +115,7 @@ Changing a user's password will log out all their sessions. See
 Authenticating users
 --------------------
 
-.. function:: authenticate(request=None, \**credentials)
+.. function:: authenticate(request=None, **credentials)
 
     Use :func:`~django.contrib.auth.authenticate()` to verify a set of
     credentials. It takes credentials as keyword arguments, ``username`` and
@@ -262,6 +262,20 @@ The permission can then be assigned to a
 attribute or to a :class:`~django.contrib.auth.models.Group` via its
 ``permissions`` attribute.
 
+.. admonition:: Proxy models need their own content type
+
+    If you want to create :ref:`permissions for a proxy model
+    <proxy-models-permissions-topic>`, pass ``for_concrete_model=False`` to
+    :meth:`.ContentTypeManager.get_for_model` to get the appropriate
+    ``ContentType``::
+
+        content_type = ContentType.objects.get_for_model(BlogPostProxy, for_concrete_model=False)
+
+    .. versionchanged:: 2.2
+
+        In older versions, proxy models use the content type of the concrete
+        model.
+
 Permission caching
 ------------------
 
@@ -302,6 +316,44 @@ the user from the database. For example::
         user.has_perm('myapp.change_blogpost')  # True
 
         ...
+
+.. _proxy-models-permissions-topic:
+
+Proxy models
+------------
+
+Proxy models work exactly the same way as concrete models. Permissions are
+created using the own content type of the proxy model. Proxy models don't
+inherit the permissions of the concrete model they subclass::
+
+    class Person(models.Model):
+        class Meta:
+            permissions = [('can_eat_pizzas', 'Can eat pizzas')]
+
+    class Student(Person):
+        class Meta:
+            proxy = True
+            permissions = [('can_deliver_pizzas', 'Can deliver pizzas')]
+
+    >>> # Fetch the content type for the proxy model.
+    >>> content_type = ContentType.objects.get_for_model(Student, for_concrete_model=False)
+    >>> student_permissions = Permission.objects.filter(content_type=content_type)
+    >>> [p.codename for p in student_permissions]
+    ['add_student', 'change_student', 'delete_student', 'view_student',
+    'can_deliver_pizzas']
+    >>> for permission in student_permissions:
+    ...     user.user_permissions.add(permission)
+    >>> user.has_perm('app.add_person')
+    False
+    >>> user.has_perm('app.can_eat_pizzas')
+    False
+    >>> user.has_perms(('app.add_student', 'app.can_deliver_pizzas'))
+    True
+
+.. versionchanged:: 2.2
+
+    In older versions, permissions for proxy models use the content type of
+    the concrete model rather than content type of the proxy model.
 
 .. _auth-web-requests:
 
@@ -770,12 +822,6 @@ the behavior of a view when access is denied. Authenticated users are denied
 access with an HTTP 403 Forbidden response. Anonymous users are redirected to
 the login page or shown an HTTP 403 Forbidden response, depending on the
 :attr:`~django.contrib.auth.mixins.AccessMixin.raise_exception` attribute.
-
-.. versionchanged:: 2.1
-
-    In older versions, authenticated users who lacked permissions were
-    redirected to the login page (which resulted in a loop) instead of
-    receiving an HTTP 403 Forbidden response.
 
 .. class:: AccessMixin
 
@@ -1246,7 +1292,8 @@ implementation details see :ref:`using-the-views`.
       link. By default, HTML email is not sent.
 
     * ``extra_email_context``: A dictionary of context data that will be
-      available in the email template.
+      available in the email template. It can be used to override default
+      template context values listed below e.g. ``domain``.
 
     **Template context:**
 
@@ -1348,6 +1395,13 @@ implementation details see :ref:`using-the-views`.
 
     * ``extra_context``: A dictionary of context data that will be added to the
       default context data passed to the template.
+
+    * ``reset_url_token``: Token parameter displayed as a component of password
+      reset URLs. Defaults to ``'set-password'``.
+
+      .. versionchanged:: 3.0
+
+        The ``reset_url_token`` class attribute was added.
 
     **Template context:**
 

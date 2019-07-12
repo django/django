@@ -228,25 +228,19 @@ class FileSystemStorage(Storage):
 
         # Create any intermediate directories that do not exist.
         directory = os.path.dirname(full_path)
-        if not os.path.exists(directory):
-            try:
-                if self.directory_permissions_mode is not None:
-                    # os.makedirs applies the global umask, so we reset it,
-                    # for consistency with file_permissions_mode behavior.
-                    old_umask = os.umask(0)
-                    try:
-                        os.makedirs(directory, self.directory_permissions_mode)
-                    finally:
-                        os.umask(old_umask)
-                else:
-                    os.makedirs(directory)
-            except FileExistsError:
-                # There's a race between os.path.exists() and os.makedirs().
-                # If os.makedirs() fails with FileExistsError, the directory
-                # was created concurrently.
-                pass
-        if not os.path.isdir(directory):
-            raise IOError("%s exists and is not a directory." % directory)
+        try:
+            if self.directory_permissions_mode is not None:
+                # os.makedirs applies the global umask, so we reset it,
+                # for consistency with file_permissions_mode behavior.
+                old_umask = os.umask(0)
+                try:
+                    os.makedirs(directory, self.directory_permissions_mode, exist_ok=True)
+                finally:
+                    os.umask(old_umask)
+            else:
+                os.makedirs(directory, exist_ok=True)
+        except FileExistsError:
+            raise FileExistsError('%s exists and is not a directory.' % directory)
 
         # There's a potential race condition between get_available_name and
         # saving the file; it's possible that two threads might return the

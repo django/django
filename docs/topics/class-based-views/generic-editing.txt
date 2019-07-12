@@ -206,10 +206,11 @@ to edit, and override
 .. code-block:: python
     :caption: views.py
 
+    from django.contrib.auth.mixins import LoginRequiredMixin
     from django.views.generic.edit import CreateView
     from myapp.models import Author
 
-    class AuthorCreate(CreateView):
+    class AuthorCreate(LoginRequiredMixin, CreateView):
         model = Author
         fields = ['name']
 
@@ -217,11 +218,9 @@ to edit, and override
             form.instance.created_by = self.request.user
             return super().form_valid(form)
 
-Note that you'll need to :ref:`decorate this
-view<decorating-class-based-views>` using
-:func:`~django.contrib.auth.decorators.login_required`, or
-alternatively handle unauthorized users in the
-:meth:`~django.views.generic.edit.ModelFormMixin.form_valid()`.
+:class:`~django.contrib.auth.mixins.LoginRequiredMixin` prevents users who
+aren't logged in from accessing the form. If you omit that, you'll need to
+handle unauthorized users in :meth:`~.ModelFormMixin.form_valid()`.
 
 AJAX example
 ============

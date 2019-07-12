@@ -206,7 +206,7 @@ class MigrationLoader:
         self.load_disk()
         # Load database data
         if self.connection is None:
-            self.applied_migrations = set()
+            self.applied_migrations = {}
         else:
             recorder = MigrationRecorder(self.connection)
             self.applied_migrations = recorder.applied_migrations()
@@ -232,9 +232,9 @@ class MigrationLoader:
             # Ensure the replacing migration is only marked as applied if all of
             # its replacement targets are.
             if all(applied_statuses):
-                self.applied_migrations.add(key)
+                self.applied_migrations[key] = migration
             else:
-                self.applied_migrations.discard(key)
+                self.applied_migrations.pop(key, None)
             # A replacing migration can be used if either all or none of its
             # replacement targets have been applied.
             if all(applied_statuses) or (not any(applied_statuses)):

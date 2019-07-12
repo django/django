@@ -173,14 +173,6 @@ class Atomic(ContextDecorator):
             connection.commit_on_exit = True
             connection.needs_rollback = False
             if not connection.get_autocommit():
-                # sqlite3 in Python < 3.6 doesn't handle transactions and
-                # savepoints properly when autocommit is off.
-                # Turning autocommit back on isn't an option; it would trigger
-                # a premature commit. Give up if that happens.
-                if connection.features.autocommits_when_autocommit_is_off:
-                    raise TransactionManagementError(
-                        "Your database backend doesn't behave properly when "
-                        "autocommit is off. Turn it on before using 'atomic'.")
                 # Pretend we're already in an atomic block to bypass the code
                 # that disables autocommit to enter a transaction, and make a
                 # note to deal with this case in __exit__.

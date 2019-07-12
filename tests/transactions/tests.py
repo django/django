@@ -228,7 +228,6 @@ class AtomicInsideTransactionTests(AtomicTests):
         self.atomic.__exit__(*sys.exc_info())
 
 
-@skipIfDBFeature('autocommits_when_autocommit_is_off')
 class AtomicWithoutAutocommitTests(AtomicTests):
     """All basic tests for atomic should also pass when autocommit is turned off."""
 
@@ -480,7 +479,6 @@ class AtomicMiscTests(TransactionTestCase):
         Reporter.objects.create()
 
 
-@skipIfDBFeature('autocommits_when_autocommit_is_off')
 class NonAutocommitTests(TransactionTestCase):
 
     available_apps = []

@@ -1,4 +1,4 @@
-/*global Calendar, findPosX, findPosY, getStyle, get_format, gettext, gettext_noop, interpolate, ngettext, quickElement*/
+/*global Calendar, findPosX, findPosY, get_format, gettext, gettext_noop, interpolate, ngettext, quickElement*/
 // Inserts shortcut buttons after all of the following:
 //     <input type="text" class="vDateField">
 //     <input type="text" class="vTimeField">
@@ -20,10 +20,10 @@
         dismissClockFunc: [],
         dismissCalendarFunc: [],
         calendarDivName1: 'calendarbox', // name of calendar <div> that gets toggled
-        calendarDivName2: 'calendarin',  // name of <div> that contains calendar
-        calendarLinkName: 'calendarlink',// name of the link that is used to toggle
-        clockDivName: 'clockbox',        // name of clock <div> that gets toggled
-        clockLinkName: 'clocklink',      // name of the link that is used to toggle
+        calendarDivName2: 'calendarin', // name of <div> that contains calendar
+        calendarLinkName: 'calendarlink', // name of the link that is used to toggle
+        clockDivName: 'clockbox', // name of clock <div> that gets toggled
+        clockLinkName: 'clocklink', // name of the link that is used to toggle
         shortCutsClass: 'datetimeshortcuts', // class of the clock and cal shortcuts
         timezoneWarningClass: 'timezonewarning', // class of the warning for timezone mismatch
         timezoneOffset: 0,
@@ -197,7 +197,7 @@
 
             // Recalculate the clockbox position
             // is it left-to-right or right-to-left layout ?
-            if (getStyle(document.body, 'direction') !== 'rtl') {
+            if (window.getComputedStyle(document.body).direction !== 'rtl') {
                 clock_box.style.left = findPosX(clock_link) + 17 + 'px';
             }
             else {
@@ -370,7 +370,7 @@
 
             // Recalculate the clockbox position
             // is it left-to-right or right-to-left layout ?
-            if (getStyle(document.body, 'direction') !== 'rtl') {
+            if (window.getComputedStyle(document.body).direction !== 'rtl') {
                 cal_box.style.left = findPosX(cal_link) + 17 + 'px';
             }
             else {
@@ -399,10 +399,10 @@
             var format = get_format('DATE_INPUT_FORMATS')[0];
             // the format needs to be escaped a little
             format = format.replace('\\', '\\\\')
-                           .replace('\r', '\\r')
-                           .replace('\n', '\\n')
-                           .replace('\t', '\\t')
-                           .replace("'", "\\'");
+                .replace('\r', '\\r')
+                .replace('\n', '\\n')
+                .replace('\t', '\\t')
+                .replace("'", "\\'");
             return function(y, m, d) {
                 DateTimeShortcuts.calendarInputs[num].value = new Date(y, m - 1, d).strftime(format);
                 DateTimeShortcuts.calendarInputs[num].focus();

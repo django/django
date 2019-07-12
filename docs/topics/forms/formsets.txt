@@ -2,8 +2,7 @@
 Formsets
 ========
 
-.. module:: django.forms.formsets
-    :synopsis: An abstraction for working with multiple forms on the same page.
+.. currentmodule:: django.forms.formsets
 
 .. class:: BaseFormSet
 
@@ -274,7 +273,9 @@ is where you define your own validation that works at the formset level::
     ...             return
     ...         titles = []
     ...         for form in self.forms:
-    ...             title = form.cleaned_data['title']
+    ...             if self.can_delete and self._should_delete_form(form):
+    ...                 continue
+    ...             title = form.cleaned_data.get('title')
     ...             if title in titles:
     ...                 raise forms.ValidationError("Articles in a set must have distinct titles.")
     ...             titles.append(title)
@@ -447,6 +448,49 @@ happen when the user changes these values::
     {'pub_date': datetime.date(2008, 5, 1), 'ORDER': 0, 'title': 'Article #3'}
     {'pub_date': datetime.date(2008, 5, 11), 'ORDER': 1, 'title': 'Article #2'}
     {'pub_date': datetime.date(2008, 5, 10), 'ORDER': 2, 'title': 'Article #1'}
+
+:class:`~django.forms.formsets.BaseFormSet` also provides an
+:attr:`~django.forms.formsets.BaseFormSet.ordering_widget` attribute and
+:meth:`~django.forms.formsets.BaseFormSet.get_ordering_widget` method that
+control the widget used with
+:attr:`~django.forms.formsets.BaseFormSet.can_order`.
+
+``ordering_widget``
+^^^^^^^^^^^^^^^^^^^
+
+.. versionadded:: 3.0
+
+.. attribute:: BaseFormSet.ordering_widget
+
+Default: :class:`~django.forms.NumberInput`
+
+Set ``ordering_widget`` to specify the widget class to be used with
+``can_order``::
+
+    >>> from django.forms import BaseFormSet, formset_factory
+    >>> from myapp.forms import ArticleForm
+    >>> class BaseArticleFormSet(BaseFormSet):
+    ...     ordering_widget = HiddenInput
+
+    >>> ArticleFormSet = formset_factory(ArticleForm, formset=BaseArticleFormSet, can_order=True)
+
+``get_ordering_widget``
+^^^^^^^^^^^^^^^^^^^^^^^
+
+.. versionadded:: 3.0
+
+.. method:: BaseFormSet.get_ordering_widget()
+
+Override ``get_ordering_widget()`` if you need to provide a widget instance for
+use with ``can_order``::
+
+    >>> from django.forms import BaseFormSet, formset_factory
+    >>> from myapp.forms import ArticleForm
+    >>> class BaseArticleFormSet(BaseFormSet):
+    ...     def get_ordering_widget(self):
+    ...         return HiddenInput(attrs={'class': 'ordering'})
+
+    >>> ArticleFormSet = formset_factory(ArticleForm, formset=BaseArticleFormSet, can_order=True)
 
 ``can_delete``
 --------------
@@ -687,7 +731,7 @@ Using more than one formset in a view
 You are able to use more than one formset in a view if you like. Formsets
 borrow much of its behavior from forms. With that said you are able to use
 ``prefix`` to prefix formset form field names with a given value to allow
-more than one formset to be sent to a view without name clashing. Lets take
+more than one formset to be sent to a view without name clashing. Let's take
 a look at how this might be accomplished::
 
     from django.forms import formset_factory

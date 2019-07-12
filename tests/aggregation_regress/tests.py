@@ -11,6 +11,7 @@ from django.db.models import (
     Avg, Case, Count, DecimalField, F, IntegerField, Max, Q, StdDev, Sum,
     Value, Variance, When,
 )
+from django.db.models.aggregates import Aggregate
 from django.test import (
     TestCase, ignore_warnings, skipUnlessAnyDBFeature, skipUnlessDBFeature,
 )
@@ -400,7 +401,7 @@ class AggregationTests(TestCase):
                 When(pages__lt=400, then='discount_price'),
                 output_field=DecimalField()
             )))['test'],
-            22.27, places=2
+            Decimal('22.27'), places=2
         )
 
     def test_distinct_conditional_aggregate(self):
@@ -1040,7 +1041,7 @@ class AggregationTests(TestCase):
         books = Book.objects.values_list("publisher__name").annotate(
             Count("id"), Avg("price"), Avg("authors__age"), avg_pgs=Avg("pages")
         ).order_by("-publisher__name")
-        self.assertEqual(books[0], ('Sams', 1, 23.09, 45.0, 528.0))
+        self.assertEqual(books[0], ('Sams', 1, Decimal('23.09'), 45.0, 528.0))
 
     def test_annotation_disjunction(self):
         qs = Book.objects.annotate(n_authors=Count("authors")).filter(
@@ -1116,7 +1117,6 @@ class AggregationTests(TestCase):
             lambda b: (b.name, b.authorCount)
         )
 
-    @skipUnlessDBFeature('supports_stddev')
     def test_stddev(self):
         self.assertEqual(
             Book.objects.aggregate(StdDev('pages')),
@@ -1130,7 +1130,7 @@ class AggregationTests(TestCase):
 
         self.assertEqual(
             Book.objects.aggregate(StdDev('price')),
-            {'price__stddev': Approximate(24.16, 2)}
+            {'price__stddev': Approximate(Decimal('24.16'), 2)}
         )
 
         self.assertEqual(
@@ -1145,7 +1145,7 @@ class AggregationTests(TestCase):
 
         self.assertEqual(
             Book.objects.aggregate(StdDev('price', sample=True)),
-            {'price__stddev': Approximate(26.46, 1)}
+            {'price__stddev': Approximate(Decimal('26.46'), 1)}
         )
 
         self.assertEqual(
@@ -1160,7 +1160,7 @@ class AggregationTests(TestCase):
 
         self.assertEqual(
             Book.objects.aggregate(Variance('price')),
-            {'price__variance': Approximate(583.77, 1)}
+            {'price__variance': Approximate(Decimal('583.77'), 1)}
         )
 
         self.assertEqual(
@@ -1175,7 +1175,7 @@ class AggregationTests(TestCase):
 
         self.assertEqual(
             Book.objects.aggregate(Variance('price', sample=True)),
-            {'price__variance': Approximate(700.53, 2)}
+            {'price__variance': Approximate(Decimal('700.53'), 2)}
         )
 
     def test_filtering_by_annotation_name(self):
@@ -1496,6 +1496,16 @@ class AggregationTests(TestCase):
         """Find ages that are shared by at least two authors."""
         qs = Author.objects.values_list('age', flat=True).annotate(age_count=Count('age')).filter(age_count__gt=1)
         self.assertSequenceEqual(qs, [29])
+
+    def test_allow_distinct(self):
+        class MyAggregate(Aggregate):
+            pass
+        with self.assertRaisesMessage(TypeError, 'MyAggregate does not allow distinct'):
+            MyAggregate('foo', distinct=True)
+
+        class DistinctAggregate(Aggregate):
+            allow_distinct = True
+        DistinctAggregate('foo', distinct=True)
 
 
 class JoinPromotionTests(TestCase):

@@ -5,7 +5,7 @@ from distutils.sysconfig import get_python_lib
 from setuptools import find_packages, setup
 
 CURRENT_PYTHON = sys.version_info[:2]
-REQUIRED_PYTHON = (3, 5)
+REQUIRED_PYTHON = (3, 6)
 
 # This check and everything above must remain compatible with Python 2.7.
 if CURRENT_PYTHON < REQUIRED_PYTHON:
@@ -83,7 +83,7 @@ setup(
     entry_points={'console_scripts': [
         'django-admin = django.core.management:execute_from_command_line',
     ]},
-    install_requires=['pytz', 'sqlparse'],
+    install_requires=['pytz', 'sqlparse', 'asgiref'],
     extras_require={
         "bcrypt": ["bcrypt"],
         "argon2": ["argon2-cffi >= 16.1.0"],
@@ -98,7 +98,6 @@ setup(
         'Operating System :: OS Independent',
         'Programming Language :: Python',
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3 :: Only',

@@ -1,6 +1,7 @@
+import cgi
+import codecs
 import copy
 import re
-import warnings
 from io import BytesIO
 from itertools import chain
 from urllib.parse import quote, urlencode, urljoin, urlsplit
@@ -12,8 +13,9 @@ from django.core.exceptions import (
 )
 from django.core.files import uploadhandler
 from django.http.multipartparser import MultiPartParser, MultiPartParserError
-from django.utils.datastructures import ImmutableList, MultiValueDict
-from django.utils.deprecation import RemovedInDjango30Warning
+from django.utils.datastructures import (
+    CaseInsensitiveMapping, ImmutableList, MultiValueDict,
+)
 from django.utils.encoding import escape_uri_path, iri_to_uri
 from django.utils.functional import cached_property
 from django.utils.http import is_same_domain, limited_parse_qsl
@@ -22,7 +24,7 @@ RAISE_ERROR = object()
 host_validation_re = re.compile(r"^([a-z0-9.-]+|\[[a-f0-9]*:[a-f0-9\.:]+\])(:\d+)?$")
 
 
-class UnreadablePostError(IOError):
+class UnreadablePostError(OSError):
     pass
 
 
@@ -64,6 +66,21 @@ class HttpRequest:
         if self.method is None or not self.get_full_path():
             return '<%s>' % self.__class__.__name__
         return '<%s: %s %r>' % (self.__class__.__name__, self.method, self.get_full_path())
+
+    @cached_property
+    def headers(self):
+        return HttpHeaders(self.META)
+
+    def _set_content_type_params(self, meta):
+        """Set content_type, content_params, and encoding."""
+        self.content_type, self.content_params = cgi.parse_header(meta.get('CONTENT_TYPE', ''))
+        if 'charset' in self.content_params:
+            try:
+                codecs.lookup(self.content_params['charset'])
+            except LookupError:
+                pass
+            else:
+                self.encoding = self.content_params['charset']
 
     def _get_raw_host(self):
         """
@@ -209,13 +226,14 @@ class HttpRequest:
     def scheme(self):
         if settings.SECURE_PROXY_SSL_HEADER:
             try:
-                header, value = settings.SECURE_PROXY_SSL_HEADER
+                header, secure_value = settings.SECURE_PROXY_SSL_HEADER
             except ValueError:
                 raise ImproperlyConfigured(
                     'The SECURE_PROXY_SSL_HEADER setting must be a tuple containing two values.'
                 )
-            if self.META.get(header) == value:
-                return 'https'
+            header_value = self.META.get(header)
+            if header_value is not None:
+                return 'https' if header_value == secure_value else 'http'
         return self._get_scheme()
 
     def is_secure(self):
@@ -280,7 +298,7 @@ class HttpRequest:
 
             try:
                 self._body = self.read()
-            except IOError as e:
+            except OSError as e:
                 raise UnreadablePostError(*e.args) from e
             self._stream = BytesIO(self._body)
         return self._body
@@ -335,28 +353,47 @@ class HttpRequest:
         self._read_started = True
         try:
             return self._stream.read(*args, **kwargs)
-        except IOError as e:
+        except OSError as e:
             raise UnreadablePostError(*e.args) from e
 
     def readline(self, *args, **kwargs):
         self._read_started = True
         try:
             return self._stream.readline(*args, **kwargs)
-        except IOError as e:
+        except OSError as e:
             raise UnreadablePostError(*e.args) from e
 
     def __iter__(self):
         return iter(self.readline, b'')
 
-    def xreadlines(self):
-        warnings.warn(
-            'HttpRequest.xreadlines() is deprecated in favor of iterating the '
-            'request.', RemovedInDjango30Warning, stacklevel=2,
-        )
-        yield from self
-
     def readlines(self):
         return list(self)
+
+
+class HttpHeaders(CaseInsensitiveMapping):
+    HTTP_PREFIX = 'HTTP_'
+    # PEP 333 gives two headers which aren't prepended with HTTP_.
+    UNPREFIXED_HEADERS = {'CONTENT_TYPE', 'CONTENT_LENGTH'}
+
+    def __init__(self, environ):
+        headers = {}
+        for header, value in environ.items():
+            name = self.parse_header_name(header)
+            if name:
+                headers[name] = value
+        super().__init__(headers)
+
+    def __getitem__(self, key):
+        """Allow header lookup using underscores in place of hyphens."""
+        return super().__getitem__(key.replace('_', '-'))
+
+    @classmethod
+    def parse_header_name(cls, header):
+        if header.startswith(cls.HTTP_PREFIX):
+            header = header[len(cls.HTTP_PREFIX):]
+        elif header not in cls.UNPREFIXED_HEADERS:
+            return None
+        return header.replace('_', '-').title()
 
 
 class QueryDict(MultiValueDict):
@@ -518,7 +555,7 @@ class QueryDict(MultiValueDict):
 
 
 # It's neither necessary nor appropriate to use
-# django.utils.encoding.force_text for parsing URLs and form inputs. Thus,
+# django.utils.encoding.force_str() for parsing URLs and form inputs. Thus,
 # this slightly more restricted function, used by QueryDict.
 def bytes_to_text(s, encoding):
     """

@@ -15,6 +15,10 @@ class Employee(models.Model):
         return '%s %s' % (self.firstname, self.lastname)
 
 
+class RemoteEmployee(Employee):
+    adjusted_salary = models.IntegerField()
+
+
 class Company(models.Model):
     name = models.CharField(max_length=100)
     num_employees = models.PositiveIntegerField()

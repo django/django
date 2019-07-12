@@ -189,6 +189,7 @@ class SeleniumTests(AdminSeleniumTestCase):
         self.assertEqual(len(results), PAGINATOR_SIZE + 11)
         # Limit the results with the search field.
         search.send_keys('Who')
+        self.assertTrue(result_container.is_displayed())
         results = result_container.find_elements_by_css_selector('.select2-results__option')
         self.assertEqual(len(results), 1)
         # Select the result.
@@ -222,6 +223,7 @@ class SeleniumTests(AdminSeleniumTestCase):
         self.assertEqual(len(results), 31)
         # Limit the results with the search field.
         search.send_keys('Who')
+        self.assertTrue(result_container.is_displayed())
         results = result_container.find_elements_by_css_selector('.select2-results__option')
         self.assertEqual(len(results), 1)
         # Select the result.

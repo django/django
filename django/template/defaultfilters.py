@@ -812,7 +812,7 @@ def filesizeformat(bytes_):
     102 bytes, etc.).
     """
     try:
-        bytes_ = float(bytes_)
+        bytes_ = int(bytes_)
     except (TypeError, ValueError, UnicodeDecodeError):
         value = ngettext("%(size)d byte", "%(size)d bytes", 0) % {'size': 0}
         return avoid_wrapping(value)
@@ -851,8 +851,8 @@ def filesizeformat(bytes_):
 @register.filter(is_safe=False)
 def pluralize(value, arg='s'):
     """
-    Return a plural suffix if the value is not 1. By default, use 's' as the
-    suffix:
+    Return a plural suffix if the value is not 1, '1', or an object of
+    length 1. By default, use 's' as the suffix:
 
     * If value is 0, vote{{ value|pluralize }} display "votes".
     * If value is 1, vote{{ value|pluralize }} display "vote".
@@ -879,17 +879,15 @@ def pluralize(value, arg='s'):
     singular_suffix, plural_suffix = bits[:2]
 
     try:
-        if float(value) != 1:
-            return plural_suffix
+        return singular_suffix if float(value) == 1 else plural_suffix
     except ValueError:  # Invalid string that's not a number.
         pass
     except TypeError:  # Value isn't a string or a number; maybe it's a list?
         try:
-            if len(value) != 1:
-                return plural_suffix
+            return singular_suffix if len(value) == 1 else plural_suffix
         except TypeError:  # len() of unsized object.
             pass
-    return singular_suffix
+    return ''
 
 
 @register.filter("phone2numeric", is_safe=True)
