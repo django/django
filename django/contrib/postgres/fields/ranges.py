@@ -149,12 +149,13 @@ RangeField.register_lookup(lookups.ContainedBy)
 RangeField.register_lookup(lookups.Overlap)
 
 
-class DateTimeRangeContains(models.Lookup):
+class DateTimeRangeContains(lookups.PostgresSimpleLookup):
     """
     Lookup for Date/DateTimeRange containment to cast the rhs to the correct
     type.
     """
     lookup_name = 'contains'
+    operator = '@>'
 
     def process_rhs(self, compiler, connection):
         # Transform rhs value for db lookup.
@@ -165,9 +166,7 @@ class DateTimeRangeContains(models.Lookup):
         return super().process_rhs(compiler, connection)
 
     def as_sql(self, compiler, connection):
-        lhs, lhs_params = self.process_lhs(compiler, connection)
-        rhs, rhs_params = self.process_rhs(compiler, connection)
-        params = lhs_params + rhs_params
+        sql, params = super().as_sql(compiler, connection)
         # Cast the rhs if needed.
         cast_sql = ''
         if (
@@ -178,7 +177,7 @@ class DateTimeRangeContains(models.Lookup):
         ):
             cast_internal_type = self.lhs.output_field.base_field.get_internal_type()
             cast_sql = '::{}'.format(connection.data_types.get(cast_internal_type))
-        return '%s @> %s%s' % (lhs, rhs, cast_sql), params
+        return '%s%s' % (sql, cast_sql), params
 
 
 DateRangeField.register_lookup(DateTimeRangeContains)
