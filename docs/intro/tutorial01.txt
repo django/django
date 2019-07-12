@@ -120,7 +120,7 @@ These files are:
 The development server
 ======================
 
-Let's verify your Django project works. Change into the outer :file:`mysite` directory, if
+Let's verify your Django project works. Change into the inner :file:`mysite` directory, if
 you haven't already, and run the following commands:
 
 .. console::
