@@ -916,3 +916,31 @@ types.
     .. attribute:: range_type
 
         The psycopg2 range type to use.
+
+Range operators
+---------------
+
+.. versionadded:: 3.0
+
+.. class:: RangeOperators
+
+PostgreSQL provides a set of SQL operators that can be used together with the
+range data types (see `the PostgreSQL documentation for the full details of
+range operators <https://www.postgresql.org/docs/current/
+functions-range.html#RANGE-OPERATORS-TABLE>`_). This class is meant as a
+convenient method to avoid typos. The operator names overlap with the names of
+corresponding lookups.
+
+.. code-block:: python
+
+    class RangeOperators:
+        EQUAL = '='
+        NOT_EQUAL = '<>'
+        CONTAINS = '@>'
+        CONTAINED_BY = '<@'
+        OVERLAPS = '&&'
+        FULLY_LT = '<<'
+        FULLY_GT = '>>'
+        NOT_LT = '&>'
+        NOT_GT = '&<'
+        ADJACENT_TO = '-|-'

@@ -12,7 +12,22 @@ __all__ = [
     'RangeField', 'IntegerRangeField', 'BigIntegerRangeField',
     'DecimalRangeField', 'DateTimeRangeField', 'DateRangeField',
     'FloatRangeField',
+    'RangeOperators',
 ]
+
+
+class RangeOperators:
+    # https://www.postgresql.org/docs/current/functions-range.html#RANGE-OPERATORS-TABLE
+    EQUAL = '='
+    NOT_EQUAL = '<>'
+    CONTAINS = '@>'
+    CONTAINED_BY = '<@'
+    OVERLAPS = '&&'
+    FULLY_LT = '<<'
+    FULLY_GT = '>>'
+    NOT_LT = '&>'
+    NOT_GT = '&<'
+    ADJACENT_TO = '-|-'
 
 
 class RangeField(models.Field):
@@ -155,7 +170,7 @@ class DateTimeRangeContains(lookups.PostgresSimpleLookup):
     type.
     """
     lookup_name = 'contains'
-    operator = '@>'
+    operator = RangeOperators.CONTAINS
 
     def process_rhs(self, compiler, connection):
         # Transform rhs value for db lookup.
@@ -193,7 +208,7 @@ class RangeContainedBy(lookups.PostgresSimpleLookup):
         'date': 'daterange',
         'timestamp with time zone': 'tstzrange',
     }
-    operator = '<@'
+    operator = RangeOperators.CONTAINED_BY
 
     def process_rhs(self, compiler, connection):
         rhs, rhs_params = super().process_rhs(compiler, connection)
@@ -220,31 +235,31 @@ models.FloatField.register_lookup(RangeContainedBy)
 @RangeField.register_lookup
 class FullyLessThan(lookups.PostgresSimpleLookup):
     lookup_name = 'fully_lt'
-    operator = '<<'
+    operator = RangeOperators.FULLY_LT
 
 
 @RangeField.register_lookup
 class FullGreaterThan(lookups.PostgresSimpleLookup):
     lookup_name = 'fully_gt'
-    operator = '>>'
+    operator = RangeOperators.FULLY_GT
 
 
 @RangeField.register_lookup
 class NotLessThan(lookups.PostgresSimpleLookup):
     lookup_name = 'not_lt'
-    operator = '&>'
+    operator = RangeOperators.NOT_LT
 
 
 @RangeField.register_lookup
 class NotGreaterThan(lookups.PostgresSimpleLookup):
     lookup_name = 'not_gt'
-    operator = '&<'
+    operator = RangeOperators.NOT_GT
 
 
 @RangeField.register_lookup
 class AdjacentToLookup(lookups.PostgresSimpleLookup):
     lookup_name = 'adjacent_to'
-    operator = '-|-'
+    operator = RangeOperators.ADJACENT_TO
 
 
 @RangeField.register_lookup
