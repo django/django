@@ -66,6 +66,14 @@ async code before, this may trigger if you were doing it incorrectly. If you
 see a ``SynchronousOnlyOperation`` error, then closely examine your code and
 move any database operations to be in a synchronous child thread.
 
+Exclusion constraints on PostgreSQL
+-----------------------------------
+
+The new :class:`~django.contrib.postgres.constraints.ExclusionConstraint` class
+enable adding exclusion constraints on PostgreSQL. Constraints are added to
+models using the
+:attr:`Meta.constraints <django.db.models.Options.constraints>` option.
+
 Minor features
 --------------
 
@@ -136,6 +144,9 @@ Minor features
 * The new :class:`~django.contrib.postgres.fields.RangeOperators` helps to
   avoid typos in SQL operators that can be used together with
   :class:`~django.contrib.postgres.fields.RangeField`.
+
+* The new :class:`~django.contrib.postgres.fields.RangeBoundary` expression
+  represents the range boundaries.
 
 :mod:`django.contrib.redirects`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

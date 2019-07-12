@@ -12,8 +12,18 @@ __all__ = [
     'RangeField', 'IntegerRangeField', 'BigIntegerRangeField',
     'DecimalRangeField', 'DateTimeRangeField', 'DateRangeField',
     'FloatRangeField',
-    'RangeOperators',
+    'RangeBoundary', 'RangeOperators',
 ]
+
+
+class RangeBoundary(models.Expression):
+    """A class that represents range boundaries."""
+    def __init__(self, inclusive_lower=True, inclusive_upper=False):
+        self.lower = '[' if inclusive_lower else '('
+        self.upper = ']' if inclusive_upper else ')'
+
+    def as_sql(self, compiler, connection):
+        return "'%s%s'" % (self.lower, self.upper), []
 
 
 class RangeOperators:

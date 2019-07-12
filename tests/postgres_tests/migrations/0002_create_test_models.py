@@ -262,4 +262,25 @@ class Migration(migrations.Migration):
             },
             bases=(models.Model,),
         ),
+        migrations.CreateModel(
+            name='Room',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('number', models.IntegerField(unique=True)),
+            ],
+        ),
+        migrations.CreateModel(
+            name='HotelReservation',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('room', models.ForeignKey('postgres_tests.Room', models.CASCADE)),
+                ('datespan', DateRangeField()),
+                ('start', models.DateTimeField()),
+                ('end', models.DateTimeField()),
+                ('cancelled', models.BooleanField(default=False)),
+            ],
+            options={
+                'required_db_vendor': 'postgresql',
+            },
+        ),
     ]

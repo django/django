@@ -944,3 +944,26 @@ corresponding lookups.
         NOT_LT = '&>'
         NOT_GT = '&<'
         ADJACENT_TO = '-|-'
+
+RangeBoundary() expressions
+---------------------------
+
+.. versionadded:: 3.0
+
+.. class:: RangeBoundary(inclusive_lower=True, inclusive_upper=False)
+
+    .. attribute:: inclusive_lower
+
+        If ``True`` (default), the lower bound is inclusive ``'['``, otherwise
+        it's exclusive ``'('``.
+
+    .. attribute:: inclusive_upper
+
+        If ``False`` (default), the upper bound is exclusive ``')'``, otherwise
+        it's inclusive ``']'``.
+
+A ``RangeBoundary()`` expression represents the range boundaries. It can be
+used with a custom range functions that expected boundaries, for example to
+define :class:`~django.contrib.postgres.constraints.ExclusionConstraint`. See
+`the PostgreSQL documentation for the full details <https://www.postgresql.org/
+docs/current/rangetypes.html#RANGETYPES-INCLUSIVITY>`_.
