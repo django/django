@@ -73,7 +73,7 @@ class CheckConstraintTests(TestCase):
         with self.assertRaises(IntegrityError):
             Product.objects.create(name='Invalid', price=10, discounted_price=20)
 
-    @skipUnlessDBFeature('supports_table_check_constraints')
+    @skipUnlessDBFeature('supports_table_check_constraints', 'can_introspect_check_constraints')
     def test_name(self):
         constraints = get_constraints(Product._meta.db_table)
         for expected_name in (
@@ -83,7 +83,7 @@ class CheckConstraintTests(TestCase):
             with self.subTest(expected_name):
                 self.assertIn(expected_name, constraints)
 
-    @skipUnlessDBFeature('supports_table_check_constraints')
+    @skipUnlessDBFeature('supports_table_check_constraints', 'can_introspect_check_constraints')
     def test_abstract_name(self):
         constraints = get_constraints(ChildModel._meta.db_table)
         self.assertIn('constraints_childmodel_adult', constraints)

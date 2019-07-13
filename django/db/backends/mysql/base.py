@@ -61,6 +61,7 @@ class CursorWrapper:
     codes_for_integrityerror = (
         1048,  # Column cannot be null
         1690,  # BIGINT UNSIGNED value is out of range
+        4025,  # CHECK constraint failed
     )
 
     def __init__(self, cursor):
@@ -327,6 +328,15 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             return False
         else:
             return True
+
+    @cached_property
+    def data_type_check_constraints(self):
+        if self.features.supports_column_check_constraints:
+            return {
+                'PositiveIntegerField': '`%(column)s` >= 0',
+                'PositiveSmallIntegerField': '`%(column)s` >= 0',
+            }
+        return {}
 
     @cached_property
     def mysql_server_info(self):

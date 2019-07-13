@@ -1,5 +1,6 @@
 from collections import namedtuple
 
+import sqlparse
 from MySQLdb.constants import FIELD_TYPE
 
 from django.db.backends.base.introspection import (
@@ -189,6 +190,31 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                 constraints[constraint]['unique'] = True
             elif kind.lower() == "unique":
                 constraints[constraint]['unique'] = True
+        # Add check constraints.
+        if self.connection.features.can_introspect_check_constraints:
+            type_query = """
+                SELECT c.constraint_name, c.check_clause
+                FROM information_schema.check_constraints AS c
+                WHERE
+                    c.constraint_schema = DATABASE() AND
+                    c.table_name = %s
+            """
+            cursor.execute(type_query, [table_name])
+            for constraint, check_clause in cursor.fetchall():
+                # Parse columns.
+                columns = OrderedSet()
+                for statement in sqlparse.parse(check_clause):
+                    for token in statement.flatten():
+                        if token.ttype in [sqlparse.tokens.Name, sqlparse.tokens.Literal.String.Single]:
+                            columns.add(token.value[1:-1])
+                constraints[constraint] = {
+                    'columns': columns,
+                    'primary_key': False,
+                    'unique': False,
+                    'index': False,
+                    'check': True,
+                    'foreign_key': None,
+                }
         # Now add in the indexes
         cursor.execute("SHOW INDEX FROM %s" % self.connection.ops.quote_name(table_name))
         for table, non_unique, index, colseq, column, type_ in [x[:5] + (x[10],) for x in cursor.fetchall()]:

@@ -1556,7 +1556,7 @@ class SchemaTests(TransactionTestCase):
         # Ensure the m2m table is still there.
         self.assertEqual(len(self.column_classes(LocalM2M)), 1)
 
-    @skipUnlessDBFeature('supports_column_check_constraints')
+    @skipUnlessDBFeature('supports_column_check_constraints', 'can_introspect_check_constraints')
     def test_check_constraints(self):
         """
         Tests creating/deleting CHECK constraints
@@ -1586,7 +1586,7 @@ class SchemaTests(TransactionTestCase):
         if not any(details['columns'] == ['height'] and details['check'] for details in constraints.values()):
             self.fail("No check constraint for height found")
 
-    @skipUnlessDBFeature('supports_column_check_constraints')
+    @skipUnlessDBFeature('supports_column_check_constraints', 'can_introspect_check_constraints')
     def test_remove_field_check_does_not_remove_meta_constraints(self):
         with connection.schema_editor() as editor:
             editor.create_model(Author)

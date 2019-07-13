@@ -237,7 +237,10 @@ class IntrospectionTests(TransactionTestCase):
             'article_email_pub_date_uniq',
             'email_pub_date_idx',
         }
-        if connection.features.supports_column_check_constraints:
+        if (
+            connection.features.supports_column_check_constraints and
+            connection.features.can_introspect_check_constraints
+        ):
             custom_constraints.add('up_votes_gte_0_check')
             assertDetails(constraints['up_votes_gte_0_check'], ['up_votes'], check=True)
         assertDetails(constraints['article_email_pub_date_uniq'], ['article_id', 'email', 'pub_date'], unique=True)
