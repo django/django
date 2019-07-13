@@ -48,16 +48,18 @@ database-schema problems. Here's a quick example:
 Install it
 ==========
 
-Next, run the Django command-line utility to create the database tables
+Next, run the Django command-line utilities to create the database tables
 automatically:
 
 .. console::
 
+    $ python manage.py makemigrations
     $ python manage.py migrate
 
-The :djadmin:`migrate` command looks at all your available models and creates
-tables in your database for whichever tables don't already exist, as well as
-optionally providing :doc:`much richer schema control </topics/migrations>`.
+The :djadmin:`makemigrations` command looks at all your available models and
+creates migrations for whichever tables don't already exist. :djadmin:`migrate`
+runs the migrations and creates tables in your database, as well as optionally
+providing :doc:`much richer schema control </topics/migrations>`.
 
 Enjoy the free API
 ==================
