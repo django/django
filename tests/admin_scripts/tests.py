@@ -2161,18 +2161,25 @@ class StartApp(AdminScriptTestCase):
         )
 
     def test_app_path(self):
-        args = ['startapp', 'test_app', 'app_parent/test_app']
-        app_parent = os.path.join(self.test_dir, 'app_parent')
-        test_app = os.path.join(app_parent, 'test_app')
+        test_args = [
+            ('app_parent/test_app', 'app_parent.test_app'),
+            ('../test_project/app_parent/test_app', 'app_parent.test_app'),
+            ('../test_app_parent/test_app', 'test_app')
+        ]
+        for test_arg in test_args:
+            with self.subTest(app_name=test_arg):
+                target_dir, app_python_path = test_arg
+                args = ['startapp', 'test_app', target_dir]
 
-        os.mkdir(app_parent)
-        os.mkdir(test_app)
-        self.run_django_admin(args)
-        with open(os.path.join(test_app, 'apps.py')) as f:
-            content = f.read()
-            self.assertIn("class TestAppConfig(AppConfig)", content)
-            self.assertIn("name = 'app_parent.test_app'", content)
-        shutil.rmtree(app_parent)
+                test_dir = os.path.join(self.test_dir, target_dir)
+                os.makedirs(test_dir)
+
+                _, err = self.run_django_admin(args)
+                with open(os.path.join(test_dir, 'apps.py')) as f:
+                    content = f.read()
+                    self.assertIn("class TestAppConfig(AppConfig)", content)
+                    self.assertIn("name = '{}'".format(app_python_path), content)
+                shutil.rmtree(test_dir)
 
 
 class DiffSettings(AdminScriptTestCase):
