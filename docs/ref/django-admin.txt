@@ -1255,7 +1255,9 @@ files is:
 
 - Any option passed to the ``startapp`` command (among the command's supported
   options)
-- ``app_name`` -- the app name as passed to the command
+- ``app_python_path`` -- full python path to the application as passed to the command
+.. versionadded:: 2.2
+    The ``app_python_path`` context variable was added
 - ``app_directory`` -- the full path of the newly created app
 - ``camel_case_app_name`` -- the app name in camel case format
 - ``docs_version`` -- the version of the documentation: ``'dev'`` or ``'1.x'``

@@ -136,6 +136,9 @@ Management Commands
   <https://facebook.github.io/watchman/>`_ to improve the performance of
   watching a large number of files for changes.
 
+* The new :djadmin:`startapp` with optional directory renders the name variable
+  in apps.py as :option:`app_python_app`
+
 Migrations
 ~~~~~~~~~~
 
