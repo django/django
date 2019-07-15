@@ -187,8 +187,8 @@ def strip_tags(value):
     value = str(value)
     while '<' in value and '>' in value:
         new_value = _strip_once(value)
-        if len(new_value) >= len(value):
-            # _strip_once was not able to detect more tags
+        if value.count('<') == new_value.count('<'):
+            # _strip_once wasn't able to detect more tags.
             break
         value = new_value
     return value
