@@ -86,6 +86,8 @@ class TestUtilsHtml(SimpleTestCase):
             # caused infinite loop on Pythons not patched with
             # http://bugs.python.org/issue20288
             ('&gotcha&#;<>', '&gotcha&#;<>'),
+            ('><!' + ('&' * 16000) + 'D', '><!' + ('&' * 16000) + 'D'),
+            ('X<<<<br>br>br>br>X', 'XX'),
         )
         for value, output in items:
             self.check_output(f, value, output)
