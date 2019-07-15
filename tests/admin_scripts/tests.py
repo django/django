@@ -2166,19 +2166,16 @@ class StartApp(AdminScriptTestCase):
             ('../test_project/app_parent/test_app', 'app_parent.test_app'),
             ('../test_app_parent/test_app', 'test_app')
         ]
-        for test_arg in test_args:
-            with self.subTest(app_name=test_arg):
-                target_dir, app_python_path = test_arg
-                args = ['startapp', 'test_app', target_dir]
-
-                test_dir = os.path.join(self.test_dir, target_dir)
+        for target, expected_name in test_args:
+            with self.subTest(app_name=target):
+                test_dir = os.path.join(self.test_dir, target)
                 os.makedirs(test_dir)
-
-                _, err = self.run_django_admin(args)
+                _, err = self.run_django_admin(['startapp', 'test_app', target])
+                self.assertNoOutput(err)
                 with open(os.path.join(test_dir, 'apps.py')) as f:
                     content = f.read()
                     self.assertIn("class TestAppConfig(AppConfig)", content)
-                    self.assertIn("name = '{}'".format(app_python_path), content)
+                    self.assertIn("name = '{}'".format(expected_name), content)
                 shutil.rmtree(test_dir)
 
 

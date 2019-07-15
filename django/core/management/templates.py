@@ -77,15 +77,14 @@ class TemplateCommand(BaseCommand):
         else:
             if app_or_project == 'app':
                 self.validate_name(os.path.basename(target), 'directory')
+            # Use a relative path if it's below the current working
+            # directory, or an app name otherwise.
             top_dir = os.path.abspath(path.expanduser(target))
             rel_path = os.path.relpath(top_dir)
-            if not rel_path.startswith('..'):
-                app_python_path = rel_path.replace('\\', '/').replace('/', '.')
+            if os.getcwd() in top_dir:
+                app_python_path = rel_path.replace('\\', '/').replace('../', '').replace('/', '.')
             else:
-                if os.getcwd() in top_dir:
-                    app_python_path = rel_path.replace('\\', '/').replace('../', '').replace('/', '.')
-                else:
-                    app_python_path = name
+                app_python_path = name
             if not os.path.exists(top_dir):
                 raise CommandError("Destination directory '%s' does not "
                                    "exist, please create it first." % top_dir)
