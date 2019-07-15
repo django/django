@@ -6,6 +6,20 @@ Django 2.2.4 release notes
 
 Django 2.2.4 fixes security issues and several bugs in 2.2.3.
 
+CVE-2019-14232: Denial-of-service possibility in ``django.utils.text.Truncator``
+================================================================================
+
+If ``django.utils.text.Truncator``'s ``chars()`` and ``words()`` methods
+were passed the ``html=True`` argument, they were extremely slow to evaluate
+certain inputs due to a catastrophic backtracking vulnerability in a regular
+expression. The ``chars()`` and ``words()`` methods are used to implement the
+:tfilter:`truncatechars_html` and :tfilter:`truncatewords_html` template
+filters, which were thus vulnerable.
+
+The regular expressions used by ``Truncator`` have been simplified in order to
+avoid potential backtracking issues. As a consequence, trailing punctuation may
+now at times be included in the truncated output.
+
 Bugfixes
 ========
 

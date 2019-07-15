@@ -88,6 +88,17 @@ class TestUtilsText(SimpleTestCase):
         # lazy strings are handled correctly
         self.assertEqual(text.Truncator(lazystr('The quick brown fox')).chars(10), 'The quick…')
 
+    def test_truncate_chars_html(self):
+        perf_test_values = [
+            (('</a' + '\t' * 50000) + '//>', None),
+            ('&' * 50000, '&' * 9 + '…'),
+            ('_X<<<<<<<<<<<>', None),
+        ]
+        for value, expected in perf_test_values:
+            with self.subTest(value=value):
+                truncator = text.Truncator(value)
+                self.assertEqual(expected if expected else value, truncator.chars(10, html=True))
+
     def test_truncate_words(self):
         truncator = text.Truncator('The quick brown fox jumped over the lazy dog.')
         self.assertEqual('The quick brown fox jumped over the lazy dog.', truncator.words(10))
@@ -137,11 +148,17 @@ class TestUtilsText(SimpleTestCase):
         truncator = text.Truncator('<i>Buenos d&iacute;as! &#x00bf;C&oacute;mo est&aacute;?</i>')
         self.assertEqual('<i>Buenos d&iacute;as! &#x00bf;C&oacute;mo…</i>', truncator.words(3, html=True))
         truncator = text.Truncator('<p>I &lt;3 python, what about you?</p>')
-        self.assertEqual('<p>I &lt;3 python…</p>', truncator.words(3, html=True))
+        self.assertEqual('<p>I &lt;3 python,…</p>', truncator.words(3, html=True))
 
-        re_tag_catastrophic_test = ('</a' + '\t' * 50000) + '//>'
-        truncator = text.Truncator(re_tag_catastrophic_test)
-        self.assertEqual(re_tag_catastrophic_test, truncator.words(500, html=True))
+        perf_test_values = [
+            ('</a' + '\t' * 50000) + '//>',
+            '&' * 50000,
+            '_X<<<<<<<<<<<>',
+        ]
+        for value in perf_test_values:
+            with self.subTest(value=value):
+                truncator = text.Truncator(value)
+                self.assertEqual(value, truncator.words(50, html=True))
 
     def test_wrap(self):
         digits = '1234 67 9'
