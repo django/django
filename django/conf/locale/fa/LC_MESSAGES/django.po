@@ -311,13 +311,13 @@ msgid "Syndication"
 msgstr "پیوند"
 
 msgid "That page number is not an integer"
-msgstr "شمارهٔ صفحه باید یک عدد باشد"
+msgstr "شمارهٔ صفحه باید یک شماره باشد"
 
 msgid "That page number is less than 1"
 msgstr "شمارهٔ صفحه باید بزرگتر از ۱ باشد"
 
 msgid "That page contains no results"
-msgstr "این صفحه خالی از اطلاعات است"
+msgstr "این صفحه خالی از داده است"
 
 msgid "Enter a valid value."
 msgstr "یک مقدار معتبر وارد کنید."
@@ -326,7 +326,7 @@ msgid "Enter a valid URL."
 msgstr "یک نشانی اینترنتی معتبر وارد کنید."
 
 msgid "Enter a valid integer."
-msgstr "یک عدد معتبر وارد کنید."
+msgstr "یک شماره معتبر وارد کنید."
 
 msgid "Enter a valid email address."
 msgstr "یک ایمیل آدرس معتبر وارد کنید."
@@ -334,12 +334,12 @@ msgstr "یک ایمیل آدرس معتبر وارد کنید."
 #. Translators: "letters" means latin letters: a-z and A-Z.
 msgid ""
 "Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
-msgstr "یک 'slug' معتبر شامل حروف، ارقام، خط زیر و یا خط تیره وارد کنید."
+msgstr "یک «نامک» معتبر شامل حروف، ارقام، خط زیر و یا خط تیره وارد کنید."
 
 msgid ""
 "Enter a valid 'slug' consisting of Unicode letters, numbers, underscores, or "
 "hyphens."
-msgstr "یک «نامک» معتبر شامل حروف یونیکد، اعداد، زیرخط یا خط فاصله وارد کنید."
+msgstr "یک «نامک» معتبر شامل حروف یونیکد، شماره، زیرخط یا خط فاصله وارد کنید."
 
 msgid "Enter a valid IPv4 address."
 msgstr "یک نشانی IPv4 معتبر وارد کنید."
@@ -351,7 +351,7 @@ msgid "Enter a valid IPv4 or IPv6 address."
 msgstr "IPv4 یا IPv6 آدرس معتبر وارد کنید."
 
 msgid "Enter only digits separated by commas."
-msgstr "فقط ارقام جدا شده با کاما وارد کنید."
+msgstr "فقط مقادیر جدا شده با واوَک وارد کنید."
 
 #, python-format
 msgid "Ensure this value is %(limit_value)s (it is %(show_value)s)."
@@ -394,27 +394,27 @@ msgstr[1] ""
 "است)."
 
 msgid "Enter a number."
-msgstr "یک عدد وارد کنید."
+msgstr "یک شماره وارد کنید."
 
 #, python-format
 msgid "Ensure that there are no more than %(max)s digit in total."
 msgid_plural "Ensure that there are no more than %(max)s digits in total."
-msgstr[0] "نباید در مجموع بیش از %(max)s رقم داشته باشد."
-msgstr[1] "نباید در مجموع بیش از %(max)s رقم داشته باشد."
+msgstr[0] "نباید در مجموع بیش از %(max)s شماره داشته باشد."
+msgstr[1] "نباید در مجموع بیش از %(max)s شماره داشته باشد."
 
 #, python-format
 msgid "Ensure that there are no more than %(max)s decimal place."
 msgid_plural "Ensure that there are no more than %(max)s decimal places."
-msgstr[0] "نباید بیش از %(max)s رقم اعشار داشته باشد."
-msgstr[1] "نباید بیش از %(max)s رقم اعشار داشته باشد."
+msgstr[0] "نباید بیش از %(max)s شماره اعشار داشته باشد."
+msgstr[1] "نباید بیش از %(max)s شماره اعشار داشته باشد."
 
 #, python-format
 msgid ""
 "Ensure that there are no more than %(max)s digit before the decimal point."
 msgid_plural ""
 "Ensure that there are no more than %(max)s digits before the decimal point."
-msgstr[0] "نباید بیش از %(max)s رقم قبل ممیز داشته باشد."
-msgstr[1] "نباید بیش از %(max)s رقم قبل ممیز داشته باشد."
+msgstr[0] "نباید بیش از %(max)s شماره قبل ممیز داشته باشد."
+msgstr[1] "نباید بیش از %(max)s شماره قبل ممیز داشته باشد."
 
 #, python-format
 msgid ""
@@ -439,10 +439,10 @@ msgid "Value %(value)r is not a valid choice."
 msgstr "مقدار %(value)r انتخاب معتبری نیست. "
 
 msgid "This field cannot be null."
-msgstr "این فیلد نمی تواند پوچ باشد."
+msgstr "این خانه نمی تواند پوچ باشد."
 
 msgid "This field cannot be blank."
-msgstr "این فیلد نمی تواند خالی باشد."
+msgstr "این خانه نمی تواند خالی باشد."
 
 #, python-format
 msgid "%(model_name)s with this %(field_label)s already exists."
@@ -458,17 +458,17 @@ msgstr ""
 
 #, python-format
 msgid "Field of type: %(field_type)s"
-msgstr "فیلد با نوع: %(field_type)s"
+msgstr "خانه با نوع: %(field_type)s"
 
 msgid "Integer"
-msgstr "عدد صحیح"
+msgstr "شماره صحیح"
 
 #, python-format
 msgid "'%(value)s' value must be an integer."
-msgstr "مقدار «%(value)s» باید یک عدد باشد."
+msgstr "مقدار «%(value)s» باید یک شماره باشد."
 
 msgid "Big (8 byte) integer"
-msgstr "بزرگ (8 بایت) عدد صحیح"
+msgstr "بزرگ (8 بایت) شماره صحیح"
 
 #, python-format
 msgid "'%(value)s' value must be either True or False."
@@ -486,7 +486,7 @@ msgid "String (up to %(max_length)s)"
 msgstr "رشته (تا %(max_length)s)"
 
 msgid "Comma-separated integers"
-msgstr "اعداد صحیح جدا-شده با ویلگول"
+msgstr "شماره‌های صحیح جدا-شده با واوَک"
 
 #, python-format
 msgid ""
@@ -528,10 +528,10 @@ msgstr "تاریخ (با زمان)"
 
 #, python-format
 msgid "'%(value)s' value must be a decimal number."
-msgstr "مقدار «%(value)s» باید عدد باشد."
+msgstr "مقدار «%(value)s» باید شماره باشد."
 
 msgid "Decimal number"
-msgstr "عدد دهدهی"
+msgstr "شماره دهدهی"
 
 #, python-format
 msgid ""
@@ -552,10 +552,10 @@ msgstr "مسیر پرونده"
 
 #, python-format
 msgid "'%(value)s' value must be a float."
-msgstr "مقدار «%(value)s» باید عدد حقیقی باشد."
+msgstr "مقدار «%(value)s» باید شماره حقیقی باشد."
 
 msgid "Floating point number"
-msgstr "عدد اعشاری"
+msgstr "شماره اعشاری"
 
 msgid "IPv4 address"
 msgstr "IPv4 آدرس"
@@ -571,17 +571,17 @@ msgid "Boolean (Either True, False or None)"
 msgstr "‌بولی (درست، نادرست یا پوچ)"
 
 msgid "Positive integer"
-msgstr "عدد صحیح مثبت"
+msgstr "شماره صحیح مثبت"
 
 msgid "Positive small integer"
-msgstr "مثبت عدد صحیح کوچک"
+msgstr "مثبت شماره صحیح کوچک"
 
 #, python-format
 msgid "Slug (up to %(max_length)s)"
 msgstr "تیتر (حداکثر %(max_length)s)"
 
 msgid "Small integer"
-msgstr "عدد صحیح کوچک"
+msgstr "شماره صحیح کوچک"
 
 msgid "Text"
 msgstr "متن"
@@ -629,7 +629,7 @@ msgid "%(model)s instance with %(field)s %(value)r does not exist."
 msgstr "%(model)s با %(field)s %(value)r وجود ندارد."
 
 msgid "Foreign Key (type determined by related field)"
-msgstr "کلید خارجی ( نوع بر اساس فیلد رابط مشخص میشود )"
+msgstr "کلید خارجی ( نوع بر اساس خانه رابط مشخص میشود )"
 
 msgid "One-to-one relationship"
 msgstr "رابطه یک به یک "
@@ -652,10 +652,10 @@ msgid ":?.!"
 msgstr ":؟.!"
 
 msgid "This field is required."
-msgstr "این فیلد لازم است."
+msgstr "این خانه لازم است."
 
 msgid "Enter a whole number."
-msgstr "به طور کامل یک عدد وارد کنید."
+msgstr "به طور کامل یک شماره وارد کنید."
 
 msgid "Enter a valid date."
 msgstr "یک تاریخ معتبر وارد کنید."
@@ -671,7 +671,7 @@ msgstr "یک بازهٔ زمانی معتبر وارد کنید."
 
 #, python-brace-format
 msgid "The number of days must be between {min_days} and {max_days}."
-msgstr "عدد روز باید بین {min_days} و {max_days}  باشد."
+msgstr "شماره روز باید بین {min_days} و {max_days}  باشد."
 
 msgid "No file was submitted. Check the encoding type on the form."
 msgstr "پرونده‌ای ارسال نشده است. نوع کدگذاری فرم را بررسی کنید."
@@ -692,7 +692,7 @@ msgstr[1] ""
 "طول عنوان پرونده باید حداقل %(max)d کاراکتر باشد (طولش %(length)d است)."
 
 msgid "Please either submit a file or check the clear checkbox, not both."
-msgstr "لطفا یا فایل ارسال کنید یا دکمه پاک کردن را علامت بزنید، نه هردو."
+msgstr "لطفا یا پرونده ارسال کنید یا دکمه پاک کردن را علامت بزنید، نه هردو."
 
 msgid ""
 "Upload a valid image. The file you uploaded was either not an image or a "
@@ -720,10 +720,10 @@ msgstr ":"
 
 #, python-format
 msgid "(Hidden field %(name)s) %(error)s"
-msgstr "(فیلد پنهان %(name)s) %(error)s"
+msgstr "(خانه پنهان %(name)s) %(error)s"
 
 msgid "ManagementForm data is missing or has been tampered with"
-msgstr "اطلاعات ManagementForm ناقص است و یا دستکاری شده است."
+msgstr "داده‌های ManagementForm ناقص است و یا دستکاری شده است."
 
 #, python-format
 msgid "Please submit %d or fewer forms."
@@ -756,7 +756,7 @@ msgid ""
 "Please correct the duplicate data for %(field_name)s which must be unique "
 "for the %(lookup)s in %(date_field)s."
 msgstr ""
-"لطفا اطلاعات تکراری  %(field_name)s را اصلاح کنید که باید در  %(lookup)s "
+"لطفا داده‌های تکراری  %(field_name)s را اصلاح کنید که باید در  %(lookup)s "
 "یکتا باشد %(date_field)s."
 
 msgid "Please correct the duplicate values below."
@@ -1123,7 +1123,7 @@ msgid ""
 msgstr ""
 "شما این پیام را می‌بینید چون این سایتِ HTTPS نیازمند یک «تیتر ارجاع (Referer "
 "header)» برای ارسال به مرورگر شماست اما هیچ چیزی ارسال نشده است. این تیتر "
-"برای امنیت شما با حصول اطمینان از اینکه کنترل مرورگرتان به دست شخص ثالثی "
+"برای امنیت شما با حصول باور از اینکه کنترل مرورگرتان به دست شخص سومی "
 "نیفتاده باشد ضروری است."
 
 msgid ""
@@ -1155,7 +1155,7 @@ msgid ""
 msgstr ""
 "شما این پیام را میبینید چون این سایت نیازمند کوکی «جعل درخواست میان وبگاهی "
 "(CSRF)» است. این کوکی برای امنیت شما ضروری است. با این کوکی می‌توانیم از "
-"اینکه شخص ثالثی کنترل مرورگرتان را به دست نگرفته است اطمینان پیدا کنیم."
+"اینکه شخص سومی کنترل مرورگرتان را به دست نگرفته است باور پیدا کنیم."
 
 msgid ""
 "If you have configured your browser to disable cookies, please re-enable "
@@ -1165,7 +1165,7 @@ msgstr ""
 "حداقل برای این وبگاه و یا برای «same-origin» فعالش کنید."
 
 msgid "More information is available with DEBUG=True."
-msgstr "اطلاعات بیشتر با DEBUG=True ارائه خواهد شد."
+msgstr "داده‌های بیشتر با DEBUG=True ارائه خواهد شد."
 
 msgid "No year specified"
 msgstr "هیچ سالی مشخص نشده است"
@@ -1203,7 +1203,7 @@ msgid "No %(verbose_name)s found matching the query"
 msgstr "هیچ %(verbose_name)s ای مطابق جستجو پیدا نشد."
 
 msgid "Page is not 'last', nor can it be converted to an int."
-msgstr "Page مقدار 'last' نیست,همچنین قابل تبدیل به عدد هم نمیباشد."
+msgstr "Page مقدار 'last' نیست,همچنین قابل تبدیل به شماره هم نمیباشد."
 
 #, python-format
 msgid "Invalid page (%(page_number)s): %(message)s"
@@ -1248,7 +1248,7 @@ msgid ""
 msgstr ""
 "شما این صفحه را به این دلیل مشاهده می کنید که <a href=\"https://docs."
 "djangoproject.com/en/%(version)s/ref/settings/#debug\" target=\"_blank\" rel="
-"\"noopener\">DEBUG=True</a> در فایل تنظیمات شما وجود دارد و شما هیچ URL "
+"\"noopener\">DEBUG=True</a> در پرونده تنظیمات شما وجود دارد و شما هیچ URL "
 "تنظیم نکرده اید."
 
 msgid "Django Documentation"
