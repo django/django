@@ -149,7 +149,14 @@ production environment (that is, where :setting:`DEBUG` is set to ``False``):
 
 .. versionchanged:: 3.0
 
-    Cleansing of ``request.META`` was added.
+    Django cleanses settings and :attr:.HttpRequest.META that appear sensitive,
+    as described in the :setting:DEBUG documentation.
+
+    In addition, Django offers a set of function decorators to help you control
+    additional information, such as a credit card number, for example, which
+    should be filtered out of error reports in a production environment
+    (that is, where :setting:DEBUG is set to False): :func:sensitive_variables
+    and :func:sensitive_post_parameters.
 
 .. _`full traceback`: https://en.wikipedia.org/wiki/Stack_trace
 .. _`traceback frame`: https://en.wikipedia.org/wiki/Stack_frame
@@ -269,13 +276,20 @@ Your custom filter class needs to inherit from
 :class:`django.views.debug.SafeExceptionReporterFilter` and may override the
 following methods:
 
-.. class:: SafeExceptionReporterFilter(cleansed_substitute=DEFAULT_CLEANSED_SUBSTITUTE, hidden_settings=DEFAULT_HIDDEN_SETTINGS)
+.. class:: SafeExceptionReporterFilter
+
+.. attribute:: cleansed_substitute
 
 .. versionadded:: 3.0
 
-    * ``cleansed_substitute``: The value to replace sensitive values with.
-    Defaults to '********************'
-    * ``hidden_settings``: Defaults to match any keys containing the following strings:
+    The value to replace sensitive values with.
+    Defaults to DEFAULT_CLEANSED_SUBSTITUTE: '********************'
+
+.. attribute:: hidden_settings
+
+.. versionadded:: 3.0
+
+    Defaults to match any keys containing the following strings:
         * API
         * TOKEN
         * KEY
@@ -283,18 +297,24 @@ following methods:
         * PASS
         * SIGNATURE
 
+.. method:: SafeExceptionReporterFilter.__init__(cleansed_substitute, hidden_settings)
+
+.. versionadded:: 3.0
+
+    Added cleansed_substitute and hidden_settings attributes
+
 .. method:: SafeExceptionReporterFilter.is_active(request)
 
     Returns ``True`` to activate the filtering operated in the other methods.
     By default the filter is active if :setting:`DEBUG` is ``False``.
 
+.. method:: SafeExceptionReporterFilter.get_safe_request_meta(request)
+
 .. versionadded:: 3.0
 
-    .. method:: SafeExceptionReporterFilter.get_safe_request_meta(request)
-
-        Returns the filtered dictionary of META parameters. It replaces
-        the values of sensitive parameters with the value of the
-        ``cleansed_substitute`` attribute.
+    Returns the filtered dictionary of META parameters. It replaces
+    the values of sensitive parameters with the value of the
+    ``cleansed_substitute`` attribute.
 
 .. method:: SafeExceptionReporterFilter.get_post_parameters(request)
 
