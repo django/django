@@ -340,7 +340,7 @@ class CommonMiddlewareTest(SimpleTestCase):
 
 @override_settings(
     IGNORABLE_404_URLS=[re.compile(r'foo')],
-    MANAGERS=['PHB@dilbert.com'],
+    MANAGERS=[('PHD', 'PHB@dilbert.com')],
 )
 class BrokenLinkEmailsMiddlewareTest(SimpleTestCase):
 

@@ -154,7 +154,7 @@ class UserAttributeSimilarityValidator:
                     )
 
     def get_help_text(self):
-        return _("Your password can't be too similar to your other personal information.")
+        return _('Your password can’t be too similar to your other personal information.')
 
 
 class CommonPasswordValidator:
@@ -185,7 +185,7 @@ class CommonPasswordValidator:
             )
 
     def get_help_text(self):
-        return _("Your password can't be a commonly used password.")
+        return _('Your password can’t be a commonly used password.')
 
 
 class NumericPasswordValidator:
@@ -200,4 +200,4 @@ class NumericPasswordValidator:
             )
 
     def get_help_text(self):
-        return _("Your password can't be entirely numeric.")
+        return _('Your password can’t be entirely numeric.')

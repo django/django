@@ -8,9 +8,10 @@ attributes of the resolved URL match.
 import functools
 import inspect
 import re
-import threading
 from importlib import import_module
 from urllib.parse import quote
+
+from asgiref.local import Local
 
 from django.conf import settings
 from django.core.checks import Error, Warning
@@ -62,10 +63,14 @@ class ResolverMatch:
         )
 
 
-@functools.lru_cache(maxsize=None)
 def get_resolver(urlconf=None):
     if urlconf is None:
         urlconf = settings.ROOT_URLCONF
+    return _get_cached_resolver(urlconf)
+
+
+@functools.lru_cache(maxsize=None)
+def _get_cached_resolver(urlconf=None):
     return URLResolver(RegexPattern(r'^/'), urlconf)
 
 
@@ -152,7 +157,7 @@ class RegexPattern(CheckURLMixin):
             # If there are any named groups, use those as kwargs, ignoring
             # non-named groups. Otherwise, pass all non-named arguments as
             # positional arguments.
-            kwargs = match.groupdict()
+            kwargs = {k: v for k, v in match.groupdict().items() if v is not None}
             args = () if kwargs else match.groups()
             return path[match.end():], args, kwargs
         return None
@@ -380,7 +385,7 @@ class URLResolver:
         # urlpatterns
         self._callback_strs = set()
         self._populated = False
-        self._local = threading.local()
+        self._local = Local()
 
     def __repr__(self):
         if isinstance(self.urlconf_name, list) and self.urlconf_name:

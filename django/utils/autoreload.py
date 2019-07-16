@@ -2,7 +2,6 @@ import functools
 import itertools
 import logging
 import os
-import pathlib
 import signal
 import subprocess
 import sys
@@ -120,7 +119,9 @@ def iter_modules_and_files(modules, extra_files):
             # __main__ (usually manage.py) doesn't always have a __spec__ set.
             # Handle this by falling back to using __file__, resolved below.
             # See https://docs.python.org/reference/import.html#main-spec
-            sys_file_paths.append(module.__file__)
+            # __file__ may not exists, e.g. when running ipdb debugger.
+            if hasattr(module, '__file__'):
+                sys_file_paths.append(module.__file__)
             continue
         if getattr(module, '__spec__', None) is None:
             continue
@@ -135,12 +136,14 @@ def iter_modules_and_files(modules, extra_files):
     for filename in itertools.chain(sys_file_paths, extra_files):
         if not filename:
             continue
-        path = pathlib.Path(filename)
-        if not path.exists():
+        path = Path(filename)
+        try:
+            resolved_path = path.resolve(strict=True).absolute()
+        except FileNotFoundError:
             # The module could have been removed, don't fail loudly if this
             # is the case.
             continue
-        results.add(path.resolve().absolute())
+        results.add(resolved_path)
     return frozenset(results)
 
 
@@ -182,14 +185,15 @@ def sys_path_directories():
     """
     for path in sys.path:
         path = Path(path)
-        if not path.exists():
+        try:
+            resolved_path = path.resolve(strict=True).absolute()
+        except FileNotFoundError:
             continue
-        path = path.resolve().absolute()
         # If the path is a file (like a zip file), watch the parent directory.
-        if path.is_file():
-            yield path.parent
+        if resolved_path.is_file():
+            yield resolved_path.parent
         else:
-            yield path
+            yield resolved_path
 
 
 def get_child_arguments():

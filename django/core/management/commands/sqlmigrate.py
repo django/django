@@ -63,4 +63,6 @@ class Command(BaseCommand):
         # for it
         plan = [(executor.loader.graph.nodes[targets[0]], options['backwards'])]
         sql_statements = executor.collect_sql(plan)
+        if not sql_statements and options['verbosity'] >= 1:
+            self.stderr.write('No operations found.')
         return '\n'.join(sql_statements)

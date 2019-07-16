@@ -727,7 +727,7 @@ providing two additional methods:
 
 .. class:: models.CustomUserManager
 
-    .. method:: models.CustomUserManager.create_user(*username_field*, password=None, \**other_fields)
+    .. method:: models.CustomUserManager.create_user(*username_field*, password=None, **other_fields)
 
         The prototype of ``create_user()`` should accept the username field,
         plus all required fields as arguments. For example, if your user model
@@ -738,7 +738,7 @@ providing two additional methods:
                 # create user here
                 ...
 
-    .. method:: models.CustomUserManager.create_superuser(*username_field*, password, \**other_fields)
+    .. method:: models.CustomUserManager.create_superuser(*username_field*, password, **other_fields)
 
         The prototype of ``create_superuser()`` should accept the username
         field, plus all required fields as arguments. For example, if your user
@@ -880,6 +880,28 @@ override any of the definitions that refer to fields on
 ``django.contrib.auth.models.AbstractUser`` that aren't on your
 custom user class.
 
+.. note::
+
+    If you are using a custom ``ModelAdmin`` which is a subclass of
+    ``django.contrib.auth.admin.UserAdmin``, then you need to add your custom
+    fields to ``fieldsets`` (for fields to be used in editing users) and to
+    ``add_fieldsets`` (for fields to be used when creating a user). For
+    example::
+
+        from django.contrib.auth.admin import UserAdmin
+
+        class CustomUserAdmin(UserAdmin):
+            ...
+            fieldsets = UserAdmin.fieldsets + (
+                (None, {'fields': ('custom_field',)}),
+            )
+            add_fieldsets = UserAdmin.add_fieldsets + (
+                (None, {'fields': ('custom_field',)}),
+            )
+
+    See :ref:`a full example <custom-users-admin-full-example>` for more
+    details.
+
 Custom users and permissions
 ----------------------------
 
@@ -973,6 +995,8 @@ model, you remove the ability of Django to reliably identify the base class.
 If your project uses proxy models, you must either modify the proxy to extend
 the user model that's in use in your project, or merge your proxy's behavior
 into your :class:`~django.contrib.auth.models.User` subclass.
+
+.. _custom-users-admin-full-example:
 
 A full example
 --------------
@@ -1138,12 +1162,13 @@ code would be required in the app's ``admin.py`` file::
         add_fieldsets = (
             (None, {
                 'classes': ('wide',),
-                'fields': ('email', 'date_of_birth', 'password1', 'password2')}
-            ),
+                'fields': ('email', 'date_of_birth', 'password1', 'password2'),
+            }),
         )
         search_fields = ('email',)
         ordering = ('email',)
         filter_horizontal = ()
+
 
     # Now register the new UserAdmin...
     admin.site.register(MyUser, UserAdmin)

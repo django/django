@@ -2253,10 +2253,13 @@ By default, ``is_secure()`` determines if a request is secure by confirming
 that a requested URL uses ``https://``. This method is important for Django's
 CSRF protection, and it may be used by your own code or third-party apps.
 
-If your Django app is behind a proxy, though, the proxy may be "swallowing" the
-fact that a request is HTTPS, using a non-HTTPS connection between the proxy
-and Django. In this case, ``is_secure()`` would always return ``False`` -- even
-for requests that were made via HTTPS by the end user.
+If your Django app is behind a proxy, though, the proxy may be "swallowing"
+whether the original request uses HTTPS or not. If there is a non-HTTPS
+connection between the proxy and Django then ``is_secure()`` would always
+return ``False`` -- even for requests that were made via HTTPS by the end user.
+In contrast, if there is an HTTPS connection between the proxy and Django then
+``is_secure()`` would always return ``True`` -- even for requests that were
+made originally via HTTP.
 
 In this situation, configure your proxy to set a custom HTTP header that tells
 Django whether the request came in via HTTPS, and set

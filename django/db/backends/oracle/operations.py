@@ -12,7 +12,7 @@ from django.utils.encoding import force_bytes, force_str
 from django.utils.functional import cached_property
 
 from .base import Database
-from .utils import BulkInsertMapper, InsertIdVar, Oracle_datetime
+from .utils import BulkInsertMapper, InsertVar, Oracle_datetime
 
 
 class DatabaseOperations(BaseDatabaseOperations):
@@ -333,8 +333,8 @@ END;
             match_option = "'i'"
         return 'REGEXP_LIKE(%%s, %%s, %s)' % match_option
 
-    def return_insert_id(self):
-        return "RETURNING %s INTO %%s", (InsertIdVar(),)
+    def return_insert_id(self, field):
+        return 'RETURNING %s INTO %%s', (InsertVar(field),)
 
     def __foreign_key_constraints(self, table_name, recursive):
         with self.connection.cursor() as cursor:

@@ -296,6 +296,39 @@ class IndexesTests(SimpleTestCase):
 
         self.assertEqual(Bar.check(), [])
 
+    def test_name_constraints(self):
+        class Model(models.Model):
+            class Meta:
+                indexes = [
+                    models.Index(fields=['id'], name='_index_name'),
+                    models.Index(fields=['id'], name='5index_name'),
+                ]
+
+        self.assertEqual(Model.check(), [
+            Error(
+                "The index name '%sindex_name' cannot start with an "
+                "underscore or a number." % prefix,
+                obj=Model,
+                id='models.E033',
+            ) for prefix in ('_', '5')
+        ])
+
+    def test_max_name_length(self):
+        index_name = 'x' * 31
+
+        class Model(models.Model):
+            class Meta:
+                indexes = [models.Index(fields=['id'], name=index_name)]
+
+        self.assertEqual(Model.check(), [
+            Error(
+                "The index name '%s' cannot be longer than 30 characters."
+                % index_name,
+                obj=Model,
+                id='models.E034',
+            ),
+        ])
+
 
 @isolate_apps('invalid_models_tests')
 class FieldNamesTests(SimpleTestCase):

@@ -38,6 +38,7 @@ class Store(models.Model):
     books = models.ManyToManyField(Book)
     original_opening = models.DateTimeField()
     friday_night_closing = models.TimeField()
+    area = models.IntegerField(null=True, db_column='surface')
 
     def __str__(self):
         return self.name

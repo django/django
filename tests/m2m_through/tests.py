@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import date, datetime
 from operator import attrgetter
 
 from django.db import IntegrityError
@@ -7,7 +7,7 @@ from django.test import TestCase
 from .models import (
     CustomMembership, Employee, Event, Friendship, Group, Ingredient,
     Invitation, Membership, Person, PersonSelfRefM2M, Recipe, RecipeIngredient,
-    Relationship,
+    Relationship, SymmetricalFriendship,
 )
 
 
@@ -401,7 +401,7 @@ class M2mThroughReferentialTests(TestCase):
             attrgetter("name")
         )
 
-    def test_self_referential_symmetrical(self):
+    def test_self_referential_non_symmetrical_both(self):
         tony = PersonSelfRefM2M.objects.create(name="Tony")
         chris = PersonSelfRefM2M.objects.create(name="Chris")
         Friendship.objects.create(
@@ -437,6 +437,71 @@ class M2mThroughReferentialTests(TestCase):
             john.subordinates.all(),
             ['peter', 'mary', 'harry'],
             attrgetter('name')
+        )
+
+    def test_self_referential_symmetrical(self):
+        tony = PersonSelfRefM2M.objects.create(name='Tony')
+        chris = PersonSelfRefM2M.objects.create(name='Chris')
+        SymmetricalFriendship.objects.create(
+            first=tony, second=chris, date_friended=date.today(),
+        )
+        self.assertSequenceEqual(tony.sym_friends.all(), [chris])
+        # Manually created symmetrical m2m relation doesn't add mirror entry
+        # automatically.
+        self.assertSequenceEqual(chris.sym_friends.all(), [])
+        SymmetricalFriendship.objects.create(
+            first=chris, second=tony, date_friended=date.today()
+        )
+        self.assertSequenceEqual(chris.sym_friends.all(), [tony])
+
+    def test_add_on_symmetrical_m2m_with_intermediate_model(self):
+        tony = PersonSelfRefM2M.objects.create(name='Tony')
+        chris = PersonSelfRefM2M.objects.create(name='Chris')
+        date_friended = date(2017, 1, 3)
+        tony.sym_friends.add(chris, through_defaults={'date_friended': date_friended})
+        self.assertSequenceEqual(tony.sym_friends.all(), [chris])
+        self.assertSequenceEqual(chris.sym_friends.all(), [tony])
+        friendship = tony.symmetricalfriendship_set.get()
+        self.assertEqual(friendship.date_friended, date_friended)
+
+    def test_set_on_symmetrical_m2m_with_intermediate_model(self):
+        tony = PersonSelfRefM2M.objects.create(name='Tony')
+        chris = PersonSelfRefM2M.objects.create(name='Chris')
+        anne = PersonSelfRefM2M.objects.create(name='Anne')
+        kate = PersonSelfRefM2M.objects.create(name='Kate')
+        date_friended_add = date(2013, 1, 5)
+        date_friended_set = date.today()
+        tony.sym_friends.add(
+            anne, chris,
+            through_defaults={'date_friended': date_friended_add},
+        )
+        tony.sym_friends.set(
+            [anne, kate],
+            through_defaults={'date_friended': date_friended_set},
+        )
+        self.assertSequenceEqual(tony.sym_friends.all(), [anne, kate])
+        self.assertSequenceEqual(anne.sym_friends.all(), [tony])
+        self.assertSequenceEqual(kate.sym_friends.all(), [tony])
+        self.assertEqual(
+            kate.symmetricalfriendship_set.get().date_friended,
+            date_friended_set,
+        )
+        # Date is preserved.
+        self.assertEqual(
+            anne.symmetricalfriendship_set.get().date_friended,
+            date_friended_add,
+        )
+        # Recreate relationship.
+        tony.sym_friends.set(
+            [anne],
+            clear=True,
+            through_defaults={'date_friended': date_friended_set},
+        )
+        self.assertSequenceEqual(tony.sym_friends.all(), [anne])
+        self.assertSequenceEqual(anne.sym_friends.all(), [tony])
+        self.assertEqual(
+            anne.symmetricalfriendship_set.get().date_friended,
+            date_friended_set,
         )
 
 

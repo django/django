@@ -3,7 +3,7 @@ from django.db import IntegrityError, connection, models
 from django.db.models.constraints import BaseConstraint
 from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
 
-from .models import Product
+from .models import ChildModel, Product
 
 
 def get_constraints(table):
@@ -76,8 +76,17 @@ class CheckConstraintTests(TestCase):
     @skipUnlessDBFeature('supports_table_check_constraints')
     def test_name(self):
         constraints = get_constraints(Product._meta.db_table)
-        expected_name = 'price_gt_discounted_price'
-        self.assertIn(expected_name, constraints)
+        for expected_name in (
+            'price_gt_discounted_price',
+            'constraints_product_price_gt_0',
+        ):
+            with self.subTest(expected_name):
+                self.assertIn(expected_name, constraints)
+
+    @skipUnlessDBFeature('supports_table_check_constraints')
+    def test_abstract_name(self):
+        constraints = get_constraints(ChildModel._meta.db_table)
+        self.assertIn('constraints_childmodel_adult', constraints)
 
 
 class UniqueConstraintTests(TestCase):

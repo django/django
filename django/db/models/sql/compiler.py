@@ -356,7 +356,12 @@ class SQLCompiler:
                         resolved.set_source_expressions([RawSQL('%d' % (idx + 1), ())])
                         break
                 else:
-                    raise DatabaseError('ORDER BY term does not match any column in the result set.')
+                    if col_alias:
+                        raise DatabaseError('ORDER BY term does not match any column in the result set.')
+                    # Add column used in ORDER BY clause without an alias to
+                    # the selected columns.
+                    self.query.add_select_col(src)
+                    resolved.set_source_expressions([RawSQL('%d' % len(self.query.select), ())])
             sql, params = self.compile(resolved)
             # Don't add the same column twice, but the order direction is
             # not taken into account so we strip it. When this entire method
@@ -426,6 +431,7 @@ class SQLCompiler:
                 # must have the same columns list. Set the selects defined on
                 # the query on all combined queries, if not already set.
                 if not compiler.query.values_select and self.query.values_select:
+                    compiler.query = compiler.query.clone()
                     compiler.query.set_values((
                         *self.query.extra_select,
                         *self.query.values_select,
@@ -716,6 +722,11 @@ class SQLCompiler:
 
             results = []
             for item in opts.ordering:
+                if hasattr(item, 'resolve_expression') and not isinstance(item, OrderBy):
+                    item = item.desc() if descending else item.asc()
+                if isinstance(item, OrderBy):
+                    results.append((item, False))
+                    continue
                 results.extend(self.find_ordering_name(item, opts, alias,
                                                        order, already_seen))
             return results
@@ -1298,7 +1309,7 @@ class SQLInsertCompiler(SQLCompiler):
             if ignore_conflicts_suffix_sql:
                 result.append(ignore_conflicts_suffix_sql)
             col = "%s.%s" % (qn(opts.db_table), qn(opts.pk.column))
-            r_fmt, r_params = self.connection.ops.return_insert_id()
+            r_fmt, r_params = self.connection.ops.return_insert_id(opts.pk)
             # Skip empty r_fmt to allow subclasses to customize behavior for
             # 3rd party backends. Refs #19096.
             if r_fmt:

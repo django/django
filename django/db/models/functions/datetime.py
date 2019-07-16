@@ -73,6 +73,14 @@ class Extract(TimezoneMixin, Transform):
             raise ValueError(
                 "Cannot extract time component '%s' from DateField '%s'. " % (copy.lookup_name, field.name)
             )
+        if (
+            isinstance(field, DurationField) and
+            copy.lookup_name in ('year', 'iso_year', 'month', 'week', 'week_day', 'quarter')
+        ):
+            raise ValueError(
+                "Cannot extract component '%s' from DurationField '%s'."
+                % (copy.lookup_name, field.name)
+            )
         return copy
 
 

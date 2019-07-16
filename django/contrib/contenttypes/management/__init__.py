@@ -31,7 +31,7 @@ class RenameContentType(migrations.RunPython):
                 # asking the user what should be done next.
                 content_type.model = old_model
             else:
-                # Clear the cache as the `get_by_natual_key()` call will cache
+                # Clear the cache as the `get_by_natural_key()` call will cache
                 # the renamed ContentType instance by its old model name.
                 ContentType.objects.clear_cache()
 

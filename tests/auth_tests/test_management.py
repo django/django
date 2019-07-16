@@ -1,5 +1,6 @@
 import builtins
 import getpass
+import os
 import sys
 from datetime import date
 from io import StringIO
@@ -902,6 +903,61 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
                 stderr=new_io,
             )
             self.assertEqual(new_io.getvalue().strip(), 'Superuser created successfully.')
+
+        test(self)
+
+    @mock.patch.dict(os.environ, {
+        'DJANGO_SUPERUSER_PASSWORD': 'test_password',
+        'DJANGO_SUPERUSER_USERNAME': 'test_superuser',
+        'DJANGO_SUPERUSER_EMAIL': 'joe@somewhere.org',
+        'DJANGO_SUPERUSER_FIRST_NAME': 'ignored_first_name',
+    })
+    def test_environment_variable_non_interactive(self):
+        call_command('createsuperuser', interactive=False, stdout=StringIO())
+        user = User.objects.get(username='test_superuser')
+        self.assertEqual(user.email, 'joe@somewhere.org')
+        self.assertTrue(user.check_password('test_password'))
+        # Environment variables are ignored for non-required fields.
+        self.assertEqual(user.first_name, '')
+
+    @mock.patch.dict(os.environ, {
+        'DJANGO_SUPERUSER_USERNAME': 'test_superuser',
+        'DJANGO_SUPERUSER_EMAIL': 'joe@somewhere.org',
+    })
+    def test_ignore_environment_variable_non_interactive(self):
+        # Environment variables are ignored in non-interactive mode, if
+        # provided by a command line arguments.
+        call_command(
+            'createsuperuser',
+            interactive=False,
+            username='cmd_superuser',
+            email='cmd@somewhere.org',
+            stdout=StringIO(),
+        )
+        user = User.objects.get(username='cmd_superuser')
+        self.assertEqual(user.email, 'cmd@somewhere.org')
+        self.assertFalse(user.has_usable_password())
+
+    @mock.patch.dict(os.environ, {
+        'DJANGO_SUPERUSER_PASSWORD': 'test_password',
+        'DJANGO_SUPERUSER_USERNAME': 'test_superuser',
+        'DJANGO_SUPERUSER_EMAIL': 'joe@somewhere.org',
+    })
+    def test_ignore_environment_variable_interactive(self):
+        # Environment variables are ignored in interactive mode.
+        @mock_inputs({'password': 'cmd_password'})
+        def test(self):
+            call_command(
+                'createsuperuser',
+                interactive=True,
+                username='cmd_superuser',
+                email='cmd@somewhere.org',
+                stdin=MockTTY(),
+                stdout=StringIO(),
+            )
+            user = User.objects.get(username='cmd_superuser')
+            self.assertEqual(user.email, 'cmd@somewhere.org')
+            self.assertTrue(user.check_password('cmd_password'))
 
         test(self)
 

@@ -136,6 +136,10 @@ class TestIterModulesAndFiles(SimpleTestCase):
         main_module = sys.modules['__main__']
         self.assertFileFound(Path(main_module.__file__))
 
+    def test_main_module_without_file_is_not_resolved(self):
+        fake_main = types.ModuleType('__main__')
+        self.assertEqual(autoreload.iter_modules_and_files((fake_main,), frozenset()), frozenset())
+
 
 class TestCommonRoots(SimpleTestCase):
     def test_common_roots(self):

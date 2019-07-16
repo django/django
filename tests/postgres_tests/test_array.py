@@ -909,6 +909,18 @@ class TestSplitFormField(PostgreSQLSimpleTestCase):
         obj = form.save(commit=False)
         self.assertEqual(obj.field, [1, 2])
 
+    def test_splitarrayfield_has_changed(self):
+        class Form(forms.ModelForm):
+            field = SplitArrayField(forms.IntegerField(), required=False, size=2)
+
+            class Meta:
+                model = IntegerArrayModel
+                fields = ('field',)
+
+        obj = IntegerArrayModel(field=[1, 2])
+        form = Form({'field_0': '1', 'field_1': '2'}, instance=obj)
+        self.assertFalse(form.has_changed())
+
 
 class TestSplitFormWidget(PostgreSQLWidgetTestCase):
 

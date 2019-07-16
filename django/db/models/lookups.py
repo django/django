@@ -176,8 +176,9 @@ class FieldGetDbPrepValueMixin:
     get_db_prep_lookup_value_is_iterable = False
 
     def get_db_prep_lookup(self, value, connection):
-        # For relational fields, use the output_field of the 'field' attribute.
-        field = getattr(self.lhs.output_field, 'field', None)
+        # For relational fields, use the 'target_field' attribute of the
+        # output_field.
+        field = getattr(self.lhs.output_field, 'target_field', None)
         get_db_prep_value = getattr(field, 'get_db_prep_value', None) or self.lhs.output_field.get_db_prep_value
         return (
             '%s',

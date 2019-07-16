@@ -20,6 +20,7 @@ from django.db import utils
 from django.db.backends import utils as backend_utils
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.utils import timezone
+from django.utils.asyncio import async_unsafe
 from django.utils.dateparse import parse_datetime, parse_time
 from django.utils.duration import duration_microseconds
 
@@ -191,6 +192,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         kwargs.update({'check_same_thread': False, 'uri': True})
         return kwargs
 
+    @async_unsafe
     def get_new_connection(self, conn_params):
         conn = Database.connect(**conn_params)
         conn.create_function("django_date_extract", 2, _sqlite_datetime_extract)
@@ -248,6 +250,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     def create_cursor(self, name=None):
         return self.connection.cursor(factory=SQLiteCursorWrapper)
 
+    @async_unsafe
     def close(self):
         self.validate_thread_sharing()
         # If database is in memory, closing the connection destroys the

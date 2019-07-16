@@ -44,6 +44,28 @@ MariaDB support
 Django now officially supports `MariaDB <https://mariadb.org/>`_ 10.1 and
 higher. See :ref:`MariaDB notes <mariadb-notes>` for more details.
 
+ASGI support
+------------
+
+Django 3.0 begins our journey to making Django fully async-capable by providing
+support for running as an `ASGI <https://asgi.readthedocs.io/>`_ application.
+
+This is in addition to our existing WSGI support. Django intends to support
+both for the foreseeable future. Async features will only be available to
+applications that run under ASGI, however.
+
+There is no need to switch your applications over unless you want to start
+experimenting with asynchronous code, but we have
+:doc:`documentation on deploying with ASGI </howto/deployment/asgi/index>` if
+you want to learn more.
+
+Note that as a side-effect of this change, Django is now aware of asynchronous
+event loops and will block you calling code marked as "async unsafe" - such as
+ORM operations - from an asynchronous context. If you were using Django from
+async code before, this may trigger if you were doing it incorrectly. If you
+see a ``SynchronousOnlyOperation`` error, then closely examine your code and
+move any database operations to be in a synchronous child thread.
+
 Minor features
 --------------
 
@@ -56,6 +78,8 @@ Minor features
 * The new :meth:`ModelAdmin.get_inlines()
   <django.contrib.admin.ModelAdmin.get_inlines>` method allows specifying the
   inlines based on the request or model instance.
+
+* Select2 library is upgraded from version 4.0.3 to 4.0.7.
 
 :mod:`django.contrib.admindocs`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -79,6 +103,10 @@ Minor features
 * Added HTML ``autocomplete`` attribute to widgets of username, email, and
   password fields in :mod:`django.contrib.auth.forms` for better interaction
   with browser password managers.
+
+* :djadmin:`createsuperuser` now falls back to environment variables for
+  password and required fields, when a corresponding command line argument
+  isn't provided in non-interactive mode.
 
 :mod:`django.contrib.contenttypes`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -145,7 +173,9 @@ Minor features
 Cache
 ~~~~~
 
-* ...
+* :func:`~django.utils.cache.add_never_cache_headers` and
+  :func:`~django.views.decorators.cache.never_cache` now adds ``private``
+  directive to a ``Cache-Control`` header.
 
 CSRF
 ~~~~
@@ -231,6 +261,14 @@ Models
 * ``connection.queries`` now shows ``COPY … TO`` statements on PostgreSQL.
 
 * :class:`~django.db.models.FilePathField` now accepts a callable ``path``.
+
+* Allowed symmetrical intermediate table for self-referential
+  :class:`~django.db.models.ManyToManyField`.
+
+* The ``name`` attributes of :class:`~django.db.models.CheckConstraint`,
+  :class:`~django.db.models.UniqueConstraint`, and
+  :class:`~django.db.models.Index` now support app label and class
+  interpolation using the ``'%(app_label)s'`` and ``'%(class)s'`` placeholders.
 
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -321,6 +359,15 @@ backends.
   Third-party backends should handle this format when preparing
   :class:`~django.db.models.DateTimeField` in ``datetime_cast_date_sql()``,
   ``datetime_extract_sql()``, etc.
+
+* ``DatabaseOperations.return_insert_id()`` now requires an additional
+  ``field`` argument with the model field.
+
+:mod:`django.contrib.admin`
+---------------------------
+
+* Admin's model history change messages now prefers more readable field labels
+  instead of field names.
 
 :mod:`django.contrib.gis`
 -------------------------

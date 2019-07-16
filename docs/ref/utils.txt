@@ -62,8 +62,13 @@ need to distinguish caches by the ``Accept-language`` header.
 
 .. function:: add_never_cache_headers(response)
 
-    Adds a ``Cache-Control: max-age=0, no-cache, no-store, must-revalidate``
-    header to a response to indicate that a page should never be cached.
+    Adds a ``Cache-Control: max-age=0, no-cache, no-store, must-revalidate,
+    private`` header to a response to indicate that a page should never be
+    cached.
+
+    .. versionchanged:: 3.0
+
+        ``private`` directive was added.
 
 .. function:: patch_vary_headers(response, newheaders)
 

@@ -2432,8 +2432,9 @@ Django's built-in :tfilter:`escape` filter. The default value for
 
 .. note::
 
-    If ``urlize`` is applied to text that already contains HTML markup,
-    things won't work as expected. Apply this filter only to plain text.
+    If ``urlize`` is applied to text that already contains HTML markup, or to
+    email addresses that contain single quotes (``'``), things won't work as
+    expected. Apply this filter only to plain text.
 
 .. templatefilter:: urlizetrunc
 

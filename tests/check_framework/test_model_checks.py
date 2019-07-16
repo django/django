@@ -131,6 +131,22 @@ class IndexNameTests(SimpleTestCase):
             ),
         ])
 
+    def test_no_collision_abstract_model_interpolation(self):
+        class AbstractModel(models.Model):
+            name = models.CharField(max_length=20)
+
+            class Meta:
+                indexes = [models.Index(fields=['name'], name='%(app_label)s_%(class)s_foo')]
+                abstract = True
+
+        class Model1(AbstractModel):
+            pass
+
+        class Model2(AbstractModel):
+            pass
+
+        self.assertEqual(checks.run_checks(app_configs=self.apps.get_app_configs()), [])
+
     @modify_settings(INSTALLED_APPS={'append': 'basic'})
     @isolate_apps('basic', 'check_framework', kwarg_name='apps')
     def test_collision_across_apps(self, apps):
@@ -153,6 +169,23 @@ class IndexNameTests(SimpleTestCase):
                 id='models.E030',
             ),
         ])
+
+    @modify_settings(INSTALLED_APPS={'append': 'basic'})
+    @isolate_apps('basic', 'check_framework', kwarg_name='apps')
+    def test_no_collision_across_apps_interpolation(self, apps):
+        index = models.Index(fields=['id'], name='%(app_label)s_%(class)s_foo')
+
+        class Model1(models.Model):
+            class Meta:
+                app_label = 'basic'
+                constraints = [index]
+
+        class Model2(models.Model):
+            class Meta:
+                app_label = 'check_framework'
+                constraints = [index]
+
+        self.assertEqual(checks.run_checks(app_configs=apps.get_app_configs()), [])
 
 
 @isolate_apps('check_framework', attr_name='apps')
@@ -214,6 +247,22 @@ class ConstraintNameTests(TestCase):
             ),
         ])
 
+    def test_no_collision_abstract_model_interpolation(self):
+        class AbstractModel(models.Model):
+            class Meta:
+                constraints = [
+                    models.CheckConstraint(check=models.Q(id__gt=0), name='%(app_label)s_%(class)s_foo'),
+                ]
+                abstract = True
+
+        class Model1(AbstractModel):
+            pass
+
+        class Model2(AbstractModel):
+            pass
+
+        self.assertEqual(checks.run_checks(app_configs=self.apps.get_app_configs()), [])
+
     @modify_settings(INSTALLED_APPS={'append': 'basic'})
     @isolate_apps('basic', 'check_framework', kwarg_name='apps')
     def test_collision_across_apps(self, apps):
@@ -236,3 +285,20 @@ class ConstraintNameTests(TestCase):
                 id='models.E032',
             ),
         ])
+
+    @modify_settings(INSTALLED_APPS={'append': 'basic'})
+    @isolate_apps('basic', 'check_framework', kwarg_name='apps')
+    def test_no_collision_across_apps_interpolation(self, apps):
+        constraint = models.CheckConstraint(check=models.Q(id__gt=0), name='%(app_label)s_%(class)s_foo')
+
+        class Model1(models.Model):
+            class Meta:
+                app_label = 'basic'
+                constraints = [constraint]
+
+        class Model2(models.Model):
+            class Meta:
+                app_label = 'check_framework'
+                constraints = [constraint]
+
+        self.assertEqual(checks.run_checks(app_configs=apps.get_app_configs()), [])

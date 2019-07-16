@@ -1115,7 +1115,7 @@ class GetAdminLogTests(TestCase):
             '{{ entry|safe }}'
             '{% endfor %}'
         )
-        self.assertEqual(t.render(Context({})), 'Added "<User: jondoe>".')
+        self.assertEqual(t.render(Context({})), 'Added “<User: jondoe>”.')
 
     def test_missing_args(self):
         msg = "'get_admin_log' statements require two arguments"

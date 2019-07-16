@@ -236,7 +236,7 @@ class UserCreationFormTest(TestDataMixin, TestCase):
         form = UserCreationForm()
         self.assertEqual(
             form.fields['password1'].help_text,
-            '<ul><li>Your password can&#x27;t be too similar to your other personal information.</li></ul>'
+            '<ul><li>Your password can’t be too similar to your other personal information.</li></ul>'
         )
 
     @override_settings(AUTH_PASSWORD_VALIDATORS=[

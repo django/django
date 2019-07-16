@@ -426,7 +426,7 @@ class TestFormField(PostgreSQLSimpleTestCase):
         field = forms.JSONField()
         with self.assertRaises(exceptions.ValidationError) as cm:
             field.clean('{some badly formed: json}')
-        self.assertEqual(cm.exception.messages[0], "'{some badly formed: json}' value must be valid JSON.")
+        self.assertEqual(cm.exception.messages[0], '“{some badly formed: json}” value must be valid JSON.')
 
     def test_formfield(self):
         model_field = JSONField()

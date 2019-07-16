@@ -5,7 +5,8 @@ import os
 import re
 import sys
 import warnings
-from threading import local
+
+from asgiref.local import Local
 
 from django.apps import apps
 from django.conf import settings
@@ -20,7 +21,7 @@ from . import to_language, to_locale
 # Translations are cached in a dictionary for every language.
 # The active translations are stored by threadid to make them thread local.
 _translations = {}
-_active = local()
+_active = Local()
 
 # The default translation is based on the settings file.
 _default = None

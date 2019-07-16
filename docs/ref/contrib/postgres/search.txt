@@ -38,7 +38,7 @@ To use the ``search`` lookup, ``'django.contrib.postgres'`` must be in your
 ``SearchVector``
 ================
 
-.. class:: SearchVector(\*expressions, config=None, weight=None)
+.. class:: SearchVector(*expressions, config=None, weight=None)
 
 Searching against a single field is great but rather limiting. The ``Entry``
 instances we're searching belong to a ``Blog``, which has a ``tagline`` field.

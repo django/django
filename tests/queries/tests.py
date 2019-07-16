@@ -16,18 +16,19 @@ from .models import (
     FK1, Annotation, Article, Author, BaseA, Book, CategoryItem,
     CategoryRelationship, Celebrity, Channel, Chapter, Child, ChildObjectA,
     Classroom, CommonMixedCaseForeignKeys, Company, Cover, CustomPk,
-    CustomPkTag, Detail, DumbCategory, Eaten, Employment, ExtraInfo, Fan, Food,
-    Identifier, Individual, Item, Job, JobResponsibilities, Join, LeafA, LeafB,
-    LoopX, LoopZ, ManagedModel, Member, MixedCaseDbColumnCategoryItem,
-    MixedCaseFieldCategoryItem, ModelA, ModelB, ModelC, ModelD, MyObject,
-    NamedCategory, Node, Note, NullableName, Number, ObjectA, ObjectB, ObjectC,
-    OneToOneCategory, Order, OrderItem, Page, Paragraph, Person, Plaything,
-    PointerA, Program, ProxyCategory, ProxyObjectA, ProxyObjectB, Ranking,
-    Related, RelatedIndividual, RelatedObject, Report, ReportComment,
-    ReservedName, Responsibility, School, SharedConnection, SimpleCategory,
-    SingleObject, SpecialCategory, Staff, StaffUser, Student, Tag, Task,
-    Teacher, Ticket21203Child, Ticket21203Parent, Ticket23605A, Ticket23605B,
-    Ticket23605C, TvChef, Valid, X,
+    CustomPkTag, DateTimePK, Detail, DumbCategory, Eaten, Employment,
+    ExtraInfo, Fan, Food, Identifier, Individual, Item, Job,
+    JobResponsibilities, Join, LeafA, LeafB, LoopX, LoopZ, ManagedModel,
+    Member, MixedCaseDbColumnCategoryItem, MixedCaseFieldCategoryItem, ModelA,
+    ModelB, ModelC, ModelD, MyObject, NamedCategory, Node, Note, NullableName,
+    Number, ObjectA, ObjectB, ObjectC, OneToOneCategory, Order, OrderItem,
+    Page, Paragraph, Person, Plaything, PointerA, Program, ProxyCategory,
+    ProxyObjectA, ProxyObjectB, Ranking, Related, RelatedIndividual,
+    RelatedObject, Report, ReportComment, ReservedName, Responsibility, School,
+    SharedConnection, SimpleCategory, SingleObject, SpecialCategory, Staff,
+    StaffUser, Student, Tag, Task, Teacher, Ticket21203Child,
+    Ticket21203Parent, Ticket23605A, Ticket23605B, Ticket23605C, TvChef, Valid,
+    X,
 )
 
 
@@ -1462,6 +1463,14 @@ class Queries4Tests(TestCase):
         CategoryItem.objects.create(category=c1)
         self.assertSequenceEqual(SimpleCategory.objects.order_by('categoryitem', 'pk'), [c1, c2, c1])
 
+    def test_filter_reverse_non_integer_pk(self):
+        date_obj = DateTimePK.objects.create()
+        extra_obj = ExtraInfo.objects.create(info='extra', date=date_obj)
+        self.assertEqual(
+            DateTimePK.objects.filter(extrainfo=extra_obj).get(),
+            date_obj,
+        )
+
     def test_ticket10181(self):
         # Avoid raising an EmptyResultSet if an inner query is probably
         # empty (and hence, not executed).
@@ -2326,7 +2335,7 @@ class ValuesQuerysetTests(TestCase):
         qs = Number.objects.extra(select={'num2': 'num+1'}).annotate(Count('id'))
         values = qs.values_list(named=True).first()
         self.assertEqual(type(values).__name__, 'Row')
-        self.assertEqual(values._fields, ('num2', 'id', 'num', 'id__count'))
+        self.assertEqual(values._fields, ('num2', 'id', 'num', 'other_num', 'id__count'))
         self.assertEqual(values.num, 72)
         self.assertEqual(values.num2, 73)
         self.assertEqual(values.id__count, 1)

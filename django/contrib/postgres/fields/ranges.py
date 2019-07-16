@@ -149,12 +149,13 @@ RangeField.register_lookup(lookups.ContainedBy)
 RangeField.register_lookup(lookups.Overlap)
 
 
-class DateTimeRangeContains(models.Lookup):
+class DateTimeRangeContains(lookups.PostgresSimpleLookup):
     """
     Lookup for Date/DateTimeRange containment to cast the rhs to the correct
     type.
     """
     lookup_name = 'contains'
+    operator = '@>'
 
     def process_rhs(self, compiler, connection):
         # Transform rhs value for db lookup.
@@ -165,22 +166,25 @@ class DateTimeRangeContains(models.Lookup):
         return super().process_rhs(compiler, connection)
 
     def as_sql(self, compiler, connection):
-        lhs, lhs_params = self.process_lhs(compiler, connection)
-        rhs, rhs_params = self.process_rhs(compiler, connection)
-        params = lhs_params + rhs_params
+        sql, params = super().as_sql(compiler, connection)
         # Cast the rhs if needed.
         cast_sql = ''
-        if isinstance(self.rhs, models.Expression) and self.rhs._output_field_or_none:
+        if (
+            isinstance(self.rhs, models.Expression) and
+            self.rhs._output_field_or_none and
+            # Skip cast if rhs has a matching range type.
+            not isinstance(self.rhs._output_field_or_none, self.lhs.output_field.__class__)
+        ):
             cast_internal_type = self.lhs.output_field.base_field.get_internal_type()
             cast_sql = '::{}'.format(connection.data_types.get(cast_internal_type))
-        return '%s @> %s%s' % (lhs, rhs, cast_sql), params
+        return '%s%s' % (sql, cast_sql), params
 
 
 DateRangeField.register_lookup(DateTimeRangeContains)
 DateTimeRangeField.register_lookup(DateTimeRangeContains)
 
 
-class RangeContainedBy(models.Lookup):
+class RangeContainedBy(lookups.PostgresSimpleLookup):
     lookup_name = 'contained_by'
     type_mapping = {
         'integer': 'int4range',
@@ -189,17 +193,18 @@ class RangeContainedBy(models.Lookup):
         'date': 'daterange',
         'timestamp with time zone': 'tstzrange',
     }
+    operator = '<@'
 
-    def as_sql(self, qn, connection):
-        field = self.lhs.output_field
-        if isinstance(field, models.FloatField):
-            sql = '%s::numeric <@ %s::{}'.format(self.type_mapping[field.db_type(connection)])
-        else:
-            sql = '%s <@ %s::{}'.format(self.type_mapping[field.db_type(connection)])
-        lhs, lhs_params = self.process_lhs(qn, connection)
-        rhs, rhs_params = self.process_rhs(qn, connection)
-        params = lhs_params + rhs_params
-        return sql % (lhs, rhs), params
+    def process_rhs(self, compiler, connection):
+        rhs, rhs_params = super().process_rhs(compiler, connection)
+        cast_type = self.type_mapping[self.lhs.output_field.db_type(connection)]
+        return '%s::%s' % (rhs, cast_type), rhs_params
+
+    def process_lhs(self, compiler, connection):
+        lhs, lhs_params = super().process_lhs(compiler, connection)
+        if isinstance(self.lhs.output_field, models.FloatField):
+            lhs = '%s::numeric' % lhs
+        return lhs, lhs_params
 
     def get_prep_lookup(self):
         return RangeField().get_prep_value(self.rhs)

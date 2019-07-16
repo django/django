@@ -478,5 +478,5 @@ class NeverCacheDecoratorTest(TestCase):
         r = a_view(HttpRequest())
         self.assertEqual(
             set(r['Cache-Control'].split(', ')),
-            {'max-age=0', 'no-cache', 'no-store', 'must-revalidate'},
+            {'max-age=0', 'no-cache', 'no-store', 'must-revalidate', 'private'},
         )

@@ -3,14 +3,26 @@ import datetime
 from .base import Database
 
 
-class InsertIdVar:
+class InsertVar:
     """
     A late-binding cursor variable that can be passed to Cursor.execute
     as a parameter, in order to receive the id of the row created by an
     insert statement.
     """
+    types = {
+        'FloatField': Database.NATIVE_FLOAT,
+        'CharField': str,
+        'DateTimeField': Database.TIMESTAMP,
+        'DateField': Database.DATETIME,
+        'DecimalField': Database.NUMBER,
+    }
+
+    def __init__(self, field):
+        internal_type = getattr(field, 'target_field', field).get_internal_type()
+        self.db_type = self.types.get(internal_type, int)
+
     def bind_parameter(self, cursor):
-        param = cursor.cursor.var(int)
+        param = cursor.cursor.var(self.db_type)
         cursor._insert_id_var = param
         return param
 

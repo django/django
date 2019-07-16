@@ -269,7 +269,7 @@ class BaseModelAdmin(metaclass=forms.MediaDefiningClass):
         form_field = db_field.formfield(**kwargs)
         if (isinstance(form_field.widget, SelectMultiple) and
                 not isinstance(form_field.widget, (CheckboxSelectMultiple, AutocompleteSelectMultiple))):
-            msg = _('Hold down "Control", or "Command" on a Mac, to select more than one.')
+            msg = _('Hold down “Control”, or “Command” on a Mac, to select more than one.')
             help_text = form_field.help_text
             form_field.help_text = format_lazy('{} {}', help_text, msg) if help_text else msg
         return form_field
@@ -1202,7 +1202,7 @@ class ModelAdmin(BaseModelAdmin):
                 "_saveasnew" in request.POST and self.save_as_continue and
                 self.has_change_permission(request, obj)
         ):
-            msg = _('The {name} "{obj}" was added successfully.')
+            msg = _('The {name} “{obj}” was added successfully.')
             if self.has_change_permission(request, obj):
                 msg += ' ' + _('You may edit it again below.')
             self.message_user(request, format_html(msg, **msg_dict), messages.SUCCESS)
@@ -1216,7 +1216,7 @@ class ModelAdmin(BaseModelAdmin):
 
         elif "_addanother" in request.POST:
             msg = format_html(
-                _('The {name} "{obj}" was added successfully. You may add another {name} below.'),
+                _('The {name} “{obj}” was added successfully. You may add another {name} below.'),
                 **msg_dict
             )
             self.message_user(request, msg, messages.SUCCESS)
@@ -1226,7 +1226,7 @@ class ModelAdmin(BaseModelAdmin):
 
         else:
             msg = format_html(
-                _('The {name} "{obj}" was added successfully.'),
+                _('The {name} “{obj}” was added successfully.'),
                 **msg_dict
             )
             self.message_user(request, msg, messages.SUCCESS)
@@ -1266,7 +1266,7 @@ class ModelAdmin(BaseModelAdmin):
         }
         if "_continue" in request.POST:
             msg = format_html(
-                _('The {name} "{obj}" was changed successfully. You may edit it again below.'),
+                _('The {name} “{obj}” was changed successfully. You may edit it again below.'),
                 **msg_dict
             )
             self.message_user(request, msg, messages.SUCCESS)
@@ -1276,7 +1276,7 @@ class ModelAdmin(BaseModelAdmin):
 
         elif "_saveasnew" in request.POST:
             msg = format_html(
-                _('The {name} "{obj}" was added successfully. You may edit it again below.'),
+                _('The {name} “{obj}” was added successfully. You may edit it again below.'),
                 **msg_dict
             )
             self.message_user(request, msg, messages.SUCCESS)
@@ -1289,7 +1289,7 @@ class ModelAdmin(BaseModelAdmin):
 
         elif "_addanother" in request.POST:
             msg = format_html(
-                _('The {name} "{obj}" was changed successfully. You may add another {name} below.'),
+                _('The {name} “{obj}” was changed successfully. You may add another {name} below.'),
                 **msg_dict
             )
             self.message_user(request, msg, messages.SUCCESS)
@@ -1301,7 +1301,7 @@ class ModelAdmin(BaseModelAdmin):
 
         else:
             msg = format_html(
-                _('The {name} "{obj}" was changed successfully.'),
+                _('The {name} “{obj}” was changed successfully.'),
                 **msg_dict
             )
             self.message_user(request, msg, messages.SUCCESS)
@@ -1422,7 +1422,7 @@ class ModelAdmin(BaseModelAdmin):
 
         self.message_user(
             request,
-            _('The %(name)s "%(obj)s" was deleted successfully.') % {
+            _('The %(name)s “%(obj)s” was deleted successfully.') % {
                 'name': opts.verbose_name,
                 'obj': obj_display,
             },
@@ -1501,7 +1501,7 @@ class ModelAdmin(BaseModelAdmin):
         Create a message informing the user that the object doesn't exist
         and return a redirect to the admin index page.
         """
-        msg = _("""%(name)s with ID "%(key)s" doesn't exist. Perhaps it was deleted?""") % {
+        msg = _('%(name)s with ID “%(key)s” doesn’t exist. Perhaps it was deleted?') % {
             'name': opts.verbose_name,
             'key': unquote(object_id),
         }

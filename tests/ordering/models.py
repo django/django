@@ -33,7 +33,7 @@ class Article(models.Model):
     class Meta:
         ordering = (
             '-pub_date',
-            'headline',
+            models.F('headline'),
             models.F('author__name').asc(),
             OrderBy(models.F('second_author__name')),
         )
@@ -52,6 +52,10 @@ class OrderedByFArticle(Article):
     class Meta:
         proxy = True
         ordering = (models.F('author').asc(nulls_first=True), 'id')
+
+
+class ChildArticle(Article):
+    pass
 
 
 class Reference(models.Model):
