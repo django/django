@@ -29,9 +29,7 @@ class SchemaTests(PostgreSQLTestCase):
         )
         with connection.schema_editor() as editor:
             editor.add_constraint(RangesModel, constraint)
-        with connection.cursor() as cursor:
-            constraints = connection.introspection.get_constraints(cursor, RangesModel._meta.db_table)
-        self.assertIn(constraint_name, constraints)
+        self.assertIn(constraint_name, self.get_constraints(RangesModel._meta.db_table))
         with self.assertRaises(IntegrityError), transaction.atomic():
             RangesModel.objects.create(ints=(20, 50))
         RangesModel.objects.create(ints=(10, 30))
@@ -45,9 +43,7 @@ class SchemaTests(PostgreSQLTestCase):
         )
         with connection.schema_editor() as editor:
             editor.add_constraint(RangesModel, constraint)
-        with connection.cursor() as cursor:
-            constraints = connection.introspection.get_constraints(cursor, RangesModel._meta.db_table)
-        self.assertIn(constraint_name, constraints)
+        self.assertIn(constraint_name, self.get_constraints(RangesModel._meta.db_table))
         date_1 = datetime.date(2016, 1, 1)
         date_2 = datetime.date(2016, 1, 4)
         with self.assertRaises(IntegrityError), transaction.atomic():
@@ -69,9 +65,7 @@ class SchemaTests(PostgreSQLTestCase):
         )
         with connection.schema_editor() as editor:
             editor.add_constraint(RangesModel, constraint)
-        with connection.cursor() as cursor:
-            constraints = connection.introspection.get_constraints(cursor, RangesModel._meta.db_table)
-        self.assertIn(constraint_name, constraints)
+        self.assertIn(constraint_name, self.get_constraints(RangesModel._meta.db_table))
         datetime_1 = datetime.datetime(2016, 1, 1)
         datetime_2 = datetime.datetime(2016, 1, 2, 12)
         with self.assertRaises(IntegrityError), transaction.atomic():
