@@ -16,10 +16,10 @@ Django includes getting-started documentation for the following WSGI servers:
 .. toctree::
    :maxdepth: 1
 
-   modwsgi
-   apache-auth
    gunicorn
    uwsgi
+   modwsgi
+   apache-auth
 
 The ``application`` object
 ==========================
