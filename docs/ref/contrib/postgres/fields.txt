@@ -881,7 +881,7 @@ Returned objects are empty ranges. Can be chained to valid lookups for a
     <QuerySet []>
 
 Defining your own range types
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-----------------------------
 
 PostgreSQL allows the definition of custom range types. Django's model and form
 field implementations use base classes below, and psycopg2 provides a
