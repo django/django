@@ -501,14 +501,11 @@ class BaseDatabaseWrapper:
                 self.close()
                 return
 
-            # If an exception other than DataError or IntegrityError occurred
-            # since the last commit / rollback, check if the connection works.
-            if self.errors_occurred:
-                if self.is_usable():
-                    self.errors_occurred = False
-                else:
-                    self.close()
-                    return
+            if self.is_usable():
+                self.errors_occurred = False
+            else:
+                self.close()
+                return
 
             if self.close_at is not None and time.time() >= self.close_at:
                 self.close()
