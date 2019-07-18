@@ -220,6 +220,19 @@ Miscellaneous
   Django 3.1, the first request to any previously cached template fragment will
   be a cache miss.
 
+* The compatibility imports of ``django.core.exceptions.EmptyResultSet`` in
+  ``django.db.models.query``, ``django.db.models.sql``, and
+  ``django.db.models.sql.datastructures`` are removed.
+
+* The compatibility import of ``django.core.exceptions.FieldDoesNotExist`` in
+  ``django.db.models.fields`` is removed.
+
+* The compatibility imports of ``django.forms.utils.pretty_name()`` and
+  ``django.forms.boundfield.BoundField`` in ``django.forms.forms`` are removed.
+
+* The compatibility imports of ``Context``, ``ContextPopException``, and
+  ``RequestContext`` in ``django.template.base`` are removed.
+
 .. _deprecated-features-3.1:
 
 Features deprecated in 3.1

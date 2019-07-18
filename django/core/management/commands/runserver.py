@@ -155,7 +155,3 @@ class Command(BaseCommand):
             if shutdown_message:
                 self.stdout.write(shutdown_message)
             sys.exit(0)
-
-
-# Kept for backward compatibility
-BaseRunserverCommand = Command

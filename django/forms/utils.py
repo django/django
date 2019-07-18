@@ -2,7 +2,7 @@ import json
 from collections import UserList
 
 from django.conf import settings
-from django.core.exceptions import ValidationError  # backwards compatibility
+from django.core.exceptions import ValidationError
 from django.utils import timezone
 from django.utils.html import escape, format_html, format_html_join, html_safe
 from django.utils.translation import gettext_lazy as _

@@ -15,10 +15,11 @@ from django.utils.safestring import mark_safe
 from .base import (
     BLOCK_TAG_END, BLOCK_TAG_START, COMMENT_TAG_END, COMMENT_TAG_START,
     FILTER_SEPARATOR, SINGLE_BRACE_END, SINGLE_BRACE_START,
-    VARIABLE_ATTRIBUTE_SEPARATOR, VARIABLE_TAG_END, VARIABLE_TAG_START,
-    Context, Node, NodeList, TemplateSyntaxError, VariableDoesNotExist,
-    kwarg_re, render_value_in_context, token_kwargs,
+    VARIABLE_ATTRIBUTE_SEPARATOR, VARIABLE_TAG_END, VARIABLE_TAG_START, Node,
+    NodeList, TemplateSyntaxError, VariableDoesNotExist, kwarg_re,
+    render_value_in_context, token_kwargs,
 )
+from .context import Context
 from .defaultfilters import date
 from .library import Library
 from .smartif import IfParser, Literal

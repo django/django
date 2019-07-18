@@ -15,8 +15,6 @@ from urllib.parse import urlsplit, urlunsplit
 
 from django.core import validators
 from django.core.exceptions import ValidationError
-# Provide this import for backwards compatibility.
-from django.core.validators import EMPTY_VALUES  # NOQA
 from django.forms.boundfield import BoundField
 from django.forms.utils import from_current_timezone, to_current_timezone
 from django.forms.widgets import (

@@ -12,10 +12,6 @@ from django import forms
 from django.apps import apps
 from django.conf import settings
 from django.core import checks, exceptions, validators
-# When the _meta object was formalized, this exception was moved to
-# django.core.exceptions. It is retained here for backwards compatibility
-# purposes.
-from django.core.exceptions import FieldDoesNotExist  # NOQA
 from django.db import connection, connections, router
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.query_utils import DeferredAttribute, RegisterLookupMixin
@@ -35,11 +31,11 @@ __all__ = [
     'AutoField', 'BLANK_CHOICE_DASH', 'BigAutoField', 'BigIntegerField',
     'BinaryField', 'BooleanField', 'CharField', 'CommaSeparatedIntegerField',
     'DateField', 'DateTimeField', 'DecimalField', 'DurationField',
-    'EmailField', 'Empty', 'Field', 'FieldDoesNotExist', 'FilePathField',
-    'FloatField', 'GenericIPAddressField', 'IPAddressField', 'IntegerField',
-    'NOT_PROVIDED', 'NullBooleanField', 'PositiveIntegerField',
-    'PositiveSmallIntegerField', 'SlugField', 'SmallAutoField',
-    'SmallIntegerField', 'TextField', 'TimeField', 'URLField', 'UUIDField',
+    'EmailField', 'Empty', 'Field', 'FilePathField', 'FloatField',
+    'GenericIPAddressField', 'IPAddressField', 'IntegerField', 'NOT_PROVIDED',
+    'NullBooleanField', 'PositiveIntegerField', 'PositiveSmallIntegerField',
+    'SlugField', 'SmallAutoField', 'SmallIntegerField', 'TextField',
+    'TimeField', 'URLField', 'UUIDField',
 ]
 
 
