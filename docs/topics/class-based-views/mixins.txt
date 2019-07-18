@@ -461,11 +461,6 @@ Our new ``AuthorDetail`` looks like this::
         def get_success_url(self):
             return reverse('author-detail', kwargs={'pk': self.object.pk})
 
-        def get_context_data(self, **kwargs):
-            context = super().get_context_data(**kwargs)
-            context['form'] = self.get_form()
-            return context
-
         def post(self, request, *args, **kwargs):
             if not request.user.is_authenticated:
                 return HttpResponseForbidden()
@@ -483,9 +478,7 @@ Our new ``AuthorDetail`` looks like this::
 
 ``get_success_url()`` is just providing somewhere to redirect to,
 which gets used in the default implementation of
-``form_valid()``. We have to provide our own ``post()`` as
-noted earlier, and override ``get_context_data()`` to make the
-:class:`~django.forms.Form` available in the context data.
+``form_valid()``. We have to provide our own ``post()`` as noted earlier.
 
 A better solution
 -----------------
