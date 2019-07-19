@@ -1,4 +1,5 @@
 import datetime
+import sys
 import unittest
 from unittest import mock
 from urllib.parse import quote_plus
@@ -6,8 +7,8 @@ from urllib.parse import quote_plus
 from django.test import SimpleTestCase
 from django.utils.encoding import (
     DjangoUnicodeDecodeError, escape_uri_path, filepath_to_uri, force_bytes,
-    force_str, get_system_encoding, iri_to_uri, smart_bytes, smart_str,
-    uri_to_iri,
+    force_str, get_system_encoding, iri_to_uri, repercent_broken_unicode,
+    smart_bytes, smart_str, uri_to_iri,
 )
 from django.utils.functional import SimpleLazyObject
 from django.utils.translation import gettext_lazy
@@ -89,6 +90,15 @@ class TestEncodingUtils(SimpleTestCase):
     def test_get_default_encoding(self):
         with mock.patch('locale.getdefaultlocale', side_effect=Exception):
             self.assertEqual(get_system_encoding(), 'ascii')
+
+    def test_repercent_broken_unicode_recursion_error(self):
+        # Prepare a string long enough to force a recursion error if the tested
+        # function uses recursion.
+        data = b'\xfc' * sys.getrecursionlimit()
+        try:
+            self.assertEqual(repercent_broken_unicode(data), b'%FC' * sys.getrecursionlimit())
+        except RecursionError:
+            self.fail('Unexpected RecursionError raised.')
 
 
 class TestRFC3987IEncodingUtils(unittest.TestCase):
