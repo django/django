@@ -105,7 +105,7 @@ class PostgreSqlDbshellCommandTestCase(SimpleTestCase):
         )
 
     def test_sigint_handler(self):
-        """SIGINT is ignored in Python and passed to psql to abort quries."""
+        """SIGINT is ignored in Python and passed to psql to abort queries."""
         def _mock_subprocess_run(*args, **kwargs):
             handler = signal.getsignal(signal.SIGINT)
             self.assertEqual(handler, signal.SIG_IGN)
