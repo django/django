@@ -115,30 +115,17 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         Return a dictionary of {field_name: (field_name_other_table, other_table)}
         representing all relationships to the given table.
         """
+        return {row[0]: (row[2], row[1]) for row in self.get_key_columns(cursor, table_name)}
+
+    def get_key_columns(self, cursor, table_name):
         cursor.execute("""
-            SELECT c2.relname, a1.attname, a2.attname
+            SELECT a1.attname, c2.relname, a2.attname
             FROM pg_constraint con
             LEFT JOIN pg_class c1 ON con.conrelid = c1.oid
             LEFT JOIN pg_class c2 ON con.confrelid = c2.oid
             LEFT JOIN pg_attribute a1 ON c1.oid = a1.attrelid AND a1.attnum = con.conkey[1]
             LEFT JOIN pg_attribute a2 ON c2.oid = a2.attrelid AND a2.attnum = con.confkey[1]
             WHERE c1.relname = %s AND con.contype = 'f'
-        """, [table_name])
-        return {row[1]: (row[2], row[0]) for row in cursor.fetchall()}
-
-    def get_key_columns(self, cursor, table_name):
-        cursor.execute("""
-            SELECT kcu.column_name, ccu.table_name AS referenced_table, ccu.column_name AS referenced_column
-            FROM information_schema.constraint_column_usage ccu
-            LEFT JOIN information_schema.key_column_usage kcu
-                ON ccu.constraint_catalog = kcu.constraint_catalog
-                    AND ccu.constraint_schema = kcu.constraint_schema
-                    AND ccu.constraint_name = kcu.constraint_name
-            LEFT JOIN information_schema.table_constraints tc
-                ON ccu.constraint_catalog = tc.constraint_catalog
-                    AND ccu.constraint_schema = tc.constraint_schema
-                    AND ccu.constraint_name = tc.constraint_name
-            WHERE kcu.table_name = %s AND tc.constraint_type = 'FOREIGN KEY'
         """, [table_name])
         return cursor.fetchall()
 
