@@ -2,12 +2,13 @@
 from __future__ import unicode_literals
 
 import datetime
+import sys
 import unittest
 
 from django.utils import six
 from django.utils.encoding import (
     escape_uri_path, filepath_to_uri, force_bytes, force_text, iri_to_uri,
-    smart_text, uri_to_iri,
+    repercent_broken_unicode, smart_text, uri_to_iri,
 )
 from django.utils.functional import SimpleLazyObject
 from django.utils.http import urlquote_plus
@@ -75,6 +76,15 @@ class TestEncodingUtils(unittest.TestCase):
         self.assertEqual(smart_text(TestU()), '\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111')
         self.assertEqual(smart_text(1), '1')
         self.assertEqual(smart_text('foo'), 'foo')
+
+    def test_repercent_broken_unicode_recursion_error(self):
+        # Prepare a string long enough to force a recursion error if the tested
+        # function uses recursion.
+        data = b'\xfc' * sys.getrecursionlimit()
+        try:
+            self.assertEqual(repercent_broken_unicode(data), b'%FC' * sys.getrecursionlimit())
+        except RecursionError:
+            self.fail('Unexpected RecursionError raised.')
 
 
 class TestRFC3987IEncodingUtils(unittest.TestCase):
