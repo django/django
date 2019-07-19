@@ -566,8 +566,9 @@ class BaseModelFormSet(BaseFormSet):
     unique_fields = set()
 
     def __init__(self, data=None, files=None, auto_id='id_%s', prefix=None,
-                 queryset=None, *, initial=None, **kwargs):
+                 queryset=None, *, edit_only=False, initial=None, **kwargs):
         self.queryset = queryset
+        self.edit_only = edit_only
         self.initial_extra = initial
         super().__init__(**{'data': data, 'files': files, 'auto_id': auto_id, 'prefix': prefix, **kwargs})
 
@@ -669,7 +670,10 @@ class BaseModelFormSet(BaseFormSet):
                 for form in self.saved_forms:
                     form.save_m2m()
             self.save_m2m = save_m2m
-        return self.save_existing_objects(commit) + self.save_new_objects(commit)
+        if not self.edit_only:
+            return self.save_existing_objects(commit) + self.save_new_objects(commit)
+        else:
+            return self.save_existing_objects(commit)
 
     save.alters_data = True
 

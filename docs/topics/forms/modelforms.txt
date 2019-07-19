@@ -948,12 +948,6 @@ extra forms displayed.
     >>> [x.name for x in formset.get_queryset()]
     ['Charles Baudelaire', 'Paul Verlaine', 'Walt Whitman']
 
-Also, ``extra=0`` doesn't prevent creation of new model instances as you can
-:ref:`add additional forms with JavaScript <understanding-the-managementform>`
-or just send additional POST data. Formsets `don't yet provide functionality
-<https://code.djangoproject.com/ticket/26142>`_ for an "edit only" view that
-prevents creation of new instances.
-
 If the value of ``max_num`` is greater than the number of existing related
 objects, up to ``extra`` additional blank forms will be added to the formset,
 so long as the total number of forms does not exceed ``max_num``::
@@ -969,6 +963,29 @@ so long as the total number of forms does not exceed ``max_num``::
 
 A ``max_num`` value of ``None`` (the default) puts a high limit on the number
 of forms displayed (1000). In practice this is equivalent to no limit.
+
+Also, ``extra=0`` doesn't prevent creation of new model instances as you can
+:ref:`add additional forms with JavaScript <understanding-the-managementform>`
+or just send additional POST data.
+
+`edit only` mode for the model formsets
+---------------------------------------
+
+.. versionadded:: 3.0
+
+.. attribute:: BaseModelFormSet.edit_only
+
+You can use the Model Formset in `edit only` mode, which will block creation of
+any new instances of a model. Thus enabling you to use the formset as a means to
+edit a certain queryset easily. This way is safe from user side forgery of the
+data, and hence is a more secure implementation.::
+
+    >>> AuthorFormSet = modelformset_factory(Author, fields=('name',), extra=2)
+    >>> qs = Author.objects.filter(name__startswith="Charles")
+    >>> formset = AuthorFormSet(queryset=qs, edit_only=True)
+
+The above ``formset`` will only change the Author instances who's name starts with "Charles".
+Apart from this no new object will be created or no other objects will be edited.
 
 Using a model formset in a view
 -------------------------------

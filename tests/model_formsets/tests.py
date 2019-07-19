@@ -451,6 +451,76 @@ class ModelFormsetTest(TestCase):
         formset = AuthorFormSet(queryset=qs)
         self.assertEqual(len(formset.forms), 1)
 
+    def test_instance_creation_without_edit_only(self):
+        Author.objects.create(name='Charles Baudelaire')
+        AuthorFormSet = modelformset_factory(Author, fields="__all__", max_num=1, extra=0, validate_max=True)
+        data = {
+            'form-TOTAL_FORMS': '1',
+            'form-INITIAL_FORMS': '0',  # would be 1 normally, but pretend the user edited it.
+            'form-MAX_NUM_FORMS': '0',
+            'form-0-name': 'Walt Whitman',
+        }
+        formset = AuthorFormSet(data, queryset=Author.objects.all())
+        self.assertTrue(formset.is_valid())
+        formset.save()
+        self.assertQuerysetEqual(Author.objects.all(), [
+            '<Author: Charles Baudelaire>',
+            '<Author: Walt Whitman>',
+        ])
+
+    def test_edit_only_prevent_instance_creation(self):
+        Author.objects.create(name='Charles Baudelaire')
+        AuthorFormSet = modelformset_factory(Author, fields="__all__")
+        data = {
+            'form-TOTAL_FORMS': '1',
+            'form-INITIAL_FORMS': '0',  # would be 1 normally, but pretend the user edited it.
+            'form-MAX_NUM_FORMS': '0',
+            'form-0-name': 'Walt Whitman',
+        }
+        formset = AuthorFormSet(data, queryset=Author.objects.all(), edit_only=True)
+        self.assertTrue(formset.is_valid())
+        formset.save()
+        self.assertQuerysetEqual(Author.objects.all(), [
+            '<Author: Charles Baudelaire>',
+        ])
+
+    def test_deletion_with_edit_only(self):
+        PoetFormSet = modelformset_factory(Poet, fields="__all__", can_delete=True)
+        poet = Poet.objects.create(name='test')
+        data = {
+            'form-TOTAL_FORMS': '1',
+            'form-INITIAL_FORMS': '1',
+            'form-MAX_NUM_FORMS': '0',
+            'form-0-id': str(poet.pk),
+            'form-0-name': 'test',
+            'form-0-DELETE': 'on',
+        }
+        formset = PoetFormSet(data, queryset=Poet.objects.all(), edit_only=True)
+        formset.save(commit=False)
+        self.assertEqual(Poet.objects.count(), 1)
+
+        formset.save()
+        self.assertTrue(formset.is_valid())
+        self.assertEqual(Poet.objects.count(), 0)
+
+    def test_prevent_editing_object_outside_of_queryset(self):
+        Author.objects.create(name='Charles Baudelaire')
+        auth2 = Author.objects.create(name='Walt Whitman')
+        AuthorFormSet = modelformset_factory(Author, fields="__all__")
+        data = {
+            'form-TOTAL_FORMS': '1',
+            'form-INITIAL_FORMS': '1',
+            'form-0-id': str(auth2.pk),
+            'form-0-name': 'Parth Patil',
+        }
+        formset = AuthorFormSet(data, queryset=Author.objects.filter(name__startswith='Charles'))
+        self.assertTrue(formset.is_valid())
+        formset.save()
+        self.assertQuerysetEqual(Author.objects.all(), [
+            '<Author: Charles Baudelaire>',
+            '<Author: Walt Whitman>',
+        ])
+
     def test_custom_save_method(self):
         class PoetForm(forms.ModelForm):
             def save(self, commit=True):

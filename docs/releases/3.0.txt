@@ -206,6 +206,11 @@ Forms
   :attr:`~django.forms.formsets.BaseFormSet.ordering_widget` attribute or
   overriding :attr:`~django.forms.formsets.BaseFormSet.get_ordering_widget()`.
 
+* Added new :attr:`~django.forms.BaseModelFormSet.edit_only` mode to the
+  :class:`~django.forms.models.BaseModelFormSet`, which can block new instance
+  creation, and can be used to edit only a specific queryset without affecting the
+  rest of the database.
+
 Generic Views
 ~~~~~~~~~~~~~
 
