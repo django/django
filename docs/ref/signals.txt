@@ -106,6 +106,12 @@ Arguments sent with this signal:
         ``_state.db`` is ``None`` and cannot be used to check an ``instance``
         database.
 
+.. warning::
+
+    For performance reasons, you shouldn't perform queries in receivers of
+    ``pre_init`` or ``post_init`` signals because they would be executed for
+    each instance returned during queryset iteration.
+
 ``pre_save``
 ------------
 
