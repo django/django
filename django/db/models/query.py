@@ -283,7 +283,10 @@ class QuerySet:
     def __getitem__(self, k):
         """Retrieve an item or slice from the set of results."""
         if not isinstance(k, (int, slice)):
-            raise TypeError
+            raise TypeError(
+                'QuerySet indices must be integers or slices, not %s.'
+                % type(k).__name__
+            )
         assert ((not isinstance(k, slice) and (k >= 0)) or
                 (isinstance(k, slice) and (k.start is None or k.start >= 0) and
                  (k.stop is None or k.stop >= 0))), \
