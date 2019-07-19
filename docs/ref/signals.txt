@@ -99,6 +99,13 @@ Arguments sent with this signal:
 ``instance``
     The actual instance of the model that's just been created.
 
+    .. note::
+
+        ``instance._state`` isn't set before sending the ``post_init`` signal,
+        so ``_state`` attributes always have their default values. For example,
+        ``_state.db`` is ``None`` and cannot be used to check an ``instance``
+        database.
+
 ``pre_save``
 ------------
 
