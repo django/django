@@ -283,6 +283,9 @@ Miscellaneous
   :class:`pathlib.Path` instead of :mod:`os.path` for building filesystem
   paths.
 
+* The :setting:`TIME_ZONE <DATABASE-TIME_ZONE>` setting is now allowed on
+  databases that support time zones.
+
 .. _backwards-incompatible-3.1:
 
 Backwards incompatible changes in 3.1

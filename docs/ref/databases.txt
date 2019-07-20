@@ -121,8 +121,11 @@ Django needs the following parameters for its database connections:
 - ``client_encoding``: ``'UTF8'``,
 - ``default_transaction_isolation``: ``'read committed'`` by default,
   or the value set in the connection options (see below),
-- ``timezone``: ``'UTC'`` when :setting:`USE_TZ` is ``True``, value of
-  :setting:`TIME_ZONE` otherwise.
+- ``timezone``:
+    - when :setting:`USE_TZ` is ``True``, ``'UTC'`` by default, or the
+      :setting:`TIME_ZONE <DATABASE-TIME_ZONE>` value set for the connection,
+    - when :setting:`USE_TZ` is ``False``, the value of the global
+      :setting:`TIME_ZONE` setting.
 
 If these parameters already have the correct values, Django won't set them for
 every new connection, which improves performance slightly. You can configure

@@ -9,8 +9,7 @@ import pytz
 
 from django.contrib.auth.models import User
 from django.core import serializers
-from django.core.exceptions import ImproperlyConfigured
-from django.db import connection, connections
+from django.db import connection
 from django.db.models import F, Max, Min
 from django.http import HttpRequest
 from django.template import (
@@ -532,6 +531,14 @@ class NewDatabaseTests(TestCase):
             cursor.execute('SELECT dt FROM timezones_event WHERE dt = %s', [utc_naive_dt])
             self.assertEqual(cursor.fetchall()[0][0], utc_naive_dt)
 
+    @skipUnlessDBFeature('supports_timezones')
+    def test_cursor_explicit_time_zone(self):
+        with override_database_connection_timezone('Europe/Paris'):
+            with connection.cursor() as cursor:
+                cursor.execute('SELECT CURRENT_TIMESTAMP')
+                now = cursor.fetchone()[0]
+                self.assertEqual(now.tzinfo.zone, 'Europe/Paris')
+
     @requires_tz_support
     def test_filter_date_field_with_aware_datetime(self):
         # Regression test for #17742
@@ -593,27 +600,6 @@ class ForcedTimeZoneDatabaseTests(TransactionTestCase):
         event = Event.objects.get()
         fake_dt = datetime.datetime(2011, 9, 1, 17, 20, 30, tzinfo=UTC)
         self.assertEqual(event.dt, fake_dt)
-
-
-@skipUnlessDBFeature('supports_timezones')
-@override_settings(TIME_ZONE='Africa/Nairobi', USE_TZ=True)
-class UnsupportedTimeZoneDatabaseTests(TestCase):
-
-    def test_time_zone_parameter_not_supported_if_database_supports_timezone(self):
-        connections.databases['tz'] = connections.databases['default'].copy()
-        connections.databases['tz']['TIME_ZONE'] = 'Asia/Bangkok'
-        tz_conn = connections['tz']
-        try:
-            msg = (
-                "Connection 'tz' cannot set TIME_ZONE because its engine "
-                "handles time zones conversions natively."
-            )
-            with self.assertRaisesMessage(ImproperlyConfigured, msg):
-                tz_conn.cursor()
-        finally:
-            connections['tz'].close()       # in case the test fails
-            del connections['tz']
-            del connections.databases['tz']
 
 
 @override_settings(TIME_ZONE='Africa/Nairobi')

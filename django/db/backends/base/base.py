@@ -124,11 +124,11 @@ class BaseDatabaseWrapper:
 
         When the database backend supports time zones, it doesn't matter which
         time zone Django uses, as long as aware datetimes are used everywhere.
-        For simplicity, Django selects UTC.
+        Other users connecting to the database can choose their own time zone.
 
         When the database backend doesn't support time zones, the time zone
-        Django uses can be selected with the TIME_ZONE configuration option, so
-        it can match what other users of the database expect.
+        Django uses may be constrained by the requirements of other users of
+        the database.
         """
         if not settings.USE_TZ:
             return None
@@ -205,15 +205,11 @@ class BaseDatabaseWrapper:
         self.run_on_commit = []
 
     def check_settings(self):
-        if self.settings_dict['TIME_ZONE'] is not None:
-            if not settings.USE_TZ:
-                raise ImproperlyConfigured(
-                    "Connection '%s' cannot set TIME_ZONE because USE_TZ is "
-                    "False." % self.alias)
-            elif self.features.supports_timezones:
-                raise ImproperlyConfigured(
-                    "Connection '%s' cannot set TIME_ZONE because its engine "
-                    "handles time zones conversions natively." % self.alias)
+        if self.settings_dict['TIME_ZONE'] is not None and not settings.USE_TZ:
+            raise ImproperlyConfigured(
+                "Connection '%s' cannot set TIME_ZONE because USE_TZ is False."
+                % self.alias
+            )
 
     @async_unsafe
     def ensure_connection(self):
