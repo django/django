@@ -117,17 +117,20 @@ class BaseDatabaseWrapper:
     @cached_property
     def timezone(self):
         """
-        Time zone for datetimes stored as naive values in the database.
+        Return a tzinfo of the database connection time zone.
 
-        Return a tzinfo object or None.
+        This is only used when time zone support is enabled. When a datetime is
+        read from the database, it is always returned in this time zone.
 
-        This is only needed when time zone support is enabled and the database
-        doesn't support time zones. (When the database supports time zones,
-        the adapter handles aware datetimes so Django doesn't need to.)
+        When the database backend supports time zones, it doesn't matter which
+        time zone Django uses, as long as aware datetimes are used everywhere.
+        For simplicity, Django selects UTC.
+
+        When the database backend doesn't support time zones, the time zone
+        Django uses can be selected with the TIME_ZONE configuration option, so
+        it can match what other users of the database expect.
         """
         if not settings.USE_TZ:
-            return None
-        elif self.features.supports_timezones:
             return None
         elif self.settings_dict['TIME_ZONE'] is None:
             return timezone.utc

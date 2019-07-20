@@ -297,6 +297,11 @@ backends.
 * ``DatabaseOperations.fetch_returned_insert_columns()`` now requires an
   additional ``returning_params`` argument.
 
+* ``connection.timezone`` property is now ``'UTC'`` by default, or the
+  :setting:`TIME_ZONE <DATABASE-TIME_ZONE>` when :setting:`USE_TZ` is ``True``
+  on databases that support time zones. Previously, it was ``None`` on
+  databases that support time zones.
+
 Dropped support for MariaDB 10.1
 --------------------------------
 
