@@ -1,4 +1,3 @@
-from django.http import StreamingHttpResponse
 from django.test import SimpleTestCase, override_settings
 from django.test.utils import require_jinja2
 
@@ -37,10 +36,3 @@ class RenderTests(SimpleTestCase):
         self.assertEqual(response.content, b'DTL\n')
         response = self.client.get('/render/using/?using=jinja2')
         self.assertEqual(response.content, b'Jinja2\n')
-
-    def test_stream(self):
-        response = self.client.get('/stream/')
-        self.assertIsInstance(response, StreamingHttpResponse)
-        self.assertEqual(response.status_code, 200)
-        self.assertContains(response, b'FOO.BAR../stream/\n')
-        self.assertEqual(response['Content-Type'], 'text/html; charset=utf-8')

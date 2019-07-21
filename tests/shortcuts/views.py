@@ -35,10 +35,3 @@ def render_view_with_status(request):
 def render_view_with_using(request):
     using = request.GET.get('using')
     return render(request, 'shortcuts/using.html', using=using)
-
-
-def stream_view(request):
-    return render(request, 'shortcuts/render_test.html', {
-        'foo': 'FOO',
-        'bar': 'BAR',
-    }, stream=True)

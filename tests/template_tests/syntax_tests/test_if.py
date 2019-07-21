@@ -601,12 +601,6 @@ class IfTagTests(SimpleTestCase):
         output = self.engine.render_to_string('template', {})
         self.assertEqual(output, 'no')
 
-    @setup({'if-tag-stream': '{% if foo %}{{ a }}42{% else %}no{% endif %}'})
-    def test_if_tag_stream(self):
-        output = self.engine.render_to_string('if-tag-stream', {'foo': True, 'a': 21}, stream=True)
-        self.assertEqual(next(output), '21')
-        self.assertEqual(next(output), '42')
-
 
 class IfNodeTests(SimpleTestCase):
     def test_repr(self):

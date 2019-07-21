@@ -146,7 +146,7 @@ class Engine:
             template = Template(template, origin, template_name, engine=self)
         return template
 
-    def render_to_string(self, template_name, context=None, stream=False):
+    def render_to_string(self, template_name, context=None):
         """
         Render the template specified by template_name with the given context.
         For use in Django's test suite.
@@ -158,9 +158,9 @@ class Engine:
         # Django < 1.8 accepted a Context in `context` even though that's
         # unintended. Preserve this ability but don't rewrap `context`.
         if isinstance(context, Context):
-            return t.render(context, stream=stream)
+            return t.render(context)
         else:
-            return t.render(Context(context, autoescape=self.autoescape), stream=stream)
+            return t.render(Context(context, autoescape=self.autoescape))
 
     def select_template(self, template_name_list):
         """

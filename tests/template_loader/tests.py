@@ -166,12 +166,3 @@ class TemplateLoaderTests(SimpleTestCase):
         content = render_to_string(["template_loader/goodbye.html",
                                     "template_loader/hello.html"])
         self.assertEqual(content, "Goodbye! (Django templates)\n")
-
-    def test_stream_django_engine(self):
-        content = render_to_string("template_loader/goodbye.html", stream=True)
-        self.assertEqual(list(content), ["Goodbye! (Django templates)\n"])
-
-    def test_stream_django_engine_with_request(self):
-        request = RequestFactory().get('/foobar/')
-        content = render_to_string("template_loader/request.html", request=request, stream=True)
-        self.assertEqual(list(content), ["/foobar/", "\n"])

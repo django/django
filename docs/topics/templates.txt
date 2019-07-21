@@ -170,7 +170,7 @@ must provide a ``render()`` method with the following signature:
     template. How this is achieved is up to each backend.
 
     If ``stream`` is set to True, it will return a generator for rendering
-    the template instead
+    the template
 
     .. versionadded:: 3.0
 
@@ -248,7 +248,7 @@ the following templates:
 In addition, to cut down on the repetitive nature of loading and rendering
 templates, Django provides a shortcut function which automates the process.
 
-.. function:: render_to_string(template_name, context=None, request=None, using=None, stream=False)
+.. function:: render_to_string(template_name, context=None, request=None, using=None)
 
     ``render_to_string()`` loads a template like :func:`get_template` and
     calls its ``render()`` method immediately. It takes the following
@@ -269,13 +269,6 @@ templates, Django provides a shortcut function which automates the process.
     ``using``
         An optional template engine :setting:`NAME <TEMPLATES-NAME>`. The
         search for the template will be restricted to that engine.
-
-    ``stream``
-        If set to ``True``, it will return a generator of the template instead.
-
-        .. versionadded:: 3.0
-
-            The ``stream()`` argument was added.
 
     Usage example::
 
