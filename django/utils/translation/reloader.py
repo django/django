@@ -13,8 +13,7 @@ def watch_for_translation_changes(sender, **kwargs):
         directories.extend(Path(config.path) / 'locale' for config in apps.get_app_configs())
         directories.extend(Path(p) for p in settings.LOCALE_PATHS)
         for path in directories:
-            absolute_path = path.absolute()
-            sender.watch_dir(absolute_path, '**/*.mo')
+            sender.watch_dir(path, '**/*.mo')
 
 
 def translation_file_changed(sender, file_path, **kwargs):
