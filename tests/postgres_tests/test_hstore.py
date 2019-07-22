@@ -4,8 +4,9 @@ from __future__ import unicode_literals
 import json
 
 from django.core import exceptions, serializers
+from django.db import connection
 from django.forms import Form
-from django.test.utils import modify_settings
+from django.test.utils import CaptureQueriesContext, modify_settings
 
 from . import PostgreSQLTestCase
 from .models import HStoreModel
@@ -165,6 +166,18 @@ class TestQuerying(HStoreTestCase):
         self.assertSequenceEqual(
             HStoreModel.objects.filter(id__in=HStoreModel.objects.filter(field__a='b')),
             self.objs[:2]
+        )
+
+    def test_key_sql_injection(self):
+        with CaptureQueriesContext(connection) as queries:
+            self.assertFalse(
+                HStoreModel.objects.filter(**{
+                    "field__test' = 'a') OR 1 = 1 OR ('d": 'x',
+                }).exists()
+            )
+        self.assertIn(
+            """."field" -> 'test'' = ''a'') OR 1 = 1 OR (''d') = 'x' """,
+            queries[0]['sql'],
         )
 
 
