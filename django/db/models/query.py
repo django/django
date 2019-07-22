@@ -181,13 +181,10 @@ def construct_object(
     model_cls,
     data
 ):
-    # TODO: Think about better way to do this
-    exists_key = 'annotation_exists'
     field_names = data.keys()
-    exists = data[exists_key]
-    del data[exists_key]
+    object_exists = any(data.values())
 
-    if not exists:
+    if not object_exists:
         return None
 
     model_instance = model_cls.from_db(
@@ -1056,12 +1053,10 @@ class QuerySet:
         }
 
         for existing_annotation_key, existing_annotaion_value in queryset.query.annotations.items():
-            fields_annotations[f'{SELECT_RELATED_PREFIX}__{field_name}__{existing_annotation_key}'] = existing_annotaion_value
+            fields_annotations[f'{SELECT_RELATED_PREFIX}__{field_name}__{existing_annotation_key}'] =\
+                existing_annotaion_value
 
-        return clone.annotate(**{
-            f'{SELECT_RELATED_PREFIX}__{field_name}__annotation_exists': Exists(object_queryset),
-            **fields_annotations
-        })
+        return clone.annotate(**fields_annotations)
 
     def annotate(self, *args, **kwargs):
         """
