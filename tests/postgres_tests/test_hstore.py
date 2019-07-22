@@ -1,8 +1,9 @@
 import json
 
 from django.core import checks, exceptions, serializers
+from django.db import connection
 from django.forms import Form
-from django.test.utils import isolate_apps
+from django.test.utils import CaptureQueriesContext, isolate_apps
 
 from . import PostgreSQLSimpleTestCase, PostgreSQLTestCase
 from .models import HStoreModel, PostgreSQLModel
@@ -183,6 +184,18 @@ class TestQuerying(PostgreSQLTestCase):
         self.assertSequenceEqual(
             HStoreModel.objects.filter(id__in=HStoreModel.objects.filter(field__a='b')),
             self.objs[:2]
+        )
+
+    def test_key_sql_injection(self):
+        with CaptureQueriesContext(connection) as queries:
+            self.assertFalse(
+                HStoreModel.objects.filter(**{
+                    "field__test' = 'a') OR 1 = 1 OR ('d": 'x',
+                }).exists()
+            )
+        self.assertIn(
+            """."field" -> 'test'' = ''a'') OR 1 = 1 OR (''d') = 'x' """,
+            queries[0]['sql'],
         )
 
 

@@ -36,3 +36,12 @@ Remember that absolutely NO guarantee is provided about the results of
 ``strip_tags()`` being HTML safe. So NEVER mark safe the result of a
 ``strip_tags()`` call without escaping it first, for example with
 :func:`django.utils.html.escape`.
+
+CVE-2019-14234: SQL injection possibility in key and index lookups for ``JSONField``/``HStoreField``
+====================================================================================================
+
+:lookup:`Key and index lookups <jsonfield.key>` for
+:class:`~django.contrib.postgres.fields.JSONField` and :lookup:`key lookups
+<hstorefield.key>` for :class:`~django.contrib.postgres.fields.HStoreField`
+were subject to SQL injection, using a suitably crafted dictionary, with
+dictionary expansion, as the ``**kwargs`` passed to ``QuerySet.filter()``.
