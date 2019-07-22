@@ -4,9 +4,10 @@ from decimal import Decimal
 
 from django.core import checks, exceptions, serializers
 from django.core.serializers.json import DjangoJSONEncoder
+from django.db import connection
 from django.db.models import Q
 from django.forms import CharField, Form, widgets
-from django.test.utils import isolate_apps
+from django.test.utils import CaptureQueriesContext, isolate_apps
 from django.utils.html import escape
 
 from . import PostgreSQLTestCase
@@ -298,6 +299,18 @@ class TestQuerying(PostgreSQLTestCase):
 
     def test_iregex(self):
         self.assertTrue(JSONModel.objects.filter(field__foo__iregex=r'^bAr$').exists())
+
+    def test_key_sql_injection(self):
+        with CaptureQueriesContext(connection) as queries:
+            self.assertFalse(
+                JSONModel.objects.filter(**{
+                    """field__test' = '"a"') OR 1 = 1 OR ('d""": 'x',
+                }).exists()
+            )
+        self.assertIn(
+            """."field" -> 'test'' = ''"a"'') OR 1 = 1 OR (''d') = '"x"' """,
+            queries[0]['sql'],
+        )
 
 
 @isolate_apps('postgres_tests')
