@@ -190,11 +190,19 @@ def construct_object(
     if not exists:
         return None
 
-    return model_cls.from_db(
+    model_instance = model_cls.from_db(
         db=db,
         field_names=field_names,
         values=[data[field_name] for field_name in field_names]
     )
+
+    # To attach annotations
+    # TODO: Think about better way pls. There should be one
+    for key, value in data.items():
+        if not hasattr(model_instance, key):
+            setattr(model_instance, key, value)
+
+    return model_instance
 
 
 class QuerySet:
@@ -1046,6 +1054,9 @@ class QuerySet:
             f'{SELECT_RELATED_PREFIX}__{field_name}__{field}': get_field_expression(field)
             for field in fields
         }
+
+        for existing_annotation_key, existing_annotaion_value in queryset.query.annotations.items():
+            fields_annotations[f'{SELECT_RELATED_PREFIX}__{field_name}__{existing_annotation_key}'] = existing_annotaion_value
 
         return clone.annotate(**{
             f'{SELECT_RELATED_PREFIX}__{field_name}__annotation_exists': Exists(object_queryset),
