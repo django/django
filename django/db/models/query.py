@@ -176,6 +176,27 @@ class FlatValuesListIterable(BaseIterable):
         return chain.from_iterable(compiler.results_iter(chunked_fetch=self.chunked_fetch, chunk_size=self.chunk_size))
 
 
+def construct_object(
+    db,
+    model_cls,
+    data
+):
+    # TODO: Think about better way to do this
+    exists_key = 'annotation_exists'
+    field_names = data.keys()
+    exists = data[exists_key]
+    del data[exists_key]
+
+    if not exists:
+        return None
+
+    return model_cls.from_db(
+        db=db,
+        field_names=field_names,
+        values=[data[field_name] for field_name in field_names]
+    )
+
+
 class QuerySet:
     """Represent a lazy database lookup for a set of objects."""
 
@@ -959,9 +980,77 @@ class QuerySet:
             clone._prefetch_related_lookups = clone._prefetch_related_lookups + lookups
         return clone
 
-    def annotate_object(self, field_name, queryset):
-        # TODO: Implement
-        return self
+    def annotate_object(
+        self,
+        field_name,
+        queryset,
+        related_object_id,
+        fields=None,
+    ):
+        from collections import defaultdict
+        from django.db.models import Subquery, Exists
+
+        SELECT_RELATED_PREFIX = 'select_related'
+
+        if not fields:
+            fields = []
+
+        if 'id' not in fields:
+            fields = ['id', *fields]
+
+        clone = self._clone()
+
+        class AnnotateObjectIterable(clone._iterable_class):
+            def extract_data_for_annotated_objects(self, obj):
+                prefix = f'{SELECT_RELATED_PREFIX}__'
+                result = defaultdict(dict)
+
+                for obj_field_name, obj_field_value in obj.__dict__.items():
+                    if obj_field_name.startswith(prefix):
+                        field_name, subfield_name = obj_field_name[len(prefix):].split('__')
+
+                        result[field_name][subfield_name] = obj_field_value
+
+                return result
+
+            def attach_annotated_objects(self, obj, annotated_objects_data):
+                for annotated_object_name, annotated_object_data in annotated_objects_data.items():
+                    select_related_obj = construct_object(
+                        db=self.queryset.db,
+                        model_cls=queryset.model,
+                        data=annotated_object_data
+                    )
+
+                    if select_related_obj:
+                        setattr(obj, annotated_object_name, select_related_obj)
+                        obj._state.fields_cache[annotated_object_name] = select_related_obj
+
+            def __iter__(self):
+                for obj in super().__iter__():
+                    annotated_objects_data = self.extract_data_for_annotated_objects(obj)
+                    self.attach_annotated_objects(obj, annotated_objects_data)
+
+                    yield obj
+
+        clone._iterable_class = AnnotateObjectIterable
+
+        object_queryset = queryset.filter(pk=related_object_id)
+
+        def get_field_expression(field_name):
+            field_name_queryset = object_queryset.values_list(field_name)[:1]
+            output_field = queryset.model._meta._forward_fields_map[field_name]
+
+            return Subquery(queryset=field_name_queryset, output_field=output_field)
+
+        fields_annotations = {
+            f'{SELECT_RELATED_PREFIX}__{field_name}__{field}': get_field_expression(field)
+            for field in fields
+        }
+
+        return clone.annotate(**{
+            f'{SELECT_RELATED_PREFIX}__{field_name}__annotation_exists': Exists(object_queryset),
+            **fields_annotations
+        })
 
     def annotate(self, *args, **kwargs):
         """

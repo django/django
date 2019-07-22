@@ -23,36 +23,38 @@ class AnnotateObjectTestCase(TestCase):
 
     def test_annotate_non_existing_object(self):
         book_1_id = self.book_1.id
-        non_existing_author_id = -1
+        non_existing_author_id = -1000
 
         book_with_annotated_author = Book.objects\
             .annotate_object(
                 field_name='annotated_author',
-                queryset=Author.objects.filter(id=non_existing_author_id)
+                queryset=Author.objects.all(),
+                related_object_id=non_existing_author_id
             ).get(
                 id=book_1_id
             )
 
         self.assertEqual(book_with_annotated_author, self.book_1)
-        self.assertIsNone(book_with_annotated_author.annotated_author, self.book_1.author)
+        self.assertIsNone(getattr(book_with_annotated_author, 'annotated_author', None))
 
     def test_basic_object_annotation(self):
         book_1_id = self.book_1.id
         book_with_annotated_author = Book.objects\
             .annotate_object(
                 field_name='annotated_author',
-                queryset=Author.objects.filter(id=OuterRef('author__id'))
+                queryset=Author.objects.all(),
+                related_object_id=OuterRef('contact__id')
             ).get(
                 id=book_1_id
             )
 
         self.assertEqual(book_with_annotated_author, self.book_1)
-        self.assertEqual(book_with_annotated_author.annotated_author, self.book_1.author)
+        self.assertEqual(book_with_annotated_author.annotated_author, self.book_1.contact)
 
-        for key, value in self.book_1.author.__dict__:
+        for key in Author._meta._forward_fields_map.keys():
             self.assertEqual(
                 getattr(book_with_annotated_author.annotated_author, key),
-                getattr(self.book_1.author, key),
+                getattr(self.book_1.contact, key),
             )
 
     def test_preserve_annotated_object_own_annotation(self):
@@ -60,26 +62,23 @@ class AnnotateObjectTestCase(TestCase):
 
         book_1_id = self.book_1.id
 
-        author_queryset = Author.objects\
-            .filter(id=OuterRef('author__id'))\
-            .annotate(
-                greeting=Value(greeting, output_field=CharField())
-            )
+        author_queryset = Author.objects.annotate(greeting=Value(greeting, output_field=CharField()))
 
         book_with_annotated_author = Book.objects\
             .annotate_object(
                 field_name='annotated_author',
-                queryset=author_queryset
+                queryset=author_queryset,
+                related_object_id=OuterRef('contact__id')
             ).get(
                 id=book_1_id
             )
 
         self.assertEqual(book_with_annotated_author, self.book_1)
-        self.assertEqual(book_with_annotated_author.annotated_author, self.book_1.author)
+        self.assertEqual(book_with_annotated_author.annotated_author, self.book_1.contact)
         self.assertEqual(greeting, book_with_annotated_author.annotated_author.greeting)
 
-        for key, value in self.book_1.author.__dict__:
+        for key in Author._meta._forward_fields_map.keys():
             self.assertEqual(
                 getattr(book_with_annotated_author.annotated_author, key),
-                getattr(self.book_1.author, key),
+                getattr(self.book_1.contact, key),
             )
