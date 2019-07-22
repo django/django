@@ -959,6 +959,10 @@ class QuerySet:
             clone._prefetch_related_lookups = clone._prefetch_related_lookups + lookups
         return clone
 
+    def annotate_object(self, field_name, queryset):
+        # TODO: Implement
+        return self
+
     def annotate(self, *args, **kwargs):
         """
         Return a query set in which the returned objects have been annotated
