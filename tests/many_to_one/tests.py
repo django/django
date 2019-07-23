@@ -168,6 +168,18 @@ class ManyToOneTests(TestCase):
         parent.bestchild_id = child2.pk
         self.assertTrue(Parent.bestchild.is_cached(parent))
 
+    def test_assign_fk_id_none(self):
+        parent = Parent.objects.create(name='jeff')
+        child = Child.objects.create(name='frank', parent=parent)
+        parent.bestchild = child
+        parent.save()
+        parent.bestchild_id = None
+        parent.save()
+        self.assertIsNone(parent.bestchild_id)
+        self.assertFalse(Parent.bestchild.is_cached(parent))
+        self.assertIsNone(parent.bestchild)
+        self.assertTrue(Parent.bestchild.is_cached(parent))
+
     def test_selects(self):
         self.r.article_set.create(headline="John's second story", pub_date=datetime.date(2005, 7, 29))
         self.r2.article_set.create(headline="Paul's story", pub_date=datetime.date(2006, 1, 17))

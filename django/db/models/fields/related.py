@@ -19,9 +19,9 @@ from django.utils.translation import gettext_lazy as _
 from . import Field
 from .mixins import FieldCacheMixin
 from .related_descriptors import (
-    ForwardManyToOneDescriptor, ForwardOneToOneDescriptor,
-    ManyToManyDescriptor, ReverseManyToOneDescriptor,
-    ReverseOneToOneDescriptor,
+    ForeignKeyDeferredAttribute, ForwardManyToOneDescriptor,
+    ForwardOneToOneDescriptor, ManyToManyDescriptor,
+    ReverseManyToOneDescriptor, ReverseOneToOneDescriptor,
 )
 from .related_lookups import (
     RelatedExact, RelatedGreaterThan, RelatedGreaterThanOrEqual, RelatedIn,
@@ -764,7 +764,7 @@ class ForeignKey(ForeignObject):
     By default ForeignKey will target the pk of the remote model but this
     behavior can be changed by using the ``to_field`` argument.
     """
-
+    descriptor_class = ForeignKeyDeferredAttribute
     # Field flags
     many_to_many = False
     many_to_one = True

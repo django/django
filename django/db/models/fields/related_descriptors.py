@@ -67,7 +67,15 @@ from django.core.exceptions import FieldError
 from django.db import connections, router, transaction
 from django.db.models import Q, signals
 from django.db.models.query import QuerySet
+from django.db.models.query_utils import DeferredAttribute
 from django.utils.functional import cached_property
+
+
+class ForeignKeyDeferredAttribute(DeferredAttribute):
+    def __set__(self, instance, value):
+        if instance.__dict__.get(self.field.attname) != value and self.field.is_cached(instance):
+            self.field.delete_cached_value(instance)
+        instance.__dict__[self.field.attname] = value
 
 
 class ForwardManyToOneDescriptor:

@@ -490,6 +490,10 @@ Miscellaneous
 * ``intword`` template filter now translates ``1.0`` as a singular phrase and
   all other numeric values as plural. This may be incorrect for some languages.
 
+* Assigning a value to a model's :class:`~django.db.models.ForeignKey` or
+  :class:`~django.db.models.OneToOneField` ``'_id'`` attribute now unsets the
+  corresponding field. Accessing the field afterwards will result in a query.
+
 .. _deprecated-features-3.0:
 
 Features deprecated in 3.0
