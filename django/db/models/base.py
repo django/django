@@ -457,11 +457,6 @@ class Model(metaclass=ModelBase):
                             val = kwargs.pop(field.attname)
                         except KeyError:
                             val = field.get_default()
-                    else:
-                        # Object instance was passed in. Special case: You can
-                        # pass in "None" for related objects if it's allowed.
-                        if rel_obj is None and field.null:
-                            val = None
                 else:
                     try:
                         val = kwargs.pop(field.attname)
