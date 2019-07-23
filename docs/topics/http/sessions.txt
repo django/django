@@ -658,7 +658,7 @@ session for their account. If the attacker has control over ``bad.example.com``,
 they can use it to send their session key to you since a subdomain is permitted
 to set cookies on ``*.example.com``. When you visit ``good.example.com``,
 you'll be logged in as the attacker and might inadvertently enter your
-sensitive personal data (e.g. credit card info) into the attackers account.
+sensitive personal data (e.g. credit card info) into the attacker's account.
 
 Another possible attack would be if ``good.example.com`` sets its
 :setting:`SESSION_COOKIE_DOMAIN` to ``"example.com"`` which would cause
