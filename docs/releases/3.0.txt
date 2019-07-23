@@ -283,6 +283,10 @@ Models
   :class:`~django.db.models.Index` now support app label and class
   interpolation using the ``'%(app_label)s'`` and ``'%(class)s'`` placeholders.
 
+* The new :attr:`.Field.descriptor_class` attribute allows model fields to
+  customize the get and set behavior by overriding their
+  :py:ref:`descriptors <descriptors>`.
+
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 

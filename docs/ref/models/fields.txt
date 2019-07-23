@@ -1793,6 +1793,16 @@ Field API reference
 
         where the arguments are interpolated from the field's ``__dict__``.
 
+    .. attribute:: descriptor_class
+
+        .. versionadded:: 3.0
+
+        A class implementing the :py:ref:`descriptor protocol <descriptors>`
+        that is instantiated and assigned to the model instance attribute. The
+        constructor must accept a single argument, the ``Field`` instance.
+        Overriding this class attribute allows for customizing the get and set
+        behavior.
+
     To map a ``Field`` to a database-specific type, Django exposes several
     methods:
 
