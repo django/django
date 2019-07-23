@@ -97,7 +97,6 @@ class CursorWrapper:
 
 class DatabaseWrapper(BaseDatabaseWrapper):
     vendor = 'mysql'
-    display_name = 'MySQL'
     # This dictionary maps Field objects to their associated MySQL column
     # types, as strings. Column-type strings can contain format strings; they'll
     # be interpolated against the values of Field.__dict__ before being output.
@@ -328,6 +327,10 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             return False
         else:
             return True
+
+    @cached_property
+    def display_name(self):
+        return 'MariaDB' if self.mysql_is_mariadb else 'MySQL'
 
     @cached_property
     def data_type_check_constraints(self):
