@@ -738,7 +738,7 @@ class Field(RegisterLookupMixin):
             # if you have a classmethod and a field with the same name, then
             # such fields can't be deferred (we don't have a check for this).
             if not getattr(cls, self.attname, None):
-                setattr(cls, self.attname, DeferredAttribute(self.attname))
+                setattr(cls, self.attname, DeferredAttribute(self))
         if self.choices is not None:
             setattr(cls, 'get_%s_display' % self.name,
                     partialmethod(cls._get_FIELD_display, field=self))
