@@ -20,7 +20,7 @@ class InsertVar:
         'PositiveIntegerField': int,
         'FloatField': Database.NATIVE_FLOAT,
         'DateTimeField': Database.TIMESTAMP,
-        'DateField': Database.DATETIME,
+        'DateField': Database.Date,
         'DecimalField': Database.NUMBER,
     }
 
