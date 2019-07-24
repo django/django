@@ -448,13 +448,19 @@ backends.
   :class:`~django.db.models.DateTimeField` in ``datetime_cast_date_sql()``,
   ``datetime_extract_sql()``, etc.
 
-* ``DatabaseOperations.return_insert_id()`` now requires an additional
-  ``field`` argument with the model field.
-
 * Entries for ``AutoField``, ``BigAutoField``, and ``SmallAutoField`` are added
   to  ``DatabaseOperations.integer_field_ranges`` to support the integer range
   validators on these field types. Third-party backends may need to customize
   the default entries.
+
+* ``DatabaseOperations.fetch_returned_insert_id()`` is replaced by
+  ``fetch_returned_insert_columns()`` which returns a list of values returned
+  by the ``INSERT … RETURNING`` statement, instead of a single value.
+
+* ``DatabaseOperations.return_insert_id()`` is replaced by
+  ``return_insert_columns()`` that accepts a ``fields``
+  argument, which is an iterable of fields to be returned after insert. Usually
+  this is only the auto-generated primary key.
 
 :mod:`django.contrib.admin`
 ---------------------------

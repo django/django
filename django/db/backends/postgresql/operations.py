@@ -76,13 +76,12 @@ class DatabaseOperations(BaseDatabaseOperations):
     def deferrable_sql(self):
         return " DEFERRABLE INITIALLY DEFERRED"
 
-    def fetch_returned_insert_ids(self, cursor):
+    def fetch_returned_insert_rows(self, cursor):
         """
         Given a cursor object that has just performed an INSERT...RETURNING
-        statement into a table that has an auto-incrementing ID, return the
-        list of newly created IDs.
+        statement into a table, return the tuple of returned data.
         """
-        return [item[0] for item in cursor.fetchall()]
+        return cursor.fetchall()
 
     def lookup_cast(self, lookup_type, internal_type=None):
         lookup = '%s'
@@ -236,8 +235,16 @@ class DatabaseOperations(BaseDatabaseOperations):
             return cursor.query.decode()
         return None
 
-    def return_insert_id(self, field):
-        return "RETURNING %s", ()
+    def return_insert_columns(self, fields):
+        if not fields:
+            return '', ()
+        columns = [
+            '%s.%s' % (
+                self.quote_name(field.model._meta.db_table),
+                self.quote_name(field.column),
+            ) for field in fields
+        ]
+        return 'RETURNING %s' % ', '.join(columns), ()
 
     def bulk_insert_sql(self, fields, placeholder_rows):
         placeholder_rows_sql = (", ".join(row) for row in placeholder_rows)

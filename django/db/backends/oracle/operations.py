@@ -248,7 +248,7 @@ END;
     def deferrable_sql(self):
         return " DEFERRABLE INITIALLY DEFERRED"
 
-    def fetch_returned_insert_id(self, cursor):
+    def fetch_returned_insert_columns(self, cursor):
         value = cursor._insert_id_var.getvalue()
         if value is None or value == []:
             # cx_Oracle < 6.3 returns None, >= 6.3 returns empty list.
@@ -258,7 +258,7 @@ END;
                 'Oracle OCI library (see https://code.djangoproject.com/ticket/28859).'
             )
         # cx_Oracle < 7 returns value, >= 7 returns list with single value.
-        return value[0] if isinstance(value, list) else value
+        return value if isinstance(value, list) else [value]
 
     def field_cast_sql(self, db_type, internal_type):
         if db_type and db_type.endswith('LOB'):
@@ -341,8 +341,14 @@ END;
             match_option = "'i'"
         return 'REGEXP_LIKE(%%s, %%s, %s)' % match_option
 
-    def return_insert_id(self, field):
-        return 'RETURNING %s INTO %%s', (InsertVar(field),)
+    def return_insert_columns(self, fields):
+        if not fields:
+            return '', ()
+        sql = 'RETURNING %s.%s INTO %%s' % (
+            self.quote_name(fields[0].model._meta.db_table),
+            self.quote_name(fields[0].column),
+        )
+        return sql, (InsertVar(fields[0]),)
 
     def __foreign_key_constraints(self, table_name, recursive):
         with self.connection.cursor() as cursor:

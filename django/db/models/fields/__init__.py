@@ -735,6 +735,14 @@ class Field(RegisterLookupMixin):
     def db_tablespace(self):
         return self._db_tablespace or settings.DEFAULT_INDEX_TABLESPACE
 
+    @property
+    def db_returning(self):
+        """
+        Private API intended only to be used by Django itself. Currently only
+        the PostgreSQL backend supports returning multiple fields on a model.
+        """
+        return False
+
     def set_attributes_from_name(self, name):
         self.name = self.name or name
         self.attname, self.column = self.get_attname_column()
@@ -2311,6 +2319,7 @@ class UUIDField(Field):
 
 
 class AutoFieldMixin:
+    db_returning = True
 
     def __init__(self, *args, **kwargs):
         kwargs['blank'] = True
