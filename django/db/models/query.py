@@ -401,7 +401,7 @@ class QuerySet:
         Perform the query and return a single object matching the given
         keyword arguments.
         """
-        clone = self.filter(*args, **kwargs)
+        clone = self._chain() if self.query.combinator else self.filter(*args, **kwargs)
         if self.query.can_filter() and not self.query.distinct_fields:
             clone = clone.order_by()
         limit = None
@@ -890,6 +890,7 @@ class QuerySet:
         Return a new QuerySet instance with the args ANDed to the existing
         set.
         """
+        self._not_support_combined_queries('filter')
         return self._filter_or_exclude(False, *args, **kwargs)
 
     def exclude(self, *args, **kwargs):
@@ -897,6 +898,7 @@ class QuerySet:
         Return a new QuerySet instance with NOT (args) ANDed to the existing
         set.
         """
+        self._not_support_combined_queries('exclude')
         return self._filter_or_exclude(True, *args, **kwargs)
 
     def _filter_or_exclude(self, negate, *args, **kwargs):
@@ -985,7 +987,7 @@ class QuerySet:
 
         If select_related(None) is called, clear the list.
         """
-
+        self._not_support_combined_queries('select_related')
         if self._fields is not None:
             raise TypeError("Cannot call select_related() after .values() or .values_list()")
 
@@ -1007,6 +1009,7 @@ class QuerySet:
         When prefetch_related() is called more than once, append to the list of
         prefetch lookups. If prefetch_related(None) is called, clear the list.
         """
+        self._not_support_combined_queries('prefetch_related')
         clone = self._chain()
         if lookups == (None,):
             clone._prefetch_related_lookups = ()
@@ -1025,6 +1028,7 @@ class QuerySet:
         Return a query set in which the returned objects have been annotated
         with extra data or aggregations.
         """
+        self._not_support_combined_queries('annotate')
         self._validate_values_are_expressions(args + tuple(kwargs.values()), method_name='annotate')
         annotations = {}
         for arg in args:
@@ -1088,6 +1092,7 @@ class QuerySet:
     def extra(self, select=None, where=None, params=None, tables=None,
               order_by=None, select_params=None):
         """Add extra SQL fragments to the query."""
+        self._not_support_combined_queries('extra')
         assert self.query.can_filter(), \
             "Cannot change a query once a slice has been taken"
         clone = self._chain()
@@ -1109,6 +1114,7 @@ class QuerySet:
         The only exception to this is if None is passed in as the only
         parameter, in which case removal all deferrals.
         """
+        self._not_support_combined_queries('defer')
         if self._fields is not None:
             raise TypeError("Cannot call defer() after .values() or .values_list()")
         clone = self._chain()
@@ -1124,6 +1130,7 @@ class QuerySet:
         method and that are not already specified as deferred are loaded
         immediately when the queryset is evaluated.
         """
+        self._not_support_combined_queries('only')
         if self._fields is not None:
             raise TypeError("Cannot call only() after .values() or .values_list()")
         if fields == (None,):
@@ -1310,6 +1317,13 @@ class QuerySet:
                     method_name,
                     ', '.join(invalid_args),
                 )
+            )
+
+    def _not_support_combined_queries(self, operation_name):
+        if self.query.combinator:
+            raise NotSupportedError(
+                'Calling QuerySet.%s() after %s() is not supported.'
+                % (operation_name, self.query.combinator)
             )
 
 
