@@ -10,8 +10,15 @@ class InsertVar:
     insert statement.
     """
     types = {
+        'AutoField': int,
+        'BigAutoField': int,
+        'SmallAutoField': int,
+        'IntegerField': int,
+        'BigIntegerField': int,
+        'SmallIntegerField': int,
+        'PositiveSmallIntegerField': int,
+        'PositiveIntegerField': int,
         'FloatField': Database.NATIVE_FLOAT,
-        'CharField': str,
         'DateTimeField': Database.TIMESTAMP,
         'DateField': Database.DATETIME,
         'DecimalField': Database.NUMBER,
@@ -19,7 +26,7 @@ class InsertVar:
 
     def __init__(self, field):
         internal_type = getattr(field, 'target_field', field).get_internal_type()
-        self.db_type = self.types.get(internal_type, int)
+        self.db_type = self.types.get(internal_type, str)
 
     def bind_parameter(self, cursor):
         param = cursor.cursor.var(self.db_type)
