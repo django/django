@@ -418,15 +418,6 @@ class ReloaderTests(SimpleTestCase):
 class IntegrationTests:
     @mock.patch('django.utils.autoreload.BaseReloader.notify_file_changed')
     @mock.patch('django.utils.autoreload.iter_all_python_module_files', return_value=frozenset())
-    def test_file(self, mocked_modules, notify_mock):
-        self.reloader.watch_file(self.existing_file)
-        with self.tick_twice():
-            self.increment_mtime(self.existing_file)
-        self.assertEqual(notify_mock.call_count, 1)
-        self.assertCountEqual(notify_mock.call_args[0], [self.existing_file])
-
-    @mock.patch('django.utils.autoreload.BaseReloader.notify_file_changed')
-    @mock.patch('django.utils.autoreload.iter_all_python_module_files', return_value=frozenset())
     def test_glob(self, mocked_modules, notify_mock):
         non_py_file = self.ensure_file(self.tempdir / 'non_py_file')
         self.reloader.watch_dir(self.tempdir, '*.py')
@@ -507,15 +498,6 @@ class IntegrationTests:
 
 class BaseReloaderTests(ReloaderTests):
     RELOADER_CLS = autoreload.BaseReloader
-
-    def test_watch_without_absolute(self):
-        with self.assertRaisesMessage(ValueError, 'test.py must be absolute.'):
-            self.reloader.watch_file('test.py')
-
-    def test_watch_with_single_file(self):
-        self.reloader.watch_file(self.existing_file)
-        watched_files = list(self.reloader.watched_files())
-        self.assertIn(self.existing_file, watched_files)
 
     def test_watch_with_glob(self):
         self.reloader.watch_dir(self.tempdir, '*.py')

@@ -245,13 +245,6 @@ class BaseReloader:
         logger.debug('Watching dir %s with glob %s.', path, glob)
         self.directory_globs[path].add(glob)
 
-    def watch_file(self, path):
-        path = Path(path)
-        if not path.is_absolute():
-            raise ValueError('%s must be absolute.' % path)
-        logger.debug('Watching file %s.', path)
-        self.extra_files.add(path)
-
     def watched_files(self, include_globs=True):
         """
         Yield all files that need to be watched, including module files and
