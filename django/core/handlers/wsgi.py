@@ -141,7 +141,7 @@ class WSGIHandler(base.BaseHandler):
         ]
         start_response(status, response_headers)
         if getattr(response, 'file_to_stream', None) is not None and environ.get('wsgi.file_wrapper'):
-            response = environ['wsgi.file_wrapper'](response.file_to_stream)
+            response = environ['wsgi.file_wrapper'](response.file_to_stream, response.block_size)
         return response
 
 
