@@ -49,17 +49,18 @@ class Index:
         # it's handled outside of that class, the work is done here.
         return sql % tuple(map(schema_editor.quote_value, params))
 
-    def create_sql(self, model, schema_editor, using=''):
+    def create_sql(self, model, schema_editor, using='', **kwargs):
         fields = [model._meta.get_field(field_name) for field_name, _ in self.fields_orders]
         col_suffixes = [order[1] for order in self.fields_orders]
         condition = self._get_condition_sql(model, schema_editor)
         return schema_editor._create_index_sql(
             model, fields, name=self.name, using=using, db_tablespace=self.db_tablespace,
             col_suffixes=col_suffixes, opclasses=self.opclasses, condition=condition,
+            **kwargs,
         )
 
-    def remove_sql(self, model, schema_editor):
-        return schema_editor._delete_index_sql(model, self.name)
+    def remove_sql(self, model, schema_editor, **kwargs):
+        return schema_editor._delete_index_sql(model, self.name, **kwargs)
 
     def deconstruct(self):
         path = '%s.%s' % (self.__class__.__module__, self.__class__.__name__)

@@ -13,7 +13,11 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
     sql_set_sequence_owner = 'ALTER SEQUENCE %(sequence)s OWNED BY %(table)s.%(column)s'
 
     sql_create_index = "CREATE INDEX %(name)s ON %(table)s%(using)s (%(columns)s)%(extra)s%(condition)s"
+    sql_create_index_concurrently = (
+        "CREATE INDEX CONCURRENTLY %(name)s ON %(table)s%(using)s (%(columns)s)%(extra)s%(condition)s"
+    )
     sql_delete_index = "DROP INDEX IF EXISTS %(name)s"
+    sql_delete_index_concurrently = "DROP INDEX CONCURRENTLY IF EXISTS %(name)s"
 
     sql_create_column_inline_fk = 'REFERENCES %(to_table)s(%(to_column)s)%(deferrable)s'
     # Setting the constraint to IMMEDIATE runs any deferred checks to allow
@@ -157,3 +161,24 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         if opclasses:
             return IndexColumns(table, columns, self.quote_name, col_suffixes=col_suffixes, opclasses=opclasses)
         return super()._index_columns(table, columns, col_suffixes, opclasses)
+
+    def add_index(self, model, index, concurrently=False):
+        self.execute(index.create_sql(model, self, concurrently=concurrently), params=None)
+
+    def remove_index(self, model, index, concurrently=False):
+        self.execute(index.remove_sql(model, self, concurrently=concurrently))
+
+    def _delete_index_sql(self, model, name, sql=None, concurrently=False):
+        sql = self.sql_delete_index_concurrently if concurrently else self.sql_delete_index
+        return super()._delete_index_sql(model, name, sql)
+
+    def _create_index_sql(
+        self, model, fields, *, name=None, suffix='', using='',
+        db_tablespace=None, col_suffixes=(), sql=None, opclasses=(),
+        condition=None, concurrently=False,
+    ):
+        sql = self.sql_create_index if not concurrently else self.sql_create_index_concurrently
+        return super()._create_index_sql(
+            model, fields, name=name, suffix=suffix, using=using, db_tablespace=db_tablespace,
+            col_suffixes=col_suffixes, sql=sql, opclasses=opclasses, condition=condition,
+        )

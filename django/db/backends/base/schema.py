@@ -959,9 +959,9 @@ class BaseDatabaseSchemaEditor:
             condition=(' WHERE ' + condition) if condition else '',
         )
 
-    def _delete_index_sql(self, model, name):
+    def _delete_index_sql(self, model, name, sql=None):
         return Statement(
-            self.sql_delete_index,
+            sql or self.sql_delete_index,
             table=Table(model._meta.db_table, self.quote_name),
             name=self.quote_name(name),
         )

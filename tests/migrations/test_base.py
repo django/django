@@ -13,8 +13,6 @@ from django.test import TransactionTestCase
 from django.test.utils import extend_sys_path
 from django.utils.module_loading import module_dir
 
-from .models import FoodManager, FoodQuerySet
-
 
 class MigrationTestBase(TransactionTestCase):
     """
@@ -57,14 +55,14 @@ class MigrationTestBase(TransactionTestCase):
     def assertColumnNotNull(self, table, column, using='default'):
         self.assertEqual(self._get_column_allows_null(table, column, using), False)
 
-    def assertIndexExists(self, table, columns, value=True, using='default'):
+    def assertIndexExists(self, table, columns, value=True, using='default', index_type=None):
         with connections[using].cursor() as cursor:
             self.assertEqual(
                 value,
                 any(
                     c["index"]
                     for c in connections[using].introspection.get_constraints(cursor, table).values()
-                    if c['columns'] == list(columns)
+                    if c['columns'] == list(columns) and (index_type is None or c['type'] == index_type)
                 ),
             )
 
@@ -266,6 +264,7 @@ class OperationTestBase(MigrationTestBase):
                 bases=['%s.Pony' % app_label],
             ))
         if manager_model:
+            from .models import FoodManager, FoodQuerySet
             operations.append(migrations.CreateModel(
                 'Food',
                 fields=[
