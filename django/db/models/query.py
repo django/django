@@ -635,7 +635,7 @@ class QuerySet:
                 "arguments or 'get_latest_by' in the model's Meta."
             )
 
-        assert self.query.can_filter(), \
+        assert not self.query.is_sliced, \
             "Cannot change a query once a slice has been taken."
         obj = self._chain()
         obj.query.set_limits(high=1)
@@ -664,7 +664,7 @@ class QuerySet:
         Return a dictionary mapping each of the given IDs to the object with
         that ID. If `id_list` isn't provided, evaluate the entire QuerySet.
         """
-        assert self.query.can_filter(), \
+        assert not self.query.is_sliced, \
             "Cannot use 'limit' or 'offset' with in_bulk"
         if field_name != 'pk' and not self.model._meta.get_field(field_name).unique:
             raise ValueError("in_bulk()'s field_name must be a unique field but %r isn't." % field_name)
@@ -689,7 +689,7 @@ class QuerySet:
 
     def delete(self):
         """Delete the records in the current QuerySet."""
-        assert self.query.can_filter(), \
+        assert not self.query.is_sliced, \
             "Cannot use 'limit' or 'offset' with delete."
 
         if self._fields is not None:
@@ -731,7 +731,7 @@ class QuerySet:
         Update all elements in the current QuerySet, setting all the given
         fields to the appropriate values.
         """
-        assert self.query.can_filter(), \
+        assert not self.query.is_sliced, \
             "Cannot update a query once a slice has been taken."
         self._for_write = True
         query = self.query.chain(sql.UpdateQuery)
@@ -751,7 +751,7 @@ class QuerySet:
         code (it requires too much poking around at model internals to be
         useful at that level).
         """
-        assert self.query.can_filter(), \
+        assert not self.query.is_sliced, \
             "Cannot update a query once a slice has been taken."
         query = self.query.chain(sql.UpdateQuery)
         query.add_update_fields(values)
@@ -903,7 +903,7 @@ class QuerySet:
 
     def _filter_or_exclude(self, negate, *args, **kwargs):
         if args or kwargs:
-            assert self.query.can_filter(), \
+            assert not self.query.is_sliced, \
                 "Cannot filter a query once a slice has been taken."
 
         clone = self._chain()
@@ -1072,7 +1072,7 @@ class QuerySet:
 
     def order_by(self, *field_names):
         """Return a new QuerySet instance with the ordering changed."""
-        assert self.query.can_filter(), \
+        assert not self.query.is_sliced, \
             "Cannot reorder a query once a slice has been taken."
         obj = self._chain()
         obj.query.clear_ordering(force_empty=False)
@@ -1083,7 +1083,7 @@ class QuerySet:
         """
         Return a new QuerySet instance that will select only distinct results.
         """
-        assert self.query.can_filter(), \
+        assert not self.query.is_sliced, \
             "Cannot create distinct fields once a slice has been taken."
         obj = self._chain()
         obj.query.add_distinct_fields(*field_names)
@@ -1093,7 +1093,7 @@ class QuerySet:
               order_by=None, select_params=None):
         """Add extra SQL fragments to the query."""
         self._not_support_combined_queries('extra')
-        assert self.query.can_filter(), \
+        assert not self.query.is_sliced, \
             "Cannot change a query once a slice has been taken"
         clone = self._chain()
         clone.query.add_extra(select, select_params, where, params, tables, order_by)
@@ -1101,7 +1101,7 @@ class QuerySet:
 
     def reverse(self):
         """Reverse the ordering of the QuerySet."""
-        if not self.query.can_filter():
+        if self.query.is_sliced:
             raise TypeError('Cannot reverse a query once a slice has been taken.')
         clone = self._chain()
         clone.query.standard_ordering = not clone.query.standard_ordering
