@@ -2,7 +2,7 @@ from django.db import connection, migrations, models
 from django.db.migrations.state import ProjectState
 from django.test import override_settings
 
-from .test_operations import OperationTestBase
+from .test_base import OperationTestBase
 
 
 class AgnosticRouter:
