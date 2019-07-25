@@ -2,9 +2,9 @@
 Django 2.2.4 release notes
 ==========================
 
-*Expected August 1, 2019*
+*August 1, 2019*
 
-Django 2.2.4 fixes several bugs in 2.2.3.
+Django 2.2.4 fixes security issues and several bugs in 2.2.3.
 
 Bugfixes
 ========

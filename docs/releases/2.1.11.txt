@@ -1,0 +1,7 @@
+===========================
+Django 2.1.11 release notes
+===========================
+
+*August 1, 2019*
+
+Django 2.1.11 fixes security issues in 2.1.10.
