@@ -1,0 +1,7 @@
+============================
+Django 1.11.23 release notes
+============================
+
+*August 1, 2019*
+
+Django 1.11.23 fixes security issues in 1.11.22.
