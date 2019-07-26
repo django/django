@@ -341,8 +341,13 @@ it on a ``QuerySet`` by calling
 
 Adding an index to your database may help to improve ordering performance.
 
-Insert in bulk
-==============
+Use bulk methods
+================
+
+Use bulk methods to reduce the number of SQL statements.
+
+Create in bulk
+--------------
 
 When creating objects, where possible, use the
 :meth:`~django.db.models.query.QuerySet.bulk_create()` method to reduce the
@@ -362,8 +367,13 @@ Note that there are a number of :meth:`caveats to this method
 <django.db.models.query.QuerySet.bulk_create>`, so make sure it's appropriate
 for your use case.
 
-This also applies to :class:`ManyToManyFields
-<django.db.models.ManyToManyField>`, so doing::
+Insert in bulk
+--------------
+
+When inserting objects into :class:`ManyToManyFields
+<django.db.models.ManyToManyField>`, use
+:meth:`~django.db.models.fields.related.RelatedManager.add` with multiple
+objects to reduce the number of SQL queries. For example::
 
     my_band.members.add(me, my_friend)
 
