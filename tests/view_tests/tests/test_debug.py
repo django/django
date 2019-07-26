@@ -415,9 +415,18 @@ class ExceptionReporterTests(SimpleTestCase):
         self.assertEqual(last_frame['function'], 'funcName')
         self.assertEqual(last_frame['lineno'], 2)
         html = reporter.get_traceback_html()
-        self.assertIn('generated in funcName', html)
+        self.assertIn('generated in funcName, line 2', html)
+        self.assertIn(
+            '"generated", line 2, in funcName\n'
+            '    &lt;source code not available&gt;',
+            html,
+        )
         text = reporter.get_traceback_text()
-        self.assertIn('"generated" in funcName', text)
+        self.assertIn(
+            '"generated", line 2, in funcName\n'
+            '    <source code not available>',
+            text,
+        )
 
     def test_reporting_frames_for_cyclic_reference(self):
         try:
@@ -698,7 +707,7 @@ class PlainTextReportTests(SimpleTestCase):
         self.assertIn('USER: jacob', text)
         self.assertIn('Exception Type:', text)
         self.assertIn('Exception Value:', text)
-        self.assertIn('Traceback:', text)
+        self.assertIn('Traceback (most recent call last):', text)
         self.assertIn('Request information:', text)
         self.assertNotIn('Request data not supplied', text)
 
@@ -717,7 +726,7 @@ class PlainTextReportTests(SimpleTestCase):
         self.assertNotIn('USER:', text)
         self.assertIn('Exception Type:', text)
         self.assertIn('Exception Value:', text)
-        self.assertIn('Traceback:', text)
+        self.assertIn('Traceback (most recent call last):', text)
         self.assertIn('Request data not supplied', text)
 
     def test_no_exception(self):
