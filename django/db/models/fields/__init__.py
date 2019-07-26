@@ -38,8 +38,8 @@ __all__ = [
     'EmailField', 'Empty', 'Field', 'FieldDoesNotExist', 'FilePathField',
     'FloatField', 'GenericIPAddressField', 'IPAddressField', 'IntegerField',
     'NOT_PROVIDED', 'NullBooleanField', 'PositiveIntegerField',
-    'PositiveSmallIntegerField', 'SlugField', 'SmallIntegerField', 'TextField',
-    'TimeField', 'URLField', 'UUIDField',
+    'PositiveSmallIntegerField', 'SlugField', 'SmallAutoField',
+    'SmallIntegerField', 'TextField', 'TimeField', 'URLField', 'UUIDField',
 ]
 
 
@@ -983,6 +983,16 @@ class BigAutoField(AutoField):
 
     def rel_db_type(self, connection):
         return BigIntegerField().db_type(connection=connection)
+
+
+class SmallAutoField(AutoField):
+    description = _('Small integer')
+
+    def get_internal_type(self):
+        return 'SmallAutoField'
+
+    def rel_db_type(self, connection):
+        return SmallIntegerField().db_type(connection=connection)
 
 
 class BooleanField(Field):

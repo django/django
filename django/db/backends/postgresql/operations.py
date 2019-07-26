@@ -11,6 +11,7 @@ class DatabaseOperations(BaseDatabaseOperations):
     cast_data_types = {
         'AutoField': 'integer',
         'BigAutoField': 'bigint',
+        'SmallAutoField': 'smallint',
     }
 
     def unification_cast_sql(self, output_field):

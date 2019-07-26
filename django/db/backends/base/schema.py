@@ -182,7 +182,7 @@ class BaseDatabaseSchemaEditor:
             ))
             # Autoincrement SQL (for backends with post table definition
             # variant).
-            if field.get_internal_type() in ('AutoField', 'BigAutoField'):
+            if field.get_internal_type() in ('AutoField', 'BigAutoField', 'SmallAutoField'):
                 autoinc_sql = self.connection.ops.autoinc_sql(model._meta.db_table, field.column)
                 if autoinc_sql:
                     self.deferred_sql.extend(autoinc_sql)

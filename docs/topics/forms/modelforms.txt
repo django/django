@@ -110,6 +110,8 @@ Model field                         Form field
 
 :class:`SlugField`                  :class:`~django.forms.SlugField`
 
+:class:`SmallAutoField`             Not represented in the form
+
 :class:`SmallIntegerField`          :class:`~django.forms.IntegerField`
 
 :class:`TextField`                  :class:`~django.forms.CharField` with

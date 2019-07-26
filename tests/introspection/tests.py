@@ -5,7 +5,9 @@ from django.db.models import Index
 from django.db.utils import DatabaseError
 from django.test import TransactionTestCase, skipUnlessDBFeature
 
-from .models import Article, ArticleReporter, City, Comment, District, Reporter
+from .models import (
+    Article, ArticleReporter, City, Comment, Country, District, Reporter,
+)
 
 
 class IntrospectionTests(TransactionTestCase):
@@ -112,6 +114,15 @@ class IntrospectionTests(TransactionTestCase):
             desc = connection.introspection.get_table_description(cursor, City._meta.db_table)
         self.assertIn(
             connection.features.introspected_big_auto_field_type,
+            [connection.introspection.get_field_type(r[1], r) for r in desc],
+        )
+
+    @skipUnlessDBFeature('can_introspect_autofield')
+    def test_smallautofield(self):
+        with connection.cursor() as cursor:
+            desc = connection.introspection.get_table_description(cursor, Country._meta.db_table)
+        self.assertIn(
+            connection.features.introspected_small_auto_field_type,
             [connection.introspection.get_field_type(r[1], r) for r in desc],
         )
 

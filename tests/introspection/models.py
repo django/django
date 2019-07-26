@@ -9,6 +9,11 @@ class City(models.Model):
         return self.name
 
 
+class Country(models.Model):
+    id = models.SmallAutoField(primary_key=True)
+    name = models.CharField(max_length=50)
+
+
 class District(models.Model):
     city = models.ForeignKey(City, models.CASCADE, primary_key=True)
     name = models.CharField(max_length=50)

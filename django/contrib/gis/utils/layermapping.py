@@ -61,6 +61,7 @@ class LayerMapping:
     FIELD_TYPES = {
         models.AutoField: OFTInteger,
         models.BigAutoField: OFTInteger64,
+        models.SmallAutoField: OFTInteger,
         models.BooleanField: (OFTInteger, OFTReal, OFTString),
         models.IntegerField: (OFTInteger, OFTReal, OFTString),
         models.FloatField: (OFTInteger, OFTReal),

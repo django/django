@@ -1085,6 +1085,17 @@ It uses :class:`~django.core.validators.validate_slug` or
     If ``True``, the field accepts Unicode letters in addition to ASCII
     letters. Defaults to ``False``.
 
+``SmallAutoField``
+------------------
+
+.. class:: SmallAutoField(**options)
+
+.. versionadded:: 3.0
+
+Like an :class:`AutoField`, but only allows values under a certain
+(database-dependent) limit. Values from ``1`` to ``32767`` are safe in all
+databases supported by Django.
+
 ``SmallIntegerField``
 ---------------------
 

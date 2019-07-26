@@ -294,6 +294,11 @@ Models
 * :class:`~django.db.models.Avg` and :class:`~django.db.models.Sum` now support
   the ``distinct`` argument.
 
+* Added :class:`~django.db.models.SmallAutoField` which acts much like an
+  :class:`~django.db.models.AutoField` except that it only allows values under
+  a certain (database-dependent) limit. Values from ``1`` to ``32767`` are safe
+  in all databases supported by Django.
+
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 

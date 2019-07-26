@@ -143,9 +143,10 @@ class BaseDatabaseFeatures:
     # Can the backend introspect a TimeField, instead of a DateTimeField?
     can_introspect_time_field = True
 
-    # Some backends may not be able to differentiate BigAutoField from other
-    # fields such as AutoField.
+    # Some backends may not be able to differentiate BigAutoField or
+    # SmallAutoField from other fields such as AutoField.
     introspected_big_auto_field_type = 'BigAutoField'
+    introspected_small_auto_field_type = 'SmallAutoField'
 
     # Some backends may not be able to differentiate BooleanField from other
     # fields such as IntegerField.

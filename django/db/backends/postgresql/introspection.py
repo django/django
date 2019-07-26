@@ -37,6 +37,8 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                 return 'AutoField'
             elif field_type == 'BigIntegerField':
                 return 'BigAutoField'
+            elif field_type == 'SmallIntegerField':
+                return 'SmallAutoField'
         return field_type
 
     def get_table_list(self, cursor):

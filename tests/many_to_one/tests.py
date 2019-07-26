@@ -8,8 +8,9 @@ from django.test import TestCase
 from django.utils.translation import gettext_lazy
 
 from .models import (
-    Article, Category, Child, ChildNullableParent, City, District, First,
-    Parent, Record, Relation, Reporter, School, Student, Third, ToFieldChild,
+    Article, Category, Child, ChildNullableParent, City, Country, District,
+    First, Parent, Record, Relation, Reporter, School, Student, Third,
+    ToFieldChild,
 )
 
 
@@ -575,6 +576,15 @@ class ManyToOneTests(TestCase):
         ny = City.objects.create(name='New York', id=2 ** 33)
         District.objects.create(city=ny, name='Brooklyn')
         District.objects.create(city=ny, name='Manhattan')
+
+    def test_fk_to_smallautofield(self):
+        us = Country.objects.create(name='United States')
+        City.objects.create(country=us, name='Chicago')
+        City.objects.create(country=us, name='New York')
+
+        uk = Country.objects.create(name='United Kingdom', id=2 ** 11)
+        City.objects.create(country=uk, name='London')
+        City.objects.create(country=uk, name='Edinburgh')
 
     def test_multiple_foreignkeys(self):
         # Test of multiple ForeignKeys to the same model (bug #7125).

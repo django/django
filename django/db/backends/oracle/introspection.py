@@ -35,6 +35,8 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
             if scale == 0:
                 if precision > 11:
                     return 'BigAutoField' if description.is_autofield else 'BigIntegerField'
+                elif 1 < precision < 6 and description.is_autofield:
+                    return 'SmallAutoField'
                 elif precision == 1:
                     return 'BooleanField'
                 elif description.is_autofield:

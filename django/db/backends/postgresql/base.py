@@ -92,6 +92,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         'PositiveIntegerField': 'integer',
         'PositiveSmallIntegerField': 'smallint',
         'SlugField': 'varchar(%(max_length)s)',
+        'SmallAutoField': 'smallserial',
         'SmallIntegerField': 'smallint',
         'TextField': 'text',
         'TimeField': 'time',

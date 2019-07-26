@@ -56,6 +56,7 @@ END;
     cast_data_types = {
         'AutoField': 'NUMBER(11)',
         'BigAutoField': 'NUMBER(19)',
+        'SmallAutoField': 'NUMBER(5)',
         'TextField': cast_char_field_without_max_length,
     }
 

@@ -123,6 +123,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         'PositiveIntegerField': 'integer UNSIGNED',
         'PositiveSmallIntegerField': 'smallint UNSIGNED',
         'SlugField': 'varchar(%(max_length)s)',
+        'SmallAutoField': 'smallint AUTO_INCREMENT',
         'SmallIntegerField': 'smallint',
         'TextField': 'longtext',
         'TimeField': 'time(6)',
