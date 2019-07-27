@@ -280,6 +280,12 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
 
             prev = pnt  # setting the previous geometry
 
+    def test_point_reverse(self):
+        point = GEOSGeometry('POINT(144.963 -37.8143)', 4326)
+        self.assertEqual(point.srid, 4326)
+        point.reverse()
+        self.assertEqual(point.ewkt, 'SRID=4326;POINT (-37.8143 144.963)')
+
     def test_multipoints(self):
         "Testing MultiPoint objects."
         for mp in self.geometries.multipoints:
@@ -347,6 +353,12 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
 
         # Test __iter__().
         self.assertEqual(list(LineString((0, 0), (1, 1), (2, 2))), [(0, 0), (1, 1), (2, 2)])
+
+    def test_linestring_reverse(self):
+        line = GEOSGeometry('LINESTRING(144.963 -37.8143,151.2607 -33.887)', 4326)
+        self.assertEqual(line.srid, 4326)
+        line.reverse()
+        self.assertEqual(line.ewkt, 'SRID=4326;LINESTRING (151.2607 -33.887, 144.963 -37.8143)')
 
     def test_multilinestring(self):
         "Testing MultiLineString objects."
