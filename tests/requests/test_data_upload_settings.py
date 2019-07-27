@@ -23,6 +23,9 @@ class DataUploadMaxMemorySizeFormPostTests(SimpleTestCase):
         with self.settings(DATA_UPLOAD_MAX_MEMORY_SIZE=12):
             with self.assertRaisesMessage(RequestDataTooBig, TOO_MUCH_DATA_MSG):
                 self.request._load_post_and_files()
+        # Even if the exception is raised, request._body should exist to allow
+        # handling the exception later if needed.
+        self.assertTrue(hasattr(self.request, '_body'))
 
     def test_size_not_exceeded(self):
         with self.settings(DATA_UPLOAD_MAX_MEMORY_SIZE=13):

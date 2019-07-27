@@ -294,6 +294,7 @@ class HttpRequest:
             # Limit the maximum request data size that will be handled in-memory.
             if (settings.DATA_UPLOAD_MAX_MEMORY_SIZE is not None and
                     int(self.META.get('CONTENT_LENGTH') or 0) > settings.DATA_UPLOAD_MAX_MEMORY_SIZE):
+                self._body = self.read(None)
                 raise RequestDataTooBig('Request body exceeded settings.DATA_UPLOAD_MAX_MEMORY_SIZE.')
 
             try:
