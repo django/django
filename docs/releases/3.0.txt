@@ -355,6 +355,17 @@ Models
 
 * :class:`~django.db.models.CheckConstraint` is now supported on MySQL 8.0.16+.
 
+* The new ``allows_group_by_selected_pks_on_model()`` method of
+  ``django.db.backends.base.BaseDatabaseFeatures`` allows optimization of
+  ``GROUP BY`` clauses to require only the selected models' primary keys. By
+  default, it's supported only for managed models on PostgreSQL.
+
+  To enable the ``GROUP BY`` primary key-only optimization for unmanaged
+  models, you have to subclass the PostgreSQL database engine, overriding the
+  features class ``allows_group_by_selected_pks_on_model()`` method as you
+  require. See :ref:`Subclassing the built-in database backends
+  <subclassing-database-backends>` for an example.
+
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 
