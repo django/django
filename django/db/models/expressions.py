@@ -149,6 +149,8 @@ class BaseExpression:
     _output_field_resolved_to_none = False
     # Can the expression be used in a WHERE clause?
     filterable = True
+    # Can the expression allowe null values?
+    nullable = True
     # Can the expression can be used as a source expression in Window?
     window_compatible = False
 
