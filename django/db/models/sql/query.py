@@ -1296,8 +1296,8 @@ class Query(BaseExpression):
                 #   <=>
                 # NOT (col IS NOT NULL AND col = someval).
                 lookup_class = targets[0].get_lookup('isnull')
-                col = _get_col(targets[0], join_info.targets[0], alias, simple_col)
-                clause.add(lookup_class(col, False), AND)
+                if condition.lhs.nullable:
+                    clause.add(lookup_class(condition.lhs, False), AND)
         return clause, used_joins if not require_outer else ()
 
     def add_filter(self, filter_clause):

@@ -1,17 +1,17 @@
 from datetime import datetime
 
 from django.core.exceptions import FieldError
-from django.db.models import CharField, F, Q
+from django.db.models import CharField, F, IntegerField, Q
 from django.db.models.expressions import SimpleCol
 from django.db.models.fields.related_lookups import RelatedIsNull
-from django.db.models.functions import Lower
+from django.db.models.functions import Abs, Lower
 from django.db.models.lookups import Exact, GreaterThan, IsNull, LessThan
 from django.db.models.sql.query import Query
 from django.db.models.sql.where import OR
 from django.test import SimpleTestCase
 from django.test.utils import register_lookup
 
-from .models import Author, Item, ObjectC, Ranking
+from .models import Author, Item, Number, ObjectC, Ranking
 
 
 class TestQuery(SimpleTestCase):
@@ -83,6 +83,33 @@ class TestQuery(SimpleTestCase):
         lookup = where.children[1]
         self.assertIsInstance(lookup, IsNull)
         self.assertEqual(lookup.lhs.target, Item._meta.get_field('modified'))
+
+    def test_transform_negated_nullable(self):
+        with register_lookup(IntegerField, Abs):
+            query = Query(Number)
+            where = query.build_where(~Q(other_num__abs=1))
+            self.assertTrue(where.negated)
+            lookup = where.children[0]
+            self.assertIsInstance(lookup, Exact)
+            self.assertIsInstance(lookup.lhs, Abs)
+            self.assertIsInstance(lookup.lhs.lhs, SimpleCol)
+            lookup = where.children[1]
+            self.assertIsInstance(lookup, IsNull)
+            self.assertIsInstance(lookup.lhs, Abs)
+            self.assertIsInstance(lookup.lhs.lhs, SimpleCol)
+
+    def test_not_nullable_transform_negated_nullable(self):
+        class AbsNotNullable(Abs):
+            nullable = False
+        with register_lookup(IntegerField, AbsNotNullable):
+            query = Query(Number)
+            where = query.build_where(~Q(other_num__abs=1))
+            self.assertTrue(where.negated)
+            lookup = where.children[0]
+            self.assertIsInstance(lookup, Exact)
+            self.assertIsInstance(lookup.lhs, Abs)
+            self.assertIsInstance(lookup.lhs.lhs, SimpleCol)
+            self.assertEqual(len(where.children), 1)
 
     def test_foreign_key(self):
         query = Query(Item)
