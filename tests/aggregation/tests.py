@@ -388,9 +388,6 @@ class AggregateTestCase(TestCase):
         vals = Book.objects.aggregate(Count("rating"))
         self.assertEqual(vals, {"rating__count": 6})
 
-        vals = Book.objects.aggregate(Count("rating", distinct=True))
-        self.assertEqual(vals, {"rating__count": 4})
-
     def test_count_star(self):
         with self.assertNumQueries(1) as ctx:
             Book.objects.aggregate(n=Count("*"))
@@ -402,6 +399,10 @@ class AggregateTestCase(TestCase):
             distinct_ratings=Count(Case(When(pages__gt=300, then='rating')), distinct=True),
         )
         self.assertEqual(aggs['distinct_ratings'], 4)
+
+    def test_distinct_on_aggregate(self):
+        books = Book.objects.aggregate(ratings=Count('rating', distinct=True))
+        self.assertEqual(books['ratings'], 4)
 
     def test_non_grouped_annotation_not_in_group_by(self):
         """
