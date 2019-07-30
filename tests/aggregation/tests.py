@@ -401,8 +401,14 @@ class AggregateTestCase(TestCase):
         self.assertEqual(aggs['distinct_ratings'], 4)
 
     def test_distinct_on_aggregate(self):
-        books = Book.objects.aggregate(ratings=Count('rating', distinct=True))
-        self.assertEqual(books['ratings'], 4)
+        for aggregate, expected_result in (
+            (Avg, 4.125),
+            (Count, 4),
+            (Sum, 16.5),
+        ):
+            with self.subTest(aggregate=aggregate.__name__):
+                books = Book.objects.aggregate(ratings=aggregate('rating', distinct=True))
+                self.assertEqual(books['ratings'], expected_result)
 
     def test_non_grouped_annotation_not_in_group_by(self):
         """
