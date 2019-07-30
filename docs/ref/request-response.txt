@@ -1082,7 +1082,8 @@ Attributes
 
 .. attribute:: StreamingHttpResponse.streaming_content
 
-    An iterator of strings representing the content.
+    An iterator of the response content, bytestring encoded according to
+    :attr:`HttpResponse.charset`.
 
 .. attribute:: StreamingHttpResponse.status_code
 
