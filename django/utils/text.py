@@ -351,7 +351,7 @@ def _replace_entity(match):
     else:
         try:
             return chr(html.entities.name2codepoint[text])
-        except (ValueError, KeyError):
+        except KeyError:
             return match.group(0)
 
 
