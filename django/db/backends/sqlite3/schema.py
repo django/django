@@ -4,6 +4,7 @@ from decimal import Decimal
 from django.apps.registry import Apps
 from django.db.backends.base.schema import BaseDatabaseSchemaEditor
 from django.db.backends.ddl_references import Statement
+from django.db.backends.utils import strip_quotes
 from django.db.models import UniqueConstraint
 from django.db.transaction import atomic
 from django.db.utils import NotSupportedError
@@ -263,7 +264,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         body_copy = copy.deepcopy(body)
         meta_contents = {
             'app_label': model._meta.app_label,
-            'db_table': 'new__%s' % model._meta.db_table,
+            'db_table': 'new__%s' % strip_quotes(model._meta.db_table),
             'unique_together': unique_together,
             'index_together': index_together,
             'indexes': indexes,
