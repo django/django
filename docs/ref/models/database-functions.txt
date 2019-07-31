@@ -1623,6 +1623,89 @@ Usage example:
     >>> print(author.name_code_point)
     77
 
+``RegexpCount``, ``RegexpLike``, ``RegexpReplace``, ``RegexpStrIndex``, and ``RegexpSubstr``
+--------------------------------------------------------------------------------------------
+
+.. versionadded:: 5.1
+
+.. class:: RegexpCount(expression, pattern, position=1, flags=Value(''), **extra)
+
+Returns the number of times that ``pattern`` is matched in ``expression``.
+
+.. class:: RegexpLike(expression, pattern, flags=Value(''), **extra)
+
+Returns ``True`` if ``pattern`` is matched in ``expression``, else ``False``.
+
+.. class:: RegexpReplace(expression, pattern, replacement=Value(''), position=1, occurrence=1, flags=Value(''), **extra)
+
+Replaces matches of ``pattern`` with ``replacement`` in ``expression``. The
+default replacement text is an empty string.
+
+.. class:: RegexpStrIndex(expression, pattern, position=1, occurrence=1, return_option=0, flags=Value(''), **extra)
+
+Returns the offset of the first substring from ``expression`` that matches
+``pattern``.
+
+.. class:: RegexpSubstr(expression, pattern, position=1, occurrence=1, flags=Value(''), **extra)
+
+Returns the first substring from ``expression`` that matches ``pattern``.
+
+A string of ``flags`` can be provided to adjust the matching and replacement
+behavior for all of the above functions:
+
+* ``c``: Perform case-sensitive matching of ``pattern``.
+* ``i``: Perform case-insensitive matching of ``pattern``.
+* ``m``: Perform matching across multiple lines in the ``pattern``.
+* ``s``: Allow the ``.`` character to match newline characters.
+* ``x``: Enable extended (verbose) pattern (whitespace is ignored).
+
+.. admonition:: Variations between database backends
+
+    Regular expression functions have varying implementations across database
+    backends and provide different functionality. Django attempts to smooth out
+    these differences as much as possible to provide as consistent an
+    implementation as possible. It may be that certain niche features are not
+    exposed or are passed through in different ways to achieve this goal.
+
+    PostgreSQL enables *non-newline-sensitive* matching (the ``s`` flag) by
+    default. Django passes the ``p`` flag to use *partial newline-sensitive*
+    matching so that the same behavior is used on all backends.
+
+    MariaDB doesn't natively support passing ``flags`` as an argument, but
+    support is emulated by prepending ``pattern`` with inline flags, e.g.
+    ``(?i)``. It also behaves differently to other backends in that matches are
+    case-insensitive by default -- Django passes ``(?-i)`` by default to ensure
+    consistency between backends. The extended flag (``x``) is not supported.
+    It is only possible to replace all matches when using
+    :class:`RegexpReplace`, not a single match.
+
+    In addition, MariaDB supports configuring the `default flags
+    <https://mariadb.com/kb/en/server-system-variables/#default_regex_flags>`_
+    for regular expressions which may affect the default behavior of these
+    functions.
+
+    MySQL, like MariaDB, performs case-insensitive matching by default --
+    Django passes the ``c`` flag by default to ensure consistency between
+    backends. The extended flag (``x``) is not supported.
+
+    Oracle has much more limited POSIX-style regular expressions and does not
+    support features such as non-capturing groups and lookahead or lookbehind
+    assertions. When using the extended flag (``x``), the ``pattern`` does not
+    support embedded end-of-line comments unlike other backends.
+
+Usage example:
+
+.. code-block:: pycon
+
+    >>> from django.db.models import Value
+    >>> from django.db.models.functions import RegexpReplace
+    >>> Author.objects.create(name="J. R. R. Tolkien")
+    >>> Author.objects.create(name="Margaret Smith")
+    >>> Author.objects.update(name=RegexpReplace("name", "R\.", Value(""), occurrence=0))
+    1
+    >>> Author.objects.values("name")
+    <QuerySet [{'name': 'J. Tolkien'}, {'name': 'Margaret Smith'}]>
+
 ``Repeat``
 ----------
 

@@ -80,6 +80,12 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     test_now_utc_template = "STATEMENT_TIMESTAMP() AT TIME ZONE 'UTC'"
     insert_test_table_with_defaults = "INSERT INTO {} DEFAULT VALUES"
 
+    # Force partial newline-sensitive matching by default for consistency.
+    regexp_functions_flags_default = "p"
+    # The `m` flag is supported for newline-sensitive matching, but it is
+    # considered a historical synonym for `n` in PostgreSQL.
+    regexp_functions_flags_mapping = {"m": "n"}
+
     django_test_skips = {
         "opclasses are PostgreSQL only.": {
             "indexes.tests.SchemaIndexesNotPostgreSQLTests."

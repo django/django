@@ -168,7 +168,11 @@ Migrations
 Models
 ~~~~~~
 
-* ...
+* Added the :class:`~django.db.models.functions.RegexpCount`,
+  :class:`~django.db.models.functions.RegexpLike`,
+  :class:`~django.db.models.functions.RegexpReplace`,
+  :class:`~django.db.models.functions.RegexpStrIndex`, and
+  :class:`~django.db.models.functions.RegexpSubstr` database functions.
 
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -226,7 +230,27 @@ Database backend API
 This section describes changes that may be needed in third-party database
 backends.
 
-* ...
+* ``DatabaseFeatures.regexp_functions_flags_default`` should be set to a string
+  containing flags to enable by default for the ``RegexpCount``,
+  ``RegexpReplace``, ``RegexpLike``, ``RegexpStrIndex``, and ``RegexpSubstr``
+  database functions.
+
+* ``DatabaseFeatures.regexp_functions_flags_mapping`` should be set to a
+  mapping from one of the supported flags in Django, i.e. ``"c"``, ``"i"``,
+  ``"m"``, ``"s"``, or ``"x"``, to an equivalent flag where it differs in the
+  database to support the ``RegexpCount``, ``RegexpLike``, ``RegexpReplace``,
+  ``RegexpStrIndex``, and ``RegexpSubstr`` database functions.
+
+* ``DatabaseFeatures.regexp_functions_flags_inline`` should be set to ``True``
+  if the database requires flags to be passed inline in the pattern for the
+  ``RegexpCount``, ``RegexpLike``, ``RegexpReplace``, ``RegexpStrIndex``, and
+  ``RegexpSubstr`` database functions.
+
+* ``DatabaseFeatures.regexp_functions_flags_inline_negated`` should be set to a
+  mapping from one of the supported flags in Django, i.e. ``"c"``, ``"i"``,
+  ``"m"``, ``"s"``, or ``"x"``, to an equivalent flag that should be negated to
+  mean the inverse. For example, ``{"c": "i"}`` means that ``(?c)``
+  (case-sensitive) should be converted to ``(?-i)`` (not case-insensitive).
 
 Miscellaneous
 -------------

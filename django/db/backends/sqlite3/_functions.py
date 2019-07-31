@@ -1,12 +1,14 @@
 """
 Implementations of SQL functions for SQLite.
 """
-import functools
 import random
+import re
 import statistics
 import zoneinfo
 from datetime import timedelta
+from functools import partial, reduce
 from hashlib import md5, sha1, sha224, sha256, sha384, sha512
+from itertools import islice
 from math import (
     acos,
     asin,
@@ -25,7 +27,11 @@ from math import (
     sqrt,
     tan,
 )
+from operator import or_
+from re import findall as re_findall
+from re import finditer as re_finditer
 from re import search as re_search
+from re import sub as re_sub
 
 from django.db.backends.utils import (
     split_tzname_delta,
@@ -35,9 +41,11 @@ from django.db.backends.utils import (
 from django.utils import timezone
 from django.utils.duration import duration_microseconds
 
+_re_char_to_flag = {"i": re.I, "m": re.M, "s": re.S, "x": re.X}
+
 
 def register(connection):
-    create_deterministic_function = functools.partial(
+    create_deterministic_function = partial(
         connection.create_function,
         deterministic=True,
     )
@@ -63,6 +71,11 @@ def register(connection):
     create_deterministic_function("COT", 1, _sqlite_cot)
     create_deterministic_function("LPAD", 3, _sqlite_lpad)
     create_deterministic_function("MD5", 1, _sqlite_md5)
+    create_deterministic_function("REGEXP_COUNT", 4, _sqlite_regexp_count)
+    create_deterministic_function("REGEXP_LIKE", 3, _sqlite_regexp_like)
+    create_deterministic_function("REGEXP_INSTR", 6, _sqlite_regexp_instr)
+    create_deterministic_function("REGEXP_REPLACE", 6, _sqlite_regexp_replace)
+    create_deterministic_function("REGEXP_SUBSTR", 5, _sqlite_regexp_substr)
     create_deterministic_function("REPEAT", 2, _sqlite_repeat)
     create_deterministic_function("REVERSE", 1, _sqlite_reverse)
     create_deterministic_function("RPAD", 3, _sqlite_rpad)
@@ -301,6 +314,69 @@ def _sqlite_regexp(pattern, string):
     if not isinstance(string, str):
         string = str(string)
     return bool(re_search(pattern, string))
+
+
+def _sqlite_regexp_convert_flags(flags):
+    # When Python 3.11 is minimum supported version use re.NOFLAG instead of 0.
+    return reduce(or_, (_re_char_to_flag[x] for x in flags if x in "imsx"), 0)
+
+
+def _sqlite_regexp_count(text, pattern, position=1, flags=""):
+    if text is None or pattern is None or flags is None:
+        return None
+    flags = _sqlite_regexp_convert_flags(flags)
+    return len(re_findall(pattern, text[position - 1 :], flags))
+
+
+def _sqlite_regexp_like(text, pattern, flags=""):
+    if text is None or pattern is None or flags is None:
+        return None
+    flags = _sqlite_regexp_convert_flags(flags)
+    return bool(re_search(pattern, text, flags))
+
+
+def _sqlite_regexp_instr(
+    text, pattern, position=1, occurrence=1, return_option=0, flags=""
+):
+    if text is None or pattern is None or flags is None:
+        return None
+    flags = _sqlite_regexp_convert_flags(flags)
+    string = text[position - 1 :]
+    if occurrence > 1:
+        match = next(islice(re_finditer(pattern, string, flags), occurrence - 1, None))
+    else:
+        match = re_search(pattern, string, flags)
+    if match:
+        return position + (match.end() if return_option == 1 else match.start())
+    else:
+        return 0
+
+
+def _sqlite_regexp_replace(
+    text, pattern, replacement, position=1, occurrence=1, flags=""
+):
+    if text is None or pattern is None or replacement is None or flags is None:
+        return None
+    flags = _sqlite_regexp_convert_flags(flags)
+    prefix = text[: position - 1]
+    string = text[position - 1 :]
+    if occurrence > 1:
+        match = next(islice(re_finditer(pattern, string, flags), occurrence - 1, None))
+        return prefix + string[: match.start()] + replacement + string[match.end() :]
+    else:
+        return prefix + re_sub(pattern, replacement, string, occurrence, flags)
+
+
+def _sqlite_regexp_substr(text, pattern, position=1, occurrence=1, flags=""):
+    if text is None or pattern is None or flags is None:
+        return None
+    flags = _sqlite_regexp_convert_flags(flags)
+    string = text[position - 1 :]
+    if occurrence > 1:
+        match = next(islice(re_finditer(pattern, string, flags), occurrence - 1, None))
+    else:
+        match = re_search(pattern, string, flags)
+    return match[0] if match else None
 
 
 def _sqlite_acos(x):
