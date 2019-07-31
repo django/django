@@ -433,6 +433,19 @@ class BaseDatabaseFeatures:
     # on databases that don't use LIKE for pattern matching.
     pattern_lookup_needs_param_pattern = True
 
+    # A string of default flags to pass to regular expression functions to
+    # enforce consistency between different database backends.
+    regexp_functions_flags_default = ""
+    # A mapping of flag characters for regular expression functions to
+    # translate those used by Django to the equivalent used by the database.
+    regexp_functions_flags_mapping = {}
+    # Do regular expression functions require flags inline in the pattern?
+    regexp_functions_flags_inline = False
+    # A mapping of flag characters that, when inline, need to be specified in
+    # negated form, e.g. `(?c)` (case-sensitive) may be written as `(?-i)` (not
+    # case-insensitive). Omit the `-` in the replacement, e.g. `{"c": "i"}`.
+    regexp_functions_flags_inline_negated = {}
+
     # A set of dotted paths to tests in Django's test suite that are expected
     # to fail on this database.
     django_test_expected_failures = set()
