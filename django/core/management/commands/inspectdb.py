@@ -125,9 +125,10 @@ class Command(BaseCommand):
                             else table2model(relations[column_name][1])
                         )
                         if rel_to in known_models:
-                            field_type = '%s(%s' % (rel_type, rel_to)
+                            field_type = 'ForeignKey(%s' % rel_to
                         else:
-                            field_type = "%s('%s'" % (rel_type, rel_to)
+                            field_type = "ForeignKey('%s'" % rel_to
+                        extra_params['related_name'] = '%s_%s' % (table2model(table_name), column_to_field_name[column_name])
                     else:
                         # Calling `get_field_type` to get the field type string and any
                         # additional parameters and notes.
