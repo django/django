@@ -118,6 +118,9 @@ Minor features
   password and required fields, when a corresponding command line argument
   isn't provided in non-interactive mode.
 
+* :attr:`~django.contrib.auth.models.CustomUser.REQUIRED_FIELDS` now supports
+  :class:`~django.db.models.ManyToManyField`\s.
+
 :mod:`django.contrib.contenttypes`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
