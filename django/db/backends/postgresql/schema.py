@@ -70,7 +70,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         # Make ALTER TYPE with SERIAL make sense.
         table = strip_quotes(model._meta.db_table)
         if new_type.lower() in ("serial", "bigserial"):
-            column = new_field.column
+            column = strip_quotes(new_field.column)
             sequence_name = "%s_%s_seq" % (table, column)
             col_type = "integer" if new_type.lower() == "serial" else "bigint"
             return (
