@@ -262,7 +262,7 @@ class IndexTransform(Transform):
 
     def as_sql(self, compiler, connection):
         lhs, params = compiler.compile(self.lhs)
-        return '%s[%s]' % (lhs, self.index), params
+        return '%s[%%s]' % lhs, params + [self.index]
 
     @property
     def output_field(self):
@@ -288,7 +288,7 @@ class SliceTransform(Transform):
 
     def as_sql(self, compiler, connection):
         lhs, params = compiler.compile(self.lhs)
-        return '%s[%s:%s]' % (lhs, self.start, self.end), params
+        return '%s[%%s:%%s]' % lhs, params + [self.start, self.end]
 
 
 class SliceTransformFactory:
