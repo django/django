@@ -1015,3 +1015,17 @@ Versions affected
 * Django 2.2 :commit:`(patch) <4f5b58f5cd3c57fee9972ab074f8dc6895d8f387>`
 * Django 2.1 :commit:`(patch) <f74b3ae3628c26e1b4f8db3d13a91d52a833a975>`
 * Django 1.11 :commit:`(patch) <ed682a24fca774818542757651bfba576c3fc3ef>`
+
+August 1, 2019 - :cve:`2019-14235`
+----------------------------------
+
+Potential memory exhaustion in ``django.utils.encoding.uri_to_iri()``. `Full
+description
+<https://www.djangoproject.com/weblog/2019/aug/01/security-releases/>`__
+
+Versions affected
+~~~~~~~~~~~~~~~~~
+
+* Django 2.2 :commit:`(patch) <cf694e6852b0da7799f8b53f1fb2f7d20cf17534>`
+* Django 2.1 :commit:`(patch) <5d50a2e5fa36ad23ab532fc54cf4073de84b3306>`
+* Django 1.11 :commit:`(patch) <869b34e9b3be3a4cfcb3a145f218ffd3f5e3fd79>`
