@@ -1114,6 +1114,17 @@ class Query(BaseExpression):
                 for v in value:
                     self.check_query_object_type(v, opts, field)
 
+    def check_filterable(self, expression):
+        """Raise an error if expression cannot be used in a WHERE clause."""
+        if not getattr(expression, 'filterable', 'True'):
+            raise NotSupportedError(
+                expression.__class__.__name__ + ' is disallowed in the filter '
+                'clause.'
+            )
+        if hasattr(expression, 'get_source_expressions'):
+            for expr in expression.get_source_expressions():
+                self.check_filterable(expr)
+
     def build_lookup(self, lookups, lhs, rhs):
         """
         Try to extract transforms and lookup from given lhs.
@@ -1217,11 +1228,7 @@ class Query(BaseExpression):
             raise FieldError("Cannot parse keyword query %r" % arg)
         lookups, parts, reffed_expression = self.solve_lookup_type(arg)
 
-        if not getattr(reffed_expression, 'filterable', True):
-            raise NotSupportedError(
-                reffed_expression.__class__.__name__ + ' is disallowed in '
-                'the filter clause.'
-            )
+        self.check_filterable(reffed_expression)
 
         if not allow_joins and len(parts) > 1:
             raise FieldError("Joined field references are not permitted in this query")
@@ -1229,6 +1236,8 @@ class Query(BaseExpression):
         pre_joins = self.alias_refcount.copy()
         value = self.resolve_lookup_value(value, can_reuse, allow_joins, simple_col)
         used_joins = {k for k, v in self.alias_refcount.items() if v > pre_joins.get(k, 0)}
+
+        self.check_filterable(value)
 
         clause = self.where_class()
         if reffed_expression:

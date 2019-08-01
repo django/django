@@ -4,7 +4,8 @@ from unittest import mock, skipIf, skipUnless
 from django.core.exceptions import FieldError
 from django.db import NotSupportedError, connection
 from django.db.models import (
-    F, OuterRef, RowRange, Subquery, Value, ValueRange, Window, WindowFrame,
+    F, Func, OuterRef, Q, RowRange, Subquery, Value, ValueRange, Window,
+    WindowFrame,
 )
 from django.db.models.aggregates import Avg, Max, Min, Sum
 from django.db.models.functions import (
@@ -833,8 +834,17 @@ class NonQueryWindowTests(SimpleTestCase):
 
     def test_invalid_filter(self):
         msg = 'Window is disallowed in the filter clause'
+        qs = Employee.objects.annotate(dense_rank=Window(expression=DenseRank()))
         with self.assertRaisesMessage(NotSupportedError, msg):
-            Employee.objects.annotate(dense_rank=Window(expression=DenseRank())).filter(dense_rank__gte=1)
+            qs.filter(dense_rank__gte=1)
+        with self.assertRaisesMessage(NotSupportedError, msg):
+            qs.annotate(inc_rank=F('dense_rank') + Value(1)).filter(inc_rank__gte=1)
+        with self.assertRaisesMessage(NotSupportedError, msg):
+            qs.filter(id=F('dense_rank'))
+        with self.assertRaisesMessage(NotSupportedError, msg):
+            qs.filter(id=Func('dense_rank', 2, function='div'))
+        with self.assertRaisesMessage(NotSupportedError, msg):
+            qs.annotate(total=Sum('dense_rank', filter=Q(name='Jones'))).filter(total=1)
 
     def test_invalid_order_by(self):
         msg = 'order_by must be either an Expression or a sequence of expressions'

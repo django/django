@@ -500,8 +500,6 @@ class TemporalSubtraction(CombinedExpression):
 @deconstructible
 class F(Combinable):
     """An object capable of resolving references to existing query objects."""
-    # Can the expression be used in a WHERE clause?
-    filterable = True
 
     def __init__(self, name):
         """
