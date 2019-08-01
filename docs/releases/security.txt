@@ -987,3 +987,16 @@ Versions affected
 * Django 2.2 :commit:`(patch) <c3289717c6f21a8cf23daff1c78c0c014b94041f>`
 * Django 2.1 :commit:`(patch) <c23723a1551340cc7d3126f04fcfd178fa224193>`
 * Django 1.11 :commit:`(patch) <42a66e969023c00536256469f0e8b8a099ef109d>`
+
+August 1, 2019 - :cve:`2019-14233`
+----------------------------------
+
+Denial-of-service possibility in ``strip_tags()``. `Full description
+<https://www.djangoproject.com/weblog/2019/aug/01/security-releases/>`__
+
+Versions affected
+~~~~~~~~~~~~~~~~~
+
+* Django 2.2 :commit:`(patch) <e34f3c0e9ee5fc9022428fe91640638bafd4cda7>`
+* Django 2.1 :commit:`(patch) <5ff8e791148bd451180124d76a55cb2b2b9556eb>`
+* Django 1.11 :commit:`(patch) <52479acce792ad80bb0f915f20b835f919993c72>`
