@@ -382,7 +382,7 @@ class ManifestFilesMixin(HashedFilesMixin):
         try:
             with self.open(self.manifest_name) as manifest:
                 return manifest.read().decode()
-        except OSError:
+        except FileNotFoundError:
             return None
 
     def load_manifest(self):

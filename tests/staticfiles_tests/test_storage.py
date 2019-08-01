@@ -4,6 +4,7 @@ import sys
 import tempfile
 import unittest
 from io import StringIO
+from unittest import mock
 
 from django.conf import settings
 from django.contrib.staticfiles import finders, storage
@@ -388,6 +389,11 @@ class TestCollectionManifestStorage(TestHashedFiles, CollectionTestCase):
     def test_manifest_does_not_exist(self):
         storage.staticfiles_storage.manifest_name = 'does.not.exist.json'
         self.assertIsNone(storage.staticfiles_storage.read_manifest())
+
+    def test_manifest_does_not_ignore_permission_error(self):
+        with mock.patch('builtins.open', side_effect=PermissionError):
+            with self.assertRaises(PermissionError):
+                storage.staticfiles_storage.read_manifest()
 
     def test_loaded_cache(self):
         self.assertNotEqual(storage.staticfiles_storage.hashed_files, {})
