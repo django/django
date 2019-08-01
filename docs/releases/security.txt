@@ -1000,3 +1000,18 @@ Versions affected
 * Django 2.2 :commit:`(patch) <e34f3c0e9ee5fc9022428fe91640638bafd4cda7>`
 * Django 2.1 :commit:`(patch) <5ff8e791148bd451180124d76a55cb2b2b9556eb>`
 * Django 1.11 :commit:`(patch) <52479acce792ad80bb0f915f20b835f919993c72>`
+
+
+August 1, 2019 - :cve:`2019-14234`
+----------------------------------
+
+SQL injection possibility in key and index lookups for
+``JSONField``/``HStoreField``. `Full description
+<https://www.djangoproject.com/weblog/2019/aug/01/security-releases/>`__
+
+Versions affected
+~~~~~~~~~~~~~~~~~
+
+* Django 2.2 :commit:`(patch) <4f5b58f5cd3c57fee9972ab074f8dc6895d8f387>`
+* Django 2.1 :commit:`(patch) <f74b3ae3628c26e1b4f8db3d13a91d52a833a975>`
+* Django 1.11 :commit:`(patch) <ed682a24fca774818542757651bfba576c3fc3ef>`
