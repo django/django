@@ -344,13 +344,13 @@ class BaseDatabaseSchemaEditor:
         self.execute(index.remove_sql(model, self))
 
     def add_constraint(self, model, constraint):
-        """Add a check constraint to a model."""
+        """Add a constraint to a model."""
         sql = constraint.create_sql(model, self)
         if sql:
             self.execute(sql)
 
     def remove_constraint(self, model, constraint):
-        """Remove a check constraint from a model."""
+        """Remove a constraint from a model."""
         sql = constraint.remove_sql(model, self)
         if sql:
             self.execute(sql)
