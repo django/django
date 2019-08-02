@@ -2,6 +2,7 @@ import json
 
 from django.core import checks, exceptions, serializers
 from django.db import connection
+from django.db.models.expressions import RawSQL
 from django.forms import Form
 from django.test.utils import CaptureQueriesContext, isolate_apps
 
@@ -11,6 +12,7 @@ from .models import HStoreModel, PostgreSQLModel
 try:
     from django.contrib.postgres import forms
     from django.contrib.postgres.fields import HStoreField
+    from django.contrib.postgres.fields.hstore import KeyTransform
     from django.contrib.postgres.validators import KeysValidator
 except ImportError:
     pass
@@ -124,6 +126,13 @@ class TestQuerying(PostgreSQLTestCase):
     def test_key_transform(self):
         self.assertSequenceEqual(
             HStoreModel.objects.filter(field__a='b'),
+            self.objs[:2]
+        )
+
+    def test_key_transform_raw_expression(self):
+        expr = RawSQL('%s::hstore', ['x => b, y => c'])
+        self.assertSequenceEqual(
+            HStoreModel.objects.filter(field__a=KeyTransform('x', expr)),
             self.objs[:2]
         )
 

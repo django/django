@@ -1,0 +1,15 @@
+============================
+Django 1.11.24 release notes
+============================
+
+*Expected September 2, 2019*
+
+Django 1.11.24 fixes a regression in 1.11.23.
+
+Bugfixes
+========
+
+* Fixed crash of ``KeyTransform()`` for
+  :class:`~django.contrib.postgres.fields.JSONField` and
+  :class:`~django.contrib.postgres.fields.HStoreField` when using on
+  expressions with params (:ticket:`30672`).
