@@ -9,6 +9,8 @@ from django.core import checks, exceptions, serializers, validators
 from django.core.exceptions import FieldError
 from django.core.management import call_command
 from django.db import IntegrityError, connection, models
+from django.db.models.expressions import RawSQL
+from django.db.models.functions import Cast
 from django.test import TransactionTestCase, modify_settings, override_settings
 from django.test.utils import isolate_apps
 from django.utils import timezone
@@ -24,6 +26,7 @@ from .models import (
 
 try:
     from django.contrib.postgres.fields import ArrayField
+    from django.contrib.postgres.fields.array import IndexTransform, SliceTransform
     from django.contrib.postgres.forms import (
         SimpleArrayField, SplitArrayField, SplitArrayWidget,
     )
@@ -304,6 +307,18 @@ class TestQuerying(PostgreSQLTestCase):
             [instance]
         )
 
+    def test_index_transform_expression(self):
+        expr = RawSQL("string_to_array(%s, ';')", ['1;2'])
+        self.assertSequenceEqual(
+            NullableIntegerArrayModel.objects.filter(
+                field__0=Cast(
+                    IndexTransform(1, models.IntegerField, expr),
+                    output_field=models.IntegerField(),
+                ),
+            ),
+            self.objs[:1],
+        )
+
     def test_overlap(self):
         self.assertSequenceEqual(
             NullableIntegerArrayModel.objects.filter(field__overlap=[1, 2]),
@@ -356,6 +371,13 @@ class TestQuerying(PostgreSQLTestCase):
         self.assertSequenceEqual(
             NestedIntegerArrayModel.objects.filter(field__0__0_1=[1]),
             [instance]
+        )
+
+    def test_slice_transform_expression(self):
+        expr = RawSQL("string_to_array(%s, ';')", ['9;2;3'])
+        self.assertSequenceEqual(
+            NullableIntegerArrayModel.objects.filter(field__0_2=SliceTransform(2, 3, expr)),
+            self.objs[2:3],
         )
 
     def test_usage_in_subquery(self):
