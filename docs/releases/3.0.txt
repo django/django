@@ -108,6 +108,10 @@ Minor features
   to mirror the existing
   :meth:`~django.contrib.auth.models.User.get_group_permissions()` method.
 
+* Added HTML ``autocapitalize`` attribute to widgets of username fields in
+  :mod:`django.contrib.auth.forms` using a value of ``none`` to disable
+  undesirable auto-capitalization in browsers.
+
 * Added HTML ``autocomplete`` attribute to widgets of username, email, and
   password fields in :mod:`django.contrib.auth.forms` for better interaction
   with browser password managers.
