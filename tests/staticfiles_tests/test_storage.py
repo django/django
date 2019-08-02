@@ -385,6 +385,10 @@ class TestCollectionManifestStorage(TestHashedFiles, CollectionTestCase):
         path = storage.staticfiles_storage.path(filename)
         self.assertTrue(os.path.exists(path))
 
+    def test_manifest_does_not_exist(self):
+        storage.staticfiles_storage.manifest_name = 'does.not.exist.json'
+        self.assertIsNone(storage.staticfiles_storage.read_manifest())
+
     def test_loaded_cache(self):
         self.assertNotEqual(storage.staticfiles_storage.hashed_files, {})
         manifest_content = storage.staticfiles_storage.read_manifest()
