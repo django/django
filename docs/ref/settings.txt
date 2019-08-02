@@ -2191,11 +2191,15 @@ header if you support older browsers.
 ``SECURE_CONTENT_TYPE_NOSNIFF``
 -------------------------------
 
-Default: ``False``
+Default: ``True``
 
 If ``True``, the :class:`~django.middleware.security.SecurityMiddleware`
 sets the :ref:`x-content-type-options` header on all responses that do not
 already have it.
+
+.. versionchanged:: 3.0
+
+    In older versions, the default value is ``False``.
 
 .. setting:: SECURE_HSTS_INCLUDE_SUBDOMAINS
 
