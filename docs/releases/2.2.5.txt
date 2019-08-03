@@ -9,4 +9,8 @@ Django 2.2.5 fixes several bugs in 2.2.4.
 Bugfixes
 ========
 
+* Fixed a regression in Django 2.2 when different models have same ``db_table``
+  Error is raised although ``DATABASE_ROUTER`` is pointed each model to
+  different database (:ticket:`30673`).
+
 * ...

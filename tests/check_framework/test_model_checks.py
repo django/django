@@ -1,10 +1,14 @@
 from django.core import checks
-from django.core.checks import Error
+from django.core.checks import Error, Warning
 from django.db import models
 from django.test import SimpleTestCase
 from django.test.utils import (
-    isolate_apps, modify_settings, override_system_checks,
+    isolate_apps, modify_settings, override_settings, override_system_checks,
 )
+
+
+class DummyDatabaseRouter:
+    pass
 
 
 @isolate_apps('check_framework', attr_name='apps')
@@ -47,6 +51,26 @@ class DuplicateDBTableTests(SimpleTestCase):
                 "basic.Model1, check_framework.Model2.",
                 obj='test_table',
                 id='models.E028',
+            )
+        ])
+
+    @override_settings(DATABASE_ROUTERS=['check_framework.test_model_checks.DummyDatabaseRouter'])
+    def test_collision_when_database_routers_defined(self):
+        class Model1(models.Model):
+            class Meta:
+                db_table = 'test_table'
+
+        class Model2(models.Model):
+            class Meta:
+                db_table = 'test_table'
+
+        self.assertEqual(checks.run_checks(app_configs=self.apps.get_app_configs()), [
+            Warning(
+                "db_table 'test_table' is used by multiple models "
+                "however DATABASE_ROUTERS is defined: "
+                "check_framework.Model1, check_framework.Model2.",
+                obj='test_table',
+                id='models.W028',
             )
         ])
 
