@@ -4,7 +4,8 @@ from collections import defaultdict
 from itertools import chain
 
 from django.apps import apps
-from django.core.checks import Error, Tags, register
+from django.conf import settings
+from django.core.checks import Error, Tags, Warning, register
 
 
 @register(Tags.models)
@@ -29,14 +30,25 @@ def check_all_models(app_configs=None, **kwargs):
             )
         else:
             errors.extend(model.check(**kwargs))
+    if settings.DATABASE_ROUTERS:
+        error_class, error_id = Warning, 'models.W035'
+        error_hint = (
+            'You have configured settings.DATABASE_ROUTERS. Verify that %s '
+            'are correctly routed to separate databases.'
+        )
+    else:
+        error_class, error_id = Error, 'models.E028'
+        error_hint = None
     for db_table, model_labels in db_table_models.items():
         if len(model_labels) != 1:
+            model_labels_str = ', '.join(model_labels)
             errors.append(
-                Error(
+                error_class(
                     "db_table '%s' is used by multiple models: %s."
-                    % (db_table, ', '.join(db_table_models[db_table])),
+                    % (db_table, model_labels_str),
                     obj=db_table,
-                    id='models.E028',
+                    hint=(error_hint % model_labels_str) if error_hint else None,
+                    id=error_id,
                 )
             )
     return errors
