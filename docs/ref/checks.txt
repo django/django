@@ -317,6 +317,8 @@ Models
   or a number.
 * **models.E034**: The index name ``<index>`` cannot be longer than
   ``<max_length>`` characters.
+* **models.W035**: ``db_table`` ``<db_table>`` is used by multiple models:
+  ``<model list>``.
 
 Security
 --------

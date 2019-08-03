@@ -9,4 +9,6 @@ Django 2.2.5 fixes several bugs in 2.2.4.
 Bugfixes
 ========
 
-* ...
+* Relaxed the system check added in Django 2.2 for models to reallow use of the
+  same ``db_table`` by multiple models when database routers are installed
+  (:ticket:`30673`).
