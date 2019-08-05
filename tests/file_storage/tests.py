@@ -520,8 +520,8 @@ class FileStorageTests(SimpleTestCase):
         )
         defaults_storage = self.storage_class()
         settings = {
-            'MEDIA_ROOT': 'overriden_media_root',
-            'MEDIA_URL': 'overriden_media_url/',
+            'MEDIA_ROOT': 'overridden_media_root',
+            'MEDIA_URL': 'overridden_media_url/',
             'FILE_UPLOAD_PERMISSIONS': 0o333,
             'FILE_UPLOAD_DIRECTORY_PERMISSIONS': 0o333,
         }

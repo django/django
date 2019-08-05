@@ -65,7 +65,7 @@ to_pretty_wkt = string_output(
 # Memory leak fixed in GDAL 1.5; still exists in 1.4.
 to_xml = string_output(lgdal.OSRExportToXML, [c_void_p, POINTER(c_char_p), c_char_p], offset=-2, decoding='utf-8')
 
-# String attribute retrival routines.
+# String attribute retrieval routines.
 get_attr_value = const_string_output(std_call('OSRGetAttrValue'), [c_void_p, c_char_p, c_int], decoding='utf-8')
 get_auth_name = const_string_output(lgdal.OSRGetAuthorityName, [c_void_p, c_char_p], decoding='ascii')
 get_auth_code = const_string_output(lgdal.OSRGetAuthorityCode, [c_void_p, c_char_p], decoding='ascii')

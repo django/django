@@ -86,7 +86,7 @@ def sanitize_address(addr, encoding):
             if rest:
                 # The entire email address must be parsed.
                 raise ValueError(
-                    'Invalid adddress; only %s could be parsed from "%s"'
+                    'Invalid address; only %s could be parsed from "%s"'
                     % (token, addr)
                 )
             nm = token.display_name or ''
