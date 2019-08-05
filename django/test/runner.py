@@ -20,6 +20,11 @@ from django.utils.datastructures import OrderedSet
 from django.utils.version import PY37
 
 try:
+    import ipdb as pdb
+except ImportError:
+    import pdb
+
+try:
     import tblib.pickling_support
 except ImportError:
     tblib = None
@@ -70,6 +75,26 @@ class DebugSQLTextTestResult(unittest.TextTestResult):
             self.stream.writeln(err)
             self.stream.writeln(self.separator2)
             self.stream.writeln(sql_debug)
+
+
+class PDBDebugResult(unittest.TextTestResult):
+    """
+    Custom result class that triggers a PDB session when an error or failure
+    occurs.
+    """
+
+    def addError(self, test, err):
+        super().addError(test, err)
+        self.debug(err)
+
+    def addFailure(self, test, err):
+        super().addFailure(test, err)
+        self.debug(err)
+
+    def debug(self, error):
+        exc_type, exc_value, traceback = error
+        print("\nOpening PDB: %r" % exc_value)
+        pdb.post_mortem(traceback)
 
 
 class RemoteTestResult:
@@ -408,7 +433,8 @@ class DiscoverRunner:
     def __init__(self, pattern=None, top_level=None, verbosity=1,
                  interactive=True, failfast=False, keepdb=False,
                  reverse=False, debug_mode=False, debug_sql=False, parallel=0,
-                 tags=None, exclude_tags=None, test_name_patterns=None, **kwargs):
+                 tags=None, exclude_tags=None, test_name_patterns=None,
+                 pdb=False, **kwargs):
 
         self.pattern = pattern
         self.top_level = top_level
@@ -422,6 +448,9 @@ class DiscoverRunner:
         self.parallel = parallel
         self.tags = set(tags or [])
         self.exclude_tags = set(exclude_tags or [])
+        self.pdb = pdb
+        if self.pdb and self.parallel > 1:
+            raise ValueError('You cannot use --pdb with parallel tests; pass --parallel=1 to use it.')
         self.test_name_patterns = None
         if test_name_patterns:
             # unittest does not export the _convert_select_pattern function
@@ -469,6 +498,10 @@ class DiscoverRunner:
         parser.add_argument(
             '--exclude-tag', action='append', dest='exclude_tags',
             help='Do not run tests with the specified tag. Can be used multiple times.',
+        )
+        parser.add_argument(
+            '--pdb', action='store_true',
+            help='Runs a debugger (pdb, or ipdb if installed) on error or failure.'
         )
         if PY37:
             parser.add_argument(
@@ -574,7 +607,10 @@ class DiscoverRunner:
         )
 
     def get_resultclass(self):
-        return DebugSQLTextTestResult if self.debug_sql else None
+        if self.debug_sql:
+            return DebugSQLTextTestResult
+        elif self.pdb:
+            return PDBDebugResult
 
     def get_test_runner_kwargs(self):
         return {

@@ -348,6 +348,9 @@ Tests
 * Django test runner now supports ``--start-at`` and ``--start-after`` options
   to run tests starting from a specific top-level module.
 
+* Django test runner now supports a ``--pdb`` option to spawn a debugger at
+  each error or failure.
+
 URLs
 ~~~~
 
