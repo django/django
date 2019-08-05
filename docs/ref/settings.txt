@@ -2182,6 +2182,10 @@ Default: ``False``
 If ``True``, the :class:`~django.middleware.security.SecurityMiddleware` sets
 the :ref:`x-xss-protection` header on all responses that do not already have it.
 
+Modern browsers don't honor ``X-XSS-Protection`` HTTP header anymore. Although
+the setting offers little practical benefit, you may still want to set the
+header if you support older browsers.
+
 .. setting:: SECURE_CONTENT_TYPE_NOSNIFF
 
 ``SECURE_CONTENT_TYPE_NOSNIFF``
