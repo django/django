@@ -284,7 +284,7 @@ class ActionSelenium(argparse.Action):
 
 def django_tests(verbosity, interactive, failfast, keepdb, reverse,
                  test_labels, debug_sql, parallel, tags, exclude_tags,
-                 test_name_patterns, start_at, start_after):
+                 test_name_patterns, start_at, start_after, pdb):
     state = setup(verbosity, test_labels, parallel, start_at, start_after)
     extra_tests = []
 
@@ -304,6 +304,7 @@ def django_tests(verbosity, interactive, failfast, keepdb, reverse,
         tags=tags,
         exclude_tags=exclude_tags,
         test_name_patterns=test_name_patterns,
+        pdb=pdb,
     )
     failures = test_runner.run_tests(
         test_labels or get_installed(),
@@ -495,6 +496,10 @@ if __name__ == "__main__":
         '--start-at', dest='start_at',
         help='Run tests starting at the specified top-level module.',
     )
+    parser.add_argument(
+        '--pdb', action='store_true',
+        help='Runs the PDB debugger on error or failure.'
+    )
     if PY37:
         parser.add_argument(
             '-k', dest='test_name_patterns', action='append',
@@ -561,7 +566,7 @@ if __name__ == "__main__":
             options.debug_sql, options.parallel, options.tags,
             options.exclude_tags,
             getattr(options, 'test_name_patterns', None),
-            options.start_at, options.start_after,
+            options.start_at, options.start_after, options.pdb,
         )
         if failures:
             sys.exit(1)
