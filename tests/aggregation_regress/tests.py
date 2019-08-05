@@ -377,7 +377,7 @@ class AggregationTests(TestCase):
             {'c__max': 3}
         )
 
-    def test_conditional_aggreate(self):
+    def test_conditional_aggregate(self):
         # Conditional aggregation of a grouped queryset.
         self.assertEqual(
             Book.objects.annotate(c=Count('authors')).values('pk').aggregate(test=Sum(

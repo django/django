@@ -55,7 +55,7 @@ class SerializerRegistrationTests(SimpleTestCase):
             serializers.unregister_serializer("nonsense")
 
     def test_builtin_serializers(self):
-        "Requesting a list of serializer formats popuates the registry"
+        "Requesting a list of serializer formats populates the registry"
         all_formats = set(serializers.get_serializer_formats())
         public_formats = set(serializers.get_public_serializer_formats())
 

@@ -80,7 +80,7 @@ class MigrateTests(MigrationTestBase):
             call_command('migrate', app_label='unmigrated_app_syncdb')
 
     @override_settings(MIGRATION_MODULES={'migrations': 'migrations.test_migrations_clashing_prefix'})
-    def test_ambigious_prefix(self):
+    def test_ambiguous_prefix(self):
         msg = (
             "More than one migration matches 'a' in app 'migrations'. Please "
             "be more specific."
