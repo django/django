@@ -89,6 +89,9 @@ class TestUtilsText(SimpleTestCase):
         self.assertEqual(text.Truncator(lazystr('The quick brown fox')).chars(10), 'The quick…')
 
     def test_truncate_chars_html(self):
+        truncator = text.Truncator('<p>I &lt;3 python, what about you?</p>')
+        self.assertEqual('<p>I &lt;3 p…</p>', truncator.chars(6, html=True))
+
         perf_test_values = [
             (('</a' + '\t' * 50000) + '//>', None),
             ('&' * 50000, '&' * 9 + '…'),
