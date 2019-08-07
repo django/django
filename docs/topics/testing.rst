@@ -207,7 +207,7 @@ or keyword arguments in the ``scope``::
 
 .. note::
 
-    Since the ``WebsocketCommunicator`` class takes a URL in its contructor,
+    Since the ``WebsocketCommunicator`` class takes a URL in its constructor,
     a single Communicator can only test a single URL. If you want to test
     multiple different URLs, use multiple Communicators.
 

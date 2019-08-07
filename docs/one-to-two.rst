@@ -82,7 +82,7 @@ Full Async
 Channels 2 is also built on a fundamental async foundation, and all servers
 are actually running an asynchronous event loop and only jumping to synchronous
 code when you interact with the Django view system or ORM. That means that
-you, too, can write fully asychronous code if you wish.
+you, too, can write fully asynchronous code if you wish.
 
 It's not a requirement, but it's there if you need it. We also provide
 convenience methods that let you jump between synchronous and asynchronous

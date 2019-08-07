@@ -32,7 +32,7 @@ environments.
 First off, try changing your production environment to see if that helps - for example, if you have Nginx/Apache/etc.
 between browsers and Channels, try going direct to the Python server and see if that fixes things. Turn SSL off if you
 have it on. Try from different browsers and internet connections. WebSockets are notoriously hard to debug already,
-and so you should expect some level of akwardness from any project involving them.
+and so you should expect some level of awkwardness from any project involving them.
 
 Next, check package versions between your local and remote environments. You'd be surprised how easy it is to forget
 to upgrade something!

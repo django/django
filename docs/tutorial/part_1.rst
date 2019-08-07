@@ -9,7 +9,7 @@ In this tutorial we will build a simple chat server. It will have two pages:
 The room view will use a WebSocket to communicate with the Django server and
 listen for any messages that are posted.
 
-We assume that you are familar with basic concepts for building a Django site.
+We assume that you are familiar with basic concepts for building a Django site.
 If not we recommend you complete `the Django tutorial`_ first and then come back 
 to this tutorial.
 

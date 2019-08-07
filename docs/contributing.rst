@@ -74,7 +74,7 @@ your environment::
     pip install -e .[tests]
 
 Note the ``[tests]`` section there; that tells ``pip`` that you want to install
-the ``tests`` extra, which will bring in testing depedencies like
+the ``tests`` extra, which will bring in testing dependencies like
 ``pytest-django``.
 
 Then, you can run the tests::

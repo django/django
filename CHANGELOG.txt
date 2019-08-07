@@ -38,7 +38,7 @@ https://channels.readthedocs.io/en/latest/releases
 ------------------
 
 * Django middleware is now cached rather than instantiated per request
-  resulting in a sigificant speed improvement
+  resulting in a significant speed improvement
 
 * ChannelServerLiveTestCase now serves static files again
 

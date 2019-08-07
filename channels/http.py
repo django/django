@@ -235,7 +235,7 @@ class AsgiHandler(base.BaseHandler):
             )
             response = http.HttpResponseBadRequest()
         except RequestTimeout:
-            # Parsing the rquest failed, so the response is a Request Timeout error
+            # Parsing the request failed, so the response is a Request Timeout error
             response = HttpResponse("408 Request Timeout (upload too slow)", status=408)
         except RequestAborted:
             # Client closed connection on us mid request. Abort!

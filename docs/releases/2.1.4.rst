@@ -8,7 +8,7 @@ Bugfixes & Small Changes
 ------------------------
 
 * Django middleware is now cached rather than instantiated per request
-  resulting in a sigificant speed improvement. Some middleware took seconds to
+  resulting in a significant speed improvement. Some middleware took seconds to
   load and as a result Channels was unusable for HTTP serving before.
 
 * ChannelServerLiveTestCase now serves static files again.

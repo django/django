@@ -130,5 +130,5 @@ applications that serve them::
 
     ChannelNameRouter({
         "thumbnails-generate": some_app,
-        "thunbnails-delete": some_other_app,
+        "thumbnails-delete": some_other_app,
     })

@@ -40,7 +40,7 @@ class AsyncConsumer:
         """
         Dispatches incoming messages to type-based handlers asynchronously.
         """
-        # Initalize channel layer
+        # Initialize channel layer
         self.channel_layer = get_channel_layer(self.channel_layer_alias)
         if self.channel_layer is not None:
             self.channel_name = await self.channel_layer.new_channel()

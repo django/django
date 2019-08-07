@@ -55,7 +55,7 @@ name. We recommend you use ProtocolTypeRouter and ChannelNameRouter (see
         ...
         "channel": ChannelNameRouter({
             "thumbnails-generate": consumers.GenerateConsumer,
-            "thunbnails-delete": consumers.DeleteConsumer,
+            "thumbnails-delete": consumers.DeleteConsumer,
         }),
     })
 

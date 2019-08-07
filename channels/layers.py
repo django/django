@@ -112,7 +112,7 @@ class BaseChannelLayer:
         """
         result = []
         for pattern, value in channel_capacity.items():
-            # If they passed in a precompiled regex, leave it, else intepret
+            # If they passed in a precompiled regex, leave it, else interpret
             # it as a glob.
             if hasattr(pattern, "match"):
                 result.append((pattern, value))
