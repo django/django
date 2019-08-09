@@ -44,6 +44,10 @@ class ValidationTests(SimpleTestCase):
         f = models.CharField(max_length=1, choices=[('a', 'A'), ('b', 'B')])
         self.assertEqual('a', f.clean('a', None))
 
+    def test_charfield_with_choices_cleans_valid_int_choice(self):
+        f = models.CharField(max_length=1, choices=[(1, 'One'), (2, 'Two')])
+        self.assertEqual('1', f.clean('1', None))
+
     def test_charfield_with_choices_raises_error_on_invalid_choice(self):
         f = models.CharField(choices=[('a', 'A'), ('b', 'B')])
         with self.assertRaises(ValidationError):

@@ -600,15 +600,16 @@ class Field(RegisterLookupMixin):
             # Skip validation for non-editable fields.
             return
 
+        text_value = str(value)
         if self.choices is not None and value not in self.empty_values:
             for option_key, option_value in self.choices:
                 if isinstance(option_value, (list, tuple)):
                     # This is an optgroup, so look inside the group for
                     # options.
                     for optgroup_key, optgroup_value in option_value:
-                        if value == optgroup_key:
+                        if value == optgroup_key or text_value == str(optgroup_key):
                             return
-                elif value == option_key:
+                elif value == option_key or text_value == str(option_key):
                     return
             raise exceptions.ValidationError(
                 self.error_messages['invalid_choice'],
