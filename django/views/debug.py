@@ -5,10 +5,10 @@ import types
 from pathlib import Path
 
 from django.conf import settings
-from django.http import HttpResponse, HttpResponseNotFound
+from django.http import Http404, HttpResponse, HttpResponseNotFound
 from django.template import Context, Engine, TemplateDoesNotExist
 from django.template.defaultfilters import pprint
-from django.urls import Resolver404, resolve
+from django.urls import resolve
 from django.utils import timezone
 from django.utils.datastructures import MultiValueDict
 from django.utils.encoding import force_str
@@ -483,7 +483,7 @@ def technical_404_response(request, exception):
     caller = ''
     try:
         resolver_match = resolve(request.path)
-    except Resolver404:
+    except Http404:
         pass
     else:
         obj = resolver_match.func

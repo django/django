@@ -12,11 +12,13 @@ from unittest import mock
 from django.core import mail
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.db import DatabaseError, connection
+from django.http import Http404
 from django.shortcuts import render
 from django.template import TemplateDoesNotExist
 from django.test import RequestFactory, SimpleTestCase, override_settings
 from django.test.utils import LoggingCaptureMixin
 from django.urls import path, reverse
+from django.urls.converters import IntConverter
 from django.utils.functional import SimpleLazyObject
 from django.utils.safestring import mark_safe
 from django.views.debug import (
@@ -236,6 +238,11 @@ class DebugViewTests(SimpleTestCase):
             m.reset_mock()
             technical_404_response(mock.MagicMock(), mock.Mock())
             m.assert_called_once_with(encoding='utf-8')
+
+    def test_technical_404_converter_raise_404(self):
+        with mock.patch.object(IntConverter, 'to_python', side_effect=Http404):
+            response = self.client.get('/path-post/1/')
+            self.assertContains(response, 'Page not found', status_code=404)
 
 
 class DebugViewQueriesAllowedTests(SimpleTestCase):
