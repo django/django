@@ -113,8 +113,8 @@ def urlencode(query, doseq=False):
     for key, value in query:
         if value is None:
             raise TypeError(
-                'Cannot encode None in a query string. Did you mean to pass '
-                'an empty string or omit the value?'
+                "Cannot encode None for key '%s' in a query string. Did you "
+                "mean to pass an empty string or omit the value?" % key
             )
         elif not doseq or isinstance(value, (str, bytes)):
             query_val = value
@@ -130,8 +130,9 @@ def urlencode(query, doseq=False):
                 for item in itr:
                     if item is None:
                         raise TypeError(
-                            'Cannot encode None in a query string. Did you '
-                            'mean to pass an empty string or omit the value?'
+                            "Cannot encode None for key '%s' in a query "
+                            "string. Did you mean to pass an empty string or "
+                            "omit the value?" % key
                         )
                     elif not isinstance(item, bytes):
                         item = str(item)

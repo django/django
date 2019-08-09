@@ -14,8 +14,8 @@ from django.utils.http import (
 
 class URLEncodeTests(SimpleTestCase):
     cannot_encode_none_msg = (
-        'Cannot encode None in a query string. Did you mean to pass an '
-        'empty string or omit the value?'
+        "Cannot encode None for key 'a' in a query string. Did you mean to "
+        "pass an empty string or omit the value?"
     )
 
     def test_tuples(self):
