@@ -16,6 +16,8 @@ from .utils import BulkInsertMapper, InsertVar, Oracle_datetime
 
 
 class DatabaseOperations(BaseDatabaseOperations):
+    compiler_module = "django.db.backends.oracle.compiler"
+
     # Oracle uses NUMBER(11) and NUMBER(19) for integer fields.
     integer_field_ranges = {
         'SmallIntegerField': (-99999999999, 99999999999),

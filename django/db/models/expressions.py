@@ -1068,14 +1068,6 @@ class Exists(Subquery):
             sql = 'NOT {}'.format(sql)
         return sql, params
 
-    def as_oracle(self, compiler, connection, template=None, **extra_context):
-        # Oracle doesn't allow EXISTS() in the SELECT list, so wrap it with a
-        # CASE WHEN expression. Change the template since the When expression
-        # requires a left hand side (column) to compare against.
-        sql, params = self.as_sql(compiler, connection, template, **extra_context)
-        sql = 'CASE WHEN {} THEN 1 ELSE 0 END'.format(sql)
-        return sql, params
-
 
 class OrderBy(BaseExpression):
     template = '%(expression)s %(ordering)s'
@@ -1132,6 +1124,17 @@ class OrderBy(BaseExpression):
         elif self.nulls_first:
             template = 'IF(ISNULL(%(expression)s),0,1), %(expression)s %(ordering)s '
         return self.as_sql(compiler, connection, template=template)
+
+    def as_oracle(self, compiler, connection):
+        if isinstance(self.expression, Exists):
+            copy = self.copy()
+            # XXX: Use copy.expression = Case(When(self.expression)) when
+            # When accepts boolean expressions.
+            exists_sql, params = compiler.compile(self.expression)
+            case_sql = 'CASE WHEN %s THEN 1 ELSE 0 END' % exists_sql
+            copy.expression = RawSQL(case_sql, params)
+            return copy.as_sql(compiler, connection)
+        return self.as_sql(compiler, connection)
 
     def get_group_by_cols(self, alias=None):
         cols = []
