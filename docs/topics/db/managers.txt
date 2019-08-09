@@ -214,6 +214,15 @@ appropriate for your circumstances, you can tell Django which class to use by
 setting :attr:`Meta.base_manager_name
 <django.db.models.Options.base_manager_name>`.
 
+For example::
+
+    class Person(models.Model):
+        #...
+        people = PersonManager()
+
+        class Meta:
+            base_manager_name = 'people'
+
 Base managers aren't used when querying on related models. For example, if the
 ``Question`` model :ref:`from the tutorial <creating-models>` had a ``deleted``
 field and a base manager that filters out instances with ``deleted=True``, a
