@@ -389,7 +389,7 @@ class Field(RegisterLookupMixin):
         from django.db.models.expressions import Col
         return Col(self.model._meta.db_table, self)
 
-    def select_format(self, compiler, sql, params):
+    def select_format(self, compiler, sql, params, subquery):
         """
         Custom format for select clauses. For example, GIS columns need to be
         selected as AsText(table.col) on MySQL as the table.col data can't be

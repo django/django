@@ -266,13 +266,15 @@ class GeometryField(BaseSpatialField):
             defaults.setdefault('widget', forms.Textarea)
         return super().formfield(**defaults)
 
-    def select_format(self, compiler, sql, params):
+    def select_format(self, compiler, sql, params, subquery):
         """
         Return the selection format string, depending on the requirements
         of the spatial backend. For example, Oracle and MySQL require custom
         selection formats in order to retrieve geometries in OGC WKB.
         """
-        return compiler.connection.ops.select % sql, params
+        if not subquery:
+            return compiler.connection.ops.select % sql, params
+        return sql, params
 
 
 # The OpenGIS Geometry Type Fields
@@ -333,9 +335,9 @@ class ExtentField(Field):
     def get_internal_type(self):
         return "ExtentField"
 
-    def select_format(self, compiler, sql, params):
+    def select_format(self, compiler, sql, params, subquery):
         select = compiler.connection.ops.select_extent
-        return select % sql if select else sql, params
+        return select % sql if not subquery and select else sql, params
 
 
 class RasterField(BaseSpatialField):
