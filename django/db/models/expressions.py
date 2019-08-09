@@ -366,6 +366,13 @@ class BaseExpression:
             if expr:
                 yield from expr.flatten()
 
+    def select_format(self, compiler, sql, params):
+        """
+        Custom format for select clauses. For example, EXISTS expressions need
+        to be wrapped in CASE WHEN on Oracle.
+        """
+        return self.output_field.select_format(compiler, sql, params)
+
     @cached_property
     def identity(self):
         constructor_signature = inspect.signature(self.__init__)
