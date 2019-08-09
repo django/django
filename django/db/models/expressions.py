@@ -1075,12 +1075,11 @@ class Exists(Subquery):
             sql = 'NOT {}'.format(sql)
         return sql, params
 
-    def as_oracle(self, compiler, connection, template=None, **extra_context):
+    def select_format(self, compiler, sql, params, subquery):
         # Oracle doesn't allow EXISTS() in the SELECT list, so wrap it with a
-        # CASE WHEN expression. Change the template since the When expression
-        # requires a left hand side (column) to compare against.
-        sql, params = self.as_sql(compiler, connection, template, **extra_context)
-        sql = 'CASE WHEN {} THEN 1 ELSE 0 END'.format(sql)
+        # CASE WHEN expression.
+        if compiler.connection.vendor == 'oracle':
+            sql = 'CASE WHEN {} THEN 1 ELSE 0 END'.format(sql)
         return sql, params
 
 
