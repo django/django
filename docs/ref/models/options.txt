@@ -38,8 +38,8 @@ Available ``Meta`` options
 
 .. attribute:: Options.base_manager_name
 
-    The name of the manager to use for the model's
-    :attr:`~django.db.models.Model._base_manager`.
+    The attribute name of the manager, for example, ``'objects'``, to use for
+    the model's :attr:`~django.db.models.Model._base_manager`.
 
 ``db_table``
 ------------
