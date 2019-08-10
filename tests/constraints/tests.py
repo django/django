@@ -3,7 +3,7 @@ from django.db import IntegrityError, connection, models
 from django.db.models.constraints import BaseConstraint
 from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
 
-from .models import ChildModel, Product
+from .models import ChildModel, Product, UniqueConstraintProduct
 
 
 def get_constraints(table):
@@ -69,9 +69,9 @@ class CheckConstraintTests(TestCase):
 
     @skipUnlessDBFeature('supports_table_check_constraints')
     def test_database_constraint(self):
-        Product.objects.create(name='Valid', price=10, discounted_price=5)
+        Product.objects.create(price=10, discounted_price=5)
         with self.assertRaises(IntegrityError):
-            Product.objects.create(name='Invalid', price=10, discounted_price=20)
+            Product.objects.create(price=10, discounted_price=20)
 
     @skipUnlessDBFeature('supports_table_check_constraints', 'can_introspect_check_constraints')
     def test_name(self):
@@ -92,9 +92,9 @@ class CheckConstraintTests(TestCase):
 class UniqueConstraintTests(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.p1, cls.p2 = Product.objects.bulk_create([
-            Product(name='p1', color='red'),
-            Product(name='p2'),
+        cls.p1, cls.p2 = UniqueConstraintProduct.objects.bulk_create([
+            UniqueConstraintProduct(name='p1', color='red'),
+            UniqueConstraintProduct(name='p2'),
         ])
 
     def test_eq(self):
@@ -177,19 +177,20 @@ class UniqueConstraintTests(TestCase):
 
     def test_database_constraint(self):
         with self.assertRaises(IntegrityError):
-            Product.objects.create(name=self.p1.name, color=self.p1.color)
+            UniqueConstraintProduct.objects.create(name=self.p1.name, color=self.p1.color)
 
     def test_model_validation(self):
-        with self.assertRaisesMessage(ValidationError, 'Product with this Name and Color already exists.'):
-            Product(name=self.p1.name, color=self.p1.color).validate_unique()
+        msg = 'Unique constraint product with this Name and Color already exists.'
+        with self.assertRaisesMessage(ValidationError, msg):
+            UniqueConstraintProduct(name=self.p1.name, color=self.p1.color).validate_unique()
 
     def test_model_validation_with_condition(self):
         """Partial unique constraints are ignored by Model.validate_unique()."""
-        Product(name=self.p1.name, color='blue').validate_unique()
-        Product(name=self.p2.name).validate_unique()
+        UniqueConstraintProduct(name=self.p1.name, color='blue').validate_unique()
+        UniqueConstraintProduct(name=self.p2.name).validate_unique()
 
     def test_name(self):
-        constraints = get_constraints(Product._meta.db_table)
+        constraints = get_constraints(UniqueConstraintProduct._meta.db_table)
         expected_name = 'name_color_uniq'
         self.assertIn(expected_name, constraints)
 

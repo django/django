@@ -1813,7 +1813,10 @@ class Model(metaclass=ModelBase):
             if not router.allow_migrate_model(db, cls):
                 continue
             connection = connections[db]
-            if connection.features.supports_table_check_constraints:
+            if (
+                connection.features.supports_table_check_constraints or
+                'supports_table_check_constraints' in cls._meta.required_db_features
+            ):
                 continue
             if any(isinstance(constraint, CheckConstraint) for constraint in cls._meta.constraints):
                 errors.append(
