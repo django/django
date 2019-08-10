@@ -93,6 +93,12 @@ option on the ``Meta`` subclass).
 
 .. class:: AlterUniqueTogether(name, unique_together)
 
+    .. admonition:: Use :class:`.AddConstraint` and `RemoveConstraint` with :class:`.UniqueConstraint` instead.
+
+        :class:`.UniqueConstraint` provides more functionality than
+        ``unique_together``. Also, ``unique_together`` may be deprecated in the
+        future.
+
 Changes the model's set of unique constraints (the
 :attr:`~django.db.models.Options.unique_together` option on the ``Meta``
 subclass).
@@ -215,7 +221,7 @@ Removes the index named ``name`` from the model with ``model_name``.
 .. versionadded:: 2.2
 
 Creates a constraint in the database table for the model with ``model_name``.
-``constraint`` is an instance of :class:`~django.db.models.CheckConstraint`.
+``constraint``.
 
 ``RemoveConstraint``
 --------------------

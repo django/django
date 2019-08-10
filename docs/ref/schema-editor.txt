@@ -81,10 +81,34 @@ Adds ``index`` to ``model``’s table.
 
 Removes ``index`` from ``model``’s table.
 
+``add_constraint()``
+--------------------
+
+.. method:: BaseDatabaseSchemaEditor.add_constraint(model, constraint)
+
+.. versionadded:: 2.2
+
+Adds ``constraint`` of types as specified in :doc:`constraints </ref/models/constraints>` to ``model``'s table.
+
+``remove_constraint()``
+-----------------------
+
+.. method:: BaseDatabaseSchemaEditor.remove_constraint(model, constraint)
+
+.. versionadded:: 2.2
+
+Removes ``constraint`` of types as specified in :doc:`constraints </ref/models/constraints>` from ``model``'s table.
+
 ``alter_unique_together()``
 ---------------------------
 
 .. method:: BaseDatabaseSchemaEditor.alter_unique_together(model, old_unique_together, new_unique_together)
+
+    .. admonition:: Use `add_constraint()` and `remove_constraint()` with :class:`.UniqueConstraint` instead.
+
+        :class:`.UniqueConstraint` provides more functionality than
+        ``unique_together``. Also, ``unique_together`` may be deprecated in the
+        future.
 
 Changes a model's :attr:`~django.db.models.Options.unique_together` value; this
 will add or remove unique constraints from the model's table until they match
