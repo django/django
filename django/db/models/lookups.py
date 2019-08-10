@@ -3,8 +3,10 @@ import math
 from copy import copy
 
 from django.core.exceptions import EmptyResultSet
-from django.db.models.expressions import Func, Value
-from django.db.models.fields import DateTimeField, Field, IntegerField
+from django.db.models.expressions import Exists, Func, RawSQL, Value
+from django.db.models.fields import (
+    BooleanField, DateTimeField, Field, IntegerField,
+)
 from django.db.models.query_utils import RegisterLookupMixin
 from django.utils.datastructures import OrderedSet
 from django.utils.functional import cached_property
@@ -256,6 +258,32 @@ class Exact(FieldGetDbPrepValueMixin, BuiltinLookup):
                     'one result using slicing.'
                 )
         return super().process_rhs(compiler, connection)
+
+    def as_sql(self, compiler, connection):
+        if (isinstance(self.lhs.output_field, BooleanField) and
+                connection.features.supports_boolean_predicates):
+            if self.rhs is True:
+                return self.process_lhs(compiler, connection)
+            if self.rhs is False:
+                lhs_sql, lhs_params = self.process_lhs(compiler, connection)
+                return 'NOT %s' % lhs_sql, lhs_params
+        return super().as_sql(compiler, connection)
+
+    def as_oracle(self, compiler, connection):
+        lookup = self
+        if isinstance(self.lhs, Exists):
+            if self.rhs is True:
+                return self.process_lhs(compiler, connection)
+            if self.rhs is False:
+                lhs_sql, lhs_params = self.process_lhs(compiler, connection)
+                return 'NOT %s' % lhs_sql, lhs_params
+            # XXX: Use lookup.expression = Case(When(self.lhs)) when
+            # When accepts boolean expressions.
+            lhs_sql, lhs_params = compiler.compile(self.lhs)
+            case_sql = 'CASE WHEN %s THEN 1 ELSE 0 END' % lhs_sql
+            lookup = lookup.copy()
+            lookup.rhs = RawSQL(case_sql, lhs_params)
+        return lookup.as_sql(compiler, connection)
 
 
 @Field.register_lookup

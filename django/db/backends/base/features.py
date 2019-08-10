@@ -288,6 +288,8 @@ class BaseDatabaseFeatures:
     # field(s)?
     allows_multiple_constraints_on_same_fields = True
 
+    supports_boolean_predicates = True
+
     def __init__(self, connection):
         self.connection = connection
 
