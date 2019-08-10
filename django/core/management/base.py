@@ -465,10 +465,10 @@ class BaseCommand:
             apps_waiting_migration = sorted({migration.app_label for migration, backwards in plan})
             self.stdout.write(
                 self.style.NOTICE(
-                    "\nYou have %(unpplied_migration_count)s unapplied migration(s). "
+                    "\nYou have %(unapplied_migration_count)s unapplied migration(s). "
                     "Your project may not work properly until you apply the "
                     "migrations for app(s): %(apps_waiting_migration)s." % {
-                        "unpplied_migration_count": len(plan),
+                        "unapplied_migration_count": len(plan),
                         "apps_waiting_migration": ", ".join(apps_waiting_migration),
                     }
                 )
