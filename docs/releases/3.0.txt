@@ -133,6 +133,11 @@ Minor features
 * Added support for the ``furlong`` unit in
   :class:`~django.contrib.gis.measure.Distance`.
 
+* The :setting:`GEOIP_PATH` setting now supports :class:`pathlib.Path`.
+
+* The :class:`~django.contrib.gis.geoip2.GeoIP2` class now accepts
+  :class:`pathlib.Path` ``path``.
+
 :mod:`django.contrib.messages`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
