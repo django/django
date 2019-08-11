@@ -3,7 +3,7 @@ import math
 from copy import copy
 
 from django.core.exceptions import EmptyResultSet
-from django.db.models.expressions import Func, Value
+from django.db.models.expressions import Exists, Func, RawSQL, Value
 from django.db.models.fields import DateTimeField, Field, IntegerField
 from django.db.models.query_utils import RegisterLookupMixin
 from django.utils.datastructures import OrderedSet
@@ -111,6 +111,23 @@ class Lookup:
 
     def as_sql(self, compiler, connection):
         raise NotImplementedError
+
+    def as_oracle(self, compiler, connection):
+        # Oracle doesn't allow EXISTS() to be compared to another expression
+        # unless it's wrapped in a CASE WHEN.
+        wrapped = False
+        exprs = []
+        for expr in (self.lhs, self.rhs):
+            if isinstance(expr, Exists):
+                # XXX: Use Case(When(self.lhs)) once support for boolean
+                # expressions is added to When.
+                sql, params = compiler.compile(expr)
+                sql = 'CASE WHEN %s THEN 1 ELSE 0 END' % sql
+                expr = RawSQL(sql, params)
+                wrapped = True
+            exprs.append(expr)
+        lookup = type(self)(*exprs) if wrapped else self
+        return lookup.as_sql(compiler, connection)
 
     @cached_property
     def contains_aggregate(self):
