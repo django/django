@@ -324,11 +324,16 @@ Now we can write a new ``PublisherDetail``::
             self.object = self.get_object(queryset=Publisher.objects.all())
             return super().get(request, *args, **kwargs)
 
+        def get_context_data(self, **kwargs):
+            context = super().get_context_data(**kwargs)
+            context['publisher'] = self.object
+            return context
+
         def get_queryset(self):
             return self.object.book_set.all()
 
 Notice how we set ``self.object`` within ``get()`` so we
-can use it again later in ``get_queryset()``.
+can use it again later in ``get_context_data()`` and ``get_queryset()``.
 If you don't set ``template_name``, the template will default to the normal
 :class:`ListView` choice, which in this case would be
 ``"books/book_list.html"`` because it's a list of books;
