@@ -45,9 +45,10 @@ class BaseDatabaseCreation:
             if keepdb:
                 action = "Using existing"
 
-            self.log('%s test database for alias %s...' % (
+            self.log('%s test database for alias %s%s...' % (
                 action,
                 self._get_database_display_str(verbosity, test_database_name),
+                '(if exists)' if keepdb else '',
             ))
 
         # We could skip this call if keepdb is True, but we instead
