@@ -31,6 +31,18 @@ class FunctionTests(SimpleTestCase):
     def test_truncate_something(self):
         self.assertEqual(truncatechars_html('a<b>b</b>c', 3), 'a<b>b</b>c')
 
+    def test_truncate_on_name_entity(self):
+        self.assertEqual(
+            truncatechars_html('<p>one &lt; <a href="#">two - three <br>four</a> five</p>', 7),
+            '<p>one &lt;…</p>',
+        )
+
+    def test_truncate_on_number_entity(self):
+        self.assertEqual(
+            truncatechars_html('<p>one &#60; <a href="#">two - three <br>four</a> five</p>', 7),
+            '<p>one &#60;…</p>',
+        )
+
     def test_invalid_arg(self):
         html = '<p>one <a href="#">two - three <br>four</a> five</p>'
         self.assertEqual(truncatechars_html(html, 'a'), html)
