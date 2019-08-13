@@ -242,7 +242,10 @@ WHEN (new.%(col_name)s IS NULL)
         return " DEFERRABLE INITIALLY DEFERRED"
 
     def fetch_returned_insert_id(self, cursor):
-        return int(cursor._insert_id_var.getvalue())
+        insert_id_ = cursor._insert_id_var.getvalue()
+        if isinstance(insert_id_, list):
+            insert_id_ = insert_id_[0]
+        return int(insert_id_)
 
     def field_cast_sql(self, db_type, internal_type):
         if db_type and db_type.endswith('LOB'):
