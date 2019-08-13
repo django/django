@@ -256,8 +256,9 @@ def add_never_cache_headers(response):
 def patch_vary_headers(response, newheaders):
     """
     Add (or update) the "Vary" header in the given HttpResponse object.
-    newheaders is a list of header names that should be in "Vary". Existing
-    headers in "Vary" aren't removed.
+    newheaders is a list of header names that should be in "Vary". If headers
+    contains an asterisk, then "Vary" header will consist of a single asterisk
+    '*'. Otherwise, existing headers in "Vary" aren't removed.
     """
     # Note that we need to keep the original order intact, because cache
     # implementations may rely on the order of the Vary contents in, say,
@@ -270,7 +271,11 @@ def patch_vary_headers(response, newheaders):
     existing_headers = {header.lower() for header in vary_headers}
     additional_headers = [newheader for newheader in newheaders
                           if newheader.lower() not in existing_headers]
-    response['Vary'] = ', '.join(vary_headers + additional_headers)
+    vary_headers += additional_headers
+    if '*' in vary_headers:
+        response['Vary'] = '*'
+    else:
+        response['Vary'] = ', '.join(vary_headers)
 
 
 def has_vary_header(response, header_query):

@@ -73,8 +73,14 @@ need to distinguish caches by the ``Accept-language`` header.
 .. function:: patch_vary_headers(response, newheaders)
 
     Adds (or updates) the ``Vary`` header in the given ``HttpResponse`` object.
-    ``newheaders`` is a list of header names that should be in ``Vary``.
-    Existing headers in ``Vary`` aren't removed.
+    ``newheaders`` is a list of header names that should be in ``Vary``. If
+    headers contains an asterisk, then ``Vary`` header will consist of a single
+    asterisk ``'*'``. Otherwise, existing headers in ``Vary`` aren't removed.
+
+    .. versionchanged:: 3.0
+
+        Handling an asterisk ``'*'`` according to :rfc:`7231#section-7.1.4` was
+        added.
 
 .. function:: get_cache_key(request, key_prefix=None)
 
