@@ -477,11 +477,11 @@ class Field(RegisterLookupMixin):
         path = "%s.%s" % (self.__class__.__module__, self.__class__.__qualname__)
         if path.startswith("django.db.models.fields.related"):
             path = path.replace("django.db.models.fields.related", "django.db.models")
-        if path.startswith("django.db.models.fields.files"):
+        elif path.startswith("django.db.models.fields.files"):
             path = path.replace("django.db.models.fields.files", "django.db.models")
-        if path.startswith("django.db.models.fields.proxy"):
+        elif path.startswith("django.db.models.fields.proxy"):
             path = path.replace("django.db.models.fields.proxy", "django.db.models")
-        if path.startswith("django.db.models.fields"):
+        elif path.startswith("django.db.models.fields"):
             path = path.replace("django.db.models.fields", "django.db.models")
         # Return basic info - other fields should override this.
         return (self.name, path, [], keywords)
