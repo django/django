@@ -7,6 +7,9 @@ from decimal import Decimal
 from django.core import exceptions, serializers
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db import connection
+from django.db.models import F
+from django.db.models.expressions import RawSQL
+from django.db.models.functions import Cast
 from django.forms import CharField, Form, widgets
 from django.test import skipUnlessDBFeature
 from django.test.utils import CaptureQueriesContext
@@ -18,6 +21,7 @@ from .models import JSONModel
 try:
     from django.contrib.postgres import forms
     from django.contrib.postgres.fields import JSONField
+    from django.contrib.postgres.fields.jsonb import KeyTransform
 except ImportError:
     pass
 
@@ -145,6 +149,24 @@ class TestQuerying(PostgreSQLTestCase):
         self.assertSequenceEqual(
             JSONModel.objects.filter(field__isnull=True),
             [self.objs[0]]
+        )
+
+    def test_key_transform_raw_expression(self):
+        expr = RawSQL('%s::jsonb', ['{"x": "bar"}'])
+        self.assertSequenceEqual(
+            JSONModel.objects.filter(field__foo=KeyTransform('x', expr)),
+            [self.objs[-1]],
+        )
+
+    def test_key_transform_expression(self):
+        self.assertSequenceEqual(
+            JSONModel.objects.filter(field__d__0__isnull=False).annotate(
+                key=KeyTransform('d', 'field'),
+            ).annotate(
+                chain=KeyTransform('0', 'key'),
+                expr=KeyTransform('0', Cast('key', JSONField())),
+            ).filter(chain=F('expr')),
+            [self.objs[8]],
         )
 
     def test_isnull_key(self):
