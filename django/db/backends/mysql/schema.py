@@ -48,7 +48,16 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         return db_type is not None and db_type.lower() in self.connection._limited_data_types
 
     def skip_default(self, field):
-        return self._is_limited_data_type(field)
+        if not self._supports_limited_data_type_defaults:
+            return self._is_limited_data_type(field)
+        return False
+
+    @property
+    def _supports_limited_data_type_defaults(self):
+        # Only MariaDB >= 10.2.1 supports defaults for BLOB and TEXT.
+        if self.connection.mysql_is_mariadb:
+            return self.connection.mysql_version >= (10, 2, 1)
+        return False
 
     def add_field(self, model, field):
         super().add_field(model, field)

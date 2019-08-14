@@ -130,9 +130,11 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         'UUIDField': 'char(32)',
     }
 
-    # For these columns, MySQL doesn't:
-    # - accept default values and implicitly treats these columns as nullable
-    # - support a database index
+    # For these data types:
+    # - MySQL and MariaDB < 10.2.1 don't accept default values and implicitly
+    #   treat them as nullable
+    # - all versions of MySQL and MariaDB don't support full width database
+    #   indexes
     _limited_data_types = (
         'tinyblob', 'blob', 'mediumblob', 'longblob', 'tinytext', 'text',
         'mediumtext', 'longtext', 'json',
