@@ -601,6 +601,14 @@ Miscellaneous
   :func:`html.unescape`. Note that unlike ``unescape_entities()``,
   ``html.unescape()`` evaluates lazy strings immediately.
 
+* To avoid possible confusion as to effective scope, the private internal
+  utility ``is_safe_url()`` is renamed to
+  ``url_has_allowed_host_and_scheme()``. That a URL has an allowed host and
+  scheme doesn't in general imply that it's "safe". It may still be quoted
+  incorrectly, for example. Ensure to also use
+  :func:`~django.utils.encoding.iri_to_uri` on the path component of untrusted
+  URLs.
+
 .. _removed-features-3.0:
 
 Features removed in 3.0

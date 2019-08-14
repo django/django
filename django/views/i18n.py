@@ -10,7 +10,7 @@ from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.template import Context, Engine
 from django.urls import translate_url
 from django.utils.formats import get_format
-from django.utils.http import is_safe_url
+from django.utils.http import url_has_allowed_host_and_scheme
 from django.utils.translation import (
     LANGUAGE_SESSION_KEY, check_for_language, get_language,
 )
@@ -32,11 +32,17 @@ def set_language(request):
     any state.
     """
     next = request.POST.get('next', request.GET.get('next'))
-    if ((next or not request.is_ajax()) and
-            not is_safe_url(url=next, allowed_hosts={request.get_host()}, require_https=request.is_secure())):
+    if (
+        (next or not request.is_ajax()) and
+        not url_has_allowed_host_and_scheme(
+            url=next, allowed_hosts={request.get_host()}, require_https=request.is_secure(),
+        )
+    ):
         next = request.META.get('HTTP_REFERER')
         next = next and unquote(next)  # HTTP_REFERER may be encoded.
-        if not is_safe_url(url=next, allowed_hosts={request.get_host()}, require_https=request.is_secure()):
+        if not url_has_allowed_host_and_scheme(
+            url=next, allowed_hosts={request.get_host()}, require_https=request.is_secure(),
+        ):
             next = '/'
     response = HttpResponseRedirect(next) if next else HttpResponse(status=204)
     if request.method == 'POST':

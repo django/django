@@ -32,6 +32,8 @@ details on these changes.
 
 * ``django.utils.text.unescape_entities()`` will be removed.
 
+* ``django.utils.http.is_safe_url()`` will be removed.
+
 .. _deprecation-removed-in-3.1:
 
 3.1
