@@ -168,6 +168,7 @@ class TestQuerying(PostgreSQLTestCase):
         self.assertSequenceEqual(
             JSONModel.objects.filter(field__d__0__isnull=False).annotate(
                 key=KeyTransform('d', 'field'),
+            ).annotate(
                 chain=KeyTransform('0', 'key'),
                 expr=KeyTransform('0', Cast('key', JSONField())),
             ).filter(chain=F('expr')),
