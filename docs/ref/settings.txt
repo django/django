@@ -2881,6 +2881,16 @@ when the link is generated, it will be valid for up to a day longer.
 
 Used by the :class:`~django.contrib.auth.views.PasswordResetConfirmView`.
 
+.. note::
+
+   Reducing the value of this timeout makes zero difference to the ability of an
+   attacker to brute-force a password reset token, and the tokens are designed
+   to be safe from brute-forcing without any timeout.
+
+   The timeout exists only to protect against some unlikely attack scenarios,
+   such as someone gaining access to email archives that may contain old, unused
+   password reset tokens.
+
 .. setting:: PASSWORD_HASHERS
 
 ``PASSWORD_HASHERS``
