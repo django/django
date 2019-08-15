@@ -640,6 +640,10 @@ Miscellaneous
 * The ``list`` message for :class:`~django.forms.ModelMultipleChoiceField` is
   deprecated in favor of ``invalid_list``.
 
+* The passing of URL kwargs directly to the context by
+  :class:`~django.views.generic.base.TemplateView` is deprecated. Reference
+  them in the template with ``view.kwargs`` instead.
+
 .. _removed-features-3.1:
 
 Features removed in 3.1

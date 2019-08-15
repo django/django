@@ -66,6 +66,9 @@ details on these changes.
 
 * The ``list`` message for ``ModelMultipleChoiceField`` will be removed.
 
+* ``django.views.generic.TemplateView`` will no longer pass URL kwargs directly
+  to the ``context``.
+
 See the :ref:`Django 3.1 release notes <deprecated-features-3.1>` for more
 details on these changes.
 
