@@ -6,35 +6,262 @@ Formset API reference. For introductory material about formsets, see the
 :doc:`/topics/forms/formsets` topic guide.
 
 .. module:: django.forms.formsets
-   :synopsis: Django's functions for building formsets.
+   :synopsis: Django's formset layer.
 
 ``Making a formset``
 ====================
 
+Using ``BaseFormSet`` with the ``formset_factory`` method
+---------------------------------------------------------
+
+Hers's how you can create a formset using formset_factory(), for a
+ArticleForm, using the BaseFormSet as the base class.
+
+    >>> from django.forms import formset_factory
+    >>> ArticleFormSet = formset_factory(ArticleForm)
+
+You now have created a formset named ``ArticleFormSet``. The formset gives you
+the ability to iterate over the forms in the formset and display them as you
+would with a regular form::
+
+    >>> formset = ArticleFormSet()
+    >>> for form in formset:
+    ...     print(form.as_table())
+    <tr><th><label for="id_form-0-title">Title:</label></th><td><input type="text" name="form-0-title" id="id_form-0-title"></td></tr>
+    <tr><th><label for="id_form-0-pub_date">Pub date:</label></th><td><input type="text" name="form-0-pub_date" id="id_form-0-pub_date"></td></tr>
+
+Using ``Formset`` class
+-----------------------
+
+.. versionadded:: 3.0
+
+You can use the ``FormSet`` class to declare a formset in same way you declare models.
+This is alternative method to using ``formset_factory`` to make the formset class.
+
+To create a formset out of an ``ArticleForm`` you would do::
+
+    >>> from django.forms import formsets
+    >>> class ArticleFormSet(formsets.FormSet):
+    ...     form = ArticleForm
+
 .. note::
-    From 3.0 and onwards, a formset can be made using two ways either
-    by using the `formset_factory` or by using the `FormSet` class both are
-    mentioned below.
+    It is compulsory to pass the form argument while declaring the Formset class. Similar to
+    how it's compulsory to pass form as first argument to ``formset_factory``.
+
+You now have created a formset named ``ArticleFormSet``, which is similar to how to create
+it using the ``formset_factory``. You can use it in the same way as the previous example::
+
+    >>> formset = ArticleFormSet()
+    >>> for form in formset:
+    ...     print(form.as_table())
+    <tr><th><label for="id_form-0-title">Title:</label></th><td><input type="text" name="form-0-title" id="id_form-0-title"></td></tr>
+    <tr><th><label for="id_form-0-pub_date">Pub date:</label></th><td><input type="text" name="form-0-pub_date" id="id_form-0-pub_date"></td></tr>
+
+``BaseFormSet``
+===============
+
+.. class:: BaseFormSet
+
+    It is the base class from which every FormSet class is derived.
+
+    Following attributes and methods are available in this class
+    see the :doc:`topics</topics/forms/formsets>` page for examples on how to use them
+
+``initial``
+-----------
+
+.. attribute:: initial
+
+    ``initial`` is a dictonary of a initial data which is used as a reference point
+    to detect changes in the formset.
+
+    See :ref:`formsets-initial-data` for example usage.
+
+``max_num``
+-----------
+
+.. attribute:: max_num
+
+    The ``max_num`` parameter gives you the ability to limit the number of forms
+    the formset will display
+
+    See :ref:`formsets-max-num` for example usage.
+
+``extra``
+---------
+
+.. attribute:: extra
+
+    Limits the maximum number of extra blank form to be attached with every formset.
+
+``empty_form``
+--------------
+
+.. attribute:: empty_form
+
+    ``BaseFormSet`` provides an additional attribute ``empty_form`` which returns
+    a form instance with a prefix of ``__prefix__`` for easier use in dynamic
+    forms with JavaScript.
+
+    See :ref:`empty_form` for example usage.
+
+``validate_max``
+----------------
+
+.. attribute:: validate_max
+
+    If ``validate_max=True`` is passed to
+    :func:`~django.forms.formsets.formset_factory`, validation will also check
+    that the number of forms in the data set, minus those marked for
+    deletion, is less than or equal to ``max_num``.
+
+    See :ref:`validate_max` for example usage.
+
+``validate_min``
+----------------
+
+.. attribute:: validate_min
+
+    If ``validate_min=True`` is passed to
+    :func:`~django.forms.formsets.formset_factory`, validation will also check
+    that the number of forms in the data set, minus those marked for
+    deletion, is greater than or equal to ``min_num``.
+
+    See :ref:`validate_min` for example usage.
+
+``can_order``
+-------------
+
+.. attribute:: can_order
+
+    Lets you create a formset with the ability to order.
+
+    See :attr:`~django.forms.formsets.BaseFormSet.can_order` for example usage.
+
+``ordering_widget``
+-------------------
+
+.. attribute:: ordering_widget
+
+.. versionadded:: 3.0
+
+    Set ``ordering_widget`` to specify the widget class to be used with
+    ``can_order``
+
+    See :attr:`~django.forms.formsets.BaseFormSet.ordering_widget` for example usage.
+
+``can_delete``
+--------------
+
+.. attribute:: can_delete
+
+    Default: ``False``
+    Lets you create a formset with the ability to select forms for deletion.
+
+    See :attr:`~django.forms.formsets.BaseFormSet.can_delete` for example usage.
+
+``form_kwargs``
+---------------
+
+.. attribute:: form_kwargs
+
+    You can pass custom parameter to the forms when instantiating the formset
+
+    See :ref:`custom-formset-form-kwargs` for example usage.
+
+``prefix``
+----------
+
+.. attribute:: prefix
+
+    In the rendered HTML, formsets include a prefix on each field's name. By
+    default, the prefix is ``'form'``, but it can be customized using the formset's
+    ``prefix`` argument.
+
+    See :ref:`formset-prefix` for example usage.
+
+``errors``
+----------
+
+.. attribute:: errors
+
+    ``errors`` is a list whose entries correspond to the errors forms in the formset
+
+    See :ref:`formset-validation` for example usage.
+
+``total_error_count``
+---------------------
+
+.. method:: total_error_count
+
+    To check how many errors there are in the formset, we can use the
+    ``total_error_count`` method
+
+    See :ref:`formset-validation` for example usage.
+
+``has_changed``
+---------------
+
+.. method:: has_changed
+
+    Checks if the formset has changed from the initial data provided.
+
+``is_valid``
+------------
+
+.. method:: is_valid
+
+    Calls the ``is_valid`` method on all the forms and return True if
+    all the calls return True, i.e. all the forms are valid.
+
+    See :ref:`formset-validation` for example usage.
+
+``clean``
+---------
+
+.. method:: clean
+
+    Calls the ``clean`` method on all the forms and return True if
+    all the calls return True, i.e. all the forms are clean.
+
+``get_ordering_widget``
+-----------------------
+
+.. method:: get_ordering_widget
+
+.. versionadded:: 3.0
+
+    Override ``get_ordering_widget()`` if you need to provide a widget instance for
+    use with ``can_order``
+
+    See :meth:`~django.forms.formsets.BaseFormSet.get_ordering_widget` for example usage.
+
+``add_fields``
+--------------
+
+.. method:: add_fields
+
+    hook to add custom fields to your forms.
+
+    See :ref:`formset-add-fields` for example usage.
 
 
-``FormSet class``
------------------
+``as_table``
+------------
 
-.. class:: FormSet.objects
+.. method:: as_table
 
-    The :class:`~django.forms.formsets.FormSet` class is used to create the
-    ``Formset`` from the given ``form`` using a declarative syntax.
-    See the following example which shows how to create AuthorFormSet from
-    AuthorForm::
+    prints the formset as HTML table.
 
-        from django.forms import formsets
+``as_p``
+--------
 
-        class AuthorFormSet(formsets.FormSet):
-            # adding a form field is must
-            form = AuthorForm
+.. method:: as_p
+
+    prints the formset as HTML paragraph.
 
 ``formset_factory``
--------------------
+===================
 
 .. function:: formset_factory(form, formset=BaseFormSet, extra=1, can_order=False, can_delete=False, max_num=None, validate_max=False, min_num=None, validate_min=False, absolute_max=None, can_delete_extra=True, renderer=None)
 
@@ -42,37 +269,17 @@ Formset API reference. For introductory material about formsets, see the
 
     See :doc:`formsets </topics/forms/formsets>` for example usage.
 
-``Overriding methods in fromset``
-=================================
+``FormSet class``
+=================
 
-.. note::
-    Similar to how the formset can be made using two different ways. Overriding the
-    default behavior of the formset methods can also be done in two different ways.
-    Below are the examples of how to override the default `is_valid` method.
+.. class:: FormSet.objects
 
-``Overiding using BaseFormSet class``
--------------------------------------
+    The ``FormSet`` class is used to create the ``Formset`` object from
+    the given ``form`` using a declarative syntax.See the following
+    example which shows how to create `AuthorFormSet` from `AuthorForm`::
 
-You can inherit a class from the `BaseFormSet` and then pass that as an argument
-to the `formset_factory` to create a formset with the modified method.
+        from django.forms import formsets
 
-    >>> from django.forms import formsets
-    >>> from django.forms import formset_factory
-    >>> class ArticleBaseFormSet(formsets.BaseFormSet):
-    ...     def is_valid(self):
-    ...         #Your custom conditions may go here
-    ...         return super().is_valid
-    >>> ArticleFormSet = formset_factory(form=ArticleForm, formset=ArticleBaseFormSet)
-
-``Overiding using FormSet class``
----------------------------------
-
-You can directly insert whatever custom methods you want in the class inherited
-form the `FormSet`
-
-    >>> from django.forms import formsets
-    >>> class ArticleFormset(formsets.FormSet):
-    ...     form = ArticleForm
-    ...     def is_valid(self):
-    ...         #Your custom conditions may go here
-    ...         return super().is_valid
+        class AuthorFormSet(formsets.FormSet):
+            # adding a form field is must
+            form = AuthorForm
