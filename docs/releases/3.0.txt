@@ -215,6 +215,23 @@ Forms
   :attr:`~django.forms.formsets.BaseFormSet.ordering_widget` attribute or
   overriding :attr:`~django.forms.formsets.BaseFormSet.get_ordering_widget`.
 
+* The new :class:`formsets.Formset<django.forms.formsets.FormSet>` enables
+  formsets to be made using the declarative syntax similar to that of the
+  model class.
+
+* The new :class:`forms.models.ModelFormSet<django.forms.models.ModelFormSet>`
+  and :class:`forms.models.InlineFormSet<django.forms.models.InlineFormSet>`
+  classes provides a similar declarative syntax for using the model formsets
+  and replaces the :meth:`forms.models.modelformset_factory()
+  <django.forms.models.modelformset_factory>` and
+  :meth:`forms.models.inlineformset_factory()
+  <django.forms.models.inlineformset_factory>` respectively.
+
+Generic Views
+~~~~~~~~~~~~~
+
+* ...
+
 Internationalization
 ~~~~~~~~~~~~~~~~~~~~
 
