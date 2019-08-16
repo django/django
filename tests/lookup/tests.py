@@ -942,3 +942,17 @@ class LookupTests(TestCase):
             pk_exists=Exists(qs),
         )
         self.assertCountEqual(seasons, Season.objects.all())
+
+    def test_nested_outerref_lhs(self):
+        tag = Tag.objects.create(name=self.au1.alias)
+        tag.articles.add(self.a1)
+        qs = Tag.objects.annotate(
+            has_author_alias_match=Exists(
+                Article.objects.annotate(
+                    author_exists=Exists(
+                        Author.objects.filter(alias=OuterRef(OuterRef('name')))
+                    ),
+                ).filter(author_exists=True)
+            ),
+        )
+        self.assertEqual(qs.get(has_author_alias_match=True), tag)
