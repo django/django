@@ -302,7 +302,7 @@ class FileField(Field):
         if callable(self.upload_to):
             filename = self.upload_to(instance, filename)
         else:
-            dirname = datetime.datetime.now().strftime(self.upload_to)
+            dirname = datetime.datetime.now().strftime(str(self.upload_to))
             filename = posixpath.join(dirname, filename)
         return self.storage.generate_filename(filename)
 

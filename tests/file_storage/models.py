@@ -38,6 +38,7 @@ class Storage(models.Model):
     normal = models.FileField(storage=temp_storage, upload_to='tests')
     custom = models.FileField(storage=temp_storage, upload_to=custom_upload_to)
     pathlib_callable = models.FileField(storage=temp_storage, upload_to=pathlib_upload_to)
+    pathlib_direct = models.FileField(storage=temp_storage, upload_to=Path('bar'))
     random = models.FileField(storage=temp_storage, upload_to=random_upload_to)
     custom_valid_name = models.FileField(
         storage=CustomValidNameStorage(location=temp_storage_location),

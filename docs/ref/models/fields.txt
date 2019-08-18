@@ -629,9 +629,10 @@ Has two optional arguments:
     and can be set in two ways. In both cases, the value is passed to the
     :meth:`Storage.save() <django.core.files.storage.Storage.save>` method.
 
-    If you specify a string value, it may contain :func:`~time.strftime`
-    formatting, which will be replaced by the date/time of the file upload (so
-    that uploaded files don't fill up the given directory). For example::
+    If you specify a string value or a :class:`~pathlib.Path`, it may contain
+    :func:`~time.strftime` formatting, which will be replaced by the date/time
+    of the file upload (so that uploaded files don't fill up the given
+    directory). For example::
 
         class MyModel(models.Model):
             # file will be uploaded to MEDIA_ROOT/uploads
@@ -678,6 +679,10 @@ Has two optional arguments:
 
         class MyModel(models.Model):
             upload = models.FileField(upload_to=user_directory_path)
+
+    .. versionchanged:: 3.0
+
+        Support for :class:`pathlib.Path` was added.
 
 .. attribute:: FileField.storage
 

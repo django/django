@@ -304,6 +304,8 @@ Models
   a certain (database-dependent) limit. Values from ``1`` to ``32767`` are safe
   in all databases supported by Django.
 
+* :attr:`.FileField.upload_to` now supports :class:`pathlib.Path`.
+
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 
