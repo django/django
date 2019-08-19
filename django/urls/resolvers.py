@@ -8,6 +8,7 @@ attributes of the resolved URL match.
 import functools
 import inspect
 import re
+import string
 from importlib import import_module
 from urllib.parse import quote
 
@@ -206,6 +207,8 @@ def _route_to_regex(route, is_endpoint=False):
     For example, 'foo/<int:pk>' returns '^foo\\/(?P<pk>[0-9]+)'
     and {'pk': <django.urls.converters.IntConverter>}.
     """
+    if not set(route).isdisjoint(string.whitespace):
+        raise ImproperlyConfigured("URL route '%s' cannot contain whitespace." % route)
     original_route = route
     parts = ['^']
     converters = {}
