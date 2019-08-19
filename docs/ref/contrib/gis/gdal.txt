@@ -22,7 +22,7 @@ to raster (image) data.
     capabilities of OGR and GDAL's raster features at this time.
 
 __ https://www.gdal.org/
-__ https://www.gdal.org/ogr_arch.html
+__ https://gdal.org/user/vector_data_model.html
 
 Overview
 ========
@@ -92,7 +92,7 @@ each feature in that layer.
 
     Returns the name of the data source.
 
-__ https://www.gdal.org/ogr_formats.html
+__ https://gdal.org/drivers/vector/
 
 ``Layer``
 ---------
@@ -446,7 +446,7 @@ coordinate transformation::
     :class:`Feature.geom` attribute, when reading vector data from
     :class:`Layer` (which is in turn a part of a :class:`DataSource`).
 
-    __ https://www.gdal.org/classOGRGeometry.html
+    __ https://gdal.org/api/ogrgeometry_cpp.html#ogrgeometry-class
 
     .. classmethod:: from_gml(gml_string)
 
@@ -1176,7 +1176,7 @@ blue.
         altered as needed. For instance, use ``GTiff`` for a ``GeoTiff`` file.
         For a list of file types, see also the `GDAL Raster Formats`__ list.
 
-        __ https://www.gdal.org/formats_list.html
+        __ https://gdal.org/drivers/raster/
 
         An in-memory raster is created through the following example:
 
@@ -1403,7 +1403,7 @@ blue.
         Returns a string with a summary of the raster. This is equivalent to
         the `gdalinfo`__ command line utility.
 
-        __ https://www.gdal.org/gdalinfo.html
+        __ https://gdal.org/programs/gdalinfo.html
 
     .. attribute:: metadata
 
@@ -1732,7 +1732,7 @@ Key               Default  Usage
         ...    }
         ... })
 
-__ https://www.gdal.org/frmt_gtiff.html
+__ https://gdal.org/drivers/raster/gtiff.html
 
 The ``band_input`` dictionary
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
