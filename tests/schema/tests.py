@@ -2574,7 +2574,7 @@ class SchemaTests(TransactionTestCase):
                 self.assertIsNone(field.default)
 
     @unittest.skipIf(connection.vendor == 'sqlite', 'SQLite naively remakes the table on field alteration.')
-    def test_alter_field_default_doesnt_perfom_queries(self):
+    def test_alter_field_default_doesnt_perform_queries(self):
         """
         No queries are performed if a field default changes and the field's
         not changing from null to non-null.

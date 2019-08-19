@@ -1298,7 +1298,7 @@ class AggregationTests(TestCase):
         )
 
     @skipUnlessDBFeature('allows_group_by_selected_pks')
-    def test_aggregate_ummanaged_model_columns(self):
+    def test_aggregate_unmanaged_model_columns(self):
         """
         Unmanaged models are sometimes used to represent database views which
         may not allow grouping by selected primary key.
