@@ -236,4 +236,5 @@ the GDAL library.  For example::
        It is easier to install the shifting files now, then to have debug a
        problem caused by their absence later.
 .. [#] Specifically, GeoDjango provides support for the `OGR
-       <https://gdal.org/ogr_arch.html>`_ library, a component of GDAL.
+       <https://gdal.org/user/vector_data_model.html>`_ library, a component of
+       GDAL.
