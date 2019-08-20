@@ -130,6 +130,11 @@ class SimplifiedURLTests(SimpleTestCase):
         with self.assertRaisesMessage(ImproperlyConfigured, msg):
             path('foo/<nonexistent:var>/', empty_view)
 
+    def test_space_in_route(self):
+        msg = "URL route 'space/<int: num>' cannot contain whitespace."
+        with self.assertRaisesMessage(ImproperlyConfigured, msg):
+            path('space/<int: num>', empty_view)
+
 
 @override_settings(ROOT_URLCONF='urlpatterns.converter_urls')
 class ConverterTests(SimpleTestCase):
