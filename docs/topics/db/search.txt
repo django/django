@@ -17,7 +17,7 @@ Standard textual queries
 ------------------------
 
 Text-based fields have a selection of simple matching operations. For example,
-you may wish to allow lookup up an author like so::
+you may wish to allow lookup of an author like so::
 
     >>> Author.objects.filter(name__contains='Terry')
     [<Author: Terry Gilliam>, <Author: Terry Jones>]
