@@ -2,7 +2,6 @@ from unittest import mock
 
 from django.core.checks import Error, Warning as DjangoWarning
 from django.db import connection, models
-from django.db.models.fields.related import ForeignObject
 from django.test.testcases import SimpleTestCase
 from django.test.utils import isolate_apps, override_settings
 
@@ -608,7 +607,7 @@ class RelativeFieldTests(SimpleTestCase):
         class Child(models.Model):
             a = models.PositiveIntegerField()
             b = models.PositiveIntegerField()
-            parent = ForeignObject(
+            parent = models.ForeignObject(
                 Parent,
                 on_delete=models.SET_NULL,
                 from_fields=('a', 'b'),
@@ -633,7 +632,7 @@ class RelativeFieldTests(SimpleTestCase):
         class Child(models.Model):
             a = models.PositiveIntegerField()
             b = models.PositiveIntegerField()
-            parent = ForeignObject(
+            parent = models.ForeignObject(
                 'invalid_models_tests.Parent',
                 on_delete=models.SET_NULL,
                 from_fields=('a', 'b'),
@@ -1441,7 +1440,7 @@ class M2mThroughFieldsTests(SimpleTestCase):
             a = models.PositiveIntegerField()
             b = models.PositiveIntegerField()
             value = models.CharField(max_length=255)
-            parent = ForeignObject(
+            parent = models.ForeignObject(
                 Parent,
                 on_delete=models.SET_NULL,
                 from_fields=('a', 'b'),
@@ -1477,7 +1476,7 @@ class M2mThroughFieldsTests(SimpleTestCase):
             b = models.PositiveIntegerField()
             d = models.PositiveIntegerField()
             value = models.CharField(max_length=255)
-            parent = ForeignObject(
+            parent = models.ForeignObject(
                 Parent,
                 on_delete=models.SET_NULL,
                 from_fields=('a', 'b', 'd'),

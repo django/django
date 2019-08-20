@@ -2,9 +2,8 @@ import unittest
 
 from migrations.test_base import OperationTestBase
 
-from django.db import connection, models
+from django.db import NotSupportedError, connection
 from django.db.models import Index
-from django.db.utils import NotSupportedError
 from django.test import modify_settings
 
 try:
@@ -26,7 +25,7 @@ class AddIndexConcurrentlyTests(OperationTestBase):
         new_state = project_state.clone()
         operation = AddIndexConcurrently(
             'Pony',
-            models.Index(fields=['pink'], name='pony_pink_idx'),
+            Index(fields=['pink'], name='pony_pink_idx'),
         )
         msg = (
             'The AddIndexConcurrently operation cannot be executed inside '

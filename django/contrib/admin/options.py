@@ -30,7 +30,6 @@ from django.core.exceptions import (
 from django.core.paginator import Paginator
 from django.db import models, router, transaction
 from django.db.models.constants import LOOKUP_SEP
-from django.db.models.fields import BLANK_CHOICE_DASH
 from django.forms.formsets import DELETION_FIELD_NAME, all_valid
 from django.forms.models import (
     BaseInlineFormSet, inlineformset_factory, modelform_defines_fields,
@@ -889,7 +888,7 @@ class ModelAdmin(BaseModelAdmin):
         actions = self._filter_actions_by_permissions(request, self._get_base_actions())
         return {name: (func, name, desc) for func, name, desc in actions}
 
-    def get_action_choices(self, request, default_choices=BLANK_CHOICE_DASH):
+    def get_action_choices(self, request, default_choices=models.BLANK_CHOICE_DASH):
         """
         Return a list of choices for use in a form object.  Each choice is a
         tuple (name, description).

@@ -10,12 +10,11 @@ import warnings
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
-from django.db import connections
+from django.db import DatabaseError as WrappedDatabaseError, connections
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.backends.utils import (
     CursorDebugWrapper as BaseCursorDebugWrapper,
 )
-from django.db.utils import DatabaseError as WrappedDatabaseError
 from django.utils.asyncio import async_unsafe
 from django.utils.functional import cached_property
 from django.utils.safestring import SafeString

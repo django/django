@@ -6,22 +6,16 @@ from unittest import mock
 
 from django.core.management.color import no_style
 from django.db import (
-    DatabaseError, IntegrityError, OperationalError, connection,
+    DatabaseError, DataError, IntegrityError, OperationalError, connection,
 )
-from django.db.models import Index, Model, Q
-from django.db.models.constraints import CheckConstraint, UniqueConstraint
-from django.db.models.deletion import CASCADE, PROTECT
-from django.db.models.fields import (
-    AutoField, BigAutoField, BigIntegerField, BinaryField, BooleanField,
-    CharField, DateField, DateTimeField, IntegerField, PositiveIntegerField,
-    SlugField, SmallAutoField, SmallIntegerField, TextField, TimeField,
-    UUIDField,
-)
-from django.db.models.fields.related import (
-    ForeignKey, ForeignObject, ManyToManyField, OneToOneField,
+from django.db.models import (
+    CASCADE, PROTECT, AutoField, BigAutoField, BigIntegerField, BinaryField,
+    BooleanField, CharField, CheckConstraint, DateField, DateTimeField,
+    ForeignKey, ForeignObject, Index, IntegerField, ManyToManyField, Model,
+    OneToOneField, PositiveIntegerField, Q, SlugField, SmallAutoField,
+    SmallIntegerField, TextField, TimeField, UniqueConstraint, UUIDField,
 )
 from django.db.transaction import TransactionManagementError, atomic
-from django.db.utils import DataError
 from django.test import (
     TransactionTestCase, skipIfDBFeature, skipUnlessDBFeature,
 )

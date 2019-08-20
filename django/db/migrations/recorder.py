@@ -1,6 +1,5 @@
 from django.apps.registry import Apps
-from django.db import models
-from django.db.utils import DatabaseError
+from django.db import DatabaseError, models
 from django.utils.functional import classproperty
 from django.utils.timezone import now
 

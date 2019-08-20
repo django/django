@@ -7,12 +7,11 @@ from django.contrib.contenttypes.models import ContentType
 from django.core import checks
 from django.core.exceptions import FieldDoesNotExist, ObjectDoesNotExist
 from django.db import DEFAULT_DB_ALIAS, models, router, transaction
-from django.db.models import DO_NOTHING
+from django.db.models import DO_NOTHING, ForeignObject, ForeignObjectRel
 from django.db.models.base import ModelBase, make_foreign_order_accessors
 from django.db.models.fields.mixins import FieldCacheMixin
 from django.db.models.fields.related import (
-    ForeignObject, ForeignObjectRel, ReverseManyToOneDescriptor,
-    lazy_related_operation,
+    ReverseManyToOneDescriptor, lazy_related_operation,
 )
 from django.db.models.query_utils import PathInfo
 from django.utils.functional import cached_property

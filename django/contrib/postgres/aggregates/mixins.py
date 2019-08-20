@@ -1,4 +1,4 @@
-from django.db.models.expressions import F, OrderBy
+from django.db.models import F, OrderBy
 
 
 class OrderableAggMixin:

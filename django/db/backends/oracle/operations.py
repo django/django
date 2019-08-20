@@ -3,11 +3,12 @@ import uuid
 from functools import lru_cache
 
 from django.conf import settings
+from django.db import DatabaseError
 from django.db.backends.base.operations import BaseDatabaseOperations
 from django.db.backends.utils import strip_quotes, truncate_name
-from django.db.models.expressions import Exists, ExpressionWrapper, RawSQL
+from django.db.models import AutoField, Exists, ExpressionWrapper
+from django.db.models.expressions import RawSQL
 from django.db.models.sql.where import WhereNode
-from django.db.utils import DatabaseError
 from django.utils import timezone
 from django.utils.encoding import force_bytes, force_str
 from django.utils.functional import cached_property
@@ -466,12 +467,11 @@ END;
         return sql
 
     def sequence_reset_sql(self, style, model_list):
-        from django.db import models
         output = []
         query = self._sequence_reset_sql
         for model in model_list:
             for f in model._meta.local_fields:
-                if isinstance(f, models.AutoField):
+                if isinstance(f, AutoField):
                     no_autofield_sequence_name = self._get_no_autofield_sequence_name(model._meta.db_table)
                     table = self.quote_name(model._meta.db_table)
                     column = self.quote_name(f.column)

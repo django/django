@@ -42,12 +42,12 @@ the field class we want the lookup to be available for. In this case, the lookup
 makes sense on all ``Field`` subclasses, so we register it with ``Field``
 directly::
 
-  from django.db.models.fields import Field
+  from django.db.models import Field
   Field.register_lookup(NotEqual)
 
 Lookup registration can also be done using a decorator pattern::
 
-    from django.db.models.fields import Field
+    from django.db.models import Field
 
     @Field.register_lookup
     class NotEqualLookup(Lookup):

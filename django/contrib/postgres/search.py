@@ -1,9 +1,8 @@
-from django.db.models import CharField, Field, FloatField, TextField
-from django.db.models.expressions import (
-    CombinedExpression, Expression, Func, Value,
+from django.db.models import (
+    CharField, Expression, Field, FloatField, Func, Lookup, TextField, Value,
 )
+from django.db.models.expressions import CombinedExpression
 from django.db.models.functions import Cast, Coalesce
-from django.db.models.lookups import Lookup
 
 
 class SearchVectorExact(Lookup):

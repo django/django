@@ -1,14 +1,14 @@
 import datetime
 from decimal import Decimal
 
-from django.db.models.fields import (
+from django.db.models import (
     AutoField, BinaryField, BooleanField, CharField, DateField, DateTimeField,
-    DecimalField, EmailField, FilePathField, FloatField, GenericIPAddressField,
-    IntegerField, IPAddressField, NullBooleanField, PositiveBigIntegerField,
-    PositiveIntegerField, PositiveSmallIntegerField, SlugField,
-    SmallIntegerField, TextField, TimeField, URLField,
+    DecimalField, EmailField, FileField, FilePathField, FloatField,
+    GenericIPAddressField, ImageField, IntegerField, IPAddressField,
+    NullBooleanField, PositiveBigIntegerField, PositiveIntegerField,
+    PositiveSmallIntegerField, SlugField, SmallIntegerField, TextField,
+    TimeField, URLField,
 )
-from django.db.models.fields.files import FileField, ImageField
 from django.test import SimpleTestCase
 from django.utils.functional import lazy
 

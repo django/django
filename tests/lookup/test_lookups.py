@@ -1,7 +1,6 @@
 from datetime import datetime
 
-from django.db.models import Value
-from django.db.models.fields import DateTimeField
+from django.db.models import DateTimeField, Value
 from django.db.models.lookups import YearLookup
 from django.test import SimpleTestCase
 

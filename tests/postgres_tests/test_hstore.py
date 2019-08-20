@@ -2,7 +2,8 @@ import json
 
 from django.core import checks, exceptions, serializers
 from django.db import connection
-from django.db.models.expressions import OuterRef, RawSQL, Subquery
+from django.db.models import OuterRef, Subquery
+from django.db.models.expressions import RawSQL
 from django.forms import Form
 from django.test.utils import CaptureQueriesContext, isolate_apps
 

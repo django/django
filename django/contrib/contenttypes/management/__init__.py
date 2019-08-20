@@ -1,6 +1,7 @@
 from django.apps import apps as global_apps
-from django.db import DEFAULT_DB_ALIAS, migrations, router, transaction
-from django.db.utils import IntegrityError
+from django.db import (
+    DEFAULT_DB_ALIAS, IntegrityError, migrations, router, transaction,
+)
 
 
 class RenameContentType(migrations.RunPython):

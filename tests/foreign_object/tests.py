@@ -3,7 +3,6 @@ from operator import attrgetter
 
 from django.core.exceptions import FieldError
 from django.db import models
-from django.db.models.fields.related import ForeignObject
 from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
 from django.test.utils import isolate_apps
 from django.utils import translation
@@ -436,7 +435,7 @@ class TestModelCheckTests(SimpleTestCase):
             a = models.PositiveIntegerField()
             b = models.PositiveIntegerField()
             value = models.CharField(max_length=255)
-            parent = ForeignObject(
+            parent = models.ForeignObject(
                 Parent,
                 on_delete=models.SET_NULL,
                 from_fields=('a', 'b'),
@@ -461,7 +460,7 @@ class TestModelCheckTests(SimpleTestCase):
             b = models.PositiveIntegerField()
             c = models.PositiveIntegerField()
             d = models.CharField(max_length=255)
-            parent = ForeignObject(
+            parent = models.ForeignObject(
                 Parent,
                 on_delete=models.SET_NULL,
                 from_fields=('a', 'b', 'c'),

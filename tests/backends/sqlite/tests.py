@@ -8,11 +8,9 @@ from sqlite3 import dbapi2
 from unittest import mock
 
 from django.core.exceptions import ImproperlyConfigured
-from django.db import ConnectionHandler, connection, transaction
-from django.db.models import Avg, StdDev, Sum, Variance
-from django.db.models.aggregates import Aggregate
-from django.db.models.fields import CharField
-from django.db.utils import NotSupportedError
+from django.db import NotSupportedError, connection, transaction
+from django.db.models import Aggregate, Avg, CharField, StdDev, Sum, Variance
+from django.db.utils import ConnectionHandler
 from django.test import (
     TestCase, TransactionTestCase, override_settings, skipIfDBFeature,
 )

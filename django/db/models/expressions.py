@@ -4,10 +4,9 @@ import inspect
 from decimal import Decimal
 
 from django.core.exceptions import EmptyResultSet, FieldError
-from django.db import connection
+from django.db import NotSupportedError, connection
 from django.db.models import fields
 from django.db.models.query_utils import Q
-from django.db.utils import NotSupportedError
 from django.utils.deconstruct import deconstructible
 from django.utils.functional import cached_property
 from django.utils.hashable import make_hashable

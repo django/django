@@ -10,8 +10,7 @@ from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.messages.storage.cookie import CookieStorage
 from django.db import connection, models
-from django.db.models import F
-from django.db.models.fields import Field, IntegerField
+from django.db.models import F, Field, IntegerField
 from django.db.models.functions import Upper
 from django.db.models.lookups import Contains, Exact
 from django.template import Context, Template, TemplateSyntaxError

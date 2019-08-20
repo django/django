@@ -6,9 +6,8 @@ from itertools import chain
 
 from django.conf import settings
 from django.core.exceptions import FieldError
-from django.db import utils
+from django.db import DatabaseError, NotSupportedError, models
 from django.db.backends.base.operations import BaseDatabaseOperations
-from django.db.models import aggregates, fields
 from django.db.models.expressions import Col
 from django.utils import timezone
 from django.utils.dateparse import parse_date, parse_datetime, parse_time
@@ -40,8 +39,8 @@ class DatabaseOperations(BaseDatabaseOperations):
             return len(objs)
 
     def check_expression_support(self, expression):
-        bad_fields = (fields.DateField, fields.DateTimeField, fields.TimeField)
-        bad_aggregates = (aggregates.Sum, aggregates.Avg, aggregates.Variance, aggregates.StdDev)
+        bad_fields = (models.DateField, models.DateTimeField, models.TimeField)
+        bad_aggregates = (models.Sum, models.Avg, models.Variance, models.StdDev)
         if isinstance(expression, bad_aggregates):
             for expr in expression.get_source_expressions():
                 try:
@@ -52,13 +51,13 @@ class DatabaseOperations(BaseDatabaseOperations):
                     pass
                 else:
                     if isinstance(output_field, bad_fields):
-                        raise utils.NotSupportedError(
+                        raise NotSupportedError(
                             'You cannot use Sum, Avg, StdDev, and Variance '
                             'aggregations on date/time fields in sqlite3 '
                             'since date/time is saved as text.'
                         )
-        if isinstance(expression, aggregates.Aggregate) and len(expression.source_expressions) > 1:
-            raise utils.NotSupportedError(
+        if isinstance(expression, models.Aggregate) and len(expression.source_expressions) > 1:
+            raise NotSupportedError(
                 "SQLite doesn't support DISTINCT on aggregate functions "
                 "accepting multiple arguments."
             )
@@ -313,7 +312,7 @@ class DatabaseOperations(BaseDatabaseOperations):
 
     def combine_duration_expression(self, connector, sub_expressions):
         if connector not in ['+', '-']:
-            raise utils.DatabaseError('Invalid connector for timedelta: %s.' % connector)
+            raise DatabaseError('Invalid connector for timedelta: %s.' % connector)
         fn_params = ["'%s'" % connector] + sub_expressions
         if len(fn_params) > 3:
             raise ValueError('Too many params for timedelta operations.')

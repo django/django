@@ -8,10 +8,9 @@ from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import FieldError
 from django.db import connection
 from django.db.models import (
-    Avg, Case, Count, DecimalField, F, IntegerField, Max, Q, StdDev, Sum,
-    Value, Variance, When,
+    Aggregate, Avg, Case, Count, DecimalField, F, IntegerField, Max, Q, StdDev,
+    Sum, Value, Variance, When,
 )
-from django.db.models.aggregates import Aggregate
 from django.test import TestCase, skipUnlessAnyDBFeature, skipUnlessDBFeature
 from django.test.utils import Approximate
 

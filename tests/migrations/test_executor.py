@@ -1,12 +1,11 @@
 from unittest import mock
 
 from django.apps.registry import apps as global_apps
-from django.db import connection
+from django.db import DatabaseError, connection
 from django.db.migrations.exceptions import InvalidMigrationPlan
 from django.db.migrations.executor import MigrationExecutor
 from django.db.migrations.graph import MigrationGraph
 from django.db.migrations.recorder import MigrationRecorder
-from django.db.utils import DatabaseError
 from django.test import (
     SimpleTestCase, modify_settings, override_settings, skipUnlessDBFeature,
 )

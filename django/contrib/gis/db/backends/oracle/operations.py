@@ -9,12 +9,12 @@
 """
 import re
 
+from django.contrib.gis.db import models
 from django.contrib.gis.db.backends.base.operations import (
     BaseSpatialOperations,
 )
 from django.contrib.gis.db.backends.oracle.adapter import OracleSpatialAdapter
 from django.contrib.gis.db.backends.utils import SpatialOperator
-from django.contrib.gis.db.models import aggregates
 from django.contrib.gis.geos.geometry import GEOSGeometry, GEOSGeometryBase
 from django.contrib.gis.geos.prototypes.io import wkb_r
 from django.contrib.gis.measure import Distance
@@ -53,7 +53,7 @@ class OracleOperations(BaseSpatialOperations, DatabaseOperations):
 
     name = 'oracle'
     oracle = True
-    disallowed_aggregates = (aggregates.Collect, aggregates.Extent3D, aggregates.MakeLine)
+    disallowed_aggregates = (models.Collect, models.Extent3D, models.MakeLine)
 
     Adapter = OracleSpatialAdapter
 

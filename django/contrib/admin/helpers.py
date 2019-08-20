@@ -7,7 +7,7 @@ from django.contrib.admin.utils import (
     lookup_field,
 )
 from django.core.exceptions import ObjectDoesNotExist
-from django.db.models.fields.related import ManyToManyRel
+from django.db.models import ManyToManyRel
 from django.forms.utils import flatatt
 from django.template.defaultfilters import capfirst, linebreaksbr
 from django.utils.html import conditional_escape, format_html

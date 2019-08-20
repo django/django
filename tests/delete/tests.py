@@ -1,9 +1,8 @@
 from math import ceil
 
 from django.db import connection, models
-from django.db.models.deletion import (
-    Collector, ProtectedError, RestrictedError,
-)
+from django.db.models import ProtectedError, RestrictedError
+from django.db.models.deletion import Collector
 from django.db.models.sql.constants import GET_ITERATOR_CHUNK_SIZE
 from django.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
 

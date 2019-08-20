@@ -5,10 +5,9 @@ from decimal import Decimal
 from django.core.exceptions import FieldError
 from django.db import connection
 from django.db.models import (
-    Avg, Count, DecimalField, DurationField, F, FloatField, Func, IntegerField,
-    Max, Min, Sum, Value,
+    Avg, Case, Count, DecimalField, DurationField, Exists, F, FloatField, Func,
+    IntegerField, Max, Min, OuterRef, Subquery, Sum, Value, When,
 )
-from django.db.models.expressions import Case, Exists, OuterRef, Subquery, When
 from django.db.models.functions import Coalesce
 from django.test import TestCase
 from django.test.testcases import skipUnlessDBFeature

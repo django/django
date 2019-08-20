@@ -4,10 +4,9 @@ from unittest import mock, skipIf
 from django.core.exceptions import FieldError
 from django.db import NotSupportedError, connection
 from django.db.models import (
-    BooleanField, Case, F, Func, OuterRef, Q, RowRange, Subquery, Value,
-    ValueRange, When, Window, WindowFrame,
+    Avg, BooleanField, Case, F, Func, Max, Min, OuterRef, Q, RowRange,
+    Subquery, Sum, Value, ValueRange, When, Window, WindowFrame,
 )
-from django.db.models.aggregates import Avg, Max, Min, Sum
 from django.db.models.functions import (
     CumeDist, DenseRank, ExtractYear, FirstValue, Lag, LastValue, Lead,
     NthValue, Ntile, PercentRank, Rank, RowNumber, Upper,

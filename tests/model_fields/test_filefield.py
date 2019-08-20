@@ -8,7 +8,7 @@ from pathlib import Path
 from django.core.files import File, temp
 from django.core.files.base import ContentFile
 from django.core.files.uploadedfile import TemporaryUploadedFile
-from django.db.utils import IntegrityError
+from django.db import IntegrityError
 from django.test import TestCase, override_settings
 
 from .models import Document

@@ -5,7 +5,7 @@ from unittest import mock
 
 from django.conf import settings
 from django.db import DEFAULT_DB_ALIAS, connection
-from django.db.models.expressions import Func
+from django.db.models import Func
 
 
 def skipUnlessGISLookup(*gis_lookups):

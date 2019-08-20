@@ -1,8 +1,7 @@
 import unittest
 
-from django.db import connection
-from django.db.models.fields import BooleanField, NullBooleanField
-from django.db.utils import DatabaseError
+from django.db import DatabaseError, connection
+from django.db.models import BooleanField, NullBooleanField
 from django.test import TransactionTestCase
 
 from ..models import Square

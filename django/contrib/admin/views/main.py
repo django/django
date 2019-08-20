@@ -17,8 +17,8 @@ from django.core.exceptions import (
     FieldDoesNotExist, ImproperlyConfigured, SuspiciousOperation,
 )
 from django.core.paginator import InvalidPage
-from django.db import models
-from django.db.models.expressions import Combinable, F, OrderBy
+from django.db.models import F, Field, ManyToOneRel, OrderBy
+from django.db.models.expressions import Combinable
 from django.urls import reverse
 from django.utils.http import urlencode
 from django.utils.timezone import make_aware
@@ -141,7 +141,7 @@ class ChangeList:
                     # FieldListFilter class that has been registered for the
                     # type of the given field.
                     field, field_list_filter_class = list_filter, FieldListFilter.create
-                if not isinstance(field, models.Field):
+                if not isinstance(field, Field):
                     field_path = field
                     field = get_fields_from_path(self.model, field_path)[-1]
 
@@ -487,7 +487,7 @@ class ChangeList:
             except FieldDoesNotExist:
                 pass
             else:
-                if isinstance(field.remote_field, models.ManyToOneRel):
+                if isinstance(field.remote_field, ManyToOneRel):
                     # <FK>_id field names don't require a join.
                     if field_name != field.get_attname():
                         return True

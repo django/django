@@ -3,10 +3,9 @@ import unittest
 from io import StringIO
 from unittest import mock
 
-from django.db import connection
+from django.db import DatabaseError, connection
 from django.db.backends.base.creation import BaseDatabaseCreation
 from django.db.backends.mysql.creation import DatabaseCreation
-from django.db.utils import DatabaseError
 from django.test import SimpleTestCase
 
 

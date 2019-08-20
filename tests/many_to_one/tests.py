@@ -2,8 +2,7 @@ import datetime
 from copy import deepcopy
 
 from django.core.exceptions import FieldError, MultipleObjectsReturned
-from django.db import models, transaction
-from django.db.utils import IntegrityError
+from django.db import IntegrityError, models, transaction
 from django.test import TestCase
 from django.utils.translation import gettext_lazy
 

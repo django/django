@@ -2,10 +2,7 @@ import datetime
 from unittest import skipIf, skipUnless
 
 from django.db import connection
-from django.db.models import Index
-from django.db.models.deletion import CASCADE
-from django.db.models.fields.related import ForeignKey
-from django.db.models.query_utils import Q
+from django.db.models import CASCADE, ForeignKey, Index, Q
 from django.test import (
     TestCase, TransactionTestCase, skipIfDBFeature, skipUnlessDBFeature,
 )

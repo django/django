@@ -7,9 +7,7 @@ from django.apps import apps
 from django.conf import settings
 from django.core.exceptions import FieldDoesNotExist
 from django.db import connections
-from django.db.models import Manager
-from django.db.models.fields import AutoField
-from django.db.models.fields.proxy import OrderWrt
+from django.db.models import AutoField, Manager, OrderWrt
 from django.db.models.query_utils import PathInfo
 from django.utils.datastructures import ImmutableList, OrderedSet
 from django.utils.functional import cached_property

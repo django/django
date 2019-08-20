@@ -4,12 +4,12 @@ from django.contrib.gis.db.models.fields import BaseSpatialField, GeometryField
 from django.contrib.gis.db.models.sql import AreaField, DistanceField
 from django.contrib.gis.geos import GEOSGeometry
 from django.core.exceptions import FieldError
+from django.db import NotSupportedError
 from django.db.models import (
-    BinaryField, BooleanField, FloatField, IntegerField, TextField, Transform,
+    BinaryField, BooleanField, FloatField, Func, IntegerField, TextField,
+    Transform, Value,
 )
-from django.db.models.expressions import Func, Value
 from django.db.models.functions import Cast
-from django.db.utils import NotSupportedError
 from django.utils.functional import cached_property
 
 NUMERIC_TYPES = (int, float, Decimal)

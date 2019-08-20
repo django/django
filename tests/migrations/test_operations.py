@@ -1,12 +1,12 @@
 from django.core.exceptions import FieldDoesNotExist
-from django.db import connection, migrations, models, transaction
+from django.db import (
+    IntegrityError, connection, migrations, models, transaction,
+)
 from django.db.migrations.migration import Migration
 from django.db.migrations.operations import CreateModel
 from django.db.migrations.operations.fields import FieldOperation
 from django.db.migrations.state import ModelState, ProjectState
-from django.db.models.fields import NOT_PROVIDED
 from django.db.transaction import atomic
-from django.db.utils import IntegrityError
 from django.test import SimpleTestCase, override_settings, skipUnlessDBFeature
 
 from .models import FoodManager, FoodQuerySet, UnicodeModel
@@ -979,7 +979,7 @@ class OperationTests(OperationTestBase):
             f for n, f in new_state.models["test_adflpd", "pony"].fields
             if n == "height"
         ][0]
-        self.assertEqual(field.default, NOT_PROVIDED)
+        self.assertEqual(field.default, models.NOT_PROVIDED)
         # Test the database alteration
         project_state.apps.get_model("test_adflpd", "pony").objects.create(
             weight=4,

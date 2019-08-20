@@ -1,9 +1,9 @@
+from django.contrib.gis.db import models
 from django.contrib.gis.db.backends.base.adapter import WKTAdapter
 from django.contrib.gis.db.backends.base.operations import (
     BaseSpatialOperations,
 )
 from django.contrib.gis.db.backends.utils import SpatialOperator
-from django.contrib.gis.db.models import aggregates
 from django.contrib.gis.geos.geometry import GEOSGeometryBase
 from django.contrib.gis.geos.prototypes.io import wkb_r
 from django.contrib.gis.measure import Distance
@@ -49,8 +49,8 @@ class MySQLOperations(BaseSpatialOperations, DatabaseOperations):
         return operators
 
     disallowed_aggregates = (
-        aggregates.Collect, aggregates.Extent, aggregates.Extent3D,
-        aggregates.MakeLine, aggregates.Union,
+        models.Collect, models.Extent, models.Extent3D, models.MakeLine,
+        models.Union,
     )
 
     @cached_property

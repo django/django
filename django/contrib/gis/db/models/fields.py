@@ -8,7 +8,7 @@ from django.contrib.gis.geos import (
     MultiLineString, MultiPoint, MultiPolygon, Point, Polygon,
 )
 from django.core.exceptions import ImproperlyConfigured
-from django.db.models.fields import Field
+from django.db.models import Field
 from django.utils.translation import gettext_lazy as _
 
 # Local cache of the spatial_ref_sys table, which holds SRID data for each

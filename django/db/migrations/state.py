@@ -5,7 +5,6 @@ from django.apps import AppConfig
 from django.apps.registry import Apps, apps as global_apps
 from django.conf import settings
 from django.db import models
-from django.db.models.fields.proxy import OrderWrt
 from django.db.models.fields.related import RECURSIVE_RELATIONSHIP_CONSTANT
 from django.db.models.options import DEFAULT_NAMES, normalize_together
 from django.db.models.utils import make_model_tuple
@@ -406,7 +405,7 @@ class ModelState:
         for field in model._meta.local_fields:
             if getattr(field, "remote_field", None) and exclude_rels:
                 continue
-            if isinstance(field, OrderWrt):
+            if isinstance(field, models.OrderWrt):
                 continue
             name = field.name
             try:

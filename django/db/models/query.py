@@ -12,19 +12,17 @@ from itertools import chain
 from django.conf import settings
 from django.core import exceptions
 from django.db import (
-    DJANGO_VERSION_PICKLE_KEY, IntegrityError, connections, router,
-    transaction,
+    DJANGO_VERSION_PICKLE_KEY, IntegrityError, NotSupportedError, connections,
+    router, transaction,
 )
-from django.db.models import DateField, DateTimeField, sql
+from django.db.models import AutoField, DateField, DateTimeField, sql
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.deletion import Collector
 from django.db.models.expressions import Case, Expression, F, Value, When
-from django.db.models.fields import AutoField
 from django.db.models.functions import Cast, Trunc
 from django.db.models.query_utils import FilteredRelation, Q
 from django.db.models.sql.constants import CURSOR, GET_ITERATOR_CHUNK_SIZE
 from django.db.models.utils import resolve_callables
-from django.db.utils import NotSupportedError
 from django.utils import timezone
 from django.utils.functional import cached_property, partition
 from django.utils.version import get_version

@@ -1,4 +1,4 @@
-from django.db.utils import ProgrammingError
+from django.db import ProgrammingError
 from django.utils.functional import cached_property
 
 

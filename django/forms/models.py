@@ -140,7 +140,7 @@ def fields_for_model(model, fields=None, exclude=None, widgets=None,
     ignored = []
     opts = model._meta
     # Avoid circular import
-    from django.db.models.fields import Field as ModelField
+    from django.db.models import Field as ModelField
     sortable_private_fields = [f for f in opts.private_fields if isinstance(f, ModelField)]
     for f in sorted(chain(opts.concrete_fields, sortable_private_fields, opts.many_to_many)):
         if not getattr(f, 'editable', False):

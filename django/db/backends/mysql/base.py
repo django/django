@@ -4,7 +4,7 @@ MySQL database backend for Django.
 Requires mysqlclient: https://pypi.org/project/mysqlclient/
 """
 from django.core.exceptions import ImproperlyConfigured
-from django.db import utils
+from django.db import IntegrityError
 from django.db.backends import utils as backend_utils
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.utils.asyncio import async_unsafe
@@ -75,7 +75,7 @@ class CursorWrapper:
             # Map some error codes to IntegrityError, since they seem to be
             # misclassified and Django would prefer the more logical place.
             if e.args[0] in self.codes_for_integrityerror:
-                raise utils.IntegrityError(*tuple(e.args))
+                raise IntegrityError(*tuple(e.args))
             raise
 
     def executemany(self, query, args):
@@ -85,7 +85,7 @@ class CursorWrapper:
             # Map some error codes to IntegrityError, since they seem to be
             # misclassified and Django would prefer the more logical place.
             if e.args[0] in self.codes_for_integrityerror:
-                raise utils.IntegrityError(*tuple(e.args))
+                raise IntegrityError(*tuple(e.args))
             raise
 
     def __getattr__(self, attr):
@@ -314,7 +314,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
                         )
                     )
                     for bad_row in cursor.fetchall():
-                        raise utils.IntegrityError(
+                        raise IntegrityError(
                             "The row in table '%s' with primary key '%s' has an invalid "
                             "foreign key: %s.%s contains a value '%s' that does not "
                             "have a corresponding value in %s.%s."

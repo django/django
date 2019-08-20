@@ -5,8 +5,7 @@ from operator import attrgetter
 
 from django.core.exceptions import FieldError
 from django.db import connection
-from django.db.models import Max
-from django.db.models.expressions import Exists, OuterRef
+from django.db.models import Exists, Max, OuterRef
 from django.db.models.functions import Substr
 from django.test import TestCase, skipUnlessDBFeature
 from django.utils.deprecation import RemovedInDjango40Warning

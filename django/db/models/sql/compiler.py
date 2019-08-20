@@ -4,6 +4,7 @@ from functools import partial
 from itertools import chain
 
 from django.core.exceptions import EmptyResultSet, FieldError
+from django.db import DatabaseError, NotSupportedError
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.expressions import OrderBy, Random, RawSQL, Ref, Value
 from django.db.models.functions import Cast
@@ -13,7 +14,6 @@ from django.db.models.sql.constants import (
 )
 from django.db.models.sql.query import Query, get_order_dir
 from django.db.transaction import TransactionManagementError
-from django.db.utils import DatabaseError, NotSupportedError
 from django.utils.functional import cached_property
 from django.utils.hashable import make_hashable
 
