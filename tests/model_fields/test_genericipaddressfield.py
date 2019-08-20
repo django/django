@@ -29,6 +29,14 @@ class GenericIPAddressFieldTests(TestCase):
         o = GenericIPAddress.objects.get()
         self.assertIsNone(o.ip)
 
+    def test_invalid_value(self):
+        with self.assertRaisesMessage(ValueError, "Enter a valid IPv4 address."):
+            GenericIPAddress.objects.create(ip=' ')
+        with self.assertRaisesMessage(ValueError, "Enter a valid IPv4 address."):
+            GenericIPAddress.objects.create(ip=' ')
+        with self.assertRaisesMessage(ValueError, "Field 'ip' expected a string but got '1'"):
+            GenericIPAddress.objects.filter(ip=1)
+
     def test_blank_string_saved_as_null(self):
         o = GenericIPAddress.objects.create(ip='')
         o.refresh_from_db()
@@ -38,6 +46,6 @@ class GenericIPAddressFieldTests(TestCase):
         self.assertIsNone(o.ip)
 
     def test_save_load(self):
-        instance = GenericIPAddress.objects.create(ip='::1')
+        instance = GenericIPAddress.objects.create(ip='1.1.1.1')
         loaded = GenericIPAddress.objects.get()
         self.assertEqual(loaded.ip, instance.ip)

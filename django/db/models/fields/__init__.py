@@ -1921,6 +1921,8 @@ class GenericIPAddressField(Field):
 
     def __init__(self, verbose_name=None, name=None, protocol='both',
                  unpack_ipv4=False, *args, **kwargs):
+        self.name = name
+        self.verbose_name = verbose_name
         self.unpack_ipv4 = unpack_ipv4
         self.protocol = protocol
         self.default_validators, invalid_error_message = \
@@ -1979,11 +1981,21 @@ class GenericIPAddressField(Field):
         value = super().get_prep_value(value)
         if value is None:
             return None
-        if value and ':' in value:
-            try:
-                return clean_ipv6_address(value, self.unpack_ipv4)
-            except exceptions.ValidationError:
-                pass
+        if value and not isinstance(value, str):
+            raise ValueError("Field '%s' expected a string but got '%s'." % (self.name, value))
+        if value:
+            if ':' in value:
+                try:
+                    return clean_ipv6_address(value, self.unpack_ipv4)
+                except exceptions.ValidationError:
+                    pass
+
+            for validator in self.validators:
+                try:
+                    validator(value)
+                except exceptions.ValidationError as e:
+                    raise ValueError(e.messages[0])
+
         return str(value)
 
     def formfield(self, **kwargs):
