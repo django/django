@@ -5,6 +5,14 @@ from .search import SearchVector, SearchVectorExact, SearchVectorField
 
 
 class PostgresSimpleLookup(FieldGetDbPrepValueMixin, Lookup):
+    def process_lhs(self, compiler, connection, lhs=None):
+        lhs_sql, params = super().process_lhs(compiler, connection, lhs)
+        field_internal_type = self.lhs.output_field.get_internal_type()
+        db_type = self.lhs.output_field.db_type(connection=connection)
+        lhs_sql = connection.ops.field_cast_sql(
+            db_type, field_internal_type) % lhs_sql
+        lhs_sql = connection.ops.lookup_cast(self.lookup_name, field_internal_type) % lhs_sql
+        return lhs_sql, list(params)
     def as_sql(self, qn, connection):
         lhs, lhs_params = self.process_lhs(qn, connection)
         rhs, rhs_params = self.process_rhs(qn, connection)
