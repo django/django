@@ -1,10 +1,10 @@
-from django.db.models import Lookup, Transform
+from django.db.models import BuiltinLookup, Transform
 from django.db.models.lookups import Exact, FieldGetDbPrepValueMixin
 
 from .search import SearchVector, SearchVectorExact, SearchVectorField
 
 
-class PostgresSimpleLookup(FieldGetDbPrepValueMixin, Lookup):
+class PostgresSimpleLookup(FieldGetDbPrepValueMixin, BuiltinLookup):
     def as_sql(self, qn, connection):
         lhs, lhs_params = self.process_lhs(qn, connection)
         rhs, rhs_params = self.process_rhs(qn, connection)
