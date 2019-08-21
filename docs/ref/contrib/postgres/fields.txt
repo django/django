@@ -284,7 +284,7 @@ transform do not change. For example::
     similar to PostgreSQL's ``text`` type.
 
     .. _citext: https://www.postgresql.org/docs/current/citext.html
-    .. _the performance considerations: https://www.postgresql.org/docs/current/citext.html#AEN178177
+    .. _the performance considerations: https://www.postgresql.org/docs/current/citext.html#id-1.11.7.17.7
 
 ``HStoreField``
 ===============
