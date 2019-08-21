@@ -1,7 +1,9 @@
 from collections import OrderedDict
 from datetime import datetime, timedelta
 
+from django import forms
 from django.conf import settings
+from django.contrib import messages
 from django.contrib.admin import FieldListFilter
 from django.contrib.admin.exceptions import (
     DisallowedModelAdminLookup, DisallowedModelAdminToField,
@@ -35,10 +37,19 @@ IGNORED_PARAMS = (
     ALL_VAR, ORDER_VAR, ORDER_TYPE_VAR, SEARCH_VAR, IS_POPUP_VAR, TO_FIELD_VAR)
 
 
+class ChangeListSearchForm(forms.Form):
+    def __init__(self, *args, **kwargs):
+        super(ChangeListSearchForm, self).__init__(*args, **kwargs)
+        self.fields = {
+            SEARCH_VAR: forms.CharField(required=False, strip=False),
+        }
+
+
 class ChangeList:
     def __init__(self, request, model, list_display, list_display_links,
                  list_filter, date_hierarchy, search_fields, list_select_related,
-                 list_per_page, list_max_show_all, list_editable, model_admin, sortable_by):
+                 list_per_page, list_max_show_all, list_editable, model_admin, sortable_by,
+                 search_form_class=ChangeListSearchForm):
         self.model = model
         self.opts = model._meta
         self.lookup_opts = self.opts
@@ -55,8 +66,17 @@ class ChangeList:
         self.model_admin = model_admin
         self.preserved_filters = model_admin.get_preserved_filters(request)
         self.sortable_by = sortable_by
+        if not issubclass(search_form_class, forms.Form):
+            raise ValueError('%s must subclass forms.Form', search_form_class)
+        self.search_form_class = search_form_class
 
         # Get search parameters from the query string.
+        _search_form = self.search_form_class(request.GET)
+        if not _search_form.is_valid():
+            for k, error in _search_form.errors.items():
+                messages.error(request, ', '.join(error))
+
+        self.query = _search_form.cleaned_data.get(SEARCH_VAR) or ''
         try:
             self.page_num = int(request.GET.get(PAGE_VAR, 0))
         except ValueError:
@@ -77,7 +97,6 @@ class ChangeList:
             self.list_editable = ()
         else:
             self.list_editable = list_editable
-        self.query = request.GET.get(SEARCH_VAR, '')
         self.queryset = self.get_queryset(request)
         self.get_results(request)
         if self.is_popup:

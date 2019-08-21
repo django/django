@@ -9,6 +9,7 @@ from django.contrib.admin import (
 from django.contrib.admin.options import IncorrectLookupParameters
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
+from django.contrib.messages.storage.cookie import CookieStorage
 from django.core.exceptions import ImproperlyConfigured
 from django.test import RequestFactory, TestCase, override_settings
 
@@ -1037,6 +1038,23 @@ class ListFiltersTests(TestCase):
         request.user = self.alfred
         with self.assertRaises(ZeroDivisionError):
             modeladmin.get_changelist_instance(request)
+
+    def test_filter_for_change_list_form(self):
+        modeladmin = BookAdmin(Book, site)
+        tests = (
+            ({'q': '\x00'}, 'Null characters are not allowed'),
+            ({'q': 'some\x00thing'}, 'Null characters are not allowed')
+        )
+
+        for case, error in tests:
+            with self.subTest(case=case):
+                request = self.request_factory.get('/', case)
+                request.user = self.alfred
+                request._messages = CookieStorage(request)
+                modeladmin.get_changelist_instance(request)
+                messages = [m.message for m in request._messages]
+                self.assertEqual(1, len(messages))
+                self.assertIn(error, messages[0])
 
     def test_simplelistfilter_with_queryset_based_lookups(self):
         modeladmin = DecadeFilterBookAdminWithQuerysetBasedLookups(Book, site)
