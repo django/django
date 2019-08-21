@@ -1,6 +1,7 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Bai HuanCheng (Bestony) <xiqingongzi@gmail.com>, 2018
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Kewei Ma <marknv.42@gmail.com>, 2016
 # Lele Long <schemacs@gmail.com>, 2011,2015
@@ -14,9 +15,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2017-09-19 16:41+0000\n"
-"Last-Translator: Liping Wang <lynn.config@gmail.com>\n"
+"POT-Creation-Date: 2018-05-17 11:50+0200\n"
+"PO-Revision-Date: 2018-01-14 07:41+0000\n"
+"Last-Translator: Bai HuanCheng (Bestony) <xiqingongzi@gmail.com>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/django/django/"
 "language/zh_CN/)\n"
 "MIME-Version: 1.0\n"
@@ -74,7 +75,7 @@ msgstr "删除全部"
 
 #, javascript-format
 msgid "Click to remove all chosen %s at once."
-msgstr "删除所有选择的%s。"
+msgstr "删除所有已选择的%s。"
 
 msgid "%(sel)s of %(cnt)s selected"
 msgid_plural "%(sel)s of %(cnt)s selected"
@@ -102,24 +103,8 @@ msgstr ""
 "你已选则执行一个动作, 但可编辑栏位沒有任何改变. 你应该尝试 '去' 按钮, 而不是 "
 "'保存' 按钮."
 
-#, javascript-format
-msgid "Note: You are %s hour ahead of server time."
-msgid_plural "Note: You are %s hours ahead of server time."
-msgstr[0] "注意：你比服务器时间超前 %s 个小时。"
-
-#, javascript-format
-msgid "Note: You are %s hour behind server time."
-msgid_plural "Note: You are %s hours behind server time."
-msgstr[0] "注意：你比服务器时间滞后 %s 个小时。"
-
 msgid "Now"
 msgstr "现在"
-
-msgid "Choose a Time"
-msgstr "选择一个时间"
-
-msgid "Choose a time"
-msgstr "选择一个时间"
 
 msgid "Midnight"
 msgstr "午夜"
@@ -132,6 +117,22 @@ msgstr "正午"
 
 msgid "6 p.m."
 msgstr "下午6点"
+
+#, javascript-format
+msgid "Note: You are %s hour ahead of server time."
+msgid_plural "Note: You are %s hours ahead of server time."
+msgstr[0] "注意：你比服务器时间超前 %s 个小时。"
+
+#, javascript-format
+msgid "Note: You are %s hour behind server time."
+msgid_plural "Note: You are %s hours behind server time."
+msgstr[0] "注意：你比服务器时间滞后 %s 个小时。"
+
+msgid "Choose a Time"
+msgstr "选择一个时间"
+
+msgid "Choose a time"
+msgstr "选择一个时间"
 
 msgid "Cancel"
 msgstr "取消"

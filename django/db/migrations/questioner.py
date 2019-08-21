@@ -1,10 +1,11 @@
+import datetime
 import importlib
 import os
 import sys
 
 from django.apps import apps
 from django.db.models.fields import NOT_PROVIDED
-from django.utils import datetime_safe, timezone
+from django.utils import timezone
 
 from .loader import MigrationLoader
 
@@ -28,7 +29,7 @@ class MigrationQuestioner:
             return True
         # Otherwise, we look to see if it has a migrations module
         # without any Python files in it, apart from __init__.py.
-        # Apps from the new app template will have these; the python
+        # Apps from the new app template will have these; the Python
         # file check will ensure we skip South ones.
         try:
             app_config = apps.get_app_config(app_label)
@@ -135,7 +136,7 @@ class InteractiveMigrationQuestioner(MigrationQuestioner):
                 sys.exit(1)
             else:
                 try:
-                    return eval(code, {}, {"datetime": datetime_safe, "timezone": timezone})
+                    return eval(code, {}, {'datetime': datetime, 'timezone': timezone})
                 except (SyntaxError, NameError) as e:
                     print("Invalid input: %s" % e)
 

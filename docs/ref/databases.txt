@@ -92,7 +92,7 @@ below for information on how to set up your database correctly.
 PostgreSQL notes
 ================
 
-Django supports PostgreSQL 9.4 and higher. `psycopg2`_ 2.5.4 or higher is
+Django supports PostgreSQL 9.5 and higher. `psycopg2`_ 2.5.4 or higher is
 required, though the latest release is recommended.
 
 .. _psycopg2: http://initd.org/psycopg/
@@ -121,7 +121,7 @@ user with `ALTER ROLE`_.
 Django will work just fine without this optimization, but each new connection
 will do some additional queries to set these parameters.
 
-.. _ALTER ROLE: https://www.postgresql.org/docs/current/static/sql-alterrole.html
+.. _ALTER ROLE: https://www.postgresql.org/docs/current/sql-alterrole.html
 
 .. _database-isolation-level:
 
@@ -148,7 +148,7 @@ configuration in :setting:`DATABASES`::
     handle exceptions raised on serialization failures. This option is
     designed for advanced uses.
 
-.. _isolation level: https://www.postgresql.org/docs/current/static/transaction-iso.html
+.. _isolation level: https://www.postgresql.org/docs/current/transaction-iso.html
 
 Indexes for ``varchar`` and ``text`` columns
 --------------------------------------------
@@ -162,7 +162,7 @@ for the column.  The extra index is necessary to correctly perform
 lookups that use the ``LIKE`` operator in their SQL, as is done with the
 ``contains`` and ``startswith`` lookup types.
 
-.. _PostgreSQL operator class: https://www.postgresql.org/docs/current/static/indexes-opclass.html
+.. _PostgreSQL operator class: https://www.postgresql.org/docs/current/indexes-opclass.html
 
 Migration operation for adding extensions
 -----------------------------------------
@@ -185,7 +185,7 @@ faster, but this could diminish performance if more than 10% of the results are
 retrieved. PostgreSQL's assumptions on the number of rows retrieved for a
 cursor query is controlled with the `cursor_tuple_fraction`_ option.
 
-.. _cursor_tuple_fraction: https://www.postgresql.org/docs/current/static/runtime-config-query.html#GUC-CURSOR-TUPLE-FRACTION
+.. _cursor_tuple_fraction: https://www.postgresql.org/docs/current/runtime-config-query.html#GUC-CURSOR-TUPLE-FRACTION
 
 .. _transaction-pooling-server-side-cursors:
 
@@ -244,8 +244,8 @@ If you need to specify such values, reset the sequence afterwards to avoid
 reusing a value that's already in the table. The :djadmin:`sqlsequencereset`
 management command generates the SQL statements to do that.
 
-.. _SERIAL data type: https://www.postgresql.org/docs/current/static/datatype-numeric.html#DATATYPE-SERIAL
-.. _sequence: https://www.postgresql.org/docs/current/static/sql-createsequence.html
+.. _SERIAL data type: https://www.postgresql.org/docs/current/datatype-numeric.html#DATATYPE-SERIAL
+.. _sequence: https://www.postgresql.org/docs/current/sql-createsequence.html
 
 Test database templates
 -----------------------
@@ -253,13 +253,13 @@ Test database templates
 You can use the :setting:`TEST['TEMPLATE'] <TEST_TEMPLATE>` setting to specify
 a `template`_ (e.g. ``'template0'``) from which to create a test database.
 
-.. _template: https://www.postgresql.org/docs/current/static/sql-createdatabase.html
+.. _template: https://www.postgresql.org/docs/current/sql-createdatabase.html
 
 Speeding up test execution with non-durable settings
 ----------------------------------------------------
 
 You can speed up test execution times by `configuring PostgreSQL to be
-non-durable <https://www.postgresql.org/docs/current/static/non-durability.html>`_.
+non-durable <https://www.postgresql.org/docs/current/non-durability.html>`_.
 
 .. warning::
 
@@ -267,6 +267,18 @@ non-durable <https://www.postgresql.org/docs/current/static/non-durability.html>
     or corruption in the case of a server crash or power loss. Only use this on
     a development machine where you can easily restore the entire contents of
     all databases in the cluster.
+
+.. _mariadb-notes:
+
+MariaDB notes
+=============
+
+.. versionadded:: 3.0
+
+Django supports MariaDB 10.1 and higher.
+
+To use MariaDB, use the MySQL backend, which is shared between the two. See the
+:ref:`MySQL notes <mysql-notes>` for more details.
 
 .. _mysql-notes:
 
@@ -321,7 +333,7 @@ MySQL has a couple drivers that implement the Python Database API described in
   require the MySQL client library or any Python modules outside the standard
   library.
 
-.. _mysqlclient: https://pypi.python.org/pypi/mysqlclient
+.. _mysqlclient: https://pypi.org/project/mysqlclient/
 .. _MySQL Connector/Python: https://dev.mysql.com/downloads/connector/python
 
 These drivers are thread-safe and provide connection pooling.
@@ -335,7 +347,7 @@ Connector/Python includes `its own`_.
 mysqlclient
 ~~~~~~~~~~~
 
-Django requires `mysqlclient`_ 1.3.7 or later.
+Django requires `mysqlclient`_ 1.3.13 or later.
 
 MySQL Connector/Python
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -415,10 +427,10 @@ Refer to the :doc:`settings documentation </ref/settings>`.
 
 Connection settings are used in this order:
 
-1. :setting:`OPTIONS`.
-2. :setting:`NAME`, :setting:`USER`, :setting:`PASSWORD`,
-   :setting:`HOST`, :setting:`PORT`
-3. MySQL option files.
+#. :setting:`OPTIONS`.
+#. :setting:`NAME`, :setting:`USER`, :setting:`PASSWORD`, :setting:`HOST`,
+   :setting:`PORT`
+#. MySQL option files.
 
 In other words, if you set the name of the database in :setting:`OPTIONS`,
 this will take precedence over :setting:`NAME`, which would override
@@ -488,13 +500,10 @@ this entry are the four standard isolation levels:
 
 or ``None`` to use the server's configured isolation level. However, Django
 works best with and defaults to read committed rather than MySQL's default,
-repeatable read. Data loss is possible with repeatable read.
-
-.. versionchanged:: 2.0
-
-    In older versions, the MySQL database backend defaults to using the
-    database's isolation level (which defaults to repeatable read) rather
-    than read committed.
+repeatable read. Data loss is possible with repeatable read. In particular,
+you may see cases where :meth:`~django.db.models.query.QuerySet.get_or_create`
+will raise an :exc:`~django.db.IntegrityError` but the object won't appear in
+a subsequent :meth:`~django.db.models.query.QuerySet.get` call.
 
 .. _transaction isolation level: https://dev.mysql.com/doc/refman/en/innodb-transaction-isolation-levels.html
 
@@ -633,6 +642,8 @@ appropriate typecasting.
 SQLite notes
 ============
 
+Django supports SQLite 3.8.3 and later.
+
 SQLite_ provides an excellent development alternative for applications that
 are predominantly read-only or require a smaller installation footprint. As
 with all database servers, though, there are some differences that are
@@ -716,13 +727,26 @@ can use the "pyformat" parameter style, where placeholders in the query
 are given as ``'%(name)s'`` and the parameters are passed as a dictionary
 rather than a list. SQLite does not support this.
 
+.. _sqlite-isolation:
+
+Isolation when using ``QuerySet.iterator()``
+--------------------------------------------
+
+There are special considerations described in `Isolation In SQLite`_ when
+modifying a table while iterating over it using :meth:`.QuerySet.iterator`. If
+a row is added, changed, or deleted within the loop, then that row may or may
+not appear, or may appear twice, in subsequent results fetched from the
+iterator. Your code must handle this.
+
+.. _`Isolation in SQLite`: https://sqlite.org/isolation.html
+
 .. _oracle-notes:
 
 Oracle notes
 ============
 
-Django supports `Oracle Database Server`_ versions 12.1 and higher. Version
-5.2 or higher of the `cx_Oracle`_ Python driver is required.
+Django supports `Oracle Database Server`_ versions 12.2 and higher. Version
+6.0 or higher of the `cx_Oracle`_ Python driver is required.
 
 .. _`Oracle Database Server`: https://www.oracle.com/
 .. _`cx_Oracle`: https://oracle.github.io/python-cx_Oracle/
@@ -749,15 +773,16 @@ privileges:
 * CREATE PROCEDURE WITH ADMIN OPTION
 * CREATE TRIGGER WITH ADMIN OPTION
 
-Note that, while the RESOURCE role has the required CREATE TABLE, CREATE
-SEQUENCE, CREATE PROCEDURE and CREATE TRIGGER privileges, and a user
-granted RESOURCE WITH ADMIN OPTION can grant RESOURCE, such a user cannot
-grant the individual privileges (e.g. CREATE TABLE), and thus RESOURCE
-WITH ADMIN OPTION is not usually sufficient for running tests.
+While the ``RESOURCE`` role has the required ``CREATE TABLE``,
+``CREATE SEQUENCE``, ``CREATE PROCEDURE``, and ``CREATE TRIGGER`` privileges,
+and a user granted ``RESOURCE WITH ADMIN OPTION`` can grant ``RESOURCE``, such
+a user cannot grant the individual privileges (e.g. ``CREATE TABLE``), and thus
+``RESOURCE WITH ADMIN OPTION`` is not usually sufficient for running tests.
 
-Some test suites also create views; to run these, the user also needs
-the CREATE VIEW WITH ADMIN OPTION privilege. In particular, this is needed
-for Django's own test suite.
+Some test suites also create views or materialized views; to run these, the
+user also needs ``CREATE VIEW WITH ADMIN OPTION`` and
+``CREATE MATERIALIZED VIEW WITH ADMIN OPTION`` privileges. In particular, this
+is needed for Django's own test suite.
 
 All of these privileges are included in the DBA role, which is appropriate
 for use on a private developer's database.
@@ -810,16 +835,34 @@ You should either supply both :setting:`HOST` and :setting:`PORT`, or leave
 both as empty strings. Django will use a different connect descriptor depending
 on that choice.
 
+Full DSN and Easy Connect
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+A Full DSN or Easy Connect string can be used in :setting:`NAME` if both
+:setting:`HOST` and :setting:`PORT` are empty. This format is required when
+using RAC or pluggable databases without ``tnsnames.ora``, for example.
+
+Example of an Easy Connect string::
+
+    'NAME': 'localhost:1521/orclpdb1',
+
+Example of a full DSN string::
+
+    'NAME': (
+        '(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=localhost)(PORT=1521))'
+        '(CONNECT_DATA=(SERVICE_NAME=orclpdb1)))'
+    ),
+
 Threaded option
-----------------
+---------------
 
 If you plan to run Django in a multithreaded environment (e.g. Apache using the
 default MPM module on any modern operating system), then you **must** set
-the ``threaded`` option of your Oracle database configuration to True::
+the ``threaded`` option of your Oracle database configuration to ``True``::
 
-            'OPTIONS': {
-                'threaded': True,
-            },
+    'OPTIONS': {
+        'threaded': True,
+    },
 
 Failure to do this may result in crashes and other odd behavior.
 
@@ -831,14 +874,14 @@ retrieve the value of an ``AutoField`` when inserting new rows.  This behavior
 may result in a ``DatabaseError`` in certain unusual setups, such as when
 inserting into a remote table, or into a view with an ``INSTEAD OF`` trigger.
 The ``RETURNING INTO`` clause can be disabled by setting the
-``use_returning_into`` option of the database configuration to False::
+``use_returning_into`` option of the database configuration to ``False``::
 
-            'OPTIONS': {
-                'use_returning_into': False,
-            },
+    'OPTIONS': {
+        'use_returning_into': False,
+    },
 
 In this case, the Oracle backend will use a separate ``SELECT`` query to
-retrieve AutoField values.
+retrieve ``AutoField`` values.
 
 Naming issues
 -------------
@@ -871,11 +914,13 @@ occur when an Oracle datatype is used as a column name.  In
 particular, take care to avoid using the names ``date``,
 ``timestamp``, ``number`` or ``float`` as a field name.
 
+.. _oracle-null-empty-strings:
+
 NULL and empty strings
 ----------------------
 
-Django generally prefers to use the empty string ('') rather than
-NULL, but Oracle treats both identically. To get around this, the
+Django generally prefers to use the empty string (``''``) rather than
+``NULL``, but Oracle treats both identically. To get around this, the
 Oracle backend ignores an explicit ``null`` option on fields that
 have the empty string as a possible value and generates DDL as if
 ``null=True``. When fetching from the database, it is assumed that
@@ -907,7 +952,6 @@ Using a 3rd-party database backend
 In addition to the officially supported databases, there are backends provided
 by 3rd parties that allow you to use other databases with Django:
 
-* `SAP SQL Anywhere`_
 * `IBM DB2`_
 * `Microsoft SQL Server`_
 * Firebird_
@@ -918,8 +962,7 @@ vary considerably. Queries regarding the specific capabilities of these
 unofficial backends, along with any support queries, should be directed to
 the support channels provided by each 3rd party project.
 
-.. _SAP SQL Anywhere: https://github.com/sqlanywhere/sqlany-django
-.. _IBM DB2: https://pypi.python.org/pypi/ibm_db/
-.. _Microsoft SQL Server: https://django-mssql.readthedocs.io/en/latest/
+.. _IBM DB2: https://pypi.org/project/ibm_db/
+.. _Microsoft SQL Server: https://pypi.org/project/django-pyodbc-azure/
 .. _Firebird: https://github.com/maxirobaina/django-firebird
 .. _ODBC: https://github.com/lionheart/django-pyodbc/

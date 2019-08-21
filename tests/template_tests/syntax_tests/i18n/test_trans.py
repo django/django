@@ -1,4 +1,4 @@
-from threading import local
+from asgiref.local import Local
 
 from django.template import Context, Template, TemplateSyntaxError
 from django.templatetags.l10n import LocalizeNode
@@ -136,7 +136,7 @@ class TranslationTransTagTests(SimpleTestCase):
     @override_settings(LOCALE_PATHS=extended_locale_paths)
     def test_template_tags_pgettext(self):
         """{% trans %} takes message contexts into account (#14806)."""
-        trans_real._active = local()
+        trans_real._active = Local()
         trans_real._translations = {}
         with translation.override('de'):
             # Nonexistent context...

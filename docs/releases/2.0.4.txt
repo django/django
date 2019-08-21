@@ -1,0 +1,34 @@
+==========================
+Django 2.0.4 release notes
+==========================
+
+*April 2, 2018*
+
+Django 2.0.4 fixes several bugs in 2.0.3.
+
+Bugfixes
+========
+
+* Fixed a crash when filtering with an ``Exists()`` annotation of a queryset
+  containing a single field (:ticket:`29195`).
+
+* Fixed admin autocomplete widget's translations for `zh-hans` and `zh-hant`
+  languages (:ticket:`29213`).
+
+* Corrected admin's autocomplete widget to add a space after custom classes
+  (:ticket:`29221`).
+
+* Fixed ``PasswordResetConfirmView`` crash when using a user model with a
+  ``UUIDField`` primary key and the reset URL contains an encoded primary key
+  value that decodes to an invalid UUID (:ticket:`29206`).
+
+* Fixed a regression in Django 1.11.8 where combining two annotated
+  ``values_list()`` querysets with ``union()``, ``difference()``, or
+  ``intersection()`` crashed due to mismatching columns (:ticket:`29229`).
+
+* Fixed a regression in Django 1.11 where an empty choice could be initially
+  selected for the ``SelectMultiple`` and ``CheckboxSelectMultiple`` widgets
+  (:ticket:`29273`).
+
+* Fixed a regression in Django 2.0 where ``OpenLayersWidget`` deserialization
+  ignored the widget map's SRID and assumed 4326 (WGS84) (:ticket:`29116`).

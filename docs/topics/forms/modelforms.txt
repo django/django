@@ -2,9 +2,6 @@
 Creating forms from models
 ==========================
 
-.. module:: django.forms.models
-   :synopsis: ModelForm and ModelFormset.
-
 .. currentmodule:: django.forms
 
 ``ModelForm``
@@ -67,7 +64,9 @@ Model field                         Form field
                                     ``True`` on the model field, otherwise not
                                     represented in the form.
 
-:class:`BooleanField`               :class:`~django.forms.BooleanField`
+:class:`BooleanField`               :class:`~django.forms.BooleanField`, or
+                                    :class:`~django.forms.NullBooleanField` if
+                                    ``null=True``.
 
 :class:`CharField`                  :class:`~django.forms.CharField` with
                                     ``max_length`` set to the model field's
@@ -110,6 +109,8 @@ Model field                         Form field
 :class:`PositiveSmallIntegerField`  :class:`~django.forms.IntegerField`
 
 :class:`SlugField`                  :class:`~django.forms.SlugField`
+
+:class:`SmallAutoField`             Not represented in the form
 
 :class:`SmallIntegerField`          :class:`~django.forms.IntegerField`
 
@@ -163,11 +164,11 @@ Consider this set of models::
     from django.db import models
     from django.forms import ModelForm
 
-    TITLE_CHOICES = (
+    TITLE_CHOICES = [
         ('MR', 'Mr.'),
         ('MRS', 'Mrs.'),
         ('MS', 'Ms.'),
-    )
+    ]
 
     class Author(models.Model):
         name = models.CharField(max_length=100)
@@ -293,8 +294,8 @@ You can override the error messages from ``NON_FIELD_ERRORS`` raised by model
 validation by adding the :data:`~django.core.exceptions.NON_FIELD_ERRORS` key
 to the ``error_messages`` dictionary of the ``ModelForm``’s inner ``Meta`` class::
 
-    from django.forms import ModelForm
     from django.core.exceptions import NON_FIELD_ERRORS
+    from django.forms import ModelForm
 
     class ArticleForm(ModelForm):
         class Meta:
@@ -520,7 +521,9 @@ For example, if you want the ``CharField`` for the ``name`` attribute of
             }
 
 The ``widgets`` dictionary accepts either widget instances (e.g.,
-``Textarea(...)``) or classes (e.g., ``Textarea``).
+``Textarea(...)``) or classes (e.g., ``Textarea``). Note that the ``widgets``
+dictionary is ignored for a model field with a non-empty ``choices`` attribute.
+In this case, you must override the form field to use a different widget.
 
 Similarly, you can specify the ``labels``, ``help_texts`` and ``error_messages``
 attributes of the inner ``Meta`` class if you want to further customize a field.
@@ -571,7 +574,7 @@ fields like you would in a regular ``Form``.
 If you want to specify a field's validators, you can do so by defining
 the field declaratively and setting its ``validators`` parameter::
 
-    from django.forms import ModelForm, CharField
+    from django.forms import CharField, ModelForm
     from myapp.models import Article
 
     class ArticleForm(ModelForm):
@@ -875,8 +878,10 @@ As with regular formsets, it's possible to :ref:`specify initial data
 parameter when instantiating the model formset class returned by
 :func:`~django.forms.models.modelformset_factory`. However, with model
 formsets, the initial values only apply to extra forms, those that aren't
-attached to an existing model instance. If the extra forms with initial data
-aren't changed by the user, they won't be validated or saved.
+attached to an existing model instance. If the length of ``initial`` exceeds
+the number of extra forms, the excess initial data is ignored. If the extra
+forms with initial data aren't changed by the user, they won't be validated or
+saved.
 
 .. _saving-objects-in-the-formset:
 
@@ -1069,14 +1074,14 @@ There are three ways to render a formset in a Django template.
 
 First, you can let the formset do most of the work::
 
-    <form method="post" action="">
+    <form method="post">
         {{ formset }}
     </form>
 
 Second, you can manually render the formset, but let the form deal with
 itself::
 
-    <form method="post" action="">
+    <form method="post">
         {{ formset.management_form }}
         {% for form in formset %}
             {{ form }}
@@ -1089,7 +1094,7 @@ form as shown above. See the :ref:`management form documentation
 
 Third, you can manually render each field::
 
-    <form method="post" action="">
+    <form method="post">
         {{ formset.management_form }}
         {% for form in formset %}
             {% for field in form %}
@@ -1102,7 +1107,7 @@ If you opt to use this third method and you don't iterate over the fields with
 a ``{% for %}`` loop, you'll need to render the primary key field. For example,
 if you were rendering the ``name`` and ``age`` fields of a model::
 
-    <form method="post" action="">
+    <form method="post">
         {{ formset.management_form }}
         {% for form in formset %}
             {{ form.id }}

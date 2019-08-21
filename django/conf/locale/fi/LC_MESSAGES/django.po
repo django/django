@@ -1,18 +1,19 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Aarni Koskela, 2015,2017
+# Aarni Koskela, 2015,2017-2018
 # Antti Kaihola <antti.15+transifex@kaihola.fi>, 2011
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Lasse Liehu <larso@gmx.com>, 2015
+# Mika Mäkelä <mika.m.makela@gmail.com>, 2018
 # Klaus Dahlén <klaus.dahlen@gmail.com>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-11-15 16:15+0100\n"
-"PO-Revision-Date: 2017-11-16 01:13+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2019-01-16 20:42+0100\n"
+"PO-Revision-Date: 2019-01-18 00:44+0000\n"
+"Last-Translator: Ramiro Morales\n"
 "Language-Team: Finnish (http://www.transifex.com/django/django/language/"
 "fi/)\n"
 "MIME-Version: 1.0\n"
@@ -141,6 +142,9 @@ msgstr "Yläsorbi"
 msgid "Hungarian"
 msgstr "unkari"
 
+msgid "Armenian"
+msgstr ""
+
 msgid "Interlingua"
 msgstr "interlingua"
 
@@ -161,6 +165,9 @@ msgstr "japani"
 
 msgid "Georgian"
 msgstr "georgia"
+
+msgid "Kabyle"
+msgstr "Kabyle"
 
 msgid "Kazakh"
 msgstr "kazakin kieli"
@@ -384,6 +391,9 @@ msgstr[1] ""
 "Varmista, että tämä arvo on enintään %(limit_value)d merkkiä pitkä (tällä "
 "hetkellä %(show_value)d)."
 
+msgid "Enter a number."
+msgstr "Syötä luku."
+
 #, python-format
 msgid "Ensure that there are no more than %(max)s digit in total."
 msgid_plural "Ensure that there are no more than %(max)s digits in total."
@@ -415,7 +425,7 @@ msgstr ""
 "\"%(allowed_extensions)s\"."
 
 msgid "Null characters are not allowed."
-msgstr ""
+msgstr "Tyhjiä merkkejä (null) ei sallita."
 
 msgid "and"
 msgstr "ja"
@@ -464,6 +474,10 @@ msgstr "Suuri (8-tavuinen) kokonaisluku"
 #, python-format
 msgid "'%(value)s' value must be either True or False."
 msgstr "%(value)s-arvo pitää olla joko tosi tai epätosi."
+
+#, python-format
+msgid "'%(value)s' value must be either True, False, or None."
+msgstr "%(value)s-arvo pitää olla joko tosi, epätosi tai ei mitään."
 
 msgid "Boolean (Either True or False)"
 msgstr "Totuusarvo: joko tosi (True) tai epätosi (False)"
@@ -598,6 +612,9 @@ msgstr "Raaka binaaridata"
 msgid "'%(value)s' is not a valid UUID."
 msgstr "%(value)s ei ole kelvollinen UUID."
 
+msgid "Universally unique identifier"
+msgstr ""
+
 msgid "File"
 msgstr "Tiedosto"
 
@@ -637,9 +654,6 @@ msgstr "Tämä kenttä vaaditaan."
 msgid "Enter a whole number."
 msgstr "Syötä kokonaisluku."
 
-msgid "Enter a number."
-msgstr "Syötä luku."
-
 msgid "Enter a valid date."
 msgstr "Syötä oikea päivämäärä."
 
@@ -651,6 +665,10 @@ msgstr "Syötä oikea pvm/kellonaika."
 
 msgid "Enter a valid duration."
 msgstr "Syötä oikea kesto."
+
+#, python-brace-format
+msgid "The number of days must be between {min_days} and {max_days}."
+msgstr "Päivien määrä täytyy olla välillä {min_days} ja {max_days}."
 
 msgid "No file was submitted. Check the encoding type on the form."
 msgstr "Tiedostoa ei lähetetty. Tarkista lomakkeen koodaus (encoding)."
@@ -743,14 +761,14 @@ msgid "Please correct the duplicate values below."
 msgstr "Korjaa allaolevat kaksoisarvot."
 
 msgid "The inline value did not match the parent instance."
-msgstr ""
+msgstr "Liittyvä arvo ei vastannut vanhempaa instanssia."
 
 msgid "Select a valid choice. That choice is not one of the available choices."
 msgstr "Valitse oikea vaihtoehto. Valintasi ei löydy vaihtoehtojen joukosta."
 
 #, python-format
 msgid "\"%(pk)s\" is not a valid value."
-msgstr ""
+msgstr "\"%(pk)s\" ei ole kelvollinen arvo."
 
 #, python-format
 msgid ""
@@ -1040,8 +1058,8 @@ msgstr "Tämä ei ole kelvollinen IPv6-osoite."
 
 #, python-format
 msgctxt "String to return when truncating text"
-msgid "%(truncated_text)s..."
-msgstr "%(truncated_text)s…"
+msgid "%(truncated_text)s…"
+msgstr ""
 
 msgid "or"
 msgstr "tai"
@@ -1122,6 +1140,11 @@ msgid ""
 "If you're concerned about privacy, use alternatives like <a rel=\"noreferrer"
 "\" ...> for links to third-party sites."
 msgstr ""
+"Jos käytät <meta name=\"referrer\" content=\"no-referrer\">-tagia tai "
+"\"Referrer-Policy: no-referrer\" -otsaketta, ole hyvä ja poista ne. CSRF-"
+"suojaus vaatii Referer-otsakkeen tehdäkseen tarkan referer-tarkistuksen. Jos "
+"vaadit yksityisyyttä, käytä vaihtoehtoja kuten <a rel=\"noreferrer\" ..."
+">linkittääksesi kolmannen osapuolen sivuille."
 
 msgid ""
 "You are seeing this message because this site requires a CSRF cookie when "
@@ -1147,7 +1170,7 @@ msgid "No year specified"
 msgstr "Vuosi puuttuu"
 
 msgid "Date out of range"
-msgstr ""
+msgstr "Päivämäärä ei alueella"
 
 msgid "No month specified"
 msgstr "Kuukausi puuttuu"
@@ -1208,9 +1231,11 @@ msgid ""
 "View <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" "
 "target=\"_blank\" rel=\"noopener\">release notes</a> for Django %(version)s"
 msgstr ""
+"Katso Django %(version)s <a href=\"https://docs.djangoproject.com/en/"
+"%(version)s/releases/\" target=\"_blank\" rel=\"noopener\">julkaisutiedot</a>"
 
 msgid "The install worked successfully! Congratulations!"
-msgstr ""
+msgstr "Asennus toimi! Onneksi olkoon!"
 
 #, python-format
 msgid ""
@@ -1219,21 +1244,24 @@ msgid ""
 "\">DEBUG=True</a> is in your settings file and you have not configured any "
 "URLs."
 msgstr ""
+"Näet tämän viestin, koska asetuksissasi on <a href=\"https://docs."
+"djangoproject.com/en/%(version)s/ref/settings/#debug\" target=\"_blank\" rel="
+"\"noopener\">DEBUG = True</a> etkä ole konfiguroinut yhtään URL-osoitetta."
 
 msgid "Django Documentation"
-msgstr ""
+msgstr "Django-dokumentaatio"
 
 msgid "Topics, references, &amp; how-to's"
-msgstr ""
+msgstr "Aiheet, viittaukset &amp; how-tot"
 
 msgid "Tutorial: A Polling App"
-msgstr ""
+msgstr "Tutoriaali: kyselyapplikaatio"
 
 msgid "Get started with Django"
-msgstr ""
+msgstr "Miten päästä alkuun Djangolla"
 
 msgid "Django Community"
-msgstr ""
+msgstr "Django-yhteisö"
 
 msgid "Connect, get help, or contribute"
-msgstr ""
+msgstr "Verkostoidu, saa apua tai jatkokehitä"

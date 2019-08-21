@@ -177,7 +177,7 @@ form .aligned table p {
     padding-left: 0;
 }
 
-fieldset .field-box {
+fieldset .fieldBox {
     float: left;
     margin-right: 20px;
 }
@@ -291,10 +291,27 @@ body.popup .submit-row {
     color: #fff;
 }
 
+.submit-row a.closelink {
+    display: inline-block;
+    background: #bbbbbb;
+    border-radius: 4px;
+    padding: 10px 15px;
+    height: 15px;
+    line-height: 15px;
+    margin: 0 0 0 5px;
+    color: #fff;
+}
+
 .submit-row a.deletelink:focus,
 .submit-row a.deletelink:hover,
 .submit-row a.deletelink:active {
     background: #a41515;
+}
+
+.submit-row a.closelink:focus,
+.submit-row a.closelink:hover,
+.submit-row a.closelink:active {
+    background: #aaaaaa;
 }
 
 /* CUSTOM FORM FIELDS */
@@ -336,7 +353,7 @@ body.popup .submit-row {
     width: 2.2em;
 }
 
-.vTextField {
+.vTextField, .vUUIDField {
     width: 20em;
 }
 

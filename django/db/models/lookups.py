@@ -3,15 +3,17 @@ import math
 from copy import copy
 
 from django.core.exceptions import EmptyResultSet
-from django.db.models.expressions import Func, Value
+from django.db.models.expressions import Exists, Func, RawSQL, Value
 from django.db.models.fields import DateTimeField, Field, IntegerField
 from django.db.models.query_utils import RegisterLookupMixin
+from django.utils.datastructures import OrderedSet
 from django.utils.functional import cached_property
 
 
 class Lookup:
     lookup_name = None
     prepare_rhs = True
+    can_use_none_as_rhs = False
 
     def __init__(self, lhs, rhs):
         self.lhs, self.rhs = lhs, rhs
@@ -62,8 +64,8 @@ class Lookup:
             self.lhs, self.rhs = new_exprs
 
     def get_prep_lookup(self):
-        if hasattr(self.rhs, '_prepare'):
-            return self.rhs._prepare(self.lhs.output_field)
+        if hasattr(self.rhs, 'resolve_expression'):
+            return self.rhs
         if self.prepare_rhs and hasattr(self.lhs.output_field, 'get_prep_value'):
             return self.lhs.output_field.get_prep_value(self.rhs)
         return self.rhs
@@ -87,8 +89,7 @@ class Lookup:
             value = self.apply_bilateral_transforms(value)
             value = value.resolve_expression(compiler.query)
         if hasattr(value, 'as_sql'):
-            sql, params = compiler.compile(value)
-            return '(' + sql + ')', params
+            return compiler.compile(value)
         else:
             return self.get_db_prep_lookup(value, connection)
 
@@ -102,7 +103,7 @@ class Lookup:
             new.rhs = new.rhs.relabeled_clone(relabels)
         return new
 
-    def get_group_by_cols(self):
+    def get_group_by_cols(self, alias=None):
         cols = self.lhs.get_group_by_cols()
         if hasattr(self.rhs, 'get_group_by_cols'):
             cols.extend(self.rhs.get_group_by_cols())
@@ -110,6 +111,23 @@ class Lookup:
 
     def as_sql(self, compiler, connection):
         raise NotImplementedError
+
+    def as_oracle(self, compiler, connection):
+        # Oracle doesn't allow EXISTS() to be compared to another expression
+        # unless it's wrapped in a CASE WHEN.
+        wrapped = False
+        exprs = []
+        for expr in (self.lhs, self.rhs):
+            if isinstance(expr, Exists):
+                # XXX: Use Case(When(self.lhs)) once support for boolean
+                # expressions is added to When.
+                sql, params = compiler.compile(expr)
+                sql = 'CASE WHEN %s THEN 1 ELSE 0 END' % sql
+                expr = RawSQL(sql, params)
+                wrapped = True
+            exprs.append(expr)
+        lookup = type(self)(*exprs) if wrapped else self
+        return lookup.as_sql(compiler, connection)
 
     @cached_property
     def contains_aggregate(self):
@@ -175,8 +193,9 @@ class FieldGetDbPrepValueMixin:
     get_db_prep_lookup_value_is_iterable = False
 
     def get_db_prep_lookup(self, value, connection):
-        # For relational fields, use the output_field of the 'field' attribute.
-        field = getattr(self.lhs.output_field, 'field', None)
+        # For relational fields, use the 'target_field' attribute of the
+        # output_field.
+        field = getattr(self.lhs.output_field, 'target_field', None)
         get_db_prep_value = getattr(field, 'get_db_prep_value', None) or self.lhs.output_field.get_db_prep_value
         return (
             '%s',
@@ -194,11 +213,9 @@ class FieldGetDbPrepValueIterableMixin(FieldGetDbPrepValueMixin):
     get_db_prep_lookup_value_is_iterable = True
 
     def get_prep_lookup(self):
+        if hasattr(self.rhs, 'resolve_expression'):
+            return self.rhs
         prepared_values = []
-        if hasattr(self.rhs, '_prepare'):
-            # A subquery is like an iterable but its items shouldn't be
-            # prepared independently.
-            return self.rhs._prepare(self.lhs.output_field)
         for rhs_value in self.rhs:
             if hasattr(rhs_value, 'resolve_expression'):
                 # An expression will be handled by the database but can coexist
@@ -325,7 +342,7 @@ class In(FieldGetDbPrepValueIterableMixin, BuiltinLookup):
 
         if self.rhs_is_direct_value():
             try:
-                rhs = set(self.rhs)
+                rhs = OrderedSet(self.rhs)
             except TypeError:  # Unhashable items in self.rhs
                 rhs = self.rhs
 
@@ -376,6 +393,8 @@ class In(FieldGetDbPrepValueIterableMixin, BuiltinLookup):
 
 
 class PatternLookup(BuiltinLookup):
+    param_pattern = '%%%s%%'
+    prepare_rhs = False
 
     def get_rhs_op(self, connection, rhs):
         # Assume we are in startswith. We need to produce SQL like:
@@ -393,71 +412,43 @@ class PatternLookup(BuiltinLookup):
         else:
             return super().get_rhs_op(connection, rhs)
 
+    def process_rhs(self, qn, connection):
+        rhs, params = super().process_rhs(qn, connection)
+        if self.rhs_is_direct_value() and params and not self.bilateral_transforms:
+            params[0] = self.param_pattern % connection.ops.prep_for_like_query(params[0])
+        return rhs, params
+
 
 @Field.register_lookup
 class Contains(PatternLookup):
     lookup_name = 'contains'
-    prepare_rhs = False
-
-    def process_rhs(self, qn, connection):
-        rhs, params = super().process_rhs(qn, connection)
-        if params and not self.bilateral_transforms:
-            params[0] = "%%%s%%" % connection.ops.prep_for_like_query(params[0])
-        return rhs, params
 
 
 @Field.register_lookup
 class IContains(Contains):
     lookup_name = 'icontains'
-    prepare_rhs = False
 
 
 @Field.register_lookup
 class StartsWith(PatternLookup):
     lookup_name = 'startswith'
-    prepare_rhs = False
-
-    def process_rhs(self, qn, connection):
-        rhs, params = super().process_rhs(qn, connection)
-        if params and not self.bilateral_transforms:
-            params[0] = "%s%%" % connection.ops.prep_for_like_query(params[0])
-        return rhs, params
+    param_pattern = '%s%%'
 
 
 @Field.register_lookup
-class IStartsWith(PatternLookup):
+class IStartsWith(StartsWith):
     lookup_name = 'istartswith'
-    prepare_rhs = False
-
-    def process_rhs(self, qn, connection):
-        rhs, params = super().process_rhs(qn, connection)
-        if params and not self.bilateral_transforms:
-            params[0] = "%s%%" % connection.ops.prep_for_like_query(params[0])
-        return rhs, params
 
 
 @Field.register_lookup
 class EndsWith(PatternLookup):
     lookup_name = 'endswith'
-    prepare_rhs = False
-
-    def process_rhs(self, qn, connection):
-        rhs, params = super().process_rhs(qn, connection)
-        if params and not self.bilateral_transforms:
-            params[0] = "%%%s" % connection.ops.prep_for_like_query(params[0])
-        return rhs, params
+    param_pattern = '%%%s'
 
 
 @Field.register_lookup
-class IEndsWith(PatternLookup):
+class IEndsWith(EndsWith):
     lookup_name = 'iendswith'
-    prepare_rhs = False
-
-    def process_rhs(self, qn, connection):
-        rhs, params = super().process_rhs(qn, connection)
-        if params and not self.bilateral_transforms:
-            params[0] = "%%%s" % connection.ops.prep_for_like_query(params[0])
-        return rhs, params
 
 
 @Field.register_lookup
@@ -510,71 +501,52 @@ class YearLookup(Lookup):
             bounds = connection.ops.year_lookup_bounds_for_date_field(year)
         return bounds
 
-
-class YearComparisonLookup(YearLookup):
     def as_sql(self, compiler, connection):
-        # We will need to skip the extract part and instead go
-        # directly with the originating field, that is self.lhs.lhs.
-        lhs_sql, params = self.process_lhs(compiler, connection, self.lhs.lhs)
-        rhs_sql, rhs_params = self.process_rhs(compiler, connection)
-        rhs_sql = self.get_rhs_op(connection, rhs_sql)
-        start, finish = self.year_lookup_bounds(connection, rhs_params[0])
-        params.append(self.get_bound(start, finish))
-        return '%s %s' % (lhs_sql, rhs_sql), params
+        # Avoid the extract operation if the rhs is a direct value to allow
+        # indexes to be used.
+        if self.rhs_is_direct_value():
+            # Skip the extract part by directly using the originating field,
+            # that is self.lhs.lhs.
+            lhs_sql, params = self.process_lhs(compiler, connection, self.lhs.lhs)
+            rhs_sql, _ = self.process_rhs(compiler, connection)
+            rhs_sql = self.get_direct_rhs_sql(connection, rhs_sql)
+            start, finish = self.year_lookup_bounds(connection, self.rhs)
+            params.extend(self.get_bound_params(start, finish))
+            return '%s %s' % (lhs_sql, rhs_sql), params
+        return super().as_sql(compiler, connection)
 
-    def get_rhs_op(self, connection, rhs):
+    def get_direct_rhs_sql(self, connection, rhs):
         return connection.operators[self.lookup_name] % rhs
 
-    def get_bound(self, start, finish):
+    def get_bound_params(self, start, finish):
         raise NotImplementedError(
-            'subclasses of YearComparisonLookup must provide a get_bound() method'
+            'subclasses of YearLookup must provide a get_bound_params() method'
         )
 
 
 class YearExact(YearLookup, Exact):
-    lookup_name = 'exact'
+    def get_direct_rhs_sql(self, connection, rhs):
+        return 'BETWEEN %s AND %s'
 
-    def as_sql(self, compiler, connection):
-        # We will need to skip the extract part and instead go
-        # directly with the originating field, that is self.lhs.lhs.
-        lhs_sql, params = self.process_lhs(compiler, connection, self.lhs.lhs)
-        rhs_sql, rhs_params = self.process_rhs(compiler, connection)
-        try:
-            # Check that rhs_params[0] exists (IndexError),
-            # it isn't None (TypeError), and is a number (ValueError)
-            int(rhs_params[0])
-        except (IndexError, TypeError, ValueError):
-            # Can't determine the bounds before executing the query, so skip
-            # optimizations by falling back to a standard exact comparison.
-            return super().as_sql(compiler, connection)
-        bounds = self.year_lookup_bounds(connection, rhs_params[0])
-        params.extend(bounds)
-        return '%s BETWEEN %%s AND %%s' % lhs_sql, params
+    def get_bound_params(self, start, finish):
+        return (start, finish)
 
 
-class YearGt(YearComparisonLookup):
-    lookup_name = 'gt'
-
-    def get_bound(self, start, finish):
-        return finish
+class YearGt(YearLookup, GreaterThan):
+    def get_bound_params(self, start, finish):
+        return (finish,)
 
 
-class YearGte(YearComparisonLookup):
-    lookup_name = 'gte'
-
-    def get_bound(self, start, finish):
-        return start
+class YearGte(YearLookup, GreaterThanOrEqual):
+    def get_bound_params(self, start, finish):
+        return (start,)
 
 
-class YearLt(YearComparisonLookup):
-    lookup_name = 'lt'
-
-    def get_bound(self, start, finish):
-        return start
+class YearLt(YearLookup, LessThan):
+    def get_bound_params(self, start, finish):
+        return (start,)
 
 
-class YearLte(YearComparisonLookup):
-    lookup_name = 'lte'
-
-    def get_bound(self, start, finish):
-        return finish
+class YearLte(YearLookup, LessThanOrEqual):
+    def get_bound_params(self, start, finish):
+        return (finish,)

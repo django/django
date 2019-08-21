@@ -5,7 +5,7 @@ from django.test import SimpleTestCase
 from django.utils.functional import lazystr
 from django.utils.html import (
     conditional_escape, escape, escapejs, format_html, html_safe, json_script,
-    linebreaks, smart_urlquote, strip_spaces_between_tags, strip_tags,
+    linebreaks, smart_urlquote, strip_spaces_between_tags, strip_tags, urlize,
 )
 from django.utils.safestring import mark_safe
 
@@ -27,7 +27,7 @@ class TestUtilsHtml(SimpleTestCase):
             ('<', '&lt;'),
             ('>', '&gt;'),
             ('"', '&quot;'),
-            ("'", '&#39;'),
+            ("'", '&#x27;'),
         )
         # Substitution patterns for testing the above items.
         patterns = ("%s", "asdf%sfdsa", "%s1", "1%sb")
@@ -70,6 +70,8 @@ class TestUtilsHtml(SimpleTestCase):
         items = (
             ('<p>See: &#39;&eacute; is an apostrophe followed by e acute</p>',
              'See: &#39;&eacute; is an apostrophe followed by e acute'),
+            ('<p>See: &#x27;&eacute; is an apostrophe followed by e acute</p>',
+             'See: &#x27;&eacute; is an apostrophe followed by e acute'),
             ('<adf>a', 'a'),
             ('</adf>a', 'a'),
             ('<asdf><asdf>e', 'e'),
@@ -84,10 +86,12 @@ class TestUtilsHtml(SimpleTestCase):
             ('d<a:b c:d>e</p>f', 'def'),
             ('<strong>foo</strong><a href="http://example.com">bar</a>', 'foobar'),
             # caused infinite loop on Pythons not patched with
-            # http://bugs.python.org/issue20288
+            # https://bugs.python.org/issue20288
             ('&gotcha&#;<>', '&gotcha&#;<>'),
             ('<sc<!-- -->ript>test<<!-- -->/script>', 'ript>test'),
             ('<script>alert()</script>&h', 'alert()h'),
+            ('><!' + ('&' * 16000) + 'D', '><!' + ('&' * 16000) + 'D'),
+            ('X<<<<br>br>br>br>X', 'XX'),
         )
         for value, output in items:
             with self.subTest(value=value, output=output):
@@ -99,7 +103,7 @@ class TestUtilsHtml(SimpleTestCase):
         for filename in ('strip_tags1.html', 'strip_tags2.txt'):
             with self.subTest(filename=filename):
                 path = os.path.join(os.path.dirname(__file__), 'files', filename)
-                with open(path, 'r') as fp:
+                with open(path) as fp:
                     content = fp.read()
                     start = datetime.now()
                     stripped = strip_tags(content)
@@ -183,6 +187,7 @@ class TestUtilsHtml(SimpleTestCase):
              'http://example.com/?q=http%3A%2F%2Fexample.com%2F%3Fx%3D1%26q%3Ddjango'),
             ('http://example.com/?q=http%3A%2F%2Fexample.com%2F%3Fx%3D1%26q%3Ddjango',
              'http://example.com/?q=http%3A%2F%2Fexample.com%2F%3Fx%3D1%26q%3Ddjango'),
+            ('http://.www.f oo.bar/', 'http://.www.f%20oo.bar/'),
         )
         # IDNs are properly quoted
         for value, output in items:
@@ -238,3 +243,33 @@ class TestUtilsHtml(SimpleTestCase):
             @html_safe
             class HtmlClass:
                 pass
+
+    def test_urlize(self):
+        tests = (
+            (
+                'Search for google.com/?q=! and see.',
+                'Search for <a href="http://google.com/?q=">google.com/?q=</a>! and see.'
+            ),
+            (
+                lazystr('Search for google.com/?q=!'),
+                'Search for <a href="http://google.com/?q=">google.com/?q=</a>!'
+            ),
+            ('foo@example.com', '<a href="mailto:foo@example.com">foo@example.com</a>'),
+        )
+        for value, output in tests:
+            with self.subTest(value=value):
+                self.assertEqual(urlize(value), output)
+
+    def test_urlize_unchanged_inputs(self):
+        tests = (
+            ('a' + '@a' * 50000) + 'a',  # simple_email_re catastrophic test
+            ('a' + '.' * 1000000) + 'a',  # trailing_punctuation catastrophic test
+            'foo@',
+            '@foo.com',
+            'foo@.example.com',
+            'foo@localhost',
+            'foo@localhost.',
+        )
+        for value in tests:
+            with self.subTest(value=value):
+                self.assertEqual(urlize(value), value)

@@ -175,7 +175,7 @@ the first release of Django that deprecates a feature (``A.B``) should raise a
 will be removed) when the deprecated feature is invoked. Assuming we have good
 test coverage, these warnings are converted to errors when :ref:`running the
 test suite <running-unit-tests>` with warnings enabled:
-``python -Wall runtests.py``. Thus, when adding a ``RemovedInDjangoXXWarning``
+``python -Wa runtests.py``. Thus, when adding a ``RemovedInDjangoXXWarning``
 you need to eliminate or silence any warnings generated when running the tests.
 
 The first step is to remove any use of the deprecated behavior by Django itself.
@@ -273,6 +273,10 @@ Bugs
 
 * Is there a proper regression test (the test should fail before the fix
   is applied)?
+* If it's a bug that :ref:`qualifies for a backport <supported-versions-policy>`
+  to the stable version of Django, is there a release note in
+  ``docs/releases/A.B.C.txt``? Bug fixes that will be applied only to the
+  master branch don't need a release note.
 
 New Features
 ------------

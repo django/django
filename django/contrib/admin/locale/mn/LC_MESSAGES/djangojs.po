@@ -2,16 +2,16 @@
 #
 # Translators:
 # Tsolmon <mnts26@gmail.com>, 2012
-# Zorig <zorig_ezd@yahoo.com>, 2014
-# Анхбаяр Анхаа <l.ankhbayar@gmail.com>, 2011-2012,2015
+# Zorig, 2014,2018
+# Анхбаяр Анхаа <l.ankhbayar@gmail.com>, 2011-2012,2015,2019
 # Ганзориг БП <ganzo.bp@gmail.com>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2017-09-19 16:41+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2018-05-17 11:50+0200\n"
+"PO-Revision-Date: 2019-02-13 09:19+0000\n"
+"Last-Translator: Анхбаяр Анхаа <l.ankhbayar@gmail.com>\n"
 "Language-Team: Mongolian (http://www.transifex.com/django/django/language/"
 "mn/)\n"
 "MIME-Version: 1.0\n"
@@ -99,6 +99,21 @@ msgstr ""
 "Та 1 үйлдлийг сонгосон байна бас та ямарваа өөрчлөлт оруулсангүй. Та Save "
 "товчлуур биш Go товчлуурыг хайж байгаа бололтой."
 
+msgid "Now"
+msgstr "Одоо"
+
+msgid "Midnight"
+msgstr "Шөнө дунд"
+
+msgid "6 a.m."
+msgstr "06 цаг"
+
+msgid "Noon"
+msgstr "Үд дунд"
+
+msgid "6 p.m."
+msgstr "18 цаг"
+
 #, javascript-format
 msgid "Note: You are %s hour ahead of server time."
 msgid_plural "Note: You are %s hours ahead of server time."
@@ -111,26 +126,11 @@ msgid_plural "Note: You are %s hours behind server time."
 msgstr[0] "Та серверийн цагаас %s цагаар хоцорч байна"
 msgstr[1] "Та серверийн цагаас %s цагаар хоцорч байна"
 
-msgid "Now"
-msgstr "Одоо"
-
 msgid "Choose a Time"
 msgstr "Цаг сонгох"
 
 msgid "Choose a time"
 msgstr "Цаг сонгох"
-
-msgid "Midnight"
-msgstr "Шөнө дунд"
-
-msgid "6 a.m."
-msgstr "6 цаг"
-
-msgid "Noon"
-msgstr "Үд дунд"
-
-msgid "6 p.m."
-msgstr "Оройн 6 цаг"
 
 msgid "Cancel"
 msgstr "Болих"
@@ -148,68 +148,68 @@ msgid "Tomorrow"
 msgstr "Маргааш"
 
 msgid "January"
-msgstr ""
+msgstr "1-р сар"
 
 msgid "February"
-msgstr ""
+msgstr "2-р сар"
 
 msgid "March"
-msgstr ""
+msgstr "3-р сар"
 
 msgid "April"
-msgstr ""
+msgstr "4-р сар"
 
 msgid "May"
-msgstr ""
+msgstr "5-р сар"
 
 msgid "June"
-msgstr ""
+msgstr "6-р сар"
 
 msgid "July"
-msgstr ""
+msgstr "7-р сар"
 
 msgid "August"
-msgstr ""
+msgstr "8-р сар"
 
 msgid "September"
-msgstr ""
+msgstr "9-р сар"
 
 msgid "October"
-msgstr ""
+msgstr "10-р сар"
 
 msgid "November"
-msgstr ""
+msgstr "11-р сар"
 
 msgid "December"
-msgstr ""
+msgstr "12-р сар"
 
 msgctxt "one letter Sunday"
 msgid "S"
-msgstr ""
+msgstr "Н"
 
 msgctxt "one letter Monday"
 msgid "M"
-msgstr ""
+msgstr "Д"
 
 msgctxt "one letter Tuesday"
 msgid "T"
-msgstr ""
+msgstr "М"
 
 msgctxt "one letter Wednesday"
 msgid "W"
-msgstr ""
+msgstr "Л"
 
 msgctxt "one letter Thursday"
 msgid "T"
-msgstr ""
+msgstr "П"
 
 msgctxt "one letter Friday"
 msgid "F"
-msgstr ""
+msgstr "Ба"
 
 msgctxt "one letter Saturday"
 msgid "S"
-msgstr ""
+msgstr "Бя"
 
 msgid "Show"
 msgstr "Үзэх"

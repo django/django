@@ -1,6 +1,6 @@
 import inspect
-import os
 from importlib import import_module
+from pathlib import Path
 
 from django.apps import apps
 from django.conf import settings
@@ -14,14 +14,16 @@ from django.core.exceptions import ImproperlyConfigured, ViewDoesNotExist
 from django.db import models
 from django.http import Http404
 from django.template.engine import Engine
-from django.urls import get_mod_func, get_resolver, get_urlconf, reverse
+from django.urls import get_mod_func, get_resolver, get_urlconf
 from django.utils.decorators import method_decorator
 from django.utils.inspect import (
-    func_accepts_kwargs, func_accepts_var_args, func_has_no_args,
-    get_func_full_args,
+    func_accepts_kwargs, func_accepts_var_args, get_func_full_args,
+    method_has_no_args,
 )
 from django.utils.translation import gettext as _
 from django.views.generic import TemplateView
+
+from .utils import get_view_name
 
 # Exclude methods starting with these strings from documentation
 MODEL_METHODS_EXCLUDE = ('_', 'add_', 'delete', 'save', 'set_')
@@ -42,21 +44,12 @@ class BaseAdminDocsView(TemplateView):
     def get_context_data(self, **kwargs):
         return super().get_context_data(**{
             **kwargs,
-            'root_path': reverse('admin:index'),
             **admin.site.each_context(self.request),
         })
 
 
 class BookmarkletsView(BaseAdminDocsView):
     template_name = 'admin_doc/bookmarklets.html'
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context.update({
-            'admin_url': "%s://%s%s" % (
-                self.request.scheme, self.request.get_host(), context['root_path'])
-        })
-        return context
 
 
 class TemplateTagIndexView(BaseAdminDocsView):
@@ -124,18 +117,13 @@ class TemplateFilterIndexView(BaseAdminDocsView):
 class ViewIndexView(BaseAdminDocsView):
     template_name = 'admin_doc/view_index.html'
 
-    @staticmethod
-    def _get_full_name(func):
-        mod_name = func.__module__
-        return '%s.%s' % (mod_name, func.__qualname__)
-
     def get_context_data(self, **kwargs):
         views = []
         urlconf = import_module(settings.ROOT_URLCONF)
         view_functions = extract_views_from_urlpatterns(urlconf.urlpatterns)
         for (func, regex, namespace, name) in view_functions:
             views.append({
-                'full_name': self._get_full_name(func),
+                'full_name': get_view_name(func),
                 'url': simplify_regex(regex),
                 'url_name': ':'.join((namespace or []) + (name and [name] or [])),
                 'namespace': ':'.join((namespace or [])),
@@ -259,7 +247,7 @@ class ModelDetailView(BaseAdminDocsView):
         methods = []
         # Gather model methods.
         for func_name, func in model.__dict__.items():
-            if inspect.isfunction(func):
+            if inspect.isfunction(func) or isinstance(func, property):
                 try:
                     for exclude in MODEL_METHODS_EXCLUDE:
                         if func_name.startswith(exclude):
@@ -270,9 +258,15 @@ class ModelDetailView(BaseAdminDocsView):
                 verbose = verbose and (
                     utils.parse_rst(utils.trim_docstring(verbose), 'model', _('model:') + opts.model_name)
                 )
-                # If a method has no arguments, show it as a 'field', otherwise
-                # as a 'method with arguments'.
-                if func_has_no_args(func) and not func_accepts_kwargs(func) and not func_accepts_var_args(func):
+                # Show properties and methods without arguments as fields.
+                # Otherwise, show as a 'method with arguments'.
+                if isinstance(func, property):
+                    fields.append({
+                        'name': func_name,
+                        'data_type': get_return_data_type(func_name),
+                        'verbose': verbose or ''
+                    })
+                elif method_has_no_args(func) and not func_accepts_kwargs(func) and not func_accepts_var_args(func):
                     fields.append({
                         'name': func_name,
                         'data_type': get_return_data_type(func_name),
@@ -284,7 +278,7 @@ class ModelDetailView(BaseAdminDocsView):
                     # join it with '='. Use repr() so that strings will be
                     # correctly displayed.
                     print_arguments = ', '.join([
-                        '='.join(list(arg_el[:1]) + [repr(el) for el in arg_el[1:]])
+                        '='.join([arg_el[0], *map(repr, arg_el[1:])])
                         for arg_el in arguments
                     ])
                     methods.append({
@@ -334,15 +328,15 @@ class TemplateDetailView(BaseAdminDocsView):
         else:
             # This doesn't account for template loaders (#24128).
             for index, directory in enumerate(default_engine.dirs):
-                template_file = os.path.join(directory, template)
-                if os.path.exists(template_file):
-                    with open(template_file) as f:
+                template_file = Path(directory) / template
+                if template_file.exists():
+                    with template_file.open() as f:
                         template_contents = f.read()
                 else:
                     template_contents = ''
                 templates.append({
                     'file': template_file,
-                    'exists': os.path.exists(template_file),
+                    'exists': template_file.exists(),
                     'contents': template_contents,
                     'order': index,
                 })

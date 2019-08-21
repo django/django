@@ -76,21 +76,21 @@ class FieldFlagsTests(test.SimpleTestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        cls.fields = (
-            list(AllFieldsModel._meta.fields) +
-            list(AllFieldsModel._meta.private_fields)
-        )
+        cls.fields = [
+            *AllFieldsModel._meta.fields,
+            *AllFieldsModel._meta.private_fields,
+        ]
 
-        cls.all_fields = (
-            cls.fields +
-            list(AllFieldsModel._meta.many_to_many) +
-            list(AllFieldsModel._meta.private_fields)
-        )
+        cls.all_fields = [
+            *cls.fields,
+            *AllFieldsModel._meta.many_to_many,
+            *AllFieldsModel._meta.private_fields,
+        ]
 
-        cls.fields_and_reverse_objects = (
-            cls.all_fields +
-            list(AllFieldsModel._meta.related_objects)
-        )
+        cls.fields_and_reverse_objects = [
+            *cls.all_fields,
+            *AllFieldsModel._meta.related_objects,
+        ]
 
     def test_each_field_should_have_a_concrete_attribute(self):
         self.assertTrue(all(f.concrete.__class__ == bool for f in self.fields))

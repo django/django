@@ -53,7 +53,10 @@ def trace_view(request):
 def put_view(request):
     if request.method == 'PUT':
         t = Template('Data received: {{ data }} is the body.', name='PUT Template')
-        c = Context({'data': request.body.decode()})
+        c = Context({
+            'Content-Length': request.META['CONTENT_LENGTH'],
+            'data': request.body.decode(),
+        })
     else:
         t = Template('Viewing GET page.', name='Empty GET Template')
         c = Context()
@@ -80,14 +83,14 @@ def post_view(request):
 def json_view(request):
     """
     A view that expects a request with the header 'application/json' and JSON
-    data with a key named 'value'.
+    data, which is deserialized and included in the context.
     """
     if request.META.get('CONTENT_TYPE') != 'application/json':
         return HttpResponse()
 
     t = Template('Viewing {} page. With data {{ data }}.'.format(request.method))
     data = json.loads(request.body.decode('utf-8'))
-    c = Context({'data': data['value']})
+    c = Context({'data': data})
     return HttpResponse(t.render(c))
 
 

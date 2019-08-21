@@ -3,6 +3,7 @@ import sys
 from psycopg2 import errorcodes
 
 from django.db.backends.base.creation import BaseDatabaseCreation
+from django.db.backends.utils import strip_quotes
 
 
 class DatabaseCreation(BaseDatabaseCreation):
@@ -28,13 +29,21 @@ class DatabaseCreation(BaseDatabaseCreation):
             template=test_settings.get('TEMPLATE'),
         )
 
+    def _database_exists(self, cursor, database_name):
+        cursor.execute('SELECT 1 FROM pg_catalog.pg_database WHERE datname = %s', [strip_quotes(database_name)])
+        return cursor.fetchone() is not None
+
     def _execute_create_test_db(self, cursor, parameters, keepdb=False):
         try:
+            if keepdb and self._database_exists(cursor, parameters['dbname']):
+                # If the database should be kept and it already exists, don't
+                # try to create a new one.
+                return
             super()._execute_create_test_db(cursor, parameters, keepdb)
         except Exception as e:
             if getattr(e.__cause__, 'pgcode', '') != errorcodes.DUPLICATE_DATABASE:
                 # All errors except "database already exists" cancel tests.
-                sys.stderr.write('Got an error creating the test database: %s\n' % e)
+                self.log('Got an error creating the test database: %s' % e)
                 sys.exit(2)
             elif not keepdb:
                 # If the database should be kept, ignore "database already
@@ -55,14 +64,14 @@ class DatabaseCreation(BaseDatabaseCreation):
         with self._nodb_connection.cursor() as cursor:
             try:
                 self._execute_create_test_db(cursor, test_db_params, keepdb)
-            except Exception as e:
+            except Exception:
                 try:
                     if verbosity >= 1:
-                        print("Destroying old test database for alias %s..." % (
+                        self.log('Destroying old test database for alias %s...' % (
                             self._get_database_display_str(verbosity, target_database_name),
                         ))
                     cursor.execute('DROP DATABASE %(dbname)s' % test_db_params)
                     self._execute_create_test_db(cursor, test_db_params, keepdb)
                 except Exception as e:
-                    sys.stderr.write("Got an error cloning the test database: %s\n" % e)
+                    self.log('Got an error cloning the test database: %s' % e)
                     sys.exit(2)

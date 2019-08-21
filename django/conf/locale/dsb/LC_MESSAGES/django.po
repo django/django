@@ -1,13 +1,13 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Michael Wolf <milupo@sorbzilla.de>, 2016-2017
+# Michael Wolf <milupo@sorbzilla.de>, 2016-2019
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-11-15 16:15+0100\n"
-"PO-Revision-Date: 2017-11-17 21:09+0000\n"
+"POT-Creation-Date: 2019-01-16 20:42+0100\n"
+"PO-Revision-Date: 2019-02-19 10:16+0000\n"
 "Last-Translator: Michael Wolf <milupo@sorbzilla.de>\n"
 "Language-Team: Lower Sorbian (http://www.transifex.com/django/django/"
 "language/dsb/)\n"
@@ -138,6 +138,9 @@ msgstr "Górnoserbšćina"
 msgid "Hungarian"
 msgstr "Hungoršćina"
 
+msgid "Armenian"
+msgstr "Armeńšćina"
+
 msgid "Interlingua"
 msgstr "Interlingua"
 
@@ -158,6 +161,9 @@ msgstr "Japańšćina"
 
 msgid "Georgian"
 msgstr "Georgišćina"
+
+msgid "Kabyle"
+msgstr "Kabylšćina"
 
 msgid "Kazakh"
 msgstr "Kazachšćina"
@@ -395,6 +401,9 @@ msgstr[3] ""
 "Zawěććo, až toś ta gódnota ma maksimalnje %(limit_value)d znamuškow (ma "
 "%(show_value)d)."
 
+msgid "Enter a number."
+msgstr "Zapódajśo licbu."
+
 #, python-format
 msgid "Ensure that there are no more than %(max)s digit in total."
 msgid_plural "Ensure that there are no more than %(max)s digits in total."
@@ -478,6 +487,10 @@ msgstr "Big (8 bajtow) integer"
 #, python-format
 msgid "'%(value)s' value must be either True or False."
 msgstr "Gódnota '%(value)s musy pak True pak False byś."
+
+#, python-format
+msgid "'%(value)s' value must be either True, False, or None."
+msgstr "Gódnota '%(value)s' musy pak True, False pak None byś."
 
 msgid "Boolean (Either True or False)"
 msgstr "Boolean (pak True pak False)"
@@ -615,6 +628,9 @@ msgstr "Gropne binarne daty"
 msgid "'%(value)s' is not a valid UUID."
 msgstr "'%(value)s' njejo płaśiwy UUID."
 
+msgid "Universally unique identifier"
+msgstr "Uniwerselnje jadnorazowy identifikator"
+
 msgid "File"
 msgstr "Dataja"
 
@@ -654,9 +670,6 @@ msgstr "Toś to pólo jo trěbne."
 msgid "Enter a whole number."
 msgstr "Zapódajśo cełu licbu."
 
-msgid "Enter a number."
-msgstr "Zapódajśo licbu."
-
 msgid "Enter a valid date."
 msgstr "Zapódajśo płaśiwy datum."
 
@@ -668,6 +681,10 @@ msgstr "Zapódajśo płaśiwy datum/cas."
 
 msgid "Enter a valid duration."
 msgstr "Zapódaśe płaśiwe traśe."
+
+#, python-brace-format
+msgid "The number of days must be between {min_days} and {max_days}."
+msgstr "Licba dnjow musy mjazy  {min_days} a {max_days} byś."
 
 msgid "No file was submitted. Check the encoding type on the form."
 msgstr ""
@@ -1078,8 +1095,8 @@ msgstr "To njejo płaśiwa IPv6-adresa."
 
 #, python-format
 msgctxt "String to return when truncating text"
-msgid "%(truncated_text)s..."
-msgstr "%(truncated_text)s..."
+msgid "%(truncated_text)s…"
+msgstr "%(truncated_text)s…"
 
 msgid "or"
 msgstr "abo"

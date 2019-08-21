@@ -41,7 +41,7 @@ class JsTokensTest(SimpleTestCase):
         (r"a=/a*\[^/,1", ["id a", "punct =", r"regex /a*\[^/", "punct ,", "dnum 1"]),
         (r"a=/\//,1", ["id a", "punct =", r"regex /\//", "punct ,", "dnum 1"]),
 
-        # next two are from http://www.mozilla.org/js/language/js20-2002-04/rationale/syntax.html#regular-expressions
+        # next two are from https://www-archive.mozilla.org/js/language/js20-2002-04/rationale/syntax.html#regular-expressions  # NOQA
         ("""for (var x = a in foo && "</x>" || mot ? z:/x:3;x<5;y</g/i) {xyz(x++);}""",
             ["keyword for", "punct (", "keyword var", "id x", "punct =", "id a", "keyword in",
             "id foo", "punct &&", 'string "</x>"', "punct ||", "id mot", "punct ?", "id z",
@@ -57,7 +57,7 @@ class JsTokensTest(SimpleTestCase):
         # Various "illegal" regexes that are valid according to the std.
         (r"""/????/, /++++/, /[----]/ """, ["regex /????/", "punct ,", "regex /++++/", "punct ,", "regex /[----]/"]),
 
-        # Stress cases from http://stackoverflow.com/questions/5533925/what-javascript-constructs-does-jslex-incorrectly-lex/5573409#5573409  # NOQA
+        # Stress cases from https://stackoverflow.com/questions/5533925/what-javascript-constructs-does-jslex-incorrectly-lex/5573409#5573409  # NOQA
         (r"""/\[/""", [r"""regex /\[/"""]),
         (r"""/[i]/""", [r"""regex /[i]/"""]),
         (r"""/[\]]/""", [r"""regex /[\]]/"""]),

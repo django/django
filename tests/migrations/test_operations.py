@@ -1,9 +1,8 @@
-import unittest
-
 from django.core.exceptions import FieldDoesNotExist
 from django.db import connection, migrations, models, transaction
 from django.db.migrations.migration import Migration
 from django.db.migrations.operations import CreateModel
+from django.db.migrations.operations.fields import FieldOperation
 from django.db.migrations.state import ModelState, ProjectState
 from django.db.models.fields import NOT_PROVIDED
 from django.db.transaction import atomic
@@ -11,162 +10,11 @@ from django.db.utils import IntegrityError
 from django.test import SimpleTestCase, override_settings, skipUnlessDBFeature
 
 from .models import FoodManager, FoodQuerySet, UnicodeModel
-from .test_base import MigrationTestBase
-
-try:
-    import sqlparse
-except ImportError:
-    sqlparse = None
+from .test_base import OperationTestBase
 
 
 class Mixin:
     pass
-
-
-class OperationTestBase(MigrationTestBase):
-    """
-    Common functions to help test operations.
-    """
-
-    def apply_operations(self, app_label, project_state, operations, atomic=True):
-        migration = Migration('name', app_label)
-        migration.operations = operations
-        with connection.schema_editor(atomic=atomic) as editor:
-            return migration.apply(project_state, editor)
-
-    def unapply_operations(self, app_label, project_state, operations, atomic=True):
-        migration = Migration('name', app_label)
-        migration.operations = operations
-        with connection.schema_editor(atomic=atomic) as editor:
-            return migration.unapply(project_state, editor)
-
-    def make_test_state(self, app_label, operation, **kwargs):
-        """
-        Makes a test state using set_up_test_model and returns the
-        original state and the state after the migration is applied.
-        """
-        project_state = self.set_up_test_model(app_label, **kwargs)
-        new_state = project_state.clone()
-        operation.state_forwards(app_label, new_state)
-        return project_state, new_state
-
-    def set_up_test_model(
-            self, app_label, second_model=False, third_model=False, index=False, multicol_index=False,
-            related_model=False, mti_model=False, proxy_model=False, manager_model=False,
-            unique_together=False, options=False, db_table=None, index_together=False):
-        """
-        Creates a test model state and database table.
-        """
-        # Delete the tables if they already exist
-        table_names = [
-            # Start with ManyToMany tables
-            '_pony_stables', '_pony_vans',
-            # Then standard model tables
-            '_pony', '_stable', '_van',
-        ]
-        tables = [(app_label + table_name) for table_name in table_names]
-        with connection.cursor() as cursor:
-            table_names = connection.introspection.table_names(cursor)
-            connection.disable_constraint_checking()
-            sql_delete_table = connection.schema_editor().sql_delete_table
-            with transaction.atomic():
-                for table in tables:
-                    if table in table_names:
-                        cursor.execute(sql_delete_table % {
-                            "table": connection.ops.quote_name(table),
-                        })
-            connection.enable_constraint_checking()
-
-        # Make the "current" state
-        model_options = {
-            "swappable": "TEST_SWAP_MODEL",
-            "index_together": [["weight", "pink"]] if index_together else [],
-            "unique_together": [["pink", "weight"]] if unique_together else [],
-        }
-        if options:
-            model_options["permissions"] = [("can_groom", "Can groom")]
-        if db_table:
-            model_options["db_table"] = db_table
-        operations = [migrations.CreateModel(
-            "Pony",
-            [
-                ("id", models.AutoField(primary_key=True)),
-                ("pink", models.IntegerField(default=3)),
-                ("weight", models.FloatField()),
-            ],
-            options=model_options,
-        )]
-        if index:
-            operations.append(migrations.AddIndex(
-                "Pony",
-                models.Index(fields=["pink"], name="pony_pink_idx")
-            ))
-        if multicol_index:
-            operations.append(migrations.AddIndex(
-                "Pony",
-                models.Index(fields=["pink", "weight"], name="pony_test_idx")
-            ))
-        if second_model:
-            operations.append(migrations.CreateModel(
-                "Stable",
-                [
-                    ("id", models.AutoField(primary_key=True)),
-                ]
-            ))
-        if third_model:
-            operations.append(migrations.CreateModel(
-                "Van",
-                [
-                    ("id", models.AutoField(primary_key=True)),
-                ]
-            ))
-        if related_model:
-            operations.append(migrations.CreateModel(
-                "Rider",
-                [
-                    ("id", models.AutoField(primary_key=True)),
-                    ("pony", models.ForeignKey("Pony", models.CASCADE)),
-                    ("friend", models.ForeignKey("self", models.CASCADE))
-                ],
-            ))
-        if mti_model:
-            operations.append(migrations.CreateModel(
-                "ShetlandPony",
-                fields=[
-                    ('pony_ptr', models.OneToOneField(
-                        'Pony',
-                        models.CASCADE,
-                        auto_created=True,
-                        parent_link=True,
-                        primary_key=True,
-                        to_field='id',
-                        serialize=False,
-                    )),
-                    ("cuteness", models.IntegerField(default=1)),
-                ],
-                bases=['%s.Pony' % app_label],
-            ))
-        if proxy_model:
-            operations.append(migrations.CreateModel(
-                "ProxyPony",
-                fields=[],
-                options={"proxy": True},
-                bases=['%s.Pony' % app_label],
-            ))
-        if manager_model:
-            operations.append(migrations.CreateModel(
-                "Food",
-                fields=[
-                    ("id", models.AutoField(primary_key=True)),
-                ],
-                managers=[
-                    ("food_qs", FoodQuerySet.as_manager()),
-                    ("food_mgr", FoodManager("a", "b")),
-                    ("food_mgr_kwargs", FoodManager("x", "y", 3, 4)),
-                ]
-            ))
-
-        return self.apply_operations(app_label, ProjectState(), operations)
 
 
 class OperationTests(OperationTestBase):
@@ -462,6 +310,90 @@ class OperationTests(OperationTestBase):
         self.assertTableNotExists("test_crummo_unmanagedpony")
         self.assertTableExists("test_crummo_pony")
 
+    @skipUnlessDBFeature('supports_table_check_constraints')
+    def test_create_model_with_constraint(self):
+        where = models.Q(pink__gt=2)
+        check_constraint = models.CheckConstraint(check=where, name='test_constraint_pony_pink_gt_2')
+        operation = migrations.CreateModel(
+            "Pony",
+            [
+                ("id", models.AutoField(primary_key=True)),
+                ("pink", models.IntegerField(default=3)),
+            ],
+            options={'constraints': [check_constraint]},
+        )
+
+        # Test the state alteration
+        project_state = ProjectState()
+        new_state = project_state.clone()
+        operation.state_forwards("test_crmo", new_state)
+        self.assertEqual(len(new_state.models['test_crmo', 'pony'].options['constraints']), 1)
+
+        # Test database alteration
+        self.assertTableNotExists("test_crmo_pony")
+        with connection.schema_editor() as editor:
+            operation.database_forwards("test_crmo", editor, project_state, new_state)
+        self.assertTableExists("test_crmo_pony")
+        with connection.cursor() as cursor:
+            with self.assertRaises(IntegrityError):
+                cursor.execute("INSERT INTO test_crmo_pony (id, pink) VALUES (1, 1)")
+
+        # Test reversal
+        with connection.schema_editor() as editor:
+            operation.database_backwards("test_crmo", editor, new_state, project_state)
+        self.assertTableNotExists("test_crmo_pony")
+
+        # Test deconstruction
+        definition = operation.deconstruct()
+        self.assertEqual(definition[0], "CreateModel")
+        self.assertEqual(definition[1], [])
+        self.assertEqual(definition[2]['options']['constraints'], [check_constraint])
+
+    def test_create_model_with_partial_unique_constraint(self):
+        partial_unique_constraint = models.UniqueConstraint(
+            fields=['pink'],
+            condition=models.Q(weight__gt=5),
+            name='test_constraint_pony_pink_for_weight_gt_5_uniq',
+        )
+        operation = migrations.CreateModel(
+            'Pony',
+            [
+                ('id', models.AutoField(primary_key=True)),
+                ('pink', models.IntegerField(default=3)),
+                ('weight', models.FloatField()),
+            ],
+            options={'constraints': [partial_unique_constraint]},
+        )
+        # Test the state alteration
+        project_state = ProjectState()
+        new_state = project_state.clone()
+        operation.state_forwards('test_crmo', new_state)
+        self.assertEqual(len(new_state.models['test_crmo', 'pony'].options['constraints']), 1)
+        # Test database alteration
+        self.assertTableNotExists('test_crmo_pony')
+        with connection.schema_editor() as editor:
+            operation.database_forwards('test_crmo', editor, project_state, new_state)
+        self.assertTableExists('test_crmo_pony')
+        # Test constraint works
+        Pony = new_state.apps.get_model('test_crmo', 'Pony')
+        Pony.objects.create(pink=1, weight=4.0)
+        Pony.objects.create(pink=1, weight=4.0)
+        Pony.objects.create(pink=1, weight=6.0)
+        if connection.features.supports_partial_indexes:
+            with self.assertRaises(IntegrityError):
+                Pony.objects.create(pink=1, weight=7.0)
+        else:
+            Pony.objects.create(pink=1, weight=7.0)
+        # Test reversal
+        with connection.schema_editor() as editor:
+            operation.database_backwards('test_crmo', editor, new_state, project_state)
+        self.assertTableNotExists('test_crmo_pony')
+        # Test deconstruction
+        definition = operation.deconstruct()
+        self.assertEqual(definition[0], 'CreateModel')
+        self.assertEqual(definition[1], [])
+        self.assertEqual(definition[2]['options']['constraints'], [partial_unique_constraint])
+
     def test_create_model_managers(self):
         """
         The managers on a model are set.
@@ -542,6 +474,29 @@ class OperationTests(OperationTestBase):
             operation.database_backwards("test_dlprmo", editor, new_state, project_state)
         self.assertTableExists("test_dlprmo_pony")
         self.assertTableNotExists("test_dlprmo_proxypony")
+
+    def test_delete_mti_model(self):
+        project_state = self.set_up_test_model('test_dlmtimo', mti_model=True)
+        # Test the state alteration
+        operation = migrations.DeleteModel('ShetlandPony')
+        new_state = project_state.clone()
+        operation.state_forwards('test_dlmtimo', new_state)
+        self.assertIn(('test_dlmtimo', 'shetlandpony'), project_state.models)
+        self.assertNotIn(('test_dlmtimo', 'shetlandpony'), new_state.models)
+        # Test the database alteration
+        self.assertTableExists('test_dlmtimo_pony')
+        self.assertTableExists('test_dlmtimo_shetlandpony')
+        self.assertColumnExists('test_dlmtimo_shetlandpony', 'pony_ptr_id')
+        with connection.schema_editor() as editor:
+            operation.database_forwards('test_dlmtimo', editor, project_state, new_state)
+        self.assertTableExists('test_dlmtimo_pony')
+        self.assertTableNotExists('test_dlmtimo_shetlandpony')
+        # And test reversal
+        with connection.schema_editor() as editor:
+            operation.database_backwards('test_dlmtimo', editor, new_state, project_state)
+        self.assertTableExists('test_dlmtimo_pony')
+        self.assertTableExists('test_dlmtimo_shetlandpony')
+        self.assertColumnExists('test_dlmtimo_shetlandpony', 'pony_ptr_id')
 
     def test_rename_model(self):
         """
@@ -801,6 +756,34 @@ class OperationTests(OperationTestBase):
         self.assertEqual(Rider.objects.count(), 2)
         self.assertEqual(PonyRider.objects.count(), 2)
         self.assertEqual(pony.riders.count(), 2)
+
+    def test_rename_m2m_model_after_rename_field(self):
+        """RenameModel renames a many-to-many column after a RenameField."""
+        app_label = 'test_rename_multiple'
+        project_state = self.apply_operations(app_label, ProjectState(), operations=[
+            migrations.CreateModel('Pony', fields=[
+                ('id', models.AutoField(primary_key=True)),
+                ('name', models.CharField(max_length=20)),
+            ]),
+            migrations.CreateModel('Rider', fields=[
+                ('id', models.AutoField(primary_key=True)),
+                ('pony', models.ForeignKey('test_rename_multiple.Pony', models.CASCADE)),
+            ]),
+            migrations.CreateModel('PonyRider', fields=[
+                ('id', models.AutoField(primary_key=True)),
+                ('riders', models.ManyToManyField('Rider')),
+            ]),
+            migrations.RenameField(model_name='pony', old_name='name', new_name='fancy_name'),
+            migrations.RenameModel(old_name='Rider', new_name='Jockey'),
+        ], atomic=connection.features.supports_atomic_references_rename)
+        Pony = project_state.apps.get_model(app_label, 'Pony')
+        Jockey = project_state.apps.get_model(app_label, 'Jockey')
+        PonyRider = project_state.apps.get_model(app_label, 'PonyRider')
+        # No "no such column" error means the column was renamed correctly.
+        pony = Pony.objects.create(fancy_name='a good name')
+        jockey = Jockey.objects.create(pony=pony)
+        ponyrider = PonyRider.objects.create()
+        ponyrider.riders.add(jockey)
 
     def test_add_field(self):
         """
@@ -1680,6 +1663,242 @@ class OperationTests(OperationTestBase):
         operation = migrations.AlterIndexTogether("Pony", None)
         self.assertEqual(operation.describe(), "Alter index_together for Pony (0 constraint(s))")
 
+    @skipUnlessDBFeature('supports_table_check_constraints')
+    def test_add_constraint(self):
+        project_state = self.set_up_test_model("test_addconstraint")
+        gt_check = models.Q(pink__gt=2)
+        gt_constraint = models.CheckConstraint(check=gt_check, name="test_add_constraint_pony_pink_gt_2")
+        gt_operation = migrations.AddConstraint("Pony", gt_constraint)
+        self.assertEqual(
+            gt_operation.describe(), "Create constraint test_add_constraint_pony_pink_gt_2 on model Pony"
+        )
+        # Test the state alteration
+        new_state = project_state.clone()
+        gt_operation.state_forwards("test_addconstraint", new_state)
+        self.assertEqual(len(new_state.models["test_addconstraint", "pony"].options["constraints"]), 1)
+        Pony = new_state.apps.get_model("test_addconstraint", "Pony")
+        self.assertEqual(len(Pony._meta.constraints), 1)
+        # Test the database alteration
+        with connection.schema_editor() as editor:
+            gt_operation.database_forwards("test_addconstraint", editor, project_state, new_state)
+        with self.assertRaises(IntegrityError), transaction.atomic():
+            Pony.objects.create(pink=1, weight=1.0)
+        # Add another one.
+        lt_check = models.Q(pink__lt=100)
+        lt_constraint = models.CheckConstraint(check=lt_check, name="test_add_constraint_pony_pink_lt_100")
+        lt_operation = migrations.AddConstraint("Pony", lt_constraint)
+        lt_operation.state_forwards("test_addconstraint", new_state)
+        self.assertEqual(len(new_state.models["test_addconstraint", "pony"].options["constraints"]), 2)
+        Pony = new_state.apps.get_model("test_addconstraint", "Pony")
+        self.assertEqual(len(Pony._meta.constraints), 2)
+        with connection.schema_editor() as editor:
+            lt_operation.database_forwards("test_addconstraint", editor, project_state, new_state)
+        with self.assertRaises(IntegrityError), transaction.atomic():
+            Pony.objects.create(pink=100, weight=1.0)
+        # Test reversal
+        with connection.schema_editor() as editor:
+            gt_operation.database_backwards("test_addconstraint", editor, new_state, project_state)
+        Pony.objects.create(pink=1, weight=1.0)
+        # Test deconstruction
+        definition = gt_operation.deconstruct()
+        self.assertEqual(definition[0], "AddConstraint")
+        self.assertEqual(definition[1], [])
+        self.assertEqual(definition[2], {'model_name': "Pony", 'constraint': gt_constraint})
+
+    @skipUnlessDBFeature('supports_table_check_constraints')
+    def test_add_constraint_percent_escaping(self):
+        app_label = 'add_constraint_string_quoting'
+        operations = [
+            CreateModel(
+                'Author',
+                fields=[
+                    ('id', models.AutoField(primary_key=True)),
+                    ('name', models.CharField(max_length=100)),
+                    ('rebate', models.CharField(max_length=100)),
+                ],
+            ),
+        ]
+        from_state = self.apply_operations(app_label, ProjectState(), operations)
+        # "%" generated in startswith lookup should be escaped in a way that is
+        # considered a leading wildcard.
+        check = models.Q(name__startswith='Albert')
+        constraint = models.CheckConstraint(check=check, name='name_constraint')
+        operation = migrations.AddConstraint('Author', constraint)
+        to_state = from_state.clone()
+        operation.state_forwards(app_label, to_state)
+        with connection.schema_editor() as editor:
+            operation.database_forwards(app_label, editor, from_state, to_state)
+        Author = to_state.apps.get_model(app_label, 'Author')
+        with self.assertRaises(IntegrityError), transaction.atomic():
+            Author.objects.create(name='Artur')
+        # Literal "%" should be escaped in a way that is not a considered a
+        # wildcard.
+        check = models.Q(rebate__endswith='%')
+        constraint = models.CheckConstraint(check=check, name='rebate_constraint')
+        operation = migrations.AddConstraint('Author', constraint)
+        from_state = to_state
+        to_state = from_state.clone()
+        operation.state_forwards(app_label, to_state)
+        Author = to_state.apps.get_model(app_label, 'Author')
+        with connection.schema_editor() as editor:
+            operation.database_forwards(app_label, editor, from_state, to_state)
+        Author = to_state.apps.get_model(app_label, 'Author')
+        with self.assertRaises(IntegrityError), transaction.atomic():
+            Author.objects.create(name='Albert', rebate='10$')
+        author = Author.objects.create(name='Albert', rebate='10%')
+        self.assertEqual(Author.objects.get(), author)
+
+    @skipUnlessDBFeature('supports_table_check_constraints')
+    def test_add_or_constraint(self):
+        app_label = 'test_addorconstraint'
+        constraint_name = 'add_constraint_or'
+        from_state = self.set_up_test_model(app_label)
+        check = models.Q(pink__gt=2, weight__gt=2) | models.Q(weight__lt=0)
+        constraint = models.CheckConstraint(check=check, name=constraint_name)
+        operation = migrations.AddConstraint('Pony', constraint)
+        to_state = from_state.clone()
+        operation.state_forwards(app_label, to_state)
+        with connection.schema_editor() as editor:
+            operation.database_forwards(app_label, editor, from_state, to_state)
+        Pony = to_state.apps.get_model(app_label, 'Pony')
+        with self.assertRaises(IntegrityError), transaction.atomic():
+            Pony.objects.create(pink=2, weight=3.0)
+        with self.assertRaises(IntegrityError), transaction.atomic():
+            Pony.objects.create(pink=3, weight=1.0)
+        Pony.objects.bulk_create([
+            Pony(pink=3, weight=-1.0),
+            Pony(pink=1, weight=-1.0),
+            Pony(pink=3, weight=3.0),
+        ])
+
+    @skipUnlessDBFeature('supports_table_check_constraints')
+    def test_remove_constraint(self):
+        project_state = self.set_up_test_model("test_removeconstraint", constraints=[
+            models.CheckConstraint(check=models.Q(pink__gt=2), name="test_remove_constraint_pony_pink_gt_2"),
+            models.CheckConstraint(check=models.Q(pink__lt=100), name="test_remove_constraint_pony_pink_lt_100"),
+        ])
+        gt_operation = migrations.RemoveConstraint("Pony", "test_remove_constraint_pony_pink_gt_2")
+        self.assertEqual(
+            gt_operation.describe(), "Remove constraint test_remove_constraint_pony_pink_gt_2 from model Pony"
+        )
+        # Test state alteration
+        new_state = project_state.clone()
+        gt_operation.state_forwards("test_removeconstraint", new_state)
+        self.assertEqual(len(new_state.models["test_removeconstraint", "pony"].options['constraints']), 1)
+        Pony = new_state.apps.get_model("test_removeconstraint", "Pony")
+        self.assertEqual(len(Pony._meta.constraints), 1)
+        # Test database alteration
+        with connection.schema_editor() as editor:
+            gt_operation.database_forwards("test_removeconstraint", editor, project_state, new_state)
+        Pony.objects.create(pink=1, weight=1.0).delete()
+        with self.assertRaises(IntegrityError), transaction.atomic():
+            Pony.objects.create(pink=100, weight=1.0)
+        # Remove the other one.
+        lt_operation = migrations.RemoveConstraint("Pony", "test_remove_constraint_pony_pink_lt_100")
+        lt_operation.state_forwards("test_removeconstraint", new_state)
+        self.assertEqual(len(new_state.models["test_removeconstraint", "pony"].options['constraints']), 0)
+        Pony = new_state.apps.get_model("test_removeconstraint", "Pony")
+        self.assertEqual(len(Pony._meta.constraints), 0)
+        with connection.schema_editor() as editor:
+            lt_operation.database_forwards("test_removeconstraint", editor, project_state, new_state)
+        Pony.objects.create(pink=100, weight=1.0).delete()
+        # Test reversal
+        with connection.schema_editor() as editor:
+            gt_operation.database_backwards("test_removeconstraint", editor, new_state, project_state)
+        with self.assertRaises(IntegrityError), transaction.atomic():
+            Pony.objects.create(pink=1, weight=1.0)
+        # Test deconstruction
+        definition = gt_operation.deconstruct()
+        self.assertEqual(definition[0], "RemoveConstraint")
+        self.assertEqual(definition[1], [])
+        self.assertEqual(definition[2], {'model_name': "Pony", 'name': "test_remove_constraint_pony_pink_gt_2"})
+
+    def test_add_partial_unique_constraint(self):
+        project_state = self.set_up_test_model('test_addpartialuniqueconstraint')
+        partial_unique_constraint = models.UniqueConstraint(
+            fields=['pink'],
+            condition=models.Q(weight__gt=5),
+            name='test_constraint_pony_pink_for_weight_gt_5_uniq',
+        )
+        operation = migrations.AddConstraint('Pony', partial_unique_constraint)
+        self.assertEqual(
+            operation.describe(),
+            'Create constraint test_constraint_pony_pink_for_weight_gt_5_uniq '
+            'on model Pony'
+        )
+        # Test the state alteration
+        new_state = project_state.clone()
+        operation.state_forwards('test_addpartialuniqueconstraint', new_state)
+        self.assertEqual(len(new_state.models['test_addpartialuniqueconstraint', 'pony'].options['constraints']), 1)
+        Pony = new_state.apps.get_model('test_addpartialuniqueconstraint', 'Pony')
+        self.assertEqual(len(Pony._meta.constraints), 1)
+        # Test the database alteration
+        with connection.schema_editor() as editor:
+            operation.database_forwards('test_addpartialuniqueconstraint', editor, project_state, new_state)
+        # Test constraint works
+        Pony.objects.create(pink=1, weight=4.0)
+        Pony.objects.create(pink=1, weight=4.0)
+        Pony.objects.create(pink=1, weight=6.0)
+        if connection.features.supports_partial_indexes:
+            with self.assertRaises(IntegrityError), transaction.atomic():
+                Pony.objects.create(pink=1, weight=7.0)
+        else:
+            Pony.objects.create(pink=1, weight=7.0)
+        # Test reversal
+        with connection.schema_editor() as editor:
+            operation.database_backwards('test_addpartialuniqueconstraint', editor, new_state, project_state)
+        # Test constraint doesn't work
+        Pony.objects.create(pink=1, weight=7.0)
+        # Test deconstruction
+        definition = operation.deconstruct()
+        self.assertEqual(definition[0], 'AddConstraint')
+        self.assertEqual(definition[1], [])
+        self.assertEqual(definition[2], {'model_name': 'Pony', 'constraint': partial_unique_constraint})
+
+    def test_remove_partial_unique_constraint(self):
+        project_state = self.set_up_test_model('test_removepartialuniqueconstraint', constraints=[
+            models.UniqueConstraint(
+                fields=['pink'],
+                condition=models.Q(weight__gt=5),
+                name='test_constraint_pony_pink_for_weight_gt_5_uniq',
+            ),
+        ])
+        gt_operation = migrations.RemoveConstraint('Pony', 'test_constraint_pony_pink_for_weight_gt_5_uniq')
+        self.assertEqual(
+            gt_operation.describe(), 'Remove constraint test_constraint_pony_pink_for_weight_gt_5_uniq from model Pony'
+        )
+        # Test state alteration
+        new_state = project_state.clone()
+        gt_operation.state_forwards('test_removepartialuniqueconstraint', new_state)
+        self.assertEqual(len(new_state.models['test_removepartialuniqueconstraint', 'pony'].options['constraints']), 0)
+        Pony = new_state.apps.get_model('test_removepartialuniqueconstraint', 'Pony')
+        self.assertEqual(len(Pony._meta.constraints), 0)
+        # Test database alteration
+        with connection.schema_editor() as editor:
+            gt_operation.database_forwards('test_removepartialuniqueconstraint', editor, project_state, new_state)
+        # Test constraint doesn't work
+        Pony.objects.create(pink=1, weight=4.0)
+        Pony.objects.create(pink=1, weight=4.0)
+        Pony.objects.create(pink=1, weight=6.0)
+        Pony.objects.create(pink=1, weight=7.0).delete()
+        # Test reversal
+        with connection.schema_editor() as editor:
+            gt_operation.database_backwards('test_removepartialuniqueconstraint', editor, new_state, project_state)
+        # Test constraint works
+        if connection.features.supports_partial_indexes:
+            with self.assertRaises(IntegrityError), transaction.atomic():
+                Pony.objects.create(pink=1, weight=7.0)
+        else:
+            Pony.objects.create(pink=1, weight=7.0)
+        # Test deconstruction
+        definition = gt_operation.deconstruct()
+        self.assertEqual(definition[0], 'RemoveConstraint')
+        self.assertEqual(definition[1], [])
+        self.assertEqual(definition[2], {
+            'model_name': 'Pony',
+            'name': 'test_constraint_pony_pink_for_weight_gt_5_uniq',
+        })
+
     def test_alter_model_options(self):
         """
         Tests the AlterModelOptions operation.
@@ -1870,7 +2089,6 @@ class OperationTests(OperationTestBase):
         self.assertColumnExists("test_afknfk_rider", "pony_id")
         self.assertColumnNotExists("test_afknfk_rider", "pony")
 
-    @unittest.skipIf(sqlparse is None and connection.features.requires_sqlparse_for_splitting, "Missing sqlparse")
     def test_run_sql(self):
         """
         Tests the RunSQL operation.
@@ -2283,9 +2501,13 @@ class OperationTests(OperationTestBase):
             fill_data.state_forwards("fill_data", new_state)
             fill_data.database_forwards("fill_data", editor, project_state, new_state)
 
-    def test_autofield_foreignfield_growth(self):
+    def _test_autofield_foreignfield_growth(self, source_field, target_field, target_value):
         """
-        A field may be migrated from AutoField to BigAutoField.
+        A field may be migrated in the following ways:
+
+        - AutoField to BigAutoField
+        - SmallAutoField to AutoField
+        - SmallAutoField to BigAutoField
         """
         def create_initial_data(models, schema_editor):
             Article = models.get_model("test_article", "Article")
@@ -2297,14 +2519,14 @@ class OperationTests(OperationTestBase):
         def create_big_data(models, schema_editor):
             Article = models.get_model("test_article", "Article")
             Blog = models.get_model("test_blog", "Blog")
-            blog2 = Blog.objects.create(name="Frameworks", id=2 ** 33)
+            blog2 = Blog.objects.create(name="Frameworks", id=target_value)
             Article.objects.create(name="Django", blog=blog2)
-            Article.objects.create(id=2 ** 33, name="Django2", blog=blog2)
+            Article.objects.create(id=target_value, name="Django2", blog=blog2)
 
         create_blog = migrations.CreateModel(
             "Blog",
             [
-                ("id", models.AutoField(primary_key=True)),
+                ("id", source_field(primary_key=True)),
                 ("name", models.CharField(max_length=100)),
             ],
             options={},
@@ -2312,7 +2534,7 @@ class OperationTests(OperationTestBase):
         create_article = migrations.CreateModel(
             "Article",
             [
-                ("id", models.AutoField(primary_key=True)),
+                ("id", source_field(primary_key=True)),
                 ("blog", models.ForeignKey(to="test_blog.Blog", on_delete=models.CASCADE)),
                 ("name", models.CharField(max_length=100)),
                 ("data", models.TextField(default="")),
@@ -2322,8 +2544,8 @@ class OperationTests(OperationTestBase):
         fill_initial_data = migrations.RunPython(create_initial_data, create_initial_data)
         fill_big_data = migrations.RunPython(create_big_data, create_big_data)
 
-        grow_article_id = migrations.AlterField("Article", "id", models.BigAutoField(primary_key=True))
-        grow_blog_id = migrations.AlterField("Blog", "id", models.BigAutoField(primary_key=True))
+        grow_article_id = migrations.AlterField('Article', 'id', target_field(primary_key=True))
+        grow_blog_id = migrations.AlterField('Blog', 'id', target_field(primary_key=True))
 
         project_state = ProjectState()
         new_state = project_state.clone()
@@ -2351,7 +2573,7 @@ class OperationTests(OperationTestBase):
 
         state = new_state.clone()
         article = state.apps.get_model("test_article.Article")
-        self.assertIsInstance(article._meta.pk, models.BigAutoField)
+        self.assertIsInstance(article._meta.pk, target_field)
 
         project_state = new_state
         new_state = new_state.clone()
@@ -2361,13 +2583,37 @@ class OperationTests(OperationTestBase):
 
         state = new_state.clone()
         blog = state.apps.get_model("test_blog.Blog")
-        self.assertIsInstance(blog._meta.pk, models.BigAutoField)
+        self.assertIsInstance(blog._meta.pk, target_field)
 
         project_state = new_state
         new_state = new_state.clone()
         with connection.schema_editor() as editor:
             fill_big_data.state_forwards("fill_big_data", new_state)
             fill_big_data.database_forwards("fill_big_data", editor, project_state, new_state)
+
+    def test_autofield__bigautofield_foreignfield_growth(self):
+        """A field may be migrated from AutoField to BigAutoField."""
+        self._test_autofield_foreignfield_growth(
+            models.AutoField,
+            models.BigAutoField,
+            2 ** 33,
+        )
+
+    def test_smallfield_autofield_foreignfield_growth(self):
+        """A field may be migrated from SmallAutoField to AutoField."""
+        self._test_autofield_foreignfield_growth(
+            models.SmallAutoField,
+            models.AutoField,
+            2 ** 22,
+        )
+
+    def test_smallfield_bigautofield_foreignfield_growth(self):
+        """A field may be migrated from SmallAutoField to BigAutoField."""
+        self._test_autofield_foreignfield_growth(
+            models.SmallAutoField,
+            models.BigAutoField,
+            2 ** 33,
+        )
 
     def test_run_python_noop(self):
         """
@@ -2380,7 +2626,6 @@ class OperationTests(OperationTestBase):
             operation.database_forwards("test_runpython", editor, project_state, new_state)
             operation.database_backwards("test_runpython", editor, new_state, project_state)
 
-    @unittest.skipIf(sqlparse is None and connection.features.requires_sqlparse_for_splitting, "Missing sqlparse")
     def test_separate_database_and_state(self):
         """
         Tests the SeparateDatabaseAndState operation.
@@ -2600,3 +2845,53 @@ class TestCreateModel(SimpleTestCase):
 
     def test_references_model_mixin(self):
         CreateModel('name', [], bases=(Mixin, models.Model)).references_model('other_model')
+
+
+class FieldOperationTests(SimpleTestCase):
+    def test_references_model(self):
+        operation = FieldOperation('MoDel', 'field', models.ForeignKey('Other', models.CASCADE))
+        # Model name match.
+        self.assertIs(operation.references_model('mOdEl'), True)
+        # Referenced field.
+        self.assertIs(operation.references_model('oTher'), True)
+        # Doesn't reference.
+        self.assertIs(operation.references_model('Whatever'), False)
+
+    def test_references_field_by_name(self):
+        operation = FieldOperation('MoDel', 'field', models.BooleanField(default=False))
+        self.assertIs(operation.references_field('model', 'field'), True)
+
+    def test_references_field_by_remote_field_model(self):
+        operation = FieldOperation('Model', 'field', models.ForeignKey('Other', models.CASCADE))
+        self.assertIs(operation.references_field('Other', 'whatever'), True)
+        self.assertIs(operation.references_field('Missing', 'whatever'), False)
+
+    def test_references_field_by_from_fields(self):
+        operation = FieldOperation(
+            'Model', 'field', models.fields.related.ForeignObject('Other', models.CASCADE, ['from'], ['to'])
+        )
+        self.assertIs(operation.references_field('Model', 'from'), True)
+        self.assertIs(operation.references_field('Model', 'to'), False)
+        self.assertIs(operation.references_field('Other', 'from'), False)
+        self.assertIs(operation.references_field('Model', 'to'), False)
+
+    def test_references_field_by_to_fields(self):
+        operation = FieldOperation('Model', 'field', models.ForeignKey('Other', models.CASCADE, to_field='field'))
+        self.assertIs(operation.references_field('Other', 'field'), True)
+        self.assertIs(operation.references_field('Other', 'whatever'), False)
+        self.assertIs(operation.references_field('Missing', 'whatever'), False)
+
+    def test_references_field_by_through(self):
+        operation = FieldOperation('Model', 'field', models.ManyToManyField('Other', through='Through'))
+        self.assertIs(operation.references_field('Other', 'whatever'), True)
+        self.assertIs(operation.references_field('Through', 'whatever'), True)
+        self.assertIs(operation.references_field('Missing', 'whatever'), False)
+
+    def test_reference_field_by_through_fields(self):
+        operation = FieldOperation(
+            'Model', 'field', models.ManyToManyField('Other', through='Through', through_fields=('first', 'second'))
+        )
+        self.assertIs(operation.references_field('Other', 'whatever'), True)
+        self.assertIs(operation.references_field('Through', 'whatever'), False)
+        self.assertIs(operation.references_field('Through', 'first'), True)
+        self.assertIs(operation.references_field('Through', 'second'), True)

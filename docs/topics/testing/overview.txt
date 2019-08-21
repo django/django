@@ -128,7 +128,7 @@ be reported, and any test databases created by the run will not be destroyed.
 .. admonition:: Test with warnings enabled
 
     It's a good idea to run your tests with Python warnings enabled:
-    ``python -Wall manage.py test``. The ``-Wall`` flag tells Python to
+    ``python -Wa manage.py test``. The ``-Wa`` flag tells Python to
     display deprecation warnings. Django, like many other Python libraries,
     uses these warnings to flag when features are going away. It also might
     flag areas in your code that aren't strictly wrong but could benefit
@@ -150,6 +150,13 @@ You can prevent the test databases from being destroyed by using the
 :option:`test --keepdb` option. This will preserve the test database between
 runs. If the database does not exist, it will first be created. Any migrations
 will also be applied in order to keep it up to date.
+
+As described in the previous section, if a test run is forcefully interrupted,
+the test database may not be destroyed. On the next run, you'll be asked
+whether you want to reuse or destroy the database. Use the :option:`test
+--noinput` option to suppress that prompt and automatically destroy the
+database. This can be useful when running tests on a continuous integration
+server where tests may be interrupted by a timeout, for example.
 
 The default test database names are created by prepending ``test_`` to the
 value of each :setting:`NAME` in :setting:`DATABASES`. When using SQLite, the

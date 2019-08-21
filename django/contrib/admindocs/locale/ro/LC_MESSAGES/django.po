@@ -1,6 +1,7 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Bogdan Mateescu, 2018
 # Daniel Ursache-Dogariu, 2011
 # Denis Darii <denis.darii@gmail.com>, 2014
 # Jannis Leidel <jannis@leidel.info>, 2011
@@ -10,8 +11,8 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-09-19 16:40+0000\n"
-"Last-Translator: Razvan Stefanescu <razvan.stefanescu@gmail.com>\n"
+"PO-Revision-Date: 2018-02-28 15:16+0000\n"
+"Last-Translator: Bogdan Mateescu\n"
 "Language-Team: Romanian (http://www.transifex.com/django/django/language/"
 "ro/)\n"
 "MIME-Version: 1.0\n"
@@ -220,7 +221,7 @@ msgid "Back to View documentation"
 msgstr "Înapoi la Documentația Codurilor de afișare"
 
 msgid "View documentation"
-msgstr "Documentația codurilor de afișare"
+msgstr "Vezi documentația"
 
 msgid "Jump to namespace"
 msgstr "Mergeți la spațiul de nume"

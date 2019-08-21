@@ -25,7 +25,8 @@ class CaseTestModel(models.Model):
     if Image:
         image = models.ImageField(null=True)
     generic_ip_address = models.GenericIPAddressField(null=True)
-    null_boolean = models.NullBooleanField()
+    null_boolean = models.BooleanField(null=True)
+    null_boolean_old = models.NullBooleanField()
     positive_integer = models.PositiveIntegerField(null=True)
     positive_small_integer = models.PositiveSmallIntegerField(null=True)
     slug = models.SlugField(default='')

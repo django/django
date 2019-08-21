@@ -3,11 +3,11 @@ import decimal
 import functools
 import hashlib
 import logging
-from time import time
+import time
+from contextlib import contextmanager
 
 from django.conf import settings
 from django.db.utils import NotSupportedError
-from django.utils.encoding import force_bytes
 from django.utils.timezone import utc
 
 logger = logging.getLogger('django.db.backends')
@@ -80,6 +80,7 @@ class CursorWrapper:
         self.db.validate_no_broken_transaction()
         with self.db.wrap_database_errors:
             if params is None:
+                # params default might be backend specific.
                 return self.cursor.execute(sql)
             else:
                 return self.cursor.execute(sql, params)
@@ -95,40 +96,38 @@ class CursorDebugWrapper(CursorWrapper):
     # XXX callproc isn't instrumented at this time.
 
     def execute(self, sql, params=None):
-        start = time()
-        try:
+        with self.debug_sql(sql, params, use_last_executed_query=True):
             return super().execute(sql, params)
-        finally:
-            stop = time()
-            duration = stop - start
-            sql = self.db.ops.last_executed_query(self.cursor, sql, params)
-            self.db.queries_log.append({
-                'sql': sql,
-                'time': "%.3f" % duration,
-            })
-            logger.debug(
-                '(%.3f) %s; args=%s', duration, sql, params,
-                extra={'duration': duration, 'sql': sql, 'params': params}
-            )
 
     def executemany(self, sql, param_list):
-        start = time()
-        try:
+        with self.debug_sql(sql, param_list, many=True):
             return super().executemany(sql, param_list)
+
+    @contextmanager
+    def debug_sql(self, sql=None, params=None, use_last_executed_query=False, many=False):
+        start = time.monotonic()
+        try:
+            yield
         finally:
-            stop = time()
+            stop = time.monotonic()
             duration = stop - start
+            if use_last_executed_query:
+                sql = self.db.ops.last_executed_query(self.cursor, sql, params)
             try:
-                times = len(param_list)
-            except TypeError:           # param_list could be an iterator
+                times = len(params) if many else ''
+            except TypeError:
+                # params could be an iterator.
                 times = '?'
             self.db.queries_log.append({
-                'sql': '%s times: %s' % (times, sql),
-                'time': "%.3f" % duration,
+                'sql': '%s times: %s' % (times, sql) if many else sql,
+                'time': '%.3f' % duration,
             })
             logger.debug(
-                '(%.3f) %s; args=%s', duration, sql, param_list,
-                extra={'duration': duration, 'sql': sql, 'params': param_list}
+                '(%.3f) %s; args=%s',
+                duration,
+                sql,
+                params,
+                extra={'duration': duration, 'sql': sql, 'params': params},
             )
 
 
@@ -159,15 +158,11 @@ def typecast_timestamp(s):  # does NOT store time zone information
     if ' ' not in s:
         return typecast_date(s)
     d, t = s.split()
-    # Extract timezone information, if it exists. Currently it's ignored.
+    # Remove timezone information.
     if '-' in t:
-        t, tz = t.split('-', 1)
-        tz = '-' + tz
+        t, _ = t.split('-', 1)
     elif '+' in t:
-        t, tz = t.split('+', 1)
-        tz = '+' + tz
-    else:
-        tz = ''
+        t, _ = t.split('+', 1)
     dates = d.split('-')
     times = t.split(':')
     seconds = times[2]
@@ -186,12 +181,6 @@ def typecast_timestamp(s):  # does NOT store time zone information
 ###############################################
 # Converters from Python to database (string) #
 ###############################################
-
-def rev_typecast_decimal(d):
-    if d is None:
-        return None
-    return str(d)
-
 
 def split_identifier(identifier):
     """
@@ -220,8 +209,19 @@ def truncate_name(identifier, length=None, hash_len=4):
     if length is None or len(name) <= length:
         return identifier
 
-    digest = hashlib.md5(force_bytes(name)).hexdigest()[:hash_len]
+    digest = names_digest(name, length=hash_len)
     return '%s%s%s' % ('%s"."' % namespace if namespace else '', name[:length - hash_len], digest)
+
+
+def names_digest(*args, length):
+    """
+    Generate a 32-bit digest of a set of arguments that can be used to shorten
+    identifying names.
+    """
+    h = hashlib.md5()
+    for arg in args:
+        h.update(arg.encode())
+    return h.hexdigest()[:length]
 
 
 def format_number(value, max_digits, decimal_places):
@@ -231,18 +231,14 @@ def format_number(value, max_digits, decimal_places):
     """
     if value is None:
         return None
-    if isinstance(value, decimal.Decimal):
-        context = decimal.getcontext().copy()
-        if max_digits is not None:
-            context.prec = max_digits
-        if decimal_places is not None:
-            value = value.quantize(decimal.Decimal(1).scaleb(-decimal_places), context=context)
-        else:
-            context.traps[decimal.Rounded] = 1
-            value = context.create_decimal(value)
-        return "{:f}".format(value)
+    context = decimal.getcontext().copy()
+    if max_digits is not None:
+        context.prec = max_digits
     if decimal_places is not None:
-        return "%.*f" % (decimal_places, value)
+        value = value.quantize(decimal.Decimal(1).scaleb(-decimal_places), context=context)
+    else:
+        context.traps[decimal.Rounded] = 1
+        value = context.create_decimal(value)
     return "{:f}".format(value)
 
 

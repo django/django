@@ -1,5 +1,3 @@
-import cgi
-import codecs
 import re
 from io import BytesIO
 
@@ -73,22 +71,15 @@ class WSGIRequest(HttpRequest):
         self.path_info = path_info
         # be careful to only replace the first slash in the path because of
         # http://test/something and http://test//something being different as
-        # stated in http://www.ietf.org/rfc/rfc2396.txt
+        # stated in https://www.ietf.org/rfc/rfc2396.txt
         self.path = '%s/%s' % (script_name.rstrip('/'),
                                path_info.replace('/', '', 1))
         self.META = environ
         self.META['PATH_INFO'] = path_info
         self.META['SCRIPT_NAME'] = script_name
         self.method = environ['REQUEST_METHOD'].upper()
-        self.content_type, self.content_params = cgi.parse_header(environ.get('CONTENT_TYPE', ''))
-        if 'charset' in self.content_params:
-            try:
-                codecs.lookup(self.content_params['charset'])
-            except LookupError:
-                pass
-            else:
-                self.encoding = self.content_params['charset']
-        self._post_parse_error = False
+        # Set content_type, content_params, and encoding.
+        self._set_content_type_params(environ)
         try:
             content_length = int(environ.get('CONTENT_LENGTH'))
         except (ValueError, TypeError):
@@ -144,12 +135,13 @@ class WSGIHandler(base.BaseHandler):
         response._handler_class = self.__class__
 
         status = '%d %s' % (response.status_code, response.reason_phrase)
-        response_headers = list(response.items())
-        for c in response.cookies.values():
-            response_headers.append(('Set-Cookie', c.output(header='')))
+        response_headers = [
+            *response.items(),
+            *(('Set-Cookie', c.output(header='')) for c in response.cookies.values()),
+        ]
         start_response(status, response_headers)
         if getattr(response, 'file_to_stream', None) is not None and environ.get('wsgi.file_wrapper'):
-            response = environ['wsgi.file_wrapper'](response.file_to_stream)
+            response = environ['wsgi.file_wrapper'](response.file_to_stream, response.block_size)
         return response
 
 

@@ -3,7 +3,7 @@ import json
 import os
 import posixpath
 import re
-from collections import OrderedDict
+import warnings
 from urllib.parse import unquote, urldefrag, urlsplit, urlunsplit
 
 from django.conf import settings
@@ -14,7 +14,7 @@ from django.core.cache import (
 from django.core.exceptions import ImproperlyConfigured
 from django.core.files.base import ContentFile
 from django.core.files.storage import FileSystemStorage, get_storage_class
-from django.utils.encoding import force_bytes
+from django.utils.deprecation import RemovedInDjango31Warning
 from django.utils.functional import LazyObject
 
 
@@ -55,10 +55,11 @@ class HashedFilesMixin:
             (r"""(@import\s*["']\s*(.*?)["'])""", """@import url("%s")"""),
         )),
     )
+    keep_intermediate_files = True
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self._patterns = OrderedDict()
+        self._patterns = {}
         self.hashed_files = {}
         for extension, patterns in self.patterns:
             for pattern in patterns:
@@ -92,7 +93,7 @@ class HashedFilesMixin:
                 raise ValueError("The file '%s' could not be found with %r." % (filename, self))
             try:
                 content = self.open(filename)
-            except IOError:
+            except OSError:
                 # Handle directory paths and fragments
                 return name
         try:
@@ -207,7 +208,7 @@ class HashedFilesMixin:
 
     def post_process(self, paths, dry_run=False, **options):
         """
-        Post process the given OrderedDict of files (called from collectstatic).
+        Post process the given dictionary of files (called from collectstatic).
 
         Processing is actually two separate operations:
 
@@ -224,7 +225,7 @@ class HashedFilesMixin:
             return
 
         # where to store the new paths
-        hashed_files = OrderedDict()
+        hashed_files = {}
 
         # build a list of adjustable files
         adjustable_paths = [
@@ -296,9 +297,10 @@ class HashedFilesMixin:
                     if hashed_file_exists:
                         self.delete(hashed_name)
                     # then save the processed result
-                    content_file = ContentFile(force_bytes(content))
-                    # Save intermediate file for reference
-                    saved_name = self._save(hashed_name, content_file)
+                    content_file = ContentFile(content.encode())
+                    if self.keep_intermediate_files:
+                        # Save intermediate file for reference
+                        self._save(hashed_name, content_file)
                     hashed_name = self.hashed_name(name, content_file)
 
                     if self.exists(hashed_name):
@@ -370,6 +372,7 @@ class ManifestFilesMixin(HashedFilesMixin):
     manifest_version = '1.0'  # the manifest format standard
     manifest_name = 'staticfiles.json'
     manifest_strict = True
+    keep_intermediate_files = False
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -379,26 +382,26 @@ class ManifestFilesMixin(HashedFilesMixin):
         try:
             with self.open(self.manifest_name) as manifest:
                 return manifest.read().decode()
-        except IOError:
+        except FileNotFoundError:
             return None
 
     def load_manifest(self):
         content = self.read_manifest()
         if content is None:
-            return OrderedDict()
+            return {}
         try:
-            stored = json.loads(content, object_pairs_hook=OrderedDict)
+            stored = json.loads(content)
         except json.JSONDecodeError:
             pass
         else:
             version = stored.get('version')
             if version == '1.0':
-                return stored.get('paths', OrderedDict())
+                return stored.get('paths', {})
         raise ValueError("Couldn't load manifest '%s' (version %s)" %
                          (self.manifest_name, self.manifest_version))
 
     def post_process(self, *args, **kwargs):
-        self.hashed_files = OrderedDict()
+        self.hashed_files = {}
         yield from super().post_process(*args, **kwargs)
         self.save_manifest()
 
@@ -466,7 +469,7 @@ class CachedFilesMixin(HashedFilesMixin):
             self.hashed_files = _MappingCache(default_cache)
 
     def hash_key(self, name):
-        key = hashlib.md5(force_bytes(self.clean_name(name))).hexdigest()
+        key = hashlib.md5(self.clean_name(name).encode()).hexdigest()
         return 'staticfiles:%s' % key
 
 
@@ -475,7 +478,13 @@ class CachedStaticFilesStorage(CachedFilesMixin, StaticFilesStorage):
     A static file system storage backend which also saves
     hashed copies of the files it saves.
     """
-    pass
+    def __init__(self, *args, **kwargs):
+        warnings.warn(
+            'CachedStaticFilesStorage is deprecated in favor of '
+            'ManifestStaticFilesStorage.',
+            RemovedInDjango31Warning, stacklevel=2,
+        )
+        super().__init__(*args, **kwargs)
 
 
 class ManifestStaticFilesStorage(ManifestFilesMixin, StaticFilesStorage):

@@ -12,8 +12,7 @@ from django.db.migrations.questioner import MigrationQuestioner
 from django.db.migrations.utils import (
     COMPILED_REGEX_TYPE, RegexObject, get_migration_name_timestamp,
 )
-
-from .topological_sort import stable_topological_sort
+from django.utils.topological_sort import stable_topological_sort
 
 
 class MigrationAutodetector:
@@ -122,6 +121,7 @@ class MigrationAutodetector:
         # resolve dependencies caused by M2Ms and FKs.
         self.generated_operations = {}
         self.altered_indexes = {}
+        self.altered_constraints = {}
 
         # Prepare some old/new state and model lists, separating
         # proxy models and ignoring unmigrated apps.
@@ -175,7 +175,9 @@ class MigrationAutodetector:
         # This avoids the same computation in generate_removed_indexes()
         # and generate_added_indexes().
         self.create_altered_indexes()
+        self.create_altered_constraints()
         # Generate index removal operations before field is removed
+        self.generate_removed_constraints()
         self.generate_removed_indexes()
         # Generate field operations
         self.generate_renamed_fields()
@@ -185,6 +187,7 @@ class MigrationAutodetector:
         self.generate_altered_unique_together()
         self.generate_altered_index_together()
         self.generate_added_indexes()
+        self.generate_added_constraints()
         self.generate_altered_db_table()
         self.generate_altered_order_with_respect_to()
 
@@ -233,6 +236,17 @@ class MigrationAutodetector:
                     )
                     self.through_users[through_key] = (app_label, old_model_name, field_name)
 
+    @staticmethod
+    def _resolve_dependency(dependency):
+        """
+        Return the resolved dependency and a boolean denoting whether or not
+        it was swappable.
+        """
+        if dependency[0] != '__setting__':
+            return dependency, False
+        resolved_app_label, resolved_object_name = getattr(settings, dependency[1]).split('.')
+        return (resolved_app_label, resolved_object_name.lower()) + dependency[2:], True
+
     def _build_migration_list(self, graph=None):
         """
         Chop the lists of operations up into migrations with dependencies on
@@ -261,16 +275,13 @@ class MigrationAutodetector:
                     deps_satisfied = True
                     operation_dependencies = set()
                     for dep in operation._auto_deps:
-                        is_swappable_dep = dep[0] == '__setting__'
-                        if is_swappable_dep:
-                            # We need to temporarily resolve the swappable dependency to prevent
-                            # circular references. While keeping the dependency checks on the
-                            # resolved model we still add the swappable dependencies.
-                            # See #23322
-                            resolved_app_label, resolved_object_name = getattr(settings, dep[1]).split('.')
-                            original_dep = dep
-                            dep = (resolved_app_label, resolved_object_name.lower(), dep[2], dep[3])
-                        if dep[0] != app_label and dep[0] != "__setting__":
+                        # Temporarily resolve the swappable dependency to
+                        # prevent circular references. While keeping the
+                        # dependency checks on the resolved model, add the
+                        # swappable dependencies.
+                        original_dep = dep
+                        dep, is_swappable_dep = self._resolve_dependency(dep)
+                        if dep[0] != app_label:
                             # External app dependency. See if it's not yet
                             # satisfied.
                             for other_operation in self.generated_operations.get(dep[0], []):
@@ -333,6 +344,9 @@ class MigrationAutodetector:
             dependency_graph = {op: set() for op in ops}
             for op in ops:
                 for dep in op._auto_deps:
+                    # Resolve intra-app dependencies to handle circular
+                    # references involving a swappable model.
+                    dep = self._resolve_dependency(dep)[0]
                     if dep[0] == app_label:
                         for op2 in ops:
                             if self.check_dependency(op2, dep):
@@ -533,6 +547,7 @@ class MigrationAutodetector:
                     related_fields[field.name] = field
             # Are there indexes/unique|index_together to defer?
             indexes = model_state.options.pop('indexes')
+            constraints = model_state.options.pop('constraints')
             unique_together = model_state.options.pop('unique_together', None)
             index_together = model_state.options.pop('index_together', None)
             order_with_respect_to = model_state.options.pop('order_with_respect_to', None)
@@ -598,6 +613,15 @@ class MigrationAutodetector:
                     operations.AddIndex(
                         model_name=model_name,
                         index=index,
+                    ),
+                    dependencies=related_dependencies,
+                )
+            for constraint in constraints:
+                self.add_operation(
+                    app_label,
+                    operations.AddConstraint(
+                        model_name=model_name,
+                        constraint=constraint,
                     ),
                     dependencies=related_dependencies,
                 )
@@ -697,10 +721,6 @@ class MigrationAutodetector:
         for app_label, model_name in all_deleted_models:
             model_state = self.from_state.models[app_label, model_name]
             model = self.old_apps.get_model(app_label, model_name)
-            if not model._meta.managed:
-                # Skip here, no need to handle fields for unmanaged models
-                continue
-
             # Gather related fields
             related_fields = {}
             for field in model._meta.local_fields:
@@ -797,12 +817,19 @@ class MigrationAutodetector:
             field_dec = self.deep_deconstruct(field)
             for rem_app_label, rem_model_name, rem_field_name in sorted(self.old_field_keys - self.new_field_keys):
                 if rem_app_label == app_label and rem_model_name == model_name:
-                    old_field_dec = self.deep_deconstruct(old_model_state.get_field_by_name(rem_field_name))
+                    old_field = old_model_state.get_field_by_name(rem_field_name)
+                    old_field_dec = self.deep_deconstruct(old_field)
                     if field.remote_field and field.remote_field.model and 'to' in old_field_dec[2]:
                         old_rel_to = old_field_dec[2]['to']
                         if old_rel_to in self.renamed_models_rel:
                             old_field_dec[2]['to'] = self.renamed_models_rel[old_rel_to]
-                    if old_field_dec == field_dec:
+                    old_field.set_attributes_from_name(rem_field_name)
+                    old_db_column = old_field.get_attname_column()[1]
+                    if (old_field_dec == field_dec or (
+                            # Was the field renamed and db_column equal to the
+                            # old field's column added?
+                            old_field_dec[0:2] == field_dec[0:2] and
+                            dict(old_field_dec[2], db_column=old_db_column) == field_dec[2])):
                         if self.questioner.ask_rename(model_name, rem_field_name, field_name, field):
                             self.add_operation(
                                 app_label,
@@ -987,6 +1014,46 @@ class MigrationAutodetector:
                     operations.RemoveIndex(
                         model_name=model_name,
                         name=index.name,
+                    )
+                )
+
+    def create_altered_constraints(self):
+        option_name = operations.AddConstraint.option_name
+        for app_label, model_name in sorted(self.kept_model_keys):
+            old_model_name = self.renamed_models.get((app_label, model_name), model_name)
+            old_model_state = self.from_state.models[app_label, old_model_name]
+            new_model_state = self.to_state.models[app_label, model_name]
+
+            old_constraints = old_model_state.options[option_name]
+            new_constraints = new_model_state.options[option_name]
+            add_constraints = [c for c in new_constraints if c not in old_constraints]
+            rem_constraints = [c for c in old_constraints if c not in new_constraints]
+
+            self.altered_constraints.update({
+                (app_label, model_name): {
+                    'added_constraints': add_constraints, 'removed_constraints': rem_constraints,
+                }
+            })
+
+    def generate_added_constraints(self):
+        for (app_label, model_name), alt_constraints in self.altered_constraints.items():
+            for constraint in alt_constraints['added_constraints']:
+                self.add_operation(
+                    app_label,
+                    operations.AddConstraint(
+                        model_name=model_name,
+                        constraint=constraint,
+                    )
+                )
+
+    def generate_removed_constraints(self):
+        for (app_label, model_name), alt_constraints in self.altered_constraints.items():
+            for constraint in alt_constraints['removed_constraints']:
+                self.add_operation(
+                    app_label,
+                    operations.RemoveConstraint(
+                        model_name=model_name,
+                        name=constraint.name,
                     )
                 )
 

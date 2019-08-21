@@ -1,13 +1,13 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Ramiro Morales, 2015-2017
+# Ramiro Morales, 2015-2018
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-09-23 20:42+0000\n"
+"POT-Creation-Date: 2018-05-17 11:49+0200\n"
+"PO-Revision-Date: 2018-07-31 16:47+0000\n"
 "Last-Translator: Ramiro Morales\n"
 "Language-Team: Spanish (Argentina) (http://www.transifex.com/django/django/"
 "language/es_AR/)\n"
@@ -21,7 +21,7 @@ msgid "PostgreSQL extensions"
 msgstr "Extensiones PostgreSQL"
 
 #, python-format
-msgid "Item %(nth)s in the array did not validate: "
+msgid "Item %(nth)s in the array did not validate:"
 msgstr "La validación del ítem %(nth)s del arreglo falló:"
 
 msgid "Nested arrays must have the same length."
@@ -38,7 +38,7 @@ msgid "A JSON object"
 msgstr "Un objeto JSON"
 
 msgid "Value must be valid JSON."
-msgstr "El valor debe ser JSON valido."
+msgstr "El valor debe ser JSON válido."
 
 msgid "Could not load JSON data."
 msgstr "No se han podido cargar los datos JSON."
@@ -48,7 +48,7 @@ msgstr "debe ser un diccionario JSON."
 
 #, python-format
 msgid "'%(value)s' value must be valid JSON."
-msgstr "El valor de '%(value)s' debe ser JSON valido."
+msgstr "El valor de '%(value)s' debe ser JSON válido."
 
 msgid "Enter two valid values."
 msgstr "Introduzca dos valores válidos."
@@ -57,7 +57,7 @@ msgid "The start of the range must not exceed the end of the range."
 msgstr "El inicio del rango no debe ser mayor que el fin del rango."
 
 msgid "Enter two whole numbers."
-msgstr "Introduzca don números enteros."
+msgstr "Introduzca dos números enteros."
 
 msgid "Enter two numbers."
 msgstr "Introduzca dos números."
@@ -76,10 +76,10 @@ msgid_plural ""
 "List contains %(show_value)d items, it should contain no more than "
 "%(limit_value)d."
 msgstr[0] ""
-"La lista contiene %(show_value)d item, debe contener no mas de "
+"La lista contiene %(show_value)d ítem, debe contener no mas de "
 "%(limit_value)d."
 msgstr[1] ""
-"La lista contiene %(show_value)d items, debe contener no mas de "
+"La lista contiene %(show_value)d ítems, debe contener no mas de "
 "%(limit_value)d."
 
 #, python-format
@@ -90,10 +90,10 @@ msgid_plural ""
 "List contains %(show_value)d items, it should contain no fewer than "
 "%(limit_value)d."
 msgstr[0] ""
-"La lista contiene %(show_value)d item, debe contener no mas de "
+"La lista contiene %(show_value)d ítem, debe contener no mas de "
 "%(limit_value)d."
 msgstr[1] ""
-"La lista contiene %(show_value)d items, debe contener no menos de "
+"La lista contiene %(show_value)d ítems, debe contener no menos de "
 "%(limit_value)d."
 
 #, python-format

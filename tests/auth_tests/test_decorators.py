@@ -15,7 +15,7 @@ class LoginRequiredTestCase(AuthViewsTestCase):
     Tests the login_required decorators
     """
 
-    def testCallable(self):
+    def test_callable(self):
         """
         login_required is assignable to callable objects.
         """
@@ -24,7 +24,7 @@ class LoginRequiredTestCase(AuthViewsTestCase):
                 pass
         login_required(CallableView())
 
-    def testView(self):
+    def test_view(self):
         """
         login_required is assignable to normal views.
         """
@@ -32,7 +32,7 @@ class LoginRequiredTestCase(AuthViewsTestCase):
             pass
         login_required(normal_view)
 
-    def testLoginRequired(self, view_url='/login_required/', login_url=None):
+    def test_login_required(self, view_url='/login_required/', login_url=None):
         """
         login_required works on a simple view wrapped in a login_required
         decorator.
@@ -46,24 +46,26 @@ class LoginRequiredTestCase(AuthViewsTestCase):
         response = self.client.get(view_url)
         self.assertEqual(response.status_code, 200)
 
-    def testLoginRequiredNextUrl(self):
+    def test_login_required_next_url(self):
         """
         login_required works on a simple view wrapped in a login_required
         decorator with a login_url set.
         """
-        self.testLoginRequired(view_url='/login_required_login_url/', login_url='/somewhere/')
+        self.test_login_required(view_url='/login_required_login_url/', login_url='/somewhere/')
 
 
 class PermissionsRequiredDecoratorTest(TestCase):
     """
     Tests for the permission_required decorator
     """
-    def setUp(self):
-        self.user = models.User.objects.create(username='joe', password='qwerty')
-        self.factory = RequestFactory()
+    factory = RequestFactory()
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.user = models.User.objects.create(username='joe', password='qwerty')
         # Add permissions auth.add_customuser and auth.change_customuser
         perms = models.Permission.objects.filter(codename__in=('add_customuser', 'change_customuser'))
-        self.user.user_permissions.add(*perms)
+        cls.user.user_permissions.add(*perms)
 
     def test_many_permissions_pass(self):
 

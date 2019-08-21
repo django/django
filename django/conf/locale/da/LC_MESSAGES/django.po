@@ -3,7 +3,7 @@
 # Translators:
 # Christian Joergensen <christian@gmta.info>, 2012
 # Danni Randeris <danniranderis+djangocore@gmail.com>, 2014
-# Erik Wognsen <r4mses@gmail.com>, 2013-2017
+# Erik Wognsen <r4mses@gmail.com>, 2013-2019
 # Finn Gruwier Larsen, 2011
 # Jannis Leidel <jannis@leidel.info>, 2011
 # jonaskoelker <jonaskoelker@gnu.org>, 2012
@@ -13,8 +13,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-11-15 16:15+0100\n"
-"PO-Revision-Date: 2017-11-21 20:41+0000\n"
+"POT-Creation-Date: 2019-01-16 20:42+0100\n"
+"PO-Revision-Date: 2019-01-18 07:05+0000\n"
 "Last-Translator: Erik Wognsen <r4mses@gmail.com>\n"
 "Language-Team: Danish (http://www.transifex.com/django/django/language/da/)\n"
 "MIME-Version: 1.0\n"
@@ -143,6 +143,9 @@ msgstr "øvresorbisk"
 msgid "Hungarian"
 msgstr "ungarsk"
 
+msgid "Armenian"
+msgstr "armensk"
+
 msgid "Interlingua"
 msgstr "interlingua"
 
@@ -163,6 +166,9 @@ msgstr "japansk"
 
 msgid "Georgian"
 msgstr "georgisk"
+
+msgid "Kabyle"
+msgstr "kabylsk"
 
 msgid "Kazakh"
 msgstr "kasakhisk"
@@ -382,6 +388,9 @@ msgstr[0] ""
 msgstr[1] ""
 "Denne værdi må højst have %(limit_value)d tegn (den har %(show_value)d)."
 
+msgid "Enter a number."
+msgstr "Indtast et tal."
+
 #, python-format
 msgid "Ensure that there are no more than %(max)s digit in total."
 msgid_plural "Ensure that there are no more than %(max)s digits in total."
@@ -459,6 +468,10 @@ msgstr "Stort heltal (8 byte)"
 #, python-format
 msgid "'%(value)s' value must be either True or False."
 msgstr "'%(value)s'-værdien skal være enten True eller False."
+
+#, python-format
+msgid "'%(value)s' value must be either True, False, or None."
+msgstr "'%(value)s' værdien skal være enten True, False eller None."
 
 msgid "Boolean (Either True or False)"
 msgstr "Boolsk (enten True eller False)"
@@ -597,6 +610,9 @@ msgstr "Rå binære data"
 msgid "'%(value)s' is not a valid UUID."
 msgstr "'%(value)s' er ikke et gyldigt UUID."
 
+msgid "Universally unique identifier"
+msgstr "Universelt unik identifikator"
+
 msgid "File"
 msgstr "Fil"
 
@@ -636,9 +652,6 @@ msgstr "Dette felt er påkrævet."
 msgid "Enter a whole number."
 msgstr "Indtast et heltal."
 
-msgid "Enter a number."
-msgstr "Indtast et tal."
-
 msgid "Enter a valid date."
 msgstr "Indtast en gyldig dato."
 
@@ -650,6 +663,10 @@ msgstr "Indtast gyldig dato/tid."
 
 msgid "Enter a valid duration."
 msgstr "Indtast en gyldig varighed."
+
+#, python-brace-format
+msgid "The number of days must be between {min_days} and {max_days}."
+msgstr "Antallet af dage skal være mellem {min_days} og {max_days}."
 
 msgid "No file was submitted. Check the encoding type on the form."
 msgstr "Ingen fil blev indsendt. Kontroller kodningstypen i formularen."
@@ -1042,8 +1059,8 @@ msgstr "Dette er ikke en gyldig IPv6-adresse."
 
 #, python-format
 msgctxt "String to return when truncating text"
-msgid "%(truncated_text)s..."
-msgstr "%(truncated_text)s..."
+msgid "%(truncated_text)s…"
+msgstr "%(truncated_text)s…"
 
 msgid "or"
 msgstr "eller"

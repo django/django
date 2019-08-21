@@ -4,15 +4,16 @@
 # gudmundur <inactive+gudmundur@transifex.com>, 2011
 # Hafsteinn Einarsson <haffi67@gmail.com>, 2011-2012
 # Jannis Leidel <jannis@leidel.info>, 2011
+# Matt R, 2018
 # saevarom <saevar@saevar.is>, 2011
 # saevarom <saevar@saevar.is>, 2013,2015
-# Thordur Sigurdsson <thordur@ja.is>, 2016-2017
+# Thordur Sigurdsson <thordur@ja.is>, 2016-2019
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-11-15 16:15+0100\n"
-"PO-Revision-Date: 2017-11-27 07:32+0000\n"
+"POT-Creation-Date: 2019-01-16 20:42+0100\n"
+"PO-Revision-Date: 2019-01-18 15:48+0000\n"
 "Last-Translator: Thordur Sigurdsson <thordur@ja.is>\n"
 "Language-Team: Icelandic (http://www.transifex.com/django/django/language/"
 "is/)\n"
@@ -142,6 +143,9 @@ msgstr "Efri sorbíska"
 msgid "Hungarian"
 msgstr "Ungverska"
 
+msgid "Armenian"
+msgstr "Armenska"
+
 msgid "Interlingua"
 msgstr "Interlingua"
 
@@ -162,6 +166,9 @@ msgstr "Japanska"
 
 msgid "Georgian"
 msgstr "Georgíska"
+
+msgid "Kabyle"
+msgstr ""
 
 msgid "Kazakh"
 msgstr "Kasakska"
@@ -388,6 +395,9 @@ msgstr[1] ""
 "Gildið má mest vera %(limit_value)d stafir að lengd (það er %(show_value)d "
 "nú)"
 
+msgid "Enter a number."
+msgstr "Sláðu inn tölu."
+
 #, python-format
 msgid "Ensure that there are no more than %(max)s digit in total."
 msgid_plural "Ensure that there are no more than %(max)s digits in total."
@@ -467,6 +477,10 @@ msgstr "Stór (8 bæta) heiltala"
 #, python-format
 msgid "'%(value)s' value must be either True or False."
 msgstr "'%(value)s' verður að vera annaðhvort satt eða ósatt."
+
+#, python-format
+msgid "'%(value)s' value must be either True, False, or None."
+msgstr "'%(value)s' verður að vera eitt eftirtalinna: True, False eða None."
 
 msgid "Boolean (Either True or False)"
 msgstr "Boole-gildi (True eða False)"
@@ -603,6 +617,9 @@ msgstr "Hrá tvíundargögn (binary data)"
 msgid "'%(value)s' is not a valid UUID."
 msgstr "'%(value)s' er ekki gilt UUID."
 
+msgid "Universally unique identifier"
+msgstr ""
+
 msgid "File"
 msgstr "Skrá"
 
@@ -642,9 +659,6 @@ msgstr "Þennan reit þarf að fylla út."
 msgid "Enter a whole number."
 msgstr "Sláðu inn heiltölu."
 
-msgid "Enter a number."
-msgstr "Sláðu inn tölu."
-
 msgid "Enter a valid date."
 msgstr "Sláðu inn gilda dagsetningu."
 
@@ -656,6 +670,10 @@ msgstr "Sláðu inn gilda dagsetningu ásamt tíma."
 
 msgid "Enter a valid duration."
 msgstr "Sláðu inn gilt tímabil."
+
+#, python-brace-format
+msgid "The number of days must be between {min_days} and {max_days}."
+msgstr "Fjöldi daga verður að vera á milli {min_days} og {max_days}."
 
 msgid "No file was submitted. Check the encoding type on the form."
 msgstr "Engin skrá var send. Athugaðu kótunartegund á forminu (encoding type)."
@@ -855,25 +873,25 @@ msgid "Sunday"
 msgstr "sunnudagur"
 
 msgid "Mon"
-msgstr "Mán"
+msgstr "mán"
 
 msgid "Tue"
-msgstr "Þri"
+msgstr "þri"
 
 msgid "Wed"
-msgstr "Mið"
+msgstr "mið"
 
 msgid "Thu"
-msgstr "Fim"
+msgstr "fim"
 
 msgid "Fri"
-msgstr "Fös"
+msgstr "fös"
 
 msgid "Sat"
-msgstr "Lau"
+msgstr "lau"
 
 msgid "Sun"
-msgstr "Sun"
+msgstr "sun"
 
 msgid "January"
 msgstr "janúar"
@@ -949,107 +967,107 @@ msgstr "des"
 
 msgctxt "abbrev. month"
 msgid "Jan."
-msgstr "Jan."
+msgstr "jan."
 
 msgctxt "abbrev. month"
 msgid "Feb."
-msgstr "Feb."
+msgstr "feb."
 
 msgctxt "abbrev. month"
 msgid "March"
-msgstr "Mars"
+msgstr "mars"
 
 msgctxt "abbrev. month"
 msgid "April"
-msgstr "Apríl"
+msgstr "apríl"
 
 msgctxt "abbrev. month"
 msgid "May"
-msgstr "Maí"
+msgstr "maí"
 
 msgctxt "abbrev. month"
 msgid "June"
-msgstr "Júní"
+msgstr "júní"
 
 msgctxt "abbrev. month"
 msgid "July"
-msgstr "Júlí"
+msgstr "júlí"
 
 msgctxt "abbrev. month"
 msgid "Aug."
-msgstr "Ág."
+msgstr "ág."
 
 msgctxt "abbrev. month"
 msgid "Sept."
-msgstr "Sept."
+msgstr "sept."
 
 msgctxt "abbrev. month"
 msgid "Oct."
-msgstr "Okt."
+msgstr "okt."
 
 msgctxt "abbrev. month"
 msgid "Nov."
-msgstr "Nóv."
+msgstr "nóv."
 
 msgctxt "abbrev. month"
 msgid "Dec."
-msgstr "Des."
+msgstr "des."
 
 msgctxt "alt. month"
 msgid "January"
-msgstr "Janúar"
+msgstr "janúar"
 
 msgctxt "alt. month"
 msgid "February"
-msgstr "Febrúar"
+msgstr "febrúar"
 
 msgctxt "alt. month"
 msgid "March"
-msgstr "Mars"
+msgstr "mars"
 
 msgctxt "alt. month"
 msgid "April"
-msgstr "Apríl"
+msgstr "apríl"
 
 msgctxt "alt. month"
 msgid "May"
-msgstr "Maí"
+msgstr "maí"
 
 msgctxt "alt. month"
 msgid "June"
-msgstr "Júní"
+msgstr "júní"
 
 msgctxt "alt. month"
 msgid "July"
-msgstr "Júlí"
+msgstr "júlí"
 
 msgctxt "alt. month"
 msgid "August"
-msgstr "Ágúst"
+msgstr "ágúst"
 
 msgctxt "alt. month"
 msgid "September"
-msgstr "September"
+msgstr "september"
 
 msgctxt "alt. month"
 msgid "October"
-msgstr "Október"
+msgstr "október"
 
 msgctxt "alt. month"
 msgid "November"
-msgstr "Nóvember"
+msgstr "nóvember"
 
 msgctxt "alt. month"
 msgid "December"
-msgstr "Desember"
+msgstr "desember"
 
 msgid "This is not a valid IPv6 address."
 msgstr "Þetta er ekki gilt IPv6 vistfang."
 
 #, python-format
 msgctxt "String to return when truncating text"
-msgid "%(truncated_text)s..."
-msgstr "%(truncated_text)s..."
+msgid "%(truncated_text)s…"
+msgstr "%(truncated_text)s…"
 
 msgid "or"
 msgstr "eða"

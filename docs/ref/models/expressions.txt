@@ -17,16 +17,12 @@ Django supports negation, addition, subtraction, multiplication, division,
 modulo arithmetic, and the power operator on query expressions, using Python
 constants, variables, and even other expressions.
 
-.. versionchanged:: 2.1
-
-    Support for negation was added.
-
 Some examples
 =============
 
 .. code-block:: python
 
-    from django.db.models import F, Count, Value
+    from django.db.models import Count, F, Value
     from django.db.models.functions import Length, Upper
 
     # Find companies that have more employees than chairs.
@@ -64,10 +60,14 @@ Some examples
     # Aggregates can contain complex computations also
     Company.objects.annotate(num_offerings=Count(F('products') + F('services')))
 
-    # Expressions can also be used in order_by()
+    # Expressions can also be used in order_by(), either directly
     Company.objects.order_by(Length('name').asc())
     Company.objects.order_by(Length('name').desc())
-
+    # or using the double underscore lookup syntax.
+    from django.db.models import CharField
+    from django.db.models.functions import Length
+    CharField.register_lookup(Length)
+    Company.objects.order_by('name__length')
 
 Built-in Expressions
 ====================
@@ -181,7 +181,9 @@ instance and will be applied on each :meth:`~Model.save()`. For example::
     reporter.save()
 
 ``stories_filed`` will be updated twice in this case. If it's initially ``1``,
-the final value will be ``3``.
+the final value will be ``3``. This persistence can be avoided by reloading the
+model object after saving it, for example, by using
+:meth:`~Model.refresh_from_db()`.
 
 Using ``F()`` in filters
 ~~~~~~~~~~~~~~~~~~~~~~~~
@@ -224,6 +226,21 @@ primary key value rather than a model instance::
     >> car.built_by
     3
 
+.. _using-f-to-sort-null-values:
+
+Using ``F()`` to sort null values
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Use ``F()`` and the ``nulls_first`` or ``nulls_last`` keyword argument to
+:meth:`.Expression.asc` or :meth:`~.Expression.desc` to control the ordering of
+a field's null values. By default, the ordering depends on your database.
+
+For example, to sort companies that haven't been contacted (``last_contacted``
+is null) after companies that have been contacted::
+
+    from django.db.models import F
+    Company.objects.order_by(F('last_contacted').desc(nulls_last=True))
+
 .. _func-expressions:
 
 ``Func()`` expressions
@@ -233,7 +250,7 @@ primary key value rather than a model instance::
 database functions like ``COALESCE`` and ``LOWER``, or aggregates like ``SUM``.
 They can be used directly::
 
-    from django.db.models import Func, F
+    from django.db.models import F, Func
 
     queryset.annotate(field_lower=Func(F('field'), function='LOWER'))
 
@@ -245,7 +262,9 @@ or they can be used to build a library of database functions::
     queryset.annotate(field_lower=Lower('field'))
 
 But both cases will result in a queryset where each model is annotated with an
-extra attribute ``field_lower`` produced, roughly, from the following SQL::
+extra attribute ``field_lower`` produced, roughly, from the following SQL:
+
+.. code-block:: sql
 
     SELECT
         ...
@@ -295,19 +314,20 @@ The ``Func`` API is as follows:
         ``arg_joiner``, and any other ``**extra_context`` parameters to
         customize the SQL as needed. For example:
 
-        .. snippet::
-            :filename: django/db/models/functions.py
+        .. code-block:: python
+            :caption: django/db/models/functions.py
 
             class ConcatPair(Func):
                 ...
                 function = 'CONCAT'
                 ...
 
-                def as_mysql(self, compiler, connection):
+                def as_mysql(self, compiler, connection, **extra_context):
                     return super().as_sql(
                         compiler, connection,
                         function='CONCAT_WS',
                         template="%(function)s('', %(expressions)s)",
+                        **extra_context
                     )
 
         To avoid a SQL injection vulnerability, ``extra_context`` :ref:`must
@@ -353,13 +373,13 @@ some complex computations::
 
 The ``Aggregate`` API is as follows:
 
-.. class:: Aggregate(expression, output_field=None, filter=None, **extra)
+.. class:: Aggregate(*expressions, output_field=None, distinct=False, filter=None, **extra)
 
     .. attribute:: template
 
         A class attribute, as a format string, that describes the SQL that is
         generated for this aggregate. Defaults to
-        ``'%(function)s( %(expressions)s )'``.
+        ``'%(function)s(%(distinct)s%(expressions)s)'``.
 
     .. attribute:: function
 
@@ -369,14 +389,20 @@ The ``Aggregate`` API is as follows:
 
     .. attribute:: window_compatible
 
-        .. versionadded:: 2.0
-
         Defaults to ``True`` since most aggregate functions can be used as the
         source expression in :class:`~django.db.models.expressions.Window`.
 
-The ``expression`` argument can be the name of a field on the model, or another
-expression. It will be converted to a string and used as the ``expressions``
-placeholder within the ``template``.
+    .. attribute:: allow_distinct
+
+        .. versionadded:: 2.2
+
+        A class attribute determining whether or not this aggregate function
+        allows passing a ``distinct`` keyword argument. If set to ``False``
+        (default), ``TypeError`` is raised if ``distinct=True`` is passed.
+
+The ``expressions`` positional arguments can include expressions or the names
+of model fields. They will be converted to a string and used as the
+``expressions`` placeholder within the ``template``.
 
 The ``output_field`` argument requires a model field instance, like
 ``IntegerField()`` or ``BooleanField()``, into which Django will load the value
@@ -391,6 +417,11 @@ should define the desired ``output_field``. For example, adding an
 ``IntegerField()`` and a ``FloatField()`` together should probably have
 ``output_field=FloatField()`` defined.
 
+The ``distinct`` argument determines whether or not the aggregate function
+should be invoked for each distinct value of ``expressions`` (or set of
+values, for multiple ``expressions``). The argument is only supported on
+aggregates that have :attr:`~Aggregate.allow_distinct` set to ``True``.
+
 The ``filter`` argument takes a :class:`Q object <django.db.models.Q>` that's
 used to filter the rows that are aggregated. See :ref:`conditional-aggregation`
 and :ref:`filtering-on-annotations` for example usage.
@@ -398,9 +429,9 @@ and :ref:`filtering-on-annotations` for example usage.
 The ``**extra`` kwargs are ``key=value`` pairs that can be interpolated
 into the ``template`` attribute.
 
-.. versionchanged:: 2.0
+.. versionadded:: 2.2
 
-    The ``filter`` argument was added.
+    The ``allow_distinct`` attribute and ``distinct`` argument were added.
 
 Creating your own Aggregate Functions
 -------------------------------------
@@ -411,19 +442,18 @@ SQL that is generated. Here's a brief example::
 
     from django.db.models import Aggregate
 
-    class Count(Aggregate):
-        # supports COUNT(distinct field)
-        function = 'COUNT'
-        template = '%(function)s(%(distinct)s%(expressions)s)'
+    class Sum(Aggregate):
+        # Supports SUM(ALL field).
+        function = 'SUM'
+        template = '%(function)s(%(all_values)s%(expressions)s)'
+        allow_distinct = False
 
-        def __init__(self, expression, distinct=False, **extra):
+        def __init__(self, expression, all_values=False, **extra):
             super().__init__(
                 expression,
-                distinct='DISTINCT ' if distinct else '',
-                output_field=IntegerField(),
+                all_values='ALL ' if all_values else '',
                 **extra
             )
-
 
 ``Value()`` expressions
 -----------------------
@@ -675,8 +705,6 @@ should avoid them if possible.
 Window functions
 ----------------
 
-.. versionadded:: 2.0
-
 Window functions provide a way to apply functions on partitions. Unlike a
 normal aggregation function which computes a final result for each set defined
 by the group by, window functions operate on :ref:`frames <window-frames>` and
@@ -883,23 +911,17 @@ calling the appropriate methods on the wrapped expression.
 
     .. attribute:: contains_over_clause
 
-        .. versionadded:: 2.0
-
         Tells Django that this expression contains a
         :class:`~django.db.models.expressions.Window` expression. It's used,
         for example, to disallow window function expressions in queries that
-        modify data. Defaults to ``True``.
+        modify data.
 
     .. attribute:: filterable
-
-        .. versionadded:: 2.0
 
         Tells Django that this expression can be referenced in
         :meth:`.QuerySet.filter`. Defaults to ``True``.
 
     .. attribute:: window_compatible
-
-        .. versionadded:: 2.0
 
         Tells Django that this expression can be used as the source expression
         in :class:`~django.db.models.expressions.Window`. Defaults to
@@ -955,24 +977,31 @@ calling the appropriate methods on the wrapped expression.
         A hook allowing the expression to coerce ``value`` into a more
         appropriate type.
 
-    .. method:: get_group_by_cols()
+    .. method:: get_group_by_cols(alias=None)
 
         Responsible for returning the list of columns references by
         this expression. ``get_group_by_cols()`` should be called on any
         nested expressions. ``F()`` objects, in particular, hold a reference
-        to a column.
+        to a column. The ``alias`` parameter will be ``None`` unless the
+        expression has been annotated and is used for grouping.
+
+        .. versionchanged:: 3.0
+
+            The ``alias`` parameter was added.
 
     .. method:: asc(nulls_first=False, nulls_last=False)
 
         Returns the expression ready to be sorted in ascending order.
 
         ``nulls_first`` and ``nulls_last`` define how null values are sorted.
+        See :ref:`using-f-to-sort-null-values` for example usage.
 
     .. method:: desc(nulls_first=False, nulls_last=False)
 
         Returns the expression ready to be sorted in descending order.
 
         ``nulls_first`` and ``nulls_last`` define how null values are sorted.
+        See :ref:`using-f-to-sort-null-values` for example usage.
 
     .. method:: reverse_ordering()
 

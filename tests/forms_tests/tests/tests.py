@@ -2,15 +2,13 @@ import datetime
 
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.db import models
-from django.forms import (
-    CharField, FileField, Form, ModelChoiceField, ModelForm,
-)
+from django.forms import CharField, FileField, Form, ModelForm
 from django.forms.models import ModelFormMetaclass
 from django.test import SimpleTestCase, TestCase
 
 from ..models import (
     BoundaryModel, ChoiceFieldModel, ChoiceModel, ChoiceOptionModel, Defaults,
-    FileModel, Group, OptionalMultiChoiceModel,
+    FileModel, OptionalMultiChoiceModel,
 )
 
 
@@ -54,24 +52,6 @@ class EmptyCharLabelNoneChoiceForm(ModelForm):
 
 class FileForm(Form):
     file1 = FileField()
-
-
-class TestModelChoiceField(TestCase):
-
-    def test_choices_not_fetched_when_not_rendering(self):
-        """
-        Generating choices for ModelChoiceField should require 1 query (#12510).
-        """
-        self.groups = [Group.objects.create(name=name) for name in 'abc']
-        # only one query is required to pull the model from DB
-        with self.assertNumQueries(1):
-            field = ModelChoiceField(Group.objects.order_by('-name'))
-            self.assertEqual('a', field.clean(self.groups[0].pk).name)
-
-    def test_queryset_manager(self):
-        f = ModelChoiceField(ChoiceOptionModel.objects)
-        choice = ChoiceOptionModel.objects.create(name="choice 1")
-        self.assertEqual(list(f.choices), [('', '---------'), (choice.pk, str(choice))])
 
 
 class TestTicket14567(TestCase):

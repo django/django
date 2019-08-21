@@ -53,8 +53,8 @@ may be a good choice for the :ref:`range fields <range-fields>` and
         It is possible to nest array fields - you can specify an instance of
         ``ArrayField`` as the ``base_field``. For example::
 
-            from django.db import models
             from django.contrib.postgres.fields import ArrayField
+            from django.db import models
 
             class ChessBoard(models.Model):
                 board = ArrayField(
@@ -109,8 +109,8 @@ Querying ``ArrayField``
 There are a number of custom lookups and transforms for :class:`ArrayField`.
 We will use the following example model::
 
-    from django.db import models
     from django.contrib.postgres.fields import ArrayField
+    from django.db import models
 
     class Post(models.Model):
         name = models.CharField(max_length=200)
@@ -265,6 +265,11 @@ transform do not change. For example::
     :ref:`setup the citext extension <create-postgresql-extensions>` in
     PostgreSQL before the first ``CreateModel`` migration operation.
 
+    If you're using an :class:`~django.contrib.postgres.fields.ArrayField`
+    of ``CIText`` fields, you must add ``'django.contrib.postgres'`` in your
+    :setting:`INSTALLED_APPS`, otherwise field values will appear as strings
+    like ``'{thoughts,django}'``.
+
     Several fields that use the mixin are provided:
 
 .. class:: CICharField(**options)
@@ -278,8 +283,8 @@ transform do not change. For example::
     ``max_length`` won't be enforced in the database since ``citext`` behaves
     similar to PostgreSQL's ``text`` type.
 
-    .. _citext: https://www.postgresql.org/docs/current/static/citext.html
-    .. _the performance considerations: https://www.postgresql.org/docs/current/static/citext.html#AEN178177
+    .. _citext: https://www.postgresql.org/docs/current/citext.html
+    .. _the performance considerations: https://www.postgresql.org/docs/current/citext.html#AEN178177
 
 ``HStoreField``
 ===============
@@ -292,8 +297,8 @@ transform do not change. For example::
 
     To use this field, you'll need to:
 
-    1. Add ``'django.contrib.postgres'`` in your :setting:`INSTALLED_APPS`.
-    2. :ref:`Setup the hstore extension <create-postgresql-extensions>` in
+    #. Add ``'django.contrib.postgres'`` in your :setting:`INSTALLED_APPS`.
+    #. :ref:`Setup the hstore extension <create-postgresql-extensions>` in
        PostgreSQL.
 
     You'll see an error like ``can't adapt type 'dict'`` if you skip the first
@@ -544,7 +549,7 @@ name::
     ...         }],
     ...     },
     ... })
-    >>> Dog.objects.create(name='Meg', data={'breed': 'collie'})
+    >>> Dog.objects.create(name='Meg', data={'breed': 'collie', 'owner': None})
 
     >>> Dog.objects.filter(data__breed='collie')
     <QuerySet [<Dog: Meg>]>
@@ -565,6 +570,17 @@ the :lookup:`jsonfield.contains` lookup instead.
 
 If only one key or index is used, the SQL operator ``->`` is used. If multiple
 operators are used then the ``#>`` operator is used.
+
+To query for ``null`` in JSON data, use ``None`` as a value::
+
+    >>> Dog.objects.filter(data__owner=None)
+    <QuerySet [<Dog: Meg>]>
+
+To query for missing keys, use the ``isnull`` lookup::
+
+    >>> Dog.objects.create(name='Shep', data={'breed': 'collie'})
+    >>> Dog.objects.filter(data__owner__isnull=True)
+    <QuerySet [<Dog: Shep>]>
 
 .. warning::
 
@@ -604,7 +620,7 @@ start and end timestamps of an event, or the range of ages an activity is
 suitable for.
 
 All of the range fields translate to :ref:`psycopg2 Range objects
-<psycopg2:adapt-range>` in python, but also accept tuples as input if no bounds
+<psycopg2:adapt-range>` in Python, but also accept tuples as input if no bounds
 information is necessary. The default is lower bound included, upper bound
 excluded; that is, ``[)``.
 
@@ -636,6 +652,18 @@ excluded; that is, ``[)``.
     returns a range in a canonical form that includes the lower bound and
     excludes the upper bound; that is ``[)``.
 
+``DecimalRangeField``
+---------------------
+
+.. class:: DecimalRangeField(**options)
+
+    .. versionadded:: 2.2
+
+    Stores a range of floating point values. Based on a
+    :class:`~django.db.models.DecimalField`. Represented by a ``numrange`` in
+    the database and a :class:`~psycopg2:psycopg2.extras.NumericRange` in
+    Python.
+
 ``FloatRangeField``
 -------------------
 
@@ -644,6 +672,10 @@ excluded; that is, ``[)``.
     Stores a range of floating point values. Based on a
     :class:`~django.db.models.FloatField`. Represented by a ``numrange`` in the
     database and a :class:`~psycopg2:psycopg2.extras.NumericRange` in Python.
+
+    .. deprecated:: 2.2
+
+        Use :class:`DecimalRangeField` instead.
 
 ``DateTimeRangeField``
 ----------------------
@@ -849,7 +881,7 @@ Returned objects are empty ranges. Can be chained to valid lookups for a
     <QuerySet []>
 
 Defining your own range types
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-----------------------------
 
 PostgreSQL allows the definition of custom range types. Django's model and form
 field implementations use base classes below, and psycopg2 provides a
@@ -884,3 +916,54 @@ types.
     .. attribute:: range_type
 
         The psycopg2 range type to use.
+
+Range operators
+---------------
+
+.. versionadded:: 3.0
+
+.. class:: RangeOperators
+
+PostgreSQL provides a set of SQL operators that can be used together with the
+range data types (see `the PostgreSQL documentation for the full details of
+range operators <https://www.postgresql.org/docs/current/
+functions-range.html#RANGE-OPERATORS-TABLE>`_). This class is meant as a
+convenient method to avoid typos. The operator names overlap with the names of
+corresponding lookups.
+
+.. code-block:: python
+
+    class RangeOperators:
+        EQUAL = '='
+        NOT_EQUAL = '<>'
+        CONTAINS = '@>'
+        CONTAINED_BY = '<@'
+        OVERLAPS = '&&'
+        FULLY_LT = '<<'
+        FULLY_GT = '>>'
+        NOT_LT = '&>'
+        NOT_GT = '&<'
+        ADJACENT_TO = '-|-'
+
+RangeBoundary() expressions
+---------------------------
+
+.. versionadded:: 3.0
+
+.. class:: RangeBoundary(inclusive_lower=True, inclusive_upper=False)
+
+    .. attribute:: inclusive_lower
+
+        If ``True`` (default), the lower bound is inclusive ``'['``, otherwise
+        it's exclusive ``'('``.
+
+    .. attribute:: inclusive_upper
+
+        If ``False`` (default), the upper bound is exclusive ``')'``, otherwise
+        it's inclusive ``']'``.
+
+A ``RangeBoundary()`` expression represents the range boundaries. It can be
+used with a custom range functions that expected boundaries, for example to
+define :class:`~django.contrib.postgres.constraints.ExclusionConstraint`. See
+`the PostgreSQL documentation for the full details <https://www.postgresql.org/
+docs/current/rangetypes.html#RANGETYPES-INCLUSIVITY>`_.

@@ -5,6 +5,7 @@
 # Eric Hamiter <ehamiter@gmail.com>, 2013
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Kaveh Karimi, 2015
+# MJafar Mashhadi <raindigital2007@gmail.com>, 2018
 # Pouya Abbassi, 2016
 # Reza Mohammadi <reza@teeleh.ir>, 2013-2014
 msgid ""
@@ -12,15 +13,15 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-09-24 13:46+0200\n"
-"PO-Revision-Date: 2017-09-24 14:24+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"PO-Revision-Date: 2018-06-23 23:12+0000\n"
+"Last-Translator: MJafar Mashhadi <raindigital2007@gmail.com>\n"
 "Language-Team: Persian (http://www.transifex.com/django/django/language/"
 "fa/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: fa\n"
-"Plural-Forms: nplurals=1; plural=0;\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
 msgid "Personal info"
 msgstr "اطلاعات شخصی"
@@ -73,6 +74,8 @@ msgid ""
 "Raw passwords are not stored, so there is no way to see this user's "
 "password, but you can change the password using <a href=\"{}\">this form</a>."
 msgstr ""
+"گذرواژه‌ها به صورت خام نگهداری نمی‌شوند لذا راهی برای مشاهدهٔ گذرواژهٔ این کاربر "
+"وجود ندارد، اما می‌توانید آن را با <a href=\"{}\">این فرم</a> تغییر دهید."
 
 #, python-format
 msgid ""
@@ -233,11 +236,15 @@ msgid_plural ""
 msgstr[0] ""
 "این رمز عبور خیلی کوتاه است. رمز عبور می‌بایست حداقل از %(min_length)d حرف "
 "تشکیل شده باشد."
+msgstr[1] ""
+"این رمز عبور خیلی کوتاه است. رمز عبور می‌بایست حداقل از %(min_length)d حرف "
+"تشکیل شده باشد."
 
 #, python-format
 msgid "Your password must contain at least %(min_length)d character."
 msgid_plural "Your password must contain at least %(min_length)d characters."
 msgstr[0] "رمز عبور شما می‌بایست حداقل از %(min_length)d حرف تشکیل شده باشد."
+msgstr[1] "رمز عبور شما می‌بایست حداقل از %(min_length)d حرف تشکیل شده باشد."
 
 #, python-format
 msgid "The password is too similar to the %(verbose_name)s."

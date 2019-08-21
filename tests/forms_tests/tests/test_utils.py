@@ -151,7 +151,6 @@ class FormsUtilsTestCase(SimpleTestCase):
 
         e_deepcopy = copy.deepcopy(e)
         self.assertEqual(e, e_deepcopy)
-        self.assertEqual(e.as_data(), e_copy.as_data())
 
     def test_error_dict_html_safe(self):
         e = ErrorDict()

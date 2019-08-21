@@ -7,6 +7,9 @@ View decorators
 Django provides several decorators that can be applied to views to support
 various HTTP features.
 
+See :ref:`decorating-class-based-views` for how to use these decorators with
+class-based views.
+
 Allowed HTTP methods
 ====================
 
@@ -116,5 +119,9 @@ client-side caching.
 .. function:: never_cache(view_func)
 
     This decorator adds a ``Cache-Control: max-age=0, no-cache, no-store,
-    must-revalidate`` header to a response to indicate that a page should never
-    be cached.
+    must-revalidate, private`` header to a response to indicate that a page
+    should never be cached.
+
+    .. versionchanged:: 3.0
+
+        ``private`` directive was added.

@@ -6,7 +6,7 @@ from django.contrib.gis.gdal import GDAL_VERSION, Driver, GDALException
 from django.contrib.gis.utils.ogrinspect import ogrinspect
 from django.core.management import call_command
 from django.db import connection, connections
-from django.test import TestCase, skipUnlessDBFeature
+from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
 from django.test.utils import modify_settings
 
 from ..test_data import TEST_DATA
@@ -59,7 +59,8 @@ class InspectDbTests(TestCase):
 @modify_settings(
     INSTALLED_APPS={'append': 'django.contrib.gis'},
 )
-class OGRInspectTest(TestCase):
+class OGRInspectTest(SimpleTestCase):
+    expected_srid = 'srid=-1' if GDAL_VERSION < (2, 2) else ''
     maxDiff = 1024
 
     def test_poly(self):
@@ -73,9 +74,9 @@ class OGRInspectTest(TestCase):
             '',
             'class MyModel(models.Model):',
             '    float = models.FloatField()',
-            '    int = models.{}()'.format('BigIntegerField' if GDAL_VERSION >= (2, 0) else 'FloatField'),
+            '    int = models.BigIntegerField()',
             '    str = models.CharField(max_length=80)',
-            '    geom = models.PolygonField(srid=-1)',
+            '    geom = models.PolygonField(%s)' % self.expected_srid,
         ]
 
         self.assertEqual(model_def, '\n'.join(expected))
@@ -83,11 +84,12 @@ class OGRInspectTest(TestCase):
     def test_poly_multi(self):
         shp_file = os.path.join(TEST_DATA, 'test_poly', 'test_poly.shp')
         model_def = ogrinspect(shp_file, 'MyModel', multi_geom=True)
-        self.assertIn('geom = models.MultiPolygonField(srid=-1)', model_def)
+        self.assertIn('geom = models.MultiPolygonField(%s)' % self.expected_srid, model_def)
         # Same test with a 25D-type geometry field
         shp_file = os.path.join(TEST_DATA, 'gas_lines', 'gas_leitung.shp')
         model_def = ogrinspect(shp_file, 'MyModel', multi_geom=True)
-        self.assertIn('geom = models.MultiLineStringField(srid=-1)', model_def)
+        srid = '-1' if GDAL_VERSION < (2, 3) else '31253'
+        self.assertIn('geom = models.MultiLineStringField(srid=%s)' % srid, model_def)
 
     def test_date_field(self):
         shp_file = os.path.join(TEST_DATA, 'cities', 'cities.shp')
@@ -100,10 +102,10 @@ class OGRInspectTest(TestCase):
             '',
             'class City(models.Model):',
             '    name = models.CharField(max_length=80)',
-            '    population = models.{}()'.format('BigIntegerField' if GDAL_VERSION >= (2, 0) else 'FloatField'),
+            '    population = models.BigIntegerField()',
             '    density = models.FloatField()',
             '    created = models.DateField()',
-            '    geom = models.PointField(srid=-1)',
+            '    geom = models.PointField(%s)' % self.expected_srid,
         ]
 
         self.assertEqual(model_def, '\n'.join(expected))
@@ -133,12 +135,22 @@ class OGRInspectTest(TestCase):
         ))
 
         # The ordering of model fields might vary depending on several factors (version of GDAL, etc.)
-        self.assertIn('    f_decimal = models.DecimalField(max_digits=0, decimal_places=0)', model_def)
+        if connection.vendor == 'sqlite':
+            # SpatiaLite introspection is somewhat lacking (#29461).
+            self.assertIn('    f_decimal = models.CharField(max_length=0)', model_def)
+        else:
+            self.assertIn('    f_decimal = models.DecimalField(max_digits=0, decimal_places=0)', model_def)
         self.assertIn('    f_int = models.IntegerField()', model_def)
-        self.assertIn('    f_datetime = models.DateTimeField()', model_def)
-        self.assertIn('    f_time = models.TimeField()', model_def)
-        self.assertIn('    f_float = models.FloatField()', model_def)
-        self.assertIn('    f_char = models.CharField(max_length=10)', model_def)
+        if connection.vendor != 'mysql' or not connection.mysql_is_mariadb:
+            # Probably a bug between GDAL and MariaDB on time fields.
+            self.assertIn('    f_datetime = models.DateTimeField()', model_def)
+            self.assertIn('    f_time = models.TimeField()', model_def)
+        if connection.vendor == 'sqlite':
+            self.assertIn('    f_float = models.CharField(max_length=0)', model_def)
+        else:
+            self.assertIn('    f_float = models.FloatField()', model_def)
+        max_length = 0 if connection.vendor == 'sqlite' else 10
+        self.assertIn('    f_char = models.CharField(max_length=%s)' % max_length, model_def)
         self.assertIn('    f_date = models.DateField()', model_def)
 
         # Some backends may have srid=-1
@@ -153,7 +165,7 @@ class OGRInspectTest(TestCase):
 
     def test_mapping_option(self):
         expected = (
-            "    geom = models.PointField(srid=-1)\n"
+            "    geom = models.PointField(%s)\n"
             "\n"
             "\n"
             "# Auto-generated `LayerMapping` dictionary for City model\n"
@@ -163,7 +175,7 @@ class OGRInspectTest(TestCase):
             "    'density': 'Density',\n"
             "    'created': 'Created',\n"
             "    'geom': 'POINT',\n"
-            "}\n")
+            "}\n" % self.expected_srid)
         shp_file = os.path.join(TEST_DATA, 'cities', 'cities.shp')
         out = StringIO()
         call_command('ogrinspect', shp_file, '--mapping', 'City', stdout=out)
@@ -179,7 +191,7 @@ def get_ogr_db_string():
     db = connections.databases['default']
 
     # Map from the django backend into the OGR driver name and database identifier
-    # http://www.gdal.org/ogr/ogr_formats.html
+    # https://www.gdal.org/ogr/ogr_formats.html
     #
     # TODO: Support Oracle (OCI).
     drivers = {

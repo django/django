@@ -3,7 +3,7 @@
 # Translators:
 # Christian Joergensen <christian@gmta.info>, 2012
 # Dimitris Glezos <glezos@transifex.com>, 2012
-# Erik Wognsen <r4mses@gmail.com>, 2013,2015-2017
+# Erik Wognsen <r4mses@gmail.com>, 2013,2015-2019
 # Finn Gruwier Larsen, 2011
 # Jannis Leidel <jannis@leidel.info>, 2011
 # valberg <valberg@orn.li>, 2014-2015
@@ -11,8 +11,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-09-19 16:40+0000\n"
+"POT-Creation-Date: 2019-01-16 20:42+0100\n"
+"PO-Revision-Date: 2019-01-18 07:26+0000\n"
 "Last-Translator: Erik Wognsen <r4mses@gmail.com>\n"
 "Language-Team: Danish (http://www.transifex.com/django/django/language/da/)\n"
 "MIME-Version: 1.0\n"
@@ -90,6 +90,15 @@ msgstr "Tilføj endnu en %(verbose_name)s"
 msgid "Remove"
 msgstr "Fjern"
 
+msgid "Addition"
+msgstr "Tilføjelse"
+
+msgid "Change"
+msgstr "Ret"
+
+msgid "Deletion"
+msgstr "Sletning"
+
 msgid "action time"
 msgstr "handlingstid"
 
@@ -103,7 +112,7 @@ msgid "object id"
 msgstr "objekt-ID"
 
 #. Translators: 'repr' means representation
-#. (https://docs.python.org/3/library/functions.html#repr)
+#. (https://docs.python.org/library/functions.html#repr)
 msgid "object repr"
 msgstr "objekt repr"
 
@@ -168,24 +177,28 @@ msgstr ""
 "Hold \"Ctrl\" (eller \"Æbletasten\" på Mac) nede for at vælge mere end en."
 
 #, python-brace-format
-msgid ""
-"The {name} \"{obj}\" was added successfully. You may edit it again below."
-msgstr "{name} \"{obj}\" blev tilføjet. Du kan redigere den/det igen herunder."
+msgid "The {name} \"{obj}\" was added successfully."
+msgstr "{name} \"{obj}\" blev tilføjet."
+
+msgid "You may edit it again below."
+msgstr "Du kan redigere den/det igen herunder."
 
 #, python-brace-format
 msgid ""
 "The {name} \"{obj}\" was added successfully. You may add another {name} "
 "below."
-msgstr "{name} \"{obj}\" blev tilføjet. Du kan endnu en/et {name} herunder."
-
-#, python-brace-format
-msgid "The {name} \"{obj}\" was added successfully."
-msgstr "{name} \"{obj}\" blev tilføjet."
+msgstr ""
+"{name} \"{obj}\" blev tilføjet. Du kan tilføje endnu en/et {name} herunder."
 
 #, python-brace-format
 msgid ""
 "The {name} \"{obj}\" was changed successfully. You may edit it again below."
 msgstr "{name} \"{obj}\" blev ændret. Du kan redigere den/det igen herunder."
+
+#, python-brace-format
+msgid ""
+"The {name} \"{obj}\" was added successfully. You may edit it again below."
+msgstr "{name} \"{obj}\" blev tilføjet. Du kan redigere den/det igen herunder."
 
 #, python-brace-format
 msgid ""
@@ -225,8 +238,12 @@ msgstr "Tilføj %s"
 msgid "Change %s"
 msgstr "Ret %s"
 
+#, python-format
+msgid "View %s"
+msgstr "Vis %s"
+
 msgid "Database error"
-msgstr "databasefejl"
+msgstr "Databasefejl"
 
 #, python-format
 msgid "%(count)s %(name)s was changed successfully."
@@ -444,8 +461,8 @@ msgstr ""
 "Er du sikker på du vil slette de valgte %(objects_name)s? Alle de følgende "
 "objekter og deres relaterede emner vil blive slettet:"
 
-msgid "Change"
-msgstr "Ret"
+msgid "View"
+msgstr "Vis"
 
 msgid "Delete?"
 msgstr "Slet?"
@@ -464,8 +481,8 @@ msgstr "Modeller i applikationen %(name)s"
 msgid "Add"
 msgstr "Tilføj"
 
-msgid "You don't have permission to edit anything."
-msgstr "Du har ikke rettigheder til at foretage ændringer."
+msgid "You don't have permission to view or edit anything."
+msgstr "Du har ikke rettigheder til at se eller redigere noget."
 
 msgid "Recent actions"
 msgstr "Seneste handlinger"
@@ -521,20 +538,8 @@ msgstr "Vis alle"
 msgid "Save"
 msgstr "Gem"
 
-msgid "Popup closing..."
-msgstr "Popup lukker..."
-
-#, python-format
-msgid "Change selected %(model)s"
-msgstr "Redigér valgte %(model)s"
-
-#, python-format
-msgid "Add another %(model)s"
-msgstr "Tilføj endnu en %(model)s"
-
-#, python-format
-msgid "Delete selected %(model)s"
-msgstr "Slet valgte %(model)s"
+msgid "Popup closing…"
+msgstr "Popup lukker…"
 
 msgid "Search"
 msgstr "Søg"
@@ -557,6 +562,24 @@ msgstr "Gem og tilføj endnu en"
 
 msgid "Save and continue editing"
 msgstr "Gem og fortsæt med at redigere"
+
+msgid "Save and view"
+msgstr "Gem og vis"
+
+msgid "Close"
+msgstr "Luk"
+
+#, python-format
+msgid "Change selected %(model)s"
+msgstr "Redigér valgte %(model)s"
+
+#, python-format
+msgid "Add another %(model)s"
+msgstr "Tilføj endnu en %(model)s"
+
+#, python-format
+msgid "Delete selected %(model)s"
+msgstr "Slet valgte %(model)s"
 
 msgid "Thanks for spending some quality time with the Web site today."
 msgstr "Tak for den kvalitetstid du brugte på websitet i dag."
@@ -668,6 +691,10 @@ msgstr "Vælg %s"
 #, python-format
 msgid "Select %s to change"
 msgstr "Vælg %s, der skal ændres"
+
+#, python-format
+msgid "Select %s to view"
+msgstr "Vælg %s, der skal vises"
 
 msgid "Date:"
 msgstr "Dato:"

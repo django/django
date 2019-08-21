@@ -78,6 +78,24 @@
        "width": 2.0, "quadsegs": 8
       }
   ],
+  "buffer_with_style_geoms": [
+      {"wkt": "POINT (0 0)",
+       "buffer_wkt": "POLYGON EMPTY",
+       "width": 5.0, "end_cap_style": 2, "join_style": 2
+      },
+      {"wkt": "POLYGON ((0 0, 10 0, 10 10, 0 10, 0 0))",
+       "buffer_wkt": "POLYGON ((-2 -2, -2 12, 12 12, 12 -2, -2 -2))",
+       "width": 2.0, "end_cap_style": 2, "join_style": 2
+      },
+      {"wkt": "LINESTRING (0 0, 10 0)",
+       "buffer_wkt": "POLYGON ((10 2, 10 -2, 0 -2, 0 2, 10 2))",
+       "width": 2.0, "end_cap_style": 2, "join_style": 2
+      },
+      {"wkt": "LINESTRING (0 0, 10 0, 10 10, 0 10)",
+       "buffer_wkt": "POLYGON ((8 2, 8 8, 0 8, 0 12, 12 12, 12 -2, 0 -2, 0 2, 8 2))",
+       "width": 2.0, "end_cap_style": 2, "join_style": 2
+      }
+  ],
   "relate_geoms": [
       {"wkt_a": "MULTIPOINT(80 70, 20 20, 200 170, 140 120)",
        "wkt_b": "MULTIPOINT(80 170, 140 120, 200 80, 80 70)",

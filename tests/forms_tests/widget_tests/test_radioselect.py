@@ -1,6 +1,6 @@
 import datetime
 
-from django.forms import RadioSelect
+from django.forms import MultiWidget, RadioSelect
 from django.test import override_settings
 
 from .base import WidgetTest
@@ -130,3 +130,16 @@ class RadioSelectTest(WidgetTest):
         </ul>
         """
         self.check_html(self.widget(choices=choices), 'time', None, html=html)
+
+    def test_render_as_subwidget(self):
+        """A RadioSelect as a subwidget of MultiWidget."""
+        choices = (('', '------'),) + self.beatles
+        self.check_html(MultiWidget([self.widget(choices=choices)]), 'beatle', ['J'], html=(
+            """<ul>
+            <li><label><input type="radio" name="beatle_0" value=""> ------</label></li>
+            <li><label><input checked type="radio" name="beatle_0" value="J"> John</label></li>
+            <li><label><input type="radio" name="beatle_0" value="P"> Paul</label></li>
+            <li><label><input type="radio" name="beatle_0" value="G"> George</label></li>
+            <li><label><input type="radio" name="beatle_0" value="R"> Ringo</label></li>
+            </ul>"""
+        ))

@@ -10,7 +10,9 @@ from urllib.parse import quote
 
 from django.core.files import temp as tempfile
 from django.core.files.uploadedfile import SimpleUploadedFile
-from django.http.multipartparser import MultiPartParser, parse_header
+from django.http.multipartparser import (
+    MultiPartParser, MultiPartParserError, parse_header,
+)
 from django.test import SimpleTestCase, TestCase, client, override_settings
 
 from . import uploadhandler
@@ -27,8 +29,7 @@ class FileUploadTests(TestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        if not os.path.isdir(MEDIA_ROOT):
-            os.makedirs(MEDIA_ROOT)
+        os.makedirs(MEDIA_ROOT, exist_ok=True)
 
     @classmethod
     def tearDownClass(cls):
@@ -384,8 +385,8 @@ class FileUploadTests(TestCase):
             file.write(b'a' * (2 ** 21))
             file.seek(0)
 
-            # AttributeError: You cannot alter upload handlers after the upload has been processed.
-            with self.assertRaises(AttributeError):
+            msg = 'You cannot alter upload handlers after the upload has been processed.'
+            with self.assertRaisesMessage(AttributeError, msg):
                 self.client.post('/quota/broken/', {'f': file})
 
     def test_fileupload_getlist(self):
@@ -526,8 +527,7 @@ class DirectoryCreationTests(SimpleTestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        if not os.path.isdir(MEDIA_ROOT):
-            os.makedirs(MEDIA_ROOT)
+        os.makedirs(MEDIA_ROOT, exist_ok=True)
 
     @classmethod
     def tearDownClass(cls):
@@ -546,19 +546,16 @@ class DirectoryCreationTests(SimpleTestCase):
             self.obj.testfile.save('foo.txt', SimpleUploadedFile('foo.txt', b'x'), save=False)
 
     def test_not_a_directory(self):
-        """The correct IOError is raised when the upload directory name exists but isn't a directory"""
         # Create a file with the upload directory name
         open(UPLOAD_TO, 'wb').close()
         self.addCleanup(os.remove, UPLOAD_TO)
-        with self.assertRaises(IOError) as exc_info:
+        msg = '%s exists and is not a directory.' % UPLOAD_TO
+        with self.assertRaisesMessage(FileExistsError, msg):
             with SimpleUploadedFile('foo.txt', b'x') as file:
                 self.obj.testfile.save('foo.txt', file, save=False)
-        # The test needs to be done on a specific string as IOError
-        # is raised even without the patch (just not early enough)
-        self.assertEqual(exc_info.exception.args[0], "%s exists and is not a directory." % UPLOAD_TO)
 
 
-class MultiParserTests(unittest.TestCase):
+class MultiParserTests(SimpleTestCase):
 
     def test_empty_upload_handlers(self):
         # We're not actually parsing here; just checking if the parser properly
@@ -567,6 +564,27 @@ class MultiParserTests(unittest.TestCase):
             'CONTENT_TYPE': 'multipart/form-data; boundary=_foo',
             'CONTENT_LENGTH': '1'
         }, StringIO('x'), [], 'utf-8')
+
+    def test_invalid_content_type(self):
+        with self.assertRaisesMessage(MultiPartParserError, 'Invalid Content-Type: text/plain'):
+            MultiPartParser({
+                'CONTENT_TYPE': 'text/plain',
+                'CONTENT_LENGTH': '1',
+            }, StringIO('x'), [], 'utf-8')
+
+    def test_negative_content_length(self):
+        with self.assertRaisesMessage(MultiPartParserError, 'Invalid content length: -1'):
+            MultiPartParser({
+                'CONTENT_TYPE': 'multipart/form-data; boundary=_foo',
+                'CONTENT_LENGTH': -1,
+            }, StringIO('x'), [], 'utf-8')
+
+    def test_bad_type_content_length(self):
+        multipart_parser = MultiPartParser({
+            'CONTENT_TYPE': 'multipart/form-data; boundary=_foo',
+            'CONTENT_LENGTH': 'a',
+        }, StringIO('x'), [], 'utf-8')
+        self.assertEqual(multipart_parser._content_length, 0)
 
     def test_rfc2231_parsing(self):
         test_data = (

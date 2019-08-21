@@ -19,15 +19,15 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument(
-            '--no-startup', action='store_true', dest='no_startup',
+            '--no-startup', action='store_true',
             help='When using plain Python, ignore the PYTHONSTARTUP environment variable and ~/.pythonrc.py script.',
         )
         parser.add_argument(
-            '-i', '--interface', choices=self.shells, dest='interface',
+            '-i', '--interface', choices=self.shells,
             help='Specify an interactive interpreter interface. Available options: "ipython", "bpython", and "python"',
         )
         parser.add_argument(
-            '-c', '--command', dest='command',
+            '-c', '--command',
             help='Instead of opening an interactive shell, run a command as Django and exit.',
         )
 
@@ -88,7 +88,7 @@ class Command(BaseCommand):
 
         # Execute stdin if it has anything to read and exit.
         # Not supported on Windows due to select.select() limitations.
-        if sys.platform != 'win32' and select.select([sys.stdin], [], [], 0)[0]:
+        if sys.platform != 'win32' and not sys.stdin.isatty() and select.select([sys.stdin], [], [], 0)[0]:
             exec(sys.stdin.read())
             return
 

@@ -1,7 +1,7 @@
 import copy
 import inspect
 from bisect import bisect
-from collections import OrderedDict, defaultdict
+from collections import defaultdict
 
 from django.apps import apps
 from django.conf import settings
@@ -32,9 +32,7 @@ DEFAULT_NAMES = (
     'auto_created', 'index_together', 'apps', 'default_permissions',
     'select_on_save', 'default_related_name', 'required_db_features',
     'required_db_vendor', 'base_manager_name', 'default_manager_name',
-    'indexes',
-    # For backwards compatibility with Django 1.11. RemovedInDjango30Warning
-    'manager_inheritance_from_future',
+    'indexes', 'constraints',
 )
 
 
@@ -89,10 +87,11 @@ class Options:
         self.ordering = []
         self._ordering_clash = False
         self.indexes = []
+        self.constraints = []
         self.unique_together = []
         self.index_together = []
         self.select_on_save = False
-        self.default_permissions = ('add', 'change', 'delete')
+        self.default_permissions = ('add', 'change', 'delete', 'view')
         self.permissions = []
         self.object_name = None
         self.app_label = app_label
@@ -118,7 +117,7 @@ class Options:
         # concrete models, the concrete_model is always the class itself.
         self.concrete_model = None
         self.swappable = None
-        self.parents = OrderedDict()
+        self.parents = {}
         self.auto_created = False
 
         # List of all lookups defined in ForeignKey 'limit_choices_to' options
@@ -181,6 +180,12 @@ class Options:
 
             self.unique_together = normalize_together(self.unique_together)
             self.index_together = normalize_together(self.index_together)
+            # App label/class name interpolation for names of constraints and
+            # indexes.
+            if not getattr(cls._meta, 'abstract', False):
+                for attr_name in {'constraints', 'indexes'}:
+                    objs = getattr(self, attr_name, [])
+                    setattr(self, attr_name, self._format_names_with_class(cls, objs))
 
             # verbose_name_plural is a special case because it uses a 's'
             # by default.
@@ -201,6 +206,18 @@ class Options:
         if not self.db_table:
             self.db_table = "%s_%s" % (self.app_label, self.model_name)
             self.db_table = truncate_name(self.db_table, connection.ops.max_name_length())
+
+    def _format_names_with_class(self, cls, objs):
+        """App label/class name interpolation for object names."""
+        new_objs = []
+        for obj in objs:
+            obj = obj.clone()
+            obj.name = obj.name % {
+                'app_label': cls._meta.app_label.lower(),
+                'class': cls.__name__.lower(),
+            }
+            new_objs.append(obj)
+        return new_objs
 
     def _prepare(self, model):
         if self.order_with_respect_to:

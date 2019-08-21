@@ -88,6 +88,7 @@ JSONField.register_lookup(lookups.ContainedBy)
 JSONField.register_lookup(lookups.HasKey)
 JSONField.register_lookup(lookups.HasKeys)
 JSONField.register_lookup(lookups.HasAnyKeys)
+JSONField.register_lookup(lookups.JSONExact)
 
 
 class KeyTransform(Transform):
@@ -106,14 +107,12 @@ class KeyTransform(Transform):
             previous = previous.lhs
         lhs, params = compiler.compile(previous)
         if len(key_transforms) > 1:
-            return "(%s %s %%s)" % (lhs, self.nested_operator), [key_transforms] + params
+            return '(%s %s %%s)' % (lhs, self.nested_operator), params + [key_transforms]
         try:
-            int(self.key_name)
+            lookup = int(self.key_name)
         except ValueError:
-            lookup = "'%s'" % self.key_name
-        else:
-            lookup = "%s" % self.key_name
-        return "(%s %s %s)" % (lhs, self.operator, lookup), params
+            lookup = self.key_name
+        return '(%s %s %%s)' % (lhs, self.operator), params + [lookup]
 
 
 class KeyTextTransform(KeyTransform):

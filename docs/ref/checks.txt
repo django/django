@@ -85,6 +85,7 @@ Django's system checks are organized using the following tags:
 * ``signals``: Checks on signal declarations and handler registrations.
 * ``staticfiles``: Checks :mod:`django.contrib.staticfiles` configuration.
 * ``templates``: Checks template related configuration.
+* ``translation``: Checks translation related configuration.
 * ``urls``: Checks URL configuration.
 
 Some checks may be registered with multiple tags.
@@ -138,10 +139,12 @@ Model fields
 * **fields.E007**: Primary keys must not have ``null=True``.
 * **fields.E008**: All ``validators`` must be callable.
 * **fields.E100**: ``AutoField``\s must set primary_key=True.
-* **fields.E110**: ``BooleanField``\s do not accept null values.
+* **fields.E110**: ``BooleanField``\s do not accept null values. *This check
+  appeared before support for null values was added in Django 2.1.*
 * **fields.E120**: ``CharField``\s must define a ``max_length`` attribute.
 * **fields.E121**: ``max_length`` must be a positive integer.
-* **fields.W122**: ``max_length`` is ignored when used with ``IntegerField``.
+* **fields.W122**: ``max_length`` is ignored when used with
+  ``<integer field type>``.
 * **fields.E130**: ``DecimalField``\s must define a ``decimal_places`` attribute.
 * **fields.E131**: ``decimal_places`` must be a non-negative integer.
 * **fields.E132**: ``DecimalField``\s must define a ``max_digits`` attribute.
@@ -156,6 +159,8 @@ Model fields
 * **fields.W161**: Fixed default value provided.
 * **fields.W162**: ``<database>`` does not support a database index on
   ``<field data type>`` columns.
+* **fields.E170**: ``BinaryField``’s ``default`` cannot be a string. Use bytes
+  content instead.
 * **fields.E900**: ``IPAddressField`` has been removed except for support in
   historical migrations.
 * **fields.W900**: ``IPAddressField`` has been deprecated. Support for it
@@ -166,6 +171,8 @@ Model fields
   check appeared in Django 1.10 and 1.11*.
 * **fields.E901**: ``CommaSeparatedIntegerField`` is removed except for support
   in historical migrations.
+* **fields.W902**: ``FloatRangeField`` is deprecated and will be removed in
+  Django 3.1.
 
 File fields
 ~~~~~~~~~~~
@@ -215,7 +222,7 @@ Related fields
 * **fields.E331**: Field specifies a many-to-many relation through model
   ``<model>``, which has not been installed.
 * **fields.E332**: Many-to-many fields with intermediate tables must not be
-  symmetrical.
+  symmetrical. *This check appeared before Django 3.0.*
 * **fields.E333**: The model is used as an intermediate model by ``<model>``,
   but it has more than two foreign keys to ``<model>``, which is ambiguous.
   You must specify which two foreign keys Django should use via the
@@ -251,8 +258,8 @@ Models
 * **models.E001**: ``<swappable>`` is not of the form ``app_label.app_name``.
 * **models.E002**: ``<SETTING>`` references ``<model>``, which has not been
   installed, or is abstract.
-* **models.E003**: The model has two many-to-many relations through the
-  intermediate model ``<app_label>.<model>``.
+* **models.E003**: The model has two identical many-to-many relations through
+  the intermediate model ``<app_label>.<model>``.
 * **models.E004**: ``id`` can only be used as a field name if the field also
   sets ``primary_key=True``.
 * **models.E005**: The field ``<field name>`` from parent model ``<model>``
@@ -272,8 +279,8 @@ Models
   supported for that option.
 * **models.E014**: ``ordering`` must be a tuple or list (even if you want to
   order by only one field).
-* **models.E015**: ``ordering`` refers to the nonexistent field
-  ``<field name>``.
+* **models.E015**: ``ordering`` refers to the nonexistent field, related field,
+  or lookup ``<field name>``.
 * **models.E016**: ``indexes/index_together/unique_together`` refers to field
   ``<field_name>`` which is not local to model ``<model>``.
 * **models.E017**: Proxy model ``<model>`` contains model fields.
@@ -294,6 +301,24 @@ Models
   as it collides with the query lookup syntax.
 * **models.E025**: The property ``<property name>`` clashes with a related
   field accessor.
+* **models.E026**: The model cannot have more than one field with
+  ``primary_key=True``.
+* **models.W027**: ``<database>`` does not support check constraints.
+* **models.E028**: ``db_table`` ``<db_table>`` is used by multiple models:
+  ``<model list>``.
+* **models.E029**: index name ``<index>`` is not unique for model ``<model>``.
+* **models.E030**: index name ``<index>`` is not unique amongst models:
+  ``<model list>``.
+* **models.E031**: constraint name ``<constraint>`` is not unique for model
+  ``<model>``.
+* **models.E032**: constraint name ``<constraint>`` is not unique amongst
+  models: ``<model list>``.
+* **models.E033**: The index name ``<index>`` cannot start with an underscore
+  or a number.
+* **models.E034**: The index name ``<index>`` cannot be longer than
+  ``<max_length>`` characters.
+* **models.W035**: ``db_table`` ``<db_table>`` is used by multiple models:
+  ``<model list>``.
 
 Security
 --------
@@ -340,13 +365,14 @@ The following checks are run if you use the :option:`check --deploy` option:
   your domain should be served exclusively via SSL.
 * **security.W006**: Your :setting:`SECURE_CONTENT_TYPE_NOSNIFF` setting is not
   set to ``True``, so your pages will not be served with an
-  ``'x-content-type-options: nosniff'`` header. You should consider enabling
+  ``'X-Content-Type-Options: nosniff'`` header. You should consider enabling
   this header to prevent the browser from identifying content types incorrectly.
 * **security.W007**: Your :setting:`SECURE_BROWSER_XSS_FILTER` setting is not
   set to ``True``, so your pages will not be served with an
-  ``'x-xss-protection: 1; mode=block'`` header. You should consider enabling
+  ``'X-XSS-Protection: 1; mode=block'`` header. You should consider enabling
   this header to activate the browser's XSS filtering and help prevent XSS
-  attacks.
+  attacks. *This check is removed in Django 3.0 as the ``X-XSS-Protection``
+  header is no longer honored by modern browsers.*
 * **security.W008**: Your :setting:`SECURE_SSL_REDIRECT` setting is not set to
   ``True``. Unless your site should be available over both SSL and non-SSL
   connections, you may want to either set this setting to ``True`` or configure
@@ -387,7 +413,7 @@ The following checks are run if you use the :option:`check --deploy` option:
 * **security.W017**: :setting:`CSRF_COOKIE_HTTPONLY` is not set to ``True``.
   Using an ``HttpOnly`` CSRF cookie makes it more difficult for cross-site
   scripting attacks to steal the CSRF token. *This check is removed in Django
-  1.11 as the* :setting:`CSRF_COOKIE_HTTPONLY` *setting offers no pratical
+  1.11 as the* :setting:`CSRF_COOKIE_HTTPONLY` *setting offers no practical
   benefit.*
 * **security.W018**: You should not have :setting:`DEBUG` set to ``True`` in
   deployment.
@@ -422,6 +448,21 @@ configured:
   :setting:`OPTIONS <TEMPLATES-OPTIONS>` must be a string but got: ``{value}``
   (``{type}``).
 
+Translation
+-----------
+
+The following checks are performed on your translation configuration:
+
+* **translation.E001**: You have provided an invalid value for the
+  :setting:`LANGUAGE_CODE` setting: ``<value>``.
+* **translation.E002**: You have provided an invalid language code in the
+  :setting:`LANGUAGES` setting: ``<value>``.
+* **translation.E003**: You have provided an invalid language code in the
+  :setting:`LANGUAGES_BIDI` setting: ``<value>``.
+* **translation.E004**: You have provided a value for the
+  :setting:`LANGUAGE_CODE` setting that is not in the :setting:`LANGUAGES`
+  setting.
+
 URLs
 ----
 
@@ -444,6 +485,10 @@ The following checks are performed on your URL configuration:
   able to reverse all URLs in this namespace.
 * **urls.E006**: The :setting:`MEDIA_URL`/ :setting:`STATIC_URL` setting must
   end with a slash.
+* **urls.E007**: The custom ``handlerXXX`` view ``'path.to.view'`` does not
+  take the correct number of arguments (…).
+* **urls.E008**: The custom ``handlerXXX`` view ``'path.to.view'`` could not be
+  imported.
 
 ``contrib`` app checks
 ======================
@@ -576,6 +621,10 @@ with the admin site:
   which does not refer to a Field.
 * **admin.E128**: The value of ``date_hierarchy`` must be a ``DateField`` or
   ``DateTimeField``.
+* **admin.E129**: ``<modeladmin>`` must define a ``has_<foo>_permission()``
+  method for the ``<action>`` action.
+* **admin.E130**: ``__name__`` attributes of actions defined in
+  ``<modeladmin>`` must be unique.
 
 ``InlineModelAdmin``
 ~~~~~~~~~~~~~~~~~~~~
@@ -618,7 +667,26 @@ The following checks are performed on the default
 * **admin.E401**: :mod:`django.contrib.contenttypes` must be in
   :setting:`INSTALLED_APPS` in order to use the admin application.
 * **admin.E402**: :mod:`django.contrib.auth.context_processors.auth`
-  must be in :setting:`TEMPLATES` in order to use the admin application.
+  must be enabled in :class:`~django.template.backends.django.DjangoTemplates`
+  (:setting:`TEMPLATES`) if using the default auth backend in order to use the
+  admin application.
+* **admin.E403**: A :class:`django.template.backends.django.DjangoTemplates`
+  instance must be configured in :setting:`TEMPLATES` in order to use the
+  admin application.
+* **admin.E404**: ``django.contrib.messages.context_processors.messages``
+  must be enabled in :class:`~django.template.backends.django.DjangoTemplates`
+  (:setting:`TEMPLATES`) in order to use the admin application.
+* **admin.E405**: :mod:`django.contrib.auth` must be in
+  :setting:`INSTALLED_APPS` in order to use the admin application.
+* **admin.E406**: :mod:`django.contrib.messages` must be in
+  :setting:`INSTALLED_APPS` in order to use the admin application.
+* **admin.E408**:
+  :class:`django.contrib.auth.middleware.AuthenticationMiddleware` must be in
+  :setting:`MIDDLEWARE` in order to use the admin application.
+* **admin.E409**: :class:`django.contrib.messages.middleware.MessageMiddleware`
+  must be in :setting:`MIDDLEWARE` in order to use the admin application.
+* **admin.E410**: :class:`django.contrib.sessions.middleware.SessionMiddleware`
+  must be in :setting:`MIDDLEWARE` in order to use the admin application.
 
 ``auth``
 --------
@@ -695,3 +763,5 @@ configured:
   or list.
 * **staticfiles.E002**: The :setting:`STATICFILES_DIRS` setting should not
   contain the :setting:`STATIC_ROOT` setting.
+* **staticfiles.E003**: The prefix ``<prefix>`` in the
+  :setting:`STATICFILES_DIRS` setting must not end with a slash.

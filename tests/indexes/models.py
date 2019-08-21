@@ -27,6 +27,7 @@ class ArticleTranslation(models.Model):
 class Article(models.Model):
     headline = models.CharField(max_length=100)
     pub_date = models.DateTimeField()
+    published = models.BooleanField(default=False)
 
     # Add virtual relation to the ArticleTranslation model.
     translation = CurrentTranslation(ArticleTranslation, models.CASCADE, ['id'], ['article'])
@@ -52,3 +53,8 @@ if connection.vendor == 'postgresql':
         headline = models.CharField(max_length=100, db_index=True)
         body = models.TextField(db_index=True)
         slug = models.CharField(max_length=40, unique=True)
+
+
+class IndexedArticle2(models.Model):
+    headline = models.CharField(max_length=100)
+    body = models.TextField()

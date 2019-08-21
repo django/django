@@ -17,7 +17,7 @@ def prefix_validation_error(error, prefix, code, params):
             # ngettext calls require a count parameter and are converted
             # to an empty string if they are missing it.
             message=format_lazy(
-                '{}{}',
+                '{} {}',
                 SimpleLazyObject(lambda: prefix % params),
                 SimpleLazyObject(lambda: error.message % error_params),
             ),

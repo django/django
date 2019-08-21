@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
+"POT-Creation-Date: 2018-05-17 11:50+0200\n"
 "PO-Revision-Date: 2017-09-19 16:41+0000\n"
 "Last-Translator: Vláďa Macek <macek@sandbox.cz>\n"
 "Language-Team: Czech (http://www.transifex.com/django/django/language/cs/)\n"
@@ -17,7 +17,8 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: cs\n"
-"Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
+"Plural-Forms: nplurals=4; plural=(n == 1 && n % 1 == 0) ? 0 : (n >= 2 && n "
+"<= 4 && n % 1 == 0) ? 1: (n % 1 != 0 ) ? 2 : 3;\n"
 
 #, javascript-format
 msgid "Available %s"
@@ -77,6 +78,7 @@ msgid_plural "%(sel)s of %(cnt)s selected"
 msgstr[0] "Vybrána je %(sel)s položka z celkem %(cnt)s."
 msgstr[1] "Vybrány jsou %(sel)s položky z celkem %(cnt)s."
 msgstr[2] "Vybraných je %(sel)s položek z celkem %(cnt)s."
+msgstr[3] "Vybraných je %(sel)s položek z celkem %(cnt)s."
 
 msgid ""
 "You have unsaved changes on individual editable fields. If you run an "
@@ -101,28 +103,8 @@ msgstr ""
 "Byla vybrána operace a jednotlivá pole nejsou změněná. Patrně hledáte "
 "tlačítko Provést spíše než Uložit."
 
-#, javascript-format
-msgid "Note: You are %s hour ahead of server time."
-msgid_plural "Note: You are %s hours ahead of server time."
-msgstr[0] "Poznámka: Váš čas o %s hodinu předstihuje čas na serveru."
-msgstr[1] "Poznámka: Váš čas o %s hodiny předstihuje čas na serveru."
-msgstr[2] "Poznámka: Váš čas o %s hodin předstihuje čas na serveru."
-
-#, javascript-format
-msgid "Note: You are %s hour behind server time."
-msgid_plural "Note: You are %s hours behind server time."
-msgstr[0] "Poznámka: Váš čas se o %s hodinu zpožďuje za časem na serveru."
-msgstr[1] "Poznámka: Váš čas se o %s hodiny zpožďuje za časem na serveru."
-msgstr[2] "Poznámka: Váš čas se o %s hodin zpožďuje za časem na serveru."
-
 msgid "Now"
 msgstr "Nyní"
-
-msgid "Choose a Time"
-msgstr "Vyberte čas"
-
-msgid "Choose a time"
-msgstr "Vyberte čas"
 
 msgid "Midnight"
 msgstr "Půlnoc"
@@ -135,6 +117,28 @@ msgstr "Poledne"
 
 msgid "6 p.m."
 msgstr "6h večer"
+
+#, javascript-format
+msgid "Note: You are %s hour ahead of server time."
+msgid_plural "Note: You are %s hours ahead of server time."
+msgstr[0] "Poznámka: Váš čas o %s hodinu předstihuje čas na serveru."
+msgstr[1] "Poznámka: Váš čas o %s hodiny předstihuje čas na serveru."
+msgstr[2] "Poznámka: Váš čas o %s hodin předstihuje čas na serveru."
+msgstr[3] "Poznámka: Váš čas o %s hodin předstihuje čas na serveru."
+
+#, javascript-format
+msgid "Note: You are %s hour behind server time."
+msgid_plural "Note: You are %s hours behind server time."
+msgstr[0] "Poznámka: Váš čas se o %s hodinu zpožďuje za časem na serveru."
+msgstr[1] "Poznámka: Váš čas se o %s hodiny zpožďuje za časem na serveru."
+msgstr[2] "Poznámka: Váš čas se o %s hodin zpožďuje za časem na serveru."
+msgstr[3] "Poznámka: Váš čas se o %s hodin zpožďuje za časem na serveru."
+
+msgid "Choose a Time"
+msgstr "Vyberte čas"
+
+msgid "Choose a time"
+msgstr "Vyberte čas"
 
 msgid "Cancel"
 msgstr "Storno"

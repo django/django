@@ -24,7 +24,6 @@ class AutocompleteJsonView(BaseListView):
             return JsonResponse({'error': '403 Forbidden'}, status=403)
 
         self.term = request.GET.get('term', '')
-        self.paginator_class = self.model_admin.paginator
         self.object_list = self.get_queryset()
         context = self.get_context_data()
         return JsonResponse({
@@ -49,4 +48,4 @@ class AutocompleteJsonView(BaseListView):
 
     def has_perm(self, request, obj=None):
         """Check if user has permission to access the related model."""
-        return self.model_admin.has_change_permission(request, obj=obj)
+        return self.model_admin.has_view_permission(request, obj=obj)

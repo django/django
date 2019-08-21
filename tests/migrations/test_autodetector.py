@@ -61,6 +61,12 @@ class AutodetectorTests(TestCase):
         ("id", models.AutoField(primary_key=True)),
         ("name", models.CharField(max_length=200, default='Ada Lovelace')),
     ])
+    author_name_check_constraint = ModelState("testapp", "Author", [
+        ("id", models.AutoField(primary_key=True)),
+        ("name", models.CharField(max_length=200)),
+    ],
+        {'constraints': [models.CheckConstraint(check=models.Q(name__contains='Bob'), name='name_contains_bob')]},
+    )
     author_dates_of_birth_auto_now = ModelState("testapp", "Author", [
         ("id", models.AutoField(primary_key=True)),
         ("date_of_birth", models.DateField(auto_now=True)),
@@ -783,8 +789,10 @@ class AutodetectorTests(TestCase):
         self.assertOperationAttributes(changes, "testapp", 0, 0, name="name", preserve_default=True)
         self.assertOperationFieldAttributes(changes, "testapp", 0, 0, default='Ada Lovelace')
 
-    @mock.patch('django.db.migrations.questioner.MigrationQuestioner.ask_not_null_alteration',
-                return_value=models.NOT_PROVIDED)
+    @mock.patch(
+        'django.db.migrations.questioner.MigrationQuestioner.ask_not_null_alteration',
+        return_value=models.NOT_PROVIDED,
+    )
     def test_alter_field_to_not_null_without_default(self, mocked_ask_method):
         """
         #23609 - Tests autodetection of nullable to non-nullable alterations.
@@ -797,8 +805,10 @@ class AutodetectorTests(TestCase):
         self.assertOperationAttributes(changes, "testapp", 0, 0, name="name", preserve_default=True)
         self.assertOperationFieldAttributes(changes, "testapp", 0, 0, default=models.NOT_PROVIDED)
 
-    @mock.patch('django.db.migrations.questioner.MigrationQuestioner.ask_not_null_alteration',
-                return_value='Some Name')
+    @mock.patch(
+        'django.db.migrations.questioner.MigrationQuestioner.ask_not_null_alteration',
+        return_value='Some Name',
+    )
     def test_alter_field_to_not_null_oneoff_default(self, mocked_ask_method):
         """
         #23609 - Tests autodetection of nullable to non-nullable alterations.
@@ -916,6 +926,67 @@ class AutodetectorTests(TestCase):
         self.assertOperationAttributes(
             changes, 'app', 0, 1, model_name='bar', old_name='second', new_name='second_renamed',
         )
+
+    def test_rename_field_preserved_db_column(self):
+        """
+        RenameField is used if a field is renamed and db_column equal to the
+        old field's column is added.
+        """
+        before = [
+            ModelState('app', 'Foo', [
+                ('id', models.AutoField(primary_key=True)),
+                ('field', models.IntegerField()),
+            ]),
+        ]
+        after = [
+            ModelState('app', 'Foo', [
+                ('id', models.AutoField(primary_key=True)),
+                ('renamed_field', models.IntegerField(db_column='field')),
+            ]),
+        ]
+        changes = self.get_changes(before, after, MigrationQuestioner({'ask_rename': True}))
+        self.assertNumberMigrations(changes, 'app', 1)
+        self.assertOperationTypes(changes, 'app', 0, ['RenameField', 'AlterField'])
+        self.assertOperationAttributes(
+            changes, 'app', 0, 0, model_name='foo', old_name='field', new_name='renamed_field',
+        )
+        self.assertOperationAttributes(changes, 'app', 0, 1, model_name='foo', name='renamed_field')
+        self.assertEqual(changes['app'][0].operations[-1].field.deconstruct(), (
+            'renamed_field', 'django.db.models.IntegerField', [], {'db_column': 'field'},
+        ))
+
+    def test_rename_related_field_preserved_db_column(self):
+        before = [
+            ModelState('app', 'Foo', [
+                ('id', models.AutoField(primary_key=True)),
+            ]),
+            ModelState('app', 'Bar', [
+                ('id', models.AutoField(primary_key=True)),
+                ('foo', models.ForeignKey('app.Foo', models.CASCADE)),
+            ]),
+        ]
+        after = [
+            ModelState('app', 'Foo', [
+                ('id', models.AutoField(primary_key=True)),
+            ]),
+            ModelState('app', 'Bar', [
+                ('id', models.AutoField(primary_key=True)),
+                ('renamed_foo', models.ForeignKey('app.Foo', models.CASCADE, db_column='foo_id')),
+            ]),
+        ]
+        changes = self.get_changes(before, after, MigrationQuestioner({'ask_rename': True}))
+        self.assertNumberMigrations(changes, 'app', 1)
+        self.assertOperationTypes(changes, 'app', 0, ['RenameField', 'AlterField'])
+        self.assertOperationAttributes(
+            changes, 'app', 0, 0, model_name='bar', old_name='foo', new_name='renamed_foo',
+        )
+        self.assertOperationAttributes(changes, 'app', 0, 1, model_name='bar', name='renamed_foo')
+        self.assertEqual(changes['app'][0].operations[-1].field.deconstruct(), (
+            'renamed_foo',
+            'django.db.models.ForeignKey',
+            [],
+            {'to': 'app.Foo', 'on_delete': models.CASCADE, 'db_column': 'foo_id'},
+        ))
 
     def test_rename_model(self):
         """Tests autodetection of renamed models."""
@@ -1079,10 +1150,9 @@ class AutodetectorTests(TestCase):
         changes = self.get_changes([], [self.author_with_publisher, self.publisher])
         # Right number/type of migrations?
         self.assertNumberMigrations(changes, 'testapp', 1)
-        self.assertOperationTypes(changes, 'testapp', 0, ["CreateModel", "CreateModel", "AddField"])
-        self.assertOperationAttributes(changes, "testapp", 0, 0, name="Author")
-        self.assertOperationAttributes(changes, "testapp", 0, 1, name="Publisher")
-        self.assertOperationAttributes(changes, "testapp", 0, 2, name="publisher")
+        self.assertOperationTypes(changes, 'testapp', 0, ["CreateModel", "CreateModel"])
+        self.assertOperationAttributes(changes, "testapp", 0, 0, name="Publisher")
+        self.assertOperationAttributes(changes, "testapp", 0, 1, name="Author")
         self.assertMigrationDependencies(changes, 'testapp', 0, [])
 
     def test_circular_fk_dependency(self):
@@ -1094,8 +1164,8 @@ class AutodetectorTests(TestCase):
         # Right number/type of migrations?
         self.assertNumberMigrations(changes, 'testapp', 1)
         self.assertOperationTypes(changes, 'testapp', 0, ["CreateModel", "CreateModel"])
-        self.assertOperationAttributes(changes, "testapp", 0, 0, name="Author")
-        self.assertOperationAttributes(changes, "testapp", 0, 1, name="Publisher")
+        self.assertOperationAttributes(changes, "testapp", 0, 0, name="Publisher")
+        self.assertOperationAttributes(changes, "testapp", 0, 1, name="Author")
         self.assertMigrationDependencies(changes, 'testapp', 0, [("otherapp", "auto_1")])
         # Right number/type of migrations?
         self.assertNumberMigrations(changes, 'otherapp', 2)
@@ -1205,7 +1275,7 @@ class AutodetectorTests(TestCase):
             "testapp", "model", [("id", models.AutoField(primary_key=True, validators=[
                 RegexValidator(
                     re.compile('^[-a-zA-Z0-9_]+\\Z'),
-                    "Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens.",
+                    'Enter a valid “slug” consisting of letters, numbers, underscores or hyphens.',
                     'invalid'
                 )
             ]))]
@@ -1222,7 +1292,7 @@ class AutodetectorTests(TestCase):
             "testapp", "model", [("id", models.AutoField(primary_key=True, validators=[
                 RegexValidator(
                     re.compile('^[a-z]+\\Z', 32),
-                    "Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens.",
+                    'Enter a valid “slug” consisting of letters, numbers, underscores or hyphens.',
                     'invalid'
                 )
             ]))]
@@ -1323,6 +1393,40 @@ class AutodetectorTests(TestCase):
         self.assertOperationAttributes(changes, 'otherapp', 0, 0, model_name='book', name='book_title_author_idx')
         added_index = models.Index(fields=['title', 'author'], name='book_author_title_idx')
         self.assertOperationAttributes(changes, 'otherapp', 0, 1, model_name='book', index=added_index)
+
+    def test_create_model_with_check_constraint(self):
+        """Test creation of new model with constraints already defined."""
+        author = ModelState('otherapp', 'Author', [
+            ('id', models.AutoField(primary_key=True)),
+            ('name', models.CharField(max_length=200)),
+        ], {'constraints': [models.CheckConstraint(check=models.Q(name__contains='Bob'), name='name_contains_bob')]})
+        changes = self.get_changes([], [author])
+        added_constraint = models.CheckConstraint(check=models.Q(name__contains='Bob'), name='name_contains_bob')
+        # Right number of migrations?
+        self.assertEqual(len(changes['otherapp']), 1)
+        # Right number of actions?
+        migration = changes['otherapp'][0]
+        self.assertEqual(len(migration.operations), 2)
+        # Right actions order?
+        self.assertOperationTypes(changes, 'otherapp', 0, ['CreateModel', 'AddConstraint'])
+        self.assertOperationAttributes(changes, 'otherapp', 0, 0, name='Author')
+        self.assertOperationAttributes(changes, 'otherapp', 0, 1, model_name='author', constraint=added_constraint)
+
+    def test_add_constraints(self):
+        """Test change detection of new constraints."""
+        changes = self.get_changes([self.author_name], [self.author_name_check_constraint])
+        self.assertNumberMigrations(changes, 'testapp', 1)
+        self.assertOperationTypes(changes, 'testapp', 0, ['AddConstraint'])
+        added_constraint = models.CheckConstraint(check=models.Q(name__contains='Bob'), name='name_contains_bob')
+        self.assertOperationAttributes(changes, 'testapp', 0, 0, model_name='author', constraint=added_constraint)
+
+    def test_remove_constraints(self):
+        """Test change detection of removed constraints."""
+        changes = self.get_changes([self.author_name_check_constraint], [self.author_name])
+        # Right number/type of migrations?
+        self.assertNumberMigrations(changes, 'testapp', 1)
+        self.assertOperationTypes(changes, 'testapp', 0, ['RemoveConstraint'])
+        self.assertOperationAttributes(changes, 'testapp', 0, 0, model_name='author', name='name_contains_bob')
 
     def test_add_foo_together(self):
         """Tests index/unique_together detection."""
@@ -1425,10 +1529,10 @@ class AutodetectorTests(TestCase):
         )
         # Right number/type of migrations?
         self.assertNumberMigrations(changes, "otherapp", 1)
-        self.assertOperationTypes(changes, "otherapp", 0, ["RemoveField", "AlterUniqueTogether", "AlterIndexTogether"])
-        self.assertOperationAttributes(changes, "otherapp", 0, 0, model_name="book", name="newfield")
-        self.assertOperationAttributes(changes, "otherapp", 0, 1, name="book", unique_together={("author", "title")})
-        self.assertOperationAttributes(changes, "otherapp", 0, 2, name="book", index_together={("author", "title")})
+        self.assertOperationTypes(changes, "otherapp", 0, ["AlterUniqueTogether", "AlterIndexTogether", "RemoveField"])
+        self.assertOperationAttributes(changes, "otherapp", 0, 0, name="book", unique_together={("author", "title")})
+        self.assertOperationAttributes(changes, "otherapp", 0, 1, name="book", index_together={("author", "title")})
+        self.assertOperationAttributes(changes, "otherapp", 0, 2, model_name="book", name="newfield")
 
     def test_rename_field_and_foo_together(self):
         """
@@ -1455,7 +1559,7 @@ class AutodetectorTests(TestCase):
         self.assertNumberMigrations(changes, "testapp", 1)
         self.assertOperationTypes(changes, "testapp", 0, ["CreateModel"])
         self.assertOperationAttributes(
-            changes, "testapp", 0, 0, name="AuthorProxy", options={"proxy": True, "indexes": []}
+            changes, "testapp", 0, 0, name="AuthorProxy", options={"proxy": True, "indexes": [], "constraints": []}
         )
         # Now, we test turning a proxy model into a non-proxy model
         # It should delete the proxy then make the real one
@@ -1557,6 +1661,11 @@ class AutodetectorTests(TestCase):
         self.assertNumberMigrations(changes, 'testapp', 1)
         self.assertOperationTypes(changes, 'testapp', 0, ["CreateModel"])
         self.assertOperationAttributes(changes, 'testapp', 0, 0, name="AuthorUnmanaged", options={"managed": False})
+
+    def test_unmanaged_delete(self):
+        changes = self.get_changes([self.author_empty, self.author_unmanaged], [self.author_empty])
+        self.assertNumberMigrations(changes, 'testapp', 1)
+        self.assertOperationTypes(changes, 'testapp', 0, ['DeleteModel'])
 
     def test_unmanaged_to_managed(self):
         # Now, we test turning an unmanaged model into a managed model
@@ -1802,13 +1911,12 @@ class AutodetectorTests(TestCase):
         # Right number/type of migrations?
         self.assertNumberMigrations(changes, "testapp", 1)
         self.assertOperationTypes(changes, "testapp", 0, [
-            "CreateModel", "CreateModel", "CreateModel", "AddField", "AddField"
+            'CreateModel', 'CreateModel', 'CreateModel', 'AddField',
         ])
-        self.assertOperationAttributes(changes, 'testapp', 0, 0, name="Author")
-        self.assertOperationAttributes(changes, 'testapp', 0, 1, name="Contract")
-        self.assertOperationAttributes(changes, 'testapp', 0, 2, name="Publisher")
-        self.assertOperationAttributes(changes, 'testapp', 0, 3, model_name='contract', name='publisher')
-        self.assertOperationAttributes(changes, 'testapp', 0, 4, model_name='author', name='publishers')
+        self.assertOperationAttributes(changes, 'testapp', 0, 0, name='Author')
+        self.assertOperationAttributes(changes, 'testapp', 0, 1, name='Publisher')
+        self.assertOperationAttributes(changes, 'testapp', 0, 2, name='Contract')
+        self.assertOperationAttributes(changes, 'testapp', 0, 3, model_name='author', name='publishers')
 
     def test_many_to_many_removed_before_through_model(self):
         """
@@ -1822,11 +1930,9 @@ class AutodetectorTests(TestCase):
         # Remove both the through model and ManyToMany
         # Right number/type of migrations?
         self.assertNumberMigrations(changes, "otherapp", 1)
-        self.assertOperationTypes(changes, "otherapp", 0, ["RemoveField", "RemoveField", "RemoveField", "DeleteModel"])
-        self.assertOperationAttributes(changes, 'otherapp', 0, 0, name="author", model_name='attribution')
-        self.assertOperationAttributes(changes, 'otherapp', 0, 1, name="book", model_name='attribution')
-        self.assertOperationAttributes(changes, 'otherapp', 0, 2, name="authors", model_name='book')
-        self.assertOperationAttributes(changes, 'otherapp', 0, 3, name='Attribution')
+        self.assertOperationTypes(changes, 'otherapp', 0, ['RemoveField', 'DeleteModel'])
+        self.assertOperationAttributes(changes, 'otherapp', 0, 0, name='authors', model_name='book')
+        self.assertOperationAttributes(changes, 'otherapp', 0, 1, name='Attribution')
 
     def test_many_to_many_removed_before_through_model_2(self):
         """
@@ -1841,14 +1947,10 @@ class AutodetectorTests(TestCase):
         # Remove both the through model and ManyToMany
         # Right number/type of migrations?
         self.assertNumberMigrations(changes, "otherapp", 1)
-        self.assertOperationTypes(changes, "otherapp", 0, [
-            "RemoveField", "RemoveField", "RemoveField", "DeleteModel", "DeleteModel"
-        ])
-        self.assertOperationAttributes(changes, 'otherapp', 0, 0, name="author", model_name='attribution')
-        self.assertOperationAttributes(changes, 'otherapp', 0, 1, name="book", model_name='attribution')
-        self.assertOperationAttributes(changes, 'otherapp', 0, 2, name="authors", model_name='book')
-        self.assertOperationAttributes(changes, 'otherapp', 0, 3, name='Attribution')
-        self.assertOperationAttributes(changes, 'otherapp', 0, 4, name='Book')
+        self.assertOperationTypes(changes, 'otherapp', 0, ['RemoveField', 'DeleteModel', 'DeleteModel'])
+        self.assertOperationAttributes(changes, 'otherapp', 0, 0, name='authors', model_name='book')
+        self.assertOperationAttributes(changes, 'otherapp', 0, 1, name='Attribution')
+        self.assertOperationAttributes(changes, 'otherapp', 0, 2, name='Book')
 
     def test_m2m_w_through_multistep_remove(self):
         """
@@ -1861,13 +1963,12 @@ class AutodetectorTests(TestCase):
         # Right number/type of migrations?
         self.assertNumberMigrations(changes, "testapp", 1)
         self.assertOperationTypes(changes, "testapp", 0, [
-            "RemoveField", "RemoveField", "RemoveField", "DeleteModel", "DeleteModel"
+            "RemoveField", "RemoveField", "DeleteModel", "DeleteModel"
         ])
-        self.assertOperationAttributes(changes, "testapp", 0, 0, name="publishers", model_name='author')
-        self.assertOperationAttributes(changes, "testapp", 0, 1, name="author", model_name='contract')
-        self.assertOperationAttributes(changes, "testapp", 0, 2, name="publisher", model_name='contract')
-        self.assertOperationAttributes(changes, "testapp", 0, 3, name="Author")
-        self.assertOperationAttributes(changes, "testapp", 0, 4, name="Contract")
+        self.assertOperationAttributes(changes, "testapp", 0, 0, name="author", model_name='contract')
+        self.assertOperationAttributes(changes, "testapp", 0, 1, name="publisher", model_name='contract')
+        self.assertOperationAttributes(changes, "testapp", 0, 2, name="Author")
+        self.assertOperationAttributes(changes, "testapp", 0, 3, name="Contract")
 
     def test_concrete_field_changed_to_many_to_many(self):
         """
@@ -1904,11 +2005,10 @@ class AutodetectorTests(TestCase):
         changes = self.get_changes([self.author_with_publisher, self.publisher_with_author], [])
         # Right number/type of migrations?
         self.assertNumberMigrations(changes, "testapp", 1)
-        self.assertOperationTypes(changes, "testapp", 0, ["RemoveField", "RemoveField", "DeleteModel", "DeleteModel"])
-        self.assertOperationAttributes(changes, "testapp", 0, 0, name="publisher", model_name='author')
-        self.assertOperationAttributes(changes, "testapp", 0, 1, name="author", model_name='publisher')
-        self.assertOperationAttributes(changes, "testapp", 0, 2, name="Author")
-        self.assertOperationAttributes(changes, "testapp", 0, 3, name="Publisher")
+        self.assertOperationTypes(changes, "testapp", 0, ["RemoveField", "DeleteModel", "DeleteModel"])
+        self.assertOperationAttributes(changes, "testapp", 0, 0, name="author", model_name='publisher')
+        self.assertOperationAttributes(changes, "testapp", 0, 1, name="Author")
+        self.assertOperationAttributes(changes, "testapp", 0, 2, name="Publisher")
 
     def test_alter_model_options(self):
         """Changing a model's options should make a change."""
@@ -1980,8 +2080,10 @@ class AutodetectorTests(TestCase):
         changes = self.get_changes([], [self.book, self.author_with_book_order_wrt])
         # Right number/type of migrations?
         self.assertNumberMigrations(changes, 'testapp', 1)
-        self.assertOperationTypes(changes, 'testapp', 0, ["CreateModel", "AlterOrderWithRespectTo"])
-        self.assertOperationAttributes(changes, 'testapp', 0, 1, name="author", order_with_respect_to="book")
+        self.assertOperationTypes(changes, 'testapp', 0, ["CreateModel"])
+        self.assertOperationAttributes(
+            changes, 'testapp', 0, 0, name="Author", options={'order_with_respect_to': 'book'}
+        )
         self.assertNotIn("_order", [name for name, field in changes['testapp'][0].operations[0].fields])
 
     def test_alter_model_managers(self):
@@ -2006,6 +2108,25 @@ class AutodetectorTests(TestCase):
         self.assertOperationTypes(changes, 'thirdapp', 0, ["CreateModel", "CreateModel"])
         self.assertOperationAttributes(changes, 'thirdapp', 0, 0, name="CustomUser")
         self.assertOperationAttributes(changes, 'thirdapp', 0, 1, name="Aardvark")
+
+    def test_default_related_name_option(self):
+        model_state = ModelState('app', 'model', [
+            ('id', models.AutoField(primary_key=True)),
+        ], options={'default_related_name': 'related_name'})
+        changes = self.get_changes([], [model_state])
+        self.assertNumberMigrations(changes, 'app', 1)
+        self.assertOperationTypes(changes, 'app', 0, ['CreateModel'])
+        self.assertOperationAttributes(
+            changes, 'app', 0, 0, name='model',
+            options={'default_related_name': 'related_name'},
+        )
+        altered_model_state = ModelState('app', 'Model', [
+            ('id', models.AutoField(primary_key=True)),
+        ])
+        changes = self.get_changes([model_state], [altered_model_state])
+        self.assertNumberMigrations(changes, 'app', 1)
+        self.assertOperationTypes(changes, 'app', 0, ['AlterModelOptions'])
+        self.assertOperationAttributes(changes, 'app', 0, 0, name='model', options={})
 
     @override_settings(AUTH_USER_MODEL="thirdapp.CustomUser")
     def test_swappable_first_setting(self):
@@ -2232,6 +2353,18 @@ class AutodetectorTests(TestCase):
         self.assertOperationTypes(changes, 'a', 0, ["CreateModel"])
         self.assertMigrationDependencies(changes, 'a', 0, [])
 
+    @override_settings(AUTH_USER_MODEL='a.User')
+    def test_swappable_circular_multi_mti(self):
+        with isolate_lru_cache(apps.get_swappable_settings_name):
+            parent = ModelState('a', 'Parent', [
+                ('user', models.ForeignKey(settings.AUTH_USER_MODEL, models.CASCADE))
+            ])
+            child = ModelState('a', 'Child', [], bases=('a.Parent',))
+            user = ModelState('a', 'User', [], bases=(AbstractBaseUser, 'a.Child'))
+            changes = self.get_changes([], [parent, child, user])
+        self.assertNumberMigrations(changes, 'a', 1)
+        self.assertOperationTypes(changes, 'a', 0, ['CreateModel', 'CreateModel', 'CreateModel', 'AddField'])
+
     @mock.patch('django.db.migrations.questioner.MigrationQuestioner.ask_not_null_addition',
                 side_effect=AssertionError("Should not have prompted for not null addition"))
     def test_add_blank_textfield_and_charfield(self, mocked_ask_method):
@@ -2257,3 +2390,13 @@ class AutodetectorTests(TestCase):
         self.assertNumberMigrations(changes, 'testapp', 1)
         self.assertOperationTypes(changes, 'testapp', 0, ["AddField", "AddField"])
         self.assertOperationAttributes(changes, 'testapp', 0, 0)
+
+    def test_mti_inheritance_model_removal(self):
+        Animal = ModelState('app', 'Animal', [
+            ("id", models.AutoField(primary_key=True)),
+        ])
+        Dog = ModelState('app', 'Dog', [], bases=('app.Animal',))
+        changes = self.get_changes([Animal, Dog], [Animal])
+        self.assertNumberMigrations(changes, 'app', 1)
+        self.assertOperationTypes(changes, 'app', 0, ['DeleteModel'])
+        self.assertOperationAttributes(changes, 'app', 0, 0, name='Dog')

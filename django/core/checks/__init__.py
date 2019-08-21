@@ -12,6 +12,7 @@ import django.core.checks.security.base  # NOQA isort:skip
 import django.core.checks.security.csrf  # NOQA isort:skip
 import django.core.checks.security.sessions  # NOQA isort:skip
 import django.core.checks.templates  # NOQA isort:skip
+import django.core.checks.translation  # NOQA isort:skip
 import django.core.checks.urls  # NOQA isort:skip
 
 

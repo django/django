@@ -19,7 +19,6 @@ from django.core.signals import (
 )
 from django.db import close_old_connections
 from django.http import HttpRequest, QueryDict, SimpleCookie
-from django.template import TemplateDoesNotExist
 from django.test import signals
 from django.test.utils import ContextList
 from django.urls import resolve
@@ -34,8 +33,8 @@ __all__ = ('Client', 'RedirectCycleError', 'RequestFactory', 'encode_file', 'enc
 BOUNDARY = 'BoUnDaRyStRiNg'
 MULTIPART_CONTENT = 'multipart/form-data; boundary=%s' % BOUNDARY
 CONTENT_TYPE_RE = re.compile(r'.*; charset=([\w\d-]+);?')
-# JSON Vendor Tree spec: https://tools.ietf.org/html/rfc6838#section-3.2
-JSON_CONTENT_TYPE_RE = re.compile(r'^application\/(vnd\..+\+)?json')
+# Structured suffix spec: https://tools.ietf.org/html/rfc6838#section-4.2.8
+JSON_CONTENT_TYPE_RE = re.compile(r'^application\/(.+\+)?json')
 
 
 class RedirectCycleError(Exception):
@@ -49,7 +48,7 @@ class RedirectCycleError(Exception):
 class FakePayload:
     """
     A wrapper around BytesIO that restricts what can be read since data from
-    the network can't be seeked and cannot be read outside of its content
+    the network can't be sought and cannot be read outside of its content
     length. This makes sure that views can't do anything under the test client
     that wouldn't work in real life.
     """
@@ -76,7 +75,7 @@ class FakePayload:
 
     def write(self, content):
         if self.read_started:
-            raise ValueError("Unable to write a payload after he's been read")
+            raise ValueError("Unable to write a payload after it's been read")
         content = force_bytes(content)
         self.__content.write(content)
         self.__len += len(content)
@@ -192,7 +191,12 @@ def encode_multipart(boundary, data):
     # file, or a *list* of form values and/or files. Remember that HTTP field
     # names can be duplicated!
     for (key, value) in data.items():
-        if is_file(value):
+        if value is None:
+            raise TypeError(
+                "Cannot encode None for key '%s' as POST data. Did you mean "
+                "to pass an empty string or omit the value?" % key
+            )
+        elif is_file(value):
             lines.extend(encode_file(boundary, key, value))
         elif not isinstance(value, str) and is_iterable(value):
             for item in value:
@@ -275,9 +279,12 @@ class RequestFactory:
         # This is a minimal valid WSGI environ dictionary, plus:
         # - HTTP_COOKIE: for cookie support,
         # - REMOTE_ADDR: often useful, see #8551.
-        # See http://www.python.org/dev/peps/pep-3333/#environ-variables
+        # See https://www.python.org/dev/peps/pep-3333/#environ-variables
         return {
-            'HTTP_COOKIE': self.cookies.output(header='', sep='; '),
+            'HTTP_COOKIE': '; '.join(sorted(
+                '%s=%s' % (morsel.key, morsel.coded_value)
+                for morsel in self.cookies.values()
+            )),
             'PATH_INFO': '/',
             'REMOTE_ADDR': '127.0.0.1',
             'REQUEST_METHOD': 'GET',
@@ -314,10 +321,10 @@ class RequestFactory:
 
     def _encode_json(self, data, content_type):
         """
-        Return encoded JSON if data is a dict and content_type is
-        application/json.
+        Return encoded JSON if data is a dict, list, or tuple and content_type
+        is application/json.
         """
-        should_encode = JSON_CONTENT_TYPE_RE.match(content_type) and isinstance(data, dict)
+        should_encode = JSON_CONTENT_TYPE_RE.match(content_type) and isinstance(data, (dict, list, tuple))
         return json.dumps(data, cls=self.json_encoder) if should_encode else data
 
     def _get_path(self, parsed):
@@ -401,7 +408,7 @@ class RequestFactory:
         }
         if data:
             r.update({
-                'CONTENT_LENGTH': len(data),
+                'CONTENT_LENGTH': str(len(data)),
                 'CONTENT_TYPE': content_type,
                 'wsgi.input': FakePayload(data),
             })
@@ -409,7 +416,7 @@ class RequestFactory:
         # If QUERY_STRING is absent or empty, we want to extract it from the URL.
         if not r.get('QUERY_STRING'):
             # WSGI requires latin-1 encoded strings. See get_path_info().
-            query_string = force_bytes(parsed[4]).decode('iso-8859-1')
+            query_string = parsed[4].encode().decode('iso-8859-1')
             r['QUERY_STRING'] = query_string
         return self.request(**r)
 
@@ -432,9 +439,10 @@ class Client(RequestFactory):
     contexts and templates produced by a view, rather than the
     HTML rendered to the end-user.
     """
-    def __init__(self, enforce_csrf_checks=False, **defaults):
+    def __init__(self, enforce_csrf_checks=False, raise_request_exception=True, **defaults):
         super().__init__(**defaults)
         self.handler = ClientHandler(enforce_csrf_checks)
+        self.raise_request_exception = raise_request_exception
         self.exc_info = None
 
     def store_exc_info(self, **kwargs):
@@ -473,54 +481,37 @@ class Client(RequestFactory):
         exception_uid = "request-exception-%s" % id(request)
         got_request_exception.connect(self.store_exc_info, dispatch_uid=exception_uid)
         try:
-            try:
-                response = self.handler(environ)
-            except TemplateDoesNotExist as e:
-                # If the view raises an exception, Django will attempt to show
-                # the 500.html template. If that template is not available,
-                # we should ignore the error in favor of re-raising the
-                # underlying exception that caused the 500 error. Any other
-                # template found to be missing during view error handling
-                # should be reported as-is.
-                if e.args != ('500.html',):
-                    raise
-
-            # Look for a signalled exception, clear the current context
-            # exception data, then re-raise the signalled exception.
-            # Also make sure that the signalled exception is cleared from
-            # the local cache!
-            if self.exc_info:
-                _, exc_value, _ = self.exc_info
-                self.exc_info = None
-                raise exc_value
-
-            # Save the client and request that stimulated the response.
-            response.client = self
-            response.request = request
-
-            # Add any rendered template detail to the response.
-            response.templates = data.get("templates", [])
-            response.context = data.get("context")
-
-            response.json = partial(self._parse_json, response)
-
-            # Attach the ResolverMatch instance to the response
-            response.resolver_match = SimpleLazyObject(lambda: resolve(request['PATH_INFO']))
-
-            # Flatten a single context. Not really necessary anymore thanks to
-            # the __getattr__ flattening in ContextList, but has some edge-case
-            # backwards-compatibility implications.
-            if response.context and len(response.context) == 1:
-                response.context = response.context[0]
-
-            # Update persistent cookie data.
-            if response.cookies:
-                self.cookies.update(response.cookies)
-
-            return response
+            response = self.handler(environ)
         finally:
             signals.template_rendered.disconnect(dispatch_uid=signal_uid)
             got_request_exception.disconnect(dispatch_uid=exception_uid)
+        # Look for a signaled exception, clear the current context exception
+        # data, then re-raise the signaled exception. Also clear the signaled
+        # exception from the local cache.
+        response.exc_info = self.exc_info
+        if self.exc_info:
+            _, exc_value, _ = self.exc_info
+            self.exc_info = None
+            if self.raise_request_exception:
+                raise exc_value
+        # Save the client and request that stimulated the response.
+        response.client = self
+        response.request = request
+        # Add any rendered template detail to the response.
+        response.templates = data.get('templates', [])
+        response.context = data.get('context')
+        response.json = partial(self._parse_json, response)
+        # Attach the ResolverMatch instance to the response.
+        response.resolver_match = SimpleLazyObject(lambda: resolve(request['PATH_INFO']))
+        # Flatten a single context. Not really necessary anymore thanks to the
+        # __getattr__ flattening in ContextList, but has some edge case
+        # backwards compatibility implications.
+        if response.context and len(response.context) == 1:
+            response.context = response.context[0]
+        # Update persistent cookie data.
+        if response.cookies:
+            self.cookies.update(response.cookies)
+        return response
 
     def get(self, path, data=None, follow=False, secure=False, **extra):
         """Request a response from the server using GET."""
@@ -659,7 +650,7 @@ class Client(RequestFactory):
                     'Content-Type header is "{0}", not "application/json"'
                     .format(response.get('Content-Type'))
                 )
-            response._json = json.loads(response.content.decode(), **extra)
+            response._json = json.loads(response.content.decode(response.charset), **extra)
         return response._json
 
     def _handle_redirects(self, response, data='', content_type='', **extra):

@@ -8,6 +8,7 @@ from xml.sax.expatreader import ExpatParser as _ExpatParser
 
 from django.apps import apps
 from django.conf import settings
+from django.core.exceptions import ObjectDoesNotExist
 from django.core.serializers import base
 from django.db import DEFAULT_DB_ALIAS, models
 from django.utils.xmlutils import (
@@ -151,6 +152,7 @@ class Deserializer(base.Deserializer):
 
     def __init__(self, stream_or_string, *, using=DEFAULT_DB_ALIAS, ignorenonexistent=False, **options):
         super().__init__(stream_or_string, **options)
+        self.handle_forward_references = options.pop('handle_forward_references', False)
         self.event_stream = pulldom.parse(self.stream, self._make_parser())
         self.db = using
         self.ignore = ignorenonexistent
@@ -181,6 +183,7 @@ class Deserializer(base.Deserializer):
         # Also start building a dict of m2m data (this is saved as
         # {m2m_accessor_attribute : [list_of_related_objects]})
         m2m_data = {}
+        deferred_fields = {}
 
         field_names = {f.name for f in Model._meta.get_fields()}
         # Deserialize each field.
@@ -200,9 +203,26 @@ class Deserializer(base.Deserializer):
 
             # As is usually the case, relation fields get the special treatment.
             if field.remote_field and isinstance(field.remote_field, models.ManyToManyRel):
-                m2m_data[field.name] = self._handle_m2m_field_node(field_node, field)
+                value = self._handle_m2m_field_node(field_node, field)
+                if value == base.DEFER_FIELD:
+                    deferred_fields[field] = [
+                        [
+                            getInnerText(nat_node).strip()
+                            for nat_node in obj_node.getElementsByTagName('natural')
+                        ]
+                        for obj_node in field_node.getElementsByTagName('object')
+                    ]
+                else:
+                    m2m_data[field.name] = value
             elif field.remote_field and isinstance(field.remote_field, models.ManyToOneRel):
-                data[field.attname] = self._handle_fk_field_node(field_node, field)
+                value = self._handle_fk_field_node(field_node, field)
+                if value == base.DEFER_FIELD:
+                    deferred_fields[field] = [
+                        getInnerText(k).strip()
+                        for k in field_node.getElementsByTagName('natural')
+                    ]
+                else:
+                    data[field.attname] = value
             else:
                 if field_node.getElementsByTagName('None'):
                     value = None
@@ -213,7 +233,7 @@ class Deserializer(base.Deserializer):
         obj = base.build_instance(Model, data, self.db)
 
         # Return a DeserializedObject so that the m2m data has a place to live.
-        return base.DeserializedObject(obj, m2m_data)
+        return base.DeserializedObject(obj, m2m_data, deferred_fields)
 
     def _handle_fk_field_node(self, node, field):
         """
@@ -229,7 +249,13 @@ class Deserializer(base.Deserializer):
                 if keys:
                     # If there are 'natural' subelements, it must be a natural key
                     field_value = [getInnerText(k).strip() for k in keys]
-                    obj = model._default_manager.db_manager(self.db).get_by_natural_key(*field_value)
+                    try:
+                        obj = model._default_manager.db_manager(self.db).get_by_natural_key(*field_value)
+                    except ObjectDoesNotExist:
+                        if self.handle_forward_references:
+                            return base.DEFER_FIELD
+                        else:
+                            raise
                     obj_pk = getattr(obj, field.remote_field.field_name)
                     # If this is a natural foreign key to an object that
                     # has a FK/O2O as the foreign key, use the FK value
@@ -264,7 +290,17 @@ class Deserializer(base.Deserializer):
         else:
             def m2m_convert(n):
                 return model._meta.pk.to_python(n.getAttribute('pk'))
-        return [m2m_convert(c) for c in node.getElementsByTagName("object")]
+        values = []
+        try:
+            for c in node.getElementsByTagName('object'):
+                values.append(m2m_convert(c))
+        except Exception as e:
+            if isinstance(e, ObjectDoesNotExist) and self.handle_forward_references:
+                return base.DEFER_FIELD
+            else:
+                raise base.M2MDeserializationError(e, c)
+        else:
+            return values
 
     def _get_model_from_node(self, node, attr):
         """
@@ -286,7 +322,7 @@ class Deserializer(base.Deserializer):
 
 def getInnerText(node):
     """Get all the inner text of a DOM node (recursively)."""
-    # inspired by http://mail.python.org/pipermail/xml-sig/2005-March/011022.html
+    # inspired by https://mail.python.org/pipermail/xml-sig/2005-March/011022.html
     inner_text = []
     for child in node.childNodes:
         if child.nodeType == child.TEXT_NODE or child.nodeType == child.CDATA_SECTION_NODE:

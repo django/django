@@ -4,13 +4,14 @@
 # Lele Long <schemacs@gmail.com>, 2015,2017
 # Liping Wang <lynn.config@gmail.com>, 2016
 # Liping Wang <lynn.config@gmail.com>, 2016
+# wang zhao <672565116@qq.com>, 2018
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-09-21 22:44+0000\n"
-"Last-Translator: Lele Long <schemacs@gmail.com>\n"
+"POT-Creation-Date: 2018-05-17 11:49+0200\n"
+"PO-Revision-Date: 2018-10-18 08:48+0000\n"
+"Last-Translator: wang zhao <672565116@qq.com>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/django/django/"
 "language/zh_CN/)\n"
 "MIME-Version: 1.0\n"
@@ -23,8 +24,8 @@ msgid "PostgreSQL extensions"
 msgstr "PostgreSQL 扩展。"
 
 #, python-format
-msgid "Item %(nth)s in the array did not validate: "
-msgstr "数组中的第 %(nth)s 项无法校验。"
+msgid "Item %(nth)s in the array did not validate:"
+msgstr "数组中的%(nth)s项目没有验证："
 
 msgid "Nested arrays must have the same length."
 msgstr "嵌套数组必须是相同长度。"

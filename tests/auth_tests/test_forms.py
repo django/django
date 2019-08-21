@@ -1,9 +1,7 @@
 import datetime
 import re
-from importlib import reload
 from unittest import mock
 
-import django
 from django import forms
 from django.contrib.auth.forms import (
     AdminPasswordChangeForm, AuthenticationForm, PasswordChangeForm,
@@ -13,7 +11,7 @@ from django.contrib.auth.forms import (
 from django.contrib.auth.models import User
 from django.contrib.auth.signals import user_login_failed
 from django.contrib.sites.models import Site
-from django.core import mail, signals
+from django.core import mail
 from django.core.mail import EmailMultiAlternatives
 from django.forms.fields import CharField, Field, IntegerField
 from django.test import SimpleTestCase, TestCase, override_settings
@@ -29,24 +27,6 @@ from .models.with_integer_username import IntegerUsernameUser
 from .settings import AUTH_TEMPLATES
 
 
-def reload_auth_forms(sender, setting, value, enter, **kwargs):
-    if setting == 'AUTH_USER_MODEL':
-        reload(django.contrib.auth.forms)
-
-
-class ReloadFormsMixin:
-
-    @classmethod
-    def setUpClass(cls):
-        super().setUpClass()
-        signals.setting_changed.connect(reload_auth_forms)
-
-    @classmethod
-    def tearDownClass(cls):
-        signals.setting_changed.disconnect(reload_auth_forms)
-        super().tearDownClass()
-
-
 class TestDataMixin:
 
     @classmethod
@@ -57,10 +37,9 @@ class TestDataMixin:
         cls.u4 = User.objects.create(username='empty_password', password='')
         cls.u5 = User.objects.create(username='unmanageable_password', password='$')
         cls.u6 = User.objects.create(username='unknown_password', password='foo$bar')
-        cls.u7 = ExtensionUser.objects.create(username='extension_client', date_of_birth='1998-02-24')
 
 
-class UserCreationFormTest(ReloadFormsMixin, TestDataMixin, TestCase):
+class UserCreationFormTest(TestDataMixin, TestCase):
 
     def test_user_already_exists(self):
         data = {
@@ -196,25 +175,19 @@ class UserCreationFormTest(ReloadFormsMixin, TestDataMixin, TestCase):
         )
 
     def test_custom_form(self):
-        with override_settings(AUTH_USER_MODEL='auth_tests.ExtensionUser'):
-            from django.contrib.auth.forms import UserCreationForm
-            self.assertEqual(UserCreationForm.Meta.model, ExtensionUser)
+        class CustomUserCreationForm(UserCreationForm):
+            class Meta(UserCreationForm.Meta):
+                model = ExtensionUser
+                fields = UserCreationForm.Meta.fields + ('date_of_birth',)
 
-            class CustomUserCreationForm(UserCreationForm):
-                class Meta(UserCreationForm.Meta):
-                    fields = UserCreationForm.Meta.fields + ('date_of_birth',)
-
-            data = {
-                'username': 'testclient',
-                'password1': 'testclient',
-                'password2': 'testclient',
-                'date_of_birth': '1988-02-24',
-            }
-            form = CustomUserCreationForm(data)
-            self.assertTrue(form.is_valid())
-        # reload_auth_forms() reloads the form.
-        from django.contrib.auth.forms import UserCreationForm
-        self.assertEqual(UserCreationForm.Meta.model, User)
+        data = {
+            'username': 'testclient',
+            'password1': 'testclient',
+            'password2': 'testclient',
+            'date_of_birth': '1988-02-24',
+        }
+        form = CustomUserCreationForm(data)
+        self.assertTrue(form.is_valid())
 
     def test_custom_form_with_different_username_field(self):
         class CustomUserCreationForm(UserCreationForm):
@@ -263,7 +236,7 @@ class UserCreationFormTest(ReloadFormsMixin, TestDataMixin, TestCase):
         form = UserCreationForm()
         self.assertEqual(
             form.fields['password1'].help_text,
-            '<ul><li>Your password can&#39;t be too similar to your other personal information.</li></ul>'
+            '<ul><li>Your password can’t be too similar to your other personal information.</li></ul>'
         )
 
     @override_settings(AUTH_PASSWORD_VALIDATORS=[
@@ -288,29 +261,20 @@ class UserCreationFormTest(ReloadFormsMixin, TestDataMixin, TestCase):
             ['The password is too similar to the first name.'],
         )
 
-    def test_with_custom_user_model(self):
-        with override_settings(AUTH_USER_MODEL='auth_tests.ExtensionUser'):
-            data = {
-                'username': 'test_username',
-                'password1': 'test_password',
-                'password2': 'test_password',
-            }
-            from django.contrib.auth.forms import UserCreationForm
-            self.assertEqual(UserCreationForm.Meta.model, ExtensionUser)
-            form = UserCreationForm(data)
-            self.assertTrue(form.is_valid())
+    def test_username_field_autocapitalize_none(self):
+        form = UserCreationForm()
+        self.assertEqual(form.fields['username'].widget.attrs.get('autocapitalize'), 'none')
 
-    def test_customer_user_model_with_different_username_field(self):
-        with override_settings(AUTH_USER_MODEL='auth_tests.CustomUser'):
-            from django.contrib.auth.forms import UserCreationForm
-            self.assertEqual(UserCreationForm.Meta.model, CustomUser)
-            data = {
-                'email': 'testchange@test.com',
-                'password1': 'test_password',
-                'password2': 'test_password',
-            }
-            form = UserCreationForm(data)
-            self.assertTrue(form.is_valid())
+    def test_html_autocomplete_attributes(self):
+        form = UserCreationForm()
+        tests = (
+            ('username', 'username'),
+            ('password1', 'new-password'),
+            ('password2', 'new-password'),
+        )
+        for field_name, autocomplete in tests:
+            with self.subTest(field_name=field_name, autocomplete=autocomplete):
+                self.assertEqual(form.fields[field_name].widget.attrs['autocomplete'], autocomplete)
 
 
 # To verify that the login form rejects inactive users, use an authentication
@@ -490,6 +454,10 @@ class AuthenticationFormTest(TestDataMixin, TestCase):
         username_field = User._meta.get_field(User.USERNAME_FIELD)
         self.assertEqual(form.fields['username'].label, capfirst(username_field.verbose_name))
 
+    def test_username_field_autocapitalize_none(self):
+        form = AuthenticationForm()
+        self.assertEqual(form.fields['username'].widget.attrs.get('autocapitalize'), 'none')
+
     def test_username_field_label_empty_string(self):
 
         class CustomAuthenticationForm(AuthenticationForm):
@@ -534,6 +502,16 @@ class AuthenticationFormTest(TestDataMixin, TestCase):
         )
         self.assertEqual(error.code, 'invalid_login')
         self.assertEqual(error.params, {'username': 'username'})
+
+    def test_html_autocomplete_attributes(self):
+        form = AuthenticationForm()
+        tests = (
+            ('username', 'username'),
+            ('password', 'current-password'),
+        )
+        for field_name, autocomplete in tests:
+            with self.subTest(field_name=field_name, autocomplete=autocomplete):
+                self.assertEqual(form.fields[field_name].widget.attrs['autocomplete'], autocomplete)
 
 
 class SetPasswordFormTest(TestDataMixin, TestCase):
@@ -615,6 +593,16 @@ class SetPasswordFormTest(TestDataMixin, TestCase):
             for french_text in french_help_texts:
                 self.assertIn(french_text, html)
 
+    def test_html_autocomplete_attributes(self):
+        form = SetPasswordForm(self.u1)
+        tests = (
+            ('new_password1', 'new-password'),
+            ('new_password2', 'new-password'),
+        )
+        for field_name, autocomplete in tests:
+            with self.subTest(field_name=field_name, autocomplete=autocomplete):
+                self.assertEqual(form.fields[field_name].widget.attrs['autocomplete'], autocomplete)
+
 
 class PasswordChangeFormTest(TestDataMixin, TestCase):
 
@@ -676,8 +664,13 @@ class PasswordChangeFormTest(TestDataMixin, TestCase):
         self.assertEqual(form.cleaned_data['new_password1'], data['new_password1'])
         self.assertEqual(form.cleaned_data['new_password2'], data['new_password2'])
 
+    def test_html_autocomplete_attributes(self):
+        user = User.objects.get(username='testclient')
+        form = PasswordChangeForm(user)
+        self.assertEqual(form.fields['old_password'].widget.attrs['autocomplete'], 'current-password')
 
-class UserChangeFormTest(ReloadFormsMixin, TestDataMixin, TestCase):
+
+class UserChangeFormTest(TestDataMixin, TestCase):
 
     def test_username_validity(self):
         user = User.objects.get(username='testclient')
@@ -751,51 +744,37 @@ class UserChangeFormTest(ReloadFormsMixin, TestDataMixin, TestCase):
         self.assertEqual(form.initial['password'], form['password'].value())
 
     def test_custom_form(self):
-        with override_settings(AUTH_USER_MODEL='auth_tests.ExtensionUser'):
-            from django.contrib.auth.forms import UserChangeForm
-            self.assertEqual(UserChangeForm.Meta.model, ExtensionUser)
+        class CustomUserChangeForm(UserChangeForm):
+            class Meta(UserChangeForm.Meta):
+                model = ExtensionUser
+                fields = ('username', 'password', 'date_of_birth',)
 
-            class CustomUserChangeForm(UserChangeForm):
-                class Meta(UserChangeForm.Meta):
-                    fields = ('username', 'password', 'date_of_birth')
+        user = User.objects.get(username='testclient')
+        data = {
+            'username': 'testclient',
+            'password': 'testclient',
+            'date_of_birth': '1998-02-24',
+        }
+        form = CustomUserChangeForm(data, instance=user)
+        self.assertTrue(form.is_valid())
+        form.save()
+        self.assertEqual(form.cleaned_data['username'], 'testclient')
+        self.assertEqual(form.cleaned_data['date_of_birth'], datetime.date(1998, 2, 24))
 
-            data = {
-                'username': 'testclient',
-                'password': 'testclient',
-                'date_of_birth': '1998-02-24',
-            }
-            form = CustomUserChangeForm(data, instance=self.u7)
-            self.assertTrue(form.is_valid())
-            form.save()
-            self.assertEqual(form.cleaned_data['username'], 'testclient')
-            self.assertEqual(form.cleaned_data['date_of_birth'], datetime.date(1998, 2, 24))
-        # reload_auth_forms() reloads the form.
-        from django.contrib.auth.forms import UserChangeForm
-        self.assertEqual(UserChangeForm.Meta.model, User)
+    def test_password_excluded(self):
+        class UserChangeFormWithoutPassword(UserChangeForm):
+            password = None
 
-    def test_with_custom_user_model(self):
-        with override_settings(AUTH_USER_MODEL='auth_tests.ExtensionUser'):
-            from django.contrib.auth.forms import UserChangeForm
-            self.assertEqual(UserChangeForm.Meta.model, ExtensionUser)
-            data = {
-                'username': 'testclient',
-                'date_joined': '1998-02-24',
-                'date_of_birth': '1998-02-24',
-            }
-            form = UserChangeForm(data, instance=self.u7)
-            self.assertTrue(form.is_valid())
+            class Meta:
+                model = User
+                exclude = ['password']
 
-    def test_customer_user_model_with_different_username_field(self):
-        with override_settings(AUTH_USER_MODEL='auth_tests.CustomUser'):
-            from django.contrib.auth.forms import UserChangeForm
-            self.assertEqual(UserChangeForm.Meta.model, CustomUser)
-            user = CustomUser.custom_objects.create(email='test@test.com', date_of_birth='1998-02-24')
-            data = {
-                'email': 'testchange@test.com',
-                'date_of_birth': '1998-02-24',
-            }
-            form = UserChangeForm(data, instance=user)
-            self.assertTrue(form.is_valid())
+        form = UserChangeFormWithoutPassword()
+        self.assertNotIn('password', form.fields)
+
+    def test_username_field_autocapitalize_none(self):
+        form = UserChangeForm()
+        self.assertEqual(form.fields['username'].widget.attrs.get('autocapitalize'), 'none')
 
 
 @override_settings(TEMPLATES=AUTH_TEMPLATES)
@@ -938,7 +917,7 @@ class PasswordResetFormTest(TestDataMixin, TestCase):
 
     def test_save_html_email_template_name(self):
         """
-        Test the PasswordResetFOrm.save() method with html_email_template_name
+        Test the PasswordResetForm.save() method with html_email_template_name
         parameter specified.
         Test to ensure that a multipart email is sent with both text/plain
         and text/html parts.
@@ -972,6 +951,10 @@ class PasswordResetFormTest(TestDataMixin, TestCase):
         self.assertEqual(form.cleaned_data['email'], email)
         self.assertEqual(len(mail.outbox), 1)
         self.assertEqual(mail.outbox[0].to, [email])
+
+    def test_html_autocomplete_attributes(self):
+        form = PasswordResetForm()
+        self.assertEqual(form.fields['email'].widget.attrs['autocomplete'], 'email')
 
 
 class ReadOnlyPasswordHashTest(SimpleTestCase):
@@ -1030,3 +1013,38 @@ class AdminPasswordChangeFormTest(TestDataMixin, TestCase):
         self.assertTrue(form.is_valid())
         self.assertEqual(form.cleaned_data['password1'], data['password1'])
         self.assertEqual(form.cleaned_data['password2'], data['password2'])
+
+    def test_non_matching_passwords(self):
+        user = User.objects.get(username='testclient')
+        data = {'password1': 'password1', 'password2': 'password2'}
+        form = AdminPasswordChangeForm(user, data)
+        self.assertEqual(form.errors['password2'], [form.error_messages['password_mismatch']])
+
+    def test_missing_passwords(self):
+        user = User.objects.get(username='testclient')
+        data = {'password1': '', 'password2': ''}
+        form = AdminPasswordChangeForm(user, data)
+        required_error = [Field.default_error_messages['required']]
+        self.assertEqual(form.errors['password1'], required_error)
+        self.assertEqual(form.errors['password2'], required_error)
+
+    def test_one_password(self):
+        user = User.objects.get(username='testclient')
+        form1 = AdminPasswordChangeForm(user, {'password1': '', 'password2': 'test'})
+        required_error = [Field.default_error_messages['required']]
+        self.assertEqual(form1.errors['password1'], required_error)
+        self.assertNotIn('password2', form1.errors)
+        form2 = AdminPasswordChangeForm(user, {'password1': 'test', 'password2': ''})
+        self.assertEqual(form2.errors['password2'], required_error)
+        self.assertNotIn('password1', form2.errors)
+
+    def test_html_autocomplete_attributes(self):
+        user = User.objects.get(username='testclient')
+        form = AdminPasswordChangeForm(user)
+        tests = (
+            ('password1', 'new-password'),
+            ('password2', 'new-password'),
+        )
+        for field_name, autocomplete in tests:
+            with self.subTest(field_name=field_name, autocomplete=autocomplete):
+                self.assertEqual(form.fields[field_name].widget.attrs['autocomplete'], autocomplete)

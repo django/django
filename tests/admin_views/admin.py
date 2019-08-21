@@ -1,10 +1,10 @@
+import datetime
 import os
 import tempfile
 from io import StringIO
 from wsgiref.util import FileWrapper
 
 from django import forms
-from django.conf.urls import url
 from django.contrib import admin
 from django.contrib.admin import BooleanFieldListFilter
 from django.contrib.admin.views.main import ChangeList
@@ -16,6 +16,7 @@ from django.core.mail import EmailMessage
 from django.db import models
 from django.forms.models import BaseModelFormSet
 from django.http import HttpResponse, StreamingHttpResponse
+from django.urls import path
 from django.utils.html import format_html
 from django.utils.safestring import mark_safe
 
@@ -42,7 +43,8 @@ from .models import (
     Restaurant, RowLevelChangePermissionModel, Section, ShortMessage, Simple,
     Sketch, State, Story, StumpJoke, Subscriber, SuperVillain, Telegram, Thing,
     Topping, UnchangeableObject, UndeletableObject, UnorderedObject,
-    UserMessenger, Villain, Vodcast, Whatsit, Widget, Worker, WorkHour,
+    UserMessenger, UserProxy, Villain, Vodcast, Whatsit, Widget, Worker,
+    WorkHour,
 )
 
 
@@ -90,25 +92,41 @@ class ChapterXtra1Admin(admin.ModelAdmin):
     )
 
 
+class ArticleForm(forms.ModelForm):
+    extra_form_field = forms.BooleanField(required=False)
+
+    class Meta:
+        fields = '__all__'
+        model = Article
+
+
 class ArticleAdmin(admin.ModelAdmin):
     list_display = (
         'content', 'date', callable_year, 'model_year', 'modeladmin_year',
         'model_year_reversed', 'section', lambda obj: obj.title,
+        'order_by_expression', 'model_property_year', 'model_month',
     )
     list_editable = ('section',)
     list_filter = ('date', 'section')
     autocomplete_fields = ('section',)
     view_on_site = False
+    form = ArticleForm
     fieldsets = (
         ('Some fields', {
             'classes': ('collapse',),
-            'fields': ('title', 'content')
+            'fields': ('title', 'content', 'extra_form_field'),
         }),
         ('Some other fields', {
             'classes': ('wide',),
             'fields': ('date', 'section', 'sub_section')
         })
     )
+
+    def order_by_expression(self, obj):
+        return obj.model_year
+    # This ordering isn't particularly useful but shows that expressions can
+    # be used for admin_order_field.
+    order_by_expression.admin_order_field = models.F('date') + datetime.timedelta(days=3)
 
     def changelist_view(self, request):
         return super().changelist_view(request, extra_context={'extra_var': 'Hello!'})
@@ -147,6 +165,10 @@ class RowLevelChangePermissionModelAdmin(admin.ModelAdmin):
     def has_change_permission(self, request, obj=None):
         """ Only allow changing objects with even id number """
         return request.user.is_staff and (obj is not None) and (obj.id % 2 == 0)
+
+    def has_view_permission(self, request, obj=None):
+        """Only allow viewing objects if id is a multiple of 3."""
+        return request.user.is_staff and obj is not None and obj.id % 3 == 0
 
 
 class CustomArticleAdmin(admin.ModelAdmin):
@@ -274,8 +296,7 @@ download.short_description = 'Download subscription'
 
 
 def no_perm(modeladmin, request, selected):
-    return HttpResponse(content='No permission to perform this action',
-                        status=403)
+    return HttpResponse(content='No permission to perform this action', status=403)
 
 
 no_perm.short_description = 'No permission to run'
@@ -437,6 +458,13 @@ class PrePopulatedPostAdmin(admin.ModelAdmin):
         if obj and obj.published:
             return {}
         return self.prepopulated_fields
+
+
+class PrePopulatedPostReadOnlyAdmin(admin.ModelAdmin):
+    prepopulated_fields = {'slug': ('title',)}
+
+    def has_change_permission(self, *args, **kwargs):
+        return False
 
 
 class PostAdmin(admin.ModelAdmin):
@@ -677,11 +705,7 @@ class ReportAdmin(admin.ModelAdmin):
 
     def get_urls(self):
         # Corner case: Don't call parent implementation
-        return [
-            url(r'^extra/$',
-                self.extra,
-                name='cable_extra'),
-        ]
+        return [path('extra/', self.extra, name='cable_extra')]
 
 
 class CustomTemplateBooleanFieldListFilter(BooleanFieldListFilter):
@@ -707,16 +731,20 @@ class RelatedPrepopulatedInline1(admin.StackedInline):
     model = RelatedPrepopulated
     extra = 1
     autocomplete_fields = ['fk', 'm2m']
-    prepopulated_fields = {'slug1': ['name', 'pubdate'],
-                           'slug2': ['status', 'name']}
+    prepopulated_fields = {
+        'slug1': ['name', 'pubdate'],
+        'slug2': ['status', 'name'],
+    }
 
 
 class RelatedPrepopulatedInline2(admin.TabularInline):
     model = RelatedPrepopulated
     extra = 1
     autocomplete_fields = ['fk', 'm2m']
-    prepopulated_fields = {'slug1': ['name', 'pubdate'],
-                           'slug2': ['status', 'name']}
+    prepopulated_fields = {
+        'slug1': ['name', 'pubdate'],
+        'slug2': ['status', 'name'],
+    }
 
 
 class RelatedPrepopulatedInline3(admin.TabularInline):
@@ -865,8 +893,27 @@ class CityInlineAdmin(admin.TabularInline):
     view_on_site = False
 
 
+class StateAdminForm(forms.ModelForm):
+    nolabel_form_field = forms.BooleanField(required=False)
+
+    class Meta:
+        model = State
+        fields = '__all__'
+        labels = {'name': 'State name (from form’s Meta.labels)'}
+
+    @property
+    def changed_data(self):
+        data = super().changed_data
+        if data:
+            # Add arbitrary name to changed_data to test
+            # change message construction.
+            return data + ['not_a_form_field']
+        return data
+
+
 class StateAdmin(admin.ModelAdmin):
     inlines = [CityInlineAdmin]
+    form = StateAdminForm
 
 
 class RestaurantInlineAdmin(admin.TabularInline):
@@ -1048,6 +1095,7 @@ site.register(Ingredient)
 site.register(NotReferenced)
 site.register(ExplicitlyProvidedPK, GetFormsetsArgumentCheckingAdmin)
 site.register(ImplicitlyGeneratedPK, GetFormsetsArgumentCheckingAdmin)
+site.register(UserProxy)
 
 # Register core models we need in our tests
 site.register(User, UserAdmin)
@@ -1069,6 +1117,7 @@ site2.register(Person, save_as_continue=False)
 site7 = admin.AdminSite(name="admin7")
 site7.register(Article, ArticleAdmin2)
 site7.register(Section)
+site7.register(PrePopulatedPost, PrePopulatedPostReadOnlyAdmin)
 
 
 # Used to test ModelAdmin.sortable_by and get_sortable_by().
@@ -1109,3 +1158,22 @@ site6.register(Article, ArticleAdmin6)
 site6.register(Actor, ActorAdmin6)
 site6.register(Chapter, ChapterAdmin6)
 site6.register(Color, ColorAdmin6)
+
+
+class ArticleAdmin9(admin.ModelAdmin):
+    def has_change_permission(self, request, obj=None):
+        # Simulate that the user can't change a specific object.
+        return obj is None
+
+
+site9 = admin.AdminSite(name='admin9')
+site9.register(Article, ArticleAdmin9)
+
+
+class ArticleAdmin10(admin.ModelAdmin):
+    def has_change_permission(self, request, obj=None):
+        return False
+
+
+site10 = admin.AdminSite(name='admin10')
+site10.register(Article, ArticleAdmin10)

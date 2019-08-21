@@ -11,7 +11,7 @@ from .models import ModelWithNullFKToSite, Post
 
 
 @modify_settings(INSTALLED_APPS={'append': ['no_models']})
-class UpdateContentTypesTests(TestCase):
+class RemoveStaleContentTypesTests(TestCase):
     # Speed up tests by avoiding retrieving ContentTypes for all test apps.
     available_apps = ['contenttypes_tests', 'no_models', 'django.contrib.contenttypes']
 
@@ -22,8 +22,8 @@ class UpdateContentTypesTests(TestCase):
 
     def test_interactive_true_with_dependent_objects(self):
         """
-        interactive mode of remove_stale_contenttypes (the default) deletes
-        stale contenttypes and warn of dependent objects.
+        interactive mode (the default) deletes stale content types and warns of
+        dependent objects.
         """
         post = Post.objects.create(title='post', content_type=self.content_type)
         # A related object is needed to show that a custom collector with
@@ -42,8 +42,8 @@ class UpdateContentTypesTests(TestCase):
 
     def test_interactive_true_without_dependent_objects(self):
         """
-        interactive mode of remove_stale_contenttypes (the default) deletes
-        stale contenttypes even if there aren't any dependent objects.
+        interactive mode deletes stale content types even if there aren't any
+        dependent objects.
         """
         with mock.patch('builtins.input', return_value='yes'):
             with captured_stdout() as stdout:
@@ -52,14 +52,11 @@ class UpdateContentTypesTests(TestCase):
         self.assertEqual(ContentType.objects.count(), self.before_count)
 
     def test_interactive_false(self):
-        """
-        non-interactive mode of remove_stale_contenttypes doesn't delete
-        stale content types.
-        """
+        """non-interactive mode deletes stale content types."""
         with captured_stdout() as stdout:
             call_command('remove_stale_contenttypes', interactive=False, verbosity=2)
-        self.assertIn("Stale content types remain.", stdout.getvalue())
-        self.assertEqual(ContentType.objects.count(), self.before_count + 1)
+        self.assertIn('Deleting stale content type', stdout.getvalue())
+        self.assertEqual(ContentType.objects.count(), self.before_count)
 
     def test_unavailable_content_type_model(self):
         """A ContentType isn't created if the model isn't available."""

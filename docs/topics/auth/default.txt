@@ -115,7 +115,7 @@ Changing a user's password will log out all their sessions. See
 Authenticating users
 --------------------
 
-.. function:: authenticate(request=None, \**credentials)
+.. function:: authenticate(request=None, **credentials)
 
     Use :func:`~django.contrib.auth.authenticate()` to verify a set of
     credentials. It takes credentials as keyword arguments, ``username`` and
@@ -158,6 +158,8 @@ code.
 
 The Django admin site uses permissions as follows:
 
+* Access to view objects is limited to users with the "view" or "change"
+  permission for that type of object.
 * Access to view the "add" form and add an object is limited to users with
   the "add" permission for that type of object.
 * Access to view the change list, view the "change" form and change an
@@ -168,6 +170,7 @@ The Django admin site uses permissions as follows:
 
 Permissions can be set not only per type of object, but also per specific
 object instance. By using the
+:meth:`~django.contrib.admin.ModelAdmin.has_view_permission`,
 :meth:`~django.contrib.admin.ModelAdmin.has_add_permission`,
 :meth:`~django.contrib.admin.ModelAdmin.has_change_permission` and
 :meth:`~django.contrib.admin.ModelAdmin.has_delete_permission` methods provided
@@ -193,8 +196,8 @@ Default permissions
 -------------------
 
 When ``django.contrib.auth`` is listed in your :setting:`INSTALLED_APPS`
-setting, it will ensure that three default permissions -- add, change and
-delete -- are created for each Django model defined in one of your installed
+setting, it will ensure that four default permissions -- add, change, delete,
+and view -- are created for each Django model defined in one of your installed
 applications.
 
 These permissions will be created when you run :djadmin:`manage.py migrate
@@ -213,6 +216,7 @@ to test for basic permissions you should use:
 * add: ``user.has_perm('foo.add_bar')``
 * change: ``user.has_perm('foo.change_bar')``
 * delete: ``user.has_perm('foo.delete_bar')``
+* view: ``user.has_perm('foo.view_bar')``
 
 The :class:`~django.contrib.auth.models.Permission` model is rarely accessed
 directly.
@@ -258,6 +262,20 @@ The permission can then be assigned to a
 attribute or to a :class:`~django.contrib.auth.models.Group` via its
 ``permissions`` attribute.
 
+.. admonition:: Proxy models need their own content type
+
+    If you want to create :ref:`permissions for a proxy model
+    <proxy-models-permissions-topic>`, pass ``for_concrete_model=False`` to
+    :meth:`.ContentTypeManager.get_for_model` to get the appropriate
+    ``ContentType``::
+
+        content_type = ContentType.objects.get_for_model(BlogPostProxy, for_concrete_model=False)
+
+    .. versionchanged:: 2.2
+
+        In older versions, proxy models use the content type of the concrete
+        model.
+
 Permission caching
 ------------------
 
@@ -298,6 +316,44 @@ the user from the database. For example::
         user.has_perm('myapp.change_blogpost')  # True
 
         ...
+
+.. _proxy-models-permissions-topic:
+
+Proxy models
+------------
+
+Proxy models work exactly the same way as concrete models. Permissions are
+created using the own content type of the proxy model. Proxy models don't
+inherit the permissions of the concrete model they subclass::
+
+    class Person(models.Model):
+        class Meta:
+            permissions = [('can_eat_pizzas', 'Can eat pizzas')]
+
+    class Student(Person):
+        class Meta:
+            proxy = True
+            permissions = [('can_deliver_pizzas', 'Can deliver pizzas')]
+
+    >>> # Fetch the content type for the proxy model.
+    >>> content_type = ContentType.objects.get_for_model(Student, for_concrete_model=False)
+    >>> student_permissions = Permission.objects.filter(content_type=content_type)
+    >>> [p.codename for p in student_permissions]
+    ['add_student', 'change_student', 'delete_student', 'view_student',
+    'can_deliver_pizzas']
+    >>> for permission in student_permissions:
+    ...     user.user_permissions.add(permission)
+    >>> user.has_perm('app.add_person')
+    False
+    >>> user.has_perm('app.can_eat_pizzas')
+    False
+    >>> user.has_perms(('app.add_student', 'app.can_deliver_pizzas'))
+    True
+
+.. versionchanged:: 2.2
+
+    In older versions, permissions for proxy models use the content type of
+    the concrete model rather than content type of the proxy model.
 
 .. _auth-web-requests:
 
@@ -712,6 +768,10 @@ The ``permission_required`` decorator
         def my_view(request):
             ...
 
+    This also avoids a redirect loop when :class:`.LoginView`'s
+    ``redirect_authenticated_user=True`` and the logged-in user doesn't have
+    all of the required permissions.
+
 .. currentmodule:: django.contrib.auth.mixins
 
 The ``PermissionRequiredMixin`` mixin
@@ -757,8 +817,11 @@ Redirecting unauthorized requests in class-based views
 ------------------------------------------------------
 
 To ease the handling of access restrictions in :doc:`class-based views
-</ref/class-based-views/index>`, the ``AccessMixin`` can be used to redirect a
-user to the login page or issue an HTTP 403 Forbidden response.
+</ref/class-based-views/index>`, the ``AccessMixin`` can be used to configure
+the behavior of a view when access is denied. Authenticated users are denied
+access with an HTTP 403 Forbidden response. Anonymous users are redirected to
+the login page or shown an HTTP 403 Forbidden response, depending on the
+:attr:`~django.contrib.auth.mixins.AccessMixin.raise_exception` attribute.
 
 .. class:: AccessMixin
 
@@ -781,8 +844,9 @@ user to the login page or issue an HTTP 403 Forbidden response.
     .. attribute:: raise_exception
 
         If this attribute is set to ``True``, a
-        :class:`~django.core.exceptions.PermissionDenied` exception will be
-        raised instead of the redirect. Defaults to ``False``.
+        :class:`~django.core.exceptions.PermissionDenied` exception is raised
+        when the conditions are not met.  When ``False`` (the default),
+        anonymous users are redirected to the login page.
 
     .. method:: get_login_url()
 
@@ -970,6 +1034,10 @@ implementation details see :ref:`using-the-views`.
         this "`social media fingerprinting
         <https://robinlinus.github.io/socialmedia-leak/>`_" information
         leakage, host all images and your favicon on a separate domain.
+
+        Enabling ``redirect_authenticated_user`` can also result in a redirect
+        loop when using the :func:`.permission_required` decorator
+        unless the ``raise_exception`` parameter is used.
 
     * ``success_url_allowed_hosts``: A :class:`set` of hosts, in addition to
       :meth:`request.get_host() <django.http.HttpRequest.get_host>`, that are
@@ -1224,7 +1292,8 @@ implementation details see :ref:`using-the-views`.
       link. By default, HTML email is not sent.
 
     * ``extra_email_context``: A dictionary of context data that will be
-      available in the email template.
+      available in the email template. It can be used to override default
+      template context values listed below e.g. ``domain``.
 
     **Template context:**
 
@@ -1327,10 +1396,17 @@ implementation details see :ref:`using-the-views`.
     * ``extra_context``: A dictionary of context data that will be added to the
       default context data passed to the template.
 
+    * ``reset_url_token``: Token parameter displayed as a component of password
+      reset URLs. Defaults to ``'set-password'``.
+
+      .. versionchanged:: 3.0
+
+        The ``reset_url_token`` class attribute was added.
+
     **Template context:**
 
-    * ``form``: The form (see ``set_password_form`` above) for setting the
-      new user's password.
+    * ``form``: The form (see ``form_class`` above) for setting the new user's
+      password.
 
     * ``validlink``: Boolean, True if the link (combination of ``uidb64`` and
       ``token``) is valid or unused yet.
@@ -1425,7 +1501,7 @@ provides several built-in forms located in :mod:`django.contrib.auth.forms`:
                     pass
 
         (In this case, you'll also need to use an authentication backend that
-        allows inactive users, such as as
+        allows inactive users, such as
         :class:`~django.contrib.auth.backends.AllowAllUsersModelBackend`.)
 
         Or to allow only some active users to log in::
@@ -1486,12 +1562,9 @@ provides several built-in forms located in :mod:`django.contrib.auth.forms`:
 
     A :class:`~django.forms.ModelForm` for creating a new user.
 
-    It has three fields: one named after the
-    :attr:`~django.contrib.auth.models.CustomUser.USERNAME_FIELD` from the
-    user model, and ``password1`` and ``password2``.
-
-    It verifies that ``password1`` and ``password2`` match, validates the
-    password using
+    It has three fields: ``username`` (from the user model), ``password1``,
+    and ``password2``. It verifies that ``password1`` and ``password2`` match,
+    validates the password using
     :func:`~django.contrib.auth.password_validation.validate_password`, and
     sets the user's password using
     :meth:`~django.contrib.auth.models.User.set_password()`.

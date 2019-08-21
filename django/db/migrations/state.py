@@ -1,5 +1,4 @@
 import copy
-from collections import OrderedDict
 from contextlib import contextmanager
 
 from django.apps import AppConfig
@@ -261,14 +260,16 @@ class StateApps(Apps):
                 self.real_models.append(ModelState.from_model(model, exclude_rels=True))
         # Populate the app registry with a stub for each application.
         app_labels = {model_state.app_label for model_state in models.values()}
-        app_configs = [AppConfigStub(label) for label in sorted(real_apps + list(app_labels))]
+        app_configs = [AppConfigStub(label) for label in sorted([*real_apps, *app_labels])]
         super().__init__(app_configs)
 
-        # The lock gets in the way of copying as implemented in clone(), which
-        # is called whenever Django duplicates a StateApps before updating it.
+        # These locks get in the way of copying as implemented in clone(),
+        # which is called whenever Django duplicates a StateApps before
+        # updating it.
         self._lock = None
+        self.ready_event = None
 
-        self.render_multiple(list(models.values()) + self.real_models)
+        self.render_multiple([*models.values(), *self.real_models])
 
         # There shouldn't be any operations pending at this point.
         from django.core.checks.model_checks import _check_lazy_references
@@ -332,7 +333,7 @@ class StateApps(Apps):
         if app_label not in self.app_configs:
             self.app_configs[app_label] = AppConfigStub(app_label)
             self.app_configs[app_label].apps = self
-            self.app_configs[app_label].models = OrderedDict()
+            self.app_configs[app_label].models = {}
         self.app_configs[app_label].models[model._meta.model_name] = model
         self.do_pending_operations(model)
         self.clear_cache()
@@ -362,6 +363,7 @@ class ModelState:
         self.fields = fields
         self.options = options or {}
         self.options.setdefault('indexes', [])
+        self.options.setdefault('constraints', [])
         self.bases = bases or (models.Model,)
         self.managers = managers or []
         # Sanity-check that fields is NOT a dict. It must be ordered.
@@ -445,6 +447,8 @@ class ModelState:
                         if not index.name:
                             index.set_name_with_model(model)
                     options['indexes'] = indexes
+                elif name == 'constraints':
+                    options['constraints'] = [con.clone() for con in model._meta.constraints]
                 else:
                     options[name] = model._meta.original_attrs[name]
         # If we're ignoring relationships, remove all field-listing model
@@ -584,6 +588,12 @@ class ModelState:
             if index.name == name:
                 return index
         raise ValueError("No index named %s on model %s" % (name, self.name))
+
+    def get_constraint_by_name(self, name):
+        for constraint in self.options['constraints']:
+            if constraint.name == name:
+                return constraint
+        raise ValueError('No constraint named %s on model %s' % (name, self.name))
 
     def __repr__(self):
         return "<%s: '%s.%s'>" % (self.__class__.__name__, self.app_label, self.name)

@@ -6,7 +6,7 @@ from django.contrib.gis.db.models.functions import (
 from django.contrib.gis.geos import GEOSGeometry, LineString, Point
 from django.contrib.gis.measure import D  # alias for Distance
 from django.db import NotSupportedError, connection
-from django.db.models import F, Q
+from django.db.models import Exists, F, OuterRef, Q
 from django.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
 
 from ..utils import (
@@ -223,6 +223,16 @@ class DistanceTest(TestCase):
         msg = 'Only numeric values of degree units are allowed on geodetic distance queries.'
         with self.assertRaisesMessage(ValueError, msg):
             AustraliaCity.objects.filter(point__distance_lte=(Point(0, 0), D(m=100))).exists()
+
+    @skipUnlessDBFeature('supports_dwithin_lookup')
+    def test_dwithin_subquery(self):
+        """dwithin lookup in a subquery using OuterRef as a parameter."""
+        qs = CensusZipcode.objects.annotate(
+            annotated_value=Exists(SouthTexasCity.objects.filter(
+                point__dwithin=(OuterRef('poly'), D(m=10)),
+            ))
+        ).filter(annotated_value=True)
+        self.assertEqual(self.get_names(qs), ['77002', '77025', '77401'])
 
 
 '''

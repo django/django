@@ -1,4 +1,7 @@
-from django.core.management.base import BaseCommand, CommandError
+import sys
+
+from django.apps import apps
+from django.core.management.base import BaseCommand
 from django.db import DEFAULT_DB_ALIAS, connections
 from django.db.migrations.loader import MigrationLoader
 
@@ -12,14 +15,18 @@ class Command(BaseCommand):
             help='App labels of applications to limit the output to.',
         )
         parser.add_argument(
-            '--database', action='store', dest='database', default=DEFAULT_DB_ALIAS,
+            '--database', default=DEFAULT_DB_ALIAS,
             help='Nominates a database to synchronize. Defaults to the "default" database.',
         )
 
         formats = parser.add_mutually_exclusive_group()
         formats.add_argument(
             '--list', '-l', action='store_const', dest='format', const='list',
-            help='Shows a list of all migrations and which are applied.',
+            help=(
+                'Shows a list of all migrations and which are applied. '
+                'With a verbosity level of 2 or above, the applied datetimes '
+                'will be included.'
+            ),
         )
         formats.add_argument(
             '--plan', '-p', action='store_const', dest='format', const='plan',
@@ -45,12 +52,15 @@ class Command(BaseCommand):
             return self.show_list(connection, options['app_label'])
 
     def _validate_app_names(self, loader, app_names):
-        invalid_apps = []
+        has_bad_names = False
         for app_name in app_names:
-            if app_name not in loader.migrated_apps:
-                invalid_apps.append(app_name)
-        if invalid_apps:
-            raise CommandError('No migrations present for: %s' % (', '.join(sorted(invalid_apps))))
+            try:
+                apps.get_app_config(app_name)
+            except LookupError as err:
+                self.stderr.write(str(err))
+                has_bad_names = True
+        if has_bad_names:
+            sys.exit(2)
 
     def show_list(self, connection, app_names=None):
         """
@@ -78,9 +88,13 @@ class Command(BaseCommand):
                         title = plan_node[1]
                         if graph.nodes[plan_node].replaces:
                             title += " (%s squashed migrations)" % len(graph.nodes[plan_node].replaces)
+                        applied_migration = loader.applied_migrations.get(plan_node)
                         # Mark it as applied/unapplied
-                        if plan_node in loader.applied_migrations:
-                            self.stdout.write(" [X] %s" % title)
+                        if applied_migration:
+                            output = ' [X] %s' % title
+                            if self.verbosity >= 2:
+                                output += ' (applied at %s)' % applied_migration.applied.strftime('%Y-%m-%d %H:%M:%S')
+                            self.stdout.write(output)
                         else:
                             self.stdout.write(" [ ] %s" % title)
                         shown.add(plan_node)
@@ -129,3 +143,5 @@ class Command(BaseCommand):
                 self.stdout.write("[X]  %s.%s%s" % (node.key[0], node.key[1], deps))
             else:
                 self.stdout.write("[ ]  %s.%s%s" % (node.key[0], node.key[1], deps))
+        if not plan:
+            self.stdout.write('(no migrations)', self.style.ERROR)

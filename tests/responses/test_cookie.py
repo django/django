@@ -47,12 +47,12 @@ class SetCookieTests(SimpleTestCase):
     def test_far_expiration(self):
         """Cookie will expire when a distant expiration time is provided."""
         response = HttpResponse()
-        response.set_cookie('datetime', expires=datetime(2028, 1, 1, 4, 5, 6))
+        response.set_cookie('datetime', expires=datetime(2038, 1, 1, 4, 5, 6))
         datetime_cookie = response.cookies['datetime']
         self.assertIn(
             datetime_cookie['expires'],
             # assertIn accounts for slight time dependency (#23450)
-            ('Sat, 01 Jan 2028 04:05:06 GMT', 'Sat, 01 Jan 2028 04:05:07 GMT')
+            ('Fri, 01 Jan 2038 04:05:06 GMT', 'Fri, 01 Jan 2038 04:05:07 GMT')
         )
 
     def test_max_age_expiration(self):
@@ -78,6 +78,17 @@ class SetCookieTests(SimpleTestCase):
         cookie_value = '清風'
         response.set_cookie('test', cookie_value)
         self.assertEqual(response.cookies['test'].value, cookie_value)
+
+    def test_samesite(self):
+        response = HttpResponse()
+        response.set_cookie('example', samesite='Lax')
+        self.assertEqual(response.cookies['example']['samesite'], 'Lax')
+        response.set_cookie('example', samesite='strict')
+        self.assertEqual(response.cookies['example']['samesite'], 'strict')
+
+    def test_invalid_samesite(self):
+        with self.assertRaisesMessage(ValueError, 'samesite must be "lax" or "strict".'):
+            HttpResponse().set_cookie('example', samesite='invalid')
 
 
 class DeleteCookieTests(SimpleTestCase):

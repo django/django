@@ -222,10 +222,10 @@ def stringformat(value, arg):
     """
     Format the variable according to the arg, a string formatting specifier.
 
-    This specifier uses Python string formating syntax, with the exception that
-    the leading "%" is dropped.
+    This specifier uses Python string formatting syntax, with the exception
+    that the leading "%" is dropped.
 
-    See https://docs.python.org/3/library/stdtypes.html#printf-style-string-formatting
+    See https://docs.python.org/library/stdtypes.html#printf-style-string-formatting
     for documentation of Python string formatting.
     """
     if isinstance(value, tuple):
@@ -280,7 +280,7 @@ def truncatewords(value, arg):
         length = int(arg)
     except ValueError:  # Invalid literal for int().
         return value  # Fail silently.
-    return Truncator(value).words(length, truncate=' ...')
+    return Truncator(value).words(length, truncate=' …')
 
 
 @register.filter(is_safe=True)
@@ -294,7 +294,7 @@ def truncatewords_html(value, arg):
         length = int(arg)
     except ValueError:  # invalid literal for int()
         return value  # Fail silently.
-    return Truncator(value).words(length, html=True, truncate=' ...')
+    return Truncator(value).words(length, html=True, truncate=' …')
 
 
 @register.filter(is_safe=False)
@@ -448,7 +448,7 @@ def safeseq(value):
     individually, as safe, after converting them to strings. Return a list
     with the results.
     """
-    return [mark_safe(str(obj)) for obj in value]
+    return [mark_safe(obj) for obj in value]
 
 
 @register.filter(is_safe=True)
@@ -573,7 +573,7 @@ def slice_filter(value, arg):
     """
     try:
         bits = []
-        for x in arg.split(':'):
+        for x in str(arg).split(':'):
             if not x:
                 bits.append(None)
             else:
@@ -812,7 +812,7 @@ def filesizeformat(bytes_):
     102 bytes, etc.).
     """
     try:
-        bytes_ = float(bytes_)
+        bytes_ = int(bytes_)
     except (TypeError, ValueError, UnicodeDecodeError):
         value = ngettext("%(size)d byte", "%(size)d bytes", 0) % {'size': 0}
         return avoid_wrapping(value)
@@ -851,25 +851,25 @@ def filesizeformat(bytes_):
 @register.filter(is_safe=False)
 def pluralize(value, arg='s'):
     """
-    Return a plural suffix if the value is not 1. By default, use 's' as the
-    suffix:
+    Return a plural suffix if the value is not 1, '1', or an object of
+    length 1. By default, use 's' as the suffix:
 
-    * If value is 0, vote{{ value|pluralize }} display "0 votes".
-    * If value is 1, vote{{ value|pluralize }} display "1 vote".
-    * If value is 2, vote{{ value|pluralize }} display "2 votes".
+    * If value is 0, vote{{ value|pluralize }} display "votes".
+    * If value is 1, vote{{ value|pluralize }} display "vote".
+    * If value is 2, vote{{ value|pluralize }} display "votes".
 
     If an argument is provided, use that string instead:
 
-    * If value is 0, class{{ value|pluralize:"es" }} display "0 classes".
-    * If value is 1, class{{ value|pluralize:"es" }} display "1 class".
-    * If value is 2, class{{ value|pluralize:"es" }} display "2 classes".
+    * If value is 0, class{{ value|pluralize:"es" }} display "classes".
+    * If value is 1, class{{ value|pluralize:"es" }} display "class".
+    * If value is 2, class{{ value|pluralize:"es" }} display "classes".
 
     If the provided argument contains a comma, use the text before the comma
     for the singular case and the text after the comma for the plural case:
 
-    * If value is 0, cand{{ value|pluralize:"y,ies" }} display "0 candies".
-    * If value is 1, cand{{ value|pluralize:"y,ies" }} display "1 candy".
-    * If value is 2, cand{{ value|pluralize:"y,ies" }} display "2 candies".
+    * If value is 0, cand{{ value|pluralize:"y,ies" }} display "candies".
+    * If value is 1, cand{{ value|pluralize:"y,ies" }} display "candy".
+    * If value is 2, cand{{ value|pluralize:"y,ies" }} display "candies".
     """
     if ',' not in arg:
         arg = ',' + arg
@@ -879,17 +879,15 @@ def pluralize(value, arg='s'):
     singular_suffix, plural_suffix = bits[:2]
 
     try:
-        if float(value) != 1:
-            return plural_suffix
+        return singular_suffix if float(value) == 1 else plural_suffix
     except ValueError:  # Invalid string that's not a number.
         pass
     except TypeError:  # Value isn't a string or a number; maybe it's a list?
         try:
-            if len(value) != 1:
-                return plural_suffix
+            return singular_suffix if len(value) == 1 else plural_suffix
         except TypeError:  # len() of unsized object.
             pass
-    return singular_suffix
+    return ''
 
 
 @register.filter("phone2numeric", is_safe=True)

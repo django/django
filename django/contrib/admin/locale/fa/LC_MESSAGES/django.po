@@ -5,15 +5,16 @@
 # Ali Vakilzade <ali.vakilzade@gmail.com>, 2015
 # Arash Fazeli <a.fazeli@gmail.com>, 2012
 # Jannis Leidel <jannis@leidel.info>, 2011
-# Mohammad Hossein Mojtahedi <Mhm5000@gmail.com>, 2017
+# MJafar Mashhadi <raindigital2007@gmail.com>, 2018
+# Mohammad Hossein Mojtahedi <Mhm5000@gmail.com>, 2017,2019
 # Pouya Abbassi, 2016
 # Reza Mohammadi <reza@teeleh.ir>, 2013-2014
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-09-23 18:54+0000\n"
+"POT-Creation-Date: 2019-01-16 20:42+0100\n"
+"PO-Revision-Date: 2019-01-23 12:01+0000\n"
 "Last-Translator: Mohammad Hossein Mojtahedi <Mhm5000@gmail.com>\n"
 "Language-Team: Persian (http://www.transifex.com/django/django/language/"
 "fa/)\n"
@@ -21,7 +22,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: fa\n"
-"Plural-Forms: nplurals=1; plural=0;\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
 #, python-format
 msgid "Successfully deleted %(count)d %(items)s."
@@ -92,6 +93,15 @@ msgstr "افزودن یک %(verbose_name)s دیگر"
 msgid "Remove"
 msgstr "حذف"
 
+msgid "Addition"
+msgstr "افزودن"
+
+msgid "Change"
+msgstr "تغییر"
+
+msgid "Deletion"
+msgstr "کاستن"
+
 msgid "action time"
 msgstr "زمان اقدام"
 
@@ -105,7 +115,7 @@ msgid "object id"
 msgstr "شناسهٔ شیء"
 
 #. Translators: 'repr' means representation
-#. (https://docs.python.org/3/library/functions.html#repr)
+#. (https://docs.python.org/library/functions.html#repr)
 msgid "object repr"
 msgstr "صورت شیء"
 
@@ -171,11 +181,11 @@ msgstr ""
 "دارید."
 
 #, python-brace-format
-msgid ""
-"The {name} \"{obj}\" was added successfully. You may edit it again below."
-msgstr ""
-" {name} \"{obj}\" به موفقیت اضافه شد. شما میتوانید در قسمت پایین، آنرا "
-"ویرایش کنید."
+msgid "The {name} \"{obj}\" was added successfully."
+msgstr "{name} \"{obj}\" با موفقیت اضافه شد."
+
+msgid "You may edit it again below."
+msgstr "می‌توانید مجدداً ویرایش کنید."
 
 #, python-brace-format
 msgid ""
@@ -186,15 +196,18 @@ msgstr ""
 "اضافه کنید."
 
 #, python-brace-format
-msgid "The {name} \"{obj}\" was added successfully."
-msgstr "{name} \"{obj}\" با موفقیت اضافه شد."
-
-#, python-brace-format
 msgid ""
 "The {name} \"{obj}\" was changed successfully. You may edit it again below."
 msgstr ""
 "{name} \"{obj}\" با موفقیت تغییر یافت. شما میتوانید دوباره آنرا در قسمت "
 "پایین ویرایش کنید."
+
+#, python-brace-format
+msgid ""
+"The {name} \"{obj}\" was added successfully. You may edit it again below."
+msgstr ""
+" {name} \"{obj}\" به موفقیت اضافه شد. شما میتوانید در قسمت پایین، آنرا "
+"ویرایش کنید."
 
 #, python-brace-format
 msgid ""
@@ -224,7 +237,7 @@ msgstr "%(name)s·\"%(obj)s\" با موفقیت حذف شد."
 
 #, python-format
 msgid "%(name)s with ID \"%(key)s\" doesn't exist. Perhaps it was deleted?"
-msgstr "%(name)s با آی‌دی «%(key)s» وجود ندارد. شاید حذف شده است؟"
+msgstr "%(name)s با کلید «%(key)s» وجود ندارد. ممکن است حذف شده باشد."
 
 #, python-format
 msgid "Add %s"
@@ -234,6 +247,10 @@ msgstr "اضافه کردن %s"
 msgid "Change %s"
 msgstr "تغییر %s"
 
+#, python-format
+msgid "View %s"
+msgstr "مشاهده %s"
+
 msgid "Database error"
 msgstr "خطا در بانک اطلاعاتی"
 
@@ -241,11 +258,13 @@ msgstr "خطا در بانک اطلاعاتی"
 msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
 msgstr[0] "%(count)s %(name)s با موفقیت تغییر کرد."
+msgstr[1] "%(count)s %(name)s با موفقیت تغییر کرد."
 
 #, python-format
 msgid "%(total_count)s selected"
 msgid_plural "All %(total_count)s selected"
 msgstr[0] "همه موارد %(total_count)s انتخاب شده"
+msgstr[1] "همه موارد %(total_count)s انتخاب شده"
 
 #, python-format
 msgid "0 of %(cnt)s selected"
@@ -449,8 +468,8 @@ msgstr ""
 "آیا در خصوص حذف %(objects_name)s انتخاب شده اطمینان دارید؟ تمام موجودیت‌های "
 "ذیل به همراه موارد مرتبط با آنها حذف خواهند شد:"
 
-msgid "Change"
-msgstr "تغییر"
+msgid "View"
+msgstr "مشاهده"
 
 msgid "Delete?"
 msgstr "حذف؟"
@@ -469,8 +488,8 @@ msgstr "مدلها در برنامه %(name)s "
 msgid "Add"
 msgstr "اضافه کردن"
 
-msgid "You don't have permission to edit anything."
-msgstr "شما اجازهٔ ویرایش چیزی را ندارید."
+msgid "You don't have permission to view or edit anything."
+msgstr "شما اجازهٔ مشاهده یا ویرایش چیزی را ندارید."
 
 msgid "Recent actions"
 msgstr "فعالیتهای اخیر"
@@ -526,20 +545,8 @@ msgstr "نمایش همه"
 msgid "Save"
 msgstr "ذخیره"
 
-msgid "Popup closing..."
+msgid "Popup closing…"
 msgstr "در حال بستن پنجره..."
-
-#, python-format
-msgid "Change selected %(model)s"
-msgstr "تغییر دادن %(model)s انتخاب شده"
-
-#, python-format
-msgid "Add another %(model)s"
-msgstr "افزدون %(model)s دیگر"
-
-#, python-format
-msgid "Delete selected %(model)s"
-msgstr "حذف کردن %(model)s انتخاب شده"
 
 msgid "Search"
 msgstr "جستجو"
@@ -548,6 +555,7 @@ msgstr "جستجو"
 msgid "%(counter)s result"
 msgid_plural "%(counter)s results"
 msgstr[0] "%(counter)s نتیجه"
+msgstr[1] "%(counter)s نتیجه"
 
 #, python-format
 msgid "%(full_result_count)s total"
@@ -561,6 +569,24 @@ msgstr "ذخیره و ایجاد یکی دیگر"
 
 msgid "Save and continue editing"
 msgstr "ذخیره و ادامهٔ ویرایش"
+
+msgid "Save and view"
+msgstr "ذخیره و نمایش"
+
+msgid "Close"
+msgstr "بستن"
+
+#, python-format
+msgid "Change selected %(model)s"
+msgstr "تغییر دادن %(model)s انتخاب شده"
+
+#, python-format
+msgid "Add another %(model)s"
+msgstr "افزدون %(model)s دیگر"
+
+#, python-format
+msgid "Delete selected %(model)s"
+msgstr "حذف کردن %(model)s انتخاب شده"
 
 msgid "Thanks for spending some quality time with the Web site today."
 msgstr "متشکر از اینکه مدتی از وقت خود را به ما اختصاص دادید."
@@ -671,6 +697,10 @@ msgstr "%s انتخاب کنید"
 #, python-format
 msgid "Select %s to change"
 msgstr "%s را برای تغییر انتخاب کنید"
+
+#, python-format
+msgid "Select %s to view"
+msgstr "%s را برای مشاهده انتخاب کنید"
 
 msgid "Date:"
 msgstr "تاریخ:"

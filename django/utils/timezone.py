@@ -3,13 +3,15 @@ Timezone-related classes and functions.
 """
 
 import functools
+import warnings
 from contextlib import ContextDecorator
-from datetime import datetime, timedelta, tzinfo
-from threading import local
+from datetime import datetime, timedelta, timezone, tzinfo
 
 import pytz
+from asgiref.local import Local
 
 from django.conf import settings
+from django.utils.deprecation import RemovedInDjango31Warning
 
 __all__ = [
     'utc', 'get_fixed_timezone',
@@ -36,6 +38,10 @@ class FixedOffset(tzinfo):
     """
 
     def __init__(self, offset=None, name=None):
+        warnings.warn(
+            'FixedOffset is deprecated in favor of datetime.timezone',
+            RemovedInDjango31Warning, stacklevel=2,
+        )
         if offset is not None:
             self.__offset = timedelta(minutes=offset)
         if name is not None:
@@ -62,7 +68,7 @@ def get_fixed_timezone(offset):
     sign = '-' if offset < 0 else '+'
     hhmm = '%02d%02d' % divmod(abs(offset), 60)
     name = sign + hhmm
-    return FixedOffset(offset, name)
+    return timezone(timedelta(minutes=offset), name)
 
 
 # In order to avoid accessing settings at compile time,
@@ -83,7 +89,7 @@ def get_default_timezone_name():
     return _get_timezone_name(get_default_timezone())
 
 
-_active = local()
+_active = Local()
 
 
 def get_current_timezone():
@@ -98,12 +104,7 @@ def get_current_timezone_name():
 
 def _get_timezone_name(timezone):
     """Return the name of ``timezone``."""
-    try:
-        # for pytz timezones
-        return timezone.zone
-    except AttributeError:
-        # for regular tzinfo objects
-        return timezone.tzname(None)
+    return timezone.tzname(None)
 
 # Timezone selection functions.
 
@@ -239,7 +240,7 @@ def is_aware(value):
     Determine if a given datetime.datetime is aware.
 
     The concept is defined in Python's docs:
-    http://docs.python.org/library/datetime.html#datetime.tzinfo
+    https://docs.python.org/library/datetime.html#datetime.tzinfo
 
     Assuming value.tzinfo is either None or a proper datetime.tzinfo,
     value.utcoffset() implements the appropriate logic.
@@ -252,7 +253,7 @@ def is_naive(value):
     Determine if a given datetime.datetime is naive.
 
     The concept is defined in Python's docs:
-    http://docs.python.org/library/datetime.html#datetime.tzinfo
+    https://docs.python.org/library/datetime.html#datetime.tzinfo
 
     Assuming value.tzinfo is either None or a proper datetime.tzinfo,
     value.utcoffset() implements the appropriate logic.

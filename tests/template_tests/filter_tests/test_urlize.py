@@ -52,7 +52,7 @@ class UrlizeTests(SimpleTestCase):
     @setup({'urlize06': '{{ a|urlize }}'})
     def test_urlize06(self):
         output = self.engine.render_to_string('urlize06', {'a': "<script>alert('foo')</script>"})
-        self.assertEqual(output, '&lt;script&gt;alert(&#39;foo&#39;)&lt;/script&gt;')
+        self.assertEqual(output, '&lt;script&gt;alert(&#x27;foo&#x27;)&lt;/script&gt;')
 
     # mailto: testing for urlize
     @setup({'urlize07': '{{ a|urlize }}'})
@@ -113,7 +113,7 @@ class FunctionTests(SimpleTestCase):
         )
         self.assertEqual(
             urlize('www.server.com\'abc'),
-            '<a href="http://www.server.com" rel="nofollow">www.server.com</a>&#39;abc',
+            '<a href="http://www.server.com" rel="nofollow">www.server.com</a>&#x27;abc',
         )
         self.assertEqual(
             urlize('www.server.com<abc'),
@@ -277,6 +277,24 @@ class FunctionTests(SimpleTestCase):
             '[<a href="http://168.192.0.1](http://168.192.0.1)" rel="nofollow">'
             'http://168.192.0.1](http://168.192.0.1)</a>',
         )
+
+    def test_wrapping_characters(self):
+        wrapping_chars = (
+            ('()', ('(', ')')),
+            ('<>', ('&lt;', '&gt;')),
+            ('[]', ('[', ']')),
+            ('""', ('&quot;', '&quot;')),
+            ("''", ('&#x27;', '&#x27;')),
+        )
+        for wrapping_in, (start_out, end_out) in wrapping_chars:
+            with self.subTest(wrapping_in=wrapping_in):
+                start_in, end_in = wrapping_in
+                self.assertEqual(
+                    urlize(start_in + 'https://www.example.org/' + end_in),
+                    start_out +
+                    '<a href="https://www.example.org/" rel="nofollow">https://www.example.org/</a>' +
+                    end_out,
+                )
 
     def test_ipv4(self):
         self.assertEqual(

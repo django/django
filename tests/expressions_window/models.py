@@ -6,6 +6,7 @@ class Employee(models.Model):
     salary = models.PositiveIntegerField()
     department = models.CharField(max_length=40, blank=False, null=False)
     hire_date = models.DateField(blank=False, null=False)
+    age = models.IntegerField(blank=False, null=False)
 
     def __str__(self):
         return '{}, {}, {}, {}'.format(self.name, self.department, self.salary, self.hire_date)

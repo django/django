@@ -58,10 +58,6 @@ The ``File`` class
 
         It can be used as a context manager, e.g. ``with file.open() as f:``.
 
-        .. versionchanged:: 2.0
-
-            Context manager support was added.
-
     .. method:: __iter__()
 
         Iterate over the file yielding one line at a time.
@@ -103,7 +99,7 @@ The ``ContentFile`` class
 
         from django.core.files.base import ContentFile
 
-        f1 = ContentFile("esta sentencia está en español")
+        f1 = ContentFile("esta frase está en español")
         f2 = ContentFile(b"these are bytes")
 
 .. currentmodule:: django.core.files.images

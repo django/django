@@ -4,8 +4,9 @@ from decimal import Decimal
 from django.core.exceptions import FieldDoesNotExist, FieldError
 from django.db.models import (
     BooleanField, CharField, Count, DateTimeField, ExpressionWrapper, F, Func,
-    IntegerField, NullBooleanField, Q, Sum, Value,
+    IntegerField, NullBooleanField, OuterRef, Q, Subquery, Sum, Value,
 )
+from django.db.models.expressions import RawSQL
 from django.db.models.functions import Length, Lower
 from django.test import TestCase, skipUnlessDBFeature
 
@@ -283,9 +284,10 @@ class NonAggregateAnnotationTestCase(TestCase):
 
     def test_annotation_reverse_m2m(self):
         books = Book.objects.annotate(
-            store_name=F('store__name')).filter(
-            name='Practical Django Projects').order_by(
-            'store_name')
+            store_name=F('store__name'),
+        ).filter(
+            name='Practical Django Projects',
+        ).order_by('store_name')
 
         self.assertQuerysetEqual(
             books, [
@@ -320,6 +322,17 @@ class NonAggregateAnnotationTestCase(TestCase):
         publishers = Publisher.objects.values('id', 'book__rating').annotate(total=Sum('book__rating'))
         for publisher in publishers.filter(pk=self.p1.pk):
             self.assertEqual(publisher['book__rating'], publisher['total'])
+
+    @skipUnlessDBFeature('allows_group_by_pk')
+    def test_rawsql_group_by_collapse(self):
+        raw = RawSQL('SELECT MIN(id) FROM annotations_book', [])
+        qs = Author.objects.values('id').annotate(
+            min_book_id=raw,
+            count_friends=Count('friends'),
+        ).order_by()
+        _, _, group_by = qs.query.get_compiler(using='default').pre_sql_setup()
+        self.assertEqual(len(group_by), 1)
+        self.assertNotEqual(raw, group_by[0])
 
     def test_defer_annotation(self):
         """
@@ -391,6 +404,28 @@ class NonAggregateAnnotationTestCase(TestCase):
             ],
             lambda a: (a['age'], a['age_count'])
         )
+
+    def test_raw_sql_with_inherited_field(self):
+        DepartmentStore.objects.create(
+            name='Angus & Robinson',
+            original_opening=datetime.date(2014, 3, 8),
+            friday_night_closing=datetime.time(21),
+            chain='Westfield',
+            area=123,
+        )
+        tests = (
+            ('name', 'Angus & Robinson'),
+            ('surface', 123),
+            ("case when name='Angus & Robinson' then chain else name end", 'Westfield'),
+        )
+        for sql, expected_result in tests:
+            with self.subTest(sql=sql):
+                self.assertSequenceEqual(
+                    DepartmentStore.objects.annotate(
+                        annotation=RawSQL(sql, ()),
+                    ).values_list('annotation', flat=True),
+                    [expected_result],
+                )
 
     def test_annotate_exists(self):
         authors = Author.objects.annotate(c=Count('id')).filter(c__gt=1)
@@ -497,7 +532,8 @@ class NonAggregateAnnotationTestCase(TestCase):
                 F('ticker_name'),
                 F('description'),
                 Value('No Tag'),
-                function='COALESCE')
+                function='COALESCE',
+            )
         ).annotate(
             tagline_lower=Lower(F('tagline'), output_field=CharField())
         ).order_by('name')
@@ -519,13 +555,15 @@ class NonAggregateAnnotationTestCase(TestCase):
         books = Book.objects.annotate(
             is_book=Value(True, output_field=BooleanField()),
             is_pony=Value(False, output_field=BooleanField()),
-            is_none=Value(None, output_field=NullBooleanField()),
+            is_none=Value(None, output_field=BooleanField(null=True)),
+            is_none_old=Value(None, output_field=NullBooleanField()),
         )
         self.assertGreater(len(books), 0)
         for book in books:
             self.assertIs(book.is_book, True)
             self.assertIs(book.is_pony, False)
             self.assertIsNone(book.is_none)
+            self.assertIsNone(book.is_none_old)
 
     def test_annotation_in_f_grouped_by_annotation(self):
         qs = (
@@ -553,3 +591,31 @@ class NonAggregateAnnotationTestCase(TestCase):
             Book.objects.annotate(is_book=True)
         with self.assertRaisesMessage(TypeError, msg % ', '.join([str(BooleanField()), 'True'])):
             Book.objects.annotate(BooleanField(), Value(False), is_book=True)
+
+    def test_chaining_annotation_filter_with_m2m(self):
+        qs = Author.objects.filter(
+            name='Adrian Holovaty',
+            friends__age=35,
+        ).annotate(
+            jacob_name=F('friends__name'),
+        ).filter(
+            friends__age=29,
+        ).annotate(
+            james_name=F('friends__name'),
+        ).values('jacob_name', 'james_name')
+        self.assertCountEqual(
+            qs,
+            [{'jacob_name': 'Jacob Kaplan-Moss', 'james_name': 'James Bennett'}],
+        )
+
+    def test_annotation_filter_with_subquery(self):
+        long_books_qs = Book.objects.filter(
+            publisher=OuterRef('pk'),
+            pages__gt=400,
+        ).values('publisher').annotate(count=Count('pk')).values('count')
+        publisher_books_qs = Publisher.objects.annotate(
+            total_books=Count('book'),
+        ).filter(
+            total_books=Subquery(long_books_qs, output_field=IntegerField()),
+        ).values('name')
+        self.assertCountEqual(publisher_books_qs, [{'name': 'Sams'}, {'name': 'Morgan Kaufmann'}])

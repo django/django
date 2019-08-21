@@ -34,45 +34,63 @@ Features specification [#fnogc]_. There is no such standard for raster data.
 
 .. class:: GeometryField
 
+The base class for geometry fields.
+
 ``PointField``
 --------------
 
 .. class:: PointField
+
+Stores a :class:`~django.contrib.gis.geos.Point`.
 
 ``LineStringField``
 -------------------
 
 .. class:: LineStringField
 
+Stores a :class:`~django.contrib.gis.geos.LineString`.
+
 ``PolygonField``
 ----------------
 
 .. class:: PolygonField
+
+Stores a :class:`~django.contrib.gis.geos.Polygon`.
 
 ``MultiPointField``
 -------------------
 
 .. class:: MultiPointField
 
+Stores a :class:`~django.contrib.gis.geos.MultiPoint`.
+
 ``MultiLineStringField``
 ------------------------
 
 .. class:: MultiLineStringField
+
+Stores a :class:`~django.contrib.gis.geos.MultiLineString`.
 
 ``MultiPolygonField``
 ---------------------
 
 .. class:: MultiPolygonField
 
+Stores a :class:`~django.contrib.gis.geos.MultiPolygon`.
+
 ``GeometryCollectionField``
 ---------------------------
 
 .. class:: GeometryCollectionField
 
+Stores a :class:`~django.contrib.gis.geos.GeometryCollection`.
+
 ``RasterField``
 ---------------
 
 .. class:: RasterField
+
+Stores a :class:`~django.contrib.gis.gdal.GDALRaster`.
 
 ``RasterField`` is currently only implemented for the PostGIS backend.
 
@@ -245,7 +263,7 @@ determining `when to use geography data type over geometry data type
 <https://postgis.net/docs/using_postgis_dbmanagement.html#PostGIS_GeographyVSGeometry>`_.
 
 .. rubric:: Footnotes
-.. [#fnogc] OpenGIS Consortium, Inc., `Simple Feature Specification For SQL <http://www.opengeospatial.org/standards/sfs>`_.
+.. [#fnogc] OpenGIS Consortium, Inc., `Simple Feature Specification For SQL <https://www.opengeospatial.org/standards/sfs>`_.
 .. [#fnogcsrid] *See id.* at Ch. 2.3.8, p. 39 (Geometry Values and Spatial Reference Systems).
 .. [#fnsrid] Typically, SRID integer corresponds to an EPSG (`European Petroleum Survey Group <http://www.epsg.org>`_) identifier.  However, it may also be associated with custom projections defined in spatial database's spatial reference systems table.
 .. [#fnthematic] Terry A. Slocum, Robert B. McMaster, Fritz C. Kessler, & Hugh H. Howard, *Thematic Cartography and Geographic Visualization* (Prentice Hall, 2nd edition), at Ch. 7.1.3.

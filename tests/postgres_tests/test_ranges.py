@@ -1,13 +1,15 @@
 import datetime
 import json
+from decimal import Decimal
 
 from django import forms
 from django.core import exceptions, serializers
 from django.db.models import DateField, DateTimeField, F, Func, Value
-from django.test import override_settings
+from django.test import ignore_warnings, override_settings
 from django.utils import timezone
+from django.utils.deprecation import RemovedInDjango31Warning
 
-from . import PostgreSQLTestCase
+from . import PostgreSQLSimpleTestCase, PostgreSQLTestCase
 from .models import RangeLookupsModel, RangesModel
 
 try:
@@ -27,7 +29,7 @@ class TestSaveLoad(PostgreSQLTestCase):
         instance = RangesModel(
             ints=NumericRange(0, 10),
             bigints=NumericRange(10, 20),
-            floats=NumericRange(20, 30),
+            decimals=NumericRange(20, 30),
             timestamps=DateTimeTZRange(now - datetime.timedelta(hours=1), now),
             dates=DateRange(now.date() - datetime.timedelta(days=1), now.date()),
         )
@@ -35,7 +37,7 @@ class TestSaveLoad(PostgreSQLTestCase):
         loaded = RangesModel.objects.get()
         self.assertEqual(instance.ints, loaded.ints)
         self.assertEqual(instance.bigints, loaded.bigints)
-        self.assertEqual(instance.floats, loaded.floats)
+        self.assertEqual(instance.decimals, loaded.decimals)
         self.assertEqual(instance.timestamps, loaded.timestamps)
         self.assertEqual(instance.dates, loaded.dates)
 
@@ -54,18 +56,18 @@ class TestSaveLoad(PostgreSQLTestCase):
 
     def test_range_object_boundaries(self):
         r = NumericRange(0, 10, '[]')
-        instance = RangesModel(floats=r)
+        instance = RangesModel(decimals=r)
         instance.save()
         loaded = RangesModel.objects.get()
-        self.assertEqual(r, loaded.floats)
-        self.assertIn(10, loaded.floats)
+        self.assertEqual(r, loaded.decimals)
+        self.assertIn(10, loaded.decimals)
 
     def test_unbounded(self):
         r = NumericRange(None, None, '()')
-        instance = RangesModel(floats=r)
+        instance = RangesModel(decimals=r)
         instance.save()
         loaded = RangesModel.objects.get()
-        self.assertEqual(r, loaded.floats)
+        self.assertEqual(r, loaded.decimals)
 
     def test_empty(self):
         r = NumericRange(empty=True)
@@ -113,11 +115,15 @@ class TestRangeContainsLookup(PostgreSQLTestCase):
         ]
         cls.obj = RangesModel.objects.create(
             dates=(cls.dates[0], cls.dates[3]),
+            dates_inner=(cls.dates[1], cls.dates[2]),
             timestamps=(cls.timestamps[0], cls.timestamps[3]),
+            timestamps_inner=(cls.timestamps[1], cls.timestamps[2]),
         )
         cls.aware_obj = RangesModel.objects.create(
             dates=(cls.dates[0], cls.dates[3]),
+            dates_inner=(cls.dates[1], cls.dates[2]),
             timestamps=(cls.aware_timestamps[0], cls.aware_timestamps[3]),
+            timestamps_inner=(cls.timestamps[1], cls.timestamps[2]),
         )
         # Objects that don't match any queries.
         for i in range(3, 4):
@@ -138,6 +144,7 @@ class TestRangeContainsLookup(PostgreSQLTestCase):
             (self.aware_timestamps[1], self.aware_timestamps[2]),
             Value(self.dates[0], output_field=DateTimeField()),
             Func(F('dates'), function='lower', output_field=DateTimeField()),
+            F('timestamps_inner'),
         )
         for filter_arg in filter_args:
             with self.subTest(filter_arg=filter_arg):
@@ -152,6 +159,7 @@ class TestRangeContainsLookup(PostgreSQLTestCase):
             (self.dates[1], self.dates[2]),
             Value(self.dates[0], output_field=DateField()),
             Func(F('timestamps'), function='lower', output_field=DateField()),
+            F('dates_inner'),
         )
         for filter_arg in filter_args:
             with self.subTest(filter_arg=filter_arg):
@@ -165,13 +173,13 @@ class TestQuerying(PostgreSQLTestCase):
 
     @classmethod
     def setUpTestData(cls):
-        cls.objs = [
-            RangesModel.objects.create(ints=NumericRange(0, 10)),
-            RangesModel.objects.create(ints=NumericRange(5, 15)),
-            RangesModel.objects.create(ints=NumericRange(None, 0)),
-            RangesModel.objects.create(ints=NumericRange(empty=True)),
-            RangesModel.objects.create(ints=None),
-        ]
+        cls.objs = RangesModel.objects.bulk_create([
+            RangesModel(ints=NumericRange(0, 10)),
+            RangesModel(ints=NumericRange(5, 15)),
+            RangesModel(ints=NumericRange(None, 0)),
+            RangesModel(ints=NumericRange(empty=True)),
+            RangesModel(ints=None),
+        ])
 
     def test_exact(self):
         self.assertSequenceEqual(
@@ -331,13 +339,13 @@ class TestQueryingWithRanges(PostgreSQLTestCase):
         )
 
     def test_f_ranges(self):
-        parent = RangesModel.objects.create(floats=NumericRange(0, 10))
+        parent = RangesModel.objects.create(decimals=NumericRange(0, 10))
         objs = [
             RangeLookupsModel.objects.create(float=5, parent=parent),
             RangeLookupsModel.objects.create(float=99, parent=parent),
         ]
         self.assertSequenceEqual(
-            RangeLookupsModel.objects.filter(float__contained_by=F('parent__floats')),
+            RangeLookupsModel.objects.filter(float__contained_by=F('parent__decimals')),
             [objs[0]]
         )
 
@@ -353,13 +361,15 @@ class TestQueryingWithRanges(PostgreSQLTestCase):
         )
 
 
-class TestSerialization(PostgreSQLTestCase):
+class TestSerialization(PostgreSQLSimpleTestCase):
     test_data = (
         '[{"fields": {"ints": "{\\"upper\\": \\"10\\", \\"lower\\": \\"0\\", '
-        '\\"bounds\\": \\"[)\\"}", "floats": "{\\"empty\\": true}", '
+        '\\"bounds\\": \\"[)\\"}", "decimals": "{\\"empty\\": true}", '
         '"bigints": null, "timestamps": "{\\"upper\\": \\"2014-02-02T12:12:12+00:00\\", '
         '\\"lower\\": \\"2014-01-01T00:00:00+00:00\\", \\"bounds\\": \\"[)\\"}", '
-        '"dates": "{\\"upper\\": \\"2014-02-02\\", \\"lower\\": \\"2014-01-01\\", \\"bounds\\": \\"[)\\"}" }, '
+        '"timestamps_inner": null, '
+        '"dates": "{\\"upper\\": \\"2014-02-02\\", \\"lower\\": \\"2014-01-01\\", \\"bounds\\": \\"[)\\"}", '
+        '"dates_inner": null }, '
         '"model": "postgres_tests.rangesmodel", "pk": null}]'
     )
 
@@ -370,7 +380,7 @@ class TestSerialization(PostgreSQLTestCase):
 
     def test_dumping(self):
         instance = RangesModel(
-            ints=NumericRange(0, 10), floats=NumericRange(empty=True),
+            ints=NumericRange(0, 10), decimals=NumericRange(empty=True),
             timestamps=DateTimeTZRange(self.lower_dt, self.upper_dt),
             dates=DateRange(self.lower_date, self.upper_date),
         )
@@ -386,7 +396,7 @@ class TestSerialization(PostgreSQLTestCase):
     def test_loading(self):
         instance = list(serializers.deserialize('json', self.test_data))[0].object
         self.assertEqual(instance.ints, NumericRange(0, 10))
-        self.assertEqual(instance.floats, NumericRange(empty=True))
+        self.assertEqual(instance.decimals, NumericRange(empty=True))
         self.assertIsNone(instance.bigints)
         self.assertEqual(instance.dates, DateRange(self.lower_date, self.upper_date))
         self.assertEqual(instance.timestamps, DateTimeTZRange(self.lower_dt, self.upper_dt))
@@ -403,7 +413,7 @@ class TestSerialization(PostgreSQLTestCase):
         self.assertEqual(new_instance.ints, NumericRange(10, None))
 
 
-class TestValidators(PostgreSQLTestCase):
+class TestValidators(PostgreSQLSimpleTestCase):
 
     def test_max(self):
         validator = RangeMaxValueValidator(5)
@@ -428,17 +438,28 @@ class TestValidators(PostgreSQLTestCase):
             validator(NumericRange(None, 10))  # an unbound range
 
 
-class TestFormField(PostgreSQLTestCase):
+class TestFormField(PostgreSQLSimpleTestCase):
 
     def test_valid_integer(self):
         field = pg_forms.IntegerRangeField()
         value = field.clean(['1', '2'])
         self.assertEqual(value, NumericRange(1, 2))
 
+    @ignore_warnings(category=RemovedInDjango31Warning)
     def test_valid_floats(self):
         field = pg_forms.FloatRangeField()
         value = field.clean(['1.12345', '2.001'])
         self.assertEqual(value, NumericRange(1.12345, 2.001))
+
+    def test_valid_decimal(self):
+        field = pg_forms.DecimalRangeField()
+        value = field.clean(['1.12345', '2.001'])
+        self.assertEqual(value, NumericRange(Decimal('1.12345'), Decimal('2.001')))
+
+    def test_float_range_field_deprecation(self):
+        msg = 'FloatRangeField is deprecated in favor of DecimalRangeField.'
+        with self.assertRaisesMessage(RemovedInDjango31Warning, msg):
+            pg_forms.FloatRangeField()
 
     def test_valid_timestamps(self):
         field = pg_forms.DateTimeRangeField()
@@ -544,44 +565,44 @@ class TestFormField(PostgreSQLTestCase):
         value = field.clean([1, ''])
         self.assertEqual(value, NumericRange(1, None))
 
-    def test_float_lower_bound_higher(self):
-        field = pg_forms.FloatRangeField()
+    def test_decimal_lower_bound_higher(self):
+        field = pg_forms.DecimalRangeField()
         with self.assertRaises(exceptions.ValidationError) as cm:
             field.clean(['1.8', '1.6'])
         self.assertEqual(cm.exception.messages[0], 'The start of the range must not exceed the end of the range.')
         self.assertEqual(cm.exception.code, 'bound_ordering')
 
-    def test_float_open(self):
-        field = pg_forms.FloatRangeField()
+    def test_decimal_open(self):
+        field = pg_forms.DecimalRangeField()
         value = field.clean(['', '3.1415926'])
-        self.assertEqual(value, NumericRange(None, 3.1415926))
+        self.assertEqual(value, NumericRange(None, Decimal('3.1415926')))
 
-    def test_float_incorrect_data_type(self):
-        field = pg_forms.FloatRangeField()
+    def test_decimal_incorrect_data_type(self):
+        field = pg_forms.DecimalRangeField()
         with self.assertRaises(exceptions.ValidationError) as cm:
             field.clean('1.6')
         self.assertEqual(cm.exception.messages[0], 'Enter two numbers.')
         self.assertEqual(cm.exception.code, 'invalid')
 
-    def test_float_invalid_lower(self):
-        field = pg_forms.FloatRangeField()
+    def test_decimal_invalid_lower(self):
+        field = pg_forms.DecimalRangeField()
         with self.assertRaises(exceptions.ValidationError) as cm:
             field.clean(['a', '3.1415926'])
         self.assertEqual(cm.exception.messages[0], 'Enter a number.')
 
-    def test_float_invalid_upper(self):
-        field = pg_forms.FloatRangeField()
+    def test_decimal_invalid_upper(self):
+        field = pg_forms.DecimalRangeField()
         with self.assertRaises(exceptions.ValidationError) as cm:
             field.clean(['1.61803399', 'b'])
         self.assertEqual(cm.exception.messages[0], 'Enter a number.')
 
-    def test_float_required(self):
-        field = pg_forms.FloatRangeField(required=True)
+    def test_decimal_required(self):
+        field = pg_forms.DecimalRangeField(required=True)
         with self.assertRaises(exceptions.ValidationError) as cm:
             field.clean(['', ''])
         self.assertEqual(cm.exception.messages[0], 'This field is required.')
         value = field.clean(['1.61803399', ''])
-        self.assertEqual(value, NumericRange(1.61803399, None))
+        self.assertEqual(value, NumericRange(Decimal('1.61803399'), None))
 
     def test_date_lower_bound_higher(self):
         field = pg_forms.DateRangeField()
@@ -680,9 +701,9 @@ class TestFormField(PostgreSQLTestCase):
         self.assertIsInstance(form_field, pg_forms.IntegerRangeField)
 
     def test_model_field_formfield_float(self):
-        model_field = pg_fields.FloatRangeField()
+        model_field = pg_fields.DecimalRangeField()
         form_field = model_field.formfield()
-        self.assertIsInstance(form_field, pg_forms.FloatRangeField)
+        self.assertIsInstance(form_field, pg_forms.DecimalRangeField)
 
     def test_model_field_formfield_date(self):
         model_field = pg_fields.DateRangeField()
@@ -695,7 +716,7 @@ class TestFormField(PostgreSQLTestCase):
         self.assertIsInstance(form_field, pg_forms.DateTimeRangeField)
 
 
-class TestWidget(PostgreSQLTestCase):
+class TestWidget(PostgreSQLSimpleTestCase):
     def test_range_widget(self):
         f = pg_forms.ranges.DateTimeRangeField()
         self.assertHTMLEqual(

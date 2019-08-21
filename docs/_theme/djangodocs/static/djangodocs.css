@@ -101,9 +101,8 @@ pre { font-size:small; background:#E0FFB8; border:1px solid #94da3a; border-widt
 dt .literal, table .literal { background:none; }
 #bd a.reference { text-decoration: none; }
 #bd a.reference tt.literal { border-bottom: 1px #234f32 dotted; }
-div.snippet-filename { color: white; background-color: #234F32; margin: 0; padding: 2px 5px; width: 100%; font-family: monospace; font-size: small; line-height: 1.3em; }
-div.snippet-filename + div.highlight > pre { margin-top: 0; }
-div.snippet-filename + pre { margin-top: 0; }
+div.code-block-caption { color: white; background-color: #234F32; margin: 0; padding: 2px 5px; width: 100%; font-family: monospace; font-size: small; line-height: 1.3em; }
+div.literal-block-wrapper pre { margin-top: 0; }
 
 /* Restore colors of pygments hyperlinked code */
 #bd .highlight .k a:link, #bd .highlight .k a:visited { color: #000000; text-decoration: none; border-bottom: 1px dotted #000000; }

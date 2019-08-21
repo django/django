@@ -1,11 +1,11 @@
 import pickle
 
 from django.db import DJANGO_VERSION_PICKLE_KEY, models
-from django.test import TestCase
+from django.test import SimpleTestCase
 from django.utils.version import get_version
 
 
-class ModelPickleTestCase(TestCase):
+class ModelPickleTests(SimpleTestCase):
     def test_missing_django_version_unpickling(self):
         """
         #21430 -- Verifies a warning is raised for models that are

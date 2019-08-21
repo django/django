@@ -2,6 +2,8 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import signals
 from django.db.models.aggregates import *  # NOQA
 from django.db.models.aggregates import __all__ as aggregates_all
+from django.db.models.constraints import *  # NOQA
+from django.db.models.constraints import __all__ as constraints_all
 from django.db.models.deletion import (
     CASCADE, DO_NOTHING, PROTECT, SET, SET_DEFAULT, SET_NULL, ProtectedError,
 )
@@ -30,7 +32,7 @@ from django.db.models.fields.related import (  # isort:skip
 )
 
 
-__all__ = aggregates_all + fields_all + indexes_all
+__all__ = aggregates_all + constraints_all + fields_all + indexes_all
 __all__ += [
     'ObjectDoesNotExist', 'signals',
     'CASCADE', 'DO_NOTHING', 'PROTECT', 'SET', 'SET_DEFAULT', 'SET_NULL',

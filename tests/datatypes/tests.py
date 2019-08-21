@@ -12,14 +12,18 @@ class DataTypesTestCase(TestCase):
         d = Donut(name='Apple Fritter')
         self.assertFalse(d.is_frosted)
         self.assertIsNone(d.has_sprinkles)
+        self.assertIsNone(d.has_sprinkles_old)
         d.has_sprinkles = True
+        d.has_sprinkles_old = True
         self.assertTrue(d.has_sprinkles)
+        self.assertTrue(d.has_sprinkles_old)
 
         d.save()
 
         d2 = Donut.objects.get(name='Apple Fritter')
         self.assertFalse(d2.is_frosted)
         self.assertTrue(d2.has_sprinkles)
+        self.assertTrue(d2.has_sprinkles_old)
 
     def test_date_type(self):
         d = Donut(name='Apple Fritter')

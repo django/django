@@ -4,6 +4,7 @@ import sys
 import tempfile
 import unittest
 from io import StringIO
+from unittest import mock
 
 from django.conf import settings
 from django.contrib.staticfiles import finders, storage
@@ -12,7 +13,8 @@ from django.contrib.staticfiles.management.commands.collectstatic import (
 )
 from django.core.cache.backends.base import BaseCache
 from django.core.management import call_command
-from django.test import override_settings
+from django.test import SimpleTestCase, ignore_warnings, override_settings
+from django.utils.deprecation import RemovedInDjango31Warning
 
 from .cases import CollectionTestCase
 from .settings import TEST_ROOT
@@ -43,9 +45,6 @@ class TestHashedFiles:
         pass
 
     def test_template_tag_return(self):
-        """
-        Test the CachedStaticFilesStorage backend.
-        """
         self.assertStaticRaises(ValueError, "does/not/exist.png", "/static/does/not/exist.png")
         self.assertStaticRenders("test/file.txt", "/static/test/file.dad0999e4f8f.txt")
         self.assertStaticRenders("test/file.txt", "/static/test/file.dad0999e4f8f.txt", asvar=True)
@@ -232,6 +231,7 @@ class TestHashedFiles:
         self.assertPostCondition()
 
 
+@ignore_warnings(category=RemovedInDjango31Warning)
 @override_settings(
     STATICFILES_STORAGE='django.contrib.staticfiles.storage.CachedStaticFilesStorage',
 )
@@ -299,10 +299,20 @@ class TestCollectionCachedStorage(TestHashedFiles, CollectionTestCase):
             self.hashed_file_path('cached/styles.css')
 
 
-@override_settings(
-    STATICFILES_STORAGE='staticfiles_tests.storage.ExtraPatternsCachedStaticFilesStorage',
-)
-class TestExtraPatternsCachedStorage(CollectionTestCase):
+class TestCachedStaticFilesStorageDeprecation(SimpleTestCase):
+    def test_warning(self):
+        from django.contrib.staticfiles.storage import CachedStaticFilesStorage
+        from django.utils.deprecation import RemovedInDjango31Warning
+        msg = (
+            'CachedStaticFilesStorage is deprecated in favor of '
+            'ManifestStaticFilesStorage.'
+        )
+        with self.assertRaisesMessage(RemovedInDjango31Warning, msg):
+            CachedStaticFilesStorage()
+
+
+@override_settings(STATICFILES_STORAGE='staticfiles_tests.storage.ExtraPatternsStorage')
+class TestExtraPatternsStorage(CollectionTestCase):
 
     def setUp(self):
         storage.staticfiles_storage.hashed_files.clear()  # avoid cache interference
@@ -348,7 +358,8 @@ class TestCollectionManifestStorage(TestHashedFiles, CollectionTestCase):
             f.write('to be deleted in one test')
 
         self.patched_settings = self.settings(
-            STATICFILES_DIRS=settings.STATICFILES_DIRS + [temp_dir])
+            STATICFILES_DIRS=settings.STATICFILES_DIRS + [temp_dir],
+        )
         self.patched_settings.enable()
         self.addCleanup(shutil.rmtree, temp_dir)
         self._manifest_strict = storage.staticfiles_storage.manifest_strict
@@ -374,6 +385,15 @@ class TestCollectionManifestStorage(TestHashedFiles, CollectionTestCase):
         filename = storage.staticfiles_storage.manifest_name
         path = storage.staticfiles_storage.path(filename)
         self.assertTrue(os.path.exists(path))
+
+    def test_manifest_does_not_exist(self):
+        storage.staticfiles_storage.manifest_name = 'does.not.exist.json'
+        self.assertIsNone(storage.staticfiles_storage.read_manifest())
+
+    def test_manifest_does_not_ignore_permission_error(self):
+        with mock.patch('builtins.open', side_effect=PermissionError):
+            with self.assertRaises(PermissionError):
+                storage.staticfiles_storage.read_manifest()
 
     def test_loaded_cache(self):
         self.assertNotEqual(storage.staticfiles_storage.hashed_files, {})
@@ -435,14 +455,21 @@ class TestCollectionManifestStorage(TestHashedFiles, CollectionTestCase):
         # File exists on disk
         self.hashed_file_path(missing_file_name)
 
+    def test_intermediate_files(self):
+        cached_files = os.listdir(os.path.join(settings.STATIC_ROOT, 'cached'))
+        # Intermediate files shouldn't be created for reference.
+        self.assertEqual(
+            len([
+                cached_file
+                for cached_file in cached_files
+                if cached_file.startswith('relative.')
+            ]),
+            2,
+        )
 
-@override_settings(
-    STATICFILES_STORAGE='staticfiles_tests.storage.SimpleCachedStaticFilesStorage',
-)
-class TestCollectionSimpleCachedStorage(CollectionTestCase):
-    """
-    Tests for the Cache busting storage
-    """
+
+@override_settings(STATICFILES_STORAGE='staticfiles_tests.storage.SimpleStorage')
+class TestCollectionSimpleStorage(CollectionTestCase):
     hashed_file_path = hashed_file_path
 
     def setUp(self):
@@ -450,9 +477,6 @@ class TestCollectionSimpleCachedStorage(CollectionTestCase):
         super().setUp()
 
     def test_template_tag_return(self):
-        """
-        Test the CachedStaticFilesStorage backend.
-        """
         self.assertStaticRaises(ValueError, "does/not/exist.png", "/static/does/not/exist.png")
         self.assertStaticRenders("test/file.txt", "/static/test/file.deploy12345.txt")
         self.assertStaticRenders("cached/styles.css", "/static/cached/styles.deploy12345.css")
@@ -542,7 +566,7 @@ class TestStaticFilePermissions(CollectionTestCase):
 
 
 @override_settings(
-    STATICFILES_STORAGE='django.contrib.staticfiles.storage.CachedStaticFilesStorage',
+    STATICFILES_STORAGE='django.contrib.staticfiles.storage.ManifestStaticFilesStorage',
 )
 class TestCollectionHashedFilesCache(CollectionTestCase):
     """

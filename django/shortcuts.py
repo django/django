@@ -3,29 +3,12 @@ This module collects helper functions and classes that "span" multiple levels
 of MVC. In other words, these functions/classes introduce controlled coupling
 for convenience's sake.
 """
-import warnings
-
 from django.http import (
     Http404, HttpResponse, HttpResponsePermanentRedirect, HttpResponseRedirect,
 )
 from django.template import loader
 from django.urls import NoReverseMatch, reverse
-from django.utils.deprecation import RemovedInDjango30Warning
 from django.utils.functional import Promise
-
-
-def render_to_response(template_name, context=None, content_type=None, status=None, using=None):
-    """
-    Return a HttpResponse whose content is filled with the result of calling
-    django.template.loader.render_to_string() with the passed arguments.
-    """
-    warnings.warn(
-        'render_to_response() is deprecated in favor render(). It has the '
-        'same signature except that it also requires a request.',
-        RemovedInDjango30Warning, stacklevel=2,
-    )
-    content = loader.render_to_string(template_name, context, using=using)
-    return HttpResponse(content, content_type, status)
 
 
 def render(request, template_name, context=None, content_type=None, status=None, using=None):
@@ -83,14 +66,14 @@ def get_object_or_404(klass, *args, **kwargs):
     one object is found.
     """
     queryset = _get_queryset(klass)
-    try:
-        return queryset.get(*args, **kwargs)
-    except AttributeError:
+    if not hasattr(queryset, 'get'):
         klass__name = klass.__name__ if isinstance(klass, type) else klass.__class__.__name__
         raise ValueError(
             "First argument to get_object_or_404() must be a Model, Manager, "
             "or QuerySet, not '%s'." % klass__name
         )
+    try:
+        return queryset.get(*args, **kwargs)
     except queryset.model.DoesNotExist:
         raise Http404('No %s matches the given query.' % queryset.model._meta.object_name)
 
@@ -104,14 +87,13 @@ def get_list_or_404(klass, *args, **kwargs):
     arguments and keyword arguments are used in the filter() query.
     """
     queryset = _get_queryset(klass)
-    try:
-        obj_list = list(queryset.filter(*args, **kwargs))
-    except AttributeError:
+    if not hasattr(queryset, 'filter'):
         klass__name = klass.__name__ if isinstance(klass, type) else klass.__class__.__name__
         raise ValueError(
             "First argument to get_list_or_404() must be a Model, Manager, or "
             "QuerySet, not '%s'." % klass__name
         )
+    obj_list = list(queryset.filter(*args, **kwargs))
     if not obj_list:
         raise Http404('No %s matches the given query.' % queryset.model._meta.object_name)
     return obj_list

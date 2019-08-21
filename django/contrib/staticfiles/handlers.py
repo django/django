@@ -4,22 +4,19 @@ from urllib.request import url2pathname
 from django.conf import settings
 from django.contrib.staticfiles import utils
 from django.contrib.staticfiles.views import serve
+from django.core.handlers.asgi import ASGIHandler
+from django.core.handlers.exception import response_for_exception
 from django.core.handlers.wsgi import WSGIHandler, get_path_info
+from django.http import Http404
 
 
-class StaticFilesHandler(WSGIHandler):
+class StaticFilesHandlerMixin:
     """
-    WSGI middleware that intercepts calls to the static files directory, as
-    defined by the STATIC_URL setting, and serves those files.
+    Common methods used by WSGI and ASGI handlers.
     """
     # May be used to differentiate between handler types (e.g. in a
     # request_finished signal)
     handles_files = True
-
-    def __init__(self, application):
-        self.application = application
-        self.base_url = urlparse(self.get_base_url())
-        super().__init__()
 
     def load_middleware(self):
         # Middleware are already loaded for self.application; no need to reload
@@ -50,18 +47,42 @@ class StaticFilesHandler(WSGIHandler):
         return serve(request, self.file_path(request.path), insecure=True)
 
     def get_response(self, request):
-        from django.http import Http404
+        try:
+            return self.serve(request)
+        except Http404 as e:
+            return response_for_exception(request, e)
 
-        if self._should_handle(request.path):
-            try:
-                return self.serve(request)
-            except Http404 as e:
-                if settings.DEBUG:
-                    from django.views import debug
-                    return debug.technical_404_response(request, e)
-        return super().get_response(request)
+
+class StaticFilesHandler(StaticFilesHandlerMixin, WSGIHandler):
+    """
+    WSGI middleware that intercepts calls to the static files directory, as
+    defined by the STATIC_URL setting, and serves those files.
+    """
+    def __init__(self, application):
+        self.application = application
+        self.base_url = urlparse(self.get_base_url())
+        super().__init__()
 
     def __call__(self, environ, start_response):
         if not self._should_handle(get_path_info(environ)):
             return self.application(environ, start_response)
         return super().__call__(environ, start_response)
+
+
+class ASGIStaticFilesHandler(StaticFilesHandlerMixin, ASGIHandler):
+    """
+    ASGI application which wraps another and intercepts requests for static
+    files, passing them off to Django's static file serving.
+    """
+    def __init__(self, application):
+        self.application = application
+        self.base_url = urlparse(self.get_base_url())
+
+    async def __call__(self, scope, receive, send):
+        # Only even look at HTTP requests
+        if scope['type'] == 'http' and self._should_handle(scope['path']):
+            # Serve static content
+            # (the one thing super() doesn't do is __call__, apparently)
+            return await super().__call__(scope, receive, send)
+        # Hand off to the main app
+        return await self.application(scope, receive, send)

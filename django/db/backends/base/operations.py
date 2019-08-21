@@ -2,12 +2,13 @@ import datetime
 import decimal
 from importlib import import_module
 
+import sqlparse
+
 from django.conf import settings
-from django.core.exceptions import ImproperlyConfigured
 from django.db import NotSupportedError, transaction
 from django.db.backends import utils
 from django.utils import timezone
-from django.utils.encoding import force_text
+from django.utils.encoding import force_str
 
 
 class BaseDatabaseOperations:
@@ -25,6 +26,9 @@ class BaseDatabaseOperations:
         'BigIntegerField': (-9223372036854775808, 9223372036854775807),
         'PositiveSmallIntegerField': (0, 32767),
         'PositiveIntegerField': (0, 2147483647),
+        'SmallAutoField': (-32768, 32767),
+        'AutoField': (-2147483648, 2147483647),
+        'BigAutoField': (-9223372036854775808, 9223372036854775807),
     }
     set_operators = {
         'union': 'UNION',
@@ -44,6 +48,9 @@ class BaseDatabaseOperations:
     UNBOUNDED_PRECEDING = 'UNBOUNDED ' + PRECEDING
     UNBOUNDED_FOLLOWING = 'UNBOUNDED ' + FOLLOWING
     CURRENT_ROW = 'CURRENT ROW'
+
+    # Prefix for EXPLAIN queries, or None EXPLAIN isn't supported.
+    explain_prefix = None
 
     def __init__(self, connection):
         self.connection = connection
@@ -158,7 +165,7 @@ class BaseDatabaseOperations:
         """
         return ''
 
-    def distinct_sql(self, fields):
+    def distinct_sql(self, fields, params):
         """
         Return an SQL DISTINCT clause which removes duplicate rows from the
         result set. If any fields are given, only check the given fields for
@@ -167,7 +174,7 @@ class BaseDatabaseOperations:
         if fields:
             raise NotSupportedError('DISTINCT ON fields is not supported by this database backend')
         else:
-            return 'DISTINCT'
+            return ['DISTINCT'], []
 
     def fetch_returned_insert_id(self, cursor):
         """
@@ -214,10 +221,10 @@ class BaseDatabaseOperations:
     def limit_offset_sql(self, low_mark, high_mark):
         """Return LIMIT/OFFSET SQL clause."""
         limit, offset = self._get_limit_offset_params(low_mark, high_mark)
-        return '%s%s' % (
-            (' LIMIT %d' % limit) if limit else '',
-            (' OFFSET %d' % offset) if offset else '',
-        )
+        return ' '.join(sql for sql in (
+            ('LIMIT %d' % limit) if limit else None,
+            ('OFFSET %d' % offset) if offset else None,
+        ) if sql)
 
     def last_executed_query(self, cursor, sql, params):
         """
@@ -231,7 +238,7 @@ class BaseDatabaseOperations:
         """
         # Convert params to contain string values.
         def to_string(s):
-            return force_text(s, strings_only=True, errors='replace')
+            return force_str(s, strings_only=True, errors='replace')
         if isinstance(params, (list, tuple)):
             u_params = tuple(to_string(val) for val in params)
         elif params is None:
@@ -295,16 +302,10 @@ class BaseDatabaseOperations:
         cursor.execute() call and PEP 249 doesn't talk about this use case,
         the default implementation is conservative.
         """
-        try:
-            import sqlparse
-        except ImportError:
-            raise ImproperlyConfigured(
-                "The sqlparse package is required if you don't split your SQL "
-                "statements manually."
-            )
-        else:
-            return [sqlparse.format(statement, strip_comments=True)
-                    for statement in sqlparse.split(sql) if statement]
+        return [
+            sqlparse.format(statement, strip_comments=True)
+            for statement in sqlparse.split(sql) if statement
+        ]
 
     def process_clob(self, value):
         """
@@ -313,7 +314,7 @@ class BaseDatabaseOperations:
         """
         return value
 
-    def return_insert_id(self):
+    def return_insert_id(self, field):
         """
         For backends that support returning the last insert ID as part of an
         insert query, return the SQL and params to append to the INSERT query.
@@ -396,7 +397,7 @@ class BaseDatabaseOperations:
         to tables with foreign keys pointing the tables being truncated.
         PostgreSQL requires a cascade even if these tables are empty.
         """
-        raise NotImplementedError('subclasses of BaseDatabaseOperations must provide an sql_flush() method')
+        raise NotImplementedError('subclasses of BaseDatabaseOperations must provide a sql_flush() method')
 
     def execute_sql_flush(self, using, sql_list):
         """Execute a list of SQL statements to flush the database."""
@@ -652,3 +653,24 @@ class BaseDatabaseOperations:
 
     def window_frame_range_start_end(self, start=None, end=None):
         return self.window_frame_rows_start_end(start, end)
+
+    def explain_query_prefix(self, format=None, **options):
+        if not self.connection.features.supports_explaining_query_execution:
+            raise NotSupportedError('This backend does not support explaining query execution.')
+        if format:
+            supported_formats = self.connection.features.supported_explain_formats
+            normalized_format = format.upper()
+            if normalized_format not in supported_formats:
+                msg = '%s is not a recognized format.' % normalized_format
+                if supported_formats:
+                    msg += ' Allowed formats: %s' % ', '.join(sorted(supported_formats))
+                raise ValueError(msg)
+        if options:
+            raise ValueError('Unknown options: %s' % ', '.join(sorted(options.keys())))
+        return self.explain_prefix
+
+    def insert_statement(self, ignore_conflicts=False):
+        return 'INSERT INTO'
+
+    def ignore_conflicts_suffix_sql(self, ignore_conflicts=None):
+        return ''

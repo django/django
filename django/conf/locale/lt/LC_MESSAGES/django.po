@@ -4,7 +4,7 @@
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Kostas <tamosiunas@gmail.com>, 2011
 # lauris <lauris@runbox.com>, 2011
-# Matas Dailyda <matas@dailyda.com>, 2015-2017
+# Matas Dailyda <matas@dailyda.com>, 2015-2019
 # naktinis <naktinis@gmail.com>, 2012
 # Nikolajus Krauklis <nikolajus@gmail.com>, 2013
 # Povilas Balzaravičius <pavvka@gmail.com>, 2011-2012
@@ -14,8 +14,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-11-15 16:15+0100\n"
-"PO-Revision-Date: 2017-11-16 08:56+0000\n"
+"POT-Creation-Date: 2019-01-16 20:42+0100\n"
+"PO-Revision-Date: 2019-01-18 10:33+0000\n"
 "Last-Translator: Matas Dailyda <matas@dailyda.com>\n"
 "Language-Team: Lithuanian (http://www.transifex.com/django/django/language/"
 "lt/)\n"
@@ -23,8 +23,9 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: lt\n"
-"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && (n"
-"%100<10 || n%100>=20) ? 1 : 2);\n"
+"Plural-Forms: nplurals=4; plural=(n % 10 == 1 && (n % 100 > 19 || n % 100 < "
+"11) ? 0 : (n % 10 >= 2 && n % 10 <=9) && (n % 100 > 19 || n % 100 < 11) ? "
+"1 : n % 1 != 0 ? 2: 3);\n"
 
 msgid "Afrikaans"
 msgstr "Afrikiečių"
@@ -146,6 +147,9 @@ msgstr "Aukštutinė Sorbų"
 msgid "Hungarian"
 msgstr "Vengrų"
 
+msgid "Armenian"
+msgstr "Armėnų"
+
 msgid "Interlingua"
 msgstr "Interlingua"
 
@@ -166,6 +170,9 @@ msgstr "Japonų"
 
 msgid "Georgian"
 msgstr "Gruzinų"
+
+msgid "Kabyle"
+msgstr "Kabilų"
 
 msgid "Kazakh"
 msgstr "Kazachų"
@@ -379,6 +386,9 @@ msgstr[1] ""
 msgstr[2] ""
 "Įsitikinkite, kad reikšmė sudaryta iš nemažiau kaip %(limit_value)d ženklų "
 "(dabartinis ilgis %(show_value)d)."
+msgstr[3] ""
+"Įsitikinkite, kad reikšmė sudaryta iš nemažiau kaip %(limit_value)d ženklų "
+"(dabartinis ilgis %(show_value)d)."
 
 #, python-format
 msgid ""
@@ -396,6 +406,12 @@ msgstr[1] ""
 msgstr[2] ""
 "Įsitikinkite, kad reikšmė sudaryta iš nedaugiau kaip %(limit_value)d ženklų "
 "(dabartinis ilgis %(show_value)d)."
+msgstr[3] ""
+"Įsitikinkite, kad reikšmė sudaryta iš nedaugiau kaip %(limit_value)d ženklų "
+"(dabartinis ilgis %(show_value)d)."
+
+msgid "Enter a number."
+msgstr "Įveskite skaičių."
 
 #, python-format
 msgid "Ensure that there are no more than %(max)s digit in total."
@@ -403,6 +419,7 @@ msgid_plural "Ensure that there are no more than %(max)s digits in total."
 msgstr[0] "Įsitikinkite, kad yra nedaugiau nei %(max)s skaitmuo."
 msgstr[1] "Įsitikinkite, kad yra nedaugiau nei %(max)s skaitmenys."
 msgstr[2] "Įsitikinkite, kad yra nedaugiau nei %(max)s skaitmenų."
+msgstr[3] "Įsitikinkite, kad yra nedaugiau nei %(max)s skaitmenų."
 
 #, python-format
 msgid "Ensure that there are no more than %(max)s decimal place."
@@ -410,6 +427,7 @@ msgid_plural "Ensure that there are no more than %(max)s decimal places."
 msgstr[0] "Įsitikinkite, kad yra nedaugiau nei %(max)s skaitmuo po kablelio."
 msgstr[1] "Įsitikinkite, kad yra nedaugiau nei %(max)s skaitmenys po kablelio."
 msgstr[2] "Įsitikinkite, kad yra nedaugiau nei %(max)s skaitmenų po kablelio."
+msgstr[3] "Įsitikinkite, kad yra nedaugiau nei %(max)s skaitmenų po kablelio."
 
 #, python-format
 msgid ""
@@ -420,6 +438,8 @@ msgstr[0] "Įsitikinkite, kad yra nedaugiau nei %(max)s skaitmuo prieš kablelį
 msgstr[1] ""
 "Įsitikinkite, kad yra nedaugiau nei %(max)s skaitmenys prieš kablelį."
 msgstr[2] ""
+"Įsitikinkite, kad yra nedaugiau nei %(max)s skaitmenų prieš kablelį."
+msgstr[3] ""
 "Įsitikinkite, kad yra nedaugiau nei %(max)s skaitmenų prieš kablelį."
 
 #, python-format
@@ -479,6 +499,10 @@ msgstr "Didelis (8 baitų) sveikas skaičius"
 #, python-format
 msgid "'%(value)s' value must be either True or False."
 msgstr "'%(value)s' reikšmė turi būti arba True, arba False."
+
+#, python-format
+msgid "'%(value)s' value must be either True, False, or None."
+msgstr "'%(value)s' reikšmė turi būti True, False, arba None."
 
 msgid "Boolean (Either True or False)"
 msgstr "Loginė reikšmė (Tiesa arba Netiesa)"
@@ -617,6 +641,9 @@ msgstr "Neapdorota informacija"
 msgid "'%(value)s' is not a valid UUID."
 msgstr "'%(value)s' yra netinkama UUID reikšmė."
 
+msgid "Universally unique identifier"
+msgstr "Universaliai unikalus identifikatorius"
+
 msgid "File"
 msgstr "Failas"
 
@@ -656,9 +683,6 @@ msgstr "Šis laukas yra privalomas."
 msgid "Enter a whole number."
 msgstr "Įveskite pilną skaičių."
 
-msgid "Enter a number."
-msgstr "Įveskite skaičių."
-
 msgid "Enter a valid date."
 msgstr "Įveskite tinkamą datą."
 
@@ -670,6 +694,10 @@ msgstr "Įveskite tinkamą datą/laiką."
 
 msgid "Enter a valid duration."
 msgstr "Įveskite tinkamą trukmę."
+
+#, python-brace-format
+msgid "The number of days must be between {min_days} and {max_days}."
+msgstr "Dienų skaičius turi būti tarp {min_days} ir {max_days}."
 
 msgid "No file was submitted. Check the encoding type on the form."
 msgstr "Nebuvo nurodytas failas. Patikrinkite formos koduotę."
@@ -691,6 +719,9 @@ msgstr[1] ""
 "Įsitikinkite, kad failo pavadinimas sudarytas iš nedaugiau kaip %(max)d "
 "ženklų (dabartinis ilgis %(length)d)."
 msgstr[2] ""
+"Įsitikinkite, kad failo pavadinimas sudarytas iš nedaugiau kaip %(max)d "
+"ženklų (dabartinis ilgis %(length)d)."
+msgstr[3] ""
 "Įsitikinkite, kad failo pavadinimas sudarytas iš nedaugiau kaip %(max)d "
 "ženklų (dabartinis ilgis %(length)d)."
 
@@ -734,6 +765,7 @@ msgid_plural "Please submit %d or fewer forms."
 msgstr[0] "Prašome pateikti %d arba mažiau formų."
 msgstr[1] "Prašome pateikti %d arba mažiau formų."
 msgstr[2] "Prašome pateikti %d arba mažiau formų."
+msgstr[3] "Prašome pateikti %d arba mažiau formų."
 
 #, python-format
 msgid "Please submit %d or more forms."
@@ -741,6 +773,7 @@ msgid_plural "Please submit %d or more forms."
 msgstr[0] "Prašome pateikti %d arba daugiau formų."
 msgstr[1] "Prašome pateikti %d arba daugiau formų."
 msgstr[2] "Prašome pateikti %d arba daugiau formų."
+msgstr[3] "Prašome pateikti %d arba daugiau formų."
 
 msgid "Order"
 msgstr "Nurodyti"
@@ -814,6 +847,7 @@ msgid_plural "%(size)d bytes"
 msgstr[0] "%(size)d baitas"
 msgstr[1] "%(size)d baitai"
 msgstr[2] "%(size)d baitai"
+msgstr[3] "%(size)d baitai"
 
 #, python-format
 msgid "%s KB"
@@ -1068,7 +1102,7 @@ msgstr "Tai nėra teisingas IPv6 adresas."
 
 #, python-format
 msgctxt "String to return when truncating text"
-msgid "%(truncated_text)s..."
+msgid "%(truncated_text)s…"
 msgstr "%(truncated_text)s..."
 
 msgid "or"
@@ -1084,6 +1118,7 @@ msgid_plural "%d years"
 msgstr[0] "%d metas"
 msgstr[1] "%d metai"
 msgstr[2] "%d metų"
+msgstr[3] "%d metų"
 
 #, python-format
 msgid "%d month"
@@ -1091,6 +1126,7 @@ msgid_plural "%d months"
 msgstr[0] "%d mėnuo"
 msgstr[1] "%d mėnesiai"
 msgstr[2] "%d mėnesių"
+msgstr[3] "%d mėnesių"
 
 #, python-format
 msgid "%d week"
@@ -1098,6 +1134,7 @@ msgid_plural "%d weeks"
 msgstr[0] "%d savaitė"
 msgstr[1] "%d savaitės"
 msgstr[2] "%d savaičių"
+msgstr[3] "%d savaičių"
 
 #, python-format
 msgid "%d day"
@@ -1105,6 +1142,7 @@ msgid_plural "%d days"
 msgstr[0] "%d diena"
 msgstr[1] "%d dienos"
 msgstr[2] "%d dienų"
+msgstr[3] "%d dienų"
 
 #, python-format
 msgid "%d hour"
@@ -1112,6 +1150,7 @@ msgid_plural "%d hours"
 msgstr[0] "%d valanda"
 msgstr[1] "%d valandos"
 msgstr[2] "%d valandų"
+msgstr[3] "%d valandų"
 
 #, python-format
 msgid "%d minute"
@@ -1119,6 +1158,7 @@ msgid_plural "%d minutes"
 msgstr[0] "%d minutė"
 msgstr[1] "%d minutės"
 msgstr[2] "%d minučių"
+msgstr[3] "%d minučių"
 
 msgid "0 minutes"
 msgstr "0 minučių"

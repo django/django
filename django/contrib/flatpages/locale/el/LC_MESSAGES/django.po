@@ -4,13 +4,13 @@
 # Dimitris Glezos <glezos@transifex.com>, 2011
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Pãnoș <panos.laganakos@gmail.com>, 2014
-# Pãnoș <panos.laganakos@gmail.com>, 2016
+# Pãnoș <panos.laganakos@gmail.com>, 2016,2019
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2017-09-23 18:54+0000\n"
+"POT-Creation-Date: 2019-01-16 20:42+0100\n"
+"PO-Revision-Date: 2019-01-25 19:37+0000\n"
 "Last-Translator: Pãnoș <panos.laganakos@gmail.com>\n"
 "Language-Team: Greek (http://www.transifex.com/django/django/language/el/)\n"
 "MIME-Version: 1.0\n"
@@ -40,6 +40,10 @@ msgid ""
 msgstr ""
 "Η τιμή αυτή πρέπει να περιέχει μόνο γράμματα, αριθμούς, τελείες, παύλες, "
 "κάτω παύλες, καθέτους ή περισπωμένες."
+
+msgid "Example: '/about/contact'. Make sure to have a leading slash."
+msgstr ""
+"Παράδειγμα: '/about/contact/'. Βεβαιωθείτε ότι περιέχει κάθετο στην αρχή."
 
 msgid "URL is missing a leading slash."
 msgstr "Λείπει μια αρχική κάθετος από την διεύθυνση."

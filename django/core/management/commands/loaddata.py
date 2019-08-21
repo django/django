@@ -39,11 +39,11 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument('args', metavar='fixture', nargs='+', help='Fixture labels.')
         parser.add_argument(
-            '--database', action='store', dest='database', default=DEFAULT_DB_ALIAS,
+            '--database', default=DEFAULT_DB_ALIAS,
             help='Nominates a specific database to load fixtures into. Defaults to the "default" database.',
         )
         parser.add_argument(
-            '--app', action='store', dest='app_label', default=None,
+            '--app', dest='app_label',
             help='Only look for fixtures in the specified app.',
         )
         parser.add_argument(
@@ -52,11 +52,11 @@ class Command(BaseCommand):
                  'currently exist on the model.',
         )
         parser.add_argument(
-            '-e', '--exclude', dest='exclude', action='append', default=[],
+            '-e', '--exclude', action='append', default=[],
             help='An app_label or app_label.ModelName to exclude. Can be used multiple times.',
         )
         parser.add_argument(
-            '--format', action='store', dest='format', default=None,
+            '--format',
             help='Format of serialized data when reading from stdin.',
         )
 
@@ -109,8 +109,11 @@ class Command(BaseCommand):
             return
 
         with connection.constraint_checks_disabled():
+            self.objs_with_deferred_fields = []
             for fixture_label in fixture_labels:
                 self.load_label(fixture_label)
+            for obj in self.objs_with_deferred_fields:
+                obj.save_deferred_fields(using=self.using)
 
         # Since we disabled constraint checks, we must manually check for
         # any invalid keys that might have been added
@@ -163,6 +166,7 @@ class Command(BaseCommand):
 
                 objects = serializers.deserialize(
                     ser_fmt, fixture, using=self.using, ignorenonexistent=self.ignore,
+                    handle_forward_references=True,
                 )
 
                 for obj in objects:
@@ -189,6 +193,8 @@ class Command(BaseCommand):
                                 'error_msg': e,
                             },)
                             raise
+                    if obj.deferred_fields:
+                        self.objs_with_deferred_fields.append(obj)
                 if objects and show_progress:
                     self.stdout.write('')  # add a newline after progress indicator
                 self.loaded_object_count += loaded_objects_in_fixture
@@ -292,10 +298,9 @@ class Command(BaseCommand):
                 continue
             if os.path.isdir(app_dir):
                 dirs.append(app_dir)
-        dirs.extend(list(fixture_dirs))
+        dirs.extend(fixture_dirs)
         dirs.append('')
-        dirs = [os.path.abspath(os.path.realpath(d)) for d in dirs]
-        return dirs
+        return [os.path.realpath(d) for d in dirs]
 
     def parse_name(self, fixture_name):
         """
@@ -321,7 +326,7 @@ class Command(BaseCommand):
             else:
                 raise CommandError(
                     "Problem installing fixture '%s': %s is not a known "
-                    "serialization format." % (''.join(parts[:-1]), parts[-1]))
+                    "serialization format." % ('.'.join(parts[:-1]), parts[-1]))
         else:
             ser_fmt = None
 

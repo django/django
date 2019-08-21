@@ -7,6 +7,7 @@ import json
 from django import forms
 from django.conf import settings
 from django.core.exceptions import ValidationError
+from django.core.validators import URLValidator
 from django.db.models.deletion import CASCADE
 from django.urls import reverse
 from django.urls.exceptions import NoReverseMatch
@@ -51,16 +52,11 @@ class FilteredSelectMultiple(forms.SelectMultiple):
 
 
 class AdminDateWidget(forms.DateInput):
-    @property
-    def media(self):
-        extra = '' if settings.DEBUG else '.min'
+    class Media:
         js = [
-            'vendor/jquery/jquery%s.js' % extra,
-            'jquery.init.js',
-            'calendar.js',
-            'admin/DateTimeShortcuts.js',
+            'admin/js/calendar.js',
+            'admin/js/admin/DateTimeShortcuts.js',
         ]
-        return forms.Media(js=["admin/js/%s" % path for path in js])
 
     def __init__(self, attrs=None, format=None):
         attrs = {'class': 'vDateField', 'size': '10', **(attrs or {})}
@@ -68,16 +64,11 @@ class AdminDateWidget(forms.DateInput):
 
 
 class AdminTimeWidget(forms.TimeInput):
-    @property
-    def media(self):
-        extra = '' if settings.DEBUG else '.min'
+    class Media:
         js = [
-            'vendor/jquery/jquery%s.js' % extra,
-            'jquery.init.js',
-            'calendar.js',
-            'admin/DateTimeShortcuts.js',
+            'admin/js/calendar.js',
+            'admin/js/admin/DateTimeShortcuts.js',
         ]
-        return forms.Media(js=["admin/js/%s" % path for path in js])
 
     def __init__(self, attrs=None, format=None):
         attrs = {'class': 'vTimeField', 'size': '8', **(attrs or {})}
@@ -164,8 +155,12 @@ class ForeignKeyRawIdWidget(forms.TextInput):
             context['link_title'] = _('Lookup')
             # The JavaScript code looks for this class.
             context['widget']['attrs'].setdefault('class', 'vForeignKeyRawIdAdminField')
+        else:
+            context['related_url'] = None
         if context['widget']['value']:
             context['link_label'], context['link_url'] = self.label_and_url_for_value(value)
+        else:
+            context['link_label'] = None
         return context
 
     def base_url_parameters(self):
@@ -199,7 +194,7 @@ class ForeignKeyRawIdWidget(forms.TextInput):
         except NoReverseMatch:
             url = ''  # Admin not registered for target model.
 
-        return Truncator(obj).words(14, truncate='...'), url
+        return Truncator(obj).words(14), url
 
 
 class ManyToManyRawIdWidget(ForeignKeyRawIdWidget):
@@ -239,7 +234,8 @@ class RelatedFieldWidgetWrapper(forms.Widget):
     template_name = 'admin/widgets/related_widget_wrapper.html'
 
     def __init__(self, widget, rel, admin_site, can_add_related=None,
-                 can_change_related=False, can_delete_related=False):
+                 can_change_related=False, can_delete_related=False,
+                 can_view_related=False):
         self.needs_multipart_form = widget.needs_multipart_form
         self.attrs = widget.attrs
         self.choices = widget.choices
@@ -256,6 +252,7 @@ class RelatedFieldWidgetWrapper(forms.Widget):
         # XXX: The deletion UX can be confusing when dealing with cascading deletion.
         cascade = getattr(rel, 'on_delete', None) is CASCADE
         self.can_delete_related = not multiple and not cascade and can_delete_related
+        self.can_view_related = not multiple and can_view_related
         # so we can check if the related object is registered with this AdminSite
         self.admin_site = admin_site
 
@@ -289,28 +286,21 @@ class RelatedFieldWidgetWrapper(forms.Widget):
         ])
         context = {
             'rendered_widget': self.widget.render(name, value, attrs),
+            'is_hidden': self.is_hidden,
             'name': name,
             'url_params': url_params,
             'model': rel_opts.verbose_name,
+            'can_add_related': self.can_add_related,
+            'can_change_related': self.can_change_related,
+            'can_delete_related': self.can_delete_related,
+            'can_view_related': self.can_view_related,
         }
-        if self.can_change_related:
-            change_related_template_url = self.get_related_url(info, 'change', '__fk__')
-            context.update(
-                can_change_related=True,
-                change_related_template_url=change_related_template_url,
-            )
         if self.can_add_related:
-            add_related_url = self.get_related_url(info, 'add')
-            context.update(
-                can_add_related=True,
-                add_related_url=add_related_url,
-            )
+            context['add_related_url'] = self.get_related_url(info, 'add')
         if self.can_delete_related:
-            delete_related_template_url = self.get_related_url(info, 'delete', '__fk__')
-            context.update(
-                can_delete_related=True,
-                delete_related_template_url=delete_related_template_url,
-            )
+            context['delete_related_template_url'] = self.get_related_url(info, 'delete', '__fk__')
+        if self.can_view_related or self.can_change_related:
+            context['change_related_template_url'] = self.get_related_url(info, 'change', '__fk__')
         return context
 
     def value_from_datadict(self, data, files, name):
@@ -341,14 +331,21 @@ class AdminEmailInputWidget(forms.EmailInput):
 class AdminURLFieldWidget(forms.URLInput):
     template_name = 'admin/widgets/url.html'
 
-    def __init__(self, attrs=None):
+    def __init__(self, attrs=None, validator_class=URLValidator):
         super().__init__(attrs={'class': 'vURLField', **(attrs or {})})
+        self.validator = validator_class()
 
     def get_context(self, name, value, attrs):
+        try:
+            self.validator(value if value else '')
+            url_valid = True
+        except ValidationError:
+            url_valid = False
         context = super().get_context(name, value, attrs)
         context['current_label'] = _('Currently:')
         context['change_label'] = _('Change:')
         context['widget']['href'] = smart_urlquote(context['widget']['value']) if value else ''
+        context['url_valid'] = url_valid
         return context
 
 
@@ -363,16 +360,22 @@ class AdminBigIntegerFieldWidget(AdminIntegerFieldWidget):
     class_name = 'vBigIntegerField'
 
 
-# Mapping of lower case language codes [returned by Django's get_language()]
-# to language codes supported by select2.
+class AdminUUIDInputWidget(forms.TextInput):
+    def __init__(self, attrs=None):
+        super().__init__(attrs={'class': 'vUUIDField', **(attrs or {})})
+
+
+# Mapping of lowercase language codes [returned by Django's get_language()] to
+# language codes supported by select2.
 # See django/contrib/admin/static/admin/js/vendor/select2/i18n/*
 SELECT2_TRANSLATIONS = {x.lower(): x for x in [
     'ar', 'az', 'bg', 'ca', 'cs', 'da', 'de', 'el', 'en', 'es', 'et',
     'eu', 'fa', 'fi', 'fr', 'gl', 'he', 'hi', 'hr', 'hu', 'id', 'is',
     'it', 'ja', 'km', 'ko', 'lt', 'lv', 'mk', 'ms', 'nb', 'nl', 'pl',
     'pt-BR', 'pt', 'ro', 'ru', 'sk', 'sr-Cyrl', 'sr', 'sv', 'th',
-    'tr', 'uk', 'vi', 'zh-CN', 'zh-TW',
+    'tr', 'uk', 'vi',
 ]}
+SELECT2_TRANSLATIONS.update({'zh-hans': 'zh-CN', 'zh-hant': 'zh-TW'})
 
 
 class AutocompleteMixin:
@@ -389,10 +392,7 @@ class AutocompleteMixin:
         self.admin_site = admin_site
         self.db = using
         self.choices = choices
-        if attrs is not None:
-            self.attrs = attrs.copy()
-        else:
-            self.attrs = {}
+        self.attrs = {} if attrs is None else attrs.copy()
 
     def get_url(self):
         model = self.rel.model
@@ -415,7 +415,7 @@ class AutocompleteMixin:
             'data-theme': 'admin-autocomplete',
             'data-allow-clear': json.dumps(not self.is_required),
             'data-placeholder': '',  # Allows clearing of the input.
-            'class': attrs['class'] + 'admin-autocomplete',
+            'class': attrs['class'] + (' ' if attrs['class'] else '') + 'admin-autocomplete',
         })
         return attrs
 

@@ -76,7 +76,7 @@ Methods
         The value included in the HTTP ``Content-Type`` header, including the
         MIME type specification and the character set encoding. If
         ``content_type`` is specified, then its value is used. Otherwise,
-        :setting:`DEFAULT_CONTENT_TYPE` is used.
+        ``'text/html'`` is used.
 
     ``status``
         The HTTP status code for the response.
@@ -171,7 +171,7 @@ Methods
         The value included in the HTTP ``Content-Type`` header, including the
         MIME type specification and the character set encoding. If
         ``content_type`` is specified, then its value is used. Otherwise,
-        :setting:`DEFAULT_CONTENT_TYPE` is used.
+        ``'text/html'`` is used.
 
     ``status``
         The HTTP status code for the response.

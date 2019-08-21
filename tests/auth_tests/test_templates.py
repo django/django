@@ -14,13 +14,13 @@ from .client import PasswordResetConfirmClient
 
 @override_settings(ROOT_URLCONF='auth_tests.urls')
 class AuthTemplateTests(TestCase):
+    request_factory = RequestFactory()
 
     @classmethod
     def setUpTestData(cls):
-        rf = RequestFactory()
         user = User.objects.create_user('jsmith', 'jsmith@example.com', 'pass')
         user = authenticate(username=user.username, password='pass')
-        request = rf.get('/somepath/')
+        request = cls.request_factory.get('/somepath/')
         request.user = user
         cls.user, cls.request = user, request
 
@@ -47,7 +47,7 @@ class AuthTemplateTests(TestCase):
         client = PasswordResetConfirmClient()
         default_token_generator = PasswordResetTokenGenerator()
         token = default_token_generator.make_token(self.user)
-        uidb64 = urlsafe_base64_encode(str(self.user.pk).encode()).decode()
+        uidb64 = urlsafe_base64_encode(str(self.user.pk).encode())
         url = reverse('password_reset_confirm', kwargs={'uidb64': uidb64, 'token': token})
         response = client.get(url)
         self.assertContains(response, '<title>Enter new password</title>')

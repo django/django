@@ -1,6 +1,6 @@
 from django.db import models
 from django.template import Context, Template
-from django.test import TestCase, override_settings
+from django.test import SimpleTestCase, TestCase, override_settings
 from django.test.utils import isolate_apps
 
 from .models import (
@@ -160,7 +160,7 @@ class ManagersRegressionTests(TestCase):
 
 
 @isolate_apps('managers_regress')
-class TestManagerInheritance(TestCase):
+class TestManagerInheritance(SimpleTestCase):
     def test_implicit_inheritance(self):
         class CustomManager(models.Manager):
             pass

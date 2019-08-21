@@ -59,7 +59,7 @@ class GeoFeedMixin:
                         raise ValueError('Cannot use simple GeoRSS box in W3C Geo feeds.')
                     handler.addQuickElement('georss:box', self.georss_coords(box_coords))
             else:
-                # Getting the lower-case geometry type.
+                # Getting the lowercase geometry type.
                 gtype = str(geom.geom_type).lower()
                 if gtype == 'point':
                     self.add_georss_point(handler, geom.coords, w3c_geo=w3c_geo)

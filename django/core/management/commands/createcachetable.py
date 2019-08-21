@@ -19,13 +19,13 @@ class Command(BaseCommand):
             help='Optional table names. Otherwise, settings.CACHES is used to find cache tables.',
         )
         parser.add_argument(
-            '--database', action='store', dest='database',
+            '--database',
             default=DEFAULT_DB_ALIAS,
             help='Nominates a database onto which the cache tables will be '
                  'installed. Defaults to the "default" database.',
         )
         parser.add_argument(
-            '--dry-run', action='store_true', dest='dry_run',
+            '--dry-run', action='store_true',
             help='Does not create the table, just prints the SQL that would be run.',
         )
 

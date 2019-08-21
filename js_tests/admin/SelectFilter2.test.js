@@ -11,6 +11,10 @@ QUnit.test('init', function(assert) {
     SelectFilter.init('id', 'things', 0);
     assert.equal($('.selector-available h2').text().trim(), "Available things");
     assert.equal($('.selector-chosen h2').text().trim(), "Chosen things");
+    assert.equal(
+        $('.selector-available select').outerHeight() + $('.selector-filter').outerHeight(),
+        $('.selector-chosen select').height()
+    );
     assert.equal($('.selector-chooseall').text(), "Choose all");
     assert.equal($('.selector-add').text(), "Choose");
     assert.equal($('.selector-remove').text(), "Remove");

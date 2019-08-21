@@ -1,11 +1,9 @@
-import unittest
 from operator import attrgetter
 
 from django.core.exceptions import FieldError, ValidationError
 from django.db import connection, models
 from django.test import SimpleTestCase, TestCase
 from django.test.utils import CaptureQueriesContext, isolate_apps
-from django.utils.version import PY36
 
 from .models import (
     Base, Chef, CommonInfo, GrandChild, GrandParent, ItalianRestaurant,
@@ -133,6 +131,24 @@ class ModelInheritanceTests(TestCase):
             if 'UPDATE' in sql:
                 self.assertEqual(expected_sql, sql)
 
+    def test_create_child_no_update(self):
+        """Creating a child with non-abstract parents only issues INSERTs."""
+        def a():
+            GrandChild.objects.create(
+                email='grand_parent@example.com',
+                first_name='grand',
+                last_name='parent',
+            )
+
+        def b():
+            GrandChild().save()
+        for i, test in enumerate([a, b]):
+            with self.subTest(i=i), self.assertNumQueries(4), CaptureQueriesContext(connection) as queries:
+                test()
+                for query in queries:
+                    sql = query['sql']
+                    self.assertIn('INSERT INTO', sql, sql)
+
     def test_eq(self):
         # Equality doesn't transfer in multitable inheritance.
         self.assertNotEqual(Place(id=1), Restaurant(id=1))
@@ -158,22 +174,35 @@ class ModelInheritanceTests(TestCase):
 
         self.assertIs(C._meta.parents[A], C._meta.get_field('a'))
 
-    @unittest.skipUnless(PY36, 'init_subclass is new in Python 3.6')
     @isolate_apps('model_inheritance')
     def test_init_subclass(self):
         saved_kwargs = {}
 
-        class A:
+        class A(models.Model):
             def __init_subclass__(cls, **kwargs):
                 super().__init_subclass__()
                 saved_kwargs.update(kwargs)
 
         kwargs = {'x': 1, 'y': 2, 'z': 3}
 
-        class B(A, models.Model, **kwargs):
+        class B(A, **kwargs):
             pass
 
         self.assertEqual(saved_kwargs, kwargs)
+
+    @isolate_apps('model_inheritance')
+    def test_set_name(self):
+        class ClassAttr:
+            called = None
+
+            def __set_name__(self_, owner, name):
+                self.assertIsNone(self_.called)
+                self_.called = (owner, name)
+
+        class A(models.Model):
+            attr = ClassAttr()
+
+        self.assertEqual(A.attr.called, (A, 'attr'))
 
 
 class ModelInheritanceDataTests(TestCase):
@@ -461,8 +490,8 @@ class InheritanceSameModelNameTests(SimpleTestCase):
         ForeignReferent = Referent
 
         self.assertFalse(hasattr(Referenced, related_name))
-        self.assertTrue(Referenced.model_inheritance_referent_references.rel.model, LocalReferent)
-        self.assertTrue(Referenced.tests_referent_references.rel.model, ForeignReferent)
+        self.assertIs(Referenced.model_inheritance_referent_references.field.model, LocalReferent)
+        self.assertIs(Referenced.tests_referent_references.field.model, ForeignReferent)
 
 
 class InheritanceUniqueTests(TestCase):

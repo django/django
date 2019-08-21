@@ -3,15 +3,13 @@ from django.db.utils import InterfaceError
 
 
 class DatabaseFeatures(BaseDatabaseFeatures):
-    empty_fetchmany_value = ()
     interprets_empty_strings_as_nulls = True
-    uses_savepoints = True
     has_select_for_update = True
     has_select_for_update_nowait = True
     has_select_for_update_skip_locked = True
     has_select_for_update_of = True
     select_for_update_of_column = True
-    can_return_id_from_insert = True
+    can_return_columns_from_insert = True
     can_introspect_autofield = True
     supports_subqueries_in_group_by = False
     supports_transactions = True
@@ -22,6 +20,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     truncates_names = True
     supports_tablespaces = True
     supports_sequence_reset = False
+    can_introspect_materialized_views = True
     can_introspect_time_field = False
     atomic_transactions = False
     supports_combined_alters = False
@@ -29,7 +28,6 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     requires_literal_defaults = True
     closed_cursor_error_class = InterfaceError
     bare_select_suffix = " FROM DUAL"
-    uppercases_column_names = True
     # select for update with limit can be achieved on Oracle, but not with the current backend.
     supports_select_for_update_with_limit = False
     supports_temporal_subtraction = True
@@ -54,4 +52,10 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     """
     supports_callproc_kwargs = True
     supports_over_clause = True
+    supports_frame_range_fixed_distance = True
+    supports_ignore_conflicts = False
     max_query_params = 2**16 - 1
+    supports_partial_indexes = False
+    supports_slicing_ordering_in_compound = True
+    allows_multiple_constraints_on_same_fields = False
+    supports_boolean_expr_in_select_clause = False

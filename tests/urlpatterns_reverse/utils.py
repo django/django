@@ -1,13 +1,13 @@
-from django.conf.urls import url
+from django.urls import path, re_path
 
 from . import views
 
 
 class URLObject:
     urlpatterns = [
-        url(r'^inner/$', views.empty_view, name='urlobject-view'),
-        url(r'^inner/(?P<arg1>[0-9]+)/(?P<arg2>[0-9]+)/$', views.empty_view, name='urlobject-view'),
-        url(r'^inner/\+\\\$\*/$', views.empty_view, name='urlobject-special-view'),
+        path('inner/', views.empty_view, name='urlobject-view'),
+        re_path(r'^inner/(?P<arg1>[0-9]+)/(?P<arg2>[0-9]+)/$', views.empty_view, name='urlobject-view'),
+        re_path(r'^inner/\+\\\$\*/$', views.empty_view, name='urlobject-special-view'),
     ]
 
     def __init__(self, app_name, namespace=None):

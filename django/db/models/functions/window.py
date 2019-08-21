@@ -1,4 +1,5 @@
-from django.db.models import FloatField, Func, IntegerField
+from django.db.models.expressions import Func
+from django.db.models.fields import FloatField, IntegerField
 
 __all__ = [
     'CumeDist', 'DenseRank', 'FirstValue', 'Lag', 'LastValue', 'Lead',
@@ -8,14 +9,12 @@ __all__ = [
 
 class CumeDist(Func):
     function = 'CUME_DIST'
-    name = 'CumeDist'
     output_field = FloatField()
     window_compatible = True
 
 
 class DenseRank(Func):
     function = 'DENSE_RANK'
-    name = 'DenseRank'
     output_field = IntegerField()
     window_compatible = True
 
@@ -23,7 +22,6 @@ class DenseRank(Func):
 class FirstValue(Func):
     arity = 1
     function = 'FIRST_VALUE'
-    name = 'FirstValue'
     window_compatible = True
 
 
@@ -53,24 +51,20 @@ class LagLeadFunction(Func):
 
 class Lag(LagLeadFunction):
     function = 'LAG'
-    name = 'Lag'
 
 
 class LastValue(Func):
     arity = 1
     function = 'LAST_VALUE'
-    name = 'LastValue'
     window_compatible = True
 
 
 class Lead(LagLeadFunction):
     function = 'LEAD'
-    name = 'Lead'
 
 
 class NthValue(Func):
     function = 'NTH_VALUE'
-    name = 'NthValue'
     window_compatible = True
 
     def __init__(self, expression, nth=1, **extra):
@@ -87,7 +81,6 @@ class NthValue(Func):
 
 class Ntile(Func):
     function = 'NTILE'
-    name = 'Ntile'
     output_field = IntegerField()
     window_compatible = True
 
@@ -99,20 +92,17 @@ class Ntile(Func):
 
 class PercentRank(Func):
     function = 'PERCENT_RANK'
-    name = 'PercentRank'
     output_field = FloatField()
     window_compatible = True
 
 
 class Rank(Func):
     function = 'RANK'
-    name = 'Rank'
     output_field = IntegerField()
     window_compatible = True
 
 
 class RowNumber(Func):
     function = 'ROW_NUMBER'
-    name = 'RowNumber'
     output_field = IntegerField()
     window_compatible = True

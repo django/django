@@ -13,8 +13,8 @@ from .models import City, Country
 @override_settings(ROOT_URLCONF='gis_tests.geoapp.urls')
 class GeoSitemapTest(TestCase):
 
-    def setUp(self):
-        super().setUp()
+    @classmethod
+    def setUpTestData(cls):
         Site(id=settings.SITE_ID, domain="example.com", name="example.com").save()
 
     def assertChildNodes(self, elem, expected):

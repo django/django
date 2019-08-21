@@ -4,7 +4,7 @@ from django.conf import settings
 from django.db.backends.base.operations import BaseDatabaseOperations
 from django.utils import timezone
 from django.utils.duration import duration_microseconds
-from django.utils.encoding import force_text
+from django.utils.encoding import force_str
 
 
 class DatabaseOperations(BaseDatabaseOperations):
@@ -17,7 +17,12 @@ class DatabaseOperations(BaseDatabaseOperations):
         'PositiveIntegerField': (0, 4294967295),
     }
     cast_data_types = {
+        'AutoField': 'signed integer',
+        'BigAutoField': 'signed integer',
+        'SmallAutoField': 'signed integer',
         'CharField': 'char(%(max_length)s)',
+        'DecimalField': 'decimal(%(max_digits)s, %(decimal_places)s)',
+        'TextField': 'char',
         'IntegerField': 'signed integer',
         'BigIntegerField': 'signed integer',
         'SmallIntegerField': 'signed integer',
@@ -25,9 +30,10 @@ class DatabaseOperations(BaseDatabaseOperations):
         'PositiveSmallIntegerField': 'unsigned integer',
     }
     cast_char_field_without_max_length = 'char'
+    explain_prefix = 'EXPLAIN'
 
     def date_extract_sql(self, lookup_type, field_name):
-        # http://dev.mysql.com/doc/mysql/en/date-and-time-functions.html
+        # https://dev.mysql.com/doc/mysql/en/date-and-time-functions.html
         if lookup_type == 'week_day':
             # DAYOFWEEK() returns an integer, 1-7, Sunday=1.
             # Note: WEEKDAY() returns 0-6, Monday=0.
@@ -37,6 +43,10 @@ class DatabaseOperations(BaseDatabaseOperations):
             # other database backends.
             # Mode 3: Monday, 1-53, with 4 or more days this year.
             return "WEEK(%s, 3)" % field_name
+        elif lookup_type == 'iso_year':
+            # Get the year part from the YEARWEEK function, which returns a
+            # number as year * 100 + week.
+            return "TRUNCATE(YEARWEEK(%s, 3), -2) / 100" % field_name
         else:
             # EXTRACT returns 1-53 based on ISO-8601 for the week number.
             return "EXTRACT(%s FROM %s)" % (lookup_type.upper(), field_name)
@@ -60,9 +70,20 @@ class DatabaseOperations(BaseDatabaseOperations):
         else:
             return "DATE(%s)" % (field_name)
 
+    def _prepare_tzname_delta(self, tzname):
+        if '+' in tzname:
+            return tzname[tzname.find('+'):]
+        elif '-' in tzname:
+            return tzname[tzname.find('-'):]
+        return tzname
+
     def _convert_field_to_tz(self, field_name, tzname):
-        if settings.USE_TZ:
-            field_name = "CONVERT_TZ(%s, 'UTC', '%s')" % (field_name, tzname)
+        if settings.USE_TZ and self.connection.timezone_name != tzname:
+            field_name = "CONVERT_TZ(%s, '%s', '%s')" % (
+                field_name,
+                self.connection.timezone_name,
+                self._prepare_tzname_delta(tzname),
+            )
         return field_name
 
     def datetime_cast_date_sql(self, field_name, tzname):
@@ -99,7 +120,7 @@ class DatabaseOperations(BaseDatabaseOperations):
         except ValueError:
             sql = field_name
         else:
-            format_str = ''.join([f for f in format[:i]] + [f for f in format_def[i:]])
+            format_str = ''.join(format[:i] + format_def[i:])
             sql = "CAST(DATE_FORMAT(%s, '%s') AS DATETIME)" % (field_name, format_str)
         return sql
 
@@ -130,10 +151,11 @@ class DatabaseOperations(BaseDatabaseOperations):
         return [(None, ("NULL", [], False))]
 
     def last_executed_query(self, cursor, sql, params):
-        # With MySQLdb, cursor objects have an (undocumented) "_last_executed"
+        # With MySQLdb, cursor objects have an (undocumented) "_executed"
         # attribute where the exact query sent to the database is saved.
         # See MySQLdb/cursors.py in the source distribution.
-        return force_text(getattr(cursor, '_last_executed', None), errors='replace')
+        # MySQLdb returns string, PyMySQL bytes.
+        return force_str(getattr(cursor, '_executed', None), errors='replace')
 
     def no_limit_value(self):
         # 2**64 - 1, as recommended by the MySQL documentation
@@ -224,9 +246,7 @@ class DatabaseOperations(BaseDatabaseOperations):
     def get_db_converters(self, expression):
         converters = super().get_db_converters(expression)
         internal_type = expression.output_field.get_internal_type()
-        if internal_type == 'TextField':
-            converters.append(self.convert_textfield_value)
-        elif internal_type in ['BooleanField', 'NullBooleanField']:
+        if internal_type in ['BooleanField', 'NullBooleanField']:
             converters.append(self.convert_booleanfield_value)
         elif internal_type == 'DateTimeField':
             if settings.USE_TZ:
@@ -234,11 +254,6 @@ class DatabaseOperations(BaseDatabaseOperations):
         elif internal_type == 'UUIDField':
             converters.append(self.convert_uuidfield_value)
         return converters
-
-    def convert_textfield_value(self, value, expression, connection):
-        if value is not None:
-            value = force_text(value)
-        return value
 
     def convert_booleanfield_value(self, value, expression, connection):
         if value in (0, 1):
@@ -262,9 +277,41 @@ class DatabaseOperations(BaseDatabaseOperations):
         lhs_sql, lhs_params = lhs
         rhs_sql, rhs_params = rhs
         if internal_type == 'TimeField':
+            if self.connection.mysql_is_mariadb:
+                # MariaDB includes the microsecond component in TIME_TO_SEC as
+                # a decimal. MySQL returns an integer without microseconds.
+                return 'CAST((TIME_TO_SEC(%(lhs)s) - TIME_TO_SEC(%(rhs)s)) * 1000000 AS SIGNED)' % {
+                    'lhs': lhs_sql, 'rhs': rhs_sql
+                }, lhs_params + rhs_params
             return (
-                "((TIME_TO_SEC(%(lhs)s) * POW(10, 6) + MICROSECOND(%(lhs)s)) -"
-                " (TIME_TO_SEC(%(rhs)s) * POW(10, 6) + MICROSECOND(%(rhs)s)))"
+                "((TIME_TO_SEC(%(lhs)s) * 1000000 + MICROSECOND(%(lhs)s)) -"
+                " (TIME_TO_SEC(%(rhs)s) * 1000000 + MICROSECOND(%(rhs)s)))"
             ) % {'lhs': lhs_sql, 'rhs': rhs_sql}, lhs_params * 2 + rhs_params * 2
         else:
             return "TIMESTAMPDIFF(MICROSECOND, %s, %s)" % (rhs_sql, lhs_sql), rhs_params + lhs_params
+
+    def explain_query_prefix(self, format=None, **options):
+        # Alias MySQL's TRADITIONAL to TEXT for consistency with other backends.
+        if format and format.upper() == 'TEXT':
+            format = 'TRADITIONAL'
+        prefix = super().explain_query_prefix(format, **options)
+        if format:
+            prefix += ' FORMAT=%s' % format
+        if self.connection.features.needs_explain_extended and format is None:
+            # EXTENDED and FORMAT are mutually exclusive options.
+            prefix += ' EXTENDED'
+        return prefix
+
+    def regex_lookup(self, lookup_type):
+        # REGEXP BINARY doesn't work correctly in MySQL 8+ and REGEXP_LIKE
+        # doesn't exist in MySQL 5.6 or in MariaDB.
+        if self.connection.mysql_version < (8, 0, 0) or self.connection.mysql_is_mariadb:
+            if lookup_type == 'regex':
+                return '%s REGEXP BINARY %s'
+            return '%s REGEXP %s'
+
+        match_option = 'c' if lookup_type == 'regex' else 'i'
+        return "REGEXP_LIKE(%%s, %%s, '%s')" % match_option
+
+    def insert_statement(self, ignore_conflicts=False):
+        return 'INSERT IGNORE INTO' if ignore_conflicts else super().insert_statement(ignore_conflicts)

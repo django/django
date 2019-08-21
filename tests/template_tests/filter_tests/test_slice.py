@@ -26,6 +26,9 @@ class FunctionTests(SimpleTestCase):
     def test_index(self):
         self.assertEqual(slice_filter('abcdefg', '1'), 'a')
 
+    def test_index_integer(self):
+        self.assertEqual(slice_filter('abcdefg', 1), 'a')
+
     def test_negative_index(self):
         self.assertEqual(slice_filter('abcdefg', '-1'), 'abcdef')
 

@@ -18,7 +18,7 @@ Example
 context of the units.  In the example below, two different distance objects are
 instantiated in units of kilometers (``km``) and miles (``mi``)::
 
-    >>> from django.contrib.gis.measure import Distance, D
+    >>> from django.contrib.gis.measure import D, Distance
     >>> d1 = Distance(km=5)
     >>> print(d1)
     5.0 km
@@ -93,6 +93,7 @@ Unit Attribute                     Full name or alias(es)
 ``clarke_link``                    Clarke's link
 ``fathom``                         Fathom
 ``rod``                            Rod
+``furlong``                        Furlong, Furrow Long
 ``nm``                             Nautical Mile
 ``nm_uk``                          Nautical Mile (UK)
 ``german_m``                       German legal metre

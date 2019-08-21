@@ -113,11 +113,10 @@ class SelectForUpdateTests(TransactionTestCase):
             ))
         features = connections['default'].features
         if features.select_for_update_of_column:
-            expected = ['"select_for_update_person"."id"', '"select_for_update_country"."id"']
+            expected = ['select_for_update_person"."id', 'select_for_update_country"."id']
         else:
-            expected = ['"select_for_update_person"', '"select_for_update_country"']
-        if features.uppercases_column_names:
-            expected = [value.upper() for value in expected]
+            expected = ['select_for_update_person', 'select_for_update_country']
+        expected = [connection.ops.quote_name(value) for value in expected]
         self.assertTrue(self.has_for_update_sql(ctx.captured_queries, of=expected))
 
     @skipUnlessDBFeature('has_select_for_update_of')
@@ -376,7 +375,7 @@ class SelectForUpdateTests(TransactionTestCase):
 
         # Check the thread has finished. Assuming it has, we should
         # find that it has updated the person's name.
-        self.assertFalse(thread.isAlive())
+        self.assertFalse(thread.is_alive())
 
         # We must commit the transaction to ensure that MySQL gets a fresh read,
         # since by default it runs in REPEATABLE READ mode

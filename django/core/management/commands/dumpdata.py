@@ -1,5 +1,4 @@
 import warnings
-from collections import OrderedDict
 
 from django.apps import apps
 from django.core import serializers
@@ -24,21 +23,21 @@ class Command(BaseCommand):
             help='Restricts dumped data to the specified app_label or app_label.ModelName.',
         )
         parser.add_argument(
-            '--format', default='json', dest='format',
+            '--format', default='json',
             help='Specifies the output serialization format for fixtures.',
         )
         parser.add_argument(
-            '--indent', default=None, dest='indent', type=int,
+            '--indent', type=int,
             help='Specifies the indent level to use when pretty-printing output.',
         )
         parser.add_argument(
-            '--database', action='store', dest='database',
+            '--database',
             default=DEFAULT_DB_ALIAS,
             help='Nominates a specific database to dump fixtures from. '
                  'Defaults to the "default" database.',
         )
         parser.add_argument(
-            '-e', '--exclude', dest='exclude', action='append', default=[],
+            '-e', '--exclude', action='append', default=[],
             help='An app_label or app_label.ModelName to exclude '
                  '(use multiple --exclude to exclude multiple apps/models).',
         )
@@ -61,7 +60,7 @@ class Command(BaseCommand):
                  "list of keys. This option only works when you specify one model.",
         )
         parser.add_argument(
-            '-o', '--output', default=None, dest='output',
+            '-o', '--output',
             help='Specifies file to which the output is written.'
         )
 
@@ -87,14 +86,14 @@ class Command(BaseCommand):
         if not app_labels:
             if primary_keys:
                 raise CommandError("You can only use --pks option with one model")
-            app_list = OrderedDict.fromkeys(
+            app_list = dict.fromkeys(
                 app_config for app_config in apps.get_app_configs()
                 if app_config.models_module is not None and app_config not in excluded_apps
             )
         else:
             if len(app_labels) > 1 and primary_keys:
                 raise CommandError("You can only use --pks option with one model")
-            app_list = OrderedDict()
+            app_list = {}
             for label in app_labels:
                 try:
                     app_label, model_label = label.split('.')
@@ -111,7 +110,7 @@ class Command(BaseCommand):
 
                     app_list_value = app_list.setdefault(app_config, [])
 
-                    # We may have previously seen a "all-models" request for
+                    # We may have previously seen an "all-models" request for
                     # this app (no model qualifier was given). In this case
                     # there is no need adding specific models to the list.
                     if app_list_value is not None:

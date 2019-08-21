@@ -1,27 +1,34 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Brian Wang <singeeking@gmail.com>, 2018
 # Fulong Sun <sunfulong@neusoft.edu.cn>, 2016
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Kevin Sze <leiarix@gmail.com>, 2012
 # Lele Long <schemacs@gmail.com>, 2011,2015
+# Le Yang <youngleocn@qq.com>, 2018
 # Liping Wang <lynn.config@gmail.com>, 2016-2017
 # mozillazg <opensource.mozillazg@gmail.com>, 2016
-# Ronald White <ouyanghongyu@gmail.com>, 2013-2014
+# Ronald White <tkliuxing@me.com>, 2013-2014
 # Sean Lee <iseansay@gmail.com>, 2013
 # Sean Lee <iseansay@gmail.com>, 2013
 # slene <vslene@gmail.com>, 2011
-# Ziang Song <songziang@gmail.com>, 2012
+# Suntravel Chris <chrisfromcn@gmail.com>, 2019
+# Wentao Han <wentao.han@gmail.com>, 2018
+# xuyi wang <xuyi.wg@gmail.com>, 2018
+# yf zhan <daxian12345@gmail.com>, 2018
+# dykai <yingkaidang@gmail.com>, 2019
+# ced773123cfad7b4e8b79ca80f736af9, 2012
 # Kevin Sze <leiarix@gmail.com>, 2012
 # 雨翌 <yumendy@163.com>, 2016
-# Ronald White <ouyanghongyu@gmail.com>, 2013
+# Ronald White <tkliuxing@me.com>, 2013
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-09-19 16:40+0000\n"
-"Last-Translator: Liping Wang <lynn.config@gmail.com>\n"
+"POT-Creation-Date: 2019-01-16 20:42+0100\n"
+"PO-Revision-Date: 2019-02-15 05:12+0000\n"
+"Last-Translator: dykai <yingkaidang@gmail.com>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/django/django/"
 "language/zh_CN/)\n"
 "MIME-Version: 1.0\n"
@@ -97,6 +104,15 @@ msgstr "添加另一个 %(verbose_name)s"
 msgid "Remove"
 msgstr "删除"
 
+msgid "Addition"
+msgstr "添加"
+
+msgid "Change"
+msgstr "修改"
+
+msgid "Deletion"
+msgstr "删除"
+
 msgid "action time"
 msgstr "动作时间"
 
@@ -110,7 +126,7 @@ msgid "object id"
 msgstr "对象id"
 
 #. Translators: 'repr' means representation
-#. (https://docs.python.org/3/library/functions.html#repr)
+#. (https://docs.python.org/library/functions.html#repr)
 msgid "object repr"
 msgstr "对象表示"
 
@@ -143,7 +159,7 @@ msgstr "LogEntry对象"
 
 #, python-brace-format
 msgid "Added {name} \"{object}\"."
-msgstr "以添加{name}\"{object}\"。"
+msgstr "已添加{name}\"{object}\"。"
 
 msgid "Added."
 msgstr "已添加。"
@@ -174,9 +190,11 @@ msgid ""
 msgstr "按住 ”Control“，或者Mac上的 “Command”，可以选择多个。"
 
 #, python-brace-format
-msgid ""
-"The {name} \"{obj}\" was added successfully. You may edit it again below."
-msgstr "{name} \"{obj}\" 已经添加成功。你可以在下面再次编辑它。"
+msgid "The {name} \"{obj}\" was added successfully."
+msgstr "{name}\"{obj}\"添加成功。"
+
+msgid "You may edit it again below."
+msgstr "您可以在下面再次编辑它."
 
 #, python-brace-format
 msgid ""
@@ -185,13 +203,14 @@ msgid ""
 msgstr "{name} \"{obj}\" 已经添加成功。你可以在下面添加其它的{name}。"
 
 #, python-brace-format
-msgid "The {name} \"{obj}\" was added successfully."
-msgstr "{name}\"{obj}\"添加成功。"
-
-#, python-brace-format
 msgid ""
 "The {name} \"{obj}\" was changed successfully. You may edit it again below."
 msgstr "{name} \"{obj}\" 添加成功。你可以在下面再次编辑它。"
+
+#, python-brace-format
+msgid ""
+"The {name} \"{obj}\" was added successfully. You may edit it again below."
+msgstr "{name} \"{obj}\" 已经添加成功。你可以在下面再次编辑它。"
 
 #, python-brace-format
 msgid ""
@@ -226,6 +245,10 @@ msgstr "增加 %s"
 #, python-format
 msgid "Change %s"
 msgstr "修改 %s"
+
+#, python-format
+msgid "View %s"
+msgstr "查看 %s"
 
 msgid "Database error"
 msgstr "数据库错误"
@@ -282,7 +305,7 @@ msgid "Page not found"
 msgstr "页面没有找到"
 
 msgid "We're sorry, but the requested page could not be found."
-msgstr "很报歉，请求页面无法找到。"
+msgstr "很抱歉，请求页面无法找到。"
 
 msgid "Home"
 msgstr "首页"
@@ -325,13 +348,13 @@ msgid ""
 msgstr "首先，输入一个用户名和密码。然后，你就可以编辑更多的用户选项。"
 
 msgid "Enter a username and password."
-msgstr "输入用户名和"
+msgstr "输入用户名和密码"
 
 msgid "Change password"
 msgstr "修改密码"
 
 msgid "Please correct the error below."
-msgstr "请修正下面的错误。"
+msgstr "请更正下列错误。"
 
 msgid "Please correct the errors below."
 msgstr "请更正下列错误。"
@@ -437,8 +460,8 @@ msgstr ""
 "请确认要删除选中的 %(objects_name)s 吗？以下所有对象和余它们相关的条目将都会"
 "被删除："
 
-msgid "Change"
-msgstr "修改"
+msgid "View"
+msgstr "查看"
 
 msgid "Delete?"
 msgstr "删除？"
@@ -457,8 +480,8 @@ msgstr "在应用程序 %(name)s 中的模型"
 msgid "Add"
 msgstr "增加"
 
-msgid "You don't have permission to edit anything."
-msgstr "你无权修改任何东西。"
+msgid "You don't have permission to view or edit anything."
+msgstr "无权查看或修改。"
 
 msgid "Recent actions"
 msgstr "最近动作"
@@ -511,20 +534,8 @@ msgstr "显示全部"
 msgid "Save"
 msgstr "保存"
 
-msgid "Popup closing..."
-msgstr "弹窗关闭中。。。"
-
-#, python-format
-msgid "Change selected %(model)s"
-msgstr "更改选中的%(model)s"
-
-#, python-format
-msgid "Add another %(model)s"
-msgstr "增加另一个 %(model)s"
-
-#, python-format
-msgid "Delete selected %(model)s"
-msgstr "取消选中 %(model)s"
+msgid "Popup closing…"
+msgstr "弹窗关闭中..."
 
 msgid "Search"
 msgstr "搜索"
@@ -546,6 +557,24 @@ msgstr "保存并增加另一个"
 
 msgid "Save and continue editing"
 msgstr "保存并继续编辑"
+
+msgid "Save and view"
+msgstr "保存并查看"
+
+msgid "Close"
+msgstr "关闭"
+
+#, python-format
+msgid "Change selected %(model)s"
+msgstr "更改选中的%(model)s"
+
+#, python-format
+msgid "Add another %(model)s"
+msgstr "增加另一个 %(model)s"
+
+#, python-format
+msgid "Delete selected %(model)s"
+msgstr "取消选中 %(model)s"
 
 msgid "Thanks for spending some quality time with the Web site today."
 msgstr "感谢您今天在本站花费了一些宝贵时间。"
@@ -573,7 +602,7 @@ msgid "Password reset"
 msgstr "密码重设"
 
 msgid "Your password has been set.  You may go ahead and log in now."
-msgstr "你的口令己经设置。现在你可以继续进行登录。"
+msgstr "你的密码己经设置完成，现在你可以继续进行登录。"
 
 msgid "Password reset confirmation"
 msgstr "密码重设确认"
@@ -649,6 +678,10 @@ msgstr "选择 %s"
 #, python-format
 msgid "Select %s to change"
 msgstr "选择 %s 来修改"
+
+#, python-format
+msgid "Select %s to view"
+msgstr "选择%s查看"
 
 msgid "Date:"
 msgstr "日期："

@@ -97,8 +97,7 @@ class BaseCache:
         if version is None:
             version = self.version
 
-        new_key = self.key_func(key, self.key_prefix, version)
-        return new_key
+        return self.key_func(key, self.key_prefix, version)
 
     def add(self, key, value, timeout=DEFAULT_TIMEOUT, version=None):
         """
@@ -123,6 +122,13 @@ class BaseCache:
         key; otherwise use the default cache timeout.
         """
         raise NotImplementedError('subclasses of BaseCache must provide a set() method')
+
+    def touch(self, key, timeout=DEFAULT_TIMEOUT, version=None):
+        """
+        Update the key's expiry time using timeout. Return True if successful
+        or False if the key does not exist.
+        """
+        raise NotImplementedError('subclasses of BaseCache must provide a touch() method')
 
     def delete(self, key, version=None):
         """

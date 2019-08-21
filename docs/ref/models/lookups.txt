@@ -36,7 +36,7 @@ Registration API
 Django uses :class:`~lookups.RegisterLookupMixin` to give a class the interface to
 register lookups on itself. The two prominent examples are
 :class:`~django.db.models.Field`, the base class of all model fields, and
-``Aggregate``, the base class of all Django aggregates.
+:class:`Transform`, the base class of all Django transforms.
 
 .. class:: lookups.RegisterLookupMixin
 
@@ -56,6 +56,11 @@ register lookups on itself. The two prominent examples are
         The default implementation looks recursively on all parent classes
         and checks if any has a registered lookup named ``lookup_name``, returning
         the first match.
+
+    .. method:: get_lookups()
+
+        Returns a dictionary of each lookup name registered in the class mapped
+        to the :class:`Lookup` class.
 
     .. method:: get_transform(transform_name)
 
@@ -127,7 +132,7 @@ following methods:
     prominent example is ``__year`` that transforms a ``DateField`` into a
     ``IntegerField``.
 
-    The notation to use a ``Transform`` in an lookup expression is
+    The notation to use a ``Transform`` in a lookup expression is
     ``<expression>__<transformation>`` (e.g. ``date__year``).
 
     This class follows the :ref:`Query Expression API <query-expression>`, which

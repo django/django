@@ -1,15 +1,15 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Claude Paroz <claude@2xlibre.net>, 2013-2017
+# Claude Paroz <claude@2xlibre.net>, 2013-2019
 # Claude Paroz <claude@2xlibre.net>, 2011,2013
 # Jannis Leidel <jannis@leidel.info>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-09-19 16:41+0000\n"
+"POT-Creation-Date: 2019-01-16 20:42+0100\n"
+"PO-Revision-Date: 2019-01-18 17:28+0000\n"
 "Last-Translator: Claude Paroz <claude@2xlibre.net>\n"
 "Language-Team: French (http://www.transifex.com/django/django/language/fr/)\n"
 "MIME-Version: 1.0\n"
@@ -88,6 +88,15 @@ msgstr "Ajouter un objet %(verbose_name)s supplémentaire"
 msgid "Remove"
 msgstr "Supprimer"
 
+msgid "Addition"
+msgstr "Ajout"
+
+msgid "Change"
+msgstr "Modifier"
+
+msgid "Deletion"
+msgstr "Suppression"
+
 msgid "action time"
 msgstr "heure de l'action"
 
@@ -101,7 +110,7 @@ msgid "object id"
 msgstr "id de l'objet"
 
 #. Translators: 'repr' means representation
-#. (https://docs.python.org/3/library/functions.html#repr)
+#. (https://docs.python.org/library/functions.html#repr)
 msgid "object repr"
 msgstr "représentation de l'objet"
 
@@ -122,7 +131,7 @@ msgid "Added \"%(object)s\"."
 msgstr "Ajout de « %(object)s »."
 
 #, python-format
-msgid "Changed \"%(object)s\" - %(changes)s"
+msgid "Changed “%(object)s” - %(changes)s"
 msgstr "Modification de « %(object)s » - %(changes)s"
 
 #, python-format
@@ -133,7 +142,7 @@ msgid "LogEntry Object"
 msgstr "Objet de journal"
 
 #, python-brace-format
-msgid "Added {name} \"{object}\"."
+msgid "Added {name} “{object}”."
 msgstr "Ajout de {name} « {object} »."
 
 msgid "Added."
@@ -143,7 +152,7 @@ msgid "and"
 msgstr "et"
 
 #, python-brace-format
-msgid "Changed {fields} for {name} \"{object}\"."
+msgid "Changed {fields} for {name} “{object}”."
 msgstr "Modification de {fields} pour l'objet {name} « {object} »."
 
 #, python-brace-format
@@ -151,7 +160,7 @@ msgid "Changed {fields}."
 msgstr "Modification de {fields}."
 
 #, python-brace-format
-msgid "Deleted {name} \"{object}\"."
+msgid "Deleted {name} “{object}”."
 msgstr "Suppression de {name} « {object} »."
 
 msgid "No fields changed."
@@ -167,11 +176,11 @@ msgstr ""
 "en sélectionner plusieurs."
 
 #, python-brace-format
-msgid ""
-"The {name} \"{obj}\" was added successfully. You may edit it again below."
-msgstr ""
-"L'objet {name} « {obj} » a été ajouté avec succès. Vous pouvez continuer "
-"l'édition ci-dessous."
+msgid "The {name} \"{obj}\" was added successfully."
+msgstr "L'objet {name} « {obj} » a été ajouté avec succès."
+
+msgid "You may edit it again below."
+msgstr "Vous pouvez l'éditer à nouveau ci-dessous."
 
 #, python-brace-format
 msgid ""
@@ -182,14 +191,17 @@ msgstr ""
 "autre objet « {name} » ci-dessous."
 
 #, python-brace-format
-msgid "The {name} \"{obj}\" was added successfully."
-msgstr "L'objet {name} « {obj} » a été ajouté avec succès."
-
-#, python-brace-format
 msgid ""
 "The {name} \"{obj}\" was changed successfully. You may edit it again below."
 msgstr ""
 "L'objet {name} « {obj} » a été modifié avec succès. Vous pouvez continuer "
+"l'édition ci-dessous."
+
+#, python-brace-format
+msgid ""
+"The {name} \"{obj}\" was added successfully. You may edit it again below."
+msgstr ""
+"L'objet {name} « {obj} » a été ajouté avec succès. Vous pouvez continuer "
 "l'édition ci-dessous."
 
 #, python-brace-format
@@ -231,6 +243,10 @@ msgstr "Ajout %s"
 #, python-format
 msgid "Change %s"
 msgstr "Modification de %s"
+
+#, python-format
+msgid "View %s"
+msgstr "Afficher %s"
 
 msgid "Database error"
 msgstr "Erreur de base de données"
@@ -341,7 +357,7 @@ msgid "Change password"
 msgstr "Modifier le mot de passe"
 
 msgid "Please correct the error below."
-msgstr "Corrigez les erreurs suivantes."
+msgstr "Corrigez l'erreur ci-dessous."
 
 msgid "Please correct the errors below."
 msgstr "Corrigez les erreurs ci-dessous."
@@ -455,8 +471,8 @@ msgstr ""
 "Voulez-vous vraiment supprimer les objets %(objects_name)s sélectionnés ? "
 "Tous les objets suivants et les éléments liés seront supprimés :"
 
-msgid "Change"
-msgstr "Modifier"
+msgid "View"
+msgstr "Afficher"
 
 msgid "Delete?"
 msgstr "Supprimer ?"
@@ -475,8 +491,8 @@ msgstr "Modèles de l'application %(name)s"
 msgid "Add"
 msgstr "Ajouter"
 
-msgid "You don't have permission to edit anything."
-msgstr "Vous n'avez pas la permission de modifier quoi que ce soit."
+msgid "You don't have permission to view or edit anything."
+msgstr "Vous n'avez pas la permission de voir ou de modifier quoi que ce soit."
 
 msgid "Recent actions"
 msgstr "Actions récentes"
@@ -533,20 +549,8 @@ msgstr "Tout afficher"
 msgid "Save"
 msgstr "Enregistrer"
 
-msgid "Popup closing..."
+msgid "Popup closing…"
 msgstr "Fenêtre en cours de fermeture…"
-
-#, python-format
-msgid "Change selected %(model)s"
-msgstr "Modifier l'objet %(model)s sélectionné"
-
-#, python-format
-msgid "Add another %(model)s"
-msgstr "Ajouter un autre objet %(model)s"
-
-#, python-format
-msgid "Delete selected %(model)s"
-msgstr "Supprimer l'objet %(model)s sélectionné"
 
 msgid "Search"
 msgstr "Rechercher"
@@ -569,6 +573,24 @@ msgstr "Enregistrer et ajouter un nouveau"
 
 msgid "Save and continue editing"
 msgstr "Enregistrer et continuer les modifications"
+
+msgid "Save and view"
+msgstr "Enregistrer et afficher"
+
+msgid "Close"
+msgstr "Fermer"
+
+#, python-format
+msgid "Change selected %(model)s"
+msgstr "Modifier l'objet %(model)s sélectionné"
+
+#, python-format
+msgid "Add another %(model)s"
+msgstr "Ajouter un autre objet %(model)s"
+
+#, python-format
+msgid "Delete selected %(model)s"
+msgstr "Supprimer l'objet %(model)s sélectionné"
 
 msgid "Thanks for spending some quality time with the Web site today."
 msgstr "Merci pour le temps que vous avez accordé à ce site aujourd'hui."
@@ -685,6 +707,10 @@ msgstr "Sélectionnez %s"
 #, python-format
 msgid "Select %s to change"
 msgstr "Sélectionnez l'objet %s à changer"
+
+#, python-format
+msgid "Select %s to view"
+msgstr "Sélectionnez l'objet %s à afficher"
 
 msgid "Date:"
 msgstr "Date :"

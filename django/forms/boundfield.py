@@ -63,7 +63,10 @@ class BoundField:
         # Prevent unnecessary reevaluation when accessing BoundField's attrs
         # from templates.
         if not isinstance(idx, (int, slice)):
-            raise TypeError
+            raise TypeError(
+                'BoundField indices must be integers or slices, not %s.'
+                % type(idx).__name__
+            )
         return self.subwidgets[idx]
 
     @property
@@ -248,7 +251,7 @@ class BoundWidget:
         return self.tag(wrap_label=True)
 
     def tag(self, wrap_label=False):
-        context = {'widget': self.data, 'wrap_label': wrap_label}
+        context = {'widget': {**self.data, 'wrap_label': wrap_label}}
         return self.parent_widget._render(self.template_name, context, self.renderer)
 
     @property

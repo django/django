@@ -1,18 +1,21 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Anivar Aravind <anivar.aravind@gmail.com>, 2013
+# c1007a0b890405f1fbddfacebc4c6ef7, 2013
+# Hrishikesh <hrishi.kb@gmail.com>, 2019
 # Jannis Leidel <jannis@leidel.info>, 2011
+# Jaseem KM <napsterjaseem@gmail.com>, 2019
 # Jeffy <jeffymj@gmail.com>, 2012
+# Jibin Mathew <jibin.mathew94@gmail.com>, 2019
 # Rag sagar <ragsagar@gmail.com>, 2016
 # Rajeesh Nair <rajeeshrnair@gmail.com>, 2011-2012
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-11-15 16:15+0100\n"
-"PO-Revision-Date: 2017-11-16 01:13+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2019-01-16 20:42+0100\n"
+"PO-Revision-Date: 2019-03-10 08:55+0000\n"
+"Last-Translator: Hrishikesh <hrishi.kb@gmail.com>\n"
 "Language-Team: Malayalam (http://www.transifex.com/django/django/language/"
 "ml/)\n"
 "MIME-Version: 1.0\n"
@@ -52,7 +55,7 @@ msgid "Catalan"
 msgstr "കാറ്റലന്‍"
 
 msgid "Czech"
-msgstr "ചെക്"
+msgstr "ചെൿ"
 
 msgid "Welsh"
 msgstr "വെല്‍ഷ്"
@@ -64,19 +67,19 @@ msgid "German"
 msgstr "ജര്‍മന്‍"
 
 msgid "Lower Sorbian"
-msgstr ""
+msgstr "ലോവർ സോർബിയൻ "
 
 msgid "Greek"
 msgstr "ഗ്രീക്ക്"
 
 msgid "English"
-msgstr "ഇംഗ്ളീഷ്"
+msgstr "ഇംഗ്ലീഷ്"
 
 msgid "Australian English"
 msgstr "ആസ്ട്രേലിയൻ ഇംഗ്ലീഷ്"
 
 msgid "British English"
-msgstr "ബ്രിട്ടീഷ് ഇംഗ്ളീഷ്"
+msgstr "ബ്രിട്ടീഷ് ഇംഗ്ലീഷ്"
 
 msgid "Esperanto"
 msgstr "എസ്പെരാന്റോ"
@@ -121,13 +124,13 @@ msgid "Irish"
 msgstr "ഐറിഷ്"
 
 msgid "Scottish Gaelic"
-msgstr "സ്കോട്ടിഷ് ഗൈലിക്ക്"
+msgstr "സ്കോട്ടിഷ് ഗൈലിൿ"
 
 msgid "Galician"
 msgstr "ഗലിഷ്യന്‍"
 
 msgid "Hebrew"
-msgstr "ഹീബ്റു"
+msgstr "ഹീബ്രു"
 
 msgid "Hindi"
 msgstr "ഹിന്ദി"
@@ -136,10 +139,13 @@ msgid "Croatian"
 msgstr "ക്രൊയേഷ്യന്‍"
 
 msgid "Upper Sorbian"
-msgstr ""
+msgstr "അപ്പർ സോർബിയൻ "
 
 msgid "Hungarian"
 msgstr "ഹംഗേറിയന്‍"
+
+msgid "Armenian"
+msgstr "അർമേനിയൻ"
 
 msgid "Interlingua"
 msgstr "ഇന്റര്‍ലിംഗ്വാ"
@@ -151,7 +157,7 @@ msgid "Ido"
 msgstr "ഈടോ"
 
 msgid "Icelandic"
-msgstr "ഐസ്ലാന്‍ഡിക്"
+msgstr "ഐസ്ലാന്‍ഡിൿ"
 
 msgid "Italian"
 msgstr "ഇറ്റാലിയന്‍"
@@ -162,8 +168,11 @@ msgstr "ജാപ്പനീസ്"
 msgid "Georgian"
 msgstr "ജോര്‍ജിയന്‍"
 
+msgid "Kabyle"
+msgstr "കാബയെൽ "
+
 msgid "Kazakh"
-msgstr "കസാക്"
+msgstr "കസാഖ്"
 
 msgid "Khmer"
 msgstr "ഖ്മേര്‍"
@@ -223,7 +232,7 @@ msgid "Portuguese"
 msgstr "പോര്‍ചുഗീസ്"
 
 msgid "Brazilian Portuguese"
-msgstr "ബ്റസീലിയന്‍ പോര്‍ചുഗീസ്"
+msgstr "ബ്രസീലിയന്‍ പോര്‍ച്ചുഗീസ്"
 
 msgid "Romanian"
 msgstr "റൊമാനിയന്‍"
@@ -232,7 +241,7 @@ msgid "Russian"
 msgstr "റഷ്യന്‍"
 
 msgid "Slovak"
-msgstr "സ്ളൊവാക്"
+msgstr "സ്ലൊവാൿ"
 
 msgid "Slovenian"
 msgstr "സ്ളൊവേനിയന്‍"
@@ -280,7 +289,7 @@ msgid "Vietnamese"
 msgstr "വിയറ്റ്നാമീസ്"
 
 msgid "Simplified Chinese"
-msgstr "ലഘു ചൈനീസ്"
+msgstr "സിമ്പ്ലിഫൈഡ് ചൈനീസ്"
 
 msgid "Traditional Chinese"
 msgstr "പരമ്പരാഗത ചൈനീസ്"
@@ -289,58 +298,58 @@ msgid "Messages"
 msgstr "സന്ദേശങ്ങൾ"
 
 msgid "Site Maps"
-msgstr "സൈറ്റ് മാപ്പ്"
+msgstr "സൈറ്റ് മാപ്പുകൾ"
 
 msgid "Static Files"
-msgstr " സ്റ്റാറ്റിക്ക് ഫയൽസ്"
+msgstr " സ്റ്റാറ്റിൿ ഫയലുകൾ"
 
 msgid "Syndication"
 msgstr "വിതരണം "
 
 msgid "That page number is not an integer"
-msgstr ""
+msgstr "ആ പേജ് നമ്പർ ഒരു ഇന്റിജറല്ല"
 
 msgid "That page number is less than 1"
-msgstr ""
+msgstr "ആ പേജ് നമ്പർ 1 നെ കാൾ ചെറുതാണ് "
 
 msgid "That page contains no results"
-msgstr ""
+msgstr "ആ പേജിൽ റിസൾട്ടുകൾ ഒന്നും ഇല്ല "
 
 msgid "Enter a valid value."
-msgstr "സാധുതയുള്ള മൂല്യം നല്‍കുക."
+msgstr "ശരിയായ വാല്യു നൽകുക."
 
 msgid "Enter a valid URL."
-msgstr "സാധുതയുള്ള URL നല്‍കുക"
+msgstr "ശരിയായ URL നല്‍കുക"
 
 msgid "Enter a valid integer."
-msgstr "സാധുതയുള്ള അക്കം നല്കുക."
+msgstr "ശരിയായ ഇന്റിജർ നൽകുക."
 
 msgid "Enter a valid email address."
-msgstr "സാധുതയുള്ള ഇമെയില്‍ വിലാസം നല്‍കുക"
+msgstr "ശരിയായ ഇമെയില്‍ വിലാസം നല്‍കുക."
 
 #. Translators: "letters" means latin letters: a-z and A-Z.
 msgid ""
 "Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
 msgstr ""
-"അക്ഷരങ്ങള്‍, അക്കങ്ങള്‍, അണ്ടര്‍സ്കോര്‍, ഹൈഫന്‍ എന്നിവ മാത്രം അടങ്ങിയ സാധുതയുള്ള ഒരുവാക്ക് "
-"ചുരുക്കവാക്കായി നല്‍കുക "
+"അക്ഷരങ്ങള്‍, അക്കങ്ങള്‍, അണ്ടര്‍സ്കോര്‍, ഹൈഫന്‍ എന്നിവ മാത്രം അടങ്ങിയ ശരിയായ ഒരു 'സ്ലഗ്' നൽകുക. "
 
 msgid ""
 "Enter a valid 'slug' consisting of Unicode letters, numbers, underscores, or "
 "hyphens."
 msgstr ""
+"യൂണികോഡ് അക്ഷരങ്ങൾ, നമ്പറുകൾ, ഹൈഫൺ, അണ്ടർസ്കോർ എന്നിവ അടങ്ങിയ ശെരിയായ ‌ഒരു സ്ലഗ് എഴുതുക ."
 
 msgid "Enter a valid IPv4 address."
-msgstr "ശരിയായ IPv4 വിലാസം നല്കണം"
+msgstr "ശരിയായ IPv4 വിലാസം നൽകുക."
 
 msgid "Enter a valid IPv6 address."
-msgstr "ശരിയായ ഒരു IPv6 വിലാസം നല്കുക."
+msgstr "ശരിയായ ഒരു IPv6 വിലാസം നൽകുക."
 
 msgid "Enter a valid IPv4 or IPv6 address."
-msgstr "ശരിയായ ഒരു IPv4 വിലാസമോ IPv6 വിലാസമോ നല്കുക."
+msgstr "ശരിയായ ഒരു IPv4 വിലാസമോ IPv6 വിലാസമോ നൽകുക."
 
 msgid "Enter only digits separated by commas."
-msgstr "അക്കങ്ങള്‍ മാത്രം (കോമയിട്ടു വേര്‍തിരിച്ചത്)"
+msgstr "കോമകൾ ഉപയോഗിച്ച് വേർതിരിച്ച രീതിയിലുള്ള അക്കങ്ങൾ മാത്രം നൽകുക."
 
 #, python-format
 msgid "Ensure this value is %(limit_value)s (it is %(show_value)s)."
@@ -362,7 +371,11 @@ msgid_plural ""
 "Ensure this value has at least %(limit_value)d characters (it has "
 "%(show_value)d)."
 msgstr[0] ""
+"ഈ വാല്യൂയിൽ %(limit_value)d ക്യാരക്ടർ  എങ്കിലും ഉണ്ടെന്നു ഉറപ്പു വരുത്തുക(ഇതിൽ "
+"%(show_value)d ഉണ്ട് )"
 msgstr[1] ""
+"ഈ വാല്യൂയിൽ %(limit_value)dക്യാരക്ടേർസ് എങ്കിലും ഉണ്ടെന്നു ഉറപ്പു വരുത്തുക(ഇതിൽ "
+"%(show_value)d ഉണ്ട് )"
 
 #, python-format
 msgid ""
@@ -372,47 +385,56 @@ msgid_plural ""
 "Ensure this value has at most %(limit_value)d characters (it has "
 "%(show_value)d)."
 msgstr[0] ""
+"ഈ വാല്യൂയിൽ %(limit_value)d ക്യാരക്ടർ 1 ഇൽ കൂടുതൽ ഇല്ലെന്നു ഉറപ്പു വരുത്തുക(ഇതിൽ 2 "
+"%(show_value)d ഉണ്ട് )"
 msgstr[1] ""
+"ഈ വാല്യൂയിൽ %(limit_value)d ക്യാരക്ടർസ് 1 ഇൽ കൂടുതൽ ഇല്ലെന്നു ഉറപ്പു വരുത്തുക(ഇതിൽ 2 "
+"%(show_value)d ഉണ്ട് )"
+
+msgid "Enter a number."
+msgstr "ഒരു സംഖ്യ നല്കുക."
 
 #, python-format
 msgid "Ensure that there are no more than %(max)s digit in total."
 msgid_plural "Ensure that there are no more than %(max)s digits in total."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%(max)s ഡിജിറ്റിൽ കൂടുതൽ ഇല്ല എന്ന് ഉറപ്പു വരുത്തുക ."
+msgstr[1] "%(max)sഡിജിറ്റ്സിൽ കൂടുതൽ ഇല്ല എന്ന് ഉറപ്പു വരുത്തുക. "
 
 #, python-format
 msgid "Ensure that there are no more than %(max)s decimal place."
 msgid_plural "Ensure that there are no more than %(max)s decimal places."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%(max)sകൂടുതൽ ഡെസിമൽ പോയന്റില്ല എന്ന് ഉറപ്പു വരുത്തുക. "
+msgstr[1] "%(max)sകൂടുതൽ ഡെസിമൽ പോയിന്റുകളില്ല  എന്ന് ഉറപ്പു വരുത്തുക. "
 
 #, python-format
 msgid ""
 "Ensure that there are no more than %(max)s digit before the decimal point."
 msgid_plural ""
 "Ensure that there are no more than %(max)s digits before the decimal point."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%(max)sഡിജിറ്റ് ഡെസിമൽ പോയിന്റിനു മുൻപ് ഇല്ല എന്ന് ഉറപ്പു വരുത്തുക."
+msgstr[1] "%(max)sഡിജിറ്റ്സ് ഡെസിമൽ പോയിന്റിനു മുൻപ് ഇല്ല എന്ന് ഉറപ്പു വരുത്തുക. "
 
 #, python-format
 msgid ""
 "File extension '%(extension)s' is not allowed. Allowed extensions are: "
 "'%(allowed_extensions)s'."
 msgstr ""
+"'%(extension)s' എന്ന ഫയൽ എക്സ്റ്റൻഷൻ അനുവദനീയമല്ല.  അനുവദനീയമായ എക്സറ്റന്ഷനുകൾ ഇവയാണ് : "
+"'%(allowed_extensions)s'"
 
 msgid "Null characters are not allowed."
-msgstr ""
+msgstr "Null  ക്യാരക്ടറുകൾ അനുവദനീയമല്ല."
 
 msgid "and"
-msgstr "ഉം"
+msgstr "പിന്നെ"
 
 #, python-format
 msgid "%(model_name)s with this %(field_labels)s already exists."
-msgstr ""
+msgstr "%(field_labels)sഉള്ള %(model_name)sനിലവിലുണ്ട്."
 
 #, python-format
 msgid "Value %(value)r is not a valid choice."
-msgstr ""
+msgstr "%(value)r എന്ന വാല്യൂ ശെരിയായ ചോയ്സ് അല്ല. "
 
 msgid "This field cannot be null."
 msgstr "ഈ കളം (ഫീല്‍ഡ്) ഒഴിച്ചിടരുത്."
@@ -450,6 +472,10 @@ msgstr "8 ബൈറ്റ് പൂര്‍ണസംഖ്യ."
 msgid "'%(value)s' value must be either True or False."
 msgstr "'%(value)s' മൂല്യം True അഥവാ False ആയിരിക്കണം."
 
+#, python-format
+msgid "'%(value)s' value must be either True, False, or None."
+msgstr "%(value)sഎന്ന വാല്യൂ True, False, അല്ലെങ്കിൽ None എന്നിവയിൽ ഒന്നായിരിക്കണം."
+
 msgid "Boolean (Either True or False)"
 msgstr "ശരിയോ തെറ്റോ (True അഥവാ False)"
 
@@ -481,12 +507,17 @@ msgid ""
 "'%(value)s' value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[."
 "uuuuuu]][TZ] format."
 msgstr ""
+"%(value)sവാല്യൂ ശെരിയായ ഫോർമാറ്റിൽ അല്ല ഉള്ളത്. അതു YYYY-MM-DD HH:MM[:ss[.uuuuuu]]"
+"[TZ]        \n"
+"ഫോർമാറ്റിലായിരിക്കണം."
 
 #, python-format
 msgid ""
 "'%(value)s' value has the correct format (YYYY-MM-DD HH:MM[:ss[.uuuuuu]]"
 "[TZ]) but it is an invalid date/time."
 msgstr ""
+"%(value)sശെരിയായ ഫോര്മാറ്റിലാണുള്ളത് (YYYY-MM-DD HH:MM[:ss[.uuuuuu]][TZ]) പക്ഷേ "
+"തെറ്റായ date/time ആണ്. "
 
 msgid "Date (with time)"
 msgstr "തീയതി (സമയത്തോടൊപ്പം)"
@@ -579,6 +610,9 @@ msgstr "റോ ബൈനറി ഡാറ്റ"
 msgid "'%(value)s' is not a valid UUID."
 msgstr "'%(value)s' ഒരു സാധുവായ യു യു ഐ ഡി അല്ലാ."
 
+msgid "Universally unique identifier"
+msgstr "എല്ലായിടത്തും യുണീക്കായ ഐഡന്റിഫൈയർ."
+
 msgid "File"
 msgstr "ഫയല്‍"
 
@@ -587,7 +621,7 @@ msgstr "ചിത്രം"
 
 #, python-format
 msgid "%(model)s instance with %(field)s %(value)r does not exist."
-msgstr ""
+msgstr "%(field)s%(value)r ഉള്ള%(model)s ഇൻസ്റ്റൻസ് നിലവിൽ ഇല്ല."
 
 msgid "Foreign Key (type determined by related field)"
 msgstr "ഫോറിന്‍ കീ (ടൈപ്പ് ബന്ധപ്പെട്ട ഫീല്‍ഡില്‍ നിന്നും നിര്‍ണ്ണയിക്കുന്നതാണ്)"
@@ -597,11 +631,11 @@ msgstr "വണ്‍-ടു-വണ്‍ ബന്ധം"
 
 #, python-format
 msgid "%(from)s-%(to)s relationship"
-msgstr ""
+msgstr "%(from)s-%(to)s റിലേഷൻഷിപ്‌."
 
 #, python-format
 msgid "%(from)s-%(to)s relationships"
-msgstr ""
+msgstr "%(from)s-%(to)sറിലേഷൻഷിപ്‌സ്. "
 
 msgid "Many-to-many relationship"
 msgstr "മെനി-ടു-മെനി ബന്ധം"
@@ -618,9 +652,6 @@ msgstr "ഈ കള്ളി(ഫീല്‍ഡ്) നിര്‍ബന്ധ�
 msgid "Enter a whole number."
 msgstr "ഒരു പൂര്‍ണസംഖ്യ നല്കുക."
 
-msgid "Enter a number."
-msgstr "ഒരു സംഖ്യ നല്കുക."
-
 msgid "Enter a valid date."
 msgstr "ശരിയായ തീയതി നല്കുക."
 
@@ -632,6 +663,10 @@ msgstr "ശരിയായ തീയതിയും സമയവും നല്
 
 msgid "Enter a valid duration."
 msgstr "സാധുതയുള്ള കാലയളവ് നല്കുക."
+
+#, python-brace-format
+msgid "The number of days must be between {min_days} and {max_days}."
+msgstr "ദിവസങ്ങളുടെ എണ്ണം {min_days},   {max_days} എന്നിവയുടെ ഇടയിലായിരിക്കണം."
 
 msgid "No file was submitted. Check the encoding type on the form."
 msgstr "ഫയലൊന്നും ലഭിച്ചിട്ടില്ല. ഫോമിലെ എന്‍-കോഡിംഗ് പരിശോധിക്കുക."
@@ -647,7 +682,9 @@ msgid "Ensure this filename has at most %(max)d character (it has %(length)d)."
 msgid_plural ""
 "Ensure this filename has at most %(max)d characters (it has %(length)d)."
 msgstr[0] ""
+"ഈ ഫയൽ നെയ്മിൽ%(max)dക്യാരക്ടറിൽ കൂടുതലില്ല എന്ന് ഉറപ്പു വരുത്തുക (അതിൽ %(length)dഉണ്ട്) . "
 msgstr[1] ""
+"ഈ ഫയൽ നെയ്മിൽ%(max)dക്യാരക്ടേഴ്‌സിൽ കൂടുതലില്ല എന്ന് ഉറപ്പു വരുത്തുക (അതിൽ %(length)dഉണ്ട്)."
 
 msgid "Please either submit a file or check the clear checkbox, not both."
 msgstr ""
@@ -680,22 +717,22 @@ msgstr ":"
 
 #, python-format
 msgid "(Hidden field %(name)s) %(error)s"
-msgstr ""
+msgstr "(ഹിഡൻ ഫീൽഡ് %(name)s)%(error)s"
 
 msgid "ManagementForm data is missing or has been tampered with"
-msgstr ""
+msgstr "ManagementForm ടാറ്റ കാണ്മാനില്ല അല്ലെങ്കിൽ തിരിമറി നടത്തപ്പെട്ടു ."
 
 #, python-format
 msgid "Please submit %d or fewer forms."
 msgid_plural "Please submit %d or fewer forms."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "ദയവായി%d അല്ലെങ്കിൽ കുറവ് ഫോമുകൾ സമർപ്പിക്കുക."
+msgstr[1] "ദയവായി%d അല്ലെങ്കിൽ കുറവ് ഫോമുകൾ സമർപ്പിക്കുക."
 
 #, python-format
 msgid "Please submit %d or more forms."
 msgid_plural "Please submit %d or more forms."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "ദയവായി %d അല്ലെങ്കിൽ കൂടുതൽ ഫോമുകൾ സമർപ്പിക്കുക. "
+msgstr[1] "ദയവായി%d അല്ലെങ്കിൽ കൂടുതൽ ഫോമുകൾ സമർപ്പിക്കുക. "
 
 msgid "Order"
 msgstr "ക്രമം"
@@ -723,14 +760,14 @@ msgid "Please correct the duplicate values below."
 msgstr "താഴെ കൊടുത്തവയില്‍ ആവര്‍ത്തനം ഒഴിവാക്കുക."
 
 msgid "The inline value did not match the parent instance."
-msgstr ""
+msgstr "ഇൻലൈൻ വാല്യൂ, പാരെന്റ് ഇൻസ്റ്റൻസുമായി ചേരുന്നില്ല."
 
 msgid "Select a valid choice. That choice is not one of the available choices."
 msgstr "യോഗ്യമായത് തെരഞ്ഞെടുക്കുക. നിങ്ങള്‍ നല്കിയത് ലഭ്യമായവയില്‍ ഉള്‍പ്പെടുന്നില്ല."
 
 #, python-format
 msgid "\"%(pk)s\" is not a valid value."
-msgstr ""
+msgstr "\"%(pk)s\" ശെരിയായ ഒരു വാല്യൂ അല്ല."
 
 #, python-format
 msgid ""
@@ -806,25 +843,25 @@ msgid "noon"
 msgstr "ഉച്ച"
 
 msgid "Monday"
-msgstr "തിങ്കള്‍"
+msgstr "തിങ്കളാഴ്ച"
 
 msgid "Tuesday"
-msgstr "ചൊവ്വ"
+msgstr "ചൊവ്വാഴ്ച"
 
 msgid "Wednesday"
-msgstr "ബുധന്‍"
+msgstr "ബുധനാഴ്ച"
 
 msgid "Thursday"
-msgstr "വ്യാഴം"
+msgstr "വ്യാഴാഴ്ച"
 
 msgid "Friday"
-msgstr "വെള്ളി"
+msgstr "വെള്ളിയാഴ്ച"
 
 msgid "Saturday"
-msgstr "ശനി"
+msgstr "ശനിയാഴ്ച"
 
 msgid "Sunday"
-msgstr "ഞായര്‍"
+msgstr "ഞായറാഴ്ച"
 
 msgid "Mon"
 msgstr "തിങ്കള്‍"
@@ -1020,7 +1057,7 @@ msgstr "ഇതു സാധുവായ IPv6 വിലാസമല്ല."
 
 #, python-format
 msgctxt "String to return when truncating text"
-msgid "%(truncated_text)s..."
+msgid "%(truncated_text)s…"
 msgstr "%(truncated_text)s..."
 
 msgid "or"
@@ -1058,7 +1095,7 @@ msgstr[1] "%d ദിവസങ്ങൾ"
 msgid "%d hour"
 msgid_plural "%d hours"
 msgstr[0] "%d മണിക്കൂർ"
-msgstr[1] "%d മണിക്കൂരുകൾ"
+msgstr[1] "%d മണിക്കൂറുകൾ"
 
 #, python-format
 msgid "%d minute"
@@ -1101,6 +1138,9 @@ msgid ""
 "submitting forms. This cookie is required for security reasons, to ensure "
 "that your browser is not being hijacked by third parties."
 msgstr ""
+"ഫോം  സമർപ്പിക്കുമ്പോൾ ഒരു CSRF കുക്കി ഈ സൈറ്റിൽ ആവശ്യമാണ് എന്നതിനാലാണ് നിങ്ങൾ ഈ സന്ദേശം "
+"കാണുന്നത്. മറ്റുള്ളവരാരെങ്കിലും നിങ്ങളുടെ ബ്രൗസറിനെ നിയന്ത്രിക്കുന്നില്ല എന്ന് ഉറപ്പുവരുത്താനായി ഈ "
+"കുക്കി ആവശ്യമാണ്. "
 
 msgid ""
 "If you have configured your browser to disable cookies, please re-enable "
@@ -1114,7 +1154,7 @@ msgid "No year specified"
 msgstr "വര്‍ഷം പരാമര്‍ശിച്ചിട്ടില്ല"
 
 msgid "Date out of range"
-msgstr ""
+msgstr "ഡാറ്റ പരിധിയുടെ പുറത്താണ്"
 
 msgid "No month specified"
 msgstr "മാസം പരാമര്‍ശിച്ചിട്ടില്ല"
@@ -1169,7 +1209,7 @@ msgid "Index of %(directory)s"
 msgstr "%(directory)s യുടെ സൂചിക"
 
 msgid "Django: the Web framework for perfectionists with deadlines."
-msgstr ""
+msgstr "ജാംഗോ:  സമയപരിമിതികളുള്ള പൂർണ്ണതാമോഹികൾക്കായുള്ള വെബ് ഫ്രെയിംവർക്ക്. "
 
 #, python-format
 msgid ""
@@ -1178,7 +1218,7 @@ msgid ""
 msgstr ""
 
 msgid "The install worked successfully! Congratulations!"
-msgstr ""
+msgstr "ഇൻസ്ടാൾ ഭംഗിയായി നടന്നു! അഭിനന്ദനങ്ങൾ !"
 
 #, python-format
 msgid ""
@@ -1189,19 +1229,19 @@ msgid ""
 msgstr ""
 
 msgid "Django Documentation"
-msgstr ""
+msgstr "ജാംഗോ ഡോക്യുമെന്റേഷൻ"
 
 msgid "Topics, references, &amp; how-to's"
-msgstr ""
+msgstr "വിഷയങ്ങൾ, അനുബന്ധ വിഷയങ്ങൾ &amp; നിർദ്ദേശക്കുറിപ്പുകൾ"
 
 msgid "Tutorial: A Polling App"
-msgstr ""
+msgstr "പരിശീലനം: ഒരു പോളിങ്ങ് ആപ്പ്"
 
 msgid "Get started with Django"
-msgstr ""
+msgstr "ജാംഗോയുമായി പരിചയത്തിലാവുക"
 
 msgid "Django Community"
-msgstr ""
+msgstr "ജാംഗോ കമ്യൂണിറ്റി"
 
 msgid "Connect, get help, or contribute"
-msgstr ""
+msgstr "കൂട്ടുകൂടൂ, സഹായം തേടൂ, അല്ലെങ്കിൽ സഹകരിക്കൂ"

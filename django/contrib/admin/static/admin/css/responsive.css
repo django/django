@@ -38,11 +38,9 @@ input[type="submit"], button {
     /* Header */
 
     #header {
-        display: flex;
         flex-direction: column;
         padding: 15px 30px;
-        height: auto;
-        line-height: 1;
+        justify-content: flex-start;
     }
 
     #branding h1 {
@@ -207,13 +205,13 @@ input[type="submit"], button {
         min-height: 0;
     }
 
-    fieldset .field-box {
+    fieldset .fieldBox {
         float: none;
         margin: 0 -10px;
         padding: 0 10px;
     }
 
-    fieldset .field-box + .field-box {
+    fieldset .fieldBox + .fieldBox {
         margin-top: 10px;
         padding-top: 10px;
         border-top: 1px solid #eee;
@@ -572,7 +570,7 @@ input[type="submit"], button {
         width: auto;
     }
 
-    fieldset .field-box + .field-box {
+    fieldset .fieldBox + .fieldBox {
         margin-top: 15px;
         padding-top: 15px;
     }
@@ -810,10 +808,14 @@ input[type="submit"], button {
         width: 100%;
     }
 
-    .submit-row input, .submit-row input.default, .submit-row a {
+    .submit-row input, .submit-row input.default, .submit-row a, .submit-row a.closelink {
         float: none;
         margin: 0 0 10px;
         text-align: center;
+    }
+
+    .submit-row a.closelink {
+        padding: 10px 0;
     }
 
     .submit-row p.deletelink-box {

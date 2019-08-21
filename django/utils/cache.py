@@ -17,23 +17,21 @@ An example: i18n middleware would need to distinguish caches by the
 "Accept-language" header.
 """
 import hashlib
-import logging
 import re
 import time
 
 from django.conf import settings
 from django.core.cache import caches
 from django.http import HttpResponse, HttpResponseNotModified
-from django.utils.encoding import force_bytes, force_text, iri_to_uri
+from django.utils.encoding import iri_to_uri
 from django.utils.http import (
     http_date, parse_etags, parse_http_date_safe, quote_etag,
 )
+from django.utils.log import log_response
 from django.utils.timezone import get_current_timezone_name
 from django.utils.translation import get_language
 
 cc_delim_re = re.compile(r'\s*,\s*')
-
-logger = logging.getLogger('django.request')
 
 
 def patch_cache_control(response, **kwargs):
@@ -106,14 +104,13 @@ def set_response_etag(response):
 
 
 def _precondition_failed(request):
-    logger.warning(
+    response = HttpResponse(status=412)
+    log_response(
         'Precondition Failed: %s', request.path,
-        extra={
-            'status_code': 412,
-            'request': request,
-        },
+        response=response,
+        request=request,
     )
-    return HttpResponse(status=412)
+    return response
 
 
 def _not_modified(request, response=None):
@@ -253,14 +250,15 @@ def add_never_cache_headers(response):
     Add headers to a response to indicate that a page should never be cached.
     """
     patch_response_headers(response, cache_timeout=-1)
-    patch_cache_control(response, no_cache=True, no_store=True, must_revalidate=True)
+    patch_cache_control(response, no_cache=True, no_store=True, must_revalidate=True, private=True)
 
 
 def patch_vary_headers(response, newheaders):
     """
     Add (or update) the "Vary" header in the given HttpResponse object.
-    newheaders is a list of header names that should be in "Vary". Existing
-    headers in "Vary" aren't removed.
+    newheaders is a list of header names that should be in "Vary". If headers
+    contains an asterisk, then "Vary" header will consist of a single asterisk
+    '*'. Otherwise, existing headers in "Vary" aren't removed.
     """
     # Note that we need to keep the original order intact, because cache
     # implementations may rely on the order of the Vary contents in, say,
@@ -273,7 +271,11 @@ def patch_vary_headers(response, newheaders):
     existing_headers = {header.lower() for header in vary_headers}
     additional_headers = [newheader for newheader in newheaders
                           if newheader.lower() not in existing_headers]
-    response['Vary'] = ', '.join(vary_headers + additional_headers)
+    vary_headers += additional_headers
+    if '*' in vary_headers:
+        response['Vary'] = '*'
+    else:
+        response['Vary'] = ', '.join(vary_headers)
 
 
 def has_vary_header(response, header_query):
@@ -295,12 +297,7 @@ def _i18n_cache_key_suffix(request, cache_key):
         # which in turn can also fall back to settings.LANGUAGE_CODE
         cache_key += '.%s' % getattr(request, 'LANGUAGE_CODE', get_language())
     if settings.USE_TZ:
-        # The datetime module doesn't restrict the output of tzname().
-        # Windows is known to use non-standard, locale-dependent names.
-        # User-defined tzinfo classes may return absolutely anything.
-        # Hence this paranoid conversion to create a valid cache key.
-        tz_name = force_text(get_current_timezone_name(), errors='ignore')
-        cache_key += '.%s' % tz_name.encode('ascii', 'ignore').decode('ascii').replace(' ', '_')
+        cache_key += '.%s' % get_current_timezone_name()
     return cache_key
 
 
@@ -310,8 +307,8 @@ def _generate_cache_key(request, method, headerlist, key_prefix):
     for header in headerlist:
         value = request.META.get(header)
         if value is not None:
-            ctx.update(force_bytes(value))
-    url = hashlib.md5(force_bytes(iri_to_uri(request.build_absolute_uri())))
+            ctx.update(value.encode())
+    url = hashlib.md5(iri_to_uri(request.build_absolute_uri()).encode('ascii'))
     cache_key = 'views.decorators.cache.cache_page.%s.%s.%s.%s' % (
         key_prefix, method, url.hexdigest(), ctx.hexdigest())
     return _i18n_cache_key_suffix(request, cache_key)
@@ -319,7 +316,7 @@ def _generate_cache_key(request, method, headerlist, key_prefix):
 
 def _generate_cache_header_key(key_prefix, request):
     """Return a cache key for the header cache."""
-    url = hashlib.md5(force_bytes(iri_to_uri(request.build_absolute_uri())))
+    url = hashlib.md5(iri_to_uri(request.build_absolute_uri()).encode('ascii'))
     cache_key = 'views.decorators.cache.cache_header.%s.%s' % (
         key_prefix, url.hexdigest())
     return _i18n_cache_key_suffix(request, cache_key)

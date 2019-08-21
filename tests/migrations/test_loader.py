@@ -1,3 +1,6 @@
+import compileall
+import os
+
 from django.db import connection, connections
 from django.db.migrations.exceptions import (
     AmbiguityError, InconsistentMigrationHistory, NodeNotFoundError,
@@ -6,12 +9,14 @@ from django.db.migrations.loader import MigrationLoader
 from django.db.migrations.recorder import MigrationRecorder
 from django.test import TestCase, modify_settings, override_settings
 
+from .test_base import MigrationTestBase
+
 
 class RecorderTests(TestCase):
     """
     Tests recording migrations as applied or not.
     """
-    multi_db = True
+    databases = {'default', 'other'}
 
     def test_apply(self):
         """
@@ -80,6 +85,22 @@ class LoaderTests(TestCase):
 
         # Ensure we've included unmigrated apps in there too
         self.assertIn("basic", project_state.real_apps)
+
+    @override_settings(MIGRATION_MODULES={
+        'migrations': 'migrations.test_migrations',
+        'migrations2': 'migrations2.test_migrations_2',
+    })
+    @modify_settings(INSTALLED_APPS={'append': 'migrations2'})
+    def test_plan_handles_repeated_migrations(self):
+        """
+        _generate_plan() doesn't readd migrations already in the plan (#29180).
+        """
+        migration_loader = MigrationLoader(connection)
+        nodes = [('migrations', '0002_second'), ('migrations2', '0001_initial')]
+        self.assertEqual(
+            migration_loader.graph._generate_plan(nodes, at_end=True),
+            [('migrations', '0001_initial'), ('migrations', '0002_second'), ('migrations2', '0001_initial')]
+        )
 
     @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations_unmigdep"})
     def test_load_unmigrated_dependency(self):
@@ -244,7 +265,7 @@ class LoaderTests(TestCase):
 
         def num_nodes():
             plan = set(loader.graph.forwards_plan(('migrations', '7_auto')))
-            return len(plan - loader.applied_migrations)
+            return len(plan - loader.applied_migrations.keys())
 
         # Empty database: use squashed migration
         loader.build_graph()
@@ -318,7 +339,7 @@ class LoaderTests(TestCase):
         loader.build_graph()
 
         plan = set(loader.graph.forwards_plan(('app1', '4_auto')))
-        plan = plan - loader.applied_migrations
+        plan = plan - loader.applied_migrations.keys()
         expected_plan = {
             ('app2', '1_squashed_2'),
             ('app1', '3_auto'),
@@ -337,7 +358,7 @@ class LoaderTests(TestCase):
 
         def num_nodes():
             plan = set(loader.graph.forwards_plan(('migrations', '7_auto')))
-            return len(plan - loader.applied_migrations)
+            return len(plan - loader.applied_migrations.keys())
 
         # Empty database: use squashed migration
         loader.build_graph()
@@ -445,7 +466,7 @@ class LoaderTests(TestCase):
         # Load with nothing applied: both migrations squashed.
         loader.build_graph()
         plan = set(loader.graph.forwards_plan(('app1', '4_auto')))
-        plan = plan - loader.applied_migrations
+        plan = plan - loader.applied_migrations.keys()
         expected_plan = {
             ('app1', '1_auto'),
             ('app2', '1_squashed_2'),
@@ -459,7 +480,7 @@ class LoaderTests(TestCase):
         recorder.record_applied('app1', '2_auto')
         loader.build_graph()
         plan = set(loader.graph.forwards_plan(('app1', '4_auto')))
-        plan = plan - loader.applied_migrations
+        plan = plan - loader.applied_migrations.keys()
         expected_plan = {
             ('app2', '1_squashed_2'),
             ('app1', '3_auto'),
@@ -471,10 +492,52 @@ class LoaderTests(TestCase):
         recorder.record_applied('app2', '1_auto')
         loader.build_graph()
         plan = set(loader.graph.forwards_plan(('app1', '4_auto')))
-        plan = plan - loader.applied_migrations
+        plan = plan - loader.applied_migrations.keys()
         expected_plan = {
             ('app2', '2_auto'),
             ('app1', '3_auto'),
             ('app1', '4_auto'),
         }
         self.assertEqual(plan, expected_plan)
+
+    @override_settings(MIGRATION_MODULES={'migrations': 'migrations.test_migrations_private'})
+    def test_ignore_files(self):
+        """Files prefixed with underscore, tilde, or dot aren't loaded."""
+        loader = MigrationLoader(connection)
+        loader.load_disk()
+        migrations = [name for app, name in loader.disk_migrations if app == 'migrations']
+        self.assertEqual(migrations, ['0001_initial'])
+
+
+class PycLoaderTests(MigrationTestBase):
+
+    def test_valid(self):
+        """
+        To support frozen environments, MigrationLoader loads .pyc migrations.
+        """
+        with self.temporary_migration_module(module='migrations.test_migrations') as migration_dir:
+            # Compile .py files to .pyc files and delete .py files.
+            compileall.compile_dir(migration_dir, force=True, quiet=1, legacy=True)
+            for name in os.listdir(migration_dir):
+                if name.endswith('.py'):
+                    os.remove(os.path.join(migration_dir, name))
+            loader = MigrationLoader(connection)
+            self.assertIn(('migrations', '0001_initial'), loader.disk_migrations)
+
+    def test_invalid(self):
+        """
+        MigrationLoader reraises ImportErrors caused by "bad magic number" pyc
+        files with a more helpful message.
+        """
+        with self.temporary_migration_module(module='migrations.test_migrations_bad_pyc') as migration_dir:
+            # The -tpl suffix is to avoid the pyc exclusion in MANIFEST.in.
+            os.rename(
+                os.path.join(migration_dir, '0001_initial.pyc-tpl'),
+                os.path.join(migration_dir, '0001_initial.pyc'),
+            )
+            msg = (
+                r"Couldn't import '\w+.migrations.0001_initial' as it appears "
+                "to be a stale .pyc file."
+            )
+            with self.assertRaisesRegex(ImportError, msg):
+                MigrationLoader(connection)

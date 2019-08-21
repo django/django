@@ -1,7 +1,7 @@
 from operator import attrgetter
 
 from django.db import models
-from django.test import TestCase
+from django.test import SimpleTestCase, TestCase
 from django.test.utils import isolate_apps
 
 from .base_tests import BaseOrderWithRespectToTests
@@ -14,7 +14,7 @@ class OrderWithRespectToBaseTests(BaseOrderWithRespectToTests, TestCase):
     Question = Question
 
 
-class OrderWithRespectToTests(TestCase):
+class OrderWithRespectToTests(SimpleTestCase):
 
     @isolate_apps('order_with_respect_to')
     def test_duplicate_order_field(self):

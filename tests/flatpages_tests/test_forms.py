@@ -49,6 +49,11 @@ class FlatpageAdminFormTests(TestCase):
     def test_flatpage_requires_trailing_slash_with_append_slash(self):
         form = FlatpageForm(data=dict(url='/no_trailing_slash', **self.form_data))
         with translation.override('en'):
+            self.assertEqual(
+                form.fields['url'].help_text,
+                'Example: “/about/contact/”. Make sure to have leading and '
+                'trailing slashes.'
+            )
             self.assertFalse(form.is_valid())
             self.assertEqual(form.errors['url'], ["URL is missing a trailing slash."])
 
@@ -56,6 +61,11 @@ class FlatpageAdminFormTests(TestCase):
     def test_flatpage_doesnt_requires_trailing_slash_without_append_slash(self):
         form = FlatpageForm(data=dict(url='/no_trailing_slash', **self.form_data))
         self.assertTrue(form.is_valid())
+        with translation.override('en'):
+            self.assertEqual(
+                form.fields['url'].help_text,
+                'Example: “/about/contact”. Make sure to have a leading slash.'
+            )
 
     def test_flatpage_admin_form_url_uniqueness_validation(self):
         "The flatpage admin form correctly enforces url uniqueness among flatpages of the same site"

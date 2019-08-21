@@ -1,11 +1,10 @@
 from unittest import mock
 
-from django.conf.urls import url
 from django.contrib import admin
 from django.contrib.auth.models import User
 from django.db import connections
 from django.test import TestCase, override_settings
-from django.urls import reverse
+from django.urls import path, reverse
 
 from .models import Book
 
@@ -23,13 +22,13 @@ site = admin.AdminSite(name='test_adminsite')
 site.register(Book)
 
 urlpatterns = [
-    url(r'^admin/', site.urls),
+    path('admin/', site.urls),
 ]
 
 
 @override_settings(ROOT_URLCONF=__name__, DATABASE_ROUTERS=['%s.Router' % __name__])
 class MultiDatabaseTests(TestCase):
-    multi_db = True
+    databases = {'default', 'other'}
 
     @classmethod
     def setUpTestData(cls):

@@ -107,8 +107,7 @@ class Engine:
 
     def find_template_loader(self, loader):
         if isinstance(loader, (tuple, list)):
-            args = list(loader[1:])
-            loader = loader[0]
+            loader, *args = loader
         else:
             args = []
 
@@ -161,7 +160,7 @@ class Engine:
         if isinstance(context, Context):
             return t.render(context)
         else:
-            return t.render(Context(context))
+            return t.render(Context(context, autoescape=self.autoescape))
 
     def select_template(self, template_name_list):
         """

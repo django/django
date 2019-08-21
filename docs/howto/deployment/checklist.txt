@@ -242,11 +242,6 @@ Customize the default error views
 Django includes default views and templates for several HTTP error codes. You
 may want to override the default templates by creating the following templates
 in your root template directory: ``404.html``, ``500.html``, ``403.html``, and
-``400.html``. The default views should suffice for 99% of Web applications, but
-if you desire to customize them, see these instructions which also contain
-details about the default templates:
-
-* :ref:`http_not_found_view`
-* :ref:`http_internal_server_error_view`
-* :ref:`http_forbidden_view`
-* :ref:`http_bad_request_view`
+``400.html``. The :ref:`default error views <error-views>` that use these
+templates should suffice for 99% of Web applications, but you can
+:ref:`customize them <customizing-error-views>` as well.

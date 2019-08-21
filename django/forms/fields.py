@@ -5,6 +5,7 @@ Field classes.
 import copy
 import datetime
 import math
+import operator
 import os
 import re
 import uuid
@@ -20,7 +21,7 @@ from django.forms.boundfield import BoundField
 from django.forms.utils import from_current_timezone, to_current_timezone
 from django.forms.widgets import (
     FILE_INPUT_CONTRADICTION, CheckboxInput, ClearableFileInput, DateInput,
-    DateTimeInput, EmailInput, HiddenInput, MultipleHiddenInput,
+    DateTimeInput, EmailInput, FileInput, HiddenInput, MultipleHiddenInput,
     NullBooleanSelect, NumberInput, Select, SelectMultiple,
     SplitDateTimeWidget, SplitHiddenDateTimeWidget, TextInput, TimeInput,
     URLInput,
@@ -468,12 +469,7 @@ class DateTimeField(BaseTemporalField):
 class DurationField(Field):
     default_error_messages = {
         'invalid': _('Enter a valid duration.'),
-        'overflow': _(
-            'The number of days must be between {min_days} and {max_days}.'.format(
-                min_days=datetime.timedelta.min.days,
-                max_days=datetime.timedelta.max.days,
-            )
-        )
+        'overflow': _('The number of days must be between {min_days} and {max_days}.')
     }
 
     def prepare_value(self, value):
@@ -489,7 +485,10 @@ class DurationField(Field):
         try:
             value = parse_duration(str(value))
         except OverflowError:
-            raise ValidationError(self.error_messages['overflow'], code='overflow')
+            raise ValidationError(self.error_messages['overflow'].format(
+                min_days=datetime.timedelta.min.days,
+                max_days=datetime.timedelta.max.days,
+            ), code='overflow')
         if value is None:
             raise ValidationError(self.error_messages['invalid'], code='invalid')
         return value
@@ -645,6 +644,12 @@ class ImageField(FileField):
         if hasattr(f, 'seek') and callable(f.seek):
             f.seek(0)
         return f
+
+    def widget_attrs(self, widget):
+        attrs = super().widget_attrs(widget)
+        if isinstance(widget, FileInput) and 'accept' not in widget.attrs:
+            attrs.setdefault('accept', 'image/*')
+        return attrs
 
 
 class URLField(CharField):
@@ -1100,17 +1105,16 @@ class FilePathField(ChoiceField):
                             f = os.path.join(root, f)
                             self.choices.append((f, f.replace(path, "", 1)))
         else:
-            try:
-                for f in sorted(os.listdir(self.path)):
-                    if f == '__pycache__':
-                        continue
-                    full_file = os.path.join(self.path, f)
-                    if (((self.allow_files and os.path.isfile(full_file)) or
-                            (self.allow_folders and os.path.isdir(full_file))) and
-                            (self.match is None or self.match_re.search(f))):
-                        self.choices.append((full_file, f))
-            except OSError:
-                pass
+            choices = []
+            for f in os.scandir(self.path):
+                if f.name == '__pycache__':
+                    continue
+                if (((self.allow_files and f.is_file()) or
+                        (self.allow_folders and f.is_dir())) and
+                        (self.match is None or self.match_re.search(f.name))):
+                    choices.append((f.path, f.name))
+            choices.sort(key=operator.itemgetter(1))
+            self.choices.extend(choices)
 
         self.widget.choices = self.choices
 
@@ -1183,7 +1187,7 @@ class UUIDField(CharField):
 
     def prepare_value(self, value):
         if isinstance(value, uuid.UUID):
-            return value.hex
+            return str(value)
         return value
 
     def to_python(self, value):

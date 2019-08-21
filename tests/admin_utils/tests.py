@@ -166,6 +166,10 @@ class UtilsTests(SimpleTestCase):
         expected = '<img src="%sadmin/img/icon-unknown.svg" alt="None">' % settings.STATIC_URL
         self.assertHTMLEqual(display_value, expected)
 
+        display_value = display_for_field(None, models.BooleanField(null=True), self.empty_value)
+        expected = '<img src="%sadmin/img/icon-unknown.svg" alt="None" />' % settings.STATIC_URL
+        self.assertHTMLEqual(display_value, expected)
+
         display_value = display_for_field(None, models.DecimalField(), self.empty_value)
         self.assertEqual(display_value, self.empty_value)
 
@@ -281,6 +285,22 @@ class UtilsTests(SimpleTestCase):
             label_for_field("test_from_model", Article, model_admin=MockModelAdmin, return_attr=True),
             ("not Really the Model", MockModelAdmin.test_from_model)
         )
+
+    def test_label_for_field_form_argument(self):
+        class ArticleForm(forms.ModelForm):
+            extra_form_field = forms.BooleanField()
+
+            class Meta:
+                fields = '__all__'
+                model = Article
+
+        self.assertEqual(
+            label_for_field('extra_form_field', Article, form=ArticleForm()),
+            'Extra form field'
+        )
+        msg = "Unable to lookup 'nonexistent' on Article or ArticleForm"
+        with self.assertRaisesMessage(AttributeError, msg):
+            label_for_field('nonexistent', Article, form=ArticleForm()),
 
     def test_label_for_property(self):
         # NOTE: cannot use @property decorator, because of

@@ -9,7 +9,7 @@ class SelectMultipleTest(WidgetTest):
 
     def test_format_value(self):
         widget = self.widget(choices=self.numeric_choices)
-        self.assertEqual(widget.format_value(None), [''])
+        self.assertEqual(widget.format_value(None), [])
         self.assertEqual(widget.format_value(''), [''])
         self.assertEqual(widget.format_value([3, 0, 1]), ['3', '0', '1'])
 
@@ -35,10 +35,12 @@ class SelectMultipleTest(WidgetTest):
 
     def test_render_none(self):
         """
-        If the value is None, none of the options are selected.
+        If the value is None, none of the options are selected, even if the
+        choices have an empty option.
         """
-        self.check_html(self.widget(choices=self.beatles), 'beatles', None, html=(
+        self.check_html(self.widget(choices=(('', 'Unknown'),) + self.beatles), 'beatles', None, html=(
             """<select multiple name="beatles">
+            <option value="">Unknown</option>
             <option value="J">John</option>
             <option value="P">Paul</option>
             <option value="G">George</option>

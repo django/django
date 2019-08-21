@@ -5,13 +5,13 @@ import types
 from pathlib import Path
 
 from django.conf import settings
-from django.http import HttpResponse, HttpResponseNotFound
+from django.http import Http404, HttpResponse, HttpResponseNotFound
 from django.template import Context, Engine, TemplateDoesNotExist
 from django.template.defaultfilters import pprint
-from django.urls import Resolver404, resolve
+from django.urls import resolve
 from django.utils import timezone
 from django.utils.datastructures import MultiValueDict
-from django.utils.encoding import force_text
+from django.utils.encoding import force_str
 from django.utils.module_loading import import_string
 from django.utils.version import get_docs_version
 
@@ -269,7 +269,7 @@ class ExceptionReporter:
                     v = pprint(v)
                     # Trim large blobs of data
                     if len(v) > 4096:
-                        v = '%s... <trimmed %d bytes string>' % (v[0:4096], len(v))
+                        v = '%s… <trimmed %d bytes string>' % (v[0:4096], len(v))
                     frame_vars.append((k, v))
                 frame['vars'] = frame_vars
             frames[i] = frame
@@ -280,7 +280,7 @@ class ExceptionReporter:
             end = getattr(self.exc_value, 'end', None)
             if start is not None and end is not None:
                 unicode_str = self.exc_value.args[1]
-                unicode_hint = force_text(
+                unicode_hint = force_str(
                     unicode_str[max(start - 5, 0):min(end + 5, len(unicode_str))],
                     'ascii', errors='replace'
                 )
@@ -328,14 +328,14 @@ class ExceptionReporter:
 
     def get_traceback_html(self):
         """Return HTML version of debug 500 HTTP error page."""
-        with Path(CURRENT_DIR, 'templates', 'technical_500.html').open() as fh:
+        with Path(CURRENT_DIR, 'templates', 'technical_500.html').open(encoding='utf-8') as fh:
             t = DEBUG_ENGINE.from_string(fh.read())
         c = Context(self.get_traceback_data(), use_l10n=False)
         return t.render(c)
 
     def get_traceback_text(self):
         """Return plain text version of debug 500 HTTP error page."""
-        with Path(CURRENT_DIR, 'templates', 'technical_500.txt').open() as fh:
+        with Path(CURRENT_DIR, 'templates', 'technical_500.txt').open(encoding='utf-8') as fh:
             t = DEBUG_ENGINE.from_string(fh.read())
         c = Context(self.get_traceback_data(), autoescape=False, use_l10n=False)
         return t.render(c)
@@ -357,7 +357,7 @@ class ExceptionReporter:
             try:
                 with open(filename, 'rb') as fp:
                     source = fp.read().splitlines()
-            except (OSError, IOError):
+            except OSError:
                 pass
         if source is None:
             return None, [], None, []
@@ -369,7 +369,7 @@ class ExceptionReporter:
             encoding = 'ascii'
             for line in source[:2]:
                 # File coding may be specified. Match pattern from PEP-263
-                # (http://www.python.org/dev/peps/pep-0263/)
+                # (https://www.python.org/dev/peps/pep-0263/)
                 match = re.search(br'coding[:=]\s*([-\w.]+)', line)
                 if match:
                     encoding = match.group(1).decode('ascii')
@@ -397,6 +397,9 @@ class ExceptionReporter:
         while exc_value:
             exceptions.append(exc_value)
             exc_value = explicit_or_implicit_cause(exc_value)
+            if exc_value in exceptions:
+                # Avoid infinite loop if there's a cyclic reference (#29393).
+                break
 
         frames = []
         # No exceptions were supplied to ExceptionReporter
@@ -480,7 +483,7 @@ def technical_404_response(request, exception):
     caller = ''
     try:
         resolver_match = resolve(request.path)
-    except Resolver404:
+    except Http404:
         pass
     else:
         obj = resolver_match.func
@@ -494,7 +497,7 @@ def technical_404_response(request, exception):
             module = obj.__module__
             caller = '%s.%s' % (module, caller)
 
-    with Path(CURRENT_DIR, 'templates', 'technical_404.html').open() as fh:
+    with Path(CURRENT_DIR, 'templates', 'technical_404.html').open(encoding='utf-8') as fh:
         t = DEBUG_ENGINE.from_string(fh.read())
     c = Context({
         'urlconf': urlconf,
@@ -511,7 +514,7 @@ def technical_404_response(request, exception):
 
 def default_urlconf(request):
     """Create an empty URLconf 404 error response."""
-    with Path(CURRENT_DIR, 'templates', 'default_urlconf.html').open() as fh:
+    with Path(CURRENT_DIR, 'templates', 'default_urlconf.html').open(encoding='utf-8') as fh:
         t = DEBUG_ENGINE.from_string(fh.read())
     c = Context({
         'version': get_docs_version(),

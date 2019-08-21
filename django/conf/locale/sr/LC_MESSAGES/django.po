@@ -1,15 +1,17 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Branko Kokanovic <branko@kokanovic.org>, 2018
+# Igor Jerosimić, 2019
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Janos Guljas <janos@resenje.org>, 2011-2012
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-11-15 16:15+0100\n"
-"PO-Revision-Date: 2017-11-16 01:13+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2019-01-16 20:42+0100\n"
+"PO-Revision-Date: 2019-06-27 19:31+0000\n"
+"Last-Translator: Igor Jerosimić\n"
 "Language-Team: Serbian (http://www.transifex.com/django/django/language/"
 "sr/)\n"
 "MIME-Version: 1.0\n"
@@ -139,6 +141,9 @@ msgstr "горњолужичкосрпски"
 msgid "Hungarian"
 msgstr "мађарски"
 
+msgid "Armenian"
+msgstr "јерменски"
+
 msgid "Interlingua"
 msgstr "интерлингва"
 
@@ -159,6 +164,9 @@ msgstr "јапански"
 
 msgid "Georgian"
 msgstr "грузијски"
+
+msgid "Kabyle"
+msgstr "кабилски"
 
 msgid "Kazakh"
 msgstr "казашки"
@@ -293,7 +301,7 @@ msgid "Static Files"
 msgstr "Статички фајлови"
 
 msgid "Syndication"
-msgstr ""
+msgstr "Удруживање садржаја"
 
 msgid "That page number is not an integer"
 msgstr "Задати број стране није цео број"
@@ -388,6 +396,9 @@ msgstr[2] ""
 "Ово поље не сме да има више од %(limit_value)d карактера (тренутно има "
 "%(show_value)d)."
 
+msgid "Enter a number."
+msgstr "Унесите број."
+
 #, python-format
 msgid "Ensure that there are no more than %(max)s digit in total."
 msgid_plural "Ensure that there are no more than %(max)s digits in total."
@@ -469,6 +480,10 @@ msgstr "Велики (8 бајтова) цео број"
 #, python-format
 msgid "'%(value)s' value must be either True or False."
 msgstr "Вредност '%(value)s' мора бити или True или False."
+
+#, python-format
+msgid "'%(value)s' value must be either True, False, or None."
+msgstr "'%(value)s' вредност мора бити или True, False, или None."
 
 msgid "Boolean (Either True or False)"
 msgstr "Булова вредност (True или False)"
@@ -607,6 +622,9 @@ msgstr "Сирови бинарни подаци"
 msgid "'%(value)s' is not a valid UUID."
 msgstr "'%(value)s' није валидан UUID."
 
+msgid "Universally unique identifier"
+msgstr "Универзално јединствени идентификатор"
+
 msgid "File"
 msgstr "Фајл"
 
@@ -646,9 +664,6 @@ msgstr "Ово поље се мора попунити."
 msgid "Enter a whole number."
 msgstr "Унесите цео број."
 
-msgid "Enter a number."
-msgstr "Унесите број."
-
 msgid "Enter a valid date."
 msgstr "Унесите исправан датум."
 
@@ -660,6 +675,10 @@ msgstr "Унесите исправан датум/време."
 
 msgid "Enter a valid duration."
 msgstr "Унесите исправан временски интервал."
+
+#, python-brace-format
+msgid "The number of days must be between {min_days} and {max_days}."
+msgstr "Број дана мора бити између {min_days} и {max_days}."
 
 msgid "No file was submitted. Check the encoding type on the form."
 msgstr "Фајл није пребачен. Проверите тип енкодирања на форми."
@@ -1056,7 +1075,7 @@ msgstr "Ово није валидна IPv6 адреса."
 
 #, python-format
 msgctxt "String to return when truncating text"
-msgid "%(truncated_text)s..."
+msgid "%(truncated_text)s…"
 msgstr "%(truncated_text)s..."
 
 msgid "or"
@@ -1248,6 +1267,9 @@ msgid ""
 "\">DEBUG=True</a> is in your settings file and you have not configured any "
 "URLs."
 msgstr ""
+"Ова страна је приказана јер је <a href=\"https://docs.djangoproject.com/en/"
+"%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener"
+"\">DEBUG=True</a> у вашим подешавањима и нисте конфигурисали ниједан URL."
 
 msgid "Django Documentation"
 msgstr "Ђанго документација"

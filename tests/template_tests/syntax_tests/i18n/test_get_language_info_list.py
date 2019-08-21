@@ -1,3 +1,4 @@
+from django.template import TemplateSyntaxError
 from django.test import SimpleTestCase
 from django.utils import translation
 
@@ -43,3 +44,9 @@ class GetLanguageInfoListTests(SimpleTestCase):
             'it: Italian/italiano/italsky bidi=False; '
             'fr: French/français/francouzsky bidi=False; '
         )
+
+    @setup({'i18n_syntax': '{% load i18n %} {% get_language_info_list error %}'})
+    def test_no_for_as(self):
+        msg = "'get_language_info_list' requires 'for sequence as variable' (got ['error'])"
+        with self.assertRaisesMessage(TemplateSyntaxError, msg):
+            self.engine.render_to_string('i18n_syntax')

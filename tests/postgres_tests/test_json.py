@@ -1,21 +1,36 @@
 import datetime
+import operator
 import uuid
 from decimal import Decimal
 
 from django.core import checks, exceptions, serializers
 from django.core.serializers.json import DjangoJSONEncoder
+from django.db import connection
+from django.db.models import Count, F, Q
+from django.db.models.expressions import RawSQL
+from django.db.models.functions import Cast
 from django.forms import CharField, Form, widgets
-from django.test.utils import isolate_apps
+from django.test.utils import CaptureQueriesContext, isolate_apps
 from django.utils.html import escape
 
-from . import PostgreSQLTestCase
+from . import PostgreSQLSimpleTestCase, PostgreSQLTestCase
 from .models import JSONModel, PostgreSQLModel
 
 try:
     from django.contrib.postgres import forms
     from django.contrib.postgres.fields import JSONField
+    from django.contrib.postgres.fields.jsonb import KeyTextTransform, KeyTransform
 except ImportError:
     pass
+
+
+class TestModelMetaOrdering(PostgreSQLSimpleTestCase):
+    def test_ordering_by_json_field_value(self):
+        class TestJSONModel(JSONModel):
+            class Meta:
+                ordering = ['field__value']
+
+        self.assertEqual(TestJSONModel.check(), [])
 
 
 class TestSaveLoad(PostgreSQLTestCase):
@@ -94,19 +109,19 @@ class TestSaveLoad(PostgreSQLTestCase):
 class TestQuerying(PostgreSQLTestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.objs = [
-            JSONModel.objects.create(field=None),
-            JSONModel.objects.create(field=True),
-            JSONModel.objects.create(field=False),
-            JSONModel.objects.create(field='yes'),
-            JSONModel.objects.create(field=7),
-            JSONModel.objects.create(field=[]),
-            JSONModel.objects.create(field={}),
-            JSONModel.objects.create(field={
+        cls.objs = JSONModel.objects.bulk_create([
+            JSONModel(field=None),
+            JSONModel(field=True),
+            JSONModel(field=False),
+            JSONModel(field='yes'),
+            JSONModel(field=7),
+            JSONModel(field=[]),
+            JSONModel(field={}),
+            JSONModel(field={
                 'a': 'b',
                 'c': 1,
             }),
-            JSONModel.objects.create(field={
+            JSONModel(field={
                 'a': 'b',
                 'c': 1,
                 'd': ['e', {'f': 'g'}],
@@ -115,13 +130,13 @@ class TestQuerying(PostgreSQLTestCase):
                 'j': None,
                 'k': {'l': 'm'},
             }),
-            JSONModel.objects.create(field=[1, [2]]),
-            JSONModel.objects.create(field={
+            JSONModel(field=[1, [2]]),
+            JSONModel(field={
                 'k': True,
                 'l': False,
             }),
-            JSONModel.objects.create(field={'foo': 'bar'}),
-        ]
+            JSONModel(field={'foo': 'bar'}),
+        ])
 
     def test_exact(self):
         self.assertSequenceEqual(
@@ -141,6 +156,86 @@ class TestQuerying(PostgreSQLTestCase):
             [self.objs[0]]
         )
 
+    def test_ordering_by_transform(self):
+        objs = [
+            JSONModel.objects.create(field={'ord': 93, 'name': 'bar'}),
+            JSONModel.objects.create(field={'ord': 22.1, 'name': 'foo'}),
+            JSONModel.objects.create(field={'ord': -1, 'name': 'baz'}),
+            JSONModel.objects.create(field={'ord': 21.931902, 'name': 'spam'}),
+            JSONModel.objects.create(field={'ord': -100291029, 'name': 'eggs'}),
+        ]
+        query = JSONModel.objects.filter(field__name__isnull=False).order_by('field__ord')
+        self.assertSequenceEqual(query, [objs[4], objs[2], objs[3], objs[1], objs[0]])
+
+    def test_ordering_grouping_by_key_transform(self):
+        base_qs = JSONModel.objects.filter(field__d__0__isnull=False)
+        for qs in (
+            base_qs.order_by('field__d__0'),
+            base_qs.annotate(key=KeyTransform('0', KeyTransform('d', 'field'))).order_by('key'),
+        ):
+            self.assertSequenceEqual(qs, [self.objs[8]])
+        qs = JSONModel.objects.filter(field__isnull=False)
+        self.assertQuerysetEqual(
+            qs.values('field__d__0').annotate(count=Count('field__d__0')).order_by('count'),
+            [1, 10],
+            operator.itemgetter('count'),
+        )
+        self.assertQuerysetEqual(
+            qs.filter(field__isnull=False).annotate(
+                key=KeyTextTransform('f', KeyTransform('1', KeyTransform('d', 'field'))),
+            ).values('key').annotate(count=Count('key')).order_by('count'),
+            [(None, 0), ('g', 1)],
+            operator.itemgetter('key', 'count'),
+        )
+
+    def test_key_transform_raw_expression(self):
+        expr = RawSQL('%s::jsonb', ['{"x": "bar"}'])
+        self.assertSequenceEqual(
+            JSONModel.objects.filter(field__foo=KeyTransform('x', expr)),
+            [self.objs[-1]],
+        )
+
+    def test_key_transform_expression(self):
+        self.assertSequenceEqual(
+            JSONModel.objects.filter(field__d__0__isnull=False).annotate(
+                key=KeyTransform('d', 'field'),
+                chain=KeyTransform('0', 'key'),
+                expr=KeyTransform('0', Cast('key', JSONField())),
+            ).filter(chain=F('expr')),
+            [self.objs[8]],
+        )
+
+    def test_nested_key_transform_raw_expression(self):
+        expr = RawSQL('%s::jsonb', ['{"x": {"y": "bar"}}'])
+        self.assertSequenceEqual(
+            JSONModel.objects.filter(field__foo=KeyTransform('y', KeyTransform('x', expr))),
+            [self.objs[-1]],
+        )
+
+    def test_nested_key_transform_expression(self):
+        self.assertSequenceEqual(
+            JSONModel.objects.filter(field__d__0__isnull=False).annotate(
+                key=KeyTransform('d', 'field'),
+                chain=KeyTransform('f', KeyTransform('1', 'key')),
+                expr=KeyTransform('f', KeyTransform('1', Cast('key', JSONField()))),
+            ).filter(chain=F('expr')),
+            [self.objs[8]],
+        )
+
+    def test_deep_values(self):
+        query = JSONModel.objects.values_list('field__k__l')
+        self.assertSequenceEqual(
+            query,
+            [
+                (None,), (None,), (None,), (None,), (None,), (None,),
+                (None,), (None,), ('m',), (None,), (None,), (None,),
+            ]
+        )
+
+    def test_deep_distinct(self):
+        query = JSONModel.objects.distinct('field__k__l').values_list('field__k__l')
+        self.assertSequenceEqual(query, [('m',), (None,)])
+
     def test_isnull_key(self):
         # key__isnull works the same as has_key='key'.
         self.assertSequenceEqual(
@@ -150,6 +245,20 @@ class TestQuerying(PostgreSQLTestCase):
         self.assertSequenceEqual(
             JSONModel.objects.filter(field__a__isnull=False),
             [self.objs[7], self.objs[8]]
+        )
+
+    def test_none_key(self):
+        self.assertSequenceEqual(JSONModel.objects.filter(field__j=None), [self.objs[8]])
+
+    def test_none_key_exclude(self):
+        obj = JSONModel.objects.create(field={'j': 1})
+        self.assertSequenceEqual(JSONModel.objects.exclude(field__j=None), [obj])
+
+    def test_isnull_key_or_none(self):
+        obj = JSONModel.objects.create(field={'a': None})
+        self.assertSequenceEqual(
+            JSONModel.objects.filter(Q(field__a__isnull=True) | Q(field__a=None)),
+            self.objs[:7] + self.objs[9:] + [obj]
         )
 
     def test_contains(self):
@@ -259,9 +368,21 @@ class TestQuerying(PostgreSQLTestCase):
     def test_iregex(self):
         self.assertTrue(JSONModel.objects.filter(field__foo__iregex=r'^bAr$').exists())
 
+    def test_key_sql_injection(self):
+        with CaptureQueriesContext(connection) as queries:
+            self.assertFalse(
+                JSONModel.objects.filter(**{
+                    """field__test' = '"a"') OR 1 = 1 OR ('d""": 'x',
+                }).exists()
+            )
+        self.assertIn(
+            """."field" -> 'test'' = ''"a"'') OR 1 = 1 OR (''d') = '"x"' """,
+            queries[0]['sql'],
+        )
+
 
 @isolate_apps('postgres_tests')
-class TestChecks(PostgreSQLTestCase):
+class TestChecks(PostgreSQLSimpleTestCase):
 
     def test_invalid_default(self):
         class MyModel(PostgreSQLModel):
@@ -296,23 +417,33 @@ class TestChecks(PostgreSQLTestCase):
         self.assertEqual(model.check(), [])
 
 
-class TestSerialization(PostgreSQLTestCase):
+class TestSerialization(PostgreSQLSimpleTestCase):
     test_data = (
-        '[{"fields": {"field": {"a": "b", "c": null}, "field_custom": null}, '
+        '[{"fields": {"field": %s, "field_custom": null}, '
         '"model": "postgres_tests.jsonmodel", "pk": null}]'
+    )
+    test_values = (
+        # (Python value, serialized value),
+        ({'a': 'b', 'c': None}, '{"a": "b", "c": null}'),
+        ('abc', '"abc"'),
+        ('{"a": "a"}', '"{\\"a\\": \\"a\\"}"'),
     )
 
     def test_dumping(self):
-        instance = JSONModel(field={'a': 'b', 'c': None})
-        data = serializers.serialize('json', [instance])
-        self.assertJSONEqual(data, self.test_data)
+        for value, serialized in self.test_values:
+            with self.subTest(value=value):
+                instance = JSONModel(field=value)
+                data = serializers.serialize('json', [instance])
+                self.assertJSONEqual(data, self.test_data % serialized)
 
     def test_loading(self):
-        instance = list(serializers.deserialize('json', self.test_data))[0].object
-        self.assertEqual(instance.field, {'a': 'b', 'c': None})
+        for value, serialized in self.test_values:
+            with self.subTest(value=value):
+                instance = list(serializers.deserialize('json', self.test_data % serialized))[0].object
+                self.assertEqual(instance.field, value)
 
 
-class TestValidation(PostgreSQLTestCase):
+class TestValidation(PostgreSQLSimpleTestCase):
 
     def test_not_serializable(self):
         field = JSONField()
@@ -328,7 +459,7 @@ class TestValidation(PostgreSQLTestCase):
         self.assertEqual(field.clean(datetime.timedelta(days=1), None), datetime.timedelta(days=1))
 
 
-class TestFormField(PostgreSQLTestCase):
+class TestFormField(PostgreSQLSimpleTestCase):
 
     def test_valid(self):
         field = forms.JSONField()
@@ -344,7 +475,7 @@ class TestFormField(PostgreSQLTestCase):
         field = forms.JSONField()
         with self.assertRaises(exceptions.ValidationError) as cm:
             field.clean('{some badly formed: json}')
-        self.assertEqual(cm.exception.messages[0], "'{some badly formed: json}' value must be valid JSON.")
+        self.assertEqual(cm.exception.messages[0], '“{some badly formed: json}” value must be valid JSON.')
 
     def test_formfield(self):
         model_field = JSONField()

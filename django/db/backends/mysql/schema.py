@@ -16,7 +16,10 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
     sql_rename_column = "ALTER TABLE %(table)s CHANGE %(old_column)s %(new_column)s %(type)s"
 
     sql_delete_unique = "ALTER TABLE %(table)s DROP INDEX %(name)s"
-
+    sql_create_column_inline_fk = (
+        ', ADD CONSTRAINT %(name)s FOREIGN KEY (%(column)s) '
+        'REFERENCES %(to_table)s(%(to_column)s)'
+    )
     sql_delete_fk = "ALTER TABLE %(table)s DROP FOREIGN KEY %(name)s"
 
     sql_delete_index = "DROP INDEX %(name)s ON %(table)s"
@@ -24,17 +27,37 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
     sql_create_pk = "ALTER TABLE %(table)s ADD CONSTRAINT %(name)s PRIMARY KEY (%(columns)s)"
     sql_delete_pk = "ALTER TABLE %(table)s DROP PRIMARY KEY"
 
+    sql_create_index = 'CREATE INDEX %(name)s ON %(table)s (%(columns)s)%(extra)s'
+    # The name of the column check constraint is the same as the field name on
+    # MariaDB. Adding IF EXISTS clause prevents migrations crash. Constraint is
+    # removed during a "MODIFY" column statement.
+    sql_delete_check = 'ALTER TABLE %(table)s DROP CONSTRAINT IF EXISTS %(name)s'
+
     def quote_value(self, value):
-        # Inner import to allow module to fail to load gracefully
-        import MySQLdb.converters
-        return MySQLdb.escape(value, MySQLdb.converters.conversions)
+        self.connection.ensure_connection()
+        if isinstance(value, str):
+            value = value.replace('%', '%%')
+        # MySQLdb escapes to string, PyMySQL to bytes.
+        quoted = self.connection.connection.escape(value, self.connection.connection.encoders)
+        if isinstance(value, str) and isinstance(quoted, bytes):
+            quoted = quoted.decode()
+        return quoted
 
     def _is_limited_data_type(self, field):
         db_type = field.db_type(self.connection)
         return db_type is not None and db_type.lower() in self.connection._limited_data_types
 
     def skip_default(self, field):
-        return self._is_limited_data_type(field)
+        if not self._supports_limited_data_type_defaults:
+            return self._is_limited_data_type(field)
+        return False
+
+    @property
+    def _supports_limited_data_type_defaults(self):
+        # Only MariaDB >= 10.2.1 supports defaults for BLOB and TEXT.
+        if self.connection.mysql_is_mariadb:
+            return self.connection.mysql_version >= (10, 2, 1)
+        return False
 
     def add_field(self, model, field):
         super().add_field(model, field)

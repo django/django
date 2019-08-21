@@ -161,7 +161,7 @@ For example::
     class Person(models.Model):
         first_name = models.CharField(max_length=50)
         last_name = models.CharField(max_length=50)
-        role = models.CharField(max_length=1, choices=(('A', _('Author')), ('E', _('Editor'))))
+        role = models.CharField(max_length=1, choices=[('A', _('Author')), ('E', _('Editor'))])
         people = models.Manager()
         authors = AuthorManager()
         editors = EditorManager()
@@ -214,7 +214,7 @@ appropriate for your circumstances, you can tell Django which class to use by
 setting :attr:`Meta.base_manager_name
 <django.db.models.Options.base_manager_name>`.
 
-Manager's aren't used when querying on related models. For example, if the
+Base managers aren't used when querying on related models. For example, if the
 ``Question`` model :ref:`from the tutorial <creating-models>` had a ``deleted``
 field and a base manager that filters out instances with ``deleted=True``, a
 queryset like ``Choice.objects.filter(question__name__startswith='What')``
@@ -261,7 +261,7 @@ custom ``QuerySet`` if you also implement them on the ``Manager``::
     class Person(models.Model):
         first_name = models.CharField(max_length=50)
         last_name = models.CharField(max_length=50)
-        role = models.CharField(max_length=1, choices=(('A', _('Author')), ('E', _('Editor'))))
+        role = models.CharField(max_length=1, choices=[('A', _('Author')), ('E', _('Editor'))])
         people = PersonManager()
 
 This example allows you to call both ``authors()`` and ``editors()`` directly from

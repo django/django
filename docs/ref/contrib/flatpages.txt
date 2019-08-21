@@ -20,11 +20,6 @@ template. It can be associated with one, or multiple, sites.
 The content field may optionally be left blank if you prefer to put your
 content in a custom template.
 
-Here are some examples of flatpages on Django-powered sites:
-
-* http://www.lawrence.com/about/contact/
-* http://www2.ljworld.com/site/rules/
-
 Installation
 ============
 
@@ -213,10 +208,8 @@ Via the Python API
 
     Flatpages are represented by a standard
     :doc:`Django model </topics/db/models>`,
-    which lives in `django/contrib/flatpages/models.py`_. You can access
+    which lives in :source:`django/contrib/flatpages/models.py`. You can access
     flatpage objects via the :doc:`Django database API </topics/db/queries>`.
-
-.. _django/contrib/flatpages/models.py: https://github.com/django/django/blob/master/django/contrib/flatpages/models.py
 
 .. currentmodule:: django.contrib.flatpages
 

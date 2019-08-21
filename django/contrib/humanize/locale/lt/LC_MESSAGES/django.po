@@ -1,14 +1,14 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Matas Dailyda <matas@dailyda.com>, 2015
+# Matas Dailyda <matas@dailyda.com>, 2015,2018
 # Simonas Kazlauskas <simonas@kazlauskas.me>, 2013-2014
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-01-17 11:07+0100\n"
-"PO-Revision-Date: 2017-09-19 20:40+0000\n"
+"POT-Creation-Date: 2018-05-17 11:49+0200\n"
+"PO-Revision-Date: 2018-05-18 08:22+0000\n"
 "Last-Translator: Matas Dailyda <matas@dailyda.com>\n"
 "Language-Team: Lithuanian (http://www.transifex.com/django/django/language/"
 "lt/)\n"
@@ -16,23 +16,67 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: lt\n"
-"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && (n"
-"%100<10 || n%100>=20) ? 1 : 2);\n"
+"Plural-Forms: nplurals=4; plural=(n % 10 == 1 && (n % 100 > 19 || n % 100 < "
+"11) ? 0 : (n % 10 >= 2 && n % 10 <=9) && (n % 100 > 19 || n % 100 < 11) ? "
+"1 : n % 1 != 0 ? 2: 3);\n"
 
 msgid "Humanize"
 msgstr "Sužmoginti"
 
-msgid "th"
-msgstr "-as"
+#. Translators: Ordinal format for 11 (11th), 12 (12th), and 13 (13th).
+msgctxt "ordinal 11, 12, 13"
+msgid "{}th"
+msgstr "{}-as"
 
-msgid "st"
-msgstr "-as"
+#. Translators: Ordinal format when value ends with 0, e.g. 80th.
+msgctxt "ordinal 0"
+msgid "{}th"
+msgstr "{}-as"
 
-msgid "nd"
-msgstr "-as"
+#. Translators: Ordinal format when value ends with 1, e.g. 81st, except 11.
+msgctxt "ordinal 1"
+msgid "{}st"
+msgstr "{}-as"
 
-msgid "rd"
-msgstr "-as"
+#. Translators: Ordinal format when value ends with 2, e.g. 82nd, except 12.
+msgctxt "ordinal 2"
+msgid "{}nd"
+msgstr "{}-as"
+
+#. Translators: Ordinal format when value ends with 3, e.g. 83th, except 13.
+msgctxt "ordinal 3"
+msgid "{}rd"
+msgstr "{}-as"
+
+#. Translators: Ordinal format when value ends with 4, e.g. 84th.
+msgctxt "ordinal 4"
+msgid "{}th"
+msgstr "{}-as"
+
+#. Translators: Ordinal format when value ends with 5, e.g. 85th.
+msgctxt "ordinal 5"
+msgid "{}th"
+msgstr "{}-as"
+
+#. Translators: Ordinal format when value ends with 6, e.g. 86th.
+msgctxt "ordinal 6"
+msgid "{}th"
+msgstr "{}-as"
+
+#. Translators: Ordinal format when value ends with 7, e.g. 87th.
+msgctxt "ordinal 7"
+msgid "{}th"
+msgstr "{}-as"
+
+#. Translators: Ordinal format when value ends with 8, e.g. 88th.
+msgctxt "ordinal 8"
+msgid "{}th"
+msgstr "{}-as"
+
+#. Translators: Ordinal format when value ends with 9, e.g. 89th.
+msgctxt "ordinal 9"
+msgid "{}th"
+msgstr "{}-as"
 
 #, python-format
 msgid "%(value).1f million"
@@ -40,6 +84,7 @@ msgid_plural "%(value).1f million"
 msgstr[0] "%(value).1f milijonas"
 msgstr[1] "%(value).1f milijonai"
 msgstr[2] "%(value).1f milijonų"
+msgstr[3] "%(value).1f milijonų"
 
 #, python-format
 msgid "%(value)s million"
@@ -47,6 +92,7 @@ msgid_plural "%(value)s million"
 msgstr[0] "%(value)s milijonas"
 msgstr[1] "%(value)s milijonai"
 msgstr[2] "%(value)s milijonų"
+msgstr[3] "%(value)s milijonų"
 
 #, python-format
 msgid "%(value).1f billion"
@@ -54,6 +100,7 @@ msgid_plural "%(value).1f billion"
 msgstr[0] "%(value).1f milijardas"
 msgstr[1] "%(value).1f milijardai"
 msgstr[2] "%(value).1f milijardų"
+msgstr[3] "%(value).1f milijardų"
 
 #, python-format
 msgid "%(value)s billion"
@@ -61,6 +108,7 @@ msgid_plural "%(value)s billion"
 msgstr[0] "%(value)s milijardas"
 msgstr[1] "%(value)s milijardai"
 msgstr[2] "%(value)s milijardų"
+msgstr[3] "%(value)s milijardų"
 
 #, python-format
 msgid "%(value).1f trillion"
@@ -68,6 +116,7 @@ msgid_plural "%(value).1f trillion"
 msgstr[0] "%(value).1f trilijonas"
 msgstr[1] "%(value).1f trilijonai"
 msgstr[2] "%(value).1f trilijonų"
+msgstr[3] "%(value).1f trilijonų"
 
 #, python-format
 msgid "%(value)s trillion"
@@ -75,6 +124,7 @@ msgid_plural "%(value)s trillion"
 msgstr[0] "%(value)s trilijonas"
 msgstr[1] "%(value)s trilijonai"
 msgstr[2] "%(value)s trilijonų"
+msgstr[3] "%(value)s trilijonų"
 
 #, python-format
 msgid "%(value).1f quadrillion"
@@ -82,6 +132,7 @@ msgid_plural "%(value).1f quadrillion"
 msgstr[0] "%(value).1f kvadrilijonas"
 msgstr[1] "%(value).1f kvadrilijonai"
 msgstr[2] "%(value).1f kvadrilijonų"
+msgstr[3] "%(value).1f kvadrilijonų"
 
 #, python-format
 msgid "%(value)s quadrillion"
@@ -89,6 +140,7 @@ msgid_plural "%(value)s quadrillion"
 msgstr[0] "%(value)s kvadrilijonas"
 msgstr[1] "%(value)s kvadrilijonai"
 msgstr[2] "%(value)s kvadrilijonų"
+msgstr[3] "%(value)s kvadrilijonų"
 
 #, python-format
 msgid "%(value).1f quintillion"
@@ -96,6 +148,7 @@ msgid_plural "%(value).1f quintillion"
 msgstr[0] "%(value).1f kvintilijonas"
 msgstr[1] "%(value).1f kvintilijonai"
 msgstr[2] "%(value).1f kvintilijonų"
+msgstr[3] "%(value).1f kvintilijonų"
 
 #, python-format
 msgid "%(value)s quintillion"
@@ -103,6 +156,7 @@ msgid_plural "%(value)s quintillion"
 msgstr[0] "%(value)s kvintilijonas"
 msgstr[1] "%(value)s kvintilijonai"
 msgstr[2] "%(value)s kvintilijonų"
+msgstr[3] "%(value)s kvintilijonų"
 
 #, python-format
 msgid "%(value).1f sextillion"
@@ -110,6 +164,7 @@ msgid_plural "%(value).1f sextillion"
 msgstr[0] "%(value).1f sikstilijonas"
 msgstr[1] "%(value).1f sikstilijonai"
 msgstr[2] "%(value).1f sikstilijonų"
+msgstr[3] "%(value).1f sikstilijonų"
 
 #, python-format
 msgid "%(value)s sextillion"
@@ -117,6 +172,7 @@ msgid_plural "%(value)s sextillion"
 msgstr[0] "%(value)s sikstilijonas"
 msgstr[1] "%(value)s sikstilijonai"
 msgstr[2] "%(value)s sikstilijonų"
+msgstr[3] "%(value)s sikstilijonų"
 
 #, python-format
 msgid "%(value).1f septillion"
@@ -124,6 +180,7 @@ msgid_plural "%(value).1f septillion"
 msgstr[0] "%(value).1f septilijonas"
 msgstr[1] "%(value).1f septilijonai"
 msgstr[2] "%(value).1f septilijonų"
+msgstr[3] "%(value).1f septilijonų"
 
 #, python-format
 msgid "%(value)s septillion"
@@ -131,6 +188,7 @@ msgid_plural "%(value)s septillion"
 msgstr[0] "%(value)s septilijonas"
 msgstr[1] "%(value)s septilijonai"
 msgstr[2] "%(value)s septilijonų"
+msgstr[3] "%(value)s septilijonų"
 
 #, python-format
 msgid "%(value).1f octillion"
@@ -138,6 +196,7 @@ msgid_plural "%(value).1f octillion"
 msgstr[0] "%(value).1f oktilijonas"
 msgstr[1] "%(value).1f oktilijonai"
 msgstr[2] "%(value).1f oktilijonų"
+msgstr[3] "%(value).1f oktilijonų"
 
 #, python-format
 msgid "%(value)s octillion"
@@ -145,6 +204,7 @@ msgid_plural "%(value)s octillion"
 msgstr[0] "%(value)s oktilijonas"
 msgstr[1] "%(value)s oktilijonai"
 msgstr[2] "%(value)s oktilijonų"
+msgstr[3] "%(value)s oktilijonų"
 
 #, python-format
 msgid "%(value).1f nonillion"
@@ -152,6 +212,7 @@ msgid_plural "%(value).1f nonillion"
 msgstr[0] "%(value).1f naintilijonas"
 msgstr[1] "%(value).1f naintilijonai"
 msgstr[2] "%(value).1f naintilijonų"
+msgstr[3] "%(value).1f naintilijonų"
 
 #, python-format
 msgid "%(value)s nonillion"
@@ -159,6 +220,7 @@ msgid_plural "%(value)s nonillion"
 msgstr[0] "%(value)s naintilijonas"
 msgstr[1] "%(value)s naintilijonai"
 msgstr[2] "%(value)s naintilijonų"
+msgstr[3] "%(value)s naintilijonų"
 
 #, python-format
 msgid "%(value).1f decillion"
@@ -166,6 +228,7 @@ msgid_plural "%(value).1f decillion"
 msgstr[0] "%(value).1f decilijonas"
 msgstr[1] "%(value).1f decilijonai"
 msgstr[2] "%(value).1f decilijonų"
+msgstr[3] "%(value).1f decilijonų"
 
 #, python-format
 msgid "%(value)s decillion"
@@ -173,6 +236,7 @@ msgid_plural "%(value)s decillion"
 msgstr[0] "%(value)s decilijonas"
 msgstr[1] "%(value)s decilijonai"
 msgstr[2] "%(value)s decilijonų"
+msgstr[3] "%(value)s decilijonų"
 
 #, python-format
 msgid "%(value).1f googol"
@@ -180,6 +244,7 @@ msgid_plural "%(value).1f googol"
 msgstr[0] "%(value).1f gugolas"
 msgstr[1] "%(value).1f gugolai"
 msgstr[2] "%(value).1f gugolų"
+msgstr[3] "%(value).1f gugolų"
 
 #, python-format
 msgid "%(value)s googol"
@@ -187,6 +252,7 @@ msgid_plural "%(value)s googol"
 msgstr[0] "%(value)s gugolas"
 msgstr[1] "%(value)s gugolai"
 msgstr[2] "%(value)s gugolų"
+msgstr[3] "%(value)s gugolų"
 
 msgid "one"
 msgstr "vienas"
@@ -224,10 +290,67 @@ msgstr "rytoj"
 msgid "yesterday"
 msgstr "vakar"
 
+#. Translators: delta will contain a string like '2 months' or '1 month, 2
+#. weeks'
 #, python-format
-msgctxt "naturaltime"
 msgid "%(delta)s ago"
 msgstr "prieš %(delta)s"
+
+#. Translators: 'naturaltime-past' strings will be included in
+#. '%(delta)s ago'
+#, python-format
+msgctxt "naturaltime-past"
+msgid "%d year"
+msgid_plural "%d years"
+msgstr[0] "%d metus"
+msgstr[1] "%d metus"
+msgstr[2] "%d metų"
+msgstr[3] "%d metų"
+
+#, python-format
+msgctxt "naturaltime-past"
+msgid "%d month"
+msgid_plural "%d months"
+msgstr[0] "%d mėnesį"
+msgstr[1] "%d mėnesius"
+msgstr[2] "%d mėnesių"
+msgstr[3] "%d mėnesių"
+
+#, python-format
+msgctxt "naturaltime-past"
+msgid "%d week"
+msgid_plural "%d weeks"
+msgstr[0] "%d savaitę"
+msgstr[1] "%d savaites"
+msgstr[2] "%d savaičių"
+msgstr[3] "%d savaičių"
+
+#, python-format
+msgctxt "naturaltime-past"
+msgid "%d day"
+msgid_plural "%d days"
+msgstr[0] "%d dieną"
+msgstr[1] "%d dienas"
+msgstr[2] "%d dienų"
+msgstr[3] "%d dienų"
+
+#, python-format
+msgctxt "naturaltime-past"
+msgid "%d hour"
+msgid_plural "%d hours"
+msgstr[0] "%d valandą"
+msgstr[1] "%d valandas"
+msgstr[2] "%d valandų"
+msgstr[3] "%d valandų"
+
+#, python-format
+msgctxt "naturaltime-past"
+msgid "%d minute"
+msgid_plural "%d minutes"
+msgstr[0] "%d minutę"
+msgstr[1] "%d minutes"
+msgstr[2] "%d minučių"
+msgstr[3] "%d minučių"
 
 msgid "now"
 msgstr "dabar"
@@ -240,6 +363,7 @@ msgid_plural "%(count)s seconds ago"
 msgstr[0] "prieš %(count)s sekundę"
 msgstr[1] "prieš %(count)s sekundes"
 msgstr[2] "prieš %(count)s sekundžių"
+msgstr[3] "prieš %(count)s sekundžių"
 
 #. Translators: please keep a non-breaking space (U+00A0)
 #. between count and time unit.
@@ -249,6 +373,7 @@ msgid_plural "%(count)s minutes ago"
 msgstr[0] "prieš %(count)s minutę"
 msgstr[1] "prieš %(count)s minutes"
 msgstr[2] "prieš %(count)s minučių"
+msgstr[3] "prieš %(count)s minučių"
 
 #. Translators: please keep a non-breaking space (U+00A0)
 #. between count and time unit.
@@ -258,11 +383,69 @@ msgid_plural "%(count)s hours ago"
 msgstr[0] "prieš %(count)s valandą"
 msgstr[1] "prieš %(count)s valandas"
 msgstr[2] "prieš %(count)s valandų"
+msgstr[3] "prieš %(count)s valandų"
 
+#. Translators: delta will contain a string like '2 months' or '1 month, 2
+#. weeks'
 #, python-format
-msgctxt "naturaltime"
 msgid "%(delta)s from now"
 msgstr "%(delta)s nuo dabar"
+
+#. Translators: 'naturaltime-future' strings will be included in
+#. '%(delta)s from now'
+#, python-format
+msgctxt "naturaltime-future"
+msgid "%d year"
+msgid_plural "%d years"
+msgstr[0] "%d metus"
+msgstr[1] "%d metus"
+msgstr[2] "%d metų"
+msgstr[3] "%d metų"
+
+#, python-format
+msgctxt "naturaltime-future"
+msgid "%d month"
+msgid_plural "%d months"
+msgstr[0] "%d mėnesį"
+msgstr[1] "%d mėnesius"
+msgstr[2] "%d mėnesių"
+msgstr[3] "%d mėnesių"
+
+#, python-format
+msgctxt "naturaltime-future"
+msgid "%d week"
+msgid_plural "%d weeks"
+msgstr[0] "%d savaitę"
+msgstr[1] "%d savaites"
+msgstr[2] "%d savaičių"
+msgstr[3] "%d savaičių"
+
+#, python-format
+msgctxt "naturaltime-future"
+msgid "%d day"
+msgid_plural "%d days"
+msgstr[0] "%d dieną"
+msgstr[1] "%d dienas"
+msgstr[2] "%d dienų"
+msgstr[3] "%d dienų"
+
+#, python-format
+msgctxt "naturaltime-future"
+msgid "%d hour"
+msgid_plural "%d hours"
+msgstr[0] "%d valandą"
+msgstr[1] "%d valandas"
+msgstr[2] "%d valandų"
+msgstr[3] "%d valandų"
+
+#, python-format
+msgctxt "naturaltime-future"
+msgid "%d minute"
+msgid_plural "%d minutes"
+msgstr[0] "%d minutė"
+msgstr[1] "%d minutes"
+msgstr[2] "%d minučių"
+msgstr[3] "%d minučių"
 
 #. Translators: please keep a non-breaking space (U+00A0)
 #. between count and time unit.
@@ -272,6 +455,7 @@ msgid_plural "%(count)s seconds from now"
 msgstr[0] "%(count)s sekundė nuo dabar"
 msgstr[1] "%(count)s sekundes nuo dabar"
 msgstr[2] "%(count)s skundžių nuo dabar"
+msgstr[3] "%(count)s skundžių nuo dabar"
 
 #. Translators: please keep a non-breaking space (U+00A0)
 #. between count and time unit.
@@ -281,6 +465,7 @@ msgid_plural "%(count)s minutes from now"
 msgstr[0] "%(count)s minutė nuo dabar"
 msgstr[1] "%(count)s minutės nuo dabar"
 msgstr[2] "%(count)s minučių nuo dabar"
+msgstr[3] "%(count)s minučių nuo dabar"
 
 #. Translators: please keep a non-breaking space (U+00A0)
 #. between count and time unit.
@@ -290,3 +475,4 @@ msgid_plural "%(count)s hours from now"
 msgstr[0] "%(count)s valandą nuo dabar"
 msgstr[1] "%(count)s valandos nuo dabar"
 msgstr[2] "%(count)s valandų nuo dabar"
+msgstr[3] "%(count)s valandų nuo dabar"

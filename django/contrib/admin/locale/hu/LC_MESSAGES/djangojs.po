@@ -11,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
+"POT-Creation-Date: 2018-05-17 11:50+0200\n"
 "PO-Revision-Date: 2017-09-23 18:54+0000\n"
 "Last-Translator: János R (Hangya)\n"
 "Language-Team: Hungarian (http://www.transifex.com/django/django/language/"
@@ -102,26 +102,8 @@ msgstr ""
 "Kiválasztott egy műveletet, és nem módosított egyetlen mezőt sem. "
 "Feltehetően a Mehet gombot keresi a Mentés helyett."
 
-#, javascript-format
-msgid "Note: You are %s hour ahead of server time."
-msgid_plural "Note: You are %s hours ahead of server time."
-msgstr[0] "Megjegyzés: %s órával a szerveridő előtt jársz"
-msgstr[1] "Megjegyzés: %s órával a szerveridő előtt jársz"
-
-#, javascript-format
-msgid "Note: You are %s hour behind server time."
-msgid_plural "Note: You are %s hours behind server time."
-msgstr[0] "Megjegyzés: %s órával a szerveridő mögött jársz"
-msgstr[1] "Megjegyzés: %s órával a szerveridő mögött jársz"
-
 msgid "Now"
 msgstr "Most"
-
-msgid "Choose a Time"
-msgstr "Válassza ki az időt"
-
-msgid "Choose a time"
-msgstr "Válassza ki az időt"
 
 msgid "Midnight"
 msgstr "Éjfél"
@@ -134,6 +116,24 @@ msgstr "Dél"
 
 msgid "6 p.m."
 msgstr "Este 6 óra"
+
+#, javascript-format
+msgid "Note: You are %s hour ahead of server time."
+msgid_plural "Note: You are %s hours ahead of server time."
+msgstr[0] "Megjegyzés: %s órával a szerveridő előtt jársz"
+msgstr[1] "Megjegyzés: %s órával a szerveridő előtt jársz"
+
+#, javascript-format
+msgid "Note: You are %s hour behind server time."
+msgid_plural "Note: You are %s hours behind server time."
+msgstr[0] "Megjegyzés: %s órával a szerveridő mögött jársz"
+msgstr[1] "Megjegyzés: %s órával a szerveridő mögött jársz"
+
+msgid "Choose a Time"
+msgstr "Válassza ki az időt"
+
+msgid "Choose a time"
+msgstr "Válassza ki az időt"
 
 msgid "Cancel"
 msgstr "Mégsem"

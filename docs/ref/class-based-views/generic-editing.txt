@@ -10,13 +10,19 @@ editing content:
 * :class:`django.views.generic.edit.UpdateView`
 * :class:`django.views.generic.edit.DeleteView`
 
+.. seealso::
+
+    The :doc:`messages framework </ref/contrib/messages>` contains
+    :class:`~django.contrib.messages.views.SuccessMessageMixin`, which
+    facilitates presenting messages about successful form submissions.
+
 .. note::
 
     Some of the examples on this page assume that an ``Author`` model has been
     defined as follows in ``myapp/models.py``::
 
-        from django.urls import reverse
         from django.db import models
+        from django.urls import reverse
 
         class Author(models.Model):
             name = models.CharField(max_length=200)
@@ -74,7 +80,7 @@ editing content:
 
     .. code-block:: html+django
 
-        <form action="" method="post">{% csrf_token %}
+        <form method="post">{% csrf_token %}
             {{ form.as_p }}
             <input type="submit" value="Send message">
         </form>
@@ -130,7 +136,7 @@ editing content:
 
     .. code-block:: html+django
 
-        <form action="" method="post">{% csrf_token %}
+        <form method="post">{% csrf_token %}
             {{ form.as_p }}
             <input type="submit" value="Save">
         </form>
@@ -187,7 +193,7 @@ editing content:
 
     .. code-block:: html+django
 
-        <form action="" method="post">{% csrf_token %}
+        <form method="post">{% csrf_token %}
             {{ form.as_p }}
             <input type="submit" value="Update">
         </form>
@@ -226,8 +232,8 @@ editing content:
 
     **Example myapp/views.py**::
 
-        from django.views.generic.edit import DeleteView
         from django.urls import reverse_lazy
+        from django.views.generic.edit import DeleteView
         from myapp.models import Author
 
         class AuthorDelete(DeleteView):
@@ -238,7 +244,7 @@ editing content:
 
     .. code-block:: html+django
 
-        <form action="" method="post">{% csrf_token %}
+        <form method="post">{% csrf_token %}
             <p>Are you sure you want to delete "{{ object }}"?</p>
             <input type="submit" value="Confirm">
         </form>

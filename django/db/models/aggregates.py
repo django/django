@@ -3,7 +3,10 @@ Classes to represent the definitions of aggregate functions.
 """
 from django.core.exceptions import FieldError
 from django.db.models.expressions import Case, Func, Star, When
-from django.db.models.fields import DecimalField, FloatField, IntegerField
+from django.db.models.fields import IntegerField
+from django.db.models.functions.mixins import (
+    FixDurationInputMixin, NumericOutputFieldMixin,
+)
 
 __all__ = [
     'Aggregate', 'Avg', 'Count', 'Max', 'Min', 'StdDev', 'Sum', 'Variance',
@@ -11,14 +14,19 @@ __all__ = [
 
 
 class Aggregate(Func):
+    template = '%(function)s(%(distinct)s%(expressions)s)'
     contains_aggregate = True
     name = None
     filter_template = '%s FILTER (WHERE %%(filter)s)'
     window_compatible = True
+    allow_distinct = False
 
-    def __init__(self, *args, filter=None, **kwargs):
+    def __init__(self, *expressions, distinct=False, filter=None, **extra):
+        if distinct and not self.allow_distinct:
+            raise TypeError("%s does not allow distinct." % self.__class__.__name__)
+        self.distinct = distinct
         self.filter = filter
-        super().__init__(*args, **kwargs)
+        super().__init__(*expressions, **extra)
 
     def get_source_fields(self):
         # Don't return the filter expression since it's not a source field.
@@ -27,7 +35,7 @@ class Aggregate(Func):
     def get_source_expressions(self):
         source_expressions = super().get_source_expressions()
         if self.filter:
-            source_expressions += [self.filter]
+            return source_expressions + [self.filter]
         return source_expressions
 
     def set_source_expressions(self, exprs):
@@ -56,15 +64,19 @@ class Aggregate(Func):
             return '%s__%s' % (expressions[0].name, self.name.lower())
         raise TypeError("Complex expressions require an alias")
 
-    def get_group_by_cols(self):
+    def get_group_by_cols(self, alias=None):
         return []
 
     def as_sql(self, compiler, connection, **extra_context):
+        extra_context['distinct'] = 'DISTINCT ' if self.distinct else ''
         if self.filter:
             if connection.features.supports_aggregate_filter_clause:
                 filter_sql, filter_params = self.filter.as_sql(compiler, connection)
                 template = self.filter_template % extra_context.get('template', self.template)
-                sql, params = super().as_sql(compiler, connection, template=template, filter=filter_sql)
+                sql, params = super().as_sql(
+                    compiler, connection, template=template, filter=filter_sql,
+                    **extra_context
+                )
                 return sql, params + filter_params
             else:
                 copy = self.copy()
@@ -77,55 +89,31 @@ class Aggregate(Func):
 
     def _get_repr_options(self):
         options = super()._get_repr_options()
+        if self.distinct:
+            options['distinct'] = self.distinct
         if self.filter:
-            options.update({'filter': self.filter})
+            options['filter'] = self.filter
         return options
 
 
-class Avg(Aggregate):
+class Avg(FixDurationInputMixin, NumericOutputFieldMixin, Aggregate):
     function = 'AVG'
     name = 'Avg'
-
-    def _resolve_output_field(self):
-        source_field = self.get_source_fields()[0]
-        if isinstance(source_field, (IntegerField, DecimalField)):
-            return FloatField()
-        return super()._resolve_output_field()
-
-    def as_mysql(self, compiler, connection):
-        sql, params = super().as_sql(compiler, connection)
-        if self.output_field.get_internal_type() == 'DurationField':
-            sql = 'CAST(%s as SIGNED)' % sql
-        return sql, params
-
-    def as_oracle(self, compiler, connection):
-        if self.output_field.get_internal_type() == 'DurationField':
-            expression = self.get_source_expressions()[0]
-            from django.db.backends.oracle.functions import IntervalToSeconds, SecondsToInterval
-            return compiler.compile(
-                SecondsToInterval(Avg(IntervalToSeconds(expression), filter=self.filter))
-            )
-        return super().as_sql(compiler, connection)
+    allow_distinct = True
 
 
 class Count(Aggregate):
     function = 'COUNT'
     name = 'Count'
-    template = '%(function)s(%(distinct)s%(expressions)s)'
     output_field = IntegerField()
+    allow_distinct = True
 
-    def __init__(self, expression, distinct=False, filter=None, **extra):
+    def __init__(self, expression, filter=None, **extra):
         if expression == '*':
             expression = Star()
         if isinstance(expression, Star) and filter is not None:
             raise ValueError('Star cannot be used with filter. Please specify a field.')
-        super().__init__(
-            expression, distinct='DISTINCT ' if distinct else '',
-            filter=filter, **extra
-        )
-
-    def _get_repr_options(self):
-        return {**super()._get_repr_options(), 'distinct': self.extra['distinct'] != ''}
+        super().__init__(expression, filter=filter, **extra)
 
     def convert_value(self, value, expression, connection):
         return 0 if value is None else value
@@ -141,9 +129,8 @@ class Min(Aggregate):
     name = 'Min'
 
 
-class StdDev(Aggregate):
+class StdDev(NumericOutputFieldMixin, Aggregate):
     name = 'StdDev'
-    output_field = FloatField()
 
     def __init__(self, expression, sample=False, **extra):
         self.function = 'STDDEV_SAMP' if sample else 'STDDEV_POP'
@@ -153,29 +140,14 @@ class StdDev(Aggregate):
         return {**super()._get_repr_options(), 'sample': self.function == 'STDDEV_SAMP'}
 
 
-class Sum(Aggregate):
+class Sum(FixDurationInputMixin, Aggregate):
     function = 'SUM'
     name = 'Sum'
-
-    def as_mysql(self, compiler, connection):
-        sql, params = super().as_sql(compiler, connection)
-        if self.output_field.get_internal_type() == 'DurationField':
-            sql = 'CAST(%s as SIGNED)' % sql
-        return sql, params
-
-    def as_oracle(self, compiler, connection):
-        if self.output_field.get_internal_type() == 'DurationField':
-            expression = self.get_source_expressions()[0]
-            from django.db.backends.oracle.functions import IntervalToSeconds, SecondsToInterval
-            return compiler.compile(
-                SecondsToInterval(Sum(IntervalToSeconds(expression)))
-            )
-        return super().as_sql(compiler, connection)
+    allow_distinct = True
 
 
-class Variance(Aggregate):
+class Variance(NumericOutputFieldMixin, Aggregate):
     name = 'Variance'
-    output_field = FloatField()
 
     def __init__(self, expression, sample=False, **extra):
         self.function = 'VAR_SAMP' if sample else 'VAR_POP'

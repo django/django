@@ -2,14 +2,15 @@
 #
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011
+# NullIsNot0 <nullisnot0@inbox.lv>, 2019
 # peterisb <pb@sungis.lv>, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2017-09-19 16:40+0000\n"
-"Last-Translator: peterisb <pb@sungis.lv>\n"
+"POT-Creation-Date: 2019-01-16 20:42+0100\n"
+"PO-Revision-Date: 2019-02-18 17:02+0000\n"
+"Last-Translator: NullIsNot0 <nullisnot0@inbox.lv>\n"
 "Language-Team: Latvian (http://www.transifex.com/django/django/language/"
 "lv/)\n"
 "MIME-Version: 1.0\n"
@@ -40,6 +41,11 @@ msgid ""
 msgstr ""
 "Šai vērtība ir jāsatur tikai burtus, ciparus, punktus, pasvītrojumi, "
 "domuzīmes, slīpsvītras vai tildes simboli."
+
+msgid "Example: '/about/contact'. Make sure to have a leading slash."
+msgstr ""
+"Piemēram: '/about/contact'. Pārliecinieties, ka esat ievietojuši sākuma "
+"slīpsvītru."
 
 msgid "URL is missing a leading slash."
 msgstr "URL trūkst sākuma slīpsvītra."

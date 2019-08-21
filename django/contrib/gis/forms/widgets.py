@@ -2,6 +2,7 @@ import logging
 
 from django.conf import settings
 from django.contrib.gis import gdal
+from django.contrib.gis.geometry import json_regex
 from django.contrib.gis.geos import GEOSException, GEOSGeometry
 from django.forms.widgets import Widget
 from django.utils import translation
@@ -36,7 +37,7 @@ class BaseGeometryWidget(Widget):
     def deserialize(self, value):
         try:
             return GEOSGeometry(value)
-        except (GEOSException, ValueError) as err:
+        except (GEOSException, ValueError, TypeError) as err:
             logger.error("Error creating geometry from value '%s' (%s)", value, err)
         return None
 
@@ -79,17 +80,24 @@ class OpenLayersWidget(BaseGeometryWidget):
     class Media:
         css = {
             'all': (
-                'https://cdnjs.cloudflare.com/ajax/libs/ol3/3.20.1/ol.css',
+                'https://cdnjs.cloudflare.com/ajax/libs/ol3/4.6.5/ol.css',
                 'gis/css/ol3.css',
             )
         }
         js = (
-            'https://cdnjs.cloudflare.com/ajax/libs/ol3/3.20.1/ol.js',
+            'https://cdnjs.cloudflare.com/ajax/libs/ol3/4.6.5/ol.js',
             'gis/js/OLMapWidget.js',
         )
 
     def serialize(self, value):
         return value.json if value else ''
+
+    def deserialize(self, value):
+        geom = super().deserialize(value)
+        # GeoJSON assumes WGS84 (4326). Use the map's SRID instead.
+        if geom and json_regex.match(value) and self.map_srid != 4326:
+            geom.srid = self.map_srid
+        return geom
 
 
 class OSMWidget(OpenLayersWidget):

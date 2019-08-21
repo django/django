@@ -15,7 +15,7 @@ class Command(BaseCommand):
             help='Tells Django to NOT prompt the user for input of any kind.',
         )
         parser.add_argument(
-            '--database', action='store', dest='database', default=DEFAULT_DB_ALIAS,
+            '--database', default=DEFAULT_DB_ALIAS,
             help='Nominates the database to use. Defaults to the "default" database.',
         )
 
@@ -60,7 +60,7 @@ Are you sure you want to delete these content types?
 If you're unsure, answer 'no'.\n""" % content_type_display)
                     ok_to_delete = input("Type 'yes' to continue, or 'no' to cancel: ")
                 else:
-                    ok_to_delete = False
+                    ok_to_delete = 'yes'
 
                 if ok_to_delete == 'yes':
                     for ct in to_remove:

@@ -15,6 +15,10 @@ class Employee(models.Model):
         return '%s %s' % (self.firstname, self.lastname)
 
 
+class RemoteEmployee(Employee):
+    adjusted_salary = models.IntegerField()
+
+
 class Company(models.Model):
     name = models.CharField(max_length=100)
     num_employees = models.PositiveIntegerField()
@@ -22,12 +26,14 @@ class Company(models.Model):
     ceo = models.ForeignKey(
         Employee,
         models.CASCADE,
-        related_name='company_ceo_set')
+        related_name='company_ceo_set',
+    )
     point_of_contact = models.ForeignKey(
         Employee,
         models.SET_NULL,
         related_name='company_point_of_contact_set',
-        null=True)
+        null=True,
+    )
 
     def __str__(self):
         return self.name

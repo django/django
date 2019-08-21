@@ -60,12 +60,11 @@ wasn't a deliberate choice, Unicode characters have always been accepted when
 using Python 3.
 
 The username validator now explicitly accepts Unicode characters by
-default on Python 3 only. This default behavior can be overridden by changing
-the :attr:`~django.contrib.auth.models.User.username_validator` attribute of
-the ``User`` model, or to any proxy of that model, using either
+default on Python 3 only.
+
+Custom user models may use the new
 :class:`~django.contrib.auth.validators.ASCIIUsernameValidator` or
-:class:`~django.contrib.auth.validators.UnicodeUsernameValidator`. Custom user
-models may also use those validators.
+:class:`~django.contrib.auth.validators.UnicodeUsernameValidator`.
 
 Minor features
 --------------
@@ -656,7 +655,7 @@ The apps registry is no longer auto-populated when unpickling models. This was
 added in Django 1.7.2 as an attempt to allow unpickling models outside of
 Django, such as in an RQ worker, without calling ``django.setup()``, but it
 creates the possibility of a deadlock. To adapt your code in the case of RQ,
-you can `provide your own worker script <http://python-rq.org/docs/workers/>`_
+you can `provide your own worker script <https://python-rq.org/docs/workers/>`_
 that calls ``django.setup()``.
 
 Removed null assignment check for non-null foreign key fields

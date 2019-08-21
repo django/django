@@ -4,13 +4,13 @@
 # Jannis Leidel <jannis@leidel.info>, 2011
 # lardissone <lardissone@gmail.com>, 2014
 # poli <poli@devartis.com>, 2014
-# Ramiro Morales, 2013-2017
+# Ramiro Morales, 2013-2019
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-11-15 16:15+0100\n"
-"PO-Revision-Date: 2017-11-16 01:55+0000\n"
+"POT-Creation-Date: 2019-01-16 20:42+0100\n"
+"PO-Revision-Date: 2019-03-20 14:07+0000\n"
 "Last-Translator: Ramiro Morales\n"
 "Language-Team: Spanish (Argentina) (http://www.transifex.com/django/django/"
 "language/es_AR/)\n"
@@ -140,6 +140,9 @@ msgstr "alto sorabo"
 msgid "Hungarian"
 msgstr "húngaro"
 
+msgid "Armenian"
+msgstr "Armenio"
+
 msgid "Interlingua"
 msgstr "Interlingua"
 
@@ -160,6 +163,9 @@ msgstr "japonés"
 
 msgid "Georgian"
 msgstr "georgiano"
+
+msgid "Kabyle"
+msgstr "cabilio"
 
 msgid "Kazakh"
 msgstr "kazajo"
@@ -385,6 +391,9 @@ msgstr[1] ""
 "Asegúrese de que este valor tenga como máximo %(limit_value)d caracteres "
 "(tiene %(show_value)d)."
 
+msgid "Enter a number."
+msgstr "Introduzca un número."
+
 #, python-format
 msgid "Ensure that there are no more than %(max)s digit in total."
 msgid_plural "Ensure that there are no more than %(max)s digits in total."
@@ -465,6 +474,10 @@ msgstr "Entero grande (8 bytes)"
 #, python-format
 msgid "'%(value)s' value must be either True or False."
 msgstr "El valor de '%(value)s' debe ser Verdadero o Falso."
+
+#, python-format
+msgid "'%(value)s' value must be either True, False, or None."
+msgstr "El valor de '%(value)s' debe ser Verdadero, Falso o None."
 
 msgid "Boolean (Either True or False)"
 msgstr "Booleano (Verdadero o Falso)"
@@ -603,6 +616,9 @@ msgstr "Datos binarios crudos"
 msgid "'%(value)s' is not a valid UUID."
 msgstr "'%(value)s' no es un UUID válido."
 
+msgid "Universally unique identifier"
+msgstr "Identificador universalmente único"
+
 msgid "File"
 msgstr "Archivo"
 
@@ -642,9 +658,6 @@ msgstr "Este campo es obligatorio."
 msgid "Enter a whole number."
 msgstr "Introduzca un número entero."
 
-msgid "Enter a number."
-msgstr "Introduzca un número."
-
 msgid "Enter a valid date."
 msgstr "Introduzca una fecha válida."
 
@@ -656,6 +669,10 @@ msgstr "Introduzca un valor de fecha/hora válido."
 
 msgid "Enter a valid duration."
 msgstr "Introduzca una duración válida."
+
+#, python-brace-format
+msgid "The number of days must be between {min_days} and {max_days}."
+msgstr "La cantidad de días debe tener valores entre {min_days} y {max_days}."
 
 msgid "No file was submitted. Check the encoding type on the form."
 msgstr ""
@@ -1003,59 +1020,59 @@ msgstr "Dic."
 
 msgctxt "alt. month"
 msgid "January"
-msgstr "Enero"
+msgstr "enero"
 
 msgctxt "alt. month"
 msgid "February"
-msgstr "Febrero"
+msgstr "febrero"
 
 msgctxt "alt. month"
 msgid "March"
-msgstr "Marzo"
+msgstr "marzo"
 
 msgctxt "alt. month"
 msgid "April"
-msgstr "Abril"
+msgstr "abril"
 
 msgctxt "alt. month"
 msgid "May"
-msgstr "Mayo"
+msgstr "mayo"
 
 msgctxt "alt. month"
 msgid "June"
-msgstr "Junio"
+msgstr "junio"
 
 msgctxt "alt. month"
 msgid "July"
-msgstr "Julio"
+msgstr "julio"
 
 msgctxt "alt. month"
 msgid "August"
-msgstr "Agosto"
+msgstr "agosto"
 
 msgctxt "alt. month"
 msgid "September"
-msgstr "Setiembre"
+msgstr "setiembre"
 
 msgctxt "alt. month"
 msgid "October"
-msgstr "Octubre"
+msgstr "octubre"
 
 msgctxt "alt. month"
 msgid "November"
-msgstr "Noviembre"
+msgstr "noviembre"
 
 msgctxt "alt. month"
 msgid "December"
-msgstr "Diciembre"
+msgstr "diciembre"
 
 msgid "This is not a valid IPv6 address."
-msgstr "Esta no es una direción IPv6 válida."
+msgstr "Esta no es una dirección IPv6 válida."
 
 #, python-format
 msgctxt "String to return when truncating text"
-msgid "%(truncated_text)s..."
-msgstr "%(truncated_text)s..."
+msgid "%(truncated_text)s…"
+msgstr "%(truncated_text)s…"
 
 msgid "or"
 msgstr "o"
@@ -1265,4 +1282,4 @@ msgid "Django Community"
 msgstr "Comunidad Django"
 
 msgid "Connect, get help, or contribute"
-msgstr "Conécteses, consiga ayuda o contribuya"
+msgstr "Conéctese, consiga ayuda o contribuya"

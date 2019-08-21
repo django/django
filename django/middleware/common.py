@@ -7,6 +7,7 @@ from django.core.mail import mail_managers
 from django.http import HttpResponsePermanentRedirect
 from django.urls import is_valid_path
 from django.utils.deprecation import MiddlewareMixin
+from django.utils.http import escape_leading_slashes
 
 
 class CommonMiddleware(MiddlewareMixin):
@@ -37,9 +38,10 @@ class CommonMiddleware(MiddlewareMixin):
         """
 
         # Check for denied User-Agents
-        if 'HTTP_USER_AGENT' in request.META:
+        user_agent = request.META.get('HTTP_USER_AGENT')
+        if user_agent is not None:
             for user_agent_regex in settings.DISALLOWED_USER_AGENTS:
-                if user_agent_regex.search(request.META['HTTP_USER_AGENT']):
+                if user_agent_regex.search(user_agent):
                     raise PermissionDenied('Forbidden user agent')
 
         # Check for a redirect based on settings.PREPEND_WWW
@@ -79,6 +81,8 @@ class CommonMiddleware(MiddlewareMixin):
         POST, PUT, or PATCH.
         """
         new_path = request.get_full_path(force_append_slash=True)
+        # Prevent construction of scheme relative urls.
+        new_path = escape_leading_slashes(new_path)
         if settings.DEBUG and request.method in ('POST', 'PUT', 'PATCH'):
             raise RuntimeError(
                 "You called this URL via %(method)s, but the URL doesn't end "
@@ -130,7 +134,8 @@ class BrokenLinkEmailsMiddleware(MiddlewareMixin):
                     ),
                     "Referrer: %s\nRequested URL: %s\nUser agent: %s\n"
                     "IP address: %s\n" % (referer, path, ua, ip),
-                    fail_silently=True)
+                    fail_silently=True,
+                )
         return response
 
     def is_internal_request(self, domain, referer):

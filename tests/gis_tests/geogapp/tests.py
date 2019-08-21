@@ -66,11 +66,11 @@ class GeographyTest(TestCase):
         # Getting the shapefile and mapping dictionary.
         shp_path = os.path.realpath(os.path.join(os.path.dirname(__file__), '..', 'data'))
         co_shp = os.path.join(shp_path, 'counties', 'counties.shp')
-        co_mapping = {'name': 'Name',
-                      'state': 'State',
-                      'mpoly': 'MULTIPOLYGON',
-                      }
-
+        co_mapping = {
+            'name': 'Name',
+            'state': 'State',
+            'mpoly': 'MULTIPOLYGON',
+        }
         # Reference county names, number of polygons, and state names.
         names = ['Bexar', 'Galveston', 'Harris', 'Honolulu', 'Pueblo']
         num_polys = [1, 2, 1, 19, 1]  # Number of polygons for each.

@@ -32,10 +32,12 @@ class CheckboxSelectMultipleTest(WidgetTest):
 
     def test_render_none(self):
         """
-        If the value is None, none of the options are selected.
+        If the value is None, none of the options are selected, even if the
+        choices have an empty option.
         """
-        self.check_html(self.widget(choices=self.beatles), 'beatles', None, html=(
+        self.check_html(self.widget(choices=(('', 'Unknown'),) + self.beatles), 'beatles', None, html=(
             """<ul>
+            <li><label><input type="checkbox" name="beatles" value=""> Unknown</label></li>
             <li><label><input type="checkbox" name="beatles" value="J"> John</label></li>
             <li><label><input type="checkbox" name="beatles" value="P"> Paul</label></li>
             <li><label><input type="checkbox" name="beatles" value="G"> George</label></li>

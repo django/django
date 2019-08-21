@@ -77,4 +77,8 @@
         margin-left: 0;
         margin-right: 15px;
     }
+
+    [dir="rtl"] .aligned ul {
+        margin-right: 0;
+    }
 }

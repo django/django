@@ -7,7 +7,6 @@ from django.core.exceptions import ImproperlyConfigured, PermissionDenied
 from django.middleware.csrf import rotate_token
 from django.utils.crypto import constant_time_compare
 from django.utils.module_loading import import_string
-from django.utils.translation import LANGUAGE_SESSION_KEY
 
 from .signals import user_logged_in, user_logged_out, user_login_failed
 
@@ -119,6 +118,9 @@ def login(request, user, backend=None):
                 'therefore must provide the `backend` argument or set the '
                 '`backend` attribute on the user.'
             )
+    else:
+        if not isinstance(backend, str):
+            raise TypeError('backend must be a dotted import path string (got %r).' % backend)
 
     request.session[SESSION_KEY] = user._meta.pk.value_to_string(user)
     request.session[BACKEND_SESSION_KEY] = backend
@@ -140,15 +142,7 @@ def logout(request):
     if not getattr(user, 'is_authenticated', True):
         user = None
     user_logged_out.send(sender=user.__class__, request=request, user=user)
-
-    # remember language choice saved to session
-    language = request.session.get(LANGUAGE_SESSION_KEY)
-
     request.session.flush()
-
-    if language is not None:
-        request.session[LANGUAGE_SESSION_KEY] = language
-
     if hasattr(request, 'user'):
         from django.contrib.auth.models import AnonymousUser
         request.user = AnonymousUser()

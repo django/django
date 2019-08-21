@@ -4,16 +4,16 @@
 # Ankhbayar <ankhaa1002@gmail.com>, 2013
 # Jannis Leidel <jannis@leidel.info>, 2011
 # jargalan <jargalanch@gmail.com>, 2011
-# Zorig <zorig_ezd@yahoo.com>, 2016
-# Анхбаяр Анхаа <l.ankhbayar@gmail.com>, 2013-2016
+# Zorig, 2016
+# Анхбаяр Анхаа <l.ankhbayar@gmail.com>, 2013-2016,2018-2019
 # Баясгалан Цэвлээ <bayasaa_7672@yahoo.com>, 2011,2017
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-09-19 16:40+0000\n"
-"Last-Translator: Баясгалан Цэвлээ <bayasaa_7672@yahoo.com>\n"
+"POT-Creation-Date: 2019-01-16 20:42+0100\n"
+"PO-Revision-Date: 2019-02-13 09:17+0000\n"
+"Last-Translator: Анхбаяр Анхаа <l.ankhbayar@gmail.com>\n"
 "Language-Team: Mongolian (http://www.transifex.com/django/django/language/"
 "mn/)\n"
 "MIME-Version: 1.0\n"
@@ -91,6 +91,15 @@ msgstr "Өөр %(verbose_name)s  нэмэх "
 msgid "Remove"
 msgstr "Хасах"
 
+msgid "Addition"
+msgstr "Нэмэгдсэн"
+
+msgid "Change"
+msgstr "Өөрчлөх"
+
+msgid "Deletion"
+msgstr "Устгагдсан"
+
 msgid "action time"
 msgstr "үйлдлийн хугацаа"
 
@@ -104,7 +113,7 @@ msgid "object id"
 msgstr "обектийн id"
 
 #. Translators: 'repr' means representation
-#. (https://docs.python.org/3/library/functions.html#repr)
+#. (https://docs.python.org/library/functions.html#repr)
 msgid "object repr"
 msgstr "обектийн хамаарал"
 
@@ -170,9 +179,11 @@ msgstr ""
 "байгаад сонгоно."
 
 #, python-brace-format
-msgid ""
-"The {name} \"{obj}\" was added successfully. You may edit it again below."
-msgstr "{name} \"{obj}\" амжилттай нэмэгдлээ. Та дахин засах боломжтой."
+msgid "The {name} \"{obj}\" was added successfully."
+msgstr " {name} \"{obj}\" амжилттай нэмэгдлээ."
+
+msgid "You may edit it again below."
+msgstr "Та дараахийг дахин засах боломжтой"
 
 #, python-brace-format
 msgid ""
@@ -183,13 +194,14 @@ msgstr ""
 "боломжтой."
 
 #, python-brace-format
-msgid "The {name} \"{obj}\" was added successfully."
-msgstr " {name} \"{obj}\" амжилттай нэмэгдлээ."
-
-#, python-brace-format
 msgid ""
 "The {name} \"{obj}\" was changed successfully. You may edit it again below."
 msgstr "{name} \"{obj}\" амжилттай өөрчилөгдлөө. Та дахин засах боломжтой."
+
+#, python-brace-format
+msgid ""
+"The {name} \"{obj}\" was added successfully. You may edit it again below."
+msgstr "{name} \"{obj}\" амжилттай нэмэгдлээ. Та дахин засах боломжтой."
 
 #, python-brace-format
 msgid ""
@@ -228,6 +240,10 @@ msgstr "%s-ийг нэмэх"
 #, python-format
 msgid "Change %s"
 msgstr "%s-ийг өөрчлөх"
+
+#, python-format
+msgid "View %s"
+msgstr "%s харах "
 
 msgid "Database error"
 msgstr "Өгөгдлийн сангийн алдаа"
@@ -337,7 +353,7 @@ msgid "Change password"
 msgstr "Нууц үг өөрчлөх"
 
 msgid "Please correct the error below."
-msgstr "Доорх алдаануудыг засна уу."
+msgstr "Доорх алдааг засна уу"
 
 msgid "Please correct the errors below."
 msgstr "Доор гарсан алдаануудыг засна уу."
@@ -446,8 +462,8 @@ msgstr ""
 "Та %(objects_name)s ийг устгах гэж байна итгэлтэй байна? Дараах обектууд "
 "болон холбоотой зүйлс хамт устагдах болно:"
 
-msgid "Change"
-msgstr "Өөрчлөх"
+msgid "View"
+msgstr "Харах"
 
 msgid "Delete?"
 msgstr "Устгах уу?"
@@ -466,8 +482,8 @@ msgstr "%(name)s хэрэглүүр дэх моделууд."
 msgid "Add"
 msgstr "Нэмэх"
 
-msgid "You don't have permission to edit anything."
-msgstr "Та ямар нэг зүйл засварлах зөвшөөрөлгүй байна."
+msgid "You don't have permission to view or edit anything."
+msgstr "Танд харах болон засах эрх алга."
 
 msgid "Recent actions"
 msgstr "Сүүлд хийсэн үйлдлүүд"
@@ -523,20 +539,8 @@ msgstr "Бүгдийг харуулах"
 msgid "Save"
 msgstr "Хадгалах"
 
-msgid "Popup closing..."
-msgstr "Цонх хаагдлаа"
-
-#, python-format
-msgid "Change selected %(model)s"
-msgstr "Сонгосон %(model)s-ийг өөрчлөх"
-
-#, python-format
-msgid "Add another %(model)s"
-msgstr "Өөр %(model)s нэмэх"
-
-#, python-format
-msgid "Delete selected %(model)s"
-msgstr "Сонгосон %(model)s устгах"
+msgid "Popup closing…"
+msgstr "Хааж байна..."
 
 msgid "Search"
 msgstr "Хайлт"
@@ -559,6 +563,24 @@ msgstr "Хадгалаад өөрийг нэмэх"
 
 msgid "Save and continue editing"
 msgstr "Хадгалаад нэмж засах"
+
+msgid "Save and view"
+msgstr "Хадгалаад харах."
+
+msgid "Close"
+msgstr "Хаах"
+
+#, python-format
+msgid "Change selected %(model)s"
+msgstr "Сонгосон %(model)s-ийг өөрчлөх"
+
+#, python-format
+msgid "Add another %(model)s"
+msgstr "Өөр %(model)s нэмэх"
+
+#, python-format
+msgid "Delete selected %(model)s"
+msgstr "Сонгосон %(model)s устгах"
 
 msgid "Thanks for spending some quality time with the Web site today."
 msgstr "Манай вэб сайтыг ашигласанд баярлалаа."
@@ -669,6 +691,10 @@ msgstr "%s-г сонго"
 #, python-format
 msgid "Select %s to change"
 msgstr "Өөрчлөх %s-г сонгоно уу"
+
+#, python-format
+msgid "Select %s to view"
+msgstr "Харахын тулд %s  сонгоно уу"
 
 msgid "Date:"
 msgstr "Огноо:"

@@ -22,9 +22,9 @@ for the previous LTS, Django 1.8, will end in April 2018.
 Python compatibility
 ====================
 
-Django 1.11 requires Python 2.7, 3.4, 3.5, or 3.6. Django 1.11 is the first
-release to support Python 3.6. We **highly recommend** and only officially
-support the latest release of each series.
+Django 1.11 requires Python 2.7, 3.4, 3.5, 3.6, or 3.7 (as of 1.11.17). We
+**highly recommend** and only officially support the latest release of each
+series.
 
 The Django 1.11.x series is the last to support Python 2. The next major
 release, Django 2.0, will only support Python 3.4+.
@@ -180,8 +180,8 @@ Minor features
 
 * The OpenLayers-based form widgets now use ``OpenLayers.js`` from
   ``https://cdnjs.cloudflare.com`` which is more suitable for production use
-  than the the old ``http://openlayers.org`` source. They are also updated to
-  use OpenLayers 3.
+  than the old ``https://openlayers.org/`` source. They are also updated to use
+  OpenLayers 3.
 
 * PostGIS migrations can now change field dimensions.
 
@@ -512,7 +512,7 @@ backends.
   default value is ``True`` and the ``DatabaseIntrospection.get_constraints()``
   method should include an ``'orders'`` key in each of the returned
   dictionaries with a list of ``'ASC'`` and/or ``'DESC'`` values corresponding
-  to the the ordering of each column in the index.
+  to the ordering of each column in the index.
 
 * :djadmin:`inspectdb` no longer calls ``DatabaseIntrospection.get_indexes()``
   which is deprecated. Custom database backends should ensure all types of
@@ -576,7 +576,7 @@ It's automatically installed along with Django.
 Support for ``settings.TIME_ZONE = None`` is removed as the behavior isn't
 commonly used and is questionably useful. If you want to automatically detect
 the timezone based on the system timezone, you can use `tzlocal
-<https://pypi.python.org/pypi/tzlocal>`_::
+<https://pypi.org/project/tzlocal/>`_::
 
     from tzlocal import get_localzone
 
@@ -639,6 +639,17 @@ custom operation that works with model classes or model instances from the
 you must render model states using the ``clear_delayed_apps_cache()`` method as
 described in :ref:`writing your own migration operation
 <writing-your-own-migration-operation>`.
+
+Server-side cursors on PostgreSQL
+---------------------------------
+
+The change to make :meth:`.QuerySet.iterator()` use server-side cursors on
+PostgreSQL prevents running Django with `pgBouncer` in transaction pooling
+mode. To reallow that, use the :setting:`DISABLE_SERVER_SIDE_CURSORS
+<DATABASE-DISABLE_SERVER_SIDE_CURSORS>` setting (added in Django 1.11.1) in
+:setting:`DATABASES`.
+
+See :ref:`transaction-pooling-server-side-cursors` for more discussion.
 
 Miscellaneous
 -------------
@@ -765,6 +776,13 @@ Miscellaneous
   now require a ``name`` attribute with a value that passes the
   :data:`~django.core.validators.validate_image_file_extension` validator.
   See the note in :meth:`.Client.post`.
+
+* :class:`~django.db.models.FileField` now moves rather than copies the file
+  it receives. With the default file upload settings, files larger than
+  :setting:`FILE_UPLOAD_MAX_MEMORY_SIZE` now have the same permissions as
+  temporary files (often ``0o600``) rather than the system's standard umask
+  (often ``0o6644``). Set the :setting:`FILE_UPLOAD_PERMISSIONS` if you need
+  the same permission regardless of file size.
 
 .. _deprecated-features-1.11:
 

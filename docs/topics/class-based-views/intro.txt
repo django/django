@@ -82,11 +82,12 @@ Because Django's URL resolver expects to send the request and associated
 arguments to a callable function, not a class, class-based views have an
 :meth:`~django.views.generic.base.View.as_view` class method which returns a
 function that can be called when a request arrives for a URL matching the
-associated pattern. The function creates an instance of the class and calls its
-:meth:`~django.views.generic.base.View.dispatch` method. ``dispatch`` looks at
-the request to determine whether it is a ``GET``, ``POST``, etc, and relays the
-request to a matching method if one is defined, or raises
-:class:`~django.http.HttpResponseNotAllowed` if not::
+associated pattern. The function creates an instance of the class, calls
+:meth:`~django.views.generic.base.View.setup` to initialize its attributes, and
+then calls its :meth:`~django.views.generic.base.View.dispatch` method.
+``dispatch`` looks at the request to determine whether it is a ``GET``,
+``POST``, etc, and relays the request to a matching method if one is defined,
+or raises :class:`~django.http.HttpResponseNotAllowed` if not::
 
     # urls.py
     from django.urls import path
@@ -306,6 +307,9 @@ decorator. In the example, ``never_cache()`` will process the request before
 ``login_required()``.
 
 In this example, every instance of ``ProtectedView`` will have login protection.
+These examples use ``login_required``, however, the same behavior can be
+obtained more simply using
+:class:`~django.contrib.auth.mixins.LoginRequiredMixin`.
 
 .. note::
 

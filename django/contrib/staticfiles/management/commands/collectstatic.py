@@ -1,5 +1,4 @@
 import os
-from collections import OrderedDict
 
 from django.apps import apps
 from django.contrib.staticfiles.finders import get_finders
@@ -51,16 +50,16 @@ class Command(BaseCommand):
                  "pattern. Use multiple times to ignore more.",
         )
         parser.add_argument(
-            '-n', '--dry-run', action='store_true', dest='dry_run',
+            '-n', '--dry-run', action='store_true',
             help="Do everything except modify the filesystem.",
         )
         parser.add_argument(
-            '-c', '--clear', action='store_true', dest='clear',
+            '-c', '--clear', action='store_true',
             help="Clear the existing files using the storage "
                  "before trying to copy or link the original file.",
         )
         parser.add_argument(
-            '-l', '--link', action='store_true', dest='link',
+            '-l', '--link', action='store_true',
             help="Create a symbolic link to each file instead of copying.",
         )
         parser.add_argument(
@@ -80,7 +79,7 @@ class Command(BaseCommand):
         ignore_patterns = options['ignore_patterns']
         if options['use_default_ignore_patterns']:
             ignore_patterns += apps.get_app_config('staticfiles').ignore_patterns
-        self.ignore_patterns = list(set(ignore_patterns))
+        self.ignore_patterns = list(set(os.path.normpath(p) for p in ignore_patterns))
         self.post_process = options['post_process']
 
     def collect(self):
@@ -100,7 +99,7 @@ class Command(BaseCommand):
         else:
             handler = self.copy_file
 
-        found_files = OrderedDict()
+        found_files = {}
         for finder in get_finders():
             for path, storage in finder.list(self.ignore_patterns):
                 # Prefix the relative path if the source storage contains it
@@ -134,7 +133,7 @@ class Command(BaseCommand):
                     raise processed
                 if processed:
                     self.log("Post-processed '%s' as '%s'" %
-                             (original_path, processed_path), level=1)
+                             (original_path, processed_path), level=2)
                     self.post_processed_files.append(original_path)
                 else:
                     self.log("Skipped post-processing '%s'" % original_path)
@@ -271,7 +270,6 @@ class Command(BaseCommand):
                         # unmodified files.
                         can_skip_unmodified_files = not (self.symlink ^ os.path.islink(full_path))
                     else:
-                        full_path = None
                         # In remote storages, skipping is only based on the
                         # modified times since symlinks aren't relevant.
                         can_skip_unmodified_files = True
@@ -309,12 +307,9 @@ class Command(BaseCommand):
         if self.dry_run:
             self.log("Pretending to link '%s'" % source_path, level=1)
         else:
-            self.log("Linking '%s'" % source_path, level=1)
+            self.log("Linking '%s'" % source_path, level=2)
             full_path = self.storage.path(prefixed_path)
-            try:
-                os.makedirs(os.path.dirname(full_path))
-            except OSError:
-                pass
+            os.makedirs(os.path.dirname(full_path), exist_ok=True)
             try:
                 if os.path.lexists(full_path):
                     os.unlink(full_path)
@@ -348,7 +343,7 @@ class Command(BaseCommand):
         if self.dry_run:
             self.log("Pretending to copy '%s'" % source_path, level=1)
         else:
-            self.log("Copying '%s'" % source_path, level=1)
+            self.log("Copying '%s'" % source_path, level=2)
             with source_storage.open(path) as source_file:
                 self.storage.save(prefixed_path, source_file)
         self.copied_files.append(prefixed_path)

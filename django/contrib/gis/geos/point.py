@@ -40,6 +40,12 @@ class Point(GEOSGeometry):
         #  createPoint factory.
         super().__init__(point, srid=srid)
 
+    def _to_pickle_wkb(self):
+        return None if self.empty else super()._to_pickle_wkb()
+
+    def _from_pickle_wkb(self, wkb):
+        return self._create_empty() if wkb is None else super()._from_pickle_wkb(wkb)
+
     def _ogr_ptr(self):
         return gdal.geometries.Point._create_empty() if self.empty else super()._ogr_ptr()
 
@@ -70,8 +76,11 @@ class Point(GEOSGeometry):
     def _set_list(self, length, items):
         ptr = self._create_point(length, items)
         if ptr:
+            srid = self.srid
             capi.destroy_geom(self.ptr)
             self._ptr = ptr
+            if srid is not None:
+                self.srid = srid
             self._post_init()
         else:
             # can this happen?

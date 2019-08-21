@@ -1,9 +1,10 @@
 import unittest
-import warnings
+from io import StringIO
 from unittest import mock
 
-from django.db import DatabaseError, connection
-from django.test import TestCase
+from django.core.exceptions import ImproperlyConfigured
+from django.db import DatabaseError, connection, connections
+from django.test import TestCase, override_settings
 
 
 @unittest.skipUnless(connection.vendor == 'postgresql', 'PostgreSQL tests')
@@ -23,16 +24,37 @@ class Tests(TestCase):
         self.assertIsNone(nodb_conn.settings_dict['NAME'])
 
         # Now assume the 'postgres' db isn't available
-        with warnings.catch_warnings(record=True) as w:
+        msg = (
+            "Normally Django will use a connection to the 'postgres' database "
+            "to avoid running initialization queries against the production "
+            "database when it's not needed (for example, when running tests). "
+            "Django was unable to create a connection to the 'postgres' "
+            "database and will use the first PostgreSQL database instead."
+        )
+        with self.assertWarnsMessage(RuntimeWarning, msg):
             with mock.patch('django.db.backends.base.base.BaseDatabaseWrapper.connect',
                             side_effect=mocked_connect, autospec=True):
-                warnings.simplefilter('always', RuntimeWarning)
-                nodb_conn = connection._nodb_connection
+                with mock.patch.object(
+                    connection,
+                    'settings_dict',
+                    {**connection.settings_dict, 'NAME': 'postgres'},
+                ):
+                    nodb_conn = connection._nodb_connection
         self.assertIsNotNone(nodb_conn.settings_dict['NAME'])
-        self.assertEqual(nodb_conn.settings_dict['NAME'], connection.settings_dict['NAME'])
-        # Check a RuntimeWarning has been emitted
-        self.assertEqual(len(w), 1)
-        self.assertEqual(w[0].message.__class__, RuntimeWarning)
+        self.assertEqual(nodb_conn.settings_dict['NAME'], connections['other'].settings_dict['NAME'])
+
+    def test_database_name_too_long(self):
+        from django.db.backends.postgresql.base import DatabaseWrapper
+        settings = connection.settings_dict.copy()
+        max_name_length = connection.ops.max_name_length()
+        settings['NAME'] = 'a' + (max_name_length * 'a')
+        msg = (
+            "The database name '%s' (%d characters) is longer than "
+            "PostgreSQL's limit of %s characters. Supply a shorter NAME in "
+            "settings.DATABASES."
+        ) % (settings['NAME'], max_name_length + 1, max_name_length)
+        with self.assertRaisesMessage(ImproperlyConfigured, msg):
+            DatabaseWrapper(settings).get_connection_params()
 
     def test_connect_and_rollback(self):
         """
@@ -113,6 +135,12 @@ class Tests(TestCase):
         finally:
             new_connection.close()
 
+    def test_connect_no_is_usable_checks(self):
+        new_connection = connection.copy()
+        with mock.patch.object(new_connection, 'is_usable') as is_usable:
+            new_connection.connect()
+        is_usable.assert_not_called()
+
     def _select(self, val):
         with connection.cursor() as cursor:
             cursor.execute('SELECT %s', (val,))
@@ -149,3 +177,15 @@ class Tests(TestCase):
             self.assertEqual(psycopg2_version(), (4, 2, 1))
         with mock.patch('psycopg2.__version__', '4.2b0.dev1 (dt dec pq3 ext lo64)'):
             self.assertEqual(psycopg2_version(), (4, 2))
+
+    @override_settings(DEBUG=True)
+    def test_copy_cursors(self):
+        out = StringIO()
+        copy_expert_sql = 'COPY django_session TO STDOUT (FORMAT CSV, HEADER)'
+        with connection.cursor() as cursor:
+            cursor.copy_expert(copy_expert_sql, out)
+            cursor.copy_to(out, 'django_session')
+        self.assertEqual(
+            [q['sql'] for q in connection.queries],
+            [copy_expert_sql, 'COPY django_session TO STDOUT'],
+        )

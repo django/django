@@ -114,6 +114,8 @@ Some widgets add further information to the context. For instance, all widgets
 that subclass ``Input`` defines ``widget['type']`` and :class:`.MultiWidget`
 defines ``widget['subwidgets']`` for looping purposes.
 
+.. _overriding-built-in-widget-templates:
+
 Overriding built-in widget templates
 ====================================
 
@@ -123,6 +125,6 @@ Each widget has a ``template_name`` attribute with a value such as
 ``input.html`` by defining ``django/forms/widgets/input.html``, for example.
 See :ref:`built-in widgets` for the name of each widget's template.
 
-If you use the :class:`TemplatesSetting` renderer, overriding widget templates
-works the same as overriding any other template in your project. You can't
-override built-in widget templates using the other built-in renderers.
+To override widget templates, you must use the :class:`TemplatesSetting`
+renderer. Then overriding widget templates works :doc:`the same as
+</howto/overriding-templates>` overriding any other template in your project.

@@ -3,16 +3,17 @@
 # Translators:
 # Claude Paroz <claude@2xlibre.net>, 2016
 # Jannis Leidel <jannis@leidel.info>, 2011
-# Shinya Okano <tokibito@gmail.com>, 2012-2017
+# Shinichi Katsumata <shinichi.katsumata@gmail.com>, 2019
+# Shinya Okano <tokibito@gmail.com>, 2012-2018
 # Tetsuya Morimoto <tetsuya.morimoto@gmail.com>, 2011
 # 上田慶祐 <kei.mokusyun@gmail.com>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-09-19 16:41+0000\n"
-"Last-Translator: Shinya Okano <tokibito@gmail.com>\n"
+"POT-Creation-Date: 2019-01-16 20:42+0100\n"
+"PO-Revision-Date: 2019-01-19 07:00+0000\n"
+"Last-Translator: Shinichi Katsumata <shinichi.katsumata@gmail.com>\n"
 "Language-Team: Japanese (http://www.transifex.com/django/django/language/"
 "ja/)\n"
 "MIME-Version: 1.0\n"
@@ -90,6 +91,15 @@ msgstr "%(verbose_name)s の追加"
 msgid "Remove"
 msgstr "削除"
 
+msgid "Addition"
+msgstr "追加"
+
+msgid "Change"
+msgstr "変更"
+
+msgid "Deletion"
+msgstr "削除"
+
 msgid "action time"
 msgstr "操作時刻"
 
@@ -103,7 +113,7 @@ msgid "object id"
 msgstr "オブジェクト ID"
 
 #. Translators: 'repr' means representation
-#. (https://docs.python.org/3/library/functions.html#repr)
+#. (https://docs.python.org/library/functions.html#repr)
 msgid "object repr"
 msgstr "オブジェクトの文字列表現"
 
@@ -169,9 +179,11 @@ msgstr ""
 "Command キーを使ってください"
 
 #, python-brace-format
-msgid ""
-"The {name} \"{obj}\" was added successfully. You may edit it again below."
-msgstr "{name} \"{obj}\" を追加しました。続けて編集できます。"
+msgid "The {name} \"{obj}\" was added successfully."
+msgstr "{name} \"{obj}\" を追加しました。"
+
+msgid "You may edit it again below."
+msgstr "以下で再度編集できます。"
 
 #, python-brace-format
 msgid ""
@@ -180,13 +192,14 @@ msgid ""
 msgstr "{name} \"{obj}\" を追加しました。 別の {name} を以下から追加できます。"
 
 #, python-brace-format
-msgid "The {name} \"{obj}\" was added successfully."
-msgstr "{name} \"{obj}\" を追加しました。"
-
-#, python-brace-format
 msgid ""
 "The {name} \"{obj}\" was changed successfully. You may edit it again below."
 msgstr "{name} \"{obj}\" を変更しました。 以下から再度編集できます。"
+
+#, python-brace-format
+msgid ""
+"The {name} \"{obj}\" was added successfully. You may edit it again below."
+msgstr "{name} \"{obj}\" を追加しました。続けて編集できます。"
 
 #, python-brace-format
 msgid ""
@@ -223,6 +236,10 @@ msgstr "%s を追加"
 #, python-format
 msgid "Change %s"
 msgstr "%s を変更"
+
+#, python-format
+msgid "View %s"
+msgstr "%sを表示"
 
 msgid "Database error"
 msgstr "データベースエラー"
@@ -441,8 +458,8 @@ msgstr ""
 "本当に選択した %(objects_name)s を削除しますか？ 以下の全てのオブジェクトと関"
 "連する要素が削除されます:"
 
-msgid "Change"
-msgstr "変更"
+msgid "View"
+msgstr "表示"
 
 msgid "Delete?"
 msgstr "削除しますか?"
@@ -461,8 +478,8 @@ msgstr "%(name)s アプリケーション内のモデル"
 msgid "Add"
 msgstr "追加"
 
-msgid "You don't have permission to edit anything."
-msgstr "変更のためのパーミッションがありません。"
+msgid "You don't have permission to view or edit anything."
+msgstr "表示または変更のためのパーミッションがありません。"
 
 msgid "Recent actions"
 msgstr "最近行った操作"
@@ -517,20 +534,8 @@ msgstr "全件表示"
 msgid "Save"
 msgstr "保存"
 
-msgid "Popup closing..."
+msgid "Popup closing…"
 msgstr "ポップアップを閉じています..."
-
-#, python-format
-msgid "Change selected %(model)s"
-msgstr "選択された %(model)s の変更"
-
-#, python-format
-msgid "Add another %(model)s"
-msgstr "%(model)s の追加"
-
-#, python-format
-msgid "Delete selected %(model)s"
-msgstr "選択された %(model)s を削除"
 
 msgid "Search"
 msgstr "検索"
@@ -552,6 +557,24 @@ msgstr "保存してもう一つ追加"
 
 msgid "Save and continue editing"
 msgstr "保存して編集を続ける"
+
+msgid "Save and view"
+msgstr "保存して表示"
+
+msgid "Close"
+msgstr "閉じる"
+
+#, python-format
+msgid "Change selected %(model)s"
+msgstr "選択された %(model)s の変更"
+
+#, python-format
+msgid "Add another %(model)s"
+msgstr "%(model)s の追加"
+
+#, python-format
+msgid "Delete selected %(model)s"
+msgstr "選択された %(model)s を削除"
 
 msgid "Thanks for spending some quality time with the Web site today."
 msgstr "ご利用ありがとうございました。"
@@ -660,6 +683,10 @@ msgstr "%s を選択"
 #, python-format
 msgid "Select %s to change"
 msgstr "変更する %s を選択"
+
+#, python-format
+msgid "Select %s to view"
+msgstr "表示する%sを選択"
 
 msgid "Date:"
 msgstr "日付:"

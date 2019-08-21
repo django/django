@@ -1,7 +1,7 @@
 # This file is distributed under the same license as the Django package.
 #
 # The *_FORMAT strings use the Django date format syntax,
-# see http://docs.djangoproject.com/en/dev/ref/templates/builtins/#date
+# see https://docs.djangoproject.com/en/dev/ref/templates/builtins/#date
 DATE_FORMAT = 'd E Y р.'
 TIME_FORMAT = 'H:i'
 DATETIME_FORMAT = 'd E Y р. H:i'
@@ -12,7 +12,7 @@ SHORT_DATETIME_FORMAT = 'd.m.Y H:i'
 FIRST_DAY_OF_WEEK = 1  # Monday
 
 # The *_INPUT_FORMATS strings use the Python strftime format syntax,
-# see http://docs.python.org/library/datetime.html#strftime-strptime-behavior
+# see https://docs.python.org/library/datetime.html#strftime-strptime-behavior
 DATE_INPUT_FORMATS = [
     '%d.%m.%Y',  # '25.10.2006'
     '%d %B %Y',  # '25 October 2006'

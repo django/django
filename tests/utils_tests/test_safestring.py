@@ -1,6 +1,6 @@
 from django.template import Context, Template
 from django.test import SimpleTestCase
-from django.utils import html, text
+from django.utils import html
 from django.utils.functional import lazy, lazystr
 from django.utils.safestring import SafeData, mark_safe
 
@@ -26,7 +26,7 @@ class SafeStringTest(SimpleTestCase):
 
     def test_mark_safe_str(self):
         """
-        Calling str() on a SafeText instance doesn't lose the safe status.
+        Calling str() on a SafeString instance doesn't lose the safe status.
         """
         s = mark_safe('a&b')
         self.assertIsInstance(str(s), type(s))
@@ -66,10 +66,6 @@ class SafeStringTest(SimpleTestCase):
         self.assertRenderEqual('{{ s }}', 'a&b', s=s)
 
         s = html.escapejs(lazystr('a'))
-        s += mark_safe('&b')
-        self.assertRenderEqual('{{ s }}', 'a&b', s=s)
-
-        s = text.slugify(lazystr('a'))
         s += mark_safe('&b')
         self.assertRenderEqual('{{ s }}', 'a&b', s=s)
 

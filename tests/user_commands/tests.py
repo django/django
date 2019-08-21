@@ -7,11 +7,15 @@ from admin_scripts.tests import AdminScriptTestCase
 from django.apps import apps
 from django.core import management
 from django.core.management import BaseCommand, CommandError, find_commands
-from django.core.management.utils import find_command, popen_wrapper
+from django.core.management.utils import (
+    find_command, get_random_secret_key, is_ignored_path,
+    normalize_path_patterns, popen_wrapper,
+)
 from django.db import connection
 from django.test import SimpleTestCase, override_settings
 from django.test.utils import captured_stderr, extend_sys_path
 from django.utils import translation
+from django.utils.version import PY37
 
 from .management.commands import dance
 
@@ -63,17 +67,16 @@ class CommandTests(SimpleTestCase):
             dance.Command.requires_system_checks = True
         self.assertIn("CommandError", stderr.getvalue())
 
-    def test_deactivate_locale_set(self):
-        # Deactivate translation when set to true
+    def test_no_translations_deactivate_translations(self):
+        """
+        When the Command handle method is decorated with @no_translations,
+        translations are deactivated inside the command.
+        """
+        current_locale = translation.get_language()
         with translation.override('pl'):
-            result = management.call_command('leave_locale_alone_false', stdout=StringIO())
+            result = management.call_command('no_translations', stdout=StringIO())
             self.assertIsNone(result)
-
-    def test_configured_locale_preserved(self):
-        # Leaves locale from settings when set to false
-        with translation.override('pl'):
-            result = management.call_command('leave_locale_alone_true', stdout=StringIO())
-            self.assertEqual(result, "pl")
+        self.assertEqual(translation.get_language(), current_locale)
 
     def test_find_command_without_PATH(self):
         """
@@ -178,30 +181,84 @@ class CommandTests(SimpleTestCase):
     def test_call_command_unrecognized_option(self):
         msg = (
             'Unknown option(s) for dance command: unrecognized. Valid options '
-            'are: example, help, integer, no_color, opt_3, option3, '
-            'pythonpath, settings, skip_checks, stderr, stdout, style, '
-            'traceback, verbosity, version.'
+            'are: example, force_color, help, integer, no_color, opt_3, '
+            'option3, pythonpath, settings, skip_checks, stderr, stdout, '
+            'style, traceback, verbosity, version.'
         )
         with self.assertRaisesMessage(TypeError, msg):
             management.call_command('dance', unrecognized=1)
 
         msg = (
             'Unknown option(s) for dance command: unrecognized, unrecognized2. '
-            'Valid options are: example, help, integer, no_color, opt_3, '
-            'option3, pythonpath, settings, skip_checks, stderr, stdout, '
-            'style, traceback, verbosity, version.'
+            'Valid options are: example, force_color, help, integer, no_color, '
+            'opt_3, option3, pythonpath, settings, skip_checks, stderr, '
+            'stdout, style, traceback, verbosity, version.'
         )
         with self.assertRaisesMessage(TypeError, msg):
             management.call_command('dance', unrecognized=1, unrecognized2=1)
+
+    def test_call_command_with_required_parameters_in_options(self):
+        out = StringIO()
+        management.call_command('required_option', need_me='foo', needme2='bar', stdout=out)
+        self.assertIn('need_me', out.getvalue())
+        self.assertIn('needme2', out.getvalue())
+
+    def test_call_command_with_required_parameters_in_mixed_options(self):
+        out = StringIO()
+        management.call_command('required_option', '--need-me=foo', needme2='bar', stdout=out)
+        self.assertIn('need_me', out.getvalue())
+        self.assertIn('needme2', out.getvalue())
+
+    def test_command_add_arguments_after_common_arguments(self):
+        out = StringIO()
+        management.call_command('common_args', stdout=out)
+        self.assertIn('Detected that --version already exists', out.getvalue())
+
+    def test_subparser(self):
+        out = StringIO()
+        management.call_command('subparser', 'foo', 12, stdout=out)
+        self.assertIn('bar', out.getvalue())
+
+    def test_subparser_dest_args(self):
+        out = StringIO()
+        management.call_command('subparser_dest', 'foo', bar=12, stdout=out)
+        self.assertIn('bar', out.getvalue())
+
+    def test_subparser_dest_required_args(self):
+        out = StringIO()
+        management.call_command('subparser_required', 'foo_1', 'foo_2', bar=12, stdout=out)
+        self.assertIn('bar', out.getvalue())
+
+    def test_subparser_invalid_option(self):
+        msg = "Error: invalid choice: 'test' (choose from 'foo')"
+        with self.assertRaisesMessage(CommandError, msg):
+            management.call_command('subparser', 'test', 12)
+        if PY37:
+            # "required" option requires Python 3.7 and later.
+            msg = 'Error: the following arguments are required: subcommand'
+            with self.assertRaisesMessage(CommandError, msg):
+                management.call_command('subparser_dest', subcommand='foo', bar=12)
+        else:
+            msg = (
+                'Unknown option(s) for subparser_dest command: subcommand. '
+                'Valid options are: bar, force_color, help, no_color, '
+                'pythonpath, settings, skip_checks, stderr, stdout, '
+                'traceback, verbosity, version.'
+            )
+            with self.assertRaisesMessage(TypeError, msg):
+                management.call_command('subparser_dest', subcommand='foo', bar=12)
+
+    def test_create_parser_kwargs(self):
+        """BaseCommand.create_parser() passes kwargs to CommandParser."""
+        epilog = 'some epilog text'
+        parser = BaseCommand().create_parser('prog_name', 'subcommand', epilog=epilog)
+        self.assertEqual(parser.epilog, epilog)
 
 
 class CommandRunTests(AdminScriptTestCase):
     """
     Tests that need to run by simulating the command line, not by call_command.
     """
-    def tearDown(self):
-        self.remove_settings('settings.py')
-
     def test_script_prefix_set_in_commands(self):
         self.write_settings('settings.py', apps=['user_commands'], sdict={
             'ROOT_URLCONF': '"user_commands.urls"',
@@ -211,6 +268,26 @@ class CommandRunTests(AdminScriptTestCase):
         self.assertNoOutput(err)
         self.assertEqual(out.strip(), '/PREFIX/some/url/')
 
+    def test_disallowed_abbreviated_options(self):
+        """
+        To avoid conflicts with custom options, commands don't allow
+        abbreviated forms of the --setting and --pythonpath options.
+        """
+        self.write_settings('settings.py', apps=['user_commands'])
+        out, err = self.run_manage(['set_option', '--set', 'foo'])
+        self.assertNoOutput(err)
+        self.assertEqual(out.strip(), 'Set foo')
+
+    def test_skip_checks(self):
+        self.write_settings('settings.py', apps=['django.contrib.staticfiles', 'user_commands'], sdict={
+            # (staticfiles.E001) The STATICFILES_DIRS setting is not a tuple or
+            # list.
+            'STATICFILES_DIRS': '"foo"',
+        })
+        out, err = self.run_manage(['set_option', '--skip-checks', '--set', 'foo'])
+        self.assertNoOutput(err)
+        self.assertEqual(out.strip(), 'Set foo')
+
 
 class UtilsTests(SimpleTestCase):
 
@@ -218,3 +295,31 @@ class UtilsTests(SimpleTestCase):
         msg = 'Error executing a_42_command_that_doesnt_exist_42'
         with self.assertRaisesMessage(CommandError, msg):
             popen_wrapper(['a_42_command_that_doesnt_exist_42'])
+
+    def test_get_random_secret_key(self):
+        key = get_random_secret_key()
+        self.assertEqual(len(key), 50)
+        for char in key:
+            self.assertIn(char, 'abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*(-_=+)')
+
+    def test_is_ignored_path_true(self):
+        patterns = (
+            ['foo/bar/baz'],
+            ['baz'],
+            ['foo/bar/baz'],
+            ['*/baz'],
+            ['*'],
+            ['b?z'],
+            ['[abc]az'],
+            ['*/ba[!z]/baz'],
+        )
+        for ignore_patterns in patterns:
+            with self.subTest(ignore_patterns=ignore_patterns):
+                self.assertIs(is_ignored_path('foo/bar/baz', ignore_patterns=ignore_patterns), True)
+
+    def test_is_ignored_path_false(self):
+        self.assertIs(is_ignored_path('foo/bar/baz', ignore_patterns=['foo/bar/bat', 'bar', 'flub/blub']), False)
+
+    def test_normalize_path_patterns_truncates_wildcard_base(self):
+        expected = [os.path.normcase(p) for p in ['foo/bar', 'bar/*/']]
+        self.assertEqual(normalize_path_patterns(['foo/bar/*', 'bar/*/']), expected)

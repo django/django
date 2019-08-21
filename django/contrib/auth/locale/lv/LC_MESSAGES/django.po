@@ -1,7 +1,8 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Edgars Voroboks <nullisnot0@inbox.lv>, 2017
+# NullIsNot0 <nullisnot0@inbox.lv>, 2017
+# NullIsNot0 <nullisnot0@inbox.lv>, 2017
 # Jannis Leidel <jannis@leidel.info>, 2011
 # peterisb <pb@sungis.lv>, 2016
 msgid ""
@@ -9,8 +10,8 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-09-24 13:46+0200\n"
-"PO-Revision-Date: 2017-11-17 20:12+0000\n"
-"Last-Translator: Edgars Voroboks <nullisnot0@inbox.lv>\n"
+"PO-Revision-Date: 2017-12-10 19:29+0000\n"
+"Last-Translator: NullIsNot0 <nullisnot0@inbox.lv>\n"
 "Language-Team: Latvian (http://www.transifex.com/django/django/language/"
 "lv/)\n"
 "MIME-Version: 1.0\n"
@@ -260,7 +261,7 @@ msgid "This password is entirely numeric."
 msgstr "Parole sastāv tikai no cipariem."
 
 msgid "Your password can't be entirely numeric."
-msgstr "Parole nevar sastāvēt tikai no cipariem."
+msgstr "Parole nedrīkst sastāvēt tikai no cipariem."
 
 #, python-format
 msgid "Password reset on %(site_name)s"
@@ -284,7 +285,7 @@ msgid "Logged out"
 msgstr "Atslēdzies"
 
 msgid "Password reset"
-msgstr "Paroles pārstādīšana"
+msgstr "Paroles pārstatīšana"
 
 msgid "Password reset sent"
 msgstr "Paroles pārstatīšana nosūtīta"

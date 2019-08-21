@@ -1,3 +1,4 @@
+import re
 from functools import update_wrapper
 from weakref import WeakSet
 
@@ -106,7 +107,14 @@ class AdminSite:
                 )
 
             if model in self._registry:
-                raise AlreadyRegistered('The model %s is already registered' % model.__name__)
+                registered_admin = str(self._registry[model])
+                msg = 'The model %s is already registered ' % model.__name__
+                if registered_admin.endswith('.ModelAdmin'):
+                    # Most likely registered without a ModelAdmin subclass.
+                    msg += 'in app %r.' % re.sub(r'\.ModelAdmin$', '', registered_admin)
+                else:
+                    msg += 'with %r.' % registered_admin
+                raise AlreadyRegistered(msg)
 
             # Ignore the registration if the model has been
             # swapped out.
@@ -300,6 +308,7 @@ class AdminSite:
             'site_url': site_url,
             'has_permission': self.has_permission(request),
             'available_apps': self.get_app_list(request),
+            'is_popup': False,
         }
 
     def password_change(self, request, extra_context=None):
@@ -431,8 +440,11 @@ class AdminSite:
                 'name': capfirst(model._meta.verbose_name_plural),
                 'object_name': model._meta.object_name,
                 'perms': perms,
+                'admin_url': None,
+                'add_url': None,
             }
-            if perms.get('change'):
+            if perms.get('change') or perms.get('view'):
+                model_dict['view_only'] = not perms.get('change')
                 try:
                     model_dict['admin_url'] = reverse('admin:%s_%s_changelist' % info, current_app=self.name)
                 except NoReverseMatch:

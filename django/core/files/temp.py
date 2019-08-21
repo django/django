@@ -13,7 +13,7 @@ The custom version of NamedTemporaryFile doesn't support the same keyword
 arguments available in tempfile.NamedTemporaryFile.
 
 1: https://mail.python.org/pipermail/python-list/2005-December/336957.html
-2: http://bugs.python.org/issue14243
+2: https://bugs.python.org/issue14243
 """
 
 import os
@@ -50,7 +50,7 @@ if os.name == 'nt':
                 self.close_called = True
                 try:
                     self.file.close()
-                except (OSError, IOError):
+                except OSError:
                     pass
                 try:
                     self.unlink(self.name)

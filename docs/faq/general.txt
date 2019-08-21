@@ -42,7 +42,7 @@ Django is pronounced **JANG**-oh. Rhymes with FANG-oh. The "D" is silent.
 We've also recorded an `audio clip of the pronunciation`_.
 
 .. _Django Reinhardt: https://en.wikipedia.org/wiki/Django_Reinhardt
-.. _audio clip of the pronunciation: http://red-bean.com/~adrian/django_pronunciation.mp3
+.. _audio clip of the pronunciation: https://www.red-bean.com/~adrian/django_pronunciation.mp3
 
 Is Django stable?
 =================
@@ -70,6 +70,20 @@ Who's behind this?
 Django was originally developed at World Online, the Web department of a
 newspaper in Lawrence, Kansas, USA. Django's now run by an international
 `team of volunteers <https://www.djangoproject.com/foundation/teams/>`_.
+
+How is Django licensed?
+=======================
+
+Django is distributed under :source:`the 3-clause BSD license <LICENSE>`. This
+is an open source license granting broad permissions to modify and redistribute
+Django.
+
+Why does Django include Python's license file?
+==============================================
+
+Django includes code from the Python standard library. Python is distributed
+under a permissive open source license. :source:`A copy of the Python license
+<LICENSE.python>` is included with Django for compliance with Python's terms.
 
 Which sites use Django?
 =======================
@@ -168,14 +182,12 @@ The Django docs are available in the ``docs`` directory of each Django tarball
 release. These docs are in reST (reStructuredText) format, and each text file
 corresponds to a Web page on the official Django site.
 
-Because the documentation is `stored in revision control`_, you can browse
-documentation changes just like you can browse code changes.
+Because the documentation is :source:`stored in revision control <docs>`, you
+can browse documentation changes just like you can browse code changes.
 
 Technically, the docs on Django's site are generated from the latest development
 versions of those reST documents, so the docs on the Django site may offer more
 information than the docs that come with the latest Django release.
-
-.. _stored in revision control: https://github.com/django/django/tree/master/docs/
 
 How do I cite Django?
 =====================
@@ -203,4 +215,4 @@ If you need a name, just use "Django", without any tagline.
 If you need a publication date, use the year of release of the version you're
 referencing (e.g., 2013 for v1.5)
 
-.. _APA style: http://www.apastyle.org
+.. _APA style: https://www.apastyle.org

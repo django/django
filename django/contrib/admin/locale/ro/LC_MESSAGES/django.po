@@ -1,6 +1,7 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Bogdan Mateescu, 2018-2019
 # Daniel Ursache-Dogariu, 2011
 # Denis Darii <denis.darii@gmail.com>, 2011,2014
 # Ionel Cristian Mărieș <ionel.mc@gmail.com>, 2012
@@ -10,9 +11,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-09-19 16:41+0000\n"
-"Last-Translator: Razvan Stefanescu <razvan.stefanescu@gmail.com>\n"
+"POT-Creation-Date: 2019-01-16 20:42+0100\n"
+"PO-Revision-Date: 2019-01-18 12:02+0000\n"
+"Last-Translator: Bogdan Mateescu\n"
 "Language-Team: Romanian (http://www.transifex.com/django/django/language/"
 "ro/)\n"
 "MIME-Version: 1.0\n"
@@ -91,6 +92,15 @@ msgstr "Adăugati încă un/o %(verbose_name)s"
 msgid "Remove"
 msgstr "Elimină"
 
+msgid "Addition"
+msgstr "Adăugare"
+
+msgid "Change"
+msgstr "Schimbă"
+
+msgid "Deletion"
+msgstr "Ștergere"
+
 msgid "action time"
 msgstr "timp acțiune"
 
@@ -104,7 +114,7 @@ msgid "object id"
 msgstr "id obiect"
 
 #. Translators: 'repr' means representation
-#. (https://docs.python.org/3/library/functions.html#repr)
+#. (https://docs.python.org/library/functions.html#repr)
 msgid "object repr"
 msgstr "repr obiect"
 
@@ -170,11 +180,11 @@ msgstr ""
 "mult de unul."
 
 #, python-brace-format
-msgid ""
-"The {name} \"{obj}\" was added successfully. You may edit it again below."
-msgstr ""
-"{name} \"{obj}\" a fost adăugat cu succes. Poți să îl editezi în continuare "
-"mai jos."
+msgid "The {name} \"{obj}\" was added successfully."
+msgstr "{name} \"{obj}\" a fost adăugat cu succes."
+
+msgid "You may edit it again below."
+msgstr "O poți edita din nou mai jos."
 
 #, python-brace-format
 msgid ""
@@ -184,15 +194,18 @@ msgstr ""
 "{name} \"{obj}\" a fost adăugat cu succes. Poți adăuga alt {name} mai jos."
 
 #, python-brace-format
-msgid "The {name} \"{obj}\" was added successfully."
-msgstr "{name} \"{obj}\" a fost adăugat cu succes."
-
-#, python-brace-format
 msgid ""
 "The {name} \"{obj}\" was changed successfully. You may edit it again below."
 msgstr ""
 "{name} \"{obj}\" a fost modificat cu succes. Poți să îl editezi în "
 "continuare mai jos."
+
+#, python-brace-format
+msgid ""
+"The {name} \"{obj}\" was added successfully. You may edit it again below."
+msgstr ""
+"{name} \"{obj}\" a fost adăugat cu succes. Poți să îl editezi în continuare "
+"mai jos."
 
 #, python-brace-format
 msgid ""
@@ -230,6 +243,10 @@ msgstr "Adaugă %s"
 #, python-format
 msgid "Change %s"
 msgstr "Schimbă %s"
+
+#, python-format
+msgid "View %s"
+msgstr "Vizualizează %s"
 
 msgid "Database error"
 msgstr "Eroare de bază de date"
@@ -341,7 +358,7 @@ msgid "Change password"
 msgstr "Schimbă parola"
 
 msgid "Please correct the error below."
-msgstr "Corectați erorile de mai jos"
+msgstr "Corectați eroarea de mai jos."
 
 msgid "Please correct the errors below."
 msgstr "Corectați erorile de mai jos."
@@ -361,7 +378,7 @@ msgid "Documentation"
 msgstr "Documentație"
 
 msgid "Log out"
-msgstr "Deautentificare"
+msgstr "Deconectează-te"
 
 #, python-format
 msgid "Add %(name)s"
@@ -453,8 +470,8 @@ msgstr ""
 "Sigur doriţi să ștergeți %(objects_name)s conform selecției? Toate obiectele "
 "următoare alături de cele asociate lor vor fi șterse:"
 
-msgid "Change"
-msgstr "Schimbă"
+msgid "View"
+msgstr "Vizualizează"
 
 msgid "Delete?"
 msgstr "Elimină?"
@@ -473,8 +490,8 @@ msgstr "Modele în aplicația %(name)s"
 msgid "Add"
 msgstr "Adaugă"
 
-msgid "You don't have permission to edit anything."
-msgstr "Nu nicio permisiune de editare."
+msgid "You don't have permission to view or edit anything."
+msgstr "Nu aveți permisiunea de a edita sau vizualiza nimic."
 
 msgid "Recent actions"
 msgstr "Acțiuni recente"
@@ -530,20 +547,8 @@ msgstr "Arată totul"
 msgid "Save"
 msgstr "Salvează"
 
-msgid "Popup closing..."
+msgid "Popup closing…"
 msgstr "Fereastra se închide..."
-
-#, python-format
-msgid "Change selected %(model)s"
-msgstr "Modifică %(model)s selectat"
-
-#, python-format
-msgid "Add another %(model)s"
-msgstr "Adaugă alt %(model)s"
-
-#, python-format
-msgid "Delete selected %(model)s"
-msgstr "Șterge %(model)s selectat"
 
 msgid "Search"
 msgstr "Caută"
@@ -567,6 +572,24 @@ msgstr "Salvați și mai adăugați"
 
 msgid "Save and continue editing"
 msgstr "Salvați și continuați editarea"
+
+msgid "Save and view"
+msgstr "Salvează și vizualizează"
+
+msgid "Close"
+msgstr "Închide"
+
+#, python-format
+msgid "Change selected %(model)s"
+msgstr "Modifică %(model)s selectat"
+
+#, python-format
+msgid "Add another %(model)s"
+msgstr "Adaugă alt %(model)s"
+
+#, python-format
+msgid "Delete selected %(model)s"
+msgstr "Șterge %(model)s selectat"
 
 msgid "Thanks for spending some quality time with the Web site today."
 msgstr "Mulţumiri pentru timpul petrecut astăzi pe sit."
@@ -680,6 +703,10 @@ msgstr "Selectează %s"
 #, python-format
 msgid "Select %s to change"
 msgstr "Selectează %s pentru schimbare"
+
+#, python-format
+msgid "Select %s to view"
+msgstr "Selecteză %s pentru a vizualiza"
 
 msgid "Date:"
 msgstr "Dată:"

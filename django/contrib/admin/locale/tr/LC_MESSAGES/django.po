@@ -1,7 +1,7 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# BouRock, 2015-2017
+# BouRock, 2015-2019
 # BouRock, 2014-2015
 # Caner Başaran <basaran.caner@protonmail.com>, 2013
 # Cihad GÜNDOĞDU <cihadgundogdu@gmail.com>, 2012
@@ -14,8 +14,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-09-23 18:54+0000\n"
+"POT-Creation-Date: 2019-01-16 20:42+0100\n"
+"PO-Revision-Date: 2019-01-18 16:09+0000\n"
 "Last-Translator: BouRock\n"
 "Language-Team: Turkish (http://www.transifex.com/django/django/language/"
 "tr/)\n"
@@ -94,6 +94,15 @@ msgstr "Başka bir %(verbose_name)s ekle"
 msgid "Remove"
 msgstr "Kaldır"
 
+msgid "Addition"
+msgstr "Ekleme"
+
+msgid "Change"
+msgstr "Değiştir"
+
+msgid "Deletion"
+msgstr "Silme"
+
 msgid "action time"
 msgstr "eylem zamanı"
 
@@ -107,7 +116,7 @@ msgid "object id"
 msgstr "nesne kimliği"
 
 #. Translators: 'repr' means representation
-#. (https://docs.python.org/3/library/functions.html#repr)
+#. (https://docs.python.org/library/functions.html#repr)
 msgid "object repr"
 msgstr "nesne kodu"
 
@@ -173,10 +182,11 @@ msgstr ""
 "basılı tutun."
 
 #, python-brace-format
-msgid ""
-"The {name} \"{obj}\" was added successfully. You may edit it again below."
-msgstr ""
-"{name} \"{obj}\" başarılı olarak eklendi. Aşağıda tekrar düzenleyebilirsiniz."
+msgid "The {name} \"{obj}\" was added successfully."
+msgstr "{name} \"{obj}\" başarılı olarak eklendi."
+
+msgid "You may edit it again below."
+msgstr "Aşağıdan bunu tekrar düzenleyebilirsiniz."
 
 #, python-brace-format
 msgid ""
@@ -187,15 +197,17 @@ msgstr ""
 "ekleyebilirsiniz."
 
 #, python-brace-format
-msgid "The {name} \"{obj}\" was added successfully."
-msgstr "{name} \"{obj}\" başarılı olarak eklendi."
-
-#, python-brace-format
 msgid ""
 "The {name} \"{obj}\" was changed successfully. You may edit it again below."
 msgstr ""
 "{name} \"{obj}\" başarılı olarak değiştirildi. Aşağıda tekrar "
 "düzenleyebilirsiniz."
+
+#, python-brace-format
+msgid ""
+"The {name} \"{obj}\" was added successfully. You may edit it again below."
+msgstr ""
+"{name} \"{obj}\" başarılı olarak eklendi. Aşağıda tekrar düzenleyebilirsiniz."
 
 #, python-brace-format
 msgid ""
@@ -234,6 +246,10 @@ msgstr "%s ekle"
 #, python-format
 msgid "Change %s"
 msgstr "%s değiştir"
+
+#, python-format
+msgid "View %s"
+msgstr "%s göster"
 
 msgid "Database error"
 msgstr "Veritabanı hatası"
@@ -454,8 +470,8 @@ msgstr ""
 "Seçilen %(objects_name)s nesnelerini silmek istediğinize emin misiniz? "
 "Aşağıdaki nesnelerin tümü ve onların ilgili öğeleri silinecektir:"
 
-msgid "Change"
-msgstr "Değiştir"
+msgid "View"
+msgstr "Göster"
 
 msgid "Delete?"
 msgstr "Silinsin mi?"
@@ -474,8 +490,8 @@ msgstr "%(name)s uygulamasındaki modeller"
 msgid "Add"
 msgstr "Ekle"
 
-msgid "You don't have permission to edit anything."
-msgstr "Hiçbir şeyi düzenlemek için izne sahip değilsiniz."
+msgid "You don't have permission to view or edit anything."
+msgstr "Hiçbir şeyi düzenlemek ve göstermek için izne sahip değilsiniz."
 
 msgid "Recent actions"
 msgstr "Son eylemler"
@@ -531,20 +547,8 @@ msgstr "Tümünü göster"
 msgid "Save"
 msgstr "Kaydet"
 
-msgid "Popup closing..."
-msgstr "Açılır pencere kapanıyor..."
-
-#, python-format
-msgid "Change selected %(model)s"
-msgstr "Seçilen %(model)s değiştir"
-
-#, python-format
-msgid "Add another %(model)s"
-msgstr "Başka bir %(model)s ekle"
-
-#, python-format
-msgid "Delete selected %(model)s"
-msgstr "Seçilen %(model)s sil"
+msgid "Popup closing…"
+msgstr "Açılır pencere kapanıyor…"
 
 msgid "Search"
 msgstr "Ara"
@@ -567,6 +571,24 @@ msgstr "Kaydet ve başka birini ekle"
 
 msgid "Save and continue editing"
 msgstr "Kaydet ve düzenlemeye devam et"
+
+msgid "Save and view"
+msgstr "Kaydet ve göster"
+
+msgid "Close"
+msgstr "Kapat"
+
+#, python-format
+msgid "Change selected %(model)s"
+msgstr "Seçilen %(model)s değiştir"
+
+#, python-format
+msgid "Add another %(model)s"
+msgstr "Başka bir %(model)s ekle"
+
+#, python-format
+msgid "Delete selected %(model)s"
+msgstr "Seçilen %(model)s sil"
 
 msgid "Thanks for spending some quality time with the Web site today."
 msgstr ""
@@ -678,6 +700,10 @@ msgstr "%s seç"
 #, python-format
 msgid "Select %s to change"
 msgstr "Değiştirmek için %s seçin"
+
+#, python-format
+msgid "Select %s to view"
+msgstr "Göstermek için %s seçin"
 
 msgid "Date:"
 msgstr "Tarih:"

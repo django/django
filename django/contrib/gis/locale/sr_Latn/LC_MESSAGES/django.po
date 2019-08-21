@@ -1,6 +1,7 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Igor Jerosimić, 2019
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Janos Guljas <janos@resenje.org>, 2012
 msgid ""
@@ -8,10 +9,10 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-09-19 16:40+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"PO-Revision-Date: 2019-06-27 19:06+0000\n"
+"Last-Translator: Igor Jerosimić\n"
 "Language-Team: Serbian (Latin) (http://www.transifex.com/django/django/"
-"language/sr%40latin/)\n"
+"language/sr@latin/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -20,14 +21,14 @@ msgstr ""
 "%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 
 msgid "GIS"
-msgstr ""
+msgstr "GIS"
 
 msgid "The base GIS field."
-msgstr ""
+msgstr "Osnovno GIS polje."
 
 msgid ""
 "The base Geometry field -- maps to the OpenGIS Specification Geometry type."
-msgstr ""
+msgstr "Osnovno geometrijsko polje -- mapira na OpenGIS tip specifikacije."
 
 msgid "Point"
 msgstr "Tačka"
@@ -54,7 +55,7 @@ msgid "Extent Aggregate Field"
 msgstr ""
 
 msgid "Raster Field"
-msgstr ""
+msgstr "Rastersko polje"
 
 msgid "No geometry value provided."
 msgstr "Niste zadali parametre za geometriju."
@@ -71,13 +72,13 @@ msgid ""
 msgstr "Greška se desila tokom transformacije geometrije na „SRID“ tip polja."
 
 msgid "Delete all Features"
-msgstr ""
+msgstr "Obriši sva svojstva"
 
 msgid "WKT debugging window:"
-msgstr ""
+msgstr "WKT prozor za otklanjanje grešaka:"
 
 msgid "Debugging window (serialized value)"
-msgstr ""
+msgstr "Prozor za otklanjanje grešaka (serijalizovana vrednost)"
 
 msgid "No feeds are registered."
 msgstr "Nema registrovanih fidova."

@@ -44,22 +44,22 @@ class CsrfViewTests(SimpleTestCase):
         self.assertContains(
             response,
             'You are seeing this message because this HTTPS site requires a '
-            '&#39;Referer header&#39; to be sent by your Web browser, but '
+            '“Referer header” to be sent by your Web browser, but '
             'none was sent.',
             status_code=403,
         )
         self.assertContains(
             response,
-            'If you have configured your browser to disable &#39;Referer&#39; '
+            'If you have configured your browser to disable “Referer” '
             'headers, please re-enable them, at least for this site, or for '
-            'HTTPS connections, or for &#39;same-origin&#39; requests.',
+            'HTTPS connections, or for “same-origin” requests.',
             status_code=403,
         )
         self.assertContains(
             response,
             'If you are using the &lt;meta name=&quot;referrer&quot; '
             'content=&quot;no-referrer&quot;&gt; tag or including the '
-            '&#39;Referrer-Policy: no-referrer&#39; header, please remove them.',
+            '“Referrer-Policy: no-referrer” header, please remove them.',
             status_code=403,
         )
 

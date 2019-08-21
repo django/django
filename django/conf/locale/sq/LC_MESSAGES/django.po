@@ -2,14 +2,14 @@
 #
 # Translators:
 # Besnik <besnik@programeshqip.org>, 2011-2014
-# Besnik <besnik@programeshqip.org>, 2015-2017
+# Besnik <besnik@programeshqip.org>, 2015-2019
 # Jannis Leidel <jannis@leidel.info>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-11-15 16:15+0100\n"
-"PO-Revision-Date: 2017-11-29 22:51+0000\n"
+"POT-Creation-Date: 2019-01-16 20:42+0100\n"
+"PO-Revision-Date: 2019-03-30 10:51+0000\n"
 "Last-Translator: Besnik <besnik@programeshqip.org>\n"
 "Language-Team: Albanian (http://www.transifex.com/django/django/language/"
 "sq/)\n"
@@ -139,6 +139,9 @@ msgstr "Sorbiane e Sipërme"
 msgid "Hungarian"
 msgstr "Hungareze"
 
+msgid "Armenian"
+msgstr "Armenisht"
+
 msgid "Interlingua"
 msgstr "Interlingua"
 
@@ -159,6 +162,9 @@ msgstr "Japoneze"
 
 msgid "Georgian"
 msgstr "Gjeorgjiane"
+
+msgid "Kabyle"
+msgstr "Kabilase"
 
 msgid "Kazakh"
 msgstr "Kazake"
@@ -382,6 +388,9 @@ msgstr[1] ""
 "Sigurohuni që kjo vlerë ka të shumtën %(limit_value)d shenja (ka "
 "%(show_value)d)."
 
+msgid "Enter a number."
+msgstr "Jepni një numër."
+
 #, python-format
 msgid "Ensure that there are no more than %(max)s digit in total."
 msgid_plural "Ensure that there are no more than %(max)s digits in total."
@@ -462,6 +471,10 @@ msgstr "Numër i plotë i madh (8 bajte)"
 msgid "'%(value)s' value must be either True or False."
 msgstr "Vlera '%(value)s' duhet të jetë True ose False."
 
+#, python-format
+msgid "'%(value)s' value must be either True, False, or None."
+msgstr "Vlera për '%(value)s' duhet të jetë ose True, ose False, ose None."
+
 msgid "Boolean (Either True or False)"
 msgstr "Buleane (Ose True, ose False)"
 
@@ -485,7 +498,7 @@ msgid ""
 "'%(value)s' value has the correct format (YYYY-MM-DD) but it is an invalid "
 "date."
 msgstr ""
-"Vlera '%(value)s' ka format të saktë (YYYY-MM-DD) por është datë e "
+"Vlera '%(value)s' ka formatin e saktë (YYYY-MM-DD), por është datë e "
 "pavlefshme."
 
 msgid "Date (without time)"
@@ -504,7 +517,7 @@ msgid ""
 "'%(value)s' value has the correct format (YYYY-MM-DD HH:MM[:ss[.uuuuuu]]"
 "[TZ]) but it is an invalid date/time."
 msgstr ""
-"Vlera '%(value)s' ka format të saktë (YYYY-MM-DD HH:MM[:ss[.uuuuuu]][TZ]) "
+"Vlera '%(value)s' ka format të saktë (YYYY-MM-DD HH:MM[:ss[.uuuuuu]][TZ]), "
 "por është datë/kohë e pavlefshme."
 
 msgid "Date (with time)"
@@ -599,6 +612,9 @@ msgstr "Të dhëna dyore të papërpunuara"
 msgid "'%(value)s' is not a valid UUID."
 msgstr "'%(value)s' s’është UUID i vlefshëm."
 
+msgid "Universally unique identifier"
+msgstr "Identifikues universalisht unik"
+
 msgid "File"
 msgstr "Kartelë"
 
@@ -638,9 +654,6 @@ msgstr "Kjo fushë është e domosdoshme."
 msgid "Enter a whole number."
 msgstr "Jepni një numër të tërë."
 
-msgid "Enter a number."
-msgstr "Jepni një numër."
-
 msgid "Enter a valid date."
 msgstr "Jepni një datë të vlefshme."
 
@@ -652,6 +665,10 @@ msgstr "Jepni një datë/kohë të vlefshme."
 
 msgid "Enter a valid duration."
 msgstr "Jepni një kohëzgjatje të vlefshme."
+
+#, python-brace-format
+msgid "The number of days must be between {min_days} and {max_days}."
+msgstr "Numri i ditëve duhet të jetë mes {min_days} dhe {max_days}."
 
 msgid "No file was submitted. Check the encoding type on the form."
 msgstr ""
@@ -689,7 +706,7 @@ msgstr ""
 #, python-format
 msgid "Select a valid choice. %(value)s is not one of the available choices."
 msgstr ""
-"Përzgjidhni një zgjedhje të vlefshme. %(value)s s’është nga zgjedhjet e "
+"Përzgjidhni një zgjedhje të vlefshme. %(value)s s’është një nga zgjedhjet e "
 "mundshme."
 
 msgid "Enter a list of values."
@@ -1051,7 +1068,7 @@ msgstr "Kjo s’është adresë IPv6 e vlefshme."
 
 #, python-format
 msgctxt "String to return when truncating text"
-msgid "%(truncated_text)s..."
+msgid "%(truncated_text)s…"
 msgstr "%(truncated_text)s…"
 
 msgid "or"
@@ -1217,7 +1234,7 @@ msgid "Index of %(directory)s"
 msgstr "Tregues i %(directory)s"
 
 msgid "Django: the Web framework for perfectionists with deadlines."
-msgstr ""
+msgstr "Django: platforma Web për perfeksionistë me afate."
 
 #, python-format
 msgid ""

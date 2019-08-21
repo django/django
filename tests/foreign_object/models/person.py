@@ -88,7 +88,8 @@ class Friendship(models.Model):
         on_delete=models.CASCADE,
         from_fields=['from_friend_country', 'from_friend_id'],
         to_fields=['person_country_id', 'id'],
-        related_name='from_friend')
+        related_name='from_friend',
+    )
 
     to_friend_country = models.ForeignObject(
         Country,

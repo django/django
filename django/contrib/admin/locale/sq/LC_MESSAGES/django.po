@@ -2,13 +2,13 @@
 #
 # Translators:
 # Besnik <besnik@programeshqip.org>, 2011,2015
-# Besnik <besnik@programeshqip.org>, 2015
+# Besnik <besnik@programeshqip.org>, 2015,2018-2019
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-11-29 22:00+0000\n"
+"POT-Creation-Date: 2019-01-16 20:42+0100\n"
+"PO-Revision-Date: 2019-01-18 11:06+0000\n"
 "Last-Translator: Besnik <besnik@programeshqip.org>\n"
 "Language-Team: Albanian (http://www.transifex.com/django/django/language/"
 "sq/)\n"
@@ -88,6 +88,15 @@ msgstr "Shtoni një tjetër %(verbose_name)s"
 msgid "Remove"
 msgstr "Hiqe"
 
+msgid "Addition"
+msgstr "Shtim"
+
+msgid "Change"
+msgstr "Ndryshoje"
+
+msgid "Deletion"
+msgstr "Fshirje"
+
 msgid "action time"
 msgstr "kohë veprimi"
 
@@ -101,9 +110,9 @@ msgid "object id"
 msgstr "id objekti"
 
 #. Translators: 'repr' means representation
-#. (https://docs.python.org/3/library/functions.html#repr)
+#. (https://docs.python.org/library/functions.html#repr)
 msgid "object repr"
-msgstr ""
+msgstr "paraqitje objekti"
 
 msgid "action flag"
 msgstr "shenjë veprimi"
@@ -167,9 +176,11 @@ msgstr ""
 "\"Command\"."
 
 #, python-brace-format
-msgid ""
-"The {name} \"{obj}\" was added successfully. You may edit it again below."
-msgstr "{name} \"{obj}\" u ndryshua me sukses. Mund ta ripërpunoni më poshtë."
+msgid "The {name} \"{obj}\" was added successfully."
+msgstr "{name} \"{obj}\" u shtua me sukses."
+
+msgid "You may edit it again below."
+msgstr "Mund ta ripërpunoni më poshtë."
 
 #, python-brace-format
 msgid ""
@@ -180,13 +191,14 @@ msgstr ""
 "poshtë."
 
 #, python-brace-format
-msgid "The {name} \"{obj}\" was added successfully."
-msgstr "{name} \"{obj}\" u shtua me sukses."
-
-#, python-brace-format
 msgid ""
 "The {name} \"{obj}\" was changed successfully. You may edit it again below."
 msgstr "{name} \"{obj}\" u ndryshua me sukses. Mund të ripërpunoni më poshtë."
+
+#, python-brace-format
+msgid ""
+"The {name} \"{obj}\" was added successfully. You may edit it again below."
+msgstr "{name} \"{obj}\" u ndryshua me sukses. Mund ta ripërpunoni më poshtë."
 
 #, python-brace-format
 msgid ""
@@ -225,6 +237,10 @@ msgstr "Shtoni %s"
 #, python-format
 msgid "Change %s"
 msgstr "Ndrysho %s"
+
+#, python-format
+msgid "View %s"
+msgstr "Shiheni %s"
 
 msgid "Database error"
 msgstr "Gabim baze të dhënash"
@@ -446,8 +462,8 @@ msgstr ""
 "Jeni i sigurt se doni të fshihen %(objects_name)s e përzgjedhur? Krejt "
 "objektet vijues dhe gjëra të lidhura me ta do të fshihen:"
 
-msgid "Change"
-msgstr "Ndryshoje"
+msgid "View"
+msgstr "Shiheni"
 
 msgid "Delete?"
 msgstr "Të fshihet?"
@@ -466,8 +482,8 @@ msgstr "Modele te aplikacioni %(name)s"
 msgid "Add"
 msgstr "Shtoni"
 
-msgid "You don't have permission to edit anything."
-msgstr "S’keni leje për të përpunuar ndonjë gjë."
+msgid "You don't have permission to view or edit anything."
+msgstr "S’keni leje të shihni apo përpunoni gjë."
 
 msgid "Recent actions"
 msgstr "Veprime së fundi"
@@ -523,20 +539,8 @@ msgstr "Shfaqi krejt"
 msgid "Save"
 msgstr "Ruaje"
 
-msgid "Popup closing..."
-msgstr "Flluska po mbyllet…"
-
-#, python-format
-msgid "Change selected %(model)s"
-msgstr "Ndryshoni %(model)s e përzgjedhur"
-
-#, python-format
-msgid "Add another %(model)s"
-msgstr "Shtoni një %(model)s tjetër"
-
-#, python-format
-msgid "Delete selected %(model)s"
-msgstr "Fshije %(model)s e përzgjedhur"
+msgid "Popup closing…"
+msgstr "Mbyllje flluske…"
 
 msgid "Search"
 msgstr "Kërko"
@@ -559,6 +563,24 @@ msgstr "Ruajeni dhe shtoni një tjetër"
 
 msgid "Save and continue editing"
 msgstr "Ruajeni dhe vazhdoni përpunimin"
+
+msgid "Save and view"
+msgstr "Ruajeni dhe shiheni"
+
+msgid "Close"
+msgstr "Mbylle"
+
+#, python-format
+msgid "Change selected %(model)s"
+msgstr "Ndryshoni %(model)s e përzgjedhur"
+
+#, python-format
+msgid "Add another %(model)s"
+msgstr "Shtoni një %(model)s tjetër"
+
+#, python-format
+msgid "Delete selected %(model)s"
+msgstr "Fshije %(model)s e përzgjedhur"
 
 msgid "Thanks for spending some quality time with the Web site today."
 msgstr "Faleminderit që shpenzoni sot pak kohë të çmuar me sajtin Web."
@@ -672,6 +694,10 @@ msgstr "Përzgjidhni %s"
 #, python-format
 msgid "Select %s to change"
 msgstr "Përzgjidhni %s për ta ndryshuar"
+
+#, python-format
+msgid "Select %s to view"
+msgstr "Përzgjidhni %s për parje"
 
 msgid "Date:"
 msgstr "Datë:"

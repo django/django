@@ -1,6 +1,6 @@
-from django.conf.urls import url
 from django.contrib.staticfiles import views
+from django.urls import re_path
 
 urlpatterns = [
-    url(r'^static/(?P<path>.*)$', views.serve),
+    re_path('^static/(?P<path>.*)$', views.serve),
 ]

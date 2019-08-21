@@ -5,7 +5,7 @@ from ctypes import (
     c_double, c_float, c_int16, c_int32, c_ubyte, c_uint16, c_uint32,
 )
 
-# See http://www.gdal.org/gdal_8h.html#a22e22ce0a55036a96f652765793fb7a4
+# See https://www.gdal.org/gdal_8h.html#a22e22ce0a55036a96f652765793fb7a4
 GDAL_PIXEL_TYPES = {
     0: 'GDT_Unknown',  # Unknown or unspecified type
     1: 'GDT_Byte',  # Eight bit unsigned integer
@@ -44,7 +44,7 @@ GDAL_RESAMPLE_ALGORITHMS = {
     'Mode': 6,
 }
 
-# See http://www.gdal.org/gdal_8h.html#ace76452d94514561fffa8ea1d2a5968c
+# See https://www.gdal.org/gdal_8h.html#ace76452d94514561fffa8ea1d2a5968c
 GDAL_COLOR_TYPES = {
     0: 'GCI_Undefined',  # Undefined, default value, i.e. not known
     1: 'GCI_GrayIndex',  # Greyscale

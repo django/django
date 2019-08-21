@@ -1,13 +1,13 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Michael Wolf <milupo@sorbzilla.de>, 2016-2017
+# Michael Wolf <milupo@sorbzilla.de>, 2016-2019
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-09-23 00:02+0000\n"
+"POT-Creation-Date: 2019-01-16 20:42+0100\n"
+"PO-Revision-Date: 2019-03-04 13:47+0000\n"
 "Last-Translator: Michael Wolf <milupo@sorbzilla.de>\n"
 "Language-Team: Upper Sorbian (http://www.transifex.com/django/django/"
 "language/hsb/)\n"
@@ -87,6 +87,15 @@ msgstr "Přidajće nowe %(verbose_name)s"
 msgid "Remove"
 msgstr "Wotstronić"
 
+msgid "Addition"
+msgstr "Přidaće"
+
+msgid "Change"
+msgstr "Změnić"
+
+msgid "Deletion"
+msgstr "Zhašenje"
+
 msgid "action time"
 msgstr "akciski čas"
 
@@ -100,7 +109,7 @@ msgid "object id"
 msgstr "objektowy id"
 
 #. Translators: 'repr' means representation
-#. (https://docs.python.org/3/library/functions.html#repr)
+#. (https://docs.python.org/library/functions.html#repr)
 msgid "object repr"
 msgstr "objektowa reprezentacija"
 
@@ -164,9 +173,11 @@ msgid ""
 msgstr "Dźeržće „ctrl“ abo „cmd“ na Mac stłóčeny, zo byšće přez jedyn wubrał."
 
 #, python-brace-format
-msgid ""
-"The {name} \"{obj}\" was added successfully. You may edit it again below."
-msgstr "{name} „{obj}“ je so wuspěšnje přidał. Móžeće jón deleka wobdźěłować."
+msgid "The {name} \"{obj}\" was added successfully."
+msgstr "{name} „{obj}“ je so wuspěšnje přidał."
+
+msgid "You may edit it again below."
+msgstr "Móžeće deleka unowa wobdźěłać."
 
 #, python-brace-format
 msgid ""
@@ -176,13 +187,14 @@ msgstr ""
 "{name} „{obj}“ je so wuspěšnje přidał. Móžeće deleka dalši {name} přidać."
 
 #, python-brace-format
-msgid "The {name} \"{obj}\" was added successfully."
-msgstr "{name} „{obj}“ je so wuspěšnje přidał."
-
-#, python-brace-format
 msgid ""
 "The {name} \"{obj}\" was changed successfully. You may edit it again below."
 msgstr "{name} „{obj}“ je so wuspěšnje změnił. Móžeće jón deleka wobdźěłować."
+
+#, python-brace-format
+msgid ""
+"The {name} \"{obj}\" was added successfully. You may edit it again below."
+msgstr "{name} „{obj}“ je so wuspěšnje přidał. Móžeće jón deleka wobdźěłować."
 
 #, python-brace-format
 msgid ""
@@ -220,6 +232,10 @@ msgstr "%s přidać"
 #, python-format
 msgid "Change %s"
 msgstr "%s změnić"
+
+#, python-format
+msgid "View %s"
+msgstr "%s pokazać"
 
 msgid "Database error"
 msgstr "Zmylk datoweje banki"
@@ -442,8 +458,8 @@ msgstr ""
 "Chceće woprawdźe wubrane %(objects_name)s zhašeć? Wšě slědowace objekty a "
 "jich přisłušne zapiski so zhašeja:"
 
-msgid "Change"
-msgstr "Změnić"
+msgid "View"
+msgstr "Pokazać"
 
 msgid "Delete?"
 msgstr "Zhašeć?"
@@ -462,8 +478,8 @@ msgstr "Modele w nałoženju %(name)s"
 msgid "Add"
 msgstr "Přidać"
 
-msgid "You don't have permission to edit anything."
-msgstr "Nimaće prawo něšto wobdźěłować."
+msgid "You don't have permission to view or edit anything."
+msgstr "Nimaće prawo něšto pokazać abo wobdźěłać."
 
 msgid "Recent actions"
 msgstr "Najnowše akcije"
@@ -519,20 +535,8 @@ msgstr "Wšě pokazać"
 msgid "Save"
 msgstr "Składować"
 
-msgid "Popup closing..."
-msgstr "Wuskakowace wokno so začinja..."
-
-#, python-format
-msgid "Change selected %(model)s"
-msgstr "Wubrane %(model)s změnić"
-
-#, python-format
-msgid "Add another %(model)s"
-msgstr "Druhi %(model)s přidać"
-
-#, python-format
-msgid "Delete selected %(model)s"
-msgstr "Wubrane %(model)s zhašeć"
+msgid "Popup closing…"
+msgstr "Wuskakowace wokno so začinja…"
 
 msgid "Search"
 msgstr "Pytać"
@@ -557,6 +561,24 @@ msgstr "Skłaodwac a druhi přidać"
 
 msgid "Save and continue editing"
 msgstr "Składować a dale wobdźěłować"
+
+msgid "Save and view"
+msgstr "Składować a pokazać"
+
+msgid "Close"
+msgstr "Začinić"
+
+#, python-format
+msgid "Change selected %(model)s"
+msgstr "Wubrane %(model)s změnić"
+
+#, python-format
+msgid "Add another %(model)s"
+msgstr "Druhi %(model)s přidać"
+
+#, python-format
+msgid "Delete selected %(model)s"
+msgstr "Wubrane %(model)s zhašeć"
 
 msgid "Thanks for spending some quality time with the Web site today."
 msgstr "Wulki dźak, zo sće dźensa rjane chwile z websydłom přebywali."
@@ -667,6 +689,10 @@ msgstr "%s wubrać"
 #, python-format
 msgid "Select %s to change"
 msgstr "%s wubrać, zo by so změniło"
+
+#, python-format
+msgid "Select %s to view"
+msgstr "%s wubrać, kotryž ma so pokazać"
 
 msgid "Date:"
 msgstr "Datum:"

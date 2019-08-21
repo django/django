@@ -1,7 +1,7 @@
-from django.conf.urls import url
+from django.urls import path
 
 from . import widgetadmin
 
 urlpatterns = [
-    url(r'^', widgetadmin.site.urls),
+    path('', widgetadmin.site.urls),
 ]

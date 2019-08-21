@@ -124,7 +124,8 @@ For example, we could look up the
 :class:`~django.contrib.auth.models.User` model::
 
     >>> from django.contrib.contenttypes.models import ContentType
-    >>> ContentType.objects.get(app_label="auth", model="user")
+    >>> user_type = ContentType.objects.get(app_label='auth', model='user')
+    >>> user_type
     <ContentType: user>
 
 And then use it to query for a particular
@@ -241,9 +242,9 @@ generic (sometimes called "polymorphic") relationships between models.
 
 A simple example is a tagging system, which might look like this::
 
-    from django.db import models
     from django.contrib.contenttypes.fields import GenericForeignKey
     from django.contrib.contenttypes.models import ContentType
+    from django.db import models
 
     class TaggedItem(models.Model):
         tag = models.SlugField()
@@ -371,8 +372,8 @@ Reverse generic relations
 If you know which models you'll be using most often, you can also add
 a "reverse" generic relationship to enable an additional API. For example::
 
-    from django.db import models
     from django.contrib.contenttypes.fields import GenericRelation
+    from django.db import models
 
     class Bookmark(models.Model):
         url = models.URLField()
@@ -393,21 +394,21 @@ be used to retrieve their associated ``TaggedItems``::
 Defining :class:`~django.contrib.contenttypes.fields.GenericRelation` with
 ``related_query_name`` set allows querying from the related object::
 
-    tags = GenericRelation(TaggedItem, related_query_name='bookmarks')
+    tags = GenericRelation(TaggedItem, related_query_name='bookmark')
 
 This enables filtering, ordering, and other query operations on ``Bookmark``
 from ``TaggedItem``::
 
     >>> # Get all tags belonging to bookmarks containing `django` in the url
-    >>> TaggedItem.objects.filter(bookmarks__url__contains='django')
+    >>> TaggedItem.objects.filter(bookmark__url__contains='django')
     <QuerySet [<TaggedItem: django>, <TaggedItem: python>]>
 
-Of course, if you don't add the reverse relationship, you can do the
+Of course, if you don't add the ``related_query_name``, you can do the
 same types of lookups manually::
 
-    >>> b = Bookmark.objects.get(url='https://www.djangoproject.com/')
-    >>> bookmark_type = ContentType.objects.get_for_model(b)
-    >>> TaggedItem.objects.filter(content_type__pk=bookmark_type.id, object_id=b.id)
+    >>> bookmarks = Bookmark.objects.filter(url__contains='django')
+    >>> bookmark_type = ContentType.objects.get_for_model(Bookmark)
+    >>> TaggedItem.objects.filter(content_type__pk=bookmark_type.id, object_id__in=bookmarks)
     <QuerySet [<TaggedItem: django>, <TaggedItem: python>]>
 
 Just as :class:`~django.contrib.contenttypes.fields.GenericForeignKey`

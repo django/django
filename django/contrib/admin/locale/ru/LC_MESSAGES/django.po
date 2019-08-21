@@ -4,17 +4,19 @@
 # Ivan Ivaschenko <defuz.net@gmail.com>, 2013
 # Denis Darii <denis.darii@gmail.com>, 2011
 # Dimmus <dmitri.chudinov@gmail.com>, 2011
-# Eugene MechanisM <eugene@mechanism.pro>, 2016-2017
-# inoks <inoks@mail.ru>, 2016
+# Eugene <eugene.mechanism@gmail.com>, 2016-2017
+# Sergey <inoks@mail.ru>, 2016
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Алексей Борискин <sun.void@gmail.com>, 2012-2015
+# Дмитрий <nerosketch@gmail.com>, 2019
+# Дмитрий Шатера <mr.bobsans@gmail.com>, 2018
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-09-23 18:54+0000\n"
-"Last-Translator: Eugene MechanisM <eugene@mechanism.pro>\n"
+"POT-Creation-Date: 2019-01-16 20:42+0100\n"
+"PO-Revision-Date: 2019-02-14 12:41+0000\n"
+"Last-Translator: Дмитрий <nerosketch@gmail.com>\n"
 "Language-Team: Russian (http://www.transifex.com/django/django/language/"
 "ru/)\n"
 "MIME-Version: 1.0\n"
@@ -94,6 +96,15 @@ msgstr "Добавить еще один %(verbose_name)s"
 msgid "Remove"
 msgstr "Удалить"
 
+msgid "Addition"
+msgstr "Добавление"
+
+msgid "Change"
+msgstr "Изменить"
+
+msgid "Deletion"
+msgstr "Удаление"
+
 msgid "action time"
 msgstr "время действия"
 
@@ -107,7 +118,7 @@ msgid "object id"
 msgstr "идентификатор объекта"
 
 #. Translators: 'repr' means representation
-#. (https://docs.python.org/3/library/functions.html#repr)
+#. (https://docs.python.org/library/functions.html#repr)
 msgid "object repr"
 msgstr "представление объекта"
 
@@ -173,11 +184,11 @@ msgstr ""
 "значений."
 
 #, python-brace-format
-msgid ""
-"The {name} \"{obj}\" was added successfully. You may edit it again below."
-msgstr ""
-"{name} \"{obj}\" был успешно добавлен. Вы можете отредактировать его еще раз "
-"ниже."
+msgid "The {name} \"{obj}\" was added successfully."
+msgstr "{name} \"{obj}\" было успешно добавлено."
+
+msgid "You may edit it again below."
+msgstr "Вы можете снова изменить этот объект ниже."
 
 #, python-brace-format
 msgid ""
@@ -188,14 +199,17 @@ msgstr ""
 "ниже."
 
 #, python-brace-format
-msgid "The {name} \"{obj}\" was added successfully."
-msgstr "{name} \"{obj}\" было успешно добавлено."
-
-#, python-brace-format
 msgid ""
 "The {name} \"{obj}\" was changed successfully. You may edit it again below."
 msgstr ""
 "{name} \"{obj}\" был изменен успешно. Вы можете отредактировать его снова "
+"ниже."
+
+#, python-brace-format
+msgid ""
+"The {name} \"{obj}\" was added successfully. You may edit it again below."
+msgstr ""
+"{name} \"{obj}\" был успешно добавлен. Вы можете отредактировать его еще раз "
 "ниже."
 
 #, python-brace-format
@@ -233,6 +247,10 @@ msgstr "Добавить %s"
 #, python-format
 msgid "Change %s"
 msgstr "Изменить %s"
+
+#, python-format
+msgid "View %s"
+msgstr "Просмотреть %s"
 
 msgid "Database error"
 msgstr "Ошибка базы данных"
@@ -346,7 +364,7 @@ msgid "Change password"
 msgstr "Изменить пароль"
 
 msgid "Please correct the error below."
-msgstr "Пожалуйста, исправьте ошибки ниже."
+msgstr "Пожалуйста, исправьте ошибку ниже."
 
 msgid "Please correct the errors below."
 msgstr "Пожалуйста, исправьте ошибки ниже."
@@ -456,8 +474,8 @@ msgstr ""
 "Вы уверены, что хотите удалить %(objects_name)s? Все следующие объекты и "
 "связанные с ними элементы будут удалены:"
 
-msgid "Change"
-msgstr "Изменить"
+msgid "View"
+msgstr "Просмотреть"
 
 msgid "Delete?"
 msgstr "Удалить?"
@@ -476,8 +494,8 @@ msgstr "Модели в приложении %(name)s"
 msgid "Add"
 msgstr "Добавить"
 
-msgid "You don't have permission to edit anything."
-msgstr "У вас недостаточно прав для редактирования."
+msgid "You don't have permission to view or edit anything."
+msgstr "У вас недостаточно полномочий для просмотра или изменения чего либо."
 
 msgid "Recent actions"
 msgstr "Последние действия"
@@ -534,20 +552,8 @@ msgstr "Показать все"
 msgid "Save"
 msgstr "Сохранить"
 
-msgid "Popup closing..."
+msgid "Popup closing…"
 msgstr "Всплывающее окно закрывается..."
-
-#, python-format
-msgid "Change selected %(model)s"
-msgstr "Изменить выбранный объект типа \"%(model)s\""
-
-#, python-format
-msgid "Add another %(model)s"
-msgstr "Добавить ещё один объект типа \"%(model)s\""
-
-#, python-format
-msgid "Delete selected %(model)s"
-msgstr "Удалить выбранный объект типа \"%(model)s\""
 
 msgid "Search"
 msgstr "Найти"
@@ -572,6 +578,24 @@ msgstr "Сохранить и добавить другой объект"
 
 msgid "Save and continue editing"
 msgstr "Сохранить и продолжить редактирование"
+
+msgid "Save and view"
+msgstr "Сохранить и просмотреть"
+
+msgid "Close"
+msgstr "Закрыть"
+
+#, python-format
+msgid "Change selected %(model)s"
+msgstr "Изменить выбранный объект типа \"%(model)s\""
+
+#, python-format
+msgid "Add another %(model)s"
+msgstr "Добавить ещё один объект типа \"%(model)s\""
+
+#, python-format
+msgid "Delete selected %(model)s"
+msgstr "Удалить выбранный объект типа \"%(model)s\""
 
 msgid "Thanks for spending some quality time with the Web site today."
 msgstr "Благодарим вас за время, проведенное на этом сайте."
@@ -684,6 +708,10 @@ msgstr "Выберите %s"
 #, python-format
 msgid "Select %s to change"
 msgstr "Выберите %s для изменения"
+
+#, python-format
+msgid "Select %s to view"
+msgstr "Выберите %s для просмотра"
 
 msgid "Date:"
 msgstr "Дата:"

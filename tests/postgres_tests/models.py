@@ -3,8 +3,8 @@ from django.db import models
 
 from .fields import (
     ArrayField, BigIntegerRangeField, CICharField, CIEmailField, CITextField,
-    DateRangeField, DateTimeRangeField, FloatRangeField, HStoreField,
-    IntegerRangeField, JSONField, SearchVectorField,
+    DateRangeField, DateTimeRangeField, DecimalRangeField, EnumField,
+    HStoreField, IntegerRangeField, JSONField, SearchVectorField,
 )
 
 
@@ -63,15 +63,22 @@ class NestedIntegerArrayModel(PostgreSQLModel):
 
 
 class OtherTypesArrayModel(PostgreSQLModel):
-    ips = ArrayField(models.GenericIPAddressField())
-    uuids = ArrayField(models.UUIDField())
-    decimals = ArrayField(models.DecimalField(max_digits=5, decimal_places=2))
+    ips = ArrayField(models.GenericIPAddressField(), default=list)
+    uuids = ArrayField(models.UUIDField(), default=list)
+    decimals = ArrayField(models.DecimalField(max_digits=5, decimal_places=2), default=list)
     tags = ArrayField(TagField(), blank=True, null=True)
+    json = ArrayField(JSONField(default=dict), default=list)
+    int_ranges = ArrayField(IntegerRangeField(), blank=True, null=True)
+    bigint_ranges = ArrayField(BigIntegerRangeField(), blank=True, null=True)
 
 
 class HStoreModel(PostgreSQLModel):
     field = HStoreField(blank=True, null=True)
     array_field = ArrayField(HStoreField(), null=True)
+
+
+class ArrayEnumModel(PostgreSQLModel):
+    array_of_enums = ArrayField(EnumField(max_length=20))
 
 
 class CharFieldModel(models.Model):
@@ -126,9 +133,11 @@ class Line(PostgreSQLModel):
 class RangesModel(PostgreSQLModel):
     ints = IntegerRangeField(blank=True, null=True)
     bigints = BigIntegerRangeField(blank=True, null=True)
-    floats = FloatRangeField(blank=True, null=True)
+    decimals = DecimalRangeField(blank=True, null=True)
     timestamps = DateTimeRangeField(blank=True, null=True)
+    timestamps_inner = DateTimeRangeField(blank=True, null=True)
     dates = DateRangeField(blank=True, null=True)
+    dates_inner = DateRangeField(blank=True, null=True)
 
 
 class RangeLookupsModel(PostgreSQLModel):
@@ -156,7 +165,7 @@ class AggregateTestModel(models.Model):
     """
     char_field = models.CharField(max_length=30, blank=True)
     integer_field = models.IntegerField(null=True)
-    boolean_field = models.NullBooleanField()
+    boolean_field = models.BooleanField(null=True)
 
 
 class StatTestModel(models.Model):
@@ -174,3 +183,15 @@ class NowTestModel(models.Model):
 
 class UUIDTestModel(models.Model):
     uuid = models.UUIDField(default=None, null=True)
+
+
+class Room(models.Model):
+    number = models.IntegerField(unique=True)
+
+
+class HotelReservation(PostgreSQLModel):
+    room = models.ForeignKey('Room', on_delete=models.CASCADE)
+    datespan = DateRangeField()
+    start = models.DateTimeField()
+    end = models.DateTimeField()
+    cancelled = models.BooleanField(default=False)

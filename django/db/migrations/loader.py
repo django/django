@@ -1,4 +1,4 @@
-import os
+import pkgutil
 import sys
 from importlib import import_module, reload
 
@@ -24,7 +24,7 @@ class MigrationLoader:
     but will probably follow the 1234_name.py convention.
 
     On initialization, this class will scan those directories, and open and
-    read the python files, looking for a class called Migration, which should
+    read the Python files, looking for a class called Migration, which should
     inherit from django.db.migrations.Migration. See
     django.db.migrations.migration for what that looks like.
 
@@ -97,17 +97,23 @@ class MigrationLoader:
                 if was_loaded:
                     reload(module)
             self.migrated_apps.add(app_config.label)
-            directory = os.path.dirname(module.__file__)
-            # Scan for .py files
-            migration_names = set()
-            for name in os.listdir(directory):
-                if name.endswith(".py"):
-                    import_name = name.rsplit(".", 1)[0]
-                    if import_name[0] not in "_.~":
-                        migration_names.add(import_name)
-            # Load them
+            migration_names = {
+                name for _, name, is_pkg in pkgutil.iter_modules(module.__path__)
+                if not is_pkg and name[0] not in '_~'
+            }
+            # Load migrations
             for migration_name in migration_names:
-                migration_module = import_module("%s.%s" % (module_name, migration_name))
+                migration_path = '%s.%s' % (module_name, migration_name)
+                try:
+                    migration_module = import_module(migration_path)
+                except ImportError as e:
+                    if 'bad magic number' in str(e):
+                        raise ImportError(
+                            "Couldn't import %r as it appears to be a stale "
+                            ".pyc file." % migration_path
+                        ) from e
+                    else:
+                        raise
                 if not hasattr(migration_module, "Migration"):
                     raise BadMigrationError(
                         "Migration %s in app %s has no Migration class" % (migration_name, app_config.label)
@@ -200,7 +206,7 @@ class MigrationLoader:
         self.load_disk()
         # Load database data
         if self.connection is None:
-            self.applied_migrations = set()
+            self.applied_migrations = {}
         else:
             recorder = MigrationRecorder(self.connection)
             self.applied_migrations = recorder.applied_migrations()
@@ -210,11 +216,12 @@ class MigrationLoader:
         self.replacements = {}
         for key, migration in self.disk_migrations.items():
             self.graph.add_node(key, migration)
-            # Internal (aka same-app) dependencies.
-            self.add_internal_dependencies(key, migration)
             # Replacing migrations.
             if migration.replaces:
                 self.replacements[key] = migration
+        for key, migration in self.disk_migrations.items():
+            # Internal (same app) dependencies.
+            self.add_internal_dependencies(key, migration)
         # Add external dependencies now that the internal ones have been resolved.
         for key, migration in self.disk_migrations.items():
             self.add_external_dependencies(key, migration)
@@ -225,9 +232,9 @@ class MigrationLoader:
             # Ensure the replacing migration is only marked as applied if all of
             # its replacement targets are.
             if all(applied_statuses):
-                self.applied_migrations.add(key)
+                self.applied_migrations[key] = migration
             else:
-                self.applied_migrations.discard(key)
+                self.applied_migrations.pop(key, None)
             # A replacing migration can be used if either all or none of its
             # replacement targets have been applied.
             if all(applied_statuses) or (not any(applied_statuses)):
@@ -265,6 +272,7 @@ class MigrationLoader:
                         exc.node
                     ) from exc
             raise exc
+        self.graph.ensure_not_cyclic()
 
     def check_consistent_history(self, connection):
         """

@@ -1,13 +1,13 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Michael Wolf <milupo@sorbzilla.de>, 2016-2017
+# Michael Wolf <milupo@sorbzilla.de>, 2016-2019
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-09-23 00:02+0000\n"
+"POT-Creation-Date: 2019-01-16 20:42+0100\n"
+"PO-Revision-Date: 2019-02-19 10:13+0000\n"
 "Last-Translator: Michael Wolf <milupo@sorbzilla.de>\n"
 "Language-Team: Lower Sorbian (http://www.transifex.com/django/django/"
 "language/dsb/)\n"
@@ -87,6 +87,15 @@ msgstr "Dalšne %(verbose_name)s pśidaś"
 msgid "Remove"
 msgstr "Wótpóraś"
 
+msgid "Addition"
+msgstr "Pśidanje"
+
+msgid "Change"
+msgstr "Změniś"
+
+msgid "Deletion"
+msgstr "Wulašowanje"
+
 msgid "action time"
 msgstr "akciski cas"
 
@@ -100,7 +109,7 @@ msgid "object id"
 msgstr "objektowy id"
 
 #. Translators: 'repr' means representation
-#. (https://docs.python.org/3/library/functions.html#repr)
+#. (https://docs.python.org/library/functions.html#repr)
 msgid "object repr"
 msgstr "objektowa reprezentacija"
 
@@ -164,11 +173,11 @@ msgid ""
 msgstr "´Źaržćo „ctrl“ abo „cmd“ na Mac tłocony, aby wusej jadnogo wubrał."
 
 #, python-brace-format
-msgid ""
-"The {name} \"{obj}\" was added successfully. You may edit it again below."
-msgstr ""
-"{name} \"{obj}\" jo se wuspěšnje pśidał. Móžośo jen dołojce znowego "
-"wobźěłowaś."
+msgid "The {name} \"{obj}\" was added successfully."
+msgstr "{name} \"{obj}\" jo se wuspěšnje pśidał."
+
+msgid "You may edit it again below."
+msgstr "Móźośo dołojce znowego wobźěłaś."
 
 #, python-brace-format
 msgid ""
@@ -178,14 +187,17 @@ msgstr ""
 "{name} \"{obj}\" jo se wuspěšnje pśidał. Móžośo dołojce dalšne {name} pśidaś."
 
 #, python-brace-format
-msgid "The {name} \"{obj}\" was added successfully."
-msgstr "{name} \"{obj}\" jo se wuspěšnje pśidał."
-
-#, python-brace-format
 msgid ""
 "The {name} \"{obj}\" was changed successfully. You may edit it again below."
 msgstr ""
 "{name} \"{obj}\" jo se wuspěšnje změnił. Móžośo jen dołojce znowego "
+"wobźěłowaś."
+
+#, python-brace-format
+msgid ""
+"The {name} \"{obj}\" was added successfully. You may edit it again below."
+msgstr ""
+"{name} \"{obj}\" jo se wuspěšnje pśidał. Móžośo jen dołojce znowego "
 "wobźěłowaś."
 
 #, python-brace-format
@@ -224,6 +236,10 @@ msgstr "%s pśidaś"
 #, python-format
 msgid "Change %s"
 msgstr "%s změniś"
+
+#, python-format
+msgid "View %s"
+msgstr "%s pokazaś"
 
 msgid "Database error"
 msgstr "Zmólka datoweje banki"
@@ -337,7 +353,7 @@ msgid "Change password"
 msgstr "Gronidło změniś"
 
 msgid "Please correct the error below."
-msgstr "Pšosym skorigěrujśo slědujucu zmólku."
+msgstr "Pšosym korigěrujśo slědujucu zmólku."
 
 msgid "Please correct the errors below."
 msgstr "Pšosym skorigěrujśo slědujuce zmólki."
@@ -446,8 +462,8 @@ msgstr ""
 "Cośo napšawdu wubrany %(objects_name)s lašowaś? Wšykne slědujuce objekty a "
 "jich pśisłušne zapiski se wulašuju:"
 
-msgid "Change"
-msgstr "Změniś"
+msgid "View"
+msgstr "Pokazaś"
 
 msgid "Delete?"
 msgstr "Lašowaś?"
@@ -466,8 +482,8 @@ msgstr "Modele w nałoženju %(name)s"
 msgid "Add"
 msgstr "Pśidaś"
 
-msgid "You don't have permission to edit anything."
-msgstr "Njejsćo pšawo něco wobźěłowaś."
+msgid "You don't have permission to view or edit anything."
+msgstr "Njamaśo pšawo něco pokazaś abo wobźěłaś"
 
 msgid "Recent actions"
 msgstr "Nejnowše akcije"
@@ -523,20 +539,8 @@ msgstr "Wšykne pokazaś"
 msgid "Save"
 msgstr "Składowaś"
 
-msgid "Popup closing..."
-msgstr "Wuskokujuce wokno se zacynja..."
-
-#, python-format
-msgid "Change selected %(model)s"
-msgstr "Wubrane %(model)s změniś"
-
-#, python-format
-msgid "Add another %(model)s"
-msgstr "Dalšny %(model)s pśidaś"
-
-#, python-format
-msgid "Delete selected %(model)s"
-msgstr "Wubrane %(model)s lašowaś"
+msgid "Popup closing…"
+msgstr "Wuskokujuce wokno se zacynja…"
 
 msgid "Search"
 msgstr "Pytaś"
@@ -561,6 +565,24 @@ msgstr "Składowaś a dalšny pśidaś"
 
 msgid "Save and continue editing"
 msgstr "Składowaś a dalej wobźěłowaś"
+
+msgid "Save and view"
+msgstr "Składowaś a pokazaś"
+
+msgid "Close"
+msgstr "Zacyniś"
+
+#, python-format
+msgid "Change selected %(model)s"
+msgstr "Wubrane %(model)s změniś"
+
+#, python-format
+msgid "Add another %(model)s"
+msgstr "Dalšny %(model)s pśidaś"
+
+#, python-format
+msgid "Delete selected %(model)s"
+msgstr "Wubrane %(model)s lašowaś"
 
 msgid "Thanks for spending some quality time with the Web site today."
 msgstr "Źěkujomy se, až sćo źinsa wěsty cas na websedle pśebywał."
@@ -672,6 +694,10 @@ msgstr "%s wubraś"
 #, python-format
 msgid "Select %s to change"
 msgstr "%s wubraś, aby se změniło"
+
+#, python-format
+msgid "Select %s to view"
+msgstr "%s wubraś, kótaryž ma se pokazaś"
 
 msgid "Date:"
 msgstr "Datum:"

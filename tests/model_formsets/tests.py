@@ -4,7 +4,7 @@ from datetime import date
 from decimal import Decimal
 
 from django import forms
-from django.core.exceptions import ImproperlyConfigured
+from django.core.exceptions import ImproperlyConfigured, ValidationError
 from django.db import models
 from django.forms.models import (
     BaseModelFormSet, _get_foreign_key, inlineformset_factory,
@@ -1459,6 +1459,33 @@ class ModelFormsetTest(TestCase):
         self.assertEqual(player1.team, team)
         self.assertEqual(player1.name, 'Bobby')
 
+    def test_inlineformset_with_arrayfield(self):
+        class SimpleArrayField(forms.CharField):
+            """A proxy for django.contrib.postgres.forms.SimpleArrayField."""
+            def to_python(self, value):
+                value = super().to_python(value)
+                return value.split(',') if value else []
+
+        class BookForm(forms.ModelForm):
+            title = SimpleArrayField()
+
+            class Meta:
+                model = Book
+                fields = ('title',)
+
+        BookFormSet = inlineformset_factory(Author, Book, form=BookForm)
+        data = {
+            'book_set-TOTAL_FORMS': '3',
+            'book_set-INITIAL_FORMS': '0',
+            'book_set-MAX_NUM_FORMS': '',
+            'book_set-0-title': 'test1,test2',
+            'book_set-1-title': 'test1,test2',
+            'book_set-2-title': 'test3,test4',
+        }
+        author = Author.objects.create(name='test')
+        formset = BookFormSet(data, instance=author)
+        self.assertEqual(formset.errors, [{}, {'__all__': ['Please correct the duplicate values below.']}, {}])
+
     def test_model_formset_with_custom_pk(self):
         # a formset for a Model that has a custom primary key that still needs to be
         # added to the formset automatically
@@ -1713,6 +1740,12 @@ class ModelFormsetTest(TestCase):
             formset.errors,
             [{'id': ['Select a valid choice. That choice is not one of the available choices.']}],
         )
+
+    def test_initial_form_count_empty_data_raises_validation_error(self):
+        AuthorFormSet = modelformset_factory(Author, fields='__all__')
+        msg = 'ManagementForm data is missing or has been tampered with'
+        with self.assertRaisesMessage(ValidationError, msg):
+            AuthorFormSet({}).initial_form_count()
 
 
 class TestModelFormsetOverridesTroughFormMeta(TestCase):

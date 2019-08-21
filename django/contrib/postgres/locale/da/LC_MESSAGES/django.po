@@ -1,14 +1,14 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Erik Wognsen <r4mses@gmail.com>, 2015-2017
+# Erik Wognsen <r4mses@gmail.com>, 2015-2018
 # valberg <valberg@orn.li>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-09-24 16:43+0000\n"
+"POT-Creation-Date: 2018-05-17 11:49+0200\n"
+"PO-Revision-Date: 2018-05-18 20:41+0000\n"
 "Last-Translator: Erik Wognsen <r4mses@gmail.com>\n"
 "Language-Team: Danish (http://www.transifex.com/django/django/language/da/)\n"
 "MIME-Version: 1.0\n"
@@ -21,8 +21,8 @@ msgid "PostgreSQL extensions"
 msgstr "PostgreSQL udvidelser"
 
 #, python-format
-msgid "Item %(nth)s in the array did not validate: "
-msgstr "Element %(nth)s i array'et blev ikke valideret."
+msgid "Item %(nth)s in the array did not validate:"
+msgstr "Element %(nth)s i array'et blev ikke valideret:"
 
 msgid "Nested arrays must have the same length."
 msgstr "Indlejrede arrays skal have den samme længde."

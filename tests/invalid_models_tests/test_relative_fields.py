@@ -1,7 +1,9 @@
+from unittest import mock
+
 from django.core.checks import Error, Warning as DjangoWarning
-from django.db import models
+from django.db import connection, models
 from django.db.models.fields.related import ForeignObject
-from django.test.testcases import SimpleTestCase, skipIfDBFeature
+from django.test.testcases import SimpleTestCase
 from django.test.utils import isolate_apps, override_settings
 
 
@@ -258,24 +260,6 @@ class RelativeFieldTests(SimpleTestCase):
         field = Group._meta.get_field('members')
         self.assertEqual(field.check(from_model=Group), [])
 
-    def test_symmetrical_self_referential_field(self):
-        class Person(models.Model):
-            # Implicit symmetrical=False.
-            friends = models.ManyToManyField('self', through="Relationship")
-
-        class Relationship(models.Model):
-            first = models.ForeignKey(Person, models.CASCADE, related_name="rel_from_set")
-            second = models.ForeignKey(Person, models.CASCADE, related_name="rel_to_set")
-
-        field = Person._meta.get_field('friends')
-        self.assertEqual(field.check(from_model=Person), [
-            Error(
-                'Many-to-many fields with intermediate tables must not be symmetrical.',
-                obj=field,
-                id='fields.E332',
-            ),
-        ])
-
     def test_too_many_foreign_keys_in_self_referential_model(self):
         class Person(models.Model):
             friends = models.ManyToManyField('self', through="InvalidRelationship", symmetrical=False)
@@ -296,52 +280,6 @@ class RelativeFieldTests(SimpleTestCase):
                 hint='Use through_fields to specify which two foreign keys Django should use.',
                 obj=InvalidRelationship,
                 id='fields.E333',
-            ),
-        ])
-
-    def test_symmetric_self_reference_with_intermediate_table(self):
-        class Person(models.Model):
-            # Explicit symmetrical=True.
-            friends = models.ManyToManyField('self', through="Relationship", symmetrical=True)
-
-        class Relationship(models.Model):
-            first = models.ForeignKey(Person, models.CASCADE, related_name="rel_from_set")
-            second = models.ForeignKey(Person, models.CASCADE, related_name="rel_to_set")
-
-        field = Person._meta.get_field('friends')
-        self.assertEqual(field.check(from_model=Person), [
-            Error(
-                'Many-to-many fields with intermediate tables must not be symmetrical.',
-                obj=field,
-                id='fields.E332',
-            ),
-        ])
-
-    def test_symmetric_self_reference_with_intermediate_table_and_through_fields(self):
-        """
-        Using through_fields in a m2m with an intermediate model shouldn't
-        mask its incompatibility with symmetry.
-        """
-        class Person(models.Model):
-            # Explicit symmetrical=True.
-            friends = models.ManyToManyField(
-                'self',
-                symmetrical=True,
-                through="Relationship",
-                through_fields=('first', 'second'),
-            )
-
-        class Relationship(models.Model):
-            first = models.ForeignKey(Person, models.CASCADE, related_name="rel_from_set")
-            second = models.ForeignKey(Person, models.CASCADE, related_name="rel_to_set")
-            referee = models.ForeignKey(Person, models.CASCADE, related_name="referred")
-
-        field = Person._meta.get_field('friends')
-        self.assertEqual(field.check(from_model=Person), [
-            Error(
-                'Many-to-many fields with intermediate tables must not be symmetrical.',
-                obj=field,
-                id='fields.E332',
             ),
         ])
 
@@ -501,13 +439,14 @@ class RelativeFieldTests(SimpleTestCase):
             ),
         ])
 
-    @skipIfDBFeature('interprets_empty_strings_as_nulls')
     def test_nullable_primary_key(self):
         class Model(models.Model):
             field = models.IntegerField(primary_key=True, null=True)
 
         field = Model._meta.get_field('field')
-        self.assertEqual(field.check(), [
+        with mock.patch.object(connection.features, 'interprets_empty_strings_as_nulls', False):
+            results = field.check()
+        self.assertEqual(results, [
             Error(
                 'Primary keys must not have null=True.',
                 hint='Set null=False on the field, or remove primary_key=True argument.',

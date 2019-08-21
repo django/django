@@ -85,6 +85,11 @@ class ManyToOneNullTests(TestCase):
             ['<Article: Fourth>', '<Article: Second>', '<Article: Third>']
         )
 
+    def test_set_clear_non_bulk(self):
+        # 2 queries for clear(), 1 for add(), and 1 to select objects.
+        with self.assertNumQueries(4):
+            self.r.article_set.set([self.a], bulk=False, clear=True)
+
     def test_assign_clear_related_set(self):
         # Use descriptor assignment to allocate ForeignKey. Null is legal, so
         # existing members of the set that are not in the assignment set are

@@ -114,7 +114,7 @@ class ForeignObjectRel(FieldCacheMixin):
             self.related_model._meta.model_name,
         )
 
-    def get_choices(self, include_blank=True, blank_choice=BLANK_CHOICE_DASH):
+    def get_choices(self, include_blank=True, blank_choice=BLANK_CHOICE_DASH, ordering=()):
         """
         Return choices with a default blank choices included, for use
         as <select> choices for this field.
@@ -122,8 +122,11 @@ class ForeignObjectRel(FieldCacheMixin):
         Analog of django.db.models.fields.Field.get_choices(), provided
         initially for utilization by RelatedFieldListFilter.
         """
+        qs = self.related_model._default_manager.all()
+        if ordering:
+            qs = qs.order_by(*ordering)
         return (blank_choice if include_blank else []) + [
-            (x.pk, str(x)) for x in self.related_model._default_manager.all()
+            (x.pk, str(x)) for x in qs
         ]
 
     def is_hidden(self):
@@ -149,10 +152,10 @@ class ForeignObjectRel(FieldCacheMixin):
     def get_accessor_name(self, model=None):
         # This method encapsulates the logic that decides what name to give an
         # accessor descriptor that retrieves related many-to-one or
-        # many-to-many objects. It uses the lower-cased object_name + "_set",
-        # but this can be overridden with the "related_name" option.
-        # Due to backwards compatibility ModelForms need to be able to provide
-        # an alternate model. See BaseInlineFormSet.get_default_prefix().
+        # many-to-many objects. It uses the lowercased object_name + "_set",
+        # but this can be overridden with the "related_name" option. Due to
+        # backwards compatibility ModelForms need to be able to provide an
+        # alternate model. See BaseInlineFormSet.get_default_prefix().
         opts = model._meta if model else self.related_model._meta
         model = model or self.related_model
         if self.multiple:

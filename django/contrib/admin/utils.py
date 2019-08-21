@@ -1,10 +1,10 @@
 import datetime
 import decimal
+import re
 from collections import defaultdict
 
-from django.contrib.auth import get_permission_codename
 from django.core.exceptions import FieldDoesNotExist
-from django.db import models
+from django.db import models, router
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.deletion import Collector
 from django.forms.utils import pretty_name
@@ -13,6 +13,10 @@ from django.utils import formats, timezone
 from django.utils.html import format_html
 from django.utils.text import capfirst
 from django.utils.translation import ngettext, override as translation_override
+
+QUOTE_MAP = {i: '_%02X' % i for i in b'":/_#?;@&=+$,"[]<>%\n\\'}
+UNQUOTE_MAP = {v: chr(k) for k, v in QUOTE_MAP.items()}
+UNQUOTE_RE = re.compile('_(?:%s)' % '|'.join([x[1:] for x in UNQUOTE_MAP]))
 
 
 class FieldIsAForeignKeyColumnName(Exception):
@@ -65,33 +69,12 @@ def quote(s):
     Similar to urllib.parse.quote(), except that the quoting is slightly
     different so that it doesn't get automatically unquoted by the Web browser.
     """
-    if not isinstance(s, str):
-        return s
-    res = list(s)
-    for i in range(len(res)):
-        c = res[i]
-        if c in """:/_#?;@&=+$,"[]<>%\n\\""":
-            res[i] = '_%02X' % ord(c)
-    return ''.join(res)
+    return s.translate(QUOTE_MAP) if isinstance(s, str) else s
 
 
 def unquote(s):
-    """Undo the effects of quote(). Based heavily on urllib.parse.unquote()."""
-    mychr = chr
-    myatoi = int
-    list = s.split('_')
-    res = [list[0]]
-    myappend = res.append
-    del list[0]
-    for item in list:
-        if item[1:2]:
-            try:
-                myappend(mychr(myatoi(item[:2], 16)) + item[2:])
-            except ValueError:
-                myappend('_' + item)
-        else:
-            myappend('_' + item)
-    return "".join(res)
+    """Undo the effects of quote()."""
+    return UNQUOTE_RE.sub(lambda m: UNQUOTE_MAP[m.group(0)], s)
 
 
 def flatten(fields):
@@ -117,7 +100,7 @@ def flatten_fieldsets(fieldsets):
     return field_names
 
 
-def get_deleted_objects(objs, opts, user, admin_site, using):
+def get_deleted_objects(objs, request, admin_site):
     """
     Find all objects related to ``objs`` that should also be deleted. ``objs``
     must be a homogeneous iterable of objects (e.g. a QuerySet).
@@ -125,17 +108,26 @@ def get_deleted_objects(objs, opts, user, admin_site, using):
     Return a nested list of strings suitable for display in the
     template with the ``unordered_list`` filter.
     """
+    try:
+        obj = objs[0]
+    except IndexError:
+        return [], {}, set(), []
+    else:
+        using = router.db_for_write(obj._meta.model)
     collector = NestedObjects(using=using)
     collector.collect(objs)
     perms_needed = set()
 
     def format_callback(obj):
-        has_admin = obj.__class__ in admin_site._registry
+        model = obj.__class__
+        has_admin = model in admin_site._registry
         opts = obj._meta
 
         no_edit_link = '%s: %s' % (capfirst(opts.verbose_name), obj)
 
         if has_admin:
+            if not admin_site._registry[model].has_delete_permission(request, obj):
+                perms_needed.add(opts.verbose_name)
             try:
                 admin_url = reverse('%s:%s_%s_change'
                                     % (admin_site.name,
@@ -146,10 +138,6 @@ def get_deleted_objects(objs, opts, user, admin_site, using):
                 # Change url doesn't exist -- don't display link to edit
                 return no_edit_link
 
-            if 'delete' in opts.default_permissions:
-                p = '%s.%s' % (opts.app_label, get_permission_codename('delete', opts))
-                if not user.has_perm(p):
-                    perms_needed.add(opts.verbose_name)
             # Display a link to the admin page.
             return format_html('{}: <a href="{}">{}</a>',
                                capfirst(opts.verbose_name),
@@ -315,7 +303,7 @@ def _get_non_gfk_field(opts, name):
     return field
 
 
-def label_for_field(name, model, model_admin=None, return_attr=False):
+def label_for_field(name, model, model_admin=None, return_attr=False, form=None):
     """
     Return a sensible label for a field name. The name can be a callable,
     property (but not created with @property decorator), or the name of an
@@ -342,10 +330,14 @@ def label_for_field(name, model, model_admin=None, return_attr=False):
                 attr = getattr(model_admin, name)
             elif hasattr(model, name):
                 attr = getattr(model, name)
+            elif form and name in form.fields:
+                attr = form.fields[name]
             else:
                 message = "Unable to lookup '%s' on %s" % (name, model._meta.object_name)
                 if model_admin:
                     message += " or %s" % (model_admin.__class__.__name__,)
+                if form:
+                    message += " or %s" % form.__class__.__name__
                 raise AttributeError(message)
 
             if hasattr(attr, "short_description"):
@@ -388,9 +380,9 @@ def display_for_field(value, field, empty_value_display):
 
     if getattr(field, 'flatchoices', None):
         return dict(field.flatchoices).get(value, empty_value_display)
-    # NullBooleanField needs special-case null-handling, so it comes
-    # before the general null test.
-    elif isinstance(field, (models.BooleanField, models.NullBooleanField)):
+    # BooleanField needs special-case null-handling, so it comes before the
+    # general null test.
+    elif isinstance(field, models.BooleanField):
         return _boolean_icon(value)
     elif value is None:
         return empty_value_display
@@ -497,12 +489,21 @@ def construct_change_message(form, formsets, add):
     Translations are deactivated so that strings are stored untranslated.
     Translation happens later on LogEntry access.
     """
+    # Evaluating `form.changed_data` prior to disabling translations is required
+    # to avoid fields affected by localization from being included incorrectly,
+    # e.g. where date formats differ such as MM/DD/YYYY vs DD/MM/YYYY.
+    changed_data = form.changed_data
+    with translation_override(None):
+        # Deactivate translations while fetching verbose_name for form
+        # field labels and using `field_name`, if verbose_name is not provided.
+        # Translations will happen later on LogEntry access.
+        changed_field_labels = _get_changed_field_labels_from_form(form, changed_data)
+
     change_message = []
     if add:
         change_message.append({'added': {}})
     elif form.changed_data:
-        change_message.append({'changed': {'fields': form.changed_data}})
-
+        change_message.append({'changed': {'fields': changed_field_labels}})
     if formsets:
         with translation_override(None):
             for formset in formsets:
@@ -518,7 +519,7 @@ def construct_change_message(form, formsets, add):
                         'changed': {
                             'name': str(changed_object._meta.verbose_name),
                             'object': str(changed_object),
-                            'fields': changed_fields,
+                            'fields': _get_changed_field_labels_from_form(formset.forms[0], changed_fields),
                         }
                     })
                 for deleted_object in formset.deleted_objects:
@@ -529,3 +530,14 @@ def construct_change_message(form, formsets, add):
                         }
                     })
     return change_message
+
+
+def _get_changed_field_labels_from_form(form, changed_data):
+    changed_field_labels = []
+    for field_name in changed_data:
+        try:
+            verbose_field_name = form.fields[field_name].label or field_name
+        except KeyError:
+            verbose_field_name = field_name
+        changed_field_labels.append(str(verbose_field_name))
+    return changed_field_labels

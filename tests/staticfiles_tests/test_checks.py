@@ -75,3 +75,13 @@ class FindersCheckTests(SimpleTestCase):
                 id='staticfiles.E002',
             )
         ])
+
+    @override_settings(STATICFILES_DIRS=[('prefix/', '/fake/path')])
+    def test_prefix_contains_trailing_slash(self):
+        self.assertEqual(check_finders(None), [
+            Error(
+                "The prefix 'prefix/' in the STATICFILES_DIRS setting must "
+                "not end with a slash.",
+                id='staticfiles.E003',
+            )
+        ])

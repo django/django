@@ -54,6 +54,19 @@ class ClientTest(TestCase):
         self.assertEqual(response.context['var'], '\xf2')
         self.assertEqual(response.templates[0].name, 'GET Template')
 
+    def test_query_string_encoding(self):
+        # WSGI requires latin-1 encoded strings.
+        response = self.client.get('/get_view/?var=1\ufffd')
+        self.assertEqual(response.context['var'], '1\ufffd')
+
+    def test_get_data_none(self):
+        msg = (
+            "Cannot encode None for key 'value' in a query string. Did you "
+            "mean to pass an empty string or omit the value?"
+        )
+        with self.assertRaisesMessage(TypeError, msg):
+            self.client.get('/get_view/', {'value': None})
+
     def test_get_post_view(self):
         "GET a view that normally expects POSTs"
         response = self.client.get('/post_view/', {})
@@ -87,17 +100,32 @@ class ClientTest(TestCase):
         self.assertEqual(response.templates[0].name, 'POST Template')
         self.assertContains(response, 'Data received')
 
+    def test_post_data_none(self):
+        msg = (
+            "Cannot encode None for key 'value' as POST data. Did you mean "
+            "to pass an empty string or omit the value?"
+        )
+        with self.assertRaisesMessage(TypeError, msg):
+            self.client.post('/post_view/', {'value': None})
+
     def test_json_serialization(self):
         """The test client serializes JSON data."""
         methods = ('post', 'put', 'patch', 'delete')
+        tests = (
+            ({'value': 37}, {'value': 37}),
+            ([37, True], [37, True]),
+            ((37, False), [37, False]),
+        )
         for method in methods:
             with self.subTest(method=method):
-                client_method = getattr(self.client, method)
-                method_name = method.upper()
-                response = client_method('/json_view/', {'value': 37}, content_type='application/json')
-                self.assertEqual(response.status_code, 200)
-                self.assertEqual(response.context['data'], 37)
-                self.assertContains(response, 'Viewing %s page.' % method_name)
+                for data, expected in tests:
+                    with self.subTest(data):
+                        client_method = getattr(self.client, method)
+                        method_name = method.upper()
+                        response = client_method('/json_view/', data, content_type='application/json')
+                        self.assertEqual(response.status_code, 200)
+                        self.assertEqual(response.context['data'], expected)
+                        self.assertContains(response, 'Viewing %s page.' % method_name)
 
     def test_json_encoder_argument(self):
         """The test Client accepts a json_encoder."""
@@ -111,6 +139,13 @@ class ClientTest(TestCase):
         client.post('/json_view/', {'value': 37}, content_type='application/vnd.api+json')
         self.assertTrue(mock_encoder.called)
         self.assertTrue(mock_encoding.encode.called)
+
+    def test_put(self):
+        response = self.client.put('/put_view/', {'foo': 'bar'})
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.templates[0].name, 'PUT Template')
+        self.assertEqual(response.context['data'], "{'foo': 'bar'}")
+        self.assertEqual(response.context['Content-Length'], '14')
 
     def test_trace(self):
         """TRACE a view"""
@@ -166,8 +201,7 @@ class ClientTest(TestCase):
         test_doc = """<?xml version="1.0" encoding="utf-8"?>
         <library><book><title>Blink</title><author>Malcolm Gladwell</author></book></library>
         """
-        response = self.client.post("/raw_post_view/", test_doc,
-                                    content_type="text/xml")
+        response = self.client.post('/raw_post_view/', test_doc, content_type='text/xml')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.templates[0].name, "Book template")
         self.assertEqual(response.content, b"Blink - Malcolm Gladwell")
@@ -193,6 +227,12 @@ class ClientTest(TestCase):
         "GET a URL that redirects with given GET parameters"
         response = self.client.get('/redirect_view/', {'var': 'value'})
         self.assertRedirects(response, '/get_view/?var=value')
+
+    def test_redirect_with_query_ordering(self):
+        """assertRedirects() ignores the order of query string parameters."""
+        response = self.client.get('/redirect_view/', {'var': 'value', 'foo': 'bar'})
+        self.assertRedirects(response, '/get_view/?var=value&foo=bar')
+        self.assertRedirects(response, '/get_view/?foo=bar&var=value')
 
     def test_permanent_redirect(self):
         "GET a URL that redirects permanently elsewhere"
@@ -719,6 +759,20 @@ class ClientTest(TestCase):
         with self.assertRaises(KeyError):
             self.client.get("/broken_view/")
 
+    def test_exc_info(self):
+        client = Client(raise_request_exception=False)
+        response = client.get("/broken_view/")
+        self.assertEqual(response.status_code, 500)
+        exc_type, exc_value, exc_traceback = response.exc_info
+        self.assertIs(exc_type, KeyError)
+        self.assertIsInstance(exc_value, KeyError)
+        self.assertEqual(str(exc_value), "'Oops! Looks like you wrote some bad code.'")
+        self.assertIsNotNone(exc_traceback)
+
+    def test_exc_info_none(self):
+        response = self.client.get("/get_view/")
+        self.assertIsNone(response.exc_info)
+
     def test_mail_sending(self):
         "Mail is redirected to a dummy outbox during test setup"
         response = self.client.get('/mail_sending_view/')
@@ -775,8 +829,9 @@ class ClientTest(TestCase):
 
     def test_response_raises_multi_arg_exception(self):
         """A request may raise an exception with more than one required arg."""
-        with self.assertRaises(TwoArgException):
+        with self.assertRaises(TwoArgException) as cm:
             self.client.get('/two_arg_exception/')
+        self.assertEqual(cm.exception.args, ('one', 'two'))
 
     def test_uploading_temp_file(self):
         with tempfile.TemporaryFile() as test_file:
@@ -837,9 +892,7 @@ class RequestFactoryTest(SimpleTestCase):
         ('options', _generic_view),
         ('trace', trace_view),
     )
-
-    def setUp(self):
-        self.request_factory = RequestFactory()
+    request_factory = RequestFactory()
 
     def test_request_factory(self):
         """The request factory implements all the HTTP/1.1 methods."""

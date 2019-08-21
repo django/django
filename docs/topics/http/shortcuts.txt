@@ -46,8 +46,8 @@ Optional arguments
     view will call it just before rendering the template.
 
 ``content_type``
-    The MIME type to use for the resulting document. Defaults to the value of
-    the :setting:`DEFAULT_CONTENT_TYPE` setting.
+    The MIME type to use for the resulting document. Defaults to
+    ``'text/html'``.
 
 ``status``
     The status code for the response. Defaults to ``200``.
@@ -81,21 +81,10 @@ This example is equivalent to::
         c = {'foo': 'bar'}
         return HttpResponse(t.render(c, request), content_type='application/xhtml+xml')
 
-``render_to_response()``
-========================
-
-.. function:: render_to_response(template_name, context=None, content_type=None, status=None, using=None)
-
-   .. deprecated:: 2.0
-
-   This function preceded the introduction of :func:`render` and works
-   similarly except that it doesn't make the ``request`` available in the
-   response.
-
 ``redirect()``
 ==============
 
-.. function:: redirect(to, permanent=False, *args, **kwargs)
+.. function:: redirect(to, *args, permanent=False, **kwargs)
 
    Returns an :class:`~django.http.HttpResponseRedirect` to the appropriate URL
    for the arguments passed.
@@ -119,7 +108,7 @@ Examples
 
 You can use the :func:`redirect` function in a number of ways.
 
-1. By passing some object; that object's
+#. By passing some object; that object's
    :meth:`~django.db.models.Model.get_absolute_url` method will be called
    to figure out the redirect URL::
 
@@ -127,10 +116,10 @@ You can use the :func:`redirect` function in a number of ways.
 
         def my_view(request):
             ...
-            object = MyModel.objects.get(...)
-            return redirect(object)
+            obj = MyModel.objects.get(...)
+            return redirect(obj)
 
-2. By passing the name of a view and optionally some positional or
+#. By passing the name of a view and optionally some positional or
    keyword arguments; the URL will be reverse resolved using the
    :func:`~django.urls.reverse` method::
 
@@ -138,7 +127,7 @@ You can use the :func:`redirect` function in a number of ways.
             ...
             return redirect('some-view-name', foo='bar')
 
-3. By passing a hardcoded URL to redirect to::
+#. By passing a hardcoded URL to redirect to::
 
         def my_view(request):
             ...
@@ -156,8 +145,8 @@ will be returned::
 
     def my_view(request):
         ...
-        object = MyModel.objects.get(...)
-        return redirect(object, permanent=True)
+        obj = MyModel.objects.get(...)
+        return redirect(obj, permanent=True)
 
 ``get_object_or_404()``
 =======================
@@ -190,7 +179,7 @@ The following example gets the object with the primary key of 1 from
     from django.shortcuts import get_object_or_404
 
     def my_view(request):
-        my_object = get_object_or_404(MyModel, pk=1)
+        obj = get_object_or_404(MyModel, pk=1)
 
 This example is equivalent to::
 
@@ -198,7 +187,7 @@ This example is equivalent to::
 
     def my_view(request):
         try:
-            my_object = MyModel.objects.get(pk=1)
+            obj = MyModel.objects.get(pk=1)
         except MyModel.DoesNotExist:
             raise Http404("No MyModel matches the given query.")
 
