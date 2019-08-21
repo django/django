@@ -559,7 +559,9 @@ class OuterRef(F):
                            summarize=False, for_save=False, simple_col=False):
         if isinstance(self.name, self.__class__):
             return self.name
-        return ResolvedOuterRef(self.name)
+        if isinstance(self.name, F) or not getattr(self.name, 'resolve_expression', None):
+            return ResolvedOuterRef(self.name)
+        return self.name.resolve_expression(query, allow_joins, reuse, summarize, for_save, simple_col)
 
 
 class Func(SQLiteNumericMixin, Expression):
