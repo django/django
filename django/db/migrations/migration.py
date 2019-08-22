@@ -58,8 +58,9 @@ class Migration:
         self.replaces = list(self.__class__.replaces)
 
     def __eq__(self, other):
+        if not isinstance(other, Migration):
+            raise NotImplementedError
         return (
-            isinstance(other, Migration) and
             self.name == other.name and
             self.app_label == other.app_label
         )

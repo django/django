@@ -54,8 +54,9 @@ class CheckConstraint(BaseConstraint):
         return "<%s: check='%s' name=%r>" % (self.__class__.__name__, self.check, self.name)
 
     def __eq__(self, other):
+        if not isinstance(other, CheckConstraint):
+            raise NotImplementedError
         return (
-            isinstance(other, CheckConstraint) and
             self.name == other.name and
             self.check == other.check
         )
@@ -106,8 +107,9 @@ class UniqueConstraint(BaseConstraint):
         )
 
     def __eq__(self, other):
+        if not isinstance(other, UniqueConstraint):
+            raise NotImplementedError
         return (
-            isinstance(other, UniqueConstraint) and
             self.name == other.name and
             self.fields == other.fields and
             self.condition == other.condition
