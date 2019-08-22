@@ -20,7 +20,7 @@
 
 import os
 from argparse import ArgumentParser
-from subprocess import PIPE, Popen, call
+from subprocess import PIPE, run
 
 import django
 from django.conf import settings
@@ -73,10 +73,9 @@ def _check_diff(cat_name, base_path):
     """
     po_path = '%(path)s/en/LC_MESSAGES/django%(ext)s.po' % {
         'path': base_path, 'ext': 'js' if cat_name.endswith('-js') else ''}
-    p = Popen("git diff -U0 %s | egrep '^[-+]msgid' | wc -l" % po_path,
-              stdout=PIPE, stderr=PIPE, shell=True)
-    output, errors = p.communicate()
-    num_changes = int(output.strip())
+    p = run("git diff -U0 %s | egrep '^[-+]msgid' | wc -l" % po_path,
+            stdout=PIPE, stderr=PIPE, shell=True)
+    num_changes = int(p.stdout.strip())
     print("%d changed/added messages in '%s' catalog." % (num_changes, cat_name))
 
 
@@ -122,18 +121,17 @@ def lang_stats(resources=None, languages=None):
             po_path = '{path}/{lang}/LC_MESSAGES/django{ext}.po'.format(
                 path=dir_, lang=lang, ext='js' if name.endswith('-js') else ''
             )
-            p = Popen(
+            p = run(
                 ['msgfmt', '-vc', '-o', '/dev/null', po_path],
                 stdout=PIPE, stderr=PIPE,
                 env={'LANG': 'C'}
             )
-            output, errors = p.communicate()
             if p.returncode == 0:
                 # msgfmt output stats on stderr
-                print("%s: %s" % (lang, errors.decode().strip()))
+                print("%s: %s" % (lang, p.stderr.decode().strip()))
             else:
                 print("Errors happened when checking %s translation for %s:\n%s" % (
-                    lang, name, errors.decode()))
+                    lang, name, p.stderr.decode()))
 
 
 def fetch(resources=None, languages=None):
@@ -146,11 +144,11 @@ def fetch(resources=None, languages=None):
     for name, dir_ in locale_dirs:
         # Transifex pull
         if languages is None:
-            call('tx pull -r %(res)s -a -f  --minimum-perc=5' % {'res': _tx_resource_for_name(name)}, shell=True)
+            run('tx pull -r %(res)s -a -f  --minimum-perc=5' % {'res': _tx_resource_for_name(name)}, shell=True)
             target_langs = sorted(d for d in os.listdir(dir_) if not d.startswith('_') and d != 'en')
         else:
             for lang in languages:
-                call('tx pull -r %(res)s -f -l %(lang)s' % {
+                run('tx pull -r %(res)s -f -l %(lang)s' % {
                     'res': _tx_resource_for_name(name), 'lang': lang}, shell=True)
             target_langs = languages
 
@@ -162,9 +160,9 @@ def fetch(resources=None, languages=None):
                 print("No %(lang)s translation for resource %(name)s" % {
                     'lang': lang, 'name': name})
                 continue
-            call('msgcat --no-location -o %s %s' % (po_path, po_path), shell=True)
-            res = call('msgfmt -c -o %s.mo %s' % (po_path[:-3], po_path), shell=True)
-            if res != 0:
+            run('msgcat --no-location -o %s %s' % (po_path, po_path), shell=True)
+            msgfmt = run('msgfmt -c -o %s.mo %s' % (po_path[:-3], po_path), shell=True)
+            if msgfmt.returncode != 0:
                 errors.append((name, lang))
     if errors:
         print("\nWARNING: Errors have occurred in following cases:")

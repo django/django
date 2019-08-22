@@ -54,7 +54,7 @@ Compiler library and Java version 6 or later."""
             )
             if options.verbose:
                 sys.stdout.write("Running: %s\n" % cmd)
-            subprocess.call(cmd.split())
+            subprocess.run(cmd.split())
         else:
             sys.stdout.write("File %s not found. Sure it exists?\n" % to_compress)
 
