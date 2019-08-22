@@ -82,6 +82,10 @@ class ArrayField(CheckFieldDefaultMixin, Field):
         size = self.size or ''
         return '%s[%s]' % (self.base_field.db_type(connection), size)
 
+    def cast_db_type(self, connection):
+        size = self.size or ''
+        return '%s[%s]' % (self.base_field.cast_db_type(connection), size)
+
     def get_placeholder(self, value, compiler, connection):
         return '%s::{}'.format(self.db_type(connection))
 
@@ -193,7 +197,7 @@ class ArrayField(CheckFieldDefaultMixin, Field):
 class ArrayCastRHSMixin:
     def process_rhs(self, compiler, connection):
         rhs, rhs_params = super().process_rhs(compiler, connection)
-        cast_type = self.lhs.output_field.db_type(connection)
+        cast_type = self.lhs.output_field.cast_db_type(connection)
         return '%s::%s' % (rhs, cast_type), rhs_params
 
 
