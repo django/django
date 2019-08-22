@@ -1,4 +1,5 @@
 import json
+import time
 
 from django.contrib import admin
 from django.contrib.admin.tests import AdminSeleniumTestCase
@@ -189,6 +190,12 @@ class SeleniumTests(AdminSeleniumTestCase):
         self.assertEqual(len(results), PAGINATOR_SIZE + 11)
         # Limit the results with the search field.
         search.send_keys('Who')
+        # Ajax request is delayed.
+        self.assertTrue(result_container.is_displayed())
+        results = result_container.find_elements_by_css_selector('.select2-results__option')
+        self.assertEqual(len(results), PAGINATOR_SIZE + 12)
+        # Wait for ajax delay.
+        time.sleep(0.25)
         self.assertTrue(result_container.is_displayed())
         results = result_container.find_elements_by_css_selector('.select2-results__option')
         self.assertEqual(len(results), 1)
@@ -223,6 +230,12 @@ class SeleniumTests(AdminSeleniumTestCase):
         self.assertEqual(len(results), 31)
         # Limit the results with the search field.
         search.send_keys('Who')
+        # Ajax request is delayed.
+        self.assertTrue(result_container.is_displayed())
+        results = result_container.find_elements_by_css_selector('.select2-results__option')
+        self.assertEqual(len(results), 32)
+        # Wait for ajax delay.
+        time.sleep(0.25)
         self.assertTrue(result_container.is_displayed())
         results = result_container.find_elements_by_css_selector('.select2-results__option')
         self.assertEqual(len(results), 1)
