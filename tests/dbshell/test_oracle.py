@@ -10,7 +10,7 @@ from django.test import SimpleTestCase
 class OracleDbshellTests(SimpleTestCase):
     def _run_dbshell(self, rlwrap=False):
         """Run runshell command and capture its arguments."""
-        def _mock_subprocess_run(*args):
+        def _mock_subprocess_run(*args, **kwargs):
             self.subprocess_args = list(*args)
             return CompletedProcess(self.subprocess_args, 0)
 
@@ -24,11 +24,11 @@ class OracleDbshellTests(SimpleTestCase):
     def test_without_rlwrap(self):
         self.assertEqual(
             self._run_dbshell(rlwrap=False),
-            ('sqlplus', '-L', connection._connect_string()),
+            ['sqlplus', '-L', connection._connect_string()],
         )
 
     def test_with_rlwrap(self):
         self.assertEqual(
             self._run_dbshell(rlwrap=True),
-            ('/usr/bin/rlwrap', 'sqlplus', '-L', connection._connect_string()),
+            ['/usr/bin/rlwrap', 'sqlplus', '-L', connection._connect_string()],
         )
