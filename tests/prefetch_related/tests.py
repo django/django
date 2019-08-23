@@ -1363,7 +1363,7 @@ class Ticket21760Tests(TestCase):
         self.assertNotIn(' JOIN ', str(queryset.query))
 
 
-class DirectPrefechedObjectCacheReuseTests(TestCase):
+class DirectPrefetchedObjectCacheReuseTests(TestCase):
     """
     prefetch_related() reuses objects fetched in _prefetched_objects_cache.
 
