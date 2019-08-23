@@ -4,7 +4,7 @@ import stat
 import unittest
 from io import StringIO
 from pathlib import Path
-from subprocess import Popen
+from subprocess import run
 from unittest import mock
 
 from django.core.management import (
@@ -184,7 +184,7 @@ class CompilationErrorHandling(MessageCompilationTests):
         # Make sure the output of msgfmt is unaffected by the current locale.
         env = os.environ.copy()
         env.update({'LANG': 'C'})
-        with mock.patch('django.core.management.utils.Popen', lambda *args, **kwargs: Popen(*args, env=env, **kwargs)):
+        with mock.patch('django.core.management.utils.run', lambda *args, **kwargs: run(*args, env=env, **kwargs)):
             cmd = MakeMessagesCommand()
             if cmd.gettext_version < (0, 18, 3):
                 self.skipTest("python-brace-format is a recent gettext addition.")
