@@ -2872,6 +2872,19 @@ doesn't have a ``next_page`` attribute.
 If ``None``, no redirect will be performed and the logout view will be
 rendered.
 
+.. setting:: PASSWORD_RESET_TIMEOUT
+
+``PASSWORD_RESET_TIMEOUT``
+--------------------------
+
+.. versionadded:: 3.1
+
+Default: ``259200`` (3 days, in seconds)
+
+The minimum number of seconds a password reset link is valid for.
+
+Used by the :class:`~django.contrib.auth.views.PasswordResetConfirmView`.
+
 .. setting:: PASSWORD_RESET_TIMEOUT_DAYS
 
 ``PASSWORD_RESET_TIMEOUT_DAYS``
@@ -2883,6 +2896,10 @@ The minimum number of days a password reset link is valid for. Depending on
 when the link is generated, it will be valid for up to a day longer.
 
 Used by the :class:`~django.contrib.auth.views.PasswordResetConfirmView`.
+
+.. deprecated:: 3.1
+
+    This setting is deprecated. Use :setting:`PASSWORD_RESET_TIMEOUT` instead.
 
 .. setting:: PASSWORD_HASHERS
 
