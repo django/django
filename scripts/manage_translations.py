@@ -144,12 +144,11 @@ def fetch(resources=None, languages=None):
     for name, dir_ in locale_dirs:
         # Transifex pull
         if languages is None:
-            run('tx pull -r %(res)s -a -f  --minimum-perc=5' % {'res': _tx_resource_for_name(name)}, shell=True)
+            run(['tx', 'pull', '-r', _tx_resource_for_name(name), '-a', '-f', '--minimum-perc=5'])
             target_langs = sorted(d for d in os.listdir(dir_) if not d.startswith('_') and d != 'en')
         else:
             for lang in languages:
-                run('tx pull -r %(res)s -f -l %(lang)s' % {
-                    'res': _tx_resource_for_name(name), 'lang': lang}, shell=True)
+                run(['tx', 'pull', '-r', _tx_resource_for_name(name), '-f', '-l', lang])
             target_langs = languages
 
         # msgcat to wrap lines and msgfmt for compilation of .mo file
@@ -160,8 +159,8 @@ def fetch(resources=None, languages=None):
                 print("No %(lang)s translation for resource %(name)s" % {
                     'lang': lang, 'name': name})
                 continue
-            run('msgcat --no-location -o %s %s' % (po_path, po_path), shell=True)
-            msgfmt = run('msgfmt -c -o %s.mo %s' % (po_path[:-3], po_path), shell=True)
+            run(['msgcat', '--no-location', '-o', po_path, po_path])
+            msgfmt = run(['msgfmt', '-c', '-o', '%s.mo' % po_path[:-3], po_path])
             if msgfmt.returncode != 0:
                 errors.append((name, lang))
     if errors:
