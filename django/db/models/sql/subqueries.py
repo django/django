@@ -1,7 +1,6 @@
 """
 Query subclasses which provide extra functionality beyond simple data retrieval.
 """
-
 from django.core.exceptions import FieldError
 from django.db import connections
 from django.db.models.query_utils import Q
@@ -91,6 +90,7 @@ class UpdateQuery(Query):
         would normally be set in __init__() should go here instead.
         """
         self.values = []
+        self.values_lookups = {}
         self.related_ids = None
         self.related_updates = {}
 
@@ -114,7 +114,9 @@ class UpdateQuery(Query):
         """
         values_seq = []
         for name, val in values.items():
-            field = self.get_meta().get_field(name)
+            lookups, name, _ = self.solve_lookup_type(name)
+            self.values_lookups[name[0]] = lookups
+            field = self.get_meta().get_field(name[0])
             direct = not (field.auto_created and not field.concrete) or not field.concrete
             model = field.model._meta.concrete_model
             if not direct or (field.is_relation and field.many_to_many):

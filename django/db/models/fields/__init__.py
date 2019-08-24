@@ -122,6 +122,7 @@ class Field(RegisterLookupMixin):
     one_to_many = None
     one_to_one = None
     related_model = None
+    keys = None
 
     descriptor_class = DeferredAttribute
 
@@ -2212,7 +2213,7 @@ class BinaryField(Field):
     def get_internal_type(self):
         return "BinaryField"
 
-    def get_placeholder(self, value, compiler, connection):
+    def get_placeholder(self, value, compiler, connection, key_lookups=None):
         return connection.ops.binary_placeholder_sql(value)
 
     def get_default(self):

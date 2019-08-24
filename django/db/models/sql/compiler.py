@@ -1376,6 +1376,7 @@ class SQLUpdateCompiler(SQLCompiler):
             return '', ()
         qn = self.quote_name_unless_alias
         values, update_params = [], []
+        key_lookups = self.query.values_lookups
         for field, model, val in self.query.values:
             if hasattr(val, 'resolve_expression'):
                 val = val.resolve_expression(self.query, allow_joins=False, for_save=True)
@@ -1406,19 +1407,23 @@ class SQLUpdateCompiler(SQLCompiler):
 
             # Getting the placeholder for the field.
             if hasattr(field, 'get_placeholder'):
-                placeholder = field.get_placeholder(val, self, self.connection)
+                placeholder = field.get_placeholder(val, self, self.connection, key_lookups=key_lookups.get(field.column, []))
             else:
                 placeholder = '%s'
-            name = field.column
+
+            name = qn(field.column)
+            if hasattr(field, 'get_keys_placeholder'):
+                name += field.get_keys_placeholder(key_lookups.get(field.column, []))
+
             if hasattr(val, 'as_sql'):
                 sql, params = self.compile(val)
-                values.append('%s = %s' % (qn(name), placeholder % sql))
+                values.append('%s = %s' % (name, placeholder % sql))
                 update_params.extend(params)
             elif val is not None:
-                values.append('%s = %s' % (qn(name), placeholder))
+                values.append('%s = %s' % (name, placeholder))
                 update_params.append(val)
             else:
-                values.append('%s = NULL' % qn(name))
+                values.append('%s = NULL' % name)
         table = self.query.base_table
         result = [
             'UPDATE %s SET' % qn(table),

@@ -1008,3 +1008,19 @@ class TestSplitFormWidget(PostgreSQLWidgetTestCase):
         self.assertIs(widget.value_omitted_from_data({'field_0': 'value'}, {}, 'field'), False)
         self.assertIs(widget.value_omitted_from_data({'field_1': 'value'}, {}, 'field'), False)
         self.assertIs(widget.value_omitted_from_data({'field_0': 'value', 'field_1': 'value'}, {}, 'field'), False)
+
+#
+# class TestUpdate(PostgreSQLTestCase):
+#     def test_update_first_index(self):
+#         instance = IntegerArrayModel(field=[1])
+#         instance.save()
+#         IntegerArrayModel.objects.update(field__0=2)
+#         loaded = IntegerArrayModel.objects.get()
+#         self.assertEqual(loaded.field, [2])
+#
+#     def test_update_not_existing_index(self):
+#         instance = IntegerArrayModel(field=[1])
+#         instance.save()
+#         IntegerArrayModel.objects.update(field__1=2)
+#         loaded = IntegerArrayModel.objects.get()
+#         self.assertEqual(loaded.field, [1, 2])
