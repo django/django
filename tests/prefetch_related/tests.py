@@ -204,7 +204,7 @@ class PrefetchRelatedTests(TestDataMixin, TestCase):
 
     def test_reverse_one_to_one_then_m2m(self):
         """
-        A m2m relation can be followed afterr going through the select_related
+        A m2m relation can be followed after going through the select_related
         reverse of an o2o.
         """
         qs = Author.objects.prefetch_related('bio__books').select_related('bio')
