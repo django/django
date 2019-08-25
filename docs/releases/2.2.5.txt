@@ -22,3 +22,6 @@ Bugfixes
   :attr:`ModelAdmin.list_filter <django.contrib.admin.ModelAdmin.list_filter>`
   choices to foreign objects don't respect a model's ``Meta.ordering``
   (:ticket:`30449`).
+
+* Fixed a race condition in loading URLconf module that could cause a crash of
+  auto-reloader on Python 3.5 and below (:ticket:`30500`).

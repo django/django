@@ -381,6 +381,7 @@ class URLResolver:
         self._callback_strs = set()
         self._populated = False
         self._local = threading.local()
+        self._urlconf_lock = threading.Lock()
 
     def __repr__(self):
         if isinstance(self.urlconf_name, list) and self.urlconf_name:
@@ -568,10 +569,14 @@ class URLResolver:
 
     @cached_property
     def urlconf_module(self):
-        if isinstance(self.urlconf_name, str):
-            return import_module(self.urlconf_name)
-        else:
-            return self.urlconf_name
+        # import_module is not thread safe if the module throws an exception
+        # during import, and can return an empty module object in Python < 3.6
+        # (see https://bugs.python.org/issue36284).
+        with self._urlconf_lock:
+            if isinstance(self.urlconf_name, str):
+                return import_module(self.urlconf_name)
+            else:
+                return self.urlconf_name
 
     @cached_property
     def url_patterns(self):
