@@ -9,6 +9,7 @@ import functools
 import inspect
 import re
 import string
+import threading
 from importlib import import_module
 from urllib.parse import quote
 
@@ -389,6 +390,7 @@ class URLResolver:
         self._callback_strs = set()
         self._populated = False
         self._local = Local()
+        self._urlconf_lock = threading.Lock()
 
     def __repr__(self):
         if isinstance(self.urlconf_name, list) and self.urlconf_name:
@@ -576,10 +578,13 @@ class URLResolver:
 
     @cached_property
     def urlconf_module(self):
-        if isinstance(self.urlconf_name, str):
-            return import_module(self.urlconf_name)
-        else:
-            return self.urlconf_name
+        # Ticket #30500: import_module is not thread safe if the module throws an exception during import and can
+        # return an empty module object.
+        with self._urlconf_lock:
+            if isinstance(self.urlconf_name, str):
+                return import_module(self.urlconf_name)
+            else:
+                return self.urlconf_name
 
     @cached_property
     def url_patterns(self):
