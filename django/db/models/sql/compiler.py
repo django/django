@@ -1404,16 +1404,16 @@ class SQLUpdateCompiler(SQLCompiler):
                     )
             else:
                 val = field.get_db_prep_save(val, connection=self.connection)
-
+            key_lookups = key_lookups.get(field.column)
             # Getting the placeholder for the field.
             if hasattr(field, 'get_placeholder'):
-                placeholder = field.get_placeholder(val, self, self.connection, key_lookups=key_lookups.get(field.column, []))
+                placeholder = field.get_placeholder(val, self, self.connection, key_lookups=key_lookups)
             else:
                 placeholder = '%s'
 
             name = qn(field.column)
             if hasattr(field, 'get_keys_placeholder'):
-                name += field.get_keys_placeholder(key_lookups.get(field.column, []))
+                name += field.get_keys_placeholder(key_lookups)
 
             if hasattr(val, 'as_sql'):
                 sql, params = self.compile(val)

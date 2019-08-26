@@ -1,6 +1,7 @@
 """
 Query subclasses which provide extra functionality beyond simple data retrieval.
 """
+
 from django.core.exceptions import FieldError
 from django.db import connections
 from django.db.models.query_utils import Q
