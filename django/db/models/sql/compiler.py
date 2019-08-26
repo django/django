@@ -1553,6 +1553,7 @@ class SQLUpdateCompiler(SQLCompiler):
         self.query.reset_refcounts(refcounts_before)
 
 
+# RemovedInDjango40Warning: this class will be removed.
 class SQLAggregateCompiler(SQLCompiler):
     def as_sql(self):
         """

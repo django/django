@@ -166,3 +166,25 @@ class BaseTable:
             self.table_name == other.table_name and
             self.table_alias == other.table_alias
         )
+
+
+class BaseSubquery:
+    join_type = None
+    parent_alias = None
+    filtered_relation = None
+
+    def __init__(self, query, alias):
+        self.query = query
+        assert self.query.subquery is True
+        self.table_name = self.table_alias = alias
+
+    def as_sql(self, compiler, connection):
+        subquery_sql, subquery_params = self.query.as_sql(
+            compiler, connection, with_col_aliases=True
+        )
+        return '%s %s' % (subquery_sql, self.table_alias), subquery_params
+
+    def relabeled_clone(self, change_map):
+        return self.__class__(
+            self.query, change_map.get(self.table_alias, self.table_alias)
+        )

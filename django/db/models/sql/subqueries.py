@@ -1,6 +1,7 @@
 """
 Query subclasses which provide extra functionality beyond simple data retrieval.
 """
+import warnings
 
 from django.core.exceptions import FieldError
 from django.db.models.query_utils import Q
@@ -8,6 +9,7 @@ from django.db.models.sql.constants import (
     CURSOR, GET_ITERATOR_CHUNK_SIZE, NO_RESULTS,
 )
 from django.db.models.sql.query import Query
+from django.utils.deprecation import RemovedInDjango40Warning
 
 __all__ = ['DeleteQuery', 'UpdateQuery', 'InsertQuery', 'AggregateQuery']
 
@@ -156,6 +158,14 @@ class AggregateQuery(Query):
     """
 
     compiler = 'SQLAggregateCompiler'
+
+    def __init__(self, *args, **kwargs):
+        warnings.warn(
+            'AggregateQuery is deprecated, read more in Django 3.1 release notes.',
+            RemovedInDjango40Warning,
+            stacklevel=2,
+        )
+        super().__init__(*args, **kwargs)
 
     def add_subquery(self, query, using):
         query.subquery = True

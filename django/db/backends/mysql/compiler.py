@@ -37,7 +37,3 @@ class SQLDeleteCompiler(compiler.SQLDeleteCompiler, SQLCompiler):
 
 class SQLUpdateCompiler(compiler.SQLUpdateCompiler, SQLCompiler):
     pass
-
-
-class SQLAggregateCompiler(compiler.SQLAggregateCompiler, SQLCompiler):
-    pass

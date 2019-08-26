@@ -457,6 +457,9 @@ backends.
   yields a cursor and automatically closes the cursor and connection upon
   exiting the ``with`` statement.
 
+* ``AggregateQuery`` is deprecated. A normal ``Query`` is created instead and
+  is joined with a ``BaseSubquery`` containing the inner query.
+
 Dropped support for MariaDB 10.1
 --------------------------------
 
