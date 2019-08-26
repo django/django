@@ -547,19 +547,18 @@ class TestFormField(PostgreSQLSimpleTestCase):
         self.assertIs(field.has_changed({'a': True}, '{"a": 1}'), True)
         self.assertIs(field.has_changed({'a': 1, 'b': 2}, '{"b": 2, "a": 1}'), False)
 
-#
-# class TestUpdate(PostgreSQLTestCase):
-#     def test_update_field(self):
-#         instance = JSONModel(field={'name': 'Test'})
-#         instance.save()
-#         JSONModel.objects.update(field__name='New Test')
-#         loaded = JSONModel.objects.get()
-#         self.assertEqual(loaded.field, {'name': 'New Test'})
-#
-#     def test_not_existing_field(self):
-#         instance = JSONModel(field={})
-#         instance.save()
-#         JSONModel.objects.update(field__name='New Test')
-#         loaded = JSONModel.objects.get()
-#         self.assertEqual(loaded.field, {'name': 'New Test'})
 
+class TestUpdate(PostgreSQLTestCase):
+    def test_update_field(self):
+        instance = JSONModel(field={'name': 'Test'})
+        instance.save()
+        JSONModel.objects.update(field__name='New Test')
+        loaded = JSONModel.objects.get()
+        self.assertEqual(loaded.field, {'name': 'New Test'})
+
+    def test_not_existing_field(self):
+        instance = JSONModel(field={})
+        instance.save()
+        JSONModel.objects.update(field__name='New Test')
+        loaded = JSONModel.objects.get()
+        self.assertEqual(loaded.field, {'name': 'New Test'})
