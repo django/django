@@ -458,7 +458,7 @@ class RequestsTests(SimpleTestCase):
         self.assertEqual(request.read(13), b'--boundary\r\nC')
         self.assertEqual(request.POST, {'name': ['value']})
 
-    def test_POST_immutable_for_mutipart(self):
+    def test_POST_immutable_for_multipart(self):
         """
         MultiPartParser.parse() leaves request.POST immutable.
         """

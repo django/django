@@ -8,6 +8,7 @@ from django.contrib.admin.tests import AdminSeleniumTestCase
 from django.contrib.admin.views.main import ALL_VAR, SEARCH_VAR
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
+from django.contrib.messages.storage.cookie import CookieStorage
 from django.db import connection, models
 from django.db.models import F
 from django.db.models.fields import Field, IntegerField
@@ -405,6 +406,22 @@ class ChangeListTests(TestCase):
         cl = m.get_changelist_instance(request)
         # Make sure distinct() was called
         self.assertEqual(cl.queryset.count(), 1)
+
+    def test_changelist_search_form_validation(self):
+        m = ConcertAdmin(Concert, custom_site)
+        tests = [
+            ({SEARCH_VAR: '\x00'}, 'Null characters are not allowed.'),
+            ({SEARCH_VAR: 'some\x00thing'}, 'Null characters are not allowed.'),
+        ]
+        for case, error in tests:
+            with self.subTest(case=case):
+                request = self.factory.get('/concert/', case)
+                request.user = self.superuser
+                request._messages = CookieStorage(request)
+                m.get_changelist_instance(request)
+                messages = [m.message for m in request._messages]
+                self.assertEqual(1, len(messages))
+                self.assertEqual(error, messages[0])
 
     def test_distinct_for_non_unique_related_object_in_search_fields(self):
         """

@@ -11,6 +11,7 @@ import weakref
 import zipfile
 from importlib import import_module
 from pathlib import Path
+from subprocess import CompletedProcess
 from unittest import mock, skip, skipIf
 
 from django.apps.registry import Apps
@@ -345,7 +346,7 @@ class RestartWithReloaderTests(SimpleTestCase):
     executable = '/usr/bin/python'
 
     def patch_autoreload(self, argv):
-        patch_call = mock.patch('django.utils.autoreload.subprocess.call', return_value=0)
+        patch_call = mock.patch('django.utils.autoreload.subprocess.run', return_value=CompletedProcess(argv, 0))
         patches = [
             mock.patch('django.utils.autoreload.sys.argv', argv),
             mock.patch('django.utils.autoreload.sys.executable', self.executable),

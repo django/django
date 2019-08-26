@@ -23,8 +23,8 @@ from django.test import TestCase, override_settings
 from django.utils.translation import gettext_lazy as _
 
 from .models import (
-    CustomUser, CustomUserNonUniqueUsername, CustomUserWithFK, Email,
-    UserProxy,
+    CustomUser, CustomUserNonUniqueUsername, CustomUserWithFK,
+    CustomUserWithM2M, Email, Organization, UserProxy,
 )
 
 MOCK_INPUT_KEY_TO_PROMPTS = {
@@ -499,6 +499,87 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
             self.assertEqual(u.group, group)
 
         test(self)
+
+    @override_settings(AUTH_USER_MODEL='auth_tests.CustomUserWithM2m')
+    def test_fields_with_m2m(self):
+        new_io = StringIO()
+        org_id_1 = Organization.objects.create(name='Organization 1').pk
+        org_id_2 = Organization.objects.create(name='Organization 2').pk
+        call_command(
+            'createsuperuser',
+            interactive=False,
+            username='joe',
+            orgs=[org_id_1, org_id_2],
+            stdout=new_io,
+        )
+        command_output = new_io.getvalue().strip()
+        self.assertEqual(command_output, 'Superuser created successfully.')
+        user = CustomUserWithM2M._default_manager.get(username='joe')
+        self.assertEqual(user.orgs.count(), 2)
+
+    @override_settings(AUTH_USER_MODEL='auth_tests.CustomUserWithM2M')
+    def test_fields_with_m2m_interactive(self):
+        new_io = StringIO()
+        org_id_1 = Organization.objects.create(name='Organization 1').pk
+        org_id_2 = Organization.objects.create(name='Organization 2').pk
+
+        @mock_inputs({
+            'password': 'nopasswd',
+            'Username: ': 'joe',
+            'Orgs (Organization.id): ': '%s, %s' % (org_id_1, org_id_2),
+        })
+        def test(self):
+            call_command(
+                'createsuperuser',
+                interactive=True,
+                stdout=new_io,
+                stdin=MockTTY(),
+            )
+            command_output = new_io.getvalue().strip()
+            self.assertEqual(command_output, 'Superuser created successfully.')
+            user = CustomUserWithM2M._default_manager.get(username='joe')
+            self.assertEqual(user.orgs.count(), 2)
+
+        test(self)
+
+    @override_settings(AUTH_USER_MODEL='auth_tests.CustomUserWithM2M')
+    def test_fields_with_m2m_interactive_blank(self):
+        new_io = StringIO()
+        org_id = Organization.objects.create(name='Organization').pk
+        entered_orgs = [str(org_id), ' ']
+
+        def return_orgs():
+            return entered_orgs.pop()
+
+        @mock_inputs({
+            'password': 'nopasswd',
+            'Username: ': 'joe',
+            'Orgs (Organization.id): ': return_orgs,
+        })
+        def test(self):
+            call_command(
+                'createsuperuser',
+                interactive=True,
+                stdout=new_io,
+                stderr=new_io,
+                stdin=MockTTY(),
+            )
+            self.assertEqual(
+                new_io.getvalue().strip(),
+                'Error: This field cannot be blank.\n'
+                'Superuser created successfully.',
+            )
+
+        test(self)
+
+    @override_settings(AUTH_USER_MODEL='auth_tests.CustomUserWithM2MThrough')
+    def test_fields_with_m2m_and_through(self):
+        msg = (
+            "Required field 'orgs' specifies a many-to-many relation through "
+            "model, which is not supported."
+        )
+        with self.assertRaisesMessage(CommandError, msg):
+            call_command('createsuperuser')
 
     def test_default_username(self):
         """createsuperuser uses a default username when one isn't provided."""

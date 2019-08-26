@@ -118,12 +118,13 @@ class AdminScriptTestCase(SimpleTestCase):
         test_environ['PYTHONPATH'] = os.pathsep.join(python_path)
         test_environ['PYTHONWARNINGS'] = ''
 
-        return subprocess.Popen(
+        p = subprocess.run(
             [sys.executable, script] + args,
             stdout=subprocess.PIPE, stderr=subprocess.PIPE,
             cwd=self.test_dir,
             env=test_environ, universal_newlines=True,
-        ).communicate()
+        )
+        return p.stdout, p.stderr
 
     def run_django_admin(self, args, settings_file=None):
         script_dir = os.path.abspath(os.path.join(os.path.dirname(django.__file__), 'bin'))

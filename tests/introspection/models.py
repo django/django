@@ -83,6 +83,7 @@ class Comment(models.Model):
 
 class CheckConstraintModel(models.Model):
     up_votes = models.PositiveIntegerField()
+    voting_number = models.PositiveIntegerField(unique=True)
 
     class Meta:
         required_db_features = {

@@ -131,7 +131,7 @@ class ASGIHandler(base.BaseHandler):
     chunk_size = 2 ** 16
 
     def __init__(self):
-        super(ASGIHandler, self).__init__()
+        super().__init__()
         self.load_middleware()
 
     async def __call__(self, scope, receive, send):

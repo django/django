@@ -89,6 +89,8 @@ Minor features
 
 * Select2 library is upgraded from version 4.0.3 to 4.0.7.
 
+* jQuery is upgraded from version 3.3.1 to 3.4.1.
+
 :mod:`django.contrib.admindocs`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -115,6 +117,9 @@ Minor features
 * :djadmin:`createsuperuser` now falls back to environment variables for
   password and required fields, when a corresponding command line argument
   isn't provided in non-interactive mode.
+
+* :attr:`~django.contrib.auth.models.CustomUser.REQUIRED_FIELDS` now supports
+  :class:`~django.db.models.ManyToManyField`\s.
 
 :mod:`django.contrib.contenttypes`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

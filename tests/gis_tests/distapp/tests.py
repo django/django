@@ -234,6 +234,30 @@ class DistanceTest(TestCase):
         ).filter(annotated_value=True)
         self.assertEqual(self.get_names(qs), ['77002', '77025', '77401'])
 
+    @skipUnlessDBFeature('supports_dwithin_lookup', 'supports_dwithin_distance_expr')
+    def test_dwithin_with_expression_rhs(self):
+        # LineString of Wollongong and Adelaide coords.
+        ls = LineString(((150.902, -34.4245), (138.6, -34.9258)), srid=4326)
+        qs = AustraliaCity.objects.filter(
+            point__dwithin=(ls, F('allowed_distance')),
+        ).order_by('name')
+        self.assertEqual(
+            self.get_names(qs),
+            ['Adelaide', 'Mittagong', 'Shellharbour', 'Thirroul', 'Wollongong'],
+        )
+
+    @skipIfDBFeature('supports_dwithin_distance_expr')
+    def test_dwithin_with_expression_rhs_not_supported(self):
+        ls = LineString(((150.902, -34.4245), (138.6, -34.9258)), srid=4326)
+        msg = (
+            'This backend does not support expressions for specifying '
+            'distance in the dwithin lookup.'
+        )
+        with self.assertRaisesMessage(NotSupportedError, msg):
+            list(AustraliaCity.objects.filter(
+                point__dwithin=(ls, F('allowed_distance')),
+            ))
+
 
 '''
 =============================
