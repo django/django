@@ -10,7 +10,7 @@ from django.db.models.sql.constants import (
 )
 from django.db.models.sql.query import Query
 
-__all__ = ['DeleteQuery', 'UpdateQuery', 'InsertQuery', 'AggregateQuery']
+__all__ = ['DeleteQuery', 'UpdateQuery', 'InsertQuery']
 
 
 class DeleteQuery(Query):
@@ -179,16 +179,3 @@ class InsertQuery(Query):
         self.fields = fields
         self.objs = objs
         self.raw = raw
-
-
-class AggregateQuery(Query):
-    """
-    Take another query as a parameter to the FROM clause and only select the
-    elements in the provided list.
-    """
-
-    compiler = 'SQLAggregateCompiler'
-
-    def add_subquery(self, query, using):
-        query.subquery = True
-        self.subquery, self.sub_params = query.get_compiler(using).as_sql(with_col_aliases=True)

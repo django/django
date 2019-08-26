@@ -16,9 +16,7 @@ from collections.abc import Iterator, Mapping
 from itertools import chain, count, product
 from string import ascii_uppercase
 
-from django.core.exceptions import (
-    EmptyResultSet, FieldDoesNotExist, FieldError,
-)
+from django.core.exceptions import FieldDoesNotExist, FieldError
 from django.db import DEFAULT_DB_ALIAS, NotSupportedError, connections
 from django.db.models.aggregates import Count
 from django.db.models.constants import LOOKUP_SEP
@@ -35,7 +33,7 @@ from django.db.models.sql.constants import (
     INNER, LOUTER, ORDER_DIR, ORDER_PATTERN, SINGLE,
 )
 from django.db.models.sql.datastructures import (
-    BaseTable, Empty, Join, MultiJoin,
+    BaseSubquery, BaseTable, Empty, Join, MultiJoin,
 )
 from django.db.models.sql.where import (
     AND, OR, ExtraWhere, NothingNode, WhereNode,
@@ -431,8 +429,6 @@ class Query(BaseExpression):
         # the distinct and limit after the aggregation.
         if (isinstance(self.group_by, tuple) or self.is_sliced or existing_annotations or
                 self.distinct or self.combinator):
-            from django.db.models.sql.subqueries import AggregateQuery
-            outer_query = AggregateQuery(self.model)
             inner_query = self.clone()
             inner_query.select_for_update = False
             inner_query.select_related = False
@@ -458,8 +454,14 @@ class Query(BaseExpression):
 
             relabels = {t: 'subquery' for t in inner_query.alias_map}
             relabels[None] = 'subquery'
+
+            outer_query = Query(self.model)
+            outer_query.join(BaseSubquery(inner_query, 'subquery'))
+            outer_query.select = ()
+            outer_query.default_cols = None
+
             # Remove any aggregates marked for reduction from the subquery
-            # and move them to the outer AggregateQuery.
+            # and move them to the outer query.
             col_cnt = 0
             for alias, expression in list(inner_query.annotation_select.items()):
                 annotation_select_mask = inner_query.annotation_select_mask
@@ -475,13 +477,6 @@ class Query(BaseExpression):
                 # field selected in the inner query, yet we must use a subquery.
                 # So, make sure at least one field is selected.
                 inner_query.select = (self.model._meta.pk.get_col(inner_query.get_initial_alias()),)
-            try:
-                outer_query.add_subquery(inner_query, using)
-            except EmptyResultSet:
-                return {
-                    alias: None
-                    for alias in outer_query.annotation_select
-                }
         else:
             outer_query = self
             self.select = ()
@@ -1039,8 +1034,8 @@ class Query(BaseExpression):
         )
         return clone
 
-    def as_sql(self, compiler, connection):
-        sql, params = self.get_compiler(connection=connection).as_sql()
+    def as_sql(self, compiler, connection, **kwargs):
+        sql, params = self.get_compiler(connection=connection).as_sql(**kwargs)
         if self.subquery:
             sql = '(%s)' % sql
         return sql, params

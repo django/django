@@ -1493,27 +1493,6 @@ class SQLUpdateCompiler(SQLCompiler):
         self.query.reset_refcounts(refcounts_before)
 
 
-class SQLAggregateCompiler(SQLCompiler):
-    def as_sql(self):
-        """
-        Create the SQL for this query. Return the SQL string and list of
-        parameters.
-        """
-        sql, params = [], []
-        for annotation in self.query.annotation_select.values():
-            ann_sql, ann_params = self.compile(annotation)
-            ann_sql, ann_params = annotation.select_format(self, ann_sql, ann_params)
-            sql.append(ann_sql)
-            params.extend(ann_params)
-        self.col_count = len(self.query.annotation_select)
-        sql = ', '.join(sql)
-        params = tuple(params)
-
-        sql = 'SELECT %s FROM (%s) subquery' % (sql, self.query.subquery)
-        params = params + self.query.sub_params
-        return sql, params
-
-
 def cursor_iter(cursor, sentinel, col_count, itersize):
     """
     Yield blocks of rows from a cursor and ensure the cursor is closed when
