@@ -857,7 +857,7 @@ class TestSimpleFormField(PostgreSQLSimpleTestCase):
         self.assertIs(field.has_changed([], ''), False)
 
 
-class TestSplitFormField(PostgreSQLSimpleTestCase):
+class TestSplitFormField(PostgreSQLTestCase):
 
     def test_valid(self):
         class SplitForm(forms.Form):

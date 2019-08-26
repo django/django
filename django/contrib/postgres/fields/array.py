@@ -87,20 +87,17 @@ class ArrayField(CheckFieldDefaultMixin, Field):
         return '%s[%s]' % (self.base_field.cast_db_type(connection), size)
 
     def get_placeholder(self, value, compiler, connection, key_lookups=None):
-        base_field_db_type = self.base_field.db_type(connection)
-        if key_lookups:
-            return '%s::{}'.format(base_field_db_type)
-
-        return '%s::{}'.format(self.db_type(connection))
+        field = self.base_field if key_lookups else self
+        return '%s::{}'.format(field.db_type(connection))
 
     def get_db_prep_value(self, value, connection, prepared=False):
         if isinstance(value, (list, tuple)):
             return [self.base_field.get_db_prep_value(i, connection, prepared=False) for i in value]
         return value
 
-    def get_keys_placeholder(self, keys):
-        place_holders = ['[%s]' % self.get_transform(key).index for key in keys or []]
-        return ''.join(place_holders)
+    def get_sql_placeholder(self, quoted_name, key_lookups):
+        place_holders = ['[%s]' % self.get_transform(key).index for key in key_lookups or []]
+        return '{}{} = %s'.format(quoted_name, ''.join(place_holders))
 
     def deconstruct(self):
         name, path, args, kwargs = super().deconstruct()

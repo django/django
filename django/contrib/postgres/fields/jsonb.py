@@ -44,11 +44,12 @@ class JSONField(CheckFieldDefaultMixin, Field):
     def db_type(self, connection):
         return 'jsonb'
 
-    def get_placeholder(self, value, compiler, connection, key_lookups=None):
-        if key_lookups:
-            keys = ','.join(key_lookups)
-            return "jsonb_set(%s, '{%s}', %%s::jsonb)" % (self.column, keys)
-        return '%s'
+    def get_sql_placeholder(self, quoted_name, key_lookups):
+        if not key_lookups:
+            return '{} = %s'.format(quoted_name)
+
+        keys = ','.join(key_lookups)
+        return "{name} = jsonb_set({name}, '{{{keys}}}', %s::jsonb)".format(name=quoted_name, keys=keys)
 
     def deconstruct(self):
         name, path, args, kwargs = super().deconstruct()

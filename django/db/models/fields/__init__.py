@@ -763,6 +763,9 @@ class Field(RegisterLookupMixin):
     def get_internal_type(self):
         return self.__class__.__name__
 
+    def get_sql_placeholder(self, quoted_name, lookups):
+        return '{} = %s'.format(quoted_name)
+
     def pre_save(self, model_instance, add):
         """Return field's value just before saving."""
         return getattr(model_instance, self.attname)
