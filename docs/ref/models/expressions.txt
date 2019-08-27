@@ -944,6 +944,9 @@ calling the appropriate methods on the wrapped expression.
         ``summarize`` is a boolean that, when ``True``, signals that the
         query being computed is a terminal aggregate query.
 
+        ``for_save`` is a boolean that, when ``True``, signals that the query
+        being executed is performing a create or update.
+
     .. method:: get_source_expressions()
 
         Returns an ordered list of inner expressions. For example::
