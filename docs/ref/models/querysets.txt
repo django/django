@@ -2948,7 +2948,8 @@ Example::
 implementation of the relevant query varies among different database engines.)
 
 When :setting:`USE_TZ` is ``True``, fields are converted to the current time
-zone before filtering.
+zone before filtering. This requires :ref:`time zone definitions in the
+database <database-time-zone-definitions>`.
 
 .. fieldlookup:: year
 
@@ -2971,7 +2972,8 @@ SQL equivalent::
 (The exact SQL syntax varies for each database engine.)
 
 When :setting:`USE_TZ` is ``True``, datetime fields are converted to the
-current time zone before filtering.
+current time zone before filtering. This requires :ref:`time zone definitions
+in the database <database-time-zone-definitions>`.
 
 .. fieldlookup:: iso_year
 
@@ -2991,7 +2993,8 @@ Example::
 (The exact SQL syntax varies for each database engine.)
 
 When :setting:`USE_TZ` is ``True``, datetime fields are converted to the
-current time zone before filtering.
+current time zone before filtering. This requires :ref:`time zone definitions
+in the database <database-time-zone-definitions>`.
 
 .. fieldlookup:: month
 
@@ -3061,8 +3064,9 @@ Example::
 (No equivalent SQL code fragment is included for this lookup because
 implementation of the relevant query varies among different database engines.)
 
-When :setting:`USE_TZ` is ``True``, fields are converted to the current time
-zone before filtering.
+When :setting:`USE_TZ` is ``True``, datetime fields are converted to the
+current time zone before filtering. This requires :ref:`time zone definitions
+in the database <database-time-zone-definitions>`.
 
 .. fieldlookup:: week_day
 
@@ -3128,7 +3132,8 @@ Example::
 implementation of the relevant query varies among different database engines.)
 
 When :setting:`USE_TZ` is ``True``, fields are converted to the current time
-zone before filtering.
+zone before filtering. This requires :ref:`time zone definitions in the
+database <database-time-zone-definitions>`.
 
 .. fieldlookup:: hour
 
@@ -3152,8 +3157,9 @@ SQL equivalent::
 
 (The exact SQL syntax varies for each database engine.)
 
-For datetime fields, when :setting:`USE_TZ` is ``True``, values are converted
-to the current time zone before filtering.
+When :setting:`USE_TZ` is ``True``, datetime fields are converted to the
+current time zone before filtering. This requires :ref:`time zone definitions
+in the database <database-time-zone-definitions>`.
 
 .. fieldlookup:: minute
 
@@ -3177,8 +3183,9 @@ SQL equivalent::
 
 (The exact SQL syntax varies for each database engine.)
 
-For datetime fields, When :setting:`USE_TZ` is ``True``, values are converted
-to the current time zone before filtering.
+When :setting:`USE_TZ` is ``True``, datetime fields are converted to the
+current time zone before filtering. This requires :ref:`time zone definitions
+in the database <database-time-zone-definitions>`.
 
 .. fieldlookup:: second
 
@@ -3202,8 +3209,9 @@ SQL equivalent::
 
 (The exact SQL syntax varies for each database engine.)
 
-For datetime fields, when :setting:`USE_TZ` is ``True``, values are converted
-to the current time zone before filtering.
+When :setting:`USE_TZ` is ``True``, datetime fields are converted to the
+current time zone before filtering. This requires :ref:`time zone definitions
+in the database <database-time-zone-definitions>`.
 
 .. fieldlookup:: isnull
 
