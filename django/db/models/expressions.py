@@ -1019,6 +1019,11 @@ class Subquery(Expression):
         self.extra = extra
         super().__init__(output_field)
 
+    def __getstate__(self):
+        state = super().__getstate__()
+        state.pop('_constructor_args', None)
+        return state
+
     def get_source_expressions(self):
         return [self.query]
 
