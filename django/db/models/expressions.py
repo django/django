@@ -1163,11 +1163,11 @@ class OrderBy(BaseExpression):
         # a CASE WHEN.
         if isinstance(self.expression, Exists):
             copy = self.copy()
-            # XXX: Use Case(When(self.lhs)) once support for boolean
-            # expressions is added to When.
-            exists_sql, params = compiler.compile(self.expression)
-            case_sql = 'CASE WHEN %s THEN 1 ELSE 0 END' % exists_sql
-            copy.expression = RawSQL(case_sql, params)
+            copy.expression = Case(
+                When(self.expression, then=True),
+                default=False,
+                output_field=fields.BooleanField(),
+            )
             return copy.as_sql(compiler, connection)
         return self.as_sql(compiler, connection)
 

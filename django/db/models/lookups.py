@@ -3,8 +3,10 @@ import math
 from copy import copy
 
 from django.core.exceptions import EmptyResultSet
-from django.db.models.expressions import Exists, Func, RawSQL, Value
-from django.db.models.fields import DateTimeField, Field, IntegerField
+from django.db.models.expressions import Case, Exists, Func, Value, When
+from django.db.models.fields import (
+    BooleanField, DateTimeField, Field, IntegerField,
+)
 from django.db.models.query_utils import RegisterLookupMixin
 from django.utils.datastructures import OrderedSet
 from django.utils.functional import cached_property
@@ -119,11 +121,7 @@ class Lookup:
         exprs = []
         for expr in (self.lhs, self.rhs):
             if isinstance(expr, Exists):
-                # XXX: Use Case(When(self.lhs)) once support for boolean
-                # expressions is added to When.
-                sql, params = compiler.compile(expr)
-                sql = 'CASE WHEN %s THEN 1 ELSE 0 END' % sql
-                expr = RawSQL(sql, params)
+                expr = Case(When(expr, then=True), default=False, output_field=BooleanField())
                 wrapped = True
             exprs.append(expr)
         lookup = type(self)(*exprs) if wrapped else self
