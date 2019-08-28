@@ -188,9 +188,12 @@ def encode_multipart(boundary, data):
     def is_file(thing):
         return hasattr(thing, "read") and callable(thing.read)
 
-    # Each bit of the multipart form data could be either a form value or a
-    # file, or a *list* of form values and/or files. Remember that HTTP field
-    # names can be duplicated!
+    # Each bit of the multipart form data could be either:
+    # * a form value
+    # * a file
+    # * a dict of serializable values
+    # * a *list* of form values and/or files.
+    # Remember that HTTP field names can be duplicated!
     for (key, value) in data.items():
         if value is None:
             raise TypeError(
@@ -199,6 +202,13 @@ def encode_multipart(boundary, data):
             )
         elif is_file(value):
             lines.extend(encode_file(boundary, key, value))
+        elif isinstance(value, dict):
+            lines.extend(to_bytes(val) for val in [
+                '--%s' % boundary,
+                'Content-Disposition: form-data; name="%s"' % key,
+                '',
+                json.dumps(value)
+            ])
         elif not isinstance(value, str) and is_iterable(value):
             for item in value:
                 if is_file(item):
