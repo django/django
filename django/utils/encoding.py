@@ -236,7 +236,7 @@ def repercent_broken_unicode(path):
             # CVE-2019-14235: A recursion shouldn't be used since the exception
             # handling uses massive amounts of memory
             repercent = quote(path[e.start:e.end], safe=b"/#%[]=:;$&()+,!?*@'~")
-            path = path[:e.start] + force_bytes(repercent) + path[e.end:]
+            path = path[:e.start] + repercent.encode() + path[e.end:]
         else:
             return path
 
