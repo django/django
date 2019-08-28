@@ -227,7 +227,9 @@ Email
 File Storage
 ~~~~~~~~~~~~
 
-* ...
+* The new :meth:`.Storage.get_alternative_name` method allows customizing the
+  algorithm for generating filenames if a file with the uploaded name already
+  exists.
 
 File Uploads
 ~~~~~~~~~~~~
