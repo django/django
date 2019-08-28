@@ -28,7 +28,7 @@ Next, clone your fork, install some requirements, and run the tests:
 
 .. console::
 
-   $ git clone git@github.com:YourGitHubName/django.git django-repo
+   $ git clone https://github.com/YourGitHubName/django.git django-repo
    $ cd django-repo/tests
    $ python -m pip install -e ..
    $ python -m pip install -r requirements/py3.txt
