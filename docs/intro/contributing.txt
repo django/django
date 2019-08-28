@@ -53,13 +53,20 @@ We'll be walking you through contributing a patch to Django for the first time.
 By the end of this tutorial, you should have a basic understanding of both the
 tools and the processes involved. Specifically, we'll be covering the following:
 
+* Code of Conduct.
 * Installing Git.
-* Downloading a copy of Django's development version.
-* Running Django's test suite.
-* Writing a test for your patch.
-* Writing the code for your patch.
-* Testing your patch.
-* Submitting a pull request.
+* Getting a copy of Django’s development version.
+* Running Django’s test suite for the first time.
+* Working on a feature.
+* Creating a branch for your patch.
+* Writing some tests for your ticket.
+* Running your new test.
+* Writing the code for your ticket.
+* Running Django’s test suite for the second time.
+* Writing Documentation.
+* Previewing your changes.
+* Committing the changes in the patch.
+* Pushing the commit and making a pull request.
 * Where to look for more information.
 
 Once you're done with the tutorial, you can look through the rest of
