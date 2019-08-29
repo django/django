@@ -74,7 +74,7 @@ class BasicExpressionsTests(TestCase):
         companies = Company.objects.annotate(foo=RawSQL('%s', ['value']))
         self.assertEqual(companies.count(), 3)
 
-    @unittest.skipIf(connection.vendor == 'oracle', "Oracle doesn't support using boolean type in SELECT")
+    @skipUnlessDBFeature('supports_boolean_expr_in_select_clause')
     def test_filtering_on_annotate_that_uses_q(self):
         self.assertEqual(
             Company.objects.annotate(
