@@ -542,7 +542,7 @@ Save these changes and start a new Python interactive shell by running
     <QuerySet [<Choice: Not much>, <Choice: The sky>, <Choice: Just hacking again>]>
 
     # Let's delete one of the choices. Use delete() for that.
-    >>> c = q.choice_set.filter(choice_text__startswith='Just hacking')
+    >>> c = q.choice_set.filter(choice_text__startswith='Just hacking again')
     >>> c.delete()
 
 For more information on model relations, see :doc:`Accessing related objects
