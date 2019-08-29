@@ -735,7 +735,7 @@ providing two additional methods:
 
 .. class:: models.CustomUserManager
 
-    .. method:: models.CustomUserManager.create_user(*username_field*, password=None, **other_fields)
+    .. method:: models.CustomUserManager.create_user(username_field, password=None, **other_fields)
 
         The prototype of ``create_user()`` should accept the username field,
         plus all required fields as arguments. For example, if your user model
@@ -746,7 +746,7 @@ providing two additional methods:
                 # create user here
                 ...
 
-    .. method:: models.CustomUserManager.create_superuser(*username_field*, password=None, **other_fields)
+    .. method:: models.CustomUserManager.create_superuser(username_field, password=None, **other_fields)
 
         The prototype of ``create_superuser()`` should accept the username
         field, plus all required fields as arguments. For example, if your user
