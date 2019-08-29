@@ -1331,6 +1331,8 @@ class CaseWhenTests(SimpleTestCase):
         with self.assertRaisesMessage(TypeError, msg):
             When(condition=object())
         with self.assertRaisesMessage(TypeError, msg):
+            When(condition=Value(1, output_field=models.IntegerField()))
+        with self.assertRaisesMessage(TypeError, msg):
             When()
 
     def test_empty_q_object(self):
