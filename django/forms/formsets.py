@@ -186,7 +186,7 @@ class BaseFormSet:
         """Return a list of all the extra forms in this formset."""
         return self.forms[self.initial_form_count():]
 
-    @property
+    @cached_property
     def empty_form(self):
         form = self.form(
             auto_id=self.auto_id,
