@@ -1,9 +1,20 @@
 from django.conf import settings
 
-from .. import Tags, Warning, register
+from .. import Error, Tags, Warning, register
 
+REFERRER_POLICY_VALUES = {
+    "no-referrer",
+    "no-referrer-when-downgrade",
+    "origin",
+    "origin-when-cross-origin",
+    "same-origin",
+    "strict-origin",
+    "strict-origin-when-cross-origin",
+    "unsafe-url",
+}
 SECRET_KEY_MIN_LENGTH = 50
 SECRET_KEY_MIN_UNIQUE_CHARACTERS = 5
+
 
 W001 = Warning(
     "You do not have 'django.middleware.security.SecurityMiddleware' "
@@ -95,6 +106,19 @@ W021 = Warning(
     "You have not set the SECURE_HSTS_PRELOAD setting to True. Without this, "
     "your site cannot be submitted to the browser preload list.",
     id='security.W021',
+)
+
+W022 = Warning(
+    "You have not set the SECURE_REFERRER_POLICY setting. Without this, your "
+    "site will not send a Referrer-Policy header. You should consider enabling "
+    "this header to protect user privacy.",
+    id="security.W022"
+)
+
+E001 = Error(
+    "You have set the SECURE_REFERRER_POLICY setting to an invalid value. Valid "
+    "values are: {}".format(', '.join(REFERRER_POLICY_VALUES)),
+    id="security.E001"
 )
 
 
@@ -190,3 +214,14 @@ def check_xframe_deny(app_configs, **kwargs):
 @register(Tags.security, deploy=True)
 def check_allowed_hosts(app_configs, **kwargs):
     return [] if settings.ALLOWED_HOSTS else [W020]
+
+
+@register(Tags.security, deploy=True)
+def check_referrer_policy(app_configs, **kwargs):
+    if not _security_middleware():
+        return []
+    if settings.SECURE_REFERRER_POLICY is None:
+        return [W022]
+    elif settings.SECURE_REFERRER_POLICY not in REFERRER_POLICY_VALUES:
+        return [E001]
+    return []

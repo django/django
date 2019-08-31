@@ -222,3 +222,20 @@ class SecurityMiddlewareTest(SimpleTestCase):
         """
         ret = self.process_request("get", "/some/url")
         self.assertIsNone(ret)
+
+    def test_referrer_policy(self):
+        """
+        The middleware sets Referrer-Policy when REFERRER_POLICY is given.
+        """
+        response = self.process_response()
+        self.assertNotIn("referrer-policy", response)
+
+        for policy_value in (
+            'no-referrer', 'no-referrer-when-downgrade', 'origin',
+            'origin-when-cross-origin', 'same-origin', 'strict-origin',
+            'strict-origin-when-cross-origin', 'unsafe-url'
+        ):
+            with self.settings(SECURE_REFERRER_POLICY=policy_value):
+                response = self.process_response()
+                self.assertIn('referrer-policy', response)
+                self.assertEqual(response['referrer-policy'], policy_value)

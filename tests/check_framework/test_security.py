@@ -402,6 +402,34 @@ class CheckContentTypeNosniffTest(SimpleTestCase):
         self.assertEqual(self.func(None), [])
 
 
+class CheckReferrerPolicy(SimpleTestCase):
+    @property
+    def func(self):
+        from django.core.checks.security.base import check_referrer_policy
+        return check_referrer_policy
+
+    @override_settings(
+        MIDDLEWARE=['django.middleware.security.SecurityMiddleware'],
+        SECURE_REFERRER_POLICY=None,
+    )
+    def test_unset_referrer_policy(self):
+        self.assertEqual(self.func(None), [base.W022])
+
+    @override_settings(
+        MIDDLEWARE=['django.middleware.security.SecurityMiddleware'],
+        SECURE_REFERRER_POLICY='origin-when-cross-origin',
+    )
+    def test_valid_referrer_policy(self):
+        self.assertEqual(self.func(None), [])
+
+    @override_settings(
+        MIDDLEWARE=['django.middleware.security.SecurityMiddleware'],
+        SECURE_REFERRER_POLICY='absolutely not valid',
+    )
+    def test_unvalid_referrer_policy(self):
+        self.assertEqual(self.func(None), [base.E001])
+
+
 class CheckSSLRedirectTest(SimpleTestCase):
     @property
     def func(self):

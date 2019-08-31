@@ -186,6 +186,7 @@ enabled or disabled with a setting.
 * :setting:`SECURE_HSTS_PRELOAD`
 * :setting:`SECURE_HSTS_SECONDS`
 * :setting:`SECURE_REDIRECT_EXEMPT`
+* :setting:`SECURE_REFERRER_POLICY`
 * :setting:`SECURE_SSL_HOST`
 * :setting:`SECURE_SSL_REDIRECT`
 
@@ -331,6 +332,93 @@ in the :setting:`SECURE_REDIRECT_EXEMPT` setting.
     may need to set the :setting:`SECURE_PROXY_SSL_HEADER` setting.
 
 .. _nginx: https://nginx.org
+
+.. _referrer-policy:
+
+``Referrer-Policy``
+~~~~~~~~~~~~~~~~~~~
+
+Browsers use `the Referer header`_ as a way to send information to a site about
+how users got there. When a user clicks a link, the browser will send the full
+URL of the linking page as the referrer. While this can be useful for some
+purposes -- like figuring out who's linking to your site -- it also can cause
+privacy concerns by informing one site that a user was visiting another site.
+
+Some browsers have the ability to accept hints about whether they should send
+the HTTP ``Referer`` header when a user clicks a link; this hint is provided via
+`the Referrer-Policy header`_. This header can suggest any of three behaviors to
+browsers:
+
+* Full URL: send the entire URL in the ``Referer`` header. For example, if the
+  user is visiting ``https://example.com/page.html``, the ``Referer`` header
+  would contain ``"https://example.com/page.html"``.
+
+* Origin only: send only the "origin" in the referrer. The origin consists of
+  the scheme, host and (optionally) port number. For example, if the user is
+  visiting ``https://example.com/page.html``, the origin would be
+  ``https://example.com/``.
+
+* No referrer: do not send a ``Referer`` header at all. (This can break Django's
+  CSRF protection, see the warning below.)
+
+There are two types of conditions this header can tell a browser to watch out for:
+
+* Same-origin versus cross-origin: a link from ``https://example.com/page.html``
+  to ``https://exmaple.com/page2.html`` is same-origin. A link from
+  ``https://example.com/page.html`` to ``https://not.example.com/page.html`` is
+  cross-origin.
+
+* Protocol downgrade: a downgrade occurs if the page containing the link is
+  served via HTTPS, but the page being linked to is not served via HTTPS.
+
+.. warning::
+
+    When your site is served via HTTPS, :ref:`Django's CSRF protection system
+    <using-csrf>` requires the ``Referer`` header to be present, so completely
+    disabling the ``Referer`` header will interfere with CSRF protection. To gain
+    most of the benefits of disabling ``Referer`` headers while also keeping
+    CSRF protection, consider enabling only same-origin referrers.
+
+``SecurityMiddleware`` can set the ``Referrer-Policy`` header for you, based on
+the the :setting:`SECURE_REFERRER_POLICY` setting (note spelling: browsers send
+a ``Referer`` header when a user clicks a link, but the header instructing a
+browser whether to do so is spelled ``Referrer-Policy``). The valid values for
+this setting are:
+
+``"no-referrer"``
+    Instructs the browser to send no referrer for links clicked on this site.
+
+``"no-referrer-when-downgrade"``
+    Instructs the browser to send a full URL as the referrer, but only when no
+    protocol downgrade occurs.
+
+``"origin"``
+    Instructs the browser to send only the origin, not the full URL, as the
+    referrer.
+
+``"origin-when-cross-origin"``
+    Instructs the browser to send the full URL as the referrer for same-origin
+    links, and only the origin for cross-origin links.
+
+``"same-origin"``
+    Instructs the browser to send a full URL, but only for same-origin links. No
+    referrer will be sent for cross-origin links.
+
+``"strict-origin"``
+    Instructs the browser to send only the origin, not the full URL, and to send
+    no referrer when a protocol downgrade occurs.
+
+``"strict-origin-when-cross-origin"``
+    Instructs the browser to send the full URL when the link is same-origin and
+    no protocol downgrade occurs; send only the origin when the link is
+    cross-origin and no protocol downgrade occurs; and no referrer when a
+    protocol downgrade occurs.
+
+``"unsafe-url"``
+    Instructs the browser to always send the full URL as the referrer.
+
+.. _the Referer header: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Referer
+.. _the Referrer-Policy header: https://www.w3.org/TR/referrer-policy/
 
 Session middleware
 ------------------

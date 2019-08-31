@@ -342,6 +342,18 @@ Requests and Responses
 * For use in, for example, Django templates, :attr:`.HttpRequest.headers` now
   allows look ups using underscores (e.g. ``user_agent``) in place of hyphens.
 
+Security
+~~~~~~~~
+
+* :setting:`SECURE_CONTENT_TYPE_NOSNIFF` setting now defaults to ``True``. With
+  the enabled :setting:`SECURE_CONTENT_TYPE_NOSNIFF`, the
+  :class:`~django.middleware.security.SecurityMiddleware` sets the
+  :ref:`x-content-type-options` header on all responses that do not already
+  have it.
+
+* :class:`~django.middleware.security.SecurityMiddleware` can now send
+  :ref:`the Referrer-Policy header <referrer-policy>`.
+
 Serialization
 ~~~~~~~~~~~~~
 
@@ -552,12 +564,6 @@ Miscellaneous
   ``'*'`` according to :rfc:`7231#section-7.1.4`, i.e. if a list of header
   field names contains an asterisk, then the ``Vary`` header will consist of a
   single asterisk ``'*'``.
-
-* :setting:`SECURE_CONTENT_TYPE_NOSNIFF` setting now defaults to ``True``. With
-  the enabled :setting:`SECURE_CONTENT_TYPE_NOSNIFF`, the
-  :class:`~django.middleware.security.SecurityMiddleware` sets the
-  :ref:`x-content-type-options` header on all responses that do not already
-  have it.
 
 .. _deprecated-features-3.0:
 
