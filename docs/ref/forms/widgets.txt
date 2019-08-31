@@ -401,7 +401,7 @@ foundation for custom widgets.
         .. code-block:: html+django
 
             {% for subwidget in widget.subwidgets %}
-                {% include widget.template_name with widget=subwidget %}
+                {% include subwidget.template_name with widget=subwidget %}
             {% endfor %}
 
     Here's an example widget which subclasses :class:`MultiWidget` to display
