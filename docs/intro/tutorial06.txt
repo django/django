@@ -92,7 +92,7 @@ Adding a background-image
 Next, we'll create a subdirectory for images. Create an ``images`` subdirectory
 in the ``polls/static/polls/`` directory. Inside this directory, put an image
 called ``background.gif``. In other words, put your image in
-``polls/static/polls/images/background.gif``.
+``polls/static/polls/images/``.
 
 Then, add to your stylesheet (``polls/static/polls/style.css``):
 
