@@ -364,6 +364,22 @@ Requests and Responses
 * For use in, for example, Django templates, :attr:`.HttpRequest.headers` now
   allows look ups using underscores (e.g. ``user_agent``) in place of hyphens.
 
+.. _whats-new-security-3.0:
+
+Security
+~~~~~~~~
+
+* :setting:`X_FRAME_OPTIONS` now defaults to ``'DENY'``. In older versions, the
+  :setting:`X_FRAME_OPTIONS` setting defaults to ``'SAMEORIGIN'``. If your site
+  uses frames of itself, you will need to explicitly set ``X_FRAME_ORIGINS =
+  'SAMEORIGIN'`` for them to continue working.
+
+* :setting:`SECURE_CONTENT_TYPE_NOSNIFF` setting now defaults to ``True``. With
+  the enabled :setting:`SECURE_CONTENT_TYPE_NOSNIFF`, the
+  :class:`~django.middleware.security.SecurityMiddleware` sets the
+  :ref:`x-content-type-options` header on all responses that do not already
+  have it.
+
 Serialization
 ~~~~~~~~~~~~~
 
@@ -541,14 +557,18 @@ upload handler is used.
 ``FILE_UPLOAD_PERMISSION`` now defaults to ``0o644`` to avoid this
 inconsistency.
 
-New default value for the ``X_FRAME_OPTIONS`` setting
------------------------------------------------------
+New default values for security settings
+----------------------------------------
 
-In older versions, the :setting:`X_FRAME_OPTIONS` setting defaults to
-``'SAMEORIGIN'``. To make Django projects more secure by default,
-:setting:`X_FRAME_OPTIONS` now defaults to ``'DENY'``. If your site uses frames
-of itself, you will need to explicitly set ``X_FRAME_ORIGINS = 'SAMEORIGIN'``
-for them to continue working.
+To make Django projects more secure by default, some security settings now have
+more secure default values:
+
+* :setting:`X_FRAME_OPTIONS` now defaults to ``'DENY'``.
+
+* :setting:`SECURE_CONTENT_TYPE_NOSNIFF` now defaults to ``True``.
+
+See the *What's New* :ref:`Security section <whats-new-security-3.0>` above for
+more details on these changes.
 
 Miscellaneous
 -------------
@@ -589,12 +609,6 @@ Miscellaneous
   ``'*'`` according to :rfc:`7231#section-7.1.4`, i.e. if a list of header
   field names contains an asterisk, then the ``Vary`` header will consist of a
   single asterisk ``'*'``.
-
-* :setting:`SECURE_CONTENT_TYPE_NOSNIFF` setting now defaults to ``True``. With
-  the enabled :setting:`SECURE_CONTENT_TYPE_NOSNIFF`, the
-  :class:`~django.middleware.security.SecurityMiddleware` sets the
-  :ref:`x-content-type-options` header on all responses that do not already
-  have it.
 
 * On MySQL 8.0.16+, ``PositiveIntegerField`` and ``PositiveSmallIntegerField``
   now include a check constraint to prevent negative values in the database.
