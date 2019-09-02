@@ -62,9 +62,11 @@ class UsernameField(forms.CharField):
         return unicodedata.normalize('NFKC', super().to_python(value))
 
     def widget_attrs(self, widget):
-        attrs = super().widget_attrs(widget)
-        attrs['autocapitalize'] = 'none'
-        return attrs
+        return {
+            **super().widget_attrs(widget),
+            'autocapitalize': 'none',
+            'autocomplete': 'username',
+        }
 
 
 class UserCreationForm(forms.ModelForm):
@@ -96,10 +98,7 @@ class UserCreationForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         if self._meta.model.USERNAME_FIELD in self.fields:
-            self.fields[self._meta.model.USERNAME_FIELD].widget.attrs.update({
-                'autocomplete': 'username',
-                'autofocus': True,
-            })
+            self.fields[self._meta.model.USERNAME_FIELD].widget.attrs['autofocus'] = True
 
     def clean_password2(self):
         password1 = self.cleaned_data.get("password1")
@@ -166,7 +165,7 @@ class AuthenticationForm(forms.Form):
     Base class for authenticating users. Extend this to get a form that accepts
     username/password logins.
     """
-    username = UsernameField(widget=forms.TextInput(attrs={'autocomplete': 'username', 'autofocus': True}))
+    username = UsernameField(widget=forms.TextInput(attrs={'autofocus': True}))
     password = forms.CharField(
         label=_("Password"),
         strip=False,
