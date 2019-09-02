@@ -1,6 +1,6 @@
 .\" Man page generated from reStructuredText.
 .
-.TH "DJANGO-ADMIN" "1" "July 01, 2019" "2.2" "Django"
+.TH "DJANGO-ADMIN" "1" "September 02, 2019" "2.2" "Django"
 .SH NAME
 django-admin \- Utility script for the Django Web framework
 .
@@ -1735,7 +1735,7 @@ options)
 .IP \(bu 2
 \fBdocs_version\fP \-\- the version of the documentation: \fB\(aqdev\(aq\fP or \fB\(aq1.x\(aq\fP
 .IP \(bu 2
-\fBdjango_version\fP \-\- the version of Django, e.g.\(ga\(ga\(aq2.0.3\(aq\(ga\(ga
+\fBdjango_version\fP \-\- the version of Django, e.g. \fB\(aq2.0.3\(aq\fP
 .UNINDENT
 .sp
 \fBWARNING:\fP
@@ -1825,7 +1825,7 @@ supported options)
 .IP \(bu 2
 \fBdocs_version\fP \-\- the version of the documentation: \fB\(aqdev\(aq\fP or \fB\(aq1.x\(aq\fP
 .IP \(bu 2
-\fBdjango_version\fP \-\- the version of Django, e.g.\(ga\(ga\(aq2.0.3\(aq\(ga\(ga
+\fBdjango_version\fP \-\- the version of Django, e.g. \fB\(aq2.0.3\(aq\fP
 .UNINDENT
 .sp
 Please also see the \fI\%rendering warning\fP as mentioned
@@ -2115,6 +2115,13 @@ When run interactively, this command will prompt for a password for
 the new superuser account. When run non\-interactively, no password
 will be set, and the superuser account will not be able to log in until
 a password has been manually set for it.
+.INDENT 0.0
+.TP
+.B \-\-noinput, \-\-no\-input
+.UNINDENT
+.sp
+Suppresses all user prompts. If a suppressed prompt cannot be resolved
+automatically, the command will exit with error code 1.
 .INDENT 0.0
 .TP
 .B \-\-username USERNAME
