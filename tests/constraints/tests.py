@@ -1,3 +1,5 @@
+from unittest import mock
+
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError, connection, models
 from django.db.models.constraints import BaseConstraint
@@ -39,6 +41,7 @@ class CheckConstraintTests(TestCase):
             models.CheckConstraint(check=check1, name='price'),
             models.CheckConstraint(check=check1, name='price'),
         )
+        self.assertEqual(models.CheckConstraint(check=check1, name='price'), mock.ANY)
         self.assertNotEqual(
             models.CheckConstraint(check=check1, name='price'),
             models.CheckConstraint(check=check1, name='price2'),
@@ -101,6 +104,10 @@ class UniqueConstraintTests(TestCase):
         self.assertEqual(
             models.UniqueConstraint(fields=['foo', 'bar'], name='unique'),
             models.UniqueConstraint(fields=['foo', 'bar'], name='unique'),
+        )
+        self.assertEqual(
+            models.UniqueConstraint(fields=['foo', 'bar'], name='unique'),
+            mock.ANY,
         )
         self.assertNotEqual(
             models.UniqueConstraint(fields=['foo', 'bar'], name='unique'),

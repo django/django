@@ -1,4 +1,5 @@
 import datetime
+from unittest import mock
 
 from django.db import connection, transaction
 from django.db.models import F, Func, Q
@@ -175,6 +176,7 @@ class ExclusionConstraintTests(PostgreSQLTestCase):
             condition=Q(cancelled=False),
         )
         self.assertEqual(constraint_1, constraint_1)
+        self.assertEqual(constraint_1, mock.ANY)
         self.assertNotEqual(constraint_1, constraint_2)
         self.assertNotEqual(constraint_1, constraint_3)
         self.assertNotEqual(constraint_2, constraint_3)

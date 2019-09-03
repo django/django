@@ -309,8 +309,9 @@ class FilteredRelation:
         self.path = []
 
     def __eq__(self, other):
+        if not isinstance(other, self.__class__):
+            return NotImplemented
         return (
-            isinstance(other, self.__class__) and
             self.relation_name == other.relation_name and
             self.alias == other.alias and
             self.condition == other.condition

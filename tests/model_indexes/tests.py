@@ -1,3 +1,5 @@
+from unittest import mock
+
 from django.conf import settings
 from django.db import connection, models
 from django.db.models.query_utils import Q
@@ -28,6 +30,7 @@ class SimpleIndexesTests(SimpleTestCase):
         same_index.model = Book
         another_index.model = Book
         self.assertEqual(index, same_index)
+        self.assertEqual(index, mock.ANY)
         self.assertNotEqual(index, another_index)
 
     def test_index_fields_type(self):

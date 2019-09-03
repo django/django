@@ -401,7 +401,9 @@ class BaseExpression:
         return tuple(identity)
 
     def __eq__(self, other):
-        return isinstance(other, BaseExpression) and other.identity == self.identity
+        if not isinstance(other, BaseExpression):
+            return NotImplemented
+        return other.identity == self.identity
 
     def __hash__(self):
         return hash(self.identity)

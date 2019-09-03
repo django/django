@@ -89,13 +89,14 @@ class ExclusionConstraint(BaseConstraint):
         return path, args, kwargs
 
     def __eq__(self, other):
-        return (
-            isinstance(other, self.__class__) and
-            self.name == other.name and
-            self.index_type == other.index_type and
-            self.expressions == other.expressions and
-            self.condition == other.condition
-        )
+        if isinstance(other, self.__class__):
+            return (
+                self.name == other.name and
+                self.index_type == other.index_type and
+                self.expressions == other.expressions and
+                self.condition == other.condition
+            )
+        return super().__eq__(other)
 
     def __repr__(self):
         return '<%s: index_type=%s, expressions=%s%s>' % (

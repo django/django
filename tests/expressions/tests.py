@@ -3,6 +3,7 @@ import pickle
 import unittest
 import uuid
 from copy import deepcopy
+from unittest import mock
 
 from django.core.exceptions import FieldError
 from django.db import DatabaseError, connection, models
@@ -965,6 +966,7 @@ class SimpleExpressionTests(SimpleTestCase):
             Expression(models.IntegerField()),
             Expression(output_field=models.IntegerField())
         )
+        self.assertEqual(Expression(models.IntegerField()), mock.ANY)
         self.assertNotEqual(
             Expression(models.IntegerField()),
             Expression(models.CharField())

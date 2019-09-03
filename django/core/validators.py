@@ -324,8 +324,9 @@ class BaseValidator:
             raise ValidationError(self.message, code=self.code, params=params)
 
     def __eq__(self, other):
+        if not isinstance(other, self.__class__):
+            return NotImplemented
         return (
-            isinstance(other, self.__class__) and
             self.limit_value == other.limit_value and
             self.message == other.message and
             self.code == other.code

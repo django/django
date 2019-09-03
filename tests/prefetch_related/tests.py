@@ -1,3 +1,5 @@
+from unittest import mock
+
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import connection
@@ -243,6 +245,7 @@ class PrefetchRelatedTests(TestDataMixin, TestCase):
         prefetch_1 = Prefetch('authors', queryset=Author.objects.all())
         prefetch_2 = Prefetch('books', queryset=Book.objects.all())
         self.assertEqual(prefetch_1, prefetch_1)
+        self.assertEqual(prefetch_1, mock.ANY)
         self.assertNotEqual(prefetch_1, prefetch_2)
 
     def test_forward_m2m_to_attr_conflict(self):

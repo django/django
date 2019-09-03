@@ -112,4 +112,6 @@ class Index:
         )
 
     def __eq__(self, other):
-        return (self.__class__ == other.__class__) and (self.deconstruct() == other.deconstruct())
+        if self.__class__ == other.__class__:
+            return self.deconstruct() == other.deconstruct()
+        return NotImplemented

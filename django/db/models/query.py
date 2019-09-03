@@ -1543,7 +1543,9 @@ class Prefetch:
         return None
 
     def __eq__(self, other):
-        return isinstance(other, Prefetch) and self.prefetch_to == other.prefetch_to
+        if not isinstance(other, Prefetch):
+            return NotImplemented
+        return self.prefetch_to == other.prefetch_to
 
     def __hash__(self):
         return hash((self.__class__, self.prefetch_to))

@@ -522,7 +522,7 @@ class Model(metaclass=ModelBase):
 
     def __eq__(self, other):
         if not isinstance(other, Model):
-            return False
+            return NotImplemented
         if self._meta.concrete_model != other._meta.concrete_model:
             return False
         my_pk = self.pk

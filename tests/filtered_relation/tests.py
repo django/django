@@ -1,3 +1,5 @@
+from unittest import mock
+
 from django.db import connection, transaction
 from django.db.models import Case, Count, F, FilteredRelation, Q, When
 from django.test import TestCase
@@ -322,6 +324,9 @@ class FilteredRelationTests(TestCase):
             ).filter(generic_authored_book__isnull=False),
             [self.book1]
         )
+
+    def test_eq(self):
+        self.assertEqual(FilteredRelation('book', condition=Q(book__title='b')), mock.ANY)
 
 
 class FilteredRelationAggregationTests(TestCase):
