@@ -75,7 +75,7 @@ def base64_hmac(salt, value, key):
 
 
 def _cookie_signer_key(key):
-    return b'django.http.cookies' + force_bytes(key)
+    return b'django.http.cookies' + force_bytes(key)  # SECRET_KEY may be str or bytes.
 
 
 def get_cookie_signer(salt='django.core.signing.get_cookie_signer'):
@@ -101,7 +101,7 @@ class JSONSerializer:
 def dumps(obj, key=None, salt='django.core.signing', serializer=JSONSerializer, compress=False):
     """
     Return URL-safe, hmac/SHA1 signed base64 compressed JSON string. If key is
-    None, use the default secret key instead.
+    None, use the first key in settings.SECRET_KEYS instead.
 
     If compress is True (not the default), check if compressing using zlib can
     save some space. Prepend a '.' to signify compression. This is included
@@ -139,7 +139,7 @@ def loads(s, key=None, salt='django.core.signing', serializer=JSONSerializer, ma
     """
     # TimestampSigner.unsign() returns str but base64 and zlib compression
     # operate on bytes.
-    base64d = TimestampSigner(key, salt=salt, keys=keys).unsign(s, max_age=max_age).encode()
+    base64d = TimestampSigner(key=key, salt=salt, keys=keys).unsign(s, max_age=max_age).encode()
     decompress = base64d[:1] == b'.'
     if decompress:
         # It's compressed; uncompress it first

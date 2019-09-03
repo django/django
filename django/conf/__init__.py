@@ -159,7 +159,7 @@ class Settings:
 
         if self.SECRET_KEY:
             if self.SECRET_KEYS is not None:
-                raise ImproperlyConfigured('Only one of SECRET_KEY and SECRET_KEYS must be specified, not both.')
+                raise ImproperlyConfigured('Only one of SECRET_KEY and SECRET_KEYS can be specified, not both.')
             self.SECRET_KEYS = [self.SECRET_KEY]
         elif self.SECRET_KEYS:
             self.SECRET_KEY = self.SECRET_KEYS[0]
