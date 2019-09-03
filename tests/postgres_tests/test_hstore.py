@@ -390,3 +390,12 @@ class TestValidator(PostgreSQLSimpleTestCase):
         self.assertEqual(path, 'django.contrib.postgres.validators.KeysValidator')
         self.assertEqual(args, ())
         self.assertEqual(kwargs, {'keys': ['a', 'b'], 'strict': True, 'messages': messages})
+
+
+class TestUpdate(PostgreSQLTestCase):
+    def test_update_field(self):
+        instance = HStoreModel(field={})
+        instance.save()
+        HStoreModel.objects.update(field__c='Test Value')
+        loaded = HStoreModel.objects.get()
+        self.assertEqual(loaded.field, {'c': 'Test Value'})
