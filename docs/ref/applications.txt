@@ -13,7 +13,7 @@ This registry is simply called :attr:`~django.apps.apps` and it's available in
 
     >>> from django.apps import apps
     >>> apps.get_app_config('admin').verbose_name
-    'Admin'
+    'Administration'
 
 Projects and applications
 =========================

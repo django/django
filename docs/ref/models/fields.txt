@@ -80,21 +80,21 @@ If a field has ``blank=False``, the field will be required.
 
 .. attribute:: Field.choices
 
-An iterable (e.g., a list or tuple) consisting itself of iterables of exactly
-two items (e.g. ``[(A, B), (A, B) ...]``) to use as choices for this field. If
-choices are given, they're enforced by :ref:`model validation
-<validating-objects>` and the default form widget will be a select box with
-these choices instead of the standard text field.
+A :term:`sequence` consisting itself of iterables of exactly two items (e.g.
+``[(A, B), (A, B) ...]``) to use as choices for this field. If choices are
+given, they're enforced by :ref:`model validation <validating-objects>` and the
+default form widget will be a select box with these choices instead of the
+standard text field.
 
 The first element in each tuple is the actual value to be set on the model,
 and the second element is the human-readable name. For example::
 
-    YEAR_IN_SCHOOL_CHOICES = (
+    YEAR_IN_SCHOOL_CHOICES = [
         ('FR', 'Freshman'),
         ('SO', 'Sophomore'),
         ('JR', 'Junior'),
         ('SR', 'Senior'),
-    )
+    ]
 
 Generally, it's best to define choices inside a model class, and to
 define a suitably-named constant for each value::
@@ -106,12 +106,12 @@ define a suitably-named constant for each value::
         SOPHOMORE = 'SO'
         JUNIOR = 'JR'
         SENIOR = 'SR'
-        YEAR_IN_SCHOOL_CHOICES = (
+        YEAR_IN_SCHOOL_CHOICES = [
             (FRESHMAN, 'Freshman'),
             (SOPHOMORE, 'Sophomore'),
             (JUNIOR, 'Junior'),
             (SENIOR, 'Senior'),
-        )
+        ]
         year_in_school = models.CharField(
             max_length=2,
             choices=YEAR_IN_SCHOOL_CHOICES,
@@ -130,7 +130,7 @@ will work anywhere that the ``Student`` model has been imported).
 You can also collect your available choices into named groups that can
 be used for organizational purposes::
 
-    MEDIA_CHOICES = (
+    MEDIA_CHOICES = [
         ('Audio', (
                 ('vinyl', 'Vinyl'),
                 ('cd', 'CD'),
@@ -142,7 +142,7 @@ be used for organizational purposes::
             )
         ),
         ('unknown', 'Unknown'),
-    )
+    ]
 
 The first element in each tuple is the name to apply to the group. The
 second element is an iterable of 2-tuples, with each 2-tuple containing
@@ -155,11 +155,14 @@ method to retrieve the human-readable name for the field's current value. See
 :meth:`~django.db.models.Model.get_FOO_display` in the database API
 documentation.
 
-Note that choices can be any iterable object -- not necessarily a list or tuple.
-This lets you construct choices dynamically. But if you find yourself hacking
-:attr:`~Field.choices` to be dynamic, you're probably better off using a proper
-database table with a :class:`ForeignKey`. :attr:`~Field.choices` is meant for
-static data that doesn't change much, if ever.
+Note that choices can be any sequence object -- not necessarily a list or
+tuple. This lets you construct choices dynamically. But if you find yourself
+hacking :attr:`~Field.choices` to be dynamic, you're probably better off using
+a proper database table with a :class:`ForeignKey`. :attr:`~Field.choices` is
+meant for static data that doesn't change much, if ever.
+
+.. note::
+    A new migration is created each time the order of ``choices`` changes.
 
 Unless :attr:`blank=False<Field.blank>` is set on the field along with a
 :attr:`~Field.default` then a label containing ``"---------"`` will be rendered
@@ -626,9 +629,10 @@ Has two optional arguments:
     and can be set in two ways. In both cases, the value is passed to the
     :meth:`Storage.save() <django.core.files.storage.Storage.save>` method.
 
-    If you specify a string value, it may contain :func:`~time.strftime`
-    formatting, which will be replaced by the date/time of the file upload (so
-    that uploaded files don't fill up the given directory). For example::
+    If you specify a string value or a :class:`~pathlib.Path`, it may contain
+    :func:`~time.strftime` formatting, which will be replaced by the date/time
+    of the file upload (so that uploaded files don't fill up the given
+    directory). For example::
 
         class MyModel(models.Model):
             # file will be uploaded to MEDIA_ROOT/uploads
@@ -675,6 +679,10 @@ Has two optional arguments:
 
         class MyModel(models.Model):
             upload = models.FileField(upload_to=user_directory_path)
+
+    .. versionchanged:: 3.0
+
+        Support for :class:`pathlib.Path` was added.
 
 .. attribute:: FileField.storage
 
@@ -867,6 +875,23 @@ directory on the filesystem. Has three special arguments, of which the first is
 
     Required. The absolute filesystem path to a directory from which this
     :class:`FilePathField` should get its choices. Example: ``"/home/images"``.
+
+    ``path`` may also be a callable, such as a function to dynamically set the
+    path at runtime. Example::
+
+        import os
+        from django.conf import settings
+        from django.db import models
+
+        def images_path():
+            return os.path.join(settings.LOCAL_FILE_DIR, 'images')
+
+        class MyModel(models.Model):
+            file = models.FilePathField(path=images_path)
+
+    .. versionchanged:: 3.0
+
+        ``path`` can now be a callable.
 
 .. attribute:: FilePathField.match
 
@@ -1064,6 +1089,17 @@ It uses :class:`~django.core.validators.validate_slug` or
 
     If ``True``, the field accepts Unicode letters in addition to ASCII
     letters. Defaults to ``False``.
+
+``SmallAutoField``
+------------------
+
+.. class:: SmallAutoField(**options)
+
+.. versionadded:: 3.0
+
+Like an :class:`AutoField`, but only allows values under a certain
+(database-dependent) limit. Values from ``1`` to ``32767`` are safe in all
+databases supported by Django.
 
 ``SmallIntegerField``
 ---------------------
@@ -1517,6 +1553,11 @@ that control how the relationship functions.
     add the descriptor for the reverse relationship, allowing
     :class:`ManyToManyField` relationships to be non-symmetrical.
 
+    .. versionchanged:: 3.0
+
+        Specifying ``symmetrical=True`` for recursive many-to-many
+        relationships using an intermediary model was allowed.
+
 .. attribute:: ManyToManyField.through
 
     Django will automatically generate a table to manage many-to-many
@@ -1528,6 +1569,16 @@ that control how the relationship functions.
     The most common use for this option is when you want to associate
     :ref:`extra data with a many-to-many relationship
     <intermediary-manytomany>`.
+
+    .. note::
+
+        Recursive relationships using an intermediary model and defined as
+        symmetrical (that is, with :attr:`symmetrical=True
+        <ManyToManyField.symmetrical>`, which is the default) can't determine
+        the reverse accessors names, as they would be the same. You need to set
+        a :attr:`~ForeignKey.related_name` to at least one of them. If you'd
+        prefer Django not to create a backwards relation, set ``related_name``
+        to ``'+'``.
 
     If you don't specify an explicit ``through`` model, there is still an
     implicit ``through`` model class you can use to directly access the table
@@ -1603,12 +1654,6 @@ that control how the relationship functions.
     when an intermediary model is used and there are more than two
     foreign keys to the model, or you want to explicitly specify which two
     Django should use.
-
-    Recursive relationships using an intermediary model are always defined as
-    non-symmetrical -- that is, with :attr:`symmetrical=False <ManyToManyField.symmetrical>`
-    -- therefore, there is the concept of a "source" and a "target". In that
-    case ``'field1'`` will be treated as the "source" of the relationship and
-    ``'field2'`` as the "target".
 
 .. attribute:: ManyToManyField.db_table
 
@@ -1763,6 +1808,16 @@ Field API reference
             description = _("String (up to %(max_length)s)")
 
         where the arguments are interpolated from the field's ``__dict__``.
+
+    .. attribute:: descriptor_class
+
+        .. versionadded:: 3.0
+
+        A class implementing the :py:ref:`descriptor protocol <descriptors>`
+        that is instantiated and assigned to the model instance attribute. The
+        constructor must accept a single argument, the ``Field`` instance.
+        Overriding this class attribute allows for customizing the get and set
+        behavior.
 
     To map a ``Field`` to a database-specific type, Django exposes several
     methods:

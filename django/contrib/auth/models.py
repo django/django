@@ -146,7 +146,7 @@ class UserManager(BaseUserManager):
         extra_fields.setdefault('is_superuser', False)
         return self._create_user(username, email, password, **extra_fields)
 
-    def create_superuser(self, username, email, password, **extra_fields):
+    def create_superuser(self, username, email=None, password=None, **extra_fields):
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)
 
@@ -157,13 +157,40 @@ class UserManager(BaseUserManager):
 
         return self._create_user(username, email, password, **extra_fields)
 
+    def with_perm(self, perm, is_active=True, include_superusers=True, backend=None, obj=None):
+        if backend is None:
+            backends = auth._get_backends(return_tuples=True)
+            if len(backends) == 1:
+                backend, _ = backends[0]
+            else:
+                raise ValueError(
+                    'You have multiple authentication backends configured and '
+                    'therefore must provide the `backend` argument.'
+                )
+        elif not isinstance(backend, str):
+            raise TypeError(
+                'backend must be a dotted import path string (got %r).'
+                % backend
+            )
+        else:
+            backend = auth.load_backend(backend)
+        if hasattr(backend, 'with_perm'):
+            return backend.with_perm(
+                perm,
+                is_active=is_active,
+                include_superusers=include_superusers,
+                obj=obj,
+            )
+        return self.none()
+
 
 # A few helper functions for common logic between User and AnonymousUser.
-def _user_get_all_permissions(user, obj):
+def _user_get_permissions(user, obj, from_name):
     permissions = set()
+    name = 'get_%s_permissions' % from_name
     for backend in auth.get_backends():
-        if hasattr(backend, "get_all_permissions"):
-            permissions.update(backend.get_all_permissions(user, obj))
+        if hasattr(backend, name):
+            permissions.update(getattr(backend, name)(user, obj))
     return permissions
 
 
@@ -233,20 +260,24 @@ class PermissionsMixin(models.Model):
     class Meta:
         abstract = True
 
+    def get_user_permissions(self, obj=None):
+        """
+        Return a list of permission strings that this user has directly.
+        Query all available auth backends. If an object is passed in,
+        return only permissions matching this object.
+        """
+        return _user_get_permissions(self, obj, 'user')
+
     def get_group_permissions(self, obj=None):
         """
         Return a list of permission strings that this user has through their
         groups. Query all available auth backends. If an object is passed in,
         return only permissions matching this object.
         """
-        permissions = set()
-        for backend in auth.get_backends():
-            if hasattr(backend, "get_group_permissions"):
-                permissions.update(backend.get_group_permissions(self, obj))
-        return permissions
+        return _user_get_permissions(self, obj, 'group')
 
     def get_all_permissions(self, obj=None):
-        return _user_get_all_permissions(self, obj)
+        return _user_get_permissions(self, obj, 'all')
 
     def has_perm(self, perm, obj=None):
         """
@@ -403,11 +434,14 @@ class AnonymousUser:
     def user_permissions(self):
         return self._user_permissions
 
+    def get_user_permissions(self, obj=None):
+        return _user_get_permissions(self, obj, 'user')
+
     def get_group_permissions(self, obj=None):
         return set()
 
     def get_all_permissions(self, obj=None):
-        return _user_get_all_permissions(self, obj=obj)
+        return _user_get_permissions(self, obj, 'all')
 
     def has_perm(self, perm, obj=None):
         return _user_has_perm(self, perm, obj=obj)

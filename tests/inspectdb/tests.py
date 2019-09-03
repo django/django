@@ -152,11 +152,11 @@ class InspectDBTestCase(TestCase):
             output,
         )
         self.assertIn(
-            "people_pk = models.ForeignKey(InspectdbPeople, models.DO_NOTHING, primary_key=True)",
+            'people_pk = models.OneToOneField(InspectdbPeople, models.DO_NOTHING, primary_key=True)',
             output,
         )
         self.assertIn(
-            "people_unique = models.ForeignKey(InspectdbPeople, models.DO_NOTHING, unique=True)",
+            'people_unique = models.OneToOneField(InspectdbPeople, models.DO_NOTHING)',
             output,
         )
 
@@ -215,7 +215,7 @@ class InspectDBTestCase(TestCase):
         call_command('inspectdb', 'inspectdb_uniquetogether', stdout=out)
         output = out.getvalue()
         self.assertIn("    unique_together = (('", output)
-        unique_together_match = re.findall(self.unique_re, output)
+        unique_together_match = self.unique_re.findall(output)
         # There should be one unique_together tuple.
         self.assertEqual(len(unique_together_match), 1)
         fields = unique_together_match[0]
@@ -244,7 +244,7 @@ class InspectDBTestCase(TestCase):
             )
             output = out.getvalue()
             self.assertIn('# A unique constraint could not be introspected.', output)
-            self.assertEqual(re.findall(self.unique_re, output), ["('id', 'people_unique')"])
+            self.assertEqual(self.unique_re.findall(output), ["('id', 'people_unique')"])
         finally:
             with connection.cursor() as c:
                 c.execute('DROP INDEX Findex')

@@ -115,11 +115,15 @@ class TestRangeContainsLookup(PostgreSQLTestCase):
         ]
         cls.obj = RangesModel.objects.create(
             dates=(cls.dates[0], cls.dates[3]),
+            dates_inner=(cls.dates[1], cls.dates[2]),
             timestamps=(cls.timestamps[0], cls.timestamps[3]),
+            timestamps_inner=(cls.timestamps[1], cls.timestamps[2]),
         )
         cls.aware_obj = RangesModel.objects.create(
             dates=(cls.dates[0], cls.dates[3]),
+            dates_inner=(cls.dates[1], cls.dates[2]),
             timestamps=(cls.aware_timestamps[0], cls.aware_timestamps[3]),
+            timestamps_inner=(cls.timestamps[1], cls.timestamps[2]),
         )
         # Objects that don't match any queries.
         for i in range(3, 4):
@@ -140,6 +144,7 @@ class TestRangeContainsLookup(PostgreSQLTestCase):
             (self.aware_timestamps[1], self.aware_timestamps[2]),
             Value(self.dates[0], output_field=DateTimeField()),
             Func(F('dates'), function='lower', output_field=DateTimeField()),
+            F('timestamps_inner'),
         )
         for filter_arg in filter_args:
             with self.subTest(filter_arg=filter_arg):
@@ -154,6 +159,7 @@ class TestRangeContainsLookup(PostgreSQLTestCase):
             (self.dates[1], self.dates[2]),
             Value(self.dates[0], output_field=DateField()),
             Func(F('timestamps'), function='lower', output_field=DateField()),
+            F('dates_inner'),
         )
         for filter_arg in filter_args:
             with self.subTest(filter_arg=filter_arg):
@@ -361,7 +367,9 @@ class TestSerialization(PostgreSQLSimpleTestCase):
         '\\"bounds\\": \\"[)\\"}", "decimals": "{\\"empty\\": true}", '
         '"bigints": null, "timestamps": "{\\"upper\\": \\"2014-02-02T12:12:12+00:00\\", '
         '\\"lower\\": \\"2014-01-01T00:00:00+00:00\\", \\"bounds\\": \\"[)\\"}", '
-        '"dates": "{\\"upper\\": \\"2014-02-02\\", \\"lower\\": \\"2014-01-01\\", \\"bounds\\": \\"[)\\"}" }, '
+        '"timestamps_inner": null, '
+        '"dates": "{\\"upper\\": \\"2014-02-02\\", \\"lower\\": \\"2014-01-01\\", \\"bounds\\": \\"[)\\"}", '
+        '"dates_inner": null }, '
         '"model": "postgres_tests.rangesmodel", "pk": null}]'
     )
 

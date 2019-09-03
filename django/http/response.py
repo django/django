@@ -241,6 +241,9 @@ class HttpResponseBase:
 
     # The WSGI server must call this method upon completion of the request.
     # See http://blog.dscpl.com.au/2012/10/obligations-for-calling-close-on.html
+    # When wsgi.file_wrapper is used, the WSGI server instead calls close()
+    # on the file-like object. Django ensures this method is called in this
+    # case by replacing self.file_to_stream.close() with a wrapped version.
     def close(self):
         for closable in self._closable_objects:
             try:
@@ -397,14 +400,39 @@ class FileResponse(StreamingHttpResponse):
         self.filename = filename
         super().__init__(*args, **kwargs)
 
+    def _wrap_file_to_stream_close(self, filelike):
+        """
+        Wrap the file-like close() with a version that calls
+        FileResponse.close().
+        """
+        closing = False
+        filelike_close = getattr(filelike, 'close', lambda: None)
+
+        def file_wrapper_close():
+            nonlocal closing
+            # Prevent an infinite loop since FileResponse.close() tries to
+            # close the objects in self._closable_objects.
+            if closing:
+                return
+            closing = True
+            try:
+                filelike_close()
+            finally:
+                self.close()
+
+        filelike.close = file_wrapper_close
+
     def _set_streaming_content(self, value):
         if not hasattr(value, 'read'):
             self.file_to_stream = None
             return super()._set_streaming_content(value)
 
         self.file_to_stream = filelike = value
+        # Add to closable objects before wrapping close(), since the filelike
+        # might not have close().
         if hasattr(filelike, 'close'):
             self._closable_objects.append(filelike)
+        self._wrap_file_to_stream_close(filelike)
         value = iter(lambda: filelike.read(self.block_size), b'')
         self.set_headers(filelike)
         super()._set_streaming_content(value)
@@ -436,15 +464,17 @@ class FileResponse(StreamingHttpResponse):
             else:
                 self['Content-Type'] = 'application/octet-stream'
 
-        if self.as_attachment:
-            filename = self.filename or os.path.basename(filename)
-            if filename:
-                try:
-                    filename.encode('ascii')
-                    file_expr = 'filename="{}"'.format(filename)
-                except UnicodeEncodeError:
-                    file_expr = "filename*=utf-8''{}".format(quote(filename))
-                self['Content-Disposition'] = 'attachment; {}'.format(file_expr)
+        filename = self.filename or os.path.basename(filename)
+        if filename:
+            disposition = 'attachment' if self.as_attachment else 'inline'
+            try:
+                filename.encode('ascii')
+                file_expr = 'filename="{}"'.format(filename)
+            except UnicodeEncodeError:
+                file_expr = "filename*=utf-8''{}".format(quote(filename))
+            self['Content-Disposition'] = '{}; {}'.format(disposition, file_expr)
+        elif self.as_attachment:
+            self['Content-Disposition'] = 'attachment'
 
 
 class HttpResponseRedirectBase(HttpResponse):

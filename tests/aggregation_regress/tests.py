@@ -377,7 +377,7 @@ class AggregationTests(TestCase):
             {'c__max': 3}
         )
 
-    def test_conditional_aggreate(self):
+    def test_conditional_aggregate(self):
         # Conditional aggregation of a grouped queryset.
         self.assertEqual(
             Book.objects.annotate(c=Count('authors')).values('pk').aggregate(test=Sum(
@@ -1298,7 +1298,7 @@ class AggregationTests(TestCase):
         )
 
     @skipUnlessDBFeature('allows_group_by_selected_pks')
-    def test_aggregate_ummanaged_model_columns(self):
+    def test_aggregate_unmanaged_model_columns(self):
         """
         Unmanaged models are sometimes used to represent database views which
         may not allow grouping by selected primary key.

@@ -1,4 +1,5 @@
 import os
+import pathlib
 from unittest import mock, skipUnless
 
 from django.conf import settings
@@ -19,7 +20,7 @@ if HAS_GEOIP2:
     "GeoIP is required along with the GEOIP_PATH setting."
 )
 class GeoIPTest(SimpleTestCase):
-    addr = '128.249.1.1'
+    addr = '75.41.39.1'
     fqdn = 'tmc.edu'
 
     def test01_init(self):
@@ -28,8 +29,13 @@ class GeoIPTest(SimpleTestCase):
         path = settings.GEOIP_PATH
         g2 = GeoIP2(path, 0)  # Passing in data path explicitly.
         g3 = GeoIP2.open(path, 0)  # MaxMind Python API syntax.
+        # path accepts str and pathlib.Path.
+        if isinstance(path, str):
+            g4 = GeoIP2(pathlib.Path(path))
+        else:
+            g4 = GeoIP2(str(path))
 
-        for g in (g1, g2, g3):
+        for g in (g1, g2, g3, g4):
             self.assertTrue(g._country)
             self.assertTrue(g._city)
 
@@ -99,7 +105,7 @@ class GeoIPTest(SimpleTestCase):
     @mock.patch('socket.gethostbyname')
     def test04_city(self, gethostbyname):
         "GeoIP city querying methods."
-        gethostbyname.return_value = '128.249.1.1'
+        gethostbyname.return_value = '75.41.39.1'
         g = GeoIP2(country='<foo>')
 
         for query in (self.fqdn, self.addr):
@@ -124,9 +130,10 @@ class GeoIPTest(SimpleTestCase):
             self.assertEqual('NA', d['continent_code'])
             self.assertEqual('North America', d['continent_name'])
             self.assertEqual('US', d['country_code'])
-            self.assertEqual('Houston', d['city'])
+            self.assertEqual('Dallas', d['city'])
             self.assertEqual('TX', d['region'])
             self.assertEqual('America/Chicago', d['time_zone'])
+            self.assertFalse(d['is_in_european_union'])
             geom = g.geos(query)
             self.assertIsInstance(geom, GEOSGeometry)
 

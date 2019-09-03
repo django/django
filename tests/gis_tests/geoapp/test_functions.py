@@ -26,7 +26,6 @@ class GISFunctionsTests(FuncTestMixin, TestCase):
     fixtures = ['initial']
 
     def test_asgeojson(self):
-        # Only PostGIS and SpatiaLite support GeoJSON.
         if not connection.features.has_AsGeoJSON_function:
             with self.assertRaises(NotSupportedError):
                 list(Country.objects.annotate(json=functions.AsGeoJSON('mpoly')))
@@ -85,6 +84,9 @@ class GISFunctionsTests(FuncTestMixin, TestCase):
         # SELECT ST_AsGeoJson("geoapp_city"."point", 5, 3) FROM "geoapp_city"
         # WHERE "geoapp_city"."name" = 'Chicago';
         # Finally, we set every available keyword.
+        # MariaDB doesn't limit the number of decimals in bbox.
+        if mysql and connection.mysql_is_mariadb:
+            chicago_json['bbox'] = [-87.650175, 41.850385, -87.650175, 41.850385]
         self.assertJSONEqual(
             City.objects.annotate(
                 geojson=functions.AsGeoJSON('point', bbox=True, crs=True, precision=5)
@@ -360,26 +362,9 @@ class GISFunctionsTests(FuncTestMixin, TestCase):
 
     @skipUnlessDBFeature("has_PointOnSurface_function")
     def test_point_on_surface(self):
-        # Reference values.
-        if oracle:
-            # SELECT SDO_UTIL.TO_WKTGEOMETRY(SDO_GEOM.SDO_POINTONSURFACE(GEOAPP_COUNTRY.MPOLY, 0.05))
-            # FROM GEOAPP_COUNTRY;
-            ref = {
-                'New Zealand': fromstr('POINT (174.616364 -36.100861)', srid=4326),
-                'Texas': fromstr('POINT (-103.002434 36.500397)', srid=4326),
-            }
-        else:
-            # Using GEOSGeometry to compute the reference point on surface values
-            # -- since PostGIS also uses GEOS these should be the same.
-            ref = {
-                'New Zealand': Country.objects.get(name='New Zealand').mpoly.point_on_surface,
-                'Texas': Country.objects.get(name='Texas').mpoly.point_on_surface
-            }
-
         qs = Country.objects.annotate(point_on_surface=functions.PointOnSurface('mpoly'))
         for country in qs:
-            tol = 0.00001  # SpatiaLite might have WKT-translation-related precision issues
-            self.assertTrue(ref[country.name].equals_exact(country.point_on_surface, tol))
+            self.assertTrue(country.mpoly.intersection(country.point_on_surface))
 
     @skipUnlessDBFeature("has_Reverse_function")
     def test_reverse_geom(self):

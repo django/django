@@ -5,6 +5,7 @@ from operator import attrgetter
 
 from django.core.exceptions import FieldError
 from django.db import connection
+from django.db.models.expressions import Exists, OuterRef
 from django.db.models.functions import Substr
 from django.test import TestCase, skipUnlessDBFeature
 
@@ -932,3 +933,26 @@ class LookupTests(TestCase):
         field = query.model._meta.get_field('nulled_text_field')
         self.assertIsInstance(query.build_lookup(['isnull_none_rhs'], field, None), IsNullWithNoneAsRHS)
         self.assertTrue(Season.objects.filter(pk=season.pk, nulled_text_field__isnull_none_rhs=True))
+
+    def test_exact_exists(self):
+        qs = Article.objects.filter(pk=OuterRef('pk'))
+        seasons = Season.objects.annotate(
+            pk_exists=Exists(qs),
+        ).filter(
+            pk_exists=Exists(qs),
+        )
+        self.assertCountEqual(seasons, Season.objects.all())
+
+    def test_nested_outerref_lhs(self):
+        tag = Tag.objects.create(name=self.au1.alias)
+        tag.articles.add(self.a1)
+        qs = Tag.objects.annotate(
+            has_author_alias_match=Exists(
+                Article.objects.annotate(
+                    author_exists=Exists(
+                        Author.objects.filter(alias=OuterRef(OuterRef('name')))
+                    ),
+                ).filter(author_exists=True)
+            ),
+        )
+        self.assertEqual(qs.get(has_author_alias_match=True), tag)

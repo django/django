@@ -888,7 +888,8 @@ If you're using Linux or MacOS and install both `pywatchman`_ and the
 `Watchman`_ service, kernel signals will be used to autoreload the server
 (rather than polling file modification timestamps each second). This offers
 better performance on large projects, reduced response time after code changes,
-more robust change detection, and a reduction in power usage.
+more robust change detection, and a reduction in power usage. Django supports
+``pywatchman`` 1.2.0 and higher.
 
 .. admonition:: Large directories with many files may cause performance issues
 
@@ -896,6 +897,11 @@ more robust change detection, and a reduction in power usage.
     directories like ``node_modules``, it's advisable to ignore this directory
     for optimal performance. See the `watchman documentation`_ for information
     on how to do this.
+
+.. admonition:: Watchman timeout
+
+    The default timeout of ``Watchman`` client is 5 seconds. You can change it
+    by setting the ``DJANGO_WATCHMAN_TIMEOUT`` environment variable.
 
 .. _Watchman: https://facebook.github.io/watchman/
 .. _pywatchman: https://pypi.org/project/pywatchman/
@@ -1215,9 +1221,10 @@ For example::
 
 .. django-admin-option:: --template TEMPLATE
 
-Provides the path to a directory with a custom app template file or a path to a
-compressed file (``.tar.gz``, ``.tar.bz2``, ``.tgz``, ``.tbz``, ``.zip``)
-containing the app template files.
+Provides the path to a directory with a custom app template file, or a path to
+an uncompressed archive (``.tar``) or a compressed archive (``.tar.gz``,
+``.tar.bz2``, ``.tar.xz``, ``.tar.lzma``, ``.tgz``, ``.tbz2``, ``.txz``,
+``.tlz``, ``.zip``) containing the app template files.
 
 For example, this would look for an app template in the given directory when
 creating the ``myapp`` app::
@@ -1232,6 +1239,11 @@ For example, taking advantage of GitHub's feature to expose repositories as
 zip files, you can use a URL like::
 
     django-admin startapp --template=https://github.com/githubuser/django-app-template/archive/master.zip myapp
+
+.. versionchanged:: 3.0
+
+    Support for XZ archives (``.tar.xz``, ``.txz``) and LZMA archives
+    (``.tar.lzma``, ``.tlz``) was added.
 
 .. django-admin-option:: --extension EXTENSIONS, -e EXTENSIONS
 
@@ -1253,7 +1265,7 @@ files is:
 - ``app_directory`` -- the full path of the newly created app
 - ``camel_case_app_name`` -- the app name in camel case format
 - ``docs_version`` -- the version of the documentation: ``'dev'`` or ``'1.x'``
-- ``django_version`` -- the version of Django, e.g.``'2.0.3'``
+- ``django_version`` -- the version of Django, e.g. ``'2.0.3'``
 
 .. _render_warning:
 
@@ -1321,7 +1333,7 @@ The :class:`template context <django.template.Context>` used is:
 - ``project_directory`` -- the full path of the newly created project
 - ``secret_key`` -- a random key for the :setting:`SECRET_KEY` setting
 - ``docs_version`` -- the version of the documentation: ``'dev'`` or ``'1.x'``
-- ``django_version`` -- the version of Django, e.g.``'2.0.3'``
+- ``django_version`` -- the version of Django, e.g. ``'2.0.3'``
 
 Please also see the :ref:`rendering warning <render_warning>` as mentioned
 for :djadmin:`startapp`.
@@ -1355,7 +1367,7 @@ The ``test`` command receives options on behalf of the specified
 :option:`--testrunner`. These are the options of the default test runner:
 :class:`~django.test.runner.DiscoverRunner`.
 
-.. django-admin-option:: --keepdb, -k
+.. django-admin-option:: --keepdb
 
 Preserves the test database between test runs. This has the advantage of
 skipping both the create and destroy actions which can greatly decrease the
@@ -1403,7 +1415,7 @@ correctly:
 
 .. code-block:: console
 
-    $ pip install tblib
+    $ python -m pip install tblib
 
 This feature isn't available on Windows. It doesn't work with the Oracle
 database backend either.
@@ -1432,6 +1444,24 @@ May be specified multiple times and combined with :option:`test --exclude-tag`.
 
 Excludes tests :ref:`marked with the specified tags <topics-tagging-tests>`.
 May be specified multiple times and combined with :option:`test --tag`.
+
+.. django-admin-option:: -k TEST_NAME_PATTERNS
+
+.. versionadded:: 3.0
+
+Runs test methods and classes matching test name patterns, in the same way as
+:option:`unittest's -k option<unittest.-k>`. Can be specified multiple times.
+
+.. admonition:: Python 3.7 and later
+
+    This feature is only available for Python 3.7 and later.
+
+.. django-admin-option:: --pdb
+
+.. versionadded:: 3.0
+
+Spawns a ``pdb`` debugger at each test error or failure. If you have it
+installed, ``ipdb`` is used instead.
 
 ``testserver``
 --------------
@@ -1542,9 +1572,28 @@ useful if you need to create an initial superuser account or if you need to
 programmatically generate superuser accounts for your site(s).
 
 When run interactively, this command will prompt for a password for
-the new superuser account. When run non-interactively, no password
-will be set, and the superuser account will not be able to log in until
-a password has been manually set for it.
+the new superuser account. When run non-interactively, you can provide
+a password by setting the ``DJANGO_SUPERUSER_PASSWORD`` environment variable.
+Otherwise, no password will be set, and the superuser account will not be able
+to log in until a password has been manually set for it.
+
+In non-interactive mode, the
+:attr:`~django.contrib.auth.models.CustomUser.USERNAME_FIELD` and required
+fields (listed in
+:attr:`~django.contrib.auth.models.CustomUser.REQUIRED_FIELDS`) fall back to
+``DJANGO_SUPERUSER_<uppercase_field_name>`` environment variables, unless they
+are overridden by a command line argument. For example, to provide an ``email``
+field, you can use ``DJANGO_SUPERUSER_EMAIL`` environment variable.
+
+.. versionchanged:: 3.0
+
+    Support for using ``DJANGO_SUPERUSER_PASSWORD`` and
+    ``DJANGO_SUPERUSER_<uppercase_field_name>`` environment variables was added.
+
+.. django-admin-option:: --noinput, --no-input
+
+Suppresses all user prompts. If a suppressed prompt cannot be resolved
+automatically, the command will exit with error code 1.
 
 .. django-admin-option:: --username USERNAME
 .. django-admin-option:: --email EMAIL
@@ -1718,6 +1767,19 @@ Example usage::
 Forces colorization of the command output if it would otherwise be disabled
 as discussed in :ref:`syntax-coloring`. For example, you may want to pipe
 colored output to another command.
+
+.. django-admin-option:: --skip-checks
+
+.. versionadded:: 3.0
+
+Skips running system checks prior to running the command. This option is only
+available if the
+:attr:`~django.core.management.BaseCommand.requires_system_checks` command
+attribute is set to ``True``.
+
+Example usage::
+
+    django-admin migrate --skip-checks
 
 Extra niceties
 ==============
@@ -1909,5 +1971,5 @@ Output redirection
 Note that you can redirect standard output and error streams as all commands
 support the ``stdout`` and ``stderr`` options. For example, you could write::
 
-    with open('/path/to/command_output') as f:
+    with open('/path/to/command_output', 'w') as f:
         management.call_command('dumpdata', stdout=f)

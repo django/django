@@ -35,7 +35,7 @@ class SimplifiedURLTests(SimpleTestCase):
         self.assertEqual(match.kwargs, {'year': 2015})
         self.assertEqual(match.route, 'articles/<int:year>/')
 
-    def test_path_lookup_with_multiple_paramaters(self):
+    def test_path_lookup_with_multiple_parameters(self):
         match = resolve('/articles/2015/04/12/')
         self.assertEqual(match.url_name, 'articles-year-month-day')
         self.assertEqual(match.args, ())
@@ -53,6 +53,20 @@ class SimplifiedURLTests(SimpleTestCase):
         self.assertEqual(match.url_name, 'regex')
         self.assertEqual(match.kwargs, {'pk': '1'})
         self.assertEqual(match.route, '^regex/(?P<pk>[0-9]+)/$')
+
+    def test_re_path_with_optional_parameter(self):
+        for url, kwargs in (
+            ('/regex_optional/1/2/', {'arg1': '1', 'arg2': '2'}),
+            ('/regex_optional/1/', {'arg1': '1'}),
+        ):
+            with self.subTest(url=url):
+                match = resolve(url)
+                self.assertEqual(match.url_name, 'regex_optional')
+                self.assertEqual(match.kwargs, kwargs)
+                self.assertEqual(
+                    match.route,
+                    r'^regex_optional/(?P<arg1>\d+)/(?:(?P<arg2>\d+)/)?',
+                )
 
     def test_path_lookup_with_inclusion(self):
         match = resolve('/included_urls/extra/something/')
@@ -107,7 +121,7 @@ class SimplifiedURLTests(SimpleTestCase):
         self.assertEqual(match.url_name, 'inner-extra')
         self.assertEqual(match.kwargs, {'extra': 'something'})
 
-    def test_path_inclusion_is_reversable(self):
+    def test_path_inclusion_is_reversible(self):
         url = reverse('inner-extra', kwargs={'extra': 'something'})
         self.assertEqual(url, '/included_urls/extra/something/')
 
@@ -115,6 +129,11 @@ class SimplifiedURLTests(SimpleTestCase):
         msg = "URL route 'foo/<nonexistent:var>/' uses invalid converter 'nonexistent'."
         with self.assertRaisesMessage(ImproperlyConfigured, msg):
             path('foo/<nonexistent:var>/', empty_view)
+
+    def test_space_in_route(self):
+        msg = "URL route 'space/<int: num>' cannot contain whitespace."
+        with self.assertRaisesMessage(ImproperlyConfigured, msg):
+            path('space/<int: num>', empty_view)
 
 
 @override_settings(ROOT_URLCONF='urlpatterns.converter_urls')

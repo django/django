@@ -3,12 +3,36 @@ import warnings
 
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Permission
+from django.db.models import Exists, OuterRef, Q
 from django.utils.deprecation import RemovedInDjango31Warning
 
 UserModel = get_user_model()
 
 
-class ModelBackend:
+class BaseBackend:
+    def authenticate(self, request, **kwargs):
+        return None
+
+    def get_user(self, user_id):
+        return None
+
+    def get_user_permissions(self, user_obj, obj=None):
+        return set()
+
+    def get_group_permissions(self, user_obj, obj=None):
+        return set()
+
+    def get_all_permissions(self, user_obj, obj=None):
+        return {
+            *self.get_user_permissions(user_obj, obj=obj),
+            *self.get_group_permissions(user_obj, obj=obj),
+        }
+
+    def has_perm(self, user_obj, perm, obj=None):
+        return perm in self.get_all_permissions(user_obj, obj=obj)
+
+
+class ModelBackend(BaseBackend):
     """
     Authenticates against settings.AUTH_USER_MODEL.
     """
@@ -16,6 +40,8 @@ class ModelBackend:
     def authenticate(self, request, username=None, password=None, **kwargs):
         if username is None:
             username = kwargs.get(UserModel.USERNAME_FIELD)
+        if username is None or password is None:
+            return
         try:
             user = UserModel._default_manager.get_by_natural_key(username)
         except UserModel.DoesNotExist:
@@ -79,14 +105,11 @@ class ModelBackend:
         if not user_obj.is_active or user_obj.is_anonymous or obj is not None:
             return set()
         if not hasattr(user_obj, '_perm_cache'):
-            user_obj._perm_cache = {
-                *self.get_user_permissions(user_obj),
-                *self.get_group_permissions(user_obj),
-            }
+            user_obj._perm_cache = super().get_all_permissions(user_obj)
         return user_obj._perm_cache
 
     def has_perm(self, user_obj, perm, obj=None):
-        return user_obj.is_active and perm in self.get_all_permissions(user_obj, obj)
+        return user_obj.is_active and super().has_perm(user_obj, perm, obj=obj)
 
     def has_module_perms(self, user_obj, app_label):
         """
@@ -96,6 +119,42 @@ class ModelBackend:
             perm[:perm.index('.')] == app_label
             for perm in self.get_all_permissions(user_obj)
         )
+
+    def with_perm(self, perm, is_active=True, include_superusers=True, obj=None):
+        """
+        Return users that have permission "perm". By default, filter out
+        inactive users and include superusers.
+        """
+        if isinstance(perm, str):
+            try:
+                app_label, codename = perm.split('.')
+            except ValueError:
+                raise ValueError(
+                    'Permission name should be in the form '
+                    'app_label.permission_codename.'
+                )
+        elif not isinstance(perm, Permission):
+            raise TypeError(
+                'The `perm` argument must be a string or a permission instance.'
+            )
+
+        UserModel = get_user_model()
+        if obj is not None:
+            return UserModel._default_manager.none()
+
+        permission_q = Q(group__user=OuterRef('pk')) | Q(user=OuterRef('pk'))
+        if isinstance(perm, Permission):
+            permission_q &= Q(pk=perm.pk)
+        else:
+            permission_q &= Q(codename=codename, content_type__app_label=app_label)
+
+        user_q = Exists(Permission.objects.filter(permission_q))
+        if include_superusers:
+            user_q |= Q(is_superuser=True)
+        if is_active is not None:
+            user_q &= Q(is_active=is_active)
+
+        return UserModel._default_manager.filter(user_q)
 
     def get_user(self, user_id):
         try:

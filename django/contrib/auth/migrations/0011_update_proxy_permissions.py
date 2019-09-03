@@ -1,5 +1,18 @@
-from django.db import migrations
+import sys
+
+from django.core.management.color import color_style
+from django.db import migrations, transaction
 from django.db.models import Q
+from django.db.utils import IntegrityError
+
+WARNING = """
+    A problem arose migrating proxy model permissions for {old} to {new}.
+
+      Permission(s) for {new} already existed.
+      Codenames Q: {query}
+
+    Ensure to audit ALL permissions for {old} and {new}.
+"""
 
 
 def update_proxy_model_permissions(apps, schema_editor, reverse=False):
@@ -7,6 +20,7 @@ def update_proxy_model_permissions(apps, schema_editor, reverse=False):
     Update the content_type of proxy model permissions to use the ContentType
     of the proxy model.
     """
+    style = color_style()
     Permission = apps.get_model('auth', 'Permission')
     ContentType = apps.get_model('contenttypes', 'ContentType')
     for Model in apps.get_models():
@@ -24,10 +38,16 @@ def update_proxy_model_permissions(apps, schema_editor, reverse=False):
         proxy_content_type = ContentType.objects.get_for_model(Model, for_concrete_model=False)
         old_content_type = proxy_content_type if reverse else concrete_content_type
         new_content_type = concrete_content_type if reverse else proxy_content_type
-        Permission.objects.filter(
-            permissions_query,
-            content_type=old_content_type,
-        ).update(content_type=new_content_type)
+        try:
+            with transaction.atomic():
+                Permission.objects.filter(
+                    permissions_query,
+                    content_type=old_content_type,
+                ).update(content_type=new_content_type)
+        except IntegrityError:
+            old = '{}_{}'.format(old_content_type.app_label, old_content_type.model)
+            new = '{}_{}'.format(new_content_type.app_label, new_content_type.model)
+            sys.stdout.write(style.WARNING(WARNING.format(old=old, new=new, query=permissions_query)))
 
 
 def revert_proxy_model_permissions(apps, schema_editor):

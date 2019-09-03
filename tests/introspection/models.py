@@ -9,6 +9,11 @@ class City(models.Model):
         return self.name
 
 
+class Country(models.Model):
+    id = models.SmallAutoField(primary_key=True)
+    name = models.CharField(max_length=50)
+
+
 class District(models.Model):
     city = models.ForeignKey(City, models.CASCADE, primary_key=True)
     name = models.CharField(max_length=50)
@@ -65,14 +70,25 @@ class Comment(models.Model):
     article = models.ForeignKey(Article, models.CASCADE, db_index=True)
     email = models.EmailField()
     pub_date = models.DateTimeField()
-    up_votes = models.PositiveIntegerField()
     body = models.TextField()
 
     class Meta:
         constraints = [
-            models.CheckConstraint(name='up_votes_gte_0_check', check=models.Q(up_votes__gte=0)),
             models.UniqueConstraint(fields=['article', 'email', 'pub_date'], name='article_email_pub_date_uniq'),
         ]
         indexes = [
             models.Index(fields=['email', 'pub_date'], name='email_pub_date_idx'),
+        ]
+
+
+class CheckConstraintModel(models.Model):
+    up_votes = models.PositiveIntegerField()
+    voting_number = models.PositiveIntegerField(unique=True)
+
+    class Meta:
+        required_db_features = {
+            'supports_table_check_constraints',
+        }
+        constraints = [
+            models.CheckConstraint(name='up_votes_gte_0_check', check=models.Q(up_votes__gte=0)),
         ]

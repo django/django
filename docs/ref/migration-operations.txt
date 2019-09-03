@@ -214,8 +214,8 @@ Removes the index named ``name`` from the model with ``model_name``.
 
 .. versionadded:: 2.2
 
-Creates a constraint in the database table for the model with ``model_name``.
-``constraint`` is an instance of :class:`~django.db.models.CheckConstraint`.
+Creates a :doc:`constraint </ref/models/constraints>` in the database table for
+the model with ``model_name``.
 
 ``RemoveConstraint``
 --------------------

@@ -36,6 +36,9 @@ class BaseSpatialFeatures:
     # The following properties indicate if the database backend support
     # certain lookups (dwithin, left and right, relate, ...)
     supports_left_right_lookups = False
+    # Does the backend support expressions for specifying distance in the
+    # dwithin lookup?
+    supports_dwithin_distance_expr = True
 
     # Does the database have raster support?
     supports_raster = False

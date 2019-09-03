@@ -198,14 +198,13 @@ class DatabaseOperations(BaseDatabaseOperations):
             # Simulate TRUNCATE CASCADE by recursively collecting the tables
             # referencing the tables to be flushed.
             tables = set(chain.from_iterable(self._references_graph(table) for table in tables))
-        sql = ['%s %s %s;' % (
+        # Note: No requirement for reset of auto-incremented indices (cf. other
+        # sql_flush() implementations). Just return SQL at this point
+        return ['%s %s %s;' % (
             style.SQL_KEYWORD('DELETE'),
             style.SQL_KEYWORD('FROM'),
             style.SQL_FIELD(self.quote_name(table))
         ) for table in tables]
-        # Note: No requirement for reset of auto-incremented indices (cf. other
-        # sql_flush() implementations). Just return SQL at this point
-        return sql
 
     def adapt_datetimefield_value(self, value):
         if value is None:

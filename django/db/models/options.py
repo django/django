@@ -180,6 +180,12 @@ class Options:
 
             self.unique_together = normalize_together(self.unique_together)
             self.index_together = normalize_together(self.index_together)
+            # App label/class name interpolation for names of constraints and
+            # indexes.
+            if not getattr(cls._meta, 'abstract', False):
+                for attr_name in {'constraints', 'indexes'}:
+                    objs = getattr(self, attr_name, [])
+                    setattr(self, attr_name, self._format_names_with_class(cls, objs))
 
             # verbose_name_plural is a special case because it uses a 's'
             # by default.
@@ -200,6 +206,18 @@ class Options:
         if not self.db_table:
             self.db_table = "%s_%s" % (self.app_label, self.model_name)
             self.db_table = truncate_name(self.db_table, connection.ops.max_name_length())
+
+    def _format_names_with_class(self, cls, objs):
+        """App label/class name interpolation for object names."""
+        new_objs = []
+        for obj in objs:
+            obj = obj.clone()
+            obj.name = obj.name % {
+                'app_label': cls._meta.app_label.lower(),
+                'class': cls.__name__.lower(),
+            }
+            new_objs.append(obj)
+        return new_objs
 
     def _prepare(self, model):
         if self.order_with_respect_to:

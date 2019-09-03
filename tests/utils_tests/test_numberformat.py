@@ -56,7 +56,7 @@ class TestNumberFormat(SimpleTestCase):
 
     def test_float_numbers(self):
         # A float without a fractional part (3.) results in a ".0" when no
-        # deimal_pos is given. Contrast that with the Decimal('3.') case in
+        # decimal_pos is given. Contrast that with the Decimal('3.') case in
         # test_decimal_numbers which doesn't return a fractional part.
         self.assertEqual(nformat(3., '.'), '3.0')
 

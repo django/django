@@ -66,7 +66,7 @@ def wsgi_app_file_wrapper(environ, start_response):
 
 class WSGIFileWrapperTests(TestCase):
     """
-    The wsgi.file_wrapper works for the builting server.
+    The wsgi.file_wrapper works for the builtin server.
 
     Tests for #9659: wsgi.file_wrapper in the builtin server.
     We need to mock a couple of handlers and keep track of what

@@ -48,7 +48,7 @@ class RedirectCycleError(Exception):
 class FakePayload:
     """
     A wrapper around BytesIO that restricts what can be read since data from
-    the network can't be seeked and cannot be read outside of its content
+    the network can't be sought and cannot be read outside of its content
     length. This makes sure that views can't do anything under the test client
     that wouldn't work in real life.
     """
@@ -193,8 +193,8 @@ def encode_multipart(boundary, data):
     for (key, value) in data.items():
         if value is None:
             raise TypeError(
-                'Cannot encode None as POST data. Did you mean to pass an '
-                'empty string or omit the value?'
+                "Cannot encode None for key '%s' as POST data. Did you mean "
+                "to pass an empty string or omit the value?" % key
             )
         elif is_file(value):
             lines.extend(encode_file(boundary, key, value))
@@ -650,7 +650,7 @@ class Client(RequestFactory):
                     'Content-Type header is "{0}", not "application/json"'
                     .format(response.get('Content-Type'))
                 )
-            response._json = json.loads(response.content.decode(), **extra)
+            response._json = json.loads(response.content.decode(response.charset), **extra)
         return response._json
 
     def _handle_redirects(self, response, data='', content_type='', **extra):

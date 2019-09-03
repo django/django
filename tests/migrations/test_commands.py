@@ -80,7 +80,7 @@ class MigrateTests(MigrationTestBase):
             call_command('migrate', app_label='unmigrated_app_syncdb')
 
     @override_settings(MIGRATION_MODULES={'migrations': 'migrations.test_migrations_clashing_prefix'})
-    def test_ambigious_prefix(self):
+    def test_ambiguous_prefix(self):
         msg = (
             "More than one migration matches 'a' in app 'migrations'. Please "
             "be more specific."
@@ -644,6 +644,12 @@ class MigrateTests(MigrationTestBase):
         if start_transaction_sql:
             self.assertNotIn(start_transaction_sql.lower(), queries)
         self.assertNotIn(connection.ops.end_transaction_sql().lower(), queries)
+
+    @override_settings(MIGRATION_MODULES={'migrations': 'migrations.test_migrations_no_operations'})
+    def test_migrations_no_operations(self):
+        err = io.StringIO()
+        call_command('sqlmigrate', 'migrations', '0001_initial', stderr=err)
+        self.assertEqual(err.getvalue(), 'No operations found.\n')
 
     @override_settings(
         INSTALLED_APPS=[

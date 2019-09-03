@@ -143,14 +143,14 @@ useful -- you can use the global default storage system::
     >>> from django.core.files.base import ContentFile
     >>> from django.core.files.storage import default_storage
 
-    >>> path = default_storage.save('/path/to/file', ContentFile('new content'))
+    >>> path = default_storage.save('path/to/file', ContentFile(b'new content'))
     >>> path
-    '/path/to/file'
+    'path/to/file'
 
     >>> default_storage.size(path)
     11
     >>> default_storage.open(path).read()
-    'new content'
+    b'new content'
 
     >>> default_storage.delete(path)
     >>> default_storage.exists(path)

@@ -11,6 +11,7 @@ class DatabaseOperations(BaseDatabaseOperations):
     cast_data_types = {
         'AutoField': 'integer',
         'BigAutoField': 'bigint',
+        'SmallAutoField': 'smallint',
     }
 
     def unification_cast_sql(self, output_field):
@@ -40,9 +41,16 @@ class DatabaseOperations(BaseDatabaseOperations):
         # https://www.postgresql.org/docs/current/functions-datetime.html#FUNCTIONS-DATETIME-TRUNC
         return "DATE_TRUNC('%s', %s)" % (lookup_type, field_name)
 
+    def _prepare_tzname_delta(self, tzname):
+        if '+' in tzname:
+            return tzname.replace('+', '-')
+        elif '-' in tzname:
+            return tzname.replace('-', '+')
+        return tzname
+
     def _convert_field_to_tz(self, field_name, tzname):
         if settings.USE_TZ:
-            field_name = "%s AT TIME ZONE '%s'" % (field_name, tzname)
+            field_name = "%s AT TIME ZONE '%s'" % (field_name, self._prepare_tzname_delta(tzname))
         return field_name
 
     def datetime_cast_date_sql(self, field_name, tzname):
@@ -228,7 +236,7 @@ class DatabaseOperations(BaseDatabaseOperations):
             return cursor.query.decode()
         return None
 
-    def return_insert_id(self):
+    def return_insert_id(self, field):
         return "RETURNING %s", ()
 
     def bulk_insert_sql(self, fields, placeholder_rows):

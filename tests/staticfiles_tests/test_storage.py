@@ -4,6 +4,7 @@ import sys
 import tempfile
 import unittest
 from io import StringIO
+from unittest import mock
 
 from django.conf import settings
 from django.contrib.staticfiles import finders, storage
@@ -385,6 +386,15 @@ class TestCollectionManifestStorage(TestHashedFiles, CollectionTestCase):
         path = storage.staticfiles_storage.path(filename)
         self.assertTrue(os.path.exists(path))
 
+    def test_manifest_does_not_exist(self):
+        storage.staticfiles_storage.manifest_name = 'does.not.exist.json'
+        self.assertIsNone(storage.staticfiles_storage.read_manifest())
+
+    def test_manifest_does_not_ignore_permission_error(self):
+        with mock.patch('builtins.open', side_effect=PermissionError):
+            with self.assertRaises(PermissionError):
+                storage.staticfiles_storage.read_manifest()
+
     def test_loaded_cache(self):
         self.assertNotEqual(storage.staticfiles_storage.hashed_files, {})
         manifest_content = storage.staticfiles_storage.read_manifest()
@@ -444,6 +454,18 @@ class TestCollectionManifestStorage(TestHashedFiles, CollectionTestCase):
         configured_storage.save(missing_file_name, content)
         # File exists on disk
         self.hashed_file_path(missing_file_name)
+
+    def test_intermediate_files(self):
+        cached_files = os.listdir(os.path.join(settings.STATIC_ROOT, 'cached'))
+        # Intermediate files shouldn't be created for reference.
+        self.assertEqual(
+            len([
+                cached_file
+                for cached_file in cached_files
+                if cached_file.startswith('relative.')
+            ]),
+            2,
+        )
 
 
 @override_settings(STATICFILES_STORAGE='staticfiles_tests.storage.SimpleStorage')

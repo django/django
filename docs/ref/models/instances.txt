@@ -368,7 +368,7 @@ primary key — then that auto-incremented value will be calculated and saved as
 an attribute on your object the first time you call ``save()``::
 
     >>> b2 = Blog(name='Cheddar Talk', tagline='Thoughts on cheese.')
-    >>> b2.id     # Returns None, because b doesn't have an ID yet.
+    >>> b2.id     # Returns None, because b2 doesn't have an ID yet.
     >>> b2.save()
     >>> b2.id     # Returns the ID of your new object.
 
@@ -472,7 +472,8 @@ follows this algorithm:
   ``True`` (i.e., a value other than ``None`` or the empty string), Django
   executes an ``UPDATE``.
 * If the object's primary key attribute is *not* set or if the ``UPDATE``
-  didn't update anything, Django executes an ``INSERT``.
+  didn't update anything (e.g. if primary key is set to a value that doesn't
+  exist in the database), Django executes an ``INSERT``.
 
 The one gotcha here is that you should be careful not to specify a primary-key
 value explicitly when saving new objects, if you cannot guarantee the
@@ -796,8 +797,8 @@ For example::
     >>> p.get_shirt_size_display()
     'Large'
 
-.. method:: Model.get_next_by_FOO(\**kwargs)
-.. method:: Model.get_previous_by_FOO(\**kwargs)
+.. method:: Model.get_next_by_FOO(**kwargs)
+.. method:: Model.get_previous_by_FOO(**kwargs)
 
 For every :class:`~django.db.models.DateField` and
 :class:`~django.db.models.DateTimeField` that does not have :attr:`null=True

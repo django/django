@@ -402,38 +402,6 @@ class CheckContentTypeNosniffTest(SimpleTestCase):
         self.assertEqual(self.func(None), [])
 
 
-class CheckXssFilterTest(SimpleTestCase):
-    @property
-    def func(self):
-        from django.core.checks.security.base import check_xss_filter
-        return check_xss_filter
-
-    @override_settings(
-        MIDDLEWARE=["django.middleware.security.SecurityMiddleware"],
-        SECURE_BROWSER_XSS_FILTER=False,
-    )
-    def test_no_xss_filter(self):
-        """
-        Warn if SECURE_BROWSER_XSS_FILTER isn't True.
-        """
-        self.assertEqual(self.func(None), [base.W007])
-
-    @override_settings(MIDDLEWARE=[], SECURE_BROWSER_XSS_FILTER=False)
-    def test_no_xss_filter_no_middleware(self):
-        """
-        Don't warn if SECURE_BROWSER_XSS_FILTER isn't True and
-        SecurityMiddleware isn't in MIDDLEWARE.
-        """
-        self.assertEqual(self.func(None), [])
-
-    @override_settings(
-        MIDDLEWARE=["django.middleware.security.SecurityMiddleware"],
-        SECURE_BROWSER_XSS_FILTER=True,
-    )
-    def test_with_xss_filter(self):
-        self.assertEqual(self.func(None), [])
-
-
 class CheckSSLRedirectTest(SimpleTestCase):
     @property
     def func(self):

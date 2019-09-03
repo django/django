@@ -21,7 +21,7 @@ from django.db.models.functions import (
 from django.db.models.sql import constants
 from django.db.models.sql.datastructures import Join
 from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
-from django.test.utils import Approximate
+from django.test.utils import Approximate, isolate_apps
 
 from .models import (
     UUID, UUIDPK, Company, Employee, Experiment, Number, RemoteEmployee,
@@ -37,7 +37,7 @@ class BasicExpressionsTests(TestCase):
             ceo=Employee.objects.create(firstname="Joe", lastname="Smith", salary=10)
         )
         cls.foobar_ltd = Company.objects.create(
-            name="Foobar Ltd.", num_employees=3, num_chairs=4,
+            name="Foobar Ltd.", num_employees=3, num_chairs=4, based_in_eu=True,
             ceo=Employee.objects.create(firstname="Frank", lastname="Meyer", salary=20)
         )
         cls.max = Employee.objects.create(firstname='Max', lastname='Mustermann', salary=30)
@@ -70,12 +70,24 @@ class BasicExpressionsTests(TestCase):
             ['<Company: Example Inc.>', '<Company: Foobar Ltd.>', '<Company: Test GmbH>'],
         )
 
-    @unittest.skipIf(connection.vendor == 'oracle', "Oracle doesn't support using boolean type in SELECT")
+    def test_annotate_values_count(self):
+        companies = Company.objects.annotate(foo=RawSQL('%s', ['value']))
+        self.assertEqual(companies.count(), 3)
+
+    @skipUnlessDBFeature('supports_boolean_expr_in_select_clause')
     def test_filtering_on_annotate_that_uses_q(self):
         self.assertEqual(
             Company.objects.annotate(
                 num_employees_check=ExpressionWrapper(Q(num_employees__gt=3), output_field=models.BooleanField())
             ).filter(num_employees_check=True).count(),
+            2,
+        )
+
+    def test_filtering_on_q_that_is_boolean(self):
+        self.assertEqual(
+            Company.objects.filter(
+                ExpressionWrapper(Q(num_employees__gt=3), output_field=models.BooleanField())
+            ).count(),
             2,
         )
 
@@ -281,7 +293,7 @@ class BasicExpressionsTests(TestCase):
 
         test_gmbh.point_of_contact = self.gmbh.ceo
         test_gmbh.save()
-        test_gmbh.name = F('ceo__last_name')
+        test_gmbh.name = F('ceo__lastname')
         msg = 'Joined field references are not permitted in this query'
         with self.assertRaisesMessage(FieldError, msg):
             test_gmbh.save()
@@ -379,6 +391,29 @@ class BasicExpressionsTests(TestCase):
             Exists(Company.objects.filter(ceo=OuterRef('pk'))).desc()
         )
         self.assertSequenceEqual(mustermanns_by_seniority, [self.max, mary])
+
+    def test_order_by_multiline_sql(self):
+        raw_order_by = (
+            RawSQL('''
+                CASE WHEN num_employees > 1000
+                     THEN num_chairs
+                     ELSE 0 END
+            ''', []).desc(),
+            RawSQL('''
+                CASE WHEN num_chairs > 1
+                     THEN 1
+                     ELSE 0 END
+            ''', []).asc()
+        )
+        for qs in (
+            Company.objects.all(),
+            Company.objects.distinct(),
+        ):
+            with self.subTest(qs=qs):
+                self.assertSequenceEqual(
+                    qs.order_by(*raw_order_by),
+                    [self.example_inc, self.gmbh, self.foobar_ltd],
+                )
 
     def test_outerref(self):
         inner = Company.objects.filter(point_of_contact=OuterRef('pk'))
@@ -614,6 +649,56 @@ class BasicExpressionsTests(TestCase):
     def test_incorrect_joined_field_in_F_expression(self):
         with self.assertRaisesMessage(FieldError, "Cannot resolve keyword 'nope' into field."):
             list(Company.objects.filter(ceo__pk=F('point_of_contact__nope')))
+
+    def test_exists_in_filter(self):
+        inner = Company.objects.filter(ceo=OuterRef('pk')).values('pk')
+        qs1 = Employee.objects.filter(Exists(inner))
+        qs2 = Employee.objects.annotate(found=Exists(inner)).filter(found=True)
+        self.assertCountEqual(qs1, qs2)
+        self.assertFalse(Employee.objects.exclude(Exists(inner)).exists())
+        self.assertCountEqual(qs2, Employee.objects.exclude(~Exists(inner)))
+
+    def test_subquery_in_filter(self):
+        inner = Company.objects.filter(ceo=OuterRef('pk')).values('based_in_eu')
+        self.assertSequenceEqual(
+            Employee.objects.filter(Subquery(inner)),
+            [self.foobar_ltd.ceo],
+        )
+
+    def test_case_in_filter_if_boolean_output_field(self):
+        is_ceo = Company.objects.filter(ceo=OuterRef('pk'))
+        is_poc = Company.objects.filter(point_of_contact=OuterRef('pk'))
+        qs = Employee.objects.filter(
+            Case(
+                When(Exists(is_ceo), then=True),
+                When(Exists(is_poc), then=True),
+                default=False,
+                output_field=models.BooleanField(),
+            ),
+        )
+        self.assertSequenceEqual(qs, [self.example_inc.ceo, self.foobar_ltd.ceo, self.max])
+
+    def test_boolean_expression_combined(self):
+        is_ceo = Company.objects.filter(ceo=OuterRef('pk'))
+        is_poc = Company.objects.filter(point_of_contact=OuterRef('pk'))
+        self.gmbh.point_of_contact = self.max
+        self.gmbh.save()
+        self.assertSequenceEqual(
+            Employee.objects.filter(Exists(is_ceo) | Exists(is_poc)),
+            [self.example_inc.ceo, self.foobar_ltd.ceo, self.max],
+        )
+        self.assertSequenceEqual(
+            Employee.objects.filter(Exists(is_ceo) & Exists(is_poc)),
+            [self.max],
+        )
+        self.assertSequenceEqual(
+            Employee.objects.filter(Exists(is_ceo) & Q(salary__gte=30)),
+            [self.max],
+        )
+        self.assertSequenceEqual(
+            Employee.objects.filter(Exists(is_poc) | Q(salary__lt=15)),
+            [self.example_inc.ceo, self.max],
+        )
 
 
 class IterableLookupInnerExpressionsTests(TestCase):
@@ -871,6 +956,7 @@ class ExpressionsTests(TestCase):
         )
 
 
+@isolate_apps('expressions')
 class SimpleExpressionTests(SimpleTestCase):
 
     def test_equal(self):
@@ -884,6 +970,15 @@ class SimpleExpressionTests(SimpleTestCase):
             Expression(models.CharField())
         )
 
+        class TestModel(models.Model):
+            field = models.IntegerField()
+            other_field = models.IntegerField()
+
+        self.assertNotEqual(
+            Expression(TestModel._meta.get_field('field')),
+            Expression(TestModel._meta.get_field('other_field')),
+        )
+
     def test_hash(self):
         self.assertEqual(hash(Expression()), hash(Expression()))
         self.assertEqual(
@@ -893,6 +988,15 @@ class SimpleExpressionTests(SimpleTestCase):
         self.assertNotEqual(
             hash(Expression(models.IntegerField())),
             hash(Expression(models.CharField())),
+        )
+
+        class TestModel(models.Model):
+            field = models.IntegerField()
+            other_field = models.IntegerField()
+
+        self.assertNotEqual(
+            hash(Expression(TestModel._meta.get_field('field'))),
+            hash(Expression(TestModel._meta.get_field('other_field'))),
         )
 
 

@@ -20,11 +20,6 @@ template. It can be associated with one, or multiple, sites.
 The content field may optionally be left blank if you prefer to put your
 content in a custom template.
 
-Here are some examples of flatpages on Django-powered sites:
-
-* http://www.lawrence.com/about/contact/
-* http://www2.ljworld.com/site/rules/
-
 Installation
 ============
 

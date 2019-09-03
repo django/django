@@ -108,6 +108,16 @@ class TestInline(TestDataMixin, TestCase):
         response = self.client.get(reverse('admin:admin_inlines_titlecollection_add'))
         self.assertContains(response, '<th class="column-title1 required">Title1</th>', html=True)
 
+    def test_custom_form_tabular_inline_extra_field_label(self):
+        response = self.client.get(reverse('admin:admin_inlines_outfititem_add'))
+        _, extra_field = list(response.context['inline_admin_formset'].fields())
+        self.assertEqual(extra_field['label'], 'Extra field')
+
+    def test_non_editable_custom_form_tabular_inline_extra_field_label(self):
+        response = self.client.get(reverse('admin:admin_inlines_chapter_add'))
+        _, extra_field = list(response.context['inline_admin_formset'].fields())
+        self.assertEqual(extra_field['label'], 'Extra field')
+
     def test_custom_form_tabular_inline_overridden_label(self):
         """
         SomeChildModelForm.__init__() overrides the label of a form field.
@@ -1014,6 +1024,24 @@ class SeleniumTests(AdminSeleniumTestCase):
         test_fields = ['#id_nonautopkbook_set-0-title', '#id_nonautopkbook_set-2-0-title']
         show_links = self.selenium.find_elements_by_link_text('SHOW')
         self.assertEqual(len(show_links), 3)
+        for show_index, field_name in enumerate(test_fields, 0):
+            self.wait_until_invisible(field_name)
+            show_links[show_index].click()
+            self.wait_until_visible(field_name)
+        hide_links = self.selenium.find_elements_by_link_text('HIDE')
+        self.assertEqual(len(hide_links), 2)
+        for hide_index, field_name in enumerate(test_fields, 0):
+            self.wait_until_visible(field_name)
+            hide_links[hide_index].click()
+            self.wait_until_invisible(field_name)
+
+    def test_added_stacked_inline_with_collapsed_fields(self):
+        self.admin_login(username='super', password='secret')
+        self.selenium.get(self.live_server_url + reverse('admin:admin_inlines_teacher_add'))
+        self.selenium.find_element_by_link_text('Add another Child').click()
+        test_fields = ['#id_child_set-0-name', '#id_child_set-1-name']
+        show_links = self.selenium.find_elements_by_link_text('SHOW')
+        self.assertEqual(len(show_links), 2)
         for show_index, field_name in enumerate(test_fields, 0):
             self.wait_until_invisible(field_name)
             show_links[show_index].click()

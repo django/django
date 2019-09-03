@@ -47,8 +47,8 @@ class DatabaseValidation(BaseDatabaseValidation):
         if field.db_index and field_type.lower() in self.connection._limited_data_types:
             errors.append(
                 checks.Warning(
-                    'MySQL does not support a database index on %s columns.'
-                    % field_type,
+                    '%s does not support a database index on %s columns.'
+                    % (self.connection.display_name, field_type),
                     hint=(
                         "An index won't be created. Silence this warning if "
                         "you don't care about it."

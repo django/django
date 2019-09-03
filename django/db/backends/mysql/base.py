@@ -9,6 +9,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.db import utils
 from django.db.backends import utils as backend_utils
 from django.db.backends.base.base import BaseDatabaseWrapper
+from django.utils.asyncio import async_unsafe
 from django.utils.functional import cached_property
 
 try:
@@ -60,6 +61,7 @@ class CursorWrapper:
     codes_for_integrityerror = (
         1048,  # Column cannot be null
         1690,  # BIGINT UNSIGNED value is out of range
+        4025,  # CHECK constraint failed
     )
 
     def __init__(self, cursor):
@@ -95,7 +97,6 @@ class CursorWrapper:
 
 class DatabaseWrapper(BaseDatabaseWrapper):
     vendor = 'mysql'
-    display_name = 'MySQL'
     # This dictionary maps Field objects to their associated MySQL column
     # types, as strings. Column-type strings can contain format strings; they'll
     # be interpolated against the values of Field.__dict__ before being output.
@@ -122,15 +123,18 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         'PositiveIntegerField': 'integer UNSIGNED',
         'PositiveSmallIntegerField': 'smallint UNSIGNED',
         'SlugField': 'varchar(%(max_length)s)',
+        'SmallAutoField': 'smallint AUTO_INCREMENT',
         'SmallIntegerField': 'smallint',
         'TextField': 'longtext',
         'TimeField': 'time(6)',
         'UUIDField': 'char(32)',
     }
 
-    # For these columns, MySQL doesn't:
-    # - accept default values and implicitly treats these columns as nullable
-    # - support a database index
+    # For these data types:
+    # - MySQL < 8.0.13 and MariaDB < 10.2.1 don't accept default values and
+    #   implicitly treat them as nullable
+    # - all versions of MySQL and MariaDB don't support full width database
+    #   indexes
     _limited_data_types = (
         'tinyblob', 'blob', 'mediumblob', 'longblob', 'tinytext', 'text',
         'mediumtext', 'longtext', 'json',
@@ -223,6 +227,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         kwargs.update(options)
         return kwargs
 
+    @async_unsafe
     def get_new_connection(self, conn_params):
         return Database.connect(**conn_params)
 
@@ -242,6 +247,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             with self.cursor() as cursor:
                 cursor.execute('; '.join(assignments))
 
+    @async_unsafe
     def create_cursor(self, name=None):
         cursor = self.connection.cursor()
         return CursorWrapper(cursor)
@@ -326,6 +332,19 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             return True
 
     @cached_property
+    def display_name(self):
+        return 'MariaDB' if self.mysql_is_mariadb else 'MySQL'
+
+    @cached_property
+    def data_type_check_constraints(self):
+        if self.features.supports_column_check_constraints:
+            return {
+                'PositiveIntegerField': '`%(column)s` >= 0',
+                'PositiveSmallIntegerField': '`%(column)s` >= 0',
+            }
+        return {}
+
+    @cached_property
     def mysql_server_info(self):
         with self.temporary_connection() as cursor:
             cursor.execute('SELECT VERSION()')
@@ -340,5 +359,4 @@ class DatabaseWrapper(BaseDatabaseWrapper):
 
     @cached_property
     def mysql_is_mariadb(self):
-        # MariaDB isn't officially supported.
         return 'mariadb' in self.mysql_server_info.lower()

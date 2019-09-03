@@ -38,6 +38,7 @@ Here is an example of its usage::
     'country_code': 'US',
     'country_name': 'United States',
     'dma_code': 807,
+    'is_in_european_union': False,
     'latitude': 37.419200897216797,
     'longitude': -122.05740356445312,
     'postal_code': '94043',
@@ -84,6 +85,10 @@ Keyword Arguments    Description
                      ``GeoLite2-City.mmdb``. Setting this keyword overrides
                      the :setting:`GEOIP_CITY` setting.
 ===================  =======================================================
+
+.. versionchanged:: 3.0
+
+    Support for :class:`pathlib.Path` ``path`` was added.
 
 Methods
 =======
@@ -150,9 +155,13 @@ Settings
 ``GEOIP_PATH``
 --------------
 
-A string specifying the directory where the GeoIP data files are
-located. This setting is *required* unless manually specified
+A string or :class:`pathlib.Path` specifying the directory where the GeoIP data
+files are located. This setting is *required* unless manually specified
 with ``path`` keyword when initializing the :class:`GeoIP2` object.
+
+.. versionchanged:: 3.0
+
+    Support for :class:`pathlib.Path` was added.
 
 .. setting:: GEOIP_COUNTRY
 

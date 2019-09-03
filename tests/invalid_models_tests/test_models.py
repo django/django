@@ -117,6 +117,19 @@ class IndexTogetherTests(SimpleTestCase):
             ),
         ])
 
+    def test_pointing_to_fk(self):
+        class Foo(models.Model):
+            pass
+
+        class Bar(models.Model):
+            foo_1 = models.ForeignKey(Foo, on_delete=models.CASCADE, related_name='bar_1')
+            foo_2 = models.ForeignKey(Foo, on_delete=models.CASCADE, related_name='bar_2')
+
+            class Meta:
+                index_together = [['foo_1_id', 'foo_2']]
+
+        self.assertEqual(Bar.check(), [])
+
 
 # unique_together tests are very similar to index_together tests.
 @isolate_apps('invalid_models_tests')
@@ -204,6 +217,19 @@ class UniqueTogetherTests(SimpleTestCase):
             ),
         ])
 
+    def test_pointing_to_fk(self):
+        class Foo(models.Model):
+            pass
+
+        class Bar(models.Model):
+            foo_1 = models.ForeignKey(Foo, on_delete=models.CASCADE, related_name='bar_1')
+            foo_2 = models.ForeignKey(Foo, on_delete=models.CASCADE, related_name='bar_2')
+
+            class Meta:
+                unique_together = [['foo_1_id', 'foo_2']]
+
+        self.assertEqual(Bar.check(), [])
+
 
 @isolate_apps('invalid_models_tests')
 class IndexesTests(SimpleTestCase):
@@ -254,6 +280,52 @@ class IndexesTests(SimpleTestCase):
                 hint='This issue may be caused by multi-table inheritance.',
                 obj=Bar,
                 id='models.E016',
+            ),
+        ])
+
+    def test_pointing_to_fk(self):
+        class Foo(models.Model):
+            pass
+
+        class Bar(models.Model):
+            foo_1 = models.ForeignKey(Foo, on_delete=models.CASCADE, related_name='bar_1')
+            foo_2 = models.ForeignKey(Foo, on_delete=models.CASCADE, related_name='bar_2')
+
+            class Meta:
+                indexes = [models.Index(fields=['foo_1_id', 'foo_2'], name='index_name')]
+
+        self.assertEqual(Bar.check(), [])
+
+    def test_name_constraints(self):
+        class Model(models.Model):
+            class Meta:
+                indexes = [
+                    models.Index(fields=['id'], name='_index_name'),
+                    models.Index(fields=['id'], name='5index_name'),
+                ]
+
+        self.assertEqual(Model.check(), [
+            Error(
+                "The index name '%sindex_name' cannot start with an "
+                "underscore or a number." % prefix,
+                obj=Model,
+                id='models.E033',
+            ) for prefix in ('_', '5')
+        ])
+
+    def test_max_name_length(self):
+        index_name = 'x' * 31
+
+        class Model(models.Model):
+            class Meta:
+                indexes = [models.Index(fields=['id'], name=index_name)]
+
+        self.assertEqual(Model.check(), [
+            Error(
+                "The index name '%s' cannot be longer than 30 characters."
+                % index_name,
+                obj=Model,
+                id='models.E034',
             ),
         ])
 
@@ -1119,3 +1191,13 @@ class ConstraintsTests(SimpleTestCase):
         )
         expected = [] if connection.features.supports_table_check_constraints else [warn, warn]
         self.assertCountEqual(errors, expected)
+
+    def test_check_constraints_required_db_features(self):
+        class Model(models.Model):
+            age = models.IntegerField()
+
+            class Meta:
+                required_db_features = {'supports_table_check_constraints'}
+                constraints = [models.CheckConstraint(check=models.Q(age__gte=18), name='is_adult')]
+
+        self.assertEqual(Model.check(), [])

@@ -10,7 +10,7 @@ from django.utils.safestring import mark_safe
 from django.utils.timezone import is_aware, utc
 from django.utils.translation import (
     gettext as _, gettext_lazy, ngettext, ngettext_lazy, npgettext_lazy,
-    pgettext,
+    pgettext, round_away_from_one,
 )
 
 register = template.Library()
@@ -158,7 +158,8 @@ def intword(value):
         large_number = 10 ** exponent
         if value < large_number * 1000:
             new_value = value / large_number
-            return _check_for_i18n(new_value, *converters(new_value))
+            rounded_value = round_away_from_one(new_value)
+            return _check_for_i18n(new_value, *converters(rounded_value))
     return value
 
 

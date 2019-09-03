@@ -28,6 +28,9 @@ from django.utils import timezone
 from django.utils.functional import cached_property, partition
 from django.utils.version import get_version
 
+# The maximum number of results to fetch in a get() query.
+MAX_GET_RESULTS = 21
+
 # The maximum number of items to display in a QuerySet.__repr__
 REPR_OUTPUT_SIZE = 20
 
@@ -280,7 +283,10 @@ class QuerySet:
     def __getitem__(self, k):
         """Retrieve an item or slice from the set of results."""
         if not isinstance(k, (int, slice)):
-            raise TypeError
+            raise TypeError(
+                'QuerySet indices must be integers or slices, not %s.'
+                % type(k).__name__
+            )
         assert ((not isinstance(k, slice) and (k >= 0)) or
                 (isinstance(k, slice) and (k.start is None or k.start >= 0) and
                  (k.stop is None or k.stop >= 0))), \
@@ -395,9 +401,13 @@ class QuerySet:
         Perform the query and return a single object matching the given
         keyword arguments.
         """
-        clone = self.filter(*args, **kwargs)
+        clone = self._chain() if self.query.combinator else self.filter(*args, **kwargs)
         if self.query.can_filter() and not self.query.distinct_fields:
             clone = clone.order_by()
+        limit = None
+        if not clone.query.select_for_update or connections[clone.db].features.supports_select_for_update_with_limit:
+            limit = MAX_GET_RESULTS
+            clone.query.set_limits(high=limit)
         num = len(clone)
         if num == 1:
             return clone._result_cache[0]
@@ -407,8 +417,10 @@ class QuerySet:
                 self.model._meta.object_name
             )
         raise self.model.MultipleObjectsReturned(
-            "get() returned more than one %s -- it returned %s!" %
-            (self.model._meta.object_name, num)
+            'get() returned more than one %s -- it returned %s!' % (
+                self.model._meta.object_name,
+                num if not limit or num < limit else 'more than %s' % (limit - 1),
+            )
         )
 
     def create(self, **kwargs):
@@ -623,7 +635,7 @@ class QuerySet:
                 "arguments or 'get_latest_by' in the model's Meta."
             )
 
-        assert self.query.can_filter(), \
+        assert not self.query.is_sliced, \
             "Cannot change a query once a slice has been taken."
         obj = self._chain()
         obj.query.set_limits(high=1)
@@ -652,7 +664,7 @@ class QuerySet:
         Return a dictionary mapping each of the given IDs to the object with
         that ID. If `id_list` isn't provided, evaluate the entire QuerySet.
         """
-        assert self.query.can_filter(), \
+        assert not self.query.is_sliced, \
             "Cannot use 'limit' or 'offset' with in_bulk"
         if field_name != 'pk' and not self.model._meta.get_field(field_name).unique:
             raise ValueError("in_bulk()'s field_name must be a unique field but %r isn't." % field_name)
@@ -677,7 +689,7 @@ class QuerySet:
 
     def delete(self):
         """Delete the records in the current QuerySet."""
-        assert self.query.can_filter(), \
+        assert not self.query.is_sliced, \
             "Cannot use 'limit' or 'offset' with delete."
 
         if self._fields is not None:
@@ -719,7 +731,7 @@ class QuerySet:
         Update all elements in the current QuerySet, setting all the given
         fields to the appropriate values.
         """
-        assert self.query.can_filter(), \
+        assert not self.query.is_sliced, \
             "Cannot update a query once a slice has been taken."
         self._for_write = True
         query = self.query.chain(sql.UpdateQuery)
@@ -739,7 +751,7 @@ class QuerySet:
         code (it requires too much poking around at model internals to be
         useful at that level).
         """
-        assert self.query.can_filter(), \
+        assert not self.query.is_sliced, \
             "Cannot update a query once a slice has been taken."
         query = self.query.chain(sql.UpdateQuery)
         query.add_update_fields(values)
@@ -878,6 +890,7 @@ class QuerySet:
         Return a new QuerySet instance with the args ANDed to the existing
         set.
         """
+        self._not_support_combined_queries('filter')
         return self._filter_or_exclude(False, *args, **kwargs)
 
     def exclude(self, *args, **kwargs):
@@ -885,11 +898,12 @@ class QuerySet:
         Return a new QuerySet instance with NOT (args) ANDed to the existing
         set.
         """
+        self._not_support_combined_queries('exclude')
         return self._filter_or_exclude(True, *args, **kwargs)
 
     def _filter_or_exclude(self, negate, *args, **kwargs):
         if args or kwargs:
-            assert self.query.can_filter(), \
+            assert not self.query.is_sliced, \
                 "Cannot filter a query once a slice has been taken."
 
         clone = self._chain()
@@ -973,7 +987,7 @@ class QuerySet:
 
         If select_related(None) is called, clear the list.
         """
-
+        self._not_support_combined_queries('select_related')
         if self._fields is not None:
             raise TypeError("Cannot call select_related() after .values() or .values_list()")
 
@@ -995,6 +1009,7 @@ class QuerySet:
         When prefetch_related() is called more than once, append to the list of
         prefetch lookups. If prefetch_related(None) is called, clear the list.
         """
+        self._not_support_combined_queries('prefetch_related')
         clone = self._chain()
         if lookups == (None,):
             clone._prefetch_related_lookups = ()
@@ -1013,6 +1028,7 @@ class QuerySet:
         Return a query set in which the returned objects have been annotated
         with extra data or aggregations.
         """
+        self._not_support_combined_queries('annotate')
         self._validate_values_are_expressions(args + tuple(kwargs.values()), method_name='annotate')
         annotations = {}
         for arg in args:
@@ -1056,7 +1072,7 @@ class QuerySet:
 
     def order_by(self, *field_names):
         """Return a new QuerySet instance with the ordering changed."""
-        assert self.query.can_filter(), \
+        assert not self.query.is_sliced, \
             "Cannot reorder a query once a slice has been taken."
         obj = self._chain()
         obj.query.clear_ordering(force_empty=False)
@@ -1067,7 +1083,7 @@ class QuerySet:
         """
         Return a new QuerySet instance that will select only distinct results.
         """
-        assert self.query.can_filter(), \
+        assert not self.query.is_sliced, \
             "Cannot create distinct fields once a slice has been taken."
         obj = self._chain()
         obj.query.add_distinct_fields(*field_names)
@@ -1076,7 +1092,8 @@ class QuerySet:
     def extra(self, select=None, where=None, params=None, tables=None,
               order_by=None, select_params=None):
         """Add extra SQL fragments to the query."""
-        assert self.query.can_filter(), \
+        self._not_support_combined_queries('extra')
+        assert not self.query.is_sliced, \
             "Cannot change a query once a slice has been taken"
         clone = self._chain()
         clone.query.add_extra(select, select_params, where, params, tables, order_by)
@@ -1084,7 +1101,7 @@ class QuerySet:
 
     def reverse(self):
         """Reverse the ordering of the QuerySet."""
-        if not self.query.can_filter():
+        if self.query.is_sliced:
             raise TypeError('Cannot reverse a query once a slice has been taken.')
         clone = self._chain()
         clone.query.standard_ordering = not clone.query.standard_ordering
@@ -1097,6 +1114,7 @@ class QuerySet:
         The only exception to this is if None is passed in as the only
         parameter, in which case removal all deferrals.
         """
+        self._not_support_combined_queries('defer')
         if self._fields is not None:
             raise TypeError("Cannot call defer() after .values() or .values_list()")
         clone = self._chain()
@@ -1112,6 +1130,7 @@ class QuerySet:
         method and that are not already specified as deferred are loaded
         immediately when the queryset is evaluated.
         """
+        self._not_support_combined_queries('only')
         if self._fields is not None:
             raise TypeError("Cannot call only() after .values() or .values_list()")
         if fields == (None,):
@@ -1298,6 +1317,13 @@ class QuerySet:
                     method_name,
                     ', '.join(invalid_args),
                 )
+            )
+
+    def _not_support_combined_queries(self, operation_name):
+        if self.query.combinator:
+            raise NotSupportedError(
+                'Calling QuerySet.%s() after %s() is not supported.'
+                % (operation_name, self.query.combinator)
             )
 
 
@@ -1547,7 +1573,7 @@ def prefetch_related_objects(model_instances, *related_lookups):
     while all_lookups:
         lookup = all_lookups.pop()
         if lookup.prefetch_to in done_queries:
-            if lookup.queryset:
+            if lookup.queryset is not None:
                 raise ValueError("'%s' lookup was already seen with a different queryset. "
                                  "You may need to adjust the ordering of your lookups." % lookup.prefetch_to)
 

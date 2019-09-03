@@ -178,7 +178,7 @@ class UserAttributeSimilarityValidatorTest(TestCase):
     def test_help_text(self):
         self.assertEqual(
             UserAttributeSimilarityValidator().get_help_text(),
-            "Your password can't be too similar to your other personal information."
+            'Your password can’t be too similar to your other personal information.'
         )
 
 
@@ -210,7 +210,7 @@ class CommonPasswordValidatorTest(SimpleTestCase):
     def test_help_text(self):
         self.assertEqual(
             CommonPasswordValidator().get_help_text(),
-            "Your password can't be a commonly used password."
+            'Your password can’t be a commonly used password.'
         )
 
 
@@ -227,7 +227,7 @@ class NumericPasswordValidatorTest(SimpleTestCase):
     def test_help_text(self):
         self.assertEqual(
             NumericPasswordValidator().get_help_text(),
-            "Your password can't be entirely numeric."
+            'Your password can’t be entirely numeric.'
         )
 
 

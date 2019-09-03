@@ -1,1 +1,1 @@
-psycopg2-binary>=2.5.4
+psycopg2>=2.5.4

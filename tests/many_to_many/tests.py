@@ -1,12 +1,10 @@
 from unittest import mock
 
-from django.db import connection, transaction
+from django.db import transaction
 from django.test import TestCase, skipUnlessDBFeature
-from django.test.utils import CaptureQueriesContext
 
 from .models import (
-    Article, InheritedArticleA, InheritedArticleB, NullablePublicationThrough,
-    NullableTargetArticle, Publication,
+    Article, InheritedArticleA, InheritedArticleB, Publication, User,
 )
 
 
@@ -79,6 +77,32 @@ class ManyToManyTests(TestCase):
                 '<Publication: The Python Journal>',
             ]
         )
+
+    def test_add_remove_set_by_pk(self):
+        a5 = Article.objects.create(headline='Django lets you create Web apps easily')
+        a5.publications.add(self.p1.pk)
+        self.assertQuerysetEqual(
+            a5.publications.all(),
+            ['<Publication: The Python Journal>'],
+        )
+        a5.publications.set([self.p2.pk])
+        self.assertQuerysetEqual(
+            a5.publications.all(),
+            ['<Publication: Science News>'],
+        )
+        a5.publications.remove(self.p2.pk)
+        self.assertQuerysetEqual(a5.publications.all(), [])
+
+    def test_add_remove_set_by_to_field(self):
+        user_1 = User.objects.create(username='Jean')
+        user_2 = User.objects.create(username='Joe')
+        a5 = Article.objects.create(headline='Django lets you create Web apps easily')
+        a5.authors.add(user_1.username)
+        self.assertQuerysetEqual(a5.authors.all(), ['<User: Jean>'])
+        a5.authors.set([user_2.username])
+        self.assertQuerysetEqual(a5.authors.all(), ['<User: Joe>'])
+        a5.authors.remove(user_2.username)
+        self.assertQuerysetEqual(a5.authors.all(), [])
 
     def test_reverse_add(self):
         # Adding via the 'other' end of an m2m
@@ -585,36 +609,8 @@ class ManyToManyTests(TestCase):
         )
         self.assertQuerysetEqual(b.publications.all(), ['<Publication: Science Weekly>'])
 
-
-class ManyToManyQueryTests(TestCase):
-    @classmethod
-    def setUpTestData(cls):
-        cls.article = Article.objects.create(headline='Django lets you build Web apps easily')
-        cls.nullable_target_article = NullableTargetArticle.objects.create(headline='The python is good')
-        NullablePublicationThrough.objects.create(article=cls.nullable_target_article, publication=None)
-
-    @skipUnlessDBFeature('supports_foreign_keys')
-    def test_count_join_optimization(self):
-        with CaptureQueriesContext(connection) as query:
-            self.article.publications.count()
-        self.assertNotIn('JOIN', query[0]['sql'])
-        self.assertEqual(self.nullable_target_article.publications.count(), 0)
-
-    def test_count_join_optimization_disabled(self):
-        with mock.patch.object(connection.features, 'supports_foreign_keys', False), \
-                CaptureQueriesContext(connection) as query:
-            self.article.publications.count()
-        self.assertIn('JOIN', query[0]['sql'])
-
-    @skipUnlessDBFeature('supports_foreign_keys')
-    def test_exists_join_optimization(self):
-        with CaptureQueriesContext(connection) as query:
-            self.article.publications.exists()
-        self.assertNotIn('JOIN', query[0]['sql'])
-        self.assertIs(self.nullable_target_article.publications.exists(), False)
-
-    def test_exists_join_optimization_disabled(self):
-        with mock.patch.object(connection.features, 'supports_foreign_keys', False), \
-                CaptureQueriesContext(connection) as query:
-            self.article.publications.exists()
-        self.assertIn('JOIN', query[0]['sql'])
+    def test_custom_default_manager_exists_count(self):
+        a5 = Article.objects.create(headline='deleted')
+        a5.publications.add(self.p2)
+        self.assertEqual(self.p2.article_set.count(), self.p2.article_set.all().count())
+        self.assertEqual(self.p3.article_set.exists(), self.p3.article_set.all().exists())

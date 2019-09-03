@@ -15,6 +15,7 @@ from django.db import (
     DEFAULT_DB_ALIAS, DJANGO_VERSION_PICKLE_KEY, DatabaseError, connection,
     connections, router, transaction,
 )
+from django.db.models import NOT_PROVIDED
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.constraints import CheckConstraint, UniqueConstraint
 from django.db.models.deletion import CASCADE, Collector
@@ -457,11 +458,6 @@ class Model(metaclass=ModelBase):
                             val = kwargs.pop(field.attname)
                         except KeyError:
                             val = field.get_default()
-                    else:
-                        # Object instance was passed in. Special case: You can
-                        # pass in "None" for related objects if it's allowed.
-                        if rel_obj is None and field.null:
-                            val = None
                 else:
                     try:
                         val = kwargs.pop(field.attname)
@@ -678,13 +674,15 @@ class Model(metaclass=ModelBase):
             # been assigned and there's no need to worry about this check.
             if field.is_relation and field.is_cached(self):
                 obj = getattr(self, field.name, None)
+                if not obj:
+                    continue
                 # A pk may have been assigned manually to a model instance not
                 # saved to the database (or auto-generated in a case like
                 # UUIDField), but we allow the save to proceed and rely on the
                 # database to raise an IntegrityError if applicable. If
                 # constraints aren't supported by the database, there's the
                 # unavoidable risk of data corruption.
-                if obj and obj.pk is None:
+                if obj.pk is None:
                     # Remove the object from a related instance cache.
                     if not field.remote_field.multiple:
                         field.remote_field.delete_cached_value(obj)
@@ -692,9 +690,13 @@ class Model(metaclass=ModelBase):
                         "save() prohibited to prevent data loss due to "
                         "unsaved related object '%s'." % field.name
                     )
+                elif getattr(self, field.attname) is None:
+                    # Use pk from related object if it has been saved after
+                    # an assignment.
+                    setattr(self, field.attname, obj.pk)
                 # If the relationship's pk/to_field was changed, clear the
                 # cached relationship.
-                if obj and getattr(obj, field.target_field.attname) != getattr(self, field.attname):
+                if getattr(obj, field.target_field.attname) != getattr(self, field.attname):
                     field.delete_cached_value(self)
 
         using = using or router.db_for_write(self.__class__, instance=self)
@@ -727,7 +729,7 @@ class Model(metaclass=ModelBase):
                                  % ', '.join(non_model_fields))
 
         # If saving to the same database, and this model is deferred, then
-        # automatically do a "update_fields" save on the loaded fields.
+        # automatically do an "update_fields" save on the loaded fields.
         elif not force_insert and deferred_fields and using == self._state.db:
             field_names = set()
             for field in self._meta.concrete_fields:
@@ -841,6 +843,14 @@ class Model(metaclass=ModelBase):
         if not pk_set and (force_update or update_fields):
             raise ValueError("Cannot force an update in save() with no primary key.")
         updated = False
+        # Skip an UPDATE when adding an instance and primary key has a default.
+        if (
+            not force_insert and
+            self._state.adding and
+            self._meta.pk.default and
+            self._meta.pk.default is not NOT_PROVIDED
+        ):
+            force_insert = True
         # If possible, try an UPDATE. If that doesn't update anything, do an INSERT.
         if pk_set and not force_insert:
             base_qs = cls._base_manager.using(using)
@@ -1561,9 +1571,32 @@ class Model(metaclass=ModelBase):
 
     @classmethod
     def _check_indexes(cls):
-        """Check the fields of indexes."""
+        """Check the fields and names of indexes."""
+        errors = []
+        for index in cls._meta.indexes:
+            # Index name can't start with an underscore or a number, restricted
+            # for cross-database compatibility with Oracle.
+            if index.name[0] == '_' or index.name[0].isdigit():
+                errors.append(
+                    checks.Error(
+                        "The index name '%s' cannot start with an underscore "
+                        "or a number." % index.name,
+                        obj=cls,
+                        id='models.E033',
+                    ),
+                )
+            if len(index.name) > index.max_name_length:
+                errors.append(
+                    checks.Error(
+                        "The index name '%s' cannot be longer than %d "
+                        "characters." % (index.name, index.max_name_length),
+                        obj=cls,
+                        id='models.E034',
+                    ),
+                )
         fields = [field for index in cls._meta.indexes for field, _ in index.fields_orders]
-        return cls._check_local_fields(fields, 'indexes')
+        errors.extend(cls._check_local_fields(fields, 'indexes'))
+        return errors
 
     @classmethod
     def _check_local_fields(cls, fields, option):
@@ -1571,9 +1604,11 @@ class Model(metaclass=ModelBase):
 
         # In order to avoid hitting the relation tree prematurely, we use our
         # own fields_map instead of using get_field()
-        forward_fields_map = {
-            field.name: field for field in cls._meta._get_fields(reverse=False)
-        }
+        forward_fields_map = {}
+        for field in cls._meta._get_fields(reverse=False):
+            forward_fields_map[field.name] = field
+            if hasattr(field, 'attname'):
+                forward_fields_map[field.attname] = field
 
         errors = []
         for field_name in fields:
@@ -1787,7 +1822,10 @@ class Model(metaclass=ModelBase):
             if not router.allow_migrate_model(db, cls):
                 continue
             connection = connections[db]
-            if connection.features.supports_table_check_constraints:
+            if (
+                connection.features.supports_table_check_constraints or
+                'supports_table_check_constraints' in cls._meta.required_db_features
+            ):
                 continue
             if any(isinstance(constraint, CheckConstraint) for constraint in cls._meta.constraints):
                 errors.append(

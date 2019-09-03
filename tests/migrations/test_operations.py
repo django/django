@@ -10,161 +10,11 @@ from django.db.utils import IntegrityError
 from django.test import SimpleTestCase, override_settings, skipUnlessDBFeature
 
 from .models import FoodManager, FoodQuerySet, UnicodeModel
-from .test_base import MigrationTestBase
+from .test_base import OperationTestBase
 
 
 class Mixin:
     pass
-
-
-class OperationTestBase(MigrationTestBase):
-    """
-    Common functions to help test operations.
-    """
-
-    @classmethod
-    def setUpClass(cls):
-        super().setUpClass()
-        cls._initial_table_names = frozenset(connection.introspection.table_names())
-
-    def tearDown(self):
-        self.cleanup_test_tables()
-        super().tearDown()
-
-    def cleanup_test_tables(self):
-        table_names = frozenset(connection.introspection.table_names()) - self._initial_table_names
-        with connection.schema_editor() as editor:
-            with connection.constraint_checks_disabled():
-                for table_name in table_names:
-                    editor.execute(editor.sql_delete_table % {
-                        'table': editor.quote_name(table_name),
-                    })
-
-    def apply_operations(self, app_label, project_state, operations, atomic=True):
-        migration = Migration('name', app_label)
-        migration.operations = operations
-        with connection.schema_editor(atomic=atomic) as editor:
-            return migration.apply(project_state, editor)
-
-    def unapply_operations(self, app_label, project_state, operations, atomic=True):
-        migration = Migration('name', app_label)
-        migration.operations = operations
-        with connection.schema_editor(atomic=atomic) as editor:
-            return migration.unapply(project_state, editor)
-
-    def make_test_state(self, app_label, operation, **kwargs):
-        """
-        Makes a test state using set_up_test_model and returns the
-        original state and the state after the migration is applied.
-        """
-        project_state = self.set_up_test_model(app_label, **kwargs)
-        new_state = project_state.clone()
-        operation.state_forwards(app_label, new_state)
-        return project_state, new_state
-
-    def set_up_test_model(
-            self, app_label, second_model=False, third_model=False, index=False, multicol_index=False,
-            related_model=False, mti_model=False, proxy_model=False, manager_model=False,
-            unique_together=False, options=False, db_table=None, index_together=False, constraints=None):
-        """
-        Creates a test model state and database table.
-        """
-        # Make the "current" state
-        model_options = {
-            "swappable": "TEST_SWAP_MODEL",
-            "index_together": [["weight", "pink"]] if index_together else [],
-            "unique_together": [["pink", "weight"]] if unique_together else [],
-        }
-        if options:
-            model_options["permissions"] = [("can_groom", "Can groom")]
-        if db_table:
-            model_options["db_table"] = db_table
-        operations = [migrations.CreateModel(
-            "Pony",
-            [
-                ("id", models.AutoField(primary_key=True)),
-                ("pink", models.IntegerField(default=3)),
-                ("weight", models.FloatField()),
-            ],
-            options=model_options,
-        )]
-        if index:
-            operations.append(migrations.AddIndex(
-                "Pony",
-                models.Index(fields=["pink"], name="pony_pink_idx")
-            ))
-        if multicol_index:
-            operations.append(migrations.AddIndex(
-                "Pony",
-                models.Index(fields=["pink", "weight"], name="pony_test_idx")
-            ))
-        if constraints:
-            for constraint in constraints:
-                operations.append(migrations.AddConstraint(
-                    "Pony",
-                    constraint,
-                ))
-        if second_model:
-            operations.append(migrations.CreateModel(
-                "Stable",
-                [
-                    ("id", models.AutoField(primary_key=True)),
-                ]
-            ))
-        if third_model:
-            operations.append(migrations.CreateModel(
-                "Van",
-                [
-                    ("id", models.AutoField(primary_key=True)),
-                ]
-            ))
-        if related_model:
-            operations.append(migrations.CreateModel(
-                "Rider",
-                [
-                    ("id", models.AutoField(primary_key=True)),
-                    ("pony", models.ForeignKey("Pony", models.CASCADE)),
-                    ("friend", models.ForeignKey("self", models.CASCADE))
-                ],
-            ))
-        if mti_model:
-            operations.append(migrations.CreateModel(
-                "ShetlandPony",
-                fields=[
-                    ('pony_ptr', models.OneToOneField(
-                        'Pony',
-                        models.CASCADE,
-                        auto_created=True,
-                        parent_link=True,
-                        primary_key=True,
-                        to_field='id',
-                        serialize=False,
-                    )),
-                    ("cuteness", models.IntegerField(default=1)),
-                ],
-                bases=['%s.Pony' % app_label],
-            ))
-        if proxy_model:
-            operations.append(migrations.CreateModel(
-                "ProxyPony",
-                fields=[],
-                options={"proxy": True},
-                bases=['%s.Pony' % app_label],
-            ))
-        if manager_model:
-            operations.append(migrations.CreateModel(
-                "Food",
-                fields=[
-                    ("id", models.AutoField(primary_key=True)),
-                ],
-                managers=[
-                    ("food_qs", FoodQuerySet.as_manager()),
-                    ("food_mgr", FoodManager("a", "b")),
-                    ("food_mgr_kwargs", FoodManager("x", "y", 3, 4)),
-                ]
-            ))
-
-        return self.apply_operations(app_label, ProjectState(), operations)
 
 
 class OperationTests(OperationTestBase):
@@ -1856,6 +1706,72 @@ class OperationTests(OperationTestBase):
         self.assertEqual(definition[2], {'model_name': "Pony", 'constraint': gt_constraint})
 
     @skipUnlessDBFeature('supports_table_check_constraints')
+    def test_add_constraint_percent_escaping(self):
+        app_label = 'add_constraint_string_quoting'
+        operations = [
+            CreateModel(
+                'Author',
+                fields=[
+                    ('id', models.AutoField(primary_key=True)),
+                    ('name', models.CharField(max_length=100)),
+                    ('rebate', models.CharField(max_length=100)),
+                ],
+            ),
+        ]
+        from_state = self.apply_operations(app_label, ProjectState(), operations)
+        # "%" generated in startswith lookup should be escaped in a way that is
+        # considered a leading wildcard.
+        check = models.Q(name__startswith='Albert')
+        constraint = models.CheckConstraint(check=check, name='name_constraint')
+        operation = migrations.AddConstraint('Author', constraint)
+        to_state = from_state.clone()
+        operation.state_forwards(app_label, to_state)
+        with connection.schema_editor() as editor:
+            operation.database_forwards(app_label, editor, from_state, to_state)
+        Author = to_state.apps.get_model(app_label, 'Author')
+        with self.assertRaises(IntegrityError), transaction.atomic():
+            Author.objects.create(name='Artur')
+        # Literal "%" should be escaped in a way that is not a considered a
+        # wildcard.
+        check = models.Q(rebate__endswith='%')
+        constraint = models.CheckConstraint(check=check, name='rebate_constraint')
+        operation = migrations.AddConstraint('Author', constraint)
+        from_state = to_state
+        to_state = from_state.clone()
+        operation.state_forwards(app_label, to_state)
+        Author = to_state.apps.get_model(app_label, 'Author')
+        with connection.schema_editor() as editor:
+            operation.database_forwards(app_label, editor, from_state, to_state)
+        Author = to_state.apps.get_model(app_label, 'Author')
+        with self.assertRaises(IntegrityError), transaction.atomic():
+            Author.objects.create(name='Albert', rebate='10$')
+        author = Author.objects.create(name='Albert', rebate='10%')
+        self.assertEqual(Author.objects.get(), author)
+
+    @skipUnlessDBFeature('supports_table_check_constraints')
+    def test_add_or_constraint(self):
+        app_label = 'test_addorconstraint'
+        constraint_name = 'add_constraint_or'
+        from_state = self.set_up_test_model(app_label)
+        check = models.Q(pink__gt=2, weight__gt=2) | models.Q(weight__lt=0)
+        constraint = models.CheckConstraint(check=check, name=constraint_name)
+        operation = migrations.AddConstraint('Pony', constraint)
+        to_state = from_state.clone()
+        operation.state_forwards(app_label, to_state)
+        with connection.schema_editor() as editor:
+            operation.database_forwards(app_label, editor, from_state, to_state)
+        Pony = to_state.apps.get_model(app_label, 'Pony')
+        with self.assertRaises(IntegrityError), transaction.atomic():
+            Pony.objects.create(pink=2, weight=3.0)
+        with self.assertRaises(IntegrityError), transaction.atomic():
+            Pony.objects.create(pink=3, weight=1.0)
+        Pony.objects.bulk_create([
+            Pony(pink=3, weight=-1.0),
+            Pony(pink=1, weight=-1.0),
+            Pony(pink=3, weight=3.0),
+        ])
+
+    @skipUnlessDBFeature('supports_table_check_constraints')
     def test_remove_constraint(self):
         project_state = self.set_up_test_model("test_removeconstraint", constraints=[
             models.CheckConstraint(check=models.Q(pink__gt=2), name="test_remove_constraint_pony_pink_gt_2"),
@@ -2585,9 +2501,13 @@ class OperationTests(OperationTestBase):
             fill_data.state_forwards("fill_data", new_state)
             fill_data.database_forwards("fill_data", editor, project_state, new_state)
 
-    def test_autofield_foreignfield_growth(self):
+    def _test_autofield_foreignfield_growth(self, source_field, target_field, target_value):
         """
-        A field may be migrated from AutoField to BigAutoField.
+        A field may be migrated in the following ways:
+
+        - AutoField to BigAutoField
+        - SmallAutoField to AutoField
+        - SmallAutoField to BigAutoField
         """
         def create_initial_data(models, schema_editor):
             Article = models.get_model("test_article", "Article")
@@ -2599,14 +2519,14 @@ class OperationTests(OperationTestBase):
         def create_big_data(models, schema_editor):
             Article = models.get_model("test_article", "Article")
             Blog = models.get_model("test_blog", "Blog")
-            blog2 = Blog.objects.create(name="Frameworks", id=2 ** 33)
+            blog2 = Blog.objects.create(name="Frameworks", id=target_value)
             Article.objects.create(name="Django", blog=blog2)
-            Article.objects.create(id=2 ** 33, name="Django2", blog=blog2)
+            Article.objects.create(id=target_value, name="Django2", blog=blog2)
 
         create_blog = migrations.CreateModel(
             "Blog",
             [
-                ("id", models.AutoField(primary_key=True)),
+                ("id", source_field(primary_key=True)),
                 ("name", models.CharField(max_length=100)),
             ],
             options={},
@@ -2614,7 +2534,7 @@ class OperationTests(OperationTestBase):
         create_article = migrations.CreateModel(
             "Article",
             [
-                ("id", models.AutoField(primary_key=True)),
+                ("id", source_field(primary_key=True)),
                 ("blog", models.ForeignKey(to="test_blog.Blog", on_delete=models.CASCADE)),
                 ("name", models.CharField(max_length=100)),
                 ("data", models.TextField(default="")),
@@ -2624,8 +2544,8 @@ class OperationTests(OperationTestBase):
         fill_initial_data = migrations.RunPython(create_initial_data, create_initial_data)
         fill_big_data = migrations.RunPython(create_big_data, create_big_data)
 
-        grow_article_id = migrations.AlterField("Article", "id", models.BigAutoField(primary_key=True))
-        grow_blog_id = migrations.AlterField("Blog", "id", models.BigAutoField(primary_key=True))
+        grow_article_id = migrations.AlterField('Article', 'id', target_field(primary_key=True))
+        grow_blog_id = migrations.AlterField('Blog', 'id', target_field(primary_key=True))
 
         project_state = ProjectState()
         new_state = project_state.clone()
@@ -2653,7 +2573,7 @@ class OperationTests(OperationTestBase):
 
         state = new_state.clone()
         article = state.apps.get_model("test_article.Article")
-        self.assertIsInstance(article._meta.pk, models.BigAutoField)
+        self.assertIsInstance(article._meta.pk, target_field)
 
         project_state = new_state
         new_state = new_state.clone()
@@ -2663,13 +2583,37 @@ class OperationTests(OperationTestBase):
 
         state = new_state.clone()
         blog = state.apps.get_model("test_blog.Blog")
-        self.assertIsInstance(blog._meta.pk, models.BigAutoField)
+        self.assertIsInstance(blog._meta.pk, target_field)
 
         project_state = new_state
         new_state = new_state.clone()
         with connection.schema_editor() as editor:
             fill_big_data.state_forwards("fill_big_data", new_state)
             fill_big_data.database_forwards("fill_big_data", editor, project_state, new_state)
+
+    def test_autofield__bigautofield_foreignfield_growth(self):
+        """A field may be migrated from AutoField to BigAutoField."""
+        self._test_autofield_foreignfield_growth(
+            models.AutoField,
+            models.BigAutoField,
+            2 ** 33,
+        )
+
+    def test_smallfield_autofield_foreignfield_growth(self):
+        """A field may be migrated from SmallAutoField to AutoField."""
+        self._test_autofield_foreignfield_growth(
+            models.SmallAutoField,
+            models.AutoField,
+            2 ** 22,
+        )
+
+    def test_smallfield_bigautofield_foreignfield_growth(self):
+        """A field may be migrated from SmallAutoField to BigAutoField."""
+        self._test_autofield_foreignfield_growth(
+            models.SmallAutoField,
+            models.BigAutoField,
+            2 ** 33,
+        )
 
     def test_run_python_noop(self):
         """

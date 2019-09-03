@@ -49,6 +49,22 @@ The name of the index. If ``name`` isn't provided Django will auto-generate a
 name. For compatibility with different databases, index names cannot be longer
 than 30 characters and shouldn't start with a number (0-9) or underscore (_).
 
+.. admonition:: Partial indexes in abstract base classes
+
+    You must always specify a unique name for an index. As such, you
+    cannot normally specify a partial index on an abstract base class, since
+    the :attr:`Meta.indexes <django.db.models.Options.indexes>` option is
+    inherited by subclasses, with exactly the same values for the attributes
+    (including ``name``) each time. To work around name collisions, part of the
+    name may contain ``'%(app_label)s'`` and ``'%(class)s'``, which are
+    replaced, respectively, by the lowercased app label and class name of the
+    concrete model. For example ``Index(fields=['title'],
+    name='%(app_label)s_%(class)s_title_index')``.
+
+.. versionchanged:: 3.0
+
+    Interpolation of  ``'%(app_label)s'`` and ``'%(class)s'`` was added.
+
 ``db_tablespace``
 -----------------
 
@@ -105,7 +121,7 @@ indexes records with more than 400 pages.
 
 .. admonition:: Restrictions on PostgreSQL
 
-    PostgreSQL requires functions referenced in the condition to be be marked as
+    PostgreSQL requires functions referenced in the condition to be marked as
     IMMUTABLE. Django doesn't validate this but PostgreSQL will error. This
     means that functions such as :ref:`date-functions` and
     :class:`~django.db.models.functions.Concat` aren't accepted. If you store

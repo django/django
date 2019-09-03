@@ -1,21 +1,22 @@
-from threading import local
 from urllib.parse import urlsplit, urlunsplit
+
+from asgiref.local import Local
 
 from django.utils.encoding import iri_to_uri
 from django.utils.functional import lazy
 from django.utils.translation import override
 
 from .exceptions import NoReverseMatch, Resolver404
-from .resolvers import get_ns_resolver, get_resolver
+from .resolvers import _get_cached_resolver, get_ns_resolver, get_resolver
 from .utils import get_callable
 
 # SCRIPT_NAME prefixes for each thread are stored here. If there's no entry for
 # the current thread (which is the only one we ever access), it is assumed to
 # be empty.
-_prefixes = local()
+_prefixes = Local()
 
 # Overridden URLconfs for each thread are stored here.
-_urlconfs = local()
+_urlconfs = Local()
 
 
 def resolve(path, urlconf=None):
@@ -36,10 +37,7 @@ def reverse(viewname, urlconf=None, args=None, kwargs=None, current_app=None):
     if not isinstance(viewname, str):
         view = viewname
     else:
-        parts = viewname.split(':')
-        parts.reverse()
-        view = parts[0]
-        path = parts[1:]
+        *path, view = viewname.split(':')
 
         if current_app:
             current_path = current_app.split(':')
@@ -50,8 +48,7 @@ def reverse(viewname, urlconf=None, args=None, kwargs=None, current_app=None):
         resolved_path = []
         ns_pattern = ''
         ns_converters = {}
-        while path:
-            ns = path.pop()
+        for ns in path:
             current_ns = current_path.pop() if current_path else None
             # Lookup the name to see if it could be an app identifier.
             try:
@@ -95,7 +92,7 @@ reverse_lazy = lazy(reverse, str)
 
 def clear_url_caches():
     get_callable.cache_clear()
-    get_resolver.cache_clear()
+    _get_cached_resolver.cache_clear()
     get_ns_resolver.cache_clear()
 
 

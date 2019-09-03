@@ -39,10 +39,10 @@ Use standard DB optimization techniques
 
 * Indexes_. This is a number one priority, *after* you have determined from
   profiling what indexes should be added. Use
-  :attr:`Field.db_index <django.db.models.Field.db_index>` or
-  :attr:`Meta.index_together <django.db.models.Options.index_together>` to add
-  these from Django. Consider adding indexes to fields that you frequently
-  query using :meth:`~django.db.models.query.QuerySet.filter()`,
+  :attr:`Meta.indexes <django.db.models.Options.indexes>` or
+  :attr:`Field.db_index <django.db.models.Field.db_index>` to add these from
+  Django. Consider adding indexes to fields that you frequently query using
+  :meth:`~django.db.models.query.QuerySet.filter()`,
   :meth:`~django.db.models.query.QuerySet.exclude()`,
   :meth:`~django.db.models.query.QuerySet.order_by()`, etc. as indexes may help
   to speed up lookups. Note that determining the best indexes is a complex
@@ -341,8 +341,13 @@ it on a ``QuerySet`` by calling
 
 Adding an index to your database may help to improve ordering performance.
 
-Insert in bulk
-==============
+Use bulk methods
+================
+
+Use bulk methods to reduce the number of SQL statements.
+
+Create in bulk
+--------------
 
 When creating objects, where possible, use the
 :meth:`~django.db.models.query.QuerySet.bulk_create()` method to reduce the
@@ -362,8 +367,44 @@ Note that there are a number of :meth:`caveats to this method
 <django.db.models.query.QuerySet.bulk_create>`, so make sure it's appropriate
 for your use case.
 
-This also applies to :class:`ManyToManyFields
-<django.db.models.ManyToManyField>`, so doing::
+Update in bulk
+--------------
+
+.. versionadded:: 2.2
+
+When updating objects, where possible, use the
+:meth:`~django.db.models.query.QuerySet.bulk_update()` method to reduce the
+number of SQL queries. Given a list or queryset of objects::
+
+    entries = Entry.objects.bulk_create([
+        Entry(headline='This is a test'),
+        Entry(headline='This is only a test'),
+    ])
+
+The following example::
+
+    entries[0].headline = 'This is not a test'
+    entries[1].headline = 'This is no longer a test'
+    Entry.objects.bulk_update(entries, ['headline'])
+
+...is preferable to::
+
+    entries[0].headline = 'This is not a test'
+    entries.save()
+    entries[1].headline = 'This is no longer a test'
+    entries.save()
+
+Note that there are a number of :meth:`caveats to this method
+<django.db.models.query.QuerySet.bulk_update>`, so make sure it's appropriate
+for your use case.
+
+Insert in bulk
+--------------
+
+When inserting objects into :class:`ManyToManyFields
+<django.db.models.ManyToManyField>`, use
+:meth:`~django.db.models.fields.related.RelatedManager.add` with multiple
+objects to reduce the number of SQL queries. For example::
 
     my_band.members.add(me, my_friend)
 

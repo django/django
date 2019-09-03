@@ -198,7 +198,7 @@ class GeometryField(BaseSpatialField):
     """
     The base Geometry field -- maps to the OpenGIS Specification Geometry type.
     """
-    description = _("The base Geometry field -- maps to the OpenGIS Specification Geometry type.")
+    description = _('The base Geometry field — maps to the OpenGIS Specification Geometry type.')
     form_class = forms.GeometryField
     # The OpenGIS Geometry name.
     geom_type = 'GEOMETRY'
@@ -272,7 +272,9 @@ class GeometryField(BaseSpatialField):
         of the spatial backend. For example, Oracle and MySQL require custom
         selection formats in order to retrieve geometries in OGC WKB.
         """
-        return compiler.connection.ops.select % sql, params
+        if not compiler.query.subquery:
+            return compiler.connection.ops.select % sql, params
+        return sql, params
 
 
 # The OpenGIS Geometry Type Fields

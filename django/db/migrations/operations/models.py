@@ -428,7 +428,14 @@ class RenameModel(ModelOperation):
         )
 
 
-class AlterModelTable(ModelOperation):
+class ModelOptionOperation(ModelOperation):
+    def reduce(self, operation, app_label=None):
+        if isinstance(operation, (self.__class__, DeleteModel)) and self.name_lower == operation.name_lower:
+            return [operation]
+        return super().reduce(operation, app_label=app_label)
+
+
+class AlterModelTable(ModelOptionOperation):
     """Rename a model's table."""
 
     def __init__(self, name, table):
@@ -476,18 +483,6 @@ class AlterModelTable(ModelOperation):
             self.name,
             self.table if self.table is not None else "(default)"
         )
-
-    def reduce(self, operation, app_label=None):
-        if isinstance(operation, (AlterModelTable, DeleteModel)) and self.name_lower == operation.name_lower:
-            return [operation]
-        return super().reduce(operation, app_label=app_label)
-
-
-class ModelOptionOperation(ModelOperation):
-    def reduce(self, operation, app_label=None):
-        if isinstance(operation, (self.__class__, DeleteModel)) and self.name_lower == operation.name_lower:
-            return [operation]
-        return super().reduce(operation, app_label=app_label)
 
 
 class AlterTogetherOptionOperation(ModelOptionOperation):

@@ -155,10 +155,8 @@ Widget classes
     ``OpenLayersWidget`` and :class:`OSMWidget` use the ``openlayers.js`` file
     hosted on the ``cdnjs.cloudflare.com`` content-delivery network. You can
     subclass these widgets in order to specify your own version of the
-    ``OpenLayers.js`` file `tailored to your needs`_ in the ``js`` property of
-    the inner ``Media`` class (see :ref:`assets-as-a-static-definition`).
-
-    .. _tailored to your needs: https://openlayers.org/en/latest/doc/tutorials/custom-builds.html
+    ``OpenLayers.js`` file in the ``js`` property of the inner ``Media`` class
+    (see :ref:`assets-as-a-static-definition`).
 
 ``OSMWidget``
 

@@ -268,6 +268,18 @@ non-durable <https://www.postgresql.org/docs/current/non-durability.html>`_.
     a development machine where you can easily restore the entire contents of
     all databases in the cluster.
 
+.. _mariadb-notes:
+
+MariaDB notes
+=============
+
+.. versionadded:: 3.0
+
+Django supports MariaDB 10.1 and higher.
+
+To use MariaDB, use the MySQL backend, which is shared between the two. See the
+:ref:`MySQL notes <mysql-notes>` for more details.
+
 .. _mysql-notes:
 
 MySQL notes
@@ -488,7 +500,10 @@ this entry are the four standard isolation levels:
 
 or ``None`` to use the server's configured isolation level. However, Django
 works best with and defaults to read committed rather than MySQL's default,
-repeatable read. Data loss is possible with repeatable read.
+repeatable read. Data loss is possible with repeatable read. In particular,
+you may see cases where :meth:`~django.db.models.query.QuerySet.get_or_create`
+will raise an :exc:`~django.db.IntegrityError` but the object won't appear in
+a subsequent :meth:`~django.db.models.query.QuerySet.get` call.
 
 .. _transaction isolation level: https://dev.mysql.com/doc/refman/en/innodb-transaction-isolation-levels.html
 

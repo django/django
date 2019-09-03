@@ -1,6 +1,5 @@
 from calendar import timegm
 
-from django.conf import settings
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.exceptions import ImproperlyConfigured, ObjectDoesNotExist
 from django.http import Http404, HttpResponse
@@ -10,6 +9,7 @@ from django.utils.encoding import iri_to_uri
 from django.utils.html import escape
 from django.utils.http import http_date
 from django.utils.timezone import get_default_timezone, is_naive, make_aware
+from django.utils.translation import get_language
 
 
 def add_domain(domain, url, secure=False):
@@ -30,6 +30,7 @@ class Feed:
     feed_type = feedgenerator.DefaultFeed
     title_template = None
     description_template = None
+    language = None
 
     def __call__(self, request, *args, **kwargs):
         try:
@@ -134,7 +135,7 @@ class Feed:
             subtitle=self._get_dynamic_attr('subtitle', obj),
             link=link,
             description=self._get_dynamic_attr('description', obj),
-            language=settings.LANGUAGE_CODE,
+            language=self.language or get_language(),
             feed_url=add_domain(
                 current_site.domain,
                 self._get_dynamic_attr('feed_url', obj) or request.path,

@@ -131,7 +131,7 @@ msgid "Added \"%(object)s\"."
 msgstr "Ajout de « %(object)s »."
 
 #, python-format
-msgid "Changed \"%(object)s\" - %(changes)s"
+msgid "Changed “%(object)s” - %(changes)s"
 msgstr "Modification de « %(object)s » - %(changes)s"
 
 #, python-format
@@ -142,7 +142,7 @@ msgid "LogEntry Object"
 msgstr "Objet de journal"
 
 #, python-brace-format
-msgid "Added {name} \"{object}\"."
+msgid "Added {name} “{object}”."
 msgstr "Ajout de {name} « {object} »."
 
 msgid "Added."
@@ -152,7 +152,7 @@ msgid "and"
 msgstr "et"
 
 #, python-brace-format
-msgid "Changed {fields} for {name} \"{object}\"."
+msgid "Changed {fields} for {name} “{object}”."
 msgstr "Modification de {fields} pour l'objet {name} « {object} »."
 
 #, python-brace-format
@@ -160,7 +160,7 @@ msgid "Changed {fields}."
 msgstr "Modification de {fields}."
 
 #, python-brace-format
-msgid "Deleted {name} \"{object}\"."
+msgid "Deleted {name} “{object}”."
 msgstr "Suppression de {name} « {object} »."
 
 msgid "No fields changed."

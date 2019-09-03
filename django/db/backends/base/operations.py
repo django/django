@@ -26,6 +26,9 @@ class BaseDatabaseOperations:
         'BigIntegerField': (-9223372036854775808, 9223372036854775807),
         'PositiveSmallIntegerField': (0, 32767),
         'PositiveIntegerField': (0, 2147483647),
+        'SmallAutoField': (-32768, 32767),
+        'AutoField': (-2147483648, 2147483647),
+        'BigAutoField': (-9223372036854775808, 9223372036854775807),
     }
     set_operators = {
         'union': 'UNION',
@@ -311,7 +314,7 @@ class BaseDatabaseOperations:
         """
         return value
 
-    def return_insert_id(self):
+    def return_insert_id(self, field):
         """
         For backends that support returning the last insert ID as part of an
         insert query, return the SQL and params to append to the INSERT query.
@@ -394,7 +397,7 @@ class BaseDatabaseOperations:
         to tables with foreign keys pointing the tables being truncated.
         PostgreSQL requires a cascade even if these tables are empty.
         """
-        raise NotImplementedError('subclasses of BaseDatabaseOperations must provide an sql_flush() method')
+        raise NotImplementedError('subclasses of BaseDatabaseOperations must provide a sql_flush() method')
 
     def execute_sql_flush(self, using, sql_list):
         """Execute a list of SQL statements to flush the database."""
@@ -577,6 +580,13 @@ class BaseDatabaseOperations:
         NotSupportedError.
         """
         pass
+
+    def conditional_expression_supported_in_where_clause(self, expression):
+        """
+        Return True, if the conditional expression is supported in the WHERE
+        clause.
+        """
+        return True
 
     def combine_expression(self, connector, sub_expressions):
         """

@@ -18,7 +18,7 @@ class ModelTuple(namedtuple('ModelTupleBase', ('app_label', 'model_name'))):
     @classmethod
     def from_model(cls, model, app_label=None, model_name=None):
         """
-        Take a model class or a 'app_label.ModelName' string and return a
+        Take a model class or an 'app_label.ModelName' string and return a
         ModelTuple('app_label', 'modelname'). The optional app_label and
         model_name arguments are the defaults if "self" or "ModelName" are
         passed.

@@ -1,8 +1,9 @@
 import json
 import sys
 
-from django.test import SimpleTestCase
+from django.test import SimpleTestCase, ignore_warnings
 from django.utils import text
+from django.utils.deprecation import RemovedInDjango40Warning
 from django.utils.functional import lazystr
 from django.utils.text import format_lazy
 from django.utils.translation import gettext_lazy, override
@@ -87,6 +88,17 @@ class TestUtilsText(SimpleTestCase):
         # lazy strings are handled correctly
         self.assertEqual(text.Truncator(lazystr('The quick brown fox')).chars(10), 'The quick…')
 
+    def test_truncate_chars_html(self):
+        perf_test_values = [
+            (('</a' + '\t' * 50000) + '//>', None),
+            ('&' * 50000, '&' * 9 + '…'),
+            ('_X<<<<<<<<<<<>', None),
+        ]
+        for value, expected in perf_test_values:
+            with self.subTest(value=value):
+                truncator = text.Truncator(value)
+                self.assertEqual(expected if expected else value, truncator.chars(10, html=True))
+
     def test_truncate_words(self):
         truncator = text.Truncator('The quick brown fox jumped over the lazy dog.')
         self.assertEqual('The quick brown fox jumped over the lazy dog.', truncator.words(10))
@@ -136,11 +148,17 @@ class TestUtilsText(SimpleTestCase):
         truncator = text.Truncator('<i>Buenos d&iacute;as! &#x00bf;C&oacute;mo est&aacute;?</i>')
         self.assertEqual('<i>Buenos d&iacute;as! &#x00bf;C&oacute;mo…</i>', truncator.words(3, html=True))
         truncator = text.Truncator('<p>I &lt;3 python, what about you?</p>')
-        self.assertEqual('<p>I &lt;3 python…</p>', truncator.words(3, html=True))
+        self.assertEqual('<p>I &lt;3 python,…</p>', truncator.words(3, html=True))
 
-        re_tag_catastrophic_test = ('</a' + '\t' * 50000) + '//>'
-        truncator = text.Truncator(re_tag_catastrophic_test)
-        self.assertEqual(re_tag_catastrophic_test, truncator.words(500, html=True))
+        perf_test_values = [
+            ('</a' + '\t' * 50000) + '//>',
+            '&' * 50000,
+            '_X<<<<<<<<<<<>',
+        ]
+        for value in perf_test_values:
+            with self.subTest(value=value):
+                truncator = text.Truncator(value)
+                self.assertEqual(value, truncator.words(50, html=True))
 
     def test_wrap(self):
         digits = '1234 67 9'
@@ -184,6 +202,7 @@ class TestUtilsText(SimpleTestCase):
         # interning the result may be useful, e.g. when fed to Path.
         self.assertEqual(sys.intern(text.slugify('a')), 'a')
 
+    @ignore_warnings(category=RemovedInDjango40Warning)
     def test_unescape_entities(self):
         items = [
             ('', ''),
@@ -199,6 +218,14 @@ class TestUtilsText(SimpleTestCase):
         for value, output in items:
             self.assertEqual(text.unescape_entities(value), output)
             self.assertEqual(text.unescape_entities(lazystr(value)), output)
+
+    def test_unescape_entities_deprecated(self):
+        msg = (
+            'django.utils.text.unescape_entities() is deprecated in favor of '
+            'html.unescape().'
+        )
+        with self.assertWarnsMessage(RemovedInDjango40Warning, msg):
+            text.unescape_entities('foo')
 
     def test_unescape_string_literal(self):
         items = [
@@ -240,7 +267,7 @@ class TestUtilsText(SimpleTestCase):
 
         # The format string can be lazy. (string comes from contrib.admin)
         s = format_lazy(
-            gettext_lazy("Added {name} \"{object}\"."),
+            gettext_lazy('Added {name} “{object}”.'),
             name='article', object='My first try',
         )
         with override('fr'):

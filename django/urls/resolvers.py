@@ -8,14 +8,16 @@ attributes of the resolved URL match.
 import functools
 import inspect
 import re
-import threading
+import string
 from importlib import import_module
 from urllib.parse import quote
+
+from asgiref.local import Local
 
 from django.conf import settings
 from django.core.checks import Error, Warning
 from django.core.checks.urls import check_resolver
-from django.core.exceptions import ImproperlyConfigured
+from django.core.exceptions import ImproperlyConfigured, ViewDoesNotExist
 from django.utils.datastructures import MultiValueDict
 from django.utils.functional import cached_property
 from django.utils.http import RFC3986_SUBDELIMS, escape_leading_slashes
@@ -62,10 +64,14 @@ class ResolverMatch:
         )
 
 
-@functools.lru_cache(maxsize=None)
 def get_resolver(urlconf=None):
     if urlconf is None:
         urlconf = settings.ROOT_URLCONF
+    return _get_cached_resolver(urlconf)
+
+
+@functools.lru_cache(maxsize=None)
+def _get_cached_resolver(urlconf=None):
     return URLResolver(RegexPattern(r'^/'), urlconf)
 
 
@@ -152,7 +158,7 @@ class RegexPattern(CheckURLMixin):
             # If there are any named groups, use those as kwargs, ignoring
             # non-named groups. Otherwise, pass all non-named arguments as
             # positional arguments.
-            kwargs = match.groupdict()
+            kwargs = {k: v for k, v in match.groupdict().items() if v is not None}
             args = () if kwargs else match.groups()
             return path[match.end():], args, kwargs
         return None
@@ -201,6 +207,8 @@ def _route_to_regex(route, is_endpoint=False):
     For example, 'foo/<int:pk>' returns '^foo\\/(?P<pk>[0-9]+)'
     and {'pk': <django.urls.converters.IntConverter>}.
     """
+    if not set(route).isdisjoint(string.whitespace):
+        raise ImproperlyConfigured("URL route '%s' cannot contain whitespace." % route)
     original_route = route
     parts = ['^']
     converters = {}
@@ -380,7 +388,7 @@ class URLResolver:
         # urlpatterns
         self._callback_strs = set()
         self._populated = False
-        self._local = threading.local()
+        self._local = Local()
 
     def __repr__(self):
         if isinstance(self.urlconf_name, list) and self.urlconf_name:
@@ -405,7 +413,15 @@ class URLResolver:
         # All handlers take (request, exception) arguments except handler500
         # which takes (request).
         for status_code, num_parameters in [(400, 2), (403, 2), (404, 2), (500, 1)]:
-            handler, param_dict = self.resolve_error_handler(status_code)
+            try:
+                handler, param_dict = self.resolve_error_handler(status_code)
+            except (ImportError, ViewDoesNotExist) as e:
+                path = getattr(self.urlconf_module, 'handler%s' % status_code)
+                msg = (
+                    "The custom handler{status_code} view '{path}' could not be imported."
+                ).format(status_code=status_code, path=path)
+                messages.append(Error(msg, hint=str(e), id='urls.E008'))
+                continue
             signature = inspect.signature(handler)
             args = [None] * num_parameters
             try:

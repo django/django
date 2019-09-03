@@ -1,8 +1,9 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# HuanCheng Bai <xiqingongzi@gmail.com>, 2017-2018
+# Bai HuanCheng <xiqingongzi@gmail.com>, 2017-2018
 # Daniel Duan <DaNmarner@gmail.com>, 2013
+# jamin M <lxxmbyx@163.com>, 2019
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Kevin Sze <leiarix@gmail.com>, 2012
 # Lele Long <schemacs@gmail.com>, 2011,2015,2017
@@ -29,8 +30,8 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-01-16 20:42+0100\n"
-"PO-Revision-Date: 2019-02-01 07:07+0000\n"
-"Last-Translator: Suntravel Chris <chrisfromcn@gmail.com>\n"
+"PO-Revision-Date: 2019-05-26 11:53+0000\n"
+"Last-Translator: jamin M <lxxmbyx@163.com>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/django/django/"
 "language/zh_CN/)\n"
 "MIME-Version: 1.0\n"
@@ -473,14 +474,14 @@ msgstr "大整数(8字节)"
 
 #, python-format
 msgid "'%(value)s' value must be either True or False."
-msgstr "’%(value)s‘ 必须为 True 或者 False。"
+msgstr "’%(value)s‘ 的值必须为 True 或者 False。"
 
 #, python-format
 msgid "'%(value)s' value must be either True, False, or None."
-msgstr "'%(value)s' 值必须是 None, True 或 False 之一。"
+msgstr "'%(value)s' 的值必须是 True ,  False 或 None 之一。"
 
 msgid "Boolean (Either True or False)"
-msgstr "布尔值（True或False）"
+msgstr "布尔值( True或False )"
 
 #, python-format
 msgid "String (up to %(max_length)s)"
@@ -502,7 +503,7 @@ msgid ""
 msgstr "’%(value)s‘ 值的格式正确(YYYY-MM-DD)，但是日期无效。"
 
 msgid "Date (without time)"
-msgstr "日期（无时间）"
+msgstr "日期（不带时分）"
 
 #, python-format
 msgid ""
@@ -521,7 +522,7 @@ msgstr ""
 "效。"
 
 msgid "Date (with time)"
-msgstr "日期（带时间）"
+msgstr "日期（带时分）"
 
 #, python-format
 msgid "'%(value)s' value must be a decimal number."
@@ -563,7 +564,7 @@ msgid "'%(value)s' value must be either None, True or False."
 msgstr "’%(value)s‘ 必须为None，True或者False。"
 
 msgid "Boolean (Either True, False or None)"
-msgstr "布尔值（True、False或None）"
+msgstr "布尔值(True、False或None)"
 
 msgid "Positive integer"
 msgstr "正整数"
@@ -1098,16 +1099,17 @@ msgid ""
 "required for security reasons, to ensure that your browser is not being "
 "hijacked by third parties."
 msgstr ""
-"您看到此消息是由于HTTPS站点需要浏览器发送 ‘Referer HTTP头‘，但是目前没有被发"
-"送。出于安全考虑，浏览器必须发送该HTTP头，以确保您的浏览器没有被第三方劫持。"
+"您看到此消息是由于HTTPS站点需要您的浏览器发送的 'Referer header'信息，但是该"
+"信息并未被发送。该header信息的确认是出于安全问题的考虑，以确认您的浏览器并未"
+"被第三方劫持。"
 
 msgid ""
 "If you have configured your browser to disable 'Referer' headers, please re-"
 "enable them, at least for this site, or for HTTPS connections, or for 'same-"
 "origin' requests."
 msgstr ""
-"如果您已经设置浏览器禁用 ‘Referer’ 头，请重新启用，至少针对这个站点，全部"
-"HTTPS请求，或者同源请求（same-origin）启用发送该HTTP头。"
+"如果您已经设置您的浏览器禁用 'Referer' 头部信息，请重新启用它们，至少要针对这"
+"个站点，或者针对全部HTTPS连接，或者针对 'same-origin' 请求来启用。"
 
 msgid ""
 "If you are using the <meta name=\"referrer\" content=\"no-referrer\"> tag or "
@@ -1133,17 +1135,17 @@ msgid ""
 "If you have configured your browser to disable cookies, please re-enable "
 "them, at least for this site, or for 'same-origin' requests."
 msgstr ""
-"如果您已经设置浏览器禁用cookies，请重新启用，至少针对这个站点，全部HTTPS请"
-"求，或者同源请求（same-origin）启用cookies。"
+"如果您已经设置您的浏览器禁用cookies，请重新启用它们，至少要针对这个站点，或者"
+"针对 'same-origin' 请求来启用。"
 
 msgid "More information is available with DEBUG=True."
-msgstr "更多信息请设置选项DEBUG＝True。"
+msgstr "更多可用信息请设置选项DEBUG＝True。"
 
 msgid "No year specified"
 msgstr "没有指定年"
 
 msgid "Date out of range"
-msgstr "日期不在访问中。"
+msgstr "日期超出范围。"
 
 msgid "No month specified"
 msgstr "没有指定月"
@@ -1156,7 +1158,7 @@ msgstr "没有指定周"
 
 #, python-format
 msgid "No %(verbose_name_plural)s available"
-msgstr "%(verbose_name_plural)s 不存在"
+msgstr "%(verbose_name_plural)s 可用"
 
 #, python-format
 msgid ""

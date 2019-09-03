@@ -5,10 +5,11 @@ Query Expressions
 .. currentmodule:: django.db.models
 
 Query expressions describe a value or a computation that can be used as part of
-an update, create, filter, order by, annotation, or aggregate. There are a
-number of built-in expressions (documented below) that can be used to help you
-write queries. Expressions can be combined, or in some cases nested, to form
-more complex computations.
+an update, create, filter, order by, annotation, or aggregate. When an
+expression outputs a boolean value, it may be used directly in filters. There
+are a number of built-in expressions (documented below) that can be used to
+help you write queries. Expressions can be combined, or in some cases nested,
+to form more complex computations.
 
 Supported arithmetic
 ====================
@@ -68,6 +69,12 @@ Some examples
     from django.db.models.functions import Length
     CharField.register_lookup(Length)
     Company.objects.order_by('name__length')
+
+    # Boolean expression can be used directly in filters.
+    from django.db.models import Exists
+    Company.objects.filter(
+        Exists(Employee.objects.filter(company=OuterRef('pk'), salary__gt=10))
+    )
 
 Built-in Expressions
 ====================
@@ -181,7 +188,9 @@ instance and will be applied on each :meth:`~Model.save()`. For example::
     reporter.save()
 
 ``stories_filed`` will be updated twice in this case. If it's initially ``1``,
-the final value will be ``3``.
+the final value will be ``3``. This persistence can be avoided by reloading the
+model object after saving it, for example, by using
+:meth:`~Model.refresh_from_db()`.
 
 Using ``F()`` in filters
 ~~~~~~~~~~~~~~~~~~~~~~~~
@@ -237,7 +246,7 @@ For example, to sort companies that haven't been contacted (``last_contacted``
 is null) after companies that have been contacted::
 
     from django.db.models import F
-    Company.object.order_by(F('last_contacted').desc(nulls_last=True))
+    Company.objects.order_by(F('last_contacted').desc(nulls_last=True))
 
 .. _func-expressions:
 
@@ -260,7 +269,9 @@ or they can be used to build a library of database functions::
     queryset.annotate(field_lower=Lower('field'))
 
 But both cases will result in a queryset where each model is annotated with an
-extra attribute ``field_lower`` produced, roughly, from the following SQL::
+extra attribute ``field_lower`` produced, roughly, from the following SQL:
+
+.. code-block:: sql
 
     SELECT
         ...
@@ -375,7 +386,7 @@ The ``Aggregate`` API is as follows:
 
         A class attribute, as a format string, that describes the SQL that is
         generated for this aggregate. Defaults to
-        ``'%(function)s( %(expressions)s )'``.
+        ``'%(function)s(%(distinct)s%(expressions)s)'``.
 
     .. attribute:: function
 
@@ -438,19 +449,18 @@ SQL that is generated. Here's a brief example::
 
     from django.db.models import Aggregate
 
-    class Count(Aggregate):
-        # supports COUNT(distinct field)
-        function = 'COUNT'
-        template = '%(function)s(%(distinct)s%(expressions)s)'
+    class Sum(Aggregate):
+        # Supports SUM(ALL field).
+        function = 'SUM'
+        template = '%(function)s(%(all_values)s%(expressions)s)'
+        allow_distinct = False
 
-        def __init__(self, expression, distinct=False, **extra):
+        def __init__(self, expression, all_values=False, **extra):
             super().__init__(
                 expression,
-                distinct='DISTINCT ' if distinct else '',
-                output_field=IntegerField(),
+                all_values='ALL ' if all_values else '',
                 **extra
             )
-
 
 ``Value()`` expressions
 -----------------------
@@ -623,22 +633,25 @@ degrade performance, it's automatically removed.
 
 You can query using ``NOT EXISTS`` with ``~Exists()``.
 
-Filtering on a ``Subquery`` expression
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Filtering on a ``Subquery()`` or ``Exists()`` expressions
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-It's not possible to filter directly using ``Subquery`` and ``Exists``, e.g.::
+``Subquery()`` that returns a boolean value and ``Exists()`` may be used as a
+``condition`` in :class:`~django.db.models.expressions.When` expressions, or to
+directly filter a queryset::
 
+    >>> recent_comments = Comment.objects.filter(...)  # From above
     >>> Post.objects.filter(Exists(recent_comments))
-    ...
-    TypeError: 'Exists' object is not iterable
 
+This will ensure that the subquery will not be added to the ``SELECT`` columns,
+which may result in a better performance.
 
-You must filter on a subquery expression by first annotating the queryset
-and then filtering based on that annotation::
+.. versionchanged:: 3.0
 
-    >>> Post.objects.annotate(
-    ...     recent_comment=Exists(recent_comments),
-    ... ).filter(recent_comment=True)
+    In previous versions of Django, it was necessary to first annotate and then
+    filter against the annotation. This resulted in the annotated value always
+    being present in the query result, and often resulted in a query that took
+    more time to execute.
 
 Using aggregates within a ``Subquery`` expression
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -940,6 +953,9 @@ calling the appropriate methods on the wrapped expression.
 
         ``summarize`` is a boolean that, when ``True``, signals that the
         query being computed is a terminal aggregate query.
+
+        ``for_save`` is a boolean that, when ``True``, signals that the query
+        being executed is performing a create or update.
 
     .. method:: get_source_expressions()
 

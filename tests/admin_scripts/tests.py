@@ -118,12 +118,13 @@ class AdminScriptTestCase(SimpleTestCase):
         test_environ['PYTHONPATH'] = os.pathsep.join(python_path)
         test_environ['PYTHONWARNINGS'] = ''
 
-        return subprocess.Popen(
+        p = subprocess.run(
             [sys.executable, script] + args,
             stdout=subprocess.PIPE, stderr=subprocess.PIPE,
             cwd=self.test_dir,
             env=test_environ, universal_newlines=True,
-        ).communicate()
+        )
+        return p.stdout, p.stderr
 
     def run_django_admin(self, args, settings_file=None):
         script_dir = os.path.abspath(os.path.join(os.path.dirname(django.__file__), 'bin'))
@@ -1103,13 +1104,13 @@ class ManageCheck(AdminScriptTestCase):
                 'django.contrib.auth',
                 'django.contrib.contenttypes',
                 'django.contrib.messages',
-                'django.contrib.sessions',
             ],
             sdict={
                 'DEBUG': True,
                 'MIDDLEWARE': [
                     'django.contrib.messages.middleware.MessageMiddleware',
                     'django.contrib.auth.middleware.AuthenticationMiddleware',
+                    'django.contrib.sessions.middleware.SessionMiddleware',
                 ],
                 'TEMPLATES': [
                     {
@@ -2131,6 +2132,25 @@ class StartApp(AdminScriptTestCase):
             "another name."
         )
         self.assertFalse(os.path.exists(testproject_dir))
+
+    def test_invalid_target_name(self):
+        for bad_target in ('invalid.dir_name', '7invalid_dir_name', '.invalid_dir_name'):
+            with self.subTest(bad_target):
+                _, err = self.run_django_admin(['startapp', 'app', bad_target])
+                self.assertOutput(
+                    err,
+                    "CommandError: '%s' is not a valid app directory. Please "
+                    "make sure the directory is a valid identifier." % bad_target
+                )
+
+    def test_importable_target_name(self):
+        _, err = self.run_django_admin(['startapp', 'app', 'os'])
+        self.assertOutput(
+            err,
+            "CommandError: 'os' conflicts with the name of an existing Python "
+            "module and cannot be used as an app directory. Please try "
+            "another directory."
+        )
 
     def test_overlaying_app(self):
         self.run_django_admin(['startapp', 'app1'])

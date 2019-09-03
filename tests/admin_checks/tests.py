@@ -5,6 +5,7 @@ from django.contrib.auth.backends import ModelBackend
 from django.contrib.auth.middleware import AuthenticationMiddleware
 from django.contrib.contenttypes.admin import GenericStackedInline
 from django.contrib.messages.middleware import MessageMiddleware
+from django.contrib.sessions.middleware import SessionMiddleware
 from django.core import checks
 from django.test import SimpleTestCase, override_settings
 
@@ -52,13 +53,16 @@ class ModelBackendSubclass(ModelBackend):
     pass
 
 
+class SessionMiddlewareSubclass(SessionMiddleware):
+    pass
+
+
 @override_settings(
     SILENCED_SYSTEM_CHECKS=['fields.W342'],  # ForeignKey(unique=True)
     INSTALLED_APPS=[
         'django.contrib.admin',
         'django.contrib.auth',
         'django.contrib.contenttypes',
-        'django.contrib.sessions',
         'django.contrib.messages',
         'admin_checks',
     ],
@@ -93,11 +97,6 @@ class SystemChecksTestCase(SimpleTestCase):
                 "to use the admin application.",
                 id='admin.E406',
             ),
-            checks.Error(
-                "'django.contrib.sessions' must be in INSTALLED_APPS in order "
-                "to use the admin application.",
-                id='admin.E407',
-            )
         ]
         self.assertEqual(errors, expected)
 
@@ -201,13 +200,19 @@ class SystemChecksTestCase(SimpleTestCase):
                 "'django.contrib.messages.middleware.MessageMiddleware' "
                 "must be in MIDDLEWARE in order to use the admin application.",
                 id='admin.E409',
-            )
+            ),
+            checks.Error(
+                "'django.contrib.sessions.middleware.SessionMiddleware' "
+                "must be in MIDDLEWARE in order to use the admin application.",
+                id='admin.E410',
+            ),
         ]
         self.assertEqual(errors, expected)
 
     @override_settings(MIDDLEWARE=[
         'admin_checks.tests.AuthenticationMiddlewareSubclass',
         'admin_checks.tests.MessageMiddlewareSubclass',
+        'admin_checks.tests.SessionMiddlewareSubclass',
     ])
     def test_middleware_subclasses(self):
         self.assertEqual(admin.checks.check_dependencies(), [])
@@ -216,6 +221,7 @@ class SystemChecksTestCase(SimpleTestCase):
         'django.contrib.does.not.Exist',
         'django.contrib.auth.middleware.AuthenticationMiddleware',
         'django.contrib.messages.middleware.MessageMiddleware',
+        'django.contrib.sessions.middleware.SessionMiddleware',
     ])
     def test_admin_check_ignores_import_error_in_middleware(self):
         self.assertEqual(admin.checks.check_dependencies(), [])

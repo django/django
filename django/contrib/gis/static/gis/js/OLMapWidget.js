@@ -207,15 +207,15 @@ ol.inherits(GeometryTypeControl, ol.control.Control);
             } else {
                 geometry = features[0].getGeometry().clone();
                 for (var j = 1; j < features.length; j++) {
-                    switch(geometry.getType()) {
-                        case "MultiPoint":
-                            geometry.appendPoint(features[j].getGeometry().getPoint(0));
-                            break;
-                        case "MultiLineString":
-                            geometry.appendLineString(features[j].getGeometry().getLineString(0));
-                            break;
-                        case "MultiPolygon":
-                            geometry.appendPolygon(features[j].getGeometry().getPolygon(0));
+                    switch (geometry.getType()) {
+                    case "MultiPoint":
+                        geometry.appendPoint(features[j].getGeometry().getPoint(0));
+                        break;
+                    case "MultiLineString":
+                        geometry.appendLineString(features[j].getGeometry().getLineString(0));
+                        break;
+                    case "MultiPolygon":
+                        geometry.appendPolygon(features[j].getGeometry().getPolygon(0));
                     }
                 }
             }

@@ -91,7 +91,10 @@ urlpatterns = auth_urlpatterns + [
     path('password_reset_from_email/', views.PasswordResetView.as_view(from_email='staffmember@example.com')),
     path(
         'password_reset_extra_email_context/',
-        views.PasswordResetView.as_view(extra_email_context={'greeting': 'Hello!'})),
+        views.PasswordResetView.as_view(
+            extra_email_context={'greeting': 'Hello!', 'domain': 'custom.example.com'},
+        ),
+    ),
     path(
         'password_reset/custom_redirect/',
         views.PasswordResetView.as_view(success_url='/custom/')),
@@ -110,6 +113,10 @@ urlpatterns = auth_urlpatterns + [
     re_path(
         '^reset/custom/named/{}/$'.format(uid_token),
         views.PasswordResetConfirmView.as_view(success_url=reverse_lazy('password_reset')),
+    ),
+    re_path(
+        '^reset/custom/token/{}/$'.format(uid_token),
+        views.PasswordResetConfirmView.as_view(reset_url_token='set-passwordcustom'),
     ),
     re_path(
         '^reset/post_reset_login/{}/$'.format(uid_token),

@@ -2,11 +2,10 @@ import psycopg2
 
 from django.db.backends.base.schema import BaseDatabaseSchemaEditor
 from django.db.backends.ddl_references import IndexColumns
+from django.db.backends.utils import strip_quotes
 
 
 class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
-
-    sql_alter_column_type = "ALTER COLUMN %(column)s TYPE %(type)s USING %(column)s::%(type)s"
 
     sql_create_sequence = "CREATE SEQUENCE %(sequence)s"
     sql_delete_sequence = "DROP SEQUENCE IF EXISTS %(sequence)s CASCADE"
@@ -14,7 +13,11 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
     sql_set_sequence_owner = 'ALTER SEQUENCE %(sequence)s OWNED BY %(table)s.%(column)s'
 
     sql_create_index = "CREATE INDEX %(name)s ON %(table)s%(using)s (%(columns)s)%(extra)s%(condition)s"
+    sql_create_index_concurrently = (
+        "CREATE INDEX CONCURRENTLY %(name)s ON %(table)s%(using)s (%(columns)s)%(extra)s%(condition)s"
+    )
     sql_delete_index = "DROP INDEX IF EXISTS %(name)s"
+    sql_delete_index_concurrently = "DROP INDEX CONCURRENTLY IF EXISTS %(name)s"
 
     sql_create_column_inline_fk = 'REFERENCES %(to_table)s(%(to_column)s)%(deferrable)s'
     # Setting the constraint to IMMEDIATE runs any deferred checks to allow
@@ -24,6 +27,8 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
     sql_delete_procedure = 'DROP FUNCTION %(procedure)s(%(param_types)s)'
 
     def quote_value(self, value):
+        if isinstance(value, str):
+            value = value.replace('%', '%%')
         # getquoted() returns a quoted bytestring of the adapted value.
         return psycopg2.extensions.adapt(value).getquoted().decode()
 
@@ -33,6 +38,11 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         if like_index_statement is not None:
             output.append(like_index_statement)
         return output
+
+    def _field_data_type(self, field):
+        if field.is_relation:
+            return field.rel_db_type(self.connection)
+        return self.connection.data_types[field.get_internal_type()]
 
     def _create_like_index_sql(self, model, field):
         """
@@ -57,17 +67,21 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         return None
 
     def _alter_column_type_sql(self, model, old_field, new_field, new_type):
-        """Make ALTER TYPE with SERIAL make sense."""
-        table = model._meta.db_table
-        if new_type.lower() in ("serial", "bigserial"):
-            column = new_field.column
+        self.sql_alter_column_type = 'ALTER COLUMN %(column)s TYPE %(type)s'
+        # Cast when data type changed.
+        if self._field_data_type(old_field) != self._field_data_type(new_field):
+            self.sql_alter_column_type += ' USING %(column)s::%(type)s'
+        # Make ALTER TYPE with SERIAL make sense.
+        table = strip_quotes(model._meta.db_table)
+        serial_fields_map = {'bigserial': 'bigint', 'serial': 'integer', 'smallserial': 'smallint'}
+        if new_type.lower() in serial_fields_map:
+            column = strip_quotes(new_field.column)
             sequence_name = "%s_%s_seq" % (table, column)
-            col_type = "integer" if new_type.lower() == "serial" else "bigint"
             return (
                 (
                     self.sql_alter_column_type % {
                         "column": self.quote_name(column),
-                        "type": col_type,
+                        "type": serial_fields_map[new_type.lower()],
                     },
                     [],
                 ),
@@ -147,3 +161,24 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         if opclasses:
             return IndexColumns(table, columns, self.quote_name, col_suffixes=col_suffixes, opclasses=opclasses)
         return super()._index_columns(table, columns, col_suffixes, opclasses)
+
+    def add_index(self, model, index, concurrently=False):
+        self.execute(index.create_sql(model, self, concurrently=concurrently), params=None)
+
+    def remove_index(self, model, index, concurrently=False):
+        self.execute(index.remove_sql(model, self, concurrently=concurrently))
+
+    def _delete_index_sql(self, model, name, sql=None, concurrently=False):
+        sql = self.sql_delete_index_concurrently if concurrently else self.sql_delete_index
+        return super()._delete_index_sql(model, name, sql)
+
+    def _create_index_sql(
+        self, model, fields, *, name=None, suffix='', using='',
+        db_tablespace=None, col_suffixes=(), sql=None, opclasses=(),
+        condition=None, concurrently=False,
+    ):
+        sql = self.sql_create_index if not concurrently else self.sql_create_index_concurrently
+        return super()._create_index_sql(
+            model, fields, name=name, suffix=suffix, using=using, db_tablespace=db_tablespace,
+            col_suffixes=col_suffixes, sql=sql, opclasses=opclasses, condition=condition,
+        )

@@ -7,15 +7,15 @@ from django.utils.deprecation import RemovedInDjango40Warning
 from django.utils.http import (
     base36_to_int, escape_leading_slashes, http_date, int_to_base36,
     is_safe_url, is_same_domain, parse_etags, parse_http_date, quote_etag,
-    urlencode, urlquote, urlquote_plus, urlsafe_base64_decode,
-    urlsafe_base64_encode, urlunquote, urlunquote_plus,
+    url_has_allowed_host_and_scheme, urlencode, urlquote, urlquote_plus,
+    urlsafe_base64_decode, urlsafe_base64_encode, urlunquote, urlunquote_plus,
 )
 
 
 class URLEncodeTests(SimpleTestCase):
     cannot_encode_none_msg = (
-        'Cannot encode None in a query string. Did you mean to pass an '
-        'empty string or omit the value?'
+        "Cannot encode None for key 'a' in a query string. Did you mean to "
+        "pass an empty string or omit the value?"
     )
 
     def test_tuples(self):
@@ -34,7 +34,20 @@ class URLEncodeTests(SimpleTestCase):
         ])
 
     def test_dict_containing_sequence_not_doseq(self):
-        self.assertEqual(urlencode({'a': [1, 2]}, doseq=False), 'a=%5B%271%27%2C+%272%27%5D')
+        self.assertEqual(urlencode({'a': [1, 2]}, doseq=False), 'a=%5B1%2C+2%5D')
+
+    def test_dict_containing_tuple_not_doseq(self):
+        self.assertEqual(urlencode({'a': (1, 2)}, doseq=False), 'a=%281%2C+2%29')
+
+    def test_custom_iterable_not_doseq(self):
+        class IterableWithStr:
+            def __str__(self):
+                return 'custom'
+
+            def __iter__(self):
+                yield from range(0, 3)
+
+        self.assertEqual(urlencode({'a': IterableWithStr()}, doseq=False), 'a=custom')
 
     def test_dict_containing_sequence_doseq(self):
         self.assertEqual(urlencode({'a': [1, 2]}, doseq=True), 'a=1&a=2')
@@ -61,14 +74,10 @@ class URLEncodeTests(SimpleTestCase):
 
     def test_dict_with_bytearray(self):
         self.assertEqual(urlencode({'a': bytearray(range(2))}, doseq=True), 'a=0&a=1')
-        self.assertEqual(urlencode({'a': bytearray(range(2))}, doseq=False), 'a=%5B%270%27%2C+%271%27%5D')
 
     def test_generator(self):
-        def gen():
-            yield from range(2)
-
-        self.assertEqual(urlencode({'a': gen()}, doseq=True), 'a=0&a=1')
-        self.assertEqual(urlencode({'a': gen()}, doseq=False), 'a=%5B%270%27%2C+%271%27%5D')
+        self.assertEqual(urlencode({'a': range(2)}, doseq=True), 'a=0&a=1')
+        self.assertEqual(urlencode({'a': range(2)}, doseq=False), 'a=range%280%2C+2%29')
 
     def test_none(self):
         with self.assertRaisesMessage(TypeError, self.cannot_encode_none_msg):
@@ -119,7 +128,7 @@ class Base36IntTests(SimpleTestCase):
             self.assertEqual(base36_to_int(b36), n)
 
 
-class IsSafeURLTests(unittest.TestCase):
+class IsSafeURLTests(SimpleTestCase):
     def test_bad_urls(self):
         bad_urls = (
             'http://example.com',
@@ -155,7 +164,10 @@ class IsSafeURLTests(unittest.TestCase):
         )
         for bad_url in bad_urls:
             with self.subTest(url=bad_url):
-                self.assertIs(is_safe_url(bad_url, allowed_hosts={'testserver', 'testserver2'}), False)
+                self.assertIs(
+                    url_has_allowed_host_and_scheme(bad_url, allowed_hosts={'testserver', 'testserver2'}),
+                    False,
+                )
 
     def test_good_urls(self):
         good_urls = (
@@ -172,21 +184,27 @@ class IsSafeURLTests(unittest.TestCase):
         )
         for good_url in good_urls:
             with self.subTest(url=good_url):
-                self.assertIs(is_safe_url(good_url, allowed_hosts={'otherserver', 'testserver'}), True)
+                self.assertIs(
+                    url_has_allowed_host_and_scheme(good_url, allowed_hosts={'otherserver', 'testserver'}),
+                    True,
+                )
 
     def test_basic_auth(self):
         # Valid basic auth credentials are allowed.
-        self.assertIs(is_safe_url(r'http://user:pass@testserver/', allowed_hosts={'user:pass@testserver'}), True)
+        self.assertIs(
+            url_has_allowed_host_and_scheme(r'http://user:pass@testserver/', allowed_hosts={'user:pass@testserver'}),
+            True,
+        )
 
     def test_no_allowed_hosts(self):
         # A path without host is allowed.
-        self.assertIs(is_safe_url('/confirm/me@example.com', allowed_hosts=None), True)
+        self.assertIs(url_has_allowed_host_and_scheme('/confirm/me@example.com', allowed_hosts=None), True)
         # Basic auth without host is not allowed.
-        self.assertIs(is_safe_url(r'http://testserver\@example.com', allowed_hosts=None), False)
+        self.assertIs(url_has_allowed_host_and_scheme(r'http://testserver\@example.com', allowed_hosts=None), False)
 
     def test_allowed_hosts_str(self):
-        self.assertIs(is_safe_url('http://good.com/good', allowed_hosts='good.com'), True)
-        self.assertIs(is_safe_url('http://good.co/evil', allowed_hosts='good.com'), False)
+        self.assertIs(url_has_allowed_host_and_scheme('http://good.com/good', allowed_hosts='good.com'), True)
+        self.assertIs(url_has_allowed_host_and_scheme('http://good.co/evil', allowed_hosts='good.com'), False)
 
     def test_secure_param_https_urls(self):
         secure_urls = (
@@ -196,7 +214,10 @@ class IsSafeURLTests(unittest.TestCase):
         )
         for url in secure_urls:
             with self.subTest(url=url):
-                self.assertIs(is_safe_url(url, allowed_hosts={'example.com'}, require_https=True), True)
+                self.assertIs(
+                    url_has_allowed_host_and_scheme(url, allowed_hosts={'example.com'}, require_https=True),
+                    True,
+                )
 
     def test_secure_param_non_https_urls(self):
         insecure_urls = (
@@ -206,7 +227,18 @@ class IsSafeURLTests(unittest.TestCase):
         )
         for url in insecure_urls:
             with self.subTest(url=url):
-                self.assertIs(is_safe_url(url, allowed_hosts={'example.com'}, require_https=True), False)
+                self.assertIs(
+                    url_has_allowed_host_and_scheme(url, allowed_hosts={'example.com'}, require_https=True),
+                    False,
+                )
+
+    def test_is_safe_url_deprecated(self):
+        msg = (
+            'django.utils.http.is_safe_url() is deprecated in favor of '
+            'url_has_allowed_host_and_scheme().'
+        )
+        with self.assertWarnsMessage(RemovedInDjango40Warning, msg):
+            is_safe_url('https://example.com', allowed_hosts={'example.com'})
 
 
 class URLSafeBase64Tests(unittest.TestCase):

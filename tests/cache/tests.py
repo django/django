@@ -1625,6 +1625,8 @@ class CacheUtils(SimpleTestCase):
             (None, ('Accept-Encoding', 'COOKIE'), 'Accept-Encoding, COOKIE'),
             ('Cookie,     Accept-Encoding', ('Accept-Encoding', 'cookie'), 'Cookie, Accept-Encoding'),
             ('Cookie    ,     Accept-Encoding', ('Accept-Encoding', 'cookie'), 'Cookie, Accept-Encoding'),
+            ('*', ('Accept-Language', 'Cookie'), '*'),
+            ('Accept-Language, Cookie', ('*',), '*'),
         )
         for initial_vary, newheaders, resulting_vary in headers:
             with self.subTest(initial_vary=initial_vary, newheaders=newheaders):

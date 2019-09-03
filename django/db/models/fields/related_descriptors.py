@@ -67,7 +67,15 @@ from django.core.exceptions import FieldError
 from django.db import connections, router, transaction
 from django.db.models import Q, signals
 from django.db.models.query import QuerySet
+from django.db.models.query_utils import DeferredAttribute
 from django.utils.functional import cached_property
+
+
+class ForeignKeyDeferredAttribute(DeferredAttribute):
+    def __set__(self, instance, value):
+        if instance.__dict__.get(self.field.attname) != value and self.field.is_cached(instance):
+            self.field.delete_cached_value(instance)
+        instance.__dict__[self.field.attname] = value
 
 
 class ForwardManyToOneDescriptor:
@@ -929,33 +937,6 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
                 False,
             )
 
-        @property
-        def constrained_target(self):
-            # If the through relation's target field's foreign integrity is
-            # enforced, the query can be performed solely against the through
-            # table as the INNER JOIN'ing against target table is unnecessary.
-            if not self.target_field.db_constraint:
-                return None
-            db = router.db_for_read(self.through, instance=self.instance)
-            if not connections[db].features.supports_foreign_keys:
-                return None
-            hints = {'instance': self.instance}
-            manager = self.through._base_manager.db_manager(db, hints=hints)
-            filters = {self.source_field_name: self.instance.pk}
-            # Nullable target rows must be excluded as well as they would have
-            # been filtered out from an INNER JOIN.
-            if self.target_field.null:
-                filters['%s__isnull' % self.target_field_name] = False
-            return manager.filter(**filters)
-
-        def exists(self):
-            constrained_target = self.constrained_target
-            return constrained_target.exists() if constrained_target else super().exists()
-
-        def count(self):
-            constrained_target = self.constrained_target
-            return constrained_target.count() if constrained_target else super().count()
-
         def add(self, *objs, through_defaults=None):
             self._remove_prefetched_objects()
             db = router.db_for_write(self.through, instance=self.instance)
@@ -965,11 +946,14 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
                     through_defaults=through_defaults,
                 )
                 # If this is a symmetrical m2m relation to self, add the mirror
-                # entry in the m2m table. `through_defaults` aren't used here
-                # because of the system check error fields.E332: Many-to-many
-                # fields with intermediate tables must not be symmetrical.
+                # entry in the m2m table.
                 if self.symmetrical:
-                    self._add_items(self.target_field_name, self.source_field_name, *objs)
+                    self._add_items(
+                        self.target_field_name,
+                        self.source_field_name,
+                        *objs,
+                        through_defaults=through_defaults,
+                    )
         add.alters_data = True
 
         def remove(self, *objs):
@@ -1175,7 +1159,8 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
         def _remove_items(self, source_field_name, target_field_name, *objs):
             # source_field_name: the PK colname in join table for the source object
             # target_field_name: the PK colname in join table for the target object
-            # *objs - objects to remove
+            # *objs - objects to remove. Either object instances, or primary
+            # keys of object instances.
             if not objs:
                 return
 

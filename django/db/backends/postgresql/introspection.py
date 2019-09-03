@@ -37,6 +37,8 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                 return 'AutoField'
             elif field_type == 'BigIntegerField':
                 return 'BigAutoField'
+            elif field_type == 'SmallIntegerField':
+                return 'SmallAutoField'
         return field_type
 
     def get_table_list(self, cursor):
@@ -99,10 +101,9 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                 JOIN pg_attrdef ad ON ad.oid = d.objid AND d.classid = 'pg_attrdef'::regclass
                 JOIN pg_attribute col ON col.attrelid = ad.adrelid AND col.attnum = ad.adnum
                 JOIN pg_class tbl ON tbl.oid = ad.adrelid
-                JOIN pg_namespace n ON n.oid = tbl.relnamespace
             WHERE s.relkind = 'S'
               AND d.deptype in ('a', 'n')
-              AND n.nspname = 'public'
+              AND pg_catalog.pg_table_is_visible(tbl.oid)
               AND tbl.relname = %s
         """, [table_name])
         return [
@@ -115,30 +116,21 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         Return a dictionary of {field_name: (field_name_other_table, other_table)}
         representing all relationships to the given table.
         """
+        return {row[0]: (row[2], row[1]) for row in self.get_key_columns(cursor, table_name)}
+
+    def get_key_columns(self, cursor, table_name):
         cursor.execute("""
-            SELECT c2.relname, a1.attname, a2.attname
+            SELECT a1.attname, c2.relname, a2.attname
             FROM pg_constraint con
             LEFT JOIN pg_class c1 ON con.conrelid = c1.oid
             LEFT JOIN pg_class c2 ON con.confrelid = c2.oid
             LEFT JOIN pg_attribute a1 ON c1.oid = a1.attrelid AND a1.attnum = con.conkey[1]
             LEFT JOIN pg_attribute a2 ON c2.oid = a2.attrelid AND a2.attnum = con.confkey[1]
-            WHERE c1.relname = %s AND con.contype = 'f'
-        """, [table_name])
-        return {row[1]: (row[2], row[0]) for row in cursor.fetchall()}
-
-    def get_key_columns(self, cursor, table_name):
-        cursor.execute("""
-            SELECT kcu.column_name, ccu.table_name AS referenced_table, ccu.column_name AS referenced_column
-            FROM information_schema.constraint_column_usage ccu
-            LEFT JOIN information_schema.key_column_usage kcu
-                ON ccu.constraint_catalog = kcu.constraint_catalog
-                    AND ccu.constraint_schema = kcu.constraint_schema
-                    AND ccu.constraint_name = kcu.constraint_name
-            LEFT JOIN information_schema.table_constraints tc
-                ON ccu.constraint_catalog = tc.constraint_catalog
-                    AND ccu.constraint_schema = tc.constraint_schema
-                    AND ccu.constraint_name = tc.constraint_name
-            WHERE kcu.table_name = %s AND tc.constraint_type = 'FOREIGN KEY'
+            WHERE
+                c1.relname = %s AND
+                con.contype = 'f' AND
+                c1.relnamespace = c2.relnamespace AND
+                pg_catalog.pg_table_is_visible(c1.oid)
         """, [table_name])
         return cursor.fetchall()
 
@@ -170,9 +162,8 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                 cl.reloptions
             FROM pg_constraint AS c
             JOIN pg_class AS cl ON c.conrelid = cl.oid
-            JOIN pg_namespace AS ns ON cl.relnamespace = ns.oid
-            WHERE ns.nspname = %s AND cl.relname = %s
-        """, ["public", table_name])
+            WHERE cl.relname = %s AND pg_catalog.pg_table_is_visible(cl.oid)
+        """, [table_name])
         for constraint, columns, kind, used_cols, options in cursor.fetchall():
             constraints[constraint] = {
                 "columns": columns,
@@ -211,7 +202,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                 LEFT JOIN pg_class c2 ON idx.indexrelid = c2.oid
                 LEFT JOIN pg_am am ON c2.relam = am.oid
                 LEFT JOIN pg_attribute attr ON attr.attrelid = c.oid AND attr.attnum = idx.key
-                WHERE c.relname = %s
+                WHERE c.relname = %s AND pg_catalog.pg_table_is_visible(c.oid)
             ) s2
             GROUP BY indexname, indisunique, indisprimary, amname, exprdef, attoptions;
         """, [table_name])

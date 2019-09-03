@@ -58,3 +58,4 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_partial_indexes = False
     supports_slicing_ordering_in_compound = True
     allows_multiple_constraints_on_same_fields = False
+    supports_boolean_expr_in_select_clause = False

@@ -4,6 +4,7 @@ from django.conf import settings
 from django.db.backends.base.operations import BaseDatabaseOperations
 from django.utils import timezone
 from django.utils.duration import duration_microseconds
+from django.utils.encoding import force_str
 
 
 class DatabaseOperations(BaseDatabaseOperations):
@@ -18,6 +19,7 @@ class DatabaseOperations(BaseDatabaseOperations):
     cast_data_types = {
         'AutoField': 'signed integer',
         'BigAutoField': 'signed integer',
+        'SmallAutoField': 'signed integer',
         'CharField': 'char(%(max_length)s)',
         'DecimalField': 'decimal(%(max_digits)s, %(decimal_places)s)',
         'TextField': 'char',
@@ -68,9 +70,20 @@ class DatabaseOperations(BaseDatabaseOperations):
         else:
             return "DATE(%s)" % (field_name)
 
+    def _prepare_tzname_delta(self, tzname):
+        if '+' in tzname:
+            return tzname[tzname.find('+'):]
+        elif '-' in tzname:
+            return tzname[tzname.find('-'):]
+        return tzname
+
     def _convert_field_to_tz(self, field_name, tzname):
         if settings.USE_TZ and self.connection.timezone_name != tzname:
-            field_name = "CONVERT_TZ(%s, '%s', '%s')" % (field_name, self.connection.timezone_name, tzname)
+            field_name = "CONVERT_TZ(%s, '%s', '%s')" % (
+                field_name,
+                self.connection.timezone_name,
+                self._prepare_tzname_delta(tzname),
+            )
         return field_name
 
     def datetime_cast_date_sql(self, field_name, tzname):
@@ -141,10 +154,8 @@ class DatabaseOperations(BaseDatabaseOperations):
         # With MySQLdb, cursor objects have an (undocumented) "_executed"
         # attribute where the exact query sent to the database is saved.
         # See MySQLdb/cursors.py in the source distribution.
-        query = getattr(cursor, '_executed', None)
-        if query is not None:
-            query = query.decode(errors='replace')
-        return query
+        # MySQLdb returns string, PyMySQL bytes.
+        return force_str(getattr(cursor, '_executed', None), errors='replace')
 
     def no_limit_value(self):
         # 2**64 - 1, as recommended by the MySQL documentation

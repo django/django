@@ -367,7 +367,7 @@ Consider the following two models::
         birthdate = models.DateField()
 
         class Meta:
-            unique_together = (('first_name', 'last_name'),)
+            unique_together = [['first_name', 'last_name']]
 
     class Book(models.Model):
         name = models.CharField(max_length=100)
@@ -411,7 +411,7 @@ name::
         objects = PersonManager()
 
         class Meta:
-            unique_together = (('first_name', 'last_name'),)
+            unique_together = [['first_name', 'last_name']]
 
 Now books can use that natural key to refer to ``Person`` objects::
 
@@ -459,7 +459,7 @@ Firstly, you need to add another method -- this time to the model itself::
         objects = PersonManager()
 
         class Meta:
-            unique_together = (('first_name', 'last_name'),)
+            unique_together = [['first_name', 'last_name']]
 
         def natural_key(self):
             return (self.first_name, self.last_name)

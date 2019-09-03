@@ -38,6 +38,49 @@ compatible with Django 3.0.
 What's new in Django 3.0
 ========================
 
+MariaDB support
+---------------
+
+Django now officially supports `MariaDB <https://mariadb.org/>`_ 10.1 and
+higher. See :ref:`MariaDB notes <mariadb-notes>` for more details.
+
+ASGI support
+------------
+
+Django 3.0 begins our journey to making Django fully async-capable by providing
+support for running as an `ASGI <https://asgi.readthedocs.io/>`_ application.
+
+This is in addition to our existing WSGI support. Django intends to support
+both for the foreseeable future. Async features will only be available to
+applications that run under ASGI, however.
+
+There is no need to switch your applications over unless you want to start
+experimenting with asynchronous code, but we have
+:doc:`documentation on deploying with ASGI </howto/deployment/asgi/index>` if
+you want to learn more.
+
+Note that as a side-effect of this change, Django is now aware of asynchronous
+event loops and will block you calling code marked as "async unsafe" - such as
+ORM operations - from an asynchronous context. If you were using Django from
+async code before, this may trigger if you were doing it incorrectly. If you
+see a ``SynchronousOnlyOperation`` error, then closely examine your code and
+move any database operations to be in a synchronous child thread.
+
+Exclusion constraints on PostgreSQL
+-----------------------------------
+
+The new :class:`~django.contrib.postgres.constraints.ExclusionConstraint` class
+enable adding exclusion constraints on PostgreSQL. Constraints are added to
+models using the
+:attr:`Meta.constraints <django.db.models.Options.constraints>` option.
+
+Filter expressions
+------------------
+
+Expressions that outputs :class:`~django.db.models.BooleanField` may now be
+used directly in ``QuerySet`` filters, without having to first annotate and
+then filter against the annotation.
+
 Minor features
 --------------
 
@@ -47,6 +90,14 @@ Minor features
 * Added support for the ``admin_order_field`` attribute on properties in
   :attr:`.ModelAdmin.list_display`.
 
+* The new :meth:`ModelAdmin.get_inlines()
+  <django.contrib.admin.ModelAdmin.get_inlines>` method allows specifying the
+  inlines based on the request or model instance.
+
+* Select2 library is upgraded from version 4.0.3 to 4.0.7.
+
+* jQuery is upgraded from version 3.3.1 to 3.4.1.
+
 :mod:`django.contrib.admindocs`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -55,7 +106,30 @@ Minor features
 :mod:`django.contrib.auth`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* The new ``reset_url_token`` attribute in
+  :class:`~django.contrib.auth.views.PasswordResetConfirmView` allows specifying
+  a token parameter displayed as a component of password reset URLs.
+
+* Added :class:`~django.contrib.auth.backends.BaseBackend` class to ease
+  customization of authentication backends.
+
+* Added :meth:`~django.contrib.auth.models.User.get_user_permissions()` method
+  to mirror the existing
+  :meth:`~django.contrib.auth.models.User.get_group_permissions()` method.
+
+* Added HTML ``autocomplete`` attribute to widgets of username, email, and
+  password fields in :mod:`django.contrib.auth.forms` for better interaction
+  with browser password managers.
+
+* :djadmin:`createsuperuser` now falls back to environment variables for
+  password and required fields, when a corresponding command line argument
+  isn't provided in non-interactive mode.
+
+* :attr:`~django.contrib.auth.models.CustomUser.REQUIRED_FIELDS` now supports
+  :class:`~django.db.models.ManyToManyField`\s.
+
+* The new :meth:`.UserManager.with_perm` method returns users that have the
+  specified permission.
 
 :mod:`django.contrib.contenttypes`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -71,6 +145,14 @@ Minor features
 * Added the :class:`~django.contrib.gis.db.models.functions.GeometryDistance`
   function, supported on PostGIS.
 
+* Added support for the ``furlong`` unit in
+  :class:`~django.contrib.gis.measure.Distance`.
+
+* The :setting:`GEOIP_PATH` setting now supports :class:`pathlib.Path`.
+
+* The :class:`~django.contrib.gis.geoip2.GeoIP2` class now accepts
+  :class:`pathlib.Path` ``path``.
+
 :mod:`django.contrib.messages`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -79,7 +161,16 @@ Minor features
 :mod:`django.contrib.postgres`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* The new :class:`~django.contrib.postgres.fields.RangeOperators` helps to
+  avoid typos in SQL operators that can be used together with
+  :class:`~django.contrib.postgres.fields.RangeField`.
+
+* The new :class:`~django.contrib.postgres.fields.RangeBoundary` expression
+  represents the range boundaries.
+
+* The new :class:`~django.contrib.postgres.operations.AddIndexConcurrently`
+  and :class:`~django.contrib.postgres.operations.RemoveIndexConcurrently`
+  classes allow creating and dropping indexes ``CONCURRENTLY`` on PostgreSQL.
 
 :mod:`django.contrib.redirects`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -89,7 +180,9 @@ Minor features
 :mod:`django.contrib.sessions`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* The new
+  :meth:`~django.contrib.sessions.backends.base.SessionBase.get_session_cookie_age()`
+  methods allows dynamically specifying the session cookie age.
 
 :mod:`django.contrib.sitemaps`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -109,12 +202,17 @@ Minor features
 :mod:`django.contrib.syndication`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* Added the ``language`` class attribute to the
+  :class:`django.contrib.syndication.views.Feed` to customize a feed language.
+  The default value is :func:`~django.utils.translation.get_language()` instead
+  of :setting:`LANGUAGE_CODE`.
 
 Cache
 ~~~~~
 
-* ...
+* :func:`~django.utils.cache.add_never_cache_headers` and
+  :func:`~django.views.decorators.cache.never_cache` now adds ``private``
+  directive to a ``Cache-Control`` header.
 
 CSRF
 ~~~~
@@ -129,7 +227,9 @@ Email
 File Storage
 ~~~~~~~~~~~~
 
-* ...
+* The new :meth:`.Storage.get_alternative_name` method allows customizing the
+  algorithm for generating filenames if a file with the uploaded name already
+  exists.
 
 File Uploads
 ~~~~~~~~~~~~
@@ -168,6 +268,18 @@ Management Commands
 * :option:`showmigrations --list` now shows the applied datetimes when
   ``--verbosity`` is 2 and above.
 
+* On PostgreSQL, :djadmin:`dbshell` now supports client-side TLS certificates.
+
+* :djadmin:`inspectdb` now introspects :class:`~django.db.models.OneToOneField`
+  when a foreign key has a unique or primary key constraint.
+
+* The new :option:`--skip-checks` option skips running system checks prior to
+  running the command.
+
+* The :option:`startapp --template` and :option:`startproject --template`
+  options now support templates stored in XZ archives (``.tar.xz``, ``.txz``)
+  and LZMA archives (``.tar.lzma``, ``.tlz``).
+
 Migrations
 ~~~~~~~~~~
 
@@ -189,11 +301,46 @@ Models
   :class:`~django.db.models.functions.Trunc` database functions determines the
   treatment of nonexistent and ambiguous datetimes.
 
+* ``connection.queries`` now shows ``COPY … TO`` statements on PostgreSQL.
+
+* :class:`~django.db.models.FilePathField` now accepts a callable ``path``.
+
+* Allowed symmetrical intermediate table for self-referential
+  :class:`~django.db.models.ManyToManyField`.
+
+* The ``name`` attributes of :class:`~django.db.models.CheckConstraint`,
+  :class:`~django.db.models.UniqueConstraint`, and
+  :class:`~django.db.models.Index` now support app label and class
+  interpolation using the ``'%(app_label)s'`` and ``'%(class)s'`` placeholders.
+
+* The new :attr:`.Field.descriptor_class` attribute allows model fields to
+  customize the get and set behavior by overriding their
+  :py:ref:`descriptors <descriptors>`.
+
+* :class:`~django.db.models.Avg` and :class:`~django.db.models.Sum` now support
+  the ``distinct`` argument.
+
+* Added :class:`~django.db.models.SmallAutoField` which acts much like an
+  :class:`~django.db.models.AutoField` except that it only allows values under
+  a certain (database-dependent) limit. Values from ``1`` to ``32767`` are safe
+  in all databases supported by Django.
+
+* :class:`~django.db.models.AutoField`,
+  :class:`~django.db.models.BigAutoField`, and
+  :class:`~django.db.models.SmallAutoField` now inherit from
+  ``IntegerField``, ``BigIntegerField`` and ``SmallIntegerField`` respectively.
+  System checks and validators are now also properly inherited.
+
+* :attr:`.FileField.upload_to` now supports :class:`pathlib.Path`.
+
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 
 * Allowed :class:`~django.http.HttpResponse` to be initialized with
   :class:`memoryview` content.
+
+* For use in, for example, Django templates, :attr:`.HttpRequest.headers` now
+  allows look ups using underscores (e.g. ``user_agent``) in place of hyphens.
 
 Serialization
 ~~~~~~~~~~~~~
@@ -220,6 +367,23 @@ Tests
   exception occurs, the test client will return a 500 response with the
   attribute :attr:`~django.test.Response.exc_info`, a tuple providing
   information of the exception that occurred.
+
+* Tests and test cases to run can be selected by test name pattern using the
+  new :option:`test -k` option.
+
+* HTML comparison, as used by
+  :meth:`~django.test.SimpleTestCase.assertHTMLEqual`, now treats text, character
+  references, and entity references that refer to the same character as
+  equivalent.
+
+* Django test runner now supports headless mode for selenium tests on supported
+  browsers. Add the ``--headless`` option to enable this mode.
+
+* Django test runner now supports ``--start-at`` and ``--start-after`` options
+  to run tests starting from a specific top-level module.
+
+* Django test runner now supports a ``--pdb`` option to spawn a debugger at
+  each error or failure.
 
 URLs
 ~~~~
@@ -254,6 +418,27 @@ backends.
 * ``DatabaseFeatures.can_return_id_from_insert`` and
   ``can_return_ids_from_bulk_insert`` are renamed to
   ``can_return_columns_from_insert`` and ``can_return_rows_from_bulk_insert``.
+
+* Database functions now handle :class:`datetime.timezone` formats when created
+  using :class:`datetime.timedelta` instances (e.g.
+  ``timezone(timedelta(hours=5))``, which would output ``'UTC+05:00'``).
+  Third-party backends should handle this format when preparing
+  :class:`~django.db.models.DateTimeField` in ``datetime_cast_date_sql()``,
+  ``datetime_extract_sql()``, etc.
+
+* ``DatabaseOperations.return_insert_id()`` now requires an additional
+  ``field`` argument with the model field.
+
+* Entries for ``AutoField``, ``BigAutoField``, and ``SmallAutoField`` are added
+  to  ``DatabaseOperations.integer_field_ranges`` to support the integer range
+  validators on these field types. Third-party backends may need to customize
+  the default entries.
+
+:mod:`django.contrib.admin`
+---------------------------
+
+* Admin's model history change messages now prefers more readable field labels
+  instead of field names.
 
 :mod:`django.contrib.gis`
 -------------------------
@@ -339,6 +524,41 @@ Miscellaneous
   the session and :func:`django.contrib.auth.logout` no longer preserves the
   session's language after logout.
 
+* :func:`django.utils.html.escape` now uses :func:`html.escape` to escape HTML.
+  This converts ``'`` to ``&#x27;`` instead of the previous equivalent decimal
+  code ``&#39;``.
+
+* The ``django-admin test -k`` option now works as the :option:`unittest
+  -k<unittest.-k>` option rather than as a shortcut for ``--keepdb``.
+
+* Support for ``pywatchman`` < 1.2.0 is removed.
+
+* HTML rendered by :class:`~django.forms.SelectDateWidget` for required fields
+  now have the ``placeholder`` attribute, which mainly may require some
+  adjustments in tests that compare HTML.
+
+* :func:`~django.utils.http.urlencode` now encodes iterable values as they are
+  when ``doseq=False``, rather than iterating them, bringing it into line with
+  the standard library :func:`urllib.parse.urlencode` function.
+
+* ``intword`` template filter now translates ``1.0`` as a singular phrase and
+  all other numeric values as plural. This may be incorrect for some languages.
+
+* Assigning a value to a model's :class:`~django.db.models.ForeignKey` or
+  :class:`~django.db.models.OneToOneField` ``'_id'`` attribute now unsets the
+  corresponding field. Accessing the field afterwards will result in a query.
+
+* :func:`~django.utils.cache.patch_vary_headers` now handles an asterisk
+  ``'*'`` according to :rfc:`7231#section-7.1.4`, i.e. if a list of header
+  field names contains an asterisk, then the ``Vary`` header will consist of a
+  single asterisk ``'*'``.
+
+* :setting:`SECURE_CONTENT_TYPE_NOSNIFF` setting now defaults to ``True``. With
+  the enabled :setting:`SECURE_CONTENT_TYPE_NOSNIFF`, the
+  :class:`~django.middleware.security.SecurityMiddleware` sets the
+  :ref:`x-content-type-options` header on all responses that do not already
+  have it.
+
 .. _deprecated-features-3.0:
 
 Features deprecated in 3.0
@@ -376,6 +596,18 @@ Miscellaneous
 
 * ``alias=None`` is added to the signature of
   :meth:`.Expression.get_group_by_cols`.
+
+* ``django.utils.text.unescape_entities()`` is deprecated in favor of
+  :func:`html.unescape`. Note that unlike ``unescape_entities()``,
+  ``html.unescape()`` evaluates lazy strings immediately.
+
+* To avoid possible confusion as to effective scope, the private internal
+  utility ``is_safe_url()`` is renamed to
+  ``url_has_allowed_host_and_scheme()``. That a URL has an allowed host and
+  scheme doesn't in general imply that it's "safe". It may still be quoted
+  incorrectly, for example. Ensure to also use
+  :func:`~django.utils.encoding.iri_to_uri` on the path component of untrusted
+  URLs.
 
 .. _removed-features-3.0:
 

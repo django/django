@@ -15,7 +15,7 @@ class HStoreField(CheckFieldDefaultMixin, Field):
     empty_strings_allowed = False
     description = _('Map of strings to strings/nulls')
     default_error_messages = {
-        'not_a_string': _('The value of "%(key)s" is not a string or null.'),
+        'not_a_string': _('The value of “%(key)s” is not a string or null.'),
     }
     _default_hint = ('dict', '{}')
 
@@ -86,7 +86,7 @@ class KeyTransform(Transform):
 
     def as_sql(self, compiler, connection):
         lhs, params = compiler.compile(self.lhs)
-        return "(%s -> '%s')" % (lhs, self.key_name), params
+        return '(%s -> %%s)' % lhs, params + [self.key_name]
 
 
 class KeyTransformFactory:

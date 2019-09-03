@@ -21,7 +21,7 @@ def serve(request, path, insecure=False, **kwargs):
 
         from django.contrib.staticfiles import views
 
-        url(r'^(?P<path>.*)$', views.serve)
+        path('<path:path>', views.serve)
 
     in your URLconf.
 

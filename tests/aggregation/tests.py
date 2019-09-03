@@ -388,9 +388,6 @@ class AggregateTestCase(TestCase):
         vals = Book.objects.aggregate(Count("rating"))
         self.assertEqual(vals, {"rating__count": 6})
 
-        vals = Book.objects.aggregate(Count("rating", distinct=True))
-        self.assertEqual(vals, {"rating__count": 4})
-
     def test_count_star(self):
         with self.assertNumQueries(1) as ctx:
             Book.objects.aggregate(n=Count("*"))
@@ -402,6 +399,16 @@ class AggregateTestCase(TestCase):
             distinct_ratings=Count(Case(When(pages__gt=300, then='rating')), distinct=True),
         )
         self.assertEqual(aggs['distinct_ratings'], 4)
+
+    def test_distinct_on_aggregate(self):
+        for aggregate, expected_result in (
+            (Avg, 4.125),
+            (Count, 4),
+            (Sum, 16.5),
+        ):
+            with self.subTest(aggregate=aggregate.__name__):
+                books = Book.objects.aggregate(ratings=aggregate('rating', distinct=True))
+                self.assertEqual(books['ratings'], expected_result)
 
     def test_non_grouped_annotation_not_in_group_by(self):
         """
@@ -884,7 +891,10 @@ class AggregateTestCase(TestCase):
         self.assertEqual(p2, {'avg_price': Approximate(Decimal('53.39'), places=2)})
 
     def test_combine_different_types(self):
-        msg = 'Expression contains mixed types. You must set output_field.'
+        msg = (
+            'Expression contains mixed types: FloatField, IntegerField. '
+            'You must set output_field.'
+        )
         qs = Book.objects.annotate(sums=Sum('rating') + Sum('pages') + Sum('price'))
         with self.assertRaisesMessage(FieldError, msg):
             qs.first()

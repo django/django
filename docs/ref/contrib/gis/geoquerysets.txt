@@ -445,11 +445,15 @@ Geometry example::
     # the intersection pattern (the pattern here is for 'contains').
     Zipcode.objects.filter(poly__relate=(geom, 'T*T***FF*'))
 
-PostGIS SQL equivalent::
+PostGIS SQL equivalent:
+
+.. code-block:: sql
 
     SELECT ... WHERE ST_Relate(poly, geom, 'T*T***FF*')
 
-SpatiaLite SQL equivalent::
+SpatiaLite SQL equivalent:
+
+.. code-block:: sql
 
     SELECT ... WHERE Relate(poly, geom, 'T*T***FF*')
 
@@ -458,7 +462,9 @@ Raster example::
     Zipcode.objects.filter(poly__relate=(rast, 1, 'T*T***FF*'))
     Zipcode.objects.filter(rast__2__relate=(rast, 1, 'T*T***FF*'))
 
-PostGIS SQL equivalent::
+PostGIS SQL equivalent:
+
+.. code-block:: sql
 
     SELECT ... WHERE ST_Relate(poly, ST_Polygon(rast, 1), 'T*T***FF*')
     SELECT ... WHERE ST_Relate(ST_Polygon(rast, 2), ST_Polygon(rast, 1), 'T*T***FF*')
@@ -477,7 +483,9 @@ Example::
 
     Zipcode.objects.filter(poly__relate=(geom, 'anyinteract'))
 
-Oracle SQL equivalent::
+Oracle SQL equivalent:
+
+.. code-block:: sql
 
     SELECT ... WHERE SDO_RELATE(poly, geom, 'anyinteract')
 
@@ -552,7 +560,9 @@ Example::
 
     Zipcode.objects.filter(poly__left=geom)
 
-PostGIS equivalent::
+PostGIS equivalent:
+
+.. code-block:: sql
 
     SELECT ... WHERE poly << geom
 
@@ -571,7 +581,9 @@ Example::
 
     Zipcode.objects.filter(poly__right=geom)
 
-PostGIS equivalent::
+PostGIS equivalent:
+
+.. code-block:: sql
 
     SELECT ... WHERE poly >> geom
 
@@ -590,7 +602,9 @@ Example::
 
     Zipcode.objects.filter(poly__overlaps_left=geom)
 
-PostGIS equivalent::
+PostGIS equivalent:
+
+.. code-block:: sql
 
     SELECT ... WHERE poly &< geom
 
@@ -610,7 +624,9 @@ Example::
 
     Zipcode.objects.filter(poly__overlaps_right=geom)
 
-PostGIS equivalent::
+PostGIS equivalent:
+
+.. code-block:: sql
 
     SELECT ... WHERE poly &> geom
 
@@ -629,7 +645,9 @@ Example::
 
     Zipcode.objects.filter(poly__overlaps_above=geom)
 
-PostGIS equivalent::
+PostGIS equivalent:
+
+.. code-block:: sql
 
     SELECT ... WHERE poly |&> geom
 
@@ -648,7 +666,9 @@ Example::
 
     Zipcode.objects.filter(poly__overlaps_below=geom)
 
-PostGIS equivalent::
+PostGIS equivalent:
+
+.. code-block:: sql
 
     SELECT ... WHERE poly &<| geom
 
@@ -667,7 +687,9 @@ Example::
 
     Zipcode.objects.filter(poly__strictly_above=geom)
 
-PostGIS equivalent::
+PostGIS equivalent:
+
+.. code-block:: sql
 
     SELECT ... WHERE poly |>> geom
 
@@ -686,7 +708,9 @@ Example::
 
     Zipcode.objects.filter(poly__strictly_below=geom)
 
-PostGIS equivalent::
+PostGIS equivalent:
+
+.. code-block:: sql
 
     SELECT ... WHERE poly <<| geom
 

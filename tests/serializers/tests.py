@@ -12,8 +12,9 @@ from django.test import SimpleTestCase, override_settings, skipUnlessDBFeature
 from django.test.utils import Approximate
 
 from .models import (
-    Actor, Article, Author, AuthorProfile, BaseModel, Category, ComplexModel,
-    Movie, Player, ProxyBaseModel, ProxyProxyBaseModel, Score, Team,
+    Actor, Article, Author, AuthorProfile, BaseModel, Category, Child,
+    ComplexModel, Movie, Player, ProxyBaseModel, ProxyProxyBaseModel, Score,
+    Team,
 )
 
 
@@ -54,7 +55,7 @@ class SerializerRegistrationTests(SimpleTestCase):
             serializers.unregister_serializer("nonsense")
 
     def test_builtin_serializers(self):
-        "Requesting a list of serializer formats popuates the registry"
+        "Requesting a list of serializer formats populates the registry"
         all_formats = set(serializers.get_serializer_formats())
         public_formats = set(serializers.get_public_serializer_formats())
 
@@ -339,6 +340,14 @@ class SerializersTestBase:
         proxy_proxy_data = serializers.serialize("json", proxy_proxy_objects)
         self.assertEqual(base_data, proxy_data.replace('proxy', ''))
         self.assertEqual(base_data, proxy_proxy_data.replace('proxy', ''))
+
+    def test_serialize_inherited_fields(self):
+        child_1 = Child.objects.create(parent_data='a', child_data='b')
+        child_2 = Child.objects.create(parent_data='c', child_data='d')
+        child_1.parent_m2m.add(child_2)
+        child_data = serializers.serialize(self.serializer_name, [child_1, child_2])
+        self.assertEqual(self._get_field_values(child_data, 'parent_m2m'), [])
+        self.assertEqual(self._get_field_values(child_data, 'parent_data'), [])
 
 
 class SerializerAPITests(SimpleTestCase):

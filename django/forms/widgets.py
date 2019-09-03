@@ -979,7 +979,11 @@ class SelectDateWidget(Widget):
         date_context['year'] = self.select_widget(attrs, choices=year_choices).get_context(
             name=year_name,
             value=context['widget']['value']['year'],
-            attrs={**context['widget']['attrs'], 'id': 'id_%s' % year_name},
+            attrs={
+                **context['widget']['attrs'],
+                'id': 'id_%s' % year_name,
+                'placeholder': _('Year') if self.is_required else False,
+            },
         )
         month_choices = list(self.months.items())
         if not self.is_required:
@@ -988,7 +992,11 @@ class SelectDateWidget(Widget):
         date_context['month'] = self.select_widget(attrs, choices=month_choices).get_context(
             name=month_name,
             value=context['widget']['value']['month'],
-            attrs={**context['widget']['attrs'], 'id': 'id_%s' % month_name},
+            attrs={
+                **context['widget']['attrs'],
+                'id': 'id_%s' % month_name,
+                'placeholder': _('Month') if self.is_required else False,
+            },
         )
         day_choices = [(i, i) for i in range(1, 32)]
         if not self.is_required:
@@ -997,7 +1005,11 @@ class SelectDateWidget(Widget):
         date_context['day'] = self.select_widget(attrs, choices=day_choices,).get_context(
             name=day_name,
             value=context['widget']['value']['day'],
-            attrs={**context['widget']['attrs'], 'id': 'id_%s' % day_name},
+            attrs={
+                **context['widget']['attrs'],
+                'id': 'id_%s' % day_name,
+                'placeholder': _('Day') if self.is_required else False,
+            },
         )
         subwidgets = []
         for field in self._parse_date_fmt():
@@ -1058,18 +1070,15 @@ class SelectDateWidget(Widget):
         if y == m == d == '':
             return None
         if y is not None and m is not None and d is not None:
-            if settings.USE_L10N:
-                input_format = get_format('DATE_INPUT_FORMATS')[0]
-                try:
-                    date_value = datetime.date(int(y), int(m), int(d))
-                except ValueError:
-                    pass
-                else:
-                    date_value = datetime_safe.new_date(date_value)
-                    return date_value.strftime(input_format)
-            # Return pseudo-ISO dates with zeros for any unselected values,
-            # e.g. '2017-0-23'.
-            return '%s-%s-%s' % (y or 0, m or 0, d or 0)
+            input_format = get_format('DATE_INPUT_FORMATS')[0]
+            try:
+                date_value = datetime.date(int(y), int(m), int(d))
+            except ValueError:
+                # Return pseudo-ISO dates with zeros for any unselected values,
+                # e.g. '2017-0-23'.
+                return '%s-%s-%s' % (y or 0, m or 0, d or 0)
+            date_value = datetime_safe.new_date(date_value)
+            return date_value.strftime(input_format)
         return data.get(name)
 
     def value_omitted_from_data(self, data, files, name):

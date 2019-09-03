@@ -49,7 +49,7 @@ To build the documentation locally, install Sphinx:
 
 .. console::
 
-     $ pip install Sphinx
+     $ python -m pip install Sphinx
 
 Then from the ``docs`` directory, build the HTML:
 

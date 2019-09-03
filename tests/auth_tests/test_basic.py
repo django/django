@@ -53,14 +53,18 @@ class BasicTestCase(TestCase):
 
     def test_user_no_email(self):
         "Users can be created without an email"
-        u = User.objects.create_user('testuser1')
-        self.assertEqual(u.email, '')
-
-        u2 = User.objects.create_user('testuser2', email='')
-        self.assertEqual(u2.email, '')
-
-        u3 = User.objects.create_user('testuser3', email=None)
-        self.assertEqual(u3.email, '')
+        cases = [
+            {},
+            {'email': ''},
+            {'email': None},
+        ]
+        for i, kwargs in enumerate(cases):
+            with self.subTest(**kwargs):
+                u = User.objects.create_user(
+                    'testuser{}'.format(i),
+                    **kwargs
+                )
+                self.assertEqual(u.email, '')
 
     def test_superuser(self):
         "Check the creation and properties of a superuser"
@@ -68,6 +72,22 @@ class BasicTestCase(TestCase):
         self.assertTrue(super.is_superuser)
         self.assertTrue(super.is_active)
         self.assertTrue(super.is_staff)
+
+    def test_superuser_no_email_or_password(self):
+        cases = [
+            {},
+            {'email': ''},
+            {'email': None},
+            {'password': None},
+        ]
+        for i, kwargs in enumerate(cases):
+            with self.subTest(**kwargs):
+                superuser = User.objects.create_superuser(
+                    'super{}'.format(i),
+                    **kwargs
+                )
+                self.assertEqual(superuser.email, '')
+                self.assertFalse(superuser.has_usable_password())
 
     def test_get_user_model(self):
         "The current user model can be retrieved"

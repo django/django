@@ -222,7 +222,7 @@ Related fields
 * **fields.E331**: Field specifies a many-to-many relation through model
   ``<model>``, which has not been installed.
 * **fields.E332**: Many-to-many fields with intermediate tables must not be
-  symmetrical.
+  symmetrical. *This check appeared before Django 3.0.*
 * **fields.E333**: The model is used as an intermediate model by ``<model>``,
   but it has more than two foreign keys to ``<model>``, which is ambiguous.
   You must specify which two foreign keys Django should use via the
@@ -306,6 +306,19 @@ Models
 * **models.W027**: ``<database>`` does not support check constraints.
 * **models.E028**: ``db_table`` ``<db_table>`` is used by multiple models:
   ``<model list>``.
+* **models.E029**: index name ``<index>`` is not unique for model ``<model>``.
+* **models.E030**: index name ``<index>`` is not unique amongst models:
+  ``<model list>``.
+* **models.E031**: constraint name ``<constraint>`` is not unique for model
+  ``<model>``.
+* **models.E032**: constraint name ``<constraint>`` is not unique amongst
+  models: ``<model list>``.
+* **models.E033**: The index name ``<index>`` cannot start with an underscore
+  or a number.
+* **models.E034**: The index name ``<index>`` cannot be longer than
+  ``<max_length>`` characters.
+* **models.W035**: ``db_table`` ``<db_table>`` is used by multiple models:
+  ``<model list>``.
 
 Security
 --------
@@ -358,7 +371,8 @@ The following checks are run if you use the :option:`check --deploy` option:
   set to ``True``, so your pages will not be served with an
   ``'X-XSS-Protection: 1; mode=block'`` header. You should consider enabling
   this header to activate the browser's XSS filtering and help prevent XSS
-  attacks.
+  attacks. *This check is removed in Django 3.0 as the ``X-XSS-Protection``
+  header is no longer honored by modern browsers.*
 * **security.W008**: Your :setting:`SECURE_SSL_REDIRECT` setting is not set to
   ``True``. Unless your site should be available over both SSL and non-SSL
   connections, you may want to either set this setting to ``True`` or configure
@@ -399,7 +413,7 @@ The following checks are run if you use the :option:`check --deploy` option:
 * **security.W017**: :setting:`CSRF_COOKIE_HTTPONLY` is not set to ``True``.
   Using an ``HttpOnly`` CSRF cookie makes it more difficult for cross-site
   scripting attacks to steal the CSRF token. *This check is removed in Django
-  1.11 as the* :setting:`CSRF_COOKIE_HTTPONLY` *setting offers no pratical
+  1.11 as the* :setting:`CSRF_COOKIE_HTTPONLY` *setting offers no practical
   benefit.*
 * **security.W018**: You should not have :setting:`DEBUG` set to ``True`` in
   deployment.
@@ -448,9 +462,6 @@ The following checks are performed on your translation configuration:
 * **translation.E004**: You have provided a value for the
   :setting:`LANGUAGE_CODE` setting that is not in the :setting:`LANGUAGES`
   setting.
-* **translation.E005**: You have provided values in the
-  :setting:`LANGUAGES_BIDI` setting that are not in the :setting:`LANGUAGES`
-  setting.
 
 URLs
 ----
@@ -476,6 +487,8 @@ The following checks are performed on your URL configuration:
   end with a slash.
 * **urls.E007**: The custom ``handlerXXX`` view ``'path.to.view'`` does not
   take the correct number of arguments (…).
+* **urls.E008**: The custom ``handlerXXX`` view ``'path.to.view'`` could not be
+  imported.
 
 ``contrib`` app checks
 ======================
@@ -667,12 +680,12 @@ The following checks are performed on the default
   :setting:`INSTALLED_APPS` in order to use the admin application.
 * **admin.E406**: :mod:`django.contrib.messages` must be in
   :setting:`INSTALLED_APPS` in order to use the admin application.
-* **admin.E407**: :mod:`django.contrib.sessions` must be in
-  :setting:`INSTALLED_APPS` in order to use the admin application.
 * **admin.E408**:
   :class:`django.contrib.auth.middleware.AuthenticationMiddleware` must be in
   :setting:`MIDDLEWARE` in order to use the admin application.
 * **admin.E409**: :class:`django.contrib.messages.middleware.MessageMiddleware`
+  must be in :setting:`MIDDLEWARE` in order to use the admin application.
+* **admin.E410**: :class:`django.contrib.sessions.middleware.SessionMiddleware`
   must be in :setting:`MIDDLEWARE` in order to use the admin application.
 
 ``auth``

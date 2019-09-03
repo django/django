@@ -93,6 +93,7 @@ Unit Attribute                     Full name or alias(es)
 ``clarke_link``                    Clarke's link
 ``fathom``                         Fathom
 ``rod``                            Rod
+``furlong``                        Furlong, Furrow Long
 ``nm``                             Nautical Mile
 ``nm_uk``                          Nautical Mile (UK)
 ``german_m``                       German legal metre

@@ -27,12 +27,11 @@ In template {{ template_info.name }}, error at line {{ template_info.line }}
    {{ template_info.message }}
 {% for source_line in template_info.source_lines %}{% if source_line.0 == template_info.line %}   {{ source_line.0 }} : {{ template_info.before }} {{ template_info.during }} {{ template_info.after }}{% else %}   {{ source_line.0 }} : {{ source_line.1 }}{% endif %}{% endfor %}{% endif %}{% if frames %}
 
-Traceback:
+Traceback (most recent call last):
 {% for frame in frames %}{% ifchanged frame.exc_cause %}{% if frame.exc_cause %}
 {% if frame.exc_cause_explicit %}The above exception ({{ frame.exc_cause }}) was the direct cause of the following exception:{% else %}During handling of the above exception ({{ frame.exc_cause }}), another exception occurred:{% endif %}
-{% endif %}{% endifchanged %}
-File "{{ frame.filename }}" in {{ frame.function }}
-{% if frame.context_line %}  {{ frame.lineno }}. {{ frame.context_line }}{% endif %}
+{% endif %}{% endifchanged %}  File "{{ frame.filename }}"{% if frame.context_line %}, line {{ frame.lineno }}{% endif %}, in {{ frame.function }}
+{% if frame.context_line %}    {% spaceless %}{{ frame.context_line }}{% endspaceless %}{% endif %}
 {% endfor %}
 {% if exception_type %}Exception Type: {{ exception_type }}{% if request %} at {{ request.path_info }}{% endif %}
 {% if exception_value %}Exception Value: {{ exception_value }}{% endif %}{% endif %}{% endif %}

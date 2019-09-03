@@ -33,6 +33,12 @@ class OrderableAggMixin:
             return sql, sql_params + ordering_params
         return super().as_sql(compiler, connection, ordering='')
 
+    def set_source_expressions(self, exprs):
+        # Extract the ordering expressions because ORDER BY clause is handled
+        # in a custom way.
+        self.ordering = exprs[self._get_ordering_expressions_index():]
+        return super().set_source_expressions(exprs[:self._get_ordering_expressions_index()])
+
     def get_source_expressions(self):
         return self.source_expressions + self.ordering
 

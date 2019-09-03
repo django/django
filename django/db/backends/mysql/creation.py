@@ -56,8 +56,7 @@ class DatabaseCreation(BaseDatabaseCreation):
 
     def _clone_db(self, source_database_name, target_database_name):
         dump_args = DatabaseClient.settings_to_cmd_args(self.connection.settings_dict)[1:]
-        dump_args[-1] = source_database_name
-        dump_cmd = ['mysqldump', '--routines', '--events'] + dump_args
+        dump_cmd = ['mysqldump', *dump_args[:-1], '--routines', '--events', source_database_name]
         load_cmd = DatabaseClient.settings_to_cmd_args(self.connection.settings_dict)
         load_cmd[-1] = target_database_name
 

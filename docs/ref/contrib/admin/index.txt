@@ -1273,7 +1273,9 @@ subclass::
     word must be in at least one of ``search_fields``. For example, if
     ``search_fields`` is set to ``['first_name', 'last_name']`` and a user
     searches for ``john lennon``, Django will do the equivalent of this SQL
-    ``WHERE`` clause::
+    ``WHERE`` clause:
+
+    .. code-block:: sql
 
         WHERE (first_name ILIKE '%john%' OR last_name ILIKE '%john%')
         AND (first_name ILIKE '%lennon%' OR last_name ILIKE '%lennon%')
@@ -1626,6 +1628,16 @@ templates used by the :class:`ModelAdmin` views:
     If you override this method, make sure that the returned inlines are
     instances of the classes defined in :attr:`inlines` or you might encounter
     a "Bad Request" error when adding related objects.
+
+.. method:: ModelAdmin.get_inlines(request, obj)
+
+    .. versionadded:: 3.0
+
+    The ``get_inlines`` method is given the ``HttpRequest`` and the
+    ``obj`` being edited (or ``None`` on an add form) and is expected to return
+    an iterable of inlines. You can override this method to dynamically add
+    inlines based on the request or model instance instead of specifying them
+    in :attr:`ModelAdmin.inlines`.
 
 .. method:: ModelAdmin.get_urls()
 
@@ -2117,9 +2129,13 @@ jQuery
 Django admin JavaScript makes use of the `jQuery`_ library.
 
 To avoid conflicts with user-supplied scripts or libraries, Django's jQuery
-(version 3.3.1) is namespaced as ``django.jQuery``. If you want to use jQuery
+(version 3.4.1) is namespaced as ``django.jQuery``. If you want to use jQuery
 in your own admin JavaScript without including a second copy, you can use the
 ``django.jQuery`` object on changelist and add/edit views.
+
+.. versionchanged:: 3.0
+
+    jQuery was upgraded from 3.3.1 to 3.4.1.
 
 The :class:`ModelAdmin` class requires jQuery by default, so there is no need
 to add jQuery to your ``ModelAdmin``’s list of media resources unless you have
@@ -2223,6 +2239,7 @@ adds some of its own (the shared features are actually defined in the
 - :attr:`~ModelAdmin.filter_vertical`
 - :attr:`~ModelAdmin.ordering`
 - :attr:`~ModelAdmin.prepopulated_fields`
+- :meth:`~ModelAdmin.get_fieldsets`
 - :meth:`~ModelAdmin.get_queryset`
 - :attr:`~ModelAdmin.radio_fields`
 - :attr:`~ModelAdmin.readonly_fields`
@@ -2346,7 +2363,8 @@ The ``InlineModelAdmin`` class adds or customizes:
 .. method:: InlineModelAdmin.get_formset(request, obj=None, **kwargs)
 
     Returns a :class:`~django.forms.models.BaseInlineFormSet` class for use in
-    admin add/change views. See the example for
+    admin add/change views. ``obj`` is the parent object being edited or
+    ``None`` when adding a new parent. See the example for
     :class:`ModelAdmin.get_formsets_with_inlines`.
 
 .. method:: InlineModelAdmin.get_extra(request, obj=None, **kwargs)
@@ -2409,6 +2427,10 @@ The ``InlineModelAdmin`` class adds or customizes:
 
     Should return ``True`` if deleting an inline object is permitted, ``False``
     otherwise. ``obj`` is the parent object being edited.
+
+.. note::
+    The ``obj`` argument passed to ``InlineModelAdmin`` methods is the parent
+    object being edited or ``None`` when adding a new parent.
 
 Working with a model with two or more foreign keys to the same parent model
 ---------------------------------------------------------------------------

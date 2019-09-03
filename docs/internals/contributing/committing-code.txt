@@ -129,7 +129,7 @@ Django's Git repository:
 
   .. code-block:: none
 
-      Fixed #18307 -- Added git workflow guidelines
+      Fixed #18307 -- Added git workflow guidelines.
 
       Refactored the Django's documentation to remove mentions of SVN
       specific tasks. Added guidelines of how to use Git, GitHub, and

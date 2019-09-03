@@ -60,6 +60,14 @@ class Storage:
         """
         return get_valid_filename(name)
 
+    def get_alternative_name(self, file_root, file_ext):
+        """
+        Return an alternative filename, by adding an underscore and a random 7
+        character alphanumeric string (before the file extension, if one
+        exists) to the filename.
+        """
+        return '%s_%s%s' % (file_root, get_random_string(7), file_ext)
+
     def get_available_name(self, name, max_length=None):
         """
         Return a filename that's free on the target storage system and
@@ -67,14 +75,13 @@ class Storage:
         """
         dir_name, file_name = os.path.split(name)
         file_root, file_ext = os.path.splitext(file_name)
-        # If the filename already exists, add an underscore and a random 7
-        # character alphanumeric string (before the file extension, if one
-        # exists) to the filename until the generated filename doesn't exist.
+        # If the filename already exists, generate an alternative filename
+        # until it doesn't exist.
         # Truncate original name if required, so the new filename does not
         # exceed the max_length.
         while self.exists(name) or (max_length and len(name) > max_length):
             # file_ext includes the dot.
-            name = os.path.join(dir_name, "%s_%s%s" % (file_root, get_random_string(7), file_ext))
+            name = os.path.join(dir_name, self.get_alternative_name(file_root, file_ext))
             if max_length is None:
                 continue
             # Truncate file_root if max_length exceeded.
@@ -88,7 +95,7 @@ class Storage:
                         'Please make sure that the corresponding file field '
                         'allows sufficient "max_length".' % name
                     )
-                name = os.path.join(dir_name, "%s_%s%s" % (file_root, get_random_string(7), file_ext))
+                name = os.path.join(dir_name, self.get_alternative_name(file_root, file_ext))
         return name
 
     def generate_filename(self, filename):

@@ -20,6 +20,7 @@ from django.db import utils
 from django.db.backends import utils as backend_utils
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.utils import timezone
+from django.utils.asyncio import async_unsafe
 from django.utils.dateparse import parse_datetime, parse_time
 from django.utils.duration import duration_microseconds
 
@@ -103,6 +104,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         'PositiveIntegerField': 'integer unsigned',
         'PositiveSmallIntegerField': 'smallint unsigned',
         'SlugField': 'varchar(%(max_length)s)',
+        'SmallAutoField': 'integer',
         'SmallIntegerField': 'smallint',
         'TextField': 'text',
         'TimeField': 'time',
@@ -115,6 +117,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     data_types_suffix = {
         'AutoField': 'AUTOINCREMENT',
         'BigAutoField': 'AUTOINCREMENT',
+        'SmallAutoField': 'AUTOINCREMENT',
     }
     # SQLite requires LIKE statements to include an ESCAPE clause if the value
     # being escaped has a percent or underscore in it.
@@ -191,6 +194,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         kwargs.update({'check_same_thread': False, 'uri': True})
         return kwargs
 
+    @async_unsafe
     def get_new_connection(self, conn_params):
         conn = Database.connect(**conn_params)
         conn.create_function("django_date_extract", 2, _sqlite_datetime_extract)
@@ -248,6 +252,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     def create_cursor(self, name=None):
         return self.connection.cursor(factory=SQLiteCursorWrapper)
 
+    @async_unsafe
     def close(self):
         self.validate_thread_sharing()
         # If database is in memory, closing the connection destroys the
@@ -408,6 +413,14 @@ def _sqlite_datetime_parse(dt, tzname=None, conn_tzname=None):
     if conn_tzname:
         dt = dt.replace(tzinfo=pytz.timezone(conn_tzname))
     if tzname is not None and tzname != conn_tzname:
+        sign_index = tzname.find('+') + tzname.find('-') + 1
+        if sign_index > -1:
+            sign = tzname[sign_index]
+            tzname, offset = tzname.split(sign)
+            if offset:
+                hours, minutes = offset.split(':')
+                offset_delta = datetime.timedelta(hours=int(hours), minutes=int(minutes))
+                dt += offset_delta if sign == '+' else -offset_delta
         dt = timezone.localtime(dt, pytz.timezone(tzname))
     return dt
 

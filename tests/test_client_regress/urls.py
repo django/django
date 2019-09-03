@@ -31,6 +31,7 @@ urlpatterns = [
     path('check_unicode/', views.return_unicode),
     path('check_binary/', views.return_undecodable_binary),
     path('json_response/', views.return_json_response),
+    path('json_response_latin1/', views.return_json_response_latin1),
     path('parse_encoded_text/', views.return_text_file),
     path('check_headers/', views.check_headers),
     path('check_headers_redirect/', RedirectView.as_view(url='/check_headers/')),

@@ -864,12 +864,12 @@ class EmptyModelMixin(models.Model):
 
 
 class State(models.Model):
-    name = models.CharField(max_length=100)
+    name = models.CharField(max_length=100, verbose_name='State verbose_name')
 
 
 class City(models.Model):
     state = models.ForeignKey(State, models.CASCADE)
-    name = models.CharField(max_length=100)
+    name = models.CharField(max_length=100, verbose_name='City verbose_name')
 
     def get_absolute_url(self):
         return '/dummy/%s/' % self.pk

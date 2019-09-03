@@ -284,7 +284,7 @@ transform do not change. For example::
     similar to PostgreSQL's ``text`` type.
 
     .. _citext: https://www.postgresql.org/docs/current/citext.html
-    .. _the performance considerations: https://www.postgresql.org/docs/current/citext.html#AEN178177
+    .. _the performance considerations: https://www.postgresql.org/docs/current/citext.html#id-1.11.7.17.7
 
 ``HStoreField``
 ===============
@@ -881,7 +881,7 @@ Returned objects are empty ranges. Can be chained to valid lookups for a
     <QuerySet []>
 
 Defining your own range types
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-----------------------------
 
 PostgreSQL allows the definition of custom range types. Django's model and form
 field implementations use base classes below, and psycopg2 provides a
@@ -916,3 +916,54 @@ types.
     .. attribute:: range_type
 
         The psycopg2 range type to use.
+
+Range operators
+---------------
+
+.. versionadded:: 3.0
+
+.. class:: RangeOperators
+
+PostgreSQL provides a set of SQL operators that can be used together with the
+range data types (see `the PostgreSQL documentation for the full details of
+range operators <https://www.postgresql.org/docs/current/
+functions-range.html#RANGE-OPERATORS-TABLE>`_). This class is meant as a
+convenient method to avoid typos. The operator names overlap with the names of
+corresponding lookups.
+
+.. code-block:: python
+
+    class RangeOperators:
+        EQUAL = '='
+        NOT_EQUAL = '<>'
+        CONTAINS = '@>'
+        CONTAINED_BY = '<@'
+        OVERLAPS = '&&'
+        FULLY_LT = '<<'
+        FULLY_GT = '>>'
+        NOT_LT = '&>'
+        NOT_GT = '&<'
+        ADJACENT_TO = '-|-'
+
+RangeBoundary() expressions
+---------------------------
+
+.. versionadded:: 3.0
+
+.. class:: RangeBoundary(inclusive_lower=True, inclusive_upper=False)
+
+    .. attribute:: inclusive_lower
+
+        If ``True`` (default), the lower bound is inclusive ``'['``, otherwise
+        it's exclusive ``'('``.
+
+    .. attribute:: inclusive_upper
+
+        If ``False`` (default), the upper bound is exclusive ``')'``, otherwise
+        it's inclusive ``']'``.
+
+A ``RangeBoundary()`` expression represents the range boundaries. It can be
+used with a custom range functions that expected boundaries, for example to
+define :class:`~django.contrib.postgres.constraints.ExclusionConstraint`. See
+`the PostgreSQL documentation for the full details <https://www.postgresql.org/
+docs/current/rangetypes.html#RANGETYPES-INCLUSIVITY>`_.

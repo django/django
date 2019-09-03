@@ -3,8 +3,10 @@ import math
 from copy import copy
 
 from django.core.exceptions import EmptyResultSet
-from django.db.models.expressions import Func, Value
-from django.db.models.fields import DateTimeField, Field, IntegerField
+from django.db.models.expressions import Case, Exists, Func, Value, When
+from django.db.models.fields import (
+    BooleanField, DateTimeField, Field, IntegerField,
+)
 from django.db.models.query_utils import RegisterLookupMixin
 from django.utils.datastructures import OrderedSet
 from django.utils.functional import cached_property
@@ -112,6 +114,19 @@ class Lookup:
     def as_sql(self, compiler, connection):
         raise NotImplementedError
 
+    def as_oracle(self, compiler, connection):
+        # Oracle doesn't allow EXISTS() to be compared to another expression
+        # unless it's wrapped in a CASE WHEN.
+        wrapped = False
+        exprs = []
+        for expr in (self.lhs, self.rhs):
+            if isinstance(expr, Exists):
+                expr = Case(When(expr, then=True), default=False, output_field=BooleanField())
+                wrapped = True
+            exprs.append(expr)
+        lookup = type(self)(*exprs) if wrapped else self
+        return lookup.as_sql(compiler, connection)
+
     @cached_property
     def contains_aggregate(self):
         return self.lhs.contains_aggregate or getattr(self.rhs, 'contains_aggregate', False)
@@ -176,8 +191,9 @@ class FieldGetDbPrepValueMixin:
     get_db_prep_lookup_value_is_iterable = False
 
     def get_db_prep_lookup(self, value, connection):
-        # For relational fields, use the output_field of the 'field' attribute.
-        field = getattr(self.lhs.output_field, 'field', None)
+        # For relational fields, use the 'target_field' attribute of the
+        # output_field.
+        field = getattr(self.lhs.output_field, 'target_field', None)
         get_db_prep_value = getattr(field, 'get_db_prep_value', None) or self.lhs.output_field.get_db_prep_value
         return (
             '%s',
@@ -483,71 +499,52 @@ class YearLookup(Lookup):
             bounds = connection.ops.year_lookup_bounds_for_date_field(year)
         return bounds
 
-
-class YearComparisonLookup(YearLookup):
     def as_sql(self, compiler, connection):
-        # We will need to skip the extract part and instead go
-        # directly with the originating field, that is self.lhs.lhs.
-        lhs_sql, params = self.process_lhs(compiler, connection, self.lhs.lhs)
-        rhs_sql, rhs_params = self.process_rhs(compiler, connection)
-        rhs_sql = self.get_rhs_op(connection, rhs_sql)
-        start, finish = self.year_lookup_bounds(connection, rhs_params[0])
-        params.append(self.get_bound(start, finish))
-        return '%s %s' % (lhs_sql, rhs_sql), params
+        # Avoid the extract operation if the rhs is a direct value to allow
+        # indexes to be used.
+        if self.rhs_is_direct_value():
+            # Skip the extract part by directly using the originating field,
+            # that is self.lhs.lhs.
+            lhs_sql, params = self.process_lhs(compiler, connection, self.lhs.lhs)
+            rhs_sql, _ = self.process_rhs(compiler, connection)
+            rhs_sql = self.get_direct_rhs_sql(connection, rhs_sql)
+            start, finish = self.year_lookup_bounds(connection, self.rhs)
+            params.extend(self.get_bound_params(start, finish))
+            return '%s %s' % (lhs_sql, rhs_sql), params
+        return super().as_sql(compiler, connection)
 
-    def get_rhs_op(self, connection, rhs):
+    def get_direct_rhs_sql(self, connection, rhs):
         return connection.operators[self.lookup_name] % rhs
 
-    def get_bound(self, start, finish):
+    def get_bound_params(self, start, finish):
         raise NotImplementedError(
-            'subclasses of YearComparisonLookup must provide a get_bound() method'
+            'subclasses of YearLookup must provide a get_bound_params() method'
         )
 
 
 class YearExact(YearLookup, Exact):
-    lookup_name = 'exact'
+    def get_direct_rhs_sql(self, connection, rhs):
+        return 'BETWEEN %s AND %s'
 
-    def as_sql(self, compiler, connection):
-        # We will need to skip the extract part and instead go
-        # directly with the originating field, that is self.lhs.lhs.
-        lhs_sql, params = self.process_lhs(compiler, connection, self.lhs.lhs)
-        rhs_sql, rhs_params = self.process_rhs(compiler, connection)
-        try:
-            # Check that rhs_params[0] exists (IndexError),
-            # it isn't None (TypeError), and is a number (ValueError)
-            int(rhs_params[0])
-        except (IndexError, TypeError, ValueError):
-            # Can't determine the bounds before executing the query, so skip
-            # optimizations by falling back to a standard exact comparison.
-            return super().as_sql(compiler, connection)
-        bounds = self.year_lookup_bounds(connection, rhs_params[0])
-        params.extend(bounds)
-        return '%s BETWEEN %%s AND %%s' % lhs_sql, params
+    def get_bound_params(self, start, finish):
+        return (start, finish)
 
 
-class YearGt(YearComparisonLookup):
-    lookup_name = 'gt'
-
-    def get_bound(self, start, finish):
-        return finish
+class YearGt(YearLookup, GreaterThan):
+    def get_bound_params(self, start, finish):
+        return (finish,)
 
 
-class YearGte(YearComparisonLookup):
-    lookup_name = 'gte'
-
-    def get_bound(self, start, finish):
-        return start
+class YearGte(YearLookup, GreaterThanOrEqual):
+    def get_bound_params(self, start, finish):
+        return (start,)
 
 
-class YearLt(YearComparisonLookup):
-    lookup_name = 'lt'
-
-    def get_bound(self, start, finish):
-        return start
+class YearLt(YearLookup, LessThan):
+    def get_bound_params(self, start, finish):
+        return (start,)
 
 
-class YearLte(YearComparisonLookup):
-    lookup_name = 'lte'
-
-    def get_bound(self, start, finish):
-        return finish
+class YearLte(YearLookup, LessThanOrEqual):
+    def get_bound_params(self, start, finish):
+        return (finish,)

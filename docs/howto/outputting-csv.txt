@@ -47,7 +47,7 @@ mention:
   bill.
 
 * For each row in your CSV file, call ``writer.writerow``, passing it an
-  iterable object such as a list or tuple.
+  :term:`iterable`.
 
 * The CSV module takes care of quoting for you, so you don't have to worry
   about escaping strings with quotes or commas in them. Just pass

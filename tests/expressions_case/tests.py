@@ -1327,9 +1327,14 @@ class CaseWhenTests(SimpleTestCase):
             Case(When(Q(pk__in=[])), object())
 
     def test_invalid_when_constructor_args(self):
-        msg = '__init__() takes either a Q object or lookups as keyword arguments'
+        msg = (
+            'When() supports a Q object, a boolean expression, or lookups as '
+            'a condition.'
+        )
         with self.assertRaisesMessage(TypeError, msg):
             When(condition=object())
+        with self.assertRaisesMessage(TypeError, msg):
+            When(condition=Value(1, output_field=models.IntegerField()))
         with self.assertRaisesMessage(TypeError, msg):
             When()
 

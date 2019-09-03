@@ -116,8 +116,8 @@ class DeferredAttribute:
     A wrapper for a deferred-loading field. When the value is read from this
     object the first time, the query is executed.
     """
-    def __init__(self, field_name):
-        self.field_name = field_name
+    def __init__(self, field):
+        self.field = field
 
     def __get__(self, instance, cls=None):
         """
@@ -127,26 +127,26 @@ class DeferredAttribute:
         if instance is None:
             return self
         data = instance.__dict__
-        if data.get(self.field_name, self) is self:
+        field_name = self.field.attname
+        if data.get(field_name, self) is self:
             # Let's see if the field is part of the parent chain. If so we
             # might be able to reuse the already loaded value. Refs #18343.
-            val = self._check_parent_chain(instance, self.field_name)
+            val = self._check_parent_chain(instance)
             if val is None:
-                instance.refresh_from_db(fields=[self.field_name])
-                val = getattr(instance, self.field_name)
-            data[self.field_name] = val
-        return data[self.field_name]
+                instance.refresh_from_db(fields=[field_name])
+                val = getattr(instance, field_name)
+            data[field_name] = val
+        return data[field_name]
 
-    def _check_parent_chain(self, instance, name):
+    def _check_parent_chain(self, instance):
         """
         Check if the field value can be fetched from a parent field already
         loaded in the instance. This can be done if the to-be fetched
         field is a primary key field.
         """
         opts = instance._meta
-        f = opts.get_field(name)
-        link_field = opts.get_ancestor_link(f.model)
-        if f.primary_key and f != link_field:
+        link_field = opts.get_ancestor_link(self.field.model)
+        if self.field.primary_key and self.field != link_field:
             return getattr(instance, link_field.attname)
         return None
 

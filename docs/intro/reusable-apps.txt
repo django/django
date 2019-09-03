@@ -280,14 +280,14 @@ working. We'll now fix this by installing our new ``django-polls`` package.
 #. To install the package, use pip (you already :ref:`installed it
    <installing-reusable-apps-prerequisites>`, right?)::
 
-    pip install --user django-polls/dist/django-polls-0.1.tar.gz
+    python -m pip install --user django-polls/dist/django-polls-0.1.tar.gz
 
 #. With luck, your Django project should now work correctly again. Run the
    server again to confirm this.
 
 #. To uninstall the package, use pip::
 
-    pip uninstall django-polls
+    python -m pip uninstall django-polls
 
 Publishing your app
 ===================

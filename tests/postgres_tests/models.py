@@ -135,7 +135,9 @@ class RangesModel(PostgreSQLModel):
     bigints = BigIntegerRangeField(blank=True, null=True)
     decimals = DecimalRangeField(blank=True, null=True)
     timestamps = DateTimeRangeField(blank=True, null=True)
+    timestamps_inner = DateTimeRangeField(blank=True, null=True)
     dates = DateRangeField(blank=True, null=True)
+    dates_inner = DateRangeField(blank=True, null=True)
 
 
 class RangeLookupsModel(PostgreSQLModel):
@@ -181,3 +183,15 @@ class NowTestModel(models.Model):
 
 class UUIDTestModel(models.Model):
     uuid = models.UUIDField(default=None, null=True)
+
+
+class Room(models.Model):
+    number = models.IntegerField(unique=True)
+
+
+class HotelReservation(PostgreSQLModel):
+    room = models.ForeignKey('Room', on_delete=models.CASCADE)
+    datespan = DateRangeField()
+    start = models.DateTimeField()
+    end = models.DateTimeField()
+    cancelled = models.BooleanField(default=False)

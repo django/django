@@ -115,7 +115,7 @@ Changing a user's password will log out all their sessions. See
 Authenticating users
 --------------------
 
-.. function:: authenticate(request=None, \**credentials)
+.. function:: authenticate(request=None, **credentials)
 
     Use :func:`~django.contrib.auth.authenticate()` to verify a set of
     credentials. It takes credentials as keyword arguments, ``username`` and
@@ -328,12 +328,12 @@ inherit the permissions of the concrete model they subclass::
 
     class Person(models.Model):
         class Meta:
-            permissions = (('can_eat_pizzas', 'Can eat pizzas'),)
+            permissions = [('can_eat_pizzas', 'Can eat pizzas')]
 
     class Student(Person):
         class Meta:
             proxy = True
-            permissions = (('can_deliver_pizzas', 'Can deliver pizzas'),)
+            permissions = [('can_deliver_pizzas', 'Can deliver pizzas')]
 
     >>> # Fetch the content type for the proxy model.
     >>> content_type = ContentType.objects.get_for_model(Student, for_concrete_model=False)
@@ -1292,7 +1292,8 @@ implementation details see :ref:`using-the-views`.
       link. By default, HTML email is not sent.
 
     * ``extra_email_context``: A dictionary of context data that will be
-      available in the email template.
+      available in the email template. It can be used to override default
+      template context values listed below e.g. ``domain``.
 
     **Template context:**
 
@@ -1394,6 +1395,13 @@ implementation details see :ref:`using-the-views`.
 
     * ``extra_context``: A dictionary of context data that will be added to the
       default context data passed to the template.
+
+    * ``reset_url_token``: Token parameter displayed as a component of password
+      reset URLs. Defaults to ``'set-password'``.
+
+      .. versionchanged:: 3.0
+
+        The ``reset_url_token`` class attribute was added.
 
     **Template context:**
 

@@ -27,8 +27,14 @@ class Article(models.Model):
         return self.headline
 
 
+class Country(models.Model):
+    id = models.SmallAutoField(primary_key=True)
+    name = models.CharField(max_length=50)
+
+
 class City(models.Model):
     id = models.BigAutoField(primary_key=True)
+    country = models.ForeignKey(Country, models.CASCADE, related_name='cities', null=True)
     name = models.CharField(max_length=50)
 
     def __str__(self):
@@ -68,6 +74,10 @@ class Parent(models.Model):
 class Child(models.Model):
     name = models.CharField(max_length=20)
     parent = models.ForeignKey(Parent, models.CASCADE)
+
+
+class ChildNullableParent(models.Model):
+    parent = models.ForeignKey(Parent, models.CASCADE, null=True)
 
 
 class ToFieldChild(models.Model):

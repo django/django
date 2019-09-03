@@ -28,6 +28,7 @@ class AustraliaCity(NamedModel):
     "City model for Australia, using WGS84."
     point = models.PointField()
     radius = models.IntegerField(default=10000)
+    allowed_distance = models.FloatField(default=0.5)
 
 
 class CensusZipcode(NamedModel):

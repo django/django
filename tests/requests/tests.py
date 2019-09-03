@@ -458,7 +458,7 @@ class RequestsTests(SimpleTestCase):
         self.assertEqual(request.read(13), b'--boundary\r\nC')
         self.assertEqual(request.POST, {'name': ['value']})
 
-    def test_POST_immutable_for_mutipart(self):
+    def test_POST_immutable_for_multipart(self):
         """
         MultiPartParser.parse() leaves request.POST immutable.
         """
@@ -896,6 +896,7 @@ class RequestHeadersTests(SimpleTestCase):
         request = WSGIRequest(self.ENVIRON)
         self.assertEqual(request.headers['User-Agent'], 'python-requests/1.2.0')
         self.assertEqual(request.headers['user-agent'], 'python-requests/1.2.0')
+        self.assertEqual(request.headers['user_agent'], 'python-requests/1.2.0')
         self.assertEqual(request.headers['Content-Type'], 'text/html')
         self.assertEqual(request.headers['Content-Length'], '100')
 

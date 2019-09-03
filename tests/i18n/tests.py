@@ -8,10 +8,9 @@ import tempfile
 from contextlib import contextmanager
 from importlib import import_module
 from pathlib import Path
-from threading import local
 from unittest import mock
 
-import _thread
+from asgiref.local import Local
 
 from django import forms
 from django.apps import AppConfig
@@ -34,9 +33,9 @@ from django.utils.translation import (
     LANGUAGE_SESSION_KEY, activate, check_for_language, deactivate,
     get_language, get_language_bidi, get_language_from_request,
     get_language_info, gettext, gettext_lazy, ngettext, ngettext_lazy,
-    npgettext, npgettext_lazy, pgettext, to_language, to_locale, trans_null,
-    trans_real, ugettext, ugettext_lazy, ugettext_noop, ungettext,
-    ungettext_lazy,
+    npgettext, npgettext_lazy, pgettext, round_away_from_one, to_language,
+    to_locale, trans_null, trans_real, ugettext, ugettext_lazy, ugettext_noop,
+    ungettext, ungettext_lazy,
 )
 from django.utils.translation.reloader import (
     translation_file_changed, watch_for_translation_changes,
@@ -289,7 +288,7 @@ class TranslationTests(SimpleTestCase):
 
     @override_settings(LOCALE_PATHS=extended_locale_paths)
     def test_pgettext(self):
-        trans_real._active = local()
+        trans_real._active = Local()
         trans_real._translations = {}
         with translation.override('de'):
             self.assertEqual(pgettext("unexisting", "May"), "May")
@@ -310,7 +309,7 @@ class TranslationTests(SimpleTestCase):
         Translating a string requiring no auto-escaping with gettext or pgettext
         shouldn't change the "safe" status.
         """
-        trans_real._active = local()
+        trans_real._active = Local()
         trans_real._translations = {}
         s1 = mark_safe('Password')
         s2 = mark_safe('May')
@@ -1678,7 +1677,7 @@ class UnprefixedDefaultLanguageTests(SimpleTestCase):
     def test_no_redirect_on_404(self):
         """
         A request for a nonexistent URL shouldn't cause a redirect to
-        /<defaut_language>/<request_url> when prefix_default_language=False and
+        /<default_language>/<request_url> when prefix_default_language=False and
         /<default_language>/<request_url> has a URL match (#27402).
         """
         # A match for /group1/group2/ must exist for this to act as a
@@ -1801,7 +1800,7 @@ class NonDjangoLanguageTests(SimpleTestCase):
         self.assertEqual(gettext("year"), "reay")
 
     @override_settings(USE_I18N=True)
-    def test_check_for_langauge(self):
+    def test_check_for_language(self):
         with tempfile.TemporaryDirectory() as app_dir:
             os.makedirs(os.path.join(app_dir, 'locale', 'dummy_Lang', 'LC_MESSAGES'))
             open(os.path.join(app_dir, 'locale', 'dummy_Lang', 'LC_MESSAGES', 'django.mo'), 'w').close()
@@ -1882,4 +1881,32 @@ class TranslationFileChangedTests(SimpleTestCase):
         self.assertEqual(gettext_module._translations, {})
         self.assertEqual(trans_real._translations, {})
         self.assertIsNone(trans_real._default)
-        self.assertIsInstance(trans_real._active, _thread._local)
+        self.assertIsInstance(trans_real._active, Local)
+
+
+class UtilsTests(SimpleTestCase):
+    def test_round_away_from_one(self):
+        tests = [
+            (0, 0),
+            (0., 0),
+            (0.25, 0),
+            (0.5, 0),
+            (0.75, 0),
+            (1, 1),
+            (1., 1),
+            (1.25, 2),
+            (1.5, 2),
+            (1.75, 2),
+            (-0., 0),
+            (-0.25, -1),
+            (-0.5, -1),
+            (-0.75, -1),
+            (-1, -1),
+            (-1., -1),
+            (-1.25, -2),
+            (-1.5, -2),
+            (-1.75, -2),
+        ]
+        for value, expected in tests:
+            with self.subTest(value=value):
+                self.assertEqual(round_away_from_one(value), expected)

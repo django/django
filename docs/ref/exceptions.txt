@@ -162,6 +162,40 @@ or model are classified as ``NON_FIELD_ERRORS``. This constant is used
 as a key in dictionaries that otherwise map fields to their respective
 list of errors.
 
+``RequestAborted``
+------------------
+
+.. exception:: RequestAborted
+
+    .. versionadded:: 3.0
+
+    The :exc:`RequestAborted` exception is raised when a HTTP body being read
+    in by the handler is cut off midstream and the client connection closes,
+    or when the client does not send data and hits a timeout where the server
+    closes the connection.
+
+    It is internal to the HTTP handler modules and you are unlikely to see
+    it elsewhere. If you are modifying HTTP handling code, you should raise
+    this when you encounter an aborted request to make sure the socket is
+    closed cleanly.
+
+``SynchronousOnlyOperation``
+----------------------------
+
+.. exception:: SynchronousOnlyOperation
+
+    .. versionadded:: 3.0
+
+    The :exc:`SynchronousOnlyOperation` exception is raised when code that
+    is only allowed in synchronous Python code is called from an asynchronous
+    context (a thread with a running asynchronous event loop). These parts of
+    Django are generally heavily reliant on thread-safety to function and don't
+    work correctly under coroutines sharing the same thread.
+
+    If you are trying to call code that is synchronous-only from an
+    asynchronous thread, then create a synchronous thread and call it in that.
+    You can accomplish this is with ``asgiref.sync.sync_to_async``.
+
 .. currentmodule:: django.urls
 
 URL Resolver exceptions

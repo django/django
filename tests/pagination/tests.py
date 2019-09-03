@@ -366,7 +366,8 @@ class ModelPaginationTests(TestCase):
         # Make sure object_list queryset is not evaluated by an invalid __getitem__ call.
         # (this happens from the template engine when using eg: {% page_obj.has_previous %})
         self.assertIsNone(p.object_list._result_cache)
-        with self.assertRaises(TypeError):
+        msg = 'Page indices must be integers or slices, not str.'
+        with self.assertRaisesMessage(TypeError, msg):
             p['has_previous']
         self.assertIsNone(p.object_list._result_cache)
         self.assertNotIsInstance(p.object_list, list)

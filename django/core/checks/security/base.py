@@ -51,15 +51,6 @@ W006 = Warning(
     id='security.W006',
 )
 
-W007 = Warning(
-    "Your SECURE_BROWSER_XSS_FILTER setting is not set to True, "
-    "so your pages will not be served with an "
-    "'X-XSS-Protection: 1; mode=block' header. "
-    "You should consider enabling this header to activate the "
-    "browser's XSS filtering and help prevent XSS attacks.",
-    id='security.W007',
-)
-
 W008 = Warning(
     "Your SECURE_SSL_REDIRECT setting is not set to True. "
     "Unless your site should be available over both SSL and non-SSL "
@@ -160,15 +151,6 @@ def check_content_type_nosniff(app_configs, **kwargs):
         settings.SECURE_CONTENT_TYPE_NOSNIFF is True
     )
     return [] if passed_check else [W006]
-
-
-@register(Tags.security, deploy=True)
-def check_xss_filter(app_configs, **kwargs):
-    passed_check = (
-        not _security_middleware() or
-        settings.SECURE_BROWSER_XSS_FILTER is True
-    )
-    return [] if passed_check else [W007]
 
 
 @register(Tags.security, deploy=True)

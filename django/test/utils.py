@@ -306,8 +306,7 @@ def get_runner(settings, test_runner_class=None):
     else:
         test_module_name = '.'
     test_module = __import__(test_module_name, {}, {}, test_path[-1])
-    test_runner = getattr(test_module, test_path[-1])
-    return test_runner
+    return getattr(test_module, test_path[-1])
 
 
 class TestContextDecorator:
@@ -548,7 +547,8 @@ def compare_xml(want, got):
     """
     Try to do a 'xml-comparison' of want and got. Plain string comparison
     doesn't always work because, for example, attribute ordering should not be
-    important. Ignore comment nodes and leading and trailing whitespace.
+    important. Ignore comment nodes, document type node, and leading and
+    trailing whitespaces.
 
     Based on https://github.com/lxml/lxml/blob/master/src/lxml/doctestcompare.py
     """
@@ -586,7 +586,7 @@ def compare_xml(want, got):
 
     def first_node(document):
         for node in document.childNodes:
-            if node.nodeType != Node.COMMENT_NODE:
+            if node.nodeType not in (Node.COMMENT_NODE, Node.DOCUMENT_TYPE_NODE):
                 return node
 
     want = want.strip().replace('\\n', '\n')
@@ -767,7 +767,7 @@ def require_jinja2(test_func):
     Django template engine for a test or skip it if Jinja2 isn't available.
     """
     test_func = skipIf(jinja2 is None, "this test requires jinja2")(test_func)
-    test_func = override_settings(TEMPLATES=[{
+    return override_settings(TEMPLATES=[{
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'APP_DIRS': True,
     }, {
@@ -775,7 +775,6 @@ def require_jinja2(test_func):
         'APP_DIRS': True,
         'OPTIONS': {'keep_trailing_newline': True},
     }])(test_func)
-    return test_func
 
 
 class override_script_prefix(TestContextDecorator):

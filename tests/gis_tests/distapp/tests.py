@@ -6,7 +6,7 @@ from django.contrib.gis.db.models.functions import (
 from django.contrib.gis.geos import GEOSGeometry, LineString, Point
 from django.contrib.gis.measure import D  # alias for Distance
 from django.db import NotSupportedError, connection
-from django.db.models import F, Q
+from django.db.models import Exists, F, OuterRef, Q
 from django.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
 
 from ..utils import (
@@ -223,6 +223,40 @@ class DistanceTest(TestCase):
         msg = 'Only numeric values of degree units are allowed on geodetic distance queries.'
         with self.assertRaisesMessage(ValueError, msg):
             AustraliaCity.objects.filter(point__distance_lte=(Point(0, 0), D(m=100))).exists()
+
+    @skipUnlessDBFeature('supports_dwithin_lookup')
+    def test_dwithin_subquery(self):
+        """dwithin lookup in a subquery using OuterRef as a parameter."""
+        qs = CensusZipcode.objects.annotate(
+            annotated_value=Exists(SouthTexasCity.objects.filter(
+                point__dwithin=(OuterRef('poly'), D(m=10)),
+            ))
+        ).filter(annotated_value=True)
+        self.assertEqual(self.get_names(qs), ['77002', '77025', '77401'])
+
+    @skipUnlessDBFeature('supports_dwithin_lookup', 'supports_dwithin_distance_expr')
+    def test_dwithin_with_expression_rhs(self):
+        # LineString of Wollongong and Adelaide coords.
+        ls = LineString(((150.902, -34.4245), (138.6, -34.9258)), srid=4326)
+        qs = AustraliaCity.objects.filter(
+            point__dwithin=(ls, F('allowed_distance')),
+        ).order_by('name')
+        self.assertEqual(
+            self.get_names(qs),
+            ['Adelaide', 'Mittagong', 'Shellharbour', 'Thirroul', 'Wollongong'],
+        )
+
+    @skipIfDBFeature('supports_dwithin_distance_expr')
+    def test_dwithin_with_expression_rhs_not_supported(self):
+        ls = LineString(((150.902, -34.4245), (138.6, -34.9258)), srid=4326)
+        msg = (
+            'This backend does not support expressions for specifying '
+            'distance in the dwithin lookup.'
+        )
+        with self.assertRaisesMessage(NotSupportedError, msg):
+            list(AustraliaCity.objects.filter(
+                point__dwithin=(ls, F('allowed_distance')),
+            ))
 
 
 '''

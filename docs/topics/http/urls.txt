@@ -41,8 +41,8 @@ algorithm the system follows to determine which Python code to execute:
    :setting:`ROOT_URLCONF` setting.
 
 #. Django loads that Python module and looks for the variable
-   ``urlpatterns``. This should be a Python list of :func:`django.urls.path`
-   and/or :func:`django.urls.re_path` instances.
+   ``urlpatterns``. This should be a :term:`sequence` of
+   :func:`django.urls.path` and/or :func:`django.urls.re_path` instances.
 
 #. Django runs through each URL pattern, in order, and stops at the first
    one that matches the requested URL.
@@ -146,7 +146,9 @@ A converter is a class that includes the following:
 
 * A ``to_python(self, value)`` method, which handles converting the matched
   string into the type that should be passed to the view function. It should
-  raise ``ValueError`` if it can't convert the given value.
+  raise ``ValueError`` if it can't convert the given value. A ``ValueError`` is
+  interpreted as no match and as a consequence a 404 response is sent to the
+  user.
 
 * A ``to_url(self, value)`` method, which handles converting the Python type
   into a string to be used in the URL.
@@ -317,8 +319,8 @@ accessed. This makes the system blazingly fast.
 Syntax of the ``urlpatterns`` variable
 ======================================
 
-``urlpatterns`` should be a Python list of :func:`~django.urls.path` and/or
-:func:`~django.urls.re_path` instances.
+``urlpatterns`` should be a :term:`sequence` of :func:`~django.urls.path`
+and/or :func:`~django.urls.re_path` instances.
 
 Error handling
 ==============

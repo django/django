@@ -2,9 +2,6 @@
 Creating forms from models
 ==========================
 
-.. module:: django.forms.models
-   :synopsis: ModelForm and ModelFormset.
-
 .. currentmodule:: django.forms
 
 ``ModelForm``
@@ -113,6 +110,8 @@ Model field                         Form field
 
 :class:`SlugField`                  :class:`~django.forms.SlugField`
 
+:class:`SmallAutoField`             Not represented in the form
+
 :class:`SmallIntegerField`          :class:`~django.forms.IntegerField`
 
 :class:`TextField`                  :class:`~django.forms.CharField` with
@@ -165,11 +164,11 @@ Consider this set of models::
     from django.db import models
     from django.forms import ModelForm
 
-    TITLE_CHOICES = (
+    TITLE_CHOICES = [
         ('MR', 'Mr.'),
         ('MRS', 'Mrs.'),
         ('MS', 'Ms.'),
-    )
+    ]
 
     class Author(models.Model):
         name = models.CharField(max_length=100)
@@ -522,7 +521,9 @@ For example, if you want the ``CharField`` for the ``name`` attribute of
             }
 
 The ``widgets`` dictionary accepts either widget instances (e.g.,
-``Textarea(...)``) or classes (e.g., ``Textarea``).
+``Textarea(...)``) or classes (e.g., ``Textarea``). Note that the ``widgets``
+dictionary is ignored for a model field with a non-empty ``choices`` attribute.
+In this case, you must override the form field to use a different widget.
 
 Similarly, you can specify the ``labels``, ``help_texts`` and ``error_messages``
 attributes of the inner ``Meta`` class if you want to further customize a field.
