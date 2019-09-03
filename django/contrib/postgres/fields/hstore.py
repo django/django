@@ -28,6 +28,12 @@ class HStoreField(CheckFieldDefaultMixin, Field):
             return transform
         return KeyTransformFactory(name)
 
+    def get_sql_placeholder(self, quoted_name, key_lookups):
+        if not key_lookups:
+            return '{} = %s'.format(quoted_name)
+        key_name = self.get_transform(key_lookups[0]).key_name
+        return "{0} = {0} || hstore('{1}', %s)".format(quoted_name, key_name)
+
     def validate(self, value, model_instance):
         super().validate(value, model_instance)
         for key, val in value.items():
