@@ -45,7 +45,7 @@ When you have created your GitHub account, with the nick "GitHub_nick", and
 `forked Django's repository <https://github.com/django/django/fork>`__,
 create a local copy of your fork::
 
-    git clone git@github.com:GitHub_nick/django.git
+    git clone https://github.com/GitHub_nick/django.git
 
 This will create a new directory "django", containing a clone of your GitHub
 repository. The rest of the git commands on this page need to be run within the
