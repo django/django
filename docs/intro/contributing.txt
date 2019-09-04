@@ -113,7 +113,7 @@ Download the Django source code repository using the following command:
 
 .. console::
 
-    $ git clone git@github.com:YourGitHubName/django.git
+    $ git clone https://github.com/YourGitHubName/django.git
 
 .. admonition:: Low bandwidth connection?
 
