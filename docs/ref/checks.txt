@@ -138,6 +138,8 @@ Model fields
 * **fields.E006**: ``db_index`` must be ``None``, ``True`` or ``False``.
 * **fields.E007**: Primary keys must not have ``null=True``.
 * **fields.E008**: All ``validators`` must be callable.
+* **fields.E009**: ``max_length`` is too small to fit the longest value in
+  ``choices`` (``<count>`` characters).
 * **fields.E100**: ``AutoField``\s must set primary_key=True.
 * **fields.E110**: ``BooleanField``\s do not accept null values. *This check
   appeared before support for null values was added in Django 2.1.*

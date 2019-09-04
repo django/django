@@ -257,6 +257,7 @@ class Field(RegisterLookupMixin):
                 )
             ]
 
+        choice_max_length = 0
         # Expect [group_name, [value, display]]
         for choices_group in self.choices:
             try:
@@ -270,16 +271,32 @@ class Field(RegisterLookupMixin):
                     for value, human_name in group_choices
                 ):
                     break
+                if self.max_length is not None and group_choices:
+                    choice_max_length = max(
+                        choice_max_length,
+                        *(len(value) for value, _ in group_choices if isinstance(value, str)),
+                    )
             except (TypeError, ValueError):
                 # No groups, choices in the form [value, display]
                 value, human_name = group_name, group_choices
                 if not is_value(value) or not is_value(human_name):
                     break
+                if self.max_length is not None and isinstance(value, str):
+                    choice_max_length = max(choice_max_length, len(value))
 
             # Special case: choices=['ab']
             if isinstance(choices_group, str):
                 break
         else:
+            if self.max_length is not None and choice_max_length > self.max_length:
+                return [
+                    checks.Error(
+                        "'max_length' is too small to fit the longest value "
+                        "in 'choices' (%d characters)." % choice_max_length,
+                        obj=self,
+                        id='fields.E009',
+                    ),
+                ]
             return []
 
         return [
