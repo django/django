@@ -353,6 +353,8 @@ Models
 
 * :attr:`.FileField.upload_to` now supports :class:`pathlib.Path`.
 
+* :class:`~django.db.models.CheckConstraint` is now supported on MySQL 8.0.16+.
+
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 
@@ -578,6 +580,9 @@ Miscellaneous
   :class:`~django.middleware.security.SecurityMiddleware` sets the
   :ref:`x-content-type-options` header on all responses that do not already
   have it.
+
+* On MySQL 8.0.16+, ``PositiveIntegerField`` and ``PositiveSmallIntegerField``
+  now include a check constraint to prevent negative values in the database.
 
 .. _deprecated-features-3.0:
 

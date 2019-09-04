@@ -28,10 +28,15 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
     sql_delete_pk = "ALTER TABLE %(table)s DROP PRIMARY KEY"
 
     sql_create_index = 'CREATE INDEX %(name)s ON %(table)s (%(columns)s)%(extra)s'
-    # The name of the column check constraint is the same as the field name on
-    # MariaDB. Adding IF EXISTS clause prevents migrations crash. Constraint is
-    # removed during a "MODIFY" column statement.
-    sql_delete_check = 'ALTER TABLE %(table)s DROP CONSTRAINT IF EXISTS %(name)s'
+
+    @property
+    def sql_delete_check(self):
+        if self.connection.mysql_is_mariadb:
+            # The name of the column check constraint is the same as the field
+            # name on MariaDB. Adding IF EXISTS clause prevents migrations
+            # crash. Constraint is removed during a "MODIFY" column statement.
+            return 'ALTER TABLE %(table)s DROP CONSTRAINT IF EXISTS %(name)s'
+        return 'ALTER TABLE %(table)s DROP CHECK %(name)s'
 
     def quote_value(self, value):
         self.connection.ensure_connection()

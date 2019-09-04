@@ -89,7 +89,9 @@ class DatabaseFeatures(BaseDatabaseFeatures):
 
     @cached_property
     def supports_column_check_constraints(self):
-        return self.connection.mysql_is_mariadb and self.connection.mysql_version >= (10, 2, 1)
+        if self.connection.mysql_is_mariadb:
+            return self.connection.mysql_version >= (10, 2, 1)
+        return self.connection.mysql_version >= (8, 0, 16)
 
     supports_table_check_constraints = property(operator.attrgetter('supports_column_check_constraints'))
 
@@ -99,7 +101,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
             version = self.connection.mysql_version
             if (version >= (10, 2, 22) and version < (10, 3)) or version >= (10, 3, 10):
                 return True
-        return False
+        return self.connection.mysql_version >= (8, 0, 16)
 
     @cached_property
     def has_select_for_update_skip_locked(self):

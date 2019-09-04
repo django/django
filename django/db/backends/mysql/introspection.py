@@ -209,13 +209,27 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         if self.connection.features.can_introspect_check_constraints:
             unnamed_constraints_index = 0
             columns = {info.name for info in self.get_table_description(cursor, table_name)}
-            type_query = """
-                SELECT c.constraint_name, c.check_clause
-                FROM information_schema.check_constraints AS c
-                WHERE
-                    c.constraint_schema = DATABASE() AND
-                    c.table_name = %s
-            """
+            if self.connection.mysql_is_mariadb:
+                type_query = """
+                    SELECT c.constraint_name, c.check_clause
+                    FROM information_schema.check_constraints AS c
+                    WHERE
+                        c.constraint_schema = DATABASE() AND
+                        c.table_name = %s
+                """
+            else:
+                type_query = """
+                    SELECT cc.constraint_name, cc.check_clause
+                    FROM
+                        information_schema.check_constraints AS cc,
+                        information_schema.table_constraints AS tc
+                    WHERE
+                        cc.constraint_schema = DATABASE() AND
+                        tc.table_schema = cc.constraint_schema AND
+                        cc.constraint_name = tc.constraint_name AND
+                        tc.constraint_type = 'CHECK' AND
+                        tc.table_name = %s
+                """
             cursor.execute(type_query, [table_name])
             for constraint, check_clause in cursor.fetchall():
                 constraint_columns = self._parse_constraint_columns(check_clause, columns)

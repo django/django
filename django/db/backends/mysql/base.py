@@ -61,6 +61,7 @@ class CursorWrapper:
     codes_for_integrityerror = (
         1048,  # Column cannot be null
         1690,  # BIGINT UNSIGNED value is out of range
+        3819,  # CHECK constraint is violated
         4025,  # CHECK constraint failed
     )
 
