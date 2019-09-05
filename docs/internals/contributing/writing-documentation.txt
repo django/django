@@ -129,7 +129,7 @@ Instead of:
 * his or hers... use theirs.
 * himself or herself... use themselves.
 
-Try to avoid using words that minimise the difficulty involved in a task or
+Try to avoid using words that minimize the difficulty involved in a task or
 operation, such as "easily", "simply", "just", "merely", "straightforward", and
 so on. People's experience may not match your expectations, and they may become
 frustrated when they do not find a step as "straightforward" or "simple" as it
