@@ -76,7 +76,7 @@ copyright = 'Django Software Foundation and contributors'
 # built documents.
 #
 # The short X.Y version.
-version = '3.0'
+version = '3.1'
 # The full version, including alpha/beta/rc tags.
 try:
     from django import VERSION, get_version
@@ -92,7 +92,7 @@ else:
     release = django_release()
 
 # The "development version" of Django
-django_next_version = '3.0'
+django_next_version = '3.1'
 
 extlinks = {
     'commit': ('https://github.com/django/django/commit/%s', ''),
