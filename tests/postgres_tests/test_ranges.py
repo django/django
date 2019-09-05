@@ -5,9 +5,8 @@ from decimal import Decimal
 from django import forms
 from django.core import exceptions, serializers
 from django.db.models import DateField, DateTimeField, F, Func, Value
-from django.test import ignore_warnings, override_settings
+from django.test import override_settings
 from django.utils import timezone
-from django.utils.deprecation import RemovedInDjango31Warning
 
 from . import PostgreSQLSimpleTestCase, PostgreSQLTestCase
 from .models import RangeLookupsModel, RangesModel
@@ -445,21 +444,10 @@ class TestFormField(PostgreSQLSimpleTestCase):
         value = field.clean(['1', '2'])
         self.assertEqual(value, NumericRange(1, 2))
 
-    @ignore_warnings(category=RemovedInDjango31Warning)
-    def test_valid_floats(self):
-        field = pg_forms.FloatRangeField()
-        value = field.clean(['1.12345', '2.001'])
-        self.assertEqual(value, NumericRange(1.12345, 2.001))
-
     def test_valid_decimal(self):
         field = pg_forms.DecimalRangeField()
         value = field.clean(['1.12345', '2.001'])
         self.assertEqual(value, NumericRange(Decimal('1.12345'), Decimal('2.001')))
-
-    def test_float_range_field_deprecation(self):
-        msg = 'FloatRangeField is deprecated in favor of DecimalRangeField.'
-        with self.assertRaisesMessage(RemovedInDjango31Warning, msg):
-            pg_forms.FloatRangeField()
 
     def test_valid_timestamps(self):
         field = pg_forms.DateTimeRangeField()

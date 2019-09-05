@@ -661,19 +661,6 @@ excluded; that is, ``[)``.
     the database and a :class:`~psycopg2:psycopg2.extras.NumericRange` in
     Python.
 
-``FloatRangeField``
--------------------
-
-.. class:: FloatRangeField(**options)
-
-    Stores a range of floating point values. Based on a
-    :class:`~django.db.models.FloatField`. Represented by a ``numrange`` in the
-    database and a :class:`~psycopg2:psycopg2.extras.NumericRange` in Python.
-
-    .. deprecated:: 2.2
-
-        Use :class:`DecimalRangeField` instead.
-
 ``DateTimeRangeField``
 ----------------------
 
