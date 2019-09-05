@@ -584,6 +584,9 @@ Miscellaneous
 * On MySQL 8.0.16+, ``PositiveIntegerField`` and ``PositiveSmallIntegerField``
   now include a check constraint to prevent negative values in the database.
 
+* ``alias=None`` is added to the signature of
+  :meth:`.Expression.get_group_by_cols`.
+
 .. _deprecated-features-3.0:
 
 Features deprecated in 3.0
@@ -618,9 +621,6 @@ Miscellaneous
   :func:`django.views.i18n.set_language` will stop setting the user's language
   in the session in Django 4.0. Since Django 2.1, the language is always stored
   in the :setting:`LANGUAGE_COOKIE_NAME` cookie.
-
-* ``alias=None`` is added to the signature of
-  :meth:`.Expression.get_group_by_cols`.
 
 * ``django.utils.text.unescape_entities()`` is deprecated in favor of
   :func:`html.unescape`. Note that unlike ``unescape_entities()``,
