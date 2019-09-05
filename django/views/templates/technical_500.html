@@ -417,7 +417,7 @@ Exception Value: {{ exception_value|force_escape }}
         </tr>
       </thead>
       <tbody>
-        {% for k, v in request_COOKIES_items %}
+        {% for k, v in filtered_COOKIES_items %}
           <tr>
             <td>{{ k }}</td>
             <td class="code"><pre>{{ v|pprint }}</pre></td>

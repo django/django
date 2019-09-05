@@ -118,6 +118,12 @@ class ExceptionReporterFilter:
         else:
             return request.POST
 
+    def get_cookies(self, request):
+        if request is None:
+            return {}
+        else:
+            return request.COOKIES
+
     def get_traceback_frame_variables(self, request, tb_frame):
         return list(tb_frame.f_locals.items())
 
@@ -303,6 +309,7 @@ class ExceptionReporter:
             'request': self.request,
             'user_str': user_str,
             'filtered_POST_items': list(self.filter.get_post_parameters(self.request).items()),
+            'filtered_COOKIES_items': list(self.filter.get_cookies(self.request).items()),
             'settings': get_safe_settings(),
             'sys_executable': sys.executable,
             'sys_version_info': '%d.%d.%d' % sys.version_info[0:3],
@@ -316,7 +323,6 @@ class ExceptionReporter:
         if self.request is not None:
             c['request_GET_items'] = self.request.GET.items()
             c['request_FILES_items'] = self.request.FILES.items()
-            c['request_COOKIES_items'] = self.request.COOKIES.items()
         # Check whether exception info is available
         if self.exc_type:
             c['exception_type'] = self.exc_type.__name__
