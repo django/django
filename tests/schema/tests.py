@@ -1130,6 +1130,7 @@ class SchemaTests(TransactionTestCase):
         # The unique constraint remains.
         self.assertEqual(counts, {'fks': expected_fks, 'uniques': 1, 'indexes': 0})
 
+    @skipUnlessDBFeature('ignores_table_name_case')
     def test_alter_db_table_case(self):
         # Create the table
         with connection.schema_editor() as editor:
