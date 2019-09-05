@@ -1,8 +1,7 @@
+from collections import OrderedDict
 from datetime import datetime, timedelta
 
-from django import forms
 from django.conf import settings
-from django.contrib import messages
 from django.contrib.admin import FieldListFilter
 from django.contrib.admin.exceptions import (
     DisallowedModelAdminLookup, DisallowedModelAdminToField,
@@ -36,18 +35,7 @@ IGNORED_PARAMS = (
     ALL_VAR, ORDER_VAR, ORDER_TYPE_VAR, SEARCH_VAR, IS_POPUP_VAR, TO_FIELD_VAR)
 
 
-class ChangeListSearchForm(forms.Form):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        # Populate "fields" dynamically because SEARCH_VAR is a variable:
-        self.fields = {
-            SEARCH_VAR: forms.CharField(required=False, strip=False),
-        }
-
-
 class ChangeList:
-    search_form_class = ChangeListSearchForm
-
     def __init__(self, request, model, list_display, list_display_links,
                  list_filter, date_hierarchy, search_fields, list_select_related,
                  list_per_page, list_max_show_all, list_editable, model_admin, sortable_by):
@@ -69,11 +57,6 @@ class ChangeList:
         self.sortable_by = sortable_by
 
         # Get search parameters from the query string.
-        _search_form = self.search_form_class(request.GET)
-        if not _search_form.is_valid():
-            for error in _search_form.errors.values():
-                messages.error(request, ', '.join(error))
-        self.query = _search_form.cleaned_data.get(SEARCH_VAR) or ''
         try:
             self.page_num = int(request.GET.get(PAGE_VAR, 0))
         except ValueError:
@@ -94,6 +77,7 @@ class ChangeList:
             self.list_editable = ()
         else:
             self.list_editable = list_editable
+        self.query = request.GET.get(SEARCH_VAR, '')
         self.queryset = self.get_queryset(request)
         self.get_results(request)
         if self.is_popup:
@@ -181,13 +165,16 @@ class ChangeList:
                     # In this branch, from_date will always be the first of a
                     # month, so advancing 32 days gives the next month.
                     to_date = (from_date + timedelta(days=32)).replace(day=1)
+                    # we need to make_aware to_date separately to avoid DST bugs
+                    if settings.USE_TZ:
+                        to_date = make_aware(to_date.replace(tzinfo=None))
                 else:
                     to_date = from_date.replace(year=from_date.year + 1)
                 lookup_params.update({
                     '%s__gte' % self.date_hierarchy: from_date,
                     '%s__lt' % self.date_hierarchy: to_date,
                 })
-
+                
         # At this point, all the parameters used by the various ListFilters
         # have been removed from lookup_params, which now only contains other
         # parameters passed via the query string. We now loop through the
@@ -281,8 +268,6 @@ class ChangeList:
                 attr = getattr(self.model_admin, field_name)
             else:
                 attr = getattr(self.model, field_name)
-            if isinstance(attr, property) and hasattr(attr, 'fget'):
-                attr = attr.fget
             return getattr(attr, 'admin_order_field', None)
 
     def get_ordering(self, request, queryset):
@@ -379,12 +364,12 @@ class ChangeList:
 
     def get_ordering_field_columns(self):
         """
-        Return a dictionary of ordering field column numbers and asc/desc.
+        Return an OrderedDict of ordering field column numbers and asc/desc.
         """
         # We must cope with more than one column having the same underlying sort
         # field, so we base things on column numbers.
         ordering = self._get_default_ordering()
-        ordering_fields = {}
+        ordering_fields = OrderedDict()
         if ORDER_VAR not in self.params:
             # for ordering specified on ModelAdmin or model Meta, we don't know
             # the right column numbers absolutely, because there might be more

@@ -1,5 +1,6 @@
 import datetime
 
+from django.conf import settings
 from django.contrib.admin.templatetags.admin_urls import add_preserved_filters
 from django.contrib.admin.utils import (
     display_for_field, display_for_value, label_for_field, lookup_field,
@@ -18,6 +19,7 @@ from django.utils.html import format_html
 from django.utils.safestring import mark_safe
 from django.utils.text import capfirst
 from django.utils.translation import gettext as _
+from django.utils.timezone import make_naive
 
 from .base import InclusionAdminNode
 
@@ -128,9 +130,6 @@ def result_headers(cl):
                 continue
 
             admin_order_field = getattr(attr, "admin_order_field", None)
-            # Set ordering for attr that is a property, if defined.
-            if isinstance(attr, property) and hasattr(attr, 'fget'):
-                admin_order_field = getattr(attr.fget, 'admin_order_field', None)
             if not admin_order_field:
                 is_field_sortable = False
 
@@ -377,11 +376,25 @@ def date_hierarchy(cl):
             if date_range['first'] and date_range['last']:
                 if date_range['first'].year == date_range['last'].year:
                     year_lookup = date_range['first'].year
+                    # If TZ is used, we need to make aware date_range
+                    if isinstance(date_range['first'], datetime.datetime) and settings.USE_TZ:
+                        year_lookup = make_naive(date_range['first']).year
                     if date_range['first'].month == date_range['last'].month:
                         month_lookup = date_range['first'].month
-
+                        if isinstance(date_range['first'], datetime.datetime) and settings.USE_TZ:
+                            month_lookup = make_naive(date_range['first']).month
         if year_lookup and month_lookup and day_lookup:
-            day = datetime.date(int(year_lookup), int(month_lookup), int(day_lookup))
+            # If TZ is used, we need to make aware date
+            year_filter = field_name + '__year'
+            month_filter = field_name + '__month'
+            day_filter = field_name + '__day'
+            dates_or_datetimes = cl.model.objects.filter(**{year_filter:year_lookup, month_filter:month_lookup,day_filter:day_lookup}).values_list(field_name, flat=True)
+            if (dates_or_datetimes.count()>0 
+              and isinstance(dates_or_datetimes.first(), datetime.datetime) 
+              and settings.USE_TZ) :
+                day = make_naive(dates_or_datetimes[0]).date()
+            else:
+                day = dates_or_datetimes[0].date()
             return {
                 'show': True,
                 'back': {
@@ -391,7 +404,21 @@ def date_hierarchy(cl):
                 'choices': [{'title': capfirst(formats.date_format(day, 'MONTH_DAY_FORMAT'))}]
             }
         elif year_lookup and month_lookup:
-            days = getattr(cl.queryset, 'dates')(field_name, 'day')
+            # If TZ is used, we need to make aware dates 
+            year_filter = field_name + '__year'
+            month_filter = field_name + '__month'
+            dates_or_datetimes = cl.model.objects.filter(**{year_filter:year_lookup, month_filter:month_lookup}).values_list(field_name, flat=True)
+            days = []
+            if (dates_or_datetimes.count()>0 
+              and isinstance(dates_or_datetimes.first(), datetime.datetime) 
+              and settings.USE_TZ) :
+                for day in dates_or_datetimes:
+                    if make_naive(day).date() not in days: 
+                        days.append(make_naive(day).date())
+            else:
+                for day in dates_or_datetimes:
+                    if day not in days: 
+                        days.append(day)
             return {
                 'show': True,
                 'back': {
@@ -404,7 +431,19 @@ def date_hierarchy(cl):
                 } for day in days]
             }
         elif year_lookup:
-            months = getattr(cl.queryset, 'dates')(field_name, 'month')
+            # If TZ is used, we need to make aware dates 
+            year_filter=field_name+'__year'
+            dates_or_datetimes = cl.model.objects.filter(**{year_filter:year_lookup}).values_list(field_name, flat=True)
+            months = []
+            if (dates_or_datetimes.count()>0 
+              and isinstance(dates_or_datetimes.first(), datetime.datetime) 
+              and settings.USE_TZ) :
+                for date in dates_or_datetimes:
+                    if make_naive(date).date().replace(day=1) not in months: 
+                        months.append(make_naive(date).date().replace(day = 1))
+            else:
+                for date in dates_or_datetimes:
+                    if date.replace(day=1) not in months: months.append(date.replace(day=1))
             return {
                 'show': True,
                 'back': {
@@ -412,12 +451,23 @@ def date_hierarchy(cl):
                     'title': _('All dates')
                 },
                 'choices': [{
-                    'link': link({year_field: year_lookup, month_field: month.month}),
-                    'title': capfirst(formats.date_format(month, 'YEAR_MONTH_FORMAT'))
-                } for month in months]
+                    'link': link({year_field: year_lookup, month_field: date.month}),
+                    'title': capfirst(formats.date_format(date, 'YEAR_MONTH_FORMAT'))
+                } for date in months]
             }
         else:
-            years = getattr(cl.queryset, 'dates')(field_name, 'year')
+            year_filter = field_name+'__year'
+            dates_or_datetimes = cl.queryset.order_by(field_name).values_list(field_name, flat=True)
+            years = []
+            if (dates_or_datetimes.count()>0 
+              and isinstance(dates_or_datetimes.first(), datetime.datetime) 
+              and settings.USE_TZ) :
+                for date in dates_or_datetimes:
+                    if make_naive(date).date().replace(month=1, day=1) not in years : 
+                        years.append(make_naive(date).date().replace(month=1, day = 1))
+            else:
+                for date in dates_or_datetimes:
+                    if date.replace(month=1, day=1) not in years: years.append(date.replace(month=1, day=1))
             return {
                 'show': True,
                 'back': None,
