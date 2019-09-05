@@ -495,4 +495,4 @@ class ChangeList:
         return reverse('admin:%s_%s_change' % (self.opts.app_label,
                                                self.opts.model_name),
                        args=(quote(pk),),
-current_app=self.model_admin.admin_site.name)
+                       current_app=self.model_admin.admin_site.name)
