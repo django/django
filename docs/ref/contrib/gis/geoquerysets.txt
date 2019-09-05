@@ -193,10 +193,6 @@ Example::
 
     Zipcode.objects.filter(poly__coveredby=geom)
 
-.. versionchanged:: 2.2
-
-    SpatiaLite support was added.
-
 ==========  =============================
 Backend     SQL Equivalent
 ==========  =============================
@@ -219,10 +215,6 @@ Tests if no point in the lookup geometry is outside the geometry field.
 Example::
 
     Zipcode.objects.filter(poly__covers=geom)
-
-.. versionchanged:: 2.2
-
-    SpatiaLite support was added.
 
 ==========  ==========================
 Backend     SQL Equivalent

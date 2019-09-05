@@ -257,10 +257,6 @@ the :meth:`~BaseCommand.handle` method must be implemented.
     You can customize the instance by overriding this method and calling
     ``super()`` with ``kwargs`` of :class:`~argparse.ArgumentParser` parameters.
 
-    .. versionchanged:: 2.2
-
-        ``kwargs`` was added.
-
 .. method:: BaseCommand.add_arguments(parser)
 
     Entry point to add parser arguments to handle command line arguments passed

@@ -846,8 +846,6 @@ when running tests. If not provided, Django will generate a random password.
 ``ORACLE_MANAGED_FILES``
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. versionadded:: 2.2
-
 Default: ``False``
 
 This is an Oracle-specific setting.

@@ -197,8 +197,6 @@ not greater than the upper bound. All of these fields use
 
 .. class:: DecimalRangeField
 
-    .. versionadded:: 2.2
-
     Based on :class:`~django.forms.DecimalField` and translates its input into
     :class:`~psycopg2:psycopg2.extras.NumericRange`. Default for
     :class:`~django.contrib.postgres.fields.DecimalRangeField`.

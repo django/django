@@ -628,10 +628,6 @@ utility methods in the ``django.test.utils`` module.
     databases should be setup for. If it's not provided, it defaults to all of
     :setting:`DATABASES` aliases.
 
-    .. versionadded:: 2.2
-
-        The ``aliases`` argument was added.
-
 .. function:: teardown_databases(old_config, parallel=0, keepdb=False)
 
     Destroys the test databases, restoring pre-test conditions.

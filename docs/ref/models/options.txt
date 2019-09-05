@@ -459,8 +459,6 @@ Django quotes column and table names behind the scenes.
 
 .. attribute:: Options.constraints
 
-    .. versionadded:: 2.2
-
     A list of :doc:`constraints </ref/models/constraints>` that you want to
     define on the model::
 

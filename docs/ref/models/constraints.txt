@@ -6,8 +6,6 @@ Constraints reference
 
 .. currentmodule:: django.db.models
 
-.. versionadded:: 2.2
-
 The classes defined in this module create database constraints. They are added
 in the model :attr:`Meta.constraints <django.db.models.Options.constraints>`
 option.

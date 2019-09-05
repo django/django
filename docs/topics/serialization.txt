@@ -517,8 +517,6 @@ command line flags to generate natural keys.
 Natural keys and forward references
 -----------------------------------
 
-.. versionadded:: 2.2
-
 Sometimes when you use :ref:`natural foreign keys
 <topics-serialization-natural-keys>` you'll need to deserialize data where
 an object has a foreign key referencing another object that hasn't yet been

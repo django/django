@@ -684,10 +684,6 @@ Django can serialize the following:
 - Any class reference (must be in module's top-level scope)
 - Anything with a custom ``deconstruct()`` method (:ref:`see below <custom-deconstruct-method>`)
 
-.. versionchanged:: 2.2
-
-    Serialization support for ``NoneType`` was added.
-
 Django cannot serialize:
 
 - Nested classes
@@ -698,8 +694,6 @@ Django cannot serialize:
 
 Custom serializers
 ------------------
-
-.. versionadded:: 2.2
 
 You can serialize other types by writing a custom serializer. For example, if
 Django didn't serialize :class:`~decimal.Decimal` by default, you could do

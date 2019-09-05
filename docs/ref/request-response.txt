@@ -172,8 +172,6 @@ All attributes should be considered read-only, unless stated otherwise.
 
 .. attribute:: HttpRequest.headers
 
-    .. versionadded:: 2.2
-
     A case insensitive, dict-like object that provides access to all
     HTTP-prefixed headers (plus ``Content-Length`` and ``Content-Type``) from
     the request.

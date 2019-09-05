@@ -271,11 +271,6 @@ attribute or to a :class:`~django.contrib.auth.models.Group` via its
 
         content_type = ContentType.objects.get_for_model(BlogPostProxy, for_concrete_model=False)
 
-    .. versionchanged:: 2.2
-
-        In older versions, proxy models use the content type of the concrete
-        model.
-
 Permission caching
 ------------------
 
@@ -349,11 +344,6 @@ inherit the permissions of the concrete model they subclass::
     False
     >>> user.has_perms(('app.add_student', 'app.can_deliver_pizzas'))
     True
-
-.. versionchanged:: 2.2
-
-    In older versions, permissions for proxy models use the content type of
-    the concrete model rather than content type of the proxy model.
 
 .. _auth-web-requests:
 

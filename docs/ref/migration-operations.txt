@@ -212,8 +212,6 @@ Removes the index named ``name`` from the model with ``model_name``.
 
 .. class:: AddConstraint(model_name, constraint)
 
-.. versionadded:: 2.2
-
 Creates a :doc:`constraint </ref/models/constraints>` in the database table for
 the model with ``model_name``.
 
@@ -221,8 +219,6 @@ the model with ``model_name``.
 --------------------
 
 .. class:: RemoveConstraint(model_name, name)
-
-.. versionadded:: 2.2
 
 Removes the constraint named ``name`` from the model with ``model_name``.
 

@@ -154,8 +154,6 @@ will result in a database error.
 
 .. class:: NullIf(expression1, expression2)
 
-.. versionadded:: 2.2
-
 Accepts two expressions and returns ``None`` if they are equal, otherwise
 returns ``expression1``.
 
@@ -273,8 +271,6 @@ Usage example::
     .. attribute:: lookup_name = 'year'
 
 .. class:: ExtractIsoYear(expression, tzinfo=None, **extra)
-
-    .. versionadded:: 2.2
 
     Returns the ISO-8601 week-numbering year.
 
@@ -715,8 +711,6 @@ that deal with time-parts can be used with ``TimeField``::
 
 Math Functions
 ==============
-
-.. versionadded:: 2.2
 
 We'll be using the following model in math function examples::
 
@@ -1418,8 +1412,6 @@ Usage example::
 -----------
 
 .. class:: Reverse(expression, **extra)
-
-.. versionadded:: 2.2
 
 Accepts a single text field or expression and returns the characters of that
 expression in reverse order.

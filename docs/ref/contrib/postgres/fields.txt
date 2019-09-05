@@ -656,8 +656,6 @@ excluded; that is, ``[)``.
 
 .. class:: DecimalRangeField(**options)
 
-    .. versionadded:: 2.2
-
     Stores a range of floating point values. Based on a
     :class:`~django.db.models.DecimalField`. Represented by a ``numrange`` in
     the database and a :class:`~psycopg2:psycopg2.extras.NumericRange` in

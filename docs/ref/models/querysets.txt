@@ -2091,14 +2091,8 @@ that fail constraints such as duplicate unique values. Enabling this parameter
 disables setting the primary key on each model instance (if the database
 normally supports it).
 
-.. versionchanged:: 2.2
-
-    The ``ignore_conflicts`` parameter was added.
-
 ``bulk_update()``
 ~~~~~~~~~~~~~~~~~
-
-.. versionadded:: 2.2
 
 .. method:: bulk_update(objs, fields, batch_size=None)
 
@@ -2252,10 +2246,6 @@ psycopg mailing list <https://www.postgresql.org/message-id/4D2F2C71.8080805%40d
     is going to fetch less than 100KB of data, which seems a good compromise
     between the number of rows transferred and the data discarded if the loop
     is exited early.
-
-.. versionchanged:: 2.2
-
-    Support for result streaming on SQLite was added.
 
 ``latest()``
 ~~~~~~~~~~~~
@@ -3003,8 +2993,6 @@ in the database <database-time-zone-definitions>`.
 ``iso_year``
 ~~~~~~~~~~~~
 
-.. versionadded:: 2.2
-
 For date and datetime fields, an exact ISO 8601 week-numbering year match.
 Allows chaining additional field lookups. Takes an integer year.
 
@@ -3464,10 +3452,6 @@ by the aggregate.
         By default, ``StdDev`` returns the population standard deviation. However,
         if ``sample=True``, the return value will be the sample standard deviation.
 
-    .. versionchanged:: 2.2
-
-        SQLite support was added.
-
 ``Sum``
 ~~~~~~~
 
@@ -3507,10 +3491,6 @@ by the aggregate.
 
         By default, ``Variance`` returns the population variance. However,
         if ``sample=True``, the return value will be the sample variance.
-
-    .. versionchanged:: 2.2
-
-        SQLite support was added.
 
 Query-related tools
 ===================

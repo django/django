@@ -274,10 +274,6 @@ SDO_GEOM-reference.html#GUID-646638D0-2C5F-490A-AF63-DE9B7A4C97C1__CHDJCEIH>`__,
 Accepts a single geographic field or expression and returns the geometry
 representing the bounding box of the geometry.
 
-.. versionchanged:: 2.2
-
-    Oracle support was added.
-
 ``ForcePolygonCW``
 ==================
 

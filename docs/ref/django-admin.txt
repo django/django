@@ -421,17 +421,11 @@ PostgreSQL
 * Models are created for partition tables if
   :option:`--include-partitions` is used.
 
-.. versionchanged:: 2.2
-
-    Support for foreign tables and materialized views was added.
-
 .. django-admin-option:: --database DATABASE
 
 Specifies the database to introspect. Defaults to ``default``.
 
 .. django-admin-option:: --include-partitions
-
-.. versionadded:: 2.2
 
 If this option is provided, models are also created for partitions.
 
@@ -783,8 +777,6 @@ name must be a valid Python :ref:`identifier <python:identifiers>`.
 
 .. django-admin-option:: --no-header
 
-.. versionadded:: 2.2
-
 Generate migration files without Django version and timestamp header.
 
 .. django-admin-option:: --check
@@ -840,8 +832,6 @@ table names and so is only safe to use if you are confident that your existing
 schema matches what is recorded in your initial migration.
 
 .. django-admin-option:: --plan
-
-.. versionadded:: 2.2
 
 Shows the migration operations that will be performed for the given ``migrate``
 command.
@@ -906,10 +896,6 @@ more robust change detection, and a reduction in power usage. Django supports
 .. _Watchman: https://facebook.github.io/watchman/
 .. _pywatchman: https://pypi.org/project/pywatchman/
 .. _watchman documentation: https://facebook.github.io/watchman/docs/config.html#ignore_dirs
-
-.. versionchanged:: 2.2
-
-   Watchman support replaced support for `pyinotify`.
 
 When you start the server, and each time you change Python code while the
 server is running, the system check framework will check your entire Django
@@ -1192,8 +1178,6 @@ Sets the name of the squashed migration. When omitted, the name is based on the
 first and last migration, with ``_squashed_`` in between.
 
 .. django-admin-option:: --no-header
-
-.. versionadded:: 2.2
 
 Generate squashed migration file without Django version and timestamp header.
 
@@ -1761,8 +1745,6 @@ Example usage::
     django-admin runserver --no-color
 
 .. django-admin-option:: --force-color
-
-.. versionadded:: 2.2
 
 Forces colorization of the command output if it would otherwise be disabled
 as discussed in :ref:`syntax-coloring`. For example, you may want to pipe

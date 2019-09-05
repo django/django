@@ -370,8 +370,6 @@ for your use case.
 Update in bulk
 --------------
 
-.. versionadded:: 2.2
-
 When updating objects, where possible, use the
 :meth:`~django.db.models.query.QuerySet.bulk_update()` method to reduce the
 number of SQL queries. Given a list or queryset of objects::

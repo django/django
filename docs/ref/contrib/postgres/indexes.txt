@@ -22,16 +22,10 @@ available from the ``django.contrib.postgres.indexes`` module.
 
     .. _automatic summarization: https://www.postgresql.org/docs/current/brin-intro.html#BRIN-OPERATION
 
-    .. versionchanged:: 2.2
-
-        The ``autosummarize`` parameter was added.
-
 ``BTreeIndex``
 ==============
 
 .. class:: BTreeIndex(fillfactor=None, **options)
-
-    .. versionadded:: 2.2
 
     Creates a B-Tree index.
 
@@ -100,8 +94,6 @@ available from the ``django.contrib.postgres.indexes`` module.
 
 .. class:: HashIndex(fillfactor=None, **options)
 
-    .. versionadded:: 2.2
-
     Creates a hash index.
 
     Provide an integer value from 10 to 100 to the fillfactor_ parameter to
@@ -118,8 +110,6 @@ available from the ``django.contrib.postgres.indexes`` module.
 ===============
 
 .. class:: SpGistIndex(fillfactor=None, **options)
-
-    .. versionadded:: 2.2
 
     Creates an `SP-GiST index
     <https://www.postgresql.org/docs/current/spgist.html>`_.

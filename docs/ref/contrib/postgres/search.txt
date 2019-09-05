@@ -102,10 +102,6 @@ Search docs`_ to learn about differences and syntax. Examples:
 See :ref:`postgresql-fts-search-configuration` for an explanation of the
 ``config`` parameter.
 
-.. versionadded:: 2.2
-
-    The `search_type` parameter was added.
-
 ``SearchRank``
 ==============
 

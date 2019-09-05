@@ -90,8 +90,6 @@ in the same tablespace as the table.
 
 .. attribute:: Index.opclasses
 
-.. versionadded:: 2.2
-
 The names of the `PostgreSQL operator classes
 <https://www.postgresql.org/docs/current/indexes-opclass.html>`_ to use for
 this index. If you require a custom operator class, you must provide one for
@@ -109,8 +107,6 @@ opclasses=['jsonb_path_ops'])`` creates a gin index on ``jsonfield`` using
 -------------
 
 .. attribute:: Index.condition
-
-.. versionadded:: 2.2
 
 If the table is very large and your queries mostly target a subset of rows,
 it may be useful to restrict an index to that subset. Specify a condition as a

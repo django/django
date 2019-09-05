@@ -400,8 +400,6 @@ The ``Aggregate`` API is as follows:
 
     .. attribute:: allow_distinct
 
-        .. versionadded:: 2.2
-
         A class attribute determining whether or not this aggregate function
         allows passing a ``distinct`` keyword argument. If set to ``False``
         (default), ``TypeError`` is raised if ``distinct=True`` is passed.
@@ -434,10 +432,6 @@ and :ref:`filtering-on-annotations` for example usage.
 
 The ``**extra`` kwargs are ``key=value`` pairs that can be interpolated
 into the ``template`` attribute.
-
-.. versionadded:: 2.2
-
-    The ``allow_distinct`` attribute and ``distinct`` argument were added.
 
 Creating your own Aggregate Functions
 -------------------------------------

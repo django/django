@@ -132,8 +132,6 @@ If the URL does not resolve, the function raises a
 
     .. attribute:: ResolverMatch.route
 
-        .. versionadded:: 2.2
-
         The route of the matching URL pattern.
 
         For example, if ``path('users/<id>/', ...)`` is the matching pattern,

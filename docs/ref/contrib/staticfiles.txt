@@ -96,10 +96,6 @@ Some commonly used options are:
     multiple times to ignore more. When specifying a path, always use forward
     slashes, even on Windows.
 
-    .. versionchanged:: 2.2
-
-        Path matching was added.
-
 .. django-admin-option:: --dry-run, -n
 
     Do everything except modify the filesystem.

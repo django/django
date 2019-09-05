@@ -73,10 +73,6 @@ Related objects reference
         :ref:`intermediate model <intermediary-manytomany>` instance(s), if
         needed.
 
-        .. versionchanged:: 2.2
-
-            The ``through_defaults`` argument was added.
-
     .. method:: create(through_defaults=None, **kwargs)
 
         Creates a new object, saves it and puts it in the related object set.
@@ -110,10 +106,6 @@ Related objects reference
         Use the ``through_defaults`` argument to specify values for the new
         :ref:`intermediate model <intermediary-manytomany>` instance, if
         needed.
-
-        .. versionchanged:: 2.2
-
-            The ``through_defaults`` argument was added.
 
     .. method:: remove(*objs, bulk=True)
 
@@ -202,10 +194,6 @@ Related objects reference
         Use the ``through_defaults`` argument to specify values for the new
         :ref:`intermediate model <intermediary-manytomany>` instance(s), if
         needed.
-
-        .. versionchanged:: 2.2
-
-            The ``through_defaults`` argument was added.
 
     .. note::
 

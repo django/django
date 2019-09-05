@@ -86,16 +86,12 @@ Removes ``index`` from ``model``’s table.
 
 .. method:: BaseDatabaseSchemaEditor.add_constraint(model, constraint)
 
-.. versionadded:: 2.2
-
 Adds ``constraint`` to ``model``'s table.
 
 ``remove_constraint()``
 -----------------------
 
 .. method:: BaseDatabaseSchemaEditor.remove_constraint(model, constraint)
-
-.. versionadded:: 2.2
 
 Removes ``constraint`` from ``model``'s table.
 

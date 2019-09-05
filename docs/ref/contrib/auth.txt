@@ -396,10 +396,6 @@ Fields
         Required. 150 characters or fewer. Any characters are permitted.
         Example: ``'Awesome Users'``.
 
-        .. versionchanged:: 2.2
-
-             The ``max_length`` increased from 80 to 150 characters.
-
     .. attribute:: permissions
 
         Many-to-many field to :class:`~django.contrib.auth.models.Permission`::
@@ -676,11 +672,6 @@ The following backends are available in :mod:`django.contrib.auth.backends`:
         ``request`` is an :class:`~django.http.HttpRequest` and may be ``None``
         if it wasn't provided to :func:`~django.contrib.auth.authenticate`
         (which passes it on to the backend).
-
-        .. versionchanged:: 2.2
-
-            The ``request`` argument was added. Support for method overrides
-            that don't accept it will be removed in Django 3.1.
 
     .. method:: user_can_authenticate()
 
