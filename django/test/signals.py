@@ -86,7 +86,6 @@ def reset_template_engines(**kwargs):
     if kwargs['setting'] in {
         'TEMPLATES',
         'DEBUG',
-        'FILE_CHARSET',
         'INSTALLED_APPS',
     }:
         from django.template import engines

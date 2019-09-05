@@ -232,3 +232,5 @@ to remove usage of these features.
 
 * ``django.contrib.postgres.fields.FloatRangeField`` and
   ``django.contrib.postgres.forms.FloatRangeField`` are removed.
+
+* The ``FILE_CHARSET`` setting is removed.

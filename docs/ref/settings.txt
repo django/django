@@ -1414,21 +1414,6 @@ Default: ``None``
 Specifies a timeout in seconds for blocking operations like the connection
 attempt.
 
-.. setting:: FILE_CHARSET
-
-``FILE_CHARSET``
-----------------
-
-Default: ``'utf-8'``
-
-The character encoding used to decode any files read from disk. This includes
-template files, static files, and translation catalogs.
-
-.. deprecated:: 2.2
-
-    This setting is deprecated. Starting with Django 3.1, files read from disk
-    must be UTF-8 encoded.
-
 .. setting:: FILE_UPLOAD_HANDLERS
 
 ``FILE_UPLOAD_HANDLERS``

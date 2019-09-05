@@ -171,9 +171,6 @@ MANAGERS = ADMINS
 # manually specified. It's used to construct the Content-Type header.
 DEFAULT_CHARSET = 'utf-8'
 
-# Encoding of files read from disk (template and initial SQL files).
-FILE_CHARSET = 'utf-8'
-
 # Email address that error messages come from.
 SERVER_EMAIL = 'root@localhost'
 
