@@ -835,15 +835,6 @@ appropriate entities.
 
     :class:`~datetime.tzinfo` instance that represents UTC.
 
-.. class:: FixedOffset(offset=None, name=None)
-
-    A :class:`~datetime.tzinfo` subclass modeling a fixed offset from UTC.
-    ``offset`` is an integer number of minutes east of UTC.
-
-    .. deprecated:: 2.2
-
-        Use :class:`datetime.timezone` instead.
-
 .. function:: get_fixed_timezone(offset)
 
     Returns a :class:`~datetime.tzinfo` instance that represents a time zone
