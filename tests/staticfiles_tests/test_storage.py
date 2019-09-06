@@ -11,10 +11,8 @@ from django.contrib.staticfiles import finders, storage
 from django.contrib.staticfiles.management.commands.collectstatic import (
     Command as CollectstaticCommand,
 )
-from django.core.cache.backends.base import BaseCache
 from django.core.management import call_command
-from django.test import SimpleTestCase, ignore_warnings, override_settings
-from django.utils.deprecation import RemovedInDjango31Warning
+from django.test import override_settings
 
 from .cases import CollectionTestCase
 from .settings import TEST_ROOT
@@ -229,86 +227,6 @@ class TestHashedFiles:
             call_command('collectstatic', interactive=False, verbosity=0, stderr=err)
         self.assertEqual("Post-processing 'faulty.css' failed!\n\n", err.getvalue())
         self.assertPostCondition()
-
-
-@ignore_warnings(category=RemovedInDjango31Warning)
-@override_settings(
-    STATICFILES_STORAGE='django.contrib.staticfiles.storage.CachedStaticFilesStorage',
-)
-class TestCollectionCachedStorage(TestHashedFiles, CollectionTestCase):
-    """
-    Tests for the Cache busting storage
-    """
-    def test_cache_invalidation(self):
-        name = "cached/styles.css"
-        hashed_name = "cached/styles.5e0040571e1a.css"
-        # check if the cache is filled correctly as expected
-        cache_key = storage.staticfiles_storage.hash_key(name)
-        cached_name = storage.staticfiles_storage.hashed_files.get(cache_key)
-        self.assertEqual(self.hashed_file_path(name), cached_name)
-        # clearing the cache to make sure we re-set it correctly in the url method
-        storage.staticfiles_storage.hashed_files.clear()
-        cached_name = storage.staticfiles_storage.hashed_files.get(cache_key)
-        self.assertIsNone(cached_name)
-        self.assertEqual(self.hashed_file_path(name), hashed_name)
-        cached_name = storage.staticfiles_storage.hashed_files.get(cache_key)
-        self.assertEqual(cached_name, hashed_name)
-
-        # Check files that had to be hashed multiple times since their content
-        # includes other files that were hashed.
-        name = 'cached/relative.css'
-        hashed_name = 'cached/relative.c3e9e1ea6f2e.css'
-        cache_key = storage.staticfiles_storage.hash_key(name)
-        cached_name = storage.staticfiles_storage.hashed_files.get(cache_key)
-        self.assertIsNone(cached_name)
-        self.assertEqual(self.hashed_file_path(name), hashed_name)
-        cached_name = storage.staticfiles_storage.hashed_files.get(cache_key)
-        self.assertEqual(cached_name, hashed_name)
-
-    def test_cache_key_memcache_validation(self):
-        """
-        Handle cache key creation correctly, see #17861.
-        """
-        name = (
-            "/some crazy/long filename/ with spaces Here and ?#%#$/other/stuff"
-            "/some crazy/long filename/ with spaces Here and ?#%#$/other/stuff"
-            "/some crazy/long filename/ with spaces Here and ?#%#$/other/stuff"
-            "/some crazy/long filename/ with spaces Here and ?#%#$/other/stuff"
-            "/some crazy/long filename/ with spaces Here and ?#%#$/other/stuff"
-            "/some crazy/\x16\xb4"
-        )
-        cache_key = storage.staticfiles_storage.hash_key(name)
-        cache_validator = BaseCache({})
-        cache_validator.validate_key(cache_key)
-        self.assertEqual(cache_key, 'staticfiles:821ea71ef36f95b3922a77f7364670e7')
-
-    def test_corrupt_intermediate_files(self):
-        configured_storage = storage.staticfiles_storage
-        # Clear cache to force rehashing of the files
-        configured_storage.hashed_files.clear()
-        # Simulate a corrupt chain of intermediate files by ensuring they don't
-        # resolve before the max post-process count, which would normally be
-        # high enough.
-        configured_storage.max_post_process_passes = 1
-        # File without intermediates that can be rehashed without a problem.
-        self.hashed_file_path('cached/css/img/window.png')
-        # File with too many intermediates to rehash with the low max
-        # post-process passes.
-        err_msg = "The name 'cached/styles.css' could not be hashed with %r." % (configured_storage._wrapped,)
-        with self.assertRaisesMessage(ValueError, err_msg):
-            self.hashed_file_path('cached/styles.css')
-
-
-class TestCachedStaticFilesStorageDeprecation(SimpleTestCase):
-    def test_warning(self):
-        from django.contrib.staticfiles.storage import CachedStaticFilesStorage
-        from django.utils.deprecation import RemovedInDjango31Warning
-        msg = (
-            'CachedStaticFilesStorage is deprecated in favor of '
-            'ManifestStaticFilesStorage.'
-        )
-        with self.assertRaisesMessage(RemovedInDjango31Warning, msg):
-            CachedStaticFilesStorage()
 
 
 @override_settings(STATICFILES_STORAGE='staticfiles_tests.storage.ExtraPatternsStorage')

@@ -363,39 +363,6 @@ hashing algorithm.
 .. _`url()`: https://www.w3.org/TR/CSS2/syndata.html#uri
 .. _`Cascading Style Sheets`: https://www.w3.org/Style/CSS/
 
-``CachedStaticFilesStorage``
-----------------------------
-
-.. class:: storage.CachedStaticFilesStorage
-
-.. deprecated:: 2.2
-
-    ``CachedStaticFilesStorage`` is deprecated as it has some intractable
-    problems, some of which are outlined below. Use
-    :class:`~storage.ManifestStaticFilesStorage` or a third-party cloud storage
-    instead.
-
-``CachedStaticFilesStorage`` is a similar class like the
-:class:`~django.contrib.staticfiles.storage.ManifestStaticFilesStorage` class
-but uses Django's :doc:`caching framework</topics/cache>` for storing the
-hashed names of processed files instead of a static manifest file called
-``staticfiles.json``. This is mostly useful for situations in which you don't
-have access to the file system.
-
-If you want to override certain options of the cache backend the storage uses,
-specify a custom entry in the :setting:`CACHES` setting named
-``'staticfiles'``. It falls back to using the ``'default'`` cache backend.
-
-.. warning::
-
-    ``CachedStaticFilesStorage`` isn't recommended --  in almost all cases
-    ``ManifestStaticFilesStorage`` is a better choice. There are several
-    performance penalties when using ``CachedStaticFilesStorage`` since a cache
-    miss requires hashing files at runtime. Remote file storage require several
-    round-trips to hash a file on a cache miss, as several file accesses are
-    required to ensure that the file hash is correct in the case of nested file
-    paths.
-
 ``ManifestFilesMixin``
 ----------------------
 
