@@ -232,6 +232,8 @@ to remove usage of these features.
 
 * ``django.utils.timezone.FixedOffset`` is removed.
 
+* ``django.core.paginator.QuerySetPaginator`` is removed.
+
 * ``django.contrib.postgres.fields.FloatRangeField`` and
   ``django.contrib.postgres.forms.FloatRangeField`` are removed.
 
