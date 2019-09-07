@@ -2,15 +2,12 @@ import inspect
 import warnings
 
 
-class RemovedInDjango31Warning(DeprecationWarning):
+class RemovedInNextVersionWarning(DeprecationWarning):
     pass
 
 
 class RemovedInDjango40Warning(PendingDeprecationWarning):
     pass
-
-
-RemovedInNextVersionWarning = RemovedInDjango31Warning
 
 
 class warn_about_renamed_method:
