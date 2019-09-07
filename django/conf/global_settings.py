@@ -567,6 +567,10 @@ LOGGING_CONFIG = 'logging.config.dictConfig'
 # Custom logging configuration.
 LOGGING = {}
 
+# Default exception reporter class used in case none has been
+# specifically assigned to the HttpRequest instance.
+DEFAULT_EXCEPTION_REPORTER = 'django.views.debug.ExceptionReporter'
+
 # Default exception reporter filter class used in case none has been
 # specifically assigned to the HttpRequest instance.
 DEFAULT_EXCEPTION_REPORTER_FILTER = 'django.views.debug.SafeExceptionReporterFilter'

@@ -278,6 +278,12 @@ Logging
   :class:`~django.utils.log.AdminEmailHandler` allows providing an
   ``django.views.debug.ExceptionReporter`` subclass to customize the traceback
   text sent to site :setting:`ADMINS` when :setting:`DEBUG` is ``False``.
+Error reporter class
+~~~~~~~~~~~~~~~~~~~~~~
+* Added the :setting:`DEFAULT_EXCEPTION_REPORTER` setting defaults
+  to ``django.views.debug.ExceptionReporter``. This setting allows providing
+  ``django.views.debug.ExceptionReporter`` subclass to customize
+  the traceback text in error reports when :setting:`DEBUG` is ``False``.
 
 Management Commands
 ~~~~~~~~~~~~~~~~~~~

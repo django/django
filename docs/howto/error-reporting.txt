@@ -281,6 +281,25 @@ following methods:
     frame. By default it replaces the values of sensitive variables with stars
     (`**********`).
 
+Also there is a way to use your custom reporter class. You can do by
+defining :setting:`DEFAULT_EXCEPTION_REPORTER` setting::
+
+    DEFAULT_EXCEPTION_REPORTER = 'path.to.your.CustomExceptionReporter'
+
+Your custom reporter class needs to inherit from
+:class:`django.views.debug.ExceptionReporter`
+
+As well as with filter class you may also control which reporter class to use within any
+given view by setting the ``HttpRequest``’s ``exception_reporter_class`` attribute::
+
+    def my_view(request):
+        if request.user.is_authenticated:
+            request.exception_reporter_class = CustomExceptionReporter()
+        ...
+
+.. currentmodule:: django.views.debug
+
+
 .. seealso::
 
     You can also set up custom error reporting by writing a custom piece of
