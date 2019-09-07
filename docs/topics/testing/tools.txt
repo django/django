@@ -747,14 +747,6 @@ If your tests make any database queries, use subclasses
     setting the ``databases`` class attribute to ``'__all__'`` on your test
     class.
 
-.. attribute:: SimpleTestCase.allow_database_queries
-
-    .. deprecated:: 2.2
-
-    This attribute is deprecated in favor of :attr:`databases`. The previous
-    behavior of ``allow_database_queries = True`` can be achieved by setting
-    ``databases = '__all__'``.
-
 .. warning::
 
     ``SimpleTestCase`` and its subclasses (e.g. ``TestCase``, ...) rely on
@@ -1180,14 +1172,6 @@ only loaded into the ``default`` database.
 Queries against databases not in ``databases`` will give assertion errors to
 prevent state leaking between tests.
 
-.. attribute:: TransactionTestCase.multi_db
-
-.. deprecated:: 2.2
-
-This attribute is deprecated in favor of :attr:`~TransactionTestCase.databases`.
-The previous behavior of ``multi_db = True`` can be achieved by setting
-``databases = '__all__'``.
-
 .. attribute:: TestCase.databases
 
 By default, only the ``default`` database will be wrapped in a transaction
@@ -1209,14 +1193,6 @@ This test will only allow queries against the ``other`` database. Just like for
 :attr:`SimpleTestCase.databases` and :attr:`TransactionTestCase.databases`, the
 ``'__all__'`` constant can be used to specify that the test should allow
 queries to all databases.
-
-.. attribute:: TestCase.multi_db
-
-.. deprecated:: 2.2
-
-This attribute is deprecated in favor of :attr:`~TestCase.databases`. The
-previous behavior of ``multi_db = True`` can be achieved by setting
-``databases = '__all__'``.
 
 .. _overriding-settings:
 

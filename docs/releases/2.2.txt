@@ -508,8 +508,8 @@ Miscellaneous
   first positional argument, if it accepts it. Support for overrides that don't
   accept it will be removed in Django 3.1.
 
-* The :attr:`.SimpleTestCase.allow_database_queries`,
-  :attr:`.TransactionTestCase.multi_db`, and :attr:`.TestCase.multi_db`
+* The ``SimpleTestCase.allow_database_queries``,
+  ``TransactionTestCase.multi_db``, and ``TestCase.multi_db``
   attributes are deprecated in favor of :attr:`.SimpleTestCase.databases`,
   :attr:`.TransactionTestCase.databases`, and :attr:`.TestCase.databases`.
   These new attributes allow databases dependencies to be declared in order to

@@ -240,3 +240,6 @@ to remove usage of these features.
 * The ``FILE_CHARSET`` setting is removed.
 
 * ``django.contrib.staticfiles.storage.CachedStaticFilesStorage`` is removed.
+
+* Support for ``SimpleTestCase.allow_database_queries`` and
+  ``TransactionTestCase.multi_db`` is removed.

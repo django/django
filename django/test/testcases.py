@@ -4,7 +4,6 @@ import posixpath
 import sys
 import threading
 import unittest
-import warnings
 from collections import Counter
 from contextlib import contextmanager
 from copy import copy
@@ -38,7 +37,6 @@ from django.test.utils import (
     override_settings,
 )
 from django.utils.decorators import classproperty
-from django.utils.deprecation import RemovedInDjango31Warning
 from django.views.static import serve
 
 __all__ = ('TestCase', 'TransactionTestCase',
@@ -144,25 +142,6 @@ class _DatabaseFailure:
         raise AssertionError(self.message)
 
 
-class _SimpleTestCaseDatabasesDescriptor:
-    """Descriptor for SimpleTestCase.allow_database_queries deprecation."""
-    def __get__(self, instance, cls=None):
-        try:
-            allow_database_queries = cls.allow_database_queries
-        except AttributeError:
-            pass
-        else:
-            msg = (
-                '`SimpleTestCase.allow_database_queries` is deprecated. '
-                'Restrict the databases available during the execution of '
-                '%s.%s with the `databases` attribute instead.'
-            ) % (cls.__module__, cls.__qualname__)
-            warnings.warn(msg, RemovedInDjango31Warning)
-            if allow_database_queries:
-                return {DEFAULT_DB_ALIAS}
-        return set()
-
-
 class SimpleTestCase(unittest.TestCase):
 
     # The class we'll use for the test client self.client.
@@ -171,7 +150,7 @@ class SimpleTestCase(unittest.TestCase):
     _overridden_settings = None
     _modified_settings = None
 
-    databases = _SimpleTestCaseDatabasesDescriptor()
+    databases = set()
     _disallowed_database_msg = (
         'Database %(operation)s to %(alias)r are not allowed in SimpleTestCase '
         'subclasses. Either subclass TestCase or TransactionTestCase to ensure '
@@ -870,26 +849,6 @@ class SimpleTestCase(unittest.TestCase):
                 self.fail(self._formatMessage(msg, standardMsg))
 
 
-class _TransactionTestCaseDatabasesDescriptor:
-    """Descriptor for TransactionTestCase.multi_db deprecation."""
-    msg = (
-        '`TransactionTestCase.multi_db` is deprecated. Databases available '
-        'during this test can be defined using %s.%s.databases.'
-    )
-
-    def __get__(self, instance, cls=None):
-        try:
-            multi_db = cls.multi_db
-        except AttributeError:
-            pass
-        else:
-            msg = self.msg % (cls.__module__, cls.__qualname__)
-            warnings.warn(msg, RemovedInDjango31Warning)
-            if multi_db:
-                return set(connections)
-        return {DEFAULT_DB_ALIAS}
-
-
 class TransactionTestCase(SimpleTestCase):
 
     # Subclasses can ask for resetting of auto increment sequence before each
@@ -902,7 +861,7 @@ class TransactionTestCase(SimpleTestCase):
     # Subclasses can define fixtures which will be automatically installed.
     fixtures = None
 
-    databases = _TransactionTestCaseDatabasesDescriptor()
+    databases = {DEFAULT_DB_ALIAS}
     _disallowed_database_msg = (
         'Database %(operation)s to %(alias)r are not allowed in this test. '
         'Add %(alias)r to %(test)s.databases to ensure proper test isolation '
@@ -1075,14 +1034,6 @@ def connections_support_transactions(aliases=None):
     return all(conn.features.supports_transactions for conn in conns)
 
 
-class _TestCaseDatabasesDescriptor(_TransactionTestCaseDatabasesDescriptor):
-    """Descriptor for TestCase.multi_db deprecation."""
-    msg = (
-        '`TestCase.multi_db` is deprecated. Databases available during this '
-        'test can be defined using %s.%s.databases.'
-    )
-
-
 class TestCase(TransactionTestCase):
     """
     Similar to TransactionTestCase, but use `transaction.atomic()` to achieve
@@ -1096,8 +1047,6 @@ class TestCase(TransactionTestCase):
     On database backends with no transaction support, TestCase behaves as
     TransactionTestCase.
     """
-    databases = _TestCaseDatabasesDescriptor()
-
     @classmethod
     def _enter_atomics(cls):
         """Open atomic blocks for multiple databases."""

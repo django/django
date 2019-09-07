@@ -1091,9 +1091,8 @@ Miscellaneous
 
 * In order to enforce test isolation, database queries are not allowed
   by default in :class:`~django.test.SimpleTestCase` tests anymore. You
-  can disable this behavior by setting the
-  :attr:`~django.test.SimpleTestCase.allow_database_queries` class attribute
-  to ``True`` on your test class.
+  can disable this behavior by setting the ``allow_database_queries`` class
+  attribute to ``True`` on your test class.
 
 * ``ResolverMatch.app_name`` was changed to contain the full namespace path in
   the case of nested namespaces. For consistency with
