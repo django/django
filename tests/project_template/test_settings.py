@@ -39,5 +39,5 @@ class TestStartProjectSettings(SimpleTestCase):
                 b'Content-Length: 0',
                 b'Content-Type: text/html; charset=utf-8',
                 b'X-Content-Type-Options: nosniff',
-                b'X-Frame-Options: SAMEORIGIN',
+                b'X-Frame-Options: DENY',
             ])

@@ -2795,12 +2795,15 @@ and :setting:`MONTH_DAY_FORMAT`.
 ``X_FRAME_OPTIONS``
 -------------------
 
-Default: ``'SAMEORIGIN'``
+Default: ``'DENY'``
 
 The default value for the X-Frame-Options header used by
 :class:`~django.middleware.clickjacking.XFrameOptionsMiddleware`. See the
 :doc:`clickjacking protection </ref/clickjacking/>` documentation.
 
+.. versionchanged:: 3.0
+
+    In older versions, the default value is ``SAMEORIGIN``.
 
 Auth
 ====

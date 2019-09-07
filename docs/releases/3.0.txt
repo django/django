@@ -535,6 +535,15 @@ upload handler is used.
 ``FILE_UPLOAD_PERMISSION`` now defaults to ``0o644`` to avoid this
 inconsistency.
 
+New default value for the ``X_FRAME_OPTIONS`` setting
+-----------------------------------------------------
+
+In older versions, the :setting:`X_FRAME_OPTIONS` setting defaults to
+``'SAMEORIGIN'``. To make Django projects more secure by default,
+:setting:`X_FRAME_OPTIONS` now defaults to ``'DENY'``. If your site uses frames
+of itself, you will need to explicitly set ``X_FRAME_ORIGINS = 'SAMEORIGIN'``
+for them to continue working.
+
 Miscellaneous
 -------------
 

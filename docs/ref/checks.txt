@@ -420,9 +420,8 @@ The following checks are run if you use the :option:`check --deploy` option:
 * **security.W019**: You have
   :class:`django.middleware.clickjacking.XFrameOptionsMiddleware` in your
   :setting:`MIDDLEWARE`, but :setting:`X_FRAME_OPTIONS` is not set to
-  ``'DENY'``. The default is ``'SAMEORIGIN'``, but unless there is a good reason
-  for your site to serve other parts of itself in a frame, you should change
-  it to ``'DENY'``.
+  ``'DENY'``. Unless there is a good reason for your site to serve other parts
+  of itself in a frame, you should change it to ``'DENY'``.
 * **security.W020**: :setting:`ALLOWED_HOSTS` must not be empty in deployment.
 * **security.W021**: You have not set the
   :setting:`SECURE_HSTS_PRELOAD` setting to ``True``. Without this, your site

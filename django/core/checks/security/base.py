@@ -80,9 +80,8 @@ W019 = Warning(
     "You have "
     "'django.middleware.clickjacking.XFrameOptionsMiddleware' in your "
     "MIDDLEWARE, but X_FRAME_OPTIONS is not set to 'DENY'. "
-    "The default is 'SAMEORIGIN', but unless there is a good reason for "
-    "your site to serve other parts of itself in a frame, you should "
-    "change it to 'DENY'.",
+    "Unless there is a good reason for your site to serve other parts of "
+    "itself in a frame, you should change it to 'DENY'.",
     id='security.W019',
 )
 
