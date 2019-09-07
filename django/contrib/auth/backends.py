@@ -1,10 +1,6 @@
-import inspect
-import warnings
-
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Permission
 from django.db.models import Exists, OuterRef, Q
-from django.utils.deprecation import RemovedInDjango31Warning
 
 UserModel = get_user_model()
 
@@ -206,17 +202,7 @@ class RemoteUserBackend(ModelBackend):
                 UserModel.USERNAME_FIELD: username
             })
             if created:
-                args = (request, user)
-                try:
-                    inspect.getcallargs(self.configure_user, request, user)
-                except TypeError:
-                    args = (user,)
-                    warnings.warn(
-                        'Update %s.configure_user() to accept `request` as '
-                        'the first argument.'
-                        % self.__class__.__name__, RemovedInDjango31Warning
-                    )
-                user = self.configure_user(*args)
+                user = self.configure_user(request, user)
         else:
             try:
                 user = UserModel._default_manager.get_by_natural_key(username)
