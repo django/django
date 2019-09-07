@@ -1250,6 +1250,19 @@ Default: ``'utf-8'``
 Default charset to use for all ``HttpResponse`` objects, if a MIME type isn't
 manually specified. Used when constructing the ``Content-Type`` header.
 
+.. setting:: DEFAULT_EXCEPTION_REPORTER
+
+``DEFAULT_EXCEPTION_REPORTER``
+------------------------------
+
+.. versionadded:: 3.1
+
+Default: ``'``:class:`django.views.debug.ExceptionReporter`\ ``'``
+
+Default exception reporter class to be used if none has been assigned to the
+:class:`~django.http.HttpRequest` instance yet. See
+:ref:`custom-error-reports`.
+
 .. setting:: DEFAULT_EXCEPTION_REPORTER_FILTER
 
 ``DEFAULT_EXCEPTION_REPORTER_FILTER``
@@ -3537,6 +3550,7 @@ Email
 
 Error reporting
 ---------------
+* :setting:`DEFAULT_EXCEPTION_REPORTER`
 * :setting:`DEFAULT_EXCEPTION_REPORTER_FILTER`
 * :setting:`IGNORABLE_404_URLS`
 * :setting:`MANAGERS`

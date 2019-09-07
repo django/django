@@ -47,7 +47,7 @@ def technical_500_response(request, exc_type, exc_value, tb, status_code=500):
     Create a technical server error response. The last three arguments are
     the values returned from sys.exc_info() and friends.
     """
-    reporter = ExceptionReporter(request, exc_type, exc_value, tb)
+    reporter = get_exception_reporter_class(request)(request, exc_type, exc_value, tb)
     if request.is_ajax():
         text = reporter.get_traceback_text()
         return HttpResponse(text, status=status_code, content_type='text/plain; charset=utf-8')
@@ -65,6 +65,11 @@ def get_default_exception_reporter_filter():
 def get_exception_reporter_filter(request):
     default_filter = get_default_exception_reporter_filter()
     return getattr(request, 'exception_reporter_filter', default_filter)
+
+
+def get_exception_reporter_class(request):
+    default_exception_reporter_class = import_string(settings.DEFAULT_EXCEPTION_REPORTER)
+    return getattr(request, 'exception_reporter_class', default_exception_reporter_class)
 
 
 class SafeExceptionReporterFilter:
