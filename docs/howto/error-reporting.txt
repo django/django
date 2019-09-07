@@ -305,6 +305,62 @@ following attributes and methods:
         traceback frame. Sensitive values are replaced with
         :attr:`cleansed_substitute`.
 
+.. versionadded:: 3.1
+
+If you need to customize error reports beyond filtering you may specify a
+custom error reporter class by defining the
+:setting:`DEFAULT_EXCEPTION_REPORTER` setting::
+
+    DEFAULT_EXCEPTION_REPORTER = 'path.to.your.CustomExceptionReporter'
+
+The exception reporter is responsible for compiling the exception report data,
+and formatting it as text or HTML appropriately. (The exception reporter uses
+:setting:`DEFAULT_EXCEPTION_REPORTER_FILTER` when preparing the exception
+report data.)
+
+Your custom reporter class needs to inherit from
+:class:`django.views.debug.ExceptionReporter`.
+
+.. class:: ExceptionReporter
+
+    .. method:: get_traceback_data()
+
+        Return a dictionary containing traceback information.
+
+        This is the main extension point for customizing exception reports, for
+        example::
+
+            from django.views.debug import ExceptionReporter
+
+
+            class CustomExceptionReporter(ExceptionReporter):
+                def get_traceback_data(self):
+                    data = super().get_traceback_data()
+                    # ... remove/add something here ...
+                    return data
+
+    .. method:: get_traceback_html()
+
+        Return HTML version of exception report.
+
+        Used for HTML version of debug 500 HTTP error page.
+
+    .. method:: get_traceback_text()
+
+        Return plain text version of exception report.
+
+        Used for plain text version of debug 500 HTTP error page and email
+        reports.
+
+As with the filter class, you may control which exception reporter class to use
+within any given view by setting the ``HttpRequest``’s
+``exception_reporter_class`` attribute::
+
+    def my_view(request):
+        if request.user.is_authenticated:
+            request.exception_reporter_class = CustomExceptionReporter()
+        ...
+
 .. seealso::
 
     You can also set up custom error reporting by writing a custom piece of

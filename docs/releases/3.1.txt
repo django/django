@@ -173,6 +173,10 @@ Error Reporting
   :setting:`DEFAULT_EXCEPTION_REPORTER_FILTER` when applying settings
   filtering.
 
+* The new :setting:`DEFAULT_EXCEPTION_REPORTER` allows providing a
+  :class:`django.views.debug.ExceptionReporter` subclass to customize exception
+  report generation. See :ref:`custom-error-reports` for details.
+
 File Storage
 ~~~~~~~~~~~~
 
