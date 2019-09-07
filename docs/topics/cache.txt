@@ -530,8 +530,9 @@ cached separately. This middleware expects that a HEAD request is answered with
 the same response headers as the corresponding GET request; in which case it can
 return a cached GET response for HEAD request.
 
-Additionally, ``UpdateCacheMiddleware`` automatically sets a few headers in each
-:class:`~django.http.HttpResponse`:
+Additionally, ``UpdateCacheMiddleware`` automatically sets a few headers in
+each :class:`~django.http.HttpResponse` which affect :ref:`downstream caches
+<downstream-caches>`:
 
 * Sets the ``Expires`` header to the current date/time plus the defined
   :setting:`CACHE_MIDDLEWARE_SECONDS`.
@@ -620,6 +621,10 @@ setting for the middleware.  It can be used like this::
 The ``key_prefix`` and ``cache`` arguments may be specified together. The
 ``key_prefix`` argument and the :setting:`KEY_PREFIX <CACHES-KEY_PREFIX>`
 specified under :setting:`CACHES` will be concatenated.
+
+Additionally, ``cache_page`` automatically sets ``Cache-Control`` and
+``Expires`` headers in the response which affect :ref:`downstream caches
+<downstream-caches>`.
 
 .. versionchanged:: 3.1
 
@@ -1108,6 +1113,8 @@ instance, to do this for the ``locmem`` backend, put this code in a module::
 
 ...and use the dotted Python path to this class in the
 :setting:`BACKEND <CACHES-BACKEND>` portion of your :setting:`CACHES` setting.
+
+.. _downstream-caches:
 
 Downstream caches
 =================
