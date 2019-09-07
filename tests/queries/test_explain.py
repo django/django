@@ -2,11 +2,8 @@ import unittest
 
 from django.db import NotSupportedError, connection, transaction
 from django.db.models import Count
-from django.test import (
-    TestCase, ignore_warnings, skipIfDBFeature, skipUnlessDBFeature,
-)
+from django.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
 from django.test.utils import CaptureQueriesContext
-from django.utils.deprecation import RemovedInDjango31Warning
 
 from .models import Tag
 
@@ -14,7 +11,6 @@ from .models import Tag
 @skipUnlessDBFeature('supports_explaining_query_execution')
 class ExplainTests(TestCase):
 
-    @ignore_warnings(category=RemovedInDjango31Warning)
     def test_basic(self):
         querysets = [
             Tag.objects.filter(name='test'),

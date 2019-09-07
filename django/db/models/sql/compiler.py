@@ -1,6 +1,5 @@
 import collections
 import re
-import warnings
 from itertools import chain
 
 from django.core.exceptions import EmptyResultSet, FieldError
@@ -14,7 +13,6 @@ from django.db.models.sql.constants import (
 from django.db.models.sql.query import Query, get_order_dir
 from django.db.transaction import TransactionManagementError
 from django.db.utils import DatabaseError, NotSupportedError
-from django.utils.deprecation import RemovedInDjango31Warning
 from django.utils.hashable import make_hashable
 
 
@@ -565,17 +563,7 @@ class SQLCompiler:
                     order_by = order_by or self.connection.ops.force_no_ordering()
                     result.append('GROUP BY %s' % ', '.join(grouping))
                     if self._meta_ordering:
-                        # When the deprecation ends, replace with:
-                        # order_by = None
-                        warnings.warn(
-                            "%s QuerySet won't use Meta.ordering in Django 3.1. "
-                            "Add .order_by(%s) to retain the current query." % (
-                                self.query.model.__name__,
-                                ', '.join(repr(f) for f in self._meta_ordering),
-                            ),
-                            RemovedInDjango31Warning,
-                            stacklevel=4,
-                        )
+                        order_by = None
                 if having:
                     result.append('HAVING %s' % having)
                     params.extend(h_params)

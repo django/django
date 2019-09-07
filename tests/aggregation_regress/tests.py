@@ -12,11 +12,8 @@ from django.db.models import (
     Value, Variance, When,
 )
 from django.db.models.aggregates import Aggregate
-from django.test import (
-    TestCase, ignore_warnings, skipUnlessAnyDBFeature, skipUnlessDBFeature,
-)
+from django.test import TestCase, skipUnlessAnyDBFeature, skipUnlessDBFeature
 from django.test.utils import Approximate
-from django.utils.deprecation import RemovedInDjango31Warning
 
 from .models import (
     Alfa, Author, Book, Bravo, Charlie, Clues, Entries, HardbackBook, ItemTag,
@@ -110,7 +107,6 @@ class AggregationTests(TestCase):
         for attr, value in kwargs.items():
             self.assertEqual(getattr(obj, attr), value)
 
-    @ignore_warnings(category=RemovedInDjango31Warning)
     def test_annotation_with_value(self):
         values = Book.objects.filter(
             name='Practical Django Projects',
@@ -218,7 +214,6 @@ class AggregationTests(TestCase):
             {'pages__sum': 3703}
         )
 
-    @ignore_warnings(category=RemovedInDjango31Warning)
     def test_annotation(self):
         # Annotations get combined with extra select clauses
         obj = Book.objects.annotate(mean_auth_age=Avg("authors__age")).extra(
@@ -312,8 +307,7 @@ class AggregationTests(TestCase):
 
         # If an annotation isn't included in the values, it can still be used
         # in a filter
-        with ignore_warnings(category=RemovedInDjango31Warning):
-            qs = Book.objects.annotate(n_authors=Count('authors')).values('name').filter(n_authors__gt=2)
+        qs = Book.objects.annotate(n_authors=Count('authors')).values('name').filter(n_authors__gt=2)
         self.assertSequenceEqual(
             qs, [
                 {"name": 'Python Web Development with Django'}
@@ -457,7 +451,6 @@ class AggregationTests(TestCase):
         with self.assertRaisesMessage(FieldError, msg):
             Book.objects.all().annotate(num_authors=Count('authors__id')).aggregate(Max('foo'))
 
-    @ignore_warnings(category=RemovedInDjango31Warning)
     def test_more(self):
         # Old-style count aggregations can be mixed with new-style
         self.assertEqual(
@@ -811,7 +804,6 @@ class AggregationTests(TestCase):
         with self.assertRaisesMessage(ValueError, msg):
             Author.objects.annotate(book_contact_set=Avg('friends__age'))
 
-    @ignore_warnings(category=RemovedInDjango31Warning)
     def test_pickle(self):
         # Regression for #10197 -- Queries with aggregates can be pickled.
         # First check that pickling is possible at all. No crash = success
@@ -1210,7 +1202,6 @@ class AggregationTests(TestCase):
             {'book__count__max': 2}
         )
 
-    @ignore_warnings(category=RemovedInDjango31Warning)
     def test_annotate_joins(self):
         """
         The base table's join isn't promoted to LOUTER. This could
@@ -1474,7 +1465,6 @@ class AggregationTests(TestCase):
         query.filter(q1 | q2)
         self.assertEqual(len(q2.children), 1)
 
-    @ignore_warnings(category=RemovedInDjango31Warning)
     def test_fobj_group_by(self):
         """
         An F() object referring to related column works correctly in group by.
@@ -1562,7 +1552,6 @@ class JoinPromotionTests(TestCase):
         qs = Charlie.objects.annotate(Count('alfa__name'))
         self.assertIn(' LEFT OUTER JOIN ', str(qs.query))
 
-    @ignore_warnings(category=RemovedInDjango31Warning)
     def test_non_nullable_fk_not_promoted(self):
         qs = Book.objects.annotate(Count('contact__name'))
         self.assertIn(' INNER JOIN ', str(qs.query))

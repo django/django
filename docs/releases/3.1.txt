@@ -234,6 +234,8 @@ to remove usage of these features.
 
 * ``django.core.paginator.QuerySetPaginator`` is removed.
 
+* A model's ``Meta.ordering`` doesn't affect ``GROUP BY`` queries.
+
 * ``django.contrib.postgres.fields.FloatRangeField`` and
   ``django.contrib.postgres.forms.FloatRangeField`` are removed.
 

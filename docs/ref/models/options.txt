@@ -284,10 +284,6 @@ Django quotes column and table names behind the scenes.
 
         ordering = [F('author').asc(nulls_last=True)]
 
-    Default ordering also affects :ref:`aggregation queries
-    <aggregation-ordering-interaction>` but this won't be the case starting
-    in Django 3.1.
-
 .. warning::
 
     Ordering is not a free operation. Each field you add to the ordering
