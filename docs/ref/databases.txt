@@ -677,6 +677,18 @@ substring filtering.
 
 .. _documented at sqlite.org: https://www.sqlite.org/faq.html#q18
 
+.. _sqlite-decimal-handling:
+
+Decimal handling
+----------------
+
+SQLite has no real decimal internal type. Decimal values are internally
+converted to the ``REAL`` data type (8-byte IEEE floating point number), as
+explained in the `SQLite datatypes documentation`__, so they don't support
+correctly-rounded decimal floating point arithmetic.
+
+__ https://www.sqlite.org/datatype3.html#storage_classes_and_datatypes
+
 "Database is locked" errors
 ---------------------------
 
