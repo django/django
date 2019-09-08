@@ -715,7 +715,9 @@ when :attr:`~django.forms.Field.localize` is ``False`` or
 
     For more information about the differences between the
     :class:`FloatField` and :class:`DecimalField` classes, please
-    see :ref:`FloatField vs. DecimalField <floatfield_vs_decimalfield>`.
+    see :ref:`FloatField vs. DecimalField <floatfield_vs_decimalfield>`. You
+    should also be aware of :ref:`SQLite limitations <sqlite-decimal-handling>`
+    of decimal fields.
 
 ``DurationField``
 -----------------
