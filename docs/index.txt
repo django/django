@@ -228,7 +228,8 @@ testing of Django applications:
   :doc:`WSGI servers <howto/deployment/wsgi/index>` |
   :doc:`ASGI servers <howto/deployment/asgi/index>` |
   :doc:`Deploying static files <howto/static-files/deployment>` |
-  :doc:`Tracking code errors by email <howto/error-reporting>`
+  :doc:`Tracking code errors by email <howto/error-reporting>` |
+  :doc:`Deployment checklist <howto/deployment/checklist>`
 
 The admin
 =========

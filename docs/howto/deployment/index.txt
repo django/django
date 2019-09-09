@@ -15,8 +15,10 @@ site to use asynchronous Python features, and asynchronous Django features as
 they are developed.
 
 .. toctree::
-   :maxdepth: 1
+   :maxdepth: 2
 
    wsgi/index
    asgi/index
+   ../static-files/deployment
+   ../error-reporting
    checklist
