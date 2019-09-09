@@ -944,6 +944,54 @@ some limitations on the usage of such LOB columns in general:
   conjunction with ``distinct()`` to prevent ``TextField`` columns from being
   included in the ``SELECT DISTINCT`` list.
 
+.. _subclassing-database-backends:
+
+Subclassing the built-in database backends
+==========================================
+
+Django comes with built-in database backends. You may subclass an existing
+database backends to modify its behavior, features, or configuration.
+
+Consider, for example, that you need to change a single database feature.
+First, you have to create a new directory with a ``base`` module in it. For
+example::
+
+    mysite/
+        ...
+        mydbengine/
+            __init__.py
+            base.py
+
+The ``base.py`` module must contain a class named ``DatabaseWrapper`` that
+subclasses an existing engine from the ``django.db.backends`` module. Here's an
+example of subclassing the PostgreSQL engine to change a feature class
+``allows_group_by_selected_pks_on_model``:
+
+.. code-block:: python
+    :caption: mysite/mydbengine/base.py
+
+    from django.db.backends.postgresql import base, features
+
+    class DatabaseFeatures(features.DatabaseFeatures):
+        def allows_group_by_selected_pks_on_model(self, model):
+            return True
+
+    class DatabaseWrapper(base.DatabaseWrapper):
+        features_class = DatabaseFeatures
+
+Finally, you must specify a :setting:`DATABASE-ENGINE` in your ``settings.py``
+file::
+
+    DATABASES = {
+        'default': {
+            'ENGINE': 'mydbengine',
+            ...
+        },
+    }
+
+You can see the current list of database engines by looking in
+:source:`django/db/backends`.
+
 .. _third-party-notes:
 
 Using a 3rd-party database backend
