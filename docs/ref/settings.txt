@@ -2306,8 +2306,11 @@ available in ``request.META``.)
 Default: ``[]`` (Empty list)
 
 If a URL path matches a regular expression in this list, the request will not be
-redirected to HTTPS. If :setting:`SECURE_SSL_REDIRECT` is ``False``, this
-setting has no effect.
+redirected to HTTPS. The
+:class:`~django.middleware.security.SecurityMiddleware` strips leading slashes
+from URL paths, so patterns shouldn't include them, e.g.
+``SECURE_REDIRECT_EXEMPT = [r'^no-ssl/$', …]``. If
+:setting:`SECURE_SSL_REDIRECT` is ``False``, this setting has no effect.
 
 .. setting:: SECURE_REFERRER_POLICY
 
