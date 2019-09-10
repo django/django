@@ -2,7 +2,7 @@ from datetime import datetime
 
 from django.core.exceptions import FieldError
 from django.db.models import CharField, F, Q
-from django.db.models.expressions import SimpleCol
+from django.db.models.expressions import Col
 from django.db.models.fields.related_lookups import RelatedIsNull
 from django.db.models.functions import Lower
 from django.db.models.lookups import Exact, GreaterThan, IsNull, LessThan
@@ -23,20 +23,24 @@ class TestQuery(SimpleTestCase):
         self.assertEqual(lookup.rhs, 2)
         self.assertEqual(lookup.lhs.target, Author._meta.get_field('num'))
 
-    def test_simplecol_query(self):
-        query = Query(Author)
+    def test_non_alias_cols_query(self):
+        query = Query(Author, alias_cols=False)
         where = query.build_where(Q(num__gt=2, name__isnull=False) | Q(num__lt=F('id')))
 
         name_isnull_lookup, num_gt_lookup = where.children[0].children
         self.assertIsInstance(num_gt_lookup, GreaterThan)
-        self.assertIsInstance(num_gt_lookup.lhs, SimpleCol)
+        self.assertIsInstance(num_gt_lookup.lhs, Col)
+        self.assertIsNone(num_gt_lookup.lhs.alias)
         self.assertIsInstance(name_isnull_lookup, IsNull)
-        self.assertIsInstance(name_isnull_lookup.lhs, SimpleCol)
+        self.assertIsInstance(name_isnull_lookup.lhs, Col)
+        self.assertIsNone(name_isnull_lookup.lhs.alias)
 
         num_lt_lookup = where.children[1]
         self.assertIsInstance(num_lt_lookup, LessThan)
-        self.assertIsInstance(num_lt_lookup.rhs, SimpleCol)
-        self.assertIsInstance(num_lt_lookup.lhs, SimpleCol)
+        self.assertIsInstance(num_lt_lookup.rhs, Col)
+        self.assertIsNone(num_lt_lookup.rhs.alias)
+        self.assertIsInstance(num_lt_lookup.lhs, Col)
+        self.assertIsNone(num_lt_lookup.lhs.alias)
 
     def test_complex_query(self):
         query = Query(Author)
@@ -54,23 +58,26 @@ class TestQuery(SimpleTestCase):
         self.assertEqual(lookup.lhs.target, Author._meta.get_field('num'))
 
     def test_multiple_fields(self):
-        query = Query(Item)
+        query = Query(Item, alias_cols=False)
         where = query.build_where(Q(modified__gt=F('created')))
         lookup = where.children[0]
         self.assertIsInstance(lookup, GreaterThan)
-        self.assertIsInstance(lookup.rhs, SimpleCol)
-        self.assertIsInstance(lookup.lhs, SimpleCol)
+        self.assertIsInstance(lookup.rhs, Col)
+        self.assertIsNone(lookup.rhs.alias)
+        self.assertIsInstance(lookup.lhs, Col)
+        self.assertIsNone(lookup.lhs.alias)
         self.assertEqual(lookup.rhs.target, Item._meta.get_field('created'))
         self.assertEqual(lookup.lhs.target, Item._meta.get_field('modified'))
 
     def test_transform(self):
-        query = Query(Author)
+        query = Query(Author, alias_cols=False)
         with register_lookup(CharField, Lower):
             where = query.build_where(~Q(name__lower='foo'))
         lookup = where.children[0]
         self.assertIsInstance(lookup, Exact)
         self.assertIsInstance(lookup.lhs, Lower)
-        self.assertIsInstance(lookup.lhs.lhs, SimpleCol)
+        self.assertIsInstance(lookup.lhs.lhs, Col)
+        self.assertIsNone(lookup.lhs.lhs.alias)
         self.assertEqual(lookup.lhs.lhs.target, Author._meta.get_field('name'))
 
     def test_negated_nullable(self):
@@ -96,15 +103,17 @@ class TestQuery(SimpleTestCase):
             query.build_where(Q(rank__gt=F('author__num')))
 
     def test_foreign_key_exclusive(self):
-        query = Query(ObjectC)
+        query = Query(ObjectC, alias_cols=False)
         where = query.build_where(Q(objecta=None) | Q(objectb=None))
         a_isnull = where.children[0]
         self.assertIsInstance(a_isnull, RelatedIsNull)
-        self.assertIsInstance(a_isnull.lhs, SimpleCol)
+        self.assertIsInstance(a_isnull.lhs, Col)
+        self.assertIsNone(a_isnull.lhs.alias)
         self.assertEqual(a_isnull.lhs.target, ObjectC._meta.get_field('objecta'))
         b_isnull = where.children[1]
         self.assertIsInstance(b_isnull, RelatedIsNull)
-        self.assertIsInstance(b_isnull.lhs, SimpleCol)
+        self.assertIsInstance(b_isnull.lhs, Col)
+        self.assertIsNone(b_isnull.lhs.alias)
         self.assertEqual(b_isnull.lhs.target, ObjectC._meta.get_field('objectb'))
 
     def test_clone_select_related(self):

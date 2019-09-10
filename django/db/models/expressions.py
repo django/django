@@ -529,8 +529,8 @@ class F(Combinable):
         return "{}({})".format(self.__class__.__name__, self.name)
 
     def resolve_expression(self, query=None, allow_joins=True, reuse=None,
-                           summarize=False, for_save=False, simple_col=False):
-        return query.resolve_ref(self.name, allow_joins, reuse, summarize, simple_col)
+                           summarize=False, for_save=False):
+        return query.resolve_ref(self.name, allow_joins, reuse, summarize)
 
     def asc(self, **kwargs):
         return OrderBy(self, **kwargs)
@@ -565,8 +565,7 @@ class ResolvedOuterRef(F):
 
 
 class OuterRef(F):
-    def resolve_expression(self, query=None, allow_joins=True, reuse=None,
-                           summarize=False, for_save=False, simple_col=False):
+    def resolve_expression(self, *args, **kwargs):
         if isinstance(self.name, self.__class__):
             return self.name
         return ResolvedOuterRef(self.name)
@@ -754,14 +753,19 @@ class Col(Expression):
         self.alias, self.target = alias, target
 
     def __repr__(self):
-        return "{}({}, {})".format(
-            self.__class__.__name__, self.alias, self.target)
+        alias, target = self.alias, self.target
+        identifiers = (alias, str(target)) if alias else (str(target),)
+        return '{}({})'.format(self.__class__.__name__, ', '.join(identifiers))
 
     def as_sql(self, compiler, connection):
-        qn = compiler.quote_name_unless_alias
-        return "%s.%s" % (qn(self.alias), qn(self.target.column)), []
+        alias, column = self.alias, self.target.column
+        identifiers = (alias, column) if alias else (column,)
+        sql = '.'.join(map(compiler.quote_name_unless_alias, identifiers))
+        return sql, []
 
     def relabeled_clone(self, relabels):
+        if self.alias is None:
+            return self
         return self.__class__(relabels.get(self.alias, self.alias), self.target, self.output_field)
 
     def get_group_by_cols(self, alias=None):
@@ -772,40 +776,6 @@ class Col(Expression):
             return self.output_field.get_db_converters(connection)
         return (self.output_field.get_db_converters(connection) +
                 self.target.get_db_converters(connection))
-
-
-class SimpleCol(Expression):
-    """
-    Represents the SQL of a column name without the table name.
-
-    This variant of Col doesn't include the table name (or an alias) to
-    avoid a syntax error in check constraints.
-    """
-    contains_column_references = True
-
-    def __init__(self, target, output_field=None):
-        if output_field is None:
-            output_field = target
-        super().__init__(output_field=output_field)
-        self.target = target
-
-    def __repr__(self):
-        return '{}({})'.format(self.__class__.__name__, self.target)
-
-    def as_sql(self, compiler, connection):
-        qn = compiler.quote_name_unless_alias
-        return qn(self.target.column), []
-
-    def get_group_by_cols(self, alias=None):
-        return [self]
-
-    def get_db_converters(self, connection):
-        if self.target == self.output_field:
-            return self.output_field.get_db_converters(connection)
-        return (
-            self.output_field.get_db_converters(connection) +
-            self.target.get_db_converters(connection)
-        )
 
 
 class Ref(Expression):

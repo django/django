@@ -38,10 +38,7 @@ class ExclusionConstraint(BaseConstraint):
         for expression, operator in self.expressions:
             if isinstance(expression, str):
                 expression = F(expression)
-            if isinstance(expression, F):
-                expression = expression.resolve_expression(query=query, simple_col=True)
-            else:
-                expression = expression.resolve_expression(query=query)
+            expression = expression.resolve_expression(query=query)
             sql, params = expression.as_sql(compiler, connection)
             expressions.append('%s WITH %s' % (sql % params, operator))
         return expressions
@@ -54,7 +51,7 @@ class ExclusionConstraint(BaseConstraint):
         return sql % tuple(schema_editor.quote_value(p) for p in params)
 
     def constraint_sql(self, model, schema_editor):
-        query = Query(model)
+        query = Query(model, alias_cols=False)
         compiler = query.get_compiler(connection=schema_editor.connection)
         expressions = self._get_expression_sql(compiler, schema_editor.connection, query)
         condition = self._get_condition_sql(compiler, schema_editor, query)
