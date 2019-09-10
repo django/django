@@ -77,7 +77,7 @@ models using the
 Filter expressions
 ------------------
 
-Expressions that outputs :class:`~django.db.models.BooleanField` may now be
+Expressions that output :class:`~django.db.models.BooleanField` may now be
 used directly in ``QuerySet`` filters, without having to first annotate and
 then filter against the annotation.
 
@@ -110,17 +110,13 @@ Minor features
 
 * jQuery is upgraded from version 3.3.1 to 3.4.1.
 
-:mod:`django.contrib.admindocs`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
-
 :mod:`django.contrib.auth`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 * The new ``reset_url_token`` attribute in
-  :class:`~django.contrib.auth.views.PasswordResetConfirmView` allows specifying
-  a token parameter displayed as a component of password reset URLs.
+  :class:`~django.contrib.auth.views.PasswordResetConfirmView` allows
+  specifying a token parameter displayed as a component of password reset
+  URLs.
 
 * Added :class:`~django.contrib.auth.backends.BaseBackend` class to ease
   customization of authentication backends.
@@ -143,11 +139,6 @@ Minor features
 * The new :meth:`.UserManager.with_perm` method returns users that have the
   specified permission.
 
-:mod:`django.contrib.contenttypes`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
-
 :mod:`django.contrib.gis`
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -165,11 +156,6 @@ Minor features
 * The :class:`~django.contrib.gis.geoip2.GeoIP2` class now accepts
   :class:`pathlib.Path` ``path``.
 
-:mod:`django.contrib.messages`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
-
 :mod:`django.contrib.postgres`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -184,32 +170,12 @@ Minor features
   and :class:`~django.contrib.postgres.operations.RemoveIndexConcurrently`
   classes allow creating and dropping indexes ``CONCURRENTLY`` on PostgreSQL.
 
-:mod:`django.contrib.redirects`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
-
 :mod:`django.contrib.sessions`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 * The new
   :meth:`~django.contrib.sessions.backends.base.SessionBase.get_session_cookie_age()`
-  methods allows dynamically specifying the session cookie age.
-
-:mod:`django.contrib.sitemaps`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
-
-:mod:`django.contrib.sites`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
-
-:mod:`django.contrib.staticfiles`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
+  method allows dynamically specifying the session cookie age.
 
 :mod:`django.contrib.syndication`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -226,28 +192,12 @@ Cache
   :func:`~django.views.decorators.cache.never_cache` now adds ``private``
   directive to a ``Cache-Control`` header.
 
-CSRF
-~~~~
-
-* ...
-
-Email
-~~~~~
-
-* ...
-
 File Storage
 ~~~~~~~~~~~~
 
 * The new :meth:`.Storage.get_alternative_name` method allows customizing the
   algorithm for generating filenames if a file with the uploaded name already
   exists.
-
-File Uploads
-~~~~~~~~~~~~
-
-* ...
-
 
 Forms
 ~~~~~
@@ -256,11 +206,6 @@ Forms
   :attr:`~django.forms.formsets.BaseFormSet.can_order` by setting the
   :attr:`~django.forms.formsets.BaseFormSet.ordering_widget` attribute or
   overriding :attr:`~django.forms.formsets.BaseFormSet.get_ordering_widget()`.
-
-Generic Views
-~~~~~~~~~~~~~
-
-* ...
 
 Internationalization
 ~~~~~~~~~~~~~~~~~~~~
@@ -300,11 +245,6 @@ Management Commands
   options now support templates stored in XZ archives (``.tar.xz``, ``.txz``)
   and LZMA archives (``.tar.lzma``, ``.tlz``).
 
-Migrations
-~~~~~~~~~~
-
-* ...
-
 Models
 ~~~~~~
 
@@ -323,7 +263,7 @@ Models
 
 * ``connection.queries`` now shows ``COPY … TO`` statements on PostgreSQL.
 
-* :class:`~django.db.models.FilePathField` now accepts a callable ``path``.
+* :class:`~django.db.models.FilePathField` now accepts a callable for ``path``.
 
 * Allowed symmetrical intermediate table for self-referential
   :class:`~django.db.models.ManyToManyField`.
@@ -394,21 +334,6 @@ Security
 * :class:`~django.middleware.security.SecurityMiddleware` can now send the
   :ref:`Referrer-Policy <referrer-policy>` header.
 
-Serialization
-~~~~~~~~~~~~~
-
-* ...
-
-Signals
-~~~~~~~
-
-* ...
-
-Templates
-~~~~~~~~~
-
-* ...
-
 Tests
 ~~~~~
 
@@ -436,16 +361,6 @@ Tests
 
 * Django test runner now supports a ``--pdb`` option to spawn a debugger at
   each error or failure.
-
-URLs
-~~~~
-
-* ...
-
-Validators
-~~~~~~~~~~
-
-* ...
 
 .. _backwards-incompatible-3.0:
 
@@ -605,7 +520,7 @@ Miscellaneous
 * Support for ``pywatchman`` < 1.2.0 is removed.
 
 * HTML rendered by :class:`~django.forms.SelectDateWidget` for required fields
-  now have the ``placeholder`` attribute, which mainly may require some
+  now have the ``placeholder`` attribute, which, mainly, may require some
   adjustments in tests that compare HTML.
 
 * :func:`~django.utils.http.urlencode` now encodes iterable values as they are
