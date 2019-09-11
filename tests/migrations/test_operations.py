@@ -1310,7 +1310,7 @@ class OperationTests(OperationTestBase):
 
     @skipUnlessDBFeature('supports_foreign_keys')
     def test_alter_field_reloads_state_on_fk_with_to_field_target_type_change(self):
-        app_label = 'alter_field_reloads_state_on_fk_with_to_field_target_type_change'
+        app_label = 'test_alflrsfkwtflttc'
         project_state = self.apply_operations(app_label, ProjectState(), operations=[
             migrations.CreateModel('Rider', fields=[
                 ('id', models.AutoField(primary_key=True)),
@@ -1330,7 +1330,7 @@ class OperationTests(OperationTestBase):
 
     @skipUnlessDBFeature('supports_foreign_keys')
     def test_alter_field_reloads_state_on_fk_with_to_field_related_name_target_type_change(self):
-        app_label = 'alter_field_reloads_state_on_fk_with_to_field_rn_target_type_change'
+        app_label = 'test_alflrsfkwtflrnttc'
         project_state = self.apply_operations(app_label, ProjectState(), operations=[
             migrations.CreateModel('Rider', fields=[
                 ('id', models.AutoField(primary_key=True)),
