@@ -194,7 +194,7 @@ When contributing to Django it's very important that your code changes don't
 introduce bugs into other areas of Django. One way to check that Django still
 works after you make your changes is by running Django's test suite. If all
 the tests still pass, then you can be reasonably sure that your changes
-work and haven't broken other parts Django. If you've never run Django's test
+work and haven't broken other parts of Django. If you've never run Django's test
 suite before, it's a good idea to run it once beforehand to get familiar with
 its output.
 

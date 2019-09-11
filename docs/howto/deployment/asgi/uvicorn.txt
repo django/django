@@ -19,7 +19,7 @@ Running Django in Uvicorn
 
 When Uvicorn is installed, a ``uvicorn`` command is available which runs ASGI
 applications. Uvicorn needs to be called with the location of a module
-containing a ASGI application object, followed by what the application is
+containing an ASGI application object, followed by what the application is
 called (separated by a colon).
 
 For a typical Django project, invoking Uvicorn would look like::

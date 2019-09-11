@@ -294,8 +294,8 @@ for:
     keeping CSRF protection, consider enabling only same-origin referrers.
 
 ``SecurityMiddleware`` can set the ``Referrer-Policy`` header for you, based on
-the the :setting:`SECURE_REFERRER_POLICY` setting (note spelling: browsers send
-a ``Referer`` header when a user clicks a link, but the header instructing a
+the :setting:`SECURE_REFERRER_POLICY` setting (note spelling: browsers send a
+``Referer`` header when a user clicks a link, but the header instructing a
 browser whether to do so is spelled ``Referrer-Policy``). The valid values for
 this setting are:
 
@@ -522,7 +522,7 @@ Here are some hints about the ordering of various Django middleware classes:
 
 #. :class:`~django.contrib.sessions.middleware.SessionMiddleware`
 
-   Before any middleware that may raise an an exception to trigger an error
+   Before any middleware that may raise an exception to trigger an error
    view (such as :exc:`~django.core.exceptions.PermissionDenied`) if you're
    using :setting:`CSRF_USE_SESSIONS`.
 
