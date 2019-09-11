@@ -174,7 +174,7 @@ class Template:
         """
         Parse and compile the template source into a nodelist. If debug
         is True and an exception occurs during parsing, the exception is
-        is annotated with contextual line information where it occurred in the
+        annotated with contextual line information where it occurred in the
         template source.
         """
         if self.engine.debug:

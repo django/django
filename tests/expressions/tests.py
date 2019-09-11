@@ -1129,7 +1129,7 @@ class ExpressionOperatorTests(TestCase):
         self.assertEqual(Number.objects.get(pk=self.n.pk).float, Approximate(15.500, places=3))
 
     def test_lefthand_power(self):
-        # LH Powert arithmetic operation on floats and integers
+        # LH Power arithmetic operation on floats and integers
         Number.objects.filter(pk=self.n.pk).update(integer=F('integer') ** 2, float=F('float') ** 1.5)
         self.assertEqual(Number.objects.get(pk=self.n.pk).integer, 1764)
         self.assertEqual(Number.objects.get(pk=self.n.pk).float, Approximate(61.02, places=2))
@@ -1171,7 +1171,7 @@ class ExpressionOperatorTests(TestCase):
         self.assertEqual(Number.objects.get(pk=self.n.pk).float, Approximate(15.500, places=3))
 
     def test_righthand_power(self):
-        # RH Powert arithmetic operation on floats and integers
+        # RH Power arithmetic operation on floats and integers
         Number.objects.filter(pk=self.n.pk).update(integer=2 ** F('integer'), float=1.5 ** F('float'))
         self.assertEqual(Number.objects.get(pk=self.n.pk).integer, 4398046511104)
         self.assertEqual(Number.objects.get(pk=self.n.pk).float, Approximate(536.308, places=3))
