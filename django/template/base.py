@@ -903,7 +903,22 @@ class Node:
             return self.render(context)
         except Exception as e:
             if context.template.engine.debug and not hasattr(e, 'template_debug'):
-                e.template_debug = context.render_context.template.get_exception_info(e, self.token)
+                from django.template.context import template_stack
+                
+                # ticket #28935, work in progress (WIP):
+                try:
+                    # template_stack[-1].name => "base.html"
+                    # template_stack[-2].nodelist[0].token.contents => "extends 'base.html" 
+                    if (
+                        len(template_stack) >= 2
+                        and "extends" in template_stack[-2].nodelist[0].token.contents
+                        and template_stack[-1].name in template_stack[-2].nodelist[0].token.contents
+                    ):
+                        e.template_debug = context.template.get_exception_info(e, self.token)
+                    else:
+                        e.template_debug = context.render_context.template.get_exception_info(e, self.token)
+                except (AttributeError, IndexError, KeyError):
+                    e.template_debug = context.render_context.template.get_exception_info(e, self.token)
             raise
 
     def __iter__(self):

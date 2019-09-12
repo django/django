@@ -4,6 +4,7 @@ from copy import copy
 # Hard-coded processor for easier use of CSRF protection.
 _builtin_context_processors = ('django.template.context_processors.csrf',)
 
+template_stack = []
 
 class ContextPopException(Exception):
     "pop() has been called more times than push()"
@@ -200,6 +201,7 @@ class RenderContext(BaseContext):
 
     @contextmanager
     def push_state(self, template, isolated_context=True):
+        template_stack.append(template)
         initial = self.template
         self.template = template
         if isolated_context:
