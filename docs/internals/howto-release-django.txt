@@ -134,6 +134,12 @@ any time leading up to the actual release:
 
    and then commit the changed man page.
 
+#. If this is the alpha release of a new series, create a new stable branch
+   from master. For example, when releasing Django 3.1::
+
+    $ git checkout -b stable/3.1.x origin/master
+    $ git push origin -u stable/3.1.x:stable/3.1.x
+
 #. If this is the "dot zero" release of a new series, create a new branch from
    the current stable branch in the `django-docs-translations
    <https://github.com/django/django-docs-translations>`_ repository. For
@@ -291,6 +297,9 @@ Now you're ready to actually put the release out there. To do this:
 
         $ scp Django-* djangoproject.com:/home/www/www/media/releases/A.B
 
+   If this is the alpha release of a new series, you will need to create the
+   directory A.B.
+
 #. Upload the checksum file(s)::
 
         $ scp Django-A.B.C.checksum.txt.asc djangoproject.com:/home/www/www/media/pgp/Django-A.B.C.checksum.txt
@@ -334,6 +343,11 @@ Now you're ready to actually put the release out there. To do this:
    an LTS branch, mark it so.
 
    __ https://www.djangoproject.com/admin/releases/release/add/
+
+   If this is the alpha release of a new series, also create a Release object
+   for the *final* release, ensuring that the *Release date* field is blank,
+   thus marking it as *unreleased*. For example, when creating the Release
+   object for ``3.1a1``, also create ``3.1`` with the Release date field blank.
 
 #. Make the blog post announcing the release live.
 
