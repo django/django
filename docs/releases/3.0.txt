@@ -139,6 +139,9 @@ Minor features
 * The new :meth:`.UserManager.with_perm` method returns users that have the
   specified permission.
 
+* The default iteration count for the PBKDF2 password hasher is increased from
+  150,000 to 180,000.
+
 :mod:`django.contrib.gis`
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
