@@ -33,6 +33,9 @@ logger = logging.getLogger('django.utils.autoreload')
 _error_files = []
 _exception = None
 
+# wait for finished request locker
+request_locker = threading.Lock()
+
 try:
     import termios
 except ImportError:
@@ -218,7 +221,15 @@ def get_child_arguments():
     return args
 
 
+def wait_for_finished_request():
+    request_finished = request_locker.acquire(blocking=False)
+    if not request_finished:
+        logger.info("Waiting for finishing current request...")
+        request_locker.acquire()
+
+
 def trigger_reload(filename):
+    wait_for_finished_request()
     logger.info('%s changed, reloading.', filename)
     sys.exit(3)
 

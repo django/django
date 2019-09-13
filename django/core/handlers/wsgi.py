@@ -8,6 +8,7 @@ from django.http import HttpRequest, QueryDict, parse_cookie
 from django.urls import set_script_prefix
 from django.utils.encoding import repercent_broken_unicode
 from django.utils.functional import cached_property
+from django.utils.autoreload import request_locker
 
 _slashes_re = re.compile(br'/+')
 
@@ -126,6 +127,13 @@ class WSGIHandler(base.BaseHandler):
         super().__init__(*args, **kwargs)
         self.load_middleware()
 
+    def check_request_finish(func):
+        def wrapper(*args, **kwargs):
+            with request_locker:
+                return func(*args, **kwargs)
+        return wrapper
+    
+    @check_request_finish
     def __call__(self, environ, start_response):
         set_script_prefix(get_script_name(environ))
         signals.request_started.send(sender=self.__class__, environ=environ)
