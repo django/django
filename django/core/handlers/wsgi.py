@@ -132,7 +132,7 @@ class WSGIHandler(base.BaseHandler):
             with request_locker:
                 return func(*args, **kwargs)
         return wrapper
-    
+
     @check_request_finish
     def __call__(self, environ, start_response):
         set_script_prefix(get_script_name(environ))
