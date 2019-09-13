@@ -323,7 +323,7 @@ protection is safe from cross-subdomain attacks by default - please see the
 Default: ``False``
 
 Whether to use ``HttpOnly`` flag on the CSRF cookie. If this is set to
-``True``, client-side JavaScript will not to be able to access the CSRF cookie.
+``True``, client-side JavaScript will not be able to access the CSRF cookie.
 
 Designating the CSRF cookie as ``HttpOnly`` doesn't offer any practical
 protection because CSRF is only to protect against cross-domain attacks. If an
@@ -1759,7 +1759,7 @@ deletes the old one.
 Default: ``False``
 
 Whether to use ``HttpOnly`` flag on the language cookie. If this is set to
-``True``, client-side JavaScript will not to be able to access the language
+``True``, client-side JavaScript will not be able to access the language
 cookie.
 
 See :setting:`SESSION_COOKIE_HTTPONLY` for details on ``HttpOnly``.
@@ -3048,7 +3048,7 @@ This setting also affects cookies set by :mod:`django.contrib.messages`.
 Default: ``True``
 
 Whether to use ``HttpOnly`` flag on the session cookie. If this is set to
-``True``, client-side JavaScript will not to be able to access the session
+``True``, client-side JavaScript will not be able to access the session
 cookie.
 
 HttpOnly_ is a flag included in a Set-Cookie HTTP response header. It's part of
