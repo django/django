@@ -323,7 +323,7 @@ protection is safe from cross-subdomain attacks by default - please see the
 Default: ``False``
 
 Whether to use ``HttpOnly`` flag on the CSRF cookie. If this is set to
-``True``, client-side JavaScript will not to be able to access the CSRF cookie.
+``True``, client-side JavaScript will not be able to access the CSRF cookie.
 
 Designating the CSRF cookie as ``HttpOnly`` doesn't offer any practical
 protection because CSRF is only to protect against cross-domain attacks. If an
