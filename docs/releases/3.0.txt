@@ -90,7 +90,7 @@ and ``IntegerChoices`` types are provided for text and integer fields. The
 ``Choices`` class allows defining a compatible enumeration for other concrete
 data types. These custom enumeration types support human-readable labels that
 can be translated and accessed via a property on the enumeration or its
-members. See :ref:`Field.choices documentation <field-choices>` for more
+members. See :ref:`Enumeration types <field-choices-enum-types>` for more
 details and examples.
 
 Minor features
