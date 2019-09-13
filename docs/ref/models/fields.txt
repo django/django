@@ -130,6 +130,59 @@ model class keeps all of that information with the class that uses it,
 and helps reference the choices (e.g, ``Student.SOPHOMORE``
 will work anywhere that the ``Student`` model has been imported).
 
+.. _field-choices-named-groups:
+
+You can also collect your available choices into named groups that can
+be used for organizational purposes::
+
+    MEDIA_CHOICES = [
+        ('Audio', (
+                ('vinyl', 'Vinyl'),
+                ('cd', 'CD'),
+            )
+        ),
+        ('Video', (
+                ('vhs', 'VHS Tape'),
+                ('dvd', 'DVD'),
+            )
+        ),
+        ('unknown', 'Unknown'),
+    ]
+
+The first element in each tuple is the name to apply to the group. The
+second element is an iterable of 2-tuples, with each 2-tuple containing
+a value and a human-readable name for an option. Grouped options may be
+combined with ungrouped options within a single list (such as the
+`unknown` option in this example).
+
+For each model field that has :attr:`~Field.choices` set, Django will add a
+method to retrieve the human-readable name for the field's current value. See
+:meth:`~django.db.models.Model.get_FOO_display` in the database API
+documentation.
+
+Note that choices can be any sequence object -- not necessarily a list or
+tuple. This lets you construct choices dynamically. But if you find yourself
+hacking :attr:`~Field.choices` to be dynamic, you're probably better off using
+a proper database table with a :class:`ForeignKey`. :attr:`~Field.choices` is
+meant for static data that doesn't change much, if ever.
+
+.. note::
+    A new migration is created each time the order of ``choices`` changes.
+
+.. _field-choices-blank-label:
+
+Unless :attr:`blank=False<Field.blank>` is set on the field along with a
+:attr:`~Field.default` then a label containing ``"---------"`` will be rendered
+with the select box. To override this behavior, add a tuple to ``choices``
+containing ``None``; e.g. ``(None, 'Your String For Display')``.
+Alternatively, you can use an empty string instead of ``None`` where this makes
+sense - such as on a :class:`~django.db.models.CharField`.
+
+.. _field-choices-enum-types:
+
+Enumeration types
+~~~~~~~~~~~~~~~~~
+
 In addition, Django provides enumeration types that you can subclass to define
 choices in a concise way::
 
@@ -156,11 +209,17 @@ choices in a concise way::
 These work similar to :mod:`enum` from Python's standard library, but with some
 modifications:
 
-* Instead of values in the ``enum``, Django uses ``(value, label)`` tuples. The
-  ``label`` can be a lazy translatable string. If a tuple is not provided, the
-  label is automatically generated from the member name.
-* ``.label`` property is added on values, to return the label specified.
-* Number of custom properties are added to the enumeration classes --
+* Enum member values are a tuple of arguments to use when constructing the
+  concrete data type. Django supports adding an extra string value to the end
+  of this tuple to be used as the human-readable name, or ``label``. The
+  ``label`` can be a lazy translatable string. Thus, in most cases, the member
+  value will be a ``(value, label)`` two-tuple. See below for :ref:`an example
+  of subclassing choices <field-choices-enum-subclassing>` using a more complex
+  data type. If a tuple is not provided, or the last item is not a (lazy)
+  string, the ``label`` is :ref:`automatically generated
+  <field-choices-enum-auto-label>` from the member name.
+* A ``.label`` property is added on values, to return the human-readable name.
+* A number of custom properties are added to the enumeration classes --
   ``.choices``, ``.labels``, ``.values``, and ``.names`` -- to make it easier
   to access lists of those separate parts of the enumeration. Use ``.choices``
   as a suitable value to pass to :attr:`~Field.choices` in a field definition.
@@ -168,23 +227,26 @@ modifications:
   defined multiple times. This is unlikely to be expected in choices for a
   field.
 
-Note that ``YearInSchool.SENIOR``, ``YearInSchool['SENIOR']``,
-``YearInSchool('SR')`` work as expected, while ``YearInSchool.SENIOR.label`` is
-a translatable string.
+Note that using ``YearInSchool.SENIOR``, ``YearInSchool['SENIOR']``, or
+``YearInSchool('SR')`` to access or lookup enum members work as expected, as do
+the ``.name`` and ``.value`` properties on the members.
+
+.. _field-choices-enum-auto-label:
 
 If you don't need to have the human-readable names translated, you can have
-them inferred from the member name (replacing underscores to spaces and using
+them inferred from the member name (replacing underscores with spaces and using
 title-case)::
 
-    class YearInSchool(models.TextChoices):
-        FRESHMAN = 'FR'
-        SOPHOMORE = 'SO'
-        JUNIOR = 'JR'
-        SENIOR = 'SR'
-        GRADUATE = 'GR'
+    >>> class Vehicle(models.TextChoices):
+    ...     CAR = 'C'
+    ...     TRUCK = 'T'
+    ...     JET_SKI = 'J'
+    ...
+    >>> Vehicle.JET_SKI.label
+    'Jet Ski'
 
 Since the case where the enum values need to be integers is extremely common,
-Django provides a ``IntegerChoices`` class. For example::
+Django provides an ``IntegerChoices`` class. For example::
 
     class Card(models.Model):
 
@@ -207,9 +269,11 @@ that labels are automatically generated as highlighted above::
     >>> Place.choices
     [(1, 'First'), (2, 'Second'), (3, 'Third')]
 
+.. _field-choices-enum-subclassing:
+
 If you require support for a concrete data type other than ``int`` or ``str``,
 you can subclass ``Choices`` and the required concrete data type, e.g.
-:class:``datetime.date`` for use with :class:`~django.db.models.DateField`::
+:class:`~datetime.date` for use with :class:`~django.db.models.DateField`::
 
     class MoonLandings(datetime.date, models.Choices):
         APOLLO_11 = 1969, 7, 20, 'Apollo 11 (Eagle)'
@@ -219,52 +283,14 @@ you can subclass ``Choices`` and the required concrete data type, e.g.
         APOLLO_16 = 1972, 4, 21, 'Apollo 16 (Orion)'
         APOLLO_17 = 1972, 12, 11, 'Apollo 17 (Challenger)'
 
-You can also collect your available choices into named groups that can
-be used for organizational purposes::
+There are some additional caveats to be aware of:
 
-    MEDIA_CHOICES = [
-        ('Audio', (
-                ('vinyl', 'Vinyl'),
-                ('cd', 'CD'),
-            )
-        ),
-        ('Video', (
-                ('vhs', 'VHS Tape'),
-                ('dvd', 'DVD'),
-            )
-        ),
-        ('unknown', 'Unknown'),
-    ]
-
-The first element in each tuple is the name to apply to the group. The
-second element is an iterable of 2-tuples, with each 2-tuple containing
-a value and a human-readable name for an option. Grouped options may be
-combined with ungrouped options within a single list (such as the
-`unknown` option in this example). Grouping is not supported by the custom
-enumeration types for managing choices.
-
-For each model field that has :attr:`~Field.choices` set, Django will add a
-method to retrieve the human-readable name for the field's current value. See
-:meth:`~django.db.models.Model.get_FOO_display` in the database API
-documentation.
-
-Note that choices can be any sequence object -- not necessarily a list or
-tuple. This lets you construct choices dynamically. But if you find yourself
-hacking :attr:`~Field.choices` to be dynamic, you're probably better off using
-a proper database table with a :class:`ForeignKey`. :attr:`~Field.choices` is
-meant for static data that doesn't change much, if ever.
-
-.. note::
-    A new migration is created each time the order of ``choices`` changes.
-
-Unless :attr:`blank=False<Field.blank>` is set on the field along with a
-:attr:`~Field.default` then a label containing ``"---------"`` will be rendered
-with the select box. To override this behavior, add a tuple to ``choices``
-containing ``None``; e.g. ``(None, 'Your String For Display')``.
-Alternatively, you can use an empty string instead of ``None`` where this makes
-sense - such as on a :class:`~django.db.models.CharField`. To change the label
-when using one of the custom enumeration types, set the ``__empty__`` attribute
-on the class::
+- Enumeration types do not support :ref:`named groups
+  <field-choices-named-groups>`.
+- Because an enumeration with a concrete data type requires all values to match
+  the type, overriding the :ref:`blank label <field-choices-blank-label>`
+  cannot be achieved by creating a member with a value of ``None``. Instead,
+  set the ``__empty__`` attribute on the class::
 
     class Answer(models.IntegerChoices):
         NO = 0, _('No')
