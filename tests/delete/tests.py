@@ -31,7 +31,10 @@ class OnDeleteTests(TestCase):
     def test_auto_nullable(self):
         a = create_a('auto_nullable')
         a.auto_nullable.delete()
-        self.assertFalse(A.objects.filter(name='auto_nullable').exists())
+        if connection.features.can_defer_constraint_checks:
+            self.assertFalse(A.objects.filter(name='auto_nullable').exists())
+        else:
+            self.assertTrue(A.objects.filter(name='auto_nullable').exists())
 
     def test_setvalue(self):
         a = create_a('setvalue')
@@ -65,7 +68,10 @@ class OnDeleteTests(TestCase):
     def test_cascade_nullable(self):
         a = create_a('cascade_nullable')
         a.cascade_nullable.delete()
-        self.assertFalse(A.objects.filter(name='cascade_nullable').exists())
+        if connection.features.can_defer_constraint_checks:
+            self.assertFalse(A.objects.filter(name='cascade_nullable').exists())
+        else:
+            self.assertTrue(A.objects.filter(name='cascade_nullable').exists())
 
     def test_protect(self):
         a = create_a('protect')
@@ -310,13 +316,12 @@ class DeletionTests(TestCase):
         # user.avatar if we are going to delete the user immediately after it,
         # and there are no more cascades.
         # 1 query to find the users for the avatar.
-        # 1 query to delete the user
-        # 1 query to null out user.avatar, because we can't defer the constraint
+        # 1 query to update the user
         # 1 query to delete the avatar
-        self.assertNumQueries(4, a.delete)
-        self.assertFalse(User.objects.exists())
+        self.assertNumQueries(3, a.delete)
+        self.assertTrue(User.objects.exists())
         self.assertFalse(Avatar.objects.exists())
-        self.assertEqual(len(calls), 1)
+        self.assertEqual(len(calls), 0)
         models.signals.post_delete.disconnect(noop, sender=User)
 
     def test_hidden_related(self):
@@ -496,11 +501,19 @@ class FastDeleteTests(TestCase):
             avatar=Avatar.objects.create()
         )
         a = Avatar.objects.get(pk=u.avatar_id)
-        # 1 query to fast-delete the user
-        # 1 query to delete the avatar
-        self.assertNumQueries(2, a.delete)
-        self.assertFalse(User.objects.exists())
-        self.assertFalse(Avatar.objects.exists())
+
+        if connection.features.can_defer_constraint_checks:
+            # 1 query to fast-delete the user
+            # 1 query to delete the avatar
+            self.assertNumQueries(2, a.delete)
+            self.assertFalse(User.objects.exists())
+            self.assertFalse(Avatar.objects.exists())
+        else:
+            # 1 query to fast-delete the user
+            # 1 query to delete the avatar
+            self.assertNumQueries(3, a.delete)
+            self.assertTrue(User.objects.exists())
+            self.assertFalse(Avatar.objects.exists())
 
     def test_fast_delete_m2m(self):
         t = M2MTo.objects.create()
@@ -559,6 +572,7 @@ class FastDeleteTests(TestCase):
         self.assertFalse(Parent.objects.exists())
         self.assertFalse(Child.objects.exists())
 
+    @skipUnlessDBFeature("can_defer_constraint_checks")
     def test_fast_delete_large_batch(self):
         User.objects.bulk_create(User() for i in range(0, 2000))
         # No problems here - we aren't going to cascade, so we will fast
