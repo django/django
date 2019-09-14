@@ -443,8 +443,9 @@ models, not only for your own convenience when dealing with the interactive
 prompt, but also because objects' representations are used throughout Django's
 automatically-generated admin.
 
-Note these are normal Python methods. Let's add a custom method, just for
-demonstration:
+.. _tutorial02-import-timezone:
+
+Let's also add a custom method to this model:
 
 .. code-block:: python
     :caption: polls/models.py

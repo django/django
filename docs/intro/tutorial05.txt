@@ -220,6 +220,13 @@ and you'll see something like::
     FAILED (failures=1)
     Destroying test database for alias 'default'...
 
+.. admonition:: Different error?
+
+    If instead you're getting a ``NameError`` here, you may have missed a step
+    in :ref:`Part 2 <tutorial02-import-timezone>` where we added imports of
+    ``datetime`` and ``timezone`` to ``polls/models.py``. Copy the imports from
+    that section, and try running your tests again.
+
 What happened is this:
 
 * ``manage.py test polls`` looked for tests in the ``polls`` application
