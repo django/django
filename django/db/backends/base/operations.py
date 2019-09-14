@@ -176,7 +176,7 @@ class BaseDatabaseOperations:
         else:
             return ['DISTINCT'], []
 
-    def fetch_returned_insert_columns(self, cursor):
+    def fetch_returned_insert_columns(self, cursor, returning_params):
         """
         Given a cursor object that has just performed an INSERT...RETURNING
         statement into a table, return the newly created data.

@@ -208,7 +208,8 @@ Database backend API
 This section describes changes that may be needed in third-party database
 backends.
 
-* ...
+* ``DatabaseOperations.fetch_returned_insert_columns()`` now requires an
+  additional ``returning_params`` argument.
 
 Miscellaneous
 -------------

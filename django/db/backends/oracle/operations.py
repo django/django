@@ -248,17 +248,19 @@ END;
     def deferrable_sql(self):
         return " DEFERRABLE INITIALLY DEFERRED"
 
-    def fetch_returned_insert_columns(self, cursor):
-        value = cursor._insert_id_var.getvalue()
-        if value is None or value == []:
-            # cx_Oracle < 6.3 returns None, >= 6.3 returns empty list.
-            raise DatabaseError(
-                'The database did not return a new row id. Probably "ORA-1403: '
-                'no data found" was raised internally but was hidden by the '
-                'Oracle OCI library (see https://code.djangoproject.com/ticket/28859).'
-            )
-        # cx_Oracle < 7 returns value, >= 7 returns list with single value.
-        return value if isinstance(value, list) else [value]
+    def fetch_returned_insert_columns(self, cursor, returning_params):
+        for param in returning_params:
+            value = param.get_value()
+            if value is None or value == []:
+                # cx_Oracle < 6.3 returns None, >= 6.3 returns empty list.
+                raise DatabaseError(
+                    'The database did not return a new row id. Probably '
+                    '"ORA-1403: no data found" was raised internally but was '
+                    'hidden by the Oracle OCI library (see '
+                    'https://code.djangoproject.com/ticket/28859).'
+                )
+            # cx_Oracle < 7 returns value, >= 7 returns list with single value.
+            yield value[0] if isinstance(value, list) else value
 
     def field_cast_sql(self, db_type, internal_type):
         if db_type and db_type.endswith('LOB'):
@@ -344,11 +346,18 @@ END;
     def return_insert_columns(self, fields):
         if not fields:
             return '', ()
-        sql = 'RETURNING %s.%s INTO %%s' % (
-            self.quote_name(fields[0].model._meta.db_table),
-            self.quote_name(fields[0].column),
-        )
-        return sql, (InsertVar(fields[0]),)
+        field_names = []
+        params = []
+        for field in fields:
+            field_names.append('%s.%s' % (
+                self.quote_name(field.model._meta.db_table),
+                self.quote_name(field.column),
+            ))
+            params.append(InsertVar(field))
+        return 'RETURNING %s INTO %s' % (
+            ', '.join(field_names),
+            ', '.join(['%s'] * len(params)),
+        ), tuple(params)
 
     def __foreign_key_constraints(self, table_name, recursive):
         with self.connection.cursor() as cursor:

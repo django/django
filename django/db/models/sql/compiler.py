@@ -1152,6 +1152,7 @@ class SQLCompiler:
 
 class SQLInsertCompiler(SQLCompiler):
     returning_fields = None
+    returning_params = tuple()
 
     def field_as_sql(self, field, val):
         """
@@ -1300,10 +1301,10 @@ class SQLInsertCompiler(SQLCompiler):
                 result.append(ignore_conflicts_suffix_sql)
             # Skip empty r_sql to allow subclasses to customize behavior for
             # 3rd party backends. Refs #19096.
-            r_sql, r_params = self.connection.ops.return_insert_columns(self.returning_fields)
+            r_sql, self.returning_params = self.connection.ops.return_insert_columns(self.returning_fields)
             if r_sql:
                 result.append(r_sql)
-                params += [r_params]
+                params += [self.returning_params]
             return [(" ".join(result), tuple(chain.from_iterable(params)))]
 
         if can_bulk:
@@ -1342,7 +1343,7 @@ class SQLInsertCompiler(SQLCompiler):
                         'not supported on this database backend.'
                     )
                 assert len(self.query.objs) == 1
-                return self.connection.ops.fetch_returned_insert_columns(cursor)
+                return self.connection.ops.fetch_returned_insert_columns(cursor, self.returning_params)
             return [self.connection.ops.last_insert_id(
                 cursor, self.query.get_meta().db_table, self.query.get_meta().pk.column
             )]

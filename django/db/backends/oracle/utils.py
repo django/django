@@ -27,11 +27,14 @@ class InsertVar:
     def __init__(self, field):
         internal_type = getattr(field, 'target_field', field).get_internal_type()
         self.db_type = self.types.get(internal_type, str)
+        self.bound_param = None
 
     def bind_parameter(self, cursor):
-        param = cursor.cursor.var(self.db_type)
-        cursor._insert_id_var = param
-        return param
+        self.bound_param = cursor.cursor.var(self.db_type)
+        return self.bound_param
+
+    def get_value(self):
+        return self.bound_param.getvalue()
 
 
 class Oracle_datetime(datetime.datetime):
