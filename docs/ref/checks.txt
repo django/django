@@ -180,6 +180,8 @@ Model fields
 * **fields.E011**: ``<database>`` does not support default database values with
   expressions (``db_default``).
 * **fields.E012**: ``<expression>`` cannot be used in ``db_default``.
+* **fields.E013**: ``<field>`` default expression may not reference database
+  columns (e.g. should not contain Q or F expressions).
 * **fields.E100**: ``AutoField``\s must set primary_key=True.
 * **fields.E110**: ``BooleanField``\s do not accept null values. *This check
   appeared before support for null values was added in Django 2.1.*

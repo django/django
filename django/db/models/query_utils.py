@@ -46,6 +46,7 @@ class Q(tree.Node):
     XOR = "XOR"
     default = AND
     conditional = True
+    contains_column_references = True
 
     def __init__(self, *args, _connector=None, _negated=False, **kwargs):
         super().__init__(

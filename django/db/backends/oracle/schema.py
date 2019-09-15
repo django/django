@@ -198,6 +198,9 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         return self.normalize_name(for_name + "_" + suffix)
 
     def prepare_default(self, value):
+        if hasattr(value, "as_sql"):
+            sql, params = self.prepare_param(value)
+            return sql % tuple(self.quote_value(p) for p in params)
         # Replace % with %% as %-formatting is applied in
         # FormatStylePlaceholderCursor._fix_for_params().
         return self.quote_value(value).replace("%", "%%")

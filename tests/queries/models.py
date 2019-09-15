@@ -4,7 +4,9 @@ Various complex queries that have been problematic in the past.
 import datetime
 
 from django.db import models
-from django.db.models.functions import Now
+from django.db.models import ExpressionWrapper, Value
+from django.db.models.expressions import Func, RawSQL
+from django.db.models.functions import Cast, Coalesce, ExtractYear, Now, Pi, TruncDay
 
 
 class DumbCategory(models.Model):
@@ -767,20 +769,53 @@ class CustomDbColumn(models.Model):
     ip_address = models.GenericIPAddressField(null=True)
 
 
-class CreatedField(models.DateTimeField):
-    db_returning = True
+class NativeUUID4:
+    """UUID as implemented by the database."""
 
-    def __init__(self, *args, **kwargs):
-        kwargs.setdefault("default", Now)
-        super().__init__(*args, **kwargs)
+    def as_sql(self, compiler, connection):
+        raise NotImplementedError
+
+    def as_postgresql(self, compiler, connection):
+        return "uuid_generate_v4()", ()
+
+    def as_oracle(self, compiler, connection):
+        return "SYS_GUID()", ()
+
+    def as_mysql(self, compiler, connection):
+        return "UUID()", ()
+
+
+class Mod(Func):
+    function = "MOD"
 
 
 class ReturningModel(models.Model):
-    created = CreatedField(editable=False)
+    created = models.DateTimeField(editable=False, default=Now())
+    created_date = models.DateField(default=TruncDay(Now()))
+    year = models.PositiveSmallIntegerField(default=ExtractYear(Now()))
+    pi = models.FloatField(default=Pi())
+    expr_wrapper = models.PositiveBigIntegerField(
+        default=ExpressionWrapper(
+            Value(1) + Value(2),
+            output_field=models.PositiveBigIntegerField(),
+        )
+    )
+    coalesce_val = models.PositiveBigIntegerField(
+        default=Coalesce(
+            Value(None), Value(1337), output_field=models.PositiveBigIntegerField()
+        ),
+    )
+    raw_sql = models.IntegerField(
+        default=RawSQL("5 * %s", (15,), output_field=models.IntegerField())
+    )
+    uuid = models.UUIDField(default=NativeUUID4())
+    is_odd = models.BooleanField(
+        default=Cast(Mod(Value(10), Value(2)), output_field=models.BooleanField())
+    )
 
 
 class NonIntegerPKReturningModel(models.Model):
-    created = CreatedField(editable=False, primary_key=True)
+    created = models.DateTimeField(editable=False, primary_key=True, default=Now())
 
 
 class JSONFieldNullable(models.Model):

@@ -1,4 +1,5 @@
 import datetime
+import uuid
 
 from django.db import connection
 from django.test import TestCase, skipUnlessDBFeature
@@ -7,8 +8,16 @@ from django.test.utils import CaptureQueriesContext
 from .models import DumbCategory, NonIntegerPKReturningModel, ReturningModel
 
 
+class UUIDExtensionTestCase(TestCase):
+    def setUp(self):
+        super().setUp()
+        if connection.vendor == "postgresql":
+            with connection.cursor() as cursor:
+                cursor.execute('CREATE EXTENSION IF NOT EXISTS "uuid-ossp";')
+
+
 @skipUnlessDBFeature("can_return_columns_from_insert")
-class ReturningValuesTests(TestCase):
+class ReturningValuesTests(UUIDExtensionTestCase):
     def test_insert_returning(self):
         with CaptureQueriesContext(connection) as captured_queries:
             DumbCategory.objects.create()
@@ -53,3 +62,39 @@ class ReturningValuesTests(TestCase):
             with self.subTest(obj=obj):
                 self.assertTrue(obj.pk)
                 self.assertIsInstance(obj.created, datetime.datetime)
+
+
+@skipUnlessDBFeature("can_return_columns_from_insert")
+class DatabaseDefaultsTests(UUIDExtensionTestCase):
+    def test_now(self):
+        obj = ReturningModel.objects.create()
+        self.assertIsInstance(obj.created, datetime.datetime)
+
+    def test_truncate(self):
+        obj = ReturningModel.objects.create()
+        self.assertIsInstance(obj.year, int)
+
+    def test_pi(self):
+        obj = ReturningModel.objects.create()
+        self.assertAlmostEqual(obj.pi, 3.1415926535897)  # decimal precision varies
+
+    def test_expression_wrapper(self):
+        obj = ReturningModel.objects.create()
+        self.assertEqual(obj.expr_wrapper, 3)
+
+    def test_coalesce_value(self):
+        obj = ReturningModel.objects.create()
+        self.assertEqual(obj.coalesce_val, 1337)
+
+    def test_raw_sql(self):
+        obj = ReturningModel.objects.create()
+        self.assertEqual(obj.raw_sql, 75)
+
+    def test_custom_uuid(self):
+        obj = ReturningModel.objects.create()
+        self.assertIsInstance(obj.uuid, uuid.UUID)
+
+    def test_boolean_function(self):
+        obj = ReturningModel.objects.create()
+        self.assertIsInstance(obj.is_odd, bool)
+        self.assertFalse(obj.is_odd)

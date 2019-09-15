@@ -179,6 +179,10 @@ Models
   :class:`~django.db.models.expressions.ValueRange` allows excluding rows,
   groups, and ties from the window frames.
 
+* The MariaDB, Oracle and PostgreSQL backends support
+  :doc:`Query Expressions </ref/models/expressions>` as
+  :attr:`~django.db.models.Field.default` values for model fields.
+
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 

@@ -169,6 +169,15 @@ class BaseDatabaseSchemaEditor:
 
     # Core utility functions
 
+    def prepare_param(self, node):
+        sql, params = None, (node,)
+        if hasattr(node, "as_sql"):
+            compiler = self.connection.ops.compiler("SQLCompiler")(
+                query=None, connection=self.connection, using=None
+            )
+            sql, params = compiler.compile(node)
+        return sql, tuple(params)
+
     def execute(self, sql, params=()):
         """Execute the given SQL statement, with optional parameters."""
         # Don't perform the transactional DDL check if SQL is being collected
@@ -184,21 +193,32 @@ class BaseDatabaseSchemaEditor:
             )
         # Account for non-string statement objects.
         sql = str(sql)
+        prepared_params = None
+        if params is not None:
+            prepared_params = [self.prepare_param(p) for p in params]
+            params_sql = tuple(filter(None, (p[0] for p in prepared_params)))
+            if params_sql:
+                sql %= params_sql
+            prepared_params = tuple(q for p in prepared_params for q in p[1])
+
         # Log the command we're running, then run it
         logger.debug(
-            "%s; (params %r)", sql, params, extra={"params": params, "sql": sql}
+            "%s; (params %r)",
+            sql,
+            prepared_params,
+            extra={"params": prepared_params, "sql": sql},
         )
         if self.collect_sql:
             ending = "" if sql.rstrip().endswith(";") else ";"
-            if params is not None:
+            if prepared_params is not None:
                 self.collected_sql.append(
-                    (sql % tuple(map(self.quote_value, params))) + ending
+                    (sql % tuple(map(self.quote_value, prepared_params))) + ending
                 )
             else:
                 self.collected_sql.append(sql + ending)
         else:
             with self.connection.cursor() as cursor:
-                cursor.execute(sql, params)
+                cursor.execute(sql, prepared_params)
 
     def quote_name(self, name):
         return self.connection.ops.quote_name(name)
@@ -460,7 +480,10 @@ class BaseDatabaseSchemaEditor:
 
     def effective_default(self, field):
         """Return a field's effective database default value."""
-        return field.get_db_prep_save(self._effective_default(field), self.connection)
+        default = self._effective_default(field)
+        if hasattr(default, "as_sql"):
+            return default
+        return field.get_db_prep_save(default, self.connection)
 
     def quote_value(self, value):
         """

@@ -273,6 +273,7 @@ class Field(RegisterLookupMixin):
             *self._check_field_name(),
             *self._check_choices(),
             *self._check_db_default(**kwargs),
+            *self._check_default_expressions(),
             *self._check_db_index(),
             *self._check_db_comment(**kwargs),
             *self._check_null_allowed_for_primary_keys(),
@@ -312,6 +313,21 @@ class Field(RegisterLookupMixin):
             ]
         else:
             return []
+
+    def _check_default_expressions(self):
+        if (
+            hasattr(self.default, "contains_column_references")
+            and self.default.contains_column_references
+        ):
+            return [
+                checks.Error(
+                    "'default' expressions cannot reference other fields (e.g. should "
+                    "not contain Q or F expressions).",
+                    obj=self,
+                    id="fields.E013",
+                )
+            ]
+        return []
 
     @classmethod
     def _choices_is_value(cls, value):
@@ -931,7 +947,8 @@ class Field(RegisterLookupMixin):
     def db_returning(self):
         """Private API intended only to be used by Django itself."""
         return (
-            self.db_default is not NOT_PROVIDED
+            self.has_default()
+            and hasattr(self.default, "as_sql")
             and connection.features.can_return_columns_from_insert
         )
 
@@ -2731,6 +2748,8 @@ class UUIDField(Field):
     def get_db_prep_value(self, value, connection, prepared=False):
         if value is None:
             return None
+        if hasattr(value, "as_sql"):
+            return value
         if not isinstance(value, uuid.UUID):
             value = self.to_python(value)
 
