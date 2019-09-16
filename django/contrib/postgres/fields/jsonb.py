@@ -112,7 +112,7 @@ class KeyTransform(Transform):
             lookup = int(self.key_name)
         except ValueError:
             lookup = self.key_name
-        return '(%s %s %%s)' % (lhs, self.operator), params + [lookup]
+        return '(%s %s %%s)' % (lhs, self.operator), tuple(params) + (lookup,)
 
 
 class KeyTextTransform(KeyTransform):

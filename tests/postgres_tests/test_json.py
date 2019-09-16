@@ -6,7 +6,7 @@ from decimal import Decimal
 from django.core import checks, exceptions, serializers
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db import connection
-from django.db.models import Count, F, Q
+from django.db.models import Count, F, OuterRef, Q, Subquery
 from django.db.models.expressions import RawSQL
 from django.db.models.functions import Cast
 from django.forms import CharField, Form, widgets
@@ -302,6 +302,12 @@ class TestQuerying(PostgreSQLTestCase):
             JSONModel.objects.filter(field__a='b'),
             [self.objs[7], self.objs[8]]
         )
+
+    def test_obj_subquery_lookup(self):
+        qs = JSONModel.objects.annotate(
+            value=Subquery(JSONModel.objects.filter(pk=OuterRef('pk')).values('field')),
+        ).filter(value__a='b')
+        self.assertSequenceEqual(qs, [self.objs[7], self.objs[8]])
 
     def test_deep_lookup_objs(self):
         self.assertSequenceEqual(
