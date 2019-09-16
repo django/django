@@ -26,6 +26,7 @@ versions of the documentation contain the release notes for any later releases.
 .. toctree::
    :maxdepth: 1
 
+   1.11.25
    1.11.24
    1.11.23
    1.11.22
