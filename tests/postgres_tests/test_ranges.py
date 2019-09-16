@@ -500,6 +500,43 @@ class TestFormField(PostgreSQLSimpleTestCase):
         value = field.clean(['', ''])
         self.assertIsNone(value)
 
+    def test_datetime_form_as_table(self):
+        class DateTimeRangeForm(forms.Form):
+            datetime_field = pg_forms.DateTimeRangeField(show_hidden_initial=True)
+
+        form = DateTimeRangeForm()
+        self.assertHTMLEqual(
+            form.as_table(),
+            """
+            <tr><th>
+            <label for="id_datetime_field_0">Datetime field:</label>
+            </th><td>
+            <input type="text" name="datetime_field_0" id="id_datetime_field_0">
+            <input type="text" name="datetime_field_1" id="id_datetime_field_1">
+            <input type="hidden" name="initial-datetime_field" value="[None, None]"
+            id="initial-id_datetime_field"></td></tr>
+            """
+        )
+        form = DateTimeRangeForm({
+            'datetime_field_0': '2010-01-01 11:13:00',
+            'datetime_field_1': '2020-12-12 16:59:00',
+        })
+        self.assertHTMLEqual(
+            form.as_table(),
+            """
+            <tr><th>
+            <label for="id_datetime_field_0">Datetime field:</label>
+            </th><td>
+            <input type="text" name="datetime_field_0"
+            value="2010-01-01 11:13:00" id="id_datetime_field_0">
+            <input type="text" name="datetime_field_1"
+            value="2020-12-12 16:59:00" id="id_datetime_field_1">
+            <input type="hidden" name="initial-datetime_field"
+            value="[&#x27;2010-01-01 11:13:00&#x27;, &#x27;2020-12-12 16:59:00&#x27;]"
+            id="initial-id_datetime_field"></td></tr>
+            """
+        )
+
     def test_rendering(self):
         class RangeForm(forms.Form):
             ints = pg_forms.IntegerRangeField()
@@ -631,6 +668,18 @@ class TestFormField(PostgreSQLSimpleTestCase):
         value = field.clean(['1976-04-16', ''])
         self.assertEqual(value, DateRange(datetime.date(1976, 4, 16), None))
 
+    def test_date_has_changed_first(self):
+        self.assertTrue(pg_forms.DateRangeField().has_changed(
+            ['2010-01-01', '2020-12-12'],
+            ['2010-01-31', '2020-12-12'],
+        ))
+
+    def test_date_has_changed_last(self):
+        self.assertTrue(pg_forms.DateRangeField().has_changed(
+            ['2010-01-01', '2020-12-12'],
+            ['2010-01-01', '2020-12-31'],
+        ))
+
     def test_datetime_lower_bound_higher(self):
         field = pg_forms.DateTimeRangeField()
         with self.assertRaises(exceptions.ValidationError) as cm:
@@ -678,6 +727,18 @@ class TestFormField(PostgreSQLSimpleTestCase):
         )
         self.assertEqual(value, [datetime.datetime(2015, 5, 22, 18, 6, 33), None])
 
+    def test_datetime_has_changed_first(self):
+        self.assertTrue(pg_forms.DateTimeRangeField().has_changed(
+            ['2010-01-01 00:00', '2020-12-12 00:00'],
+            ['2010-01-31 23:00', '2020-12-12 00:00'],
+        ))
+
+    def test_datetime_has_changed_last(self):
+        self.assertTrue(pg_forms.DateTimeRangeField().has_changed(
+            ['2010-01-01 00:00', '2020-12-12 00:00'],
+            ['2010-01-01 00:00', '2020-12-31 23:00'],
+        ))
+
     def test_model_field_formfield_integer(self):
         model_field = pg_fields.IntegerRangeField()
         form_field = model_field.formfield()
@@ -702,6 +763,19 @@ class TestFormField(PostgreSQLSimpleTestCase):
         model_field = pg_fields.DateTimeRangeField()
         form_field = model_field.formfield()
         self.assertIsInstance(form_field, pg_forms.DateTimeRangeField)
+
+    def test_has_changed(self):
+        for field, value in (
+            (pg_forms.DateRangeField(), ['2010-01-01', '2020-12-12']),
+            (pg_forms.DateTimeRangeField(), ['2010-01-01 11:13', '2020-12-12 14:52']),
+            (pg_forms.IntegerRangeField(), [1, 2]),
+            (pg_forms.DecimalRangeField(), ['1.12345', '2.001']),
+        ):
+            with self.subTest(field=field.__class__.__name__):
+                self.assertTrue(field.has_changed(None, value))
+                self.assertTrue(field.has_changed([value[0], ''], value))
+                self.assertTrue(field.has_changed(['', value[1]], value))
+                self.assertFalse(field.has_changed(value, value))
 
 
 class TestWidget(PostgreSQLSimpleTestCase):
