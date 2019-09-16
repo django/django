@@ -1,6 +1,13 @@
 Full release notes, with more details and upgrade information, are available at:
 https://channels.readthedocs.io/en/latest/releases
 
+UNRELEASED
+----------
+
+* Adjusted HTTP body handling to use a spooled file, rather than reading
+  request body into memory. ``AsgiRequest.__init__()`` is adjusted to expected
+  an IO stream, rather than bytes.
+
 2.2.0 (2019-04-14)
 ------------------
 

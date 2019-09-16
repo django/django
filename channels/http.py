@@ -2,8 +2,8 @@ import cgi
 import codecs
 import logging
 import sys
+import tempfile
 import traceback
-from io import BytesIO
 
 from django import http
 from django.conf import settings
@@ -30,7 +30,7 @@ class AsgiRequest(http.HttpRequest):
     # body and aborts.
     body_receive_timeout = 60
 
-    def __init__(self, scope, body):
+    def __init__(self, scope, stream):
         self.scope = scope
         self._content_length = 0
         self._post_parse_error = False
@@ -117,21 +117,7 @@ class AsgiRequest(http.HttpRequest):
             except (ValueError, TypeError):
                 pass
         # Body handling
-        # TODO: chunked bodies
-
-        # Limit the maximum request data size that will be handled in-memory.
-        if (
-            settings.DATA_UPLOAD_MAX_MEMORY_SIZE is not None
-            and self._content_length > settings.DATA_UPLOAD_MAX_MEMORY_SIZE
-        ):
-            raise RequestDataTooBig(
-                "Request body exceeded settings.DATA_UPLOAD_MAX_MEMORY_SIZE."
-            )
-
-        self._body = body
-        assert isinstance(self._body, bytes), "Body is not bytes"
-        # Add a stream-a-like for the body
-        self._stream = BytesIO(self._body)
+        self._stream = stream
         # Other bits
         self.resolver_match = None
 
@@ -144,7 +130,6 @@ class AsgiRequest(http.HttpRequest):
 
     def _get_post(self):
         if not hasattr(self, "_post"):
-            self._read_started = False
             self._load_post_and_files()
         return self._post
 
@@ -153,7 +138,6 @@ class AsgiRequest(http.HttpRequest):
 
     def _get_files(self):
         if not hasattr(self, "_files"):
-            self._read_started = False
             self._load_post_and_files()
         return self._files
 
@@ -198,20 +182,34 @@ class AsgiHandler(base.BaseHandler):
         threadpool.
         """
         self.send = async_to_sync(send)
-        body = b""
+
+        # Receive the HTTP request body as a stream object.
+        try:
+            body_stream = await self.read_body(receive)
+        except RequestAborted:
+            return
+        # Launch into body handling (and a synchronous subthread).
+        await self.handle(body_stream)
+
+    async def read_body(self, receive):
+        """Reads a HTTP body from an ASGI connection."""
+        # Use the tempfile that auto rolls-over to a disk file as it fills up.
+        body_file = tempfile.SpooledTemporaryFile(
+            max_size=settings.FILE_UPLOAD_MAX_MEMORY_SIZE, mode="w+b"
+        )
         while True:
             message = await receive()
             if message["type"] == "http.disconnect":
-                # Once they disconnect, that's it. GOOD DAY SIR. I SAID GOOD. DAY.
-                return
-            else:
-                # See if the message has body, and if it's the end, launch into
-                # handling (and a synchronous subthread)
-                if "body" in message:
-                    body += message["body"]
-                if not message.get("more_body", False):
-                    await self.handle(body)
-                    return
+                # Early client disconnect.
+                raise RequestAborted()
+            # Add a body chunk from the message, if provided.
+            if "body" in message:
+                body_file.write(message["body"])
+            # Quit out if that's the end.
+            if not message.get("more_body", False):
+                break
+        body_file.seek(0)
+        return body_file
 
     @sync_to_async
     def handle(self, body):
