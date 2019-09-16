@@ -85,11 +85,11 @@ You can acquire the token like this:
 .. code-block:: javascript
 
     function getCookie(name) {
-        var cookieValue = null;
+        const cookieValue = null;
         if (document.cookie && document.cookie !== '') {
-            var cookies = document.cookie.split(';');
-            for (var i = 0; i < cookies.length; i++) {
-                var cookie = cookies[i].trim();
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                let cookie = cookies[i].trim();
                 // Does this cookie string begin with the name we want?
                 if (cookie.substring(0, name.length + 1) === (name + '=')) {
                     cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
@@ -99,14 +99,14 @@ You can acquire the token like this:
         }
         return cookieValue;
     }
-    var csrftoken = getCookie('csrftoken');
+    const csrftoken = getCookie('csrftoken');
 
 The above code could be simplified by using the `JavaScript Cookie library
 <https://github.com/js-cookie/js-cookie/>`_ to replace ``getCookie``:
 
 .. code-block:: javascript
 
-    var csrftoken = Cookies.get('csrftoken');
+    const csrftoken = Cookies.get('csrftoken');
 
 .. note::
 
@@ -137,17 +137,49 @@ and read the token from the DOM with JavaScript:
 
     {% csrf_token %}
     <script type="text/javascript">
-    // using jQuery
-    var csrftoken = jQuery("[name=csrfmiddlewaretoken]").val();
+    const csrftoken = document.getElementsByName('csrfmiddlewaretoken')[0].value;
+    </script>
+
+Or if you're using jQuery:
+
+.. code-block:: html+django
+
+    {% csrf_token %}
+    <script type="text/javascript">
+    const csrftoken = jQuery("[name=csrfmiddlewaretoken]").val();
     </script>
 
 Setting the token on the AJAX request
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Finally, you'll have to actually set the header on your AJAX request, while
-protecting the CSRF token from being sent to other domains using
-`settings.crossDomain <https://api.jquery.com/jQuery.ajax/>`_ in jQuery 1.5.1
-and newer:
+Finally, you'll have to actually set the header on your AJAX request:
+
+.. code-block:: javascript
+
+    const formElement = document.querySelector("#myform");
+    fetch("/patch/to/view/", {
+        method: "POST",
+        headers: {
+            "X-CSRFToken": csrftoken,
+            "Content-Type": "application/x-www-form-urlencoded",
+        },
+        body: new FormData(formElement),
+    })
+    .then(processResponse);
+
+Or if you're the older ``XMLHttpRequest`` API:
+
+.. code-block:: javascript
+
+    const request = new XMLHttpRequest();
+    request.setRequestHeader('X-CSRFToken', csrftoken);
+    request.open("POST", "/path/to/view/");
+    const formElement = document.querySelector("#myform");
+    request.send(new FormData(formElement));
+
+If you're using jQuery 1.5.1 and newer, you can set up all AJAX requests to
+send the CSRF token while not sending it to other domains using
+`settings.crossDomain <https://api.jquery.com/jQuery.ajax/>`_:
 
 .. code-block:: javascript
 
