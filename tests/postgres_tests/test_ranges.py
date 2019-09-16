@@ -5,6 +5,7 @@ from decimal import Decimal
 from django import forms
 from django.core import exceptions, serializers
 from django.db.models import DateField, DateTimeField, F, Func, Value
+from django.http import QueryDict
 from django.test import override_settings
 from django.utils import timezone
 
@@ -513,8 +514,9 @@ class TestFormField(PostgreSQLSimpleTestCase):
             </th><td>
             <input type="text" name="datetime_field_0" id="id_datetime_field_0">
             <input type="text" name="datetime_field_1" id="id_datetime_field_1">
-            <input type="hidden" name="initial-datetime_field" value="[None, None]"
-            id="initial-id_datetime_field"></td></tr>
+            <input type="hidden" name="initial-datetime_field_0" id="initial-id_datetime_field_0">
+            <input type="hidden" name="initial-datetime_field_1" id="initial-id_datetime_field_1">
+            </td></tr>
             """
         )
         form = DateTimeRangeForm({
@@ -531,11 +533,30 @@ class TestFormField(PostgreSQLSimpleTestCase):
             value="2010-01-01 11:13:00" id="id_datetime_field_0">
             <input type="text" name="datetime_field_1"
             value="2020-12-12 16:59:00" id="id_datetime_field_1">
-            <input type="hidden" name="initial-datetime_field"
-            value="[&#x27;2010-01-01 11:13:00&#x27;, &#x27;2020-12-12 16:59:00&#x27;]"
-            id="initial-id_datetime_field"></td></tr>
+            <input type="hidden" name="initial-datetime_field_0" value="2010-01-01 11:13:00"
+            id="initial-id_datetime_field_0">
+            <input type="hidden" name="initial-datetime_field_1" value="2020-12-12 16:59:00"
+            id="initial-id_datetime_field_1"></td></tr>
             """
         )
+
+    def test_datetime_form_initial_data(self):
+        class DateTimeRangeForm(forms.Form):
+            datetime_field = pg_forms.DateTimeRangeField(show_hidden_initial=True)
+
+        data = QueryDict(mutable=True)
+        data.update({
+            'datetime_field_0': '2010-01-01 11:13:00',
+            'datetime_field_1': '',
+            'initial-datetime_field_0': '2010-01-01 10:12:00',
+            'initial-datetime_field_1': '',
+        })
+        form = DateTimeRangeForm(data=data)
+        self.assertTrue(form.has_changed())
+
+        data['initial-datetime_field_0'] = '2010-01-01 11:13:00'
+        form = DateTimeRangeForm(data=data)
+        self.assertFalse(form.has_changed())
 
     def test_rendering(self):
         class RangeForm(forms.Form):
