@@ -2,7 +2,7 @@ import json
 
 from django.core import checks, exceptions, serializers
 from django.db import connection
-from django.db.models.expressions import RawSQL
+from django.db.models.expressions import OuterRef, RawSQL, Subquery
 from django.forms import Form
 from django.test.utils import CaptureQueriesContext, isolate_apps
 
@@ -206,6 +206,12 @@ class TestQuerying(PostgreSQLTestCase):
             """."field" -> 'test'' = ''a'') OR 1 = 1 OR (''d') = 'x' """,
             queries[0]['sql'],
         )
+
+    def test_obj_subquery_lookup(self):
+        qs = HStoreModel.objects.annotate(
+            value=Subquery(HStoreModel.objects.filter(pk=OuterRef('pk')).values('field')),
+        ).filter(value__a='b')
+        self.assertSequenceEqual(qs, self.objs[:2])
 
 
 @isolate_apps('postgres_tests')
