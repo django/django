@@ -88,6 +88,11 @@ that tells the middleware not to set the header::
     def ok_to_load_in_a_frame(request):
         return HttpResponse("This page is safe to load in a frame on any site.")
 
+.. note::
+
+    If you want to submit a form or access a session cookie within a frame or
+    iframe, you may need to modify the :setting:`CSRF_COOKIE_SAMESITE` or
+    :setting:`SESSION_COOKIE_SAMESITE` settings.
 
 Setting ``X-Frame-Options`` per view
 ------------------------------------
