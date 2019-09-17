@@ -391,11 +391,11 @@ input[type="submit"], button {
     .datetimeshortcuts {
         color: #ccc;
     }
-    
+
     .form-row .datetime input.vDateField, .form-row .datetime input.vTimeField {
         width: 75%;
     }
-    
+
     .inline-group {
         overflow: auto;
     }
