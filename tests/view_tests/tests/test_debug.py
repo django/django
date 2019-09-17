@@ -438,7 +438,14 @@ class ExceptionReporterTests(SimpleTestCase):
         self.assertEqual(last_frame['function'], 'funcName')
         self.assertEqual(last_frame['lineno'], 2)
         html = reporter.get_traceback_html()
-        self.assertIn('generated in funcName, line 2', html)
+        self.assertIn(
+            '<span class="fname">generated</span>, line 2, in funcName',
+            html,
+        )
+        self.assertIn(
+            '<code class="fname">generated</code>, line 2, in funcName',
+            html,
+        )
         self.assertIn(
             '"generated", line 2, in funcName\n'
             '    &lt;source code not available&gt;',
@@ -472,7 +479,14 @@ class ExceptionReporterTests(SimpleTestCase):
             self.assertEqual(last_frame['function'], 'funcName')
             self.assertEqual(last_frame['lineno'], 2)
             html = reporter.get_traceback_html()
-            self.assertIn('generated in funcName, line 2', html)
+            self.assertIn(
+                '<span class="fname">generated</span>, line 2, in funcName',
+                html,
+            )
+            self.assertIn(
+                '<code class="fname">generated</code>, line 2, in funcName',
+                html,
+            )
             self.assertIn(
                 '"generated", line 2, in funcName\n'
                 '    &lt;source code not available&gt;',
