@@ -262,8 +262,7 @@ p.datetime {
     color: #ccc;
 }
 
-.datetime input, .form-row .datetime input.vDateField, .form-row .datetime input.vTimeField {
-    width: auto;
+.datetime input, .form-row .datetime input.vDateField, .form-row .datetime input.vTimeField {    
     margin-left: 5px;
     margin-bottom: 4px;
 }
