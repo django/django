@@ -270,9 +270,16 @@ Arguments sent with this signal:
     from the relation.
 
 ``pk_set``
-    For the ``pre_add``, ``post_add``, ``pre_remove`` and ``post_remove``
-    actions, this is a set of primary key values that have been added to
-    or removed from the relation.
+    For the ``pre_add`` and ``post_add`` actions, this is a set of primary key
+    values that will be, or have been, added to the relation. This may be a
+    subset of the values submitted to be added, since inserts must filter
+    existing values in order to avoid a database ``IntegrityError``.
+
+    For the ``pre_remove`` and ``post_remove`` actions, this is a set of
+    primary key values that was submitted to be removed from the relation. This
+    is not dependent on whether the values actually will be, or have been,
+    removed. In particular, non-existent values may be submitted, and will
+    appear in ``pk_set``, even though they have no effect on the database.
 
     For the ``pre_clear`` and ``post_clear`` actions, this is ``None``.
 
