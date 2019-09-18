@@ -8,7 +8,7 @@ in the same room.
 Add the room view
 -----------------
 
-We will now create the second view, a room view that lets you see messages 
+We will now create the second view, a room view that lets you see messages
 posted in a particular chat room.
 
 Create a new file ``chat/templates/chat/room.html``.
@@ -39,35 +39,35 @@ Create the view template for the room view in ``chat/templates/chat/room.html``:
     </body>
     <script>
         var roomName = {{ room_name_json }};
-        
+
         var chatSocket = new WebSocket(
-            'ws://' + window.location.host + 
+            'ws://' + window.location.host +
             '/ws/chat/' + roomName + '/');
-        
+
         chatSocket.onmessage = function(e) {
             var data = JSON.parse(e.data);
             var message = data['message'];
             document.querySelector('#chat-log').value += (message + '\n');
         };
-        
+
         chatSocket.onclose = function(e) {
             console.error('Chat socket closed unexpectedly');
         };
-        
+
         document.querySelector('#chat-message-input').focus();
         document.querySelector('#chat-message-input').onkeyup = function(e) {
             if (e.keyCode === 13) {  // enter, return
                 document.querySelector('#chat-message-submit').click();
             }
         };
-        
+
         document.querySelector('#chat-message-submit').onclick = function(e) {
             var messageInputDom = document.querySelector('#chat-message-input');
             var message = messageInputDom.value;
             chatSocket.send(JSON.stringify({
                 'message': message
             }));
-            
+
             messageInputDom.value = '';
         };
     </script>
@@ -80,10 +80,10 @@ Add the imports of ``mark_safe`` and ``json`` and add the ``room`` view function
     from django.shortcuts import render
     from django.utils.safestring import mark_safe
     import json
-    
+
     def index(request):
         return render(request, 'chat/index.html', {})
-    
+
     def room(request, room_name):
         return render(request, 'chat/room.html', {
             'room_name_json': mark_safe(json.dumps(room_name))
@@ -93,9 +93,9 @@ Create the route for the room view in ``chat/urls.py``::
 
     # chat/urls.py
     from django.urls import path
-    
+
     from . import views
-    
+
     urlpatterns = [
         path('', views.index, name='index'),
         path('<str:room_name>/', views.room, name='room'),
@@ -139,13 +139,13 @@ echos it back to the same WebSocket.
     WebSocket connections from ordinary HTTP connections because it will make
     deploying Channels to a production environment in certain configurations
     easier.
-    
+
     In particular for large sites it will be possible to configure a
     production-grade HTTP server like nginx to route requests based on path to
     either (1) a production-grade WSGI server like Gunicorn+Django for ordinary
     HTTP requests or (2) a production-grade ASGI server like Daphne+Channels
     for WebSocket requests.
-    
+
     Note that for smaller sites you can use a simpler deployment strategy where
     Daphne serves all requests - HTTP and WebSocket - rather than having a
     separate WSGI server. In this deployment configuration no common path prefix
@@ -168,18 +168,18 @@ Put the following code in ``chat/consumers.py``::
     # chat/consumers.py
     from channels.generic.websocket import WebsocketConsumer
     import json
-    
+
     class ChatConsumer(WebsocketConsumer):
         def connect(self):
             self.accept()
-        
+
         def disconnect(self, close_code):
             pass
-        
+
         def receive(self, text_data):
             text_data_json = json.loads(text_data)
             message = text_data_json['message']
-            
+
             self.send(text_data=json.dumps({
                 'message': message
             }))
@@ -213,12 +213,12 @@ look like::
 Put the following code in ``chat/routing.py``::
 
     # chat/routing.py
-    from django.urls import path
-    
+    from django.urls import re_path
+
     from . import consumers
-    
+
     websocket_urlpatterns = [
-        path('ws/chat/<str:room_name>/', consumers.ChatConsumer),
+        re_path(r'ws/chat/(?P<room_name>\w+)/$', consumers.ChatConsumer),
     ]
 
 The next step is to point the root routing configuration at the **chat.routing**
@@ -230,7 +230,7 @@ and ``chat.routing``; and insert a ``'websocket'`` key in the
     from channels.auth import AuthMiddlewareStack
     from channels.routing import ProtocolTypeRouter, URLRouter
     import chat.routing
-    
+
     application = ProtocolTypeRouter({
         # (http->django views is added by default)
         'websocket': AuthMiddlewareStack(
@@ -369,32 +369,32 @@ following code in ``chat/consumers.py``, replacing the old code::
     from asgiref.sync import async_to_sync
     from channels.generic.websocket import WebsocketConsumer
     import json
-    
+
     class ChatConsumer(WebsocketConsumer):
         def connect(self):
             self.room_name = self.scope['url_route']['kwargs']['room_name']
             self.room_group_name = 'chat_%s' % self.room_name
-            
+
             # Join room group
             async_to_sync(self.channel_layer.group_add)(
                 self.room_group_name,
                 self.channel_name
             )
-            
+
             self.accept()
-        
+
         def disconnect(self, close_code):
             # Leave room group
             async_to_sync(self.channel_layer.group_discard)(
                 self.room_group_name,
                 self.channel_name
             )
-        
+
         # Receive message from WebSocket
         def receive(self, text_data):
             text_data_json = json.loads(text_data)
             message = text_data_json['message']
-            
+
             # Send message to room group
             async_to_sync(self.channel_layer.group_send)(
                 self.room_group_name,
@@ -403,11 +403,11 @@ following code in ``chat/consumers.py``, replacing the old code::
                     'message': message
                 }
             )
-        
+
         # Receive message from room group
         def chat_message(self, event):
             message = event['message']
-            
+
             # Send message to WebSocket
             self.send(text_data=json.dumps({
                 'message': message
