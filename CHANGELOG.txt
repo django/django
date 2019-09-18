@@ -1,12 +1,16 @@
 Full release notes, with more details and upgrade information, are available at:
 https://channels.readthedocs.io/en/latest/releases
 
-UNRELEASED
-----------
+2.3.0 (2019-09-18)
+------------------
 
-* Adjusted HTTP body handling to use a spooled file, rather than reading
-  request body into memory. ``AsgiRequest.__init__()`` is adjusted to expected
-  an IO stream, rather than bytes.
+* Adjusted ``AsgiHandler`` HTTP body handling to use a spooled temporary file,
+  rather than reading the whole request body into memory.
+
+  As a result, ``AsgiRequest.__init__()`` is adjusted to expect a file-like
+  ``stream``, rather than the whole ``body`` as bytes. Test cases instantiating
+  requests directly will likely need to be updated to wrap the provided body
+  in, e.g., `io.BytesIO`.
 
 2.2.0 (2019-04-14)
 ------------------
