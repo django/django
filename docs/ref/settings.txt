@@ -3057,7 +3057,9 @@ Default: ``None``
 
 The domain to use for session cookies. Set this to a string such as
 ``"example.com"`` for cross-domain cookies, or use ``None`` for a standard
-domain cookie.
+domain cookie. The setting also supports a subdomain wildcard, so you could use
+``".example.com"``, for example, to create cookies accessible from all
+subdomains of ``example.com``.
 
 Be cautious when updating this setting on a production site. If you update
 this setting to enable cross-domain cookies on a site that previously used
