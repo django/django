@@ -15,4 +15,4 @@ jobs:
         with:
           python-version: ${{ matrix.python }}
           architecture: x64
-      - run: python my_script.py
+      - run: pip install tests
