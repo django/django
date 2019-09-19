@@ -1921,7 +1921,7 @@ Examples::
 Note that command options that take no arguments are passed as keywords
 with ``True`` or ``False``, as you can see with the ``interactive`` option above.
 
-Named arguments can be passed by using either one of the following syntaxes::
+Named arguments can be passed by using one of the following syntaxes::
 
       # Similar to the command line
       management.call_command('dumpdata', '--natural-foreign')
