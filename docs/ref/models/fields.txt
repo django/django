@@ -1304,6 +1304,13 @@ it is recommended to use :attr:`~Field.default`::
 Note that a callable (with the parentheses omitted) is passed to ``default``,
 not an instance of ``UUID``.
 
+.. admonition:: Lookups on PostgreSQL
+
+    Using :lookup:`iexact`, :lookup:`contains`, :lookup:`icontains`,
+    :lookup:`startswith`, :lookup:`istartswith`, :lookup:`endswith`, or
+    :lookup:`iendswith` lookups on PostgreSQL don't work for values without
+    hyphens, because PostgreSQL stores them in a hyphenated uuid datatype type.
+
 Relationship fields
 ===================
 
