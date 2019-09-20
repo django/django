@@ -2885,6 +2885,16 @@ The minimum number of seconds a password reset link is valid for.
 
 Used by the :class:`~django.contrib.auth.views.PasswordResetConfirmView`.
 
+.. note::
+
+   Reducing the value of this timeout doesn't make difference to the ability of
+   an attacker to brute-force a password reset token. Tokens are designed to be
+   safe from brute-forcing without any timeout.
+
+   This timeout exists to protect against some unlikely attack scenarios, such
+   as someone gaining access to email archives that may contain old, unused
+   password reset tokens.
+
 .. setting:: PASSWORD_RESET_TIMEOUT_DAYS
 
 ``PASSWORD_RESET_TIMEOUT_DAYS``
