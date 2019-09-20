@@ -186,7 +186,7 @@ class BaseModelAdminChecks:
                         id='admin.E039',
                     )
                 ]
-            elif not related_admin.search_fields:
+            elif not related_admin.search_fields and not related_admin.get_search_fields(None):
                 return [
                     checks.Error(
                         '%s must define "search_fields", because it\'s '
