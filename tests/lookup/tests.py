@@ -966,6 +966,6 @@ class LookupTests(TestCase):
             'name',
         ).annotate(
             max_id=Max('id'),
-        ).values('max_id')
+        ).values('max_id').order_by()
         authors = Author.objects.filter(id=authors_max_ids[:1])
         self.assertEqual(authors.get(), newest_author)
