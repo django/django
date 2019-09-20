@@ -14,6 +14,13 @@ classes live in :source:`django/core/paginator.py`.
 
 .. class:: Paginator(object_list, per_page, orphans=0, allow_empty_first_page=True)
 
+    A paginator acts like a sequence of :class:`Page` when using ``len()`` or
+    iterating it directly.
+
+    .. versionchanged:: 3.1
+
+        Support for iterating over ``Paginator`` was added.
+
 .. attribute:: Paginator.object_list
 
     Required. A list, tuple, ``QuerySet``, or other sliceable object with a
@@ -98,8 +105,8 @@ Attributes
 ``Page`` class
 ==============
 
-You usually won't construct ``Page`` objects by hand -- you'll get them using
-:meth:`Paginator.page`.
+You usually won't construct ``Page`` objects by hand -- you'll get them by
+iterating :class:`Paginator`, or by using :meth:`Paginator.page`.
 
 .. class:: Page(object_list, number, paginator)
 
