@@ -162,6 +162,11 @@ Models
 
 * ...
 
+Pagination
+~~~~~~~~~~
+
+* Support for iterating over ``Paginator`` was added.
+
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 
