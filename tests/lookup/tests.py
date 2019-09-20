@@ -5,6 +5,7 @@ from operator import attrgetter
 
 from django.core.exceptions import FieldError
 from django.db import connection
+from django.db.models import Max
 from django.db.models.expressions import Exists, OuterRef
 from django.db.models.functions import Substr
 from django.test import TestCase, skipUnlessDBFeature
@@ -956,3 +957,14 @@ class LookupTests(TestCase):
             ),
         )
         self.assertEqual(qs.get(has_author_alias_match=True), tag)
+
+    def test_exact_selected_field_rhs_subquery(self):
+        """Ensures GROUP BY in query persists when used as subquery."""
+        _ = Author.objects.create(name='one')
+        author_2 = Author.objects.create(name='two')
+        max_ids = Author.objects.values('alias').annotate(m=Max('id')).values('m').order_by()
+        # Include empty .order_by() to disregard ordering set in Author's Meta class.
+
+        authors = Author.objects.filter(id=max_ids[:1])
+
+        self.assertEqual(authors[0], author_2)
