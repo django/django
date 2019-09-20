@@ -5,6 +5,7 @@ from operator import attrgetter
 
 from django.core.exceptions import FieldError
 from django.db import connection
+from django.db.models import Max
 from django.db.models.expressions import Exists, OuterRef
 from django.db.models.functions import Substr
 from django.test import TestCase, skipUnlessDBFeature
@@ -956,3 +957,15 @@ class LookupTests(TestCase):
             ),
         )
         self.assertEqual(qs.get(has_author_alias_match=True), tag)
+
+    def test_exact_query_rhs_with_selected_columns(self):
+        newest_author = Author.objects.create(name='Author 2')
+        authors_max_ids = Author.objects.filter(
+            name='Author 2',
+        ).values(
+            'name',
+        ).annotate(
+            max_id=Max('id'),
+        ).values('max_id')
+        authors = Author.objects.filter(id=authors_max_ids[:1])
+        self.assertEqual(authors.get(), newest_author)
