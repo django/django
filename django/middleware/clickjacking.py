@@ -6,10 +6,9 @@ malicious site loading resources from your site in a hidden frame.
 """
 
 from django.conf import settings
-from django.utils.deprecation import MiddlewareMixin
 
 
-class XFrameOptionsMiddleware(MiddlewareMixin):
+class XFrameOptionsMiddleware:
     """
     Set the X-Frame-Options HTTP header in HTTP responses.
 
@@ -21,6 +20,13 @@ class XFrameOptionsMiddleware(MiddlewareMixin):
     response from being loaded in a frame in any site, set X_FRAME_OPTIONS in
     your project's Django settings to 'DENY'.
     """
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        response = self.get_response(request)
+        return self.process_response(request, response)
+
     def process_response(self, request, response):
         # Don't set it if it's already in the response
         if response.get('X-Frame-Options') is not None:

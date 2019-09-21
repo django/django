@@ -63,7 +63,7 @@ class RedirectTests(TestCase):
             'django.contrib.sites is not installed.'
         )
         with self.assertRaisesMessage(ImproperlyConfigured, msg):
-            RedirectFallbackMiddleware()
+            RedirectFallbackMiddleware(None)
 
 
 class OverriddenRedirectFallbackMiddleware(RedirectFallbackMiddleware):

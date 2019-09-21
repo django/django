@@ -905,30 +905,31 @@ class BaseCacheTests:
         self.assertEqual(caches['custom_key2'].get('answer2'), 42)
 
     def test_cache_write_unpicklable_object(self):
-        update_middleware = UpdateCacheMiddleware()
-        update_middleware.cache = cache
-
-        fetch_middleware = FetchFromCacheMiddleware()
+        fetch_middleware = FetchFromCacheMiddleware(None)
         fetch_middleware.cache = cache
 
         request = self.factory.get('/cache/test')
         request._cache_update_cache = True
-        get_cache_data = FetchFromCacheMiddleware().process_request(request)
+        get_cache_data = FetchFromCacheMiddleware(None).process_request(request)
         self.assertIsNone(get_cache_data)
 
-        response = HttpResponse()
         content = 'Testing cookie serialization.'
-        response.content = content
-        response.set_cookie('foo', 'bar')
 
-        update_middleware.process_response(request, response)
+        def get_response(req):
+            response = HttpResponse(content)
+            response.set_cookie('foo', 'bar')
+            return response
+
+        update_middleware = UpdateCacheMiddleware(get_response)
+        update_middleware.cache = cache
+        response = update_middleware(request)
 
         get_cache_data = fetch_middleware.process_request(request)
         self.assertIsNotNone(get_cache_data)
         self.assertEqual(get_cache_data.content, content.encode())
         self.assertEqual(get_cache_data.cookies, response.cookies)
 
-        update_middleware.process_response(request, get_cache_data)
+        UpdateCacheMiddleware(lambda req: get_cache_data)(request)
         get_cache_data = fetch_middleware.process_request(request)
         self.assertIsNotNone(get_cache_data)
         self.assertEqual(get_cache_data.content, content.encode())
@@ -1752,9 +1753,7 @@ class CacheHEADTest(SimpleTestCase):
         cache.clear()
 
     def _set_cache(self, request, msg):
-        response = HttpResponse()
-        response.content = msg
-        return UpdateCacheMiddleware().process_response(request, response)
+        return UpdateCacheMiddleware(lambda req: HttpResponse(msg))(request)
 
     def test_head_caches_correctly(self):
         test_content = 'test content'
@@ -1765,7 +1764,7 @@ class CacheHEADTest(SimpleTestCase):
 
         request = self.factory.head(self.path)
         request._cache_update_cache = True
-        get_cache_data = FetchFromCacheMiddleware().process_request(request)
+        get_cache_data = FetchFromCacheMiddleware(None).process_request(request)
         self.assertIsNotNone(get_cache_data)
         self.assertEqual(test_content.encode(), get_cache_data.content)
 
@@ -1777,7 +1776,7 @@ class CacheHEADTest(SimpleTestCase):
         self._set_cache(request, test_content)
 
         request = self.factory.head(self.path)
-        get_cache_data = FetchFromCacheMiddleware().process_request(request)
+        get_cache_data = FetchFromCacheMiddleware(None).process_request(request)
         self.assertIsNotNone(get_cache_data)
         self.assertEqual(test_content.encode(), get_cache_data.content)
 
@@ -1915,30 +1914,33 @@ class CacheI18nTest(SimpleTestCase):
     )
     def test_middleware(self):
         def set_cache(request, lang, msg):
+            def get_response(req):
+                return HttpResponse(msg)
+
             translation.activate(lang)
-            response = HttpResponse()
-            response.content = msg
-            return UpdateCacheMiddleware().process_response(request, response)
+            return UpdateCacheMiddleware(get_response)(request)
 
         # cache with non empty request.GET
         request = self.factory.get(self.path, {'foo': 'bar', 'other': 'true'})
         request._cache_update_cache = True
 
-        get_cache_data = FetchFromCacheMiddleware().process_request(request)
+        get_cache_data = FetchFromCacheMiddleware(None).process_request(request)
         # first access, cache must return None
         self.assertIsNone(get_cache_data)
-        response = HttpResponse()
         content = 'Check for cache with QUERY_STRING'
-        response.content = content
-        UpdateCacheMiddleware().process_response(request, response)
-        get_cache_data = FetchFromCacheMiddleware().process_request(request)
+
+        def get_response(req):
+            return HttpResponse(content)
+
+        UpdateCacheMiddleware(get_response)(request)
+        get_cache_data = FetchFromCacheMiddleware(None).process_request(request)
         # cache must return content
         self.assertIsNotNone(get_cache_data)
         self.assertEqual(get_cache_data.content, content.encode())
         # different QUERY_STRING, cache must be empty
         request = self.factory.get(self.path, {'foo': 'bar', 'somethingelse': 'true'})
         request._cache_update_cache = True
-        get_cache_data = FetchFromCacheMiddleware().process_request(request)
+        get_cache_data = FetchFromCacheMiddleware(None).process_request(request)
         self.assertIsNone(get_cache_data)
 
         # i18n tests
@@ -1948,7 +1950,7 @@ class CacheI18nTest(SimpleTestCase):
         request = self.factory.get(self.path)
         request._cache_update_cache = True
         set_cache(request, 'en', en_message)
-        get_cache_data = FetchFromCacheMiddleware().process_request(request)
+        get_cache_data = FetchFromCacheMiddleware(None).process_request(request)
         # The cache can be recovered
         self.assertIsNotNone(get_cache_data)
         self.assertEqual(get_cache_data.content, en_message.encode())
@@ -1959,11 +1961,11 @@ class CacheI18nTest(SimpleTestCase):
         # change again the language
         translation.activate('en')
         # retrieve the content from cache
-        get_cache_data = FetchFromCacheMiddleware().process_request(request)
+        get_cache_data = FetchFromCacheMiddleware(None).process_request(request)
         self.assertEqual(get_cache_data.content, en_message.encode())
         # change again the language
         translation.activate('es')
-        get_cache_data = FetchFromCacheMiddleware().process_request(request)
+        get_cache_data = FetchFromCacheMiddleware(None).process_request(request)
         self.assertEqual(get_cache_data.content, es_message.encode())
         # reset the language
         translation.deactivate()
@@ -1974,14 +1976,15 @@ class CacheI18nTest(SimpleTestCase):
     )
     def test_middleware_doesnt_cache_streaming_response(self):
         request = self.factory.get(self.path)
-        get_cache_data = FetchFromCacheMiddleware().process_request(request)
+        get_cache_data = FetchFromCacheMiddleware(None).process_request(request)
         self.assertIsNone(get_cache_data)
 
-        content = ['Check for cache with streaming content.']
-        response = StreamingHttpResponse(content)
-        UpdateCacheMiddleware().process_response(request, response)
+        def get_stream_response(req):
+            return StreamingHttpResponse(['Check for cache with streaming content.'])
 
-        get_cache_data = FetchFromCacheMiddleware().process_request(request)
+        UpdateCacheMiddleware(get_stream_response)(request)
+
+        get_cache_data = FetchFromCacheMiddleware(None).process_request(request)
         self.assertIsNone(get_cache_data)
 
 
@@ -2183,18 +2186,13 @@ class CacheMiddlewareTest(SimpleTestCase):
         Django must prevent caching of responses that set a user-specific (and
         maybe security sensitive) cookie in response to a cookie-less request.
         """
-        csrf_middleware = CsrfViewMiddleware()
-        cache_middleware = CacheMiddleware()
-
         request = self.factory.get('/view/')
-        self.assertIsNone(cache_middleware.process_request(request))
-
+        csrf_middleware = CsrfViewMiddleware(csrf_view)
         csrf_middleware.process_view(request, csrf_view, (), {})
+        cache_middleware = CacheMiddleware(csrf_middleware)
 
-        response = csrf_view(request)
-
-        response = csrf_middleware.process_response(request, response)
-        response = cache_middleware.process_response(request, response)
+        self.assertIsNone(cache_middleware.process_request(request))
+        cache_middleware(request)
 
         # Inserting a CSRF cookie in a cookie-less request prevented caching.
         self.assertIsNone(cache_middleware.process_request(request))

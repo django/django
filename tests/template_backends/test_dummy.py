@@ -76,7 +76,7 @@ class TemplateStringsTests(SimpleTestCase):
 
     def test_csrf_token(self):
         request = HttpRequest()
-        CsrfViewMiddleware().process_view(request, lambda r: None, (), {})
+        CsrfViewMiddleware(None).process_view(request, lambda r: None, (), {})
 
         template = self.engine.get_template('template_backends/csrf.html')
         content = template.render(request=request)

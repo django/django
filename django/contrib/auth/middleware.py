@@ -3,7 +3,6 @@ from django.contrib import auth
 from django.contrib.auth import load_backend
 from django.contrib.auth.backends import RemoteUserBackend
 from django.core.exceptions import ImproperlyConfigured
-from django.utils.deprecation import MiddlewareMixin
 from django.utils.functional import SimpleLazyObject
 
 
@@ -13,8 +12,11 @@ def get_user(request):
     return request._cached_user
 
 
-class AuthenticationMiddleware(MiddlewareMixin):
-    def process_request(self, request):
+class AuthenticationMiddleware:
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
         assert hasattr(request, 'session'), (
             "The Django authentication middleware requires session middleware "
             "to be installed. Edit your MIDDLEWARE%s setting to insert "
@@ -22,9 +24,10 @@ class AuthenticationMiddleware(MiddlewareMixin):
             "'django.contrib.auth.middleware.AuthenticationMiddleware'."
         ) % ("_CLASSES" if settings.MIDDLEWARE is None else "")
         request.user = SimpleLazyObject(lambda: get_user(request))
+        return self.get_response(request)
 
 
-class RemoteUserMiddleware(MiddlewareMixin):
+class RemoteUserMiddleware:
     """
     Middleware for utilizing Web-server-provided authentication.
 
@@ -43,6 +46,13 @@ class RemoteUserMiddleware(MiddlewareMixin):
     # all uppercase and the addition of "HTTP_" prefix apply.
     header = "REMOTE_USER"
     force_logout_if_no_header = True
+
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        self.process_request(request)
+        return self.get_response(request)
 
     def process_request(self, request):
         # AuthenticationMiddleware is required so that request.user exists.

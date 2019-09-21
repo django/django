@@ -6,11 +6,10 @@ from django.core.exceptions import PermissionDenied
 from django.core.mail import mail_managers
 from django.http import HttpResponsePermanentRedirect
 from django.urls import is_valid_path
-from django.utils.deprecation import MiddlewareMixin
 from django.utils.http import escape_leading_slashes
 
 
-class CommonMiddleware(MiddlewareMixin):
+class CommonMiddleware:
     """
     "Common" middleware for taking care of some basic operations:
 
@@ -30,6 +29,14 @@ class CommonMiddleware(MiddlewareMixin):
     """
 
     response_redirect_class = HttpResponsePermanentRedirect
+
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        response = self.process_request(request)
+        response = response or self.get_response(request)
+        return self.process_response(request, response)
 
     def process_request(self, request):
         """
@@ -115,7 +122,13 @@ class CommonMiddleware(MiddlewareMixin):
         return response
 
 
-class BrokenLinkEmailsMiddleware(MiddlewareMixin):
+class BrokenLinkEmailsMiddleware:
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        response = self.get_response(request)
+        return self.process_response(request, response)
 
     def process_response(self, request, response):
         """Send broken link emails for relevant 404 NOT FOUND responses."""

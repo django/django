@@ -4,16 +4,23 @@ from django.http import HttpResponseRedirect
 from django.urls import get_script_prefix, is_valid_path
 from django.utils import translation
 from django.utils.cache import patch_vary_headers
-from django.utils.deprecation import MiddlewareMixin
 
 
-class LocaleMiddleware(MiddlewareMixin):
+class LocaleMiddleware:
     """
     Parse a request and decide what translation object to install in the
     current thread context. This allows pages to be dynamically translated to
     the language the user desires (if the language is available, of course).
     """
     response_redirect_class = HttpResponseRedirect
+
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        self.process_request(request)
+        response = self.get_response(request)
+        return self.process_response(request, response)
 
     def process_request(self, request):
         urlconf = getattr(request, 'urlconf', settings.ROOT_URLCONF)

@@ -4,21 +4,24 @@ from django.contrib.redirects.models import Redirect
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.exceptions import ImproperlyConfigured
 from django.http import HttpResponseGone, HttpResponsePermanentRedirect
-from django.utils.deprecation import MiddlewareMixin
 
 
-class RedirectFallbackMiddleware(MiddlewareMixin):
+class RedirectFallbackMiddleware:
     # Defined as class-level attributes to be subclassing-friendly.
     response_gone_class = HttpResponseGone
     response_redirect_class = HttpResponsePermanentRedirect
 
-    def __init__(self, get_response=None):
+    def __init__(self, get_response):
         if not apps.is_installed('django.contrib.sites'):
             raise ImproperlyConfigured(
                 "You cannot use RedirectFallbackMiddleware when "
                 "django.contrib.sites is not installed."
             )
-        super().__init__(get_response)
+        self.get_response = get_response
+
+    def __call__(self, request):
+        response = self.get_response(request)
+        return self.process_response(request, response)
 
     def process_response(self, request, response):
         # No need to check for a redirect for non-404 responses.

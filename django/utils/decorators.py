@@ -113,7 +113,9 @@ def decorator_from_middleware(middleware_class):
 
 def make_middleware_decorator(middleware_class):
     def _make_decorator(*m_args, **m_kwargs):
-        middleware = middleware_class(*m_args, **m_kwargs)
+        def fake_get_response(req):
+            return None
+        middleware = middleware_class(fake_get_response, *m_args, **m_kwargs)
 
         def _decorator(view_func):
             @wraps(view_func)

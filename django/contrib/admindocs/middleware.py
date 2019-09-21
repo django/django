@@ -1,14 +1,19 @@
 from django.conf import settings
 from django.http import HttpResponse
-from django.utils.deprecation import MiddlewareMixin
 
 from .utils import get_view_name
 
 
-class XViewMiddleware(MiddlewareMixin):
+class XViewMiddleware:
     """
     Add an X-View header to internal HEAD requests.
     """
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        return self.get_response(request)
+
     def process_view(self, request, view_func, view_args, view_kwargs):
         """
         If the request method is HEAD and either the IP is internal or the

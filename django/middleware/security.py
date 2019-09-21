@@ -2,11 +2,10 @@ import re
 
 from django.conf import settings
 from django.http import HttpResponsePermanentRedirect
-from django.utils.deprecation import MiddlewareMixin
 
 
-class SecurityMiddleware(MiddlewareMixin):
-    def __init__(self, get_response=None):
+class SecurityMiddleware:
+    def __init__(self, get_response):
         self.sts_seconds = settings.SECURE_HSTS_SECONDS
         self.sts_include_subdomains = settings.SECURE_HSTS_INCLUDE_SUBDOMAINS
         self.sts_preload = settings.SECURE_HSTS_PRELOAD
@@ -17,6 +16,11 @@ class SecurityMiddleware(MiddlewareMixin):
         self.redirect_exempt = [re.compile(r) for r in settings.SECURE_REDIRECT_EXEMPT]
         self.referrer_policy = settings.SECURE_REFERRER_POLICY
         self.get_response = get_response
+
+    def __call__(self, request):
+        response = self.process_request(request)
+        response = response or self.get_response(request)
+        return self.process_response(request, response)
 
     def process_request(self, request):
         path = request.path.lstrip("/")

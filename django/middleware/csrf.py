@@ -14,7 +14,6 @@ from django.core.exceptions import DisallowedHost, ImproperlyConfigured
 from django.urls import get_callable
 from django.utils.cache import patch_vary_headers
 from django.utils.crypto import constant_time_compare, get_random_string
-from django.utils.deprecation import MiddlewareMixin
 from django.utils.http import is_same_domain
 from django.utils.log import log_response
 
@@ -128,7 +127,7 @@ def _compare_salted_tokens(request_csrf_token, csrf_token):
     )
 
 
-class CsrfViewMiddleware(MiddlewareMixin):
+class CsrfViewMiddleware:
     """
     Require a present and correct csrfmiddlewaretoken for POST requests that
     have a CSRF cookie, and set an outgoing CSRF cookie.
@@ -136,6 +135,14 @@ class CsrfViewMiddleware(MiddlewareMixin):
     This middleware should be used in conjunction with the {% csrf_token %}
     template tag.
     """
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        self.process_request(request)
+        response = self.get_response(request)
+        return self.process_response(request, response)
+
     # The _accept and _reject methods currently only exist for the sake of the
     # requires_csrf_token decorator.
     def _accept(self, request):

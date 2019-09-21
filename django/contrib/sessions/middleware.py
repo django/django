@@ -5,15 +5,19 @@ from django.conf import settings
 from django.contrib.sessions.backends.base import UpdateError
 from django.core.exceptions import SuspiciousOperation
 from django.utils.cache import patch_vary_headers
-from django.utils.deprecation import MiddlewareMixin
 from django.utils.http import http_date
 
 
-class SessionMiddleware(MiddlewareMixin):
-    def __init__(self, get_response=None):
+class SessionMiddleware:
+    def __init__(self, get_response):
         self.get_response = get_response
         engine = import_module(settings.SESSION_ENGINE)
         self.SessionStore = engine.SessionStore
+
+    def __call__(self, request):
+        self.process_request(request)
+        response = self.get_response(request)
+        return self.process_response(request, response)
 
     def process_request(self, request):
         session_key = request.COOKIES.get(settings.SESSION_COOKIE_NAME)

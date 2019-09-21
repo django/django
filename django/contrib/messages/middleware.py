@@ -1,15 +1,18 @@
 from django.conf import settings
 from django.contrib.messages.storage import default_storage
-from django.utils.deprecation import MiddlewareMixin
 
 
-class MessageMiddleware(MiddlewareMixin):
+class MessageMiddleware:
     """
     Middleware that handles temporary messages.
     """
+    def __init__(self, get_response):
+        self.get_response = get_response
 
-    def process_request(self, request):
+    def __call__(self, request):
         request._messages = default_storage(request)
+        response = self.get_response(request)
+        return self.process_response(request, response)
 
     def process_response(self, request, response):
         """

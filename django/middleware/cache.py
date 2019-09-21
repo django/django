@@ -49,10 +49,9 @@ from django.utils.cache import (
     get_cache_key, get_max_age, has_vary_header, learn_cache_key,
     patch_response_headers,
 )
-from django.utils.deprecation import MiddlewareMixin
 
 
-class UpdateCacheMiddleware(MiddlewareMixin):
+class UpdateCacheMiddleware:
     """
     Response-phase cache middleware that updates the cache if the response is
     cacheable.
@@ -61,12 +60,16 @@ class UpdateCacheMiddleware(MiddlewareMixin):
     UpdateCacheMiddleware must be the first piece of middleware in MIDDLEWARE
     so that it'll get called last during the response phase.
     """
-    def __init__(self, get_response=None):
+    def __init__(self, get_response):
         self.cache_timeout = settings.CACHE_MIDDLEWARE_SECONDS
         self.key_prefix = settings.CACHE_MIDDLEWARE_KEY_PREFIX
         self.cache_alias = settings.CACHE_MIDDLEWARE_ALIAS
         self.cache = caches[self.cache_alias]
         self.get_response = get_response
+
+    def __call__(self, request):
+        response = self.get_response(request)
+        return self.process_response(request, response)
 
     def _should_update_cache(self, request, response):
         return hasattr(request, '_cache_update_cache') and request._cache_update_cache
@@ -110,7 +113,7 @@ class UpdateCacheMiddleware(MiddlewareMixin):
         return response
 
 
-class FetchFromCacheMiddleware(MiddlewareMixin):
+class FetchFromCacheMiddleware:
     """
     Request-phase cache middleware that fetches a page from the cache.
 
@@ -118,11 +121,15 @@ class FetchFromCacheMiddleware(MiddlewareMixin):
     FetchFromCacheMiddleware must be the last piece of middleware in MIDDLEWARE
     so that it'll get called last during the request phase.
     """
-    def __init__(self, get_response=None):
+    def __init__(self, get_response):
         self.key_prefix = settings.CACHE_MIDDLEWARE_KEY_PREFIX
         self.cache_alias = settings.CACHE_MIDDLEWARE_ALIAS
         self.cache = caches[self.cache_alias]
         self.get_response = get_response
+
+    def __call__(self, request):
+        response = self.process_request(request)
+        return response or self.get_response(request)
 
     def process_request(self, request):
         """

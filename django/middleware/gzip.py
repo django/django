@@ -1,18 +1,24 @@
 import re
 
 from django.utils.cache import patch_vary_headers
-from django.utils.deprecation import MiddlewareMixin
 from django.utils.text import compress_sequence, compress_string
 
 re_accepts_gzip = re.compile(r'\bgzip\b')
 
 
-class GZipMiddleware(MiddlewareMixin):
+class GZipMiddleware:
     """
     Compress content if the browser allows gzip compression.
     Set the Vary header accordingly, so that caches will base their storage
     on the Accept-Encoding header.
     """
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        response = self.get_response(request)
+        return self.process_response(request, response)
+
     def process_response(self, request, response):
         # It's not worth attempting to compress really short responses.
         if not response.streaming and len(response.content) < 200:

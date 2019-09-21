@@ -1,16 +1,22 @@
 from django.utils.cache import (
     cc_delim_re, get_conditional_response, set_response_etag,
 )
-from django.utils.deprecation import MiddlewareMixin
 from django.utils.http import parse_http_date_safe
 
 
-class ConditionalGetMiddleware(MiddlewareMixin):
+class ConditionalGetMiddleware:
     """
     Handle conditional GET operations. If the response has an ETag or
     Last-Modified header and the request has If-None-Match or If-Modified-Since,
     replace the response with HttpNotModified. Add an ETag header if needed.
     """
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        response = self.get_response(request)
+        return self.process_response(request, response)
+
     def process_response(self, request, response):
         # It's too late to prevent an unsafe request with a 412 response, and
         # for a HEAD request, the response body is always empty so computing
