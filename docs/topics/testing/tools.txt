@@ -880,6 +880,33 @@ It also provides an additional method:
     modify them, you could reload them in the ``setUp()`` method with
     :meth:`~django.db.models.Model.refresh_from_db`, for example.
 
+.. note::
+
+    Testing code which uses :func:`~django.db.transaction.on_commit` hooks are
+    not run during ``TestCase`` because of the transaction wrapping it
+    perform to ensure data isolation. As mentioned above the proper way
+    to test for such database transaction behavior is to use a
+    ``TransactionTestCase``. However, if
+    :func:`~django.db.transaction.on_commit` is required to be triggered in
+    ``TestCase`` tests one possible solution is to add a context manager like
+    below to your base ``TestCase`` subclass::
+
+        @contextmanager
+        def immediate_on_commit(self, using=None):
+            """
+            Context manager executing transaction.on_commit() hooks immediately as
+            if the connection was in auto-commit mode. This is required when
+            using a subclass of django.test.TestCase as all tests are wrapped in
+            a transaction that never gets committed.
+            """
+            immediate_using = DEFAULT_DB_ALIAS if using is None else using
+            def on_commit(func, using=None):
+                using = DEFAULT_DB_ALIAS if using is None else using
+                if using == immediate_using:
+                    func()
+            with mock.patch('django.db.transaction.on_commit', side_effect=on_commit) as patch:
+                yield patch
+
 .. _live-test-server:
 
 ``LiveServerTestCase``
