@@ -60,7 +60,7 @@ class Driver(models.Model):
 
 
 class CarDriver(models.Model):
-    car = models.ForeignKey('Car', models.CASCADE, to_field='make')
+    car = models.ForeignKey('Car', models.CASCADE, to_field='make', null=True)
     driver = models.ForeignKey('Driver', models.CASCADE, to_field='name')
 
     def __str__(self):

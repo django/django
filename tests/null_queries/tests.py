@@ -42,7 +42,11 @@ class NullQueriesTests(TestCase):
 
         # Related managers use __exact=None implicitly if the object hasn't been saved.
         p2 = Poll(question="How?")
-        self.assertEqual(repr(p2.choice_set.all()), '<QuerySet []>')
+
+        msg = '"<Poll: Q: How? >" needs to have a primary key ' \
+              'value before this relationship can be used.'
+        with self.assertRaisesMessage(ValueError, msg):
+            p2.choice_set.all()
 
     def test_reverse_relations(self):
         """

@@ -180,8 +180,8 @@ class ToFieldThroughTests(TestCase):
     def test_m2m_relations_unusable_on_null_to_field(self):
         nullcar = Car(make=None)
         msg = (
-            '"<Car: None>" needs to have a value for field "make" before this '
-            'many-to-many relationship can be used.'
+            '"<Car: None>" needs to have a value for field "make" '
+            'before this many-to-many relationship can be used.'
         )
         with self.assertRaisesMessage(ValueError, msg):
             nullcar.drivers.all()
@@ -245,6 +245,49 @@ class ToFieldThroughTests(TestCase):
         self.driver.car_set._remove_items('driver', 'car', self.car)
         self.assertQuerysetEqual(
             self.driver.car_set.all(), [])
+
+    def test_add_null(self):
+        nullcar = Car.objects.create(make=None)
+        msg = (
+            '"<Car: None>" needs to have a value for field "make"'
+            ' before this many-to-many relationship can be used.'
+        )
+        with self.assertRaisesMessage(ValueError, msg):
+            nullcar.drivers._add_items('car', 'driver', self.unused_driver)
+
+    def test_remove_empty(self):
+        c = Car.objects.create(make=None)
+        msg = (
+            '"<Car: None>" needs to have a value for field "make" '
+            'before this many-to-many relationship can be used.'
+        )
+        with self.assertRaisesMessage(ValueError, msg):
+            c.drivers._remove_items('car', 'drivers', self.driver)
+
+    def test_clear_empty(self):
+        c = Car.objects.create(make=None)
+        msg = (
+            '"<Car: None>" needs to have a value for field "make" '
+            'before this many-to-many relationship can be used.'
+        )
+        with self.assertRaisesMessage(ValueError, msg):
+            c.drivers.clear()
+
+    def test_null_query(self):
+        cd = CarDriver(driver=self.driver)
+        new_car = Car()
+        msg = (
+            '"<Car: None>" needs to have a value for field "make" '
+            'before this many-to-many relationship can be used.'
+        )
+        with self.assertRaisesMessage(ValueError, msg):
+            new_car.drivers
+        new_car.make = 'toyota'
+        new_car.save()
+        self.assertQuerysetEqual(new_car.drivers.all(), [])
+        cd.car = new_car
+        cd.save()
+        self.assertEqual(list(new_car.drivers.all()), [self.driver])
 
 
 class ThroughLoadDataTestCase(TestCase):
