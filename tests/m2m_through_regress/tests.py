@@ -282,7 +282,7 @@ class ToFieldThroughTests(TestCase):
         )
         with self.assertRaisesMessage(ValueError, msg):
             new_car.drivers
-        new_car.make = 'toyota'
+        new_car.make = 'HondaCars'
         new_car.save()
         self.assertQuerysetEqual(new_car.drivers.all(), [])
         cd.car = new_car
