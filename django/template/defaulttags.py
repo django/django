@@ -1418,10 +1418,10 @@ def widthratio(parser, token):
     (because 175/200 = .875; .875 * 100 = 87.5 which is rounded up to 88).
 
     In some cases you might want to capture the result of widthratio in a
-    variable. It can be useful for instance in a blocktrans like this::
+    variable. It can be useful for instance in a blocktranslate like this::
 
         {% widthratio this_value max_value max_width as width %}
-        {% blocktrans %}The width is: {{ width }}{% endblocktrans %}
+        {% blocktranslate %}The width is: {{ width }}{% endblocktranslate %}
     """
     bits = token.split_contents()
     if len(bits) == 4:

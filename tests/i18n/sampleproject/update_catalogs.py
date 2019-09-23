@@ -13,8 +13,7 @@ blocktranslate. This issue is difficult to debug, it could be a problem with
 extraction, interpolation, or both.
 
 How this script helps:
- * Add {% translate "Two %% Three %%%" %} and blocktranslate equivalent to
-   templates.
+ * Add {% translate "Two %% Three %%%" %} and blocktranslate equivalent to templates.
  * Run this script.
  * Test extraction - verify the new msgid in sampleproject's django.po.
  * Add a translation to sampleproject's django.po.

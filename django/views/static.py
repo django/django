@@ -62,10 +62,10 @@ DEFAULT_DIRECTORY_INDEX_TEMPLATE = """
     <meta http-equiv="Content-type" content="text/html; charset=utf-8">
     <meta http-equiv="Content-Language" content="en-us">
     <meta name="robots" content="NONE,NOARCHIVE">
-    <title>{% blocktrans %}Index of {{ directory }}{% endblocktrans %}</title>
+    <title>{% blocktranslate %}Index of {{ directory }}{% endblocktranslate %}</title>
   </head>
   <body>
-    <h1>{% blocktrans %}Index of {{ directory }}{% endblocktrans %}</h1>
+    <h1>{% blocktranslate %}Index of {{ directory }}{% endblocktranslate %}</h1>
     <ul>
       {% if directory != "/" %}
       <li><a href="../">../</a></li>

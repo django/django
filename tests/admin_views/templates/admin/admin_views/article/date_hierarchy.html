@@ -5,5 +5,5 @@
 <select id="date-selector" class="override-date_hierarchy">{% for choice in choices %}
   <option{% if choice.link %} value="{{ choice.link }}"{% endif %}>{{ choice.title }}</option>
 {% endfor %}</select>
-<button id="date-selected">{% trans "Go" %}</button>
+<button id="date-selected">{% translate "Go" %}</button>
 {% endblock %}

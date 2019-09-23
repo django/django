@@ -324,7 +324,7 @@ def do_translate(parser, token):
 
     Usage::
 
-        {% trans "this is a test" %}
+        {% translate "this is a test" %}
 
     This marks the string for translation so it will be pulled out by
     makemessages into the .po files and runs the string through the translation
@@ -332,7 +332,7 @@ def do_translate(parser, token):
 
     There is a second form::
 
-        {% trans "this is a test" noop %}
+        {% translate "this is a test" noop %}
 
     This marks the string for translation, but returns the string unchanged.
     Use it when you need to store values into forms that should be translated
@@ -341,19 +341,19 @@ def do_translate(parser, token):
     You can use variables instead of constant strings
     to translate stuff you marked somewhere else::
 
-        {% trans variable %}
+        {% translate variable %}
 
     This tries to translate the contents of the variable ``variable``. Make
     sure that the string in there is something that is in the .po file.
 
     It is possible to store the translated string into a variable::
 
-        {% trans "this is a test" as var %}
+        {% translate "this is a test" as var %}
         {{ var }}
 
     Contextual translations are also supported::
 
-        {% trans "this is a test" context "greeting" %}
+        {% translate "this is a test" context "greeting" %}
 
     This is equivalent to calling pgettext instead of (u)gettext.
     """
@@ -417,37 +417,37 @@ def do_block_translate(parser, token):
 
     Usage::
 
-        {% blocktrans with bar=foo|filter boo=baz|filter %}
+        {% blocktranslate with bar=foo|filter boo=baz|filter %}
         This is {{ bar }} and {{ boo }}.
-        {% endblocktrans %}
+        {% endblocktranslate %}
 
     Additionally, this supports pluralization::
 
-        {% blocktrans count count=var|length %}
+        {% blocktranslate count count=var|length %}
         There is {{ count }} object.
         {% plural %}
         There are {{ count }} objects.
-        {% endblocktrans %}
+        {% endblocktranslate %}
 
     This is much like ngettext, only in template syntax.
 
     The "var as value" legacy format is still supported::
 
-        {% blocktrans with foo|filter as bar and baz|filter as boo %}
-        {% blocktrans count var|length as count %}
+        {% blocktranslate with foo|filter as bar and baz|filter as boo %}
+        {% blocktranslate count var|length as count %}
 
     The translated string can be stored in a variable using `asvar`::
 
-        {% blocktrans with bar=foo|filter boo=baz|filter asvar var %}
+        {% blocktranslate with bar=foo|filter boo=baz|filter asvar var %}
         This is {{ bar }} and {{ boo }}.
-        {% endblocktrans %}
+        {% endblocktranslate %}
         {{ var }}
 
     Contextual translations are supported::
 
-        {% blocktrans with bar=foo|filter context "greeting" %}
+        {% blocktranslate with bar=foo|filter context "greeting" %}
             This is {{ bar }}.
-        {% endblocktrans %}
+        {% endblocktranslate %}
 
     This is equivalent to calling pgettext/npgettext instead of
     (u)gettext/(u)ngettext.
