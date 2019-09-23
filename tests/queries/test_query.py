@@ -106,3 +106,10 @@ class TestQuery(SimpleTestCase):
         self.assertIsInstance(b_isnull, RelatedIsNull)
         self.assertIsInstance(b_isnull.lhs, SimpleCol)
         self.assertEqual(b_isnull.lhs.target, ObjectC._meta.get_field('objectb'))
+
+    def test_clone_select_related(self):
+        query = Query(Item)
+        query.add_select_related(['creator'])
+        clone = query.clone()
+        clone.add_select_related(['note', 'creator__extra'])
+        self.assertEqual(query.select_related, {'creator': {}})

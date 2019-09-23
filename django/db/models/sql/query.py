@@ -6,6 +6,7 @@ themselves do not have to (and could be backed by things other than SQL
 databases). The abstraction barrier only works one way: this module has to know
 all about the internals of models in order to get the information it needs.
 """
+import copy
 import difflib
 import functools
 import inspect
@@ -324,6 +325,10 @@ class Query(BaseExpression):
             obj._extra_select_cache = None
         else:
             obj._extra_select_cache = self._extra_select_cache.copy()
+        if self.select_related is not False:
+            # Use deepcopy because select_related stores fields in nested
+            # dicts.
+            obj.select_related = copy.deepcopy(obj.select_related)
         if 'subq_aliases' in self.__dict__:
             obj.subq_aliases = self.subq_aliases.copy()
         obj.used_aliases = self.used_aliases.copy()
