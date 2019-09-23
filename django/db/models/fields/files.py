@@ -272,7 +272,7 @@ class FileField(Field):
         return name, path, args, kwargs
 
     def get_internal_type(self):
-        return "FileField"
+        return self.__class__.__name__
 
     def get_prep_value(self, value):
         value = super().get_prep_value(value)
