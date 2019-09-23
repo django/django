@@ -2887,9 +2887,9 @@ Used by the :class:`~django.contrib.auth.views.PasswordResetConfirmView`.
 
 .. note::
 
-   Reducing the value of this timeout doesn't make difference to the ability of
-   an attacker to brute-force a password reset token. Tokens are designed to be
-   safe from brute-forcing without any timeout.
+   Reducing the value of this timeout doesn't make any difference to the
+   ability of an attacker to brute-force a password reset token. Tokens are
+   designed to be safe from brute-forcing without any timeout.
 
    This timeout exists to protect against some unlikely attack scenarios, such
    as someone gaining access to email archives that may contain old, unused
