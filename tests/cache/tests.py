@@ -948,6 +948,7 @@ class BaseCacheTests:
         self.assertEqual(cache.get_or_set('projector', 42), 42)
         self.assertEqual(cache.get('projector'), 42)
         self.assertEqual(cache.get_or_set('null', None), None)
+        self.assertIsNone(cache.get_or_set('null', 'default'))
 
     def test_get_or_set_callable(self):
         def my_callable():
@@ -959,7 +960,8 @@ class BaseCacheTests:
     def test_get_or_set_callable_returning_none(self):
         self.assertIsNone(cache.get_or_set('mykey', lambda: None))
         # Previous get_or_set() doesn't store None in the cache.
-        self.assertEqual(cache.get('mykey', 'default'), 'default')
+        self.assertIsNone(cache.get_or_set('mykey', 'default'))
+        self.assertIsNone(cache.get('mykey', 'default'))
 
     def test_get_or_set_version(self):
         msg = "get_or_set() missing 1 required positional argument: 'default'"
