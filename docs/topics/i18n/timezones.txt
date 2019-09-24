@@ -169,15 +169,18 @@ Add the following middleware to :setting:`MIDDLEWARE`::
     import pytz
 
     from django.utils import timezone
-    from django.utils.deprecation import MiddlewareMixin
 
-    class TimezoneMiddleware(MiddlewareMixin):
-        def process_request(self, request):
+    class TimezoneMiddleware:
+        def __init__(self, get_response):
+            self.get_response = get_response
+
+        def __call__(self, request):
             tzname = request.session.get('django_timezone')
             if tzname:
                 timezone.activate(pytz.timezone(tzname))
             else:
                 timezone.deactivate()
+            return self.get_response(request)
 
 Create a view that can set the current timezone::
 
