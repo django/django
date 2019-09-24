@@ -1,7 +1,7 @@
 import datetime
 
-from django.db import NotSupportedError, connection
-from django.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
+from django.db import connection
+from django.test import TestCase, skipUnlessDBFeature
 from django.test.utils import CaptureQueriesContext
 
 from .models import DumbCategory, NonIntegerPKReturningModel, ReturningModel
@@ -25,7 +25,6 @@ class ReturningValuesTests(TestCase):
         self.assertTrue(obj.created)
         self.assertIsInstance(obj.created, datetime.datetime)
 
-    @skipUnlessDBFeature('can_return_multiple_columns_from_insert')
     def test_insert_returning_multiple(self):
         with CaptureQueriesContext(connection) as captured_queries:
             obj = ReturningModel.objects.create()
@@ -42,19 +41,7 @@ class ReturningValuesTests(TestCase):
         self.assertTrue(obj.pk)
         self.assertIsInstance(obj.created, datetime.datetime)
 
-    @skipIfDBFeature('can_return_multiple_columns_from_insert')
-    def test_insert_returning_multiple_not_supported(self):
-        msg = (
-            'Returning multiple columns from INSERT statements is '
-            'not supported on this database backend.'
-        )
-        with self.assertRaisesMessage(NotSupportedError, msg):
-            ReturningModel.objects.create()
-
-    @skipUnlessDBFeature(
-        'can_return_rows_from_bulk_insert',
-        'can_return_multiple_columns_from_insert',
-    )
+    @skipUnlessDBFeature('can_return_rows_from_bulk_insert')
     def test_bulk_insert(self):
         objs = [ReturningModel(), ReturningModel(pk=2 ** 11), ReturningModel()]
         ReturningModel.objects.bulk_create(objs)

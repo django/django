@@ -1334,14 +1334,6 @@ class SQLInsertCompiler(SQLCompiler):
             if self.connection.features.can_return_rows_from_bulk_insert and len(self.query.objs) > 1:
                 return self.connection.ops.fetch_returned_insert_rows(cursor)
             if self.connection.features.can_return_columns_from_insert:
-                if (
-                    len(self.returning_fields) > 1 and
-                    not self.connection.features.can_return_multiple_columns_from_insert
-                ):
-                    raise NotSupportedError(
-                        'Returning multiple columns from INSERT statements is '
-                        'not supported on this database backend.'
-                    )
                 assert len(self.query.objs) == 1
                 return self.connection.ops.fetch_returned_insert_columns(cursor, self.returning_params)
             return [self.connection.ops.last_insert_id(
