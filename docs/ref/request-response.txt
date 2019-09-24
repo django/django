@@ -286,16 +286,17 @@ Methods
         behind multiple proxies. One solution is to use middleware to rewrite
         the proxy headers, as in the following example::
 
-            from django.utils.deprecation import MiddlewareMixin
-
-            class MultipleProxyMiddleware(MiddlewareMixin):
+            class MultipleProxyMiddleware:
                 FORWARDED_FOR_FIELDS = [
                     'HTTP_X_FORWARDED_FOR',
                     'HTTP_X_FORWARDED_HOST',
                     'HTTP_X_FORWARDED_SERVER',
                 ]
 
-                def process_request(self, request):
+                def __init__(self, get_response):
+                    self.get_response = get_response
+
+                def __call__(self, request):
                     """
                     Rewrites the proxy headers so that only the most
                     recent proxy is used.
@@ -305,6 +306,7 @@ Methods
                             if ',' in request.META[field]:
                                 parts = request.META[field].split(',')
                                 request.META[field] = parts[-1].strip()
+                    return self.get_response(request)
 
         This middleware should be positioned before any other middleware that
         relies on the value of :meth:`~HttpRequest.get_host()` -- for instance,
