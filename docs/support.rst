@@ -5,7 +5,7 @@ If you have questions about Channels, need debugging help or technical support, 
 
 - `Stack Overflow <https://www.stackoverflow.com>`_
 - The `Django Users mailing list <https://groups.google.com/forum/#!forum/django-users>`_ (django-users@googlegroups.com)
-- The Channels support channel on the `PySlackers Slack group <https://pyslackers.com/>`_
+- The #django channel on the `PySlackers Slack group <https://pyslackers.com/>`_
 
 If you have a concrete bug or feature request (one that is clear and actionable), please file an issue against the
 appropriate GitHub project.
