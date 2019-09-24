@@ -161,7 +161,7 @@ class BaseCache:
         Return the value of the key stored or retrieved.
         """
         val = self.get(key, default, version=version)
-        if val in [None,default]:
+        if val in [None, default]:
             if callable(default):
                 default = default()
             self.add(key, default, timeout=timeout, version=version)
