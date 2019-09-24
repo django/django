@@ -678,6 +678,7 @@ Django can serialize the following:
 - :func:`functools.partial` and :class:`functools.partialmethod` instances
   which have serializable ``func``, ``args``, and ``keywords`` values.
 - ``LazyObject`` instances which wrap a serializable value.
+- Enumeration types (e.g. ``TextChoices`` or ``IntegerChoices``) instances.
 - Any Django field
 - Any function or method reference (e.g. ``datetime.datetime.today``) (must be in module's top-level scope)
 - Unbound methods used from within the class body
