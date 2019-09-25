@@ -206,6 +206,12 @@ Defining and sending signals
 Your applications can take advantage of the signal infrastructure and provide
 its own signals.
 
+.. admonition:: When to use custom signals
+
+    Signals are implicit function calls which make debugging harder. If the
+    sender and receiver of your custom signal are both within your project,
+    you're better off using an explicit function call.
+
 Defining signals
 ----------------
 
