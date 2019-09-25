@@ -172,7 +172,7 @@ class MemcachedCache(BaseMemcachedCache):
         key = self.make_key(key, version=version)
         return self._cache.touch(key, self.get_backend_timeout(timeout)) != 0
 
-    def __get(self, memcache, cmd, key, default):
+    def __get(self, memcache, key, default):
 
         # python-memcached doesn't support default values in get().
         # this method will help us in getting the default value if
@@ -183,6 +183,7 @@ class MemcachedCache(BaseMemcachedCache):
         # https://github.com/linsomniac/python-memcached/issues/159
         # Remove this method if that issue is fixed.
 
+        cmd = 'get'
         key = memcache._encode_key(key)
         if memcache.do_check_key:
             memcache.check_key(key)
@@ -229,7 +230,7 @@ class MemcachedCache(BaseMemcachedCache):
 
     def get(self, key, default=None, version=None):
         key = self.make_key(key, version=version)
-        val = self.__get(self._cache, 'get', key, default)
+        val = self.__get(self._cache, key, default)
         return val
 
 

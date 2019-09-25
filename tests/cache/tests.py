@@ -961,7 +961,6 @@ class BaseCacheTests:
         self.assertIsNone(cache.get_or_set('mykey', lambda: None))
         # Previous get_or_set() doesn't store None in the cache.
         self.assertIsNone(cache.get_or_set('mykey', 'default'))
-        self.assertIsNone(cache.get('mykey', 'default'))
 
     def test_get_or_set_version(self):
         msg = "get_or_set() missing 1 required positional argument: 'default'"
@@ -1378,7 +1377,7 @@ class MemcachedCacheTests(BaseMemcachedTests, TestCase):
         overrides the one in BaseCacheTests.
         """
         cache.set('key_default_none', None)
-        self.assertEqual(cache.get('key_default_none', default='default'), 'default')
+        self.assertEqual(cache.get('key_default_none', default='default'), None)
 
 
 @unittest.skipUnless(PyLibMCCache_params, "PyLibMCCache backend not configured")
