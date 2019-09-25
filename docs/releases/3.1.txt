@@ -259,6 +259,11 @@ Utilities
 * :func:`~django.utils.dateparse.parse_duration` now supports comma separators
   for decimal fractions in the ISO 8601 format.
 
+* :func:`~django.utils.dateparse.parse_datetime`,
+  :func:`~django.utils.dateparse.parse_duration`, and
+  :func:`~django.utils.dateparse.parse_time` now support comma separators for
+  milliseconds.
+
 Validators
 ~~~~~~~~~~
 
