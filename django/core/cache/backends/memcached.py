@@ -2,10 +2,21 @@
 
 import pickle
 import re
+import socket
 import time
+
+import six
 
 from django.core.cache.backends.base import DEFAULT_TIMEOUT, BaseCache
 from django.utils.functional import cached_property
+
+
+class _Error(Exception):
+    pass
+
+
+class _ConnectionDeadError(Exception):
+    pass
 
 
 class BaseMemcachedCache(BaseCache):
@@ -144,6 +155,7 @@ class BaseMemcachedCache(BaseCache):
 
 class MemcachedCache(BaseMemcachedCache):
     "An implementation of a cache binding using python-memcached"
+
     def __init__(self, server, params):
         import memcache
         super().__init__(server, params, library=memcache, value_not_found_exception=ValueError)
@@ -160,19 +172,70 @@ class MemcachedCache(BaseMemcachedCache):
         key = self.make_key(key, version=version)
         return self._cache.touch(key, self.get_backend_timeout(timeout)) != 0
 
-    def get(self, key, default=None, version=None):
-        key = self.make_key(key, version=version)
-        val = self._cache.get(key)
+    def __get(self, memcache, cmd, key, default):
+
         # python-memcached doesn't support default values in get().
+        # this method will help us in getting the default value if
+        # key doesn't exist, if the Key exists with None as value then
+        # it will return None instead of giving default value.
+        # It will help us in get_or_set to determine if we already
+        # have a key with None or not.
         # https://github.com/linsomniac/python-memcached/issues/159
         # Remove this method if that issue is fixed.
-        if val is None:
-            return default
+
+        key = memcache._encode_key(key)
+        if memcache.do_check_key:
+            memcache.check_key(key)
+        server, key = memcache._get_server(key)
+        if not server:
+            return None
+
+        def _unsafe_get():
+            memcache._statlog(cmd)
+
+            try:
+                cmd_bytes = cmd.encode('utf-8') if six.PY3 else cmd
+                fullcmd = b''.join((cmd_bytes, b' ', key))
+                server.send_cmd(fullcmd)
+                rkey, flags, rlen, = memcache._expectvalue(
+                    server, raise_exception=True
+                )
+
+                if not rkey:
+                    return default
+                try:
+                    value = memcache._recv_value(server, flags, rlen)
+                finally:
+                    server.expect(b"END", raise_exception=True)
+            except (_Error, socket.error) as msg:
+                if isinstance(msg, tuple):
+                    msg = msg[1]
+                server.mark_dead(msg)
+                return None
+
+            return value
+
+        try:
+            return _unsafe_get()
+        except _ConnectionDeadError:
+            # retry once
+            try:
+                if server.connect():
+                    return _unsafe_get()
+                return None
+            except (_ConnectionDeadError, socket.error) as msg:
+                server.mark_dead(msg)
+            return None
+
+    def get(self, key, default=None, version=None):
+        key = self.make_key(key, version=version)
+        val = self.__get(self._cache, 'get', key, default)
         return val
 
 
 class PyLibMCCache(BaseMemcachedCache):
     "An implementation of a cache binding using pylibmc"
+
     def __init__(self, server, params):
         import pylibmc
         super().__init__(server, params, library=pylibmc, value_not_found_exception=pylibmc.NotFound)
