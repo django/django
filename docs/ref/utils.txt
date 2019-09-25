@@ -139,6 +139,10 @@ The functions defined in this module share the following properties:
     UTC offsets aren't supported; if ``value`` describes one, the result is
     ``None``.
 
+    .. versionchanged:: 3.1
+
+        Support for comma separators for milliseconds was added.
+
 .. function:: parse_datetime(value)
 
     Parses a string and returns a :class:`datetime.datetime`.
@@ -146,18 +150,23 @@ The functions defined in this module share the following properties:
     UTC offsets are supported; if ``value`` describes one, the result's
     ``tzinfo`` attribute is a :class:`datetime.timezone` instance.
 
+    .. versionchanged:: 3.1
+
+        Support for comma separators for milliseconds was added.
+
 .. function:: parse_duration(value)
 
     Parses a string and returns a :class:`datetime.timedelta`.
 
-    Expects data in the format ``"DD HH:MM:SS.uuuuuu"`` or as specified by ISO
-    8601 (e.g. ``P4DT1H15M20S`` which is equivalent to ``4 1:15:20``) or
-    PostgreSQL's day-time interval format (e.g. ``3 days 04:05:06``).
+    Expects data in the format ``"DD HH:MM:SS.uuuuuu"``,
+    ``"DD HH:MM:SS,uuuuuu"``,  or as specified by ISO 8601 (e.g.
+    ``P4DT1H15M20S`` which is equivalent to ``4 1:15:20``) or PostgreSQL's
+    day-time interval format (e.g. ``3 days 04:05:06``).
 
     .. versionchanged:: 3.1
 
         Support for comma separators for decimal fractions in the ISO 8601
-        format was added.
+        format and for the format ``"DD HH:MM:SS,uuuuuu"`` was added.
 
 ``django.utils.decorators``
 ===========================
