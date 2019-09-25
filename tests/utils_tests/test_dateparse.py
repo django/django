@@ -23,6 +23,7 @@ class DateParseTests(unittest.TestCase):
         self.assertEqual(parse_time('09:15:00'), time(9, 15))
         self.assertEqual(parse_time('10:10'), time(10, 10))
         self.assertEqual(parse_time('10:20:30.400'), time(10, 20, 30, 400000))
+        self.assertEqual(parse_time('10:20:30,400'), time(10, 20, 30, 400000))
         self.assertEqual(parse_time('4:8:16'), time(4, 8, 16))
         # Invalid inputs
         self.assertIsNone(parse_time('091500'))
@@ -38,6 +39,7 @@ class DateParseTests(unittest.TestCase):
             ('2012-04-23T10:20:30.400+02:30', datetime(2012, 4, 23, 10, 20, 30, 400000, get_fixed_timezone(150))),
             ('2012-04-23T10:20:30.400+02', datetime(2012, 4, 23, 10, 20, 30, 400000, get_fixed_timezone(120))),
             ('2012-04-23T10:20:30.400-02', datetime(2012, 4, 23, 10, 20, 30, 400000, get_fixed_timezone(-120))),
+            ('2012-04-23T10:20:30,400-02', datetime(2012, 4, 23, 10, 20, 30, 400000, get_fixed_timezone(-120))),
         )
         for source, expected in valid_inputs:
             with self.subTest(source=source):
