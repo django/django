@@ -656,7 +656,6 @@ class WatchmanReloaderTests(ReloaderTests, IntegrationTests):
         self.assertEqual(self.RELOADER_CLS().client_timeout, 10)
 
 
-
 @skipIf(on_macos_with_hfs(), "These tests do not work with HFS+ as a filesystem")
 class StatReloaderTests(ReloaderTests, IntegrationTests):
     RELOADER_CLS = autoreload.StatReloader
