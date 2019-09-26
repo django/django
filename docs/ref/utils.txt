@@ -945,11 +945,14 @@ appropriate entities.
     post-transition respectively.
 
     The ``pytz.NonExistentTimeError`` exception is raised if you try to make
-    ``value`` aware during a DST transition such that the time never occurred
-    (when entering into DST). Setting ``is_dst`` to ``True`` or ``False`` will
-    avoid the exception by moving the hour backwards or forwards by 1
-    respectively. For example, ``is_dst=True`` would change a nonexistent
-    time of 2:30 to 1:30 and ``is_dst=False`` would change the time to 3:30.
+    ``value`` aware during a DST transition such that the time never occurred.
+    For example, if the 2:00 hour is skipped during a DST transition, trying to
+    make 2:30 aware in that time zone will raise an exception. To avoid that
+    you can use ``is_dst`` to specify how ``make_aware()`` should interpret
+    such a nonexistent time. If ``is_dst=True`` then the above time would be
+    interpreted as 2:30 DST time (equivalent to 1:30 local time). Conversely,
+    if ``is_dst=False`` the time would be interpreted as 2:30 standard time
+    (equivalent to 3:30 local time).
 
 .. function:: make_naive(value, timezone=None)
 
