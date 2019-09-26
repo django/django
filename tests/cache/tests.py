@@ -2188,6 +2188,29 @@ class CacheMiddlewareTest(SimpleTestCase):
         response = other_with_prefix_view(request, '16')
         self.assertEqual(response.content, b'Hello World 16')
 
+    def test_cache_page_timeout(self):
+        # Page timeout takes precedence over the "max-age" section of the
+        # "Cache-Control".
+        tests = [
+            (1, 3),  # max_age < page_timeout.
+            (3, 1),  # max_age > page_timeout.
+        ]
+        for max_age, page_timeout in tests:
+            with self.subTest(max_age=max_age, page_timeout=page_timeout):
+                view = cache_page(timeout=page_timeout)(
+                    cache_control(max_age=max_age)(hello_world_view)
+                )
+                request = self.factory.get('/view/')
+                response = view(request, '1')
+                self.assertEqual(response.content, b'Hello World 1')
+                time.sleep(1)
+                response = view(request, '2')
+                self.assertEqual(
+                    response.content,
+                    b'Hello World 1' if page_timeout > max_age else b'Hello World 2',
+                )
+            cache.clear()
+
     def test_cached_control_private_not_cached(self):
         """Responses with 'Cache-Control: private' are not cached."""
         view_with_private_cache = cache_page(3)(cache_control(private=True)(hello_world_view))

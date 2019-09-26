@@ -430,6 +430,10 @@ Miscellaneous
   used with :setting:`DEFAULT_EXCEPTION_REPORTER_FILTER` needs to inherit from
   :class:`django.views.debug.SafeExceptionReporterFilter`.
 
+* The cache timeout set by :func:`~django.views.decorators.cache.cache_page`
+  decorator now takes precedence over the ``max-age`` directive from the
+  ``Cache-Control`` header.
+
 .. _deprecated-features-3.1:
 
 Features deprecated in 3.1
