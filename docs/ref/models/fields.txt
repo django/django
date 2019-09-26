@@ -583,6 +583,12 @@ or :class:`~django.forms.NullBooleanSelect` if :attr:`null=True <Field.null>`.
 The default value of ``BooleanField`` is ``None`` when :attr:`Field.default`
 isn't defined.
 
+.. versionchanged:: 2.1
+
+    In older versions (pre 2.1), this field was ``blank=True`` implicitly.
+    Now it is ``blank=False`` as default. If you need the old behavior please
+    add ``blank=True``.
+
 ``CharField``
 -------------
 
