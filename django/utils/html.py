@@ -8,7 +8,7 @@ from urllib.parse import (
     parse_qsl, quote, unquote, urlencode, urlsplit, urlunsplit,
 )
 
-from django.utils.encoding import punycode
+from django.utils.encoding import punycode, iri_to_uri
 from django.utils.functional import Promise, keep_lazy, keep_lazy_text
 from django.utils.http import RFC3986_GENDELIMS, RFC3986_SUBDELIMS
 from django.utils.safestring import SafeData, SafeString, mark_safe
@@ -197,6 +197,10 @@ def strip_spaces_between_tags(value):
 def smart_urlquote(url):
     """Quote a URL if it isn't already quoted."""
     def unquote_quote(segment):
+        # Special case where segment is already quoted on non-quotable character '/'
+        if '%2F' in segment:
+            return iri_to_uri(segment)
+
         segment = unquote(segment)
         # Tilde is part of RFC3986 Unreserved Characters
         # https://tools.ietf.org/html/rfc3986#section-2.3
