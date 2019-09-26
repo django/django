@@ -36,5 +36,5 @@
 {% endif %}
 {% if display_wkt %}<p>{% trans "WKT debugging window:" %} </p>{% endif %}
 <textarea id="{{ id }}" class="vWKTField required" cols="150" rows="10" name="{{ name }}">{{ wkt }}</textarea>
-<script type="text/javascript">{% block init_function %}{{ module }}.init();{% endblock %}</script>
+<script type="text/javascript">{% block init_function %}jQuery(document).ready(function ($){{{ module }}.init();});{% endblock %}</script>
 </span>
