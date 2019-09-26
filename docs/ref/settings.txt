@@ -1228,8 +1228,12 @@ specify a particular storage system. See :doc:`/topics/files`.
 Default: ``'webmaster@localhost'``
 
 Default email address to use for various automated correspondence from the
-site manager(s). This doesn't include error messages sent to :setting:`ADMINS`
-and :setting:`MANAGERS`; for that, see :setting:`SERVER_EMAIL`.
+site manager(s). The value should be a tuple containing two strings,
+`(name, address)`,  or a string in the form of `name <email@example.com>`.
+This doesn't include error messages sent to :setting:`ADMINS` and
+:setting:`MANAGERS`; for that, see :setting:`SERVER_EMAIL`.
+
+
 
 .. setting:: DEFAULT_INDEX_TABLESPACE
 
