@@ -398,7 +398,8 @@ class ManifestFilesMixin(HashedFilesMixin):
     def post_process(self, *args, **kwargs):
         self.hashed_files = {}
         yield from super().post_process(*args, **kwargs)
-        self.save_manifest()
+        if not kwargs.get('dry_run'):
+            self.save_manifest()
 
     def save_manifest(self):
         payload = {'paths': self.hashed_files, 'version': self.manifest_version}

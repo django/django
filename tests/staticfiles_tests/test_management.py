@@ -392,6 +392,11 @@ class TestCollectionFilesOverride(CollectionTestCase):
         self.assertFileContains('file2.txt', 'duplicate of file2.txt')
 
 
+@override_settings(STATICFILES_STORAGE='django.contrib.staticfiles.storage.ManifestStaticFilesStorage')
+class TestCollectionDryRunManifestStaticFilesStorage(TestCollectionDryRun):
+    pass
+
+
 # The collectstatic test suite already has conflicting files since both
 # project/test/file.txt and apps/test/static/test/file.txt are collected. To
 # properly test for the warning not happening unless we tell it to explicitly,
