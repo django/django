@@ -260,6 +260,11 @@ class Query(BaseExpression):
         done by the database interface at execution time.
         """
         sql, params = self.sql_with_params()
+
+        cursor = self.get_compiler(DEFAULT_DB_ALIAS).connection.cursor()
+        if hasattr(cursor, 'mogrify'):
+            return cursor.mogrify(sql, params).decode('utf-8')
+
         return sql % params
 
     def sql_with_params(self):

@@ -540,7 +540,7 @@ class LookupTransformCallOrderTests(SimpleTestCase):
                              ['lookup'])
 
 
-class CustomisedMethodsTests(SimpleTestCase):
+class CustomisedMethodsTests(TestCase):
 
     def test_overridden_get_lookup(self):
         q = CustomModel.objects.filter(field__lookupfunc_monkeys=3)

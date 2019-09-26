@@ -3532,7 +3532,7 @@ class Ticket20101Tests(TestCase):
         self.assertIn(n, (qs1 | qs2))
 
 
-class EmptyStringPromotionTests(SimpleTestCase):
+class EmptyStringPromotionTests(TestCase):
     def test_empty_string_promotion(self):
         qs = RelatedObject.objects.filter(single__name='')
         if connection.features.interprets_empty_strings_as_nulls:
@@ -3571,7 +3571,7 @@ class DoubleInSubqueryTests(TestCase):
         self.assertSequenceEqual(qs, [lfb1])
 
 
-class Ticket18785Tests(SimpleTestCase):
+class Ticket18785Tests(TestCase):
     def test_ticket_18785(self):
         # Test join trimming from ticket18785
         qs = Item.objects.exclude(
