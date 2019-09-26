@@ -76,10 +76,6 @@ on upstream/master::
 The -b flag creates a new branch for you locally. Don't hesitate to create new
 branches even for the smallest things - that's what they are there for.
 
-If instead you were working for a fix on the 1.4 branch, you would do::
-
-    git checkout -b ticket_xxxxx_1_4 upstream/stable/1.4.x
-
 Assume the work is carried on the ticket_xxxxx branch. Make some changes and
 commit them::
 
