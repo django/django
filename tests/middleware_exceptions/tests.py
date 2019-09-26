@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.core.exceptions import MiddlewareNotUsed
+from django.http import HttpResponse
 from django.test import RequestFactory, SimpleTestCase, override_settings
 
 from . import middleware as mw
@@ -114,7 +115,7 @@ class RootUrlconfTests(SimpleTestCase):
 
 class MyMiddleware:
 
-    def __init__(self, get_response=None):
+    def __init__(self, get_response):
         raise MiddlewareNotUsed
 
     def process_request(self, request):
@@ -123,7 +124,7 @@ class MyMiddleware:
 
 class MyMiddlewareWithExceptionMessage:
 
-    def __init__(self, get_response=None):
+    def __init__(self, get_response):
         raise MiddlewareNotUsed('spam eggs')
 
     def process_request(self, request):
@@ -142,7 +143,7 @@ class MiddlewareNotUsedTests(SimpleTestCase):
     def test_raise_exception(self):
         request = self.rf.get('middleware_exceptions/view/')
         with self.assertRaises(MiddlewareNotUsed):
-            MyMiddleware().process_request(request)
+            MyMiddleware(lambda req: HttpResponse()).process_request(request)
 
     @override_settings(MIDDLEWARE=['middleware_exceptions.tests.MyMiddleware'])
     def test_log(self):

@@ -1,7 +1,7 @@
 import re
 
 from django.forms import CharField, Form, Media
-from django.http import HttpRequest
+from django.http import HttpRequest, HttpResponse
 from django.middleware.csrf import (
     CsrfViewMiddleware, _compare_salted_tokens as equivalent_tokens, get_token,
 )
@@ -76,7 +76,7 @@ class TemplateStringsTests(SimpleTestCase):
 
     def test_csrf_token(self):
         request = HttpRequest()
-        CsrfViewMiddleware().process_view(request, lambda r: None, (), {})
+        CsrfViewMiddleware(lambda req: HttpResponse()).process_view(request, lambda r: None, (), {})
 
         template = self.engine.get_template('template_backends/csrf.html')
         content = template.render(request=request)

@@ -4,21 +4,22 @@ from django.test.utils import override_settings
 
 
 class SecurityMiddlewareTest(SimpleTestCase):
-    @property
-    def middleware(self):
+    def middleware(self, *args, **kwargs):
         from django.middleware.security import SecurityMiddleware
-        return SecurityMiddleware()
+        return SecurityMiddleware(self.response(*args, **kwargs))
 
     @property
     def secure_request_kwargs(self):
         return {"wsgi.url_scheme": "https"}
 
     def response(self, *args, headers=None, **kwargs):
-        response = HttpResponse(*args, **kwargs)
-        if headers:
-            for k, v in headers.items():
-                response[k] = v
-        return response
+        def get_response(req):
+            response = HttpResponse(*args, **kwargs)
+            if headers:
+                for k, v in headers.items():
+                    response[k] = v
+            return response
+        return get_response
 
     def process_response(self, *args, secure=False, request=None, **kwargs):
         request_kwargs = {}
@@ -26,11 +27,10 @@ class SecurityMiddlewareTest(SimpleTestCase):
             request_kwargs.update(self.secure_request_kwargs)
         if request is None:
             request = self.request.get("/some/url", **request_kwargs)
-        ret = self.middleware.process_request(request)
+        ret = self.middleware(*args, **kwargs).process_request(request)
         if ret:
             return ret
-        return self.middleware.process_response(
-            request, self.response(*args, **kwargs))
+        return self.middleware(*args, **kwargs)(request)
 
     request = RequestFactory()
 
@@ -38,7 +38,7 @@ class SecurityMiddlewareTest(SimpleTestCase):
         if secure:
             kwargs.update(self.secure_request_kwargs)
         req = getattr(self.request, method.lower())(*args, **kwargs)
-        return self.middleware.process_request(req)
+        return self.middleware().process_request(req)
 
     @override_settings(SECURE_HSTS_SECONDS=3600)
     def test_sts_on(self):

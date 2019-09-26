@@ -295,8 +295,8 @@ middleware classes that are compatible with both :setting:`MIDDLEWARE` and the
 old ``MIDDLEWARE_CLASSES``. All middleware classes included with Django
 are compatible with both settings.
 
-The mixin provides an ``__init__()`` method that accepts an optional
-``get_response`` argument and stores it in ``self.get_response``.
+The mixin provides an ``__init__()`` method that requires a ``get_response``
+argument and stores it in ``self.get_response``.
 
 The ``__call__()`` method:
 

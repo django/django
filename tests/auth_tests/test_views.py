@@ -25,7 +25,7 @@ from django.contrib.sessions.middleware import SessionMiddleware
 from django.contrib.sites.requests import RequestSite
 from django.core import mail
 from django.db import connection
-from django.http import HttpRequest
+from django.http import HttpRequest, HttpResponse
 from django.middleware.csrf import CsrfViewMiddleware, get_token
 from django.test import Client, TestCase, override_settings
 from django.test.client import RedirectCycleError
@@ -650,15 +650,17 @@ class LoginTest(AuthViewsTestCase):
         """
         Makes sure that a login rotates the currently-used CSRF token.
         """
+        def get_response(request):
+            return HttpResponse()
+
         # Do a GET to establish a CSRF token
         # The test client isn't used here as it's a test for middleware.
         req = HttpRequest()
-        CsrfViewMiddleware().process_view(req, LoginView.as_view(), (), {})
+        CsrfViewMiddleware(get_response).process_view(req, LoginView.as_view(), (), {})
         # get_token() triggers CSRF token inclusion in the response
         get_token(req)
-        resp = LoginView.as_view()(req)
-        resp2 = CsrfViewMiddleware().process_response(req, resp)
-        csrf_cookie = resp2.cookies.get(settings.CSRF_COOKIE_NAME, None)
+        resp = CsrfViewMiddleware(LoginView.as_view())(req)
+        csrf_cookie = resp.cookies.get(settings.CSRF_COOKIE_NAME, None)
         token1 = csrf_cookie.coded_value
 
         # Prepare the POST request
@@ -668,13 +670,12 @@ class LoginTest(AuthViewsTestCase):
         req.POST = {'username': 'testclient', 'password': 'password', 'csrfmiddlewaretoken': token1}
 
         # Use POST request to log in
-        SessionMiddleware().process_request(req)
-        CsrfViewMiddleware().process_view(req, LoginView.as_view(), (), {})
+        SessionMiddleware(get_response).process_request(req)
+        CsrfViewMiddleware(get_response).process_view(req, LoginView.as_view(), (), {})
         req.META["SERVER_NAME"] = "testserver"  # Required to have redirect work in login view
         req.META["SERVER_PORT"] = 80
-        resp = LoginView.as_view()(req)
-        resp2 = CsrfViewMiddleware().process_response(req, resp)
-        csrf_cookie = resp2.cookies.get(settings.CSRF_COOKIE_NAME, None)
+        resp = CsrfViewMiddleware(LoginView.as_view())(req)
+        csrf_cookie = resp.cookies.get(settings.CSRF_COOKIE_NAME, None)
         token2 = csrf_cookie.coded_value
 
         # Check the CSRF token switched
