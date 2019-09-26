@@ -334,6 +334,11 @@ class TestCollectionDryRun(TestNoFilesCreated, CollectionTestCase):
         super().run_collectstatic(dry_run=True)
 
 
+@override_settings(STATICFILES_STORAGE='django.contrib.staticfiles.storage.ManifestStaticFilesStorage')
+class TestCollectionDryRunManifestStaticFilesStorage(TestCollectionDryRun):
+    pass
+
+
 class TestCollectionFilesOverride(CollectionTestCase):
     """
     Test overriding duplicated files by ``collectstatic`` management command.
