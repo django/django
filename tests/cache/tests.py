@@ -1705,6 +1705,12 @@ class CacheUtils(SimpleTestCase):
             ('', {'no-cache': 'Set-Cookie'}, {'no-cache=Set-Cookie'}),
             ('no-cache=Set-Cookie', {'no_cache': True}, {'no-cache'}),
             ('no-cache=Set-Cookie,no-cache=Link', {'no_cache': True}, {'no-cache'}),
+            ('no-cache=Set-Cookie', {'no_cache': 'Link'}, {'no-cache=Set-Cookie', 'no-cache=Link'}),
+            (
+                'no-cache=Set-Cookie,no-cache=Link',
+                {'no_cache': 'Custom'},
+                {'no-cache=Set-Cookie', 'no-cache=Link', 'no-cache=Custom'},
+            ),
             # Test whether private/public attributes are mutually exclusive
             ('private', {'private': True}, {'private'}),
             ('private', {'public': True}, {'public'}),

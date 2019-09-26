@@ -43,6 +43,11 @@ need to distinguish caches by the ``Accept-language`` header.
     * All other parameters are added with their value, after applying
       ``str()`` to it.
 
+    .. versionchanged:: 3.1
+
+        Support for multiple field names in the ``no-cache`` directive was
+        added.
+
 .. function:: get_max_age(response)
 
     Returns the max-age from the response Cache-Control header as an integer

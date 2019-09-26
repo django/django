@@ -1277,6 +1277,7 @@ Here are some more examples:
 * ``no_transform=True``
 * ``must_revalidate=True``
 * ``stale_while_revalidate=num_seconds``
+* ``no_cache=True``
 
 The full list of known directives can be found in the `IANA registry`_
 (note that not all of them apply to responses).

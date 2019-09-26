@@ -104,7 +104,10 @@ Minor features
 Cache
 ~~~~~
 
-* ...
+* The :func:`~django.views.decorators.cache.cache_control` decorator and
+  :func:`~django.utils.cache.patch_cache_control` method now support multiple
+  field names in the ``no-cache`` directive for the ``Cache-Control`` header,
+  according to :rfc:`7234#section-5.2.2.2`.
 
 CSRF
 ~~~~
