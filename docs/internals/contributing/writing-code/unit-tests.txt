@@ -135,6 +135,15 @@ necessary for the majority of patches. To run the JavaScript tests using
 This command runs ``npm install`` to ensure test requirements are up to
 date and then runs ``npm test``.
 
+Running tests using ``django-docker-box``
+-----------------------------------------
+
+`django-docker-box`_ allows you to run the Django's test suite across all
+supported databases and python versions. See the `django-docker-box`_ project
+page for installation and usage instructions.
+
+.. _django-docker-box: https://github.com/django/django-docker-box
+
 .. _running-unit-tests-settings:
 
 Using another ``settings`` module
