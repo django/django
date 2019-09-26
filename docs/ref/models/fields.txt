@@ -459,6 +459,10 @@ isn't defined.
     use :class:`NullBooleanField` instead. Using the latter is now discouraged
     as it's likely to be deprecated in a future version of Django.
 
+    In older versions, this field was ``blank=True`` implicitly. Now it is
+    ``blank=False`` as default. If you need the old behavior please add
+    ``blank=True``.
+
 ``CharField``
 -------------
 
