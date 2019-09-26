@@ -5,12 +5,12 @@ from decimal import Decimal
 from django import template
 from django.conf import settings
 from django.template import defaultfilters
-from django.utils.formats import number_format
+from django.utils.formats import number_format, get_format
 from django.utils.safestring import mark_safe
 from django.utils.timezone import is_aware, utc
 from django.utils.translation import (
     gettext as _, gettext_lazy, ngettext, ngettext_lazy, npgettext_lazy,
-    pgettext, round_away_from_one,
+    pgettext, round_away_from_one, get_language
 )
 
 register = template.Library()
@@ -60,8 +60,10 @@ def ordinal(value):
 @register.filter(is_safe=True)
 def intcomma(value, use_l10n=True):
     """
-    Convert an integer to a string containing commas every three digits.
-    For example, 3000 becomes '3,000' and 45000 becomes '45,000'.
+    Convert an integer to a string containing commas (or period, depending
+    on locale) every three digits.
+    en-US example: 3000 becomes '3,000' and 45000.25 becomes '45,000.25'
+    de-DE example: 3000 becomes '3.000' and 45000.25 becomes '45.000,25'
     """
     if settings.USE_L10N and use_l10n:
         try:
@@ -72,8 +74,12 @@ def intcomma(value, use_l10n=True):
         else:
             return number_format(value, force_grouping=True)
     orig = str(value)
-    new = re.sub(r"^(-?\d+)(\d{3})", r'\g<1>,\g<2>', orig)
+    new = re.sub(r"^(-?\d+)(\d{3})", r'\g<1>X\g<2>', orig)
+    lang = get_language()
     if orig == new:
+        new = re.sub(r"\.", r"Y", new)
+        new = re.sub(r"Y", get_format('DECIMAL_SEPARATOR', lang), new)
+        new = re.sub(r"X", get_format('THOUSAND_SEPARATOR', lang), new)
         return new
     else:
         return intcomma(new, use_l10n)
