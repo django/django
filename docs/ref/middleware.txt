@@ -95,8 +95,8 @@ GZip middleware
     .. _the BREACH paper (PDF): http://breachattack.com/resources/BREACH%20-%20SSL,%20gone%20in%2030%20seconds.pdf
     .. _breachattack.com: http://breachattack.com
 
-Compresses content for browsers that understand GZip compression (all modern
-browsers).
+The ``django.middleware.gzip.GZipMiddleware`` compresses content for browsers
+that understand GZip compression (all modern browsers).
 
 This middleware should be placed before any other middleware that need to
 read or write the response body so that compression happens afterward.
