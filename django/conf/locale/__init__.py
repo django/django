@@ -536,6 +536,12 @@ LANG_INFO = {
         'name': 'Urdu',
         'name_local': 'اردو',
     },
+    'uz': {
+        'bidi': False,
+        'code': 'uz',
+        'name': 'Uzbek',
+        'name_local': 'oʻzbek tili',
+    },
     'vi': {
         'bidi': False,
         'code': 'vi',

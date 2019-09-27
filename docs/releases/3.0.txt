@@ -219,6 +219,8 @@ Internationalization
   language cookies. The default values of these settings preserve the previous
   behavior.
 
+* Added support and translations for the Uzbek language.
+
 Logging
 ~~~~~~~
 
