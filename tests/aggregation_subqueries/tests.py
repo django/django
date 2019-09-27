@@ -2,7 +2,7 @@ import datetime
 
 from django.conf import settings
 from django.db.models import (
-    Count, DateTimeField, Exists, F, Max, Min, OuterRef, Q, Sum
+    Count, DateTimeField, Exists, F, Max, Min, OuterRef, Q, Sum,
 )
 from django.db.models.functions import Coalesce, Cast
 from django.test import TestCase
