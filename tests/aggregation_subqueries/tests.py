@@ -90,7 +90,11 @@ class TestParentChild(TestCase):
 
         parents = Parent.objects.filter(name='John').annotate(**annotation)
 
-        oldest_child = Child.objects.filter(parent__name='John').order_by(Coalesce('other_timestamp', 'timestamp').asc())[0]
+        oldest_child = Child.objects.filter(
+            parent__name='John'
+        ).order_by(
+            Coalesce('other_timestamp', 'timestamp').asc()
+        )[0]
 
         self.assertEqual(parents[0].oldest_child_with_other, oldest_child.other_timestamp or oldest_child.timestamp)
 
@@ -408,7 +412,8 @@ class TestManyToManyExists(TestCase):
 
     def test_filter(self):
         publisher_id = Publisher.objects.get(name='Publisher 1').id
-        authors = Author.objects.annotate(published_by_1=Exists('authored_books', filter=Q(book__publisher_id=publisher_id)))
+        authors = Author.objects.annotate(published_by_1=Exists('authored_books',
+                                                                filter=Q(book__publisher_id=publisher_id)))
 
         authors = {author.name: author.published_by_1 for author in authors}
 
@@ -595,7 +600,8 @@ class TestAggregateComputedField(TestCase):
         expected = dict((store.id, store.balance) for store in stores)
 
         stores = Store.objects.annotate(
-            balance=Sum(F('seller__sale__revenue') - F('seller__sale__expenses'), filter=Q(date='2019-01-02')).as_subquery()
+            balance=Sum(F('seller__sale__revenue') - F('seller__sale__expenses'),
+                        filter=Q(date='2019-01-02')).as_subquery()
         )
 
         actual = dict((store.id, store.balance) for store in stores)
@@ -612,9 +618,12 @@ class TestOrderableAggregate(PostgreSQLTestCase):
         cls.c1 = Child.objects.create(parent=cls.p1, name='Joe', timestamp='2017-06-01', other_timestamp=None),
         cls.c2 = Child.objects.create(parent=cls.p1, name='Jan', timestamp='2017-07-01', other_timestamp=None),
         cls.c3 = Child.objects.create(parent=cls.p1, name='Jen', timestamp='2017-05-01', other_timestamp='2017-08-01')
-        cls.c4 = Child.objects.create(parent=cls.p1, name='Bhani', timestamp='2014-05-01', other_timestamp='2017-08-01')
-        cls.c5 = Child.objects.create(parent=cls.p1, name='Carlos', timestamp='2019-05-01', other_timestamp='2017-08-01')
-        cls.c6 = Child.objects.create(parent=cls.p1, name='Anansi', timestamp='2018-05-01', other_timestamp='2017-08-01')
+        cls.c4 = Child.objects.create(parent=cls.p1, name='Bhani', timestamp='2014-05-01',
+                                      other_timestamp='2017-06-01')
+        cls.c5 = Child.objects.create(parent=cls.p1, name='Carlos', timestamp='2019-05-01',
+                                      other_timestamp='2017-09-01')
+        cls.c6 = Child.objects.create(parent=cls.p1, name='Anansi', timestamp='2018-05-01',
+                                      other_timestamp='2017-05-01')
 
     def test_arrayagg_subquery_ordering(self):
         parents = Parent.objects.annotate(
