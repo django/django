@@ -1,5 +1,4 @@
 import functools
-import gzip
 import re
 from difflib import SequenceMatcher
 from pathlib import Path
