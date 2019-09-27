@@ -1,15 +1,20 @@
 import datetime
 
 from django.conf import settings
-from django.contrib.postgres.aggregates import ArrayAgg
-from django.db.models import DateTimeField, Q, OuterRef, F
+from django.db.models import DateTimeField, Q, OuterRef, F, Min, Max, Count, Exists, Sum
 from django.db.models.functions import Coalesce, Cast
 from django.test import TestCase
+from tests.postgres_tests import PostgreSQLTestCase
 
 from .models import (Parent, Child, Author, Book, BookAuthor, BookEditor, Publisher, Catalog, Package,
                      Purchase, CatalogInfo, Category, Collection, Item, ItemCollectionM2M, Bit, Dog, Cat,
                      Owner, Product, Brand, Store, Seller, Sale)
-from django.db.models import Min, Max, Count, Exists, Sum
+
+# Postgres specific import
+try:
+    from django.contrib.postgres.aggregates import ArrayAgg
+except ImportError:
+    pass
 
 
 class TestParentChild(TestCase):
@@ -597,7 +602,7 @@ class TestAggregateComputedField(TestCase):
         self.assertEqual(expected, actual)
 
 
-class TestOrderableAggregate(TestCase):
+class TestOrderableAggregate(PostgreSQLTestCase):
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
