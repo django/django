@@ -1031,7 +1031,6 @@ class Subquery(Expression):
     def __init__(self, queryset_or_expression, output_field=None, **extra):
         from django.db.models import QuerySet
         if isinstance(queryset_or_expression, QuerySet):
-            self.queryset = queryset_or_expression
             self.query = queryset_or_expression.query
             self.extra = extra
             super().__init__(output_field)
@@ -1067,7 +1066,8 @@ class Subquery(Expression):
 
     def copy(self):
         clone = super().copy()
-        clone.query = clone.query.clone()
+        if clone.query is not None:
+            clone.query = clone.query.clone()
         return clone
 
     @property
@@ -1266,8 +1266,9 @@ class Exists(Subquery):
         super(Exists, self).__init__(*args, **kwargs)
 
     def __invert__(self):
-        # Be careful not to evaluate self.queryset on this line
-        return type(self)(self.queryset if self.queryset is not None else self.expression, negated=(not self.negated), **self.extra)
+        clone = self.copy()
+        clone.negated = not self.negated
+        return clone
 
     def as_sql(self, compiler, connection, template=None, **extra_context):
         sql, params = super().as_sql(compiler, connection, template, **extra_context)
