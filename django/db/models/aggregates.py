@@ -2,7 +2,7 @@
 Classes to represent the definitions of aggregate functions.
 """
 from django.core.exceptions import FieldError
-from django.db.models.expressions import Case, Func, Star, When
+from django.db.models.expressions import Case, Func, Star, When, SubqueryAggregate
 from django.db.models.fields import IntegerField
 from django.db.models.functions.mixins import (
     FixDurationInputMixin, NumericOutputFieldMixin,
@@ -26,6 +26,9 @@ class Aggregate(Func):
             raise TypeError("%s does not allow distinct." % self.__class__.__name__)
         self.distinct = distinct
         self.filter = filter
+        # These two are necessary to keep in case as_subquery is called
+        self.expressions = expressions
+        self.extra = extra
         super().__init__(*expressions, **extra)
 
     def get_source_fields(self):
@@ -87,6 +90,11 @@ class Aggregate(Func):
                 return super(Aggregate, copy).as_sql(compiler, connection, **extra_context)
         return super().as_sql(compiler, connection, **extra_context)
 
+    def as_subquery(self):
+        aggregate = self.__class__
+        return SubqueryAggregate(*self.expressions, aggregate=aggregate,
+                                 distinct=self.distinct, filter=self.filter, **self.extra)
+
     def _get_repr_options(self):
         options = super()._get_repr_options()
         if self.distinct:
@@ -117,6 +125,11 @@ class Count(Aggregate):
 
     def convert_value(self, value, expression, connection):
         return 0 if value is None else value
+
+    def as_subquery(self):
+        self.extra['template'] = 'COALESCE((%(subquery)s), 0)'
+        self.extra['output_field'] = IntegerField()
+        return super().as_subquery()
 
 
 class Max(Aggregate):

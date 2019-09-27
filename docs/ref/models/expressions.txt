@@ -404,6 +404,11 @@ The ``Aggregate`` API is as follows:
         allows passing a ``distinct`` keyword argument. If set to ``False``
         (default), ``TypeError`` is raised if ``distinct=True`` is passed.
 
+    .. method:: as_subquery()
+
+        Computes the equivalent aggregation result using a SQL subquery rather
+        than joining to the related tables.
+
 The ``expressions`` positional arguments can include expressions or the names
 of model fields. They will be converted to a string and used as the
 ``expressions`` placeholder within the ``template``.
@@ -587,7 +592,7 @@ row: the email address of the most recently created comment.
 ``Exists()`` subqueries
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-.. class:: Exists(queryset)
+.. class:: Exists(queryset_or_expression)
 
 ``Exists`` is a ``Subquery`` subclass that uses an SQL ``EXISTS`` statement. In
 many cases it will perform better than a subquery since the database is able to
@@ -596,15 +601,12 @@ stop evaluation of the subquery when a first matching row is found.
 For example, to annotate each post with whether or not it has a comment from
 within the last day::
 
-    >>> from django.db.models import Exists, OuterRef
+    >>> from django.db.models import Exists, Q
     >>> from datetime import timedelta
     >>> from django.utils import timezone
     >>> one_day_ago = timezone.now() - timedelta(days=1)
-    >>> recent_comments = Comment.objects.filter(
-    ...     post=OuterRef('pk'),
-    ...     created_at__gte=one_day_ago,
-    ... )
-    >>> Post.objects.annotate(recent_comment=Exists(recent_comments))
+    >>> q = Q(created_at__gte=one_day_ago)
+    >>> Post.objects.annotate(recent_comment=Exists('comment', filter=q))
 
 On PostgreSQL, the SQL looks like:
 

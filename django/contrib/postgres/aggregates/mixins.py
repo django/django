@@ -7,6 +7,7 @@ class OrderableAggMixin:
         if not isinstance(ordering, (list, tuple)):
             ordering = [ordering]
         ordering = ordering or []
+        self.unparsed_ordering = ordering
         # Transform minus sign prefixed strings into an OrderBy() expression.
         ordering = (
             (OrderBy(F(o[1:]), descending=True) if isinstance(o, str) and o[0] == '-' else o)
@@ -32,6 +33,10 @@ class OrderableAggMixin:
             ))
             return sql, sql_params + ordering_params
         return super().as_sql(compiler, connection, ordering='')
+
+    def as_subquery(self):
+        self.extra['ordering'] = self.unparsed_ordering
+        return super().as_subquery()
 
     def set_source_expressions(self, exprs):
         # Extract the ordering expressions because ORDER BY clause is handled
