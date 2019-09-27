@@ -91,6 +91,7 @@ class MinimumLengthValidator:
     """
     Validate whether the password is of a minimum length.
     """
+
     def __init__(self, min_length=8):
         self.min_length = min_length
 
@@ -213,6 +214,7 @@ class NumericPasswordValidator:
     """
     Validate whether the password is alphanumeric.
     """
+
     def validate(self, password, user=None):
         if password.isdigit():
             raise ValidationError(
