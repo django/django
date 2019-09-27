@@ -136,6 +136,7 @@ LANGUAGES = [
     ('udm', gettext_noop('Udmurt')),
     ('uk', gettext_noop('Ukrainian')),
     ('ur', gettext_noop('Urdu')),
+    ('uz', gettext_noop('Uzbek')),
     ('vi', gettext_noop('Vietnamese')),
     ('zh-hans', gettext_noop('Simplified Chinese')),
     ('zh-hant', gettext_noop('Traditional Chinese')),
