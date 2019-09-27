@@ -18,7 +18,7 @@ class QuerySetQueryTests(PostgreSQLTestCase):
         )
         self.assertEqual(
             a.query.__str__(),
-            '''SELECT "postgres_tests_hotelreservation"."id", "postgres_tests_hotelreservation"."room_id", "postgres_tests_hotelreservation"."datespan", "postgres_tests_hotelreservation"."start", "postgres_tests_hotelreservation"."end", "postgres_tests_hotelreservation"."cancelled" FROM "postgres_tests_hotelreservation" WHERE ("postgres_tests_hotelreservation"."end" = '2005-09-28T00:00:00'::timestamp AND "postgres_tests_hotelreservation"."start" = '2005-07-28T00:00:00'::timestamp)''',
+            '''SELECT "postgres_tests_hotelreservation"."id", "postgres_tests_hotelreservation"."room_id", "postgres_tests_hotelreservation"."datespan", "postgres_tests_hotelreservation"."start", "postgres_tests_hotelreservation"."end", "postgres_tests_hotelreservation"."cancelled" FROM "postgres_tests_hotelreservation" WHERE ("postgres_tests_hotelreservation"."end" = '2005-09-28T00:00:00'::timestamp AND "postgres_tests_hotelreservation"."start" = '2005-07-28T00:00:00'::timestamp)''',  # noqa: E501
         )
 
     def test_queryset_query_empty(self):
@@ -26,5 +26,5 @@ class QuerySetQueryTests(PostgreSQLTestCase):
         print(a.query)
         self.assertEqual(
             a.query.__str__(),
-            '''SELECT "postgres_tests_hotelreservation"."id", "postgres_tests_hotelreservation"."room_id", "postgres_tests_hotelreservation"."datespan", "postgres_tests_hotelreservation"."start", "postgres_tests_hotelreservation"."end", "postgres_tests_hotelreservation"."cancelled" FROM "postgres_tests_hotelreservation"''',
+            '''SELECT "postgres_tests_hotelreservation"."id", "postgres_tests_hotelreservation"."room_id", "postgres_tests_hotelreservation"."datespan", "postgres_tests_hotelreservation"."start", "postgres_tests_hotelreservation"."end", "postgres_tests_hotelreservation"."cancelled" FROM "postgres_tests_hotelreservation"''',  # noqa: E501
         )
