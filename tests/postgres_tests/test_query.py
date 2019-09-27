@@ -1,11 +1,10 @@
 import datetime
 
-from django.test import TestCase
-
+from . import PostgreSQLTestCase
 from .models import HotelReservation
 
 
-class QuerySetQueryTests(TestCase):
+class QuerySetQueryTests(PostgreSQLTestCase):
     """
     Tests the output of queryset.query for PostgreSQL,
     which should use mogrify() to give an exact output
