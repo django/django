@@ -805,6 +805,12 @@ The behavior of this command changes depending on the arguments provided:
   migrated past the named migration. Use the name ``zero`` to unapply all
   migrations for an app.
 
+.. warning::
+
+    When unapplying migrations, all dependent migrations will also be
+    unapplied, regardless of ``<app_label>``. You can use ``--plan`` to check
+    which migrations will be unapplied.
+
 .. django-admin-option:: --database DATABASE
 
 Specifies the database to migrate. Defaults to ``default``.
