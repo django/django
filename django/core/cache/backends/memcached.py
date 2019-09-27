@@ -5,8 +5,6 @@ import re
 import socket
 import time
 
-import six
-
 from django.core.cache.backends.base import DEFAULT_TIMEOUT, BaseCache
 from django.utils.functional import cached_property
 
@@ -183,7 +181,6 @@ class MemcachedCache(BaseMemcachedCache):
         # https://github.com/linsomniac/python-memcached/issues/159
         # Remove this method if that issue is fixed.
 
-        cmd = 'get'
         key = memcache._encode_key(key)
         if memcache.do_check_key:
             memcache.check_key(key)
@@ -192,11 +189,9 @@ class MemcachedCache(BaseMemcachedCache):
             return None
 
         def _unsafe_get():
-            memcache._statlog(cmd)
 
             try:
-                cmd_bytes = cmd.encode('utf-8') if six.PY3 else cmd
-                fullcmd = b''.join((cmd_bytes, b' ', key))
+                fullcmd = b''.join((b'get ', key))
                 server.send_cmd(fullcmd)
                 rkey, flags, rlen, = memcache._expectvalue(
                     server, raise_exception=True
