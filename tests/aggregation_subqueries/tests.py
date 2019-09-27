@@ -1,14 +1,18 @@
 import datetime
 
 from django.conf import settings
-from django.db.models import Count, DateTimeField, Exists, F, Max, Min, OuterRef, Q, Sum
+from django.db.models import (
+    Count, DateTimeField, Exists, F, Max, Min, OuterRef, Q, Sum
+)
 from django.db.models.functions import Coalesce, Cast
 from django.test import TestCase
 from tests.postgres_tests import PostgreSQLTestCase
 
-from .models import (Author, Bit, Book, BookAuthor, BookEditor, Brand, Cat, Catalog,
-                     CatalogInfo, Category, Child, Collection, Dog, Item, ItemCollectionM2M,
-                     Owner, Package, Parent, Product, Publisher, Purchase, Sale, Seller, Store)
+from .models import (
+    Author, Bit, Book, BookAuthor, BookEditor, Brand, Cat, Catalog,
+    CatalogInfo, Category, Child, Collection, Dog, Item, ItemCollectionM2M,
+    Owner, Package, Parent, Product, Publisher, Purchase, Sale, Seller, Store,
+)
 
 # Postgres specific import
 try:
