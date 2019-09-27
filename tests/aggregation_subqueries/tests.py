@@ -1,12 +1,13 @@
 import datetime
 
+from tests.postgres_tests import PostgreSQLTestCase
+
 from django.conf import settings
 from django.db.models import (
     Count, DateTimeField, Exists, F, Max, Min, OuterRef, Q, Sum,
 )
-from django.db.models.functions import Coalesce, Cast
+from django.db.models.functions import Cast, Coalesce
 from django.test import TestCase
-from tests.postgres_tests import PostgreSQLTestCase
 
 from .models import (
     Author, Bit, Book, BookAuthor, BookEditor, Brand, Cat, Catalog,
