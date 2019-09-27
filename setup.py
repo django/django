@@ -60,6 +60,12 @@ EXCLUDE_FROM_PACKAGES = ['django.conf.project_template',
 # Dynamically calculate the version based on django.VERSION.
 version = __import__('django').get_version()
 
+INSTALL_REQUIRES = ['pytz', 'sqlparse', 'asgiref', 'bloom-filter']
+
+if sys.version_info.major >= 3 and sys.version_info.minor < 7:
+    # importlib.resources used in 3.7+, earlier uses backport importlib_resources
+    INSTALL_REQUIRES.append('importlib_resources')
+
 
 def read(fname):
     with open(os.path.join(os.path.dirname(__file__), fname)) as f:
@@ -83,7 +89,7 @@ setup(
     entry_points={'console_scripts': [
         'django-admin = django.core.management:execute_from_command_line',
     ]},
-    install_requires=['pytz', 'sqlparse', 'asgiref'],
+    install_requires=INSTALL_REQUIRES,
     extras_require={
         "bcrypt": ["bcrypt"],
         "argon2": ["argon2-cffi >= 16.1.0"],

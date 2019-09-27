@@ -157,28 +157,50 @@ class UserAttributeSimilarityValidator:
         return _('Your password can’t be too similar to your other personal information.')
 
 
+try:
+    from importlib.resources import read_binary
+except ModuleNotFoundError:
+    from importlib_resources import read_binary
+
+
 class CommonPasswordValidator:
     """
     Validate whether the password is a common password.
 
-    The password is rejected if it occurs in a provided list of passwords,
-    which may be gzipped. The list Django ships with contains 20000 common
-    passwords (lowercased and deduplicated), created by Royce Williams:
-    https://gist.github.com/roycewilliams/281ce539915a947a23db17137d91aeb7
-    The password list must be lowercased to match the comparison in validate().
-    """
-    DEFAULT_PASSWORD_LIST_PATH = Path(__file__).resolve().parent / 'common-passwords.txt.gz'
+    The password is rejected if it occurs in a provided list of passwords, one password per line.
+    The list Django ships with contains 20000 common  passwords (lowercased and deduplicated),
+    created by Royce Williams:
 
-    def __init__(self, password_list_path=DEFAULT_PASSWORD_LIST_PATH):
-        try:
-            with gzip.open(password_list_path, 'rt', encoding='utf-8') as f:
-                self.passwords = {x.strip() for x in f}
-        except OSError:
-            with open(password_list_path) as f:
-                self.passwords = {x.strip() for x in f}
+    https://gist.github.com/roycewilliams/281ce539915a947a23db17137d91aeb7
+
+    Internally, the list is stored in a Bloom filter for size and speed.
+    """
+
+    def __init__(self, password_list_path=None):
+        from bloom_filter import BloomFilter
+        import pickle
+
+        if not password_list_path:
+            # just load the built-in 20k list
+            self.bloom = pickle.loads(read_binary('django.contrib.auth', 'common-passwords.dat'))
+        else:
+            self.bloom = BloomFilter(max_elements=self._count_lines(password_list_path) + 100, error_rate=0.1)
+            self._load_passwords(password_list_path)
+
+    @staticmethod
+    def _count_lines(filename):
+        with Path(filename).open() as f:
+            return sum(1 for line in f.readlines())
+
+    def _load_passwords(self, filename):
+        with Path(filename).open() as f:
+            for line in f.readlines():
+                line = line.strip().lower()
+                if len(line) > 0:
+                    self.bloom.add(line)
 
     def validate(self, password, user=None):
-        if password.lower().strip() in self.passwords:
+        if password.lower().strip() in self.bloom:
             raise ValidationError(
                 _("This password is too common."),
                 code='password_too_common',
