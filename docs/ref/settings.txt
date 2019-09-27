@@ -1233,8 +1233,6 @@ site manager(s). The value should be a tuple containing two strings,
 This doesn't include error messages sent to :setting:`ADMINS` and
 :setting:`MANAGERS`; for that, see :setting:`SERVER_EMAIL`.
 
-
-
 .. setting:: DEFAULT_INDEX_TABLESPACE
 
 ``DEFAULT_INDEX_TABLESPACE``
