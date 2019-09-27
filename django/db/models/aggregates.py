@@ -2,7 +2,7 @@
 Classes to represent the definitions of aggregate functions.
 """
 from django.core.exceptions import FieldError
-from django.db.models.expressions import Case, Func, Star, When, SubqueryAggregate
+from django.db.models.expressions import Case, Func, Star, SubqueryAggregate, When
 from django.db.models.fields import IntegerField
 from django.db.models.functions.mixins import (
     FixDurationInputMixin, NumericOutputFieldMixin,
