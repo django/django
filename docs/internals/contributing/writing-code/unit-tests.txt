@@ -476,12 +476,12 @@ You can also use the ``DJANGO_TEST_PROCESSES`` environment variable for this
 purpose.
 
 Tips for writing tests
-----------------------
+======================
 
 .. highlight:: python
 
 Isolating model registration
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+----------------------------
 
 To avoid polluting the global :attr:`~django.apps.apps` registry and prevent
 unnecessary table creation, models defined in a test method should be bound to
