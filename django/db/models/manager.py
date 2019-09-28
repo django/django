@@ -163,7 +163,10 @@ class BaseManager:
 
 
 class Manager(BaseManager.from_queryset(QuerySet)):
-    pass
+    # for static type-checking only, no effects on runtime
+    def __class_getitem__(cls, *args, **kwargs):
+        return cls
+
 
 
 class ManagerDescriptor:

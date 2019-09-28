@@ -199,6 +199,10 @@ class QuerySet:
         self._iterable_class = ModelIterable
         self._fields = None
 
+    # for static type-checking only, no effects on runtime
+    def __class_getitem__(cls, *args, **kwargs):
+        return cls
+
     def as_manager(cls):
         # Address the circular dependency between `Queryset` and `Manager`.
         from django.db.models.manager import Manager
