@@ -1210,7 +1210,7 @@ class SubqueryAggregate(Subquery):
         self.aggregate = extra.pop('aggregate', self.aggregate)
         assert self.aggregate is not None, "Error: Attempt to instantiate a " \
                                            "SubqueryAggregate with no aggregate function"
-        super(SubqueryAggregate, self).__init__(*args, **extra)
+        super().__init__(*args, **extra)
 
     def get_queryset(self, query, allow_joins, reuse, summarize):
         queryset = self._get_base_queryset(query, allow_joins, reuse, summarize)
@@ -1264,7 +1264,7 @@ class Exists(Subquery):
 
     def __init__(self, *args, **kwargs):
         self.negated = kwargs.pop('negated', False)
-        super(Exists, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def __invert__(self):
         clone = self.copy()
