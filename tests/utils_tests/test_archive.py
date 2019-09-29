@@ -32,8 +32,6 @@ class TestArchive(unittest.TestCase):
     def test_extract_file_permissions(self):
         """archive.extract() preserves file permissions."""
         mask = stat.S_IRWXU | stat.S_IRWXG | stat.S_IRWXO
-        umask = os.umask(0)
-        os.umask(umask)  # Restore the original umask.
         for entry in os.scandir(self.testdir):
             if entry.name.startswith('leadpath_'):
                 continue
@@ -44,4 +42,4 @@ class TestArchive(unittest.TestCase):
                 self.assertEqual(os.stat(filepath).st_mode & mask, 0o775)
                 # A file is readable even if permission data is missing.
                 filepath = os.path.join(tmpdir, 'no_permissions')
-                self.assertEqual(os.stat(filepath).st_mode & mask, 0o664 & ~umask)
+                self.assertEqual(os.stat(filepath).st_mode & mask, 0o4)

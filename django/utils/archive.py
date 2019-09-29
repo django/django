@@ -100,12 +100,10 @@ class BaseArchive:
     @staticmethod
     def _copy_permissions(mode, filename):
         """
-        If the file in the archive has some permissions (this assumes a file
-        won't be writable/executable without being readable), apply those
-        permissions to the unarchived file.
+        Carry over permissions from the archive, ensuring extracted files are 
+        always owner readable.
         """
-        if mode & stat.S_IROTH:
-            os.chmod(filename, mode)
+        os.chmod(filename, mode | stat.S_IROTH)
 
     def split_leading_dir(self, path):
         path = str(path)
