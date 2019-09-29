@@ -1026,6 +1026,12 @@ subclass::
     If you need to specify a dynamic value based on the request, you can
     implement a :meth:`~ModelAdmin.get_list_select_related` method.
 
+    .. note::
+
+        ``ModelAdmin`` ignores this attribute when
+        :meth:`~django.db.models.query.QuerySet.select_related` was already
+        called on the changelist's ``QuerySet``.
+
 .. attribute:: ModelAdmin.ordering
 
     Set ``ordering`` to specify how lists of objects should be ordered in the
