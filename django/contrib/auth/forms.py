@@ -286,13 +286,13 @@ class PasswordResetForm(forms.Form):
         user.
         """
         email = self.cleaned_data["email"]
+        if not domain_override:
+            current_site = get_current_site(request)
+            site_name = current_site.name
+            domain = current_site.domain
+        else:
+            site_name = domain = domain_override
         for user in self.get_users(email):
-            if not domain_override:
-                current_site = get_current_site(request)
-                site_name = current_site.name
-                domain = current_site.domain
-            else:
-                site_name = domain = domain_override
             context = {
                 'email': email,
                 'domain': domain,
