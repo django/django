@@ -116,10 +116,11 @@ Note:
   attributes corresponding to ``<changefreq>`` and ``<priority>`` elements,
   respectively. They can be made callable as functions, as
   :attr:`~Sitemap.lastmod` was in the example.
-* :attr:`~Sitemap.items()` is a method that returns a list of objects. The
-  objects returned will get passed to any callable methods corresponding to a
-  sitemap property (:attr:`~Sitemap.location`, :attr:`~Sitemap.lastmod`,
-  :attr:`~Sitemap.changefreq`, and :attr:`~Sitemap.priority`).
+* :attr:`~Sitemap.items()` is a method that returns a :term:`sequence` or
+  ``QuerySet`` of objects. The objects returned will get passed to any callable
+  methods corresponding to a sitemap property (:attr:`~Sitemap.location`,
+  :attr:`~Sitemap.lastmod`, :attr:`~Sitemap.changefreq`, and
+  :attr:`~Sitemap.priority`).
 * :attr:`~Sitemap.lastmod` should return a :class:`~datetime.datetime`.
 * There is no :attr:`~Sitemap.location` method in this example, but you
   can provide it in order to specify the URL for your object. By default,
@@ -135,11 +136,11 @@ Note:
 
     .. attribute:: Sitemap.items
 
-        **Required.** A method that returns a list of objects. The framework
-        doesn't care what *type* of objects they are; all that matters is that
-        these objects get passed to the :attr:`~Sitemap.location()`,
-        :attr:`~Sitemap.lastmod()`, :attr:`~Sitemap.changefreq()` and
-        :attr:`~Sitemap.priority()` methods.
+        **Required.** A method that returns a :term:`sequence` or ``QuerySet``
+        of objects. The framework doesn't care what *type* of objects they are;
+        all that matters is that these objects get passed to the
+        :attr:`~Sitemap.location()`, :attr:`~Sitemap.lastmod()`,
+        :attr:`~Sitemap.changefreq()` and :attr:`~Sitemap.priority()` methods.
 
     .. attribute:: Sitemap.location
 
