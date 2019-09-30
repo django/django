@@ -36,8 +36,10 @@ class DatabaseOperations(BaseDatabaseOperations):
         # https://dev.mysql.com/doc/mysql/en/date-and-time-functions.html
         if lookup_type == 'week_day':
             # DAYOFWEEK() returns an integer, 1-7, Sunday=1.
-            # Note: WEEKDAY() returns 0-6, Monday=0.
             return "DAYOFWEEK(%s)" % field_name
+        elif lookup_type == 'iso_week_day':
+            # WEEKDAY() returns an integer, 0-6, Monday=0.
+            return "WEEKDAY(%s) + 1" % field_name
         elif lookup_type == 'week':
             # Override the value of default_week_format for consistency with
             # other database backends.

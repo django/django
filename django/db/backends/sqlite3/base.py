@@ -478,6 +478,8 @@ def _sqlite_datetime_extract(lookup_type, dt, tzname=None, conn_tzname=None):
         return None
     if lookup_type == 'week_day':
         return (dt.isoweekday() % 7) + 1
+    elif lookup_type == 'iso_week_day':
+        return dt.isoweekday()
     elif lookup_type == 'week':
         return dt.isocalendar()[1]
     elif lookup_type == 'quarter':

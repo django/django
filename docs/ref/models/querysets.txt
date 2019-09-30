@@ -3110,6 +3110,35 @@ When :setting:`USE_TZ` is ``True``, datetime fields are converted to the
 current time zone before filtering. This requires :ref:`time zone definitions
 in the database <database-time-zone-definitions>`.
 
+.. fieldlookup:: iso_week_day
+
+``iso_week_day``
+~~~~~~~~~~~~~~~~
+
+.. versionadded:: 3.1
+
+For date and datetime fields, an exact ISO 8601 day of the week match. Allows
+chaining additional field lookups.
+
+Takes an integer value representing the day of the week from 1 (Monday) to 7
+(Sunday).
+
+Example::
+
+    Entry.objects.filter(pub_date__iso_week_day=1)
+    Entry.objects.filter(pub_date__iso_week_day__gte=1)
+
+(No equivalent SQL code fragment is included for this lookup because
+implementation of the relevant query varies among different database engines.)
+
+Note this will match any record with a ``pub_date`` that falls on a Monday (day
+1 of the week), regardless of the month or year in which it occurs. Week days
+are indexed with day 1 being Monday and day 7 being Sunday.
+
+When :setting:`USE_TZ` is ``True``, datetime fields are converted to the
+current time zone before filtering. This requires :ref:`time zone definitions
+in the database <database-time-zone-definitions>`.
+
 .. fieldlookup:: quarter
 
 ``quarter``

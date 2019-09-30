@@ -75,7 +75,7 @@ class Extract(TimezoneMixin, Transform):
             )
         if (
             isinstance(field, DurationField) and
-            copy.lookup_name in ('year', 'iso_year', 'month', 'week', 'week_day', 'quarter')
+            copy.lookup_name in ('year', 'iso_year', 'month', 'week', 'week_day', 'iso_week_day', 'quarter')
         ):
             raise ValueError(
                 "Cannot extract component '%s' from DurationField '%s'."
@@ -118,6 +118,11 @@ class ExtractWeekDay(Extract):
     lookup_name = 'week_day'
 
 
+class ExtractIsoWeekDay(Extract):
+    """Return Monday=1 through Sunday=7, based on ISO-8601."""
+    lookup_name = 'iso_week_day'
+
+
 class ExtractQuarter(Extract):
     lookup_name = 'quarter'
 
@@ -138,6 +143,7 @@ DateField.register_lookup(ExtractYear)
 DateField.register_lookup(ExtractMonth)
 DateField.register_lookup(ExtractDay)
 DateField.register_lookup(ExtractWeekDay)
+DateField.register_lookup(ExtractIsoWeekDay)
 DateField.register_lookup(ExtractWeek)
 DateField.register_lookup(ExtractIsoYear)
 DateField.register_lookup(ExtractQuarter)

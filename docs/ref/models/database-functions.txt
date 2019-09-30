@@ -205,6 +205,7 @@ Given the datetime ``2015-06-15 23:30:01.000321+00:00``, the built-in
 * "day": 15
 * "week": 25
 * "week_day": 2
+* "iso_week_day": 1
 * "hour": 23
 * "minute": 30
 * "second": 1
@@ -216,6 +217,7 @@ returned when this timezone is active will be the same as above except for:
 
 * "day": 16
 * "week_day": 3
+* "iso_week_day": 2
 * "hour": 9
 
 .. admonition:: ``week_day`` values
@@ -288,6 +290,15 @@ Usage example::
 
     .. attribute:: lookup_name = 'week_day'
 
+.. class:: ExtractIsoWeekDay(expression, tzinfo=None, **extra)
+
+    .. versionadded:: 3.1
+
+    Returns the ISO-8601 week day with day 1 being Monday and day 7 being
+    Sunday.
+
+    .. attribute:: lookup_name = 'iso_week_day'
+
 .. class:: ExtractWeek(expression, tzinfo=None, **extra)
 
     .. attribute:: lookup_name = 'week'
@@ -307,7 +318,7 @@ that deal with date-parts can be used with ``DateField``::
     >>> from django.utils import timezone
     >>> from django.db.models.functions import (
     ...     ExtractDay, ExtractMonth, ExtractQuarter, ExtractWeek,
-    ...     ExtractWeekDay, ExtractIsoYear, ExtractYear,
+    ...     ExtractIsoWeekDay, ExtractWeekDay, ExtractIsoYear, ExtractYear,
     ... )
     >>> start_2015 = datetime(2015, 6, 15, 23, 30, 1, tzinfo=timezone.utc)
     >>> end_2015 = datetime(2015, 6, 16, 13, 11, 27, tzinfo=timezone.utc)
@@ -322,11 +333,13 @@ that deal with date-parts can be used with ``DateField``::
     ...     week=ExtractWeek('start_date'),
     ...     day=ExtractDay('start_date'),
     ...     weekday=ExtractWeekDay('start_date'),
-    ... ).values('year', 'isoyear', 'quarter', 'month', 'week', 'day', 'weekday').get(
-    ...     end_date__year=ExtractYear('start_date'),
-    ... )
+    ...     isoweekday=ExtractIsoWeekDay('start_date'),
+    ... ).values(
+    ...     'year', 'isoyear', 'quarter', 'month', 'week', 'day', 'weekday',
+    ...     'isoweekday',
+    ... ).get(end_date__year=ExtractYear('start_date'))
     {'year': 2015, 'isoyear': 2015, 'quarter': 2, 'month': 6, 'week': 25,
-     'day': 15, 'weekday': 2}
+     'day': 15, 'weekday': 2, 'isoweekday': 1}
 
 ``DateTimeField`` extracts
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -356,8 +369,8 @@ Each class is also a ``Transform`` registered on ``DateTimeField`` as
     >>> from django.utils import timezone
     >>> from django.db.models.functions import (
     ...     ExtractDay, ExtractHour, ExtractMinute, ExtractMonth,
-    ...     ExtractQuarter, ExtractSecond, ExtractWeek, ExtractWeekDay,
-    ...     ExtractIsoYear, ExtractYear,
+    ...     ExtractQuarter, ExtractSecond, ExtractWeek, ExtractIsoWeekDay,
+    ...     ExtractWeekDay, ExtractIsoYear, ExtractYear,
     ... )
     >>> start_2015 = datetime(2015, 6, 15, 23, 30, 1, tzinfo=timezone.utc)
     >>> end_2015 = datetime(2015, 6, 16, 13, 11, 27, tzinfo=timezone.utc)
@@ -372,15 +385,17 @@ Each class is also a ``Transform`` registered on ``DateTimeField`` as
     ...     week=ExtractWeek('start_datetime'),
     ...     day=ExtractDay('start_datetime'),
     ...     weekday=ExtractWeekDay('start_datetime'),
+    ...     isoweekday=ExtractIsoWeekDay('start_datetime'),
     ...     hour=ExtractHour('start_datetime'),
     ...     minute=ExtractMinute('start_datetime'),
     ...     second=ExtractSecond('start_datetime'),
     ... ).values(
     ...     'year', 'isoyear', 'month', 'week', 'day',
-    ...     'weekday', 'hour', 'minute', 'second',
+    ...     'weekday', 'isoweekday', 'hour', 'minute', 'second',
     ... ).get(end_datetime__year=ExtractYear('start_datetime'))
     {'year': 2015, 'isoyear': 2015, 'quarter': 2, 'month': 6, 'week': 25,
-     'day': 15, 'weekday': 2, 'hour': 23, 'minute': 30, 'second': 1}
+     'day': 15, 'weekday': 2, 'isoweekday': 1, 'hour': 23, 'minute': 30,
+     'second': 1}
 
 When :setting:`USE_TZ` is ``True`` then datetimes are stored in the database
 in UTC. If a different timezone is active in Django, the datetime is converted
@@ -394,11 +409,12 @@ values that are returned::
     ...    Experiment.objects.annotate(
     ...        day=ExtractDay('start_datetime'),
     ...        weekday=ExtractWeekDay('start_datetime'),
+    ...        isoweekday=ExtractIsoWeekDay('start_datetime'),
     ...        hour=ExtractHour('start_datetime'),
-    ...    ).values('day', 'weekday', 'hour').get(
+    ...    ).values('day', 'weekday', 'isoweekday', 'hour').get(
     ...        end_datetime__year=ExtractYear('start_datetime'),
     ...    )
-    {'day': 16, 'weekday': 3, 'hour': 9}
+    {'day': 16, 'weekday': 3, 'isoweekday': 2, 'hour': 9}
 
 Explicitly passing the timezone to the ``Extract`` function behaves in the same
 way, and takes priority over an active timezone::
@@ -408,11 +424,12 @@ way, and takes priority over an active timezone::
     >>> Experiment.objects.annotate(
     ...     day=ExtractDay('start_datetime', tzinfo=melb),
     ...     weekday=ExtractWeekDay('start_datetime', tzinfo=melb),
+    ...     isoweekday=ExtractIsoWeekDay('start_datetime', tzinfo=melb),
     ...     hour=ExtractHour('start_datetime', tzinfo=melb),
-    ... ).values('day', 'weekday', 'hour').get(
+    ... ).values('day', 'weekday', 'isoweekday', 'hour').get(
     ...     end_datetime__year=ExtractYear('start_datetime'),
     ... )
-    {'day': 16, 'weekday': 3, 'hour': 9}
+    {'day': 16, 'weekday': 3, 'isoweekday': 2, 'hour': 9}
 
 ``Now``
 -------

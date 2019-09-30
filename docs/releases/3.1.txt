@@ -160,7 +160,10 @@ Migrations
 Models
 ~~~~~~
 
-* ...
+* The new :class:`~django.db.models.functions.ExtractIsoWeekDay` function
+  extracts ISO-8601 week days from :class:`~django.db.models.DateField` and
+  :class:`~django.db.models.DateTimeField`, and the new :lookup:`iso_week_day`
+  lookup allows querying by an ISO-8601 day of week.
 
 Pagination
 ~~~~~~~~~~
