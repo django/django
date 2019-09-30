@@ -377,7 +377,7 @@ class AbstractUser(AbstractBaseUser, PermissionsMixin):
         return self.first_name
 
     def email_user(self, subject, message, from_email=None, **kwargs):
-        """Send an email to this user and return the number of sent emails."""
+        """Email this user and return the number of emails sent."""
         return send_mail(subject, message, from_email, [self.email], **kwargs)
 
 
