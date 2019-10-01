@@ -49,6 +49,16 @@ class BulkCreateTests(TestCase):
         Country.objects.bulk_create([Country(description='Ж' * 3000)])
         self.assertEqual(Country.objects.count(), 1)
 
+    @skipUnlessDBFeature('has_bulk_insert')
+    def test_long_and_short_text(self):
+        Country.objects.bulk_create([
+            Country(description='a' * 4001),
+            Country(description='a'),
+            Country(description='Ж' * 2001),
+            Country(description='Ж'),
+        ])
+        self.assertEqual(Country.objects.count(), 4)
+
     def test_multi_table_inheritance_unsupported(self):
         expected_message = "Can't bulk create a multi-table inherited model"
         with self.assertRaisesMessage(ValueError, expected_message):
