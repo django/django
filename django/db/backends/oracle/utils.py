@@ -54,6 +54,7 @@ class Oracle_datetime(datetime.datetime):
 
 class BulkInsertMapper:
     BLOB = 'TO_BLOB(%s)'
+    CBLOB = 'TO_CLOB(%s)'
     DATE = 'TO_DATE(%s)'
     INTERVAL = 'CAST(%s as INTERVAL DAY(9) TO SECOND(6))'
     NUMBER = 'TO_NUMBER(%s)'
@@ -73,5 +74,6 @@ class BulkInsertMapper:
         'PositiveIntegerField': NUMBER,
         'PositiveSmallIntegerField': NUMBER,
         'SmallIntegerField': NUMBER,
+        'TextField': CBLOB,
         'TimeField': TIMESTAMP,
     }
