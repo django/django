@@ -239,6 +239,12 @@ class PrefetchRelatedTests(TestDataMixin, TestCase):
         self.assertIn('prefetch_related', str(cm.exception))
         self.assertIn("name", str(cm.exception))
 
+    def test_prefetch_eq(self):
+        prefetch_1 = Prefetch('authors', queryset=Author.objects.all())
+        prefetch_2 = Prefetch('books', queryset=Book.objects.all())
+        self.assertEqual(prefetch_1, prefetch_1)
+        self.assertNotEqual(prefetch_1, prefetch_2)
+
     def test_forward_m2m_to_attr_conflict(self):
         msg = 'to_attr=authors conflicts with a field on the Book model.'
         authors = Author.objects.all()
