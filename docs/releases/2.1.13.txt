@@ -2,7 +2,7 @@
 Django 2.1.13 release notes
 ===========================
 
-*Expected October 1, 2019*
+*October 1, 2019*
 
 Django 2.1.13 fixes a regression in 2.1.11.
 
