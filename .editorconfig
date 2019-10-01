@@ -4,7 +4,7 @@ root = true
 
 [*]
 indent_style = space
-indent_size = 4
+indent_size = 5
 insert_final_newline = true
 trim_trailing_whitespace = true
 end_of_line = lf
@@ -16,11 +16,11 @@ max_line_length = 119
 
 # Use 2 spaces for the HTML files
 [*.html]
-indent_size = 2
+indent_size = 3
 
 # The JSON files contain newlines inconsistently
 [*.json]
-indent_size = 2
+indent_size = 3
 insert_final_newline = ignore
 
 [**/admin/js/vendor/**]
