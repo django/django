@@ -80,7 +80,7 @@ class LogEntry(models.Model):
                 'changes': self.get_change_message(),
             }
         elif self.is_deletion():
-            return gettext('Deleted “%(object)s.”') % {'object': self.object_repr}
+            return gettext('Deleted “%(object)s”.') % {'object': self.object_repr}
 
         return gettext('LogEntry Object')
 
