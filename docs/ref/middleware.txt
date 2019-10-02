@@ -557,6 +557,10 @@ Here are some hints about the ordering of various Django middleware classes:
    Before any view middleware that assumes that CSRF attacks have been dealt
    with.
 
+   Before :class:`~django.contrib.auth.middleware.RemoteUserMiddleware`, or any
+   other authentication middleware that may perform a login, and hence rotate
+   the CSRF token, before calling down the middleware chain.
+
    After ``SessionMiddleware`` if you're using :setting:`CSRF_USE_SESSIONS`.
 
 #. :class:`~django.contrib.auth.middleware.AuthenticationMiddleware`
