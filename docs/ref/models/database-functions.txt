@@ -357,7 +357,7 @@ Each class is also a ``Transform`` registered on ``DateTimeField`` as
     >>> from django.db.models.functions import (
     ...     ExtractDay, ExtractHour, ExtractMinute, ExtractMonth,
     ...     ExtractQuarter, ExtractSecond, ExtractWeek, ExtractWeekDay,
-    ...     ExtractYear,
+    ...     ExtractIsoYear, ExtractYear,
     ... )
     >>> start_2015 = datetime(2015, 6, 15, 23, 30, 1, tzinfo=timezone.utc)
     >>> end_2015 = datetime(2015, 6, 16, 13, 11, 27, tzinfo=timezone.utc)
