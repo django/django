@@ -130,6 +130,10 @@ def setup_test_environment(debug=None):
     saved_data.template_render = Template._render
     Template._render = instrumented_test_render
 
+    saved_data.password_hasher = settings.PASSWORD_HASHERS
+    if settings.TEST_PASSWORD_HASHER is not None:
+        settings.PASSWORD_HASHERS = [settings.TEST_PASSWORD_HASHER]
+
     mail.outbox = []
 
     deactivate()
@@ -146,6 +150,7 @@ def teardown_test_environment():
     settings.DEBUG = saved_data.debug
     settings.EMAIL_BACKEND = saved_data.email_backend
     Template._render = saved_data.template_render
+    settings.PASSWORD_HASHERS = saved_data.password_hasher
 
     del _TestState.saved_data
     del mail.outbox

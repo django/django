@@ -1084,6 +1084,42 @@ class SetupTestEnvironmentTests(SimpleTestCase):
                         setup_test_environment()
                         self.assertEqual(settings.ALLOWED_HOSTS, ['*', 'testserver'])
 
+    def test_password_hasher_for_test(self):
+        with mock.patch('django.test.utils._TestState') as x:
+            del x.saved_data
+            with self.settings(PASSWORD_HASHERS=['django.contrib.auth.hashers.PBKDF2PasswordHasher']):
+                setup_test_environment()
+                self.assertEqual(
+                    settings.PASSWORD_HASHERS,
+                    ['django.contrib.auth.hashers.SHA1PasswordHasher'],
+                )
+
+    def test_disable_password_hasher_for_test(self):
+        with mock.patch('django.test.utils._TestState') as x:
+            del x.saved_data
+            with self.settings(
+                PASSWORD_HASHERS=['django.contrib.auth.hashers.PBKDF2PasswordHasher'],
+                TEST_PASSWORD_HASHER=None,
+            ):
+                setup_test_environment()
+                self.assertEqual(
+                    settings.PASSWORD_HASHERS,
+                    ['django.contrib.auth.hashers.PBKDF2PasswordHasher'],
+                )
+
+    def test_override_password_hasher_for_test(self):
+        with mock.patch('django.test.utils._TestState') as x:
+            del x.saved_data
+            with self.settings(
+                PASSWORD_HASHERS=['django.contrib.auth.hashers.PBKDF2PasswordHasher'],
+                TEST_PASSWORD_HASHER='django.contrib.auth.hashers.MD5PasswordHasher',
+            ):
+                setup_test_environment()
+                self.assertEqual(
+                    settings.PASSWORD_HASHERS,
+                    ['django.contrib.auth.hashers.MD5PasswordHasher'],
+                )
+
 
 class OverrideSettingsTests(SimpleTestCase):
 
