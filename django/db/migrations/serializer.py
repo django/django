@@ -121,7 +121,7 @@ class EnumSerializer(BaseSerializer):
         enum_class = self.value.__class__
         module = enum_class.__module__
         return (
-            '%s.%s[%r]' % (module, enum_class.__name__, self.value.name),
+            '%s.%s[%r]' % (module, enum_class.__qualname__, self.value.name),
             {'import %s' % module},
         )
 
