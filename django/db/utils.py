@@ -1,9 +1,7 @@
 import pkgutil
 from importlib import import_module
 from pathlib import Path
-
 from asgiref.local import Local
-
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.functional import cached_property
