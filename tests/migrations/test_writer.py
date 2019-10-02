@@ -41,6 +41,26 @@ class TestModel1:
     thing = models.FileField(upload_to=upload_to)
 
 
+class TextEnum(enum.Enum):
+    A = 'a-value'
+    B = 'value-b'
+
+
+class TextTranslatedEnum(enum.Enum):
+    A = _('a-value')
+    B = _('value-b')
+
+
+class BinaryEnum(enum.Enum):
+    A = b'a-value'
+    B = b'value-b'
+
+
+class IntEnum(enum.IntEnum):
+    A = 1
+    B = 2
+
+
 class OperationWriterTests(SimpleTestCase):
 
     def test_empty_signature(self):
@@ -253,22 +273,6 @@ class WriterTests(SimpleTestCase):
         self.assertEqual(self.serialize_round_trip(lazy_pattern), pattern)
 
     def test_serialize_enums(self):
-        class TextEnum(enum.Enum):
-            A = 'a-value'
-            B = 'value-b'
-
-        class TextTranslatedEnum(enum.Enum):
-            A = _('a-value')
-            B = _('value-b')
-
-        class BinaryEnum(enum.Enum):
-            A = b'a-value'
-            B = b'value-b'
-
-        class IntEnum(enum.IntEnum):
-            A = 1
-            B = 2
-
         self.assertSerializedResultEqual(
             TextEnum.A,
             ("migrations.test_writer.TextEnum['A']", {'import migrations.test_writer'})
