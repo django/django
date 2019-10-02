@@ -28,8 +28,7 @@ __all__ = [
     'ExtractQuarter', 'ExtractSecond', 'ExtractWeek', 'ExtractIsoWeekDay',
     'ExtractWeekDay', 'ExtractIsoYear', 'ExtractYear', 'Now', 'Trunc',
     'TruncDate', 'TruncDay', 'TruncHour', 'TruncMinute', 'TruncMonth',
-    'TruncQuarter', 'TruncSecond', 'TruncMinute', 'TruncMonth', 'TruncQuarter',
-    'TruncSecond', 'TruncTime', 'TruncWeek', 'TruncYear',
+    'TruncQuarter', 'TruncSecond', 'TruncTime', 'TruncWeek', 'TruncYear',
     # math
     'Abs', 'ACos', 'ASin', 'ATan', 'ATan2', 'Ceil', 'Cos', 'Cot', 'Degrees',
     'Exp', 'Floor', 'Ln', 'Log', 'Mod', 'Pi', 'Power', 'Radians', 'Round',
