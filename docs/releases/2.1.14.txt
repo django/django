@@ -1,0 +1,12 @@
+===========================
+Django 2.1.14 release notes
+===========================
+
+*Expected November 1, 2019*
+
+Django 2.1.14 fixes a regression in 2.1.13.
+
+Bugfixes
+========
+
+* ...
