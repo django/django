@@ -1252,7 +1252,7 @@ class ChangelistTests(AuthViewsTestCase):
             response,
             '<strong>algorithm</strong>: %s\n\n'
             '<strong>salt</strong>: %s**********\n\n'
-            '<strong>hash</strong>: %s**************************\n\n' % (
+            '<strong>hash</strong>: %s**********************************\n\n' % (
                 algo, salt[:2], hash_string[:6],
             ),
             html=True,
