@@ -416,6 +416,8 @@ foundation for custom widgets.
             def __init__(self, attrs=None):
                 # create choices for days, months, years
                 # example below, the rest snipped for brevity.
+                days = [(day, day) for day in (1, 2, 3)]
+                months = [(month, month) for month in (3, 4, 5)]
                 years = [(year, year) for year in (2011, 2012, 2013)]
                 _widgets = (
                     widgets.Select(attrs=attrs, choices=days),
