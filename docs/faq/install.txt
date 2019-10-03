@@ -19,19 +19,21 @@ What are Django's prerequisites?
 
 Django requires Python. See the table in the next question for the versions of
 Python that work with each version of Django. Other Python libraries may be
-required for some uses, but you'll receive an error about it as they're needed.
+required for some use cases, but you'll receive an error about them as they're
+needed.
 
 For a development environment -- if you just want to experiment with Django --
-you don't need to have a separate Web server installed; Django comes with its
-own lightweight development server. For a production environment, Django follows
-the WSGI spec, :pep:`3333`, which means it can run on a variety of server
-platforms. See :doc:`Deploying Django </howto/deployment/index>` for some
-popular alternatives.
+you don't need to have a separate Web server installed or database server.
 
-If you want to use Django with a database, which is probably the case, you'll
-also need a database engine. PostgreSQL_ is recommended, because we're
-PostgreSQL fans, and MariaDB_, MySQL_, `SQLite`_, and Oracle_ are also
-supported.
+Django comes with its own :djadmin:`lightweight development server<runserver>`.
+For a production environment, Django follows the WSGI spec, :pep:`3333`, which
+means it can run on a variety of web servers. See :doc:`Deploying Django
+</howto/deployment/index>` for more information.
+
+Django runs `SQLite`_ by default, which is included in Python installations.
+For a production environment, we recommend PostgreSQL_; but we also officially
+support MariaDB_, MySQL_, `SQLite`_, and Oracle_. See :doc:`Supported Databases
+</ref/databases>` for more information.
 
 .. _Python: https://www.python.org/
 .. _PostgreSQL: https://www.postgresql.org/
@@ -60,9 +62,9 @@ download page <https://www.python.org/downloads/>`_.
 
 Typically, we will support a Python version up to and including the first
 Django LTS release whose security support ends after security support for that
-version of Python ends. For example, Python 3.3 security support ends September
-2017 and Django 1.8 LTS security support ends April 2018. Therefore Django 1.8
-is the last version to support Python 3.3.
+version of Python ends. For example, Python 3.3 security support ended
+September 2017 and Django 1.8 LTS security support ended April 2018. Therefore
+Django 1.8 is the last version to support Python 3.3.
 
 What Python version should I use with Django?
 =============================================
