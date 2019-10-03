@@ -2,6 +2,17 @@
 Databases
 =========
 
+Django officially supports the following databases:
+
+* :ref:`PostgreSQL <postgresql-notes>`
+* :ref:`MariaDB <mariadb-notes>`
+* :ref:`MySQL <mysql-notes>`
+* :ref:`Oracle <oracle-notes>`
+* :ref:`SQLite <sqlite-notes>`
+
+There are also a number of :ref:`database backends provided by third parties
+<third-party-notes>`.
+
 Django attempts to support as many features as possible on all database
 backends. However, not all database backends are alike, and we've had to make
 design decisions on which features to support and which assumptions we can make
