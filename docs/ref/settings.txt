@@ -2941,7 +2941,7 @@ Default::
 
 .. versionadded:: 3.1
 
-An faster password hasher to use while running tests.
+A faster password hasher to use while running tests.
 
 Default: ``'django.contrib.auth.hashers.UnsaltedSHA1PasswordHasher'``
 

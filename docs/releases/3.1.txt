@@ -51,9 +51,9 @@ Minor features
   instead of deprecated ``PASSWORD_RESET_TIMEOUT_DAYS``, which will be removed
   in Django 4.0.
 
-* Added the :settings:`TEST_PASSWORD_HASHER` setting to define a faster
+* Added the :setting:`TEST_PASSWORD_HASHER` setting to define a faster
   password algorithm when running tests. It uses an basic SHA1-based algorithm
-  by default. It's possible to opt-out from this behaviour by setting its value
+  by default. It's possible to opt-out from this behavior by setting its value
   to ``None``.
 
 :mod:`django.contrib.contenttypes`

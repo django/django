@@ -341,8 +341,8 @@ Password hashing
 ~~~~~~~~~~~~~~~~
 
 The default password hasher is rather slow by design so when running tests,
-Django changes the :setting:`PASSWORD_HASHERS` setting to a faster -but
-unsecure- algorithm, which is equivalent to running tests with::
+Django changes the :setting:`PASSWORD_HASHERS` setting to a faster algorithm,
+which is equivalent to running tests with::
 
     PASSWORD_HASHERS = [
         'django.contrib.auth.hashers.UnsaltedSHA1PasswordHasher',
@@ -350,16 +350,16 @@ unsecure- algorithm, which is equivalent to running tests with::
 
 .. versionadded:: 3.1
 
-    This behaviour was automated via the :setting:`TEST_PASSWORD_HASHER` setting.
+    This behavior was automated via the :setting:`TEST_PASSWORD_HASHER` setting.
 
-To opt-out from this behaviour, you can set the :setting:`TEST_PASSWORD_HASHER`
-setting to `None`, which would leave your :setting:`PASSWORD_HASHERS` setting unchanged::
+To opt-out from this behavior, you can set the :setting:`TEST_PASSWORD_HASHER`
+setting to ``None``, which would leave your :setting:`PASSWORD_HASHERS` setting unchanged::
 
-    TEST_PASSWORD_HASHER=None
+    TEST_PASSWORD_HASHER = None
 
 The other option is to set this setting to another password hasher of your choice::
 
-    TEST_PASSWORD_HASHER='django.contrib.auth.hashers.MD5PasswordHasher'
+    TEST_PASSWORD_HASHER = 'django.contrib.auth.hashers.MD5PasswordHasher'
 
 Don't forget that the :setting:`PASSWORD_HASHERS` should include any hashing
 algorithm used in fixtures, if any.
