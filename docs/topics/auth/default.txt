@@ -1257,7 +1257,7 @@ implementation details see :ref:`using-the-views`.
 
     * ``email_template_name``: The full name of a template to use for
       generating the email with the reset password link. Defaults to
-      :file:`registration/password_reset_email.html` if not supplied.
+      :file:`registration/password_reset_email.txt` if not supplied.
 
     * ``subject_template_name``: The full name of a template to use for
       the subject of the email with the reset password link. Defaults
@@ -1312,7 +1312,7 @@ implementation details see :ref:`using-the-views`.
 
     * ``token``: Token to check that the reset link is valid.
 
-    Sample ``registration/password_reset_email.html`` (email body template):
+    Sample ``registration/password_reset_email.txt`` (email body template):
 
     .. code-block:: html+django
 

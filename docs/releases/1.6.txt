@@ -749,7 +749,7 @@ be true.
 
 ``django.contrib.auth.views.password_reset_confirm()`` has been modified to
 take a ``uidb64`` parameter instead of ``uidb36``. If you are reversing this
-view, for example in a custom ``password_reset_email.html`` template, be sure
+view, for example in a custom ``password_reset_email.txt`` template, be sure
 to update your code.
 
 A temporary shim for ``django.contrib.auth.views.password_reset_confirm()``

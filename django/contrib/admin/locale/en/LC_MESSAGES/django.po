@@ -807,26 +807,26 @@ msgid ""
 "you registered with, and check your spam folder."
 msgstr ""
 
-#: contrib/admin/templates/registration/password_reset_email.html:2
+#: contrib/admin/templates/registration/password_reset_email.txt:2
 #, python-format
 msgid ""
 "You're receiving this email because you requested a password reset for your "
 "user account at %(site_name)s."
 msgstr ""
 
-#: contrib/admin/templates/registration/password_reset_email.html:4
+#: contrib/admin/templates/registration/password_reset_email.txt:4
 msgid "Please go to the following page and choose a new password:"
 msgstr ""
 
-#: contrib/admin/templates/registration/password_reset_email.html:8
+#: contrib/admin/templates/registration/password_reset_email.txt:8
 msgid "Your username, in case you’ve forgotten:"
 msgstr ""
 
-#: contrib/admin/templates/registration/password_reset_email.html:10
+#: contrib/admin/templates/registration/password_reset_email.txt:10
 msgid "Thanks for using our site!"
 msgstr ""
 
-#: contrib/admin/templates/registration/password_reset_email.html:12
+#: contrib/admin/templates/registration/password_reset_email.txt:12
 #, python-format
 msgid "The %(site_name)s team"
 msgstr ""

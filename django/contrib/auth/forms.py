@@ -277,7 +277,7 @@ class PasswordResetForm(forms.Form):
 
     def save(self, domain_override=None,
              subject_template_name='registration/password_reset_subject.txt',
-             email_template_name='registration/password_reset_email.html',
+             email_template_name='registration/password_reset_email.txt',
              use_https=False, token_generator=default_token_generator,
              from_email=None, request=None, html_email_template_name=None,
              extra_email_context=None):

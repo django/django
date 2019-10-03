@@ -206,7 +206,7 @@ class PasswordContextMixin:
 
 
 class PasswordResetView(PasswordContextMixin, FormView):
-    email_template_name = 'registration/password_reset_email.html'
+    email_template_name = 'registration/password_reset_email.txt'
     extra_email_context = None
     form_class = PasswordResetForm
     from_email = None
