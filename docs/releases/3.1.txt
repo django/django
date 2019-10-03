@@ -168,7 +168,8 @@ Models
 Pagination
 ~~~~~~~~~~
 
-* Support for iterating over ``Paginator`` was added.
+* :class:`~django.core.paginator.Paginator` can now be iterated over to yield
+  its pages.
 
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
