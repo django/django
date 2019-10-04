@@ -345,7 +345,7 @@ Django changes the :setting:`PASSWORD_HASHERS` setting to a faster algorithm,
 which is equivalent to running tests with::
 
     PASSWORD_HASHERS = [
-        'django.contrib.auth.hashers.UnsaltedSHA1PasswordHasher',
+        'django.test.utils.PlainPasswordHasher',
     ]
 
 .. versionadded:: 3.1

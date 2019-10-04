@@ -1091,7 +1091,7 @@ class SetupTestEnvironmentTests(SimpleTestCase):
                 setup_test_environment()
                 self.assertEqual(
                     settings.PASSWORD_HASHERS,
-                    ['django.contrib.auth.hashers.SHA1PasswordHasher'],
+                    ['django.test.utils.PlainPasswordHasher'],
                 )
 
     def test_disable_password_hasher_for_test(self):

@@ -14,6 +14,7 @@ from xml.dom.minidom import Node, parseString
 from django.apps import apps
 from django.apps.registry import Apps
 from django.conf import UserSettingsHolder, settings
+from django.contrib.auth.hashers import BasePasswordHasher, mask_hash
 from django.core import mail
 from django.core.exceptions import ImproperlyConfigured
 from django.core.signals import request_started
@@ -855,3 +856,35 @@ def register_lookup(field, *lookups, lookup_name=None):
     finally:
         for lookup in lookups:
             field._unregister_lookup(lookup, lookup_name)
+
+
+class PlainPasswordHasher(BasePasswordHasher):
+    """
+    Plain password hashing algorithm (for tests use only).
+
+    Store password in plain text and use a static salt.
+    """
+    algorithm = 'plain'
+
+    def salt(self):
+        """Override base class method to return a fixed salt."""
+        return 'plain-salt'
+
+    def encode(self, password, salt):
+        assert password is not None
+        assert salt and '$' not in salt
+        return "%s$%s$%s" % (self.algorithm, salt, password)
+
+    def verify(self, password, encoded):
+        algorithm, salt, stored_password = encoded.split('$', 2)
+        assert algorithm == self.algorithm
+        return password == stored_password
+
+    def safe_summary(self, encoded):
+        algorithm, salt, password = encoded.split('$', 3)
+        assert algorithm == self.algorithm
+        return {
+            'algorithm': algorithm,
+            'salt': mask_hash(salt, show=2),
+            'hash': mask_hash(password),
+        }

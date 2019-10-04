@@ -2941,9 +2941,10 @@ Default::
 
 .. versionadded:: 3.1
 
-A faster password hasher to use while running tests.
+An alternative, faster password hasher to use while running tests, using a
+plain password hasher by default.
 
-Default: ``'django.contrib.auth.hashers.UnsaltedSHA1PasswordHasher'``
+Default: ``'django.test.utils.PlainPasswordHasher'``
 
 .. setting:: AUTH_PASSWORD_VALIDATORS
 

@@ -521,7 +521,7 @@ PASSWORD_HASHERS = [
 ]
 
 # Password hasher to use for running tests
-TEST_PASSWORD_HASHER = 'django.contrib.auth.hashers.SHA1PasswordHasher'
+TEST_PASSWORD_HASHER = 'django.test.utils.PlainPasswordHasher'
 
 AUTH_PASSWORD_VALIDATORS = []
 
