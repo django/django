@@ -12,6 +12,7 @@ from django.contrib.auth.tokens import default_token_generator
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.mail import EmailMultiAlternatives
 from django.template import loader
+from django template.exceptions import TemplateDoesNotExist
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
 from django.utils.text import capfirst
@@ -253,8 +254,11 @@ class PasswordResetForm(forms.Form):
         subject = loader.render_to_string(subject_template_name, context)
         # Email subject *must not* contain newlines
         subject = ''.join(subject.splitlines())
-        body = loader.render_to_string(email_template_name, context)
-
+        try:
+            body = loader.render_to_string(email_template_name, context)
+        except TemplateDoesNotExist:
+            legacy_email_template_name = 'registration/password_reset_email.html'
+            body = loader.render_to_string(legacy_email_template_name, context)
         email_message = EmailMultiAlternatives(subject, body, from_email, [to_email])
         if html_email_template_name is not None:
             html_email = loader.render_to_string(html_email_template_name, context)
