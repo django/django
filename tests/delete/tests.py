@@ -596,3 +596,10 @@ class FastDeleteTests(TestCase):
                 User.objects.filter(avatar__desc='missing').delete(),
                 (0, {'delete.User': 0})
             )
+
+    @skipIfDBFeature("can_defer_constraint_checks")
+    def test_ticket_26630(self):
+        a = Avatar.objects.create(desc='a')
+        a.user_set.create()
+        a.delete()
+        assert User.objects.get().avatar is None
