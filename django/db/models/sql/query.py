@@ -1310,7 +1310,7 @@ class Query(BaseExpression):
         lookup_type = condition.lookup_name
         clause.add(condition, AND)
 
-        require_outer = lookup_type == 'isnull' and condition.rhs is True and not current_negated
+        require_outer = lookup_type == 'isnull' and condition.rhs and not current_negated
         if current_negated and (lookup_type != 'isnull' or condition.rhs is False) and condition.rhs is not None:
             require_outer = True
             if (lookup_type != 'isnull' and (

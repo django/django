@@ -3160,6 +3160,15 @@ class NullJoinPromotionOrTest(TestCase):
         self.assertEqual(str(qs.query).count('INNER JOIN'), 1)
         self.assertEqual(list(qs), [self.a2])
 
+    def test_isnull_filter_promotion_non_bool(self):
+        qs = ModelA.objects.filter(Q(b__name__isnull=1))
+        self.assertEqual(str(qs.query).count('LEFT OUTER'), 1)
+        self.assertEqual(list(qs), [self.a1])
+
+        qs = ModelA.objects.filter(Q(b__name__isnull=0))
+        self.assertEqual(str(qs.query).count('INNER JOIN'), 1)
+        self.assertEqual(list(qs), [self.a2])
+
     def test_null_join_demotion(self):
         qs = ModelA.objects.filter(Q(b__name__isnull=False) & Q(b__name__isnull=True))
         self.assertIn(' INNER JOIN ', str(qs.query))
