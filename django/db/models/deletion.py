@@ -210,43 +210,46 @@ class Collector:
                                  source_attr=ptr.remote_field.related_name,
                                  collect_related=False,
                                  reverse_dependency=True)
-        if collect_related:
-            if keep_parents:
-                parents = set(model._meta.get_parent_list())
-            for related in get_candidate_relations_to_delete(model._meta):
-                # Preserve parent reverse relationships if keep_parents=True.
-                if keep_parents and related.model in parents:
-                    continue
-                field = related.field
-                if field.remote_field.on_delete == DO_NOTHING:
-                    continue
-                batches = self.get_del_batches(new_objs, field)
-                for batch in batches:
-                    sub_objs = self.related_objects(related, batch)
-                    if self.can_fast_delete(sub_objs, from_field=field):
-                        self.fast_deletes.append(sub_objs)
-                    else:
-                        related_model = related.related_model
-                        # Non-referenced fields can be deferred if no signal
-                        # receivers are connected for the related model as
-                        # they'll never be exposed to the user. Skip field
-                        # deferring when some relationships are select_related
-                        # as interactions between both features are hard to
-                        # get right. This should only happen in the rare
-                        # cases where .related_objects is overridden anyway.
-                        if not (sub_objs.query.select_related or self._has_signal_listeners(related_model)):
-                            referenced_fields = set(chain.from_iterable(
-                                (rf.attname for rf in rel.field.foreign_related_fields)
-                                for rel in get_candidate_relations_to_delete(related_model._meta)
-                            ))
-                            sub_objs = sub_objs.only(*tuple(referenced_fields))
-                        if sub_objs:
-                            field.remote_field.on_delete(self, field, sub_objs, self.using)
-            for field in model._meta.private_fields:
-                if hasattr(field, 'bulk_related_objects'):
-                    # It's something like generic foreign key.
-                    sub_objs = field.bulk_related_objects(new_objs, self.using)
-                    self.collect(sub_objs, source=model, nullable=True)
+        if not collect_related:
+            return
+
+        if keep_parents:
+            parents = set(model._meta.get_parent_list())
+        for related in get_candidate_relations_to_delete(model._meta):
+            # Preserve parent reverse relationships if keep_parents=True.
+            if keep_parents and related.model in parents:
+                continue
+            field = related.field
+            if field.remote_field.on_delete == DO_NOTHING:
+                continue
+            batches = self.get_del_batches(new_objs, field)
+            for batch in batches:
+                sub_objs = self.related_objects(related, batch)
+                if self.can_fast_delete(sub_objs, from_field=field):
+                    self.fast_deletes.append(sub_objs)
+                else:
+                    related_model = related.related_model
+                    # Non-referenced fields can be deferred if no signal
+                    # receivers are connected for the related model as
+                    # they'll never be exposed to the user. Skip field
+                    # deferring when some relationships are select_related
+                    # as interactions between both features are hard to
+                    # get right. This should only happen in the rare
+                    # cases where .related_objects is overridden anyway.
+                    if not (sub_objs.query.select_related or self._has_signal_listeners(related_model)):
+                        referenced_fields = set(chain.from_iterable(
+                            (rf.attname for rf in rel.field.foreign_related_fields)
+                            for rel in get_candidate_relations_to_delete(related_model._meta)
+                        ))
+                        sub_objs = sub_objs.only(*tuple(referenced_fields))
+                    if sub_objs:
+                        field.remote_field.on_delete(self, field, sub_objs, self.using)
+
+        for field in model._meta.private_fields:
+            if hasattr(field, 'bulk_related_objects'):
+                # It's something like generic foreign key.
+                sub_objs = field.bulk_related_objects(new_objs, self.using)
+                self.collect(sub_objs, source=model, nullable=True)
 
     def related_objects(self, related, objs):
         """
