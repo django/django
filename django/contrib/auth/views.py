@@ -101,7 +101,17 @@ class LoginView(SuccessURLAllowedHostsMixin, FormView):
             'site_name': current_site.name,
             **(self.extra_context or {})
         })
-        return context
+        
+        # If user info is incorrect, return 'form_invalid_message'
+        try:
+            http_method = str(self.request).split()[1] 
+            if http_method == 'POST' and self.content_type is None:
+                context.update({
+                    'form_invalid_message': 'User info is incorrect',
+                })
+            return context
+        except:
+            return context
 
 
 class LogoutView(SuccessURLAllowedHostsMixin, TemplateView):
