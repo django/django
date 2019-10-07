@@ -154,9 +154,6 @@ def get_conditional_response(request, etag=None, last_modified=None, response=No
             not _if_unmodified_since_passes(last_modified, if_unmodified_since)):
         return _precondition_failed(request)
 
-    if etag == 'dart':
-        print(if_none_match_etags, _if_none_match_passes(etag, if_none_match_etags))
-
     # Step 3: Test the If-None-Match precondition.
     if if_none_match_etags and not _if_none_match_passes(etag, if_none_match_etags) and not x_sendfile:
         if request.method in ('GET', 'HEAD'):
