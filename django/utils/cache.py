@@ -143,6 +143,7 @@ def get_conditional_response(request, etag=None, last_modified=None, response=No
     if_none_match_etags = parse_etags(request.META.get('HTTP_IF_NONE_MATCH', ''))
     if_modified_since = request.META.get('HTTP_IF_MODIFIED_SINCE')
     if_modified_since = if_modified_since and parse_http_date_safe(if_modified_since)
+    x_sendfile = response.has_header('X-SENDFILE')
 
     # Step 1 of section 6 of RFC 7232: Test the If-Match precondition.
     if if_match_etags and not _if_match_passes(etag, if_match_etags):
@@ -154,7 +155,7 @@ def get_conditional_response(request, etag=None, last_modified=None, response=No
         return _precondition_failed(request)
 
     # Step 3: Test the If-None-Match precondition.
-    if if_none_match_etags and not _if_none_match_passes(etag, if_none_match_etags):
+    if if_none_match_etags and not _if_none_match_passes(etag, if_none_match_etags) and not x_sendfile:
         if request.method in ('GET', 'HEAD'):
             return _not_modified(request, response)
         else:
