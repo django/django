@@ -525,3 +525,8 @@ state changes, all it does is run one command::
 
         def describe(self):
             return "Creates extension %s" % self.name
+
+If you want to automatically load the extension whenever it is required, you
+should consider having a closer look at the autodetector signals:
+:data:`~django.db.models.signals.pre_autodetect` and 
+:data:`~django.db.models.signals.post_autodetect`.

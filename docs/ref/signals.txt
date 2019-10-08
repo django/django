@@ -520,6 +520,50 @@ For example, you could register a callback in an
     when settings are overridden) and such signals should be connected for each
     new ``AppConfig`` instance.
 
+``pre_autodetect``
+------------------
+
+.. data:: django.db.models.signals.pre_autodetect
+   :module:
+
+Sent during :djadmin:`makemigrations` before detecting changes to models.
+This signal allows for third-party applications to modify the change detection
+process, and to insert custom operations into the automatically generated
+migration files, based on changes to the models.
+
+Handlers of this signal must take care that model state is maintained, such
+that repeated calls to :djadmin:`makemigrations` will not result in duplicate
+migration files.
+
+Arguments sent with this signal:
+
+``sender``
+    The autodetector object itself.
+
+.. versionadded:: 3.0
+
+``post_autodetect``
+-------------------
+
+.. data:: django.db.models.signals.pre_autodetect
+   :module:
+
+Sent during :djadmin:`makemigrations` after detecting changes to models.
+This signal allows for third-party applications to modify the change detection
+process, and to insert custom operations into the automatically generated
+migration files, based on changes to the models.
+
+Handlers of this signal must take care that model state is maintained, such
+that repeated calls to :djadmin:`makemigrations` will not result in duplicate
+migration files.
+
+Arguments sent with this signal:
+
+``sender``
+    The autodetector object itself.
+
+.. versionadded:: 3.0
+
 Request/response signals
 ========================
 

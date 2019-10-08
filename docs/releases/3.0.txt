@@ -309,6 +309,11 @@ Models
   require. See :ref:`Subclassing the built-in database backends
   <subclassing-database-backends>` for an example.
 
+* Added two new signals, :data:`~django.db.models.signals.pre_autodetect` and
+  :data:`~django.db.models.signals.post_autodetect` to allow third-party 
+  applications to hook into the autodetector during :djadmin:`makemigrations`.
+
+
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 
