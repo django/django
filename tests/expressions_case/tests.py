@@ -6,9 +6,9 @@ from uuid import UUID
 
 from django.core.exceptions import FieldError
 from django.db.models import (
-    BinaryField, BooleanField, Case, CharField, Count, DurationField, F,
-    GenericIPAddressField, IntegerField, Max, Min, Q, Sum, TextField,
-    TimeField, UUIDField, Value, When,
+    BinaryField, BooleanField, Case, CharField, Count, DecimalField,
+    DurationField, F, GenericIPAddressField, IntegerField, Max, Min, Q, Sum,
+    TextField, TimeField, UUIDField, Value, When,
 )
 from django.test import SimpleTestCase, TestCase
 
@@ -705,7 +705,7 @@ class CaseExpressionTests(TestCase):
         CaseTestModel.objects.update(
             decimal=Case(
                 When(integer=1, then=Decimal('1.1')),
-                When(integer=2, then=Decimal('2.2')),
+                When(integer=2, then=Value(Decimal('2.2'), output_field=DecimalField())),
             ),
         )
         self.assertQuerysetEqual(

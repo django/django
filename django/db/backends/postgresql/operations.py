@@ -257,6 +257,9 @@ class DatabaseOperations(BaseDatabaseOperations):
     def adapt_timefield_value(self, value):
         return value
 
+    def adapt_decimalfield_value(self, value, max_digits=None, decimal_places=None):
+        return value
+
     def adapt_ipaddressfield_value(self, value):
         if value:
             return Inet(value)
