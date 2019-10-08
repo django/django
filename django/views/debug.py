@@ -341,11 +341,7 @@ class ExceptionReporter:
         c = Context(self.get_traceback_data(), autoescape=False, use_l10n=False)
         return t.render(c)
 
-    def _get_lines_from_file(self, filename, lineno, context_lines, loader=None, module_name=None):
-        """
-        Return context_lines before and after lineno from file.
-        Return (pre_context_lineno, pre_context, context_line, post_context).
-        """
+    def _get_source(self, filename, loader, module_name):
         source = None
         if hasattr(loader, 'get_source'):
             try:
@@ -360,6 +356,14 @@ class ExceptionReporter:
                     source = fp.read().splitlines()
             except OSError:
                 pass
+        return source
+
+    def _get_lines_from_file(self, filename, lineno, context_lines, loader=None, module_name=None):
+        """
+        Return context_lines before and after lineno from file.
+        Return (pre_context_lineno, pre_context, context_line, post_context).
+        """
+        source = self._get_source(filename, loader, module_name)
         if source is None:
             return None, [], None, []
 
