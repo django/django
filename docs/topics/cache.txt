@@ -724,6 +724,7 @@ a cached item, for example:
     # cache key for {% cache 500 sidebar username %}
     >>> key = make_template_fragment_key('sidebar', [username])
     >>> cache.delete(key) # invalidates cached template fragment
+    True
 
 .. _low-level-cache-api:
 
@@ -884,6 +885,14 @@ You can delete keys explicitly with ``delete()`` to clear the cache for a
 particular object::
 
     >>> cache.delete('a')
+    True
+
+``delete()`` returns ``True`` if the key was successfully deleted, ``False``
+otherwise.
+
+.. versionchanged:: 3.1
+
+    The boolean return value was added.
 
 .. method:: cache.delete_many(keys, version=None)
 

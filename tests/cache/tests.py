@@ -105,7 +105,7 @@ class DummyCacheTests(SimpleTestCase):
         "Cache deletion is transparently ignored on the dummy cache backend"
         cache.set_many({'key1': 'spam', 'key2': 'eggs'})
         self.assertIsNone(cache.get("key1"))
-        cache.delete("key1")
+        self.assertFalse(cache.delete("key1"))
         self.assertIsNone(cache.get("key1"))
         self.assertIsNone(cache.get("key2"))
 
@@ -315,9 +315,12 @@ class BaseCacheTests:
         # Cache keys can be deleted
         cache.set_many({'key1': 'spam', 'key2': 'eggs'})
         self.assertEqual(cache.get("key1"), "spam")
-        cache.delete("key1")
+        self.assertTrue(cache.delete("key1"))
         self.assertIsNone(cache.get("key1"))
         self.assertEqual(cache.get("key2"), "eggs")
+
+    def test_delete_nonexistent(self):
+        self.assertFalse(cache.delete('nonexistent_key'))
 
     def test_has_key(self):
         # The cache can be inspected for cache keys
@@ -741,25 +744,25 @@ class BaseCacheTests:
     def test_cache_versioning_delete(self):
         cache.set('answer1', 37, version=1)
         cache.set('answer1', 42, version=2)
-        cache.delete('answer1')
+        self.assertTrue(cache.delete('answer1'))
         self.assertIsNone(cache.get('answer1', version=1))
         self.assertEqual(cache.get('answer1', version=2), 42)
 
         cache.set('answer2', 37, version=1)
         cache.set('answer2', 42, version=2)
-        cache.delete('answer2', version=2)
+        self.assertTrue(cache.delete('answer2', version=2))
         self.assertEqual(cache.get('answer2', version=1), 37)
         self.assertIsNone(cache.get('answer2', version=2))
 
         cache.set('answer3', 37, version=1)
         cache.set('answer3', 42, version=2)
-        caches['v2'].delete('answer3')
+        self.assertTrue(caches['v2'].delete('answer3'))
         self.assertEqual(cache.get('answer3', version=1), 37)
         self.assertIsNone(cache.get('answer3', version=2))
 
         cache.set('answer4', 37, version=1)
         cache.set('answer4', 42, version=2)
-        caches['v2'].delete('answer4', version=1)
+        self.assertTrue(caches['v2'].delete('answer4', version=1))
         self.assertIsNone(cache.get('answer4', version=1))
         self.assertEqual(cache.get('answer4', version=2), 42)
 
