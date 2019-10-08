@@ -384,10 +384,12 @@ class ExceptionReporter:
         lower_bound = max(0, lineno - context_lines)
         upper_bound = lineno + context_lines
 
-        pre_context = source[lower_bound:lineno]
-        context_line = source[lineno]
-        post_context = source[lineno + 1:upper_bound]
-
+        try:
+            pre_context = source[lower_bound:lineno]
+            context_line = source[lineno]
+            post_context = source[lineno + 1:upper_bound]
+        except IndexError:
+            return None, [], None, []
         return lower_bound, pre_context, context_line, post_context
 
     def get_traceback_frames(self):
