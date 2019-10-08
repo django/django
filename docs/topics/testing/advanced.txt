@@ -299,6 +299,40 @@ Advanced features of ``TransactionTestCase``
     Using ``reset_sequences = True`` will slow down the test, since the primary
     key reset is a relatively expensive database operation.
 
+.. _topics-testing-enforce-run-sequentially:
+
+Enforce running test classes sequentially
+=========================================
+
+If you have test classes that cannot be run in parallel (e.g. because they
+share a common resource), you can use ``django.test.testcases.SerializeMixin``
+to run them sequentially. This mixin uses a filesystem ``lockfile``.
+
+For example, you can use ``__file__`` to determine that all test classes in the
+same file that inherit from ``SerializeMixin`` will run sequentially::
+
+    import os
+
+    from django.test import TestCase
+    from django.test.testcases import SerializeMixin
+
+    class ImageTestCaseMixin(SerializeMixin):
+        lockfile = __file__
+
+        def setUp(self):
+            self.filename = os.path.join(temp_storage_dir, 'my_file.png')
+            self.file = create_file(self.filename)
+
+    class RemoveImageTests(ImageTestCaseMixin, TestCase):
+        def test_remove_image(self):
+            os.remove(self.filename)
+            self.assertFalse(os.path.exists(self.filename))
+
+    class ResizeImageTests(ImageTestCaseMixin, TestCase):
+        def test_resize_image(self):
+            resize_image(self.file, (48, 48))
+            self.assertEqual(get_image_size(self.file), (48, 48))
+
 .. _testing-reusable-applications:
 
 Using the Django test runner to test reusable applications
