@@ -88,6 +88,8 @@ class DatabaseFeatures(BaseDatabaseFeatures):
             return self.connection.mysql_version >= (10, 2)
         return self.connection.mysql_version >= (8, 0, 2)
 
+    supports_frame_range_fixed_distance = property(operator.attrgetter('supports_over_clause'))
+
     @cached_property
     def supports_column_check_constraints(self):
         if self.connection.mysql_is_mariadb:
