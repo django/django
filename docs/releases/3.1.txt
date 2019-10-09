@@ -248,6 +248,10 @@ Miscellaneous
   ``/`` if not set). This change should not affect settings set to valid URLs
   or absolute paths.
 
+* :class:`~django.middleware.http.ConditionalGetMiddleware` no longer adds the
+  ``ETag`` header to responses with an empty
+  :attr:`~django.http.HttpResponse.content`.
+
 .. _deprecated-features-3.1:
 
 Features deprecated in 3.1
