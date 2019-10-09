@@ -6,7 +6,6 @@ from django.db.migrations.loader import AmbiguityError, MigrationLoader
 from django.db.migrations.migration import SwappableTuple
 from django.db.migrations.optimizer import MigrationOptimizer
 from django.db.migrations.writer import MigrationWriter
-from django.utils.version import get_docs_version
 
 
 class Command(BaseCommand):
@@ -116,12 +115,6 @@ class Command(BaseCommand):
         # as it may be 0002 depending on 0001
         first_migration = True
         for smigration in migrations_to_squash:
-            if smigration.replaces:
-                raise CommandError(
-                    "You cannot squash squashed migrations! Please transition "
-                    "it to a normal migration first: "
-                    "https://docs.djangoproject.com/en/%s/topics/migrations/#squashing-migrations" % get_docs_version()
-                )
             operations.extend(smigration.operations)
             for dependency in smigration.dependencies:
                 if isinstance(dependency, SwappableTuple):
@@ -159,8 +152,7 @@ class Command(BaseCommand):
         for migration in migrations_to_squash:
             if migration.replaces:
                 replaces.extend(migration.replaces)
-            else:
-                replaces.append((migration.app_label, migration.name))
+            replaces.append((migration.app_label, migration.name))
 
         # Make a new migration with those operations
         subclass = type("Migration", (migrations.Migration,), {

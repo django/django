@@ -3,6 +3,11 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
+    replaces = [
+        ("migrations", "0001_initial"),
+        ("migrations", "0002_second"),
+    ]
+
     operations = [
 
         migrations.CreateModel(
@@ -12,16 +17,16 @@ class Migration(migrations.Migration):
                 ("name", models.CharField(max_length=255)),
                 ("slug", models.SlugField(null=True)),
                 ("age", models.IntegerField(default=0)),
-                ("silly_field", models.BooleanField(default=False)),
+                ("rating", models.IntegerField(default=0)),
             ],
         ),
 
         migrations.CreateModel(
-            "Tribble",
+            "Book",
             [
                 ("id", models.AutoField(primary_key=True)),
-                ("fluffy", models.BooleanField(default=True)),
+                ("author", models.ForeignKey("migrations.Author", models.SET_NULL, null=True)),
             ],
-        )
+        ),
 
     ]

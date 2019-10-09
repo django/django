@@ -451,6 +451,18 @@ class MigrateTests(MigrationTestBase):
             out.getvalue().lower()
         )
 
+    @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations_squashed_twice"})
+    def test_showmigrations_plan_squashed_twice(self):
+        """
+        Tests --plan output of showmigrations command with squashed migrations.
+        """
+        out = io.StringIO()
+        call_command("showmigrations", format='plan', stdout=out)
+        self.assertEqual(
+            "[ ]  migrations.0001_squashed_0003\n",
+            out.getvalue().lower()
+        )
+
     @override_settings(INSTALLED_APPS=[
         'migrations.migrations_test_apps.mutate_state_b',
         'migrations.migrations_test_apps.alter_fk.author_app',
@@ -762,6 +774,31 @@ class MigrateTests(MigrationTestBase):
         )
         self.assertIn(
             ("migrations", "0001_squashed_0002"),
+            recorder.applied_migrations()
+        )
+        # No changes were actually applied so there is nothing to rollback
+
+    @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations_squashed_twice"})
+    def test_migrate_record_squashed_twice(self):
+        """
+        Running migrate for a double squashed migrations should record as run
+        if all of the replaced migrations have been run.
+        """
+        recorder = MigrationRecorder(connection)
+        recorder.record_applied("migrations", "0001_initial")
+        recorder.record_applied("migrations", "0002_second")
+        recorder.record_applied("migrations", "0001_squashed_0002")
+        recorder.record_applied("migrations", "0003_third")
+        out = io.StringIO()
+        call_command("migrate", "migrations", verbosity=0)
+        call_command("showmigrations", "migrations", stdout=out, no_color=True)
+        self.assertEqual(
+            'migrations\n'
+            ' [x] 0001_squashed_0003 (4 squashed migrations)\n',
+            out.getvalue().lower()
+        )
+        self.assertIn(
+            ("migrations", "0001_squashed_0003"),
             recorder.applied_migrations()
         )
         # No changes were actually applied so there is nothing to rollback
@@ -1565,6 +1602,36 @@ class SquashMigrationsTests(MigrationTestBase):
             )
             squashed_migration_file = os.path.join(migration_dir, '0001_%s.py' % squashed_name)
             self.assertTrue(os.path.exists(squashed_migration_file))
+
+    def test_squashmigrations_already_squashed(self):
+        """Squashing already squashed migrations."""
+        out = io.StringIO()
+        modules = [
+            "migrations.test_migrations_squashed_extra",
+            "migrations.test_migrations_squashed_old_cleaned",
+        ]
+        for module in modules:
+            with self.subTest(module=module):
+                with self.temporary_migration_module(module=module) as migration_dir:
+                    call_command(
+                        'squashmigrations', 'migrations', '0003',
+                        interactive=False, verbosity=1, stdout=out,
+                    )
+                    squashed_migration_file = os.path.join(migration_dir, "0001_squashed_0003_third.py")
+                    self.assertTrue(os.path.exists(squashed_migration_file))
+                    with open(squashed_migration_file, encoding='utf-8') as fp:
+                        content = fp.read()
+                        self.assertIn("initial = True", content)
+                        self.assertIn(
+                            "replaces = [('migrations', '0001_initial'), ('migrations', '0002_second'), "
+                            "('migrations', '0001_squashed_0002'), ('migrations', '0003_third')]",
+                            content
+                        )
+        out = out.getvalue()
+        self.assertNotIn(" - 0001_initial", out)
+        self.assertNotIn(" - 0002_second", out)
+        self.assertIn(" - 0001_squashed_0002", out)
+        self.assertIn(" - 0003_third", out)
 
 
 class AppLabelErrorTests(TestCase):
