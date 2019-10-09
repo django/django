@@ -105,7 +105,9 @@ Minor features
 :mod:`django.contrib.sessions`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* The :setting:`SESSION_COOKIE_SAMESITE` setting now allows ``'None'`` (string)
+  value to explicitly state that the cookie is sent with all same-site and
+  cross-site requests.
 
 :mod:`django.contrib.sitemaps`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -141,7 +143,9 @@ Cache
 CSRF
 ~~~~
 
-* ...
+* The :setting:`CSRF_COOKIE_SAMESITE` setting now allows ``'None'`` (string)
+  value to explicitly state that the cookie is sent with all same-site and
+  cross-site requests.
 
 Email
 ~~~~~
@@ -173,7 +177,9 @@ Generic Views
 Internationalization
 ~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* The :setting:`LANGUAGE_COOKIE_SAMESITE` setting now allows ``'None'``
+  (string) value to explicitly state that the cookie is sent with all same-site
+  and cross-site requests.
 
 Logging
 ~~~~~~~
@@ -231,6 +237,10 @@ Requests and Responses
 
 * If :setting:`ALLOWED_HOSTS` is empty and ``DEBUG=True``, subdomains of
   localhost are now allowed in the ``Host`` header, e.g. ``static.localhost``.
+
+* :meth:`.HttpResponse.set_cookie` and :meth:`.HttpResponse.set_signed_cookie`
+  now allow using ``samesite='None'`` (string) to explicitly state that the
+  cookie is sent with all same-site and cross-site requests.
 
 Serialization
 ~~~~~~~~~~~~~

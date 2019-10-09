@@ -383,6 +383,10 @@ cookie from being sent in cross-site requests.
 
 See :setting:`SESSION_COOKIE_SAMESITE` for details about ``SameSite``.
 
+.. versionchanged:: 3.1
+
+    Setting ``CSRF_COOKIE_SAMESITE = 'None'`` was allowed.
+
 .. setting:: CSRF_COOKIE_SECURE
 
 ``CSRF_COOKIE_SECURE``
@@ -1862,6 +1866,10 @@ cookie from being sent in cross-site requests.
 
 See :setting:`SESSION_COOKIE_SAMESITE` for details about ``SameSite``.
 
+.. versionchanged:: 3.1
+
+    Setting ``LANGUAGE_COOKIE_SAMESITE = 'None'`` was allowed.
+
 .. setting:: LANGUAGE_COOKIE_SECURE
 
 ``LANGUAGE_COOKIE_SECURE``
@@ -3208,7 +3216,14 @@ Possible values for the setting are:
   regular link from an external website and be blocked in CSRF-prone request
   methods (e.g. ``POST``).
 
-* ``None``: disables the flag.
+* ``'None'`` (string): the session cookie will be sent with all same-site and
+  cross-site requests.
+
+* ``False``: disables the flag.
+
+.. versionchanged:: 3.1
+
+    Setting ``SESSION_COOKIE_SAMESITE = 'None'`` was allowed.
 
 .. _SameSite: https://www.owasp.org/index.php/SameSite
 
