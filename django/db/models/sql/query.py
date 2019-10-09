@@ -511,12 +511,22 @@ class Query(BaseExpression):
         """
         Perform a COUNT() query using the current filter constraints.
         """
-        obj = self.clone()
+        to_clone = self.model.objects.all().query if self.can_optimize_count else self
+        obj = to_clone.clone()
         obj.add_annotation(Count('*'), alias='__count', is_summary=True)
         number = obj.get_aggregation(using, ['__count'])['__count']
         if number is None:
             number = 0
         return number
+
+	@property
+    def can_optimize_count(self):
+        """
+        True if this query can use a shortcut count query. Right now this means
+        that it has no filters, and so any joins created by select related or
+        annotations do not effect the total counted rows.
+        """
+        return not self.has_filters() and self.can_filter() and not self.distinct
 
     def has_filters(self):
         return self.where
