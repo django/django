@@ -42,3 +42,4 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     can_defer_constraint_checks = supports_pragma_foreign_key_check
     supports_functions_in_partial_indexes = Database.sqlite_version_info >= (3, 15, 0)
     supports_over_clause = Database.sqlite_version_info >= (3, 25, 0)
+    supports_frame_range_fixed_distance = Database.sqlite_version_info >= (3, 28, 0)
