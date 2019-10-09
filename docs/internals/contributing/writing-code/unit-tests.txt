@@ -373,6 +373,13 @@ in ``tests/auth_tests``.
 Troubleshooting
 ===============
 
+Test suite hangs or shows failures on ``master`` branch
+-------------------------------------------------------
+
+Ensure you have the latest point release of a :ref:`supported Python version
+<faq-python-version-support>`, since there are often bugs in earlier versions
+that may cause the test suite to fail or hang.
+
 Many test failures with ``UnicodeEncodeError``
 ----------------------------------------------
 
