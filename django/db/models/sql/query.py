@@ -519,7 +519,7 @@ class Query(BaseExpression):
             number = 0
         return number
 
-	@property
+    @property
     def can_optimize_count(self):
         """
         True if this query can use a shortcut count query. Right now this means
