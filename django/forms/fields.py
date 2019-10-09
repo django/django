@@ -25,7 +25,7 @@ from django.forms.widgets import (
     URLInput,
 )
 from django.utils import formats
-from django.utils.dateparse import parse_duration
+from django.utils.dateparse import parse_datetime, parse_duration
 from django.utils.duration import duration_string
 from django.utils.ipv6 import clean_ipv6_address
 from django.utils.regex_helper import _lazy_re_compile
@@ -459,7 +459,12 @@ class DateTimeField(BaseTemporalField):
         if isinstance(value, datetime.date):
             result = datetime.datetime(value.year, value.month, value.day)
             return from_current_timezone(result)
-        result = super().to_python(value)
+        try:
+            result = parse_datetime(value.strip())
+        except ValueError:
+            raise ValidationError(self.error_messages['invalid'], code='invalid')
+        if not result:
+            result = super().to_python(value)
         return from_current_timezone(result)
 
     def strptime(self, value, format):

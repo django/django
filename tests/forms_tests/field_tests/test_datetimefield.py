@@ -2,6 +2,7 @@ from datetime import date, datetime
 
 from django.forms import DateTimeField, ValidationError
 from django.test import SimpleTestCase
+from django.utils.timezone import get_fixed_timezone, utc
 
 
 class DateTimeFieldTest(SimpleTestCase):
@@ -31,6 +32,19 @@ class DateTimeFieldTest(SimpleTestCase):
             ('10/25/06 14:30:00', datetime(2006, 10, 25, 14, 30)),
             ('10/25/06 14:30', datetime(2006, 10, 25, 14, 30)),
             ('10/25/06', datetime(2006, 10, 25, 0, 0)),
+            # ISO 8601 formats.
+            (
+                '2014-09-23T22:34:41.614804',
+                datetime(2014, 9, 23, 22, 34, 41, 614804),
+            ),
+            ('2014-09-23T22:34:41', datetime(2014, 9, 23, 22, 34, 41)),
+            ('2014-09-23T22:34', datetime(2014, 9, 23, 22, 34)),
+            ('2014-09-23', datetime(2014, 9, 23, 0, 0)),
+            ('2014-09-23T22:34Z', datetime(2014, 9, 23, 22, 34, tzinfo=utc)),
+            (
+                '2014-09-23T22:34+07:00',
+                datetime(2014, 9, 23, 22, 34, tzinfo=get_fixed_timezone(420)),
+            ),
             # Whitespace stripping.
             (' 2006-10-25   14:30:45 ', datetime(2006, 10, 25, 14, 30, 45)),
             (' 2006-10-25 ', datetime(2006, 10, 25, 0, 0)),
@@ -39,6 +53,11 @@ class DateTimeFieldTest(SimpleTestCase):
             (' 10/25/2006 ', datetime(2006, 10, 25, 0, 0)),
             (' 10/25/06 14:30:45 ', datetime(2006, 10, 25, 14, 30, 45)),
             (' 10/25/06 ', datetime(2006, 10, 25, 0, 0)),
+            (
+                ' 2014-09-23T22:34:41.614804 ',
+                datetime(2014, 9, 23, 22, 34, 41, 614804),
+            ),
+            (' 2014-09-23T22:34Z ', datetime(2014, 9, 23, 22, 34, tzinfo=utc)),
         ]
         f = DateTimeField()
         for value, expected_datetime in tests:
@@ -54,9 +73,11 @@ class DateTimeFieldTest(SimpleTestCase):
             f.clean('2006-10-25 4:30 p.m.')
         with self.assertRaisesMessage(ValidationError, msg):
             f.clean('   ')
+        with self.assertRaisesMessage(ValidationError, msg):
+            f.clean('2014-09-23T28:23')
         f = DateTimeField(input_formats=['%Y %m %d %I:%M %p'])
         with self.assertRaisesMessage(ValidationError, msg):
-            f.clean('2006-10-25 14:30:45')
+            f.clean('2006.10.25 14:30:45')
 
     def test_datetimefield_clean_input_formats(self):
         tests = [
@@ -72,6 +93,8 @@ class DateTimeFieldTest(SimpleTestCase):
                     datetime(2006, 10, 25, 14, 30, 59, 200),
                 ),
                 ('2006 10 25 2:30 PM', datetime(2006, 10, 25, 14, 30)),
+                # ISO-like formats are always accepted.
+                ('2006-10-25 14:30:45', datetime(2006, 10, 25, 14, 30, 45)),
             )),
             ('%Y.%m.%d %H:%M:%S.%f', (
                 (

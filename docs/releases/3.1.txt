@@ -179,6 +179,10 @@ Forms
   to access model instances. See :ref:`iterating-relationship-choices` for
   details.
 
+* :class:`django.forms.DateTimeField` now accepts dates in a subset of ISO 8601
+  datetime formats, including optional timezone (e.g. ``2019-10-10T06:47``,
+  ``2019-10-10T06:47:23+04:00``, or ``2019-10-10T06:47:23Z``).
+
 Generic Views
 ~~~~~~~~~~~~~
 

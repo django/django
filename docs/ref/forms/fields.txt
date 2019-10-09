@@ -490,13 +490,30 @@ For each field, we describe the default widget used if you don't specify
     .. attribute:: input_formats
 
         A list of formats used to attempt to convert a string to a valid
-        ``datetime.datetime`` object.
+        ``datetime.datetime`` object, in addition to ISO 8601 formats.
+
+    The field always accepts strings in ISO 8601 formatted dates or similar
+    recognized by :func:`~django.utils.dateparse.parse_datetime`. Some examples
+    are::
+
+        * '2006-10-25 14:30:59'
+        * '2006-10-25T14:30:59'
+        * '2006-10-25 14:30'
+        * '2006-10-25T14:30'
+        * '2006-10-25T14:30Z'
+        * '2006-10-25T14:30+02:00'
+        * '2006-10-25'
 
     If no ``input_formats`` argument is provided, the default input formats are
     taken from :setting:`DATETIME_INPUT_FORMATS` if :setting:`USE_L10N` is
     ``False``, or from the active locale format ``DATETIME_INPUT_FORMATS`` key
     if localization is enabled. See also :doc:`format localization
     </topics/i18n/formatting>`.
+
+    .. versionchanged:: 3.1
+
+        Support for ISO 8601 date string parsing (including optional timezone)
+        was added.
 
 ``DecimalField``
 ----------------
