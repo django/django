@@ -60,8 +60,6 @@ class View:
 
         def view(request, *args, **kwargs):
             self = cls(**initkwargs)
-            if hasattr(self, 'get') and not hasattr(self, 'head'):
-                self.head = self.get
             self.setup(request, *args, **kwargs)
             if not hasattr(self, 'request'):
                 raise AttributeError(
@@ -82,6 +80,8 @@ class View:
 
     def setup(self, request, *args, **kwargs):
         """Initialize attributes shared by all view methods."""
+        if hasattr(self, 'get') and not hasattr(self, 'head'):
+            self.head = self.get
         self.request = request
         self.args = args
         self.kwargs = kwargs

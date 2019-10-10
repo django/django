@@ -113,6 +113,13 @@ class ViewTest(SimpleTestCase):
         response = SimpleView.as_view()(self.rf.head('/'))
         self.assertEqual(response.status_code, 200)
 
+    def test_setup_get_and_head(self):
+        view_instance = SimpleView()
+        self.assertFalse(hasattr(view_instance, 'head'))
+        view_instance.setup(self.rf.get('/'))
+        self.assertTrue(hasattr(view_instance, 'head'))
+        self.assertEqual(view_instance.head, view_instance.get)
+
     def test_head_no_get(self):
         """
         Test a view which supplies no GET method responds to HEAD with HTTP 405.
