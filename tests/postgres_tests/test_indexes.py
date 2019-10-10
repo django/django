@@ -1,17 +1,18 @@
 from unittest import mock
 
 from django.contrib.postgres.indexes import (
-    BloomIndex, BrinIndex, BTreeIndex, GinIndex, GistIndex, HashIndex,
+    BloomIndex, BrinIndex, BTreeIndex, GinIndex, GistIndex, HashIndex, OpClass,
     SpGistIndex,
 )
 from django.db import NotSupportedError, connection
-from django.db.models import CharField, Q
-from django.db.models.functions import Length
+from django.db.models import CharField, F, Index, Q
+from django.db.models.functions import Cast, Collate, Length, Lower
 from django.test import skipUnlessDBFeature
-from django.test.utils import register_lookup
+from django.test.utils import modify_settings, register_lookup
 
 from . import PostgreSQLSimpleTestCase, PostgreSQLTestCase
-from .models import CharFieldModel, IntegerArrayModel, Scene
+from .fields import SearchVector, SearchVectorField
+from .models import CharFieldModel, IntegerArrayModel, Scene, TextFieldModel
 
 
 class IndexTestMixin:
@@ -27,6 +28,17 @@ class IndexTestMixin:
         self.assertEqual(path, 'django.contrib.postgres.indexes.%s' % self.index_class.__name__)
         self.assertEqual(args, ())
         self.assertEqual(kwargs, {'fields': ['title'], 'name': 'test_title_%s' % self.index_class.suffix})
+
+    def test_deconstruction_with_expressions_no_customization(self):
+        name = f'test_title_{self.index_class.suffix}'
+        index = self.index_class(Lower('title'), name=name)
+        path, args, kwargs = index.deconstruct()
+        self.assertEqual(
+            path,
+            f'django.contrib.postgres.indexes.{self.index_class.__name__}',
+        )
+        self.assertEqual(args, (Lower('title'),))
+        self.assertEqual(kwargs, {'name': name})
 
 
 class BloomIndexTests(IndexTestMixin, PostgreSQLSimpleTestCase):
@@ -181,7 +193,14 @@ class SpGistIndexTests(IndexTestMixin, PostgreSQLSimpleTestCase):
         self.assertEqual(kwargs, {'fields': ['title'], 'name': 'test_title_spgist', 'fillfactor': 80})
 
 
+@modify_settings(INSTALLED_APPS={'append': 'django.contrib.postgres'})
 class SchemaTests(PostgreSQLTestCase):
+    get_opclass_query = '''
+        SELECT opcname, c.relname FROM pg_opclass AS oc
+        JOIN pg_index as i on oc.oid = ANY(i.indclass)
+        JOIN pg_class as c on c.oid = i.indexrelid
+        WHERE c.relname = %s
+    '''
 
     def get_constraints(self, table):
         """
@@ -259,6 +278,37 @@ class SchemaTests(PostgreSQLTestCase):
         with connection.schema_editor() as editor:
             editor.remove_index(IntegerArrayModel, index)
         self.assertNotIn(index_name, self.get_constraints(IntegerArrayModel._meta.db_table))
+
+    def test_trigram_op_class_gin_index(self):
+        index_name = 'trigram_op_class_gin'
+        index = GinIndex(OpClass(F('scene'), name='gin_trgm_ops'), name=index_name)
+        with connection.schema_editor() as editor:
+            editor.add_index(Scene, index)
+        with editor.connection.cursor() as cursor:
+            cursor.execute(self.get_opclass_query, [index_name])
+            self.assertCountEqual(cursor.fetchall(), [('gin_trgm_ops', index_name)])
+        constraints = self.get_constraints(Scene._meta.db_table)
+        self.assertIn(index_name, constraints)
+        self.assertIn(constraints[index_name]['type'], GinIndex.suffix)
+        with connection.schema_editor() as editor:
+            editor.remove_index(Scene, index)
+        self.assertNotIn(index_name, self.get_constraints(Scene._meta.db_table))
+
+    def test_cast_search_vector_gin_index(self):
+        index_name = 'cast_search_vector_gin'
+        index = GinIndex(Cast('field', SearchVectorField()), name=index_name)
+        with connection.schema_editor() as editor:
+            editor.add_index(TextFieldModel, index)
+            sql = index.create_sql(TextFieldModel, editor)
+        table = TextFieldModel._meta.db_table
+        constraints = self.get_constraints(table)
+        self.assertIn(index_name, constraints)
+        self.assertIn(constraints[index_name]['type'], GinIndex.suffix)
+        self.assertIs(sql.references_column(table, 'field'), True)
+        self.assertIn('::tsvector', str(sql))
+        with connection.schema_editor() as editor:
+            editor.remove_index(TextFieldModel, index)
+        self.assertNotIn(index_name, self.get_constraints(table))
 
     def test_bloom_index(self):
         index_name = 'char_field_model_field_bloom'
@@ -400,6 +450,28 @@ class SchemaTests(PostgreSQLTestCase):
                     editor.add_index(Scene, index)
         self.assertNotIn(index_name, self.get_constraints(Scene._meta.db_table))
 
+    def test_tsvector_op_class_gist_index(self):
+        index_name = 'tsvector_op_class_gist'
+        index = GistIndex(
+            OpClass(
+                SearchVector('scene', 'setting', config='english'),
+                name='tsvector_ops',
+            ),
+            name=index_name,
+        )
+        with connection.schema_editor() as editor:
+            editor.add_index(Scene, index)
+            sql = index.create_sql(Scene, editor)
+        table = Scene._meta.db_table
+        constraints = self.get_constraints(table)
+        self.assertIn(index_name, constraints)
+        self.assertIn(constraints[index_name]['type'], GistIndex.suffix)
+        self.assertIs(sql.references_column(table, 'scene'), True)
+        self.assertIs(sql.references_column(table, 'setting'), True)
+        with connection.schema_editor() as editor:
+            editor.remove_index(Scene, index)
+        self.assertNotIn(index_name, self.get_constraints(table))
+
     def test_hash_index(self):
         # Ensure the table is there and doesn't have an index.
         self.assertNotIn('field', self.get_constraints(CharFieldModel._meta.db_table))
@@ -455,3 +527,83 @@ class SchemaTests(PostgreSQLTestCase):
         with connection.schema_editor() as editor:
             editor.remove_index(CharFieldModel, index)
         self.assertNotIn(index_name, self.get_constraints(CharFieldModel._meta.db_table))
+
+    def test_op_class(self):
+        index_name = 'test_op_class'
+        index = Index(
+            OpClass(Lower('field'), name='text_pattern_ops'),
+            name=index_name,
+        )
+        with connection.schema_editor() as editor:
+            editor.add_index(TextFieldModel, index)
+        with editor.connection.cursor() as cursor:
+            cursor.execute(self.get_opclass_query, [index_name])
+            self.assertCountEqual(cursor.fetchall(), [('text_pattern_ops', index_name)])
+
+    def test_op_class_descending_collation(self):
+        collation = connection.features.test_collations.get('non_default')
+        if not collation:
+            self.skipTest(
+                'This backend does not support case-insensitive collations.'
+            )
+        index_name = 'test_op_class_descending_collation'
+        index = Index(
+            Collate(
+                OpClass(Lower('field'), name='text_pattern_ops').desc(nulls_last=True),
+                collation=collation,
+            ),
+            name=index_name,
+        )
+        with connection.schema_editor() as editor:
+            editor.add_index(TextFieldModel, index)
+            self.assertIn(
+                'COLLATE %s' % editor.quote_name(collation),
+                str(index.create_sql(TextFieldModel, editor)),
+            )
+        with editor.connection.cursor() as cursor:
+            cursor.execute(self.get_opclass_query, [index_name])
+            self.assertCountEqual(cursor.fetchall(), [('text_pattern_ops', index_name)])
+        table = TextFieldModel._meta.db_table
+        constraints = self.get_constraints(table)
+        self.assertIn(index_name, constraints)
+        self.assertEqual(constraints[index_name]['orders'], ['DESC'])
+        with connection.schema_editor() as editor:
+            editor.remove_index(TextFieldModel, index)
+        self.assertNotIn(index_name, self.get_constraints(table))
+
+    def test_op_class_descending_partial(self):
+        index_name = 'test_op_class_descending_partial'
+        index = Index(
+            OpClass(Lower('field'), name='text_pattern_ops').desc(),
+            name=index_name,
+            condition=Q(field__contains='China'),
+        )
+        with connection.schema_editor() as editor:
+            editor.add_index(TextFieldModel, index)
+        with editor.connection.cursor() as cursor:
+            cursor.execute(self.get_opclass_query, [index_name])
+            self.assertCountEqual(cursor.fetchall(), [('text_pattern_ops', index_name)])
+        constraints = self.get_constraints(TextFieldModel._meta.db_table)
+        self.assertIn(index_name, constraints)
+        self.assertEqual(constraints[index_name]['orders'], ['DESC'])
+
+    def test_op_class_descending_partial_tablespace(self):
+        index_name = 'test_op_class_descending_partial_tablespace'
+        index = Index(
+            OpClass(Lower('field').desc(), name='text_pattern_ops'),
+            name=index_name,
+            condition=Q(field__contains='China'),
+            db_tablespace='pg_default',
+        )
+        with connection.schema_editor() as editor:
+            editor.add_index(TextFieldModel, index)
+            self.assertIn(
+                'TABLESPACE "pg_default" ',
+                str(index.create_sql(TextFieldModel, editor))
+            )
+        with editor.connection.cursor() as cursor:
+            cursor.execute(self.get_opclass_query, [index_name])
+            self.assertCountEqual(cursor.fetchall(), [('text_pattern_ops', index_name)])
+        constraints = self.get_constraints(TextFieldModel._meta.db_table)
+        self.assertIn(index_name, constraints)
+        self.assertEqual(constraints[index_name]['orders'], ['DESC'])

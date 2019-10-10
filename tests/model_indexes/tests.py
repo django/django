@@ -2,6 +2,7 @@ from unittest import mock
 
 from django.conf import settings
 from django.db import connection, models
+from django.db.models.functions import Lower, Upper
 from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
 from django.test.utils import isolate_apps
 
@@ -27,6 +28,7 @@ class SimpleIndexesTests(SimpleTestCase):
             name='opclasses_idx',
             opclasses=['varchar_pattern_ops', 'text_pattern_ops'],
         )
+        func_index = models.Index(Lower('title'), name='book_func_idx')
         self.assertEqual(repr(index), "<Index: fields='title'>")
         self.assertEqual(repr(multi_col_index), "<Index: fields='title, author'>")
         self.assertEqual(repr(partial_index), "<Index: fields='title' condition=(AND: ('pages__gt', 400))>")
@@ -39,6 +41,7 @@ class SimpleIndexesTests(SimpleTestCase):
             "<Index: fields='headline, body' "
             "opclasses='varchar_pattern_ops, text_pattern_ops'>",
         )
+        self.assertEqual(repr(func_index), "<Index: expressions='Lower(F(title))'>")
 
     def test_eq(self):
         index = models.Index(fields=['title'])
@@ -47,6 +50,14 @@ class SimpleIndexesTests(SimpleTestCase):
         index.model = Book
         same_index.model = Book
         another_index.model = Book
+        self.assertEqual(index, same_index)
+        self.assertEqual(index, mock.ANY)
+        self.assertNotEqual(index, another_index)
+
+    def test_eq_func(self):
+        index = models.Index(Lower('title'), models.F('author'), name='book_func_idx')
+        same_index = models.Index(Lower('title'), 'author', name='book_func_idx')
+        another_index = models.Index(Lower('title'), name='book_func_idx')
         self.assertEqual(index, same_index)
         self.assertEqual(index, mock.ANY)
         self.assertNotEqual(index, another_index)
@@ -63,10 +74,15 @@ class SimpleIndexesTests(SimpleTestCase):
     def test_fields_tuple(self):
         self.assertEqual(models.Index(fields=('title',)).fields, ['title'])
 
-    def test_raises_error_without_field(self):
-        msg = 'At least one field is required to define an index.'
+    def test_requires_field_or_expression(self):
+        msg = 'At least one field or expression is required to define an index.'
         with self.assertRaisesMessage(ValueError, msg):
             models.Index()
+
+    def test_expressions_and_fields_mutually_exclusive(self):
+        msg = "Index.fields and expressions are mutually exclusive."
+        with self.assertRaisesMessage(ValueError, msg):
+            models.Index(Upper('foo'), fields=['field'])
 
     def test_opclasses_requires_index_name(self):
         with self.assertRaisesMessage(ValueError, 'An index must be named to use opclasses.'):
@@ -84,6 +100,23 @@ class SimpleIndexesTests(SimpleTestCase):
     def test_condition_requires_index_name(self):
         with self.assertRaisesMessage(ValueError, 'An index must be named to use condition.'):
             models.Index(condition=models.Q(pages__gt=400))
+
+    def test_expressions_requires_index_name(self):
+        msg = 'An index must be named to use expressions.'
+        with self.assertRaisesMessage(ValueError, msg):
+            models.Index(Lower('field'))
+
+    def test_expressions_with_opclasses(self):
+        msg = (
+            'Index.opclasses cannot be used with expressions. Use '
+            'django.contrib.postgres.indexes.OpClass() instead.'
+        )
+        with self.assertRaisesMessage(ValueError, msg):
+            models.Index(
+                Lower('field'),
+                name='test_func_opclass',
+                opclasses=['jsonb_path_ops'],
+            )
 
     def test_condition_must_be_q(self):
         with self.assertRaisesMessage(ValueError, 'Index.condition must be a Q instance.'):
@@ -181,11 +214,24 @@ class SimpleIndexesTests(SimpleTestCase):
             },
         )
 
+    def test_deconstruct_with_expressions(self):
+        index = models.Index(Upper('title'), name='book_func_idx')
+        path, args, kwargs = index.deconstruct()
+        self.assertEqual(path, 'django.db.models.Index')
+        self.assertEqual(args, (Upper('title'),))
+        self.assertEqual(kwargs, {'name': 'book_func_idx'})
+
     def test_clone(self):
         index = models.Index(fields=['title'])
         new_index = index.clone()
         self.assertIsNot(index, new_index)
         self.assertEqual(index.fields, new_index.fields)
+
+    def test_clone_with_expressions(self):
+        index = models.Index(Upper('title'), name='book_func_idx')
+        new_index = index.clone()
+        self.assertIsNot(index, new_index)
+        self.assertEqual(index.expressions, new_index.expressions)
 
     def test_name_set(self):
         index_names = [index.name for index in Book._meta.indexes]
@@ -248,3 +294,29 @@ class IndexesTests(TestCase):
         # db_tablespace.
         index = models.Index(fields=['shortcut'])
         self.assertIn('"idx_tbls"', str(index.create_sql(Book, editor)).lower())
+
+    @skipUnlessDBFeature('supports_tablespaces')
+    def test_func_with_tablespace(self):
+        # Functional index with db_tablespace attribute.
+        index = models.Index(
+            Lower('shortcut').desc(),
+            name='functional_tbls',
+            db_tablespace='idx_tbls2',
+        )
+        with connection.schema_editor() as editor:
+            sql = str(index.create_sql(Book, editor))
+            self.assertIn(editor.quote_name('idx_tbls2'), sql)
+        # Functional index without db_tablespace attribute.
+        index = models.Index(Lower('shortcut').desc(), name='functional_no_tbls')
+        with connection.schema_editor() as editor:
+            sql = str(index.create_sql(Book, editor))
+            # The DEFAULT_INDEX_TABLESPACE setting can't be tested because it's
+            # evaluated when the model class is defined. As a consequence,
+            # @override_settings doesn't work.
+            if settings.DEFAULT_INDEX_TABLESPACE:
+                self.assertIn(
+                    editor.quote_name(settings.DEFAULT_INDEX_TABLESPACE),
+                    sql,
+                )
+            else:
+                self.assertNotIn('TABLESPACE', sql)

@@ -58,6 +58,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_deferrable_unique_constraints = True
     has_json_operators = True
     json_key_contains_list_matching_requires_list = True
+    supports_expression_indexes = True
 
     django_test_skips = {
         'opclasses are PostgreSQL only.': {

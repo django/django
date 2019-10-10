@@ -41,6 +41,10 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     """
     # Neither MySQL nor MariaDB support partial indexes.
     supports_partial_indexes = False
+    # COLLATE must be wrapped in parentheses because MySQL treats COLLATE as an
+    # indexed expression.
+    collate_as_index_expression = True
+
     supports_order_by_nulls_modifier = False
     order_by_nulls_first = True
     test_collations = {
@@ -59,6 +63,10 @@ class DatabaseFeatures(BaseDatabaseFeatures):
             'Running on MySQL requires utf8mb4 encoding (#18392).': {
                 'model_fields.test_textfield.TextFieldTests.test_emoji',
                 'model_fields.test_charfield.TestCharField.test_emoji',
+            },
+            "MySQL doesn't support functional indexes on a function that "
+            "returns JSON": {
+                'schema.tests.SchemaTests.test_func_index_json_key_transform',
             },
         }
         if 'ONLY_FULL_GROUP_BY' in self.connection.sql_mode:
@@ -224,4 +232,11 @@ class DatabaseFeatures(BaseDatabaseFeatures):
         return (
             not self.connection.mysql_is_mariadb and
             self.connection.mysql_version >= (8, 0, 1)
+        )
+
+    @cached_property
+    def supports_expression_indexes(self):
+        return (
+            not self.connection.mysql_is_mariadb and
+            self.connection.mysql_version >= (8, 0, 13)
         )

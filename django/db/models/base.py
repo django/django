@@ -1681,6 +1681,22 @@ class Model(metaclass=ModelBase):
                         id='models.W040',
                     )
                 )
+            if not (
+                connection.features.supports_expression_indexes or
+                'supports_expression_indexes' in cls._meta.required_db_features
+            ) and any(index.contains_expressions for index in cls._meta.indexes):
+                errors.append(
+                    checks.Warning(
+                        '%s does not support indexes on expressions.'
+                        % connection.display_name,
+                        hint=(
+                            "An index won't be created. Silence this warning "
+                            "if you don't care about it."
+                        ),
+                        obj=cls,
+                        id='models.W043',
+                    )
+                )
         fields = [field for index in cls._meta.indexes for field, _ in index.fields_orders]
         fields += [include for index in cls._meta.indexes for include in index.include]
         errors.extend(cls._check_local_fields(fields, 'indexes'))

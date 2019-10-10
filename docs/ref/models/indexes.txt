@@ -21,9 +21,54 @@ options`_.
 ``Index`` options
 =================
 
-.. class:: Index(fields=(), name=None, db_tablespace=None, opclasses=(), condition=None, include=None)
+.. class:: Index(*expressions, fields=(), name=None, db_tablespace=None, opclasses=(), condition=None, include=None)
 
     Creates an index (B-Tree) in the database.
+
+``expressions``
+---------------
+
+.. attribute:: Index.expressions
+
+.. versionadded:: 3.2
+
+Positional argument ``*expressions`` allows creating functional indexes on
+expressions and database functions.
+
+For example::
+
+    Index(Lower('title').desc(), 'pub_date', name='lower_title_date_idx')
+
+creates an index on the lowercased value of the ``title`` field in descending
+order and the ``pub_date`` field in the default ascending order.
+
+Another example::
+
+    Index(F('height') * F('weight'), Round('weight'), name='calc_idx')
+
+creates an index on the result of multiplying fields ``height`` and ``weight``
+and the ``weight`` rounded to the nearest integer.
+
+:attr:`Index.name` is required when using ``*expressions``.
+
+.. admonition:: Restrictions on Oracle
+
+    Oracle requires functions referenced in an index to be marked as
+    ``DETERMINISTIC``. Django doesn't validate this but Oracle will error. This
+    means that functions such as
+    :class:`Random() <django.db.models.functions.Random>` aren't accepted.
+
+.. admonition:: Restrictions on PostgreSQL
+
+    PostgreSQL requires functions and operators referenced in an index to be
+    marked as ``IMMUTABLE``. Django doesn't validate this but PostgreSQL will
+    error. This means that functions such as
+    :class:`Concat() <django.db.models.functions.Concat>` aren't accepted.
+
+.. admonition:: MySQL and MariaDB
+
+    Functional indexes are ignored with MySQL < 8.0.13 and MariaDB as neither
+    supports them.
 
 ``fields``
 ----------
@@ -130,8 +175,8 @@ indexes records with more than 400 pages.
 .. admonition:: Oracle
 
     Oracle does not support partial indexes. Instead, partial indexes can be
-    emulated using functional indexes. Use a :doc:`migration
-    </topics/migrations>` to add the index using :class:`.RunSQL`.
+    emulated by using functional indexes together with
+    :class:`~django.db.models.expressions.Case` expressions.
 
 .. admonition:: MySQL and MariaDB
 

@@ -95,6 +95,42 @@ or on a per-model basis::
 In anticipation of the changing default, a system check will provide a warning
 if you do not have an explicit setting for :setting:`DEFAULT_AUTO_FIELD`.
 
+.. _new_functional_indexes:
+
+Functional indexes
+------------------
+
+The new :attr:`*expressions <django.db.models.Index.expressions>` positional
+argument of :class:`Index() <django.db.models.Index>` enables creating
+functional indexes on expressions and database functions. For example::
+
+    from django.db import models
+    from django.db.models import F, Index, Value
+    from django.db.models.functions import Lower, Upper
+
+
+    class MyModel(models.Model):
+        first_name = models.CharField(max_length=255)
+        last_name = models.CharField(max_length=255)
+        height = models.IntegerField()
+        weight = models.IntegerField()
+
+        class Meta:
+            indexes = [
+                Index(
+                    Lower('first_name'),
+                    Upper('last_name').desc(),
+                    name='first_last_name_idx',
+                ),
+                Index(
+                    F('height') / (F('weight') + Value(5)),
+                    name='calc_idx',
+                ),
+            ]
+
+Functional indexes are added to models using the
+:attr:`Meta.indexes <django.db.models.Options.indexes>` option.
+
 ``pymemcache`` support
 ----------------------
 
@@ -209,6 +245,10 @@ Minor features
 
 * Lookups for :class:`~django.contrib.postgres.fields.ArrayField` now allow
   (non-nested) arrays containing expressions as right-hand sides.
+
+* The new :class:`OpClass() <django.contrib.postgres.indexes.OpClass>`
+  expression allows creating functional indexes on expressions with a custom
+  operator class. See :ref:`new_functional_indexes` for more details.
 
 :mod:`django.contrib.redirects`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

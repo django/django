@@ -1,5 +1,5 @@
 from django.db import NotSupportedError
-from django.db.models import Index
+from django.db.models import Func, Index
 from django.utils.functional import cached_property
 
 __all__ = [
@@ -39,8 +39,8 @@ class PostgresIndex(Index):
 class BloomIndex(PostgresIndex):
     suffix = 'bloom'
 
-    def __init__(self, *, length=None, columns=(), **kwargs):
-        super().__init__(**kwargs)
+    def __init__(self, *expressions, length=None, columns=(), **kwargs):
+        super().__init__(*expressions, **kwargs)
         if len(self.fields) > 32:
             raise ValueError('Bloom indexes support a maximum of 32 fields.')
         if not isinstance(columns, (list, tuple)):
@@ -83,12 +83,12 @@ class BloomIndex(PostgresIndex):
 class BrinIndex(PostgresIndex):
     suffix = 'brin'
 
-    def __init__(self, *, autosummarize=None, pages_per_range=None, **kwargs):
+    def __init__(self, *expressions, autosummarize=None, pages_per_range=None, **kwargs):
         if pages_per_range is not None and pages_per_range <= 0:
             raise ValueError('pages_per_range must be None or a positive integer')
         self.autosummarize = autosummarize
         self.pages_per_range = pages_per_range
-        super().__init__(**kwargs)
+        super().__init__(*expressions, **kwargs)
 
     def deconstruct(self):
         path, args, kwargs = super().deconstruct()
@@ -114,9 +114,9 @@ class BrinIndex(PostgresIndex):
 class BTreeIndex(PostgresIndex):
     suffix = 'btree'
 
-    def __init__(self, *, fillfactor=None, **kwargs):
+    def __init__(self, *expressions, fillfactor=None, **kwargs):
         self.fillfactor = fillfactor
-        super().__init__(**kwargs)
+        super().__init__(*expressions, **kwargs)
 
     def deconstruct(self):
         path, args, kwargs = super().deconstruct()
@@ -134,10 +134,10 @@ class BTreeIndex(PostgresIndex):
 class GinIndex(PostgresIndex):
     suffix = 'gin'
 
-    def __init__(self, *, fastupdate=None, gin_pending_list_limit=None, **kwargs):
+    def __init__(self, *expressions, fastupdate=None, gin_pending_list_limit=None, **kwargs):
         self.fastupdate = fastupdate
         self.gin_pending_list_limit = gin_pending_list_limit
-        super().__init__(**kwargs)
+        super().__init__(*expressions, **kwargs)
 
     def deconstruct(self):
         path, args, kwargs = super().deconstruct()
@@ -159,10 +159,10 @@ class GinIndex(PostgresIndex):
 class GistIndex(PostgresIndex):
     suffix = 'gist'
 
-    def __init__(self, *, buffering=None, fillfactor=None, **kwargs):
+    def __init__(self, *expressions, buffering=None, fillfactor=None, **kwargs):
         self.buffering = buffering
         self.fillfactor = fillfactor
-        super().__init__(**kwargs)
+        super().__init__(*expressions, **kwargs)
 
     def deconstruct(self):
         path, args, kwargs = super().deconstruct()
@@ -188,9 +188,9 @@ class GistIndex(PostgresIndex):
 class HashIndex(PostgresIndex):
     suffix = 'hash'
 
-    def __init__(self, *, fillfactor=None, **kwargs):
+    def __init__(self, *expressions, fillfactor=None, **kwargs):
         self.fillfactor = fillfactor
-        super().__init__(**kwargs)
+        super().__init__(*expressions, **kwargs)
 
     def deconstruct(self):
         path, args, kwargs = super().deconstruct()
@@ -208,9 +208,9 @@ class HashIndex(PostgresIndex):
 class SpGistIndex(PostgresIndex):
     suffix = 'spgist'
 
-    def __init__(self, *, fillfactor=None, **kwargs):
+    def __init__(self, *expressions, fillfactor=None, **kwargs):
         self.fillfactor = fillfactor
-        super().__init__(**kwargs)
+        super().__init__(*expressions, **kwargs)
 
     def deconstruct(self):
         path, args, kwargs = super().deconstruct()
@@ -223,3 +223,10 @@ class SpGistIndex(PostgresIndex):
         if self.fillfactor is not None:
             with_params.append('fillfactor = %d' % self.fillfactor)
         return with_params
+
+
+class OpClass(Func):
+    template = '%(expressions)s %(name)s'
+
+    def __init__(self, expression, name):
+        super().__init__(expression, name=name)

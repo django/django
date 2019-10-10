@@ -4,6 +4,7 @@ import unittest
 from copy import copy
 from unittest import mock
 
+from django.core.exceptions import FieldError
 from django.core.management.color import no_style
 from django.db import (
     DatabaseError, DataError, IntegrityError, OperationalError, connection,
@@ -11,15 +12,21 @@ from django.db import (
 from django.db.models import (
     CASCADE, PROTECT, AutoField, BigAutoField, BigIntegerField, BinaryField,
     BooleanField, CharField, CheckConstraint, DateField, DateTimeField,
-    ForeignKey, ForeignObject, Index, IntegerField, ManyToManyField, Model,
-    OneToOneField, PositiveIntegerField, Q, SlugField, SmallAutoField,
-    SmallIntegerField, TextField, TimeField, UniqueConstraint, UUIDField,
+    DecimalField, F, FloatField, ForeignKey, ForeignObject, Index,
+    IntegerField, JSONField, ManyToManyField, Model, OneToOneField, OrderBy,
+    PositiveIntegerField, Q, SlugField, SmallAutoField, SmallIntegerField,
+    TextField, TimeField, UniqueConstraint, UUIDField, Value,
 )
+from django.db.models.fields.json import KeyTextTransform
+from django.db.models.functions import Abs, Cast, Collate, Lower, Random, Upper
+from django.db.models.indexes import IndexExpression
 from django.db.transaction import TransactionManagementError, atomic
 from django.test import (
     TransactionTestCase, skipIfDBFeature, skipUnlessDBFeature,
 )
-from django.test.utils import CaptureQueriesContext, isolate_apps
+from django.test.utils import (
+    CaptureQueriesContext, isolate_apps, register_lookup,
+)
 from django.utils import timezone
 
 from .fields import (
@@ -2480,6 +2487,366 @@ class SchemaTests(TransactionTestCase):
         # The text_field index is present if the database supports it.
         assertion = self.assertIn if connection.features.supports_index_on_text_field else self.assertNotIn
         assertion('text_field', self.get_indexes(AuthorTextFieldWithIndex._meta.db_table))
+
+    def _index_expressions_wrappers(self):
+        index_expression = IndexExpression()
+        index_expression.set_wrapper_classes(connection)
+        return ', '.join([
+            wrapper_cls.__qualname__ for wrapper_cls in index_expression.wrapper_classes
+        ])
+
+    @skipUnlessDBFeature('supports_expression_indexes')
+    def test_func_index_multiple_wrapper_references(self):
+        index = Index(OrderBy(F('name').desc(), descending=True), name='name')
+        msg = (
+            "Multiple references to %s can't be used in an indexed expression."
+            % self._index_expressions_wrappers()
+        )
+        with connection.schema_editor() as editor:
+            with self.assertRaisesMessage(ValueError, msg):
+                editor.add_index(Author, index)
+
+    @skipUnlessDBFeature('supports_expression_indexes')
+    def test_func_index_invalid_topmost_expressions(self):
+        index = Index(Upper(F('name').desc()), name='name')
+        msg = (
+            '%s must be topmost expressions in an indexed expression.'
+            % self._index_expressions_wrappers()
+        )
+        with connection.schema_editor() as editor:
+            with self.assertRaisesMessage(ValueError, msg):
+                editor.add_index(Author, index)
+
+    @skipUnlessDBFeature('supports_expression_indexes')
+    def test_func_index(self):
+        with connection.schema_editor() as editor:
+            editor.create_model(Author)
+        index = Index(Lower('name').desc(), name='func_lower_idx')
+        # Add index.
+        with connection.schema_editor() as editor:
+            editor.add_index(Author, index)
+            sql = index.create_sql(Author, editor)
+        table = Author._meta.db_table
+        if connection.features.supports_index_column_ordering:
+            self.assertIndexOrder(table, index.name, ['DESC'])
+        # SQL contains a database function.
+        self.assertIs(sql.references_column(table, 'name'), True)
+        self.assertIn('LOWER(%s)' % editor.quote_name('name'), str(sql))
+        # Remove index.
+        with connection.schema_editor() as editor:
+            editor.remove_index(Author, index)
+        self.assertNotIn(index.name, self.get_constraints(table))
+
+    @skipUnlessDBFeature('supports_expression_indexes')
+    def test_func_index_f(self):
+        with connection.schema_editor() as editor:
+            editor.create_model(Tag)
+        index = Index('slug', F('title').desc(), name='func_f_idx')
+        # Add index.
+        with connection.schema_editor() as editor:
+            editor.add_index(Tag, index)
+            sql = index.create_sql(Tag, editor)
+        table = Tag._meta.db_table
+        self.assertIn(index.name, self.get_constraints(table))
+        if connection.features.supports_index_column_ordering:
+            self.assertIndexOrder(Tag._meta.db_table, index.name, ['ASC', 'DESC'])
+        # SQL contains columns.
+        self.assertIs(sql.references_column(table, 'slug'), True)
+        self.assertIs(sql.references_column(table, 'title'), True)
+        # Remove index.
+        with connection.schema_editor() as editor:
+            editor.remove_index(Tag, index)
+        self.assertNotIn(index.name, self.get_constraints(table))
+
+    @skipUnlessDBFeature('supports_expression_indexes')
+    def test_func_index_lookups(self):
+        with connection.schema_editor() as editor:
+            editor.create_model(Author)
+        with register_lookup(CharField, Lower), register_lookup(IntegerField, Abs):
+            index = Index(
+                F('name__lower'),
+                F('weight__abs'),
+                name='func_lower_abs_lookup_idx',
+            )
+            # Add index.
+            with connection.schema_editor() as editor:
+                editor.add_index(Author, index)
+                sql = index.create_sql(Author, editor)
+        table = Author._meta.db_table
+        self.assertIn(index.name, self.get_constraints(table))
+        # SQL contains columns.
+        self.assertIs(sql.references_column(table, 'name'), True)
+        self.assertIs(sql.references_column(table, 'weight'), True)
+        # Remove index.
+        with connection.schema_editor() as editor:
+            editor.remove_index(Author, index)
+        self.assertNotIn(index.name, self.get_constraints(table))
+
+    @skipUnlessDBFeature('supports_expression_indexes')
+    def test_composite_func_index(self):
+        with connection.schema_editor() as editor:
+            editor.create_model(Author)
+        index = Index(Lower('name'), Upper('name'), name='func_lower_upper_idx')
+        # Add index.
+        with connection.schema_editor() as editor:
+            editor.add_index(Author, index)
+            sql = index.create_sql(Author, editor)
+        table = Author._meta.db_table
+        self.assertIn(index.name, self.get_constraints(table))
+        # SQL contains database functions.
+        self.assertIs(sql.references_column(table, 'name'), True)
+        sql = str(sql)
+        self.assertIn('LOWER(%s)' % editor.quote_name('name'), sql)
+        self.assertIn('UPPER(%s)' % editor.quote_name('name'), sql)
+        self.assertLess(sql.index('LOWER'), sql.index('UPPER'))
+        # Remove index.
+        with connection.schema_editor() as editor:
+            editor.remove_index(Author, index)
+        self.assertNotIn(index.name, self.get_constraints(table))
+
+    @skipUnlessDBFeature('supports_expression_indexes')
+    def test_composite_func_index_field_and_expression(self):
+        with connection.schema_editor() as editor:
+            editor.create_model(Author)
+            editor.create_model(Book)
+        index = Index(
+            F('author').desc(),
+            Lower('title').asc(),
+            'pub_date',
+            name='func_f_lower_field_idx',
+        )
+        # Add index.
+        with connection.schema_editor() as editor:
+            editor.add_index(Book, index)
+            sql = index.create_sql(Book, editor)
+        table = Book._meta.db_table
+        constraints = self.get_constraints(table)
+        if connection.features.supports_index_column_ordering:
+            self.assertIndexOrder(table, index.name, ['DESC', 'ASC', 'ASC'])
+        self.assertEqual(len(constraints[index.name]['columns']), 3)
+        self.assertEqual(constraints[index.name]['columns'][2], 'pub_date')
+        # SQL contains database functions and columns.
+        self.assertIs(sql.references_column(table, 'author_id'), True)
+        self.assertIs(sql.references_column(table, 'title'), True)
+        self.assertIs(sql.references_column(table, 'pub_date'), True)
+        self.assertIn('LOWER(%s)' % editor.quote_name('title'), str(sql))
+        # Remove index.
+        with connection.schema_editor() as editor:
+            editor.remove_index(Book, index)
+        self.assertNotIn(index.name, self.get_constraints(table))
+
+    @skipUnlessDBFeature('supports_expression_indexes')
+    @isolate_apps('schema')
+    def test_func_index_f_decimalfield(self):
+        class Node(Model):
+            value = DecimalField(max_digits=5, decimal_places=2)
+
+            class Meta:
+                app_label = 'schema'
+
+        with connection.schema_editor() as editor:
+            editor.create_model(Node)
+        index = Index(F('value'), name='func_f_decimalfield_idx')
+        # Add index.
+        with connection.schema_editor() as editor:
+            editor.add_index(Node, index)
+            sql = index.create_sql(Node, editor)
+        table = Node._meta.db_table
+        self.assertIn(index.name, self.get_constraints(table))
+        self.assertIs(sql.references_column(table, 'value'), True)
+        # SQL doesn't contain casting.
+        self.assertNotIn('CAST', str(sql))
+        # Remove index.
+        with connection.schema_editor() as editor:
+            editor.remove_index(Node, index)
+        self.assertNotIn(index.name, self.get_constraints(table))
+
+    @skipUnlessDBFeature('supports_expression_indexes')
+    def test_func_index_cast(self):
+        with connection.schema_editor() as editor:
+            editor.create_model(Author)
+        index = Index(Cast('weight', FloatField()), name='func_cast_idx')
+        # Add index.
+        with connection.schema_editor() as editor:
+            editor.add_index(Author, index)
+            sql = index.create_sql(Author, editor)
+        table = Author._meta.db_table
+        self.assertIn(index.name, self.get_constraints(table))
+        self.assertIs(sql.references_column(table, 'weight'), True)
+        # Remove index.
+        with connection.schema_editor() as editor:
+            editor.remove_index(Author, index)
+        self.assertNotIn(index.name, self.get_constraints(table))
+
+    @skipUnlessDBFeature('supports_expression_indexes')
+    def test_func_index_collate(self):
+        collation = connection.features.test_collations.get('non_default')
+        if not collation:
+            self.skipTest(
+                'This backend does not support case-insensitive collations.'
+            )
+        with connection.schema_editor() as editor:
+            editor.create_model(Author)
+            editor.create_model(BookWithSlug)
+        index = Index(
+            Collate(F('title'), collation=collation).desc(),
+            Collate('slug', collation=collation),
+            name='func_collate_idx',
+        )
+        # Add index.
+        with connection.schema_editor() as editor:
+            editor.add_index(BookWithSlug, index)
+            sql = index.create_sql(BookWithSlug, editor)
+        table = Book._meta.db_table
+        self.assertIn(index.name, self.get_constraints(table))
+        if connection.features.supports_index_column_ordering:
+            self.assertIndexOrder(table, index.name, ['DESC', 'ASC'])
+        # SQL contains columns and a collation.
+        self.assertIs(sql.references_column(table, 'title'), True)
+        self.assertIs(sql.references_column(table, 'slug'), True)
+        self.assertIn('COLLATE %s' % editor.quote_name(collation), str(sql))
+        # Remove index.
+        with connection.schema_editor() as editor:
+            editor.remove_index(Book, index)
+        self.assertNotIn(index.name, self.get_constraints(table))
+
+    @skipUnlessDBFeature('supports_expression_indexes')
+    @skipIfDBFeature('collate_as_index_expression')
+    def test_func_index_collate_f_ordered(self):
+        collation = connection.features.test_collations.get('non_default')
+        if not collation:
+            self.skipTest(
+                'This backend does not support case-insensitive collations.'
+            )
+        with connection.schema_editor() as editor:
+            editor.create_model(Author)
+        index = Index(
+            Collate(F('name').desc(), collation=collation),
+            name='func_collate_f_desc_idx',
+        )
+        # Add index.
+        with connection.schema_editor() as editor:
+            editor.add_index(Author, index)
+            sql = index.create_sql(Author, editor)
+        table = Author._meta.db_table
+        self.assertIn(index.name, self.get_constraints(table))
+        if connection.features.supports_index_column_ordering:
+            self.assertIndexOrder(table, index.name, ['DESC'])
+        # SQL contains columns and a collation.
+        self.assertIs(sql.references_column(table, 'name'), True)
+        self.assertIn('COLLATE %s' % editor.quote_name(collation), str(sql))
+        # Remove index.
+        with connection.schema_editor() as editor:
+            editor.remove_index(Author, index)
+        self.assertNotIn(index.name, self.get_constraints(table))
+
+    @skipUnlessDBFeature('supports_expression_indexes')
+    def test_func_index_calc(self):
+        with connection.schema_editor() as editor:
+            editor.create_model(Author)
+        index = Index(F('height') / (F('weight') + Value(5)), name='func_calc_idx')
+        # Add index.
+        with connection.schema_editor() as editor:
+            editor.add_index(Author, index)
+            sql = index.create_sql(Author, editor)
+        table = Author._meta.db_table
+        self.assertIn(index.name, self.get_constraints(table))
+        # SQL contains columns and expressions.
+        self.assertIs(sql.references_column(table, 'height'), True)
+        self.assertIs(sql.references_column(table, 'weight'), True)
+        sql = str(sql)
+        self.assertIs(
+            sql.index(editor.quote_name('height')) <
+            sql.index('/') <
+            sql.index(editor.quote_name('weight')) <
+            sql.index('+') <
+            sql.index('5'),
+            True,
+        )
+        # Remove index.
+        with connection.schema_editor() as editor:
+            editor.remove_index(Author, index)
+        self.assertNotIn(index.name, self.get_constraints(table))
+
+    @skipUnlessDBFeature('supports_expression_indexes', 'supports_json_field')
+    @isolate_apps('schema')
+    def test_func_index_json_key_transform(self):
+        class JSONModel(Model):
+            field = JSONField()
+
+            class Meta:
+                app_label = 'schema'
+
+        with connection.schema_editor() as editor:
+            editor.create_model(JSONModel)
+        self.isolated_local_models = [JSONModel]
+        index = Index('field__some_key', name='func_json_key_idx')
+        with connection.schema_editor() as editor:
+            editor.add_index(JSONModel, index)
+            sql = index.create_sql(JSONModel, editor)
+        table = JSONModel._meta.db_table
+        self.assertIn(index.name, self.get_constraints(table))
+        self.assertIs(sql.references_column(table, 'field'), True)
+        with connection.schema_editor() as editor:
+            editor.remove_index(JSONModel, index)
+        self.assertNotIn(index.name, self.get_constraints(table))
+
+    @skipUnlessDBFeature('supports_expression_indexes', 'supports_json_field')
+    @isolate_apps('schema')
+    def test_func_index_json_key_transform_cast(self):
+        class JSONModel(Model):
+            field = JSONField()
+
+            class Meta:
+                app_label = 'schema'
+
+        with connection.schema_editor() as editor:
+            editor.create_model(JSONModel)
+        self.isolated_local_models = [JSONModel]
+        index = Index(
+            Cast(KeyTextTransform('some_key', 'field'), IntegerField()),
+            name='func_json_key_cast_idx',
+        )
+        with connection.schema_editor() as editor:
+            editor.add_index(JSONModel, index)
+            sql = index.create_sql(JSONModel, editor)
+        table = JSONModel._meta.db_table
+        self.assertIn(index.name, self.get_constraints(table))
+        self.assertIs(sql.references_column(table, 'field'), True)
+        with connection.schema_editor() as editor:
+            editor.remove_index(JSONModel, index)
+        self.assertNotIn(index.name, self.get_constraints(table))
+
+    @skipIfDBFeature('supports_expression_indexes')
+    def test_func_index_unsupported(self):
+        # Index is ignored on databases that don't support indexes on
+        # expressions.
+        with connection.schema_editor() as editor:
+            editor.create_model(Author)
+        index = Index(F('name'), name='random_idx')
+        with connection.schema_editor() as editor, self.assertNumQueries(0):
+            self.assertIsNone(editor.add_index(Author, index))
+            self.assertIsNone(editor.remove_index(Author, index))
+
+    @skipUnlessDBFeature('supports_expression_indexes')
+    def test_func_index_nonexistent_field(self):
+        index = Index(Lower('nonexistent'), name='func_nonexistent_idx')
+        msg = (
+            "Cannot resolve keyword 'nonexistent' into field. Choices are: "
+            "height, id, name, uuid, weight"
+        )
+        with self.assertRaisesMessage(FieldError, msg):
+            with connection.schema_editor() as editor:
+                editor.add_index(Author, index)
+
+    @skipUnlessDBFeature('supports_expression_indexes')
+    def test_func_index_nondeterministic(self):
+        with connection.schema_editor() as editor:
+            editor.create_model(Author)
+        index = Index(Random(), name='func_random_idx')
+        with connection.schema_editor() as editor:
+            with self.assertRaises(DatabaseError):
+                editor.add_index(Author, index)
 
     def test_primary_key(self):
         """
