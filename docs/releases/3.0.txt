@@ -192,8 +192,8 @@ Cache
 ~~~~~
 
 * :func:`~django.utils.cache.add_never_cache_headers` and
-  :func:`~django.views.decorators.cache.never_cache` now adds ``private``
-  directive to a ``Cache-Control`` header.
+  :func:`~django.views.decorators.cache.never_cache` now add the ``private``
+  directive to ``Cache-Control`` headers.
 
 File Storage
 ~~~~~~~~~~~~
