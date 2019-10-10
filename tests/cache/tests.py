@@ -1700,7 +1700,11 @@ class CacheUtils(SimpleTestCase):
             # Initial Cache-Control, kwargs to patch_cache_control, expected Cache-Control parts
             (None, {'private': True}, {'private'}),
             ('', {'private': True}, {'private'}),
-
+            # no-cache.
+            ('', {'no_cache': 'Set-Cookie'}, {'no-cache=Set-Cookie'}),
+            ('', {'no-cache': 'Set-Cookie'}, {'no-cache=Set-Cookie'}),
+            ('no-cache=Set-Cookie', {'no_cache': True}, {'no-cache'}),
+            ('no-cache=Set-Cookie,no-cache=Link', {'no_cache': True}, {'no-cache'}),
             # Test whether private/public attributes are mutually exclusive
             ('private', {'private': True}, {'private'}),
             ('private', {'public': True}, {'public'}),
