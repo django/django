@@ -205,3 +205,88 @@ Related objects reference
        If you use :meth:`~django.db.models.query.QuerySet.prefetch_related`,
        the ``add()``, ``remove()``, ``clear()``, and ``set()`` methods clear
        the prefetched cache.
+
+.. class:: ManyToManyDescriptor
+
+    A "related descriptor" is a descriptor used in a many-to-many
+    related context. This happens for both sides of a
+    :class:`~django.db.models.ManyToManyField` relation::
+
+          class Topping(models.Model):
+              # ...
+              pass
+
+          class Pizza(models.Model):
+              toppings = models.ManyToManyField(Topping)
+
+    In this example, the methods below will be available both on
+    ``Topping.pizza_set`` and on ``Pizza.toppings``.
+
+    .. method:: add_relations(relations, *, assert_no_collisions=False)
+
+        .. versionadded:: 3.1
+
+        Adds pairs of related objects.
+
+        Example::
+
+            >>> my_pizza = Pizza.objects.get(id=1)
+            >>> your_pizza = Pizza.objects.get(id=2)
+            >>> pepperoni = Topping.objects.get(id=101)
+            >>> mushroom = Topping.objects.get(id=102)
+            >>> Pizza.toppings.add_relations([
+            ...     (my_pizza, pepperoni),
+            ...     (your_pizza, pepperoni),
+            ...     (your_pizza, mushroom),
+            ... ])
+
+        Using ``add_relations()`` will not call any ``save()`` methods, but
+        rather create the relationships using :meth:`QuerySet.bulk_create()
+        <django.db.models.query.QuerySet.bulk_create>`.
+
+        Using ``add_relations()`` on a relation that already exists won't
+        duplicate the relation.
+
+        ``add_relations()`` also accepts primary key values as arguments.
+        The above example can be rewritten as::
+
+            >>> Pizza.toppings.add_relations([
+            ...     (1, 101),
+            ...     (2, 101),
+            ...     (2, 102),
+            ... ])
+
+        You can use the ``assert_no_collisions=True`` argument to save one
+        database query if you assert that none of the specified relations
+        already exist. If a specified relation exists anyway then this method
+        will fail with an :exc:`~django.db.IntegrityError` and none of the
+        relations will be added.
+
+    .. method:: remove_relations(relations)
+
+        .. versionadded:: 3.1
+
+        Removes pairs of related objects::
+
+            >>> my_pizza = Pizza.objects.get(id=1)
+            >>> your_pizza = Pizza.objects.get(id=2)
+            >>> pepperoni = Topping.objects.get(id=101)
+            >>> mushroom = Topping.objects.get(id=102)
+            >>> Pizza.toppings.remove_relations([
+            ...     (my_pizza, pepperoni),
+            ...     (your_pizza, pepperoni),
+            ...     (your_pizza, mushroom),
+            ... ])
+
+        Using ``remove_relations()`` on a relation that did not exist before
+        will ignore the relation.
+
+        Similarly to :meth:`add_relations()`, ``remove_relations()``
+        also accepts primary key values as arguments.
+        The above example can be rewritten as::
+
+            >>> Pizza.toppings.remove_relations([
+            ...     (1, 101),
+            ...     (2, 101),
+            ...     (2, 102),
+            ... ])

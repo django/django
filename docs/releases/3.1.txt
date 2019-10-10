@@ -170,6 +170,10 @@ Pagination
 
 * :class:`~django.core.paginator.Paginator` can now be iterated over to yield
   its pages.
+* :meth:`Model1.model2_set.add_relations() <django.db.models.fields.related.ManyToManyDescriptor.add_relations>`
+  and :meth:`Model1.model2_set.remove_relations() <django.db.models.fields.related.ManyToManyDescriptor.remove_relations>`
+  can be used to efficiently add and remove several pairs of related objects for
+  many-to-many fields.
 
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~

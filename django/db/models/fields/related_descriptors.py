@@ -798,6 +798,81 @@ class ManyToManyDescriptor(ReverseManyToOneDescriptor):
             self.rel.get_accessor_name() if self.reverse else self.field.name,
         )
 
+    def add_relations(self, relations, *, assert_no_collisions=False):
+        """
+        Creates many (M1, M2) relations with O(1) database queries.
+
+        Any requested relations that already exist will be left alone.
+
+        If you assert that none of the requested relations already exist,
+        you can pass assert_no_collisions=True to save 1 database query.
+        """
+        if len(relations) == 0:
+            return
+
+        (M1_M2, m1_pk_field_name, m2_pk_field_name, m1_m2_pk_tuples) = \
+            self._parse_relations(relations)
+
+        if assert_no_collisions:
+            existing_m1_m2_pk_tuples = set()  # type: Set[Tuple[PK, PK]]
+        else:
+            q = M1_M2.objects.none()
+            for (m1_pk, m2_pk) in m1_m2_pk_tuples:
+                q |= Q(**{m1_pk_field_name: m1_pk, m2_pk_field_name: m2_pk})
+            existing_m1_m2_pk_tuples = {
+                (getattr(m1_m2, m1_pk_field_name), getattr(m1_m2, m2_pk_field_name))
+                for m1_m2 in
+                M1_M2.objects.filter(q)
+            }
+
+        M1_M2.objects.bulk_create([
+            M1_M2(**{m1_pk_field_name: m1_pk, m2_pk_field_name: m2_pk})
+            for (m1_pk, m2_pk) in m1_m2_pk_tuples
+            if (m1_pk, m2_pk) not in existing_m1_m2_pk_tuples
+        ])
+
+    def remove_relations(self, relations):
+        """
+        Deletes many (M1, M2) relations with O(1) database queries.
+
+        Any requested relations that did not exist before will be skipped.
+        """
+        if len(relations) == 0:
+            return
+
+        (M1_M2, m1_pk_field_name, m2_pk_field_name, m1_m2_pk_tuples) = \
+            self._parse_relations(relations)
+
+        q = M1_M2.objects.none()
+        for (m1_pk, m2_pk) in m1_m2_pk_tuples:
+            q |= Q(**{m1_pk_field_name: m1_pk, m2_pk_field_name: m2_pk})
+        M1_M2.objects.filter(q).delete()
+
+    def _parse_relations(self, relations):
+        from django.db.models import Model
+
+        rel = self.rel
+        M1_M2 = rel.through
+
+        m1_field_name = rel.field.m2m_field_name()
+        m1_pk_field_name = M1_M2._meta.get_field(m1_field_name).get_attname()
+
+        m2_field_name = rel.field.m2m_reverse_field_name()
+        m2_pk_field_name = M1_M2._meta.get_field(m2_field_name).get_attname()
+
+        if self.reverse:
+            (m1_pk_field_name, m2_pk_field_name) = (m2_pk_field_name, m1_pk_field_name)
+
+        m1_m2_pk_tuples = [
+            (
+                m1.pk if isinstance(m1, Model) else m1,
+                m2.pk if isinstance(m2, Model) else m2,
+            )
+            for (m1, m2) in relations
+        ]
+
+        return (M1_M2, m1_pk_field_name, m2_pk_field_name, m1_m2_pk_tuples)
+
 
 def create_forward_many_to_many_manager(superclass, rel, reverse):
     """

@@ -1,6 +1,7 @@
 from unittest import mock
 
 from django.db import transaction
+from django.db.utils import IntegrityError
 from django.test import TestCase, skipUnlessDBFeature
 
 from .models import (
@@ -164,6 +165,116 @@ class ManyToManyTests(TestCase):
             with mock.patch.object(manager_cls, '_get_add_plan', return_value=add_plan):
                 self.a1.publications.add(self.p1)
         mocked.assert_called_once()
+
+    def test_add_relations(self):
+        self.assertIn(self.p1, self.a1.publications.all())
+        self.assertNotIn(self.p3, self.a3.publications.all())
+        self.assertNotIn(self.p4, self.a3.publications.all())
+        self.assertNotIn(self.p3, self.a4.publications.all())
+        self.assertNotIn(self.p4, self.a4.publications.all())
+        with self.assertNumQueries(2):
+            Article.publications.add_relations([
+                (self.a1, self.p1),
+                (self.a3, self.p3),
+                (self.a3, self.p4),
+                (self.a4, self.p3),
+                (self.a4, self.p4),
+            ])
+        self.assertIn(self.p1, self.a1.publications.all())
+        self.assertIn(self.p3, self.a3.publications.all())
+        self.assertIn(self.p4, self.a3.publications.all())
+        self.assertIn(self.p3, self.a4.publications.all())
+        self.assertIn(self.p4, self.a4.publications.all())
+
+    def test_add_relations_by_pk(self):
+        self.assertIn(self.p1, self.a1.publications.all())
+        self.assertNotIn(self.p3, self.a3.publications.all())
+        self.assertNotIn(self.p4, self.a3.publications.all())
+        self.assertNotIn(self.p3, self.a4.publications.all())
+        self.assertNotIn(self.p4, self.a4.publications.all())
+        with self.assertNumQueries(2):
+            Article.publications.add_relations([
+                (self.a1.pk, self.p1.pk),
+                (self.a3.pk, self.p3.pk),
+                (self.a3.pk, self.p4.pk),
+                (self.a4.pk, self.p3.pk),
+                (self.a4.pk, self.p4.pk),
+            ])
+        self.assertIn(self.p1, self.a1.publications.all())
+        self.assertIn(self.p3, self.a3.publications.all())
+        self.assertIn(self.p4, self.a3.publications.all())
+        self.assertIn(self.p3, self.a4.publications.all())
+        self.assertIn(self.p4, self.a4.publications.all())
+
+    def test_add_relations_with_assert_no_collisions(self):
+        # No collision
+        self.assertNotIn(self.p3, self.a3.publications.all())
+        with self.assertNumQueries(1):
+            Article.publications.add_relations([
+                (self.a3, self.p3),
+            ], assert_no_collisions=True)
+        self.assertIn(self.p3, self.a3.publications.all())
+
+        # Collision! Should raise IntegrityError. Should affect no rows.
+        self.assertNotIn(self.p4, self.a4.publications.all())
+        self.assertIn(self.p1, self.a1.publications.all())
+        with transaction.atomic():
+            with self.assertRaisesMessage(IntegrityError, ''):
+                with self.assertNumQueries(1):
+                    Article.publications.add_relations([
+                        (self.a4, self.p4),
+                        (self.a1, self.p1),
+                    ], assert_no_collisions=True)
+        self.assertNotIn(self.p4, self.a4.publications.all())
+        self.assertIn(self.p1, self.a1.publications.all())
+
+    def test_reverse_add_relations(self):
+        self.assertIn(self.p1, self.a1.publications.all())
+        self.assertNotIn(self.p3, self.a3.publications.all())
+        self.assertNotIn(self.p4, self.a3.publications.all())
+        self.assertNotIn(self.p3, self.a4.publications.all())
+        self.assertNotIn(self.p4, self.a4.publications.all())
+        with self.assertNumQueries(2):
+            Publication.article_set.add_relations([
+                (self.p1, self.a1),
+                (self.p3, self.a3),
+                (self.p4, self.a3),
+                (self.p3, self.a4),
+                (self.p4, self.a4),
+            ])
+        self.assertIn(self.p1, self.a1.publications.all())
+        self.assertIn(self.p3, self.a3.publications.all())
+        self.assertIn(self.p4, self.a3.publications.all())
+        self.assertIn(self.p3, self.a4.publications.all())
+        self.assertIn(self.p4, self.a4.publications.all())
+
+    def test_remove_relations(self):
+        self.assertIn(self.p1, self.a1.publications.all())
+        self.assertIn(self.p2, self.a2.publications.all())
+        self.assertNotIn(self.p3, self.a3.publications.all())
+        with self.assertNumQueries(1):
+            Article.publications.remove_relations([
+                (self.a1, self.p1),
+                (self.a2, self.p2),
+                (self.a3, self.p3),
+            ])
+        self.assertNotIn(self.p1, self.a1.publications.all())
+        self.assertNotIn(self.p2, self.a2.publications.all())
+        self.assertNotIn(self.p3, self.a3.publications.all())
+
+    def test_reverse_remove_relations(self):
+        self.assertIn(self.p1, self.a1.publications.all())
+        self.assertIn(self.p2, self.a2.publications.all())
+        self.assertNotIn(self.p3, self.a3.publications.all())
+        with self.assertNumQueries(1):
+            Publication.article_set.remove_relations([
+                (self.p1, self.a1),
+                (self.p2, self.a2),
+                (self.p3, self.a3),
+            ])
+        self.assertNotIn(self.p1, self.a1.publications.all())
+        self.assertNotIn(self.p2, self.a2.publications.all())
+        self.assertNotIn(self.p3, self.a3.publications.all())
 
     def test_related_sets(self):
         # Article objects have access to their related Publication objects.
