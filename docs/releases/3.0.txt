@@ -309,6 +309,10 @@ Models
   require. See :ref:`Subclassing the built-in database backends
   <subclassing-database-backends>` for an example.
 
+* The new :attr:`.AutoField.is_signed` attribute allows setting whether the
+  generated database column should store signed or unsigned values. It defaults
+  to ``True`` for backward compatibility reasons.
+
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 

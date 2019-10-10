@@ -2319,6 +2319,12 @@ class AutoFieldMixin:
 
     def __init__(self, *args, **kwargs):
         kwargs['blank'] = True
+
+        if kwargs.pop("is_signed", True):
+            self.signed_or_unsigned = "signed"
+        else:
+            self.signed_or_unsigned = "unsigned"
+
         super().__init__(*args, **kwargs)
 
     def check(self, **kwargs):

@@ -3,7 +3,10 @@ from contextlib import contextmanager
 
 from django.core.exceptions import ImproperlyConfigured
 from django.db import connection
-from django.test import TestCase, override_settings
+from django.test import TestCase, TransactionTestCase, override_settings
+from django.test.utils import isolate_apps
+
+from ..models import SignedAutoFieldModel, UnsignedAutoFieldModel
 
 
 @contextmanager
@@ -89,3 +92,23 @@ class IsolationLevelTests(TestCase):
         )
         with self.assertRaisesMessage(ImproperlyConfigured, msg):
             new_connection.cursor()
+
+
+@unittest.skipUnless(connection.vendor == "mysql", "MySQL tests")
+@isolate_apps("backends")
+class SchemaTests(TransactionTestCase):
+    available_apps = ["backends"]
+
+    def test_autoid_signed(self):
+        with connection.schema_editor(collect_sql=True) as editor:
+            editor.create_model(SignedAutoFieldModel)
+            stmts = editor.collected_sql
+
+        self.assertIn("integer signed AUTO_INCREMENT NOT NULL PRIMARY KEY", stmts[0])
+
+    def test_autoid_unsigned(self):
+        with connection.schema_editor(collect_sql=True) as editor:
+            editor.create_model(UnsignedAutoFieldModel)
+            stmts = editor.collected_sql
+
+        self.assertIn("integer unsigned AUTO_INCREMENT NOT NULL PRIMARY KEY", stmts[0])

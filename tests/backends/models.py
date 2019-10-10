@@ -5,6 +5,14 @@ from django.contrib.contenttypes.models import ContentType
 from django.db import models
 
 
+class SignedAutoFieldModel(models.Model):
+    id = models.AutoField(primary_key=True)
+
+
+class UnsignedAutoFieldModel(models.Model):
+    id = models.AutoField(primary_key=True, is_signed=False)
+
+
 class Square(models.Model):
     root = models.IntegerField()
     square = models.PositiveIntegerField()
