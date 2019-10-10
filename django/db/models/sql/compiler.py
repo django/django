@@ -1,5 +1,6 @@
 import collections
 import re
+from functools import partial
 from itertools import chain
 
 from django.core.exceptions import EmptyResultSet, FieldError
@@ -896,6 +897,9 @@ class SQLCompiler:
                 if from_obj:
                     f.remote_field.set_cached_value(from_obj, obj)
 
+            def remote_setter(name, obj, from_obj):
+                setattr(from_obj, name, obj)
+
             for name in list(requested):
                 # Filtered relations work only on the topmost level.
                 if cur_depth > 1:
@@ -906,15 +910,12 @@ class SQLCompiler:
                     model = join_opts.model
                     alias = joins[-1]
                     from_parent = issubclass(model, opts.model) and model is not opts.model
-
-                    def remote_setter(obj, from_obj):
-                        setattr(from_obj, name, obj)
                     klass_info = {
                         'model': model,
                         'field': f,
                         'reverse': True,
                         'local_setter': local_setter,
-                        'remote_setter': remote_setter,
+                        'remote_setter': partial(remote_setter, name),
                         'from_parent': from_parent,
                     }
                     related_klass_infos.append(klass_info)
