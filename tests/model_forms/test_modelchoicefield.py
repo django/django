@@ -55,6 +55,10 @@ class ModelChoiceFieldTests(TestCase):
         with self.assertRaisesMessage(ValidationError, msg):
             f.clean(c4.id)
 
+    def test_clean_to_field_name(self):
+        f = forms.ModelChoiceField(Category.objects.all(), to_field_name='slug')
+        self.assertEqual(f.clean(self.c1.slug), self.c1)
+
     def test_choices(self):
         f = forms.ModelChoiceField(Category.objects.filter(pk=self.c1.id), required=False)
         self.assertIsNone(f.clean(''))
