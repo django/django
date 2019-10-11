@@ -890,6 +890,12 @@ class SQLCompiler:
                     select, model._meta, alias, cur_depth + 1,
                     next, restricted)
                 get_related_klass_infos(klass_info, next_klass_infos)
+
+            def local_setter(obj, from_obj):
+                # Set a reverse fk object when relation is non-empty.
+                if from_obj:
+                    f.remote_field.set_cached_value(from_obj, obj)
+
             for name in list(requested):
                 # Filtered relations work only on the topmost level.
                 if cur_depth > 1:
@@ -900,11 +906,6 @@ class SQLCompiler:
                     model = join_opts.model
                     alias = joins[-1]
                     from_parent = issubclass(model, opts.model) and model is not opts.model
-
-                    def local_setter(obj, from_obj):
-                        # Set a reverse fk object when relation is non-empty.
-                        if from_obj:
-                            f.remote_field.set_cached_value(from_obj, obj)
 
                     def remote_setter(obj, from_obj):
                         setattr(from_obj, name, obj)
