@@ -36,6 +36,9 @@ details on these changes.
 
 * The ``PASSWORD_RESET_TIMEOUT_DAYS`` setting will be removed.
 
+* The undocumented usage of the :lookup:`isnull` lookup with non-boolean values
+  as the right-hand side will no longer be allowed.
+
 See the :ref:`Django 3.1 release notes <deprecated-features-3.1>` for more
 details on these changes.
 

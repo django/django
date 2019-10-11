@@ -96,3 +96,15 @@ class Product(models.Model):
 class Stock(models.Model):
     product = models.ForeignKey(Product, models.CASCADE)
     qty_available = models.DecimalField(max_digits=6, decimal_places=2)
+
+
+class Freebie(models.Model):
+    gift_product = models.ForeignKey(Product, models.CASCADE)
+    stock_id = models.IntegerField(blank=True, null=True)
+
+    stock = models.ForeignObject(
+        Stock,
+        from_fields=['stock_id', 'gift_product'],
+        to_fields=['id', 'product'],
+        on_delete=models.CASCADE,
+    )

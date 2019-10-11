@@ -1,5 +1,6 @@
 import itertools
 import math
+import warnings
 from copy import copy
 
 from django.core.exceptions import EmptyResultSet
@@ -9,6 +10,7 @@ from django.db.models.fields import (
 )
 from django.db.models.query_utils import RegisterLookupMixin
 from django.utils.datastructures import OrderedSet
+from django.utils.deprecation import RemovedInDjango40Warning
 from django.utils.functional import cached_property
 
 
@@ -463,6 +465,17 @@ class IsNull(BuiltinLookup):
     prepare_rhs = False
 
     def as_sql(self, compiler, connection):
+        if not isinstance(self.rhs, bool):
+            # When the deprecation ends, replace with:
+            # raise ValueError(
+            #     'The QuerySet value for an isnull lookup must be True or '
+            #     'False.'
+            # )
+            warnings.warn(
+                'Using a non-boolean value for an isnull lookup is '
+                'deprecated, use True or False instead.',
+                RemovedInDjango40Warning,
+            )
         sql, params = compiler.compile(self.lhs)
         if self.rhs:
             return "%s IS NULL" % sql, params
