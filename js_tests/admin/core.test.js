@@ -67,6 +67,11 @@ QUnit.test('String.strptime', function(assert) {
     assert.equal(thirdParsedDate.getUTCMonth(), 10);
     assert.equal(thirdParsedDate.getUTCFullYear(), 1983);
 
+    var fourthParsedDate = '27/09/19'.strptime('%d/%m/%y');
+    assert.equal(fourthParsedDate.getUTCDate(), 27);
+    assert.equal(fourthParsedDate.getUTCMonth(), 8);
+    assert.equal(fourthParsedDate.getUTCFullYear(), 2019);
+
     // Extracting from a Date object with local time must give the correct
     // result. Without proper conversion, timezones from GMT+0100 to GMT+1200
     // gives a date one day earlier than necessary, e.g. converting local time

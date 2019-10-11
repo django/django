@@ -159,7 +159,12 @@ function findPosY(obj) {
                 year = date[i];
                 break;
             case "%y":
-                year = date[i];
+                // 50 is cut off year. 50 to 99 means year 19xx.  00 to 49 means year 20xx.
+                if (parseInt(date[i], 10) >= 50) {
+                    year = date[i];
+                } else {
+                    year = (new Date(Date.UTC(date[i], 0))).getUTCFullYear() + 100;
+                }
                 break;
             }
             ++i;
