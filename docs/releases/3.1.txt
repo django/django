@@ -391,6 +391,10 @@ Miscellaneous
   options on models in ``django.contrib`` modules that were formerly tuples are
   now lists.
 
+* The admin calendar widget now handles two-digit years according to the Open
+  Group Specification, i.e. values between 69 and 99 are mapped to the previous
+  century, and values between 0 and 68 are mapped to the current century.
+
 .. _deprecated-features-3.1:
 
 Features deprecated in 3.1
