@@ -319,6 +319,7 @@ class MigrateTests(MigrationTestBase):
             'migrations.0001_initial\n'
             '    Create model Salamander\n'
             '    Raw Python operation -> Grow salamander tail.\n'
+            '    Raw Python operation\n'
             'migrations.0002_second\n'
             '    Create model Book\n'
             "    Raw SQL operation -> ['SELECT * FROM migrations_book']\n"
@@ -356,7 +357,8 @@ class MigrateTests(MigrationTestBase):
         self.assertEqual(
             'Planned operations:\n'
             'migrations.0004_fourth\n'
-            '    Raw SQL operation -> SELECT * FROM migrations_author WHE…\n',
+            '    Raw SQL operation -> SELECT * FROM migrations_author WHE…\n'
+            '    Raw Python operation\n',
             out.getvalue()
         )
         # Show the plan when an operation is irreversible.
@@ -367,7 +369,8 @@ class MigrateTests(MigrationTestBase):
         self.assertEqual(
             'Planned operations:\n'
             'migrations.0004_fourth\n'
-            '    Raw SQL operation -> IRREVERSIBLE\n',
+            '    Raw SQL operation -> IRREVERSIBLE\n'
+            '    Raw Python operation -> IRREVERSIBLE\n',
             out.getvalue()
         )
         # Cleanup by unmigrating everything: fake the irreversible, then

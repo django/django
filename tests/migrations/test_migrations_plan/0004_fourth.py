@@ -1,6 +1,14 @@
 from django.db import migrations
 
 
+def grow_tail(x, y):
+    pass
+
+
+def shrink_tail(x, y):
+    pass
+
+
 class Migration(migrations.Migration):
 
     dependencies = [
@@ -8,5 +16,6 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunSQL('SELECT * FROM migrations_author WHERE id = 1')
+        migrations.RunSQL('SELECT * FROM migrations_author WHERE id = 1'),
+        migrations.RunPython(grow_tail, shrink_tail),
     ]

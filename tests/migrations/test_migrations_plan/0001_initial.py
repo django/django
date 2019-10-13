@@ -11,6 +11,10 @@ def shrink_tail(x, y):
     pass
 
 
+def forward(apps, schema_editor):
+    pass
+
+
 class Migration(migrations.Migration):
 
     initial = True
@@ -25,4 +29,5 @@ class Migration(migrations.Migration):
             ],
         ),
         migrations.RunPython(grow_tail, shrink_tail),
+        migrations.RunPython(forward, shrink_tail),
     ]
