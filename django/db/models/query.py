@@ -189,7 +189,7 @@ class QuerySet:
         self.model = model
         self._db = using
         self._hints = hints or {}
-        self.query = query or sql.Query(self.model)
+        self._query = query or sql.Query(self.model)
         self._result_cache = None
         self._sticky_filter = False
         self._for_write = False
@@ -198,6 +198,20 @@ class QuerySet:
         self._known_related_objects = {}  # {rel_field: {pk: rel_obj}}
         self._iterable_class = ModelIterable
         self._fields = None
+        self._defer_next_filter = False
+        self._deferred_filter = None
+
+    @property
+    def query(self):
+        if self._deferred_filter:
+            negate, args, kwargs = self._deferred_filter
+            self._filter_or_exclude_inplace(negate, *args, **kwargs)
+            self._deferred_filter = None
+        return self._query
+
+    @query.setter
+    def query(self, value):
+        self._query = value
 
     def as_manager(cls):
         # Address the circular dependency between `Queryset` and `Manager`.
@@ -914,11 +928,18 @@ class QuerySet:
                 "Cannot filter a query once a slice has been taken."
 
         clone = self._chain()
-        if negate:
-            clone.query.add_q(~Q(*args, **kwargs))
+        if self._defer_next_filter:
+            self._defer_next_filter = False
+            clone._deferred_filter = negate, args, kwargs
         else:
-            clone.query.add_q(Q(*args, **kwargs))
+            clone._filter_or_exclude_inplace(negate, *args, **kwargs)
         return clone
+
+    def _filter_or_exclude_inplace(self, negate, *args, **kwargs):
+        if negate:
+            self._query.add_q(~Q(*args, **kwargs))
+        else:
+            self._query.add_q(Q(*args, **kwargs))
 
     def complex_filter(self, filter_obj):
         """

@@ -5,6 +5,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.db import connection
 from django.db.models import Prefetch, QuerySet
 from django.db.models.query import get_prefetcher, prefetch_related_objects
+from django.db.models.sql import Query
 from django.test import TestCase, override_settings
 from django.test.utils import CaptureQueriesContext
 
@@ -290,6 +291,20 @@ class PrefetchRelatedTests(TestDataMixin, TestCase):
 
         sql = queries[-1]['sql']
         self.assertWhereContains(sql, self.author1.id)
+
+    def test_filter_deferred(self):
+        """
+        Related filtering of prefetched querysets is deferred until necessary.
+        """
+        add_q = Query.add_q
+        with mock.patch.object(
+            Query,
+            'add_q',
+            autospec=True,
+            side_effect=lambda self, q: add_q(self, q),
+        ) as add_q_mock:
+            list(Book.objects.prefetch_related('authors'))
+            self.assertEqual(add_q_mock.call_count, 1)
 
 
 class RawQuerySetTests(TestDataMixin, TestCase):
@@ -822,6 +837,22 @@ class CustomPrefetchTests(TestCase):
             all_houses = list(House.objects.filter(occupants=person))
             with self.assertNumQueries(0):
                 self.assertEqual(person.cached_all_houses, all_houses)
+
+    def test_filter_deferred(self):
+        """
+        Related filtering of prefetched querysets is deferred until necessary.
+        """
+        add_q = Query.add_q
+        with mock.patch.object(
+            Query,
+            'add_q',
+            autospec=True,
+            side_effect=lambda self, q: add_q(self, q),
+        ) as add_q_mock:
+            list(House.objects.prefetch_related(
+                Prefetch('occupants', queryset=Person.objects.all())
+            ))
+            self.assertEqual(add_q_mock.call_count, 1)
 
 
 class DefaultManagerTests(TestCase):

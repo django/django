@@ -883,6 +883,7 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
             queryset._add_hints(instance=self.instance)
             if self._db:
                 queryset = queryset.using(self._db)
+            queryset._defer_next_filter = True
             return queryset._next_is_sticky().filter(**self.core_filters)
 
         def _remove_prefetched_objects(self):
