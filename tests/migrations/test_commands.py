@@ -378,6 +378,33 @@ class MigrateTests(MigrationTestBase):
         call_command('migrate', 'migrations', '0003', fake=True, verbosity=0)
         call_command('migrate', 'migrations', 'zero', verbosity=0)
 
+    @override_settings(MIGRATION_MODULES={'migrations': 'migrations.test_migrations_plan_noop'})
+    def test_migrate_plan_noop(self):
+        # Show the plan to initial migration.
+        out = io.StringIO()
+        call_command('migrate', 'migrations', '0001_initial', plan=True, stdout=out, no_color=True)
+        self.assertEqual(
+            'Planned operations:\n'
+            'migrations.0001_initial\n'
+            '    Raw SQL operation -> IRREVERSIBLE\n'
+            '    Raw Python operation -> IRREVERSIBLE\n',
+            out.getvalue()
+        )
+
+        # Migrate to the initial migration.
+        call_command('migrate', 'migrations', '0001', verbosity=0)
+
+        # Show the plan for reverse migration back to zero.
+        out = io.StringIO()
+        call_command('migrate', 'migrations', 'zero', plan=True, stdout=out, no_color=True)
+        self.assertEqual(
+            'Planned operations:\n'
+            'migrations.0001_initial\n'
+            '    Raw SQL operation -> IRREVERSIBLE\n'
+            '    Raw Python operation -> IRREVERSIBLE\n',
+            out.getvalue()
+        )
+
     @override_settings(MIGRATION_MODULES={'migrations': 'migrations.test_migrations_empty'})
     def test_showmigrations_no_migrations(self):
         out = io.StringIO()

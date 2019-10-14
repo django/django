@@ -9,7 +9,7 @@ from django.core.management.base import (
 from django.core.management.sql import (
     emit_post_migrate_signal, emit_pre_migrate_signal,
 )
-from django.db import DEFAULT_DB_ALIAS, connections, router
+from django.db import DEFAULT_DB_ALIAS, connections, migrations, router
 from django.db.migrations.autodetector import MigrationAutodetector
 from django.db.migrations.executor import MigrationExecutor
 from django.db.migrations.loader import AmbiguityError
@@ -346,14 +346,19 @@ class Command(BaseCommand):
         if hasattr(operation, 'code'):
             _action = None if backwards else ''
             code = operation.reverse_code if backwards else operation.code
-            action = (code.__doc__ or _action) if code else _action
+            if code == migrations.RunPython.noop:
+                action = 'noop'
+            else:
+                action = (code.__doc__ or _action) if code else _action
         elif hasattr(operation, 'sql'):
             action = operation.reverse_sql if backwards else operation.sql
+            if action == migrations.RunSQL.noop:
+                action = 'noop'
         else:
             action = ''
             if backwards:
                 prefix = 'Undo '
-        if action is None and backwards:
+        if (action is None and backwards) or action == 'noop':
             action = 'IRREVERSIBLE'
             is_error = True
         else:
