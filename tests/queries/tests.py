@@ -7,6 +7,7 @@ from operator import attrgetter
 from django.core.exceptions import EmptyResultSet, FieldError
 from django.db import DEFAULT_DB_ALIAS, connection
 from django.db.models import Count, Exists, F, OuterRef, Q
+from django.db.models.query import REPR_OUTPUT_SIZE
 from django.db.models.sql.constants import LOUTER
 from django.db.models.sql.where import NothingNode, WhereNode
 from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
@@ -3950,3 +3951,29 @@ class Ticket23622Tests(TestCase):
             set(Ticket23605A.objects.filter(qy).values_list('pk', flat=True))
         )
         self.assertSequenceEqual(Ticket23605A.objects.filter(qx), [a2])
+
+
+class Ticket20393Tests(TestCase):
+    def test_ticket_20393(self):
+        """
+        repr(queryset) should only include results if the queryset _result_cache is populated
+        """
+        individuals = [Individual.objects.create(alive=True) for _ in range(REPR_OUTPUT_SIZE)]
+        queryset = Individual.objects.all()
+        # the queryset hasn't been evaluated yet, so show no results in the repr
+        self.assertEqual(repr(queryset), "<QuerySet>")
+        # after we evaluate the queryset, we should see all the objects listed in the repr
+        list(queryset)
+        self.assertEqual(repr(queryset), "<QuerySet %r>" % list(individuals))
+        # despite adding another object, we should see the stale data in the repr
+        Individual.objects.create(alive=True)
+        self.assertEqual(repr(queryset), "<QuerySet %r>" % list(individuals))
+        # ensure we see truncated results when the number of objects exceeds the REPR_OUTPUT_SIZE
+        queryset = Individual.objects.all()
+        list(queryset)
+        individuals.append("...(remaining elements truncated)...")
+        self.assertEqual(repr(queryset), "<QuerySet %r>" % list(individuals))
+        # ensure we see [] when the queryset has no results
+        queryset = Individual.objects.filter(alive=False)
+        list(queryset)
+        self.assertEqual(repr(queryset), "<QuerySet []>")
