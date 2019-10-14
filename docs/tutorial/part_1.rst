@@ -42,8 +42,8 @@ run natively.
     tutorial will need Redis to run, and we recommend Docker as the easiest
     way to do this.
 
-.. _the Django tutorial: https://docs.djangoproject.com/en/2.0/intro/tutorial01/
-.. _Django installed: https://docs.djangoproject.com/en/2.0/intro/install/
+.. _the Django tutorial: https://docs.djangoproject.com/en/stable/intro/tutorial01/
+.. _Django installed: https://docs.djangoproject.com/en/stable/intro/install/
 
 .. _Install Docker: https://www.docker.com/get-docker
 
