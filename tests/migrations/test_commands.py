@@ -371,6 +371,28 @@ class MigrateTests(MigrationTestBase):
                 '    Raw SQL operation -> IRREVERSIBLE\n',
                 out.getvalue()
             )
+            out = io.StringIO()
+            call_command('migrate', 'migrations', '0005', plan=True, stdout=out, no_color=True)
+            # Operation is marked as irreversible only in the revert plan.
+            self.assertEqual(
+                'Planned operations:\n'
+                'migrations.0005_fifth\n'
+                '    Raw Python operation\n'
+                '    Raw Python operation\n'
+                '    Raw Python operation -> Feed salamander.\n',
+                out.getvalue()
+            )
+            call_command('migrate', 'migrations', '0005', verbosity=0)
+            out = io.StringIO()
+            call_command('migrate', 'migrations', '0004', plan=True, stdout=out, no_color=True)
+            self.assertEqual(
+                'Planned operations:\n'
+                'migrations.0005_fifth\n'
+                '    Raw Python operation -> IRREVERSIBLE\n'
+                '    Raw Python operation -> IRREVERSIBLE\n'
+                '    Raw Python operation\n',
+                out.getvalue()
+            )
         finally:
             # Cleanup by unmigrating everything: fake the irreversible, then
             # migrate all to zero.
