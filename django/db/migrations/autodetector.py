@@ -927,6 +927,10 @@ class MigrationAutodetector:
                 if remote_field_name:
                     to_field_rename_key = rename_key + (remote_field_name,)
                     if to_field_rename_key in self.renamed_fields:
+                        # Repoint both model and field name because to_field
+                        # inclusion in ForeignKey.deconstruct() is based on
+                        # both.
+                        new_field.remote_field.model = old_field.remote_field.model
                         new_field.remote_field.field_name = old_field.remote_field.field_name
                 # Handle ForeignObjects which can have multiple from_fields/to_fields.
                 from_fields = getattr(new_field, 'from_fields', None)
