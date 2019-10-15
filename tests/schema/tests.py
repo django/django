@@ -943,7 +943,7 @@ class SchemaTests(TransactionTestCase):
             editor.create_model(Book)
         # Ensure the field is right to begin with
         columns = self.column_classes(Book)
-        self.assertEqual(columns['author_id'][0], "IntegerField")
+        self.assertEqual(columns['author_id'][0], "PositiveIntegerField")
         self.assertForeignKeyExists(Book, 'author_id', 'schema_author')
         # Alter the FK
         old_field = Book._meta.get_field("author")
@@ -953,7 +953,7 @@ class SchemaTests(TransactionTestCase):
             editor.alter_field(Book, old_field, new_field, strict=True)
         # Ensure the field is right afterwards
         columns = self.column_classes(Book)
-        self.assertEqual(columns['author_id'][0], "IntegerField")
+        self.assertEqual(columns['author_id'][0], "PositiveIntegerField")
         self.assertForeignKeyExists(Book, 'author_id', 'schema_author')
 
     @skipUnlessDBFeature('supports_foreign_keys')
@@ -999,7 +999,7 @@ class SchemaTests(TransactionTestCase):
             editor.create_model(BookWithO2O)
         # Ensure the field is right to begin with
         columns = self.column_classes(BookWithO2O)
-        self.assertEqual(columns['author_id'][0], "IntegerField")
+        self.assertEqual(columns['author_id'][0], "PositiveIntegerField")
         # Ensure the field is unique
         author = Author.objects.create(name="Joe")
         BookWithO2O.objects.create(author=author, title="Django 1", pub_date=datetime.datetime.now())
@@ -1015,7 +1015,7 @@ class SchemaTests(TransactionTestCase):
             editor.alter_field(BookWithO2O, old_field, new_field, strict=True)
         # Ensure the field is right afterwards
         columns = self.column_classes(Book)
-        self.assertEqual(columns['author_id'][0], "IntegerField")
+        self.assertEqual(columns['author_id'][0], "PositiveIntegerField")
         # Ensure the field is not unique anymore
         Book.objects.create(author=author, title="Django 1", pub_date=datetime.datetime.now())
         Book.objects.create(author=author, title="Django 2", pub_date=datetime.datetime.now())
@@ -1032,7 +1032,7 @@ class SchemaTests(TransactionTestCase):
             editor.create_model(Book)
         # Ensure the field is right to begin with
         columns = self.column_classes(Book)
-        self.assertEqual(columns['author_id'][0], "IntegerField")
+        self.assertEqual(columns['author_id'][0], "PositiveIntegerField")
         # Ensure the field is not unique
         author = Author.objects.create(name="Joe")
         Book.objects.create(author=author, title="Django 1", pub_date=datetime.datetime.now())
@@ -1047,7 +1047,7 @@ class SchemaTests(TransactionTestCase):
             editor.alter_field(Book, old_field, new_field, strict=True)
         # Ensure the field is right afterwards
         columns = self.column_classes(BookWithO2O)
-        self.assertEqual(columns['author_id'][0], "IntegerField")
+        self.assertEqual(columns['author_id'][0], "PositiveIntegerField")
         # Ensure the field is unique now
         BookWithO2O.objects.create(author=author, title="Django 1", pub_date=datetime.datetime.now())
         with self.assertRaises(IntegrityError):
@@ -1437,7 +1437,7 @@ class SchemaTests(TransactionTestCase):
             editor.create_model(LocalBookWithM2M)
         # Ensure there is now an m2m table there
         columns = self.column_classes(LocalBookWithM2M._meta.get_field("tags").remote_field.through)
-        self.assertEqual(columns['tagm2mtest_id'][0], "IntegerField")
+        self.assertEqual(columns['tagm2mtest_id'][0], "PositiveIntegerField")
 
     def test_m2m_create(self):
         self._test_m2m_create(ManyToManyField)
@@ -1476,8 +1476,8 @@ class SchemaTests(TransactionTestCase):
             editor.create_model(LocalBookWithM2MThrough)
         # Ensure there is now an m2m table there
         columns = self.column_classes(LocalTagThrough)
-        self.assertEqual(columns['book_id'][0], "IntegerField")
-        self.assertEqual(columns['tag_id'][0], "IntegerField")
+        self.assertEqual(columns['book_id'][0], "PositiveIntegerField")
+        self.assertEqual(columns['tag_id'][0], "PositiveIntegerField")
 
     def test_m2m_create_through(self):
         self._test_m2m_create_through(ManyToManyField)
@@ -1516,7 +1516,7 @@ class SchemaTests(TransactionTestCase):
             editor.add_field(LocalAuthorWithM2M, new_field)
         # Ensure there is now an m2m table there
         columns = self.column_classes(new_field.remote_field.through)
-        self.assertEqual(columns['tagm2mtest_id'][0], "IntegerField")
+        self.assertEqual(columns['tagm2mtest_id'][0], "PositiveIntegerField")
 
         # "Alter" the field. This should not rename the DB table to itself.
         with connection.schema_editor() as editor:
@@ -2482,7 +2482,7 @@ class SchemaTests(TransactionTestCase):
         """
         #23065 - Constraint names must be quoted if they contain capital letters.
         """
-        def get_field(*args, field_class=IntegerField, **kwargs):
+        def get_field(*args, field_class=PositiveIntegerField, **kwargs):
             kwargs['db_column'] = "CamelCase"
             field = field_class(*args, **kwargs)
             field.set_attributes_from_name("CamelCase")
