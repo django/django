@@ -3,7 +3,7 @@ import decimal
 import unittest
 
 from django.db import connection, models
-from django.db.models import Avg, F
+from django.db.models import Avg
 from django.db.models.expressions import Value
 from django.db.models.functions import Cast
 from django.test import (
