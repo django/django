@@ -9,6 +9,7 @@ from django.shortcuts import render
 from django.template import RequestContext, Template
 from django.urls import path, re_path, reverse_lazy
 from django.views.decorators.cache import never_cache
+from django.views.decorators.csrf import ensure_csrf_cookie, csrf_protect
 from django.views.i18n import set_language
 
 
@@ -19,6 +20,8 @@ class CustomRequestAuthenticationForm(AuthenticationForm):
 
 
 @never_cache
+@ensure_csrf_cookie
+@csrf_protect
 def remote_user_auth_view(request):
     "Dummy view for remote user tests"
     t = Template("Username is {{ user }}.")

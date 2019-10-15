@@ -37,6 +37,10 @@ def get_backends():
     return _get_backends(return_tuples=False)
 
 
+def csrf_is_enabled():
+    return 'django.middleware.csrf.CsrfViewMiddleware' in settings.MIDDLEWARE
+
+
 def _clean_credentials(credentials):
     """
     Clean a dictionary of credentials of potentially sensitive info before
@@ -127,7 +131,10 @@ def login(request, user, backend=None):
     request.session[HASH_SESSION_KEY] = session_auth_hash
     if hasattr(request, 'user'):
         request.user = user
-    rotate_token(request)
+    if csrf_is_enabled():
+        request.META['CSRF_COOKIE_USED'] = True
+        request.csrf_cookie_needs_reset = True
+        request.csrf_token_rotation = True
     user_logged_in.send(sender=user.__class__, request=request, user=user)
 
 

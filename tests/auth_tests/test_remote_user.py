@@ -151,6 +151,33 @@ class RemoteUserTest(TestCase):
         response = self.client.get('/remote_user/', **{self.header: 'knownuser'})
         self.assertTrue(response.context['user'].is_anonymous)
 
+    def test_csrf_rotation_on_login(self):
+        User.objects.create(username='knownuser')
+        # Do an 'anonymous' GET to establish a CSRF token
+        response = self.client.get('/remote_user/')
+        csrf_cookie = response.cookies.get(settings.CSRF_COOKIE_NAME, None)
+        token1 = csrf_cookie.coded_value
+
+        # Do an auth'ed POST to test the token rotation
+        response2 = self.client.post('/remote_user/',
+                                     **{self.header: self.known_user})
+        csrf_cookie2 = response2.cookies.get(settings.CSRF_COOKIE_NAME, None)
+        token2 = csrf_cookie2.coded_value
+
+        # Check the token has been accepted and the view has been processed
+        self.assertEqual(response2.status_code, 200)
+        # Check the CSRF token switched because a login has been triggered
+        self.assertNotEqual(token1, token2)
+
+        # Do another auth'ed POST to test that the token hasn't rotated
+        response3 = self.client.post('/remote_user/',
+                                     **{self.header: self.known_user})
+        csrf_cookie3 = response3.cookies.get(settings.CSRF_COOKIE_NAME, None)
+        token3 = csrf_cookie3.coded_value
+
+        # Check the CSRF token hasn't switched
+        self.assertEqual(token3, token2)
+
 
 class RemoteUserNoCreateBackend(RemoteUserBackend):
     """Backend that doesn't create unknown users."""

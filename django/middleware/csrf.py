@@ -319,6 +319,12 @@ class CsrfViewMiddleware(MiddlewareMixin):
         if not request.META.get("CSRF_COOKIE_USED", False):
             return response
 
+        # Handle token rotation
+        if getattr(request, 'csrf_token_rotation', False):
+            request.META.update({
+                "CSRF_COOKIE": _get_new_csrf_token(),
+            })
+
         # Set the CSRF cookie even if it's already set, so we renew
         # the expiry timer.
         self._set_token(request, response)

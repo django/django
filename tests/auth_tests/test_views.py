@@ -11,6 +11,7 @@ from django.conf import settings
 from django.contrib.admin.models import LogEntry
 from django.contrib.auth import (
     BACKEND_SESSION_KEY, REDIRECT_FIELD_NAME, SESSION_KEY,
+    login as auth_login,
 )
 from django.contrib.auth.forms import (
     AuthenticationForm, PasswordChangeForm, SetPasswordForm,
@@ -25,7 +26,7 @@ from django.contrib.sessions.middleware import SessionMiddleware
 from django.contrib.sites.requests import RequestSite
 from django.core import mail
 from django.db import connection
-from django.http import HttpRequest
+from django.http import HttpRequest, HttpResponseRedirect
 from django.middleware.csrf import CsrfViewMiddleware, get_token
 from django.test import Client, TestCase, override_settings
 from django.test.client import RedirectCycleError
@@ -679,6 +680,67 @@ class LoginTest(AuthViewsTestCase):
 
         # Check the CSRF token switched
         self.assertNotEqual(token1, token2)
+
+    def test_login_csrf_mw_token_rotation(self):
+        """
+        Makes sure that token rotation on login is done by the middleware.
+        Tests that django.contrib.auth.login does not rotates the CSRF token
+        and delegates it to the CSRF Middleware's process_response.
+        """
+        # The first part is analogous to test_login_csrf_rotate():
+        # Do a GET to establish a CSRF token
+        # The test client isn't used here as it's a test for middleware.
+        req = HttpRequest()
+        CsrfViewMiddleware().process_view(req, LoginView.as_view(), (), {})
+        # get_token() triggers CSRF token inclusion in the response
+        get_token(req)
+        resp = LoginView.as_view()(req)
+        resp2 = CsrfViewMiddleware().process_response(req, resp)
+        csrf_cookie = resp2.cookies.get(settings.CSRF_COOKIE_NAME, None)
+        token1 = csrf_cookie.coded_value
+
+        # Prepare the POST request
+        req = HttpRequest()
+        req.COOKIES[settings.CSRF_COOKIE_NAME] = token1
+        req.method = "POST"
+        req.POST = {
+            'username': 'testclient',
+            'password': 'password',
+            'csrfmiddlewaretoken': token1
+        }
+
+        # Here comes the difference:
+        # LoginView is decorated inside with 'csrf_protect', which calls
+        # MW.process_response, rotating the token indeed, but what the goal of
+        # the test is to check that the login function
+        # (which is not a view but the test ended up here :) does
+        # not rotate it and delegates it to the middleware. For this, the
+        # behaviour of LoginView will be reproduced to be tested.
+
+        # Apply the middleware before the view execution
+        SessionMiddleware().process_request(req)
+        CsrfViewMiddleware().process_request(req)
+        CsrfViewMiddleware().process_view(req, LoginView.as_view(), (), {})
+        # If it gets up to here, then the MW has accepted the request
+        # (and its token), and instead of calling
+        # `resp = LoginView.as_view()(req)`
+        # its logic will be reproduced (wrapping with csrf_exempt at this point
+        # doesn't prevent the execution of process_response)
+        form = AuthenticationForm(data=req.POST)
+        form.is_valid()
+        auth_login(req, form.get_user())
+        # Check the token hasn't been rotated
+        self.assertTrue(req.csrf_cookie_needs_reset)
+        self.assertTrue(req.csrf_token_rotation)
+        self.assertEqual(req.META["CSRF_COOKIE"], token1)
+        resp = HttpResponseRedirect(settings.LOGIN_REDIRECT_URL)
+        # Here (process_response) is where the rotation occurs
+        resp2 = CsrfViewMiddleware().process_response(req, resp)
+        csrf_cookie2 = resp2.cookies.get(settings.CSRF_COOKIE_NAME, None)
+        token2 = csrf_cookie2.coded_value
+
+        # Check the CSRF token switched
+        self.assertNotEqual(token2, token1)
 
     def test_session_key_flushed_on_login(self):
         """

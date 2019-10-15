@@ -104,6 +104,14 @@ If you need more control, you can create your own authentication backend
 that inherits from :class:`~django.contrib.auth.backends.RemoteUserBackend` and
 override one or more of its attributes and methods.
 
+.. note::
+
+    Note that for POSTing to CSRF-protected views, you must acquire the CSRF
+    token that will rotate after login. The ``RemoteUserBackend`` will login 
+    the user after the first request with the correct header - even with a GET
+    request - and the CSFR middleware will rotate the token, returning the new
+    one in the response's cookies.
+
 .. _persistent-remote-user-middleware-howto:
 
 Using ``REMOTE_USER`` on login pages only
