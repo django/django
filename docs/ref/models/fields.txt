@@ -527,13 +527,6 @@ according to available IDs. You usually won't need to use this directly; a
 primary key field will automatically be added to your model if you don't specify
 otherwise. See :ref:`automatic-primary-key-fields`.
 
-``AutoField`` has one extra optional argument:
-
-.. attribute:: AutoField.is_signed
-
-    Determines whether the generated database column will store signed or unsigned
-    values. Defaults to ``True`` for backward compatibility reasons.
-
 ``BigAutoField``
 ----------------
 

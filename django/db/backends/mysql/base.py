@@ -103,8 +103,8 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     # be interpolated against the values of Field.__dict__ before being output.
     # If a column type is set to None, it won't be included in the output.
     data_types = {
-        'AutoField': 'integer %(signed_or_unsigned)s AUTO_INCREMENT',
-        'BigAutoField': 'bigint %(signed_or_unsigned)s AUTO_INCREMENT',
+        'AutoField': 'integer unsigned AUTO_INCREMENT',
+        'BigAutoField': 'bigint unsigned AUTO_INCREMENT',
         'BinaryField': 'longblob',
         'BooleanField': 'bool',
         'CharField': 'varchar(%(max_length)s)',
@@ -124,7 +124,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         'PositiveIntegerField': 'integer UNSIGNED',
         'PositiveSmallIntegerField': 'smallint UNSIGNED',
         'SlugField': 'varchar(%(max_length)s)',
-        'SmallAutoField': 'smallint %(signed_or_unsigned)s AUTO_INCREMENT',
+        'SmallAutoField': 'smallint unsigned AUTO_INCREMENT',
         'SmallIntegerField': 'smallint',
         'TextField': 'longtext',
         'TimeField': 'time(6)',

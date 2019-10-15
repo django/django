@@ -19,9 +19,6 @@ from django.utils.functional import cached_property
 class DatabaseOperations(BaseDatabaseOperations):
     cast_char_field_without_max_length = 'text'
     cast_data_types = {
-        'AutoField': '%(signed_or_unsigned)s integer',
-        'BigAutoField': '%(signed_or_unsigned)s integer',
-        'SmallAutoField': '%(signed_or_unsigned)s integer',
         'DateField': 'TEXT',
         'DateTimeField': 'TEXT',
     }

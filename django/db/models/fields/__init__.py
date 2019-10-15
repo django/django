@@ -2320,11 +2320,6 @@ class AutoFieldMixin:
     def __init__(self, *args, **kwargs):
         kwargs['blank'] = True
 
-        if kwargs.pop("is_signed", True):
-            self.signed_or_unsigned = "signed"
-        else:
-            self.signed_or_unsigned = "unsigned"
-
         super().__init__(*args, **kwargs)
 
     def check(self, **kwargs):
@@ -2406,7 +2401,7 @@ class AutoField(AutoFieldMixin, IntegerField, metaclass=AutoFieldMeta):
         return 'AutoField'
 
     def rel_db_type(self, connection):
-        return IntegerField().db_type(connection=connection)
+        return PositiveIntegerField().db_type(connection=connection)
 
 
 class BigAutoField(AutoFieldMixin, BigIntegerField):
@@ -2424,4 +2419,4 @@ class SmallAutoField(AutoFieldMixin, SmallIntegerField):
         return 'SmallAutoField'
 
     def rel_db_type(self, connection):
-        return SmallIntegerField().db_type(connection=connection)
+        return PositiveSmallIntegerField().db_type(connection=connection)

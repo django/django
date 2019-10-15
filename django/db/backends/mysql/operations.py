@@ -17,9 +17,9 @@ class DatabaseOperations(BaseDatabaseOperations):
         'PositiveIntegerField': (0, 4294967295),
     }
     cast_data_types = {
-        'AutoField': '%(signed_or_unsigned)s integer',
-        'BigAutoField': '%(signed_or_unsigned)s integer',
-        'SmallAutoField': '%(signed_or_unsigned)s integer',
+        'AutoField': 'unsigned integer',
+        'BigAutoField': 'unsigned integer',
+        'SmallAutoField': 'unsigned integer',
         'CharField': 'char(%(max_length)s)',
         'DecimalField': 'decimal(%(max_digits)s, %(decimal_places)s)',
         'TextField': 'char',

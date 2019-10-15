@@ -309,10 +309,6 @@ Models
   require. See :ref:`Subclassing the built-in database backends
   <subclassing-database-backends>` for an example.
 
-* The new :attr:`.AutoField.is_signed` attribute allows setting whether the
-  generated database column should store signed or unsigned values. It defaults
-  to ``True`` for backward compatibility reasons.
-
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 
@@ -413,6 +409,10 @@ backends.
   ``return_insert_columns()`` that accepts a ``fields``
   argument, which is an iterable of fields to be returned after insert. Usually
   this is only the auto-generated primary key.
+
+* :class:`~django.db.models.AutoField`, :class:`~django.db.models.BigAutoField`, and
+  :class:`~django.db.models.SmallAutoField` are now defined as unsigned integers on
+  MySQL and SQLite. Historically, they were defined as signed integers.
 
 :mod:`django.contrib.admin`
 ---------------------------

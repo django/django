@@ -131,21 +131,3 @@ class CastTests(TestCase):
 
     def test_cast_to_text_field(self):
         self.assertEqual(Author.objects.values_list(Cast('age', models.TextField()), flat=True).get(), '1')
-
-    @unittest.skipUnless(connection.vendor == 'mysql', 'MySQL test')
-    @override_settings(DEBUG=True)
-    def test_cast_autofield_unsigned_supported_databases(self):
-        """
-        It should cast to unsigned integer in MySQL
-        """
-        list(Author.objects.annotate(unsigned_id=Cast(F("id"), models.AutoField(is_signed=False))))
-        self.assertIn('CAST(`db_functions_author`.`id` AS unsigned integer)', connection.queries[-1]['sql'])
-
-    @unittest.skipUnless(connection.vendor == 'sqlite', 'SQLite test')
-    @override_settings(DEBUG=True)
-    def test_cast_autofield_unsigned_mysql(self):
-        """
-        It should cast to unsigned integer in SQLite
-        """
-        list(Author.objects.annotate(unsigned_id=Cast(F("id"), models.AutoField(is_signed=False))))
-        self.assertIn('CAST("db_functions_author"."id" AS unsigned integer)', connection.queries[-1]['sql'])
