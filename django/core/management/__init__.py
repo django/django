@@ -229,7 +229,7 @@ class ManagementUtility:
                 # (get_commands() swallows the original one) so the user is
                 # informed about it.
                 settings.INSTALLED_APPS
-            else:
+            elif not settings.configured:
                 sys.stderr.write("No Django settings specified.\n")
             possible_matches = get_close_matches(subcommand, commands)
             sys.stderr.write('Unknown command: %r' % subcommand)
