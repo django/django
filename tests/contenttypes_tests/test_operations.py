@@ -11,15 +11,14 @@ from django.test import TransactionTestCase, override_settings
     MIGRATION_MODULES=dict(
         settings.MIGRATION_MODULES,
         contenttypes="django.contrib.contenttypes.migrations",
-        auth="django.contrib.auth.migrations",
         contenttypes_tests="contenttypes_tests.operations_migrations",
     ),
 )
 class ContentTypeOperationsTests(TransactionTestCase):
     databases = {'default', 'other'}
     available_apps = [
-        "django.contrib.contenttypes",
         "contenttypes_tests",
+        "django.contrib.contenttypes",
     ]
 
     class TestRouter:
@@ -80,14 +79,14 @@ class ContentTypeOperationsTests(TransactionTestCase):
 
     @override_settings(DATABASE_ROUTERS=[TestRouter()])
     def test_existing_content_type_rename_other_database(self):
-        ContentType.objects.using('other').create(app_label='contenttypes_tests', model='foo')
-        other_content_types = ContentType.objects.using('other').filter(app_label='contenttypes_tests')
+        call_command("migrate", "contenttypes", database="other", interactive=False, verbosity=-1, fake=True)
         call_command('migrate', 'contenttypes_tests', database='other', interactive=False, verbosity=0)
+        other_content_types = ContentType.objects.using('other').filter(app_label='contenttypes_tests')
         self.assertFalse(other_content_types.filter(model='foo').exists())
-        self.assertTrue(other_content_types.filter(model='renamedfoo').exists())
+        self.assertTrue(other_content_types.filter(model='renamedtwicefoo').exists())
         call_command('migrate', 'contenttypes_tests', 'zero', database='other', interactive=False, verbosity=0)
         self.assertTrue(other_content_types.filter(model='foo').exists())
-        self.assertFalse(other_content_types.filter(model='renamedfoo').exists())
+        self.assertFalse(other_content_types.filter(model='renamedtwicefoo').exists())
 
     def test_missing_content_type_rename_ignore(self):
         ContentType.objects.filter(app_label="contettypes_tests", model="foo").delete()
