@@ -51,6 +51,8 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                 return 'PositiveIntegerField'
             elif field_type == 'SmallIntegerField':
                 return 'PositiveSmallIntegerField'
+            elif field_type == 'BigIntegerField':
+                return 'PositiveBigIntegerField'
         return field_type
 
     def get_table_list(self, cursor):

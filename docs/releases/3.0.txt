@@ -309,6 +309,8 @@ Models
   require. See :ref:`Subclassing the built-in database backends
   <subclassing-database-backends>` for an example.
 
+* Added the :class:`~django.db.models.PositiveBigIntegerField` database field.
+
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 

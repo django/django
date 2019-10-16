@@ -6,7 +6,7 @@ from django.db import IntegrityError, connection, models
 from django.test import SimpleTestCase, TestCase
 
 from .models import (
-    BigIntegerModel, IntegerModel, PositiveIntegerModel,
+    BigIntegerModel, IntegerModel, PositiveBigIntegerModel, PositiveIntegerModel,
     PositiveSmallIntegerModel, SmallIntegerModel,
 )
 
@@ -168,6 +168,11 @@ class BigIntegerFieldTests(IntegerFieldTests):
 class PositiveSmallIntegerFieldTests(IntegerFieldTests):
     model = PositiveSmallIntegerModel
     documented_range = (0, 32767)
+
+
+class PositiveBigIntegerFieldTests(IntegerFieldTests):
+    model = PositiveBigIntegerModel
+    documented_range = (0, 9223372036854775807)
 
 
 class PositiveIntegerFieldTests(IntegerFieldTests):

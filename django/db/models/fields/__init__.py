@@ -33,9 +33,9 @@ __all__ = [
     'DateField', 'DateTimeField', 'DecimalField', 'DurationField',
     'EmailField', 'Empty', 'Field', 'FilePathField', 'FloatField',
     'GenericIPAddressField', 'IPAddressField', 'IntegerField', 'NOT_PROVIDED',
-    'NullBooleanField', 'PositiveIntegerField', 'PositiveSmallIntegerField',
-    'SlugField', 'SmallAutoField', 'SmallIntegerField', 'TextField',
-    'TimeField', 'URLField', 'UUIDField',
+    'NullBooleanField', 'PositiveBigIntegerField', 'PositiveIntegerField',
+    'PositiveSmallIntegerField', 'SlugField', 'SmallAutoField', 'SmallIntegerField',
+    'TextField', 'TimeField', 'URLField', 'UUIDField',
 ]
 
 
@@ -1976,6 +1976,19 @@ class PositiveSmallIntegerField(PositiveIntegerRelDbTypeMixin, IntegerField):
         })
 
 
+class PositiveBigIntegerField(PositiveIntegerRelDbTypeMixin, IntegerField):
+    description = _("Positive big integer")
+
+    def get_internal_type(self):
+        return "PositiveBigIntegerField"
+
+    def formfield(self, **kwargs):
+        return super().formfield(**{
+            'min_value': 0,
+            **kwargs,
+        })
+
+
 class SlugField(CharField):
     default_validators = [validators.validate_slug]
     description = _("Slug (up to %(max_length)s)")
@@ -2410,7 +2423,7 @@ class BigAutoField(AutoFieldMixin, BigIntegerField):
         return 'BigAutoField'
 
     def rel_db_type(self, connection):
-        return BigIntegerField().db_type(connection=connection)
+        return PositiveBigIntegerField().db_type(connection=connection)
 
 
 class SmallAutoField(AutoFieldMixin, SmallIntegerField):

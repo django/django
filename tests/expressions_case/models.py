@@ -29,6 +29,7 @@ class CaseTestModel(models.Model):
     null_boolean_old = models.NullBooleanField()
     positive_integer = models.PositiveIntegerField(null=True)
     positive_small_integer = models.PositiveSmallIntegerField(null=True)
+    positive_big_integer = models.PositiveSmallIntegerField(null=True)
     slug = models.SlugField(default='')
     small_integer = models.SmallIntegerField(null=True)
     text = models.TextField(default='')

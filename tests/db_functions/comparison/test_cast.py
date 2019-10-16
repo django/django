@@ -59,6 +59,7 @@ class CastTests(TestCase):
             models.IntegerField,
             models.BigIntegerField,
             models.SmallIntegerField,
+            models.PositiveBigIntegerField,
             models.PositiveIntegerField,
             models.PositiveSmallIntegerField,
         ):

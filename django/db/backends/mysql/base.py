@@ -121,6 +121,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         'GenericIPAddressField': 'char(39)',
         'NullBooleanField': 'bool',
         'OneToOneField': 'integer',
+        'PositiveBigIntegerField': 'bigint UNSIGNED',
         'PositiveIntegerField': 'integer UNSIGNED',
         'PositiveSmallIntegerField': 'smallint UNSIGNED',
         'SlugField': 'varchar(%(max_length)s)',
