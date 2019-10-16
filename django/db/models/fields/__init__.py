@@ -33,9 +33,9 @@ __all__ = [
     'DateField', 'DateTimeField', 'DecimalField', 'DurationField',
     'EmailField', 'Empty', 'Field', 'FilePathField', 'FloatField',
     'GenericIPAddressField', 'IPAddressField', 'IntegerField', 'NOT_PROVIDED',
-    'NullBooleanField', 'PositiveIntegerField', 'PositiveSmallIntegerField',
-    'SlugField', 'SmallAutoField', 'SmallIntegerField', 'TextField',
-    'TimeField', 'URLField', 'UUIDField',
+    'NullBooleanField', 'PositiveBigIntegerField', 'PositiveIntegerField',
+    'PositiveSmallIntegerField', 'SlugField', 'SmallAutoField',
+    'SmallIntegerField', 'TextField', 'TimeField', 'URLField', 'UUIDField',
 ]
 
 
@@ -1953,6 +1953,19 @@ class PositiveIntegerRelDbTypeMixin:
             return self.db_type(connection)
         else:
             return IntegerField().db_type(connection=connection)
+
+
+class PositiveBigIntegerField(PositiveIntegerRelDbTypeMixin, IntegerField):
+    description = _('Positive big integer')
+
+    def get_internal_type(self):
+        return 'PositiveBigIntegerField'
+
+    def formfield(self, **kwargs):
+        return super().formfield(**{
+            'min_value': 0,
+            **kwargs,
+        })
 
 
 class PositiveIntegerField(PositiveIntegerRelDbTypeMixin, IntegerField):

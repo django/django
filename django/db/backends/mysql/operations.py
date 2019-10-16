@@ -15,6 +15,7 @@ class DatabaseOperations(BaseDatabaseOperations):
         **BaseDatabaseOperations.integer_field_ranges,
         'PositiveSmallIntegerField': (0, 65535),
         'PositiveIntegerField': (0, 4294967295),
+        'PositiveBigIntegerField': (0, 18446744073709551615),
     }
     cast_data_types = {
         'AutoField': 'signed integer',
@@ -26,6 +27,7 @@ class DatabaseOperations(BaseDatabaseOperations):
         'IntegerField': 'signed integer',
         'BigIntegerField': 'signed integer',
         'SmallIntegerField': 'signed integer',
+        'PositiveBigIntegerField': 'unsigned integer',
         'PositiveIntegerField': 'unsigned integer',
         'PositiveSmallIntegerField': 'unsigned integer',
     }

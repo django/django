@@ -117,6 +117,10 @@ class BigIntegerModel(models.Model):
     null_value = models.BigIntegerField(null=True, blank=True)
 
 
+class PositiveBigIntegerModel(models.Model):
+    value = models.PositiveBigIntegerField()
+
+
 class PositiveSmallIntegerModel(models.Model):
     value = models.PositiveSmallIntegerField()
 

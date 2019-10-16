@@ -1177,6 +1177,17 @@ values are stored as null.
 Like :class:`BooleanField` with ``null=True``. Use that instead of this field
 as it's likely to be deprecated in a future version of Django.
 
+``PositiveBigIntegerField``
+---------------------------
+
+.. class:: PositiveBigIntegerField(**options)
+
+.. versionadded:: 3.1
+
+Like a :class:`PositiveIntegerField`, but only allows values under a certain
+(database-dependent) point. Values from ``0`` to ``9223372036854775807`` are
+safe in all databases supported by Django.
+
 ``PositiveIntegerField``
 ------------------------
 

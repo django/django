@@ -47,7 +47,9 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
             elif field_type == 'SmallIntegerField':
                 return 'SmallAutoField'
         if description.is_unsigned:
-            if field_type == 'IntegerField':
+            if field_type == 'BigIntegerField':
+                return 'PositiveBigIntegerField'
+            elif field_type == 'IntegerField':
                 return 'PositiveIntegerField'
             elif field_type == 'SmallIntegerField':
                 return 'PositiveSmallIntegerField'

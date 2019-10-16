@@ -25,6 +25,7 @@ class DatabaseOperations(BaseDatabaseOperations):
         'SmallIntegerField': (-99999999999, 99999999999),
         'IntegerField': (-99999999999, 99999999999),
         'BigIntegerField': (-9999999999999999999, 9999999999999999999),
+        'PositiveBigIntegerField': (0, 9999999999999999999),
         'PositiveSmallIntegerField': (0, 99999999999),
         'PositiveIntegerField': (0, 99999999999),
         'SmallAutoField': (-99999, 99999),

@@ -76,6 +76,7 @@ class NullableFields(models.Model):
     integer_field = models.IntegerField(null=True, default=2)
     null_boolean_field = models.BooleanField(null=True, default=False)
     null_boolean_field_old = models.NullBooleanField(null=True, default=False)
+    positive_big_integer_field = models.PositiveBigIntegerField(null=True, default=2 ** 63 - 1)
     positive_integer_field = models.PositiveIntegerField(null=True, default=3)
     positive_small_integer_field = models.PositiveSmallIntegerField(null=True, default=4)
     small_integer_field = models.SmallIntegerField(null=True, default=5)

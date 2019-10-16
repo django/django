@@ -194,6 +194,11 @@ Models
   * ``TREE`` format on MySQL 8.0.16+,
   * ``analyze`` option on MySQL 8.0.18+ and MariaDB.
 
+* Added :class:`~django.db.models.PositiveBigIntegerField` which acts much like
+  a :class:`~django.db.models.PositiveIntegerField` except that it only allows
+  values under a certain (database-dependent) limit. Values from ``0`` to
+  ``9223372036854775807`` are safe in all databases supported by Django.
+
 Pagination
 ~~~~~~~~~~
 

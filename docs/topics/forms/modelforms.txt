@@ -106,6 +106,8 @@ Model field                         Form field
 
 :class:`NullBooleanField`           :class:`~django.forms.NullBooleanField`
 
+:class:`PositiveBigIntegerField`    :class:`~django.forms.IntegerField`
+
 :class:`PositiveIntegerField`       :class:`~django.forms.IntegerField`
 
 :class:`PositiveSmallIntegerField`  :class:`~django.forms.IntegerField`

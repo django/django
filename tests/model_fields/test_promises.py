@@ -4,9 +4,9 @@ from decimal import Decimal
 from django.db.models.fields import (
     AutoField, BinaryField, BooleanField, CharField, DateField, DateTimeField,
     DecimalField, EmailField, FilePathField, FloatField, GenericIPAddressField,
-    IntegerField, IPAddressField, NullBooleanField, PositiveIntegerField,
-    PositiveSmallIntegerField, SlugField, SmallIntegerField, TextField,
-    TimeField, URLField,
+    IntegerField, IPAddressField, NullBooleanField, PositiveBigIntegerField,
+    PositiveIntegerField, PositiveSmallIntegerField, SlugField,
+    SmallIntegerField, TextField, TimeField, URLField,
 )
 from django.db.models.fields.files import FileField, ImageField
 from django.test import SimpleTestCase
@@ -96,6 +96,10 @@ class PromiseTest(SimpleTestCase):
     def test_PositiveSmallIntegerField(self):
         lazy_func = lazy(lambda: 1, int)
         self.assertIsInstance(PositiveSmallIntegerField().get_prep_value(lazy_func()), int)
+
+    def test_PositiveBigIntegerField(self):
+        lazy_func = lazy(lambda: 1, int)
+        self.assertIsInstance(PositiveBigIntegerField().get_prep_value(lazy_func()), int)
 
     def test_SlugField(self):
         lazy_func = lazy(lambda: 'slug', str)

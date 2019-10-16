@@ -37,6 +37,7 @@ class FlexibleFieldLookupDict:
         'integer': 'IntegerField',
         'bigint': 'BigIntegerField',
         'integer unsigned': 'PositiveIntegerField',
+        'bigint unsigned': 'PositiveBigIntegerField',
         'decimal': 'DecimalField',
         'real': 'FloatField',
         'text': 'TextField',

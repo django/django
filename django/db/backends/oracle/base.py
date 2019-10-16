@@ -120,6 +120,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         'GenericIPAddressField': 'VARCHAR2(39)',
         'NullBooleanField': 'NUMBER(1)',
         'OneToOneField': 'NUMBER(11)',
+        'PositiveBigIntegerField': 'NUMBER(19)',
         'PositiveIntegerField': 'NUMBER(11)',
         'PositiveSmallIntegerField': 'NUMBER(11)',
         'SlugField': 'NVARCHAR2(%(max_length)s)',
@@ -133,6 +134,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     data_type_check_constraints = {
         'BooleanField': '%(qn_column)s IN (0,1)',
         'NullBooleanField': '%(qn_column)s IN (0,1)',
+        'PositiveBigIntegerField': '%(qn_column)s >= 0',
         'PositiveIntegerField': '%(qn_column)s >= 0',
         'PositiveSmallIntegerField': '%(qn_column)s >= 0',
     }
