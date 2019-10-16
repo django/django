@@ -275,11 +275,12 @@ class DeleteModel(ModelOperation):
 
 
 class RenameModel(ModelOperation):
-    """Rename a model."""
+    """Rename a model. ( with move model to new_app capability )"""
 
-    def __init__(self, old_name, new_name):
+    def __init__(self, old_name, new_name, new_app_label=None):
         self.old_name = old_name
         self.new_name = new_name
+        self.new_app_label = new_app_label
         super().__init__(old_name)
 
     @cached_property
@@ -295,6 +296,8 @@ class RenameModel(ModelOperation):
             'old_name': self.old_name,
             'new_name': self.new_name,
         }
+        if self.new_app_label:
+            kwargs['new_app_label'] = self.new_app_label
         return (
             self.__class__.__qualname__,
             [],
@@ -302,13 +305,15 @@ class RenameModel(ModelOperation):
         )
 
     def state_forwards(self, app_label, state):
+        new_app_label = self.new_app_label or app_label
         # Add a new model.
         renamed_model = state.models[app_label, self.old_name_lower].clone()
         renamed_model.name = self.new_name
-        state.models[app_label, self.new_name_lower] = renamed_model
+        renamed_model.app_label = new_app_label
+        state.models[new_app_label, self.new_name_lower] = renamed_model
         # Repoint all fields pointing to the old model to the new one.
         old_model_tuple = ModelTuple(app_label, self.old_name_lower)
-        new_remote_model = '%s.%s' % (app_label, self.new_name)
+        new_remote_model = '%s.%s' % (new_app_label, self.new_name)
         to_reload = []
         for (model_app_label, model_name), model_state in state.models.items():
             model_changed = False
@@ -340,10 +345,11 @@ class RenameModel(ModelOperation):
         state.reload_models(to_reload, delay=True)
         # Remove the old model.
         state.remove_model(app_label, self.old_name_lower)
-        state.reload_model(app_label, self.new_name_lower, delay=True)
+        state.reload_model(new_app_label, self.new_name_lower, delay=True)
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
-        new_model = to_state.apps.get_model(app_label, self.new_name)
+        new_app_label = self.new_app_label or app_label
+        new_model = to_state.apps.get_model(new_app_label, self.new_name)
         if self.allow_migrate_model(schema_editor.connection.alias, new_model):
             old_model = from_state.apps.get_model(app_label, self.old_name)
             # Move the main table
@@ -356,7 +362,7 @@ class RenameModel(ModelOperation):
             for related_object in old_model._meta.related_objects:
                 if related_object.related_model == old_model:
                     model = new_model
-                    related_key = (app_label, self.new_name_lower)
+                    related_key = (new_app_label, self.new_name_lower)
                 else:
                     model = related_object.related_model
                     related_key = (
@@ -394,24 +400,37 @@ class RenameModel(ModelOperation):
                 )
 
     def database_backwards(self, app_label, schema_editor, from_state, to_state):
+        is_moving = bool(self.new_app_label)
         self.new_name_lower, self.old_name_lower = self.old_name_lower, self.new_name_lower
         self.new_name, self.old_name = self.old_name, self.new_name
+        if is_moving:
+            self.new_app_label, app_label = app_label, self.new_app_label
 
         self.database_forwards(app_label, schema_editor, from_state, to_state)
 
         self.new_name_lower, self.old_name_lower = self.old_name_lower, self.new_name_lower
         self.new_name, self.old_name = self.old_name, self.new_name
+        if is_moving:
+            self.new_app_label, app_label = app_label, self.new_app_label
 
     def references_model(self, name, app_label=None):
+        # TODO: update references_model for moving
         return (
             name.lower() == self.old_name_lower or
             name.lower() == self.new_name_lower
         )
 
     def describe(self):
-        return "Rename model %s to %s" % (self.old_name, self.new_name)
+        if self.new_app_label:
+            if self.old_name == self.new_name:
+                return "Move model %s to %s.%s" % (self.old_name, self.new_app_label, self.new_name)
+            else:
+                return "Rename and Move model %s to %s.%s" % (self.old_name, self.new_app_label, self.new_name)
+        else:
+            return "Rename model %s to %s" % (self.old_name, self.new_name)
 
     def reduce(self, operation, app_label=None):
+        # TODO: update reduce for moving
         if (isinstance(operation, RenameModel) and
                 self.new_name_lower == operation.old_name_lower):
             return [
@@ -426,6 +445,43 @@ class RenameModel(ModelOperation):
             super(ModelOperation, self).reduce(operation, app_label=app_label) or
             not operation.references_model(self.new_name, app_label)
         )
+
+
+class MoveModelPlaceholder(Operation):
+    _comment = 'this is a required noop operation to construct dependencies for moving model'
+
+    reduces_to_sql = False
+
+    def __init__(self, old_name, new_name, new_app_label=None, comment=None, *args, **kwargs):
+        self.old_name = old_name
+        self.new_name = new_name
+        self.new_app_label = new_app_label
+        super(MoveModelPlaceholder, self).__init__(*args, **kwargs)
+
+    def deconstruct(self):
+        kwargs = {
+            'old_name': self.old_name,
+            'new_name': self.new_name,
+            'new_app_label': self.new_app_label,
+            'comment': self._comment  # tricky way to put comment in generated migration file
+        }
+        return (
+            self.__class__.__qualname__,
+            [],
+            kwargs
+        )
+
+    def state_forwards(self, app_label, state):
+        pass
+
+    def database_forwards(self, app_label, schema_editor, from_state, to_state):
+        pass
+
+    def database_backwards(self, app_label, schema_editor, from_state, to_state):
+        pass
+
+    def describe(self):
+        return "Move model %s to %s.%s (placeholder)" % (self.old_name, self.new_app_label, self.new_name)
 
 
 class ModelOptionOperation(ModelOperation):

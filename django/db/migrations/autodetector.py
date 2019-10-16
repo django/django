@@ -477,7 +477,8 @@ class MigrationAutodetector:
 
             removed_models = self.old_model_keys - self.new_model_keys
             for rem_app_label, rem_model_name in removed_models:
-                if rem_app_label == app_label:
+                is_moving = not bool(rem_app_label == app_label)
+                if True or rem_app_label == app_label:  # TODO remove if and reduce indent
                     rem_model_state = self.from_state.models[rem_app_label, rem_model_name]
                     rem_model_fields_def = self.only_relation_agnostic_fields(rem_model_state.fields)
                     if model_fields_def == rem_model_fields_def:
@@ -487,11 +488,27 @@ class MigrationAutodetector:
                             for field in model_opts.get_fields():
                                 if field.is_relation:
                                     dependencies.extend(self._get_dependencies_for_foreign_key(field))
+                            if is_moving:
+                                self.add_operation(
+                                    app_label,
+                                    operations.MoveModelPlaceholder(
+                                        old_name=rem_model_state.name,
+                                        new_name=model_state.name,
+                                        new_app_label=app_label if is_moving else None,
+                                    ),
+                                    dependencies=[
+                                        (rem_app_label, rem_model_name, None, True),
+                                    ],
+                                )
+                                self.from_state.add_model(model_state)
+                                dependencies.append((app_label, model_name, None, True))
+
                             self.add_operation(
-                                app_label,
+                                rem_app_label,
                                 operations.RenameModel(
                                     old_name=rem_model_state.name,
                                     new_name=model_state.name,
+                                    new_app_label=app_label if is_moving else None,
                                 ),
                                 dependencies=dependencies,
                             )
