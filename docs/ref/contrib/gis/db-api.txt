@@ -320,7 +320,7 @@ Lookup Type                        PostGIS    Oracle    MySQL [#]_   SpatiaLite 
 :lookup:`contains_properly`        X                                            B
 :lookup:`coveredby`                X          X                      X          B
 :lookup:`covers`                   X          X                      X          B
-:lookup:`crosses`                  X                                 X          C
+:lookup:`crosses`                  X                    X            X          C
 :lookup:`disjoint`                 X          X         X            X          B
 :lookup:`distance_gt`              X          X                      X          N
 :lookup:`distance_gte`             X          X                      X          N
