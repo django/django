@@ -219,7 +219,7 @@ in the :doc:`model-api` documentation for more details.
 Distance Lookups
 ----------------
 
-*Availability*: PostGIS, Oracle, SpatiaLite, PGRaster (Native)
+*Availability*: PostGIS, MySQL, Oracle, SpatiaLite, PGRaster (Native)
 
 The following distance lookups are available:
 
@@ -227,7 +227,7 @@ The following distance lookups are available:
 * :lookup:`distance_lte`
 * :lookup:`distance_gt`
 * :lookup:`distance_gte`
-* :lookup:`dwithin`
+* :lookup:`dwithin` (except MySQL)
 
 .. note::
 
@@ -322,10 +322,10 @@ Lookup Type                        PostGIS    Oracle    MySQL [#]_   SpatiaLite 
 :lookup:`covers`                   X          X                      X          B
 :lookup:`crosses`                  X                    X            X          C
 :lookup:`disjoint`                 X          X         X            X          B
-:lookup:`distance_gt`              X          X                      X          N
-:lookup:`distance_gte`             X          X                      X          N
-:lookup:`distance_lt`              X          X                      X          N
-:lookup:`distance_lte`             X          X                      X          N
+:lookup:`distance_gt`              X          X         X            X          N
+:lookup:`distance_gte`             X          X         X            X          N
+:lookup:`distance_lt`              X          X         X            X          N
+:lookup:`distance_lte`             X          X         X            X          N
 :lookup:`dwithin`                  X          X                      X          B
 :lookup:`equals`                   X          X         X            X          C
 :lookup:`exact`                    X          X         X            X          B
