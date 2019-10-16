@@ -224,6 +224,12 @@ backends.
 * ``DatabaseOperations.fetch_returned_insert_columns()`` now requires an
   additional ``returning_params`` argument.
 
+Dropped support for MariaDB 10.1
+--------------------------------
+
+Upstream support for MariaDB 10.1 ends in October 2020. Django 3.1 supports
+MariaDB 10.2 and higher.
+
 Miscellaneous
 -------------
 

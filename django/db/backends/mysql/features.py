@@ -85,7 +85,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     @cached_property
     def supports_over_clause(self):
         if self.connection.mysql_is_mariadb:
-            return self.connection.mysql_version >= (10, 2)
+            return True
         return self.connection.mysql_version >= (8, 0, 2)
 
     supports_frame_range_fixed_distance = property(operator.attrgetter('supports_over_clause'))
