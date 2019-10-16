@@ -219,7 +219,7 @@ in the :doc:`model-api` documentation for more details.
 Distance Lookups
 ----------------
 
-*Availability*: PostGIS, MySQL, Oracle, SpatiaLite, PGRaster (Native)
+*Availability*: PostGIS, MariaDB, MySQL, Oracle, SpatiaLite, PGRaster (Native)
 
 The following distance lookups are available:
 
@@ -227,7 +227,7 @@ The following distance lookups are available:
 * :lookup:`distance_lte`
 * :lookup:`distance_gt`
 * :lookup:`distance_gte`
-* :lookup:`dwithin` (except MySQL)
+* :lookup:`dwithin` (except MariaDB and MySQL)
 
 .. note::
 
@@ -310,41 +310,41 @@ divided into the three categories described in the :ref:`raster lookup details
 <spatial-lookup-raster>`: native support ``N``, bilateral native support ``B``,
 and geometry conversion support ``C``.
 
-=================================  =========  ========  ============ ========== ========
-Lookup Type                        PostGIS    Oracle    MySQL [#]_   SpatiaLite PGRaster
-=================================  =========  ========  ============ ========== ========
-:lookup:`bbcontains`               X                    X            X          N
-:lookup:`bboverlaps`               X                    X            X          N
-:lookup:`contained`                X                    X            X          N
-:lookup:`contains <gis-contains>`  X          X         X            X          B
-:lookup:`contains_properly`        X                                            B
-:lookup:`coveredby`                X          X                      X          B
-:lookup:`covers`                   X          X                      X          B
-:lookup:`crosses`                  X                    X            X          C
-:lookup:`disjoint`                 X          X         X            X          B
-:lookup:`distance_gt`              X          X         X            X          N
-:lookup:`distance_gte`             X          X         X            X          N
-:lookup:`distance_lt`              X          X         X            X          N
-:lookup:`distance_lte`             X          X         X            X          N
-:lookup:`dwithin`                  X          X                      X          B
-:lookup:`equals`                   X          X         X            X          C
-:lookup:`exact`                    X          X         X            X          B
-:lookup:`intersects`               X          X         X            X          B
-:lookup:`isvalid`                  X          X         X (≥ 5.7.5)  X (LWGEOM)
-:lookup:`overlaps`                 X          X         X            X          B
-:lookup:`relate`                   X          X                      X          C
-:lookup:`same_as`                  X          X         X            X          B
-:lookup:`touches`                  X          X         X            X          B
-:lookup:`within`                   X          X         X            X          B
-:lookup:`left`                     X                                            C
-:lookup:`right`                    X                                            C
-:lookup:`overlaps_left`            X                                            B
-:lookup:`overlaps_right`           X                                            B
-:lookup:`overlaps_above`           X                                            C
-:lookup:`overlaps_below`           X                                            C
-:lookup:`strictly_above`           X                                            C
-:lookup:`strictly_below`           X                                            C
-=================================  =========  ========  ============ ========== ========
+=================================  =========  ======== ========= ============ ========== ========
+Lookup Type                        PostGIS    Oracle   MariaDB   MySQL [#]_   SpatiaLite PGRaster
+=================================  =========  ======== ========= ============ ========== ========
+:lookup:`bbcontains`               X                   X         X            X          N
+:lookup:`bboverlaps`               X                   X         X            X          N
+:lookup:`contained`                X                   X         X            X          N
+:lookup:`contains <gis-contains>`  X          X        X         X            X          B
+:lookup:`contains_properly`        X                                                     B
+:lookup:`coveredby`                X          X                               X          B
+:lookup:`covers`                   X          X                               X          B
+:lookup:`crosses`                  X                   X         X            X          C
+:lookup:`disjoint`                 X          X        X         X            X          B
+:lookup:`distance_gt`              X          X        X         X            X          N
+:lookup:`distance_gte`             X          X        X         X            X          N
+:lookup:`distance_lt`              X          X        X         X            X          N
+:lookup:`distance_lte`             X          X        X         X            X          N
+:lookup:`dwithin`                  X          X                               X          B
+:lookup:`equals`                   X          X        X         X            X          C
+:lookup:`exact`                    X          X        X         X            X          B
+:lookup:`intersects`               X          X        X         X            X          B
+:lookup:`isvalid`                  X          X                  X (≥ 5.7.5)  X (LWGEOM)
+:lookup:`overlaps`                 X          X        X         X            X          B
+:lookup:`relate`                   X          X                               X          C
+:lookup:`same_as`                  X          X        X         X            X          B
+:lookup:`touches`                  X          X        X         X            X          B
+:lookup:`within`                   X          X        X         X            X          B
+:lookup:`left`                     X                                                     C
+:lookup:`right`                    X                                                     C
+:lookup:`overlaps_left`            X                                                     B
+:lookup:`overlaps_right`           X                                                     B
+:lookup:`overlaps_above`           X                                                     C
+:lookup:`overlaps_below`           X                                                     C
+:lookup:`strictly_above`           X                                                     C
+:lookup:`strictly_below`           X                                                     C
+=================================  =========  ======== ========= ============ ========== ========
 
 .. _database-functions-compatibility:
 
