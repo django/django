@@ -25,11 +25,13 @@ class OracleSpatialAdapter(WKTAdapter):
 
     def _fix_polygon(self, poly):
         """Fix single polygon orientation as described in __init__()."""
-        if self._isClockwise(poly.exterior_ring):
+        if poly.empty:
+            return poly
+        if not poly.exterior_ring.is_counterclockwise:
             poly.exterior_ring = list(reversed(poly.exterior_ring))
 
         for i in range(1, len(poly)):
-            if not self._isClockwise(poly[i]):
+            if poly[i].is_counterclockwise:
                 poly[i] = list(reversed(poly[i]))
 
         return poly
@@ -42,16 +44,3 @@ class OracleSpatialAdapter(WKTAdapter):
         for i, geom in enumerate(coll):
             if isinstance(geom, Polygon):
                 coll[i] = self._fix_polygon(geom)
-
-    def _isClockwise(self, coords):
-        """
-        A modified shoelace algorithm to determine polygon orientation.
-        See https://en.wikipedia.org/wiki/Shoelace_formula.
-        """
-        n = len(coords)
-        area = 0.0
-        for i in range(n):
-            j = (i + 1) % n
-            area += coords[i][0] * coords[j][1]
-            area -= coords[j][0] * coords[i][1]
-        return area < 0.0

@@ -61,6 +61,8 @@ Minor features
 
 * :lookup:`relate` lookup is now supported on MariaDB.
 
+* Added the :attr:`.LinearRing.is_counterclockwise` property.
+
 :mod:`django.contrib.messages`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

@@ -1,4 +1,4 @@
-from ctypes import POINTER, c_double, c_int, c_uint
+from ctypes import POINTER, c_byte, c_double, c_int, c_uint
 
 from django.contrib.gis.geos.libgeos import CS_PTR, GEOM_PTR, GEOSFuncFactory
 from django.contrib.gis.geos.prototypes.errcheck import (
@@ -89,3 +89,5 @@ cs_setz = CsOperation('GEOSCoordSeq_setZ')
 # These routines return size & dimensions.
 cs_getsize = CsInt('GEOSCoordSeq_getSize')
 cs_getdims = CsInt('GEOSCoordSeq_getDimensions')
+
+cs_is_ccw = GEOSFuncFactory('GEOSCoordSeq_isCCW', restype=c_int, argtypes=[CS_PTR, POINTER(c_byte)])
