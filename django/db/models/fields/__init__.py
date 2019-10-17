@@ -2423,7 +2423,7 @@ class BigAutoField(AutoFieldMixin, BigIntegerField):
         return 'BigAutoField'
 
     def rel_db_type(self, connection):
-        return PositiveBigIntegerField().db_type(connection=connection)
+        return BigIntegerField().db_type(connection=connection)
 
 
 class SmallAutoField(AutoFieldMixin, SmallIntegerField):
