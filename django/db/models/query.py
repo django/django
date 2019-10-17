@@ -744,7 +744,10 @@ class QuerySet:
         Delete objects found from the given queryset in single direct SQL
         query. No signals are sent and there is no protection for cascades.
         """
-        return sql.DeleteQuery(self.model).delete_qs(self, using)
+        query = self.query.clone()
+        query.__class__ = sql.DeleteQuery
+        cursor = query.get_compiler(using).execute_sql(CURSOR)
+        return cursor.rowcount if cursor else 0
     _raw_delete.alters_data = True
 
     def update(self, **kwargs):

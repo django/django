@@ -535,9 +535,7 @@ class FastDeleteTests(TestCase):
         a = Avatar.objects.create(desc='a')
         User.objects.create(avatar=a)
         u2 = User.objects.create()
-        expected_queries = 1 if connection.features.update_can_self_select else 2
-        self.assertNumQueries(expected_queries,
-                              User.objects.filter(avatar__desc='a').delete)
+        self.assertNumQueries(1, User.objects.filter(avatar__desc='a').delete)
         self.assertEqual(User.objects.count(), 1)
         self.assertTrue(User.objects.filter(pk=u2.pk).exists())
 
