@@ -7,7 +7,7 @@ from tests.forms_tests.field_tests.test_jsonfield import CustomDecoder
 
 from django import forms
 from django.conf import settings
-from django.core import serializers
+from django.core import checks, serializers
 from django.core.exceptions import ValidationError
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db import connection, connections, models, transaction
@@ -20,7 +20,7 @@ from django.db.models.fields.json import (
 from django.db.models.functions import Cast
 from django.db.utils import DatabaseError
 from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
-from django.test.utils import CaptureQueriesContext
+from django.test.utils import CaptureQueriesContext, isolate_apps
 
 from .models import JSONModel, NullableJSONModel
 
@@ -28,39 +28,6 @@ from .models import JSONModel, NullableJSONModel
 class StrEncoder(json.JSONEncoder):
     def encode(self, obj):
         return str(obj)
-
-
-class TestDefaultValue(SimpleTestCase):
-    def _set_default(self, value):
-        field = JSONModel._meta.get_field('value')
-        field.default = value
-        return field.check()
-
-    def tearDown(self):
-        self._set_default(dict)
-        return super().tearDown()
-
-    def test_mutable_default_value(self):
-        mutable_values = [
-            ['foo', 'bar', 123], {'foo': 'bar'},
-        ]
-        for value in mutable_values:
-            with self.subTest(value=value):
-                errors = self._set_default(value)
-                self.assertEqual(len(errors), 1)
-                self.assertIn('default should not be a mutable object', errors[0].msg)
-
-    def test_valid_default_value(self):
-        def callable_obj():
-            return {'it': 'works'}
-
-        valid_values = [
-            None, True, 123, 123.45, 'foo bar', ('foo', 'bar', 123), callable_obj,
-        ]
-        for value in valid_values:
-            with self.subTest(value=value):
-                errors = self._set_default(value)
-                self.assertEqual(len(errors), 0)
 
 
 class SetEncoderDecoderMixin:
@@ -165,6 +132,51 @@ class TestModelFormField(SimpleTestCase):
         form_field = model_field.formfield()
         self.assertIs(form_field.encoder, DjangoJSONEncoder)
         self.assertIs(form_field.decoder, CustomDecoder)
+
+
+@isolate_apps('model_fields.test_jsonfield')
+class TestChecks(SimpleTestCase):
+    def test_invalid_default(self):
+        class MyModel(models.Model):
+            field = models.JSONField(default={})
+
+        model = MyModel()
+        self.assertEqual(model.check(), [
+            checks.Warning(
+                msg=(
+                    "JSONField default should be a callable instead of an "
+                    "instance so that it's not shared between all field "
+                    "instances."
+                ),
+                hint='Use a callable instead, e.g., use `dict` instead of `{}`.',
+                obj=MyModel._meta.get_field('field'),
+                id='fields.E010',
+            )
+        ])
+
+    def test_valid_default(self):
+        class MyModel(models.Model):
+            field = models.JSONField(default=dict)
+
+        model = MyModel()
+        self.assertEqual(model.check(), [])
+
+    def test_valid_default_none(self):
+        class MyModel(models.Model):
+            field = models.JSONField(default=None)
+
+        model = MyModel()
+        self.assertEqual(model.check(), [])
+
+    def test_valid_callable_default(self):
+        def callable_default():
+            return {'it': 'works'}
+
+        class MyModel(models.Model):
+            field = models.JSONField(default=callable_default)
+
+        model = MyModel()
+        self.assertEqual(model.check(), [])
 
 
 class TestSerialization(SimpleTestCase):
