@@ -13,7 +13,8 @@ from django.db import NotSupportedError, connection
 from django.test import TestCase, skipUnlessDBFeature
 
 from ..utils import (
-    mysql, no_oracle, oracle, postgis, skipUnlessGISLookup, spatialite,
+    mariadb, mysql, no_oracle, oracle, postgis, skipUnlessGISLookup,
+    spatialite,
 )
 from .models import (
     City, Country, Feature, MinusOneSRID, NonConcreteModel, PennsylvaniaCity,
@@ -227,8 +228,7 @@ class GeoLookupTest(TestCase):
 
     def test_disjoint_lookup(self):
         "Testing the `disjoint` lookup type."
-        if (connection.vendor == 'mysql' and not connection.mysql_is_mariadb and
-                connection.mysql_version < (8, 0, 0)):
+        if mysql and not mariadb and connection.mysql_version < (8, 0, 0):
             raise unittest.SkipTest('MySQL < 8 gives different results.')
         ptown = City.objects.get(name='Pueblo')
         qs1 = City.objects.filter(point__disjoint=ptown.point)
