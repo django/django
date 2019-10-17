@@ -60,4 +60,3 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     allows_multiple_constraints_on_same_fields = False
     supports_boolean_expr_in_select_clause = False
     supports_primitives_in_json_field = False
-    can_introspect_json_field = True

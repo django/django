@@ -299,9 +299,8 @@ class BaseDatabaseFeatures:
     supports_json_field = True
     # Does the backend support primities in JSONField?
     supports_primitives_in_json_field = True
-
     # Can the backend introspect JSONField?
-    can_introspect_json_field = False
+    can_introspect_json_field = True
 
     def __init__(self, connection):
         self.connection = connection

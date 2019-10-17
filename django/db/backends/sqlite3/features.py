@@ -1,3 +1,6 @@
+import operator
+
+from django.db import transaction
 from django.db.backends.base.features import BaseDatabaseFeatures
 from django.db.utils import OperationalError
 from django.utils.functional import cached_property
@@ -51,12 +54,10 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     @cached_property
     def supports_json_field(self):
         try:
-            with self.connection.cursor() as cursor:
-                cursor.execute("SELECT JSON('\"test\"')")
+            with self.connection.cursor() as cursor, transaction.atomic():
+                cursor.execute('SELECT JSON(\'{"a": "b"}\')')
         except OperationalError:
             return False
         return True
 
-    @cached_property
-    def can_introspect_json_field(self):
-        return self.supports_json_field
+    can_introspect_json_field = property(operator.attrgetter('supports_json_field'))
