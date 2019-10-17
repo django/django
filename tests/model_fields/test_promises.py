@@ -5,8 +5,8 @@ from django.db.models.fields import (
     AutoField, BinaryField, BooleanField, CharField, DateField, DateTimeField,
     DecimalField, EmailField, FilePathField, FloatField, GenericIPAddressField,
     IntegerField, IPAddressField, NullBooleanField, PositiveBigIntegerField,
-    PositiveIntegerField, PositiveSmallIntegerField, SlugField, SmallIntegerField,
-    TextField, TimeField, URLField,
+    PositiveIntegerField, PositiveSmallIntegerField, SlugField,
+    SmallIntegerField, TextField, TimeField, URLField,
 )
 from django.db.models.fields.files import FileField, ImageField
 from django.test import SimpleTestCase

@@ -101,6 +101,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         'GenericIPAddressField': 'char(39)',
         'NullBooleanField': 'bool',
         'OneToOneField': 'integer',
+        'PositiveBigIntegerField': 'bigint unsigned',
         'PositiveIntegerField': 'integer unsigned',
         'PositiveSmallIntegerField': 'smallint unsigned',
         'SlugField': 'varchar(%(max_length)s)',
@@ -111,6 +112,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         'UUIDField': 'char(32)',
     }
     data_type_check_constraints = {
+        'PositiveBigIntegerField': '"%(column)s" >= 0',
         'PositiveIntegerField': '"%(column)s" >= 0',
         'PositiveSmallIntegerField': '"%(column)s" >= 0',
     }

@@ -6,8 +6,8 @@ from django.db import IntegrityError, connection, models
 from django.test import SimpleTestCase, TestCase
 
 from .models import (
-    BigIntegerModel, IntegerModel, PositiveBigIntegerModel, PositiveIntegerModel,
-    PositiveSmallIntegerModel, SmallIntegerModel,
+    BigIntegerModel, IntegerModel, PositiveBigIntegerModel,
+    PositiveIntegerModel, PositiveSmallIntegerModel, SmallIntegerModel,
 )
 
 
