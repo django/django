@@ -634,7 +634,7 @@ class DjangoAdminSettingsDirectory(AdminScriptTestCase):
 # of the generated manage.py script
 ##########################################################################
 
-class ManageManullyConfiguredSettings(AdminScriptTestCase):
+class ManageManuallyConfiguredSettings(AdminScriptTestCase):
     """Customized manage.py calling settings.configure()."""
     def test_non_existent_command_output(self):
         out, err = self.run_manage(['invalid_command'], manage_py='configured_settings_manage.py')
