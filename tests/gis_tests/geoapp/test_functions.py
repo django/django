@@ -12,7 +12,7 @@ from django.db import NotSupportedError, connection
 from django.db.models import Sum
 from django.test import TestCase, skipUnlessDBFeature
 
-from ..utils import FuncTestMixin, mysql, oracle, postgis, spatialite
+from ..utils import FuncTestMixin, mariadb, mysql, oracle, postgis, spatialite
 from .models import City, Country, CountryWebMercator, State, Track
 
 
@@ -85,7 +85,7 @@ class GISFunctionsTests(FuncTestMixin, TestCase):
         # WHERE "geoapp_city"."name" = 'Chicago';
         # Finally, we set every available keyword.
         # MariaDB doesn't limit the number of decimals in bbox.
-        if mysql and connection.mysql_is_mariadb:
+        if mariadb:
             chicago_json['bbox'] = [-87.650175, 41.850385, -87.650175, 41.850385]
         self.assertJSONEqual(
             City.objects.annotate(
