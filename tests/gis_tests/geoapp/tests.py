@@ -450,7 +450,7 @@ class GeoLookupTest(TestCase):
                 qs.count()
 
         # Relate works differently for the different backends.
-        if postgis or spatialite:
+        if postgis or spatialite or mariadb:
             contains_mask = 'T*T***FF*'
             within_mask = 'T*F**F***'
             intersects_mask = 'T********'
@@ -461,7 +461,11 @@ class GeoLookupTest(TestCase):
             intersects_mask = 'overlapbdyintersect'
 
         # Testing contains relation mask.
-        self.assertEqual('Texas', Country.objects.get(mpoly__relate=(pnt1, contains_mask)).name)
+        if connection.features.supports_transform:
+            self.assertEqual(
+                Country.objects.get(mpoly__relate=(pnt1, contains_mask)).name,
+                'Texas',
+            )
         self.assertEqual('Texas', Country.objects.get(mpoly__relate=(pnt2, contains_mask)).name)
 
         # Testing within relation mask.
@@ -470,7 +474,11 @@ class GeoLookupTest(TestCase):
 
         # Testing intersection relation mask.
         if not oracle:
-            self.assertEqual('Texas', Country.objects.get(mpoly__relate=(pnt1, intersects_mask)).name)
+            if connection.features.supports_transform:
+                self.assertEqual(
+                    Country.objects.get(mpoly__relate=(pnt1, intersects_mask)).name,
+                    'Texas',
+                )
             self.assertEqual('Texas', Country.objects.get(mpoly__relate=(pnt2, intersects_mask)).name)
             self.assertEqual('Lawrence', City.objects.get(point__relate=(ks.poly, intersects_mask)).name)
 
