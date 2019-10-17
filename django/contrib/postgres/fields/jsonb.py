@@ -7,9 +7,8 @@ from django.core import exceptions
 from django.db.models import (
     Field, TextField, Transform, lookups as builtin_lookups,
 )
+from django.db.models.fields.mixins import CheckFieldDefaultMixin
 from django.utils.translation import gettext_lazy as _
-
-from .mixins import CheckFieldDefaultMixin
 
 __all__ = ['JSONField']
 
