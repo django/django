@@ -332,7 +332,7 @@ Lookup Type                        PostGIS    Oracle   MariaDB   MySQL [#]_   Sp
 :lookup:`intersects`               X          X        X         X            X          B
 :lookup:`isvalid`                  X          X                  X (≥ 5.7.5)  X (LWGEOM)
 :lookup:`overlaps`                 X          X        X         X            X          B
-:lookup:`relate`                   X          X                               X          C
+:lookup:`relate`                   X          X        X                      X          C
 :lookup:`same_as`                  X          X        X         X            X          B
 :lookup:`touches`                  X          X        X         X            X          B
 :lookup:`within`                   X          X        X         X            X          B

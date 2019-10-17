@@ -426,14 +426,15 @@ SpatiaLite  ``Overlaps(poly, geom)``
 ----------
 
 *Availability*: `PostGIS <https://postgis.net/docs/ST_Relate.html>`__,
-Oracle, SpatiaLite, PGRaster (Conversion)
+MariaDB, Oracle, SpatiaLite, PGRaster (Conversion)
 
 Tests if the geometry field is spatially related to the lookup geometry by
 the values given in the given pattern.  This lookup requires a tuple parameter,
 ``(geom, pattern)``; the form of ``pattern`` will depend on the spatial backend:
 
-PostGIS & SpatiaLite
-~~~~~~~~~~~~~~~~~~~~
+MariaDB, PostGIS, and SpatiaLite
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 On these spatial backends the intersection pattern is a string comprising
 nine characters, which  define intersections between  the interior, boundary,
 and exterior of the geometry field and the lookup geometry.
@@ -447,7 +448,7 @@ Geometry example::
     # the intersection pattern (the pattern here is for 'contains').
     Zipcode.objects.filter(poly__relate=(geom, 'T*T***FF*'))
 
-PostGIS SQL equivalent:
+PostGIS and MariaDB SQL equivalent:
 
 .. code-block:: sql
 
@@ -470,6 +471,10 @@ PostGIS SQL equivalent:
 
     SELECT ... WHERE ST_Relate(poly, ST_Polygon(rast, 1), 'T*T***FF*')
     SELECT ... WHERE ST_Relate(ST_Polygon(rast, 2), ST_Polygon(rast, 1), 'T*T***FF*')
+
+.. versionchanged:: 3.1
+
+    MariaDB support was added.
 
 Oracle
 ~~~~~~
