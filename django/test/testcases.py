@@ -37,7 +37,7 @@ from django.test.utils import (
     CaptureQueriesContext, ContextList, compare_xml, modify_settings,
     override_settings,
 )
-from django.utils.decorators import classproperty
+from django.utils.functional import classproperty
 from django.views.static import serve
 
 __all__ = ('TestCase', 'TransactionTestCase',

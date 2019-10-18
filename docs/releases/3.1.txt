@@ -263,6 +263,9 @@ Miscellaneous
   ``ETag`` header to responses with an empty
   :attr:`~django.http.HttpResponse.content`.
 
+* ``django.utils.decorators.classproperty()`` decorator is moved to
+  ``django.utils.functional.classproperty()``.
+
 .. _deprecated-features-3.1:
 
 Features deprecated in 3.1
