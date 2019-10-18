@@ -300,4 +300,4 @@ class LowerCaseRemoteUserTest(RemoteUserTest):
 
         response = self.client.get('/remote_user/',
                                    **{self.header: self.known_user})
-        self.assertEqual(response.context['user'].username, 'knowuser')
+        self.assertEqual(response.context['user'].username, 'knownuser')
