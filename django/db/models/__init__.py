@@ -44,9 +44,9 @@ __all__ += [
     'Case', 'Exists', 'Expression', 'ExpressionList', 'ExpressionWrapper', 'F',
     'Func', 'OuterRef', 'RowRange', 'Subquery', 'Value', 'ValueRange', 'When',
     'Window', 'WindowFrame',
-    'FileField', 'ImageField', 'JSONField', 'OrderWrt', 'Lookup', 'Transform', 'Manager',
-    'Prefetch', 'Q', 'QuerySet', 'prefetch_related_objects', 'DEFERRED', 'Model',
-    'FilteredRelation',
+    'FileField', 'ImageField', 'JSONField', 'OrderWrt', 'Lookup', 'Transform',
+    'Manager', 'Prefetch', 'Q', 'QuerySet', 'prefetch_related_objects',
+    'DEFERRED', 'Model', 'FilteredRelation',
     'ForeignKey', 'ForeignObject', 'OneToOneField', 'ManyToManyField',
     'ManyToOneRel', 'ManyToManyRel', 'OneToOneRel',
 ]
