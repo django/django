@@ -49,6 +49,15 @@ run the query ``CREATE EXTENSION IF NOT EXISTS hstore;``.
 
         This is a required argument. The name of the extension to be installed.
 
+``BloomExtension``
+==================
+
+.. class:: BloomExtension()
+
+    .. versionadded:: 3.1
+
+    Install the ``bloom`` extension.
+
 ``BtreeGinExtension``
 =====================
 
