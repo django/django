@@ -279,8 +279,8 @@ class PersistentRemoteUserTest(RemoteUserTest):
         response = self.client.get('/remote_user/')
         self.assertFalse(response.context['user'].is_anonymous)
         self.assertEqual(response.context['user'].username, 'knownuser')
-        
-        
+
+
 class LowerCaseRemoteUserTest(RemoteUserTest):
     """
     LowerCaseRemoteUserBackend converts the username of the logged-in 
