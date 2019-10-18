@@ -283,7 +283,7 @@ class PersistentRemoteUserTest(RemoteUserTest):
 
 class LowerCaseRemoteUserTest(RemoteUserTest):
     """
-    LowerCaseRemoteUserBackend converts the username of the logged-in 
+    LowerCaseRemoteUserBackend converts the username of the logged-in
     user to all lower case username.
     """
 
