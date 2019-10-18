@@ -231,3 +231,16 @@ class RemoteUserBackend(ModelBackend):
 class AllowAllUsersRemoteUserBackend(RemoteUserBackend):
     def user_can_authenticate(self, user):
         return True
+    
+    
+class LowerCaseRemoteUserBackend(RemoteUserBackend):
+    """
+    This backend makes sure all users created using an external authentication
+    service are created with an all lower-case username to avoid case-sensitivty 
+    problems. 
+    """
+    def clean_username(self, username):
+        """
+        Returns an all lower-case username
+        """
+        return username.lower()
