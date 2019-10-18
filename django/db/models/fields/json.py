@@ -1,9 +1,7 @@
 import json
 
 from django import forms
-from django.conf import settings
-from django.core import checks, exceptions
-from django.db import connections
+from django.core import exceptions
 from django.db.models import lookups
 from django.db.models.lookups import (
     FieldGetDbPrepValueMixin, Lookup, Transform,
@@ -28,26 +26,6 @@ class JSONField(CheckFieldDefaultMixin, Field):
     ):
         self.encoder, self.decoder = encoder, decoder
         super().__init__(verbose_name, name, *args, **kwargs)
-
-    def check(self, **kwargs):
-        return [
-            *super().check(**kwargs),
-            *self._check_json_support(),
-        ]
-
-    @classmethod
-    def _check_json_support(cls):
-        for db in settings.DATABASES:
-            connection = connections[db]
-            if connection.features.supports_json_field:
-                return []
-        return [
-            checks.Error(
-                'No database connection that supports JSONField is found.',
-                hint='See the documentation of JSONField for supported database versions.',
-                obj=cls
-            )
-        ]
 
     def deconstruct(self):
         name, path, args, kwargs = super().deconstruct()

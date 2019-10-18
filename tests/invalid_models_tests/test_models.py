@@ -1,4 +1,5 @@
 import unittest
+from unittest import mock
 
 from django.conf import settings
 from django.core.checks import Error, Warning
@@ -6,7 +7,7 @@ from django.core.checks.model_checks import _check_lazy_references
 from django.db import connection, connections, models
 from django.db.models.functions import Lower
 from django.db.models.signals import post_init
-from django.test import SimpleTestCase, TestCase
+from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
 from django.test.utils import isolate_apps, override_settings, register_lookup
 
 
@@ -1212,15 +1213,39 @@ class OtherModelTests(SimpleTestCase):
 
 
 @isolate_apps('invalid_models_tests')
-class ModelMetaJSONFieldOrdering(TestCase):
+class JSONFieldTests(TestCase):
+
+    @skipUnlessDBFeature('supports_json_field')
     def test_ordering_by_json_field_value(self):
-        class JSONModel(models.Model):
+        class Model(models.Model):
             field = models.JSONField()
 
             class Meta:
                 ordering = ['field__value']
 
-        self.assertEqual(JSONModel.check(), [])
+        self.assertEqual(Model.check(), [])
+
+    def test_check_json_fields(self):
+        class Model(models.Model):
+            field = models.JSONField()
+
+        error = Error(
+            '%s does not support JSONFields.' % connection.display_name,
+            obj=Model,
+            id='models.E036',
+        )
+        expected = [] if connection.features.supports_json_field else [error, error]
+        self.assertEqual(Model.check(), expected)
+
+    def test_json_fields_required_db_features(self):
+        class Model(models.Model):
+            age = models.JSONField()
+
+            class Meta:
+                required_db_features = {'supports_json_field'}
+
+        with mock.patch.object(connection.features, 'supports_json_field', False):
+            self.assertEqual(Model.check(), [])
 
 
 @isolate_apps('invalid_models_tests')

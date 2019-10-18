@@ -16,7 +16,7 @@ from django.db import (
     connections, router, transaction,
 )
 from django.db.models import (
-    NOT_PROVIDED, ExpressionWrapper, IntegerField, Max, Value,
+    NOT_PROVIDED, ExpressionWrapper, IntegerField, JSONField, Max, Value,
 )
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.constraints import CheckConstraint, UniqueConstraint
@@ -1333,11 +1333,33 @@ class Model(metaclass=ModelBase):
     @classmethod
     def _check_fields(cls, **kwargs):
         """Perform all field checks."""
-        errors = []
+        errors = cls._check_json_fields(**kwargs)
         for field in cls._meta.local_fields:
             errors.extend(field.check(**kwargs))
         for field in cls._meta.local_many_to_many:
             errors.extend(field.check(from_model=cls, **kwargs))
+        return errors
+
+    @classmethod
+    def _check_json_fields(cls, **kwargs):
+        errors = []
+        for db in settings.DATABASES:
+            if not router.allow_migrate_model(db, cls):
+                continue
+            connection = connections[db]
+            if (
+                'supports_json_field' in cls._meta.required_db_features or
+                connection.features.supports_json_field
+            ):
+                continue
+            if any(isinstance(field, JSONField) for field in cls._meta.local_fields):
+                errors.append(
+                    checks.Error(
+                        '%s does not support JSONFields.' % connection.display_name,
+                        obj=cls,
+                        id='models.E036',
+                    )
+                )
         return errors
 
     @classmethod

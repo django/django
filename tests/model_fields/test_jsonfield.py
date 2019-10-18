@@ -6,11 +6,10 @@ from unittest import skipIf
 from tests.forms_tests.field_tests.test_jsonfield import CustomDecoder
 
 from django import forms
-from django.conf import settings
 from django.core import checks, serializers
 from django.core.exceptions import ValidationError
 from django.core.serializers.json import DjangoJSONEncoder
-from django.db import connection, connections, models, transaction
+from django.db import connection, models, transaction
 from django.db.models import Count, F, OuterRef, Q, Subquery, Transform, Value
 from django.db.models.expressions import RawSQL
 from django.db.models.fields.json import (
@@ -42,14 +41,6 @@ class SetEncoderDecoderMixin:
 
 
 class TestFieldMeta(SetEncoderDecoderMixin, TestCase):
-    def test_check_json_field_support(self):
-        for db in settings.DATABASES:
-            connections[db].features.supports_json_field = False
-        check = JSONModel.check()
-        self.assertEqual(check[0].msg, 'No database connection that supports JSONField is found.')
-        for db in settings.DATABASES:
-            connections[db].features.supports_json_field = True
-
     def test_deconstruction(self):
         field = models.JSONField(
             'JSON data', 'data', default=list, encoder=DjangoJSONEncoder, decoder=CustomDecoder
