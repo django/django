@@ -18,6 +18,9 @@ class ErrorTestCase(SimpleTestCase):
     def skipped_test(self):
         pass
 
+    def skipped_test_via_SkipTest(self):
+        raise unittest.SkipTest('skipped via SkipTest')
+
 
 @mock.patch.object(ErrorTestCase, '_post_teardown')
 @mock.patch.object(ErrorTestCase, '_pre_setup')
@@ -80,6 +83,13 @@ class DebugInvocationTests(SimpleTestCase):
             self.fail('SkipTest should not be raised at this stage.')
         self.assertFalse(_post_teardown.called)
         self.assertFalse(_pre_setup.called)
+
+    def test_run_skipped_via_SkipTest_cleanup(self, _pre_setup, _post_teardown):
+        test_suite = unittest.TestSuite()
+        test_suite.addTest(ErrorTestCase('skipped_test_via_SkipTest'))
+        test_suite.run(self.get_runner()._makeResult())
+        self.assertTrue(_post_teardown.called)
+        self.assertTrue(_pre_setup.called)
 
     def test_debug_cleanup(self, _pre_setup, _post_teardown):
         """Simple debug run without errors."""

@@ -265,18 +265,25 @@ class SimpleTestCase(unittest.TestCase):
                     raise
                 result.addError(self, sys.exc_info())
                 return
-        if debug:
-            super().debug()
-        else:
-            super().__call__(result)
-        if not skipped:
-            try:
-                self._post_teardown()
-            except Exception:
-                if debug:
-                    raise
-                result.addError(self, sys.exc_info())
-                return
+
+        call_teardown = not skipped
+        try:
+            if debug:
+                super().debug()
+            else:
+                super().__call__(result)
+        except BaseException:
+            if debug:
+                call_teardown = False
+                raise
+        finally:
+            if call_teardown:
+                try:
+                    self._post_teardown()
+                except Exception:
+                    if debug:
+                        raise
+                    result.addError(self, sys.exc_info())
 
     def _pre_setup(self):
         """
