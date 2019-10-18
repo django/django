@@ -935,7 +935,7 @@ class QuerySet:
             clone.query.add_q(filter_obj)
             return clone
         else:
-            return self._filter_or_exclude(None, **filter_obj)
+            return self._filter_or_exclude(False, **filter_obj)
 
     def _combinator_query(self, combinator, *other_qs, all=False):
         # Clone the query to inherit the select list and everything
