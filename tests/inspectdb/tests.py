@@ -69,7 +69,7 @@ class InspectDBTestCase(TestCase):
             assertFieldType('email_field', "models.CharField(max_length=254)")
             assertFieldType('file_field', "models.CharField(max_length=100)")
             assertFieldType('file_path_field', "models.CharField(max_length=100)")
-            assertFieldType('slug_field', "models.CharField(max_length=50)")
+            assertFieldType('slug_field', "models.CharField(db_index=True, max_length=50)")
             assertFieldType('text_field', "models.TextField()")
             assertFieldType('url_field', "models.CharField(max_length=200)")
         assertFieldType('date_field', "models.DateField()")
