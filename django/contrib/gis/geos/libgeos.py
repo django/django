@@ -148,8 +148,8 @@ class GEOSFuncFactory:
         if argtypes is not None:
             self.argtypes = argtypes
 
-    def __call__(self, *args, **kwargs):
-        return self.func(*args, **kwargs)
+    def __call__(self, *args):
+        return self.func(*args)
 
     @cached_property
     def func(self):
