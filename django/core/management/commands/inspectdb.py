@@ -119,7 +119,7 @@ class Command(BaseCommand):
                     else:
                         if column_name in unique_columns:
                             extra_params['unique'] = True
-                        if column_name in db_index_columns:
+                        if column_name in db_index_columns and not is_relation:
                             extra_params['db_index'] = True
 
                     if is_relation:
