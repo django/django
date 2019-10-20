@@ -106,18 +106,9 @@ class Command(BaseCommand):
                     used_column_names.append(att_name)
                     column_to_field_name[column_name] = att_name
 
-                    if is_relation:
-                        field_type = 'ForeignKey'
-                    else:
-                        # Calling `get_field_type` to get the field type string and any
-                        # additional parameters and notes.
-                        field_type, field_params, field_notes = self.get_field_type(connection, table_name, row)
-                        extra_params.update(field_params)
-                        comment_notes.extend(field_notes)
-                    
                     # Add primary_key, unique and db_index, if necessary.
                     field_params, field_notes = self._get_field_constrains_params(
-                        constraints, table_name, column_name, field_type,
+                        connection, constraints, table_name, column_name,
                         is_relation, is_primary_key, row)
                     extra_params.update(field_params)
                     comment_notes.extend(field_notes)
@@ -136,6 +127,12 @@ class Command(BaseCommand):
                         else:
                             field_type = "%s('%s'" % (rel_type, rel_to)
                     else:
+                        # Calling `get_field_type` to get the field type string and any
+                        # additional parameters and notes.
+                        field_type, field_params, field_notes = self.get_field_type(connection, table_name, row)
+                        extra_params.update(field_params)
+                        comment_notes.extend(field_notes)
+
                         field_type += '('
 
                     # Don't output 'id = meta.AutoField(primary_key=True)', because
@@ -262,7 +259,7 @@ class Command(BaseCommand):
 
         return field_type, field_params, field_notes
 
-    def _get_field_constrains_params(self, constraints, table_name, column_name, field_type,
+    def _get_field_constrains_params(self, connection, constraints, table_name, column_name,
                                      is_relation, is_primary_key, row):
         extra_params = {}
         field_notes = []
@@ -279,7 +276,7 @@ class Command(BaseCommand):
         else:
             if column_name in unique_columns:
                 extra_params['unique'] = True
-            if row.name in db_index_columns and not is_relation:
+            if column_name in db_index_columns and not is_relation:
                 extra_params['db_index'] = True
         return extra_params, field_notes
 
