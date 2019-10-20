@@ -85,8 +85,8 @@ class Command(BaseCommand):
                     ]
                     db_index_columns = [
                         c['columns'][0] for c in constraints.values()
-                        if c['index']  and len(c['columns']) == 1
-                    ]                    
+                        if c['index'] and len(c['columns']) == 1
+                    ]
                     table_description = connection.introspection.get_table_description(cursor, table_name)
                 except Exception as e:
                     yield "# Unable to inspect table '%s'" % table_name
