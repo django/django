@@ -79,14 +79,6 @@ class Command(BaseCommand):
                     except NotImplementedError:
                         constraints = {}
                     primary_key_column = connection.introspection.get_primary_key_column(cursor, table_name)
-                    unique_columns = [
-                        c['columns'][0] for c in constraints.values()
-                        if c['unique'] and len(c['columns']) == 1
-                    ]
-                    db_index_columns = [
-                        c['columns'][0] for c in constraints.values()
-                        if c['index'] and len(c['columns']) == 1
-                    ]
                     table_description = connection.introspection.get_table_description(cursor, table_name)
                 except Exception as e:
                     yield "# Unable to inspect table '%s'" % table_name
@@ -104,6 +96,7 @@ class Command(BaseCommand):
                     extra_params = {}  # Holds Field parameters such as 'db_column'.
                     column_name = row.name
                     is_relation = column_name in relations
+                    is_primary_key = column_name == primary_key_column
 
                     att_name, params, notes = self.normalize_col_name(
                         column_name, used_column_names, is_relation)
@@ -113,14 +106,21 @@ class Command(BaseCommand):
                     used_column_names.append(att_name)
                     column_to_field_name[column_name] = att_name
 
-                    # Add primary_key, unique and db_index, if necessary.
-                    if column_name == primary_key_column:
-                        extra_params['primary_key'] = True
+                    if is_relation:
+                        field_type = 'ForeignKey'
                     else:
-                        if column_name in unique_columns:
-                            extra_params['unique'] = True
-                        if column_name in db_index_columns and not is_relation:
-                            extra_params['db_index'] = True
+                        # Calling `get_field_type` to get the field type string and any
+                        # additional parameters and notes.
+                        field_type, field_params, field_notes = self.get_field_type(connection, table_name, row)
+                        extra_params.update(field_params)
+                        comment_notes.extend(field_notes)
+                    
+                    # Add primary_key, unique and db_index, if necessary.
+                    field_params, field_notes = self._get_field_constrains_params(
+                        constraints, table_name, column_name, field_type,
+                        is_relation, is_primary_key, row)
+                    extra_params.update(field_params)
+                    comment_notes.extend(field_notes)
 
                     if is_relation:
                         if extra_params.pop('unique', False) or extra_params.get('primary_key'):
@@ -136,12 +136,6 @@ class Command(BaseCommand):
                         else:
                             field_type = "%s('%s'" % (rel_type, rel_to)
                     else:
-                        # Calling `get_field_type` to get the field type string and any
-                        # additional parameters and notes.
-                        field_type, field_params, field_notes = self.get_field_type(connection, table_name, row)
-                        extra_params.update(field_params)
-                        comment_notes.extend(field_notes)
-
                         field_type += '('
 
                     # Don't output 'id = meta.AutoField(primary_key=True)', because
@@ -267,6 +261,27 @@ class Command(BaseCommand):
                 field_params['decimal_places'] = row.scale
 
         return field_type, field_params, field_notes
+
+    def _get_field_constrains_params(self, constraints, table_name, column_name, field_type,
+                                     is_relation, is_primary_key, row):
+        extra_params = {}
+        field_notes = []
+        unique_columns = [
+            c['columns'][0] for c in constraints.values()
+            if c['unique'] and len(c['columns']) == 1
+        ]
+        db_index_columns = [
+            c['columns'][0] for c in constraints.values()
+            if c['index'] and len(c['columns']) == 1
+        ]
+        if is_primary_key:
+            extra_params['primary_key'] = True
+        else:
+            if column_name in unique_columns:
+                extra_params['unique'] = True
+            if row.name in db_index_columns and not is_relation:
+                extra_params['db_index'] = True
+        return extra_params, field_notes
 
     def get_meta(self, table_name, constraints, column_to_field_name, is_view, is_partition):
         """
