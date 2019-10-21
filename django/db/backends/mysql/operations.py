@@ -296,6 +296,9 @@ class DatabaseOperations(BaseDatabaseOperations):
         # Alias MySQL's TRADITIONAL to TEXT for consistency with other backends.
         if format and format.upper() == 'TEXT':
             format = 'TRADITIONAL'
+        elif not format and 'TREE' in self.connection.features.supported_explain_formats:
+            # Use TREE by default (if supported) as it's more informative.
+            format = 'TREE'
         prefix = super().explain_query_prefix(format, **options)
         if format:
             prefix += ' FORMAT=%s' % format
