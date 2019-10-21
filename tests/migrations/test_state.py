@@ -1052,7 +1052,7 @@ class ModelStateTests(SimpleTestCase):
             ['searchablelocation_ptr', 'name', 'bus_routes', 'inbound']
         )
         self.assertEqual(station_state.fields[1][1].max_length, 128)
-        self.assertEqual(station_state.fields[2][1].null, False)
+        self.assertIs(station_state.fields[2][1].null, False)
         self.assertEqual(
             station_state.options,
             {'abstract': False, 'swappable': 'TEST_SWAPPABLE_MODEL', 'indexes': [], 'constraints': []}

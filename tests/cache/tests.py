@@ -219,7 +219,7 @@ class DummyCacheTests(SimpleTestCase):
 
     def test_get_or_set(self):
         self.assertEqual(cache.get_or_set('mykey', 'default'), 'default')
-        self.assertEqual(cache.get_or_set('mykey', None), None)
+        self.assertIsNone(cache.get_or_set('mykey', None))
 
     def test_get_or_set_callable(self):
         def my_callable():
@@ -947,7 +947,7 @@ class BaseCacheTests:
         self.assertIsNone(cache.get('projector'))
         self.assertEqual(cache.get_or_set('projector', 42), 42)
         self.assertEqual(cache.get('projector'), 42)
-        self.assertEqual(cache.get_or_set('null', None), None)
+        self.assertIsNone(cache.get_or_set('null', None))
 
     def test_get_or_set_callable(self):
         def my_callable():

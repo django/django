@@ -468,7 +468,7 @@ class SchemaTests(TransactionTestCase):
         # Ensure the field is right afterwards
         columns = self.column_classes(Author)
         self.assertEqual(columns['age'][0], "IntegerField")
-        self.assertEqual(columns['age'][1][6], True)
+        self.assertTrue(columns['age'][1][6])
 
     def test_add_field_remove_field(self):
         """
@@ -620,7 +620,7 @@ class SchemaTests(TransactionTestCase):
         # Ensure the field is right afterwards
         columns = self.column_classes(Author)
         self.assertEqual(columns['name'][0], "TextField")
-        self.assertEqual(columns['name'][1][6], True)
+        self.assertTrue(columns['name'][1][6])
         # Change nullability again
         new_field2 = TextField(null=False)
         new_field2.set_attributes_from_name("name")
@@ -2100,25 +2100,25 @@ class SchemaTests(TransactionTestCase):
         with connection.schema_editor() as editor:
             editor.create_model(Tag)
         # Ensure there's no index on the year/slug columns first
-        self.assertEqual(
-            False,
+        self.assertIs(
             any(
                 c["index"]
                 for c in self.get_constraints("schema_tag").values()
                 if c['columns'] == ["slug", "title"]
             ),
+            False,
         )
         # Alter the model to add an index
         with connection.schema_editor() as editor:
             editor.alter_index_together(Tag, [], [("slug", "title")])
         # Ensure there is now an index
-        self.assertEqual(
-            True,
+        self.assertIs(
             any(
                 c["index"]
                 for c in self.get_constraints("schema_tag").values()
                 if c['columns'] == ["slug", "title"]
             ),
+            True,
         )
         # Alter it back
         new_field2 = SlugField(unique=True)
@@ -2126,13 +2126,13 @@ class SchemaTests(TransactionTestCase):
         with connection.schema_editor() as editor:
             editor.alter_index_together(Tag, [("slug", "title")], [])
         # Ensure there's no index
-        self.assertEqual(
-            False,
+        self.assertIs(
             any(
                 c["index"]
                 for c in self.get_constraints("schema_tag").values()
                 if c['columns'] == ["slug", "title"]
             ),
+            False,
         )
 
     def test_index_together_with_fk(self):
@@ -2161,13 +2161,13 @@ class SchemaTests(TransactionTestCase):
         with connection.schema_editor() as editor:
             editor.create_model(TagIndexed)
         # Ensure there is an index
-        self.assertEqual(
-            True,
+        self.assertIs(
             any(
                 c["index"]
                 for c in self.get_constraints("schema_tagindexed").values()
                 if c['columns'] == ["slug", "title"]
             ),
+            True,
         )
 
     @skipUnlessDBFeature('allows_multiple_constraints_on_same_fields')

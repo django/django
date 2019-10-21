@@ -479,8 +479,9 @@ class FileUploadTests(TestCase):
             try:
                 self.client.post('/upload_errors/', post_data)
             except reference_error.__class__ as err:
-                self.assertFalse(
-                    str(err) == str(reference_error),
+                self.assertNotEqual(
+                    str(err),
+                    str(reference_error),
                     "Caught a repeated exception that'll cause an infinite loop in file uploads."
                 )
             except Exception as err:

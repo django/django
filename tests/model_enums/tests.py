@@ -66,7 +66,7 @@ class ChoicesTests(SimpleTestCase):
     def test_integerchoices_empty_label(self):
         self.assertEqual(Vehicle.choices[0], (None, '(Unknown)'))
         self.assertEqual(Vehicle.labels[0], '(Unknown)')
-        self.assertEqual(Vehicle.values[0], None)
+        self.assertIsNone(Vehicle.values[0])
         self.assertEqual(Vehicle.names[0], '__empty__')
 
     def test_integerchoices_functional_api(self):
@@ -107,7 +107,7 @@ class ChoicesTests(SimpleTestCase):
     def test_textchoices_empty_label(self):
         self.assertEqual(Gender.choices[0], (None, '(Undeclared)'))
         self.assertEqual(Gender.labels[0], '(Undeclared)')
-        self.assertEqual(Gender.values[0], None)
+        self.assertIsNone(Gender.values[0])
         self.assertEqual(Gender.names[0], '__empty__')
 
     def test_textchoices_functional_api(self):

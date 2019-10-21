@@ -183,9 +183,9 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
         # Error shouldn't be raise on equivalence testing with
         # an invalid type.
         for g in (p, ls):
-            self.assertNotEqual(g, None)
+            self.assertIsNotNone(g)
             self.assertNotEqual(g, {'foo': 'bar'})
-            self.assertNotEqual(g, False)
+            self.assertIsNot(g, False)
 
     def test_hash(self):
         point_1 = Point(5, 23)
@@ -236,7 +236,7 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
             self.assertEqual(p.x, pnt.x)
             self.assertEqual(p.y, pnt.y)
             self.assertEqual(pnt, fromstr(p.wkt))
-            self.assertEqual(False, pnt == prev)  # Use assertEqual to test __eq__
+            self.assertIs(pnt == prev, False)  # Use assertIs() to test __eq__.
 
             # Making sure that the point's X, Y components are what we expect
             self.assertAlmostEqual(p.x, pnt.tuple[0], 9)
@@ -323,7 +323,7 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
                 self.assertEqual(l.tup, ls.tuple)
 
             self.assertEqual(ls, fromstr(l.wkt))
-            self.assertEqual(False, ls == prev)  # Use assertEqual to test __eq__
+            self.assertIs(ls == prev, False)  # Use assertIs() to test __eq__.
             with self.assertRaises(IndexError):
                 ls.__getitem__(len(ls))
             prev = ls
@@ -399,7 +399,7 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
             self.assertAlmostEqual(l.centroid[1], ml.centroid.y, 9)
 
             self.assertEqual(ml, fromstr(l.wkt))
-            self.assertEqual(False, ml == prev)  # Use assertEqual to test __eq__
+            self.assertIs(ml == prev, False)  # Use assertIs() to test __eq__.
             prev = ml
 
             for ls in ml:
@@ -483,8 +483,8 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
             # Testing the geometry equivalence
             self.assertEqual(poly, fromstr(p.wkt))
             # Should not be equal to previous geometry
-            self.assertEqual(False, poly == prev)  # Use assertEqual to test __eq__
-            self.assertNotEqual(poly, prev)  # Use assertNotEqual to test __ne__
+            self.assertIs(poly == prev, False)  # Use assertIs() to test __eq__.
+            self.assertIs(poly != prev, True)  # Use assertIs() to test __ne__.
 
             # Testing the exterior ring
             ring = poly.exterior_ring
