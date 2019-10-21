@@ -124,7 +124,7 @@ Email
 File Storage
 ~~~~~~~~~~~~
 
-* ...
+* ``FileSystemStorage.save()`` method now supports :class:`pathlib.Path`.
 
 File Uploads
 ~~~~~~~~~~~~

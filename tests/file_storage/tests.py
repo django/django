@@ -545,7 +545,7 @@ class FileStorageTests(SimpleTestCase):
         p = Path('test.file')
         self.assertFalse(self.storage.exists(p))
         f = ContentFile('custom contents')
-        f_name = self.storage.save(str(p), f)
+        f_name = self.storage.save(p, f)
         # Storage basic methods.
         self.assertEqual(self.storage.path(p), os.path.join(self.temp_dir, p))
         self.assertEqual(self.storage.size(p), 15)
@@ -560,10 +560,10 @@ class CustomStorage(FileSystemStorage):
         """
         Append numbers to duplicate files rather than underscores, like Trac.
         """
-        basename, *ext = name.split('.')
+        basename, *ext = os.path.splitext(name)
         number = 2
         while self.exists(name):
-            name = '.'.join([basename, str(number)] + ext)
+            name = ''.join([basename, '.', str(number)] + ext)
             number += 1
 
         return name

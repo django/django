@@ -291,7 +291,7 @@ class FileSystemStorage(Storage):
             os.chmod(full_path, self.file_permissions_mode)
 
         # Store filenames with forward slashes, even on Windows.
-        return name.replace('\\', '/')
+        return str(name).replace('\\', '/')
 
     def delete(self, name):
         assert name, "The name argument is not allowed to be empty."
