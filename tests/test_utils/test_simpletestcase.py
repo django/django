@@ -87,7 +87,9 @@ class DebugInvocationTests(SimpleTestCase):
     def test_run_skipped_via_SkipTest_cleanup(self, _pre_setup, _post_teardown):
         test_suite = unittest.TestSuite()
         test_suite.addTest(ErrorTestCase('skipped_test_via_SkipTest'))
-        test_suite.run(self.get_runner()._makeResult())
+        result = _DebugResult()
+        with self.assertRaisesMessage(unittest.SkipTest, 'skipped via SkipTest'):
+            test_suite.run(result, debug=True)
         self.assertTrue(_post_teardown.called)
         self.assertTrue(_pre_setup.called)
 
