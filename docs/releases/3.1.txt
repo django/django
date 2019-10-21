@@ -169,7 +169,10 @@ Models
   :class:`~django.db.models.DateTimeField`, and the new :lookup:`iso_week_day`
   lookup allows querying by an ISO-8601 day of week.
 
-* :meth:`.QuerySet.explain` now supports ``TREE`` format on MySQL 8.0.16+.
+* :meth:`.QuerySet.explain` now supports:
+
+  * ``TREE`` format on MySQL 8.0.16+,
+  * ``analyze`` option on MySQL 8.0.18+ and MariaDB.
 
 Pagination
 ~~~~~~~~~~

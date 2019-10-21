@@ -80,6 +80,25 @@ class ExplainTests(TestCase):
         self.assertEqual(len(captured_queries), 1)
         self.assertIn('FORMAT=TRADITIONAL', captured_queries[0]['sql'])
 
+    @unittest.skipUnless(connection.vendor == 'mysql', 'MariaDB and MySQL >= 8.0.18 specific.')
+    def test_mysql_analyze(self):
+        # Inner skip to avoid module level query for MySQL version.
+        if not connection.features.supports_explain_analyze:
+            raise unittest.SkipTest('MariaDB and MySQL >= 8.0.18 specific.')
+        qs = Tag.objects.filter(name='test')
+        with CaptureQueriesContext(connection) as captured_queries:
+            qs.explain(analyze=True)
+        self.assertEqual(len(captured_queries), 1)
+        prefix = 'ANALYZE ' if connection.mysql_is_mariadb else 'EXPLAIN ANALYZE '
+        self.assertTrue(captured_queries[0]['sql'].startswith(prefix))
+        with CaptureQueriesContext(connection) as captured_queries:
+            qs.explain(analyze=True, format='JSON')
+        self.assertEqual(len(captured_queries), 1)
+        if connection.mysql_is_mariadb:
+            self.assertIn('FORMAT=JSON', captured_queries[0]['sql'])
+        else:
+            self.assertNotIn('FORMAT=JSON', captured_queries[0]['sql'])
+
     @unittest.skipUnless(connection.vendor == 'mysql', 'MySQL < 5.7 specific')
     def test_mysql_extended(self):
         # Inner skip to avoid module level query for MySQL version.

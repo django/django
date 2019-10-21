@@ -118,6 +118,10 @@ class DatabaseFeatures(BaseDatabaseFeatures):
         return not self.connection.mysql_is_mariadb and self.connection.mysql_version < (5, 7)
 
     @cached_property
+    def supports_explain_analyze(self):
+        return self.connection.mysql_is_mariadb or self.connection.mysql_version >= (8, 0, 18)
+
+    @cached_property
     def supported_explain_formats(self):
         # Alias MySQL's TRADITIONAL to TEXT for consistency with other
         # backends.

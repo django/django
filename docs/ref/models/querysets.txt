@@ -2587,13 +2587,14 @@ Pass these flags as keyword arguments. For example, when using PostgreSQL::
     Execution time: 0.058 ms
 
 On some databases, flags may cause the query to be executed which could have
-adverse effects on your database. For example, PostgreSQL's ``ANALYZE`` flag
-could result in changes to data if there are triggers or if a function is
-called, even for a ``SELECT`` query.
+adverse effects on your database. For example, the ``ANALYZE`` flag supported
+by MariaDB, MySQL 8.0.18+, and PostgreSQL could result in changes to data if
+there are triggers or if a function is called, even for a ``SELECT`` query.
 
 .. versionchanged:: 3.1
 
-    Support for the ``'TREE'`` format on MySQL 8.0.16+ was added.
+    Support for the ``'TREE'`` format on MySQL 8.0.16+ and ``analyze`` option
+    on MariaDB and MySQL 8.0.18+ were added.
 
 .. _field-lookups:
 
