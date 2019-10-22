@@ -102,10 +102,14 @@ class Collector:
         # deleting, and therefore do not affect the order in which objects have
         # to be deleted.
         if source is not None and not nullable:
-            if reverse_dependency:
-                source, model = model, source
-            self.dependencies[source._meta.concrete_model].add(model._meta.concrete_model)
+            self.add_dependency(source, model, reverse_dependency=reverse_dependency)
         return new_objs
+
+    def add_dependency(self, model, dependency, reverse_dependency=False):
+        if reverse_dependency:
+            model, dependency = dependency, model
+        self.dependencies[model._meta.concrete_model].add(dependency._meta.concrete_model)
+        self.data.setdefault(dependency, self.data.default_factory())
 
     def add_field_update(self, field, value, objs):
         """
