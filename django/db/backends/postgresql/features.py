@@ -64,6 +64,10 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     def is_postgresql_10(self):
         return self.connection.pg_version >= 100000
 
+    @cached_property
+    def is_postgresql_12(self):
+        return self.connection.pg_version >= 120000
+
     has_brin_autosummarize = property(operator.attrgetter('is_postgresql_10'))
     has_phraseto_tsquery = property(operator.attrgetter('is_postgresql_9_6'))
     supports_table_partitions = property(operator.attrgetter('is_postgresql_10'))
