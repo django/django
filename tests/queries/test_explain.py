@@ -56,7 +56,7 @@ class ExplainTests(TestCase):
             {'verbose': True, 'timing': True, 'analyze': True},
             {'verbose': False, 'timing': False, 'analyze': True},
         ]
-        if connection.pg_version >= 100000:
+        if connection.features.is_postgresql_10:
             test_options.append({'summary': True})
         for options in test_options:
             with self.subTest(**options), transaction.atomic():
