@@ -710,9 +710,41 @@ For each field, we describe the default widget used if you don't specify
 
     After the field has been cleaned and validated, the ``UploadedFile``
     object will have an additional ``image`` attribute containing the Pillow
-    `Image`_ instance used to check if the file was a valid image. Also,
-    ``UploadedFile.content_type`` will be updated with the image's content type
-    if Pillow can determine it, otherwise it will be set to ``None``.
+    `Image`_ instance used to check if the file was a valid image. Pillow
+    closes the underlying file descriptor after verifying an image, so whilst
+    non-image data attributes, such as ``format``, ``height``, and ``width``,
+    are available, methods that access the underlying image data, such as
+    ``getdata()`` or ``getpixel()``, cannot be used without reopening the file.
+    For example::
+
+        >>> from PIL import Image
+        >>> from django import forms
+        >>> from django.core.files.uploadedfile import SimpleUploadedFile
+        >>> class ImageForm(forms.Form):
+        ...     img = forms.ImageField()
+        >>> file_data = {'img': SimpleUploadedFile('test.png', <file data>)}
+        >>> form = ImageForm({}, file_data)
+        # Pillow closes the underlying file descriptor.
+        >>> form.is_valid()
+        True
+        >>> image_field = form.cleaned_data['img']
+        >>> image_field.image
+        <PIL.PngImagePlugin.PngImageFile image mode=RGBA size=191x287 at 0x7F5985045C18>
+        >>> image_field.image.width
+        191
+        >>> image_field.image.height
+        287
+        >>> image_field.image.format
+        'PNG'
+        >>> image_field.image.getdata()
+        # Raises AttributeError: 'NoneType' object has no attribute 'seek'.
+        >>> image = Image.open(image_field)
+        >>> image.getdata()
+        <ImagingCore object at 0x7f5984f874b0>
+
+    Additionally, ``UploadedFile.content_type`` will be updated with the
+    image's content type if Pillow can determine it, otherwise it will be set
+    to ``None``.
 
 .. _Pillow: https://pillow.readthedocs.io/en/latest/
 .. _Image: https://pillow.readthedocs.io/en/latest/reference/Image.html
