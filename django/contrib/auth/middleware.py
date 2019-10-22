@@ -1,15 +1,11 @@
+from functools import partial
+
 from django.contrib import auth
 from django.contrib.auth import load_backend
 from django.contrib.auth.backends import RemoteUserBackend
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.deprecation import MiddlewareMixin
 from django.utils.functional import SimpleLazyObject
-
-
-def get_user(request):
-    if not hasattr(request, '_cached_user'):
-        request._cached_user = auth.get_user(request)
-    return request._cached_user
 
 
 class AuthenticationMiddleware(MiddlewareMixin):
@@ -20,7 +16,7 @@ class AuthenticationMiddleware(MiddlewareMixin):
             "'django.contrib.sessions.middleware.SessionMiddleware' before "
             "'django.contrib.auth.middleware.AuthenticationMiddleware'."
         )
-        request.user = SimpleLazyObject(lambda: get_user(request))
+        request.user = SimpleLazyObject(partial(auth.get_user, request))
 
 
 class RemoteUserMiddleware(MiddlewareMixin):
