@@ -12,7 +12,7 @@ class XViewMiddleware(MiddlewareMixin):
     def process_view(self, request, view_func, view_args, view_kwargs):
         """
         If the request method is HEAD and either the IP is internal or the
-        user is a logged-in staff member, return a responsewith an x-view
+        user is a logged-in staff member, return a response with an x-view
         header indicating the view function. This is used to lookup the view
         function for an arbitrary page.
         """
