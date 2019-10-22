@@ -2,7 +2,7 @@ import unittest
 
 from django.test import SimpleTestCase
 from django.test.runner import RemoteTestResult
-from django.utils.version import PY37
+from django.utils.version import PY37, PY38
 
 try:
     import tblib
@@ -63,6 +63,11 @@ class RemoteTestResultTest(SimpleTestCase):
         with self.assertRaisesMessage(TypeError, msg):
             result._confirm_picklable(not_unpicklable_error)
 
+    @unittest.skipIf(
+        PY38 and tblib is not None and tblib.__version__ <= '1.4.0',
+        'tblib <= 1.4.0 does not support Python 3.8 due to changes in the '
+        'CodeType signature (see https://bugs.python.org/issue36886).'
+    )
     @unittest.skipUnless(tblib is not None, 'requires tblib to be installed')
     def test_add_failing_subtests(self):
         """
