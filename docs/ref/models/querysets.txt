@@ -126,7 +126,7 @@ described here.
 
 Here's the formal declaration of a ``QuerySet``:
 
-.. class:: QuerySet(model=None, query=None, using=None)
+.. class:: QuerySet(model=None, query=None, using=None, hints=None)
 
     Usually when you'll interact with a ``QuerySet`` you'll use it by
     :ref:`chaining filters <chaining-filters>`. To make this work, most
