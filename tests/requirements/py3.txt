@@ -14,4 +14,4 @@ pywatchman; sys.platform != 'win32'
 PyYAML
 selenium
 sqlparse
-tblib
+tblib >= 1.5.0
