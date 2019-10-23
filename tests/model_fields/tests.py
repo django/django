@@ -266,3 +266,26 @@ class GetChoicesOrderingTests(TestCase):
             self.field.remote_field.get_choices(include_blank=False),
             [self.bar2, self.bar1]
         )
+
+
+class GetChoicesLimitChoicesToTests(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.foo1 = Foo.objects.create(a='a', d='12.34')
+        cls.foo2 = Foo.objects.create(a='b', d='12.34')
+        cls.bar1 = Bar.objects.create(a=cls.foo1, b='b')
+        cls.bar2 = Bar.objects.create(a=cls.foo2, b='a')
+        cls.field = Bar._meta.get_field('a')
+
+    def assertChoicesEqual(self, choices, objs):
+        self.assertEqual(choices, [(obj.pk, str(obj)) for obj in objs])
+
+    def test_get_choices(self):
+        self.assertChoicesEqual(
+            self.field.get_choices(include_blank=False, limit_choices_to={'a': 'a'}),
+            [self.foo1],
+        )
+        self.assertChoicesEqual(
+            self.field.get_choices(include_blank=False, limit_choices_to={}),
+            [self.foo1, self.foo2],
+        )
