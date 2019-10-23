@@ -244,6 +244,7 @@ dependencies:
 *  gettext_ (:ref:`gettext_on_windows`)
 *  selenium_
 *  sqlparse_ (required)
+*  tblib_
 
 You can find these dependencies in `pip requirements files`_ inside the
 ``tests/requirements`` directory of the Django source tree and install them
@@ -287,6 +288,7 @@ service.
 .. _selenium: https://pypi.org/project/selenium/
 .. _sqlparse: https://pypi.org/project/sqlparse/
 .. _pip requirements files: https://pip.pypa.io/en/latest/user_guide/#requirements-files
+.. _tblib: https://pypi.org/project/tblib/
 .. _Watchman: https://facebook.github.io/watchman/
 
 Code coverage
