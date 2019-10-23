@@ -277,7 +277,7 @@ dependencies:
 *  geoip2_
 *  jinja2_ 2.7+
 *  numpy_
-*  Pillow_
+*  Pillow_ 6.2.0+
 *  PyYAML_
 *  pytz_ (required)
 *  pywatchman_
