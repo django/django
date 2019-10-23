@@ -1,6 +1,12 @@
 Full release notes, with more details and upgrade information, are available at:
 https://channels.readthedocs.io/en/latest/releases
 
+2.3.1 (2019-10-23)
+------------------
+
+* Adds compatibility with Python 3.8.
+
+
 2.3.0 (2019-09-18)
 ------------------
 
