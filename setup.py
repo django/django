@@ -14,7 +14,7 @@ setup(
     python_requires='>=3.5',
     install_requires=[
         'Django>=1.11',
-        'asgiref~=3.0',
+        'asgiref~=3.2',
         'daphne~=2.3',
     ],
     extras_require={
@@ -39,6 +39,7 @@ setup(
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
+        'Programming Language :: Python :: 3.8',
         'Topic :: Internet :: WWW/HTTP',
     ],
 )

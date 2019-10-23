@@ -1,6 +1,5 @@
 import asyncio
 import types
-from concurrent.futures import CancelledError
 
 
 def name_that_thing(thing):
@@ -57,5 +56,5 @@ async def await_many_dispatch(consumer_callables, dispatch):
             task.cancel()
             try:
                 await task
-            except CancelledError:
+            except asyncio.CancelledError:
                 pass

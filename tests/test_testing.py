@@ -1,4 +1,4 @@
-from concurrent.futures import TimeoutError
+import asyncio
 from urllib.parse import unquote
 
 import pytest
@@ -121,7 +121,7 @@ async def test_timeout_disconnect():
     assert subprotocol is None
     # Test sending text (will error internally)
     await communicator.send_to(text_data="hello")
-    with pytest.raises(TimeoutError):
+    with pytest.raises(asyncio.TimeoutError):
         await communicator.receive_from()
     # Close out
     await communicator.disconnect()
