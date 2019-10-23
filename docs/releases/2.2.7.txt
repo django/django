@@ -17,3 +17,7 @@ Bugfixes
 * Prevented :option:`migrate --plan` from showing that ``RunPython`` operations
   are irreversible when ``reverse_code`` callables don't have docstrings or
   when showing a forward migration plan (:ticket:`30870`).
+
+* Fixed migrations crash on PostgreSQL when adding an
+  :class:`~django.db.models.Index` with fields ordering and
+  :attr:`~.Index.opclasses` (:ticket:`30903`).
