@@ -10,6 +10,8 @@ from django.core.checks import Error, Tags, Warning, register
 
 @register(Tags.models)
 def check_all_models(app_configs=None, **kwargs):
+    from django.db.models.constraints import CheckConstraint
+
     db_table_models = defaultdict(list)
     indexes = defaultdict(list)
     constraints = defaultdict(list)
@@ -34,8 +36,25 @@ def check_all_models(app_configs=None, **kwargs):
             errors.extend(model.check(**kwargs))
         for model_index in model._meta.indexes:
             indexes[model_index.name].append(model._meta.label)
+
+        check_constraints_seen = {}
         for model_constraint in model._meta.constraints:
             constraints[model_constraint.name].append(model._meta.label)
+            if isinstance(model_constraint, CheckConstraint):
+                if model_constraint.check in check_constraints_seen:
+                    errors.append(
+                        Warning(
+                            "Check constraint %s duplicates %s for model %s." % (
+                                model_constraint.name,
+                                check_constraints_seen[model_constraint.check],
+                                model._meta.label,
+                            ),
+                            id='models.W036',
+                        )
+                    )
+                else:
+                    check_constraints_seen[model_constraint.check] = model_constraint.name
+
     if settings.DATABASE_ROUTERS:
         error_class, error_id = Warning, 'models.W035'
         error_hint = (

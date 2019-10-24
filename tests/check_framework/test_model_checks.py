@@ -358,3 +358,41 @@ class ConstraintNameTests(TestCase):
                 constraints = [constraint]
 
         self.assertEqual(checks.run_checks(app_configs=apps.get_app_configs()), [])
+
+    @modify_settings(INSTALLED_APPS={'append': 'basic'})
+    @isolate_apps('basic', 'check_framework', kwarg_name='apps')
+    def test_duplicate_constraint(self, apps):
+        class Model1(models.Model):
+            class Meta:
+                app_label = 'basic'
+                constraints = [
+                    models.CheckConstraint(check=models.Q(id__gt=0), name='constraint1'),
+                    models.CheckConstraint(check=models.Q(id__gt=0), name='constraint2')
+                ]
+
+        self.assertEqual(checks.run_checks(app_configs=apps.get_app_configs()), [
+            Warning(
+                'Check constraint constraint2 duplicates constraint1 for '
+                'model basic.Model1.',
+                id='models.W036',
+            )
+        ])
+
+    @modify_settings(INSTALLED_APPS={'append': 'basic'})
+    @isolate_apps('basic', 'check_framework', kwarg_name='apps')
+    def test_duplicate_constraint_different_model_no_warning(self, apps):
+        class Model1(models.Model):
+            class Meta:
+                app_label = 'basic'
+                constraints = [
+                    models.CheckConstraint(check=models.Q(id__gt=0), name='constraint1'),
+                ]
+
+        class Model2(models.Model):
+            class Meta:
+                app_label = 'basic'
+                constraints = [
+                    models.CheckConstraint(check=models.Q(id__gt=0), name='constraint2'),
+                ]
+
+        self.assertEqual(checks.run_checks(app_configs=apps.get_app_configs()), [])
