@@ -145,7 +145,7 @@ class TestInline(TestDataMixin, TestCase):
         # Here colspan is "4": two fields (title1 and title2), one hidden field and the delete checkbox.
         self.assertContains(
             response,
-            '<tr><td colspan="4"><ul class="errorlist nonfield">'
+            '<tr class="row-form-errors"><td colspan="4"><ul class="errorlist nonfield">'
             '<li>The two titles must be the same</li></ul></td></tr>'
         )
 
@@ -907,7 +907,99 @@ class SeleniumTests(AdminSeleniumTestCase):
         self.assertEqual(rows_length(), 5, msg="sanity check")
         for delete_link in self.selenium.find_elements_by_css_selector('%s .inline-deletelink' % inline_id):
             delete_link.click()
+        with self.disable_implicit_wait():
+            self.assertEqual(rows_length(), 0)
+
+    def test_delete_invalid_stacked_inlines(self):
+        from selenium.common.exceptions import NoSuchElementException
+        self.admin_login(username='super', password='secret')
+        self.selenium.get(self.live_server_url + reverse('admin:admin_inlines_holder4_add'))
+
+        inline_id = '#inner4stacked_set-group'
+
+        def rows_length():
+            return len(self.selenium.find_elements_by_css_selector('%s .dynamic-inner4stacked_set' % inline_id))
         self.assertEqual(rows_length(), 3)
+
+        add_button = self.selenium.find_element_by_link_text(
+            'Add another Inner4 stacked')
+        add_button.click()
+        add_button.click()
+        self.assertEqual(len(self.selenium.find_elements_by_css_selector('#id_inner4stacked_set-4-dummy')), 1)
+
+        # Enter some data and click 'Save'.
+        self.selenium.find_element_by_name('dummy').send_keys('1')
+        self.selenium.find_element_by_name('inner4stacked_set-0-dummy').send_keys('100')
+        self.selenium.find_element_by_name('inner4stacked_set-1-dummy').send_keys('101')
+        self.selenium.find_element_by_name('inner4stacked_set-2-dummy').send_keys('222')
+        self.selenium.find_element_by_name('inner4stacked_set-3-dummy').send_keys('103')
+        self.selenium.find_element_by_name('inner4stacked_set-4-dummy').send_keys('222')
+        self.selenium.find_element_by_xpath('//input[@value="Save"]').click()
+        self.wait_page_loaded()
+
+        self.assertEqual(rows_length(), 5, msg="sanity check")
+        errorlist = self.selenium.find_element_by_css_selector(
+            '%s .dynamic-inner4stacked_set .errorlist li' % inline_id
+        )
+        self.assertEqual('Please correct the duplicate values below.', errorlist.text)
+        delete_link = self.selenium.find_element_by_css_selector('#inner4stacked_set-4 .inline-deletelink')
+        delete_link.click()
+        self.assertEqual(rows_length(), 4)
+        with self.disable_implicit_wait(), self.assertRaises(NoSuchElementException):
+            self.selenium.find_element_by_css_selector('%s .dynamic-inner4stacked_set .errorlist li' % inline_id)
+
+        self.selenium.find_element_by_xpath('//input[@value="Save"]').click()
+        self.wait_page_loaded()
+
+        # The objects have been created in the database.
+        self.assertEqual(Inner4Stacked.objects.all().count(), 4)
+
+    def test_delete_invalid_tabular_inlines(self):
+        from selenium.common.exceptions import NoSuchElementException
+        self.admin_login(username='super', password='secret')
+        self.selenium.get(self.live_server_url + reverse('admin:admin_inlines_holder4_add'))
+
+        inline_id = '#inner4tabular_set-group'
+
+        def rows_length():
+            return len(self.selenium.find_elements_by_css_selector('%s .dynamic-inner4tabular_set' % inline_id))
+        self.assertEqual(rows_length(), 3)
+
+        add_button = self.selenium.find_element_by_link_text(
+            'Add another Inner4 tabular')
+        add_button.click()
+        add_button.click()
+        self.assertEqual(len(self.selenium.find_elements_by_css_selector('#id_inner4tabular_set-4-dummy')), 1)
+
+        # Enter some data and click 'Save'.
+        self.selenium.find_element_by_name('dummy').send_keys('1')
+        self.selenium.find_element_by_name('inner4tabular_set-0-dummy').send_keys('100')
+        self.selenium.find_element_by_name('inner4tabular_set-1-dummy').send_keys('101')
+        self.selenium.find_element_by_name('inner4tabular_set-2-dummy').send_keys('222')
+        self.selenium.find_element_by_name('inner4tabular_set-3-dummy').send_keys('103')
+        self.selenium.find_element_by_name('inner4tabular_set-4-dummy').send_keys('222')
+        self.selenium.find_element_by_xpath('//input[@value="Save"]').click()
+        self.wait_page_loaded()
+
+        self.assertEqual(rows_length(), 5, msg="sanity check")
+
+        # Non-field errorlist is in its own <tr> just before
+        # tr#inner4tabular_set-3:
+        errorlist = self.selenium.find_element_by_css_selector(
+            '%s #inner4tabular_set-3 + .row-form-errors .errorlist li' % inline_id
+        )
+        self.assertEqual('Please correct the duplicate values below.', errorlist.text)
+        delete_link = self.selenium.find_element_by_css_selector('#inner4tabular_set-4 .inline-deletelink')
+        delete_link.click()
+        self.assertEqual(rows_length(), 4)
+        with self.disable_implicit_wait(), self.assertRaises(NoSuchElementException):
+            self.selenium.find_element_by_css_selector('%s .dynamic-inner4tabular_set .errorlist li' % inline_id)
+
+        self.selenium.find_element_by_xpath('//input[@value="Save"]').click()
+        self.wait_page_loaded()
+
+        # The objects have been created in the database.
+        self.assertEqual(Inner4Tabular.objects.all().count(), 4)
 
     def test_add_inlines(self):
         """

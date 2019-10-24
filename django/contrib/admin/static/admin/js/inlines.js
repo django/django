@@ -37,6 +37,7 @@
         var totalForms = $("#id_" + options.prefix + "-TOTAL_FORMS").prop("autocomplete", "off");
         var nextIndex = parseInt(totalForms.val(), 10);
         var maxForms = $("#id_" + options.prefix + "-MAX_NUM_FORMS").prop("autocomplete", "off");
+        var minForms = $("#id_" + options.prefix + "-MIN_NUM_FORMS").prop("autocomplete", "off");
         var addButton;
 
         /**
@@ -79,6 +80,9 @@
             if ((maxForms.val() !== '') && (maxForms.val() - totalForms.val()) <= 0) {
                 addButton.parent().hide();
             }
+            // Show the remove buttons if there are more than min_num.
+            toggleDeleteButtonVisibility(row.closest('.inline-group'));
+
             // Pass the new form to the post-add callback, if provided.
             if (options.added) {
                 options.added(row);
@@ -112,7 +116,13 @@
             e1.preventDefault();
             var deleteButton = $(e1.target);
             var row = deleteButton.closest('.' + options.formCssClass);
-            // Remove the parent form containing this button:
+            var inlineGroup = row.closest('.inline-group');
+            // Remove the parent form containing this button,
+            // and also remove the relevant row with non-field errors:
+            var prevRow = row.prev();
+            if (prevRow.length && prevRow.hasClass('row-form-errors')) {
+                prevRow.remove();
+            }
             row.remove();
             nextIndex -= 1;
             // Pass the deleted form to the post-delete callback, if provided.
@@ -127,6 +137,8 @@
             if ((maxForms.val() === '') || (maxForms.val() - forms.length) > 0) {
                 addButton.parent().show();
             }
+            // Hide the remove buttons if at min_num.
+            toggleDeleteButtonVisibility(inlineGroup);
             // Also, update names and ids for all remaining form controls so
             // they remain in sequence:
             var i, formCount;
@@ -139,18 +151,37 @@
             }
         };
 
-        // Show the add button if we are allowed to add more items.
-        // Note that max_num = None translates to a blank string.
-        var showAddButton = maxForms.val() === '' || (maxForms.val() - totalForms.val()) > 0;
+        var toggleDeleteButtonVisibility = function(inlineGroup) {
+            if ((minForms.val() !== '') && (minForms.val() - totalForms.val()) >= 0) {
+                inlineGroup.find('.inline-deletelink').hide();
+            } else {
+                inlineGroup.find('.inline-deletelink').show();
+            }
+        };
+
         $this.each(function(i) {
             $(this).not("." + options.emptyCssClass).addClass(options.formCssClass);
         });
 
-        // Create the add button.
+        // Create the delete buttons for all unsaved inlines:
+        $this.filter('.' + options.formCssClass + ':not(.has_original):not(.' + options.emptyCssClass + ')').each(function() {
+            addInlineDeleteButton($(this));
+        });
+        toggleDeleteButtonVisibility($this);
+
+        // Create the add button, initially hidden.
         addButton = options.addButton;
+        addInlineAddButton();
+
+        // Show the add button if allowed to add more items.
+        // Note that max_num = None translates to a blank string.
+        var showAddButton = maxForms.val() === '' || (maxForms.val() - totalForms.val()) > 0;
         if ($this.length && showAddButton) {
-            addInlineAddButton();
+            addButton.parent().show();
+        } else {
+            addButton.parent().hide();
         }
+
         return this;
     };
 
@@ -314,7 +345,7 @@
                 $(selector).stackedFormset(selector, inlineOptions.options);
                 break;
             case "tabular":
-                selector = inlineOptions.name + "-group .tabular.inline-related tbody:first > tr";
+                selector = inlineOptions.name + "-group .tabular.inline-related tbody:first > tr.form-row";
                 $(selector).tabularFormset(selector, inlineOptions.options);
                 break;
             }
