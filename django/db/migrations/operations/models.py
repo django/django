@@ -456,7 +456,7 @@ class MoveModelPlaceholder(Operation):
         self.old_name = old_name
         self.new_name = new_name
         self.new_app_label = new_app_label
-        super(MoveModelPlaceholder, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def deconstruct(self):
         kwargs = {
