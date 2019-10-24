@@ -77,10 +77,6 @@ def _empty(of_cls):
     return new
 
 
-def return_None():
-    return None
-
-
 @total_ordering
 class Field(RegisterLookupMixin):
     """Base class for all field types"""
@@ -824,7 +820,7 @@ class Field(RegisterLookupMixin):
             return lambda: self.default
 
         if not self.empty_strings_allowed or self.null and not connection.features.interprets_empty_strings_as_nulls:
-            return return_None
+            return lambda: None
         return str  # return empty string
 
     def get_choices(self, include_blank=True, blank_choice=BLANK_CHOICE_DASH, limit_choices_to=None, ordering=()):
