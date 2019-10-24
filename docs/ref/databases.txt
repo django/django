@@ -629,6 +629,9 @@ MySQL does not support the ``NOWAIT``, ``SKIP LOCKED``, and ``OF`` options to
 the ``SELECT ... FOR UPDATE`` statement. If ``select_for_update()`` is used
 with ``nowait=True``, ``skip_locked=True``, or ``of`` then a
 :exc:`~django.db.NotSupportedError` is raised.
+Make sure you filter against at least set of fields contained in a unique constraint
+or only against fields covered by indices on MySQL when using ``select_for_update()`` else
+an exclusive write lock will be acquired over the full table for the duration of the transaction.
 
 Automatic typecasting can cause unexpected results
 --------------------------------------------------
