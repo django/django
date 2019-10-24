@@ -1,3 +1,6 @@
+import sys
+from unittest import skipIf
+
 from asgiref.sync import async_to_sync
 
 from django.core.exceptions import SynchronousOnlyOperation
@@ -7,6 +10,7 @@ from django.utils.asyncio import async_unsafe
 from .models import SimpleModel
 
 
+@skipIf(sys.platform == 'win32' and (3, 8, 0) < sys.version_info < (3, 8, 1), 'https://bugs.python.org/issue38563')
 class DatabaseConnectionTest(SimpleTestCase):
     """A database connection cannot be used in an async context."""
     @async_to_sync
@@ -15,6 +19,7 @@ class DatabaseConnectionTest(SimpleTestCase):
             list(SimpleModel.objects.all())
 
 
+@skipIf(sys.platform == 'win32' and (3, 8, 0) < sys.version_info < (3, 8, 1), 'https://bugs.python.org/issue38563')
 class AsyncUnsafeTest(SimpleTestCase):
     """
     async_unsafe decorator should work correctly and returns the correct

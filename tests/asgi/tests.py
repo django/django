@@ -1,5 +1,6 @@
 import asyncio
 import sys
+from unittest import skipIf
 
 from asgiref.sync import async_to_sync
 from asgiref.testing import ApplicationCommunicator
@@ -12,6 +13,7 @@ from django.test import SimpleTestCase, override_settings
 from .urls import test_filename
 
 
+@skipIf(sys.platform == 'win32' and (3, 8, 0) < sys.version_info < (3, 8, 1), 'https://bugs.python.org/issue38563')
 @override_settings(ROOT_URLCONF='asgi.urls')
 class ASGITest(SimpleTestCase):
 
