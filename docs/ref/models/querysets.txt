@@ -2569,12 +2569,12 @@ The output differs significantly between databases.
 ``explain()`` is supported by all built-in database backends except Oracle
 because an implementation there isn't straightforward.
 
-The ``format`` parameter changes the output format from the databases's default,
-usually text-based. PostgreSQL supports ``'TEXT'``, ``'JSON'``, ``'YAML'``, and
-``'XML'`` formats. MariaDB and MySQL support ``'TEXT'`` (also called
-``'TRADITIONAL'``) and ``'JSON'`` formats. MySQL 8.0.16+ also supports an
-improved ``'TREE'`` format, which is similar to PostgreSQL's ``'TEXT'`` output
-and is used by default, if supported.
+The ``format`` parameter changes the output format from the databases's
+default, which is usually text-based. PostgreSQL supports ``'TEXT'``,
+``'JSON'``, ``'YAML'``, and ``'XML'`` formats. MariaDB and MySQL support
+``'TEXT'`` (also called ``'TRADITIONAL'``) and ``'JSON'`` formats. MySQL
+8.0.16+ also supports an improved ``'TREE'`` format, which is similar to
+PostgreSQL's ``'TEXT'`` output and is used by default, if supported.
 
 Some databases accept flags that can return more information about the query.
 Pass these flags as keyword arguments. For example, when using PostgreSQL::
