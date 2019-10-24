@@ -6,7 +6,6 @@ from django.utils.functional import cached_property
 
 class DatabaseFeatures(BaseDatabaseFeatures):
     empty_fetchmany_value = ()
-    update_can_self_select = False
     allows_group_by_pk = True
     related_fields_match_type = True
     # MySQL doesn't support sliced subqueries with IN/ALL/ANY/SOME.
@@ -61,6 +60,10 @@ class DatabaseFeatures(BaseDatabaseFeatures):
             cursor.execute("SELECT ENGINE FROM INFORMATION_SCHEMA.ENGINES WHERE SUPPORT = 'DEFAULT'")
             result = cursor.fetchone()
         return result[0]
+
+    @cached_property
+    def update_can_self_select(self):
+        return self.connection.mysql_is_mariadb and self.connection.mysql_version >= (10, 3, 2)
 
     @cached_property
     def can_introspect_foreign_keys(self):
