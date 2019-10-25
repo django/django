@@ -627,7 +627,7 @@ For each field, we describe the default widget used if you don't specify
 .. class:: FilePathField(**kwargs)
 
     * Default widget: :class:`Select`
-    * Empty value: ``None``
+    * Empty value: ``''`` (an empty string)
     * Normalizes to: A string.
     * Validates that the selected choice exists in the list of choices.
     * Error message keys: ``required``, ``invalid_choice``
