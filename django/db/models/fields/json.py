@@ -94,8 +94,10 @@ class SimpleFunctionOperatorMixin(FieldGetDbPrepValueMixin):
     def as_sql_function(self, compiler, connection, template, flipped=False):
         lhs, lhs_params = self.process_lhs(compiler, connection)
         rhs, rhs_params = self.process_rhs(compiler, connection)
-        params = tuple(lhs_params) + tuple(rhs_params)
-        return template % ((lhs, rhs) if not flipped else (rhs, lhs)), params
+        if flipped:
+            return template % (rhs, lhs), tuple(rhs_params) + tuple(lhs_params)
+        else:
+            return template % (lhs, rhs), tuple(lhs_params) + tuple(rhs_params)
 
     def as_sql_operator(self, compiler, connection, operator):
         lhs, lhs_params = self.process_lhs(compiler, connection)
