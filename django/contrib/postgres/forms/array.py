@@ -178,6 +178,18 @@ class SplitArrayField(forms.Field):
         kwargs.setdefault('widget', widget)
         super().__init__(**kwargs)
 
+    def _remove_trailing_nulls(self, values):
+        index = None
+        if self.remove_trailing_nulls:
+            for i, value in reversed(list(enumerate(values))):
+                if value in self.base_field.empty_values:
+                    index = i
+                else:
+                    break
+            if index is not None:
+                values = values[:index]
+        return values, index
+
     def to_python(self, value):
         value = super().to_python(value)
         return [self.base_field.to_python(item) for item in value]
@@ -202,16 +214,9 @@ class SplitArrayField(forms.Field):
                 cleaned_data.append(None)
             else:
                 errors.append(None)
-        if self.remove_trailing_nulls:
-            null_index = None
-            for i, value in reversed(list(enumerate(cleaned_data))):
-                if value in self.base_field.empty_values:
-                    null_index = i
-                else:
-                    break
-            if null_index is not None:
-                cleaned_data = cleaned_data[:null_index]
-                errors = errors[:null_index]
+        cleaned_data, null_index = self._remove_trailing_nulls(cleaned_data)
+        if null_index is not None:
+            errors = errors[:null_index]
         errors = list(filter(None, errors))
         if errors:
             raise ValidationError(list(chain.from_iterable(errors)))
