@@ -63,7 +63,7 @@ class NestedIntegerArrayModel(PostgreSQLModel):
     field = ArrayField(ArrayField(models.IntegerField()))
 
 
-class OtherTypesArrayModel(PostgreSQLModel):
+class OtherTypesArrayModel(models.Model):
     ips = ArrayField(models.GenericIPAddressField(), default=list)
     uuids = ArrayField(models.UUIDField(), default=list)
     decimals = ArrayField(models.DecimalField(max_digits=5, decimal_places=2), default=list)
@@ -71,6 +71,10 @@ class OtherTypesArrayModel(PostgreSQLModel):
     json = ArrayField(models.JSONField(default=dict), default=list)
     int_ranges = ArrayField(IntegerRangeField(), blank=True, null=True)
     bigint_ranges = ArrayField(BigIntegerRangeField(), blank=True, null=True)
+
+    class Meta:
+        required_db_features = {'supports_json_field'}
+        required_db_vendor = 'postgresql'
 
 
 class HStoreModel(PostgreSQLModel):
@@ -160,9 +164,13 @@ class RangeLookupsModel(PostgreSQLModel):
     decimal_field = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True)
 
 
-class JSONModel(PostgreSQLModel):
+class JSONModel(models.Model):
     field = models.JSONField(blank=True, null=True)
     field_custom = models.JSONField(blank=True, null=True, encoder=DjangoJSONEncoder)
+
+    class Meta:
+        required_db_features = {'supports_json_field'}
+        required_db_vendor = 'postgresql'
 
 
 class ArrayFieldSubclass(ArrayField):

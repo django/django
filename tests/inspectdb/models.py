@@ -66,8 +66,17 @@ class ColumnTypes(models.Model):
     time_field = models.TimeField()
     url_field = models.URLField()
     uuid_field = models.UUIDField()
+
+
+class JSONFieldColumnType(models.Model):
     json_field = models.JSONField()
     null_json_field = models.JSONField(blank=True, null=True)
+
+    class Meta:
+        required_db_features = {
+            'can_introspect_json_field',
+            'supports_json_field',
+        }
 
 
 class UniqueTogether(models.Model):

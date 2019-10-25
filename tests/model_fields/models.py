@@ -338,9 +338,15 @@ if Image:
 class JSONModel(models.Model):
     value = models.JSONField()
 
+    class Meta:
+        required_db_features = {'supports_json_field'}
+
 
 class NullableJSONModel(models.Model):
     value = models.JSONField(blank=True, null=True)
+
+    class Meta:
+        required_db_features = {'supports_json_field'}
 
 
 class AllFieldsModel(models.Model):
@@ -357,7 +363,6 @@ class AllFieldsModel(models.Model):
     floatf = models.FloatField()
     integer = models.IntegerField()
     generic_ip = models.GenericIPAddressField()
-    json = models.JSONField()
     null_boolean = models.NullBooleanField()
     positive_integer = models.PositiveIntegerField()
     positive_small_integer = models.PositiveSmallIntegerField()
