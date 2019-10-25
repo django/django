@@ -73,6 +73,27 @@ location (:setting:`MEDIA_ROOT` if you are using the default
     >>> car.photo.path == new_path
     True
 
+.. note::
+
+    Whilst :class:`~django.db.models.ImageField` non-image data attributes,
+    such as ``height``, ``width``, and ``size`` are available on the instance,
+    the underlying image data cannot be used without reopening the image. For
+    example::
+
+        >>> from PIL import Image
+        >>> car = Car.objects.get(name='57 Chevy')
+        >>> car.photo.width
+        191
+        >>> car.photo.height
+        287
+        >>> image = Image.open(car.photo)
+        # Raises ValueError: seek of closed file.
+        >>> car.photo.open()
+        <ImageFieldFile: cars/chevy.jpg>
+        >>> image = Image.open(car.photo)
+        >>> image
+        <PIL.JpegImagePlugin.JpegImageFile image mode=RGB size=1600x1200 at 0x7F99A94E9048>
+
 The ``File`` object
 ===================
 
