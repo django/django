@@ -90,6 +90,35 @@ class JSONField(CheckFieldDefaultMixin, Field):
         })
 
 
+def compile_json_path(key_transforms):
+    path = ['$']
+    for key_transform in key_transforms:
+        try:
+            num = int(key_transform)
+        except ValueError:  # non-integer
+            path.append('.')
+            path.append(json.dumps(key_transform))
+        else:
+            path.append('[%s]' % num)
+    return ''.join(path)
+
+
+class PreprocessLhsMixin:
+    """
+    Mixin for separating the original lhs from the applied key transforms.
+    """
+    def preprocess_lhs(self, compiler, connection, lhs_only=False):
+        if not lhs_only:
+            key_transforms = [self.key_name] if isinstance(self, KeyTransform) else []
+        previous = self.lhs
+        while isinstance(previous, KeyTransform):
+            if not lhs_only:
+                key_transforms.insert(0, previous.key_name)
+            previous = previous.lhs
+        lhs, params = compiler.compile(previous)
+        return (lhs, params, key_transforms) if not lhs_only else (lhs, params)
+
+
 class SimpleFunctionOperatorMixin(FieldGetDbPrepValueMixin):
     def as_sql_function(self, compiler, connection, template, flipped=False):
         lhs, lhs_params = self.process_lhs(compiler, connection)
@@ -114,13 +143,23 @@ class SimpleFunctionOperatorMixin(FieldGetDbPrepValueMixin):
         )
 
 
-class HasKeyLookup(SimpleFunctionOperatorMixin, Lookup):
+class HasKeyLookup(PreprocessLhsMixin, SimpleFunctionOperatorMixin, Lookup):
     logical_operator = None
 
     def as_sql(self, compiler, connection, template=None):
-        lhs, lhs_params = self.process_lhs(compiler, connection)
-        rhs = [self.rhs] if not isinstance(self.rhs, (list, tuple)) else self.rhs
-        rhs_params = ['$.%s' % json.dumps(key) for key in rhs]
+        lhs, lhs_params, lhs_key_transforms = self.preprocess_lhs(compiler, connection)
+        rhs = [self.rhs] if not isinstance(self.rhs, (list, tuple)) else list(self.rhs)
+        rhs_params = []
+        for key in rhs:
+            if isinstance(key, str):
+                rhs_params.insert(0, compile_json_path(lhs_key_transforms + [key]))
+            else:
+                key_transforms = []
+                previous = key
+                while isinstance(previous, (KeyTransform, KeyTextTransform)):
+                    key_transforms.insert(0, previous.key_name)
+                    previous = previous.lhs
+                rhs_params.insert(0, compile_json_path(lhs_key_transforms + key_transforms))
         sql = template % lhs
         if self.logical_operator:
             # Add condition for each key.
@@ -154,7 +193,10 @@ class HasAnyKeys(HasKeyLookup):
     logical_operator = ' OR '
 
     def get_prep_lookup(self):
-        return [str(item) for item in self.rhs]
+        return [
+            str(item) if not isinstance(item, (KeyTransform, KeyTextTransform)) else item
+            for item in self.rhs
+        ]
 
 
 @JSONField.register_lookup
@@ -244,35 +286,6 @@ class JSONExact(lookups.Exact):
             func = ["JSON_EXTRACT(%s, '$')" for value in rhs_params]
             rhs = rhs % tuple(func)
         return rhs, rhs_params
-
-
-def compile_json_path(key_transforms):
-    path = ['$']
-    for key_transform in key_transforms:
-        try:
-            num = int(key_transform)
-        except ValueError:  # non-integer
-            path.append('.')
-            path.append(json.dumps(key_transform))
-        else:
-            path.append('[%s]' % num)
-    return ''.join(path)
-
-
-class PreprocessLhsMixin:
-    """
-    Mixin for separating the original lhs from the applied key transforms.
-    """
-    def preprocess_lhs(self, compiler, connection, lhs_only=False):
-        if not lhs_only:
-            key_transforms = [self.key_name] if isinstance(self, KeyTransform) else []
-        previous = self.lhs
-        while isinstance(previous, KeyTransform):
-            if not lhs_only:
-                key_transforms.insert(0, previous.key_name)
-            previous = previous.lhs
-        lhs, params = compiler.compile(previous)
-        return (lhs, params, key_transforms) if not lhs_only else (lhs, params)
 
 
 class KeyTransform(PreprocessLhsMixin, Transform):

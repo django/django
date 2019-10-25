@@ -9,7 +9,9 @@ from django import forms
 from django.core import checks, serializers
 from django.core.exceptions import ValidationError
 from django.core.serializers.json import DjangoJSONEncoder
-from django.db import DataError, IntegrityError, connection, models
+from django.db import (
+    DataError, IntegrityError, OperationalError, connection, models,
+)
 from django.db.models import Count, F, OuterRef, Q, Subquery, Transform, Value
 from django.db.models.expressions import RawSQL
 from django.db.models.fields.json import (
@@ -112,7 +114,7 @@ class TestValidation(SetEncoderDecoderMixin, TestCase):
         value = '{@!invalid json value 123 $!@#'
         self._set_encoder_decoder(StrEncoder, None)
         obj = JSONModel(value=value)
-        with self.assertRaises((IntegrityError, DataError)):
+        with self.assertRaises((IntegrityError, DataError, OperationalError)):
             obj.save()
 
 
@@ -678,6 +680,10 @@ class TestQuerying(TestCase):
                 KeyTransform('x', RawSQL(sql, ['{"x": {"a": "b", "c": 1, "d": "e"}}'])),
             ),
             ('value__has_key', KeyTextTransform('foo', 'value')),
+            ('value__has_keys', [
+                KeyTextTransform('a', KeyTransform('baz', 'value')),
+                KeyTransform('c', KeyTransform('baz', 'value')),
+            ]),
         )
         for lookup, value in tests:
             with self.subTest(lookup=lookup):
