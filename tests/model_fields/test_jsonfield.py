@@ -680,10 +680,6 @@ class TestQuerying(TestCase):
                 KeyTransform('x', RawSQL(sql, ['{"x": {"a": "b", "c": 1, "d": "e"}}'])),
             ),
             ('value__has_key', KeyTextTransform('foo', 'value')),
-            ('value__has_keys', [
-                KeyTextTransform('a', KeyTransform('baz', 'value')),
-                KeyTransform('c', KeyTransform('baz', 'value')),
-            ]),
         )
         for lookup, value in tests:
             with self.subTest(lookup=lookup):
