@@ -5,6 +5,7 @@ from email.errors import HeaderParseError
 from email.parser import HeaderParser
 
 from django.urls import reverse
+from django.utils.regex_helper import _lazy_re_compile
 from django.utils.safestring import mark_safe
 
 try:
@@ -146,8 +147,8 @@ if docutils_is_available:
         create_reference_role(name, urlbase)
 
 # Match the beginning of a named or unnamed group.
-named_group_matcher = re.compile(r'\(\?P(<\w+>)')
-unnamed_group_matcher = re.compile(r'\(')
+named_group_matcher = _lazy_re_compile(r'\(\?P(<\w+>)')
+unnamed_group_matcher = _lazy_re_compile(r'\(')
 
 
 def replace_named_groups(pattern):

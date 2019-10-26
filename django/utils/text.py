@@ -7,6 +7,7 @@ from io import BytesIO
 
 from django.utils.deprecation import RemovedInDjango40Warning
 from django.utils.functional import SimpleLazyObject, keep_lazy_text, lazy
+from django.utils.regex_helper import _lazy_re_compile
 from django.utils.translation import gettext as _, gettext_lazy, pgettext
 
 
@@ -17,11 +18,11 @@ def capfirst(x):
 
 
 # Set up regular expressions
-re_words = re.compile(r'<[^>]+?>|([^<>\s]+)', re.S)
-re_chars = re.compile(r'<[^>]+?>|(.)', re.S)
-re_tag = re.compile(r'<(/)?(\S+?)(?:(\s*/)|\s.*?)?>', re.S)
-re_newlines = re.compile(r'\r\n|\r')  # Used in normalize_newlines
-re_camel_case = re.compile(r'(((?<=[a-z])[A-Z])|([A-Z](?![A-Z]|$)))')
+re_words = _lazy_re_compile(r'<[^>]+?>|([^<>\s]+)', re.S)
+re_chars = _lazy_re_compile(r'<[^>]+?>|(.)', re.S)
+re_tag = _lazy_re_compile(r'<(/)?(\S+?)(?:(\s*/)|\s.*?)?>', re.S)
+re_newlines = _lazy_re_compile(r'\r\n|\r')  # Used in normalize_newlines
+re_camel_case = _lazy_re_compile(r'(((?<=[a-z])[A-Z])|([A-Z](?![A-Z]|$)))')
 
 
 @keep_lazy_text
@@ -306,7 +307,7 @@ def compress_sequence(sequence):
 
 # Expression to match some_token and some_token="with spaces" (and similarly
 # for single-quoted strings).
-smart_split_re = re.compile(r"""
+smart_split_re = _lazy_re_compile(r"""
     ((?:
         [^\s'"]*
         (?:
@@ -355,7 +356,7 @@ def _replace_entity(match):
             return match.group(0)
 
 
-_entity_re = re.compile(r"&(#?[xX]?(?:[0-9a-fA-F]+|\w{1,8}));")
+_entity_re = _lazy_re_compile(r"&(#?[xX]?(?:[0-9a-fA-F]+|\w{1,8}));")
 
 
 @keep_lazy_text

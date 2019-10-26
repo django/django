@@ -58,6 +58,7 @@ from inspect import getcallargs, getfullargspec, unwrap
 from django.template.context import BaseContext
 from django.utils.formats import localize
 from django.utils.html import conditional_escape, escape
+from django.utils.regex_helper import _lazy_re_compile
 from django.utils.safestring import SafeData, mark_safe
 from django.utils.text import (
     get_text_list, smart_split, unescape_string_literal,
@@ -87,7 +88,7 @@ UNKNOWN_SOURCE = '<unknown source>'
 
 # match a variable or block tag and capture the entire tag, including start/end
 # delimiters
-tag_re = (re.compile('(%s.*?%s|%s.*?%s|%s.*?%s)' %
+tag_re = (_lazy_re_compile('(%s.*?%s|%s.*?%s|%s.*?%s)' %
           (re.escape(BLOCK_TAG_START), re.escape(BLOCK_TAG_END),
            re.escape(VARIABLE_TAG_START), re.escape(VARIABLE_TAG_END),
            re.escape(COMMENT_TAG_START), re.escape(COMMENT_TAG_END))))
@@ -603,7 +604,7 @@ filter_raw_string = r"""
     'arg_sep': re.escape(FILTER_ARGUMENT_SEPARATOR),
 }
 
-filter_re = re.compile(filter_raw_string, re.VERBOSE)
+filter_re = _lazy_re_compile(filter_raw_string, re.VERBOSE)
 
 
 class FilterExpression:
@@ -993,7 +994,7 @@ class VariableNode(Node):
 
 
 # Regex for token keyword arguments
-kwarg_re = re.compile(r"(?:(\w+)=)?(.+)")
+kwarg_re = _lazy_re_compile(r"(?:(\w+)=)?(.+)")
 
 
 def token_kwargs(bits, parser, support_legacy=False):

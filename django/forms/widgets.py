@@ -4,7 +4,6 @@ HTML Widget classes
 
 import copy
 import datetime
-import re
 import warnings
 from collections import defaultdict
 from itertools import chain
@@ -17,6 +16,7 @@ from django.utils.datastructures import OrderedSet
 from django.utils.dates import MONTHS
 from django.utils.formats import get_format
 from django.utils.html import format_html, html_safe
+from django.utils.regex_helper import _lazy_re_compile
 from django.utils.safestring import mark_safe
 from django.utils.topological_sort import (
     CyclicDependencyError, stable_topological_sort,
@@ -935,7 +935,7 @@ class SelectDateWidget(Widget):
     template_name = 'django/forms/widgets/select_date.html'
     input_type = 'select'
     select_widget = Select
-    date_re = re.compile(r'(\d{4}|0)-(\d\d?)-(\d\d?)$')
+    date_re = _lazy_re_compile(r'(\d{4}|0)-(\d\d?)-(\d\d?)$')
 
     def __init__(self, attrs=None, years=None, months=None, empty_label=None):
         self.attrs = attrs or {}

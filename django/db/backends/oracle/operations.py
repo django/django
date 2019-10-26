@@ -1,5 +1,4 @@
 import datetime
-import re
 import uuid
 from functools import lru_cache
 
@@ -12,6 +11,7 @@ from django.db.utils import DatabaseError
 from django.utils import timezone
 from django.utils.encoding import force_bytes, force_str
 from django.utils.functional import cached_property
+from django.utils.regex_helper import _lazy_re_compile
 
 from .base import Database
 from .utils import BulkInsertMapper, InsertVar, Oracle_datetime
@@ -102,7 +102,7 @@ END;
     # if the time zone name is passed in parameter. Use interpolation instead.
     # https://groups.google.com/forum/#!msg/django-developers/zwQju7hbG78/9l934yelwfsJ
     # This regexp matches all time zone names from the zoneinfo database.
-    _tzname_re = re.compile(r'^[\w/:+-]+$')
+    _tzname_re = _lazy_re_compile(r'^[\w/:+-]+$')
 
     def _prepare_tzname_delta(self, tzname):
         if '+' in tzname:

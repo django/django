@@ -1,11 +1,10 @@
-import re
-
 from django.contrib.gis.db.models.fields import BaseSpatialField
 from django.contrib.gis.measure import Distance
 from django.db import NotSupportedError
 from django.db.models.expressions import Expression
 from django.db.models.lookups import Lookup, Transform
 from django.db.models.sql.query import Query
+from django.utils.regex_helper import _lazy_re_compile
 
 
 class RasterBandTransform(Transform):
@@ -253,7 +252,7 @@ class OverlapsLookup(GISLookup):
 class RelateLookup(GISLookup):
     lookup_name = 'relate'
     sql_template = '%(func)s(%(lhs)s, %(rhs)s, %%s)'
-    pattern_regex = re.compile(r'^[012TF\*]{9}$')
+    pattern_regex = _lazy_re_compile(r'^[012TF\*]{9}$')
 
     def process_rhs(self, compiler, connection):
         # Check the pattern argument

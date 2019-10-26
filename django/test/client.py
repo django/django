@@ -1,7 +1,6 @@
 import json
 import mimetypes
 import os
-import re
 import sys
 from copy import copy
 from functools import partial
@@ -26,15 +25,16 @@ from django.utils.encoding import force_bytes
 from django.utils.functional import SimpleLazyObject
 from django.utils.http import urlencode
 from django.utils.itercompat import is_iterable
+from django.utils.regex_helper import _lazy_re_compile
 
 __all__ = ('Client', 'RedirectCycleError', 'RequestFactory', 'encode_file', 'encode_multipart')
 
 
 BOUNDARY = 'BoUnDaRyStRiNg'
 MULTIPART_CONTENT = 'multipart/form-data; boundary=%s' % BOUNDARY
-CONTENT_TYPE_RE = re.compile(r'.*; charset=([\w\d-]+);?')
+CONTENT_TYPE_RE = _lazy_re_compile(r'.*; charset=([\w\d-]+);?')
 # Structured suffix spec: https://tools.ietf.org/html/rfc6838#section-4.2.8
-JSON_CONTENT_TYPE_RE = re.compile(r'^application\/(.+\+)?json')
+JSON_CONTENT_TYPE_RE = _lazy_re_compile(r'^application\/(.+\+)?json')
 
 
 class RedirectCycleError(Exception):

@@ -17,7 +17,6 @@ An example: i18n middleware would need to distinguish caches by the
 "Accept-language" header.
 """
 import hashlib
-import re
 import time
 from collections import defaultdict
 
@@ -29,10 +28,11 @@ from django.utils.http import (
     http_date, parse_etags, parse_http_date_safe, quote_etag,
 )
 from django.utils.log import log_response
+from django.utils.regex_helper import _lazy_re_compile
 from django.utils.timezone import get_current_timezone_name
 from django.utils.translation import get_language
 
-cc_delim_re = re.compile(r'\s*,\s*')
+cc_delim_re = _lazy_re_compile(r'\s*,\s*')
 
 
 def patch_cache_control(response, **kwargs):

@@ -23,6 +23,7 @@ from django.utils import timezone
 from django.utils.asyncio import async_unsafe
 from django.utils.dateparse import parse_datetime, parse_time
 from django.utils.duration import duration_microseconds
+from django.utils.regex_helper import _lazy_re_compile
 
 from .client import DatabaseClient                          # isort:skip
 from .creation import DatabaseCreation                      # isort:skip
@@ -380,7 +381,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         return self.creation.is_in_memory_db(self.settings_dict['NAME'])
 
 
-FORMAT_QMARK_REGEX = re.compile(r'(?<!%)%s')
+FORMAT_QMARK_REGEX = _lazy_re_compile(r'(?<!%)%s')
 
 
 class SQLiteCursorWrapper(Database.Cursor):

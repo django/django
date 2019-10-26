@@ -13,6 +13,7 @@ from django.utils import timezone
 from django.utils.datastructures import MultiValueDict
 from django.utils.encoding import force_str
 from django.utils.module_loading import import_string
+from django.utils.regex_helper import _lazy_re_compile
 from django.utils.version import get_docs_version
 
 # Minimal Django templates engine to render the error templates
@@ -24,7 +25,7 @@ DEBUG_ENGINE = Engine(
     libraries={'i18n': 'django.templatetags.i18n'},
 )
 
-HIDDEN_SETTINGS = re.compile('API|TOKEN|KEY|SECRET|PASS|SIGNATURE', flags=re.IGNORECASE)
+HIDDEN_SETTINGS = _lazy_re_compile('API|TOKEN|KEY|SECRET|PASS|SIGNATURE', flags=re.IGNORECASE)
 
 CLEANSED_SUBSTITUTE = '********************'
 

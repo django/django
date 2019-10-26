@@ -28,6 +28,7 @@ from django.utils import formats
 from django.utils.dateparse import parse_duration
 from django.utils.duration import duration_string
 from django.utils.ipv6 import clean_ipv6_address
+from django.utils.regex_helper import _lazy_re_compile
 from django.utils.translation import gettext_lazy as _, ngettext_lazy
 
 __all__ = (
@@ -243,7 +244,7 @@ class IntegerField(Field):
     default_error_messages = {
         'invalid': _('Enter a whole number.'),
     }
-    re_decimal = re.compile(r'\.0*\s*$')
+    re_decimal = _lazy_re_compile(r'\.0*\s*$')
 
     def __init__(self, *, max_value=None, min_value=None, **kwargs):
         self.max_value, self.min_value = max_value, min_value

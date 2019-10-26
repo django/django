@@ -1,12 +1,13 @@
 """Compare two HTML documents."""
 
-import re
 from html.parser import HTMLParser
+
+from django.utils.regex_helper import _lazy_re_compile
 
 # ASCII whitespace is U+0009 TAB, U+000A LF, U+000C FF, U+000D CR, or U+0020
 # SPACE.
 # https://infra.spec.whatwg.org/#ascii-whitespace
-ASCII_WHITESPACE = re.compile(r'[\t\n\f\r ]+')
+ASCII_WHITESPACE = _lazy_re_compile(r'[\t\n\f\r ]+')
 
 
 def normalize_whitespace(string):

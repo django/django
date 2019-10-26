@@ -7,10 +7,11 @@ from django.db.backends.base.introspection import (
     BaseDatabaseIntrospection, FieldInfo as BaseFieldInfo, TableInfo,
 )
 from django.db.models.indexes import Index
+from django.utils.regex_helper import _lazy_re_compile
 
 FieldInfo = namedtuple('FieldInfo', BaseFieldInfo._fields + ('pk',))
 
-field_size_re = re.compile(r'^\s*(?:var)?char\s*\(\s*(\d+)\s*\)\s*$')
+field_size_re = _lazy_re_compile(r'^\s*(?:var)?char\s*\(\s*(\d+)\s*\)\s*$')
 
 
 def get_field_size(name):
