@@ -156,7 +156,7 @@ class HasKeyLookup(PreprocessLhsMixin, SimpleFunctionOperatorMixin, Lookup):
             else:
                 key_transforms = []
                 previous = key
-                while isinstance(previous, (KeyTransform, KeyTextTransform)):
+                while isinstance(previous, KeyTransform):
                     key_transforms.insert(0, previous.key_name)
                     previous = previous.lhs
                 rhs_params.insert(0, compile_json_path(lhs_key_transforms + key_transforms))
@@ -194,7 +194,7 @@ class HasAnyKeys(HasKeyLookup):
 
     def get_prep_lookup(self):
         return [
-            str(item) if not isinstance(item, (KeyTransform, KeyTextTransform)) else item
+            str(item) if not isinstance(item, KeyTransform) else item
             for item in self.rhs
         ]
 
