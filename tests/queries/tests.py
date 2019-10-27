@@ -3081,10 +3081,9 @@ class WhereNodeTest(SimpleTestCase):
 
 class QuerySetExceptionTests(SimpleTestCase):
     def test_iter_exceptions(self):
-        qs = ExtraInfo.objects.only('author')
-        msg = "'ManyToOneRel' object has no attribute 'attname'"
-        with self.assertRaisesMessage(AttributeError, msg):
-            list(qs)
+        msg = "only() does not support reverse relation fields. Use select_related instead."
+        with self.assertRaisesMessage(ValueError, msg):
+            ExtraInfo.objects.only('author')
 
     def test_invalid_qs_list(self):
         # Test for #19895 - second iteration over invalid queryset

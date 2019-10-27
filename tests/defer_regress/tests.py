@@ -160,9 +160,6 @@ class DeferRegressionTest(TestCase):
         self.assertEqual(len(Item.objects.select_related(
             'one_to_one_item').defer('one_to_one_item__name')), 1)
         self.assertEqual(len(Item.objects.select_related('one_to_one_item').defer('value')), 1)
-        # Make sure that `only()` doesn't break when we pass in a unique relation,
-        # rather than a field on the relation.
-        self.assertEqual(len(Item.objects.only('one_to_one_item')), 1)
         with self.assertNumQueries(1):
             i = Item.objects.select_related('one_to_one_item')[0]
             self.assertEqual(i.one_to_one_item.pk, o2o.pk)

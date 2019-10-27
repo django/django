@@ -1168,10 +1168,24 @@ class QuerySet:
             # Can only pass None to defer(), not only(), as the rest option.
             # That won't stop people trying to do this, so let's be explicit.
             raise TypeError("Cannot pass None as an argument to only().")
+
+        reverse_fields = set(
+            field.attname if hasattr(field, 'attname') else field.name
+            for field in self.model._meta.related_objects
+        )
+
+        if isinstance(self.query.select_related, bool):
+            select_related = {}
+        else:
+            select_related = self.query.select_related
+
         for field in fields:
             field = field.split(LOOKUP_SEP, 1)[0]
             if field in self.query._filtered_relations:
                 raise ValueError('only() is not supported with FilteredRelation.')
+            if field in reverse_fields and field not in select_related:
+                raise ValueError('only() does not support reverse relation fields. '
+                                 'Use select_related instead.')
         clone = self._chain()
         clone.query.add_immediate_loading(fields)
         return clone
