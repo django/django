@@ -19,6 +19,16 @@ class QTests(SimpleTestCase):
     def test_combine_or_both_empty(self):
         self.assertEqual(Q() | Q(), Q())
 
+    def test_implication(self):
+        p = Q(x=1)
+        q = Q(y=2)
+        self.assertEqual(p.implies(q), ~p or q)
+
+    def test_implication_via_operator(self):
+        p = Q(x=1)
+        q = Q(y=2)
+        self.assertEqual(p >> q, ~p or q)
+
     def test_combine_not_q_object(self):
         obj = object()
         q = Q(x=1)

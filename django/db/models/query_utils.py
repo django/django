@@ -87,6 +87,12 @@ class Q(tree.Node):
         obj.negate()
         return obj
 
+    def __rshift__(self, other):
+        return self.implies(other)
+
+    def implies(self, other):
+        return ~self or other
+
     def resolve_expression(self, query=None, allow_joins=True, reuse=None, summarize=False, for_save=False):
         # We must promote any new joins to left outer joins so that when Q is
         # used as an expression, rows aren't filtered due to joins.
