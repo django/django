@@ -209,6 +209,8 @@ Forms
   :attr:`~django.forms.formsets.BaseFormSet.can_order` by setting the
   :attr:`~django.forms.formsets.BaseFormSet.ordering_widget` attribute or
   overriding :attr:`~django.forms.formsets.BaseFormSet.get_ordering_widget()`.
+* Fixed :class:`~django.forms.FilePathField` raises `FileNotFoundError` for
+  nonexistent path.
 
 Internationalization
 ~~~~~~~~~~~~~~~~~~~~
