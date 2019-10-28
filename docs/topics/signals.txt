@@ -49,7 +49,8 @@ Listening to signals
 
 To receive a signal, register a *receiver* function using the
 :meth:`Signal.connect` method. The receiver function is called when the signal
-is sent.
+is sent. All of the signal's receiver functions are called one at a time, in
+the order they were registered.
 
 .. method:: Signal.connect(receiver, sender=None, weak=True, dispatch_uid=None)
 
