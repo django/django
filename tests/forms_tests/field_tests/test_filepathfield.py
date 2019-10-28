@@ -41,6 +41,10 @@ class FilePathFieldTest(SimpleTestCase):
     def test_fix_os_paths(self):
         self.assertEqual(fix_os_paths(self.path), ('/filepathfield_test_dir/'))
 
+    def test_nonexistent_path(self):
+        with self.assertRaisesMessage(FileNotFoundError, 'nonexistent'):
+            FilePathField(path='nonexistent')
+
     def test_no_options(self):
         f = FilePathField(path=self.path)
         expected = [
