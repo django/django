@@ -173,8 +173,6 @@ class ChangeList:
                     )
                 except ValueError as e:
                     raise IncorrectLookupParameters(e) from e
-                if settings.USE_TZ:
-                    from_date = make_aware(from_date)
                 if day:
                     to_date = from_date + timedelta(days=1)
                 elif month:
@@ -183,6 +181,9 @@ class ChangeList:
                     to_date = (from_date + timedelta(days=32)).replace(day=1)
                 else:
                     to_date = from_date.replace(year=from_date.year + 1)
+                if settings.USE_TZ:
+                    from_date = make_aware(from_date)
+                    to_date = make_aware(to_date)
                 lookup_params.update({
                     '%s__gte' % self.date_hierarchy: from_date,
                     '%s__lt' % self.date_hierarchy: to_date,
