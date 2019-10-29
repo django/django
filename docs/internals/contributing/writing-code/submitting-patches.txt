@@ -200,19 +200,14 @@ level:
     class MyDeprecatedTests(unittest.TestCase):
         ...
 
-You can also add a test for the deprecation warning. You'll have to disable the
-"warning as error" behavior in your test by doing::
+You can also add a test for the deprecation warning::
 
-    import warnings
+    from django.utils.deprecation import RemovedInDjangoXXWarning
 
     def test_foo_deprecation_warning(self):
-        with warnings.catch_warnings(record=True) as warns:
-            warnings.simplefilter('always')  # prevent warnings from appearing as errors
+        msg = 'Expected deprecation message'
+        with self.assertWarnsMessage(RemovedInDjangoXXWarning, msg):
             # invoke deprecated behavior
-
-        self.assertEqual(len(warns), 1)
-        msg = str(warns[0].message)
-        self.assertEqual(msg, 'Expected deprecation message')
 
 Finally, there are a couple of updates to Django's documentation to make:
 
