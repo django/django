@@ -5,70 +5,74 @@ from operator import attrgetter
 
 from django.core.exceptions import FieldError
 from django.db import connection
+from django.db.models import Max
+from django.db.models.expressions import Exists, OuterRef
 from django.db.models.functions import Substr
 from django.test import TestCase, skipUnlessDBFeature
+from django.utils.deprecation import RemovedInDjango40Warning
 
 from .models import (
-    Article, Author, Game, IsNullWithNoneAsRHS, Player, Season, Tag,
+    Article, Author, Freebie, Game, IsNullWithNoneAsRHS, Player, Season, Tag,
 )
 
 
 class LookupTests(TestCase):
 
-    def setUp(self):
+    @classmethod
+    def setUpTestData(cls):
         # Create a few Authors.
-        self.au1 = Author.objects.create(name='Author 1', alias='a1')
-        self.au2 = Author.objects.create(name='Author 2', alias='a2')
+        cls.au1 = Author.objects.create(name='Author 1', alias='a1')
+        cls.au2 = Author.objects.create(name='Author 2', alias='a2')
         # Create a few Articles.
-        self.a1 = Article.objects.create(
+        cls.a1 = Article.objects.create(
             headline='Article 1',
             pub_date=datetime(2005, 7, 26),
-            author=self.au1,
+            author=cls.au1,
             slug='a1',
         )
-        self.a2 = Article.objects.create(
+        cls.a2 = Article.objects.create(
             headline='Article 2',
             pub_date=datetime(2005, 7, 27),
-            author=self.au1,
+            author=cls.au1,
             slug='a2',
         )
-        self.a3 = Article.objects.create(
+        cls.a3 = Article.objects.create(
             headline='Article 3',
             pub_date=datetime(2005, 7, 27),
-            author=self.au1,
+            author=cls.au1,
             slug='a3',
         )
-        self.a4 = Article.objects.create(
+        cls.a4 = Article.objects.create(
             headline='Article 4',
             pub_date=datetime(2005, 7, 28),
-            author=self.au1,
+            author=cls.au1,
             slug='a4',
         )
-        self.a5 = Article.objects.create(
+        cls.a5 = Article.objects.create(
             headline='Article 5',
             pub_date=datetime(2005, 8, 1, 9, 0),
-            author=self.au2,
+            author=cls.au2,
             slug='a5',
         )
-        self.a6 = Article.objects.create(
+        cls.a6 = Article.objects.create(
             headline='Article 6',
             pub_date=datetime(2005, 8, 1, 8, 0),
-            author=self.au2,
+            author=cls.au2,
             slug='a6',
         )
-        self.a7 = Article.objects.create(
+        cls.a7 = Article.objects.create(
             headline='Article 7',
             pub_date=datetime(2005, 7, 27),
-            author=self.au2,
+            author=cls.au2,
             slug='a7',
         )
         # Create a few Tags.
-        self.t1 = Tag.objects.create(name='Tag 1')
-        self.t1.articles.add(self.a1, self.a2, self.a3)
-        self.t2 = Tag.objects.create(name='Tag 2')
-        self.t2.articles.add(self.a3, self.a4, self.a5)
-        self.t3 = Tag.objects.create(name='Tag 3')
-        self.t3.articles.add(self.a5, self.a6, self.a7)
+        cls.t1 = Tag.objects.create(name='Tag 1')
+        cls.t1.articles.add(cls.a1, cls.a2, cls.a3)
+        cls.t2 = Tag.objects.create(name='Tag 2')
+        cls.t2.articles.add(cls.a3, cls.a4, cls.a5)
+        cls.t3 = Tag.objects.create(name='Tag 3')
+        cls.t3.articles.add(cls.a5, cls.a6, cls.a7)
 
     def test_exists(self):
         # We can use .exists() to check that there are some
@@ -477,10 +481,11 @@ class LookupTests(TestCase):
         )
 
     def test_exclude(self):
-        Article.objects.create(headline='Article_ with underscore', pub_date=datetime(2005, 11, 20))
-        Article.objects.create(headline='Article% with percent sign', pub_date=datetime(2005, 11, 21))
-        Article.objects.create(headline='Article with \\ backslash', pub_date=datetime(2005, 11, 22))
-
+        Article.objects.bulk_create([
+            Article(headline='Article_ with underscore', pub_date=datetime(2005, 11, 20)),
+            Article(headline='Article% with percent sign', pub_date=datetime(2005, 11, 21)),
+            Article(headline='Article with \\ backslash', pub_date=datetime(2005, 11, 22)),
+        ])
         # exclude() is the opposite of filter() when doing lookups:
         self.assertQuerysetEqual(
             Article.objects.filter(headline__contains='Article').exclude(headline__contains='with'),
@@ -530,7 +535,7 @@ class LookupTests(TestCase):
         self.assertQuerysetEqual(Article.objects.filter(headline__startswith='Article').none(), [])
         self.assertEqual(Article.objects.none().count(), 0)
         self.assertEqual(Article.objects.none().update(headline="This should not take effect"), 0)
-        self.assertQuerysetEqual([article for article in Article.objects.none().iterator()], [])
+        self.assertQuerysetEqual(Article.objects.none().iterator(), [])
 
     def test_in(self):
         # using __in with an empty list should return an empty query set
@@ -605,15 +610,17 @@ class LookupTests(TestCase):
         for a in Article.objects.all():
             a.delete()
         now = datetime.now()
-        Article.objects.create(pub_date=now, headline='f')
-        Article.objects.create(pub_date=now, headline='fo')
-        Article.objects.create(pub_date=now, headline='foo')
-        Article.objects.create(pub_date=now, headline='fooo')
-        Article.objects.create(pub_date=now, headline='hey-Foo')
-        Article.objects.create(pub_date=now, headline='bar')
-        Article.objects.create(pub_date=now, headline='AbBa')
-        Article.objects.create(pub_date=now, headline='baz')
-        Article.objects.create(pub_date=now, headline='baxZ')
+        Article.objects.bulk_create([
+            Article(pub_date=now, headline='f'),
+            Article(pub_date=now, headline='fo'),
+            Article(pub_date=now, headline='foo'),
+            Article(pub_date=now, headline='fooo'),
+            Article(pub_date=now, headline='hey-Foo'),
+            Article(pub_date=now, headline='bar'),
+            Article(pub_date=now, headline='AbBa'),
+            Article(pub_date=now, headline='baz'),
+            Article(pub_date=now, headline='baxZ'),
+        ])
         # zero-or-more
         self.assertQuerysetEqual(
             Article.objects.filter(headline__regex=r'fo*'),
@@ -663,13 +670,15 @@ class LookupTests(TestCase):
         )
 
         # and more articles:
-        Article.objects.create(pub_date=now, headline='foobar')
-        Article.objects.create(pub_date=now, headline='foobaz')
-        Article.objects.create(pub_date=now, headline='ooF')
-        Article.objects.create(pub_date=now, headline='foobarbaz')
-        Article.objects.create(pub_date=now, headline='zoocarfaz')
-        Article.objects.create(pub_date=now, headline='barfoobaz')
-        Article.objects.create(pub_date=now, headline='bazbaRFOO')
+        Article.objects.bulk_create([
+            Article(pub_date=now, headline='foobar'),
+            Article(pub_date=now, headline='foobaz'),
+            Article(pub_date=now, headline='ooF'),
+            Article(pub_date=now, headline='foobarbaz'),
+            Article(pub_date=now, headline='zoocarfaz'),
+            Article(pub_date=now, headline='barfoobaz'),
+            Article(pub_date=now, headline='bazbaRFOO'),
+        ])
 
         # alternation
         self.assertQuerysetEqual(
@@ -722,13 +731,15 @@ class LookupTests(TestCase):
     def test_regex_backreferencing(self):
         # grouping and backreferences
         now = datetime.now()
-        Article.objects.create(pub_date=now, headline='foobar')
-        Article.objects.create(pub_date=now, headline='foobaz')
-        Article.objects.create(pub_date=now, headline='ooF')
-        Article.objects.create(pub_date=now, headline='foobarbaz')
-        Article.objects.create(pub_date=now, headline='zoocarfaz')
-        Article.objects.create(pub_date=now, headline='barfoobaz')
-        Article.objects.create(pub_date=now, headline='bazbaRFOO')
+        Article.objects.bulk_create([
+            Article(pub_date=now, headline='foobar'),
+            Article(pub_date=now, headline='foobaz'),
+            Article(pub_date=now, headline='ooF'),
+            Article(pub_date=now, headline='foobarbaz'),
+            Article(pub_date=now, headline='zoocarfaz'),
+            Article(pub_date=now, headline='barfoobaz'),
+            Article(pub_date=now, headline='bazbaRFOO'),
+        ])
         self.assertQuerysetEqual(
             Article.objects.filter(headline__regex=r'b(.).*b\1'),
             ['<Article: barfoobaz>', '<Article: bazbaRFOO>', '<Article: foobarbaz>']
@@ -924,3 +935,59 @@ class LookupTests(TestCase):
         field = query.model._meta.get_field('nulled_text_field')
         self.assertIsInstance(query.build_lookup(['isnull_none_rhs'], field, None), IsNullWithNoneAsRHS)
         self.assertTrue(Season.objects.filter(pk=season.pk, nulled_text_field__isnull_none_rhs=True))
+
+    def test_exact_exists(self):
+        qs = Article.objects.filter(pk=OuterRef('pk'))
+        seasons = Season.objects.annotate(
+            pk_exists=Exists(qs),
+        ).filter(
+            pk_exists=Exists(qs),
+        )
+        self.assertCountEqual(seasons, Season.objects.all())
+
+    def test_nested_outerref_lhs(self):
+        tag = Tag.objects.create(name=self.au1.alias)
+        tag.articles.add(self.a1)
+        qs = Tag.objects.annotate(
+            has_author_alias_match=Exists(
+                Article.objects.annotate(
+                    author_exists=Exists(
+                        Author.objects.filter(alias=OuterRef(OuterRef('name')))
+                    ),
+                ).filter(author_exists=True)
+            ),
+        )
+        self.assertEqual(qs.get(has_author_alias_match=True), tag)
+
+    def test_exact_query_rhs_with_selected_columns(self):
+        newest_author = Author.objects.create(name='Author 2')
+        authors_max_ids = Author.objects.filter(
+            name='Author 2',
+        ).values(
+            'name',
+        ).annotate(
+            max_id=Max('id'),
+        ).values('max_id')
+        authors = Author.objects.filter(id=authors_max_ids[:1])
+        self.assertEqual(authors.get(), newest_author)
+
+    def test_isnull_non_boolean_value(self):
+        # These tests will catch ValueError in Django 4.0 when using
+        # non-boolean values for an isnull lookup becomes forbidden.
+        # msg = (
+        #     'The QuerySet value for an isnull lookup must be True or False.'
+        # )
+        msg = (
+            'Using a non-boolean value for an isnull lookup is deprecated, '
+            'use True or False instead.'
+        )
+        tests = [
+            Author.objects.filter(alias__isnull=1),
+            Article.objects.filter(author__isnull=1),
+            Season.objects.filter(games__isnull=1),
+            Freebie.objects.filter(stock__isnull=1),
+        ]
+        for qs in tests:
+            with self.subTest(qs=qs):
+                with self.assertWarnsMessage(RemovedInDjango40Warning, msg):
+                    qs.exists()

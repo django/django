@@ -1,7 +1,8 @@
-from collections import OrderedDict
 from datetime import datetime, timedelta
 
+from django import forms
 from django.conf import settings
+from django.contrib import messages
 from django.contrib.admin import FieldListFilter
 from django.contrib.admin.exceptions import (
     DisallowedModelAdminLookup, DisallowedModelAdminToField,
@@ -35,7 +36,18 @@ IGNORED_PARAMS = (
     ALL_VAR, ORDER_VAR, ORDER_TYPE_VAR, SEARCH_VAR, IS_POPUP_VAR, TO_FIELD_VAR)
 
 
+class ChangeListSearchForm(forms.Form):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Populate "fields" dynamically because SEARCH_VAR is a variable:
+        self.fields = {
+            SEARCH_VAR: forms.CharField(required=False, strip=False),
+        }
+
+
 class ChangeList:
+    search_form_class = ChangeListSearchForm
+
     def __init__(self, request, model, list_display, list_display_links,
                  list_filter, date_hierarchy, search_fields, list_select_related,
                  list_per_page, list_max_show_all, list_editable, model_admin, sortable_by):
@@ -57,6 +69,11 @@ class ChangeList:
         self.sortable_by = sortable_by
 
         # Get search parameters from the query string.
+        _search_form = self.search_form_class(request.GET)
+        if not _search_form.is_valid():
+            for error in _search_form.errors.values():
+                messages.error(request, ', '.join(error))
+        self.query = _search_form.cleaned_data.get(SEARCH_VAR) or ''
         try:
             self.page_num = int(request.GET.get(PAGE_VAR, 0))
         except ValueError:
@@ -77,7 +94,6 @@ class ChangeList:
             self.list_editable = ()
         else:
             self.list_editable = list_editable
-        self.query = request.GET.get(SEARCH_VAR, '')
         self.queryset = self.get_queryset(request)
         self.get_results(request)
         if self.is_popup:
@@ -157,8 +173,6 @@ class ChangeList:
                     )
                 except ValueError as e:
                     raise IncorrectLookupParameters(e) from e
-                if settings.USE_TZ:
-                    from_date = make_aware(from_date)
                 if day:
                     to_date = from_date + timedelta(days=1)
                 elif month:
@@ -167,6 +181,9 @@ class ChangeList:
                     to_date = (from_date + timedelta(days=32)).replace(day=1)
                 else:
                     to_date = from_date.replace(year=from_date.year + 1)
+                if settings.USE_TZ:
+                    from_date = make_aware(from_date)
+                    to_date = make_aware(to_date)
                 lookup_params.update({
                     '%s__gte' % self.date_hierarchy: from_date,
                     '%s__lt' % self.date_hierarchy: to_date,
@@ -265,6 +282,8 @@ class ChangeList:
                 attr = getattr(self.model_admin, field_name)
             else:
                 attr = getattr(self.model, field_name)
+            if isinstance(attr, property) and hasattr(attr, 'fget'):
+                attr = attr.fget
             return getattr(attr, 'admin_order_field', None)
 
     def get_ordering(self, request, queryset):
@@ -273,8 +292,8 @@ class ChangeList:
         First check the get_ordering() method in model admin, then check
         the object's default ordering. Then, any manually-specified ordering
         from the query string overrides anything. Finally, a deterministic
-        order is guaranteed by ensuring the primary key is used as the last
-        ordering field.
+        order is guaranteed by calling _get_deterministic_ordering() with the
+        constructed ordering.
         """
         params = self.params
         ordering = list(self.model_admin.get_ordering(request) or self._get_default_ordering())
@@ -303,25 +322,70 @@ class ChangeList:
         # Add the given query's ordering fields, if any.
         ordering.extend(queryset.query.order_by)
 
-        # Ensure that the primary key is systematically present in the list of
-        # ordering fields so we can guarantee a deterministic order across all
-        # database backends.
-        pk_name = self.lookup_opts.pk.name
-        if {'pk', '-pk', pk_name, '-' + pk_name}.isdisjoint(ordering):
-            # The two sets do not intersect, meaning the pk isn't present. So
-            # we add it.
-            ordering.append('-pk')
+        return self._get_deterministic_ordering(ordering)
 
+    def _get_deterministic_ordering(self, ordering):
+        """
+        Ensure a deterministic order across all database backends. Search for a
+        single field or unique together set of fields providing a total
+        ordering. If these are missing, augment the ordering with a descendant
+        primary key.
+        """
+        ordering = list(ordering)
+        ordering_fields = set()
+        total_ordering_fields = {'pk'} | {
+            field.attname for field in self.lookup_opts.fields
+            if field.unique and not field.null
+        }
+        for part in ordering:
+            # Search for single field providing a total ordering.
+            field_name = None
+            if isinstance(part, str):
+                field_name = part.lstrip('-')
+            elif isinstance(part, F):
+                field_name = part.name
+            elif isinstance(part, OrderBy) and isinstance(part.expression, F):
+                field_name = part.expression.name
+            if field_name:
+                # Normalize attname references by using get_field().
+                try:
+                    field = self.lookup_opts.get_field(field_name)
+                except FieldDoesNotExist:
+                    # Could be "?" for random ordering or a related field
+                    # lookup. Skip this part of introspection for now.
+                    continue
+                # Ordering by a related field name orders by the referenced
+                # model's ordering. Skip this part of introspection for now.
+                if field.remote_field and field_name == field.name:
+                    continue
+                if field.attname in total_ordering_fields:
+                    break
+                ordering_fields.add(field.attname)
+        else:
+            # No single total ordering field, try unique_together.
+            for field_names in self.lookup_opts.unique_together:
+                # Normalize attname references by using get_field().
+                fields = [self.lookup_opts.get_field(field_name) for field_name in field_names]
+                # Composite unique constraints containing a nullable column
+                # cannot ensure total ordering.
+                if any(field.null for field in fields):
+                    continue
+                if ordering_fields.issuperset(field.attname for field in fields):
+                    break
+            else:
+                # If no set of unique fields is present in the ordering, rely
+                # on the primary key to provide total ordering.
+                ordering.append('-pk')
         return ordering
 
     def get_ordering_field_columns(self):
         """
-        Return an OrderedDict of ordering field column numbers and asc/desc.
+        Return a dictionary of ordering field column numbers and asc/desc.
         """
         # We must cope with more than one column having the same underlying sort
         # field, so we base things on column numbers.
         ordering = self._get_default_ordering()
-        ordering_fields = OrderedDict()
+        ordering_fields = {}
         if ORDER_VAR not in self.params:
             # for ordering specified on ModelAdmin or model Meta, we don't know
             # the right column numbers absolutely, because there might be more

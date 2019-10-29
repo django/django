@@ -1052,7 +1052,7 @@ class ModelStateTests(SimpleTestCase):
             ['searchablelocation_ptr', 'name', 'bus_routes', 'inbound']
         )
         self.assertEqual(station_state.fields[1][1].max_length, 128)
-        self.assertEqual(station_state.fields[2][1].null, False)
+        self.assertIs(station_state.fields[2][1].null, False)
         self.assertEqual(
             station_state.options,
             {'abstract': False, 'swappable': 'TEST_SWAPPABLE_MODEL', 'indexes': [], 'constraints': []}
@@ -1105,7 +1105,7 @@ class ModelStateTests(SimpleTestCase):
             class Meta:
                 app_label = 'migrations'
                 abstract = True
-                indexes = [models.indexes.Index(fields=['name'])]
+                indexes = [models.Index(fields=['name'])]
 
         class Child1(Abstract):
             pass
@@ -1131,7 +1131,7 @@ class ModelStateTests(SimpleTestCase):
 
             class Meta:
                 app_label = 'migrations'
-                indexes = [models.indexes.Index(fields=['name'], name='foo_idx')]
+                indexes = [models.Index(fields=['name'], name='foo_idx')]
 
         model_state = ModelState.from_model(TestModel)
         index_names = [index.name for index in model_state.options['indexes']]

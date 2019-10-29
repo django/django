@@ -3,7 +3,7 @@ import re
 import types
 from datetime import datetime, timedelta
 from decimal import Decimal
-from unittest import TestCase
+from unittest import TestCase, mock
 
 from django.core.exceptions import ValidationError
 from django.core.files.base import ContentFile
@@ -202,6 +202,10 @@ TEST_DATA = [
 
     (MinValueValidator(0), -1, ValidationError),
     (MinValueValidator(NOW), NOW - timedelta(days=1), ValidationError),
+
+    # limit_value may be a callable.
+    (MinValueValidator(lambda: 1), 0, ValidationError),
+    (MinValueValidator(lambda: 1), 1, None),
 
     (MaxLengthValidator(10), '', None),
     (MaxLengthValidator(10), 10 * 'x', None),
@@ -420,6 +424,7 @@ class TestValidatorEquality(TestCase):
             MaxValueValidator(44),
             MaxValueValidator(44),
         )
+        self.assertEqual(MaxValueValidator(44), mock.ANY)
         self.assertNotEqual(
             MaxValueValidator(44),
             MinValueValidator(44),

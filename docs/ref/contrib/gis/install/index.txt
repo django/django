@@ -8,9 +8,9 @@ Overview
 ========
 In general, GeoDjango installation requires:
 
-1. :ref:`Python and Django <django>`
-2. :ref:`spatial_database`
-3. :doc:`geolibs`
+#. :ref:`Python and Django <django>`
+#. :ref:`spatial_database`
+#. :doc:`geolibs`
 
 Details for each of the requirements and installation instructions
 are provided in the sections below. In addition, platform-specific
@@ -58,10 +58,10 @@ supported versions, and any notes for each of the supported database backends:
 ==================  ==============================  ==================  =========================================
 Database            Library Requirements            Supported Versions  Notes
 ==================  ==============================  ==================  =========================================
-PostgreSQL          GEOS, GDAL, PROJ.4, PostGIS     9.4+                Requires PostGIS.
-MySQL               GEOS, GDAL                      5.6+                Not OGC-compliant; :ref:`limited functionality <mysql-spatial-limitations>`.
-Oracle              GEOS, GDAL                      12.1+               XE not supported.
-SQLite              GEOS, GDAL, PROJ.4, SpatiaLite  3.7.15+                Requires SpatiaLite 4.1+
+PostgreSQL          GEOS, GDAL, PROJ.4, PostGIS     9.5+                Requires PostGIS.
+MySQL               GEOS, GDAL                      5.6.1+              :ref:`Limited functionality <mysql-spatial-limitations>`.
+Oracle              GEOS, GDAL                      12.2+               XE not supported.
+SQLite              GEOS, GDAL, PROJ.4, SpatiaLite  3.8.3+              Requires SpatiaLite 4.3+
 ==================  ==============================  ==================  =========================================
 
 See also `this comparison matrix`__ on the OSGeo Wiki for
@@ -272,9 +272,9 @@ KyngChaos packages
 ~~~~~~~~~~~~~~~~~~
 
 William Kyngesburye provides a number of `geospatial library binary packages`__
-that make it simple to get GeoDjango installed on macOS without compiling
-them from source.  However, `Xcode`_ is still necessary for compiling the
-Python database adapters :ref:`psycopg2_kyngchaos` (for PostGIS).
+that help to get GeoDjango installed on macOS without compiling them from
+source.  However, `Xcode`_ is still necessary for compiling the Python database
+adapters :ref:`psycopg2_kyngchaos` (for PostGIS).
 
 .. note::
 
@@ -316,7 +316,7 @@ psycopg2
 After you've installed the KyngChaos binaries and modified your ``PATH``, as
 described above, ``psycopg2`` may be installed using the following command::
 
-    $ pip install psycopg2
+    $ python -m pip install psycopg2
 
 .. note::
 
@@ -385,9 +385,9 @@ PostgreSQL
 ~~~~~~~~~~
 
 First, download the latest `PostgreSQL 9.x installer`__ from the
-`EnterpriseDB`__ website.  After downloading, simply run the installer,
-follow the on-screen directions, and keep the default options unless
-you know the consequences of changing them.
+`EnterpriseDB`__ website.  After downloading, run the installer, follow the
+on-screen directions, and keep the default options unless you know the
+consequences of changing them.
 
 .. note::
 
@@ -446,14 +446,13 @@ __ http://www.stickpeople.com/projects/python/win-psycopg/
 OSGeo4W
 ~~~~~~~
 
-The `OSGeo4W installer`_ makes it simple to install the PROJ.4, GDAL, and GEOS
-libraries required by GeoDjango.  First, download the `OSGeo4W installer`_,
-and run it.  Select :menuselection:`Express Web-GIS Install` and click next.
-In the 'Select Packages' list, ensure that GDAL is selected; MapServer and
-Apache are also enabled by default, but are not required by GeoDjango and
-may be unchecked safely.  After clicking next, the packages will be
-automatically downloaded and installed, after which you may exit the
-installer.
+The `OSGeo4W installer`_ helps to install the PROJ.4, GDAL, and GEOS libraries
+required by GeoDjango. First, download the `OSGeo4W installer`_, and run it.
+Select :menuselection:`Express Web-GIS Install` and click next.  In the 'Select
+Packages' list, ensure that GDAL is selected; MapServer and Apache are also
+enabled by default, but are not required by GeoDjango and may be unchecked
+safely.  After clicking next, the packages will be automatically downloaded and
+installed, after which you may exit the installer.
 
 .. _OSGeo4W installer: https://trac.osgeo.org/osgeo4w/
 

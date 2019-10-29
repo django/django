@@ -8,8 +8,9 @@ from django.test import TestCase
 from django.utils.translation import gettext_lazy
 
 from .models import (
-    Article, Category, Child, City, District, First, Parent, Record, Relation,
-    Reporter, School, Student, Third, ToFieldChild,
+    Article, Category, Child, ChildNullableParent, City, Country, District,
+    First, Parent, Record, Relation, Reporter, School, Student, Third,
+    ToFieldChild,
 )
 
 
@@ -151,6 +152,34 @@ class ManyToOneTests(TestCase):
         # Reporter cannot be null - there should not be a clear or remove method
         self.assertFalse(hasattr(self.r2.article_set, 'remove'))
         self.assertFalse(hasattr(self.r2.article_set, 'clear'))
+
+    def test_assign_fk_id_value(self):
+        parent = Parent.objects.create(name='jeff')
+        child1 = Child.objects.create(name='frank', parent=parent)
+        child2 = Child.objects.create(name='randy', parent=parent)
+        parent.bestchild = child1
+        parent.save()
+        parent.bestchild_id = child2.pk
+        parent.save()
+        self.assertEqual(parent.bestchild_id, child2.pk)
+        self.assertFalse(Parent.bestchild.is_cached(parent))
+        self.assertEqual(parent.bestchild, child2)
+        self.assertTrue(Parent.bestchild.is_cached(parent))
+        # Reassigning the same value doesn't clear cached instance.
+        parent.bestchild_id = child2.pk
+        self.assertTrue(Parent.bestchild.is_cached(parent))
+
+    def test_assign_fk_id_none(self):
+        parent = Parent.objects.create(name='jeff')
+        child = Child.objects.create(name='frank', parent=parent)
+        parent.bestchild = child
+        parent.save()
+        parent.bestchild_id = None
+        parent.save()
+        self.assertIsNone(parent.bestchild_id)
+        self.assertFalse(Parent.bestchild.is_cached(parent))
+        self.assertIsNone(parent.bestchild)
+        self.assertTrue(Parent.bestchild.is_cached(parent))
 
     def test_selects(self):
         self.r.article_set.create(headline="John's second story", pub_date=datetime.date(2005, 7, 29))
@@ -522,6 +551,23 @@ class ManyToOneTests(TestCase):
         self.assertIsNot(c.parent, p)
         self.assertEqual(c.parent, p)
 
+    def test_save_nullable_fk_after_parent(self):
+        parent = Parent()
+        child = ChildNullableParent(parent=parent)
+        parent.save()
+        child.save()
+        child.refresh_from_db()
+        self.assertEqual(child.parent, parent)
+
+    def test_save_nullable_fk_after_parent_with_to_field(self):
+        parent = Parent(name='jeff')
+        child = ToFieldChild(parent=parent)
+        parent.save()
+        child.save()
+        child.refresh_from_db()
+        self.assertEqual(child.parent, parent)
+        self.assertEqual(child.parent_id, parent.name)
+
     def test_fk_to_bigautofield(self):
         ch = City.objects.create(name='Chicago')
         District.objects.create(city=ch, name='Far South')
@@ -530,6 +576,15 @@ class ManyToOneTests(TestCase):
         ny = City.objects.create(name='New York', id=2 ** 33)
         District.objects.create(city=ny, name='Brooklyn')
         District.objects.create(city=ny, name='Manhattan')
+
+    def test_fk_to_smallautofield(self):
+        us = Country.objects.create(name='United States')
+        City.objects.create(country=us, name='Chicago')
+        City.objects.create(country=us, name='New York')
+
+        uk = Country.objects.create(name='United Kingdom', id=2 ** 11)
+        City.objects.create(country=uk, name='London')
+        City.objects.create(country=uk, name='Edinburgh')
 
     def test_multiple_foreignkeys(self):
         # Test of multiple ForeignKeys to the same model (bug #7125).
@@ -666,3 +721,16 @@ class ManyToOneTests(TestCase):
         self.a.reporter_id = self.r2.pk
         self.a.save()
         self.assertEqual(self.a.reporter, self.r2)
+
+    def test_cached_foreign_key_with_to_field_not_cleared_by_save(self):
+        parent = Parent.objects.create(name='a')
+        child = ToFieldChild.objects.create(parent=parent)
+        with self.assertNumQueries(0):
+            self.assertIs(child.parent, parent)
+
+    def test_reverse_foreign_key_instance_to_field_caching(self):
+        parent = Parent.objects.create(name='a')
+        ToFieldChild.objects.create(parent=parent)
+        child = parent.to_field_children.get()
+        with self.assertNumQueries(0):
+            self.assertIs(child.parent, parent)

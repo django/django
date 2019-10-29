@@ -28,17 +28,55 @@
         <input id="id_first-TOTAL_FORMS" value="1">
         <input id="id_first-MAX_NUM_FORMS" value="">
         <table class="inline">
-            <tr id="first-0" class="form-row">
+            <tr id="first-0" class="form-row row1">
                 <td class="field-test_field">
-                    <input id="id_first-test_field">
+                    <input id="id_first-0-test_field">
                 </td>
             </tr>
-            <tr id="first-empty" class="empty-row">
+            <tr id="first-empty" class="form-row empty-form">
                 <td class="field-test_field">
-                    <input id="id_first-test_field">
+                    <input id="id_first-__prefix__-test_field">
                 </td>
             </tr>
         </table>
+    </script>
+    <script type="text/html" id="tabular-formset-with-validation-error">
+        <div class="inline-group">
+            <div class="tabular inline-related">
+                <input id="id_second-TOTAL_FORMS" value="2">
+                <input id="id_second-MAX_NUM_FORMS" value="">
+                <input id="id_second-MIN_NUM_FORMS" value="">
+                <table class="inline">
+                    <tr id="second-0" class="form-row has_original row1">
+                        <td class="field-test_field">
+                            <input id="id_second-0-test_field">
+                        </td>
+                        <td class="delete">
+                          <input type="checkbox" />
+                        </td>
+                    </tr>
+                    <tr class="row-form-errors">
+                      <td colspan="2">
+                        <ul class="errorlist nonfield">
+                          <li>This next form has non-field errors.</li>
+                        </ul>
+                      </td>
+                    </tr>
+                    <tr id="second-1" class="form-row row2">
+                        <td class="field-test_field">
+                            <input id="id_second-1-test_field">
+                        </td>
+                        <td class="delete"></td>
+                    </tr>
+                    <tr id="second-empty" class="form-row empty-form">
+                        <td class="field-test_field">
+                            <input id="id_second-__prefix__-test_field">
+                        </td>
+                        <td class="delete"></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
     </script>
 
     <script src="./qunit/qunit.js"></script>
@@ -50,9 +88,6 @@
 
     <script src='../django/contrib/admin/static/admin/js/core.js' data-cover></script>
     <script src='./admin/core.test.js'></script>
-
-    <script src='../django/contrib/admin/static/admin/js/timeparse.js' data-cover></script>
-    <script src='./admin/timeparse.test.js'></script>
 
     <script src='../django/contrib/admin/static/admin/js/admin/RelatedObjectLookups.js' data-cover></script>
     <script src='./admin/RelatedObjectLookups.test.js'></script>

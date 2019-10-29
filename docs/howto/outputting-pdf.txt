@@ -26,7 +26,7 @@ You can install ReportLab with ``pip``:
 
 .. console::
 
-    $ pip install reportlab
+    $ python -m pip install reportlab
 
 Test your installation by importing it in the Python interactive interpreter::
 
@@ -67,6 +67,7 @@ Here's a "Hello World" example::
 
         # FileResponse sets the Content-Disposition header so that browsers
         # present the option to save the file.
+        buffer.seek(0)
         return FileResponse(buffer, as_attachment=True, filename='hello.pdf')
 
 The code and comments should be self-explanatory, but a few things deserve a
@@ -87,7 +88,7 @@ mention:
 * You can provide an arbitrary ``filename`` parameter. It'll be used by browsers
   in the "Save as..." dialog.
 
-* Hooking into the ReportLab API is easy: The same buffer passed as the first
+* You can hook into the ReportLab API: The same buffer passed as the first
   argument to ``canvas.Canvas`` can be fed to the
   :class:`~django.http.FileResponse` class.
 

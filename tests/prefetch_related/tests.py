@@ -1,16 +1,19 @@
+from unittest import mock
+
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import connection
 from django.db.models import Prefetch, QuerySet
 from django.db.models.query import get_prefetcher, prefetch_related_objects
+from django.db.models.sql import Query
 from django.test import TestCase, override_settings
 from django.test.utils import CaptureQueriesContext
 
 from .models import (
-    Author, Author2, AuthorAddress, AuthorWithAge, Bio, Book, Bookmark,
-    BookReview, BookWithYear, Comment, Department, Employee, FavoriteAuthors,
-    House, LessonEntry, ModelIterableSubclass, Person, Qualification, Reader,
-    Room, TaggedItem, Teacher, WordEntry,
+    Article, Author, Author2, AuthorAddress, AuthorWithAge, Bio, Book,
+    Bookmark, BookReview, BookWithYear, Comment, Department, Employee,
+    FavoriteAuthors, House, LessonEntry, ModelIterableSubclass, Person,
+    Qualification, Reader, Room, TaggedItem, Teacher, WordEntry,
 )
 
 
@@ -204,7 +207,7 @@ class PrefetchRelatedTests(TestDataMixin, TestCase):
 
     def test_reverse_one_to_one_then_m2m(self):
         """
-        A m2m relation can be followed afterr going through the select_related
+        A m2m relation can be followed after going through the select_related
         reverse of an o2o.
         """
         qs = Author.objects.prefetch_related('bio__books').select_related('bio')
@@ -238,6 +241,13 @@ class PrefetchRelatedTests(TestDataMixin, TestCase):
 
         self.assertIn('prefetch_related', str(cm.exception))
         self.assertIn("name", str(cm.exception))
+
+    def test_prefetch_eq(self):
+        prefetch_1 = Prefetch('authors', queryset=Author.objects.all())
+        prefetch_2 = Prefetch('books', queryset=Book.objects.all())
+        self.assertEqual(prefetch_1, prefetch_1)
+        self.assertEqual(prefetch_1, mock.ANY)
+        self.assertNotEqual(prefetch_1, prefetch_2)
 
     def test_forward_m2m_to_attr_conflict(self):
         msg = 'to_attr=authors conflicts with a field on the Book model.'
@@ -281,6 +291,20 @@ class PrefetchRelatedTests(TestDataMixin, TestCase):
 
         sql = queries[-1]['sql']
         self.assertWhereContains(sql, self.author1.id)
+
+    def test_filter_deferred(self):
+        """
+        Related filtering of prefetched querysets is deferred until necessary.
+        """
+        add_q = Query.add_q
+        with mock.patch.object(
+            Query,
+            'add_q',
+            autospec=True,
+            side_effect=lambda self, q: add_q(self, q),
+        ) as add_q_mock:
+            list(Book.objects.prefetch_related('authors'))
+            self.assertEqual(add_q_mock.call_count, 1)
 
 
 class RawQuerySetTests(TestDataMixin, TestCase):
@@ -400,11 +424,16 @@ class CustomPrefetchTests(TestCase):
             "'houses' lookup was already seen with a different queryset. You "
             "may need to adjust the ordering of your lookups."
         )
-        with self.assertRaisesMessage(ValueError, msg):
-            self.traverse_qs(
-                Person.objects.prefetch_related('houses__rooms', Prefetch('houses', queryset=House.objects.all())),
-                [['houses', 'rooms']]
-            )
+        # lookup.queryset shouldn't be evaluated.
+        with self.assertNumQueries(3):
+            with self.assertRaisesMessage(ValueError, msg):
+                self.traverse_qs(
+                    Person.objects.prefetch_related(
+                        'houses__rooms',
+                        Prefetch('houses', queryset=House.objects.all()),
+                    ),
+                    [['houses', 'rooms']],
+                )
 
         # Ambiguous: Lookup houses_lst doesn't yet exist when performing houses_lst__rooms.
         msg = (
@@ -809,6 +838,22 @@ class CustomPrefetchTests(TestCase):
             with self.assertNumQueries(0):
                 self.assertEqual(person.cached_all_houses, all_houses)
 
+    def test_filter_deferred(self):
+        """
+        Related filtering of prefetched querysets is deferred until necessary.
+        """
+        add_q = Query.add_q
+        with mock.patch.object(
+            Query,
+            'add_q',
+            autospec=True,
+            side_effect=lambda self, q: add_q(self, q),
+        ) as add_q_mock:
+            list(House.objects.prefetch_related(
+                Prefetch('occupants', queryset=Person.objects.all())
+            ))
+            self.assertEqual(add_q_mock.call_count, 1)
+
 
 class DefaultManagerTests(TestCase):
 
@@ -884,6 +929,19 @@ class GenericRelationTests(TestCase):
         with self.assertNumQueries(2):
             qs = Comment.objects.prefetch_related('content_object')
             [c.content_object for c in qs]
+
+    def test_prefetch_GFK_uuid_pk(self):
+        article = Article.objects.create(name='Django')
+        Comment.objects.create(comment='awesome', content_object_uuid=article)
+        qs = Comment.objects.prefetch_related('content_object_uuid')
+        self.assertEqual([c.content_object_uuid for c in qs], [article])
+
+    def test_prefetch_GFK_fk_pk(self):
+        book = Book.objects.create(title='Poems')
+        book_with_year = BookWithYear.objects.create(book=book, published_year=2019)
+        Comment.objects.create(comment='awesome', content_object=book_with_year)
+        qs = Comment.objects.prefetch_related('content_object')
+        self.assertEqual([c.content_object for c in qs], [book_with_year])
 
     def test_traverse_GFK(self):
         """
@@ -1155,7 +1213,7 @@ class NullableTest(TestCase):
 
 
 class MultiDbTests(TestCase):
-    multi_db = True
+    databases = {'default', 'other'}
 
     def test_using_is_honored_m2m(self):
         B = Book.objects.using('other')
@@ -1345,7 +1403,7 @@ class Ticket21760Tests(TestCase):
         self.assertNotIn(' JOIN ', str(queryset.query))
 
 
-class DirectPrefechedObjectCacheReuseTests(TestCase):
+class DirectPrefetchedObjectCacheReuseTests(TestCase):
     """
     prefetch_related() reuses objects fetched in _prefetched_objects_cache.
 

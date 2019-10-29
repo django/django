@@ -25,7 +25,7 @@ from .models import (
 class TestCaseFixtureLoadingTests(TestCase):
     fixtures = ['fixture1.json', 'fixture2.json']
 
-    def testClassFixtures(self):
+    def test_class_fixtures(self):
         "Test case has installed 3 fixture objects"
         self.assertEqual(Article.objects.count(), 3)
         self.assertQuerysetEqual(Article.objects.all(), [
@@ -41,7 +41,7 @@ class SubclassTestCaseFixtureLoadingTests(TestCaseFixtureLoadingTests):
     """
     fixtures = []
 
-    def testClassFixtures(self):
+    def test_class_fixtures(self):
         "There were no fixture objects installed"
         self.assertEqual(Article.objects.count(), 0)
 
@@ -53,17 +53,21 @@ class DumpDataAssertMixin:
                          use_base_manager=False, exclude_list=[], primary_keys=''):
         new_io = StringIO()
         filename = filename and os.path.join(tempfile.gettempdir(), filename)
-        management.call_command('dumpdata', *args, **{'format': format,
-                                                      'stdout': new_io,
-                                                      'stderr': new_io,
-                                                      'output': filename,
-                                                      'use_natural_foreign_keys': natural_foreign_keys,
-                                                      'use_natural_primary_keys': natural_primary_keys,
-                                                      'use_base_manager': use_base_manager,
-                                                      'exclude': exclude_list,
-                                                      'primary_keys': primary_keys})
+        management.call_command(
+            'dumpdata',
+            *args,
+            format=format,
+            stdout=new_io,
+            stderr=new_io,
+            output=filename,
+            use_natural_foreign_keys=natural_foreign_keys,
+            use_natural_primary_keys=natural_primary_keys,
+            use_base_manager=use_base_manager,
+            exclude=exclude_list,
+            primary_keys=primary_keys,
+        )
         if filename:
-            with open(filename, "r") as f:
+            with open(filename) as f:
                 command_output = f.read()
             os.remove(filename)
         else:
@@ -695,7 +699,7 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
         fixture_json = os.path.join(tests_dir, 'fixtures', 'fixture1.json')
         fixture_xml = os.path.join(tests_dir, 'fixtures', 'fixture3.xml')
 
-        with mock.patch('django.core.management.commands.loaddata.sys.stdin', open(fixture_json, 'r')):
+        with mock.patch('django.core.management.commands.loaddata.sys.stdin', open(fixture_json)):
             management.call_command('loaddata', '--format=json', '-', verbosity=0)
             self.assertEqual(Article.objects.count(), 2)
             self.assertQuerysetEqual(Article.objects.all(), [
@@ -703,7 +707,7 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
                 '<Article: Poker has no place on ESPN>',
             ])
 
-        with mock.patch('django.core.management.commands.loaddata.sys.stdin', open(fixture_xml, 'r')):
+        with mock.patch('django.core.management.commands.loaddata.sys.stdin', open(fixture_xml)):
             management.call_command('loaddata', '--format=xml', '-', verbosity=0)
             self.assertEqual(Article.objects.count(), 3)
             self.assertQuerysetEqual(Article.objects.all(), [

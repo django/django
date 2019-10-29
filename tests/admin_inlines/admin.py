@@ -3,13 +3,14 @@ from django.contrib import admin
 from django.db import models
 
 from .models import (
-    Author, BinaryTree, CapoFamiglia, Chapter, ChildModel1, ChildModel2,
-    Consigliere, EditablePKBook, ExtraTerrestrial, Fashionista, Holder,
-    Holder2, Holder3, Holder4, Inner, Inner2, Inner3, Inner4Stacked,
+    Author, BinaryTree, CapoFamiglia, Chapter, Child, ChildModel1, ChildModel2,
+    Consigliere, EditablePKBook, ExtraTerrestrial, Fashionista, FootNote,
+    Holder, Holder2, Holder3, Holder4, Inner, Inner2, Inner3, Inner4Stacked,
     Inner4Tabular, NonAutoPKBook, NonAutoPKBookChild, Novel,
-    NovelReadonlyChapter, ParentModelWithCustomPk, Poll, Profile,
+    NovelReadonlyChapter, OutfitItem, ParentModelWithCustomPk, Poll, Profile,
     ProfileCollection, Question, ReadOnlyInline, ShoppingWeakness, Sighting,
-    SomeChildModel, SomeParentModel, SottoCapo, Title, TitleCollection,
+    SomeChildModel, SomeParentModel, SottoCapo, Teacher, Title,
+    TitleCollection,
 )
 
 site = admin.AdminSite(name="admin")
@@ -130,6 +131,35 @@ class InlineWeakness(admin.TabularInline):
     extra = 1
 
 
+class WeaknessForm(forms.ModelForm):
+    extra_field = forms.CharField()
+
+    class Meta:
+        model = ShoppingWeakness
+        fields = '__all__'
+
+
+class WeaknessInlineCustomForm(admin.TabularInline):
+    model = ShoppingWeakness
+    form = WeaknessForm
+
+
+class FootNoteForm(forms.ModelForm):
+    extra_field = forms.CharField()
+
+    class Meta:
+        model = FootNote
+        fields = '__all__'
+
+
+class FootNoteNonEditableInlineCustomForm(admin.TabularInline):
+    model = FootNote
+    form = FootNoteForm
+
+    def has_change_permission(self, request, obj=None):
+        return False
+
+
 class QuestionInline(admin.TabularInline):
     model = Question
     readonly_fields = ['call_me']
@@ -235,6 +265,18 @@ class SomeChildModelInline(admin.TabularInline):
     readonly_fields = ('readonly_field',)
 
 
+class StudentInline(admin.StackedInline):
+    model = Child
+    extra = 1
+    fieldsets = [
+        ('Name', {'fields': ('name',), 'classes': ('collapse',)}),
+    ]
+
+
+class TeacherAdmin(admin.ModelAdmin):
+    inlines = [StudentInline]
+
+
 site.register(TitleCollection, inlines=[TitleInline])
 # Test bug #12561 and #12778
 # only ModelAdmin media
@@ -257,3 +299,6 @@ site.register(BinaryTree, inlines=[BinaryTreeAdmin])
 site.register(ExtraTerrestrial, inlines=[SightingInline])
 site.register(SomeParentModel, inlines=[SomeChildModelInline])
 site.register([Question, Inner4Stacked, Inner4Tabular])
+site.register(Teacher, TeacherAdmin)
+site.register(Chapter, inlines=[FootNoteNonEditableInlineCustomForm])
+site.register(OutfitItem, inlines=[WeaknessInlineCustomForm])

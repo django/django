@@ -69,19 +69,31 @@ class GeometryFieldTest(SimpleTestCase):
 
     def test_to_python(self):
         """
-        Testing to_python returns a correct GEOSGeometry object or
-        a ValidationError
+        to_python() either returns a correct GEOSGeometry object or
+        a ValidationError.
         """
+        good_inputs = [
+            'POINT(5 23)',
+            'MULTIPOLYGON(((0 0, 0 1, 1 1, 1 0, 0 0)))',
+            'LINESTRING(0 0, 1 1)',
+        ]
+        bad_inputs = [
+            'POINT(5)',
+            'MULTI   POLYGON(((0 0, 0 1, 1 1, 1 0, 0 0)))',
+            'BLAH(0 0, 1 1)',
+            '{"type": "FeatureCollection", "features": ['
+            '{"geometry": {"type": "Point", "coordinates": [508375, 148905]}, "type": "Feature"}]}',
+        ]
         fld = forms.GeometryField()
         # to_python returns the same GEOSGeometry for a WKT
-        for wkt in ('POINT(5 23)', 'MULTIPOLYGON(((0 0, 0 1, 1 1, 1 0, 0 0)))', 'LINESTRING(0 0, 1 1)'):
-            with self.subTest(wkt=wkt):
-                self.assertEqual(GEOSGeometry(wkt, srid=fld.widget.map_srid), fld.to_python(wkt))
+        for geo_input in good_inputs:
+            with self.subTest(geo_input=geo_input):
+                self.assertEqual(GEOSGeometry(geo_input, srid=fld.widget.map_srid), fld.to_python(geo_input))
         # but raises a ValidationError for any other string
-        for wkt in ('POINT(5)', 'MULTI   POLYGON(((0 0, 0 1, 1 1, 1 0, 0 0)))', 'BLAH(0 0, 1 1)'):
-            with self.subTest(wkt=wkt):
+        for geo_input in bad_inputs:
+            with self.subTest(geo_input=geo_input):
                 with self.assertRaises(forms.ValidationError):
-                    fld.to_python(wkt)
+                    fld.to_python(geo_input)
 
     def test_to_python_different_map_srid(self):
         f = forms.GeometryField(widget=OpenLayersWidget)
@@ -223,7 +235,7 @@ class SpecializedFieldTest(SimpleTestCase):
         ogr.transform(3857)
         self.assertIn(escape(ogr.json), rendered)
 
-    # map_srid in operlayers.html template must not be localized.
+    # map_srid in openlayers.html template must not be localized.
     @override_settings(USE_L10N=True, USE_THOUSAND_SEPARATOR=True)
     def test_pointfield(self):
         class PointForm(forms.Form):

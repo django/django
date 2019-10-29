@@ -746,6 +746,15 @@ Java</label></li>
             [str(bf[1]), str(bf[2]), str(bf[3])],
         )
 
+    def test_boundfield_invalid_index(self):
+        class TestForm(Form):
+            name = ChoiceField(choices=[])
+
+        field = TestForm()['name']
+        msg = 'BoundField indices must be integers or slices, not str.'
+        with self.assertRaisesMessage(TypeError, msg):
+            field['foo']
+
     def test_boundfield_bool(self):
         """BoundField without any choices (subwidgets) evaluates to True."""
         class TestForm(Form):
@@ -995,7 +1004,7 @@ Java</label></li>
         self.assertHTMLEqual(
             f.as_table(),
             """<tr><th>&lt;em&gt;Special&lt;/em&gt; Field:</th><td>
-<ul class="errorlist"><li>Something&#39;s wrong with &#39;Nothing to escape&#39;</li></ul>
+<ul class="errorlist"><li>Something&#x27;s wrong with &#x27;Nothing to escape&#x27;</li></ul>
 <input type="text" name="special_name" value="Nothing to escape" required></td></tr>
 <tr><th><em>Special</em> Field:</th><td>
 <ul class="errorlist"><li>'<b>Nothing to escape</b>' is a safe string</li></ul>
@@ -1008,10 +1017,10 @@ Java</label></li>
         self.assertHTMLEqual(
             f.as_table(),
             """<tr><th>&lt;em&gt;Special&lt;/em&gt; Field:</th><td>
-<ul class="errorlist"><li>Something&#39;s wrong with &#39;Should escape &lt; &amp; &gt; and
-&lt;script&gt;alert(&#39;xss&#39;)&lt;/script&gt;&#39;</li></ul>
+<ul class="errorlist"><li>Something&#x27;s wrong with &#x27;Should escape &lt; &amp; &gt; and
+&lt;script&gt;alert(&#x27;xss&#x27;)&lt;/script&gt;&#x27;</li></ul>
 <input type="text" name="special_name"
-value="Should escape &lt; &amp; &gt; and &lt;script&gt;alert(&#39;xss&#39;)&lt;/script&gt;" required></td></tr>
+value="Should escape &lt; &amp; &gt; and &lt;script&gt;alert(&#x27;xss&#x27;)&lt;/script&gt;" required></td></tr>
 <tr><th><em>Special</em> Field:</th><td>
 <ul class="errorlist"><li>'<b><i>Do not escape</i></b>' is a safe string</li></ul>
 <input type="text" name="special_safe_name" value="&lt;i&gt;Do not escape&lt;/i&gt;" required></td></tr>"""
@@ -1964,7 +1973,7 @@ Password: <input type="password" name="password" required></li>
             occupation = CharField(initial=lambda: 'Unknown')
 
         form = PersonForm(initial={'first_name': 'Jane'})
-        self.assertEqual(form.get_initial_for_field(form.fields['age'], 'age'), None)
+        self.assertIsNone(form.get_initial_for_field(form.fields['age'], 'age'))
         self.assertEqual(form.get_initial_for_field(form.fields['last_name'], 'last_name'), 'Doe')
         # Form.initial overrides Field.initial.
         self.assertEqual(form.get_initial_for_field(form.fields['first_name'], 'first_name'), 'Jane')
@@ -2356,39 +2365,57 @@ Password: <input type="password" name="password" required>
 
         p = Person({'name': 'Joe'}, auto_id=False)
         self.assertHTMLEqual(str(p['is_cool']), """<select name="is_cool">
-<option value="1" selected>Unknown</option>
-<option value="2">Yes</option>
-<option value="3">No</option>
+<option value="unknown" selected>Unknown</option>
+<option value="true">Yes</option>
+<option value="false">No</option>
 </select>""")
         p = Person({'name': 'Joe', 'is_cool': '1'}, auto_id=False)
         self.assertHTMLEqual(str(p['is_cool']), """<select name="is_cool">
-<option value="1" selected>Unknown</option>
-<option value="2">Yes</option>
-<option value="3">No</option>
+<option value="unknown" selected>Unknown</option>
+<option value="true">Yes</option>
+<option value="false">No</option>
 </select>""")
         p = Person({'name': 'Joe', 'is_cool': '2'}, auto_id=False)
         self.assertHTMLEqual(str(p['is_cool']), """<select name="is_cool">
-<option value="1">Unknown</option>
-<option value="2" selected>Yes</option>
-<option value="3">No</option>
+<option value="unknown">Unknown</option>
+<option value="true" selected>Yes</option>
+<option value="false">No</option>
 </select>""")
         p = Person({'name': 'Joe', 'is_cool': '3'}, auto_id=False)
         self.assertHTMLEqual(str(p['is_cool']), """<select name="is_cool">
-<option value="1">Unknown</option>
-<option value="2">Yes</option>
-<option value="3" selected>No</option>
+<option value="unknown">Unknown</option>
+<option value="true">Yes</option>
+<option value="false" selected>No</option>
 </select>""")
         p = Person({'name': 'Joe', 'is_cool': True}, auto_id=False)
         self.assertHTMLEqual(str(p['is_cool']), """<select name="is_cool">
-<option value="1">Unknown</option>
-<option value="2" selected>Yes</option>
-<option value="3">No</option>
+<option value="unknown">Unknown</option>
+<option value="true" selected>Yes</option>
+<option value="false">No</option>
 </select>""")
         p = Person({'name': 'Joe', 'is_cool': False}, auto_id=False)
         self.assertHTMLEqual(str(p['is_cool']), """<select name="is_cool">
-<option value="1">Unknown</option>
-<option value="2">Yes</option>
-<option value="3" selected>No</option>
+<option value="unknown">Unknown</option>
+<option value="true">Yes</option>
+<option value="false" selected>No</option>
+</select>""")
+        p = Person({'name': 'Joe', 'is_cool': 'unknown'}, auto_id=False)
+        self.assertHTMLEqual(str(p['is_cool']), """<select name="is_cool">
+<option value="unknown" selected>Unknown</option>
+<option value="true">Yes</option>
+<option value="false">No</option>
+</select>""")
+        p = Person({'name': 'Joe', 'is_cool': 'true'}, auto_id=False)
+        self.assertHTMLEqual(str(p['is_cool']), """<select name="is_cool">
+<option value="unknown">Unknown</option>
+<option value="true" selected>Yes</option>
+<option value="false">No</option>
+</select>""")
+        p = Person({'name': 'Joe', 'is_cool': 'false'}, auto_id=False)
+        self.assertHTMLEqual(str(p['is_cool']), """<select name="is_cool">
+<option value="unknown">Unknown</option>
+<option value="true">Yes</option>
+<option value="false" selected>No</option>
 </select>""")
 
     def test_forms_with_file_fields(self):
@@ -2614,7 +2641,7 @@ Password: <input type="password" name="password" required>
             t.render(Context({'form': UserRegistration(auto_id=False)})),
             """<form>
 <p>Username: <input type="text" name="username" maxlength="10" required><br>
-Good luck picking a username that doesn&#39;t already exist.</p>
+Good luck picking a username that doesn&#x27;t already exist.</p>
 <p>Password1: <input type="password" name="password1" required></p>
 <p>Password2: <input type="password" name="password2" required></p>
 <input type="submit" required>
@@ -2758,9 +2785,9 @@ Good luck picking a username that doesn&#39;t already exist.</p>
 <label class="required" for="id_name">Name:</label> <input type="text" name="name" id="id_name" required></li>
 <li class="required"><label class="required" for="id_is_cool">Is cool:</label>
 <select name="is_cool" id="id_is_cool">
-<option value="1" selected>Unknown</option>
-<option value="2">Yes</option>
-<option value="3">No</option>
+<option value="unknown" selected>Unknown</option>
+<option value="true">Yes</option>
+<option value="false">No</option>
 </select></li>
 <li><label for="id_email">Email:</label> <input type="email" name="email" id="id_email"></li>
 <li class="required error"><ul class="errorlist"><li>This field is required.</li></ul>
@@ -2774,9 +2801,9 @@ Good luck picking a username that doesn&#39;t already exist.</p>
 <input type="text" name="name" id="id_name" required></p>
 <p class="required"><label class="required" for="id_is_cool">Is cool:</label>
 <select name="is_cool" id="id_is_cool">
-<option value="1" selected>Unknown</option>
-<option value="2">Yes</option>
-<option value="3">No</option>
+<option value="unknown" selected>Unknown</option>
+<option value="true">Yes</option>
+<option value="false">No</option>
 </select></p>
 <p><label for="id_email">Email:</label> <input type="email" name="email" id="id_email"></p>
 <ul class="errorlist"><li>This field is required.</li></ul>
@@ -2792,9 +2819,9 @@ Good luck picking a username that doesn&#39;t already exist.</p>
 <input type="text" name="name" id="id_name" required></td></tr>
 <tr class="required"><th><label class="required" for="id_is_cool">Is cool:</label></th>
 <td><select name="is_cool" id="id_is_cool">
-<option value="1" selected>Unknown</option>
-<option value="2">Yes</option>
-<option value="3">No</option>
+<option value="unknown" selected>Unknown</option>
+<option value="true">Yes</option>
+<option value="false">No</option>
 </select></td></tr>
 <tr><th><label for="id_email">Email:</label></th><td>
 <input type="email" name="email" id="id_email"></td></tr>
@@ -2854,8 +2881,14 @@ Good luck picking a username that doesn&#39;t already exist.</p>
         self.assertEqual(form.errors, {'name': ['bad value not allowed']})
         form = NameForm(data={'name': ['should be overly', 'long for the field names']})
         self.assertFalse(form.is_valid())
-        self.assertEqual(form.errors, {'name': ['Ensure this value has at most 10 characters (it has 16).',
-                                                'Ensure this value has at most 10 characters (it has 24).']})
+        self.assertEqual(
+            form.errors, {
+                'name': [
+                    'Ensure this value has at most 10 characters (it has 16).',
+                    'Ensure this value has at most 10 characters (it has 24).',
+                ],
+            }
+        )
         form = NameForm(data={'name': ['fname', 'lname']})
         self.assertTrue(form.is_valid())
         self.assertEqual(form.cleaned_data, {'name': 'fname lname'})
@@ -3647,6 +3680,22 @@ Good luck picking a username that doesn&#39;t already exist.</p>
         self.assertTrue(f.is_valid())
         self.assertEqual(f.cleaned_data, {'data': 'xyzzy'})
 
+    def test_empty_data_files_multi_value_dict(self):
+        p = Person()
+        self.assertIsInstance(p.data, MultiValueDict)
+        self.assertIsInstance(p.files, MultiValueDict)
+
+    def test_field_deep_copy_error_messages(self):
+        class CustomCharField(CharField):
+            def __init__(self, **kwargs):
+                kwargs['error_messages'] = {'invalid': 'Form custom error message.'}
+                super().__init__(**kwargs)
+
+        field = CustomCharField()
+        field_copy = copy.deepcopy(field)
+        self.assertIsInstance(field_copy, CustomCharField)
+        self.assertIsNot(field_copy.error_messages, field.error_messages)
+
 
 class CustomRenderer(DjangoTemplates):
     pass
@@ -3680,7 +3729,7 @@ class RendererTests(SimpleTestCase):
             default_renderer = CustomRenderer
 
         form = CustomForm()
-        self.assertTrue(isinstance(form.renderer, CustomForm.default_renderer))
+        self.assertIsInstance(form.renderer, CustomForm.default_renderer)
 
     def test_attribute_override(self):
         class CustomForm(Form):

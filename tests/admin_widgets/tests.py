@@ -181,7 +181,7 @@ class AdminFormfieldForDBFieldTests(SimpleTestCase):
         f = ma.formfield_for_dbfield(Advisor._meta.get_field('companies'), request=None)
         self.assertEqual(
             f.help_text,
-            'Hold down "Control", or "Command" on a Mac, to select more than one.'
+            'Hold down “Control”, or “Command” on a Mac, to select more than one.'
         )
 
 
@@ -333,6 +333,13 @@ class AdminSplitDateTimeWidgetTest(SimpleTestCase):
 
 
 class AdminURLWidgetTest(SimpleTestCase):
+    def test_get_context_validates_url(self):
+        w = widgets.AdminURLFieldWidget()
+        for invalid in ['', '/not/a/full/url/', 'javascript:alert("Danger XSS!")']:
+            with self.subTest(url=invalid):
+                self.assertFalse(w.get_context('name', invalid, {})['url_valid'])
+        self.assertTrue(w.get_context('name', 'http://example.com', {})['url_valid'])
+
     def test_render(self):
         w = widgets.AdminURLFieldWidget()
         self.assertHTMLEqual(
@@ -366,31 +373,31 @@ class AdminURLWidgetTest(SimpleTestCase):
         VALUE_RE = re.compile('value="([^"]+)"')
         TEXT_RE = re.compile('<a[^>]+>([^>]+)</a>')
         w = widgets.AdminURLFieldWidget()
-        output = w.render('test', 'http://example.com/<sometag>some text</sometag>')
+        output = w.render('test', 'http://example.com/<sometag>some-text</sometag>')
         self.assertEqual(
             HREF_RE.search(output).groups()[0],
-            'http://example.com/%3Csometag%3Esome%20text%3C/sometag%3E',
+            'http://example.com/%3Csometag%3Esome-text%3C/sometag%3E',
         )
         self.assertEqual(
             TEXT_RE.search(output).groups()[0],
-            'http://example.com/&lt;sometag&gt;some text&lt;/sometag&gt;',
+            'http://example.com/&lt;sometag&gt;some-text&lt;/sometag&gt;',
         )
         self.assertEqual(
             VALUE_RE.search(output).groups()[0],
-            'http://example.com/&lt;sometag&gt;some text&lt;/sometag&gt;',
+            'http://example.com/&lt;sometag&gt;some-text&lt;/sometag&gt;',
         )
-        output = w.render('test', 'http://example-äüö.com/<sometag>some text</sometag>')
+        output = w.render('test', 'http://example-äüö.com/<sometag>some-text</sometag>')
         self.assertEqual(
             HREF_RE.search(output).groups()[0],
-            'http://xn--example--7za4pnc.com/%3Csometag%3Esome%20text%3C/sometag%3E',
+            'http://xn--example--7za4pnc.com/%3Csometag%3Esome-text%3C/sometag%3E',
         )
         self.assertEqual(
             TEXT_RE.search(output).groups()[0],
-            'http://example-äüö.com/&lt;sometag&gt;some text&lt;/sometag&gt;',
+            'http://example-äüö.com/&lt;sometag&gt;some-text&lt;/sometag&gt;',
         )
         self.assertEqual(
             VALUE_RE.search(output).groups()[0],
-            'http://example-äüö.com/&lt;sometag&gt;some text&lt;/sometag&gt;',
+            'http://example-äüö.com/&lt;sometag&gt;some-text&lt;/sometag&gt;',
         )
         output = w.render('test', 'http://www.example.com/%C3%A4"><script>alert("XSS!")</script>"')
         self.assertEqual(
@@ -687,6 +694,29 @@ class RelatedFieldWidgetWrapperTests(SimpleTestCase):
         wrapper = widgets.RelatedFieldWidgetWrapper(widget, rel, widget_admin_site)
         self.assertIs(wrapper.value_omitted_from_data({}, {}, 'band'), False)
 
+    def test_widget_is_hidden(self):
+        rel = Album._meta.get_field('band').remote_field
+        widget = forms.HiddenInput()
+        widget.choices = ()
+        wrapper = widgets.RelatedFieldWidgetWrapper(widget, rel, widget_admin_site)
+        self.assertIs(wrapper.is_hidden, True)
+        context = wrapper.get_context('band', None, {})
+        self.assertIs(context['is_hidden'], True)
+        output = wrapper.render('name', 'value')
+        # Related item links are hidden.
+        self.assertNotIn('<a ', output)
+
+    def test_widget_is_not_hidden(self):
+        rel = Album._meta.get_field('band').remote_field
+        widget = forms.Select()
+        wrapper = widgets.RelatedFieldWidgetWrapper(widget, rel, widget_admin_site)
+        self.assertIs(wrapper.is_hidden, False)
+        context = wrapper.get_context('band', None, {})
+        self.assertIs(context['is_hidden'], False)
+        output = wrapper.render('name', 'value')
+        # Related item links are present.
+        self.assertIn('<a ', output)
+
 
 @override_settings(ROOT_URLCONF='admin_widgets.urls')
 class AdminWidgetSeleniumTestCase(AdminSeleniumTestCase):
@@ -844,7 +874,7 @@ class DateTimePickerSeleniumTests(AdminWidgetSeleniumTestCase):
         for language_code, language_name in settings.LANGUAGES:
             try:
                 catalog = gettext.translation('djangojs', path, [language_code])
-            except IOError:
+            except OSError:
                 continue
             if month_string in catalog._catalog:
                 month_name = catalog._catalog[month_string]
@@ -1363,7 +1393,7 @@ class RelatedFieldWidgetSeleniumTests(AdminWidgetSeleniumTestCase):
 
         # Go ahead and submit the form to make sure it works
         self.selenium.find_element_by_css_selector(save_button_css_selector).click()
-        self.wait_for_text('li.success', 'The profile "changednewuser" was added successfully.')
+        self.wait_for_text('li.success', 'The profile “changednewuser” was added successfully.')
         profiles = Profile.objects.all()
         self.assertEqual(len(profiles), 1)
         self.assertEqual(profiles[0].user.username, username_value)

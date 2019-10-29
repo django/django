@@ -119,18 +119,18 @@ from `Django's release team`_ and consists of:
 
 On the day of disclosure, we will take the following steps:
 
-1. Apply the relevant patch(es) to Django's codebase.
+#. Apply the relevant patch(es) to Django's codebase.
 
-2. Issue the relevant release(s), by placing new packages on `the
+#. Issue the relevant release(s), by placing new packages on `the
    Python Package Index`_ and on the Django website, and tagging the
    new release(s) in Django's git repository.
 
-3. Post a public entry on `the official Django development blog`_,
+#. Post a public entry on `the official Django development blog`_,
    describing the issue and its resolution in detail, pointing to the
    relevant patches and new releases, and crediting the reporter of
    the issue (if the reporter wishes to be publicly identified).
 
-4. Post a notice to the |django-announce| and oss-security@lists.openwall.com
+#. Post a notice to the |django-announce| and oss-security@lists.openwall.com
    mailing lists that links to the blog post.
 
 .. _the Python Package Index: https://pypi.org/
@@ -163,8 +163,8 @@ notification of security issues is not and will not be made public.
 We also aim to keep this list as small as effectively possible, in
 order to better manage the flow of confidential information prior to
 disclosure. As such, our notification list is *not* simply a list of
-users of Django, and merely being a user of Django is not sufficient
-reason to be placed on the notification list.
+users of Django, and being a user of Django is not sufficient reason
+to be placed on the notification list.
 
 In broad terms, recipients of security notifications fall into three
 groups:

@@ -7,6 +7,7 @@ and where files should be stored.
 
 import random
 import tempfile
+from pathlib import Path
 
 from django.core.files.storage import FileSystemStorage
 from django.db import models
@@ -31,8 +32,13 @@ class Storage(models.Model):
         # to make sure it only gets called once.
         return '%s/%s' % (random.randint(100, 999), filename)
 
+    def pathlib_upload_to(self, filename):
+        return Path('bar') / filename
+
     normal = models.FileField(storage=temp_storage, upload_to='tests')
     custom = models.FileField(storage=temp_storage, upload_to=custom_upload_to)
+    pathlib_callable = models.FileField(storage=temp_storage, upload_to=pathlib_upload_to)
+    pathlib_direct = models.FileField(storage=temp_storage, upload_to=Path('bar'))
     random = models.FileField(storage=temp_storage, upload_to=random_upload_to)
     custom_valid_name = models.FileField(
         storage=CustomValidNameStorage(location=temp_storage_location),

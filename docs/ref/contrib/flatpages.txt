@@ -5,25 +5,20 @@ The flatpages app
 .. module:: django.contrib.flatpages
    :synopsis: A framework for managing simple ?flat? HTML content in a database.
 
-Django comes with an optional "flatpages" application. It lets you store simple
-"flat" HTML content in a database and handles the management for you via
-Django's admin interface and a Python API.
+Django comes with an optional "flatpages" application. It lets you store "flat"
+HTML content in a database and handles the management for you via Django's
+admin interface and a Python API.
 
-A flatpage is a simple object with a URL, title and content. Use it for
-one-off, special-case pages, such as "About" or "Privacy Policy" pages, that
-you want to store in a database but for which you don't want to develop a
-custom Django application.
+A flatpage is a object with a URL, title and content. Use it for one-off,
+special-case pages, such as "About" or "Privacy Policy" pages, that you want to
+store in a database but for which you don't want to develop a custom Django
+application.
 
 A flatpage can use a custom template or a default, systemwide flatpage
 template. It can be associated with one, or multiple, sites.
 
 The content field may optionally be left blank if you prefer to put your
 content in a custom template.
-
-Here are some examples of flatpages on Django-powered sites:
-
-* http://www.lawrence.com/about/contact/
-* http://www2.ljworld.com/site/rules/
 
 Installation
 ============
@@ -63,9 +58,9 @@ How it works
 ============
 
 ``manage.py migrate`` creates two tables in your database: ``django_flatpage``
-and ``django_flatpage_sites``. ``django_flatpage`` is a simple lookup table
-that simply maps a URL to a title and bunch of text content.
-``django_flatpage_sites`` associates a flatpage with a site.
+and ``django_flatpage_sites``. ``django_flatpage`` is a lookup table that maps
+a URL to a title and bunch of text content. ``django_flatpage_sites``
+associates a flatpage with a site.
 
 Using the URLconf
 -----------------
@@ -213,10 +208,8 @@ Via the Python API
 
     Flatpages are represented by a standard
     :doc:`Django model </topics/db/models>`,
-    which lives in `django/contrib/flatpages/models.py`_. You can access
+    which lives in :source:`django/contrib/flatpages/models.py`. You can access
     flatpage objects via the :doc:`Django database API </topics/db/queries>`.
-
-.. _django/contrib/flatpages/models.py: https://github.com/django/django/blob/master/django/contrib/flatpages/models.py
 
 .. currentmodule:: django.contrib.flatpages
 
@@ -236,12 +229,12 @@ By default, flatpages are rendered via the template
 particular flatpage: in the admin, a collapsed fieldset titled
 "Advanced options" (clicking will expand it) contains a field for
 specifying a template name. If you're creating a flat page via the
-Python API you can simply set the template name as the field
-``template_name`` on the ``FlatPage`` object.
+Python API you can set the template name as the field ``template_name`` on the
+``FlatPage`` object.
 
 Creating the :file:`flatpages/default.html` template is your responsibility;
-in your template directory, just create a :file:`flatpages` directory
-containing a file :file:`default.html`.
+in your template directory, create a :file:`flatpages` directory containing a
+file :file:`default.html`.
 
 Flatpage templates are passed a single context variable, ``flatpage``,
 which is the flatpage object.

@@ -127,12 +127,9 @@ class BlockTranslateNode(Node):
             message_context = self.message_context.resolve(context)
         else:
             message_context = None
-        tmp_context = {}
-        for var, val in self.extra_context.items():
-            tmp_context[var] = val.resolve(context)
         # Update() works like a push(), so corresponding context.pop() is at
         # the end of function
-        context.update(tmp_context)
+        context.update({var: val.resolve(context) for var, val in self.extra_context.items()})
         singular, vars = self.render_token_list(self.singular)
         if self.plural and self.countervar and self.counter:
             count = self.counter.resolve(context)

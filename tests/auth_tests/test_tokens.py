@@ -1,4 +1,4 @@
-from datetime import date, timedelta
+from datetime import datetime, timedelta
 
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -28,25 +28,28 @@ class TokenGeneratorTest(TestCase):
         self.assertEqual(tk1, tk2)
 
     def test_timeout(self):
-        """
-        The token is valid after n days, but no greater.
-        """
+        """The token is valid after n seconds, but no greater."""
         # Uses a mocked version of PasswordResetTokenGenerator so we can change
-        # the value of 'today'
+        # the value of 'now'.
         class Mocked(PasswordResetTokenGenerator):
-            def __init__(self, today):
-                self._today_val = today
+            def __init__(self, now):
+                self._now_val = now
 
-            def _today(self):
-                return self._today_val
+            def _now(self):
+                return self._now_val
 
         user = User.objects.create_user('tokentestuser', 'test2@example.com', 'testpw')
         p0 = PasswordResetTokenGenerator()
         tk1 = p0.make_token(user)
-        p1 = Mocked(date.today() + timedelta(settings.PASSWORD_RESET_TIMEOUT_DAYS))
+        p1 = Mocked(datetime.now() + timedelta(seconds=settings.PASSWORD_RESET_TIMEOUT))
         self.assertTrue(p1.check_token(user, tk1))
-        p2 = Mocked(date.today() + timedelta(settings.PASSWORD_RESET_TIMEOUT_DAYS + 1))
+        p2 = Mocked(datetime.now() + timedelta(seconds=(settings.PASSWORD_RESET_TIMEOUT + 1)))
         self.assertFalse(p2.check_token(user, tk1))
+        with self.settings(PASSWORD_RESET_TIMEOUT=60 * 60):
+            p3 = Mocked(datetime.now() + timedelta(seconds=settings.PASSWORD_RESET_TIMEOUT))
+            self.assertTrue(p3.check_token(user, tk1))
+            p4 = Mocked(datetime.now() + timedelta(seconds=(settings.PASSWORD_RESET_TIMEOUT + 1)))
+            self.assertFalse(p4.check_token(user, tk1))
 
     def test_check_token_with_nonexistent_token_and_user(self):
         user = User.objects.create_user('tokentestuser', 'test2@example.com', 'testpw')

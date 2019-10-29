@@ -15,6 +15,10 @@ class Employee(models.Model):
         return '%s %s' % (self.firstname, self.lastname)
 
 
+class RemoteEmployee(Employee):
+    adjusted_salary = models.IntegerField()
+
+
 class Company(models.Model):
     name = models.CharField(max_length=100)
     num_employees = models.PositiveIntegerField()
@@ -30,6 +34,7 @@ class Company(models.Model):
         related_name='company_point_of_contact_set',
         null=True,
     )
+    based_in_eu = models.BooleanField(default=False)
 
     def __str__(self):
         return self.name

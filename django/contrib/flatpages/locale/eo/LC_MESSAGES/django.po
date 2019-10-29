@@ -2,14 +2,15 @@
 #
 # Translators:
 # Baptiste Darthenay <baptiste+transifex@darthenay.fr>, 2011-2012
-# Baptiste Darthenay <baptiste+transifex@darthenay.fr>, 2014-2015,2017
+# Baptiste Darthenay <baptiste+transifex@darthenay.fr>, 2014-2015,2017,2019
+# Robin van der Vliet <info@robinvandervliet.nl>, 2019
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2017-09-19 16:40+0000\n"
-"Last-Translator: Baptiste Darthenay <baptiste+transifex@darthenay.fr>\n"
+"POT-Creation-Date: 2019-01-16 20:42+0100\n"
+"PO-Revision-Date: 2019-02-04 21:33+0000\n"
+"Last-Translator: Robin van der Vliet <info@robinvandervliet.nl>\n"
 "Language-Team: Esperanto (http://www.transifex.com/django/django/language/"
 "eo/)\n"
 "MIME-Version: 1.0\n"
@@ -39,11 +40,14 @@ msgstr ""
 "Ĉi tiu valoro devus enhavi sole leterojn, nombrojn, punktojn, substrekoj, "
 "haltostrekoj, oblikvoj aŭ tildoj."
 
+msgid "Example: '/about/contact'. Make sure to have a leading slash."
+msgstr "Ekzemple: “/pri-ni/kontakto”. Certiĝu, ke ekas per oblikva streko."
+
 msgid "URL is missing a leading slash."
-msgstr "La streka karaktero \"/\" ne ĉeestas en komenco de ĉeno."
+msgstr "La streka signo \"/\" ne ĉeestas en komenco de ĉeno."
 
 msgid "URL is missing a trailing slash."
-msgstr "La streka karaktero \"/\" ne ĉeestas en fino de ĉeno."
+msgstr "La streka signo \"/\" ne ĉeestas en fino de ĉeno."
 
 #, python-format
 msgid "Flatpage with url %(url)s already exists for site %(site)s"

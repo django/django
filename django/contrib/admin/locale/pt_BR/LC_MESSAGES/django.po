@@ -2,6 +2,7 @@
 #
 # Translators:
 # Allisson Azevedo <allisson@gmail.com>, 2014
+# Bruce de Sá <contato@publidex.com.br>, 2019
 # bruno.devpod <bruno.devpod@gmail.com>, 2014
 # Filipe Cifali Stangler <cifali.filipe@gmail.com>, 2016
 # dudanogueira <dudanogueira@gmail.com>, 2012
@@ -17,16 +18,16 @@
 # Luiz Boaretto <lboaretto@gmail.com>, 2017
 # Marcelo Moro Brondani <mbrondani@inf.ufsm.br>, 2018
 # Marco Rougeth <marco@rougeth.com>, 2015
-# Otávio Reis Perkles <otaviocha@gmail.com>, 2018
+# Otávio Reis <otaviocha@gmail.com>, 2018
 # Raysa Dutra, 2016
 # Sergio Garcia <sergio@ginx.com.br>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-05-21 14:16-0300\n"
-"PO-Revision-Date: 2018-06-25 18:02+0000\n"
-"Last-Translator: Marcelo Moro Brondani <mbrondani@inf.ufsm.br>\n"
+"POT-Creation-Date: 2019-01-16 20:42+0100\n"
+"PO-Revision-Date: 2019-01-26 20:51+0000\n"
+"Last-Translator: Bruce de Sá <contato@publidex.com.br>\n"
 "Language-Team: Portuguese (Brazil) (http://www.transifex.com/django/django/"
 "language/pt_BR/)\n"
 "MIME-Version: 1.0\n"
@@ -126,7 +127,7 @@ msgid "object id"
 msgstr "id do objeto"
 
 #. Translators: 'repr' means representation
-#. (https://docs.python.org/3/library/functions.html#repr)
+#. (https://docs.python.org/library/functions.html#repr)
 msgid "object repr"
 msgstr "repr do objeto"
 
@@ -558,24 +559,8 @@ msgstr "Mostrar tudo"
 msgid "Save"
 msgstr "Salvar"
 
-msgid "Popup closing..."
-msgstr "Fechando popup..."
-
-#, python-format
-msgid "Change selected %(model)s"
-msgstr "Alterar %(model)s selecionado"
-
-#, python-format
-msgid "View selected %(model)s"
-msgstr "Visualizar %(model)s selecionados"
-
-#, python-format
-msgid "Add another %(model)s"
-msgstr "Adicionar outro %(model)s"
-
-#, python-format
-msgid "Delete selected %(model)s"
-msgstr "Excluir %(model)s selecionado"
+msgid "Popup closing…"
+msgstr "Popup fechando…"
 
 msgid "Search"
 msgstr "Pesquisar"
@@ -604,6 +589,18 @@ msgstr "Salvar e visualizar"
 
 msgid "Close"
 msgstr "Fechar"
+
+#, python-format
+msgid "Change selected %(model)s"
+msgstr "Alterar %(model)s selecionado"
+
+#, python-format
+msgid "Add another %(model)s"
+msgstr "Adicionar outro %(model)s"
+
+#, python-format
+msgid "Delete selected %(model)s"
+msgstr "Excluir %(model)s selecionado"
 
 msgid "Thanks for spending some quality time with the Web site today."
 msgstr "Obrigado por visitar nosso Web site hoje."

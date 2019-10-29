@@ -5,24 +5,13 @@ from urllib.parse import urlsplit, urlunsplit
 
 from django.core.exceptions import ValidationError
 from django.utils.deconstruct import deconstructible
-from django.utils.functional import SimpleLazyObject
+from django.utils.encoding import punycode
 from django.utils.ipv6 import is_valid_ipv6_address
+from django.utils.regex_helper import _lazy_re_compile
 from django.utils.translation import gettext_lazy as _, ngettext_lazy
 
 # These values, if given to validate(), will trigger the self.required check.
 EMPTY_VALUES = (None, '', [], (), {})
-
-
-def _lazy_re_compile(regex, flags=0):
-    """Lazily compile a regex with flags."""
-    def _compile():
-        # Compile the regex if it was not passed pre-compiled.
-        if isinstance(regex, str):
-            return re.compile(regex, flags)
-        else:
-            assert not flags, "flags must be empty if regex is passed pre-compiled"
-            return regex
-    return SimpleLazyObject(_compile)
 
 
 @deconstructible
@@ -124,7 +113,7 @@ class URLValidator(RegexValidator):
                 except ValueError:  # for example, "Invalid IPv6 URL"
                     raise ValidationError(self.message, code=self.code)
                 try:
-                    netloc = netloc.encode('idna').decode('ascii')  # IDN -> ACE
+                    netloc = punycode(netloc)  # IDN -> ACE
                 except UnicodeError:  # invalid domain part
                     raise e
                 url = urlunsplit((scheme, netloc, path, query, fragment))
@@ -199,7 +188,7 @@ class EmailValidator:
                 not self.validate_domain_part(domain_part)):
             # Try for possible IDN domain-part
             try:
-                domain_part = domain_part.encode('idna').decode('ascii')
+                domain_part = punycode(domain_part)
             except UnicodeError:
                 pass
             else:
@@ -236,14 +225,14 @@ slug_re = _lazy_re_compile(r'^[-a-zA-Z0-9_]+\Z')
 validate_slug = RegexValidator(
     slug_re,
     # Translators: "letters" means latin letters: a-z and A-Z.
-    _("Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."),
+    _('Enter a valid “slug” consisting of letters, numbers, underscores or hyphens.'),
     'invalid'
 )
 
 slug_unicode_re = _lazy_re_compile(r'^[-\w]+\Z')
 validate_unicode_slug = RegexValidator(
     slug_unicode_re,
-    _("Enter a valid 'slug' consisting of Unicode letters, numbers, underscores, or hyphens."),
+    _('Enter a valid “slug” consisting of Unicode letters, numbers, underscores, or hyphens.'),
     'invalid'
 )
 
@@ -317,13 +306,15 @@ class BaseValidator:
 
     def __call__(self, value):
         cleaned = self.clean(value)
-        params = {'limit_value': self.limit_value, 'show_value': cleaned, 'value': value}
-        if self.compare(cleaned, self.limit_value):
+        limit_value = self.limit_value() if callable(self.limit_value) else self.limit_value
+        params = {'limit_value': limit_value, 'show_value': cleaned, 'value': value}
+        if self.compare(cleaned, limit_value):
             raise ValidationError(self.message, code=self.code, params=params)
 
     def __eq__(self, other):
+        if not isinstance(other, self.__class__):
+            return NotImplemented
         return (
-            isinstance(other, self.__class__) and
             self.limit_value == other.limit_value and
             self.message == other.message and
             self.code == other.code
@@ -465,8 +456,8 @@ class DecimalValidator:
 @deconstructible
 class FileExtensionValidator:
     message = _(
-        "File extension '%(extension)s' is not allowed. "
-        "Allowed extensions are: '%(allowed_extensions)s'."
+        'File extension “%(extension)s” is not allowed. '
+        'Allowed extensions are: %(allowed_extensions)s.'
     )
     code = 'invalid_extension'
 

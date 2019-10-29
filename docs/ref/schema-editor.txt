@@ -34,10 +34,10 @@ If you are writing or maintaining a third-party database backend for Django,
 you will need to provide a ``SchemaEditor`` implementation in order to work with
 1.7's migration functionality - however, as long as your database is relatively
 standard in its use of SQL and relational design, you should be able to
-subclass one of the built-in Django ``SchemaEditor`` classes and just tweak the
+subclass one of the built-in Django ``SchemaEditor`` classes and tweak the
 syntax a little. Also note that there are a few new database features that
-migrations will look for: ``can_rollback_ddl`` and
-``supports_combined_alters`` are the most important.
+migrations will look for: ``can_rollback_ddl``
+and ``supports_combined_alters`` are the most important.
 
 Methods
 =======
@@ -48,8 +48,8 @@ Methods
 .. method:: BaseDatabaseSchemaEditor.execute(sql, params=[])
 
 Executes the SQL statement passed in, with parameters if supplied. This
-is a simple wrapper around the normal database cursors that allows
-capture of the SQL to a ``.sql`` file if the user wishes.
+is a wrapper around the normal database cursors that allows capture of the SQL
+to a ``.sql`` file if the user wishes.
 
 ``create_model()``
 ------------------
@@ -80,6 +80,20 @@ Adds ``index`` to ``model``’s table.
 .. method:: BaseDatabaseSchemaEditor.remove_index(model, index)
 
 Removes ``index`` from ``model``’s table.
+
+``add_constraint()``
+--------------------
+
+.. method:: BaseDatabaseSchemaEditor.add_constraint(model, constraint)
+
+Adds ``constraint`` to ``model``'s table.
+
+``remove_constraint()``
+-----------------------
+
+.. method:: BaseDatabaseSchemaEditor.remove_constraint(model, constraint)
+
+Removes ``constraint`` from ``model``'s table.
 
 ``alter_unique_together()``
 ---------------------------

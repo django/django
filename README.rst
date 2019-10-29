@@ -1,3 +1,7 @@
+======
+Django
+======
+
 Django is a high-level Python Web framework that encourages rapid development
 and clean, pragmatic design. Thanks for checking it out.
 
@@ -25,9 +29,9 @@ ticket here: https://code.djangoproject.com/newticket
 
 To get more help:
 
-* Join the ``#django`` channel on irc.freenode.net. Lots of helpful people hang out
-  there. Read the archives at https://botbot.me/freenode/django/. See
-  https://en.wikipedia.org/wiki/Wikipedia:IRC/Tutorial if you're new to IRC.
+* Join the ``#django`` channel on irc.freenode.net. Lots of helpful people hang
+  out there. See https://en.wikipedia.org/wiki/Wikipedia:IRC/Tutorial if you're
+  new to IRC.
 
 * Join the django-users mailing list, or read the archives, at
   https://groups.google.com/group/django-users.

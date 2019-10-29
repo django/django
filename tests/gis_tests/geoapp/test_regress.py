@@ -14,15 +14,19 @@ class GeoRegressionTests(TestCase):
 
     def test_update(self):
         "Testing QuerySet.update() (#10411)."
-        pnt = City.objects.get(name='Pueblo').point
-        bak = pnt.clone()
-        pnt.y += 0.005
-        pnt.x += 0.005
+        pueblo = City.objects.get(name='Pueblo')
+        bak = pueblo.point.clone()
+        pueblo.point.y += 0.005
+        pueblo.point.x += 0.005
 
-        City.objects.filter(name='Pueblo').update(point=pnt)
-        self.assertEqual(pnt, City.objects.get(name='Pueblo').point)
+        City.objects.filter(name='Pueblo').update(point=pueblo.point)
+        pueblo.refresh_from_db()
+        self.assertAlmostEqual(bak.y + 0.005, pueblo.point.y, 6)
+        self.assertAlmostEqual(bak.x + 0.005, pueblo.point.x, 6)
         City.objects.filter(name='Pueblo').update(point=bak)
-        self.assertEqual(bak, City.objects.get(name='Pueblo').point)
+        pueblo.refresh_from_db()
+        self.assertAlmostEqual(bak.y, pueblo.point.y, 6)
+        self.assertAlmostEqual(bak.x, pueblo.point.x, 6)
 
     def test_kmz(self):
         "Testing `render_to_kmz` with non-ASCII data. See #11624."

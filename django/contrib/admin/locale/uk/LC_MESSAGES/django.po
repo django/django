@@ -6,21 +6,22 @@
 # Boryslav Larin <brabadu@gmail.com>, 2011
 # Денис Подлесный <haos616@gmail.com>, 2016
 # Igor Melnyk, 2014,2017
+# Ivan Dmytrenko <dmitrenko.ivan@gmail.com>, 2019
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Kirill Gagarski <gagarin.gtn@gmail.com>, 2015
 # Max V. Stotsky <transifex@ms.pereslavl.ru>, 2014
 # Mikhail Kolesnik <mike@openbunker.org>, 2015
 # Mykola Zamkovoi <nickzam@gmail.com>, 2014
 # Sergiy Kuzmenko <s.kuzmenko@gmail.com>, 2011
-# Taras Korzhak <taras.korzhak96@gmail.com>, 2018
+# tarasyyyk <taras.korzhak96@gmail.com>, 2018
 # Zoriana Zaiats, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-05-21 14:16-0300\n"
-"PO-Revision-Date: 2018-08-24 20:12+0000\n"
-"Last-Translator: Taras Korzhak <taras.korzhak96@gmail.com>\n"
+"POT-Creation-Date: 2019-01-16 20:42+0100\n"
+"PO-Revision-Date: 2019-02-18 21:37+0000\n"
+"Last-Translator: Ivan Dmytrenko <dmitrenko.ivan@gmail.com>\n"
 "Language-Team: Ukrainian (http://www.transifex.com/django/django/language/"
 "uk/)\n"
 "MIME-Version: 1.0\n"
@@ -123,7 +124,7 @@ msgid "object id"
 msgstr "id об'єкта"
 
 #. Translators: 'repr' means representation
-#. (https://docs.python.org/3/library/functions.html#repr)
+#. (https://docs.python.org/library/functions.html#repr)
 msgid "object repr"
 msgstr "представлення об'єкта (repr)"
 
@@ -553,24 +554,8 @@ msgstr "Показати всі"
 msgid "Save"
 msgstr "Зберегти"
 
-msgid "Popup closing..."
-msgstr "Закриття спливаючого вікна..."
-
-#, python-format
-msgid "Change selected %(model)s"
-msgstr "Змінити обрану %(model)s"
-
-#, python-format
-msgid "View selected %(model)s"
-msgstr "Переглянути вибрані %(model)s"
-
-#, python-format
-msgid "Add another %(model)s"
-msgstr "Додати ще одну %(model)s"
-
-#, python-format
-msgid "Delete selected %(model)s"
-msgstr "Видалити обрану %(model)s"
+msgid "Popup closing…"
+msgstr "Закриття спливаючого вікна"
 
 msgid "Search"
 msgstr "Пошук"
@@ -601,6 +586,18 @@ msgstr "Зберегти і переглянути"
 
 msgid "Close"
 msgstr "Закрити"
+
+#, python-format
+msgid "Change selected %(model)s"
+msgstr "Змінити обрану %(model)s"
+
+#, python-format
+msgid "Add another %(model)s"
+msgstr "Додати ще одну %(model)s"
+
+#, python-format
+msgid "Delete selected %(model)s"
+msgstr "Видалити обрану %(model)s"
 
 msgid "Thanks for spending some quality time with the Web site today."
 msgstr "Дякуємо за час, проведений сьогодні на сайті."

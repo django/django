@@ -41,16 +41,6 @@ QUnit.test('Date.getTwoDigitSecond', function(assert) {
     assert.equal(new Date(2014, 6, 1, 0, 0, 20).getTwoDigitSecond(), '20', '12:00:20 am is 20');
 });
 
-QUnit.test('Date.getHourMinute', function(assert) {
-    assert.equal(new Date(2014, 6, 1, 11, 0).getHourMinute(), '11:00', '11:00 am is 11:00');
-    assert.equal(new Date(2014, 6, 1, 13, 25).getHourMinute(), '13:25', '1:25 pm is 13:25');
-});
-
-QUnit.test('Date.getHourMinuteSecond', function(assert) {
-    assert.equal(new Date(2014, 6, 1, 11, 0, 0).getHourMinuteSecond(), '11:00:00', '11:00 am is 11:00:00');
-    assert.equal(new Date(2014, 6, 1, 17, 45, 30).getHourMinuteSecond(), '17:45:30', '5:45:30 pm is 17:45:30');
-});
-
 QUnit.test('Date.strftime', function(assert) {
     var date = new Date(2014, 6, 1, 11, 0, 5);
     assert.equal(date.strftime('%Y-%m-%d %H:%M:%S'), '2014-07-01 11:00:05');

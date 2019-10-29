@@ -10,9 +10,8 @@ from django import db
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.core.management import call_command
-from django.test import (
-    TestCase, TransactionTestCase, skipUnlessDBFeature, testcases,
-)
+from django.core.management.base import SystemCheckError
+from django.test import TransactionTestCase, skipUnlessDBFeature, testcases
 from django.test.runner import DiscoverRunner
 from django.test.testcases import connections_support_transactions
 from django.test.utils import dependency_ordered
@@ -156,13 +155,11 @@ class CustomTestRunnerOptionsSettingsTests(AdminScriptTestCase):
     through a settings file.
     """
     def setUp(self):
+        super().setUp()
         settings = {
             'TEST_RUNNER': '\'test_runner.runner.CustomOptionsTestRunner\'',
         }
         self.write_settings('settings.py', sdict=settings)
-
-    def tearDown(self):
-        self.remove_settings('settings.py')
 
     def test_default_options(self):
         args = ['test', '--settings=test_project.settings']
@@ -196,10 +193,8 @@ class CustomTestRunnerOptionsCmdlineTests(AdminScriptTestCase):
     using --testrunner.
     """
     def setUp(self):
+        super().setUp()
         self.write_settings('settings.py')
-
-    def tearDown(self):
-        self.remove_settings('settings.py')
 
     def test_testrunner_option(self):
         args = [
@@ -229,10 +224,8 @@ class CustomTestRunnerOptionsCmdlineTests(AdminScriptTestCase):
 
 class Ticket17477RegressionTests(AdminScriptTestCase):
     def setUp(self):
+        super().setUp()
         self.write_settings('settings.py')
-
-    def tearDown(self):
-        self.remove_settings('settings.py')
 
     def test_ticket_17477(self):
         """'manage.py help test' works after r16352."""
@@ -241,13 +234,24 @@ class Ticket17477RegressionTests(AdminScriptTestCase):
         self.assertNoOutput(err)
 
 
-class Sqlite3InMemoryTestDbs(TestCase):
-    multi_db = True
+class SQLiteInMemoryTestDbs(TransactionTestCase):
+    available_apps = ['test_runner']
+    databases = {'default', 'other'}
 
     @unittest.skipUnless(all(db.connections[conn].vendor == 'sqlite' for conn in db.connections),
                          "This is an sqlite-specific issue")
     def test_transaction_support(self):
-        """Ticket #16329: sqlite3 in-memory test databases"""
+        # Assert connections mocking is appropriately applied by preventing
+        # any attempts at calling create_test_db on the global connection
+        # objects.
+        for connection in db.connections.all():
+            create_test_db = mock.patch.object(
+                connection.creation,
+                'create_test_db',
+                side_effect=AssertionError("Global connection object shouldn't be manipulated.")
+            )
+            create_test_db.start()
+            self.addCleanup(create_test_db.stop)
         for option_key, option_value in (
                 ('NAME', ':memory:'), ('TEST', {'NAME': ':memory:'})):
             tested_connections = db.ConnectionHandler({
@@ -260,16 +264,17 @@ class Sqlite3InMemoryTestDbs(TestCase):
                     option_key: option_value,
                 },
             })
-            with mock.patch('django.db.connections', new=tested_connections):
-                with mock.patch('django.test.testcases.connections', new=tested_connections):
-                    other = tested_connections['other']
-                    DiscoverRunner(verbosity=0).setup_databases()
-                    msg = ("DATABASES setting '%s' option set to sqlite3's ':memory:' value "
-                           "shouldn't interfere with transaction support detection." % option_key)
-                    # Transaction support should be properly initialized for the 'other' DB
-                    self.assertTrue(other.features.supports_transactions, msg)
-                    # And all the DBs should report that they support transactions
-                    self.assertTrue(connections_support_transactions(), msg)
+            with mock.patch('django.test.utils.connections', new=tested_connections):
+                other = tested_connections['other']
+                DiscoverRunner(verbosity=0).setup_databases()
+                msg = (
+                    "DATABASES setting '%s' option set to sqlite3's ':memory:' value "
+                    "shouldn't interfere with transaction support detection." % option_key
+                )
+                # Transaction support is properly initialized for the 'other' DB.
+                self.assertTrue(other.features.supports_transactions, msg)
+                # And all the DBs report that they support transactions.
+                self.assertTrue(connections_support_transactions(), msg)
 
 
 class DummyBackendTest(unittest.TestCase):
@@ -287,7 +292,7 @@ class DummyBackendTest(unittest.TestCase):
 class AliasedDefaultTestSetupTest(unittest.TestCase):
     def test_setup_aliased_default_database(self):
         """
-        setup_datebases() doesn't fail when 'default' is aliased
+        setup_databases() doesn't fail when 'default' is aliased
         """
         tested_connections = db.ConnectionHandler({
             'default': {
@@ -407,3 +412,59 @@ class EmptyDefaultDatabaseTest(unittest.TestCase):
         connection = testcases.connections[db.utils.DEFAULT_DB_ALIAS]
         self.assertEqual(connection.settings_dict['ENGINE'], 'django.db.backends.dummy')
         connections_support_transactions()
+
+
+class RunTestsExceptionHandlingTests(unittest.TestCase):
+    def test_run_checks_raises(self):
+        """
+        Teardown functions are run when run_checks() raises SystemCheckError.
+        """
+        with mock.patch('django.test.runner.DiscoverRunner.setup_test_environment'), \
+                mock.patch('django.test.runner.DiscoverRunner.setup_databases'), \
+                mock.patch('django.test.runner.DiscoverRunner.build_suite'), \
+                mock.patch('django.test.runner.DiscoverRunner.run_checks', side_effect=SystemCheckError), \
+                mock.patch('django.test.runner.DiscoverRunner.teardown_databases') as teardown_databases, \
+                mock.patch('django.test.runner.DiscoverRunner.teardown_test_environment') as teardown_test_environment:
+            runner = DiscoverRunner(verbosity=0, interactive=False)
+            with self.assertRaises(SystemCheckError):
+                runner.run_tests(['test_runner_apps.sample.tests_sample.TestDjangoTestCase'])
+            self.assertTrue(teardown_databases.called)
+            self.assertTrue(teardown_test_environment.called)
+
+    def test_run_checks_raises_and_teardown_raises(self):
+        """
+        SystemCheckError is surfaced when run_checks() raises SystemCheckError
+        and teardown databases() raises ValueError.
+        """
+        with mock.patch('django.test.runner.DiscoverRunner.setup_test_environment'), \
+                mock.patch('django.test.runner.DiscoverRunner.setup_databases'), \
+                mock.patch('django.test.runner.DiscoverRunner.build_suite'), \
+                mock.patch('django.test.runner.DiscoverRunner.run_checks', side_effect=SystemCheckError), \
+                mock.patch('django.test.runner.DiscoverRunner.teardown_databases', side_effect=ValueError) \
+                as teardown_databases, \
+                mock.patch('django.test.runner.DiscoverRunner.teardown_test_environment') as teardown_test_environment:
+            runner = DiscoverRunner(verbosity=0, interactive=False)
+            with self.assertRaises(SystemCheckError):
+                runner.run_tests(['test_runner_apps.sample.tests_sample.TestDjangoTestCase'])
+            self.assertTrue(teardown_databases.called)
+            self.assertFalse(teardown_test_environment.called)
+
+    def test_run_checks_passes_and_teardown_raises(self):
+        """
+        Exceptions on teardown are surfaced if no exceptions happen during
+        run_checks().
+        """
+        with mock.patch('django.test.runner.DiscoverRunner.setup_test_environment'), \
+                mock.patch('django.test.runner.DiscoverRunner.setup_databases'), \
+                mock.patch('django.test.runner.DiscoverRunner.build_suite'), \
+                mock.patch('django.test.runner.DiscoverRunner.run_checks'), \
+                mock.patch('django.test.runner.DiscoverRunner.teardown_databases', side_effect=ValueError) \
+                as teardown_databases, \
+                mock.patch('django.test.runner.DiscoverRunner.teardown_test_environment') as teardown_test_environment:
+            runner = DiscoverRunner(verbosity=0, interactive=False)
+            with self.assertRaises(ValueError):
+                # Suppress the output when running TestDjangoTestCase.
+                with mock.patch('sys.stderr'):
+                    runner.run_tests(['test_runner_apps.sample.tests_sample.TestDjangoTestCase'])
+            self.assertTrue(teardown_databases.called)
+            self.assertFalse(teardown_test_environment.called)

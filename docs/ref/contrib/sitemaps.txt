@@ -5,8 +5,8 @@ The sitemap framework
 .. module:: django.contrib.sitemaps
    :synopsis: A framework for generating Google sitemap XML files.
 
-Django comes with a high-level sitemap-generating framework that makes
-creating sitemap_ XML files easy.
+Django comes with a high-level sitemap-generating framework to create sitemap_
+XML files.
 
 .. _sitemap: https://www.sitemaps.org/
 
@@ -22,7 +22,7 @@ The Django sitemap framework automates the creation of this XML file by letting
 you express this information in Python code.
 
 It works much like Django's :doc:`syndication framework
-</ref/contrib/syndication>`. To create a sitemap, just write a
+</ref/contrib/syndication>`. To create a sitemap, write a
 :class:`~django.contrib.sitemaps.Sitemap` class and point to it in your
 :doc:`URLconf </topics/http/urls>`.
 
@@ -31,15 +31,13 @@ Installation
 
 To install the sitemap app, follow these steps:
 
-1. Add ``'django.contrib.sitemaps'`` to your :setting:`INSTALLED_APPS`
-   setting.
+#. Add ``'django.contrib.sitemaps'`` to your :setting:`INSTALLED_APPS` setting.
 
-2. Make sure your :setting:`TEMPLATES` setting contains a ``DjangoTemplates``
+#. Make sure your :setting:`TEMPLATES` setting contains a ``DjangoTemplates``
    backend whose ``APP_DIRS`` options is set to ``True``. It's in there by
    default, so you'll only need to change this if you've changed that setting.
 
-3. Make sure you've installed the
-   :mod:`sites framework <django.contrib.sites>`.
+#. Make sure you've installed the :mod:`sites framework<django.contrib.sites>`.
 
 (Note: The sitemap application doesn't install any database tables. The only
 reason it needs to go into :setting:`INSTALLED_APPS` is so that the
@@ -78,11 +76,11 @@ a :class:`~django.contrib.sitemaps.Sitemap` class (e.g.,
 ``Sitemap`` classes
 ===================
 
-A :class:`~django.contrib.sitemaps.Sitemap` class is a simple Python
-class that represents a "section" of entries in your sitemap. For example,
-one :class:`~django.contrib.sitemaps.Sitemap` class could represent
-all the entries of your Weblog, while another could represent all of the
-events in your events calendar.
+A :class:`~django.contrib.sitemaps.Sitemap` class is a Python class that
+represents a "section" of entries in your sitemap. For example, one
+:class:`~django.contrib.sitemaps.Sitemap` class could represent all the entries
+of your Weblog, while another could represent all of the events in your events
+calendar.
 
 In the simplest case, all these sections get lumped together into one
 :file:`sitemap.xml`, but it's also possible to use the framework to generate a
@@ -92,8 +90,8 @@ sitemap index that references individual sitemap files, one per section. (See
 :class:`~django.contrib.sitemaps.Sitemap` classes must subclass
 ``django.contrib.sitemaps.Sitemap``. They can live anywhere in your codebase.
 
-A simple example
-================
+An example
+==========
 
 Let's assume you have a blog system, with an ``Entry`` model, and you want your
 sitemap to include all the links to your individual blog entries. Here's how
@@ -118,9 +116,9 @@ Note:
   attributes corresponding to ``<changefreq>`` and ``<priority>`` elements,
   respectively. They can be made callable as functions, as
   :attr:`~Sitemap.lastmod` was in the example.
-* :attr:`~Sitemap.items()` is simply a method that returns a list of
-  objects. The objects returned will get passed to any callable methods
-  corresponding to a sitemap property (:attr:`~Sitemap.location`,
+* :attr:`~Sitemap.items()` is a method that returns a :term:`sequence` or
+  ``QuerySet`` of objects. The objects returned will get passed to any callable
+  methods corresponding to a sitemap property (:attr:`~Sitemap.location`,
   :attr:`~Sitemap.lastmod`, :attr:`~Sitemap.changefreq`, and
   :attr:`~Sitemap.priority`).
 * :attr:`~Sitemap.lastmod` should return a :class:`~datetime.datetime`.
@@ -138,11 +136,11 @@ Note:
 
     .. attribute:: Sitemap.items
 
-        **Required.** A method that returns a list of objects. The framework
-        doesn't care what *type* of objects they are; all that matters is that
-        these objects get passed to the :attr:`~Sitemap.location()`,
-        :attr:`~Sitemap.lastmod()`, :attr:`~Sitemap.changefreq()` and
-        :attr:`~Sitemap.priority()` methods.
+        **Required.** A method that returns a :term:`sequence` or ``QuerySet``
+        of objects. The framework doesn't care what *type* of objects they are;
+        all that matters is that these objects get passed to the
+        :attr:`~Sitemap.location()`, :attr:`~Sitemap.lastmod()`,
+        :attr:`~Sitemap.changefreq()` and :attr:`~Sitemap.priority()` methods.
 
     .. attribute:: Sitemap.location
 
@@ -483,13 +481,20 @@ You may want to "ping" Google when your sitemap changes, to let it know to
 reindex your site. The sitemaps framework provides a function to do just
 that: :func:`django.contrib.sitemaps.ping_google()`.
 
-.. function:: ping_google
+.. function:: ping_google(sitemap_url=None, ping_url=PING_URL, sitemap_uses_https=True)
 
-    :func:`ping_google` takes an optional argument, ``sitemap_url``,
-    which should be the absolute path to your site's sitemap (e.g.,
-    :file:`'/sitemap.xml'`). If this argument isn't provided,
-    :func:`ping_google` will attempt to figure out your
-    sitemap by performing a reverse looking in your URLconf.
+    ``ping_google`` takes these optional arguments:
+
+    * ``sitemap_url`` - The absolute path to your site's sitemap (e.g.,
+      :file:`'/sitemap.xml'`). If this argument isn't provided, ``ping_google``
+      will attempt to figure out your sitemap by performing a reverse lookup in
+      your URLconf.
+
+    * ``ping_url`` - Defaults to Google's Ping Tool:
+      https://www.google.com/webmasters/tools/ping.
+
+    * ``sitemap_uses_https`` - Set to ``False`` if your site uses ``http``
+      rather than ``https``.
 
     :func:`ping_google` raises the exception
     ``django.contrib.sitemaps.SitemapNotFound`` if it cannot determine your
@@ -532,3 +537,7 @@ Once the sitemaps application is added to your project, you may also
 ping Google using the ``ping_google`` management command::
 
     python manage.py ping_google [/sitemap.xml]
+
+.. django-admin-option:: --sitemap-uses-http
+
+Use this option if your sitemap uses ``http`` rather than ``https``.

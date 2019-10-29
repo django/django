@@ -4,13 +4,13 @@
 # Evelijn Saaltink <evelijnsaaltink@gmail.com>, 2016
 # Ilja Maas <iljamaas@dreamsolution.nl>, 2015
 # Sander Steffann <inactive+steffann@transifex.com>, 2015
-# Tonnes <tonnes.mb@gmail.com>, 2017
+# Tonnes <tonnes.mb@gmail.com>, 2017,2019
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-09-21 22:44+0000\n"
+"POT-Creation-Date: 2018-05-17 11:49+0200\n"
+"PO-Revision-Date: 2019-02-19 08:36+0000\n"
 "Last-Translator: Tonnes <tonnes.mb@gmail.com>\n"
 "Language-Team: Dutch (http://www.transifex.com/django/django/language/nl/)\n"
 "MIME-Version: 1.0\n"
@@ -23,11 +23,11 @@ msgid "PostgreSQL extensions"
 msgstr "PostgreSQL-extensies"
 
 #, python-format
-msgid "Item %(nth)s in the array did not validate: "
-msgstr "Item %(nth)s in de lijst werd niet gevalideerd:"
+msgid "Item %(nth)s in the array did not validate:"
+msgstr "Item %(nth)s in de matrix is niet gevalideerd:"
 
 msgid "Nested arrays must have the same length."
-msgstr "Lijsten met meerdere lagen moeten allemaal dezelfde lengte hebben."
+msgstr "Geneste matrices moeten dezelfde lengte hebben."
 
 msgid "Map of strings to strings/nulls"
 msgstr "Toewijzing van tekenreeksen naar tekenreeksen/nulwaarden"
@@ -40,7 +40,7 @@ msgid "A JSON object"
 msgstr "Een JSON-object"
 
 msgid "Value must be valid JSON."
-msgstr "De waarde moet valide JSON zijn."
+msgstr "De waarde moet geldige JSON zijn."
 
 msgid "Could not load JSON data."
 msgstr "Kon JSON-gegevens niet laden."

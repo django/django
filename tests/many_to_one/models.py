@@ -20,15 +20,21 @@ class Article(models.Model):
     pub_date = models.DateField()
     reporter = models.ForeignKey(Reporter, models.CASCADE)
 
+    class Meta:
+        ordering = ('headline',)
+
     def __str__(self):
         return self.headline
 
-    class Meta:
-        ordering = ('headline',)
+
+class Country(models.Model):
+    id = models.SmallAutoField(primary_key=True)
+    name = models.CharField(max_length=50)
 
 
 class City(models.Model):
     id = models.BigAutoField(primary_key=True)
+    country = models.ForeignKey(Country, models.CASCADE, related_name='cities', null=True)
     name = models.CharField(max_length=50)
 
     def __str__(self):
@@ -70,8 +76,12 @@ class Child(models.Model):
     parent = models.ForeignKey(Parent, models.CASCADE)
 
 
+class ChildNullableParent(models.Model):
+    parent = models.ForeignKey(Parent, models.CASCADE, null=True)
+
+
 class ToFieldChild(models.Model):
-    parent = models.ForeignKey(Parent, models.CASCADE, to_field='name')
+    parent = models.ForeignKey(Parent, models.CASCADE, to_field='name', related_name='to_field_children')
 
 
 # Multiple paths to the same model (#7110, #7125)

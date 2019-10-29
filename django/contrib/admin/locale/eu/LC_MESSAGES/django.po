@@ -2,7 +2,7 @@
 #
 # Translators:
 # Aitzol Naberan <anaberan@codesyntax.com>, 2013,2016
-# Eneko Illarramendi <eneko@illarra.com>, 2017-2018
+# Eneko Illarramendi <eneko@illarra.com>, 2017-2019
 # Jannis Leidel <jannis@leidel.info>, 2011
 # julen, 2012-2013
 # julen, 2013
@@ -11,8 +11,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-05-21 14:16-0300\n"
-"PO-Revision-Date: 2018-08-28 10:32+0000\n"
+"POT-Creation-Date: 2019-01-16 20:42+0100\n"
+"PO-Revision-Date: 2019-01-22 09:57+0000\n"
 "Last-Translator: Eneko Illarramendi <eneko@illarra.com>\n"
 "Language-Team: Basque (http://www.transifex.com/django/django/language/eu/)\n"
 "MIME-Version: 1.0\n"
@@ -112,7 +112,7 @@ msgid "object id"
 msgstr "objetuaren id-a"
 
 #. Translators: 'repr' means representation
-#. (https://docs.python.org/3/library/functions.html#repr)
+#. (https://docs.python.org/library/functions.html#repr)
 msgid "object repr"
 msgstr "objeturaren adierazpena"
 
@@ -541,24 +541,8 @@ msgstr "Erakutsi dena"
 msgid "Save"
 msgstr "Gorde"
 
-msgid "Popup closing..."
-msgstr "Popupa ixten..."
-
-#, python-format
-msgid "Change selected %(model)s"
-msgstr "Aldatu aukeratutako %(model)s"
-
-#, python-format
-msgid "View selected %(model)s"
-msgstr "Ikusi aukeratutako %(model)s"
-
-#, python-format
-msgid "Add another %(model)s"
-msgstr "Gehitu beste %(model)s"
-
-#, python-format
-msgid "Delete selected %(model)s"
-msgstr "Ezabatu aukeratutako %(model)s"
+msgid "Popup closing…"
+msgstr "Popup leihoa ixten..."
 
 msgid "Search"
 msgstr "Bilatu"
@@ -587,6 +571,18 @@ msgstr "Gorde eta ikusi"
 
 msgid "Close"
 msgstr "Itxi"
+
+#, python-format
+msgid "Change selected %(model)s"
+msgstr "Aldatu aukeratutako %(model)s"
+
+#, python-format
+msgid "Add another %(model)s"
+msgstr "Gehitu beste %(model)s"
+
+#, python-format
+msgid "Delete selected %(model)s"
+msgstr "Ezabatu aukeratutako %(model)s"
 
 msgid "Thanks for spending some quality time with the Web site today."
 msgstr "Eskerrik asko webguneari zure probetxuzko denbora eskaintzeagatik."

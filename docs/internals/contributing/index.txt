@@ -6,6 +6,11 @@ Django is a community that lives on its volunteers. As it keeps growing, we
 always need more people to help others. As soon as you learn Django, you can
 contribute in many ways:
 
+* Join the `Django forum`_. This forum is a place for discussing the Django
+  framework and applications and projects that use it. This is also a good
+  place to ask and answer any questions related to installing, using, or
+  contributing to Django.
+
 * Join the |django-users| mailing list and answer questions. This
   mailing list has a huge audience, and we really want to maintain a
   friendly and helpful atmosphere. If you're new to the Django community,
@@ -36,7 +41,7 @@ development:
   on the `#django-dev IRC channel`_.
 
 * :doc:`Submit patches <writing-code/submitting-patches>` for new and/or
-  fixed behavior. If you're looking for an easy way to start contributing
+  fixed behavior. If you're looking for a way to get started contributing
   to Django read the :doc:`/intro/contributing` tutorial and have a look at the
   `easy pickings`_ tickets. The :ref:`patch-review-checklist` will also be
   helpful.
@@ -66,6 +71,7 @@ Browse the following sections to find out how:
 .. _#django IRC channel: irc://irc.freenode.net/django
 .. _#django-dev IRC channel: irc://irc.freenode.net/django-dev
 .. _community page: https://www.djangoproject.com/community/
+.. _Django forum: https://forum.djangoproject.com/
 .. _register it here: https://www.djangoproject.com/community/add/blogs/
 .. _ticket tracker: https://code.djangoproject.com/
 .. _easy pickings: https://code.djangoproject.com/query?status=!closed&easy=1

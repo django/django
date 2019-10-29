@@ -263,7 +263,6 @@ p.datetime {
 }
 
 .datetime input, .form-row .datetime input.vDateField, .form-row .datetime input.vTimeField {
-    min-width: 0;
     margin-left: 5px;
     margin-bottom: 4px;
 }

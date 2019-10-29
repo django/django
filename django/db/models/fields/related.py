@@ -4,6 +4,7 @@ from functools import partial
 
 from django import forms
 from django.apps import apps
+from django.conf import SettingsReference
 from django.core import checks, exceptions
 from django.db import connection, router
 from django.db.backends import utils
@@ -18,9 +19,9 @@ from django.utils.translation import gettext_lazy as _
 from . import Field
 from .mixins import FieldCacheMixin
 from .related_descriptors import (
-    ForwardManyToOneDescriptor, ForwardOneToOneDescriptor,
-    ManyToManyDescriptor, ReverseManyToOneDescriptor,
-    ReverseOneToOneDescriptor,
+    ForeignKeyDeferredAttribute, ForwardManyToOneDescriptor,
+    ForwardOneToOneDescriptor, ManyToManyDescriptor,
+    ReverseManyToOneDescriptor, ReverseOneToOneDescriptor,
 )
 from .related_lookups import (
     RelatedExact, RelatedGreaterThan, RelatedGreaterThanOrEqual, RelatedIn,
@@ -590,7 +591,6 @@ class ForeignObject(RelatedField):
                         % (kwargs['to'].setting_name, swappable_setting)
                     )
             # Set it
-            from django.db.migrations.writer import SettingsReference
             kwargs['to'] = SettingsReference(
                 kwargs['to'],
                 swappable_setting,
@@ -764,7 +764,7 @@ class ForeignKey(ForeignObject):
     By default ForeignKey will target the pk of the remote model but this
     behavior can be changed by using the ``to_field`` argument.
     """
-
+    descriptor_class = ForeignKeyDeferredAttribute
     # Field flags
     many_to_many = False
     many_to_one = True
@@ -797,6 +797,8 @@ class ForeignKey(ForeignObject):
             # the to_field during FK construction. It won't be guaranteed to
             # be correct until contribute_to_class is called. Refs #12190.
             to_field = to_field or (to._meta.pk and to._meta.pk.name)
+        if not callable(on_delete):
+            raise TypeError('on_delete must be callable.')
 
         kwargs['rel'] = self.rel_class(
             self, to, to_field,
@@ -939,6 +941,9 @@ class ForeignKey(ForeignObject):
     def get_db_prep_value(self, value, connection, prepared=False):
         return self.target_field.get_db_prep_value(value, connection, prepared)
 
+    def get_prep_value(self, value):
+        return self.target_field.get_prep_value(value)
+
     def contribute_to_related_class(self, cls, related):
         super().contribute_to_related_class(cls, related)
         if self.remote_field.field_name is None:
@@ -977,7 +982,13 @@ class ForeignKey(ForeignObject):
         return converters
 
     def get_col(self, alias, output_field=None):
-        return super().get_col(alias, output_field or self.target_field)
+        if output_field is None:
+            output_field = self.target_field
+            while isinstance(output_field, ForeignKey):
+                output_field = output_field.target_field
+                if output_field is self:
+                    raise ValueError('Cannot resolve output_field.')
+        return super().get_col(alias, output_field)
 
 
 class OneToOneField(ForeignKey):
@@ -1020,6 +1031,10 @@ class OneToOneField(ForeignKey):
             setattr(instance, self.name, data)
         else:
             setattr(instance, self.attname, data)
+            # Remote field object must be cleared otherwise Model.save()
+            # will reassign attname using the related object pk.
+            if data is None:
+                setattr(instance, self.name, data)
 
     def _check_unique(self, **kwargs):
         # Override ForeignKey since check isn't applicable here.
@@ -1219,18 +1234,6 @@ class ManyToManyField(RelatedField):
                 to_model_name = to_model._meta.object_name
             relationship_model_name = self.remote_field.through._meta.object_name
             self_referential = from_model == to_model
-
-            # Check symmetrical attribute.
-            if (self_referential and self.remote_field.symmetrical and
-                    not self.remote_field.through._meta.auto_created):
-                errors.append(
-                    checks.Error(
-                        'Many-to-many fields with intermediate tables must not be symmetrical.',
-                        obj=self,
-                        id='fields.E332',
-                    )
-                )
-
             # Count foreign keys in intermediate model
             if self_referential:
                 seen_self = sum(
@@ -1404,7 +1407,7 @@ class ManyToManyField(RelatedField):
                 opts = model._meta.auto_created._meta
                 clashing_obj = '%s.%s' % (opts.label, _get_field_name(model))
             else:
-                clashing_obj = '%s' % model._meta.label
+                clashing_obj = model._meta.label
             return [
                 checks.Error(
                     "The field's intermediary table '%s' clashes with the "
@@ -1451,7 +1454,6 @@ class ManyToManyField(RelatedField):
                         "(%s and %s)" % (kwargs['to'].setting_name, swappable_setting)
                     )
 
-            from django.db.migrations.writer import SettingsReference
             kwargs['to'] = SettingsReference(
                 kwargs['to'],
                 swappable_setting,

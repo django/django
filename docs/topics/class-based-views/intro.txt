@@ -25,7 +25,7 @@ these patterns and ease view development for the common cases.
 
 The problem with function-based generic views is that while they covered the
 simple cases well, there was no way to extend or customize them beyond some
-simple configuration options, limiting their usefulness in many real-world
+configuration options, limiting their usefulness in many real-world
 applications.
 
 Class-based generic views were created with the same objective as
@@ -35,9 +35,9 @@ results in class-based generic views being more extensible and flexible than
 their function-based counterparts.
 
 If you have tried function based generic views in the past and found them
-lacking, you should not think of class-based generic views as simply a
-class-based equivalent, but rather as a fresh approach to solving the original
-problems that generic views were meant to solve.
+lacking, you should not think of class-based generic views as a class-based
+equivalent, but rather as a fresh approach to solving the original problems
+that generic views were meant to solve.
 
 The toolkit of base classes and mixins that Django uses to build class-based
 generic views are built for maximum flexibility, and as such have many hooks in
@@ -45,11 +45,11 @@ the form of default method implementations and attributes that you are unlikely
 to be concerned with in the simplest use cases. For example, instead of
 limiting you to a class-based attribute for ``form_class``, the implementation
 uses a ``get_form`` method, which calls a ``get_form_class`` method, which in
-its default implementation just returns the ``form_class`` attribute of the
-class. This gives you several options for specifying what form to use, from a
-simple attribute, to a fully dynamic, callable hook. These options seem to add
-hollow complexity for simple situations, but without them, more advanced
-designs would be limited.
+its default implementation returns the ``form_class`` attribute of the class.
+This gives you several options for specifying what form to use, from an
+attribute, to a fully dynamic, callable hook. These options seem to add hollow
+complexity for simple situations, but without them, more advanced designs would
+be limited.
 
 Using class-based views
 =======================
@@ -82,11 +82,12 @@ Because Django's URL resolver expects to send the request and associated
 arguments to a callable function, not a class, class-based views have an
 :meth:`~django.views.generic.base.View.as_view` class method which returns a
 function that can be called when a request arrives for a URL matching the
-associated pattern. The function creates an instance of the class and calls its
-:meth:`~django.views.generic.base.View.dispatch` method. ``dispatch`` looks at
-the request to determine whether it is a ``GET``, ``POST``, etc, and relays the
-request to a matching method if one is defined, or raises
-:class:`~django.http.HttpResponseNotAllowed` if not::
+associated pattern. The function creates an instance of the class, calls
+:meth:`~django.views.generic.base.View.setup` to initialize its attributes, and
+then calls its :meth:`~django.views.generic.base.View.dispatch` method.
+``dispatch`` looks at the request to determine whether it is a ``GET``,
+``POST``, etc, and relays the request to a matching method if one is defined,
+or raises :class:`~django.http.HttpResponseNotAllowed` if not::
 
     # urls.py
     from django.urls import path
@@ -220,7 +221,7 @@ A similar class-based view might look like::
 
             return render(request, self.template_name, {'form': form})
 
-This is a very simple case, but you can see that you would then have the option
+This is a minimal case, but you can see that you would then have the option
 of customizing this view by overriding any of the class attributes, e.g.
 ``form_class``, via URLconf configuration, or subclassing and overriding one or
 more of the methods (or both!).
@@ -235,9 +236,9 @@ differently depending on if you're using ``as_view()`` or creating a subclass.
 Decorating in URLconf
 ---------------------
 
-The simplest way of decorating class-based views is to decorate the
-result of the :meth:`~django.views.generic.base.View.as_view` method.
-The easiest place to do this is in the URLconf where you deploy your view::
+You can adjust class-based views by decorating the result of the
+:meth:`~django.views.generic.base.View.as_view` method. The easiest place to do
+this is in the URLconf where you deploy your view::
 
     from django.contrib.auth.decorators import login_required, permission_required
     from django.views.generic import TemplateView
@@ -262,11 +263,11 @@ To decorate every instance of a class-based view, you need to decorate
 the class definition itself. To do this you apply the decorator to the
 :meth:`~django.views.generic.base.View.dispatch` method of the class.
 
-A method on a class isn't quite the same as a standalone function, so
-you can't just apply a function decorator to the method -- you need to
-transform it into a method decorator first. The ``method_decorator``
-decorator transforms a function decorator into a method decorator so
-that it can be used on an instance method. For example::
+A method on a class isn't quite the same as a standalone function, so you can't
+just apply a function decorator to the method -- you need to transform it into
+a method decorator first. The ``method_decorator`` decorator transforms a
+function decorator into a method decorator so that it can be used on an
+instance method. For example::
 
     from django.contrib.auth.decorators import login_required
     from django.utils.decorators import method_decorator
@@ -305,7 +306,10 @@ The decorators will process a request in the order they are passed to the
 decorator. In the example, ``never_cache()`` will process the request before
 ``login_required()``.
 
-In this example, every instance of ``ProtectedView`` will have login protection.
+In this example, every instance of ``ProtectedView`` will have login
+protection. These examples use ``login_required``, however, the same behavior
+can be obtained by using
+:class:`~django.contrib.auth.mixins.LoginRequiredMixin`.
 
 .. note::
 

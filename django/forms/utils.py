@@ -2,7 +2,7 @@ import json
 from collections import UserList
 
 from django.conf import settings
-from django.core.exceptions import ValidationError  # backwards compatibility
+from django.core.exceptions import ValidationError
 from django.utils import timezone
 from django.utils.html import escape, format_html, format_html_join, html_safe
 from django.utils.translation import gettext_lazy as _
@@ -159,7 +159,7 @@ def from_current_timezone(value):
             return timezone.make_aware(value, current_timezone)
         except Exception as exc:
             raise ValidationError(
-                _('%(datetime)s couldn\'t be interpreted '
+                _('%(datetime)s couldn’t be interpreted '
                   'in time zone %(current_timezone)s; it '
                   'may be ambiguous or it may not exist.'),
                 code='ambiguous_timezone',

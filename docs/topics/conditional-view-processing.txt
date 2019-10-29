@@ -71,7 +71,7 @@ if they are not already set by the view and if the request's method is safe
 (``GET`` or ``HEAD``).
 
 Using this feature usefully is probably best explained with an example.
-Suppose you have this pair of models, representing a simple blog system::
+Suppose you have this pair of models, representing a small blog system::
 
     import datetime
     from django.db import models
@@ -176,16 +176,16 @@ trying to change has been altered in the meantime.
 
 For example, consider the following exchange between the client and server:
 
-1. Client requests ``/foo/``.
-2. Server responds with some content with an ETag of ``"abcd1234"``.
-3. Client sends an HTTP ``PUT`` request to ``/foo/`` to update the
+#. Client requests ``/foo/``.
+#. Server responds with some content with an ETag of ``"abcd1234"``.
+#. Client sends an HTTP ``PUT`` request to ``/foo/`` to update the
    resource. It also sends an ``If-Match: "abcd1234"`` header to specify
    the version it is trying to update.
-4. Server checks to see if the resource has changed, by computing the ETag
+#. Server checks to see if the resource has changed, by computing the ETag
    the same way it does for a ``GET`` request (using the same function).
    If the resource *has* changed, it will return a 412 status code,
    meaning "precondition failed".
-5. Client sends a ``GET`` request to ``/foo/``, after receiving a 412
+#. Client sends a ``GET`` request to ``/foo/``, after receiving a 412
    response, to retrieve an updated version of the content before updating
    it.
 
@@ -205,10 +205,9 @@ every time.
 Comparison with middleware conditional processing
 =================================================
 
-Django provides simple and straightforward conditional ``GET`` handling via
-:class:`django.middleware.http.ConditionalGetMiddleware`. While being easy to
-use and suitable for many situations, the middleware has limitations for
-advanced usage:
+Django provides conditional ``GET`` handling via
+:class:`django.middleware.http.ConditionalGetMiddleware`. While being suitable
+for many situations, the middleware has limitations for advanced usage:
 
 * It's applied globally to all views in your project.
 * It doesn't save you from generating the response, which may be expensive.

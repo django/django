@@ -50,5 +50,5 @@ class CotTests(TestCase):
         with register_lookup(DecimalField, Cot):
             DecimalModel.objects.create(n1=Decimal('12.0'), n2=Decimal('0'))
             DecimalModel.objects.create(n1=Decimal('1.0'), n2=Decimal('0'))
-            objs = DecimalModel.objects.filter(n1__cot__gt=0)
-            self.assertQuerysetEqual(objs, [Decimal('1.0')], lambda a: a.n1)
+            obj = DecimalModel.objects.filter(n1__cot__gt=0).get()
+            self.assertEqual(obj.n1, Decimal('1.0'))

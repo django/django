@@ -15,12 +15,6 @@ class SimpleDatabaseOperationTests(SimpleTestCase):
     def setUp(self):
         self.ops = BaseDatabaseOperations(connection=connection)
 
-    @skipIfDBFeature('can_distinct_on_fields')
-    def test_distinct_on_fields(self):
-        msg = 'DISTINCT ON fields is not supported by this database backend'
-        with self.assertRaisesMessage(NotSupportedError, msg):
-            self.ops.distinct_sql(['a', 'b'], None)
-
     def test_deferrable_sql(self):
         self.assertEqual(self.ops.deferrable_sql(), '')
 
@@ -43,7 +37,7 @@ class SimpleDatabaseOperationTests(SimpleTestCase):
         self.assertEqual(self.ops.set_time_zone_sql(), '')
 
     def test_sql_flush(self):
-        msg = 'subclasses of BaseDatabaseOperations must provide an sql_flush() method'
+        msg = 'subclasses of BaseDatabaseOperations must provide a sql_flush() method'
         with self.assertRaisesMessage(NotImplementedError, msg):
             self.ops.sql_flush(None, None, None)
 
@@ -123,6 +117,23 @@ class SimpleDatabaseOperationTests(SimpleTestCase):
         with self.assertRaisesMessage(NotImplementedError, self.may_requre_msg % 'datetime_extract_sql'):
             self.ops.datetime_extract_sql(None, None, None)
 
+
+class DatabaseOperationTests(TestCase):
+    def setUp(self):
+        self.ops = BaseDatabaseOperations(connection=connection)
+
+    @skipIfDBFeature('supports_over_clause')
+    def test_window_frame_raise_not_supported_error(self):
+        msg = 'This backend does not support window expressions.'
+        with self.assertRaisesMessage(NotSupportedError, msg):
+            self.ops.window_frame_rows_start_end()
+
+    @skipIfDBFeature('can_distinct_on_fields')
+    def test_distinct_on_fields(self):
+        msg = 'DISTINCT ON fields is not supported by this database backend'
+        with self.assertRaisesMessage(NotSupportedError, msg):
+            self.ops.distinct_sql(['a', 'b'], None)
+
     @skipIfDBFeature('supports_temporal_subtraction')
     def test_subtract_temporals(self):
         duration_field = DurationField()
@@ -133,13 +144,3 @@ class SimpleDatabaseOperationTests(SimpleTestCase):
         )
         with self.assertRaisesMessage(NotSupportedError, msg):
             self.ops.subtract_temporals(duration_field_internal_type, None, None)
-
-
-class DatabaseOperationTests(TestCase):
-    # Checking the 'supports_over_clause' feature requires a query for the
-    # MySQL backend to perform a version check.
-    @skipIfDBFeature('supports_over_clause')
-    def test_window_frame_raise_not_supported_error(self):
-        msg = 'This backend does not support window expressions.'
-        with self.assertRaisesMessage(NotSupportedError, msg):
-            connection.ops.window_frame_rows_start_end()

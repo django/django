@@ -5,7 +5,7 @@
 # Dimitris Glezos <glezos@transifex.com>, 2011,2013,2017
 # Giannis Meletakis <meletakis@gmail.com>, 2015
 # Jannis Leidel <jannis@leidel.info>, 2011
-# Nick Mavrakis <mavrakis.n@gmail.com>, 2017-2018
+# Nick Mavrakis <mavrakis.n@gmail.com>, 2017-2019
 # Nikolas Demiridis <nikolas@demiridis.gr>, 2014
 # Nick Mavrakis <mavrakis.n@gmail.com>, 2016
 # Pãnoș <panos.laganakos@gmail.com>, 2014
@@ -17,8 +17,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-05-17 11:49+0200\n"
-"PO-Revision-Date: 2018-09-22 10:11+0000\n"
+"POT-Creation-Date: 2019-01-16 20:42+0100\n"
+"PO-Revision-Date: 2019-05-23 19:25+0000\n"
 "Last-Translator: Nick Mavrakis <mavrakis.n@gmail.com>\n"
 "Language-Team: Greek (http://www.transifex.com/django/django/language/el/)\n"
 "MIME-Version: 1.0\n"
@@ -146,6 +146,9 @@ msgstr "Άνω Σορβικά"
 
 msgid "Hungarian"
 msgstr "Ουγγρικά"
+
+msgid "Armenian"
+msgstr "Αρμενικά"
 
 msgid "Interlingua"
 msgstr "Ιντερλίνγκουα"
@@ -622,6 +625,9 @@ msgstr "Δυαδικά δεδομένα"
 msgid "'%(value)s' is not a valid UUID."
 msgstr "'%(value)s' δεν είναι ένα έγκυρο UUID."
 
+msgid "Universally unique identifier"
+msgstr "Καθολικά μοναδικό αναγνωριστικό"
+
 msgid "File"
 msgstr "Αρχείο"
 
@@ -1077,8 +1083,8 @@ msgstr "Αυτή δεν είναι έγκυρη διεύθυνση IPv6."
 
 #, python-format
 msgctxt "String to return when truncating text"
-msgid "%(truncated_text)s..."
-msgstr "%(truncated_text)s..."
+msgid "%(truncated_text)s…"
+msgstr "%(truncated_text)s…"
 
 msgid "or"
 msgstr "ή"

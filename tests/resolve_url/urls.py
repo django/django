@@ -1,4 +1,4 @@
-from django.conf.urls import url
+from django.urls import path
 
 
 def some_view(request):
@@ -6,5 +6,5 @@ def some_view(request):
 
 
 urlpatterns = [
-    url(r'^some-url/$', some_view, name='some-view'),
+    path('some-url/', some_view, name='some-view'),
 ]

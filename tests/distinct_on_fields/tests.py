@@ -9,27 +9,28 @@ from .models import Celebrity, Fan, Staff, StaffTag, Tag
 @skipUnlessDBFeature('can_distinct_on_fields')
 @skipUnlessDBFeature('supports_nullable_unique_constraints')
 class DistinctOnTests(TestCase):
-    def setUp(self):
-        self.t1 = Tag.objects.create(name='t1')
-        self.t2 = Tag.objects.create(name='t2', parent=self.t1)
-        self.t3 = Tag.objects.create(name='t3', parent=self.t1)
-        self.t4 = Tag.objects.create(name='t4', parent=self.t3)
-        self.t5 = Tag.objects.create(name='t5', parent=self.t3)
+    @classmethod
+    def setUpTestData(cls):
+        cls.t1 = Tag.objects.create(name='t1')
+        cls.t2 = Tag.objects.create(name='t2', parent=cls.t1)
+        cls.t3 = Tag.objects.create(name='t3', parent=cls.t1)
+        cls.t4 = Tag.objects.create(name='t4', parent=cls.t3)
+        cls.t5 = Tag.objects.create(name='t5', parent=cls.t3)
 
-        self.p1_o1 = Staff.objects.create(id=1, name="p1", organisation="o1")
-        self.p2_o1 = Staff.objects.create(id=2, name="p2", organisation="o1")
-        self.p3_o1 = Staff.objects.create(id=3, name="p3", organisation="o1")
-        self.p1_o2 = Staff.objects.create(id=4, name="p1", organisation="o2")
-        self.p1_o1.coworkers.add(self.p2_o1, self.p3_o1)
-        StaffTag.objects.create(staff=self.p1_o1, tag=self.t1)
-        StaffTag.objects.create(staff=self.p1_o1, tag=self.t1)
+        cls.p1_o1 = Staff.objects.create(id=1, name="p1", organisation="o1")
+        cls.p2_o1 = Staff.objects.create(id=2, name="p2", organisation="o1")
+        cls.p3_o1 = Staff.objects.create(id=3, name="p3", organisation="o1")
+        cls.p1_o2 = Staff.objects.create(id=4, name="p1", organisation="o2")
+        cls.p1_o1.coworkers.add(cls.p2_o1, cls.p3_o1)
+        StaffTag.objects.create(staff=cls.p1_o1, tag=cls.t1)
+        StaffTag.objects.create(staff=cls.p1_o1, tag=cls.t1)
 
         celeb1 = Celebrity.objects.create(name="c1")
         celeb2 = Celebrity.objects.create(name="c2")
 
-        self.fan1 = Fan.objects.create(fan_of=celeb1)
-        self.fan2 = Fan.objects.create(fan_of=celeb1)
-        self.fan3 = Fan.objects.create(fan_of=celeb2)
+        cls.fan1 = Fan.objects.create(fan_of=celeb1)
+        cls.fan2 = Fan.objects.create(fan_of=celeb1)
+        cls.fan3 = Fan.objects.create(fan_of=celeb2)
 
     def test_basic_distinct_on(self):
         """QuerySet.distinct('field', ...) works"""

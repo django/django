@@ -2,7 +2,7 @@
 Translation
 ===========
 
-.. module:: django.utils.translation
+.. currentmodule:: django.utils.translation
 
 Overview
 ========
@@ -63,12 +63,12 @@ as a shorter alias, ``_``, to save typing.
     global namespace, as an alias for ``gettext()``. In Django, we have chosen
     not to follow this practice, for a couple of reasons:
 
-    1. Sometimes, you should use :func:`~django.utils.translation.gettext_lazy`
+    #. Sometimes, you should use :func:`~django.utils.translation.gettext_lazy`
        as the default translation method for a particular file. Without ``_()``
        in the global namespace, the developer has to think about which is the
        most appropriate translation function.
 
-    2. The underscore character (``_``) is used to represent "the previous
+    #. The underscore character (``_``) is used to represent "the previous
        result" in Python's interactive shell and doctest tests. Installing a
        global ``_()`` function causes interference. Explicitly importing
        ``gettext()`` as ``_()`` avoids this problem.
@@ -91,8 +91,8 @@ string::
         output = _("Welcome to my site.")
         return HttpResponse(output)
 
-Obviously, you could code this without using the alias. This example is
-identical to the previous one::
+You could code this without using the alias. This example is identical to the
+previous one::
 
     from django.http import HttpResponse
     from django.utils.translation import gettext
@@ -439,8 +439,8 @@ strings before passing them to non-Django code::
 
     requests.post('https://example.com/send', data={'body': str(body)})
 
-If you don't like the long ``gettext_lazy`` name, you can just alias it as
-``_`` (underscore), like so::
+If you don't like the long ``gettext_lazy`` name, you can alias it as ``_``
+(underscore), like so::
 
     from django.db import models
     from django.utils.translation import gettext_lazy as _
@@ -566,6 +566,13 @@ access to these tags, put ``{% load i18n %}`` toward the top of your template.
 As with all template tags, this tag needs to be loaded in all templates which
 use translations, even those templates that extend from other templates which
 have already loaded the ``i18n`` tag.
+
+.. warning::
+
+    Translated strings will not be escaped when rendered in a template.
+    This allows you to include HTML in translations, for example for emphasis,
+    but potentially dangerous characters (e.g. ``"``) will also be rendered
+    unchanged.
 
 .. templatetag:: trans
 
@@ -921,7 +928,7 @@ view <set_language-redirect-view>` for an example of how to display a language
 selector using ``{% get_language_info_list %}``.
 
 In addition to :setting:`LANGUAGES` style list of tuples,
-``{% get_language_info_list %}`` supports simple lists of language codes.
+``{% get_language_info_list %}`` supports lists of language codes.
 If you do this in your view:
 
 .. code-block:: python
@@ -942,7 +949,7 @@ you can iterate over those languages in the template::
 Template filters
 ~~~~~~~~~~~~~~~~
 
-There are also simple filters available for convenience:
+There are also some filters available for convenience:
 
 * ``{{ LANGUAGE_CODE|language_name }}`` ("German")
 * ``{{ LANGUAGE_CODE|language_name_local }}`` ("Deutsch")
@@ -1041,7 +1048,7 @@ Using the JavaScript translation catalog
 
 .. highlightlang:: javascript
 
-To use the catalog, just pull in the dynamically generated script like this:
+To use the catalog, pull in the dynamically generated script like this:
 
 .. code-block:: html+django
 
@@ -1315,7 +1322,7 @@ translations to existing site so that the current URLs won't change.
 Example URL patterns::
 
     from django.conf.urls.i18n import i18n_patterns
-    from django.urls import include, url
+    from django.urls import include, path
 
     from about import views as about_views
     from news import views as news_views
@@ -1558,9 +1565,9 @@ multiple times::
 
     If you don't have the ``gettext`` utilities installed,
     :djadmin:`makemessages` will create empty files. If that's the case, either
-    install the ``gettext`` utilities or just copy the English message file
+    install the ``gettext`` utilities or copy the English message file
     (``locale/en/LC_MESSAGES/django.po``) if available and use it as a starting
-    point; it's just an empty translation file.
+    point, which is an empty translation file.
 
 .. admonition:: Working on Windows?
 
@@ -1568,11 +1575,10 @@ multiple times::
    :djadmin:`makemessages` works, see :ref:`gettext_on_windows` for more
    information.
 
-The format of ``.po`` files is straightforward. Each ``.po`` file contains a
-small bit of metadata, such as the translation maintainer's contact
-information, but the bulk of the file is a list of **messages** -- simple
-mappings between translation strings and the actual translated text for the
-particular language.
+Each ``.po`` file contains a small bit of metadata, such as the translation
+maintainer's contact information, but the bulk of the file is a list of
+**messages** -- mappings between translation strings and the actual translated
+text for the particular language.
 
 For example, if your Django app contained a translation string for the text
 ``"Welcome to my site."``, like so::
@@ -1686,7 +1692,7 @@ djangojs`` parameter, like this::
     django-admin makemessages -d djangojs -l de
 
 This would create or update the message file for JavaScript for German. After
-updating message files, just run :djadmin:`django-admin compilemessages
+updating message files, run :djadmin:`django-admin compilemessages
 <compilemessages>` the same way as you do with normal Django message files.
 
 .. _gettext_on_windows:
@@ -1695,9 +1701,9 @@ updating message files, just run :djadmin:`django-admin compilemessages
 ----------------------
 
 This is only needed for people who either want to extract message IDs or compile
-message files (``.po``). Translation work itself just involves editing existing
-files of this type, but if you want to create your own message files, or want to
-test or compile a changed message file, download `a precompiled binary
+message files (``.po``). Translation work itself involves editing existing
+files of this type, but if you want to create your own message files, or want
+to test or compile a changed message file, download `a precompiled binary
 installer <https://mlocati.github.io/articles/gettext-iconv-windows.html>`_.
 
 You may also use ``gettext`` binaries you have obtained elsewhere, so long as
@@ -1778,10 +1784,6 @@ language choice in the user's session. It also saves the language choice in a
 cookie that is named ``django_language`` by default. (The name can be changed
 through the :setting:`LANGUAGE_COOKIE_NAME` setting.)
 
-.. versionchanged:: 2.1
-
-    In older versions, the cookie is only set if session support isn't enabled.
-
 After setting the language choice, Django looks for a ``next`` parameter in the
 ``POST`` or ``GET`` data. If that is found and Django considers it to be a safe
 URL (i.e. it doesn't point to a different host and uses a safe scheme), a
@@ -1828,20 +1830,8 @@ You may want to set the active language for the current session explicitly. Perh
 a user's language preference is retrieved from another system, for example.
 You've already been introduced to :func:`django.utils.translation.activate()`. That
 applies to the current thread only. To persist the language for the entire
-session, also modify :data:`~django.utils.translation.LANGUAGE_SESSION_KEY`
-in the session::
-
-    from django.utils import translation
-    user_language = 'fr'
-    translation.activate(user_language)
-    request.session[translation.LANGUAGE_SESSION_KEY] = user_language
-
-You would typically want to use both: :func:`django.utils.translation.activate()`
-will change the language for this thread, and modifying the session makes this
-preference persist in future requests.
-
-If you are not using sessions, the language will persist in a cookie, whose name
-is configured in :setting:`LANGUAGE_COOKIE_NAME`. For example::
+session in a cookie, set the :setting:`LANGUAGE_COOKIE_NAME` cookie on the
+response::
 
     from django.conf import settings
     from django.http import HttpResponse
@@ -1850,6 +1840,14 @@ is configured in :setting:`LANGUAGE_COOKIE_NAME`. For example::
     translation.activate(user_language)
     response = HttpResponse(...)
     response.set_cookie(settings.LANGUAGE_COOKIE_NAME, user_language)
+
+You would typically want to use both: :func:`django.utils.translation.activate()`
+changes the language for this thread, and setting the cookie makes this
+preference persist in future requests.
+
+.. versionchanged:: 3.0
+
+    In older versions, you could set the language in the current session.
 
 Using translations outside views and templates
 ----------------------------------------------
@@ -1904,7 +1902,10 @@ A number of settings can be used to adjust language cookie options:
 * :setting:`LANGUAGE_COOKIE_NAME`
 * :setting:`LANGUAGE_COOKIE_AGE`
 * :setting:`LANGUAGE_COOKIE_DOMAIN`
+* :setting:`LANGUAGE_COOKIE_HTTPONLY`
 * :setting:`LANGUAGE_COOKIE_PATH`
+* :setting:`LANGUAGE_COOKIE_SAMESITE`
+* :setting:`LANGUAGE_COOKIE_SECURE`
 
 Implementation notes
 ====================
@@ -1933,9 +1934,9 @@ way Django does translation:
 How Django discovers language preference
 ----------------------------------------
 
-Once you've prepared your translations -- or, if you just want to use the
-translations that come with Django -- you'll just need to activate translation
-for your app.
+Once you've prepared your translations -- or, if you want to use the
+translations that come with Django -- you'll need to activate translation for
+your app.
 
 Behind the scenes, Django has a very flexible model of deciding which language
 should be used -- installation-wide, for a particular user, or both.
@@ -1983,9 +1984,6 @@ following this algorithm:
   only performed when you are using the ``i18n_patterns`` function in your
   root URLconf. See :ref:`url-internationalization` for more information
   about the language prefix and how to internationalize URL patterns.
-
-* Failing that, it looks for the :data:`~django.utils.translation.LANGUAGE_SESSION_KEY`
-  key in the current user's session.
 
 * Failing that, it looks for a cookie.
 
@@ -2043,7 +2041,7 @@ Notes:
 Once ``LocaleMiddleware`` determines the user's preference, it makes this
 preference available as ``request.LANGUAGE_CODE`` for each
 :class:`~django.http.HttpRequest`. Feel free to read this value in your view
-code. Here's a simple example::
+code. Here's an example::
 
     from django.http import HttpResponse
 
@@ -2073,13 +2071,13 @@ the order in which it examines the different file paths to load the compiled
 :term:`message files <message file>` (``.mo``) and the precedence of multiple
 translations for the same literal:
 
-1. The directories listed in :setting:`LOCALE_PATHS` have the highest
+#. The directories listed in :setting:`LOCALE_PATHS` have the highest
    precedence, with the ones appearing first having higher precedence than
    the ones appearing later.
-2. Then, it looks for and uses if it exists a ``locale`` directory in each
+#. Then, it looks for and uses if it exists a ``locale`` directory in each
    of the installed apps listed in :setting:`INSTALLED_APPS`.  The ones
    appearing first have higher precedence than the ones appearing later.
-3. Finally, the Django-provided base translation in ``django/conf/locale``
+#. Finally, the Django-provided base translation in ``django/conf/locale``
    is used as a fallback.
 
 .. seealso::
@@ -2098,13 +2096,9 @@ etc. Untranslated strings for territorial language variants use the translations
 of the generic language. For example, untranslated ``pt_BR`` strings use ``pt``
 translations.
 
-.. versionchanged:: 2.1
-
-    Fallback to the generic language as described above was added.
-
 This way, you can write applications that include their own translations, and
-you can override base translations in your project. Or, you can just build
-a big project out of several apps and put all translations into one big common
+you can override base translations in your project. Or, you can build a big
+project out of several apps and put all translations into one big common
 message file specific to the project you are composing. The choice is yours.
 
 All message file repositories are structured the same way. They are:

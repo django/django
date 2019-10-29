@@ -3,7 +3,6 @@ import inspect
 import warnings
 from math import ceil
 
-from django.utils.deprecation import RemovedInDjango31Warning
 from django.utils.functional import cached_property
 from django.utils.inspect import method_has_no_args
 from django.utils.translation import gettext_lazy as _
@@ -34,6 +33,10 @@ class Paginator:
         self.per_page = int(per_page)
         self.orphans = int(orphans)
         self.allow_empty_first_page = allow_empty_first_page
+
+    def __iter__(self):
+        for page_number in self.page_range:
+            yield self.page(page_number)
 
     def validate_number(self, number):
         """Validate the given 1-based page number."""
@@ -126,16 +129,6 @@ class Paginator:
             )
 
 
-class QuerySetPaginator(Paginator):
-
-    def __init__(self, *args, **kwargs):
-        warnings.warn(
-            'The QuerySetPaginator alias of Paginator is deprecated.',
-            RemovedInDjango31Warning, stacklevel=2,
-        )
-        super().__init__(*args, **kwargs)
-
-
 class Page(collections.abc.Sequence):
 
     def __init__(self, object_list, number, paginator):
@@ -151,7 +144,10 @@ class Page(collections.abc.Sequence):
 
     def __getitem__(self, index):
         if not isinstance(index, (int, slice)):
-            raise TypeError
+            raise TypeError(
+                'Page indices must be integers or slices, not %s.'
+                % type(index).__name__
+            )
         # The object_list is converted to a list so that if it was a QuerySet
         # it won't be a database hit per __getitem__.
         if not isinstance(self.object_list, list):

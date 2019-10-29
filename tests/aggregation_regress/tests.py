@@ -11,11 +11,9 @@ from django.db.models import (
     Avg, Case, Count, DecimalField, F, IntegerField, Max, Q, StdDev, Sum,
     Value, Variance, When,
 )
-from django.test import (
-    TestCase, ignore_warnings, skipUnlessAnyDBFeature, skipUnlessDBFeature,
-)
+from django.db.models.aggregates import Aggregate
+from django.test import TestCase, skipUnlessAnyDBFeature, skipUnlessDBFeature
 from django.test.utils import Approximate
-from django.utils.deprecation import RemovedInDjango31Warning
 
 from .models import (
     Alfa, Author, Book, Bravo, Charlie, Clues, Entries, HardbackBook, ItemTag,
@@ -109,7 +107,6 @@ class AggregationTests(TestCase):
         for attr, value in kwargs.items():
             self.assertEqual(getattr(obj, attr), value)
 
-    @ignore_warnings(category=RemovedInDjango31Warning)
     def test_annotation_with_value(self):
         values = Book.objects.filter(
             name='Practical Django Projects',
@@ -217,7 +214,6 @@ class AggregationTests(TestCase):
             {'pages__sum': 3703}
         )
 
-    @ignore_warnings(category=RemovedInDjango31Warning)
     def test_annotation(self):
         # Annotations get combined with extra select clauses
         obj = Book.objects.annotate(mean_auth_age=Avg("authors__age")).extra(
@@ -311,8 +307,7 @@ class AggregationTests(TestCase):
 
         # If an annotation isn't included in the values, it can still be used
         # in a filter
-        with ignore_warnings(category=RemovedInDjango31Warning):
-            qs = Book.objects.annotate(n_authors=Count('authors')).values('name').filter(n_authors__gt=2)
+        qs = Book.objects.annotate(n_authors=Count('authors')).values('name').filter(n_authors__gt=2)
         self.assertSequenceEqual(
             qs, [
                 {"name": 'Python Web Development with Django'}
@@ -376,7 +371,7 @@ class AggregationTests(TestCase):
             {'c__max': 3}
         )
 
-    def test_conditional_aggreate(self):
+    def test_conditional_aggregate(self):
         # Conditional aggregation of a grouped queryset.
         self.assertEqual(
             Book.objects.annotate(c=Count('authors')).values('pk').aggregate(test=Sum(
@@ -400,7 +395,7 @@ class AggregationTests(TestCase):
                 When(pages__lt=400, then='discount_price'),
                 output_field=DecimalField()
             )))['test'],
-            22.27, places=2
+            Decimal('22.27'), places=2
         )
 
     def test_distinct_conditional_aggregate(self):
@@ -456,7 +451,6 @@ class AggregationTests(TestCase):
         with self.assertRaisesMessage(FieldError, msg):
             Book.objects.all().annotate(num_authors=Count('authors__id')).aggregate(Max('foo'))
 
-    @ignore_warnings(category=RemovedInDjango31Warning)
     def test_more(self):
         # Old-style count aggregations can be mixed with new-style
         self.assertEqual(
@@ -810,7 +804,6 @@ class AggregationTests(TestCase):
         with self.assertRaisesMessage(ValueError, msg):
             Author.objects.annotate(book_contact_set=Avg('friends__age'))
 
-    @ignore_warnings(category=RemovedInDjango31Warning)
     def test_pickle(self):
         # Regression for #10197 -- Queries with aggregates can be pickled.
         # First check that pickling is possible at all. No crash = success
@@ -1040,7 +1033,7 @@ class AggregationTests(TestCase):
         books = Book.objects.values_list("publisher__name").annotate(
             Count("id"), Avg("price"), Avg("authors__age"), avg_pgs=Avg("pages")
         ).order_by("-publisher__name")
-        self.assertEqual(books[0], ('Sams', 1, 23.09, 45.0, 528.0))
+        self.assertEqual(books[0], ('Sams', 1, Decimal('23.09'), 45.0, 528.0))
 
     def test_annotation_disjunction(self):
         qs = Book.objects.annotate(n_authors=Count("authors")).filter(
@@ -1116,7 +1109,6 @@ class AggregationTests(TestCase):
             lambda b: (b.name, b.authorCount)
         )
 
-    @skipUnlessDBFeature('supports_stddev')
     def test_stddev(self):
         self.assertEqual(
             Book.objects.aggregate(StdDev('pages')),
@@ -1130,7 +1122,7 @@ class AggregationTests(TestCase):
 
         self.assertEqual(
             Book.objects.aggregate(StdDev('price')),
-            {'price__stddev': Approximate(24.16, 2)}
+            {'price__stddev': Approximate(Decimal('24.16'), 2)}
         )
 
         self.assertEqual(
@@ -1145,7 +1137,7 @@ class AggregationTests(TestCase):
 
         self.assertEqual(
             Book.objects.aggregate(StdDev('price', sample=True)),
-            {'price__stddev': Approximate(26.46, 1)}
+            {'price__stddev': Approximate(Decimal('26.46'), 1)}
         )
 
         self.assertEqual(
@@ -1160,7 +1152,7 @@ class AggregationTests(TestCase):
 
         self.assertEqual(
             Book.objects.aggregate(Variance('price')),
-            {'price__variance': Approximate(583.77, 1)}
+            {'price__variance': Approximate(Decimal('583.77'), 1)}
         )
 
         self.assertEqual(
@@ -1175,7 +1167,7 @@ class AggregationTests(TestCase):
 
         self.assertEqual(
             Book.objects.aggregate(Variance('price', sample=True)),
-            {'price__variance': Approximate(700.53, 2)}
+            {'price__variance': Approximate(Decimal('700.53'), 2)}
         )
 
     def test_filtering_by_annotation_name(self):
@@ -1210,7 +1202,6 @@ class AggregationTests(TestCase):
             {'book__count__max': 2}
         )
 
-    @ignore_warnings(category=RemovedInDjango31Warning)
     def test_annotate_joins(self):
         """
         The base table's join isn't promoted to LOUTER. This could
@@ -1298,7 +1289,7 @@ class AggregationTests(TestCase):
         )
 
     @skipUnlessDBFeature('allows_group_by_selected_pks')
-    def test_aggregate_ummanaged_model_columns(self):
+    def test_aggregate_unmanaged_model_columns(self):
         """
         Unmanaged models are sometimes used to represent database views which
         may not allow grouping by selected primary key.
@@ -1332,6 +1323,33 @@ class AggregationTests(TestCase):
             for index, field in enumerate(Author._meta.fields):
                 self.assertIn(field.name, grouping[index + 1][0])
             assertQuerysetResults(queryset)
+
+    @skipUnlessDBFeature('allows_group_by_selected_pks')
+    def test_aggregate_unmanaged_model_as_tables(self):
+        qs = Book.objects.select_related('contact').annotate(num_authors=Count('authors'))
+        # Force treating unmanaged models as tables.
+        with mock.patch(
+            'django.db.connection.features.allows_group_by_selected_pks_on_model',
+            return_value=True,
+        ):
+            with mock.patch.object(Book._meta, 'managed', False), \
+                    mock.patch.object(Author._meta, 'managed', False):
+                _, _, grouping = qs.query.get_compiler(using='default').pre_sql_setup()
+                self.assertEqual(len(grouping), 2)
+                self.assertIn('id', grouping[0][0])
+                self.assertIn('id', grouping[1][0])
+                self.assertQuerysetEqual(
+                    qs.order_by('name'),
+                    [
+                        ('Artificial Intelligence: A Modern Approach', 2),
+                        ('Paradigms of Artificial Intelligence Programming: Case Studies in Common Lisp', 1),
+                        ('Practical Django Projects', 1),
+                        ('Python Web Development with Django', 3),
+                        ('Sams Teach Yourself Django in 24 Hours', 1),
+                        ('The Definitive Guide to Django: Web Development Done Right', 2),
+                    ],
+                    attrgetter('name', 'num_authors'),
+                )
 
     def test_reverse_join_trimming(self):
         qs = Author.objects.annotate(Count('book_contact_set__contact'))
@@ -1447,7 +1465,6 @@ class AggregationTests(TestCase):
         query.filter(q1 | q2)
         self.assertEqual(len(q2.children), 1)
 
-    @ignore_warnings(category=RemovedInDjango31Warning)
     def test_fobj_group_by(self):
         """
         An F() object referring to related column works correctly in group by.
@@ -1497,6 +1514,16 @@ class AggregationTests(TestCase):
         qs = Author.objects.values_list('age', flat=True).annotate(age_count=Count('age')).filter(age_count__gt=1)
         self.assertSequenceEqual(qs, [29])
 
+    def test_allow_distinct(self):
+        class MyAggregate(Aggregate):
+            pass
+        with self.assertRaisesMessage(TypeError, 'MyAggregate does not allow distinct'):
+            MyAggregate('foo', distinct=True)
+
+        class DistinctAggregate(Aggregate):
+            allow_distinct = True
+        DistinctAggregate('foo', distinct=True)
+
 
 class JoinPromotionTests(TestCase):
     def test_ticket_21150(self):
@@ -1525,7 +1552,6 @@ class JoinPromotionTests(TestCase):
         qs = Charlie.objects.annotate(Count('alfa__name'))
         self.assertIn(' LEFT OUTER JOIN ', str(qs.query))
 
-    @ignore_warnings(category=RemovedInDjango31Warning)
     def test_non_nullable_fk_not_promoted(self):
         qs = Book.objects.annotate(Count('contact__name'))
         self.assertIn(' INNER JOIN ', str(qs.query))

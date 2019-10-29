@@ -17,8 +17,8 @@ An example: i18n middleware would need to distinguish caches by the
 "Accept-language" header.
 """
 import hashlib
-import re
 import time
+from collections import defaultdict
 
 from django.conf import settings
 from django.core.cache import caches
@@ -28,10 +28,11 @@ from django.utils.http import (
     http_date, parse_etags, parse_http_date_safe, quote_etag,
 )
 from django.utils.log import log_response
+from django.utils.regex_helper import _lazy_re_compile
 from django.utils.timezone import get_current_timezone_name
 from django.utils.translation import get_language
 
-cc_delim_re = re.compile(r'\s*,\s*')
+cc_delim_re = _lazy_re_compile(r'\s*,\s*')
 
 
 def patch_cache_control(response, **kwargs):
@@ -53,17 +54,21 @@ def patch_cache_control(response, **kwargs):
         else:
             return (t[0].lower(), True)
 
-    def dictvalue(t):
+    def dictvalue(*t):
         if t[1] is True:
             return t[0]
         else:
             return '%s=%s' % (t[0], t[1])
 
+    cc = defaultdict(set)
     if response.get('Cache-Control'):
-        cc = cc_delim_re.split(response['Cache-Control'])
-        cc = dict(dictitem(el) for el in cc)
-    else:
-        cc = {}
+        for field in cc_delim_re.split(response['Cache-Control']):
+            directive, value = dictitem(field)
+            if directive == 'no-cache':
+                # no-cache supports multiple field names.
+                cc[directive].add(value)
+            else:
+                cc[directive] = value
 
     # If there's already a max-age header but we're being asked to set a new
     # max-age, use the minimum of the two ages. In practice this happens when
@@ -78,8 +83,23 @@ def patch_cache_control(response, **kwargs):
         del cc['public']
 
     for (k, v) in kwargs.items():
-        cc[k.replace('_', '-')] = v
-    cc = ', '.join(dictvalue(el) for el in cc.items())
+        directive = k.replace('_', '-')
+        if directive == 'no-cache':
+            # no-cache supports multiple field names.
+            cc[directive].add(v)
+        else:
+            cc[directive] = v
+
+    directives = []
+    for directive, values in cc.items():
+        if isinstance(values, set):
+            if True in values:
+                # True takes precedence.
+                values = {True}
+            directives.extend([dictvalue(directive, value) for value in values])
+        else:
+            directives.append(dictvalue(directive, values))
+    cc = ', '.join(directives)
     response['Cache-Control'] = cc
 
 
@@ -98,7 +118,7 @@ def get_max_age(response):
 
 
 def set_response_etag(response):
-    if not response.streaming:
+    if not response.streaming and response.content:
         response['ETag'] = quote_etag(hashlib.md5(response.content).hexdigest())
     return response
 
@@ -250,14 +270,15 @@ def add_never_cache_headers(response):
     Add headers to a response to indicate that a page should never be cached.
     """
     patch_response_headers(response, cache_timeout=-1)
-    patch_cache_control(response, no_cache=True, no_store=True, must_revalidate=True)
+    patch_cache_control(response, no_cache=True, no_store=True, must_revalidate=True, private=True)
 
 
 def patch_vary_headers(response, newheaders):
     """
     Add (or update) the "Vary" header in the given HttpResponse object.
-    newheaders is a list of header names that should be in "Vary". Existing
-    headers in "Vary" aren't removed.
+    newheaders is a list of header names that should be in "Vary". If headers
+    contains an asterisk, then "Vary" header will consist of a single asterisk
+    '*'. Otherwise, existing headers in "Vary" aren't removed.
     """
     # Note that we need to keep the original order intact, because cache
     # implementations may rely on the order of the Vary contents in, say,
@@ -270,7 +291,11 @@ def patch_vary_headers(response, newheaders):
     existing_headers = {header.lower() for header in vary_headers}
     additional_headers = [newheader for newheader in newheaders
                           if newheader.lower() not in existing_headers]
-    response['Vary'] = ', '.join(vary_headers + additional_headers)
+    vary_headers += additional_headers
+    if '*' in vary_headers:
+        response['Vary'] = '*'
+    else:
+        response['Vary'] = ', '.join(vary_headers)
 
 
 def has_vary_header(response, header_query):

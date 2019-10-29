@@ -105,6 +105,7 @@ class LineString(LinearGeometryMixin, GEOSGeometry):
     def _set_list(self, length, items):
         ndim = self._cs.dims
         hasz = self._cs.hasz  # I don't understand why these are different
+        srid = self.srid
 
         # create a new coordinate sequence and populate accordingly
         cs = GEOSCoordSeq(capi.create_cs(length, ndim), z=hasz)
@@ -115,6 +116,8 @@ class LineString(LinearGeometryMixin, GEOSGeometry):
         if ptr:
             capi.destroy_geom(self.ptr)
             self.ptr = ptr
+            if srid is not None:
+                self.srid = srid
             self._post_init()
         else:
             # can this happen?
@@ -173,3 +176,11 @@ class LineString(LinearGeometryMixin, GEOSGeometry):
 class LinearRing(LineString):
     _minlength = 4
     _init_func = capi.create_linearring
+
+    @property
+    def is_counterclockwise(self):
+        if self.empty:
+            raise ValueError(
+                'Orientation of an empty LinearRing cannot be determined.'
+            )
+        return self._cs.is_counterclockwise

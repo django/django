@@ -4,6 +4,7 @@ from django.conf import settings
 from django.db.backends.base.operations import BaseDatabaseOperations
 from django.utils import timezone
 from django.utils.duration import duration_microseconds
+from django.utils.encoding import force_str
 
 
 class DatabaseOperations(BaseDatabaseOperations):
@@ -18,6 +19,7 @@ class DatabaseOperations(BaseDatabaseOperations):
     cast_data_types = {
         'AutoField': 'signed integer',
         'BigAutoField': 'signed integer',
+        'SmallAutoField': 'signed integer',
         'CharField': 'char(%(max_length)s)',
         'DecimalField': 'decimal(%(max_digits)s, %(decimal_places)s)',
         'TextField': 'char',
@@ -34,8 +36,10 @@ class DatabaseOperations(BaseDatabaseOperations):
         # https://dev.mysql.com/doc/mysql/en/date-and-time-functions.html
         if lookup_type == 'week_day':
             # DAYOFWEEK() returns an integer, 1-7, Sunday=1.
-            # Note: WEEKDAY() returns 0-6, Monday=0.
             return "DAYOFWEEK(%s)" % field_name
+        elif lookup_type == 'iso_week_day':
+            # WEEKDAY() returns an integer, 0-6, Monday=0.
+            return "WEEKDAY(%s) + 1" % field_name
         elif lookup_type == 'week':
             # Override the value of default_week_format for consistency with
             # other database backends.
@@ -68,9 +72,20 @@ class DatabaseOperations(BaseDatabaseOperations):
         else:
             return "DATE(%s)" % (field_name)
 
+    def _prepare_tzname_delta(self, tzname):
+        if '+' in tzname:
+            return tzname[tzname.find('+'):]
+        elif '-' in tzname:
+            return tzname[tzname.find('-'):]
+        return tzname
+
     def _convert_field_to_tz(self, field_name, tzname):
-        if settings.USE_TZ:
-            field_name = "CONVERT_TZ(%s, 'UTC', '%s')" % (field_name, tzname)
+        if settings.USE_TZ and self.connection.timezone_name != tzname:
+            field_name = "CONVERT_TZ(%s, '%s', '%s')" % (
+                field_name,
+                self.connection.timezone_name,
+                self._prepare_tzname_delta(tzname),
+            )
         return field_name
 
     def datetime_cast_date_sql(self, field_name, tzname):
@@ -107,7 +122,7 @@ class DatabaseOperations(BaseDatabaseOperations):
         except ValueError:
             sql = field_name
         else:
-            format_str = ''.join([f for f in format[:i]] + [f for f in format_def[i:]])
+            format_str = ''.join(format[:i] + format_def[i:])
             sql = "CAST(DATE_FORMAT(%s, '%s') AS DATETIME)" % (field_name, format_str)
         return sql
 
@@ -138,13 +153,11 @@ class DatabaseOperations(BaseDatabaseOperations):
         return [(None, ("NULL", [], False))]
 
     def last_executed_query(self, cursor, sql, params):
-        # With MySQLdb, cursor objects have an (undocumented) "_last_executed"
+        # With MySQLdb, cursor objects have an (undocumented) "_executed"
         # attribute where the exact query sent to the database is saved.
         # See MySQLdb/cursors.py in the source distribution.
-        query = getattr(cursor, '_last_executed', None)
-        if query is not None:
-            query = query.decode(errors='replace')
-        return query
+        # MySQLdb returns string, PyMySQL bytes.
+        return force_str(getattr(cursor, '_executed', None), errors='replace')
 
     def no_limit_value(self):
         # 2**64 - 1, as recommended by the MySQL documentation
@@ -283,11 +296,19 @@ class DatabaseOperations(BaseDatabaseOperations):
         # Alias MySQL's TRADITIONAL to TEXT for consistency with other backends.
         if format and format.upper() == 'TEXT':
             format = 'TRADITIONAL'
+        elif not format and 'TREE' in self.connection.features.supported_explain_formats:
+            # Use TREE by default (if supported) as it's more informative.
+            format = 'TREE'
+        analyze = options.pop('analyze', False)
         prefix = super().explain_query_prefix(format, **options)
-        if format:
+        if analyze and self.connection.features.supports_explain_analyze:
+            # MariaDB uses ANALYZE instead of EXPLAIN ANALYZE.
+            prefix = 'ANALYZE' if self.connection.mysql_is_mariadb else prefix + ' ANALYZE'
+        if format and not (analyze and not self.connection.mysql_is_mariadb):
+            # Only MariaDB supports the analyze option with formats.
             prefix += ' FORMAT=%s' % format
-        if self.connection.features.needs_explain_extended and format is None:
-            # EXTENDED and FORMAT are mutually exclusive options.
+        if self.connection.features.needs_explain_extended and not analyze and format is None:
+            # ANALYZE, EXTENDED, and FORMAT are mutually exclusive options.
             prefix += ' EXTENDED'
         return prefix
 

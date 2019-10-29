@@ -1,3 +1,4 @@
+from django.db.backends.ddl_references import Statement
 from django.db.backends.postgresql.schema import DatabaseSchemaEditor
 
 
@@ -32,13 +33,15 @@ class PostGISSchemaEditor(DatabaseSchemaEditor):
             # Use "nd" ops which are fast on multidimensional cases
             field_column = "%s %s" % (field_column, self.geom_index_ops_nd)
 
-        return self.sql_create_index % {
-            "name": self.quote_name('%s_%s_id' % (model._meta.db_table, field.column)),
-            "table": self.quote_name(model._meta.db_table),
-            "using": "USING %s" % self.geom_index_type,
-            "columns": field_column,
-            "extra": '',
-        }
+        return Statement(
+            self.sql_create_index,
+            name=self.quote_name('%s_%s_id' % (model._meta.db_table, field.column)),
+            table=self.quote_name(model._meta.db_table),
+            using='USING %s' % self.geom_index_type,
+            columns=field_column,
+            extra='',
+            condition='',
+        )
 
     def _alter_column_type_sql(self, table, old_field, new_field, new_type):
         """

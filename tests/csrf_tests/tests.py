@@ -441,12 +441,12 @@ class CsrfViewMiddlewareTestMixin:
 
     def test_post_data_read_failure(self):
         """
-        #20128 -- IOErrors during POST data reading should be caught and
-        treated as if the POST data wasn't there.
+        OSErrors during POST data reading are caught and treated as if the
+        POST data wasn't there (#20128).
         """
         class CsrfPostRequest(HttpRequest):
             """
-            HttpRequest that can raise an IOError when accessing POST data
+            HttpRequest that can raise an OSError when accessing POST data
             """
             def __init__(self, token, raise_error):
                 super().__init__()
@@ -464,7 +464,7 @@ class CsrfViewMiddlewareTestMixin:
                 self.raise_error = raise_error
 
             def _load_post_and_files(self):
-                raise IOError('error reading input data')
+                raise OSError('error reading input data')
 
             def _get_post(self):
                 if self.raise_error:

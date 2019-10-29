@@ -91,6 +91,8 @@ def mail_admins(subject, message, fail_silently=False, connection=None,
     """Send a message to the admins, as defined by the ADMINS setting."""
     if not settings.ADMINS:
         return
+    if not all(isinstance(a, (list, tuple)) and len(a) == 2 for a in settings.ADMINS):
+        raise ValueError('The ADMINS setting must be a list of 2-tuples.')
     mail = EmailMultiAlternatives(
         '%s%s' % (settings.EMAIL_SUBJECT_PREFIX, subject), message,
         settings.SERVER_EMAIL, [a[1] for a in settings.ADMINS],
@@ -106,6 +108,8 @@ def mail_managers(subject, message, fail_silently=False, connection=None,
     """Send a message to the managers, as defined by the MANAGERS setting."""
     if not settings.MANAGERS:
         return
+    if not all(isinstance(a, (list, tuple)) and len(a) == 2 for a in settings.MANAGERS):
+        raise ValueError('The MANAGERS setting must be a list of 2-tuples.')
     mail = EmailMultiAlternatives(
         '%s%s' % (settings.EMAIL_SUBJECT_PREFIX, subject), message,
         settings.SERVER_EMAIL, [a[1] for a in settings.MANAGERS],

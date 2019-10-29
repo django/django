@@ -25,13 +25,13 @@ then inserting into a GeoDjango model.
     that :class:`LayerMapping` is using too much memory, set
     :setting:`DEBUG` to ``False`` in your settings.  When :setting:`DEBUG`
     is set to ``True``, Django :ref:`automatically logs <faq-see-raw-sql-queries>`
-    *every* SQL query -- thus, when SQL statements contain geometries, it is
-    easy to consume more memory than is typical.
+    *every* SQL query -- and when SQL statements contain geometries, this may
+    consume more memory than is typical.
 
 Example
 =======
 
-1. You need a GDAL-supported data source, like a shapefile (here we're using
+#. You need a GDAL-supported data source, like a shapefile (here we're using
    a simple polygon shapefile, ``test_poly.shp``, with three features)::
 
     >>> from django.contrib.gis.gdal import DataSource
@@ -50,7 +50,7 @@ Example
         PRIMEM["Greenwich",0],
         UNIT["Degree",0.017453292519943295]]
 
-2. Now we define our corresponding Django model (make sure to use :djadmin:`migrate`)::
+#. Now we define our corresponding Django model (make sure to use :djadmin:`migrate`)::
 
     from django.contrib.gis.db import models
 
@@ -61,7 +61,7 @@ Example
         def __str__(self):
             return 'Name: %s' % self.name
 
-3. Use :class:`LayerMapping` to extract all the features and place them in the
+#. Use :class:`LayerMapping` to extract all the features and place them in the
    database::
 
     >>> from django.contrib.gis.utils import LayerMapping
@@ -75,10 +75,10 @@ Example
     Saved: Name: 2
     Saved: Name: 3
 
-Here, :class:`LayerMapping` just transformed the three geometries from the
-shapefile in their original spatial reference system (WGS84) to the spatial
-reference system of the GeoDjango model (NAD83).  If no spatial reference
-system is defined for the layer, use the ``source_srs`` keyword with a
+Here, :class:`LayerMapping` transformed the three geometries from the shapefile
+in their original spatial reference system (WGS84) to the spatial reference
+system of the GeoDjango model (NAD83).  If no spatial reference system is
+defined for the layer, use the ``source_srs`` keyword with a
 :class:`~django.contrib.gis.gdal.SpatialReference` object to specify one.
 
 ``LayerMapping`` API

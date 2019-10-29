@@ -2,12 +2,13 @@ import datetime
 import decimal
 from importlib import import_module
 
+import sqlparse
+
 from django.conf import settings
-from django.core.exceptions import ImproperlyConfigured
 from django.db import NotSupportedError, transaction
 from django.db.backends import utils
 from django.utils import timezone
-from django.utils.encoding import force_text
+from django.utils.encoding import force_str
 
 
 class BaseDatabaseOperations:
@@ -25,6 +26,9 @@ class BaseDatabaseOperations:
         'BigIntegerField': (-9223372036854775808, 9223372036854775807),
         'PositiveSmallIntegerField': (0, 32767),
         'PositiveIntegerField': (0, 2147483647),
+        'SmallAutoField': (-32768, 32767),
+        'AutoField': (-2147483648, 2147483647),
+        'BigAutoField': (-9223372036854775808, 9223372036854775807),
     }
     set_operators = {
         'union': 'UNION',
@@ -172,13 +176,12 @@ class BaseDatabaseOperations:
         else:
             return ['DISTINCT'], []
 
-    def fetch_returned_insert_id(self, cursor):
+    def fetch_returned_insert_columns(self, cursor, returning_params):
         """
         Given a cursor object that has just performed an INSERT...RETURNING
-        statement into a table that has an auto-incrementing ID, return the
-        newly created ID.
+        statement into a table, return the newly created data.
         """
-        return cursor.fetchone()[0]
+        return cursor.fetchone()
 
     def field_cast_sql(self, db_type, internal_type):
         """
@@ -217,10 +220,10 @@ class BaseDatabaseOperations:
     def limit_offset_sql(self, low_mark, high_mark):
         """Return LIMIT/OFFSET SQL clause."""
         limit, offset = self._get_limit_offset_params(low_mark, high_mark)
-        return '%s%s' % (
-            (' LIMIT %d' % limit) if limit else '',
-            (' OFFSET %d' % offset) if offset else '',
-        )
+        return ' '.join(sql for sql in (
+            ('LIMIT %d' % limit) if limit else None,
+            ('OFFSET %d' % offset) if offset else None,
+        ) if sql)
 
     def last_executed_query(self, cursor, sql, params):
         """
@@ -234,7 +237,7 @@ class BaseDatabaseOperations:
         """
         # Convert params to contain string values.
         def to_string(s):
-            return force_text(s, strings_only=True, errors='replace')
+            return force_str(s, strings_only=True, errors='replace')
         if isinstance(params, (list, tuple)):
             u_params = tuple(to_string(val) for val in params)
         elif params is None:
@@ -298,16 +301,10 @@ class BaseDatabaseOperations:
         cursor.execute() call and PEP 249 doesn't talk about this use case,
         the default implementation is conservative.
         """
-        try:
-            import sqlparse
-        except ImportError:
-            raise ImproperlyConfigured(
-                "The sqlparse package is required if you don't split your SQL "
-                "statements manually."
-            )
-        else:
-            return [sqlparse.format(statement, strip_comments=True)
-                    for statement in sqlparse.split(sql) if statement]
+        return [
+            sqlparse.format(statement, strip_comments=True)
+            for statement in sqlparse.split(sql) if statement
+        ]
 
     def process_clob(self, value):
         """
@@ -316,12 +313,11 @@ class BaseDatabaseOperations:
         """
         return value
 
-    def return_insert_id(self):
+    def return_insert_columns(self, fields):
         """
-        For backends that support returning the last insert ID as part of an
-        insert query, return the SQL and params to append to the INSERT query.
-        The returned fragment should contain a format string to hold the
-        appropriate column.
+        For backends that support returning columns as part of an insert query,
+        return the SQL and params to append to the INSERT query. The returned
+        fragment should contain a format string to hold the appropriate column.
         """
         pass
 
@@ -399,7 +395,7 @@ class BaseDatabaseOperations:
         to tables with foreign keys pointing the tables being truncated.
         PostgreSQL requires a cascade even if these tables are empty.
         """
-        raise NotImplementedError('subclasses of BaseDatabaseOperations must provide an sql_flush() method')
+        raise NotImplementedError('subclasses of BaseDatabaseOperations must provide a sql_flush() method')
 
     def execute_sql_flush(self, using, sql_list):
         """Execute a list of SQL statements to flush the database."""
@@ -582,6 +578,13 @@ class BaseDatabaseOperations:
         NotSupportedError.
         """
         pass
+
+    def conditional_expression_supported_in_where_clause(self, expression):
+        """
+        Return True, if the conditional expression is supported in the WHERE
+        clause.
+        """
+        return True
 
     def combine_expression(self, connector, sub_expressions):
         """

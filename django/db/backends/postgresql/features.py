@@ -1,3 +1,5 @@
+import operator
+
 from django.db.backends.base.features import BaseDatabaseFeatures
 from django.db.utils import InterfaceError
 from django.utils.functional import cached_property
@@ -5,8 +7,8 @@ from django.utils.functional import cached_property
 
 class DatabaseFeatures(BaseDatabaseFeatures):
     allows_group_by_selected_pks = True
-    can_return_id_from_insert = True
-    can_return_ids_from_bulk_insert = True
+    can_return_columns_from_insert = True
+    can_return_rows_from_bulk_insert = True
     has_real_datatype = True
     has_native_uuid_field = True
     has_native_duration_field = True
@@ -14,12 +16,13 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     has_select_for_update = True
     has_select_for_update_nowait = True
     has_select_for_update_of = True
-    uses_savepoints = True
+    has_select_for_update_skip_locked = True
     can_release_savepoints = True
     supports_tablespaces = True
     supports_transactions = True
     can_introspect_autofield = True
     can_introspect_ip_address_field = True
+    can_introspect_materialized_views = True
     can_introspect_small_integer_field = True
     can_distinct_on_fields = True
     can_rollback_ddl = True
@@ -27,7 +30,6 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     nulls_order_largest = True
     closed_cursor_error_class = InterfaceError
     has_case_insensitive_like = False
-    requires_sqlparse_for_splitting = False
     greatest_least_ignores_nulls = True
     can_clone_databases = True
     supports_temporal_subtraction = True
@@ -55,10 +57,6 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     validates_explain_options = False  # A query will error on invalid options.
 
     @cached_property
-    def is_postgresql_9_5(self):
-        return self.connection.pg_version >= 90500
-
-    @cached_property
     def is_postgresql_9_6(self):
         return self.connection.pg_version >= 90600
 
@@ -66,10 +64,10 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     def is_postgresql_10(self):
         return self.connection.pg_version >= 100000
 
-    has_select_for_update_skip_locked = is_postgresql_9_5
-    has_brin_index_support = is_postgresql_9_5
-    has_jsonb_agg = is_postgresql_9_5
-    has_brin_autosummarize = is_postgresql_10
-    has_gin_pending_list_limit = is_postgresql_9_5
-    supports_ignore_conflicts = is_postgresql_9_5
-    has_phraseto_tsquery = is_postgresql_9_6
+    @cached_property
+    def is_postgresql_12(self):
+        return self.connection.pg_version >= 120000
+
+    has_brin_autosummarize = property(operator.attrgetter('is_postgresql_10'))
+    has_phraseto_tsquery = property(operator.attrgetter('is_postgresql_9_6'))
+    supports_table_partitions = property(operator.attrgetter('is_postgresql_10'))

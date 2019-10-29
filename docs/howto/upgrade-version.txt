@@ -93,7 +93,7 @@ If you installed Django with pip_, you can use the ``--upgrade`` or ``-U`` flag:
 
 .. console::
 
-   $ pip install -U Django
+   $ python -m pip install -U Django
 
 .. _pip: https://pip.pypa.io/
 .. _virtualenv: https://virtualenv.pypa.io/

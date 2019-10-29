@@ -5,7 +5,10 @@ from django.db.models import Index
 from django.db.utils import DatabaseError
 from django.test import TransactionTestCase, skipUnlessDBFeature
 
-from .models import Article, ArticleReporter, City, District, Reporter
+from .models import (
+    Article, ArticleReporter, CheckConstraintModel, City, Comment, Country,
+    District, Reporter,
+)
 
 
 class IntrospectionTests(TransactionTestCase):
@@ -76,19 +79,24 @@ class IntrospectionTests(TransactionTestCase):
         with connection.cursor() as cursor:
             desc = connection.introspection.get_table_description(cursor, Reporter._meta.db_table)
         self.assertEqual(
-            [datatype(r[1], r) for r in desc],
-            ['AutoField' if connection.features.can_introspect_autofield else 'IntegerField',
-             'CharField', 'CharField', 'CharField',
-             'BigIntegerField' if connection.features.can_introspect_big_integer_field else 'IntegerField',
-             'BinaryField' if connection.features.can_introspect_binary_field else 'TextField',
-             'SmallIntegerField' if connection.features.can_introspect_small_integer_field else 'IntegerField']
+            [connection.introspection.get_field_type(r[1], r) for r in desc],
+            [
+                'AutoField' if connection.features.can_introspect_autofield else 'IntegerField',
+                'CharField',
+                'CharField',
+                'CharField',
+                'BigIntegerField' if connection.features.can_introspect_big_integer_field else 'IntegerField',
+                'BinaryField' if connection.features.can_introspect_binary_field else 'TextField',
+                'SmallIntegerField' if connection.features.can_introspect_small_integer_field else 'IntegerField',
+                'DurationField' if connection.features.can_introspect_duration_field else 'BigIntegerField',
+            ]
         )
 
     def test_get_table_description_col_lengths(self):
         with connection.cursor() as cursor:
             desc = connection.introspection.get_table_description(cursor, Reporter._meta.db_table)
         self.assertEqual(
-            [r[3] for r in desc if datatype(r[1], r) == 'CharField'],
+            [r[3] for r in desc if connection.introspection.get_field_type(r[1], r) == 'CharField'],
             [30, 30, 254]
         )
 
@@ -98,14 +106,26 @@ class IntrospectionTests(TransactionTestCase):
         nullable_by_backend = connection.features.interprets_empty_strings_as_nulls
         self.assertEqual(
             [r[6] for r in desc],
-            [False, nullable_by_backend, nullable_by_backend, nullable_by_backend, True, True, False]
+            [False, nullable_by_backend, nullable_by_backend, nullable_by_backend, True, True, False, False]
         )
 
     @skipUnlessDBFeature('can_introspect_autofield')
     def test_bigautofield(self):
         with connection.cursor() as cursor:
             desc = connection.introspection.get_table_description(cursor, City._meta.db_table)
-        self.assertIn('BigAutoField', [datatype(r[1], r) for r in desc])
+        self.assertIn(
+            connection.features.introspected_big_auto_field_type,
+            [connection.introspection.get_field_type(r[1], r) for r in desc],
+        )
+
+    @skipUnlessDBFeature('can_introspect_autofield')
+    def test_smallautofield(self):
+        with connection.cursor() as cursor:
+            desc = connection.introspection.get_table_description(cursor, Country._meta.db_table)
+        self.assertIn(
+            connection.features.introspected_small_auto_field_type,
+            [connection.introspection.get_field_type(r[1], r) for r in desc],
+        )
 
     # Regression test for #9991 - 'real' types in postgres
     @skipUnlessDBFeature('has_real_datatype')
@@ -114,7 +134,7 @@ class IntrospectionTests(TransactionTestCase):
             cursor.execute("CREATE TABLE django_ixn_real_test_table (number REAL);")
             desc = connection.introspection.get_table_description(cursor, 'django_ixn_real_test_table')
             cursor.execute('DROP TABLE django_ixn_real_test_table;')
-        self.assertEqual(datatype(desc[0][1], desc[0]), 'FloatField')
+        self.assertEqual(connection.introspection.get_field_type(desc[0][1], desc[0]), 'FloatField')
 
     @skipUnlessDBFeature('can_introspect_foreign_keys')
     def test_get_relations(self):
@@ -158,10 +178,10 @@ class IntrospectionTests(TransactionTestCase):
     def test_get_key_columns(self):
         with connection.cursor() as cursor:
             key_columns = connection.introspection.get_key_columns(cursor, Article._meta.db_table)
-        self.assertEqual(
-            set(key_columns),
-            {('reporter_id', Reporter._meta.db_table, 'id'),
-             ('response_to_id', Article._meta.db_table, 'id')})
+        self.assertEqual(set(key_columns), {
+            ('reporter_id', Reporter._meta.db_table, 'id'),
+            ('response_to_id', Article._meta.db_table, 'id'),
+        })
 
     def test_get_primary_key_column(self):
         with connection.cursor() as cursor:
@@ -204,11 +224,71 @@ class IntrospectionTests(TransactionTestCase):
                 indexes_verified += 1
         self.assertEqual(indexes_verified, 4)
 
+    def test_get_constraints(self):
+        def assertDetails(details, cols, primary_key=False, unique=False, index=False, check=False, foreign_key=None):
+            # Different backends have different values for same constraints:
+            #               PRIMARY KEY     UNIQUE CONSTRAINT    UNIQUE INDEX
+            # MySQL      pk=1 uniq=1 idx=1  pk=0 uniq=1 idx=1  pk=0 uniq=1 idx=1
+            # PostgreSQL pk=1 uniq=1 idx=0  pk=0 uniq=1 idx=0  pk=0 uniq=1 idx=1
+            # SQLite     pk=1 uniq=0 idx=0  pk=0 uniq=1 idx=0  pk=0 uniq=1 idx=1
+            if details['primary_key']:
+                details['unique'] = True
+            if details['unique']:
+                details['index'] = False
+            self.assertEqual(details['columns'], cols)
+            self.assertEqual(details['primary_key'], primary_key)
+            self.assertEqual(details['unique'], unique)
+            self.assertEqual(details['index'], index)
+            self.assertEqual(details['check'], check)
+            self.assertEqual(details['foreign_key'], foreign_key)
 
-def datatype(dbtype, description):
-    """Helper to convert a data type into a string."""
-    dt = connection.introspection.get_field_type(dbtype, description)
-    if type(dt) is tuple:
-        return dt[0]
-    else:
-        return dt
+        # Test custom constraints
+        custom_constraints = {
+            'article_email_pub_date_uniq',
+            'email_pub_date_idx',
+        }
+        with connection.cursor() as cursor:
+            constraints = connection.introspection.get_constraints(cursor, Comment._meta.db_table)
+            if (
+                connection.features.supports_column_check_constraints and
+                connection.features.can_introspect_check_constraints
+            ):
+                constraints.update(
+                    connection.introspection.get_constraints(cursor, CheckConstraintModel._meta.db_table)
+                )
+                custom_constraints.add('up_votes_gte_0_check')
+                assertDetails(constraints['up_votes_gte_0_check'], ['up_votes'], check=True)
+        assertDetails(constraints['article_email_pub_date_uniq'], ['article_id', 'email', 'pub_date'], unique=True)
+        assertDetails(constraints['email_pub_date_idx'], ['email', 'pub_date'], index=True)
+        # Test field constraints
+        field_constraints = set()
+        for name, details in constraints.items():
+            if name in custom_constraints:
+                continue
+            elif details['columns'] == ['up_votes'] and details['check']:
+                assertDetails(details, ['up_votes'], check=True)
+                field_constraints.add(name)
+            elif details['columns'] == ['voting_number'] and details['check']:
+                assertDetails(details, ['voting_number'], check=True)
+                field_constraints.add(name)
+            elif details['columns'] == ['ref'] and details['unique']:
+                assertDetails(details, ['ref'], unique=True)
+                field_constraints.add(name)
+            elif details['columns'] == ['voting_number'] and details['unique']:
+                assertDetails(details, ['voting_number'], unique=True)
+                field_constraints.add(name)
+            elif details['columns'] == ['article_id'] and details['index']:
+                assertDetails(details, ['article_id'], index=True)
+                field_constraints.add(name)
+            elif details['columns'] == ['id'] and details['primary_key']:
+                assertDetails(details, ['id'], primary_key=True, unique=True)
+                field_constraints.add(name)
+            elif details['columns'] == ['article_id'] and details['foreign_key']:
+                assertDetails(details, ['article_id'], foreign_key=('introspection_article', 'id'))
+                field_constraints.add(name)
+            elif details['check']:
+                # Some databases (e.g. Oracle) include additional check
+                # constraints.
+                field_constraints.add(name)
+        # All constraints are accounted for.
+        self.assertEqual(constraints.keys() ^ (custom_constraints | field_constraints), set())

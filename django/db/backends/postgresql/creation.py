@@ -64,10 +64,10 @@ class DatabaseCreation(BaseDatabaseCreation):
         with self._nodb_connection.cursor() as cursor:
             try:
                 self._execute_create_test_db(cursor, test_db_params, keepdb)
-            except Exception as e:
+            except Exception:
                 try:
                     if verbosity >= 1:
-                        self.log('Destroying old test database for alias %s…' % (
+                        self.log('Destroying old test database for alias %s...' % (
                             self._get_database_display_str(verbosity, target_database_name),
                         ))
                     cursor.execute('DROP DATABASE %(dbname)s' % test_db_params)

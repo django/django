@@ -18,7 +18,7 @@ from django.contrib.gis.geos.prototypes.io import (
     ewkb_w, wkb_r, wkb_w, wkt_r, wkt_w,
 )
 from django.utils.deconstruct import deconstructible
-from django.utils.encoding import force_bytes, force_text
+from django.utils.encoding import force_bytes, force_str
 
 
 class GEOSGeometryBase(GEOSBase):
@@ -695,7 +695,7 @@ class GEOSGeometry(GEOSGeometryBase, ListMixin):
         """
         input_srid = None
         if isinstance(geo_input, bytes):
-            geo_input = force_text(geo_input)
+            geo_input = force_str(geo_input)
         if isinstance(geo_input, str):
             wkt_m = wkt_regex.match(geo_input)
             if wkt_m:

@@ -5,11 +5,11 @@ from decimal import Decimal
 from django import forms
 from django.core import exceptions, serializers
 from django.db.models import DateField, DateTimeField, F, Func, Value
-from django.test import ignore_warnings, override_settings
+from django.http import QueryDict
+from django.test import override_settings
 from django.utils import timezone
-from django.utils.deprecation import RemovedInDjango31Warning
 
-from . import PostgreSQLTestCase
+from . import PostgreSQLSimpleTestCase, PostgreSQLTestCase
 from .models import RangeLookupsModel, RangesModel
 
 try:
@@ -115,11 +115,15 @@ class TestRangeContainsLookup(PostgreSQLTestCase):
         ]
         cls.obj = RangesModel.objects.create(
             dates=(cls.dates[0], cls.dates[3]),
+            dates_inner=(cls.dates[1], cls.dates[2]),
             timestamps=(cls.timestamps[0], cls.timestamps[3]),
+            timestamps_inner=(cls.timestamps[1], cls.timestamps[2]),
         )
         cls.aware_obj = RangesModel.objects.create(
             dates=(cls.dates[0], cls.dates[3]),
+            dates_inner=(cls.dates[1], cls.dates[2]),
             timestamps=(cls.aware_timestamps[0], cls.aware_timestamps[3]),
+            timestamps_inner=(cls.timestamps[1], cls.timestamps[2]),
         )
         # Objects that don't match any queries.
         for i in range(3, 4):
@@ -140,6 +144,7 @@ class TestRangeContainsLookup(PostgreSQLTestCase):
             (self.aware_timestamps[1], self.aware_timestamps[2]),
             Value(self.dates[0], output_field=DateTimeField()),
             Func(F('dates'), function='lower', output_field=DateTimeField()),
+            F('timestamps_inner'),
         )
         for filter_arg in filter_args:
             with self.subTest(filter_arg=filter_arg):
@@ -154,6 +159,7 @@ class TestRangeContainsLookup(PostgreSQLTestCase):
             (self.dates[1], self.dates[2]),
             Value(self.dates[0], output_field=DateField()),
             Func(F('timestamps'), function='lower', output_field=DateField()),
+            F('dates_inner'),
         )
         for filter_arg in filter_args:
             with self.subTest(filter_arg=filter_arg):
@@ -167,13 +173,13 @@ class TestQuerying(PostgreSQLTestCase):
 
     @classmethod
     def setUpTestData(cls):
-        cls.objs = [
-            RangesModel.objects.create(ints=NumericRange(0, 10)),
-            RangesModel.objects.create(ints=NumericRange(5, 15)),
-            RangesModel.objects.create(ints=NumericRange(None, 0)),
-            RangesModel.objects.create(ints=NumericRange(empty=True)),
-            RangesModel.objects.create(ints=None),
-        ]
+        cls.objs = RangesModel.objects.bulk_create([
+            RangesModel(ints=NumericRange(0, 10)),
+            RangesModel(ints=NumericRange(5, 15)),
+            RangesModel(ints=NumericRange(None, 0)),
+            RangesModel(ints=NumericRange(empty=True)),
+            RangesModel(ints=None),
+        ])
 
     def test_exact(self):
         self.assertSequenceEqual(
@@ -355,13 +361,15 @@ class TestQueryingWithRanges(PostgreSQLTestCase):
         )
 
 
-class TestSerialization(PostgreSQLTestCase):
+class TestSerialization(PostgreSQLSimpleTestCase):
     test_data = (
         '[{"fields": {"ints": "{\\"upper\\": \\"10\\", \\"lower\\": \\"0\\", '
         '\\"bounds\\": \\"[)\\"}", "decimals": "{\\"empty\\": true}", '
         '"bigints": null, "timestamps": "{\\"upper\\": \\"2014-02-02T12:12:12+00:00\\", '
         '\\"lower\\": \\"2014-01-01T00:00:00+00:00\\", \\"bounds\\": \\"[)\\"}", '
-        '"dates": "{\\"upper\\": \\"2014-02-02\\", \\"lower\\": \\"2014-01-01\\", \\"bounds\\": \\"[)\\"}" }, '
+        '"timestamps_inner": null, '
+        '"dates": "{\\"upper\\": \\"2014-02-02\\", \\"lower\\": \\"2014-01-01\\", \\"bounds\\": \\"[)\\"}", '
+        '"dates_inner": null }, '
         '"model": "postgres_tests.rangesmodel", "pk": null}]'
     )
 
@@ -405,7 +413,7 @@ class TestSerialization(PostgreSQLTestCase):
         self.assertEqual(new_instance.ints, NumericRange(10, None))
 
 
-class TestValidators(PostgreSQLTestCase):
+class TestValidators(PostgreSQLSimpleTestCase):
 
     def test_max(self):
         validator = RangeMaxValueValidator(5)
@@ -430,28 +438,17 @@ class TestValidators(PostgreSQLTestCase):
             validator(NumericRange(None, 10))  # an unbound range
 
 
-class TestFormField(PostgreSQLTestCase):
+class TestFormField(PostgreSQLSimpleTestCase):
 
     def test_valid_integer(self):
         field = pg_forms.IntegerRangeField()
         value = field.clean(['1', '2'])
         self.assertEqual(value, NumericRange(1, 2))
 
-    @ignore_warnings(category=RemovedInDjango31Warning)
-    def test_valid_floats(self):
-        field = pg_forms.FloatRangeField()
-        value = field.clean(['1.12345', '2.001'])
-        self.assertEqual(value, NumericRange(1.12345, 2.001))
-
     def test_valid_decimal(self):
         field = pg_forms.DecimalRangeField()
         value = field.clean(['1.12345', '2.001'])
         self.assertEqual(value, NumericRange(Decimal('1.12345'), Decimal('2.001')))
-
-    def test_float_range_field_deprecation(self):
-        msg = 'FloatRangeField is deprecated in favor of DecimalRangeField.'
-        with self.assertRaisesMessage(RemovedInDjango31Warning, msg):
-            pg_forms.FloatRangeField()
 
     def test_valid_timestamps(self):
         field = pg_forms.DateTimeRangeField()
@@ -503,6 +500,63 @@ class TestFormField(PostgreSQLTestCase):
         field = pg_forms.IntegerRangeField(required=False)
         value = field.clean(['', ''])
         self.assertIsNone(value)
+
+    def test_datetime_form_as_table(self):
+        class DateTimeRangeForm(forms.Form):
+            datetime_field = pg_forms.DateTimeRangeField(show_hidden_initial=True)
+
+        form = DateTimeRangeForm()
+        self.assertHTMLEqual(
+            form.as_table(),
+            """
+            <tr><th>
+            <label for="id_datetime_field_0">Datetime field:</label>
+            </th><td>
+            <input type="text" name="datetime_field_0" id="id_datetime_field_0">
+            <input type="text" name="datetime_field_1" id="id_datetime_field_1">
+            <input type="hidden" name="initial-datetime_field_0" id="initial-id_datetime_field_0">
+            <input type="hidden" name="initial-datetime_field_1" id="initial-id_datetime_field_1">
+            </td></tr>
+            """
+        )
+        form = DateTimeRangeForm({
+            'datetime_field_0': '2010-01-01 11:13:00',
+            'datetime_field_1': '2020-12-12 16:59:00',
+        })
+        self.assertHTMLEqual(
+            form.as_table(),
+            """
+            <tr><th>
+            <label for="id_datetime_field_0">Datetime field:</label>
+            </th><td>
+            <input type="text" name="datetime_field_0"
+            value="2010-01-01 11:13:00" id="id_datetime_field_0">
+            <input type="text" name="datetime_field_1"
+            value="2020-12-12 16:59:00" id="id_datetime_field_1">
+            <input type="hidden" name="initial-datetime_field_0" value="2010-01-01 11:13:00"
+            id="initial-id_datetime_field_0">
+            <input type="hidden" name="initial-datetime_field_1" value="2020-12-12 16:59:00"
+            id="initial-id_datetime_field_1"></td></tr>
+            """
+        )
+
+    def test_datetime_form_initial_data(self):
+        class DateTimeRangeForm(forms.Form):
+            datetime_field = pg_forms.DateTimeRangeField(show_hidden_initial=True)
+
+        data = QueryDict(mutable=True)
+        data.update({
+            'datetime_field_0': '2010-01-01 11:13:00',
+            'datetime_field_1': '',
+            'initial-datetime_field_0': '2010-01-01 10:12:00',
+            'initial-datetime_field_1': '',
+        })
+        form = DateTimeRangeForm(data=data)
+        self.assertTrue(form.has_changed())
+
+        data['initial-datetime_field_0'] = '2010-01-01 11:13:00'
+        form = DateTimeRangeForm(data=data)
+        self.assertFalse(form.has_changed())
 
     def test_rendering(self):
         class RangeForm(forms.Form):
@@ -635,6 +689,18 @@ class TestFormField(PostgreSQLTestCase):
         value = field.clean(['1976-04-16', ''])
         self.assertEqual(value, DateRange(datetime.date(1976, 4, 16), None))
 
+    def test_date_has_changed_first(self):
+        self.assertTrue(pg_forms.DateRangeField().has_changed(
+            ['2010-01-01', '2020-12-12'],
+            ['2010-01-31', '2020-12-12'],
+        ))
+
+    def test_date_has_changed_last(self):
+        self.assertTrue(pg_forms.DateRangeField().has_changed(
+            ['2010-01-01', '2020-12-12'],
+            ['2010-01-01', '2020-12-31'],
+        ))
+
     def test_datetime_lower_bound_higher(self):
         field = pg_forms.DateTimeRangeField()
         with self.assertRaises(exceptions.ValidationError) as cm:
@@ -682,6 +748,18 @@ class TestFormField(PostgreSQLTestCase):
         )
         self.assertEqual(value, [datetime.datetime(2015, 5, 22, 18, 6, 33), None])
 
+    def test_datetime_has_changed_first(self):
+        self.assertTrue(pg_forms.DateTimeRangeField().has_changed(
+            ['2010-01-01 00:00', '2020-12-12 00:00'],
+            ['2010-01-31 23:00', '2020-12-12 00:00'],
+        ))
+
+    def test_datetime_has_changed_last(self):
+        self.assertTrue(pg_forms.DateTimeRangeField().has_changed(
+            ['2010-01-01 00:00', '2020-12-12 00:00'],
+            ['2010-01-01 00:00', '2020-12-31 23:00'],
+        ))
+
     def test_model_field_formfield_integer(self):
         model_field = pg_fields.IntegerRangeField()
         form_field = model_field.formfield()
@@ -707,8 +785,21 @@ class TestFormField(PostgreSQLTestCase):
         form_field = model_field.formfield()
         self.assertIsInstance(form_field, pg_forms.DateTimeRangeField)
 
+    def test_has_changed(self):
+        for field, value in (
+            (pg_forms.DateRangeField(), ['2010-01-01', '2020-12-12']),
+            (pg_forms.DateTimeRangeField(), ['2010-01-01 11:13', '2020-12-12 14:52']),
+            (pg_forms.IntegerRangeField(), [1, 2]),
+            (pg_forms.DecimalRangeField(), ['1.12345', '2.001']),
+        ):
+            with self.subTest(field=field.__class__.__name__):
+                self.assertTrue(field.has_changed(None, value))
+                self.assertTrue(field.has_changed([value[0], ''], value))
+                self.assertTrue(field.has_changed(['', value[1]], value))
+                self.assertFalse(field.has_changed(value, value))
 
-class TestWidget(PostgreSQLTestCase):
+
+class TestWidget(PostgreSQLSimpleTestCase):
     def test_range_widget(self):
         f = pg_forms.ranges.DateTimeRangeField()
         self.assertHTMLEqual(

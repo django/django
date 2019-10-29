@@ -12,8 +12,7 @@ from django.db.migrations.questioner import MigrationQuestioner
 from django.db.migrations.utils import (
     COMPILED_REGEX_TYPE, RegexObject, get_migration_name_timestamp,
 )
-
-from .topological_sort import stable_topological_sort
+from django.utils.topological_sort import stable_topological_sort
 
 
 class MigrationAutodetector:
@@ -237,6 +236,17 @@ class MigrationAutodetector:
                     )
                     self.through_users[through_key] = (app_label, old_model_name, field_name)
 
+    @staticmethod
+    def _resolve_dependency(dependency):
+        """
+        Return the resolved dependency and a boolean denoting whether or not
+        it was swappable.
+        """
+        if dependency[0] != '__setting__':
+            return dependency, False
+        resolved_app_label, resolved_object_name = getattr(settings, dependency[1]).split('.')
+        return (resolved_app_label, resolved_object_name.lower()) + dependency[2:], True
+
     def _build_migration_list(self, graph=None):
         """
         Chop the lists of operations up into migrations with dependencies on
@@ -265,16 +275,13 @@ class MigrationAutodetector:
                     deps_satisfied = True
                     operation_dependencies = set()
                     for dep in operation._auto_deps:
-                        is_swappable_dep = dep[0] == '__setting__'
-                        if is_swappable_dep:
-                            # We need to temporarily resolve the swappable dependency to prevent
-                            # circular references. While keeping the dependency checks on the
-                            # resolved model we still add the swappable dependencies.
-                            # See #23322
-                            resolved_app_label, resolved_object_name = getattr(settings, dep[1]).split('.')
-                            original_dep = dep
-                            dep = (resolved_app_label, resolved_object_name.lower(), dep[2], dep[3])
-                        if dep[0] != app_label and dep[0] != "__setting__":
+                        # Temporarily resolve the swappable dependency to
+                        # prevent circular references. While keeping the
+                        # dependency checks on the resolved model, add the
+                        # swappable dependencies.
+                        original_dep = dep
+                        dep, is_swappable_dep = self._resolve_dependency(dep)
+                        if dep[0] != app_label:
                             # External app dependency. See if it's not yet
                             # satisfied.
                             for other_operation in self.generated_operations.get(dep[0], []):
@@ -337,6 +344,9 @@ class MigrationAutodetector:
             dependency_graph = {op: set() for op in ops}
             for op in ops:
                 for dep in op._auto_deps:
+                    # Resolve intra-app dependencies to handle circular
+                    # references involving a swappable model.
+                    dep = self._resolve_dependency(dep)[0]
                     if dep[0] == app_label:
                         for op2 in ops:
                             if self.check_dependency(op2, dep):
@@ -711,10 +721,6 @@ class MigrationAutodetector:
         for app_label, model_name in all_deleted_models:
             model_state = self.from_state.models[app_label, model_name]
             model = self.old_apps.get_model(app_label, model_name)
-            if not model._meta.managed:
-                # Skip here, no need to handle fields for unmanaged models
-                continue
-
             # Gather related fields
             related_fields = {}
             for field in model._meta.local_fields:
@@ -906,6 +912,7 @@ class MigrationAutodetector:
             old_field_name = self.renamed_fields.get((app_label, model_name, field_name), field_name)
             old_field = self.old_apps.get_model(app_label, old_model_name)._meta.get_field(old_field_name)
             new_field = self.new_apps.get_model(app_label, model_name)._meta.get_field(field_name)
+            dependencies = []
             # Implement any model renames on relations; these are handled by RenameModel
             # so we need to exclude them from the comparison
             if hasattr(new_field, "remote_field") and getattr(new_field.remote_field, "model", None):
@@ -920,6 +927,10 @@ class MigrationAutodetector:
                 if remote_field_name:
                     to_field_rename_key = rename_key + (remote_field_name,)
                     if to_field_rename_key in self.renamed_fields:
+                        # Repoint both model and field name because to_field
+                        # inclusion in ForeignKey.deconstruct() is based on
+                        # both.
+                        new_field.remote_field.model = old_field.remote_field.model
                         new_field.remote_field.field_name = old_field.remote_field.field_name
                 # Handle ForeignObjects which can have multiple from_fields/to_fields.
                 from_fields = getattr(new_field, 'from_fields', None)
@@ -933,6 +944,7 @@ class MigrationAutodetector:
                         self.renamed_fields.get(rename_key + (to_field,), to_field)
                         for to_field in new_field.to_fields
                     ])
+                dependencies.extend(self._get_dependencies_for_foreign_key(new_field))
             if hasattr(new_field, "remote_field") and getattr(new_field.remote_field, "through", None):
                 rename_key = (
                     new_field.remote_field.through._meta.app_label,
@@ -964,7 +976,8 @@ class MigrationAutodetector:
                             name=field_name,
                             field=field,
                             preserve_default=preserve_default,
-                        )
+                        ),
+                        dependencies=dependencies,
                     )
                 else:
                     # We cannot alter between m2m and concrete fields

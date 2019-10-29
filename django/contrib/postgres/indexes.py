@@ -18,9 +18,9 @@ class PostgresIndex(Index):
         # indexes.
         return Index.max_name_length - len(Index.suffix) + len(self.suffix)
 
-    def create_sql(self, model, schema_editor, using=''):
+    def create_sql(self, model, schema_editor, using='', **kwargs):
         self.check_supported(schema_editor)
-        statement = super().create_sql(model, schema_editor, using=' USING %s' % self.suffix)
+        statement = super().create_sql(model, schema_editor, using=' USING %s' % self.suffix, **kwargs)
         with_params = self.get_with_params()
         if with_params:
             statement.parts['extra'] = 'WITH (%s) %s' % (
@@ -55,8 +55,6 @@ class BrinIndex(PostgresIndex):
         return path, args, kwargs
 
     def check_supported(self, schema_editor):
-        if not schema_editor.connection.features.has_brin_index_support:
-            raise NotSupportedError('BRIN indexes require PostgreSQL 9.5+.')
         if self.autosummarize and not schema_editor.connection.features.has_brin_autosummarize:
             raise NotSupportedError('BRIN option autosummarize requires PostgreSQL 10+.')
 
@@ -104,10 +102,6 @@ class GinIndex(PostgresIndex):
         if self.gin_pending_list_limit is not None:
             kwargs['gin_pending_list_limit'] = self.gin_pending_list_limit
         return path, args, kwargs
-
-    def check_supported(self, schema_editor):
-        if self.gin_pending_list_limit and not schema_editor.connection.features.has_gin_pending_list_limit:
-            raise NotSupportedError('GIN option gin_pending_list_limit requires PostgreSQL 9.5+.')
 
     def get_with_params(self):
         with_params = []

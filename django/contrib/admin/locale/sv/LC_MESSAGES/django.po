@@ -3,21 +3,22 @@
 # Translators:
 # Alex Nordlund <deep.alexander@gmail.com>, 2012
 # Andreas Pelme <andreas@pelme.se>, 2014
-# cvitan <tome@cvitan.com>, 2011
+# d7bcbd5f5cbecdc2b959899620582440, 2011
 # Cybjit <cybjit@gmail.com>, 2012
+# Henrik Palmlund Wahlgren <henrik@pwit.se>, 2019
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Jonathan Lindén, 2015
 # Jonathan Lindén, 2014
 # Mattias Hansson <mattias.gothenburg@gmail.com>, 2016
 # Mikko Hellsing <mikko@aino.se>, 2011
-# Thomas Lundqvist <thomas@biljettshop.se>, 2013,2016-2017
+# Thomas Lundqvist, 2013,2016-2017
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-09-15 13:27+0000\n"
-"Last-Translator: Thomas Lundqvist <thomas@biljettshop.se>\n"
+"POT-Creation-Date: 2019-01-16 20:42+0100\n"
+"PO-Revision-Date: 2019-01-28 13:45+0000\n"
+"Last-Translator: Henrik Palmlund Wahlgren <henrik@pwit.se>\n"
 "Language-Team: Swedish (http://www.transifex.com/django/django/language/"
 "sv/)\n"
 "MIME-Version: 1.0\n"
@@ -95,6 +96,15 @@ msgstr "Lägg till ytterligare %(verbose_name)s"
 msgid "Remove"
 msgstr "Ta bort"
 
+msgid "Addition"
+msgstr "Tillägg"
+
+msgid "Change"
+msgstr "Ändra"
+
+msgid "Deletion"
+msgstr "Borttagning"
+
 msgid "action time"
 msgstr "händelsetid"
 
@@ -108,7 +118,7 @@ msgid "object id"
 msgstr "objektets id"
 
 #. Translators: 'repr' means representation
-#. (https://docs.python.org/3/library/functions.html#repr)
+#. (https://docs.python.org/library/functions.html#repr)
 msgid "object repr"
 msgstr "objektets beskrivning"
 
@@ -173,9 +183,11 @@ msgstr ""
 "Håll ner \"Control\", eller \"Command\" på en Mac, för att välja fler än en."
 
 #, python-brace-format
-msgid ""
-"The {name} \"{obj}\" was added successfully. You may edit it again below."
-msgstr "{name} \"{obj}\" lades till. Du kan redigera objektet igen nedanför."
+msgid "The {name} \"{obj}\" was added successfully."
+msgstr "{name} \"{obj}\" lades till."
+
+msgid "You may edit it again below."
+msgstr "Du kan redigera det igen nedan"
 
 #, python-brace-format
 msgid ""
@@ -185,13 +197,14 @@ msgstr ""
 "{name} \"{obj}\" lades till. Du kan lägga till ytterligare {name} nedan."
 
 #, python-brace-format
-msgid "The {name} \"{obj}\" was added successfully."
-msgstr "{name} \"{obj}\" lades till."
-
-#, python-brace-format
 msgid ""
 "The {name} \"{obj}\" was changed successfully. You may edit it again below."
 msgstr "{name} \"{obj}\" ändrades. Du kan ändra det igen nedan."
+
+#, python-brace-format
+msgid ""
+"The {name} \"{obj}\" was added successfully. You may edit it again below."
+msgstr "{name} \"{obj}\" lades till. Du kan redigera objektet igen nedanför."
 
 #, python-brace-format
 msgid ""
@@ -230,6 +243,10 @@ msgstr "Lägg till %s"
 #, python-format
 msgid "Change %s"
 msgstr "Ändra %s"
+
+#, python-format
+msgid "View %s"
+msgstr "Visa 1%s"
 
 msgid "Database error"
 msgstr "Databasfel"
@@ -340,7 +357,7 @@ msgid "Change password"
 msgstr "Ändra lösenord"
 
 msgid "Please correct the error below."
-msgstr "Rätta till felen nedan."
+msgstr "Vänligen rätta nedanstående fel"
 
 msgid "Please correct the errors below."
 msgstr "Vänligen rätta till felen nedan."
@@ -451,8 +468,8 @@ msgstr ""
 "Är du säker på att du vill ta bort valda %(objects_name)s? Alla följande "
 "objekt samt relaterade objekt kommer att tas bort: "
 
-msgid "Change"
-msgstr "Ändra"
+msgid "View"
+msgstr "Visa"
 
 msgid "Delete?"
 msgstr "Radera?"
@@ -471,8 +488,8 @@ msgstr "Modeller i applikationen %(name)s"
 msgid "Add"
 msgstr "Lägg till"
 
-msgid "You don't have permission to edit anything."
-msgstr "Du har inte rättigheter att redigera något."
+msgid "You don't have permission to view or edit anything."
+msgstr "Du har inte tillåtelse att se eller redigera någonting."
 
 msgid "Recent actions"
 msgstr "Senaste Händelser"
@@ -527,20 +544,8 @@ msgstr "Visa alla"
 msgid "Save"
 msgstr "Spara"
 
-msgid "Popup closing..."
-msgstr "Popup stänger..."
-
-#, python-format
-msgid "Change selected %(model)s"
-msgstr "Ändra markerade %(model)s"
-
-#, python-format
-msgid "Add another %(model)s"
-msgstr "Lägg till %(model)s"
-
-#, python-format
-msgid "Delete selected %(model)s"
-msgstr "Ta bort markerade %(model)s"
+msgid "Popup closing…"
+msgstr "Popup stängs..."
 
 msgid "Search"
 msgstr "Sök"
@@ -563,6 +568,24 @@ msgstr "Spara och lägg till ny"
 
 msgid "Save and continue editing"
 msgstr "Spara och fortsätt redigera"
+
+msgid "Save and view"
+msgstr "Spara och visa"
+
+msgid "Close"
+msgstr "Stäng"
+
+#, python-format
+msgid "Change selected %(model)s"
+msgstr "Ändra markerade %(model)s"
+
+#, python-format
+msgid "Add another %(model)s"
+msgstr "Lägg till %(model)s"
+
+#, python-format
+msgid "Delete selected %(model)s"
+msgstr "Ta bort markerade %(model)s"
 
 msgid "Thanks for spending some quality time with the Web site today."
 msgstr "Tack för att du spenderade lite kvalitetstid med webbplatsen idag."
@@ -674,6 +697,10 @@ msgstr "Välj %s"
 #, python-format
 msgid "Select %s to change"
 msgstr "Välj %s att ändra"
+
+#, python-format
+msgid "Select %s to view"
+msgstr "Välj 1%s för visning"
 
 msgid "Date:"
 msgstr "Datum:"

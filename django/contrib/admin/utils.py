@@ -1,6 +1,5 @@
 import datetime
 import decimal
-import re
 from collections import defaultdict
 
 from django.core.exceptions import FieldDoesNotExist
@@ -11,12 +10,13 @@ from django.forms.utils import pretty_name
 from django.urls import NoReverseMatch, reverse
 from django.utils import formats, timezone
 from django.utils.html import format_html
+from django.utils.regex_helper import _lazy_re_compile
 from django.utils.text import capfirst
 from django.utils.translation import ngettext, override as translation_override
 
 QUOTE_MAP = {i: '_%02X' % i for i in b'":/_#?;@&=+$,"[]<>%\n\\'}
 UNQUOTE_MAP = {v: chr(k) for k, v in QUOTE_MAP.items()}
-UNQUOTE_RE = re.compile('_(?:%s)' % '|'.join([x[1:] for x in UNQUOTE_MAP]))
+UNQUOTE_RE = _lazy_re_compile('_(?:%s)' % '|'.join([x[1:] for x in UNQUOTE_MAP]))
 
 
 class FieldIsAForeignKeyColumnName(Exception):
@@ -182,9 +182,9 @@ class NestedObjects(Collector):
         except models.ProtectedError as e:
             self.protected.update(e.protected_objects)
 
-    def related_objects(self, related, objs):
-        qs = super().related_objects(related, objs)
-        return qs.select_related(related.field.name)
+    def related_objects(self, related_model, related_fields, objs):
+        qs = super().related_objects(related_model, related_fields, objs)
+        return qs.select_related(*[related_field.name for related_field in related_fields])
 
     def _nested(self, obj, seen, format_callback):
         if obj in seen:
@@ -489,12 +489,21 @@ def construct_change_message(form, formsets, add):
     Translations are deactivated so that strings are stored untranslated.
     Translation happens later on LogEntry access.
     """
+    # Evaluating `form.changed_data` prior to disabling translations is required
+    # to avoid fields affected by localization from being included incorrectly,
+    # e.g. where date formats differ such as MM/DD/YYYY vs DD/MM/YYYY.
+    changed_data = form.changed_data
+    with translation_override(None):
+        # Deactivate translations while fetching verbose_name for form
+        # field labels and using `field_name`, if verbose_name is not provided.
+        # Translations will happen later on LogEntry access.
+        changed_field_labels = _get_changed_field_labels_from_form(form, changed_data)
+
     change_message = []
     if add:
         change_message.append({'added': {}})
     elif form.changed_data:
-        change_message.append({'changed': {'fields': form.changed_data}})
-
+        change_message.append({'changed': {'fields': changed_field_labels}})
     if formsets:
         with translation_override(None):
             for formset in formsets:
@@ -510,7 +519,7 @@ def construct_change_message(form, formsets, add):
                         'changed': {
                             'name': str(changed_object._meta.verbose_name),
                             'object': str(changed_object),
-                            'fields': changed_fields,
+                            'fields': _get_changed_field_labels_from_form(formset.forms[0], changed_fields),
                         }
                     })
                 for deleted_object in formset.deleted_objects:
@@ -521,3 +530,14 @@ def construct_change_message(form, formsets, add):
                         }
                     })
     return change_message
+
+
+def _get_changed_field_labels_from_form(form, changed_data):
+    changed_field_labels = []
+    for field_name in changed_data:
+        try:
+            verbose_field_name = form.fields[field_name].label or field_name
+        except KeyError:
+            verbose_field_name = field_name
+        changed_field_labels.append(str(verbose_field_name))
+    return changed_field_labels

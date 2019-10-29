@@ -179,11 +179,11 @@ Requires jQuery, core.js, and SelectBox.js.
                 // This is much faster in WebKit browsers than the fallback.
                 field.attr('required', 'required');
                 any_selected = field.is(':valid');
-                field.removeAttr('required');
             } catch (e) {
                 // Browsers that don't support :valid (IE < 10)
                 any_selected = field.find('option:selected').length > 0;
             }
+            field.removeAttr('required');
             return any_selected;
         },
         refresh_icons: function(field_id) {

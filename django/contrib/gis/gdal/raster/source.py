@@ -17,7 +17,7 @@ from django.contrib.gis.gdal.raster.const import (
 )
 from django.contrib.gis.gdal.srs import SpatialReference, SRSException
 from django.contrib.gis.geometry import json_regex
-from django.utils.encoding import force_bytes, force_text
+from django.utils.encoding import force_bytes, force_str
 from django.utils.functional import cached_property
 
 
@@ -233,7 +233,7 @@ class GDALRaster(GDALRasterBase):
         Return the name of this raster. Corresponds to filename
         for file-based rasters.
         """
-        return force_text(capi.get_ds_description(self._ptr))
+        return force_str(capi.get_ds_description(self._ptr))
 
     @cached_property
     def driver(self):

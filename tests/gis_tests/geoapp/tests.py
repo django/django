@@ -1,4 +1,5 @@
 import tempfile
+import unittest
 from io import StringIO
 
 from django.contrib.gis import gdal
@@ -12,7 +13,8 @@ from django.db import NotSupportedError, connection
 from django.test import TestCase, skipUnlessDBFeature
 
 from ..utils import (
-    mysql, no_oracle, oracle, postgis, skipUnlessGISLookup, spatialite,
+    mariadb, mysql, no_oracle, oracle, postgis, skipUnlessGISLookup,
+    spatialite,
 )
 from .models import (
     City, Country, Feature, MinusOneSRID, NonConcreteModel, PennsylvaniaCity,
@@ -226,14 +228,14 @@ class GeoLookupTest(TestCase):
 
     def test_disjoint_lookup(self):
         "Testing the `disjoint` lookup type."
+        if mysql and not mariadb and connection.mysql_version < (8, 0, 0):
+            raise unittest.SkipTest('MySQL < 8 gives different results.')
         ptown = City.objects.get(name='Pueblo')
         qs1 = City.objects.filter(point__disjoint=ptown.point)
         self.assertEqual(7, qs1.count())
-
-        if connection.features.supports_real_shape_operations:
-            qs2 = State.objects.filter(poly__disjoint=ptown.point)
-            self.assertEqual(1, qs2.count())
-            self.assertEqual('Kansas', qs2[0].name)
+        qs2 = State.objects.filter(poly__disjoint=ptown.point)
+        self.assertEqual(1, qs2.count())
+        self.assertEqual('Kansas', qs2[0].name)
 
     def test_contains_contained_lookups(self):
         "Testing the 'contained', 'contains', and 'bbcontains' lookup types."
@@ -271,8 +273,7 @@ class GeoLookupTest(TestCase):
         # Pueblo and Oklahoma City (even though OK City is within the bounding box of Texas)
         # are not contained in Texas or New Zealand.
         self.assertEqual(len(Country.objects.filter(mpoly__contains=pueblo.point)), 0)  # Query w/GEOSGeometry object
-        self.assertEqual(len(Country.objects.filter(mpoly__contains=okcity.point.wkt)),
-                         0 if connection.features.supports_real_shape_operations else 1)  # Query w/WKT
+        self.assertEqual(len(Country.objects.filter(mpoly__contains=okcity.point.wkt)), 0)  # Query w/WKT
 
         # OK City is contained w/in bounding box of Texas.
         if connection.features.supports_bbcontains_lookup:
@@ -449,7 +450,7 @@ class GeoLookupTest(TestCase):
                 qs.count()
 
         # Relate works differently for the different backends.
-        if postgis or spatialite:
+        if postgis or spatialite or mariadb:
             contains_mask = 'T*T***FF*'
             within_mask = 'T*F**F***'
             intersects_mask = 'T********'
@@ -460,7 +461,11 @@ class GeoLookupTest(TestCase):
             intersects_mask = 'overlapbdyintersect'
 
         # Testing contains relation mask.
-        self.assertEqual('Texas', Country.objects.get(mpoly__relate=(pnt1, contains_mask)).name)
+        if connection.features.supports_transform:
+            self.assertEqual(
+                Country.objects.get(mpoly__relate=(pnt1, contains_mask)).name,
+                'Texas',
+            )
         self.assertEqual('Texas', Country.objects.get(mpoly__relate=(pnt2, contains_mask)).name)
 
         # Testing within relation mask.
@@ -469,7 +474,11 @@ class GeoLookupTest(TestCase):
 
         # Testing intersection relation mask.
         if not oracle:
-            self.assertEqual('Texas', Country.objects.get(mpoly__relate=(pnt1, intersects_mask)).name)
+            if connection.features.supports_transform:
+                self.assertEqual(
+                    Country.objects.get(mpoly__relate=(pnt1, intersects_mask)).name,
+                    'Texas',
+                )
             self.assertEqual('Texas', Country.objects.get(mpoly__relate=(pnt2, intersects_mask)).name)
             self.assertEqual('Lawrence', City.objects.get(point__relate=(ks.poly, intersects_mask)).name)
 
@@ -570,13 +579,7 @@ class GeoQuerySetTest(TestCase):
         """
         tex_cities = City.objects.filter(
             point__within=Country.objects.filter(name='Texas').values('mpoly')).order_by('name')
-        expected = ['Dallas', 'Houston']
-        if not connection.features.supports_real_shape_operations:
-            expected.append('Oklahoma City')
-        self.assertEqual(
-            list(tex_cities.values_list('name', flat=True)),
-            expected
-        )
+        self.assertEqual(list(tex_cities.values_list('name', flat=True)), ['Dallas', 'Houston'])
 
     def test_non_concrete_field(self):
         NonConcreteModel.objects.create(point=Point(0, 0), name='name')

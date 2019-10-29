@@ -1,6 +1,6 @@
-from django.conf.urls import url
 from django.http import HttpResponse
 from django.template import Context, Template
+from django.urls import path
 
 
 def inner_view(request):
@@ -10,5 +10,5 @@ def inner_view(request):
 
 
 urlpatterns = [
-    url(r'^second_test/$', inner_view, name='inner'),
+    path('second_test/', inner_view, name='inner'),
 ]

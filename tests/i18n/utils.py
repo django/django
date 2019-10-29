@@ -59,7 +59,3 @@ class RunInTmpDirMixin:
         if os.path.commonprefix([self.test_dir, os.path.abspath(dname)]) != self.test_dir:
             return
         shutil.rmtree(dname)
-
-    def rmfile(self, filepath):
-        if os.path.exists(filepath):
-            os.remove(filepath)

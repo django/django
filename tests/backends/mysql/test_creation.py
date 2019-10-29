@@ -1,3 +1,4 @@
+import subprocess
 import unittest
 from io import StringIO
 from unittest import mock
@@ -43,3 +44,42 @@ class DatabaseCreationTests(SimpleTestCase):
         with self.patch_test_db_creation(self._execute_raise_access_denied):
             with self.assertRaises(SystemExit):
                 creation._create_test_db(verbosity=0, autoclobber=False, keepdb=False)
+
+    def test_clone_test_db_database_exists(self):
+        creation = DatabaseCreation(connection)
+        with self.patch_test_db_creation(self._execute_raise_database_exists):
+            with mock.patch.object(DatabaseCreation, '_clone_db') as _clone_db:
+                creation._clone_test_db('suffix', verbosity=0, keepdb=True)
+                _clone_db.assert_not_called()
+
+    def test_clone_test_db_options_ordering(self):
+        creation = DatabaseCreation(connection)
+        try:
+            saved_settings = connection.settings_dict
+            connection.settings_dict = {
+                'NAME': 'source_db',
+                'USER': '',
+                'PASSWORD': '',
+                'PORT': '',
+                'HOST': '',
+                'ENGINE': 'django.db.backends.mysql',
+                'OPTIONS': {
+                    'read_default_file': 'my.cnf',
+                },
+            }
+            with mock.patch.object(subprocess, 'Popen') as mocked_popen:
+                creation._clone_db('source_db', 'target_db')
+                mocked_popen.assert_has_calls([
+                    mock.call(
+                        [
+                            'mysqldump',
+                            '--defaults-file=my.cnf',
+                            '--routines',
+                            '--events',
+                            'source_db',
+                        ],
+                        stdout=subprocess.PIPE,
+                    ),
+                ])
+        finally:
+            connection.settings_dict = saved_settings

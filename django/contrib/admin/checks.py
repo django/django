@@ -1,4 +1,3 @@
-import warnings
 from itertools import chain
 
 from django.apps import apps
@@ -16,8 +15,35 @@ from django.forms.models import (
 )
 from django.template import engines
 from django.template.backends.django import DjangoTemplates
-from django.utils.deprecation import RemovedInDjango30Warning
-from django.utils.inspect import get_func_args
+from django.utils.module_loading import import_string
+
+
+def _issubclass(cls, classinfo):
+    """
+    issubclass() variant that doesn't raise an exception if cls isn't a
+    class.
+    """
+    try:
+        return issubclass(cls, classinfo)
+    except TypeError:
+        return False
+
+
+def _contains_subclass(class_path, candidate_paths):
+    """
+    Return whether or not a dotted class path (or a subclass of that class) is
+    found in a list of candidate paths.
+    """
+    cls = import_string(class_path)
+    for path in candidate_paths:
+        try:
+            candidate_cls = import_string(path)
+        except ImportError:
+            # ImportErrors are raised elsewhere.
+            continue
+        if _issubclass(candidate_cls, cls):
+            return True
+    return False
 
 
 def check_admin_app(app_configs, **kwargs):
@@ -39,7 +65,6 @@ def check_dependencies(**kwargs):
         ('django.contrib.contenttypes', 401),
         ('django.contrib.auth', 405),
         ('django.contrib.messages', 406),
-        ('django.contrib.sessions', 407),
     )
     for app_name, error_code in app_dependencies:
         if not apps.is_installed(app_name):
@@ -64,8 +89,7 @@ def check_dependencies(**kwargs):
     else:
         if ('django.contrib.auth.context_processors.auth'
                 not in django_templates_instance.context_processors and
-                'django.contrib.auth.backends.ModelBackend'
-                in settings.AUTHENTICATION_BACKENDS):
+                _contains_subclass('django.contrib.auth.backends.ModelBackend', settings.AUTHENTICATION_BACKENDS)):
             errors.append(checks.Error(
                 "'django.contrib.auth.context_processors.auth' must be "
                 "enabled in DjangoTemplates (TEMPLATES) if using the default "
@@ -80,19 +104,24 @@ def check_dependencies(**kwargs):
                 "the admin application.",
                 id='admin.E404',
             ))
-    if ('django.contrib.auth.middleware.AuthenticationMiddleware'
-            not in settings.MIDDLEWARE):
+
+    if not _contains_subclass('django.contrib.auth.middleware.AuthenticationMiddleware', settings.MIDDLEWARE):
         errors.append(checks.Error(
             "'django.contrib.auth.middleware.AuthenticationMiddleware' must "
             "be in MIDDLEWARE in order to use the admin application.",
             id='admin.E408',
         ))
-    if ('django.contrib.messages.middleware.MessageMiddleware'
-            not in settings.MIDDLEWARE):
+    if not _contains_subclass('django.contrib.messages.middleware.MessageMiddleware', settings.MIDDLEWARE):
         errors.append(checks.Error(
             "'django.contrib.messages.middleware.MessageMiddleware' must "
             "be in MIDDLEWARE in order to use the admin application.",
             id='admin.E409',
+        ))
+    if not _contains_subclass('django.contrib.sessions.middleware.SessionMiddleware', settings.MIDDLEWARE):
+        errors.append(checks.Error(
+            "'django.contrib.sessions.middleware.SessionMiddleware' must "
+            "be in MIDDLEWARE in order to use the admin application.",
+            id='admin.E410',
         ))
     return errors
 
@@ -341,7 +370,7 @@ class BaseModelAdminChecks:
 
     def _check_form(self, obj):
         """ Check that form subclasses BaseModelForm. """
-        if not issubclass(obj.form, BaseModelForm):
+        if not _issubclass(obj.form, BaseModelForm):
             return must_inherit_from(parent='BaseModelForm', option='form',
                                      obj=obj, id='admin.E016')
         else:
@@ -640,11 +669,20 @@ class ModelAdminChecks(BaseModelAdminChecks):
 
     def _check_inlines_item(self, obj, inline, label):
         """ Check one inline model admin. """
-        inline_label = inline.__module__ + '.' + inline.__name__
+        try:
+            inline_label = inline.__module__ + '.' + inline.__name__
+        except AttributeError:
+            return [
+                checks.Error(
+                    "'%s' must inherit from 'InlineModelAdmin'." % obj,
+                    obj=obj.__class__,
+                    id='admin.E104',
+                )
+            ]
 
         from django.contrib.admin.options import InlineModelAdmin
 
-        if not issubclass(inline, InlineModelAdmin):
+        if not _issubclass(inline, InlineModelAdmin):
             return [
                 checks.Error(
                     "'%s' must inherit from 'InlineModelAdmin'." % inline_label,
@@ -660,7 +698,7 @@ class ModelAdminChecks(BaseModelAdminChecks):
                     id='admin.E105',
                 )
             ]
-        elif not issubclass(inline.model, models.Model):
+        elif not _issubclass(inline.model, models.Model):
             return must_be('a Model', option='%s.model' % inline_label, obj=obj, id='admin.E106')
         else:
             return inline(obj.model, obj.admin_site).check()
@@ -682,33 +720,33 @@ class ModelAdminChecks(BaseModelAdminChecks):
             return []
         elif hasattr(obj, item):
             return []
-        elif hasattr(obj.model, item):
+        try:
+            field = obj.model._meta.get_field(item)
+        except FieldDoesNotExist:
             try:
-                field = obj.model._meta.get_field(item)
-            except FieldDoesNotExist:
-                return []
-            else:
-                if isinstance(field, models.ManyToManyField):
-                    return [
-                        checks.Error(
-                            "The value of '%s' must not be a ManyToManyField." % label,
-                            obj=obj.__class__,
-                            id='admin.E109',
-                        )
-                    ]
-                return []
-        else:
+                field = getattr(obj.model, item)
+            except AttributeError:
+                return [
+                    checks.Error(
+                        "The value of '%s' refers to '%s', which is not a "
+                        "callable, an attribute of '%s', or an attribute or "
+                        "method on '%s.%s'." % (
+                            label, item, obj.__class__.__name__,
+                            obj.model._meta.app_label, obj.model._meta.object_name,
+                        ),
+                        obj=obj.__class__,
+                        id='admin.E108',
+                    )
+                ]
+        if isinstance(field, models.ManyToManyField):
             return [
                 checks.Error(
-                    "The value of '%s' refers to '%s', which is not a callable, "
-                    "an attribute of '%s', or an attribute or method on '%s.%s'." % (
-                        label, item, obj.__class__.__name__,
-                        obj.model._meta.app_label, obj.model._meta.object_name,
-                    ),
+                    "The value of '%s' must not be a ManyToManyField." % label,
                     obj=obj.__class__,
-                    id='admin.E108',
+                    id='admin.E109',
                 )
             ]
+        return []
 
     def _check_list_display_links(self, obj):
         """ Check that list_display_links is a unique subset of list_display.
@@ -763,7 +801,7 @@ class ModelAdminChecks(BaseModelAdminChecks):
 
         if callable(item) and not isinstance(item, models.Field):
             # If item is option 3, it should be a ListFilter...
-            if not issubclass(item, ListFilter):
+            if not _issubclass(item, ListFilter):
                 return must_inherit_from(parent='ListFilter', option=label,
                                          obj=obj, id='admin.E113')
             # ...  but not a FieldListFilter.
@@ -780,7 +818,7 @@ class ModelAdminChecks(BaseModelAdminChecks):
         elif isinstance(item, (tuple, list)):
             # item is option #2
             field, list_filter_class = item
-            if not issubclass(list_filter_class, FieldListFilter):
+            if not _issubclass(list_filter_class, FieldListFilter):
                 return must_inherit_from(parent='FieldListFilter', option='%s[1]' % label, obj=obj, id='admin.E115')
             else:
                 return []
@@ -961,7 +999,6 @@ class ModelAdminChecks(BaseModelAdminChecks):
 class InlineModelAdminChecks(BaseModelAdminChecks):
 
     def check(self, inline_obj, **kwargs):
-        self._check_has_add_permission(inline_obj)
         parent_model = inline_obj.parent_model
         return [
             *super().check(inline_obj),
@@ -1041,24 +1078,10 @@ class InlineModelAdminChecks(BaseModelAdminChecks):
     def _check_formset(self, obj):
         """ Check formset is a subclass of BaseModelFormSet. """
 
-        if not issubclass(obj.formset, BaseModelFormSet):
+        if not _issubclass(obj.formset, BaseModelFormSet):
             return must_inherit_from(parent='BaseModelFormSet', option='formset', obj=obj, id='admin.E206')
         else:
             return []
-
-    def _check_has_add_permission(self, obj):
-        cls = obj.__class__
-        try:
-            func = cls.has_add_permission
-        except AttributeError:
-            pass
-        else:
-            args = get_func_args(func)
-            if 'obj' not in args:
-                warnings.warn(
-                    "Update %s.has_add_permission() to accept a positional "
-                    "`obj` argument." % cls.__name__, RemovedInDjango30Warning
-                )
 
 
 def must_be(type, option, obj, id):

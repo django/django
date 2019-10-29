@@ -52,6 +52,7 @@ class AutocompleteMixinTests(TestCase):
         self.assertEqual(attrs, {
             'class': 'my-class admin-autocomplete',
             'data-ajax--cache': 'true',
+            'data-ajax--delay': 250,
             'data-ajax--type': 'GET',
             'data-ajax--url': '/admin_widgets/band/autocomplete/?to_field=id',
             'data-theme': 'admin-autocomplete',
@@ -145,4 +146,4 @@ class AutocompleteMixinTests(TestCase):
                 else:
                     expected_files = base_files
                 with translation.override(lang):
-                    self.assertEqual(AutocompleteSelect(rel, admin.site).media._js, expected_files)
+                    self.assertEqual(AutocompleteSelect(rel, admin.site).media._js, list(expected_files))

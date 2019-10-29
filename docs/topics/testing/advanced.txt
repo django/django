@@ -35,7 +35,7 @@ restricted subset of the test client API:
 Example
 -------
 
-The following is a simple unit test using the request factory::
+The following is a unit test using the request factory::
 
     from django.contrib.auth.models import AnonymousUser, User
     from django.test import RequestFactory, TestCase
@@ -79,9 +79,8 @@ Projects that support multitenancy or otherwise alter business logic based on
 the request's host and use custom host names in tests must include those hosts
 in :setting:`ALLOWED_HOSTS`.
 
-The first and simplest option to do so is to add the hosts to your settings
-file. For example, the test suite for docs.djangoproject.com includes the
-following::
+The first option to do so is to add the hosts to your settings file. For
+example, the test suite for docs.djangoproject.com includes the following::
 
     from django.test import TestCase
 
@@ -300,6 +299,40 @@ Advanced features of ``TransactionTestCase``
     Using ``reset_sequences = True`` will slow down the test, since the primary
     key reset is a relatively expensive database operation.
 
+.. _topics-testing-enforce-run-sequentially:
+
+Enforce running test classes sequentially
+=========================================
+
+If you have test classes that cannot be run in parallel (e.g. because they
+share a common resource), you can use ``django.test.testcases.SerializeMixin``
+to run them sequentially. This mixin uses a filesystem ``lockfile``.
+
+For example, you can use ``__file__`` to determine that all test classes in the
+same file that inherit from ``SerializeMixin`` will run sequentially::
+
+    import os
+
+    from django.test import TestCase
+    from django.test.testcases import SerializeMixin
+
+    class ImageTestCaseMixin(SerializeMixin):
+        lockfile = __file__
+
+        def setUp(self):
+            self.filename = os.path.join(temp_storage_dir, 'my_file.png')
+            self.file = create_file(self.filename)
+
+    class RemoveImageTests(ImageTestCaseMixin, TestCase):
+        def test_remove_image(self):
+            os.remove(self.filename)
+            self.assertFalse(os.path.exists(self.filename))
+
+    class ResizeImageTests(ImageTestCaseMixin, TestCase):
+        def test_resize_image(self):
+            resize_image(self.file, (48, 48))
+            self.assertEqual(get_image_size(self.file), (48, 48))
+
 .. _testing-reusable-applications:
 
 Using the Django test runner to test reusable applications
@@ -424,7 +457,7 @@ behavior. This class defines the ``run_tests()`` entry point, plus a
 selection of other methods that are used to by ``run_tests()`` to set up,
 execute and tear down the test suite.
 
-.. class:: DiscoverRunner(pattern='test*.py', top_level=None, verbosity=1, interactive=True, failfast=False, keepdb=False, reverse=False, debug_mode=False, debug_sql=False, **kwargs)
+.. class:: DiscoverRunner(pattern='test*.py', top_level=None, verbosity=1, interactive=True, failfast=False, keepdb=False, reverse=False, debug_mode=False, debug_sql=False, test_name_patterns=None, **kwargs)
 
     ``DiscoverRunner`` will search for tests in any file matching ``pattern``.
 
@@ -462,6 +495,9 @@ execute and tear down the test suite.
     logged to the :ref:`django.db.backends logger <django-db-logger>` as well
     as the traceback. If ``verbosity`` is ``2``, then queries in all tests are
     output.
+
+    ``test_name_patterns`` can be used to specify a set of patterns for
+    filtering test methods and classes by their names.
 
     Django may, from time to time, extend the capabilities of the test runner
     by adding new arguments. The ``**kwargs`` declaration allows for this
@@ -614,13 +650,17 @@ utility methods in the ``django.test.utils`` module.
     Performs global post-test teardown, such as removing instrumentation from
     the template system and restoring normal email services.
 
-.. function:: setup_databases(verbosity, interactive, keepdb=False, debug_sql=False, parallel=0, **kwargs)
+.. function:: setup_databases(verbosity, interactive, keepdb=False, debug_sql=False, parallel=0, aliases=None, **kwargs)
 
     Creates the test databases.
 
     Returns a data structure that provides enough detail to undo the changes
     that have been made. This data will be provided to the
     :func:`teardown_databases` function at the conclusion of testing.
+
+    The ``aliases`` argument determines which :setting:`DATABASES` aliases test
+    databases should be setup for. If it's not provided, it defaults to all of
+    :setting:`DATABASES` aliases.
 
 .. function:: teardown_databases(old_config, parallel=0, keepdb=False)
 

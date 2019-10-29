@@ -15,13 +15,15 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
     sql_alter_column_default = "MODIFY %(column)s DEFAULT %(default)s"
     sql_alter_column_no_default = "MODIFY %(column)s DEFAULT NULL"
     sql_delete_column = "ALTER TABLE %(table)s DROP COLUMN %(column)s"
+    sql_create_column_inline_fk = 'CONSTRAINT %(name)s REFERENCES %(to_table)s(%(to_column)s)%(deferrable)s'
     sql_delete_table = "DROP TABLE %(table)s CASCADE CONSTRAINTS"
+    sql_create_index = "CREATE INDEX %(name)s ON %(table)s (%(columns)s)%(extra)s"
 
     def quote_value(self, value):
         if isinstance(value, (datetime.date, datetime.time, datetime.datetime)):
             return "'%s'" % value
         elif isinstance(value, str):
-            return "'%s'" % value.replace("\'", "\'\'")
+            return "'%s'" % value.replace("\'", "\'\'").replace('%', '%%')
         elif isinstance(value, (bytes, bytearray, memoryview)):
             return "'%s'" % value.hex()
         elif isinstance(value, bool):
@@ -88,12 +90,13 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         # Make a new field that's like the new one but with a temporary
         # column name.
         new_temp_field = copy.deepcopy(new_field)
-        new_temp_field.null = (new_field.get_internal_type() not in ('AutoField', 'BigAutoField'))
+        new_temp_field.null = (new_field.get_internal_type() not in ('AutoField', 'BigAutoField', 'SmallAutoField'))
         new_temp_field.column = self._generate_temp_name(new_field.column)
         # Add it
         self.add_field(model, new_temp_field)
         # Explicit data type conversion
-        # https://docs.oracle.com/database/121/SQLRF/sql_elements002.htm#SQLRF51054
+        # https://docs.oracle.com/en/database/oracle/oracle-database/18/sqlrf
+        # /Data-Type-Comparison-Rules.html#GUID-D0C5A47E-6F93-4C2D-9E49-4F2B86B359DD
         new_value = self.quote_name(old_field.column)
         old_type = old_field.db_type(self.connection)
         if re.match('^N?CLOB', old_type):

@@ -40,7 +40,7 @@ from django.contrib.gis.gdal.driver import Driver
 from django.contrib.gis.gdal.error import GDALException
 from django.contrib.gis.gdal.layer import Layer
 from django.contrib.gis.gdal.prototypes import ds as capi
-from django.utils.encoding import force_bytes, force_text
+from django.utils.encoding import force_bytes, force_str
 
 
 # For more information, see the OGR C API source code:
@@ -117,4 +117,4 @@ class DataSource(GDALBase):
     def name(self):
         "Return the name of the data source."
         name = capi.get_ds_name(self._ptr)
-        return force_text(name, self.encoding, strings_only=True)
+        return force_str(name, self.encoding, strings_only=True)

@@ -70,10 +70,10 @@ documentation, test suite, packaging scripts and other miscellaneous bits.
 Django's code will be present in your clone as a directory named
 ``django``.
 
-To try out the in-development code with your own applications, simply place
-the directory containing your clone on your Python import path. Then
-``import`` statements which look for Django will find the ``django`` module
-within your clone.
+To try out the in-development code with your own applications, place the
+directory containing your clone on your Python import path. Then ``import``
+statements which look for Django will find the ``django`` module within your
+clone.
 
 If you're going to be working on Django's code (say, to fix a bug or
 develop a new feature), you can probably stop reading here and move

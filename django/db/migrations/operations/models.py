@@ -428,7 +428,14 @@ class RenameModel(ModelOperation):
         )
 
 
-class AlterModelTable(ModelOperation):
+class ModelOptionOperation(ModelOperation):
+    def reduce(self, operation, app_label=None):
+        if isinstance(operation, (self.__class__, DeleteModel)) and self.name_lower == operation.name_lower:
+            return [operation]
+        return super().reduce(operation, app_label=app_label)
+
+
+class AlterModelTable(ModelOptionOperation):
     """Rename a model's table."""
 
     def __init__(self, name, table):
@@ -476,18 +483,6 @@ class AlterModelTable(ModelOperation):
             self.name,
             self.table if self.table is not None else "(default)"
         )
-
-    def reduce(self, operation, app_label=None):
-        if isinstance(operation, (AlterModelTable, DeleteModel)) and self.name_lower == operation.name_lower:
-            return [operation]
-        return super().reduce(operation, app_label=app_label)
-
-
-class ModelOptionOperation(ModelOperation):
-    def reduce(self, operation, app_label=None):
-        if isinstance(operation, (self.__class__, DeleteModel)) and self.name_lower == operation.name_lower:
-            return [operation]
-        return super().reduce(operation, app_label=app_label)
 
 
 class AlterTogetherOptionOperation(ModelOptionOperation):
@@ -819,6 +814,7 @@ class AddConstraint(IndexOperation):
     def state_forwards(self, app_label, state):
         model_state = state.models[app_label, self.model_name_lower]
         model_state.options[self.option_name] = [*model_state.options[self.option_name], self.constraint]
+        state.reload_model(app_label, self.model_name_lower, delay=True)
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
         model = to_state.apps.get_model(app_label, self.model_name)
@@ -851,9 +847,10 @@ class RemoveConstraint(IndexOperation):
         model_state = state.models[app_label, self.model_name_lower]
         constraints = model_state.options[self.option_name]
         model_state.options[self.option_name] = [c for c in constraints if c.name != self.name]
+        state.reload_model(app_label, self.model_name_lower, delay=True)
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
-        model = from_state.apps.get_model(app_label, self.model_name)
+        model = to_state.apps.get_model(app_label, self.model_name)
         if self.allow_migrate_model(schema_editor.connection.alias, model):
             from_model_state = from_state.models[app_label, self.model_name_lower]
             constraint = from_model_state.get_constraint_by_name(self.name)

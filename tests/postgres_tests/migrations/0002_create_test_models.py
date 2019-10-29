@@ -3,8 +3,8 @@ from django.db import migrations, models
 
 from ..fields import (
     ArrayField, BigIntegerRangeField, CICharField, CIEmailField, CITextField,
-    DateRangeField, DateTimeRangeField, DecimalRangeField, HStoreField,
-    IntegerRangeField, JSONField, SearchVectorField,
+    DateRangeField, DateTimeRangeField, DecimalRangeField, EnumField,
+    HStoreField, IntegerRangeField, JSONField, SearchVectorField,
 )
 from ..models import TagField
 
@@ -211,7 +211,9 @@ class Migration(migrations.Migration):
                 ('bigints', BigIntegerRangeField(null=True, blank=True)),
                 ('decimals', DecimalRangeField(null=True, blank=True)),
                 ('timestamps', DateTimeRangeField(null=True, blank=True)),
+                ('timestamps_inner', DateTimeRangeField(null=True, blank=True)),
                 ('dates', DateRangeField(null=True, blank=True)),
+                ('dates_inner', DateRangeField(null=True, blank=True)),
             ],
             options={
                 'required_db_vendor': 'postgresql'
@@ -248,5 +250,37 @@ class Migration(migrations.Migration):
                 'required_db_vendor': 'postgresql',
             },
             bases=(models.Model,),
+        ),
+        migrations.CreateModel(
+            name='ArrayEnumModel',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('array_of_enums', ArrayField(EnumField(max_length=20), null=True, blank=True)),
+            ],
+            options={
+                'required_db_vendor': 'postgresql',
+            },
+            bases=(models.Model,),
+        ),
+        migrations.CreateModel(
+            name='Room',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('number', models.IntegerField(unique=True)),
+            ],
+        ),
+        migrations.CreateModel(
+            name='HotelReservation',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('room', models.ForeignKey('postgres_tests.Room', models.CASCADE)),
+                ('datespan', DateRangeField()),
+                ('start', models.DateTimeField()),
+                ('end', models.DateTimeField()),
+                ('cancelled', models.BooleanField(default=False)),
+            ],
+            options={
+                'required_db_vendor': 'postgresql',
+            },
         ),
     ]

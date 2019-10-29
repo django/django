@@ -402,38 +402,6 @@ class CheckContentTypeNosniffTest(SimpleTestCase):
         self.assertEqual(self.func(None), [])
 
 
-class CheckXssFilterTest(SimpleTestCase):
-    @property
-    def func(self):
-        from django.core.checks.security.base import check_xss_filter
-        return check_xss_filter
-
-    @override_settings(
-        MIDDLEWARE=["django.middleware.security.SecurityMiddleware"],
-        SECURE_BROWSER_XSS_FILTER=False,
-    )
-    def test_no_xss_filter(self):
-        """
-        Warn if SECURE_BROWSER_XSS_FILTER isn't True.
-        """
-        self.assertEqual(self.func(None), [base.W007])
-
-    @override_settings(MIDDLEWARE=[], SECURE_BROWSER_XSS_FILTER=False)
-    def test_no_xss_filter_no_middleware(self):
-        """
-        Don't warn if SECURE_BROWSER_XSS_FILTER isn't True and
-        SecurityMiddleware isn't in MIDDLEWARE.
-        """
-        self.assertEqual(self.func(None), [])
-
-    @override_settings(
-        MIDDLEWARE=["django.middleware.security.SecurityMiddleware"],
-        SECURE_BROWSER_XSS_FILTER=True,
-    )
-    def test_with_xss_filter(self):
-        self.assertEqual(self.func(None), [])
-
-
 class CheckSSLRedirectTest(SimpleTestCase):
     @property
     def func(self):
@@ -534,3 +502,46 @@ class CheckAllowedHostsTest(SimpleTestCase):
     @override_settings(ALLOWED_HOSTS=['.example.com'])
     def test_allowed_hosts_set(self):
         self.assertEqual(self.func(None), [])
+
+
+class CheckReferrerPolicyTest(SimpleTestCase):
+
+    @property
+    def func(self):
+        from django.core.checks.security.base import check_referrer_policy
+        return check_referrer_policy
+
+    @override_settings(
+        MIDDLEWARE=['django.middleware.security.SecurityMiddleware'],
+        SECURE_REFERRER_POLICY=None,
+    )
+    def test_no_referrer_policy(self):
+        self.assertEqual(self.func(None), [base.W022])
+
+    @override_settings(MIDDLEWARE=[], SECURE_REFERRER_POLICY=None)
+    def test_no_referrer_policy_no_middleware(self):
+        """
+        Don't warn if SECURE_REFERRER_POLICY is None and SecurityMiddleware
+        isn't in MIDDLEWARE.
+        """
+        self.assertEqual(self.func(None), [])
+
+    @override_settings(MIDDLEWARE=['django.middleware.security.SecurityMiddleware'])
+    def test_with_referrer_policy(self):
+        tests = (
+            'strict-origin',
+            'strict-origin,origin',
+            'strict-origin, origin',
+            ['strict-origin', 'origin'],
+            ('strict-origin', 'origin'),
+        )
+        for value in tests:
+            with self.subTest(value=value), override_settings(SECURE_REFERRER_POLICY=value):
+                self.assertEqual(self.func(None), [])
+
+    @override_settings(
+        MIDDLEWARE=['django.middleware.security.SecurityMiddleware'],
+        SECURE_REFERRER_POLICY='invalid-value',
+    )
+    def test_with_invalid_referrer_policy(self):
+        self.assertEqual(self.func(None), [base.E023])

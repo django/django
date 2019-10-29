@@ -95,8 +95,8 @@ GZip middleware
     .. _the BREACH paper (PDF): http://breachattack.com/resources/BREACH%20-%20SSL,%20gone%20in%2030%20seconds.pdf
     .. _breachattack.com: http://breachattack.com
 
-Compresses content for browsers that understand GZip compression (all modern
-browsers).
+The ``django.middleware.gzip.GZipMiddleware`` compresses content for browsers
+that understand GZip compression (all modern browsers).
 
 This middleware should be placed before any other middleware that need to
 read or write the response body so that compression happens afterward.
@@ -125,7 +125,7 @@ Conditional GET middleware
 .. class:: ConditionalGetMiddleware
 
 Handles conditional GET operations. If the response doesn't have an ``ETag``
-header, the middleware adds one if needed. If the response has a ``ETag`` or
+header, the middleware adds one if needed. If the response has an ``ETag`` or
 ``Last-Modified`` header, and the request has ``If-None-Match`` or
 ``If-Modified-Since``, the response is replaced by an
 :class:`~django.http.HttpResponseNotModified`.
@@ -186,6 +186,7 @@ enabled or disabled with a setting.
 * :setting:`SECURE_HSTS_PRELOAD`
 * :setting:`SECURE_HSTS_SECONDS`
 * :setting:`SECURE_REDIRECT_EXEMPT`
+* :setting:`SECURE_REFERRER_POLICY`
 * :setting:`SECURE_SSL_HOST`
 * :setting:`SECURE_SSL_REDIRECT`
 
@@ -197,7 +198,7 @@ HTTP Strict Transport Security
 For sites that should only be accessed over HTTPS, you can instruct modern
 browsers to refuse to connect to your domain name via an insecure connection
 (for a given period of time) by setting the `"Strict-Transport-Security"
-header`_. This reduces your exposure to some SSL-stripping man-in-the-middle
+header`__. This reduces your exposure to some SSL-stripping man-in-the-middle
 (MITM) attacks.
 
 ``SecurityMiddleware`` will set this header for you on all HTTPS responses if
@@ -238,8 +239,106 @@ If you wish to submit your site to the `browser preload list`_, set the
     it may be because Django doesn't realize that it's on a secure connection;
     you may need to set the :setting:`SECURE_PROXY_SSL_HEADER` setting.
 
-.. _"Strict-Transport-Security" header: https://en.wikipedia.org/wiki/Strict_Transport_Security
+__ https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Strict-Transport-Security
 .. _browser preload list: https://hstspreload.org/
+
+.. _referrer-policy:
+
+Referrer Policy
+~~~~~~~~~~~~~~~
+
+.. versionadded:: 3.0
+
+Browsers use `the Referer header`__ as a way to send information to a site
+about how users got there. When a user clicks a link, the browser will send the
+full URL of the linking page as the referrer. While this can be useful for some
+purposes -- like figuring out who's linking to your site -- it also can cause
+privacy concerns by informing one site that a user was visiting another site.
+
+__ https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Referer
+
+Some browsers have the ability to accept hints about whether they should send
+the HTTP ``Referer`` header when a user clicks a link; this hint is provided
+via `the Referrer-Policy header`__. This header can suggest any of three
+behaviors to browsers:
+
+__ https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Referrer-Policy
+
+* Full URL: send the entire URL in the ``Referer`` header. For example, if the
+  user is visiting ``https://example.com/page.html``, the ``Referer`` header
+  would contain ``"https://example.com/page.html"``.
+
+* Origin only: send only the "origin" in the referrer. The origin consists of
+  the scheme, host and (optionally) port number. For example, if the user is
+  visiting ``https://example.com/page.html``, the origin would be
+  ``https://example.com/``.
+
+* No referrer: do not send a ``Referer`` header at all.
+
+There are two types of conditions this header can tell a browser to watch out
+for:
+
+* Same-origin versus cross-origin: a link from ``https://example.com/1.html``
+  to ``https://example.com/2.html`` is same-origin. A link from
+  ``https://example.com/page.html`` to ``https://not.example.com/page.html`` is
+  cross-origin.
+
+* Protocol downgrade: a downgrade occurs if the page containing the link is
+  served via HTTPS, but the page being linked to is not served via HTTPS.
+
+.. warning::
+    When your site is served via HTTPS, :ref:`Django's CSRF protection system
+    <using-csrf>` requires the ``Referer`` header to be present, so completely
+    disabling the ``Referer`` header will interfere with CSRF protection. To
+    gain most of the benefits of disabling ``Referer`` headers while also
+    keeping CSRF protection, consider enabling only same-origin referrers.
+
+``SecurityMiddleware`` can set the ``Referrer-Policy`` header for you, based on
+the :setting:`SECURE_REFERRER_POLICY` setting (note spelling: browsers send a
+``Referer`` header when a user clicks a link, but the header instructing a
+browser whether to do so is spelled ``Referrer-Policy``). The valid values for
+this setting are:
+
+``no-referrer``
+    Instructs the browser to send no referrer for links clicked on this site.
+
+``no-referrer-when-downgrade``
+    Instructs the browser to send a full URL as the referrer, but only when no
+    protocol downgrade occurs.
+
+``origin``
+    Instructs the browser to send only the origin, not the full URL, as the
+    referrer.
+
+``origin-when-cross-origin``
+    Instructs the browser to send the full URL as the referrer for same-origin
+    links, and only the origin for cross-origin links.
+
+``same-origin``
+    Instructs the browser to send a full URL, but only for same-origin links. No
+    referrer will be sent for cross-origin links.
+
+``strict-origin``
+    Instructs the browser to send only the origin, not the full URL, and to send
+    no referrer when a protocol downgrade occurs.
+
+``strict-origin-when-cross-origin``
+    Instructs the browser to send the full URL when the link is same-origin and
+    no protocol downgrade occurs; send only the origin when the link is
+    cross-origin and no protocol downgrade occurs; and no referrer when a
+    protocol downgrade occurs.
+
+``unsafe-url``
+    Instructs the browser to always send the full URL as the referrer.
+
+.. admonition:: Unknown Policy Values
+
+    Where a policy value is `unknown`__ by a user agent, it is possible to
+    specify multiple policy values to provide a fallback. The last specified
+    value that is understood takes precedence. To support this, an iterable or
+    comma-separated string can be used with :setting:`SECURE_REFERRER_POLICY`.
+
+    __ https://w3c.github.io/webappsec-referrer-policy/#unknown-policy-values
 
 .. _x-content-type-options:
 
@@ -281,7 +380,7 @@ attack`_. They work by looking for JavaScript content in the GET or POST
 parameters of a page. If the JavaScript is replayed in the server's response,
 the page is blocked from rendering and an error page is shown instead.
 
-The `X-XSS-Protection header`_ is used to control the operation of the
+The `X-XSS-Protection header`__ is used to control the operation of the
 XSS filter.
 
 To enable the XSS filter in the browser, and force it to always block
@@ -296,7 +395,7 @@ header. ``SecurityMiddleware`` will do this for all responses if the
     sanitizing <cross-site-scripting>` all input to prevent XSS attacks.
 
 .. _XSS attack: https://en.wikipedia.org/wiki/Cross-site_scripting
-.. _X-XSS-Protection header: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-XSS-Protection
+__ https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-XSS-Protection
 
 .. _ssl-redirect:
 
@@ -380,9 +479,7 @@ details.
 CSRF protection middleware
 --------------------------
 
-.. module:: django.middleware.csrf
-   :synopsis: Middleware adding protection against Cross Site Request
-              Forgeries.
+.. currentmodule:: django.middleware.csrf
 
 .. class:: CsrfViewMiddleware
 
@@ -393,8 +490,7 @@ fields to POST forms and checking requests for the correct value. See the
 ``X-Frame-Options`` middleware
 ------------------------------
 
-.. module:: django.middleware.clickjacking
-   :synopsis: Clickjacking protection
+.. currentmodule:: django.middleware.clickjacking
 
 .. class:: XFrameOptionsMiddleware
 
@@ -426,6 +522,10 @@ Here are some hints about the ordering of various Django middleware classes:
 
 #. :class:`~django.contrib.sessions.middleware.SessionMiddleware`
 
+   Before any middleware that may raise an exception to trigger an error
+   view (such as :exc:`~django.core.exceptions.PermissionDenied`) if you're
+   using :setting:`CSRF_USE_SESSIONS`.
+
    After ``UpdateCacheMiddleware``: Modifies ``Vary`` header.
 
 #. :class:`~django.middleware.http.ConditionalGetMiddleware`
@@ -450,13 +550,18 @@ Here are some hints about the ordering of various Django middleware classes:
    Close to the top: it redirects when :setting:`APPEND_SLASH` or
    :setting:`PREPEND_WWW` are set to ``True``.
 
+   After ``SessionMiddleware`` if you're using :setting:`CSRF_USE_SESSIONS`.
+
 #. :class:`~django.middleware.csrf.CsrfViewMiddleware`
 
    Before any view middleware that assumes that CSRF attacks have been dealt
    with.
 
-   It must come after ``SessionMiddleware`` if you're using
-   :setting:`CSRF_USE_SESSIONS`.
+   Before :class:`~django.contrib.auth.middleware.RemoteUserMiddleware`, or any
+   other authentication middleware that may perform a login, and hence rotate
+   the CSRF token, before calling down the middleware chain.
+
+   After ``SessionMiddleware`` if you're using :setting:`CSRF_USE_SESSIONS`.
 
 #. :class:`~django.contrib.auth.middleware.AuthenticationMiddleware`
 

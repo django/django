@@ -1,4 +1,4 @@
-from operator import attrgetter
+import datetime
 
 from django.test import TestCase
 
@@ -6,176 +6,114 @@ from .models import Person
 
 
 class RecursiveM2MTests(TestCase):
-    def setUp(self):
-        self.a, self.b, self.c, self.d = [
+    @classmethod
+    def setUpTestData(cls):
+        cls.a, cls.b, cls.c, cls.d = [
             Person.objects.create(name=name)
-            for name in ["Anne", "Bill", "Chuck", "David"]
+            for name in ['Anne', 'Bill', 'Chuck', 'David']
         ]
-
-        # Anne is friends with Bill and Chuck
-        self.a.friends.add(self.b, self.c)
-
-        # David is friends with Anne and Chuck - add in reverse direction
-        self.d.friends.add(self.a, self.c)
+        cls.a.friends.add(cls.b, cls.c)
+        # Add m2m for Anne and Chuck in reverse direction.
+        cls.d.friends.add(cls.a, cls.c)
 
     def test_recursive_m2m_all(self):
-        # Who is friends with Anne?
-        self.assertQuerysetEqual(
-            self.a.friends.all(), [
-                "Bill",
-                "Chuck",
-                "David"
-            ],
-            attrgetter("name"),
-            ordered=False
-        )
-        # Who is friends with Bill?
-        self.assertQuerysetEqual(
-            self.b.friends.all(), [
-                "Anne",
-            ],
-            attrgetter("name")
-        )
-        # Who is friends with Chuck?
-        self.assertQuerysetEqual(
-            self.c.friends.all(), [
-                "Anne",
-                "David"
-            ],
-            attrgetter("name"),
-            ordered=False
-        )
-        # Who is friends with David?
-        self.assertQuerysetEqual(
-            self.d.friends.all(), [
-                "Anne",
-                "Chuck",
-            ],
-            attrgetter("name"),
-            ordered=False
-        )
+        for person, friends in (
+            (self.a, [self.b, self.c, self.d]),
+            (self.b, [self.a]),
+            (self.c, [self.a, self.d]),
+            (self.d, [self.a, self.c]),
+        ):
+            with self.subTest(person=person):
+                self.assertSequenceEqual(person.friends.all(), friends)
 
     def test_recursive_m2m_reverse_add(self):
-        # Bill is already friends with Anne - add Anne again, but in the
-        # reverse direction
+        # Add m2m for Anne in reverse direction.
         self.b.friends.add(self.a)
-
-        # Who is friends with Anne?
-        self.assertQuerysetEqual(
-            self.a.friends.all(), [
-                "Bill",
-                "Chuck",
-                "David",
-            ],
-            attrgetter("name"),
-            ordered=False
-        )
-        # Who is friends with Bill?
-        self.assertQuerysetEqual(
-            self.b.friends.all(), [
-                "Anne",
-            ],
-            attrgetter("name")
-        )
+        self.assertSequenceEqual(self.a.friends.all(), [self.b, self.c, self.d])
+        self.assertSequenceEqual(self.b.friends.all(), [self.a])
 
     def test_recursive_m2m_remove(self):
-        # Remove Anne from Bill's friends
         self.b.friends.remove(self.a)
-
-        # Who is friends with Anne?
-        self.assertQuerysetEqual(
-            self.a.friends.all(), [
-                "Chuck",
-                "David",
-            ],
-            attrgetter("name"),
-            ordered=False
-        )
-        # Who is friends with Bill?
-        self.assertQuerysetEqual(
-            self.b.friends.all(), []
-        )
+        self.assertSequenceEqual(self.a.friends.all(), [self.c, self.d])
+        self.assertSequenceEqual(self.b.friends.all(), [])
 
     def test_recursive_m2m_clear(self):
-        # Clear Anne's group of friends
+        # Clear m2m for Anne.
         self.a.friends.clear()
-
-        # Who is friends with Anne?
-        self.assertQuerysetEqual(
-            self.a.friends.all(), []
-        )
-
-        # Reverse relationships should also be gone
-        # Who is friends with Chuck?
-        self.assertQuerysetEqual(
-            self.c.friends.all(), [
-                "David",
-            ],
-            attrgetter("name")
-        )
-
-        # Who is friends with David?
-        self.assertQuerysetEqual(
-            self.d.friends.all(), [
-                "Chuck",
-            ],
-            attrgetter("name")
-        )
+        self.assertSequenceEqual(self.a.friends.all(), [])
+        # Reverse m2m relationships should be removed.
+        self.assertSequenceEqual(self.c.friends.all(), [self.d])
+        self.assertSequenceEqual(self.d.friends.all(), [self.c])
 
     def test_recursive_m2m_add_via_related_name(self):
-        # David is idolized by Anne and Chuck - add in reverse direction
+        # Add m2m with custom related name for Anne in reverse direction.
         self.d.stalkers.add(self.a)
-
-        # Who are Anne's idols?
-        self.assertQuerysetEqual(
-            self.a.idols.all(), [
-                "David",
-            ],
-            attrgetter("name"),
-            ordered=False
-        )
-        # Who is stalking Anne?
-        self.assertQuerysetEqual(
-            self.a.stalkers.all(), [],
-            attrgetter("name")
-        )
+        self.assertSequenceEqual(self.a.idols.all(), [self.d])
+        self.assertSequenceEqual(self.a.stalkers.all(), [])
 
     def test_recursive_m2m_add_in_both_directions(self):
-        """Adding the same relation twice results in a single relation."""
-        # Ann idolizes David
+        # Adding the same relation twice results in a single relation.
         self.a.idols.add(self.d)
-
-        # David is idolized by Anne
         self.d.stalkers.add(self.a)
-
-        # Who are Anne's idols?
-        self.assertQuerysetEqual(
-            self.a.idols.all(), [
-                "David",
-            ],
-            attrgetter("name"),
-            ordered=False
-        )
-        # As the assertQuerysetEqual uses a set for comparison,
-        # check we've only got David listed once
-        self.assertEqual(self.a.idols.all().count(), 1)
+        self.assertSequenceEqual(self.a.idols.all(), [self.d])
 
     def test_recursive_m2m_related_to_self(self):
-        # Ann idolizes herself
         self.a.idols.add(self.a)
+        self.assertSequenceEqual(self.a.idols.all(), [self.a])
+        self.assertSequenceEqual(self.a.stalkers.all(), [self.a])
 
-        # Who are Anne's idols?
-        self.assertQuerysetEqual(
-            self.a.idols.all(), [
-                "Anne",
-            ],
-            attrgetter("name"),
-            ordered=False
-        )
-        # Who is stalking Anne?
-        self.assertQuerysetEqual(
-            self.a.stalkers.all(), [
-                "Anne",
-            ],
-            attrgetter("name")
-        )
+
+class RecursiveSymmetricalM2MThroughTests(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.a, cls.b, cls.c, cls.d = [
+            Person.objects.create(name=name)
+            for name in ['Anne', 'Bill', 'Chuck', 'David']
+        ]
+        cls.a.colleagues.add(cls.b, cls.c, through_defaults={
+            'first_meet': datetime.date(2013, 1, 5),
+        })
+        # Add m2m for Anne and Chuck in reverse direction.
+        cls.d.colleagues.add(cls.a, cls.c, through_defaults={
+            'first_meet': datetime.date(2015, 6, 15),
+        })
+
+    def test_recursive_m2m_all(self):
+        for person, colleagues in (
+            (self.a, [self.b, self.c, self.d]),
+            (self.b, [self.a]),
+            (self.c, [self.a, self.d]),
+            (self.d, [self.a, self.c]),
+        ):
+            with self.subTest(person=person):
+                self.assertSequenceEqual(person.colleagues.all(), colleagues)
+
+    def test_recursive_m2m_reverse_add(self):
+        # Add m2m for Anne in reverse direction.
+        self.b.colleagues.add(self.a, through_defaults={
+            'first_meet': datetime.date(2013, 1, 5),
+        })
+        self.assertSequenceEqual(self.a.colleagues.all(), [self.b, self.c, self.d])
+        self.assertSequenceEqual(self.b.colleagues.all(), [self.a])
+
+    def test_recursive_m2m_remove(self):
+        self.b.colleagues.remove(self.a)
+        self.assertSequenceEqual(self.a.colleagues.all(), [self.c, self.d])
+        self.assertSequenceEqual(self.b.colleagues.all(), [])
+
+    def test_recursive_m2m_clear(self):
+        # Clear m2m for Anne.
+        self.a.colleagues.clear()
+        self.assertSequenceEqual(self.a.friends.all(), [])
+        # Reverse m2m relationships is removed.
+        self.assertSequenceEqual(self.c.colleagues.all(), [self.d])
+        self.assertSequenceEqual(self.d.colleagues.all(), [self.c])
+
+    def test_recursive_m2m_set(self):
+        # Set new relationships for Chuck.
+        self.c.colleagues.set([self.b, self.d], through_defaults={
+            'first_meet': datetime.date(2013, 1, 5),
+        })
+        self.assertSequenceEqual(self.c.colleagues.order_by('name'), [self.b, self.d])
+        # Reverse m2m relationships is removed.
+        self.assertSequenceEqual(self.a.colleagues.order_by('name'), [self.b, self.d])

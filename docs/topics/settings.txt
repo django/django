@@ -46,7 +46,7 @@ The value of ``DJANGO_SETTINGS_MODULE`` should be in Python path syntax, e.g.
 ``mysite.settings``. Note that the settings module should be on the
 Python `import search path`_.
 
-.. _import search path: http://www.diveintopython3.net/your-first-python-program.html#importsearchpath
+.. _import search path: https://www.diveinto.org/python3/your-first-python-program.html#importsearchpath
 
 The ``django-admin`` utility
 ----------------------------
@@ -104,9 +104,8 @@ that's redundant.
 Seeing which settings you've changed
 ------------------------------------
 
-There's an easy way to view which of your settings deviate from the default
-settings. The command ``python manage.py diffsettings`` displays differences
-between the current settings file and Django's default settings.
+The command ``python manage.py diffsettings`` displays differences between the
+current settings file and Django's default settings.
 
 For more, see the :djadmin:`diffsettings` documentation.
 
@@ -161,7 +160,7 @@ Creating your own settings
 ==========================
 
 There's nothing stopping you from creating your own settings, for your own
-Django apps. Just follow these guidelines:
+Django apps, but follow these guidelines:
 
 * Setting names must be all uppercase.
 * Don't reinvent an already-existing setting.
@@ -248,7 +247,7 @@ is accessed.
 
 If you set ``DJANGO_SETTINGS_MODULE``, access settings values somehow, *then*
 call ``configure()``, Django will raise a ``RuntimeError`` indicating
-that settings have already been configured. There is a property just for this
+that settings have already been configured. There is a property for this
 purpose:
 
 .. attribute: django.conf.settings.configured

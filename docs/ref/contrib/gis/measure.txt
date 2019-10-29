@@ -26,8 +26,8 @@ instantiated in units of kilometers (``km``) and miles (``mi``)::
     >>> print(d2)
     5.0 mi
 
-Conversions are easy, just access the preferred unit attribute to get a
-converted distance quantity::
+For conversions, access the preferred unit attribute to get a converted
+distance quantity::
 
     >>> print(d1.mi) # Converting 5 kilometers to miles
     3.10685596119
@@ -93,6 +93,7 @@ Unit Attribute                     Full name or alias(es)
 ``clarke_link``                    Clarke's link
 ``fathom``                         Fathom
 ``rod``                            Rod
+``furlong``                        Furlong, Furrow Long
 ``nm``                             Nautical Mile
 ``nm_uk``                          Nautical Mile (UK)
 ``german_m``                       German legal metre

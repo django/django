@@ -4,17 +4,17 @@
 # André Hagenbruch, 2012
 # Florian Apolloner <florian@apolloner.eu>, 2011
 # Dimitris Glezos <glezos@transifex.com>, 2012
-# Jannis, 2013
-# Jannis Leidel <jannis@leidel.info>, 2013-2017
-# Jannis, 2016
-# Markus Holtermann <inyoka@markusholtermann.eu>, 2013,2015
+# Jannis Vajen, 2013
+# Jannis Leidel <jannis@leidel.info>, 2013-2018
+# Jannis Vajen, 2016
+# Markus Holtermann <info@markusholtermann.eu>, 2013,2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-09-23 18:54+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2019-01-16 20:42+0100\n"
+"PO-Revision-Date: 2019-01-18 00:36+0000\n"
+"Last-Translator: Ramiro Morales\n"
 "Language-Team: German (http://www.transifex.com/django/django/language/de/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -91,6 +91,15 @@ msgstr "%(verbose_name)s hinzufügen"
 msgid "Remove"
 msgstr "Entfernen"
 
+msgid "Addition"
+msgstr "Hinzugefügt"
+
+msgid "Change"
+msgstr "Ändern"
+
+msgid "Deletion"
+msgstr "Gelöscht"
+
 msgid "action time"
 msgstr "Zeitpunkt der Aktion"
 
@@ -104,7 +113,7 @@ msgid "object id"
 msgstr "Objekt-ID"
 
 #. Translators: 'repr' means representation
-#. (https://docs.python.org/3/library/functions.html#repr)
+#. (https://docs.python.org/library/functions.html#repr)
 msgid "object repr"
 msgstr "Objekt Darst."
 
@@ -170,10 +179,11 @@ msgstr ""
 "mehrere Einträge auszuwählen."
 
 #, python-brace-format
-msgid ""
-"The {name} \"{obj}\" was added successfully. You may edit it again below."
-msgstr ""
-"{name} „{obj}“ wurde erfolgreich hinzugefügt und kann unten geändert werden."
+msgid "The {name} \"{obj}\" was added successfully."
+msgstr "{name} „{obj}“ wurde erfolgreich hinzugefügt."
+
+msgid "You may edit it again below."
+msgstr "Es kann unten erneut geändert werden."
 
 #, python-brace-format
 msgid ""
@@ -184,15 +194,17 @@ msgstr ""
 "Weiteres ergänzt werden."
 
 #, python-brace-format
-msgid "The {name} \"{obj}\" was added successfully."
-msgstr "{name} „{obj}“ wurde erfolgreich hinzugefügt."
-
-#, python-brace-format
 msgid ""
 "The {name} \"{obj}\" was changed successfully. You may edit it again below."
 msgstr ""
 "{name} „{obj}“ wurde erfolgreich geändert und kann unten erneut geändert "
 "werden."
+
+#, python-brace-format
+msgid ""
+"The {name} \"{obj}\" was added successfully. You may edit it again below."
+msgstr ""
+"{name} „{obj}“ wurde erfolgreich hinzugefügt und kann unten geändert werden."
 
 #, python-brace-format
 msgid ""
@@ -231,6 +243,10 @@ msgstr "%s hinzufügen"
 #, python-format
 msgid "Change %s"
 msgstr "%s ändern"
+
+#, python-format
+msgid "View %s"
+msgstr "%s ansehen"
 
 msgid "Database error"
 msgstr "Datenbankfehler"
@@ -341,7 +357,7 @@ msgid "Change password"
 msgstr "Passwort ändern"
 
 msgid "Please correct the error below."
-msgstr "Bitte die aufgeführten Fehler korrigieren."
+msgstr "Bitte den unten aufgeführten Fehler korrigieren."
 
 msgid "Please correct the errors below."
 msgstr "Bitte die unten aufgeführten Fehler korrigieren."
@@ -454,8 +470,8 @@ msgstr ""
 "Sind Sie sicher, dass Sie die ausgewählten %(objects_name)s löschen wollen? "
 "Alle folgenden Objekte und ihre verwandten Objekte werden gelöscht:"
 
-msgid "Change"
-msgstr "Ändern"
+msgid "View"
+msgstr "Ansehen"
 
 msgid "Delete?"
 msgstr "Löschen?"
@@ -474,8 +490,10 @@ msgstr "Modelle der %(name)s-Anwendung"
 msgid "Add"
 msgstr "Hinzufügen"
 
-msgid "You don't have permission to edit anything."
-msgstr "Sie haben keine Berechtigung, irgendetwas zu ändern."
+msgid "You don't have permission to view or edit anything."
+msgstr ""
+"Ihr Benutzerkonto besitzt nicht die nötigen Rechte, um etwas anzusehen oder "
+"zu ändern."
 
 msgid "Recent actions"
 msgstr "Neueste Aktionen"
@@ -531,20 +549,8 @@ msgstr "Zeige alle"
 msgid "Save"
 msgstr "Sichern"
 
-msgid "Popup closing..."
-msgstr "Popup wird geschlossen..."
-
-#, python-format
-msgid "Change selected %(model)s"
-msgstr "Ausgewählte %(model)s ändern"
-
-#, python-format
-msgid "Add another %(model)s"
-msgstr "%(model)s hinzufügen"
-
-#, python-format
-msgid "Delete selected %(model)s"
-msgstr "Ausgewählte %(model)s löschen"
+msgid "Popup closing…"
+msgstr ""
 
 msgid "Search"
 msgstr "Suchen"
@@ -567,6 +573,24 @@ msgstr "Sichern und neu hinzufügen"
 
 msgid "Save and continue editing"
 msgstr "Sichern und weiter bearbeiten"
+
+msgid "Save and view"
+msgstr "Sichern und ansehen"
+
+msgid "Close"
+msgstr "Schließen"
+
+#, python-format
+msgid "Change selected %(model)s"
+msgstr "Ausgewählte %(model)s ändern"
+
+#, python-format
+msgid "Add another %(model)s"
+msgstr "%(model)s hinzufügen"
+
+#, python-format
+msgid "Delete selected %(model)s"
+msgstr "Ausgewählte %(model)s löschen"
 
 msgid "Thanks for spending some quality time with the Web site today."
 msgstr "Vielen Dank, dass Sie hier ein paar nette Minuten verbracht haben."
@@ -679,6 +703,10 @@ msgstr "%s auswählen"
 #, python-format
 msgid "Select %s to change"
 msgstr "%s zur Änderung auswählen"
+
+#, python-format
+msgid "Select %s to view"
+msgstr "%s zum Ansehen auswählen"
 
 msgid "Date:"
 msgstr "Datum:"

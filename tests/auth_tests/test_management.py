@@ -1,12 +1,13 @@
 import builtins
 import getpass
+import os
 import sys
 from datetime import date
 from io import StringIO
 from unittest import mock
 
 from django.apps import apps
-from django.contrib.auth import management
+from django.contrib.auth import get_permission_codename, management
 from django.contrib.auth.management import (
     create_permissions, get_default_username,
 )
@@ -22,7 +23,8 @@ from django.test import TestCase, override_settings
 from django.utils.translation import gettext_lazy as _
 
 from .models import (
-    CustomUser, CustomUserNonUniqueUsername, CustomUserWithFK, Email,
+    CustomUser, CustomUserNonUniqueUsername, CustomUserWithFK,
+    CustomUserWithM2M, Email, Organization, UserProxy,
 )
 
 MOCK_INPUT_KEY_TO_PROMPTS = {
@@ -132,8 +134,11 @@ class GetDefaultUsernameTestCase(TestCase):
 ])
 class ChangepasswordManagementCommandTestCase(TestCase):
 
+    @classmethod
+    def setUpTestData(cls):
+        cls.user = User.objects.create_user(username='joe', password='qwerty')
+
     def setUp(self):
-        self.user = User.objects.create_user(username='joe', password='qwerty')
         self.stdout = StringIO()
         self.stderr = StringIO()
 
@@ -210,7 +215,7 @@ class ChangepasswordManagementCommandTestCase(TestCase):
 
 
 class MultiDBChangepasswordManagementCommandTestCase(TestCase):
-    multi_db = True
+    databases = {'default', 'other'}
 
     @mock.patch.object(changepassword.Command, '_get_pass', return_value='not qwerty')
     def test_that_changepassword_command_with_database_option_uses_given_db(self, mock_get_pass):
@@ -494,6 +499,87 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
             self.assertEqual(u.group, group)
 
         test(self)
+
+    @override_settings(AUTH_USER_MODEL='auth_tests.CustomUserWithM2m')
+    def test_fields_with_m2m(self):
+        new_io = StringIO()
+        org_id_1 = Organization.objects.create(name='Organization 1').pk
+        org_id_2 = Organization.objects.create(name='Organization 2').pk
+        call_command(
+            'createsuperuser',
+            interactive=False,
+            username='joe',
+            orgs=[org_id_1, org_id_2],
+            stdout=new_io,
+        )
+        command_output = new_io.getvalue().strip()
+        self.assertEqual(command_output, 'Superuser created successfully.')
+        user = CustomUserWithM2M._default_manager.get(username='joe')
+        self.assertEqual(user.orgs.count(), 2)
+
+    @override_settings(AUTH_USER_MODEL='auth_tests.CustomUserWithM2M')
+    def test_fields_with_m2m_interactive(self):
+        new_io = StringIO()
+        org_id_1 = Organization.objects.create(name='Organization 1').pk
+        org_id_2 = Organization.objects.create(name='Organization 2').pk
+
+        @mock_inputs({
+            'password': 'nopasswd',
+            'Username: ': 'joe',
+            'Orgs (Organization.id): ': '%s, %s' % (org_id_1, org_id_2),
+        })
+        def test(self):
+            call_command(
+                'createsuperuser',
+                interactive=True,
+                stdout=new_io,
+                stdin=MockTTY(),
+            )
+            command_output = new_io.getvalue().strip()
+            self.assertEqual(command_output, 'Superuser created successfully.')
+            user = CustomUserWithM2M._default_manager.get(username='joe')
+            self.assertEqual(user.orgs.count(), 2)
+
+        test(self)
+
+    @override_settings(AUTH_USER_MODEL='auth_tests.CustomUserWithM2M')
+    def test_fields_with_m2m_interactive_blank(self):
+        new_io = StringIO()
+        org_id = Organization.objects.create(name='Organization').pk
+        entered_orgs = [str(org_id), ' ']
+
+        def return_orgs():
+            return entered_orgs.pop()
+
+        @mock_inputs({
+            'password': 'nopasswd',
+            'Username: ': 'joe',
+            'Orgs (Organization.id): ': return_orgs,
+        })
+        def test(self):
+            call_command(
+                'createsuperuser',
+                interactive=True,
+                stdout=new_io,
+                stderr=new_io,
+                stdin=MockTTY(),
+            )
+            self.assertEqual(
+                new_io.getvalue().strip(),
+                'Error: This field cannot be blank.\n'
+                'Superuser created successfully.',
+            )
+
+        test(self)
+
+    @override_settings(AUTH_USER_MODEL='auth_tests.CustomUserWithM2MThrough')
+    def test_fields_with_m2m_and_through(self):
+        msg = (
+            "Required field 'orgs' specifies a many-to-many relation through "
+            "model, which is not supported."
+        )
+        with self.assertRaisesMessage(CommandError, msg):
+            call_command('createsuperuser')
 
     def test_default_username(self):
         """createsuperuser uses a default username when one isn't provided."""
@@ -901,9 +987,64 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
 
         test(self)
 
+    @mock.patch.dict(os.environ, {
+        'DJANGO_SUPERUSER_PASSWORD': 'test_password',
+        'DJANGO_SUPERUSER_USERNAME': 'test_superuser',
+        'DJANGO_SUPERUSER_EMAIL': 'joe@somewhere.org',
+        'DJANGO_SUPERUSER_FIRST_NAME': 'ignored_first_name',
+    })
+    def test_environment_variable_non_interactive(self):
+        call_command('createsuperuser', interactive=False, stdout=StringIO())
+        user = User.objects.get(username='test_superuser')
+        self.assertEqual(user.email, 'joe@somewhere.org')
+        self.assertTrue(user.check_password('test_password'))
+        # Environment variables are ignored for non-required fields.
+        self.assertEqual(user.first_name, '')
+
+    @mock.patch.dict(os.environ, {
+        'DJANGO_SUPERUSER_USERNAME': 'test_superuser',
+        'DJANGO_SUPERUSER_EMAIL': 'joe@somewhere.org',
+    })
+    def test_ignore_environment_variable_non_interactive(self):
+        # Environment variables are ignored in non-interactive mode, if
+        # provided by a command line arguments.
+        call_command(
+            'createsuperuser',
+            interactive=False,
+            username='cmd_superuser',
+            email='cmd@somewhere.org',
+            stdout=StringIO(),
+        )
+        user = User.objects.get(username='cmd_superuser')
+        self.assertEqual(user.email, 'cmd@somewhere.org')
+        self.assertFalse(user.has_usable_password())
+
+    @mock.patch.dict(os.environ, {
+        'DJANGO_SUPERUSER_PASSWORD': 'test_password',
+        'DJANGO_SUPERUSER_USERNAME': 'test_superuser',
+        'DJANGO_SUPERUSER_EMAIL': 'joe@somewhere.org',
+    })
+    def test_ignore_environment_variable_interactive(self):
+        # Environment variables are ignored in interactive mode.
+        @mock_inputs({'password': 'cmd_password'})
+        def test(self):
+            call_command(
+                'createsuperuser',
+                interactive=True,
+                username='cmd_superuser',
+                email='cmd@somewhere.org',
+                stdin=MockTTY(),
+                stdout=StringIO(),
+            )
+            user = User.objects.get(username='cmd_superuser')
+            self.assertEqual(user.email, 'cmd@somewhere.org')
+            self.assertTrue(user.check_password('cmd_password'))
+
+        test(self)
+
 
 class MultiDBCreatesuperuserTestCase(TestCase):
-    multi_db = True
+    databases = {'default', 'other'}
 
     def test_createsuperuser_command_with_database_option(self):
         """
@@ -982,3 +1123,18 @@ class CreatePermissionsTests(TestCase):
         ContentType.objects.filter(app_label='auth', model='group').delete()
         # This fails with a foreign key constraint without the fix.
         create_permissions(apps.get_app_config('auth'), interactive=False, verbosity=0)
+
+    def test_permission_with_proxy_content_type_created(self):
+        """
+        A proxy model's permissions use its own content type rather than the
+        content type of the concrete model.
+        """
+        opts = UserProxy._meta
+        codename = get_permission_codename('add', opts)
+        self.assertTrue(
+            Permission.objects.filter(
+                content_type__model=opts.model_name,
+                content_type__app_label=opts.app_label,
+                codename=codename,
+            ).exists()
+        )

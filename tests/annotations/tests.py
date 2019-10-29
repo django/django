@@ -405,6 +405,28 @@ class NonAggregateAnnotationTestCase(TestCase):
             lambda a: (a['age'], a['age_count'])
         )
 
+    def test_raw_sql_with_inherited_field(self):
+        DepartmentStore.objects.create(
+            name='Angus & Robinson',
+            original_opening=datetime.date(2014, 3, 8),
+            friday_night_closing=datetime.time(21),
+            chain='Westfield',
+            area=123,
+        )
+        tests = (
+            ('name', 'Angus & Robinson'),
+            ('surface', 123),
+            ("case when name='Angus & Robinson' then chain else name end", 'Westfield'),
+        )
+        for sql, expected_result in tests:
+            with self.subTest(sql=sql):
+                self.assertSequenceEqual(
+                    DepartmentStore.objects.annotate(
+                        annotation=RawSQL(sql, ()),
+                    ).values_list('annotation', flat=True),
+                    [expected_result],
+                )
+
     def test_annotate_exists(self):
         authors = Author.objects.annotate(c=Count('id')).filter(c__gt=1)
         self.assertFalse(authors.exists())
@@ -586,7 +608,6 @@ class NonAggregateAnnotationTestCase(TestCase):
             [{'jacob_name': 'Jacob Kaplan-Moss', 'james_name': 'James Bennett'}],
         )
 
-    @skipUnlessDBFeature('supports_subqueries_in_group_by')
     def test_annotation_filter_with_subquery(self):
         long_books_qs = Book.objects.filter(
             publisher=OuterRef('pk'),

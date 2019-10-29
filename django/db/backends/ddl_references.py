@@ -110,13 +110,14 @@ class IndexColumns(Columns):
 
     def __str__(self):
         def col_str(column, idx):
-            try:
-                col = self.quote_name(column) + self.col_suffixes[idx]
-            except IndexError:
-                col = self.quote_name(column)
             # Index.__init__() guarantees that self.opclasses is the same
             # length as self.columns.
-            return '{} {}'.format(col, self.opclasses[idx])
+            col = '{} {}'.format(self.quote_name(column), self.opclasses[idx])
+            try:
+                col = '{} {}'.format(col, self.col_suffixes[idx])
+            except IndexError:
+                pass
+            return col
 
         return ', '.join(col_str(column, idx) for idx, column in enumerate(self.columns))
 

@@ -1,4 +1,5 @@
 import copy
+import threading
 import time
 import warnings
 from collections import deque
@@ -16,6 +17,7 @@ from django.db.backends.signals import connection_created
 from django.db.transaction import TransactionManagementError
 from django.db.utils import DatabaseError, DatabaseErrorWrapper
 from django.utils import timezone
+from django.utils.asyncio import async_unsafe
 from django.utils.functional import cached_property
 
 NO_DB_ALIAS = '__no_db__'
@@ -43,8 +45,7 @@ class BaseDatabaseWrapper:
 
     queries_limit = 9000
 
-    def __init__(self, settings_dict, alias=DEFAULT_DB_ALIAS,
-                 allow_thread_sharing=False):
+    def __init__(self, settings_dict, alias=DEFAULT_DB_ALIAS):
         # Connection related attributes.
         # The underlying database connection.
         self.connection = None
@@ -80,7 +81,8 @@ class BaseDatabaseWrapper:
         self.errors_occurred = False
 
         # Thread-safety related attributes.
-        self.allow_thread_sharing = allow_thread_sharing
+        self._thread_sharing_lock = threading.Lock()
+        self._thread_sharing_count = 0
         self._thread_ident = _thread.get_ident()
 
         # A list of no-argument functions to run when the transaction commits.
@@ -176,6 +178,7 @@ class BaseDatabaseWrapper:
 
     # ##### Backend-specific methods for creating connections #####
 
+    @async_unsafe
     def connect(self):
         """Connect to the database. Assume that the connection is closed."""
         # Check for invalid configurations.
@@ -186,7 +189,7 @@ class BaseDatabaseWrapper:
         self.needs_rollback = False
         # Reset parameters defining when to close the connection
         max_age = self.settings_dict['CONN_MAX_AGE']
-        self.close_at = None if max_age is None else time.time() + max_age
+        self.close_at = None if max_age is None else time.monotonic() + max_age
         self.closed_in_transaction = False
         self.errors_occurred = False
         # Establish the connection
@@ -209,6 +212,7 @@ class BaseDatabaseWrapper:
                     "Connection '%s' cannot set TIME_ZONE because its engine "
                     "handles time zones conversions natively." % self.alias)
 
+    @async_unsafe
     def ensure_connection(self):
         """Guarantee that a connection to the database is established."""
         if self.connection is None:
@@ -250,10 +254,12 @@ class BaseDatabaseWrapper:
 
     # ##### Generic wrappers for PEP-249 connection methods #####
 
+    @async_unsafe
     def cursor(self):
         """Create a cursor, opening a connection if necessary."""
         return self._cursor()
 
+    @async_unsafe
     def commit(self):
         """Commit a transaction and reset the dirty flag."""
         self.validate_thread_sharing()
@@ -263,6 +269,7 @@ class BaseDatabaseWrapper:
         self.errors_occurred = False
         self.run_commit_hooks_on_set_autocommit_on = True
 
+    @async_unsafe
     def rollback(self):
         """Roll back a transaction and reset the dirty flag."""
         self.validate_thread_sharing()
@@ -273,6 +280,7 @@ class BaseDatabaseWrapper:
         self.needs_rollback = False
         self.run_on_commit = []
 
+    @async_unsafe
     def close(self):
         """Close the connection to the database."""
         self.validate_thread_sharing()
@@ -312,6 +320,7 @@ class BaseDatabaseWrapper:
 
     # ##### Generic savepoint management methods #####
 
+    @async_unsafe
     def savepoint(self):
         """
         Create a savepoint inside the current transaction. Return an
@@ -332,6 +341,7 @@ class BaseDatabaseWrapper:
 
         return sid
 
+    @async_unsafe
     def savepoint_rollback(self, sid):
         """
         Roll back to a savepoint. Do nothing if savepoints are not supported.
@@ -347,6 +357,7 @@ class BaseDatabaseWrapper:
             (sids, func) for (sids, func) in self.run_on_commit if sid not in sids
         ]
 
+    @async_unsafe
     def savepoint_commit(self, sid):
         """
         Release a savepoint. Do nothing if savepoints are not supported.
@@ -357,6 +368,7 @@ class BaseDatabaseWrapper:
         self.validate_thread_sharing()
         self._savepoint_commit(sid)
 
+    @async_unsafe
     def clean_savepoints(self):
         """
         Reset the counter used to generate unique savepoint ids in this thread.
@@ -385,7 +397,7 @@ class BaseDatabaseWrapper:
         The usual way to start a transaction is to turn autocommit off.
         SQLite does not properly start a transaction when disabling
         autocommit. To avoid this buggy behavior and to actually enter a new
-        transaction, an explcit BEGIN is required. Using
+        transaction, an explicit BEGIN is required. Using
         force_begin_transaction_with_broken_autocommit=True will issue an
         explicit BEGIN with SQLite. This option will be ignored for other
         backends.
@@ -395,7 +407,7 @@ class BaseDatabaseWrapper:
 
         start_transaction_under_autocommit = (
             force_begin_transaction_with_broken_autocommit and not autocommit and
-            self.features.autocommits_when_autocommit_is_off
+            hasattr(self, '_start_transaction_under_autocommit')
         )
 
         if start_transaction_under_autocommit:
@@ -509,18 +521,33 @@ class BaseDatabaseWrapper:
                     self.close()
                     return
 
-            if self.close_at is not None and time.time() >= self.close_at:
+            if self.close_at is not None and time.monotonic() >= self.close_at:
                 self.close()
                 return
 
     # ##### Thread safety handling #####
 
+    @property
+    def allow_thread_sharing(self):
+        with self._thread_sharing_lock:
+            return self._thread_sharing_count > 0
+
+    def inc_thread_sharing(self):
+        with self._thread_sharing_lock:
+            self._thread_sharing_count += 1
+
+    def dec_thread_sharing(self):
+        with self._thread_sharing_lock:
+            if self._thread_sharing_count <= 0:
+                raise RuntimeError('Cannot decrement the thread sharing count below zero.')
+            self._thread_sharing_count -= 1
+
     def validate_thread_sharing(self):
         """
         Validate that the connection isn't accessed by another thread than the
         one which originally created it, unless the connection was explicitly
-        authorized to be shared between threads (via the `allow_thread_sharing`
-        property). Raise an exception if the validation fails.
+        authorized to be shared between threads (via the `inc_thread_sharing()`
+        method). Raise an exception if the validation fails.
         """
         if not (self.allow_thread_sharing or self._thread_ident == _thread.get_ident()):
             raise DatabaseError(
@@ -589,20 +616,7 @@ class BaseDatabaseWrapper:
         potential child threads while (or after) the test database is destroyed.
         Refs #10868, #17786, #16969.
         """
-        return self.__class__(
-            {**self.settings_dict, 'NAME': None},
-            alias=NO_DB_ALIAS,
-            allow_thread_sharing=False,
-        )
-
-    def _start_transaction_under_autocommit(self):
-        """
-        Only required when autocommits_when_autocommit_is_off = True.
-        """
-        raise NotImplementedError(
-            'subclasses of BaseDatabaseWrapper may require a '
-            '_start_transaction_under_autocommit() method'
-        )
+        return self.__class__({**self.settings_dict, 'NAME': None}, alias=NO_DB_ALIAS)
 
     def schema_editor(self, *args, **kwargs):
         """
@@ -644,7 +658,7 @@ class BaseDatabaseWrapper:
         finally:
             self.execute_wrappers.pop()
 
-    def copy(self, alias=None, allow_thread_sharing=None):
+    def copy(self, alias=None):
         """
         Return a copy of this connection.
 
@@ -653,6 +667,4 @@ class BaseDatabaseWrapper:
         settings_dict = copy.deepcopy(self.settings_dict)
         if alias is None:
             alias = self.alias
-        if allow_thread_sharing is None:
-            allow_thread_sharing = self.allow_thread_sharing
-        return type(self)(settings_dict, alias, allow_thread_sharing)
+        return type(self)(settings_dict, alias)

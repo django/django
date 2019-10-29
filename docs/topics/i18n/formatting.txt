@@ -45,8 +45,8 @@ locales when guessing the format used by the user when inputting data on forms.
     ``%b`` (abbreviated month name), ``%B`` (full month name),
     or ``%p`` (AM/PM).
 
-To enable a form field to localize input and output data simply use its
-``localize`` argument::
+To enable a form field to localize input and output data use its ``localize``
+argument::
 
     class CashRegisterForm(forms.Form):
        product = forms.CharField()
@@ -152,8 +152,8 @@ want to create your own, because a format files doesn't exist for your locale,
 or because you want to overwrite some of the values.
 
 To use custom formats, specify the path where you'll place format files
-first. To do that, just set your :setting:`FORMAT_MODULE_PATH` setting to
-the package where format files will exist, for instance::
+first.  To do that, set your :setting:`FORMAT_MODULE_PATH` setting to the
+package where format files will exist, for instance::
 
     FORMAT_MODULE_PATH = [
         'mysite.formats',

@@ -14,13 +14,13 @@ from .client import PasswordResetConfirmClient
 
 @override_settings(ROOT_URLCONF='auth_tests.urls')
 class AuthTemplateTests(TestCase):
+    request_factory = RequestFactory()
 
     @classmethod
     def setUpTestData(cls):
-        rf = RequestFactory()
         user = User.objects.create_user('jsmith', 'jsmith@example.com', 'pass')
         user = authenticate(username=user.username, password='pass')
-        request = rf.get('/somepath/')
+        request = cls.request_factory.get('/somepath/')
         request.user = user
         cls.user, cls.request = user, request
 

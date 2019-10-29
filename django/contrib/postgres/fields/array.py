@@ -5,12 +5,11 @@ from django.contrib.postgres.forms import SimpleArrayField
 from django.contrib.postgres.validators import ArrayMaxLengthValidator
 from django.core import checks, exceptions
 from django.db.models import Field, IntegerField, Transform
+from django.db.models.fields.mixins import CheckFieldDefaultMixin
 from django.db.models.lookups import Exact, In
-from django.utils.inspect import func_supports_parameter
 from django.utils.translation import gettext_lazy as _
 
 from ..utils import prefix_validation_error
-from .mixins import CheckFieldDefaultMixin
 from .utils import AttributeSetter
 
 __all__ = ['ArrayField']
@@ -83,6 +82,10 @@ class ArrayField(CheckFieldDefaultMixin, Field):
         size = self.size or ''
         return '%s[%s]' % (self.base_field.db_type(connection), size)
 
+    def cast_db_type(self, connection):
+        size = self.size or ''
+        return '%s[%s]' % (self.base_field.cast_db_type(connection), size)
+
     def get_placeholder(self, value, compiler, connection):
         return '%s::{}'.format(self.db_type(connection))
 
@@ -112,9 +115,7 @@ class ArrayField(CheckFieldDefaultMixin, Field):
         if value is None:
             return value
         return [
-            self.base_field.from_db_value(item, expression, connection, {})
-            if func_supports_parameter(self.base_field.from_db_value, 'context')  # RemovedInDjango30Warning
-            else self.base_field.from_db_value(item, expression, connection)
+            self.base_field.from_db_value(item, expression, connection)
             for item in value
         ]
 
@@ -193,36 +194,31 @@ class ArrayField(CheckFieldDefaultMixin, Field):
         })
 
 
-@ArrayField.register_lookup
-class ArrayContains(lookups.DataContains):
-    def as_sql(self, qn, connection):
-        sql, params = super().as_sql(qn, connection)
-        sql = '%s::%s' % (sql, self.lhs.output_field.db_type(connection))
-        return sql, params
+class ArrayCastRHSMixin:
+    def process_rhs(self, compiler, connection):
+        rhs, rhs_params = super().process_rhs(compiler, connection)
+        cast_type = self.lhs.output_field.cast_db_type(connection)
+        return '%s::%s' % (rhs, cast_type), rhs_params
 
 
 @ArrayField.register_lookup
-class ArrayContainedBy(lookups.ContainedBy):
-    def as_sql(self, qn, connection):
-        sql, params = super().as_sql(qn, connection)
-        sql = '%s::%s' % (sql, self.lhs.output_field.db_type(connection))
-        return sql, params
+class ArrayContains(ArrayCastRHSMixin, lookups.DataContains):
+    pass
 
 
 @ArrayField.register_lookup
-class ArrayExact(Exact):
-    def as_sql(self, qn, connection):
-        sql, params = super().as_sql(qn, connection)
-        sql = '%s::%s' % (sql, self.lhs.output_field.db_type(connection))
-        return sql, params
+class ArrayContainedBy(ArrayCastRHSMixin, lookups.ContainedBy):
+    pass
 
 
 @ArrayField.register_lookup
-class ArrayOverlap(lookups.Overlap):
-    def as_sql(self, qn, connection):
-        sql, params = super().as_sql(qn, connection)
-        sql = '%s::%s' % (sql, self.lhs.output_field.db_type(connection))
-        return sql, params
+class ArrayExact(ArrayCastRHSMixin, Exact):
+    pass
+
+
+@ArrayField.register_lookup
+class ArrayOverlap(ArrayCastRHSMixin, lookups.Overlap):
+    pass
 
 
 @ArrayField.register_lookup
@@ -243,8 +239,7 @@ class ArrayLenTransform(Transform):
 class ArrayInLookup(In):
     def get_prep_lookup(self):
         values = super().get_prep_lookup()
-        if hasattr(self.rhs, '_prepare'):
-            # Subqueries don't need further preparation.
+        if hasattr(values, 'resolve_expression'):
             return values
         # In.process_rhs() expects values to be hashable, so convert lists
         # to tuples.
@@ -266,7 +261,7 @@ class IndexTransform(Transform):
 
     def as_sql(self, compiler, connection):
         lhs, params = compiler.compile(self.lhs)
-        return '%s[%s]' % (lhs, self.index), params
+        return '%s[%%s]' % lhs, params + [self.index]
 
     @property
     def output_field(self):
@@ -292,7 +287,7 @@ class SliceTransform(Transform):
 
     def as_sql(self, compiler, connection):
         lhs, params = compiler.compile(self.lhs)
-        return '%s[%s:%s]' % (lhs, self.start, self.end), params
+        return '%s[%%s:%%s]' % lhs, params + [self.start, self.end]
 
 
 class SliceTransformFactory:

@@ -9,6 +9,7 @@ import re
 import types
 import uuid
 
+from django.conf import SettingsReference
 from django.db import models
 from django.db.migrations.operations.base import Operation
 from django.db.migrations.utils import COMPILED_REGEX_TYPE, RegexObject
@@ -43,6 +44,11 @@ class BaseSequenceSerializer(BaseSerializer):
 class BaseSimpleSerializer(BaseSerializer):
     def serialize(self):
         return repr(self.value), set()
+
+
+class ChoicesSerializer(BaseSerializer):
+    def serialize(self):
+        return serializer_factory(self.value.value).serialize()
 
 
 class DateTimeSerializer(BaseSerializer):
@@ -114,9 +120,10 @@ class EnumSerializer(BaseSerializer):
     def serialize(self):
         enum_class = self.value.__class__
         module = enum_class.__module__
-        v_string, v_imports = serializer_factory(self.value.value).serialize()
-        imports = {'import %s' % module, *v_imports}
-        return "%s.%s(%s)" % (module, enum_class.__name__, v_string), imports
+        return (
+            '%s.%s[%r]' % (module, enum_class.__qualname__, self.value.name),
+            {'import %s' % module},
+        )
 
 
 class FloatSerializer(BaseSimpleSerializer):
@@ -270,8 +277,41 @@ class UUIDSerializer(BaseSerializer):
         return "uuid.%s" % repr(self.value), {"import uuid"}
 
 
+class Serializer:
+    _registry = {
+        # Some of these are order-dependent.
+        frozenset: FrozensetSerializer,
+        list: SequenceSerializer,
+        set: SetSerializer,
+        tuple: TupleSerializer,
+        dict: DictionarySerializer,
+        models.Choices: ChoicesSerializer,
+        enum.Enum: EnumSerializer,
+        datetime.datetime: DatetimeDatetimeSerializer,
+        (datetime.date, datetime.timedelta, datetime.time): DateTimeSerializer,
+        SettingsReference: SettingsReferenceSerializer,
+        float: FloatSerializer,
+        (bool, int, type(None), bytes, str, range): BaseSimpleSerializer,
+        decimal.Decimal: DecimalSerializer,
+        (functools.partial, functools.partialmethod): FunctoolsPartialSerializer,
+        (types.FunctionType, types.BuiltinFunctionType, types.MethodType): FunctionTypeSerializer,
+        collections.abc.Iterable: IterableSerializer,
+        (COMPILED_REGEX_TYPE, RegexObject): RegexSerializer,
+        uuid.UUID: UUIDSerializer,
+    }
+
+    @classmethod
+    def register(cls, type_, serializer):
+        if not issubclass(serializer, BaseSerializer):
+            raise ValueError("'%s' must inherit from 'BaseSerializer'." % serializer.__name__)
+        cls._registry[type_] = serializer
+
+    @classmethod
+    def unregister(cls, type_):
+        cls._registry.pop(type_)
+
+
 def serializer_factory(value):
-    from django.db.migrations.writer import SettingsReference
     if isinstance(value, Promise):
         value = str(value)
     elif isinstance(value, LazyObject):
@@ -290,42 +330,9 @@ def serializer_factory(value):
     # Anything that knows how to deconstruct itself.
     if hasattr(value, 'deconstruct'):
         return DeconstructableSerializer(value)
-
-    # Unfortunately some of these are order-dependent.
-    if isinstance(value, frozenset):
-        return FrozensetSerializer(value)
-    if isinstance(value, list):
-        return SequenceSerializer(value)
-    if isinstance(value, set):
-        return SetSerializer(value)
-    if isinstance(value, tuple):
-        return TupleSerializer(value)
-    if isinstance(value, dict):
-        return DictionarySerializer(value)
-    if isinstance(value, enum.Enum):
-        return EnumSerializer(value)
-    if isinstance(value, datetime.datetime):
-        return DatetimeDatetimeSerializer(value)
-    if isinstance(value, (datetime.date, datetime.timedelta, datetime.time)):
-        return DateTimeSerializer(value)
-    if isinstance(value, SettingsReference):
-        return SettingsReferenceSerializer(value)
-    if isinstance(value, float):
-        return FloatSerializer(value)
-    if isinstance(value, (bool, int, type(None), bytes, str)):
-        return BaseSimpleSerializer(value)
-    if isinstance(value, decimal.Decimal):
-        return DecimalSerializer(value)
-    if isinstance(value, (functools.partial, functools.partialmethod)):
-        return FunctoolsPartialSerializer(value)
-    if isinstance(value, (types.FunctionType, types.BuiltinFunctionType, types.MethodType)):
-        return FunctionTypeSerializer(value)
-    if isinstance(value, collections.abc.Iterable):
-        return IterableSerializer(value)
-    if isinstance(value, (COMPILED_REGEX_TYPE, RegexObject)):
-        return RegexSerializer(value)
-    if isinstance(value, uuid.UUID):
-        return UUIDSerializer(value)
+    for type_, serializer_cls in Serializer._registry.items():
+        if isinstance(value, type_):
+            return serializer_cls(value)
     raise ValueError(
         "Cannot serialize: %r\nThere are some values Django cannot serialize into "
         "migration files.\nFor more, see https://docs.djangoproject.com/en/%s/"

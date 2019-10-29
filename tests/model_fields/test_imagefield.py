@@ -269,7 +269,7 @@ class ImageFieldTwoDimensionsTests(ImageFieldTestMixin, TestCase):
 
         # Field and dimensions should be cleared after a delete.
         p.mugshot.delete(save=False)
-        self.assertEqual(p.mugshot, None)
+        self.assertIsNone(p.mugshot.name)
         self.check_dimensions(p, None, None)
 
     def test_dimensions(self):

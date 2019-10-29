@@ -410,15 +410,15 @@ class AdminActionsPermissionTests(TestCase):
     def setUpTestData(cls):
         cls.s1 = ExternalSubscriber.objects.create(name='John Doe', email='john@example.org')
         cls.s2 = Subscriber.objects.create(name='Max Mustermann', email='max@example.org')
-
-    def setUp(self):
-        self.user = User.objects.create_user(
+        cls.user = User.objects.create_user(
             username='user', password='secret', email='user@example.com',
             is_staff=True,
         )
-        self.client.force_login(self.user)
         permission = Permission.objects.get(codename='change_subscriber')
-        self.user.user_permissions.add(permission)
+        cls.user.user_permissions.add(permission)
+
+    def setUp(self):
+        self.client.force_login(self.user)
 
     def test_model_admin_no_delete_permission(self):
         """

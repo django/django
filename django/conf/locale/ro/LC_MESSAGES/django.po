@@ -2,7 +2,7 @@
 #
 # Translators:
 # Abel Radac <abelradac@gmail.com>, 2017
-# Bogdan Mateescu, 2018
+# Bogdan Mateescu, 2018-2019
 # mihneasim <contact@mesimian.com>, 2011
 # Daniel Ursache-Dogariu, 2011
 # Denis Darii <denis.darii@gmail.com>, 2011,2014
@@ -14,8 +14,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-05-17 11:49+0200\n"
-"PO-Revision-Date: 2018-05-18 05:42+0000\n"
+"POT-Creation-Date: 2019-01-16 20:42+0100\n"
+"PO-Revision-Date: 2019-01-18 11:00+0000\n"
 "Last-Translator: Bogdan Mateescu\n"
 "Language-Team: Romanian (http://www.transifex.com/django/django/language/"
 "ro/)\n"
@@ -145,6 +145,9 @@ msgstr "Soraba Superioară"
 
 msgid "Hungarian"
 msgstr "Ungară"
+
+msgid "Armenian"
+msgstr "Armeană"
 
 msgid "Interlingua"
 msgstr "Interlingua"
@@ -629,6 +632,9 @@ msgstr "Date binare brute"
 msgid "'%(value)s' is not a valid UUID."
 msgstr "'%(value)s' nu este un UUID valid."
 
+msgid "Universally unique identifier"
+msgstr "Identificator unic universal"
+
 msgid "File"
 msgstr "Fișier"
 
@@ -1083,8 +1089,8 @@ msgstr "Aceasta nu este o adresă IPv6 validă."
 
 #, python-format
 msgctxt "String to return when truncating text"
-msgid "%(truncated_text)s..."
-msgstr "%(truncated_text)s..."
+msgid "%(truncated_text)s…"
+msgstr "%(truncated_text)s…"
 
 msgid "or"
 msgstr "sau"

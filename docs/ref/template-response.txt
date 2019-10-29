@@ -76,7 +76,7 @@ Methods
         The value included in the HTTP ``Content-Type`` header, including the
         MIME type specification and the character set encoding. If
         ``content_type`` is specified, then its value is used. Otherwise,
-        :setting:`DEFAULT_CONTENT_TYPE` is used.
+        ``'text/html'`` is used.
 
     ``status``
         The HTTP status code for the response.
@@ -171,7 +171,7 @@ Methods
         The value included in the HTTP ``Content-Type`` header, including the
         MIME type specification and the character set encoding. If
         ``content_type`` is specified, then its value is used. Otherwise,
-        :setting:`DEFAULT_CONTENT_TYPE` is used.
+        ``'text/html'`` is used.
 
     ``status``
         The HTTP status code for the response.
@@ -239,7 +239,7 @@ Some operations -- such as caching -- cannot be performed on an
 unrendered template. They must be performed on a fully complete and
 rendered response.
 
-If you're using middleware, the solution is easy. Middleware provides
+If you're using middleware, you can do that. Middleware provides
 multiple opportunities to process a response on exit from a view. If
 you put behavior in the response middleware, it's guaranteed to execute
 after template rendering has taken place.
@@ -253,7 +253,7 @@ be invoked when rendering has completed. Using this callback, you can
 defer critical processing until a point where you can guarantee that
 rendered content will be available.
 
-To define a post-render callback, just define a function that takes
+To define a post-render callback, define a function that takes
 a single argument -- response -- and register that function with
 the template response::
 
@@ -285,8 +285,8 @@ A :class:`TemplateResponse` object can be used anywhere that a normal
 :class:`django.http.HttpResponse` can be used. It can also be used as an
 alternative to calling :func:`~django.shortcuts.render()`.
 
-For example, the following simple view returns a :class:`TemplateResponse`
-with a simple template and a context containing a queryset::
+For example, the following view returns a :class:`TemplateResponse` with a
+template and a context containing a queryset::
 
     from django.template.response import TemplateResponse
 

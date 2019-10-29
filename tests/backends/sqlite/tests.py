@@ -1,36 +1,39 @@
 import re
 import threading
 import unittest
+from sqlite3 import dbapi2
+from unittest import mock
 
-from django.db import connection
+from django.core.exceptions import ImproperlyConfigured
+from django.db import connection, transaction
 from django.db.models import Avg, StdDev, Sum, Variance
+from django.db.models.aggregates import Aggregate
 from django.db.models.fields import CharField
 from django.db.utils import NotSupportedError
-from django.test import TestCase, TransactionTestCase, override_settings
+from django.test import (
+    TestCase, TransactionTestCase, override_settings, skipIfDBFeature,
+)
 from django.test.utils import isolate_apps
 
 from ..models import Author, Item, Object, Square
+
+try:
+    from django.db.backends.sqlite3.base import check_sqlite_version
+except ImproperlyConfigured:
+    # Ignore "SQLite is too old" when running tests on another database.
+    pass
 
 
 @unittest.skipUnless(connection.vendor == 'sqlite', 'SQLite tests')
 class Tests(TestCase):
     longMessage = True
 
-    def test_autoincrement(self):
-        """
-        auto_increment fields are created with the AUTOINCREMENT keyword
-        in order to be monotonically increasing (#10164).
-        """
-        with connection.schema_editor(collect_sql=True) as editor:
-            editor.create_model(Square)
-            statements = editor.collected_sql
-        match = re.search('"id" ([^,]+),', statements[0])
-        self.assertIsNotNone(match)
-        self.assertEqual(
-            'integer NOT NULL PRIMARY KEY AUTOINCREMENT',
-            match.group(1),
-            'Wrong SQL used to create an auto-increment column on SQLite'
-        )
+    def test_check_sqlite_version(self):
+        msg = 'SQLite 3.8.3 or later is required (found 3.8.2).'
+        with mock.patch.object(dbapi2, 'sqlite_version_info', (3, 8, 2)), \
+                mock.patch.object(dbapi2, 'sqlite_version', '3.8.2'), \
+                self.assertRaisesMessage(ImproperlyConfigured, msg):
+            check_sqlite_version()
 
     def test_aggregation(self):
         """
@@ -47,6 +50,17 @@ class Tests(TestCase):
                 Item.objects.all().aggregate(
                     **{'complex': aggregate('last_modified') + aggregate('last_modified')}
                 )
+
+    def test_distinct_aggregation(self):
+        class DistinctAggregate(Aggregate):
+            allow_distinct = True
+        aggregate = DistinctAggregate('first', 'second', distinct=True)
+        msg = (
+            "SQLite doesn't support DISTINCT on aggregate functions accepting "
+            "multiple arguments."
+        )
+        with self.assertRaisesMessage(NotSupportedError, msg):
+            connection.ops.check_expression_support(aggregate)
 
     def test_memory_db_test_name(self):
         """A named in-memory db should be allowed where supported."""
@@ -82,6 +96,53 @@ class SchemaTests(TransactionTestCase):
 
     available_apps = ['backends']
 
+    def test_autoincrement(self):
+        """
+        auto_increment fields are created with the AUTOINCREMENT keyword
+        in order to be monotonically increasing (#10164).
+        """
+        with connection.schema_editor(collect_sql=True) as editor:
+            editor.create_model(Square)
+            statements = editor.collected_sql
+        match = re.search('"id" ([^,]+),', statements[0])
+        self.assertIsNotNone(match)
+        self.assertEqual(
+            'integer NOT NULL PRIMARY KEY AUTOINCREMENT',
+            match.group(1),
+            'Wrong SQL used to create an auto-increment column on SQLite'
+        )
+
+    def test_disable_constraint_checking_failure_disallowed(self):
+        """
+        SQLite schema editor is not usable within an outer transaction if
+        foreign key constraint checks are not disabled beforehand.
+        """
+        msg = (
+            'SQLite schema editor cannot be used while foreign key '
+            'constraint checks are enabled. Make sure to disable them '
+            'before entering a transaction.atomic() context because '
+            'SQLite does not support disabling them in the middle of '
+            'a multi-statement transaction.'
+        )
+        with self.assertRaisesMessage(NotSupportedError, msg):
+            with transaction.atomic(), connection.schema_editor(atomic=True):
+                pass
+
+    def test_constraint_checks_disabled_atomic_allowed(self):
+        """
+        SQLite schema editor is usable within an outer transaction as long as
+        foreign key constraints checks are disabled beforehand.
+        """
+        def constraint_checks_enabled():
+            with connection.cursor() as cursor:
+                return bool(cursor.execute('PRAGMA foreign_keys').fetchone()[0])
+        with connection.constraint_checks_disabled(), transaction.atomic():
+            with connection.schema_editor(atomic=True):
+                self.assertFalse(constraint_checks_enabled())
+            self.assertFalse(constraint_checks_enabled())
+        self.assertTrue(constraint_checks_enabled())
+
+    @skipIfDBFeature('supports_atomic_references_rename')
     def test_field_rename_inside_atomic_block(self):
         """
         NotImplementedError is raised when a model field rename is attempted
@@ -91,14 +152,15 @@ class SchemaTests(TransactionTestCase):
         new_field.set_attributes_from_name('renamed')
         msg = (
             "Renaming the 'backends_author'.'name' column while in a "
-            "transaction is not supported on SQLite because it would break "
-            "referential integrity. Try adding `atomic = False` to the "
+            "transaction is not supported on SQLite < 3.26 because it would "
+            "break referential integrity. Try adding `atomic = False` to the "
             "Migration class."
         )
         with self.assertRaisesMessage(NotSupportedError, msg):
             with connection.schema_editor(atomic=True) as editor:
                 editor.alter_field(Author, Author._meta.get_field('name'), new_field)
 
+    @skipIfDBFeature('supports_atomic_references_rename')
     def test_table_rename_inside_atomic_block(self):
         """
         NotImplementedError is raised when a table rename is attempted inside
@@ -106,7 +168,7 @@ class SchemaTests(TransactionTestCase):
         """
         msg = (
             "Renaming the 'backends_author' table while in a transaction is "
-            "not supported on SQLite because it would break referential "
+            "not supported on SQLite < 3.26 because it would break referential "
             "integrity. Try adding `atomic = False` to the Migration class."
         )
         with self.assertRaisesMessage(NotSupportedError, msg):

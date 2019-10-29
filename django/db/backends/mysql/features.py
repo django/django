@@ -1,10 +1,11 @@
+import operator
+
 from django.db.backends.base.features import BaseDatabaseFeatures
 from django.utils.functional import cached_property
 
 
 class DatabaseFeatures(BaseDatabaseFeatures):
     empty_fetchmany_value = ()
-    update_can_self_select = False
     allows_group_by_pk = True
     related_fields_match_type = True
     # MySQL doesn't support sliced subqueries with IN/ALL/ANY/SOME.
@@ -15,6 +16,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_date_lookup_using_string = False
     can_introspect_autofield = True
     can_introspect_binary_field = False
+    can_introspect_duration_field = False
     can_introspect_small_integer_field = True
     can_introspect_positive_integer_field = True
     introspected_boolean_field_type = 'IntegerField'
@@ -22,11 +24,8 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_timezones = False
     requires_explicit_null_ordering_when_grouping = True
     allows_auto_pk_0 = False
-    uses_savepoints = True
     can_release_savepoints = True
     atomic_transactions = False
-    supports_column_check_constraints = False
-    supports_table_check_constraints = False
     can_clone_databases = True
     supports_temporal_subtraction = True
     supports_select_intersection = False
@@ -49,8 +48,8 @@ class DatabaseFeatures(BaseDatabaseFeatures):
         END;
     """
     db_functions_convert_bytes_to_str = True
-    # Alias MySQL's TRADITIONAL to TEXT for consistency with other backends.
-    supported_explain_formats = {'JSON', 'TEXT', 'TRADITIONAL'}
+    # Neither MySQL nor MariaDB support partial indexes.
+    supports_partial_indexes = False
 
     @cached_property
     def _mysql_storage_engine(self):
@@ -61,16 +60,21 @@ class DatabaseFeatures(BaseDatabaseFeatures):
         return result[0]
 
     @cached_property
+    def update_can_self_select(self):
+        return self.connection.mysql_is_mariadb and self.connection.mysql_version >= (10, 3, 2)
+
+    @cached_property
     def can_introspect_foreign_keys(self):
         "Confirm support for introspected foreign keys"
         return self._mysql_storage_engine != 'MyISAM'
 
     @cached_property
     def has_zoneinfo_database(self):
-        # Test if the time zone definitions are installed.
+        # Test if the time zone definitions are installed. CONVERT_TZ returns
+        # NULL if 'UTC' timezone isn't loaded into the mysql.time_zone.
         with self.connection.cursor() as cursor:
-            cursor.execute("SELECT 1 FROM mysql.time_zone LIMIT 1")
-            return cursor.fetchone() is not None
+            cursor.execute("SELECT CONVERT_TZ('2001-01-01 01:00:00', 'UTC', 'UTC')")
+            return cursor.fetchone()[0] is not None
 
     @cached_property
     def is_sql_auto_is_null_enabled(self):
@@ -82,19 +86,49 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     @cached_property
     def supports_over_clause(self):
         if self.connection.mysql_is_mariadb:
-            return self.connection.mysql_version >= (10, 2)
+            return True
         return self.connection.mysql_version >= (8, 0, 2)
+
+    supports_frame_range_fixed_distance = property(operator.attrgetter('supports_over_clause'))
+
+    @cached_property
+    def supports_column_check_constraints(self):
+        if self.connection.mysql_is_mariadb:
+            return self.connection.mysql_version >= (10, 2, 1)
+        return self.connection.mysql_version >= (8, 0, 16)
+
+    supports_table_check_constraints = property(operator.attrgetter('supports_column_check_constraints'))
+
+    @cached_property
+    def can_introspect_check_constraints(self):
+        if self.connection.mysql_is_mariadb:
+            version = self.connection.mysql_version
+            return (version >= (10, 2, 22) and version < (10, 3)) or version >= (10, 3, 10)
+        return self.connection.mysql_version >= (8, 0, 16)
 
     @cached_property
     def has_select_for_update_skip_locked(self):
         return not self.connection.mysql_is_mariadb and self.connection.mysql_version >= (8, 0, 1)
 
-    has_select_for_update_nowait = has_select_for_update_skip_locked
+    has_select_for_update_nowait = property(operator.attrgetter('has_select_for_update_skip_locked'))
 
     @cached_property
     def needs_explain_extended(self):
         # EXTENDED is deprecated (and not required) in MySQL 5.7.
         return not self.connection.mysql_is_mariadb and self.connection.mysql_version < (5, 7)
+
+    @cached_property
+    def supports_explain_analyze(self):
+        return self.connection.mysql_is_mariadb or self.connection.mysql_version >= (8, 0, 18)
+
+    @cached_property
+    def supported_explain_formats(self):
+        # Alias MySQL's TRADITIONAL to TEXT for consistency with other
+        # backends.
+        formats = {'JSON', 'TEXT', 'TRADITIONAL'}
+        if not self.connection.mysql_is_mariadb and self.connection.mysql_version >= (8, 0, 16):
+            formats.add('TREE')
+        return formats
 
     @cached_property
     def supports_transactions(self):

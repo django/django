@@ -3,7 +3,6 @@ A Python "serializer". Doesn't do much serializing per se -- just converts to
 and from basic Python data types (lists, dicts, strings, etc.). Useful as a basis for
 other serializers.
 """
-from collections import OrderedDict
 
 from django.apps import apps
 from django.core.serializers import base
@@ -26,14 +25,14 @@ class Serializer(base.Serializer):
         pass
 
     def start_object(self, obj):
-        self._current = OrderedDict()
+        self._current = {}
 
     def end_object(self, obj):
         self.objects.append(self.get_dump_object(obj))
         self._current = None
 
     def get_dump_object(self, obj):
-        data = OrderedDict([('model', str(obj._meta))])
+        data = {'model': str(obj._meta)}
         if not self.use_natural_primary_keys or not hasattr(obj, 'natural_key'):
             data["pk"] = self._value_from_field(obj, obj._meta.pk)
         data['fields'] = self._current

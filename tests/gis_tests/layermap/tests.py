@@ -1,3 +1,4 @@
+import datetime
 import os
 import unittest
 from copy import copy
@@ -13,8 +14,9 @@ from django.db import connection
 from django.test import TestCase, override_settings
 
 from .models import (
-    City, County, CountyFeat, ICity1, ICity2, Interstate, Invalid, State,
-    city_mapping, co_mapping, cofeat_mapping, inter_mapping,
+    City, County, CountyFeat, DoesNotAllowNulls, HasNulls, ICity1, ICity2,
+    Interstate, Invalid, State, city_mapping, co_mapping, cofeat_mapping,
+    has_nulls_mapping, inter_mapping,
 )
 
 shp_path = os.path.realpath(os.path.join(os.path.dirname(__file__), os.pardir, 'data'))
@@ -22,6 +24,7 @@ city_shp = os.path.join(shp_path, 'cities', 'cities.shp')
 co_shp = os.path.join(shp_path, 'counties', 'counties.shp')
 inter_shp = os.path.join(shp_path, 'interstates', 'interstates.shp')
 invalid_shp = os.path.join(shp_path, 'invalid', 'emptypoints.shp')
+has_nulls_geojson = os.path.join(shp_path, 'has_nulls', 'has_nulls.geojson')
 
 # Dictionaries to hold what's expected in the county shapefile.
 NAMES = ['Bexar', 'Galveston', 'Harris', 'Honolulu', 'Pueblo']
@@ -261,13 +264,13 @@ class LayerMapTest(TestCase):
 
     def test_model_inheritance(self):
         "Tests LayerMapping on inherited models.  See #12093."
-        icity_mapping = {'name': 'Name',
-                         'population': 'Population',
-                         'density': 'Density',
-                         'point': 'POINT',
-                         'dt': 'Created',
-                         }
-
+        icity_mapping = {
+            'name': 'Name',
+            'population': 'Population',
+            'density': 'Density',
+            'point': 'POINT',
+            'dt': 'Created',
+        }
         # Parent model has geometry field.
         lm1 = LayerMapping(ICity1, city_shp, icity_mapping)
         lm1.save()
@@ -321,6 +324,59 @@ class LayerMapTest(TestCase):
         self.assertIsNotNone(hu.mpoly)
         self.assertEqual(hu.mpoly.ogr.num_coords, 449)
 
+    def test_null_number_imported(self):
+        """LayerMapping import of GeoJSON with a null numeric value."""
+        lm = LayerMapping(HasNulls, has_nulls_geojson, has_nulls_mapping)
+        lm.save()
+        self.assertEqual(HasNulls.objects.count(), 3)
+        self.assertEqual(HasNulls.objects.filter(num=0).count(), 1)
+        self.assertEqual(HasNulls.objects.filter(num__isnull=True).count(), 1)
+
+    def test_null_string_imported(self):
+        "Test LayerMapping import of GeoJSON with a null string value."
+        lm = LayerMapping(HasNulls, has_nulls_geojson, has_nulls_mapping)
+        lm.save()
+        self.assertEqual(HasNulls.objects.filter(name='None').count(), 0)
+        num_empty = 1 if connection.features.interprets_empty_strings_as_nulls else 0
+        self.assertEqual(HasNulls.objects.filter(name='').count(), num_empty)
+        self.assertEqual(HasNulls.objects.filter(name__isnull=True).count(), 1)
+
+    def test_nullable_boolean_imported(self):
+        """LayerMapping import of GeoJSON with a nullable boolean value."""
+        lm = LayerMapping(HasNulls, has_nulls_geojson, has_nulls_mapping)
+        lm.save()
+        self.assertEqual(HasNulls.objects.filter(boolean=True).count(), 1)
+        self.assertEqual(HasNulls.objects.filter(boolean=False).count(), 1)
+        self.assertEqual(HasNulls.objects.filter(boolean__isnull=True).count(), 1)
+
+    def test_nullable_datetime_imported(self):
+        """LayerMapping import of GeoJSON with a nullable date/time value."""
+        lm = LayerMapping(HasNulls, has_nulls_geojson, has_nulls_mapping)
+        lm.save()
+        self.assertEqual(HasNulls.objects.filter(datetime__lt=datetime.date(1994, 8, 15)).count(), 1)
+        self.assertEqual(HasNulls.objects.filter(datetime='2018-11-29T03:02:52').count(), 1)
+        self.assertEqual(HasNulls.objects.filter(datetime__isnull=True).count(), 1)
+
+    def test_uuids_imported(self):
+        """LayerMapping import of GeoJSON with UUIDs."""
+        lm = LayerMapping(HasNulls, has_nulls_geojson, has_nulls_mapping)
+        lm.save()
+        self.assertEqual(HasNulls.objects.filter(uuid='1378c26f-cbe6-44b0-929f-eb330d4991f5').count(), 1)
+
+    def test_null_number_imported_not_allowed(self):
+        """
+        LayerMapping import of GeoJSON with nulls to fields that don't permit
+        them.
+        """
+        lm = LayerMapping(DoesNotAllowNulls, has_nulls_geojson, has_nulls_mapping)
+        lm.save(silent=True)
+        # When a model fails to save due to IntegrityError (null in non-null
+        # column), subsequent saves fail with "An error occurred in the current
+        # transaction. You can't execute queries until the end of the 'atomic'
+        # block." On Oracle and MySQL, the one object that did load appears in
+        # this count. On other databases, no records appear.
+        self.assertLessEqual(DoesNotAllowNulls.objects.count(), 1)
+
 
 class OtherRouter:
     def db_for_read(self, model, **hints):
@@ -341,7 +397,7 @@ class OtherRouter:
 
 @override_settings(DATABASE_ROUTERS=[OtherRouter()])
 class LayerMapRouterTest(TestCase):
-    multi_db = True
+    databases = {'default', 'other'}
 
     @unittest.skipUnless(len(settings.DATABASES) > 1, 'multiple databases required')
     def test_layermapping_default_db(self):

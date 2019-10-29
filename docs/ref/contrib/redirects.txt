@@ -5,7 +5,7 @@ The redirects app
 .. module:: django.contrib.redirects
    :synopsis: A framework for managing redirects.
 
-Django comes with an optional redirects application. It lets you store simple
+Django comes with an optional redirects application. It lets you store
 redirects in a database and handles the redirecting for you. It uses the HTTP
 response status code ``301 Moved Permanently`` by default.
 
@@ -14,18 +14,18 @@ Installation
 
 To install the redirects app, follow these steps:
 
-1. Ensure that the ``django.contrib.sites`` framework
+#. Ensure that the ``django.contrib.sites`` framework
    :ref:`is installed <enabling-the-sites-framework>`.
-2. Add ``'django.contrib.redirects'`` to your :setting:`INSTALLED_APPS` setting.
-3. Add ``'django.contrib.redirects.middleware.RedirectFallbackMiddleware'``
+#. Add ``'django.contrib.redirects'`` to your :setting:`INSTALLED_APPS` setting.
+#. Add ``'django.contrib.redirects.middleware.RedirectFallbackMiddleware'``
    to your :setting:`MIDDLEWARE` setting.
-4. Run the command :djadmin:`manage.py migrate <migrate>`.
+#. Run the command :djadmin:`manage.py migrate <migrate>`.
 
 How it works
 ============
 
 ``manage.py migrate`` creates a ``django_redirect`` table in your database. This
-is a simple lookup table with ``site_id``, ``old_path`` and ``new_path`` fields.
+is a lookup table with ``site_id``, ``old_path`` and ``new_path`` fields.
 
 The :class:`~django.contrib.redirects.middleware.RedirectFallbackMiddleware`
 does all of the work. Each time any Django application raises a 404
@@ -72,10 +72,8 @@ Via the Python API
 .. class:: models.Redirect
 
     Redirects are represented by a standard :doc:`Django model </topics/db/models>`,
-    which lives in `django/contrib/redirects/models.py`_. You can access redirect
-    objects via the :doc:`Django database API </topics/db/queries>`.
-
-.. _django/contrib/redirects/models.py: https://github.com/django/django/blob/master/django/contrib/redirects/models.py
+    which lives in :source:`django/contrib/redirects/models.py`. You can access
+    redirect objects via the :doc:`Django database API </topics/db/queries>`.
 
 Middleware
 ==========

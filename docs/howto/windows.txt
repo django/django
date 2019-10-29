@@ -2,7 +2,9 @@
 How to install Django on Windows
 ================================
 
-This document will guide you through installing Python 3.5 and Django on
+.. highlight:: doscon
+
+This document will guide you through installing Python 3.7 and Django on
 Windows. It also provides instructions for installing `virtualenv`_ and
 `virtualenvwrapper`_, which make it easier to work on Python projects. This is
 meant as a beginner's guide for users working on Django projects and does not
@@ -17,17 +19,22 @@ Install Python
 ==============
 
 Django is a Python web framework, thus requiring Python to be installed on your
-machine. At the time of writing, Python 3.5 is the latest version.
+machine. At the time of writing, Python 3.7 is the latest version.
 
 To install Python on your machine go to https://python.org/downloads/. The
 website should offer you a download button for the latest Python version.
-Download the executable installer and run it. Check the box next to ``Add
-Python 3.5 to PATH`` and then click ``Install Now``.
+Download the executable installer and run it. Check the boxes next to ``Install
+launcher for all users (recommended)`` and ``Add Python 3.7 to PATH`` then
+click ``Install Now``.
 
 After installation, open the command prompt and check that the Python version
 matches the version you installed by executing::
 
-    python --version
+    ...\> py --version
+
+.. seealso::
+
+    For more details, see :doc:`python:using/windows` documentation.
 
 About ``pip``
 =============
@@ -42,25 +49,27 @@ get-pip.py`` instructions.
 
 .. _pip: https://pypi.org/project/pip/
 
+.. _virtualenvwrapper-win:
+
 Install ``virtualenv`` and ``virtualenvwrapper``
 ================================================
 
 `virtualenv`_ and `virtualenvwrapper`_ provide a dedicated environment for
 each Django project you create. While not mandatory, this is considered a best
 practice and will save you time in the future when you're ready to deploy your
-project. Simply type::
+project. To do this, run::
 
-    pip install virtualenvwrapper-win
+    ...\> py -m pip install virtualenvwrapper-win
 
 Then create a virtual environment for your project::
 
-    mkvirtualenv myproject
+    ...\> mkvirtualenv myproject
 
 The virtual environment will be activated automatically and you'll see
 "(myproject)" next to the command prompt to designate that. If you start a new
 command prompt, you'll need to activate the environment again using::
 
-    workon myproject
+    ...\> workon myproject
 
 .. _virtualenv: https://pypi.org/project/virtualenv/
 .. _virtualenvwrapper: https://pypi.org/project/virtualenvwrapper-win/
@@ -73,7 +82,7 @@ Django can be installed easily using ``pip`` within your virtual environment.
 In the command prompt, ensure your virtual environment is active, and execute
 the following command::
 
-    pip install django
+    ...\> py -m pip install Django
 
 This will download and install the latest Django release.
 
@@ -92,9 +101,9 @@ Common pitfalls
   running Python scripts in ``PATH``. This usually occurs when there is more
   than one Python version installed.
 
-* If you are connecting to the internet behind a proxy, there might be problem
-  in running the command ``pip install django``. Set the environment variables
-  for proxy configuration in the command prompt as follows::
+* If you are connecting to the internet behind a proxy, there might be problems
+  in running the command ``py -m pip install Django``. Set the environment
+  variables for proxy configuration in the command prompt as follows::
 
-    set http_proxy=http://username:password@proxyserver:proxyport
-    set https_proxy=https://username:password@proxyserver:proxyport
+    ...\> set http_proxy=http://username:password@proxyserver:proxyport
+    ...\> set https_proxy=https://username:password@proxyserver:proxyport

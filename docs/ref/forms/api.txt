@@ -25,7 +25,7 @@ A :class:`Form` instance is either **bound** to a set of data, or **unbound**.
 
 .. class:: Form
 
-To create an unbound :class:`Form` instance, simply instantiate the class::
+To create an unbound :class:`Form` instance, instantiate the class::
 
     >>> f = ContactForm()
 
@@ -158,8 +158,9 @@ By default, ``as_json()`` does not escape its output. If you are using it for
 something like AJAX requests to a form view where the client interprets the
 response and inserts errors into the page, you'll want to be sure to escape the
 results on the client-side to avoid the possibility of a cross-site scripting
-attack. It's trivial to do so using a JavaScript library like jQuery - simply
-use ``$(el).text(errorText)`` rather than ``.html()``.
+attack. You can do this in JavaScript with ``element.textContent = errorText``
+or with jQuery's ``$(el).text(errorText)`` (rather than its ``.html()``
+function).
 
 If for some reason you don't want to use client-side escaping, you can also
 set ``escape_html=True`` and error messages will be escaped so you can use them
@@ -185,7 +186,7 @@ should be added. If its value is ``None`` the error will be treated as
 a non-field error as returned by :meth:`Form.non_field_errors()
 <django.forms.Form.non_field_errors>`.
 
-The ``error`` argument can be a simple string, or preferably an instance of
+The ``error`` argument can be a string, or preferably an instance of
 ``ValidationError``. See :ref:`raising-validation-error` for best practices
 when defining form errors.
 
@@ -299,6 +300,8 @@ provided in :attr:`~Form.initial`. It returns an empty list if no data differs.
     >>> f = ContactForm(request.POST, initial=data)
     >>> if f.has_changed():
     ...     print("The following fields changed: %s" % ", ".join(f.changed_data))
+    >>> f.changed_data
+    ['subject', 'message']
 
 Accessing the fields from the form
 ==================================
@@ -432,7 +435,7 @@ Outputting forms as HTML
 ========================
 
 The second task of a ``Form`` object is to render itself as HTML. To do so,
-simply ``print`` it::
+``print`` it::
 
     >>> f = ContactForm()
     >>> print(f)
@@ -561,7 +564,7 @@ errors. For example, you might want to present required form rows in bold and
 highlight errors in red.
 
 The :class:`Form` class has a couple of hooks you can use to add ``class``
-attributes to required rows or to rows with errors: simply set the
+attributes to required rows or to rows with errors: set the
 :attr:`Form.error_css_class` and/or :attr:`Form.required_css_class`
 attributes::
 
@@ -632,7 +635,7 @@ tags nor ``id`` attributes::
     <p>Cc myself: <input type="checkbox" name="cc_myself"></p>
 
 If ``auto_id`` is set to ``True``, then the form output *will* include
-``<label>`` tags and will simply use the field name as its ``id`` for each form
+``<label>`` tags and will use the field name as its ``id`` for each form
 field::
 
     >>> f = ContactForm(auto_id=True)
@@ -748,7 +751,7 @@ In the ``as_p()``, ``as_ul()`` and ``as_table()`` shortcuts, the fields are
 displayed in the order in which you define them in your form class. For
 example, in the ``ContactForm`` example, the fields are defined in the order
 ``subject``, ``message``, ``sender``, ``cc_myself``. To reorder the HTML
-output, just change the order in which those fields are listed in the class.
+output, change the order in which those fields are listed in the class.
 
 There are several other ways to customize the order:
 
@@ -831,7 +834,7 @@ pass that in at construction time::
 More granular output
 ====================
 
-The ``as_p()``, ``as_ul()``, and ``as_table()`` methods are simply shortcuts --
+The ``as_p()``, ``as_ul()``, and ``as_table()`` methods are shortcuts --
 they're not the only way a form object can be displayed.
 
 .. class:: BoundField
@@ -1119,8 +1122,8 @@ form data)::
     # Bound form with an image field, data from the request
     >>> f = ContactFormWithMugshot(request.POST, request.FILES)
 
-Constructing an unbound form is the same as always -- just omit both
-form data *and* file data::
+Constructing an unbound form is the same as always -- omit both form data *and*
+file data::
 
     # Unbound form with an image field
     >>> f = ContactFormWithMugshot()

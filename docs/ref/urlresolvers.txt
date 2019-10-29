@@ -130,6 +130,13 @@ If the URL does not resolve, the function raises a
 
         The name of the URL pattern that matches the URL.
 
+    .. attribute:: ResolverMatch.route
+
+        The route of the matching URL pattern.
+
+        For example, if ``path('users/<id>/', ...)`` is the matching pattern,
+        ``route`` will contain ``'users/<id>/'``.
+
     .. attribute:: ResolverMatch.app_name
 
         The application namespace for the URL pattern that matches the

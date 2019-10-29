@@ -585,6 +585,32 @@ class ModelFormBaseTest(TestCase):
         m2 = mf2.save(commit=False)
         self.assertEqual(m2.mode, '')
 
+    def test_default_not_populated_on_non_empty_value_in_cleaned_data(self):
+        class PubForm(forms.ModelForm):
+            mode = forms.CharField(max_length=255, required=False)
+            mocked_mode = None
+
+            def clean(self):
+                self.cleaned_data['mode'] = self.mocked_mode
+                return self.cleaned_data
+
+            class Meta:
+                model = PublicationDefaults
+                fields = ('mode',)
+
+        pub_form = PubForm({})
+        pub_form.mocked_mode = 'de'
+        pub = pub_form.save(commit=False)
+        self.assertEqual(pub.mode, 'de')
+        # Default should be populated on an empty value in cleaned_data.
+        default_mode = 'di'
+        for empty_value in pub_form.fields['mode'].empty_values:
+            with self.subTest(empty_value=empty_value):
+                pub_form = PubForm({})
+                pub_form.mocked_mode = empty_value
+                pub = pub_form.save(commit=False)
+                self.assertEqual(pub.mode, default_mode)
+
     def test_default_not_populated_on_optional_checkbox_input(self):
         class PubForm(forms.ModelForm):
             class Meta:
@@ -832,8 +858,9 @@ class UniqueTest(TestCase):
     """
     unique/unique_together validation.
     """
-    def setUp(self):
-        self.writer = Writer.objects.create(name='Mike Royko')
+    @classmethod
+    def setUpTestData(cls):
+        cls.writer = Writer.objects.create(name='Mike Royko')
 
     def test_simple_unique(self):
         form = ProductForm({'slug': 'teddy-bear-blue'})
@@ -1196,7 +1223,7 @@ class ModelFormBasicTests(TestCase):
 <li>Article: <textarea rows="10" cols="40" name="article" required></textarea></li>
 <li>Categories: <select multiple name="categories">
 <option value="%s" selected>Entertainment</option>
-<option value="%s" selected>It&#39;s a test</option>
+<option value="%s" selected>It&#x27;s a test</option>
 <option value="%s">Third test</option>
 </select></li>
 <li>Status: <select name="status">
@@ -1238,7 +1265,7 @@ class ModelFormBasicTests(TestCase):
 <li>Article: <textarea rows="10" cols="40" name="article" required>Hello.</textarea></li>
 <li>Categories: <select multiple name="categories">
 <option value="%s">Entertainment</option>
-<option value="%s">It&#39;s a test</option>
+<option value="%s">It&#x27;s a test</option>
 <option value="%s">Third test</option>
 </select></li>
 <li>Status: <select name="status">
@@ -1289,16 +1316,18 @@ class ModelFormBasicTests(TestCase):
 <li><label for="id_categories">Categories:</label>
 <select multiple name="categories" id="id_categories">
 <option value="%d" selected>Entertainment</option>
-<option value="%d" selected>It&39;s a test</option>
+<option value="%d" selected>It&#x27;s a test</option>
 <option value="%d">Third test</option>
 </select></li>"""
             % (self.c1.pk, self.c2.pk, self.c3.pk))
 
     def test_basic_creation(self):
         self.assertEqual(Category.objects.count(), 0)
-        f = BaseCategoryForm({'name': 'Entertainment',
-                              'slug': 'entertainment',
-                              'url': 'entertainment'})
+        f = BaseCategoryForm({
+            'name': 'Entertainment',
+            'slug': 'entertainment',
+            'url': 'entertainment',
+        })
         self.assertTrue(f.is_valid())
         self.assertEqual(f.cleaned_data['name'], 'Entertainment')
         self.assertEqual(f.cleaned_data['slug'], 'entertainment')
@@ -1329,7 +1358,7 @@ class ModelFormBasicTests(TestCase):
         self.assertEqual(f.errors['name'], ['This field is required.'])
         self.assertEqual(
             f.errors['slug'],
-            ["Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."]
+            ['Enter a valid “slug” consisting of letters, numbers, underscores or hyphens.']
         )
         self.assertEqual(f.cleaned_data, {'url': 'foo'})
         msg = "The Category could not be created because the data didn't validate."
@@ -1358,7 +1387,7 @@ class ModelFormBasicTests(TestCase):
 <tr><th>Article:</th><td><textarea rows="10" cols="40" name="article" required></textarea></td></tr>
 <tr><th>Categories:</th><td><select multiple name="categories">
 <option value="%s">Entertainment</option>
-<option value="%s">It&#39;s a test</option>
+<option value="%s">It&#x27;s a test</option>
 <option value="%s">Third test</option>
 </select></td></tr>
 <tr><th>Status:</th><td><select name="status">
@@ -1388,7 +1417,7 @@ class ModelFormBasicTests(TestCase):
 <li>Article: <textarea rows="10" cols="40" name="article" required>Hello.</textarea></li>
 <li>Categories: <select multiple name="categories">
 <option value="%s" selected>Entertainment</option>
-<option value="%s">It&#39;s a test</option>
+<option value="%s">It&#x27;s a test</option>
 <option value="%s">Third test</option>
 </select></li>
 <li>Status: <select name="status">
@@ -1532,7 +1561,7 @@ class ModelFormBasicTests(TestCase):
 <li>Article: <textarea rows="10" cols="40" name="article" required></textarea></li>
 <li>Categories: <select multiple name="categories">
 <option value="%s">Entertainment</option>
-<option value="%s">It&#39;s a test</option>
+<option value="%s">It&#x27;s a test</option>
 <option value="%s">Third test</option>
 </select> </li>
 <li>Status: <select name="status">
@@ -1558,7 +1587,7 @@ class ModelFormBasicTests(TestCase):
 <li>Article: <textarea rows="10" cols="40" name="article" required></textarea></li>
 <li>Categories: <select multiple name="categories">
 <option value="%s">Entertainment</option>
-<option value="%s">It&#39;s a test</option>
+<option value="%s">It&#x27;s a test</option>
 <option value="%s">Third test</option>
 <option value="%s">Fourth</option>
 </select></li>
@@ -1587,10 +1616,11 @@ class ModelFormBasicTests(TestCase):
 
 
 class ModelMultipleChoiceFieldTests(TestCase):
-    def setUp(self):
-        self.c1 = Category.objects.create(name='Entertainment', slug='entertainment', url='entertainment')
-        self.c2 = Category.objects.create(name="It's a test", slug='its-test', url='test')
-        self.c3 = Category.objects.create(name='Third', slug='third-test', url='third')
+    @classmethod
+    def setUpTestData(cls):
+        cls.c1 = Category.objects.create(name='Entertainment', slug='entertainment', url='entertainment')
+        cls.c2 = Category.objects.create(name="It's a test", slug='its-test', url='test')
+        cls.c3 = Category.objects.create(name='Third', slug='third-test', url='third')
 
     def test_model_multiple_choice_field(self):
         f = forms.ModelMultipleChoiceField(Category.objects.all())
@@ -1710,15 +1740,23 @@ class ModelMultipleChoiceFieldTests(TestCase):
         person1 = Writer.objects.create(name="Person 1")
         person2 = Writer.objects.create(name="Person 2")
 
-        form = WriterForm(initial={'persons': [person1, person2]},
-                          data={'initial-persons': [str(person1.pk), str(person2.pk)],
-                                'persons': [str(person1.pk), str(person2.pk)]})
+        form = WriterForm(
+            initial={'persons': [person1, person2]},
+            data={
+                'initial-persons': [str(person1.pk), str(person2.pk)],
+                'persons': [str(person1.pk), str(person2.pk)],
+            },
+        )
         self.assertTrue(form.is_valid())
         self.assertFalse(form.has_changed())
 
-        form = WriterForm(initial={'persons': [person1, person2]},
-                          data={'initial-persons': [str(person1.pk), str(person2.pk)],
-                                'persons': [str(person2.pk)]})
+        form = WriterForm(
+            initial={'persons': [person1, person2]},
+            data={
+                'initial-persons': [str(person1.pk), str(person2.pk)],
+                'persons': [str(person2.pk)],
+            },
+        )
         self.assertTrue(form.is_valid())
         self.assertTrue(form.has_changed())
 
@@ -1802,6 +1840,10 @@ class ModelOneToOneFieldTests(TestCase):
 
         bw = BetterWriter.objects.create(name='Joe Better', score=10)
         self.assertEqual(sorted(model_to_dict(bw)), ['id', 'name', 'score', 'writer_ptr'])
+        self.assertEqual(sorted(model_to_dict(bw, fields=[])), [])
+        self.assertEqual(sorted(model_to_dict(bw, fields=['id', 'name'])), ['id', 'name'])
+        self.assertEqual(sorted(model_to_dict(bw, exclude=[])), ['id', 'name', 'score', 'writer_ptr'])
+        self.assertEqual(sorted(model_to_dict(bw, exclude=['id', 'name'])), ['score', 'writer_ptr'])
 
         form = BetterWriterForm({'name': 'Some Name', 'score': 12})
         self.assertTrue(form.is_valid())
@@ -2849,7 +2891,7 @@ class CustomMetaclassTestCase(SimpleTestCase):
         self.assertEqual(new_cls.base_fields, {})
 
 
-class StrictAssignmentTests(TestCase):
+class StrictAssignmentTests(SimpleTestCase):
     """
     Should a model do anything special with __setattr__() or descriptors which
     raise a ValidationError, a model form should catch the error (#24706).

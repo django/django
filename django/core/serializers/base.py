@@ -108,7 +108,7 @@ class Serializer:
                     else:
                         if self.selected_fields is None or field.attname[:-3] in self.selected_fields:
                             self.handle_fk_field(obj, field)
-            for field in concrete_model._meta.many_to_many:
+            for field in concrete_model._meta.local_many_to_many:
                 if field.serialize:
                     if self.selected_fields is None or field.attname in self.selected_fields:
                         self.handle_m2m_field(obj, field)
@@ -146,19 +146,19 @@ class Serializer:
         """
         Called to handle each individual (non-relational) field on an object.
         """
-        raise NotImplementedError('subclasses of Serializer must provide an handle_field() method')
+        raise NotImplementedError('subclasses of Serializer must provide a handle_field() method')
 
     def handle_fk_field(self, obj, field):
         """
         Called to handle a ForeignKey field.
         """
-        raise NotImplementedError('subclasses of Serializer must provide an handle_fk_field() method')
+        raise NotImplementedError('subclasses of Serializer must provide a handle_fk_field() method')
 
     def handle_m2m_field(self, obj, field):
         """
         Called to handle a ManyToManyField.
         """
-        raise NotImplementedError('subclasses of Serializer must provide an handle_m2m_field() method')
+        raise NotImplementedError('subclasses of Serializer must provide a handle_m2m_field() method')
 
     def getvalue(self):
         """
@@ -256,15 +256,18 @@ def build_instance(Model, data, db):
     If the model instance doesn't have a primary key and the model supports
     natural keys, try to retrieve it from the database.
     """
-    obj = Model(**data)
-    if (obj.pk is None and hasattr(Model, 'natural_key') and
-            hasattr(Model._default_manager, 'get_by_natural_key')):
-        natural_key = obj.natural_key()
+    default_manager = Model._meta.default_manager
+    pk = data.get(Model._meta.pk.name)
+    if (pk is None and hasattr(default_manager, 'get_by_natural_key') and
+            hasattr(Model, 'natural_key')):
+        natural_key = Model(**data).natural_key()
         try:
-            obj.pk = Model._default_manager.db_manager(db).get_by_natural_key(*natural_key).pk
+            data[Model._meta.pk.attname] = Model._meta.pk.to_python(
+                default_manager.db_manager(db).get_by_natural_key(*natural_key).pk
+            )
         except Model.DoesNotExist:
             pass
-    return obj
+    return Model(**data)
 
 
 def deserialize_m2m_values(field, field_value, using, handle_forward_references):

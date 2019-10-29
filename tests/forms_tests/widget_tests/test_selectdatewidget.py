@@ -314,6 +314,46 @@ class SelectDateWidgetTest(WidgetTest):
         self.assertFalse(GetNotRequiredDate().fields['mydate'].widget.is_required)
         self.assertTrue(GetRequiredDate().fields['mydate'].widget.is_required)
 
+    def test_selectdate_required_placeholder(self):
+        for required in (True, False):
+            field = DateField(widget=SelectDateWidget(years=('2018', '2019')), required=required)
+            self.check_html(field.widget, 'my_date', '', html=(
+                """
+                <select name="my_date_month" id="id_my_date_month" %(m_placeholder)s>
+                    %(empty)s
+                    <option value="1">January</option>
+                    <option value="2">February</option>
+                    <option value="3">March</option>
+                    <option value="4">April</option>
+                    <option value="5">May</option>
+                    <option value="6">June</option>
+                    <option value="7">July</option>
+                    <option value="8">August</option>
+                    <option value="9">September</option>
+                    <option value="10">October</option>
+                    <option value="11">November</option>
+                    <option value="12">December</option>
+                </select>
+                <select name="my_date_day" id="id_my_date_day" %(d_placeholder)s>
+                    %(empty)s
+                    %(days_options)s
+                </select>
+                <select name="my_date_year" id="id_my_date_year" %(y_placeholder)s>
+                    %(empty)s
+                    <option value="2018">2018</option>
+                    <option value="2019">2019</option>
+                </select>
+                """ % {
+                    'days_options': '\n'.join(
+                        '<option value="%s">%s</option>' % (i, i) for i in range(1, 32)
+                    ),
+                    'm_placeholder': 'placeholder="Month"' if required else '',
+                    'd_placeholder': 'placeholder="Day"' if required else '',
+                    'y_placeholder': 'placeholder="Year"' if required else '',
+                    'empty': '' if required else '<option selected value="">---</option>',
+                }
+            ))
+
     def test_selectdate_empty_label(self):
         w = SelectDateWidget(years=('2014',), empty_label='empty_label')
 
@@ -484,6 +524,21 @@ class SelectDateWidgetTest(WidgetTest):
             '13-08-0001',
         )
 
+    @override_settings(USE_L10N=False, DATE_INPUT_FORMATS=['%d.%m.%Y'])
+    def test_custom_input_format(self):
+        w = SelectDateWidget(years=('0001', '1899', '2009', '2010'))
+        for values, expected in (
+            (('0001', '8', '13'), '13.08.0001'),
+            (('1899', '7', '11'), '11.07.1899'),
+            (('2009', '3', '7'), '07.03.2009'),
+        ):
+            with self.subTest(values=values):
+                data = {
+                    'field_%s' % field: value
+                    for field, value in zip(('year', 'month', 'day'), values)
+                }
+                self.assertEqual(w.value_from_datadict(data, {}, 'field'), expected)
+
     def test_format_value(self):
         valid_formats = [
             '2000-1-1', '2000-10-15', '2000-01-01',
@@ -505,7 +560,7 @@ class SelectDateWidgetTest(WidgetTest):
 
     def test_value_from_datadict(self):
         tests = [
-            (('2000', '12', '1'), '2000-12-1'),
+            (('2000', '12', '1'), '2000-12-01'),
             (('', '12', '1'), '0-12-1'),
             (('2000', '', '1'), '2000-0-1'),
             (('2000', '12', ''), '2000-12-0'),

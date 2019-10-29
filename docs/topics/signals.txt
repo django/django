@@ -49,7 +49,8 @@ Listening to signals
 
 To receive a signal, register a *receiver* function using the
 :meth:`Signal.connect` method. The receiver function is called when the signal
-is sent.
+is sent. All of the signal's receiver functions are called one at a time, in
+the order they were registered.
 
 .. method:: Signal.connect(receiver, sender=None, weak=True, dispatch_uid=None)
 
@@ -138,7 +139,7 @@ Now, our ``my_callback`` function will be called each time a request finishes.
     submodule of the application they relate to. Signal receivers are
     connected in the :meth:`~django.apps.AppConfig.ready` method of your
     application configuration class. If you're using the :func:`receiver`
-    decorator, simply import the ``signals`` submodule inside
+    decorator, import the ``signals`` submodule inside
     :meth:`~django.apps.AppConfig.ready`.
 
 .. note::
@@ -205,6 +206,12 @@ Defining and sending signals
 
 Your applications can take advantage of the signal infrastructure and provide
 its own signals.
+
+.. admonition:: When to use custom signals
+
+    Signals are implicit function calls which make debugging harder. If the
+    sender and receiver of your custom signal are both within your project,
+    you're better off using an explicit function call.
 
 Defining signals
 ----------------

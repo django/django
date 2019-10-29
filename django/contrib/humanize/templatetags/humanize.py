@@ -10,7 +10,7 @@ from django.utils.safestring import mark_safe
 from django.utils.timezone import is_aware, utc
 from django.utils.translation import (
     gettext as _, gettext_lazy, ngettext, ngettext_lazy, npgettext_lazy,
-    pgettext,
+    pgettext, round_away_from_one,
 )
 
 register = template.Library()
@@ -158,7 +158,8 @@ def intword(value):
         large_number = 10 ** exponent
         if value < large_number * 1000:
             new_value = value / large_number
-            return _check_for_i18n(new_value, *converters(new_value))
+            rounded_value = round_away_from_one(new_value)
+            return _check_for_i18n(new_value, *converters(rounded_value))
     return value
 
 
@@ -187,14 +188,11 @@ def naturalday(value, arg=None):
     present day return representing string. Otherwise, return a string
     formatted according to settings.DATE_FORMAT.
     """
+    tzinfo = getattr(value, 'tzinfo', None)
     try:
-        tzinfo = getattr(value, 'tzinfo', None)
         value = date(value.year, value.month, value.day)
     except AttributeError:
         # Passed value wasn't a date object
-        return value
-    except ValueError:
-        # Date arguments out of range
         return value
     today = datetime.now(tzinfo).date()
     delta = value - today

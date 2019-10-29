@@ -40,7 +40,7 @@ class BaseSpatialOperations:
     unsupported_functions = {
         'Area', 'AsGeoJSON', 'AsGML', 'AsKML', 'AsSVG', 'Azimuth',
         'BoundingCircle', 'Centroid', 'Difference', 'Distance', 'Envelope',
-        'ForceRHR', 'GeoHash', 'Intersection', 'IsValid', 'Length',
+        'GeoHash', 'GeometryDistance', 'Intersection', 'IsValid', 'Length',
         'LineLocatePoint', 'MakeValid', 'MemSize', 'NumGeometries',
         'NumPoints', 'Perimeter', 'PointOnSurface', 'Reverse', 'Scale',
         'SnapToGrid', 'SymDifference', 'Transform', 'Translate', 'Union',

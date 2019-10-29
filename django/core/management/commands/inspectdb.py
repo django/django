@@ -1,6 +1,5 @@
 import keyword
 import re
-from collections import OrderedDict
 
 from django.core.management.base import BaseCommand, CommandError
 from django.db import DEFAULT_DB_ALIAS, connections
@@ -21,6 +20,9 @@ class Command(BaseCommand):
         parser.add_argument(
             '--database', default=DEFAULT_DB_ALIAS,
             help='Nominates a database to introspect. Defaults to using the "default" database.',
+        )
+        parser.add_argument(
+            '--include-partitions', action='store_true', help='Also output models for partition tables.',
         )
         parser.add_argument(
             '--include-views', action='store_true', help='Also output models for database views.',
@@ -46,7 +48,7 @@ class Command(BaseCommand):
             yield "# You'll have to do the following manually to clean this up:"
             yield "#   * Rearrange models' order"
             yield "#   * Make sure each model has one field with primary_key=True"
-            yield "#   * Make sure each ForeignKey has `on_delete` set to the desired behavior."
+            yield "#   * Make sure each ForeignKey and OneToOneField has `on_delete` set to the desired behavior"
             yield (
                 "#   * Remove `managed = False` lines if you wish to allow "
                 "Django to create, modify, and delete the table"
@@ -55,12 +57,15 @@ class Command(BaseCommand):
             yield 'from %s import models' % self.db_module
             known_models = []
             table_info = connection.introspection.get_table_list(cursor)
-            tables_to_introspect = (
-                options['table'] or
-                sorted(info.name for info in table_info if options['include_views'] or info.type == 't')
-            )
 
-            for table_name in tables_to_introspect:
+            # Determine types of tables and/or views to be introspected.
+            types = {'t'}
+            if options['include_partitions']:
+                types.add('p')
+            if options['include_views']:
+                types.add('v')
+
+            for table_name in (options['table'] or sorted(info.name for info in table_info if info.type in types)):
                 if table_name_filter is not None and callable(table_name_filter):
                     if not table_name_filter(table_name):
                         continue
@@ -92,7 +97,7 @@ class Command(BaseCommand):
                 column_to_field_name = {}  # Maps column names to names of model fields
                 for row in table_description:
                     comment_notes = []  # Holds Field notes, to be displayed in a Python comment.
-                    extra_params = OrderedDict()  # Holds Field parameters such as 'db_column'.
+                    extra_params = {}  # Holds Field parameters such as 'db_column'.
                     column_name = row.name
                     is_relation = column_name in relations
 
@@ -111,14 +116,18 @@ class Command(BaseCommand):
                         extra_params['unique'] = True
 
                     if is_relation:
+                        if extra_params.pop('unique', False) or extra_params.get('primary_key'):
+                            rel_type = 'OneToOneField'
+                        else:
+                            rel_type = 'ForeignKey'
                         rel_to = (
                             "self" if relations[column_name][1] == table_name
                             else table2model(relations[column_name][1])
                         )
                         if rel_to in known_models:
-                            field_type = 'ForeignKey(%s' % rel_to
+                            field_type = '%s(%s' % (rel_type, rel_to)
                         else:
-                            field_type = "ForeignKey('%s'" % rel_to
+                            field_type = "%s('%s'" % (rel_type, rel_to)
                     else:
                         # Calling `get_field_type` to get the field type string and any
                         # additional parameters and notes.
@@ -148,7 +157,7 @@ class Command(BaseCommand):
                         '' if '.' in field_type else 'models.',
                         field_type,
                     )
-                    if field_type.startswith('ForeignKey('):
+                    if field_type.startswith(('ForeignKey(', 'OneToOneField(')):
                         field_desc += ', models.DO_NOTHING'
 
                     if extra_params:
@@ -160,7 +169,8 @@ class Command(BaseCommand):
                         field_desc += '  # ' + ' '.join(comment_notes)
                     yield '    %s' % field_desc
                 is_view = any(info.name == table_name and info.type == 'v' for info in table_info)
-                for meta_line in self.get_meta(table_name, constraints, column_to_field_name, is_view):
+                is_partition = any(info.name == table_name and info.type == 'p' for info in table_info)
+                for meta_line in self.get_meta(table_name, constraints, column_to_field_name, is_view, is_partition):
                     yield meta_line
 
     def normalize_col_name(self, col_name, used_column_names, is_relation):
@@ -225,7 +235,7 @@ class Command(BaseCommand):
         description, this routine will return the given field type name, as
         well as any additional keyword parameters and notes for the field.
         """
-        field_params = OrderedDict()
+        field_params = {}
         field_notes = []
 
         try:
@@ -233,12 +243,6 @@ class Command(BaseCommand):
         except KeyError:
             field_type = 'TextField'
             field_notes.append('This field type is a guess.')
-
-        # This is a hook for data_types_reverse to return a tuple of
-        # (field_type, field_params_dict).
-        if type(field_type) is tuple:
-            field_type, new_params = field_type
-            field_params.update(new_params)
 
         # Add max_length for all CharFields.
         if field_type == 'CharField' and row.internal_size:
@@ -257,7 +261,7 @@ class Command(BaseCommand):
 
         return field_type, field_params, field_notes
 
-    def get_meta(self, table_name, constraints, column_to_field_name, is_view):
+    def get_meta(self, table_name, constraints, column_to_field_name, is_view, is_partition):
         """
         Return a sequence comprising the lines of code necessary
         to construct the inner Meta class for the model corresponding
@@ -273,7 +277,12 @@ class Command(BaseCommand):
                 columns = [x for x in columns if x is not None]
                 if len(columns) > 1:
                     unique_together.append(str(tuple(column_to_field_name[c] for c in columns)))
-        managed_comment = "  # Created from a view. Don't remove." if is_view else ""
+        if is_view:
+            managed_comment = "  # Created from a view. Don't remove."
+        elif is_partition:
+            managed_comment = "  # Created from a partition. Don't remove."
+        else:
+            managed_comment = ''
         meta = ['']
         if has_unsupported_constraint:
             meta.append('    # A unique constraint could not be introspected.')

@@ -102,9 +102,9 @@ raises ``ValueError``::
     ...
     ValueError: save() prohibited to prevent data loss due to unsaved related object 'place'.
 
-Restaurant.objects.all() just returns the Restaurants, not the Places.  Note
-that there are two restaurants - Ace Hardware the Restaurant was created in the
-call to r.place = p2::
+Restaurant.objects.all() returns the Restaurants, not the Places. Note that
+there are two restaurants - Ace Hardware the Restaurant was created in the call
+to r.place = p2::
 
     >>> Restaurant.objects.all()
     <QuerySet [<Restaurant: Demon Dogs the restaurant>, <Restaurant: Ace Hardware the restaurant>]>

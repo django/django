@@ -392,6 +392,10 @@ input[type="submit"], button {
         color: #ccc;
     }
 
+    .form-row .datetime input.vDateField, .form-row .datetime input.vTimeField {
+        width: 75%;
+    }
+
     .inline-group {
         overflow: auto;
     }

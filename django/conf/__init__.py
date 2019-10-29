@@ -15,19 +15,29 @@ from pathlib import Path
 
 import django
 from django.conf import global_settings
-from django.core.exceptions import ImproperlyConfigured
-from django.utils.deprecation import (
-    RemovedInDjango30Warning, RemovedInDjango31Warning,
-)
+from django.core.exceptions import ImproperlyConfigured, ValidationError
+from django.core.validators import URLValidator
+from django.utils.deprecation import RemovedInDjango40Warning
 from django.utils.functional import LazyObject, empty
 
 ENVIRONMENT_VARIABLE = "DJANGO_SETTINGS_MODULE"
 
-DEFAULT_CONTENT_TYPE_DEPRECATED_MSG = 'The DEFAULT_CONTENT_TYPE setting is deprecated.'
-FILE_CHARSET_DEPRECATED_MSG = (
-    'The FILE_CHARSET setting is deprecated. Starting with Django 3.1, all '
-    'files read from disk must be UTF-8 encoded.'
+PASSWORD_RESET_TIMEOUT_DAYS_DEPRECATED_MSG = (
+    'The PASSWORD_RESET_TIMEOUT_DAYS setting is deprecated. Use '
+    'PASSWORD_RESET_TIMEOUT instead.'
 )
+
+
+class SettingsReference(str):
+    """
+    String subclass which references a current settings value. It's treated as
+    the value in memory but serializes to a settings.NAME attribute reference.
+    """
+    def __new__(self, value, setting_name):
+        return str.__new__(self, value)
+
+    def __init__(self, value, setting_name):
+        self.setting_name = setting_name
 
 
 class LazySettings(LazyObject):
@@ -95,8 +105,30 @@ class LazySettings(LazyObject):
             raise RuntimeError('Settings already configured.')
         holder = UserSettingsHolder(default_settings)
         for name, value in options.items():
+            if not name.isupper():
+                raise TypeError('Setting %r must be uppercase.' % name)
             setattr(holder, name, value)
         self._wrapped = holder
+
+    @staticmethod
+    def _add_script_prefix(value):
+        """
+        Add SCRIPT_NAME prefix to relative paths.
+
+        Useful when the app is being served at a subpath and manually prefixing
+        subpath to STATIC_URL and MEDIA_URL in settings is inconvenient.
+        """
+        # Don't apply prefix to valid URLs.
+        try:
+            URLValidator()(value)
+            return value
+        except (ValidationError, AttributeError):
+            pass
+        # Don't apply prefix to absolute paths.
+        if value.startswith('/'):
+            return value
+        from django.urls import get_script_prefix
+        return '%s%s' % (get_script_prefix(), value)
 
     @property
     def configured(self):
@@ -104,32 +136,26 @@ class LazySettings(LazyObject):
         return self._wrapped is not empty
 
     @property
-    def DEFAULT_CONTENT_TYPE(self):
+    def PASSWORD_RESET_TIMEOUT_DAYS(self):
         stack = traceback.extract_stack()
         # Show a warning if the setting is used outside of Django.
         # Stack index: -1 this line, -2 the caller.
-        filename, _line_number, _function_name, _text = stack[-2]
+        filename, _, _, _ = stack[-2]
         if not filename.startswith(os.path.dirname(django.__file__)):
             warnings.warn(
-                DEFAULT_CONTENT_TYPE_DEPRECATED_MSG,
-                RemovedInDjango30Warning,
+                PASSWORD_RESET_TIMEOUT_DAYS_DEPRECATED_MSG,
+                RemovedInDjango40Warning,
                 stacklevel=2,
             )
-        return self.__getattr__('DEFAULT_CONTENT_TYPE')
+        return self.__getattr__('PASSWORD_RESET_TIMEOUT_DAYS')
 
     @property
-    def FILE_CHARSET(self):
-        stack = traceback.extract_stack()
-        # Show a warning if the setting is used outside of Django.
-        # Stack index: -1 this line, -2 the caller.
-        filename, _line_number, _function_name, _text = stack[-2]
-        if not filename.startswith(os.path.dirname(django.__file__)):
-            warnings.warn(
-                FILE_CHARSET_DEPRECATED_MSG,
-                RemovedInDjango31Warning,
-                stacklevel=2,
-            )
-        return self.__getattr__('FILE_CHARSET')
+    def STATIC_URL(self):
+        return self._add_script_prefix(self.__getattr__('STATIC_URL'))
+
+    @property
+    def MEDIA_URL(self):
+        return self._add_script_prefix(self.__getattr__('MEDIA_URL'))
 
 
 class Settings:
@@ -163,10 +189,14 @@ class Settings:
         if not self.SECRET_KEY:
             raise ImproperlyConfigured("The SECRET_KEY setting must not be empty.")
 
-        if self.is_overridden('DEFAULT_CONTENT_TYPE'):
-            warnings.warn(DEFAULT_CONTENT_TYPE_DEPRECATED_MSG, RemovedInDjango30Warning)
-        if self.is_overridden('FILE_CHARSET'):
-            warnings.warn(FILE_CHARSET_DEPRECATED_MSG, RemovedInDjango31Warning)
+        if self.is_overridden('PASSWORD_RESET_TIMEOUT_DAYS'):
+            if self.is_overridden('PASSWORD_RESET_TIMEOUT'):
+                raise ImproperlyConfigured(
+                    'PASSWORD_RESET_TIMEOUT_DAYS/PASSWORD_RESET_TIMEOUT are '
+                    'mutually exclusive.'
+                )
+            setattr(self, 'PASSWORD_RESET_TIMEOUT', self.PASSWORD_RESET_TIMEOUT_DAYS * 60 * 60 * 24)
+            warnings.warn(PASSWORD_RESET_TIMEOUT_DAYS_DEPRECATED_MSG, RemovedInDjango40Warning)
 
         if hasattr(time, 'tzset') and self.TIME_ZONE:
             # When we can, attempt to validate the timezone. If we can't find
@@ -205,16 +235,15 @@ class UserSettingsHolder:
         self.default_settings = default_settings
 
     def __getattr__(self, name):
-        if name in self._deleted:
+        if not name.isupper() or name in self._deleted:
             raise AttributeError
         return getattr(self.default_settings, name)
 
     def __setattr__(self, name, value):
         self._deleted.discard(name)
-        if name == 'DEFAULT_CONTENT_TYPE':
-            warnings.warn(DEFAULT_CONTENT_TYPE_DEPRECATED_MSG, RemovedInDjango30Warning)
-        elif name == 'FILE_CHARSET':
-            warnings.warn(FILE_CHARSET_DEPRECATED_MSG, RemovedInDjango31Warning)
+        if name == 'PASSWORD_RESET_TIMEOUT_DAYS':
+            setattr(self, 'PASSWORD_RESET_TIMEOUT', value * 60 * 60 * 24)
+            warnings.warn(PASSWORD_RESET_TIMEOUT_DAYS_DEPRECATED_MSG, RemovedInDjango40Warning)
         super().__setattr__(name, value)
 
     def __delattr__(self, name):

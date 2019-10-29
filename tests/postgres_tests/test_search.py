@@ -8,6 +8,7 @@ transcript.
 from django.contrib.postgres.search import (
     SearchQuery, SearchRank, SearchVector,
 )
+from django.db import connection
 from django.db.models import F
 from django.test import SimpleTestCase, modify_settings, skipUnlessDBFeature
 
@@ -112,6 +113,10 @@ class SearchVectorFieldTest(GrailTestData, PostgreSQLTestCase):
         searched = Line.objects.filter(dialogue_search_vector=SearchQuery('cadeaux', config='french'))
         self.assertSequenceEqual(searched, [self.french])
 
+    def test_single_coalesce_expression(self):
+        searched = Line.objects.annotate(search=SearchVector('dialogue')).filter(search='cadeaux')
+        self.assertNotIn('COALESCE(COALESCE', str(searched.query))
+
 
 class MultipleFieldsTest(GrailTestData, PostgreSQLTestCase):
 
@@ -153,7 +158,7 @@ class MultipleFieldsTest(GrailTestData, PostgreSQLTestCase):
         searched = Line.objects.annotate(
             search=SearchVector('scene__setting', 'dialogue'),
         ).filter(search='bedemir')
-        self.assertEqual(set(searched), {self.bedemir0, self.bedemir1, self.crowd, self.witch, self.duck})
+        self.assertCountEqual(searched, [self.bedemir0, self.bedemir1, self.crowd, self.witch, self.duck])
 
     def test_search_with_non_text(self):
         searched = Line.objects.annotate(
@@ -186,7 +191,7 @@ class MultipleFieldsTest(GrailTestData, PostgreSQLTestCase):
     def test_raw_search(self):
         line_qs = Line.objects.annotate(search=SearchVector('dialogue'))
         searched = line_qs.filter(search=SearchQuery('Robin', search_type='raw'))
-        self.assertEqual(set(searched), {self.verse0, self.verse1})
+        self.assertCountEqual(searched, [self.verse0, self.verse1])
         searched = line_qs.filter(search=SearchQuery("Robin & !'Camelot'", search_type='raw'))
         self.assertSequenceEqual(searched, [self.verse1])
 
@@ -233,7 +238,7 @@ class TestCombinations(GrailTestData, PostgreSQLTestCase):
         searched = Line.objects.annotate(
             search=SearchVector('scene__setting') + SearchVector('character__name'),
         ).filter(search='bedemir')
-        self.assertEqual(set(searched), {self.bedemir0, self.bedemir1, self.crowd, self.witch, self.duck})
+        self.assertCountEqual(searched, [self.bedemir0, self.bedemir1, self.crowd, self.witch, self.duck])
 
     def test_vector_add_multi(self):
         searched = Line.objects.annotate(
@@ -243,7 +248,7 @@ class TestCombinations(GrailTestData, PostgreSQLTestCase):
                 SearchVector('dialogue')
             ),
         ).filter(search='bedemir')
-        self.assertEqual(set(searched), {self.bedemir0, self.bedemir1, self.crowd, self.witch, self.duck})
+        self.assertCountEqual(searched, [self.bedemir0, self.bedemir1, self.crowd, self.witch, self.duck])
 
     def test_query_and(self):
         searched = Line.objects.annotate(
@@ -264,24 +269,36 @@ class TestCombinations(GrailTestData, PostgreSQLTestCase):
 
     def test_query_or(self):
         searched = Line.objects.filter(dialogue__search=SearchQuery('kneecaps') | SearchQuery('nostrils'))
-        self.assertEqual(set(searched), {self.verse1, self.verse2})
+        self.assertCountEqual(searched, [self.verse1, self.verse2])
 
     def test_query_multiple_or(self):
         searched = Line.objects.filter(
             dialogue__search=SearchQuery('kneecaps') | SearchQuery('nostrils') | SearchQuery('Sir Robin')
         )
-        self.assertEqual(set(searched), {self.verse1, self.verse2, self.verse0})
+        self.assertCountEqual(searched, [self.verse1, self.verse2, self.verse0])
 
     def test_query_invert(self):
         searched = Line.objects.filter(character=self.minstrel, dialogue__search=~SearchQuery('kneecaps'))
-        self.assertEqual(set(searched), {self.verse0, self.verse2})
+        self.assertCountEqual(searched, [self.verse0, self.verse2])
 
-    def test_query_config_mismatch(self):
-        with self.assertRaisesMessage(TypeError, "SearchQuery configs don't match."):
-            Line.objects.filter(
-                dialogue__search=SearchQuery('kneecaps', config='german') |
+    def test_combine_different_configs(self):
+        searched = Line.objects.filter(
+            dialogue__search=(
+                SearchQuery('cadeau', config='french') |
                 SearchQuery('nostrils', config='english')
             )
+        )
+        self.assertCountEqual(searched, [self.french, self.verse2])
+
+    @skipUnlessDBFeature('has_phraseto_tsquery')
+    def test_combine_raw_phrase(self):
+        searched = Line.objects.filter(
+            dialogue__search=(
+                SearchQuery('burn:*', search_type='raw', config='simple') |
+                SearchQuery('rode forth from Camelot', search_type='phrase')
+            )
+        )
+        self.assertCountEqual(searched, [self.verse0, self.verse1, self.verse2])
 
     def test_query_combined_mismatch(self):
         msg = "SearchQuery can only be combined with other SearchQuerys, got"
@@ -332,6 +349,23 @@ class TestRankingAndWeights(GrailTestData, PostgreSQLTestCase):
             rank=SearchRank(SearchVector('dialogue'), SearchQuery('brave sir robin')),
         ).filter(rank__gt=0.3)
         self.assertSequenceEqual(searched, [self.verse0])
+
+
+class SearchVectorIndexTests(PostgreSQLTestCase):
+    def test_search_vector_index(self):
+        """SearchVector generates IMMUTABLE SQL in order to be indexable."""
+        # This test should be moved to test_indexes and use a functional
+        # index instead once support lands (see #26167).
+        query = Line.objects.all().query
+        resolved = SearchVector('id', 'dialogue', config='english').resolve_expression(query)
+        compiler = query.get_compiler(connection.alias)
+        sql, params = resolved.as_sql(compiler, connection)
+        # Indexed function must be IMMUTABLE.
+        with connection.cursor() as cursor:
+            cursor.execute(
+                'CREATE INDEX search_vector_index ON %s USING GIN (%s)' % (Line._meta.db_table, sql),
+                params,
+            )
 
 
 class SearchQueryTests(SimpleTestCase):

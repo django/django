@@ -21,13 +21,23 @@ class OrderableAggMixin:
 
     def as_sql(self, compiler, connection):
         if self.ordering:
-            self.extra['ordering'] = 'ORDER BY ' + ', '.join((
-                ordering_element.as_sql(compiler, connection)[0]
-                for ordering_element in self.ordering
+            ordering_params = []
+            ordering_expr_sql = []
+            for expr in self.ordering:
+                expr_sql, expr_params = expr.as_sql(compiler, connection)
+                ordering_expr_sql.append(expr_sql)
+                ordering_params.extend(expr_params)
+            sql, sql_params = super().as_sql(compiler, connection, ordering=(
+                'ORDER BY ' + ', '.join(ordering_expr_sql)
             ))
-        else:
-            self.extra['ordering'] = ''
-        return super().as_sql(compiler, connection)
+            return sql, sql_params + ordering_params
+        return super().as_sql(compiler, connection, ordering='')
+
+    def set_source_expressions(self, exprs):
+        # Extract the ordering expressions because ORDER BY clause is handled
+        # in a custom way.
+        self.ordering = exprs[self._get_ordering_expressions_index():]
+        return super().set_source_expressions(exprs[:self._get_ordering_expressions_index()])
 
     def get_source_expressions(self):
         return self.source_expressions + self.ordering

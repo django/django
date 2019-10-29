@@ -13,14 +13,7 @@ to get started? This is the section for you.
 First steps
 ===========
 
-Start with these easy tasks to discover Django's development process.
-
-* **Sign the Contributor License Agreement**
-
-  The code that you write belongs to you or your employer. If your
-  contribution is more than one or two lines of code, you need to sign the
-  `CLA`_. See the `Contributor License Agreement FAQ`_ for a more thorough
-  explanation.
+Start with these steps to discover Django's development process.
 
 * **Triage tickets**
 
@@ -45,7 +38,7 @@ Start with these easy tasks to discover Django's development process.
 
   Oftentimes the codebase will change between a patch being submitted and the
   time it gets reviewed. Make sure it still applies cleanly and functions as
-  expected. Simply updating a patch is both useful and important! See more on
+  expected. Updating a patch is both useful and important! See more on
   :doc:`writing-code/submitting-patches`.
 
 * **Write some documentation**
@@ -62,6 +55,13 @@ Start with these easy tasks to discover Django's development process.
       suggested above.
 
       .. _reports page: https://code.djangoproject.com/wiki/Reports
+
+* **Sign the Contributor License Agreement**
+
+  The code that you write belongs to you or your employer. If your
+  contribution is more than one or two lines of code, you need to sign the
+  `CLA`_. See the `Contributor License Agreement FAQ`_ for a more thorough
+  explanation.
 
 .. _CLA: https://www.djangoproject.com/foundation/cla/
 .. _Contributor License Agreement FAQ: https://www.djangoproject.com/foundation/cla/faq/

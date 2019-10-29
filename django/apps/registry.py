@@ -2,7 +2,7 @@ import functools
 import sys
 import threading
 import warnings
-from collections import Counter, OrderedDict, defaultdict
+from collections import Counter, defaultdict
 from functools import partial
 
 from django.core.exceptions import AppRegistryNotReady, ImproperlyConfigured
@@ -31,10 +31,10 @@ class Apps:
         # and whether the registry has been populated. Since it isn't possible
         # to reimport a module safely (it could reexecute initialization code)
         # all_models is never overridden or reset.
-        self.all_models = defaultdict(OrderedDict)
+        self.all_models = defaultdict(dict)
 
         # Mapping of labels to AppConfig instances for installed apps.
-        self.app_configs = OrderedDict()
+        self.app_configs = {}
 
         # Stack of app_configs. Used to store the current state in
         # set_available_apps and set_installed_apps.
@@ -42,6 +42,8 @@ class Apps:
 
         # Whether the registry is populated.
         self.apps_ready = self.models_ready = self.ready = False
+        # For the autoreloader.
+        self.ready_event = threading.Event()
 
         # Lock for thread-safe population.
         self._lock = threading.RLock()
@@ -120,6 +122,7 @@ class Apps:
                 app_config.ready()
 
             self.ready = True
+            self.ready_event.set()
 
     def check_apps_ready(self):
         """Raise an exception if all apps haven't been imported yet."""
@@ -313,10 +316,11 @@ class Apps:
             )
 
         self.stored_app_configs.append(self.app_configs)
-        self.app_configs = OrderedDict(
-            (label, app_config)
+        self.app_configs = {
+            label: app_config
             for label, app_config in self.app_configs.items()
-            if app_config.name in available)
+            if app_config.name in available
+        }
         self.clear_cache()
 
     def unset_available_apps(self):
@@ -344,7 +348,7 @@ class Apps:
         if not self.ready:
             raise AppRegistryNotReady("App registry isn't ready yet.")
         self.stored_app_configs.append(self.app_configs)
-        self.app_configs = OrderedDict()
+        self.app_configs = {}
         self.apps_ready = self.models_ready = self.loading = self.ready = False
         self.clear_cache()
         self.populate(installed)

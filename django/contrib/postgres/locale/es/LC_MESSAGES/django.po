@@ -3,6 +3,7 @@
 # Translators:
 # Antoni Aloy <aaloy@apsl.net>, 2015,2017
 # Ernesto Avilés Vázquez <whippiii@gmail.com>, 2015
+# Ignacio José Lizarán Rus <ilizaran@gmail.com>, 2019
 # Igor Támara <igor@tamarapatino.org>, 2015
 # Pablo, 2015
 # Veronicabh <vero.blazher@gmail.com>, 2015
@@ -10,9 +11,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-09-23 20:42+0000\n"
-"Last-Translator: Antoni Aloy <aaloy@apsl.net>\n"
+"POT-Creation-Date: 2018-05-17 11:49+0200\n"
+"PO-Revision-Date: 2019-02-19 08:46+0000\n"
+"Last-Translator: Ignacio José Lizarán Rus <ilizaran@gmail.com>\n"
 "Language-Team: Spanish (http://www.transifex.com/django/django/language/"
 "es/)\n"
 "MIME-Version: 1.0\n"
@@ -25,7 +26,7 @@ msgid "PostgreSQL extensions"
 msgstr "Extensiones de PostgreSQL"
 
 #, python-format
-msgid "Item %(nth)s in the array did not validate: "
+msgid "Item %(nth)s in the array did not validate:"
 msgstr "El elemento %(nth)s del arreglo no se pudo validar:"
 
 msgid "Nested arrays must have the same length."

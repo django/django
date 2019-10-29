@@ -2,11 +2,8 @@ import unittest
 
 from django.db import NotSupportedError, connection, transaction
 from django.db.models import Count
-from django.test import (
-    TestCase, ignore_warnings, skipIfDBFeature, skipUnlessDBFeature,
-)
+from django.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
 from django.test.utils import CaptureQueriesContext
-from django.utils.deprecation import RemovedInDjango31Warning
 
 from .models import Tag
 
@@ -14,7 +11,6 @@ from .models import Tag
 @skipUnlessDBFeature('supports_explaining_query_execution')
 class ExplainTests(TestCase):
 
-    @ignore_warnings(category=RemovedInDjango31Warning)
     def test_basic(self):
         querysets = [
             Tag.objects.filter(name='test'),
@@ -60,8 +56,10 @@ class ExplainTests(TestCase):
             {'verbose': True, 'timing': True, 'analyze': True},
             {'verbose': False, 'timing': False, 'analyze': True},
         ]
-        if connection.pg_version >= 100000:
+        if connection.features.is_postgresql_10:
             test_options.append({'summary': True})
+        if connection.features.is_postgresql_12:
+            test_options.append({'settings': True})
         for options in test_options:
             with self.subTest(**options), transaction.atomic():
                 with CaptureQueriesContext(connection) as captured_queries:
@@ -73,13 +71,33 @@ class ExplainTests(TestCase):
 
     @unittest.skipUnless(connection.vendor == 'mysql', 'MySQL specific')
     def test_mysql_text_to_traditional(self):
-        # Initialize the cached property, if needed, to prevent a query for
-        # the MySQL version during the QuerySet evaluation.
+        # Ensure these cached properties are initialized to prevent queries for
+        # the MariaDB or MySQL version during the QuerySet evaluation.
         connection.features.needs_explain_extended
+        connection.features.supported_explain_formats
         with CaptureQueriesContext(connection) as captured_queries:
             Tag.objects.filter(name='test').explain(format='text')
         self.assertEqual(len(captured_queries), 1)
         self.assertIn('FORMAT=TRADITIONAL', captured_queries[0]['sql'])
+
+    @unittest.skipUnless(connection.vendor == 'mysql', 'MariaDB and MySQL >= 8.0.18 specific.')
+    def test_mysql_analyze(self):
+        # Inner skip to avoid module level query for MySQL version.
+        if not connection.features.supports_explain_analyze:
+            raise unittest.SkipTest('MariaDB and MySQL >= 8.0.18 specific.')
+        qs = Tag.objects.filter(name='test')
+        with CaptureQueriesContext(connection) as captured_queries:
+            qs.explain(analyze=True)
+        self.assertEqual(len(captured_queries), 1)
+        prefix = 'ANALYZE ' if connection.mysql_is_mariadb else 'EXPLAIN ANALYZE '
+        self.assertTrue(captured_queries[0]['sql'].startswith(prefix))
+        with CaptureQueriesContext(connection) as captured_queries:
+            qs.explain(analyze=True, format='JSON')
+        self.assertEqual(len(captured_queries), 1)
+        if connection.mysql_is_mariadb:
+            self.assertIn('FORMAT=JSON', captured_queries[0]['sql'])
+        else:
+            self.assertNotIn('FORMAT=JSON', captured_queries[0]['sql'])
 
     @unittest.skipUnless(connection.vendor == 'mysql', 'MySQL < 5.7 specific')
     def test_mysql_extended(self):

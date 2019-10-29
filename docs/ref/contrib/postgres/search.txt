@@ -4,7 +4,7 @@ Full text search
 
 The database functions in the ``django.contrib.postgres.search`` module ease
 the use of PostgreSQL's `full text search engine
-<https://www.postgresql.org/docs/current/static/textsearch.html>`_.
+<https://www.postgresql.org/docs/current/textsearch.html>`_.
 
 For the examples in this document, we'll use the models defined in
 :doc:`/topics/db/queries`.
@@ -21,7 +21,7 @@ The ``search`` lookup
 
 .. fieldlookup:: search
 
-The simplest way to use full text search is to search a single term against a
+A common way to use full text search is to search a single term against a
 single column in the database. For example::
 
     >>> Entry.objects.filter(body_text__search='Cheese')
@@ -38,7 +38,7 @@ To use the ``search`` lookup, ``'django.contrib.postgres'`` must be in your
 ``SearchVector``
 ================
 
-.. class:: SearchVector(\*expressions, config=None, weight=None)
+.. class:: SearchVector(*expressions, config=None, weight=None)
 
 Searching against a single field is great but rather limiting. The ``Entry``
 instances we're searching belong to a ``Blog``, which has a ``tagline`` field.
@@ -83,7 +83,7 @@ as a single phrase. If ``search_type`` is ``'raw'``, then you can provide a
 formatted search query with terms and operators. Read PostgreSQL's `Full Text
 Search docs`_ to learn about differences and syntax. Examples:
 
-.. _Full Text Search docs: https://www.postgresql.org/docs/current/static/textsearch-controls.html#TEXTSEARCH-PARSING-QUERIES
+.. _Full Text Search docs: https://www.postgresql.org/docs/current/textsearch-controls.html#TEXTSEARCH-PARSING-QUERIES
 
     >>> from django.contrib.postgres.search import SearchQuery
     >>> SearchQuery('red tomato')  # two keywords
@@ -102,18 +102,14 @@ Search docs`_ to learn about differences and syntax. Examples:
 See :ref:`postgresql-fts-search-configuration` for an explanation of the
 ``config`` parameter.
 
-.. versionadded:: 2.2
-
-    The `search_type` parameter was added.
-
 ``SearchRank``
 ==============
 
 .. class:: SearchRank(vector, query, weights=None)
 
-So far, we've just returned the results for which any match between the vector
-and the query are possible. It's likely you may wish to order the results by
-some sort of relevancy. PostgreSQL provides a ranking function which takes into
+So far, we've returned the results for which any match between the vector and
+the query are possible. It's likely you may wish to order the results by some
+sort of relevancy. PostgreSQL provides a ranking function which takes into
 account how often the query terms appear in the document, how close together
 the terms are in the document, and how important the part of the document is
 where they occur. The better the match, the higher the value of the rank. To
@@ -184,7 +180,7 @@ In the event that all the fields you're querying on are contained within one
 particular model, you can create a functional index which matches the search
 vector you wish to use. The PostgreSQL documentation has details on
 `creating indexes for full text search
-<https://www.postgresql.org/docs/current/static/textsearch-tables.html#TEXTSEARCH-TABLES-INDEX>`_.
+<https://www.postgresql.org/docs/current/textsearch-tables.html#TEXTSEARCH-TABLES-INDEX>`_.
 
 ``SearchVectorField``
 ---------------------
@@ -200,7 +196,7 @@ if it were an annotated ``SearchVector``::
     >>> Entry.objects.filter(search_vector='cheese')
     [<Entry: Cheese on Toast recipes>, <Entry: Pizza recipes>]
 
-.. _PostgreSQL documentation: https://www.postgresql.org/docs/current/static/textsearch-features.html#TEXTSEARCH-UPDATE-TRIGGERS
+.. _PostgreSQL documentation: https://www.postgresql.org/docs/current/textsearch-features.html#TEXTSEARCH-UPDATE-TRIGGERS
 
 Trigram similarity
 ==================
@@ -210,8 +206,8 @@ three consecutive characters. In addition to the :lookup:`trigram_similar`
 lookup, you can use a couple of other expressions.
 
 To use them, you need to activate the `pg_trgm extension
-<https://www.postgresql.org/docs/current/static/pgtrgm.html>`_ on
-PostgreSQL. You can install it using the
+<https://www.postgresql.org/docs/current/pgtrgm.html>`_ on PostgreSQL. You can
+install it using the
 :class:`~django.contrib.postgres.operations.TrigramExtension` migration
 operation.
 

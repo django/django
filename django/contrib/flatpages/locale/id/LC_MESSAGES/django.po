@@ -1,16 +1,16 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Fery Setiawan <gembelweb@gmail.com>, 2015-2016
+# Fery Setiawan <gembelweb@gmail.com>, 2015-2016,2019
 # Jannis Leidel <jannis@leidel.info>, 2011
 # rodin <romihardiyanto@gmail.com>, 2011-2012
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2017-09-23 18:54+0000\n"
-"Last-Translator: rodin <romihardiyanto@gmail.com>\n"
+"POT-Creation-Date: 2019-01-16 20:42+0100\n"
+"PO-Revision-Date: 2019-01-26 23:58+0000\n"
+"Last-Translator: Fery Setiawan <gembelweb@gmail.com>\n"
 "Language-Team: Indonesian (http://www.transifex.com/django/django/language/"
 "id/)\n"
 "MIME-Version: 1.0\n"
@@ -40,6 +40,9 @@ msgid ""
 msgstr ""
 "Nilai hanya hanya dapat berisi huruf, angka, titik, garis bawah, tanda "
 "minus, garis miring, atau tanda tilde."
+
+msgid "Example: '/about/contact'. Make sure to have a leading slash."
+msgstr "Contoh: '/about/contact'. Pastikan anda memiliki awalan garis miring."
 
 msgid "URL is missing a leading slash."
 msgstr "Tidak ada garis miring awal pada URL."

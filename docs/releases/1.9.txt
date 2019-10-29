@@ -1045,9 +1045,9 @@ When installing Django 1.9 or 1.9.1 with setuptools 5.5.x, you'll see::
 
 It's safe to ignore these errors (Django will still install just fine), but you
 can avoid them by upgrading setuptools to a more recent version. If you're
-using pip, you can upgrade pip using ``pip install -U pip`` which will also
-upgrade setuptools. This is resolved in later versions of Django as described
-in the :doc:`/releases/1.9.2`.
+using pip, you can upgrade pip using ``python -m pip install -U pip`` which
+will also upgrade setuptools. This is resolved in later versions of Django as
+described in the :doc:`/releases/1.9.2`.
 
 Miscellaneous
 -------------
@@ -1091,9 +1091,8 @@ Miscellaneous
 
 * In order to enforce test isolation, database queries are not allowed
   by default in :class:`~django.test.SimpleTestCase` tests anymore. You
-  can disable this behavior by setting the
-  :attr:`~django.test.SimpleTestCase.allow_database_queries` class attribute
-  to ``True`` on your test class.
+  can disable this behavior by setting the ``allow_database_queries`` class
+  attribute to ``True`` on your test class.
 
 * ``ResolverMatch.app_name`` was changed to contain the full namespace path in
   the case of nested namespaces. For consistency with

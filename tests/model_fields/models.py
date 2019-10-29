@@ -12,6 +12,7 @@ from django.db.models.fields.files import ImageField, ImageFieldFile
 from django.db.models.fields.related import (
     ForeignKey, ForeignObject, ManyToManyField, OneToOneField,
 )
+from django.utils.translation import gettext_lazy as _
 
 try:
     from PIL import Image
@@ -46,8 +47,17 @@ class Whiz(models.Model):
         )
         ),
         (0, 'Other'),
+        (5, _('translated')),
     )
     c = models.IntegerField(choices=CHOICES, null=True)
+
+
+class WhizDelayed(models.Model):
+    c = models.IntegerField(choices=(), null=True)
+
+
+# Contrived way of adding choices later.
+WhizDelayed._meta.get_field('c').choices = Whiz.CHOICES
 
 
 class WhizIter(models.Model):
@@ -56,6 +66,14 @@ class WhizIter(models.Model):
 
 class WhizIterEmpty(models.Model):
     c = models.CharField(choices=iter(()), blank=True, max_length=1)
+
+
+class Choiceful(models.Model):
+    no_choices = models.IntegerField(null=True)
+    empty_choices = models.IntegerField(choices=(), null=True)
+    with_choices = models.IntegerField(choices=[(1, 'A')], null=True)
+    empty_choices_bool = models.BooleanField(choices=())
+    empty_choices_text = models.TextField(choices=())
 
 
 class BigD(models.Model):
@@ -72,6 +90,18 @@ class BigS(models.Model):
 
 class UnicodeSlugField(models.Model):
     s = models.SlugField(max_length=255, allow_unicode=True)
+
+
+class AutoModel(models.Model):
+    value = models.AutoField(primary_key=True)
+
+
+class BigAutoModel(models.Model):
+    value = models.BigAutoField(primary_key=True)
+
+
+class SmallAutoModel(models.Model):
+    value = models.SmallAutoField(primary_key=True)
 
 
 class SmallIntegerModel(models.Model):
@@ -328,7 +358,7 @@ class AllFieldsModel(models.Model):
     fo = ForeignObject(
         'self',
         on_delete=models.CASCADE,
-        from_fields=['abstract_non_concrete_id'],
+        from_fields=['positive_integer'],
         to_fields=['id'],
         related_name='reverse'
     )

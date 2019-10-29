@@ -62,7 +62,7 @@ The :djadmin:`collectstatic` management command calls the
 method of the :setting:`STATICFILES_STORAGE` after each run and passes
 a list of paths that have been found by the management command. It also
 receives all command line options of :djadmin:`collectstatic`. This is used
-by the :class:`~django.contrib.staticfiles.storage.CachedStaticFilesStorage`
+by the :class:`~django.contrib.staticfiles.storage.ManifestStaticFilesStorage`
 by default.
 
 By default, collected files receive permissions from
@@ -84,8 +84,6 @@ respectively. For example::
 Then set the :setting:`STATICFILES_STORAGE` setting to
 ``'path.to.MyStaticFilesStorage'``.
 
-.. highlight:: console
-
 Some commonly used options are:
 
 .. django-admin-option:: --noinput, --no-input
@@ -97,10 +95,6 @@ Some commonly used options are:
     Ignore files, directories, or paths matching this glob-style pattern. Use
     multiple times to ignore more. When specifying a path, always use forward
     slashes, even on Windows.
-
-    .. versionchanged:: 2.2
-
-        Path matching was added.
 
 .. django-admin-option:: --dry-run, -n
 
@@ -125,7 +119,9 @@ Some commonly used options are:
     Don't ignore the common private glob-style patterns ``'CVS'``, ``'.*'``
     and ``'*~'``.
 
-For a full list of options, refer to the commands own help by running::
+For a full list of options, refer to the commands own help by running:
+
+.. console::
 
    $ python manage.py collectstatic --help
 
@@ -155,7 +151,9 @@ class, override the ``ignore_patterns`` attribute of this class and replace
 
 Searches for one or more relative paths with the enabled finders.
 
-For example::
+For example:
+
+.. console::
 
    $ python manage.py findstatic css/base.css admin/js/core.js
    Found 'css/base.css' here:
@@ -167,7 +165,9 @@ For example::
 .. django-admin-option:: findstatic --first
 
 By default, all matching locations are found. To only return the first match
-for each relative path, use the ``--first`` option::
+for each relative path, use the ``--first`` option:
+
+.. console::
 
    $ python manage.py findstatic css/base.css --first
    Found 'css/base.css' here:
@@ -177,14 +177,18 @@ This is a debugging aid; it'll show you exactly which static file will be
 collected for a given path.
 
 By setting the ``--verbosity`` flag to 0, you can suppress the extra output and
-just get the path names::
+just get the path names:
+
+.. console::
 
    $ python manage.py findstatic css/base.css --verbosity 0
    /home/special.polls.com/core/static/css/base.css
    /home/polls.com/core/static/css/base.css
 
 On the other hand, by setting the ``--verbosity`` flag to 2, you can get all
-the directories which were searched::
+the directories which were searched:
+
+.. console::
 
    $ python manage.py findstatic css/base.css --verbosity 2
    Found 'css/base.css' here:
@@ -215,9 +219,11 @@ Use the ``--nostatic`` option to disable serving of static files with the
 only available if the :doc:`staticfiles </ref/contrib/staticfiles>` app is
 in your project's :setting:`INSTALLED_APPS` setting.
 
-Example usage::
+Example usage:
 
-    django-admin runserver --nostatic
+.. console::
+
+    $ django-admin runserver --nostatic
 
 .. django-admin-option:: --insecure
 
@@ -229,13 +235,13 @@ local development, should **never be used in production** and is only
 available if the :doc:`staticfiles </ref/contrib/staticfiles>` app is
 in your project's :setting:`INSTALLED_APPS` setting.
 
-``--insecure`` doesn't work with
-:class:`~django.contrib.staticfiles.storage.ManifestStaticFilesStorage` or
-:class:`~django.contrib.staticfiles.storage.CachedStaticFilesStorage`.
+``--insecure`` doesn't work with :class:`~.storage.ManifestStaticFilesStorage`.
 
-Example usage::
+Example usage:
 
-    django-admin runserver --insecure
+.. console::
+
+    $ django-admin runserver --insecure
 
 .. _staticfiles-storages:
 
@@ -262,7 +268,7 @@ line options. It yields tuples of three values:
 ``processed`` is a boolean indicating whether or not the value was
 post-processed, or an exception if post-processing failed.
 
-The :class:`~django.contrib.staticfiles.storage.CachedStaticFilesStorage`
+The :class:`~django.contrib.staticfiles.storage.ManifestStaticFilesStorage`
 uses this behind the scenes to replace the paths with their hashed
 counterparts and update the cache appropriately.
 
@@ -291,7 +297,7 @@ by default covers the `@import`_ rule and `url()`_ statement of `Cascading
 Style Sheets`_. For example, the ``'css/styles.css'`` file with the
 content
 
-.. code-block:: css+django
+.. code-block:: css
 
     @import url("../admin/css/base.css");
 
@@ -300,7 +306,7 @@ method of the ``ManifestStaticFilesStorage`` storage backend, ultimately
 saving a ``'css/styles.55e7cbb9ba48.css'`` file with the following
 content:
 
-.. code-block:: css+django
+.. code-block:: css
 
     @import url("../admin/css/base.27e20196a850.css");
 
@@ -357,31 +363,13 @@ hashing algorithm.
 .. _`url()`: https://www.w3.org/TR/CSS2/syndata.html#uri
 .. _`Cascading Style Sheets`: https://www.w3.org/Style/CSS/
 
-``CachedStaticFilesStorage``
-----------------------------
+``ManifestFilesMixin``
+----------------------
 
-.. class:: storage.CachedStaticFilesStorage
+.. class:: storage.ManifestFilesMixin
 
-``CachedStaticFilesStorage`` is a similar class like the
-:class:`~django.contrib.staticfiles.storage.ManifestStaticFilesStorage` class
-but uses Django's :doc:`caching framework</topics/cache>` for storing the
-hashed names of processed files instead of a static manifest file called
-``staticfiles.json``. This is mostly useful for situations in which you don't
-have access to the file system.
-
-If you want to override certain options of the cache backend the storage uses,
-simply specify a custom entry in the :setting:`CACHES` setting named
-``'staticfiles'``. It falls back to using the ``'default'`` cache backend.
-
-.. warning::
-
-    ``CachedStaticFilesStorage`` isn't recommended --  in almost all cases
-    ``ManifestStaticFilesStorage`` is a better choice. There are several
-    performance penalties when using ``CachedStaticFilesStorage`` since a cache
-    miss requires hashing files at runtime. Remote file storage require several
-    round-trips to hash a file on a cache miss, as several file accesses are
-    required to ensure that the file hash is correct in the case of nested file
-    paths.
+Use this mixin with a custom storage to append the MD5 hash of the file's
+content to the filename as :class:`~storage.ManifestStaticFilesStorage` does.
 
 Finders Module
 ==============
@@ -430,8 +418,6 @@ dedicated static file server, which is a lot of overhead to mess with when
 developing locally. Thus, the ``staticfiles`` app ships with a
 **quick and dirty helper view** that you can use to serve files locally in
 development.
-
-.. highlight:: python
 
 .. function:: views.serve(request, path)
 

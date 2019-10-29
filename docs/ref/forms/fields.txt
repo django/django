@@ -407,13 +407,13 @@ For each field, we describe the default widget used if you don't specify
 
     .. attribute:: choices
 
-        Either an iterable (e.g., a list or tuple) of 2-tuples to use as
-        choices for this field, or a callable that returns such an iterable.
-        This argument accepts the same formats as the ``choices`` argument to a
-        model field. See the :ref:`model field reference documentation on
-        choices <field-choices>` for more details. If the argument is a
-        callable, it is evaluated each time the field's form is initialized.
-        Defaults to an empty list.
+        Either an :term:`iterable` of 2-tuples to use as choices for this
+        field, or a callable that returns such an iterable. This argument
+        accepts the same formats as the ``choices`` argument to a model field.
+        See the :ref:`model field reference documentation on choices
+        <field-choices>` for more details. If the argument is a callable, it is
+        evaluated each time the field's form is initialized. Defaults to an
+        empty list.
 
 ``TypedChoiceField``
 --------------------
@@ -627,7 +627,7 @@ For each field, we describe the default widget used if you don't specify
 .. class:: FilePathField(**kwargs)
 
     * Default widget: :class:`Select`
-    * Empty value: ``None``
+    * Empty value: ``''`` (an empty string)
     * Normalizes to: A string.
     * Validates that the selected choice exists in the list of choices.
     * Error message keys: ``required``, ``invalid_choice``
@@ -1239,12 +1239,11 @@ method::
 Creating custom fields
 ======================
 
-If the built-in ``Field`` classes don't meet your needs, you can easily create
-custom ``Field`` classes. To do this, just create a subclass of
-``django.forms.Field``. Its only requirements are that it implement a
-``clean()`` method and that its ``__init__()`` method accept the core arguments
-mentioned above (``required``, ``label``, ``initial``, ``widget``,
-``help_text``).
+If the built-in ``Field`` classes don't meet your needs, you can create custom
+``Field`` classes. To do this, create a subclass of ``django.forms.Field``. Its
+only requirements are that it implement a ``clean()`` method and that its
+``__init__()`` method accept the core arguments mentioned above (``required``,
+``label``, ``initial``, ``widget``, ``help_text``).
 
 You can also customize how a field will be accessed by overriding
 :meth:`~django.forms.Field.get_bound_field()`.

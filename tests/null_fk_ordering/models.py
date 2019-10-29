@@ -17,11 +17,11 @@ class Article(models.Model):
     title = models.CharField(max_length=150)
     author = models.ForeignKey(Author, models.SET_NULL, null=True)
 
-    def __str__(self):
-        return 'Article titled: %s' % self.title
-
     class Meta:
         ordering = ['author__name']
+
+    def __str__(self):
+        return 'Article titled: %s' % self.title
 
 
 # These following 4 models represent a far more complex ordering case.

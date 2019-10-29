@@ -115,7 +115,7 @@ Changing a user's password will log out all their sessions. See
 Authenticating users
 --------------------
 
-.. function:: authenticate(request=None, \**credentials)
+.. function:: authenticate(request=None, **credentials)
 
     Use :func:`~django.contrib.auth.authenticate()` to verify a set of
     credentials. It takes credentials as keyword arguments, ``username`` and
@@ -150,7 +150,7 @@ Authenticating users
 Permissions and Authorization
 =============================
 
-Django comes with a simple permissions system. It provides a way to assign
+Django comes with a built-in permissions system. It provides a way to assign
 permissions to specific users and groups of users.
 
 It's used by the Django admin site, but you're welcome to use it in your own
@@ -262,6 +262,15 @@ The permission can then be assigned to a
 attribute or to a :class:`~django.contrib.auth.models.Group` via its
 ``permissions`` attribute.
 
+.. admonition:: Proxy models need their own content type
+
+    If you want to create :ref:`permissions for a proxy model
+    <proxy-models-permissions-topic>`, pass ``for_concrete_model=False`` to
+    :meth:`.ContentTypeManager.get_for_model` to get the appropriate
+    ``ContentType``::
+
+        content_type = ContentType.objects.get_for_model(BlogPostProxy, for_concrete_model=False)
+
 Permission caching
 ------------------
 
@@ -302,6 +311,39 @@ the user from the database. For example::
         user.has_perm('myapp.change_blogpost')  # True
 
         ...
+
+.. _proxy-models-permissions-topic:
+
+Proxy models
+------------
+
+Proxy models work exactly the same way as concrete models. Permissions are
+created using the own content type of the proxy model. Proxy models don't
+inherit the permissions of the concrete model they subclass::
+
+    class Person(models.Model):
+        class Meta:
+            permissions = [('can_eat_pizzas', 'Can eat pizzas')]
+
+    class Student(Person):
+        class Meta:
+            proxy = True
+            permissions = [('can_deliver_pizzas', 'Can deliver pizzas')]
+
+    >>> # Fetch the content type for the proxy model.
+    >>> content_type = ContentType.objects.get_for_model(Student, for_concrete_model=False)
+    >>> student_permissions = Permission.objects.filter(content_type=content_type)
+    >>> [p.codename for p in student_permissions]
+    ['add_student', 'change_student', 'delete_student', 'view_student',
+    'can_deliver_pizzas']
+    >>> for permission in student_permissions:
+    ...     user.user_permissions.add(permission)
+    >>> user.has_perm('app.add_person')
+    False
+    >>> user.has_perm('app.can_eat_pizzas')
+    False
+    >>> user.has_perms(('app.add_student', 'app.can_deliver_pizzas'))
+    True
 
 .. _auth-web-requests:
 
@@ -421,7 +463,7 @@ Limiting access to logged-in users
 The raw way
 ~~~~~~~~~~~
 
-The simple, raw way to limit access to pages is to check
+The raw way to limit access to pages is to check
 :attr:`request.user.is_authenticated
 <django.contrib.auth.models.User.is_authenticated>` and either redirect to a
 login page::
@@ -563,10 +605,9 @@ Limiting access to logged-in users that pass a test
 To limit access based on certain permissions or some other test, you'd do
 essentially the same thing as described in the previous section.
 
-The simple way is to run your test on :attr:`request.user
-<django.http.HttpRequest.user>` in the view directly. For example, this view
-checks to make sure the user has an email in the desired domain and if not,
-redirects to the login page::
+You can run your test on :attr:`request.user <django.http.HttpRequest.user>` in
+the view directly. For example, this view checks to make sure the user has an
+email in the desired domain and if not, redirects to the login page::
 
     from django.shortcuts import redirect
 
@@ -771,12 +812,6 @@ access with an HTTP 403 Forbidden response. Anonymous users are redirected to
 the login page or shown an HTTP 403 Forbidden response, depending on the
 :attr:`~django.contrib.auth.mixins.AccessMixin.raise_exception` attribute.
 
-.. versionchanged:: 2.1
-
-    In older versions, authenticated users who lacked permissions were
-    redirected to the login page (which resulted in a loop) instead of
-    receiving an HTTP 403 Forbidden response.
-
 .. class:: AccessMixin
 
     .. attribute:: login_url
@@ -969,8 +1004,8 @@ implementation details see :ref:`using-the-views`.
     * ``redirect_field_name``: The name of a ``GET`` field containing the
       URL to redirect to after login. Defaults to ``next``.
 
-    * ``authentication_form``: A callable (typically just a form class) to
-      use for authentication. Defaults to
+    * ``authentication_form``: A callable (typically a form class) to use for
+      authentication. Defaults to
       :class:`~django.contrib.auth.forms.AuthenticationForm`.
 
     * ``extra_context``: A dictionary of context data that will be added to the
@@ -1246,7 +1281,8 @@ implementation details see :ref:`using-the-views`.
       link. By default, HTML email is not sent.
 
     * ``extra_email_context``: A dictionary of context data that will be
-      available in the email template.
+      available in the email template. It can be used to override default
+      template context values listed below e.g. ``domain``.
 
     **Template context:**
 
@@ -1349,10 +1385,17 @@ implementation details see :ref:`using-the-views`.
     * ``extra_context``: A dictionary of context data that will be added to the
       default context data passed to the template.
 
+    * ``reset_url_token``: Token parameter displayed as a component of password
+      reset URLs. Defaults to ``'set-password'``.
+
+      .. versionchanged:: 3.0
+
+        The ``reset_url_token`` class attribute was added.
+
     **Template context:**
 
-    * ``form``: The form (see ``set_password_form`` above) for setting the
-      new user's password.
+    * ``form``: The form (see ``form_class`` above) for setting the new user's
+      password.
 
     * ``validlink``: Boolean, True if the link (combination of ``uidb64`` and
       ``token``) is valid or unused yet.

@@ -1,10 +1,14 @@
 """
 Internationalization support.
 """
-import re
+import warnings
 from contextlib import ContextDecorator
+from decimal import ROUND_UP, Decimal
 
+from django.utils.autoreload import autoreload_started, file_changed
+from django.utils.deprecation import RemovedInDjango40Warning
 from django.utils.functional import lazy
+from django.utils.regex_helper import _lazy_re_compile
 
 __all__ = [
     'activate', 'deactivate', 'override', 'deactivate_all',
@@ -52,6 +56,9 @@ class Trans:
         from django.conf import settings
         if settings.USE_I18N:
             from django.utils.translation import trans_real as trans
+            from django.utils.translation.reloader import watch_for_translation_changes, translation_file_changed
+            autoreload_started.connect(watch_for_translation_changes, dispatch_uid='translation_file_changed')
+            file_changed.connect(translation_file_changed, dispatch_uid='translation_file_changed')
         else:
             from django.utils.translation import trans_null as trans
         setattr(self, real_name, getattr(trans, real_name))
@@ -68,23 +75,51 @@ def gettext_noop(message):
     return _trans.gettext_noop(message)
 
 
-ugettext_noop = gettext_noop
+def ugettext_noop(message):
+    """
+    A legacy compatibility wrapper for Unicode handling on Python 2.
+    Alias of gettext_noop() since Django 2.0.
+    """
+    warnings.warn(
+        'django.utils.translation.ugettext_noop() is deprecated in favor of '
+        'django.utils.translation.gettext_noop().',
+        RemovedInDjango40Warning, stacklevel=2,
+    )
+    return gettext_noop(message)
 
 
 def gettext(message):
     return _trans.gettext(message)
 
 
-# An alias since Django 2.0
-ugettext = gettext
+def ugettext(message):
+    """
+    A legacy compatibility wrapper for Unicode handling on Python 2.
+    Alias of gettext() since Django 2.0.
+    """
+    warnings.warn(
+        'django.utils.translation.ugettext() is deprecated in favor of '
+        'django.utils.translation.gettext().',
+        RemovedInDjango40Warning, stacklevel=2,
+    )
+    return gettext(message)
 
 
 def ngettext(singular, plural, number):
     return _trans.ngettext(singular, plural, number)
 
 
-# An alias since Django 2.0
-ungettext = ngettext
+def ungettext(singular, plural, number):
+    """
+    A legacy compatibility wrapper for Unicode handling on Python 2.
+    Alias of ngettext() since Django 2.0.
+    """
+    warnings.warn(
+        'django.utils.translation.ungettext() is deprecated in favor of '
+        'django.utils.translation.ngettext().',
+        RemovedInDjango40Warning, stacklevel=2,
+    )
+    return ngettext(singular, plural, number)
 
 
 def pgettext(context, message):
@@ -95,8 +130,21 @@ def npgettext(context, singular, plural, number):
     return _trans.npgettext(context, singular, plural, number)
 
 
-gettext_lazy = ugettext_lazy = lazy(gettext, str)
+gettext_lazy = lazy(gettext, str)
 pgettext_lazy = lazy(pgettext, str)
+
+
+def ugettext_lazy(message):
+    """
+    A legacy compatibility wrapper for Unicode handling on Python 2. Has been
+    Alias of gettext_lazy since Django 2.0.
+    """
+    warnings.warn(
+        'django.utils.translation.ugettext_lazy() is deprecated in favor of '
+        'django.utils.translation.gettext_lazy().',
+        RemovedInDjango40Warning, stacklevel=2,
+    )
+    return gettext_lazy(message)
 
 
 def lazy_number(func, resultclass, number=None, **kwargs):
@@ -110,20 +158,30 @@ def lazy_number(func, resultclass, number=None, **kwargs):
             def __bool__(self):
                 return bool(kwargs['singular'])
 
+            def _get_number_value(self, values):
+                try:
+                    return values[number]
+                except KeyError:
+                    raise KeyError(
+                        "Your dictionary lacks key '%s\'. Please provide "
+                        "it, because it is required to determine whether "
+                        "string is singular or plural." % number
+                    )
+
+            def _translate(self, number_value):
+                kwargs['number'] = number_value
+                return func(**kwargs)
+
+            def format(self, *args, **kwargs):
+                number_value = self._get_number_value(kwargs) if kwargs and number else args[0]
+                return self._translate(number_value).format(*args, **kwargs)
+
             def __mod__(self, rhs):
                 if isinstance(rhs, dict) and number:
-                    try:
-                        number_value = rhs[number]
-                    except KeyError:
-                        raise KeyError(
-                            "Your dictionary lacks key '%s\'. Please provide "
-                            "it, because it is required to determine whether "
-                            "string is singular or plural." % number
-                        )
+                    number_value = self._get_number_value(rhs)
                 else:
                     number_value = rhs
-                kwargs['number'] = number_value
-                translated = func(**kwargs)
+                translated = self._translate(number_value)
                 try:
                     translated = translated % rhs
                 except TypeError:
@@ -144,8 +202,17 @@ def ngettext_lazy(singular, plural, number=None):
     return lazy_number(ngettext, str, singular=singular, plural=plural, number=number)
 
 
-# An alias since Django 2.0
-ungettext_lazy = ngettext_lazy
+def ungettext_lazy(singular, plural, number=None):
+    """
+    A legacy compatibility wrapper for Unicode handling on Python 2.
+    An alias of ungettext_lazy() since Django 2.0.
+    """
+    warnings.warn(
+        'django.utils.translation.ungettext_lazy() is deprecated in favor of '
+        'django.utils.translation.ngettext_lazy().',
+        RemovedInDjango40Warning, stacklevel=2,
+    )
+    return ngettext_lazy(singular, plural, number)
 
 
 def npgettext_lazy(context, singular, plural, number=None):
@@ -204,18 +271,18 @@ def to_language(locale):
 
 def to_locale(language):
     """Turn a language name (en-us) into a locale name (en_US)."""
-    language = language.lower()
-    parts = language.split('-')
-    try:
-        country = parts[1]
-    except IndexError:
+    language, _, country = language.lower().partition('-')
+    if not country:
         return language
     # A language with > 2 characters after the dash only has its first
     # character after the dash capitalized; e.g. sr-latn becomes sr_Latn.
     # A language with 2 characters after the dash has both characters
     # capitalized; e.g. en-us becomes en_US.
-    parts[1] = country.title() if len(country) > 2 else country.upper()
-    return parts[0] + '_' + '-'.join(parts[1:])
+    country, _, tail = country.partition('-')
+    country = country.title() if len(country) > 2 else country.upper()
+    if tail:
+        country += '-' + tail
+    return language + '_' + country
 
 
 def get_language_from_request(request, check_path=False):
@@ -261,8 +328,12 @@ def get_language_info(lang_code):
     return info
 
 
-trim_whitespace_re = re.compile(r'\s*\n\s*')
+trim_whitespace_re = _lazy_re_compile(r'\s*\n\s*')
 
 
 def trim_whitespace(s):
     return trim_whitespace_re.sub(' ', s.strip())
+
+
+def round_away_from_one(value):
+    return int(Decimal(value - 1).quantize(Decimal('0'), rounding=ROUND_UP)) + 1

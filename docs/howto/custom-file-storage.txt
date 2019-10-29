@@ -97,6 +97,14 @@ non-standard characters are converted to safe filenames.
 The code provided on ``Storage`` retains only alpha-numeric characters, periods
 and underscores from the original filename, removing everything else.
 
+.. method:: get_alternative_name(file_root, file_ext)
+
+.. versionadded:: 3.0
+
+Returns an alternative filename based on the ``file_root`` and ``file_ext``
+parameters. By default, an underscore plus a random 7 character alphanumeric
+string is appended to the filename before the extension.
+
 .. method:: get_available_name(name, max_length=None)
 
 Returns a filename that is available in the storage mechanism, possibly taking
@@ -108,5 +116,5 @@ The length of the filename will not exceed ``max_length``, if provided. If a
 free unique filename cannot be found, a :exc:`SuspiciousFileOperation
 <django.core.exceptions.SuspiciousOperation>` exception is raised.
 
-If a file with ``name`` already exists, an underscore plus a random 7 character
-alphanumeric string is appended to the filename before the extension.
+If a file with ``name`` already exists, ``get_alternative_name()`` is called to
+obtain an alternative name.

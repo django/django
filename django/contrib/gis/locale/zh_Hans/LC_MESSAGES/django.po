@@ -6,15 +6,16 @@
 # Lei Yang <yanglei.go@gmail.com>, 2011
 # Lele Long <schemacs@gmail.com>, 2011,2015
 # mozillazg <opensource.mozillazg@gmail.com>, 2016
-# Ronald White <ouyanghongyu@gmail.com>, 2014
+# Ronald White <tkliuxing@me.com>, 2014
 # Kevin Sze <leiarix@gmail.com>, 2012
+# 航 柯 <korhang@163.com>, 2018
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-09-19 16:40+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"PO-Revision-Date: 2018-10-15 08:06+0000\n"
+"Last-Translator: 航 柯 <korhang@163.com>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/django/django/"
 "language/zh_CN/)\n"
 "MIME-Version: 1.0\n"
@@ -72,10 +73,10 @@ msgstr "无效几何类型。"
 msgid ""
 "An error occurred when transforming the geometry to the SRID of the geometry "
 "form field."
-msgstr "几何形状的SRID字段发生试图转换错误ました。"
+msgstr "几何形状转换SRID字段将发生错误"
 
 msgid "Delete all Features"
-msgstr "删除所有功能"
+msgstr "删除所有要素"
 
 msgid "WKT debugging window:"
 msgstr "WKT 调试窗口："

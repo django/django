@@ -16,7 +16,10 @@ from django.utils.functional import LazyObject, cached_property
 from django.utils.module_loading import import_string
 from django.utils.text import get_valid_filename
 
-__all__ = ('Storage', 'FileSystemStorage', 'DefaultStorage', 'default_storage')
+__all__ = (
+    'Storage', 'FileSystemStorage', 'DefaultStorage', 'default_storage',
+    'get_storage_class',
+)
 
 
 class Storage:
@@ -57,6 +60,14 @@ class Storage:
         """
         return get_valid_filename(name)
 
+    def get_alternative_name(self, file_root, file_ext):
+        """
+        Return an alternative filename, by adding an underscore and a random 7
+        character alphanumeric string (before the file extension, if one
+        exists) to the filename.
+        """
+        return '%s_%s%s' % (file_root, get_random_string(7), file_ext)
+
     def get_available_name(self, name, max_length=None):
         """
         Return a filename that's free on the target storage system and
@@ -64,14 +75,13 @@ class Storage:
         """
         dir_name, file_name = os.path.split(name)
         file_root, file_ext = os.path.splitext(file_name)
-        # If the filename already exists, add an underscore and a random 7
-        # character alphanumeric string (before the file extension, if one
-        # exists) to the filename until the generated filename doesn't exist.
+        # If the filename already exists, generate an alternative filename
+        # until it doesn't exist.
         # Truncate original name if required, so the new filename does not
         # exceed the max_length.
         while self.exists(name) or (max_length and len(name) > max_length):
             # file_ext includes the dot.
-            name = os.path.join(dir_name, "%s_%s%s" % (file_root, get_random_string(7), file_ext))
+            name = os.path.join(dir_name, self.get_alternative_name(file_root, file_ext))
             if max_length is None:
                 continue
             # Truncate file_root if max_length exceeded.
@@ -85,7 +95,7 @@ class Storage:
                         'Please make sure that the corresponding file field '
                         'allows sufficient "max_length".' % name
                     )
-                name = os.path.join(dir_name, "%s_%s%s" % (file_root, get_random_string(7), file_ext))
+                name = os.path.join(dir_name, self.get_alternative_name(file_root, file_ext))
         return name
 
     def generate_filename(self, filename):
@@ -225,25 +235,19 @@ class FileSystemStorage(Storage):
 
         # Create any intermediate directories that do not exist.
         directory = os.path.dirname(full_path)
-        if not os.path.exists(directory):
-            try:
-                if self.directory_permissions_mode is not None:
-                    # os.makedirs applies the global umask, so we reset it,
-                    # for consistency with file_permissions_mode behavior.
-                    old_umask = os.umask(0)
-                    try:
-                        os.makedirs(directory, self.directory_permissions_mode)
-                    finally:
-                        os.umask(old_umask)
-                else:
-                    os.makedirs(directory)
-            except FileNotFoundError:
-                # There's a race between os.path.exists() and os.makedirs().
-                # If os.makedirs() fails with FileNotFoundError, the directory
-                # was created concurrently.
-                pass
-        if not os.path.isdir(directory):
-            raise IOError("%s exists and is not a directory." % directory)
+        try:
+            if self.directory_permissions_mode is not None:
+                # os.makedirs applies the global umask, so we reset it,
+                # for consistency with file_permissions_mode behavior.
+                old_umask = os.umask(0)
+                try:
+                    os.makedirs(directory, self.directory_permissions_mode, exist_ok=True)
+                finally:
+                    os.umask(old_umask)
+            else:
+                os.makedirs(directory, exist_ok=True)
+        except FileExistsError:
+            raise FileExistsError('%s exists and is not a directory.' % directory)
 
         # There's a potential race condition between get_available_name and
         # saving the file; it's possible that two threads might return the

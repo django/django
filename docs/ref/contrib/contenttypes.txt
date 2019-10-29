@@ -124,7 +124,8 @@ For example, we could look up the
 :class:`~django.contrib.auth.models.User` model::
 
     >>> from django.contrib.contenttypes.models import ContentType
-    >>> ContentType.objects.get(app_label="auth", model="user")
+    >>> user_type = ContentType.objects.get(app_label='auth', model='user')
+    >>> user_type
     <ContentType: user>
 
 And then use it to query for a particular
@@ -239,7 +240,7 @@ to go one step further and use
 :class:`~django.contrib.contenttypes.models.ContentType` to enable truly
 generic (sometimes called "polymorphic") relationships between models.
 
-A simple example is a tagging system, which might look like this::
+For example, it could be used for a tagging system like so::
 
     from django.contrib.contenttypes.fields import GenericForeignKey
     from django.contrib.contenttypes.models import ContentType
@@ -393,21 +394,21 @@ be used to retrieve their associated ``TaggedItems``::
 Defining :class:`~django.contrib.contenttypes.fields.GenericRelation` with
 ``related_query_name`` set allows querying from the related object::
 
-    tags = GenericRelation(TaggedItem, related_query_name='bookmarks')
+    tags = GenericRelation(TaggedItem, related_query_name='bookmark')
 
 This enables filtering, ordering, and other query operations on ``Bookmark``
 from ``TaggedItem``::
 
     >>> # Get all tags belonging to bookmarks containing `django` in the url
-    >>> TaggedItem.objects.filter(bookmarks__url__contains='django')
+    >>> TaggedItem.objects.filter(bookmark__url__contains='django')
     <QuerySet [<TaggedItem: django>, <TaggedItem: python>]>
 
-Of course, if you don't add the reverse relationship, you can do the
+Of course, if you don't add the ``related_query_name``, you can do the
 same types of lookups manually::
 
-    >>> b = Bookmark.objects.get(url='https://www.djangoproject.com/')
-    >>> bookmark_type = ContentType.objects.get_for_model(b)
-    >>> TaggedItem.objects.filter(content_type__pk=bookmark_type.id, object_id=b.id)
+    >>> bookmarks = Bookmark.objects.filter(url__contains='django')
+    >>> bookmark_type = ContentType.objects.get_for_model(Bookmark)
+    >>> TaggedItem.objects.filter(content_type__pk=bookmark_type.id, object_id__in=bookmarks)
     <QuerySet [<TaggedItem: django>, <TaggedItem: python>]>
 
 Just as :class:`~django.contrib.contenttypes.fields.GenericForeignKey`
@@ -437,7 +438,7 @@ it would be deleted at the same time.
 Unlike :class:`~django.db.models.ForeignKey`,
 :class:`~django.contrib.contenttypes.fields.GenericForeignKey` does not accept
 an :attr:`~django.db.models.ForeignKey.on_delete` argument to customize this
-behavior; if desired, you can avoid the cascade-deletion simply by not using
+behavior; if desired, you can avoid the cascade-deletion by not using
 :class:`~django.contrib.contenttypes.fields.GenericRelation`, and alternate
 behavior can be provided via the :data:`~django.db.models.signals.pre_delete`
 signal.

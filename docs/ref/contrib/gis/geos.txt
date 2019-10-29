@@ -487,8 +487,6 @@ Topological Methods
 
 .. method:: GEOSGeometry.buffer_with_style(width, quadsegs=8, end_cap_style=1, join_style=1, mitre_limit=5.0)
 
-    .. versionadded:: 2.1
-
     Same as :meth:`buffer`, but allows customizing the style of the buffer.
 
     * ``end_cap_style`` can be round (``1``), flat (``2``), or square (``3``).
@@ -732,6 +730,12 @@ Other Properties & Methods
     Notice that ``(0, 0)`` is the first and last coordinate -- if they were not
     equal, an error would be raised.
 
+    .. attribute:: is_counterclockwise
+
+        .. versionadded:: 3.1
+
+        Returns whether this ``LinearRing`` is counterclockwise.
+
 ``Polygon``
 -----------
 
@@ -835,7 +839,7 @@ Geometry Collections
 Prepared Geometries
 ===================
 
-In order to obtain a prepared geometry, just access the
+In order to obtain a prepared geometry, access the
 :attr:`GEOSGeometry.prepared` property.  Once you have a
 ``PreparedGeometry`` instance its spatial predicate methods, listed below,
 may be used with other ``GEOSGeometry`` objects.  An operation with a prepared
@@ -913,8 +917,8 @@ I/O Objects
 Reader Objects
 --------------
 
-The reader I/O classes simply return a :class:`GEOSGeometry` instance from the
-WKB and/or WKT input given to their ``read(geom)`` method.
+The reader I/O classes return a :class:`GEOSGeometry` instance from the WKB
+and/or WKT input given to their ``read(geom)`` method.
 
 .. class:: WKBReader
 

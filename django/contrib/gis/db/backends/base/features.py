@@ -21,8 +21,6 @@ class BaseSpatialFeatures:
     supports_3d_functions = False
     # Does the database support SRID transform operations?
     supports_transform = True
-    # Do geometric relationship operations operate on real shapes (or only on bounding boxes)?
-    supports_real_shape_operations = True
     # Can geometry fields be null?
     supports_null_geometries = True
     # Are empty geometries supported?
@@ -38,6 +36,9 @@ class BaseSpatialFeatures:
     # The following properties indicate if the database backend support
     # certain lookups (dwithin, left and right, relate, ...)
     supports_left_right_lookups = False
+    # Does the backend support expressions for specifying distance in the
+    # dwithin lookup?
+    supports_dwithin_distance_expr = True
 
     # Does the database have raster support?
     supports_raster = False

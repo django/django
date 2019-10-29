@@ -15,8 +15,8 @@ similarity threshold.
 
 To use it, add ``'django.contrib.postgres'`` in your :setting:`INSTALLED_APPS`
 and activate the `pg_trgm extension
-<https://www.postgresql.org/docs/current/static/pgtrgm.html>`_ on
-PostgreSQL. You can install the extension using the
+<https://www.postgresql.org/docs/current/pgtrgm.html>`_ on PostgreSQL. You can
+install the extension using the
 :class:`~django.contrib.postgres.operations.TrigramExtension` migration
 operation.
 
@@ -41,7 +41,7 @@ the `unaccent extension on PostgreSQL`_. The
 :class:`~django.contrib.postgres.operations.UnaccentExtension` migration
 operation is available if you want to perform this activation using migrations).
 
-.. _unaccent extension on PostgreSQL: https://www.postgresql.org/docs/current/static/unaccent.html
+.. _unaccent extension on PostgreSQL: https://www.postgresql.org/docs/current/unaccent.html
 
 The ``unaccent`` lookup can be used on
 :class:`~django.db.models.CharField` and :class:`~django.db.models.TextField`::

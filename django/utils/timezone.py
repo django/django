@@ -3,15 +3,13 @@ Timezone-related classes and functions.
 """
 
 import functools
-import warnings
 from contextlib import ContextDecorator
 from datetime import datetime, timedelta, timezone, tzinfo
-from threading import local
 
 import pytz
+from asgiref.local import Local
 
 from django.conf import settings
-from django.utils.deprecation import RemovedInDjango31Warning
 
 __all__ = [
     'utc', 'get_fixed_timezone',
@@ -21,40 +19,6 @@ __all__ = [
     'localtime', 'now',
     'is_aware', 'is_naive', 'make_aware', 'make_naive',
 ]
-
-
-# UTC and local time zones
-
-ZERO = timedelta(0)
-
-
-class FixedOffset(tzinfo):
-    """
-    Fixed offset in minutes east from UTC. Taken from Python's docs.
-
-    Kept as close as possible to the reference version. __init__ was changed
-    to make its arguments optional, according to Python's requirement that
-    tzinfo subclasses can be instantiated without arguments.
-    """
-
-    def __init__(self, offset=None, name=None):
-        warnings.warn(
-            'FixedOffset is deprecated in favor of datetime.timezone',
-            RemovedInDjango31Warning, stacklevel=2,
-        )
-        if offset is not None:
-            self.__offset = timedelta(minutes=offset)
-        if name is not None:
-            self.__name = name
-
-    def utcoffset(self, dt):
-        return self.__offset
-
-    def tzname(self, dt):
-        return self.__name
-
-    def dst(self, dt):
-        return ZERO
 
 
 # UTC time zone as a tzinfo instance.
@@ -89,7 +53,7 @@ def get_default_timezone_name():
     return _get_timezone_name(get_default_timezone())
 
 
-_active = local()
+_active = Local()
 
 
 def get_current_timezone():

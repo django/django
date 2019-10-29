@@ -15,9 +15,10 @@ class Stub:
 
 
 class WSGIRequestHandlerTestCase(SimpleTestCase):
+    request_factory = RequestFactory()
 
     def test_log_message(self):
-        request = WSGIRequest(RequestFactory().get('/').environ)
+        request = WSGIRequest(self.request_factory.get('/').environ)
         request.makefile = lambda *args, **kwargs: BytesIO()
         handler = WSGIRequestHandler(request, '192.168.0.2', None)
         level_status_codes = {
@@ -39,7 +40,7 @@ class WSGIRequestHandlerTestCase(SimpleTestCase):
                         self.assertNotEqual(cm.records[0].levelname, wrong_level.upper())
 
     def test_https(self):
-        request = WSGIRequest(RequestFactory().get('/').environ)
+        request = WSGIRequest(self.request_factory.get('/').environ)
         request.makefile = lambda *args, **kwargs: BytesIO()
 
         handler = WSGIRequestHandler(request, '192.168.0.2', None)

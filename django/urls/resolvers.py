@@ -8,18 +8,20 @@ attributes of the resolved URL match.
 import functools
 import inspect
 import re
-import threading
+import string
 from importlib import import_module
 from urllib.parse import quote
+
+from asgiref.local import Local
 
 from django.conf import settings
 from django.core.checks import Error, Warning
 from django.core.checks.urls import check_resolver
-from django.core.exceptions import ImproperlyConfigured
+from django.core.exceptions import ImproperlyConfigured, ViewDoesNotExist
 from django.utils.datastructures import MultiValueDict
 from django.utils.functional import cached_property
 from django.utils.http import RFC3986_SUBDELIMS, escape_leading_slashes
-from django.utils.regex_helper import normalize
+from django.utils.regex_helper import _lazy_re_compile, normalize
 from django.utils.translation import get_language
 
 from .converters import get_converter
@@ -28,11 +30,12 @@ from .utils import get_callable
 
 
 class ResolverMatch:
-    def __init__(self, func, args, kwargs, url_name=None, app_names=None, namespaces=None):
+    def __init__(self, func, args, kwargs, url_name=None, app_names=None, namespaces=None, route=None):
         self.func = func
         self.args = args
         self.kwargs = kwargs
         self.url_name = url_name
+        self.route = route
 
         # If a URLRegexResolver doesn't have a namespace or app_name, it passes
         # in an empty value.
@@ -55,16 +58,20 @@ class ResolverMatch:
         return (self.func, self.args, self.kwargs)[index]
 
     def __repr__(self):
-        return "ResolverMatch(func=%s, args=%s, kwargs=%s, url_name=%s, app_names=%s, namespaces=%s)" % (
+        return "ResolverMatch(func=%s, args=%s, kwargs=%s, url_name=%s, app_names=%s, namespaces=%s, route=%s)" % (
             self._func_path, self.args, self.kwargs, self.url_name,
-            self.app_names, self.namespaces,
+            self.app_names, self.namespaces, self.route,
         )
 
 
-@functools.lru_cache(maxsize=None)
 def get_resolver(urlconf=None):
     if urlconf is None:
         urlconf = settings.ROOT_URLCONF
+    return _get_cached_resolver(urlconf)
+
+
+@functools.lru_cache(maxsize=None)
+def _get_cached_resolver(urlconf=None):
     return URLResolver(RegexPattern(r'^/'), urlconf)
 
 
@@ -151,7 +158,7 @@ class RegexPattern(CheckURLMixin):
             # If there are any named groups, use those as kwargs, ignoring
             # non-named groups. Otherwise, pass all non-named arguments as
             # positional arguments.
-            kwargs = match.groupdict()
+            kwargs = {k: v for k, v in match.groupdict().items() if v is not None}
             args = () if kwargs else match.groups()
             return path[match.end():], args, kwargs
         return None
@@ -188,7 +195,7 @@ class RegexPattern(CheckURLMixin):
         return str(self._regex)
 
 
-_PATH_PARAMETER_COMPONENT_RE = re.compile(
+_PATH_PARAMETER_COMPONENT_RE = _lazy_re_compile(
     r'<(?:(?P<converter>[^>:]+):)?(?P<parameter>\w+)>'
 )
 
@@ -200,6 +207,8 @@ def _route_to_regex(route, is_endpoint=False):
     For example, 'foo/<int:pk>' returns '^foo\\/(?P<pk>[0-9]+)'
     and {'pk': <django.urls.converters.IntConverter>}.
     """
+    if not set(route).isdisjoint(string.whitespace):
+        raise ImproperlyConfigured("URL route '%s' cannot contain whitespace." % route)
     original_route = route
     parts = ['^']
     converters = {}
@@ -345,7 +354,7 @@ class URLPattern:
             new_path, args, kwargs = match
             # Pass any extra_kwargs as **kwargs.
             kwargs.update(self.default_args)
-            return ResolverMatch(self.callback, args, kwargs, self.pattern.name)
+            return ResolverMatch(self.callback, args, kwargs, self.pattern.name, route=str(self.pattern))
 
     @cached_property
     def lookup_str(self):
@@ -379,7 +388,7 @@ class URLResolver:
         # urlpatterns
         self._callback_strs = set()
         self._populated = False
-        self._local = threading.local()
+        self._local = Local()
 
     def __repr__(self):
         if isinstance(self.urlconf_name, list) and self.urlconf_name:
@@ -404,7 +413,15 @@ class URLResolver:
         # All handlers take (request, exception) arguments except handler500
         # which takes (request).
         for status_code, num_parameters in [(400, 2), (403, 2), (404, 2), (500, 1)]:
-            handler, param_dict = self.resolve_error_handler(status_code)
+            try:
+                handler, param_dict = self.resolve_error_handler(status_code)
+            except (ImportError, ViewDoesNotExist) as e:
+                path = getattr(self.urlconf_module, 'handler%s' % status_code)
+                msg = (
+                    "The custom handler{status_code} view '{path}' could not be imported."
+                ).format(status_code=status_code, path=path)
+                messages.append(Error(msg, hint=str(e), id='urls.E008'))
+                continue
             signature = inspect.signature(handler)
             args = [None] * num_parameters
             try:
@@ -503,6 +520,15 @@ class URLResolver:
             self._populate()
         return self._app_dict[language_code]
 
+    @staticmethod
+    def _join_route(route1, route2):
+        """Join two routes, without the starting ^ in the second route."""
+        if not route1:
+            return route2
+        if route2.startswith('^'):
+            route2 = route2[1:]
+        return route1 + route2
+
     def _is_callback(self, name):
         if not self._populated:
             self._populate()
@@ -534,6 +560,7 @@ class URLResolver:
                         sub_match_args = sub_match.args
                         if not sub_match_dict:
                             sub_match_args = args + sub_match.args
+                        current_route = '' if isinstance(pattern, URLPattern) else str(pattern.pattern)
                         return ResolverMatch(
                             sub_match.func,
                             sub_match_args,
@@ -541,6 +568,7 @@ class URLResolver:
                             sub_match.url_name,
                             [self.app_name] + sub_match.app_names,
                             [self.namespace] + sub_match.namespaces,
+                            self._join_route(current_route, sub_match.route),
                         )
                     tried.append([pattern])
             raise Resolver404({'tried': tried, 'path': new_path})

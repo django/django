@@ -18,6 +18,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         cx_Oracle.DATETIME: 'DateField',
         cx_Oracle.FIXED_CHAR: 'CharField',
         cx_Oracle.FIXED_NCHAR: 'CharField',
+        cx_Oracle.INTERVAL: 'DurationField',
         cx_Oracle.NATIVE_FLOAT: 'FloatField',
         cx_Oracle.NCHAR: 'CharField',
         cx_Oracle.NCLOB: 'TextField',
@@ -34,6 +35,8 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
             if scale == 0:
                 if precision > 11:
                     return 'BigAutoField' if description.is_autofield else 'BigIntegerField'
+                elif 1 < precision < 6 and description.is_autofield:
+                    return 'SmallAutoField'
                 elif precision == 1:
                     return 'BooleanField'
                 elif description.is_autofield:
@@ -47,9 +50,21 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
 
     def get_table_list(self, cursor):
         """Return a list of table and view names in the current database."""
-        cursor.execute("SELECT TABLE_NAME, 't' FROM USER_TABLES UNION ALL "
-                       "SELECT VIEW_NAME, 'v' FROM USER_VIEWS")
-        return [TableInfo(row[0].lower(), row[1]) for row in cursor.fetchall()]
+        cursor.execute("""
+            SELECT table_name, 't'
+            FROM user_tables
+            WHERE
+                NOT EXISTS (
+                    SELECT 1
+                    FROM user_mviews
+                    WHERE user_mviews.mview_name = user_tables.table_name
+                )
+            UNION ALL
+            SELECT view_name, 'v' FROM user_views
+            UNION ALL
+            SELECT mview_name, 'v' FROM user_mviews
+        """)
+        return [TableInfo(self.identifier_converter(row[0]), row[1]) for row in cursor.fetchall()]
 
     def get_table_description(self, cursor, table_name):
         """
@@ -85,13 +100,13 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
             internal_size, default, is_autofield = field_map[name]
             name = name % {}  # cx_Oracle, for some reason, doubles percent signs.
             description.append(FieldInfo(
-                name.lower(), *desc[1:3], internal_size, desc[4] or 0,
+                self.identifier_converter(name), *desc[1:3], internal_size, desc[4] or 0,
                 desc[5] or 0, *desc[6:], default, is_autofield,
             ))
         return description
 
-    def table_name_converter(self, name):
-        """Table name comparison is case insensitive under Oracle."""
+    def identifier_converter(self, name):
+        """Identifier comparison is case insensitive under Oracle."""
         return name.lower()
 
     def get_sequences(self, cursor, table_name, table_fields=()):
@@ -113,7 +128,11 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         # Oracle allows only one identity column per table.
         row = cursor.fetchone()
         if row:
-            return [{'name': row[0].lower(), 'table': table_name, 'column': row[1].lower()}]
+            return [{
+                'name': self.identifier_converter(row[0]),
+                'table': self.identifier_converter(table_name),
+                'column': self.identifier_converter(row[1]),
+            }]
         # To keep backward compatibility for AutoFields that aren't Oracle
         # identity columns.
         for f in table_fields:
@@ -135,10 +154,12 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
            user_constraints.r_constraint_name = cb.constraint_name AND
            ca.position = cb.position""", [table_name])
 
-        relations = {}
-        for row in cursor.fetchall():
-            relations[row[0].lower()] = (row[2].lower(), row[1].lower())
-        return relations
+        return {
+            self.identifier_converter(field_name): (
+                self.identifier_converter(rel_field_name),
+                self.identifier_converter(rel_table_name),
+            ) for field_name, rel_table_name, rel_field_name in cursor.fetchall()
+        }
 
     def get_key_columns(self, cursor, table_name):
         cursor.execute("""
@@ -149,8 +170,26 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
             JOIN user_cons_columns rcol
               ON rcol.constraint_name = c.r_constraint_name
             WHERE c.table_name = %s AND c.constraint_type = 'R'""", [table_name.upper()])
-        return [tuple(cell.lower() for cell in row)
-                for row in cursor.fetchall()]
+        return [
+            tuple(self.identifier_converter(cell) for cell in row)
+            for row in cursor.fetchall()
+        ]
+
+    def get_primary_key_column(self, cursor, table_name):
+        cursor.execute("""
+            SELECT
+                cols.column_name
+            FROM
+                user_constraints,
+                user_cons_columns cols
+            WHERE
+                user_constraints.constraint_name = cols.constraint_name AND
+                user_constraints.constraint_type = 'P' AND
+                user_constraints.table_name = UPPER(%s) AND
+                cols.position = 1
+        """, [table_name])
+        row = cursor.fetchone()
+        return self.identifier_converter(row[0]) if row else None
 
     def get_constraints(self, cursor, table_name):
         """
@@ -185,6 +224,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
             GROUP BY user_constraints.constraint_name, user_constraints.constraint_type
         """, [table_name])
         for constraint, columns, pk, unique, check in cursor.fetchall():
+            constraint = self.identifier_converter(constraint)
             constraints[constraint] = {
                 'columns': columns.split(','),
                 'primary_key': pk,
@@ -212,6 +252,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
             GROUP BY cons.constraint_name, rcols.table_name, rcols.column_name
         """, [table_name])
         for constraint, columns, other_table, other_column in cursor.fetchall():
+            constraint = self.identifier_converter(constraint)
             constraints[constraint] = {
                 'primary_key': False,
                 'unique': False,
@@ -239,6 +280,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
             GROUP BY ind.index_name, ind.index_type
         """, [table_name])
         for constraint, type_, columns, orders in cursor.fetchall():
+            constraint = self.identifier_converter(constraint)
             constraints[constraint] = {
                 'primary_key': False,
                 'unique': False,

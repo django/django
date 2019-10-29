@@ -59,6 +59,14 @@ class ClientTest(TestCase):
         response = self.client.get('/get_view/?var=1\ufffd')
         self.assertEqual(response.context['var'], '1\ufffd')
 
+    def test_get_data_none(self):
+        msg = (
+            "Cannot encode None for key 'value' in a query string. Did you "
+            "mean to pass an empty string or omit the value?"
+        )
+        with self.assertRaisesMessage(TypeError, msg):
+            self.client.get('/get_view/', {'value': None})
+
     def test_get_post_view(self):
         "GET a view that normally expects POSTs"
         response = self.client.get('/post_view/', {})
@@ -91,6 +99,14 @@ class ClientTest(TestCase):
         self.assertEqual(response.context['data'], '37')
         self.assertEqual(response.templates[0].name, 'POST Template')
         self.assertContains(response, 'Data received')
+
+    def test_post_data_none(self):
+        msg = (
+            "Cannot encode None for key 'value' as POST data. Did you mean "
+            "to pass an empty string or omit the value?"
+        )
+        with self.assertRaisesMessage(TypeError, msg):
+            self.client.post('/post_view/', {'value': None})
 
     def test_json_serialization(self):
         """The test client serializes JSON data."""
@@ -743,6 +759,20 @@ class ClientTest(TestCase):
         with self.assertRaises(KeyError):
             self.client.get("/broken_view/")
 
+    def test_exc_info(self):
+        client = Client(raise_request_exception=False)
+        response = client.get("/broken_view/")
+        self.assertEqual(response.status_code, 500)
+        exc_type, exc_value, exc_traceback = response.exc_info
+        self.assertIs(exc_type, KeyError)
+        self.assertIsInstance(exc_value, KeyError)
+        self.assertEqual(str(exc_value), "'Oops! Looks like you wrote some bad code.'")
+        self.assertIsNotNone(exc_traceback)
+
+    def test_exc_info_none(self):
+        response = self.client.get("/get_view/")
+        self.assertIsNone(response.exc_info)
+
     def test_mail_sending(self):
         "Mail is redirected to a dummy outbox during test setup"
         response = self.client.get('/mail_sending_view/')
@@ -799,8 +829,9 @@ class ClientTest(TestCase):
 
     def test_response_raises_multi_arg_exception(self):
         """A request may raise an exception with more than one required arg."""
-        with self.assertRaises(TwoArgException):
+        with self.assertRaises(TwoArgException) as cm:
             self.client.get('/two_arg_exception/')
+        self.assertEqual(cm.exception.args, ('one', 'two'))
 
     def test_uploading_temp_file(self):
         with tempfile.TemporaryFile() as test_file:
@@ -861,9 +892,7 @@ class RequestFactoryTest(SimpleTestCase):
         ('options', _generic_view),
         ('trace', trace_view),
     )
-
-    def setUp(self):
-        self.request_factory = RequestFactory()
+    request_factory = RequestFactory()
 
     def test_request_factory(self):
         """The request factory implements all the HTTP/1.1 methods."""

@@ -1,4 +1,6 @@
 from django.db.backends.utils import names_digest, split_identifier
+from django.db.models.query_utils import Q
+from django.db.models.sql import Query
 
 __all__ = ['Index']
 
@@ -9,9 +11,13 @@ class Index:
     # cross-database compatibility with Oracle)
     max_name_length = 30
 
-    def __init__(self, *, fields=(), name=None, db_tablespace=None, opclasses=()):
+    def __init__(self, *, fields=(), name=None, db_tablespace=None, opclasses=(), condition=None):
         if opclasses and not name:
             raise ValueError('An index must be named to use opclasses.')
+        if not isinstance(condition, (type(None), Q)):
+            raise ValueError('Index.condition must be a Q instance.')
+        if condition and not name:
+            raise ValueError('An index must be named to use condition.')
         if not isinstance(fields, (list, tuple)):
             raise ValueError('Index.fields must be a list or tuple.')
         if not isinstance(opclasses, (list, tuple)):
@@ -27,41 +33,31 @@ class Index:
             for field_name in self.fields
         ]
         self.name = name or ''
-        if self.name:
-            errors = self.check_name()
-            if len(self.name) > self.max_name_length:
-                errors.append('Index names cannot be longer than %s characters.' % self.max_name_length)
-            if errors:
-                raise ValueError(errors)
         self.db_tablespace = db_tablespace
         self.opclasses = opclasses
+        self.condition = condition
 
-    def check_name(self):
-        errors = []
-        # Name can't start with an underscore on Oracle; prepend D if needed.
-        if self.name[0] == '_':
-            errors.append('Index names cannot start with an underscore (_).')
-            self.name = 'D%s' % self.name[1:]
-        # Name can't start with a number on Oracle; prepend D if needed.
-        elif self.name[0].isdigit():
-            errors.append('Index names cannot start with a number (0-9).')
-            self.name = 'D%s' % self.name[1:]
-        return errors
+    def _get_condition_sql(self, model, schema_editor):
+        if self.condition is None:
+            return None
+        query = Query(model=model)
+        where = query.build_where(self.condition)
+        compiler = query.get_compiler(connection=schema_editor.connection)
+        sql, params = where.as_sql(compiler, schema_editor.connection)
+        return sql % tuple(schema_editor.quote_value(p) for p in params)
 
-    def create_sql(self, model, schema_editor, using=''):
+    def create_sql(self, model, schema_editor, using='', **kwargs):
         fields = [model._meta.get_field(field_name) for field_name, _ in self.fields_orders]
         col_suffixes = [order[1] for order in self.fields_orders]
+        condition = self._get_condition_sql(model, schema_editor)
         return schema_editor._create_index_sql(
             model, fields, name=self.name, using=using, db_tablespace=self.db_tablespace,
-            col_suffixes=col_suffixes, opclasses=self.opclasses,
+            col_suffixes=col_suffixes, opclasses=self.opclasses, condition=condition,
+            **kwargs,
         )
 
-    def remove_sql(self, model, schema_editor):
-        quote_name = schema_editor.quote_name
-        return schema_editor.sql_delete_index % {
-            'table': quote_name(model._meta.db_table),
-            'name': quote_name(self.name),
-        }
+    def remove_sql(self, model, schema_editor, **kwargs):
+        return schema_editor._delete_index_sql(model, self.name, **kwargs)
 
     def deconstruct(self):
         path = '%s.%s' % (self.__class__.__module__, self.__class__.__name__)
@@ -71,6 +67,8 @@ class Index:
             kwargs['db_tablespace'] = self.db_tablespace
         if self.opclasses:
             kwargs['opclasses'] = self.opclasses
+        if self.condition:
+            kwargs['condition'] = self.condition
         return (path, (), kwargs)
 
     def clone(self):
@@ -104,10 +102,16 @@ class Index:
             'Index too long for multiple database support. Is self.suffix '
             'longer than 3 characters?'
         )
-        self.check_name()
+        if self.name[0] == '_' or self.name[0].isdigit():
+            self.name = 'D%s' % self.name[1:]
 
     def __repr__(self):
-        return "<%s: fields='%s'>" % (self.__class__.__name__, ', '.join(self.fields))
+        return "<%s: fields='%s'%s>" % (
+            self.__class__.__name__, ', '.join(self.fields),
+            '' if self.condition is None else ', condition=%s' % self.condition,
+        )
 
     def __eq__(self, other):
-        return (self.__class__ == other.__class__) and (self.deconstruct() == other.deconstruct())
+        if self.__class__ == other.__class__:
+            return self.deconstruct() == other.deconstruct()
+        return NotImplemented
