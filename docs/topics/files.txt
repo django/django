@@ -39,7 +39,7 @@ the details of the attached photo::
 
     >>> car = Car.objects.get(name="57 Chevy")
     >>> car.photo
-    <ImageFieldFile: chevy.jpg>
+    <ImageFieldFile: cars/chevy.jpg>
     >>> car.photo.name
     'cars/chevy.jpg'
     >>> car.photo.path
