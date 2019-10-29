@@ -280,7 +280,8 @@ The functions defined in this module share the following properties:
 .. function:: filepath_to_uri(path)
 
     Convert a file system path to a URI portion that is suitable for inclusion
-    in a URL. The path is assumed to be either UTF-8 bytes or string.
+    in a URL. The path is assumed to be either UTF-8 bytes, string, or a
+    :class:`~pathlib.Path`.
 
     This method will encode certain characters that would normally be
     recognized as special characters for URIs.  Note that this method does not
@@ -288,6 +289,10 @@ The functions defined in this module share the following properties:
     ``encodeURIComponent()`` JavaScript function for more details.
 
     Returns an ASCII string containing the encoded result.
+
+    .. versionchanged:: 3.1
+
+        Support for :class:`pathlib.Path` ``path`` was added.
 
 .. function:: escape_uri_path(path)
 

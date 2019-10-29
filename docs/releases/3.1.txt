@@ -214,6 +214,12 @@ URLs
 
 * ...
 
+Utilities
+~~~~~~~~~
+
+* :func:`~django.utils.encoding.filepath_to_uri` now supports
+  :class:`pathlib.Path`.
+
 Validators
 ~~~~~~~~~~
 

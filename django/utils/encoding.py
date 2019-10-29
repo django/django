@@ -253,7 +253,7 @@ def filepath_to_uri(path):
         return path
     # I know about `os.sep` and `os.altsep` but I want to leave
     # some flexibility for hardcoding separators.
-    return quote(path.replace("\\", "/"), safe="/~!*()'")
+    return quote(str(path).replace("\\", "/"), safe="/~!*()'")
 
 
 def get_system_encoding():
