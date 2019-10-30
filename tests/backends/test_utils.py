@@ -1,9 +1,10 @@
 """Tests for django.db.backends.utils"""
 from decimal import Decimal, Rounded
+from unittest import mock
 
 from django.db import connection
 from django.db.backends.utils import (
-    format_number, split_identifier, truncate_name,
+    CursorDebugWrapper, format_number, split_identifier, truncate_name,
 )
 from django.db.utils import NotSupportedError
 from django.test import (
@@ -90,3 +91,23 @@ class CursorWrapperTests(TransactionTestCase):
         with self.assertRaisesMessage(NotSupportedError, msg):
             with connection.cursor() as cursor:
                 cursor.callproc('test_procedure', [], {'P_I': 1})
+
+
+class CursorDebugWrapperTests(SimpleTestCase):
+    @mock.patch('django.db.backends.utils.logger')
+    def test_debug_sql_logging(self, logger):
+        cursor = mock.Mock()
+
+        # Create a mock database instance including the wrap_database_errors context manager.
+        db = mock.MagicMock(alias='mydb', execute_wrappers=[])
+        db.wrap_database_errors.__exit__.return_value = True
+
+        wrapper = CursorDebugWrapper(cursor, db)
+        wrapper.execute(sql='SELECT 1;')
+
+        call_args = logger.debug.call_args[0]
+        self.assertTrue('; alias=' in call_args[0])
+        self.assertEqual(db.alias, call_args[4])
+
+        extra = logger.debug.call_args[1]['extra']
+        self.assertEqual(db.alias, extra['alias'])

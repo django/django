@@ -121,11 +121,12 @@ class CursorDebugWrapper(CursorWrapper):
                 'time': '%.3f' % duration,
             })
             logger.debug(
-                '(%.3f) %s; args=%s',
+                '(%.3f) %s; args=%s; alias=%s',
                 duration,
                 sql,
                 params,
-                extra={'duration': duration, 'sql': sql, 'params': params},
+                self.db.alias,
+                extra={'duration': duration, 'sql': sql, 'params': params, 'alias': self.db.alias},
             )
 
 
