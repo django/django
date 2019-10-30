@@ -379,7 +379,7 @@ GeoDjango on Windows.
 Python
 ~~~~~~
 
-:doc:`Install Python </howto/windows>`.
+:doc:`Install Python </howto/windows>` using the 32-bit package, labeled "Windows x86 executable installer".  
 
 PostgreSQL
 ~~~~~~~~~~
