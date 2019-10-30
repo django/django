@@ -10,8 +10,13 @@ from django.http import Http404
 from django.test import RequestFactory, override_settings
 from django.urls import reverse, reverse_lazy
 
-from .admin import AnswerAdmin, QuestionAdmin, ReferencedByParentAdmin, ParentWithFKAdmin
-from .models import Answer, Author, Authorship, Book, Question, ReferencedByParent, ParentWithFK
+from .admin import (
+    AnswerAdmin, ParentWithFKAdmin, QuestionAdmin, ReferencedByParentAdmin,
+)
+from .models import (
+    Answer, Author, Authorship, Book, ParentWithFK, Question,
+    ReferencedByParent,
+)
 from .tests import AdminViewBasicTestCase
 
 PAGINATOR_SIZE = AutocompleteJsonView.paginate_by
