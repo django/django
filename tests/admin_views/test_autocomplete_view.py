@@ -11,7 +11,7 @@ from django.test import RequestFactory, override_settings
 from django.urls import reverse, reverse_lazy
 
 from .admin import AnswerAdmin, QuestionAdmin, ReferencedByParentAdmin, ParentWithFKAdmin
-from .models import Answer, Author, Authorship, Book, Question, InlineReference, ReferencedByParent, ParentWithFK
+from .models import Answer, Author, Authorship, Book, Question, ReferencedByParent, ParentWithFK
 from .tests import AdminViewBasicTestCase
 
 PAGINATOR_SIZE = AutocompleteJsonView.paginate_by
@@ -78,7 +78,6 @@ class AutocompleteJsonViewTests(AdminViewBasicTestCase):
             'results': [{'id': str(p.fk), 'text': str(p.fk)}],
             'pagination': {'more': False},
         })
-
 
     def test_must_be_logged_in(self):
         response = self.client.get(self.url, {'term': ''})

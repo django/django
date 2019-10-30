@@ -1,6 +1,6 @@
+from django.contrib.admin.exceptions import DisallowedModelAdminToField
 from django.http import Http404, JsonResponse
 from django.views.generic.list import BaseListView
-from django.contrib.admin.exceptions import DisallowedModelAdminToField
 
 
 class AutocompleteJsonView(BaseListView):

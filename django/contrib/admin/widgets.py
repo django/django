@@ -435,7 +435,8 @@ class AutocompleteMixin:
             default[1].append(self.create_option(name, '', '', False, 0))
         choices = (
             (getattr(obj, self.to_field) if self.to_field else obj.pk, self.choices.field.label_from_instance(obj))
-            for obj in self.choices.queryset.using(self.db).filter(**{ (self.to_field if self.to_field else 'pk') + '__in':selected_choices})
+            for obj in self.choices.queryset.using(self.db).filter(**{
+                (self.to_field if self.to_field else 'pk') + '__in': selected_choices})
         )
         for option_value, option_label in choices:
             selected = (

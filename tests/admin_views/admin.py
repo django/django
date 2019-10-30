@@ -652,17 +652,21 @@ class PluggableSearchPersonAdmin(admin.ModelAdmin):
 class AlbumAdmin(admin.ModelAdmin):
     list_filter = ['title']
 
+
 class QuestionAdmin(admin.ModelAdmin):
     ordering = ['-posted']
     search_fields = ['question']
     autocomplete_fields = ['related_questions']
 
+
 class ReferencedByParentAdmin(admin.ModelAdmin):
     search_fields = ['name']
+
 
 class ParentWithFKAdmin(admin.ModelAdmin):
     search_fields = ['fk__name']
     autocomplete_fields = ['fk']
+
 
 class AnswerAdmin(admin.ModelAdmin):
     autocomplete_fields = ['question']
