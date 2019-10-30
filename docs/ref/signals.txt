@@ -29,7 +29,7 @@ model system.
     override in your own code.
 
     If you override these methods on your model, you must call the parent class'
-    methods for this signals to be sent.
+    methods for these signals to be sent.
 
     Note also that Django stores signal handlers as weak references by default,
     so if your handler is a local function, it may be garbage collected.  To
