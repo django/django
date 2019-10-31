@@ -279,6 +279,9 @@ Miscellaneous
 * ``django.utils.decorators.classproperty()`` decorator is moved to
   ``django.utils.functional.classproperty()``.
 
+* :tfilter:`floatformat` template filter now outputs (positive) ``0`` for
+  negative numbers which round to zero.
+
 .. _deprecated-features-3.1:
 
 Features deprecated in 3.1

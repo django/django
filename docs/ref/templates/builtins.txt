@@ -1722,6 +1722,11 @@ displayed. For example:
 Using ``floatformat`` with no argument is equivalent to using ``floatformat``
 with an argument of ``-1``.
 
+.. versionchanged:: 3.1
+
+    In older versions, a negative zero ``-0`` was returned for negative numbers
+    which round to zero.
+
 .. templatefilter:: force_escape
 
 ``force_escape``
