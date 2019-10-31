@@ -241,10 +241,10 @@ class Field(RegisterLookupMixin):
         if not self.choices:
             return []
 
-        def is_value(value, accept_promise=True):
-            return isinstance(value, (str, Promise) if accept_promise else str) or not is_iterable(value)
+        def is_value(value):
+            return isinstance(value, (str, Promise)) or not is_iterable(value)
 
-        if is_value(self.choices, accept_promise=False):
+        if not is_iterable(self.choices) or isinstance(self.choices, str):
             return [
                 checks.Error(
                     "'choices' must be an iterable (e.g., a list or tuple).",
