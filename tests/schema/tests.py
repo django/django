@@ -2587,6 +2587,7 @@ class SchemaTests(TransactionTestCase):
                     "columns": editor.quote_name(column),
                     "extra": "",
                     "condition": "",
+                    "include": "",
                 }
             )
             self.assertIn(expected_constraint_name, self.get_constraints(model._meta.db_table))

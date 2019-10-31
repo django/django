@@ -81,6 +81,23 @@ class UniqueConstraintDeferrable(models.Model):
         ]
 
 
+class UniqueConstraintInclude(models.Model):
+    name = models.CharField(max_length=255)
+    color = models.CharField(max_length=32, null=True)
+
+    class Meta:
+        required_db_features = {
+            'supports_table_check_constraints',
+        }
+        constraints = [
+            models.UniqueConstraint(
+                fields=['name'],
+                name='name_include_color_uniq',
+                include=['color'],
+            ),
+        ]
+
+
 class AbstractModel(models.Model):
     age = models.IntegerField()
 

@@ -84,8 +84,8 @@ class BaseDatabaseSchemaEditor:
     sql_create_column_inline_fk = None
     sql_delete_fk = sql_delete_constraint
 
-    sql_create_index = "CREATE INDEX %(name)s ON %(table)s (%(columns)s)%(extra)s%(condition)s"
-    sql_create_unique_index = "CREATE UNIQUE INDEX %(name)s ON %(table)s (%(columns)s)%(condition)s"
+    sql_create_index = "CREATE INDEX %(name)s ON %(table)s (%(columns)s)%(include)s%(extra)s%(condition)s"
+    sql_create_unique_index = "CREATE UNIQUE INDEX %(name)s ON %(table)s (%(columns)s)%(include)s%(condition)s"
     sql_delete_index = "DROP INDEX %(name)s"
 
     sql_create_pk = "ALTER TABLE %(table)s ADD CONSTRAINT %(name)s PRIMARY KEY (%(columns)s)"
@@ -956,9 +956,17 @@ class BaseDatabaseSchemaEditor:
             return ' WHERE ' + condition
         return ''
 
+    def _index_include_sql(self, model, columns):
+        if not columns or not self.connection.features.supports_covering_indexes:
+            return ''
+        return Statement(
+            ' INCLUDE (%(columns)s)',
+            columns=Columns(model._meta.db_table, columns, self.quote_name),
+        )
+
     def _create_index_sql(self, model, fields, *, name=None, suffix='', using='',
                           db_tablespace=None, col_suffixes=(), sql=None, opclasses=(),
-                          condition=None):
+                          condition=None, include=None):
         """
         Return the SQL statement to create the index for one or several fields.
         `sql` can be specified if the syntax differs from the standard (GIS
@@ -983,6 +991,7 @@ class BaseDatabaseSchemaEditor:
             columns=self._index_columns(table, columns, col_suffixes, opclasses),
             extra=tablespace_sql,
             condition=self._index_condition_sql(condition),
+            include=self._index_include_sql(model, include),
         )
 
     def _delete_index_sql(self, model, name, sql=None):
@@ -1083,16 +1092,22 @@ class BaseDatabaseSchemaEditor:
         if deferrable == Deferrable.IMMEDIATE:
             return ' DEFERRABLE INITIALLY IMMEDIATE'
 
-    def _unique_sql(self, model, fields, name, condition=None, deferrable=None):
+    def _unique_sql(self, model, fields, name, condition=None, deferrable=None, include=None):
         if (
             deferrable and
             not self.connection.features.supports_deferrable_unique_constraints
         ):
             return None
-        if condition:
-            # Databases support conditional unique constraints via a unique
-            # index.
-            sql = self._create_unique_sql(model, fields, name=name, condition=condition)
+        if condition or include:
+            # Databases support conditional and covering unique constraints via
+            # a unique index.
+            sql = self._create_unique_sql(
+                model,
+                fields,
+                name=name,
+                condition=condition,
+                include=include,
+            )
             if sql:
                 self.deferred_sql.append(sql)
             return None
@@ -1105,10 +1120,14 @@ class BaseDatabaseSchemaEditor:
             'constraint': constraint,
         }
 
-    def _create_unique_sql(self, model, columns, name=None, condition=None, deferrable=None):
+    def _create_unique_sql(self, model, columns, name=None, condition=None, deferrable=None, include=None):
         if (
-            deferrable and
-            not self.connection.features.supports_deferrable_unique_constraints
+            (
+                deferrable and
+                not self.connection.features.supports_deferrable_unique_constraints
+            ) or
+            (condition and not self.connection.features.supports_partial_indexes) or
+            (include and not self.connection.features.supports_covering_indexes)
         ):
             return None
 
@@ -1121,9 +1140,7 @@ class BaseDatabaseSchemaEditor:
         else:
             name = self.quote_name(name)
         columns = Columns(table, columns, self.quote_name)
-        if condition:
-            if not self.connection.features.supports_partial_indexes:
-                return None
+        if condition or include:
             sql = self.sql_create_unique_index
         else:
             sql = self.sql_create_unique
@@ -1134,20 +1151,24 @@ class BaseDatabaseSchemaEditor:
             columns=columns,
             condition=self._index_condition_sql(condition),
             deferrable=self._deferrable_constraint_sql(deferrable),
+            include=self._index_include_sql(model, include),
         )
 
-    def _delete_unique_sql(self, model, name, condition=None, deferrable=None):
+    def _delete_unique_sql(self, model, name, condition=None, deferrable=None, include=None):
         if (
-            deferrable and
-            not self.connection.features.supports_deferrable_unique_constraints
+            (
+                deferrable and
+                not self.connection.features.supports_deferrable_unique_constraints
+            ) or
+            (condition and not self.connection.features.supports_partial_indexes) or
+            (include and not self.connection.features.supports_covering_indexes)
         ):
             return None
-        if condition:
-            return (
-                self._delete_constraint_sql(self.sql_delete_index, model, name)
-                if self.connection.features.supports_partial_indexes else None
-            )
-        return self._delete_constraint_sql(self.sql_delete_unique, model, name)
+        if condition or include:
+            sql = self.sql_delete_index
+        else:
+            sql = self.sql_delete_unique
+        return self._delete_constraint_sql(sql, model, name)
 
     def _check_sql(self, name, check):
         return self.sql_constraint % {

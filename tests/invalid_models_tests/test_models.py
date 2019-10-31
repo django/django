@@ -375,6 +375,78 @@ class IndexesTests(TestCase):
 
         self.assertEqual(Model.check(databases=self.databases), [])
 
+    def test_index_include_pointing_to_missing_field(self):
+        class Model(models.Model):
+            class Meta:
+                indexes = [
+                    models.Index(fields=['id'], include=['missing_field'], name='name'),
+                ]
+
+        self.assertEqual(Model.check(databases=self.databases), [
+            Error(
+                "'indexes' refers to the nonexistent field 'missing_field'.",
+                obj=Model,
+                id='models.E012',
+            ),
+        ])
+
+    def test_index_include_pointing_to_m2m_field(self):
+        class Model(models.Model):
+            m2m = models.ManyToManyField('self')
+
+            class Meta:
+                indexes = [models.Index(fields=['id'], include=['m2m'], name='name')]
+
+        self.assertEqual(Model.check(databases=self.databases), [
+            Error(
+                "'indexes' refers to a ManyToManyField 'm2m', but "
+                "ManyToManyFields are not permitted in 'indexes'.",
+                obj=Model,
+                id='models.E013',
+            ),
+        ])
+
+    def test_index_include_pointing_to_non_local_field(self):
+        class Parent(models.Model):
+            field1 = models.IntegerField()
+
+        class Child(Parent):
+            field2 = models.IntegerField()
+
+            class Meta:
+                indexes = [
+                    models.Index(fields=['field2'], include=['field1'], name='name'),
+                ]
+
+        self.assertEqual(Child.check(databases=self.databases), [
+            Error(
+                "'indexes' refers to field 'field1' which is not local to "
+                "model 'Child'.",
+                hint='This issue may be caused by multi-table inheritance.',
+                obj=Child,
+                id='models.E016',
+            ),
+        ])
+
+    def test_index_include_pointing_to_fk(self):
+        class Target(models.Model):
+            pass
+
+        class Model(models.Model):
+            fk_1 = models.ForeignKey(Target, models.CASCADE, related_name='target_1')
+            fk_2 = models.ForeignKey(Target, models.CASCADE, related_name='target_2')
+
+            class Meta:
+                constraints = [
+                    models.Index(
+                        fields=['id'],
+                        include=['fk_1_id', 'fk_2'],
+                        name='name',
+                    ),
+                ]
+
+        self.assertEqual(Model.check(databases=self.databases), [])
+
 
 @isolate_apps('invalid_models_tests')
 class FieldNamesTests(TestCase):
@@ -1565,6 +1637,93 @@ class ConstraintsTests(TestCase):
             class Meta:
                 constraints = [
                     models.UniqueConstraint(fields=['fk_1_id', 'fk_2'], name='name'),
+                ]
+
+        self.assertEqual(Model.check(databases=self.databases), [])
+
+    def test_unique_constraint_include_pointing_to_missing_field(self):
+        class Model(models.Model):
+            class Meta:
+                constraints = [
+                    models.UniqueConstraint(
+                        fields=['id'],
+                        include=['missing_field'],
+                        name='name',
+                    ),
+                ]
+
+        self.assertEqual(Model.check(databases=self.databases), [
+            Error(
+                "'constraints' refers to the nonexistent field "
+                "'missing_field'.",
+                obj=Model,
+                id='models.E012',
+            ),
+        ])
+
+    def test_unique_constraint_include_pointing_to_m2m_field(self):
+        class Model(models.Model):
+            m2m = models.ManyToManyField('self')
+
+            class Meta:
+                constraints = [
+                    models.UniqueConstraint(
+                        fields=['id'],
+                        include=['m2m'],
+                        name='name',
+                    ),
+                ]
+
+        self.assertEqual(Model.check(databases=self.databases), [
+            Error(
+                "'constraints' refers to a ManyToManyField 'm2m', but "
+                "ManyToManyFields are not permitted in 'constraints'.",
+                obj=Model,
+                id='models.E013',
+            ),
+        ])
+
+    def test_unique_constraint_include_pointing_to_non_local_field(self):
+        class Parent(models.Model):
+            field1 = models.IntegerField()
+
+        class Child(Parent):
+            field2 = models.IntegerField()
+
+            class Meta:
+                constraints = [
+                    models.UniqueConstraint(
+                        fields=['field2'],
+                        include=['field1'],
+                        name='name',
+                    ),
+                ]
+
+        self.assertEqual(Child.check(databases=self.databases), [
+            Error(
+                "'constraints' refers to field 'field1' which is not local to "
+                "model 'Child'.",
+                hint='This issue may be caused by multi-table inheritance.',
+                obj=Child,
+                id='models.E016',
+            ),
+        ])
+
+    def test_unique_constraint_include_pointing_to_fk(self):
+        class Target(models.Model):
+            pass
+
+        class Model(models.Model):
+            fk_1 = models.ForeignKey(Target, models.CASCADE, related_name='target_1')
+            fk_2 = models.ForeignKey(Target, models.CASCADE, related_name='target_2')
+
+            class Meta:
+                constraints = [
+                    models.UniqueConstraint(
+                        fields=['id'],
+                        include=['fk_1_id', 'fk_2'],
+                        name='name',
+                    ),
                 ]
 
         self.assertEqual(Model.check(databases=self.databases), [])

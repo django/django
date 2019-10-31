@@ -11,7 +11,7 @@ from django.test import skipUnlessDBFeature
 from django.test.utils import register_lookup
 
 from . import PostgreSQLSimpleTestCase, PostgreSQLTestCase
-from .models import CharFieldModel, IntegerArrayModel
+from .models import CharFieldModel, IntegerArrayModel, Scene
 
 
 class IndexTestMixin:
@@ -372,6 +372,33 @@ class SchemaTests(PostgreSQLTestCase):
         with connection.schema_editor() as editor:
             editor.remove_index(CharFieldModel, index)
         self.assertNotIn(index_name, self.get_constraints(CharFieldModel._meta.db_table))
+
+    @skipUnlessDBFeature('supports_covering_gist_indexes')
+    def test_gist_include(self):
+        index_name = 'scene_gist_include_setting'
+        index = GistIndex(name=index_name, fields=['scene'], include=['setting'])
+        with connection.schema_editor() as editor:
+            editor.add_index(Scene, index)
+        constraints = self.get_constraints(Scene._meta.db_table)
+        self.assertIn(index_name, constraints)
+        self.assertEqual(constraints[index_name]['type'], GistIndex.suffix)
+        self.assertEqual(constraints[index_name]['columns'], ['scene', 'setting'])
+        with connection.schema_editor() as editor:
+            editor.remove_index(Scene, index)
+        self.assertNotIn(index_name, self.get_constraints(Scene._meta.db_table))
+
+    def test_gist_include_not_supported(self):
+        index_name = 'gist_include_exception'
+        index = GistIndex(fields=['scene'], name=index_name, include=['setting'])
+        msg = 'Covering GiST indexes requires PostgreSQL 12+.'
+        with self.assertRaisesMessage(NotSupportedError, msg):
+            with mock.patch(
+                'django.db.backends.postgresql.features.DatabaseFeatures.supports_covering_gist_indexes',
+                False,
+            ):
+                with connection.schema_editor() as editor:
+                    editor.add_index(Scene, index)
+        self.assertNotIn(index_name, self.get_constraints(Scene._meta.db_table))
 
     def test_hash_index(self):
         # Ensure the table is there and doesn't have an index.

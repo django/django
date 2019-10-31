@@ -448,6 +448,48 @@ class OperationTests(OperationTestBase):
             [deferred_unique_constraint],
         )
 
+    @skipUnlessDBFeature('supports_covering_indexes')
+    def test_create_model_with_covering_unique_constraint(self):
+        covering_unique_constraint = models.UniqueConstraint(
+            fields=['pink'],
+            include=['weight'],
+            name='test_constraint_pony_pink_covering_weight',
+        )
+        operation = migrations.CreateModel(
+            'Pony',
+            [
+                ('id', models.AutoField(primary_key=True)),
+                ('pink', models.IntegerField(default=3)),
+                ('weight', models.FloatField()),
+            ],
+            options={'constraints': [covering_unique_constraint]},
+        )
+        project_state = ProjectState()
+        new_state = project_state.clone()
+        operation.state_forwards('test_crmo', new_state)
+        self.assertEqual(len(new_state.models['test_crmo', 'pony'].options['constraints']), 1)
+        self.assertTableNotExists('test_crmo_pony')
+        # Create table.
+        with connection.schema_editor() as editor:
+            operation.database_forwards('test_crmo', editor, project_state, new_state)
+        self.assertTableExists('test_crmo_pony')
+        Pony = new_state.apps.get_model('test_crmo', 'Pony')
+        Pony.objects.create(pink=1, weight=4.0)
+        with self.assertRaises(IntegrityError):
+            Pony.objects.create(pink=1, weight=7.0)
+        # Reversal.
+        with connection.schema_editor() as editor:
+            operation.database_backwards('test_crmo', editor, new_state, project_state)
+        self.assertTableNotExists('test_crmo_pony')
+        # Deconstruction.
+        definition = operation.deconstruct()
+        self.assertEqual(definition[0], 'CreateModel')
+        self.assertEqual(definition[1], [])
+        self.assertEqual(
+            definition[2]['options']['constraints'],
+            [covering_unique_constraint],
+        )
+
     def test_create_model_managers(self):
         """
         The managers on a model are set.
@@ -2234,6 +2276,88 @@ class OperationTests(OperationTestBase):
         self.assertEqual(definition[2], {
             'model_name': 'Pony',
             'name': 'deferred_pink_constraint_rm',
+        })
+
+    def test_add_covering_unique_constraint(self):
+        app_label = 'test_addcovering_uc'
+        project_state = self.set_up_test_model(app_label)
+        covering_unique_constraint = models.UniqueConstraint(
+            fields=['pink'],
+            name='covering_pink_constraint_add',
+            include=['weight'],
+        )
+        operation = migrations.AddConstraint('Pony', covering_unique_constraint)
+        self.assertEqual(
+            operation.describe(),
+            'Create constraint covering_pink_constraint_add on model Pony',
+        )
+        # Add constraint.
+        new_state = project_state.clone()
+        operation.state_forwards(app_label, new_state)
+        self.assertEqual(len(new_state.models[app_label, 'pony'].options['constraints']), 1)
+        Pony = new_state.apps.get_model(app_label, 'Pony')
+        self.assertEqual(len(Pony._meta.constraints), 1)
+        with connection.schema_editor() as editor:
+            operation.database_forwards(app_label, editor, project_state, new_state)
+        Pony.objects.create(pink=1, weight=4.0)
+        if connection.features.supports_covering_indexes:
+            with self.assertRaises(IntegrityError):
+                Pony.objects.create(pink=1, weight=4.0)
+        else:
+            Pony.objects.create(pink=1, weight=4.0)
+        # Reversal.
+        with connection.schema_editor() as editor:
+            operation.database_backwards(app_label, editor, new_state, project_state)
+        # Constraint doesn't work.
+        Pony.objects.create(pink=1, weight=4.0)
+        # Deconstruction.
+        definition = operation.deconstruct()
+        self.assertEqual(definition[0], 'AddConstraint')
+        self.assertEqual(definition[1], [])
+        self.assertEqual(
+            definition[2],
+            {'model_name': 'Pony', 'constraint': covering_unique_constraint},
+        )
+
+    def test_remove_covering_unique_constraint(self):
+        app_label = 'test_removecovering_uc'
+        covering_unique_constraint = models.UniqueConstraint(
+            fields=['pink'],
+            name='covering_pink_constraint_rm',
+            include=['weight'],
+        )
+        project_state = self.set_up_test_model(app_label, constraints=[covering_unique_constraint])
+        operation = migrations.RemoveConstraint('Pony', covering_unique_constraint.name)
+        self.assertEqual(
+            operation.describe(),
+            'Remove constraint covering_pink_constraint_rm from model Pony',
+        )
+        # Remove constraint.
+        new_state = project_state.clone()
+        operation.state_forwards(app_label, new_state)
+        self.assertEqual(len(new_state.models[app_label, 'pony'].options['constraints']), 0)
+        Pony = new_state.apps.get_model(app_label, 'Pony')
+        self.assertEqual(len(Pony._meta.constraints), 0)
+        with connection.schema_editor() as editor:
+            operation.database_forwards(app_label, editor, project_state, new_state)
+        # Constraint doesn't work.
+        Pony.objects.create(pink=1, weight=4.0)
+        Pony.objects.create(pink=1, weight=4.0).delete()
+        # Reversal.
+        with connection.schema_editor() as editor:
+            operation.database_backwards(app_label, editor, new_state, project_state)
+        if connection.features.supports_covering_indexes:
+            with self.assertRaises(IntegrityError):
+                Pony.objects.create(pink=1, weight=4.0)
+        else:
+            Pony.objects.create(pink=1, weight=4.0)
+        # Deconstruction.
+        definition = operation.deconstruct()
+        self.assertEqual(definition[0], 'RemoveConstraint')
+        self.assertEqual(definition[1], [])
+        self.assertEqual(definition[2], {
+            'model_name': 'Pony',
+            'name': 'covering_pink_constraint_rm',
         })
 
     def test_alter_model_options(self):

@@ -77,7 +77,7 @@ class Deferrable(Enum):
 
 
 class UniqueConstraint(BaseConstraint):
-    def __init__(self, *, fields, name, condition=None, deferrable=None):
+    def __init__(self, *, fields, name, condition=None, deferrable=None, include=None):
         if not fields:
             raise ValueError('At least one field is required to define a unique constraint.')
         if not isinstance(condition, (type(None), Q)):
@@ -90,9 +90,12 @@ class UniqueConstraint(BaseConstraint):
             raise ValueError(
                 'UniqueConstraint.deferrable must be a Deferrable instance.'
             )
+        if not isinstance(include, (type(None), list, tuple)):
+            raise ValueError('UniqueConstraint.include must be a list or tuple.')
         self.fields = tuple(fields)
         self.condition = condition
         self.deferrable = deferrable
+        self.include = tuple(include) if include else ()
         super().__init__(name)
 
     def _get_condition_sql(self, model, schema_editor):
@@ -106,31 +109,36 @@ class UniqueConstraint(BaseConstraint):
 
     def constraint_sql(self, model, schema_editor):
         fields = [model._meta.get_field(field_name).column for field_name in self.fields]
+        include = [model._meta.get_field(field_name).column for field_name in self.include]
         condition = self._get_condition_sql(model, schema_editor)
         return schema_editor._unique_sql(
             model, fields, self.name, condition=condition,
-            deferrable=self.deferrable,
+            deferrable=self.deferrable, include=include,
         )
 
     def create_sql(self, model, schema_editor):
         fields = [model._meta.get_field(field_name).column for field_name in self.fields]
+        include = [model._meta.get_field(field_name).column for field_name in self.include]
         condition = self._get_condition_sql(model, schema_editor)
         return schema_editor._create_unique_sql(
             model, fields, self.name, condition=condition,
-            deferrable=self.deferrable,
+            deferrable=self.deferrable, include=include,
         )
 
     def remove_sql(self, model, schema_editor):
         condition = self._get_condition_sql(model, schema_editor)
+        include = [model._meta.get_field(field_name).column for field_name in self.include]
         return schema_editor._delete_unique_sql(
             model, self.name, condition=condition, deferrable=self.deferrable,
+            include=include,
         )
 
     def __repr__(self):
-        return '<%s: fields=%r name=%r%s%s>' % (
+        return '<%s: fields=%r name=%r%s%s%s>' % (
             self.__class__.__name__, self.fields, self.name,
             '' if self.condition is None else ' condition=%s' % self.condition,
             '' if self.deferrable is None else ' deferrable=%s' % self.deferrable,
+            '' if not self.include else ' include=%s' % repr(self.include),
         )
 
     def __eq__(self, other):
@@ -139,7 +147,8 @@ class UniqueConstraint(BaseConstraint):
                 self.name == other.name and
                 self.fields == other.fields and
                 self.condition == other.condition and
-                self.deferrable == other.deferrable
+                self.deferrable == other.deferrable and
+                self.include == other.include
             )
         return super().__eq__(other)
 
@@ -150,4 +159,6 @@ class UniqueConstraint(BaseConstraint):
             kwargs['condition'] = self.condition
         if self.deferrable:
             kwargs['deferrable'] = self.deferrable
+        if self.include:
+            kwargs['include'] = self.include
         return path, args, kwargs

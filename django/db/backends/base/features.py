@@ -277,6 +277,8 @@ class BaseDatabaseFeatures:
     # Does the backend support partial indexes (CREATE INDEX ... WHERE ...)?
     supports_partial_indexes = True
     supports_functions_in_partial_indexes = True
+    # Does the backend support covering indexes (CREATE INDEX ... INCLUDE ...)?
+    supports_covering_indexes = False
 
     # Does the database allow more than one constraint or index on the same
     # field(s)?

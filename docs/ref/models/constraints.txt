@@ -73,7 +73,7 @@ constraint.
 ``UniqueConstraint``
 ====================
 
-.. class:: UniqueConstraint(*, fields, name, condition=None, deferrable=None)
+.. class:: UniqueConstraint(*, fields, name, condition=None, deferrable=None, include=None)
 
     Creates a unique constraint in the database.
 
@@ -145,3 +145,26 @@ enforced immediately after every command.
 
     Deferred unique constraints may lead to a `performance penalty
     <https://www.postgresql.org/docs/current/sql-createtable.html#id-1.9.3.85.9.4>`_.
+
+``include``
+-----------
+
+.. attribute:: UniqueConstraint.include
+
+.. versionadded:: 3.2
+
+A list or tuple of the names of the fields to be included in the covering
+unique index as non-key columns. This allows index-only scans to be used for
+queries that select only included fields (:attr:`~UniqueConstraint.include`)
+and filter only by unique fields (:attr:`~UniqueConstraint.fields`).
+
+For example::
+
+    UniqueConstraint(name='unique_booking', fields=['room', 'date'], include=['full_name'])
+
+will allow filtering on ``room`` and ``date``, also selecting ``full_name``,
+while fetching data only from the index.
+
+``include`` is supported only on PostgreSQL.
+
+Non-key columns have the same database restrictions as :attr:`Index.include`.

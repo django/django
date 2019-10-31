@@ -1633,6 +1633,7 @@ class Model(metaclass=ModelBase):
                     )
                 )
         fields = [field for index in cls._meta.indexes for field, _ in index.fields_orders]
+        fields += [include for index in cls._meta.indexes for include in index.include]
         errors.extend(cls._check_local_fields(fields, 'indexes'))
         return errors
 
@@ -1926,10 +1927,9 @@ class Model(metaclass=ModelBase):
                         id='models.W038',
                     )
                 )
-            fields = (
-                field
+            fields = chain.from_iterable(
+                (*constraint.fields, *constraint.include)
                 for constraint in cls._meta.constraints if isinstance(constraint, UniqueConstraint)
-                for field in constraint.fields
             )
             errors.extend(cls._check_local_fields(fields, 'constraints'))
         return errors
