@@ -237,12 +237,13 @@ class Field(RegisterLookupMixin):
         else:
             return []
 
+    @classmethod
+    def _choices_is_value(cls, value):
+        return isinstance(value, (str, Promise)) or not is_iterable(value)
+
     def _check_choices(self):
         if not self.choices:
             return []
-
-        def is_value(value):
-            return isinstance(value, (str, Promise)) or not is_iterable(value)
 
         if not is_iterable(self.choices) or isinstance(self.choices, str):
             return [
@@ -263,7 +264,7 @@ class Field(RegisterLookupMixin):
                 break
             try:
                 if not all(
-                    is_value(value) and is_value(human_name)
+                    self._choices_is_value(value) and self._choices_is_value(human_name)
                     for value, human_name in group_choices
                 ):
                     break
@@ -275,7 +276,7 @@ class Field(RegisterLookupMixin):
             except (TypeError, ValueError):
                 # No groups, choices in the form [value, display]
                 value, human_name = group_name, group_choices
-                if not is_value(value) or not is_value(human_name):
+                if not self._choices_is_value(value) or not self._choices_is_value(human_name):
                     break
                 if self.max_length is not None and isinstance(value, str):
                     choice_max_length = max(choice_max_length, len(value))
