@@ -887,7 +887,7 @@ It also provides an additional method:
     mentioned above, the proper way to test this is to use the
     :class:`~django.test.TransactionTestCase`. However, should it be required
     to trigger :func:`~django.db.transaction.on_commit` in a
-    :class:`~django.test.TestCase` tests, one possible solution is to add
+    :class:`~django.test.TestCase` test, one possible solution is to add
     a context manager as follows::
 
         @contextmanager
