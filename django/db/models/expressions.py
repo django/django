@@ -1156,7 +1156,7 @@ class OrderBy(BaseExpression):
     def as_mysql(self, compiler, connection):
         template = None
         if self.nulls_last:
-            template = 'IF(ISNULL(%(expression)s),1,0), %(expression)s %(ordering)s '
+            template = 'ISNULL(%(expression)s), %(expression)s %(ordering)s '
         elif self.nulls_first:
             template = 'IF(ISNULL(%(expression)s),0,1), %(expression)s %(ordering)s '
         return self.as_sql(compiler, connection, template=template)
