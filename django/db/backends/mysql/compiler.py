@@ -15,7 +15,7 @@ class SQLInsertCompiler(compiler.SQLInsertCompiler, SQLCompiler):
 
 class SQLDeleteCompiler(compiler.SQLDeleteCompiler, SQLCompiler):
     def as_sql(self):
-        if self.single_alias:
+        if self.connection.features.update_can_self_select or self.single_alias:
             return super().as_sql()
         # MySQL and MariaDB < 10.3.2 doesn't support deletion with a subquery
         # which is what the default implementation of SQLDeleteCompiler uses
