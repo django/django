@@ -7,6 +7,7 @@ import time
 import unittest
 from datetime import datetime, timedelta
 from io import StringIO
+from pathlib import Path
 from urllib.request import urlopen
 
 from django.core.cache import cache
@@ -371,13 +372,14 @@ class FileStorageTests(SimpleTestCase):
         self.storage.save('storage_test_2', ContentFile('custom content'))
         os.mkdir(os.path.join(self.temp_dir, 'storage_dir_1'))
 
-        dirs, files = self.storage.listdir('')
-        self.assertEqual(set(dirs), {'storage_dir_1'})
-        self.assertEqual(set(files), {'storage_test_1', 'storage_test_2'})
+        self.addCleanup(self.storage.delete, 'storage_test_1')
+        self.addCleanup(self.storage.delete, 'storage_test_2')
 
-        self.storage.delete('storage_test_1')
-        self.storage.delete('storage_test_2')
-        os.rmdir(os.path.join(self.temp_dir, 'storage_dir_1'))
+        for directory in ('', Path('')):
+            with self.subTest(directory=directory):
+                dirs, files = self.storage.listdir(directory)
+                self.assertEqual(set(dirs), {'storage_dir_1'})
+                self.assertEqual(set(files), {'storage_test_1', 'storage_test_2'})
 
     def test_file_storage_prevents_directory_traversal(self):
         """
@@ -538,6 +540,19 @@ class FileStorageTests(SimpleTestCase):
             self.assertEqual(
                 defaults_storage.directory_permissions_mode, settings['FILE_UPLOAD_DIRECTORY_PERMISSIONS']
             )
+
+    def test_file_methods_pathlib_path(self):
+        p = Path('test.file')
+        self.assertFalse(self.storage.exists(p))
+        f = ContentFile('custom contents')
+        f_name = self.storage.save(str(p), f)
+        # Storage basic methods.
+        self.assertEqual(self.storage.path(p), os.path.join(self.temp_dir, p))
+        self.assertEqual(self.storage.size(p), 15)
+        self.assertEqual(self.storage.url(p), self.storage.base_url + f_name)
+        with self.storage.open(p) as f:
+            self.assertEqual(f.read(), b'custom contents')
+        self.addCleanup(self.storage.delete, p)
 
 
 class CustomStorage(FileSystemStorage):
