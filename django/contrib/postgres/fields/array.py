@@ -46,6 +46,10 @@ class ArrayField(CheckFieldDefaultMixin, Field):
         self.__dict__['model'] = model
         self.base_field.model = model
 
+    @classmethod
+    def _choices_is_value(cls, value):
+        return isinstance(value, (list, tuple)) or super()._choices_is_value(value)
+
     def check(self, **kwargs):
         errors = super().check(**kwargs)
         if self.base_field.remote_field:

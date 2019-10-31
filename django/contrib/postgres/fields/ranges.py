@@ -60,6 +60,10 @@ class RangeField(models.Field):
         self.__dict__['model'] = model
         self.base_field.model = model
 
+    @classmethod
+    def _choices_is_value(cls, value):
+        return isinstance(value, (list, tuple)) or super()._choices_is_value(value)
+
     def get_prep_value(self, value):
         if value is None:
             return None

@@ -10,7 +10,7 @@ from django.test import override_settings
 from django.utils import timezone
 
 from . import PostgreSQLSimpleTestCase, PostgreSQLTestCase
-from .models import RangeLookupsModel, RangesModel
+from .models import PostgreSQLModel, RangeLookupsModel, RangesModel
 
 try:
     from psycopg2.extras import DateRange, DateTimeTZRange, NumericRange
@@ -411,6 +411,18 @@ class TestSerialization(PostgreSQLSimpleTestCase):
         data = serializers.serialize('json', [instance])
         new_instance = list(serializers.deserialize('json', data))[0].object
         self.assertEqual(new_instance.ints, NumericRange(10, None))
+
+
+class TestChecks(PostgreSQLSimpleTestCase):
+    def test_choices_tuple_list(self):
+        class Model(PostgreSQLModel):
+            field = pg_fields.IntegerRangeField(
+                choices=[
+                    ['1-50', [((1, 25), '1-25'), ([26, 50], '26-50')]],
+                    ((51, 100), '51-100'),
+                ],
+            )
+        self.assertEqual(Model._meta.get_field('field').check(), [])
 
 
 class TestValidators(PostgreSQLSimpleTestCase):
