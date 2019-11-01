@@ -31,7 +31,7 @@ register = Library()
 
 def autoescape_aware(func):
     """
-    Decorator for filters which should escape automatically escape text based
+    Decorator for filters which should automatically escape text based
     on whether or not autoescape is True.
     """
     def _dec(*args, **kwargs):
