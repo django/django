@@ -31,6 +31,7 @@ try:
     from django.contrib.postgres.forms import (
         SimpleArrayField, SplitArrayField, SplitArrayWidget,
     )
+    from django.db.backends.postgresql.base import PSYCOPG2_VERSION
     from psycopg2.extras import NumericRange
 except ImportError:
     pass
@@ -139,6 +140,14 @@ class TestSaveLoad(PostgreSQLTestCase):
         field = instance._meta.get_field('field')
         self.assertEqual(field.model, IntegerArrayModel)
         self.assertEqual(field.base_field.model, IntegerArrayModel)
+
+    def test_nested_nullable_base_field(self):
+        if PSYCOPG2_VERSION < (2, 7, 5):
+            self.skipTest('See https://github.com/psycopg/psycopg2/issues/325')
+        instance = NullableIntegerArrayModel.objects.create(
+            field_nested=[[None, None], [None, None]],
+        )
+        self.assertEqual(instance.field_nested, [[None, None], [None, None]])
 
 
 class TestQuerying(PostgreSQLTestCase):

@@ -96,6 +96,10 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('field', ArrayField(models.IntegerField(), size=None, null=True, blank=True)),
+                (
+                    'field_nested',
+                    ArrayField(ArrayField(models.IntegerField(), size=None, null=True), size=None, null=True),
+                ),
             ],
             options={
                 'required_db_vendor': 'postgresql',
