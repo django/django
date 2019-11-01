@@ -61,7 +61,6 @@ def autoescape_aware(func):
 # STRING DECORATOR    #
 #######################
 
-
 def stringfilter(func):
     """
     Decorator for filters which should only receive strings. The object
