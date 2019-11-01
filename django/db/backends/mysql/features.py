@@ -50,6 +50,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     db_functions_convert_bytes_to_str = True
     # Neither MySQL nor MariaDB support partial indexes.
     supports_partial_indexes = False
+    supports_order_by_nulls_modifier = False
 
     @cached_property
     def _mysql_storage_engine(self):
