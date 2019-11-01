@@ -382,7 +382,7 @@ This is the equivalent of adding the following at the beginning of the filter:
         esc = lambda x: x
     text = esc(text)
 
-.. versionadded:: 2.3
+.. versionadded:: 3.1
 
     ``autoescape_aware`` decorator
 
