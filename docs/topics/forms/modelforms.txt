@@ -80,6 +80,8 @@ Model field                         Form field
 
 :class:`DecimalField`               :class:`~django.forms.DecimalField`
 
+:class:`DurationField`              :class:`~django.forms.DurationField`
+
 :class:`EmailField`                 :class:`~django.forms.EmailField`
 
 :class:`FileField`                  :class:`~django.forms.FileField`
@@ -91,7 +93,7 @@ Model field                         Form field
 :class:`ForeignKey`                 :class:`~django.forms.ModelChoiceField`
                                     (see below)
 
-``ImageField``                      :class:`~django.forms.ImageField`
+:class:`ImageField`                 :class:`~django.forms.ImageField`
 
 :class:`IntegerField`               :class:`~django.forms.IntegerField`
 
@@ -120,6 +122,8 @@ Model field                         Form field
 :class:`TimeField`                  :class:`~django.forms.TimeField`
 
 :class:`URLField`                   :class:`~django.forms.URLField`
+
+:class:`UUIDField`                  :class:`~django.forms.UUIDField`
 =================================== ==================================================
 
 .. currentmodule:: django.forms
