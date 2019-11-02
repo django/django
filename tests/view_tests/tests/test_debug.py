@@ -757,7 +757,7 @@ class PlainTextReportTests(SimpleTestCase):
             exc_type, exc_value, tb = sys.exc_info()
         reporter = ExceptionReporter(request, exc_type, exc_value, tb)
         text = reporter.get_traceback_text()
-        templ_path = Path(Path(__file__).parent.parent, 'templates', 'debug', 'template_error.html')
+        templ_path = Path(Path(__file__).parents[1], 'templates', 'debug', 'template_error.html')
         self.assertIn(
             'Template error:\n'
             'In template %(path)s, error at line 2\n'
