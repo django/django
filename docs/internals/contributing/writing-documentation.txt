@@ -287,7 +287,7 @@ define some extra description units:
         :ticket:`12345`
 
 Django's documentation uses a custom ``console`` directive for documenting
-command-line examples involving ``django-admin.py``, ``manage.py``, ``python``,
+command-line examples involving ``django-admin``, ``manage.py``, ``python``,
 etc.). In the HTML documentation, it renders a two-tab UI, with one tab showing
 a Unix-style command prompt and a second tab showing a Windows prompt.
 

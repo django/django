@@ -384,6 +384,9 @@ Miscellaneous
   :class:`~django.core.exceptions.FieldDoesNotExist` and
   :class:`~django.core.exceptions.FieldError`.
 
+* The ``django-admin.py`` entry point is deprecated in favor of
+  ``django-admin``.
+
 .. _removed-features-3.1:
 
 Features removed in 3.1

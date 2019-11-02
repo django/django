@@ -14,7 +14,6 @@ import unittest
 from io import StringIO
 from unittest import mock
 
-import django
 from django import conf, get_version
 from django.conf import settings
 from django.core.management import (
@@ -125,8 +124,7 @@ class AdminScriptTestCase(SimpleTestCase):
         return p.stdout, p.stderr
 
     def run_django_admin(self, args, settings_file=None):
-        script_dir = os.path.abspath(os.path.join(os.path.dirname(django.__file__), 'bin'))
-        return self.run_test([os.path.join(script_dir, 'django-admin.py'), *args], settings_file)
+        return self.run_test(['-m', 'django', *args], settings_file)
 
     def run_manage(self, args, settings_file=None, manage_py=None):
         template_manage_py = (
@@ -1898,7 +1896,12 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
         # running again..
         out, err = self.run_django_admin(args)
         self.assertNoOutput(out)
-        self.assertOutput(err, "already exists")
+        self.assertOutput(
+            err,
+            "CommandError: 'testproject' conflicts with the name of an "
+            "existing Python module and cannot be used as a project name. "
+            "Please try another name.",
+        )
 
     def test_invalid_project_name(self):
         "Make sure the startproject management command validates a project name"
@@ -2160,8 +2163,10 @@ class StartApp(AdminScriptTestCase):
         )
 
     def test_overlaying_app(self):
-        self.run_django_admin(['startapp', 'app1'])
-        out, err = self.run_django_admin(['startapp', 'app2', 'app1'])
+        # Use a subdirectory so it is outside the PYTHONPATH.
+        os.makedirs(os.path.join(self.test_dir, 'apps/app1'))
+        self.run_django_admin(['startapp', 'app1', 'apps/app1'])
+        out, err = self.run_django_admin(['startapp', 'app2', 'apps/app1'])
         self.assertOutput(
             err,
             "already exists. Overlaying an app into an existing directory "
@@ -2260,11 +2265,6 @@ class Dumpdata(AdminScriptTestCase):
 
 class MainModule(AdminScriptTestCase):
     """python -m django works like django-admin."""
-
-    def test_runs_django_admin(self):
-        cmd_out, _ = self.run_django_admin(['--version'])
-        mod_out, _ = self.run_test(['-m', 'django', '--version'])
-        self.assertEqual(mod_out, cmd_out)
 
     def test_program_name_in_help(self):
         out, err = self.run_test(['-m', 'django', 'help'])
