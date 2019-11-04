@@ -1711,7 +1711,8 @@ them::
 
 Currently, the ``postgresql``, ``oracle``, and ``mysql`` database
 backends support ``select_for_update()``. However, MySQL doesn't support the
-``nowait``, ``skip_locked``, and ``of`` arguments.
+``of`` argument and the ``nowait`` and ``skip_locked`` arguments are supported
+only on MySQL 8.0.1+.
 
 Passing ``nowait=True``, ``skip_locked=True``, or ``of`` to
 ``select_for_update()`` using database backends that do not support these
