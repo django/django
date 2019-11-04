@@ -2,7 +2,7 @@
 Django 1.11.26 release notes
 ============================
 
-*Expected November 1, 2019*
+*November 4, 2019*
 
 Django 1.11.26 fixes a regression in 1.11.25.
 
