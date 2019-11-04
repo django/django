@@ -52,11 +52,6 @@ if "install" in sys.argv:
             break
 
 
-EXCLUDE_FROM_PACKAGES = ['django.conf.project_template',
-                         'django.conf.app_template',
-                         'django.bin']
-
-
 # Dynamically calculate the version based on django.VERSION.
 version = __import__('django').get_version()
 
@@ -77,7 +72,7 @@ setup(
                  'rapid development and clean, pragmatic design.'),
     long_description=read('README.rst'),
     license='BSD',
-    packages=find_packages(exclude=EXCLUDE_FROM_PACKAGES),
+    packages=find_packages(),
     include_package_data=True,
     scripts=['django/bin/django-admin.py'],
     entry_points={'console_scripts': [
