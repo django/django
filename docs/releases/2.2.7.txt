@@ -2,7 +2,7 @@
 Django 2.2.7 release notes
 ==========================
 
-*Expected November 1, 2019*
+*November 4, 2019*
 
 Django 2.2.7 fixes several bugs in 2.2.6.
 
