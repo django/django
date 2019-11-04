@@ -7,11 +7,11 @@ during the development of Django applications.
 
 .. _troubleshooting-django-admin:
 
-Problems running django-admin
-=============================
+Problems running ``django-admin``
+=================================
 
-"command not found: django-admin"
-------------------------------------
+"command not found: `django-admin`"
+-----------------------------------
 
 :doc:`django-admin </ref/django-admin>` should be on your system path if you
 installed Django via ``python setup.py``. If it's not on your path, you can
@@ -24,12 +24,12 @@ If ``django-admin`` doesn't work but ``django-admin.py`` does, you're probably
 using a version of Django that doesn't match the version of this documentation.
 ``django-admin`` is new in Django 1.7.
 
-Mac OS X permissions
---------------------
+macOS permissions
+-----------------
 
-If you're using Mac OS X, you may see the message "permission denied" when
+If you're using macOS, you may see the message "permission denied" when
 you try to run ``django-admin``. This is because, on Unix-based systems like
-OS X, a file must be marked as "executable" before it can be run as a program.
+macOS, a file must be marked as "executable" before it can be run as a program.
 To do this, open Terminal.app and navigate (using the ``cd`` command) to the
 directory where :doc:`django-admin </ref/django-admin>` is installed, then
 run the command ``sudo chmod +x django-admin``.
@@ -54,15 +54,6 @@ pitfalls producing this error:
   UNIX-like systems (can be checked by the ``locale`` command). If it's the
   case, please refer to your system documentation to learn how you can change
   this to a UTF-8 locale.
-
-* You created raw bytestrings, which is easy to do on Python 2::
-
-      my_string = 'café'
-
-  Either use the ``u''`` prefix or even better, add the
-  ``from __future__ import unicode_literals`` line at the top of your file
-  so that your code will be compatible with Python 3.2 which doesn't support
-  the ``u''`` prefix.
 
 Related resources:
 

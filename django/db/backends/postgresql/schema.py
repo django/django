@@ -1,6 +1,7 @@
 import psycopg2
 
 from django.db.backends.base.schema import BaseDatabaseSchemaEditor
+from django.db.backends.ddl_references import IndexColumns
 
 
 class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
@@ -11,21 +12,26 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
     sql_delete_sequence = "DROP SEQUENCE IF EXISTS %(sequence)s CASCADE"
     sql_set_sequence_max = "SELECT setval('%(sequence)s', MAX(%(column)s)) FROM %(table)s"
 
-    sql_create_varchar_index = "CREATE INDEX %(name)s ON %(table)s (%(columns)s varchar_pattern_ops)%(extra)s"
-    sql_create_text_index = "CREATE INDEX %(name)s ON %(table)s (%(columns)s text_pattern_ops)%(extra)s"
+    sql_create_index = "CREATE INDEX %(name)s ON %(table)s%(using)s (%(columns)s)%(extra)s%(condition)s"
+    sql_delete_index = "DROP INDEX IF EXISTS %(name)s"
+
+    # Setting the constraint to IMMEDIATE runs any deferred checks to allow
+    # dropping it in the same transaction.
+    sql_delete_fk = "SET CONSTRAINTS %(name)s IMMEDIATE; ALTER TABLE %(table)s DROP CONSTRAINT %(name)s"
+
+    sql_delete_procedure = 'DROP FUNCTION %(procedure)s(%(param_types)s)'
 
     def quote_value(self, value):
-        return psycopg2.extensions.adapt(value)
+        if isinstance(value, str):
+            value = value.replace('%', '%%')
+        # getquoted() returns a quoted bytestring of the adapted value.
+        return psycopg2.extensions.adapt(value).getquoted().decode()
 
-    def _model_indexes_sql(self, model):
-        output = super(DatabaseSchemaEditor, self)._model_indexes_sql(model)
-        if not model._meta.managed or model._meta.proxy or model._meta.swapped:
-            return output
-
-        for field in model._meta.local_fields:
-            like_index_statement = self._create_like_index_sql(model, field)
-            if like_index_statement is not None:
-                output.append(like_index_statement)
+    def _field_indexes_sql(self, model, field):
+        output = super()._field_indexes_sql(model, field)
+        like_index_statement = self._create_like_index_sql(model, field)
+        if like_index_statement is not None:
+            output.append(like_index_statement)
         return output
 
     def _create_like_index_sql(self, model, field):
@@ -45,15 +51,14 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             if '[' in db_type:
                 return None
             if db_type.startswith('varchar'):
-                return self._create_index_sql(model, [field], suffix='_like', sql=self.sql_create_varchar_index)
+                return self._create_index_sql(model, [field], suffix='_like', opclasses=['varchar_pattern_ops'])
             elif db_type.startswith('text'):
-                return self._create_index_sql(model, [field], suffix='_like', sql=self.sql_create_text_index)
+                return self._create_index_sql(model, [field], suffix='_like', opclasses=['text_pattern_ops'])
         return None
 
-    def _alter_column_type_sql(self, table, old_field, new_field, new_type):
-        """
-        Makes ALTER TYPE with SERIAL make sense.
-        """
+    def _alter_column_type_sql(self, model, old_field, new_field, new_type):
+        """Make ALTER TYPE with SERIAL make sense."""
+        table = model._meta.db_table
         if new_type.lower() in ("serial", "bigserial"):
             column = new_field.column
             sequence_name = "%s_%s_seq" % (table, column)
@@ -100,26 +105,37 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
                 ],
             )
         else:
-            return super(DatabaseSchemaEditor, self)._alter_column_type_sql(
-                table, old_field, new_field, new_type
-            )
+            return super()._alter_column_type_sql(model, old_field, new_field, new_type)
 
     def _alter_field(self, model, old_field, new_field, old_type, new_type,
                      old_db_params, new_db_params, strict=False):
-        super(DatabaseSchemaEditor, self)._alter_field(
+        # Drop indexes on varchar/text/citext columns that are changing to a
+        # different type.
+        if (old_field.db_index or old_field.unique) and (
+            (old_type.startswith('varchar') and not new_type.startswith('varchar')) or
+            (old_type.startswith('text') and not new_type.startswith('text')) or
+            (old_type.startswith('citext') and not new_type.startswith('citext'))
+        ):
+            index_name = self._create_index_name(model._meta.db_table, [old_field.column], suffix='_like')
+            self.execute(self._delete_index_sql(model, index_name))
+
+        super()._alter_field(
             model, old_field, new_field, old_type, new_type, old_db_params,
             new_db_params, strict,
         )
         # Added an index? Create any PostgreSQL-specific indexes.
-        if not old_field.db_index and not old_field.unique and (new_field.db_index or new_field.unique):
+        if ((not (old_field.db_index or old_field.unique) and new_field.db_index) or
+                (not old_field.unique and new_field.unique)):
             like_index_statement = self._create_like_index_sql(model, new_field)
             if like_index_statement is not None:
                 self.execute(like_index_statement)
 
         # Removed an index? Drop any PostgreSQL-specific indexes.
-        if (old_field.db_index or old_field.unique) and not (new_field.db_index or new_field.unique):
-            index_to_remove = self._create_index_name(model, [old_field.column], suffix='_like')
-            index_names = self._constraint_names(model, [old_field.column], index=True)
-            for index_name in index_names:
-                if index_name == index_to_remove:
-                    self.execute(self._delete_constraint_sql(self.sql_delete_index, model, index_name))
+        if old_field.unique and not (new_field.db_index or new_field.unique):
+            index_to_remove = self._create_index_name(model._meta.db_table, [old_field.column], suffix='_like')
+            self.execute(self._delete_index_sql(model, index_to_remove))
+
+    def _index_columns(self, table, columns, col_suffixes, opclasses):
+        if opclasses:
+            return IndexColumns(table, columns, self.quote_name, col_suffixes=col_suffixes, opclasses=opclasses)
+        return super()._index_columns(table, columns, col_suffixes, opclasses)

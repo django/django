@@ -31,12 +31,14 @@ def pass_resolver_match_view(request, *args, **kwargs):
     response.resolver_match = request.resolver_match
     return response
 
+
 uncallable = None  # neither a callable nor a string
 
 
-class ViewClass(object):
+class ViewClass:
     def __call__(self, request, *args, **kwargs):
         return HttpResponse('')
+
 
 view_class_instance = ViewClass()
 
@@ -45,7 +47,7 @@ class LazyRedirectView(RedirectView):
     url = reverse_lazy('named-lazy-url-redirected-to')
 
 
-@user_passes_test(lambda u: u.is_authenticated(), login_url=reverse_lazy('some-login-page'))
+@user_passes_test(lambda u: u.is_authenticated, login_url=reverse_lazy('some-login-page'))
 def login_required_view(request):
     return HttpResponse('Hello you')
 

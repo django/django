@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-10 15:10+0200\n"
-"PO-Revision-Date: 2015-10-11 08:53+0000\n"
+"POT-Creation-Date: 2017-09-24 13:46+0200\n"
+"PO-Revision-Date: 2017-09-24 14:24+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Telugu (http://www.transifex.com/django/django/language/te/)\n"
 "MIME-Version: 1.0\n"
@@ -67,8 +67,7 @@ msgstr ""
 
 msgid ""
 "Raw passwords are not stored, so there is no way to see this user's "
-"password, but you can change the password using <a href=\"../password/"
-"\">this form</a>."
+"password, but you can change the password using <a href=\"{}\">this form</a>."
 msgstr ""
 
 #, python-format
@@ -108,6 +107,21 @@ msgid "salt"
 msgstr ""
 
 msgid "hash"
+msgstr ""
+
+msgid "variety"
+msgstr ""
+
+msgid "version"
+msgstr ""
+
+msgid "memory cost"
+msgstr ""
+
+msgid "time cost"
+msgstr ""
+
+msgid "parallelism"
 msgstr ""
 
 msgid "work factor"
@@ -159,12 +173,7 @@ msgstr ""
 msgid "username"
 msgstr "వాడుకరిపేరు"
 
-msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
-msgstr ""
-
-msgid ""
-"Enter a valid username. This value may contain only letters, numbers and @/./"
-"+/-/_ characters."
+msgid "Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only."
 msgstr ""
 
 msgid "A user with that username already exists."
@@ -239,6 +248,16 @@ msgstr ""
 
 #, python-format
 msgid "Password reset on %(site_name)s"
+msgstr ""
+
+msgid ""
+"Enter a valid username. This value may contain only English letters, "
+"numbers, and @/./+/-/_ characters."
+msgstr ""
+
+msgid ""
+"Enter a valid username. This value may contain only letters, numbers, and "
+"@/./+/-/_ characters."
 msgstr ""
 
 msgid "Logged out"

@@ -5,11 +5,11 @@ from django.http import HttpRequest
 
 def sensitive_variables(*variables):
     """
-    Indicates which variables used in the decorated function are sensitive, so
+    Indicate which variables used in the decorated function are sensitive so
     that those variables can later be treated in a special way, for example
     by hiding them when logging unhandled exceptions.
 
-    Two forms are accepted:
+    Accept two forms:
 
     * with specified variable names:
 
@@ -19,8 +19,8 @@ def sensitive_variables(*variables):
             credit_card = user.credit_card_number
             ...
 
-    * without any specified variable names, in which case it is assumed that
-      all variables are considered sensitive:
+    * without any specified variable names, in which case consider all
+      variables are sensitive:
 
         @sensitive_variables()
         def my_function()
@@ -40,11 +40,11 @@ def sensitive_variables(*variables):
 
 def sensitive_post_parameters(*parameters):
     """
-    Indicates which POST parameters used in the decorated view are sensitive,
+    Indicate which POST parameters used in the decorated view are sensitive,
     so that those parameters can later be treated in a special way, for example
     by hiding them when logging unhandled exceptions.
 
-    Two forms are accepted:
+    Accept two forms:
 
     * with specified parameters:
 
@@ -54,8 +54,8 @@ def sensitive_post_parameters(*parameters):
             cc = request.POST['credit_card']
             ...
 
-    * without any specified parameters, in which case it is assumed that
-      all parameters are considered sensitive:
+    * without any specified parameters, in which case consider all
+      variables are sensitive:
 
         @sensitive_post_parameters()
         def my_view(request)

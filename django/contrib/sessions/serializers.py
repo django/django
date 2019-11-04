@@ -1,18 +1,17 @@
+import pickle
+
 from django.core.signing import JSONSerializer as BaseJSONSerializer
 
-try:
-    from django.utils.six.moves import cPickle as pickle
-except ImportError:
-    import pickle
 
-
-class PickleSerializer(object):
+class PickleSerializer:
     """
     Simple wrapper around pickle to be used in signing.dumps and
     signing.loads.
     """
+    protocol = pickle.HIGHEST_PROTOCOL
+
     def dumps(self, obj):
-        return pickle.dumps(obj, pickle.HIGHEST_PROTOCOL)
+        return pickle.dumps(obj, self.protocol)
 
     def loads(self, data):
         return pickle.loads(data)

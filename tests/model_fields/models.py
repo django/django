@@ -12,7 +12,6 @@ from django.db.models.fields.files import ImageField, ImageFieldFile
 from django.db.models.fields.related import (
     ForeignKey, ForeignObject, ManyToManyField, OneToOneField,
 )
-from django.utils import six
 
 try:
     from PIL import Image
@@ -31,7 +30,7 @@ def get_foo():
 
 class Bar(models.Model):
     b = models.CharField(max_length=10)
-    a = models.ForeignKey(Foo, models.CASCADE, default=get_foo, related_name=b'bars')
+    a = models.ForeignKey(Foo, models.CASCADE, default=get_foo, related_name='bars')
 
 
 class Whiz(models.Model):
@@ -51,31 +50,16 @@ class Whiz(models.Model):
     c = models.IntegerField(choices=CHOICES, null=True)
 
 
-class Counter(six.Iterator):
-    def __init__(self):
-        self.n = 1
-
-    def __iter__(self):
-        return self
-
-    def __next__(self):
-        if self.n > 5:
-            raise StopIteration
-        else:
-            self.n += 1
-            return (self.n, 'val-' + str(self.n))
-
-
 class WhizIter(models.Model):
-    c = models.IntegerField(choices=Counter(), null=True)
+    c = models.IntegerField(choices=iter(Whiz.CHOICES), null=True)
 
 
 class WhizIterEmpty(models.Model):
-    c = models.CharField(choices=(x for x in []), blank=True, max_length=1)
+    c = models.CharField(choices=iter(()), blank=True, max_length=1)
 
 
 class BigD(models.Model):
-    d = models.DecimalField(max_digits=38, decimal_places=30)
+    d = models.DecimalField(max_digits=32, decimal_places=30)
 
 
 class FloatModel(models.Model):
@@ -117,11 +101,12 @@ class Post(models.Model):
 
 
 class NullBooleanModel(models.Model):
-    nbfield = models.NullBooleanField()
+    nbfield = models.BooleanField(null=True, blank=True)
+    nbfield_old = models.NullBooleanField()
 
 
 class BooleanModel(models.Model):
-    bfield = models.BooleanField(default=None)
+    bfield = models.BooleanField()
     string = models.CharField(max_length=10, default='abc')
 
 
@@ -163,28 +148,27 @@ class VerboseNameField(models.Model):
     field1 = models.BigIntegerField("verbose field1")
     field2 = models.BooleanField("verbose field2", default=False)
     field3 = models.CharField("verbose field3", max_length=10)
-    field4 = models.CommaSeparatedIntegerField("verbose field4", max_length=99)
-    field5 = models.DateField("verbose field5")
-    field6 = models.DateTimeField("verbose field6")
-    field7 = models.DecimalField("verbose field7", max_digits=6, decimal_places=1)
-    field8 = models.EmailField("verbose field8")
-    field9 = models.FileField("verbose field9", upload_to="unused")
-    field10 = models.FilePathField("verbose field10")
-    field11 = models.FloatField("verbose field11")
+    field4 = models.DateField("verbose field4")
+    field5 = models.DateTimeField("verbose field5")
+    field6 = models.DecimalField("verbose field6", max_digits=6, decimal_places=1)
+    field7 = models.EmailField("verbose field7")
+    field8 = models.FileField("verbose field8", upload_to="unused")
+    field9 = models.FilePathField("verbose field9")
+    field10 = models.FloatField("verbose field10")
     # Don't want to depend on Pillow in this test
     # field_image = models.ImageField("verbose field")
-    field12 = models.IntegerField("verbose field12")
-    field13 = models.GenericIPAddressField("verbose field13", protocol="ipv4")
-    field14 = models.NullBooleanField("verbose field14")
-    field15 = models.PositiveIntegerField("verbose field15")
-    field16 = models.PositiveSmallIntegerField("verbose field16")
-    field17 = models.SlugField("verbose field17")
-    field18 = models.SmallIntegerField("verbose field18")
-    field19 = models.TextField("verbose field19")
-    field20 = models.TimeField("verbose field20")
-    field21 = models.URLField("verbose field21")
-    field22 = models.UUIDField("verbose field22")
-    field23 = models.DurationField("verbose field23")
+    field11 = models.IntegerField("verbose field11")
+    field12 = models.GenericIPAddressField("verbose field12", protocol="ipv4")
+    field13 = models.NullBooleanField("verbose field13")
+    field14 = models.PositiveIntegerField("verbose field14")
+    field15 = models.PositiveSmallIntegerField("verbose field15")
+    field16 = models.SlugField("verbose field16")
+    field17 = models.SmallIntegerField("verbose field17")
+    field18 = models.TextField("verbose field18")
+    field19 = models.TimeField("verbose field19")
+    field20 = models.URLField("verbose field20")
+    field21 = models.UUIDField("verbose field21")
+    field22 = models.DurationField("verbose field22")
 
 
 class GenericIPAddress(models.Model):
@@ -216,7 +200,8 @@ class DataModel(models.Model):
 
 
 class Document(models.Model):
-    myfile = models.FileField(upload_to='unused')
+    myfile = models.FileField(upload_to='unused', unique=True)
+
 
 ###############################################################################
 # ImageField
@@ -230,11 +215,11 @@ if Image:
         """
         def __init__(self, *args, **kwargs):
             self.was_opened = False
-            super(TestImageFieldFile, self).__init__(*args, **kwargs)
+            super().__init__(*args, **kwargs)
 
         def open(self):
             self.was_opened = True
-            super(TestImageFieldFile, self).open()
+            super().open()
 
     class TestImageField(ImageField):
         attr_class = TestImageFieldFile
@@ -321,7 +306,6 @@ class AllFieldsModel(models.Model):
     binary = models.BinaryField()
     boolean = models.BooleanField(default=False)
     char = models.CharField(max_length=10)
-    csv = models.CommaSeparatedIntegerField(max_length=10)
     date = models.DateField()
     datetime = models.DateTimeField()
     decimal = models.DecimalField(decimal_places=2, max_digits=2)
@@ -360,6 +344,10 @@ class AllFieldsModel(models.Model):
     content_type = models.ForeignKey(ContentType, models.CASCADE)
     gfk = GenericForeignKey()
     gr = GenericRelation(DataModel)
+
+
+class ManyToMany(models.Model):
+    m2m = models.ManyToManyField('self')
 
 
 ###############################################################################

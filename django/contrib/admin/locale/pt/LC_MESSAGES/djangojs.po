@@ -2,15 +2,15 @@
 #
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011
-# Nuno Mariz <nmariz@gmail.com>, 2011-2012,2015
+# Nuno Mariz <nmariz@gmail.com>, 2011-2012,2015,2017
 # Paulo Köch <paulo.koch@gmail.com>, 2011
 # Raúl Pedro Fernandes Santos, 2014
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2015-11-24 18:04+0000\n"
+"POT-Creation-Date: 2016-05-17 23:12+0200\n"
+"PO-Revision-Date: 2017-11-30 23:49+0000\n"
 "Last-Translator: Nuno Mariz <nmariz@gmail.com>\n"
 "Language-Team: Portuguese (http://www.transifex.com/django/django/language/"
 "pt/)\n"
@@ -151,15 +151,69 @@ msgstr "Ontem"
 msgid "Tomorrow"
 msgstr "Amanhã"
 
-msgid ""
-"January February March April May June July August September October November "
-"December"
-msgstr ""
-"Janeiro Fevereiro Março Abril Maio Junho Julho Agosto Setembro Outubro "
-"Novembro Dezembro"
+msgid "January"
+msgstr "Janeiro"
 
-msgid "S M T W T F S"
-msgstr "D S T Q Q S S"
+msgid "February"
+msgstr "Fevereiro"
+
+msgid "March"
+msgstr "Março"
+
+msgid "April"
+msgstr "Abril"
+
+msgid "May"
+msgstr "Maio"
+
+msgid "June"
+msgstr "Junho"
+
+msgid "July"
+msgstr "Julho"
+
+msgid "August"
+msgstr "Agosto"
+
+msgid "September"
+msgstr "Setembro"
+
+msgid "October"
+msgstr "Outubro"
+
+msgid "November"
+msgstr "Novembro"
+
+msgid "December"
+msgstr "Dezembro"
+
+msgctxt "one letter Sunday"
+msgid "S"
+msgstr "D"
+
+msgctxt "one letter Monday"
+msgid "M"
+msgstr "S"
+
+msgctxt "one letter Tuesday"
+msgid "T"
+msgstr "T"
+
+msgctxt "one letter Wednesday"
+msgid "W"
+msgstr "Q"
+
+msgctxt "one letter Thursday"
+msgid "T"
+msgstr "Q"
+
+msgctxt "one letter Friday"
+msgid "F"
+msgstr "S"
+
+msgctxt "one letter Saturday"
+msgid "S"
+msgstr "S"
 
 msgid "Show"
 msgstr "Mostrar"

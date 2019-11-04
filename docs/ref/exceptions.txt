@@ -12,6 +12,15 @@ Django Core Exceptions
 
 Django core exception classes are defined in ``django.core.exceptions``.
 
+``AppRegistryNotReady``
+-----------------------
+
+.. exception:: AppRegistryNotReady
+
+    This exception is raised when attempting to use models before the :ref:`app
+    loading process <app-loading-process>`, which initializes the ORM, is
+    complete.
+
 ``ObjectDoesNotExist``
 ----------------------
 
@@ -23,6 +32,15 @@ Django core exception classes are defined in ``django.core.exceptions``.
 
     See :meth:`~django.db.models.query.QuerySet.get()` for further information
     on :exc:`ObjectDoesNotExist` and :exc:`~django.db.models.Model.DoesNotExist`.
+
+``EmptyResultSet``
+------------------
+
+.. exception:: EmptyResultSet
+
+    ``EmptyResultSet`` may be raised during query generation if a query won't
+    return any results. Most Django projects won't encounter this exception,
+    but it might be useful for implementing custom lookups and expressions.
 
 ``FieldDoesNotExist``
 ---------------------
@@ -61,9 +79,11 @@ Django core exception classes are defined in ``django.core.exceptions``.
     * ``DisallowedModelAdminToField``
     * ``DisallowedRedirect``
     * ``InvalidSessionKey``
+    * ``RequestDataTooBig``
     * ``SuspiciousFileOperation``
     * ``SuspiciousMultipartForm``
     * ``SuspiciousSession``
+    * ``TooManyFieldsSent``
 
     If a ``SuspiciousOperation`` exception reaches the WSGI handler level it is
     logged at the ``Error`` level and results in
@@ -149,12 +169,6 @@ URL Resolver exceptions
 
 URL Resolver exceptions are defined in ``django.urls``.
 
-.. deprecated:: 1.10
-
-    In older versions, these exceptions are located in
-    ``django.core.urlresolvers``. Importing from the old location will continue
-    to work until Django 2.0.
-
 ``Resolver404``
 ---------------
 
@@ -199,15 +213,7 @@ Specification v2.0, for further information.
 
 As per :pep:`3134`, a ``__cause__`` attribute is set with the original
 (underlying) database exception, allowing access to any additional
-information provided. (Note that this attribute is available under
-both Python 2 and Python 3, although :pep:`3134` normally only applies
-to Python 3. To avoid unexpected differences with Python 3, Django will also
-ensure that the exception made available via ``__cause__`` has a usable
-``__traceback__`` attribute.)
-
-.. versionchanged:: 1.10
-
-    The ``__traceback__`` attribute described above was added.
+information provided.
 
 .. exception:: models.ProtectedError
 

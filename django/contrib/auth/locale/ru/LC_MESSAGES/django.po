@@ -1,15 +1,18 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Ivan Khomutov <iskhomutov@gmail.com>, 2017
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Алексей Борискин <sun.void@gmail.com>, 2012-2015
+# Андрей Щуров <shurov9009@gmail.com>, 2016
+# Дмитрий Шатера <mr.bobsans@gmail.com>, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-10 15:10+0200\n"
-"PO-Revision-Date: 2015-10-22 18:05+0000\n"
-"Last-Translator: Алексей Борискин <sun.void@gmail.com>\n"
+"POT-Creation-Date: 2017-09-24 13:46+0200\n"
+"PO-Revision-Date: 2017-09-30 20:31+0000\n"
+"Last-Translator: Ivan Khomutov <iskhomutov@gmail.com>\n"
 "Language-Team: Russian (http://www.transifex.com/django/django/language/"
 "ru/)\n"
 "MIME-Version: 1.0\n"
@@ -69,12 +72,11 @@ msgstr "Для подтверждения введите, пожалуйста, 
 
 msgid ""
 "Raw passwords are not stored, so there is no way to see this user's "
-"password, but you can change the password using <a href=\"../password/"
-"\">this form</a>."
+"password, but you can change the password using <a href=\"{}\">this form</a>."
 msgstr ""
-"Пароли хранятся в защищённом виде, так что у нас нет способа узнать пароль "
-"этого пользователя. Однако вы можете сменить его/её пароль, используя <a "
-"href=\"../password/\">эту форму</a>."
+"Пароли не хранятся в открытом виде, поэтому нет возможности увидеть пароль "
+"этого пользователя, но вы можете изменить пароль, воспользовавшись<a href="
+"\"{}\">этой формой</a>."
 
 #, python-format
 msgid ""
@@ -116,6 +118,21 @@ msgstr "соль"
 
 msgid "hash"
 msgstr "хэш"
+
+msgid "variety"
+msgstr "множество"
+
+msgid "version"
+msgstr "версия"
+
+msgid "memory cost"
+msgstr "затраты памяти"
+
+msgid "time cost"
+msgstr "затраты времени"
+
+msgid "parallelism"
+msgstr "параллелизм"
 
 msgid "work factor"
 msgstr "рабочий фактор"
@@ -168,17 +185,10 @@ msgstr "Индивидуальные права данного пользова�
 msgid "username"
 msgstr "имя пользователя"
 
-msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
+msgid "Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only."
 msgstr ""
-"Обязательное поле. Не более 30 символов. Только буквы, цифры и символы @/./"
+"Обязательное поле. Не более 150 символов. Только буквы, цифры и символы @/./"
 "+/-/_."
-
-msgid ""
-"Enter a valid username. This value may contain only letters, numbers and @/./"
-"+/-/_ characters."
-msgstr ""
-"Введите правильное имя пользователя. Оно может содержать только буквы, цифры "
-"и знаки @/./+/-/_."
 
 msgid "A user with that username already exists."
 msgstr "Пользователь с таким именем уже существует."
@@ -270,6 +280,20 @@ msgstr "Ваш пароль не может состоять только из �
 #, python-format
 msgid "Password reset on %(site_name)s"
 msgstr "Сброс пароля на %(site_name)s"
+
+msgid ""
+"Enter a valid username. This value may contain only English letters, "
+"numbers, and @/./+/-/_ characters."
+msgstr ""
+"Введите правильное имя пользователя. Это значение может содержать только "
+"английские буквы, цифры и знаки @/./+/-/_."
+
+msgid ""
+"Enter a valid username. This value may contain only letters, numbers, and "
+"@/./+/-/_ characters."
+msgstr ""
+"Введите правильное имя пользователя. Оно может содержать только буквы, цифры "
+"и знаки @/./+/-/_."
 
 msgid "Logged out"
 msgstr "Не авторизован"

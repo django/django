@@ -1,20 +1,18 @@
-from __future__ import unicode_literals
-
 import datetime
-import unittest
 
+from django.test import SimpleTestCase
 from django.utils import feedgenerator
-from django.utils.timezone import get_fixed_timezone
+from django.utils.timezone import get_fixed_timezone, utc
 
 
-class FeedgeneratorTest(unittest.TestCase):
+class FeedgeneratorTests(SimpleTestCase):
     """
     Tests for the low-level syndication feed framework.
     """
 
     def test_get_tag_uri(self):
         """
-        Test get_tag_uri() correctly generates TagURIs.
+        get_tag_uri() correctly generates TagURIs.
         """
         self.assertEqual(
             feedgenerator.get_tag_uri('http://example.org/foo/bar#headline', datetime.date(2004, 10, 25)),
@@ -22,8 +20,7 @@ class FeedgeneratorTest(unittest.TestCase):
 
     def test_get_tag_uri_with_port(self):
         """
-        Test that get_tag_uri() correctly generates TagURIs from URLs with port
-        numbers.
+        get_tag_uri() correctly generates TagURIs from URLs with port numbers.
         """
         self.assertEqual(
             feedgenerator.get_tag_uri(
@@ -34,7 +31,7 @@ class FeedgeneratorTest(unittest.TestCase):
 
     def test_rfc2822_date(self):
         """
-        Test rfc2822_date() correctly formats datetime objects.
+        rfc2822_date() correctly formats datetime objects.
         """
         self.assertEqual(
             feedgenerator.rfc2822_date(datetime.datetime(2008, 11, 14, 13, 37, 0)),
@@ -43,7 +40,7 @@ class FeedgeneratorTest(unittest.TestCase):
 
     def test_rfc2822_date_with_timezone(self):
         """
-        Test rfc2822_date() correctly formats datetime objects with tzinfo.
+        rfc2822_date() correctly formats datetime objects with tzinfo.
         """
         self.assertEqual(
             feedgenerator.rfc2822_date(datetime.datetime(2008, 11, 14, 13, 37, 0, tzinfo=get_fixed_timezone(60))),
@@ -52,7 +49,7 @@ class FeedgeneratorTest(unittest.TestCase):
 
     def test_rfc2822_date_without_time(self):
         """
-        Test rfc2822_date() correctly formats date objects.
+        rfc2822_date() correctly formats date objects.
         """
         self.assertEqual(
             feedgenerator.rfc2822_date(datetime.date(2008, 11, 14)),
@@ -61,7 +58,7 @@ class FeedgeneratorTest(unittest.TestCase):
 
     def test_rfc3339_date(self):
         """
-        Test rfc3339_date() correctly formats datetime objects.
+        rfc3339_date() correctly formats datetime objects.
         """
         self.assertEqual(
             feedgenerator.rfc3339_date(datetime.datetime(2008, 11, 14, 13, 37, 0)),
@@ -70,7 +67,7 @@ class FeedgeneratorTest(unittest.TestCase):
 
     def test_rfc3339_date_with_timezone(self):
         """
-        Test rfc3339_date() correctly formats datetime objects with tzinfo.
+        rfc3339_date() correctly formats datetime objects with tzinfo.
         """
         self.assertEqual(
             feedgenerator.rfc3339_date(datetime.datetime(2008, 11, 14, 13, 37, 0, tzinfo=get_fixed_timezone(120))),
@@ -79,7 +76,7 @@ class FeedgeneratorTest(unittest.TestCase):
 
     def test_rfc3339_date_without_time(self):
         """
-        Test rfc3339_date() correctly formats date objects.
+        rfc3339_date() correctly formats date objects.
         """
         self.assertEqual(
             feedgenerator.rfc3339_date(datetime.date(2008, 11, 14)),
@@ -88,7 +85,7 @@ class FeedgeneratorTest(unittest.TestCase):
 
     def test_atom1_mime_type(self):
         """
-        Test to make sure Atom MIME type has UTF8 Charset parameter set
+        Atom MIME type has UTF8 Charset parameter set
         """
         atom_feed = feedgenerator.Atom1Feed("title", "link", "description")
         self.assertEqual(
@@ -97,7 +94,7 @@ class FeedgeneratorTest(unittest.TestCase):
 
     def test_rss_mime_type(self):
         """
-        Test to make sure RSS MIME type has UTF8 Charset parameter set
+        RSS MIME type has UTF8 Charset parameter set
         """
         rss_feed = feedgenerator.Rss201rev2Feed("title", "link", "description")
         self.assertEqual(
@@ -108,7 +105,7 @@ class FeedgeneratorTest(unittest.TestCase):
 
     def test_feed_without_feed_url_gets_rendered_without_atom_link(self):
         feed = feedgenerator.Rss201rev2Feed('title', '/link/', 'descr')
-        self.assertEqual(feed.feed['feed_url'], None)
+        self.assertIsNone(feed.feed['feed_url'])
         feed_content = feed.writeString('utf-8')
         self.assertNotIn('<atom:link', feed_content)
         self.assertNotIn('href="/feed/"', feed_content)
@@ -121,3 +118,20 @@ class FeedgeneratorTest(unittest.TestCase):
         self.assertIn('<atom:link', feed_content)
         self.assertIn('href="/feed/"', feed_content)
         self.assertIn('rel="self"', feed_content)
+
+    def test_atom_add_item(self):
+        # Not providing any optional arguments to Atom1Feed.add_item()
+        feed = feedgenerator.Atom1Feed('title', '/link/', 'descr')
+        feed.add_item('item_title', 'item_link', 'item_description')
+        feed.writeString('utf-8')
+
+    def test_deterministic_attribute_order(self):
+        feed = feedgenerator.Atom1Feed('title', '/link/', 'desc')
+        feed_content = feed.writeString('utf-8')
+        self.assertIn('href="/link/" rel="alternate"', feed_content)
+
+    def test_latest_post_date_returns_utc_time(self):
+        for use_tz in (True, False):
+            with self.settings(USE_TZ=use_tz):
+                rss_feed = feedgenerator.Rss201rev2Feed('title', 'link', 'description')
+                self.assertEqual(rss_feed.latest_post_date().tzinfo, utc)

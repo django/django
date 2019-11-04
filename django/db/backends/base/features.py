@@ -1,9 +1,8 @@
-from django.db.models.aggregates import StdDev
 from django.db.utils import ProgrammingError
 from django.utils.functional import cached_property
 
 
-class BaseDatabaseFeatures(object):
+class BaseDatabaseFeatures:
     gis_enabled = False
     allows_group_by_pk = False
     allows_group_by_selected_pks = False
@@ -24,19 +23,22 @@ class BaseDatabaseFeatures(object):
 
     can_use_chunked_reads = True
     can_return_id_from_insert = False
-    has_bulk_insert = False
-    uses_savepoints = False
+    can_return_ids_from_bulk_insert = False
+    has_bulk_insert = True
+    uses_savepoints = True
     can_release_savepoints = False
-    can_combine_inserts_with_and_without_auto_increment_pk = False
 
     # If True, don't use integer foreign keys referring to, e.g., positive
     # integer primary keys.
     related_fields_match_type = False
-    allow_sliced_subqueries = True
+    allow_sliced_subqueries_with_in = True
     has_select_for_update = False
     has_select_for_update_nowait = False
-
-    supports_select_related = True
+    has_select_for_update_skip_locked = False
+    has_select_for_update_of = False
+    # Does the database's SELECT FOR UPDATE OF syntax require a column rather
+    # than a table?
+    select_for_update_of_column = False
 
     # Does the default test database allow multiple connections?
     # Usually an indication that the test database is in-memory
@@ -56,7 +58,6 @@ class BaseDatabaseFeatures(object):
     # Is there a REAL datatype in addition to floats/doubles?
     has_real_datatype = False
     supports_subqueries_in_group_by = True
-    supports_bitwise_or = True
 
     # Is there a true datatype for uuid?
     has_native_uuid_field = False
@@ -64,14 +65,9 @@ class BaseDatabaseFeatures(object):
     # Is there a true datatype for timedeltas?
     has_native_duration_field = False
 
-    # Does the database driver support timedeltas as arguments?
-    # This is only relevant when there is a native duration field.
-    # Specifically, there is a bug with cx_Oracle:
-    # https://bitbucket.org/anthony_tuininga/cx_oracle/issue/7/
-    driver_supports_timedelta_args = False
-
-    # Do time/datetime fields have microsecond precision?
-    supports_microsecond_precision = True
+    # Does the database driver supports same type temporal data subtraction
+    # by returning the type used to store duration field?
+    supports_temporal_subtraction = False
 
     # Does the __regex lookup support backreferencing and grouping?
     supports_regex_backreferencing = True
@@ -92,8 +88,8 @@ class BaseDatabaseFeatures(object):
     # Does the backend order NULL values as largest or smallest?
     nulls_order_largest = False
 
-    # Is there a 1000 item limit on query parameters?
-    supports_1000_query_parameters = True
+    # The database's limit on the number of query parameters.
+    max_query_params = None
 
     # Can an object have an autoincrement primary key of 0? MySQL says No.
     allows_auto_pk_0 = True
@@ -111,16 +107,6 @@ class BaseDatabaseFeatures(object):
 
     # Does the backend reset sequences between tests?
     supports_sequence_reset = True
-
-    # Can the backend determine reliably the length of a CharField?
-    can_introspect_max_length = True
-
-    # Can the backend determine reliably if a field is nullable?
-    # Note that this is separate from interprets_empty_strings_as_nulls,
-    # although the latter feature, when true, interferes with correct
-    # setting (and introspection) of CharFields' nullability.
-    # This is True for all core backends.
-    can_introspect_null = True
 
     # Can the backend introspect the default value of a column?
     can_introspect_default = True
@@ -142,6 +128,9 @@ class BaseDatabaseFeatures(object):
     # Can the backend introspect an DecimalField, instead of an FloatField?
     can_introspect_decimal_field = True
 
+    # Can the backend introspect a DurationField, instead of a BigIntegerField?
+    can_introspect_duration_field = True
+
     # Can the backend introspect an IPAddressField, instead of an CharField?
     can_introspect_ip_address_field = False
 
@@ -154,11 +143,25 @@ class BaseDatabaseFeatures(object):
     # Can the backend introspect a TimeField, instead of a DateTimeField?
     can_introspect_time_field = True
 
+    # Some backends may not be able to differentiate BigAutoField from other
+    # fields such as AutoField.
+    introspected_big_auto_field_type = 'BigAutoField'
+
+    # Some backends may not be able to differentiate BooleanField from other
+    # fields such as IntegerField.
+    introspected_boolean_field_type = 'BooleanField'
+
+    # Can the backend introspect the column order (ASC/DESC) for indexes?
+    supports_index_column_ordering = True
+
+    # Does the backend support introspection of materialized views?
+    can_introspect_materialized_views = False
+
     # Support for the DISTINCT ON clause
     can_distinct_on_fields = False
 
     # Does the backend decide to commit before SAVEPOINT statements
-    # when autocommit is disabled? http://bugs.python.org/issue8145#msg109965
+    # when autocommit is disabled? https://bugs.python.org/issue8145#msg109965
     autocommits_when_autocommit_is_off = False
 
     # Does the backend prevent running SQL queries in broken transactions?
@@ -166,6 +169,9 @@ class BaseDatabaseFeatures(object):
 
     # Can we roll back DDL in a transaction?
     can_rollback_ddl = False
+
+    # Does it support operations requiring references rename in a transaction?
+    supports_atomic_references_rename = True
 
     # Can we issue more than one ALTER COLUMN clause in an ALTER TABLE?
     supports_combined_alters = False
@@ -175,6 +181,7 @@ class BaseDatabaseFeatures(object):
 
     # Does it support CHECK constraints?
     supports_column_check_constraints = True
+    supports_table_check_constraints = True
 
     # Does the backend support 'pyformat' style ("... %(name)s ...", {'name': value})
     # parameter passing? Note this can be provided by the backend even if not
@@ -193,17 +200,11 @@ class BaseDatabaseFeatures(object):
     # Does 'a' LIKE 'A' match?
     has_case_insensitive_like = True
 
-    # Does the backend require the sqlparse library for splitting multi-line
-    # statements before executing them?
-    requires_sqlparse_for_splitting = True
-
     # Suffix for backends that don't support "SELECT xxx;" queries.
     bare_select_suffix = ''
 
     # If NULL is implied on columns without needing to be explicitly specified
     implied_column_null = False
-
-    uppercases_column_names = False
 
     # Does the backend support "select for update" queries with limit (and offset)?
     supports_select_for_update_with_limit = True
@@ -216,8 +217,81 @@ class BaseDatabaseFeatures(object):
     # Defaults to False to allow third-party backends to opt-in.
     can_clone_databases = False
 
+    # Does the backend consider table names with different casing to
+    # be equal?
+    ignores_table_name_case = False
+
+    # Place FOR UPDATE right after FROM clause. Used on MSSQL.
+    for_update_after_from = False
+
+    # Combinatorial flags
+    supports_select_union = True
+    supports_select_intersection = True
+    supports_select_difference = True
+    supports_slicing_ordering_in_compound = False
+    supports_parentheses_in_compound = True
+
+    # Does the database support SQL 2003 FILTER (WHERE ...) in aggregate
+    # expressions?
+    supports_aggregate_filter_clause = False
+
+    # Does the backend support indexing a TextField?
+    supports_index_on_text_field = True
+
+    # Does the backend support window expressions (expression OVER (...))?
+    supports_over_clause = False
+
+    # Does the backend support CAST with precision?
+    supports_cast_with_precision = True
+
+    # How many second decimals does the database return when casting a value to
+    # a type with time?
+    time_cast_precision = 6
+
+    # SQL to create a procedure for use by the Django test suite. The
+    # functionality of the procedure isn't important.
+    create_test_procedure_without_params_sql = None
+    create_test_procedure_with_int_param_sql = None
+
+    # Does the backend support keyword parameters for cursor.callproc()?
+    supports_callproc_kwargs = False
+
+    # Convert CharField results from bytes to str in database functions.
+    db_functions_convert_bytes_to_str = False
+
+    # What formats does the backend EXPLAIN syntax support?
+    supported_explain_formats = set()
+
+    # Does DatabaseOperations.explain_query_prefix() raise ValueError if
+    # unknown kwargs are passed to QuerySet.explain()?
+    validates_explain_options = True
+
+    # Does the backend support the default parameter in lead() and lag()?
+    supports_default_in_lead_lag = True
+
+    # Does the backend support ignoring constraint or uniqueness errors during
+    # INSERT?
+    supports_ignore_conflicts = True
+
+    # Does this backend require casting the results of CASE expressions used
+    # in UPDATE statements to ensure the expression has the correct type?
+    requires_casted_case_in_updates = False
+
+    # Does the backend support partial indexes (CREATE INDEX ... WHERE ...)?
+    supports_partial_indexes = True
+    supports_functions_in_partial_indexes = True
+
+    # Does the database allow more than one constraint or index on the same
+    # field(s)?
+    allows_multiple_constraints_on_same_fields = True
+
     def __init__(self, connection):
         self.connection = connection
+
+    @cached_property
+    def supports_explaining_query_execution(self):
+        """Does this backend support explaining query execution?"""
+        return self.connection.ops.explain_prefix is not None
 
     @cached_property
     def supports_transactions(self):
@@ -232,29 +306,3 @@ class BaseDatabaseFeatures(object):
             count, = cursor.fetchone()
             cursor.execute('DROP TABLE ROLLBACK_TEST')
         return count == 0
-
-    @cached_property
-    def supports_stddev(self):
-        """Confirm support for STDDEV and related stats functions."""
-        try:
-            self.connection.ops.check_expression_support(StdDev(1))
-            return True
-        except NotImplementedError:
-            return False
-
-    def introspected_boolean_field_type(self, field=None, created_separately=False):
-        """
-        What is the type returned when the backend introspects a BooleanField?
-        The optional arguments may be used to give further details of the field to be
-        introspected; in particular, they are provided by Django's test suite:
-        field -- the field definition
-        created_separately -- True if the field was added via a SchemaEditor's AddField,
-                              False if the field was created with the model
-
-        Note that return value from this function is compared by tests against actual
-        introspection results; it should provide expectations, not run an introspection
-        itself.
-        """
-        if self.can_introspect_null and field and field.null:
-            return 'NullBooleanField'
-        return 'BooleanField'

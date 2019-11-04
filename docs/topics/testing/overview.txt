@@ -128,7 +128,7 @@ be reported, and any test databases created by the run will not be destroyed.
 .. admonition:: Test with warnings enabled
 
     It's a good idea to run your tests with Python warnings enabled:
-    ``python -Wall manage.py test``. The ``-Wall`` flag tells Python to
+    ``python -Wa manage.py test``. The ``-Wa`` flag tells Python to
     display deprecation warnings. Django, like many other Python libraries,
     uses these warnings to flag when features are going away. It also might
     flag areas in your code that aren't strictly wrong but could benefit
@@ -149,7 +149,14 @@ when all the tests have been executed.
 You can prevent the test databases from being destroyed by using the
 :option:`test --keepdb` option. This will preserve the test database between
 runs. If the database does not exist, it will first be created. Any migrations
-will also be applied in order to keep it p to date.
+will also be applied in order to keep it up to date.
+
+As described in the previous section, if a test run is forcefully interrupted,
+the test database may not be destroyed. On the next run, you'll be asked
+whether you want to reuse or destroy the database. Use the :option:`test
+--noinput` option to suppress that prompt and automatically destroy the
+database. This can be useful when running tests on a continuous integration
+server where tests may be interrupted by a timeout, for example.
 
 The default test database names are created by prepending ``test_`` to the
 value of each :setting:`NAME` in :setting:`DATABASES`. When using SQLite, the
@@ -177,9 +184,9 @@ control the particular collation used by the test database. See the
 :doc:`settings documentation </ref/settings>` for details of these
 and other advanced settings.
 
-If using a SQLite in-memory database with Python 3.4+ and SQLite 3.7.13+,
-`shared cache <https://www.sqlite.org/sharedcache.html>`_ will be enabled, so
-you can write tests with ability to share the database between threads.
+If using an SQLite in-memory database with SQLite, `shared cache
+<https://www.sqlite.org/sharedcache.html>`_ is enabled, so you can write tests
+with ability to share the database between threads.
 
 .. admonition:: Finding data from your production database when running tests?
 
@@ -252,8 +259,6 @@ The initial serialization is usually very quick, but if you wish to exclude
 some apps from this process (and speed up test runs slightly), you may add
 those apps to :setting:`TEST_NON_SERIALIZED_APPS`.
 
-.. versionchanged:: 1.9
-
 To prevent serialized data from being loaded twice, setting
 ``serialized_rollback=True`` disables the
 :data:`~django.db.models.signals.post_migrate` signal when flushing the test
@@ -304,8 +309,8 @@ failed::
     ----------------------------------------------------------------------
     Traceback (most recent call last):
       File "/dev/mysite/polls/tests.py", line 16, in test_was_published_recently_with_future_poll
-        self.assertEqual(future_poll.was_published_recently(), False)
-    AssertionError: True != False
+        self.assertIs(future_poll.was_published_recently(), False)
+    AssertionError: True is not False
 
     ----------------------------------------------------------------------
     Ran 1 test in 0.003s
@@ -326,10 +331,18 @@ need to test for success or failure at that level.
 Speeding up the tests
 ---------------------
 
-In recent versions of Django, the default password hasher is rather slow by
-design. If during your tests you are authenticating many users, you may want
-to use a custom settings file and set the :setting:`PASSWORD_HASHERS` setting
-to a faster hashing algorithm::
+Running tests in parallel
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+As long as your tests are properly isolated, you can run them in parallel to
+gain a speed up on multi-core hardware. See :option:`test --parallel`.
+
+Password hashing
+~~~~~~~~~~~~~~~~
+
+The default password hasher is rather slow by design. If you're authenticating
+many users in your tests, you may want to use a custom settings file and set
+the :setting:`PASSWORD_HASHERS` setting to a faster hashing algorithm::
 
     PASSWORD_HASHERS = [
         'django.contrib.auth.hashers.MD5PasswordHasher',
@@ -337,3 +350,10 @@ to a faster hashing algorithm::
 
 Don't forget to also include in :setting:`PASSWORD_HASHERS` any hashing
 algorithm used in fixtures, if any.
+
+Preserving the test database
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The :option:`test --keepdb` option preserves the test database between test
+runs. It skips the create and destroy actions which can greatly decrease the
+time to run tests.

@@ -7,7 +7,7 @@ from django.test import TestCase, modify_settings, override_settings
 from .settings import FLATPAGES_TEMPLATES
 
 
-class TestDataMixin(object):
+class TestDataMixin:
 
     @classmethod
     def setUpTestData(cls):
@@ -40,7 +40,7 @@ class TestDataMixin(object):
 @modify_settings(INSTALLED_APPS={'append': 'django.contrib.flatpages'})
 @override_settings(
     LOGIN_URL='/accounts/login/',
-    MIDDLEWARE_CLASSES=[
+    MIDDLEWARE=[
         'django.middleware.common.CommonMiddleware',
         'django.contrib.sessions.middleware.SessionMiddleware',
         'django.middleware.csrf.CsrfViewMiddleware',
@@ -60,7 +60,10 @@ class FlatpageMiddlewareTests(TestDataMixin, TestCase):
         self.assertContains(response, "<p>Isn't it flat!</p>")
 
     def test_view_non_existent_flatpage(self):
-        "A non-existent flatpage raises 404 when served through a view, even when the middleware is in use"
+        """
+        A nonexistent flatpage raises 404 when served through a view, even when
+        the middleware is in use.
+        """
         response = self.client.get('/flatpage_root/no_such_flatpage/')
         self.assertEqual(response.status_code, 404)
 
@@ -79,7 +82,10 @@ class FlatpageMiddlewareTests(TestDataMixin, TestCase):
         self.assertContains(response, "<p>Isn't it flat!</p>")
 
     def test_fallback_non_existent_flatpage(self):
-        "A non-existent flatpage raises a 404 when served by the fallback middleware"
+        """
+        A nonexistent flatpage raises a 404 when served by the fallback
+        middleware.
+        """
         response = self.client.get('/no_such_flatpage/')
         self.assertEqual(response.status_code, 404)
 
@@ -111,7 +117,7 @@ class FlatpageMiddlewareTests(TestDataMixin, TestCase):
 @override_settings(
     APPEND_SLASH=True,
     LOGIN_URL='/accounts/login/',
-    MIDDLEWARE_CLASSES=[
+    MIDDLEWARE=[
         'django.middleware.common.CommonMiddleware',
         'django.contrib.sessions.middleware.SessionMiddleware',
         'django.middleware.csrf.CsrfViewMiddleware',
@@ -131,7 +137,10 @@ class FlatpageMiddlewareAppendSlashTests(TestDataMixin, TestCase):
         self.assertRedirects(response, '/flatpage_root/flatpage/', status_code=301)
 
     def test_redirect_view_non_existent_flatpage(self):
-        "A non-existent flatpage raises 404 when served through a view and should not add a slash"
+        """
+        A nonexistent flatpage raises 404 when served through a view and
+        should not add a slash.
+        """
         response = self.client.get('/flatpage_root/no_such_flatpage')
         self.assertEqual(response.status_code, 404)
 
@@ -141,7 +150,10 @@ class FlatpageMiddlewareAppendSlashTests(TestDataMixin, TestCase):
         self.assertRedirects(response, '/flatpage/', status_code=301)
 
     def test_redirect_fallback_non_existent_flatpage(self):
-        "A non-existent flatpage raises a 404 when served by the fallback middleware and should not add a slash"
+        """
+        A nonexistent flatpage raises a 404 when served by the fallback
+        middleware and should not add a slash.
+        """
         response = self.client.get('/no_such_flatpage')
         self.assertEqual(response.status_code, 404)
 

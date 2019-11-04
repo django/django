@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 from django import forms
 from django.forms.formsets import DELETION_FIELD_NAME, BaseFormSet
 from django.forms.models import (
@@ -8,11 +6,10 @@ from django.forms.models import (
 )
 from django.forms.utils import ErrorDict, ErrorList
 from django.test import TestCase
-from django.utils import six
 
 from .models import (
-    Host, Manager, Network, ProfileNetwork, Restaurant, User, UserProfile,
-    UserSite,
+    Host, Manager, Network, ProfileNetwork, Restaurant, User, UserPreferences,
+    UserProfile, UserSite,
 )
 
 
@@ -58,7 +55,7 @@ class InlineFormsetTests(TestCase):
             'usersite_set-TOTAL_FORMS': '1',
             'usersite_set-INITIAL_FORMS': '1',
             'usersite_set-MAX_NUM_FORMS': '0',
-            'usersite_set-0-id': six.text_type(usersite[0]['id']),
+            'usersite_set-0-id': str(usersite[0]['id']),
             'usersite_set-0-data': '11',
             'usersite_set-0-user': 'apollo13'
         }
@@ -76,7 +73,7 @@ class InlineFormsetTests(TestCase):
             'usersite_set-TOTAL_FORMS': '2',
             'usersite_set-INITIAL_FORMS': '1',
             'usersite_set-MAX_NUM_FORMS': '0',
-            'usersite_set-0-id': six.text_type(usersite[0]['id']),
+            'usersite_set-0-id': str(usersite[0]['id']),
             'usersite_set-0-data': '11',
             'usersite_set-0-user': 'apollo13',
             'usersite_set-1-data': '42',
@@ -131,7 +128,7 @@ class InlineFormsetTests(TestCase):
             'manager_set-TOTAL_FORMS': '1',
             'manager_set-INITIAL_FORMS': '1',
             'manager_set-MAX_NUM_FORMS': '0',
-            'manager_set-0-id': six.text_type(manager[0]['id']),
+            'manager_set-0-id': str(manager[0]['id']),
             'manager_set-0-name': 'Terry Gilliam'
         }
         form_set = FormSet(data, instance=restaurant)
@@ -147,7 +144,7 @@ class InlineFormsetTests(TestCase):
             'manager_set-TOTAL_FORMS': '2',
             'manager_set-INITIAL_FORMS': '1',
             'manager_set-MAX_NUM_FORMS': '0',
-            'manager_set-0-id': six.text_type(manager[0]['id']),
+            'manager_set-0-id': str(manager[0]['id']),
             'manager_set-0-name': 'Terry Gilliam',
             'manager_set-1-name': 'John Cleese'
         }
@@ -173,6 +170,14 @@ class InlineFormsetTests(TestCase):
 
         # Testing the inline model's relation
         self.assertEqual(formset[0].instance.user_id, "guido")
+
+    def test_inline_model_with_primary_to_field(self):
+        """An inline model with a OneToOneField with to_field & primary key."""
+        FormSet = inlineformset_factory(User, UserPreferences, exclude=('is_superuser',))
+        user = User.objects.create(username='guido', serial=1337)
+        UserPreferences.objects.create(user=user, favorite_number=10)
+        formset = FormSet(instance=user)
+        self.assertEqual(formset[0].fields['user'].initial, 'guido')
 
     def test_inline_model_with_to_field_to_rel(self):
         """
@@ -228,7 +233,7 @@ class InlineFormsetTests(TestCase):
             'host_set-TOTAL_FORMS': '2',
             'host_set-INITIAL_FORMS': '1',
             'host_set-MAX_NUM_FORMS': '0',
-            'host_set-0-id': six.text_type(host1.id),
+            'host_set-0-id': str(host1.id),
             'host_set-0-hostname': 'tranquility.hub.dal.net',
             'host_set-1-hostname': 'matrix.de.eu.dal.net'
         }
@@ -291,10 +296,12 @@ class FormsetTests(TestCase):
 
     def test_extraneous_query_is_not_run(self):
         Formset = modelformset_factory(Network, fields="__all__")
-        data = {'test-TOTAL_FORMS': '1',
-                'test-INITIAL_FORMS': '0',
-                'test-MAX_NUM_FORMS': '',
-                'test-0-name': 'Random Place', }
+        data = {
+            'test-TOTAL_FORMS': '1',
+            'test-INITIAL_FORMS': '0',
+            'test-MAX_NUM_FORMS': '',
+            'test-0-name': 'Random Place',
+        }
         with self.assertNumQueries(1):
             formset = Formset(data, prefix="test")
             formset.save()
@@ -315,7 +322,7 @@ class UserSiteForm(forms.ModelForm):
         localized_fields = ('data',)
 
 
-class Callback(object):
+class Callback:
 
     def __init__(self):
         self.log = []
@@ -365,8 +372,7 @@ class FormfieldCallbackTests(TestCase):
 
     def test_modelformset_custom_callback(self):
         callback = Callback()
-        modelformset_factory(UserSite, form=UserSiteForm,
-                             formfield_callback=callback)
+        modelformset_factory(UserSite, form=UserSiteForm, formfield_callback=callback)
         self.assertCallbackCalled(callback)
 
 
@@ -378,7 +384,7 @@ class BaseCustomDeleteFormSet(BaseFormSet):
     form.should_delete() is called. The formset delete field is also suppressed.
     """
     def add_fields(self, form, index):
-        super(BaseCustomDeleteFormSet, self).add_fields(form, index)
+        super().add_fields(form, index)
         self.can_delete = True
         if DELETION_FIELD_NAME in form.fields:
             del form.fields[DELETION_FIELD_NAME]
@@ -507,7 +513,7 @@ class RedeleteTests(TestCase):
             'usersite_set-TOTAL_FORMS': '1',
             'usersite_set-INITIAL_FORMS': '1',
             'usersite_set-MAX_NUM_FORMS': '1',
-            'usersite_set-0-id': six.text_type(us.pk),
+            'usersite_set-0-id': str(us.pk),
             'usersite_set-0-data': '7',
             'usersite_set-0-user': 'foo',
             'usersite_set-0-DELETE': '1'
@@ -533,7 +539,7 @@ class RedeleteTests(TestCase):
             'usersite_set-TOTAL_FORMS': '1',
             'usersite_set-INITIAL_FORMS': '1',
             'usersite_set-MAX_NUM_FORMS': '1',
-            'usersite_set-0-id': six.text_type(us.pk),
+            'usersite_set-0-id': str(us.pk),
             'usersite_set-0-data': '7',
             'usersite_set-0-user': 'foo',
             'usersite_set-0-DELETE': '1'

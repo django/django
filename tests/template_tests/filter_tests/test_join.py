@@ -27,8 +27,7 @@ class JoinTests(SimpleTestCase):
         output = self.engine.render_to_string('join04', {'a': ['alpha', 'beta & me']})
         self.assertEqual(output, 'alpha &amp; beta & me')
 
-    # #11377 Test that joining with unsafe joiners doesn't result in
-    # unsafe strings
+    # Joining with unsafe joiners doesn't result in unsafe strings.
     @setup({'join05': '{{ a|join:var }}'})
     def test_join05(self):
         output = self.engine.render_to_string('join05', {'a': ['alpha', 'beta & me'], 'var': ' & '})
@@ -66,3 +65,11 @@ class FunctionTests(SimpleTestCase):
             join(['<a>', '<img>', '</a>'], '<br>', autoescape=False),
             '<a>&lt;br&gt;<img>&lt;br&gt;</a>',
         )
+
+    def test_noniterable_arg(self):
+        obj = object()
+        self.assertEqual(join(obj, '<br>'), obj)
+
+    def test_noniterable_arg_autoescape_off(self):
+        obj = object()
+        self.assertEqual(join(obj, '<br>', autoescape=False), obj)

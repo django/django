@@ -1,12 +1,10 @@
-from __future__ import unicode_literals
-
 from django.db import IntegrityError, connection, transaction
 from django.test import TestCase
 
 from .models import (
     Bar, Director, Favorites, HiddenPointer, ManualPrimaryKey, MultiModel,
-    Place, Pointer, RelatedModel, Restaurant, School, Target, UndergroundBar,
-    Waiter,
+    Place, Pointer, RelatedModel, Restaurant, School, Target, ToFieldPointer,
+    UndergroundBar, Waiter,
 )
 
 
@@ -164,10 +162,8 @@ class OneToOneTests(TestCase):
 
     def test_create_models_m2m(self):
         """
-        Regression test for #1064 and #1506
-
-        Check that we create models via the m2m relation if the remote model
-        has a OneToOneField.
+        Models are created via the m2m relation if the remote model has a
+        OneToOneField (#1064, #1506).
         """
         f = Favorites(name='Fred')
         f.save()
@@ -179,9 +175,7 @@ class OneToOneTests(TestCase):
 
     def test_reverse_object_cache(self):
         """
-        Regression test for #7173
-
-        Check that the name of the cache for the reverse object is correct.
+        The name of the cache for the reverse object is correct (#7173).
         """
         self.assertEqual(self.p1.restaurant, self.r1)
         self.assertEqual(self.p1.bar, self.b1)
@@ -202,6 +196,15 @@ class OneToOneTests(TestCase):
         # UndergroundBar.
         p.undergroundbar = None
 
+    def test_assign_none_to_null_cached_reverse_relation(self):
+        p = Place.objects.get(name='Demon Dogs')
+        # Prime the relation's cache with a value of None.
+        with self.assertRaises(Place.undergroundbar.RelatedObjectDoesNotExist):
+            getattr(p, 'undergroundbar')
+        # Assigning None works if there isn't a related UndergroundBar and the
+        # reverse cache has a value of None.
+        p.undergroundbar = None
+
     def test_related_object_cache(self):
         """ Regression test for #6886 (the related-object cache) """
 
@@ -213,7 +216,7 @@ class OneToOneTests(TestCase):
         self.assertIs(p.restaurant, r)
 
         # But if we kill the cache, we get a new object
-        del p._restaurant_cache
+        del p._state.fields_cache['restaurant']
         self.assertIsNot(p.restaurant, r)
 
         # Reassigning the Restaurant object results in an immediate cache update
@@ -228,12 +231,15 @@ class OneToOneTests(TestCase):
         ug_bar.place = None
         self.assertIsNone(ug_bar.place)
 
-        # Assigning None fails: Place.restaurant is null=False
-        with self.assertRaises(ValueError):
-            setattr(p, 'restaurant', None)
+        # Assigning None will not fail: Place.restaurant is null=False
+        setattr(p, 'restaurant', None)
 
         # You also can't assign an object of the wrong type here
-        with self.assertRaises(ValueError):
+        msg = (
+            'Cannot assign "<Place: Demon Dogs the place>": '
+            '"Place.restaurant" must be a "Restaurant" instance.'
+        )
+        with self.assertRaisesMessage(ValueError, msg):
             setattr(p, 'restaurant', p)
 
         # Creation using keyword argument should cache the related object.
@@ -261,24 +267,11 @@ class OneToOneTests(TestCase):
         misbehaving. We test both (primary_key=True & False) cases here to
         prevent any reappearance of the problem.
         """
-        Target.objects.create()
-
-        self.assertQuerysetEqual(
-            Target.objects.filter(pointer=None),
-            ['<Target: Target object>']
-        )
-        self.assertQuerysetEqual(
-            Target.objects.exclude(pointer=None),
-            []
-        )
-        self.assertQuerysetEqual(
-            Target.objects.filter(second_pointer=None),
-            ['<Target: Target object>']
-        )
-        self.assertQuerysetEqual(
-            Target.objects.exclude(second_pointer=None),
-            []
-        )
+        target = Target.objects.create()
+        self.assertSequenceEqual(Target.objects.filter(pointer=None), [target])
+        self.assertSequenceEqual(Target.objects.exclude(pointer=None), [])
+        self.assertSequenceEqual(Target.objects.filter(second_pointer=None), [target])
+        self.assertSequenceEqual(Target.objects.exclude(second_pointer=None), [])
 
     def test_o2o_primary_key_delete(self):
         t = Target.objects.create(name='name')
@@ -431,16 +424,10 @@ class OneToOneTests(TestCase):
         private_director = Director.objects.create(school=private_school, is_temp=True)
 
         # Only one school is available via all() due to the custom default manager.
-        self.assertQuerysetEqual(
-            School.objects.all(),
-            ["<School: School object>"]
-        )
+        self.assertSequenceEqual(School.objects.all(), [public_school])
 
         # Only one director is available via all() due to the custom default manager.
-        self.assertQuerysetEqual(
-            Director.objects.all(),
-            ["<Director: Director object>"]
-        )
+        self.assertSequenceEqual(Director.objects.all(), [public_director])
 
         self.assertEqual(public_director.school, public_school)
         self.assertEqual(public_school.director, public_director)
@@ -455,24 +442,25 @@ class OneToOneTests(TestCase):
         # allow it.
         self.assertEqual(private_school.director, private_director)
 
-        # If the manager is marked "use_for_related_fields", it'll get used instead
-        # of the "bare" queryset. Usually you'd define this as a property on the class,
-        # but this approximates that in a way that's easier in tests.
-        School.objects.use_for_related_fields = True
+        School._meta.base_manager_name = 'objects'
+        School._meta._expire_cache()
         try:
             private_director = Director._base_manager.get(pk=private_director.pk)
             with self.assertRaises(School.DoesNotExist):
                 private_director.school
         finally:
-            School.objects.use_for_related_fields = False
+            School._meta.base_manager_name = None
+            School._meta._expire_cache()
 
-        Director.objects.use_for_related_fields = True
+        Director._meta.base_manager_name = 'objects'
+        Director._meta._expire_cache()
         try:
             private_school = School._base_manager.get(pk=private_school.pk)
             with self.assertRaises(Director.DoesNotExist):
                 private_school.director
         finally:
-            Director.objects.use_for_related_fields = False
+            Director._meta.base_manager_name = None
+            Director._meta._expire_cache()
 
     def test_hasattr_related_object(self):
         # The exception raised on attribute access when a related object
@@ -495,17 +483,37 @@ class OneToOneTests(TestCase):
     def test_rel_pk_subquery(self):
         r = Restaurant.objects.first()
         q1 = Restaurant.objects.filter(place_id=r.pk)
-        # Test that subquery using primary key and a query against the
+        # Subquery using primary key and a query against the
         # same model works correctly.
         q2 = Restaurant.objects.filter(place_id__in=q1)
-        self.assertQuerysetEqual(q2, [r], lambda x: x)
-        # Test that subquery using 'pk__in' instead of 'place_id__in' work, too.
+        self.assertSequenceEqual(q2, [r])
+        # Subquery using 'pk__in' instead of 'place_id__in' work, too.
         q2 = Restaurant.objects.filter(
             pk__in=Restaurant.objects.filter(place__id=r.place.pk)
         )
-        self.assertQuerysetEqual(q2, [r], lambda x: x)
+        self.assertSequenceEqual(q2, [r])
+        q3 = Restaurant.objects.filter(place__in=Place.objects.all())
+        self.assertSequenceEqual(q3, [r])
+        q4 = Restaurant.objects.filter(place__in=Place.objects.filter(id=r.pk))
+        self.assertSequenceEqual(q4, [r])
 
     def test_rel_pk_exact(self):
         r = Restaurant.objects.first()
         r2 = Restaurant.objects.filter(pk__exact=r).first()
         self.assertEqual(r, r2)
+
+    def test_primary_key_to_field_filter(self):
+        target = Target.objects.create(name='foo')
+        pointer = ToFieldPointer.objects.create(target=target)
+        self.assertSequenceEqual(ToFieldPointer.objects.filter(target=target), [pointer])
+        self.assertSequenceEqual(ToFieldPointer.objects.filter(pk__exact=pointer), [pointer])
+
+    def test_cached_relation_invalidated_on_save(self):
+        """
+        Model.save() invalidates stale OneToOneField relations after a primary
+        key assignment.
+        """
+        self.assertEqual(self.b1.place, self.p1)  # caches b1.place
+        self.b1.place_id = self.p2.pk
+        self.b1.save()
+        self.assertEqual(self.b1.place, self.p2)

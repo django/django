@@ -1,13 +1,11 @@
-from __future__ import unicode_literals
-
+import functools
 from importlib import import_module
 
 from django.core.exceptions import ViewDoesNotExist
-from django.utils import lru_cache, six
 from django.utils.module_loading import module_has_submodule
 
 
-@lru_cache.lru_cache(maxsize=None)
+@functools.lru_cache(maxsize=None)
 def get_callable(lookup_view):
     """
     Return a callable corresponding to lookup_view.
@@ -19,7 +17,7 @@ def get_callable(lookup_view):
     if callable(lookup_view):
         return lookup_view
 
-    if not isinstance(lookup_view, six.string_types):
+    if not isinstance(lookup_view, str):
         raise ViewDoesNotExist("'%s' is not a callable or a dot-notation path" % lookup_view)
 
     mod_name, func_name = get_mod_func(lookup_view)

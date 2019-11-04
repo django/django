@@ -3,15 +3,12 @@
 """
 from django.contrib.gis.db.backends.base.models import SpatialRefSysMixin
 from django.db import models
-from django.utils.encoding import python_2_unicode_compatible
 
 
-@python_2_unicode_compatible
 class PostGISGeometryColumns(models.Model):
     """
-    The 'geometry_columns' table from the PostGIS. See the PostGIS
+    The 'geometry_columns' view from PostGIS. See the PostGIS
     documentation at Ch. 4.3.2.
-    On PostGIS 2, this is a view.
     """
     f_table_catalog = models.CharField(max_length=256)
     f_table_schema = models.CharField(max_length=256)
@@ -26,10 +23,19 @@ class PostGISGeometryColumns(models.Model):
         db_table = 'geometry_columns'
         managed = False
 
+    def __str__(self):
+        return '%s.%s - %dD %s field (SRID: %d)' % (
+            self.f_table_name,
+            self.f_geometry_column,
+            self.coord_dimension,
+            self.type,
+            self.srid,
+        )
+
     @classmethod
     def table_name_col(cls):
         """
-        Returns the name of the metadata column used to store the feature table
+        Return the name of the metadata column used to store the feature table
         name.
         """
         return 'f_table_name'
@@ -37,15 +43,10 @@ class PostGISGeometryColumns(models.Model):
     @classmethod
     def geom_col_name(cls):
         """
-        Returns the name of the metadata column used to store the feature
+        Return the name of the metadata column used to store the feature
         geometry column.
         """
         return 'f_geometry_column'
-
-    def __str__(self):
-        return "%s.%s - %dD %s field (SRID: %d)" % \
-               (self.f_table_name, self.f_geometry_column,
-                self.coord_dimension, self.type, self.srid)
 
 
 class PostGISSpatialRefSys(models.Model, SpatialRefSysMixin):
@@ -67,7 +68,3 @@ class PostGISSpatialRefSys(models.Model, SpatialRefSysMixin):
     @property
     def wkt(self):
         return self.srtext
-
-    @classmethod
-    def wkt_col(cls):
-        return 'srtext'

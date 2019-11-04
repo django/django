@@ -1,68 +1,36 @@
-from __future__ import unicode_literals
-
 import os
-import sys
 import tempfile
-from os.path import abspath, dirname, isabs, join, normcase, normpath, sep
+from os.path import abspath, dirname, join, normcase, sep
 
 from django.core.exceptions import SuspiciousFileOperation
-from django.utils import six
-from django.utils.encoding import force_text
 
-if six.PY2:
-    fs_encoding = sys.getfilesystemencoding() or sys.getdefaultencoding()
-
-
-# Under Python 2, define our own abspath function that can handle joining
-# unicode paths to a current working directory that has non-ASCII characters
-# in it.  This isn't necessary on Windows since the Windows version of abspath
-# handles this correctly. It also handles drive letters differently than the
-# pure Python implementation, so it's best not to replace it.
-if six.PY3 or os.name == 'nt':
-    abspathu = abspath
-else:
-    def abspathu(path):
-        """
-        Version of os.path.abspath that uses the unicode representation
-        of the current working directory, thus avoiding a UnicodeDecodeError
-        in join when the cwd has non-ASCII characters.
-        """
-        if not isabs(path):
-            path = join(os.getcwdu(), path)
-        return normpath(path)
+# For backwards-compatibility in Django 2.0
+abspathu = abspath
 
 
 def upath(path):
-    """
-    Always return a unicode path.
-    """
-    if six.PY2 and not isinstance(path, six.text_type):
-        return path.decode(fs_encoding)
+    """Always return a unicode path (did something for Python 2)."""
     return path
 
 
 def npath(path):
     """
     Always return a native path, that is unicode on Python 3 and bytestring on
-    Python 2.
+    Python 2. Noop for Python 3.
     """
-    if six.PY2 and not isinstance(path, bytes):
-        return path.encode(fs_encoding)
     return path
 
 
 def safe_join(base, *paths):
     """
-    Joins one or more path components to the base path component intelligently.
-    Returns a normalized, absolute version of the final path.
+    Join one or more path components to the base path component intelligently.
+    Return a normalized, absolute version of the final path.
 
-    The final path must be located inside of the base path component (otherwise
-    a ValueError is raised).
+    Raise ValueError if the final path isn't located inside of the base path
+    component.
     """
-    base = force_text(base)
-    paths = [force_text(p) for p in paths]
-    final_path = abspathu(join(base, *paths))
-    base_path = abspathu(base)
+    final_path = abspath(join(base, *paths))
+    base_path = abspath(base)
     # Ensure final_path starts with base_path (using normcase to ensure we
     # don't false-negative on case insensitive operating systems like Windows),
     # further, one of the following conditions must be true:
@@ -81,22 +49,17 @@ def safe_join(base, *paths):
 
 def symlinks_supported():
     """
-    A function to check if creating symlinks are supported in the
-    host platform and/or if they are allowed to be created (e.g.
-    on Windows it requires admin permissions).
+    Return whether or not creating symlinks are supported in the host platform
+    and/or if they are allowed to be created (e.g. on Windows it requires admin
+    permissions).
     """
-    tmpdir = tempfile.mkdtemp()
-    original_path = os.path.join(tmpdir, 'original')
-    symlink_path = os.path.join(tmpdir, 'symlink')
-    os.makedirs(original_path)
-    try:
-        os.symlink(original_path, symlink_path)
-        supported = True
-    except (OSError, NotImplementedError, AttributeError):
-        supported = False
-    else:
-        os.remove(symlink_path)
-    finally:
-        os.rmdir(original_path)
-        os.rmdir(tmpdir)
+    with tempfile.TemporaryDirectory() as temp_dir:
+        original_path = os.path.join(temp_dir, 'original')
+        symlink_path = os.path.join(temp_dir, 'symlink')
+        os.makedirs(original_path)
+        try:
+            os.symlink(original_path, symlink_path)
+            supported = True
+        except (OSError, NotImplementedError):
+            supported = False
         return supported

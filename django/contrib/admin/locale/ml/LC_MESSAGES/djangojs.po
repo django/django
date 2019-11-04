@@ -3,14 +3,15 @@
 # Translators:
 # Aby Thomas <abyzthomas@gmail.com>, 2014
 # Jannis Leidel <jannis@leidel.info>, 2011
+# MUHAMMED RAMEEZ <muhammedrameez2000@gmail.com>, 2019
 # Rajeesh Nair <rajeeshrnair@gmail.com>, 2012
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2015-10-10 08:16+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2018-05-17 11:50+0200\n"
+"PO-Revision-Date: 2019-03-09 08:56+0000\n"
+"Last-Translator: MUHAMMED RAMEEZ <muhammedrameez2000@gmail.com>\n"
 "Language-Team: Malayalam (http://www.transifex.com/django/django/language/"
 "ml/)\n"
 "MIME-Version: 1.0\n"
@@ -98,6 +99,21 @@ msgstr ""
 "നിങ്ങള്‍ ഒരു ആക്ഷന്‍ തെരഞ്ഞെടുത്തിട്ടുണ്ട്. കളങ്ങളില്‍ സേവ് ചെയ്യാത്ത മാറ്റങ്ങള്‍ ഇല്ല. നിങ്ങള്‍സേവ് ബട്ടണ്‍ "
 "തന്നെയാണോ അതോ ഗോ ബട്ടണാണോ ഉദ്ദേശിച്ചത്."
 
+msgid "Now"
+msgstr "ഇപ്പോള്‍"
+
+msgid "Midnight"
+msgstr "അര്‍ധരാത്രി"
+
+msgid "6 a.m."
+msgstr "6 a.m."
+
+msgid "Noon"
+msgstr "ഉച്ച"
+
+msgid "6 p.m."
+msgstr "6 p.m"
+
 #, javascript-format
 msgid "Note: You are %s hour ahead of server time."
 msgid_plural "Note: You are %s hours ahead of server time."
@@ -110,26 +126,11 @@ msgid_plural "Note: You are %s hours behind server time."
 msgstr[0] "ഒർക്കുക: സെർവർ സമയത്തിനെക്കാളും നിങ്ങൾ %s സമയം പിന്നിലാണ്."
 msgstr[1] "ഒർക്കുക: സെർവർ സമയത്തിനെക്കാളും നിങ്ങൾ %s സമയം പിന്നിലാണ്."
 
-msgid "Now"
-msgstr "ഇപ്പോള്‍"
-
 msgid "Choose a Time"
-msgstr ""
+msgstr "സമയം തിരഞ്ഞെടുക്കുക"
 
 msgid "Choose a time"
 msgstr "സമയം തെരഞ്ഞെടുക്കൂ"
-
-msgid "Midnight"
-msgstr "അര്‍ധരാത്രി"
-
-msgid "6 a.m."
-msgstr "6 a.m."
-
-msgid "Noon"
-msgstr "ഉച്ച"
-
-msgid "6 p.m."
-msgstr ""
 
 msgid "Cancel"
 msgstr "റദ്ദാക്കൂ"
@@ -138,7 +139,7 @@ msgid "Today"
 msgstr "ഇന്ന്"
 
 msgid "Choose a Date"
-msgstr ""
+msgstr "ഒരു തീയതി തിരഞ്ഞെടുക്കുക"
 
 msgid "Yesterday"
 msgstr "ഇന്നലെ"
@@ -146,13 +147,69 @@ msgstr "ഇന്നലെ"
 msgid "Tomorrow"
 msgstr "നാളെ"
 
-msgid ""
-"January February March April May June July August September October November "
-"December"
-msgstr "ജനുവരി ഫെബൃവരി മാര്‍ച്ച് ഏപ്രില്‍ മെയ് ജൂണ്‍ ജൂലൈ ആഗസ്ത് സെപ്തംബര്‍ ഒക്ടോബര്‍ നവംബര്‍ ഡിസംബര്‍"
+msgid "January"
+msgstr "ജനുവരി"
 
-msgid "S M T W T F S"
-msgstr "ഞാ തി ചൊ ബു വ്യാ വെ ശ"
+msgid "February"
+msgstr "ഫെബ്രുവരി"
+
+msgid "March"
+msgstr "മാർച്ച്"
+
+msgid "April"
+msgstr "ഏപ്രിൽ"
+
+msgid "May"
+msgstr "മെയ്"
+
+msgid "June"
+msgstr "ജൂൺ"
+
+msgid "July"
+msgstr "ജൂലൈ"
+
+msgid "August"
+msgstr "ആഗസ്റ്റ്"
+
+msgid "September"
+msgstr "സെപ്റ്റംബർ"
+
+msgid "October"
+msgstr "ഒക്ടോബർ"
+
+msgid "November"
+msgstr "നവംബർ"
+
+msgid "December"
+msgstr "ഡിസംബര്"
+
+msgctxt "one letter Sunday"
+msgid "S"
+msgstr "ഞ്ഞ‍"
+
+msgctxt "one letter Monday"
+msgid "M"
+msgstr "തി"
+
+msgctxt "one letter Tuesday"
+msgid "T"
+msgstr "ചൊ"
+
+msgctxt "one letter Wednesday"
+msgid "W"
+msgstr "ബു"
+
+msgctxt "one letter Thursday"
+msgid "T"
+msgstr "വ്യാ"
+
+msgctxt "one letter Friday"
+msgid "F"
+msgstr "വെ"
+
+msgctxt "one letter Saturday"
+msgid "S"
+msgstr "ശ"
 
 msgid "Show"
 msgstr "കാണട്ടെ"

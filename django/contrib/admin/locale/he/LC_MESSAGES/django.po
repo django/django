@@ -1,22 +1,23 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Alex Gaynor <alex.gaynor@gmail.com>, 2011
+# Alex Gaynor <inactive+Alex@transifex.com>, 2011
 # Jannis Leidel <jannis@leidel.info>, 2011
-# Meir Kriheli <mkriheli@gmail.com>, 2011-2015
+# Meir Kriheli <mkriheli@gmail.com>, 2011-2015,2017,2019
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-11-15 11:06+0100\n"
-"PO-Revision-Date: 2015-11-28 16:13+0000\n"
+"POT-Creation-Date: 2019-01-16 20:42+0100\n"
+"PO-Revision-Date: 2019-03-19 16:40+0000\n"
 "Last-Translator: Meir Kriheli <mkriheli@gmail.com>\n"
 "Language-Team: Hebrew (http://www.transifex.com/django/django/language/he/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: he\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Plural-Forms: nplurals=4; plural=(n == 1 && n % 1 == 0) ? 0 : (n == 2 && n % "
+"1 == 0) ? 1: (n % 10 == 0 && n % 1 == 0 && n > 10) ? 2 : 3;\n"
 
 #, python-format
 msgid "Successfully deleted %(count)d %(items)s."
@@ -63,6 +64,12 @@ msgstr "החודש"
 msgid "This year"
 msgstr "השנה"
 
+msgid "No date"
+msgstr "ללא תאריך"
+
+msgid "Has date"
+msgstr "עם תאריך"
+
 #, python-format
 msgid ""
 "Please enter the correct %(username)s and password for a staff account. Note "
@@ -73,6 +80,22 @@ msgstr ""
 
 msgid "Action:"
 msgstr "פעולה"
+
+#, python-format
+msgid "Add another %(verbose_name)s"
+msgstr "הוספת %(verbose_name)s"
+
+msgid "Remove"
+msgstr "להסיר"
+
+msgid "Addition"
+msgstr "הוספה"
+
+msgid "Change"
+msgstr "שינוי"
+
+msgid "Deletion"
+msgstr "מחיקה"
 
 msgid "action time"
 msgstr "זמן פעולה"
@@ -86,6 +109,8 @@ msgstr "סוג תוכן"
 msgid "object id"
 msgstr "מזהה אובייקט"
 
+#. Translators: 'repr' means representation
+#. (https://docs.python.org/library/functions.html#repr)
 msgid "object repr"
 msgstr "ייצוג אובייקט"
 
@@ -116,6 +141,31 @@ msgstr "בוצעה מחיקת \"%(object)s\"."
 msgid "LogEntry Object"
 msgstr "אובייקט LogEntry"
 
+#, python-brace-format
+msgid "Added {name} \"{object}\"."
+msgstr "בוצעה הוספת {name} \"{object}\"."
+
+msgid "Added."
+msgstr "נוסף."
+
+msgid "and"
+msgstr "ו"
+
+#, python-brace-format
+msgid "Changed {fields} for {name} \"{object}\"."
+msgstr "בוצע שינוי {fields} עבור {name} \"{object}\"."
+
+#, python-brace-format
+msgid "Changed {fields}."
+msgstr " {fields} שונו."
+
+#, python-brace-format
+msgid "Deleted {name} \"{object}\"."
+msgstr "בוצעה מחיקת {name} \"{object}\"."
+
+msgid "No fields changed."
+msgstr "אף שדה לא השתנה."
+
 msgid "None"
 msgstr "ללא"
 
@@ -124,62 +174,38 @@ msgid ""
 msgstr ""
 "יש להחזיק את \"Control\", או \"Command\" על מק, לחוץ כדי לבחור יותר מאחד."
 
-msgid "Added."
-msgstr "נוסף."
+#, python-brace-format
+msgid "The {name} \"{obj}\" was added successfully."
+msgstr "הוספת {name} \"{obj}\" בוצעה בהצלחה."
 
-#, python-format
-msgid "Changed %s."
-msgstr "%s שונה."
+msgid "You may edit it again below."
+msgstr "ניתן לערוך שוב מתחת."
 
-msgid "and"
-msgstr "ו"
-
-#, python-format
-msgid "Added %(name)s \"%(object)s\"."
-msgstr "בוצעה הוספת %(name)s \"%(object)s\"."
-
-#, python-format
-msgid "Changed %(list)s for %(name)s \"%(object)s\"."
-msgstr "בוצע שינוי %(list)s עבור %(name)s \"%(object)s\"."
-
-#, python-format
-msgid "Deleted %(name)s \"%(object)s\"."
-msgstr "בוצעה מחיקת %(name)s \"%(object)s\"."
-
-msgid "No fields changed."
-msgstr "אף שדה לא השתנה."
-
-#, python-format
+#, python-brace-format
 msgid ""
-"The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
-msgstr "הוספת %(name)s \"%(obj)s\" בוצעה בהצלחה. ניתן לערוך אותו שוב מתחת."
-
-#, python-format
-msgid ""
-"The %(name)s \"%(obj)s\" was added successfully. You may add another "
-"%(name)s below."
-msgstr ""
-"הוספת %(name)s \"%(obj)s\" בוצעה בהצלחה. ניתן להוסיף עוד %(name)s מתחת."
-
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was added successfully."
-msgstr "הוספת %(name)s \"%(obj)s\" בוצעה בהצלחה."
-
-#, python-format
-msgid ""
-"The %(name)s \"%(obj)s\" was changed successfully. You may edit it again "
+"The {name} \"{obj}\" was added successfully. You may add another {name} "
 "below."
-msgstr "עדכון %(name)s \"%(obj)s\" בוצע בהצלחה. ניתן לערוך שוב מתחת."
+msgstr "הוספת {name} \"{obj}\" בוצעה בהצלחה. ניתן להוסיף עוד {name} מתחת.."
 
-#, python-format
+#, python-brace-format
 msgid ""
-"The %(name)s \"%(obj)s\" was changed successfully. You may add another "
-"%(name)s below."
-msgstr "עדכון %(name)s \"%(obj)s\" בוצע בהצלחה. ניתן להוסיף עוד %(name)s מתחת."
+"The {name} \"{obj}\" was changed successfully. You may edit it again below."
+msgstr "עדכון {name} \"{obj}\" "
 
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was changed successfully."
-msgstr "שינוי %(name)s \"%(obj)s\" בוצע בהצלחה."
+#, python-brace-format
+msgid ""
+"The {name} \"{obj}\" was added successfully. You may edit it again below."
+msgstr "הוספת {name} \"{obj}\" בוצעה בהצלחה. ניתן לערוך שוב מתחת."
+
+#, python-brace-format
+msgid ""
+"The {name} \"{obj}\" was changed successfully. You may add another {name} "
+"below."
+msgstr "עדכון {name} \"{obj}\" בוצע בהצלחה. ניתן להוסיף עוד {name} מתחת."
+
+#, python-brace-format
+msgid "The {name} \"{obj}\" was changed successfully."
+msgstr "שינוי {name} \"{obj}\" בוצע בהצלחה."
 
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
@@ -194,8 +220,8 @@ msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "מחיקת %(name)s \"%(obj)s\" בוצעה בהצלחה."
 
 #, python-format
-msgid "%(name)s object with primary key %(key)r does not exist."
-msgstr "הפריט %(name)s עם המפתח הראשי %(key)r אינו קיים."
+msgid "%(name)s with ID \"%(key)s\" doesn't exist. Perhaps it was deleted?"
+msgstr "%(name)s עם ID \"%(key)s\" לא במצאי. אולי זה נמחק?"
 
 #, python-format
 msgid "Add %s"
@@ -205,6 +231,10 @@ msgstr "הוספת %s"
 msgid "Change %s"
 msgstr "שינוי %s"
 
+#, python-format
+msgid "View %s"
+msgstr "צפיה ב%s"
+
 msgid "Database error"
 msgstr "שגיאת בסיס נתונים"
 
@@ -213,12 +243,16 @@ msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
 msgstr[0] "שינוי %(count)s %(name)s בוצע בהצלחה."
 msgstr[1] "שינוי %(count)s %(name)s בוצע בהצלחה."
+msgstr[2] "שינוי %(count)s %(name)s בוצע בהצלחה."
+msgstr[3] "שינוי %(count)s %(name)s בוצע בהצלחה."
 
 #, python-format
 msgid "%(total_count)s selected"
 msgid_plural "All %(total_count)s selected"
 msgstr[0] "%(total_count)s נבחר"
 msgstr[1] "כל ה־%(total_count)s נבחרו"
+msgstr[2] "כל ה־%(total_count)s נבחרו"
+msgstr[3] "כל ה־%(total_count)s נבחרו"
 
 #, python-format
 msgid "0 of %(cnt)s selected"
@@ -312,7 +346,7 @@ msgid "Change password"
 msgstr "שינוי סיסמה"
 
 msgid "Please correct the error below."
-msgstr "נא לתקן את השגיאות המופיעות מתחת."
+msgstr "נא לתקן את השגיאה מתחת."
 
 msgid "Please correct the errors below."
 msgstr "נא לתקן את השגיאות מתחת."
@@ -333,18 +367,15 @@ msgstr "תיעוד"
 msgid "Log out"
 msgstr "יציאה"
 
-msgid "Add"
-msgstr "הוספה"
+#, python-format
+msgid "Add %(name)s"
+msgstr "הוספת %(name)s"
 
 msgid "History"
 msgstr "היסטוריה"
 
 msgid "View on site"
 msgstr "צפיה באתר"
-
-#, python-format
-msgid "Add %(name)s"
-msgstr "הוספת %(name)s"
 
 msgid "Filter"
 msgstr "סינון"
@@ -424,15 +455,8 @@ msgstr ""
 "האם אתה בטוח שאתה רוצה למחוק את ה%(objects_name)s הנבחר? כל האובייקטים הבאים "
 "ופריטים הקשורים להם יימחקו:"
 
-msgid "Change"
-msgstr "שינוי"
-
-msgid "Remove"
-msgstr "להסיר"
-
-#, python-format
-msgid "Add another %(verbose_name)s"
-msgstr "הוספת %(verbose_name)s"
+msgid "View"
+msgstr "צפיה"
 
 msgid "Delete?"
 msgstr "מחיקה ?"
@@ -448,13 +472,16 @@ msgstr "סיכום"
 msgid "Models in the %(name)s application"
 msgstr "מודלים ביישום %(name)s"
 
-msgid "You don't have permission to edit anything."
-msgstr "אין לך הרשאות לעריכה."
+msgid "Add"
+msgstr "הוספה"
 
-msgid "Recent Actions"
+msgid "You don't have permission to view or edit anything."
+msgstr "אין לך הרשאות לצפיה או עריכה."
+
+msgid "Recent actions"
 msgstr "פעולות אחרונות"
 
-msgid "My Actions"
+msgid "My actions"
 msgstr "הפעולות שלי"
 
 msgid "None available"
@@ -503,20 +530,8 @@ msgstr "הצג הכל"
 msgid "Save"
 msgstr "שמירה"
 
-msgid "Popup closing..."
+msgid "Popup closing…"
 msgstr "חלון צץ נסגר..."
-
-#, python-format
-msgid "Change selected %(model)s"
-msgstr "שינוי  %(model)s הנבחר."
-
-#, python-format
-msgid "Add another %(model)s"
-msgstr "הוספת %(model)s נוסף."
-
-#, python-format
-msgid "Delete selected %(model)s"
-msgstr "מחיקת %(model)s הנבחר."
 
 msgid "Search"
 msgstr "חיפוש"
@@ -526,6 +541,8 @@ msgid "%(counter)s result"
 msgid_plural "%(counter)s results"
 msgstr[0] "תוצאה %(counter)s"
 msgstr[1] "%(counter)s תוצאות"
+msgstr[2] "%(counter)s תוצאות"
+msgstr[3] "%(counter)s תוצאות"
 
 #, python-format
 msgid "%(full_result_count)s total"
@@ -539,6 +556,24 @@ msgstr "שמירה והוספת אחר"
 
 msgid "Save and continue editing"
 msgstr "שמירה והמשך עריכה"
+
+msgid "Save and view"
+msgstr "שמירה וצפיה"
+
+msgid "Close"
+msgstr "סגירה"
+
+#, python-format
+msgid "Change selected %(model)s"
+msgstr "שינוי  %(model)s הנבחר."
+
+#, python-format
+msgid "Add another %(model)s"
+msgstr "הוספת %(model)s נוסף."
+
+#, python-format
+msgid "Delete selected %(model)s"
+msgstr "מחיקת %(model)s הנבחר."
 
 msgid "Thanks for spending some quality time with the Web site today."
 msgstr "תודה על בילוי זמן איכות עם האתר."
@@ -647,6 +682,10 @@ msgstr "בחירת %s"
 #, python-format
 msgid "Select %s to change"
 msgstr "בחירת %s לשינוי"
+
+#, python-format
+msgid "Select %s to view"
+msgstr "בחירת %s לצפיה"
 
 msgid "Date:"
 msgstr "תאריך:"

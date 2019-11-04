@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 import unittest
 
 from django.utils import regex_helper
@@ -21,12 +19,6 @@ class NormalizeTests(unittest.TestCase):
     def test_group_positional(self):
         pattern = r"(.*)-(.+)"
         expected = [('%(_0)s-%(_1)s', ['_0', '_1'])]
-        result = regex_helper.normalize(pattern)
-        self.assertEqual(result, expected)
-
-    def test_group_ignored(self):
-        pattern = r"(?i)(?L)(?m)(?s)(?u)(?#)"
-        expected = [('', [])]
         result = regex_helper.normalize(pattern)
         self.assertEqual(result, expected)
 

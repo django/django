@@ -1,7 +1,8 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Bouke Haarsma <bouke@webatoom.nl>, 2013
+# Bouke Haarsma <bouke@haarsma.eu>, 2013
+# Evelijn Saaltink <evelijnsaaltink@gmail.com>, 2016
 # Ilja Maas <iljamaas@dreamsolution.nl>, 2015
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Jeffrey Gelens <jeffrey@noppo.pro>, 2012,2014
@@ -9,9 +10,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-10 14:49+0200\n"
-"PO-Revision-Date: 2015-11-25 19:49+0000\n"
-"Last-Translator: Ilja Maas <iljamaas@dreamsolution.nl>\n"
+"POT-Creation-Date: 2017-01-19 16:49+0100\n"
+"PO-Revision-Date: 2017-09-19 16:40+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Dutch (http://www.transifex.com/django/django/language/nl/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -137,7 +138,7 @@ msgstr "Methode"
 msgid "Arguments"
 msgstr "Argumenten"
 
-msgid "Back to Model Documentation"
+msgid "Back to Model documentation"
 msgstr "Terug naar Model documentatie"
 
 msgid "Model documentation"
@@ -157,6 +158,7 @@ msgstr "Template: %(name)s"
 msgid "Template: \"%(name)s\""
 msgstr "Template: \"%(name)s\""
 
+#. Translators: Search is not a verb here, it qualifies path (a search path)
 #, python-format
 msgid "Search path for template \"%(name)s\":"
 msgstr "Zoek naar locatie van template \"%(name)s\":"
@@ -210,8 +212,8 @@ msgstr "Contextvariabelen:"
 msgid "Templates:"
 msgstr "Templates:"
 
-msgid "Back to Views Documentation"
-msgstr "Terug naar Views documentatie"
+msgid "Back to View documentation"
+msgstr "Terug naar Bekijk documentatie"
 
 msgid "View documentation"
 msgstr "Bekijk documentatie"
@@ -238,13 +240,6 @@ msgstr ""
 "\n"
 "    View functie: <code>%(full_name)s</code>. Naam: <code>%(url_name)s</"
 "code>.\n"
-
-msgid "Boolean (Either True or False)"
-msgstr "Boolean (True danwel False)"
-
-#, python-format
-msgid "Field of type: %(field_type)s"
-msgstr "Veld van type: %(field_type)s"
 
 msgid "tag:"
 msgstr "tag:"

@@ -1,10 +1,10 @@
-from __future__ import unicode_literals
-
 import mimetypes
 import unittest
 from os import path
+from urllib.parse import quote
 
 from django.conf.urls.static import static
+from django.core.exceptions import ImproperlyConfigured
 from django.http import FileResponse, HttpResponseNotModified
 from django.test import SimpleTestCase, override_settings
 from django.utils.http import http_date
@@ -22,9 +22,9 @@ class StaticTests(SimpleTestCase):
 
     def test_serve(self):
         "The static view can serve static media"
-        media_files = ['file.txt', 'file.txt.gz']
+        media_files = ['file.txt', 'file.txt.gz', '%2F.txt']
         for filename in media_files:
-            response = self.client.get('/%s/%s' % (self.prefix, filename))
+            response = self.client.get('/%s/%s' % (self.prefix, quote(filename)))
             response_content = b''.join(response)
             file_path = path.join(media_dir, filename)
             with open(file_path, 'rb') as fp:
@@ -56,8 +56,10 @@ class StaticTests(SimpleTestCase):
 
     def test_is_modified_since(self):
         file_name = 'file.txt'
-        response = self.client.get('/%s/%s' % (self.prefix, file_name),
-            HTTP_IF_MODIFIED_SINCE='Thu, 1 Jan 1970 00:00:00 GMT')
+        response = self.client.get(
+            '/%s/%s' % (self.prefix, file_name),
+            HTTP_IF_MODIFIED_SINCE='Thu, 1 Jan 1970 00:00:00 GMT'
+        )
         response_content = b''.join(response)
         with open(path.join(media_dir, file_name), 'rb') as fp:
             self.assertEqual(fp.read(), response_content)
@@ -103,8 +105,34 @@ class StaticTests(SimpleTestCase):
         self.assertEqual(len(response_content), int(response['Content-Length']))
 
     def test_404(self):
-        response = self.client.get('/%s/non_existing_resource' % self.prefix)
+        response = self.client.get('/%s/nonexistent_resource' % self.prefix)
         self.assertEqual(404, response.status_code)
+
+    def test_index(self):
+        response = self.client.get('/%s/' % self.prefix)
+        self.assertContains(response, 'Index of ./')
+        # Directories have a trailing slash.
+        self.assertIn('subdir/', response.context['file_list'])
+
+    def test_index_subdir(self):
+        response = self.client.get('/%s/subdir/' % self.prefix)
+        self.assertContains(response, 'Index of subdir/')
+        # File with a leading dot (e.g. .hidden) aren't displayed.
+        self.assertEqual(response.context['file_list'], ['visible'])
+
+    @override_settings(TEMPLATES=[{
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'OPTIONS': {
+            'loaders': [
+                ('django.template.loaders.locmem.Loader', {
+                    'static/directory_index.html': 'Test index',
+                }),
+            ],
+        },
+    }])
+    def test_index_custom_template(self):
+        response = self.client.get('/%s/' % self.prefix)
+        self.assertEqual(response.content, b'Test index')
 
 
 class StaticHelperTest(StaticTests):
@@ -112,20 +140,36 @@ class StaticHelperTest(StaticTests):
     Test case to make sure the static URL pattern helper works as expected
     """
     def setUp(self):
-        super(StaticHelperTest, self).setUp()
+        super().setUp()
         self._old_views_urlpatterns = urls.urlpatterns[:]
         urls.urlpatterns += static('/media/', document_root=media_dir)
 
     def tearDown(self):
-        super(StaticHelperTest, self).tearDown()
+        super().tearDown()
         urls.urlpatterns = self._old_views_urlpatterns
+
+    def test_prefix(self):
+        self.assertEqual(static('test')[0].pattern.regex.pattern, '^test(?P<path>.*)$')
+
+    @override_settings(DEBUG=False)
+    def test_debug_off(self):
+        """No URLs are served if DEBUG=False."""
+        self.assertEqual(static('test'), [])
+
+    def test_empty_prefix(self):
+        with self.assertRaisesMessage(ImproperlyConfigured, 'Empty static prefix not permitted'):
+            static('')
+
+    def test_special_prefix(self):
+        """No URLs are served if prefix contains a netloc part."""
+        self.assertEqual(static('http://example.org'), [])
+        self.assertEqual(static('//example.org'), [])
 
 
 class StaticUtilsTests(unittest.TestCase):
     def test_was_modified_since_fp(self):
         """
-        Test that a floating point mtime does not disturb was_modified_since.
-        (#18675)
+        A floating point mtime does not disturb was_modified_since (#18675).
         """
         mtime = 1343416141.107817
         header = http_date(mtime)

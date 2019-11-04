@@ -2,8 +2,11 @@
 #
 # Translators:
 # Ádám Krizsány <krizsany1302@gmail.com>, 2015
+# Akos Zsolt Hochrein <hoch.akos@gmail.com>, 2018
+# András Veres-Szentkirályi, 2016,2018-2019
 # Jannis Leidel <jannis@leidel.info>, 2011
-# János Péter Ronkay <transifex2@hangya.net>, 2014
+# János R (Hangya), 2017
+# János R (Hangya), 2014
 # Kristóf Gruber <>, 2012
 # slink <gabor@20y.hu>, 2011
 # Szilveszter Farkas <szilveszter.farkas@gmail.com>, 2011
@@ -11,9 +14,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-11-15 11:06+0100\n"
-"PO-Revision-Date: 2015-12-10 16:29+0000\n"
-"Last-Translator: Ádám Krizsány <krizsany1302@gmail.com>\n"
+"POT-Creation-Date: 2019-01-16 20:42+0100\n"
+"PO-Revision-Date: 2019-04-17 07:35+0000\n"
+"Last-Translator: András Veres-Szentkirályi\n"
 "Language-Team: Hungarian (http://www.transifex.com/django/django/language/"
 "hu/)\n"
 "MIME-Version: 1.0\n"
@@ -67,6 +70,12 @@ msgstr "Ez a hónap"
 msgid "This year"
 msgstr "Ez az év"
 
+msgid "No date"
+msgstr "Nincs dátuma"
+
+msgid "Has date"
+msgstr "Van dátuma"
+
 #, python-format
 msgid ""
 "Please enter the correct %(username)s and password for a staff account. Note "
@@ -77,6 +86,22 @@ msgstr ""
 
 msgid "Action:"
 msgstr "Művelet:"
+
+#, python-format
+msgid "Add another %(verbose_name)s"
+msgstr "Újabb %(verbose_name)s hozzáadása"
+
+msgid "Remove"
+msgstr "Törlés"
+
+msgid "Addition"
+msgstr "Hozzáadás"
+
+msgid "Change"
+msgstr "Módosítás"
+
+msgid "Deletion"
+msgstr "Törlés"
 
 msgid "action time"
 msgstr "művelet időpontja"
@@ -90,6 +115,8 @@ msgstr "tartalom típusa"
 msgid "object id"
 msgstr "objektum id"
 
+#. Translators: 'repr' means representation
+#. (https://docs.python.org/library/functions.html#repr)
 msgid "object repr"
 msgstr "objektum repr"
 
@@ -120,6 +147,31 @@ msgstr "\"%(object)s\" törölve."
 msgid "LogEntry Object"
 msgstr "Naplóbejegyzés objektum"
 
+#, python-brace-format
+msgid "Added {name} \"{object}\"."
+msgstr "\"{object}\" {name} létrehozva."
+
+msgid "Added."
+msgstr "Hozzáadva."
+
+msgid "and"
+msgstr "és"
+
+#, python-brace-format
+msgid "Changed {fields} for {name} \"{object}\"."
+msgstr "\"{object}\" {name} tulajdonságai ({fields}) megváltoztak."
+
+#, python-brace-format
+msgid "Changed {fields}."
+msgstr "{fields} módosítva."
+
+#, python-brace-format
+msgid "Deleted {name} \"{object}\"."
+msgstr "\"{object}\" {name} törlésre került."
+
+msgid "No fields changed."
+msgstr "Egy mező sem változott."
+
 msgid "None"
 msgstr "Egyik sem"
 
@@ -129,64 +181,40 @@ msgstr ""
 "Tartsa lenyomva a \"Control\"-t, vagy Mac-en a \"Command\"-ot több elem "
 "kiválasztásához."
 
-msgid "Added."
-msgstr "Hozzáadva."
+#, python-brace-format
+msgid "The {name} \"{obj}\" was added successfully."
+msgstr "\"{obj}\" {name} sikeresen létrehozva."
 
-#, python-format
-msgid "Changed %s."
-msgstr "%s módosítva."
+msgid "You may edit it again below."
+msgstr "Alább ismét szerkesztheti."
 
-msgid "and"
-msgstr "és"
-
-#, python-format
-msgid "Added %(name)s \"%(object)s\"."
-msgstr "\"%(object)s\" %(name)s létrehozva."
-
-#, python-format
-msgid "Changed %(list)s for %(name)s \"%(object)s\"."
-msgstr "\"%(object)s\" %(name)s tulajdonságai (%(list)s) megváltoztak."
-
-#, python-format
-msgid "Deleted %(name)s \"%(object)s\"."
-msgstr "\"%(object)s\" %(name)s törlésre került."
-
-msgid "No fields changed."
-msgstr "Egy mező sem változott."
-
-#, python-format
+#, python-brace-format
 msgid ""
-"The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
-msgstr "\"%(obj)s\" %(name)s sikeresen létrehozva. Alább ismét szerkesztheti."
-
-#, python-format
-msgid ""
-"The %(name)s \"%(obj)s\" was added successfully. You may add another "
-"%(name)s below."
-msgstr ""
-"\"%(obj)s\" %(name)s sikeresen létrehozva. Alább újabb %(name)s hozható "
-"létre."
-
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was added successfully."
-msgstr "\"%(obj)s\" %(name)s sikeresen létrehozva."
-
-#, python-format
-msgid ""
-"The %(name)s \"%(obj)s\" was changed successfully. You may edit it again "
+"The {name} \"{obj}\" was added successfully. You may add another {name} "
 "below."
-msgstr "\"%(obj)s\" %(name)s sikeresen létrehozva. Alább ismét szerkeszthető."
-
-#, python-format
-msgid ""
-"The %(name)s \"%(obj)s\" was changed successfully. You may add another "
-"%(name)s below."
 msgstr ""
-"\"%(obj)s\" %(name)s sikeresen módosítva. Alább újabb %(name)s hozható létre."
+"\"{obj}\" {name} sikeresen létrehozva. Alább újabb {name} hozható létre."
 
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was changed successfully."
-msgstr "\"%(obj)s\" %(name)s sikeresen módosítva."
+#, python-brace-format
+msgid ""
+"The {name} \"{obj}\" was changed successfully. You may edit it again below."
+msgstr "\"{obj}\" {name} sikeresen módosítva. Alább ismét szerkesztheti."
+
+#, python-brace-format
+msgid ""
+"The {name} \"{obj}\" was added successfully. You may edit it again below."
+msgstr "\"{obj}\" {name} sikeresen létrehozva. Alább ismét szerkesztheti."
+
+#, python-brace-format
+msgid ""
+"The {name} \"{obj}\" was changed successfully. You may add another {name} "
+"below."
+msgstr ""
+"\"{obj}\" {name} sikeresen módosítva. Alább újabb {name} hozható létre."
+
+#, python-brace-format
+msgid "The {name} \"{obj}\" was changed successfully."
+msgstr "\"{obj}\" {name} sikeresen módosítva."
 
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
@@ -203,8 +231,9 @@ msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "\"%(obj)s\" %(name)s sikeresen törölve."
 
 #, python-format
-msgid "%(name)s object with primary key %(key)r does not exist."
-msgstr "%(name)s objektum %(key)r elsődleges kulccsal nem létezik."
+msgid "%(name)s with ID \"%(key)s\" doesn't exist. Perhaps it was deleted?"
+msgstr ""
+"Nem létezik %(name)s ezzel az azonosítóval: \"%(key)s\". Netán törölve lett?"
 
 #, python-format
 msgid "Add %s"
@@ -213,6 +242,10 @@ msgstr "Új %s"
 #, python-format
 msgid "Change %s"
 msgstr "%s módosítása"
+
+#, python-format
+msgid "View %s"
+msgstr "%s megtekintése"
 
 msgid "Database error"
 msgstr "Adatbázishiba"
@@ -248,6 +281,8 @@ msgid ""
 "Deleting %(class_name)s %(instance)s would require deleting the following "
 "protected related objects: %(related_objects)s"
 msgstr ""
+"%(instance)s %(class_name)s törlése az alábbi kapcsolódó védett objektumok "
+"törlését is magával vonná: %(related_objects)s"
 
 msgid "Django site admin"
 msgstr "Django honlapadminisztráció"
@@ -263,7 +298,7 @@ msgstr "Bejelentkezés"
 
 #, python-format
 msgid "%(app)s administration"
-msgstr ""
+msgstr "%(app)s adminisztráció"
 
 msgid "Page not found"
 msgstr "Nincs ilyen oldal"
@@ -320,7 +355,7 @@ msgid "Change password"
 msgstr "Jelszó megváltoztatása"
 
 msgid "Please correct the error below."
-msgstr "Kérem, javítsa az alábbi hibákat."
+msgstr "Kérem javítsa a hibát alább."
 
 msgid "Please correct the errors below."
 msgstr "Kérem javítsa ki a lenti hibákat."
@@ -334,7 +369,7 @@ msgid "Welcome,"
 msgstr "Üdvözlöm,"
 
 msgid "View site"
-msgstr ""
+msgstr "Honlap megtekintése"
 
 msgid "Documentation"
 msgstr "Dokumentáció"
@@ -342,18 +377,15 @@ msgstr "Dokumentáció"
 msgid "Log out"
 msgstr "Kijelentkezés"
 
-msgid "Add"
-msgstr "Új"
+#, python-format
+msgid "Add %(name)s"
+msgstr "Új %(name)s"
 
 msgid "History"
 msgstr "Történet"
 
 msgid "View on site"
 msgstr "Megtekintés a honlapon"
-
-#, python-format
-msgid "Add %(name)s"
-msgstr "Új %(name)s"
 
 msgid "Filter"
 msgstr "Szűrő"
@@ -398,13 +430,13 @@ msgstr ""
 "%(object_name)s)? A összes további kapcsolódó elem is törlődik:"
 
 msgid "Objects"
-msgstr ""
+msgstr "Objektumok"
 
 msgid "Yes, I'm sure"
 msgstr "Igen, biztos vagyok benne"
 
 msgid "No, take me back"
-msgstr ""
+msgstr "Nem, forduljunk vissza"
 
 msgid "Delete multiple objects"
 msgstr "Több elem törlése"
@@ -435,15 +467,8 @@ msgstr ""
 "Biztosan törölni akarja a kiválasztott %(objects_name)s objektumokat? Minden "
 "alábbi objektum, és a hozzájuk kapcsolódóak is törlésre kerülnek:"
 
-msgid "Change"
-msgstr "Módosítás"
-
-msgid "Remove"
-msgstr "Törlés"
-
-#, python-format
-msgid "Add another %(verbose_name)s"
-msgstr "Újabb %(verbose_name)s hozzáadása"
+msgid "View"
+msgstr "Megtekintés"
 
 msgid "Delete?"
 msgstr "Törli?"
@@ -459,13 +484,16 @@ msgstr "Összegzés"
 msgid "Models in the %(name)s application"
 msgstr "%(name)s alkalmazásban elérhető modellek."
 
-msgid "You don't have permission to edit anything."
-msgstr "Nincs joga szerkeszteni."
+msgid "Add"
+msgstr "Új"
 
-msgid "Recent Actions"
-msgstr "Utolsó műveletek"
+msgid "You don't have permission to view or edit anything."
+msgstr "Nincs jogosultsága megkinteni vagy módosítani akármit."
 
-msgid "My Actions"
+msgid "Recent actions"
+msgstr "Legutóbbi műveletek"
+
+msgid "My actions"
 msgstr "Az én műveleteim"
 
 msgid "None available"
@@ -488,6 +516,8 @@ msgid ""
 "You are authenticated as %(username)s, but are not authorized to access this "
 "page. Would you like to login to a different account?"
 msgstr ""
+"Jelenleg be vagy lépve mint %(username)s, de nincs jogod elérni ezt az "
+"oldalt. Szeretnél belépni egy másik fiókkal?"
 
 msgid "Forgotten your password or username?"
 msgstr "Elfelejtette jelszavát vagy felhasználónevét?"
@@ -512,20 +542,8 @@ msgstr "Mutassa mindet"
 msgid "Save"
 msgstr "Mentés"
 
-msgid "Popup closing..."
-msgstr ""
-
-#, python-format
-msgid "Change selected %(model)s"
-msgstr ""
-
-#, python-format
-msgid "Add another %(model)s"
-msgstr ""
-
-#, python-format
-msgid "Delete selected %(model)s"
-msgstr ""
+msgid "Popup closing…"
+msgstr "A popup bezáródik…"
 
 msgid "Search"
 msgstr "Keresés"
@@ -548,6 +566,24 @@ msgstr "Mentés és másik hozzáadása"
 
 msgid "Save and continue editing"
 msgstr "Mentés és a szerkesztés folytatása"
+
+msgid "Save and view"
+msgstr "Mentés és megtekintés"
+
+msgid "Close"
+msgstr "Bezárás"
+
+#, python-format
+msgid "Change selected %(model)s"
+msgstr "Kiválasztott %(model)s szerkesztése"
+
+#, python-format
+msgid "Add another %(model)s"
+msgstr "Újabb %(model)s hozzáadása"
+
+#, python-format
+msgid "Delete selected %(model)s"
+msgstr "Kiválasztott %(model)s törlése"
 
 msgid "Thanks for spending some quality time with the Web site today."
 msgstr "Köszönjük hogy egy kis időt eltöltött ma a honlapunkon."
@@ -604,6 +640,8 @@ msgid ""
 "We've emailed you instructions for setting your password, if an account "
 "exists with the email you entered. You should receive them shortly."
 msgstr ""
+"A jelszavad beállításához szükséges információkat elküldtük e-mailben a "
+"fiókhoz tartozó címre, ha létezik ilyen fiók. Hamarosan meg kell érkeznie."
 
 msgid ""
 "If you don't receive an email, please make sure you've entered the address "
@@ -656,6 +694,10 @@ msgstr "%s kiválasztása"
 #, python-format
 msgid "Select %s to change"
 msgstr "Válasszon ki egyet a módosításhoz (%s)"
+
+#, python-format
+msgid "Select %s to view"
+msgstr "Válasszon ki egyet a megtekintéshez (%s)"
 
 msgid "Date:"
 msgstr "Dátum:"

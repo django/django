@@ -5,14 +5,12 @@ Tests of ModelAdmin system checks logic.
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
-from django.utils.encoding import python_2_unicode_compatible
 
 
 class Album(models.Model):
     title = models.CharField(max_length=150)
 
 
-@python_2_unicode_compatible
 class Song(models.Model):
     title = models.CharField(max_length=150)
     album = models.ForeignKey(Album, models.CASCADE)

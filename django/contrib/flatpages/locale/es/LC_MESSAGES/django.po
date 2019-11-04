@@ -4,15 +4,16 @@
 # Antoni Aloy <aaloy@apsl.net>, 2011-2012
 # Ernesto Avilés Vázquez <whippiii@gmail.com>, 2015
 # Ernesto Avilés Vázquez <whippiii@gmail.com>, 2014
+# Ignacio José Lizarán Rus <ilizaran@gmail.com>, 2019
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Veronicabh <vero.blazher@gmail.com>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2015-10-10 15:47+0000\n"
-"Last-Translator: Ernesto Avilés Vázquez <whippiii@gmail.com>\n"
+"POT-Creation-Date: 2019-01-16 20:42+0100\n"
+"PO-Revision-Date: 2019-02-19 08:53+0000\n"
+"Last-Translator: Ignacio José Lizarán Rus <ilizaran@gmail.com>\n"
 "Language-Team: Spanish (http://www.transifex.com/django/django/language/"
 "es/)\n"
 "MIME-Version: 1.0\n"
@@ -42,6 +43,11 @@ msgid ""
 msgstr ""
 "Este valor solo puede contener letras, números, puntos, guiones bajos o "
 "medios, barras o tildes."
+
+msgid "Example: '/about/contact'. Make sure to have a leading slash."
+msgstr ""
+"Ejemplo: '/about/contact'. Asegúrese de que pone una barra oblicua al "
+"principio."
 
 msgid "URL is missing a leading slash."
 msgstr "A la URL le falta la barra inicial."

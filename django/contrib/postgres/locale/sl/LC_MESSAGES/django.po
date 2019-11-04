@@ -1,0 +1,130 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# Primož Verdnik <primoz.verdnik@gmail.com>, 2017
+# zejn <zejn@kiberpipa.org>, 2016
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2017-01-19 16:49+0100\n"
+"PO-Revision-Date: 2017-09-23 20:42+0000\n"
+"Last-Translator: Primož Verdnik <primoz.verdnik@gmail.com>\n"
+"Language-Team: Slovenian (http://www.transifex.com/django/django/language/"
+"sl/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: sl\n"
+"Plural-Forms: nplurals=4; plural=(n%100==1 ? 0 : n%100==2 ? 1 : n%100==3 || n"
+"%100==4 ? 2 : 3);\n"
+
+msgid "PostgreSQL extensions"
+msgstr "PostgreSQL razširitve"
+
+#, python-format
+msgid "Item %(nth)s in the array did not validate: "
+msgstr "Element št. %(nth)s v seznamu ni veljaven:"
+
+msgid "Nested arrays must have the same length."
+msgstr "Gnezdeni seznami morajo imeti enako dolžino."
+
+msgid "Map of strings to strings/nulls"
+msgstr "Preslikava nizev v nize/null"
+
+#, python-format
+msgid "The value of \"%(key)s\" is not a string or null."
+msgstr "Vrednost \"%(key)s\" ni niz ali null."
+
+msgid "A JSON object"
+msgstr "JSON objekt"
+
+msgid "Value must be valid JSON."
+msgstr "Vrednost mora biti veljaven JSON."
+
+msgid "Could not load JSON data."
+msgstr "Ni bilo mogoče naložiti JSON podatkov."
+
+msgid "Input must be a JSON dictionary."
+msgstr "Vhodni podatek mora biti JSON objekt."
+
+#, python-format
+msgid "'%(value)s' value must be valid JSON."
+msgstr "Vrednost '%(value)s' mora biti veljaven JSON."
+
+msgid "Enter two valid values."
+msgstr "Vnesite dve veljavni vrednosti."
+
+msgid "The start of the range must not exceed the end of the range."
+msgstr "Začetek območja mora biti po vrednosti manjši od konca območja."
+
+msgid "Enter two whole numbers."
+msgstr "Vnesite dve celi števili."
+
+msgid "Enter two numbers."
+msgstr "Vnesite dve števili."
+
+msgid "Enter two valid date/times."
+msgstr "Vnesite dva veljavna datuma oz. točki v času."
+
+msgid "Enter two valid dates."
+msgstr "Vnesite dva veljavna datuma."
+
+#, python-format
+msgid ""
+"List contains %(show_value)d item, it should contain no more than "
+"%(limit_value)d."
+msgid_plural ""
+"List contains %(show_value)d items, it should contain no more than "
+"%(limit_value)d."
+msgstr[0] ""
+"Seznam vsebuje %(show_value)d element, moral pa bi jih imeti največ "
+"%(limit_value)d."
+msgstr[1] ""
+"Seznam vsebuje %(show_value)d elementa, moral pa bi jih imeti največ "
+"%(limit_value)d."
+msgstr[2] ""
+"Seznam vsebuje %(show_value)d elemente, moral pa bi jih imeti največ "
+"%(limit_value)d."
+msgstr[3] ""
+"Seznam vsebuje %(show_value)d elementov, moral pa bi jih imeti največ "
+"%(limit_value)d."
+
+#, python-format
+msgid ""
+"List contains %(show_value)d item, it should contain no fewer than "
+"%(limit_value)d."
+msgid_plural ""
+"List contains %(show_value)d items, it should contain no fewer than "
+"%(limit_value)d."
+msgstr[0] ""
+"Seznam vsebuje %(show_value)d element, moral pa bi jih najmanj "
+"%(limit_value)d."
+msgstr[1] ""
+"Seznam vsebuje %(show_value)d elementa, moral pa bi jih najmanj "
+"%(limit_value)d."
+msgstr[2] ""
+"Seznam vsebuje %(show_value)d elemente, moral pa bi jih najmanj "
+"%(limit_value)d."
+msgstr[3] ""
+"Seznam vsebuje %(show_value)d elementov, moral pa bi jih najmanj "
+"%(limit_value)d."
+
+#, python-format
+msgid "Some keys were missing: %(keys)s"
+msgstr "Nekateri ključi manjkajo: %(keys)s"
+
+#, python-format
+msgid "Some unknown keys were provided: %(keys)s"
+msgstr "Navedeni so bili nekateri neznani ključi: %(keys)s"
+
+#, python-format
+msgid ""
+"Ensure that this range is completely less than or equal to %(limit_value)s."
+msgstr "Poskrbite, da bo to območje manj ali enako kot %(limit_value)s."
+
+#, python-format
+msgid ""
+"Ensure that this range is completely greater than or equal to "
+"%(limit_value)s."
+msgstr "Poskrbite, da bo to območje večje ali enako %(limit_value)s."

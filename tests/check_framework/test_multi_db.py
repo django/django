@@ -1,20 +1,21 @@
+from unittest import mock
+
 from django.db import connections, models
-from django.test import TestCase, mock
+from django.test import SimpleTestCase
 from django.test.utils import isolate_apps, override_settings
 
 
-class TestRouter(object):
+class TestRouter:
     """
     Routes to the 'other' database if the model name starts with 'Other'.
     """
-    def allow_migrate(self, db, app_label, model=None, **hints):
-        return db == ('other' if model._meta.verbose_name.startswith('other') else 'default')
+    def allow_migrate(self, db, app_label, model_name=None, **hints):
+        return db == ('other' if model_name.startswith('other') else 'default')
 
 
 @override_settings(DATABASE_ROUTERS=[TestRouter()])
 @isolate_apps('check_framework')
-class TestMultiDBChecks(TestCase):
-    multi_db = True
+class TestMultiDBChecks(SimpleTestCase):
 
     def _patch_check_field_on(self, db):
         return mock.patch.object(connections[db].validation, 'check_field')

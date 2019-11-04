@@ -59,11 +59,13 @@ security purposes, please see :doc:`our security policies <security>`.
 
     .. _the download page: https://www.djangoproject.com/download/
 
+.. _internal-release-cadence:
+
 Release cadence
 ===============
 
 Starting with Django 2.0, version numbers will use a loose form of `semantic
-versioning <http://semver.org/>`_ such that each version following an LTS will
+versioning <https://semver.org/>`_ such that each version following an LTS will
 bump to the next "dot zero" version. For example: 2.0, 2.1, 2.2 (LTS), 3.0,
 3.1, 3.2 (LTS), etc.
 
@@ -114,7 +116,7 @@ A more generic example:
   LTS to LTS upgrades).
 * Z.0: Drop deprecation shims added in Y.0 and Y.1.
 
-.. _backwards-compatibility-policy:
+.. _supported-versions-policy:
 
 Supported versions
 ==================
@@ -137,7 +139,7 @@ page for the current state of support for each version.
 
   * Crashing bugs.
 
-  * Major functionality bugs in newly-introduced features.
+  * Major functionality bugs in new features of the latest stable release.
 
   * Regressions from older versions of Django.
 
@@ -163,8 +165,9 @@ Django 5.1 and 5.2. At this point in time:
   released as 5.1.1, 5.1.2, etc.
 
 * Security fixes and bug fixes for data loss issues will be applied to
-  ``master`` and to the ``stable/5.1.x``, and ``stable/4.2.x`` (LTS) branches.
-  They will trigger the release of ``5.1.1``, ``4.2.1``, etc.
+  ``master`` and to the ``stable/5.1.x``, ``stable/5.0.x``, and
+  ``stable/4.2.x`` (LTS) branches. They will trigger the release of ``5.1.1``,
+  ``5.0.5``, ``4.2.8``, etc.
 
 * Documentation fixes will be applied to master, and, if easily backported, to
   the latest stable branch, ``5.1.x``.
@@ -193,7 +196,7 @@ features to include in the next version. This should include a good deal of
 preliminary work on those features -- working code trumps grand design.
 
 Major features for an upcoming release will be added to the wiki roadmap page,
-e.g. https://code.djangoproject.com/wiki/Version1.9Roadmap.
+e.g. https://code.djangoproject.com/wiki/Version1.11Roadmap.
 
 Phase two: development
 ~~~~~~~~~~~~~~~~~~~~~~

@@ -1,28 +1,26 @@
-from __future__ import unicode_literals
-
 from django.core.exceptions import FieldError
 from django.test import TestCase
-from django.utils import six
 
 from .models import Article, Author
 
 
 class CustomColumnsTests(TestCase):
 
-    def setUp(self):
-        self.a1 = Author.objects.create(first_name="John", last_name="Smith")
-        self.a2 = Author.objects.create(first_name="Peter", last_name="Jones")
-        self.authors = [self.a1, self.a2]
+    @classmethod
+    def setUpTestData(cls):
+        cls.a1 = Author.objects.create(first_name="John", last_name="Smith")
+        cls.a2 = Author.objects.create(first_name="Peter", last_name="Jones")
+        cls.authors = [cls.a1, cls.a2]
 
-        self.article = Article.objects.create(headline="Django lets you build Web apps easily", primary_author=self.a1)
-        self.article.authors.set(self.authors)
+        cls.article = Article.objects.create(headline="Django lets you build Web apps easily", primary_author=cls.a1)
+        cls.article.authors.set(cls.authors)
 
     def test_query_all_available_authors(self):
         self.assertQuerysetEqual(
             Author.objects.all(), [
                 "Peter Jones", "John Smith",
             ],
-            six.text_type
+            str
         )
 
     def test_get_first_name(self):
@@ -36,11 +34,15 @@ class CustomColumnsTests(TestCase):
             Author.objects.filter(first_name__exact="John"), [
                 "John Smith",
             ],
-            six.text_type
+            str
         )
 
     def test_field_error(self):
-        with self.assertRaises(FieldError):
+        msg = (
+            "Cannot resolve keyword 'firstname' into field. Choices are: "
+            "Author_ID, article, first_name, last_name, primary_set"
+        )
+        with self.assertRaisesMessage(FieldError, msg):
             Author.objects.filter(firstname__exact="John")
 
     def test_attribute_error(self):
@@ -56,7 +58,7 @@ class CustomColumnsTests(TestCase):
                 "Peter Jones",
                 "John Smith",
             ],
-            six.text_type
+            str
         )
 
     def test_get_all_articles_for_an_author(self):
@@ -72,7 +74,7 @@ class CustomColumnsTests(TestCase):
             self.article.authors.filter(last_name='Jones'), [
                 "Peter Jones"
             ],
-            six.text_type
+            str
         )
 
     def test_author_querying(self):

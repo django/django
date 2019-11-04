@@ -1,16 +1,15 @@
-from __future__ import unicode_literals
-
 import os
 
+from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.http import HttpResponsePermanentRedirect
 from django.middleware.locale import LocaleMiddleware
 from django.template import Context, Template
 from django.test import SimpleTestCase, override_settings
+from django.test.client import RequestFactory
 from django.test.utils import override_script_prefix
 from django.urls import clear_url_caches, reverse, translate_url
 from django.utils import translation
-from django.utils._os import upath
 
 
 class PermanentRedirectLocaleMiddleWare(LocaleMiddleware):
@@ -20,7 +19,7 @@ class PermanentRedirectLocaleMiddleWare(LocaleMiddleware):
 @override_settings(
     USE_I18N=True,
     LOCALE_PATHS=[
-        os.path.join(os.path.dirname(upath(__file__)), 'locale'),
+        os.path.join(os.path.dirname(__file__), 'locale'),
     ],
     LANGUAGE_CODE='en-us',
     LANGUAGES=[
@@ -28,14 +27,14 @@ class PermanentRedirectLocaleMiddleWare(LocaleMiddleware):
         ('en', 'English'),
         ('pt-br', 'Brazilian Portuguese'),
     ],
-    MIDDLEWARE_CLASSES=[
+    MIDDLEWARE=[
         'django.middleware.locale.LocaleMiddleware',
         'django.middleware.common.CommonMiddleware',
     ],
     ROOT_URLCONF='i18n.patterns.urls.default',
     TEMPLATES=[{
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(os.path.dirname(upath(__file__)), 'templates')],
+        'DIRS': [os.path.join(os.path.dirname(__file__), 'templates')],
         'OPTIONS': {
             'context_processors': [
                 'django.template.context_processors.i18n',
@@ -74,10 +73,13 @@ class URLPrefixTests(URLTestCaseBase):
             self.assertEqual(reverse('prefixed'), '/en/prefixed/')
         with translation.override('nl'):
             self.assertEqual(reverse('prefixed'), '/nl/prefixed/')
+        with translation.override(None):
+            self.assertEqual(reverse('prefixed'), '/%s/prefixed/' % settings.LANGUAGE_CODE)
 
     @override_settings(ROOT_URLCONF='i18n.patterns.urls.wrong')
     def test_invalid_prefix_use(self):
-        with self.assertRaises(ImproperlyConfigured):
+        msg = 'Using i18n_patterns in an included URLconf is not allowed.'
+        with self.assertRaisesMessage(ImproperlyConfigured, msg):
             reverse('account:register')
 
 
@@ -92,11 +94,23 @@ class URLDisabledTests(URLTestCaseBase):
             self.assertEqual(reverse('prefixed'), '/prefixed/')
 
 
+class RequestURLConfTests(SimpleTestCase):
+
+    @override_settings(ROOT_URLCONF='i18n.patterns.urls.path_unused')
+    def test_request_urlconf_considered(self):
+        request = RequestFactory().get('/nl/')
+        request.urlconf = 'i18n.patterns.urls.default'
+        middleware = LocaleMiddleware()
+        with translation.override('nl'):
+            middleware.process_request(request)
+        self.assertEqual(request.LANGUAGE_CODE, 'nl')
+
+
 @override_settings(ROOT_URLCONF='i18n.patterns.urls.path_unused')
 class PathUnusedTests(URLTestCaseBase):
     """
-    Check that if no i18n_patterns is used in root URLconfs, then no
-    language activation happens based on url prefix.
+    If no i18n_patterns is used in root URLconfs, then no language activation
+    activation happens based on url prefix.
     """
 
     def test_no_lang_activate(self):
@@ -137,10 +151,12 @@ class URLTranslationTests(URLTestCaseBase):
 
     def test_translate_url_utility(self):
         with translation.override('en'):
-            self.assertEqual(translate_url('/en/non-existent/', 'nl'), '/en/non-existent/')
+            self.assertEqual(translate_url('/en/nonexistent/', 'nl'), '/en/nonexistent/')
             self.assertEqual(translate_url('/en/users/', 'nl'), '/nl/gebruikers/')
             # Namespaced URL
-            self.assertEqual(translate_url('/en/account/register/', 'nl'), '/nl/profiel/registeren/')
+            self.assertEqual(translate_url('/en/account/register/', 'nl'), '/nl/profiel/registreren/')
+            # path() URL pattern
+            self.assertEqual(translate_url('/en/account/register-as-path/', 'nl'), '/nl/profiel/registreren-als-pad/')
             self.assertEqual(translation.get_language(), 'en')
 
         with translation.override('nl'):
@@ -155,9 +171,11 @@ class URLNamespaceTests(URLTestCaseBase):
     def test_account_register(self):
         with translation.override('en'):
             self.assertEqual(reverse('account:register'), '/en/account/register/')
+            self.assertEqual(reverse('account:register-as-path'), '/en/account/register-as-path/')
 
         with translation.override('nl'):
-            self.assertEqual(reverse('account:register'), '/nl/profiel/registeren/')
+            self.assertEqual(reverse('account:register'), '/nl/profiel/registreren/')
+            self.assertEqual(reverse('account:register-as-path'), '/nl/profiel/registreren-als-pad/')
 
 
 class URLRedirectTests(URLTestCaseBase):
@@ -177,12 +195,12 @@ class URLRedirectTests(URLTestCaseBase):
         self.assertEqual(response.status_code, 200)
 
     def test_en_redirect_wrong_url(self):
-        response = self.client.get('/profiel/registeren/', HTTP_ACCEPT_LANGUAGE='en')
+        response = self.client.get('/profiel/registreren/', HTTP_ACCEPT_LANGUAGE='en')
         self.assertEqual(response.status_code, 404)
 
     def test_nl_redirect(self):
-        response = self.client.get('/profiel/registeren/', HTTP_ACCEPT_LANGUAGE='nl')
-        self.assertRedirects(response, '/nl/profiel/registeren/')
+        response = self.client.get('/profiel/registreren/', HTTP_ACCEPT_LANGUAGE='nl')
+        self.assertRedirects(response, '/nl/profiel/registreren/')
 
         response = self.client.get(response['location'])
         self.assertEqual(response.status_code, 200)
@@ -207,7 +225,7 @@ class URLRedirectTests(URLTestCaseBase):
         self.assertEqual(response.status_code, 200)
 
     @override_settings(
-        MIDDLEWARE_CLASSES=[
+        MIDDLEWARE=[
             'i18n.patterns.tests.PermanentRedirectLocaleMiddleWare',
             'django.middleware.common.CommonMiddleware',
         ],
@@ -219,8 +237,7 @@ class URLRedirectTests(URLTestCaseBase):
 
 class URLVaryAcceptLanguageTests(URLTestCaseBase):
     """
-    Tests that 'Accept-Language' is not added to the Vary header when using
-    prefixed URLs.
+    'Accept-Language' is not added to the Vary header when using prefixed URLs.
     """
     def test_no_prefix_response(self):
         response = self.client.get('/not-prefixed/')
@@ -249,7 +266,7 @@ class URLRedirectWithoutTrailingSlashTests(URLTestCaseBase):
     def test_en_redirect(self):
         response = self.client.get('/account/register', HTTP_ACCEPT_LANGUAGE='en', follow=True)
         # We only want one redirect, bypassing CommonMiddleware
-        self.assertListEqual(response.redirect_chain, [('/en/account/register/', 302)])
+        self.assertEqual(response.redirect_chain, [('/en/account/register/', 302)])
         self.assertRedirects(response, '/en/account/register/', 302)
 
         response = self.client.get('/prefixed.xml', HTTP_ACCEPT_LANGUAGE='en', follow=True)
@@ -276,9 +293,7 @@ class URLRedirectWithoutTrailingSlashSettingTests(URLTestCaseBase):
 
 
 class URLResponseTests(URLTestCaseBase):
-    """
-    Tests if the response has the right language-code.
-    """
+    """Tests if the response has the correct language code."""
     def test_not_prefixed_with_prefix(self):
         response = self.client.get('/en/not-prefixed/')
         self.assertEqual(response.status_code, 404)
@@ -290,13 +305,13 @@ class URLResponseTests(URLTestCaseBase):
         self.assertEqual(response.context['LANGUAGE_CODE'], 'en')
 
     def test_nl_url(self):
-        response = self.client.get('/nl/profiel/registeren/')
+        response = self.client.get('/nl/profiel/registreren/')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response['content-language'], 'nl')
         self.assertEqual(response.context['LANGUAGE_CODE'], 'nl')
 
     def test_wrong_en_prefix(self):
-        response = self.client.get('/en/profiel/registeren/')
+        response = self.client.get('/en/profiel/registreren/')
         self.assertEqual(response.status_code, 404)
 
     def test_wrong_nl_prefix(self):
@@ -308,6 +323,18 @@ class URLResponseTests(URLTestCaseBase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response['content-language'], 'pt-br')
         self.assertEqual(response.context['LANGUAGE_CODE'], 'pt-br')
+
+    def test_en_path(self):
+        response = self.client.get('/en/account/register-as-path/')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response['content-language'], 'en')
+        self.assertEqual(response.context['LANGUAGE_CODE'], 'en')
+
+    def test_nl_path(self):
+        response = self.client.get('/nl/profiel/registreren-als-pad/')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response['content-language'], 'nl')
+        self.assertEqual(response.context['LANGUAGE_CODE'], 'nl')
 
 
 class URLRedirectWithScriptAliasTests(URLTestCaseBase):

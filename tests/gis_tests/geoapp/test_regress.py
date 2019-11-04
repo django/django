@@ -1,6 +1,3 @@
-# -*- encoding: utf-8 -*-
-from __future__ import unicode_literals
-
 from datetime import datetime
 
 from django.contrib.gis.db.models import Extent
@@ -12,21 +9,24 @@ from ..utils import no_oracle
 from .models import City, PennsylvaniaCity, State, Truth
 
 
-@skipUnlessDBFeature("gis_enabled")
 class GeoRegressionTests(TestCase):
     fixtures = ['initial']
 
     def test_update(self):
-        "Testing GeoQuerySet.update(). See #10411."
-        pnt = City.objects.get(name='Pueblo').point
-        bak = pnt.clone()
-        pnt.y += 0.005
-        pnt.x += 0.005
+        "Testing QuerySet.update() (#10411)."
+        pueblo = City.objects.get(name='Pueblo')
+        bak = pueblo.point.clone()
+        pueblo.point.y += 0.005
+        pueblo.point.x += 0.005
 
-        City.objects.filter(name='Pueblo').update(point=pnt)
-        self.assertEqual(pnt, City.objects.get(name='Pueblo').point)
+        City.objects.filter(name='Pueblo').update(point=pueblo.point)
+        pueblo.refresh_from_db()
+        self.assertAlmostEqual(bak.y + 0.005, pueblo.point.y, 6)
+        self.assertAlmostEqual(bak.x + 0.005, pueblo.point.x, 6)
         City.objects.filter(name='Pueblo').update(point=bak)
-        self.assertEqual(bak, City.objects.get(name='Pueblo').point)
+        pueblo.refresh_from_db()
+        self.assertAlmostEqual(bak.y, pueblo.point.y, 6)
+        self.assertAlmostEqual(bak.x, pueblo.point.x, 6)
 
     def test_kmz(self):
         "Testing `render_to_kmz` with non-ASCII data. See #11624."
@@ -85,5 +85,5 @@ class GeoRegressionTests(TestCase):
         self.assertIsInstance(val1, bool)
         self.assertIsInstance(val2, bool)
         # verify values
-        self.assertEqual(val1, True)
-        self.assertEqual(val2, False)
+        self.assertIs(val1, True)
+        self.assertIs(val2, False)

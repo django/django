@@ -1,6 +1,3 @@
-# Since this package contains a "django" module, this is required on Python 2.
-from __future__ import absolute_import
-
 from django.core.exceptions import (
     ImproperlyConfigured, SuspiciousFileOperation,
 )
@@ -9,21 +6,21 @@ from django.utils._os import safe_join
 from django.utils.functional import cached_property
 
 
-class BaseEngine(object):
+class BaseEngine:
 
     # Core methods: engines have to provide their own implementation
     #               (except for from_string which is optional).
 
     def __init__(self, params):
         """
-        Initializes the template engine.
+        Initialize the template engine.
 
-        Receives the configuration settings as a dict.
+        `params` is a dict of configuration settings.
         """
         params = params.copy()
         self.name = params.pop('NAME')
         self.dirs = list(params.pop('DIRS'))
-        self.app_dirs = bool(params.pop('APP_DIRS'))
+        self.app_dirs = params.pop('APP_DIRS')
         if params:
             raise ImproperlyConfigured(
                 "Unknown parameters: {}".format(", ".join(params)))
@@ -36,7 +33,7 @@ class BaseEngine(object):
 
     def from_string(self, template_code):
         """
-        Creates and returns a template for the given source code.
+        Create and return a template for the given source code.
 
         This method is optional.
         """
@@ -46,9 +43,9 @@ class BaseEngine(object):
 
     def get_template(self, template_name):
         """
-        Loads and returns a template for the given name.
+        Load and return a template for the given name.
 
-        Raises TemplateDoesNotExist if no such template exists.
+        Raise TemplateDoesNotExist if no such template exists.
         """
         raise NotImplementedError(
             "subclasses of BaseEngine must provide "
@@ -60,7 +57,7 @@ class BaseEngine(object):
     @cached_property
     def template_dirs(self):
         """
-        Returns a list of directories to search for templates.
+        Return a list of directories to search for templates.
         """
         # Immutable return value because it's cached and shared by callers.
         template_dirs = tuple(self.dirs)
@@ -70,9 +67,9 @@ class BaseEngine(object):
 
     def iter_template_filenames(self, template_name):
         """
-        Iterates over candidate files for template_name.
+        Iterate over candidate files for template_name.
 
-        Ignores files that don't lie inside configured template dirs to avoid
+        Ignore files that don't lie inside configured template dirs to avoid
         directory traversal attacks.
         """
         for template_dir in self.template_dirs:

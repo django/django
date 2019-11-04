@@ -17,7 +17,7 @@ class ComplexMultiWidget(MultiWidget):
             SelectMultiple(choices=beatles),
             SplitDateTimeWidget(),
         )
-        super(ComplexMultiWidget, self).__init__(widgets, attrs)
+        super().__init__(widgets, attrs)
 
     def decompress(self, value):
         if value:
@@ -29,18 +29,15 @@ class ComplexMultiWidget(MultiWidget):
             ]
         return [None, None, None]
 
-    def format_output(self, rendered_widgets):
-        return '\n'.join(rendered_widgets)
-
 
 class ComplexField(MultiValueField):
-    def __init__(self, required=True, widget=None, label=None, initial=None):
+    def __init__(self, **kwargs):
         fields = (
             CharField(),
             MultipleChoiceField(choices=beatles),
             SplitDateTimeField(),
         )
-        super(ComplexField, self).__init__(fields, required, widget, label, initial)
+        super().__init__(fields, **kwargs)
 
     def compress(self, data_list):
         if data_list:
@@ -57,13 +54,28 @@ class MultiValueFieldTest(SimpleTestCase):
     @classmethod
     def setUpClass(cls):
         cls.field = ComplexField(widget=ComplexMultiWidget())
-        super(MultiValueFieldTest, cls).setUpClass()
+        super().setUpClass()
 
     def test_clean(self):
         self.assertEqual(
             self.field.clean(['some text', ['J', 'P'], ['2007-04-25', '6:24:00']]),
             'some text,JP,2007-04-25 06:24:00',
         )
+
+    def test_clean_disabled_multivalue(self):
+        class ComplexFieldForm(Form):
+            f = ComplexField(disabled=True, widget=ComplexMultiWidget)
+
+        inputs = (
+            'some text,JP,2007-04-25 06:24:00',
+            ['some text', ['J', 'P'], ['2007-04-25', '6:24:00']],
+        )
+        for data in inputs:
+            with self.subTest(data=data):
+                form = ComplexFieldForm({}, initial={'f': data})
+                form.full_clean()
+                self.assertEqual(form.errors, {})
+                self.assertEqual(form.cleaned_data, {'f': inputs[0]})
 
     def test_bad_choice(self):
         msg = "'Select a valid choice. X is not one of the available choices.'"
@@ -79,9 +91,7 @@ class MultiValueFieldTest(SimpleTestCase):
             self.field.clean(['some text', ['JP']])
 
     def test_has_changed_no_initial(self):
-        self.assertTrue(self.field.has_changed(
-            None, ['some text', ['J', 'P'], ['2007-04-25', '6:24:00']],
-        ))
+        self.assertTrue(self.field.has_changed(None, ['some text', ['J', 'P'], ['2007-04-25', '6:24:00']]))
 
     def test_has_changed_same(self):
         self.assertFalse(self.field.has_changed(
@@ -108,21 +118,25 @@ class MultiValueFieldTest(SimpleTestCase):
             ['some text', ['J', 'P'], ['2009-04-25', '11:44:00']],
         ))
 
+    def test_disabled_has_changed(self):
+        f = MultiValueField(fields=(CharField(), CharField()), disabled=True)
+        self.assertIs(f.has_changed(['x', 'x'], ['y', 'y']), False)
+
     def test_form_as_table(self):
         form = ComplexFieldForm()
         self.assertHTMLEqual(
             form.as_table(),
             """
             <tr><th><label for="id_field1_0">Field1:</label></th>
-            <td><input type="text" name="field1_0" id="id_field1_0" />
-            <select multiple="multiple" name="field1_1" id="id_field1_1">
+            <td><input type="text" name="field1_0" id="id_field1_0" required>
+            <select multiple name="field1_1" id="id_field1_1" required>
             <option value="J">John</option>
             <option value="P">Paul</option>
             <option value="G">George</option>
             <option value="R">Ringo</option>
             </select>
-            <input type="text" name="field1_2_0" id="id_field1_2_0" />
-            <input type="text" name="field1_2_1" id="id_field1_2_1" /></td></tr>
+            <input type="text" name="field1_2_0" id="id_field1_2_0" required>
+            <input type="text" name="field1_2_1" id="id_field1_2_1" required></td></tr>
             """,
         )
 
@@ -137,15 +151,15 @@ class MultiValueFieldTest(SimpleTestCase):
             form.as_table(),
             """
             <tr><th><label for="id_field1_0">Field1:</label></th>
-            <td><input type="text" name="field1_0" value="some text" id="id_field1_0" />
-            <select multiple="multiple" name="field1_1" id="id_field1_1">
-            <option value="J" selected="selected">John</option>
-            <option value="P" selected="selected">Paul</option>
+            <td><input type="text" name="field1_0" value="some text" id="id_field1_0" required>
+            <select multiple name="field1_1" id="id_field1_1" required>
+            <option value="J" selected>John</option>
+            <option value="P" selected>Paul</option>
             <option value="G">George</option>
             <option value="R">Ringo</option>
             </select>
-            <input type="text" name="field1_2_0" value="2007-04-25" id="id_field1_2_0" />
-            <input type="text" name="field1_2_1" value="06:24:00" id="id_field1_2_1" /></td></tr>
+            <input type="text" name="field1_2_0" value="2007-04-25" id="id_field1_2_0" required>
+            <input type="text" name="field1_2_1" value="06:24:00" id="id_field1_2_1" required></td></tr>
             """,
         )
 
@@ -157,6 +171,4 @@ class MultiValueFieldTest(SimpleTestCase):
             'field1_2_1': '06:24:00',
         })
         form.is_valid()
-        self.assertEqual(
-            form.cleaned_data['field1'], 'some text,JP,2007-04-25 06:24:00',
-        )
+        self.assertEqual(form.cleaned_data['field1'], 'some text,JP,2007-04-25 06:24:00')

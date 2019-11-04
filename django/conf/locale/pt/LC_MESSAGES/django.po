@@ -7,16 +7,16 @@
 # Jannis Leidel <jannis@leidel.info>, 2011
 # José Durães <jdmduraes@gmail.com>, 2014
 # jorgecarleitao <jorgecarleitao@gmail.com>, 2014-2015
-# Nuno Mariz <nmariz@gmail.com>, 2011-2013,2015
+# Nuno Mariz <nmariz@gmail.com>, 2011-2013,2015-2018
 # Paulo Köch <paulo.koch@gmail.com>, 2011
 # Raúl Pedro Fernandes Santos, 2014
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2015-11-27 09:35+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2019-01-16 20:42+0100\n"
+"PO-Revision-Date: 2019-01-18 00:44+0000\n"
+"Last-Translator: Ramiro Morales\n"
 "Language-Team: Portuguese (http://www.transifex.com/django/django/language/"
 "pt/)\n"
 "MIME-Version: 1.0\n"
@@ -67,6 +67,9 @@ msgstr "Dinamarquês"
 msgid "German"
 msgstr "Alemão"
 
+msgid "Lower Sorbian"
+msgstr "Sorbedo inferior"
+
 msgid "Greek"
 msgstr "Grego"
 
@@ -89,7 +92,7 @@ msgid "Argentinian Spanish"
 msgstr "Espanhol Argentino"
 
 msgid "Colombian Spanish"
-msgstr ""
+msgstr "Espanhol Colombiano"
 
 msgid "Mexican Spanish"
 msgstr "Espanhol mexicano"
@@ -122,7 +125,7 @@ msgid "Irish"
 msgstr "Irlandês"
 
 msgid "Scottish Gaelic"
-msgstr ""
+msgstr "Escocês Gaélico"
 
 msgid "Galician"
 msgstr "Galaciano"
@@ -136,8 +139,14 @@ msgstr "Hindi"
 msgid "Croatian"
 msgstr "Croata"
 
+msgid "Upper Sorbian"
+msgstr "Sorbedo superior"
+
 msgid "Hungarian"
 msgstr "Húngaro"
+
+msgid "Armenian"
+msgstr ""
 
 msgid "Interlingua"
 msgstr "Interlíngua"
@@ -159,6 +168,9 @@ msgstr "Japonês"
 
 msgid "Georgian"
 msgstr "Georgiano"
+
+msgid "Kabyle"
+msgstr "Kabyle"
 
 msgid "Kazakh"
 msgstr "Cazaque"
@@ -196,8 +208,8 @@ msgstr "Marathi"
 msgid "Burmese"
 msgstr "Birmanês"
 
-msgid "Norwegian Bokmal"
-msgstr "Norueguês (Bokmål)"
+msgid "Norwegian Bokmål"
+msgstr "Norueguês Bokmål"
 
 msgid "Nepali"
 msgstr "Nepali"
@@ -295,8 +307,14 @@ msgstr "Ficheiros Estáticos"
 msgid "Syndication"
 msgstr "Syndication"
 
-msgid "Web Design"
-msgstr "Web Design"
+msgid "That page number is not an integer"
+msgstr "Esse número de página não é um número inteiro"
+
+msgid "That page number is less than 1"
+msgstr "Esse número de página é inferior a 1"
+
+msgid "That page contains no results"
+msgstr "Essa página não contém resultados"
 
 msgid "Enter a valid value."
 msgstr "Introduza um valor válido."
@@ -310,6 +328,7 @@ msgstr "Introduza um número inteiro válido."
 msgid "Enter a valid email address."
 msgstr "Introduza um endereço de e-mail válido."
 
+#. Translators: "letters" means latin letters: a-z and A-Z.
 msgid ""
 "Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
 msgstr ""
@@ -374,6 +393,9 @@ msgstr[1] ""
 "Garanta que este valor tenha no máximo %(limit_value)d caracteres (tem "
 "%(show_value)d)."
 
+msgid "Enter a number."
+msgstr "Introduza um número."
+
 #, python-format
 msgid "Ensure that there are no more than %(max)s digit in total."
 msgid_plural "Ensure that there are no more than %(max)s digits in total."
@@ -393,6 +415,17 @@ msgid_plural ""
 "Ensure that there are no more than %(max)s digits before the decimal point."
 msgstr[0] "Garanta que não tem mais de %(max)s dígito antes do ponto decimal."
 msgstr[1] "Garanta que não tem mais de %(max)s dígitos antes do ponto decimal."
+
+#, python-format
+msgid ""
+"File extension '%(extension)s' is not allowed. Allowed extensions are: "
+"'%(allowed_extensions)s'."
+msgstr ""
+"A extensão do ficheiro '%(extension)s' não é permitida. As extensões "
+"permitidas são: '%(allowed_extensions)s'."
+
+msgid "Null characters are not allowed."
+msgstr "Não são permitidos caracteres nulos."
 
 msgid "and"
 msgstr "e"
@@ -434,9 +467,16 @@ msgstr "Inteiro"
 msgid "'%(value)s' value must be an integer."
 msgstr "O valor '%(value)s' deve ser um número inteiro."
 
+msgid "Big (8 byte) integer"
+msgstr "Inteiro grande (8 byte)"
+
 #, python-format
 msgid "'%(value)s' value must be either True or False."
 msgstr "O valor '%(value)s' deve ser True ou False."
+
+#, python-format
+msgid "'%(value)s' value must be either True, False, or None."
+msgstr "O valor '%(value)s' deve ser True, False ou None."
 
 msgid "Boolean (Either True or False)"
 msgstr "Boolean (Pode ser True ou False)"
@@ -517,9 +557,6 @@ msgstr "O valor '%(value)s' deve ser um número de vírgula flutuante."
 msgid "Floating point number"
 msgstr "Número em vírgula flutuante"
 
-msgid "Big (8 byte) integer"
-msgstr "Inteiro grande (8 byte)"
-
 msgid "IPv4 address"
 msgstr "Endereço IPv4"
 
@@ -578,6 +615,9 @@ msgstr "Dados binários simples"
 msgid "'%(value)s' is not a valid UUID."
 msgstr "'%(value)s' não é um UUID válido."
 
+msgid "Universally unique identifier"
+msgstr ""
+
 msgid "File"
 msgstr "Ficheiro"
 
@@ -594,6 +634,14 @@ msgstr "Chave Estrangeira (tipo determinado pelo campo relacionado)"
 msgid "One-to-one relationship"
 msgstr "Relação de um-para-um"
 
+#, python-format
+msgid "%(from)s-%(to)s relationship"
+msgstr "Relação de %(from)s-%(to)s"
+
+#, python-format
+msgid "%(from)s-%(to)s relationships"
+msgstr "Relações de %(from)s-%(to)s"
+
 msgid "Many-to-many relationship"
 msgstr "Relação de muitos-para-muitos"
 
@@ -609,9 +657,6 @@ msgstr "Este campo é obrigatório."
 msgid "Enter a whole number."
 msgstr "Introduza um número inteiro."
 
-msgid "Enter a number."
-msgstr "Introduza um número."
-
 msgid "Enter a valid date."
 msgstr "Introduza uma data válida."
 
@@ -623,6 +668,10 @@ msgstr "Introduza uma data/hora válida."
 
 msgid "Enter a valid duration."
 msgstr "Introduza uma duração válida."
+
+#, python-brace-format
+msgid "The number of days must be between {min_days} and {max_days}."
+msgstr "O número de dias deve ser entre {min_days} e {max_days}."
 
 msgid "No file was submitted. Check the encoding type on the form."
 msgstr ""
@@ -719,18 +768,16 @@ msgstr ""
 msgid "Please correct the duplicate values below."
 msgstr "Por favor corrija os valores duplicados abaixo."
 
-msgid "The inline foreign key did not match the parent instance primary key."
-msgstr ""
-"A chave estrangeira em linha não coincide com a chave primária na instância "
-"pai."
+msgid "The inline value did not match the parent instance."
+msgstr "O valor em linha não corresponde à instância pai."
 
 msgid "Select a valid choice. That choice is not one of the available choices."
 msgstr ""
 "Selecione uma opção válida. Esse valor não se encontra opções disponíveis."
 
 #, python-format
-msgid "\"%(pk)s\" is not a valid value for a primary key."
-msgstr "\"%(pk)s\" não é um valor válido para uma chave primária."
+msgid "\"%(pk)s\" is not a valid value."
+msgstr "\"%(pk)s\" não é um valor válido."
 
 #, python-format
 msgid ""
@@ -740,14 +787,14 @@ msgstr ""
 "%(datetime)s não pode ser interpretada de fuso horário %(current_timezone)s; "
 "pode ser ambígua ou não podem existir."
 
+msgid "Clear"
+msgstr "Limpar"
+
 msgid "Currently"
 msgstr "Atualmente"
 
 msgid "Change"
 msgstr "Modificar"
-
-msgid "Clear"
-msgstr "Limpar"
 
 msgid "Unknown"
 msgstr "Desconhecido"
@@ -1020,8 +1067,8 @@ msgstr "Este não é um endereço IPv6 válido."
 
 #, python-format
 msgctxt "String to return when truncating text"
-msgid "%(truncated_text)s..."
-msgstr "%(truncated_text)s..."
+msgid "%(truncated_text)s…"
+msgstr ""
 
 msgid "or"
 msgstr "ou"
@@ -1096,6 +1143,19 @@ msgstr ""
 "HTTPS, ou para pedidos 'same-origin'."
 
 msgid ""
+"If you are using the <meta name=\"referrer\" content=\"no-referrer\"> tag or "
+"including the 'Referrer-Policy: no-referrer' header, please remove them. The "
+"CSRF protection requires the 'Referer' header to do strict referer checking. "
+"If you're concerned about privacy, use alternatives like <a rel=\"noreferrer"
+"\" ...> for links to third-party sites."
+msgstr ""
+"Se está a usar a tag <meta name=\"referrer\" content=\"no-referrer\"> ou a "
+"incluir o cabeçalho 'Referrer-Policy: no-referrer', por favor remova. A "
+"proteção CSRF requer o cabeçalho 'Referer' fazer uma verificação rigorosa do "
+"referente. Se está preocupado com a privacidade, use alternativas como <a "
+"rel=\"noreferrer\" ...> para links para sites de terceiros."
+
+msgid ""
 "You are seeing this message because this site requires a CSRF cookie when "
 "submitting forms. This cookie is required for security reasons, to ensure "
 "that your browser is not being hijacked by third parties."
@@ -1114,31 +1174,11 @@ msgstr ""
 msgid "More information is available with DEBUG=True."
 msgstr "Está disponível mais informação com DEBUG=True."
 
-msgid "Welcome to Django"
-msgstr "Bem-vindo ao Django"
-
-msgid "It worked!"
-msgstr "Funcionou!"
-
-msgid "Congratulations on your first Django-powered page."
-msgstr "Parabéns pela sua primeira página em Django."
-
-msgid ""
-"Of course, you haven't actually done any work yet. Next, start your first "
-"app by running <code>python manage.py startapp [app_label]</code>."
-msgstr ""
-"Claro que ainda não fizeste qualquer trabalho. Cria a tua primeira aplicação "
-"correndo <code>python manage.py startapp [app_label]</code>."
-
-msgid ""
-"You're seeing this message because you have <code>DEBUG = True</code> in "
-"your Django settings file and you haven't configured any URLs. Get to work!"
-msgstr ""
-"Estás a ver esta mensagem porque tens  <code>DEBUG = True</code> no ficheiro "
-"settings do Django e ainda não configuraste nenhum URL. Toca a trabalhar!"
-
 msgid "No year specified"
 msgstr "Nenhum ano especificado"
+
+msgid "Date out of range"
+msgstr "Data fora do alcance"
 
 msgid "No month specified"
 msgstr "Nenhum mês especificado"
@@ -1190,3 +1230,48 @@ msgstr "\"%(path)s\" não existe"
 #, python-format
 msgid "Index of %(directory)s"
 msgstr "Índice de %(directory)s"
+
+msgid "Django: the Web framework for perfectionists with deadlines."
+msgstr "Django: the Web framework for perfectionists with deadlines."
+
+#, python-format
+msgid ""
+"View <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" "
+"target=\"_blank\" rel=\"noopener\">release notes</a> for Django %(version)s"
+msgstr ""
+"Visualizar <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/"
+"\" target=\"_blank\" rel=\"noopener\">notas de lançamento</a> do Django "
+"%(version)s"
+
+msgid "The install worked successfully! Congratulations!"
+msgstr "A instalação funcionou com sucesso! Parabéns!"
+
+#, python-format
+msgid ""
+"You are seeing this page because <a href=\"https://docs.djangoproject.com/en/"
+"%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener"
+"\">DEBUG=True</a> is in your settings file and you have not configured any "
+"URLs."
+msgstr ""
+"Está a visualizar esta página porque tem <a href=\"https://docs."
+"djangoproject.com/en/%(version)s/ref/settings/#debug\" target=\"_blank\" rel="
+"\"noopener\">DEBUG=True</a> no seu ficheiro settings do Django e não "
+"configurou nenhum URLs."
+
+msgid "Django Documentation"
+msgstr "Documentação do Django"
+
+msgid "Topics, references, &amp; how-to's"
+msgstr "Tópicos, referências, &amp; how-to's"
+
+msgid "Tutorial: A Polling App"
+msgstr "Tutorial: A Polling App"
+
+msgid "Get started with Django"
+msgstr "Comece com o Django"
+
+msgid "Django Community"
+msgstr "Comunidade Django"
+
+msgid "Connect, get help, or contribute"
+msgstr "Conecte-se, obtenha ajuda ou contribua"

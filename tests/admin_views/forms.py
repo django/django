@@ -1,5 +1,6 @@
 from django import forms
 from django.contrib.admin.forms import AdminAuthenticationForm
+from django.contrib.admin.helpers import ActionForm
 
 
 class CustomAdminAuthenticationForm(AdminAuthenticationForm):
@@ -12,3 +13,8 @@ class CustomAdminAuthenticationForm(AdminAuthenticationForm):
         if username == 'customform':
             raise forms.ValidationError('custom form error')
         return username
+
+
+class MediaActionForm(ActionForm):
+    class Media:
+        js = ['path/to/media.js']

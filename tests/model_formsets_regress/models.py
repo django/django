@@ -1,5 +1,4 @@
 from django.db import models
-from django.utils.encoding import python_2_unicode_compatible
 
 
 class User(models.Model):
@@ -15,6 +14,15 @@ class UserSite(models.Model):
 class UserProfile(models.Model):
     user = models.ForeignKey(User, models.CASCADE, unique=True, to_field="username")
     about = models.TextField()
+
+
+class UserPreferences(models.Model):
+    user = models.OneToOneField(
+        User, models.CASCADE,
+        to_field='username',
+        primary_key=True,
+    )
+    favorite_number = models.IntegerField()
 
 
 class ProfileNetwork(models.Model):
@@ -40,7 +48,6 @@ class Network(models.Model):
     name = models.CharField(max_length=15)
 
 
-@python_2_unicode_compatible
 class Host(models.Model):
     network = models.ForeignKey(Network, models.CASCADE)
     hostname = models.CharField(max_length=25)

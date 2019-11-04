@@ -1,13 +1,10 @@
-from __future__ import unicode_literals
-
 from django.contrib.sites.models import Site
 from django.db import models
 from django.urls import get_script_prefix
-from django.utils.encoding import iri_to_uri, python_2_unicode_compatible
-from django.utils.translation import ugettext_lazy as _
+from django.utils.encoding import iri_to_uri
+from django.utils.translation import gettext_lazy as _
 
 
-@python_2_unicode_compatible
 class FlatPage(models.Model):
     url = models.CharField(_('URL'), max_length=100, db_index=True)
     title = models.CharField(_('title'), max_length=200)
@@ -22,9 +19,11 @@ class FlatPage(models.Model):
             "the system will use 'flatpages/default.html'."
         ),
     )
-    registration_required = models.BooleanField(_('registration required'),
+    registration_required = models.BooleanField(
+        _('registration required'),
         help_text=_("If this is checked, only logged-in users will be able to view the page."),
-        default=False)
+        default=False,
+    )
     sites = models.ManyToManyField(Site, verbose_name=_('sites'))
 
     class Meta:

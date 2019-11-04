@@ -20,12 +20,12 @@
 {% for library in filter_libraries %}
 <div class="module">
     <h2>{% firstof library.grouper _("Built-in filters") %}</h2>
-    {% if library.grouper %}<p class="small quiet">{% blocktrans with code="{"|add:"% load "|add:library.grouper|add:" %"|add:"}" %}To use these filters, put <code>{{ code }}</code> in your template before using the filter.{% endblocktrans %}</p><hr />{% endif %}
+    {% if library.grouper %}<p class="small quiet">{% blocktrans with code="{"|add:"% load "|add:library.grouper|add:" %"|add:"}" %}To use these filters, put <code>{{ code }}</code> in your template before using the filter.{% endblocktrans %}</p><hr>{% endif %}
     {% for filter in library.list|dictsort:"name" %}
     <h3 id="{{ library.grouper|default:"built_in" }}-{{ filter.name }}">{{ filter.name }}</h3>
     {{ filter.title }}
     {{ filter.body }}
-    {% if not forloop.last %}<hr />{% endif %}
+    {% if not forloop.last %}<hr>{% endif %}
     {% endfor %}
 </div>
 {% endfor %}

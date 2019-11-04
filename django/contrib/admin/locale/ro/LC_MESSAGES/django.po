@@ -1,18 +1,19 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Daniel Ursache-Dogariu <contact@danniel.net>, 2011
+# Bogdan Mateescu, 2018-2019
+# Daniel Ursache-Dogariu, 2011
 # Denis Darii <denis.darii@gmail.com>, 2011,2014
 # Ionel Cristian Mărieș <ionel.mc@gmail.com>, 2012
 # Jannis Leidel <jannis@leidel.info>, 2011
-# Razvan Stefanescu <razvan.stefanescu@gmail.com>, 2015
+# Razvan Stefanescu <razvan.stefanescu@gmail.com>, 2015-2017
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-11-15 11:06+0100\n"
-"PO-Revision-Date: 2015-11-27 12:24+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2019-01-16 20:42+0100\n"
+"PO-Revision-Date: 2019-01-18 12:02+0000\n"
+"Last-Translator: Bogdan Mateescu\n"
 "Language-Team: Romanian (http://www.transifex.com/django/django/language/"
 "ro/)\n"
 "MIME-Version: 1.0\n"
@@ -67,14 +68,38 @@ msgstr "Luna aceasta"
 msgid "This year"
 msgstr "Anul acesta"
 
+msgid "No date"
+msgstr "Fără dată"
+
+msgid "Has date"
+msgstr "Are o dată"
+
 #, python-format
 msgid ""
 "Please enter the correct %(username)s and password for a staff account. Note "
 "that both fields may be case-sensitive."
 msgstr ""
+"Introduceți vă rog un %(username)s și o parolă pentru un cont de membru. De "
+"remarcat că ambele țin cont de capitalizare."
 
 msgid "Action:"
 msgstr "Acțiune:"
+
+#, python-format
+msgid "Add another %(verbose_name)s"
+msgstr "Adăugati încă un/o %(verbose_name)s"
+
+msgid "Remove"
+msgstr "Elimină"
+
+msgid "Addition"
+msgstr "Adăugare"
+
+msgid "Change"
+msgstr "Schimbă"
+
+msgid "Deletion"
+msgstr "Ștergere"
 
 msgid "action time"
 msgstr "timp acțiune"
@@ -88,6 +113,8 @@ msgstr "tip de conținut"
 msgid "object id"
 msgstr "id obiect"
 
+#. Translators: 'repr' means representation
+#. (https://docs.python.org/library/functions.html#repr)
 msgid "object repr"
 msgstr "repr obiect"
 
@@ -118,6 +145,31 @@ msgstr "S-au șters \"%(object)s.\""
 msgid "LogEntry Object"
 msgstr "Obiect LogEntry"
 
+#, python-brace-format
+msgid "Added {name} \"{object}\"."
+msgstr "S-a adăugat {name} \"{object}\"."
+
+msgid "Added."
+msgstr "Adăugat."
+
+msgid "and"
+msgstr "și"
+
+#, python-brace-format
+msgid "Changed {fields} for {name} \"{object}\"."
+msgstr "S-au schimbat {fields} pentru {name} \"{object}\"."
+
+#, python-brace-format
+msgid "Changed {fields}."
+msgstr "S-au schimbat {fields}."
+
+#, python-brace-format
+msgid "Deleted {name} \"{object}\"."
+msgstr "S-a șters {name} \"{object}\"."
+
+msgid "No fields changed."
+msgstr "Niciun câmp modificat."
+
 msgid "None"
 msgstr "Nimic"
 
@@ -127,68 +179,44 @@ msgstr ""
 "Ține apăsat \"Control\", sau \"Command\" pe un Mac, pentru a selecta mai "
 "mult de unul."
 
-msgid "Added."
-msgstr "Adăugat."
+#, python-brace-format
+msgid "The {name} \"{obj}\" was added successfully."
+msgstr "{name} \"{obj}\" a fost adăugat cu succes."
 
-#, python-format
-msgid "Changed %s."
-msgstr "S-a schimbat %s."
+msgid "You may edit it again below."
+msgstr "O poți edita din nou mai jos."
 
-msgid "and"
-msgstr "și"
-
-#, python-format
-msgid "Added %(name)s \"%(object)s\"."
-msgstr "S-a adăugat %(name)s \"%(object)s\"."
-
-#, python-format
-msgid "Changed %(list)s for %(name)s \"%(object)s\"."
-msgstr "S-a schimbat %(list)s în %(name)s \"%(object)s\"."
-
-#, python-format
-msgid "Deleted %(name)s \"%(object)s\"."
-msgstr "S-a șters %(name)s \"%(object)s\"."
-
-msgid "No fields changed."
-msgstr "Niciun câmp modificat."
-
-#, python-format
+#, python-brace-format
 msgid ""
-"The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
-msgstr ""
-"%(name)s \"%(obj)s\" a fost adăugat(ă) cu succes. Puteți edita din nou mai "
-"jos."
-
-#, python-format
-msgid ""
-"The %(name)s \"%(obj)s\" was added successfully. You may add another "
-"%(name)s below."
-msgstr ""
-"%(name)s \"%(obj)s\" a fost adăugat cu succes. Poți adăuga alt %(name)s mai "
-"jos."
-
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was added successfully."
-msgstr "%(name)s \"%(obj)s\" a fost adăugat cu succes."
-
-#, python-format
-msgid ""
-"The %(name)s \"%(obj)s\" was changed successfully. You may edit it again "
+"The {name} \"{obj}\" was added successfully. You may add another {name} "
 "below."
 msgstr ""
-"%(name)s \"%(obj)s\" a fost modificat cu succes. Il poți edita mai jos."
+"{name} \"{obj}\" a fost adăugat cu succes. Poți adăuga alt {name} mai jos."
 
-#, python-format
+#, python-brace-format
 msgid ""
-"The %(name)s \"%(obj)s\" was changed successfully. You may add another "
-"%(name)s below."
+"The {name} \"{obj}\" was changed successfully. You may edit it again below."
 msgstr ""
-"%(name)s \"%(obj)s\" a fost modificat cu succes. Poți adăuga un alt %(name)s "
+"{name} \"{obj}\" a fost modificat cu succes. Poți să îl editezi în "
+"continuare mai jos."
+
+#, python-brace-format
+msgid ""
+"The {name} \"{obj}\" was added successfully. You may edit it again below."
+msgstr ""
+"{name} \"{obj}\" a fost adăugat cu succes. Poți să îl editezi în continuare "
 "mai jos."
 
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was changed successfully."
-msgstr "%(name)s \"%(obj)s\" a fost modificat(ă) cu succes."
+#, python-brace-format
+msgid ""
+"The {name} \"{obj}\" was changed successfully. You may add another {name} "
+"below."
+msgstr ""
+"{name} \"{obj}\" a fost modificat cu succes. Poți adăuga alt {name} mai jos."
+
+#, python-brace-format
+msgid "The {name} \"{obj}\" was changed successfully."
+msgstr "{name} \"{obj}\" a fost schimbat cu succes."
 
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
@@ -205,8 +233,8 @@ msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "%(name)s \"%(obj)s\" eliminat(ă) cu succes."
 
 #, python-format
-msgid "%(name)s object with primary key %(key)r does not exist."
-msgstr "Obiectul %(name)s ce are cheie primară %(key)r nu există."
+msgid "%(name)s with ID \"%(key)s\" doesn't exist. Perhaps it was deleted?"
+msgstr "%(name)s cu ID \"%(key)s\" inexistent. Posibil să fi fost șters?"
 
 #, python-format
 msgid "Add %s"
@@ -215,6 +243,10 @@ msgstr "Adaugă %s"
 #, python-format
 msgid "Change %s"
 msgstr "Schimbă %s"
+
+#, python-format
+msgid "View %s"
+msgstr "Vizualizează %s"
 
 msgid "Database error"
 msgstr "Eroare de bază de date"
@@ -326,7 +358,7 @@ msgid "Change password"
 msgstr "Schimbă parola"
 
 msgid "Please correct the error below."
-msgstr "Corectați erorile de mai jos"
+msgstr "Corectați eroarea de mai jos."
 
 msgid "Please correct the errors below."
 msgstr "Corectați erorile de mai jos."
@@ -346,20 +378,17 @@ msgid "Documentation"
 msgstr "Documentație"
 
 msgid "Log out"
-msgstr "Deautentificare"
+msgstr "Deconectează-te"
 
-msgid "Add"
-msgstr "Adaugă"
+#, python-format
+msgid "Add %(name)s"
+msgstr "Adaugă %(name)s"
 
 msgid "History"
 msgstr "Istoric"
 
 msgid "View on site"
 msgstr "Vizualizează pe site"
-
-#, python-format
-msgid "Add %(name)s"
-msgstr "Adaugă %(name)s"
 
 msgid "Filter"
 msgstr "Filtru"
@@ -404,13 +433,13 @@ msgstr ""
 "itemuri asociate vor fi șterse:"
 
 msgid "Objects"
-msgstr ""
+msgstr "Obiecte"
 
 msgid "Yes, I'm sure"
 msgstr "Da, cu siguranță"
 
 msgid "No, take me back"
-msgstr ""
+msgstr "Nu, vreau să mă întorc"
 
 msgid "Delete multiple objects"
 msgstr "Ștergeți obiecte multiple"
@@ -441,15 +470,8 @@ msgstr ""
 "Sigur doriţi să ștergeți %(objects_name)s conform selecției? Toate obiectele "
 "următoare alături de cele asociate lor vor fi șterse:"
 
-msgid "Change"
-msgstr "Schimbă"
-
-msgid "Remove"
-msgstr "Elimină"
-
-#, python-format
-msgid "Add another %(verbose_name)s"
-msgstr "Adăugati încă un/o %(verbose_name)s"
+msgid "View"
+msgstr "Vizualizează"
 
 msgid "Delete?"
 msgstr "Elimină?"
@@ -459,19 +481,22 @@ msgid " By %(filter_title)s "
 msgstr "După %(filter_title)s "
 
 msgid "Summary"
-msgstr ""
+msgstr "Sumar"
 
 #, python-format
 msgid "Models in the %(name)s application"
-msgstr ""
+msgstr "Modele în aplicația %(name)s"
 
-msgid "You don't have permission to edit anything."
-msgstr "Nu nicio permisiune de editare."
+msgid "Add"
+msgstr "Adaugă"
 
-msgid "Recent Actions"
+msgid "You don't have permission to view or edit anything."
+msgstr "Nu aveți permisiunea de a edita sau vizualiza nimic."
+
+msgid "Recent actions"
 msgstr "Acțiuni recente"
 
-msgid "My Actions"
+msgid "My actions"
 msgstr "Acțiunile mele"
 
 msgid "None available"
@@ -494,6 +519,8 @@ msgid ""
 "You are authenticated as %(username)s, but are not authorized to access this "
 "page. Would you like to login to a different account?"
 msgstr ""
+"Sunteți autentificat ca %(username)s, dar nu sunteți autorizat să accesați "
+"această pagină. Doriți să vă autentificați cu un alt cont?"
 
 msgid "Forgotten your password or username?"
 msgstr "Ați uitat parola sau utilizatorul ?"
@@ -520,20 +547,8 @@ msgstr "Arată totul"
 msgid "Save"
 msgstr "Salvează"
 
-msgid "Popup closing..."
-msgstr ""
-
-#, python-format
-msgid "Change selected %(model)s"
-msgstr ""
-
-#, python-format
-msgid "Add another %(model)s"
-msgstr ""
-
-#, python-format
-msgid "Delete selected %(model)s"
-msgstr ""
+msgid "Popup closing…"
+msgstr "Fereastra se închide..."
 
 msgid "Search"
 msgstr "Caută"
@@ -557,6 +572,24 @@ msgstr "Salvați și mai adăugați"
 
 msgid "Save and continue editing"
 msgstr "Salvați și continuați editarea"
+
+msgid "Save and view"
+msgstr "Salvează și vizualizează"
+
+msgid "Close"
+msgstr "Închide"
+
+#, python-format
+msgid "Change selected %(model)s"
+msgstr "Modifică %(model)s selectat"
+
+#, python-format
+msgid "Add another %(model)s"
+msgstr "Adaugă alt %(model)s"
+
+#, python-format
+msgid "Delete selected %(model)s"
+msgstr "Șterge %(model)s selectat"
 
 msgid "Thanks for spending some quality time with the Web site today."
 msgstr "Mulţumiri pentru timpul petrecut astăzi pe sit."
@@ -615,17 +648,24 @@ msgid ""
 "We've emailed you instructions for setting your password, if an account "
 "exists with the email you entered. You should receive them shortly."
 msgstr ""
+"V-am transmis pe email instrucțiunile pentru setarea unei parole noi, dacă "
+"există un cont cu adresa email introdusă. Ar trebui să le primiți în scurt "
+"timp."
 
 msgid ""
 "If you don't receive an email, please make sure you've entered the address "
 "you registered with, and check your spam folder."
 msgstr ""
+"Dacă nu primiți un email, asigurați-vă că ați introdus adresa cu care v-ați "
+"înregistrat și verificați directorul spam."
 
 #, python-format
 msgid ""
 "You're receiving this email because you requested a password reset for your "
 "user account at %(site_name)s."
 msgstr ""
+"Primiți acest email deoarece ați cerut o resetare a parolei pentru contul de "
+"utilizator de la %(site_name)s."
 
 msgid "Please go to the following page and choose a new password:"
 msgstr "Mergeți la următoarea pagină și alegeți o parolă nouă:"
@@ -644,6 +684,8 @@ msgid ""
 "Forgotten your password? Enter your email address below, and we'll email "
 "instructions for setting a new one."
 msgstr ""
+"Ați uitat parola? Introduceți adresa email mai jos și veți primi "
+"instrucțiuni pentru setarea unei noi parole."
 
 msgid "Email address:"
 msgstr "Adresă e-mail:"
@@ -661,6 +703,10 @@ msgstr "Selectează %s"
 #, python-format
 msgid "Select %s to change"
 msgstr "Selectează %s pentru schimbare"
+
+#, python-format
+msgid "Select %s to view"
+msgstr "Selecteză %s pentru a vizualiza"
 
 msgid "Date:"
 msgstr "Dată:"

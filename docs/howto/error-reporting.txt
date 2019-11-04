@@ -20,10 +20,11 @@ Server errors
 
 When :setting:`DEBUG` is ``False``, Django will email the users listed in the
 :setting:`ADMINS` setting whenever your code raises an unhandled exception and
-results in an internal server error (HTTP status code 500). This gives the
-administrators immediate notification of any errors. The :setting:`ADMINS` will
-get a description of the error, a complete Python traceback, and details about
-the HTTP request that caused the error.
+results in an internal server error (strictly speaking, for any response with
+an HTTP status code of 500 or greater). This gives the administrators immediate
+notification of any errors. The :setting:`ADMINS` will get a description of the
+error, a complete Python traceback, and details about the HTTP request that
+caused the error.
 
 .. note::
 
@@ -57,7 +58,7 @@ not found" errors). Django sends emails about 404 errors when:
 
 * :setting:`DEBUG` is ``False``;
 
-* Your :setting:`MIDDLEWARE_CLASSES` setting includes
+* Your :setting:`MIDDLEWARE` setting includes
   :class:`django.middleware.common.BrokenLinkEmailsMiddleware`.
 
 If those conditions are met, Django will email the users listed in the
@@ -67,18 +68,13 @@ those are usually just people typing in broken URLs or broken Web bots. It also
 ignores 404s when the referer is equal to the requested URL, since this
 behavior is from broken Web bots too.
 
-.. versionchanged:: 1.9
-
-    In older versions, 404s were not ignored when the referer was equal to the
-    requested URL.
-
 .. note::
 
     :class:`~django.middleware.common.BrokenLinkEmailsMiddleware` must appear
     before other middleware that intercepts 404 errors, such as
     :class:`~django.middleware.locale.LocaleMiddleware` or
     :class:`~django.contrib.flatpages.middleware.FlatpageFallbackMiddleware`.
-    Put it towards the top of your :setting:`MIDDLEWARE_CLASSES` setting.
+    Put it towards the top of your :setting:`MIDDLEWARE` setting.
 
 You can tell Django to stop reporting particular 404s by tweaking the
 :setting:`IGNORABLE_404_URLS` setting. It should be a list of compiled
@@ -125,10 +121,10 @@ Filtering error reports
 .. warning::
 
     Filtering sensitive data is a hard problem, and it's nearly impossible to
-    guarantee that sensitive won't leak into an error report. Therefore, error
-    reports should only be available to trusted team members and you should
-    avoid transmitting error reports unencrypted over the Internet (such as
-    through email).
+    guarantee that sensitive data won't leak into an error report. Therefore,
+    error reports should only be available to trusted team members and you
+    should avoid transmitting error reports unencrypted over the Internet
+    (such as through email).
 
 Filtering sensitive information
 -------------------------------
@@ -143,10 +139,12 @@ exception raised, each `traceback frame`_’s local variables, and the
 
 However, sometimes certain types of information may be too sensitive and thus
 may not be appropriate to be kept track of, for example a user's password or
-credit card number. So Django offers a set of function decorators to help you
-control which information should be filtered out of error reports in a
-production environment (that is, where :setting:`DEBUG` is set to ``False``):
-:func:`sensitive_variables` and :func:`sensitive_post_parameters`.
+credit card number. So in addition to filtering out settings that appear to be
+sensitive as described in the :setting:`DEBUG` documentation, Django offers a
+set of function decorators to help you control which information should be
+filtered out of error reports in a production environment (that is, where
+:setting:`DEBUG` is set to ``False``): :func:`sensitive_variables` and
+:func:`sensitive_post_parameters`.
 
 .. _`full traceback`: https://en.wikipedia.org/wiki/Stack_trace
 .. _`traceback frame`: https://en.wikipedia.org/wiki/Stack_frame
@@ -205,10 +203,12 @@ production environment (that is, where :setting:`DEBUG` is set to ``False``):
 
         @sensitive_post_parameters('pass_word', 'credit_card_number')
         def record_user_profile(request):
-            UserProfile.create(user=request.user,
-                               password=request.POST['pass_word'],
-                               credit_card=request.POST['credit_card_number'],
-                               name=request.POST['name'])
+            UserProfile.create(
+                user=request.user,
+                password=request.POST['pass_word'],
+                credit_card=request.POST['credit_card_number'],
+                name=request.POST['name'],
+            )
             ...
 
     In the above example, the values for the ``pass_word`` and
@@ -254,7 +254,7 @@ given view by setting the ``HttpRequest``’s ``exception_reporter_filter``
 attribute::
 
     def my_view(request):
-        if request.user.is_authenticated():
+        if request.user.is_authenticated:
             request.exception_reporter_filter = CustomExceptionReporterFilter()
         ...
 

@@ -1,16 +1,14 @@
-from __future__ import unicode_literals
-
 import datetime
 from decimal import Decimal
 
 from django.core.exceptions import FieldDoesNotExist, FieldError
 from django.db.models import (
-    F, BooleanField, CharField, Count, DateTimeField, ExpressionWrapper, Func,
-    IntegerField, Sum, Value,
+    BooleanField, CharField, Count, DateTimeField, ExpressionWrapper, F, Func,
+    IntegerField, NullBooleanField, OuterRef, Q, Subquery, Sum, Value,
 )
-from django.db.models.functions import Lower
+from django.db.models.expressions import RawSQL
+from django.db.models.functions import Length, Lower
 from django.test import TestCase, skipUnlessDBFeature
-from django.utils import six
 
 from .models import (
     Author, Book, Company, DepartmentStore, Employee, Publisher, Store, Ticket,
@@ -26,7 +24,7 @@ def cxOracle_py3_bug(func):
     """
     from unittest import expectedFailure
     from django.db import connection
-    return expectedFailure(func) if connection.vendor == 'oracle' and six.PY3 else func
+    return expectedFailure(func) if connection.vendor == 'oracle' else func
 
 
 class NonAggregateAnnotationTestCase(TestCase):
@@ -148,6 +146,19 @@ class NonAggregateAnnotationTestCase(TestCase):
         combined = int(test.pages + test.rating)
         self.assertEqual(b.combined, combined)
 
+    def test_empty_expression_annotation(self):
+        books = Book.objects.annotate(
+            selected=ExpressionWrapper(Q(pk__in=[]), output_field=BooleanField())
+        )
+        self.assertEqual(len(books), Book.objects.count())
+        self.assertTrue(all(not book.selected for book in books))
+
+        books = Book.objects.annotate(
+            selected=ExpressionWrapper(Q(pk__in=Book.objects.none()), output_field=BooleanField())
+        )
+        self.assertEqual(len(books), Book.objects.count())
+        self.assertTrue(all(not book.selected for book in books))
+
     def test_annotate_with_aggregation(self):
         books = Book.objects.annotate(
             is_book=Value(1, output_field=IntegerField()),
@@ -187,13 +198,18 @@ class NonAggregateAnnotationTestCase(TestCase):
             name_lower=Lower('last_name'),
         ).distinct('name_lower')
 
-        self.assertEqual(set(p.last_name for p in people), {'Stark', 'Roosevelt'})
+        self.assertEqual({p.last_name for p in people}, {'Stark', 'Roosevelt'})
         self.assertEqual(len(people), 2)
 
         people2 = Employee.objects.annotate(
             test_alias=F('store__name'),
         ).distinct('test_alias')
         self.assertEqual(len(people2), 1)
+
+        lengths = Employee.objects.annotate(
+            name_len=Length('first_name'),
+        ).distinct('name_len').values_list('name_len', flat=True)
+        self.assertSequenceEqual(lengths, [3, 7, 8])
 
     def test_filter_annotation(self):
         books = Book.objects.annotate(
@@ -224,10 +240,28 @@ class NonAggregateAnnotationTestCase(TestCase):
             self.assertEqual(book.sum_rating, book.rating)
 
     def test_filter_wrong_annotation(self):
-        with six.assertRaisesRegex(self, FieldError, "Cannot resolve keyword .*"):
+        with self.assertRaisesMessage(FieldError, "Cannot resolve keyword 'nope' into field."):
             list(Book.objects.annotate(
                 sum_rating=Sum('rating')
             ).filter(sum_rating=F('nope')))
+
+    def test_decimal_annotation(self):
+        salary = Decimal(10) ** -Employee._meta.get_field('salary').decimal_places
+        Employee.objects.create(
+            first_name='Max',
+            last_name='Paine',
+            store=Store.objects.first(),
+            age=23,
+            salary=salary,
+        )
+        self.assertEqual(
+            Employee.objects.annotate(new_salary=F('salary') / 10).get().new_salary,
+            salary / 10,
+        )
+
+    def test_filter_decimal_annotation(self):
+        qs = Book.objects.annotate(new_price=F('price') + 1).filter(new_price=Decimal(31)).values_list('new_price')
+        self.assertEqual(qs.get(), (Decimal(31),))
 
     def test_combined_annotation_commutative(self):
         book1 = Book.objects.annotate(adjusted_rating=F('rating') + 2).get(pk=self.b1.pk)
@@ -250,9 +284,10 @@ class NonAggregateAnnotationTestCase(TestCase):
 
     def test_annotation_reverse_m2m(self):
         books = Book.objects.annotate(
-            store_name=F('store__name')).filter(
-            name='Practical Django Projects').order_by(
-            'store_name')
+            store_name=F('store__name'),
+        ).filter(
+            name='Practical Django Projects',
+        ).order_by('store_name')
 
         self.assertQuerysetEqual(
             books, [
@@ -282,6 +317,23 @@ class NonAggregateAnnotationTestCase(TestCase):
         self.assertEqual(book['other_rating'], 4)
         self.assertEqual(book['other_isbn'], '155860191')
 
+    def test_values_with_pk_annotation(self):
+        # annotate references a field in values() with pk
+        publishers = Publisher.objects.values('id', 'book__rating').annotate(total=Sum('book__rating'))
+        for publisher in publishers.filter(pk=self.p1.pk):
+            self.assertEqual(publisher['book__rating'], publisher['total'])
+
+    @skipUnlessDBFeature('allows_group_by_pk')
+    def test_rawsql_group_by_collapse(self):
+        raw = RawSQL('SELECT MIN(id) FROM annotations_book', [])
+        qs = Author.objects.values('id').annotate(
+            min_book_id=raw,
+            count_friends=Count('friends'),
+        ).order_by()
+        _, _, group_by = qs.query.get_compiler(using='default').pre_sql_setup()
+        self.assertEqual(len(group_by), 1)
+        self.assertNotEqual(raw, group_by[0])
+
     def test_defer_annotation(self):
         """
         Deferred attributes can be referenced by an annotation,
@@ -294,7 +346,7 @@ class NonAggregateAnnotationTestCase(TestCase):
             self.assertEqual(book.rating, 5)
             self.assertEqual(book.other_rating, 4)
 
-        with six.assertRaisesRegex(self, FieldDoesNotExist, "\w has no field named u?'other_rating'"):
+        with self.assertRaisesMessage(FieldDoesNotExist, "Book has no field named 'other_rating'"):
             book = qs.defer('other_rating').get(other_rating=4)
 
     def test_mti_annotations(self):
@@ -330,7 +382,7 @@ class NonAggregateAnnotationTestCase(TestCase):
 
     def test_null_annotation(self):
         """
-        Test that annotating None onto a model round-trips
+        Annotating None onto a model round-trips
         """
         book = Book.objects.annotate(no_value=Value(None, output_field=IntegerField())).first()
         self.assertIsNone(book.no_value)
@@ -359,9 +411,9 @@ class NonAggregateAnnotationTestCase(TestCase):
 
     def test_column_field_ordering(self):
         """
-        Test that columns are aligned in the correct order for
-        resolve_columns. This test will fail on mysql if column
-        ordering is out. Column fields should be aligned as:
+        Columns are aligned in the correct order for resolve_columns. This test
+        will fail on MySQL if column ordering is out. Column fields should be
+        aligned as:
         1. extra_select
         2. model_fields
         3. annotation_fields
@@ -458,7 +510,8 @@ class NonAggregateAnnotationTestCase(TestCase):
                 F('ticker_name'),
                 F('description'),
                 Value('No Tag'),
-                function='COALESCE')
+                function='COALESCE',
+            )
         ).annotate(
             tagline_lower=Lower(F('tagline'), output_field=CharField())
         ).order_by('name')
@@ -475,3 +528,73 @@ class NonAggregateAnnotationTestCase(TestCase):
             ],
             lambda c: (c.name, c.tagline_lower)
         )
+
+    def test_boolean_value_annotation(self):
+        books = Book.objects.annotate(
+            is_book=Value(True, output_field=BooleanField()),
+            is_pony=Value(False, output_field=BooleanField()),
+            is_none=Value(None, output_field=BooleanField(null=True)),
+            is_none_old=Value(None, output_field=NullBooleanField()),
+        )
+        self.assertGreater(len(books), 0)
+        for book in books:
+            self.assertIs(book.is_book, True)
+            self.assertIs(book.is_pony, False)
+            self.assertIsNone(book.is_none)
+            self.assertIsNone(book.is_none_old)
+
+    def test_annotation_in_f_grouped_by_annotation(self):
+        qs = (
+            Publisher.objects.annotate(multiplier=Value(3))
+            # group by option => sum of value * multiplier
+            .values('name')
+            .annotate(multiplied_value_sum=Sum(F('multiplier') * F('num_awards')))
+            .order_by()
+        )
+        self.assertCountEqual(
+            qs, [
+                {'multiplied_value_sum': 9, 'name': 'Apress'},
+                {'multiplied_value_sum': 0, 'name': "Jonno's House of Books"},
+                {'multiplied_value_sum': 27, 'name': 'Morgan Kaufmann'},
+                {'multiplied_value_sum': 21, 'name': 'Prentice Hall'},
+                {'multiplied_value_sum': 3, 'name': 'Sams'},
+            ]
+        )
+
+    def test_arguments_must_be_expressions(self):
+        msg = 'QuerySet.annotate() received non-expression(s): %s.'
+        with self.assertRaisesMessage(TypeError, msg % BooleanField()):
+            Book.objects.annotate(BooleanField())
+        with self.assertRaisesMessage(TypeError, msg % True):
+            Book.objects.annotate(is_book=True)
+        with self.assertRaisesMessage(TypeError, msg % ', '.join([str(BooleanField()), 'True'])):
+            Book.objects.annotate(BooleanField(), Value(False), is_book=True)
+
+    def test_chaining_annotation_filter_with_m2m(self):
+        qs = Author.objects.filter(
+            name='Adrian Holovaty',
+            friends__age=35,
+        ).annotate(
+            jacob_name=F('friends__name'),
+        ).filter(
+            friends__age=29,
+        ).annotate(
+            james_name=F('friends__name'),
+        ).values('jacob_name', 'james_name')
+        self.assertCountEqual(
+            qs,
+            [{'jacob_name': 'Jacob Kaplan-Moss', 'james_name': 'James Bennett'}],
+        )
+
+    @skipUnlessDBFeature('supports_subqueries_in_group_by')
+    def test_annotation_filter_with_subquery(self):
+        long_books_qs = Book.objects.filter(
+            publisher=OuterRef('pk'),
+            pages__gt=400,
+        ).values('publisher').annotate(count=Count('pk')).values('count')
+        publisher_books_qs = Publisher.objects.annotate(
+            total_books=Count('book'),
+        ).filter(
+            total_books=Subquery(long_books_qs, output_field=IntegerField()),
+        ).values('name')
+        self.assertCountEqual(publisher_books_qs, [{'name': 'Sams'}, {'name': 'Morgan Kaufmann'}])

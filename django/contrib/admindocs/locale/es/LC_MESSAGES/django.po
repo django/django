@@ -3,18 +3,20 @@
 # Translators:
 # Antoni Aloy <aaloy@apsl.net>, 2012-2013
 # Claude Paroz <claude@2xlibre.net>, 2014
+# Eduardo <edos21@gmail.com>, 2017
 # Ernesto Avilés Vázquez <whippiii@gmail.com>, 2015
 # Herty Nava <translation@bolmedia.ca>, 2013
 # Jannis Leidel <jannis@leidel.info>, 2011
+# José Luis <alagunajs@gmail.com>, 2016
 # Josue Naaman Nistal Guerra <josuenistal@hotmail.com>, 2014
 # Veronicabh <vero.blazher@gmail.com>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-10 14:49+0200\n"
-"PO-Revision-Date: 2015-10-11 10:05+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2017-01-19 16:49+0100\n"
+"PO-Revision-Date: 2017-09-19 16:40+0000\n"
+"Last-Translator: Eduardo <edos21@gmail.com>\n"
 "Language-Team: Spanish (http://www.transifex.com/django/django/language/"
 "es/)\n"
 "MIME-Version: 1.0\n"
@@ -43,6 +45,9 @@ msgid ""
 "click the link and add it to your bookmarks. Now you can select the "
 "bookmarklet from any page in the site."
 msgstr ""
+"Para instalar bookmarklets, arrastre el enlace a su barra de favoritos, o "
+"pulse con el botón derecho el enlace y añádalo a sus favoritos. Ahora puede "
+"escoger el bookmarklet desde cualquier página del sitio. "
 
 msgid "Documentation for this page"
 msgstr "Documentación para esta página"
@@ -141,8 +146,8 @@ msgstr "Método"
 msgid "Arguments"
 msgstr "Argumentos"
 
-msgid "Back to Model Documentation"
-msgstr "Regresar a la Documentacion Modelo"
+msgid "Back to Model documentation"
+msgstr "Volver a la documentación del modelo"
 
 msgid "Model documentation"
 msgstr "Documentación del modelo"
@@ -161,6 +166,7 @@ msgstr "Plantilla: %(name)s"
 msgid "Template: \"%(name)s\""
 msgstr "Plantilla: \"%(name)s\""
 
+#. Translators: Search is not a verb here, it qualifies path (a search path)
 #, python-format
 msgid "Search path for template \"%(name)s\":"
 msgstr "Buscar ruta para ejemplo \"%(name)s\":"
@@ -215,8 +221,8 @@ msgstr "Contexto:"
 msgid "Templates:"
 msgstr "Plantillas:"
 
-msgid "Back to Views Documentation"
-msgstr "Volver a la documentación de las vistas"
+msgid "Back to View documentation"
+msgstr "Volver a la documentación de la vista"
 
 msgid "View documentation"
 msgstr "Ver la documentación"
@@ -243,13 +249,6 @@ msgstr ""
 "\n"
 "Visualizar funcion: <code>%(full_name)s</code>. Nombre: <code>%(url_name)s</"
 "code>.\n"
-
-msgid "Boolean (Either True or False)"
-msgstr "Booleano (Verdadero o Falso)"
-
-#, python-format
-msgid "Field of type: %(field_type)s"
-msgstr "Campo de tipo: %(field_type)s"
 
 msgid "tag:"
 msgstr "etiqueta:"

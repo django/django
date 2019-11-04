@@ -1,6 +1,124 @@
-======================================
-``django.conf.urls`` utility functions
-======================================
+=============================================
+``django.urls`` functions for use in URLconfs
+=============================================
+
+.. module:: django.urls.conf
+    :synopsis: Functions for use in URLconfs.
+
+.. currentmodule:: django.urls
+
+``path()``
+==========
+
+.. function:: path(route, view, kwargs=None, name=None)
+
+Returns an element for inclusion in ``urlpatterns``. For example::
+
+    from django.urls import include, path
+
+    urlpatterns = [
+        path('index/', views.index, name='main-view'),
+        path('bio/<username>/', views.bio, name='bio'),
+        path('articles/<slug:title>/', views.article, name='article-detail'),
+        path('articles/<slug:title>/<int:section>/', views.section, name='article-section'),
+        path('weblog/', include('blog.urls')),
+        ...
+    ]
+
+The ``route`` argument should be a string or
+:func:`~django.utils.translation.gettext_lazy()` (see
+:ref:`translating-urlpatterns`) that contains a URL pattern. The string
+may contain angle brackets (like ``<username>`` above) to capture part of the
+URL and send it as a keyword argument to the view. The angle brackets may
+include a converter specification (like the ``int`` part of ``<int:section>``)
+which limits the characters matched and may also change the type of the
+variable passed to the view. For example, ``<int:section>`` matches a string
+of decimal digits and converts the value to an ``int``. See
+:ref:`how-django-processes-a-request` for more details.
+
+The ``view`` argument is a view function or the result of
+:meth:`~django.views.generic.base.View.as_view` for class-based views. It can
+also be an :func:`django.urls.include`.
+
+The ``kwargs`` argument allows you to pass additional arguments to the view
+function or method. See :ref:`views-extra-options` for an example.
+
+See :ref:`Naming URL patterns <naming-url-patterns>` for why the ``name``
+argument is useful.
+
+``re_path()``
+=============
+
+.. function:: re_path(route, view, kwargs=None, name=None)
+
+Returns an element for inclusion in ``urlpatterns``. For example::
+
+    from django.urls import include, re_path
+
+    urlpatterns = [
+        re_path(r'^index/$', views.index, name='index'),
+        re_path(r'^bio/(?P<username>\w+)/$', views.bio, name='bio'),
+        re_path(r'^weblog/', include('blog.urls')),
+        ...
+    ]
+
+The ``route`` argument should be a string or
+:func:`~django.utils.translation.gettext_lazy()` (see
+:ref:`translating-urlpatterns`) that contains a regular expression compatible
+with Python's :py:mod:`re` module. Strings typically use raw string syntax
+(``r''``) so that they can contain sequences like ``\d`` without the need to
+escape the backslash with another backslash. When a match is made, captured
+groups from the regular expression are passed to the view -- as named arguments
+if the groups are named, and as positional arguments otherwise. The values are
+passed as strings, without any type conversion.
+
+The ``view``, ``kwargs`` and ``name`` arguments are the same as for
+:func:`~django.urls.path()`.
+
+``include()``
+=============
+
+.. function:: include(module, namespace=None)
+              include(pattern_list)
+              include((pattern_list, app_namespace), namespace=None)
+
+    A function that takes a full Python import path to another URLconf module
+    that should be "included" in this place. Optionally, the :term:`application
+    namespace` and :term:`instance namespace` where the entries will be included
+    into can also be specified.
+
+    Usually, the application namespace should be specified by the included
+    module. If an application namespace is set, the ``namespace`` argument
+    can be used to set a different instance namespace.
+
+    ``include()`` also accepts as an argument either an iterable that returns
+    URL patterns or a 2-tuple containing such iterable plus the names of the
+    application namespaces.
+
+    :arg module: URLconf module (or module name)
+    :arg namespace: Instance namespace for the URL entries being included
+    :type namespace: str
+    :arg pattern_list: Iterable of :func:`~django.urls.path` and/or :func:`~django.urls.re_path` instances.
+    :arg app_namespace: Application namespace for the URL entries being included
+    :type app_namespace: str
+
+See :ref:`including-other-urlconfs` and :ref:`namespaces-and-include`.
+
+``register_converter()``
+========================
+
+.. function:: register_converter(converter, type_name)
+
+The function for registering a converter for use in :func:`~django.urls.path()`
+``route``\s.
+
+The ``converter`` argument is a converter class, and ``type_name`` is the
+converter name to use in path patterns. See
+:ref:`registering-custom-path-converters` for an example.
+
+==================================================
+``django.conf.urls`` functions for use in URLconfs
+==================================================
 
 .. module:: django.conf.urls
 
@@ -23,67 +141,8 @@ Helper function to return a URL pattern for serving files in debug mode::
 
 .. function:: url(regex, view, kwargs=None, name=None)
 
-``urlpatterns`` should be a list of ``url()`` instances. For example::
-
-    urlpatterns = [
-        url(r'^index/$', index_view, name="main-view"),
-        ...
-    ]
-
-The ``kwargs`` parameter allows you to pass additional arguments to the view
-function or method. See :ref:`views-extra-options` for an example.
-
-See :ref:`Naming URL patterns <naming-url-patterns>` for why the ``name``
-parameter is useful.
-
-``include()``
-=============
-
-.. function:: include(module, namespace=None, app_name=None)
-              include(pattern_list)
-              include((pattern_list, app_namespace), namespace=None)
-              include((pattern_list, app_namespace, instance_namespace))
-
-    A function that takes a full Python import path to another URLconf module
-    that should be "included" in this place. Optionally, the :term:`application
-    namespace` and :term:`instance namespace` where the entries will be included
-    into can also be specified.
-
-    Usually, the application namespace should be specified by the included
-    module. If an application namespace is set, the ``namespace`` argument
-    can be used to set a different instance namespace.
-
-    ``include()`` also accepts as an argument either an iterable that returns
-    URL patterns, a 2-tuple containing such iterable plus the names of the
-    application namespaces, or a 3-tuple containing the iterable and the names
-    of both the application and instance namespace.
-
-    :arg module: URLconf module (or module name)
-    :arg namespace: Instance namespace for the URL entries being included
-    :type namespace: string
-    :arg app_name: Application namespace for the URL entries being included
-    :type app_name: string
-    :arg pattern_list: Iterable of :func:`django.conf.urls.url` instances
-    :arg app_namespace: Application namespace for the URL entries being included
-    :type app_namespace: string
-    :arg instance_namespace: Instance namespace for the URL entries being included
-    :type instance_namespace: string
-
-See :ref:`including-other-urlconfs` and :ref:`namespaces-and-include`.
-
-.. deprecated:: 1.9
-
-    Support for the ``app_name`` argument is deprecated and will be removed in
-    Django 2.0. Specify the ``app_name`` as explained in
-    :ref:`namespaces-and-include` instead.
-
-    Support for passing a 3-tuple is also deprecated and will be removed in
-    Django 2.0. Pass a 2-tuple containing the pattern list and application
-    namespace, and use the ``namespace`` argument instead.
-
-    Lastly, support for an instance namespace without an application namespace
-    has been deprecated and will be removed in Django 2.0. Specify the
-    application namespace or remove the instance namespace.
+This function is an alias to :func:`django.urls.re_path()`. It's likely to be
+deprecated in a future release.
 
 ``handler400``
 ==============
@@ -94,12 +153,9 @@ A callable, or a string representing the full Python import path to the view
 that should be called if the HTTP client has sent a request that caused an error
 condition and a response with a status code of 400.
 
-By default, this is ``'django.views.defaults.bad_request'``. If you
-implement a custom view, be sure it returns an
-:class:`~django.http.HttpResponseBadRequest`.
-
-See the documentation about :ref:`the 400 (bad request) view
-<http_bad_request_view>` for more information.
+By default, this is :func:`django.views.defaults.bad_request`. If you
+implement a custom view, be sure it accepts ``request`` and ``exception``
+arguments and returns an :class:`~django.http.HttpResponseBadRequest`.
 
 ``handler403``
 ==============
@@ -110,12 +166,9 @@ A callable, or a string representing the full Python import path to the view
 that should be called if the user doesn't have the permissions required to
 access a resource.
 
-By default, this is ``'django.views.defaults.permission_denied'``. If you
-implement a custom view, be sure it returns an
-:class:`~django.http.HttpResponseForbidden`.
-
-See the documentation about :ref:`the 403 (HTTP Forbidden) view
-<http_forbidden_view>` for more information.
+By default, this is :func:`django.views.defaults.permission_denied`. If you
+implement a custom view, be sure it accepts ``request`` and ``exception``
+arguments and returns an :class:`~django.http.HttpResponseForbidden`.
 
 ``handler404``
 ==============
@@ -125,12 +178,9 @@ See the documentation about :ref:`the 403 (HTTP Forbidden) view
 A callable, or a string representing the full Python import path to the view
 that should be called if none of the URL patterns match.
 
-By default, this is ``'django.views.defaults.page_not_found'``. If you
-implement a custom view, be sure it returns an
-:class:`~django.http.HttpResponseNotFound`.
-
-See the documentation about :ref:`the 404 (HTTP Not Found) view
-<http_not_found_view>` for more information.
+By default, this is :func:`django.views.defaults.page_not_found`. If you
+implement a custom view, be sure it accepts ``request`` and ``exception``
+arguments and returns an :class:`~django.http.HttpResponseNotFound`.
 
 ``handler500``
 ==============
@@ -141,9 +191,6 @@ A callable, or a string representing the full Python import path to the view
 that should be called in case of server errors. Server errors happen when you
 have runtime errors in view code.
 
-By default, this is ``'django.views.defaults.server_error'``. If you
+By default, this is :func:`django.views.defaults.server_error`. If you
 implement a custom view, be sure it returns an
 :class:`~django.http.HttpResponseServerError`.
-
-See the documentation about :ref:`the 500 (HTTP Internal Server Error) view
-<http_internal_server_error_view>` for more information.

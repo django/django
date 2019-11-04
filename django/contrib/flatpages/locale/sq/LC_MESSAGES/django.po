@@ -1,14 +1,14 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Besnik <besnik@programeshqip.org>, 2011
-# Besnik <besnik@programeshqip.org>, 2015
+# Besnik <besnik@programeshqip.org>, 2011,2015
+# Besnik <besnik@programeshqip.org>, 2015,2019
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2015-11-25 08:36+0000\n"
+"POT-Creation-Date: 2019-01-16 20:42+0100\n"
+"PO-Revision-Date: 2019-01-18 11:07+0000\n"
 "Last-Translator: Besnik <besnik@programeshqip.org>\n"
 "Language-Team: Albanian (http://www.transifex.com/django/django/language/"
 "sq/)\n"
@@ -30,7 +30,7 @@ msgstr "URL"
 msgid ""
 "Example: '/about/contact/'. Make sure to have leading and trailing slashes."
 msgstr ""
-"Shembull: '/rreth/kontakt/'. Sigurohuni që vendosni pjerraset përkatëse."
+"Shembull: '/rreth/kontakt/'. Sigurohuni që vendosni pjerraket përkatëse."
 
 msgid ""
 "This value must contain only letters, numbers, dots, underscores, dashes, "
@@ -38,6 +38,9 @@ msgid ""
 msgstr ""
 "Kjo vlerë duhet të përmbajë vetëm shkronja, numra, pika, nënvija, vija "
 "ndarëse, pjerrake ose shenjën afërsisht."
+
+msgid "Example: '/about/contact'. Make sure to have a leading slash."
+msgstr "Shembull: '/mbi/kontakt'. Sigurohuni që keni pjerrake paraprirëse."
 
 msgid "URL is missing a leading slash."
 msgstr "URL-së i mungon një pjerrake në krye."
@@ -73,14 +76,14 @@ msgstr "lypset regjistrim"
 
 msgid "If this is checked, only logged-in users will be able to view the page."
 msgstr ""
-"Po iu vu shenjë kësaj, vetëm përdoruesit që kanë bërë hyrjen do të jenë në "
-"gjendje ta shohin faqen."
+"Po iu vu shenjë kësaj, faqen do të jenë në gjendje ta shohin vetëm "
+"përdoruesit që kanë bërë hyrjen."
 
 msgid "sites"
 msgstr "sajte"
 
 msgid "flat page"
-msgstr "faqe e e thjeshtë"
+msgstr "faqe e thjeshtë"
 
 msgid "flat pages"
 msgstr "faqe të thjeshta"

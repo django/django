@@ -5,23 +5,21 @@ from django.contrib.contenttypes.fields import (
 )
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
-from django.utils.encoding import python_2_unicode_compatible
+from django.db.models.query import ModelIterable, QuerySet
+from django.utils.functional import cached_property
 
 
-# Basic tests
-
-@python_2_unicode_compatible
 class Author(models.Model):
     name = models.CharField(max_length=50, unique=True)
     first_book = models.ForeignKey('Book', models.CASCADE, related_name='first_time_authors')
     favorite_authors = models.ManyToManyField(
         'self', through='FavoriteAuthors', symmetrical=False, related_name='favors_me')
 
-    def __str__(self):
-        return self.name
-
     class Meta:
         ordering = ['id']
+
+    def __str__(self):
+        return self.name
 
 
 class AuthorWithAge(Author):
@@ -37,7 +35,6 @@ class FavoriteAuthors(models.Model):
         ordering = ['id']
 
 
-@python_2_unicode_compatible
 class AuthorAddress(models.Model):
     author = models.ForeignKey(Author, models.CASCADE, to_field='name', related_name='addresses')
     address = models.TextField()
@@ -49,16 +46,15 @@ class AuthorAddress(models.Model):
         return self.address
 
 
-@python_2_unicode_compatible
 class Book(models.Model):
     title = models.CharField(max_length=255)
     authors = models.ManyToManyField(Author, related_name='books')
 
-    def __str__(self):
-        return self.title
-
     class Meta:
         ordering = ['id']
+
+    def __str__(self):
+        return self.title
 
 
 class BookWithYear(Book):
@@ -69,24 +65,29 @@ class BookWithYear(Book):
 
 
 class Bio(models.Model):
-    author = models.OneToOneField(Author, models.CASCADE)
+    author = models.OneToOneField(
+        Author,
+        models.CASCADE,
+        primary_key=True,
+        to_field='name',
+    )
     books = models.ManyToManyField(Book, blank=True)
 
 
-@python_2_unicode_compatible
 class Reader(models.Model):
     name = models.CharField(max_length=50)
     books_read = models.ManyToManyField(Book, related_name='read_by')
 
-    def __str__(self):
-        return self.name
-
     class Meta:
         ordering = ['id']
 
+    def __str__(self):
+        return self.name
+
 
 class BookReview(models.Model):
-    book = models.ForeignKey(BookWithYear, models.CASCADE)
+    # Intentionally does not have a related name.
+    book = models.ForeignKey(BookWithYear, models.CASCADE, null=True)
     notes = models.TextField(null=True, blank=True)
 
 
@@ -99,23 +100,33 @@ class Qualification(models.Model):
         ordering = ['id']
 
 
+class ModelIterableSubclass(ModelIterable):
+    pass
+
+
+class TeacherQuerySet(QuerySet):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._iterable_class = ModelIterableSubclass
+
+
 class TeacherManager(models.Manager):
     def get_queryset(self):
-        return super(TeacherManager, self).get_queryset().prefetch_related('qualifications')
+        return super().get_queryset().prefetch_related('qualifications')
 
 
-@python_2_unicode_compatible
 class Teacher(models.Model):
     name = models.CharField(max_length=50)
     qualifications = models.ManyToManyField(Qualification)
 
     objects = TeacherManager()
-
-    def __str__(self):
-        return "%s (%s)" % (self.name, ", ".join(q.name for q in self.qualifications.all()))
+    objects_custom = TeacherQuerySet.as_manager()
 
     class Meta:
         ordering = ['id']
+
+    def __str__(self):
+        return "%s (%s)" % (self.name, ", ".join(q.name for q in self.qualifications.all()))
 
 
 class Department(models.Model):
@@ -128,7 +139,6 @@ class Department(models.Model):
 
 # GenericRelation/GenericForeignKey tests
 
-@python_2_unicode_compatible
 class TaggedItem(models.Model):
     tag = models.SlugField()
     content_type = models.ForeignKey(
@@ -155,11 +165,11 @@ class TaggedItem(models.Model):
     favorite_fkey = models.CharField(max_length=64, null=True)
     favorite = GenericForeignKey('favorite_ct', 'favorite_fkey')
 
-    def __str__(self):
-        return self.tag
-
     class Meta:
         ordering = ['id']
+
+    def __str__(self):
+        return self.tag
 
 
 class Bookmark(models.Model):
@@ -219,27 +229,29 @@ class Person(models.Model):
     def all_houses(self):
         return list(self.houses.all())
 
+    @cached_property
+    def cached_all_houses(self):
+        return self.all_houses
+
     class Meta:
         ordering = ['id']
 
 
 # Models for nullable FK tests
 
-@python_2_unicode_compatible
 class Employee(models.Model):
     name = models.CharField(max_length=50)
     boss = models.ForeignKey('self', models.SET_NULL, null=True, related_name='serfs')
 
-    def __str__(self):
-        return self.name
-
     class Meta:
         ordering = ['id']
+
+    def __str__(self):
+        return self.name
 
 
 # Ticket #19607
 
-@python_2_unicode_compatible
 class LessonEntry(models.Model):
     name1 = models.CharField(max_length=200)
     name2 = models.CharField(max_length=200)
@@ -248,7 +260,6 @@ class LessonEntry(models.Model):
         return "%s %s" % (self.name1, self.name2)
 
 
-@python_2_unicode_compatible
 class WordEntry(models.Model):
     lesson_entry = models.ForeignKey(LessonEntry, models.CASCADE)
     name = models.CharField(max_length=200)
@@ -259,17 +270,16 @@ class WordEntry(models.Model):
 
 # Ticket #21410: Regression when related_name="+"
 
-@python_2_unicode_compatible
 class Author2(models.Model):
     name = models.CharField(max_length=50, unique=True)
     first_book = models.ForeignKey('Book', models.CASCADE, related_name='first_time_authors+')
     favorite_books = models.ManyToManyField('Book', related_name='+')
 
-    def __str__(self):
-        return self.name
-
     class Meta:
         ordering = ['id']
+
+    def __str__(self):
+        return self.name
 
 
 # Models for many-to-many with UUID pk test:

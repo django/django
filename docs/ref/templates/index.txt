@@ -14,9 +14,11 @@ material, see :doc:`/topics/templates` topic guide.
    language
    builtins
    api
-   upgrading
 
 .. seealso::
 
     For information on writing your own custom tags and filters, see
     :doc:`/howto/custom-template-tags`.
+
+    To learn how to override templates in other Django applications, see
+    :doc:`/howto/overriding-templates`.

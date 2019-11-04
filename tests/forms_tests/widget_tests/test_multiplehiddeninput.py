@@ -9,30 +9,30 @@ class MultipleHiddenInputTest(WidgetTest):
     def test_render_single(self):
         self.check_html(
             self.widget, 'email', ['test@example.com'],
-            html='<input type="hidden" name="email" value="test@example.com" />',
+            html='<input type="hidden" name="email" value="test@example.com">',
         )
 
     def test_render_multiple(self):
         self.check_html(
             self.widget, 'email', ['test@example.com', 'foo@example.com'],
             html=(
-                '<input type="hidden" name="email" value="test@example.com" />\n'
-                '<input type="hidden" name="email" value="foo@example.com" />'
+                '<input type="hidden" name="email" value="test@example.com">\n'
+                '<input type="hidden" name="email" value="foo@example.com">'
             ),
         )
 
     def test_render_attrs(self):
         self.check_html(
             self.widget, 'email', ['test@example.com'], attrs={'class': 'fun'},
-            html='<input type="hidden" name="email" value="test@example.com" class="fun" />',
+            html='<input type="hidden" name="email" value="test@example.com" class="fun">',
         )
 
     def test_render_attrs_multiple(self):
         self.check_html(
             self.widget, 'email', ['test@example.com', 'foo@example.com'], attrs={'class': 'fun'},
             html=(
-                '<input type="hidden" name="email" value="test@example.com" class="fun" />\n'
-                '<input type="hidden" name="email" value="foo@example.com" class="fun" />'
+                '<input type="hidden" name="email" value="test@example.com" class="fun">\n'
+                '<input type="hidden" name="email" value="foo@example.com" class="fun">'
             ),
         )
 
@@ -41,18 +41,18 @@ class MultipleHiddenInputTest(WidgetTest):
         self.check_html(widget, 'email', [], '')
         self.check_html(
             widget, 'email', ['foo@example.com'],
-            html='<input type="hidden" class="fun" value="foo@example.com" name="email" />',
+            html='<input type="hidden" class="fun" value="foo@example.com" name="email">',
         )
         self.check_html(
             widget, 'email', ['foo@example.com', 'test@example.com'],
             html=(
-                '<input type="hidden" class="fun" value="foo@example.com" name="email" />\n'
-                '<input type="hidden" class="fun" value="test@example.com" name="email" />'
+                '<input type="hidden" class="fun" value="foo@example.com" name="email">\n'
+                '<input type="hidden" class="fun" value="test@example.com" name="email">'
             ),
         )
         self.check_html(
             widget, 'email', ['foo@example.com'], attrs={'class': 'special'},
-            html='<input type="hidden" class="special" value="foo@example.com" name="email" />',
+            html='<input type="hidden" class="special" value="foo@example.com" name="email">',
         )
 
     def test_render_empty(self):
@@ -68,8 +68,8 @@ class MultipleHiddenInputTest(WidgetTest):
         self.check_html(
             self.widget, 'letters', ['a', 'b', 'c'], attrs={'id': 'hideme'},
             html=(
-                '<input type="hidden" name="letters" value="a" id="hideme_0" />\n'
-                '<input type="hidden" name="letters" value="b" id="hideme_1" />\n'
-                '<input type="hidden" name="letters" value="c" id="hideme_2" />'
+                '<input type="hidden" name="letters" value="a" id="hideme_0">\n'
+                '<input type="hidden" name="letters" value="b" id="hideme_1">\n'
+                '<input type="hidden" name="letters" value="c" id="hideme_2">'
             ),
         )

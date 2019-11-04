@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-10 14:49+0200\n"
-"PO-Revision-Date: 2015-10-11 10:05+0000\n"
+"POT-Creation-Date: 2017-01-19 16:49+0100\n"
+"PO-Revision-Date: 2017-09-23 18:54+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Welsh (http://www.transifex.com/django/django/language/cy/)\n"
 "MIME-Version: 1.0\n"
@@ -134,8 +134,8 @@ msgstr ""
 msgid "Arguments"
 msgstr ""
 
-msgid "Back to Model Documentation"
-msgstr "Nôl i Ddogfennaeth Model"
+msgid "Back to Model documentation"
+msgstr ""
 
 msgid "Model documentation"
 msgstr "Dogfennaeth model"
@@ -154,6 +154,7 @@ msgstr "Templad: %(name)s"
 msgid "Template: \"%(name)s\""
 msgstr "Templad: \"%(name)s\""
 
+#. Translators: Search is not a verb here, it qualifies path (a search path)
 #, python-format
 msgid "Search path for template \"%(name)s\":"
 msgstr "Chwilio'r llwybr am dempled \"%(name)s\":"
@@ -208,8 +209,8 @@ msgstr "Cyd-destun:"
 msgid "Templates:"
 msgstr "Templadau:"
 
-msgid "Back to Views Documentation"
-msgstr "Nôl i Ddogfennaeth Golygon"
+msgid "Back to View documentation"
+msgstr ""
 
 msgid "View documentation"
 msgstr "Dogfennaeth golygon"
@@ -236,13 +237,6 @@ msgstr ""
 "\n"
 "Gweld ffwythiant: <code>%(full_name)s</code>. Enw: <code>%(url_name)s</"
 "code>.\n"
-
-msgid "Boolean (Either True or False)"
-msgstr "Booleaidd (Unai 'True' neu 'False')"
-
-#, python-format
-msgid "Field of type: %(field_type)s"
-msgstr "Maes o'r math: %(field_type)s"
 
 msgid "tag:"
 msgstr "tag:"

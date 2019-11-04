@@ -1,17 +1,16 @@
-from unittest import TestCase
-
 from django import get_version
-from django.utils import six
+from django.test import SimpleTestCase
+from django.utils.version import get_version_tuple
 
 
-class VersionTests(TestCase):
+class VersionTests(SimpleTestCase):
 
     def test_development(self):
         ver_tuple = (1, 4, 0, 'alpha', 0)
         # This will return a different result when it's run within or outside
         # of a git clone: 1.4.devYYYYMMDDHHMMSS or 1.4.
         ver_string = get_version(ver_tuple)
-        six.assertRegex(self, ver_string, r'1\.4(\.dev[0-9]+)?')
+        self.assertRegex(ver_string, r'1\.4(\.dev[0-9]+)?')
 
     def test_releases(self):
         tuples_to_strings = (
@@ -24,3 +23,8 @@ class VersionTests(TestCase):
         )
         for ver_tuple, ver_string in tuples_to_strings:
             self.assertEqual(get_version(ver_tuple), ver_string)
+
+    def test_get_version_tuple(self):
+        self.assertEqual(get_version_tuple('1.2.3'), (1, 2, 3))
+        self.assertEqual(get_version_tuple('1.2.3b2'), (1, 2, 3))
+        self.assertEqual(get_version_tuple('1.2.3b2.dev0'), (1, 2, 3))

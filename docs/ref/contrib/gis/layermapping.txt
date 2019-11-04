@@ -3,7 +3,7 @@
 ====================================
 
 .. module:: django.contrib.gis.utils.layermapping
-   :synopsis: Spatial data import utility for GeoDjango models.
+    :synopsis: Spatial data import utility for GeoDjango models.
 
 .. currentmodule:: django.contrib.gis.utils
 
@@ -31,7 +31,7 @@ then inserting into a GeoDjango model.
 Example
 =======
 
-1. You need a GDAL-supported data source, like a shapefile (here we're using
+#. You need a GDAL-supported data source, like a shapefile (here we're using
    a simple polygon shapefile, ``test_poly.shp``, with three features)::
 
     >>> from django.contrib.gis.gdal import DataSource
@@ -50,7 +50,7 @@ Example
         PRIMEM["Greenwich",0],
         UNIT["Degree",0.017453292519943295]]
 
-2. Now we define our corresponding Django model (make sure to use :djadmin:`migrate`)::
+#. Now we define our corresponding Django model (make sure to use :djadmin:`migrate`)::
 
     from django.contrib.gis.db import models
 
@@ -58,10 +58,10 @@ Example
         name = models.CharField(max_length=25) # corresponds to the 'str' field
         poly = models.PolygonField(srid=4269) # we want our model in a different SRID
 
-        def __str__(self):              # __unicode__ on Python 2
+        def __str__(self):
             return 'Name: %s' % self.name
 
-3. Use :class:`LayerMapping` to extract all the features and place them in the
+#. Use :class:`LayerMapping` to extract all the features and place them in the
    database::
 
     >>> from django.contrib.gis.utils import LayerMapping
@@ -133,7 +133,7 @@ Keyword Arguments
 
 ``unique``             Setting this to the name, or a tuple of names,
                        from the given  model will create models unique
-                       only to the given name(s). Geometries will from
+                       only to the given name(s). Geometries from
                        each feature will be added into the collection
                        associated with the unique model.  Forces
                        the transaction mode to be ``'autocommit'``.

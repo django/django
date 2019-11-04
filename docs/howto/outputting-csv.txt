@@ -47,31 +47,11 @@ mention:
   bill.
 
 * For each row in your CSV file, call ``writer.writerow``, passing it an
-  iterable object such as a list or tuple.
+  :term:`iterable`.
 
 * The CSV module takes care of quoting for you, so you don't have to worry
   about escaping strings with quotes or commas in them. Just pass
   ``writerow()`` your raw strings, and it'll do the right thing.
-
-.. admonition:: Handling Unicode on Python 2
-
-    Python 2's :mod:`csv` module does not support Unicode input. Since Django
-    uses Unicode internally this means strings read from sources such as
-    :class:`~django.http.HttpRequest` are potentially problematic. There are a
-    few options for handling this:
-
-    * Manually encode all Unicode objects to a compatible encoding.
-
-    * Use the ``UnicodeWriter`` class provided in the `csv module's examples
-      section`_.
-
-    * Use the `python-unicodecsv module`_, which aims to be a drop-in
-      replacement for :mod:`csv` that gracefully handles Unicode.
-
-    For more information, see the Python documentation of the :mod:`csv` module.
-
-    .. _`csv module's examples section`: https://docs.python.org/library/csv.html#examples
-    .. _`python-unicodecsv module`: https://github.com/jdunck/python-unicodecsv
 
 .. _streaming-csv-files:
 
@@ -89,10 +69,9 @@ the assembly and transmission of a large CSV file::
 
     import csv
 
-    from django.utils.six.moves import range
     from django.http import StreamingHttpResponse
 
-    class Echo(object):
+    class Echo:
         """An object that implements just the write method of the file-like
         interface.
         """
@@ -126,7 +105,7 @@ template output the commas in a :ttag:`for` loop.
 Here's an example, which generates the same CSV file as above::
 
     from django.http import HttpResponse
-    from django.template import loader, Context
+    from django.template import loader
 
     def some_view(request):
         # Create the HttpResponse object with the appropriate CSV header.
@@ -141,9 +120,7 @@ Here's an example, which generates the same CSV file as above::
         )
 
         t = loader.get_template('my_template_name.txt')
-        c = Context({
-            'data': csv_data,
-        })
+        c = {'data': csv_data}
         response.write(t.render(c))
         return response
 

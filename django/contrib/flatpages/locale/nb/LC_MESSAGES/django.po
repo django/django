@@ -3,16 +3,17 @@
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011
 # jensadne <jensadne@pvv.ntnu.no>, 2014
-# Jon <jon@funkbit.no>, 2015
-# Jon <jon@funkbit.no>, 2011-2012
+# Jon <jon@kolonial.no>, 2015
+# Jon <jon@kolonial.no>, 2019
+# Jon <jon@kolonial.no>, 2011-2012
 # Sigurd Gartmann <sigurdga-transifex@sigurdga.no>, 2012
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2015-11-17 10:14+0000\n"
-"Last-Translator: Jon <jon@funkbit.no>\n"
+"POT-Creation-Date: 2019-01-16 20:42+0100\n"
+"PO-Revision-Date: 2019-05-06 13:03+0000\n"
+"Last-Translator: Jon <jon@kolonial.no>\n"
 "Language-Team: Norwegian Bokmål (http://www.transifex.com/django/django/"
 "language/nb/)\n"
 "MIME-Version: 1.0\n"
@@ -41,6 +42,9 @@ msgid ""
 msgstr ""
 "Dette feltet kan kun inneholde bokstaver, nummer, skilletegn, understreker, "
 "bindestreker, skråstreker eller tilder."
+
+msgid "Example: '/about/contact'. Make sure to have a leading slash."
+msgstr "Eksempel: '/om/kontakt'. Kontroller at det er en skråstrek foran."
 
 msgid "URL is missing a leading slash."
 msgstr "URL mangler innledende skråstrek."

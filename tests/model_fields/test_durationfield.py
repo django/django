@@ -12,7 +12,7 @@ from .models import DurationModel, NullDurationModel
 class TestSaveLoad(TestCase):
 
     def test_simple_roundtrip(self):
-        duration = datetime.timedelta(days=123, seconds=123, microseconds=123)
+        duration = datetime.timedelta(microseconds=8999999999999999)
         DurationModel.objects.create(field=duration)
         loaded = DurationModel.objects.get()
         self.assertEqual(loaded.field, duration)
@@ -20,7 +20,13 @@ class TestSaveLoad(TestCase):
     def test_create_empty(self):
         NullDurationModel.objects.create()
         loaded = NullDurationModel.objects.get()
-        self.assertEqual(loaded.field, None)
+        self.assertIsNone(loaded.field)
+
+    def test_fractional_seconds(self):
+        value = datetime.timedelta(seconds=2.05)
+        d = DurationModel.objects.create(field=value)
+        d.refresh_from_db()
+        self.assertEqual(d.field, value)
 
 
 class TestQuerying(TestCase):

@@ -1,4 +1,4 @@
-# http://editorconfig.org
+# https://editorconfig.org/
 
 root = true
 
@@ -9,6 +9,10 @@ insert_final_newline = true
 trim_trailing_whitespace = true
 end_of_line = lf
 charset = utf-8
+
+# Docstrings and comments use max_line_length = 79
+[*.py]
+max_line_length = 119
 
 # Use 2 spaces for the HTML files
 [*.html]
@@ -35,3 +39,6 @@ indent_style = tab
 # Batch files use tabs for indentation
 [*.bat]
 indent_style = tab
+
+[docs/**.txt]
+max_line_length = 79

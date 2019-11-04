@@ -1,11 +1,14 @@
 {% load i18n admin_urls %}
 <div class="submit-row">
-{% if show_save %}<input type="submit" value="{% trans 'Save' %}" class="default" name="_save" />{% endif %}
-{% if show_delete_link %}
+{% block submit-row %}
+{% if show_save %}<input type="submit" value="{% trans 'Save' %}" class="default" name="_save">{% endif %}
+{% if show_delete_link and original %}
     {% url opts|admin_urlname:'delete' original.pk|admin_urlquote as delete_url %}
     <p class="deletelink-box"><a href="{% add_preserved_filters delete_url %}" class="deletelink">{% trans "Delete" %}</a></p>
 {% endif %}
-{% if show_save_as_new %}<input type="submit" value="{% trans 'Save as new' %}" name="_saveasnew" />{% endif %}
-{% if show_save_and_add_another %}<input type="submit" value="{% trans 'Save and add another' %}" name="_addanother" />{% endif %}
-{% if show_save_and_continue %}<input type="submit" value="{% trans 'Save and continue editing' %}" name="_continue" />{% endif %}
+{% if show_save_as_new %}<input type="submit" value="{% trans 'Save as new' %}" name="_saveasnew">{% endif %}
+{% if show_save_and_add_another %}<input type="submit" value="{% trans 'Save and add another' %}" name="_addanother">{% endif %}
+{% if show_save_and_continue %}<input type="submit" value="{% if can_change %}{% trans 'Save and continue editing' %}{% else %}{% trans 'Save and view' %}{% endif %}" name="_continue">{% endif %}
+{% if show_close %}<a href="{% url opts|admin_urlname:'changelist' %}" class="closelink">{% trans 'Close' %}</a>{% endif %}
+{% endblock %}
 </div>

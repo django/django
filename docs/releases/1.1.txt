@@ -2,15 +2,12 @@
 Django 1.1 release notes
 ========================
 
-
 July 29, 2009
 
 Welcome to Django 1.1!
 
-Django 1.1 includes a number of nifty `new features`_, lots of bug
-fixes, and an easy upgrade path from Django 1.0.
-
-.. _new features: `What's new in Django 1.1`_
+Django 1.1 includes a number of nifty :ref:`new features <whats-new-1.1>`, lots
+of bug fixes, and an easy upgrade path from Django 1.0.
 
 .. _backwards-incompatible-changes-1.1:
 
@@ -175,6 +172,8 @@ be upgraded to a ``DeprecationWarning``, which will be displayed loudly. Django
 For more details on our deprecation policies and strategy, see
 :doc:`/internals/release-process`.
 
+.. _whats-new-1.1:
+
 What's new in Django 1.1
 ========================
 
@@ -208,7 +207,7 @@ detail in :doc:`the ORM aggregation documentation </topics/db/aggregation>`.
 Query expressions
 ~~~~~~~~~~~~~~~~~
 
-Queries can now refer to a another field on the query and can traverse
+Queries can now refer to another field on the query and can traverse
 relationships to refer to fields on related models. This is implemented in the
 new :class:`~django.db.models.F` object; for full details, including examples,
 consult the :class:`F expressions documentation <django.db.models.F>`.
@@ -268,7 +267,7 @@ A few notable improvements have been made to the :doc:`testing framework
 </topics/testing/index>`.
 
 Test performance improvements
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. currentmodule:: django.test
 
@@ -365,7 +364,7 @@ features:
 For more details, see the GeoDjango documentation.
 
 .. _geodjango: http://geodjango.org/
-.. _spatialite: http://www.gaia-gis.it/gaia-sins/
+.. _spatialite: https://www.gaia-gis.it/gaia-sins/
 
 Other improvements
 ------------------
@@ -441,13 +440,9 @@ What's next?
 
 We'll take a short break, and then work on Django 1.2 will begin -- no rest for
 the weary! If you'd like to help, discussion of Django development, including
-progress toward the 1.2 release, takes place daily on the django-developers
-mailing list:
-
-* https://groups.google.com/group/django-developers
-
-... and in the ``#django-dev`` IRC channel on ``irc.freenode.net``. Feel free to
-join the discussions!
+progress toward the 1.2 release, takes place daily on the |django-developers|
+mailing list and in the ``#django-dev`` IRC channel on ``irc.freenode.net``.
+Feel free to join the discussions!
 
 Django's online documentation also includes pointers on how to contribute to
 Django:

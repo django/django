@@ -1,25 +1,17 @@
-import imp
 import os
 import sys
 import unittest
 from importlib import import_module
 from zipimport import zipimporter
 
-from django.test import SimpleTestCase, TestCase, modify_settings
+from django.test import SimpleTestCase, modify_settings
 from django.test.utils import extend_sys_path
-from django.utils import six
-from django.utils._os import upath
 from django.utils.module_loading import (
     autodiscover_modules, import_string, module_has_submodule,
 )
 
 
 class DefaultLoader(unittest.TestCase):
-    def setUp(self):
-        sys.meta_path.insert(0, ProxyFinder())
-
-    def tearDown(self):
-        sys.meta_path.pop(0)
 
     def test_loader(self):
         "Normal module existence can be tested"
@@ -56,10 +48,22 @@ class DefaultLoader(unittest.TestCase):
         with self.assertRaises(ImportError):
             import_module('utils_tests.test_no_submodule.anything')
 
+    def test_has_sumbodule_with_dotted_path(self):
+        """Nested module existence can be tested."""
+        test_module = import_module('utils_tests.test_module')
+        # A grandchild that exists.
+        self.assertIs(module_has_submodule(test_module, 'child_module.grandchild_module'), True)
+        # A grandchild that doesn't exist.
+        self.assertIs(module_has_submodule(test_module, 'child_module.no_such_module'), False)
+        # A grandchild whose parent doesn't exist.
+        self.assertIs(module_has_submodule(test_module, 'no_such_module.grandchild_module'), False)
+        # A grandchild whose parent is not a package.
+        self.assertIs(module_has_submodule(test_module, 'good_module.no_such_module'), False)
+
 
 class EggLoader(unittest.TestCase):
     def setUp(self):
-        self.egg_dir = '%s/eggs' % os.path.dirname(upath(__file__))
+        self.egg_dir = '%s/eggs' % os.path.dirname(__file__)
 
     def tearDown(self):
         sys.path_importer_cache.clear()
@@ -115,7 +119,7 @@ class EggLoader(unittest.TestCase):
                 import_module('egg_module.sub1.sub2.no_such_module')
 
 
-class ModuleImportTestCase(TestCase):
+class ModuleImportTests(SimpleTestCase):
     def test_import_string(self):
         cls = import_string('django.utils.module_loading.import_string')
         self.assertEqual(cls, import_string)
@@ -147,11 +151,11 @@ class AutodiscoverModulesTestCase(SimpleTestCase):
         autodiscover_modules('missing_module')
 
     def test_autodiscover_modules_found_but_bad_module(self):
-        with six.assertRaisesRegex(self, ImportError, "No module named '?a_package_name_that_does_not_exist'?"):
+        with self.assertRaisesMessage(ImportError, "No module named 'a_package_name_that_does_not_exist'"):
             autodiscover_modules('bad_module')
 
     def test_autodiscover_modules_several_one_bad_module(self):
-        with six.assertRaisesRegex(self, ImportError, "No module named '?a_package_name_that_does_not_exist'?"):
+        with self.assertRaisesMessage(ImportError, "No module named 'a_package_name_that_does_not_exist'"):
             autodiscover_modules('good_module', 'bad_module')
 
     def test_autodiscover_modules_several_found(self):
@@ -180,36 +184,7 @@ class AutodiscoverModulesTestCase(SimpleTestCase):
         self.assertEqual(site._registry, {'lorem': 'ipsum'})
 
 
-class ProxyFinder(object):
-    def __init__(self):
-        self._cache = {}
-
-    def find_module(self, fullname, path=None):
-        tail = fullname.rsplit('.', 1)[-1]
-        try:
-            fd, fn, info = imp.find_module(tail, path)
-            if fullname in self._cache:
-                old_fd = self._cache[fullname][0]
-                if old_fd:
-                    old_fd.close()
-            self._cache[fullname] = (fd, fn, info)
-        except ImportError:
-            return None
-        else:
-            return self  # this is a loader as well
-
-    def load_module(self, fullname):
-        if fullname in sys.modules:
-            return sys.modules[fullname]
-        fd, fn, info = self._cache[fullname]
-        try:
-            return imp.load_module(fullname, fd, fn, info)
-        finally:
-            if fd:
-                fd.close()
-
-
-class TestFinder(object):
+class TestFinder:
     def __init__(self, *args, **kwargs):
         self.importer = zipimporter(*args, **kwargs)
 
@@ -220,7 +195,7 @@ class TestFinder(object):
         return TestLoader(importer)
 
 
-class TestLoader(object):
+class TestLoader:
     def __init__(self, importer):
         self.importer = importer
 
@@ -237,10 +212,10 @@ class CustomLoader(EggLoader):
     into one class, this isn't required.
     """
     def setUp(self):
-        super(CustomLoader, self).setUp()
+        super().setUp()
         sys.path_hooks.insert(0, TestFinder)
         sys.path_importer_cache.clear()
 
     def tearDown(self):
-        super(CustomLoader, self).tearDown()
+        super().tearDown()
         sys.path_hooks.pop(0)

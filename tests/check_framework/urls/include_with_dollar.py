@@ -1,7 +1,5 @@
-from django.conf.urls import include, url
+from django.urls import include, re_path
 
 urlpatterns = [
-    url(r'^', include([
-        url(r'^include-with-dollar$', include([])),
-    ])),
+    re_path('^include-with-dollar$', include([])),
 ]

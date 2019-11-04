@@ -9,6 +9,10 @@ class SpatialiteSchemaEditor(DatabaseSchemaEditor):
     )
     sql_add_spatial_index = "SELECT CreateSpatialIndex(%(table)s, %(column)s)"
     sql_drop_spatial_index = "DROP TABLE idx_%(table)s_%(column)s"
+    sql_recover_geometry_metadata = (
+        "SELECT RecoverGeometryColumn(%(table)s, %(column)s, %(srid)s, "
+        "%(geom_type)s, %(dim)s)"
+    )
     sql_remove_geometry_metadata = "SELECT DiscardGeometryColumn(%(table)s, %(column)s)"
     sql_discard_geometry_columns = "DELETE FROM %(geom_table)s WHERE f_table_name = %(table)s"
     sql_update_geometry_columns = (
@@ -24,7 +28,7 @@ class SpatialiteSchemaEditor(DatabaseSchemaEditor):
     ]
 
     def __init__(self, *args, **kwargs):
-        super(SpatialiteSchemaEditor, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.geometry_sql = []
 
     def geo_quote_name(self, name):
@@ -33,7 +37,7 @@ class SpatialiteSchemaEditor(DatabaseSchemaEditor):
     def column_sql(self, model, field, include_default=False):
         from django.contrib.gis.db.models.fields import GeometryField
         if not isinstance(field, GeometryField):
-            return super(SpatialiteSchemaEditor, self).column_sql(model, field, include_default)
+            return super().column_sql(model, field, include_default)
 
         # Geometry columns are created by the `AddGeometryColumn` function
         self.geometry_sql.append(
@@ -71,7 +75,7 @@ class SpatialiteSchemaEditor(DatabaseSchemaEditor):
         )
 
     def create_model(self, model):
-        super(SpatialiteSchemaEditor, self).create_model(model)
+        super().create_model(model)
         # Create geometry columns
         for sql in self.geometry_sql:
             self.execute(sql)
@@ -94,7 +98,7 @@ class SpatialiteSchemaEditor(DatabaseSchemaEditor):
                 )
             except DatabaseError:
                 pass
-        super(SpatialiteSchemaEditor, self).delete_model(model, **kwargs)
+        super().delete_model(model, **kwargs)
 
     def add_field(self, model, field):
         from django.contrib.gis.db.models.fields import GeometryField
@@ -105,7 +109,7 @@ class SpatialiteSchemaEditor(DatabaseSchemaEditor):
                 self.execute(sql)
             self.geometry_sql = []
         else:
-            super(SpatialiteSchemaEditor, self).add_field(model, field)
+            super().add_field(model, field)
 
     def remove_field(self, model, field):
         from django.contrib.gis.db.models.fields import GeometryField
@@ -115,11 +119,11 @@ class SpatialiteSchemaEditor(DatabaseSchemaEditor):
         # do not have a db type cause they are added and removed via stored
         # procedures.
         if isinstance(field, GeometryField):
-            self._remake_table(model, delete_fields=[field])
+            self._remake_table(model, delete_field=field)
         else:
-            super(SpatialiteSchemaEditor, self).remove_field(model, field)
+            super().remove_field(model, field)
 
-    def alter_db_table(self, model, old_db_table, new_db_table):
+    def alter_db_table(self, model, old_db_table, new_db_table, disable_constraints=True):
         from django.contrib.gis.db.models.fields import GeometryField
         # Remove geometry-ness from temp table
         for field in model._meta.local_fields:
@@ -131,7 +135,7 @@ class SpatialiteSchemaEditor(DatabaseSchemaEditor):
                     }
                 )
         # Alter table
-        super(SpatialiteSchemaEditor, self).alter_db_table(model, old_db_table, new_db_table)
+        super().alter_db_table(model, old_db_table, new_db_table, disable_constraints)
         # Repoint any straggler names
         for geom_table in self.geometry_tables:
             try:
@@ -147,13 +151,12 @@ class SpatialiteSchemaEditor(DatabaseSchemaEditor):
         # Re-add geometry-ness and rename spatial index tables
         for field in model._meta.local_fields:
             if isinstance(field, GeometryField):
-                self.execute(self.sql_add_geometry_column % {
+                self.execute(self.sql_recover_geometry_metadata % {
                     "table": self.geo_quote_name(new_db_table),
                     "column": self.geo_quote_name(field.column),
                     "srid": field.srid,
                     "geom_type": self.geo_quote_name(field.geom_type),
                     "dim": field.dim,
-                    "null": int(not field.null),
                 })
             if getattr(field, 'spatial_index', False):
                 self.execute(self.sql_rename_table % {

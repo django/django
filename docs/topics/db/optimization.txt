@@ -11,8 +11,9 @@ Profile first
 =============
 
 As general programming practice, this goes without saying. Find out :ref:`what
-queries you are doing and what they are costing you
-<faq-see-raw-sql-queries>`. You may also want to use an external project like
+queries you are doing and what they are costing you <faq-see-raw-sql-queries>`.
+Use :meth:`.QuerySet.explain` to understand how specific ``QuerySet``\s are
+executed by your database. You may also want to use an external project like
 django-debug-toolbar_, or a tool that monitors your database directly.
 
 Remember that you may be optimizing for speed or memory or both, depending on
@@ -29,7 +30,7 @@ readability of your code. **All** of the suggestions below come with the caveat
 that in your circumstances the general principle might not apply, or might even
 be reversed.
 
-.. _django-debug-toolbar: https://github.com/django-debug-toolbar/django-debug-toolbar/
+.. _django-debug-toolbar: https://github.com/jazzband/django-debug-toolbar/
 
 Use standard DB optimization techniques
 =======================================
@@ -38,10 +39,10 @@ Use standard DB optimization techniques
 
 * Indexes_. This is a number one priority, *after* you have determined from
   profiling what indexes should be added. Use
-  :attr:`Field.db_index <django.db.models.Field.db_index>` or
-  :attr:`Meta.index_together <django.db.models.Options.index_together>` to add
-  these from Django. Consider adding indexes to fields that you frequently
-  query using :meth:`~django.db.models.query.QuerySet.filter()`,
+  :attr:`Meta.indexes <django.db.models.Options.indexes>` or
+  :attr:`Field.db_index <django.db.models.Field.db_index>` to add these from
+  Django. Consider adding indexes to fields that you frequently query using
+  :meth:`~django.db.models.query.QuerySet.filter()`,
   :meth:`~django.db.models.query.QuerySet.exclude()`,
   :meth:`~django.db.models.query.QuerySet.order_by()`, etc. as indexes may help
   to speed up lookups. Note that determining the best indexes is a complex
@@ -114,6 +115,14 @@ When you have a lot of objects, the caching behavior of the ``QuerySet`` can
 cause a large amount of memory to be used. In this case,
 :meth:`~django.db.models.query.QuerySet.iterator()` may help.
 
+Use ``explain()``
+-----------------
+
+:meth:`.QuerySet.explain` gives you detailed information about how the database
+executes a query, including indexes and joins that are used. These details may
+help you find queries that could be rewritten more efficiently, or identify
+indexes that could be added to improve performance.
+
 Do database work in the database rather than in Python
 ======================================================
 
@@ -161,7 +170,7 @@ So using the :ref:`example Weblog models <queryset-model-example>`::
 
 will be quicker than:
 
-  >>> entry = Entry.object.get(headline="News Item Title")
+  >>> entry = Entry.objects.get(headline="News Item Title")
 
 because ``id`` is indexed by the database and is guaranteed to be unique.
 
@@ -195,11 +204,12 @@ Understand :meth:`~django.db.models.query.QuerySet.select_related` and
 :meth:`~django.db.models.query.QuerySet.prefetch_related` thoroughly, and use
 them:
 
-* in view code,
-
-* and in :doc:`managers and default managers </topics/db/managers>` where
+* in :doc:`managers and default managers </topics/db/managers>` where
   appropriate. Be aware when your manager is and is not used; sometimes this is
   tricky so don't make assumptions.
+
+* in view code or other layers, possibly making use of
+  :func:`~django.db.models.prefetch_related_objects` where needed.
 
 Don't retrieve things you don't need
 ====================================
@@ -223,14 +233,12 @@ you know that you won't need (or won't need in most cases) to avoid loading
 them. Note that if you *do* use them, the ORM will have to go and get them in
 a separate query, making this a pessimization if you use it inappropriately.
 
-Also, be aware that there is some (small extra) overhead incurred inside
-Django when constructing a model with deferred fields. Don't be too aggressive
-in deferring fields without profiling as the database has to read most of the
-non-text, non-VARCHAR data from the disk for a single row in the results, even
-if it ends up only using a few columns. The ``defer()`` and ``only()`` methods
-are most useful when you can avoid loading a lot of text data or for fields
-that might take a lot of processing to convert back to Python. As always,
-profile first, then optimize.
+Don't be too aggressive in deferring fields without profiling as the database
+has to read most of the non-text, non-VARCHAR data from the disk for a single
+row in the results, even if it ends up only using a few columns. The
+``defer()`` and ``only()`` methods are most useful when you can avoid loading a
+lot of text data or for fields that might take a lot of processing to convert
+back to Python. As always, profile first, then optimize.
 
 Use ``QuerySet.count()``
 ------------------------
@@ -273,7 +281,7 @@ many-to-many relation to User, the following template code is optimal:
 
 It is optimal because:
 
-1. Since QuerySets are lazy, this does no database queries if 'display_inbox'
+#. Since QuerySets are lazy, this does no database queries if 'display_inbox'
    is False.
 
 #. Use of :ttag:`with` means that we store ``user.emails.all`` in a variable
@@ -331,29 +339,70 @@ it on a ``QuerySet`` by calling
 
 Adding an index to your database may help to improve ordering performance.
 
-Insert in bulk
-==============
+Use bulk methods
+================
+
+Use bulk methods to reduce the number of SQL statements.
+
+Create in bulk
+--------------
 
 When creating objects, where possible, use the
 :meth:`~django.db.models.query.QuerySet.bulk_create()` method to reduce the
 number of SQL queries. For example::
 
     Entry.objects.bulk_create([
-        Entry(headline="Python 3.0 Released"),
-        Entry(headline="Python 3.1 Planned")
+        Entry(headline='This is a test'),
+        Entry(headline='This is only a test'),
     ])
 
 ...is preferable to::
 
-    Entry.objects.create(headline="Python 3.0 Released")
-    Entry.objects.create(headline="Python 3.1 Planned")
+    Entry.objects.create(headline='This is a test')
+    Entry.objects.create(headline='This is only a test')
 
 Note that there are a number of :meth:`caveats to this method
 <django.db.models.query.QuerySet.bulk_create>`, so make sure it's appropriate
 for your use case.
 
-This also applies to :class:`ManyToManyFields
-<django.db.models.ManyToManyField>`, so doing::
+Update in bulk
+--------------
+
+.. versionadded:: 2.2
+
+When updating objects, where possible, use the
+:meth:`~django.db.models.query.QuerySet.bulk_update()` method to reduce the
+number of SQL queries. Given a list or queryset of objects::
+
+    entries = Entry.objects.bulk_create([
+        Entry(headline='This is a test'),
+        Entry(headline='This is only a test'),
+    ])
+
+The following example::
+
+    entries[0].headline = 'This is not a test'
+    entries[1].headline = 'This is no longer a test'
+    Entry.objects.bulk_update(entries, ['headline'])
+
+...is preferable to::
+
+    entries[0].headline = 'This is not a test'
+    entries.save()
+    entries[1].headline = 'This is no longer a test'
+    entries.save()
+
+Note that there are a number of :meth:`caveats to this method
+<django.db.models.query.QuerySet.bulk_update>`, so make sure it's appropriate
+for your use case.
+
+Insert in bulk
+--------------
+
+When inserting objects into :class:`ManyToManyFields
+<django.db.models.ManyToManyField>`, use
+:meth:`~django.db.models.fields.related.RelatedManager.add` with multiple
+objects to reduce the number of SQL queries. For example::
 
     my_band.members.add(me, my_friend)
 

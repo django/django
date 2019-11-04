@@ -1,18 +1,19 @@
-from __future__ import absolute_import
-
 import inspect
 import warnings
 
 
-class RemovedInDjango20Warning(PendingDeprecationWarning):
+class RemovedInDjango30Warning(DeprecationWarning):
     pass
 
 
-class RemovedInNextVersionWarning(DeprecationWarning):
+class RemovedInDjango31Warning(PendingDeprecationWarning):
     pass
 
 
-class warn_about_renamed_method(object):
+RemovedInNextVersionWarning = RemovedInDjango30Warning
+
+
+class warn_about_renamed_method:
     def __init__(self, class_name, old_method_name, new_method_name, deprecation_warning):
         self.class_name = class_name
         self.old_method_name = old_method_name
@@ -44,7 +45,7 @@ class RenameMethodsBase(type):
     renamed_methods = ()
 
     def __new__(cls, name, bases, attrs):
-        new_class = super(RenameMethodsBase, cls).__new__(cls, name, bases, attrs)
+        new_class = super().__new__(cls, name, bases, attrs)
 
         for base in inspect.getmro(new_class):
             class_name = base.__name__
@@ -78,4 +79,19 @@ class DeprecationInstanceCheck(type):
             "`%s` is deprecated, use `%s` instead." % (self.__name__, self.alternative),
             self.deprecation_warning, 2
         )
-        return super(DeprecationInstanceCheck, self).__instancecheck__(instance)
+        return super().__instancecheck__(instance)
+
+
+class MiddlewareMixin:
+    def __init__(self, get_response=None):
+        self.get_response = get_response
+        super().__init__()
+
+    def __call__(self, request):
+        response = None
+        if hasattr(self, 'process_request'):
+            response = self.process_request(request)
+        response = response or self.get_response(request)
+        if hasattr(self, 'process_response'):
+            response = self.process_response(request, response)
+        return response

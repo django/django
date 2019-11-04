@@ -5,7 +5,7 @@ and conversions. Here are some tests.
 
 import unittest
 
-from django.contrib.gis.measure import A, D, Area, Distance
+from django.contrib.gis.measure import A, Area, D, Distance
 
 
 class DistanceTest(unittest.TestCase):
@@ -143,7 +143,8 @@ class DistanceTest(unittest.TestCase):
         unit_tuple = [('Yard', 'yd'), ('Nautical Mile', 'nm'), ('German legal metre', 'german_m'),
                       ('Indian yard', 'indian_yd'), ('Chain (Sears)', 'chain_sears'), ('Chain', 'chain')]
         for nm, att in unit_tuple:
-            self.assertEqual(att, D.unit_attname(nm))
+            with self.subTest(nm=nm):
+                self.assertEqual(att, D.unit_attname(nm))
 
 
 class AreaTest(unittest.TestCase):
@@ -276,6 +277,7 @@ def suite():
 
 def run(verbosity=2):
     unittest.TextTestRunner(verbosity=verbosity).run(suite())
+
 
 if __name__ == "__main__":
     run()

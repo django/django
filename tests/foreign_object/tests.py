@@ -13,34 +13,30 @@ from .models import (
     Group, Membership, NewsArticle, Person,
 )
 
-
 # Note that these tests are testing internal implementation details.
 # ForeignObject is not part of public API.
 
 
 class MultiColumnFKTests(TestCase):
-    def setUp(self):
+    @classmethod
+    def setUpTestData(cls):
         # Creating countries
-        self.usa = Country.objects.create(name="United States of America")
-        self.soviet_union = Country.objects.create(name="Soviet Union")
-        Person()
+        cls.usa = Country.objects.create(name="United States of America")
+        cls.soviet_union = Country.objects.create(name="Soviet Union")
         # Creating People
-        self.bob = Person()
-        self.bob.name = 'Bob'
-        self.bob.person_country = self.usa
-        self.bob.save()
-        self.jim = Person.objects.create(name='Jim', person_country=self.usa)
-        self.george = Person.objects.create(name='George', person_country=self.usa)
+        cls.bob = Person.objects.create(name='Bob', person_country=cls.usa)
+        cls.jim = Person.objects.create(name='Jim', person_country=cls.usa)
+        cls.george = Person.objects.create(name='George', person_country=cls.usa)
 
-        self.jane = Person.objects.create(name='Jane', person_country=self.soviet_union)
-        self.mark = Person.objects.create(name='Mark', person_country=self.soviet_union)
-        self.sam = Person.objects.create(name='Sam', person_country=self.soviet_union)
+        cls.jane = Person.objects.create(name='Jane', person_country=cls.soviet_union)
+        cls.mark = Person.objects.create(name='Mark', person_country=cls.soviet_union)
+        cls.sam = Person.objects.create(name='Sam', person_country=cls.soviet_union)
 
         # Creating Groups
-        self.kgb = Group.objects.create(name='KGB', group_country=self.soviet_union)
-        self.cia = Group.objects.create(name='CIA', group_country=self.usa)
-        self.republican = Group.objects.create(name='Republican', group_country=self.usa)
-        self.democrat = Group.objects.create(name='Democrat', group_country=self.usa)
+        cls.kgb = Group.objects.create(name='KGB', group_country=cls.soviet_union)
+        cls.cia = Group.objects.create(name='CIA', group_country=cls.usa)
+        cls.republican = Group.objects.create(name='Republican', group_country=cls.usa)
+        cls.democrat = Group.objects.create(name='Democrat', group_country=cls.usa)
 
     def test_get_succeeds_on_multicolumn_match(self):
         # Membership objects have access to their related Person if both
@@ -70,12 +66,10 @@ class MultiColumnFKTests(TestCase):
             membership_country_id=self.soviet_union.id, person_id=self.bob.id,
             group_id=self.republican.id)
 
-        self.assertQuerysetEqual(
-            self.bob.membership_set.all(), [
-                self.cia.id
-            ],
-            attrgetter("group_id")
-        )
+        with self.assertNumQueries(1):
+            membership = self.bob.membership_set.get()
+            self.assertEqual(membership.group_id, self.cia.id)
+            self.assertIs(membership.person, self.bob)
 
     def test_query_filters_correctly(self):
 
@@ -153,16 +147,22 @@ class MultiColumnFKTests(TestCase):
                                        group_id=self.cia.id)
         Friendship.objects.create(from_friend_country_id=self.usa.id, from_friend_id=self.bob.id,
                                   to_friend_country_id=self.usa.id, to_friend_id=self.jim.id)
-        self.assertQuerysetEqual(Membership.objects.filter(
-            person__in=Person.objects.filter(
-                from_friend__in=Friendship.objects.filter(
-                    to_friend__in=Person.objects.all()))),
-            [m1], lambda x: x)
-        self.assertQuerysetEqual(Membership.objects.exclude(
-            person__in=Person.objects.filter(
-                from_friend__in=Friendship.objects.filter(
-                    to_friend__in=Person.objects.all()))),
-            [m2], lambda x: x)
+        self.assertSequenceEqual(
+            Membership.objects.filter(
+                person__in=Person.objects.filter(
+                    from_friend__in=Friendship.objects.filter(to_friend__in=Person.objects.all())
+                )
+            ),
+            [m1]
+        )
+        self.assertSequenceEqual(
+            Membership.objects.exclude(
+                person__in=Person.objects.filter(
+                    from_friend__in=Friendship.objects.filter(to_friend__in=Person.objects.all())
+                )
+            ),
+            [m2]
+        )
 
     def test_select_related_foreignkey_forward_works(self):
         Membership.objects.create(membership_country=self.usa, person=self.bob, group=self.cia)
@@ -193,8 +193,11 @@ class MultiColumnFKTests(TestCase):
                 list(p.membership_set.all())
                 for p in Person.objects.prefetch_related('membership_set').order_by('pk')]
 
-        normal_membership_sets = [list(p.membership_set.all())
-                                  for p in Person.objects.order_by('pk')]
+        with self.assertNumQueries(7):
+            normal_membership_sets = [
+                list(p.membership_set.all())
+                for p in Person.objects.order_by('pk')
+            ]
         self.assertEqual(membership_sets, normal_membership_sets)
 
     def test_m2m_through_forward_returns_valid_members(self):
@@ -363,7 +366,12 @@ class MultiColumnFKTests(TestCase):
         ArticleTag.objects.create(article=a1, name="foo")
         self.assertEqual(Article.objects.filter(tag__name="foo").count(), 1)
         self.assertEqual(Article.objects.filter(tag__name="bar").count(), 0)
-        with self.assertRaises(FieldError):
+        msg = (
+            "Cannot resolve keyword 'tags' into field. Choices are: "
+            "active_translation, active_translation_q, articletranslation, "
+            "id, idea_things, newsarticle, pub_date, tag"
+        )
+        with self.assertRaisesMessage(FieldError, msg):
             Article.objects.filter(tags__name="foo")
 
     def test_many_to_many_related_query_name(self):
@@ -372,7 +380,12 @@ class MultiColumnFKTests(TestCase):
         a1.ideas.add(i1)
         self.assertEqual(Article.objects.filter(idea_things__name="idea1").count(), 1)
         self.assertEqual(Article.objects.filter(idea_things__name="idea2").count(), 0)
-        with self.assertRaises(FieldError):
+        msg = (
+            "Cannot resolve keyword 'ideas' into field. Choices are: "
+            "active_translation, active_translation_q, articletranslation, "
+            "id, idea_things, newsarticle, pub_date, tag"
+        )
+        with self.assertRaisesMessage(FieldError, msg):
             Article.objects.filter(ideas__name="idea1")
 
     @translation.override('fi')
@@ -380,9 +393,9 @@ class MultiColumnFKTests(TestCase):
         na = NewsArticle.objects.create(pub_date=datetime.date.today())
         ArticleTranslation.objects.create(
             article=na, lang="fi", title="foo", body="bar")
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             NewsArticle.objects.select_related('active_translation'),
-            [na], lambda x: x
+            [na]
         )
         with self.assertNumQueries(1):
             self.assertEqual(
@@ -392,7 +405,6 @@ class MultiColumnFKTests(TestCase):
 
     @skipUnlessDBFeature('has_bulk_insert')
     def test_batch_create_foreign_object(self):
-        """ See: https://code.djangoproject.com/ticket/21566 """
         objs = [Person(name="abcd_%s" % i, person_country=self.usa) for i in range(0, 5)]
         Person.objects.bulk_create(objs, 10)
 
@@ -458,3 +470,16 @@ class TestModelCheckTests(SimpleTestCase):
             )
 
         self.assertEqual(Child._meta.get_field('parent').check(from_model=Child), [])
+
+
+class TestExtraJoinFilterQ(TestCase):
+    @translation.override('fi')
+    def test_extra_join_filter_q(self):
+        a = Article.objects.create(pub_date=datetime.datetime.today())
+        ArticleTranslation.objects.create(article=a, lang='fi', title='title', body='body')
+        qs = Article.objects.all()
+        with self.assertNumQueries(2):
+            self.assertEqual(qs[0].active_translation_q.title, 'title')
+        qs = qs.select_related('active_translation_q')
+        with self.assertNumQueries(1):
+            self.assertEqual(qs[0].active_translation_q.title, 'title')

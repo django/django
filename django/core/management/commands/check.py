@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals
-
 from django.apps import apps
 from django.core import checks
 from django.core.checks.registry import registry
@@ -14,17 +11,22 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument('args', metavar='app_label', nargs='*')
-        parser.add_argument('--tag', '-t', action='append', dest='tags',
-            help='Run only checks labeled with given tag.')
-        parser.add_argument('--list-tags', action='store_true', dest='list_tags',
-            help='List available tags.')
-        parser.add_argument('--deploy', action='store_true', dest='deploy',
-            help='Check deployment settings.')
+        parser.add_argument(
+            '--tag', '-t', action='append', dest='tags',
+            help='Run only checks labeled with given tag.',
+        )
+        parser.add_argument(
+            '--list-tags', action='store_true',
+            help='List available tags.',
+        )
+        parser.add_argument(
+            '--deploy', action='store_true',
+            help='Check deployment settings.',
+        )
         parser.add_argument(
             '--fail-level',
             default='ERROR',
             choices=['CRITICAL', 'ERROR', 'WARNING', 'INFO', 'DEBUG'],
-            dest='fail_level',
             help=(
                 'Message level that will cause the command to exit with a '
                 'non-zero status. Default is ERROR.'
@@ -33,7 +35,7 @@ class Command(BaseCommand):
 
     def handle(self, *app_labels, **options):
         include_deployment_checks = options['deploy']
-        if options.get('list_tags'):
+        if options['list_tags']:
             self.stdout.write('\n'.join(sorted(registry.tags_available(include_deployment_checks))))
             return
 
@@ -42,7 +44,7 @@ class Command(BaseCommand):
         else:
             app_configs = None
 
-        tags = options.get('tags')
+        tags = options['tags']
         if tags:
             try:
                 invalid_tag = next(

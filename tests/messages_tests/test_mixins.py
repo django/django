@@ -8,9 +8,7 @@ from .urls import ContactFormViewWithMsg
 class SuccessMessageMixinTests(SimpleTestCase):
 
     def test_set_messages_success(self):
-        author = {'name': 'John Doe',
-                  'slug': 'success-msg'}
+        author = {'name': 'John Doe', 'slug': 'success-msg'}
         add_url = reverse('add_success_msg')
         req = self.client.post(add_url, author)
-        self.assertIn(ContactFormViewWithMsg.success_message % author,
-                      req.cookies['messages'].value)
+        self.assertIn(ContactFormViewWithMsg.success_message % author, req.cookies['messages'].value)

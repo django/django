@@ -3,7 +3,7 @@ GeoDjango Model API
 ===================
 
 .. module:: django.contrib.gis.db.models
-   :synopsis: GeoDjango model and field API.
+    :synopsis: GeoDjango model and field API.
 
 This document explores the details of the GeoDjango Model API.  Throughout this
 section, we'll be using the following geographic model of a `ZIP code`__ and
@@ -34,57 +34,68 @@ Features specification [#fnogc]_. There is no such standard for raster data.
 
 .. class:: GeometryField
 
+The base class for geometry fields.
+
 ``PointField``
 --------------
 
 .. class:: PointField
+
+Stores a :class:`~django.contrib.gis.geos.Point`.
 
 ``LineStringField``
 -------------------
 
 .. class:: LineStringField
 
+Stores a :class:`~django.contrib.gis.geos.LineString`.
+
 ``PolygonField``
 ----------------
 
 .. class:: PolygonField
+
+Stores a :class:`~django.contrib.gis.geos.Polygon`.
 
 ``MultiPointField``
 -------------------
 
 .. class:: MultiPointField
 
+Stores a :class:`~django.contrib.gis.geos.MultiPoint`.
+
 ``MultiLineStringField``
 ------------------------
 
 .. class:: MultiLineStringField
+
+Stores a :class:`~django.contrib.gis.geos.MultiLineString`.
 
 ``MultiPolygonField``
 ---------------------
 
 .. class:: MultiPolygonField
 
+Stores a :class:`~django.contrib.gis.geos.MultiPolygon`.
+
 ``GeometryCollectionField``
 ---------------------------
 
 .. class:: GeometryCollectionField
 
+Stores a :class:`~django.contrib.gis.geos.GeometryCollection`.
+
 ``RasterField``
 ---------------
 
-.. versionadded:: 1.9
-
 .. class:: RasterField
+
+Stores a :class:`~django.contrib.gis.gdal.GDALRaster`.
 
 ``RasterField`` is currently only implemented for the PostGIS backend.
 
 Spatial Field Options
 =====================
-
-.. versionchanged:: 1.9
-
-    The geometry field options ``srid`` and ``spatial_index`` are now shared by
-    ``GeometryField`` and ``RasterField`` through the ``BaseSpatialField``.
 
 In addition to the regular :ref:`common-model-field-options` available for
 Django model fields, spatial fields have the following additional options.
@@ -122,7 +133,7 @@ a flat surface is a straight line, the shortest path between two points on a cur
 surface (such as the earth) is an *arc* of a `great circle`__. [#fnthematic]_  Thus,
 additional computation is required to obtain distances in planar units (e.g.,
 kilometers and miles).  Using a geographic coordinate system may introduce
-complications for the developer later on. For example, Spatialite does not have
+complications for the developer later on. For example, SpatiaLite does not have
 the capability to perform distance calculations between geometries using
 geographic coordinate systems, e.g. constructing a query to  find all points
 within 5 miles of a county boundary stored as WGS84.
@@ -235,55 +246,26 @@ available for geography columns:
 * :lookup:`covers`
 * :lookup:`intersects`
 
+If you need to use a spatial lookup or aggregate that doesn't support the
+geography type as input, you can use the
+:class:`~django.db.models.functions.Cast` database function to convert the
+geography column to a geometry type in the query::
+
+    from django.contrib.gis.db.models import PointField
+    from django.db.models.functions import Cast
+
+    Zipcode.objects.annotate(
+        geom=Cast('geography_field', PointField())
+    ).filter(geom__within=poly)
+
 For more information, the PostGIS documentation contains a helpful section on
 determining `when to use geography data type over geometry data type
-<http://postgis.net/docs/manual-2.1/using_postgis_dbmanagement.html#PostGIS_GeographyVSGeometry>`_.
-
-``GeoManager``
-==============
-
-.. currentmodule:: django.contrib.gis.db.models
-.. class:: GeoManager
-
-The ``GeoManager`` is required in order to use the legacy
-:ref:`geoqueryset-methods`.
-
-.. deprecated:: 1.9
-
-    All ``GeoQuerySet`` methods have been deprecated and replaced by
-    :doc:`equivalent database functions </ref/contrib/gis/functions>`. As soon
-    as the legacy methods have been replaced in your code, you should be able
-    to remove the special ``GeoManager`` from your GIS-enabled classes.
-
-.. versionchanged:: 1.9
-
-    In older versions, the manager was required to conduct geographic queries.
-    Without it, all geographic filters failed.
-
-    ``GeoManager`` was required even if the model did not have a geographic
-    field itself, e.g., in the case of a ``ForeignKey`` relation to a model
-    with a geographic field.  For example, if we had an ``Address`` model with
-    a ``ForeignKey`` to our ``Zipcode`` model::
-
-        from django.contrib.gis.db import models
-
-        class Address(models.Model):
-            num = models.IntegerField()
-            street = models.CharField(max_length=100)
-            city = models.CharField(max_length=100)
-            state = models.CharField(max_length=2)
-            zipcode = models.ForeignKey(Zipcode, on_delete=models.CASCADE)
-            objects = models.GeoManager()
-
-    The geographic manager was needed to do spatial queries on related
-    ``Zipcode`` objects, for example::
-
-        qs = Address.objects.filter(zipcode__poly__contains='POINT(-104.590948 38.319914)')
+<https://postgis.net/docs/using_postgis_dbmanagement.html#PostGIS_GeographyVSGeometry>`_.
 
 .. rubric:: Footnotes
-.. [#fnogc] OpenGIS Consortium, Inc., `Simple Feature Specification For SQL <http://www.opengeospatial.org/standards/sfs>`_.
+.. [#fnogc] OpenGIS Consortium, Inc., `Simple Feature Specification For SQL <https://www.opengeospatial.org/standards/sfs>`_.
 .. [#fnogcsrid] *See id.* at Ch. 2.3.8, p. 39 (Geometry Values and Spatial Reference Systems).
 .. [#fnsrid] Typically, SRID integer corresponds to an EPSG (`European Petroleum Survey Group <http://www.epsg.org>`_) identifier.  However, it may also be associated with custom projections defined in spatial database's spatial reference systems table.
 .. [#fnthematic] Terry A. Slocum, Robert B. McMaster, Fritz C. Kessler, & Hugh H. Howard, *Thematic Cartography and Geographic Visualization* (Prentice Hall, 2nd edition), at Ch. 7.1.3.
 .. [#fndist] This limitation does not apply to PostGIS.
-.. [#fngeography] Please refer to the `PostGIS Geography Type <http://postgis.net/docs/manual-2.1/using_postgis_dbmanagement.html#PostGIS_Geography>`_ documentation for more details.
+.. [#fngeography] Please refer to the `PostGIS Geography Type <https://postgis.net/docs/using_postgis_dbmanagement.html#PostGIS_Geography>`_ documentation for more details.

@@ -145,7 +145,7 @@ Custom file upload handlers **must** define the following methods:
 
     Receives a "chunk" of data from the file upload.
 
-    ``raw_data`` is a byte string containing the uploaded data.
+    ``raw_data`` is a bytestring containing the uploaded data.
 
     ``start`` is the position in the file where this ``raw_data`` chunk
     begins.
@@ -196,7 +196,7 @@ attributes:
 
     ``field_name`` is a string name of the file ``<input>`` field.
 
-    ``file_name`` is the unicode filename that was provided by the browser.
+    ``file_name`` is the filename provided by the browser.
 
     ``content_type`` is the MIME type provided by the browser -- E.g.
     ``'image/jpeg'``.

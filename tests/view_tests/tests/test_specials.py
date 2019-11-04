@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals
-
 from django.test import SimpleTestCase, override_settings
 
 
@@ -13,15 +10,14 @@ class URLHandling(SimpleTestCase):
 
     def test_nonascii_redirect(self):
         """
-        Tests that a non-ASCII argument to HttpRedirect is handled properly.
+        A non-ASCII argument to HttpRedirect is handled properly.
         """
         response = self.client.get('/nonascii_redirect/')
         self.assertRedirects(response, self.redirect_target)
 
     def test_permanent_nonascii_redirect(self):
         """
-        Tests that a non-ASCII argument to HttpPermanentRedirect is handled
-        properly.
+        A non-ASCII argument to HttpPermanentRedirect is handled properly.
         """
         response = self.client.get('/permanent_nonascii_redirect/')
         self.assertRedirects(response, self.redirect_target, status_code=301)

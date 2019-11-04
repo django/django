@@ -187,9 +187,13 @@ p.mini {
     margin-top: -3px;
 }
 
-.help, p.help, form p.help {
+.help, p.help, form p.help, div.help, form div.help, div.help li {
     font-size: 11px;
     color: #999;
+}
+
+div.help ul {
+     margin-bottom: 0;
 }
 
 .help-tooltip {
@@ -410,13 +414,16 @@ input, textarea, select, .form-row p, form .button {
     font-weight: normal;
     font-size: 13px;
 }
+.form-row div.help {
+    padding: 2px 3px;
+}
 
 textarea {
     vertical-align: top;
 }
 
 input[type=text], input[type=password], input[type=email], input[type=url],
-input[type=number], textarea, select, .vTextField {
+input[type=number], input[type=tel], textarea, select, .vTextField {
     border: 1px solid #ccc;
     border-radius: 4px;
     padding: 5px 6px;
@@ -424,8 +431,8 @@ input[type=number], textarea, select, .vTextField {
 }
 
 input[type=text]:focus, input[type=password]:focus, input[type=email]:focus,
-input[type=url]:focus, input[type=number]:focus, textarea:focus, select:focus,
-.vTextField:focus {
+input[type=url]:focus, input[type=number]:focus, input[type=tel]:focus,
+textarea:focus, select:focus, .vTextField:focus {
     border-color: #999;
 }
 
@@ -434,6 +441,8 @@ select {
 }
 
 select[multiple] {
+    /* Allow HTML size attribute to override the height in the rule above. */
+    height: auto;
     min-height: 150px;
 }
 
@@ -655,6 +664,11 @@ div.breadcrumbs a:focus, div.breadcrumbs a:hover {
 
 /* ACTION ICONS */
 
+.viewlink, .inlineviewlink {
+    padding-left: 16px;
+    background: url(../img/icon-viewlink.svg) 0 1px no-repeat;
+}
+
 .addlink {
     padding-left: 16px;
     background: url(../img/icon-addlink.svg) 0 1px no-repeat;
@@ -731,7 +745,7 @@ a.deletelink:focus, a.deletelink:hover {
 
 .object-tools a.viewsitelink, .object-tools a.golink,.object-tools a.addlink {
     background-repeat: no-repeat;
-    background-position: 93% center;
+    background-position: right 7px center;
     padding-right: 26px;
 }
 
@@ -815,10 +829,12 @@ table#change-history tbody th {
 
 #header {
     width: auto;
-    height: 40px;
+    height: auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     padding: 10px 40px;
     background: #417690;
-    line-height: 40px;
     color: #ffc;
     overflow: hidden;
 }

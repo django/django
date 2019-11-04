@@ -45,7 +45,7 @@ BASE62_ALPHABET = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxy
 BASE64_ALPHABET = BASE62_ALPHABET + '-_'
 
 
-class BaseConverter(object):
+class BaseConverter:
     decimal_digits = '0123456789'
 
     def __init__(self, digits, sign='-'):
@@ -55,7 +55,7 @@ class BaseConverter(object):
             raise ValueError('Sign character found in converter base digits.')
 
     def __repr__(self):
-        return "<BaseConverter: base%s (%s)>" % (len(self.digits), self.digits)
+        return "<%s: base%s (%s)>" % (self.__class__.__name__, len(self.digits), self.digits)
 
     def encode(self, i):
         neg, value = self.convert(i, self.decimal_digits, self.digits, '-')
@@ -91,6 +91,7 @@ class BaseConverter(object):
                 res = to_digits[digit] + res
                 x = int(x // len(to_digits))
         return neg, res
+
 
 base2 = BaseConverter(BASE2_ALPHABET)
 base16 = BaseConverter(BASE16_ALPHABET)

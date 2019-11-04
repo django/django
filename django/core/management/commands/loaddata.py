@@ -1,8 +1,8 @@
-from __future__ import unicode_literals
-
+import functools
 import glob
 import gzip
 import os
+import sys
 import warnings
 import zipfile
 from itertools import product
@@ -13,15 +13,12 @@ from django.core import serializers
 from django.core.exceptions import ImproperlyConfigured
 from django.core.management.base import BaseCommand, CommandError
 from django.core.management.color import no_style
+from django.core.management.utils import parse_apps_and_model_labels
 from django.db import (
     DEFAULT_DB_ALIAS, DatabaseError, IntegrityError, connections, router,
     transaction,
 )
-from django.utils import lru_cache
-from django.utils._os import upath
-from django.utils.encoding import force_text
 from django.utils.functional import cached_property
-from django.utils.glob import glob_escape
 
 try:
     import bz2
@@ -29,38 +26,53 @@ try:
 except ImportError:
     has_bz2 = False
 
+READ_STDIN = '-'
+
 
 class Command(BaseCommand):
     help = 'Installs the named fixture(s) in the database.'
-    missing_args_message = ("No database fixture specified. Please provide the "
-                            "path of at least one fixture in the command line.")
+    missing_args_message = (
+        "No database fixture specified. Please provide the path of at least "
+        "one fixture in the command line."
+    )
 
     def add_arguments(self, parser):
-        parser.add_argument('args', metavar='fixture', nargs='+',
-            help='Fixture labels.')
-        parser.add_argument('--database', action='store', dest='database',
-            default=DEFAULT_DB_ALIAS, help='Nominates a specific database to load '
-            'fixtures into. Defaults to the "default" database.')
-        parser.add_argument('--app', action='store', dest='app_label',
-            default=None, help='Only look for fixtures in the specified app.')
-        parser.add_argument('--ignorenonexistent', '-i', action='store_true',
-            dest='ignore', default=False,
+        parser.add_argument('args', metavar='fixture', nargs='+', help='Fixture labels.')
+        parser.add_argument(
+            '--database', default=DEFAULT_DB_ALIAS,
+            help='Nominates a specific database to load fixtures into. Defaults to the "default" database.',
+        )
+        parser.add_argument(
+            '--app', dest='app_label',
+            help='Only look for fixtures in the specified app.',
+        )
+        parser.add_argument(
+            '--ignorenonexistent', '-i', action='store_true', dest='ignore',
             help='Ignores entries in the serialized data for fields that do not '
-            'currently exist on the model.')
+                 'currently exist on the model.',
+        )
+        parser.add_argument(
+            '-e', '--exclude', action='append', default=[],
+            help='An app_label or app_label.ModelName to exclude. Can be used multiple times.',
+        )
+        parser.add_argument(
+            '--format',
+            help='Format of serialized data when reading from stdin.',
+        )
 
     def handle(self, *fixture_labels, **options):
-
-        self.ignore = options.get('ignore')
-        self.using = options.get('database')
-        self.app_label = options.get('app_label')
-        self.hide_empty = options.get('hide_empty', False)
-        self.verbosity = options.get('verbosity')
+        self.ignore = options['ignore']
+        self.using = options['database']
+        self.app_label = options['app_label']
+        self.verbosity = options['verbosity']
+        self.excluded_models, self.excluded_apps = parse_apps_and_model_labels(options['exclude'])
+        self.format = options['format']
 
         with transaction.atomic(using=self.using):
             self.loaddata(fixture_labels)
 
         # Close the DB connection -- unless we're still in a transaction. This
-        # is required as a workaround for an  edge case in MySQL: if the same
+        # is required as a workaround for an edge case in MySQL: if the same
         # connection is used to create tables, load data, and query, the query
         # can return incorrect results. See Django #7572, MySQL #37735.
         if transaction.get_autocommit(self.using):
@@ -81,6 +93,7 @@ class Command(BaseCommand):
             None: (open, 'rb'),
             'gz': (gzip.GzipFile, 'rb'),
             'zip': (SingleZipReader, 'r'),
+            'stdin': (lambda *args: sys.stdin, None),
         }
         if has_bz2:
             self.compression_formats['bz2'] = (bz2.BZ2File, 'r')
@@ -96,8 +109,11 @@ class Command(BaseCommand):
             return
 
         with connection.constraint_checks_disabled():
+            self.objs_with_deferred_fields = []
             for fixture_label in fixture_labels:
                 self.load_label(fixture_label)
+            for obj in self.objs_with_deferred_fields:
+                obj.save_deferred_fields(using=self.using)
 
         # Since we disabled constraint checks, we must manually check for
         # any invalid keys that might have been added
@@ -120,19 +136,19 @@ class Command(BaseCommand):
                         cursor.execute(line)
 
         if self.verbosity >= 1:
-            if self.fixture_count == 0 and self.hide_empty:
-                pass
-            elif self.fixture_object_count == self.loaded_object_count:
-                self.stdout.write("Installed %d object(s) from %d fixture(s)" %
-                    (self.loaded_object_count, self.fixture_count))
+            if self.fixture_object_count == self.loaded_object_count:
+                self.stdout.write(
+                    "Installed %d object(s) from %d fixture(s)"
+                    % (self.loaded_object_count, self.fixture_count)
+                )
             else:
-                self.stdout.write("Installed %d object(s) (of %d) from %d fixture(s)" %
-                    (self.loaded_object_count, self.fixture_object_count, self.fixture_count))
+                self.stdout.write(
+                    "Installed %d object(s) (of %d) from %d fixture(s)"
+                    % (self.loaded_object_count, self.fixture_object_count, self.fixture_count)
+                )
 
     def load_label(self, fixture_label):
-        """
-        Loads fixtures files for a given label.
-        """
+        """Load fixtures files for a given label."""
         show_progress = self.verbosity >= 3
         for fixture_file, fixture_dir, fixture_name in self.find_fixtures(fixture_label):
             _, ser_fmt, cmp_fmt = self.parse_name(os.path.basename(fixture_file))
@@ -143,14 +159,21 @@ class Command(BaseCommand):
                 objects_in_fixture = 0
                 loaded_objects_in_fixture = 0
                 if self.verbosity >= 2:
-                    self.stdout.write("Installing %s fixture '%s' from %s." %
-                        (ser_fmt, fixture_name, humanize(fixture_dir)))
+                    self.stdout.write(
+                        "Installing %s fixture '%s' from %s."
+                        % (ser_fmt, fixture_name, humanize(fixture_dir))
+                    )
 
-                objects = serializers.deserialize(ser_fmt, fixture,
-                    using=self.using, ignorenonexistent=self.ignore)
+                objects = serializers.deserialize(
+                    ser_fmt, fixture, using=self.using, ignorenonexistent=self.ignore,
+                    handle_forward_references=True,
+                )
 
                 for obj in objects:
                     objects_in_fixture += 1
+                    if (obj.object._meta.app_config in self.excluded_apps or
+                            type(obj.object) in self.excluded_models):
+                        continue
                     if router.allow_migrate_model(self.using, obj.object.__class__):
                         loaded_objects_in_fixture += 1
                         self.models.add(obj.object.__class__)
@@ -161,14 +184,17 @@ class Command(BaseCommand):
                                     '\rProcessed %i object(s).' % loaded_objects_in_fixture,
                                     ending=''
                                 )
-                        except (DatabaseError, IntegrityError) as e:
+                        # psycopg2 raises ValueError if data contains NUL chars.
+                        except (DatabaseError, IntegrityError, ValueError) as e:
                             e.args = ("Could not load %(app_label)s.%(object_name)s(pk=%(pk)s): %(error_msg)s" % {
                                 'app_label': obj.object._meta.app_label,
                                 'object_name': obj.object._meta.object_name,
                                 'pk': obj.object.pk,
-                                'error_msg': force_text(e)
+                                'error_msg': e,
                             },)
                             raise
+                    if obj.deferred_fields:
+                        self.objs_with_deferred_fields.append(obj)
                 if objects and show_progress:
                     self.stdout.write('')  # add a newline after progress indicator
                 self.loaded_object_count += loaded_objects_in_fixture
@@ -188,14 +214,15 @@ class Command(BaseCommand):
                     RuntimeWarning
                 )
 
-    @lru_cache.lru_cache(maxsize=None)
+    @functools.lru_cache(maxsize=None)
     def find_fixtures(self, fixture_label):
-        """
-        Finds fixture files for a given label.
-        """
+        """Find fixture files for a given label."""
+        if fixture_label == READ_STDIN:
+            return [(READ_STDIN, None, READ_STDIN)]
+
         fixture_name, ser_fmt, cmp_fmt = self.parse_name(fixture_label)
         databases = [self.using, None]
-        cmp_fmts = list(self.compression_formats.keys()) if cmp_fmt is None else [cmp_fmt]
+        cmp_fmts = list(self.compression_formats) if cmp_fmt is None else [cmp_fmt]
         ser_fmts = serializers.get_public_serializer_formats() if ser_fmt is None else [ser_fmt]
 
         if self.verbosity >= 2:
@@ -211,9 +238,11 @@ class Command(BaseCommand):
                                 for dir_ in fixture_dirs]
                 fixture_name = os.path.basename(fixture_name)
 
-        suffixes = ('.'.join(ext for ext in combo if ext)
-                for combo in product(databases, ser_fmts, cmp_fmts))
-        targets = set('.'.join((fixture_name, suffix)) for suffix in suffixes)
+        suffixes = (
+            '.'.join(ext for ext in combo if ext)
+            for combo in product(databases, ser_fmts, cmp_fmts)
+        )
+        targets = {'.'.join((fixture_name, suffix)) for suffix in suffixes}
 
         fixture_files = []
         for fixture_dir in fixture_dirs:
@@ -221,7 +250,7 @@ class Command(BaseCommand):
                 self.stdout.write("Checking %s for fixtures..." % humanize(fixture_dir))
             fixture_files_in_dir = []
             path = os.path.join(fixture_dir, fixture_name)
-            for candidate in glob.iglob(glob_escape(path) + '*'):
+            for candidate in glob.iglob(glob.escape(path) + '*'):
                 if os.path.basename(candidate) in targets:
                     # Save the fixture_dir and fixture_name for future error messages.
                     fixture_files_in_dir.append((candidate, fixture_dir, fixture_name))
@@ -269,15 +298,20 @@ class Command(BaseCommand):
                 continue
             if os.path.isdir(app_dir):
                 dirs.append(app_dir)
-        dirs.extend(list(fixture_dirs))
+        dirs.extend(fixture_dirs)
         dirs.append('')
-        dirs = [upath(os.path.abspath(os.path.realpath(d))) for d in dirs]
+        dirs = [os.path.abspath(os.path.realpath(d)) for d in dirs]
         return dirs
 
     def parse_name(self, fixture_name):
         """
-        Splits fixture name in name, serialization format, compression format.
+        Split fixture name in name, serialization format, compression format.
         """
+        if fixture_name == READ_STDIN:
+            if not self.format:
+                raise CommandError('--format must be specified when reading from stdin.')
+            return READ_STDIN, self.format, 'stdin'
+
         parts = fixture_name.rsplit('.', 2)
 
         if len(parts) > 1 and parts[-1] in self.compression_formats:
@@ -293,7 +327,7 @@ class Command(BaseCommand):
             else:
                 raise CommandError(
                     "Problem installing fixture '%s': %s is not a known "
-                    "serialization format." % (''.join(parts[:-1]), parts[-1]))
+                    "serialization format." % ('.'.join(parts[:-1]), parts[-1]))
         else:
             ser_fmt = None
 
@@ -305,7 +339,7 @@ class Command(BaseCommand):
 class SingleZipReader(zipfile.ZipFile):
 
     def __init__(self, *args, **kwargs):
-        zipfile.ZipFile.__init__(self, *args, **kwargs)
+        super().__init__(*args, **kwargs)
         if len(self.namelist()) != 1:
             raise ValueError("Zip-compressed fixtures must contain one file.")
 

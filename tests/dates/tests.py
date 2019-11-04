@@ -1,12 +1,9 @@
-from __future__ import unicode_literals
-
 import datetime
 from unittest import skipUnless
 
 from django.core.exceptions import FieldError
 from django.db import connection
 from django.test import TestCase, override_settings
-from django.utils import six
 
 from .models import Article, Category, Comment
 
@@ -46,44 +43,45 @@ class DatesTests(TestCase):
         c = Category.objects.create(name="serious-news")
         c.articles.add(a1, a3)
 
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             Comment.objects.dates("article__pub_date", "year"), [
                 datetime.date(2005, 1, 1),
                 datetime.date(2010, 1, 1),
             ],
-            lambda d: d,
         )
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             Comment.objects.dates("article__pub_date", "month"), [
                 datetime.date(2005, 7, 1),
                 datetime.date(2010, 7, 1),
             ],
-            lambda d: d
         )
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
+            Comment.objects.dates("article__pub_date", "week"), [
+                datetime.date(2005, 7, 25),
+                datetime.date(2010, 7, 26),
+            ],
+        )
+        self.assertSequenceEqual(
             Comment.objects.dates("article__pub_date", "day"), [
                 datetime.date(2005, 7, 28),
                 datetime.date(2010, 7, 28),
             ],
-            lambda d: d
         )
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             Article.objects.dates("comments__pub_date", "day"), [
                 datetime.date(2005, 7, 28),
                 datetime.date(2005, 7, 29),
                 datetime.date(2005, 8, 29),
                 datetime.date(2010, 7, 28),
             ],
-            lambda d: d
         )
         self.assertQuerysetEqual(
             Article.objects.dates("comments__approval_date", "day"), []
         )
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             Category.objects.dates("articles__pub_date", "day"), [
                 datetime.date(2005, 7, 28),
             ],
-            lambda d: d,
         )
 
     def test_dates_fails_when_no_arguments_are_provided(self):
@@ -91,10 +89,9 @@ class DatesTests(TestCase):
             Article.objects.dates()
 
     def test_dates_fails_when_given_invalid_field_argument(self):
-        six.assertRaisesRegex(
-            self,
+        self.assertRaisesMessage(
             FieldError,
-            "Cannot resolve keyword u?'invalid_field' into field. Choices are: "
+            "Cannot resolve keyword 'invalid_field' into field. Choices are: "
             "categories, comments, id, pub_date, pub_datetime, title",
             Article.objects.dates,
             "invalid_field",
@@ -102,7 +99,8 @@ class DatesTests(TestCase):
         )
 
     def test_dates_fails_when_given_invalid_kind_argument(self):
-        with self.assertRaisesMessage(AssertionError, "'kind' must be one of 'year', 'month' or 'day'."):
+        msg = "'kind' must be one of 'year', 'month', 'week', or 'day'."
+        with self.assertRaisesMessage(AssertionError, msg):
             Article.objects.dates("pub_date", "bad_kind")
 
     def test_dates_fails_when_given_invalid_order_argument(self):
@@ -120,10 +118,10 @@ class DatesTests(TestCase):
                 datetime.datetime(2015, 10, 22, 18, 2),
             ]
         )
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             Article.objects.dates('pub_datetime', 'day', order='ASC'), [
-                "datetime.date(2015, 10, 21)",
-                "datetime.date(2015, 10, 22)",
+                datetime.date(2015, 10, 21),
+                datetime.date(2015, 10, 22),
             ]
         )
 

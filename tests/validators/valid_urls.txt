@@ -48,7 +48,7 @@ http://foo.bar/?q=Test%20URL-encoded%20stuff
 http://مثال.إختبار
 http://例子.测试
 http://उदाहरण.परीक्षा
-http://-.~_!$&'()*+,;=:%40:80%2f::::::@example.com
+http://-.~_!$&'()*+,;=%40:80%2f@example.com
 http://xn--7sbb4ac0ad0be6cf.xn--p1ai
 http://1337.net
 http://a.b-c.de
@@ -67,3 +67,7 @@ http://aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.example.c
 http://example.aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.com
 http://example.aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 http://aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.aaaaaaaaaaaaaaaaaaaaaaaaaaa.aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.aaaaaaaaaaaaaaaaaaaaaaaaaaaa
+http://dashintld.c-m
+http://multipledashintld.a-b-c
+http://evenmoredashintld.a---c
+http://dashinpunytld.xn---c

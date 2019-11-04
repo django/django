@@ -6,21 +6,20 @@ Django 1.8 release notes
 
 Welcome to Django 1.8!
 
-These release notes cover the `new features`_, as well as some `backwards
-incompatible changes`_ you'll want to be aware of when upgrading from Django
-1.7 or older versions. We've also `begun the deprecation process for some
-features`_, and some features have reached the end of their deprecation process
-and `have been removed`_.
+These release notes cover the :ref:`new features <whats-new-1.8>`, as well as
+some :ref:`backwards incompatible changes <backwards-incompatible-1.8>` you'll
+want to be aware of when upgrading from Django 1.7 or older versions. We've
+also :ref:`begun the deprecation process for some features
+<deprecated-features-1.8>`, and some features have reached the end of their
+deprecation process and :ref:`have been removed <removed-features-1.8>`.
+
+See the :doc:`/howto/upgrade-version` guide if you're updating an existing
+project.
 
 Django 1.8 has been designated as Django's second :term:`long-term support
 release`. It will receive security updates for at least three years after its
 release. Support for the previous LTS, Django 1.4, will end 6 months from the
 release date of Django 1.8.
-
-.. _`new features`: `What's new in Django 1.8`_
-.. _`backwards incompatible changes`: `Backwards incompatible changes in 1.8`_
-.. _`begun the deprecation process for some features`: `Features deprecated in 1.8`_
-.. _`have been removed`: `Features removed in 1.8`_
 
 Python compatibility
 ====================
@@ -32,6 +31,8 @@ Django 1.8 is the first release to support Python 3.5.
 
 Due to the end of upstream support for Python 3.2 in February 2016, we won't
 test Django 1.8.x on Python 3.2 after the end of 2016.
+
+.. _whats-new-1.8:
 
 What's new in Django 1.8
 ========================
@@ -48,9 +49,7 @@ The ``Model._meta`` object has been part of Django since the days of pre-0.96
 "Magic Removal" -- it just wasn't an official, stable API. In recognition of
 this, we've endeavored to maintain backwards-compatibility with the old
 API endpoint where possible. However, API endpoints that aren't part of the
-new official API have been deprecated and will eventually be removed. A
-:ref:`guide to migrating from the old API to the new API
-<migrating-old-meta-api>` has been provided.
+new official API have been deprecated and will eventually be removed.
 
 Multiple template engines
 -------------------------
@@ -60,7 +59,7 @@ built-in support for the Django template language and for
 :class:`~django.template.backends.jinja2.Jinja2`. It supports rendering
 templates with multiple engines within the same project. Learn more about the
 new features in the :doc:`topic guide </topics/templates>` and check the
-:doc:`upgrade instructions </ref/templates/upgrading>` for details.
+upgrade instructions in older versions of the documentation.
 
 Security enhancements
 ---------------------
@@ -71,7 +70,7 @@ provides several security enhancements to the request/response cycle. The new
 :option:`check --deploy` option allows you to check your production settings
 file for ways to increase the security of your site.
 
-.. _django-secure: https://pypi.python.org/pypi/django-secure
+.. _django-secure: https://pypi.org/project/django-secure/
 
 New PostgreSQL specific functionality
 -------------------------------------
@@ -199,7 +198,7 @@ Minor features
   and :meth:`~django.contrib.auth.models.User.has_module_perms`
   to short-circuit permission checking.
 * :class:`~django.contrib.auth.forms.PasswordResetForm` now
-  has a method :meth:`~django.contrib.auth.forms.PasswordResetForm.send_email`
+  has a method :meth:`~django.contrib.auth.forms.PasswordResetForm.send_mail`
   that can be overridden to customize the mail to be sent.
 
 * The ``max_length`` of :attr:`Permission.name
@@ -224,10 +223,10 @@ Minor features
 * It is now allowed to include a subquery as a geographic lookup argument, for
   example ``City.objects.filter(point__within=Country.objects.filter(continent='Africa').values('mpoly'))``.
 
-* The Spatialite backend now supports ``Collect`` and ``Extent`` aggregates
+* The SpatiaLite backend now supports ``Collect`` and ``Extent`` aggregates
   when the database version is 3.0 or later.
 
-* The PostGIS 2 ``CREATE EXTENSION postgis`` and the Spatialite
+* The PostGIS 2 ``CREATE EXTENSION postgis`` and the SpatiaLite
   ``SELECT InitSpatialMetaData`` initialization commands are now automatically
   run by :djadmin:`migrate`.
 
@@ -444,7 +443,7 @@ Management Commands
   :setting:`FIXTURE_DIRS` contains duplicates or a default fixture directory
   path (``app_name/fixtures``), an exception is raised.
 
-* The new :option:`makemigrations --exit` option allows exiting with an error
+* The new ``makemigrations --exit`` option allows exiting with an error
   code if no migrations are created.
 
 * The new :djadmin:`showmigrations` command allows listing all migrations and
@@ -651,7 +650,7 @@ Tests
 
 * Added test client support for file uploads with file-like objects.
 
-* A shared cache is now used when testing with a SQLite in-memory database when
+* A shared cache is now used when testing with an SQLite in-memory database when
   using Python 3.4+ and SQLite 3.7.13+. This allows sharing the database
   between threads.
 
@@ -660,6 +659,8 @@ Validators
 
 * :class:`~django.core.validators.URLValidator` now supports IPv6 addresses,
   unicode domains, and URLs containing authentication data.
+
+.. _backwards-incompatible-1.8:
 
 Backwards incompatible changes in 1.8
 =====================================
@@ -988,8 +989,7 @@ will work with both Django 1.8 and older versions::
     for relation in opts.get_all_related_objects():
         to_model = getattr(relation, 'related_model', relation.model)
 
-Also note that ``get_all_related_objects()`` is deprecated in 1.8. See the
-:ref:`upgrade guide <migrating-old-meta-api>` for the new API.
+Also note that ``get_all_related_objects()`` is deprecated in 1.8.
 
 Database backend API
 --------------------
@@ -1086,7 +1086,7 @@ Miscellaneous
   If you wish to customize that error message, :ref:`override it on the form
   <modelforms-overriding-default-fields>` using the ``'unique'`` key in
   ``Meta.error_messages['username']`` or, if you have a custom form field for
-  ``'username'``, using the the ``'unique'`` key in its
+  ``'username'``, using the ``'unique'`` key in its
   :attr:`~django.forms.Field.error_messages` argument.
 
 * The block ``usertools`` in the ``base.html`` template of
@@ -1111,7 +1111,7 @@ Miscellaneous
   (or 200M, before 1.7.2) to 500M.
 
 * ``reverse()`` and ``reverse_lazy()`` now return Unicode strings instead of
-  byte strings.
+  bytestrings.
 
 * The ``CacheClass`` shim has been removed from all cache backends.
   These aliases were provided for backwards compatibility with Django 1.3.
@@ -1163,7 +1163,7 @@ Miscellaneous
   that Django includes) will no longer convert null values back to an empty
   string. This is consistent with other backends.
 
-* When the :attr:`~django.core.management.BaseCommand.leave_locale_alone`
+* When the ``BaseCommand.leave_locale_alone``
   attribute is ``False``, translations are now deactivated instead of forcing
   the "en-us" locale. In the case your models contained non-English strings and
   you counted on English translations to be activated in management commands,
@@ -1184,7 +1184,7 @@ Miscellaneous
   Be careful if you upgrade to Django 1.8 and skip Django 1.7. If you run
   ``manage.py migrate --fake``, this migration will be skipped and you'll see
   a ``RuntimeError: Error creating new content types.`` exception because the
-  ``name`` column won't be dropped from the database. Use ``migrate.py migrate
+  ``name`` column won't be dropped from the database. Use ``manage.py migrate
   --fake-initial`` to fake only the initial migration instead.
 
 * The new :option:`migrate --fake-initial` option allows faking initial
@@ -1218,9 +1218,6 @@ deprecated and will be removed in Django 1.10:
 * ``get_field_by_name()``
 * ``get_fields_with_model()``
 * ``get_m2m_with_model()``
-
-A :ref:`migration guide <migrating-old-meta-api>` has been provided to assist
-in converting your code from the old API to the new, official API.
 
 Loading ``cycle`` and ``firstof`` template tags from ``future`` library
 -----------------------------------------------------------------------
@@ -1351,6 +1348,9 @@ to ensure compatibility when reversing by Python path is removed in Django 1.10.
 Similarly for GIS sitemaps, add ``name='django.contrib.gis.sitemaps.views.kml'``
 or ``name='django.contrib.gis.sitemaps.views.kmz'``.
 
+If you are using a Python path for the :setting:`LOGIN_URL` or
+:setting:`LOGIN_REDIRECT_URL` setting, use the name of the ``url()`` instead.
+
 .. _security issue: https://www.djangoproject.com/weblog/2014/apr/21/security/#s-issue-unexpected-code-execution-using-reverse
 
 Aggregate methods and modules
@@ -1436,11 +1436,11 @@ Old :tfilter:`unordered_list` syntax
 An older (pre-1.0), more restrictive and verbose input format for the
 :tfilter:`unordered_list` template filter has been deprecated::
 
-    ``['States', [['Kansas', [['Lawrence', []], ['Topeka', []]]], ['Illinois', []]]]``
+    ['States', [['Kansas', [['Lawrence', []], ['Topeka', []]]], ['Illinois', []]]]
 
 Using the new syntax, this becomes::
 
-    ``['States', ['Kansas', ['Lawrence', 'Topeka'], 'Illinois']]``
+    ['States', ['Kansas', ['Lawrence', 'Topeka'], 'Illinois']]
 
 ``django.forms.Field._has_changed()``
 -------------------------------------
@@ -1471,9 +1471,13 @@ It's a legacy option that should no longer be necessary.
 will be removed in Django 1.10. Historically, it was used to handle fields where
 type conversion was needed when loading from the database, but it was not used
 in ``.values()`` calls or in aggregates. It has been replaced with
-:meth:`~django.db.models.Field.from_db_value`. Note that the new approach does
-not call the :meth:`~django.db.models.Field.to_python` method on assignment
-as was the case with ``SubfieldBase``.
+:meth:`~django.db.models.Field.from_db_value`.
+
+The new approach doesn't call the :meth:`~django.db.models.Field.to_python`
+method on assignment as was the case with ``SubfieldBase``. If you need that
+behavior, reimplement the ``Creator`` class `from Django's source code
+<https://github.com/django/django/blob/stable/1.8.x/django/db/models/fields/subclassing.py#L31-L44>`_
+in your project.
 
 ``django.utils.checksums``
 --------------------------
@@ -1483,7 +1487,7 @@ in Django 1.10. The functionality it provided (validating checksum using the
 Luhn algorithm) was undocumented and not used in Django. The module has been
 moved to the `django-localflavor`_ package (version 1.1+).
 
-.. _django-localflavor: https://pypi.python.org/pypi/django-localflavor
+.. _django-localflavor: https://pypi.org/project/django-localflavor/
 
 ``InlineAdminForm.original_content_type_id``
 --------------------------------------------
@@ -1511,9 +1515,6 @@ Both classes provide a ``render()`` method, however, the former takes a
 :class:`django.template.Context` as an argument while the latter expects a
 :class:`dict`. This change is enforced through a deprecation path for Django
 templates.
-
-Since it's easier to understand with examples, the :ref:`upgrade guide
-<get_template-upgrade-django-18>` shows how to adapt affected code.
 
 All this also applies to :func:`~django.template.loader.select_template()`.
 
@@ -1631,7 +1632,7 @@ Using ``AuthenticationMiddleware`` without ``SessionAuthenticationMiddleware``
 added in Django 1.7. In Django 1.7.2, its functionality was moved to
 ``auth.get_user()`` and, for backwards compatibility, enabled only if
 ``'django.contrib.auth.middleware.SessionAuthenticationMiddleware'`` appears in
-:setting:`MIDDLEWARE_CLASSES`.
+``MIDDLEWARE_CLASSES``.
 
 In Django 1.10, session verification will be enabled regardless of whether or not
 ``SessionAuthenticationMiddleware`` is enabled (at which point
@@ -1702,14 +1703,14 @@ After switching to the new signature the router will also be called by the
 :class:`~django.db.migrations.operations.RunPython` and
 :class:`~django.db.migrations.operations.RunSQL` operations.
 
-.. removed-features-1.8:
+.. _removed-features-1.8:
 
 Features removed in 1.8
 =======================
 
-These features have reached the end of their deprecation cycle and so have been
-removed in Django 1.8 (please see the :ref:`deprecation timeline
-<deprecation-removed-in-1.8>` for more details):
+These features have reached the end of their deprecation cycle and are removed
+in Django 1.8. See :ref:`deprecated-features-1.6` for details, including how to
+remove usage of these features.
 
 * ``django.contrib.comments`` is removed.
 

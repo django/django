@@ -1,10 +1,7 @@
-# Since this package contains a "jinja2" directory, this is required to
-# silence an ImportWarning warning on Python 2.
-from __future__ import absolute_import
-
 from unittest import skipIf
 
 from django.template import TemplateSyntaxError
+from django.test import RequestFactory
 
 from .test_dummy import TemplateStringsTests
 
@@ -22,7 +19,12 @@ class Jinja2Tests(TemplateStringsTests):
 
     engine_class = Jinja2
     backend_name = 'jinja2'
-    options = {'keep_trailing_newline': True}
+    options = {
+        'keep_trailing_newline': True,
+        'context_processors': [
+            'django.template.context_processors.static',
+        ],
+    }
 
     def test_origin(self):
         template = self.engine.get_template('template_backends/hello.html')
@@ -32,7 +34,7 @@ class Jinja2Tests(TemplateStringsTests):
     def test_origin_from_string(self):
         template = self.engine.from_string('Hello!\n')
         self.assertEqual(template.origin.name, '<template>')
-        self.assertEqual(template.origin.template_name, None)
+        self.assertIsNone(template.origin.template_name)
 
     def test_self_context(self):
         """
@@ -58,7 +60,7 @@ class Jinja2Tests(TemplateStringsTests):
         self.assertEqual(debug['total'], 1)
         self.assertEqual(len(debug['source_lines']), 1)
         self.assertTrue(debug['name'].endswith('syntax_error.html'))
-        self.assertTrue('message' in debug)
+        self.assertIn('message', debug)
 
     def test_exception_debug_info_max_context(self):
         with self.assertRaises(TemplateSyntaxError) as e:
@@ -73,4 +75,13 @@ class Jinja2Tests(TemplateStringsTests):
         self.assertEqual(debug['total'], 31)
         self.assertEqual(len(debug['source_lines']), 21)
         self.assertTrue(debug['name'].endswith('syntax_error2.html'))
-        self.assertTrue('message' in debug)
+        self.assertIn('message', debug)
+
+    def test_context_processors(self):
+        request = RequestFactory().get('/')
+        template = self.engine.from_string('Static URL: {{ STATIC_URL }}')
+        content = template.render(request=request)
+        self.assertEqual(content, 'Static URL: /static/')
+        with self.settings(STATIC_URL='/s/'):
+            content = template.render(request=request)
+        self.assertEqual(content, 'Static URL: /s/')

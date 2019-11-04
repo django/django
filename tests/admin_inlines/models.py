@@ -1,18 +1,13 @@
 """
 Testing of admin inline formsets.
-
 """
-from __future__ import unicode_literals
-
 import random
 
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
-from django.utils.encoding import python_2_unicode_compatible
 
 
-@python_2_unicode_compatible
 class Parent(models.Model):
     name = models.CharField(max_length=50)
 
@@ -20,7 +15,6 @@ class Parent(models.Model):
         return self.name
 
 
-@python_2_unicode_compatible
 class Teacher(models.Model):
     name = models.CharField(max_length=50)
 
@@ -28,7 +22,6 @@ class Teacher(models.Model):
         return self.name
 
 
-@python_2_unicode_compatible
 class Child(models.Model):
     name = models.CharField(max_length=50)
     teacher = models.ForeignKey(Teacher, models.CASCADE)
@@ -43,6 +36,9 @@ class Child(models.Model):
 
 class Book(models.Model):
     name = models.CharField(max_length=50)
+
+    def __str__(self):
+        return self.name
 
 
 class Author(models.Model):
@@ -60,7 +56,11 @@ class NonAutoPKBook(models.Model):
             test_pk = random.randint(1, 99999)
             if not NonAutoPKBook.objects.filter(rand_pk=test_pk).exists():
                 self.rand_pk = test_pk
-        super(NonAutoPKBook, self).save(*args, **kwargs)
+        super().save(*args, **kwargs)
+
+
+class NonAutoPKBookChild(NonAutoPKBook):
+    pass
 
 
 class EditablePKBook(models.Model):
@@ -155,11 +155,18 @@ class Poll(models.Model):
 
 
 class Question(models.Model):
+    text = models.CharField(max_length=40)
     poll = models.ForeignKey(Poll, models.CASCADE)
 
 
 class Novel(models.Model):
     name = models.CharField(max_length=40)
+
+
+class NovelReadonlyChapter(Novel):
+
+    class Meta:
+        proxy = True
 
 
 class Chapter(models.Model):
@@ -251,6 +258,7 @@ class SomeChildModel(models.Model):
     name = models.CharField(max_length=1)
     position = models.PositiveIntegerField()
     parent = models.ForeignKey(SomeParentModel, models.CASCADE)
+    readonly_field = models.CharField(max_length=1)
 
 # Other models
 

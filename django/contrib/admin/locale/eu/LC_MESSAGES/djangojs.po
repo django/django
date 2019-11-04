@@ -2,15 +2,16 @@
 #
 # Translators:
 # Aitzol Naberan <anaberan@codesyntax.com>, 2011
+# Eneko Illarramendi <eneko@illarra.com>, 2017
 # Jannis Leidel <jannis@leidel.info>, 2011
 # julen <julenx@gmail.com>, 2012-2013
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2015-10-10 08:16+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2016-05-17 23:12+0200\n"
+"PO-Revision-Date: 2017-09-23 18:54+0000\n"
+"Last-Translator: Eneko Illarramendi <eneko@illarra.com>\n"
 "Language-Team: Basque (http://www.transifex.com/django/django/language/eu/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -20,7 +21,7 @@ msgstr ""
 
 #, javascript-format
 msgid "Available %s"
-msgstr "%s Erabilgarri"
+msgstr "%s erabilgarri"
 
 #, javascript-format
 msgid ""
@@ -53,7 +54,7 @@ msgstr "Kendu"
 
 #, javascript-format
 msgid "Chosen %s"
-msgstr "%s Aukeratuak"
+msgstr "%s aukeratuak"
 
 #, javascript-format
 msgid ""
@@ -101,20 +102,20 @@ msgstr ""
 #, javascript-format
 msgid "Note: You are %s hour ahead of server time."
 msgid_plural "Note: You are %s hours ahead of server time."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Oharra: zerbitzariaren denborarekiko ordu %s aurrerago zaude"
+msgstr[1] "Oharra: zerbitzariaren denborarekiko %s ordu aurrerago zaude"
 
 #, javascript-format
 msgid "Note: You are %s hour behind server time."
 msgid_plural "Note: You are %s hours behind server time."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Oharra: zerbitzariaren denborarekiko ordu %s atzerago zaude. "
+msgstr[1] "Oharra: zerbitzariaren denborarekiko %s ordu atzerago zaude. "
 
 msgid "Now"
 msgstr "Orain"
 
 msgid "Choose a Time"
-msgstr ""
+msgstr "Aukeratu ordu bat"
 
 msgid "Choose a time"
 msgstr "Aukeratu ordu bat"
@@ -129,7 +130,7 @@ msgid "Noon"
 msgstr "Eguerdia"
 
 msgid "6 p.m."
-msgstr ""
+msgstr "6 p.m."
 
 msgid "Cancel"
 msgstr "Atzera"
@@ -138,7 +139,7 @@ msgid "Today"
 msgstr "Gaur"
 
 msgid "Choose a Date"
-msgstr ""
+msgstr "Aukeratu data bat"
 
 msgid "Yesterday"
 msgstr "Atzo"
@@ -146,15 +147,69 @@ msgstr "Atzo"
 msgid "Tomorrow"
 msgstr "Bihar"
 
-msgid ""
-"January February March April May June July August September October November "
-"December"
-msgstr ""
-"Urtarrila Otsaila Martxoa Apirila Maiatza Ekaina Uztaila Abuztua Iraila "
-"Urria Azaroa Abendua"
+msgid "January"
+msgstr "Urtarrila"
 
-msgid "S M T W T F S"
-msgstr "I A A A O O L"
+msgid "February"
+msgstr "Otsaila"
+
+msgid "March"
+msgstr "Martxoa"
+
+msgid "April"
+msgstr "Apirila"
+
+msgid "May"
+msgstr "Maiatza"
+
+msgid "June"
+msgstr "Ekaina"
+
+msgid "July"
+msgstr "Uztaila"
+
+msgid "August"
+msgstr "Abuztua"
+
+msgid "September"
+msgstr "Iraila"
+
+msgid "October"
+msgstr "Urria"
+
+msgid "November"
+msgstr "Azaroa"
+
+msgid "December"
+msgstr "Abendua"
+
+msgctxt "one letter Sunday"
+msgid "S"
+msgstr "I"
+
+msgctxt "one letter Monday"
+msgid "M"
+msgstr "A"
+
+msgctxt "one letter Tuesday"
+msgid "T"
+msgstr "A"
+
+msgctxt "one letter Wednesday"
+msgid "W"
+msgstr "A"
+
+msgctxt "one letter Thursday"
+msgid "T"
+msgstr "O"
+
+msgctxt "one letter Friday"
+msgid "F"
+msgstr "O"
+
+msgctxt "one letter Saturday"
+msgid "S"
+msgstr "L"
 
 msgid "Show"
 msgstr "Erakutsi"

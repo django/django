@@ -1,17 +1,11 @@
-from django.utils.encoding import python_2_unicode_compatible
-
-from ..models import models
+from django.contrib.gis.db import models
 
 
-@python_2_unicode_compatible
 class NamedModel(models.Model):
     name = models.CharField(max_length=25)
 
-    objects = models.GeoManager()
-
     class Meta:
         abstract = True
-        required_db_features = ['gis_enabled']
 
     def __str__(self):
         return self.name
@@ -23,7 +17,7 @@ class State(NamedModel):
 
 class County(NamedModel):
     state = models.ForeignKey(State, models.CASCADE)
-    mpoly = models.MultiPolygonField(srid=4269)  # Multipolygon in NAD83
+    mpoly = models.MultiPolygonField(srid=4269, null=True)  # Multipolygon in NAD83
 
 
 class CountyFeat(NamedModel):
@@ -40,7 +34,6 @@ class City(NamedModel):
 
     class Meta:
         app_label = 'layermap'
-        required_db_features = ['gis_enabled']
 
 
 class Interstate(NamedModel):
@@ -49,7 +42,6 @@ class Interstate(NamedModel):
 
     class Meta:
         app_label = 'layermap'
-        required_db_features = ['gis_enabled']
 
 
 # Same as `City` above, but for testing model inheritance.
@@ -76,9 +68,6 @@ class ICity2(ICity1):
 class Invalid(models.Model):
     point = models.PointField()
 
-    class Meta:
-        required_db_features = ['gis_enabled']
-
 
 # Mapping dictionaries for the models above.
 co_mapping = {
@@ -88,18 +77,21 @@ co_mapping = {
     'mpoly': 'MULTIPOLYGON',  # Will convert POLYGON features into MULTIPOLYGONS.
 }
 
-cofeat_mapping = {'name': 'Name',
-                  'poly': 'POLYGON',
-                  }
+cofeat_mapping = {
+    'name': 'Name',
+    'poly': 'POLYGON',
+}
 
-city_mapping = {'name': 'Name',
-                'population': 'Population',
-                'density': 'Density',
-                'dt': 'Created',
-                'point': 'POINT',
-                }
+city_mapping = {
+    'name': 'Name',
+    'population': 'Population',
+    'density': 'Density',
+    'dt': 'Created',
+    'point': 'POINT',
+}
 
-inter_mapping = {'name': 'Name',
-                 'length': 'Length',
-                 'path': 'LINESTRING',
-                 }
+inter_mapping = {
+    'name': 'Name',
+    'length': 'Length',
+    'path': 'LINESTRING',
+}

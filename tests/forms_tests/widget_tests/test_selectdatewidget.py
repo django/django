@@ -18,7 +18,7 @@ class SelectDateWidgetTest(WidgetTest):
         self.check_html(self.widget, 'mydate', '', html=(
             """
             <select name="mydate_month" id="id_mydate_month">
-                <option value="0">---</option>
+                <option selected value="">---</option>
                 <option value="1">January</option>
                 <option value="2">February</option>
                 <option value="3">March</option>
@@ -34,7 +34,7 @@ class SelectDateWidgetTest(WidgetTest):
             </select>
 
             <select name="mydate_day" id="id_mydate_day">
-                <option value="0">---</option>
+                <option selected value="">---</option>
                 <option value="1">1</option>
                 <option value="2">2</option>
                 <option value="3">3</option>
@@ -69,7 +69,7 @@ class SelectDateWidgetTest(WidgetTest):
             </select>
 
             <select name="mydate_year" id="id_mydate_year">
-                <option value="0">---</option>
+                <option selected value="">---</option>
                 <option value="2007">2007</option>
                 <option value="2008">2008</option>
                 <option value="2009">2009</option>
@@ -97,11 +97,11 @@ class SelectDateWidgetTest(WidgetTest):
         self.check_html(self.widget, 'mydate', '2010-04-15', html=(
             """
             <select name="mydate_month" id="id_mydate_month">
-                <option value="0">---</option>
+                <option value="">---</option>
                 <option value="1">January</option>
                 <option value="2">February</option>
                 <option value="3">March</option>
-                <option value="4" selected="selected">April</option>
+                <option value="4" selected>April</option>
                 <option value="5">May</option>
                 <option value="6">June</option>
                 <option value="7">July</option>
@@ -113,7 +113,7 @@ class SelectDateWidgetTest(WidgetTest):
             </select>
 
             <select name="mydate_day" id="id_mydate_day">
-                <option value="0">---</option>
+                <option value="">---</option>
                 <option value="1">1</option>
                 <option value="2">2</option>
                 <option value="3">3</option>
@@ -128,7 +128,7 @@ class SelectDateWidgetTest(WidgetTest):
                 <option value="12">12</option>
                 <option value="13">13</option>
                 <option value="14">14</option>
-                <option value="15" selected="selected">15</option>
+                <option value="15" selected>15</option>
                 <option value="16">16</option>
                 <option value="17">17</option>
                 <option value="18">18</option>
@@ -148,11 +148,11 @@ class SelectDateWidgetTest(WidgetTest):
             </select>
 
             <select name="mydate_year" id="id_mydate_year">
-                <option value="0">---</option>
+                <option value="">---</option>
                 <option value="2007">2007</option>
                 <option value="2008">2008</option>
                 <option value="2009">2009</option>
-                <option value="2010" selected="selected">2010</option>
+                <option value="2010" selected>2010</option>
                 <option value="2011">2011</option>
                 <option value="2012">2012</option>
                 <option value="2013">2013</option>
@@ -176,9 +176,9 @@ class SelectDateWidgetTest(WidgetTest):
         self.check_html(self.widget, 'mydate', '2010-02-31', html=(
             """
             <select name="mydate_month" id="id_mydate_month">
-                <option value="0">---</option>
+                <option value="">---</option>
                 <option value="1">January</option>
-                <option value="2" selected="selected">February</option>
+                <option value="2" selected>February</option>
                 <option value="3">March</option>
                 <option value="4">April</option>
                 <option value="5">May</option>
@@ -192,7 +192,7 @@ class SelectDateWidgetTest(WidgetTest):
             </select>
 
             <select name="mydate_day" id="id_mydate_day">
-                <option value="0">---</option>
+                <option value="">---</option>
                 <option value="1">1</option>
                 <option value="2">2</option>
                 <option value="3">3</option>
@@ -223,15 +223,15 @@ class SelectDateWidgetTest(WidgetTest):
                 <option value="28">28</option>
                 <option value="29">29</option>
                 <option value="30">30</option>
-                <option value="31" selected="selected">31</option>
+                <option value="31" selected>31</option>
             </select>
 
             <select name="mydate_year" id="id_mydate_year">
-                <option value="0">---</option>
+                <option value="">---</option>
                 <option value="2007">2007</option>
                 <option value="2008">2008</option>
                 <option value="2009">2009</option>
-                <option value="2010" selected="selected">2010</option>
+                <option value="2010" selected>2010</option>
                 <option value="2011">2011</option>
                 <option value="2012">2012</option>
                 <option value="2013">2013</option>
@@ -247,7 +247,7 @@ class SelectDateWidgetTest(WidgetTest):
         self.check_html(widget, 'mydate', '', html=(
             """
             <select name="mydate_month" id="id_mydate_month">
-                <option value="0">---</option>
+                <option selected value="">---</option>
                 <option value="1">Jan.</option>
                 <option value="2">Feb.</option>
                 <option value="3">March</option>
@@ -263,7 +263,7 @@ class SelectDateWidgetTest(WidgetTest):
             </select>
 
             <select name="mydate_day" id="id_mydate_day">
-                <option value="0">---</option>
+                <option selected value="">---</option>
                 <option value="1">1</option>
                 <option value="2">2</option>
                 <option value="3">3</option>
@@ -298,7 +298,7 @@ class SelectDateWidgetTest(WidgetTest):
             </select>
 
             <select name="mydate_year" id="id_mydate_year">
-                <option value="0">---</option>
+                <option selected value="">---</option>
                 <option value="2013">2013</option>
             </select>
             """
@@ -317,8 +317,8 @@ class SelectDateWidgetTest(WidgetTest):
     def test_selectdate_empty_label(self):
         w = SelectDateWidget(years=('2014',), empty_label='empty_label')
 
-        # Rendering the default state with empty_label setted as string.
-        self.assertInHTML('<option value="0">empty_label</option>', w.render('mydate', ''), count=3)
+        # Rendering the default state with empty_label set as string.
+        self.assertInHTML('<option selected value="">empty_label</option>', w.render('mydate', ''), count=3)
 
         w = SelectDateWidget(years=('2014',), empty_label=('empty_year', 'empty_month', 'empty_day'))
 
@@ -327,7 +327,7 @@ class SelectDateWidgetTest(WidgetTest):
             w.render('mydate', ''),
             """
             <select name="mydate_month" id="id_mydate_month">
-                <option value="0">empty_month</option>
+                <option selected value="">empty_month</option>
                 <option value="1">January</option>
                 <option value="2">February</option>
                 <option value="3">March</option>
@@ -343,7 +343,7 @@ class SelectDateWidgetTest(WidgetTest):
             </select>
 
             <select name="mydate_day" id="id_mydate_day">
-                <option value="0">empty_day</option>
+                <option selected value="">empty_day</option>
                 <option value="1">1</option>
                 <option value="2">2</option>
                 <option value="3">3</option>
@@ -378,7 +378,7 @@ class SelectDateWidgetTest(WidgetTest):
             </select>
 
             <select name="mydate_year" id="id_mydate_year">
-                <option value="0">empty_year</option>
+                <option selected value="">empty_year</option>
                 <option value="2014">2014</option>
             </select>
             """,
@@ -402,7 +402,7 @@ class SelectDateWidgetTest(WidgetTest):
             w.render('date', '13-08-2010'),
             """
             <select name="date_day" id="id_date_day">
-                <option value="0">---</option>
+                <option value="">---</option>
                 <option value="1">1</option>
                 <option value="2">2</option>
                 <option value="3">3</option>
@@ -415,7 +415,7 @@ class SelectDateWidgetTest(WidgetTest):
                 <option value="10">10</option>
                 <option value="11">11</option>
                 <option value="12">12</option>
-                <option value="13" selected="selected">13</option>
+                <option value="13" selected>13</option>
                 <option value="14">14</option>
                 <option value="15">15</option>
                 <option value="16">16</option>
@@ -437,7 +437,7 @@ class SelectDateWidgetTest(WidgetTest):
             </select>
 
             <select name="date_month" id="id_date_month">
-                <option value="0">---</option>
+                <option value="">---</option>
                 <option value="1">januari</option>
                 <option value="2">februari</option>
                 <option value="3">maart</option>
@@ -445,7 +445,7 @@ class SelectDateWidgetTest(WidgetTest):
                 <option value="5">mei</option>
                 <option value="6">juni</option>
                 <option value="7">juli</option>
-                <option value="8" selected="selected">augustus</option>
+                <option value="8" selected>augustus</option>
                 <option value="9">september</option>
                 <option value="10">oktober</option>
                 <option value="11">november</option>
@@ -453,11 +453,11 @@ class SelectDateWidgetTest(WidgetTest):
             </select>
 
             <select name="date_year" id="id_date_year">
-                <option value="0">---</option>
+                <option value="">---</option>
                 <option value="2007">2007</option>
                 <option value="2008">2008</option>
                 <option value="2009">2009</option>
-                <option value="2010" selected="selected">2010</option>
+                <option value="2010" selected>2010</option>
                 <option value="2011">2011</option>
                 <option value="2012">2012</option>
                 <option value="2013">2013</option>
@@ -469,7 +469,7 @@ class SelectDateWidgetTest(WidgetTest):
         )
 
         # Even with an invalid date, the widget should reflect the entered value (#17401).
-        self.assertEqual(w.render('mydate', '2010-02-30').count('selected="selected"'), 3)
+        self.assertEqual(w.render('mydate', '2010-02-30').count('selected'), 3)
 
         # Years before 1900 should work.
         w = SelectDateWidget(years=('1899',))
@@ -477,3 +477,116 @@ class SelectDateWidgetTest(WidgetTest):
             w.value_from_datadict({'date_year': '1899', 'date_month': '8', 'date_day': '13'}, {}, 'date'),
             '13-08-1899',
         )
+        # And years before 1000 (demonstrating the need for datetime_safe).
+        w = SelectDateWidget(years=('0001',))
+        self.assertEqual(
+            w.value_from_datadict({'date_year': '0001', 'date_month': '8', 'date_day': '13'}, {}, 'date'),
+            '13-08-0001',
+        )
+
+    def test_format_value(self):
+        valid_formats = [
+            '2000-1-1', '2000-10-15', '2000-01-01',
+            '2000-01-0', '2000-0-01', '2000-0-0',
+            '0-01-01', '0-01-0', '0-0-01', '0-0-0',
+        ]
+        for value in valid_formats:
+            year, month, day = (int(x) or '' for x in value.split('-'))
+            with self.subTest(value=value):
+                self.assertEqual(self.widget.format_value(value), {'day': day, 'month': month, 'year': year})
+
+        invalid_formats = [
+            '2000-01-001', '2000-001-01', '2-01-01', '20-01-01', '200-01-01',
+            '20000-01-01',
+        ]
+        for value in invalid_formats:
+            with self.subTest(value=value):
+                self.assertEqual(self.widget.format_value(value), {'day': None, 'month': None, 'year': None})
+
+    def test_value_from_datadict(self):
+        tests = [
+            (('2000', '12', '1'), '2000-12-1'),
+            (('', '12', '1'), '0-12-1'),
+            (('2000', '', '1'), '2000-0-1'),
+            (('2000', '12', ''), '2000-12-0'),
+            (('', '', '', ''), None),
+            ((None, '12', '1'), None),
+            (('2000', None, '1'), None),
+            (('2000', '12', None), None),
+        ]
+        for values, expected in tests:
+            with self.subTest(values=values):
+                data = {}
+                for field_name, value in zip(('year', 'month', 'day'), values):
+                    if value is not None:
+                        data['field_%s' % field_name] = value
+                self.assertEqual(self.widget.value_from_datadict(data, {}, 'field'), expected)
+
+    def test_value_omitted_from_data(self):
+        self.assertIs(self.widget.value_omitted_from_data({}, {}, 'field'), True)
+        self.assertIs(self.widget.value_omitted_from_data({'field_month': '12'}, {}, 'field'), False)
+        self.assertIs(self.widget.value_omitted_from_data({'field_year': '2000'}, {}, 'field'), False)
+        self.assertIs(self.widget.value_omitted_from_data({'field_day': '1'}, {}, 'field'), False)
+        data = {'field_day': '1', 'field_month': '12', 'field_year': '2000'}
+        self.assertIs(self.widget.value_omitted_from_data(data, {}, 'field'), False)
+
+    @override_settings(USE_THOUSAND_SEPARATOR=True, USE_L10N=True)
+    def test_years_rendered_without_separator(self):
+        widget = SelectDateWidget(years=(2007,))
+        self.check_html(widget, 'mydate', '', html=(
+            """
+            <select name="mydate_month" id="id_mydate_month">
+                <option selected value="">---</option>
+                <option value="1">January</option>
+                <option value="2">February</option>
+                <option value="3">March</option>
+                <option value="4">April</option>
+                <option value="5">May</option>
+                <option value="6">June</option>
+                <option value="7">July</option>
+                <option value="8">August</option>
+                <option value="9">September</option>
+                <option value="10">October</option>
+                <option value="11">November</option>
+                <option value="12">December</option>
+            </select>
+            <select name="mydate_day" id="id_mydate_day">
+                <option selected value="">---</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
+                <option value="7">7</option>
+                <option value="8">8</option>
+                <option value="9">9</option>
+                <option value="10">10</option>
+                <option value="11">11</option>
+                <option value="12">12</option>
+                <option value="13">13</option>
+                <option value="14">14</option>
+                <option value="15">15</option>
+                <option value="16">16</option>
+                <option value="17">17</option>
+                <option value="18">18</option>
+                <option value="19">19</option>
+                <option value="20">20</option>
+                <option value="21">21</option>
+                <option value="22">22</option>
+                <option value="23">23</option>
+                <option value="24">24</option>
+                <option value="25">25</option>
+                <option value="26">26</option>
+                <option value="27">27</option>
+                <option value="28">28</option>
+                <option value="29">29</option>
+                <option value="30">30</option>
+                <option value="31">31</option>
+            </select>
+            <select name="mydate_year" id="id_mydate_year">
+                <option selected value="">---</option>
+                <option value="2007">2007</option>
+            </select>
+            """
+        ))

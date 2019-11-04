@@ -13,7 +13,7 @@ Windows Authentication or Apache and `mod_authnz_ldap`_, `CAS`_, `Cosign`_,
 .. _CAS: https://www.apereo.org/projects/cas
 .. _Cosign: http://weblogin.org
 .. _WebAuth: https://www.stanford.edu/services/webauth/
-.. _mod_auth_sspi: http://sourceforge.net/projects/mod-auth-sspi
+.. _mod_auth_sspi: https://sourceforge.net/projects/mod-auth-sspi
 
 When the Web server takes care of authentication it typically sets the
 ``REMOTE_USER`` environment variable for use in the underlying application.  In
@@ -29,10 +29,10 @@ Configuration
 
 First, you must add the
 :class:`django.contrib.auth.middleware.RemoteUserMiddleware` to the
-:setting:`MIDDLEWARE_CLASSES` setting **after** the
+:setting:`MIDDLEWARE` setting **after** the
 :class:`django.contrib.auth.middleware.AuthenticationMiddleware`::
 
-    MIDDLEWARE_CLASSES = [
+    MIDDLEWARE = [
         '...',
         'django.contrib.auth.middleware.AuthenticationMiddleware',
         'django.contrib.auth.middleware.RemoteUserMiddleware',
@@ -64,9 +64,16 @@ remote users. These interfaces work with users stored in the database
 regardless of ``AUTHENTICATION_BACKENDS``.
 
 .. note::
-   Since the ``RemoteUserBackend`` inherits from ``ModelBackend``, you will
-   still have all of the same permissions checking that is implemented in
-   ``ModelBackend``.
+
+    Since the ``RemoteUserBackend`` inherits from ``ModelBackend``, you will
+    still have all of the same permissions checking that is implemented in
+    ``ModelBackend``.
+
+    Users with :attr:`is_active=False
+    <django.contrib.auth.models.User.is_active>` won't be allowed to
+    authenticate. Use
+    :class:`~django.contrib.auth.backends.AllowAllUsersRemoteUserBackend` if
+    you want to allow them to.
 
 If your authentication mechanism uses a custom HTTP header and not
 ``REMOTE_USER``, you can subclass ``RemoteUserMiddleware`` and set the
@@ -101,8 +108,6 @@ override one or more of its attributes and methods.
 
 Using ``REMOTE_USER`` on login pages only
 =========================================
-
-.. versionadded:: 1.9
 
 The ``RemoteUserMiddleware`` authentication middleware assumes that the HTTP
 request header ``REMOTE_USER`` is present with all authenticated requests. That

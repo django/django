@@ -6,16 +6,12 @@ Django 1.5 release notes
 
 Welcome to Django 1.5!
 
-These release notes cover the `new features`_, as well
-as some `backwards incompatible changes`_ you'll want to be aware of
-when upgrading from Django 1.4 or older versions. We've also dropped some
-features, which are detailed in :ref:`our deprecation plan
-<deprecation-removed-in-1.5>`, and we've `begun the deprecation process for
-some features`_.
-
-.. _`new features`: `What's new in Django 1.5`_
-.. _`backwards incompatible changes`: `Backwards incompatible changes in 1.5`_
-.. _`begun the deprecation process for some features`: `Features deprecated in 1.5`_
+These release notes cover the :ref:`new features <whats-new-1.5>`, as well as
+some :ref:`backwards incompatible changes <backwards-incompatible-1.5>` you'll
+want to be aware of when upgrading from Django 1.4 or older versions. We've
+also dropped some features, which are detailed in :ref:`our deprecation plan
+<deprecation-removed-in-1.5>`, and we've :ref:`begun the deprecation process
+for some features <deprecated-features-1.5>`.
 
 Overview
 ========
@@ -51,8 +47,8 @@ Other notable new features in Django 1.5 include:
 Wherever possible we try to introduce new features in a backwards-compatible
 manner per :doc:`our API stability policy </misc/api-stability>`.
 However, as with previous releases, Django 1.5 ships with some minor
-`backwards incompatible changes`_; people upgrading from previous versions
-of Django should read that list carefully.
+:ref:`backwards incompatible changes <backwards-incompatible-1.5>`; people
+upgrading from previous versions of Django should read that list carefully.
 
 One deprecated feature worth noting is the shift to "new-style" :ttag:`url` tag.
 Prior to Django 1.3, syntax like ``{% url myview %}`` was interpreted
@@ -111,12 +107,14 @@ to Python 3, so it's unlikely that a real-world application will have all its
 dependencies satisfied under Python 3.
 
 Thus, we're recommending that Django 1.5 not be used in production under Python
-3. Instead, use this opportunity to begin :doc:`porting applications to Python 3
-</topics/python3>`. If you're an author of a pluggable component, we encourage you
-to start porting now.
+3. Instead, use this opportunity to begin porting applications to Python 3. If
+you're an author of a pluggable component, we encourage you to start porting
+now.
 
 We plan to offer first-class, production-ready support for Python 3 in our next
 release, Django 1.6.
+
+.. _whats-new-1.5:
 
 What's new in Django 1.5
 ========================
@@ -135,7 +133,7 @@ you may need to make some changes to the way you reference User instances. You
 should also document any specific features of the User model that your
 application relies upon.
 
-See the :ref:`documentation on custom User models <auth-custom-user>` for
+See the :ref:`documentation on custom user models <auth-custom-user>` for
 more details.
 
 Support for saving a subset of model's fields
@@ -188,8 +186,7 @@ is an iterator.
 
 Since :class:`~django.http.StreamingHttpResponse` does not have a ``content``
 attribute, middleware that needs access to the response content must test for
-streaming responses and behave accordingly. See :ref:`response-middleware` for
-more information.
+streaming responses and behave accordingly.
 
 ``{% verbatim %}`` template tag
 -------------------------------
@@ -263,8 +260,8 @@ Django 1.5 also includes several smaller improvements worth noting:
   ``self.stderr.write('error')`` (see the note on
   :ref:`management commands output <management-commands-output>`).
 
-* The dumpdata management command outputs one row at a time, preventing
-  out-of-memory errors when dumping large datasets.
+* The :djadmin:`dumpdata` management command outputs one row at a time,
+  preventing out-of-memory errors when dumping large datasets.
 
 * In the localflavor for Canada, "pq" was added to the acceptable codes for
   Quebec. It's an old abbreviation.
@@ -347,6 +344,8 @@ Django 1.5 also includes several smaller improvements worth noting:
 
 * The admin's list filters can now be customized per-request thanks to the new
   :meth:`django.contrib.admin.ModelAdmin.get_list_filter` method.
+
+.. _backwards-incompatible-1.5:
 
 Backwards incompatible changes in 1.5
 =====================================
@@ -501,7 +500,7 @@ Python's copy of version 2.0.9. However, there are some incompatibilities
 between other versions of ``simplejson``:
 
 - While the ``simplejson`` API is documented as always returning unicode
-  strings, the optional C implementation can return a byte string. This was
+  strings, the optional C implementation can return a bytestring. This was
   fixed in Python 2.7.
 - ``simplejson.JSONEncoder`` gained a ``namedtuple_as_object`` keyword
   argument in version 2.2.
@@ -526,7 +525,7 @@ String types of hasher method parameters
 If you have written a :ref:`custom password hasher <auth_password_storage>`,
 your ``encode()``, ``verify()`` or ``safe_summary()`` methods should accept
 Unicode parameters (``password``, ``salt`` or ``encoded``). If any of the
-hashing methods need byte strings, you can use the
+hashing methods need bytestrings, you can use the
 :func:`~django.utils.encoding.force_bytes` utility to encode the strings.
 
 Validation of previous_page_number and next_page_number
@@ -561,7 +560,7 @@ Prior to Django 1.5, if you attempted to log into the admin interface and
 mistakenly used your email address instead of your username, the admin
 interface would provide a warning advising that your email address was
 not your username. In Django 1.5, the introduction of
-:ref:`custom User models <auth-custom-user>` has required the removal of this
+:ref:`custom user models <auth-custom-user>` has required the removal of this
 warning. This doesn't change the login behavior of the admin site; it only
 affects the warning message that is displayed under one particular mode of
 login failure.
@@ -603,7 +602,7 @@ Ordering of tests
 In order to make sure all ``TestCase`` code starts with a clean database,
 tests are now executed in the following order:
 
-* First, all unittests (including :class:`unittest.TestCase`,
+* First, all unit tests (including :class:`unittest.TestCase`,
   :class:`~django.test.SimpleTestCase`, :class:`~django.test.TestCase` and
   :class:`~django.test.TransactionTestCase`) are run with no particular ordering
   guaranteed nor enforced among them.
@@ -669,7 +668,7 @@ Miscellaneous
 * :func:`~django.utils.http.int_to_base36` properly raises a
   :exc:`TypeError` instead of :exc:`ValueError` for non-integer inputs.
 
-* The ``slugify`` template filter is now available as a standard python
+* The ``slugify`` template filter is now available as a standard Python
   function at :func:`django.utils.text.slugify`. Similarly, ``remove_tags`` is
   available at ``django.utils.html.remove_tags()``.
 
@@ -742,7 +741,7 @@ framework.
 ``AUTH_PROFILE_MODULE``
 -----------------------
 
-With the introduction of :ref:`custom User models <auth-custom-user>`, there is
+With the introduction of :ref:`custom user models <auth-custom-user>`, there is
 no longer any need for a built-in mechanism to store user profile data.
 
 You can still define user profiles models that have a one-to-one relation with

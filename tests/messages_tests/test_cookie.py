@@ -13,7 +13,7 @@ from .base import BaseTests
 
 def set_cookie_data(storage, messages, invalid=False, encode_empty=False):
     """
-    Sets ``request.COOKIES`` with the encoded data and removes the storage
+    Set ``request.COOKIES`` with the encoded data and remove the storage
     backend's loaded data cache.
     """
     encoded_data = storage._encode(messages, encode_empty=encode_empty)
@@ -27,7 +27,7 @@ def set_cookie_data(storage, messages, invalid=False, encode_empty=False):
 
 def stored_cookie_messages_count(storage, response):
     """
-    Returns an integer containing the number of messages stored.
+    Return an integer containing the number of messages stored.
     """
     # Get a list of cookies, excluding ones with a max-age of 0 (because
     # they have been marked for deletion).
@@ -43,7 +43,7 @@ def stored_cookie_messages_count(storage, response):
 
 
 @override_settings(SESSION_COOKIE_DOMAIN='.example.com', SESSION_COOKIE_SECURE=True, SESSION_COOKIE_HTTPONLY=True)
-class CookieTest(BaseTests, SimpleTestCase):
+class CookieTests(BaseTests, SimpleTestCase):
     storage_class = CookieStorage
 
     def stored_messages_count(self, storage, response):
@@ -54,13 +54,14 @@ class CookieTest(BaseTests, SimpleTestCase):
         # Set initial data.
         example_messages = ['test', 'me']
         set_cookie_data(storage, example_messages)
-        # Test that the message actually contains what we expect.
+        # The message contains what's expected.
         self.assertEqual(list(storage), example_messages)
 
+    @override_settings(SESSION_COOKIE_SAMESITE='Strict')
     def test_cookie_setings(self):
         """
-        Ensure that CookieStorage honors SESSION_COOKIE_DOMAIN, SESSION_COOKIE_SECURE and SESSION_COOKIE_HTTPONLY
-        Refs #15618 and #20972.
+        CookieStorage honors SESSION_COOKIE_DOMAIN, SESSION_COOKIE_SECURE, and
+        SESSION_COOKIE_HTTPONLY (#15618, #20972).
         """
         # Test before the messages have been consumed
         storage = self.get_storage()
@@ -70,8 +71,9 @@ class CookieTest(BaseTests, SimpleTestCase):
         self.assertIn('test', response.cookies['messages'].value)
         self.assertEqual(response.cookies['messages']['domain'], '.example.com')
         self.assertEqual(response.cookies['messages']['expires'], '')
-        self.assertEqual(response.cookies['messages']['secure'], True)
-        self.assertEqual(response.cookies['messages']['httponly'], True)
+        self.assertIs(response.cookies['messages']['secure'], True)
+        self.assertIs(response.cookies['messages']['httponly'], True)
+        self.assertEqual(response.cookies['messages']['samesite'], 'Strict')
 
         # Test deletion of the cookie (storing with an empty value) after the messages have been consumed
         storage = self.get_storage()
@@ -82,7 +84,7 @@ class CookieTest(BaseTests, SimpleTestCase):
         storage.update(response)
         self.assertEqual(response.cookies['messages'].value, '')
         self.assertEqual(response.cookies['messages']['domain'], '.example.com')
-        self.assertEqual(response.cookies['messages']['expires'], 'Thu, 01-Jan-1970 00:00:00 GMT')
+        self.assertEqual(response.cookies['messages']['expires'], 'Thu, 01 Jan 1970 00:00:00 GMT')
 
     def test_get_bad_cookie(self):
         request = self.get_request()
@@ -90,14 +92,13 @@ class CookieTest(BaseTests, SimpleTestCase):
         # Set initial (invalid) data.
         example_messages = ['test', 'me']
         set_cookie_data(storage, example_messages, invalid=True)
-        # Test that the message actually contains what we expect.
+        # The message actually contains what we expect.
         self.assertEqual(list(storage), [])
 
     def test_max_cookie_length(self):
         """
-        Tests that, if the data exceeds what is allowed in a cookie, older
-        messages are removed before saving (and returned by the ``update``
-        method).
+        If the data exceeds what is allowed in a cookie, older messages are
+        removed before saving (and returned by the ``update`` method).
         """
         storage = self.get_storage()
         response = self.get_response()
@@ -120,16 +121,16 @@ class CookieTest(BaseTests, SimpleTestCase):
 
     def test_json_encoder_decoder(self):
         """
-        Tests that a complex nested data structure containing Message
+        A complex nested data structure containing Message
         instances is properly encoded/decoded by the custom JSON
         encoder/decoder classes.
         """
         messages = [
             {
                 'message': Message(constants.INFO, 'Test message'),
-                'message_list': [Message(constants.INFO, 'message %s')
-                                 for x in range(5)] + [{'another-message':
-                                 Message(constants.ERROR, 'error')}],
+                'message_list': [
+                    Message(constants.INFO, 'message %s') for x in range(5)
+                ] + [{'another-message': Message(constants.ERROR, 'error')}],
             },
             Message(constants.INFO, 'message %s'),
         ]
@@ -140,7 +141,7 @@ class CookieTest(BaseTests, SimpleTestCase):
 
     def test_safedata(self):
         """
-        Tests that a message containing SafeData is keeping its safe status when
+        A message containing SafeData is keeping its safe status when
         retrieved from the message storage.
         """
         def encode_decode(data):
@@ -150,18 +151,14 @@ class CookieTest(BaseTests, SimpleTestCase):
             return decoded.message
 
         storage = self.get_storage()
-
-        self.assertIsInstance(
-            encode_decode(mark_safe("<b>Hello Django!</b>")), SafeData)
-        self.assertNotIsInstance(
-            encode_decode("<b>Hello Django!</b>"), SafeData)
+        self.assertIsInstance(encode_decode(mark_safe("<b>Hello Django!</b>")), SafeData)
+        self.assertNotIsInstance(encode_decode("<b>Hello Django!</b>"), SafeData)
 
     def test_pre_1_5_message_format(self):
         """
-        For ticket #22426. Tests whether messages that were set in the cookie
-        before the addition of is_safedata are decoded correctly.
+        Messages that were set in the cookie before the addition of is_safedata
+        are decoded correctly (#22426).
         """
-
         # Encode the messages using the current encoder.
         messages = [Message(constants.INFO, 'message %s') for x in range(5)]
         encoder = MessageEncoder(separators=(',', ':'))

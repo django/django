@@ -30,9 +30,10 @@ malicious input, it is not entirely foolproof. For example, it will not
 protect the following:
 
 .. code-block:: text
-..   highlighting as html+django fails due to intentionally missing quotes.
 
     <style class={{ var }}>...</style>
+
+.. highlighting as html+django fails due to intentionally missing quotes.
 
 If ``var`` is set to ``'class1 onmouseover=javascript:func()'``, this can result
 in unauthorized JavaScript execution, depending on how the browser renders
@@ -64,10 +65,10 @@ this if you know what you are doing. There are other :ref:`limitations
 <csrf-limitations>` if your site has subdomains that are outside of your
 control.
 
-:ref:`CSRF protection works <how-csrf-works>` by checking for a nonce in each
+:ref:`CSRF protection works <how-csrf-works>` by checking for a secret in each
 POST request. This ensures that a malicious user cannot simply "replay" a form
 POST to your website and have another logged in user unwittingly submit that
-form. The malicious user would have to know the nonce, which is user specific
+form. The malicious user would have to know the secret, which is user specific
 (using a cookie).
 
 When deployed with :ref:`HTTPS <security-recommendation-ssl>`,
@@ -89,14 +90,17 @@ SQL injection is a type of attack where a malicious user is able to execute
 arbitrary SQL code on a database. This can result in records
 being deleted or data leakage.
 
-By using Django's querysets, the resulting SQL will be properly escaped by
-the underlying database driver. However, Django also gives developers power to
-write :ref:`raw queries <executing-raw-queries>` or execute
-:ref:`custom sql <executing-custom-sql>`. These capabilities should be used
-sparingly and you should always be careful to properly escape any parameters
-that the user can control. In addition, you should exercise caution when using
-:meth:`~django.db.models.query.QuerySet.extra` and
-:class:`~django.db.models.expressions.RawSQL`.
+Django's querysets are protected from SQL injection since their queries are
+constructed using query parameterization. A query's SQL code is defined
+separately from the query's parameters. Since parameters may be user-provided
+and therefore unsafe, they are escaped by the underlying database driver.
+
+Django also gives developers power to write :ref:`raw queries
+<executing-raw-queries>` or execute :ref:`custom sql <executing-custom-sql>`.
+These capabilities should be used sparingly and you should always be careful to
+properly escape any parameters that the user can control. In addition, you
+should exercise caution when using :meth:`~django.db.models.query.QuerySet.extra`
+and :class:`~django.db.models.expressions.RawSQL`.
 
 Clickjacking protection
 =======================
@@ -159,8 +163,9 @@ server, there are some additional steps you may need:
   to a particular site should always use HTTPS. Combined with redirecting
   requests over HTTP to HTTPS, this will ensure that connections always enjoy
   the added security of SSL provided one successful connection has occurred.
-  HSTS may either be configured with :setting:`SECURE_HSTS_SECONDS` and
-  :setting:`SECURE_HSTS_INCLUDE_SUBDOMAINS` or on the Web server.
+  HSTS may either be configured with :setting:`SECURE_HSTS_SECONDS`,
+  :setting:`SECURE_HSTS_INCLUDE_SUBDOMAINS`, and :setting:`SECURE_HSTS_PRELOAD`,
+  or on the Web server.
 
 .. _host-headers-virtual-hosting:
 
@@ -195,9 +200,9 @@ For more details see the full :setting:`ALLOWED_HOSTS` documentation.
    Django now requires that you set :setting:`ALLOWED_HOSTS` explicitly rather
    than relying on web server configuration.
 
-Additionally, as of 1.3.1, Django requires you to explicitly enable support for
-the ``X-Forwarded-Host`` header (via the :setting:`USE_X_FORWARDED_HOST`
-setting) if your configuration requires it.
+Additionally, Django requires you to explicitly enable support for the
+``X-Forwarded-Host`` header (via the :setting:`USE_X_FORWARDED_HOST` setting)
+if your configuration requires it.
 
 Session security
 ================
@@ -239,7 +244,7 @@ User-uploaded content
   validate all user uploaded file content, however, there are some other steps
   you can take to mitigate these attacks:
 
-  1. One class of attacks can be prevented by always serving user uploaded
+  #. One class of attacks can be prevented by always serving user uploaded
      content from a distinct top-level or second-level domain. This prevents
      any exploit blocked by `same-origin policy`_ protections such as cross
      site scripting. For example, if your site runs on ``example.com``, you
@@ -247,7 +252,7 @@ User-uploaded content
      from something like ``usercontent-example.com``. It's *not* sufficient to
      serve content from a subdomain like ``usercontent.example.com``.
 
-  2. Beyond this, applications may choose to define a whitelist of allowable
+  #. Beyond this, applications may choose to define a whitelist of allowable
      file extensions for user uploaded files and configure the web server
      to only serve such files.
 
@@ -272,5 +277,10 @@ security protection of the Web server, operating system and other components.
 * Keep your :setting:`SECRET_KEY` a secret.
 * It is a good idea to limit the accessibility of your caching system and
   database using a firewall.
+* Take a look at the Open Web Application Security Project (OWASP) `Top 10
+  list`_ which identifies some common vulnerabilities in web applications. While
+  Django has tools to address some of the issues, other issues must be
+  accounted for in the design of your project.
 
 .. _LimitRequestBody: https://httpd.apache.org/docs/2.4/mod/core.html#limitrequestbody
+.. _Top 10 list: https://www.owasp.org/index.php/Top_10-2017_Top_10

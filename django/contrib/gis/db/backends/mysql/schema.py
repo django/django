@@ -12,18 +12,18 @@ class MySQLGISSchemaEditor(DatabaseSchemaEditor):
     sql_drop_spatial_index = 'DROP INDEX %(index)s ON %(table)s'
 
     def __init__(self, *args, **kwargs):
-        super(MySQLGISSchemaEditor, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.geometry_sql = []
 
     def skip_default(self, field):
         return (
-            super(MySQLGISSchemaEditor, self).skip_default(field) or
+            super().skip_default(field) or
             # Geometry fields are stored as BLOB/TEXT and can't have defaults.
             isinstance(field, GeometryField)
         )
 
     def column_sql(self, model, field, include_default=False):
-        column_sql = super(MySQLGISSchemaEditor, self).column_sql(model, field, include_default)
+        column_sql = super().column_sql(model, field, include_default)
         # MySQL doesn't support spatial indexes on NULL columns
         if isinstance(field, GeometryField) and field.spatial_index and not field.null:
             qn = self.connection.ops.quote_name
@@ -38,11 +38,11 @@ class MySQLGISSchemaEditor(DatabaseSchemaEditor):
         return column_sql
 
     def create_model(self, model):
-        super(MySQLGISSchemaEditor, self).create_model(model)
+        super().create_model(model)
         self.create_spatial_indexes()
 
     def add_field(self, model, field):
-        super(MySQLGISSchemaEditor, self).add_field(model, field)
+        super().add_field(model, field)
         self.create_spatial_indexes()
 
     def remove_field(self, model, field):
@@ -60,7 +60,7 @@ class MySQLGISSchemaEditor(DatabaseSchemaEditor):
                     "if your storage engine doesn't support them).", sql
                 )
 
-        super(MySQLGISSchemaEditor, self).remove_field(model, field)
+        super().remove_field(model, field)
 
     def _create_spatial_index_name(self, model, field):
         return '%s_%s_id' % (model._meta.db_table, field.column)

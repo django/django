@@ -2,15 +2,16 @@
 #
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011
+# Vasil Vangelovski <vvangelovski@gmail.com>, 2016-2017
 # Vasil Vangelovski <vvangelovski@gmail.com>, 2013-2014
 # Vasil Vangelovski <vvangelovski@gmail.com>, 2012
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-10 14:49+0200\n"
-"PO-Revision-Date: 2015-10-11 10:05+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2017-01-19 16:49+0100\n"
+"PO-Revision-Date: 2017-09-23 18:54+0000\n"
+"Last-Translator: Vasil Vangelovski <vvangelovski@gmail.com>\n"
 "Language-Team: Macedonian (http://www.transifex.com/django/django/language/"
 "mk/)\n"
 "MIME-Version: 1.0\n"
@@ -39,6 +40,9 @@ msgid ""
 "click the link and add it to your bookmarks. Now you can select the "
 "bookmarklet from any page in the site."
 msgstr ""
+"За да инсталирате букмарклети повлечете го линкот во траката со bookmarks, "
+"или кликенете со десното копче и додадете го во bookmarks. Така ќе можете да "
+"го одберете букмарклетот од било која страна на сајтот."
 
 msgid "Documentation for this page"
 msgstr "Документација за оваа страница"
@@ -117,7 +121,7 @@ msgid "Model: %(name)s"
 msgstr "Модел %(name)s"
 
 msgid "Fields"
-msgstr ""
+msgstr "Полиња"
 
 msgid "Field"
 msgstr "Поле"
@@ -129,16 +133,16 @@ msgid "Description"
 msgstr "Опис"
 
 msgid "Methods with arguments"
-msgstr ""
+msgstr "Методи со аргументи"
 
 msgid "Method"
-msgstr ""
+msgstr "Метод"
 
 msgid "Arguments"
-msgstr ""
+msgstr "Аргументи"
 
-msgid "Back to Model Documentation"
-msgstr "Назад во документација за модели"
+msgid "Back to Model documentation"
+msgstr "Назад до документација за модели."
 
 msgid "Model documentation"
 msgstr "Документација за модели"
@@ -157,6 +161,7 @@ msgstr "Шаблон: %(name)s"
 msgid "Template: \"%(name)s\""
 msgstr "Шаблон: \"%(name)s\""
 
+#. Translators: Search is not a verb here, it qualifies path (a search path)
 #, python-format
 msgid "Search path for template \"%(name)s\":"
 msgstr "Пребарај ја патеката за шаблонот \"%(name)s\":"
@@ -211,7 +216,7 @@ msgstr "Контекст:"
 msgid "Templates:"
 msgstr "Шаблони:"
 
-msgid "Back to Views Documentation"
+msgid "Back to View documentation"
 msgstr "Назад до документација за погледи"
 
 msgid "View documentation"
@@ -239,13 +244,6 @@ msgstr ""
 "\n"
 "    Погледска функција (вју функција): <code>%(full_name)s</code>. Име: "
 "<code>%(url_name)s</code>.\n"
-
-msgid "Boolean (Either True or False)"
-msgstr "Логичка (или точно или неточно)"
-
-#, python-format
-msgid "Field of type: %(field_type)s"
-msgstr "Поле од тип: %(field_type)s"
 
 msgid "tag:"
 msgstr "таг:"

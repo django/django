@@ -100,3 +100,22 @@ class RegroupTagTests(SimpleTestCase):
     def test_regroup08(self):
         with self.assertRaises(TemplateSyntaxError):
             self.engine.get_template('regroup08')
+
+    @setup({'regroup_unpack': '{% regroup data by bar as grouped %}'
+                              '{% for grouper, group in grouped %}'
+                              '{{ grouper }}:'
+                              '{% for item in group %}'
+                              '{{ item.foo }}'
+                              '{% endfor %},'
+                              '{% endfor %}'})
+    def test_regroup_unpack(self):
+        output = self.engine.render_to_string('regroup_unpack', {
+            'data': [
+                {'foo': 'c', 'bar': 1},
+                {'foo': 'd', 'bar': 1},
+                {'foo': 'a', 'bar': 2},
+                {'foo': 'b', 'bar': 2},
+                {'foo': 'x', 'bar': 3},
+            ],
+        })
+        self.assertEqual(output, '1:cd,2:ab,3:x,')

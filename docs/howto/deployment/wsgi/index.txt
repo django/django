@@ -5,7 +5,7 @@ How to deploy with WSGI
 Django's primary deployment platform is WSGI_, the Python standard for web
 servers and applications.
 
-.. _WSGI: http://www.wsgi.org
+.. _WSGI: https://wsgi.readthedocs.io/en/latest/
 
 Django's :djadmin:`startproject` management command sets up a simple default
 WSGI configuration for you, which you can tweak as needed for your project,
@@ -16,10 +16,10 @@ Django includes getting-started documentation for the following WSGI servers:
 .. toctree::
    :maxdepth: 1
 
-   modwsgi
-   apache-auth
    gunicorn
    uwsgi
+   modwsgi
+   apache-auth
 
 The ``application`` object
 ==========================
@@ -37,7 +37,7 @@ deployments.
 
 WSGI servers obtain the path to the ``application`` callable from their
 configuration. Django's built-in server, namely the :djadmin:`runserver`
-command, read it from the :setting:`WSGI_APPLICATION` setting. By default, it's
+command, reads it from the :setting:`WSGI_APPLICATION` setting. By default, it's
 set to ``<project_name>.wsgi.application``, which points to the ``application``
 callable in :file:`<project_name>/wsgi.py`.
 
@@ -81,10 +81,3 @@ application that later delegates to the Django WSGI application, if you want
 to combine a Django application with a WSGI application of another framework.
 
 .. _`WSGI middleware`: https://www.python.org/dev/peps/pep-3333/#middleware-components-that-play-both-sides
-
-.. note::
-
-    Some third-party WSGI middleware do not call ``close`` on the response
-    object after handling a request. In those cases the
-    :data:`~django.core.signals.request_finished` signal isn't sent. This can
-    result in idle connections to database and memcache servers.

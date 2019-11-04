@@ -3,16 +3,17 @@
 # Translators:
 # Flavio Curella <flavio.curella@gmail.com>, 2013
 # Jannis Leidel <jannis@leidel.info>, 2011
+# Luciano De Falco Alfano, 2016
 # Marco Bonetti, 2014
-# palmux <palmux@gmail.com>, 2015
+# palmux <palmux@gmail.com>, 2015-2016
 # Stefano Brentegani <sbrentegani@gmail.com>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-10 14:49+0200\n"
-"PO-Revision-Date: 2015-10-18 18:20+0000\n"
-"Last-Translator: palmux <palmux@gmail.com>\n"
+"POT-Creation-Date: 2017-01-19 16:49+0100\n"
+"PO-Revision-Date: 2017-09-23 18:54+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Italian (http://www.transifex.com/django/django/language/"
 "it/)\n"
 "MIME-Version: 1.0\n"
@@ -143,8 +144,8 @@ msgstr "Metodo"
 msgid "Arguments"
 msgstr "Argomenti"
 
-msgid "Back to Model Documentation"
-msgstr "Torna alla documentazione sul Modello"
+msgid "Back to Model documentation"
+msgstr "Torna alla documentzione del Model"
 
 msgid "Model documentation"
 msgstr "Documentazione Modello"
@@ -163,6 +164,7 @@ msgstr "Template: \"%(name)s\""
 msgid "Template: \"%(name)s\""
 msgstr "Template: \"%(name)s\""
 
+#. Translators: Search is not a verb here, it qualifies path (a search path)
 #, python-format
 msgid "Search path for template \"%(name)s\":"
 msgstr "Percorso di ricerca per il template \"%(name)s\":"
@@ -217,8 +219,8 @@ msgstr "Contesto:"
 msgid "Templates:"
 msgstr "Template:"
 
-msgid "Back to Views Documentation"
-msgstr "Torna alla documentazione sulle View"
+msgid "Back to View documentation"
+msgstr "Torna alla documentazione della View"
 
 msgid "View documentation"
 msgstr "Documentazione View"
@@ -245,13 +247,6 @@ msgstr ""
 "\n"
 "Funzione di View: <code>%(full_name)s</code>. Nome: <code>%(url_name)s</"
 "code>.\n"
-
-msgid "Boolean (Either True or False)"
-msgstr "Booleano (True o False)"
-
-#, python-format
-msgid "Field of type: %(field_type)s"
-msgstr "Campo di tipo: %(field_type)s"
 
 msgid "tag:"
 msgstr "tag:"

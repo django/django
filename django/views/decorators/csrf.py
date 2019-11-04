@@ -1,7 +1,7 @@
 from functools import wraps
 
 from django.middleware.csrf import CsrfViewMiddleware, get_token
-from django.utils.decorators import available_attrs, decorator_from_middleware
+from django.utils.decorators import decorator_from_middleware
 
 csrf_protect = decorator_from_middleware(CsrfViewMiddleware)
 csrf_protect.__name__ = "csrf_protect"
@@ -13,8 +13,7 @@ using the decorator multiple times, is harmless and efficient.
 
 
 class _EnsureCsrfToken(CsrfViewMiddleware):
-    # We need this to behave just like the CsrfViewMiddleware, but not reject
-    # requests or log warnings.
+    # Behave like CsrfViewMiddleware but don't reject requests or log warnings.
     def _reject(self, request, reason):
         return None
 
@@ -33,8 +32,8 @@ class _EnsureCsrfCookie(CsrfViewMiddleware):
         return None
 
     def process_view(self, request, callback, callback_args, callback_kwargs):
-        retval = super(_EnsureCsrfCookie, self).process_view(request, callback, callback_args, callback_kwargs)
-        # Forces process_response to send the cookie
+        retval = super().process_view(request, callback, callback_args, callback_kwargs)
+        # Force process_response to send the cookie
         get_token(request)
         return retval
 
@@ -48,13 +47,10 @@ uses the csrf_token template tag, or the CsrfViewMiddleware is used.
 
 
 def csrf_exempt(view_func):
-    """
-    Marks a view function as being exempt from the CSRF view protection.
-    """
-    # We could just do view_func.csrf_exempt = True, but decorators
-    # are nicer if they don't have side-effects, so we return a new
-    # function.
+    """Mark a view function as being exempt from the CSRF view protection."""
+    # view_func.csrf_exempt = True would also work, but decorators are nicer
+    # if they don't have side effects, so return a new function.
     def wrapped_view(*args, **kwargs):
         return view_func(*args, **kwargs)
     wrapped_view.csrf_exempt = True
-    return wraps(view_func, assigned=available_attrs(view_func))(wrapped_view)
+    return wraps(view_func)(wrapped_view)

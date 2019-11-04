@@ -1,7 +1,4 @@
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals
-
-import django.core.validators
+from django.contrib.auth import validators
 from django.db import migrations, models
 
 
@@ -20,12 +17,7 @@ class Migration(migrations.Migration):
                 help_text='Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only.',
                 max_length=150,
                 unique=True,
-                validators=[
-                    django.core.validators.RegexValidator(
-                        '^[\\w.@+-]+$', 'Enter a valid username. '
-                        'This value may contain only letters, numbers and @/./+/-/_ characters.'
-                    ),
-                ],
+                validators=[validators.UnicodeUsernameValidator()],
                 verbose_name='username',
             ),
         ),

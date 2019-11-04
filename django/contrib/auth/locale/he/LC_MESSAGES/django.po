@@ -1,22 +1,23 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Alex Gaynor <alex.gaynor@gmail.com>, 2011-2012
+# Alex Gaynor <inactive+Alex@transifex.com>, 2011-2012
 # Jannis Leidel <jannis@leidel.info>, 2011
-# Meir Kriheli <mkriheli@gmail.com>, 2012-2015
+# Meir Kriheli <mkriheli@gmail.com>, 2012-2015,2017
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-10 15:10+0200\n"
-"PO-Revision-Date: 2015-11-28 16:38+0000\n"
+"POT-Creation-Date: 2017-09-24 13:46+0200\n"
+"PO-Revision-Date: 2017-11-28 08:21+0000\n"
 "Last-Translator: Meir Kriheli <mkriheli@gmail.com>\n"
 "Language-Team: Hebrew (http://www.transifex.com/django/django/language/he/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: he\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Plural-Forms: nplurals=4; plural=(n == 1 && n % 1 == 0) ? 0 : (n == 2 && n % "
+"1 == 0) ? 1: (n % 10 == 0 && n % 1 == 0 && n > 10) ? 2 : 3;\n"
 
 msgid "Personal info"
 msgstr "מידע אישי"
@@ -67,11 +68,10 @@ msgstr "יש להזין את אותה סיסמה כמו קודם, לאימות."
 
 msgid ""
 "Raw passwords are not stored, so there is no way to see this user's "
-"password, but you can change the password using <a href=\"../password/"
-"\">this form</a>."
+"password, but you can change the password using <a href=\"{}\">this form</a>."
 msgstr ""
-"הסיסמאות אינן נשמרות באופן חשוף, כך שאין דרך לראות את סיסמת המשתמש, אך ניתן "
-"לשנות את הסיסמה בעזרת <a href=\"../password/\">טופס זה</a>."
+"הסיסמאות אינן נשמרות באופן חשוף, כך שאין דרך לראות את סיסמת המשתמש, ניתן "
+"לשנות את הסיסמה בעזרת <a href=\"{}\">טופס זה</a>."
 
 #, python-format
 msgid ""
@@ -113,6 +113,21 @@ msgstr "salt"
 
 msgid "hash"
 msgstr "גיבוב"
+
+msgid "variety"
+msgstr "מגוון"
+
+msgid "version"
+msgstr "גרסה"
+
+msgid "memory cost"
+msgstr "עלות זכרון"
+
+msgid "time cost"
+msgstr "עלות זמן"
+
+msgid "parallelism"
+msgstr "מקבילות"
 
 msgid "work factor"
 msgstr "work factor"
@@ -165,15 +180,8 @@ msgstr "הרשאות ספציפיות למשתמש זה."
 msgid "username"
 msgstr "שם משתמש"
 
-msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
-msgstr "שדה חובה. 30 תווים או פחות. אותיות, ספרות ו-@/./+/-/_ בלבד."
-
-msgid ""
-"Enter a valid username. This value may contain only letters, numbers and @/./"
-"+/-/_ characters."
-msgstr ""
-"יש להזין שם משתמש חוקי. ערך זה יכול להכיל אותיות, ספרות והתווים @/./+/-/_ "
-"בלבד."
+msgid "Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only."
+msgstr "שדה חובה. 150 תווים או פחות. אותיות, ספרות ו-@/./+/-/_ בלבד."
 
 msgid "A user with that username already exists."
 msgstr "משתמש עם שם משתמש זה קיים כבר"
@@ -221,12 +229,16 @@ msgid_plural ""
 "characters."
 msgstr[0] "סיסמה זו קצרה מדי. היא חייבת להכיל לפחות תו %(min_length)d ."
 msgstr[1] "סיסמה זו קצרה מדי. היא חייבת להכיל לפחות %(min_length)d תווים."
+msgstr[2] "סיסמה זו קצרה מדי. היא חייבת להכיל לפחות %(min_length)d תווים."
+msgstr[3] "סיסמה זו קצרה מדי. היא חייבת להכיל לפחות %(min_length)d תווים."
 
 #, python-format
 msgid "Your password must contain at least %(min_length)d character."
 msgid_plural "Your password must contain at least %(min_length)d characters."
 msgstr[0] "הסיסמה שלך חייבת להכיל לפחות תו %(min_length)d."
 msgstr[1] "הסיסמה שלך חייבת להכיל לפחות %(min_length)d תווים."
+msgstr[2] "הסיסמה שלך חייבת להכיל לפחות %(min_length)d תווים."
+msgstr[3] "הסיסמה שלך חייבת להכיל לפחות %(min_length)d תווים."
 
 #, python-format
 msgid "The password is too similar to the %(verbose_name)s."
@@ -250,6 +262,20 @@ msgstr "הסיסמה שלך לא יכולה להכיל רק ספרות."
 #, python-format
 msgid "Password reset on %(site_name)s"
 msgstr "החלפת הסיסמה ב-%(site_name)s"
+
+msgid ""
+"Enter a valid username. This value may contain only English letters, "
+"numbers, and @/./+/-/_ characters."
+msgstr ""
+"יש להזין שם משתמש חוקי. ערך זה יכול להכיל אותיות אנגליות, ספרות והתווים @/./"
+"+/-/_ בלבד."
+
+msgid ""
+"Enter a valid username. This value may contain only letters, numbers, and "
+"@/./+/-/_ characters."
+msgstr ""
+"יש להזין שם משתמש חוקי. ערך זה יכול להכיל אותיות, ספרות והתווים @/./+/-/_ "
+"בלבד."
 
 msgid "Logged out"
 msgstr "יצאת מהמערכת"

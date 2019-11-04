@@ -1,14 +1,14 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# GunChleoc, 2015
+# GunChleoc, 2015-2016
 # GunChleoc, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2015-11-26 20:06+0000\n"
+"POT-Creation-Date: 2018-05-17 11:50+0200\n"
+"PO-Revision-Date: 2017-09-22 17:29+0000\n"
 "Last-Translator: GunChleoc\n"
 "Language-Team: Gaelic, Scottish (http://www.transifex.com/django/django/"
 "language/gd/)\n"
@@ -106,6 +106,21 @@ msgstr ""
 "’S dòcha gu bheil thu airson am putan “Siuthad” a chleachdadh seach am putan "
 "“Sàbhail”."
 
+msgid "Now"
+msgstr "An-dràsta"
+
+msgid "Midnight"
+msgstr "Meadhan-oidhche"
+
+msgid "6 a.m."
+msgstr "6m"
+
+msgid "Noon"
+msgstr "Meadhan-latha"
+
+msgid "6 p.m."
+msgstr "6f"
+
 #, javascript-format
 msgid "Note: You are %s hour ahead of server time."
 msgid_plural "Note: You are %s hours ahead of server time."
@@ -130,26 +145,11 @@ msgstr[2] ""
 msgstr[3] ""
 "An aire: Tha thu %s uair a thìde air dheireadh àm an fhrithealaiche."
 
-msgid "Now"
-msgstr "An-dràsta"
-
 msgid "Choose a Time"
 msgstr "Tagh àm"
 
 msgid "Choose a time"
 msgstr "Tagh àm"
-
-msgid "Midnight"
-msgstr "Meadhan-oidhche"
-
-msgid "6 a.m."
-msgstr "6m"
-
-msgid "Noon"
-msgstr "Meadhan-latha"
-
-msgid "6 p.m."
-msgstr "6f"
 
 msgid "Cancel"
 msgstr "Sguir dheth"
@@ -166,15 +166,69 @@ msgstr "An-dè"
 msgid "Tomorrow"
 msgstr "A-màireach"
 
-msgid ""
-"January February March April May June July August September October November "
-"December"
-msgstr ""
-"Faoilleach Gearran Màirt Giblean Cèitean Ògmhios Iuchar Lùnastal Sultain "
-"Dàmhair Samhain Dùbhlachd"
+msgid "January"
+msgstr "Am Faoilleach"
 
-msgid "S M T W T F S"
-msgstr "D L M C D A S"
+msgid "February"
+msgstr "An Gearran"
+
+msgid "March"
+msgstr "Am Màrt"
+
+msgid "April"
+msgstr "An Giblean"
+
+msgid "May"
+msgstr "An Cèitean"
+
+msgid "June"
+msgstr "An t-Ògmhios"
+
+msgid "July"
+msgstr "An t-Iuchar"
+
+msgid "August"
+msgstr "An Lùnastal"
+
+msgid "September"
+msgstr "An t-Sultain"
+
+msgid "October"
+msgstr "An Dàmhair"
+
+msgid "November"
+msgstr "An t-Samhain"
+
+msgid "December"
+msgstr "An Dùbhlachd"
+
+msgctxt "one letter Sunday"
+msgid "S"
+msgstr "Dò"
+
+msgctxt "one letter Monday"
+msgid "M"
+msgstr "Lu"
+
+msgctxt "one letter Tuesday"
+msgid "T"
+msgstr "Mà"
+
+msgctxt "one letter Wednesday"
+msgid "W"
+msgstr "Ci"
+
+msgctxt "one letter Thursday"
+msgid "T"
+msgstr "Da"
+
+msgctxt "one letter Friday"
+msgid "F"
+msgstr "hA"
+
+msgctxt "one letter Saturday"
+msgid "S"
+msgstr "Sa"
 
 msgid "Show"
 msgstr "Seall"

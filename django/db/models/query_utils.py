@@ -5,30 +5,32 @@ Factored out from django.db.models.query to avoid making the main module very
 large and/or so that they can be used by other modules without getting into
 circular import difficulties.
 """
-from __future__ import unicode_literals
-
+import copy
+import functools
 import inspect
 from collections import namedtuple
 
-from django.core.exceptions import FieldDoesNotExist
-from django.db.backends import utils
 from django.db.models.constants import LOOKUP_SEP
 from django.utils import tree
 
 # PathInfo is used when converting lookups (fk__somecol). The contents
 # describe the relation in Model terms (model Options and Fields for both
 # sides of the relation. The join_field is the field backing the relation.
-PathInfo = namedtuple('PathInfo', 'from_opts to_opts target_fields join_field m2m direct')
+PathInfo = namedtuple('PathInfo', 'from_opts to_opts target_fields join_field m2m direct filtered_relation')
 
 
 class InvalidQuery(Exception):
-    """
-    The query passed to raw isn't a safe query to use with raw.
-    """
+    """The query passed to raw() isn't a safe query to use with raw()."""
     pass
 
 
-class QueryWrapper(object):
+def subclasses(cls):
+    yield cls
+    for subclass in cls.__subclasses__():
+        yield from subclasses(subclass)
+
+
+class QueryWrapper:
     """
     A type that indicates the contents are an SQL fragment and the associate
     parameters. Can be used to pass opaque data to a where-clause, for example.
@@ -44,20 +46,29 @@ class QueryWrapper(object):
 
 class Q(tree.Node):
     """
-    Encapsulates filters as objects that can then be combined logically (using
-    & and |).
+    Encapsulate filters as objects that can then be combined logically (using
+    `&` and `|`).
     """
     # Connection types
     AND = 'AND'
     OR = 'OR'
     default = AND
+    conditional = True
 
-    def __init__(self, *args, **kwargs):
-        super(Q, self).__init__(children=list(args) + list(kwargs.items()))
+    def __init__(self, *args, _connector=None, _negated=False, **kwargs):
+        super().__init__(children=[*args, *sorted(kwargs.items())], connector=_connector, negated=_negated)
 
     def _combine(self, other, conn):
         if not isinstance(other, Q):
             raise TypeError(other)
+
+        # If the other Q() is empty, ignore it and just use `self`.
+        if not other:
+            return copy.deepcopy(self)
+        # Or if this Q is empty, ignore it and just use `other`.
+        elif not self:
+            return copy.deepcopy(other)
+
         obj = type(self)()
         obj.connector = conn
         obj.add(self, conn)
@@ -76,16 +87,6 @@ class Q(tree.Node):
         obj.negate()
         return obj
 
-    def clone(self):
-        clone = self.__class__._new_instance(
-            children=[], connector=self.connector, negated=self.negated)
-        for child in self.children:
-            if hasattr(child, 'clone'):
-                clone.children.append(child.clone())
-            else:
-                clone.children.append(child)
-        return clone
-
     def resolve_expression(self, query=None, allow_joins=True, reuse=None, summarize=False, for_save=False):
         # We must promote any new joins to left outer joins so that when Q is
         # used as an expression, rows aren't filtered due to joins.
@@ -93,67 +94,48 @@ class Q(tree.Node):
         query.promote_joins(joins)
         return clause
 
-    @classmethod
-    def _refs_aggregate(cls, obj, existing_aggregates):
-        if not isinstance(obj, tree.Node):
-            aggregate, aggregate_lookups = refs_aggregate(obj[0].split(LOOKUP_SEP), existing_aggregates)
-            if not aggregate and hasattr(obj[1], 'refs_aggregate'):
-                return obj[1].refs_aggregate(existing_aggregates)
-            return aggregate, aggregate_lookups
-        for c in obj.children:
-            aggregate, aggregate_lookups = cls._refs_aggregate(c, existing_aggregates)
-            if aggregate:
-                return aggregate, aggregate_lookups
-        return False, ()
-
-    def refs_aggregate(self, existing_aggregates):
-        if not existing_aggregates:
-            return False
-
-        return self._refs_aggregate(self, existing_aggregates)
+    def deconstruct(self):
+        path = '%s.%s' % (self.__class__.__module__, self.__class__.__name__)
+        if path.startswith('django.db.models.query_utils'):
+            path = path.replace('django.db.models.query_utils', 'django.db.models')
+        args, kwargs = (), {}
+        if len(self.children) == 1 and not isinstance(self.children[0], Q):
+            child = self.children[0]
+            kwargs = {child[0]: child[1]}
+        else:
+            args = tuple(self.children)
+            if self.connector != self.default:
+                kwargs = {'_connector': self.connector}
+        if self.negated:
+            kwargs['_negated'] = True
+        return path, args, kwargs
 
 
-class DeferredAttribute(object):
+class DeferredAttribute:
     """
     A wrapper for a deferred-loading field. When the value is read from this
     object the first time, the query is executed.
     """
-    def __init__(self, field_name, model):
+    def __init__(self, field_name):
         self.field_name = field_name
 
     def __get__(self, instance, cls=None):
         """
-        Retrieves and caches the value from the datastore on the first lookup.
-        Returns the cached value.
+        Retrieve and caches the value from the datastore on the first lookup.
+        Return the cached value.
         """
-        non_deferred_model = instance._meta.proxy_for_model
-        opts = non_deferred_model._meta
-
-        assert instance is not None
+        if instance is None:
+            return self
         data = instance.__dict__
         if data.get(self.field_name, self) is self:
-            # self.field_name is the attname of the field, but only() takes the
-            # actual name, so we need to translate it here.
-            try:
-                f = opts.get_field(self.field_name)
-            except FieldDoesNotExist:
-                f = [f for f in opts.fields if f.attname == self.field_name][0]
-            name = f.name
             # Let's see if the field is part of the parent chain. If so we
             # might be able to reuse the already loaded value. Refs #18343.
-            val = self._check_parent_chain(instance, name)
+            val = self._check_parent_chain(instance, self.field_name)
             if val is None:
                 instance.refresh_from_db(fields=[self.field_name])
                 val = getattr(instance, self.field_name)
             data[self.field_name] = val
         return data[self.field_name]
-
-    def __set__(self, instance, value):
-        """
-        Deferred loading attributes can be set normally (which means there will
-        never be a database lookup involved.
-        """
-        instance.__dict__[self.field_name] = value
 
     def _check_parent_chain(self, instance, name):
         """
@@ -169,21 +151,17 @@ class DeferredAttribute(object):
         return None
 
 
-class RegisterLookupMixin(object):
-    def _get_lookup(self, lookup_name):
-        try:
-            return self.class_lookups[lookup_name]
-        except KeyError:
-            # To allow for inheritance, check parent class' class_lookups.
-            for parent in inspect.getmro(self.__class__):
-                if 'class_lookups' not in parent.__dict__:
-                    continue
-                if lookup_name in parent.class_lookups:
-                    return parent.class_lookups[lookup_name]
-        except AttributeError:
-            # This class didn't have any class_lookups
-            pass
-        return None
+class RegisterLookupMixin:
+
+    @classmethod
+    def _get_lookup(cls, lookup_name):
+        return cls.get_lookups().get(lookup_name, None)
+
+    @classmethod
+    @functools.lru_cache(maxsize=None)
+    def get_lookups(cls):
+        class_lookups = [parent.__dict__.get('class_lookups', {}) for parent in inspect.getmro(cls)]
+        return cls.merge_dicts(class_lookups)
 
     def get_lookup(self, lookup_name):
         from django.db.models.lookups import Lookup
@@ -203,6 +181,22 @@ class RegisterLookupMixin(object):
             return None
         return found
 
+    @staticmethod
+    def merge_dicts(dicts):
+        """
+        Merge dicts in reverse to preference the order of the original list. e.g.,
+        merge_dicts([a, b]) will preference the keys in 'a' over those in 'b'.
+        """
+        merged = {}
+        for d in reversed(dicts):
+            merged.update(d)
+        return merged
+
+    @classmethod
+    def _clear_cached_lookups(cls):
+        for subclass in subclasses(cls):
+            subclass.get_lookups.cache_clear()
+
     @classmethod
     def register_lookup(cls, lookup, lookup_name=None):
         if lookup_name is None:
@@ -210,6 +204,7 @@ class RegisterLookupMixin(object):
         if 'class_lookups' not in cls.__dict__:
             cls.class_lookups = {}
         cls.class_lookups[lookup_name] = lookup
+        cls._clear_cached_lookups()
         return lookup
 
     @classmethod
@@ -225,7 +220,7 @@ class RegisterLookupMixin(object):
 
 def select_related_descend(field, restricted, requested, load_fields, reverse=False):
     """
-    Returns True if this field should be used to descend deeper for
+    Return True if this field should be used to descend deeper for
     select_related() purposes. Used by both the query construction code
     (sql.query.fill_related_selections()) and the model instance creation code
     (query.get_klass_info()).
@@ -256,74 +251,16 @@ def select_related_descend(field, restricted, requested, load_fields, reverse=Fa
                                    " and traversed using select_related"
                                    " at the same time." %
                                    (field.model._meta.object_name, field.name))
-            return False
     return True
-
-
-# This function is needed because data descriptors must be defined on a class
-# object, not an instance, to have any effect.
-
-def deferred_class_factory(model, attrs):
-    """
-    Returns a class object that is a copy of "model" with the specified "attrs"
-    being replaced with DeferredAttribute objects. The "pk_value" ties the
-    deferred attributes to a particular instance of the model.
-    """
-    if not attrs:
-        return model
-    opts = model._meta
-    # Never create deferred models based on deferred model
-    if model._deferred:
-        # Deferred models are proxies for the non-deferred model. We never
-        # create chains of defers => proxy_for_model is the non-deferred
-        # model.
-        model = opts.proxy_for_model
-    # The app registry wants a unique name for each model, otherwise the new
-    # class won't be created (we get an exception). Therefore, we generate
-    # the name using the passed in attrs. It's OK to reuse an existing class
-    # object if the attrs are identical.
-    name = "%s_Deferred_%s" % (model.__name__, '_'.join(sorted(attrs)))
-    name = utils.truncate_name(name, 80, 32)
-
-    try:
-        return opts.apps.get_model(model._meta.app_label, name)
-
-    except LookupError:
-
-        class Meta:
-            proxy = True
-            apps = opts.apps
-            app_label = opts.app_label
-
-        overrides = {attr: DeferredAttribute(attr, model) for attr in attrs}
-        overrides["Meta"] = Meta
-        overrides["__module__"] = model.__module__
-        overrides["_deferred"] = True
-        return type(str(name), (model,), overrides)
-
-
-def refs_aggregate(lookup_parts, aggregates):
-    """
-    A helper method to check if the lookup_parts contains references
-    to the given aggregates set. Because the LOOKUP_SEP is contained in the
-    default annotation names we must check each prefix of the lookup_parts
-    for a match.
-    """
-    for n in range(len(lookup_parts) + 1):
-        level_n_lookup = LOOKUP_SEP.join(lookup_parts[0:n])
-        if level_n_lookup in aggregates and aggregates[level_n_lookup].contains_aggregate:
-            return aggregates[level_n_lookup], lookup_parts[n:]
-    return False, ()
 
 
 def refs_expression(lookup_parts, annotations):
     """
-    A helper method to check if the lookup_parts contains references
-    to the given annotations set. Because the LOOKUP_SEP is contained in the
-    default annotation names we must check each prefix of the lookup_parts
-    for a match.
+    Check if the lookup_parts contains references to the given annotations set.
+    Because the LOOKUP_SEP is contained in the default annotation names, check
+    each prefix of the lookup_parts for a match.
     """
-    for n in range(len(lookup_parts) + 1):
+    for n in range(1, len(lookup_parts) + 1):
         level_n_lookup = LOOKUP_SEP.join(lookup_parts[0:n])
         if level_n_lookup in annotations and annotations[level_n_lookup]:
             return annotations[level_n_lookup], lookup_parts[n:]
@@ -356,3 +293,44 @@ def check_rel_lookup_compatibility(model, target_opts, field):
         check(target_opts) or
         (getattr(field, 'primary_key', False) and check(field.model._meta))
     )
+
+
+class FilteredRelation:
+    """Specify custom filtering in the ON clause of SQL joins."""
+
+    def __init__(self, relation_name, *, condition=Q()):
+        if not relation_name:
+            raise ValueError('relation_name cannot be empty.')
+        self.relation_name = relation_name
+        self.alias = None
+        if not isinstance(condition, Q):
+            raise ValueError('condition argument must be a Q() instance.')
+        self.condition = condition
+        self.path = []
+
+    def __eq__(self, other):
+        return (
+            isinstance(other, self.__class__) and
+            self.relation_name == other.relation_name and
+            self.alias == other.alias and
+            self.condition == other.condition
+        )
+
+    def clone(self):
+        clone = FilteredRelation(self.relation_name, condition=self.condition)
+        clone.alias = self.alias
+        clone.path = self.path[:]
+        return clone
+
+    def resolve_expression(self, *args, **kwargs):
+        """
+        QuerySet.annotate() only accepts expression-like arguments
+        (with a resolve_expression() method).
+        """
+        raise NotImplementedError('FilteredRelation.resolve_expression() is unused.')
+
+    def as_sql(self, compiler, connection):
+        # Resolve the condition in Join.filtered_relation.
+        query = compiler.query
+        where = query.build_filtered_relation_q(self.condition, reuse=set(self.path))
+        return compiler.compile(where)

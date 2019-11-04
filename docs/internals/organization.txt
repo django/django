@@ -74,9 +74,8 @@ need them through the same process.
 Membership
 ----------
 
-The core team finds its origins with the :ref:`four people
-<original-team-list>` who created Django. It has grown to :ref:`a few dozen
-people <core-team-list>` by co-opting volunteers who demonstrate:
+`Django team members <https://www.djangoproject.com/foundation/teams/>`_
+demonstrate:
 
 - a good grasp of the philosophy of the Django Project
 - a solid track record of being constructive and helpful
@@ -145,7 +144,7 @@ The technical board holds two prerogatives:
 - Making major technical decisions when no consensus is found otherwise. This
   happens on the |django-developers| mailing-list.
 - Veto a grant of commit access or remove commit access. This happens on the
-  django-core mailing-list.
+  ``django-core`` mailing-list.
 
 In both cases, the technical board is a last resort. In these matters, it
 fulfills a similar function to the former Benevolent Dictators For Life.
@@ -162,26 +161,27 @@ capacity on non-technical decisions.
 Membership
 ----------
 
-The technical board is an elected group of five committers. They're expected
-to be experienced but there's no formal seniority requirement. Its current
-composition is published :ref:`here <technical-board-list>`.
+`The technical board`_ is an elected group of five committers. They're expected
+to be experienced but there's no formal seniority requirement.
 
 A new board is elected after each feature release of Django. The election
 process is managed by a returns officer nominated by the outgoing technical
 board. The election process works as follows:
 
-1. Candidates advertise their application for the technical board to the team.
+#. Candidates advertise their application for the technical board to the team.
 
    They must be committers already. There's no term limit for technical board
    members.
 
-2. Each team member can vote for zero to five people among the candidates.
+#. Each team member can vote for zero to five people among the candidates.
    Candidates are ranked by the total number of votes they received.
 
    In case of a tie, the person who joined the core team earlier wins.
 
 Both the application and the voting period last between one and two weeks, at
 the outgoing board's discretion.
+
+.. _the technical board: https://www.djangoproject.com/foundation/teams/#technical-board-team
 
 Changing the organization
 =========================

@@ -1,12 +1,10 @@
-from __future__ import unicode_literals
-
 import datetime
 
 from django.db import connection, models, transaction
 from django.test import TestCase, TransactionTestCase, skipUnlessDBFeature
 
 from .models import (
-    Award, AwardNote, Book, Child, Eaten, Email, File, Food, FooFile,
+    Award, AwardNote, Book, Child, Contact, Eaten, Email, File, Food, FooFile,
     FooFileProxy, FooImage, FooPhoto, House, Image, Item, Location, Login,
     OrderedPerson, OrgUnit, Person, Photo, PlayedWith, PlayedWithNote, Policy,
     Researcher, Toy, Version,
@@ -63,8 +61,7 @@ class DeleteCascadeTests(TestCase):
         """
         person = Person.objects.create(name='Nelson Mandela')
         award = Award.objects.create(name='Nobel', content_object=person)
-        AwardNote.objects.create(note='a peace prize',
-                                 award=award)
+        AwardNote.objects.create(note='a peace prize', award=award)
         self.assertEqual(AwardNote.objects.count(), 1)
         person.delete()
         self.assertEqual(Award.objects.count(), 0)
@@ -80,10 +77,8 @@ class DeleteCascadeTests(TestCase):
         """
         juan = Child.objects.create(name='Juan')
         paints = Toy.objects.create(name='Paints')
-        played = PlayedWith.objects.create(child=juan, toy=paints,
-                                           date=datetime.date.today())
-        PlayedWithNote.objects.create(played=played,
-                                      note='the next Jackson Pollock')
+        played = PlayedWith.objects.create(child=juan, toy=paints, date=datetime.date.today())
+        PlayedWithNote.objects.create(played=played, note='the next Jackson Pollock')
         self.assertEqual(PlayedWithNote.objects.count(), 1)
         paints.delete()
         self.assertEqual(PlayedWith.objects.count(), 0)
@@ -246,9 +241,10 @@ class ProxyDeleteTest(TestCase):
         self.assertEqual(len(FooFileProxy.objects.all()), 0)
 
     def test_19187_values(self):
-        with self.assertRaises(TypeError):
+        msg = 'Cannot call delete() after .values() or .values_list()'
+        with self.assertRaisesMessage(TypeError, msg):
             Image.objects.values().delete()
-        with self.assertRaises(TypeError):
+        with self.assertRaisesMessage(TypeError, msg):
             Image.objects.values_list().delete()
 
 
@@ -262,11 +258,12 @@ class Ticket19102Tests(TestCase):
     Note that .values() is not tested here on purpose. .values().delete()
     doesn't work for non fast-path deletes at all.
     """
-    def setUp(self):
-        self.o1 = OrgUnit.objects.create(name='o1')
-        self.o2 = OrgUnit.objects.create(name='o2')
-        self.l1 = Login.objects.create(description='l1', orgunit=self.o1)
-        self.l2 = Login.objects.create(description='l2', orgunit=self.o2)
+    @classmethod
+    def setUpTestData(cls):
+        cls.o1 = OrgUnit.objects.create(name='o1')
+        cls.o2 = OrgUnit.objects.create(name='o2')
+        cls.l1 = Login.objects.create(description='l1', orgunit=cls.o1)
+        cls.l2 = Login.objects.create(description='l2', orgunit=cls.o2)
 
     @skipUnlessDBFeature("update_can_self_select")
     def test_ticket_19102_annotate(self):
@@ -335,7 +332,7 @@ class Ticket19102Tests(TestCase):
         self.assertTrue(Login.objects.filter(pk=self.l2.pk).exists())
 
 
-class OrderedDeleteTests(TestCase):
+class DeleteTests(TestCase):
     def test_meta_ordered_delete(self):
         # When a subquery is performed by deletion code, the subquery must be
         # cleared of all ordering. There was a but that caused _meta ordering
@@ -345,3 +342,27 @@ class OrderedDeleteTests(TestCase):
         OrderedPerson.objects.create(name='Bob', lives_in=h)
         OrderedPerson.objects.filter(lives_in__address='Foo').delete()
         self.assertEqual(OrderedPerson.objects.count(), 0)
+
+    def test_foreign_key_delete_nullifies_correct_columns(self):
+        """
+        With a model (Researcher) that has two foreign keys pointing to the
+        same model (Contact), deleting an instance of the target model
+        (contact1) nullifies the correct fields of Researcher.
+        """
+        contact1 = Contact.objects.create(label='Contact 1')
+        contact2 = Contact.objects.create(label='Contact 2')
+        researcher1 = Researcher.objects.create(
+            primary_contact=contact1,
+            secondary_contact=contact2,
+        )
+        researcher2 = Researcher.objects.create(
+            primary_contact=contact2,
+            secondary_contact=contact1,
+        )
+        contact1.delete()
+        researcher1.refresh_from_db()
+        researcher2.refresh_from_db()
+        self.assertIsNone(researcher1.primary_contact)
+        self.assertEqual(researcher1.secondary_contact, contact2)
+        self.assertEqual(researcher2.primary_contact, contact2)
+        self.assertIsNone(researcher2.secondary_contact)

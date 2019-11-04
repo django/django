@@ -1,7 +1,5 @@
-# -*- coding: utf-8 -*-
 """Tests for jslex."""
 # originally from https://bitbucket.org/ned/jslex
-from __future__ import unicode_literals
 
 from django.test import SimpleTestCase
 from django.utils.jslex import JsLexer, prepare_js_for_gettext
@@ -43,7 +41,7 @@ class JsTokensTest(SimpleTestCase):
         (r"a=/a*\[^/,1", ["id a", "punct =", r"regex /a*\[^/", "punct ,", "dnum 1"]),
         (r"a=/\//,1", ["id a", "punct =", r"regex /\//", "punct ,", "dnum 1"]),
 
-        # next two are from http://www.mozilla.org/js/language/js20-2002-04/rationale/syntax.html#regular-expressions
+        # next two are from https://www-archive.mozilla.org/js/language/js20-2002-04/rationale/syntax.html#regular-expressions  # NOQA
         ("""for (var x = a in foo && "</x>" || mot ? z:/x:3;x<5;y</g/i) {xyz(x++);}""",
             ["keyword for", "punct (", "keyword var", "id x", "punct =", "id a", "keyword in",
             "id foo", "punct &&", 'string "</x>"', "punct ||", "id mot", "punct ?", "id z",
@@ -59,7 +57,7 @@ class JsTokensTest(SimpleTestCase):
         # Various "illegal" regexes that are valid according to the std.
         (r"""/????/, /++++/, /[----]/ """, ["regex /????/", "punct ,", "regex /++++/", "punct ,", "regex /[----]/"]),
 
-        # Stress cases from http://stackoverflow.com/questions/5533925/what-javascript-constructs-does-jslex-incorrectly-lex/5573409#5573409  # NOQA
+        # Stress cases from https://stackoverflow.com/questions/5533925/what-javascript-constructs-does-jslex-incorrectly-lex/5573409#5573409  # NOQA
         (r"""/\[/""", [r"""regex /\[/"""]),
         (r"""/[i]/""", [r"""regex /[i]/"""]),
         (r"""/[\]]/""", [r"""regex /[\]]/"""]),
@@ -67,7 +65,7 @@ class JsTokensTest(SimpleTestCase):
         (r"""/a[\]]b/""", [r"""regex /a[\]]b/"""]),
         (r"""/[\]/]/gi""", [r"""regex /[\]/]/gi"""]),
         (r"""/\[[^\]]+\]/gi""", [r"""regex /\[[^\]]+\]/gi"""]),
-        ("""
+        (r"""
             rexl.re = {
             NAME: /^(?![0-9])(?:\w)+|^"(?:[^"]|"")+"/,
             UNQUOTED_LITERAL: /^@(?:(?![0-9])(?:\w|\:)+|^"(?:[^"]|"")+")\[[^\]]+\]/,
@@ -86,7 +84,7 @@ class JsTokensTest(SimpleTestCase):
          "punct }", "punct ;"
          ]),
 
-        ("""
+        (r"""
             rexl.re = {
             NAME: /^(?![0-9])(?:\w)+|^"(?:[^"]|"")+"/,
             UNQUOTED_LITERAL: /^@(?:(?![0-9])(?:\w|\:)+|^"(?:[^"]|"")+")\[[^\]]+\]/,
@@ -120,8 +118,9 @@ def make_function(input, toks):
     def test_func(self):
         lexer = JsLexer()
         result = ["%s %s" % (name, tok) for name, tok in lexer.lex(input) if name != 'ws']
-        self.assertListEqual(result, toks)
+        self.assertEqual(result, toks)
     return test_func
+
 
 for i, (input, toks) in enumerate(JsTokensTest.LEX_CASES):
     setattr(JsTokensTest, "test_case_%d" % i, make_function(input, toks))
@@ -221,8 +220,9 @@ class JsToCForGettextTest(SimpleTestCase):
 
 def make_function(js, c):
     def test_func(self):
-        self.assertMultiLineEqual(prepare_js_for_gettext(js), c)
+        self.assertEqual(prepare_js_for_gettext(js), c)
     return test_func
+
 
 for i, pair in enumerate(GETTEXT_CASES):
     setattr(JsToCForGettextTest, "test_case_%d" % i, make_function(*pair))

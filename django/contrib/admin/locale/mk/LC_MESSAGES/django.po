@@ -3,15 +3,16 @@
 # Translators:
 # dekomote <dr.mote@gmail.com>, 2015
 # Jannis Leidel <jannis@leidel.info>, 2011
+# Vasil Vangelovski <vvangelovski@gmail.com>, 2016-2017
 # Vasil Vangelovski <vvangelovski@gmail.com>, 2013-2015
 # Vasil Vangelovski <vvangelovski@gmail.com>, 2011-2013
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-11-15 11:06+0100\n"
-"PO-Revision-Date: 2015-11-16 08:16+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2017-01-19 16:49+0100\n"
+"PO-Revision-Date: 2017-09-23 18:54+0000\n"
+"Last-Translator: Vasil Vangelovski <vvangelovski@gmail.com>\n"
 "Language-Team: Macedonian (http://www.transifex.com/django/django/language/"
 "mk/)\n"
 "MIME-Version: 1.0\n"
@@ -65,6 +66,12 @@ msgstr "Овој месец"
 msgid "This year"
 msgstr "Оваа година"
 
+msgid "No date"
+msgstr "Без датум"
+
+msgid "Has date"
+msgstr "Има датум"
+
 #, python-format
 msgid ""
 "Please enter the correct %(username)s and password for a staff account. Note "
@@ -76,18 +83,27 @@ msgstr ""
 msgid "Action:"
 msgstr "Акција:"
 
+#, python-format
+msgid "Add another %(verbose_name)s"
+msgstr "Додадете уште %(verbose_name)s"
+
+msgid "Remove"
+msgstr "Отстрани"
+
 msgid "action time"
 msgstr "време на акција"
 
 msgid "user"
-msgstr ""
+msgstr "корисник"
 
 msgid "content type"
-msgstr ""
+msgstr "тип содржина"
 
 msgid "object id"
 msgstr "идентификационен број на објект"
 
+#. Translators: 'repr' means representation
+#. (https://docs.python.org/3/library/functions.html#repr)
 msgid "object repr"
 msgstr "репрезентација на објект"
 
@@ -118,6 +134,31 @@ msgstr "Избришано \"%(object)s.\""
 msgid "LogEntry Object"
 msgstr "Запис во дневник"
 
+#, python-brace-format
+msgid "Added {name} \"{object}\"."
+msgstr "Додадено  {name} \"{object}\"."
+
+msgid "Added."
+msgstr "Додадено."
+
+msgid "and"
+msgstr "и"
+
+#, python-brace-format
+msgid "Changed {fields} for {name} \"{object}\"."
+msgstr "Изменето {fields} за {name} \"{object}\"."
+
+#, python-brace-format
+msgid "Changed {fields}."
+msgstr "Изменето {fields}."
+
+#, python-brace-format
+msgid "Deleted {name} \"{object}\"."
+msgstr "Избришано   {name} \"{object}\"."
+
+msgid "No fields changed."
+msgstr "Не е изменето ниедно поле."
+
 msgid "None"
 msgstr "Ништо"
 
@@ -127,69 +168,43 @@ msgstr ""
 "Држете го копчето \"Control\", или \"Command\" на Mac, за да изберете повеќе "
 "од едно."
 
-msgid "Added."
-msgstr ""
-
-#, python-format
-msgid "Changed %s."
-msgstr "Изменета %s."
-
-msgid "and"
-msgstr "и"
-
-#, python-format
-msgid "Added %(name)s \"%(object)s\"."
-msgstr "Додадено %(name)s „%(object)s“."
-
-#, python-format
-msgid "Changed %(list)s for %(name)s \"%(object)s\"."
-msgstr "Изменето %(list)s за %(name)s „%(object)s“."
-
-#, python-format
-msgid "Deleted %(name)s \"%(object)s\"."
-msgstr "Избришано  %(name)s „%(object)s“."
-
-msgid "No fields changed."
-msgstr "Не е изменето ниедно поле."
-
-#, python-format
+#, python-brace-format
 msgid ""
-"The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
+"The {name} \"{obj}\" was added successfully. You may edit it again below."
 msgstr ""
-"Ставката %(name)s \"%(obj)s\" беше успешно додадена. Подолу можете повторно "
-"да ја уредите."
+"Ставката  {name} \"{obj}\" беше успешно додадена. Подолу можете повторно да "
+"ја уредите."
 
-#, python-format
+#, python-brace-format
 msgid ""
-"The %(name)s \"%(obj)s\" was added successfully. You may add another "
-"%(name)s below."
-msgstr ""
-"Ставката %(name)s \"%(obj)s\" беше успешно додадена. Можете да додадете нов "
-"%(name)s подолу."
-
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was added successfully."
-msgstr "Ставката %(name)s \"%(obj)s\" беше успешно додадена."
-
-#, python-format
-msgid ""
-"The %(name)s \"%(obj)s\" was changed successfully. You may edit it again "
+"The {name} \"{obj}\" was added successfully. You may add another {name} "
 "below."
 msgstr ""
-"Ставката %(name)s \"%(obj)s\" беше успешно уредена. Подолу можете повторно "
-"да ја уредите."
+"Ставката {name} \"{obj}\" беше успешно додадена. Можете да додадете нов "
+"{name} подолу."
 
-#, python-format
+#, python-brace-format
+msgid "The {name} \"{obj}\" was added successfully."
+msgstr "Ставката {name} \"{obj}\" беше успешно додадена."
+
+#, python-brace-format
 msgid ""
-"The %(name)s \"%(obj)s\" was changed successfully. You may add another "
-"%(name)s below."
+"The {name} \"{obj}\" was changed successfully. You may edit it again below."
 msgstr ""
-"Ставката %(name)s \"%(obj)s\" беше успешно уредена. Подолу можете да "
-"додадете нов %(name)s."
+"Ставката {name} \"{obj}\" беше успешно уредена. Подолу можете повторно да ја "
+"уредите."
 
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was changed successfully."
-msgstr "%(name)s \"%(obj)s\" беше успешно изменета."
+#, python-brace-format
+msgid ""
+"The {name} \"{obj}\" was changed successfully. You may add another {name} "
+"below."
+msgstr ""
+"Ставката {name} \"{obj}\" беше успешно додадена. Можете да додадете нов "
+"{name} подолу."
+
+#, python-brace-format
+msgid "The {name} \"{obj}\" was changed successfully."
+msgstr " {name} \"{obj}\" беше успешно изменета."
 
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
@@ -206,8 +221,8 @@ msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "Ставаката %(name)s \"%(obj)s\" беше успешно избришана."
 
 #, python-format
-msgid "%(name)s object with primary key %(key)r does not exist."
-msgstr "Објект %(name)s со примарен клуч %(key)r не постои."
+msgid "%(name)s with ID \"%(key)s\" doesn't exist. Perhaps it was deleted?"
+msgstr "%(name)s со клуч \"%(key)s\" не постои. Можеби е избришан?"
 
 #, python-format
 msgid "Add %s"
@@ -346,18 +361,15 @@ msgstr "Документација"
 msgid "Log out"
 msgstr "Одјава"
 
-msgid "Add"
-msgstr "Додади"
+#, python-format
+msgid "Add %(name)s"
+msgstr "Додади %(name)s"
 
 msgid "History"
 msgstr "Историја"
 
 msgid "View on site"
 msgstr "Погледни на сајтот"
-
-#, python-format
-msgid "Add %(name)s"
-msgstr "Додади %(name)s"
 
 msgid "Filter"
 msgstr "Филтер"
@@ -441,13 +453,6 @@ msgstr ""
 msgid "Change"
 msgstr "Измени"
 
-msgid "Remove"
-msgstr "Отстрани"
-
-#, python-format
-msgid "Add another %(verbose_name)s"
-msgstr "Додадете уште %(verbose_name)s"
-
 msgid "Delete?"
 msgstr "Избриши?"
 
@@ -462,13 +467,16 @@ msgstr "Резиме"
 msgid "Models in the %(name)s application"
 msgstr "Модели во %(name)s апликација"
 
+msgid "Add"
+msgstr "Додади"
+
 msgid "You don't have permission to edit anything."
 msgstr "Немате дозвола ништо да уредува."
 
-msgid "Recent Actions"
+msgid "Recent actions"
 msgstr "Последни акции"
 
-msgid "My Actions"
+msgid "My actions"
 msgstr "Мои акции"
 
 msgid "None available"
@@ -491,6 +499,8 @@ msgid ""
 "You are authenticated as %(username)s, but are not authorized to access this "
 "page. Would you like to login to a different account?"
 msgstr ""
+"Најавени сте како  %(username)s, но не сте авторизирани да пристапите до "
+"оваа страна. Сакате ли да се најавите како друг корисник?"
 
 msgid "Forgotten your password or username?"
 msgstr "Ја заборавивте вашата лозинка или корисничко име?"
@@ -518,7 +528,7 @@ msgid "Save"
 msgstr "Сними"
 
 msgid "Popup closing..."
-msgstr ""
+msgstr "Попапот се затвара..."
 
 #, python-format
 msgid "Change selected %(model)s"

@@ -3,6 +3,7 @@
 # Translators:
 # Denis Darii <denis.darii@gmail.com>, 2011
 # Jannis Leidel <jannis@leidel.info>, 2011
+# Luciano De Falco Alfano, 2016
 # Marco Bonetti, 2014
 # Nicola Larosa <transifex@teknico.net>, 2011-2012
 # palmux <palmux@gmail.com>, 2015
@@ -11,8 +12,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2015-10-18 18:22+0000\n"
+"POT-Creation-Date: 2018-05-17 11:50+0200\n"
+"PO-Revision-Date: 2017-09-23 18:54+0000\n"
 "Last-Translator: palmux <palmux@gmail.com>\n"
 "Language-Team: Italian (http://www.transifex.com/django/django/language/"
 "it/)\n"
@@ -103,26 +104,8 @@ msgstr ""
 "Hai selezionato un'azione, e non hai ancora apportato alcuna modifica a "
 "campi singoli. Probabilmente stai cercando il pulsante Go, invece di Save."
 
-#, javascript-format
-msgid "Note: You are %s hour ahead of server time."
-msgid_plural "Note: You are %s hours ahead of server time."
-msgstr[0] "Nota: Sei %s ora in anticipo rispetto al server."
-msgstr[1] "Nota: Sei %s ore in anticipo rispetto al server."
-
-#, javascript-format
-msgid "Note: You are %s hour behind server time."
-msgid_plural "Note: You are %s hours behind server time."
-msgstr[0] "Nota: Sei %s ora in ritardo rispetto al server."
-msgstr[1] "Nota: Sei %s ore in ritardo rispetto al server."
-
 msgid "Now"
 msgstr "Adesso"
-
-msgid "Choose a Time"
-msgstr "Scegli un orario"
-
-msgid "Choose a time"
-msgstr "Scegli un orario"
 
 msgid "Midnight"
 msgstr "Mezzanotte"
@@ -135,6 +118,24 @@ msgstr "Mezzogiorno"
 
 msgid "6 p.m."
 msgstr "6 del pomeriggio"
+
+#, javascript-format
+msgid "Note: You are %s hour ahead of server time."
+msgid_plural "Note: You are %s hours ahead of server time."
+msgstr[0] "Nota: Sei %s ora in anticipo rispetto al server."
+msgstr[1] "Nota: Sei %s ore in anticipo rispetto al server."
+
+#, javascript-format
+msgid "Note: You are %s hour behind server time."
+msgid_plural "Note: You are %s hours behind server time."
+msgstr[0] "Nota: Sei %s ora in ritardo rispetto al server."
+msgstr[1] "Nota: Sei %s ore in ritardo rispetto al server."
+
+msgid "Choose a Time"
+msgstr "Scegli un orario"
+
+msgid "Choose a time"
+msgstr "Scegli un orario"
 
 msgid "Cancel"
 msgstr "Annulla"
@@ -151,15 +152,69 @@ msgstr "Ieri"
 msgid "Tomorrow"
 msgstr "Domani"
 
-msgid ""
-"January February March April May June July August September October November "
-"December"
-msgstr ""
-"gennaio febbraio marzo aprile maggio giugno luglio agosto settembre ottobre "
-"novembre dicembre"
+msgid "January"
+msgstr "Gennaio"
 
-msgid "S M T W T F S"
-msgstr "D L M M G V S"
+msgid "February"
+msgstr "Febbraio"
+
+msgid "March"
+msgstr "Marzo"
+
+msgid "April"
+msgstr "Aprile"
+
+msgid "May"
+msgstr "Maggio"
+
+msgid "June"
+msgstr "Giugno"
+
+msgid "July"
+msgstr "Luglio"
+
+msgid "August"
+msgstr "Agosto"
+
+msgid "September"
+msgstr "Settembre"
+
+msgid "October"
+msgstr "Ottobre"
+
+msgid "November"
+msgstr "Novembre"
+
+msgid "December"
+msgstr "Dicembre"
+
+msgctxt "one letter Sunday"
+msgid "S"
+msgstr "D"
+
+msgctxt "one letter Monday"
+msgid "M"
+msgstr "L"
+
+msgctxt "one letter Tuesday"
+msgid "T"
+msgstr "Ma"
+
+msgctxt "one letter Wednesday"
+msgid "W"
+msgstr "Me"
+
+msgctxt "one letter Thursday"
+msgid "T"
+msgstr "G"
+
+msgctxt "one letter Friday"
+msgid "F"
+msgstr "V"
+
+msgctxt "one letter Saturday"
+msgid "S"
+msgstr "S"
 
 msgid "Show"
 msgstr "Mostra"

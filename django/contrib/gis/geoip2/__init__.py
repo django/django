@@ -1,6 +1,6 @@
 """
 This module houses the GeoIP2 object, a wrapper for the MaxMind GeoIP2(R)
-Python API (http://geoip2.readthedocs.org/). This is an alternative to the
+Python API (https://geoip2.readthedocs.io/). This is an alternative to the
 Python GeoIP2 interface provided by MaxMind.
 
 GeoIP(R) is a registered trademark of MaxMind, Inc.
@@ -14,8 +14,10 @@ directory corresponding to settings.GEOIP_PATH.
 __all__ = ['HAS_GEOIP2']
 
 try:
+    import geoip2  # NOQA
+except ImportError:
+    HAS_GEOIP2 = False
+else:
     from .base import GeoIP2, GeoIP2Exception
     HAS_GEOIP2 = True
     __all__ += ['GeoIP2', 'GeoIP2Exception']
-except ImportError:
-    HAS_GEOIP2 = False

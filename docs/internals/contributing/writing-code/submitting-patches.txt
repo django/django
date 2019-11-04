@@ -139,7 +139,7 @@ Regardless of the way you submit your work, follow these steps.
   checked. This makes the ticket appear in the "Patches needing review" queue
   on the `Development dashboard`_.
 
-.. _ticket tracker: https://code.djangoproject.com/newticket
+.. _ticket tracker: https://code.djangoproject.com/
 .. _Development dashboard: https://dashboard.djangoproject.com/
 
 Non-trivial patches
@@ -175,7 +175,7 @@ the first release of Django that deprecates a feature (``A.B``) should raise a
 will be removed) when the deprecated feature is invoked. Assuming we have good
 test coverage, these warnings are converted to errors when :ref:`running the
 test suite <running-unit-tests>` with warnings enabled:
-``python -Wall runtests.py``. Thus, when adding a ``RemovedInDjangoXXWarning``
+``python -Wa runtests.py``. Thus, when adding a ``RemovedInDjangoXXWarning``
 you need to eliminate or silence any warnings generated when running the tests.
 
 The first step is to remove any use of the deprecated behavior by Django itself.
@@ -201,19 +201,14 @@ level:
     class MyDeprecatedTests(unittest.TestCase):
         ...
 
-You can also add a test for the deprecation warning. You'll have to disable the
-"warning as error" behavior in your test by doing::
+You can also add a test for the deprecation warning::
 
-    import warnings
+    from django.utils.deprecation import RemovedInDjangoXXWarning
 
     def test_foo_deprecation_warning(self):
-        with warnings.catch_warnings(record=True) as warns:
-            warnings.simplefilter('always')  # prevent warnings from appearing as errors
+        msg = 'Expected deprecation message'
+        with self.assertWarnsMessage(RemovedInDjangoXXWarning, msg):
             # invoke deprecated behavior
-
-        self.assertEqual(len(warns), 1)
-        msg = str(warns[0].message)
-        self.assertEqual(msg, 'Expected deprecation message')
 
 Finally, there are a couple of updates to Django's documentation to make:
 
@@ -249,9 +244,9 @@ the "Triage Stage" on the corresponding Trac ticket to "Ready for checkin".
 If you've left comments for improvement on the pull request, please tick the
 appropriate flags on the Trac ticket based on the results of your review:
 "Patch needs improvement", "Needs documentation", and/or "Needs tests". As time
-and interest permits, core developers do final reviews of "Ready for checkin"
+and interest permits, committers do final reviews of "Ready for checkin"
 tickets and will either commit the patch or bump it back to "Accepted" if
-further works need to be done. If you're looking to become a core developer,
+further works need to be done. If you're looking to become a committer,
 doing thorough reviews of patches is a great way to earn trust.
 
 Looking for a patch to review? Check out the "Patches needing review" section
@@ -273,6 +268,10 @@ Bugs
 
 * Is there a proper regression test (the test should fail before the fix
   is applied)?
+* If it's a bug that :ref:`qualifies for a backport <supported-versions-policy>`
+  to the stable version of Django, is there a release note in
+  ``docs/releases/A.B.C.txt``? Bug fixes that will be applied only to the
+  master branch don't need a release note.
 
 New Features
 ------------
@@ -296,8 +295,7 @@ All code changes
   guidelines? Are there any ``flake8`` errors?
 * If the change is backwards incompatible in any way, is there a note
   in the release notes (``docs/releases/A.B.txt``)?
-* Is Django's test suite passing? Ask in ``#django-dev`` for a core dev
-  to build the pull request against our continuous integration server.
+* Is Django's test suite passing?
 
 All tickets
 -----------

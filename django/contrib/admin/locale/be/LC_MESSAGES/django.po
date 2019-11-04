@@ -2,13 +2,14 @@
 #
 # Translators:
 # Viktar Palstsiuk <vipals@gmail.com>, 2015
+# znotdead <zhirafchik@gmail.com>, 2016-2017
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-11-15 11:06+0100\n"
-"PO-Revision-Date: 2015-11-16 08:16+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2017-01-19 16:49+0100\n"
+"PO-Revision-Date: 2017-09-19 16:41+0000\n"
+"Last-Translator: znotdead <zhirafchik@gmail.com>\n"
 "Language-Team: Belarusian (http://www.transifex.com/django/django/language/"
 "be/)\n"
 "MIME-Version: 1.0\n"
@@ -64,27 +65,44 @@ msgstr "Гэты месяц"
 msgid "This year"
 msgstr "Гэты год"
 
+msgid "No date"
+msgstr "Няма даты"
+
+msgid "Has date"
+msgstr "Мае дату"
+
 #, python-format
 msgid ""
 "Please enter the correct %(username)s and password for a staff account. Note "
 "that both fields may be case-sensitive."
 msgstr ""
+"Калі ласка, увядзіце правільны %(username)s і пароль для службовага рахунку. "
+"Адзначым, што абодва палі могуць быць адчувальныя да рэгістра."
 
 msgid "Action:"
 msgstr "Дзеяньне:"
+
+#, python-format
+msgid "Add another %(verbose_name)s"
+msgstr "Дадаць яшчэ %(verbose_name)s"
+
+msgid "Remove"
+msgstr "Прыбраць"
 
 msgid "action time"
 msgstr "час дзеяньня"
 
 msgid "user"
-msgstr ""
+msgstr "карыстальнік"
 
 msgid "content type"
-msgstr ""
+msgstr "від змесціва"
 
 msgid "object id"
 msgstr "нумар аб’екта"
 
+#. Translators: 'repr' means representation
+#. (https://docs.python.org/3/library/functions.html#repr)
 msgid "object repr"
 msgstr "прадстаўленьне аб’екта"
 
@@ -115,6 +133,31 @@ msgstr "Выдалілі «%(object)s»."
 msgid "LogEntry Object"
 msgstr "Запіс у справаздачы"
 
+#, python-brace-format
+msgid "Added {name} \"{object}\"."
+msgstr "Дадалі {name} \"{object}\"."
+
+msgid "Added."
+msgstr "Дадалі."
+
+msgid "and"
+msgstr "і"
+
+#, python-brace-format
+msgid "Changed {fields} for {name} \"{object}\"."
+msgstr "Змянілі {fields} для {name} \"{object}\"."
+
+#, python-brace-format
+msgid "Changed {fields}."
+msgstr "Зьмянілі {fields}."
+
+#, python-brace-format
+msgid "Deleted {name} \"{object}\"."
+msgstr "Выдалілі {name} \"{object}\"."
+
+msgid "No fields changed."
+msgstr "Палі не зьмяняліся."
+
 msgid "None"
 msgstr "Няма"
 
@@ -124,61 +167,35 @@ msgstr ""
 "Утрымлівайце націснутай кнопку \"Control\", або \"Command\" на Mac, каб "
 "вылучыць больш за адзін."
 
-msgid "Added."
-msgstr ""
-
-#, python-format
-msgid "Changed %s."
-msgstr "Зьмянілі %s."
-
-msgid "and"
-msgstr "і"
-
-#, python-format
-msgid "Added %(name)s \"%(object)s\"."
-msgstr "Дадалі %(name)s «%(object)s»."
-
-#, python-format
-msgid "Changed %(list)s for %(name)s \"%(object)s\"."
-msgstr "Зьмянілі %(list)s для %(name)s «%(object)s»."
-
-#, python-format
-msgid "Deleted %(name)s \"%(object)s\"."
-msgstr "Выдалілі %(name)s «%(object)s»."
-
-msgid "No fields changed."
-msgstr "Палі не зьмяняліся."
-
-#, python-format
+#, python-brace-format
 msgid ""
-"The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
-msgstr "Дадалі %(name)s «%(obj)s». Ніжэй яго можна зноўку правіць."
+"The {name} \"{obj}\" was added successfully. You may edit it again below."
+msgstr "Дадалі {name} \"{obj}\". Ніжэй яго можна зноўку правіць."
 
-#, python-format
+#, python-brace-format
 msgid ""
-"The %(name)s \"%(obj)s\" was added successfully. You may add another "
-"%(name)s below."
-msgstr ""
-
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was added successfully."
-msgstr "Дадалі %(name)s «%(obj)s»."
-
-#, python-format
-msgid ""
-"The %(name)s \"%(obj)s\" was changed successfully. You may edit it again "
+"The {name} \"{obj}\" was added successfully. You may add another {name} "
 "below."
-msgstr ""
+msgstr "Дадалі {name} \"{obj}\". Ніжэй можна дадаць іншы {name}."
 
-#, python-format
+#, python-brace-format
+msgid "The {name} \"{obj}\" was added successfully."
+msgstr "Дадалі {name} \"{obj}\"."
+
+#, python-brace-format
 msgid ""
-"The %(name)s \"%(obj)s\" was changed successfully. You may add another "
-"%(name)s below."
-msgstr ""
+"The {name} \"{obj}\" was changed successfully. You may edit it again below."
+msgstr "Змянілі {name} \"{obj}\". Ніжэй яго можна зноўку правіць."
 
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was changed successfully."
-msgstr "Зьмянілі %(name)s «%(obj)s»."
+#, python-brace-format
+msgid ""
+"The {name} \"{obj}\" was changed successfully. You may add another {name} "
+"below."
+msgstr "Змянілі {name} \"{obj}\". Ніжэй можна дадаць іншы {name}."
+
+#, python-brace-format
+msgid "The {name} \"{obj}\" was changed successfully."
+msgstr "Змянілі {name} \"{obj}\"."
 
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
@@ -195,8 +212,8 @@ msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "Сьцерлі %(name)s «%(obj)s»."
 
 #, python-format
-msgid "%(name)s object with primary key %(key)r does not exist."
-msgstr "Аб’ект %(name)s з галоўным ключом %(key)r не існуе."
+msgid "%(name)s with ID \"%(key)s\" doesn't exist. Perhaps it was deleted?"
+msgstr "%(name)s з ID \"%(key)s\" не існуе. Магчыма гэта было выдалена."
 
 #, python-format
 msgid "Add %s"
@@ -244,6 +261,8 @@ msgid ""
 "Deleting %(class_name)s %(instance)s would require deleting the following "
 "protected related objects: %(related_objects)s"
 msgstr ""
+"Каб выдаліць %(class_name)s %(instance)s, трэба выдаліць і зьвязаныя "
+"абароненыя аб’екты: %(related_objects)s"
 
 msgid "Django site admin"
 msgstr "Кіраўнічая пляцоўка «Джэнґа»"
@@ -338,18 +357,15 @@ msgstr "Дакумэнтацыя"
 msgid "Log out"
 msgstr "Выйсьці"
 
-msgid "Add"
-msgstr "Дадаць"
+#, python-format
+msgid "Add %(name)s"
+msgstr "Дадаць %(name)s"
 
 msgid "History"
 msgstr "Гісторыя"
 
 msgid "View on site"
 msgstr "Зірнуць на пляцоўцы"
-
-#, python-format
-msgid "Add %(name)s"
-msgstr "Дадаць %(name)s"
 
 msgid "Filter"
 msgstr "Прасеяць"
@@ -432,13 +448,6 @@ msgstr ""
 msgid "Change"
 msgstr "Зьмяніць"
 
-msgid "Remove"
-msgstr "Прыбраць"
-
-#, python-format
-msgid "Add another %(verbose_name)s"
-msgstr "Дадаць яшчэ %(verbose_name)s"
-
 msgid "Delete?"
 msgstr "Ці выдаліць?"
 
@@ -451,15 +460,18 @@ msgstr "Рэзюмэ"
 
 #, python-format
 msgid "Models in the %(name)s application"
-msgstr ""
+msgstr "Мадэлі ў %(name)s праграме"
+
+msgid "Add"
+msgstr "Дадаць"
 
 msgid "You don't have permission to edit anything."
 msgstr "Вы ня маеце дазволу нешта зьмяняць."
 
-msgid "Recent Actions"
-msgstr "Нядаўнія дзеяньні"
+msgid "Recent actions"
+msgstr "Нядаўнія дзеянні"
 
-msgid "My Actions"
+msgid "My actions"
 msgstr "Мае дзеяньні"
 
 msgid "None available"
@@ -481,6 +493,8 @@ msgid ""
 "You are authenticated as %(username)s, but are not authorized to access this "
 "page. Would you like to login to a different account?"
 msgstr ""
+"Вы апазнаны як %(username)s але не аўтарызаваны для доступу гэтай бачыны. Не "
+"жадаеце лі вы ўвайсці пад іншым карыстальнікам?"
 
 msgid "Forgotten your password or username?"
 msgstr "Забыліся на імя ці пароль?"
@@ -508,7 +522,7 @@ msgid "Save"
 msgstr "Захаваць"
 
 msgid "Popup closing..."
-msgstr ""
+msgstr "Усплывальнае акно зачыняецца..."
 
 #, python-format
 msgid "Change selected %(model)s"
@@ -668,4 +682,4 @@ msgid "Currently:"
 msgstr "У цяперашні час:"
 
 msgid "Change:"
-msgstr ""
+msgstr "Зьмяніць:"

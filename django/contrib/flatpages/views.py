@@ -34,13 +34,11 @@ def flatpage(request, url):
         url = '/' + url
     site_id = get_current_site(request).id
     try:
-        f = get_object_or_404(FlatPage,
-            url=url, sites=site_id)
+        f = get_object_or_404(FlatPage, url=url, sites=site_id)
     except Http404:
         if not url.endswith('/') and settings.APPEND_SLASH:
             url += '/'
-            f = get_object_or_404(FlatPage,
-                url=url, sites=site_id)
+            f = get_object_or_404(FlatPage, url=url, sites=site_id)
             return HttpResponsePermanentRedirect('%s/' % request.path)
         else:
             raise
@@ -54,7 +52,7 @@ def render_flatpage(request, f):
     """
     # If registration is required for accessing this page, and the user isn't
     # logged in, redirect to the login page.
-    if f.registration_required and not request.user.is_authenticated():
+    if f.registration_required and not request.user.is_authenticated:
         from django.contrib.auth.views import redirect_to_login
         return redirect_to_login(request.path)
     if f.template_name:

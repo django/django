@@ -185,6 +185,9 @@ call to ``{% cycle %}`` doesn't specify ``silent``::
     {% cycle 'row1' 'row2' as rowcolors silent %}
     {% cycle rowcolors %}
 
+You can use the :ttag:`resetcycle` tag to make a ``{% cycle %}`` tag restart
+from its first value when it's next encountered.
+
 .. templatetag:: debug
 
 ``debug``
@@ -211,6 +214,23 @@ This tag can be used in two ways:
   Django will use that object as the parent template.
 
 See :ref:`template-inheritance` for more information.
+
+Normally the template name is relative to the template loader's root directory.
+A string argument may also be a relative path starting with ``./`` or ``../``.
+For example, assume the following directory structure::
+
+    dir1/
+        template.html
+        base2.html
+        my/
+            base3.html
+    base1.html
+
+In ``template.html``, the following paths would be valid::
+
+    {% extends "./base2.html" %}
+    {% extends "../base1.html" %}
+    {% extends "./my/base3.html" %}
 
 .. templatetag:: filter
 
@@ -275,10 +295,6 @@ Or if only some variables should be escaped, you can use::
 
 You can use the syntax ``{% firstof var1 var2 var3 as value %}`` to store the
 output inside a variable.
-
-.. versionadded:: 1.9
-
-    The "as" syntax was added.
 
 .. templatetag:: for
 
@@ -432,7 +448,8 @@ Use of actual parentheses in the :ttag:`if` tag is invalid syntax. If you need
 them to indicate precedence, you should use nested :ttag:`if` tags.
 
 :ttag:`if` tags may also use the operators ``==``, ``!=``, ``<``, ``>``,
-``<=``, ``>=``, ``in``, and ``is`` which work as follows:
+``<=``, ``>=``, ``in``, ``not in``, ``is``, and ``is not`` which work as
+follows:
 
 ``==`` operator
 ^^^^^^^^^^^^^^^
@@ -515,24 +532,32 @@ of how ``x in y`` will be interpreted::
 
 Not contained within. This is the negation of the ``in`` operator.
 
-The comparison operators cannot be 'chained' like in Python or in mathematical
-notation. For example, instead of using::
-
-    {% if a > b > c %}  (WRONG)
-
-you should use::
-
-    {% if a > b and b > c %}
-
 ``is`` operator
 ^^^^^^^^^^^^^^^
 
-.. versionadded:: 1.10
-
 Object identity. Tests if two values are the same object. Example::
 
-    {% if value is None %}
-      This will output if and only if value is None.
+    {% if somevar is True %}
+      This appears if and only if somevar is True.
+    {% endif %}
+
+    {% if somevar is None %}
+      This appears if somevar is None, or if somevar is not found in the context.
+    {% endif %}
+
+``is not`` operator
+^^^^^^^^^^^^^^^^^^^
+
+Negated object identity. Tests if two values are not the same object. This is
+the negation of the ``is`` operator. Example::
+
+    {% if somevar is not True %}
+      This appears if somevar is not True, or if somevar is not found in the
+      context.
+    {% endif %}
+
+    {% if somevar is not None %}
+      This appears if and only if somevar is not None.
     {% endif %}
 
 Filters
@@ -572,6 +597,15 @@ operators, from lowest to highest, is as follows:
 If you need different precedence, you will need to use nested :ttag:`if` tags.
 Sometimes that is better for clarity anyway, for the sake of those who do not
 know the precedence rules.
+
+The comparison operators cannot be 'chained' like in Python or in mathematical
+notation. For example, instead of using::
+
+    {% if a > b > c %}  (WRONG)
+
+you should use::
+
+    {% if a > b and b > c %}
 
 ``ifequal`` and ``ifnotequal``
 ------------------------------
@@ -641,6 +675,10 @@ This example includes the contents of the template ``"foo/bar.html"``::
 
     {% include "foo/bar.html" %}
 
+Normally the template name is relative to the template loader's root directory.
+A string argument may also be a relative path starting with ``./`` or ``../``
+as described in the :ttag:`extends` tag.
+
 This example includes the contents of the template whose name is contained in
 the variable ``template_name``::
 
@@ -672,20 +710,6 @@ no variables at all), use the ``only`` option. No other variables are
 available to the included template::
 
     {% include "name_snippet.html" with greeting="Hi" only %}
-
-If the included template causes an exception while it's rendered (including
-if it's missing or has syntax errors), the behavior varies depending on the
-:class:`template engine's <django.template.Engine>` ``debug`` option (if not
-set, this option defaults to the value of :setting:`DEBUG`). When debug mode is
-turned on, an exception like :exc:`~django.template.TemplateDoesNotExist` or
-:exc:`~django.template.TemplateSyntaxError` will be raised. When debug mode
-is turned off, ``{% include %}`` logs a warning to the ``django.template``
-logger with the exception that happens while rendering the included template
-and returns an empty string.
-
-.. versionchanged:: 1.9
-
-    Template logging now includes the warning logging mentioned above.
 
 .. note::
     The :ttag:`include` tag should be considered as an implementation of
@@ -801,8 +825,8 @@ output (as a string) inside a variable. This is useful if you want to use
 
 Regroups a list of alike objects by a common attribute.
 
-This complex tag is best illustrated by way of an example: say that "places" is
-a list of cities represented by dictionaries containing ``"name"``,
+This complex tag is best illustrated by way of an example: say that ``cities``
+is a list of cities represented by dictionaries containing ``"name"``,
 ``"population"``, and ``"country"`` keys:
 
 .. code-block:: python
@@ -841,8 +865,8 @@ The following snippet of template code would accomplish this::
     {% for country in country_list %}
         <li>{{ country.grouper }}
         <ul>
-            {% for item in country.list %}
-              <li>{{ item.name }}: {{ item.population }}</li>
+            {% for city in country.list %}
+              <li>{{ city.name }}: {{ city.population }}</li>
             {% endfor %}
         </ul>
         </li>
@@ -855,12 +879,30 @@ resulting list. Here, we're regrouping the ``cities`` list by the ``country``
 attribute and calling the result ``country_list``.
 
 ``{% regroup %}`` produces a list (in this case, ``country_list``) of
-**group objects**. Each group object has two attributes:
+**group objects**. Group objects are instances of
+:py:func:`~collections.namedtuple` with two fields:
 
 * ``grouper`` -- the item that was grouped by (e.g., the string "India" or
   "Japan").
 * ``list`` -- a list of all items in this group (e.g., a list of all cities
   with country='India').
+
+Because ``{% regroup %}`` produces :py:func:`~collections.namedtuple` objects,
+you can also write the previous example as::
+
+    {% regroup cities by country as country_list %}
+
+    <ul>
+    {% for country, local_cities in country_list %}
+        <li>{{ country }}
+        <ul>
+            {% for city in local_cities %}
+              <li>{{ city.name }}: {{ city.population }}</li>
+            {% endfor %}
+        </ul>
+        </li>
+    {% endfor %}
+    </ul>
 
 Note that ``{% regroup %}`` does not order its input! Our example relies on
 the fact that the ``cities`` list was ordered by ``country`` in the first place.
@@ -929,6 +971,55 @@ attribute, allowing  you to group on the display string rather than the
 
 ``{{ country.grouper }}`` will now display the value fields from the
 ``choices`` set rather than the keys.
+
+.. templatetag:: resetcycle
+
+``resetcycle``
+--------------
+
+Resets a previous `cycle`_ so that it restarts from its first item at its next
+encounter. Without arguments, ``{% resetcycle %}`` will reset the last
+``{% cycle %}`` defined in the template.
+
+Example usage::
+
+    {% for coach in coach_list %}
+        <h1>{{ coach.name }}</h1>
+        {% for athlete in coach.athlete_set.all %}
+            <p class="{% cycle 'odd' 'even' %}">{{ athlete.name }}</p>
+        {% endfor %}
+        {% resetcycle %}
+    {% endfor %}
+
+This example would return this HTML::
+
+    <h1>José Mourinho</h1>
+    <p class="odd">Thibaut Courtois</p>
+    <p class="even">John Terry</p>
+    <p class="odd">Eden Hazard</p>
+
+    <h1>Carlo Ancelotti</h1>
+    <p class="odd">Manuel Neuer</p>
+    <p class="even">Thomas Müller</p>
+
+Notice how the first block ends with ``class="odd"`` and the new one starts
+with ``class="odd"``. Without the ``{% resetcycle %}`` tag, the second block
+would start with ``class="even"``.
+
+You can also reset named cycle tags::
+
+    {% for item in list %}
+        <p class="{% cycle 'odd' 'even' as stripe %} {% cycle 'major' 'minor' 'minor' 'minor' 'minor' as tick %}">
+            {{ item.data }}
+        </p>
+        {% ifchanged item.category %}
+            <h1>{{ item.category }}</h1>
+            {% if not forloop.first %}{% resetcycle tick %}{% endif %}
+        {% endifchanged %}
+    {% endfor %}
+
+In this example, we have both the alternating odd/even rows and a "major" row
+every fifth row. Only the five-row cycle is reset when a category changes.
 
 .. templatetag:: spaceless
 
@@ -1002,11 +1093,11 @@ hard-code URLs in your templates::
 
     {% url 'some-url-name' v1 v2 %}
 
-The first argument is a :func:`~django.conf.urls.url` ``name``. It can be a
-quoted literal or any other context variable. Additional arguments are optional
-and should be space-separated values that will be used as arguments in the URL.
-The example above shows passing positional arguments. Alternatively you may
-use keyword syntax::
+The first argument is a :ref:`URL pattern name <naming-url-patterns>`. It can
+be a quoted literal or any other context variable. Additional arguments are
+optional and should be space-separated values that will be used as arguments in
+the URL. The example above shows passing positional arguments. Alternatively
+you may use keyword syntax::
 
     {% url 'some-url-name' arg1=v1 arg2=v2 %}
 
@@ -1019,14 +1110,14 @@ takes a client ID (here, ``client()`` is a method inside the views file
 
 .. code-block:: python
 
-    ('^client/([0-9]+)/$', app_views.client, name='app-views-client')
+    path('client/<int:id>/', app_views.client, name='app-views-client')
 
 If this app's URLconf is included into the project's URLconf under a path
 such as this:
 
 .. code-block:: python
 
-    ('^clients/', include('project_name.app_name.urls'))
+    path('clients/', include('project_name.app_name.urls'))
 
 ...then, in a template, you can create a link to this view like this::
 
@@ -1066,8 +1157,8 @@ by the context as to the current application.
 
 .. warning::
 
-    Don't forget to put quotes around the :func:`~django.conf.urls.url`
-    ``name``, otherwise the value will be interpreted as a context variable!
+    Don't forget to put quotes around the URL pattern ``name``, otherwise the
+    value will be interpreted as a context variable!
 
 .. templatetag:: verbatim
 
@@ -1101,7 +1192,7 @@ value to a maximum value, and then applies that ratio to a constant.
 For example::
 
     <img src="bar.png" alt="Bar"
-         height="10" width="{% widthratio this_value max_value max_width %}" />
+         height="10" width="{% widthratio this_value max_value max_width %}">
 
 If ``this_value`` is 175, ``max_value`` is 200, and ``max_width`` is 100, the
 image in the above example will be 88 pixels wide
@@ -1250,78 +1341,85 @@ Available format strings:
 ================  ========================================  =====================
 Format character  Description                               Example output
 ================  ========================================  =====================
-a                 ``'a.m.'`` or ``'p.m.'`` (Note that       ``'a.m.'``
+**Day**
+``d``             Day of the month, 2 digits with           ``'01'`` to ``'31'``
+                  leading zeros.
+``j``             Day of the month without leading          ``'1'`` to ``'31'``
+                  zeros.
+``D``             Day of the week, textual, 3 letters.      ``'Fri'``
+``l``             Day of the week, textual, long.           ``'Friday'``
+``S``             English ordinal suffix for day of the     ``'st'``, ``'nd'``, ``'rd'`` or ``'th'``
+                  month, 2 characters.
+``w``             Day of the week, digits without           ``'0'`` (Sunday) to ``'6'`` (Saturday)
+                  leading zeros.
+``z``             Day of the year.                          ``0`` to ``365``
+**Week**
+``W``             ISO-8601 week number of year, with        ``1``, ``53``
+                  weeks starting on Monday.
+**Month**
+``m``             Month, 2 digits with leading zeros.       ``'01'`` to ``'12'``
+``n``             Month without leading zeros.              ``'1'`` to ``'12'``
+``M``             Month, textual, 3 letters.                ``'Jan'``
+``b``             Month, textual, 3 letters, lowercase.     ``'jan'``
+``E``             Month, locale specific alternative
+                  representation usually used for long
+                  date representation.                      ``'listopada'`` (for Polish locale, as opposed to ``'Listopad'``)
+``F``             Month, textual, long.                     ``'January'``
+``N``             Month abbreviation in Associated Press    ``'Jan.'``, ``'Feb.'``, ``'March'``, ``'May'``
+                  style. Proprietary extension.
+``t``             Number of days in the given month.        ``28`` to ``31``
+**Year**
+``y``             Year, 2 digits.                           ``'99'``
+``Y``             Year, 4 digits.                           ``'1999'``
+``L``             Boolean for whether it's a leap year.     ``True`` or ``False``
+``o``             ISO-8601 week-numbering year,             ``'1999'``
+                  corresponding to the ISO-8601 week
+                  number (W) which uses leap weeks. See Y
+                  for the more common year format.
+**Time**
+``g``             Hour, 12-hour format without leading      ``'1'`` to ``'12'``
+                  zeros.
+``G``             Hour, 24-hour format without leading      ``'0'`` to ``'23'``
+                  zeros.
+``h``             Hour, 12-hour format.                     ``'01'`` to ``'12'``
+``H``             Hour, 24-hour format.                     ``'00'`` to ``'23'``
+``i``             Minutes.                                  ``'00'`` to ``'59'``
+``s``             Seconds, 2 digits with leading zeros.     ``'00'`` to ``'59'``
+``u``             Microseconds.                             ``000000`` to ``999999``
+``a``             ``'a.m.'`` or ``'p.m.'`` (Note that       ``'a.m.'``
                   this is slightly different than PHP's
                   output, because this includes periods
                   to match Associated Press style.)
-A                 ``'AM'`` or ``'PM'``.                     ``'AM'``
-b                 Month, textual, 3 letters, lowercase.     ``'jan'``
-B                 Not implemented.
-c                 ISO 8601 format. (Note: unlike others     ``2008-01-02T10:30:00.000123+02:00``,
-                  formatters, such as "Z", "O" or "r",      or ``2008-01-02T10:30:00.000123`` if the datetime is naive
-                  the "c" formatter will not add timezone
-                  offset if value is a naive datetime
-                  (see :class:`datetime.tzinfo`).
-d                 Day of the month, 2 digits with           ``'01'`` to ``'31'``
-                  leading zeros.
-D                 Day of the week, textual, 3 letters.      ``'Fri'``
-e                 Timezone name. Could be in any format,
-                  or might return an empty string,          ``''``, ``'GMT'``, ``'-500'``, ``'US/Eastern'``, etc.
-                  depending on the datetime.
-E                 Month, locale specific alternative
-                  representation usually used for long
-                  date representation.                      ``'listopada'`` (for Polish locale, as opposed to ``'Listopad'``)
-f                 Time, in 12-hour hours and minutes,       ``'1'``, ``'1:30'``
+``A``             ``'AM'`` or ``'PM'``.                     ``'AM'``
+``f``             Time, in 12-hour hours and minutes,       ``'1'``, ``'1:30'``
                   with minutes left off if they're zero.
                   Proprietary extension.
-F                 Month, textual, long.                     ``'January'``
-g                 Hour, 12-hour format without leading      ``'1'`` to ``'12'``
-                  zeros.
-G                 Hour, 24-hour format without leading      ``'0'`` to ``'23'``
-                  zeros.
-h                 Hour, 12-hour format.                     ``'01'`` to ``'12'``
-H                 Hour, 24-hour format.                     ``'00'`` to ``'23'``
-i                 Minutes.                                  ``'00'`` to ``'59'``
-I                 Daylight Savings Time, whether it's       ``'1'`` or ``'0'``
-                  in effect or not.
-j                 Day of the month without leading          ``'1'`` to ``'31'``
-                  zeros.
-l                 Day of the week, textual, long.           ``'Friday'``
-L                 Boolean for whether it's a leap year.     ``True`` or ``False``
-m                 Month, 2 digits with leading zeros.       ``'01'`` to ``'12'``
-M                 Month, textual, 3 letters.                ``'Jan'``
-n                 Month without leading zeros.              ``'1'`` to ``'12'``
-N                 Month abbreviation in Associated Press    ``'Jan.'``, ``'Feb.'``, ``'March'``, ``'May'``
-                  style. Proprietary extension.
-o                 ISO-8601 week-numbering year,             ``'1999'``
-                  corresponding to
-                  the ISO-8601 week number (W)
-O                 Difference to Greenwich time in hours.    ``'+0200'``
-P                 Time, in 12-hour hours, minutes and       ``'1 a.m.'``, ``'1:30 p.m.'``, ``'midnight'``, ``'noon'``, ``'12:30 p.m.'``
+``P``             Time, in 12-hour hours, minutes and       ``'1 a.m.'``, ``'1:30 p.m.'``, ``'midnight'``, ``'noon'``, ``'12:30 p.m.'``
                   'a.m.'/'p.m.', with minutes left off
                   if they're zero and the special-case
                   strings 'midnight' and 'noon' if
                   appropriate. Proprietary extension.
-r                 :rfc:`2822` formatted date.               ``'Thu, 21 Dec 2000 16:01:07 +0200'``
-s                 Seconds, 2 digits with leading zeros.     ``'00'`` to ``'59'``
-S                 English ordinal suffix for day of the     ``'st'``, ``'nd'``, ``'rd'`` or ``'th'``
-                  month, 2 characters.
-t                 Number of days in the given month.        ``28`` to ``31``
-T                 Time zone of this machine.                ``'EST'``, ``'MDT'``
-u                 Microseconds.                             ``000000`` to ``999999``
-U                 Seconds since the Unix Epoch
-                  (January 1 1970 00:00:00 UTC).
-w                 Day of the week, digits without           ``'0'`` (Sunday) to ``'6'`` (Saturday)
-                  leading zeros.
-W                 ISO-8601 week number of year, with        ``1``, ``53``
-                  weeks starting on Monday.
-y                 Year, 2 digits.                           ``'99'``
-Y                 Year, 4 digits.                           ``'1999'``
-z                 Day of the year.                          ``0`` to ``365``
-Z                 Time zone offset in seconds. The          ``-43200`` to ``43200``
+**Timezone**
+``e``             Timezone name. Could be in any format,
+                  or might return an empty string,          ``''``, ``'GMT'``, ``'-500'``, ``'US/Eastern'``, etc.
+                  depending on the datetime.
+``I``             Daylight Savings Time, whether it's       ``'1'`` or ``'0'``
+                  in effect or not.
+``O``             Difference to Greenwich time in hours.    ``'+0200'``
+``T``             Time zone of this machine.                ``'EST'``, ``'MDT'``
+``Z``             Time zone offset in seconds. The          ``-43200`` to ``43200``
                   offset for timezones west of UTC is
                   always negative, and for those east of
                   UTC is always positive.
+**Date/Time**
+``c``             ISO 8601 format. (Note: unlike others     ``2008-01-02T10:30:00.000123+02:00``,
+                  formatters, such as "Z", "O" or "r",      or ``2008-01-02T10:30:00.000123`` if the datetime is naive
+                  the "c" formatter will not add timezone
+                  offset if value is a naive datetime
+                  (see :class:`datetime.tzinfo`).
+``r``             :rfc:`5322` formatted date.               ``'Thu, 21 Dec 2000 16:01:07 +0200'``
+``U``             Seconds since the Unix Epoch
+                  (January 1 1970 00:00:00 UTC).
 ================  ========================================  =====================
 
 For example::
@@ -1346,12 +1444,13 @@ for example, ``"es"``, then for::
 the output would be the string ``"09/01/2008"`` (the ``"SHORT_DATE_FORMAT"``
 format specifier for the ``es`` locale as shipped with Django is ``"d/m/Y"``).
 
-When used without a format string::
+When used without a format string, the ``DATE_FORMAT`` format specifier is
+used. Assuming the same settings as the previous example::
 
     {{ value|date }}
 
-...the formatting string defined in the :setting:`DATE_FORMAT` setting will be
-used, without applying any localization.
+outputs ``9 de Enero de 2008`` (the ``DATE_FORMAT`` format specifier for the
+``es`` locale is ``r'j \d\e F \d\e Y'``.
 
 You can combine ``date`` with the :tfilter:`time` filter to render a full
 representation of a ``datetime`` value. E.g.::
@@ -1387,7 +1486,7 @@ For example::
 
     {{ value|default_if_none:"nothing" }}
 
-If ``value`` is ``None``, the output will be the string ``"nothing"``.
+If ``value`` is ``None``, the output will be ``nothing``.
 
 .. templatefilter:: dictsort
 
@@ -1443,6 +1542,36 @@ then the output would be::
     * 1984 (George)
     * Timequake (Kurt)
 
+``dictsort`` can also order a list of lists (or any other object implementing
+``__getitem__()``) by elements at specified index. For example::
+
+    {{ value|dictsort:0 }}
+
+If ``value`` is:
+
+.. code-block:: python
+
+    [
+        ('a', '42'),
+        ('c', 'string'),
+        ('b', 'foo'),
+    ]
+
+then the output would be:
+
+.. code-block:: python
+
+    [
+        ('a', '42'),
+        ('b', 'foo'),
+        ('c', 'string'),
+    ]
+
+You must pass the index as an integer rather than a string. The following
+produce empty output::
+
+    {{ values|dictsort:"0" }}
+
 .. templatefilter:: dictsortreversed
 
 ``dictsortreversed``
@@ -1478,11 +1607,6 @@ Escapes a string's HTML. Specifically, it makes these replacements:
 * ``"`` (double quote) is converted to ``&quot;``
 * ``&`` is converted to ``&amp;``
 
-The escaping is only applied when the string is output, so it does not matter
-where in a chained sequence of filters you put ``escape``: it will always be
-applied as though it were the last filter. If you want escaping to be applied
-immediately, use the :tfilter:`force_escape` filter.
-
 Applying ``escape`` to a variable that would normally have auto-escaping
 applied to the result will only result in one round of escaping being done. So
 it is safe to use this function even in auto-escaping environments. If you want
@@ -1500,8 +1624,8 @@ For example, you can apply ``escape`` to fields when :ttag:`autoescape` is off::
 ------------
 
 Escapes characters for use in JavaScript strings. This does *not* make the
-string safe for use in HTML, but does protect you from syntax errors when using
-templates to generate JavaScript/JSON.
+string safe for use in HTML or JavaScript template literals, but does protect
+you from syntax errors when using templates to generate JavaScript/JSON.
 
 For example::
 
@@ -1664,6 +1788,45 @@ For example::
 If ``value`` is the list ``['a', 'b', 'c']``, the output will be the string
 ``"a // b // c"``.
 
+.. templatefilter:: json_script
+
+``json_script``
+---------------
+
+.. versionadded:: 2.1
+
+Safely outputs a Python object as JSON, wrapped in a ``<script>`` tag, ready
+for use with JavaScript.
+
+**Argument:** HTML "id" of the ``<script>`` tag.
+
+For example::
+
+    {{ value|json_script:"hello-data" }}
+
+If ``value`` is the dictionary ``{'hello': 'world'}``, the output will be:
+
+.. code-block:: html
+
+    <script id="hello-data" type="application/json">{"hello": "world"}</script>
+
+The resulting data can be accessed in JavaScript like this:
+
+.. code-block:: javascript
+
+    var value = JSON.parse(document.getElementById('hello-data').textContent);
+
+XSS attacks are mitigated by escaping the characters "<", ">" and "&". For
+example if ``value`` is ``{'hello': 'world</script>&amp;'}``, the output is:
+
+.. code-block:: html
+
+    <script id="hello-data" type="application/json">{"hello": "world\\u003C/script\\u003E\\u0026amp;"}</script>
+
+This is compatible with a strict Content Security Policy that prohibits in-page
+script execution. It also maintains a clean separation between passive data and
+executable code.
+
 .. templatefilter:: last
 
 ``last``
@@ -1714,14 +1877,14 @@ If ``value`` is ``['a', 'b', 'c', 'd']`` or ``"abcd"``, the output will be
 --------------
 
 Replaces line breaks in plain text with appropriate HTML; a single
-newline becomes an HTML line break (``<br />``) and a new line
+newline becomes an HTML line break (``<br>``) and a new line
 followed by a blank line becomes a paragraph break (``</p>``).
 
 For example::
 
     {{ value|linebreaks }}
 
-If ``value`` is ``Joel\nis a slug``, the output will be ``<p>Joel<br />is a
+If ``value`` is ``Joel\nis a slug``, the output will be ``<p>Joel<br>is a
 slug</p>``.
 
 .. templatefilter:: linebreaksbr
@@ -1730,13 +1893,13 @@ slug</p>``.
 ----------------
 
 Converts all newlines in a piece of plain text to HTML line breaks
-(``<br />``).
+(``<br>``).
 
 For example::
 
     {{ value|linebreaksbr }}
 
-If ``value`` is ``Joel\nis a slug``, the output will be ``Joel<br />is a
+If ``value`` is ``Joel\nis a slug``, the output will be ``Joel<br>is a
 slug``.
 
 .. templatefilter:: linenumbers
@@ -1797,8 +1960,7 @@ If ``value`` is ``Totally LOVING this Album!``, the output will be
 -------------
 
 Returns the value turned into a list. For a string, it's a list of characters.
-For an integer, the argument is cast into an unicode string before creating a
-list.
+For an integer, the argument is cast to a string before creating a list.
 
 For example::
 
@@ -1830,8 +1992,8 @@ If ``value`` is ``800-COLLECT``, the output will be ``800-2655328``.
 ``pluralize``
 -------------
 
-Returns a plural suffix if the value is not 1. By default, this suffix is
-``'s'``.
+Returns a plural suffix if the value is not ``1``, ``'1'``, or an object of
+length 1. By default, this suffix is ``'s'``.
 
 Example::
 
@@ -1930,7 +2092,7 @@ individual elements of the sequence.
 Returns a slice of the list.
 
 Uses the same syntax as Python's list slicing. See
-http://www.diveintopython3.net/native-datatypes.html#slicinglists
+https://www.diveinto.org/python3/native-datatypes.html#slicinglists
 for an introduction.
 
 Example::
@@ -1960,11 +2122,8 @@ If ``value`` is ``"Joel is a slug"``, the output will be ``"joel-is-a-slug"``.
 ----------------
 
 Formats the variable according to the argument, a string formatting specifier.
-This specifier uses Python string formatting syntax, with the exception that
-the leading "%" is dropped.
-
-See https://docs.python.org/library/stdtypes.html#string-formatting-operations
-for documentation of Python string formatting
+This specifier uses the :ref:`old-string-formatting` syntax, with the exception
+that the leading "%" is dropped.
 
 For example::
 
@@ -1994,7 +2153,7 @@ output will be ``"Joel is a slug"``.
     more robust, you can use the ``bleach`` Python library, notably its
     `clean`_ method.
 
-.. _clean: https://bleach.readthedocs.org/en/latest/clean.html
+.. _clean: https://bleach.readthedocs.io/en/latest/clean.html
 
 .. templatefilter:: time
 
@@ -2021,8 +2180,8 @@ for example, ``"de"``, then for::
 
     {{ value|time:"TIME_FORMAT" }}
 
-the output will be the string ``"01:23:00"`` (The ``"TIME_FORMAT"`` format
-specifier for the ``de`` locale as shipped with Django is ``"H:i:s"``).
+the output will be the string ``"01:23"`` (The ``"TIME_FORMAT"`` format
+specifier for the ``de`` locale as shipped with Django is ``"H:i"``).
 
 The ``time`` filter will only accept parameters in the format string that
 relate to the time of day, not the date (for obvious reasons). If you need to
@@ -2035,12 +2194,14 @@ attached timezone information (a :ref:`time-zone-aware
 accept the timezone-related :ref:`format specifiers
 <date-and-time-formatting-specifiers>` ``'e'``, ``'O'`` , ``'T'`` and ``'Z'``.
 
-When used without a format string::
+When used without a format string, the ``TIME_FORMAT`` format specifier is
+used::
 
     {{ value|time }}
 
-...the formatting string defined in the :setting:`TIME_FORMAT` setting will be
-used, without applying any localization.
+is the same as::
+
+    {{ value|time:"TIME_FORMAT" }}
 
 .. templatefilter:: timesince
 
@@ -2104,15 +2265,15 @@ If ``value`` is ``"my FIRST post"``, the output will be ``"My First Post"``.
 -----------------
 
 Truncates a string if it is longer than the specified number of characters.
-Truncated strings will end with a translatable ellipsis sequence ("...").
+Truncated strings will end with a translatable ellipsis character ("…").
 
 **Argument:** Number of characters to truncate to
 
 For example::
 
-    {{ value|truncatechars:9 }}
+    {{ value|truncatechars:7 }}
 
-If ``value`` is ``"Joel is a slug"``, the output will be ``"Joel i..."``.
+If ``value`` is ``"Joel is a slug"``, the output will be ``"Joel i…"``.
 
 .. templatefilter:: truncatechars_html
 
@@ -2125,10 +2286,10 @@ are closed immediately after the truncation.
 
 For example::
 
-    {{ value|truncatechars_html:9 }}
+    {{ value|truncatechars_html:7 }}
 
 If ``value`` is ``"<p>Joel is a slug</p>"``, the output will be
-``"<p>Joel i...</p>"``.
+``"<p>Joel i…</p>"``.
 
 Newlines in the HTML content will be preserved.
 
@@ -2145,7 +2306,7 @@ For example::
 
     {{ value|truncatewords:2 }}
 
-If ``value`` is ``"Joel is a slug"``, the output will be ``"Joel is ..."``.
+If ``value`` is ``"Joel is a slug"``, the output will be ``"Joel is …"``.
 
 Newlines within the string will be removed.
 
@@ -2166,7 +2327,7 @@ For example::
     {{ value|truncatewords_html:2 }}
 
 If ``value`` is ``"<p>Joel is a slug</p>"``, the output will be
-``"<p>Joel is ...</p>"``.
+``"<p>Joel is …</p>"``.
 
 Newlines in the HTML content will be preserved.
 
@@ -2273,8 +2434,9 @@ Django's built-in :tfilter:`escape` filter. The default value for
 
 .. note::
 
-    If ``urlize`` is applied to text that already contains HTML markup,
-    things won't work as expected. Apply this filter only to plain text.
+    If ``urlize`` is applied to text that already contains HTML markup, or to
+    email addresses that contain single quotes (``'``), things won't work as
+    expected. Apply this filter only to plain text.
 
 .. templatefilter:: urlizetrunc
 
@@ -2293,7 +2455,7 @@ For example::
 
 If ``value`` is ``"Check out www.djangoproject.com"``, the output would be
 ``'Check out <a href="http://www.djangoproject.com"
-rel="nofollow">www.djangopr...</a>'``.
+rel="nofollow">www.djangoproj…</a>'``.
 
 As with urlize_, this filter should only be applied to plain text.
 
@@ -2415,31 +2577,25 @@ app is installed, the tag will serve files using ``url()`` method of the
 storage specified by :setting:`STATICFILES_STORAGE`. For example::
 
     {% load static %}
-    <img src="{% static "images/hi.jpg" %}" alt="Hi!" />
+    <img src="{% static "images/hi.jpg" %}" alt="Hi!">
 
 It is also able to consume standard context variables, e.g. assuming a
 ``user_stylesheet`` variable is passed to the template::
 
     {% load static %}
-    <link rel="stylesheet" href="{% static user_stylesheet %}" type="text/css" media="screen" />
+    <link rel="stylesheet" href="{% static user_stylesheet %}" type="text/css" media="screen">
 
 If you'd like to retrieve a static URL without displaying it, you can use a
 slightly different call::
 
     {% load static %}
     {% static "images/hi.jpg" as myphoto %}
-    <img src="{{ myphoto }}"></img>
+    <img src="{{ myphoto }}">
 
 .. admonition:: Using Jinja2 templates?
 
     See :class:`~django.template.backends.jinja2.Jinja2` for information on
     using the ``static`` tag with Jinja2.
-
-.. versionchanged:: 1.10
-
-    In older versions, you had to use ``{% load static from staticfiles %}`` in
-    your template to serve files from the storage defined in
-    :setting:`STATICFILES_STORAGE`. This is no longer required.
 
 .. templatetag:: get_static_prefix
 
@@ -2451,7 +2607,7 @@ over exactly where and how :setting:`STATIC_URL` is injected into the template,
 you can use the :ttag:`get_static_prefix` template tag::
 
     {% load static %}
-    <img src="{% get_static_prefix %}images/hi.jpg" alt="Hi!" />
+    <img src="{% get_static_prefix %}images/hi.jpg" alt="Hi!">
 
 There's also a second form you can use to avoid extra processing if you need
 the value multiple times::
@@ -2459,8 +2615,8 @@ the value multiple times::
     {% load static %}
     {% get_static_prefix as STATIC_PREFIX %}
 
-    <img src="{{ STATIC_PREFIX }}images/hi.jpg" alt="Hi!" />
-    <img src="{{ STATIC_PREFIX }}images/hi2.jpg" alt="Hello!" />
+    <img src="{{ STATIC_PREFIX }}images/hi.jpg" alt="Hi!">
+    <img src="{{ STATIC_PREFIX }}images/hi2.jpg" alt="Hello!">
 
 .. templatetag:: get_media_prefix
 

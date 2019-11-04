@@ -4,22 +4,24 @@
 # Ali Nikneshan <ali@nikneshan.com>, 2015
 # Eric Hamiter <ehamiter@gmail.com>, 2013
 # Jannis Leidel <jannis@leidel.info>, 2011
-# ka7eh, 2015
+# Kaveh Karimi, 2015
+# MJafar Mashhadi <raindigital2007@gmail.com>, 2018
+# Pouya Abbassi, 2016
 # Reza Mohammadi <reza@teeleh.ir>, 2013-2014
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-10 15:10+0200\n"
-"PO-Revision-Date: 2015-12-12 23:43+0000\n"
-"Last-Translator: ka7eh\n"
+"POT-Creation-Date: 2017-09-24 13:46+0200\n"
+"PO-Revision-Date: 2018-06-23 23:12+0000\n"
+"Last-Translator: MJafar Mashhadi <raindigital2007@gmail.com>\n"
 "Language-Team: Persian (http://www.transifex.com/django/django/language/"
 "fa/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: fa\n"
-"Plural-Forms: nplurals=1; plural=0;\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
 msgid "Personal info"
 msgstr "اطلاعات شخصی"
@@ -70,12 +72,10 @@ msgstr "برای تائید، رمز عبور قبلی را وارد کنید."
 
 msgid ""
 "Raw passwords are not stored, so there is no way to see this user's "
-"password, but you can change the password using <a href=\"../password/"
-"\">this form</a>."
+"password, but you can change the password using <a href=\"{}\">this form</a>."
 msgstr ""
-"رمزهای عبور خام ذخیره نمیشوند، بنابراین راهی برای دیدن رمز عبور این کاربر "
-"وجود ندارد، اما می‌توانید رمز عبور را با استفاده از <a href=\"../password/"
-"\">این فرم</a> تغییر دهید."
+"گذرواژه‌ها به صورت خام نگهداری نمی‌شوند لذا راهی برای مشاهدهٔ گذرواژهٔ این کاربر "
+"وجود ندارد، اما می‌توانید آن را با <a href=\"{}\">این فرم</a> تغییر دهید."
 
 #, python-format
 msgid ""
@@ -117,6 +117,21 @@ msgstr "salt"
 
 msgid "hash"
 msgstr "hash"
+
+msgid "variety"
+msgstr "تنوع"
+
+msgid "version"
+msgstr "نسخه"
+
+msgid "memory cost"
+msgstr "هزینه‌ی حافظه"
+
+msgid "time cost"
+msgstr "هزینه‌ی زمان"
+
+msgid "parallelism"
+msgstr "موازات"
 
 msgid "work factor"
 msgstr "عامل کار"
@@ -171,15 +186,8 @@ msgstr "اجازه‌های خاص این کاربر."
 msgid "username"
 msgstr "نام کاربری"
 
-msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
-msgstr "الزامی. ۳۰ کاراکتر یا کمتر. فقط حروف الفبا، ارقام و @/./+/-/_."
-
-msgid ""
-"Enter a valid username. This value may contain only letters, numbers and @/./"
-"+/-/_ characters."
-msgstr ""
-"یک نام کاربری معتبر وارد کنید. نام کاربری می‌تواند شامل حروف، اعداد، و "
-"کاراکترهای @/./+/-/_ باشد."
+msgid "Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only."
+msgstr "الزامی. 150 کاراکتر یا کمتر. فقط شامل حروف، اعداد، و علامات @/./+/-/_"
 
 msgid "A user with that username already exists."
 msgstr "کاربری با آن نام کاربری وجود دارد."
@@ -228,11 +236,15 @@ msgid_plural ""
 msgstr[0] ""
 "این رمز عبور خیلی کوتاه است. رمز عبور می‌بایست حداقل از %(min_length)d حرف "
 "تشکیل شده باشد."
+msgstr[1] ""
+"این رمز عبور خیلی کوتاه است. رمز عبور می‌بایست حداقل از %(min_length)d حرف "
+"تشکیل شده باشد."
 
 #, python-format
 msgid "Your password must contain at least %(min_length)d character."
 msgid_plural "Your password must contain at least %(min_length)d characters."
 msgstr[0] "رمز عبور شما می‌بایست حداقل از %(min_length)d حرف تشکیل شده باشد."
+msgstr[1] "رمز عبور شما می‌بایست حداقل از %(min_length)d حرف تشکیل شده باشد."
 
 #, python-format
 msgid "The password is too similar to the %(verbose_name)s."
@@ -256,6 +268,20 @@ msgstr "رمز شما نمی تواند کلا عدد باشد"
 #, python-format
 msgid "Password reset on %(site_name)s"
 msgstr "بازیابی گذرواژه در %(site_name)s"
+
+msgid ""
+"Enter a valid username. This value may contain only English letters, "
+"numbers, and @/./+/-/_ characters."
+msgstr ""
+"یک نام کاربری معتبر وارد کنید. این مقدار میتواند فقط شامل حروف الفبای "
+"انگلیسی، اعداد، و علامات @/./+/-/_ باشد."
+
+msgid ""
+"Enter a valid username. This value may contain only letters, numbers, and "
+"@/./+/-/_ characters."
+msgstr ""
+"یک نام کاربری معتبر وارد کنید. این مقدار میتواند فقط شامل حروف، اعداد، و "
+"علامات @/./+/-/_ باشد."
 
 msgid "Logged out"
 msgstr "خارج شدید"

@@ -9,6 +9,26 @@ from .models import Car, Part, Person, SportsCar
 
 
 class ManyToManySignalsTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.vw = Car.objects.create(name='VW')
+        cls.bmw = Car.objects.create(name='BMW')
+        cls.toyota = Car.objects.create(name='Toyota')
+
+        cls.wheelset = Part.objects.create(name='Wheelset')
+        cls.doors = Part.objects.create(name='Doors')
+        cls.engine = Part.objects.create(name='Engine')
+        cls.airbag = Part.objects.create(name='Airbag')
+        cls.sunroof = Part.objects.create(name='Sunroof')
+
+        cls.alice = Person.objects.create(name='Alice')
+        cls.bob = Person.objects.create(name='Bob')
+        cls.chuck = Person.objects.create(name='Chuck')
+        cls.daisy = Person.objects.create(name='Daisy')
+
+    def setUp(self):
+        self.m2m_changed_messages = []
+
     def m2m_changed_signal_receiver(self, signal, sender, **kwargs):
         message = {
             'instance': kwargs['instance'],
@@ -21,24 +41,6 @@ class ManyToManySignalsTest(TestCase):
                 kwargs['model'].objects.filter(pk__in=kwargs['pk_set'])
             )
         self.m2m_changed_messages.append(message)
-
-    def setUp(self):
-        self.m2m_changed_messages = []
-
-        self.vw = Car.objects.create(name='VW')
-        self.bmw = Car.objects.create(name='BMW')
-        self.toyota = Car.objects.create(name='Toyota')
-
-        self.wheelset = Part.objects.create(name='Wheelset')
-        self.doors = Part.objects.create(name='Doors')
-        self.engine = Part.objects.create(name='Engine')
-        self.airbag = Part.objects.create(name='Airbag')
-        self.sunroof = Part.objects.create(name='Sunroof')
-
-        self.alice = Person.objects.create(name='Alice')
-        self.bob = Person.objects.create(name='Bob')
-        self.chuck = Person.objects.create(name='Chuck')
-        self.daisy = Person.objects.create(name='Daisy')
 
     def tearDown(self):
         # disconnect all signal handlers
@@ -359,7 +361,7 @@ class ManyToManySignalsTest(TestCase):
 
         self._initialize_signal_car(add_default_parts_before_set_signal=True)
 
-        # Check that signals still work when model inheritance is involved
+        # Signals still work when model inheritance is involved
         c4 = SportsCar.objects.create(name='Bugatti', price='1000000')
         c4b = Car.objects.get(name='Bugatti')
         c4.default_parts.set([self.doors])

@@ -9,8 +9,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-10 14:49+0200\n"
-"PO-Revision-Date: 2015-10-11 10:05+0000\n"
+"POT-Creation-Date: 2017-01-19 16:49+0100\n"
+"PO-Revision-Date: 2017-09-19 16:40+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Bengali (http://www.transifex.com/django/django/language/"
 "bn/)\n"
@@ -123,7 +123,7 @@ msgstr ""
 msgid "Arguments"
 msgstr ""
 
-msgid "Back to Model Documentation"
+msgid "Back to Model documentation"
 msgstr ""
 
 msgid "Model documentation"
@@ -143,6 +143,7 @@ msgstr "টেমপ্লেট: %(name)s"
 msgid "Template: \"%(name)s\""
 msgstr "টেমপ্লেট: \"%(name)s\""
 
+#. Translators: Search is not a verb here, it qualifies path (a search path)
 #, python-format
 msgid "Search path for template \"%(name)s\":"
 msgstr ""
@@ -193,8 +194,8 @@ msgstr ""
 msgid "Templates:"
 msgstr "টেমপ্লেটসমূহ:"
 
-msgid "Back to Views Documentation"
-msgstr "ভিউ ডকুমেন্টেশনে ফেরত যান"
+msgid "Back to View documentation"
+msgstr ""
 
 msgid "View documentation"
 msgstr "ভিউ ডকুমেন্টেশন"
@@ -218,13 +219,6 @@ msgid ""
 "    View function: <code>%(full_name)s</code>. Name: <code>%(url_name)s</"
 "code>.\n"
 msgstr ""
-
-msgid "Boolean (Either True or False)"
-msgstr "বুলিয়ান (হয় True অথবা False)"
-
-#, python-format
-msgid "Field of type: %(field_type)s"
-msgstr "ফিল্ডের ধরণ: %(field_type)s"
 
 msgid "tag:"
 msgstr "ট্যাগঃ"

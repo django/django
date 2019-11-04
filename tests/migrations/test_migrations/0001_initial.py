@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals
-
 from django.db import migrations, models
 
 
@@ -9,7 +6,6 @@ class Migration(migrations.Migration):
     initial = True
 
     operations = [
-
         migrations.CreateModel(
             "Author",
             [
@@ -20,7 +16,6 @@ class Migration(migrations.Migration):
                 ("silly_field", models.BooleanField(default=False)),
             ],
         ),
-
         migrations.CreateModel(
             "Tribble",
             [
@@ -28,10 +23,13 @@ class Migration(migrations.Migration):
                 ("fluffy", models.BooleanField(default=True)),
             ],
         ),
-
+        migrations.AddField(
+            model_name='tribble',
+            name='bool',
+            field=models.BooleanField(default=False),
+        ),
         migrations.AlterUniqueTogether(
             name='author',
-            unique_together=set([('name', 'slug')]),
+            unique_together={('name', 'slug')},
         ),
-
     ]

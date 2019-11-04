@@ -1,13 +1,11 @@
-from __future__ import unicode_literals
-
 from django.db import models
 from django.test import TestCase
-from django.utils import six
 
 from .models import (
     Book, Car, CustomManager, CustomQuerySet, DeconstructibleCustomManager,
-    FunPerson, OneToOneRestrictedModel, Person, PersonFromAbstract,
-    PersonManager, PublishedBookManager, RelatedModel, RestrictedModel,
+    FastCarAsBase, FastCarAsDefault, FunPerson, OneToOneRestrictedModel,
+    Person, PersonFromAbstract, PersonManager, PublishedBookManager,
+    RelatedModel, RestrictedModel,
 )
 
 
@@ -35,7 +33,7 @@ class CustomManagerTests(TestCase):
             Person.objects.get_fun_people(), [
                 "Bugs Bunny"
             ],
-            six.text_type
+            str
         )
 
     def test_queryset_copied_to_default(self):
@@ -44,41 +42,45 @@ class CustomManagerTests(TestCase):
         default Manager.
         """
         for manager_name in self.custom_manager_names:
-            manager = getattr(Person, manager_name)
+            with self.subTest(manager_name=manager_name):
+                manager = getattr(Person, manager_name)
 
-            # Public methods are copied
-            manager.public_method()
-            # Private methods are not copied
-            with self.assertRaises(AttributeError):
-                manager._private_method()
+                # Public methods are copied
+                manager.public_method()
+                # Private methods are not copied
+                with self.assertRaises(AttributeError):
+                    manager._private_method()
 
     def test_manager_honors_queryset_only(self):
         for manager_name in self.custom_manager_names:
-            manager = getattr(Person, manager_name)
-            # Methods with queryset_only=False are copied even if they are private.
-            manager._optin_private_method()
-            # Methods with queryset_only=True aren't copied even if they are public.
-            with self.assertRaises(AttributeError):
-                manager.optout_public_method()
+            with self.subTest(manager_name=manager_name):
+                manager = getattr(Person, manager_name)
+                # Methods with queryset_only=False are copied even if they are private.
+                manager._optin_private_method()
+                # Methods with queryset_only=True aren't copied even if they are public.
+                msg = "%r object has no attribute 'optout_public_method'" % manager.__class__.__name__
+                with self.assertRaisesMessage(AttributeError, msg):
+                    manager.optout_public_method()
 
     def test_manager_use_queryset_methods(self):
         """
         Custom manager will use the queryset methods
         """
         for manager_name in self.custom_manager_names:
-            manager = getattr(Person, manager_name)
-            queryset = manager.filter()
-            self.assertQuerysetEqual(queryset, ["Bugs Bunny"], six.text_type)
-            self.assertEqual(queryset._filter_CustomQuerySet, True)
+            with self.subTest(manager_name=manager_name):
+                manager = getattr(Person, manager_name)
+                queryset = manager.filter()
+                self.assertQuerysetEqual(queryset, ["Bugs Bunny"], str)
+                self.assertIs(queryset._filter_CustomQuerySet, True)
 
-            # Test that specialized querysets inherit from our custom queryset.
-            queryset = manager.values_list('first_name', flat=True).filter()
-            self.assertEqual(list(queryset), [six.text_type("Bugs")])
-            self.assertEqual(queryset._filter_CustomQuerySet, True)
+                # Specialized querysets inherit from our custom queryset.
+                queryset = manager.values_list('first_name', flat=True).filter()
+                self.assertEqual(list(queryset), ["Bugs"])
+                self.assertIs(queryset._filter_CustomQuerySet, True)
 
-            self.assertIsInstance(queryset.values(), CustomQuerySet)
-            self.assertIsInstance(queryset.values().values(), CustomQuerySet)
-            self.assertIsInstance(queryset.values_list().values(), CustomQuerySet)
+                self.assertIsInstance(queryset.values(), CustomQuerySet)
+                self.assertIsInstance(queryset.values().values(), CustomQuerySet)
+                self.assertIsInstance(queryset.values_list().values(), CustomQuerySet)
 
     def test_init_args(self):
         """
@@ -92,7 +94,8 @@ class CustomManagerTests(TestCase):
         querysets.
         """
         Person.custom_queryset_custom_manager.manager_only()
-        with self.assertRaises(AttributeError):
+        msg = "'CustomQuerySet' object has no attribute 'manager_only'"
+        with self.assertRaisesMessage(AttributeError, msg):
             Person.custom_queryset_custom_manager.all().manager_only()
 
     def test_queryset_and_manager(self):
@@ -100,8 +103,8 @@ class CustomManagerTests(TestCase):
         Queryset method doesn't override the custom manager method.
         """
         queryset = Person.custom_queryset_custom_manager.filter()
-        self.assertQuerysetEqual(queryset, ["Bugs Bunny"], six.text_type)
-        self.assertEqual(queryset._filter_CustomManager, True)
+        self.assertQuerysetEqual(queryset, ["Bugs Bunny"], str)
+        self.assertIs(queryset._filter_CustomManager, True)
 
     def test_related_manager(self):
         """
@@ -115,7 +118,8 @@ class CustomManagerTests(TestCase):
         The default manager, "objects", doesn't exist, because a custom one
         was provided.
         """
-        with self.assertRaises(AttributeError):
+        msg = "type object 'Book' has no attribute 'objects'"
+        with self.assertRaisesMessage(AttributeError, msg):
             Book.objects
 
     def test_filtering(self):
@@ -282,7 +286,7 @@ class CustomManagerTests(TestCase):
         Person.objects.create(first_name="Bugs", last_name="Bunny", fun=True, favorite_book=self.b1)
         droopy = Person.objects.create(first_name="Droopy", last_name="Dog", fun=False, favorite_book=self.b1)
 
-        # Check that the fun manager DOESN'T remove boring people.
+        # The fun manager DOESN'T remove boring people.
         self.b1.favorite_books(manager='fun_people').remove(droopy, bulk=bulk)
         self.assertQuerysetEqual(
             self.b1.favorite_books(manager='boring_people').all(), [
@@ -291,7 +295,7 @@ class CustomManagerTests(TestCase):
             lambda c: c.first_name,
             ordered=False,
         )
-        # Check that the boring manager DOES remove boring people.
+        # The boring manager DOES remove boring people.
         self.b1.favorite_books(manager='boring_people').remove(droopy, bulk=bulk)
         self.assertQuerysetEqual(
             self.b1.favorite_books(manager='boring_people').all(), [
@@ -302,7 +306,7 @@ class CustomManagerTests(TestCase):
         droopy.favorite_book = self.b1
         droopy.save()
 
-        # Check that the fun manager ONLY clears fun people.
+        # The fun manager ONLY clears fun people.
         self.b1.favorite_books(manager='fun_people').clear(bulk=bulk)
         self.assertQuerysetEqual(
             self.b1.favorite_books(manager='boring_people').all(), [
@@ -362,7 +366,7 @@ class CustomManagerTests(TestCase):
         Person.objects.create(first_name="Bugs", last_name="Bunny", fun=True, favorite_thing=self.b1)
         droopy = Person.objects.create(first_name="Droopy", last_name="Dog", fun=False, favorite_thing=self.b1)
 
-        # Check that the fun manager DOESN'T remove boring people.
+        # The fun manager DOESN'T remove boring people.
         self.b1.favorite_things(manager='fun_people').remove(droopy, bulk=bulk)
         self.assertQuerysetEqual(
             self.b1.favorite_things(manager='boring_people').all(), [
@@ -372,7 +376,7 @@ class CustomManagerTests(TestCase):
             ordered=False,
         )
 
-        # Check that the boring manager DOES remove boring people.
+        # The boring manager DOES remove boring people.
         self.b1.favorite_things(manager='boring_people').remove(droopy, bulk=bulk)
         self.assertQuerysetEqual(
             self.b1.favorite_things(manager='boring_people').all(), [
@@ -383,7 +387,7 @@ class CustomManagerTests(TestCase):
         droopy.favorite_thing = self.b1
         droopy.save()
 
-        # Check that the fun manager ONLY clears fun people.
+        # The fun manager ONLY clears fun people.
         self.b1.favorite_things(manager='fun_people').clear(bulk=bulk)
         self.assertQuerysetEqual(
             self.b1.favorite_things(manager='boring_people').all(), [
@@ -443,7 +447,7 @@ class CustomManagerTests(TestCase):
         droopy = Person.objects.create(first_name="Droopy", last_name="Dog", fun=False)
         self.b1.authors.add(droopy)
 
-        # Check that the fun manager DOESN'T remove boring people.
+        # The fun manager DOESN'T remove boring people.
         self.b1.authors(manager='fun_people').remove(droopy)
         self.assertQuerysetEqual(
             self.b1.authors(manager='boring_people').all(), [
@@ -453,7 +457,7 @@ class CustomManagerTests(TestCase):
             ordered=False,
         )
 
-        # Check that the boring manager DOES remove boring people.
+        # The boring manager DOES remove boring people.
         self.b1.authors(manager='boring_people').remove(droopy)
         self.assertQuerysetEqual(
             self.b1.authors(manager='boring_people').all(), [
@@ -463,7 +467,7 @@ class CustomManagerTests(TestCase):
         )
         self.b1.authors.add(droopy)
 
-        # Check that the fun manager ONLY clears fun people.
+        # The fun manager ONLY clears fun people.
         self.b1.authors(manager='fun_people').clear()
         self.assertQuerysetEqual(
             self.b1.authors(manager='boring_people').all(), [
@@ -558,6 +562,34 @@ class TestCars(TestCase):
             ],
             lambda c: c.name
         )
+        # explicit default manager
+        self.assertQuerysetEqual(
+            FastCarAsDefault.cars.order_by("name"), [
+                "Corvette",
+                "Neon",
+            ],
+            lambda c: c.name
+        )
+        self.assertQuerysetEqual(
+            FastCarAsDefault._default_manager.all(), [
+                "Corvette",
+            ],
+            lambda c: c.name
+        )
+        # explicit base manager
+        self.assertQuerysetEqual(
+            FastCarAsBase.cars.order_by("name"), [
+                "Corvette",
+                "Neon",
+            ],
+            lambda c: c.name
+        )
+        self.assertQuerysetEqual(
+            FastCarAsBase._base_manager.all(), [
+                "Corvette",
+            ],
+            lambda c: c.name
+        )
 
 
 class CustomManagersRegressTestCase(TestCase):
@@ -574,6 +606,32 @@ class CustomManagersRegressTestCase(TestCase):
         # If the hidden object wasn't seen during the save process,
         # there would now be two objects in the database.
         self.assertEqual(RestrictedModel.plain_manager.count(), 1)
+
+    def test_refresh_from_db_when_default_manager_filters(self):
+        """
+        Model.refresh_from_db() works for instances hidden by the default
+        manager.
+        """
+        book = Book._base_manager.create(is_published=False)
+        Book._base_manager.filter(pk=book.pk).update(title='Hi')
+        book.refresh_from_db()
+        self.assertEqual(book.title, 'Hi')
+
+    def test_save_clears_annotations_from_base_manager(self):
+        """Model.save() clears annotations from the base manager."""
+        self.assertEqual(Book._meta.base_manager.name, 'annotated_objects')
+        book = Book.annotated_objects.create(title='Hunting')
+        Person.objects.create(
+            first_name='Bugs', last_name='Bunny', fun=True,
+            favorite_book=book, favorite_thing_id=1,
+        )
+        book = Book.annotated_objects.first()
+        self.assertEqual(book.favorite_avg, 1)  # Annotation from the manager.
+        book.title = 'New Hunting'
+        # save() fails if annotations that involve related fields aren't
+        # cleared before the update query.
+        book.save()
+        self.assertEqual(Book.annotated_objects.first().title, 'New Hunting')
 
     def test_delete_related_on_filtered_manager(self):
         """Deleting related objects should also not be distracted by a

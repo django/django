@@ -4,6 +4,8 @@ Coding style
 
 Please follow these coding standards when writing code for inclusion in Django.
 
+.. _coding-style-python:
+
 Python style
 ============
 
@@ -31,25 +33,58 @@ Python style
 
 * Use four spaces for indentation.
 
+* Use four space hanging indentation rather than vertical alignment::
+
+    raise AttributeError(
+        'Here is a multiline error message '
+        'shortened for clarity.'
+    )
+
+  Instead of::
+
+      raise AttributeError('Here is a multiline error message '
+                           'shortened for clarity.')
+
+  This makes better use of space and avoids having to realign strings if the
+  length of the first line changes.
+
+* Use single quotes for strings, or a double quote if the string contains a
+  single quote. Don't waste time doing unrelated refactoring of existing code
+  to conform to this style.
+
+* Avoid use of "we" in comments, e.g. "Loop over" rather than "We loop over".
+
 * Use underscores, not camelCase, for variable, function and method names
-  (i.e. ``poll.get_unique_voters()``, not ``poll.getUniqueVoters``).
+  (i.e. ``poll.get_unique_voters()``, not ``poll.getUniqueVoters()``).
 
 * Use ``InitialCaps`` for class names (or for factory functions that
   return classes).
 
-* In docstrings, follow :pep:`257`. For example::
+* In docstrings, follow the style of existing docstrings and :pep:`257`.
 
-      def foo():
-          """
-          Calculate something and return the result.
-          """
-          ...
+* In tests, use
+  :meth:`~django.test.SimpleTestCase.assertRaisesMessage` and
+  :meth:`~django.test.SimpleTestCase.assertWarnsMessage`
+  instead of :meth:`~unittest.TestCase.assertRaises` and
+  :meth:`~unittest.TestCase.assertWarns` so you can check the
+  exception or warning message. Use :meth:`~unittest.TestCase.assertRaisesRegex`
+  and :meth:`~unittest.TestCase.assertWarnsRegex` only if you need regular
+  expression matching.
 
-* In tests, use :meth:`~django.test.SimpleTestCase.assertRaisesMessage` instead
-  of :meth:`~unittest.TestCase.assertRaises` so you can check the exception
-  message. Use :meth:`~unittest.TestCase.assertRaisesRegex`
-  (``six.assertRaisesRegex()`` as long as we support Python 2) only if you need
-  to use regular expression matching.
+* In test docstrings, state the expected behavior that each test demonstrates.
+  Don't include preambles such as "Tests that" or "Ensures that".
+
+  Reserve ticket references for obscure issues where the ticket has additional
+  details that can't be easily described in docstrings or comments. Include the
+  ticket number at the end of a sentence like this::
+
+    def test_foo():
+        """
+        A test docstring looks like this (#123456).
+        """
+        ...
+
+.. _coding-style-imports:
 
 Imports
 =======
@@ -59,7 +94,7 @@ Imports
 
   Quick start:
 
-  .. code-block:: console
+  .. console::
 
       $ pip install isort
       $ isort -rc .
@@ -77,7 +112,7 @@ Imports
   imports for other Django components and relative imports for local components.
 
 * On each line, alphabetize the items with the upper case items grouped before
-  the lower case items.
+  the lowercase items.
 
 * Break long lines using parentheses and indent continuation lines by 4 spaces.
   Include a trailing comma after the last import and put the closing
@@ -88,8 +123,8 @@ Imports
 
   For example (comments are for explanatory purposes only):
 
-  .. snippet::
-      :filename: django/contrib/admin/example.py
+  .. code-block:: python
+      :caption: django/contrib/admin/example.py
 
       # future
       from __future__ import unicode_literals
@@ -113,14 +148,14 @@ Imports
 
       # try/except
       try:
-          import pytz
+          import yaml
       except ImportError:
-          pytz = None
+          yaml = None
 
       CONSTANT = 'foo'
 
 
-      class Example(object):
+      class Example:
           # ...
 
 * Use convenience imports whenever available. For example, do this::
@@ -212,10 +247,6 @@ Model style
           first_name = models.CharField(max_length=20)
           last_name = models.CharField(max_length=40)
 
-* If you define a ``__str__`` method (previously ``__unicode__`` before Python 3
-  was supported), decorate the model class with
-  :func:`~django.utils.encoding.python_2_unicode_compatible`.
-
 * The order of model inner classes and standard methods should be as
   follows (noting that these are not all required):
 
@@ -227,17 +258,17 @@ Model style
   * ``def get_absolute_url()``
   * Any custom methods
 
-* If ``choices`` is defined for a given model field, define each choice as
-  a tuple of tuples, with an all-uppercase name as a class attribute on the
-  model. Example::
+* If ``choices`` is defined for a given model field, define each choice as a
+  list of tuples, with an all-uppercase name as a class attribute on the model.
+  Example::
 
     class MyModel(models.Model):
         DIRECTION_UP = 'U'
         DIRECTION_DOWN = 'D'
-        DIRECTION_CHOICES = (
+        DIRECTION_CHOICES = [
             (DIRECTION_UP, 'Up'),
             (DIRECTION_DOWN, 'Down'),
-        )
+        ]
 
 Use of ``django.conf.settings``
 ===============================
@@ -304,5 +335,5 @@ JavaScript style
 For details about the JavaScript code style used by Django, see
 :doc:`javascript`.
 
-.. _editorconfig: http://editorconfig.org/
-.. _flake8: https://pypi.python.org/pypi/flake8
+.. _editorconfig: https://editorconfig.org/
+.. _flake8: https://pypi.org/project/flake8/

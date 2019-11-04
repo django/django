@@ -17,16 +17,16 @@ class LoginRequiredTestCase(AuthViewsTestCase):
 
     def testCallable(self):
         """
-        Check that login_required is assignable to callable objects.
+        login_required is assignable to callable objects.
         """
-        class CallableView(object):
+        class CallableView:
             def __call__(self, *args, **kwargs):
                 pass
         login_required(CallableView())
 
     def testView(self):
         """
-        Check that login_required is assignable to normal views.
+        login_required is assignable to normal views.
         """
         def normal_view(request):
             pass
@@ -34,8 +34,8 @@ class LoginRequiredTestCase(AuthViewsTestCase):
 
     def testLoginRequired(self, view_url='/login_required/', login_url=None):
         """
-        Check that login_required works on a simple view wrapped in a
-        login_required decorator.
+        login_required works on a simple view wrapped in a login_required
+        decorator.
         """
         if login_url is None:
             login_url = settings.LOGIN_URL
@@ -48,23 +48,24 @@ class LoginRequiredTestCase(AuthViewsTestCase):
 
     def testLoginRequiredNextUrl(self):
         """
-        Check that login_required works on a simple view wrapped in a
-        login_required decorator with a login_url set.
+        login_required works on a simple view wrapped in a login_required
+        decorator with a login_url set.
         """
-        self.testLoginRequired(view_url='/login_required_login_url/',
-            login_url='/somewhere/')
+        self.testLoginRequired(view_url='/login_required_login_url/', login_url='/somewhere/')
 
 
 class PermissionsRequiredDecoratorTest(TestCase):
     """
     Tests for the permission_required decorator
     """
-    def setUp(self):
-        self.user = models.User.objects.create(username='joe', password='qwerty')
-        self.factory = RequestFactory()
+    factory = RequestFactory()
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.user = models.User.objects.create(username='joe', password='qwerty')
         # Add permissions auth.add_customuser and auth.change_customuser
         perms = models.Permission.objects.filter(codename__in=('add_customuser', 'change_customuser'))
-        self.user.user_permissions.add(*perms)
+        cls.user.user_permissions.add(*perms)
 
     def test_many_permissions_pass(self):
 
@@ -98,7 +99,7 @@ class PermissionsRequiredDecoratorTest(TestCase):
 
     def test_permissioned_denied_redirect(self):
 
-        @permission_required(['auth_tests.add_customuser', 'auth_tests.change_customuser', 'non-existent-permission'])
+        @permission_required(['auth_tests.add_customuser', 'auth_tests.change_customuser', 'nonexistent-permission'])
         def a_view(request):
             return HttpResponse()
         request = self.factory.get('/rand')
@@ -109,7 +110,7 @@ class PermissionsRequiredDecoratorTest(TestCase):
     def test_permissioned_denied_exception_raised(self):
 
         @permission_required([
-            'auth_tests.add_customuser', 'auth_tests.change_customuser', 'non-existent-permission'
+            'auth_tests.add_customuser', 'auth_tests.change_customuser', 'nonexistent-permission'
         ], raise_exception=True)
         def a_view(request):
             return HttpResponse()

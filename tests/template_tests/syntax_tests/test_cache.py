@@ -100,16 +100,18 @@ class CacheTagTests(SimpleTestCase):
         """
         Regression test for #11270.
         """
-        output = self.engine.render_to_string('cache17', {'poem': 'Oh freddled gruntbuggly/'
-                                            'Thy micturations are to me/'
-                                            'As plurdled gabbleblotchits/'
-                                            'On a lurgid bee/'
-                                            'That mordiously hath bitled out/'
-                                            'Its earted jurtles/'
-                                            'Into a rancid festering/'
-                                            'Or else I shall rend thee in the gobberwarts'
-                                            'with my blurglecruncheon/'
-                                            'See if I dont.'})
+        output = self.engine.render_to_string(
+            'cache17',
+            {
+                'poem': (
+                    'Oh freddled gruntbuggly/Thy micturations are to me/'
+                    'As plurdled gabbleblotchits/On a lurgid bee/'
+                    'That mordiously hath bitled out/Its earted jurtles/'
+                    'Into a rancid festering/Or else I shall rend thee in the gobberwarts'
+                    'with my blurglecruncheon/See if I don\'t.'
+                ),
+            }
+        )
         self.assertEqual(output, 'Some Content')
 
     @setup({'cache18': '{% load cache custom %}{% cache 2|noop:"x y" cache18 %}cache18{% endcache %}'})
@@ -120,13 +122,24 @@ class CacheTagTests(SimpleTestCase):
         output = self.engine.render_to_string('cache18')
         self.assertEqual(output, 'cache18')
 
+    @setup({
+        'first': '{% load cache %}{% cache None fragment19 %}content{% endcache %}',
+        'second': '{% load cache %}{% cache None fragment19 %}not rendered{% endcache %}'
+    })
+    def test_none_timeout(self):
+        """A timeout of None means "cache forever"."""
+        output = self.engine.render_to_string('first')
+        self.assertEqual(output, 'content')
+        output = self.engine.render_to_string('second')
+        self.assertEqual(output, 'content')
+
 
 class CacheTests(SimpleTestCase):
 
     @classmethod
     def setUpClass(cls):
         cls.engine = Engine(libraries={'cache': 'django.templatetags.cache'})
-        super(CacheTests, cls).setUpClass()
+        super().setUpClass()
 
     def test_cache_regression_20130(self):
         t = self.engine.from_string('{% load cache %}{% cache 1 regression_20130 %}foo{% endcache %}')

@@ -13,12 +13,12 @@ free.argtypes = [c_void_p]
 
 
 def last_arg_byref(args):
-    "Returns the last C argument's value by reference."
+    "Return the last C argument's value by reference."
     return args[-1]._obj.value
 
 
 def check_dbl(result, func, cargs):
-    "Checks the status code and returns the double value passed in by reference."
+    "Check the status code and returns the double value passed in by reference."
     # Checking the status code
     if result != 1:
         return None
@@ -43,10 +43,9 @@ def check_minus_one(result, func, cargs):
 
 def check_predicate(result, func, cargs):
     "Error checking for unary/binary predicate functions."
-    val = ord(result)  # getting the ordinal from the character
-    if val == 1:
+    if result == 1:
         return True
-    elif val == 0:
+    elif result == 0:
         return False
     else:
         raise GEOSException('Error encountered on GEOS C predicate function "%s".' % func.__name__)
@@ -82,11 +81,3 @@ def check_string(result, func, cargs):
     # Freeing the memory allocated within GEOS
     free(result)
     return s
-
-
-def check_zero(result, func, cargs):
-    "Error checking on routines that should not return 0."
-    if result == 0:
-        raise GEOSException('Error encountered in GEOS C function "%s".' % func.__name__)
-    else:
-        return result

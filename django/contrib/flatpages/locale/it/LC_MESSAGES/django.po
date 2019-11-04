@@ -1,6 +1,7 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Carlo Miron <C8E@miron.it>, 2019
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Marco Bonetti, 2014
 # palmux <palmux@gmail.com>, 2015
@@ -8,9 +9,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2015-10-18 18:15+0000\n"
-"Last-Translator: palmux <palmux@gmail.com>\n"
+"POT-Creation-Date: 2019-01-16 20:42+0100\n"
+"PO-Revision-Date: 2019-02-19 10:31+0000\n"
+"Last-Translator: Carlo Miron <C8E@miron.it>\n"
 "Language-Team: Italian (http://www.transifex.com/django/django/language/"
 "it/)\n"
 "MIME-Version: 1.0\n"
@@ -40,6 +41,9 @@ msgid ""
 msgstr ""
 "Questo valore deve contenere solo lettere, numeri, punti, underscore, "
 "trattini, barre diagonali o tilde."
+
+msgid "Example: '/about/contact'. Make sure to have a leading slash."
+msgstr "Per esempio: '/about/contact'. Assicurati che inizi con uno slash."
 
 msgid "URL is missing a leading slash."
 msgstr "Manca una barra iniziale nella URL."

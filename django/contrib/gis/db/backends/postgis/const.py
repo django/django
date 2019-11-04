@@ -27,7 +27,7 @@ GDAL_TO_STRUCT = [
 # Size of the packed value in bytes for different numerical types.
 # This is needed to cut chunks of band data out of PostGIS raster strings
 # when decomposing them into GDALRasters.
-# See https://docs.python.org/3/library/struct.html#format-characters
+# See https://docs.python.org/library/struct.html#format-characters
 STRUCT_SIZE = {
     'b': 1,  # Signed char
     'B': 1,  # Unsigned char

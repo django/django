@@ -1,7 +1,7 @@
 from django.core.cache.backends.locmem import LocMemCache
 
 
-class CloseHookMixin(object):
+class CloseHookMixin:
     closed = False
 
     def close(self, **kwargs):

@@ -1,6 +1,4 @@
-from __future__ import unicode_literals
-
-from django.db.models.query_utils import DeferredAttribute, InvalidQuery
+from django.db.models.query_utils import InvalidQuery
 from django.test import TestCase
 
 from .models import (
@@ -8,17 +6,14 @@ from .models import (
 )
 
 
-class AssertionMixin(object):
+class AssertionMixin:
     def assert_delayed(self, obj, num):
         """
         Instances with deferred fields look the same as normal instances when
         we examine attribute values. Therefore, this method returns the number
         of deferred fields on returned instances.
         """
-        count = 0
-        for field in obj._meta.fields:
-            if isinstance(obj.__class__.__dict__.get(field.attname), DeferredAttribute):
-                count += 1
+        count = len(obj.get_deferred_fields())
         self.assertEqual(count, num)
 
 
@@ -45,7 +40,9 @@ class DeferTests(AssertionMixin, TestCase):
         # of them except the model's primary key see #15494
         self.assert_delayed(qs.only("pk")[0], 3)
         # You can use 'pk' with reverse foreign key lookups.
-        self.assert_delayed(self.s1.primary_set.all().only('pk')[0], 3)
+        # The related_id is alawys set even if it's not fetched from the DB,
+        # so pk and related_id are not deferred.
+        self.assert_delayed(self.s1.primary_set.all().only('pk')[0], 2)
 
     def test_defer_only_chaining(self):
         qs = Primary.objects.all()
@@ -112,19 +109,24 @@ class DeferTests(AssertionMixin, TestCase):
         self.assertEqual(obj.name, "p1")
 
     def test_defer_select_related_raises_invalid_query(self):
-        # When we defer a field and also select_related it, the query is
-        # invalid and raises an exception.
-        with self.assertRaises(InvalidQuery):
+        msg = (
+            'Field Primary.related cannot be both deferred and traversed '
+            'using select_related at the same time.'
+        )
+        with self.assertRaisesMessage(InvalidQuery, msg):
             Primary.objects.defer("related").select_related("related")[0]
 
     def test_only_select_related_raises_invalid_query(self):
-        with self.assertRaises(InvalidQuery):
+        msg = (
+            'Field Primary.related cannot be both deferred and traversed using '
+            'select_related at the same time.'
+        )
+        with self.assertRaisesMessage(InvalidQuery, msg):
             Primary.objects.only("name").select_related("related")[0]
 
     def test_defer_foreign_keys_are_deferred_and_not_traversed(self):
-        # With a depth-based select_related, all deferred ForeignKeys are
-        # deferred instead of traversed.
-        with self.assertNumQueries(3):
+        # select_related() overrides defer().
+        with self.assertNumQueries(1):
             obj = Primary.objects.defer("related").select_related()[0]
             self.assert_delayed(obj, 1)
             self.assertEqual(obj.related.id, self.s1.pk)
@@ -186,6 +188,11 @@ class BigChildDeferTests(AssertionMixin, TestCase):
         self.assertEqual(obj.value, "foo")
         self.assertEqual(obj.other, "bar")
 
+    def test_defer_subclass_both(self):
+        # Deferring fields from both superclass and subclass works.
+        obj = BigChild.objects.defer("other", "value").get(name="b1")
+        self.assert_delayed(obj, 2)
+
     def test_only_baseclass_when_subclass_has_added_field(self):
         # You can retrieve a single field on a baseclass
         obj = BigChild.objects.only("name").get(name="b1")
@@ -223,12 +230,10 @@ class TestDefer2(AssertionMixin, TestCase):
         """
         When an inherited model is fetched from the DB, its PK is also fetched.
         When getting the PK of the parent model it is useful to use the already
-        fetched parent model PK if it happens to be available. Tests that this
-        is done.
+        fetched parent model PK if it happens to be available.
         """
         s1 = Secondary.objects.create(first="x1", second="y1")
-        bc = BigChild.objects.create(name="b1", value="foo", related=s1,
-                                     other="bar")
+        bc = BigChild.objects.create(name='b1', value='foo', related=s1, other='bar')
         bc_deferred = BigChild.objects.only('name').get(pk=bc.pk)
         with self.assertNumQueries(0):
             bc_deferred.id

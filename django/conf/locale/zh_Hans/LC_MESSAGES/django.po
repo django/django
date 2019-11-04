@@ -1,25 +1,37 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Bai HuanCheng <xiqingongzi@gmail.com>, 2017-2018
 # Daniel Duan <DaNmarner@gmail.com>, 2013
+# jamin M <lxxmbyx@163.com>, 2019
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Kevin Sze <leiarix@gmail.com>, 2012
-# Lele Long <schemacs@gmail.com>, 2011,2015
-# ouyanghongyu <ouyanghongyu@gmail.com>, 2014
+# Lele Long <schemacs@gmail.com>, 2011,2015,2017
+# Le Yang <youngleocn@qq.com>, 2018
+# Liping Wang <lynn.config@gmail.com>, 2016-2017
+# mozillazg <opensource.mozillazg@gmail.com>, 2016
+# Ronald White <tkliuxing@me.com>, 2014
 # pylemon <leeway1985@gmail.com>, 2013
+# Ray Wang <pivstone@gmail.com>, 2017
 # slene <vslene@gmail.com>, 2011
 # Sun Liwen <sunliwen@gmail.com>, 2014
+# Suntravel Chris <chrisfromcn@gmail.com>, 2019
+# Liping Wang <lynn.config@gmail.com>, 2016
+# Wentao Han <wentao.han@gmail.com>, 2018
 # Xiang Yu <bupt.aswmtjdsj@gmail.com>, 2014
-# Yin Jifeng <jifeng.yin@gmail.com>, 2013
-# Ziang Song <songziang@gmail.com>, 2011-2012
+# Jeff Yin <jifeng.yin@gmail.com>, 2013
+# Zhengyang Wang <sufforest@gmail.com>, 2017
+# ced773123cfad7b4e8b79ca80f736af9, 2011-2012
+# Ziya Tang <tcztzy@gmail.com>, 2018
+# 付峥 <fuzheng1998@outlook.com>, 2018
 # Kevin Sze <leiarix@gmail.com>, 2012
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2015-11-27 09:35+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2019-01-16 20:42+0100\n"
+"PO-Revision-Date: 2019-05-26 11:53+0000\n"
+"Last-Translator: jamin M <lxxmbyx@163.com>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/django/django/"
 "language/zh_CN/)\n"
 "MIME-Version: 1.0\n"
@@ -29,7 +41,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 
 msgid "Afrikaans"
-msgstr "南非语"
+msgstr "南非荷兰语"
 
 msgid "Arabic"
 msgstr "阿拉伯语"
@@ -70,6 +82,9 @@ msgstr "丹麦语"
 msgid "German"
 msgstr "德语"
 
+msgid "Lower Sorbian"
+msgstr "下索布"
+
 msgid "Greek"
 msgstr "希腊语"
 
@@ -92,7 +107,7 @@ msgid "Argentinian Spanish"
 msgstr "阿根廷西班牙语"
 
 msgid "Colombian Spanish"
-msgstr ""
+msgstr "哥伦比亚西班牙语"
 
 msgid "Mexican Spanish"
 msgstr "墨西哥西班牙语"
@@ -125,7 +140,7 @@ msgid "Irish"
 msgstr "爱尔兰语"
 
 msgid "Scottish Gaelic"
-msgstr ""
+msgstr "苏格兰盖尔语"
 
 msgid "Galician"
 msgstr "加利西亚语"
@@ -139,8 +154,14 @@ msgstr "北印度语"
 msgid "Croatian"
 msgstr "克罗地亚语"
 
+msgid "Upper Sorbian"
+msgstr "上索布"
+
 msgid "Hungarian"
 msgstr "匈牙利语"
+
+msgid "Armenian"
+msgstr "亚美尼亚语"
 
 msgid "Interlingua"
 msgstr "国际语"
@@ -162,6 +183,9 @@ msgstr "日语"
 
 msgid "Georgian"
 msgstr "格鲁吉亚语"
+
+msgid "Kabyle"
+msgstr "卡拜尔语"
 
 msgid "Kazakh"
 msgstr "哈萨克语"
@@ -199,7 +223,7 @@ msgstr "马拉地语"
 msgid "Burmese"
 msgstr "缅甸语"
 
-msgid "Norwegian Bokmal"
+msgid "Norwegian Bokmål"
 msgstr "挪威博克马尔"
 
 msgid "Nepali"
@@ -298,8 +322,14 @@ msgstr "静态文件"
 msgid "Syndication"
 msgstr "联合"
 
-msgid "Web Design"
-msgstr "Web设计"
+msgid "That page number is not an integer"
+msgstr "页码不是整数"
+
+msgid "That page number is less than 1"
+msgstr "页码小于 1"
+
+msgid "That page contains no results"
+msgstr "本页结果为空"
 
 msgid "Enter a valid value."
 msgstr "输入一个有效的值。"
@@ -308,11 +338,12 @@ msgid "Enter a valid URL."
 msgstr "输入一个有效的 URL。"
 
 msgid "Enter a valid integer."
-msgstr "请输入合法的整数。"
+msgstr "输入一个有效的整数。"
 
 msgid "Enter a valid email address."
-msgstr "输入一个合法的Email地址."
+msgstr "输入一个有效的 Email 地址。"
 
+#. Translators: "letters" means latin letters: a-z and A-Z.
 msgid ""
 "Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
 msgstr "输入一个有效的 'slug'，由字母、数字、下划线或横线组成。"
@@ -320,16 +351,16 @@ msgstr "输入一个有效的 'slug'，由字母、数字、下划线或横线�
 msgid ""
 "Enter a valid 'slug' consisting of Unicode letters, numbers, underscores, or "
 "hyphens."
-msgstr ""
+msgstr "输入一个有效的 'slug'，由 Unicode 字母、数字、下划线或横线组成。"
 
 msgid "Enter a valid IPv4 address."
 msgstr "输入一个有效的 IPv4 地址。"
 
 msgid "Enter a valid IPv6 address."
-msgstr "填写合法的IPv6地址。"
+msgstr "输入一个有效的 IPv6 地址。"
 
 msgid "Enter a valid IPv4 or IPv6 address."
-msgstr "输入可用的IPv4 或 IPv6 地址."
+msgstr "输入一个有效的 IPv4 或 IPv6 地址."
 
 msgid "Enter only digits separated by commas."
 msgstr "只能输入用逗号分隔的数字。"
@@ -366,6 +397,9 @@ msgid_plural ""
 msgstr[0] ""
 "确保该变量包含不超过 %(limit_value)d 字符 (目前字符数 %(show_value)d)。"
 
+msgid "Enter a number."
+msgstr "输入一个数字。"
+
 #, python-format
 msgid "Ensure that there are no more than %(max)s digit in total."
 msgid_plural "Ensure that there are no more than %(max)s digits in total."
@@ -382,6 +416,17 @@ msgid ""
 msgid_plural ""
 "Ensure that there are no more than %(max)s digits before the decimal point."
 msgstr[0] "确认小数点前不超过 %(max)s 位。"
+
+#, python-format
+msgid ""
+"File extension '%(extension)s' is not allowed. Allowed extensions are: "
+"'%(allowed_extensions)s'."
+msgstr ""
+"文件后缀名 '%(extension)s' 不被允许.。可用的文件后缀"
+"名：'%(allowed_extensions)s'。"
+
+msgid "Null characters are not allowed."
+msgstr "不允许是用空字符串。"
 
 msgid "and"
 msgstr "和"
@@ -424,12 +469,19 @@ msgstr "整数"
 msgid "'%(value)s' value must be an integer."
 msgstr "’%(value)s‘ 必须为整数。"
 
+msgid "Big (8 byte) integer"
+msgstr "大整数(8字节)"
+
 #, python-format
 msgid "'%(value)s' value must be either True or False."
-msgstr "’%(value)s‘ 必须为 True 或者 False。"
+msgstr "’%(value)s‘ 的值必须为 True 或者 False。"
+
+#, python-format
+msgid "'%(value)s' value must be either True, False, or None."
+msgstr "'%(value)s' 的值必须是 True ,  False 或 None 之一。"
 
 msgid "Boolean (Either True or False)"
-msgstr "布尔值（真或假）"
+msgstr "布尔值( True或False )"
 
 #, python-format
 msgid "String (up to %(max_length)s)"
@@ -451,7 +503,7 @@ msgid ""
 msgstr "’%(value)s‘ 值的格式正确(YYYY-MM-DD)，但是日期无效。"
 
 msgid "Date (without time)"
-msgstr "日期（无时间）"
+msgstr "日期（不带时分）"
 
 #, python-format
 msgid ""
@@ -470,7 +522,7 @@ msgstr ""
 "效。"
 
 msgid "Date (with time)"
-msgstr "日期（带时间）"
+msgstr "日期（带时分）"
 
 #, python-format
 msgid "'%(value)s' value must be a decimal number."
@@ -501,9 +553,6 @@ msgstr "’%(value)s‘ 必须为浮点数字。"
 msgid "Floating point number"
 msgstr "浮点数"
 
-msgid "Big (8 byte) integer"
-msgstr "大整数(8字节)"
-
 msgid "IPv4 address"
 msgstr "IPv4 地址"
 
@@ -515,7 +564,7 @@ msgid "'%(value)s' value must be either None, True or False."
 msgstr "’%(value)s‘ 必须为None，True或者False。"
 
 msgid "Boolean (Either True, False or None)"
-msgstr "布尔值（真、假或无)"
+msgstr "布尔值(True、False或None)"
 
 msgid "Positive integer"
 msgstr "正整数"
@@ -558,6 +607,9 @@ msgstr "原始二进制数据"
 msgid "'%(value)s' is not a valid UUID."
 msgstr "‘%(value)s’不是有效UUID。"
 
+msgid "Universally unique identifier"
+msgstr "通用唯一识别码"
+
 msgid "File"
 msgstr "文件"
 
@@ -574,6 +626,14 @@ msgstr "外键(由相关字段确定)"
 msgid "One-to-one relationship"
 msgstr "一对一关系"
 
+#, python-format
+msgid "%(from)s-%(to)s relationship"
+msgstr "%(from)s-%(to)s关系"
+
+#, python-format
+msgid "%(from)s-%(to)s relationships"
+msgstr "%(from)s-%(to)s关系"
+
 msgid "Many-to-many relationship"
 msgstr "多对多关系"
 
@@ -589,9 +649,6 @@ msgstr "这个字段是必填项。"
 msgid "Enter a whole number."
 msgstr "输入整数。"
 
-msgid "Enter a number."
-msgstr "输入一个数字。"
-
 msgid "Enter a valid date."
 msgstr "输入一个有效的日期。"
 
@@ -603,6 +660,10 @@ msgstr "输入一个有效的日期/时间。"
 
 msgid "Enter a valid duration."
 msgstr "请输入有效的时长。"
+
+#, python-brace-format
+msgid "The number of days must be between {min_days} and {max_days}."
+msgstr "天数应该在 {min_days} 和 {max_days} 之间。"
 
 msgid "No file was submitted. Check the encoding type on the form."
 msgstr "未提交文件。请检查表单的编码类型。"
@@ -686,15 +747,15 @@ msgstr ""
 msgid "Please correct the duplicate values below."
 msgstr "请修正重复的数据."
 
-msgid "The inline foreign key did not match the parent instance primary key."
-msgstr "内联外键与父实例的主键不匹配。"
+msgid "The inline value did not match the parent instance."
+msgstr "内联值与父实例不匹配。"
 
 msgid "Select a valid choice. That choice is not one of the available choices."
 msgstr "选择一个有效的选项： 该选择不在可用的选项中。"
 
 #, python-format
-msgid "\"%(pk)s\" is not a valid value for a primary key."
-msgstr "\"%(pk)s\" 不是一个合法的主键值."
+msgid "\"%(pk)s\" is not a valid value."
+msgstr "\"%(pk)s\" 不是一个有效值."
 
 #, python-format
 msgid ""
@@ -704,14 +765,14 @@ msgstr ""
 "%(datetime)s 不能在时区 %(current_timezone)s正确解读; 可能时间有歧义或者不存"
 "在."
 
+msgid "Clear"
+msgstr "清除"
+
 msgid "Currently"
 msgstr "目前"
 
 msgid "Change"
 msgstr "修改"
-
-msgid "Clear"
-msgstr "清除"
 
 msgid "Unknown"
 msgstr "未知"
@@ -983,8 +1044,8 @@ msgstr "该值不是合法的IPv6地址。"
 
 #, python-format
 msgctxt "String to return when truncating text"
-msgid "%(truncated_text)s..."
-msgstr "%(truncated_text)s..."
+msgid "%(truncated_text)s…"
+msgstr "%(truncated_text)s"
 
 msgid "or"
 msgstr "或"
@@ -1030,7 +1091,7 @@ msgid "Forbidden"
 msgstr "禁止访问"
 
 msgid "CSRF verification failed. Request aborted."
-msgstr "CSRF验证失败. 相应中断."
+msgstr "CSRF验证失败. 请求被中断."
 
 msgid ""
 "You are seeing this message because this HTTPS site requires a 'Referer "
@@ -1038,16 +1099,29 @@ msgid ""
 "required for security reasons, to ensure that your browser is not being "
 "hijacked by third parties."
 msgstr ""
-"您看到此消息是由于HTTPS站点需要浏览器发送 ‘Referer HTTP头‘，但是目前没有被发"
-"送。出于安全考虑，浏览器必须发送该HTTP头，以确保您的浏览器没有被第三方劫持。"
+"您看到此消息是由于HTTPS站点需要您的浏览器发送的 'Referer header'信息，但是该"
+"信息并未被发送。该header信息的确认是出于安全问题的考虑，以确认您的浏览器并未"
+"被第三方劫持。"
 
 msgid ""
 "If you have configured your browser to disable 'Referer' headers, please re-"
 "enable them, at least for this site, or for HTTPS connections, or for 'same-"
 "origin' requests."
 msgstr ""
-"如果您已经设置浏览器禁用 ‘Referer’ 头，请重新启用，至少针对这个站点，全部"
-"HTTPS请求，或者同源请求（same-origin）启用发送该HTTP头。"
+"如果您已经设置您的浏览器禁用 'Referer' 头部信息，请重新启用它们，至少要针对这"
+"个站点，或者针对全部HTTPS连接，或者针对 'same-origin' 请求来启用。"
+
+msgid ""
+"If you are using the <meta name=\"referrer\" content=\"no-referrer\"> tag or "
+"including the 'Referrer-Policy: no-referrer' header, please remove them. The "
+"CSRF protection requires the 'Referer' header to do strict referer checking. "
+"If you're concerned about privacy, use alternatives like <a rel=\"noreferrer"
+"\" ...> for links to third-party sites."
+msgstr ""
+"如果您正在使用 <meta name=\"referrer\" content=\"no-referrer\"> tag 或 包含"
+"了“Referrer-Policy: no-referrer”的头部， 请移除它们。CSRF保护机制要"
+"求“Referer”头部进行严格的referer检查.如果您关心隐私问题，请使用其它替代方式，"
+"如 <a rel=\"noreferrer\" ...> 到第三方站点的链接。"
 
 msgid ""
 "You are seeing this message because this site requires a CSRF cookie when "
@@ -1061,37 +1135,17 @@ msgid ""
 "If you have configured your browser to disable cookies, please re-enable "
 "them, at least for this site, or for 'same-origin' requests."
 msgstr ""
-"如果您已经设置浏览器禁用cookies，请重新启用，至少针对这个站点，全部HTTPS请"
-"求，或者同源请求（same-origin）启用cookies。"
+"如果您已经设置您的浏览器禁用cookies，请重新启用它们，至少要针对这个站点，或者"
+"针对 'same-origin' 请求来启用。"
 
 msgid "More information is available with DEBUG=True."
-msgstr "更多信息请设置选项DEBUG＝True。"
-
-msgid "Welcome to Django"
-msgstr "欢迎认识Django"
-
-msgid "It worked!"
-msgstr "正常工作了！"
-
-msgid "Congratulations on your first Django-powered page."
-msgstr "祝贺你的第一个由Django驱动的页面。"
-
-msgid ""
-"Of course, you haven't actually done any work yet. Next, start your first "
-"app by running <code>python manage.py startapp [app_label]</code>."
-msgstr ""
-"当然，您还没有真正开始工作。接下来，请执行 <code>python manage.py startapp "
-"[app_label]</code> 来创建您的第一个应用。"
-
-msgid ""
-"You're seeing this message because you have <code>DEBUG = True</code> in "
-"your Django settings file and you haven't configured any URLs. Get to work!"
-msgstr ""
-"您看到此消息是由于Django的配置文件设置了 <code>DEBUG = True</code>，您还没有"
-"配置任何路由URL。开始工作吧。"
+msgstr "更多可用信息请设置选项DEBUG＝True。"
 
 msgid "No year specified"
 msgstr "没有指定年"
+
+msgid "Date out of range"
+msgstr "日期超出范围。"
 
 msgid "No month specified"
 msgstr "没有指定月"
@@ -1104,7 +1158,7 @@ msgstr "没有指定周"
 
 #, python-format
 msgid "No %(verbose_name_plural)s available"
-msgstr "%(verbose_name_plural)s 不存在"
+msgstr "%(verbose_name_plural)s 可用"
 
 #, python-format
 msgid ""
@@ -1123,7 +1177,7 @@ msgid "No %(verbose_name)s found matching the query"
 msgstr "没有找到符合查询的 %(verbose_name)s"
 
 msgid "Page is not 'last', nor can it be converted to an int."
-msgstr "page 不等于 'last'，或者它不能被转为数字。"
+msgstr "页码既不为'last'，也不能被转为数字。"
 
 #, python-format
 msgid "Invalid page (%(page_number)s): %(message)s"
@@ -1143,3 +1197,48 @@ msgstr "\"%(path)s\" 不存在"
 #, python-format
 msgid "Index of %(directory)s"
 msgstr "%(directory)s的索引"
+
+msgid "Django: the Web framework for perfectionists with deadlines."
+msgstr "Django：按时交付完美主义者的 Web 框架"
+
+#, python-format
+msgid ""
+"View <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" "
+"target=\"_blank\" rel=\"noopener\">release notes</a> for Django %(version)s"
+msgstr ""
+"查看 Django %(version)s 的 <a href=\"https://docs.djangoproject.com/en/"
+"%(version)s/releases/\" target=\"_blank\" rel=\"noopener\">release notes</a> "
+
+msgid "The install worked successfully! Congratulations!"
+msgstr ""
+"安装成功！\n"
+"祝贺！"
+
+#, python-format
+msgid ""
+"You are seeing this page because <a href=\"https://docs.djangoproject.com/en/"
+"%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener"
+"\">DEBUG=True</a> is in your settings file and you have not configured any "
+"URLs."
+msgstr ""
+"您现在看见这个页面，因为您设置了 <a href=\"https://docs.djangoproject.com/en/"
+"%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener"
+"\">DEBUG=True</a> 并且您还没有配置任何URLs。"
+
+msgid "Django Documentation"
+msgstr "Django 文档"
+
+msgid "Topics, references, &amp; how-to's"
+msgstr "主题，参考和指南"
+
+msgid "Tutorial: A Polling App"
+msgstr "教程：投票应用"
+
+msgid "Get started with Django"
+msgstr "开始使用 Django"
+
+msgid "Django Community"
+msgstr "Django 社区"
+
+msgid "Connect, get help, or contribute"
+msgstr "联系，获取帮助，贡献代码"

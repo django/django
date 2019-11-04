@@ -1,16 +1,13 @@
-from __future__ import unicode_literals
-
 from django.contrib.gis import admin
 from django.contrib.gis.geos import Point
-from django.test import TestCase, override_settings, skipUnlessDBFeature
+from django.test import SimpleTestCase, override_settings
 
 from .admin import UnmodifiableAdmin
 from .models import City, site
 
 
-@skipUnlessDBFeature("gis_enabled")
 @override_settings(ROOT_URLCONF='django.contrib.gis.tests.geoadmin.urls')
-class GeoAdminTest(TestCase):
+class GeoAdminTest(SimpleTestCase):
 
     def test_ensure_geographic_media(self):
         geoadmin = site._registry[City]
@@ -54,7 +51,7 @@ class GeoAdminTest(TestCase):
 
     def test_olwidget_has_changed(self):
         """
-        Check that changes are accurately noticed by OpenLayersWidget.
+        Changes are accurately noticed by OpenLayersWidget.
         """
         geoadmin = site._registry[City]
         form = geoadmin.get_changelist_form(None)()
@@ -71,3 +68,32 @@ class GeoAdminTest(TestCase):
         self.assertFalse(has_changed(initial, data_same))
         self.assertFalse(has_changed(initial, data_almost_same))
         self.assertTrue(has_changed(initial, data_changed))
+
+    def test_olwidget_empty_string(self):
+        geoadmin = site._registry[City]
+        form = geoadmin.get_changelist_form(None)({'point': ''})
+        with self.assertRaisesMessage(AssertionError, 'no logs'):
+            with self.assertLogs('django.contrib.gis', 'ERROR'):
+                output = str(form['point'])
+        self.assertInHTML(
+            '<textarea id="id_point" class="vWKTField required" cols="150"'
+            ' rows="10" name="point"></textarea>',
+            output
+        )
+
+    def test_olwidget_invalid_string(self):
+        geoadmin = site._registry[City]
+        form = geoadmin.get_changelist_form(None)({'point': 'INVALID()'})
+        with self.assertLogs('django.contrib.gis', 'ERROR') as cm:
+            output = str(form['point'])
+        self.assertInHTML(
+            '<textarea id="id_point" class="vWKTField required" cols="150"'
+            ' rows="10" name="point"></textarea>',
+            output
+        )
+        self.assertEqual(len(cm.records), 1)
+        self.assertEqual(
+            cm.records[0].getMessage(),
+            "Error creating geometry from value 'INVALID()' (String input "
+            "unrecognized as WKT EWKT, and HEXEWKB.)"
+        )

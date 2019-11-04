@@ -25,15 +25,15 @@ The :doc:`data-model syntax </topics/db/models>` offers many rich ways of
 representing your models -- so far, it's been solving many years' worth of
 database-schema problems. Here's a quick example:
 
-.. snippet::
-    :filename: mysite/news/models.py
+.. code-block:: python
+    :caption: mysite/news/models.py
 
     from django.db import models
 
     class Reporter(models.Model):
         full_name = models.CharField(max_length=70)
 
-        def __str__(self):              # __unicode__ on Python 2
+        def __str__(self):
             return self.full_name
 
     class Article(models.Model):
@@ -42,22 +42,24 @@ database-schema problems. Here's a quick example:
         content = models.TextField()
         reporter = models.ForeignKey(Reporter, on_delete=models.CASCADE)
 
-        def __str__(self):              # __unicode__ on Python 2
+        def __str__(self):
             return self.headline
 
 Install it
 ==========
 
-Next, run the Django command-line utility to create the database tables
+Next, run the Django command-line utilities to create the database tables
 automatically:
 
-.. code-block:: console
+.. console::
 
+    $ python manage.py makemigrations
     $ python manage.py migrate
 
-The :djadmin:`migrate` command looks at all your available models and creates
-tables in your database for whichever tables don't already exist, as well as
-optionally providing :doc:`much richer schema control </topics/migrations>`.
+The :djadmin:`makemigrations` command looks at all your available models and
+creates migrations for whichever tables don't already exist. :djadmin:`migrate`
+runs the migrations and creates tables in your database, as well as optionally
+providing :doc:`much richer schema control </topics/migrations>`.
 
 Enjoy the free API
 ==================
@@ -69,7 +71,7 @@ necessary:
 .. code-block:: python
 
     # Import the models we created from our "news" app
-    >>> from news.models import Reporter, Article
+    >>> from news.models import Article, Reporter
 
     # No reporters are in the system yet.
     >>> Reporter.objects.all()
@@ -145,8 +147,8 @@ production ready :doc:`administrative interface </ref/contrib/admin/index>` --
 a website that lets authenticated users add, change and delete objects. It's
 as easy as registering your model in the admin site:
 
-.. snippet::
-    :filename: mysite/news/models.py
+.. code-block:: python
+    :caption: mysite/news/models.py
 
     from django.db import models
 
@@ -156,8 +158,8 @@ as easy as registering your model in the admin site:
         content = models.TextField()
         reporter = models.ForeignKey(Reporter, on_delete=models.CASCADE)
 
-.. snippet::
-    :filename: mysite/news/admin.py
+.. code-block:: python
+    :caption: mysite/news/admin.py
 
     from django.contrib import admin
 
@@ -188,36 +190,33 @@ to decouple URLs from Python code.
 Here's what a URLconf might look like for the ``Reporter``/``Article``
 example above:
 
-.. snippet::
-    :filename: mysite/news/urls.py
+.. code-block:: python
+    :caption: mysite/news/urls.py
 
-    from django.conf.urls import url
+    from django.urls import path
 
     from . import views
 
     urlpatterns = [
-        url(r'^articles/([0-9]{4})/$', views.year_archive),
-        url(r'^articles/([0-9]{4})/([0-9]{2})/$', views.month_archive),
-        url(r'^articles/([0-9]{4})/([0-9]{2})/([0-9]+)/$', views.article_detail),
+        path('articles/<int:year>/', views.year_archive),
+        path('articles/<int:year>/<int:month>/', views.month_archive),
+        path('articles/<int:year>/<int:month>/<int:pk>/', views.article_detail),
     ]
 
-The code above maps URLs, as simple `regular expressions`_, to the location of
-Python callback functions ("views"). The regular expressions use parenthesis to
-"capture" values from the URLs. When a user requests a page, Django runs
-through each pattern, in order, and stops at the first one that matches the
-requested URL. (If none of them matches, Django calls a special-case 404 view.)
-This is blazingly fast, because the regular expressions are compiled at load
-time.
+The code above maps URL paths to Python callback functions ("views"). The path
+strings use parameter tags to "capture" values from the URLs. When a user
+requests a page, Django runs through each path, in order, and stops at the
+first one that matches the requested URL. (If none of them matches, Django
+calls a special-case 404 view.) This is blazingly fast, because the paths are
+compiled into regular expressions at load time.
 
-.. _regular expressions: https://docs.python.org/howto/regex.html
-
-Once one of the regexes matches, Django imports and calls the given view, which
-is a simple Python function. Each view gets passed a request object --
-which contains request metadata -- and the values captured in the regex.
+Once one of the URL patterns matches, Django calls the given view, which is a
+Python function. Each view gets passed a request object -- which contains
+request metadata -- and the values captured in the pattern.
 
 For example, if a user requested the URL "/articles/2005/05/39323/", Django
 would call the function ``news.views.article_detail(request,
-'2005', '05', '39323')``.
+year=2005, month=5, pk=39323)``.
 
 Write your views
 ================
@@ -231,8 +230,8 @@ Generally, a view retrieves data according to the parameters, loads a template
 and renders the template with the retrieved data. Here's an example view for
 ``year_archive`` from above:
 
-.. snippet::
-    :filename: mysite/news/views.py
+.. code-block:: python
+    :caption: mysite/news/views.py
 
     from django.shortcuts import render
 
@@ -260,8 +259,8 @@ in the first directory, it checks the second, and so on.
 Let's say the ``news/year_archive.html`` template was found. Here's what that
 might look like:
 
-.. snippet:: html+django
-    :filename: mysite/news/templates/news/year_archive.html
+.. code-block:: html+django
+    :caption: mysite/news/templates/news/year_archive.html
 
     {% extends "base.html" %}
 
@@ -301,8 +300,8 @@ in templates: each template has to define only what's unique to that template.
 Here's what the "base.html" template, including the use of :doc:`static files
 </howto/static-files/index>`, might look like:
 
-.. snippet:: html+django
-    :filename: mysite/templates/base.html
+.. code-block:: html+django
+    :caption: mysite/templates/base.html
 
     {% load static %}
     <html>
@@ -310,7 +309,7 @@ Here's what the "base.html" template, including the use of :doc:`static files
         <title>{% block title %}{% endblock %}</title>
     </head>
     <body>
-        <img src="{% static "images/sitelogo.png" %}" alt="Logo" />
+        <img src="{% static "images/sitelogo.png" %}" alt="Logo">
         {% block content %}{% endblock %}
     </body>
     </html>
@@ -344,8 +343,8 @@ features:
 * A :doc:`syndication framework </ref/contrib/syndication>` that makes
   creating RSS and Atom feeds as easy as writing a small Python class.
 
-* More sexy automatically-generated admin features -- this overview barely
-  scratched the surface.
+* More attractive automatically-generated admin features -- this overview
+  barely scratched the surface.
 
 The next obvious steps are for you to `download Django`_, read :doc:`the
 tutorial </intro/tutorial01>` and join `the community`_. Thanks for your

@@ -1,7 +1,7 @@
 """
 Existing related object instance caching.
 
-Test that queries are not redone when going back through known relations.
+Queries are not redone when going back through known relations.
 """
 
 from django.db import models

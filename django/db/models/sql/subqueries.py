@@ -9,26 +9,22 @@ from django.db.models.sql.constants import (
     CURSOR, GET_ITERATOR_CHUNK_SIZE, NO_RESULTS,
 )
 from django.db.models.sql.query import Query
-from django.utils import six
 
 __all__ = ['DeleteQuery', 'UpdateQuery', 'InsertQuery', 'AggregateQuery']
 
 
 class DeleteQuery(Query):
-    """
-    Delete queries are done through this class, since they are more constrained
-    than general queries.
-    """
+    """A DELETE SQL query."""
 
     compiler = 'SQLDeleteCompiler'
 
     def do_query(self, table, where, using):
-        self.tables = [table]
+        self.alias_map = {table: self.alias_map[table]}
         self.where = where
         cursor = self.get_compiler(using).execute_sql(CURSOR)
         return cursor.rowcount if cursor else 0
 
-    def delete_batch(self, pk_list, using, field=None):
+    def delete_batch(self, pk_list, using):
         """
         Set up and execute delete queries for all the objects in pk_list.
 
@@ -37,8 +33,7 @@ class DeleteQuery(Query):
         """
         # number of objects deleted
         num_deleted = 0
-        if not field:
-            field = self.get_meta().pk
+        field = self.get_meta().pk
         for offset in range(0, len(pk_list), GET_ITERATOR_CHUNK_SIZE):
             self.where = self.where_class()
             self.add_q(Q(
@@ -57,9 +52,8 @@ class DeleteQuery(Query):
         innerq.get_initial_alias()
         # The same for our new query.
         self.get_initial_alias()
-        innerq_used_tables = [t for t in innerq.tables
-                              if innerq.alias_refcount[t]]
-        if not innerq_used_tables or innerq_used_tables == self.tables:
+        innerq_used_tables = tuple([t for t in innerq.alias_map if innerq.alias_refcount[t]])
+        if not innerq_used_tables or innerq_used_tables == tuple(self.alias_map):
             # There is only the base table in use in the query.
             self.where = innerq.where
         else:
@@ -83,30 +77,27 @@ class DeleteQuery(Query):
 
 
 class UpdateQuery(Query):
-    """
-    Represents an "update" SQL query.
-    """
+    """An UPDATE SQL query."""
 
     compiler = 'SQLUpdateCompiler'
 
     def __init__(self, *args, **kwargs):
-        super(UpdateQuery, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self._setup_query()
 
     def _setup_query(self):
         """
-        Runs on initialization and after cloning. Any attributes that would
-        normally be set in __init__ should go in here, instead, so that they
-        are also set up after a clone() call.
+        Run on initialization and at the end of chaining. Any attributes that
+        would normally be set in __init__() should go here instead.
         """
         self.values = []
         self.related_ids = None
-        if not hasattr(self, 'related_updates'):
-            self.related_updates = {}
+        self.related_updates = {}
 
-    def clone(self, klass=None, **kwargs):
-        return super(UpdateQuery, self).clone(klass,
-                related_updates=self.related_updates.copy(), **kwargs)
+    def clone(self):
+        obj = super().clone()
+        obj.related_updates = self.related_updates.copy()
+        return obj
 
     def update_batch(self, pk_list, values, using):
         self.add_update_values(values)
@@ -122,7 +113,7 @@ class UpdateQuery(Query):
         querysets.
         """
         values_seq = []
-        for name, val in six.iteritems(values):
+        for name, val in values.items():
             field = self.get_meta().get_field(name)
             direct = not (field.auto_created and not field.concrete) or not field.concrete
             model = field.model._meta.concrete_model
@@ -131,7 +122,7 @@ class UpdateQuery(Query):
                     'Cannot update model field %r (only non-relations and '
                     'foreign keys permitted).' % field
                 )
-            if model is not self.get_meta().model:
+            if model is not self.get_meta().concrete_model:
                 self.add_related_update(model, field, val)
                 continue
             values_seq.append((field, model, val))
@@ -143,26 +134,30 @@ class UpdateQuery(Query):
         that will be used to generate the UPDATE query. Might be more usefully
         called add_update_targets() to hint at the extra information here.
         """
-        self.values.extend(values_seq)
+        for field, model, val in values_seq:
+            if hasattr(val, 'resolve_expression'):
+                # Resolve expressions here so that annotations are no longer needed
+                val = val.resolve_expression(self, allow_joins=False, for_save=True)
+            self.values.append((field, model, val))
 
     def add_related_update(self, model, field, value):
         """
-        Adds (name, value) to an update query for an ancestor model.
+        Add (name, value) to an update query for an ancestor model.
 
-        Updates are coalesced so that we only run one update query per ancestor.
+        Update are coalesced so that only one update query per ancestor is run.
         """
         self.related_updates.setdefault(model, []).append((field, None, value))
 
     def get_related_updates(self):
         """
-        Returns a list of query objects: one for each update required to an
+        Return a list of query objects: one for each update required to an
         ancestor model. Each query will have the same filtering conditions as
         the current query but will only update a single table.
         """
         if not self.related_updates:
             return []
         result = []
-        for model, values in six.iteritems(self.related_updates):
+        for model, values in self.related_updates.items():
             query = UpdateQuery(model)
             query.values = values
             if self.related_ids is not None:
@@ -174,30 +169,13 @@ class UpdateQuery(Query):
 class InsertQuery(Query):
     compiler = 'SQLInsertCompiler'
 
-    def __init__(self, *args, **kwargs):
-        super(InsertQuery, self).__init__(*args, **kwargs)
+    def __init__(self, *args, ignore_conflicts=False, **kwargs):
+        super().__init__(*args, **kwargs)
         self.fields = []
         self.objs = []
-
-    def clone(self, klass=None, **kwargs):
-        extras = {
-            'fields': self.fields[:],
-            'objs': self.objs[:],
-            'raw': self.raw,
-        }
-        extras.update(kwargs)
-        return super(InsertQuery, self).clone(klass, **extras)
+        self.ignore_conflicts = ignore_conflicts
 
     def insert_values(self, fields, objs, raw=False):
-        """
-        Set up the insert query from the 'insert_values' dictionary. The
-        dictionary gives the model field names and their target values.
-
-        If 'raw_values' is True, the values in the 'insert_values' dictionary
-        are inserted directly into the query, rather than passed as SQL
-        parameters. This provides a way to insert NULL and DEFAULT keywords
-        into the query, for example.
-        """
         self.fields = fields
         self.objs = objs
         self.raw = raw
@@ -205,14 +183,12 @@ class InsertQuery(Query):
 
 class AggregateQuery(Query):
     """
-    An AggregateQuery takes another query as a parameter to the FROM
-    clause and only selects the elements in the provided list.
+    Take another query as a parameter to the FROM clause and only select the
+    elements in the provided list.
     """
 
     compiler = 'SQLAggregateCompiler'
 
     def add_subquery(self, query, using):
-        self.subquery, self.sub_params = query.get_compiler(using).as_sql(
-            with_col_aliases=True,
-            subquery=True,
-        )
+        query.subquery = True
+        self.subquery, self.sub_params = query.get_compiler(using).as_sql(with_col_aliases=True)

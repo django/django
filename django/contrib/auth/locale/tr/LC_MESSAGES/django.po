@@ -2,9 +2,9 @@
 #
 # Translators:
 # Ahmet Emre Aladağ <emre.aladag@isik.edu.tr>, 2013
-# BouRock, 2015
+# BouRock, 2015-2017
 # BouRock, 2014-2015
-# Caner Başaran <basaran.caner@gmail.com>, 2013
+# Caner Başaran <basaran.caner@protonmail.com>, 2013
 # Cihad GÜNDOĞDU <cihadgundogdu@gmail.com>, 2014
 # Gökmen Görgen <gokmen@alageek.com>, 2013
 # Jannis Leidel <jannis@leidel.info>, 2011
@@ -15,8 +15,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-10 15:10+0200\n"
-"PO-Revision-Date: 2015-10-11 09:22+0000\n"
+"POT-Creation-Date: 2017-09-24 13:46+0200\n"
+"PO-Revision-Date: 2017-09-24 15:49+0000\n"
 "Last-Translator: BouRock\n"
 "Language-Team: Turkish (http://www.transifex.com/django/django/language/"
 "tr/)\n"
@@ -75,11 +75,10 @@ msgstr "Doğrulama için önceki gibi aynı parolayı girin."
 
 msgid ""
 "Raw passwords are not stored, so there is no way to see this user's "
-"password, but you can change the password using <a href=\"../password/"
-"\">this form</a>."
+"password, but you can change the password using <a href=\"{}\">this form</a>."
 msgstr ""
-"Ham parolalar saklanmazlar, bu yüzden bu kullanıcının parolasını görmenin "
-"yolu yoktur, fakat <a href=\"../password/\">bu formu</a> kullanarak parolayı "
+"Ham parolalar saklanmaz, bu yüzden bu kullanıcının parolasını görmenin yolu "
+"yoktur, fakat <a href=\"{}\">bu formu</a> kullanarak parolayı "
 "değiştirebilirsiniz."
 
 #, python-format
@@ -122,6 +121,21 @@ msgstr "tuz"
 
 msgid "hash"
 msgstr "adresleme"
+
+msgid "variety"
+msgstr "çeşitlilik"
+
+msgid "version"
+msgstr "sürüm"
+
+msgid "memory cost"
+msgstr "bellek maliyeti"
+
+msgid "time cost"
+msgstr "zaman maliyeti"
+
+msgid "parallelism"
+msgstr "paralellik"
 
 msgid "work factor"
 msgstr "iş faktörü"
@@ -176,17 +190,10 @@ msgstr "Bu kullanıcı için belirli izinler."
 msgid "username"
 msgstr "kullanıcı adı"
 
-msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
+msgid "Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only."
 msgstr ""
-"Zorunlu. 30 karakter ya da daha az olmalı. Sadece harfler, rakamlar ve @/./"
+"Zorunlu. 150 karakter ya da daha az olmalı. Sadece harfler, rakamlar ve @/./"
 "+/-/_ karakterleri kullanılabilir."
-
-msgid ""
-"Enter a valid username. This value may contain only letters, numbers and @/./"
-"+/-/_ characters."
-msgstr ""
-"Geçerli bir kullanıcı adı girin. Bu değer sadece harfleri, sayıları ve @/./"
-"+/-/_ karakterlerini içerebilir."
 
 msgid "A user with that username already exists."
 msgstr "Bu kullanıcı adında bir kullanıcı zaten mevcut."
@@ -263,6 +270,20 @@ msgstr "Parolanız tamamıyla sayısal olamaz."
 #, python-format
 msgid "Password reset on %(site_name)s"
 msgstr "%(site_name)s sitesinde parola sıfırlama"
+
+msgid ""
+"Enter a valid username. This value may contain only English letters, "
+"numbers, and @/./+/-/_ characters."
+msgstr ""
+"Geçerli bir kullanıcı adı girin. Bu değer sadece İngilizce harfleri, "
+"sayıları, ve @/./+/-/_ karakterlerini içerebilir."
+
+msgid ""
+"Enter a valid username. This value may contain only letters, numbers, and "
+"@/./+/-/_ characters."
+msgstr ""
+"Geçerli bir kullanıcı adı girin. Bu değer sadece harfleri, sayıları, ve @/./"
+"+/-/_ karakterlerini içerebilir."
 
 msgid "Logged out"
 msgstr "Oturum kapatıldı"

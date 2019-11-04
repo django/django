@@ -47,11 +47,6 @@ file_filter = django/contrib/humanize/locale/<lang>/LC_MESSAGES/django.po
 source_file = django/contrib/humanize/locale/en/LC_MESSAGES/django.po
 source_lang = en
 
-[django.contrib-messages]
-file_filter = django/contrib/messages/locale/<lang>/LC_MESSAGES/django.po
-source_file = django/contrib/messages/locale/en/LC_MESSAGES/django.po
-source_lang = en
-
 [django.contrib-postgres]
 file_filter = django/contrib/postgres/locale/<lang>/LC_MESSAGES/django.po
 source_file = django/contrib/postgres/locale/en/LC_MESSAGES/django.po

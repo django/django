@@ -33,6 +33,24 @@ class FunctionTests(SimpleTestCase):
 
         self.assertEqual([d['foo']['bar'] for d in sorted_data], [3, 2, 1])
 
+    def test_sort_list_of_tuples(self):
+        data = [('a', '42'), ('c', 'string'), ('b', 'foo')]
+        expected = [('a', '42'), ('b', 'foo'), ('c', 'string')]
+        self.assertEqual(dictsort(data, 0), expected)
+
+    def test_sort_list_of_tuple_like_dicts(self):
+        data = [
+            {'0': 'a', '1': '42'},
+            {'0': 'c', '1': 'string'},
+            {'0': 'b', '1': 'foo'},
+        ]
+        expected = [
+            {'0': 'a', '1': '42'},
+            {'0': 'b', '1': 'foo'},
+            {'0': 'c', '1': 'string'},
+        ]
+        self.assertEqual(dictsort(data, '0'), expected)
+
     def test_invalid_values(self):
         """
         If dictsort is passed something other than a list of dictionaries,

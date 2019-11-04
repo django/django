@@ -1,7 +1,7 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Bashar Al-Abdulhadi, 2015
+# Bashar Al-Abdulhadi, 2015-2016
 # Bashar Al-Abdulhadi, 2014
 # Eyad Toma <d.eyad.t@gmail.com>, 2013-2014
 # Jannis Leidel <jannis@leidel.info>, 2011
@@ -10,8 +10,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2015-11-27 09:35+0000\n"
+"POT-Creation-Date: 2017-11-15 16:15+0100\n"
+"PO-Revision-Date: 2017-11-16 01:13+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Arabic (http://www.transifex.com/django/django/language/ar/)\n"
 "MIME-Version: 1.0\n"
@@ -63,6 +63,9 @@ msgstr "الدنماركيّة"
 msgid "German"
 msgstr "الألمانيّة"
 
+msgid "Lower Sorbian"
+msgstr "الصربية السفلى"
+
 msgid "Greek"
 msgstr "اليونانيّة"
 
@@ -85,7 +88,7 @@ msgid "Argentinian Spanish"
 msgstr "الأسبانية الأرجنتينية"
 
 msgid "Colombian Spanish"
-msgstr ""
+msgstr "الكولومبية الإسبانية"
 
 msgid "Mexican Spanish"
 msgstr "الأسبانية المكسيكية"
@@ -118,7 +121,7 @@ msgid "Irish"
 msgstr "الإيرلنديّة"
 
 msgid "Scottish Gaelic"
-msgstr ""
+msgstr "الغيلية الأسكتلندية"
 
 msgid "Galician"
 msgstr "الجليقيّة"
@@ -131,6 +134,9 @@ msgstr "الهندية"
 
 msgid "Croatian"
 msgstr "الكرواتيّة"
+
+msgid "Upper Sorbian"
+msgstr "الصربية العليا"
 
 msgid "Hungarian"
 msgstr "الهنغاريّة"
@@ -192,8 +198,8 @@ msgstr "المهاراتية"
 msgid "Burmese"
 msgstr "البورمية"
 
-msgid "Norwegian Bokmal"
-msgstr "البوكمال نرويجيّة"
+msgid "Norwegian Bokmål"
+msgstr "النرويجية"
 
 msgid "Nepali"
 msgstr "النيبالية"
@@ -291,8 +297,14 @@ msgstr "الملفات الثابتة"
 msgid "Syndication"
 msgstr "توظيف النشر"
 
-msgid "Web Design"
-msgstr "تصميم الموقع"
+msgid "That page number is not an integer"
+msgstr ""
+
+msgid "That page number is less than 1"
+msgstr ""
+
+msgid "That page contains no results"
+msgstr ""
 
 msgid "Enter a valid value."
 msgstr "أدخل قيمة صحيحة."
@@ -306,6 +318,7 @@ msgstr "أدخل رقم صالح."
 msgid "Enter a valid email address."
 msgstr "أدخل عنوان بريد إلكتروني صحيح."
 
+#. Translators: "letters" means latin letters: a-z and A-Z.
 msgid ""
 "Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
 msgstr "أدخل اختصار 'slug' صحيح يتكوّن من أحرف، أرقام، شرطات سفلية وعاديّة."
@@ -313,7 +326,7 @@ msgstr "أدخل اختصار 'slug' صحيح يتكوّن من أحرف، أر�
 msgid ""
 "Enter a valid 'slug' consisting of Unicode letters, numbers, underscores, or "
 "hyphens."
-msgstr ""
+msgstr "أدخل اختصار 'slug' صحيح يتكوّن من أحرف، أرقام، شرطات سفلية وعاديّة."
 
 msgid "Enter a valid IPv4 address."
 msgstr "أدخل عنوان IPv4 صحيح."
@@ -423,6 +436,15 @@ msgstr[3] "تحقق من أن تدخل %(max)s أرقام قبل الفاصل ا
 msgstr[4] "تحقق من أن تدخل %(max)s أرقام قبل الفاصل العشري لا أكثر."
 msgstr[5] "تحقق من أن تدخل %(max)s أرقام قبل الفاصل العشري لا أكثر."
 
+#, python-format
+msgid ""
+"File extension '%(extension)s' is not allowed. Allowed extensions are: "
+"'%(allowed_extensions)s'."
+msgstr ""
+
+msgid "Null characters are not allowed."
+msgstr ""
+
 msgid "and"
 msgstr "و"
 
@@ -462,6 +484,9 @@ msgstr "عدد صحيح"
 #, python-format
 msgid "'%(value)s' value must be an integer."
 msgstr "قيمة '%(value)s' يجب ان تكون عدد صحيح."
+
+msgid "Big (8 byte) integer"
+msgstr "عدد صحيح كبير (8 بايت)"
 
 #, python-format
 msgid "'%(value)s' value must be either True or False."
@@ -544,9 +569,6 @@ msgstr "قيمة '%(value)s' يجب ان تكون عدد فاصل عائم."
 msgid "Floating point number"
 msgstr "رقم فاصلة عائمة"
 
-msgid "Big (8 byte) integer"
-msgstr "عدد صحيح كبير (8 بايت)"
-
 msgid "IPv4 address"
 msgstr "عنوان IPv4"
 
@@ -619,6 +641,14 @@ msgstr "الحقل المرتبط (تم تحديد النوع وفقاً للح�
 
 msgid "One-to-one relationship"
 msgstr "علاقة واحد إلى واحد"
+
+#, python-format
+msgid "%(from)s-%(to)s relationship"
+msgstr "%(from)s-%(to)s علاقة"
+
+#, python-format
+msgid "%(from)s-%(to)s relationships"
+msgstr "%(from)s-%(to)s علاقات"
 
 msgid "Many-to-many relationship"
 msgstr "علاقة متعدد إلى متعدد"
@@ -761,15 +791,15 @@ msgstr ""
 msgid "Please correct the duplicate values below."
 msgstr "رجاءً صحّح القيم المُكرّرة أدناه."
 
-msgid "The inline foreign key did not match the parent instance primary key."
-msgstr "حقل foreign key المحدد لا يطابق الحقل الرئيسي له."
+msgid "The inline value did not match the parent instance."
+msgstr ""
 
 msgid "Select a valid choice. That choice is not one of the available choices."
 msgstr "انتق خياراً صحيحاً. اختيارك ليس أحد الخيارات المتاحة."
 
 #, python-format
-msgid "\"%(pk)s\" is not a valid value for a primary key."
-msgstr "\"%(pk)s\" قيمة غير صحيحة للرقم المرجعي."
+msgid "\"%(pk)s\" is not a valid value."
+msgstr ""
 
 #, python-format
 msgid ""
@@ -779,14 +809,14 @@ msgstr ""
 "%(datetime)s لا يمكن تفسيرها في المنطقة الزمنية %(current_timezone)s; قد "
 "تكون غامضة أو أنها غير موجودة."
 
+msgid "Clear"
+msgstr "تفريغ"
+
 msgid "Currently"
 msgstr "حالياً"
 
 msgid "Change"
 msgstr "عدّل"
-
-msgid "Clear"
-msgstr "تفريغ"
 
 msgid "Unknown"
 msgstr "مجهول"
@@ -1162,6 +1192,14 @@ msgstr ""
 "origin'."
 
 msgid ""
+"If you are using the <meta name=\"referrer\" content=\"no-referrer\"> tag or "
+"including the 'Referrer-Policy: no-referrer' header, please remove them. The "
+"CSRF protection requires the 'Referer' header to do strict referer checking. "
+"If you're concerned about privacy, use alternatives like <a rel=\"noreferrer"
+"\" ...> for links to third-party sites."
+msgstr ""
+
+msgid ""
 "You are seeing this message because this site requires a CSRF cookie when "
 "submitting forms. This cookie is required for security reasons, to ensure "
 "that your browser is not being hijacked by third parties."
@@ -1180,32 +1218,11 @@ msgstr ""
 msgid "More information is available with DEBUG=True."
 msgstr "يتوفر مزيد من المعلومات عند ضبط الخيار DEBUG=True."
 
-msgid "Welcome to Django"
-msgstr "مرحبا بك في جانغو"
-
-msgid "It worked!"
-msgstr "أنه فعّال!"
-
-msgid "Congratulations on your first Django-powered page."
-msgstr "تهانينا على صفحتك الأولى بدعم من جانغو."
-
-msgid ""
-"Of course, you haven't actually done any work yet. Next, start your first "
-"app by running <code>python manage.py startapp [app_label]</code>."
-msgstr ""
-"وبطبيعة الحال، لم يتم عمل أي عمل فعلي حتى الآن. الخطوة التالية هي تشغيل أول "
-"تطبيق لك عبر الأمر التالي\n"
-" <code>python manage.py startapp [app_label]</code> ."
-
-msgid ""
-"You're seeing this message because you have <code>DEBUG = True</code> in "
-"your Django settings file and you haven't configured any URLs. Get to work!"
-msgstr ""
-"تظهر لك هذه الرسالة لأنه لديك <code>DEBUG = True</code> في ملف إعدادات جانغو "
-"الخاص بك، و ايضا لعدم تكوين أي عناوين المواقع. إبدأ العمل!"
-
 msgid "No year specified"
 msgstr "لم تحدد السنة"
+
+msgid "Date out of range"
+msgstr ""
 
 msgid "No month specified"
 msgstr "لم تحدد الشهر"
@@ -1257,3 +1274,41 @@ msgstr "المسار \"%(path)s\" غير موجود."
 #, python-format
 msgid "Index of %(directory)s"
 msgstr "فهرس لـ %(directory)s"
+
+msgid "Django: the Web framework for perfectionists with deadlines."
+msgstr ""
+
+#, python-format
+msgid ""
+"View <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" "
+"target=\"_blank\" rel=\"noopener\">release notes</a> for Django %(version)s"
+msgstr ""
+
+msgid "The install worked successfully! Congratulations!"
+msgstr ""
+
+#, python-format
+msgid ""
+"You are seeing this page because <a href=\"https://docs.djangoproject.com/en/"
+"%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener"
+"\">DEBUG=True</a> is in your settings file and you have not configured any "
+"URLs."
+msgstr ""
+
+msgid "Django Documentation"
+msgstr ""
+
+msgid "Topics, references, &amp; how-to's"
+msgstr ""
+
+msgid "Tutorial: A Polling App"
+msgstr ""
+
+msgid "Get started with Django"
+msgstr ""
+
+msgid "Django Community"
+msgstr ""
+
+msgid "Connect, get help, or contribute"
+msgstr ""

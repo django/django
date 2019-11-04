@@ -2,7 +2,7 @@
 #
 # Translators:
 # abraham.martin <abraham.martin@gmail.com>, 2014
-# Antoni Aloy <aaloy@apsl.net>, 2014
+# Antoni Aloy <aaloy@apsl.net>, 2014,2017
 # Carles Barrobés <carles@barrobes.com>, 2012
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Roger Pons <rogerpons@gmail.com>, 2015
@@ -10,9 +10,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-10 14:49+0200\n"
-"PO-Revision-Date: 2015-11-21 12:04+0000\n"
-"Last-Translator: Roger Pons <rogerpons@gmail.com>\n"
+"POT-Creation-Date: 2017-01-19 16:49+0100\n"
+"PO-Revision-Date: 2017-09-19 16:40+0000\n"
+"Last-Translator: Antoni Aloy <aaloy@apsl.net>\n"
 "Language-Team: Catalan (http://www.transifex.com/django/django/language/"
 "ca/)\n"
 "MIME-Version: 1.0\n"
@@ -142,7 +142,7 @@ msgstr "Mètode"
 msgid "Arguments"
 msgstr "Arguments"
 
-msgid "Back to Model Documentation"
+msgid "Back to Model documentation"
 msgstr "Tornar a la documentació del Model"
 
 msgid "Model documentation"
@@ -162,6 +162,7 @@ msgstr "Plantilla: %(name)s"
 msgid "Template: \"%(name)s\""
 msgstr "Plantilla: \"%(name)s\""
 
+#. Translators: Search is not a verb here, it qualifies path (a search path)
 #, python-format
 msgid "Search path for template \"%(name)s\":"
 msgstr "Camí de cerca per la plantilla \"%(name)s\":"
@@ -216,7 +217,7 @@ msgstr "Contexte:"
 msgid "Templates:"
 msgstr "Plantilles:"
 
-msgid "Back to Views Documentation"
+msgid "Back to View documentation"
 msgstr "Tornar a la documentació de les Vistes"
 
 msgid "View documentation"
@@ -244,13 +245,6 @@ msgstr ""
 "\n"
 "Funció de la vista: <code>%(full_name)s</code> . Nom: <code>%(url_name)s</"
 "code> .\n"
-
-msgid "Boolean (Either True or False)"
-msgstr "Booleà (Cert o Fals)"
-
-#, python-format
-msgid "Field of type: %(field_type)s"
-msgstr "Camp del tipus: %(field_type)s"
 
 msgid "tag:"
 msgstr "etiqueta:"

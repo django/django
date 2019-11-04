@@ -2,13 +2,14 @@
 #
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011
+# Kowit Charoenratchatabhan <kowit.s.c@gmail.com>, 2018
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-01-17 11:07+0100\n"
-"PO-Revision-Date: 2014-10-05 20:12+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"PO-Revision-Date: 2018-05-06 07:45+0000\n"
+"Last-Translator: Kowit Charoenratchatabhan <kowit.s.c@gmail.com>\n"
 "Language-Team: Thai (http://www.transifex.com/django/django/language/th/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -17,7 +18,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 
 msgid "Sessions"
-msgstr ""
+msgstr "เซสชัน"
 
 msgid "session key"
 msgstr "เซสชันคีย์"

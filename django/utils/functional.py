@@ -1,10 +1,9 @@
 import copy
+import itertools
 import operator
-import warnings
 from functools import total_ordering, wraps
 
-from django.utils import six
-from django.utils.deprecation import RemovedInDjango20Warning
+from django.utils.version import PY36, get_docs_version
 
 
 # You can't trivially replace this with `functools.partial` because this binds
@@ -12,43 +11,88 @@ from django.utils.deprecation import RemovedInDjango20Warning
 # CPython) is a type and its instances don't bind.
 def curry(_curried_func, *args, **kwargs):
     def _curried(*moreargs, **morekwargs):
-        return _curried_func(*(args + moreargs), **dict(kwargs, **morekwargs))
+        return _curried_func(*args, *moreargs, **{**kwargs, **morekwargs})
     return _curried
 
 
-class cached_property(object):
+class cached_property:
     """
     Decorator that converts a method with a single self argument into a
     property cached on the instance.
 
-    Optional ``name`` argument allows you to make cached properties of other
-    methods. (e.g.  url = cached_property(get_absolute_url, name='url') )
+    A cached property can be made out of an existing method:
+    (e.g. ``url = cached_property(get_absolute_url)``).
+    On Python < 3.6, the optional ``name`` argument must be provided, e.g.
+    ``url = cached_property(get_absolute_url, name='url')``.
     """
+    name = None
+
+    @staticmethod
+    def func(instance):
+        raise TypeError(
+            'Cannot use cached_property instance without calling '
+            '__set_name__() on it.'
+        )
+
+    @staticmethod
+    def _is_mangled(name):
+        return name.startswith('__') and not name.endswith('__')
+
     def __init__(self, func, name=None):
-        self.func = func
+        if PY36:
+            self.real_func = func
+        else:
+            func_name = func.__name__
+            name = name or func_name
+            if not (isinstance(name, str) and name.isidentifier()):
+                raise ValueError(
+                    "%r can't be used as the name of a cached_property." % name,
+                )
+            if self._is_mangled(name):
+                raise ValueError(
+                    'cached_property does not work with mangled methods on '
+                    'Python < 3.6 without the appropriate `name` argument. See '
+                    'https://docs.djangoproject.com/en/%s/ref/utils/'
+                    '#cached-property-mangled-name' % get_docs_version(),
+                )
+            self.name = name
+            self.func = func
         self.__doc__ = getattr(func, '__doc__')
-        self.name = name or func.__name__
+
+    def __set_name__(self, owner, name):
+        if self.name is None:
+            self.name = name
+            self.func = self.real_func
+        elif name != self.name:
+            raise TypeError(
+                "Cannot assign the same cached_property to two different names "
+                "(%r and %r)." % (self.name, name)
+            )
 
     def __get__(self, instance, cls=None):
+        """
+        Call the function and put the return value in instance.__dict__ so that
+        subsequent attribute access on the instance returns the cached value
+        instead of calling cached_property.__get__().
+        """
         if instance is None:
             return self
         res = instance.__dict__[self.name] = self.func(instance)
         return res
 
 
-class Promise(object):
+class Promise:
     """
-    This is just a base class for the proxy class created in
-    the closure of the lazy function. It can be used to recognize
-    promises in code.
+    Base class for the proxy class created in the closure of the lazy function.
+    It's used to recognize promises in code.
     """
     pass
 
 
 def lazy(func, *resultclasses):
     """
-    Turns any callable into a lazy evaluated callable. You need to give result
-    classes or types -- at least one is needed so that the automatic forcing of
+    Turn any callable into a lazy evaluated callable. result classes or types
+    is required -- at least one is needed so that the automatic forcing of
     the lazy evaluation code is triggered. Results are not memoized; the
     function is evaluated on every access.
     """
@@ -75,11 +119,14 @@ def lazy(func, *resultclasses):
                 (func, self.__args, self.__kw) + resultclasses
             )
 
+        def __repr__(self):
+            return repr(self.__cast())
+
         @classmethod
         def __prepare_class__(cls):
             for resultclass in resultclasses:
                 for type_ in resultclass.mro():
-                    for method_name in type_.__dict__.keys():
+                    for method_name in type_.__dict__:
                         # All __promise__ return the same wrapper method, they
                         # look up the correct implementation when called.
                         if hasattr(cls, method_name):
@@ -87,20 +134,13 @@ def lazy(func, *resultclasses):
                         meth = cls.__promise__(method_name)
                         setattr(cls, method_name, meth)
             cls._delegate_bytes = bytes in resultclasses
-            cls._delegate_text = six.text_type in resultclasses
+            cls._delegate_text = str in resultclasses
             assert not (cls._delegate_bytes and cls._delegate_text), (
                 "Cannot call lazy() with both bytes and text return types.")
             if cls._delegate_text:
-                if six.PY3:
-                    cls.__str__ = cls.__text_cast
-                else:
-                    cls.__unicode__ = cls.__text_cast
-                    cls.__str__ = cls.__bytes_cast_encoded
+                cls.__str__ = cls.__text_cast
             elif cls._delegate_bytes:
-                if six.PY3:
-                    cls.__bytes__ = cls.__bytes_cast
-                else:
-                    cls.__str__ = cls.__bytes_cast
+                cls.__bytes__ = cls.__bytes_cast
 
         @classmethod
         def __promise__(cls, method_name):
@@ -119,7 +159,7 @@ def lazy(func, *resultclasses):
             return bytes(func(*self.__args, **self.__kw))
 
         def __bytes_cast_encoded(self):
-            return func(*self.__args, **self.__kw).encode('utf-8')
+            return func(*self.__args, **self.__kw).encode()
 
         def __cast(self):
             if self._delegate_bytes:
@@ -133,11 +173,6 @@ def lazy(func, *resultclasses):
             # object defines __str__(), so __prepare_class__() won't overload
             # a __str__() method from the proxied class.
             return str(self.__cast())
-
-        def __ne__(self, other):
-            if isinstance(other, Promise):
-                other = other.__cast()
-            return self.__cast() != other
 
         def __eq__(self, other):
             if isinstance(other, Promise):
@@ -153,10 +188,8 @@ def lazy(func, *resultclasses):
             return hash(self.__cast())
 
         def __mod__(self, rhs):
-            if self._delegate_bytes and six.PY2:
-                return bytes(self) % rhs
-            elif self._delegate_text:
-                return six.text_type(self) % rhs
+            if self._delegate_text:
+                return str(self) % rhs
             return self.__cast() % rhs
 
         def __deepcopy__(self, memo):
@@ -182,16 +215,7 @@ def lazystr(text):
     """
     Shortcut for the common case of a lazy callable that returns str.
     """
-    from django.utils.encoding import force_text  # Avoid circular import
-    return lazy(force_text, six.text_type)(text)
-
-
-def allow_lazy(func, *resultclasses):
-    warnings.warn(
-        "django.utils.functional.allow_lazy() is deprecated in favor of "
-        "django.utils.functional.keep_lazy()",
-        RemovedInDjango20Warning, 2)
-    return keep_lazy(*resultclasses)(func)
+    return lazy(str, str)(text)
 
 
 def keep_lazy(*resultclasses):
@@ -209,12 +233,9 @@ def keep_lazy(*resultclasses):
 
         @wraps(func)
         def wrapper(*args, **kwargs):
-            for arg in list(args) + list(six.itervalues(kwargs)):
-                if isinstance(arg, Promise):
-                    break
-            else:
-                return func(*args, **kwargs)
-            return lazy_func(*args, **kwargs)
+            if any(isinstance(arg, Promise) for arg in itertools.chain(args, kwargs.values())):
+                return lazy_func(*args, **kwargs)
+            return func(*args, **kwargs)
         return wrapper
     return decorator
 
@@ -223,7 +244,8 @@ def keep_lazy_text(func):
     """
     A decorator for functions that accept lazy arguments and return text.
     """
-    return keep_lazy(six.text_type)(func)
+    return keep_lazy(str)(func)
+
 
 empty = object()
 
@@ -236,7 +258,7 @@ def new_method_proxy(func):
     return inner
 
 
-class LazyObject(object):
+class LazyObject:
     """
     A wrapper for another class that can be used to delay instantiation of the
     wrapped class.
@@ -296,13 +318,6 @@ class LazyObject(object):
             self._setup()
         return (unpickle_lazyobject, (self._wrapped,))
 
-    # We have to explicitly override __getstate__ so that older versions of
-    # pickle don't try to pickle the __dict__ (which in the case of a
-    # SimpleLazyObject may contain a lambda). The value will end up being
-    # ignored by our __reduce__ and custom unpickler.
-    def __getstate__(self):
-        return {}
-
     def __copy__(self):
         if self._wrapped is empty:
             # If uninitialized, copy the wrapper. Use type(self), not
@@ -321,14 +336,9 @@ class LazyObject(object):
             return result
         return copy.deepcopy(self._wrapped, memo)
 
-    if six.PY3:
-        __bytes__ = new_method_proxy(bytes)
-        __str__ = new_method_proxy(str)
-        __bool__ = new_method_proxy(bool)
-    else:
-        __str__ = new_method_proxy(str)
-        __unicode__ = new_method_proxy(unicode)  # NOQA: unicode undefined on PY3
-        __nonzero__ = new_method_proxy(bool)
+    __bytes__ = new_method_proxy(bytes)
+    __str__ = new_method_proxy(str)
+    __bool__ = new_method_proxy(bool)
 
     # Introspection support
     __dir__ = new_method_proxy(dir)
@@ -337,6 +347,8 @@ class LazyObject(object):
     # care about this (especially in equality tests)
     __class__ = property(new_method_proxy(operator.attrgetter("__class__")))
     __eq__ = new_method_proxy(operator.eq)
+    __lt__ = new_method_proxy(operator.lt)
+    __gt__ = new_method_proxy(operator.gt)
     __ne__ = new_method_proxy(operator.ne)
     __hash__ = new_method_proxy(hash)
 
@@ -374,7 +386,7 @@ class SimpleLazyObject(LazyObject):
         value.
         """
         self.__dict__['_setupfunc'] = func
-        super(SimpleLazyObject, self).__init__()
+        super().__init__()
 
     def _setup(self):
         self._wrapped = self._setupfunc()
@@ -407,30 +419,9 @@ class SimpleLazyObject(LazyObject):
         return copy.deepcopy(self._wrapped, memo)
 
 
-class lazy_property(property):
-    """
-    A property that works with subclasses by wrapping the decorated
-    functions of the base class.
-    """
-    def __new__(cls, fget=None, fset=None, fdel=None, doc=None):
-        if fget is not None:
-            @wraps(fget)
-            def fget(instance, instance_type=None, name=fget.__name__):
-                return getattr(instance, name)()
-        if fset is not None:
-            @wraps(fset)
-            def fset(instance, value, name=fset.__name__):
-                return getattr(instance, name)(value)
-        if fdel is not None:
-            @wraps(fdel)
-            def fdel(instance, name=fdel.__name__):
-                return getattr(instance, name)()
-        return property(fget, fset, fdel, doc)
-
-
 def partition(predicate, values):
     """
-    Splits the values into two sets, based on the return value of the function
+    Split the values into two sets, based on the return value of the function
     (True/False). e.g.:
 
         >>> partition(lambda x: x > 3, range(5))

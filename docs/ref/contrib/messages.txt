@@ -27,14 +27,14 @@ already contains all the settings required to enable message functionality:
 
 * ``'django.contrib.messages'`` is in :setting:`INSTALLED_APPS`.
 
-* :setting:`MIDDLEWARE_CLASSES` contains
+* :setting:`MIDDLEWARE` contains
   ``'django.contrib.sessions.middleware.SessionMiddleware'`` and
   ``'django.contrib.messages.middleware.MessageMiddleware'``.
 
   The default :ref:`storage backend <message-storage-backends>` relies on
   :doc:`sessions </topics/http/sessions>`. That's why ``SessionMiddleware``
   must be enabled and appear before ``MessageMiddleware`` in
-  :setting:`MIDDLEWARE_CLASSES`.
+  :setting:`MIDDLEWARE`.
 
 * The ``'context_processors'`` option of the ``DjangoTemplates`` backend
   defined in your :setting:`TEMPLATES` setting contains
@@ -42,8 +42,8 @@ already contains all the settings required to enable message functionality:
 
 If you don't want to use messages, you can remove
 ``'django.contrib.messages'`` from your :setting:`INSTALLED_APPS`, the
-``MessageMiddleware`` line from :setting:`MIDDLEWARE_CLASSES`, and the
-``messages`` context processor from :setting:`TEMPLATES`.
+``MessageMiddleware`` line from :setting:`MIDDLEWARE`, and the ``messages``
+context processor from :setting:`TEMPLATES`.
 
 Configuring the message engine
 ==============================
@@ -320,8 +320,7 @@ Adding extra message tags
 For more direct control over message tags, you can optionally provide a string
 containing extra tags to any of the add methods::
 
-    messages.add_message(request, messages.INFO, 'Over 9000!',
-                         extra_tags='dragonball')
+    messages.add_message(request, messages.INFO, 'Over 9000!', extra_tags='dragonball')
     messages.error(request, 'Email box full', extra_tags='email')
 
 Extra tags are added before the default tag for that level and are space
@@ -336,8 +335,10 @@ if they don't want to, you may pass an additional keyword argument
 ``fail_silently=True`` to any of the ``add_message`` family of methods. For
 example::
 
-    messages.add_message(request, messages.SUCCESS, 'Profile details updated.',
-                         fail_silently=True)
+    messages.add_message(
+        request, messages.SUCCESS, 'Profile details updated.',
+        fail_silently=True,
+    )
     messages.info(request, 'Hello world.', fail_silently=True)
 
 .. note::

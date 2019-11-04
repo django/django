@@ -1,7 +1,5 @@
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals
-
 import datetime
+from unittest import mock
 
 from django.core.exceptions import ImproperlyConfigured
 from django.test import TestCase, override_settings, skipUnlessDBFeature
@@ -20,7 +18,7 @@ def _make_books(n, base_date):
             pubdate=base_date - datetime.timedelta(days=i))
 
 
-class TestDataMixin(object):
+class TestDataMixin:
 
     @classmethod
     def setUpTestData(cls):
@@ -82,7 +80,11 @@ class ArchiveIndexViewTests(TestDataMixin, TestCase):
         self.assertTemplateUsed(res, 'generic_views/book_detail.html')
 
     def test_archive_view_invalid(self):
-        with self.assertRaises(ImproperlyConfigured):
+        msg = (
+            'BookArchive is missing a QuerySet. Define BookArchive.model, '
+            'BookArchive.queryset, or override BookArchive.get_queryset().'
+        )
+        with self.assertRaisesMessage(ImproperlyConfigured, msg):
             self.client.get('/dates/books/invalid/')
 
     def test_archive_view_by_month(self):
@@ -154,6 +156,11 @@ class ArchiveIndexViewTests(TestDataMixin, TestCase):
         self.assertEqual(list(res.context['latest']), list(Book.objects.order_by('-name').all()))
         self.assertTemplateUsed(res, 'generic_views/book_archive.html')
 
+    def test_archive_view_without_date_field(self):
+        msg = 'BookArchiveWithoutDateField.date_field is required.'
+        with self.assertRaisesMessage(ImproperlyConfigured, msg):
+            self.client.get('/dates/books/without_date_field/')
+
 
 @override_settings(ROOT_URLCONF='generic_views.urls')
 class YearArchiveViewTests(TestDataMixin, TestCase):
@@ -166,7 +173,7 @@ class YearArchiveViewTests(TestDataMixin, TestCase):
         self.assertTemplateUsed(res, 'generic_views/book_archive_year.html')
 
         # Since allow_empty=False, next/prev years must be valid (#7164)
-        self.assertEqual(res.context['next_year'], None)
+        self.assertIsNone(res.context['next_year'])
         self.assertEqual(res.context['previous_year'], datetime.date(2006, 1, 1))
 
     def test_year_view_make_object_list(self):
@@ -273,6 +280,27 @@ class YearArchiveViewTests(TestDataMixin, TestCase):
         res = self.client.get('/dates/books/2011/')
         self.assertEqual(list(res.context['date_list']), list(sorted(res.context['date_list'])))
 
+    @mock.patch('django.views.generic.list.MultipleObjectMixin.get_context_data')
+    def test_get_context_data_receives_extra_context(self, mock):
+        """
+        MultipleObjectMixin.get_context_data() receives the context set by
+        BaseYearArchiveView.get_dated_items(). This behavior is implemented in
+        BaseDateListView.get().
+        """
+        BookSigning.objects.create(event_date=datetime.datetime(2008, 4, 2, 12, 0))
+        with self.assertRaisesMessage(TypeError, 'context must be a dict rather than MagicMock.'):
+            self.client.get('/dates/booksignings/2008/')
+        args, kwargs = mock.call_args
+        # These are context values from get_dated_items().
+        self.assertEqual(kwargs['year'], datetime.date(2008, 1, 1))
+        self.assertIsNone(kwargs['previous_year'])
+        self.assertIsNone(kwargs['next_year'])
+
+    def test_get_dated_items_not_implemented(self):
+        msg = 'A DateView must provide an implementation of get_dated_items()'
+        with self.assertRaisesMessage(NotImplementedError, msg):
+            self.client.get('/BaseDateListViewTest/')
+
 
 @override_settings(ROOT_URLCONF='generic_views.urls')
 class MonthArchiveViewTests(TestDataMixin, TestCase):
@@ -287,7 +315,7 @@ class MonthArchiveViewTests(TestDataMixin, TestCase):
         self.assertEqual(res.context['month'], datetime.date(2008, 10, 1))
 
         # Since allow_empty=False, next/prev months must be valid (#7164)
-        self.assertEqual(res.context['next_month'], None)
+        self.assertIsNone(res.context['next_month'])
         self.assertEqual(res.context['previous_month'], datetime.date(2006, 5, 1))
 
     def test_month_view_allow_empty(self):
@@ -310,7 +338,7 @@ class MonthArchiveViewTests(TestDataMixin, TestCase):
         url = datetime.date.today().strftime('/dates/books/%Y/%b/allow_empty/').lower()
         res = self.client.get(url)
         self.assertEqual(res.status_code, 200)
-        self.assertEqual(res.context['next_month'], None)
+        self.assertIsNone(res.context['next_month'])
 
     def test_month_view_allow_future(self):
         future = (datetime.date.today() + datetime.timedelta(days=60)).replace(day=1)
@@ -330,7 +358,7 @@ class MonthArchiveViewTests(TestDataMixin, TestCase):
 
         # Since allow_future = True but not allow_empty, next/prev are not
         # allowed to be empty months (#7164)
-        self.assertEqual(res.context['next_month'], None)
+        self.assertIsNone(res.context['next_month'])
         self.assertEqual(res.context['previous_month'], datetime.date(2008, 10, 1))
 
         # allow_future, but not allow_empty, with a current month. So next
@@ -390,6 +418,20 @@ class MonthArchiveViewTests(TestDataMixin, TestCase):
         res = self.client.get('/dates/booksignings/2008/apr/')
         self.assertEqual(res.status_code, 200)
 
+    def test_month_view_get_month_from_request(self):
+        oct1 = datetime.date(2008, 10, 1)
+        res = self.client.get('/dates/books/without_month/2008/?month=oct')
+        self.assertEqual(res.status_code, 200)
+        self.assertTemplateUsed(res, 'generic_views/book_archive_month.html')
+        self.assertEqual(list(res.context['date_list']), [oct1])
+        self.assertEqual(list(res.context['book_list']), list(Book.objects.filter(pubdate=oct1)))
+        self.assertEqual(res.context['month'], oct1)
+
+    def test_month_view_without_month_in_url(self):
+        res = self.client.get('/dates/books/without_month/2008/')
+        self.assertEqual(res.status_code, 404)
+        self.assertEqual(res.context['exception'], 'No month specified')
+
     @skipUnlessDBFeature('has_zoneinfo_database')
     @override_settings(USE_TZ=True, TIME_ZONE='Africa/Nairobi')
     def test_aware_datetime_month_view(self):
@@ -417,7 +459,7 @@ class WeekArchiveViewTests(TestDataMixin, TestCase):
         self.assertEqual(res.context['week'], datetime.date(2008, 9, 28))
 
         # Since allow_empty=False, next/prev weeks must be valid
-        self.assertEqual(res.context['next_week'], None)
+        self.assertIsNone(res.context['next_week'])
         self.assertEqual(res.context['previous_week'], datetime.date(2006, 4, 30))
 
     def test_week_view_allow_empty(self):
@@ -439,7 +481,7 @@ class WeekArchiveViewTests(TestDataMixin, TestCase):
         url = datetime.date.today().strftime('/dates/books/%Y/week/%U/allow_empty/').lower()
         res = self.client.get(url)
         self.assertEqual(res.status_code, 200)
-        self.assertEqual(res.context['next_week'], None)
+        self.assertIsNone(res.context['next_week'])
 
     def test_week_view_allow_future(self):
         # January 7th always falls in week 1, given Python's definition of week numbers
@@ -457,7 +499,7 @@ class WeekArchiveViewTests(TestDataMixin, TestCase):
 
         # Since allow_future = True but not allow_empty, next/prev are not
         # allowed to be empty weeks
-        self.assertEqual(res.context['next_week'], None)
+        self.assertIsNone(res.context['next_week'])
         self.assertEqual(res.context['previous_week'], datetime.date(2008, 9, 28))
 
         # allow_future, but not allow_empty, with a current week. So next
@@ -496,6 +538,10 @@ class WeekArchiveViewTests(TestDataMixin, TestCase):
         self.assertEqual(res.status_code, 200)
         self.assertEqual(res.context['week'], datetime.date(2008, 9, 29))
 
+    def test_unknown_week_format(self):
+        with self.assertRaisesMessage(ValueError, "Unknown week format '%T'. Choices are: %U, %W"):
+            self.client.get('/dates/books/2008/week/39/unknown_week_format/')
+
     def test_datetime_week_view(self):
         BookSigning.objects.create(event_date=datetime.datetime(2008, 4, 2, 12, 0))
         res = self.client.get('/dates/booksignings/2008/week/13/')
@@ -520,7 +566,7 @@ class DayArchiveViewTests(TestDataMixin, TestCase):
         self.assertEqual(res.context['day'], datetime.date(2008, 10, 1))
 
         # Since allow_empty=False, next/prev days must be valid.
-        self.assertEqual(res.context['next_day'], None)
+        self.assertIsNone(res.context['next_day'])
         self.assertEqual(res.context['previous_day'], datetime.date(2006, 5, 1))
 
     def test_day_view_allow_empty(self):
@@ -542,7 +588,7 @@ class DayArchiveViewTests(TestDataMixin, TestCase):
         url = datetime.date.today().strftime('/dates/books/%Y/%b/%d/allow_empty/').lower()
         res = self.client.get(url)
         self.assertEqual(res.status_code, 200)
-        self.assertEqual(res.context['next_day'], None)
+        self.assertIsNone(res.context['next_day'])
 
     def test_day_view_allow_future(self):
         future = (datetime.date.today() + datetime.timedelta(days=60))
@@ -560,7 +606,7 @@ class DayArchiveViewTests(TestDataMixin, TestCase):
         self.assertEqual(res.context['day'], future)
 
         # allow_future but not allow_empty, next/prev must be valid
-        self.assertEqual(res.context['next_day'], None)
+        self.assertIsNone(res.context['next_day'])
         self.assertEqual(res.context['previous_day'], datetime.date(2008, 10, 1))
 
         # allow_future, but not allow_empty, with a current month.
@@ -664,15 +710,30 @@ class DateDetailViewTests(TestDataMixin, TestCase):
         self.assertEqual(res.context['book'], b)
         self.assertTemplateUsed(res, 'generic_views/book_detail.html')
 
+    def test_year_out_of_range(self):
+        urls = [
+            '/dates/books/9999/',
+            '/dates/books/9999/12/',
+            '/dates/books/9999/week/52/',
+        ]
+        for url in urls:
+            with self.subTest(url=url):
+                res = self.client.get(url)
+                self.assertEqual(res.status_code, 404)
+                self.assertEqual(res.context['exception'], 'Date out of range')
+
     def test_invalid_url(self):
-        with self.assertRaises(AttributeError):
+        msg = (
+            'Generic detail view BookDetail must be called with either an '
+            'object pk or a slug in the URLconf.'
+        )
+        with self.assertRaisesMessage(AttributeError, msg):
             self.client.get("/dates/books/2008/oct/01/nopk/")
 
     def test_get_object_custom_queryset(self):
         """
-        Ensure that custom querysets are used when provided to
-        BaseDateDetailView.get_object()
-        Refs #16918.
+        Custom querysets are used when provided to
+        BaseDateDetailView.get_object().
         """
         res = self.client.get(
             '/dates/books/get_object_custom_queryset/2006/may/01/%s/' % self.book2.pk)

@@ -16,10 +16,14 @@ different types of fields.
 For example, here's a validator that only allows even numbers::
 
     from django.core.exceptions import ValidationError
+    from django.utils.translation import gettext_lazy as _
 
     def validate_even(value):
         if value % 2 != 0:
-            raise ValidationError('%s is not an even number' % value)
+            raise ValidationError(
+                _('%(value)s is not an even number'),
+                params={'value': value},
+            )
 
 You can add this to a model field via the field's :attr:`~django.db.models.Field.validators`
 argument::
@@ -81,8 +85,8 @@ to, or in lieu of custom ``field.clean()`` methods.
 
     .. attribute:: regex
 
-        The regular expression pattern to search for the provided ``value``,
-        or a pre-compiled regular expression. By default, raises a
+        The regular expression pattern to search for within the provided
+        ``value``, or a pre-compiled regular expression. By default, raises a
         :exc:`~django.core.exceptions.ValidationError` with :attr:`message`
         and :attr:`code` if a match is not found. That standard behavior can
         be reversed by setting :attr:`inverse_match` to ``True``, in which case
@@ -183,8 +187,6 @@ to, or in lieu of custom ``field.clean()`` methods.
 
 .. data:: validate_unicode_slug
 
-    .. versionadded:: 1.9
-
     A :class:`RegexValidator` instance that ensures a value consists of only
     Unicode letters, numbers, underscores, or hyphens.
 
@@ -222,51 +224,68 @@ to, or in lieu of custom ``field.clean()`` methods.
 ``int_list_validator``
 ----------------------
 
-.. function:: int_list_validator(sep=',', message=None, code='invalid')
+.. function:: int_list_validator(sep=',', message=None, code='invalid', allow_negative=False)
 
-    .. versionadded:: 1.9
-
-    Returns a :class:`RegexValidator` instance that ensures a string
-    consists of integers separated by ``sep``.
+    Returns a :class:`RegexValidator` instance that ensures a string consists
+    of integers separated by ``sep``. It allows negative integers when
+    ``allow_negative`` is ``True``.
 
 ``MaxValueValidator``
 ---------------------
 
-.. class:: MaxValueValidator(max_value, message=None)
+.. class:: MaxValueValidator(limit_value, message=None)
 
     Raises a :exc:`~django.core.exceptions.ValidationError` with a code of
-    ``'max_value'`` if ``value`` is greater than ``max_value``.
+    ``'max_value'`` if ``value`` is greater than ``limit_value``, which may be
+    a callable.
+
+    .. versionchanged:: 2.2
+
+        ``limit_value`` can now be a callable.
 
 ``MinValueValidator``
 ---------------------
 
-.. class:: MinValueValidator(min_value, message=None)
+.. class:: MinValueValidator(limit_value, message=None)
 
     Raises a :exc:`~django.core.exceptions.ValidationError` with a code of
-    ``'min_value'`` if ``value`` is less than ``min_value``.
+    ``'min_value'`` if ``value`` is less than ``limit_value``, which may be a
+    callable.
+
+    .. versionchanged:: 2.2
+
+        ``limit_value`` can now be a callable.
 
 ``MaxLengthValidator``
 ----------------------
 
-.. class:: MaxLengthValidator(max_length, message=None)
+.. class:: MaxLengthValidator(limit_value, message=None)
 
     Raises a :exc:`~django.core.exceptions.ValidationError` with a code of
-    ``'max_length'`` if the length of ``value`` is greater than ``max_length``.
+    ``'max_length'`` if the length of ``value`` is greater than
+    ``limit_value``, which may be a callable.
+
+    .. versionchanged:: 2.2
+
+        ``limit_value`` can now be a callable.
 
 ``MinLengthValidator``
 ----------------------
 
-.. class:: MinLengthValidator(min_length, message=None)
+.. class:: MinLengthValidator(limit_value, message=None)
 
     Raises a :exc:`~django.core.exceptions.ValidationError` with a code of
-    ``'min_length'`` if the length of ``value`` is less than ``min_length``.
+    ``'min_length'`` if the length of ``value`` is less than ``limit_value``,
+    which may be a callable.
+
+    .. versionchanged:: 2.2
+
+        ``limit_value`` can now be a callable.
 
 ``DecimalValidator``
 --------------------
 
 .. class:: DecimalValidator(max_digits, decimal_places)
-
-    .. versionadded:: 1.9
 
     Raises :exc:`~django.core.exceptions.ValidationError` with the following
     codes:
@@ -276,3 +295,50 @@ to, or in lieu of custom ``field.clean()`` methods.
       ``decimal_places``.
     - ``'max_whole_digits'`` if the number of whole digits is larger than
       the difference between ``max_digits`` and ``decimal_places``.
+
+``FileExtensionValidator``
+--------------------------
+
+.. class:: FileExtensionValidator(allowed_extensions, message, code)
+
+    Raises a :exc:`~django.core.exceptions.ValidationError` with a code of
+    ``'invalid_extension'`` if the extension of ``value.name`` (``value`` is
+    a :class:`~django.core.files.File`) isn't found in ``allowed_extensions``.
+    The extension is compared case-insensitively with ``allowed_extensions``.
+
+    .. warning::
+
+        Don't rely on validation of the file extension to determine a file's
+        type. Files can be renamed to have any extension no matter what data
+        they contain.
+
+``validate_image_file_extension``
+---------------------------------
+
+.. data:: validate_image_file_extension
+
+    Uses Pillow to ensure that ``value.name`` (``value`` is a
+    :class:`~django.core.files.File`) has `a valid image extension
+    <https://pillow.readthedocs.io/en/latest/handbook/image-file-formats.html>`_.
+
+``ProhibitNullCharactersValidator``
+-----------------------------------
+
+.. class:: ProhibitNullCharactersValidator(message=None, code=None)
+
+    Raises a :exc:`~django.core.exceptions.ValidationError` if ``str(value)``
+    contains one or more nulls characters (``'\x00'``).
+
+    :param message: If not ``None``, overrides :attr:`.message`.
+    :param code: If not ``None``, overrides :attr:`code`.
+
+    .. attribute:: message
+
+        The error message used by
+        :exc:`~django.core.exceptions.ValidationError` if validation fails.
+        Defaults to ``"Null characters are not allowed."``.
+
+    .. attribute:: code
+
+        The error code used by :exc:`~django.core.exceptions.ValidationError`
+        if validation fails. Defaults to ``"null_characters_not_allowed"``.

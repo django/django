@@ -1,3 +1,4 @@
+from django.apps import apps
 from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError
 from django.db import DEFAULT_DB_ALIAS, connections, migrations
@@ -5,7 +6,6 @@ from django.db.migrations.loader import AmbiguityError, MigrationLoader
 from django.db.migrations.migration import SwappableTuple
 from django.db.migrations.optimizer import MigrationOptimizer
 from django.db.migrations.writer import MigrationWriter
-from django.utils import six
 from django.utils.version import get_docs_version
 
 
@@ -13,27 +13,50 @@ class Command(BaseCommand):
     help = "Squashes an existing set of migrations (from first until specified) into a single new one."
 
     def add_arguments(self, parser):
-        parser.add_argument('app_label',
-            help='App label of the application to squash migrations for.')
-        parser.add_argument('start_migration_name', default=None, nargs='?',
-            help='Migrations will be squashed starting from and including this migration.')
-        parser.add_argument('migration_name',
-            help='Migrations will be squashed until and including this migration.')
-        parser.add_argument('--no-optimize', action='store_true', dest='no_optimize', default=False,
-            help='Do not try to optimize the squashed operations.')
-        parser.add_argument('--noinput', '--no-input',
-            action='store_false', dest='interactive', default=True,
-            help='Tells Django to NOT prompt the user for input of any kind.')
+        parser.add_argument(
+            'app_label',
+            help='App label of the application to squash migrations for.',
+        )
+        parser.add_argument(
+            'start_migration_name', nargs='?',
+            help='Migrations will be squashed starting from and including this migration.',
+        )
+        parser.add_argument(
+            'migration_name',
+            help='Migrations will be squashed until and including this migration.',
+        )
+        parser.add_argument(
+            '--no-optimize', action='store_true',
+            help='Do not try to optimize the squashed operations.',
+        )
+        parser.add_argument(
+            '--noinput', '--no-input', action='store_false', dest='interactive',
+            help='Tells Django to NOT prompt the user for input of any kind.',
+        )
+        parser.add_argument(
+            '--squashed-name',
+            help='Sets the name of the new squashed migration.',
+        )
+        parser.add_argument(
+            '--no-header', action='store_false', dest='include_header',
+            help='Do not add a header comment to the new squashed migration.',
+        )
 
     def handle(self, **options):
 
-        self.verbosity = options.get('verbosity')
-        self.interactive = options.get('interactive')
+        self.verbosity = options['verbosity']
+        self.interactive = options['interactive']
         app_label = options['app_label']
         start_migration_name = options['start_migration_name']
         migration_name = options['migration_name']
         no_optimize = options['no_optimize']
-
+        squashed_name = options['squashed_name']
+        include_header = options['include_header']
+        # Validate app_label.
+        try:
+            apps.get_app_config(app_label)
+        except LookupError as err:
+            raise CommandError(str(err))
         # Load the current graph state, check the app and migration they asked for exists
         loader = MigrationLoader(connections[DEFAULT_DB_ALIAS])
         if app_label not in loader.migrated_apps:
@@ -75,7 +98,7 @@ class Command(BaseCommand):
             if self.interactive:
                 answer = None
                 while not answer or answer not in "yn":
-                    answer = six.moves.input("Do you wish to proceed? [yN] ")
+                    answer = input("Do you wish to proceed? [yN] ")
                     if not answer:
                         answer = "n"
                         break
@@ -140,20 +163,28 @@ class Command(BaseCommand):
                 replaces.append((migration.app_label, migration.name))
 
         # Make a new migration with those operations
-        subclass = type("Migration", (migrations.Migration, ), {
+        subclass = type("Migration", (migrations.Migration,), {
             "dependencies": dependencies,
             "operations": new_operations,
             "replaces": replaces,
         })
         if start_migration_name:
-            new_migration = subclass("%s_squashed_%s" % (start_migration.name, migration.name), app_label)
+            if squashed_name:
+                # Use the name from --squashed-name.
+                prefix, _ = start_migration.name.split('_', 1)
+                name = '%s_%s' % (prefix, squashed_name)
+            else:
+                # Generate a name.
+                name = '%s_squashed_%s' % (start_migration.name, migration.name)
+            new_migration = subclass(name, app_label)
         else:
-            new_migration = subclass("0001_squashed_%s" % migration.name, app_label)
+            name = '0001_%s' % (squashed_name or 'squashed_%s' % migration.name)
+            new_migration = subclass(name, app_label)
             new_migration.initial = True
 
         # Write out the new migration file
-        writer = MigrationWriter(new_migration)
-        with open(writer.path, "wb") as fh:
+        writer = MigrationWriter(new_migration, include_header)
+        with open(writer.path, "w", encoding='utf-8') as fh:
             fh.write(writer.as_string())
 
         if self.verbosity > 0:

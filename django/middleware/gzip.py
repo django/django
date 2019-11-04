@@ -1,15 +1,16 @@
 import re
 
 from django.utils.cache import patch_vary_headers
+from django.utils.deprecation import MiddlewareMixin
 from django.utils.text import compress_sequence, compress_string
 
 re_accepts_gzip = re.compile(r'\bgzip\b')
 
 
-class GZipMiddleware(object):
+class GZipMiddleware(MiddlewareMixin):
     """
-    This middleware compresses content if the browser allows gzip compression.
-    It sets the Vary header accordingly, so that caches will base their storage
+    Compress content if the browser allows gzip compression.
+    Set the Vary header accordingly, so that caches will base their storage
     on the Accept-Encoding header.
     """
     def process_response(self, request, response):
@@ -40,8 +41,12 @@ class GZipMiddleware(object):
             response.content = compressed_content
             response['Content-Length'] = str(len(response.content))
 
-        if response.has_header('ETag'):
-            response['ETag'] = re.sub('"$', ';gzip"', response['ETag'])
+        # If there is a strong ETag, make it weak to fulfill the requirements
+        # of RFC 7232 section-2.1 while also allowing conditional request
+        # matches on ETags.
+        etag = response.get('ETag')
+        if etag and etag.startswith('"'):
+            response['ETag'] = 'W/' + etag
         response['Content-Encoding'] = 'gzip'
 
         return response

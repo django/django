@@ -10,22 +10,9 @@ class GDALException(Exception):
     pass
 
 
-# Legacy name
-OGRException = GDALException
-
-
 class SRSException(Exception):
     pass
 
-
-class OGRIndexError(GDALException, KeyError):
-    """
-    This exception is raised when an invalid index is encountered, and has
-    the 'silent_variable_feature' attribute set to true.  This ensures that
-    django's templates proceed to use the next lookup type gracefully when
-    an Exception is raised.  Fixes ticket #4740.
-    """
-    silent_variable_failure = True
 
 # #### GDAL/OGR error checking codes and routine ####
 
@@ -42,7 +29,7 @@ OGRERR_DICT = {
 }
 
 # CPL Error Codes
-# http://www.gdal.org/cpl__error_8h.html
+# https://www.gdal.org/cpl__error_8h.html
 CPLERR_DICT = {
     1: (GDALException, 'AppDefined'),
     2: (GDALException, 'OutOfMemory'),
@@ -61,7 +48,7 @@ ERR_NONE = 0
 
 def check_err(code, cpl=False):
     """
-    Checks the given CPL/OGRERR, and raises an exception where appropriate.
+    Check the given CPL/OGRERR and raise an exception where appropriate.
     """
     err_dict = CPLERR_DICT if cpl else OGRERR_DICT
 

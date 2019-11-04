@@ -4,23 +4,27 @@
 # abraham.martin <abraham.martin@gmail.com>, 2014
 # Antoni Aloy <aaloy@apsl.net>, 2011-2014
 # Claude Paroz <claude@2xlibre.net>, 2014
-# Ernesto Avilés Vázquez <whippiii@gmail.com>, 2015
+# Ernesto Avilés Vázquez <whippiii@gmail.com>, 2015-2016
 # franchukelly <inactive+franchukelly@transifex.com>, 2011
 # guillem <serra.guillem@gmail.com>, 2012
+# Ignacio José Lizarán Rus <ilizaran@gmail.com>, 2019
 # Igor Támara <igor@tamarapatino.org>, 2013
 # Jannis Leidel <jannis@leidel.info>, 2011
-# Jorge Puente-Sarrín <puentesarrin@gmail.com>, 2014-2015
+# Jorge Puente Sarrín <puentesarrin@gmail.com>, 2014-2015
+# José Luis <alagunajs@gmail.com>, 2016
 # Josue Naaman Nistal Guerra <josuenistal@hotmail.com>, 2014
+# Luigy, 2019
 # Marc Garcia <garcia.marc@gmail.com>, 2011
+# Miguel Angel Tribaldos <mtribaldos@gmail.com>, 2017
 # Pablo, 2015
 # Veronicabh <vero.blazher@gmail.com>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-11-15 11:06+0100\n"
-"PO-Revision-Date: 2015-11-16 08:16+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2019-01-16 20:42+0100\n"
+"PO-Revision-Date: 2019-02-19 08:44+0000\n"
+"Last-Translator: Ignacio José Lizarán Rus <ilizaran@gmail.com>\n"
 "Language-Team: Spanish (http://www.transifex.com/django/django/language/"
 "es/)\n"
 "MIME-Version: 1.0\n"
@@ -74,6 +78,12 @@ msgstr "Este mes"
 msgid "This year"
 msgstr "Este año"
 
+msgid "No date"
+msgstr "Sin fecha"
+
+msgid "Has date"
+msgstr "Tiene fecha"
+
 #, python-format
 msgid ""
 "Please enter the correct %(username)s and password for a staff account. Note "
@@ -84,6 +94,22 @@ msgstr ""
 
 msgid "Action:"
 msgstr "Acción:"
+
+#, python-format
+msgid "Add another %(verbose_name)s"
+msgstr "Agregar %(verbose_name)s adicional."
+
+msgid "Remove"
+msgstr "Eliminar"
+
+msgid "Addition"
+msgstr "Añadido"
+
+msgid "Change"
+msgstr "Modificar"
+
+msgid "Deletion"
+msgstr "Borrado"
 
 msgid "action time"
 msgstr "hora de la acción"
@@ -97,6 +123,8 @@ msgstr "tipo de contenido"
 msgid "object id"
 msgstr "id del objeto"
 
+#. Translators: 'repr' means representation
+#. (https://docs.python.org/library/functions.html#repr)
 msgid "object repr"
 msgstr "repr del objeto"
 
@@ -127,77 +155,80 @@ msgstr "Eliminado/a \"%(object)s.\""
 msgid "LogEntry Object"
 msgstr "Objeto de registro de Log"
 
+#, python-brace-format
+msgid "Added {name} \"{object}\"."
+msgstr "Añadido {name} \"{object}\"."
+
+msgid "Added."
+msgstr "Añadido."
+
+msgid "and"
+msgstr "y"
+
+#, python-brace-format
+msgid "Changed {fields} for {name} \"{object}\"."
+msgstr "Modificado {fields} por {name} \"{object}\"."
+
+#, python-brace-format
+msgid "Changed {fields}."
+msgstr "Modificado {fields}."
+
+#, python-brace-format
+msgid "Deleted {name} \"{object}\"."
+msgstr "Eliminado {name} \"{object}\"."
+
+msgid "No fields changed."
+msgstr "No ha cambiado ningún campo."
+
 msgid "None"
 msgstr "Ninguno"
 
 msgid ""
 "Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
 msgstr ""
-"Mantenga presionado \"Control\" o \"Command\" en un Mac, para seleccionar "
+"Mantenga presionado \"Control\", o \"Command\" en un Mac, para seleccionar "
 "más de una opción."
 
-msgid "Added."
-msgstr "Añadido."
+#, python-brace-format
+msgid "The {name} \"{obj}\" was added successfully."
+msgstr "Se añadió con éxito el {name} \"{obj}\"."
 
-#, python-format
-msgid "Changed %s."
-msgstr "Modificado/a %s."
+msgid "You may edit it again below."
+msgstr "Puede volverlo a editar otra vez a continuación."
 
-msgid "and"
-msgstr "y"
-
-#, python-format
-msgid "Added %(name)s \"%(object)s\"."
-msgstr "Añadido/a \"%(object)s\" %(name)s."
-
-#, python-format
-msgid "Changed %(list)s for %(name)s \"%(object)s\"."
-msgstr "Modificados %(list)s para \"%(object)s\" %(name)s."
-
-#, python-format
-msgid "Deleted %(name)s \"%(object)s\"."
-msgstr "Eliminado/a \"%(object)s\" %(name)s."
-
-msgid "No fields changed."
-msgstr "No ha cambiado ningún campo."
-
-#, python-format
+#, python-brace-format
 msgid ""
-"The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
-msgstr ""
-"Se añadió con éxito el %(name)s \"%(obj)s. Puede editarlo de nuevo abajo."
-
-#, python-format
-msgid ""
-"The %(name)s \"%(obj)s\" was added successfully. You may add another "
-"%(name)s below."
-msgstr ""
-"El  %(name)s \"%(obj)s\" fue añadido satisfactoriamente. Puede añadir otro "
-"%(name)s a continuación."
-
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was added successfully."
-msgstr "Se añadió con éxito el %(name)s \"%(obj)s\"."
-
-#, python-format
-msgid ""
-"The %(name)s \"%(obj)s\" was changed successfully. You may edit it again "
+"The {name} \"{obj}\" was added successfully. You may add another {name} "
 "below."
 msgstr ""
-"El %(name)s \"%(obj)s\" fue cambiado satisfactoriamente. Puede editarlo otra "
-"vez a continuación."
+"Se añadió con éxito el {name} \"{obj}\". Puede añadir otro {name} a "
+"continuación."
 
-#, python-format
+#, python-brace-format
 msgid ""
-"The %(name)s \"%(obj)s\" was changed successfully. You may add another "
-"%(name)s below."
+"The {name} \"{obj}\" was changed successfully. You may edit it again below."
 msgstr ""
-"El  %(name)s \"%(obj)s\" fue cambiado satisfactoriamente. Puede añadir otro "
-"%(name)s a continuación."
+"Se modificó con éxito el {name} \"{obj}\". Puede editarlo otra vez a "
+"continuación."
 
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was changed successfully."
-msgstr "Se modificó con éxito el %(name)s \"%(obj)s\"."
+#, python-brace-format
+msgid ""
+"The {name} \"{obj}\" was added successfully. You may edit it again below."
+msgstr ""
+"Se añadió con éxito el {name} \"{obj}\". Puede editarlo otra vez a "
+"continuación."
+
+#, python-brace-format
+msgid ""
+"The {name} \"{obj}\" was changed successfully. You may add another {name} "
+"below."
+msgstr ""
+"Se modificó con éxito el {name} \"{obj}\". Puede añadir otro {name} a "
+"continuación."
+
+#, python-brace-format
+msgid "The {name} \"{obj}\" was changed successfully."
+msgstr "Se modificó con éxito el {name} \"{obj}\"."
 
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
@@ -214,8 +245,8 @@ msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "Se eliminó con éxito el %(name)s \"%(obj)s\"."
 
 #, python-format
-msgid "%(name)s object with primary key %(key)r does not exist."
-msgstr "No existe ningún objeto %(name)s con la clave primaria %(key)r."
+msgid "%(name)s with ID \"%(key)s\" doesn't exist. Perhaps it was deleted?"
+msgstr "%(name)s con ID \"%(key)s\" no existe. ¿Fue quizá eliminado?"
 
 #, python-format
 msgid "Add %s"
@@ -224,6 +255,10 @@ msgstr "Añadir %s"
 #, python-format
 msgid "Change %s"
 msgstr "Modificar %s"
+
+#, python-format
+msgid "View %s"
+msgstr "Vistas %s"
 
 msgid "Database error"
 msgstr "Error en la base de datos"
@@ -334,7 +369,7 @@ msgid "Change password"
 msgstr "Cambiar contraseña"
 
 msgid "Please correct the error below."
-msgstr "Por favor, corrija los siguientes errores."
+msgstr "Por Favor corrija el siguiente error."
 
 msgid "Please correct the errors below."
 msgstr "Por favor, corrija los siguientes errores."
@@ -357,18 +392,15 @@ msgstr "Documentación"
 msgid "Log out"
 msgstr "Terminar sesión"
 
-msgid "Add"
-msgstr "Añadir"
+#, python-format
+msgid "Add %(name)s"
+msgstr "Añadir %(name)s"
 
 msgid "History"
 msgstr "Histórico"
 
 msgid "View on site"
 msgstr "Ver en el sitio"
-
-#, python-format
-msgid "Add %(name)s"
-msgstr "Añadir %(name)s"
 
 msgid "Filter"
 msgstr "Filtro"
@@ -450,15 +482,8 @@ msgstr ""
 "¿Está usted seguro que quiere eliminar el %(objects_name)s seleccionado? "
 "Todos los siguientes objetos y sus elementos relacionados serán borrados:"
 
-msgid "Change"
-msgstr "Modificar"
-
-msgid "Remove"
-msgstr "Eliminar"
-
-#, python-format
-msgid "Add another %(verbose_name)s"
-msgstr "Agregar %(verbose_name)s adicional."
+msgid "View"
+msgstr "Vista"
 
 msgid "Delete?"
 msgstr "¿Eliminar?"
@@ -474,13 +499,16 @@ msgstr "Resumen"
 msgid "Models in the %(name)s application"
 msgstr "Modelos en la aplicación %(name)s"
 
-msgid "You don't have permission to edit anything."
-msgstr "No tiene permiso para editar nada."
+msgid "Add"
+msgstr "Añadir"
 
-msgid "Recent Actions"
+msgid "You don't have permission to view or edit anything."
+msgstr "No tiene permisos para ver o editar nada"
+
+msgid "Recent actions"
 msgstr "Acciones recientes"
 
-msgid "My Actions"
+msgid "My actions"
 msgstr "Mis acciones"
 
 msgid "None available"
@@ -531,20 +559,8 @@ msgstr "Mostrar todo"
 msgid "Save"
 msgstr "Grabar"
 
-msgid "Popup closing..."
-msgstr ""
-
-#, python-format
-msgid "Change selected %(model)s"
-msgstr "Cambiar %(model)s seleccionado"
-
-#, python-format
-msgid "Add another %(model)s"
-msgstr "Añadir otro %(model)s"
-
-#, python-format
-msgid "Delete selected %(model)s"
-msgstr "Eliminar %(model)s seleccionada/o"
+msgid "Popup closing…"
+msgstr "Cerrando ventana emergente..."
 
 msgid "Search"
 msgstr "Buscar"
@@ -567,6 +583,24 @@ msgstr "Grabar y añadir otro"
 
 msgid "Save and continue editing"
 msgstr "Grabar y continuar editando"
+
+msgid "Save and view"
+msgstr "Guardar y ver"
+
+msgid "Close"
+msgstr "Cerrar"
+
+#, python-format
+msgid "Change selected %(model)s"
+msgstr "Cambiar %(model)s seleccionado"
+
+#, python-format
+msgid "Add another %(model)s"
+msgstr "Añadir otro %(model)s"
+
+#, python-format
+msgid "Delete selected %(model)s"
+msgstr "Eliminar %(model)s seleccionada/o"
 
 msgid "Thanks for spending some quality time with the Web site today."
 msgstr "Gracias por el tiempo que ha dedicado hoy al sitio web."
@@ -683,6 +717,10 @@ msgstr "Escoja %s"
 #, python-format
 msgid "Select %s to change"
 msgstr "Escoja %s a modificar"
+
+#, python-format
+msgid "Select %s to view"
+msgstr "Seleccione %s para ver"
 
 msgid "Date:"
 msgstr "Fecha:"

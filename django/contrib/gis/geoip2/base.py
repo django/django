@@ -1,12 +1,11 @@
-import os
 import socket
+from pathlib import Path
 
 import geoip2.database
 
 from django.conf import settings
-from django.core.validators import ipv4_re
-from django.utils import six
-from django.utils.ipv6 import is_valid_ipv6_address
+from django.core.exceptions import ValidationError
+from django.core.validators import validate_ipv46_address
 
 from .resources import City, Country
 
@@ -22,7 +21,7 @@ class GeoIP2Exception(Exception):
     pass
 
 
-class GeoIP2(object):
+class GeoIP2:
     # The flags for GeoIP memory caching.
     # Try MODE_MMAP_EXT, MODE_MMAP, MODE_FILE in that order.
     MODE_AUTO = 0
@@ -34,7 +33,7 @@ class GeoIP2(object):
     MODE_FILE = 4
     # Load database into memory. Pure Python.
     MODE_MEMORY = 8
-    cache_options = {opt: None for opt in (0, 1, 2, 4, 8)}
+    cache_options = frozenset((MODE_AUTO, MODE_MMAP_EXT, MODE_MMAP, MODE_FILE, MODE_MEMORY))
 
     # Paths to the city & country binary databases.
     _city_file = ''
@@ -74,31 +73,33 @@ class GeoIP2(object):
             raise GeoIP2Exception('Invalid GeoIP caching option: %s' % cache)
 
         # Getting the GeoIP data path.
+        path = path or GEOIP_SETTINGS['GEOIP_PATH']
         if not path:
-            path = GEOIP_SETTINGS['GEOIP_PATH']
-            if not path:
-                raise GeoIP2Exception('GeoIP path must be provided via parameter or the GEOIP_PATH setting.')
-        if not isinstance(path, six.string_types):
+            raise GeoIP2Exception('GeoIP path must be provided via parameter or the GEOIP_PATH setting.')
+        if not isinstance(path, str):
             raise TypeError('Invalid path type: %s' % type(path).__name__)
 
-        if os.path.isdir(path):
+        path = Path(path)
+        if path.is_dir():
             # Constructing the GeoIP database filenames using the settings
             # dictionary. If the database files for the GeoLite country
             # and/or city datasets exist, then try to open them.
-            country_db = os.path.join(path, country or GEOIP_SETTINGS['GEOIP_COUNTRY'])
-            if os.path.isfile(country_db):
-                self._country = geoip2.database.Reader(country_db, mode=cache)
+            country_db = path / (country or GEOIP_SETTINGS['GEOIP_COUNTRY'])
+            if country_db.is_file():
+                self._country = geoip2.database.Reader(str(country_db), mode=cache)
                 self._country_file = country_db
 
-            city_db = os.path.join(path, city or GEOIP_SETTINGS['GEOIP_CITY'])
-            if os.path.isfile(city_db):
-                self._city = geoip2.database.Reader(city_db, mode=cache)
+            city_db = path / (city or GEOIP_SETTINGS['GEOIP_CITY'])
+            if city_db.is_file():
+                self._city = geoip2.database.Reader(str(city_db), mode=cache)
                 self._city_file = city_db
-        elif os.path.isfile(path):
+            if not self._reader:
+                raise GeoIP2Exception('Could not load a database from %s.' % path)
+        elif path.is_file():
             # Otherwise, some detective work will be needed to figure out
             # whether the given database path is for the GeoIP country or city
             # databases.
-            reader = geoip2.database.Reader(path, mode=cache)
+            reader = geoip2.database.Reader(str(path), mode=cache)
             db_type = reader.metadata().database_type
 
             if db_type.endswith('City'):
@@ -116,10 +117,7 @@ class GeoIP2(object):
 
     @property
     def _reader(self):
-        if self._country:
-            return self._country
-        else:
-            return self._city
+        return self._country or self._city
 
     @property
     def _country_or_city(self):
@@ -144,9 +142,9 @@ class GeoIP2(object):
         }
 
     def _check_query(self, query, country=False, city=False, city_or_country=False):
-        "Helper routine for checking the query and database availability."
+        "Check the query and database availability."
         # Making sure a string was passed in for the query.
-        if not isinstance(query, six.string_types):
+        if not isinstance(query, str):
             raise TypeError('GeoIP query must be a string, not type %s' % type(query).__name__)
 
         # Extra checks for the existence of country and city databases.
@@ -158,7 +156,9 @@ class GeoIP2(object):
             raise GeoIP2Exception('Invalid GeoIP city data file: %s' % self._city_file)
 
         # Return the query string back to the caller. GeoIP2 only takes IP addresses.
-        if not (ipv4_re.match(query) or is_valid_ipv6_address(query)):
+        try:
+            validate_ipv46_address(query)
+        except ValidationError:
             query = socket.gethostbyname(query)
 
         return query

@@ -5,10 +5,9 @@ Tests for stuff in django.utils.datastructures.
 import copy
 
 from django.test import SimpleTestCase
-from django.utils import six
 from django.utils.datastructures import (
-    DictWrapper, ImmutableList, MultiValueDict, MultiValueDictKeyError,
-    OrderedSet,
+    CaseInsensitiveMapping, DictWrapper, ImmutableList, MultiValueDict,
+    MultiValueDictKeyError, OrderedSet,
 )
 
 
@@ -33,35 +32,28 @@ class OrderedSetTests(SimpleTestCase):
 class MultiValueDictTests(SimpleTestCase):
 
     def test_multivaluedict(self):
-        d = MultiValueDict({'name': ['Adrian', 'Simon'],
-                            'position': ['Developer']})
-
+        d = MultiValueDict({'name': ['Adrian', 'Simon'], 'position': ['Developer']})
         self.assertEqual(d['name'], 'Simon')
         self.assertEqual(d.get('name'), 'Simon')
         self.assertEqual(d.getlist('name'), ['Adrian', 'Simon'])
         self.assertEqual(
-            sorted(six.iteritems(d)),
+            sorted(d.items()),
             [('name', 'Simon'), ('position', 'Developer')]
         )
-
         self.assertEqual(
-            sorted(six.iterlists(d)),
+            sorted(d.lists()),
             [('name', ['Adrian', 'Simon']), ('position', ['Developer'])]
         )
-
-        with self.assertRaisesMessage(MultiValueDictKeyError, 'lastname'):
+        with self.assertRaises(MultiValueDictKeyError) as cm:
             d.__getitem__('lastname')
-
-        self.assertEqual(d.get('lastname'), None)
+        self.assertEqual(str(cm.exception), "'lastname'")
+        self.assertIsNone(d.get('lastname'))
         self.assertEqual(d.get('lastname', 'nonexistent'), 'nonexistent')
         self.assertEqual(d.getlist('lastname'), [])
-        self.assertEqual(d.getlist('doesnotexist', ['Adrian', 'Simon']),
-                         ['Adrian', 'Simon'])
-
+        self.assertEqual(d.getlist('doesnotexist', ['Adrian', 'Simon']), ['Adrian', 'Simon'])
         d.setlist('lastname', ['Holovaty', 'Willison'])
         self.assertEqual(d.getlist('lastname'), ['Holovaty', 'Willison'])
-        self.assertEqual(sorted(six.itervalues(d)),
-                         ['Developer', 'Simon', 'Willison'])
+        self.assertEqual(sorted(d.values()), ['Developer', 'Simon', 'Willison'])
 
     def test_appendlist(self):
         d = MultiValueDict()
@@ -95,11 +87,34 @@ class MultiValueDictTests(SimpleTestCase):
             'pm': ['Rory'],
         })
         d = mvd.dict()
-        self.assertEqual(sorted(six.iterkeys(d)), sorted(six.iterkeys(mvd)))
-        for key in six.iterkeys(mvd):
+        self.assertEqual(sorted(d), sorted(mvd))
+        for key in mvd:
             self.assertEqual(d[key], mvd[key])
 
         self.assertEqual({}, MultiValueDict().dict())
+
+    def test_getlist_doesnt_mutate(self):
+        x = MultiValueDict({'a': ['1', '2'], 'b': ['3']})
+        values = x.getlist('a')
+        values += x.getlist('b')
+        self.assertEqual(x.getlist('a'), ['1', '2'])
+
+    def test_internal_getlist_does_mutate(self):
+        x = MultiValueDict({'a': ['1', '2'], 'b': ['3']})
+        values = x._getlist('a')
+        values += x._getlist('b')
+        self.assertEqual(x._getlist('a'), ['1', '2', '3'])
+
+    def test_getlist_default(self):
+        x = MultiValueDict({'a': [1]})
+        MISSING = object()
+        values = x.getlist('b', default=MISSING)
+        self.assertIs(values, MISSING)
+
+    def test_getlist_none_empty_values(self):
+        x = MultiValueDict({'a': None, 'b': []})
+        self.assertIsNone(x.getlist('a'))
+        self.assertEqual(x.getlist('b'), [])
 
 
 class ImmutableListTests(SimpleTestCase):
@@ -133,3 +148,82 @@ class DictWrapperTests(SimpleTestCase):
             "Normal: %(a)s. Modified: %(xx_a)s" % d,
             'Normal: a. Modified: *a'
         )
+
+
+class CaseInsensitiveMappingTests(SimpleTestCase):
+    def setUp(self):
+        self.dict1 = CaseInsensitiveMapping({
+            'Accept': 'application/json',
+            'content-type': 'text/html',
+        })
+
+    def test_create_with_invalid_values(self):
+        msg = 'dictionary update sequence element #1 has length 4; 2 is required'
+        with self.assertRaisesMessage(ValueError, msg):
+            CaseInsensitiveMapping([('Key1', 'Val1'), 'Key2'])
+
+    def test_create_with_invalid_key(self):
+        msg = 'Element key 1 invalid, only strings are allowed'
+        with self.assertRaisesMessage(ValueError, msg):
+            CaseInsensitiveMapping([(1, '2')])
+
+    def test_list(self):
+        self.assertEqual(sorted(list(self.dict1)), sorted(['Accept', 'content-type']))
+
+    def test_dict(self):
+        self.assertEqual(dict(self.dict1), {'Accept': 'application/json', 'content-type': 'text/html'})
+
+    def test_repr(self):
+        dict1 = CaseInsensitiveMapping({'Accept': 'application/json'})
+        dict2 = CaseInsensitiveMapping({'content-type': 'text/html'})
+        self.assertEqual(repr(dict1), repr({'Accept': 'application/json'}))
+        self.assertEqual(repr(dict2), repr({'content-type': 'text/html'}))
+
+    def test_str(self):
+        dict1 = CaseInsensitiveMapping({'Accept': 'application/json'})
+        dict2 = CaseInsensitiveMapping({'content-type': 'text/html'})
+        self.assertEqual(str(dict1), str({'Accept': 'application/json'}))
+        self.assertEqual(str(dict2), str({'content-type': 'text/html'}))
+
+    def test_equal(self):
+        self.assertEqual(self.dict1, {'Accept': 'application/json', 'content-type': 'text/html'})
+        self.assertNotEqual(self.dict1, {'accept': 'application/jso', 'Content-Type': 'text/html'})
+        self.assertNotEqual(self.dict1, 'string')
+
+    def test_items(self):
+        other = {'Accept': 'application/json', 'content-type': 'text/html'}
+        self.assertEqual(sorted(self.dict1.items()), sorted(other.items()))
+
+    def test_copy(self):
+        copy = self.dict1.copy()
+        self.assertIs(copy, self.dict1)
+        self.assertEqual(copy, self.dict1)
+
+    def test_getitem(self):
+        self.assertEqual(self.dict1['Accept'], 'application/json')
+        self.assertEqual(self.dict1['accept'], 'application/json')
+        self.assertEqual(self.dict1['aCCept'], 'application/json')
+        self.assertEqual(self.dict1['content-type'], 'text/html')
+        self.assertEqual(self.dict1['Content-Type'], 'text/html')
+        self.assertEqual(self.dict1['Content-type'], 'text/html')
+
+    def test_in(self):
+        self.assertIn('Accept', self.dict1)
+        self.assertIn('accept', self.dict1)
+        self.assertIn('aCCept', self.dict1)
+        self.assertIn('content-type', self.dict1)
+        self.assertIn('Content-Type', self.dict1)
+
+    def test_del(self):
+        self.assertIn('Accept', self.dict1)
+        msg = "'CaseInsensitiveMapping' object does not support item deletion"
+        with self.assertRaisesMessage(TypeError, msg):
+            del self.dict1['Accept']
+        self.assertIn('Accept', self.dict1)
+
+    def test_set(self):
+        self.assertEqual(len(self.dict1), 2)
+        msg = "'CaseInsensitiveMapping' object does not support item assignment"
+        with self.assertRaisesMessage(TypeError, msg):
+            self.dict1['New Key'] = 1
+        self.assertEqual(len(self.dict1), 2)

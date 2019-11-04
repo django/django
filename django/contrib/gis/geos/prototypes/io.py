@@ -1,13 +1,14 @@
 import threading
-from ctypes import POINTER, Structure, byref, c_char, c_char_p, c_int, c_size_t
+from ctypes import POINTER, Structure, byref, c_byte, c_char_p, c_int, c_size_t
 
 from django.contrib.gis.geos.base import GEOSBase
-from django.contrib.gis.geos.libgeos import GEOM_PTR, GEOSFuncFactory
+from django.contrib.gis.geos.libgeos import (
+    GEOM_PTR, GEOSFuncFactory, geos_version_tuple,
+)
 from django.contrib.gis.geos.prototypes.errcheck import (
     check_geom, check_sized_string, check_string,
 )
 from django.contrib.gis.geos.prototypes.geom import c_uchar_p, geos_char_p
-from django.utils import six
 from django.utils.encoding import force_bytes
 
 
@@ -26,6 +27,7 @@ class WKBReader_st(Structure):
 
 class WKBWriter_st(Structure):
     pass
+
 
 WKT_READ_PTR = POINTER(WKTReader_st)
 WKT_WRITE_PTR = POINTER(WKTWriter_st)
@@ -54,7 +56,7 @@ wkt_writer_set_outdim = GEOSFuncFactory(
     'GEOSWKTWriter_setOutputDimension', argtypes=[WKT_WRITE_PTR, c_int]
 )
 
-wkt_writer_set_trim = GEOSFuncFactory('GEOSWKTWriter_setTrim', argtypes=[WKT_WRITE_PTR, c_char])
+wkt_writer_set_trim = GEOSFuncFactory('GEOSWKTWriter_setTrim', argtypes=[WKT_WRITE_PTR, c_byte])
 wkt_writer_set_precision = GEOSFuncFactory('GEOSWKTWriter_setRoundingPrecision', argtypes=[WKT_WRITE_PTR, c_int])
 
 # WKBReader routines
@@ -101,12 +103,13 @@ class WKBWriterGet(GEOSFuncFactory):
 class WKBWriterSet(GEOSFuncFactory):
     argtypes = [WKB_WRITE_PTR, c_int]
 
+
 wkb_writer_get_byteorder = WKBWriterGet('GEOSWKBWriter_getByteOrder')
 wkb_writer_set_byteorder = WKBWriterSet('GEOSWKBWriter_setByteOrder')
 wkb_writer_get_outdim = WKBWriterGet('GEOSWKBWriter_getOutputDimension')
 wkb_writer_set_outdim = WKBWriterSet('GEOSWKBWriter_setOutputDimension')
-wkb_writer_get_include_srid = WKBWriterGet('GEOSWKBWriter_getIncludeSRID', restype=c_char)
-wkb_writer_set_include_srid = WKBWriterSet('GEOSWKBWriter_setIncludeSRID', argtypes=[WKB_WRITE_PTR, c_char])
+wkb_writer_get_include_srid = WKBWriterGet('GEOSWKBWriter_getIncludeSRID', restype=c_byte)
+wkb_writer_set_include_srid = WKBWriterSet('GEOSWKBWriter_setIncludeSRID', argtypes=[WKB_WRITE_PTR, c_byte])
 
 
 # ### Base I/O Class ###
@@ -117,16 +120,7 @@ class IOBase(GEOSBase):
         self.ptr = self._constructor()
         # Loading the real destructor function at this point as doing it in
         # __del__ is too late (import error).
-        self._destructor.func = self._destructor.get_func(
-            *self._destructor.args, **self._destructor.kwargs
-        )
-
-    def __del__(self):
-        # Cleaning up with the appropriate destructor.
-        try:
-            self._destructor(self._ptr)
-        except (AttributeError, TypeError):
-            pass  # Some part might already have been garbage collected
+        self.destructor.func
 
 # ### Base WKB/WKT Reading and Writing objects ###
 
@@ -136,26 +130,26 @@ class IOBase(GEOSBase):
 # objects.
 class _WKTReader(IOBase):
     _constructor = wkt_reader_create
-    _destructor = wkt_reader_destroy
     ptr_type = WKT_READ_PTR
+    destructor = wkt_reader_destroy
 
     def read(self, wkt):
-        if not isinstance(wkt, (bytes, six.string_types)):
+        if not isinstance(wkt, (bytes, str)):
             raise TypeError
         return wkt_reader_read(self.ptr, force_bytes(wkt))
 
 
 class _WKBReader(IOBase):
     _constructor = wkb_reader_create
-    _destructor = wkb_reader_destroy
     ptr_type = WKB_READ_PTR
+    destructor = wkb_reader_destroy
 
     def read(self, wkb):
-        "Returns a _pointer_ to C GEOS Geometry object from the given WKB."
-        if isinstance(wkb, six.memoryview):
+        "Return a _pointer_ to C GEOS Geometry object from the given WKB."
+        if isinstance(wkb, memoryview):
             wkb_s = bytes(wkb)
             return wkb_reader_read(self.ptr, wkb_s, len(wkb_s))
-        elif isinstance(wkb, (bytes, six.string_types)):
+        elif isinstance(wkb, (bytes, str)):
             return wkb_reader_read_hex(self.ptr, wkb, len(wkb))
         else:
             raise TypeError
@@ -164,14 +158,22 @@ class _WKBReader(IOBase):
 # ### WKB/WKT Writer Classes ###
 class WKTWriter(IOBase):
     _constructor = wkt_writer_create
-    _destructor = wkt_writer_destroy
     ptr_type = WKT_WRITE_PTR
+    destructor = wkt_writer_destroy
 
     _trim = False
     _precision = None
 
+    def __init__(self, dim=2, trim=False, precision=None):
+        super().__init__()
+        if bool(trim) != self._trim:
+            self.trim = trim
+        if precision is not None:
+            self.precision = precision
+        self.outdim = dim
+
     def write(self, geom):
-        "Returns the WKT representation of the given geometry."
+        "Return the WKT representation of the given geometry."
         return wkt_writer_write(self.ptr, geom.ptr)
 
     @property
@@ -190,8 +192,9 @@ class WKTWriter(IOBase):
 
     @trim.setter
     def trim(self, flag):
-        self._trim = bool(flag)
-        wkt_writer_set_trim(self.ptr, b'\x01' if flag else b'\x00')
+        if bool(flag) != self._trim:
+            self._trim = bool(flag)
+            wkt_writer_set_trim(self.ptr, self._trim)
 
     @property
     def precision(self):
@@ -199,25 +202,54 @@ class WKTWriter(IOBase):
 
     @precision.setter
     def precision(self, precision):
-        if isinstance(precision, int) and precision >= 0 or precision is None:
+        if (not isinstance(precision, int) or precision < 0) and precision is not None:
+            raise AttributeError('WKT output rounding precision must be non-negative integer or None.')
+        if precision != self._precision:
             self._precision = precision
             wkt_writer_set_precision(self.ptr, -1 if precision is None else precision)
-        else:
-            raise AttributeError('WKT output rounding precision must be non-negative integer or None.')
 
 
 class WKBWriter(IOBase):
     _constructor = wkb_writer_create
-    _destructor = wkb_writer_destroy
     ptr_type = WKB_WRITE_PTR
+    destructor = wkb_writer_destroy
+    geos_version = geos_version_tuple()
+
+    def __init__(self, dim=2):
+        super().__init__()
+        self.outdim = dim
+
+    def _handle_empty_point(self, geom):
+        from django.contrib.gis.geos import Point
+        if isinstance(geom, Point) and geom.empty:
+            if self.srid:
+                # PostGIS uses POINT(NaN NaN) for WKB representation of empty
+                # points. Use it for EWKB as it's a PostGIS specific format.
+                # https://trac.osgeo.org/postgis/ticket/3181
+                geom = Point(float('NaN'), float('NaN'), srid=geom.srid)
+            else:
+                raise ValueError('Empty point is not representable in WKB.')
+        return geom
 
     def write(self, geom):
-        "Returns the WKB representation of the given geometry."
-        return six.memoryview(wkb_writer_write(self.ptr, geom.ptr, byref(c_size_t())))
+        "Return the WKB representation of the given geometry."
+        from django.contrib.gis.geos import Polygon
+        geom = self._handle_empty_point(geom)
+        wkb = wkb_writer_write(self.ptr, geom.ptr, byref(c_size_t()))
+        if self.geos_version < (3, 6, 1) and isinstance(geom, Polygon) and geom.empty:
+            # Fix GEOS output for empty polygon.
+            # See https://trac.osgeo.org/geos/ticket/680.
+            wkb = wkb[:-8] + b'\0' * 4
+        return memoryview(wkb)
 
     def write_hex(self, geom):
-        "Returns the HEXEWKB representation of the given geometry."
-        return wkb_writer_write_hex(self.ptr, geom.ptr, byref(c_size_t()))
+        "Return the HEXEWKB representation of the given geometry."
+        from django.contrib.gis.geos.polygon import Polygon
+        geom = self._handle_empty_point(geom)
+        wkb = wkb_writer_write_hex(self.ptr, geom.ptr, byref(c_size_t()))
+        if self.geos_version < (3, 6, 1) and isinstance(geom, Polygon) and geom.empty:
+            wkb = wkb[:-16] + b'0' * 8
+        return wkb
 
     # ### WKBWriter Properties ###
 
@@ -233,28 +265,24 @@ class WKBWriter(IOBase):
     byteorder = property(_get_byteorder, _set_byteorder)
 
     # Property for getting/setting the output dimension.
-    def _get_outdim(self):
+    @property
+    def outdim(self):
         return wkb_writer_get_outdim(self.ptr)
 
-    def _set_outdim(self, new_dim):
+    @outdim.setter
+    def outdim(self, new_dim):
         if new_dim not in (2, 3):
             raise ValueError('WKB output dimension must be 2 or 3')
         wkb_writer_set_outdim(self.ptr, new_dim)
 
-    outdim = property(_get_outdim, _set_outdim)
-
     # Property for getting/setting the include srid flag.
-    def _get_include_srid(self):
-        return bool(ord(wkb_writer_get_include_srid(self.ptr)))
+    @property
+    def srid(self):
+        return bool(wkb_writer_get_include_srid(self.ptr))
 
-    def _set_include_srid(self, include):
-        if include:
-            flag = b'\x01'
-        else:
-            flag = b'\x00'
-        wkb_writer_set_include_srid(self.ptr, flag)
-
-    srid = property(_get_include_srid, _set_include_srid)
+    @srid.setter
+    def srid(self, include):
+        wkb_writer_set_include_srid(self.ptr, bool(include))
 
 
 # `ThreadLocalIO` object holds instances of the WKT and WKB reader/writer
@@ -268,40 +296,44 @@ class ThreadLocalIO(threading.local):
     wkb_w = None
     ewkb_w = None
 
+
 thread_context = ThreadLocalIO()
 
 
 # These module-level routines return the I/O object that is local to the
 # thread. If the I/O object does not exist yet it will be initialized.
 def wkt_r():
-    if not thread_context.wkt_r:
-        thread_context.wkt_r = _WKTReader()
+    thread_context.wkt_r = thread_context.wkt_r or _WKTReader()
     return thread_context.wkt_r
 
 
-def wkt_w(dim=2):
+def wkt_w(dim=2, trim=False, precision=None):
     if not thread_context.wkt_w:
-        thread_context.wkt_w = WKTWriter()
-    thread_context.wkt_w.outdim = dim
+        thread_context.wkt_w = WKTWriter(dim=dim, trim=trim, precision=precision)
+    else:
+        thread_context.wkt_w.outdim = dim
+        thread_context.wkt_w.trim = trim
+        thread_context.wkt_w.precision = precision
     return thread_context.wkt_w
 
 
 def wkb_r():
-    if not thread_context.wkb_r:
-        thread_context.wkb_r = _WKBReader()
+    thread_context.wkb_r = thread_context.wkb_r or _WKBReader()
     return thread_context.wkb_r
 
 
 def wkb_w(dim=2):
     if not thread_context.wkb_w:
-        thread_context.wkb_w = WKBWriter()
-    thread_context.wkb_w.outdim = dim
+        thread_context.wkb_w = WKBWriter(dim=dim)
+    else:
+        thread_context.wkb_w.outdim = dim
     return thread_context.wkb_w
 
 
 def ewkb_w(dim=2):
     if not thread_context.ewkb_w:
-        thread_context.ewkb_w = WKBWriter()
+        thread_context.ewkb_w = WKBWriter(dim=dim)
         thread_context.ewkb_w.srid = True
-    thread_context.ewkb_w.outdim = dim
+    else:
+        thread_context.ewkb_w.outdim = dim
     return thread_context.ewkb_w

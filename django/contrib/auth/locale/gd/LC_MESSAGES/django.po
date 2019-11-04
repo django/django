@@ -1,14 +1,14 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# GunChleoc, 2015
+# GunChleoc, 2015-2017
 # GunChleoc, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-10 15:10+0200\n"
-"PO-Revision-Date: 2015-11-27 09:48+0000\n"
+"POT-Creation-Date: 2017-09-24 13:46+0200\n"
+"PO-Revision-Date: 2017-10-04 18:25+0000\n"
 "Last-Translator: GunChleoc\n"
 "Language-Team: Gaelic, Scottish (http://www.transifex.com/django/django/"
 "language/gd/)\n"
@@ -70,12 +70,11 @@ msgstr "Cuir an t-aon fhacal-faire a-steach a-rithist gus a dhearbhadh."
 
 msgid ""
 "Raw passwords are not stored, so there is no way to see this user's "
-"password, but you can change the password using <a href=\"../password/"
-"\">this form</a>."
+"password, but you can change the password using <a href=\"{}\">this form</a>."
 msgstr ""
 "Cha dèid faclan-faire amh a shàbhaladh ’s mar sin chan eil dòigh ann gus "
 "facal-faire a’ chleachdaiche seo a shealltainn. ’S urrainn dhut am facal-"
-"faire atharrachadh co-dhiù leis <a href=\"../password/\">an fhoirm seo</a>."
+"faire atharrachadh co-dhiù leis <a href=\"{}\">an fhoirm seo</a>."
 
 #, python-format
 msgid ""
@@ -119,6 +118,21 @@ msgstr "salann"
 
 msgid "hash"
 msgstr "hais"
+
+msgid "variety"
+msgstr "eug-samhail"
+
+msgid "version"
+msgstr "tionndadh"
+
+msgid "memory cost"
+msgstr "cosgais cuimhne"
+
+msgid "time cost"
+msgstr "cosgais ùine"
+
+msgid "parallelism"
+msgstr "co-shìneadh"
 
 msgid "work factor"
 msgstr "factar obrachaidh"
@@ -173,17 +187,10 @@ msgstr "Ceadan sònraichte airson a’ chleachdaiche seo."
 msgid "username"
 msgstr "ainm-cleachdaiche"
 
-msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
+msgid "Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only."
 msgstr ""
-"Riatanach. 30 caractar air a char as motha. Litrichean, àireamhan agus @/./"
+"Riatanach. 150 caractar air a char as motha. Litrichean, àireamhan agus @/./"
 "+/-/_ a-mhàin."
-
-msgid ""
-"Enter a valid username. This value may contain only letters, numbers and @/./"
-"+/-/_ characters."
-msgstr ""
-"Cuir a-steach ainm-cleachdaiche dligheach. Chan fhaod ach litrichean, "
-"àireamhan is caractaran @/./+/-/_ a bhith ’na bhroinn."
 
 msgid "A user with that username already exists."
 msgstr "Tha cleachdaiche air a bheil an t-ainm-cleachdaiche seo ann mar-tha."
@@ -286,6 +293,20 @@ msgstr ""
 #, python-format
 msgid "Password reset on %(site_name)s"
 msgstr "Ath-shuidheachadh an fhacail-fhaire air %(site_name)s"
+
+msgid ""
+"Enter a valid username. This value may contain only English letters, "
+"numbers, and @/./+/-/_ characters."
+msgstr ""
+"Cuir a-steach ainm-cleachdaiche dligheach. Chan fhaod ach litrichean gun "
+"sràcan, àireamhan is caractaran @/./+/-/_ a bhith ’na bhroinn."
+
+msgid ""
+"Enter a valid username. This value may contain only letters, numbers, and "
+"@/./+/-/_ characters."
+msgstr ""
+"Cuir a-steach ainm-cleachdaiche dligheach. Chan fhaod ach litrichean, "
+"àireamhan is caractaran @/./+/-/_ a bhith ’na bhroinn."
 
 msgid "Logged out"
 msgstr "Air a clàradh a-mach"

@@ -7,7 +7,7 @@ How to use Django with uWSGI
 uWSGI_ is a fast, self-healing and developer/sysadmin-friendly application
 container server coded in pure C.
 
-.. _uWSGI: https://projects.unbit.it/uwsgi/
+.. _uWSGI: https://uwsgi-docs.readthedocs.io/
 
 .. seealso::
 
@@ -15,7 +15,7 @@ container server coded in pure C.
     possible deployment setup of many). The docs below are focused on how to
     integrate Django with uWSGI.
 
-    .. _tutorial: https://uwsgi.readthedocs.org/en/latest/tutorials/Django_and_nginx.html
+    .. _tutorial: https://uwsgi.readthedocs.io/en/latest/tutorials/Django_and_nginx.html
 
 Prerequisite: uWSGI
 ===================
@@ -32,34 +32,21 @@ command. For example:
     # Or install LTS (long term support).
     $ pip install https://projects.unbit.it/downloads/uwsgi-lts.tar.gz
 
-.. _installation procedures: http://uwsgi-docs.readthedocs.org/en/latest/Install.html
-
-.. warning::
-
-    Some distributions, including Debian and Ubuntu, ship an outdated version
-    of uWSGI that does not conform to the WSGI specification. Versions prior to
-    1.2.6 do not call ``close`` on the response object after handling a
-    request. In those cases the :data:`~django.core.signals.request_finished`
-    signal isn't sent. This can result in idle connections to database and
-    memcache servers.
+.. _installation procedures: https://uwsgi-docs.readthedocs.io/en/latest/Install.html
 
 uWSGI model
 -----------
 
 uWSGI operates on a client-server model. Your Web server (e.g., nginx, Apache)
-communicates with a django-uwsgi "worker" process to serve dynamic content.
-See uWSGI's `background documentation`_ for more detail.
-
-.. _background documentation: https://projects.unbit.it/uwsgi/wiki/Background
+communicates with a `django-uwsgi` "worker" process to serve dynamic content.
 
 Configuring and starting the uWSGI server for Django
 ----------------------------------------------------
 
 uWSGI supports multiple ways to configure the process. See uWSGI's
-`configuration documentation`_ and `examples`_.
+`configuration documentation`_.
 
-.. _configuration documentation: https://uwsgi.readthedocs.org/en/latest/Configuration.html
-.. _examples: https://projects.unbit.it/uwsgi/wiki/Example
+.. _configuration documentation: https://uwsgi.readthedocs.io/en/latest/Configuration.html
 
 Here's an example command to start a uWSGI server::
 
@@ -114,7 +101,7 @@ Example ini configuration file usage::
     that contain non-ASCII characters, make sure uWSGI is configured to accept
     non-ASCII file names by adding this to your ``uwsgi.ini``::
 
-        env = LANG='en_US.UTF-8'
+        env = LANG=en_US.UTF-8
 
     See the :ref:`unicode-files` section of the Unicode reference guide for
     details.
@@ -122,4 +109,4 @@ Example ini configuration file usage::
 See the uWSGI docs on `managing the uWSGI process`_ for information on
 starting, stopping and reloading the uWSGI workers.
 
-.. _managing the uWSGI process: http://uwsgi-docs.readthedocs.org/en/latest/Management.html
+.. _managing the uWSGI process: https://uwsgi-docs.readthedocs.io/en/latest/Management.html

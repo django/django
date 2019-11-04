@@ -2,25 +2,9 @@ from django.contrib.auth.models import AnonymousUser, User
 from django.contrib.flatpages.models import FlatPage
 from django.contrib.sites.models import Site
 from django.template import Context, Template, TemplateSyntaxError
-from django.test import TestCase, modify_settings, override_settings
-
-from .settings import FLATPAGES_TEMPLATES
+from django.test import TestCase
 
 
-@modify_settings(INSTALLED_APPS={'append': 'django.contrib.flatpages'})
-@override_settings(
-    MIDDLEWARE_CLASSES=[
-        'django.middleware.common.CommonMiddleware',
-        'django.contrib.sessions.middleware.SessionMiddleware',
-        'django.middleware.csrf.CsrfViewMiddleware',
-        'django.contrib.auth.middleware.AuthenticationMiddleware',
-        'django.contrib.messages.middleware.MessageMiddleware',
-        'django.contrib.flatpages.middleware.FlatpageFallbackMiddleware',
-    ],
-    ROOT_URLCONF='flatpages_tests.urls',
-    TEMPLATES=FLATPAGES_TEMPLATES,
-    SITE_ID=1,
-)
 class FlatpageTemplateTagTests(TestCase):
 
     @classmethod
@@ -144,17 +128,21 @@ class FlatpageTemplateTagTests(TestCase):
         def render(t):
             return Template(t).render(Context())
 
-        with self.assertRaises(TemplateSyntaxError):
+        msg = (
+            "get_flatpages expects a syntax of get_flatpages "
+            "['url_starts_with'] [for user] as context_name"
+        )
+        with self.assertRaisesMessage(TemplateSyntaxError, msg):
             render("{% load flatpages %}{% get_flatpages %}")
-        with self.assertRaises(TemplateSyntaxError):
+        with self.assertRaisesMessage(TemplateSyntaxError, msg):
             render("{% load flatpages %}{% get_flatpages as %}")
-        with self.assertRaises(TemplateSyntaxError):
+        with self.assertRaisesMessage(TemplateSyntaxError, msg):
             render("{% load flatpages %}{% get_flatpages cheesecake flatpages %}")
-        with self.assertRaises(TemplateSyntaxError):
+        with self.assertRaisesMessage(TemplateSyntaxError, msg):
             render("{% load flatpages %}{% get_flatpages as flatpages asdf %}")
-        with self.assertRaises(TemplateSyntaxError):
+        with self.assertRaisesMessage(TemplateSyntaxError, msg):
             render("{% load flatpages %}{% get_flatpages cheesecake user as flatpages %}")
-        with self.assertRaises(TemplateSyntaxError):
+        with self.assertRaisesMessage(TemplateSyntaxError, msg):
             render("{% load flatpages %}{% get_flatpages for user as flatpages asdf %}")
-        with self.assertRaises(TemplateSyntaxError):
+        with self.assertRaisesMessage(TemplateSyntaxError, msg):
             render("{% load flatpages %}{% get_flatpages prefix for user as flatpages asdf %}")

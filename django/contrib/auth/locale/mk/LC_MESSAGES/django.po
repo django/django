@@ -3,14 +3,15 @@
 # Translators:
 # dekomote <dr.mote@gmail.com>, 2015
 # Jannis Leidel <jannis@leidel.info>, 2011
+# Vasil Vangelovski <vvangelovski@gmail.com>, 2016-2017
 # Vasil Vangelovski <vvangelovski@gmail.com>, 2013-2015
 # Vasil Vangelovski <vvangelovski@gmail.com>, 2012
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-10 15:10+0200\n"
-"PO-Revision-Date: 2015-10-11 08:53+0000\n"
+"POT-Creation-Date: 2017-09-24 13:46+0200\n"
+"PO-Revision-Date: 2017-09-24 14:24+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Macedonian (http://www.transifex.com/django/django/language/"
 "mk/)\n"
@@ -65,12 +66,11 @@ msgid "Password confirmation"
 msgstr "Потврда на лозинка"
 
 msgid "Enter the same password as before, for verification."
-msgstr ""
+msgstr "Внесете ја истата лозинка како претходно, за верификација."
 
 msgid ""
 "Raw passwords are not stored, so there is no way to see this user's "
-"password, but you can change the password using <a href=\"../password/"
-"\">this form</a>."
+"password, but you can change the password using <a href=\"{}\">this form</a>."
 msgstr ""
 
 #, python-format
@@ -115,6 +115,21 @@ msgstr "случаен клуч"
 msgid "hash"
 msgstr "хеш"
 
+msgid "variety"
+msgstr ""
+
+msgid "version"
+msgstr "верзија"
+
+msgid "memory cost"
+msgstr "просторна (мемориска) комплексност"
+
+msgid "time cost"
+msgstr "временска комплексност"
+
+msgid "parallelism"
+msgstr "паралелизам"
+
 msgid "work factor"
 msgstr "фактор на работа"
 
@@ -125,7 +140,7 @@ msgid "name"
 msgstr "име"
 
 msgid "content type"
-msgstr ""
+msgstr "тип содржина"
 
 msgid "codename"
 msgstr "кодно име"
@@ -168,16 +183,9 @@ msgstr "Специфични дозволи за овој корисник."
 msgid "username"
 msgstr "корисничко име"
 
-msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
+msgid "Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only."
 msgstr ""
-"Задолжително. 30 или помалку знаци. Единствено букви, бројки и  @/./+/-/_ ."
-
-msgid ""
-"Enter a valid username. This value may contain only letters, numbers and @/./"
-"+/-/_ characters."
-msgstr ""
-"Внесете валидно корисничко име. Оваа вредност смее да содржи само букви, "
-"бројки и карактерите: @/./+/-/_ ."
+"Задолжително. 150 или помалку знаци. Единствено букви, бројки и  @/./+/-/_ ."
 
 msgid "A user with that username already exists."
 msgstr "Веќе постои корисник со тоа корисничко име."
@@ -225,36 +233,55 @@ msgid_plural ""
 "This password is too short. It must contain at least %(min_length)d "
 "characters."
 msgstr[0] ""
+"Оваа лозинка е премногу кратка. Мора да содржи најмалку %(min_length)d "
+"карактер."
 msgstr[1] ""
+"Оваа лозинка е премногу кратка. Мора да содржи најмалку %(min_length)d "
+"карактери."
 
 #, python-format
 msgid "Your password must contain at least %(min_length)d character."
 msgid_plural "Your password must contain at least %(min_length)d characters."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Вашата лозинка мора да содржи најмалку %(min_length)d карактер."
+msgstr[1] "Вашата лозинка мора да содржи најмалку %(min_length)d карактери."
 
 #, python-format
 msgid "The password is too similar to the %(verbose_name)s."
-msgstr ""
+msgstr "Лозинката е премногу слична со %(verbose_name)s."
 
 msgid "Your password can't be too similar to your other personal information."
 msgstr ""
+"Вашата лозинка не смее да биде премногу слична со други лични информации."
 
 msgid "This password is too common."
-msgstr ""
+msgstr "Оваа лозинка е премногу често користена."
 
 msgid "Your password can't be a commonly used password."
-msgstr ""
+msgstr "Вашата лозинка не смее да биде лозинка која се користи многу често."
 
 msgid "This password is entirely numeric."
-msgstr ""
+msgstr "Оваа лозинка содржи само цифри."
 
 msgid "Your password can't be entirely numeric."
-msgstr ""
+msgstr "Вашата лозинка не може да содржи само цифри."
 
 #, python-format
 msgid "Password reset on %(site_name)s"
 msgstr "Ресетирање на лозинка за  %(site_name)s"
+
+msgid ""
+"Enter a valid username. This value may contain only English letters, "
+"numbers, and @/./+/-/_ characters."
+msgstr ""
+"Внесете валидно корисничко име. Оваа вредност може да содржи само латински "
+"букви, бројки и @/./+/-/_ знаци."
+
+msgid ""
+"Enter a valid username. This value may contain only letters, numbers, and "
+"@/./+/-/_ characters."
+msgstr ""
+"Внесете валидно корисничко име. Оваа вредност може да содржи само букви, "
+"бројки и @/./+/-/_ знаци."
 
 msgid "Logged out"
 msgstr "Одјавен"

@@ -4,12 +4,6 @@
 
 .. module:: django.urls
 
-.. deprecated:: 1.10
-
-    In older versions, these functions are located in
-    ``django.core.urlresolvers``. Importing from the old location will continue
-    to work until Django 2.0.
-
 ``reverse()``
 =============
 
@@ -23,7 +17,7 @@ callable view object. For example, given the following ``url``::
 
     from news import views
 
-    url(r'^archive/$', views.archive, name='news-archive')
+    path('archive/', views.archive, name='news-archive')
 
 you can use any of the following to reverse the URL::
 
@@ -65,7 +59,7 @@ This ``current_app`` argument is used as a hint to resolve application
 namespaces into URLs on specific application instances, according to the
 :ref:`namespaced URL resolution strategy <topics-http-reversing-url-namespaces>`.
 
-The ``urlconf`` argument is the URLconf module containing the url patterns to
+The ``urlconf`` argument is the URLconf module containing the URL patterns to
 use for reversing. By default, the root URLconf for the current thread is used.
 
 .. note::
@@ -76,9 +70,8 @@ use for reversing. By default, the root URLconf for the current thread is used.
         >>> reverse('cities', args=['Orléans'])
         '.../Orl%C3%A9ans/'
 
-    Applying further encoding (such as :meth:`~django.utils.http.urlquote` or
-    ``urllib.quote``) to the output of ``reverse()`` may produce undesirable
-    results.
+    Applying further encoding (such as :func:`urllib.parse.quote`) to the output
+    of ``reverse()`` may produce undesirable results.
 
 ``reverse_lazy()``
 ==================
@@ -137,14 +130,21 @@ If the URL does not resolve, the function raises a
 
         The name of the URL pattern that matches the URL.
 
+    .. attribute:: ResolverMatch.route
+
+        .. versionadded:: 2.2
+
+        The route of the matching URL pattern.
+
+        For example, if ``path('users/<id>/', ...)`` is the matching pattern,
+        ``route`` will contain ``'users/<id>/'``.
+
     .. attribute:: ResolverMatch.app_name
 
         The application namespace for the URL pattern that matches the
         URL.
 
     .. attribute:: ResolverMatch.app_names
-
-        .. versionadded:: 1.9
 
         The list of individual namespace components in the full
         application namespace for the URL pattern that matches the URL.
@@ -183,9 +183,9 @@ A :class:`ResolverMatch` object can also be assigned to a triple::
 One possible use of :func:`~django.urls.resolve` would be to test whether a
 view would raise a ``Http404`` error before redirecting to it::
 
+    from urllib.parse import urlparse
     from django.urls import resolve
-    from django.http import HttpResponseRedirect, Http404
-    from django.utils.six.moves.urllib.parse import urlparse
+    from django.http import Http404, HttpResponseRedirect
 
     def myview(request):
         next = request.META.get('HTTP_REFERER', None) or '/'

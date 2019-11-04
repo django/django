@@ -89,8 +89,6 @@ The following mixins are used to construct Django's editing views:
 
     .. method:: get_context_data(**kwargs)
 
-        .. versionadded:: 1.9
-
         Calls :meth:`get_form` and adds the result to the context data with the
         name 'form'.
 
@@ -175,7 +173,7 @@ The following mixins are used to construct Django's editing views:
         redirects to
         :meth:`~django.views.generic.edit.FormMixin.get_success_url`.
 
-    .. method:: form_invalid()
+    .. method:: form_invalid(form)
 
         Renders a response, providing the invalid form as context.
 
@@ -203,11 +201,6 @@ The following mixins are used to construct Django's editing views:
 
         Renders a response using a context created with
         :meth:`~django.views.generic.edit.FormMixin.get_context_data`.
-
-        .. versionchanged:: 1.9
-
-            Construction of the form was moved from this method to
-            :meth:`~django.views.generic.edit.FormMixin.get_context_data`.
 
     .. method:: post(request, *args, **kwargs)
 
@@ -238,6 +231,11 @@ The following mixins are used to construct Django's editing views:
         interpolated against the object's field attributes. For example, you
         could use ``success_url="/parent/{parent_id}/"`` to redirect to a URL
         composed out of the ``parent_id`` field on a model.
+
+    .. method:: delete(request, *args, **kwargs)
+
+        Retrieves the target object and calls its ``delete()`` method, then
+        redirects to the success URL.
 
     .. method:: get_success_url()
 

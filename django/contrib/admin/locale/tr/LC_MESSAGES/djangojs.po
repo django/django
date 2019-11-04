@@ -1,7 +1,7 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# BouRock, 2015
+# BouRock, 2015-2016
 # BouRock, 2014
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Metin Amiroff <amiroff@gmail.com>, 2011
@@ -10,8 +10,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2015-10-10 11:07+0000\n"
+"POT-Creation-Date: 2018-05-17 11:50+0200\n"
+"PO-Revision-Date: 2017-09-23 18:54+0000\n"
 "Last-Translator: BouRock\n"
 "Language-Team: Turkish (http://www.transifex.com/django/django/language/"
 "tr/)\n"
@@ -102,26 +102,8 @@ msgstr ""
 "Bir eylem seçtiniz, fakat bireysel alanlar üzerinde hiçbir değişiklik "
 "yapmadınız. Muhtemelen Kaydet düğmesi yerine Git düğmesini arıyorsunuz."
 
-#, javascript-format
-msgid "Note: You are %s hour ahead of server time."
-msgid_plural "Note: You are %s hours ahead of server time."
-msgstr[0] "Not: Sunucu saatinin %s saat ilerisindesiniz."
-msgstr[1] "Not: Sunucu saatinin %s saat ilerisindesiniz."
-
-#, javascript-format
-msgid "Note: You are %s hour behind server time."
-msgid_plural "Note: You are %s hours behind server time."
-msgstr[0] "Not: Sunucu saatinin %s saat gerisindesiniz."
-msgstr[1] "Not: Sunucu saatinin %s saat gerisindesiniz."
-
 msgid "Now"
 msgstr "Şimdi"
-
-msgid "Choose a Time"
-msgstr "Bir Saat Seçin"
-
-msgid "Choose a time"
-msgstr "Bir saat seçin"
 
 msgid "Midnight"
 msgstr "Geceyarısı"
@@ -134,6 +116,24 @@ msgstr "Öğle"
 
 msgid "6 p.m."
 msgstr "6 ö.s."
+
+#, javascript-format
+msgid "Note: You are %s hour ahead of server time."
+msgid_plural "Note: You are %s hours ahead of server time."
+msgstr[0] "Not: Sunucu saatinin %s saat ilerisindesiniz."
+msgstr[1] "Not: Sunucu saatinin %s saat ilerisindesiniz."
+
+#, javascript-format
+msgid "Note: You are %s hour behind server time."
+msgid_plural "Note: You are %s hours behind server time."
+msgstr[0] "Not: Sunucu saatinin %s saat gerisindesiniz."
+msgstr[1] "Not: Sunucu saatinin %s saat gerisindesiniz."
+
+msgid "Choose a Time"
+msgstr "Bir Saat Seçin"
+
+msgid "Choose a time"
+msgstr "Bir saat seçin"
 
 msgid "Cancel"
 msgstr "İptal"
@@ -150,14 +150,69 @@ msgstr "Dün"
 msgid "Tomorrow"
 msgstr "Yarın"
 
-msgid ""
-"January February March April May June July August September October November "
-"December"
-msgstr ""
-"Ocak Şubat Mart Nisan Mayıs Haziran Temmuz Ağustos Eylül Ekim Kasım Aralık"
+msgid "January"
+msgstr "Ocak"
 
-msgid "S M T W T F S"
-msgstr "P P S Ç P C C"
+msgid "February"
+msgstr "Şubat"
+
+msgid "March"
+msgstr "Mart"
+
+msgid "April"
+msgstr "Nisan"
+
+msgid "May"
+msgstr "Mayıs"
+
+msgid "June"
+msgstr "Haziran"
+
+msgid "July"
+msgstr "Temmuz"
+
+msgid "August"
+msgstr "Ağustos"
+
+msgid "September"
+msgstr "Eylül"
+
+msgid "October"
+msgstr "Ekim"
+
+msgid "November"
+msgstr "Kasım"
+
+msgid "December"
+msgstr "Aralık"
+
+msgctxt "one letter Sunday"
+msgid "S"
+msgstr "P"
+
+msgctxt "one letter Monday"
+msgid "M"
+msgstr "P"
+
+msgctxt "one letter Tuesday"
+msgid "T"
+msgstr "S"
+
+msgctxt "one letter Wednesday"
+msgid "W"
+msgstr "Ç"
+
+msgctxt "one letter Thursday"
+msgid "T"
+msgstr "P"
+
+msgctxt "one letter Friday"
+msgid "F"
+msgstr "C"
+
+msgctxt "one letter Saturday"
+msgid "S"
+msgstr "C"
 
 msgid "Show"
 msgstr "Göster"

@@ -2,27 +2,28 @@
 HTML Widget classes
 """
 
-from __future__ import unicode_literals
-
 import copy
 import datetime
 import re
+import warnings
+from collections import defaultdict
 from itertools import chain
 
 from django.conf import settings
-from django.forms.utils import flatatt, to_current_timezone
+from django.forms.utils import to_current_timezone
 from django.templatetags.static import static
-from django.utils import datetime_safe, formats, six
-from django.utils.datastructures import MultiValueDict
+from django.utils import datetime_safe, formats
+from django.utils.datastructures import OrderedSet
 from django.utils.dates import MONTHS
-from django.utils.encoding import (
-    force_str, force_text, python_2_unicode_compatible,
-)
 from django.utils.formats import get_format
-from django.utils.html import conditional_escape, format_html, html_safe
+from django.utils.html import format_html, html_safe
 from django.utils.safestring import mark_safe
-from django.utils.six.moves import range
-from django.utils.translation import ugettext_lazy
+from django.utils.topological_sort import (
+    CyclicDependencyError, stable_topological_sort,
+)
+from django.utils.translation import gettext_lazy as _
+
+from .renderers import get_default_renderer
 
 __all__ = (
     'Media', 'MediaDefiningClass', 'Widget', 'TextInput', 'NumberInput',
@@ -37,26 +38,44 @@ __all__ = (
 MEDIA_TYPES = ('css', 'js')
 
 
+class MediaOrderConflictWarning(RuntimeWarning):
+    pass
+
+
 @html_safe
-@python_2_unicode_compatible
-class Media(object):
-    def __init__(self, media=None, **kwargs):
-        if media:
-            media_attrs = media.__dict__
+class Media:
+    def __init__(self, media=None, css=None, js=None):
+        if media is not None:
+            css = getattr(media, 'css', {})
+            js = getattr(media, 'js', [])
         else:
-            media_attrs = kwargs
+            if css is None:
+                css = {}
+            if js is None:
+                js = []
+        self._css_lists = [css]
+        self._js_lists = [js]
 
-        self._css = {}
-        self._js = []
-
-        for name in MEDIA_TYPES:
-            getattr(self, 'add_' + name)(media_attrs.get(name))
+    def __repr__(self):
+        return 'Media(css=%r, js=%r)' % (self._css, self._js)
 
     def __str__(self):
         return self.render()
 
+    @property
+    def _css(self):
+        css = defaultdict(list)
+        for css_list in self._css_lists:
+            for medium, sublist in css_list.items():
+                css[medium].append(sublist)
+        return {medium: self.merge(*lists) for medium, lists in css.items()}
+
+    @property
+    def _js(self):
+        return self.merge(*self._js_lists)
+
     def render(self):
-        return mark_safe('\n'.join(chain(*[getattr(self, 'render_' + name)() for name in MEDIA_TYPES])))
+        return mark_safe('\n'.join(chain.from_iterable(getattr(self, 'render_' + name)() for name in MEDIA_TYPES)))
 
     def render_js(self):
         return [
@@ -69,13 +88,13 @@ class Media(object):
     def render_css(self):
         # To keep rendering order consistent, we can't just iterate over items().
         # We need to sort the keys, and iterate over the sorted list.
-        media = sorted(self._css.keys())
-        return chain(*[[
+        media = sorted(self._css)
+        return chain.from_iterable([
             format_html(
-                '<link href="{}" type="text/css" media="{}" rel="stylesheet" />',
+                '<link href="{}" type="text/css" media="{}" rel="stylesheet">',
                 self.absolute_path(path), medium
             ) for path in self._css[medium]
-        ] for medium in media])
+        ] for medium in media)
 
     def absolute_path(self, path):
         """
@@ -88,29 +107,48 @@ class Media(object):
         return static(path)
 
     def __getitem__(self, name):
-        "Returns a Media object that only contains media of the given type"
+        """Return a Media object that only contains media of the given type."""
         if name in MEDIA_TYPES:
             return Media(**{str(name): getattr(self, '_' + name)})
         raise KeyError('Unknown media type "%s"' % name)
 
-    def add_js(self, data):
-        if data:
-            for path in data:
-                if path not in self._js:
-                    self._js.append(path)
+    @staticmethod
+    def merge(*lists):
+        """
+        Merge lists while trying to keep the relative order of the elements.
+        Warn if the lists have the same elements in a different relative order.
 
-    def add_css(self, data):
-        if data:
-            for medium, paths in data.items():
-                for path in paths:
-                    if not self._css.get(medium) or path not in self._css[medium]:
-                        self._css.setdefault(medium, []).append(path)
+        For static assets it can be important to have them included in the DOM
+        in a certain order. In JavaScript you may not be able to reference a
+        global or in CSS you might want to override a style.
+        """
+        dependency_graph = defaultdict(set)
+        all_items = OrderedSet()
+        for list_ in filter(None, lists):
+            head = list_[0]
+            # The first items depend on nothing but have to be part of the
+            # dependency graph to be included in the result.
+            dependency_graph.setdefault(head, set())
+            for item in list_:
+                all_items.add(item)
+                # No self dependencies
+                if head != item:
+                    dependency_graph[item].add(head)
+                head = item
+        try:
+            return stable_topological_sort(all_items, dependency_graph)
+        except CyclicDependencyError:
+            warnings.warn(
+                'Detected duplicate Media files in an opposite order: {}'.format(
+                    ', '.join(repr(l) for l in lists)
+                ), MediaOrderConflictWarning,
+            )
+            return list(all_items)
 
     def __add__(self, other):
         combined = Media()
-        for name in MEDIA_TYPES:
-            getattr(combined, 'add_' + name)(getattr(self, '_' + name, None))
-            getattr(combined, 'add_' + name)(getattr(other, '_' + name, None))
+        combined._css_lists = self._css_lists + other._css_lists
+        combined._js_lists = self._js_lists + other._js_lists
         return combined
 
 
@@ -135,10 +173,8 @@ def media_property(cls):
                     for medium in extend:
                         m = m + base[medium]
                 return m + Media(definition)
-            else:
-                return Media(definition)
-        else:
-            return base
+            return Media(definition)
+        return base
     return property(_media)
 
 
@@ -147,8 +183,7 @@ class MediaDefiningClass(type):
     Metaclass for classes that can have media definitions.
     """
     def __new__(mcs, name, bases, attrs):
-        new_class = (super(MediaDefiningClass, mcs)
-            .__new__(mcs, name, bases, attrs))
+        new_class = super(MediaDefiningClass, mcs).__new__(mcs, name, bases, attrs)
 
         if 'media' not in attrs:
             new_class.media = media_property(new_class)
@@ -156,36 +191,14 @@ class MediaDefiningClass(type):
         return new_class
 
 
-@html_safe
-@python_2_unicode_compatible
-class SubWidget(object):
-    """
-    Some widgets are made of multiple HTML elements -- namely, RadioSelect.
-    This is a class that represents the "inner" HTML element of a widget.
-    """
-    def __init__(self, parent_widget, name, value, attrs, choices):
-        self.parent_widget = parent_widget
-        self.name, self.value = name, value
-        self.attrs, self.choices = attrs, choices
-
-    def __str__(self):
-        args = [self.name, self.value, self.attrs]
-        if self.choices:
-            args.append(self.choices)
-        return self.parent_widget.render(*args)
-
-
-class Widget(six.with_metaclass(MediaDefiningClass)):
+class Widget(metaclass=MediaDefiningClass):
     needs_multipart_form = False  # Determines does this widget need multipart form
     is_localized = False
     is_required = False
     supports_microseconds = True
 
     def __init__(self, attrs=None):
-        if attrs is not None:
-            self.attrs = attrs.copy()
-        else:
-            self.attrs = {}
+        self.attrs = {} if attrs is None else attrs.copy()
 
     def __deepcopy__(self, memo):
         obj = copy.copy(self)
@@ -197,42 +210,60 @@ class Widget(six.with_metaclass(MediaDefiningClass)):
     def is_hidden(self):
         return self.input_type == 'hidden' if hasattr(self, 'input_type') else False
 
-    def subwidgets(self, name, value, attrs=None, choices=()):
-        """
-        Yields all "subwidgets" of this widget. Used only by RadioSelect to
-        allow template access to individual <input type="radio"> buttons.
+    def subwidgets(self, name, value, attrs=None):
+        context = self.get_context(name, value, attrs)
+        yield context['widget']
 
-        Arguments are the same as for render().
+    def format_value(self, value):
         """
-        yield SubWidget(self, name, value, attrs, choices)
-
-    def render(self, name, value, attrs=None):
+        Return a value as it should appear when rendered in a template.
         """
-        Returns this Widget rendered as HTML, as a Unicode string.
+        if value == '' or value is None:
+            return None
+        if self.is_localized:
+            return formats.localize_input(value)
+        return str(value)
 
-        The 'value' given is not guaranteed to be valid input, so subclass
-        implementations should program defensively.
-        """
-        raise NotImplementedError('subclasses of Widget must provide a render() method')
+    def get_context(self, name, value, attrs):
+        context = {}
+        context['widget'] = {
+            'name': name,
+            'is_hidden': self.is_hidden,
+            'required': self.is_required,
+            'value': self.format_value(value),
+            'attrs': self.build_attrs(self.attrs, attrs),
+            'template_name': self.template_name,
+        }
+        return context
 
-    def build_attrs(self, extra_attrs=None, **kwargs):
-        "Helper function for building an attribute dictionary."
-        attrs = dict(self.attrs, **kwargs)
-        if extra_attrs:
-            attrs.update(extra_attrs)
-        return attrs
+    def render(self, name, value, attrs=None, renderer=None):
+        """Render the widget as an HTML string."""
+        context = self.get_context(name, value, attrs)
+        return self._render(self.template_name, context, renderer)
+
+    def _render(self, template_name, context, renderer=None):
+        if renderer is None:
+            renderer = get_default_renderer()
+        return mark_safe(renderer.render(template_name, context))
+
+    def build_attrs(self, base_attrs, extra_attrs=None):
+        """Build an attribute dictionary."""
+        return {**base_attrs, **(extra_attrs or {})}
 
     def value_from_datadict(self, data, files, name):
         """
-        Given a dictionary of data and this widget's name, returns the value
-        of this widget. Returns None if it's not provided.
+        Given a dictionary of data and this widget's name, return the value
+        of this widget or None if it's not provided.
         """
         return data.get(name)
 
+    def value_omitted_from_data(self, data, files, name):
+        return name not in data
+
     def id_for_label(self, id_):
         """
-        Returns the HTML ID attribute of this Widget for use by a <label>,
-        given the ID of the field. Returns None if no ID is available.
+        Return the HTML ID attribute of this Widget for use by a <label>,
+        given the ID of the field. Return None if no ID is available.
 
         This hook is necessary because some widgets have multiple HTML
         elements and, thus, multiple IDs. In that case, this method should
@@ -241,119 +272,130 @@ class Widget(six.with_metaclass(MediaDefiningClass)):
         """
         return id_
 
+    def use_required_attribute(self, initial):
+        return not self.is_hidden
+
 
 class Input(Widget):
     """
-    Base class for all <input> widgets (except type='checkbox' and
-    type='radio', which are special).
+    Base class for all <input> widgets.
     """
     input_type = None  # Subclasses must define this.
+    template_name = 'django/forms/widgets/input.html'
 
-    def _format_value(self, value):
-        if self.is_localized:
-            return formats.localize_input(value)
-        return value
+    def __init__(self, attrs=None):
+        if attrs is not None:
+            attrs = attrs.copy()
+            self.input_type = attrs.pop('type', self.input_type)
+        super().__init__(attrs)
 
-    def render(self, name, value, attrs=None):
-        if value is None:
-            value = ''
-        final_attrs = self.build_attrs(attrs, type=self.input_type, name=name)
-        if value != '':
-            # Only add the 'value' attribute if a value is non-empty.
-            final_attrs['value'] = force_text(self._format_value(value))
-        return format_html('<input{} />', flatatt(final_attrs))
+    def get_context(self, name, value, attrs):
+        context = super().get_context(name, value, attrs)
+        context['widget']['type'] = self.input_type
+        return context
 
 
 class TextInput(Input):
     input_type = 'text'
-
-    def __init__(self, attrs=None):
-        if attrs is not None:
-            self.input_type = attrs.pop('type', self.input_type)
-        super(TextInput, self).__init__(attrs)
+    template_name = 'django/forms/widgets/text.html'
 
 
-class NumberInput(TextInput):
+class NumberInput(Input):
     input_type = 'number'
+    template_name = 'django/forms/widgets/number.html'
 
 
-class EmailInput(TextInput):
+class EmailInput(Input):
     input_type = 'email'
+    template_name = 'django/forms/widgets/email.html'
 
 
-class URLInput(TextInput):
+class URLInput(Input):
     input_type = 'url'
+    template_name = 'django/forms/widgets/url.html'
 
 
-class PasswordInput(TextInput):
+class PasswordInput(Input):
     input_type = 'password'
+    template_name = 'django/forms/widgets/password.html'
 
     def __init__(self, attrs=None, render_value=False):
-        super(PasswordInput, self).__init__(attrs)
+        super().__init__(attrs)
         self.render_value = render_value
 
-    def render(self, name, value, attrs=None):
+    def get_context(self, name, value, attrs):
         if not self.render_value:
             value = None
-        return super(PasswordInput, self).render(name, value, attrs)
+        return super().get_context(name, value, attrs)
 
 
 class HiddenInput(Input):
     input_type = 'hidden'
+    template_name = 'django/forms/widgets/hidden.html'
 
 
 class MultipleHiddenInput(HiddenInput):
     """
-    A widget that handles <input type="hidden"> for fields that have a list
+    Handle <input type="hidden"> for fields that have a list
     of values.
     """
-    def render(self, name, value, attrs=None):
-        if value is None:
-            value = []
-        final_attrs = self.build_attrs(attrs, type=self.input_type, name=name)
-        id_ = final_attrs.get('id')
-        inputs = []
-        for i, v in enumerate(value):
-            input_attrs = dict(value=force_text(v), **final_attrs)
+    template_name = 'django/forms/widgets/multiple_hidden.html'
+
+    def get_context(self, name, value, attrs):
+        context = super().get_context(name, value, attrs)
+        final_attrs = context['widget']['attrs']
+        id_ = context['widget']['attrs'].get('id')
+
+        subwidgets = []
+        for index, value_ in enumerate(context['widget']['value']):
+            widget_attrs = final_attrs.copy()
             if id_:
                 # An ID attribute was given. Add a numeric index as a suffix
                 # so that the inputs don't all have the same ID attribute.
-                input_attrs['id'] = '%s_%s' % (id_, i)
-            inputs.append(format_html('<input{} />', flatatt(input_attrs)))
-        return mark_safe('\n'.join(inputs))
+                widget_attrs['id'] = '%s_%s' % (id_, index)
+            widget = HiddenInput()
+            widget.is_required = self.is_required
+            subwidgets.append(widget.get_context(name, value_, widget_attrs)['widget'])
+
+        context['widget']['subwidgets'] = subwidgets
+        return context
 
     def value_from_datadict(self, data, files, name):
-        if isinstance(data, MultiValueDict):
-            return data.getlist(name)
-        return data.get(name)
+        try:
+            getter = data.getlist
+        except AttributeError:
+            getter = data.get
+        return getter(name)
+
+    def format_value(self, value):
+        return [] if value is None else value
 
 
 class FileInput(Input):
     input_type = 'file'
     needs_multipart_form = True
+    template_name = 'django/forms/widgets/file.html'
 
-    def render(self, name, value, attrs=None):
-        return super(FileInput, self).render(name, None, attrs=attrs)
+    def format_value(self, value):
+        """File input never renders a value."""
+        return
 
     def value_from_datadict(self, data, files, name):
         "File widgets take data from FILES, not POST"
         return files.get(name)
+
+    def value_omitted_from_data(self, data, files, name):
+        return name not in files
 
 
 FILE_INPUT_CONTRADICTION = object()
 
 
 class ClearableFileInput(FileInput):
-    initial_text = ugettext_lazy('Currently')
-    input_text = ugettext_lazy('Change')
-    clear_checkbox_label = ugettext_lazy('Clear')
-
-    template_with_initial = (
-        '%(initial_text)s: <a href="%(initial_url)s">%(initial)s</a> '
-        '%(clear_template)s<br />%(input_text)s: %(input)s'
-    )
-
-    template_with_clear = '%(clear)s <label for="%(clear_checkbox_id)s">%(clear_checkbox_label)s</label>'
+    clear_checkbox_label = _('Clear')
+    initial_text = _('Currently')
+    input_text = _('Change')
+    template_name = 'django/forms/widgets/clearable_file_input.html'
 
     def clear_checkbox_name(self, name):
         """
@@ -372,42 +414,31 @@ class ClearableFileInput(FileInput):
         """
         Return whether value is considered to be initial value.
         """
-        return bool(value and hasattr(value, 'url'))
+        return bool(value and getattr(value, 'url', False))
 
-    def get_template_substitution_values(self, value):
+    def format_value(self, value):
         """
-        Return value-related substitutions.
+        Return the file object if it has a defined url attribute.
         """
-        return {
-            'initial': conditional_escape(value),
-            'initial_url': conditional_escape(value.url),
-        }
-
-    def render(self, name, value, attrs=None):
-        substitutions = {
-            'initial_text': self.initial_text,
-            'input_text': self.input_text,
-            'clear_template': '',
-            'clear_checkbox_label': self.clear_checkbox_label,
-        }
-        template = '%(input)s'
-        substitutions['input'] = super(ClearableFileInput, self).render(name, value, attrs)
-
         if self.is_initial(value):
-            template = self.template_with_initial
-            substitutions.update(self.get_template_substitution_values(value))
-            if not self.is_required:
-                checkbox_name = self.clear_checkbox_name(name)
-                checkbox_id = self.clear_checkbox_id(checkbox_name)
-                substitutions['clear_checkbox_name'] = conditional_escape(checkbox_name)
-                substitutions['clear_checkbox_id'] = conditional_escape(checkbox_id)
-                substitutions['clear'] = CheckboxInput().render(checkbox_name, False, attrs={'id': checkbox_id})
-                substitutions['clear_template'] = self.template_with_clear % substitutions
+            return value
 
-        return mark_safe(template % substitutions)
+    def get_context(self, name, value, attrs):
+        context = super().get_context(name, value, attrs)
+        checkbox_name = self.clear_checkbox_name(name)
+        checkbox_id = self.clear_checkbox_id(checkbox_name)
+        context['widget'].update({
+            'checkbox_name': checkbox_name,
+            'checkbox_id': checkbox_id,
+            'is_initial': self.is_initial(value),
+            'input_text': self.input_text,
+            'initial_text': self.initial_text,
+            'clear_checkbox_label': self.clear_checkbox_label,
+        })
+        return context
 
     def value_from_datadict(self, data, files, name):
-        upload = super(ClearableFileInput, self).value_from_datadict(data, files, name)
+        upload = super().value_from_datadict(data, files, name)
         if not self.is_required and CheckboxInput().value_from_datadict(
                 data, files, self.clear_checkbox_name(name)):
 
@@ -420,22 +451,25 @@ class ClearableFileInput(FileInput):
             return False
         return upload
 
+    def use_required_attribute(self, initial):
+        return super().use_required_attribute(initial) and not initial
+
+    def value_omitted_from_data(self, data, files, name):
+        return (
+            super().value_omitted_from_data(data, files, name) and
+            self.clear_checkbox_name(name) not in data
+        )
+
 
 class Textarea(Widget):
+    template_name = 'django/forms/widgets/textarea.html'
+
     def __init__(self, attrs=None):
         # Use slightly better defaults than HTML's 20x2 box
         default_attrs = {'cols': '40', 'rows': '10'}
         if attrs:
             default_attrs.update(attrs)
-        super(Textarea, self).__init__(default_attrs)
-
-    def render(self, name, value, attrs=None):
-        if value is None:
-            value = ''
-        final_attrs = self.build_attrs(attrs, name=name)
-        return format_html('<textarea{}>\r\n{}</textarea>',
-                           flatatt(final_attrs),
-                           force_text(value))
+        super().__init__(default_attrs)
 
 
 class DateTimeBaseInput(TextInput):
@@ -443,24 +477,26 @@ class DateTimeBaseInput(TextInput):
     supports_microseconds = False
 
     def __init__(self, attrs=None, format=None):
-        super(DateTimeBaseInput, self).__init__(attrs)
-        self.format = format if format else None
+        super().__init__(attrs)
+        self.format = format or None
 
-    def _format_value(self, value):
-        return formats.localize_input(value,
-            self.format or formats.get_format(self.format_key)[0])
+    def format_value(self, value):
+        return formats.localize_input(value, self.format or formats.get_format(self.format_key)[0])
 
 
 class DateInput(DateTimeBaseInput):
     format_key = 'DATE_INPUT_FORMATS'
+    template_name = 'django/forms/widgets/date.html'
 
 
 class DateTimeInput(DateTimeBaseInput):
     format_key = 'DATETIME_INPUT_FORMATS'
+    template_name = 'django/forms/widgets/datetime.html'
 
 
 class TimeInput(DateTimeBaseInput):
     format_key = 'TIME_INPUT_FORMATS'
+    template_name = 'django/forms/widgets/time.html'
 
 
 # Defined at module level so that CheckboxInput is picklable (#17976)
@@ -468,21 +504,28 @@ def boolean_check(v):
     return not (v is False or v is None or v == '')
 
 
-class CheckboxInput(Widget):
+class CheckboxInput(Input):
+    input_type = 'checkbox'
+    template_name = 'django/forms/widgets/checkbox.html'
+
     def __init__(self, attrs=None, check_test=None):
-        super(CheckboxInput, self).__init__(attrs)
+        super().__init__(attrs)
         # check_test is a callable that takes a value and returns True
         # if the checkbox should be checked for that value.
         self.check_test = boolean_check if check_test is None else check_test
 
-    def render(self, name, value, attrs=None):
-        final_attrs = self.build_attrs(attrs, type='checkbox', name=name)
+    def format_value(self, value):
+        """Only return the 'value' attribute if value isn't empty."""
+        if value is True or value is False or value is None or value == '':
+            return
+        return str(value)
+
+    def get_context(self, name, value, attrs):
         if self.check_test(value):
-            final_attrs['checked'] = 'checked'
-        if not (value is True or value is False or value is None or value == ''):
-            # Only add the 'value' attribute if a value is non-empty.
-            final_attrs['value'] = force_text(value)
-        return format_html('<input{} />', flatatt(final_attrs))
+            if attrs is None:
+                attrs = {}
+            attrs['checked'] = True
+        return super().get_context(name, value, attrs)
 
     def value_from_datadict(self, data, files, name):
         if name not in data:
@@ -492,16 +535,27 @@ class CheckboxInput(Widget):
         value = data.get(name)
         # Translate true and false strings to boolean values.
         values = {'true': True, 'false': False}
-        if isinstance(value, six.string_types):
+        if isinstance(value, str):
             value = values.get(value.lower(), value)
         return bool(value)
 
+    def value_omitted_from_data(self, data, files, name):
+        # HTML checkboxes don't appear in POST data if not checked, so it's
+        # never known if the value is actually omitted.
+        return False
 
-class Select(Widget):
+
+class ChoiceWidget(Widget):
     allow_multiple_selected = False
+    input_type = None
+    template_name = None
+    option_template_name = None
+    add_id_index = True
+    checked_attribute = {'checked': True}
+    option_inherits_attrs = True
 
     def __init__(self, attrs=None, choices=()):
-        super(Select, self).__init__(attrs)
+        super().__init__(attrs)
         # choices can be any iterable, but we may need to render this widget
         # multiple times. Thus, collapse it into a list so it can be consumed
         # more than once.
@@ -514,46 +568,138 @@ class Select(Widget):
         memo[id(self)] = obj
         return obj
 
-    def render(self, name, value, attrs=None):
-        if value is None:
-            value = ''
-        final_attrs = self.build_attrs(attrs, name=name)
-        output = [format_html('<select{}>', flatatt(final_attrs))]
-        options = self.render_options([value])
-        if options:
-            output.append(options)
-        output.append('</select>')
-        return mark_safe('\n'.join(output))
+    def subwidgets(self, name, value, attrs=None):
+        """
+        Yield all "subwidgets" of this widget. Used to enable iterating
+        options from a BoundField for choice widgets.
+        """
+        value = self.format_value(value)
+        yield from self.options(name, value, attrs)
 
-    def render_option(self, selected_choices, option_value, option_label):
-        if option_value is None:
-            option_value = ''
-        option_value = force_text(option_value)
-        if option_value in selected_choices:
-            selected_html = mark_safe(' selected="selected"')
-            if not self.allow_multiple_selected:
-                # Only allow for a single selection.
-                selected_choices.remove(option_value)
-        else:
-            selected_html = ''
-        return format_html('<option value="{}"{}>{}</option>',
-                           option_value,
-                           selected_html,
-                           force_text(option_label))
+    def options(self, name, value, attrs=None):
+        """Yield a flat list of options for this widgets."""
+        for group in self.optgroups(name, value, attrs):
+            yield from group[1]
 
-    def render_options(self, selected_choices):
-        # Normalize to strings.
-        selected_choices = set(force_text(v) for v in selected_choices)
-        output = []
-        for option_value, option_label in self.choices:
+    def optgroups(self, name, value, attrs=None):
+        """Return a list of optgroups for this widget."""
+        groups = []
+        has_selected = False
+
+        for index, (option_value, option_label) in enumerate(self.choices):
+            if option_value is None:
+                option_value = ''
+
+            subgroup = []
             if isinstance(option_label, (list, tuple)):
-                output.append(format_html('<optgroup label="{}">', force_text(option_value)))
-                for option in option_label:
-                    output.append(self.render_option(selected_choices, *option))
-                output.append('</optgroup>')
+                group_name = option_value
+                subindex = 0
+                choices = option_label
             else:
-                output.append(self.render_option(selected_choices, option_value, option_label))
-        return '\n'.join(output)
+                group_name = None
+                subindex = None
+                choices = [(option_value, option_label)]
+            groups.append((group_name, subgroup, index))
+
+            for subvalue, sublabel in choices:
+                selected = (
+                    str(subvalue) in value and
+                    (not has_selected or self.allow_multiple_selected)
+                )
+                has_selected |= selected
+                subgroup.append(self.create_option(
+                    name, subvalue, sublabel, selected, index,
+                    subindex=subindex, attrs=attrs,
+                ))
+                if subindex is not None:
+                    subindex += 1
+        return groups
+
+    def create_option(self, name, value, label, selected, index, subindex=None, attrs=None):
+        index = str(index) if subindex is None else "%s_%s" % (index, subindex)
+        if attrs is None:
+            attrs = {}
+        option_attrs = self.build_attrs(self.attrs, attrs) if self.option_inherits_attrs else {}
+        if selected:
+            option_attrs.update(self.checked_attribute)
+        if 'id' in option_attrs:
+            option_attrs['id'] = self.id_for_label(option_attrs['id'], index)
+        return {
+            'name': name,
+            'value': value,
+            'label': label,
+            'selected': selected,
+            'index': index,
+            'attrs': option_attrs,
+            'type': self.input_type,
+            'template_name': self.option_template_name,
+            'wrap_label': True,
+        }
+
+    def get_context(self, name, value, attrs):
+        context = super().get_context(name, value, attrs)
+        context['widget']['optgroups'] = self.optgroups(name, context['widget']['value'], attrs)
+        return context
+
+    def id_for_label(self, id_, index='0'):
+        """
+        Use an incremented id for each option where the main widget
+        references the zero index.
+        """
+        if id_ and self.add_id_index:
+            id_ = '%s_%s' % (id_, index)
+        return id_
+
+    def value_from_datadict(self, data, files, name):
+        getter = data.get
+        if self.allow_multiple_selected:
+            try:
+                getter = data.getlist
+            except AttributeError:
+                pass
+        return getter(name)
+
+    def format_value(self, value):
+        """Return selected values as a list."""
+        if value is None and self.allow_multiple_selected:
+            return []
+        if not isinstance(value, (tuple, list)):
+            value = [value]
+        return [str(v) if v is not None else '' for v in value]
+
+
+class Select(ChoiceWidget):
+    input_type = 'select'
+    template_name = 'django/forms/widgets/select.html'
+    option_template_name = 'django/forms/widgets/select_option.html'
+    add_id_index = False
+    checked_attribute = {'selected': True}
+    option_inherits_attrs = False
+
+    def get_context(self, name, value, attrs):
+        context = super().get_context(name, value, attrs)
+        if self.allow_multiple_selected:
+            context['widget']['attrs']['multiple'] = True
+        return context
+
+    @staticmethod
+    def _choice_has_empty_value(choice):
+        """Return True if the choice's value is empty string or None."""
+        value, _ = choice
+        return value is None or value == ''
+
+    def use_required_attribute(self, initial):
+        """
+        Don't render 'required' if the first <option> has a value, as that's
+        invalid HTML.
+        """
+        use_required_attribute = super().use_required_attribute(initial)
+        # 'required' is always okay for <select multiple>.
+        if self.allow_multiple_selected:
+            return use_required_attribute
+
+        first_choice = next(iter(self.choices), None)
+        return use_required_attribute and first_choice is not None and self._choice_has_empty_value(first_choice)
 
 
 class NullBooleanSelect(Select):
@@ -561,262 +707,109 @@ class NullBooleanSelect(Select):
     A Select Widget intended to be used with NullBooleanField.
     """
     def __init__(self, attrs=None):
-        choices = (('1', ugettext_lazy('Unknown')),
-                   ('2', ugettext_lazy('Yes')),
-                   ('3', ugettext_lazy('No')))
-        super(NullBooleanSelect, self).__init__(attrs, choices)
+        choices = (
+            ('unknown', _('Unknown')),
+            ('true', _('Yes')),
+            ('false', _('No')),
+        )
+        super().__init__(attrs, choices)
 
-    def render(self, name, value, attrs=None):
+    def format_value(self, value):
         try:
-            value = {True: '2', False: '3', '2': '2', '3': '3'}[value]
+            return {
+                True: 'true', False: 'false',
+                'true': 'true', 'false': 'false',
+                # For backwards compatibility with Django < 2.2.
+                '2': 'true', '3': 'false',
+            }[value]
         except KeyError:
-            value = '1'
-        return super(NullBooleanSelect, self).render(name, value, attrs)
+            return 'unknown'
 
     def value_from_datadict(self, data, files, name):
         value = data.get(name)
-        return {'2': True,
-                True: True,
-                'True': True,
-                '3': False,
-                'False': False,
-                False: False}.get(value)
+        return {
+            True: True,
+            'True': True,
+            'False': False,
+            False: False,
+            'true': True,
+            'false': False,
+            # For backwards compatibility with Django < 2.2.
+            '2': True,
+            '3': False,
+        }.get(value)
 
 
 class SelectMultiple(Select):
     allow_multiple_selected = True
 
-    def render(self, name, value, attrs=None):
-        if value is None:
-            value = []
-        final_attrs = self.build_attrs(attrs, name=name)
-        output = [format_html('<select multiple="multiple"{}>', flatatt(final_attrs))]
-        options = self.render_options(value)
-        if options:
-            output.append(options)
-        output.append('</select>')
-        return mark_safe('\n'.join(output))
-
     def value_from_datadict(self, data, files, name):
-        if isinstance(data, MultiValueDict):
-            return data.getlist(name)
-        return data.get(name)
+        try:
+            getter = data.getlist
+        except AttributeError:
+            getter = data.get
+        return getter(name)
+
+    def value_omitted_from_data(self, data, files, name):
+        # An unselected <select multiple> doesn't appear in POST data, so it's
+        # never known if the value is actually omitted.
+        return False
 
 
-@html_safe
-@python_2_unicode_compatible
-class ChoiceInput(SubWidget):
-    """
-    An object used by ChoiceFieldRenderer that represents a single
-    <input type='$input_type'>.
-    """
-    input_type = None  # Subclasses must define this
-
-    def __init__(self, name, value, attrs, choice, index):
-        self.name = name
-        self.value = value
-        self.attrs = attrs
-        self.choice_value = force_text(choice[0])
-        self.choice_label = force_text(choice[1])
-        self.index = index
-        if 'id' in self.attrs:
-            self.attrs['id'] += "_%d" % self.index
-
-    def __str__(self):
-        return self.render()
-
-    def render(self, name=None, value=None, attrs=None):
-        if self.id_for_label:
-            label_for = format_html(' for="{}"', self.id_for_label)
-        else:
-            label_for = ''
-        attrs = dict(self.attrs, **attrs) if attrs else self.attrs
-        return format_html(
-            '<label{}>{} {}</label>', label_for, self.tag(attrs), self.choice_label
-        )
-
-    def is_checked(self):
-        return self.value == self.choice_value
-
-    def tag(self, attrs=None):
-        attrs = attrs or self.attrs
-        final_attrs = dict(attrs, type=self.input_type, name=self.name, value=self.choice_value)
-        if self.is_checked():
-            final_attrs['checked'] = 'checked'
-        return format_html('<input{} />', flatatt(final_attrs))
-
-    @property
-    def id_for_label(self):
-        return self.attrs.get('id', '')
-
-
-class RadioChoiceInput(ChoiceInput):
+class RadioSelect(ChoiceWidget):
     input_type = 'radio'
-
-    def __init__(self, *args, **kwargs):
-        super(RadioChoiceInput, self).__init__(*args, **kwargs)
-        self.value = force_text(self.value)
+    template_name = 'django/forms/widgets/radio.html'
+    option_template_name = 'django/forms/widgets/radio_option.html'
 
 
-class CheckboxChoiceInput(ChoiceInput):
+class CheckboxSelectMultiple(ChoiceWidget):
+    allow_multiple_selected = True
     input_type = 'checkbox'
+    template_name = 'django/forms/widgets/checkbox_select.html'
+    option_template_name = 'django/forms/widgets/checkbox_option.html'
 
-    def __init__(self, *args, **kwargs):
-        super(CheckboxChoiceInput, self).__init__(*args, **kwargs)
-        self.value = set(force_text(v) for v in self.value)
+    def use_required_attribute(self, initial):
+        # Don't use the 'required' attribute because browser validation would
+        # require all checkboxes to be checked instead of at least one.
+        return False
 
-    def is_checked(self):
-        return self.choice_value in self.value
+    def value_omitted_from_data(self, data, files, name):
+        # HTML checkboxes don't appear in POST data if not checked, so it's
+        # never known if the value is actually omitted.
+        return False
 
-
-@html_safe
-@python_2_unicode_compatible
-class ChoiceFieldRenderer(object):
-    """
-    An object used by RadioSelect to enable customization of radio widgets.
-    """
-
-    choice_input_class = None
-    outer_html = '<ul{id_attr}>{content}</ul>'
-    inner_html = '<li>{choice_value}{sub_widgets}</li>'
-
-    def __init__(self, name, value, attrs, choices):
-        self.name = name
-        self.value = value
-        self.attrs = attrs
-        self.choices = choices
-
-    def __getitem__(self, idx):
-        choice = self.choices[idx]  # Let the IndexError propagate
-        return self.choice_input_class(self.name, self.value, self.attrs.copy(), choice, idx)
-
-    def __str__(self):
-        return self.render()
-
-    def render(self):
+    def id_for_label(self, id_, index=None):
+        """"
+        Don't include for="field_0" in <label> because clicking such a label
+        would toggle the first checkbox.
         """
-        Outputs a <ul> for this set of choice fields.
-        If an id was given to the field, it is applied to the <ul> (each
-        item in the list will get an id of `$id_$i`).
-        """
-        id_ = self.attrs.get('id')
-        output = []
-        for i, choice in enumerate(self.choices):
-            choice_value, choice_label = choice
-            if isinstance(choice_label, (tuple, list)):
-                attrs_plus = self.attrs.copy()
-                if id_:
-                    attrs_plus['id'] += '_{}'.format(i)
-                sub_ul_renderer = self.__class__(
-                    name=self.name,
-                    value=self.value,
-                    attrs=attrs_plus,
-                    choices=choice_label,
-                )
-                sub_ul_renderer.choice_input_class = self.choice_input_class
-                output.append(format_html(self.inner_html, choice_value=choice_value,
-                                          sub_widgets=sub_ul_renderer.render()))
-            else:
-                w = self.choice_input_class(self.name, self.value,
-                                            self.attrs.copy(), choice, i)
-                output.append(format_html(self.inner_html,
-                                          choice_value=force_text(w), sub_widgets=''))
-        return format_html(self.outer_html,
-                           id_attr=format_html(' id="{}"', id_) if id_ else '',
-                           content=mark_safe('\n'.join(output)))
-
-
-class RadioFieldRenderer(ChoiceFieldRenderer):
-    choice_input_class = RadioChoiceInput
-
-
-class CheckboxFieldRenderer(ChoiceFieldRenderer):
-    choice_input_class = CheckboxChoiceInput
-
-
-class RendererMixin(object):
-    renderer = None  # subclasses must define this
-    _empty_value = None
-
-    def __init__(self, *args, **kwargs):
-        # Override the default renderer if we were passed one.
-        renderer = kwargs.pop('renderer', None)
-        if renderer:
-            self.renderer = renderer
-        super(RendererMixin, self).__init__(*args, **kwargs)
-
-    def subwidgets(self, name, value, attrs=None, choices=()):
-        for widget in self.get_renderer(name, value, attrs, choices):
-            yield widget
-
-    def get_renderer(self, name, value, attrs=None, choices=()):
-        """Returns an instance of the renderer."""
-        if value is None:
-            value = self._empty_value
-        final_attrs = self.build_attrs(attrs)
-        choices = list(chain(self.choices, choices))
-        return self.renderer(name, value, final_attrs, choices)
-
-    def render(self, name, value, attrs=None, choices=()):
-        return self.get_renderer(name, value, attrs, choices).render()
-
-    def id_for_label(self, id_):
-        # Widgets using this RendererMixin are made of a collection of
-        # subwidgets, each with their own <label>, and distinct ID.
-        # The IDs are made distinct by y "_X" suffix, where X is the zero-based
-        # index of the choice field. Thus, the label for the main widget should
-        # reference the first subwidget, hence the "_0" suffix.
-        if id_:
-            id_ += '_0'
-        return id_
-
-
-class RadioSelect(RendererMixin, Select):
-    renderer = RadioFieldRenderer
-    _empty_value = ''
-
-
-class CheckboxSelectMultiple(RendererMixin, SelectMultiple):
-    renderer = CheckboxFieldRenderer
-    _empty_value = []
+        if index is None:
+            return ''
+        return super().id_for_label(id_, index)
 
 
 class MultiWidget(Widget):
     """
     A widget that is composed of multiple widgets.
 
-    Its render() method is different than other widgets', because it has to
-    figure out how to split a single value for display in multiple widgets.
-    The ``value`` argument can be one of two things:
-
-        * A list.
-        * A normal value (e.g., a string) that has been "compressed" from
-          a list of values.
-
-    In the second case -- i.e., if the value is NOT a list -- render() will
-    first "decompress" the value into a list before rendering it. It does so by
-    calling the decompress() method, which MultiWidget subclasses must
-    implement. This method takes a single "compressed" value and returns a
-    list.
-
-    When render() does its HTML rendering, each value in the list is rendered
-    with the corresponding widget -- the first value is rendered in the first
-    widget, the second value is rendered in the second widget, etc.
-
-    Subclasses may implement format_output(), which takes the list of rendered
-    widgets and returns a string of HTML that formats them any way you'd like.
+    In addition to the values added by Widget.get_context(), this widget
+    adds a list of subwidgets to the context as widget['subwidgets'].
+    These can be looped over and rendered like normal widgets.
 
     You'll probably want to use this class with MultiValueField.
     """
+    template_name = 'django/forms/widgets/multiwidget.html'
+
     def __init__(self, widgets, attrs=None):
         self.widgets = [w() if isinstance(w, type) else w for w in widgets]
-        super(MultiWidget, self).__init__(attrs)
+        super().__init__(attrs)
 
     @property
     def is_hidden(self):
         return all(w.is_hidden for w in self.widgets)
 
-    def render(self, name, value, attrs=None):
+    def get_context(self, name, value, attrs):
+        context = super().get_context(name, value, attrs)
         if self.is_localized:
             for widget in self.widgets:
                 widget.is_localized = self.is_localized
@@ -824,21 +817,29 @@ class MultiWidget(Widget):
         # in self.widgets.
         if not isinstance(value, list):
             value = self.decompress(value)
-        output = []
-        final_attrs = self.build_attrs(attrs)
+
+        final_attrs = context['widget']['attrs']
+        input_type = final_attrs.pop('type', None)
         id_ = final_attrs.get('id')
+        subwidgets = []
         for i, widget in enumerate(self.widgets):
+            if input_type is not None:
+                widget.input_type = input_type
+            widget_name = '%s_%s' % (name, i)
             try:
                 widget_value = value[i]
             except IndexError:
                 widget_value = None
             if id_:
-                final_attrs = dict(final_attrs, id='%s_%s' % (id_, i))
-            output.append(widget.render(name + '_%s' % i, widget_value, final_attrs))
-        return mark_safe(self.format_output(output))
+                widget_attrs = final_attrs.copy()
+                widget_attrs['id'] = '%s_%s' % (id_, i)
+            else:
+                widget_attrs = final_attrs
+            subwidgets.append(widget.get_context(widget_name, widget_value, widget_attrs)['widget'])
+        context['widget']['subwidgets'] = subwidgets
+        return context
 
     def id_for_label(self, id_):
-        # See the comment for RadioSelect.id_for_label()
         if id_:
             id_ += '_0'
         return id_
@@ -846,26 +847,25 @@ class MultiWidget(Widget):
     def value_from_datadict(self, data, files, name):
         return [widget.value_from_datadict(data, files, name + '_%s' % i) for i, widget in enumerate(self.widgets)]
 
-    def format_output(self, rendered_widgets):
-        """
-        Given a list of rendered widgets (as strings), returns a Unicode string
-        representing the HTML for the whole lot.
-
-        This hook allows you to format the HTML design of the widgets, if
-        needed.
-        """
-        return ''.join(rendered_widgets)
+    def value_omitted_from_data(self, data, files, name):
+        return all(
+            widget.value_omitted_from_data(data, files, name + '_%s' % i)
+            for i, widget in enumerate(self.widgets)
+        )
 
     def decompress(self, value):
         """
-        Returns a list of decompressed values for the given compressed value.
+        Return a list of decompressed values for the given compressed value.
         The given value can be assumed to be valid, but not necessarily
         non-empty.
         """
         raise NotImplementedError('Subclasses must implement this method.')
 
     def _get_media(self):
-        "Media for a multiwidget is the combination of all media of the subwidgets"
+        """
+        Media for a multiwidget is the combination of all media of the
+        subwidgets.
+        """
         media = Media()
         for w in self.widgets:
             media = media + w.media
@@ -873,7 +873,7 @@ class MultiWidget(Widget):
     media = property(_get_media)
 
     def __deepcopy__(self, memo):
-        obj = super(MultiWidget, self).__deepcopy__(memo)
+        obj = super().__deepcopy__(memo)
         obj.widgets = copy.deepcopy(self.widgets)
         return obj
 
@@ -884,46 +884,58 @@ class MultiWidget(Widget):
 
 class SplitDateTimeWidget(MultiWidget):
     """
-    A Widget that splits datetime input into two <input type="text"> boxes.
+    A widget that splits datetime input into two <input type="text"> boxes.
     """
     supports_microseconds = False
+    template_name = 'django/forms/widgets/splitdatetime.html'
 
-    def __init__(self, attrs=None, date_format=None, time_format=None):
-        widgets = (DateInput(attrs=attrs, format=date_format),
-                   TimeInput(attrs=attrs, format=time_format))
-        super(SplitDateTimeWidget, self).__init__(widgets, attrs)
+    def __init__(self, attrs=None, date_format=None, time_format=None, date_attrs=None, time_attrs=None):
+        widgets = (
+            DateInput(
+                attrs=attrs if date_attrs is None else date_attrs,
+                format=date_format,
+            ),
+            TimeInput(
+                attrs=attrs if time_attrs is None else time_attrs,
+                format=time_format,
+            ),
+        )
+        super().__init__(widgets)
 
     def decompress(self, value):
         if value:
             value = to_current_timezone(value)
-            return [value.date(), value.time().replace(microsecond=0)]
+            return [value.date(), value.time()]
         return [None, None]
 
 
 class SplitHiddenDateTimeWidget(SplitDateTimeWidget):
     """
-    A Widget that splits datetime input into two <input type="hidden"> inputs.
+    A widget that splits datetime input into two <input type="hidden"> inputs.
     """
-    def __init__(self, attrs=None, date_format=None, time_format=None):
-        super(SplitHiddenDateTimeWidget, self).__init__(attrs, date_format, time_format)
+    template_name = 'django/forms/widgets/splithiddendatetime.html'
+
+    def __init__(self, attrs=None, date_format=None, time_format=None, date_attrs=None, time_attrs=None):
+        super().__init__(attrs, date_format, time_format, date_attrs, time_attrs)
         for widget in self.widgets:
             widget.input_type = 'hidden'
 
 
 class SelectDateWidget(Widget):
     """
-    A Widget that splits date input into three <select> boxes.
+    A widget that splits date input into three <select> boxes.
 
     This also serves as an example of a Widget that has more than one HTML
     element and hence implements value_from_datadict.
     """
-    none_value = (0, '---')
+    none_value = ('', '---')
     month_field = '%s_month'
     day_field = '%s_day'
     year_field = '%s_year'
+    template_name = 'django/forms/widgets/select_date.html'
+    input_type = 'select'
     select_widget = Select
-
-    date_re = re.compile(r'(\d{4})-(\d\d?)-(\d\d?)$')
+    date_re = re.compile(r'(\d{4}|0)-(\d\d?)-(\d\d?)$')
 
     def __init__(self, attrs=None, years=None, months=None, empty_label=None):
         self.attrs = attrs or {}
@@ -946,16 +958,77 @@ class SelectDateWidget(Widget):
             if not len(empty_label) == 3:
                 raise ValueError('empty_label list/tuple must have 3 elements.')
 
-            self.year_none_value = (0, empty_label[0])
-            self.month_none_value = (0, empty_label[1])
-            self.day_none_value = (0, empty_label[2])
+            self.year_none_value = ('', empty_label[0])
+            self.month_none_value = ('', empty_label[1])
+            self.day_none_value = ('', empty_label[2])
         else:
             if empty_label is not None:
-                self.none_value = (0, empty_label)
+                self.none_value = ('', empty_label)
 
             self.year_none_value = self.none_value
             self.month_none_value = self.none_value
             self.day_none_value = self.none_value
+
+    def get_context(self, name, value, attrs):
+        context = super().get_context(name, value, attrs)
+        date_context = {}
+        year_choices = [(i, str(i)) for i in self.years]
+        if not self.is_required:
+            year_choices.insert(0, self.year_none_value)
+        year_name = self.year_field % name
+        date_context['year'] = self.select_widget(attrs, choices=year_choices).get_context(
+            name=year_name,
+            value=context['widget']['value']['year'],
+            attrs={**context['widget']['attrs'], 'id': 'id_%s' % year_name},
+        )
+        month_choices = list(self.months.items())
+        if not self.is_required:
+            month_choices.insert(0, self.month_none_value)
+        month_name = self.month_field % name
+        date_context['month'] = self.select_widget(attrs, choices=month_choices).get_context(
+            name=month_name,
+            value=context['widget']['value']['month'],
+            attrs={**context['widget']['attrs'], 'id': 'id_%s' % month_name},
+        )
+        day_choices = [(i, i) for i in range(1, 32)]
+        if not self.is_required:
+            day_choices.insert(0, self.day_none_value)
+        day_name = self.day_field % name
+        date_context['day'] = self.select_widget(attrs, choices=day_choices,).get_context(
+            name=day_name,
+            value=context['widget']['value']['day'],
+            attrs={**context['widget']['attrs'], 'id': 'id_%s' % day_name},
+        )
+        subwidgets = []
+        for field in self._parse_date_fmt():
+            subwidgets.append(date_context[field]['widget'])
+        context['widget']['subwidgets'] = subwidgets
+        return context
+
+    def format_value(self, value):
+        """
+        Return a dict containing the year, month, and day of the current value.
+        Use dict instead of a datetime to allow invalid dates such as February
+        31 to display correctly.
+        """
+        year, month, day = None, None, None
+        if isinstance(value, (datetime.date, datetime.datetime)):
+            year, month, day = value.year, value.month, value.day
+        elif isinstance(value, str):
+            match = self.date_re.match(value)
+            if match:
+                # Convert any zeros in the date to empty strings to match the
+                # empty option value.
+                year, month, day = [int(val) or '' for val in match.groups()]
+            elif settings.USE_L10N:
+                input_format = get_format('DATE_INPUT_FORMATS')[0]
+                try:
+                    d = datetime.datetime.strptime(value, input_format)
+                except ValueError:
+                    pass
+                else:
+                    year, month, day = d.year, d.month, d.day
+        return {'year': year, 'month': month, 'day': day}
 
     @staticmethod
     def _parse_date_fmt():
@@ -973,70 +1046,34 @@ class SelectDateWidget(Widget):
             elif char in 'dj':
                 yield 'day'
 
-    def render(self, name, value, attrs=None):
-        try:
-            year_val, month_val, day_val = value.year, value.month, value.day
-        except AttributeError:
-            year_val = month_val = day_val = None
-            if isinstance(value, six.string_types):
-                if settings.USE_L10N:
-                    try:
-                        input_format = get_format('DATE_INPUT_FORMATS')[0]
-                        v = datetime.datetime.strptime(force_str(value), input_format)
-                        year_val, month_val, day_val = v.year, v.month, v.day
-                    except ValueError:
-                        pass
-                if year_val is None:
-                    match = self.date_re.match(value)
-                    if match:
-                        year_val, month_val, day_val = [int(val) for val in match.groups()]
-        html = {}
-        choices = [(i, i) for i in self.years]
-        html['year'] = self.create_select(name, self.year_field, value, year_val, choices, self.year_none_value)
-        choices = list(self.months.items())
-        html['month'] = self.create_select(name, self.month_field, value, month_val, choices, self.month_none_value)
-        choices = [(i, i) for i in range(1, 32)]
-        html['day'] = self.create_select(name, self.day_field, value, day_val, choices, self.day_none_value)
-
-        output = []
-        for field in self._parse_date_fmt():
-            output.append(html[field])
-        return mark_safe('\n'.join(output))
-
     def id_for_label(self, id_):
         for first_select in self._parse_date_fmt():
             return '%s_%s' % (id_, first_select)
-        else:
-            return '%s_month' % id_
+        return '%s_month' % id_
 
     def value_from_datadict(self, data, files, name):
         y = data.get(self.year_field % name)
         m = data.get(self.month_field % name)
         d = data.get(self.day_field % name)
-        if y == m == d == "0":
+        if y == m == d == '':
             return None
-        if y and m and d:
+        if y is not None and m is not None and d is not None:
             if settings.USE_L10N:
                 input_format = get_format('DATE_INPUT_FORMATS')[0]
                 try:
                     date_value = datetime.date(int(y), int(m), int(d))
                 except ValueError:
-                    return '%s-%s-%s' % (y, m, d)
+                    pass
                 else:
                     date_value = datetime_safe.new_date(date_value)
                     return date_value.strftime(input_format)
-            else:
-                return '%s-%s-%s' % (y, m, d)
+            # Return pseudo-ISO dates with zeros for any unselected values,
+            # e.g. '2017-0-23'.
+            return '%s-%s-%s' % (y or 0, m or 0, d or 0)
         return data.get(name)
 
-    def create_select(self, name, field, value, val, choices, none_value):
-        if 'id' in self.attrs:
-            id_ = self.attrs['id']
-        else:
-            id_ = 'id_%s' % name
-        if not self.is_required:
-            choices.insert(0, none_value)
-        local_attrs = self.build_attrs(id=field % id_)
-        s = self.select_widget(choices=choices)
-        select_html = s.render(field % name, val, local_attrs)
-        return select_html
+    def value_omitted_from_data(self, data, files, name):
+        return not any(
+            ('{}_{}'.format(name, interval) in data)
+            for interval in ('year', 'month', 'day')
+        )

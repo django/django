@@ -1,8 +1,9 @@
 from django.conf import settings
 from django.contrib.messages.storage import default_storage
+from django.utils.deprecation import MiddlewareMixin
 
 
-class MessageMiddleware(object):
+class MessageMiddleware(MiddlewareMixin):
     """
     Middleware that handles temporary messages.
     """
@@ -12,10 +13,9 @@ class MessageMiddleware(object):
 
     def process_response(self, request, response):
         """
-        Updates the storage backend (i.e., saves the messages).
+        Update the storage backend (i.e., save the messages).
 
-        If not all messages could not be stored and ``DEBUG`` is ``True``, a
-        ``ValueError`` is raised.
+        Raise ValueError if not all messages could be stored and DEBUG is True.
         """
         # A higher middleware layer may return a request which does not contain
         # messages storage, so make no assumption that it will be there.

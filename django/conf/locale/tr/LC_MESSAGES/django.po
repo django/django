@@ -2,9 +2,9 @@
 #
 # Translators:
 # Ahmet Emre Aladağ <emre.aladag@isik.edu.tr>, 2013
-# BouRock, 2015
+# BouRock, 2015-2019
 # BouRock, 2014-2015
-# Caner Başaran <basaran.caner@gmail.com>, 2013
+# Caner Başaran <basaran.caner@protonmail.com>, 2013
 # Cihad GÜNDOĞDU <cihadgundogdu@gmail.com>, 2012
 # Cihad GÜNDOĞDU <cihadgundogdu@gmail.com>, 2013-2014
 # Gökmen Görgen <gokmen@alageek.com>, 2013
@@ -16,8 +16,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2015-11-27 10:11+0000\n"
+"POT-Creation-Date: 2019-01-16 20:42+0100\n"
+"PO-Revision-Date: 2019-01-18 16:08+0000\n"
 "Last-Translator: BouRock\n"
 "Language-Team: Turkish (http://www.transifex.com/django/django/language/"
 "tr/)\n"
@@ -68,6 +68,9 @@ msgstr "Danca"
 
 msgid "German"
 msgstr "Almanca"
+
+msgid "Lower Sorbian"
+msgstr "Aşağı Sorb dili"
 
 msgid "Greek"
 msgstr "Yunanca"
@@ -138,8 +141,14 @@ msgstr "Hintçe"
 msgid "Croatian"
 msgstr "Hırvatça"
 
+msgid "Upper Sorbian"
+msgstr "Yukarı Sorb dili"
+
 msgid "Hungarian"
 msgstr "Macarca"
+
+msgid "Armenian"
+msgstr "Ermenice"
 
 msgid "Interlingua"
 msgstr "Interlingua"
@@ -161,6 +170,9 @@ msgstr "Japonca"
 
 msgid "Georgian"
 msgstr "Gürcüce"
+
+msgid "Kabyle"
+msgstr "Kabiliye dili"
 
 msgid "Kazakh"
 msgstr "Kazakça"
@@ -198,7 +210,7 @@ msgstr "Marathi dili"
 msgid "Burmese"
 msgstr "Birmanca"
 
-msgid "Norwegian Bokmal"
+msgid "Norwegian Bokmål"
 msgstr "Norveççe Bokmal"
 
 msgid "Nepali"
@@ -297,8 +309,14 @@ msgstr "Sabit Dosyalar"
 msgid "Syndication"
 msgstr "Dağıtım"
 
-msgid "Web Design"
-msgstr "Web Tasarımı"
+msgid "That page number is not an integer"
+msgstr "Bu sayfa numarası bir tamsayı değil"
+
+msgid "That page number is less than 1"
+msgstr "Bu sayfa numarası 1'den az"
+
+msgid "That page contains no results"
+msgstr "Bu sayfa hiç sonuç içermiyor"
 
 msgid "Enter a valid value."
 msgstr "Geçerli bir değer girin."
@@ -312,6 +330,7 @@ msgstr "Geçerli bir tamsayı girin."
 msgid "Enter a valid email address."
 msgstr "Geçerli bir e-posta adresi girin."
 
+#. Translators: "letters" means latin letters: a-z and A-Z.
 msgid ""
 "Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
 msgstr ""
@@ -378,6 +397,9 @@ msgstr[1] ""
 "Bu değerin en fazla %(limit_value)d karaktere sahip olduğuna emin olun (şu "
 "an %(show_value)d)."
 
+msgid "Enter a number."
+msgstr "Bir sayı girin."
+
 #, python-format
 msgid "Ensure that there are no more than %(max)s digit in total."
 msgid_plural "Ensure that there are no more than %(max)s digits in total."
@@ -399,6 +421,17 @@ msgstr[0] ""
 "Ondalık noktasından önce %(max)s rakamdan daha fazla olmadığından emin olun."
 msgstr[1] ""
 "Ondalık noktasından önce %(max)s rakamdan daha fazla olmadığından emin olun."
+
+#, python-format
+msgid ""
+"File extension '%(extension)s' is not allowed. Allowed extensions are: "
+"'%(allowed_extensions)s'."
+msgstr ""
+"'%(extension)s' dosya uzantısına izin verilmiyor. İzin verilen uzantılar: "
+"'%(allowed_extensions)s'."
+
+msgid "Null characters are not allowed."
+msgstr "Boş karakterlere izin verilmiyor."
 
 msgid "and"
 msgstr "ve"
@@ -441,9 +474,16 @@ msgstr "Tamsayı"
 msgid "'%(value)s' value must be an integer."
 msgstr "'%(value)s' değeri bir tamsayı olmak zorundadır."
 
+msgid "Big (8 byte) integer"
+msgstr "Büyük (8 bayt) tamsayı"
+
 #, python-format
 msgid "'%(value)s' value must be either True or False."
 msgstr "'%(value)s' değeri ya True ya da False olmak zorundadır."
+
+#, python-format
+msgid "'%(value)s' value must be either True, False, or None."
+msgstr "'%(value)s' değeri ya True, False ya da None olmak zorundadır."
 
 msgid "Boolean (Either True or False)"
 msgstr "Boolean (Ya True ya da False)"
@@ -524,9 +564,6 @@ msgstr "'%(value)s' değeri kesirli olmak zorundadır."
 msgid "Floating point number"
 msgstr "Kayan noktalı sayı"
 
-msgid "Big (8 byte) integer"
-msgstr "Büyük (8 bayt) tamsayı"
-
 msgid "IPv4 address"
 msgstr "IPv4 adresi"
 
@@ -585,6 +622,9 @@ msgstr "Ham ikili veri"
 msgid "'%(value)s' is not a valid UUID."
 msgstr "'%(value)s' geçerli bir UUID değil."
 
+msgid "Universally unique identifier"
+msgstr "Evrensel benzersiz tanımlayıcı"
+
 msgid "File"
 msgstr "Dosya"
 
@@ -601,6 +641,14 @@ msgstr "Dış Anahtar (türü ilgili alana göre belirlenir)"
 msgid "One-to-one relationship"
 msgstr "Bire-bir ilişki"
 
+#, python-format
+msgid "%(from)s-%(to)s relationship"
+msgstr "%(from)s-%(to)s ilişkisi"
+
+#, python-format
+msgid "%(from)s-%(to)s relationships"
+msgstr "%(from)s-%(to)s ilişkileri"
+
 msgid "Many-to-many relationship"
 msgstr "Çoka-çok ilişki"
 
@@ -616,9 +664,6 @@ msgstr "Bu alan zorunludur."
 msgid "Enter a whole number."
 msgstr "Tam bir sayı girin."
 
-msgid "Enter a number."
-msgstr "Bir sayı girin."
-
 msgid "Enter a valid date."
 msgstr "Geçerli bir tarih girin."
 
@@ -630,6 +675,10 @@ msgstr "Geçerli bir tarih/saat girin."
 
 msgid "Enter a valid duration."
 msgstr "Geçerli bir süre girin."
+
+#, python-brace-format
+msgid "The number of days must be between {min_days} and {max_days}."
+msgstr "Gün sayıları {min_days} ve {max_days} arasında olmak zorundadır."
 
 msgid "No file was submitted. Check the encoding type on the form."
 msgstr "Hiç dosya gönderilmedi. Formdaki kodlama türünü kontrol edin."
@@ -725,16 +774,16 @@ msgstr ""
 msgid "Please correct the duplicate values below."
 msgstr "Lütfen aşağıdaki kopya değerleri düzeltin."
 
-msgid "The inline foreign key did not match the parent instance primary key."
-msgstr "Satıriçi dış anahtar ana örnek birincil anahtarı ile eşleşmedi."
+msgid "The inline value did not match the parent instance."
+msgstr "Satıriçi değer ana örnek ile eşleşmedi."
 
 msgid "Select a valid choice. That choice is not one of the available choices."
 msgstr ""
 "Geçerli bir seçenek seçin. Bu seçenek, mevcut seçeneklerden biri değil."
 
 #, python-format
-msgid "\"%(pk)s\" is not a valid value for a primary key."
-msgstr "\"%(pk)s\" birincil anahtar için geçerli bir değer değil."
+msgid "\"%(pk)s\" is not a valid value."
+msgstr "\"%(pk)s\" geçerli bir değer değil."
 
 #, python-format
 msgid ""
@@ -744,14 +793,14 @@ msgstr ""
 " %(datetime)s, %(current_timezone)s saat dilimi olarak yorumlanamadı; bu "
 "belirsiz olabilir ya da mevcut olmayabilir."
 
+msgid "Clear"
+msgstr "Temizle"
+
 msgid "Currently"
 msgstr "Şu anki"
 
 msgid "Change"
 msgstr "Değiştir"
-
-msgid "Clear"
-msgstr "Temizle"
 
 msgid "Unknown"
 msgstr "Bilinmiyor"
@@ -1024,8 +1073,8 @@ msgstr "Bu, geçerli bir IPv6 adresi değil."
 
 #, python-format
 msgctxt "String to return when truncating text"
-msgid "%(truncated_text)s..."
-msgstr "%(truncated_text)s..."
+msgid "%(truncated_text)s…"
+msgstr "%(truncated_text)s…"
 
 msgid "or"
 msgstr "ya da"
@@ -1085,9 +1134,9 @@ msgid ""
 "required for security reasons, to ensure that your browser is not being "
 "hijacked by third parties."
 msgstr ""
-"Bu iletiyi görüyorsunuz çünkü bu HTTPS sitesi Web tarayıcınız tarafından "
-"gönderilen 'Göndereni başlığı'nı gerektirir, ancak hiçbir şey gönderilmedi. "
-"Bu başlık güvenlik nedenleri için gerekir, tarayıcınızın üçüncü parti "
+"Bu iletiyi görüyorsunuz çünkü bu HTTPS sitesi, Web tarayıcınız tarafından "
+"gönderilen 'Referer üstbilgisi'ni gerektirir, ancak hiçbir şey gönderilmedi. "
+"Bu üstbilgi güvenlik nedenleri için gerekir, tarayıcınızın üçüncü taraf "
 "uygulamalar tarafından ele geçirilmediğinden emin olun."
 
 msgid ""
@@ -1095,9 +1144,23 @@ msgid ""
 "enable them, at least for this site, or for HTTPS connections, or for 'same-"
 "origin' requests."
 msgstr ""
-"Eğer tarayıcınızı 'Göndereni' başlıklarını etkisizleştirmek için "
+"Eğer tarayıcınızı 'Referer' üstbilgilerini etkisizleştirmek için "
 "yapılandırdıysanız, lütfen bunları, en azından bu site ya da HTTPS "
 "bağlantıları veya 'aynı-kaynakta' olan istekler için yeniden etkinleştirin."
+
+msgid ""
+"If you are using the <meta name=\"referrer\" content=\"no-referrer\"> tag or "
+"including the 'Referrer-Policy: no-referrer' header, please remove them. The "
+"CSRF protection requires the 'Referer' header to do strict referer checking. "
+"If you're concerned about privacy, use alternatives like <a rel=\"noreferrer"
+"\" ...> for links to third-party sites."
+msgstr ""
+"Eğer <meta name=\"referrer\" content=\"no-referrer\"> etiketi "
+"kullanıyorsanız ya da 'Referrer-Policy: no-referrer' üstbilgisini dahil "
+"ediyorsanız, lütfen bunları kaldırın. CSRF koruması, katı göndereni denetimi "
+"yapmak için 'Referer' üstbilgisi gerektirir. Gizlilik konusunda endişeniz "
+"varsa, üçüncü taraf sitelere bağlantılar için <a rel=\"noreferrer\" ...> "
+"gibi alternatifler kullanın."
 
 msgid ""
 "You are seeing this message because this site requires a CSRF cookie when "
@@ -1106,7 +1169,7 @@ msgid ""
 msgstr ""
 "Bu iletiyi görüyorsunuz çünkü bu site, formları gönderdiğinizde bir CSRF "
 "tanımlama bilgisini gerektirir. Bu tanımlama bilgisi güvenlik nedenleri için "
-"gerekir, tarayıcınızın üçüncü parti uygulamalar tarafından ele "
+"gerekir, tarayıcınızın üçüncü taraf uygulamalar tarafından ele "
 "geçirilmediğinden emin olun."
 
 msgid ""
@@ -1120,32 +1183,11 @@ msgstr ""
 msgid "More information is available with DEBUG=True."
 msgstr "Daha fazla bilgi DEBUG=True ayarı ile mevcut olur."
 
-msgid "Welcome to Django"
-msgstr "Django'ya Hoş Geldiniz"
-
-msgid "It worked!"
-msgstr "İşe yaradı!"
-
-msgid "Congratulations on your first Django-powered page."
-msgstr "İlk Django-destekli sayfanız için tebrikler."
-
-msgid ""
-"Of course, you haven't actually done any work yet. Next, start your first "
-"app by running <code>python manage.py startapp [app_label]</code>."
-msgstr ""
-"Tabii ki, aslında henüz herhangi bir çalışma yapmadınız. Sonrasında, "
-"<code>python manage.py startapp [app_label]</code> komutunu çalıştırarak ilk "
-"uygulamanızı başlatın."
-
-msgid ""
-"You're seeing this message because you have <code>DEBUG = True</code> in "
-"your Django settings file and you haven't configured any URLs. Get to work!"
-msgstr ""
-"Bu iletiyi görüyorsunuz çünkü Django ayarları dosyanızda <code>DEBUG = True</"
-"code> ifadesi var ve herhangi bir URL'yi yapılandırmadınız. Işe koyulun!"
-
 msgid "No year specified"
 msgstr "Yıl bilgisi belirtilmedi"
+
+msgid "Date out of range"
+msgstr "Tarih aralık dışında"
 
 msgid "No month specified"
 msgstr "Ay bilgisi belirtilmedi"
@@ -1197,3 +1239,48 @@ msgstr "\"%(path)s\" mevcut değil"
 #, python-format
 msgid "Index of %(directory)s"
 msgstr "%(directory)s indeksi"
+
+msgid "Django: the Web framework for perfectionists with deadlines."
+msgstr "Django: bitiş tarihleri olan mükemmelliyetçiler için Web yapısı."
+
+#, python-format
+msgid ""
+"View <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" "
+"target=\"_blank\" rel=\"noopener\">release notes</a> for Django %(version)s"
+msgstr ""
+"Django %(version)s sürümü için <a href=\"https://docs.djangoproject.com/en/"
+"%(version)s/releases/\" target=\"_blank\" rel=\"noopener\">yayım notlarını</"
+"a> göster"
+
+msgid "The install worked successfully! Congratulations!"
+msgstr "Yükleme başarılı olarak çalıştı! Tebrikler!"
+
+#, python-format
+msgid ""
+"You are seeing this page because <a href=\"https://docs.djangoproject.com/en/"
+"%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener"
+"\">DEBUG=True</a> is in your settings file and you have not configured any "
+"URLs."
+msgstr ""
+"Bu sayfayı görüyorsunuz çünkü <a href=\"https://docs.djangoproject.com/en/"
+"%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener"
+"\">DEBUG=True</a> parametresi ayarlar dosyanızın içindedir ve herhangi bir "
+"URL yapılandırmadınız."
+
+msgid "Django Documentation"
+msgstr "Django Belgeleri"
+
+msgid "Topics, references, &amp; how-to's"
+msgstr "Konular, kaynaklar, ve nasıl yapılırlar"
+
+msgid "Tutorial: A Polling App"
+msgstr "Eğitim: Anket Uygulaması"
+
+msgid "Get started with Django"
+msgstr "Django ile başlayın"
+
+msgid "Django Community"
+msgstr "Django Topluluğu"
+
+msgid "Connect, get help, or contribute"
+msgstr "Bağlanın, yardım alın, ya da katkıda bulunun"

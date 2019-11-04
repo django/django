@@ -10,7 +10,6 @@ from django.contrib.gis.geos.base import GEOSBase
 from django.contrib.gis.geos.error import GEOSException
 from django.contrib.gis.geos.libgeos import CS_PTR
 from django.contrib.gis.shortcuts import numpy
-from django.utils.six.moves import range
 
 
 class GEOSCoordSeq(GEOSBase):
@@ -19,34 +18,32 @@ class GEOSCoordSeq(GEOSBase):
     ptr_type = CS_PTR
 
     def __init__(self, ptr, z=False):
-        "Initializes from a GEOS pointer."
+        "Initialize from a GEOS pointer."
         if not isinstance(ptr, CS_PTR):
             raise TypeError('Coordinate sequence should initialize with a CS_PTR.')
         self._ptr = ptr
         self._z = z
 
     def __iter__(self):
-        "Iterates over each point in the coordinate sequence."
+        "Iterate over each point in the coordinate sequence."
         for i in range(self.size):
             yield self[i]
 
     def __len__(self):
-        "Returns the number of points in the coordinate sequence."
+        "Return the number of points in the coordinate sequence."
         return int(self.size)
 
     def __str__(self):
-        "Returns the string representation of the coordinate sequence."
+        "Return the string representation of the coordinate sequence."
         return str(self.tuple)
 
     def __getitem__(self, index):
-        "Returns the coordinate sequence value at the given index."
-        coords = [self.getX(index), self.getY(index)]
-        if self.dims == 3 and self._z:
-            coords.append(self.getZ(index))
-        return tuple(coords)
+        "Return the coordinate sequence value at the given index."
+        self._checkindex(index)
+        return self._point_getter(index)
 
     def __setitem__(self, index, value):
-        "Sets the coordinate sequence value at the given index."
+        "Set the coordinate sequence value at the given index."
         # Checking the input value
         if isinstance(value, (list, tuple)):
             pass
@@ -57,39 +54,74 @@ class GEOSCoordSeq(GEOSBase):
         # Checking the dims of the input
         if self.dims == 3 and self._z:
             n_args = 3
-            set_3d = True
+            point_setter = self._set_point_3d
         else:
             n_args = 2
-            set_3d = False
+            point_setter = self._set_point_2d
         if len(value) != n_args:
             raise TypeError('Dimension of value does not match.')
-        # Setting the X, Y, Z
-        self.setX(index, value[0])
-        self.setY(index, value[1])
-        if set_3d:
-            self.setZ(index, value[2])
+        self._checkindex(index)
+        point_setter(index, value)
 
     # #### Internal Routines ####
     def _checkindex(self, index):
-        "Checks the given index."
-        sz = self.size
-        if (sz < 1) or (index < 0) or (index >= sz):
-            raise IndexError('invalid GEOS Geometry index: %s' % str(index))
+        "Check the given index."
+        if not (0 <= index < self.size):
+            raise IndexError('invalid GEOS Geometry index: %s' % index)
 
     def _checkdim(self, dim):
-        "Checks the given dimension."
+        "Check the given dimension."
         if dim < 0 or dim > 2:
             raise GEOSException('invalid ordinate dimension "%d"' % dim)
 
+    def _get_x(self, index):
+        return capi.cs_getx(self.ptr, index, byref(c_double()))
+
+    def _get_y(self, index):
+        return capi.cs_gety(self.ptr, index, byref(c_double()))
+
+    def _get_z(self, index):
+        return capi.cs_getz(self.ptr, index, byref(c_double()))
+
+    def _set_x(self, index, value):
+        capi.cs_setx(self.ptr, index, value)
+
+    def _set_y(self, index, value):
+        capi.cs_sety(self.ptr, index, value)
+
+    def _set_z(self, index, value):
+        capi.cs_setz(self.ptr, index, value)
+
+    @property
+    def _point_getter(self):
+        return self._get_point_3d if self.dims == 3 and self._z else self._get_point_2d
+
+    def _get_point_2d(self, index):
+        return (self._get_x(index), self._get_y(index))
+
+    def _get_point_3d(self, index):
+        return (self._get_x(index), self._get_y(index), self._get_z(index))
+
+    def _set_point_2d(self, index, value):
+        x, y = value
+        self._set_x(index, x)
+        self._set_y(index, y)
+
+    def _set_point_3d(self, index, value):
+        x, y, z = value
+        self._set_x(index, x)
+        self._set_y(index, y)
+        self._set_z(index, z)
+
     # #### Ordinate getting and setting routines ####
     def getOrdinate(self, dimension, index):
-        "Returns the value for the given dimension and index."
+        "Return the value for the given dimension and index."
         self._checkindex(index)
         self._checkdim(dimension)
         return capi.cs_getordinate(self.ptr, index, dimension, byref(c_double()))
 
     def setOrdinate(self, dimension, index, value):
-        "Sets the value for the given dimension and index."
+        "Set the value for the given dimension and index."
         self._checkindex(index)
         self._checkdim(dimension)
         capi.cs_setordinate(self.ptr, index, dimension, value)
@@ -121,30 +153,30 @@ class GEOSCoordSeq(GEOSBase):
     # ### Dimensions ###
     @property
     def size(self):
-        "Returns the size of this coordinate sequence."
+        "Return the size of this coordinate sequence."
         return capi.cs_getsize(self.ptr, byref(c_uint()))
 
     @property
     def dims(self):
-        "Returns the dimensions of this coordinate sequence."
+        "Return the dimensions of this coordinate sequence."
         return capi.cs_getdims(self.ptr, byref(c_uint()))
 
     @property
     def hasz(self):
         """
-        Returns whether this coordinate sequence is 3D.  This property value is
+        Return whether this coordinate sequence is 3D. This property value is
         inherited from the parent Geometry.
         """
         return self._z
 
     # ### Other Methods ###
     def clone(self):
-        "Clones this coordinate sequence."
+        "Clone this coordinate sequence."
         return GEOSCoordSeq(capi.cs_clone(self.ptr), self.hasz)
 
     @property
     def kml(self):
-        "Returns the KML representation for the coordinates."
+        "Return the KML representation for the coordinates."
         # Getting the substitution string depending on whether the coordinates have
         #  a Z dimension.
         if self.hasz:
@@ -156,9 +188,9 @@ class GEOSCoordSeq(GEOSBase):
 
     @property
     def tuple(self):
-        "Returns a tuple version of this coordinate sequence."
+        "Return a tuple version of this coordinate sequence."
         n = self.size
+        get_point = self._point_getter
         if n == 1:
-            return self[0]
-        else:
-            return tuple(self[i] for i in range(n))
+            return get_point(0)
+        return tuple(get_point(i) for i in range(n))

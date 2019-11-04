@@ -43,32 +43,28 @@ If your patch stands no chance of inclusion in Django, we won't ignore it --
 we'll just close the ticket. So if your ticket is still open, it doesn't mean
 we're ignoring you; it just means we haven't had time to look at it yet.
 
-When and how might I remind the core team of a patch I care about?
-==================================================================
+When and how might I remind the team of a patch I care about?
+=============================================================
 
 A polite, well-timed message to the mailing list is one way to get attention.
 To determine the right time, you need to keep an eye on the schedule. If you
-post your message when the core developers are trying to hit a feature
-deadline or manage a planning phase, you're not going to get the sort of
-attention you require. However, if you draw attention to a ticket when the
-core developers are paying particular attention to bugs -- just before a bug
-fixing sprint, or in the lead up to a beta release for example -- you're much
-more likely to get a productive response.
+post your message right before a release deadline, you're not likely to get the
+sort of attention you require.
 
 Gentle IRC reminders can also work -- again, strategically timed if possible.
 During a bug sprint would be a very good time, for example.
 
 Another way to get traction is to pull several related tickets together. When
-the core developers sit down to fix a bug in an area they haven't touched for
+the someone sits down to review a bug in an area they haven't touched for
 a while, it can take a few minutes to remember all the fine details of how
 that area of code works. If you collect several minor bug fixes together into
 a similarly themed group, you make an attractive target, as the cost of coming
 up to speed on an area of code can be spread over multiple tickets.
 
-Please refrain from emailing core developers personally, or repeatedly raising
-the same issue over and over. This sort of behavior will not gain you any
-additional attention -- certainly not the attention that you need in order to
-get your pet bug addressed.
+Please refrain from emailing anyone personally or repeatedly raising the same
+issue over and over. This sort of behavior will not gain you any additional
+attention -- certainly not the attention that you need in order to get your
+issue addressed.
 
 But I've reminded you several times and you keep ignoring my patch!
 ===================================================================

@@ -23,18 +23,18 @@ models, which comprise a Weblog application:
         name = models.CharField(max_length=100)
         tagline = models.TextField()
 
-        def __str__(self):              # __unicode__ on Python 2
+        def __str__(self):
             return self.name
 
     class Author(models.Model):
-        name = models.CharField(max_length=50)
+        name = models.CharField(max_length=200)
         email = models.EmailField()
 
-        def __str__(self):              # __unicode__ on Python 2
+        def __str__(self):
             return self.name
 
     class Entry(models.Model):
-        blog = models.ForeignKey(Blog)
+        blog = models.ForeignKey(Blog, on_delete=models.CASCADE)
         headline = models.CharField(max_length=255)
         body_text = models.TextField()
         pub_date = models.DateField()
@@ -44,7 +44,7 @@ models, which comprise a Weblog application:
         n_pingbacks = models.IntegerField()
         rating = models.IntegerField()
 
-        def __str__(self):              # __unicode__ on Python 2
+        def __str__(self):
             return self.headline
 
 Creating objects
@@ -101,7 +101,7 @@ the field in question. This example updates the ``blog`` attribute of an
 ``Entry`` instance ``entry``, assuming appropriate instances of ``Entry`` and
 ``Blog`` are already saved to the database (so we can retrieve them below)::
 
-    >>> from blog.models import Entry
+    >>> from blog.models import Blog, Entry
     >>> entry = Entry.objects.get(pk=1)
     >>> cheese_blog = Blog.objects.get(name="Cheddar Talk")
     >>> entry.blog = cheese_blog
@@ -228,7 +228,7 @@ refinements together. For example::
     ... ).exclude(
     ...     pub_date__gte=datetime.date.today()
     ... ).filter(
-    ...     pub_date__gte=datetime(2005, 1, 30)
+    ...     pub_date__gte=datetime.date(2005, 1, 30)
     ... )
 
 This takes the initial :class:`~django.db.models.query.QuerySet` of all entries
@@ -361,6 +361,9 @@ every *second* object of the first 10::
 
     >>> Entry.objects.all()[:10:2]
 
+Further filtering or ordering of a sliced queryset is prohibited due to the
+ambiguous nature of how that might work.
+
 To retrieve a *single* object rather than a list
 (e.g. ``SELECT foo FROM bar LIMIT 1``), use a simple index instead of a
 slice. For example, this returns the first ``Entry`` in the database, after
@@ -402,9 +405,7 @@ translates (roughly) into the following SQL:
 
    Python has the ability to define functions that accept arbitrary name-value
    arguments whose names and values are evaluated at runtime. For more
-   information, see `Keyword Arguments`_ in the official Python tutorial.
-
-   .. _`Keyword Arguments`: https://docs.python.org/tutorial/controlflow.html#keyword-arguments
+   information, see :ref:`tut-keywordargs` in the official Python tutorial.
 
 The field specified in a lookup has to be the name of a model field. There's
 one exception though, in case of a :class:`~django.db.models.ForeignKey` you
@@ -521,8 +522,7 @@ will return ``Blog`` objects that have an empty ``name`` on the ``author`` and
 also those which have an empty ``author`` on the ``entry``. If you don't want
 those latter objects, you could write::
 
-    Blog.objects.filter(entry__authors__isnull=False,
-            entry__authors__name__isnull=True)
+    Blog.objects.filter(entry__authors__isnull=False, entry__authors__name__isnull=True)
 
 Spanning multi-valued relationships
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -558,14 +558,12 @@ select all blogs that contain entries with both *"Lennon"* in the headline
 and that were published in 2008 (the same entry satisfying both conditions),
 we would write::
 
-    Blog.objects.filter(entry__headline__contains='Lennon',
-            entry__pub_date__year=2008)
+    Blog.objects.filter(entry__headline__contains='Lennon', entry__pub_date__year=2008)
 
 To select all blogs that contain an entry with *"Lennon"* in the headline
 **as well as** an entry that was published in 2008, we would write::
 
-    Blog.objects.filter(entry__headline__contains='Lennon').filter(
-            entry__pub_date__year=2008)
+    Blog.objects.filter(entry__headline__contains='Lennon').filter(entry__pub_date__year=2008)
 
 Suppose there is only one blog that had both entries containing *"Lennon"* and
 entries from 2008, but that none of the entries from 2008 contained *"Lennon"*.
@@ -602,7 +600,7 @@ may not be the same as the entries in the first filter. We are filtering the
     that were published in 2008, you need to make two queries::
 
         Blog.objects.exclude(
-            entry=Entry.objects.filter(
+            entry__in=Entry.objects.filter(
                 headline__contains='Lennon',
                 pub_date__year=2008,
             ),
@@ -657,8 +655,8 @@ that were modified more than 3 days after they were published::
     >>> from datetime import timedelta
     >>> Entry.objects.filter(mod_date__gt=F('pub_date') + timedelta(days=3))
 
-The ``F()`` objects support bitwise operations by ``.bitand()`` and
-``.bitor()``, for example::
+The ``F()`` objects support bitwise operations by ``.bitand()``, ``.bitor()``,
+``.bitrightshift()``, and ``.bitleftshift()``. For example::
 
     >>> F('somefield').bitand(16)
 
@@ -768,16 +766,16 @@ For example, repeatedly getting a certain index in a queryset object will query
 the database each time::
 
     >>> queryset = Entry.objects.all()
-    >>> print queryset[5] # Queries the database
-    >>> print queryset[5] # Queries the database again
+    >>> print(queryset[5]) # Queries the database
+    >>> print(queryset[5]) # Queries the database again
 
 However, if the entire queryset has already been evaluated, the cache will be
 checked instead::
 
     >>> queryset = Entry.objects.all()
     >>> [entry for entry in queryset] # Queries the database
-    >>> print queryset[5] # Uses cache
-    >>> print queryset[5] # Uses cache
+    >>> print(queryset[5]) # Uses cache
+    >>> print(queryset[5]) # Uses cache
 
 Here are some examples of other actions that will result in the entire queryset
 being evaluated and therefore populate the cache::
@@ -854,23 +852,23 @@ precede the definition of any keyword arguments. For example::
 
     Poll.objects.get(
         Q(pub_date=date(2005, 5, 2)) | Q(pub_date=date(2005, 5, 6)),
-        question__startswith='Who')
+        question__startswith='Who',
+    )
 
 ... would be a valid query, equivalent to the previous example; but::
 
     # INVALID QUERY
     Poll.objects.get(
         question__startswith='Who',
-        Q(pub_date=date(2005, 5, 2)) | Q(pub_date=date(2005, 5, 6)))
+        Q(pub_date=date(2005, 5, 2)) | Q(pub_date=date(2005, 5, 6))
+    )
 
 ... would not be valid.
 
 .. seealso::
 
-    The `OR lookups examples`_ in the Django unit tests show some possible uses
-    of ``Q``.
-
-    .. _OR lookups examples: https://github.com/django/django/blob/master/tests/or_lookups/tests.py
+    The :source:`OR lookups examples <tests/or_lookups/tests.py>` in Django's
+    unit tests show some possible uses of ``Q``.
 
 Comparing objects
 =================
@@ -904,10 +902,6 @@ the number of deletions per object type. Example::
     >>> e.delete()
     (1, {'weblog.Entry': 1})
 
-.. versionchanged:: 1.9
-
-    The return value describing the number of objects deleted was added.
-
 You can also delete objects in bulk. Every
 :class:`~django.db.models.query.QuerySet` has a
 :meth:`~django.db.models.query.QuerySet.delete` method, which deletes all
@@ -928,10 +922,6 @@ on a model class and want to ensure that it is called, you will need to
 object individually) rather than using the bulk
 :meth:`~django.db.models.query.QuerySet.delete` method of a
 :class:`~django.db.models.query.QuerySet`.
-
-.. versionchanged:: 1.9
-
-    The return value describing the number of objects deleted was added.
 
 When Django deletes an object, by default it emulates the behavior of the SQL
 constraint ``ON DELETE CASCADE`` -- in other words, any objects which had
@@ -985,15 +975,25 @@ Due to how inheritance works, you have to set both ``pk`` and ``id`` to None::
     django_blog.id = None
     django_blog.save() # django_blog.pk == 4
 
-This process does not copy related objects. If you want to copy relations,
-you have to write a little bit more code. In our example, ``Entry`` has a many to many
-field to ``Author``::
+This process doesn't copy relations that aren't part of the model's database
+table. For example, ``Entry`` has a ``ManyToManyField`` to ``Author``. After
+duplicating an entry, you must set the many-to-many relations for the new
+entry::
 
     entry = Entry.objects.all()[0] # some previous entry
     old_authors = entry.authors.all()
     entry.pk = None
     entry.save()
-    entry.authors = old_authors # saves new many2many relations
+    entry.authors.set(old_authors)
+
+For a ``OneToOneField``, you must duplicate the related object and assign it
+to the new object's field to avoid violating the one-to-one unique constraint.
+For example, assuming ``entry`` is already duplicated as above::
+
+    detail = EntryDetail.objects.all()[0]
+    detail.pk = None
+    detail.entry = entry
+    detail.save()
 
 .. _topics-db-queries-update:
 
@@ -1056,7 +1056,7 @@ introduce joins when you use ``F()`` objects in an update -- you can only
 reference fields local to the model being updated. If you attempt to introduce
 a join with an ``F()`` object, a ``FieldError`` will be raised::
 
-    # THIS WILL RAISE A FieldError
+    # This will raise a FieldError
     >>> Entry.objects.update(headline=F('blog__name'))
 
 .. _topics-db-queries-related:
@@ -1085,7 +1085,7 @@ For example, a ``Blog`` object ``b`` has access to a list of all related
 All examples in this section use the sample ``Blog``, ``Author`` and ``Entry``
 models defined at the top of this page.
 
-.. _descriptors: http://users.rcn.com/python/download/Descriptor.htm
+.. _descriptors: https://docs.python.org/howto/descriptor.html
 
 One-to-many relationships
 -------------------------
@@ -1223,13 +1223,11 @@ be found in the :doc:`related objects reference </ref/models/relations>`.
     Replace the set of related objects.
 
 To assign the members of a related set, use the ``set()`` method with an
-iterable of object instances or a list of primary key values. For example::
+iterable of object instances. For example, if ``e1`` and ``e2`` are ``Entry``
+instances::
 
     b = Blog.objects.get(id=1)
     b.entry_set.set([e1, e2])
-
-In this example, ``e1`` and ``e2`` can be full Entry instances, or integer
-primary key values.
 
 If the ``clear()`` method is available, any pre-existing objects will be
 removed from the ``entry_set`` before all objects in the iterable (in this
@@ -1247,9 +1245,9 @@ Many-to-many relationships
 --------------------------
 
 Both ends of a many-to-many relationship get automatic API access to the other
-end. The API works just as a "backward" one-to-many relationship, above.
+end. The API works similar to a "backward" one-to-many relationship, above.
 
-The only difference is in the attribute naming: The model that defines the
+One difference is in the attribute naming: The model that defines the
 :class:`~django.db.models.ManyToManyField` uses the attribute name of that
 field itself, whereas the "reverse" model uses the lowercased model name of the
 original model, plus ``'_set'`` (just like reverse one-to-many relationships).
@@ -1270,6 +1268,15 @@ Like :class:`~django.db.models.ForeignKey`,
 if the :class:`~django.db.models.ManyToManyField` in ``Entry`` had specified
 ``related_name='entries'``, then each ``Author`` instance would have an
 ``entries`` attribute instead of ``entry_set``.
+
+Another difference from one-to-many relationships is that in addition to model
+instances,  the ``add()``, ``set()``, and ``remove()`` methods on many-to-many
+relationships accept primary key values. For example, if ``e1`` and ``e2`` are
+``Entry`` instances, then these ``set()`` calls work identically::
+
+    a = Author.objects.get(id=5)
+    a.entry_set.set([e1, e2])
+    a.entry_set.set([e1.pk, e2.pk])
 
 One-to-one relationships
 ------------------------

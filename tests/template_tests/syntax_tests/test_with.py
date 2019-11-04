@@ -1,10 +1,12 @@
 from django.template import TemplateSyntaxError
+from django.template.defaulttags import WithNode
 from django.test import SimpleTestCase
 
 from ..utils import setup
 
 
 class WithTagTests(SimpleTestCase):
+    at_least_with_one_msg = "'with' expected at least one variable assignment"
 
     @setup({'with01': '{% with key=dict.key %}{{ key }}{% endwith %}'})
     def test_with01(self):
@@ -43,10 +45,16 @@ class WithTagTests(SimpleTestCase):
 
     @setup({'with-error01': '{% with dict.key xx key %}{{ key }}{% endwith %}'})
     def test_with_error01(self):
-        with self.assertRaises(TemplateSyntaxError):
+        with self.assertRaisesMessage(TemplateSyntaxError, self.at_least_with_one_msg):
             self.engine.render_to_string('with-error01', {'dict': {'key': 50}})
 
     @setup({'with-error02': '{% with dict.key as %}{{ key }}{% endwith %}'})
     def test_with_error02(self):
-        with self.assertRaises(TemplateSyntaxError):
+        with self.assertRaisesMessage(TemplateSyntaxError, self.at_least_with_one_msg):
             self.engine.render_to_string('with-error02', {'dict': {'key': 50}})
+
+
+class WithNodeTests(SimpleTestCase):
+    def test_repr(self):
+        node = WithNode(nodelist=[], name='a', var='dict.key')
+        self.assertEqual(repr(node), '<WithNode>')

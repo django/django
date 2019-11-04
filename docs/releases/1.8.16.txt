@@ -1,0 +1,43 @@
+===========================
+Django 1.8.16 release notes
+===========================
+
+*November 1, 2016*
+
+Django 1.8.16 fixes two security issues in 1.8.15.
+
+User with hardcoded password created when running tests on Oracle
+=================================================================
+
+When running tests with an Oracle database, Django creates a temporary database
+user. In older versions, if a password isn't manually specified in the database
+settings ``TEST`` dictionary, a hardcoded password is used. This could allow
+an attacker with network access to the database server to connect.
+
+This user is usually dropped after the test suite completes, but not when using
+the ``manage.py test --keepdb`` option or if the user has an active session
+(such as an attacker's connection).
+
+A randomly generated password is now used for each test run.
+
+DNS rebinding vulnerability when ``DEBUG=True``
+===============================================
+
+Older versions of Django don't validate the ``Host`` header against
+``settings.ALLOWED_HOSTS`` when ``settings.DEBUG=True``. This makes them
+vulnerable to a `DNS rebinding attack
+<https://benmmurphy.github.io/blog/2016/07/11/rails-webconsole-dns-rebinding/>`_.
+
+While Django doesn't ship a module that allows remote code execution, this is
+at least a cross-site scripting vector, which could be quite serious if
+developers load a copy of the production database in development or connect to
+some production services for which there's no development instance, for
+example. If a project uses a package like the ``django-debug-toolbar``, then
+the attacker could execute arbitrary SQL, which could be especially bad if the
+developers connect to the database with a superuser account.
+
+``settings.ALLOWED_HOSTS`` is now validated regardless of ``DEBUG``. For
+convenience, if ``ALLOWED_HOSTS`` is empty and ``DEBUG=True``, the following
+variations of localhost are allowed ``['localhost', '127.0.0.1', '::1']``. If
+your local settings file has your production ``ALLOWED_HOSTS`` value, you must
+now omit it to get those fallback values.

@@ -4,10 +4,8 @@ from django.contrib import admin
 from django.db import models
 from django.http import HttpResponseRedirect
 from django.urls import reverse
-from django.utils.encoding import python_2_unicode_compatible
 
 
-@python_2_unicode_compatible
 class Action(models.Model):
     name = models.CharField(max_length=50, primary_key=True)
     description = models.CharField(max_length=70)
@@ -30,12 +28,12 @@ class ActionAdmin(admin.ModelAdmin):
         Remove all entries named 'name' from the ModelAdmin instance URL
         patterns list
         """
-        return [url for url in super(ActionAdmin, self).get_urls() if url.name != name]
+        return [url for url in super().get_urls() if url.name != name]
 
     def get_urls(self):
         # Add the URL of our custom 'add_view' view to the front of the URLs
         # list.  Remove the existing one(s) first
-        from django.conf.urls import url
+        from django.urls import re_path
 
         def wrap(view):
             def wrapper(*args, **kwargs):
@@ -47,7 +45,7 @@ class ActionAdmin(admin.ModelAdmin):
         view_name = '%s_%s_add' % info
 
         return [
-            url(r'^!add/$', wrap(self.add_view), name=view_name),
+            re_path('^!add/$', wrap(self.add_view), name=view_name),
         ] + self.remove_url(view_name)
 
 
@@ -73,8 +71,10 @@ class Car(models.Model):
 class CarAdmin(admin.ModelAdmin):
 
     def response_add(self, request, obj, post_url_continue=None):
-        return super(CarAdmin, self).response_add(
-            request, obj, post_url_continue=reverse('admin:admin_custom_urls_car_history', args=[obj.pk]))
+        return super().response_add(
+            request, obj,
+            post_url_continue=reverse('admin:admin_custom_urls_car_history', args=[obj.pk]),
+        )
 
 
 site = admin.AdminSite(name='admin_custom_urls')

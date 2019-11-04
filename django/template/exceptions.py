@@ -8,8 +8,7 @@ here.
 
 class TemplateDoesNotExist(Exception):
     """
-    The exception used when a template does not exist. Accepts the following
-    optional arguments:
+    The exception used when a template does not exist. Optional arguments:
 
     backend
         The template backend class used when raising this exception.
@@ -33,7 +32,7 @@ class TemplateDoesNotExist(Exception):
         if chain is None:
             chain = []
         self.chain = chain
-        super(TemplateDoesNotExist, self).__init__(msg)
+        super().__init__(msg)
 
 
 class TemplateSyntaxError(Exception):

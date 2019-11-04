@@ -18,8 +18,8 @@ Basic forms
 
 Given a simple contact form:
 
-.. snippet::
-    :filename: forms.py
+.. code-block:: python
+    :caption: forms.py
 
     from django import forms
 
@@ -33,8 +33,8 @@ Given a simple contact form:
 
 The view can be constructed using a ``FormView``:
 
-.. snippet::
-    :filename: views.py
+.. code-block:: python
+    :caption: views.py
 
     from myapp.forms import ContactForm
     from django.views.generic.edit import FormView
@@ -48,7 +48,7 @@ The view can be constructed using a ``FormView``:
             # This method is called when valid form data has been POSTed.
             # It should return an HttpResponse.
             form.send_email()
-            return super(ContactView, self).form_valid(form)
+            return super().form_valid(form)
 
 Notes:
 
@@ -96,11 +96,11 @@ add extra validation) simply set
 First we need to add :meth:`~django.db.models.Model.get_absolute_url()` to our
 ``Author`` class:
 
-.. snippet::
-    :filename: models.py
+.. code-block:: python
+    :caption: models.py
 
-    from django.urls import reverse
     from django.db import models
+    from django.urls import reverse
 
     class Author(models.Model):
         name = models.CharField(max_length=200)
@@ -112,11 +112,11 @@ Then we can use :class:`CreateView` and friends to do the actual
 work. Notice how we're just configuring the generic class-based views
 here; we don't have to write any logic ourselves:
 
-.. snippet::
-    :filename: views.py
+.. code-block:: python
+    :caption: views.py
 
-    from django.views.generic.edit import CreateView, UpdateView, DeleteView
     from django.urls import reverse_lazy
+    from django.views.generic.edit import CreateView, DeleteView, UpdateView
     from myapp.models import Author
 
     class AuthorCreate(CreateView):
@@ -146,17 +146,17 @@ and :attr:`~django.views.generic.edit.FormMixin.form_class` attributes, an
 
 Finally, we hook these new views into the URLconf:
 
-.. snippet::
-    :filename: urls.py
+.. code-block:: python
+    :caption: urls.py
 
-    from django.conf.urls import url
-    from myapp.views import AuthorCreate, AuthorUpdate, AuthorDelete
+    from django.urls import path
+    from myapp.views import AuthorCreate, AuthorDelete, AuthorUpdate
 
     urlpatterns = [
         # ...
-        url(r'author/add/$', AuthorCreate.as_view(), name='author-add'),
-        url(r'author/(?P<pk>[0-9]+)/$', AuthorUpdate.as_view(), name='author-update'),
-        url(r'author/(?P<pk>[0-9]+)/delete/$', AuthorDelete.as_view(), name='author-delete'),
+        path('author/add/', AuthorCreate.as_view(), name='author-add'),
+        path('author/<int:pk>/', AuthorUpdate.as_view(), name='author-update'),
+        path('author/<int:pk>/delete/', AuthorDelete.as_view(), name='author-delete'),
     ]
 
 .. note::
@@ -187,8 +187,8 @@ To track the user that created an object using a :class:`CreateView`,
 you can use a custom :class:`~django.forms.ModelForm` to do this. First, add
 the foreign key relation to the model:
 
-.. snippet::
-    :filename: models.py
+.. code-block:: python
+    :caption: models.py
 
     from django.contrib.auth.models import User
     from django.db import models
@@ -203,25 +203,24 @@ In the view, ensure that you don't include ``created_by`` in the list of fields
 to edit, and override
 :meth:`~django.views.generic.edit.ModelFormMixin.form_valid()` to add the user:
 
-.. snippet::
-    :filename: views.py
+.. code-block:: python
+    :caption: views.py
 
+    from django.contrib.auth.mixins import LoginRequiredMixin
     from django.views.generic.edit import CreateView
     from myapp.models import Author
 
-    class AuthorCreate(CreateView):
+    class AuthorCreate(LoginRequiredMixin, CreateView):
         model = Author
         fields = ['name']
 
         def form_valid(self, form):
             form.instance.created_by = self.request.user
-            return super(AuthorCreate, self).form_valid(form)
+            return super().form_valid(form)
 
-Note that you'll need to :ref:`decorate this
-view<decorating-class-based-views>` using
-:func:`~django.contrib.auth.decorators.login_required`, or
-alternatively handle unauthorized users in the
-:meth:`~django.views.generic.edit.ModelFormMixin.form_valid()`.
+:class:`~django.contrib.auth.mixins.LoginRequiredMixin` prevents users who
+aren't logged in from accessing the form. If you omit that, you'll need to
+handle unauthorized users in :meth:`~.ModelFormMixin.form_valid()`.
 
 AJAX example
 ============
@@ -233,13 +232,13 @@ works for AJAX requests as well as 'normal' form POSTs::
     from django.views.generic.edit import CreateView
     from myapp.models import Author
 
-    class AjaxableResponseMixin(object):
+    class AjaxableResponseMixin:
         """
         Mixin to add AJAX support to a form.
         Must be used with an object-based FormView (e.g. CreateView)
         """
         def form_invalid(self, form):
-            response = super(AjaxableResponseMixin, self).form_invalid(form)
+            response = super().form_invalid(form)
             if self.request.is_ajax():
                 return JsonResponse(form.errors, status=400)
             else:
@@ -249,7 +248,7 @@ works for AJAX requests as well as 'normal' form POSTs::
             # We make sure to call the parent's form_valid() method because
             # it might do some processing (in the case of CreateView, it will
             # call form.save() for example).
-            response = super(AjaxableResponseMixin, self).form_valid(form)
+            response = super().form_valid(form)
             if self.request.is_ajax():
                 data = {
                     'pk': self.object.pk,

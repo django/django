@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 import datetime
 import decimal
 import logging
@@ -18,18 +16,19 @@ from django.views.decorators.debug import (
     sensitive_post_parameters, sensitive_variables,
 )
 
-from . import BrokenException, except_args
-
 
 def index_page(request):
     """Dummy index page"""
     return HttpResponse('<html><body>Dummy page</body></html>')
 
 
+def with_parameter(request, parameter):
+    return HttpResponse('ok')
+
+
 def raises(request):
     # Make sure that a callable that raises an exception in the stack frame's
-    # local vars won't hijack the technical 500 response. See:
-    # http://code.djangoproject.com/ticket/15025
+    # local vars won't hijack the technical 500 response (#15025).
     def callable():
         raise Exception
     try:
@@ -69,12 +68,8 @@ class Http404View(View):
         raise Http404("Testing class-based technical 404.")
 
 
-def view_exception(request, n):
-    raise BrokenException(except_args[int(n)])
-
-
-def template_exception(request, n):
-    return render(request, 'debug/template_exception.html', {'arg': except_args[int(n)]})
+def template_exception(request):
+    return render(request, 'debug/template_exception.html')
 
 
 def jsi18n(request):
@@ -82,7 +77,7 @@ def jsi18n(request):
 
 
 def jsi18n_multi_catalogs(request):
-    return render(render, 'jsi18n-multi-catalogs.html')
+    return render(request, 'jsi18n-multi-catalogs.html')
 
 
 def raises_template_does_not_exist(request, path='i_dont_exist.html'):
@@ -113,12 +108,10 @@ def send_log(request, exc_info):
     orig_filters = admin_email_handler.filters
     admin_email_handler.filters = []
     admin_email_handler.include_html = True
-    logger.error('Internal Server Error: %s', request.path,
+    logger.error(
+        'Internal Server Error: %s', request.path,
         exc_info=exc_info,
-        extra={
-            'status_code': 500,
-            'request': request
-        }
+        extra={'status_code': 500, 'request': request},
     )
     admin_email_handler.filters = orig_filters
 
@@ -234,7 +227,7 @@ def custom_exception_reporter_filter_view(request):
         return technical_500_response(request, *exc_info)
 
 
-class Klass(object):
+class Klass:
 
     @sensitive_variables('sauce')
     def method(self, request):

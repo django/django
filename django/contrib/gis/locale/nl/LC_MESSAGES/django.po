@@ -6,14 +6,15 @@
 # Ilja Maas <iljamaas@dreamsolution.nl>, 2015
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Jeffrey Gelens <jeffrey@noppo.pro>, 2011
-# Sander Steffann <sander@steffann.nl>, 2015
+# Sander Steffann <inactive+steffann@transifex.com>, 2015
+# Tonnes <tonnes.mb@gmail.com>, 2019
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2015-11-25 19:50+0000\n"
-"Last-Translator: Ilja Maas <iljamaas@dreamsolution.nl>\n"
+"POT-Creation-Date: 2017-01-19 16:49+0100\n"
+"PO-Revision-Date: 2019-02-24 16:22+0000\n"
+"Last-Translator: Tonnes <tonnes.mb@gmail.com>\n"
 "Language-Team: Dutch (http://www.transifex.com/django/django/language/nl/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -25,71 +26,68 @@ msgid "GIS"
 msgstr "GIS"
 
 msgid "The base GIS field."
-msgstr "Het basis GIS veld"
+msgstr "Het basis-GIS-veld."
 
 msgid ""
 "The base Geometry field -- maps to the OpenGIS Specification Geometry type."
 msgstr ""
-"Het basis Geometrie veld --  corresponderend met het OpenGIS Specificatie "
-"Geometrie type."
+"Het basis-Geometrie-veld --  correspondeert met het Geometrie-type van de "
+"OpenGIS-specificatie."
 
 msgid "Point"
 msgstr "Punt"
 
 msgid "Line string"
-msgstr "Lijn string"
+msgstr "Tekenreeks"
 
 msgid "Polygon"
 msgstr "Polygoon"
 
 msgid "Multi-point"
-msgstr "Multi-punt"
+msgstr "Multipunt"
 
 msgid "Multi-line string"
-msgstr "Multi-lijn string"
+msgstr "Multi-tekenreeks"
 
 msgid "Multi polygon"
 msgstr "Multi-polygoon"
 
 msgid "Geometry collection"
-msgstr "Geometrie collectie"
+msgstr "Geometrie-verzameling"
 
 msgid "Extent Aggregate Field"
 msgstr "Gebieds-aggregatieveld"
 
 msgid "Raster Field"
-msgstr "Raster veld"
+msgstr "Rasterveld"
 
 msgid "No geometry value provided."
-msgstr "Geen geometrische waarde opgegeven."
+msgstr "Geen geometriewaarde opgegeven."
 
 msgid "Invalid geometry value."
-msgstr "Ongeldige geometrie waarde."
+msgstr "Ongeldige geometriewaarde."
 
 msgid "Invalid geometry type."
-msgstr "Ongeldig geometrie type."
+msgstr "Ongeldig geometrietype."
 
 msgid ""
 "An error occurred when transforming the geometry to the SRID of the geometry "
 "form field."
 msgstr ""
 "Er is een fout opgetreden bij het omvormen van de geometrie naar de SRID van "
-"het geometrie veld."
+"het geometrieveld."
 
 msgid "Delete all Features"
-msgstr "Verwijder alle Kenmerken"
+msgstr "Alle kenmerken verwijderen"
 
 msgid "WKT debugging window:"
-msgstr "WKT debug-venster:"
-
-msgid "Google Maps via GeoDjango"
-msgstr "Google Maps via GeoDjango"
+msgstr "WKT-debugvenster:"
 
 msgid "Debugging window (serialized value)"
-msgstr "Debug-venster (geserialiseerde waarde)"
+msgstr "Debugvenster (geserialiseerde waarde)"
 
 msgid "No feeds are registered."
-msgstr "Er zijn geen feeds geregistreerd"
+msgstr "Er zijn geen feeds geregistreerd."
 
 #, python-format
 msgid "Slug %r isn't registered."

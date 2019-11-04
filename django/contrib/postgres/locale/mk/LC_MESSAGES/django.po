@@ -2,15 +2,15 @@
 #
 # Translators:
 # dekomote <dr.mote@gmail.com>, 2015
-# Vasil Vangelovski <vvangelovski@gmail.com>, 2015
+# Vasil Vangelovski <vvangelovski@gmail.com>, 2015-2017
 # Vasil Vangelovski <vvangelovski@gmail.com>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2015-10-10 08:55+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2017-01-19 16:49+0100\n"
+"PO-Revision-Date: 2017-09-23 20:42+0000\n"
+"Last-Translator: Vasil Vangelovski <vvangelovski@gmail.com>\n"
 "Language-Team: Macedonian (http://www.transifex.com/django/django/language/"
 "mk/)\n"
 "MIME-Version: 1.0\n"
@@ -29,25 +29,28 @@ msgstr "Членот %(nth)s на низата не помина валидац�
 msgid "Nested arrays must have the same length."
 msgstr "Вгнездени низи мораат да имаат иста должина."
 
-msgid "Map of strings to strings"
-msgstr "Асоцијативна низа на текстуален податок со текстуален податок."
+msgid "Map of strings to strings/nulls"
+msgstr ""
 
 #, python-format
-msgid "The value of \"%(key)s\" is not a string."
-msgstr "Вредноста за \"%(key)s\" не е низа од знаци."
+msgid "The value of \"%(key)s\" is not a string or null."
+msgstr "Вредноста за \"%(key)s\" не е низа од знаци или ништо (null)."
 
 msgid "A JSON object"
-msgstr ""
+msgstr "JSON објект"
 
 msgid "Value must be valid JSON."
-msgstr ""
+msgstr "Вредноста мора да биде валиден JSON."
 
 msgid "Could not load JSON data."
 msgstr "Не можеа да се вчитаат JSON податоци."
 
+msgid "Input must be a JSON dictionary."
+msgstr ""
+
 #, python-format
 msgid "'%(value)s' value must be valid JSON."
-msgstr ""
+msgstr "'%(value)s' вредност мора да биде валиден JSON."
 
 msgid "Enter two valid values."
 msgstr "Внесете две валидни вредности."

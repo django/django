@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 import logging
 import logging.config  # needed when logging_config doesn't start with logging.config
 from copy import copy
@@ -10,6 +8,8 @@ from django.core.mail import get_connection
 from django.core.management.color import color_style
 from django.utils.module_loading import import_string
 from django.views.debug import ExceptionReporter
+
+request_logger = logging.getLogger('django.request')
 
 # Default logging for Django. This sends an email to the site admins on every
 # HTTP 500 error. Depending on DEBUG, all other log records are either sent to
@@ -29,7 +29,8 @@ DEFAULT_LOGGING = {
     'formatters': {
         'django.server': {
             '()': 'django.utils.log.ServerFormatter',
-            'format': '[%(server_time)s] %(message)s',
+            'format': '[{server_time}] {message}',
+            'style': '{',
         }
     },
     'handlers': {
@@ -83,7 +84,7 @@ class AdminEmailHandler(logging.Handler):
     """
 
     def __init__(self, include_html=False, email_backend=None):
-        logging.Handler.__init__(self)
+        super().__init__()
         self.include_html = include_html
         self.email_backend = email_backend
 
@@ -128,12 +129,9 @@ class AdminEmailHandler(logging.Handler):
 
     def format_subject(self, subject):
         """
-        Escape CR and LF characters, and limit length.
-        RFC 2822's hard limit is 998 characters per line. So, minus "Subject: "
-        the actual subject must be no longer than 989 characters.
+        Escape CR and LF characters.
         """
-        formatted_subject = subject.replace('\n', '\\n').replace('\r', '\\r')
-        return formatted_subject[:989]
+        return subject.replace('\n', '\\n').replace('\r', '\\r')
 
 
 class CallbackFilter(logging.Filter):
@@ -164,31 +162,69 @@ class RequireDebugTrue(logging.Filter):
 class ServerFormatter(logging.Formatter):
     def __init__(self, *args, **kwargs):
         self.style = color_style()
-        super(ServerFormatter, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def format(self, record):
-        args = record.args
         msg = record.msg
+        status_code = getattr(record, 'status_code', None)
 
-        if len(args) == 0:
-            msg = self.style.HTTP_BAD_REQUEST(msg)
-        else:
-            if args[1][0] == '2':
+        if status_code:
+            if 200 <= status_code < 300:
                 # Put 2XX first, since it should be the common case
                 msg = self.style.HTTP_SUCCESS(msg)
-            elif args[1][0] == '1':
+            elif 100 <= status_code < 200:
                 msg = self.style.HTTP_INFO(msg)
-            elif args[1] == '304':
+            elif status_code == 304:
                 msg = self.style.HTTP_NOT_MODIFIED(msg)
-            elif args[1][0] == '3':
+            elif 300 <= status_code < 400:
                 msg = self.style.HTTP_REDIRECT(msg)
-            elif args[1] == '404':
+            elif status_code == 404:
                 msg = self.style.HTTP_NOT_FOUND(msg)
-            elif args[1][0] == '4':
+            elif 400 <= status_code < 500:
                 msg = self.style.HTTP_BAD_REQUEST(msg)
             else:
-                # Any 5XX, or any other response
+                # Any 5XX, or any other status code
                 msg = self.style.HTTP_SERVER_ERROR(msg)
 
+        if self.uses_server_time() and not hasattr(record, 'server_time'):
+            record.server_time = self.formatTime(record, self.datefmt)
+
         record.msg = msg
-        return super(ServerFormatter, self).format(record)
+        return super().format(record)
+
+    def uses_server_time(self):
+        return self._fmt.find('{server_time}') >= 0
+
+
+def log_response(message, *args, response=None, request=None, logger=request_logger, level=None, exc_info=None):
+    """
+    Log errors based on HttpResponse status.
+
+    Log 5xx responses as errors and 4xx responses as warnings (unless a level
+    is given as a keyword argument). The HttpResponse status_code and the
+    request are passed to the logger's extra parameter.
+    """
+    # Check if the response has already been logged. Multiple requests to log
+    # the same response can be received in some cases, e.g., when the
+    # response is the result of an exception and is logged at the time the
+    # exception is caught so that the exc_info can be recorded.
+    if getattr(response, '_has_been_logged', False):
+        return
+
+    if level is None:
+        if response.status_code >= 500:
+            level = 'error'
+        elif response.status_code >= 400:
+            level = 'warning'
+        else:
+            level = 'info'
+
+    getattr(logger, level)(
+        message, *args,
+        extra={
+            'status_code': response.status_code,
+            'request': request,
+        },
+        exc_info=exc_info,
+    )
+    response._has_been_logged = True

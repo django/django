@@ -4,7 +4,7 @@
 # Claudio Fernandes <squeral@gmail.com>, 2015
 # Jannis Leidel <jannis@leidel.info>, 2011
 # jorgecarleitao <jorgecarleitao@gmail.com>, 2015
-# Manuela Silva <h_manuela_rodsilva@gmail.com>, 2015
+# Manuela Silva <inactive+h_manuela_rodsilva@transifex.com>, 2015
 # Nuno Mariz <nmariz@gmail.com>, 2011-2012,2015
 # Paulo Köch <paulo.koch@gmail.com>, 2011
 # Raúl Pedro Fernandes Santos, 2014
@@ -12,9 +12,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2015-11-24 18:10+0000\n"
-"Last-Translator: Nuno Mariz <nmariz@gmail.com>\n"
+"POT-Creation-Date: 2017-01-19 16:49+0100\n"
+"PO-Revision-Date: 2017-09-23 18:54+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Portuguese (http://www.transifex.com/django/django/language/"
 "pt/)\n"
 "MIME-Version: 1.0\n"
@@ -83,9 +83,6 @@ msgstr "Eliminar todas as Caraterísticas"
 
 msgid "WKT debugging window:"
 msgstr "Janela de depuração de WKT:"
-
-msgid "Google Maps via GeoDjango"
-msgstr "Google Maps via GeoDjango"
 
 msgid "Debugging window (serialized value)"
 msgstr "Janela de depuração (valor serializado)"

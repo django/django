@@ -1,0 +1,128 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# Martin Tóth <ezimir@gmail.com>, 2017-2018
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2018-05-17 11:49+0200\n"
+"PO-Revision-Date: 2018-09-05 17:06+0000\n"
+"Last-Translator: Martin Tóth <ezimir@gmail.com>\n"
+"Language-Team: Slovak (http://www.transifex.com/django/django/language/sk/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: sk\n"
+"Plural-Forms: nplurals=4; plural=(n % 1 == 0 && n == 1 ? 0 : n % 1 == 0 && n "
+">= 2 && n <= 4 ? 1 : n % 1 != 0 ? 2: 3);\n"
+
+msgid "PostgreSQL extensions"
+msgstr "PostgreSQL rozšírenia"
+
+#, python-format
+msgid "Item %(nth)s in the array did not validate:"
+msgstr "%(nth)s. položka poľa je neplatná:"
+
+msgid "Nested arrays must have the same length."
+msgstr "Vnorené polia musia mať rovnakú dĺžku."
+
+msgid "Map of strings to strings/nulls"
+msgstr "Mapovanie reťazcov na reťazce/NULL"
+
+#, python-format
+msgid "The value of \"%(key)s\" is not a string or null."
+msgstr "Hodnota s kľúčom \"%(key)s\" nie je reťazec ani NULL."
+
+msgid "A JSON object"
+msgstr "Objekt JSON"
+
+msgid "Value must be valid JSON."
+msgstr "Musí byť v platnom formáte JSON."
+
+msgid "Could not load JSON data."
+msgstr "Údaje typu JSON sa nepodarilo načítať."
+
+msgid "Input must be a JSON dictionary."
+msgstr "Vstup musí byť slovník vo formáte JSON."
+
+#, python-format
+msgid "'%(value)s' value must be valid JSON."
+msgstr "Hodnota '%(value)s' musí byť v platnom formáte JSON."
+
+msgid "Enter two valid values."
+msgstr "Zadajte dve platné hodnoty."
+
+msgid "The start of the range must not exceed the end of the range."
+msgstr "Začiatočná hodnota rozsahu nesmie býť vyššia ako koncová hodnota."
+
+msgid "Enter two whole numbers."
+msgstr "Zadajte dve celé čísla."
+
+msgid "Enter two numbers."
+msgstr "Zadajte dve čísla."
+
+msgid "Enter two valid date/times."
+msgstr "Zadajte dva platné dátumy/časy."
+
+msgid "Enter two valid dates."
+msgstr "Zadajte dva platné dátumy."
+
+#, python-format
+msgid ""
+"List contains %(show_value)d item, it should contain no more than "
+"%(limit_value)d."
+msgid_plural ""
+"List contains %(show_value)d items, it should contain no more than "
+"%(limit_value)d."
+msgstr[0] ""
+"Zoznam obsahuje %(show_value)d položku, ale nemal by obsahovať viac ako "
+"%(limit_value)d."
+msgstr[1] ""
+"Zoznam obsahuje %(show_value)d položku, ale nemal by obsahovať viac ako "
+"%(limit_value)d."
+msgstr[2] ""
+"Zoznam obsahuje %(show_value)d položku, ale nemal by obsahovať viac ako "
+"%(limit_value)d."
+msgstr[3] ""
+"Zoznam obsahuje %(show_value)d položku, ale nemal by obsahovať viac ako "
+"%(limit_value)d."
+
+#, python-format
+msgid ""
+"List contains %(show_value)d item, it should contain no fewer than "
+"%(limit_value)d."
+msgid_plural ""
+"List contains %(show_value)d items, it should contain no fewer than "
+"%(limit_value)d."
+msgstr[0] ""
+"Zoznam obsahuje %(show_value)d položku, ale nemal by obsahovať menej ako "
+"%(limit_value)d."
+msgstr[1] ""
+"Zoznam obsahuje %(show_value)d položku, ale nemal by obsahovať menej ako "
+"%(limit_value)d."
+msgstr[2] ""
+"Zoznam obsahuje %(show_value)d položku, ale nemal by obsahovať menej ako "
+"%(limit_value)d."
+msgstr[3] ""
+"Zoznam obsahuje %(show_value)d položku, ale nemal by obsahovať menej ako "
+"%(limit_value)d."
+
+#, python-format
+msgid "Some keys were missing: %(keys)s"
+msgstr "Niektoré kľúče chýbajú: %(keys)s"
+
+#, python-format
+msgid "Some unknown keys were provided: %(keys)s"
+msgstr "Boli zadané neznáme kľúče: %(keys)s"
+
+#, python-format
+msgid ""
+"Ensure that this range is completely less than or equal to %(limit_value)s."
+msgstr "Hodnota rozsahu musí byť celá menšia alebo rovná %(limit_value)s."
+
+#, python-format
+msgid ""
+"Ensure that this range is completely greater than or equal to "
+"%(limit_value)s."
+msgstr "Hodnota rozsahu musí byť celá väčšia alebo rovná %(limit_value)s."

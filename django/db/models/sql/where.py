@@ -2,7 +2,7 @@
 Code to manage the creation and SQL rendering of 'where' constraints.
 """
 
-from django.db.models.sql.datastructures import EmptyResultSet
+from django.core.exceptions import EmptyResultSet
 from django.utils import tree
 from django.utils.functional import cached_property
 
@@ -13,7 +13,7 @@ OR = 'OR'
 
 class WhereNode(tree.Node):
     """
-    Used to represent the SQL where-clause.
+    An SQL WHERE clause.
 
     The class is tied to the Query class that created it (in order to create
     the correct SQL).
@@ -26,10 +26,12 @@ class WhereNode(tree.Node):
     contains_aggregate attribute.
     """
     default = AND
+    resolved = False
+    conditional = True
 
     def split_having(self, negated=False):
         """
-        Returns two possibly None nodes: one for those parts of self that
+        Return two possibly None nodes: one for those parts of self that
         should be included in the WHERE clause and one for those parts of
         self that must be included in the HAVING clause.
         """
@@ -62,9 +64,9 @@ class WhereNode(tree.Node):
 
     def as_sql(self, compiler, connection):
         """
-        Returns the SQL version of the where clause and the value to be
-        substituted in. Returns '', [] if this node matches everything,
-        None, [] if this node is empty, and raises EmptyResultSet if this
+        Return the SQL version of the where clause and the value to be
+        substituted in. Return '', [] if this node matches everything,
+        None, [] if this node is empty, and raise EmptyResultSet if this
         node can't match anything.
         """
         result = []
@@ -108,7 +110,7 @@ class WhereNode(tree.Node):
                 # around the inner SQL in the negated case, even if the
                 # inner SQL contains just a single expression.
                 sql_string = 'NOT (%s)' % sql_string
-            elif len(result) > 1:
+            elif len(result) > 1 or self.resolved:
                 sql_string = '(%s)' % sql_string
         return sql_string, result_params
 
@@ -118,9 +120,16 @@ class WhereNode(tree.Node):
             cols.extend(child.get_group_by_cols())
         return cols
 
+    def get_source_expressions(self):
+        return self.children[:]
+
+    def set_source_expressions(self, children):
+        assert len(children) == len(self.children)
+        self.children = children
+
     def relabel_aliases(self, change_map):
         """
-        Relabels the alias values of any children. 'change_map' is a dictionary
+        Relabel the alias values of any children. 'change_map' is a dictionary
         mapping old (current) alias values to the new values.
         """
         for pos, child in enumerate(self.children):
@@ -132,8 +141,8 @@ class WhereNode(tree.Node):
 
     def clone(self):
         """
-        Creates a clone of the tree. Must only be called on root nodes (nodes
-        with empty subtree_parents). Childs must be either (Contraint, lookup,
+        Create a clone of the tree. Must only be called on root nodes (nodes
+        with empty subtree_parents). Childs must be either (Constraint, lookup,
         value) tuples, or objects supporting .clone().
         """
         clone = self.__class__._new_instance(
@@ -160,18 +169,35 @@ class WhereNode(tree.Node):
     def contains_aggregate(self):
         return self._contains_aggregate(self)
 
+    @classmethod
+    def _contains_over_clause(cls, obj):
+        if isinstance(obj, tree.Node):
+            return any(cls._contains_over_clause(c) for c in obj.children)
+        return obj.contains_over_clause
 
-class NothingNode(object):
-    """
-    A node that matches nothing.
-    """
+    @cached_property
+    def contains_over_clause(self):
+        return self._contains_over_clause(self)
+
+    @property
+    def is_summary(self):
+        return any(child.is_summary for child in self.children)
+
+    def resolve_expression(self, *args, **kwargs):
+        clone = self.clone()
+        clone.resolved = True
+        return clone
+
+
+class NothingNode:
+    """A node that matches nothing."""
     contains_aggregate = False
 
     def as_sql(self, compiler=None, connection=None):
         raise EmptyResultSet
 
 
-class ExtraWhere(object):
+class ExtraWhere:
     # The contents are a black box - assume no aggregates are used.
     contains_aggregate = False
 
@@ -184,7 +210,7 @@ class ExtraWhere(object):
         return " AND ".join(sqls), list(self.params or ())
 
 
-class SubqueryConstraint(object):
+class SubqueryConstraint:
     # Even if aggregates would be used in a subquery, the outer query isn't
     # interested about those.
     contains_aggregate = False
@@ -197,28 +223,6 @@ class SubqueryConstraint(object):
 
     def as_sql(self, compiler, connection):
         query = self.query_object
-
-        # QuerySet was sent
-        if hasattr(query, 'values'):
-            if query._db and connection.alias != query._db:
-                raise ValueError("Can't do subqueries with queries on different DBs.")
-            # Do not override already existing values.
-            if query._fields is None:
-                query = query.values(*self.targets)
-            else:
-                query = query._clone()
-            query = query.query
-            if query.can_filter():
-                # If there is no slicing in use, then we can safely drop all ordering
-                query.clear_ordering(True)
-
+        query.set_values(self.targets)
         query_compiler = query.get_compiler(connection=connection)
         return query_compiler.as_subquery_condition(self.alias, self.columns, compiler)
-
-    def relabel_aliases(self, change_map):
-        self.alias = change_map.get(self.alias, self.alias)
-
-    def clone(self):
-        return self.__class__(
-            self.alias, self.columns, self.targets,
-            self.query_object)

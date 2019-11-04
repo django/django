@@ -1,0 +1,130 @@
+=================================
+PostgreSQL specific model indexes
+=================================
+
+.. module:: django.contrib.postgres.indexes
+
+The following are PostgreSQL specific :doc:`indexes </ref/models/indexes>`
+available from the ``django.contrib.postgres.indexes`` module.
+
+``BrinIndex``
+=============
+
+.. class:: BrinIndex(autosummarize=None, pages_per_range=None, **options)
+
+    Creates a `BRIN index
+    <https://www.postgresql.org/docs/current/brin-intro.html>`_.
+
+    Set the ``autosummarize`` parameter to ``True`` to enable `automatic
+    summarization`_ to be performed by autovacuum.
+
+    The ``pages_per_range`` argument takes a positive integer.
+
+    .. _automatic summarization: https://www.postgresql.org/docs/current/brin-intro.html#BRIN-OPERATION
+
+    .. versionchanged:: 2.2
+
+        The ``autosummarize`` parameter was added.
+
+``BTreeIndex``
+==============
+
+.. class:: BTreeIndex(fillfactor=None, **options)
+
+    .. versionadded:: 2.2
+
+    Creates a B-Tree index.
+
+    Provide an integer value from 10 to 100 to the fillfactor_ parameter to
+    tune how packed the index pages will be. PostgreSQL's default is 90.
+
+    .. _fillfactor: https://www.postgresql.org/docs/current/sql-createindex.html#SQL-CREATEINDEX-STORAGE-PARAMETERS
+
+``GinIndex``
+============
+
+.. class:: GinIndex(fastupdate=None, gin_pending_list_limit=None, **options)
+
+    Creates a `gin index <https://www.postgresql.org/docs/current/gin.html>`_.
+
+    To use this index on data types not in the `built-in operator classes
+    <https://www.postgresql.org/docs/current/gin-builtin-opclasses.html>`_,
+    you need to activate the `btree_gin extension
+    <https://www.postgresql.org/docs/current/btree-gin.html>`_ on
+    PostgreSQL. You can install it using the
+    :class:`~django.contrib.postgres.operations.BtreeGinExtension` migration
+    operation.
+
+    Set the ``fastupdate`` parameter to ``False`` to disable the `GIN Fast
+    Update Technique`_ that's enabled by default in PostgreSQL.
+
+    Provide an integer number of bytes to the gin_pending_list_limit_ parameter
+    to tune the maximum size of the GIN pending list which is used when
+    ``fastupdate`` is enabled. This parameter requires PostgreSQL ≥ 9.5.
+
+    .. _GIN Fast Update Technique: https://www.postgresql.org/docs/current/gin-implementation.html#GIN-FAST-UPDATE
+    .. _gin_pending_list_limit: https://www.postgresql.org/docs/current/runtime-config-client.html#GUC-GIN-PENDING-LIST-LIMIT
+
+``GistIndex``
+=============
+
+.. class:: GistIndex(buffering=None, fillfactor=None, **options)
+
+    Creates a `GiST index
+    <https://www.postgresql.org/docs/current/gist.html>`_. These indexes are
+    automatically created on spatial fields with :attr:`spatial_index=True
+    <django.contrib.gis.db.models.BaseSpatialField.spatial_index>`. They're
+    also useful on other types, such as
+    :class:`~django.contrib.postgres.fields.HStoreField` or the :ref:`range
+    fields <range-fields>`.
+
+    To use this index on data types not in the built-in `gist operator classes
+    <https://www.postgresql.org/docs/current/gist-builtin-opclasses.html>`_,
+    you need to activate the `btree_gist extension
+    <https://www.postgresql.org/docs/current/btree-gist.html>`_ on PostgreSQL.
+    You can install it using the
+    :class:`~django.contrib.postgres.operations.BtreeGistExtension` migration
+    operation.
+
+    Set the ``buffering`` parameter to ``True`` or ``False`` to manually enable
+    or disable `buffering build`_ of the index.
+
+    Provide an integer value from 10 to 100 to the fillfactor_ parameter to
+    tune how packed the index pages will be. PostgreSQL's default is 90.
+
+    .. _buffering build: https://www.postgresql.org/docs/current/gist-implementation.html#GIST-BUFFERING-BUILD
+    .. _fillfactor: https://www.postgresql.org/docs/current/sql-createindex.html#SQL-CREATEINDEX-STORAGE-PARAMETERS
+
+``HashIndex``
+=============
+
+.. class:: HashIndex(fillfactor=None, **options)
+
+    .. versionadded:: 2.2
+
+    Creates a hash index.
+
+    Provide an integer value from 10 to 100 to the fillfactor_ parameter to
+    tune how packed the index pages will be. PostgreSQL's default is 90.
+
+    .. admonition:: Use this index only on PostgreSQL 10 and later
+
+        Hash indexes have been available in PostgreSQL for a long time, but
+        they suffer from a number of data integrity issues in older versions.
+
+    .. _fillfactor: https://www.postgresql.org/docs/current/sql-createindex.html#SQL-CREATEINDEX-STORAGE-PARAMETERS
+
+``SpGistIndex``
+===============
+
+.. class:: SpGistIndex(fillfactor=None, **options)
+
+    .. versionadded:: 2.2
+
+    Creates an `SP-GiST index
+    <https://www.postgresql.org/docs/current/spgist.html>`_.
+
+    Provide an integer value from 10 to 100 to the fillfactor_ parameter to
+    tune how packed the index pages will be. PostgreSQL's default is 90.
+
+    .. _fillfactor: https://www.postgresql.org/docs/current/sql-createindex.html#SQL-CREATEINDEX-STORAGE-PARAMETERS

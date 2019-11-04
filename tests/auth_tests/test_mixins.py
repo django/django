@@ -1,3 +1,5 @@
+from unittest import mock
+
 from django.contrib.auth import models
 from django.contrib.auth.mixins import (
     LoginRequiredMixin, PermissionRequiredMixin, UserPassesTestMixin,
@@ -5,7 +7,7 @@ from django.contrib.auth.mixins import (
 from django.contrib.auth.models import AnonymousUser
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponse
-from django.test import RequestFactory, TestCase
+from django.test import RequestFactory, SimpleTestCase, TestCase
 from django.views.generic import View
 
 
@@ -78,9 +80,23 @@ class AccessMixinTests(TestCase):
         with self.assertRaises(PermissionDenied):
             view(request)
 
+    def test_access_mixin_permission_denied_response(self):
+        user = models.User.objects.create(username='joe', password='qwerty')
+        # Authenticated users receive PermissionDenied.
+        request = self.factory.get('/rand')
+        request.user = user
+        view = AlwaysFalseView.as_view()
+        with self.assertRaises(PermissionDenied):
+            view(request)
+        # Anonymous users are redirected to the login page.
+        request.user = AnonymousUser()
+        response = view(request)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, '/accounts/login/?next=/rand')
+
+    @mock.patch.object(models.User, 'is_authenticated', False)
     def test_stacked_mixins_not_logged_in(self):
         user = models.User.objects.create(username='joe', password='qwerty')
-        user.is_authenticated = lambda: False
         perms = models.Permission.objects.filter(codename__in=('add_customuser', 'change_customuser'))
         user.user_permissions.add(*perms)
         request = self.factory.get('/rand')
@@ -95,7 +111,7 @@ class AccessMixinTests(TestCase):
             view(request)
 
 
-class UserPassesTestTests(TestCase):
+class UserPassesTestTests(SimpleTestCase):
 
     factory = RequestFactory()
 
@@ -186,8 +202,8 @@ class LoginRequiredMixinTests(TestCase):
 
     def test_login_required(self):
         """
-        Check that login_required works on a simple view wrapped in a
-        login_required decorator.
+        login_required works on a simple view wrapped in a login_required
+        decorator.
         """
         class AView(LoginRequiredMixin, EmptyResponseView):
             pass
@@ -236,18 +252,23 @@ class PermissionsRequiredMixinTests(TestCase):
     def test_permissioned_denied_redirect(self):
         class AView(PermissionRequiredMixin, EmptyResponseView):
             permission_required = [
-                'auth_tests.add_customuser', 'auth_tests.change_customuser', 'non-existent-permission',
+                'auth_tests.add_customuser', 'auth_tests.change_customuser', 'nonexistent-permission',
             ]
 
+        # Authenticated users receive PermissionDenied.
         request = self.factory.get('/rand')
         request.user = self.user
+        with self.assertRaises(PermissionDenied):
+            AView.as_view()(request)
+        # Anonymous users are redirected to the login page.
+        request.user = AnonymousUser()
         resp = AView.as_view()(request)
         self.assertEqual(resp.status_code, 302)
 
     def test_permissioned_denied_exception_raised(self):
         class AView(PermissionRequiredMixin, EmptyResponseView):
             permission_required = [
-                'auth_tests.add_customuser', 'auth_tests.change_customuser', 'non-existent-permission',
+                'auth_tests.add_customuser', 'auth_tests.change_customuser', 'nonexistent-permission',
             ]
             raise_exception = True
 

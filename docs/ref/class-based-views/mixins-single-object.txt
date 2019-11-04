@@ -100,7 +100,7 @@ Single object mixins
 
     .. method:: get_context_data(**kwargs)
 
-        Returns context data for displaying the list of objects.
+        Returns context data for displaying the object.
 
         The base implementation of this method requires that the ``self.object``
         attribute be set by the view (even if ``None``). Be sure to do this if

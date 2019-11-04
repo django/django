@@ -12,8 +12,8 @@ Write a simple form
 Let's update our poll detail template ("polls/detail.html") from the last
 tutorial, so that the template contains an HTML ``<form>`` element:
 
-.. snippet:: html+django
-    :filename: polls/templates/polls/detail.html
+.. code-block:: html+django
+    :caption: polls/templates/polls/detail.html
 
     <h1>{{ question.question_text }}</h1>
 
@@ -22,10 +22,10 @@ tutorial, so that the template contains an HTML ``<form>`` element:
     <form action="{% url 'polls:vote' question.id %}" method="post">
     {% csrf_token %}
     {% for choice in question.choice_set.all %}
-        <input type="radio" name="choice" id="choice{{ forloop.counter }}" value="{{ choice.id }}" />
-        <label for="choice{{ forloop.counter }}">{{ choice.choice_text }}</label><br />
+        <input type="radio" name="choice" id="choice{{ forloop.counter }}" value="{{ choice.id }}">
+        <label for="choice{{ forloop.counter }}">{{ choice.choice_text }}</label><br>
     {% endfor %}
-    <input type="submit" value="Vote" />
+    <input type="submit" value="Vote">
     </form>
 
 A quick rundown:
@@ -58,19 +58,19 @@ Now, let's create a Django view that handles the submitted data and does
 something with it. Remember, in :doc:`Tutorial 3 </intro/tutorial03>`, we
 created a URLconf for the polls application that includes this line:
 
-.. snippet::
-    :filename: polls/urls.py
+.. code-block:: python
+    :caption: polls/urls.py
 
-    url(r'^(?P<question_id>[0-9]+)/vote/$', views.vote, name='vote'),
+    path('<int:question_id>/vote/', views.vote, name='vote'),
 
 We also created a dummy implementation of the ``vote()`` function. Let's
 create a real version. Add the following to ``polls/views.py``:
 
-.. snippet::
-    :filename: polls/views.py
+.. code-block:: python
+    :caption: polls/views.py
 
+    from django.http import HttpResponse, HttpResponseRedirect
     from django.shortcuts import get_object_or_404, render
-    from django.http import HttpResponseRedirect, HttpResponse
     from django.urls import reverse
 
     from .models import Choice, Question
@@ -146,8 +146,8 @@ response documentation </ref/request-response>`.
 After somebody votes in a question, the ``vote()`` view redirects to the results
 page for the question. Let's write that view:
 
-.. snippet::
-    :filename: polls/views.py
+.. code-block:: python
+    :caption: polls/views.py
 
     from django.shortcuts import get_object_or_404, render
 
@@ -162,8 +162,8 @@ redundancy later.
 
 Now, create a ``polls/results.html`` template:
 
-.. snippet:: html+django
-    :filename: polls/templates/polls/results.html
+.. code-block:: html+django
+    :caption: polls/templates/polls/results.html
 
     <h1>{{ question.question_text }}</h1>
 
@@ -211,11 +211,11 @@ Let's convert our poll app to use the generic views system, so we can delete a
 bunch of our own code. We'll just have to take a few steps to make the
 conversion. We will:
 
-1. Convert the URLconf.
+#. Convert the URLconf.
 
-2. Delete some of the old, unneeded views.
+#. Delete some of the old, unneeded views.
 
-3. Introduce new views based on Django's generic views.
+#. Introduce new views based on Django's generic views.
 
 Read on for details.
 
@@ -234,23 +234,23 @@ Amend URLconf
 
 First, open the ``polls/urls.py`` URLconf and change it like so:
 
-.. snippet::
-    :filename: polls/urls.py
+.. code-block:: python
+    :caption: polls/urls.py
 
-    from django.conf.urls import url
+    from django.urls import path
 
     from . import views
 
     app_name = 'polls'
     urlpatterns = [
-        url(r'^$', views.IndexView.as_view(), name='index'),
-        url(r'^(?P<pk>[0-9]+)/$', views.DetailView.as_view(), name='detail'),
-        url(r'^(?P<pk>[0-9]+)/results/$', views.ResultsView.as_view(), name='results'),
-        url(r'^(?P<question_id>[0-9]+)/vote/$', views.vote, name='vote'),
+        path('', views.IndexView.as_view(), name='index'),
+        path('<int:pk>/', views.DetailView.as_view(), name='detail'),
+        path('<int:pk>/results/', views.ResultsView.as_view(), name='results'),
+        path('<int:question_id>/vote/', views.vote, name='vote'),
     ]
 
-Note that the name of the matched pattern in the regexes of the second and third
-patterns has changed from ``<question_id>`` to ``<pk>``.
+Note that the name of the matched pattern in the path strings of the second and
+third patterns has changed from ``<question_id>`` to ``<pk>``.
 
 Amend views
 -----------
@@ -259,11 +259,11 @@ Next, we're going to remove our old ``index``, ``detail``, and ``results``
 views and use Django's generic views instead. To do so, open the
 ``polls/views.py`` file and change it like so:
 
-.. snippet::
-    :filename: polls/views.py
+.. code-block:: python
+    :caption: polls/views.py
 
-    from django.shortcuts import get_object_or_404, render
     from django.http import HttpResponseRedirect
+    from django.shortcuts import get_object_or_404, render
     from django.urls import reverse
     from django.views import generic
 

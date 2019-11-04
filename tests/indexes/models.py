@@ -13,12 +13,13 @@ class CurrentTranslation(models.ForeignObject):
         kwargs['related_name'] = '+'
         # Set unique to enable model cache.
         kwargs['unique'] = True
-        super(CurrentTranslation, self).__init__(to, on_delete, from_fields, to_fields, **kwargs)
+        super().__init__(to, on_delete, from_fields, to_fields, **kwargs)
 
 
 class ArticleTranslation(models.Model):
 
     article = models.ForeignKey('indexes.Article', models.CASCADE)
+    article_no_constraint = models.ForeignKey('indexes.Article', models.CASCADE, db_constraint=False, related_name='+')
     language = models.CharField(max_length=10, unique=True)
     content = models.TextField()
 
@@ -26,6 +27,7 @@ class ArticleTranslation(models.Model):
 class Article(models.Model):
     headline = models.CharField(max_length=100)
     pub_date = models.DateTimeField()
+    published = models.BooleanField(default=False)
 
     # Add virtual relation to the ArticleTranslation model.
     translation = CurrentTranslation(ArticleTranslation, models.CASCADE, ['id'], ['article'])
@@ -44,9 +46,15 @@ class IndexTogetherSingleList(models.Model):
     class Meta:
         index_together = ["headline", "pub_date"]
 
+
 # Indexing a TextField on Oracle or MySQL results in index creation error.
 if connection.vendor == 'postgresql':
     class IndexedArticle(models.Model):
         headline = models.CharField(max_length=100, db_index=True)
         body = models.TextField(db_index=True)
         slug = models.CharField(max_length=40, unique=True)
+
+
+class IndexedArticle2(models.Model):
+    headline = models.CharField(max_length=100)
+    body = models.TextField()

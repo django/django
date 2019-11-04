@@ -1,7 +1,9 @@
+from django.conf import settings
 from django.contrib import auth
 from django.contrib.auth import load_backend
 from django.contrib.auth.backends import RemoteUserBackend
 from django.core.exceptions import ImproperlyConfigured
+from django.utils.deprecation import MiddlewareMixin
 from django.utils.functional import SimpleLazyObject
 
 
@@ -11,31 +13,18 @@ def get_user(request):
     return request._cached_user
 
 
-class AuthenticationMiddleware(object):
+class AuthenticationMiddleware(MiddlewareMixin):
     def process_request(self, request):
         assert hasattr(request, 'session'), (
             "The Django authentication middleware requires session middleware "
-            "to be installed. Edit your MIDDLEWARE_CLASSES setting to insert "
+            "to be installed. Edit your MIDDLEWARE%s setting to insert "
             "'django.contrib.sessions.middleware.SessionMiddleware' before "
             "'django.contrib.auth.middleware.AuthenticationMiddleware'."
-        )
+        ) % ("_CLASSES" if settings.MIDDLEWARE is None else "")
         request.user = SimpleLazyObject(lambda: get_user(request))
 
 
-class SessionAuthenticationMiddleware(object):
-    """
-    Formerly, a middleware for invalidating a user's sessions that don't
-    correspond to the user's current session authentication hash. However, it
-    caused the "Vary: Cookie" header on all responses.
-
-    It's now a shim to allow a single settings file to more easily support
-    multiple versions of Django. Will be RemovedInDjango20Warning.
-    """
-    def process_request(self, request):
-        pass
-
-
-class RemoteUserMiddleware(object):
+class RemoteUserMiddleware(MiddlewareMixin):
     """
     Middleware for utilizing Web-server-provided authentication.
 
@@ -61,7 +50,7 @@ class RemoteUserMiddleware(object):
             raise ImproperlyConfigured(
                 "The Django remote user auth middleware requires the"
                 " authentication middleware to be installed.  Edit your"
-                " MIDDLEWARE_CLASSES setting to insert"
+                " MIDDLEWARE setting to insert"
                 " 'django.contrib.auth.middleware.AuthenticationMiddleware'"
                 " before the RemoteUserMiddleware class.")
         try:
@@ -70,13 +59,13 @@ class RemoteUserMiddleware(object):
             # If specified header doesn't exist then remove any existing
             # authenticated remote-user, or return (leaving request.user set to
             # AnonymousUser by the AuthenticationMiddleware).
-            if self.force_logout_if_no_header and request.user.is_authenticated():
+            if self.force_logout_if_no_header and request.user.is_authenticated:
                 self._remove_invalid_user(request)
             return
         # If the user is already authenticated and that user is the user we are
         # getting passed in the headers, then the correct user is already
         # persisted in the session and we don't need to continue.
-        if request.user.is_authenticated():
+        if request.user.is_authenticated:
             if request.user.get_username() == self.clean_username(username, request):
                 return
             else:
@@ -86,7 +75,7 @@ class RemoteUserMiddleware(object):
 
         # We are seeing this user for the first time in this session, attempt
         # to authenticate the user.
-        user = auth.authenticate(remote_user=username)
+        user = auth.authenticate(request, remote_user=username)
         if user:
             # User is valid.  Set request.user and persist user in the session
             # by logging the user in.
@@ -95,7 +84,7 @@ class RemoteUserMiddleware(object):
 
     def clean_username(self, username, request):
         """
-        Allows the backend to clean the username, if the backend defines a
+        Allow the backend to clean the username, if the backend defines a
         clean_username method.
         """
         backend_str = request.session[auth.BACKEND_SESSION_KEY]
@@ -108,7 +97,7 @@ class RemoteUserMiddleware(object):
 
     def _remove_invalid_user(self, request):
         """
-        Removes the current authenticated user in the request which is invalid
+        Remove the current authenticated user in the request which is invalid
         but only if the user is authenticated via the RemoteUserBackend.
         """
         try:

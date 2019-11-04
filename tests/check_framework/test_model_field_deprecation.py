@@ -17,7 +17,6 @@ class TestDeprecatedField(SimpleTestCase):
         self.assertEqual(model.check(), [
             checks.Warning(
                 msg='MyField has been deprecated.',
-                hint=None,
                 obj=Model._meta.get_field('name'),
                 id='fields.WXXX',
             )
@@ -58,7 +57,6 @@ class TestRemovedField(SimpleTestCase):
         self.assertEqual(model.check(), [
             checks.Error(
                 msg='MyField has been removed except for support in historical migrations.',
-                hint=None,
                 obj=Model._meta.get_field('name'),
                 id='fields.EXXX',
             )

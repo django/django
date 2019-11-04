@@ -1,18 +1,24 @@
-from __future__ import unicode_literals
-
 from psycopg2.extras import Inet
 
 from django.conf import settings
+from django.db import NotSupportedError
 from django.db.backends.base.operations import BaseDatabaseOperations
 
 
 class DatabaseOperations(BaseDatabaseOperations):
+    cast_char_field_without_max_length = 'varchar'
+    explain_prefix = 'EXPLAIN'
+    cast_data_types = {
+        'AutoField': 'integer',
+        'BigAutoField': 'bigint',
+    }
+
     def unification_cast_sql(self, output_field):
         internal_type = output_field.get_internal_type()
         if internal_type in ("GenericIPAddressField", "IPAddressField", "TimeField", "UUIDField"):
             # PostgreSQL will resolve a union as type 'text' if input types are
             # 'unknown'.
-            # http://www.postgresql.org/docs/9.4/static/typeconv-union-case.html
+            # https://www.postgresql.org/docs/current/typeconv-union-case.html
             # These fields cannot be implicitly cast back in the default
             # PostgreSQL configuration so we need to explicitly cast them.
             # We must also remove components of the type within brackets:
@@ -21,43 +27,54 @@ class DatabaseOperations(BaseDatabaseOperations):
         return '%s'
 
     def date_extract_sql(self, lookup_type, field_name):
-        # http://www.postgresql.org/docs/current/static/functions-datetime.html#FUNCTIONS-DATETIME-EXTRACT
+        # https://www.postgresql.org/docs/current/functions-datetime.html#FUNCTIONS-DATETIME-EXTRACT
         if lookup_type == 'week_day':
             # For consistency across backends, we return Sunday=1, Saturday=7.
             return "EXTRACT('dow' FROM %s) + 1" % field_name
+        elif lookup_type == 'iso_year':
+            return "EXTRACT('isoyear' FROM %s)" % field_name
         else:
             return "EXTRACT('%s' FROM %s)" % (lookup_type, field_name)
 
     def date_trunc_sql(self, lookup_type, field_name):
-        # http://www.postgresql.org/docs/current/static/functions-datetime.html#FUNCTIONS-DATETIME-TRUNC
+        # https://www.postgresql.org/docs/current/functions-datetime.html#FUNCTIONS-DATETIME-TRUNC
         return "DATE_TRUNC('%s', %s)" % (lookup_type, field_name)
 
     def _convert_field_to_tz(self, field_name, tzname):
         if settings.USE_TZ:
-            field_name = "%s AT TIME ZONE %%s" % field_name
-            params = [tzname]
-        else:
-            params = []
-        return field_name, params
+            field_name = "%s AT TIME ZONE '%s'" % (field_name, tzname)
+        return field_name
 
     def datetime_cast_date_sql(self, field_name, tzname):
-        field_name, params = self._convert_field_to_tz(field_name, tzname)
-        sql = '(%s)::date' % field_name
-        return sql, params
+        field_name = self._convert_field_to_tz(field_name, tzname)
+        return '(%s)::date' % field_name
+
+    def datetime_cast_time_sql(self, field_name, tzname):
+        field_name = self._convert_field_to_tz(field_name, tzname)
+        return '(%s)::time' % field_name
 
     def datetime_extract_sql(self, lookup_type, field_name, tzname):
-        field_name, params = self._convert_field_to_tz(field_name, tzname)
-        sql = self.date_extract_sql(lookup_type, field_name)
-        return sql, params
+        field_name = self._convert_field_to_tz(field_name, tzname)
+        return self.date_extract_sql(lookup_type, field_name)
 
     def datetime_trunc_sql(self, lookup_type, field_name, tzname):
-        field_name, params = self._convert_field_to_tz(field_name, tzname)
-        # http://www.postgresql.org/docs/current/static/functions-datetime.html#FUNCTIONS-DATETIME-TRUNC
-        sql = "DATE_TRUNC('%s', %s)" % (lookup_type, field_name)
-        return sql, params
+        field_name = self._convert_field_to_tz(field_name, tzname)
+        # https://www.postgresql.org/docs/current/functions-datetime.html#FUNCTIONS-DATETIME-TRUNC
+        return "DATE_TRUNC('%s', %s)" % (lookup_type, field_name)
+
+    def time_trunc_sql(self, lookup_type, field_name):
+        return "DATE_TRUNC('%s', %s)::time" % (lookup_type, field_name)
 
     def deferrable_sql(self):
         return " DEFERRABLE INITIALLY DEFERRED"
+
+    def fetch_returned_insert_ids(self, cursor):
+        """
+        Given a cursor object that has just performed an INSERT...RETURNING
+        statement into a table that has an auto-incrementing ID, return the
+        list of newly created IDs.
+        """
+        return [item[0] for item in cursor.fetchall()]
 
     def lookup_cast(self, lookup_type, internal_type=None):
         lookup = '%s'
@@ -67,6 +84,8 @@ class DatabaseOperations(BaseDatabaseOperations):
                            'istartswith', 'endswith', 'iendswith', 'regex', 'iregex'):
             if internal_type in ('IPAddressField', 'GenericIPAddressField'):
                 lookup = "HOST(%s)"
+            elif internal_type in ('CICharField', 'CIEmailField', 'CITextField'):
+                lookup = '%s::citext'
             else:
                 lookup = "%s::text"
 
@@ -75,13 +94,6 @@ class DatabaseOperations(BaseDatabaseOperations):
             lookup = 'UPPER(%s)' % lookup
 
         return lookup
-
-    def last_insert_id(self, cursor, table_name, pk_name):
-        # Use pg_get_serial_sequence to get the underlying sequence name
-        # from the table name and column name (available since PostgreSQL 8)
-        cursor.execute("SELECT CURRVAL(pg_get_serial_sequence('%s','%s'))" % (
-            self.quote_name(table_name), pk_name))
-        return cursor.fetchone()[0]
 
     def no_limit_value(self):
         return None
@@ -126,16 +138,14 @@ class DatabaseOperations(BaseDatabaseOperations):
         sql = []
         for sequence_info in sequences:
             table_name = sequence_info['table']
-            column_name = sequence_info['column']
-            if not (column_name and len(column_name) > 0):
-                # This will be the case if it's an m2m using an autogenerated
-                # intermediate table (see BaseDatabaseIntrospection.sequence_list)
-                column_name = 'id'
-            sql.append("%s setval(pg_get_serial_sequence('%s','%s'), 1, false);" %
-                (style.SQL_KEYWORD('SELECT'),
+            # 'id' will be the case if it's an m2m using an autogenerated
+            # intermediate table (see BaseDatabaseIntrospection.sequence_list).
+            column_name = sequence_info['column'] or 'id'
+            sql.append("%s setval(pg_get_serial_sequence('%s','%s'), 1, false);" % (
+                style.SQL_KEYWORD('SELECT'),
                 style.SQL_TABLE(self.quote_name(table_name)),
-                style.SQL_FIELD(column_name))
-            )
+                style.SQL_FIELD(column_name),
+            ))
         return sql
 
     def tablespace_sql(self, tablespace, inline=False):
@@ -193,29 +203,29 @@ class DatabaseOperations(BaseDatabaseOperations):
 
     def max_name_length(self):
         """
-        Returns the maximum length of an identifier.
+        Return the maximum length of an identifier.
 
-        Note that the maximum length of an identifier is 63 by default, but can
-        be changed by recompiling PostgreSQL after editing the NAMEDATALEN
-        macro in src/include/pg_config_manual.h .
+        The maximum length of an identifier is 63 by default, but can be
+        changed by recompiling PostgreSQL after editing the NAMEDATALEN
+        macro in src/include/pg_config_manual.h.
 
-        This implementation simply returns 63, but can easily be overridden by a
-        custom database backend that inherits most of its behavior from this one.
+        This implementation returns 63, but can be overridden by a custom
+        database backend that inherits most of its behavior from this one.
         """
-
         return 63
 
-    def distinct_sql(self, fields):
+    def distinct_sql(self, fields, params):
         if fields:
-            return 'DISTINCT ON (%s)' % ', '.join(fields)
+            params = [param for param_list in params for param in param_list]
+            return (['DISTINCT ON (%s)' % ', '.join(fields)], params)
         else:
-            return 'DISTINCT'
+            return ['DISTINCT'], []
 
     def last_executed_query(self, cursor, sql, params):
         # http://initd.org/psycopg/docs/cursor.html#cursor.query
         # The query attribute is a Psycopg extension to the DB API 2.0.
         if cursor.query is not None:
-            return cursor.query.decode('utf-8')
+            return cursor.query.decode()
         return None
 
     def return_insert_id(self):
@@ -239,3 +249,36 @@ class DatabaseOperations(BaseDatabaseOperations):
         if value:
             return Inet(value)
         return None
+
+    def subtract_temporals(self, internal_type, lhs, rhs):
+        if internal_type == 'DateField':
+            lhs_sql, lhs_params = lhs
+            rhs_sql, rhs_params = rhs
+            return "(interval '1 day' * (%s - %s))" % (lhs_sql, rhs_sql), lhs_params + rhs_params
+        return super().subtract_temporals(internal_type, lhs, rhs)
+
+    def window_frame_range_start_end(self, start=None, end=None):
+        start_, end_ = super().window_frame_range_start_end(start, end)
+        if (start and start < 0) or (end and end > 0):
+            raise NotSupportedError(
+                'PostgreSQL only supports UNBOUNDED together with PRECEDING '
+                'and FOLLOWING.'
+            )
+        return start_, end_
+
+    def explain_query_prefix(self, format=None, **options):
+        prefix = super().explain_query_prefix(format)
+        extra = {}
+        if format:
+            extra['FORMAT'] = format
+        if options:
+            extra.update({
+                name.upper(): 'true' if value else 'false'
+                for name, value in options.items()
+            })
+        if extra:
+            prefix += ' (%s)' % ', '.join('%s %s' % i for i in extra.items())
+        return prefix
+
+    def ignore_conflicts_suffix_sql(self, ignore_conflicts=None):
+        return 'ON CONFLICT DO NOTHING' if ignore_conflicts else super().ignore_conflicts_suffix_sql(ignore_conflicts)

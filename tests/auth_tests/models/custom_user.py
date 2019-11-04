@@ -5,11 +5,11 @@ from django.contrib.auth.models import (
 from django.db import models
 
 
-# The custom User uses email as the unique identifier, and requires
+# The custom user uses email as the unique identifier, and requires
 # that every user provide a date of birth. This lets us test
 # changes in username datatype, and non-text required fields.
 class CustomUserManager(BaseUserManager):
-    def create_user(self, email, date_of_birth, password=None):
+    def create_user(self, email, date_of_birth, password=None, **fields):
         """
         Creates and saves a User with the given email and password.
         """
@@ -19,14 +19,15 @@ class CustomUserManager(BaseUserManager):
         user = self.model(
             email=self.normalize_email(email),
             date_of_birth=date_of_birth,
+            **fields
         )
 
         user.set_password(password)
         user.save(using=self._db)
         return user
 
-    def create_superuser(self, email, password, date_of_birth):
-        u = self.create_user(email, password=password, date_of_birth=date_of_birth)
+    def create_superuser(self, email, password, date_of_birth, **fields):
+        u = self.create_user(email, password=password, date_of_birth=date_of_birth, **fields)
         u.is_admin = True
         u.save(using=self._db)
         return u
@@ -37,19 +38,14 @@ class CustomUser(AbstractBaseUser):
     is_active = models.BooleanField(default=True)
     is_admin = models.BooleanField(default=False)
     date_of_birth = models.DateField()
+    first_name = models.CharField(max_length=50)
 
     custom_objects = CustomUserManager()
 
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['date_of_birth']
+    REQUIRED_FIELDS = ['date_of_birth', 'first_name']
 
-    def get_full_name(self):
-        return self.email
-
-    def get_short_name(self):
-        return self.email
-
-    def __unicode__(self):
+    def __str__(self):
         return self.email
 
     # Maybe required?
@@ -74,7 +70,7 @@ class CustomUser(AbstractBaseUser):
         return self.is_admin
 
 
-class RemoveGroupsAndPermissions(object):
+class RemoveGroupsAndPermissions:
     """
     A context manager to temporarily remove the groups and user_permissions M2M
     fields from the AbstractUser class, so they don't clash with the
@@ -93,6 +89,15 @@ class RemoveGroupsAndPermissions(object):
     def __exit__(self, exc_type, exc_value, traceback):
         AbstractUser._meta.local_many_to_many = self._old_au_local_m2m
         PermissionsMixin._meta.local_many_to_many = self._old_pm_local_m2m
+
+
+class CustomUserWithoutIsActiveField(AbstractBaseUser):
+    username = models.CharField(max_length=150, unique=True)
+    email = models.EmailField(unique=True)
+
+    objects = UserManager()
+
+    USERNAME_FIELD = 'username'
 
 
 # The extension user is a simple extension of the built-in user class,

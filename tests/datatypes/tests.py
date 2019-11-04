@@ -1,9 +1,6 @@
-from __future__ import unicode_literals
-
 import datetime
 
 from django.test import TestCase, skipIfDBFeature
-from django.utils import six
 from django.utils.timezone import utc
 
 from .models import Donut, RumBaba
@@ -15,14 +12,18 @@ class DataTypesTestCase(TestCase):
         d = Donut(name='Apple Fritter')
         self.assertFalse(d.is_frosted)
         self.assertIsNone(d.has_sprinkles)
+        self.assertIsNone(d.has_sprinkles_old)
         d.has_sprinkles = True
+        d.has_sprinkles_old = True
         self.assertTrue(d.has_sprinkles)
+        self.assertTrue(d.has_sprinkles_old)
 
         d.save()
 
         d2 = Donut.objects.get(name='Apple Fritter')
         self.assertFalse(d2.is_frosted)
         self.assertTrue(d2.has_sprinkles)
+        self.assertTrue(d2.has_sprinkles_old)
 
     def test_date_type(self):
         d = Donut(name='Apple Fritter')
@@ -47,34 +48,36 @@ class DataTypesTestCase(TestCase):
 
     def test_year_boundaries(self):
         """Year boundary tests (ticket #3689)"""
-        Donut.objects.create(name='Date Test 2007',
-             baked_date=datetime.datetime(year=2007, month=12, day=31),
-             consumed_at=datetime.datetime(year=2007, month=12, day=31, hour=23, minute=59, second=59))
-        Donut.objects.create(name='Date Test 2006',
+        Donut.objects.create(
+            name='Date Test 2007',
+            baked_date=datetime.datetime(year=2007, month=12, day=31),
+            consumed_at=datetime.datetime(year=2007, month=12, day=31, hour=23, minute=59, second=59),
+        )
+        Donut.objects.create(
+            name='Date Test 2006',
             baked_date=datetime.datetime(year=2006, month=1, day=1),
-            consumed_at=datetime.datetime(year=2006, month=1, day=1))
+            consumed_at=datetime.datetime(year=2006, month=1, day=1),
+        )
+        self.assertEqual("Date Test 2007", Donut.objects.filter(baked_date__year=2007)[0].name)
+        self.assertEqual("Date Test 2006", Donut.objects.filter(baked_date__year=2006)[0].name)
 
-        self.assertEqual("Date Test 2007",
-                         Donut.objects.filter(baked_date__year=2007)[0].name)
+        Donut.objects.create(
+            name='Apple Fritter',
+            consumed_at=datetime.datetime(year=2007, month=4, day=20, hour=16, minute=19, second=59),
+        )
 
-        self.assertEqual("Date Test 2006",
-                         Donut.objects.filter(baked_date__year=2006)[0].name)
-
-        Donut.objects.create(name='Apple Fritter',
-            consumed_at=datetime.datetime(year=2007, month=4, day=20, hour=16, minute=19, second=59))
-
-        self.assertEqual(['Apple Fritter', 'Date Test 2007'],
-            list(Donut.objects.filter(consumed_at__year=2007).order_by('name').values_list('name', flat=True)))
-
+        self.assertEqual(
+            ['Apple Fritter', 'Date Test 2007'],
+            list(Donut.objects.filter(consumed_at__year=2007).order_by('name').values_list('name', flat=True))
+        )
         self.assertEqual(0, Donut.objects.filter(consumed_at__year=2005).count())
         self.assertEqual(0, Donut.objects.filter(consumed_at__year=2008).count())
 
-    def test_textfields_unicode(self):
-        """Regression test for #10238: TextField values returned from the
-        database should be unicode."""
+    def test_textfields_str(self):
+        """TextField values returned from the database should be str."""
         d = Donut.objects.create(name='Jelly Donut', review='Outstanding')
         newd = Donut.objects.get(id=d.id)
-        self.assertIsInstance(newd.review, six.text_type)
+        self.assertIsInstance(newd.review, str)
 
     @skipIfDBFeature('supports_timezones')
     def test_error_on_timezone(self):

@@ -2,15 +2,16 @@
 #
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011
+# Vasil Vangelovski <vvangelovski@gmail.com>, 2016
 # Vasil Vangelovski <vvangelovski@gmail.com>, 2014
 # Vasil Vangelovski <vvangelovski@gmail.com>, 2011-2012
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2015-10-10 08:16+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2016-05-17 23:12+0200\n"
+"PO-Revision-Date: 2017-09-23 18:54+0000\n"
+"Last-Translator: Vasil Vangelovski <vvangelovski@gmail.com>\n"
 "Language-Team: Macedonian (http://www.transifex.com/django/django/language/"
 "mk/)\n"
 "MIME-Version: 1.0\n"
@@ -39,21 +40,21 @@ msgid "Filter"
 msgstr "Филтер"
 
 msgid "Choose all"
-msgstr "Избери ги сите"
+msgstr "Одбери ги сите ги сите"
 
 #, javascript-format
 msgid "Click to choose all %s at once."
-msgstr "Кликнете за да ги изберете сите %s од еднаш."
+msgstr "Кликнете за да ги одберете сите %s од еднаш."
 
 msgid "Choose"
-msgstr "Изберете"
+msgstr "Одбери"
 
 msgid "Remove"
 msgstr "Отстрани"
 
 #, javascript-format
 msgid "Chosen %s"
-msgstr "Избрано %s"
+msgstr "Одбрано %s"
 
 #, javascript-format
 msgid ""
@@ -73,7 +74,7 @@ msgstr "Кликнете за да ги отстраните сите одбра
 msgid "%(sel)s of %(cnt)s selected"
 msgid_plural "%(sel)s of %(cnt)s selected"
 msgstr[0] "избрано %(sel)s од %(cnt)s"
-msgstr[1] "избрани %(sel)s од %(cnt)s"
+msgstr[1] "одбрани %(sel)s од %(cnt)s"
 
 msgid ""
 "You have unsaved changes on individual editable fields. If you run an "
@@ -115,10 +116,10 @@ msgid "Now"
 msgstr "Сега"
 
 msgid "Choose a Time"
-msgstr ""
+msgstr "Одбери време"
 
 msgid "Choose a time"
-msgstr "Избери време"
+msgstr "Одбери време"
 
 msgid "Midnight"
 msgstr "Полноќ"
@@ -130,7 +131,7 @@ msgid "Noon"
 msgstr "Пладне"
 
 msgid "6 p.m."
-msgstr ""
+msgstr "6 попладне"
 
 msgid "Cancel"
 msgstr "Откажи"
@@ -139,7 +140,7 @@ msgid "Today"
 msgstr "Денеска"
 
 msgid "Choose a Date"
-msgstr ""
+msgstr "Одбери датум"
 
 msgid "Yesterday"
 msgstr "Вчера"
@@ -147,15 +148,69 @@ msgstr "Вчера"
 msgid "Tomorrow"
 msgstr "Утре"
 
-msgid ""
-"January February March April May June July August September October November "
-"December"
-msgstr ""
-"Јануари Февруари Март Април Мај Јуни Јули Август Септември Октомври Ноември "
-"Декември"
+msgid "January"
+msgstr "Јануари"
 
-msgid "S M T W T F S"
-msgstr "Н П В С Ч П С"
+msgid "February"
+msgstr "Февруари"
+
+msgid "March"
+msgstr "Март"
+
+msgid "April"
+msgstr "Април"
+
+msgid "May"
+msgstr "Мај"
+
+msgid "June"
+msgstr "Јуни"
+
+msgid "July"
+msgstr "Јули"
+
+msgid "August"
+msgstr "Август"
+
+msgid "September"
+msgstr "Септември"
+
+msgid "October"
+msgstr "Октомври"
+
+msgid "November"
+msgstr "Ноември"
+
+msgid "December"
+msgstr "Декември"
+
+msgctxt "one letter Sunday"
+msgid "S"
+msgstr "Н"
+
+msgctxt "one letter Monday"
+msgid "M"
+msgstr "П"
+
+msgctxt "one letter Tuesday"
+msgid "T"
+msgstr "В"
+
+msgctxt "one letter Wednesday"
+msgid "W"
+msgstr "С"
+
+msgctxt "one letter Thursday"
+msgid "T"
+msgstr "Ч"
+
+msgctxt "one letter Friday"
+msgid "F"
+msgstr "П"
+
+msgctxt "one letter Saturday"
+msgid "S"
+msgstr "С"
 
 msgid "Show"
 msgstr "Прикажи"

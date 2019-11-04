@@ -1,15 +1,16 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Igor Jerosimić, 2019
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Janos Guljas <janos@resenje.org>, 2011-2012
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2015-10-10 09:11+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2019-01-16 20:42+0100\n"
+"PO-Revision-Date: 2019-06-27 19:03+0000\n"
+"Last-Translator: Igor Jerosimić\n"
 "Language-Team: Serbian (Latin) (http://www.transifex.com/django/django/"
 "language/sr@latin/)\n"
 "MIME-Version: 1.0\n"
@@ -23,7 +24,7 @@ msgid "Advanced options"
 msgstr "Napredna podešavanja"
 
 msgid "Flat Pages"
-msgstr ""
+msgstr "Flet stranice"
 
 msgid "URL"
 msgstr "URL"
@@ -40,6 +41,9 @@ msgid ""
 msgstr ""
 "Uneta vrednost može sadržati samo slova, brojke, tačke, donje crte, crte, "
 "znake razlomka ili tilde."
+
+msgid "Example: '/about/contact'. Make sure to have a leading slash."
+msgstr "Primer: '/about/contact/'. Pazite na to da postoji početna kosa crta."
 
 msgid "URL is missing a leading slash."
 msgstr "Nedostaje kosa crta na početku URL-a."
@@ -79,7 +83,7 @@ msgstr ""
 "stranicu."
 
 msgid "sites"
-msgstr ""
+msgstr "sajtovi"
 
 msgid "flat page"
 msgstr "flet stranica"

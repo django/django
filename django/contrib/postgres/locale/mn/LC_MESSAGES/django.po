@@ -1,15 +1,17 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Zorig, 2016-2017
+# Zorig, 2019
 # Анхбаяр Анхаа <l.ankhbayar@gmail.com>, 2015
 # Баясгалан Цэвлээ <bayasaa_7672@yahoo.com>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2015-10-10 08:55+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2018-05-17 11:49+0200\n"
+"PO-Revision-Date: 2019-02-19 02:29+0000\n"
+"Last-Translator: Zorig\n"
 "Language-Team: Mongolian (http://www.transifex.com/django/django/language/"
 "mn/)\n"
 "MIME-Version: 1.0\n"
@@ -22,31 +24,34 @@ msgid "PostgreSQL extensions"
 msgstr "PostgreSQL -ын өргөтгөлүүд"
 
 #, python-format
-msgid "Item %(nth)s in the array did not validate: "
+msgid "Item %(nth)s in the array did not validate:"
 msgstr "Массивд байгаа %(nth)s буруу байна"
 
 msgid "Nested arrays must have the same length."
 msgstr "Түүвэрлэсэн массив ижил урттай байх ёстой."
 
-msgid "Map of strings to strings"
-msgstr ""
+msgid "Map of strings to strings/nulls"
+msgstr "Тэмдэгтийг тэмдэгт/null руу заагч"
 
 #, python-format
-msgid "The value of \"%(key)s\" is not a string."
-msgstr "\"%(key)s\" -ийн утга тэмдэгт мөр биш байна."
+msgid "The value of \"%(key)s\" is not a string or null."
+msgstr "\"%(key)s\" -ийн утга тэмдэгт мөр биш эсвэл null биш байна."
 
 msgid "A JSON object"
-msgstr ""
+msgstr "JSON объект"
 
 msgid "Value must be valid JSON."
-msgstr ""
+msgstr "Утга заавал JSON байх ёстой"
 
 msgid "Could not load JSON data."
 msgstr "JSON дата-г уншиж чадахгүй байна."
 
+msgid "Input must be a JSON dictionary."
+msgstr "Оролт JSON dictionary байх ёстой."
+
 #, python-format
 msgid "'%(value)s' value must be valid JSON."
-msgstr ""
+msgstr "'%(value)s' JSON байх ёстой."
 
 msgid "Enter two valid values."
 msgstr "Хоёр зөв утга оруулна уу"

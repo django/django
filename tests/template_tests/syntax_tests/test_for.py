@@ -1,4 +1,5 @@
 from django.template import TemplateSyntaxError
+from django.template.defaulttags import ForNode
 from django.test import SimpleTestCase
 
 from ..utils import setup
@@ -71,23 +72,44 @@ class ForTagTests(SimpleTestCase):
 
     @setup({'for-tag-unpack06': '{% for key value in items %}{{ key }}:{{ value }}/{% endfor %}'})
     def test_for_tag_unpack06(self):
-        with self.assertRaises(TemplateSyntaxError):
+        msg = "'for' tag received an invalid argument: for key value in items"
+        with self.assertRaisesMessage(TemplateSyntaxError, msg):
             self.engine.render_to_string('for-tag-unpack06', {'items': (('one', 1), ('two', 2))})
 
     @setup({'for-tag-unpack07': '{% for key,,value in items %}{{ key }}:{{ value }}/{% endfor %}'})
     def test_for_tag_unpack07(self):
-        with self.assertRaises(TemplateSyntaxError):
+        msg = "'for' tag received an invalid argument: for key,,value in items"
+        with self.assertRaisesMessage(TemplateSyntaxError, msg):
             self.engine.render_to_string('for-tag-unpack07', {'items': (('one', 1), ('two', 2))})
 
     @setup({'for-tag-unpack08': '{% for key,value, in items %}{{ key }}:{{ value }}/{% endfor %}'})
     def test_for_tag_unpack08(self):
-        with self.assertRaises(TemplateSyntaxError):
+        msg = "'for' tag received an invalid argument: for key,value, in items"
+        with self.assertRaisesMessage(TemplateSyntaxError, msg):
             self.engine.render_to_string('for-tag-unpack08', {'items': (('one', 1), ('two', 2))})
+
+    @setup({'double-quote': '{% for "k" in items %}{{ "k" }}/{% endfor %}'})
+    def test_unpack_double_quote(self):
+        msg = """'for' tag received an invalid argument: for "k" in items"""
+        with self.assertRaisesMessage(TemplateSyntaxError, msg):
+            self.engine.render_to_string('double-quote', {'items': (1, 2)})
+
+    @setup({'single-quote': "{% for 'k' in items %}{{ k }}/{% endfor %}"})
+    def test_unpack_single_quote(self):
+        msg = """'for' tag received an invalid argument: for 'k' in items"""
+        with self.assertRaisesMessage(TemplateSyntaxError, msg):
+            self.engine.render_to_string('single-quote', {'items': (1, 2)})
+
+    @setup({'vertical-bar': '{% for k|upper in items %}{{ k|upper }}/{% endfor %}'})
+    def test_unpack_vertical_bar(self):
+        msg = "'for' tag received an invalid argument: for k|upper in items"
+        with self.assertRaisesMessage(TemplateSyntaxError, msg):
+            self.engine.render_to_string('vertical-bar', {'items': (1, 2)})
 
     @setup({'for-tag-unpack09': '{% for val in items %}{{ val.0 }}:{{ val.1 }}/{% endfor %}'})
     def test_for_tag_unpack09(self):
         """
-        Ensure that a single loopvar doesn't truncate the list in val.
+        A single loopvar doesn't truncate the list in val.
         """
         output = self.engine.render_to_string('for-tag-unpack09', {'items': (('one', 1), ('two', 2))})
         self.assertEqual(output, 'one:1/two:2/')
@@ -126,6 +148,11 @@ class ForTagTests(SimpleTestCase):
         output = self.engine.render_to_string('for-tag-filter-ws', {'s': 'abc'})
         self.assertEqual(output, 'abc')
 
+    @setup({'for-tag-unpack-strs': '{% for x,y in items %}{{ x }}:{{ y }}/{% endfor %}'})
+    def test_for_tag_unpack_strs(self):
+        output = self.engine.render_to_string('for-tag-unpack-strs', {'items': ('ab', 'ac')})
+        self.assertEqual(output, 'a:b/a:c/')
+
     @setup({'for-tag-unpack10': '{% for x,y in items %}{{ x }}:{{ y }}/{% endfor %}'})
     def test_for_tag_unpack10(self):
         with self.assertRaisesMessage(ValueError, 'Need 2 values to unpack in for loop; got 3.'):
@@ -154,3 +181,38 @@ class ForTagTests(SimpleTestCase):
     def test_for_tag_unpack14(self):
         with self.assertRaisesMessage(ValueError, 'Need 2 values to unpack in for loop; got 1.'):
             self.engine.render_to_string('for-tag-unpack14', {'items': (1, 2)})
+
+    @setup({
+        'main': '{% with alpha=alpha.values %}{% include "base" %}{% endwith %}_'
+                '{% with alpha=alpha.extra %}{% include "base" %}{% endwith %}',
+        'base': '{% for x, y in alpha %}{{ x }}:{{ y }},{% endfor %}'
+    })
+    def test_for_tag_context(self):
+        """
+        ForNode.render() pops the values it pushes to the context (#28001).
+        """
+        output = self.engine.render_to_string('main', {
+            'alpha': {
+                'values': [('two', 2), ('four', 4)],
+                'extra': [('six', 6), ('eight', 8)],
+            },
+        })
+        self.assertEqual(output, 'two:2,four:4,_six:6,eight:8,')
+
+    @setup({'invalid_for_loop': '{% for x items %}{{ x }}{% endfor %}'})
+    def test_invalid_arg(self):
+        msg = "'for' statements should have at least four words: for x items"
+        with self.assertRaisesMessage(TemplateSyntaxError, msg):
+            self.engine.render_to_string('invalid_for_loop', {'items': (1, 2)})
+
+    @setup({'invalid_for_loop': '{% for x from items %}{{ x }}{% endfor %}'})
+    def test_invalid_in_keyword(self):
+        msg = "'for' statements should use the format 'for x in y': for x from items"
+        with self.assertRaisesMessage(TemplateSyntaxError, msg):
+            self.engine.render_to_string('invalid_for_loop', {'items': (1, 2)})
+
+
+class ForNodeTests(SimpleTestCase):
+    def test_repr(self):
+        node = ForNode('x', 'sequence', is_reversed=True, nodelist_loop=['val'], nodelist_empty=['val2'])
+        self.assertEqual(repr(node), '<ForNode: for x in sequence, tail_len: 1 reversed>')

@@ -1,0 +1,125 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# NullIsNot0 <nullisnot0@inbox.lv>, 2017
+# NullIsNot0 <nullisnot0@inbox.lv>, 2018
+# peterisb <pb@sungis.lv>, 2016-2017
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2018-05-17 11:49+0200\n"
+"PO-Revision-Date: 2018-05-23 16:49+0000\n"
+"Last-Translator: NullIsNot0 <nullisnot0@inbox.lv>\n"
+"Language-Team: Latvian (http://www.transifex.com/django/django/language/"
+"lv/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: lv\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n != 0 ? 1 : "
+"2);\n"
+
+msgid "PostgreSQL extensions"
+msgstr "PostgreSQL paplašinājums"
+
+#, python-format
+msgid "Item %(nth)s in the array did not validate:"
+msgstr "Masīva %(nth)s elements nav pareizs:"
+
+msgid "Nested arrays must have the same length."
+msgstr "Iekļauto masīvu garumam jābūt vienādam."
+
+msgid "Map of strings to strings/nulls"
+msgstr "Virkņu karte uz virknēm/tukšumiem"
+
+#, python-format
+msgid "The value of \"%(key)s\" is not a string or null."
+msgstr "\"%(key)s\" vērtība nav teksta rinda vai nulles simbols."
+
+msgid "A JSON object"
+msgstr "JSON objekts"
+
+msgid "Value must be valid JSON."
+msgstr "Vērtībai ir jābūt derīgam JSON."
+
+msgid "Could not load JSON data."
+msgstr "Nevarēja ielādēt JSON datus."
+
+msgid "Input must be a JSON dictionary."
+msgstr "Ieejošajiem datiem ir jābūt JSON vārdnīcai."
+
+#, python-format
+msgid "'%(value)s' value must be valid JSON."
+msgstr "'%(value)s' vērtībai jābūt korektam JSON."
+
+msgid "Enter two valid values."
+msgstr "Ievadi divas derīgas vērtības."
+
+msgid "The start of the range must not exceed the end of the range."
+msgstr "Diapazona sākums nedrīkst būt liekāks par beigām."
+
+msgid "Enter two whole numbers."
+msgstr "Ievadiet divus veselus skaitļus."
+
+msgid "Enter two numbers."
+msgstr "Ievadiet divus skaitļus."
+
+msgid "Enter two valid date/times."
+msgstr "Ievadiet divus derīgus datumus/laikus."
+
+msgid "Enter two valid dates."
+msgstr "Ievadiet divus korektus datumus."
+
+#, python-format
+msgid ""
+"List contains %(show_value)d item, it should contain no more than "
+"%(limit_value)d."
+msgid_plural ""
+"List contains %(show_value)d items, it should contain no more than "
+"%(limit_value)d."
+msgstr[0] ""
+"Saraksts satur %(show_value)d ierakstus, bet tam jāsatur ne vairāk kā "
+"%(limit_value)d."
+msgstr[1] ""
+"Saraksts satur %(show_value)d ierakstu, bet tam jāsatur ne vairāk kā "
+"%(limit_value)d."
+msgstr[2] ""
+"Saraksts satur %(show_value)d ierakstus, bet tam jāsatur ne vairāk kā "
+"%(limit_value)d."
+
+#, python-format
+msgid ""
+"List contains %(show_value)d item, it should contain no fewer than "
+"%(limit_value)d."
+msgid_plural ""
+"List contains %(show_value)d items, it should contain no fewer than "
+"%(limit_value)d."
+msgstr[0] ""
+"Saraksts satur %(show_value)d ierakstus, bet tam jāsatur vismaz "
+"%(limit_value)d."
+msgstr[1] ""
+"Saraksts satur %(show_value)d ierakstu, bet tam jāsatur vismaz "
+"%(limit_value)d."
+msgstr[2] ""
+"Saraksts satur %(show_value)d ierakstus, bet tam jāsatur vismaz "
+"%(limit_value)d."
+
+#, python-format
+msgid "Some keys were missing: %(keys)s"
+msgstr "Trūka dažas atslēgas: %(keys)s"
+
+#, python-format
+msgid "Some unknown keys were provided: %(keys)s"
+msgstr "Tika norādītas dažas nezināmas atslēgas: %(keys)s"
+
+#, python-format
+msgid ""
+"Ensure that this range is completely less than or equal to %(limit_value)s."
+msgstr "Diapazona vērtībai jābūt mazākai vai vienādai ar %(limit_value)s."
+
+#, python-format
+msgid ""
+"Ensure that this range is completely greater than or equal to "
+"%(limit_value)s."
+msgstr "Diapazona vērtībai jābūt lielākai vai vienādai ar %(limit_value)s."

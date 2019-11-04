@@ -1,0 +1,287 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2017-09-24 13:46+0200\n"
+"PO-Revision-Date: 2017-10-06 11:56+0000\n"
+"Last-Translator: Muḥend Belqasem <belkacem77@gmail.com>\n"
+"Language-Team: Kabyle (http://www.transifex.com/django/django/language/"
+"kab/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: kab\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "Personal info"
+msgstr "Talɣut tudmawant"
+
+msgid "Permissions"
+msgstr "Tisirag"
+
+msgid "Important dates"
+msgstr "Izemzen ixataren"
+
+#, python-format
+msgid "%(name)s object with primary key %(key)r does not exist."
+msgstr ""
+
+msgid "Password changed successfully."
+msgstr ""
+
+#, python-format
+msgid "Change password: %s"
+msgstr "Snifel awal uffir: %s"
+
+msgid "Authentication and Authorization"
+msgstr ""
+
+msgid "password"
+msgstr "awal uffir"
+
+msgid "last login"
+msgstr "tuqqna taneggarut"
+
+msgid "No password set."
+msgstr ""
+
+msgid "Invalid password format or unknown hashing algorithm."
+msgstr ""
+
+msgid "The two password fields didn't match."
+msgstr ""
+
+msgid "Password"
+msgstr "Awal n uɛeddi"
+
+msgid "Password confirmation"
+msgstr "Asentem n wawal uffir"
+
+msgid "Enter the same password as before, for verification."
+msgstr ""
+
+msgid ""
+"Raw passwords are not stored, so there is no way to see this user's "
+"password, but you can change the password using <a href=\"{}\">this form</a>."
+msgstr ""
+
+#, python-format
+msgid ""
+"Please enter a correct %(username)s and password. Note that both fields may "
+"be case-sensitive."
+msgstr ""
+
+msgid "This account is inactive."
+msgstr "Amidan-agi ur yermid ara."
+
+msgid "Email"
+msgstr "E-mail"
+
+msgid "New password"
+msgstr "Awal uffir amaynut"
+
+msgid "New password confirmation"
+msgstr "Asentem n wawal uffir amaynut"
+
+msgid "Your old password was entered incorrectly. Please enter it again."
+msgstr ""
+
+msgid "Old password"
+msgstr "Awal uffir aqbuṛ"
+
+msgid "Password (again)"
+msgstr "Mot de passe (bis)"
+
+msgid "algorithm"
+msgstr ""
+
+msgid "iterations"
+msgstr ""
+
+msgid "salt"
+msgstr ""
+
+msgid "hash"
+msgstr ""
+
+msgid "variety"
+msgstr ""
+
+msgid "version"
+msgstr "lqem"
+
+msgid "memory cost"
+msgstr ""
+
+msgid "time cost"
+msgstr "tasqamt n wakud"
+
+msgid "parallelism"
+msgstr ""
+
+msgid "work factor"
+msgstr ""
+
+msgid "checksum"
+msgstr ""
+
+msgid "name"
+msgstr "isem"
+
+msgid "content type"
+msgstr "anaw n ugbur"
+
+msgid "codename"
+msgstr ""
+
+msgid "permission"
+msgstr "tasiregt"
+
+msgid "permissions"
+msgstr "tisirag"
+
+msgid "group"
+msgstr "agraw"
+
+msgid "groups"
+msgstr "igrawen"
+
+msgid "superuser status"
+msgstr "addad n unebdal"
+
+msgid ""
+"Designates that this user has all permissions without explicitly assigning "
+"them."
+msgstr ""
+"Yemmal-d d akken aseqdac-agi ɣur-s akk tisirag war ma ttwanefkent-as s wudem "
+"aflalay."
+
+msgid ""
+"The groups this user belongs to. A user will get all permissions granted to "
+"each of their groups."
+msgstr ""
+
+msgid "user permissions"
+msgstr "tisirag n useqdac"
+
+msgid "Specific permissions for this user."
+msgstr ""
+
+msgid "username"
+msgstr "isem n useqdac"
+
+msgid "Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only."
+msgstr ""
+
+msgid "A user with that username already exists."
+msgstr "Tansa-agi imayl tella yakan."
+
+msgid "first name"
+msgstr "isem"
+
+msgid "last name"
+msgstr "Isem aneggaru"
+
+msgid "email address"
+msgstr "tansa imayl"
+
+msgid "staff status"
+msgstr ""
+
+msgid "Designates whether the user can log into this admin site."
+msgstr ""
+
+msgid "active"
+msgstr "urmid"
+
+msgid ""
+"Designates whether this user should be treated as active. Unselect this "
+"instead of deleting accounts."
+msgstr ""
+"Yettwag  ma yella aseqdac-agi yezmer ad yettwammel d urmid neɣ ala. Kkes "
+"afran deg umḍiq n tukksa n umiḍan."
+
+msgid "date joined"
+msgstr "azemz n ujerred"
+
+msgid "user"
+msgstr "aseqdac"
+
+msgid "users"
+msgstr "Iseqdaceniseqdacen"
+
+#, python-format
+msgid ""
+"This password is too short. It must contain at least %(min_length)d "
+"character."
+msgid_plural ""
+"This password is too short. It must contain at least %(min_length)d "
+"characters."
+msgstr[0] ""
+msgstr[1] ""
+
+#, python-format
+msgid "Your password must contain at least %(min_length)d character."
+msgid_plural "Your password must contain at least %(min_length)d characters."
+msgstr[0] ""
+msgstr[1] ""
+
+#, python-format
+msgid "The password is too similar to the %(verbose_name)s."
+msgstr ""
+
+msgid "Your password can't be too similar to your other personal information."
+msgstr ""
+
+msgid "This password is too common."
+msgstr ""
+
+msgid "Your password can't be a commonly used password."
+msgstr ""
+
+msgid "This password is entirely numeric."
+msgstr ""
+
+msgid "Your password can't be entirely numeric."
+msgstr ""
+
+#, python-format
+msgid "Password reset on %(site_name)s"
+msgstr ""
+
+msgid ""
+"Enter a valid username. This value may contain only English letters, "
+"numbers, and @/./+/-/_ characters."
+msgstr ""
+
+msgid ""
+"Enter a valid username. This value may contain only letters, numbers, and "
+"@/./+/-/_ characters."
+msgstr ""
+
+msgid "Logged out"
+msgstr "Yeffeɣ"
+
+msgid "Password reset"
+msgstr "Awennez n wawal uffir"
+
+msgid "Password reset sent"
+msgstr "Tulsa n wennez n wawal uffir tettwazen"
+
+msgid "Enter new password"
+msgstr "Sekcem awal n uffir amaynut"
+
+msgid "Password reset unsuccessful"
+msgstr "tulsa n uwennez n wawal uffir tedda"
+
+msgid "Password reset complete"
+msgstr "Awennez n wawal uffir yemmed"
+
+msgid "Password change"
+msgstr "Abeddel n wawal uffir"
+
+msgid "Password change successful"
+msgstr ""

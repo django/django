@@ -23,8 +23,10 @@ class AutoescapeTagTests(SimpleTestCase):
         self.assertEqual(output, '&lt;b&gt;hello&lt;/b&gt;')
 
     # Autoescape disabling and enabling nest in a predictable way.
-    @setup({'autoescape-tag04': '{% autoescape off %}'
-        '{{ first }} {% autoescape on %}{{ first }}{% endautoescape %}{% endautoescape %}'})
+    @setup({
+        'autoescape-tag04':
+        '{% autoescape off %}{{ first }} {% autoescape on %}{{ first }}{% endautoescape %}{% endautoescape %}'
+    })
     def test_autoescape_tag04(self):
         output = self.engine.render_to_string('autoescape-tag04', {'first': '<a>'})
         self.assertEqual(output, '<a> &lt;a&gt;')
@@ -46,8 +48,10 @@ class AutoescapeTagTests(SimpleTestCase):
         output = self.engine.render_to_string('autoescape-tag07', {'first': mark_safe('<b>Apple</b>')})
         self.assertEqual(output, '<b>Apple</b>')
 
-    @setup({'autoescape-tag08': r'{% autoescape on %}'
-        r'{{ var|default_if_none:" endquote\" hah" }}{% endautoescape %}'})
+    @setup({
+        'autoescape-tag08':
+        r'{% autoescape on %}{{ var|default_if_none:" endquote\" hah" }}{% endautoescape %}'
+    })
     def test_autoescape_tag08(self):
         """
         Literal string arguments to filters, if used in the result, are safe.
@@ -119,3 +123,15 @@ class AutoescapeTagTests(SimpleTestCase):
         """
         output = self.engine.render_to_string('autoescape-lookup01', {'var': {'key': 'this & that'}})
         self.assertEqual(output, 'this &amp; that')
+
+    @setup({'autoescape-incorrect-arg': '{% autoescape true %}{{ var.key }}{% endautoescape %}'})
+    def test_invalid_arg(self):
+        msg = "'autoescape' argument should be 'on' or 'off'"
+        with self.assertRaisesMessage(TemplateSyntaxError, msg):
+            self.engine.render_to_string('autoescape-incorrect-arg', {'var': {'key': 'this & that'}})
+
+    @setup({'autoescape-incorrect-arg': '{% autoescape %}{{ var.key }}{% endautoescape %}'})
+    def test_no_arg(self):
+        msg = "'autoescape' tag requires exactly one argument."
+        with self.assertRaisesMessage(TemplateSyntaxError, msg):
+            self.engine.render_to_string('autoescape-incorrect-arg', {'var': {'key': 'this & that'}})

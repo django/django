@@ -16,7 +16,7 @@ By default, the configuration uses SQLite. If you're new to databases, or
 you're just interested in trying Django, this is the easiest choice. SQLite is
 included in Python, so you won't need to install anything else to support your
 database. When starting your first real project, however, you may want to use a
-more robust database like PostgreSQL, to avoid database-switching headaches
+more scalable database like PostgreSQL, to avoid database-switching headaches
 down the road.
 
 If you wish to use another database, install the appropriate :ref:`database
@@ -41,11 +41,16 @@ If you are not using SQLite as your database, additional settings such as
 :setting:`USER`, :setting:`PASSWORD`, and :setting:`HOST` must be added.
 For more details, see the reference documentation for :setting:`DATABASES`.
 
-.. note::
+.. admonition:: For databases other than SQLite
 
-    If you're using PostgreSQL or MySQL, make sure you've created a database by
-    this point. Do that with "``CREATE DATABASE database_name;``" within your
-    database's interactive prompt.
+    If you're using a database besides SQLite, make sure you've created a
+    database by this point. Do that with "``CREATE DATABASE database_name;``"
+    within your database's interactive prompt.
+
+    Also make sure that the database user provided in :file:`mysite/settings.py`
+    has "create database" privileges. This allows automatic creation of a
+    :ref:`test database <the-test-database>` which will be needed in a later
+    tutorial.
 
     If you're using SQLite, you don't need to create anything beforehand - the
     database file will be created automatically when it is needed.
@@ -80,7 +85,7 @@ Some of these applications make use of at least one database table, though,
 so we need to create the tables in the database before we can use them. To do
 that, run the following command:
 
-.. code-block:: console
+.. console::
 
     $ python manage.py migrate
 
@@ -130,8 +135,8 @@ with a ``Question``.
 These concepts are represented by simple Python classes. Edit the
 :file:`polls/models.py` file so it looks like this:
 
-.. snippet::
-    :filename: polls/models.py
+.. code-block:: python
+    :caption: polls/models.py
 
     from django.db import models
 
@@ -199,12 +204,15 @@ But first we need to tell our project that the ``polls`` app is installed.
     you can distribute apps, because they don't have to be tied to a given
     Django installation.
 
-Edit the :file:`mysite/settings.py` file again, and change the
-:setting:`INSTALLED_APPS` setting to include the string
-``'polls.apps.PollsConfig'``. It'll look like this:
+To include the app in our project, we need to add a reference to its
+configuration class in the :setting:`INSTALLED_APPS` setting. The
+``PollsConfig`` class is in the :file:`polls/apps.py` file, so its dotted path
+is ``'polls.apps.PollsConfig'``. Edit the :file:`mysite/settings.py` file and
+add that dotted path to the :setting:`INSTALLED_APPS` setting. It'll look like
+this:
 
-.. snippet::
-    :filename: mysite/settings.py
+.. code-block:: python
+    :caption: mysite/settings.py
 
     INSTALLED_APPS = [
         'polls.apps.PollsConfig',
@@ -218,7 +226,7 @@ Edit the :file:`mysite/settings.py` file again, and change the
 
 Now Django knows to include the ``polls`` app. Let's run another command:
 
-.. code-block:: console
+.. console::
 
     $ python manage.py makemigrations polls
 
@@ -248,7 +256,7 @@ schema automatically - that's called :djadmin:`migrate`, and we'll come to it in
 moment - but first, let's see what SQL that migration would run. The
 :djadmin:`sqlmigrate` command takes migration names and returns their SQL:
 
-.. code-block:: console
+.. console::
 
     $ python manage.py sqlmigrate polls 0001
 
@@ -324,7 +332,7 @@ your project without making migrations or touching the database.
 
 Now, run :djadmin:`migrate` again to create those model tables in your database:
 
-.. code-block:: console
+.. console::
 
     $ python manage.py migrate
     Operations to perform:
@@ -354,7 +362,7 @@ but for now, remember the three-step guide to making model changes:
 The reason that there are separate commands to make and apply migrations is
 because you'll commit migrations to your version control system and ship them
 with your app; they not only make your development easier, they're also
-useable by other developers and in production.
+usable by other developers and in production.
 
 Read the :doc:`django-admin documentation </ref/django-admin>` for full
 information on what the ``manage.py`` utility can do.
@@ -365,7 +373,7 @@ Playing with the API
 Now, let's hop into the interactive Python shell and play around with the free
 API Django gives you. To invoke the Python shell, use this command:
 
-.. code-block:: console
+.. console::
 
     $ python manage.py shell
 
@@ -373,31 +381,9 @@ We're using this instead of simply typing "python", because :file:`manage.py`
 sets the ``DJANGO_SETTINGS_MODULE`` environment variable, which gives Django
 the Python import path to your :file:`mysite/settings.py` file.
 
-.. admonition:: Bypassing manage.py
-
-    If you'd rather not use :file:`manage.py`, no problem. Just set the
-    :envvar:`DJANGO_SETTINGS_MODULE` environment variable to
-    ``mysite.settings``, start a plain Python shell, and set up Django:
-
-    .. code-block:: pycon
-
-        >>> import django
-        >>> django.setup()
-
-    If this raises an :exc:`AttributeError`, you're probably using
-    a version of Django that doesn't match this tutorial version. You'll want
-    to either switch to the older tutorial or the newer Django version.
-
-    You must run ``python`` from the same directory :file:`manage.py` is in,
-    or ensure that directory is on the Python path, so that ``import mysite``
-    works.
-
-    For more information on all of this, see the :doc:`django-admin
-    documentation </ref/django-admin>`.
-
 Once you're in the shell, explore the :doc:`database API </topics/db/queries>`::
 
-    >>> from polls.models import Question, Choice   # Import the model classes we just wrote.
+    >>> from polls.models import Choice, Question  # Import the model classes we just wrote.
 
     # No questions are in the system yet.
     >>> Question.objects.all()
@@ -413,10 +399,7 @@ Once you're in the shell, explore the :doc:`database API </topics/db/queries>`::
     # Save the object into the database. You have to call save() explicitly.
     >>> q.save()
 
-    # Now it has an ID. Note that this might say "1L" instead of "1", depending
-    # on which database you're using. That's no biggie; it just means your
-    # database backend prefers to return integers as Python long integer
-    # objects.
+    # Now it has an ID.
     >>> q.id
     1
 
@@ -432,27 +415,24 @@ Once you're in the shell, explore the :doc:`database API </topics/db/queries>`::
 
     # objects.all() displays all the questions in the database.
     >>> Question.objects.all()
-    <QuerySet [<Question: Question object>]>
+    <QuerySet [<Question: Question object (1)>]>
 
-Wait a minute. ``<Question: Question object>`` is, utterly, an unhelpful representation
-of this object. Let's fix that by editing the ``Question`` model (in the
-``polls/models.py`` file) and adding a
+Wait a minute. ``<Question: Question object (1)>`` isn't a helpful
+representation of this object. Let's fix that by editing the ``Question`` model
+(in the ``polls/models.py`` file) and adding a
 :meth:`~django.db.models.Model.__str__` method to both ``Question`` and
 ``Choice``:
 
-.. snippet::
-    :filename: polls/models.py
+.. code-block:: python
+    :caption: polls/models.py
 
     from django.db import models
-    from django.utils.encoding import python_2_unicode_compatible
 
-    @python_2_unicode_compatible  # only if you need to support Python 2
     class Question(models.Model):
         # ...
         def __str__(self):
             return self.question_text
 
-    @python_2_unicode_compatible  # only if you need to support Python 2
     class Choice(models.Model):
         # ...
         def __str__(self):
@@ -463,11 +443,12 @@ models, not only for your own convenience when dealing with the interactive
 prompt, but also because objects' representations are used throughout Django's
 automatically-generated admin.
 
-Note these are normal Python methods. Let's add a custom method, just for
-demonstration:
+.. _tutorial02-import-timezone:
 
-.. snippet::
-    :filename: polls/models.py
+Let's also add a custom method to this model:
+
+.. code-block:: python
+    :caption: polls/models.py
 
     import datetime
 
@@ -489,7 +470,7 @@ the :doc:`time zone support docs </topics/i18n/timezones>`.
 Save these changes and start a new Python interactive shell by running
 ``python manage.py shell`` again::
 
-    >>> from polls.models import Question, Choice
+    >>> from polls.models import Choice, Question
 
     # Make sure our __str__() addition worked.
     >>> Question.objects.all()
@@ -595,7 +576,7 @@ Creating an admin user
 First we'll need to create a user who can login to the admin site. Run the
 following command:
 
-.. code-block:: console
+.. console::
 
     $ python manage.py createsuperuser
 
@@ -628,7 +609,7 @@ server and explore it.
 
 If the server is not running start it like so:
 
-.. code-block:: console
+.. console::
 
     $ python manage.py runserver
 
@@ -664,8 +645,8 @@ Just one thing to do: we need to tell the admin that ``Question``
 objects have an admin interface. To do this, open the :file:`polls/admin.py`
 file, and edit it to look like this:
 
-.. snippet::
-    :filename: polls/admin.py
+.. code-block:: python
+    :caption: polls/admin.py
 
     from django.contrib import admin
 

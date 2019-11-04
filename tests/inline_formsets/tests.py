@@ -1,8 +1,5 @@
-from __future__ import unicode_literals
-
-from django.forms.models import inlineformset_factory
+from django.forms.models import ModelForm, inlineformset_factory
 from django.test import TestCase, skipUnlessDBFeature
-from django.utils import six
 
 from .models import Child, Parent, Poem, Poet, School
 
@@ -44,14 +41,14 @@ class DeletionTests(TestCase):
         }
         formset = PoemFormSet(data, instance=poet)
         # Make sure this form doesn't pass validation.
-        self.assertEqual(formset.is_valid(), False)
+        self.assertIs(formset.is_valid(), False)
         self.assertEqual(Poem.objects.count(), 0)
 
         # Then make sure that it *does* pass validation and delete the object,
         # even though the data isn't actually valid.
         data['poem_set-0-DELETE'] = 'on'
         formset = PoemFormSet(data, instance=poet)
-        self.assertEqual(formset.is_valid(), True)
+        self.assertIs(formset.is_valid(), True)
         formset.save()
         self.assertEqual(Poem.objects.count(), 0)
 
@@ -67,20 +64,20 @@ class DeletionTests(TestCase):
             'poem_set-TOTAL_FORMS': '1',
             'poem_set-INITIAL_FORMS': '1',
             'poem_set-MAX_NUM_FORMS': '0',
-            'poem_set-0-id': six.text_type(poem.id),
-            'poem_set-0-poem': six.text_type(poem.id),
+            'poem_set-0-id': str(poem.id),
+            'poem_set-0-poem': str(poem.id),
             'poem_set-0-name': 'x' * 1000,
         }
         formset = PoemFormSet(data, instance=poet)
         # Make sure this form doesn't pass validation.
-        self.assertEqual(formset.is_valid(), False)
+        self.assertIs(formset.is_valid(), False)
         self.assertEqual(Poem.objects.count(), 1)
 
         # Then make sure that it *does* pass validation and delete the object,
         # even though the data isn't actually valid.
         data['poem_set-0-DELETE'] = 'on'
         formset = PoemFormSet(data, instance=poet)
-        self.assertEqual(formset.is_valid(), True)
+        self.assertIs(formset.is_valid(), True)
         formset.save()
         self.assertEqual(Poem.objects.count(), 0)
 
@@ -101,7 +98,7 @@ class DeletionTests(TestCase):
             'child_set-0-name': 'child',
         }
         formset = ChildFormSet(data, instance=school)
-        self.assertEqual(formset.is_valid(), True)
+        self.assertIs(formset.is_valid(), True)
         objects = formset.save(commit=False)
         for obj in objects:
             obj.mother = mother
@@ -162,3 +159,46 @@ class InlineFormsetFactoryTest(TestCase):
         PoemFormSet = inlineformset_factory(Poet, Poem, fields="__all__", extra=0)
         formset = PoemFormSet(None, instance=poet)
         self.assertEqual(len(formset.forms), 1)
+
+    def test_unsaved_fk_validate_unique(self):
+        poet = Poet(name='unsaved')
+        PoemFormSet = inlineformset_factory(Poet, Poem, fields=['name'])
+        data = {
+            'poem_set-TOTAL_FORMS': '2',
+            'poem_set-INITIAL_FORMS': '0',
+            'poem_set-MAX_NUM_FORMS': '2',
+            'poem_set-0-name': 'Poem',
+            'poem_set-1-name': 'Poem',
+        }
+        formset = PoemFormSet(data, instance=poet)
+        self.assertFalse(formset.is_valid())
+        self.assertEqual(formset.non_form_errors(), ['Please correct the duplicate data for name.'])
+
+    def test_fk_not_duplicated_in_form_fields(self):
+        """
+        A foreign key name isn't duplicated in form._meta fields (#21332).
+        """
+        poet = Poet.objects.create(name='test')
+        poet.poem_set.create(name='first test poem')
+        poet.poem_set.create(name='second test poem')
+        poet.poem_set.create(name='third test poem')
+        PoemFormSet = inlineformset_factory(Poet, Poem, fields=('name',), extra=0)
+        formset = PoemFormSet(None, instance=poet)
+        self.assertEqual(len(formset.forms), 3)
+        self.assertEqual(['name', 'poet'], PoemFormSet.form._meta.fields)
+
+    def test_fk_in_all_formset_forms(self):
+        """
+        A foreign key field is in Meta for all forms in the formset (#26538).
+        """
+        class PoemModelForm(ModelForm):
+            def __init__(self, *args, **kwargs):
+                assert 'poet' in self._meta.fields
+                super().__init__(*args, **kwargs)
+
+        poet = Poet.objects.create(name='test')
+        poet.poem_set.create(name='first test poem')
+        poet.poem_set.create(name='second test poem')
+        PoemFormSet = inlineformset_factory(Poet, Poem, form=PoemModelForm, fields=('name',), extra=0)
+        formset = PoemFormSet(None, instance=poet)
+        formset.forms  # Trigger form instantiation to run the assert above.

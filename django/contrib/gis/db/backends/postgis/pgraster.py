@@ -1,4 +1,3 @@
-import binascii
 import struct
 
 from django.forms import ValidationError
@@ -13,14 +12,14 @@ def pack(structure, data):
     """
     Pack data into hex string with little endian format.
     """
-    return binascii.hexlify(struct.pack('<' + structure, *data)).upper()
+    return struct.pack('<' + structure, *data)
 
 
 def unpack(structure, data):
     """
     Unpack little endian hexlified binary string into a list.
     """
-    return struct.unpack('<' + structure, binascii.unhexlify(data))
+    return struct.unpack('<' + structure, bytes.fromhex(data))
 
 
 def chunk(data, index):
@@ -28,18 +27,6 @@ def chunk(data, index):
     Split a string into two parts at the input index.
     """
     return data[:index], data[index:]
-
-
-def get_pgraster_srid(data):
-    """
-    Extract the SRID from a PostGIS raster string.
-    """
-    if data is None:
-        return
-    # The positional arguments here extract the hex-encoded srid from the
-    # header of the PostGIS raster string. This can be understood through
-    # the POSTGIS_HEADER_STRUCTURE constant definition in the const module.
-    return unpack('i', data[106:114])[0]
 
 
 def from_pgraster(data):
@@ -79,7 +66,7 @@ def from_pgraster(data):
 
         # Chunk and unpack band data (pack size times nr of pixels)
         band, data = chunk(data, pack_size * header[10] * header[11])
-        band_result = {'data': binascii.unhexlify(band)}
+        band_result = {'data': bytes.fromhex(band)}
 
         # If the nodata flag is True, set the nodata value.
         if has_nodata:
@@ -112,10 +99,6 @@ def to_pgraster(rast):
     """
     Convert a GDALRaster into PostGIS Raster format.
     """
-    # Return if the raster is null
-    if rast is None or rast == '':
-        return
-
     # Prepare the raster header data as a tuple. The first two numbers are
     # the endianness and the PostGIS Raster Version, both are fixed by
     # PostGIS at the moment.
@@ -125,7 +108,7 @@ def to_pgraster(rast):
         rast.srs.srid, rast.width, rast.height,
     )
 
-    # Hexlify raster header
+    # Pack raster header.
     result = pack(POSTGIS_HEADER_STRUCTURE, rasterheader)
 
     for band in rast.bands:
@@ -151,11 +134,8 @@ def to_pgraster(rast):
         # Pack band header
         bandheader = pack(structure, (pixeltype, band.nodata_value or 0))
 
-        # Hexlify band data
-        band_data_hex = binascii.hexlify(band.data(as_memoryview=True)).upper()
-
         # Add packed header and band data to result
-        result += bandheader + band_data_hex
+        result += bandheader + band.data(as_memoryview=True)
 
-    # Cast raster to string before passing it to the DB
-    return result.decode()
+    # Convert raster to hex string before passing it to the DB.
+    return result.hex()

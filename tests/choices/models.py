@@ -10,16 +10,14 @@ field. This method returns the "human-readable" value of the field.
 """
 
 from django.db import models
-from django.utils.encoding import python_2_unicode_compatible
-
-GENDER_CHOICES = (
-    ('M', 'Male'),
-    ('F', 'Female'),
-)
+from django.utils.translation import gettext_lazy as _
 
 
-@python_2_unicode_compatible
 class Person(models.Model):
+    GENDER_CHOICES = (
+        ('M', _('Male')),
+        ('F', _('Female')),
+    )
     name = models.CharField(max_length=20)
     gender = models.CharField(max_length=1, choices=GENDER_CHOICES)
 

@@ -1,0 +1,107 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# Chen Chun-Chia <ccc.larc@gmail.com>, 2015
+# Tzu-ping Chung <uranusjr@gmail.com>, 2016-2017
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2017-01-19 16:49+0100\n"
+"PO-Revision-Date: 2017-09-21 22:44+0000\n"
+"Last-Translator: Tzu-ping Chung <uranusjr@gmail.com>\n"
+"Language-Team: Chinese (Taiwan) (http://www.transifex.com/django/django/"
+"language/zh_TW/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: zh_TW\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+msgid "PostgreSQL extensions"
+msgstr "PostgreSQL 擴充"
+
+#, python-format
+msgid "Item %(nth)s in the array did not validate: "
+msgstr "陣列中第 %(nth)s 個物件驗證失敗："
+
+msgid "Nested arrays must have the same length."
+msgstr "各嵌套陣列長度必須相同。"
+
+msgid "Map of strings to strings/nulls"
+msgstr "字串與字串/空值的對應"
+
+#, python-format
+msgid "The value of \"%(key)s\" is not a string or null."
+msgstr "「%(key)s」並非字串或空值。"
+
+msgid "A JSON object"
+msgstr "一個 JSON 物件"
+
+msgid "Value must be valid JSON."
+msgstr "必須為合法 JSON 值。"
+
+msgid "Could not load JSON data."
+msgstr "無法載入 JSON 資料。"
+
+msgid "Input must be a JSON dictionary."
+msgstr "必須輸入 JSON dictionary。"
+
+#, python-format
+msgid "'%(value)s' value must be valid JSON."
+msgstr "'%(value)s' 必須為合法 JSON 值。"
+
+msgid "Enter two valid values."
+msgstr "請輸入兩個有效的值"
+
+msgid "The start of the range must not exceed the end of the range."
+msgstr "範圍的起始不可超過範圍的結束。"
+
+msgid "Enter two whole numbers."
+msgstr "請輸入兩個整數"
+
+msgid "Enter two numbers."
+msgstr "請輸入兩個數字"
+
+msgid "Enter two valid date/times."
+msgstr "請輸入兩個有效的日期/時間"
+
+msgid "Enter two valid dates."
+msgstr "請輸入兩個有效的日期"
+
+#, python-format
+msgid ""
+"List contains %(show_value)d item, it should contain no more than "
+"%(limit_value)d."
+msgid_plural ""
+"List contains %(show_value)d items, it should contain no more than "
+"%(limit_value)d."
+msgstr[0] "串列包含 %(show_value)d 個物件，但不應包含多於 %(limit_value)d 個。"
+
+#, python-format
+msgid ""
+"List contains %(show_value)d item, it should contain no fewer than "
+"%(limit_value)d."
+msgid_plural ""
+"List contains %(show_value)d items, it should contain no fewer than "
+"%(limit_value)d."
+msgstr[0] "串列包含 %(show_value)d 個物件，但應至少包含 %(limit_value)d 個。"
+
+#, python-format
+msgid "Some keys were missing: %(keys)s"
+msgstr "缺少鍵值：%(keys)s"
+
+#, python-format
+msgid "Some unknown keys were provided: %(keys)s"
+msgstr "包含不明鍵值：%(keys)s"
+
+#, python-format
+msgid ""
+"Ensure that this range is completely less than or equal to %(limit_value)s."
+msgstr "請確認此範圍是否完全小於或等於 %(limit_value)s。"
+
+#, python-format
+msgid ""
+"Ensure that this range is completely greater than or equal to "
+"%(limit_value)s."
+msgstr "請確認此範圍是否完全大於或等於 %(limit_value)s。"

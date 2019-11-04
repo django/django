@@ -62,7 +62,7 @@ The :djadmin:`collectstatic` management command calls the
 method of the :setting:`STATICFILES_STORAGE` after each run and passes
 a list of paths that have been found by the management command. It also
 receives all command line options of :djadmin:`collectstatic`. This is used
-by the :class:`~django.contrib.staticfiles.storage.CachedStaticFilesStorage`
+by the :class:`~django.contrib.staticfiles.storage.ManifestStaticFilesStorage`
 by default.
 
 By default, collected files receive permissions from
@@ -79,12 +79,10 @@ respectively. For example::
         def __init__(self, *args, **kwargs):
             kwargs['file_permissions_mode'] = 0o640
             kwargs['directory_permissions_mode'] = 0o760
-            super(MyStaticFilesStorage, self).__init__(*args, **kwargs)
+            super().__init__(*args, **kwargs)
 
 Then set the :setting:`STATICFILES_STORAGE` setting to
 ``'path.to.MyStaticFilesStorage'``.
-
-.. highlight:: console
 
 Some commonly used options are:
 
@@ -92,14 +90,15 @@ Some commonly used options are:
 
     Do NOT prompt the user for input of any kind.
 
-    .. versionchanged:: 1.9
-
-        The ``--no-input`` alias was added.
-
 .. django-admin-option:: --ignore PATTERN, -i PATTERN
 
-    Ignore files or directories matching this glob-style pattern. Use multiple
-    times to ignore more.
+    Ignore files, directories, or paths matching this glob-style pattern. Use
+    multiple times to ignore more. When specifying a path, always use forward
+    slashes, even on Windows.
+
+    .. versionchanged:: 2.2
+
+        Path matching was added.
 
 .. django-admin-option:: --dry-run, -n
 
@@ -124,18 +123,41 @@ Some commonly used options are:
     Don't ignore the common private glob-style patterns ``'CVS'``, ``'.*'``
     and ``'*~'``.
 
-For a full list of options, refer to the commands own help by running::
+For a full list of options, refer to the commands own help by running:
+
+.. console::
 
    $ python manage.py collectstatic --help
+
+.. _customize-staticfiles-ignore-patterns:
+
+Customizing the ignored pattern list
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The default ignored pattern list, ``['CVS', '.*', '*~']``, can be customized in
+a more persistent way than providing the ``--ignore`` command option at each
+``collectstatic`` invocation. Provide a custom :class:`~django.apps.AppConfig`
+class, override the ``ignore_patterns`` attribute of this class and replace
+``'django.contrib.staticfiles'`` with that class path in your
+:setting:`INSTALLED_APPS` setting:
+
+.. code-block:: python
+
+    from django.contrib.staticfiles.apps import StaticFilesConfig
+
+    class MyStaticFilesConfig(StaticFilesConfig):
+        ignore_patterns = [...]  # your custom ignore list
 
 ``findstatic``
 --------------
 
-.. django-admin:: findstatic static file [static file ...]
+.. django-admin:: findstatic staticfile [staticfile ...]
 
 Searches for one or more relative paths with the enabled finders.
 
-For example::
+For example:
+
+.. console::
 
    $ python manage.py findstatic css/base.css admin/js/core.js
    Found 'css/base.css' here:
@@ -147,7 +169,9 @@ For example::
 .. django-admin-option:: findstatic --first
 
 By default, all matching locations are found. To only return the first match
-for each relative path, use the ``--first`` option::
+for each relative path, use the ``--first`` option:
+
+.. console::
 
    $ python manage.py findstatic css/base.css --first
    Found 'css/base.css' here:
@@ -157,14 +181,18 @@ This is a debugging aid; it'll show you exactly which static file will be
 collected for a given path.
 
 By setting the ``--verbosity`` flag to 0, you can suppress the extra output and
-just get the path names::
+just get the path names:
+
+.. console::
 
    $ python manage.py findstatic css/base.css --verbosity 0
    /home/special.polls.com/core/static/css/base.css
    /home/polls.com/core/static/css/base.css
 
 On the other hand, by setting the ``--verbosity`` flag to 2, you can get all
-the directories which were searched::
+the directories which were searched:
+
+.. console::
 
    $ python manage.py findstatic css/base.css --verbosity 2
    Found 'css/base.css' here:
@@ -184,7 +212,9 @@ the directories which were searched::
 
 Overrides the core :djadmin:`runserver` command if the ``staticfiles`` app
 is :setting:`installed<INSTALLED_APPS>` and adds automatic serving of static
-files and the following new options.
+files. File serving doesn't run through :setting:`MIDDLEWARE`.
+
+The command adds these options:
 
 .. django-admin-option:: --nostatic
 
@@ -193,9 +223,11 @@ Use the ``--nostatic`` option to disable serving of static files with the
 only available if the :doc:`staticfiles </ref/contrib/staticfiles>` app is
 in your project's :setting:`INSTALLED_APPS` setting.
 
-Example usage::
+Example usage:
 
-    django-admin runserver --nostatic
+.. console::
+
+    $ django-admin runserver --nostatic
 
 .. django-admin-option:: --insecure
 
@@ -205,13 +237,15 @@ setting is ``False``. By using this you acknowledge the fact that it's
 **grossly inefficient** and probably **insecure**. This is only intended for
 local development, should **never be used in production** and is only
 available if the :doc:`staticfiles </ref/contrib/staticfiles>` app is
-in your project's :setting:`INSTALLED_APPS` setting. :djadmin:`runserver`
-``--insecure`` doesn't work with
-:class:`~django.contrib.staticfiles.storage.CachedStaticFilesStorage`.
+in your project's :setting:`INSTALLED_APPS` setting.
 
-Example usage::
+``--insecure`` doesn't work with :class:`~.storage.ManifestStaticFilesStorage`.
 
-    django-admin runserver --insecure
+Example usage:
+
+.. console::
+
+    $ django-admin runserver --insecure
 
 .. _staticfiles-storages:
 
@@ -230,11 +264,15 @@ as the base URL.
 
 .. method:: storage.StaticFilesStorage.post_process(paths, **options)
 
-This method is called by the :djadmin:`collectstatic` management command
-after each run and gets passed the local storages and paths of found
-files as a dictionary, as well as the command line options.
+If this method is defined on a storage, it's called by the
+:djadmin:`collectstatic` management command after each run and gets passed the
+local storages and paths of found files as a dictionary, as well as the command
+line options. It yields tuples of three values:
+``original_path, processed_path, processed``. The path values are strings and
+``processed`` is a boolean indicating whether or not the value was
+post-processed, or an exception if post-processing failed.
 
-The :class:`~django.contrib.staticfiles.storage.CachedStaticFilesStorage`
+The :class:`~django.contrib.staticfiles.storage.ManifestStaticFilesStorage`
 uses this behind the scenes to replace the paths with their hashed
 counterparts and update the cache appropriately.
 
@@ -263,7 +301,7 @@ by default covers the `@import`_ rule and `url()`_ statement of `Cascading
 Style Sheets`_. For example, the ``'css/styles.css'`` file with the
 content
 
-.. code-block:: css+django
+.. code-block:: css
 
     @import url("../admin/css/base.css");
 
@@ -272,9 +310,21 @@ method of the ``ManifestStaticFilesStorage`` storage backend, ultimately
 saving a ``'css/styles.55e7cbb9ba48.css'`` file with the following
 content:
 
-.. code-block:: css+django
+.. code-block:: css
 
     @import url("../admin/css/base.27e20196a850.css");
+
+.. attribute:: storage.ManifestStaticFilesStorage.max_post_process_passes
+
+Since static files might reference other static files that need to have their
+paths replaced, multiple passes of replacing paths may be needed until the file
+hashes converge. To prevent an infinite loop due to hashes not converging (for
+example, if ``'foo.css'`` references ``'bar.css'`` which references
+``'foo.css'``) there is a maximum number of passes before post-processing is
+abandoned. In cases with a large number of references, a higher number of
+passes might be needed. Increase the maximum number of passes by subclassing
+``ManifestStaticFilesStorage`` and setting the ``max_post_process_passes``
+attribute. It defaults to 5.
 
 To enable the ``ManifestStaticFilesStorage`` you have to make sure the
 following requirements are met:
@@ -285,18 +335,18 @@ following requirements are met:
 * you've collected all your static files by using the
   :djadmin:`collectstatic` management command
 
-.. versionchanged:: 1.10
-
-    In older versions, you also had to use
-    ``{% load static from staticfiles %}`` in your template. The
-    :ttag:`static` template tag (``{% load static %}``) now uses
-    :mod:`django.contrib.staticfiles` if it's installed.
-
 Since creating the MD5 hash can be a performance burden to your website
 during runtime, ``staticfiles`` will automatically store the mapping with
 hashed names for all processed files in a file called ``staticfiles.json``.
 This happens once when you run the :djadmin:`collectstatic` management
 command.
+
+.. attribute:: storage.ManifestStaticFilesStorage.manifest_strict
+
+If a file isn't found in the ``staticfiles.json`` manifest at runtime, a
+``ValueError`` is raised. This behavior can be disabled by subclassing
+``ManifestStaticFilesStorage`` and setting the ``manifest_strict`` attribute to
+``False`` -- nonexistent paths will remain unchanged.
 
 Due to the requirement of running :djadmin:`collectstatic`, this storage
 typically shouldn't be used when running tests as ``collectstatic`` isn't run
@@ -313,14 +363,21 @@ mentioned above. Feel free to override this method to use your own
 hashing algorithm.
 
 .. _`far future Expires headers`: https://developer.yahoo.com/performance/rules.html#expires
-.. _`@import`: http://www.w3.org/TR/CSS2/cascade.html#at-import
-.. _`url()`: http://www.w3.org/TR/CSS2/syndata.html#uri
-.. _`Cascading Style Sheets`: http://www.w3.org/Style/CSS/
+.. _`@import`: https://www.w3.org/TR/CSS2/cascade.html#at-import
+.. _`url()`: https://www.w3.org/TR/CSS2/syndata.html#uri
+.. _`Cascading Style Sheets`: https://www.w3.org/Style/CSS/
 
 ``CachedStaticFilesStorage``
 ----------------------------
 
 .. class:: storage.CachedStaticFilesStorage
+
+.. deprecated:: 2.2
+
+    ``CachedStaticFilesStorage`` is deprecated as it has some intractable
+    problems, some of which are outlined below. Use
+    :class:`~storage.ManifestStaticFilesStorage` or a third-party cloud storage
+    instead.
 
 ``CachedStaticFilesStorage`` is a similar class like the
 :class:`~django.contrib.staticfiles.storage.ManifestStaticFilesStorage` class
@@ -332,6 +389,24 @@ have access to the file system.
 If you want to override certain options of the cache backend the storage uses,
 simply specify a custom entry in the :setting:`CACHES` setting named
 ``'staticfiles'``. It falls back to using the ``'default'`` cache backend.
+
+.. warning::
+
+    ``CachedStaticFilesStorage`` isn't recommended --  in almost all cases
+    ``ManifestStaticFilesStorage`` is a better choice. There are several
+    performance penalties when using ``CachedStaticFilesStorage`` since a cache
+    miss requires hashing files at runtime. Remote file storage require several
+    round-trips to hash a file on a cache miss, as several file accesses are
+    required to ensure that the file hash is correct in the case of nested file
+    paths.
+
+``ManifestFilesMixin``
+----------------------
+
+.. class:: storage.ManifestFilesMixin
+
+Use this mixin with a custom storage to append the MD5 hash of the file's
+content to the filename as :class:`~storage.ManifestStaticFilesStorage` does.
 
 Finders Module
 ==============
@@ -381,8 +456,6 @@ developing locally. Thus, the ``staticfiles`` app ships with a
 **quick and dirty helper view** that you can use to serve files locally in
 development.
 
-.. highlight:: python
-
 .. function:: views.serve(request, path)
 
 This view function serves static files in development.
@@ -412,10 +485,11 @@ primary URL configuration::
 
    from django.conf import settings
    from django.contrib.staticfiles import views
+   from django.urls import re_path
 
    if settings.DEBUG:
        urlpatterns += [
-           url(r'^static/(?P<path>.*)$', views.serve),
+           re_path(r'^static/(?P<path>.*)$', views.serve),
        ]
 
 Note, the beginning of the pattern (``r'^static/'``) should be your

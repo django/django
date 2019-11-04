@@ -1,22 +1,23 @@
-# -*- coding:utf-8 -*-
-from __future__ import unicode_literals
-
 import logging
-import warnings
+from contextlib import contextmanager
+from io import StringIO
 
 from admin_scripts.tests import AdminScriptTestCase
 
 from django.conf import settings
 from django.core import mail
+from django.core.exceptions import PermissionDenied
 from django.core.files.temp import NamedTemporaryFile
+from django.core.management import color
+from django.http.multipartparser import MultiPartParserError
 from django.test import RequestFactory, SimpleTestCase, override_settings
-from django.test.utils import LoggingCaptureMixin, patch_logger
-from django.utils.deprecation import RemovedInNextVersionWarning
+from django.test.utils import LoggingCaptureMixin
 from django.utils.log import (
     DEFAULT_LOGGING, AdminEmailHandler, CallbackFilter, RequireDebugFalse,
-    RequireDebugTrue,
+    RequireDebugTrue, ServerFormatter,
 )
 
+from . import views
 from .logconfig import MyEmailBackend
 
 # logging config prior to using filter with mail_admins
@@ -47,10 +48,10 @@ class LoggingFiltersTest(SimpleTestCase):
         filter_ = RequireDebugFalse()
 
         with self.settings(DEBUG=True):
-            self.assertEqual(filter_.filter("record is not used"), False)
+            self.assertIs(filter_.filter("record is not used"), False)
 
         with self.settings(DEBUG=False):
-            self.assertEqual(filter_.filter("record is not used"), True)
+            self.assertIs(filter_.filter("record is not used"), True)
 
     def test_require_debug_true_filter(self):
         """
@@ -59,24 +60,27 @@ class LoggingFiltersTest(SimpleTestCase):
         filter_ = RequireDebugTrue()
 
         with self.settings(DEBUG=True):
-            self.assertEqual(filter_.filter("record is not used"), True)
+            self.assertIs(filter_.filter("record is not used"), True)
 
         with self.settings(DEBUG=False):
-            self.assertEqual(filter_.filter("record is not used"), False)
+            self.assertIs(filter_.filter("record is not used"), False)
 
 
-class DefaultLoggingTest(LoggingCaptureMixin, SimpleTestCase):
+class SetupDefaultLoggingMixin:
 
     @classmethod
     def setUpClass(cls):
-        super(DefaultLoggingTest, cls).setUpClass()
+        super().setUpClass()
         cls._logging = settings.LOGGING
         logging.config.dictConfig(DEFAULT_LOGGING)
 
     @classmethod
     def tearDownClass(cls):
-        super(DefaultLoggingTest, cls).tearDownClass()
+        super().tearDownClass()
         logging.config.dictConfig(cls._logging)
+
+
+class DefaultLoggingTests(SetupDefaultLoggingMixin, LoggingCaptureMixin, SimpleTestCase):
 
     def test_django_logger(self):
         """
@@ -89,49 +93,134 @@ class DefaultLoggingTest(LoggingCaptureMixin, SimpleTestCase):
             self.logger.error("Hey, this is an error.")
             self.assertEqual(self.logger_output.getvalue(), 'Hey, this is an error.\n')
 
+    @override_settings(DEBUG=True)
     def test_django_logger_warning(self):
-        with self.settings(DEBUG=True):
-            self.logger.warning('warning')
-            self.assertEqual(self.logger_output.getvalue(), 'warning\n')
-
-    def test_django_logger_info(self):
-        with self.settings(DEBUG=True):
-            self.logger.info('info')
-            self.assertEqual(self.logger_output.getvalue(), 'info\n')
-
-    def test_django_logger_debug(self):
-        with self.settings(DEBUG=True):
-            self.logger.debug('debug')
-            self.assertEqual(self.logger_output.getvalue(), '')
-
-
-class WarningLoggerTests(SimpleTestCase):
-    """
-    Tests that warnings output for RemovedInDjangoXXWarning (XX being the next
-    Django version) is enabled and captured to the logging system
-    """
-    def setUp(self):
-        # If tests are invoke with "-Wall" (or any -W flag actually) then
-        # warning logging gets disabled (see configure_logging in django/utils/log.py).
-        # However, these tests expect warnings to be logged, so manually force warnings
-        # to the logs. Use getattr() here because the logging capture state is
-        # undocumented and (I assume) brittle.
-        self._old_capture_state = bool(getattr(logging, '_warnings_showwarning', False))
-        logging.captureWarnings(True)
-
-    def tearDown(self):
-        # Reset warnings state.
-        logging.captureWarnings(self._old_capture_state)
+        self.logger.warning('warning')
+        self.assertEqual(self.logger_output.getvalue(), 'warning\n')
 
     @override_settings(DEBUG=True)
-    def test_error_filter_still_raises(self):
-        with warnings.catch_warnings():
-            warnings.filterwarnings(
-                'error',
-                category=RemovedInNextVersionWarning
+    def test_django_logger_info(self):
+        self.logger.info('info')
+        self.assertEqual(self.logger_output.getvalue(), 'info\n')
+
+    @override_settings(DEBUG=True)
+    def test_django_logger_debug(self):
+        self.logger.debug('debug')
+        self.assertEqual(self.logger_output.getvalue(), '')
+
+
+class LoggingAssertionMixin:
+
+    def assertLogsRequest(self, url, level, msg, status_code, logger='django.request', exc_class=None):
+        with self.assertLogs(logger, level) as cm:
+            try:
+                self.client.get(url)
+            except views.UncaughtException:
+                pass
+            self.assertEqual(
+                len(cm.records), 1,
+                "Wrong number of calls for logger %r in %r level." % (logger, level)
             )
-            with self.assertRaises(RemovedInNextVersionWarning):
-                warnings.warn('Foo Deprecated', RemovedInNextVersionWarning)
+            record = cm.records[0]
+            self.assertEqual(record.getMessage(), msg)
+            self.assertEqual(record.status_code, status_code)
+            if exc_class:
+                self.assertIsNotNone(record.exc_info)
+                self.assertEqual(record.exc_info[0], exc_class)
+
+
+@override_settings(DEBUG=True, ROOT_URLCONF='logging_tests.urls')
+class HandlerLoggingTests(SetupDefaultLoggingMixin, LoggingAssertionMixin, LoggingCaptureMixin, SimpleTestCase):
+
+    def test_page_found_no_warning(self):
+        self.client.get('/innocent/')
+        self.assertEqual(self.logger_output.getvalue(), '')
+
+    def test_redirect_no_warning(self):
+        self.client.get('/redirect/')
+        self.assertEqual(self.logger_output.getvalue(), '')
+
+    def test_page_not_found_warning(self):
+        self.assertLogsRequest(
+            url='/does_not_exist/',
+            level='WARNING',
+            status_code=404,
+            msg='Not Found: /does_not_exist/',
+        )
+
+    def test_page_not_found_raised(self):
+        self.assertLogsRequest(
+            url='/does_not_exist_raised/',
+            level='WARNING',
+            status_code=404,
+            msg='Not Found: /does_not_exist_raised/',
+        )
+
+    def test_uncaught_exception(self):
+        self.assertLogsRequest(
+            url='/uncaught_exception/',
+            level='ERROR',
+            status_code=500,
+            msg='Internal Server Error: /uncaught_exception/',
+            exc_class=views.UncaughtException,
+        )
+
+    def test_internal_server_error(self):
+        self.assertLogsRequest(
+            url='/internal_server_error/',
+            level='ERROR',
+            status_code=500,
+            msg='Internal Server Error: /internal_server_error/',
+        )
+
+    def test_internal_server_error_599(self):
+        self.assertLogsRequest(
+            url='/internal_server_error/?status=599',
+            level='ERROR',
+            status_code=599,
+            msg='Unknown Status Code: /internal_server_error/',
+        )
+
+    def test_permission_denied(self):
+        self.assertLogsRequest(
+            url='/permission_denied/',
+            level='WARNING',
+            status_code=403,
+            msg='Forbidden (Permission denied): /permission_denied/',
+            exc_class=PermissionDenied,
+        )
+
+    def test_multi_part_parser_error(self):
+        self.assertLogsRequest(
+            url='/multi_part_parser_error/',
+            level='WARNING',
+            status_code=400,
+            msg='Bad request (Unable to parse request body): /multi_part_parser_error/',
+            exc_class=MultiPartParserError,
+        )
+
+
+@override_settings(
+    DEBUG=True,
+    USE_I18N=True,
+    LANGUAGES=[('en', 'English')],
+    MIDDLEWARE=[
+        'django.middleware.locale.LocaleMiddleware',
+        'django.middleware.common.CommonMiddleware',
+    ],
+    ROOT_URLCONF='logging_tests.urls_i18n',
+)
+class I18nLoggingTests(SetupDefaultLoggingMixin, LoggingCaptureMixin, SimpleTestCase):
+
+    def test_i18n_page_found_no_warning(self):
+        self.client.get('/exists/')
+        self.client.get('/en/exists/')
+        self.assertEqual(self.logger_output.getvalue(), '')
+
+    def test_i18n_page_not_found_warning(self):
+        self.client.get('/this_does_not/')
+        self.client.get('/en/nor_this/')
+        self.assertEqual(self.logger_output.getvalue(), 'Not Found: /this_does_not/\nNot Found: /en/nor_this/\n')
 
 
 class CallbackFilterTest(SimpleTestCase):
@@ -157,9 +246,10 @@ class CallbackFilterTest(SimpleTestCase):
 
 class AdminEmailHandlerTest(SimpleTestCase):
     logger = logging.getLogger('django')
+    request_factory = RequestFactory()
 
     def get_admin_email_handler(self, logger):
-        # Ensure that AdminEmailHandler does not get filtered out
+        # AdminEmailHandler does not get filtered out
         # even with DEBUG=True.
         admin_email_handler = [
             h for h in logger.handlers
@@ -177,9 +267,8 @@ class AdminEmailHandlerTest(SimpleTestCase):
     )
     def test_accepts_args(self):
         """
-        Ensure that user-supplied arguments and the EMAIL_SUBJECT_PREFIX
-        setting are used to compose the email subject.
-        Refs #16736.
+        User-supplied arguments and the EMAIL_SUBJECT_PREFIX setting are used
+        to compose the email subject (#16736).
         """
         message = "Custom message that says '%s' and '%s'"
         token1 = 'ping'
@@ -208,8 +297,7 @@ class AdminEmailHandlerTest(SimpleTestCase):
     )
     def test_accepts_args_and_request(self):
         """
-        Ensure that the subject is also handled if being
-        passed a request object.
+        The subject is also handled if being passed a request object.
         """
         message = "Custom message that says '%s' and '%s'"
         token1 = 'ping'
@@ -220,9 +308,9 @@ class AdminEmailHandlerTest(SimpleTestCase):
         orig_filters = admin_email_handler.filters
         try:
             admin_email_handler.filters = []
-            rf = RequestFactory()
-            request = rf.get('/')
-            self.logger.error(message, token1, token2,
+            request = self.request_factory.get('/')
+            self.logger.error(
+                message, token1, token2,
                 extra={
                     'status_code': 403,
                     'request': request,
@@ -243,9 +331,8 @@ class AdminEmailHandlerTest(SimpleTestCase):
     )
     def test_subject_accepts_newlines(self):
         """
-        Ensure that newlines in email reports' subjects are escaped to avoid
-        AdminErrorHandler to fail.
-        Refs #17281.
+        Newlines in email reports' subjects are escaped to prevent
+        AdminErrorHandler from failing (#17281).
         """
         message = 'Message \r\n with newlines'
         expected_subject = 'ERROR: Message \\r\\n with newlines'
@@ -257,28 +344,6 @@ class AdminEmailHandlerTest(SimpleTestCase):
         self.assertEqual(len(mail.outbox), 1)
         self.assertNotIn('\n', mail.outbox[0].subject)
         self.assertNotIn('\r', mail.outbox[0].subject)
-        self.assertEqual(mail.outbox[0].subject, expected_subject)
-
-    @override_settings(
-        ADMINS=(('admin', 'admin@example.com'),),
-        EMAIL_SUBJECT_PREFIX='',
-        DEBUG=False,
-    )
-    def test_truncate_subject(self):
-        """
-        RFC 2822's hard limit is 998 characters per line.
-        So, minus "Subject: ", the actual subject must be no longer than 989
-        characters.
-        Refs #17281.
-        """
-        message = 'a' * 1000
-        expected_subject = 'ERROR: aa' + 'a' * 980
-
-        self.assertEqual(len(mail.outbox), 0)
-
-        self.logger.error(message)
-
-        self.assertEqual(len(mail.outbox), 1)
         self.assertEqual(mail.outbox[0].subject, expected_subject)
 
     @override_settings(
@@ -323,9 +388,8 @@ class AdminEmailHandlerTest(SimpleTestCase):
         """
         handler = self.get_admin_email_handler(self.logger)
         record = self.logger.makeRecord('name', logging.ERROR, 'function', 'lno', 'message', None, None)
-        rf = RequestFactory()
         url_path = '/º'
-        record.request = rf.get(url_path)
+        record.request = self.request_factory.get(url_path)
         handler.emit(record)
         self.assertEqual(len(mail.outbox), 1)
         msg = mail.outbox[0]
@@ -371,7 +435,7 @@ class AdminEmailHandlerTest(SimpleTestCase):
 
 class SettingsConfigTest(AdminScriptTestCase):
     """
-    Test that accessing settings in a custom logging handler does not trigger
+    Accessing settings in a custom logging handler does not trigger
     a circular import error.
     """
     def setUp(self):
@@ -398,15 +462,19 @@ class SettingsConfigTest(AdminScriptTestCase):
 
 def dictConfig(config):
     dictConfig.called = True
+
+
 dictConfig.called = False
 
 
 class SetupConfigureLogging(SimpleTestCase):
     """
-    Test that calling django.setup() initializes the logging configuration.
+    Calling django.setup() initializes the logging configuration.
     """
-    @override_settings(LOGGING_CONFIG='logging_tests.tests.dictConfig',
-                       LOGGING=OLD_LOGGING)
+    @override_settings(
+        LOGGING_CONFIG='logging_tests.tests.dictConfig',
+        LOGGING=OLD_LOGGING,
+    )
     def test_configure_initializes_logging(self):
         from django import setup
         setup()
@@ -414,19 +482,25 @@ class SetupConfigureLogging(SimpleTestCase):
 
 
 @override_settings(DEBUG=True, ROOT_URLCONF='logging_tests.urls')
-class SecurityLoggerTest(SimpleTestCase):
+class SecurityLoggerTest(LoggingAssertionMixin, SimpleTestCase):
 
     def test_suspicious_operation_creates_log_message(self):
-        with patch_logger('django.security.SuspiciousOperation', 'error') as calls:
-            self.client.get('/suspicious/')
-            self.assertEqual(len(calls), 1)
-            self.assertEqual(calls[0], 'dubious')
+        self.assertLogsRequest(
+            url='/suspicious/',
+            level='ERROR',
+            msg='dubious',
+            status_code=400,
+            logger='django.security.SuspiciousOperation',
+        )
 
     def test_suspicious_operation_uses_sublogger(self):
-        with patch_logger('django.security.DisallowedHost', 'error') as calls:
-            self.client.get('/suspicious_spec/')
-            self.assertEqual(len(calls), 1)
-            self.assertEqual(calls[0], 'dubious')
+        self.assertLogsRequest(
+            url='/suspicious_spec/',
+            level='ERROR',
+            msg='dubious',
+            status_code=400,
+            logger='django.security.DisallowedHost',
+        )
 
     @override_settings(
         ADMINS=[('admin', 'admin@example.com')],
@@ -440,7 +514,7 @@ class SecurityLoggerTest(SimpleTestCase):
 
 class SettingsCustomLoggingTest(AdminScriptTestCase):
     """
-    Test that using a logging defaults are still applied when using a custom
+    Using a logging defaults are still applied when using a custom
     callable in LOGGING_CONFIG (i.e., logging.config.fileConfig).
     """
     def setUp(self):
@@ -461,11 +535,12 @@ args=(sys.stdout,)
 format=%(message)s
 """
         self.temp_file = NamedTemporaryFile()
-        self.temp_file.write(logging_conf.encode('utf-8'))
+        self.temp_file.write(logging_conf.encode())
         self.temp_file.flush()
-        sdict = {'LOGGING_CONFIG': '"logging.config.fileConfig"',
-                 'LOGGING': 'r"%s"' % self.temp_file.name}
-        self.write_settings('settings.py', sdict=sdict)
+        self.write_settings('settings.py', sdict={
+            'LOGGING_CONFIG': '"logging.config.fileConfig"',
+            'LOGGING': 'r"%s"' % self.temp_file.name,
+        })
 
     def tearDown(self):
         self.temp_file.close()
@@ -475,3 +550,47 @@ format=%(message)s
         out, err = self.run_manage(['check'])
         self.assertNoOutput(err)
         self.assertOutput(out, "System check identified no issues (0 silenced).")
+
+
+class LogFormattersTests(SimpleTestCase):
+
+    def test_server_formatter_styles(self):
+        color_style = color.make_style('')
+        formatter = ServerFormatter()
+        formatter.style = color_style
+        log_msg = 'log message'
+        status_code_styles = [
+            (200, 'HTTP_SUCCESS'),
+            (100, 'HTTP_INFO'),
+            (304, 'HTTP_NOT_MODIFIED'),
+            (300, 'HTTP_REDIRECT'),
+            (404, 'HTTP_NOT_FOUND'),
+            (400, 'HTTP_BAD_REQUEST'),
+            (500, 'HTTP_SERVER_ERROR'),
+        ]
+        for status_code, style in status_code_styles:
+            record = logging.makeLogRecord({'msg': log_msg, 'status_code': status_code})
+            self.assertEqual(formatter.format(record), getattr(color_style, style)(log_msg))
+        record = logging.makeLogRecord({'msg': log_msg})
+        self.assertEqual(formatter.format(record), log_msg)
+
+    def test_server_formatter_default_format(self):
+        server_time = '2016-09-25 10:20:30'
+        log_msg = 'log message'
+        logger = logging.getLogger('django.server')
+
+        @contextmanager
+        def patch_django_server_logger():
+            old_stream = logger.handlers[0].stream
+            new_stream = StringIO()
+            logger.handlers[0].stream = new_stream
+            yield new_stream
+            logger.handlers[0].stream = old_stream
+
+        with patch_django_server_logger() as logger_output:
+            logger.info(log_msg, extra={'server_time': server_time})
+            self.assertEqual('[%s] %s\n' % (server_time, log_msg), logger_output.getvalue())
+
+        with patch_django_server_logger() as logger_output:
+            logger.info(log_msg)
+            self.assertRegex(logger_output.getvalue(), r'^\[[-:,.\s\d]+\] %s' % log_msg)

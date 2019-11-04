@@ -1,6 +1,6 @@
-from __future__ import unicode_literals
-
 import unittest
+
+from django.test import TestCase
 
 from .models import PersonWithCustomMaxLengths, PersonWithDefaultMaxLengths
 
@@ -23,7 +23,7 @@ class MaxLengthArgumentsTests(unittest.TestCase):
         self.verify_max_length(PersonWithCustomMaxLengths, 'avatar', 250)
 
 
-class MaxLengthORMTests(unittest.TestCase):
+class MaxLengthORMTests(TestCase):
 
     def test_custom_max_lengths(self):
         args = {

@@ -13,6 +13,7 @@ def staticfiles_urlpatterns(prefix=None):
         prefix = settings.STATIC_URL
     return static(prefix, view=serve)
 
+
 # Only append if urlpatterns are empty
 if settings.DEBUG and not urlpatterns:
     urlpatterns += staticfiles_urlpatterns()

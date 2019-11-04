@@ -9,19 +9,14 @@ They also act as reverse fields for the purposes of the Meta API because
 they're the closest concept currently available.
 """
 
-from __future__ import unicode_literals
-
-import warnings
-
 from django.core import exceptions
-from django.utils.deprecation import RemovedInDjango20Warning
-from django.utils.encoding import smart_text
 from django.utils.functional import cached_property
 
 from . import BLANK_CHOICE_DASH
+from .mixins import FieldCacheMixin
 
 
-class ForeignObjectRel(object):
+class ForeignObjectRel(FieldCacheMixin):
     """
     Used by ForeignObject to store information about the relation.
 
@@ -40,7 +35,7 @@ class ForeignObjectRel(object):
     null = True
 
     def __init__(self, field, to, related_name=None, related_query_name=None,
-            limit_choices_to=None, parent_link=False, on_delete=None):
+                 limit_choices_to=None, parent_link=False, on_delete=None):
         self.field = field
         self.model = to
         self.related_name = related_name
@@ -56,14 +51,6 @@ class ForeignObjectRel(object):
     # __init__ as the field doesn't have its model yet. Calling these methods
     # before field.contribute_to_class() has been called will result in
     # AttributeError
-    @property
-    def to(self):
-        warnings.warn(
-            "Usage of ForeignObjectRel.to attribute has been deprecated. "
-            "Use the model attribute instead.",
-            RemovedInDjango20Warning, 2)
-        return self.model
-
     @cached_property
     def hidden(self):
         return self.is_hidden()
@@ -79,7 +66,7 @@ class ForeignObjectRel(object):
     @property
     def target_field(self):
         """
-        When filtering against this relation, returns the field on the remote
+        When filtering against this relation, return the field on the remote
         model against which the filtering should happen.
         """
         target_fields = self.get_path_info()[-1].target_fields
@@ -110,9 +97,6 @@ class ForeignObjectRel(object):
     def one_to_one(self):
         return self.field.one_to_one
 
-    def get_prep_lookup(self, lookup_name, value):
-        return self.field.get_prep_lookup(lookup_name, value)
-
     def get_lookup(self, lookup_name):
         return self.field.get_lookup(lookup_name)
 
@@ -130,30 +114,23 @@ class ForeignObjectRel(object):
             self.related_model._meta.model_name,
         )
 
-    def get_choices(self, include_blank=True, blank_choice=BLANK_CHOICE_DASH,
-                    limit_to_currently_related=False):
+    def get_choices(self, include_blank=True, blank_choice=BLANK_CHOICE_DASH, ordering=()):
         """
-        Return choices with a default blank choices included, for use as
-        SelectField choices for this field.
+        Return choices with a default blank choices included, for use
+        as <select> choices for this field.
 
         Analog of django.db.models.fields.Field.get_choices(), provided
         initially for utilization by RelatedFieldListFilter.
         """
-        first_choice = blank_choice if include_blank else []
-        queryset = self.related_model._default_manager.all()
-        if limit_to_currently_related:
-            queryset = queryset.complex_filter(
-                {'%s__isnull' % self.related_model._meta.model_name: False}
-            )
-        lst = [(x._get_pk_val(), smart_text(x)) for x in queryset]
-        return first_choice + lst
-
-    def get_db_prep_lookup(self, lookup_type, value, connection, prepared=False):
-        # Defer to the actual field definition for db prep
-        return self.field.get_db_prep_lookup(lookup_type, value, connection=connection, prepared=prepared)
+        qs = self.related_model._default_manager.all()
+        if ordering:
+            qs = qs.order_by(*ordering)
+        return (blank_choice if include_blank else []) + [
+            (x.pk, str(x)) for x in qs
+        ]
 
     def is_hidden(self):
-        "Should the related object be hidden?"
+        """Should the related object be hidden?"""
         return bool(self.related_name) and self.related_name[-1] == '+'
 
     def get_joining_columns(self):
@@ -175,10 +152,10 @@ class ForeignObjectRel(object):
     def get_accessor_name(self, model=None):
         # This method encapsulates the logic that decides what name to give an
         # accessor descriptor that retrieves related many-to-one or
-        # many-to-many objects. It uses the lower-cased object_name + "_set",
-        # but this can be overridden with the "related_name" option.
-        # Due to backwards compatibility ModelForms need to be able to provide
-        # an alternate model. See BaseInlineFormSet.get_default_prefix().
+        # many-to-many objects. It uses the lowercased object_name + "_set",
+        # but this can be overridden with the "related_name" option. Due to
+        # backwards compatibility ModelForms need to be able to provide an
+        # alternate model. See BaseInlineFormSet.get_default_prefix().
         opts = model._meta if model else self.related_model._meta
         model = model or self.related_model
         if self.multiple:
@@ -187,18 +164,17 @@ class ForeignObjectRel(object):
                 return None
         if self.related_name:
             return self.related_name
-        if opts.default_related_name:
-            return opts.default_related_name % {
-                'model_name': opts.model_name.lower(),
-                'app_label': opts.app_label.lower(),
-            }
         return opts.model_name + ('_set' if self.multiple else '')
 
-    def get_cache_name(self):
-        return "_%s_cache" % self.get_accessor_name()
+    def get_path_info(self, filtered_relation=None):
+        return self.field.get_reverse_path_info(filtered_relation)
 
-    def get_path_info(self):
-        return self.field.get_reverse_path_info()
+    def get_cache_name(self):
+        """
+        Return the name of the cache key to use for storing an instance of the
+        forward model on the reverse model.
+        """
+        return self.get_accessor_name()
 
 
 class ManyToOneRel(ForeignObjectRel):
@@ -217,8 +193,8 @@ class ManyToOneRel(ForeignObjectRel):
     """
 
     def __init__(self, field, to, field_name, related_name=None, related_query_name=None,
-            limit_choices_to=None, parent_link=False, on_delete=None):
-        super(ManyToOneRel, self).__init__(
+                 limit_choices_to=None, parent_link=False, on_delete=None):
+        super().__init__(
             field, to,
             related_name=related_name,
             related_query_name=related_query_name,
@@ -240,8 +216,7 @@ class ManyToOneRel(ForeignObjectRel):
         """
         field = self.model._meta.get_field(self.field_name)
         if not field.concrete:
-            raise exceptions.FieldDoesNotExist("No related field named '%s'" %
-                    self.field_name)
+            raise exceptions.FieldDoesNotExist("No related field named '%s'" % self.field_name)
         return field
 
     def set_field_name(self):
@@ -257,8 +232,8 @@ class OneToOneRel(ManyToOneRel):
     """
 
     def __init__(self, field, to, field_name, related_name=None, related_query_name=None,
-            limit_choices_to=None, parent_link=False, on_delete=None):
-        super(OneToOneRel, self).__init__(
+                 limit_choices_to=None, parent_link=False, on_delete=None):
+        super().__init__(
             field, to, field_name,
             related_name=related_name,
             related_query_name=related_query_name,
@@ -279,9 +254,9 @@ class ManyToManyRel(ForeignObjectRel):
     """
 
     def __init__(self, field, to, related_name=None, related_query_name=None,
-            limit_choices_to=None, symmetrical=True, through=None, through_fields=None,
-            db_constraint=True):
-        super(ManyToManyRel, self).__init__(
+                 limit_choices_to=None, symmetrical=True, through=None,
+                 through_fields=None, db_constraint=True):
+        super().__init__(
             field, to,
             related_name=related_name,
             related_query_name=related_query_name,

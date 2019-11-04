@@ -5,15 +5,16 @@
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Janno Liivak <jannolii@gmail.com>, 2013-2015
 # madisvain <madisvain@gmail.com>, 2011
-# Martin <martinpajuste@gmail.com>, 2014-2015
-# Marti Raudsepp <marti@juffo.org>, 2014
+# Martin Pajuste <martinpajuste@gmail.com>, 2014-2015
+# Martin Pajuste <martinpajuste@gmail.com>, 2016-2017,2019
+# Marti Raudsepp <marti@juffo.org>, 2014,2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2015-11-27 09:41+0000\n"
-"Last-Translator: Janno Liivak <jannolii@gmail.com>\n"
+"POT-Creation-Date: 2019-01-16 20:42+0100\n"
+"PO-Revision-Date: 2019-01-18 16:27+0000\n"
+"Last-Translator: Martin Pajuste <martinpajuste@gmail.com>\n"
 "Language-Team: Estonian (http://www.transifex.com/django/django/language/"
 "et/)\n"
 "MIME-Version: 1.0\n"
@@ -63,6 +64,9 @@ msgstr "taani"
 
 msgid "German"
 msgstr "saksa"
+
+msgid "Lower Sorbian"
+msgstr " alamsorbi"
 
 msgid "Greek"
 msgstr "kreeka"
@@ -133,8 +137,14 @@ msgstr "hindi"
 msgid "Croatian"
 msgstr "horvaatia"
 
+msgid "Upper Sorbian"
+msgstr "ülemsorbi"
+
 msgid "Hungarian"
 msgstr "ungari"
+
+msgid "Armenian"
+msgstr "armeenia"
 
 msgid "Interlingua"
 msgstr "interlingua"
@@ -156,6 +166,9 @@ msgstr "jaapani"
 
 msgid "Georgian"
 msgstr "gruusia"
+
+msgid "Kabyle"
+msgstr ""
 
 msgid "Kazakh"
 msgstr "kasahhi"
@@ -193,8 +206,8 @@ msgstr "marathi"
 msgid "Burmese"
 msgstr "birma"
 
-msgid "Norwegian Bokmal"
-msgstr "norra (bokmal)"
+msgid "Norwegian Bokmål"
+msgstr "norra bokmål"
 
 msgid "Nepali"
 msgstr "nepali"
@@ -292,8 +305,14 @@ msgstr "Staatilised failid"
 msgid "Syndication"
 msgstr "Sündikeerimine"
 
-msgid "Web Design"
-msgstr "Veebidisain"
+msgid "That page number is not an integer"
+msgstr "See lehe number ei ole täisarv"
+
+msgid "That page number is less than 1"
+msgstr "See lehe number on väiksem kui 1"
+
+msgid "That page contains no results"
+msgstr "See leht ei sisalda tulemusi"
 
 msgid "Enter a valid value."
 msgstr "Sisestage korrektne väärtus."
@@ -307,6 +326,7 @@ msgstr "Sisestage korrektne täisarv."
 msgid "Enter a valid email address."
 msgstr "Sisestage korrektne e-posti aadress."
 
+#. Translators: "letters" means latin letters: a-z and A-Z.
 msgid ""
 "Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
 msgstr ""
@@ -371,6 +391,9 @@ msgstr[1] ""
 "Väärtuses võib olla kõige rohkem %(limit_value)d tähemärki (praegu on "
 "%(show_value)d)."
 
+msgid "Enter a number."
+msgstr "Sisestage arv."
+
 #, python-format
 msgid "Ensure that there are no more than %(max)s digit in total."
 msgid_plural "Ensure that there are no more than %(max)s digits in total."
@@ -392,6 +415,17 @@ msgstr[0] ""
 "Veenduge, et komast vasakul olevaid numbreid ei oleks rohkem kui %(max)s."
 msgstr[1] ""
 "Veenduge, et komast vasakul olevaid numbreid ei oleks rohkem kui %(max)s."
+
+#, python-format
+msgid ""
+"File extension '%(extension)s' is not allowed. Allowed extensions are: "
+"'%(allowed_extensions)s'."
+msgstr ""
+"Faililaiend '%(extension)s' ei ole lubatud. Lubatud laiendid on: "
+"'%(allowed_extensions)s'."
+
+msgid "Null characters are not allowed."
+msgstr "Tühjad tähemärgid ei ole lubatud."
 
 msgid "and"
 msgstr "ja"
@@ -434,9 +468,16 @@ msgstr "Täisarv"
 msgid "'%(value)s' value must be an integer."
 msgstr "'%(value)s' väärtus peab olema täisarv."
 
+msgid "Big (8 byte) integer"
+msgstr "Suur (8 baiti) täisarv"
+
 #, python-format
 msgid "'%(value)s' value must be either True or False."
 msgstr "'%(value)s' väärtus peab olema kas Tõene või Väär."
+
+#, python-format
+msgid "'%(value)s' value must be either True, False, or None."
+msgstr ""
 
 msgid "Boolean (Either True or False)"
 msgstr "Tõeväärtus (Kas tõene või väär)"
@@ -516,9 +557,6 @@ msgstr "'%(value)s' väärtus peab olema ujukomaarv."
 msgid "Floating point number"
 msgstr "Ujukomaarv"
 
-msgid "Big (8 byte) integer"
-msgstr "Suur (8 baiti) täisarv"
-
 msgid "IPv4 address"
 msgstr "IPv4 aadress"
 
@@ -577,6 +615,9 @@ msgstr "Töötlemata binaarandmed"
 msgid "'%(value)s' is not a valid UUID."
 msgstr "'%(value)s' ei ole korrektne UUID."
 
+msgid "Universally unique identifier"
+msgstr ""
+
 msgid "File"
 msgstr "Fail"
 
@@ -593,6 +634,14 @@ msgstr "Välisvõti (tüübi määrab seotud väli) "
 msgid "One-to-one relationship"
 msgstr "Üks-ühele seos"
 
+#, python-format
+msgid "%(from)s-%(to)s relationship"
+msgstr "%(from)s-%(to)s seos"
+
+#, python-format
+msgid "%(from)s-%(to)s relationships"
+msgstr "%(from)s-%(to)s seosed"
+
 msgid "Many-to-many relationship"
 msgstr "Mitu-mitmele seos"
 
@@ -608,9 +657,6 @@ msgstr "See lahter on nõutav."
 msgid "Enter a whole number."
 msgstr "Sisestage täisarv."
 
-msgid "Enter a number."
-msgstr "Sisestage arv."
-
 msgid "Enter a valid date."
 msgstr "Sisestage korrektne kuupäev."
 
@@ -622,6 +668,10 @@ msgstr "Sisestage korrektne kuupäev ja kellaaeg."
 
 msgid "Enter a valid duration."
 msgstr "Sisestage korrektne kestus."
+
+#, python-brace-format
+msgid "The number of days must be between {min_days} and {max_days}."
+msgstr "Päevade arv peab jääma vahemikku {min_days} kuni {max_days}."
 
 msgid "No file was submitted. Check the encoding type on the form."
 msgstr "Ühtegi faili ei saadetud. Kontrollige vormi kodeeringutüüpi."
@@ -715,15 +765,15 @@ msgstr ""
 msgid "Please correct the duplicate values below."
 msgstr "Palun parandage allolevad duplikaat-väärtused"
 
-msgid "The inline foreign key did not match the parent instance primary key."
-msgstr "Pesastatud välisvõti ei sobi ülemobjekti primaarvõtmega."
+msgid "The inline value did not match the parent instance."
+msgstr "Pesastatud väärtus ei sobi ülemobjektiga."
 
 msgid "Select a valid choice. That choice is not one of the available choices."
 msgstr "Valige korrektne väärtus. Valitud väärtus ei ole valitav."
 
 #, python-format
-msgid "\"%(pk)s\" is not a valid value for a primary key."
-msgstr "\"%(pk)s\" ei ole sobiv väärtus primaarvõtmeks."
+msgid "\"%(pk)s\" is not a valid value."
+msgstr "\"%(pk)s\" ei ole korrektne väärtus."
 
 #, python-format
 msgid ""
@@ -733,14 +783,14 @@ msgstr ""
 "%(datetime)s ei saanud tõlgendada ajavööndis %(current_timezone)s; see on "
 "kas puudu või mitmetähenduslik."
 
+msgid "Clear"
+msgstr "Tühjenda"
+
 msgid "Currently"
 msgstr "Hetkel"
 
 msgid "Change"
 msgstr "Muuda"
-
-msgid "Clear"
-msgstr "Tühjenda"
 
 msgid "Unknown"
 msgstr "Tundmatu"
@@ -1013,8 +1063,8 @@ msgstr "See ei ole korrektne IPv6 aadress."
 
 #, python-format
 msgctxt "String to return when truncating text"
-msgid "%(truncated_text)s..."
-msgstr "%(truncated_text)s..."
+msgid "%(truncated_text)s…"
+msgstr ""
 
 msgid "or"
 msgstr "või"
@@ -1089,6 +1139,14 @@ msgstr ""
 "või 'sama-allika' päringute jaoks."
 
 msgid ""
+"If you are using the <meta name=\"referrer\" content=\"no-referrer\"> tag or "
+"including the 'Referrer-Policy: no-referrer' header, please remove them. The "
+"CSRF protection requires the 'Referer' header to do strict referer checking. "
+"If you're concerned about privacy, use alternatives like <a rel=\"noreferrer"
+"\" ...> for links to third-party sites."
+msgstr ""
+
+msgid ""
 "You are seeing this message because this site requires a CSRF cookie when "
 "submitting forms. This cookie is required for security reasons, to ensure "
 "that your browser is not being hijacked by third parties."
@@ -1107,31 +1165,11 @@ msgstr ""
 msgid "More information is available with DEBUG=True."
 msgstr "Saadaval on rohkem infot kasutades DEBUG=True"
 
-msgid "Welcome to Django"
-msgstr "Teretulemast Django juurde"
-
-msgid "It worked!"
-msgstr "See töötas!"
-
-msgid "Congratulations on your first Django-powered page."
-msgstr "Õnnitleme Teie esimese Django-põhise lehe puhul."
-
-msgid ""
-"Of course, you haven't actually done any work yet. Next, start your first "
-"app by running <code>python manage.py startapp [app_label]</code>."
-msgstr ""
-"Muidugi ei ole sa veel midagi tegelikult teinud. Järgmiseks käivita oma "
-"rakendus käsuga <code>python manage.py startapp [app_label]</code>."
-
-msgid ""
-"You're seeing this message because you have <code>DEBUG = True</code> in "
-"your Django settings file and you haven't configured any URLs. Get to work!"
-msgstr ""
-"Näete seda teadet, kuna teil on määratud <code>DEBUG = True</code> Django "
-"seadete failis ja te ei ole ühtki URLi seadistanud. Ruttu tööle!"
-
 msgid "No year specified"
 msgstr "Aasta on valimata"
+
+msgid "Date out of range"
+msgstr ""
 
 msgid "No month specified"
 msgstr "Kuu on valimata"
@@ -1183,3 +1221,44 @@ msgstr "\"%(path)s\" ei eksisteeri"
 #, python-format
 msgid "Index of %(directory)s"
 msgstr "%(directory)s sisuloend"
+
+msgid "Django: the Web framework for perfectionists with deadlines."
+msgstr ""
+
+#, python-format
+msgid ""
+"View <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" "
+"target=\"_blank\" rel=\"noopener\">release notes</a> for Django %(version)s"
+msgstr ""
+
+msgid "The install worked successfully! Congratulations!"
+msgstr ""
+
+#, python-format
+msgid ""
+"You are seeing this page because <a href=\"https://docs.djangoproject.com/en/"
+"%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener"
+"\">DEBUG=True</a> is in your settings file and you have not configured any "
+"URLs."
+msgstr ""
+"Näete seda lehte, kuna teil on määratud <a href=\"https://docs.djangoproject."
+"com/en/%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener"
+"\">DEBUG=True</a> Django seadete failis ja te ei ole ühtki URLi seadistanud."
+
+msgid "Django Documentation"
+msgstr "Django dokumentatsioon"
+
+msgid "Topics, references, &amp; how-to's"
+msgstr ""
+
+msgid "Tutorial: A Polling App"
+msgstr ""
+
+msgid "Get started with Django"
+msgstr ""
+
+msgid "Django Community"
+msgstr ""
+
+msgid "Connect, get help, or contribute"
+msgstr ""

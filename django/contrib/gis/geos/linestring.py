@@ -4,7 +4,6 @@ from django.contrib.gis.geos.error import GEOSException
 from django.contrib.gis.geos.geometry import GEOSGeometry, LinearGeometryMixin
 from django.contrib.gis.geos.point import Point
 from django.contrib.gis.shortcuts import numpy
-from django.utils.six.moves import range
 
 
 class LineString(LinearGeometryMixin, GEOSGeometry):
@@ -14,7 +13,7 @@ class LineString(LinearGeometryMixin, GEOSGeometry):
 
     def __init__(self, *args, **kwargs):
         """
-        Initializes on the given sequence -- may take lists, tuples, NumPy arrays
+        Initialize on the given sequence -- may take lists, tuples, NumPy arrays
         of X,Y pairs, or Point objects.  If Point objects are used, ownership is
         _not_ transferred to the LineString object.
 
@@ -38,7 +37,7 @@ class LineString(LinearGeometryMixin, GEOSGeometry):
 
         ncoords = len(coords)
         if not ncoords:
-            super(LineString, self).__init__(self._init_func(None), srid=srid)
+            super().__init__(self._init_func(None), srid=srid)
             return
 
         if ncoords < self._minlength:
@@ -50,7 +49,14 @@ class LineString(LinearGeometryMixin, GEOSGeometry):
                 )
             )
 
-        if isinstance(coords, (tuple, list)):
+        numpy_coords = not isinstance(coords, (tuple, list))
+        if numpy_coords:
+            shape = coords.shape  # Using numpy's shape.
+            if len(shape) != 2:
+                raise TypeError('Too many dimensions.')
+            self._checkdim(shape[1])
+            ndim = shape[1]
+        else:
             # Getting the number of coords and the number of dimensions -- which
             #  must stay the same, e.g., no LineString((1, 2), (1, 2, 3)).
             ndim = None
@@ -64,38 +70,31 @@ class LineString(LinearGeometryMixin, GEOSGeometry):
                     self._checkdim(ndim)
                 elif len(coord) != ndim:
                     raise TypeError('Dimension mismatch.')
-            numpy_coords = False
-        else:
-            shape = coords.shape  # Using numpy's shape.
-            if len(shape) != 2:
-                raise TypeError('Too many dimensions.')
-            self._checkdim(shape[1])
-            ndim = shape[1]
-            numpy_coords = True
 
         # Creating a coordinate sequence object because it is easier to
-        # set the points using GEOSCoordSeq.__setitem__().
+        # set the points using its methods.
         cs = GEOSCoordSeq(capi.create_cs(ncoords, ndim), z=bool(ndim == 3))
+        point_setter = cs._set_point_3d if ndim == 3 else cs._set_point_2d
 
         for i in range(ncoords):
             if numpy_coords:
-                cs[i] = coords[i, :]
+                point_coords = coords[i, :]
             elif isinstance(coords[i], Point):
-                cs[i] = coords[i].tuple
+                point_coords = coords[i].tuple
             else:
-                cs[i] = coords[i]
+                point_coords = coords[i]
+            point_setter(i, point_coords)
 
         # Calling the base geometry initialization with the returned pointer
         #  from the function.
-        super(LineString, self).__init__(self._init_func(cs.ptr), srid=srid)
+        super().__init__(self._init_func(cs.ptr), srid=srid)
 
     def __iter__(self):
-        "Allows iteration over this LineString."
-        for i in range(len(self)):
-            yield self[i]
+        "Allow iteration over this LineString."
+        return iter(self._cs)
 
     def __len__(self):
-        "Returns the number of points in this LineString."
+        "Return the number of points in this LineString."
         return len(self._cs)
 
     def _get_single_external(self, index):
@@ -116,13 +115,12 @@ class LineString(LinearGeometryMixin, GEOSGeometry):
         if ptr:
             capi.destroy_geom(self.ptr)
             self.ptr = ptr
-            self._post_init(self.srid)
+            self._post_init()
         else:
             # can this happen?
             raise GEOSException('Geometry resulting from slice deletion was invalid.')
 
     def _set_single(self, index, value):
-        self._checkindex(index)
         self._cs[index] = value
 
     def _checkdim(self, dim):
@@ -132,14 +130,14 @@ class LineString(LinearGeometryMixin, GEOSGeometry):
     # #### Sequence Properties ####
     @property
     def tuple(self):
-        "Returns a tuple version of the geometry from the coordinate sequence."
+        "Return a tuple version of the geometry from the coordinate sequence."
         return self._cs.tuple
     coords = tuple
 
     def _listarr(self, func):
         """
-        Internal routine that returns a sequence (list) corresponding with
-        the given function.  Will return a numpy array if possible.
+        Return a sequence (list) corresponding with the given function.
+        Return a numpy array if possible.
         """
         lst = [func(i) for i in range(len(self))]
         if numpy:
@@ -149,22 +147,22 @@ class LineString(LinearGeometryMixin, GEOSGeometry):
 
     @property
     def array(self):
-        "Returns a numpy array for the LineString."
+        "Return a numpy array for the LineString."
         return self._listarr(self._cs.__getitem__)
 
     @property
     def x(self):
-        "Returns a list or numpy array of the X variable."
+        "Return a list or numpy array of the X variable."
         return self._listarr(self._cs.getX)
 
     @property
     def y(self):
-        "Returns a list or numpy array of the Y variable."
+        "Return a list or numpy array of the Y variable."
         return self._listarr(self._cs.getY)
 
     @property
     def z(self):
-        "Returns a list or numpy array of the Z variable."
+        "Return a list or numpy array of the Z variable."
         if not self.hasz:
             return None
         else:

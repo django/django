@@ -3,30 +3,36 @@
 # Translators:
 # Oleksandr Chernihov <o.chernihov@gmail.com>, 2014
 # Boryslav Larin <brabadu@gmail.com>, 2011
-# Igor Melnyk, 2014-2015
+# Денис Подлесный <haos616@gmail.com>, 2016
+# Igor Melnyk, 2014-2015,2017
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Kirill Gagarski <gagarin.gtn@gmail.com>, 2014
 # Max V. Stotsky <transifex@ms.pereslavl.ru>, 2014
 # Mikhail Kolesnik <mike@openbunker.org>, 2015
 # Mykola Zamkovoi <nickzam@gmail.com>, 2014
-# Oleksandr Bolotov <oleksandr.bolotov@gmail.com>, 2013-2014
+# Alex Bolotov <oleksandr.bolotov@gmail.com>, 2013-2014
 # Roman Kozlovskyi <krzroman@gmail.com>, 2012
 # Sergiy Kuzmenko <s.kuzmenko@gmail.com>, 2011
+# tarasyyyk <taras.korzhak96@gmail.com>, 2018
+# tarasyyyk <taras.korzhak96@gmail.com>, 2019
+# Zoriana Zaiats, 2016-2017
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2015-12-01 21:28+0000\n"
-"Last-Translator: Mikhail Kolesnik <mike@openbunker.org>\n"
+"POT-Creation-Date: 2019-01-16 20:42+0100\n"
+"PO-Revision-Date: 2019-02-21 16:29+0000\n"
+"Last-Translator: tarasyyyk <taras.korzhak96@gmail.com>\n"
 "Language-Team: Ukrainian (http://www.transifex.com/django/django/language/"
 "uk/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: uk\n"
-"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
-"%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"Plural-Forms: nplurals=4; plural=(n % 1 == 0 && n % 10 == 1 && n % 100 != "
+"11 ? 0 : n % 1 == 0 && n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 12 || n % "
+"100 > 14) ? 1 : n % 1 == 0 && (n % 10 ==0 || (n % 10 >=5 && n % 10 <=9) || "
+"(n % 100 >=11 && n % 100 <=14 )) ? 2: 3);\n"
 
 msgid "Afrikaans"
 msgstr "Африканська"
@@ -69,6 +75,9 @@ msgstr "Датська"
 
 msgid "German"
 msgstr "Німецька"
+
+msgid "Lower Sorbian"
+msgstr "Нижньолужицька"
 
 msgid "Greek"
 msgstr "Грецька"
@@ -139,8 +148,14 @@ msgstr "Хінді"
 msgid "Croatian"
 msgstr "Хорватська"
 
+msgid "Upper Sorbian"
+msgstr "Верхньолужицька"
+
 msgid "Hungarian"
 msgstr "Угорська"
+
+msgid "Armenian"
+msgstr "Вірменська"
 
 msgid "Interlingua"
 msgstr "Інтерлінгва"
@@ -162,6 +177,9 @@ msgstr "Японська"
 
 msgid "Georgian"
 msgstr "Грузинська"
+
+msgid "Kabyle"
+msgstr "Кабіли"
 
 msgid "Kazakh"
 msgstr "Казахська"
@@ -199,7 +217,7 @@ msgstr "Маратхі"
 msgid "Burmese"
 msgstr "Бірманська"
 
-msgid "Norwegian Bokmal"
+msgid "Norwegian Bokmål"
 msgstr "Норвезька (Букмол)"
 
 msgid "Nepali"
@@ -298,8 +316,14 @@ msgstr "Статичні файли"
 msgid "Syndication"
 msgstr "Об'єднання"
 
-msgid "Web Design"
-msgstr "Веб-дизайн"
+msgid "That page number is not an integer"
+msgstr "Номер сторінки не є цілим числом"
+
+msgid "That page number is less than 1"
+msgstr "Номер сторінки менше 1"
+
+msgid "That page contains no results"
+msgstr "Сторінка не містить результатів"
 
 msgid "Enter a valid value."
 msgstr "Введіть коректне значення."
@@ -313,6 +337,7 @@ msgstr "Введіть коректне ціле число."
 msgid "Enter a valid email address."
 msgstr "Введіть коректну email адресу."
 
+#. Translators: "letters" means latin letters: a-z and A-Z.
 msgid ""
 "Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
 msgstr ""
@@ -368,6 +393,9 @@ msgstr[1] ""
 msgstr[2] ""
 "Переконайтеся, що це значення містить не менш ніж %(limit_value)d символів "
 "(зараз %(show_value)d)."
+msgstr[3] ""
+"Переконайтеся, що це значення містить не менш ніж %(limit_value)d символів "
+"(зараз %(show_value)d)."
 
 #, python-format
 msgid ""
@@ -385,6 +413,12 @@ msgstr[1] ""
 msgstr[2] ""
 "Переконайтеся, що це значення містить не більше ніж %(limit_value)d символів "
 "(зараз %(show_value)d)."
+msgstr[3] ""
+"Переконайтеся, що це значення містить не більше ніж %(limit_value)d символів "
+"(зараз %(show_value)d)."
+
+msgid "Enter a number."
+msgstr "Введіть число."
 
 #, python-format
 msgid "Ensure that there are no more than %(max)s digit in total."
@@ -392,6 +426,7 @@ msgid_plural "Ensure that there are no more than %(max)s digits in total."
 msgstr[0] "Переконайтеся, що загалом тут не більше ніж %(max)s цифра."
 msgstr[1] "Переконайтеся, що загалом тут не більше ніж %(max)s цифер."
 msgstr[2] "Переконайтеся, що загалом тут не більше ніж %(max)s цифер."
+msgstr[3] "Переконайтеся, що загалом тут не більше ніж %(max)s цифер."
 
 #, python-format
 msgid "Ensure that there are no more than %(max)s decimal place."
@@ -401,6 +436,8 @@ msgstr[0] ""
 msgstr[1] ""
 "Переконайтеся, що тут не більше ніж %(max)s цифри після десяткової коми."
 msgstr[2] ""
+"Переконайтеся, що тут не більше ніж %(max)s цифер після десяткової коми."
+msgstr[3] ""
 "Переконайтеся, що тут не більше ніж %(max)s цифер після десяткової коми."
 
 #, python-format
@@ -414,6 +451,19 @@ msgstr[1] ""
 "Переконайтеся, що тут не більше ніж %(max)s цифри до десяткової коми."
 msgstr[2] ""
 "Переконайтеся, що тут не більше ніж %(max)s цифер до десяткової коми."
+msgstr[3] ""
+"Переконайтеся, що тут не більше ніж %(max)s цифер до десяткової коми."
+
+#, python-format
+msgid ""
+"File extension '%(extension)s' is not allowed. Allowed extensions are: "
+"'%(allowed_extensions)s'."
+msgstr ""
+"Розширення файлу '%(extension)s' не дозволено. Дозволені розширення: ' "
+"%(allowed_extensions)s'."
+
+msgid "Null characters are not allowed."
+msgstr "Символи Null не дозволені."
 
 msgid "and"
 msgstr "та"
@@ -456,9 +506,16 @@ msgstr "Ціле число"
 msgid "'%(value)s' value must be an integer."
 msgstr "Значення '%(value)s' повинне бути цілим числом."
 
+msgid "Big (8 byte) integer"
+msgstr "Велике (8 байтів) ціле число"
+
 #, python-format
 msgid "'%(value)s' value must be either True or False."
 msgstr "Значення '%(value)s' повинне бути True або False."
+
+#, python-format
+msgid "'%(value)s' value must be either True, False, or None."
+msgstr "Значення '%(value)s' повинне бути True, False, або None."
 
 msgid "Boolean (Either True or False)"
 msgstr "Булеве значення (True або False)"
@@ -536,9 +593,6 @@ msgstr "Значення '%(value)s' повинне бути числом з п�
 msgid "Floating point number"
 msgstr "Число з плаваючою комою"
 
-msgid "Big (8 byte) integer"
-msgstr "Велике (8 байтів) ціле число"
-
 msgid "IPv4 address"
 msgstr "IPv4 адреса"
 
@@ -597,6 +651,9 @@ msgstr "Необроблені двійкові дані"
 msgid "'%(value)s' is not a valid UUID."
 msgstr "'%(value)s' невірне значення UUID."
 
+msgid "Universally unique identifier"
+msgstr "Універсальний унікальний ідентифікатор"
+
 msgid "File"
 msgstr "Файл"
 
@@ -613,6 +670,14 @@ msgstr "Зовнішній ключ (тип визначається відпо�
 msgid "One-to-one relationship"
 msgstr "Один-до-одного"
 
+#, python-format
+msgid "%(from)s-%(to)s relationship"
+msgstr "%(from)s-%(to)s звязок"
+
+#, python-format
+msgid "%(from)s-%(to)s relationships"
+msgstr "%(from)s-%(to)s звязки"
+
 msgid "Many-to-many relationship"
 msgstr "Багато-до-багатьох"
 
@@ -628,9 +693,6 @@ msgstr "Це поле обов'язкове."
 msgid "Enter a whole number."
 msgstr "Введіть ціле число."
 
-msgid "Enter a number."
-msgstr "Введіть число."
-
 msgid "Enter a valid date."
 msgstr "Введіть коректну дату."
 
@@ -642,6 +704,10 @@ msgstr "Введіть коректну дату/час."
 
 msgid "Enter a valid duration."
 msgstr "Введіть коректну тривалість."
+
+#, python-brace-format
+msgid "The number of days must be between {min_days} and {max_days}."
+msgstr "Кількість днів повинна бути від {min_days} до {max_days}."
 
 msgid "No file was submitted. Check the encoding type on the form."
 msgstr "Файл не надіслано. Перевірте тип кодування форми."
@@ -663,6 +729,9 @@ msgstr[1] ""
 "Переконайтеся, що це ім'я файлу містить не більше ніж з %(max)d символи "
 "(зараз %(length)d)."
 msgstr[2] ""
+"Переконайтеся, що це ім'я файлу містить не більше ніж з %(max)d символів "
+"(зараз %(length)d)."
+msgstr[3] ""
 "Переконайтеся, що це ім'я файлу містить не більше ніж з %(max)d символів "
 "(зараз %(length)d)."
 
@@ -708,6 +777,7 @@ msgid_plural "Please submit %d or fewer forms."
 msgstr[0] "Будь ласка, відправте %d або менше форм."
 msgstr[1] "Будь ласка, відправте %d або менше форм."
 msgstr[2] "Будь ласка, відправте %d або менше форм."
+msgstr[3] "Будь ласка, відправте %d або менше форм."
 
 #, python-format
 msgid "Please submit %d or more forms."
@@ -715,6 +785,7 @@ msgid_plural "Please submit %d or more forms."
 msgstr[0] "Будь ласка, відправте як мінімум %d форму."
 msgstr[1] "Будь ласка, відправте як мінімум %d форми."
 msgstr[2] "Будь ласка, відправте як мінімум %d форм."
+msgstr[3] "Будь ласка, відправте як мінімум %d форм."
 
 msgid "Order"
 msgstr "Послідовність"
@@ -743,17 +814,15 @@ msgstr ""
 msgid "Please correct the duplicate values below."
 msgstr "Будь ласка, виправте повторювані значення нижче."
 
-msgid "The inline foreign key did not match the parent instance primary key."
-msgstr ""
-"Зв'язаний зовнішній ключ не відповідає первісному ключу батьківського "
-"екземпляру."
+msgid "The inline value did not match the parent instance."
+msgstr "Зв'язане значення не відповідає батьківському екземпляру."
 
 msgid "Select a valid choice. That choice is not one of the available choices."
 msgstr "Зробить коректний вибір. Такого варіанту нема серед доступних."
 
 #, python-format
-msgid "\"%(pk)s\" is not a valid value for a primary key."
-msgstr "\"%(pk)s\" не є допустимим значенням для первинного ключа."
+msgid "\"%(pk)s\" is not a valid value."
+msgstr "\"%(pk)s\" не є допустимим значенням."
 
 #, python-format
 msgid ""
@@ -763,14 +832,14 @@ msgstr ""
 "%(datetime)s не може бути інтерпретована в часовому поясі "
 "%(current_timezone)s; дата може бути неодзначною або виявитись неіснуючою."
 
+msgid "Clear"
+msgstr "Очистити"
+
 msgid "Currently"
 msgstr "Наразі"
 
 msgid "Change"
 msgstr "Змінити"
-
-msgid "Clear"
-msgstr "Очистити"
 
 msgid "Unknown"
 msgstr "Невідомо"
@@ -790,6 +859,7 @@ msgid_plural "%(size)d bytes"
 msgstr[0] "%(size)d байт"
 msgstr[1] "%(size)d байти"
 msgstr[2] "%(size)d байтів"
+msgstr[3] "%(size)d байтів"
 
 #, python-format
 msgid "%s KB"
@@ -1044,8 +1114,8 @@ msgstr "Це не є правильною адресою IPv6."
 
 #, python-format
 msgctxt "String to return when truncating text"
-msgid "%(truncated_text)s..."
-msgstr "%(truncated_text)s..."
+msgid "%(truncated_text)s…"
+msgstr "%(truncated_text)s…"
 
 msgid "or"
 msgstr "або"
@@ -1060,6 +1130,7 @@ msgid_plural "%d years"
 msgstr[0] "%d рік"
 msgstr[1] "%d роки"
 msgstr[2] "%d років"
+msgstr[3] "%d років"
 
 #, python-format
 msgid "%d month"
@@ -1067,6 +1138,7 @@ msgid_plural "%d months"
 msgstr[0] "%d місяць"
 msgstr[1] "%d місяці"
 msgstr[2] "%d місяців"
+msgstr[3] "%d місяців"
 
 #, python-format
 msgid "%d week"
@@ -1074,6 +1146,7 @@ msgid_plural "%d weeks"
 msgstr[0] "%d тиждень"
 msgstr[1] "%d тижні"
 msgstr[2] "%d тижнів"
+msgstr[3] "%d тижнів"
 
 #, python-format
 msgid "%d day"
@@ -1081,6 +1154,7 @@ msgid_plural "%d days"
 msgstr[0] "%d день"
 msgstr[1] "%d дня"
 msgstr[2] "%d днів"
+msgstr[3] "%d днів"
 
 #, python-format
 msgid "%d hour"
@@ -1088,6 +1162,7 @@ msgid_plural "%d hours"
 msgstr[0] "%d година"
 msgstr[1] "%d години"
 msgstr[2] "%d годин"
+msgstr[3] "%d годин"
 
 #, python-format
 msgid "%d minute"
@@ -1095,6 +1170,7 @@ msgid_plural "%d minutes"
 msgstr[0] "%d хвилина"
 msgstr[1] "%d хвилини"
 msgstr[2] "%d хвилин"
+msgstr[3] "%d хвилин"
 
 msgid "0 minutes"
 msgstr "0 хвилин"
@@ -1114,8 +1190,7 @@ msgstr ""
 "Ви бачите це повідомлення, тому що даний сайт використовує захищене "
 "з'єднання і вимагає, щоб заголовок «Referer» був переданий вашим браузером, "
 "але він не був ним переданий. Даний заголовок необхідний з міркувань "
-"безпеки, щоб переконатися, що ваш браузер не був зламаний, а запит до "
-"сервера ні перехоплений третьою стороною."
+"безпеки, щоб переконатися, що ваш браузер не був взламаний третьою стороною."
 
 msgid ""
 "If you have configured your browser to disable 'Referer' headers, please re-"
@@ -1124,8 +1199,22 @@ msgid ""
 msgstr ""
 "Якщо ви налаштували свій браузер таким чином, щоб заборонити йому передавати "
 "заголовок «Referer», будь ласка, дозвольте йому відсилати даний заголовок "
-"принаймні для даного сайту, або для всіх HTTPS-з'єднань, або для запитів, "
-"домен і порт призначення збігаються з доменом і портом поточної сторінки."
+"принаймні для даного сайту, або для всіх HTTPS-з'єднань, або для подібних "
+"запитів."
+
+msgid ""
+"If you are using the <meta name=\"referrer\" content=\"no-referrer\"> tag or "
+"including the 'Referrer-Policy: no-referrer' header, please remove them. The "
+"CSRF protection requires the 'Referer' header to do strict referer checking. "
+"If you're concerned about privacy, use alternatives like <a rel=\"noreferrer"
+"\" ...> for links to third-party sites."
+msgstr ""
+"Якщо ви використовуєте тег <meta name=\"referrer\" content=\"no-referrer\"> "
+"або включаєте в запит заголовок 'Referrer-Policy: no-referrer', тоді, будь "
+"ласка, видаліть їх. CSRF-захист потребує заголовок 'Referer', щоб виконати "
+"перевірку. Якщо ви занепокоєні стосовно приватності, використовуйте "
+"альтернативи, наприклад, для посилань на сайти третіх сторін використайте "
+"тег <a rel=\"noreferrer\" ...>."
 
 msgid ""
 "You are seeing this message because this site requires a CSRF cookie when "
@@ -1134,8 +1223,7 @@ msgid ""
 msgstr ""
 "Ви бачите це повідомлення, тому що даний сайт вимагає, щоб при відправці "
 "форм була відправлена ​​і CSRF-cookie. Даний тип cookie необхідний з міркувань "
-"безпеки, щоб переконатися, що ваш браузер не був зламаний, а запит до "
-"сервера ні перехоплений третьою стороною."
+"безпеки, щоб переконатися, що ваш браузер не був взламаний третьою стороною."
 
 msgid ""
 "If you have configured your browser to disable cookies, please re-enable "
@@ -1143,37 +1231,16 @@ msgid ""
 msgstr ""
 "Якщо ви налаштували свій браузер таким чином, щоб він не використав cookie, "
 "будь ласка, включіть цю функцію знову, принаймні для цього сайту, або для "
-"запитів, чиї домен і порт збігаються з доменом і портом поточної сторінки."
+"подібних запитів."
 
 msgid "More information is available with DEBUG=True."
-msgstr "Більше інформації можна отримати при DEBUG=True."
-
-msgid "Welcome to Django"
-msgstr "Ласкаво просимо до Django"
-
-msgid "It worked!"
-msgstr "Воно працює!"
-
-msgid "Congratulations on your first Django-powered page."
-msgstr "Вітаємо Вас на першій сторінці на Django."
-
-msgid ""
-"Of course, you haven't actually done any work yet. Next, start your first "
-"app by running <code>python manage.py startapp [app_label]</code>."
-msgstr ""
-"Звичайно, Ви ще, насправді, нічого не зробили. Наступним кроком, розпочніть "
-"створення Вашого першого додатку, виконавши <code>python manage.py startapp "
-"[app_label]</code>."
-
-msgid ""
-"You're seeing this message because you have <code>DEBUG = True</code> in "
-"your Django settings file and you haven't configured any URLs. Get to work!"
-msgstr ""
-"Ви бачите це повідомлення тому, що у Вас <code>DEBUG = True</code> у вашому "
-"файлі налаштувань Django і ви не налаштували жодного URL. Вперед до роботи!"
+msgstr "Більше інформації можна отримати з DEBUG=True."
 
 msgid "No year specified"
 msgstr "Рік не вказано"
+
+msgid "Date out of range"
+msgstr "Дата поза діапазоном"
 
 msgid "No month specified"
 msgstr "Місяць не вказано"
@@ -1205,9 +1272,7 @@ msgid "No %(verbose_name)s found matching the query"
 msgstr "Жодні %(verbose_name)s не були знайдені по запиту"
 
 msgid "Page is not 'last', nor can it be converted to an int."
-msgstr ""
-"Неправильна величина параметра сторінки: вона повинна бути задана цілим "
-"числом або значенням 'last'."
+msgstr "Page не є 'last', і не може бути перетворена в ціле."
 
 #, python-format
 msgid "Invalid page (%(page_number)s): %(message)s"
@@ -1215,10 +1280,10 @@ msgstr "Невірна сторінка (%(page_number)s): %(message)s"
 
 #, python-format
 msgid "Empty list and '%(class_name)s.allow_empty' is False."
-msgstr "Порожній список і величина '%(class_name)s.allow_empty' є нульовою."
+msgstr "Порожній список і величина '%(class_name)s.allow_empty' є False."
 
 msgid "Directory indexes are not allowed here."
-msgstr "Перегляд списку файлів у цій директорії не дозволений."
+msgstr "Перегляд вмісту каталогу не дозволено."
 
 #, python-format
 msgid "\"%(path)s\" does not exist"
@@ -1227,3 +1292,47 @@ msgstr "\"%(path)s\" не існує"
 #, python-format
 msgid "Index of %(directory)s"
 msgstr "Вміст директорії %(directory)s"
+
+msgid "Django: the Web framework for perfectionists with deadlines."
+msgstr "Django: веб-фреймворк для перфекціоністів з реченцями."
+
+#, python-format
+msgid ""
+"View <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" "
+"target=\"_blank\" rel=\"noopener\">release notes</a> for Django %(version)s"
+msgstr ""
+"<a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" target="
+"\"_blank\" rel=\"noopener\">Нотатки релізу</a> for Django %(version)s"
+
+msgid "The install worked successfully! Congratulations!"
+msgstr "Вітаємо, команда install завершилась успішно!"
+
+#, python-format
+msgid ""
+"You are seeing this page because <a href=\"https://docs.djangoproject.com/en/"
+"%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener"
+"\">DEBUG=True</a> is in your settings file and you have not configured any "
+"URLs."
+msgstr ""
+"Ви бачите цю сторінку тому що змінна <a href=\"https://docs.djangoproject."
+"com/en/%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener"
+"\">DEBUG</a> встановлена на <i>True</i> у вашому файлі конфігурації і ви не "
+"налаштували жодного URL."
+
+msgid "Django Documentation"
+msgstr "Документація Django"
+
+msgid "Topics, references, &amp; how-to's"
+msgstr "Статті, довідки та інструкції"
+
+msgid "Tutorial: A Polling App"
+msgstr "Посібник: програма голосування"
+
+msgid "Get started with Django"
+msgstr "Початок роботи з Django"
+
+msgid "Django Community"
+msgstr "Спільнота Django"
+
+msgid "Connect, get help, or contribute"
+msgstr "Отримати допомогу, чи допомогти"

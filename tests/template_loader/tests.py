@@ -11,11 +11,14 @@ from django.test.client import RequestFactory
     'APP_DIRS': True,
 }, {
     'BACKEND': 'django.template.backends.django.DjangoTemplates',
-    'APP_DIRS': True,
     'OPTIONS': {
         'context_processors': [
             'django.template.context_processors.request',
         ],
+        'loaders': [
+            'django.template.loaders.filesystem.Loader',
+            'django.template.loaders.app_directories.Loader',
+        ]
     },
 }])
 class TemplateLoaderTests(SimpleTestCase):

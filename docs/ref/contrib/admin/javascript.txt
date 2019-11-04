@@ -7,8 +7,6 @@ JavaScript customizations in the admin
 Inline form events
 ==================
 
-.. versionadded:: 1.9
-
 You may want to execute some JavaScript when an inline form is added or removed
 in the admin change form. The ``formset:added`` and ``formset:removed`` jQuery
 events allow this. The event handler is passed three arguments:
@@ -30,12 +28,11 @@ In your custom ``change_form.html`` template, extend the
 
     {% block admin_change_form_document_ready %}
     {{ block.super }}
-    <script type="text/javascript" src="{% static 'app/formset_handlers.js' %}></script>
-    </script>
+    <script type="text/javascript" src="{% static 'app/formset_handlers.js' %}"></script>
     {% endblock %}
 
-.. snippet:: javascript
-    :filename: app/static/app/formset_handlers.js
+.. code-block:: javascript
+    :caption: app/static/app/formset_handlers.js
 
     (function($) {
         $(document).on('formset:added', function(event, $row, formsetName) {
@@ -69,11 +66,11 @@ namespace, just listen to the event triggered from there. For example:
 
     {% block admin_change_form_document_ready %}
     {{ block.super }}
-    <script type="text/javascript" src="{% static 'app/unregistered_handlers.js' %}></script>
+    <script type="text/javascript" src="{% static 'app/unregistered_handlers.js' %}"></script>
     {% endblock %}
 
-.. snippet:: javascript
-    :filename: app/static/app/unregistered_handlers.js
+.. code-block:: javascript
+    :caption: app/static/app/unregistered_handlers.js
 
     django.jQuery(document).on('formset:added', function(event, $row, formsetName) {
         // Row added

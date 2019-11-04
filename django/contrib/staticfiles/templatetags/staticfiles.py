@@ -1,19 +1,28 @@
+import warnings
+
 from django import template
 from django.templatetags.static import (
     do_static as _do_static, static as _static,
 )
+from django.utils.deprecation import RemovedInDjango30Warning
 
 register = template.Library()
 
 
 def static(path):
-    # Backwards compatibility alias for django.templatetags.static.static().
-    # Deprecation should start in Django 2.0.
+    warnings.warn(
+        'django.contrib.staticfiles.templatetags.static() is deprecated in '
+        'favor of django.templatetags.static.static().',
+        RemovedInDjango30Warning,
+        stacklevel=2,
+    )
     return _static(path)
 
 
 @register.tag('static')
 def do_static(parser, token):
-    # Backwards compatibility alias for django.templatetags.static.do_static().
-    # Deprecation should start in Django 2.0.
+    warnings.warn(
+        '{% load staticfiles %} is deprecated in favor of {% load static %}.',
+        RemovedInDjango30Warning,
+    )
     return _do_static(parser, token)

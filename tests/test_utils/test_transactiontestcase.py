@@ -1,4 +1,9 @@
-from django.test import TransactionTestCase, mock
+from unittest import mock
+
+from django.db import connections
+from django.test import TestCase, TransactionTestCase, override_settings
+
+from .models import Car
 
 
 class TestSerializedRollbackInhibitsPostMigrate(TransactionTestCase):
@@ -26,3 +31,32 @@ class TestSerializedRollbackInhibitsPostMigrate(TransactionTestCase):
             reset_sequences=False, inhibit_post_migrate=True,
             database='default', verbosity=0,
         )
+
+
+@override_settings(DEBUG=True)  # Enable query logging for test_queries_cleared
+class TransactionTestCaseDatabasesTests(TestCase):
+    available_apps = []
+    databases = {'default', 'other'}
+
+    def test_queries_cleared(self):
+        """
+        TransactionTestCase._pre_setup() clears the connections' queries_log
+        so that it's less likely to overflow. An overflow causes
+        assertNumQueries() to fail.
+        """
+        for alias in connections:
+            self.assertEqual(len(connections[alias].queries_log), 0, 'Failed for alias %s' % alias)
+
+
+class DisallowedDatabaseQueriesTests(TransactionTestCase):
+    available_apps = ['test_utils']
+
+    def test_disallowed_database_queries(self):
+        message = (
+            "Database queries to 'other' are not allowed in this test. "
+            "Add 'other' to test_utils.test_transactiontestcase."
+            "DisallowedDatabaseQueriesTests.databases to ensure proper test "
+            "isolation and silence this failure."
+        )
+        with self.assertRaisesMessage(AssertionError, message):
+            Car.objects.using('other').get()

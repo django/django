@@ -1,10 +1,7 @@
-# -*- encoding: utf-8 -*-
 # This file is distributed under the same license as the Django package.
 #
-from __future__ import unicode_literals
-
 # The *_FORMAT strings use the Django date format syntax,
-# see http://docs.djangoproject.com/en/dev/ref/templates/builtins/#date
+# see https://docs.djangoproject.com/en/dev/ref/templates/builtins/#date
 DATE_FORMAT = r'j\-\a \d\e F Y'         # '26-a de julio 1887'
 TIME_FORMAT = 'H:i'                     # '18:59'
 DATETIME_FORMAT = r'j\-\a \d\e F Y\, \j\e H:i'  # '26-a de julio 1887, je 18:59'
@@ -15,7 +12,7 @@ SHORT_DATETIME_FORMAT = 'Y-m-d H:i'     # '1887-07-26 18:59'
 FIRST_DAY_OF_WEEK = 1  # Monday (lundo)
 
 # The *_INPUT_FORMATS strings use the Python strftime format syntax,
-# see http://docs.python.org/library/datetime.html#strftime-strptime-behavior
+# see https://docs.python.org/library/datetime.html#strftime-strptime-behavior
 DATE_INPUT_FORMATS = [
     '%Y-%m-%d',                         # '1887-07-26'
     '%y-%m-%d',                         # '87-07-26'

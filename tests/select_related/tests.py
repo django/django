@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 from django.core.exceptions import FieldError
 from django.test import SimpleTestCase, TestCase
 
@@ -100,8 +98,7 @@ class SelectRelatedTests(TestCase):
         with self.assertNumQueries(5):
             world = Species.objects.all().select_related('genus__family')
             orders = [o.genus.family.order.name for o in world]
-            self.assertEqual(sorted(orders),
-                ['Agaricales', 'Diptera', 'Fabales', 'Primates'])
+            self.assertEqual(sorted(orders), ['Agaricales', 'Diptera', 'Fabales', 'Primates'])
 
     def test_select_related_with_extra(self):
         s = (Species.objects.all()
@@ -120,8 +117,7 @@ class SelectRelatedTests(TestCase):
         with self.assertNumQueries(1):
             world = Species.objects.select_related('genus__family')
             families = [o.genus.family.name for o in world]
-            self.assertEqual(sorted(families),
-                ['Amanitacae', 'Drosophilidae', 'Fabaceae', 'Hominidae'])
+            self.assertEqual(sorted(families), ['Amanitacae', 'Drosophilidae', 'Fabaceae', 'Hominidae'])
 
     def test_more_certain_fields(self):
         """
@@ -141,13 +137,9 @@ class SelectRelatedTests(TestCase):
                  .order_by('id')[0:1].get().genus.family.order.name)
             self.assertEqual(s, 'Diptera')
 
-    def test_depth_fields_fails(self):
-        with self.assertRaises(TypeError):
-            Species.objects.select_related('genus__family__order', depth=4)
-
     def test_none_clears_list(self):
         queryset = Species.objects.select_related('genus').select_related(None)
-        self.assertEqual(queryset.query.select_related, False)
+        self.assertIs(queryset.query.select_related, False)
 
     def test_chaining(self):
         parent_1, parent_2 = Species.objects.all()[:2]
@@ -158,13 +150,20 @@ class SelectRelatedTests(TestCase):
             self.assertEqual(obj.parent_1, parent_1)
             self.assertEqual(obj.parent_2, parent_2)
 
+    def test_reverse_relation_caching(self):
+        species = Species.objects.select_related('genus').filter(name='melanogaster').first()
+        with self.assertNumQueries(0):
+            self.assertEqual(species.genus.name, 'Drosophila')
+        # The species_set reverse relation isn't cached.
+        self.assertEqual(species.genus._state.fields_cache, {})
+        with self.assertNumQueries(1):
+            self.assertEqual(species.genus.species_set.first().name, 'melanogaster')
+
     def test_select_related_after_values(self):
         """
         Running select_related() after calling values() raises a TypeError
         """
-
         message = "Cannot call select_related() after .values() or .values_list()"
-
         with self.assertRaisesMessage(TypeError, message):
             list(Species.objects.values('name').select_related('genus'))
 
@@ -172,9 +171,7 @@ class SelectRelatedTests(TestCase):
         """
         Running select_related() after calling values_list() raises a TypeError
         """
-
         message = "Cannot call select_related() after .values() or .values_list()"
-
         with self.assertRaisesMessage(TypeError, message):
             list(Species.objects.values_list('name').select_related('genus'))
 

@@ -1,8 +1,8 @@
-from __future__ import unicode_literals
+from collections import Counter
 
 from django.conf import settings
 
-from . import Tags, Warning, register
+from . import Error, Tags, Warning, register
 
 
 @register(Tags.urls)
@@ -18,74 +18,93 @@ def check_resolver(resolver):
     """
     Recursively check the resolver.
     """
-    from django.urls import RegexURLPattern, RegexURLResolver
-    warnings = []
-    for pattern in resolver.url_patterns:
-        if isinstance(pattern, RegexURLResolver):
-            warnings.extend(check_include_trailing_dollar(pattern))
-            # Check resolver recursively
-            warnings.extend(check_resolver(pattern))
-        elif isinstance(pattern, RegexURLPattern):
-            warnings.extend(check_pattern_name(pattern))
-
-        warnings.extend(check_pattern_startswith_slash(pattern))
-
-    return warnings
-
-
-def describe_pattern(pattern):
-    """
-    Format the URL pattern for display in warning messages.
-    """
-    description = "'{}'".format(pattern.regex.pattern)
-    if getattr(pattern, 'name', False):
-        description += " [name='{}']".format(pattern.name)
-    return description
-
-
-def check_include_trailing_dollar(pattern):
-    """
-    Check that include is not used with a regex ending with a dollar.
-    """
-    regex_pattern = pattern.regex.pattern
-    if regex_pattern.endswith('$') and not regex_pattern.endswith('\$'):
-        warning = Warning(
-            "Your URL pattern {} uses include with a regex ending with a '$'. "
-            "Remove the dollar from the regex to avoid problems including "
-            "URLs.".format(describe_pattern(pattern)),
-            id="urls.W001",
-        )
-        return [warning]
+    check_method = getattr(resolver, 'check', None)
+    if check_method is not None:
+        return check_method()
+    elif not hasattr(resolver, 'resolve'):
+        return get_warning_for_invalid_pattern(resolver)
     else:
         return []
 
 
-def check_pattern_startswith_slash(pattern):
+@register(Tags.urls)
+def check_url_namespaces_unique(app_configs, **kwargs):
     """
-    Check that the pattern does not begin with a forward slash.
+    Warn if URL namespaces used in applications aren't unique.
     """
-    regex_pattern = pattern.regex.pattern
-    if regex_pattern.startswith('/') or regex_pattern.startswith('^/'):
-        warning = Warning(
-            "Your URL pattern {} has a regex beginning with a '/'. "
-            "Remove this slash as it is unnecessary.".format(describe_pattern(pattern)),
-            id="urls.W002",
-        )
-        return [warning]
-    else:
+    if not getattr(settings, 'ROOT_URLCONF', None):
         return []
 
+    from django.urls import get_resolver
+    resolver = get_resolver()
+    all_namespaces = _load_all_namespaces(resolver)
+    counter = Counter(all_namespaces)
+    non_unique_namespaces = [n for n, count in counter.items() if count > 1]
+    errors = []
+    for namespace in non_unique_namespaces:
+        errors.append(Warning(
+            "URL namespace '{}' isn't unique. You may not be able to reverse "
+            "all URLs in this namespace".format(namespace),
+            id="urls.W005",
+        ))
+    return errors
 
-def check_pattern_name(pattern):
+
+def _load_all_namespaces(resolver, parents=()):
     """
-    Check that the pattern name does not contain a colon.
+    Recursively load all namespaces from URL patterns.
     """
-    if pattern.name is not None and ":" in pattern.name:
-        warning = Warning(
-            "Your URL pattern {} has a name including a ':'. Remove the colon, to "
-            "avoid ambiguous namespace references.".format(describe_pattern(pattern)),
-            id="urls.W003",
+    url_patterns = getattr(resolver, 'url_patterns', [])
+    namespaces = [
+        ':'.join(parents + (url.namespace,)) for url in url_patterns
+        if getattr(url, 'namespace', None) is not None
+    ]
+    for pattern in url_patterns:
+        namespace = getattr(pattern, 'namespace', None)
+        current = parents
+        if namespace is not None:
+            current += (namespace,)
+        namespaces.extend(_load_all_namespaces(pattern, current))
+    return namespaces
+
+
+def get_warning_for_invalid_pattern(pattern):
+    """
+    Return a list containing a warning that the pattern is invalid.
+
+    describe_pattern() cannot be used here, because we cannot rely on the
+    urlpattern having regex or name attributes.
+    """
+    if isinstance(pattern, str):
+        hint = (
+            "Try removing the string '{}'. The list of urlpatterns should not "
+            "have a prefix string as the first element.".format(pattern)
         )
-        return [warning]
+    elif isinstance(pattern, tuple):
+        hint = "Try using path() instead of a tuple."
     else:
-        return []
+        hint = None
+
+    return [Error(
+        "Your URL pattern {!r} is invalid. Ensure that urlpatterns is a list "
+        "of path() and/or re_path() instances.".format(pattern),
+        hint=hint,
+        id="urls.E004",
+    )]
+
+
+@register(Tags.urls)
+def check_url_settings(app_configs, **kwargs):
+    errors = []
+    for name in ('STATIC_URL', 'MEDIA_URL'):
+        value = getattr(settings, name)
+        if value and not value.endswith('/'):
+            errors.append(E006(name))
+    return errors
+
+
+def E006(name):
+    return Error(
+        'The {} setting must end with a slash.'.format(name),
+        id='urls.E006',
+    )

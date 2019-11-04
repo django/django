@@ -67,9 +67,9 @@ class LengthIsTests(SimpleTestCase):
 class FunctionTests(SimpleTestCase):
 
     def test_empty_list(self):
-        self.assertEqual(length_is([], 0), True)
-        self.assertEqual(length_is([], 1), False)
+        self.assertIs(length_is([], 0), True)
+        self.assertIs(length_is([], 1), False)
 
     def test_string(self):
-        self.assertEqual(length_is('a', 1), True)
-        self.assertEqual(length_is('a', 10), False)
+        self.assertIs(length_is('a', 1), True)
+        self.assertIs(length_is('a', 10), False)

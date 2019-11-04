@@ -2,13 +2,15 @@
 #
 # Translators:
 # Ali Ismayilov <ali@ismailov.info>, 2011
+# Emin Mastizada <emin@linux.com>, 2018
+# Emin Mastizada <emin@linux.com>, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-10 15:10+0200\n"
-"PO-Revision-Date: 2015-10-11 08:53+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2017-09-24 13:46+0200\n"
+"PO-Revision-Date: 2018-04-27 13:17+0000\n"
+"Last-Translator: Emin Mastizada <emin@linux.com>\n"
 "Language-Team: Azerbaijani (http://www.transifex.com/django/django/language/"
 "az/)\n"
 "MIME-Version: 1.0\n"
@@ -28,7 +30,7 @@ msgstr "Vacib tarixlər"
 
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
-msgstr ""
+msgstr "Əsas %(key)r açarı ilə %(name)s obyekti mövcud deyil."
 
 msgid "Password changed successfully."
 msgstr "Parol uğurla dəyişdirildi"
@@ -38,7 +40,7 @@ msgid "Change password: %s"
 msgstr "Parolu dəyiş: %s"
 
 msgid "Authentication and Authorization"
-msgstr ""
+msgstr "Təsdiqləmə və Səlahiyyət"
 
 msgid "password"
 msgstr "parol"
@@ -47,10 +49,10 @@ msgid "last login"
 msgstr "son dəfə daxil olub"
 
 msgid "No password set."
-msgstr ""
+msgstr "Parol qurulmayıb."
 
 msgid "Invalid password format or unknown hashing algorithm."
-msgstr ""
+msgstr "Xətalı parol formatı və ya bilinməyən heş alqoritması."
 
 msgid "The two password fields didn't match."
 msgstr "Parollar üst-üstə düşmədi."
@@ -62,25 +64,29 @@ msgid "Password confirmation"
 msgstr "Parolun təsdiqi"
 
 msgid "Enter the same password as before, for verification."
-msgstr ""
+msgstr "Təsdiqləmək üçün əvvəlki ilə eyni parolu daxil edin."
 
 msgid ""
 "Raw passwords are not stored, so there is no way to see this user's "
-"password, but you can change the password using <a href=\"../password/"
-"\">this form</a>."
+"password, but you can change the password using <a href=\"{}\">this form</a>."
 msgstr ""
+"Düz parollar saxlanmadığı üçün bu istifadəçinin parolunu görmək mümkün "
+"deyil, amma <a href=\"{}\">bu formadan</a> istifadə edərək parolunu dəyişə "
+"bilərsiz."
 
 #, python-format
 msgid ""
 "Please enter a correct %(username)s and password. Note that both fields may "
 "be case-sensitive."
 msgstr ""
+"Lütfən düzgün %(username)s və parol daxil edin. Nəzərə alın ki, hər ikisi "
+"böyük-kiçik hərflərə həssasdırlar."
 
 msgid "This account is inactive."
 msgstr "Bu hesab qeyri-aktivdir."
 
 msgid "Email"
-msgstr ""
+msgstr "E-poçt"
 
 msgid "New password"
 msgstr "Yeni parol"
@@ -99,28 +105,43 @@ msgid "Password (again)"
 msgstr "Parol (bir daha)"
 
 msgid "algorithm"
-msgstr ""
+msgstr "alqoritm"
 
 msgid "iterations"
-msgstr ""
+msgstr "təkrarlama"
 
 msgid "salt"
-msgstr ""
+msgstr "duz"
 
 msgid "hash"
-msgstr ""
+msgstr "heş"
+
+msgid "variety"
+msgstr "müxtəliflik"
+
+msgid "version"
+msgstr "versiya"
+
+msgid "memory cost"
+msgstr "yaddaş xərci"
+
+msgid "time cost"
+msgstr "vaxt xərci"
+
+msgid "parallelism"
+msgstr "paralellik"
 
 msgid "work factor"
-msgstr ""
+msgstr "iş faktoru"
 
 msgid "checksum"
-msgstr ""
+msgstr "yoxlama dəyəri"
 
 msgid "name"
 msgstr "ad"
 
 msgid "content type"
-msgstr ""
+msgstr "məzmun növü"
 
 msgid "codename"
 msgstr "kod adı"
@@ -149,25 +170,20 @@ msgid ""
 "The groups this user belongs to. A user will get all permissions granted to "
 "each of their groups."
 msgstr ""
+"Bu istifadəçinin aid olduğu qruplar. İstifadə bu qruplardan hər birinə "
+"verilən bütün icazələri alacaq."
 
 msgid "user permissions"
 msgstr "səlahiyyətləri"
 
 msgid "Specific permissions for this user."
-msgstr ""
+msgstr "Bu istifadəçiyə aid xüsusi icazələr."
 
 msgid "username"
 msgstr "istifadəçi adı"
 
-msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
-msgstr ""
-"Vacibdir. 30 simvoldan az olmalıdır. Yalnız hərf, rəqəm və @/./+/-/_ "
-"simvollarından istifadə etmək olar."
-
-msgid ""
-"Enter a valid username. This value may contain only letters, numbers and @/./"
-"+/-/_ characters."
-msgstr ""
+msgid "Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only."
+msgstr "Tələb edilir. Ən az 150 simvol. Ancaq hərf, rəqəm və @/./+/-/_."
 
 msgid "A user with that username already exists."
 msgstr "Bu istifadəçi adı altında başqa istifadəçi var."
@@ -179,7 +195,7 @@ msgid "last name"
 msgstr "soyad"
 
 msgid "email address"
-msgstr ""
+msgstr "e-poçt ünvanı"
 
 msgid "staff status"
 msgstr "admin statusu"
@@ -213,58 +229,72 @@ msgid ""
 msgid_plural ""
 "This password is too short. It must contain at least %(min_length)d "
 "characters."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Bu parol çox qısadır. Ən az %(min_length)d işarə olmalıdır."
+msgstr[1] "Bu parol çox qısadır. Ən az %(min_length)d işarə olmalıdır."
 
 #, python-format
 msgid "Your password must contain at least %(min_length)d character."
 msgid_plural "Your password must contain at least %(min_length)d characters."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Parolunuz ən az %(min_length)d işarə olmalıdır."
+msgstr[1] "Parolunuz ən az %(min_length)d işarə olmalıdır."
 
 #, python-format
 msgid "The password is too similar to the %(verbose_name)s."
-msgstr ""
+msgstr "Parolunuz %(verbose_name)s ilə çox bənzərdir."
 
 msgid "Your password can't be too similar to your other personal information."
-msgstr ""
+msgstr "Parolunuz digər şəxsi məlumatlarınıza çox bənzərdir."
 
 msgid "This password is too common."
-msgstr ""
+msgstr "Bu parol çox ümumidir."
 
 msgid "Your password can't be a commonly used password."
-msgstr ""
+msgstr "Parolunuz çox istifadə edilən ümumişlək olmamalıdır."
 
 msgid "This password is entirely numeric."
-msgstr ""
+msgstr "Bu parol ancaq rəqəmlərlədir."
 
 msgid "Your password can't be entirely numeric."
-msgstr ""
+msgstr "Parolunuz ancaq rəqəmlərlə ola bilməz."
 
 #, python-format
 msgid "Password reset on %(site_name)s"
 msgstr "%(site_name)s, parolun sıfırlanması"
 
+msgid ""
+"Enter a valid username. This value may contain only English letters, "
+"numbers, and @/./+/-/_ characters."
+msgstr ""
+"Düzgün istifadəçi adı daxil edin. Bu dəyən ancaq İngiliscə hərflərdən, rəqəm "
+"və @/./+/-/_ işarətlərindən ibarət ola bilər."
+
+msgid ""
+"Enter a valid username. This value may contain only letters, numbers, and "
+"@/./+/-/_ characters."
+msgstr ""
+"Düzgün istifadəçi adı daxil edin. Bu dəyən ancaq hərf, rəqəm və @/./+/-/_ "
+"işarətlərindən ibarət ola bilər."
+
 msgid "Logged out"
 msgstr "Çıxdınız"
 
 msgid "Password reset"
-msgstr ""
+msgstr "Parol sıfırlama"
 
 msgid "Password reset sent"
-msgstr ""
+msgstr "Parol sıfırlama göndərildi"
 
 msgid "Enter new password"
-msgstr ""
+msgstr "Yeni parolu daxil edin"
 
 msgid "Password reset unsuccessful"
-msgstr ""
+msgstr "Parol müvəffəqiyyətlə sıfırlandı"
 
 msgid "Password reset complete"
-msgstr ""
+msgstr "Parol sıfırlama tamamlandı"
 
 msgid "Password change"
-msgstr ""
+msgstr "Parol dəyişdirmə"
 
 msgid "Password change successful"
-msgstr ""
+msgstr "Parol müvəffəqiyyətlə dəyişdirildi"

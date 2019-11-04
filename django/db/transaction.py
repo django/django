@@ -1,13 +1,12 @@
+from contextlib import ContextDecorator, contextmanager
+
 from django.db import (
     DEFAULT_DB_ALIAS, DatabaseError, Error, ProgrammingError, connections,
 )
-from django.utils.decorators import ContextDecorator
 
 
 class TransactionManagementError(ProgrammingError):
-    """
-    This exception is thrown when transaction management is used improperly.
-    """
+    """Transaction management is used improperly."""
     pass
 
 
@@ -22,37 +21,29 @@ def get_connection(using=None):
 
 
 def get_autocommit(using=None):
-    """
-    Get the autocommit status of the connection.
-    """
+    """Get the autocommit status of the connection."""
     return get_connection(using).get_autocommit()
 
 
 def set_autocommit(autocommit, using=None):
-    """
-    Set the autocommit status of the connection.
-    """
+    """Set the autocommit status of the connection."""
     return get_connection(using).set_autocommit(autocommit)
 
 
 def commit(using=None):
-    """
-    Commits a transaction.
-    """
+    """Commit a transaction."""
     get_connection(using).commit()
 
 
 def rollback(using=None):
-    """
-    Rolls back a transaction.
-    """
+    """Roll back a transaction."""
     get_connection(using).rollback()
 
 
 def savepoint(using=None):
     """
-    Creates a savepoint (if supported and required by the backend) inside the
-    current transaction. Returns an identifier for the savepoint that will be
+    Create a savepoint (if supported and required by the backend) inside the
+    current transaction. Return an identifier for the savepoint that will be
     used for the subsequent rollback or commit.
     """
     return get_connection(using).savepoint()
@@ -60,7 +51,7 @@ def savepoint(using=None):
 
 def savepoint_rollback(sid, using=None):
     """
-    Rolls back the most recent savepoint (if one exists). Does nothing if
+    Roll back the most recent savepoint (if one exists). Do nothing if
     savepoints are not supported.
     """
     get_connection(using).savepoint_rollback(sid)
@@ -68,7 +59,7 @@ def savepoint_rollback(sid, using=None):
 
 def savepoint_commit(sid, using=None):
     """
-    Commits the most recent savepoint (if one exists). Does nothing if
+    Commit the most recent savepoint (if one exists). Do nothing if
     savepoints are not supported.
     """
     get_connection(using).savepoint_commit(sid)
@@ -76,31 +67,57 @@ def savepoint_commit(sid, using=None):
 
 def clean_savepoints(using=None):
     """
-    Resets the counter used to generate unique savepoint ids in this thread.
+    Reset the counter used to generate unique savepoint ids in this thread.
     """
     get_connection(using).clean_savepoints()
 
 
 def get_rollback(using=None):
-    """
-    Gets the "needs rollback" flag -- for *advanced use* only.
-    """
+    """Get the "needs rollback" flag -- for *advanced use* only."""
     return get_connection(using).get_rollback()
 
 
 def set_rollback(rollback, using=None):
     """
-    Sets or unsets the "needs rollback" flag -- for *advanced use* only.
+    Set or unset the "needs rollback" flag -- for *advanced use* only.
 
-    When `rollback` is `True`, it triggers a rollback when exiting the
-    innermost enclosing atomic block that has `savepoint=True` (that's the
-    default). Use this to force a rollback without raising an exception.
+    When `rollback` is `True`, trigger a rollback when exiting the innermost
+    enclosing atomic block that has `savepoint=True` (that's the default). Use
+    this to force a rollback without raising an exception.
 
-    When `rollback` is `False`, it prevents such a rollback. Use this only
-    after rolling back to a known-good state! Otherwise, you break the atomic
-    block and data corruption may occur.
+    When `rollback` is `False`, prevent such a rollback. Use this only after
+    rolling back to a known-good state! Otherwise, you break the atomic block
+    and data corruption may occur.
     """
     return get_connection(using).set_rollback(rollback)
+
+
+@contextmanager
+def mark_for_rollback_on_error(using=None):
+    """
+    Internal low-level utility to mark a transaction as "needs rollback" when
+    an exception is raised while not enforcing the enclosed block to be in a
+    transaction. This is needed by Model.save() and friends to avoid starting a
+    transaction when in autocommit mode and a single query is executed.
+
+    It's equivalent to:
+
+        connection = get_connection(using)
+        if connection.get_autocommit():
+            yield
+        else:
+            with transaction.atomic(using=using, savepoint=False):
+                yield
+
+    but it uses low-level utilities to avoid performance overhead.
+    """
+    try:
+        yield
+    except Exception:
+        connection = get_connection(using)
+        if connection.in_atomic_block:
+            connection.needs_rollback = True
+        raise
 
 
 def on_commit(func, using=None):
@@ -117,7 +134,7 @@ def on_commit(func, using=None):
 
 class Atomic(ContextDecorator):
     """
-    This class guarantees the atomic execution of a given block.
+    Guarantee the atomic execution of a given block.
 
     An instance can be used either as a decorator or as a context manager.
 
@@ -136,7 +153,7 @@ class Atomic(ContextDecorator):
     connection. None denotes the absence of a savepoint.
 
     This allows reentrancy even if the same AtomicWrapper is reused. For
-    example, it's possible to define `oa = @atomic('other')` and use `@oa` or
+    example, it's possible to define `oa = atomic('other')` and use `@oa` or
     `with oa:` multiple times.
 
     Since database connections are thread-local, this is thread-safe.
@@ -156,8 +173,8 @@ class Atomic(ContextDecorator):
             connection.commit_on_exit = True
             connection.needs_rollback = False
             if not connection.get_autocommit():
-                # Some database adapters (namely sqlite3) don't handle
-                # transactions and savepoints properly when autocommit is off.
+                # sqlite3 in Python < 3.6 doesn't handle transactions and
+                # savepoints properly when autocommit is off.
                 # Turning autocommit back on isn't an option; it would trigger
                 # a premature commit. Give up if that happens.
                 if connection.features.autocommits_when_autocommit_is_off:

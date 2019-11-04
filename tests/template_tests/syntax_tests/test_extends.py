@@ -1,3 +1,6 @@
+from django.template import NodeList, TemplateSyntaxError
+from django.template.base import Node
+from django.template.loader_tags import ExtendsNode
 from django.test import SimpleTestCase
 
 from ..utils import setup
@@ -52,6 +55,9 @@ inheritance_templates = {
     'inheritance40': "{% extends 'inheritance33' %}{% block opt %}new{{ block.super }}{% endblock %}",
     'inheritance41': "{% extends 'inheritance36' %}{% block opt %}new{{ block.super }}{% endblock %}",
     'inheritance42': "{% extends 'inheritance02'|cut:' ' %}",
+    'inheritance_empty': "{% extends %}",
+    'extends_duplicate': "{% extends 'base.html' %}{% extends 'base.html' %}",
+    'duplicate_block': "{% extends 'base.html' %}{% block content %}2{% endblock %}{% block content %}4{% endblock %}",
 }
 
 
@@ -396,3 +402,30 @@ class InheritanceTests(SimpleTestCase):
         """
         output = self.engine.render_to_string('inheritance42')
         self.assertEqual(output, '1234')
+
+    @setup(inheritance_templates)
+    def test_inheritance_empty(self):
+        with self.assertRaisesMessage(TemplateSyntaxError, "'extends' takes one argument"):
+            self.engine.render_to_string('inheritance_empty')
+
+    @setup(inheritance_templates)
+    def test_extends_duplicate(self):
+        msg = "'extends' cannot appear more than once in the same template"
+        with self.assertRaisesMessage(TemplateSyntaxError, msg):
+            self.engine.render_to_string('extends_duplicate')
+
+    @setup(inheritance_templates)
+    def test_duplicate_block(self):
+        msg = "'block' tag with name 'content' appears more than once"
+        with self.assertRaisesMessage(TemplateSyntaxError, msg):
+            self.engine.render_to_string('duplicate_block')
+
+
+class ExtendsNodeTests(SimpleTestCase):
+    def test_extends_node_repr(self):
+        extends_node = ExtendsNode(
+            nodelist=NodeList([]),
+            parent_name=Node(),
+            template_dirs=[],
+        )
+        self.assertEqual(repr(extends_node), '<ExtendsNode: extends None>')

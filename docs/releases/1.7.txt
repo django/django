@@ -6,16 +6,12 @@ Django 1.7 release notes
 
 Welcome to Django 1.7!
 
-These release notes cover the `new features`_, as well as some `backwards
-incompatible changes`_ you'll want to be aware of when upgrading from Django
-1.6 or older versions. We've `begun the deprecation process for some features`_,
-and some features have reached the end of their deprecation process and
-`have been removed`_.
-
-.. _`new features`: `What's new in Django 1.7`_
-.. _`backwards incompatible changes`: `Backwards incompatible changes in 1.7`_
-.. _`begun the deprecation process for some features`: `Features deprecated in 1.7`_
-.. _`have been removed`: `Features removed in 1.7`_
+These release notes cover the :ref:`new features <whats-new-1.7>`, as well as
+some :ref:`backwards incompatible changes <backwards-incompatible-1.7>` you'll
+want to be aware of when upgrading from Django 1.6 or older versions. We've
+:ref:`begun the deprecation process for some features
+<deprecated-features-1.7>`, and some features have reached the end of their
+deprecation process and :ref:`have been removed <removed-features-1.7>`.
 
 Python compatibility
 ====================
@@ -32,6 +28,8 @@ version. If you're still using Python 2.6, however, you'll need to stick to
 Django 1.6 until you can upgrade your Python version. Per :doc:`our support
 policy </internals/release-process>`, Django 1.6 will continue to receive
 security support until the release of Django 1.8.
+
+.. _whats-new-1.7:
 
 What's new in Django 1.7
 ========================
@@ -423,7 +421,7 @@ Minor features
   <django.contrib.auth.forms.AuthenticationForm.confirm_login_allowed>` method
   to more easily customize the login policy.
 
-* :func:`django.contrib.auth.views.password_reset` takes an optional
+* ``django.contrib.auth.views.password_reset()`` takes an optional
   ``html_email_template_name`` parameter used to send a multipart HTML email
   for password resets.
 
@@ -438,9 +436,8 @@ Minor features
 ``django.contrib.formtools``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* Calls to :meth:`WizardView.done()
-  <formtools.wizard.views.WizardView.done>` now include a
-  ``form_dict`` to allow easier access to forms by their step name.
+* Calls to ``WizardView.done()`` now include a ``form_dict`` to allow easier
+  access to forms by their step name.
 
 :mod:`django.contrib.gis`
 ~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -509,8 +506,7 @@ Minor features
   and :attr:`~django.core.files.storage.FileSystemStorage.directory_permissions_mode`
   parameters. See :djadmin:`collectstatic` for example usage.
 
-* The :class:`~django.contrib.staticfiles.storage.CachedStaticFilesStorage`
-  backend gets a sibling class called
+* The ``CachedStaticFilesStorage`` backend gets a sibling class called
   :class:`~django.contrib.staticfiles.storage.ManifestStaticFilesStorage`
   that doesn't use the cache system at all but instead a JSON file called
   ``staticfiles.json`` for storing the mapping between the original file name
@@ -718,7 +714,7 @@ Management Commands
     filesystem for changes every second. That caused a small delay before
     reloads and reduced battery life on laptops.
 
-    .. _pyinotify: https://pypi.python.org/pypi/pyinotify
+    .. _pyinotify: https://pypi.org/project/pyinotify/
 
   * In addition, the development server automatically reloads when a
     translation file is updated, i.e. after running
@@ -740,7 +736,7 @@ Management Commands
   :class:`~django.db.migrations.operations.RunSQL` operation of migrations,
   which benefits from the improved behavior.
 
-.. _sqlparse: https://pypi.python.org/pypi/sqlparse
+.. _sqlparse: https://pypi.org/project/sqlparse/
 
 Models
 ~~~~~~
@@ -936,6 +932,8 @@ Validators
 
 * :func:`~django.core.validators.validate_email` now accepts addresses with
   IPv6 literals, like ``example@[2001:db8::1]``, as specified in RFC 5321.
+
+.. _backwards-incompatible-1.7:
 
 Backwards incompatible changes in 1.7
 =====================================
@@ -1203,7 +1201,7 @@ a :exc:`ValueError` when encountering them, you will have to install pytz_. You
 may be affected by this problem if you use Django's time zone-related date
 formats or :mod:`django.contrib.syndication`.
 
-.. _pytz: https://pypi.python.org/pypi/pytz/
+.. _pytz: https://pypi.org/project/pytz/
 
 ``remove()`` and ``clear()`` methods of related managers
 --------------------------------------------------------
@@ -1271,13 +1269,13 @@ in a test class which is a subclass of
 :class:`~django.test.TransactionTestCase` rather than
 :class:`~django.test.TestCase`.
 
-Contrib middleware removed from default :setting:`MIDDLEWARE_CLASSES`
----------------------------------------------------------------------
+Contrib middleware removed from default ``MIDDLEWARE_CLASSES``
+--------------------------------------------------------------
 
 The :ref:`app-loading refactor <app-loading-refactor-17-release-note>`
 deprecated using models from apps which are not part of the
 :setting:`INSTALLED_APPS` setting. This exposed an incompatibility between
-the default :setting:`INSTALLED_APPS` and :setting:`MIDDLEWARE_CLASSES` in the
+the default :setting:`INSTALLED_APPS` and ``MIDDLEWARE_CLASSES`` in the
 global defaults (``django.conf.global_settings``). To bring these settings in
 sync and prevent deprecation warnings when doing things like testing reusable
 apps with minimal settings,
@@ -1287,7 +1285,7 @@ apps with minimal settings,
 from the defaults. These classes will still be included in the default settings
 generated by :djadmin:`startproject`. Most projects will not be affected by
 this change but if you were not previously declaring the
-:setting:`MIDDLEWARE_CLASSES` in your project settings and relying on the
+``MIDDLEWARE_CLASSES`` in your project settings and relying on the
 global default you should ensure that the new defaults are in line with your
 project's needs. You should also check for any code that accesses
 ``django.conf.global_settings.MIDDLEWARE_CLASSES`` directly.
@@ -1743,7 +1741,7 @@ will be removed in Django 1.9. You can simply remove the
 --------------------------------------
 
 ``javascript_quote()`` was an undocumented function present in ``django.utils.text``.
-It was used internally in the :ref:`javascript_catalog view <javascript_catalog-view>`
+It was used internally in the ``javascript_catalog()`` view
 whose implementation was changed to make use of ``json.dumps()`` instead.
 If you were relying on this function to provide safe output from untrusted
 strings, you should use ``django.utils.html.escapejs`` or the
@@ -1803,16 +1801,14 @@ Private APIs ``django.db.models.sql.where.WhereNode.make_atom()`` and
 ``django.db.models.sql.where.Constraint`` are deprecated in favor of the new
 :doc:`custom lookups API </ref/models/lookups>`.
 
-.. removed-features-1.7:
+.. _removed-features-1.7:
 
 Features removed in 1.7
 =======================
 
-These features have reached the end of their
-:ref:`deprecation cycle <deprecation-removed-in-1.7>` and so have been
-removed in Django 1.7 (please see the
-:ref:`deprecation timeline <deprecation-removed-in-1.7>` for more details):
-
+These features have reached the end of their deprecation cycle and are removed
+in Django 1.7. See :ref:`deprecated-features-1.5` for details, including how to
+remove usage of these features.
 
 * ``django.utils.simplejson`` is removed.
 
@@ -1849,7 +1845,7 @@ removed in Django 1.7 (please see the
 * The ``check_for_test_cookie`` method in
   :class:`~django.contrib.auth.forms.AuthenticationForm` is removed.
 
-* The version of :func:`django.contrib.auth.views.password_reset_confirm` that
+* The version of ``django.contrib.auth.views.password_reset_confirm()`` that
   supports base36 encoded user IDs
   (``django.contrib.auth.views.password_reset_confirm_uidb36``) is removed.
 

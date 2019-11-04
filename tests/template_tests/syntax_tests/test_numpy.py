@@ -1,4 +1,3 @@
-import warnings
 from unittest import skipIf
 
 from django.test import SimpleTestCase
@@ -13,13 +12,6 @@ except ImportError:
 
 @skipIf(numpy is False, "Numpy must be installed to run these tests.")
 class NumpyTests(SimpleTestCase):
-    # Ignore numpy deprecation warnings (#23890)
-    warnings.filterwarnings(
-        "ignore",
-        "Using a non-integer number instead of an "
-        "integer will result in an error in the future",
-        DeprecationWarning
-    )
 
     @setup({'numpy-array-index01': '{{ var.1 }}'})
     def test_numpy_array_index01(self):

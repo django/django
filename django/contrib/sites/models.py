@@ -1,24 +1,19 @@
-from __future__ import unicode_literals
-
 import string
 
 from django.core.exceptions import ImproperlyConfigured, ValidationError
 from django.db import models
 from django.db.models.signals import pre_delete, pre_save
 from django.http.request import split_domain_port
-from django.utils.encoding import python_2_unicode_compatible
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 SITE_CACHE = {}
 
 
 def _simple_domain_name_validator(value):
     """
-    Validates that the given value contains no whitespaces to prevent common
+    Validate that the given value contains no whitespaces to prevent common
     typos.
     """
-    if not value:
-        return
     checks = ((s in value) for s in string.whitespace)
     if any(checks):
         raise ValidationError(
@@ -46,16 +41,14 @@ class SiteManager(models.Manager):
         except Site.DoesNotExist:
             # Fallback to looking up site after stripping port from the host.
             domain, port = split_domain_port(host)
-            if not port:
-                raise
             if domain not in SITE_CACHE:
                 SITE_CACHE[domain] = self.get(domain__iexact=domain)
             return SITE_CACHE[domain]
 
     def get_current(self, request=None):
         """
-        Returns the current Site based on the SITE_ID in the project's settings.
-        If SITE_ID isn't defined, it returns the site with domain matching
+        Return the current Site based on the SITE_ID in the project's settings.
+        If SITE_ID isn't defined, return the site with domain matching
         request.get_host(). The ``Site`` object is cached the first time it's
         retrieved from the database.
         """
@@ -74,7 +67,7 @@ class SiteManager(models.Manager):
         )
 
     def clear_cache(self):
-        """Clears the ``Site`` object cache."""
+        """Clear the ``Site`` object cache."""
         global SITE_CACHE
         SITE_CACHE = {}
 
@@ -82,12 +75,16 @@ class SiteManager(models.Manager):
         return self.get(domain=domain)
 
 
-@python_2_unicode_compatible
 class Site(models.Model):
 
-    domain = models.CharField(_('domain name'), max_length=100,
-        validators=[_simple_domain_name_validator], unique=True)
+    domain = models.CharField(
+        _('domain name'),
+        max_length=100,
+        validators=[_simple_domain_name_validator],
+        unique=True,
+    )
     name = models.CharField(_('display name'), max_length=50)
+
     objects = SiteManager()
 
     class Meta:
@@ -105,7 +102,7 @@ class Site(models.Model):
 
 def clear_site_cache(sender, **kwargs):
     """
-    Clears the cache (if primed) each time a site is saved or deleted
+    Clear the cache (if primed) each time a site is saved or deleted.
     """
     instance = kwargs['instance']
     using = kwargs['using']
@@ -117,5 +114,7 @@ def clear_site_cache(sender, **kwargs):
         del SITE_CACHE[Site.objects.using(using).get(pk=instance.pk).domain]
     except (KeyError, Site.DoesNotExist):
         pass
+
+
 pre_save.connect(clear_site_cache, sender=Site)
 pre_delete.connect(clear_site_cache, sender=Site)

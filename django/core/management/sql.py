@@ -1,15 +1,13 @@
-from __future__ import unicode_literals
-
 from django.apps import apps
 from django.db import models
 
 
 def sql_flush(style, connection, only_django=False, reset_sequences=True, allow_cascade=False):
     """
-    Returns a list of the SQL statements used to flush the database.
+    Return a list of the SQL statements used to flush the database.
 
-    If only_django is True, then only table names that have associated Django
-    models and are in INSTALLED_APPS will be included.
+    If only_django is True, only include the table names that have associated
+    Django models and are in INSTALLED_APPS .
     """
     if only_django:
         tables = connection.introspection.django_table_names(only_existing=True, include_views=False)
@@ -20,7 +18,7 @@ def sql_flush(style, connection, only_django=False, reset_sequences=True, allow_
     return statements
 
 
-def emit_pre_migrate_signal(verbosity, interactive, db):
+def emit_pre_migrate_signal(verbosity, interactive, db, **kwargs):
     # Emit the pre_migrate signal for every application.
     for app_config in apps.get_app_configs():
         if app_config.models_module is None:
@@ -32,10 +30,12 @@ def emit_pre_migrate_signal(verbosity, interactive, db):
             app_config=app_config,
             verbosity=verbosity,
             interactive=interactive,
-            using=db)
+            using=db,
+            **kwargs
+        )
 
 
-def emit_post_migrate_signal(verbosity, interactive, db):
+def emit_post_migrate_signal(verbosity, interactive, db, **kwargs):
     # Emit the post_migrate signal for every application.
     for app_config in apps.get_app_configs():
         if app_config.models_module is None:
@@ -47,4 +47,6 @@ def emit_post_migrate_signal(verbosity, interactive, db):
             app_config=app_config,
             verbosity=verbosity,
             interactive=interactive,
-            using=db)
+            using=db,
+            **kwargs
+        )

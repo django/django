@@ -1,24 +1,35 @@
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals
+from unittest import mock
 
 from django.db import migrations
 
 try:
     from django.contrib.postgres.operations import (
-        HStoreExtension, UnaccentExtension,
+        BtreeGinExtension, BtreeGistExtension, CITextExtension,
+        CreateExtension, CryptoExtension, HStoreExtension, TrigramExtension,
+        UnaccentExtension,
     )
 except ImportError:
-    from django.test import mock
+    BtreeGinExtension = mock.Mock()
+    BtreeGistExtension = mock.Mock()
+    CITextExtension = mock.Mock()
+    CreateExtension = mock.Mock()
+    CryptoExtension = mock.Mock()
     HStoreExtension = mock.Mock()
+    TrigramExtension = mock.Mock()
     UnaccentExtension = mock.Mock()
 
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-    ]
-
     operations = [
+        BtreeGinExtension(),
+        BtreeGistExtension(),
+        CITextExtension(),
+        # Ensure CreateExtension quotes extension names by creating one with a
+        # dash in its name.
+        CreateExtension('uuid-ossp'),
+        CryptoExtension(),
         HStoreExtension(),
+        TrigramExtension(),
         UnaccentExtension(),
     ]

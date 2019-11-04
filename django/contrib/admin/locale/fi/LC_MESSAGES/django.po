@@ -1,17 +1,18 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Aarni Koskela, 2015
+# Aarni Koskela, 2015,2017
 # Antti Kaihola <antti.15+transifex@kaihola.fi>, 2011
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Klaus Dahlén <klaus.dahlen@gmail.com>, 2012
+# Nikolay Korotkiy <sikmir@gmail.com>, 2018
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-11-15 11:06+0100\n"
-"PO-Revision-Date: 2015-12-07 08:13+0000\n"
-"Last-Translator: Aarni Koskela\n"
+"POT-Creation-Date: 2019-01-16 20:42+0100\n"
+"PO-Revision-Date: 2019-01-18 00:36+0000\n"
+"Last-Translator: Ramiro Morales\n"
 "Language-Team: Finnish (http://www.transifex.com/django/django/language/"
 "fi/)\n"
 "MIME-Version: 1.0\n"
@@ -65,6 +66,12 @@ msgstr "Tässä kuussa"
 msgid "This year"
 msgstr "Tänä vuonna"
 
+msgid "No date"
+msgstr "Ei päivämäärää"
+
+msgid "Has date"
+msgstr "On päivämäärä"
+
 #, python-format
 msgid ""
 "Please enter the correct %(username)s and password for a staff account. Note "
@@ -75,6 +82,22 @@ msgstr ""
 
 msgid "Action:"
 msgstr "Toiminto:"
+
+#, python-format
+msgid "Add another %(verbose_name)s"
+msgstr "Lisää toinen %(verbose_name)s"
+
+msgid "Remove"
+msgstr "Poista"
+
+msgid "Addition"
+msgstr "Lisäys"
+
+msgid "Change"
+msgstr "Muokkaa"
+
+msgid "Deletion"
+msgstr "Poisto"
 
 msgid "action time"
 msgstr "tapahtumahetki"
@@ -88,6 +111,8 @@ msgstr "sisältötyyppi"
 msgid "object id"
 msgstr "kohteen tunniste"
 
+#. Translators: 'repr' means representation
+#. (https://docs.python.org/library/functions.html#repr)
 msgid "object repr"
 msgstr "kohteen tiedot"
 
@@ -118,6 +143,31 @@ msgstr "Poistettu \"%(object)s.\""
 msgid "LogEntry Object"
 msgstr "Lokimerkintätietue"
 
+#, python-brace-format
+msgid "Added {name} \"{object}\"."
+msgstr "Lisätty {name} \"{object}\"."
+
+msgid "Added."
+msgstr "Lisätty."
+
+msgid "and"
+msgstr "ja"
+
+#, python-brace-format
+msgid "Changed {fields} for {name} \"{object}\"."
+msgstr "Muutettu {fields} {name}-kohteelle \"{object}\"."
+
+#, python-brace-format
+msgid "Changed {fields}."
+msgstr "Muutettu {fields}."
+
+#, python-brace-format
+msgid "Deleted {name} \"{object}\"."
+msgstr "Poistettu {name} \"{object}\"."
+
+msgid "No fields changed."
+msgstr "Ei muutoksia kenttiin."
+
 msgid "None"
 msgstr "Ei arvoa"
 
@@ -127,61 +177,38 @@ msgstr ""
 " Pidä \"Ctrl\" (tai Macin \"Command\") pohjassa valitaksesi useita "
 "vaihtoehtoja."
 
-msgid "Added."
-msgstr "Lisätty."
+#, python-brace-format
+msgid "The {name} \"{obj}\" was added successfully."
+msgstr "{name} \"{obj}\" on lisätty."
 
-#, python-format
-msgid "Changed %s."
-msgstr "Muokattu: %s."
+msgid "You may edit it again below."
+msgstr ""
 
-msgid "and"
-msgstr "ja"
-
-#, python-format
-msgid "Added %(name)s \"%(object)s\"."
-msgstr "Lisätty %(name)s \"%(object)s\"."
-
-#, python-format
-msgid "Changed %(list)s for %(name)s \"%(object)s\"."
-msgstr "Muutettu %(list)s kohteelle %(name)s \"%(object)s\"."
-
-#, python-format
-msgid "Deleted %(name)s \"%(object)s\"."
-msgstr "Poistettu %(name)s \"%(object)s\"."
-
-msgid "No fields changed."
-msgstr "Ei muutoksia kenttiin."
-
-#, python-format
+#, python-brace-format
 msgid ""
-"The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
-msgstr "%(name)s \"%(obj)s\" on lisätty. Voit muokata sitä uudelleen alla."
-
-#, python-format
-msgid ""
-"The %(name)s \"%(obj)s\" was added successfully. You may add another "
-"%(name)s below."
-msgstr "%(name)s \"%(obj)s\" on lisätty. Voit lisätä toisen %(name)s alla."
-
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was added successfully."
-msgstr "%(name)s \"%(obj)s\" on lisätty."
-
-#, python-format
-msgid ""
-"The %(name)s \"%(obj)s\" was changed successfully. You may edit it again "
+"The {name} \"{obj}\" was added successfully. You may add another {name} "
 "below."
-msgstr "%(name)s \"%(obj)s\" on muokattu. Voit muokata sitä uudelleen alla."
+msgstr "{name} \"{obj}\" on lisätty. Voit lisätä toisen {name} alla."
 
-#, python-format
+#, python-brace-format
 msgid ""
-"The %(name)s \"%(obj)s\" was changed successfully. You may add another "
-"%(name)s below."
-msgstr "%(name)s \"%(obj)s\" on muokattu. Voit lisätä toisen %(name)s alla."
+"The {name} \"{obj}\" was changed successfully. You may edit it again below."
+msgstr "{name} \"{obj}\" on muokattu. Voit muokata sitä edelleen alla."
 
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was changed successfully."
-msgstr "%(name)s \"%(obj)s\" on muutettu."
+#, python-brace-format
+msgid ""
+"The {name} \"{obj}\" was added successfully. You may edit it again below."
+msgstr "{name} \"{obj}\" on lisätty. Voit muokata sitä uudelleen alla."
+
+#, python-brace-format
+msgid ""
+"The {name} \"{obj}\" was changed successfully. You may add another {name} "
+"below."
+msgstr "{name} \"{obj}\" on muokattu. Voit lisätä toisen alla."
+
+#, python-brace-format
+msgid "The {name} \"{obj}\" was changed successfully."
+msgstr "{name} \"{obj}\" on muokattu."
 
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
@@ -198,8 +225,8 @@ msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "%(name)s \"%(obj)s\" on poistettu."
 
 #, python-format
-msgid "%(name)s object with primary key %(key)r does not exist."
-msgstr "%(name)s perusavaimella %(key)r ei ole olemassa."
+msgid "%(name)s with ID \"%(key)s\" doesn't exist. Perhaps it was deleted?"
+msgstr "%(name)s tunnisteella %(key)s puuttuu. Se on voitu poistaa."
 
 #, python-format
 msgid "Add %s"
@@ -208,6 +235,10 @@ msgstr "Lisää %s"
 #, python-format
 msgid "Change %s"
 msgstr "Muokkaa %s"
+
+#, python-format
+msgid "View %s"
+msgstr ""
 
 msgid "Database error"
 msgstr "Tietokantavirhe"
@@ -317,7 +348,7 @@ msgid "Change password"
 msgstr "Vaihda salasana"
 
 msgid "Please correct the error below."
-msgstr "Korjaa allaolevat virheet."
+msgstr ""
 
 msgid "Please correct the errors below."
 msgstr "Korjaa allaolevat virheet."
@@ -338,18 +369,15 @@ msgstr "Ohjeita"
 msgid "Log out"
 msgstr "Kirjaudu ulos"
 
-msgid "Add"
-msgstr "Lisää"
+#, python-format
+msgid "Add %(name)s"
+msgstr "Lisää %(name)s"
 
 msgid "History"
 msgstr "Muokkaushistoria"
 
 msgid "View on site"
 msgstr "Näytä lopputulos"
-
-#, python-format
-msgid "Add %(name)s"
-msgstr "Lisää %(name)s"
 
 msgid "Filter"
 msgstr "Suodatin"
@@ -431,15 +459,8 @@ msgstr ""
 "Haluatki varmasti poistaa valitut %(objects_name)s? Samalla poistetaan "
 "kaikki alla mainitut ja niihin liittyvät kohteet:"
 
-msgid "Change"
-msgstr "Muokkaa"
-
-msgid "Remove"
-msgstr "Poista"
-
-#, python-format
-msgid "Add another %(verbose_name)s"
-msgstr "Lisää toinen %(verbose_name)s"
+msgid "View"
+msgstr ""
 
 msgid "Delete?"
 msgstr "Poista?"
@@ -455,14 +476,17 @@ msgstr "Yhteenveto"
 msgid "Models in the %(name)s application"
 msgstr "%(name)s -applikaation mallit"
 
-msgid "You don't have permission to edit anything."
-msgstr "Sinulla ei ole oikeutta muokata mitään."
+msgid "Add"
+msgstr "Lisää"
 
-msgid "Recent Actions"
+msgid "You don't have permission to view or edit anything."
+msgstr ""
+
+msgid "Recent actions"
 msgstr "Viimeisimmät tapahtumat"
 
-msgid "My Actions"
-msgstr "Omat tapahtumani"
+msgid "My actions"
+msgstr "Omat tapahtumat"
 
 msgid "None available"
 msgstr "Ei yhtään"
@@ -511,20 +535,8 @@ msgstr "Näytä kaikki"
 msgid "Save"
 msgstr "Tallenna ja poistu"
 
-msgid "Popup closing..."
-msgstr "Ponnahdusikkuna sulkeutuu..."
-
-#, python-format
-msgid "Change selected %(model)s"
-msgstr "Muuta valittuja %(model)s"
-
-#, python-format
-msgid "Add another %(model)s"
-msgstr "Lisää toinen %(model)s"
-
-#, python-format
-msgid "Delete selected %(model)s"
-msgstr "Poista valitut %(model)s"
+msgid "Popup closing…"
+msgstr ""
 
 msgid "Search"
 msgstr "Haku"
@@ -547,6 +559,24 @@ msgstr "Tallenna ja lisää toinen"
 
 msgid "Save and continue editing"
 msgstr "Tallenna välillä ja jatka muokkaamista"
+
+msgid "Save and view"
+msgstr ""
+
+msgid "Close"
+msgstr "Sulje"
+
+#, python-format
+msgid "Change selected %(model)s"
+msgstr "Muuta valittuja %(model)s"
+
+#, python-format
+msgid "Add another %(model)s"
+msgstr "Lisää toinen %(model)s"
+
+#, python-format
+msgid "Delete selected %(model)s"
+msgstr "Poista valitut %(model)s"
 
 msgid "Thanks for spending some quality time with the Web site today."
 msgstr "Kiitos sivuillamme viettämästäsi ajasta."
@@ -657,6 +687,10 @@ msgstr "Valitse %s"
 #, python-format
 msgid "Select %s to change"
 msgstr "Valitse muokattava %s"
+
+#, python-format
+msgid "Select %s to view"
+msgstr ""
 
 msgid "Date:"
 msgstr "Pvm:"

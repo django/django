@@ -9,14 +9,14 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
     sql_alter_column_null = "MODIFY %(column)s %(type)s NULL"
     sql_alter_column_not_null = "MODIFY %(column)s %(type)s NOT NULL"
     sql_alter_column_type = "MODIFY %(column)s %(type)s"
+
+    # No 'CASCADE' which works as a no-op in MySQL but is undocumented
+    sql_delete_column = "ALTER TABLE %(table)s DROP COLUMN %(column)s"
+
     sql_rename_column = "ALTER TABLE %(table)s CHANGE %(old_column)s %(new_column)s %(type)s"
 
     sql_delete_unique = "ALTER TABLE %(table)s DROP INDEX %(name)s"
 
-    sql_create_fk = (
-        "ALTER TABLE %(table)s ADD CONSTRAINT %(name)s FOREIGN KEY "
-        "(%(column)s) REFERENCES %(to_table)s (%(to_column)s)"
-    )
     sql_delete_fk = "ALTER TABLE %(table)s DROP FOREIGN KEY %(name)s"
 
     sql_delete_index = "DROP INDEX %(name)s ON %(table)s"
@@ -24,27 +24,24 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
     sql_create_pk = "ALTER TABLE %(table)s ADD CONSTRAINT %(name)s PRIMARY KEY (%(columns)s)"
     sql_delete_pk = "ALTER TABLE %(table)s DROP PRIMARY KEY"
 
+    sql_create_index = 'CREATE INDEX %(name)s ON %(table)s (%(columns)s)%(extra)s'
+
     def quote_value(self, value):
-        # Inner import to allow module to fail to load gracefully
-        import MySQLdb.converters
-        return MySQLdb.escape(value, MySQLdb.converters.conversions)
+        self.connection.ensure_connection()
+        quoted = self.connection.connection.escape(value, self.connection.connection.encoders)
+        if isinstance(value, str):
+            quoted = quoted.decode()
+        return quoted
+
+    def _is_limited_data_type(self, field):
+        db_type = field.db_type(self.connection)
+        return db_type is not None and db_type.lower() in self.connection._limited_data_types
 
     def skip_default(self, field):
-        """
-        MySQL doesn't accept default values for TEXT and BLOB types, and
-        implicitly treats these columns as nullable.
-        """
-        db_type = field.db_type(self.connection)
-        return (
-            db_type is not None and
-            db_type.lower() in {
-                'tinyblob', 'blob', 'mediumblob', 'longblob',
-                'tinytext', 'text', 'mediumtext', 'longtext',
-            }
-        )
+        return self._is_limited_data_type(field)
 
     def add_field(self, model, field):
-        super(DatabaseSchemaEditor, self).add_field(model, field)
+        super().add_field(model, field)
 
         # Simulate the effect of a one-off default.
         # field.default may be unhashable, so a set isn't used for "in" check.
@@ -55,17 +52,20 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
                 'column': self.quote_name(field.column),
             }, [effective_default])
 
-    def _model_indexes_sql(self, model):
+    def _field_should_be_indexed(self, model, field):
+        create_index = super()._field_should_be_indexed(model, field)
         storage = self.connection.introspection.get_storage_engine(
             self.connection.cursor(), model._meta.db_table
         )
-        if storage == "InnoDB":
-            for field in model._meta.local_fields:
-                if field.db_index and not field.unique and field.get_internal_type() == "ForeignKey":
-                    # Temporary setting db_index to False (in memory) to disable
-                    # index creation for FKs (index automatically created by MySQL)
-                    field.db_index = False
-        return super(DatabaseSchemaEditor, self)._model_indexes_sql(model)
+        # No need to create an index for ForeignKey fields except if
+        # db_constraint=False because the index from that constraint won't be
+        # created.
+        if (storage == "InnoDB" and
+                create_index and
+                field.get_internal_type() == 'ForeignKey' and
+                field.db_constraint):
+            return False
+        return not self._is_limited_data_type(field) and create_index
 
     def _delete_composed_index(self, model, fields, *args):
         """
@@ -81,7 +81,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             constraint_names = self._constraint_names(model, [first_field.column], index=True)
             if not constraint_names:
                 self.execute(self._create_index_sql(model, [first_field], suffix=""))
-        return super(DatabaseSchemaEditor, self)._delete_composed_index(model, fields, *args)
+        return super()._delete_composed_index(model, fields, *args)
 
     def _set_field_new_type_null_status(self, field, new_type):
         """
@@ -94,10 +94,10 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             new_type += " NOT NULL"
         return new_type
 
-    def _alter_column_type_sql(self, table, old_field, new_field, new_type):
+    def _alter_column_type_sql(self, model, old_field, new_field, new_type):
         new_type = self._set_field_new_type_null_status(old_field, new_type)
-        return super(DatabaseSchemaEditor, self)._alter_column_type_sql(table, old_field, new_field, new_type)
+        return super()._alter_column_type_sql(model, old_field, new_field, new_type)
 
     def _rename_field_sql(self, table, old_field, new_field, new_type):
         new_type = self._set_field_new_type_null_status(old_field, new_type)
-        return super(DatabaseSchemaEditor, self)._rename_field_sql(table, old_field, new_field, new_type)
+        return super()._rename_field_sql(table, old_field, new_field, new_type)

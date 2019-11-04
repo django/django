@@ -1,13 +1,9 @@
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals
-
 import datetime
 import itertools
 import tempfile
 
 from django.core.files.storage import FileSystemStorage
 from django.db import models
-from django.utils.encoding import python_2_unicode_compatible
 
 callable_default_counter = itertools.count()
 
@@ -54,11 +50,9 @@ class ChoiceModel(models.Model):
     choice = models.CharField(max_length=2, blank=True, choices=CHOICES)
     choice_string_w_none = models.CharField(
         max_length=2, blank=True, null=True, choices=STRING_CHOICES_WITH_NONE)
-    choice_integer = models.IntegerField(choices=INTEGER_CHOICES, blank=True,
-                                         null=True)
+    choice_integer = models.IntegerField(choices=INTEGER_CHOICES, blank=True, null=True)
 
 
-@python_2_unicode_compatible
 class ChoiceOptionModel(models.Model):
     """Destination for ChoiceFieldModel's ForeignKey.
     Can't reuse ChoiceModel because error_message tests require that it have no instances."""
@@ -133,18 +127,6 @@ class OptionalMultiChoiceModel(models.Model):
 
 class FileModel(models.Model):
     file = models.FileField(storage=temp_storage, upload_to='tests')
-
-
-@python_2_unicode_compatible
-class Group(models.Model):
-    name = models.CharField(max_length=10)
-
-    def __str__(self):
-        return '%s' % self.name
-
-
-class Cheese(models.Model):
-    name = models.CharField(max_length=100)
 
 
 class Article(models.Model):

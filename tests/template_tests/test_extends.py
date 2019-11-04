@@ -1,10 +1,7 @@
 import os
 
 from django.template import Context, Engine, TemplateDoesNotExist
-from django.template.loader_tags import ExtendsError
-from django.template.loaders.base import Loader
-from django.test import SimpleTestCase, ignore_warnings
-from django.utils.deprecation import RemovedInDjango20Warning
+from django.test import SimpleTestCase
 
 from .utils import ROOT
 
@@ -121,63 +118,23 @@ class ExtendsBehaviorTests(SimpleTestCase):
         output = template.render(Context({}))
         self.assertEqual(output.strip(), 'loader2 loader1')
 
-
-class NonRecursiveLoader(Loader):
-
-    def __init__(self, engine, templates_dict):
-        self.templates_dict = templates_dict
-        super(NonRecursiveLoader, self).__init__(engine)
-
-    def load_template_source(self, template_name, template_dirs=None):
-        try:
-            return self.templates_dict[template_name], template_name
-        except KeyError:
-            raise TemplateDoesNotExist(template_name)
-
-
-@ignore_warnings(category=RemovedInDjango20Warning)
-class NonRecursiveLoaderExtendsTests(SimpleTestCase):
-
-    loaders = [
-        ('template_tests.test_extends.NonRecursiveLoader', {
-            'base.html': 'base',
-            'index.html': '{% extends "base.html" %}',
-            'recursive.html': '{% extends "recursive.html" %}',
-            'other-recursive.html': '{% extends "recursive.html" %}',
-            'a.html': '{% extends "b.html" %}',
-            'b.html': '{% extends "a.html" %}',
-        }),
-    ]
-
-    def test_extend(self):
-        engine = Engine(loaders=self.loaders)
-        output = engine.render_to_string('index.html')
-        self.assertEqual(output, 'base')
-
-    def test_extend_cached(self):
-        engine = Engine(loaders=[
-            ('django.template.loaders.cached.Loader', self.loaders),
-        ])
-        output = engine.render_to_string('index.html')
-        self.assertEqual(output, 'base')
-
-        cache = engine.template_loaders[0].template_cache
-        self.assertTrue('base.html' in cache)
-        self.assertTrue('index.html' in cache)
-
-        # Render a second time from cache
-        output = engine.render_to_string('index.html')
-        self.assertEqual(output, 'base')
-
-    def test_extend_error(self):
-        engine = Engine(loaders=self.loaders)
-        msg = 'Cannot extend templates recursively when using non-recursive template loaders'
-
-        with self.assertRaisesMessage(ExtendsError, msg):
-            engine.render_to_string('recursive.html')
-
-        with self.assertRaisesMessage(ExtendsError, msg):
-            engine.render_to_string('other-recursive.html')
-
-        with self.assertRaisesMessage(ExtendsError, msg):
-            engine.render_to_string('a.html')
+    def test_block_override_in_extended_included_template(self):
+        """
+        ExtendsNode.find_template() initializes history with self.origin
+        (#28071).
+        """
+        engine = Engine(
+            loaders=[
+                ['django.template.loaders.locmem.Loader', {
+                    'base.html': "{% extends 'base.html' %}{% block base %}{{ block.super }}2{% endblock %}",
+                    'included.html':
+                        "{% extends 'included.html' %}{% block included %}{{ block.super }}B{% endblock %}",
+                }],
+                ['django.template.loaders.locmem.Loader', {
+                    'base.html': "{% block base %}1{% endblock %}{% include 'included.html' %}",
+                    'included.html': "{% block included %}A{% endblock %}",
+                }],
+            ],
+        )
+        template = engine.get_template('base.html')
+        self.assertEqual(template.render(Context({})), '12AB')

@@ -1,44 +1,42 @@
 import os
 import shutil
-import unittest
+import tempfile
 
 from django import conf
-from django.test import TestCase
-from django.utils import six
-from django.utils._os import upath
+from django.test import SimpleTestCase
+from django.test.utils import extend_sys_path
 
 
-@unittest.skipIf(six.PY2,
-    'Python 2 cannot import the project template because '
-    'django/conf/project_template doesn\'t have an __init__.py file.')
-class TestStartProjectSettings(TestCase):
+class TestStartProjectSettings(SimpleTestCase):
     def setUp(self):
-        # Ensure settings.py exists
-        project_dir = os.path.join(
-            os.path.dirname(upath(conf.__file__)),
+        self.temp_dir = tempfile.TemporaryDirectory()
+        self.addCleanup(self.temp_dir.cleanup)
+        template_settings_py = os.path.join(
+            os.path.dirname(conf.__file__),
             'project_template',
             'project_name',
+            'settings.py-tpl',
         )
-        template_settings_py = os.path.join(project_dir, 'settings.py-tpl')
-        test_settings_py = os.path.join(project_dir, 'settings.py')
+        test_settings_py = os.path.join(self.temp_dir.name, 'test_settings.py')
         shutil.copyfile(template_settings_py, test_settings_py)
-        self.addCleanup(os.remove, test_settings_py)
 
-    def test_middleware_classes_headers(self):
+    def test_middleware_headers(self):
         """
-        Ensure headers sent by the default MIDDLEWARE_CLASSES do not
-        inadvertently change. For example, we never want "Vary: Cookie" to
-        appear in the list since it prevents the caching of responses.
+        Ensure headers sent by the default MIDDLEWARE don't inadvertently
+        change. For example, we never want "Vary: Cookie" to appear in the list
+        since it prevents the caching of responses.
         """
-        from django.conf.project_template.project_name.settings import MIDDLEWARE_CLASSES
+        with extend_sys_path(self.temp_dir.name):
+            from test_settings import MIDDLEWARE
 
         with self.settings(
-            MIDDLEWARE_CLASSES=MIDDLEWARE_CLASSES,
+            MIDDLEWARE=MIDDLEWARE,
             ROOT_URLCONF='project_template.urls',
         ):
             response = self.client.get('/empty/')
             headers = sorted(response.serialize_headers().split(b'\r\n'))
             self.assertEqual(headers, [
+                b'Content-Length: 0',
                 b'Content-Type: text/html; charset=utf-8',
                 b'X-Frame-Options: SAMEORIGIN',
             ])

@@ -1,22 +1,23 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Chun-Chia Chen <ccc.larc@gmail.com>, 2015
+# Chen Chun-Chia <ccc.larc@gmail.com>, 2015
 # Eric Ho <eric913@gmail.com>, 2013
 # ilay <ilay@ilay.tw>, 2012
 # Jannis Leidel <jannis@leidel.info>, 2011
 # mail6543210 <mail6543210@yahoo.com.tw>, 2013
 # ming hsien tzang <tzangms@gmail.com>, 2011
 # tcc <tcchou@tcchou.org>, 2011
+# Tzu-ping Chung <uranusjr@gmail.com>, 2016-2017
 # Yeh-Yung <yyc1217@gmail.com>, 2013
 # Yeh-Yung <yyc1217@gmail.com>, 2012
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2015-11-27 09:35+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2017-12-01 21:10+0100\n"
+"PO-Revision-Date: 2017-12-03 05:47+0000\n"
+"Last-Translator: Tzu-ping Chung <uranusjr@gmail.com>\n"
 "Language-Team: Chinese (Taiwan) (http://www.transifex.com/django/django/"
 "language/zh_TW/)\n"
 "MIME-Version: 1.0\n"
@@ -35,13 +36,13 @@ msgid "Asturian"
 msgstr "阿斯圖里亞斯語"
 
 msgid "Azerbaijani"
-msgstr "阿塞拜疆(Azerbaijani)"
+msgstr "亞塞拜然語"
 
 msgid "Bulgarian"
 msgstr "保加利亞語"
 
 msgid "Belarusian"
-msgstr "白俄羅斯人"
+msgstr "白俄羅斯語"
 
 msgid "Bengali"
 msgstr "孟加拉語"
@@ -53,7 +54,7 @@ msgid "Bosnian"
 msgstr "波士尼亞語"
 
 msgid "Catalan"
-msgstr "嘉泰羅尼亞語"
+msgstr "加泰隆語"
 
 msgid "Czech"
 msgstr "捷克語"
@@ -66,6 +67,9 @@ msgstr "丹麥語"
 
 msgid "German"
 msgstr "德語"
+
+msgid "Lower Sorbian"
+msgstr "下索布語"
 
 msgid "Greek"
 msgstr "希臘語"
@@ -80,7 +84,7 @@ msgid "British English"
 msgstr "英國英語"
 
 msgid "Esperanto"
-msgstr "世界語(Esperanto)"
+msgstr "世界語"
 
 msgid "Spanish"
 msgstr "西班牙語"
@@ -89,16 +93,16 @@ msgid "Argentinian Spanish"
 msgstr "阿根廷西班牙語"
 
 msgid "Colombian Spanish"
-msgstr ""
+msgstr "哥倫比亞西班牙語"
 
 msgid "Mexican Spanish"
-msgstr "墨西哥西班牙語(Mexican Spanish)"
+msgstr "墨西哥西班牙語"
 
 msgid "Nicaraguan Spanish"
-msgstr "尼加拉瓜西班牙語(Nicaraguan Spanish)"
+msgstr "尼加拉瓜西班牙語"
 
 msgid "Venezuelan Spanish"
-msgstr "委內瑞拉西班牙人"
+msgstr "委內瑞拉西班牙語"
 
 msgid "Estonian"
 msgstr "愛沙尼亞語"
@@ -116,25 +120,28 @@ msgid "French"
 msgstr "法語"
 
 msgid "Frisian"
-msgstr "弗里斯蘭語"
+msgstr "菲士蘭語"
 
 msgid "Irish"
 msgstr "愛爾蘭語"
 
 msgid "Scottish Gaelic"
-msgstr ""
+msgstr "蘇格蘭蓋爾語"
 
 msgid "Galician"
-msgstr "加里西亞語"
+msgstr "加利西亞語"
 
 msgid "Hebrew"
 msgstr "希伯來語"
 
 msgid "Hindi"
-msgstr "印度語"
+msgstr "印地語"
 
 msgid "Croatian"
 msgstr "克羅埃西亞語"
+
+msgid "Upper Sorbian"
+msgstr "上索布語"
 
 msgid "Hungarian"
 msgstr "匈牙利語"
@@ -160,14 +167,17 @@ msgstr "日語"
 msgid "Georgian"
 msgstr "喬治亞語"
 
+msgid "Kabyle"
+msgstr "卡拜爾語"
+
 msgid "Kazakh"
-msgstr "哈薩克(Kazakh)"
+msgstr "哈薩克語"
 
 msgid "Khmer"
 msgstr "高棉語"
 
 msgid "Kannada"
-msgstr "坎那達語"
+msgstr "康納達語"
 
 msgid "Korean"
 msgstr "韓語"
@@ -185,28 +195,28 @@ msgid "Macedonian"
 msgstr "馬其頓語"
 
 msgid "Malayalam"
-msgstr "馬來亞拉姆語"
+msgstr "馬拉雅拉姆語"
 
 msgid "Mongolian"
 msgstr "蒙古語"
 
 msgid "Marathi"
-msgstr "馬拉地語"
+msgstr "馬拉提語"
 
 msgid "Burmese"
 msgstr "緬甸語"
 
-msgid "Norwegian Bokmal"
-msgstr "挪威語（波克默爾）"
+msgid "Norwegian Bokmål"
+msgstr "書面挪威語"
 
 msgid "Nepali"
-msgstr "尼泊爾(Nepali)"
+msgstr "尼泊爾語"
 
 msgid "Dutch"
 msgstr "荷蘭語"
 
 msgid "Norwegian Nynorsk"
-msgstr "挪威語（尼諾斯克）"
+msgstr "新挪威語"
 
 msgid "Ossetic"
 msgstr "奧塞梯語"
@@ -215,7 +225,7 @@ msgid "Punjabi"
 msgstr "旁遮普語"
 
 msgid "Polish"
-msgstr "波蘭嶼"
+msgstr "波蘭語"
 
 msgid "Portuguese"
 msgstr "葡萄牙語"
@@ -248,7 +258,7 @@ msgid "Swedish"
 msgstr "瑞典語"
 
 msgid "Swahili"
-msgstr "斯瓦希裡(Swahili)"
+msgstr "斯瓦希里語"
 
 msgid "Tamil"
 msgstr "坦米爾語"
@@ -263,7 +273,7 @@ msgid "Turkish"
 msgstr "土耳其語"
 
 msgid "Tatar"
-msgstr "韃靼(Tatar)"
+msgstr "韃靼語"
 
 msgid "Udmurt"
 msgstr "烏德穆爾特語"
@@ -272,7 +282,7 @@ msgid "Ukrainian"
 msgstr "烏克蘭語"
 
 msgid "Urdu"
-msgstr "烏爾都語(Urdu)"
+msgstr "烏爾都語"
 
 msgid "Vietnamese"
 msgstr "越南語"
@@ -284,43 +294,50 @@ msgid "Traditional Chinese"
 msgstr "繁體中文"
 
 msgid "Messages"
-msgstr ""
+msgstr "訊息"
 
 msgid "Site Maps"
-msgstr ""
+msgstr "網站地圖"
 
 msgid "Static Files"
-msgstr ""
+msgstr "靜態文件"
 
 msgid "Syndication"
-msgstr ""
+msgstr "聯播"
 
-msgid "Web Design"
-msgstr ""
+msgid "That page number is not an integer"
+msgstr "該頁碼並非整數"
+
+msgid "That page number is less than 1"
+msgstr "該頁碼小於 1"
+
+msgid "That page contains no results"
+msgstr "該頁未包含任何內容"
 
 msgid "Enter a valid value."
-msgstr "輸入有效的值"
+msgstr "請輸入有效的值。"
 
 msgid "Enter a valid URL."
-msgstr "輸入有效的URL"
+msgstr "請輸入有效的 URL。"
 
 msgid "Enter a valid integer."
-msgstr "輸入有效的整數"
+msgstr "請輸入有效的整數。"
 
 msgid "Enter a valid email address."
-msgstr "輸入有效的電子郵件地址。"
+msgstr "請輸入有效的電子郵件地址。"
 
+#. Translators: "letters" means latin letters: a-z and A-Z.
 msgid ""
 "Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
-msgstr "輸入一個有效的 'slug'，由字母、數字、底線與連字號組成。"
+msgstr "請輸入一個有效的「slug」，由字母、數字、底線與連字號組成。"
 
 msgid ""
 "Enter a valid 'slug' consisting of Unicode letters, numbers, underscores, or "
 "hyphens."
-msgstr ""
+msgstr "請輸入一個有效的「slug」，由 Unicode 字母、數字、底線與連字號組成。"
 
 msgid "Enter a valid IPv4 address."
-msgstr "輸入有效的 IPv4 位址。"
+msgstr "請輸入有效的 IPv4 位址。"
 
 msgid "Enter a valid IPv6 address."
 msgstr "請輸入有效的 IPv6 位址。"
@@ -329,19 +346,19 @@ msgid "Enter a valid IPv4 or IPv6 address."
 msgstr "請輸入有效的 IPv4 或 IPv6 位址。"
 
 msgid "Enter only digits separated by commas."
-msgstr "輸入以逗號分隔的數字。"
+msgstr "請輸入以逗號分隔的數字。"
 
 #, python-format
 msgid "Ensure this value is %(limit_value)s (it is %(show_value)s)."
-msgstr "確認這個是否為 %(limit_value)s (目前是 %(show_value)s)."
+msgstr "請確認這個值是否為 %(limit_value)s (目前是 %(show_value)s)。"
 
 #, python-format
 msgid "Ensure this value is less than or equal to %(limit_value)s."
-msgstr "確認這個數值是否小於或等於 %(limit_value)s。"
+msgstr "請確認此數值是否小於或等於 %(limit_value)s。"
 
 #, python-format
 msgid "Ensure this value is greater than or equal to %(limit_value)s."
-msgstr "確認這個數值是否大於或等於 %(limit_value)s。"
+msgstr "請確認此數值是否大於或等於 %(limit_value)s。"
 
 #, python-format
 msgid ""
@@ -350,7 +367,8 @@ msgid ""
 msgid_plural ""
 "Ensure this value has at least %(limit_value)d characters (it has "
 "%(show_value)d)."
-msgstr[0] "確認這個值至少 %(limit_value)d 個字 (現在是 %(show_value)d 個字)"
+msgstr[0] ""
+"請確認這個值至少包含 %(limit_value)d 個字 (目前為 %(show_value)d 個字)。"
 
 #, python-format
 msgid ""
@@ -359,41 +377,52 @@ msgid ""
 msgid_plural ""
 "Ensure this value has at most %(limit_value)d characters (it has "
 "%(show_value)d)."
-msgstr[0] "確認這個值最多 %(limit_value)d 個字 (現在是 %(show_value)d 個字)"
+msgstr[0] ""
+"請確認這個值至多包含 %(limit_value)d 個字 (目前為 %(show_value)d 個字)。"
 
 #, python-format
 msgid "Ensure that there are no more than %(max)s digit in total."
 msgid_plural "Ensure that there are no more than %(max)s digits in total."
-msgstr[0] "確認數字全長不超過 %(max)s 位。"
+msgstr[0] "請確認數字全長不超過 %(max)s 位。"
 
 #, python-format
 msgid "Ensure that there are no more than %(max)s decimal place."
 msgid_plural "Ensure that there are no more than %(max)s decimal places."
-msgstr[0] ""
+msgstr[0] "請確認十進位數字不多於 %(max)s 位。"
 
 #, python-format
 msgid ""
 "Ensure that there are no more than %(max)s digit before the decimal point."
 msgid_plural ""
 "Ensure that there are no more than %(max)s digits before the decimal point."
-msgstr[0] ""
+msgstr[0] "請確認小數點前不多於 %(max)s 位。"
+
+#, python-format
+msgid ""
+"File extension '%(extension)s' is not allowed. Allowed extensions are: "
+"'%(allowed_extensions)s'."
+msgstr ""
+"副檔名「%(extension)s」不被允許。允許的副檔名包含：%(allowed_extensions)s。"
+
+msgid "Null characters are not allowed."
+msgstr "不允許空（null）字元。"
 
 msgid "and"
 msgstr "和"
 
 #, python-format
 msgid "%(model_name)s with this %(field_labels)s already exists."
-msgstr "這個 %(field_labels)s 在 %(model_name)s 已經存在"
+msgstr "這個 %(field_labels)s 在 %(model_name)s 已經存在。"
 
 #, python-format
 msgid "Value %(value)r is not a valid choice."
-msgstr "數值 %(value)r 不是有效的選擇"
+msgstr "數值 %(value)r 不是有效的選擇。"
 
 msgid "This field cannot be null."
 msgstr "這個值不能是 null。"
 
 msgid "This field cannot be blank."
-msgstr "這個欄位不能留白"
+msgstr "這個欄位不能留白。"
 
 #, python-format
 msgid "%(model_name)s with this %(field_label)s already exists."
@@ -404,7 +433,7 @@ msgstr "這個 %(field_label)s 在 %(model_name)s 已經存在。"
 #, python-format
 msgid ""
 "%(field_label)s must be unique for %(date_field_label)s %(lookup_type)s."
-msgstr ""
+msgstr "%(field_label)s 在 %(date_field_label)s %(lookup_type)s 上必須唯一。"
 
 #, python-format
 msgid "Field of type: %(field_type)s"
@@ -417,6 +446,9 @@ msgstr "整數"
 msgid "'%(value)s' value must be an integer."
 msgstr "'%(value)s' 必須為整數。"
 
+msgid "Big (8 byte) integer"
+msgstr "大整數 (8 位元組)"
+
 #, python-format
 msgid "'%(value)s' value must be either True or False."
 msgstr "'%(value)s' 必須為 True 或 False。"
@@ -426,7 +458,7 @@ msgstr "布林值 (True 或 False)"
 
 #, python-format
 msgid "String (up to %(max_length)s)"
-msgstr "字串 (最長到 %(max_length)s 個字)"
+msgstr "字串 (至多 %(max_length)s 個字)"
 
 msgid "Comma-separated integers"
 msgstr "逗號分隔的整數"
@@ -468,7 +500,7 @@ msgid "'%(value)s' value must be a decimal number."
 msgstr "'%(value)s' 必須為十進位數字。"
 
 msgid "Decimal number"
-msgstr "十進位數(小數可)"
+msgstr "十進位數"
 
 #, python-format
 msgid ""
@@ -477,7 +509,7 @@ msgid ""
 msgstr "'%(value)s' 格式錯誤，必須為 [DD] [HH:[MM:]]ss[.uuuuuu]。"
 
 msgid "Duration"
-msgstr ""
+msgstr "時間長"
 
 msgid "Email address"
 msgstr "電子郵件地址"
@@ -487,13 +519,10 @@ msgstr "檔案路徑"
 
 #, python-format
 msgid "'%(value)s' value must be a float."
-msgstr "'%(value)s' 必須為浮點數"
+msgstr "'%(value)s' 必須為浮點數。"
 
 msgid "Floating point number"
 msgstr "浮點數"
-
-msgid "Big (8 byte) integer"
-msgstr "大整數(8位元組)"
 
 msgid "IPv4 address"
 msgstr "IPv4 地址"
@@ -557,13 +586,21 @@ msgstr "影像"
 
 #, python-format
 msgid "%(model)s instance with %(field)s %(value)r does not exist."
-msgstr ""
+msgstr "%(field)s 為 %(value)r 的 %(model)s 物件不存在。"
 
 msgid "Foreign Key (type determined by related field)"
 msgstr "外鍵 (型態由關連欄位決定)"
 
 msgid "One-to-one relationship"
 msgstr "一對一關連"
+
+#, python-format
+msgid "%(from)s-%(to)s relationship"
+msgstr "%(from)s-%(to)s 關連"
+
+#, python-format
+msgid "%(from)s-%(to)s relationships"
+msgstr "%(from)s-%(to)s 關連"
 
 msgid "Many-to-many relationship"
 msgstr "多對多關連"
@@ -593,7 +630,7 @@ msgid "Enter a valid date/time."
 msgstr "輸入有效的日期/時間"
 
 msgid "Enter a valid duration."
-msgstr ""
+msgstr "輸入有效的時間長。"
 
 msgid "No file was submitted. Check the encoding type on the form."
 msgstr "沒有檔案被送出。請檢查表單的編碼類型。"
@@ -608,7 +645,7 @@ msgstr "送出的檔案是空的。"
 msgid "Ensure this filename has at most %(max)d character (it has %(length)d)."
 msgid_plural ""
 "Ensure this filename has at most %(max)d characters (it has %(length)d)."
-msgstr[0] ""
+msgstr[0] "請確認這個檔名至多包含 %(max)d 個字 (目前為 %(length)d)。"
 
 msgid "Please either submit a file or check the clear checkbox, not both."
 msgstr "請提交一個檔案或確認清除核可項, 不能兩者都做。"
@@ -623,34 +660,34 @@ msgid "Select a valid choice. %(value)s is not one of the available choices."
 msgstr "請選擇有效的項目, %(value)s 不是一個可用的選擇。"
 
 msgid "Enter a list of values."
-msgstr "輸入一個列表的值"
+msgstr "請輸入一個列表的值。"
 
 msgid "Enter a complete value."
-msgstr "請輸入完整的值"
+msgstr "請輸入完整的值。"
 
 msgid "Enter a valid UUID."
-msgstr "請輸入有效的 UUID"
+msgstr "請輸入有效的 UUID。"
 
 #. Translators: This is the default suffix added to form field labels
 msgid ":"
-msgstr ":"
+msgstr "："
 
 #, python-format
 msgid "(Hidden field %(name)s) %(error)s"
-msgstr ""
+msgstr "(隱藏欄位 %(name)s) %(error)s"
 
 msgid "ManagementForm data is missing or has been tampered with"
-msgstr ""
+msgstr "ManagementForm 資料缺失或遭竄改"
 
 #, python-format
 msgid "Please submit %d or fewer forms."
 msgid_plural "Please submit %d or fewer forms."
-msgstr[0] ""
+msgstr[0] "請送出不多於 %d 個表單。"
 
 #, python-format
 msgid "Please submit %d or more forms."
 msgid_plural "Please submit %d or more forms."
-msgstr[0] ""
+msgstr[0] "請送出多於 %d 個表單。"
 
 msgid "Order"
 msgstr "排序"
@@ -676,15 +713,15 @@ msgstr ""
 msgid "Please correct the duplicate values below."
 msgstr "請修正下方重覆的數值"
 
-msgid "The inline foreign key did not match the parent instance primary key."
-msgstr "內含的外鍵無法連接到對應的上層實體主鍵。"
+msgid "The inline value did not match the parent instance."
+msgstr "內含的外鍵無法連接到對應的上層實體。"
 
 msgid "Select a valid choice. That choice is not one of the available choices."
 msgstr "選擇有效的選項： 此選擇不在可用的選項中。"
 
 #, python-format
-msgid "\"%(pk)s\" is not a valid value for a primary key."
-msgstr "\"%(pk)s\" 不是一個主鍵的有效資料。"
+msgid "\"%(pk)s\" is not a valid value."
+msgstr "「%(pk)s」並非有效的值。"
 
 #, python-format
 msgid ""
@@ -694,14 +731,14 @@ msgstr ""
 "%(datetime)s 無法被轉換成 %(current_timezone)s 時區格式; 可能是不符格式或不存"
 "在。"
 
+msgid "Clear"
+msgstr "清除"
+
 msgid "Currently"
 msgstr "目前"
 
 msgid "Change"
 msgstr "變更"
-
-msgid "Clear"
-msgstr "清除"
 
 msgid "Unknown"
 msgstr "未知"
@@ -1017,10 +1054,10 @@ msgid "0 minutes"
 msgstr "0 分"
 
 msgid "Forbidden"
-msgstr ""
+msgstr "禁止"
 
 msgid "CSRF verification failed. Request aborted."
-msgstr ""
+msgstr "CSRF 驗證失敗。已中止請求。"
 
 msgid ""
 "You are seeing this message because this HTTPS site requires a 'Referer "
@@ -1028,48 +1065,52 @@ msgid ""
 "required for security reasons, to ensure that your browser is not being "
 "hijacked by third parties."
 msgstr ""
+"你看到這個訊息，是因為這個 HTTPS 網站要求你的網頁瀏覽器送出一個 'Referer 標"
+"頭'，但它並未被送出。這個標頭是用於安全用途，保護你的瀏覽器不被第三方挾持。"
 
 msgid ""
 "If you have configured your browser to disable 'Referer' headers, please re-"
 "enable them, at least for this site, or for HTTPS connections, or for 'same-"
 "origin' requests."
 msgstr ""
+"若你的瀏覽器設定為將「Referer」標頭關閉，請重新為這個網站、HTTPS 連線、或"
+"「same-origin」請求啟用它。"
+
+msgid ""
+"If you are using the <meta name=\"referrer\" content=\"no-referrer\"> tag or "
+"including the 'Referrer-Policy: no-referrer' header, please remove them. The "
+"CSRF protection requires the 'Referer' header to do strict referer checking. "
+"If you're concerned about privacy, use alternatives like <a rel=\"noreferrer"
+"\" ...> for links to third-party sites."
+msgstr ""
+"若你使用 <meta name=\"referrer\" content=\"no-referrer\"> 標籤，或在頭欄位包"
+"含「Referrer-Policy: no-referrer」，請將其移除。CSRF 保護需要使用「Referer」"
+"頭欄位進行嚴格參照檢查。若你擔心隱私問題，請在指向第三方網站的連結使用 <a "
+"rel=\"noreferrer\" ...> 語法。"
 
 msgid ""
 "You are seeing this message because this site requires a CSRF cookie when "
 "submitting forms. This cookie is required for security reasons, to ensure "
 "that your browser is not being hijacked by third parties."
 msgstr ""
+"你看到這個訊息，是因為這個網站要求在送出表單包含一個 CSRF cookie。這個 "
+"cookie 是用於安全用途，保護你的瀏覽器不被第三方挾持。"
 
 msgid ""
 "If you have configured your browser to disable cookies, please re-enable "
 "them, at least for this site, or for 'same-origin' requests."
 msgstr ""
+"若你的瀏覽器設定為將 cookie 關閉，請重新為這個網站或「same-origin」請求啟用"
+"它。"
 
 msgid "More information is available with DEBUG=True."
-msgstr ""
-
-msgid "Welcome to Django"
-msgstr ""
-
-msgid "It worked!"
-msgstr ""
-
-msgid "Congratulations on your first Django-powered page."
-msgstr ""
-
-msgid ""
-"Of course, you haven't actually done any work yet. Next, start your first "
-"app by running <code>python manage.py startapp [app_label]</code>."
-msgstr ""
-
-msgid ""
-"You're seeing this message because you have <code>DEBUG = True</code> in "
-"your Django settings file and you haven't configured any URLs. Get to work!"
-msgstr ""
+msgstr "設定 DEBUG=True 以獲得更多資訊。"
 
 msgid "No year specified"
 msgstr "不指定年份"
+
+msgid "Date out of range"
+msgstr "日期超過範圍"
 
 msgid "No month specified"
 msgstr "不指定月份"
@@ -1121,3 +1162,46 @@ msgstr "\"%(path)s\" 路徑不存在"
 #, python-format
 msgid "Index of %(directory)s"
 msgstr "%(directory)s 的索引"
+
+msgid "Django: the Web framework for perfectionists with deadlines."
+msgstr "Django：為有時間壓力的完美主義者設計的網站框架。"
+
+#, python-format
+msgid ""
+"View <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" "
+"target=\"_blank\" rel=\"noopener\">release notes</a> for Django %(version)s"
+msgstr ""
+"查看 <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" "
+"target=\"_blank\" rel=\"noopener\">Django %(version)s 的發行筆記</a>"
+
+msgid "The install worked successfully! Congratulations!"
+msgstr "安裝成功！恭喜！"
+
+#, python-format
+msgid ""
+"You are seeing this page because <a href=\"https://docs.djangoproject.com/en/"
+"%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener"
+"\">DEBUG=True</a> is in your settings file and you have not configured any "
+"URLs."
+msgstr ""
+"你看到這個訊息，是因為你在 Django 設定檔中包含 <a href=\"https://docs."
+"djangoproject.com/en/%(version)s/ref/settings/#debug\" target=\"_blank\" rel="
+"\"noopener\">DEBUG = True</a>，且尚未配置任何網址。開始工作吧！"
+
+msgid "Django Documentation"
+msgstr "Django 文件"
+
+msgid "Topics, references, &amp; how-to's"
+msgstr "主題、參考、教學"
+
+msgid "Tutorial: A Polling App"
+msgstr "教學：投票應用"
+
+msgid "Get started with Django"
+msgstr "初學 Django"
+
+msgid "Django Community"
+msgstr "Django 社群"
+
+msgid "Connect, get help, or contribute"
+msgstr "聯繫、求助、貢獻"

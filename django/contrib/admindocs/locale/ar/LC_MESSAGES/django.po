@@ -1,7 +1,7 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Bashar Al-Abdulhadi, 2015
+# Bashar Al-Abdulhadi, 2015-2016
 # Bashar Al-Abdulhadi, 2014
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Ossama Khayat <okhayat@gmail.com>, 2012
@@ -9,9 +9,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-10 14:49+0200\n"
-"PO-Revision-Date: 2015-11-27 21:21+0000\n"
-"Last-Translator: Bashar Al-Abdulhadi\n"
+"POT-Creation-Date: 2017-01-19 16:49+0100\n"
+"PO-Revision-Date: 2017-09-19 16:40+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Arabic (http://www.transifex.com/django/django/language/ar/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -40,6 +40,9 @@ msgid ""
 "click the link and add it to your bookmarks. Now you can select the "
 "bookmarklet from any page in the site."
 msgstr ""
+"لتثبيت أوامر المفضلة، اسحب الرابط إلى المواقع المفضلة في شريط الأدوات الخاص "
+"بك، أو إضغط بزر الماوس الأيمن على الرابط وأضفه إلى قائمة المواقع المفضلة "
+"الخاصة بك. الآن يمكنك اختيار أوامر المفضلة من أي صفحة في الموقع."
 
 msgid "Documentation for this page"
 msgstr "الوثائق لهذه الصفحة"
@@ -120,16 +123,16 @@ msgid "Description"
 msgstr "وصف"
 
 msgid "Methods with arguments"
-msgstr ""
+msgstr "طُرق بمُعطيات"
 
 msgid "Method"
 msgstr "الطريقة"
 
 msgid "Arguments"
-msgstr ""
+msgstr "مُعطيات"
 
-msgid "Back to Model Documentation"
-msgstr "العودة إلى وثائق الموديول"
+msgid "Back to Model documentation"
+msgstr ""
 
 msgid "Model documentation"
 msgstr "وثائق الموديول"
@@ -148,6 +151,7 @@ msgstr "قالب: %(name)s"
 msgid "Template: \"%(name)s\""
 msgstr "قالب: \"%(name)s\""
 
+#. Translators: Search is not a verb here, it qualifies path (a search path)
 #, python-format
 msgid "Search path for template \"%(name)s\":"
 msgstr "البحث عن مسار القالب \"%(name)s\":"
@@ -202,8 +206,8 @@ msgstr "السياق:"
 msgid "Templates:"
 msgstr "القوالب:"
 
-msgid "Back to Views Documentation"
-msgstr "العودة إلى إستعراض الوثائق"
+msgid "Back to View documentation"
+msgstr ""
 
 msgid "View documentation"
 msgstr "عرض الوثائق"
@@ -230,13 +234,6 @@ msgstr ""
 "\n"
 "    عرض الخاصية: <code>%(full_name)s</code>. الإسم: <code>%(url_name)s</"
 "code>.\n"
-
-msgid "Boolean (Either True or False)"
-msgstr "ثنائي (إما True أو False)"
-
-#, python-format
-msgid "Field of type: %(field_type)s"
-msgstr "حقل نوع: %(field_type)s"
 
 msgid "tag:"
 msgstr "وسم:"

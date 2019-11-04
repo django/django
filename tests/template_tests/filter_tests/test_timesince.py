@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 from datetime import datetime, timedelta
 
 from django.template.defaultfilters import timesince_filter
@@ -54,7 +52,7 @@ class TimesinceTests(TimezoneTestCase):
         )
         self.assertEqual(output, '1\xa0minute')
 
-    # Check that timezone is respected
+    # Timezone is respected
     @setup({'timesince06': '{{ a|timesince:b }}'})
     def test_timesince06(self):
         output = self.engine.render_to_string('timesince06', {'a': self.now_tz - timedelta(hours=8), 'b': self.now_tz})
@@ -83,7 +81,7 @@ class TimesinceTests(TimezoneTestCase):
         output = self.engine.render_to_string('timesince10', {'now': self.now, 'later': self.now + timedelta(days=7)})
         self.assertEqual(output, '0\xa0minutes')
 
-    # Ensures that differing timezones are calculated correctly.
+    # Differing timezones are calculated correctly.
     @setup({'timesince11': '{{ a|timesince }}'})
     def test_timesince11(self):
         output = self.engine.render_to_string('timesince11', {'a': self.now})
@@ -132,6 +130,9 @@ class FunctionTests(SimpleTestCase):
 
     def test_since_now(self):
         self.assertEqual(timesince_filter(datetime.now() - timedelta(1)), '1\xa0day')
+
+    def test_no_args(self):
+        self.assertEqual(timesince_filter(None), '')
 
     def test_explicit_date(self):
         self.assertEqual(timesince_filter(datetime(2005, 12, 29), datetime(2005, 12, 30)), '1\xa0day')

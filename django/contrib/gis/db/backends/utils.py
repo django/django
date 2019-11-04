@@ -4,7 +4,7 @@ backends.
 """
 
 
-class SpatialOperator(object):
+class SpatialOperator:
     """
     Class encapsulating the behavior specific to a GIS operation (used by lookups).
     """

@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals
-
 from django.db import migrations, models
 
 
@@ -21,5 +18,5 @@ class Migration(migrations.Migration):
                 ("name", models.CharField(primary_key=True, max_length=255)),
             ],
         ),
-        migrations.RunPython(raise_error, atomic=True),
+        migrations.RunPython(raise_error, reverse_code=raise_error, atomic=True),
     ]

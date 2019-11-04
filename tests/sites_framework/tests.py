@@ -10,7 +10,8 @@ from .models import CustomArticle, ExclusiveArticle, SyndicatedArticle
 
 
 class SitesFrameworkTestCase(TestCase):
-    def setUp(self):
+    @classmethod
+    def setUpTestData(cls):
         Site.objects.get_or_create(id=settings.SITE_ID, domain="example.com", name="example.com")
         Site.objects.create(id=settings.SITE_ID + 1, domain="example2.com", name="example2.com")
 
@@ -44,9 +45,8 @@ class CurrentSiteManagerChecksTests(SimpleTestCase):
         errors = InvalidArticle.check()
         expected = [
             checks.Error(
-                ("CurrentSiteManager could not find a field named "
-                 "'places_this_article_should_appear'."),
-                hint=None,
+                "CurrentSiteManager could not find a field named "
+                "'places_this_article_should_appear'.",
                 obj=InvalidArticle.on_site,
                 id='sites.E001',
             )
@@ -62,8 +62,8 @@ class CurrentSiteManagerChecksTests(SimpleTestCase):
         errors = ConfusedArticle.check()
         expected = [
             checks.Error(
-                "CurrentSiteManager cannot use 'ConfusedArticle.site' as it is not a ForeignKey or ManyToManyField.",
-                hint=None,
+                "CurrentSiteManager cannot use 'ConfusedArticle.site' as it is "
+                "not a foreign key or a many-to-many field.",
                 obj=ConfusedArticle.on_site,
                 id='sites.E002',
             )

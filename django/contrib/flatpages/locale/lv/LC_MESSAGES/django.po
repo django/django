@@ -2,13 +2,15 @@
 #
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011
+# NullIsNot0 <nullisnot0@inbox.lv>, 2019
+# peterisb <pb@sungis.lv>, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2015-10-10 09:11+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2019-01-16 20:42+0100\n"
+"PO-Revision-Date: 2019-02-18 17:02+0000\n"
+"Last-Translator: NullIsNot0 <nullisnot0@inbox.lv>\n"
 "Language-Team: Latvian (http://www.transifex.com/django/django/language/"
 "lv/)\n"
 "MIME-Version: 1.0\n"
@@ -22,7 +24,7 @@ msgid "Advanced options"
 msgstr "Papildus opcijas"
 
 msgid "Flat Pages"
-msgstr ""
+msgstr "Vienkāršās lapas"
 
 msgid "URL"
 msgstr "URL"
@@ -37,16 +39,23 @@ msgid ""
 "This value must contain only letters, numbers, dots, underscores, dashes, "
 "slashes or tildes."
 msgstr ""
+"Šai vērtība ir jāsatur tikai burtus, ciparus, punktus, pasvītrojumi, "
+"domuzīmes, slīpsvītras vai tildes simboli."
+
+msgid "Example: '/about/contact'. Make sure to have a leading slash."
+msgstr ""
+"Piemēram: '/about/contact'. Pārliecinieties, ka esat ievietojuši sākuma "
+"slīpsvītru."
 
 msgid "URL is missing a leading slash."
-msgstr ""
+msgstr "URL trūkst sākuma slīpsvītra."
 
 msgid "URL is missing a trailing slash."
-msgstr ""
+msgstr "URL trūkst beigu slīpsvītra."
 
 #, python-format
 msgid "Flatpage with url %(url)s already exists for site %(site)s"
-msgstr ""
+msgstr "Vienkāršā lapa ar url %(url)s jau eksistē vietnei %(site)s"
 
 msgid "title"
 msgstr "virsraksts"
@@ -75,7 +84,7 @@ msgstr ""
 "Ja šis ir atzīmēts, tikai pieslēgušies lietotāji, varēs piekļūt šai lapu."
 
 msgid "sites"
-msgstr ""
+msgstr "vietnes"
 
 msgid "flat page"
 msgstr "vienkārša lapa"

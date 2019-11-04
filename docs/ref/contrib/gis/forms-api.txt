@@ -3,14 +3,14 @@ GeoDjango Forms API
 ===================
 
 .. module:: django.contrib.gis.forms
-   :synopsis: GeoDjango forms API.
+    :synopsis: GeoDjango forms API.
 
 GeoDjango provides some specialized form fields and widgets in order to visually
 display and edit geolocalized data on a map. By default, they use
-`OpenLayers`_-powered maps, with a base WMS layer provided by `Metacarta`_.
+`OpenLayers`_-powered maps, with a base WMS layer provided by `NASA`_.
 
-.. _OpenLayers: http://openlayers.org/
-.. _Metacarta: http://www.metacarta.com/
+.. _OpenLayers: https://openlayers.org/
+.. _NASA: https://earthdata.nasa.gov/
 
 Field arguments
 ===============
@@ -82,8 +82,8 @@ Form field classes
 Form widgets
 ============
 
-.. module:: django.contrib.gis.widgets
-   :synopsis: GeoDjango widgets API.
+.. module:: django.contrib.gis.forms.widgets
+    :synopsis: GeoDjango widgets API.
 
 GeoDjango form widgets allow you to display and edit geographic data on a
 visual map.
@@ -153,26 +153,31 @@ Widget classes
     ``template_name`` is ``gis/openlayers.html``.
 
     ``OpenLayersWidget`` and :class:`OSMWidget` use the ``openlayers.js`` file
-    hosted on the ``openlayers.org`` website. This works for basic usage
-    during development, but isn't appropriate for a production deployment as
-    ``openlayers.org/api/`` has no guaranteed uptime and runs on a slow server.
-    You are therefore advised to subclass these widgets in order to specify
-    your own version of the ``openlayers.js`` file in the ``js`` property of
-    the inner ``Media`` class (see :ref:`assets-as-a-static-definition`). You
-    can host a copy of ``openlayers.js``
-    `tailored to your needs`_ on your own server or refer to a copy from a
-    content-delivery network like https://cdnjs.com/. This will also allow
-    you to serve the JavaScript file(s) using the ``https`` protocol if needed.
-
-    .. _tailored to your needs: http://docs.openlayers.org/library/deploying.html
+    hosted on the ``cdnjs.cloudflare.com`` content-delivery network. You can
+    subclass these widgets in order to specify your own version of the
+    ``OpenLayers.js`` file in the ``js`` property of the inner ``Media`` class
+    (see :ref:`assets-as-a-static-definition`).
 
 ``OSMWidget``
 
 .. class:: OSMWidget
 
-    This widget uses an OpenStreetMap base layer (Mapnik) to display geographic
-    objects on.
-    ``template_name`` is ``gis/openlayers-osm.html``.
+    This widget uses an OpenStreetMap base layer to display geographic objects
+    on. Attributes are:
+
+    .. attribute:: template_name
+
+        ``gis/openlayers-osm.html``
+
+    .. attribute:: default_lat
+    .. attribute:: default_lon
+
+        The default center latitude and longitude are ``47`` and ``5``,
+        respectively, which is a location in eastern France.
+
+    .. attribute:: default_zoom
+
+        The default map zoom is ``12``.
 
     The :class:`OpenLayersWidget` note about JavaScript file hosting above also
     applies here. See also this `FAQ answer`_ about ``https`` access to map

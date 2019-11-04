@@ -1,8 +1,8 @@
 from django.contrib.admin import ModelAdmin
 from django.contrib.gis.admin.widgets import OpenLayersWidget
 from django.contrib.gis.db import models
-from django.contrib.gis.gdal import HAS_GDAL, OGRGeomType
-from django.core.exceptions import ImproperlyConfigured
+from django.contrib.gis.gdal import OGRGeomType
+from django.forms import Media
 
 spherical_mercator_srid = 3857
 
@@ -35,7 +35,7 @@ class GeoModelAdmin(ModelAdmin):
     map_height = 400
     map_srid = 4326
     map_template = 'gis/admin/openlayers.html'
-    openlayers_url = 'http://openlayers.org/api/2.13.1/OpenLayers.js'
+    openlayers_url = 'https://cdnjs.cloudflare.com/ajax/libs/openlayers/2.13.1/OpenLayers.js'
     point_zoom = num_zoom - 6
     wms_url = 'http://vmap0.tiles.osgeo.org/wms/vmap0'
     wms_layer = 'basic'
@@ -47,10 +47,7 @@ class GeoModelAdmin(ModelAdmin):
     @property
     def media(self):
         "Injects OpenLayers JavaScript into the admin."
-        media = super(GeoModelAdmin, self).media
-        media.add_js([self.openlayers_url])
-        media.add_js(self.extra_js)
-        return media
+        return super().media + Media(js=[self.openlayers_url] + self.extra_js)
 
     def formfield_for_dbfield(self, db_field, request, **kwargs):
         """
@@ -63,11 +60,11 @@ class GeoModelAdmin(ModelAdmin):
             kwargs['widget'] = self.get_map_widget(db_field)
             return db_field.formfield(**kwargs)
         else:
-            return super(GeoModelAdmin, self).formfield_for_dbfield(db_field, request, **kwargs)
+            return super().formfield_for_dbfield(db_field, request, **kwargs)
 
     def get_map_widget(self, db_field):
         """
-        Returns a subclass of the OpenLayersWidget (or whatever was specified
+        Return a subclass of the OpenLayersWidget (or whatever was specified
         in the `widget` attribute) using the settings from the attributes set
         in this class.
         """
@@ -81,7 +78,7 @@ class GeoModelAdmin(ModelAdmin):
             collection_type = 'None'
 
         class OLMap(self.widget):
-            template = self.map_template
+            template_name = self.map_template
             geom_type = db_field.geom_type
 
             wms_options = ''
@@ -89,40 +86,41 @@ class GeoModelAdmin(ModelAdmin):
                 wms_options = ["%s: '%s'" % pair for pair in self.wms_options.items()]
                 wms_options = ', %s' % ', '.join(wms_options)
 
-            params = {'default_lon': self.default_lon,
-                      'default_lat': self.default_lat,
-                      'default_zoom': self.default_zoom,
-                      'display_wkt': self.debug or self.display_wkt,
-                      'geom_type': OGRGeomType(db_field.geom_type),
-                      'field_name': db_field.name,
-                      'is_collection': is_collection,
-                      'scrollable': self.scrollable,
-                      'layerswitcher': self.layerswitcher,
-                      'collection_type': collection_type,
-                      'is_generic': db_field.geom_type == 'GEOMETRY',
-                      'is_linestring': db_field.geom_type in ('LINESTRING', 'MULTILINESTRING'),
-                      'is_polygon': db_field.geom_type in ('POLYGON', 'MULTIPOLYGON'),
-                      'is_point': db_field.geom_type in ('POINT', 'MULTIPOINT'),
-                      'num_zoom': self.num_zoom,
-                      'max_zoom': self.max_zoom,
-                      'min_zoom': self.min_zoom,
-                      'units': self.units,  # likely should get from object
-                      'max_resolution': self.max_resolution,
-                      'max_extent': self.max_extent,
-                      'modifiable': self.modifiable,
-                      'mouse_position': self.mouse_position,
-                      'scale_text': self.scale_text,
-                      'map_width': self.map_width,
-                      'map_height': self.map_height,
-                      'point_zoom': self.point_zoom,
-                      'srid': self.map_srid,
-                      'display_srid': self.display_srid,
-                      'wms_url': self.wms_url,
-                      'wms_layer': self.wms_layer,
-                      'wms_name': self.wms_name,
-                      'wms_options': wms_options,
-                      'debug': self.debug,
-                      }
+            params = {
+                'default_lon': self.default_lon,
+                'default_lat': self.default_lat,
+                'default_zoom': self.default_zoom,
+                'display_wkt': self.debug or self.display_wkt,
+                'geom_type': OGRGeomType(db_field.geom_type),
+                'field_name': db_field.name,
+                'is_collection': is_collection,
+                'scrollable': self.scrollable,
+                'layerswitcher': self.layerswitcher,
+                'collection_type': collection_type,
+                'is_generic': db_field.geom_type == 'GEOMETRY',
+                'is_linestring': db_field.geom_type in ('LINESTRING', 'MULTILINESTRING'),
+                'is_polygon': db_field.geom_type in ('POLYGON', 'MULTIPOLYGON'),
+                'is_point': db_field.geom_type in ('POINT', 'MULTIPOINT'),
+                'num_zoom': self.num_zoom,
+                'max_zoom': self.max_zoom,
+                'min_zoom': self.min_zoom,
+                'units': self.units,  # likely should get from object
+                'max_resolution': self.max_resolution,
+                'max_extent': self.max_extent,
+                'modifiable': self.modifiable,
+                'mouse_position': self.mouse_position,
+                'scale_text': self.scale_text,
+                'map_width': self.map_width,
+                'map_height': self.map_height,
+                'point_zoom': self.point_zoom,
+                'srid': self.map_srid,
+                'display_srid': self.display_srid,
+                'wms_url': self.wms_url,
+                'wms_layer': self.wms_layer,
+                'wms_name': self.wms_name,
+                'wms_options': wms_options,
+                'debug': self.debug,
+            }
         return OLMap
 
 
@@ -134,8 +132,3 @@ class OSMGeoAdmin(GeoModelAdmin):
     max_resolution = '156543.0339'
     point_zoom = num_zoom - 6
     units = 'm'
-
-    def __init__(self, *args):
-        if not HAS_GDAL:
-            raise ImproperlyConfigured("OSMGeoAdmin is not usable without GDAL libs installed")
-        super(OSMGeoAdmin, self).__init__(*args)

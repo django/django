@@ -8,8 +8,9 @@ from ..utils import setup
 
 class WordwrapTests(SimpleTestCase):
 
-    @setup({'wordwrap01':
-        '{% autoescape off %}{{ a|wordwrap:"3" }} {{ b|wordwrap:"3" }}{% endautoescape %}'})
+    @setup({
+        'wordwrap01': '{% autoescape off %}{{ a|wordwrap:"3" }} {{ b|wordwrap:"3" }}{% endautoescape %}'
+    })
     def test_wordwrap01(self):
         output = self.engine.render_to_string('wordwrap01', {'a': 'a & b', 'b': mark_safe('a & b')})
         self.assertEqual(output, 'a &\nb a &\nb')

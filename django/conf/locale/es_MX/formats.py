@@ -1,8 +1,5 @@
-# -*- encoding: utf-8 -*-
 # This file is distributed under the same license as the Django package.
 #
-from __future__ import unicode_literals
-
 DATE_FORMAT = r'j \d\e F \d\e Y'
 TIME_FORMAT = 'H:i'
 DATETIME_FORMAT = r'j \d\e F \d\e Y \a \l\a\s H:i'
@@ -24,5 +21,5 @@ DATETIME_INPUT_FORMATS = [
     '%d/%m/%y %H:%M',
 ]
 DECIMAL_SEPARATOR = '.'   # ',' is also official (less common): NOM-008-SCFI-2002
-THOUSAND_SEPARATOR = '\xa0'  # non-breaking space
+THOUSAND_SEPARATOR = ','
 NUMBER_GROUPING = 3

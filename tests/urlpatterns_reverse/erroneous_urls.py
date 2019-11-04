@@ -1,7 +1,7 @@
-from django.conf.urls import url
+from django.urls import re_path
 
 from . import views
 
 urlpatterns = [
-    url(r'(regex_error/$', views.empty_view),
+    re_path(r'(regex_error/$', views.empty_view),
 ]

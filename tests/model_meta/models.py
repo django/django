@@ -9,6 +9,13 @@ class Relation(models.Model):
     pass
 
 
+class InstanceOnlyDescriptor:
+    def __get__(self, instance, cls=None):
+        if instance is None:
+            raise AttributeError('Instance only')
+        return 1
+
+
 class AbstractPerson(models.Model):
     # DATA fields
     data_abstract = models.CharField(max_length=10)
@@ -38,6 +45,12 @@ class AbstractPerson(models.Model):
 
     class Meta:
         abstract = True
+
+    @property
+    def test_property(self):
+        return 1
+
+    test_instance_only_descriptor = InstanceOnlyDescriptor()
 
 
 class BasePerson(AbstractPerson):
@@ -134,11 +147,11 @@ class CommonAncestor(models.Model):
 
 
 class FirstParent(CommonAncestor):
-    first_ancestor = models.OneToOneField(CommonAncestor, models.SET_NULL, primary_key=True, parent_link=True)
+    first_ancestor = models.OneToOneField(CommonAncestor, models.CASCADE, primary_key=True, parent_link=True)
 
 
 class SecondParent(CommonAncestor):
-    second_ancestor = models.OneToOneField(CommonAncestor, models.SET_NULL, primary_key=True, parent_link=True)
+    second_ancestor = models.OneToOneField(CommonAncestor, models.CASCADE, primary_key=True, parent_link=True)
 
 
 class Child(FirstParent, SecondParent):

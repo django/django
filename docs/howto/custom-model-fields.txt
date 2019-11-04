@@ -19,7 +19,7 @@ only the common types, such as ``VARCHAR`` and ``INTEGER``. For more obscure
 column types, such as geographic polygons or even user-created types such as
 `PostgreSQL custom types`_, you can define your own Django ``Field`` subclasses.
 
-.. _PostgreSQL custom types: http://www.postgresql.org/docs/current/interactive/sql-createtype.html
+.. _PostgreSQL custom types: https://www.postgresql.org/docs/current/sql-createtype.html
 
 Alternatively, you may have a complex Python object that can somehow be
 serialized to fit into a standard database column type. This is another case
@@ -36,7 +36,7 @@ You only need to know that 52 cards are dealt out equally to four players, who
 are traditionally called *north*, *east*, *south* and *west*.  Our class looks
 something like this::
 
-    class Hand(object):
+    class Hand:
         """A hand of cards (bridge style)"""
 
         def __init__(self, north, east, south, west):
@@ -168,7 +168,7 @@ behave like any existing field, so we'll subclass directly from
 
         def __init__(self, *args, **kwargs):
             kwargs['max_length'] = 104
-            super(HandField, self).__init__(*args, **kwargs)
+            super().__init__(*args, **kwargs)
 
 Our ``HandField`` accepts most of the standard field options (see the list
 below), but we ensure it has a fixed length, since it only needs to hold 52
@@ -231,9 +231,10 @@ Field deconstruction
 --------------------
 
 The counterpoint to writing your ``__init__()`` method is writing the
-``deconstruct()`` method. This method tells Django how to take an instance
-of your new field and reduce it to a serialized form - in particular, what
-arguments to pass to ``__init__()`` to re-create it.
+:meth:`~.Field.deconstruct` method. It's used during :doc:`model migrations
+</topics/migrations>` to tell Django how to take an instance of your new field
+and reduce it to a serialized form - in particular, what arguments to pass to
+``__init__()`` to re-create it.
 
 If you haven't added any extra options on top of the field you inherited from,
 then there's no need to write a new ``deconstruct()`` method. If, however,
@@ -262,15 +263,17 @@ we can drop it from the keyword arguments for readability::
 
         def __init__(self, *args, **kwargs):
             kwargs['max_length'] = 104
-            super(HandField, self).__init__(*args, **kwargs)
+            super().__init__(*args, **kwargs)
 
         def deconstruct(self):
-            name, path, args, kwargs = super(HandField, self).deconstruct()
+            name, path, args, kwargs = super().deconstruct()
             del kwargs["max_length"]
             return name, path, args, kwargs
 
-If you add a new keyword argument, you need to write code to put its value
-into ``kwargs`` yourself::
+If you add a new keyword argument, you need to write code in ``deconstruct()``
+that puts its value into ``kwargs`` yourself. You should also omit the value
+from ``kwargs`` when it isn't necessary to reconstruct the state of the field,
+such as when the default value is being used::
 
     from django.db import models
 
@@ -279,10 +282,10 @@ into ``kwargs`` yourself::
 
         def __init__(self, separator=",", *args, **kwargs):
             self.separator = separator
-            super(CommaSepField, self).__init__(*args, **kwargs)
+            super().__init__(*args, **kwargs)
 
         def deconstruct(self):
-            name, path, args, kwargs = super(CommaSepField, self).deconstruct()
+            name, path, args, kwargs = super().deconstruct()
             # Only include kwarg if it's not the default
             if self.separator != ",":
                 kwargs['separator'] = self.separator
@@ -310,6 +313,34 @@ and reconstructing the field::
     name, path, args, kwargs = my_field_instance.deconstruct()
     new_instance = MyField(*args, **kwargs)
     self.assertEqual(my_field_instance.some_attribute, new_instance.some_attribute)
+
+Changing a custom field's base class
+------------------------------------
+
+You can't change the base class of a custom field because Django won't detect
+the change and make a migration for it. For example, if you start with::
+
+    class CustomCharField(models.CharField):
+        ...
+
+and then decide that you want to use ``TextField`` instead, you can't change
+the subclass like this::
+
+    class CustomCharField(models.TextField):
+        ...
+
+Instead, you must create a new custom field class and update your models to
+reference it::
+
+    class CustomCharField(models.CharField):
+        ...
+
+    class CustomTextField(models.TextField):
+        ...
+
+As discussed in :ref:`removing fields <migrations-removing-model-fields>`, you
+must retain the original ``CustomCharField`` class as long as you have
+migrations that reference it.
 
 Documenting your custom field
 -----------------------------
@@ -407,7 +438,7 @@ time -- i.e., when the class is instantiated. To do that, just implement
     class BetterCharField(models.Field):
         def __init__(self, max_length, *args, **kwargs):
             self.max_length = max_length
-            super(BetterCharField, self).__init__(*args, **kwargs)
+            super().__init__(*args, **kwargs)
 
         def db_type(self, connection):
             return 'char(%s)' % self.max_length
@@ -435,10 +466,6 @@ need the foreign keys that point to that field to use the same data type::
 
         def rel_db_type(self, connection):
             return 'integer UNSIGNED'
-
-.. versionadded:: 1.10
-
-    The :meth:`~Field.rel_db_type` method was added.
 
 .. _converting-values-to-python-objects:
 
@@ -474,6 +501,7 @@ instances::
 
     from django.core.exceptions import ValidationError
     from django.db import models
+    from django.utils.translation import gettext_lazy as _
 
     def parse_hand(hand_string):
         """Takes a string of cards and splits into a full hand."""
@@ -481,13 +509,13 @@ instances::
         p2 = re.compile('..')
         args = [p2.findall(x) for x in p1.findall(hand_string)]
         if len(args) != 4:
-            raise ValidationError("Invalid input for a Hand instance")
+            raise ValidationError(_("Invalid input for a Hand instance"))
         return Hand(*args)
 
     class HandField(models.Field):
         # ...
 
-        def from_db_value(self, value, expression, connection, context):
+        def from_db_value(self, value, expression, connection):
             if value is None:
                 return value
             return parse_hand(value)
@@ -551,7 +579,7 @@ For example, Django uses the following method for its
 :class:`BinaryField`::
 
     def get_db_prep_value(self, value, connection, prepared=False):
-        value = super(BinaryField, self).get_db_prep_value(value, connection, prepared)
+        value = super().get_db_prep_value(value, connection, prepared)
         if value is not None:
             return connection.Database.Binary(value)
         return value
@@ -575,67 +603,6 @@ If you do override this method, you must return the value of the attribute at
 the end. You should also update the model's attribute if you make any changes
 to the value so that code holding references to the model will always see the
 correct value.
-
-.. _preparing-values-for-use-in-database-lookups:
-
-Preparing values for use in database lookups
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-As with value conversions, preparing a value for database lookups is a
-two phase process.
-
-:meth:`.get_prep_lookup` performs the first phase of lookup preparation:
-type conversion and data validation.
-
-Prepares the ``value`` for passing to the database when used in a lookup (a
-``WHERE`` constraint in SQL). The ``lookup_type`` parameter will be one of the
-valid Django filter lookups: ``exact``, ``iexact``, ``contains``, ``icontains``,
-``gt``, ``gte``, ``lt``, ``lte``, ``in``, ``startswith``, ``istartswith``,
-``endswith``, ``iendswith``, ``range``, ``year``, ``month``, ``day``,
-``isnull``, ``search``, ``regex``, and ``iregex``.
-
-If you are using :doc:`custom lookups </howto/custom-lookups>`, the
-``lookup_type`` can be any ``lookup_name`` used by the project's custom lookups.
-
-Your method must be prepared to handle all of these ``lookup_type`` values and
-should raise either a ``ValueError`` if the ``value`` is of the wrong sort (a
-list when you were expecting an object, for example) or a ``TypeError`` if
-your field does not support that type of lookup. For many fields, you can get
-by with handling the lookup types that need special handling for your field
-and pass the rest to the :meth:`~Field.get_db_prep_lookup` method of the parent
-class.
-
-If you needed to implement :meth:`.get_db_prep_save`, you will usually need to
-implement :meth:`.get_prep_lookup`. If you don't, :meth:`.get_prep_value` will
-be called by the default implementation, to manage ``exact``, ``gt``, ``gte``,
-``lt``, ``lte``, ``in`` and ``range`` lookups.
-
-You may also want to implement this method to limit the lookup types that could
-be used with your custom field type.
-
-Note that, for ``"range"`` and ``"in"`` lookups, ``get_prep_lookup`` will receive
-a list of objects (presumably of the right type) and will need to convert them
-to a list of things of the right type for passing to the database. Most of the
-time, you can reuse ``get_prep_value()``, or at least factor out some common
-pieces.
-
-For example, the following code implements ``get_prep_lookup`` to limit the
-accepted lookup types to ``exact`` and ``in``::
-
-    class HandField(models.Field):
-        # ...
-
-        def get_prep_lookup(self, lookup_type, value):
-            # We only handle 'exact' and 'in'. All others are errors.
-            if lookup_type == 'exact':
-                return self.get_prep_value(value)
-            elif lookup_type == 'in':
-                return [self.get_prep_value(v) for v in value]
-            else:
-                raise TypeError('Lookup type %r not supported.' % lookup_type)
-
-For performing database-specific data conversions required by a lookup,
-you can override :meth:`~Field.get_db_prep_lookup`.
 
 .. _specifying-form-field-for-model-field:
 
@@ -669,7 +636,7 @@ as::
             # while letting the caller override them.
             defaults = {'form_class': MyFormField}
             defaults.update(kwargs)
-            return super(HandField, self).formfield(**defaults)
+            return super().formfield(**defaults)
 
 This assumes we've imported a ``MyFormField`` field class (which has its own
 default widget). This document doesn't cover the details of writing custom form
@@ -715,8 +682,8 @@ Converting field data for serialization
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 To customize how the values are serialized by a serializer, you can override
-:meth:`~Field.value_to_string`. Using ``value_from_object()`` is the best way
-to get the field's value prior to serialization. For example, since our
+:meth:`~Field.value_to_string`. Using :meth:`~Field.value_from_object` is the
+best way to get the field's value prior to serialization. For example, since
 ``HandField`` uses strings for its data storage anyway, we can reuse some
 existing conversion code::
 
@@ -728,26 +695,24 @@ existing conversion code::
             return self.get_prep_value(value)
 
 Some general advice
---------------------
+-------------------
 
 Writing a custom field can be a tricky process, particularly if you're doing
 complex conversions between your Python types and your database and
 serialization formats. Here are a couple of tips to make things go more
 smoothly:
 
-1. Look at the existing Django fields (in
+#. Look at the existing Django fields (in
    :file:`django/db/models/fields/__init__.py`) for inspiration. Try to find
    a field that's similar to what you want and extend it a little bit,
    instead of creating an entirely new field from scratch.
 
-2. Put a ``__str__()`` (``__unicode__()`` on Python 2) method on the class you're
-   wrapping up as a field. There are a lot of places where the default
-   behavior of the field code is to call
-   :func:`~django.utils.encoding.force_text` on the value. (In our
-   examples in this document, ``value`` would be a ``Hand`` instance, not a
-   ``HandField``). So if your ``__str__()`` method (``__unicode__()`` on
-   Python 2) automatically converts to the string form of your Python object,
-   you can save yourself a lot of work.
+#. Put a ``__str__()`` method on the class you're wrapping up as a field. There
+   are a lot of places where the default behavior of the field code is to call
+   ``str()`` on the value. (In our examples in this document, ``value`` would
+   be a ``Hand`` instance, not a ``HandField``). So if your ``__str__()``
+   method automatically converts to the string form of your Python object, you
+   can save yourself a lot of work.
 
 Writing a ``FileField`` subclass
 ================================
@@ -769,17 +734,17 @@ told to use it. To do so, simply assign the new ``File`` subclass to the special
 ``attr_class`` attribute of the ``FileField`` subclass.
 
 A few suggestions
-------------------
+-----------------
 
 In addition to the above details, there are a few guidelines which can greatly
 improve the efficiency and readability of the field's code.
 
-1. The source for Django's own ``ImageField`` (in
+#. The source for Django's own ``ImageField`` (in
    ``django/db/models/fields/files.py``) is a great example of how to
    subclass ``FileField`` to support a particular type of file, as it
    incorporates all of the techniques described above.
 
-2. Cache file attributes wherever possible. Since files may be stored in
+#. Cache file attributes wherever possible. Since files may be stored in
    remote storage systems, retrieving them may cost extra time, or even
    money, that isn't always necessary. Once a file is retrieved to obtain
    some data about its content, cache as much of that data as possible to

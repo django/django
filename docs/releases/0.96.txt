@@ -65,7 +65,7 @@ The effect of this change is that running ``manage.py reset`` and
 similar commands against an existing database may generate SQL with
 the new form of constraint name, while the database itself contains
 constraints named in the old form; this will cause the database server
-to raise an error message about modifying non-existent constraints.
+to raise an error message about modifying nonexistent constraints.
 
 If you need to work around this, there are two methods available:
 

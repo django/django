@@ -1,14 +1,11 @@
-# -*- coding: utf-8 -*-
 """
 Bare-bones model
 
 This is a basic model with only two non-primary-key fields.
 """
 from django.db import models
-from django.utils.encoding import python_2_unicode_compatible
 
 
-@python_2_unicode_compatible
 class Article(models.Model):
     headline = models.CharField(max_length=100, default='Default headline')
     pub_date = models.DateTimeField()
@@ -20,13 +17,16 @@ class Article(models.Model):
         return self.headline
 
 
+class FeaturedArticle(models.Model):
+    article = models.OneToOneField(Article, models.CASCADE, related_name='featured')
+
+
 class ArticleSelectOnSave(Article):
     class Meta:
         proxy = True
         select_on_save = True
 
 
-@python_2_unicode_compatible
 class SelfRef(models.Model):
     selfref = models.ForeignKey(
         'self',

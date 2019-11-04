@@ -3,9 +3,10 @@ This is the Django template system.
 
 How it works:
 
-The Lexer.tokenize() function converts a template string (i.e., a string containing
-markup with custom template tags) to tokens, which can be either plain text
-(TOKEN_TEXT), variables (TOKEN_VAR) or block statements (TOKEN_BLOCK).
+The Lexer.tokenize() method converts a template string (i.e., a string
+containing markup with custom template tags) to tokens, which can be either
+plain text (TokenType.TEXT), variables (TokenType.VAR), or block statements
+(TokenType.BLOCK).
 
 The Parser() class takes a list of tokens in its constructor, and its parse()
 method returns a compiled template -- which is, under the hood, a list of
@@ -49,46 +50,24 @@ times with multiple contexts)
 '<html></html>'
 """
 
-from __future__ import unicode_literals
-
-import inspect
 import logging
 import re
+from enum import Enum
+from inspect import getcallargs, getfullargspec, unwrap
 
 from django.template.context import (  # NOQA: imported for backwards compatibility
     BaseContext, Context, ContextPopException, RequestContext,
 )
-from django.utils import six
-from django.utils.deprecation import (
-    DeprecationInstanceCheck, RemovedInDjango20Warning,
-)
-from django.utils.encoding import (
-    force_str, force_text, python_2_unicode_compatible,
-)
 from django.utils.formats import localize
 from django.utils.html import conditional_escape, escape
-from django.utils.inspect import getargspec
-from django.utils.safestring import (
-    EscapeData, SafeData, mark_for_escaping, mark_safe,
-)
+from django.utils.safestring import SafeData, mark_safe
 from django.utils.text import (
     get_text_list, smart_split, unescape_string_literal,
 )
 from django.utils.timezone import template_localtime
-from django.utils.translation import pgettext_lazy, ugettext_lazy
+from django.utils.translation import gettext_lazy, pgettext_lazy
 
 from .exceptions import TemplateSyntaxError
-
-TOKEN_TEXT = 0
-TOKEN_VAR = 1
-TOKEN_BLOCK = 2
-TOKEN_COMMENT = 3
-TOKEN_MAPPING = {
-    TOKEN_TEXT: 'Text',
-    TOKEN_VAR: 'Var',
-    TOKEN_BLOCK: 'Block',
-    TOKEN_COMMENT: 'Comment',
-}
 
 # template syntax constants
 FILTER_SEPARATOR = '|'
@@ -118,11 +97,13 @@ tag_re = (re.compile('(%s.*?%s|%s.*?%s|%s.*?%s)' %
 logger = logging.getLogger('django.template')
 
 
-class TemplateEncodingError(Exception):
-    pass
+class TokenType(Enum):
+    TEXT = 0
+    VAR = 1
+    BLOCK = 2
+    COMMENT = 3
 
 
-@python_2_unicode_compatible
 class VariableDoesNotExist(Exception):
 
     def __init__(self, msg, params=()):
@@ -130,10 +111,10 @@ class VariableDoesNotExist(Exception):
         self.params = params
 
     def __str__(self):
-        return self.msg % tuple(force_text(p, errors='replace') for p in self.params)
+        return self.msg % self.params
 
 
-class Origin(object):
+class Origin:
     def __init__(self, name, template_name=None, loader=None):
         self.name = name
         self.template_name = template_name
@@ -143,16 +124,11 @@ class Origin(object):
         return self.name
 
     def __eq__(self, other):
-        if not isinstance(other, Origin):
-            return False
-
         return (
+            isinstance(other, Origin) and
             self.name == other.name and
             self.loader == other.loader
         )
-
-    def __ne__(self, other):
-        return not self.__eq__(other)
 
     @property
     def loader_name(self):
@@ -162,18 +138,8 @@ class Origin(object):
             )
 
 
-class StringOrigin(six.with_metaclass(DeprecationInstanceCheck, Origin)):
-    alternative = 'django.template.Origin'
-    deprecation_warning = RemovedInDjango20Warning
-
-
-class Template(object):
+class Template:
     def __init__(self, template_string, origin=None, name=None, engine=None):
-        try:
-            template_string = force_text(template_string)
-        except UnicodeDecodeError:
-            raise TemplateEncodingError("Templates can only be constructed "
-                                        "from unicode or UTF-8 strings.")
         # If Template is instantiated directly rather than from an Engine and
         # exactly one Django template engine is configured, use that engine.
         # This is required to preserve backwards-compatibility for direct use
@@ -186,29 +152,25 @@ class Template(object):
         self.name = name
         self.origin = origin
         self.engine = engine
-        self.source = template_string
+        self.source = str(template_string)  # May be lazy.
         self.nodelist = self.compile_nodelist()
 
     def __iter__(self):
         for node in self.nodelist:
-            for subnode in node:
-                yield subnode
+            yield from node
 
     def _render(self, context):
         return self.nodelist.render(context)
 
     def render(self, context):
         "Display stage -- can be called many times"
-        context.render_context.push()
-        try:
+        with context.render_context.push_state(self):
             if context.template is None:
                 with context.bind_template(self):
                     context.template_name = self.name
                     return self._render(context)
             else:
                 return self._render(context)
-        finally:
-            context.render_context.pop()
 
     def compile_nodelist(self):
         """
@@ -292,9 +254,9 @@ class Template(object):
         bottom = min(total, line + 1 + context_lines)
 
         # In some rare cases exc_value.args can be empty or an invalid
-        # unicode string.
+        # string.
         try:
-            message = force_text(exception.args[0])
+            message = str(exception.args[0])
         except (IndexError, UnicodeDecodeError):
             message = '(Could not get exception message)'
 
@@ -323,13 +285,13 @@ def linebreak_iter(template_source):
     yield len(template_source) + 1
 
 
-class Token(object):
+class Token:
     def __init__(self, token_type, contents, position=None, lineno=None):
         """
         A token representing a string from the template.
 
         token_type
-            One of TOKEN_TEXT, TOKEN_VAR, TOKEN_BLOCK, or TOKEN_COMMENT.
+            A TokenType, either .TEXT, .VAR, .BLOCK, or .COMMENT.
 
         contents
             The token source string.
@@ -348,13 +310,13 @@ class Token(object):
         self.position = position
 
     def __str__(self):
-        token_name = TOKEN_MAPPING[self.token_type]
+        token_name = self.token_type.name.capitalize()
         return ('<%s token: "%s...">' %
                 (token_name, self.contents[:20].replace('\n', '')))
 
     def split_contents(self):
         split = []
-        bits = iter(smart_split(self.contents))
+        bits = smart_split(self.contents)
         for bit in bits:
             # Handle translation-marked template pieces
             if bit.startswith(('_("', "_('")):
@@ -368,7 +330,7 @@ class Token(object):
         return split
 
 
-class Lexer(object):
+class Lexer:
     def __init__(self, template_string):
         self.template_string = template_string
         self.verbatim = False
@@ -403,19 +365,18 @@ class Lexer(object):
                 self.verbatim = False
         if in_tag and not self.verbatim:
             if token_string.startswith(VARIABLE_TAG_START):
-                token = Token(TOKEN_VAR, token_string[2:-2].strip(), position, lineno)
+                return Token(TokenType.VAR, token_string[2:-2].strip(), position, lineno)
             elif token_string.startswith(BLOCK_TAG_START):
                 if block_content[:9] in ('verbatim', 'verbatim '):
                     self.verbatim = 'end%s' % block_content
-                token = Token(TOKEN_BLOCK, block_content, position, lineno)
+                return Token(TokenType.BLOCK, block_content, position, lineno)
             elif token_string.startswith(COMMENT_TAG_START):
                 content = ''
                 if token_string.find(TRANSLATOR_COMMENT_MARK):
                     content = token_string[2:-2].strip()
-                token = Token(TOKEN_COMMENT, content, position, lineno)
+                return Token(TokenType.COMMENT, content, position, lineno)
         else:
-            token = Token(TOKEN_TEXT, token_string, position, lineno)
-        return token
+            return Token(TokenType.TEXT, token_string, position, lineno)
 
 
 class DebugLexer(Lexer):
@@ -423,7 +384,7 @@ class DebugLexer(Lexer):
         """
         Split a template string into tokens and annotates each token with its
         start and end position in the source. This is slower than the default
-        lexer so we only use it when debug is True.
+        lexer so only use it when debug is True.
         """
         lineno = 1
         result = []
@@ -445,7 +406,7 @@ class DebugLexer(Lexer):
         return result
 
 
-class Parser(object):
+class Parser:
     def __init__(self, tokens, libraries=None, builtins=None, origin=None):
         self.tokens = tokens
         self.tags = {}
@@ -476,10 +437,10 @@ class Parser(object):
         nodelist = NodeList()
         while self.tokens:
             token = self.next_token()
-            # Use the raw values here for TOKEN_* for a tiny performance boost.
-            if token.token_type == 0:  # TOKEN_TEXT
+            # Use the raw values here for TokenType.* for a tiny performance boost.
+            if token.token_type.value == 0:  # TokenType.TEXT
                 self.extend_nodelist(nodelist, TextNode(token.contents), token)
-            elif token.token_type == 1:  # TOKEN_VAR
+            elif token.token_type.value == 1:  # TokenType.VAR
                 if not token.contents:
                     raise self.error(token, 'Empty variable tag on line %d' % token.lineno)
                 try:
@@ -488,7 +449,7 @@ class Parser(object):
                     raise self.error(token, e)
                 var_node = VariableNode(filter_expression)
                 self.extend_nodelist(nodelist, var_node, token)
-            elif token.token_type == 2:  # TOKEN_BLOCK
+            elif token.token_type.value == 2:  # TokenType.BLOCK
                 try:
                     command = token.contents.split()[0]
                 except IndexError:
@@ -525,7 +486,7 @@ class Parser(object):
     def skip_past(self, endtag):
         while self.tokens:
             token = self.next_token()
-            if token.token_type == TOKEN_BLOCK and token.contents == endtag:
+            if token.token_type == TokenType.BLOCK and token.contents == endtag:
                 return
         self.unclosed_block_tag([endtag])
 
@@ -564,7 +525,7 @@ class Parser(object):
                 "forget to register or load this tag?" % (
                     token.lineno,
                     command,
-                    get_text_list(["'%s'" % p for p in parse_until]),
+                    get_text_list(["'%s'" % p for p in parse_until], 'or'),
                 ),
             )
         raise self.error(
@@ -638,17 +599,17 @@ filter_raw_string = r"""
  )""" % {
     'constant': constant_string,
     'num': r'[-+\.]?\d[\d\.e]*',
-    'var_chars': "\w\.",
+    'var_chars': r'\w\.',
     'filter_sep': re.escape(FILTER_SEPARATOR),
     'arg_sep': re.escape(FILTER_ARGUMENT_SEPARATOR),
 }
 
-filter_re = re.compile(filter_raw_string, re.UNICODE | re.VERBOSE)
+filter_re = re.compile(filter_raw_string, re.VERBOSE)
 
 
-class FilterExpression(object):
+class FilterExpression:
     """
-    Parses a variable token and its optional filters (all as a single string),
+    Parse a variable token and its optional filters (all as a single string),
     and return a list of tuples of the filter name and arguments.
     Sample::
 
@@ -737,8 +698,6 @@ class FilterExpression(object):
                 new_obj = func(obj, *arg_vals)
             if getattr(func, 'is_safe', False) and isinstance(obj, SafeData):
                 obj = mark_safe(new_obj)
-            elif isinstance(obj, EscapeData):
-                obj = mark_for_escaping(new_obj)
             else:
                 obj = new_obj
         return obj
@@ -748,9 +707,9 @@ class FilterExpression(object):
         # First argument, filter input, is implied.
         plen = len(provided) + 1
         # Check to see if a decorator is providing the real function.
-        func = getattr(func, '_decorated_function', func)
+        func = unwrap(func)
 
-        args, _, _, defaults = getargspec(func)
+        args, _, _, defaults, _, _, _ = getfullargspec(func)
         alen = len(args)
         dlen = len(defaults or [])
         # Not enough OR Too many
@@ -765,7 +724,7 @@ class FilterExpression(object):
         return self.token
 
 
-class Variable(object):
+class Variable:
     """
     A template variable, resolvable against a given context. The variable may
     be a hard-coded string (if it begins and ends with single or double quote
@@ -791,7 +750,7 @@ class Variable(object):
         self.translate = False
         self.message_context = None
 
-        if not isinstance(var, six.string_types):
+        if not isinstance(var, str):
             raise TypeError(
                 "Variable must be a string or number, got %s" % type(var))
         try:
@@ -800,17 +759,16 @@ class Variable(object):
             # Note that this could cause an OverflowError here that we're not
             # catching. Since this should only happen at compile time, that's
             # probably OK.
-            self.literal = float(var)
 
-            # So it's a float... is it an int? If the original value contained a
-            # dot or an "e" then it was a float, not an int.
-            if '.' not in var and 'e' not in var.lower():
-                self.literal = int(self.literal)
-
-            # "2." is invalid
-            if var.endswith('.'):
-                raise ValueError
-
+            # Try to interpret values containing a period or an 'e'/'E'
+            # (possibly scientific notation) as a float;  otherwise, try int.
+            if '.' in var or 'e' in var.lower():
+                self.literal = float(var)
+                # "2." is invalid
+                if var.endswith('.'):
+                    raise ValueError
+            else:
+                self.literal = int(var)
         except ValueError:
             # A ValueError means that the variable isn't a number.
             if var.startswith('_(') and var.endswith(')'):
@@ -846,7 +804,7 @@ class Variable(object):
             if self.message_context:
                 return pgettext_lazy(self.message_context, msgid)
             else:
-                return ugettext_lazy(msgid)
+                return gettext_lazy(msgid)
         return value
 
     def __repr__(self):
@@ -857,7 +815,7 @@ class Variable(object):
 
     def _resolve_lookup(self, context):
         """
-        Performs resolution of a real variable (i.e. not a literal) against the
+        Perform resolution of a real variable (i.e. not a literal) against the
         given context.
 
         As indicated by the method's name, this method is an implementation
@@ -877,10 +835,9 @@ class Variable(object):
                         if isinstance(current, BaseContext) and getattr(type(current), bit):
                             raise AttributeError
                         current = getattr(current, bit)
-                    except (TypeError, AttributeError) as e:
-                        # Reraise an AttributeError raised by a @property
-                        if (isinstance(e, AttributeError) and
-                                not isinstance(current, BaseContext) and bit in dir(current)):
+                    except (TypeError, AttributeError):
+                        # Reraise if the exception was raised by a @property
+                        if not isinstance(current, BaseContext) and bit in dir(current):
                             raise
                         try:  # list-index lookup
                             current = current[int(bit)]
@@ -901,7 +858,7 @@ class Variable(object):
                             current = current()
                         except TypeError:
                             try:
-                                inspect.getcallargs(current)
+                                getcallargs(current)
                             except TypeError:  # arguments *were* required
                                 current = context.template.engine.string_if_invalid  # invalid method call
                             else:
@@ -923,7 +880,7 @@ class Variable(object):
         return current
 
 
-class Node(object):
+class Node:
     # Set this to True for nodes that must be first in the template (although
     # they can be preceded by text nodes.
     must_be_first = False
@@ -947,7 +904,7 @@ class Node(object):
             return self.render(context)
         except Exception as e:
             if context.template.engine.debug and not hasattr(e, 'template_debug'):
-                e.template_debug = context.template.get_exception_info(e, self.token)
+                e.template_debug = context.render_context.template.get_exception_info(e, self.token)
             raise
 
     def __iter__(self):
@@ -980,7 +937,7 @@ class NodeList(list):
                 bit = node.render_annotated(context)
             else:
                 bit = node
-            bits.append(force_text(bit))
+            bits.append(str(bit))
         return mark_safe(''.join(bits))
 
     def get_nodes_by_type(self, nodetype):
@@ -996,8 +953,7 @@ class TextNode(Node):
         self.s = s
 
     def __repr__(self):
-        rep = "<%s: %r>" % (self.__class__.__name__, self.s[:25])
-        return force_str(rep, 'ascii', errors='replace')
+        return "<%s: %r>" % (self.__class__.__name__, self.s[:25])
 
     def render(self, context):
         return self.s
@@ -1005,18 +961,18 @@ class TextNode(Node):
 
 def render_value_in_context(value, context):
     """
-    Converts any value to a string to become part of a rendered template. This
-    means escaping, if required, and conversion to a unicode object. If value
-    is a string, it is expected to have already been translated.
+    Convert any value to a string to become part of a rendered template. This
+    means escaping, if required, and conversion to a string. If value is a
+    string, it's expected to already be translated.
     """
     value = template_localtime(value, use_tz=context.use_tz)
     value = localize(value, use_l10n=context.use_l10n)
-    value = force_text(value)
-    if ((context.autoescape and not isinstance(value, SafeData)) or
-            isinstance(value, EscapeData)):
+    if context.autoescape:
+        if not issubclass(type(value), str):
+            value = str(value)
         return conditional_escape(value)
     else:
-        return value
+        return str(value)
 
 
 class VariableNode(Node):
@@ -1036,28 +992,26 @@ class VariableNode(Node):
             return ''
         return render_value_in_context(output, context)
 
+
 # Regex for token keyword arguments
 kwarg_re = re.compile(r"(?:(\w+)=)?(.+)")
 
 
 def token_kwargs(bits, parser, support_legacy=False):
     """
-    A utility method for parsing token keyword arguments.
+    Parse token keyword arguments and return a dictionary of the arguments
+    retrieved from the ``bits`` token list.
 
-    :param bits: A list containing remainder of the token (split by spaces)
-        that is to be checked for arguments. Valid arguments will be removed
-        from this list.
+    `bits` is a list containing the remainder of the token (split by spaces)
+    that is to be checked for arguments. Valid arguments are removed from this
+    list.
 
-    :param support_legacy: If set to true ``True``, the legacy format
-        ``1 as foo`` will be accepted. Otherwise, only the standard ``foo=1``
-        format is allowed.
-
-    :returns: A dictionary of the arguments retrieved from the ``bits`` token
-        list.
+    `support_legacy` - if True, the legacy format ``1 as foo`` is accepted.
+    Otherwise, only the standard ``foo=1`` format is allowed.
 
     There is no requirement for all remaining token ``bits`` to be keyword
-    arguments, so the dictionary will be returned as soon as an invalid
-    argument format is reached.
+    arguments, so return the dictionary as soon as an invalid argument format
+    is reached.
     """
     if not bits:
         return {}

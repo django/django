@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 from django.db.models.signals import post_save, pre_save
 from django.test import TestCase
 
@@ -7,6 +5,8 @@ from .models import Account, Employee, Person, Profile, ProxyEmployee
 
 
 class UpdateOnlyFieldsTests(TestCase):
+    msg = 'The following fields do not exist in this model or are m2m fields: %s'
+
     def test_update_fields_basic(self):
         s = Person.objects.create(name='Sara', gender='F')
         self.assertEqual(s.gender, 'F')
@@ -72,28 +72,24 @@ class UpdateOnlyFieldsTests(TestCase):
         s1.gender = 'M'
         with self.assertNumQueries(1):
             s1.save()
-        # Test that the deferred class does not remember that gender was
-        # set, instead the instance should remember this.
+        # save() should not fetch deferred fields
         s1 = Person.objects.only('name').get(pk=s.pk)
         with self.assertNumQueries(1):
             s1.save()
 
     def test_update_fields_inheritance_defer(self):
         profile_boss = Profile.objects.create(name='Boss', salary=3000)
-        e1 = Employee.objects.create(name='Sara', gender='F',
-            employee_num=1, profile=profile_boss)
+        e1 = Employee.objects.create(name='Sara', gender='F', employee_num=1, profile=profile_boss)
         e1 = Employee.objects.only('name').get(pk=e1.pk)
         e1.name = 'Linda'
         with self.assertNumQueries(1):
             e1.save()
-        self.assertEqual(Employee.objects.get(pk=e1.pk).name,
-                         'Linda')
+        self.assertEqual(Employee.objects.get(pk=e1.pk).name, 'Linda')
 
     def test_update_fields_fk_defer(self):
         profile_boss = Profile.objects.create(name='Boss', salary=3000)
         profile_receptionist = Profile.objects.create(name='Receptionist', salary=1000)
-        e1 = Employee.objects.create(name='Sara', gender='F',
-            employee_num=1, profile=profile_boss)
+        e1 = Employee.objects.create(name='Sara', gender='F', employee_num=1, profile=profile_boss)
         e1 = Employee.objects.only('profile').get(pk=e1.pk)
         e1.profile = profile_receptionist
         with self.assertNumQueries(1):
@@ -106,8 +102,7 @@ class UpdateOnlyFieldsTests(TestCase):
 
     def test_select_related_only_interaction(self):
         profile_boss = Profile.objects.create(name='Boss', salary=3000)
-        e1 = Employee.objects.create(name='Sara', gender='F',
-            employee_num=1, profile=profile_boss)
+        e1 = Employee.objects.create(name='Sara', gender='F', employee_num=1, profile=profile_boss)
         e1 = Employee.objects.only('profile__salary').select_related('profile').get(pk=e1.pk)
         profile_boss.name = 'Clerk'
         profile_boss.salary = 1000
@@ -122,21 +117,18 @@ class UpdateOnlyFieldsTests(TestCase):
 
     def test_update_fields_m2m(self):
         profile_boss = Profile.objects.create(name='Boss', salary=3000)
-        e1 = Employee.objects.create(name='Sara', gender='F',
-            employee_num=1, profile=profile_boss)
+        e1 = Employee.objects.create(name='Sara', gender='F', employee_num=1, profile=profile_boss)
         a1 = Account.objects.create(num=1)
         a2 = Account.objects.create(num=2)
         e1.accounts.set([a1, a2])
 
-        with self.assertRaises(ValueError):
+        with self.assertRaisesMessage(ValueError, self.msg % 'accounts'):
             e1.save(update_fields=['accounts'])
 
     def test_update_fields_inheritance(self):
         profile_boss = Profile.objects.create(name='Boss', salary=3000)
         profile_receptionist = Profile.objects.create(name='Receptionist', salary=1000)
-
-        e1 = Employee.objects.create(name='Sara', gender='F',
-            employee_num=1, profile=profile_boss)
+        e1 = Employee.objects.create(name='Sara', gender='F', employee_num=1, profile=profile_boss)
 
         e1.name = 'Ian'
         e1.gender = 'M'
@@ -166,9 +158,7 @@ class UpdateOnlyFieldsTests(TestCase):
     def test_update_fields_inheritance_with_proxy_model(self):
         profile_boss = Profile.objects.create(name='Boss', salary=3000)
         profile_receptionist = Profile.objects.create(name='Receptionist', salary=1000)
-
-        e1 = ProxyEmployee.objects.create(name='Sara', gender='F',
-            employee_num=1, profile=profile_boss)
+        e1 = ProxyEmployee.objects.create(name='Sara', gender='F', employee_num=1, profile=profile_boss)
 
         e1.name = 'Ian'
         e1.gender = 'M'
@@ -213,10 +203,12 @@ class UpdateOnlyFieldsTests(TestCase):
     def test_update_fields_incorrect_params(self):
         s = Person.objects.create(name='Sara', gender='F')
 
-        with self.assertRaises(ValueError):
+        with self.assertRaisesMessage(ValueError, self.msg % 'first_name'):
             s.save(update_fields=['first_name'])
 
-        with self.assertRaises(ValueError):
+        # "name" is treated as an iterable so the output is something like
+        # "n, a, m, e" but the order isn't deterministic.
+        with self.assertRaisesMessage(ValueError, self.msg % ''):
             s.save(update_fields="name")
 
     def test_empty_update_fields(self):

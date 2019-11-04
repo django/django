@@ -31,6 +31,17 @@ The ``File`` class
 
         The underlying :py:term:`file object` that this class wraps.
 
+        .. admonition:: Be careful with this attribute in subclasses.
+
+            Some subclasses of :class:`File`, including
+            :class:`~django.core.files.base.ContentFile` and
+            :class:`~django.db.models.fields.files.FieldFile`, may replace this
+            attribute with an object other than a Python :py:term:`file object`.
+            In these cases, this attribute may itself be a :class:`File`
+            subclass (and not necessarily the same subclass). Whenever
+            possible, use the attributes and methods of the subclass itself
+            rather than the those of the subclass's ``file`` attribute.
+
     .. attribute:: mode
 
         The read/write mode for the file.
@@ -45,10 +56,7 @@ The ``File`` class
         was originally opened with; ``None`` means to reopen with the original
         mode.
 
-    .. method:: read(num_bytes=None)
-
-        Read content from the file. The optional ``size`` is the number of
-        bytes to read; if not specified, the file will be read to the end.
+        It can be used as a context manager, e.g. ``with file.open() as f:``.
 
     .. method:: __iter__()
 
@@ -67,26 +75,16 @@ The ``File`` class
         Returns ``True`` if the file is large enough to require multiple chunks
         to access all of its content give some ``chunk_size``.
 
-    .. method:: write(content)
-
-        Writes the specified content string to the file. Depending on the
-        storage system behind the scenes, this content might not be fully
-        committed until :func:`close()` is called on the file.
-
     .. method:: close()
 
         Close the file.
 
     In addition to the listed methods, :class:`~django.core.files.File` exposes
     the following attributes and methods of its ``file`` object:
-    ``encoding``, ``fileno``, ``flush``, ``isatty``, ``newlines``,
-    ``read``, ``readinto``, ``readlines``, ``seek``, ``softspace``, ``tell``,
-    ``truncate``, ``writelines``, ``xreadlines``. If you are using
-    Python 3, the ``seekable`` method is also available.
-
-    .. versionchanged:: 1.9
-
-        The ``seekable`` method was added.
+    ``encoding``, ``fileno``, ``flush``, ``isatty``, ``newlines``, ``read``,
+    ``readinto``, ``readline``, ``readlines``, ``seek``, ``tell``,
+    ``truncate``, ``write``, ``writelines``, ``readable()``, ``writable()``,
+    and ``seekable()``.
 
 .. currentmodule:: django.core.files.base
 
@@ -99,10 +97,9 @@ The ``ContentFile`` class
     but unlike :class:`~django.core.files.File` it operates on string content
     (bytes also supported), rather than an actual file. For example::
 
-        from __future__ import unicode_literals
         from django.core.files.base import ContentFile
 
-        f1 = ContentFile("esta sentencia está en español")
+        f1 = ContentFile("esta frase está en español")
         f2 = ContentFile(b"these are bytes")
 
 .. currentmodule:: django.core.files.images

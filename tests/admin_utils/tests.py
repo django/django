@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 from datetime import datetime
 from decimal import Decimal
 
@@ -7,8 +5,8 @@ from django import forms
 from django.conf import settings
 from django.contrib.admin import helpers
 from django.contrib.admin.utils import (
-    NestedObjects, display_for_field, flatten, flatten_fieldsets,
-    label_for_field, lookup_field, quote,
+    NestedObjects, display_for_field, display_for_value, flatten,
+    flatten_fieldsets, label_for_field, lookup_field, quote,
 )
 from django.db import DEFAULT_DB_ALIAS, models
 from django.test import SimpleTestCase, TestCase, override_settings
@@ -72,7 +70,7 @@ class NestedObjectsTests(TestCase):
 
     def test_on_delete_do_nothing(self):
         """
-        Check that the nested collector doesn't query for DO_NOTHING objects.
+        The nested collector doesn't query for DO_NOTHING objects.
         """
         n = NestedObjects(using=DEFAULT_DB_ALIAS)
         objs = [Event.objects.create()]
@@ -83,9 +81,9 @@ class NestedObjectsTests(TestCase):
 
     def test_relation_on_abstract(self):
         """
-        #21846 -- Check that `NestedObjects.collect()` doesn't trip
-        (AttributeError) on the special notation for relations on abstract
-        models (related_name that contains %(app_label)s and/or %(class)s).
+        NestedObjects.collect() doesn't trip (AttributeError) on the special
+        notation for relations on abstract models (related_name that contains
+        %(app_label)s and/or %(class)s) (#21846).
         """
         n = NestedObjects(using=DEFAULT_DB_ALIAS)
         Car.objects.create()
@@ -107,7 +105,7 @@ class UtilsTests(SimpleTestCase):
         SIMPLE_FUNCTION = 'function'
         INSTANCE_ATTRIBUTE = 'attr'
 
-        class MockModelAdmin(object):
+        class MockModelAdmin:
             def get_admin_value(self, obj):
                 return ADMIN_METHOD
 
@@ -165,6 +163,10 @@ class UtilsTests(SimpleTestCase):
         # Regression test for #13071: NullBooleanField has special
         # handling.
         display_value = display_for_field(None, models.NullBooleanField(), self.empty_value)
+        expected = '<img src="%sadmin/img/icon-unknown.svg" alt="None">' % settings.STATIC_URL
+        self.assertHTMLEqual(display_value, expected)
+
+        display_value = display_for_field(None, models.BooleanField(null=True), self.empty_value)
         expected = '<img src="%sadmin/img/icon-unknown.svg" alt="None" />' % settings.STATIC_URL
         self.assertHTMLEqual(display_value, expected)
 
@@ -195,6 +197,26 @@ class UtilsTests(SimpleTestCase):
         display_value = display_for_field(12345, models.IntegerField(), self.empty_value)
         self.assertEqual(display_value, '12,345')
 
+    def test_list_display_for_value(self):
+        display_value = display_for_value([1, 2, 3], self.empty_value)
+        self.assertEqual(display_value, '1, 2, 3')
+
+        display_value = display_for_value([1, 2, 'buckle', 'my', 'shoe'], self.empty_value)
+        self.assertEqual(display_value, '1, 2, buckle, my, shoe')
+
+    @override_settings(USE_L10N=True, USE_THOUSAND_SEPARATOR=True)
+    def test_list_display_for_value_boolean(self):
+        self.assertEqual(
+            display_for_value(True, '', boolean=True),
+            '<img src="/static/admin/img/icon-yes.svg" alt="True">'
+        )
+        self.assertEqual(
+            display_for_value(False, '', boolean=True),
+            '<img src="/static/admin/img/icon-no.svg" alt="False">'
+        )
+        self.assertEqual(display_for_value(True, ''), 'True')
+        self.assertEqual(display_for_value(False, ''), 'False')
+
     def test_label_for_field(self):
         """
         Tests for label_for_field
@@ -213,15 +235,11 @@ class UtilsTests(SimpleTestCase):
         )
 
         self.assertEqual(
-            label_for_field("__unicode__", Article),
+            label_for_field("__str__", Article),
             "article"
         )
-        self.assertEqual(
-            label_for_field("__str__", Article),
-            str("article")
-        )
 
-        with self.assertRaises(AttributeError):
+        with self.assertRaisesMessage(AttributeError, "Unable to lookup 'unknown' on Article"):
             label_for_field("unknown", Article)
 
         def test_callable(obj):
@@ -252,8 +270,9 @@ class UtilsTests(SimpleTestCase):
             label_for_field(lambda x: "nothing", Article),
             "--"
         )
+        self.assertEqual(label_for_field('site_id', Article), 'Site id')
 
-        class MockModelAdmin(object):
+        class MockModelAdmin:
             def test_from_model(self, obj):
                 return "nothing"
             test_from_model.short_description = "not Really the Model"
@@ -263,16 +282,30 @@ class UtilsTests(SimpleTestCase):
             "not Really the Model"
         )
         self.assertEqual(
-            label_for_field("test_from_model", Article,
-                model_admin=MockModelAdmin,
-                return_attr=True),
+            label_for_field("test_from_model", Article, model_admin=MockModelAdmin, return_attr=True),
             ("not Really the Model", MockModelAdmin.test_from_model)
         )
+
+    def test_label_for_field_form_argument(self):
+        class ArticleForm(forms.ModelForm):
+            extra_form_field = forms.BooleanField()
+
+            class Meta:
+                fields = '__all__'
+                model = Article
+
+        self.assertEqual(
+            label_for_field('extra_form_field', Article, form=ArticleForm()),
+            'Extra form field'
+        )
+        msg = "Unable to lookup 'nonexistent' on Article or ArticleForm"
+        with self.assertRaisesMessage(AttributeError, msg):
+            label_for_field('nonexistent', Article, form=ArticleForm()),
 
     def test_label_for_property(self):
         # NOTE: cannot use @property decorator, because of
         # AttributeError: 'property' object has no attribute 'short_description'
-        class MockModelAdmin(object):
+        class MockModelAdmin:
             def my_property(self):
                 return "this if from property"
             my_property.short_description = 'property short description'

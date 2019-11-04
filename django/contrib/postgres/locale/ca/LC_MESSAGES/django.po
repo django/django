@@ -1,16 +1,17 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Antoni Aloy <aaloy@apsl.net>, 2015
+# Antoni Aloy <aaloy@apsl.net>, 2015,2017
 # duub qnnp, 2015
+# Gil Obradors Via <gil.obradors@gmail.com>, 2019
 # Roger Pons <rogerpons@gmail.com>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2015-11-21 12:22+0000\n"
-"Last-Translator: Roger Pons <rogerpons@gmail.com>\n"
+"POT-Creation-Date: 2018-05-17 11:49+0200\n"
+"PO-Revision-Date: 2019-01-29 07:53+0000\n"
+"Last-Translator: Gil Obradors Via <gil.obradors@gmail.com>\n"
 "Language-Team: Catalan (http://www.transifex.com/django/django/language/"
 "ca/)\n"
 "MIME-Version: 1.0\n"
@@ -23,18 +24,18 @@ msgid "PostgreSQL extensions"
 msgstr "Extensions de PostgreSQL"
 
 #, python-format
-msgid "Item %(nth)s in the array did not validate: "
-msgstr "L'element %(nth)s de la matriu no valida:"
+msgid "Item %(nth)s in the array did not validate:"
+msgstr "L'element %(nth)s de la matriu no s'ha pogut validar:"
 
 msgid "Nested arrays must have the same length."
 msgstr "Les matrius niades han de tenir la mateixa longitud."
 
-msgid "Map of strings to strings"
-msgstr "Mapa de cadenes a cadenes"
+msgid "Map of strings to strings/nulls"
+msgstr "Mapa de cadenes a cadenes/nuls"
 
 #, python-format
-msgid "The value of \"%(key)s\" is not a string."
-msgstr "El valor de \"%(key)s\" no és una cadena."
+msgid "The value of \"%(key)s\" is not a string or null."
+msgstr "El valor de \"%(key)s no és ni una cadena ni un nul."
 
 msgid "A JSON object"
 msgstr "Un objecte JSON"
@@ -44,6 +45,9 @@ msgstr "El valor ha de ser JSON vàlid."
 
 msgid "Could not load JSON data."
 msgstr "No es poden carregar les dades JSON"
+
+msgid "Input must be a JSON dictionary."
+msgstr "L'entrada ha de ser un diccionari JSON"
 
 #, python-format
 msgid "'%(value)s' value must be valid JSON."

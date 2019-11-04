@@ -7,11 +7,11 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-10 15:10+0200\n"
-"PO-Revision-Date: 2015-10-11 08:53+0000\n"
+"POT-Creation-Date: 2017-09-24 13:46+0200\n"
+"PO-Revision-Date: 2017-09-24 14:24+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Serbian (Latin) (http://www.transifex.com/django/django/"
-"language/sr@latin/)\n"
+"language/sr%40latin/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -68,8 +68,7 @@ msgstr ""
 
 msgid ""
 "Raw passwords are not stored, so there is no way to see this user's "
-"password, but you can change the password using <a href=\"../password/"
-"\">this form</a>."
+"password, but you can change the password using <a href=\"{}\">this form</a>."
 msgstr ""
 
 #, python-format
@@ -110,6 +109,21 @@ msgstr "začin"
 
 msgid "hash"
 msgstr "heš"
+
+msgid "variety"
+msgstr ""
+
+msgid "version"
+msgstr ""
+
+msgid "memory cost"
+msgstr ""
+
+msgid "time cost"
+msgstr ""
+
+msgid "parallelism"
+msgstr ""
 
 msgid "work factor"
 msgstr "faktor rada"
@@ -162,14 +176,7 @@ msgstr ""
 msgid "username"
 msgstr "korisničko ime"
 
-msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
-msgstr ""
-"Neophodno. Najviše 30 slovnih mesta. Samo alfanumerički znaci (slova, brojke "
-"i @/./+/-/_)."
-
-msgid ""
-"Enter a valid username. This value may contain only letters, numbers and @/./"
-"+/-/_ characters."
+msgid "Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only."
 msgstr ""
 
 msgid "A user with that username already exists."
@@ -250,6 +257,16 @@ msgstr ""
 #, python-format
 msgid "Password reset on %(site_name)s"
 msgstr "Resetovanje lozinke na sajtu %(site_name)s"
+
+msgid ""
+"Enter a valid username. This value may contain only English letters, "
+"numbers, and @/./+/-/_ characters."
+msgstr ""
+
+msgid ""
+"Enter a valid username. This value may contain only letters, numbers, and "
+"@/./+/-/_ characters."
+msgstr ""
 
 msgid "Logged out"
 msgstr "Odjavljen"

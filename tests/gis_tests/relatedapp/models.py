@@ -1,18 +1,11 @@
-from django.utils.encoding import python_2_unicode_compatible
-
-from ..models import models
+from django.contrib.gis.db import models
 
 
 class SimpleModel(models.Model):
-
-    objects = models.GeoManager()
-
     class Meta:
         abstract = True
-        required_db_features = ['gis_enabled']
 
 
-@python_2_unicode_compatible
 class Location(SimpleModel):
     point = models.PointField()
 
@@ -20,7 +13,6 @@ class Location(SimpleModel):
         return self.point.wkt
 
 
-@python_2_unicode_compatible
 class City(SimpleModel):
     name = models.CharField(max_length=50)
     state = models.CharField(max_length=2)
@@ -33,15 +25,12 @@ class City(SimpleModel):
 class AugmentedLocation(Location):
     extra_text = models.TextField(blank=True)
 
-    objects = models.GeoManager()
-
 
 class DirectoryEntry(SimpleModel):
     listing_text = models.CharField(max_length=50)
     location = models.ForeignKey(AugmentedLocation, models.CASCADE)
 
 
-@python_2_unicode_compatible
 class Parcel(SimpleModel):
     name = models.CharField(max_length=30)
     city = models.ForeignKey(City, models.CASCADE)
@@ -55,7 +44,6 @@ class Parcel(SimpleModel):
         return self.name
 
 
-# These use the GeoManager but do not have any geographic fields.
 class Author(SimpleModel):
     name = models.CharField(max_length=100)
     dob = models.DateField()

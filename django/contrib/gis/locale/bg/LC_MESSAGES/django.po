@@ -2,13 +2,14 @@
 #
 # Translators:
 # Georgi Kostadinov <grgkostadinov@gmail.com>, 2012
+# Todor Lubenov <tgl.sysdev@gmail.com>, 2016
 # Todor Lubenov <tgl.sysdev@gmail.com>, 2011,2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2015-10-10 09:11+0000\n"
+"POT-Creation-Date: 2017-01-19 16:49+0100\n"
+"PO-Revision-Date: 2017-09-19 16:40+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Bulgarian (http://www.transifex.com/django/django/language/"
 "bg/)\n"
@@ -22,11 +23,12 @@ msgid "GIS"
 msgstr "GIS"
 
 msgid "The base GIS field."
-msgstr ""
+msgstr "Базово ГИС поле."
 
 msgid ""
 "The base Geometry field -- maps to the OpenGIS Specification Geometry type."
 msgstr ""
+"Основното ГИС поле - карти за спецификация от OpenGIS  геометричен тип."
 
 msgid "Point"
 msgstr "Точка"
@@ -53,7 +55,7 @@ msgid "Extent Aggregate Field"
 msgstr "Разшири Полето за обединяване"
 
 msgid "Raster Field"
-msgstr ""
+msgstr "Растерно Поле"
 
 msgid "No geometry value provided."
 msgstr "Няма предоставена геометрична стойност."
@@ -76,9 +78,6 @@ msgstr "Изтрий всички обекти"
 
 msgid "WKT debugging window:"
 msgstr "WKT прозорец за проверка:"
-
-msgid "Google Maps via GeoDjango"
-msgstr "Google Maps през GeoDjango"
 
 msgid "Debugging window (serialized value)"
 msgstr "Debugging прозорец (сериализирана стойност)"

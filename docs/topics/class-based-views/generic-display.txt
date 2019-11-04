@@ -87,7 +87,7 @@ We'll be using these models::
         class Meta:
             ordering = ["-name"]
 
-        def __str__(self):              # __unicode__ on Python 2
+        def __str__(self):
             return self.name
 
     class Author(models.Model):
@@ -96,7 +96,7 @@ We'll be using these models::
         email = models.EmailField()
         headshot = models.ImageField(upload_to='author_headshots')
 
-        def __str__(self):              # __unicode__ on Python 2
+        def __str__(self):
             return self.name
 
     class Book(models.Model):
@@ -117,11 +117,11 @@ Now we need to define a view::
 Finally hook that view into your urls::
 
     # urls.py
-    from django.conf.urls import url
+    from django.urls import path
     from books.views import PublisherList
 
     urlpatterns = [
-        url(r'^publishers/$', PublisherList.as_view()),
+        path('publishers/', PublisherList.as_view()),
     ]
 
 That's all the Python code we need to write. We still need to write a template,
@@ -172,9 +172,9 @@ they're dealing with publishers here.
 
 Well, if you're dealing with a model object, this is already done for you. When
 you are dealing with an object or queryset, Django is able to populate the
-context using the lower cased version of the model class' name. This is
-provided in addition to the default ``object_list`` entry, but contains exactly
-the same data, i.e. ``publisher_list``.
+context using the lowercased version of the model class' name. This is provided
+in addition to the default ``object_list`` entry, but contains exactly the same
+data, i.e. ``publisher_list``.
 
 If this still isn't a good match, you can manually set the name of the
 context variable. The ``context_object_name`` attribute on a generic view
@@ -210,7 +210,7 @@ The default implementation simply adds the object being displayed to the
 template, but you can override it to send more::
 
     from django.views.generic import DetailView
-    from books.models import Publisher, Book
+    from books.models import Book, Publisher
 
     class PublisherDetail(DetailView):
 
@@ -218,7 +218,7 @@ template, but you can override it to send more::
 
         def get_context_data(self, **kwargs):
             # Call the base implementation first to get a context
-            context = super(PublisherDetail, self).get_context_data(**kwargs)
+            context = super().get_context_data(**kwargs)
             # Add in a QuerySet of all the books
             context['book_list'] = Book.objects.all()
             return context
@@ -290,7 +290,7 @@ technique::
     class AcmeBookList(ListView):
 
         context_object_name = 'book_list'
-        queryset = Book.objects.filter(publisher__name='Acme Publishing')
+        queryset = Book.objects.filter(publisher__name='ACME Publishing')
         template_name = 'books/acme_list.html'
 
 Notice that along with a filtered ``queryset``, we're also using a custom
@@ -332,11 +332,11 @@ various useful things are stored on ``self``; as well as the request
 Here, we have a URLconf with a single captured group::
 
     # urls.py
-    from django.conf.urls import url
+    from django.urls import path
     from books.views import PublisherBookList
 
     urlpatterns = [
-        url(r'^books/([\w-]+)/$', PublisherBookList.as_view()),
+        path('books/<publisher>/', PublisherBookList.as_view()),
     ]
 
 Next, we'll write the ``PublisherBookList`` view itself::
@@ -351,7 +351,7 @@ Next, we'll write the ``PublisherBookList`` view itself::
         template_name = 'books/books_by_publisher.html'
 
         def get_queryset(self):
-            self.publisher = get_object_or_404(Publisher, name=self.args[0])
+            self.publisher = get_object_or_404(Publisher, name=self.kwargs['publisher'])
             return Book.objects.filter(publisher=self.publisher)
 
 As you can see, it's quite easy to add more logic to the queryset selection;
@@ -365,7 +365,7 @@ use it in the template::
 
         def get_context_data(self, **kwargs):
             # Call the base implementation first to get a context
-            context = super(PublisherBookList, self).get_context_data(**kwargs)
+            context = super().get_context_data(**kwargs)
             # Add in the publisher
             context['publisher'] = self.publisher
             return context
@@ -398,19 +398,19 @@ updated.
 First, we'd need to add an author detail bit in the URLconf to point to a
 custom view::
 
-    from django.conf.urls import url
+    from django.urls import path
     from books.views import AuthorDetailView
 
     urlpatterns = [
         #...
-        url(r'^authors/(?P<pk>[0-9]+)/$', AuthorDetailView.as_view(), name='author-detail'),
+        path('authors/<int:pk>/', AuthorDetailView.as_view(), name='author-detail'),
     ]
 
 Then we'd write our new view -- ``get_object`` is the method that retrieves the
 object -- so we simply override it and wrap the call::
 
-    from django.views.generic import DetailView
     from django.utils import timezone
+    from django.views.generic import DetailView
     from books.models import Author
 
     class AuthorDetailView(DetailView):
@@ -418,13 +418,11 @@ object -- so we simply override it and wrap the call::
         queryset = Author.objects.all()
 
         def get_object(self):
-            # Call the superclass
-            object = super(AuthorDetailView, self).get_object()
+            obj = super().get_object()
             # Record the last accessed date
-            object.last_accessed = timezone.now()
-            object.save()
-            # Return the object
-            return object
+            obj.last_accessed = timezone.now()
+            obj.save()
+            return obj
 
 .. note::
 

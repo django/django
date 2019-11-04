@@ -35,14 +35,14 @@ load the resource in a frame if the request originated from the same site. If
 the header is set to ``DENY`` then the browser will block the resource from
 loading in a frame no matter which site made the request.
 
-.. _X-Frame-Options: https://developer.mozilla.org/en-US/docs/Web/HTTP/X-Frame-Options
+.. _X-Frame-Options: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Frame-Options
 
 Django provides a few simple ways to include this header in responses from your
 site:
 
-1. A simple middleware that sets the header in all responses.
+#. A simple middleware that sets the header in all responses.
 
-2. A set of view decorators that can be used to override the middleware or to
+#. A set of view decorators that can be used to override the middleware or to
    only set the header for certain views.
 
 The ``X-Frame-Options`` HTTP header will only be set by the middleware or view
@@ -56,9 +56,9 @@ Setting ``X-Frame-Options`` for all responses
 
 To set the same ``X-Frame-Options`` value for all responses in your site, put
 ``'django.middleware.clickjacking.XFrameOptionsMiddleware'`` to
-:setting:`MIDDLEWARE_CLASSES`::
+:setting:`MIDDLEWARE`::
 
-    MIDDLEWARE_CLASSES = [
+    MIDDLEWARE = [
         ...
         'django.middleware.clickjacking.XFrameOptionsMiddleware',
         ...
@@ -84,6 +84,11 @@ that tells the middleware not to set the header::
     def ok_to_load_in_a_frame(request):
         return HttpResponse("This page is safe to load in a frame on any site.")
 
+.. note::
+
+    If you want to submit a form or access a session cookie within a frame or
+    iframe, you may need to modify the :setting:`CSRF_COOKIE_SAMESITE` or
+    :setting:`SESSION_COOKIE_SAMESITE` settings.
 
 Setting ``X-Frame-Options`` per view
 ------------------------------------
@@ -127,5 +132,5 @@ See also
 
 A `complete list`_ of browsers supporting ``X-Frame-Options``.
 
-.. _complete list: https://developer.mozilla.org/en-US/docs/Web/HTTP/X-Frame-Options#Browser_compatibility
+.. _complete list: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Frame-Options#Browser_compatibility
 .. _other clickjacking prevention techniques: https://en.wikipedia.org/wiki/Clickjacking#Prevention

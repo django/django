@@ -2,11 +2,9 @@
 Useful auxiliary data structures for query construction. Not useful outside
 the SQL domain.
 """
+# for backwards-compatibility in Django 1.11
+from django.core.exceptions import EmptyResultSet  # NOQA: F401
 from django.db.models.sql.constants import INNER, LOUTER
-
-
-class EmptyResultSet(Exception):
-    pass
 
 
 class MultiJoin(Exception):
@@ -21,11 +19,11 @@ class MultiJoin(Exception):
         self.names_with_path = path_with_names
 
 
-class Empty(object):
+class Empty:
     pass
 
 
-class Join(object):
+class Join:
     """
     Used by sql.Query and sql.SQLCompiler to generate JOIN clauses into the
     FROM entry. For example, the SQL generated could be
@@ -43,7 +41,7 @@ class Join(object):
         - relabeled_clone()
     """
     def __init__(self, table_name, parent_alias, table_alias, join_type,
-                 join_field, nullable):
+                 join_field, nullable, filtered_relation=None):
         # Join table
         self.table_name = table_name
         self.parent_alias = parent_alias
@@ -58,10 +56,11 @@ class Join(object):
         self.join_field = join_field
         # Is this join nullabled?
         self.nullable = nullable
+        self.filtered_relation = filtered_relation
 
     def as_sql(self, compiler, connection):
         """
-        Generates the full
+        Generate the full
            LEFT OUTER JOIN sometable ON sometable.somecol = othertable.othercol, params
         clause for this join.
         """
@@ -71,7 +70,7 @@ class Join(object):
         qn2 = connection.ops.quote_name
 
         # Add a join condition for each pair of joining columns.
-        for index, (lhs_col, rhs_col) in enumerate(self.join_cols):
+        for lhs_col, rhs_col in self.join_cols:
             join_conditions.append('%s.%s = %s.%s' % (
                 qn(self.parent_alias),
                 qn2(lhs_col),
@@ -87,7 +86,11 @@ class Join(object):
             extra_sql, extra_params = compiler.compile(extra_cond)
             join_conditions.append('(%s)' % extra_sql)
             params.extend(extra_params)
-
+        if self.filtered_relation:
+            extra_sql, extra_params = compiler.compile(self.filtered_relation)
+            if extra_sql:
+                join_conditions.append('(%s)' % extra_sql)
+                params.extend(extra_params)
         if not join_conditions:
             # This might be a rel on the other end of an actual declared field.
             declared_field = getattr(self.join_field, 'field', self.join_field)
@@ -103,18 +106,27 @@ class Join(object):
     def relabeled_clone(self, change_map):
         new_parent_alias = change_map.get(self.parent_alias, self.parent_alias)
         new_table_alias = change_map.get(self.table_alias, self.table_alias)
+        if self.filtered_relation is not None:
+            filtered_relation = self.filtered_relation.clone()
+            filtered_relation.path = [change_map.get(p, p) for p in self.filtered_relation.path]
+        else:
+            filtered_relation = None
         return self.__class__(
             self.table_name, new_parent_alias, new_table_alias, self.join_type,
-            self.join_field, self.nullable)
+            self.join_field, self.nullable, filtered_relation=filtered_relation,
+        )
+
+    def equals(self, other, with_filtered_relation):
+        return (
+            isinstance(other, self.__class__) and
+            self.table_name == other.table_name and
+            self.parent_alias == other.parent_alias and
+            self.join_field == other.join_field and
+            (not with_filtered_relation or self.filtered_relation == other.filtered_relation)
+        )
 
     def __eq__(self, other):
-        if isinstance(other, self.__class__):
-            return (
-                self.table_name == other.table_name and
-                self.parent_alias == other.parent_alias and
-                self.join_field == other.join_field
-            )
-        return False
+        return self.equals(other, with_filtered_relation=True)
 
     def demote(self):
         new = self.relabeled_clone({})
@@ -127,7 +139,7 @@ class Join(object):
         return new
 
 
-class BaseTable(object):
+class BaseTable:
     """
     The BaseTable class is used for base table references in FROM clause. For
     example, the SQL "foo" in
@@ -136,6 +148,7 @@ class BaseTable(object):
     """
     join_type = None
     parent_alias = None
+    filtered_relation = None
 
     def __init__(self, table_name, alias):
         self.table_name = table_name
@@ -148,3 +161,10 @@ class BaseTable(object):
 
     def relabeled_clone(self, change_map):
         return self.__class__(self.table_name, change_map.get(self.table_alias, self.table_alias))
+
+    def equals(self, other, with_filtered_relation):
+        return (
+            isinstance(self, other.__class__) and
+            self.table_name == other.table_name and
+            self.table_alias == other.table_alias
+        )

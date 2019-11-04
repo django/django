@@ -1,10 +1,7 @@
-from __future__ import unicode_literals
-
 from django.db import models
 from django.template import Context, Template
-from django.test import TestCase, override_settings
+from django.test import SimpleTestCase, TestCase, override_settings
 from django.test.utils import isolate_apps
-from django.utils.encoding import force_text
 
 from .models import (
     AbstractBase1, AbstractBase2, AbstractBase3, Child1, Child2, Child3,
@@ -46,21 +43,14 @@ class ManagersRegressionTests(TestCase):
             "<Child4: d1>",
             "<Child4: d2>",
             "<Child4: f1>",
-            "<Child4: f2>"
-        ]
-        )
-        self.assertQuerysetEqual(Child4.manager1.all(), [
-            "<Child4: d1>",
-            "<Child4: f1>"
-        ],
-            ordered=False
-        )
+            "<Child4: f2>",
+        ])
+        self.assertQuerysetEqual(Child4.manager1.all(), ["<Child4: d1>", "<Child4: f1>"], ordered=False)
         self.assertQuerysetEqual(Child5._default_manager.all(), ["<Child5: fred>"])
-        self.assertQuerysetEqual(Child6._default_manager.all(), ["<Child6: f1>"])
-        self.assertQuerysetEqual(Child7._default_manager.order_by('name'), [
-            "<Child7: barney>",
-            "<Child7: fred>"
-        ]
+        self.assertQuerysetEqual(Child6._default_manager.all(), ["<Child6: f1>", "<Child6: f2>"], ordered=False)
+        self.assertQuerysetEqual(
+            Child7._default_manager.order_by('name'),
+            ["<Child7: barney>", "<Child7: fred>"]
         )
 
     def test_abstract_manager(self):
@@ -75,7 +65,7 @@ class ManagersRegressionTests(TestCase):
             AbstractBase3.objects.all()
 
     def test_custom_abstract_manager(self):
-        # Accessing the manager on an abstract model with an custom
+        # Accessing the manager on an abstract model with a custom
         # manager should raise an attribute error with an appropriate
         # message.
         msg = "Manager isn't available; AbstractBase2 is abstract"
@@ -157,7 +147,7 @@ class ManagersRegressionTests(TestCase):
 
         self.assertEqual(
             t.render(Context({'related': related})),
-            ''.join([force_text(relation.pk)] * 3),
+            ''.join([str(relation.pk)] * 3),
         )
 
     def test_field_can_be_called_exact(self):
@@ -167,3 +157,131 @@ class ManagersRegressionTests(TestCase):
         related = RelatedModel.objects.create(exact=False)
         relation = related.test_fk.create()
         self.assertEqual(related.test_fk.get(), relation)
+
+
+@isolate_apps('managers_regress')
+class TestManagerInheritance(SimpleTestCase):
+    def test_implicit_inheritance(self):
+        class CustomManager(models.Manager):
+            pass
+
+        class AbstractModel(models.Model):
+            custom_manager = CustomManager()
+
+            class Meta:
+                abstract = True
+
+        class PlainModel(models.Model):
+            custom_manager = CustomManager()
+
+        self.assertIsInstance(PlainModel._base_manager, models.Manager)
+        self.assertIsInstance(PlainModel._default_manager, CustomManager)
+
+        class ModelWithAbstractParent(AbstractModel):
+            pass
+
+        self.assertIsInstance(ModelWithAbstractParent._base_manager, models.Manager)
+        self.assertIsInstance(ModelWithAbstractParent._default_manager, CustomManager)
+
+        class ProxyModel(PlainModel):
+            class Meta:
+                proxy = True
+
+        self.assertIsInstance(ProxyModel._base_manager, models.Manager)
+        self.assertIsInstance(ProxyModel._default_manager, CustomManager)
+
+        class MTIModel(PlainModel):
+            pass
+
+        self.assertIsInstance(MTIModel._base_manager, models.Manager)
+        self.assertIsInstance(MTIModel._default_manager, CustomManager)
+
+    def test_default_manager_inheritance(self):
+        class CustomManager(models.Manager):
+            pass
+
+        class AbstractModel(models.Model):
+            another_manager = models.Manager()
+            custom_manager = CustomManager()
+
+            class Meta:
+                default_manager_name = 'custom_manager'
+                abstract = True
+
+        class PlainModel(models.Model):
+            another_manager = models.Manager()
+            custom_manager = CustomManager()
+
+            class Meta:
+                default_manager_name = 'custom_manager'
+
+        self.assertIsInstance(PlainModel._default_manager, CustomManager)
+
+        class ModelWithAbstractParent(AbstractModel):
+            pass
+
+        self.assertIsInstance(ModelWithAbstractParent._default_manager, CustomManager)
+
+        class ProxyModel(PlainModel):
+            class Meta:
+                proxy = True
+
+        self.assertIsInstance(ProxyModel._default_manager, CustomManager)
+
+        class MTIModel(PlainModel):
+            pass
+
+        self.assertIsInstance(MTIModel._default_manager, CustomManager)
+
+    def test_base_manager_inheritance(self):
+        class CustomManager(models.Manager):
+            pass
+
+        class AbstractModel(models.Model):
+            another_manager = models.Manager()
+            custom_manager = CustomManager()
+
+            class Meta:
+                base_manager_name = 'custom_manager'
+                abstract = True
+
+        class PlainModel(models.Model):
+            another_manager = models.Manager()
+            custom_manager = CustomManager()
+
+            class Meta:
+                base_manager_name = 'custom_manager'
+
+        self.assertIsInstance(PlainModel._base_manager, CustomManager)
+
+        class ModelWithAbstractParent(AbstractModel):
+            pass
+
+        self.assertIsInstance(ModelWithAbstractParent._base_manager, CustomManager)
+
+        class ProxyModel(PlainModel):
+            class Meta:
+                proxy = True
+
+        self.assertIsInstance(ProxyModel._base_manager, CustomManager)
+
+        class MTIModel(PlainModel):
+            pass
+
+        self.assertIsInstance(MTIModel._base_manager, CustomManager)
+
+    def test_manager_no_duplicates(self):
+        class CustomManager(models.Manager):
+            pass
+
+        class AbstractModel(models.Model):
+            custom_manager = models.Manager()
+
+            class Meta:
+                abstract = True
+
+        class TestModel(AbstractModel):
+            custom_manager = CustomManager()
+
+        self.assertEqual(TestModel._meta.managers, (TestModel.custom_manager,))
+        self.assertEqual(TestModel._meta.managers_map, {'custom_manager': TestModel.custom_manager})

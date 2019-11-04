@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals
-
 import sys
 
 from django.contrib.auth.models import Group
@@ -8,6 +5,7 @@ from django.template import Context, Engine, TemplateSyntaxError
 from django.template.base import UNKNOWN_SOURCE
 from django.test import SimpleTestCase, override_settings
 from django.urls import NoReverseMatch
+from django.utils import translation
 
 
 class TemplateTests(SimpleTestCase):
@@ -15,7 +13,7 @@ class TemplateTests(SimpleTestCase):
     def test_string_origin(self):
         template = Engine().from_string('string template')
         self.assertEqual(template.origin.name, UNKNOWN_SOURCE)
-        self.assertEqual(template.origin.loader_name, None)
+        self.assertIsNone(template.origin.loader_name)
         self.assertEqual(template.source, 'string template')
 
     @override_settings(SETTINGS_MODULE=None)
@@ -44,8 +42,7 @@ class TemplateTests(SimpleTestCase):
             while tb.tb_next is not None:
                 tb = tb.tb_next
                 depth += 1
-            self.assertGreater(depth, 5,
-                "The traceback context was lost when reraising the traceback. See #19827")
+            self.assertGreater(depth, 5, "The traceback context was lost when reraising the traceback.")
 
     def test_no_wrapped_exception(self):
         """
@@ -65,15 +62,17 @@ class TemplateTests(SimpleTestCase):
 
     def test_invalid_block_suggestion(self):
         """
-        #7876 -- Error messages should include the unexpected block name.
+        Error messages should include the unexpected block name and be in all
+        English.
         """
         engine = Engine()
         msg = (
             "Invalid block tag on line 1: 'endblock', expected 'elif', 'else' "
             "or 'endif'. Did you forget to register or load this tag?"
         )
-        with self.assertRaisesMessage(TemplateSyntaxError, msg):
-            engine.from_string("{% if 1 %}lala{% endblock %}{% endif %}")
+        with self.settings(USE_I18N=True), translation.override('de'):
+            with self.assertRaisesMessage(TemplateSyntaxError, msg):
+                engine.from_string("{% if 1 %}lala{% endblock %}{% endif %}")
 
     def test_unknown_block_tag(self):
         engine = Engine()
@@ -110,6 +109,29 @@ class TemplateTests(SimpleTestCase):
         )
         with self.assertRaises(RuntimeError) as e:
             engine.from_string("{% load bad_tag %}{% badtag %}")
+        self.assertEqual(e.exception.template_debug['during'], '{% badtag %}')
+
+    def test_compile_tag_error_27584(self):
+        engine = Engine(
+            app_dirs=True,
+            debug=True,
+            libraries={'tag_27584': 'template_tests.templatetags.tag_27584'},
+        )
+        t = engine.get_template('27584_parent.html')
+        with self.assertRaises(TemplateSyntaxError) as e:
+            t.render(Context())
+        self.assertEqual(e.exception.template_debug['during'], '{% badtag %}')
+
+    def test_compile_tag_error_27956(self):
+        """Errors in a child of {% extends %} are displayed correctly."""
+        engine = Engine(
+            app_dirs=True,
+            debug=True,
+            libraries={'tag_27584': 'template_tests.templatetags.tag_27584'},
+        )
+        t = engine.get_template('27956_child.html')
+        with self.assertRaises(TemplateSyntaxError) as e:
+            t.render(Context())
         self.assertEqual(e.exception.template_debug['during'], '{% badtag %}')
 
     def test_super_errors(self):

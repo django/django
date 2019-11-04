@@ -59,14 +59,21 @@ class MySqlDbshellCommandTestCase(SimpleTestCase):
     def test_ssl_certificate_is_added(self):
         self.assertEqual(
             ['mysql', '--user=someuser', '--password=somepassword',
-             '--host=somehost', '--port=444', '--ssl-ca=sslca', 'somedbname'],
+             '--host=somehost', '--port=444', '--ssl-ca=sslca',
+             '--ssl-cert=sslcert', '--ssl-key=sslkey', 'somedbname'],
             self.get_command_line_arguments({
                 'NAME': 'somedbname',
                 'USER': 'someuser',
                 'PASSWORD': 'somepassword',
                 'HOST': 'somehost',
                 'PORT': 444,
-                'OPTIONS': {'ssl': {'ca': 'sslca'}},
+                'OPTIONS': {
+                    'ssl': {
+                        'ca': 'sslca',
+                        'cert': 'sslcert',
+                        'key': 'sslkey',
+                    },
+                },
             }))
 
     def get_command_line_arguments(self, connection_settings):

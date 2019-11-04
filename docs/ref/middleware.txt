@@ -61,10 +61,7 @@ Adds a few conveniences for perfectionists:
   indexer would treat them as separate URLs -- so it's best practice to
   normalize URLs.
 
-* Handles ETags based on the :setting:`USE_ETAGS` setting. If
-  :setting:`USE_ETAGS` is set to ``True``, Django will calculate an ETag
-  for each request by MD5-hashing the page content, and it'll take care of
-  sending ``Not Modified`` responses, if appropriate.
+* Sets the ``Content-Length`` header for non-streaming responses.
 
 .. attribute:: CommonMiddleware.response_redirect_class
 
@@ -88,19 +85,18 @@ GZip middleware
 .. warning::
 
     Security researchers recently revealed that when compression techniques
-    (including ``GZipMiddleware``) are used on a website, the site becomes
-    exposed to a number of possible attacks. These approaches can be used to
-    compromise, among other things, Django's CSRF protection. Before using
-    ``GZipMiddleware`` on your site, you should consider very carefully whether
-    you are subject to these attacks. If you're in *any* doubt about whether
-    you're affected, you should avoid using ``GZipMiddleware``. For more
-    details, see the `the BREACH paper (PDF)`_ and `breachattack.com`_.
+    (including ``GZipMiddleware``) are used on a website, the site may become
+    exposed to a number of possible attacks. Before using ``GZipMiddleware`` on
+    your site, you should consider very carefully whether you are subject to
+    these attacks. If you're in *any* doubt about whether you're affected, you
+    should avoid using ``GZipMiddleware``. For more details, see the `the BREACH
+    paper (PDF)`_ and `breachattack.com`_.
 
     .. _the BREACH paper (PDF): http://breachattack.com/resources/BREACH%20-%20SSL,%20gone%20in%2030%20seconds.pdf
     .. _breachattack.com: http://breachattack.com
 
-Compresses content for browsers that understand GZip compression (all modern
-browsers).
+The ``django.middleware.gzip.GZipMiddleware`` compresses content for browsers
+that understand GZip compression (all modern browsers).
 
 This middleware should be placed before any other middleware that need to
 read or write the response body so that compression happens afterward.
@@ -114,6 +110,9 @@ It will NOT compress content if any of the following are true:
 * The request (the browser) hasn't sent an ``Accept-Encoding`` header
   containing ``gzip``.
 
+If the response has an ``ETag`` header, the ETag is made weak to comply with
+:rfc:`7232#section-2.1`.
+
 You can apply GZip compression to individual views using the
 :func:`~django.views.decorators.gzip.gzip_page()` decorator.
 
@@ -125,12 +124,11 @@ Conditional GET middleware
 
 .. class:: ConditionalGetMiddleware
 
-Handles conditional GET operations. If the response has a ``ETag`` or
+Handles conditional GET operations. If the response doesn't have an ``ETag``
+header, the middleware adds one if needed. If the response has an ``ETag`` or
 ``Last-Modified`` header, and the request has ``If-None-Match`` or
 ``If-Modified-Since``, the response is replaced by an
 :class:`~django.http.HttpResponseNotModified`.
-
-Also sets the ``Date`` and ``Content-Length`` response-headers.
 
 Locale middleware
 -----------------
@@ -185,6 +183,7 @@ enabled or disabled with a setting.
 * :setting:`SECURE_BROWSER_XSS_FILTER`
 * :setting:`SECURE_CONTENT_TYPE_NOSNIFF`
 * :setting:`SECURE_HSTS_INCLUDE_SUBDOMAINS`
+* :setting:`SECURE_HSTS_PRELOAD`
 * :setting:`SECURE_HSTS_SECONDS`
 * :setting:`SECURE_REDIRECT_EXEMPT`
 * :setting:`SECURE_SSL_HOST`
@@ -198,7 +197,7 @@ HTTP Strict Transport Security
 For sites that should only be accessed over HTTPS, you can instruct modern
 browsers to refuse to connect to your domain name via an insecure connection
 (for a given period of time) by setting the `"Strict-Transport-Security"
-header`_. This reduces your exposure to some SSL-stripping man-in-the-middle
+header`__. This reduces your exposure to some SSL-stripping man-in-the-middle
 (MITM) attacks.
 
 ``SecurityMiddleware`` will set this header for you on all HTTPS responses if
@@ -214,10 +213,14 @@ so that infrequent visitors will be protected (31536000 seconds, i.e. 1 year,
 is common).
 
 Additionally, if you set the :setting:`SECURE_HSTS_INCLUDE_SUBDOMAINS` setting
-to ``True``, ``SecurityMiddleware`` will add the ``includeSubDomains`` tag to
-the ``Strict-Transport-Security`` header. This is recommended (assuming all
+to ``True``, ``SecurityMiddleware`` will add the ``includeSubDomains`` directive
+to the ``Strict-Transport-Security`` header. This is recommended (assuming all
 subdomains are served exclusively using HTTPS), otherwise your site may still
 be vulnerable via an insecure connection to a subdomain.
+
+If you wish to submit your site to the `browser preload list`_, set the
+:setting:`SECURE_HSTS_PRELOAD` setting to ``True``. That appends the
+``preload`` directive to the ``Strict-Transport-Security`` header.
 
 .. warning::
     The HSTS policy applies to your entire domain, not just the URL of the
@@ -235,7 +238,8 @@ be vulnerable via an insecure connection to a subdomain.
     it may be because Django doesn't realize that it's on a secure connection;
     you may need to set the :setting:`SECURE_PROXY_SSL_HEADER` setting.
 
-.. _"Strict-Transport-Security" header: https://en.wikipedia.org/wiki/Strict_Transport_Security
+__ https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Strict-Transport-Security
+.. _browser preload list: https://hstspreload.org/
 
 .. _x-content-type-options:
 
@@ -251,12 +255,9 @@ If your site serves user-uploaded files, a malicious user could upload a
 specially-crafted file that would be interpreted as HTML or JavaScript by
 the browser when you expected it to be something harmless.
 
-To learn more about this header and how the browser treats it, you can
-read about it on the `IE Security Blog`_.
-
 To prevent the browser from guessing the content type and force it to
 always use the type provided in the ``Content-Type`` header, you can pass
-the ``X-Content-Type-Options: nosniff`` header.  ``SecurityMiddleware`` will
+the `X-Content-Type-Options: nosniff`__ header.  ``SecurityMiddleware`` will
 do this for all responses if the :setting:`SECURE_CONTENT_TYPE_NOSNIFF` setting
 is ``True``.
 
@@ -268,7 +269,7 @@ you are using Django to do something like require authorization in order to
 download files and you cannot set the header using your Web server, this
 setting will be useful.
 
-.. _IE Security Blog: http://blogs.msdn.com/b/ie/archive/2008/09/02/ie8-security-part-vi-beta-2-update.aspx
+__ https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Content-Type-Options
 
 .. _x-xss-protection:
 
@@ -280,7 +281,7 @@ attack`_. They work by looking for JavaScript content in the GET or POST
 parameters of a page. If the JavaScript is replayed in the server's response,
 the page is blocked from rendering and an error page is shown instead.
 
-The `X-XSS-Protection header`_ is used to control the operation of the
+The `X-XSS-Protection header`__ is used to control the operation of the
 XSS filter.
 
 To enable the XSS filter in the browser, and force it to always block
@@ -295,7 +296,7 @@ header. ``SecurityMiddleware`` will do this for all responses if the
     sanitizing <cross-site-scripting>` all input to prevent XSS attacks.
 
 .. _XSS attack: https://en.wikipedia.org/wiki/Cross-site_scripting
-.. _X-XSS-Protection header: http://blogs.msdn.com/b/ie/archive/2008/07/02/ie8-security-part-iv-the-xss-filter.aspx
+__ https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-XSS-Protection
 
 .. _ssl-redirect:
 
@@ -329,7 +330,7 @@ in the :setting:`SECURE_REDIRECT_EXEMPT` setting.
     Django can't seem to tell when a request actually is already secure, you
     may need to set the :setting:`SECURE_PROXY_SSL_HEADER` setting.
 
-.. _nginx: http://nginx.org
+.. _nginx: https://nginx.org
 
 Session middleware
 ------------------
@@ -372,8 +373,6 @@ Middleware for utilizing Web server provided authentication. See
 
 .. class:: PersistentRemoteUserMiddleware
 
-.. versionadded:: 1.9
-
 Middleware for utilizing Web server provided authentication when enabled only
 on the login page. See :ref:`persistent-remote-user-middleware-howto` for usage
 details.
@@ -381,9 +380,7 @@ details.
 CSRF protection middleware
 --------------------------
 
-.. module:: django.middleware.csrf
-   :synopsis: Middleware adding protection against Cross Site Request
-              Forgeries.
+.. currentmodule:: django.middleware.csrf
 
 .. class:: CsrfViewMiddleware
 
@@ -394,8 +391,7 @@ fields to POST forms and checking requests for the correct value. See the
 ``X-Frame-Options`` middleware
 ------------------------------
 
-.. module:: django.middleware.clickjacking
-   :synopsis: Clickjacking protection
+.. currentmodule:: django.middleware.clickjacking
 
 .. class:: XFrameOptionsMiddleware
 
@@ -425,14 +421,21 @@ Here are some hints about the ordering of various Django middleware classes:
 
    After ``UpdateCacheMiddleware``: Modifies ``Vary`` header.
 
-#. :class:`~django.middleware.http.ConditionalGetMiddleware`
-
-   Before ``CommonMiddleware``: uses its ``Etag`` header when
-   :setting:`USE_ETAGS` = ``True``.
-
 #. :class:`~django.contrib.sessions.middleware.SessionMiddleware`
 
+   Before any middleware that may raise an an exception to trigger an error
+   view (such as :exc:`~django.core.exceptions.PermissionDenied`) if you're
+   using :setting:`CSRF_USE_SESSIONS`.
+
    After ``UpdateCacheMiddleware``: Modifies ``Vary`` header.
+
+#. :class:`~django.middleware.http.ConditionalGetMiddleware`
+
+   Before any middleware that may change the response (it sets the ``ETag``
+   header).
+
+   After ``GZipMiddleware`` so it won't calculate an ``ETag`` header on gzipped
+   contents.
 
 #. :class:`~django.middleware.locale.LocaleMiddleware`
 
@@ -441,18 +444,25 @@ Here are some hints about the ordering of various Django middleware classes:
 
 #. :class:`~django.middleware.common.CommonMiddleware`
 
-   Before any middleware that may change the response (it calculates ``ETags``).
-
-   After ``GZipMiddleware`` so it won't calculate an ``ETag`` header on gzipped
-   contents.
+   Before any middleware that may change the response (it sets the
+   ``Content-Length`` header). A middleware that appears before
+   ``CommonMiddleware`` and changes the response must reset ``Content-Length``.
 
    Close to the top: it redirects when :setting:`APPEND_SLASH` or
    :setting:`PREPEND_WWW` are set to ``True``.
+
+   After ``SessionMiddleware`` if you're using :setting:`CSRF_USE_SESSIONS`.
 
 #. :class:`~django.middleware.csrf.CsrfViewMiddleware`
 
    Before any view middleware that assumes that CSRF attacks have been dealt
    with.
+
+   Before :class:`~django.contrib.auth.middleware.RemoteUserMiddleware`, or any
+   other authentication middleware that may perform a login, and hence rotate
+   the CSRF token, before calling down the middleware chain.
+
+   After ``SessionMiddleware`` if you're using :setting:`CSRF_USE_SESSIONS`.
 
 #. :class:`~django.contrib.auth.middleware.AuthenticationMiddleware`
 

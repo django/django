@@ -1,7 +1,7 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Bashar Al-Abdulhadi, 2015
+# Bashar Al-Abdulhadi, 2015-2016,2018
 # Bashar Al-Abdulhadi, 2014
 # Eyad Toma <d.eyad.t@gmail.com>, 2013
 # Jannis Leidel <jannis@leidel.info>, 2011
@@ -9,9 +9,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-11-15 11:06+0100\n"
-"PO-Revision-Date: 2015-11-27 21:17+0000\n"
-"Last-Translator: Bashar Al-Abdulhadi\n"
+"POT-Creation-Date: 2019-01-16 20:42+0100\n"
+"PO-Revision-Date: 2019-01-18 00:36+0000\n"
+"Last-Translator: Ramiro Morales\n"
 "Language-Team: Arabic (http://www.transifex.com/django/django/language/ar/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -65,6 +65,12 @@ msgstr "هذا الشهر"
 msgid "This year"
 msgstr "هذه السنة"
 
+msgid "No date"
+msgstr "لا يوجد أي تاريخ"
+
+msgid "Has date"
+msgstr "به تاريخ"
+
 #, python-format
 msgid ""
 "Please enter the correct %(username)s and password for a staff account. Note "
@@ -75,6 +81,22 @@ msgstr ""
 
 msgid "Action:"
 msgstr "إجراء:"
+
+#, python-format
+msgid "Add another %(verbose_name)s"
+msgstr "إضافة سجل %(verbose_name)s آخر"
+
+msgid "Remove"
+msgstr "أزل"
+
+msgid "Addition"
+msgstr "إضافة"
+
+msgid "Change"
+msgstr "عدّل"
+
+msgid "Deletion"
+msgstr "حذف"
 
 msgid "action time"
 msgstr "وقت الإجراء"
@@ -88,6 +110,8 @@ msgstr "نوع المحتوى"
 msgid "object id"
 msgstr "معرف العنصر"
 
+#. Translators: 'repr' means representation
+#. (https://docs.python.org/library/functions.html#repr)
 msgid "object repr"
 msgstr "ممثل العنصر"
 
@@ -118,6 +142,31 @@ msgstr "تم حذف العناصر \"%(object)s.\""
 msgid "LogEntry Object"
 msgstr "كائن LogEntry"
 
+#, python-brace-format
+msgid "Added {name} \"{object}\"."
+msgstr "تم إضافة {name} \"{object}\"."
+
+msgid "Added."
+msgstr "تمت الإضافة."
+
+msgid "and"
+msgstr "و"
+
+#, python-brace-format
+msgid "Changed {fields} for {name} \"{object}\"."
+msgstr "تم تغيير {fields} لـ {name} \"{object}\"."
+
+#, python-brace-format
+msgid "Changed {fields}."
+msgstr "تم تغيير {fields}."
+
+#, python-brace-format
+msgid "Deleted {name} \"{object}\"."
+msgstr "تم حذف {name} \"{object}\"."
+
+msgid "No fields changed."
+msgstr "لم يتم تغيير أية حقول."
+
 msgid "None"
 msgstr "لاشيء"
 
@@ -127,61 +176,38 @@ msgstr ""
 "استمر بالضغط على مفتاح \"Control\", او \"Command\" على أجهزة الماك, لإختيار "
 "أكثر من أختيار واحد."
 
-msgid "Added."
-msgstr "تمت الإضافة."
+#, python-brace-format
+msgid "The {name} \"{obj}\" was added successfully."
+msgstr ""
 
-#, python-format
-msgid "Changed %s."
-msgstr "عدّل %s."
+msgid "You may edit it again below."
+msgstr ""
 
-msgid "and"
-msgstr "و"
-
-#, python-format
-msgid "Added %(name)s \"%(object)s\"."
-msgstr "أضاف %(name)s \"%(object)s\"."
-
-#, python-format
-msgid "Changed %(list)s for %(name)s \"%(object)s\"."
-msgstr "غيّر %(list)s في %(name)s \"%(object)s\"."
-
-#, python-format
-msgid "Deleted %(name)s \"%(object)s\"."
-msgstr "حذف %(name)s \"%(object)s\"."
-
-msgid "No fields changed."
-msgstr "لم يتم تغيير أية حقول."
-
-#, python-format
+#, python-brace-format
 msgid ""
-"The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
-msgstr "تمت إضافة %(name)s \"%(obj)s\" بنجاح، يمكنك تعديله مرة أخرى بالأسفل."
-
-#, python-format
-msgid ""
-"The %(name)s \"%(obj)s\" was added successfully. You may add another "
-"%(name)s below."
-msgstr "تمت إضافة %(name)s \"%(obj)s\" بنجاح، يمكنك إضافة %(name)s أخر أدناه."
-
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was added successfully."
-msgstr "تم اضافة %(name)s \"%(obj)s\" بنجاح."
-
-#, python-format
-msgid ""
-"The %(name)s \"%(obj)s\" was changed successfully. You may edit it again "
+"The {name} \"{obj}\" was added successfully. You may add another {name} "
 "below."
-msgstr "تم تعديل %(name)s \"%(obj)s\" بنجاح، يمكنك تعديله مرة أخرى أدناه."
+msgstr ""
 
-#, python-format
+#, python-brace-format
 msgid ""
-"The %(name)s \"%(obj)s\" was changed successfully. You may add another "
-"%(name)s below."
-msgstr "تم تعديل %(name)s \"%(obj)s\" بنجاح، يمكنك إضافة %(name)s أخر أدناه."
+"The {name} \"{obj}\" was changed successfully. You may edit it again below."
+msgstr ""
 
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was changed successfully."
-msgstr "تم تغيير %(name)s \"%(obj)s\" بنجاح."
+#, python-brace-format
+msgid ""
+"The {name} \"{obj}\" was added successfully. You may edit it again below."
+msgstr ""
+
+#, python-brace-format
+msgid ""
+"The {name} \"{obj}\" was changed successfully. You may add another {name} "
+"below."
+msgstr ""
+
+#, python-brace-format
+msgid "The {name} \"{obj}\" was changed successfully."
+msgstr ""
 
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
@@ -196,8 +222,8 @@ msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "تم حذف %(name)s \"%(obj)s\" بنجاح."
 
 #, python-format
-msgid "%(name)s object with primary key %(key)r does not exist."
-msgstr "العنصر %(name)s الذي به الحقل الأساسي %(key)r غير موجود."
+msgid "%(name)s with ID \"%(key)s\" doesn't exist. Perhaps it was deleted?"
+msgstr ""
 
 #, python-format
 msgid "Add %s"
@@ -206,6 +232,10 @@ msgstr "أضف %s"
 #, python-format
 msgid "Change %s"
 msgstr "عدّل %s"
+
+#, python-format
+msgid "View %s"
+msgstr ""
 
 msgid "Database error"
 msgstr "خطـأ في قاعدة البيانات"
@@ -323,7 +353,7 @@ msgid "Change password"
 msgstr "غيّر كلمة المرور"
 
 msgid "Please correct the error below."
-msgstr "الرجاء تصحيح الخطأ أدناه."
+msgstr ""
 
 msgid "Please correct the errors below."
 msgstr "الرجاء تصحيح الأخطاء أدناه."
@@ -344,18 +374,15 @@ msgstr "الوثائق"
 msgid "Log out"
 msgstr "اخرج"
 
-msgid "Add"
-msgstr "أضف"
+#, python-format
+msgid "Add %(name)s"
+msgstr "أضف %(name)s"
 
 msgid "History"
 msgstr "تاريخ"
 
 msgid "View on site"
 msgstr "مشاهدة على الموقع"
-
-#, python-format
-msgid "Add %(name)s"
-msgstr "أضف %(name)s"
 
 msgid "Filter"
 msgstr "مرشّح"
@@ -435,15 +462,8 @@ msgstr ""
 "أأنت متأكد أنك تريد حذف عناصر %(objects_name)s المحددة؟ جميع العناصر التالية "
 "والعناصر المرتبطة بها سيتم حذفها:"
 
-msgid "Change"
-msgstr "عدّل"
-
-msgid "Remove"
-msgstr "أزل"
-
-#, python-format
-msgid "Add another %(verbose_name)s"
-msgstr "إضافة سجل %(verbose_name)s آخر"
+msgid "View"
+msgstr ""
 
 msgid "Delete?"
 msgstr "احذفه؟"
@@ -459,13 +479,16 @@ msgstr "ملخص"
 msgid "Models in the %(name)s application"
 msgstr "النماذج في تطبيق %(name)s"
 
-msgid "You don't have permission to edit anything."
-msgstr "ليست لديك الصلاحية لتعديل أي شيء."
+msgid "Add"
+msgstr "أضف"
 
-msgid "Recent Actions"
+msgid "You don't have permission to view or edit anything."
+msgstr ""
+
+msgid "Recent actions"
 msgstr "آخر الإجراءات"
 
-msgid "My Actions"
+msgid "My actions"
 msgstr "إجراءاتي"
 
 msgid "None available"
@@ -515,20 +538,8 @@ msgstr "أظهر الكل"
 msgid "Save"
 msgstr "احفظ"
 
-msgid "Popup closing..."
-msgstr "جاري الإغلاق..."
-
-#, python-format
-msgid "Change selected %(model)s"
-msgstr "تغيير %(model)s المختارة"
-
-#, python-format
-msgid "Add another %(model)s"
-msgstr "أضف %(model)s آخر"
-
-#, python-format
-msgid "Delete selected %(model)s"
-msgstr "حذف %(model)s المختارة"
+msgid "Popup closing…"
+msgstr ""
 
 msgid "Search"
 msgstr "ابحث"
@@ -555,6 +566,24 @@ msgstr "احفظ وأضف آخر"
 
 msgid "Save and continue editing"
 msgstr "احفظ واستمر بالتعديل"
+
+msgid "Save and view"
+msgstr ""
+
+msgid "Close"
+msgstr ""
+
+#, python-format
+msgid "Change selected %(model)s"
+msgstr "تغيير %(model)s المختارة"
+
+#, python-format
+msgid "Add another %(model)s"
+msgstr "أضف %(model)s آخر"
+
+#, python-format
+msgid "Delete selected %(model)s"
+msgstr "حذف %(model)s المختارة"
 
 msgid "Thanks for spending some quality time with the Web site today."
 msgstr "شكراً لك على قضائك بعض الوقت مع الموقع اليوم."
@@ -663,6 +692,10 @@ msgstr "اختر %s"
 #, python-format
 msgid "Select %s to change"
 msgstr "اختر %s لتغييره"
+
+#, python-format
+msgid "Select %s to view"
+msgstr ""
 
 msgid "Date:"
 msgstr "التاريخ:"

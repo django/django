@@ -77,12 +77,12 @@ a feed of the latest five news items::
 To connect a URL to this feed, put an instance of the Feed object in
 your :doc:`URLconf </topics/http/urls>`. For example::
 
-    from django.conf.urls import url
+    from django.urls import path
     from myproject.feeds import LatestEntriesFeed
 
     urlpatterns = [
         # ...
-        url(r'^latest/feed/$', LatestEntriesFeed()),
+        path('latest/feed/', LatestEntriesFeed()),
         # ...
     ]
 
@@ -114,7 +114,7 @@ into those elements.
   calling the methods ``item_title()`` and ``item_description()`` on
   the :class:`~django.contrib.syndication.views.Feed` class. They are passed
   a single parameter, ``item``, which is the object itself. These are
-  optional; by default, the unicode representation of the object is used for
+  optional; by default, the string representation of the object is used for
   both.
 
   If you want to do any special formatting for either the title or
@@ -155,7 +155,7 @@ into those elements.
                 return Article.objects.order_by('-pub_date')[:5]
 
             def get_context_data(self, **kwargs):
-                context = super(ArticlesFeed, self).get_context_data(**kwargs)
+                context = super().get_context_data(**kwargs)
                 context['foo'] = 'bar'
                 return context
 
@@ -217,7 +217,7 @@ The police beat feeds could be accessible via URLs like this:
 
 These can be matched with a :doc:`URLconf </topics/http/urls>` line such as::
 
-    url(r'^beats/(?P<beat_id>[0-9]+)/rss/$', BeatFeed()),
+    path('beats/<int:beat_id>/rss/', BeatFeed()),
 
 Like a view, the arguments in the URL are passed to the ``get_object()``
 method along with the request object.
@@ -303,11 +303,6 @@ enclosure per item, the ``item_enclosure_url``, ``item_enclosure_length``, and
 ``item_enclosure_mime_type`` hooks. See the ``ExampleFeed`` class below for
 usage examples.
 
-.. versionchanged:: 1.9
-
-    Support for multiple enclosures per feed item was added through the
-    ``item_enclosures`` hook.
-
 Language
 --------
 
@@ -371,13 +366,13 @@ Here's a full example::
 
 And the accompanying URLconf::
 
-    from django.conf.urls import url
-    from myproject.feeds import RssSiteNewsFeed, AtomSiteNewsFeed
+    from django.urls import path
+    from myproject.feeds import AtomSiteNewsFeed, RssSiteNewsFeed
 
     urlpatterns = [
         # ...
-        url(r'^sitenews/rss/$', RssSiteNewsFeed()),
-        url(r'^sitenews/atom/$', AtomSiteNewsFeed()),
+        path('sitenews/rss/', RssSiteNewsFeed()),
+        path('sitenews/atom/', AtomSiteNewsFeed()),
         # ...
     ]
 
@@ -620,7 +615,7 @@ This example illustrates all possible attributes and methods for a
 
         # ITEM TITLE AND DESCRIPTION -- If title_template or
         # description_template are not defined, these are used instead. Both are
-        # optional, by default they will use the unicode representation of the
+        # optional, by default they will use the string representation of the
         # item.
 
         def item_title(self, item):
@@ -897,7 +892,7 @@ The low-level framework
 
 Behind the scenes, the high-level RSS framework uses a lower-level framework
 for generating feeds' XML. This framework lives in a single module:
-`django/utils/feedgenerator.py`_.
+:source:`django/utils/feedgenerator.py`.
 
 You use this framework on your own, for lower-level feed generation. You can
 also create custom feed generator subclasses for use with the ``feed_type``
@@ -945,9 +940,9 @@ They share this interface:
     Any extra keyword arguments you pass to ``__init__`` will be stored in
     ``self.feed`` for use with `custom feed generators`_.
 
-    All parameters should be Unicode objects, except ``categories``, which
-    should be a sequence of Unicode objects. Beware that some control characters
-    are `not allowed <http://www.w3.org/International/questions/qa-controls>`_
+    All parameters should be strings, except ``categories``, which should be a
+    sequence of strings. Beware that some control characters
+    are `not allowed <https://www.w3.org/International/questions/qa-controls>`_
     in XML documents. If your content has some of them, you might encounter a
     :exc:`ValueError` when producing the feed.
 
@@ -968,7 +963,6 @@ They share this interface:
     * ``pubdate``
     * ``comments``
     * ``unique_id``
-    * ``enclosure``
     * ``enclosures``
     * ``categories``
     * ``item_copyright``
@@ -977,20 +971,13 @@ They share this interface:
 
     Extra keyword arguments will be stored for `custom feed generators`_.
 
-    All parameters, if given, should be Unicode objects, except:
+    All parameters, if given, should be strings, except:
 
     * ``pubdate`` should be a Python  :class:`~datetime.datetime` object.
     * ``updateddate`` should be a Python  :class:`~datetime.datetime` object.
-    * ``enclosure`` should be an instance of
-      :class:`django.utils.feedgenerator.Enclosure`.
     * ``enclosures`` should be a list of
       :class:`django.utils.feedgenerator.Enclosure` instances.
-    * ``categories`` should be a sequence of Unicode objects.
-
-    .. deprecated:: 1.9
-
-        The ``enclosure`` keyword argument is deprecated in favor of the
-        ``enclosures`` keyword argument.
+    * ``categories`` should be a sequence of strings.
 
 :meth:`.SyndicationFeed.write`
     Outputs the feed in the given encoding to outfile, which is a file-like object.
@@ -1019,8 +1006,6 @@ For example, to create an Atom 1.0 feed and print it to standard output::
     ...
     </feed>
 
-.. _django/utils/feedgenerator.py: https://github.com/django/django/blob/master/django/utils/feedgenerator.py
-
 .. currentmodule:: django.contrib.syndication
 
 Custom feed generators
@@ -1042,7 +1027,7 @@ attributes. Thus, you can subclass the appropriate feed generator class
 .. _georss: http://georss.org/
 .. _itunes podcast format: https://www.apple.com/itunes/podcasts/specs.html
 
-``SyndicationFeed.root_attributes(self, )``
+``SyndicationFeed.root_attributes(self)``
     Return a ``dict`` of attributes to add to the root feed element
     (``feed``/``channel``).
 
@@ -1070,12 +1055,12 @@ For example, you might start implementing an iTunes RSS feed generator like so::
 
     class iTunesFeed(Rss201rev2Feed):
         def root_attributes(self):
-            attrs = super(iTunesFeed, self).root_attributes()
+            attrs = super().root_attributes()
             attrs['xmlns:itunes'] = 'http://www.itunes.com/dtds/podcast-1.0.dtd'
             return attrs
 
         def add_root_elements(self, handler):
-            super(iTunesFeed, self).add_root_elements(handler)
+            super().add_root_elements(handler)
             handler.addQuickElement('itunes:explicit', 'clean')
 
 Obviously there's a lot more work to be done for a complete custom feed class,

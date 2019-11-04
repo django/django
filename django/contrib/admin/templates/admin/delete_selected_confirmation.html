@@ -2,6 +2,7 @@
 {% load i18n l10n admin_urls static %}
 
 {% block extrahead %}
+    {{ block.super }}
     {{ media }}
     <script type="text/javascript" src="{% static 'admin/js/cancel.js' %}"></script>
 {% endblock %}
@@ -42,11 +43,11 @@
     <form method="post">{% csrf_token %}
     <div>
     {% for obj in queryset %}
-    <input type="hidden" name="{{ action_checkbox_name }}" value="{{ obj.pk|unlocalize }}" />
+    <input type="hidden" name="{{ action_checkbox_name }}" value="{{ obj.pk|unlocalize }}">
     {% endfor %}
-    <input type="hidden" name="action" value="delete_selected" />
-    <input type="hidden" name="post" value="yes" />
-    <input type="submit" value="{% trans "Yes, I'm sure" %}" />
+    <input type="hidden" name="action" value="delete_selected">
+    <input type="hidden" name="post" value="yes">
+    <input type="submit" value="{% trans "Yes, I'm sure" %}">
     <a href="#" class="button cancel-link">{% trans "No, take me back" %}</a>
     </div>
     </form>

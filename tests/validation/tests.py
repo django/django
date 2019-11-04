@@ -1,18 +1,16 @@
-from __future__ import unicode_literals
-
 from django import forms
 from django.core.exceptions import NON_FIELD_ERRORS
 from django.test import TestCase
 from django.utils.functional import lazy
 
-from . import ValidationTestCase
+from . import ValidationAssertions
 from .models import (
     Article, Author, GenericIPAddressTestModel, GenericIPAddrUnpackUniqueTest,
     ModelToValidate,
 )
 
 
-class BaseModelValidationTests(ValidationTestCase):
+class BaseModelValidationTests(ValidationAssertions, TestCase):
 
     def test_missing_required_field_raises_error(self):
         mtv = ModelToValidate(f_with_custom_validator=42)
@@ -28,12 +26,15 @@ class BaseModelValidationTests(ValidationTestCase):
 
     def test_wrong_FK_value_raises_error(self):
         mtv = ModelToValidate(number=10, name='Some Name', parent_id=3)
-        self.assertFieldFailsValidationWithMessage(mtv.full_clean, 'parent',
-            ['model to validate instance with id %r does not exist.' % mtv.parent_id])
-
+        self.assertFieldFailsValidationWithMessage(
+            mtv.full_clean, 'parent',
+            ['model to validate instance with id %r does not exist.' % mtv.parent_id]
+        )
         mtv = ModelToValidate(number=10, name='Some Name', ufm_id='Some Name')
-        self.assertFieldFailsValidationWithMessage(mtv.full_clean, 'ufm',
-            ["unique fields model instance with unique_charfield %r does not exist." % mtv.name])
+        self.assertFieldFailsValidationWithMessage(
+            mtv.full_clean, 'ufm',
+            ["unique fields model instance with unique_charfield %r does not exist." % mtv.name]
+        )
 
     def test_correct_FK_value_validates(self):
         parent = ModelToValidate.objects.create(number=10, name='Some Name')
@@ -82,8 +83,9 @@ class ArticleForm(forms.ModelForm):
 
 
 class ModelFormsTests(TestCase):
-    def setUp(self):
-        self.author = Author.objects.create(name='Joseph Kocherhans')
+    @classmethod
+    def setUpTestData(cls):
+        cls.author = Author.objects.create(name='Joseph Kocherhans')
 
     def test_partial_validation(self):
         # Make sure the "commit=False and set field values later" idiom still
@@ -110,7 +112,7 @@ class ModelFormsTests(TestCase):
         article = Article(author_id=self.author.id)
         form = ArticleForm(data, instance=article)
         self.assertEqual(list(form.errors), [])
-        self.assertNotEqual(form.instance.pub_date, None)
+        self.assertIsNotNone(form.instance.pub_date)
         article = form.save()
 
     def test_validation_with_invalid_blank_field(self):
@@ -125,7 +127,7 @@ class ModelFormsTests(TestCase):
         self.assertEqual(list(form.errors), ['pub_date'])
 
 
-class GenericIPAddressFieldTests(ValidationTestCase):
+class GenericIPAddressFieldTests(ValidationAssertions, TestCase):
 
     def test_correct_generic_ip_passes(self):
         giptm = GenericIPAddressTestModel(generic_ip="1.2.3.4")

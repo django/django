@@ -1,38 +1,75 @@
-from __future__ import unicode_literals
-
-import collections
+import collections.abc
 from datetime import datetime
+from math import ceil
 from operator import attrgetter
-from unittest import skipUnless
 
 from django.core.exceptions import FieldError
 from django.db import connection
-from django.test import TestCase, TransactionTestCase, skipUnlessDBFeature
+from django.db.models.functions import Substr
+from django.test import TestCase, skipUnlessDBFeature
 
-from .models import Article, Author, Game, MyISAMArticle, Player, Season, Tag
+from .models import (
+    Article, Author, Game, IsNullWithNoneAsRHS, Player, Season, Tag,
+)
 
 
 class LookupTests(TestCase):
 
-    def setUp(self):
+    @classmethod
+    def setUpTestData(cls):
         # Create a few Authors.
-        self.au1 = Author.objects.create(name='Author 1')
-        self.au2 = Author.objects.create(name='Author 2')
-        # Create a couple of Articles.
-        self.a1 = Article.objects.create(headline='Article 1', pub_date=datetime(2005, 7, 26), author=self.au1)
-        self.a2 = Article.objects.create(headline='Article 2', pub_date=datetime(2005, 7, 27), author=self.au1)
-        self.a3 = Article.objects.create(headline='Article 3', pub_date=datetime(2005, 7, 27), author=self.au1)
-        self.a4 = Article.objects.create(headline='Article 4', pub_date=datetime(2005, 7, 28), author=self.au1)
-        self.a5 = Article.objects.create(headline='Article 5', pub_date=datetime(2005, 8, 1, 9, 0), author=self.au2)
-        self.a6 = Article.objects.create(headline='Article 6', pub_date=datetime(2005, 8, 1, 8, 0), author=self.au2)
-        self.a7 = Article.objects.create(headline='Article 7', pub_date=datetime(2005, 7, 27), author=self.au2)
+        cls.au1 = Author.objects.create(name='Author 1', alias='a1')
+        cls.au2 = Author.objects.create(name='Author 2', alias='a2')
+        # Create a few Articles.
+        cls.a1 = Article.objects.create(
+            headline='Article 1',
+            pub_date=datetime(2005, 7, 26),
+            author=cls.au1,
+            slug='a1',
+        )
+        cls.a2 = Article.objects.create(
+            headline='Article 2',
+            pub_date=datetime(2005, 7, 27),
+            author=cls.au1,
+            slug='a2',
+        )
+        cls.a3 = Article.objects.create(
+            headline='Article 3',
+            pub_date=datetime(2005, 7, 27),
+            author=cls.au1,
+            slug='a3',
+        )
+        cls.a4 = Article.objects.create(
+            headline='Article 4',
+            pub_date=datetime(2005, 7, 28),
+            author=cls.au1,
+            slug='a4',
+        )
+        cls.a5 = Article.objects.create(
+            headline='Article 5',
+            pub_date=datetime(2005, 8, 1, 9, 0),
+            author=cls.au2,
+            slug='a5',
+        )
+        cls.a6 = Article.objects.create(
+            headline='Article 6',
+            pub_date=datetime(2005, 8, 1, 8, 0),
+            author=cls.au2,
+            slug='a6',
+        )
+        cls.a7 = Article.objects.create(
+            headline='Article 7',
+            pub_date=datetime(2005, 7, 27),
+            author=cls.au2,
+            slug='a7',
+        )
         # Create a few Tags.
-        self.t1 = Tag.objects.create(name='Tag 1')
-        self.t1.articles.add(self.a1, self.a2, self.a3)
-        self.t2 = Tag.objects.create(name='Tag 2')
-        self.t2.articles.add(self.a3, self.a4, self.a5)
-        self.t3 = Tag.objects.create(name='Tag 3')
-        self.t3.articles.add(self.a5, self.a6, self.a7)
+        cls.t1 = Tag.objects.create(name='Tag 1')
+        cls.t1.articles.add(cls.a1, cls.a2, cls.a3)
+        cls.t2 = Tag.objects.create(name='Tag 2')
+        cls.t2.articles.add(cls.a3, cls.a4, cls.a5)
+        cls.t3 = Tag.objects.create(name='Tag 3')
+        cls.t3.articles.add(cls.a5, cls.a6, cls.a7)
 
     def test_exists(self):
         # We can use .exists() to check that there are some
@@ -66,7 +103,7 @@ class LookupTests(TestCase):
     def test_iterator(self):
         # Each QuerySet gets iterator(), which is a generator that "lazily"
         # returns results using database-level iteration.
-        self.assertIsInstance(Article.objects.iterator(), collections.Iterator)
+        self.assertIsInstance(Article.objects.iterator(), collections.abc.Iterator)
 
         self.assertQuerysetEqual(
             Article.objects.iterator(),
@@ -131,12 +168,34 @@ class LookupTests(TestCase):
         with self.assertRaises(TypeError):
             Article.objects.in_bulk(headline__startswith='Blah')
 
+    def test_in_bulk_lots_of_ids(self):
+        test_range = 2000
+        max_query_params = connection.features.max_query_params
+        expected_num_queries = ceil(test_range / max_query_params) if max_query_params else 1
+        Author.objects.bulk_create([Author() for i in range(test_range - Author.objects.count())])
+        authors = {author.pk: author for author in Author.objects.all()}
+        with self.assertNumQueries(expected_num_queries):
+            self.assertEqual(Author.objects.in_bulk(authors), authors)
+
+    def test_in_bulk_with_field(self):
+        self.assertEqual(
+            Article.objects.in_bulk([self.a1.slug, self.a2.slug, self.a3.slug], field_name='slug'),
+            {
+                self.a1.slug: self.a1,
+                self.a2.slug: self.a2,
+                self.a3.slug: self.a3,
+            }
+        )
+
+    def test_in_bulk_non_unique_field(self):
+        msg = "in_bulk()'s field_name must be a unique field but 'author' isn't."
+        with self.assertRaisesMessage(ValueError, msg):
+            Article.objects.in_bulk([self.au1], field_name='author')
+
     def test_values(self):
         # values() returns a list of dictionaries instead of object instances --
         # and you can specify which fields you want to retrieve.
-        def identity(x):
-            return x
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             Article.objects.values('headline'),
             [
                 {'headline': 'Article 5'},
@@ -147,14 +206,12 @@ class LookupTests(TestCase):
                 {'headline': 'Article 7'},
                 {'headline': 'Article 1'},
             ],
-            transform=identity
         )
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             Article.objects.filter(pub_date__exact=datetime(2005, 7, 27)).values('id'),
             [{'id': self.a2.id}, {'id': self.a3.id}, {'id': self.a7.id}],
-            transform=identity
         )
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             Article.objects.values('id', 'headline'),
             [
                 {'id': self.a5.id, 'headline': 'Article 5'},
@@ -165,12 +222,11 @@ class LookupTests(TestCase):
                 {'id': self.a7.id, 'headline': 'Article 7'},
                 {'id': self.a1.id, 'headline': 'Article 1'},
             ],
-            transform=identity
         )
         # You can use values() with iterator() for memory savings,
         # because iterator() uses database-level iteration.
-        self.assertQuerysetEqual(
-            Article.objects.values('id', 'headline').iterator(),
+        self.assertSequenceEqual(
+            list(Article.objects.values('id', 'headline').iterator()),
             [
                 {'headline': 'Article 5', 'id': self.a5.id},
                 {'headline': 'Article 6', 'id': self.a6.id},
@@ -180,10 +236,9 @@ class LookupTests(TestCase):
                 {'headline': 'Article 7', 'id': self.a7.id},
                 {'headline': 'Article 1', 'id': self.a1.id},
             ],
-            transform=identity
         )
         # The values() method works with "extra" fields specified in extra(select).
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             Article.objects.extra(select={'id_plus_one': 'id + 1'}).values('id', 'id_plus_one'),
             [
                 {'id': self.a5.id, 'id_plus_one': self.a5.id + 1},
@@ -194,7 +249,6 @@ class LookupTests(TestCase):
                 {'id': self.a7.id, 'id_plus_one': self.a7.id + 1},
                 {'id': self.a1.id, 'id_plus_one': self.a1.id + 1},
             ],
-            transform=identity
         )
         data = {
             'id_plus_one': 'id+1',
@@ -206,8 +260,8 @@ class LookupTests(TestCase):
             'id_plus_seven': 'id+7',
             'id_plus_eight': 'id+8',
         }
-        self.assertQuerysetEqual(
-            Article.objects.filter(id=self.a1.id).extra(select=data).values(*data.keys()),
+        self.assertSequenceEqual(
+            Article.objects.filter(id=self.a1.id).extra(select=data).values(*data),
             [{
                 'id_plus_one': self.a1.id + 1,
                 'id_plus_two': self.a1.id + 2,
@@ -217,10 +271,10 @@ class LookupTests(TestCase):
                 'id_plus_six': self.a1.id + 6,
                 'id_plus_seven': self.a1.id + 7,
                 'id_plus_eight': self.a1.id + 8,
-            }], transform=identity
+            }],
         )
         # You can specify fields from forward and reverse relations, just like filter().
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             Article.objects.values('headline', 'author__name'),
             [
                 {'headline': self.a5.headline, 'author__name': self.au2.name},
@@ -230,9 +284,9 @@ class LookupTests(TestCase):
                 {'headline': self.a3.headline, 'author__name': self.au1.name},
                 {'headline': self.a7.headline, 'author__name': self.au2.name},
                 {'headline': self.a1.headline, 'author__name': self.au1.name},
-            ], transform=identity
+            ],
         )
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             Author.objects.values('name', 'article__headline').order_by('name', 'article__headline'),
             [
                 {'name': self.au1.name, 'article__headline': self.a1.headline},
@@ -242,9 +296,9 @@ class LookupTests(TestCase):
                 {'name': self.au2.name, 'article__headline': self.a5.headline},
                 {'name': self.au2.name, 'article__headline': self.a6.headline},
                 {'name': self.au2.name, 'article__headline': self.a7.headline},
-            ], transform=identity
+            ],
         )
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             (
                 Author.objects
                 .values('name', 'article__headline', 'article__tag__name')
@@ -260,23 +314,27 @@ class LookupTests(TestCase):
                 {'name': self.au2.name, 'article__headline': self.a5.headline, 'article__tag__name': self.t3.name},
                 {'name': self.au2.name, 'article__headline': self.a6.headline, 'article__tag__name': self.t3.name},
                 {'name': self.au2.name, 'article__headline': self.a7.headline, 'article__tag__name': self.t3.name},
-            ], transform=identity
+            ],
         )
         # However, an exception FieldDoesNotExist will be thrown if you specify
-        # a non-existent field name in values() (a field that is neither in the
+        # a nonexistent field name in values() (a field that is neither in the
         # model nor in extra(select)).
-        with self.assertRaises(FieldError):
+        msg = (
+            "Cannot resolve keyword 'id_plus_two' into field. Choices are: "
+            "author, author_id, headline, id, id_plus_one, pub_date, slug, tag"
+        )
+        with self.assertRaisesMessage(FieldError, msg):
             Article.objects.extra(select={'id_plus_one': 'id + 1'}).values('id', 'id_plus_two')
         # If you don't specify field names to values(), all are returned.
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             Article.objects.filter(id=self.a5.id).values(),
             [{
                 'id': self.a5.id,
                 'author_id': self.au2.id,
                 'headline': 'Article 5',
-                'pub_date': datetime(2005, 8, 1, 9, 0)
+                'pub_date': datetime(2005, 8, 1, 9, 0),
+                'slug': 'a5',
             }],
-            transform=identity
         )
 
     def test_values_list(self):
@@ -284,9 +342,7 @@ class LookupTests(TestCase):
         # returned as a list of tuples, rather than a list of dictionaries.
         # Within each tuple, the order of the elements is the same as the order
         # of fields in the values_list() call.
-        def identity(x):
-            return x
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             Article.objects.values_list('headline'),
             [
                 ('Article 5',),
@@ -296,24 +352,21 @@ class LookupTests(TestCase):
                 ('Article 3',),
                 ('Article 7',),
                 ('Article 1',),
-            ], transform=identity
+            ],
         )
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             Article.objects.values_list('id').order_by('id'),
             [(self.a1.id,), (self.a2.id,), (self.a3.id,), (self.a4.id,), (self.a5.id,), (self.a6.id,), (self.a7.id,)],
-            transform=identity
         )
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             Article.objects.values_list('id', flat=True).order_by('id'),
             [self.a1.id, self.a2.id, self.a3.id, self.a4.id, self.a5.id, self.a6.id, self.a7.id],
-            transform=identity
         )
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             Article.objects.extra(select={'id_plus_one': 'id+1'}).order_by('id').values_list('id'),
             [(self.a1.id,), (self.a2.id,), (self.a3.id,), (self.a4.id,), (self.a5.id,), (self.a6.id,), (self.a7.id,)],
-            transform=identity
         )
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             Article.objects.extra(select={'id_plus_one': 'id+1'}).order_by('id').values_list('id_plus_one', 'id'),
             [
                 (self.a1.id + 1, self.a1.id),
@@ -324,9 +377,8 @@ class LookupTests(TestCase):
                 (self.a6.id + 1, self.a6.id),
                 (self.a7.id + 1, self.a7.id)
             ],
-            transform=identity
         )
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             Article.objects.extra(select={'id_plus_one': 'id+1'}).order_by('id').values_list('id', 'id_plus_one'),
             [
                 (self.a1.id, self.a1.id + 1),
@@ -337,10 +389,9 @@ class LookupTests(TestCase):
                 (self.a6.id, self.a6.id + 1),
                 (self.a7.id, self.a7.id + 1)
             ],
-            transform=identity
         )
         args = ('name', 'article__headline', 'article__tag__name')
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             Author.objects.values_list(*args).order_by(*args),
             [
                 (self.au1.name, self.a1.headline, self.t1.name),
@@ -352,7 +403,7 @@ class LookupTests(TestCase):
                 (self.au2.name, self.a5.headline, self.t3.name),
                 (self.au2.name, self.a6.headline, self.t3.name),
                 (self.au2.name, self.a7.headline, self.t3.name),
-            ], transform=identity
+            ],
         )
         with self.assertRaises(TypeError):
             Article.objects.values_list('id', 'headline', flat=True)
@@ -423,7 +474,7 @@ class LookupTests(TestCase):
         Article.objects.create(headline='Article with \\ backslash', pub_date=datetime(2005, 11, 22))
         self.assertQuerysetEqual(
             Article.objects.filter(headline__contains='\\'),
-            ['<Article: Article with \ backslash>']
+            [r'<Article: Article with \ backslash>']
         )
 
     def test_exclude(self):
@@ -498,27 +549,57 @@ class LookupTests(TestCase):
             ]
         )
 
+    def test_in_different_database(self):
+        with self.assertRaisesMessage(
+            ValueError,
+            "Subqueries aren't allowed across different databases. Force the "
+            "inner query to be evaluated using `list(inner_query)`."
+        ):
+            list(Article.objects.filter(id__in=Article.objects.using('other').all()))
+
+    def test_in_keeps_value_ordering(self):
+        query = Article.objects.filter(slug__in=['a%d' % i for i in range(1, 8)]).values('pk').query
+        self.assertIn(' IN (a1, a2, a3, a4, a5, a6, a7) ', str(query))
+
     def test_error_messages(self):
         # Programming errors are pointed out with nice error messages
         with self.assertRaisesMessage(
             FieldError,
             "Cannot resolve keyword 'pub_date_year' into field. Choices are: "
-            "author, author_id, headline, id, pub_date, tag"
+            "author, author_id, headline, id, pub_date, slug, tag"
         ):
             Article.objects.filter(pub_date_year='2005').count()
 
+    def test_unsupported_lookups(self):
         with self.assertRaisesMessage(
             FieldError,
             "Unsupported lookup 'starts' for CharField or join on the field "
-            "not permitted."
+            "not permitted, perhaps you meant startswith or istartswith?"
         ):
             Article.objects.filter(headline__starts='Article')
+
+        with self.assertRaisesMessage(
+            FieldError,
+            "Unsupported lookup 'is_null' for DateTimeField or join on the field "
+            "not permitted, perhaps you meant isnull?"
+        ):
+            Article.objects.filter(pub_date__is_null=True)
+
+        with self.assertRaisesMessage(
+            FieldError,
+            "Unsupported lookup 'gobbledygook' for DateTimeField or join on the field "
+            "not permitted."
+        ):
+            Article.objects.filter(pub_date__gobbledygook='blahblah')
 
     def test_relation_nested_lookup_error(self):
         # An invalid nested lookup on a related field raises a useful error.
         msg = 'Related Field got invalid lookup: editor'
         with self.assertRaisesMessage(FieldError, msg):
             Article.objects.filter(author__editor__name='James')
+        msg = 'Related Field got invalid lookup: foo'
+        with self.assertRaisesMessage(FieldError, msg):
+            Tag.objects.filter(articles__foo='bar')
 
     def test_regex(self):
         # Create some articles with a bit more interesting headlines for testing field lookups:
@@ -656,45 +737,47 @@ class LookupTests(TestCase):
 
     def test_regex_null(self):
         """
-        Ensure that a regex lookup does not fail on null/None values
+        A regex lookup does not fail on null/None values
         """
         Season.objects.create(year=2012, gt=None)
         self.assertQuerysetEqual(Season.objects.filter(gt__regex=r'^$'), [])
 
     def test_regex_non_string(self):
         """
-        Ensure that a regex lookup does not fail on non-string fields
+        A regex lookup does not fail on non-string fields
         """
         Season.objects.create(year=2013, gt=444)
         self.assertQuerysetEqual(Season.objects.filter(gt__regex=r'^444$'), ['<Season: 2013>'])
 
     def test_regex_non_ascii(self):
         """
-        Ensure that a regex lookup does not trip on non-ASCII characters.
+        A regex lookup does not trip on non-ASCII characters.
         """
         Player.objects.create(name='\u2660')
         Player.objects.get(name__regex='\u2660')
 
     def test_nonfield_lookups(self):
         """
-        Ensure that a lookup query containing non-fields raises the proper
-        exception.
+        A lookup query containing non-fields raises the proper exception.
         """
-        with self.assertRaises(FieldError):
+        msg = "Unsupported lookup 'blahblah' for CharField or join on the field not permitted."
+        with self.assertRaisesMessage(FieldError, msg):
             Article.objects.filter(headline__blahblah=99)
-        with self.assertRaises(FieldError):
+        with self.assertRaisesMessage(FieldError, msg):
             Article.objects.filter(headline__blahblah__exact=99)
-        with self.assertRaises(FieldError):
+        msg = (
+            "Cannot resolve keyword 'blahblah' into field. Choices are: "
+            "author, author_id, headline, id, pub_date, slug, tag"
+        )
+        with self.assertRaisesMessage(FieldError, msg):
             Article.objects.filter(blahblah=99)
 
     def test_lookup_collision(self):
         """
-        Ensure that genuine field names don't collide with built-in lookup
-        types ('year', 'gt', 'range', 'in' etc.).
-        Refs #11670.
+        Genuine field names don't collide with built-in lookup types
+        ('year', 'gt', 'range', 'in' etc.) (#11670).
         """
-
-        # Here we're using 'gt' as a code number for the year, e.g. 111=>2009.
+        # 'gt' is used as a code number for the year, e.g. 111=>2009.
         season_2009 = Season.objects.create(year=2009, gt=111)
         season_2009.games.create(home="Houston Astros", away="St. Louis Cardinals")
         season_2010 = Season.objects.create(year=2010, gt=222)
@@ -780,26 +863,65 @@ class LookupTests(TestCase):
             ordered=False
         )
 
+    def test_exact_none_transform(self):
+        """Transforms are used for __exact=None."""
+        Season.objects.create(year=1, nulled_text_field='not null')
+        self.assertFalse(Season.objects.filter(nulled_text_field__isnull=True))
+        self.assertTrue(Season.objects.filter(nulled_text_field__nulled__isnull=True))
+        self.assertTrue(Season.objects.filter(nulled_text_field__nulled__exact=None))
+        self.assertTrue(Season.objects.filter(nulled_text_field__nulled=None))
 
-class LookupTransactionTests(TransactionTestCase):
-    available_apps = ['lookup']
+    def test_exact_sliced_queryset_limit_one(self):
+        self.assertCountEqual(
+            Article.objects.filter(author=Author.objects.all()[:1]),
+            [self.a1, self.a2, self.a3, self.a4]
+        )
 
-    @skipUnless(connection.vendor == 'mysql', 'requires MySQL')
-    def test_mysql_lookup_search(self):
-        # To use fulltext indexes on MySQL either version 5.6 is needed, or one must use
-        # MyISAM tables. Neither of these combinations is currently available on CI, so
-        # lets manually create a MyISAM table for Article model.
-        with connection.cursor() as cursor:
-            cursor.execute(
-                "CREATE TEMPORARY TABLE myisam_article ("
-                "    id INTEGER PRIMARY KEY AUTO_INCREMENT, "
-                "    headline VARCHAR(100) NOT NULL "
-                ") ENGINE MYISAM")
-            dr = MyISAMArticle.objects.create(headline='Django Reinhardt')
-            MyISAMArticle.objects.create(headline='Ringo Star')
-            # NOTE: Needs to be created after the article has been saved.
-            cursor.execute(
-                'CREATE FULLTEXT INDEX myisam_article_ft ON myisam_article (headline)')
-            self.assertQuerysetEqual(
-                MyISAMArticle.objects.filter(headline__search='Reinhardt'),
-                [dr], lambda x: x)
+    def test_exact_sliced_queryset_limit_one_offset(self):
+        self.assertCountEqual(
+            Article.objects.filter(author=Author.objects.all()[1:2]),
+            [self.a5, self.a6, self.a7]
+        )
+
+    def test_exact_sliced_queryset_not_limited_to_one(self):
+        msg = (
+            'The QuerySet value for an exact lookup must be limited to one '
+            'result using slicing.'
+        )
+        with self.assertRaisesMessage(ValueError, msg):
+            list(Article.objects.filter(author=Author.objects.all()[:2]))
+        with self.assertRaisesMessage(ValueError, msg):
+            list(Article.objects.filter(author=Author.objects.all()[1:]))
+
+    def test_custom_field_none_rhs(self):
+        """
+        __exact=value is transformed to __isnull=True if Field.get_prep_value()
+        converts value to None.
+        """
+        season = Season.objects.create(year=2012, nulled_text_field=None)
+        self.assertTrue(Season.objects.filter(pk=season.pk, nulled_text_field__isnull=True))
+        self.assertTrue(Season.objects.filter(pk=season.pk, nulled_text_field=''))
+
+    def test_pattern_lookups_with_substr(self):
+        a = Author.objects.create(name='John Smith', alias='Johx')
+        b = Author.objects.create(name='Rhonda Simpson', alias='sonx')
+        tests = (
+            ('startswith', [a]),
+            ('istartswith', [a]),
+            ('contains', [a, b]),
+            ('icontains', [a, b]),
+            ('endswith', [b]),
+            ('iendswith', [b]),
+        )
+        for lookup, result in tests:
+            with self.subTest(lookup=lookup):
+                authors = Author.objects.filter(**{'name__%s' % lookup: Substr('alias', 1, 3)})
+                self.assertCountEqual(authors, result)
+
+    def test_custom_lookup_none_rhs(self):
+        """Lookup.can_use_none_as_rhs=True allows None as a lookup value."""
+        season = Season.objects.create(year=2012, nulled_text_field=None)
+        query = Season.objects.get_queryset().query
+        field = query.model._meta.get_field('nulled_text_field')
+        self.assertIsInstance(query.build_lookup(['isnull_none_rhs'], field, None), IsNullWithNoneAsRHS)
+        self.assertTrue(Season.objects.filter(pk=season.pk, nulled_text_field__isnull_none_rhs=True))

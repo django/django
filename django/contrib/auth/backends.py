@@ -1,26 +1,38 @@
-from __future__ import unicode_literals
+import inspect
+import warnings
 
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Permission
+from django.utils.deprecation import RemovedInDjango31Warning
+
+UserModel = get_user_model()
 
 
-class ModelBackend(object):
+class ModelBackend:
     """
     Authenticates against settings.AUTH_USER_MODEL.
     """
 
-    def authenticate(self, username=None, password=None, **kwargs):
-        UserModel = get_user_model()
+    def authenticate(self, request, username=None, password=None, **kwargs):
         if username is None:
             username = kwargs.get(UserModel.USERNAME_FIELD)
         try:
             user = UserModel._default_manager.get_by_natural_key(username)
-            if user.check_password(password):
-                return user
         except UserModel.DoesNotExist:
             # Run the default password hasher once to reduce the timing
-            # difference between an existing and a non-existing user (#20760).
+            # difference between an existing and a nonexistent user (#20760).
             UserModel().set_password(password)
+        else:
+            if user.check_password(password) and self.user_can_authenticate(user):
+                return user
+
+    def user_can_authenticate(self, user):
+        """
+        Reject users with is_active=False. Custom user models that don't have
+        that attribute are allowed.
+        """
+        is_active = getattr(user, 'is_active', None)
+        return is_active or is_active is None
 
     def _get_user_permissions(self, user_obj):
         return user_obj.user_permissions.all()
@@ -32,11 +44,11 @@ class ModelBackend(object):
 
     def _get_permissions(self, user_obj, obj, from_name):
         """
-        Returns the permissions of `user_obj` from `from_name`. `from_name` can
+        Return the permissions of `user_obj` from `from_name`. `from_name` can
         be either "group" or "user" to return permissions from
         `_get_group_permissions` or `_get_user_permissions` respectively.
         """
-        if not user_obj.is_active or user_obj.is_anonymous() or obj is not None:
+        if not user_obj.is_active or user_obj.is_anonymous or obj is not None:
             return set()
 
         perm_cache_name = '_%s_perm_cache' % from_name
@@ -46,53 +58,56 @@ class ModelBackend(object):
             else:
                 perms = getattr(self, '_get_%s_permissions' % from_name)(user_obj)
             perms = perms.values_list('content_type__app_label', 'codename').order_by()
-            setattr(user_obj, perm_cache_name, set("%s.%s" % (ct, name) for ct, name in perms))
+            setattr(user_obj, perm_cache_name, {"%s.%s" % (ct, name) for ct, name in perms})
         return getattr(user_obj, perm_cache_name)
 
     def get_user_permissions(self, user_obj, obj=None):
         """
-        Returns a set of permission strings the user `user_obj` has from their
+        Return a set of permission strings the user `user_obj` has from their
         `user_permissions`.
         """
         return self._get_permissions(user_obj, obj, 'user')
 
     def get_group_permissions(self, user_obj, obj=None):
         """
-        Returns a set of permission strings the user `user_obj` has from the
+        Return a set of permission strings the user `user_obj` has from the
         groups they belong.
         """
         return self._get_permissions(user_obj, obj, 'group')
 
     def get_all_permissions(self, user_obj, obj=None):
-        if not user_obj.is_active or user_obj.is_anonymous() or obj is not None:
+        if not user_obj.is_active or user_obj.is_anonymous or obj is not None:
             return set()
         if not hasattr(user_obj, '_perm_cache'):
-            user_obj._perm_cache = self.get_user_permissions(user_obj)
-            user_obj._perm_cache.update(self.get_group_permissions(user_obj))
+            user_obj._perm_cache = {
+                *self.get_user_permissions(user_obj),
+                *self.get_group_permissions(user_obj),
+            }
         return user_obj._perm_cache
 
     def has_perm(self, user_obj, perm, obj=None):
-        if not user_obj.is_active:
-            return False
-        return perm in self.get_all_permissions(user_obj, obj)
+        return user_obj.is_active and perm in self.get_all_permissions(user_obj, obj)
 
     def has_module_perms(self, user_obj, app_label):
         """
-        Returns True if user_obj has any permissions in the given app_label.
+        Return True if user_obj has any permissions in the given app_label.
         """
-        if not user_obj.is_active:
-            return False
-        for perm in self.get_all_permissions(user_obj):
-            if perm[:perm.index('.')] == app_label:
-                return True
-        return False
+        return user_obj.is_active and any(
+            perm[:perm.index('.')] == app_label
+            for perm in self.get_all_permissions(user_obj)
+        )
 
     def get_user(self, user_id):
-        UserModel = get_user_model()
         try:
-            return UserModel._default_manager.get(pk=user_id)
+            user = UserModel._default_manager.get(pk=user_id)
         except UserModel.DoesNotExist:
             return None
+        return user if self.user_can_authenticate(user) else None
+
+
+class AllowAllUsersModelBackend(ModelBackend):
+    def user_can_authenticate(self, user):
+        return True
 
 
 class RemoteUserBackend(ModelBackend):
@@ -110,21 +125,19 @@ class RemoteUserBackend(ModelBackend):
     # Create a User object if not already in the database?
     create_unknown_user = True
 
-    def authenticate(self, remote_user):
+    def authenticate(self, request, remote_user):
         """
-        The username passed as ``remote_user`` is considered trusted.  This
-        method simply returns the ``User`` object with the given username,
-        creating a new ``User`` object if ``create_unknown_user`` is ``True``.
+        The username passed as ``remote_user`` is considered trusted. Return
+        the ``User`` object with the given username. Create a new ``User``
+        object if ``create_unknown_user`` is ``True``.
 
-        Returns None if ``create_unknown_user`` is ``False`` and a ``User``
+        Return None if ``create_unknown_user`` is ``False`` and a ``User``
         object with the given username is not found in the database.
         """
         if not remote_user:
             return
         user = None
         username = self.clean_username(remote_user)
-
-        UserModel = get_user_model()
 
         # Note that this could be accomplished in one try-except clause, but
         # instead we use get_or_create when creating unknown users since it has
@@ -134,27 +147,42 @@ class RemoteUserBackend(ModelBackend):
                 UserModel.USERNAME_FIELD: username
             })
             if created:
-                user = self.configure_user(user)
+                args = (request, user)
+                try:
+                    inspect.getcallargs(self.configure_user, request, user)
+                except TypeError:
+                    args = (user,)
+                    warnings.warn(
+                        'Update %s.configure_user() to accept `request` as '
+                        'the first argument.'
+                        % self.__class__.__name__, RemovedInDjango31Warning
+                    )
+                user = self.configure_user(*args)
         else:
             try:
                 user = UserModel._default_manager.get_by_natural_key(username)
             except UserModel.DoesNotExist:
                 pass
-        return user
+        return user if self.user_can_authenticate(user) else None
 
     def clean_username(self, username):
         """
-        Performs any cleaning on the "username" prior to using it to get or
-        create the user object.  Returns the cleaned username.
+        Perform any cleaning on the "username" prior to using it to get or
+        create the user object.  Return the cleaned username.
 
-        By default, returns the username unchanged.
+        By default, return the username unchanged.
         """
         return username
 
-    def configure_user(self, user):
+    def configure_user(self, request, user):
         """
-        Configures a user after creation and returns the updated user.
+        Configure a user after creation and return the updated user.
 
-        By default, returns the user unmodified.
+        By default, return the user unmodified.
         """
         return user
+
+
+class AllowAllUsersRemoteUserBackend(RemoteUserBackend):
+    def user_can_authenticate(self, user):
+        return True

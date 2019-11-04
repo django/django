@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 from django.apps import apps
 from django.contrib.gis.db.models.fields import GeometryField
 from django.contrib.gis.db.models.functions import AsKML, Transform
@@ -13,8 +11,7 @@ def kml(request, label, model, field_name=None, compress=False, using=DEFAULT_DB
     """
     This view generates KML for the given app label, model, and field name.
 
-    The model's default manager must be GeoManager, and the field name
-    must be that of a geographic field.
+    The field name must be that of a geographic field.
     """
     placemarks = []
     try:
@@ -59,6 +56,6 @@ def kml(request, label, model, field_name=None, compress=False, using=DEFAULT_DB
 
 def kmz(request, label, model, field_name=None, using=DEFAULT_DB_ALIAS):
     """
-    This view returns KMZ for the given app label, model, and field name.
+    Return KMZ for the given app label, model, and field name.
     """
     return kml(request, label, model, field_name, compress=True, using=using)

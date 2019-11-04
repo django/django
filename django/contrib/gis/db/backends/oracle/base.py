@@ -1,5 +1,6 @@
-from django.db.backends.oracle.base import \
-    DatabaseWrapper as OracleDatabaseWrapper
+from django.db.backends.oracle.base import (
+    DatabaseWrapper as OracleDatabaseWrapper,
+)
 
 from .features import DatabaseFeatures
 from .introspection import OracleIntrospection
@@ -9,9 +10,7 @@ from .schema import OracleGISSchemaEditor
 
 class DatabaseWrapper(OracleDatabaseWrapper):
     SchemaEditorClass = OracleGISSchemaEditor
-
-    def __init__(self, *args, **kwargs):
-        super(DatabaseWrapper, self).__init__(*args, **kwargs)
-        self.features = DatabaseFeatures(self)
-        self.ops = OracleOperations(self)
-        self.introspection = OracleIntrospection(self)
+    # Classes instantiated in __init__().
+    features_class = DatabaseFeatures
+    introspection_class = OracleIntrospection
+    ops_class = OracleOperations

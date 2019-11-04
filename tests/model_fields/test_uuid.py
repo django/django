@@ -37,34 +37,54 @@ class TestSaveLoad(TestCase):
     def test_null_handling(self):
         NullableUUIDModel.objects.create(field=None)
         loaded = NullableUUIDModel.objects.get()
-        self.assertEqual(loaded.field, None)
+        self.assertIsNone(loaded.field)
 
     def test_pk_validated(self):
-        with self.assertRaisesMessage(TypeError, 'is not a valid UUID'):
+        with self.assertRaisesMessage(exceptions.ValidationError, 'is not a valid UUID'):
             PrimaryKeyUUIDModel.objects.get(pk={})
 
-        with self.assertRaisesMessage(TypeError, 'is not a valid UUID'):
+        with self.assertRaisesMessage(exceptions.ValidationError, 'is not a valid UUID'):
             PrimaryKeyUUIDModel.objects.get(pk=[])
 
     def test_wrong_value(self):
-        with self.assertRaisesMessage(ValueError, 'badly formed hexadecimal UUID string'):
+        with self.assertRaisesMessage(exceptions.ValidationError, 'is not a valid UUID'):
             UUIDModel.objects.get(field='not-a-uuid')
 
-        with self.assertRaisesMessage(ValueError, 'badly formed hexadecimal UUID string'):
+        with self.assertRaisesMessage(exceptions.ValidationError, 'is not a valid UUID'):
             UUIDModel.objects.create(field='not-a-uuid')
 
 
-class TestMigrations(SimpleTestCase):
+class TestMethods(SimpleTestCase):
 
     def test_deconstruct(self):
         field = models.UUIDField()
         name, path, args, kwargs = field.deconstruct()
         self.assertEqual(kwargs, {})
 
+    def test_to_python(self):
+        self.assertIsNone(models.UUIDField().to_python(None))
+
+    def test_to_python_int_values(self):
+        self.assertEqual(
+            models.UUIDField().to_python(0),
+            uuid.UUID('00000000-0000-0000-0000-000000000000')
+        )
+        # Works for integers less than 128 bits.
+        self.assertEqual(
+            models.UUIDField().to_python((2 ** 128) - 1),
+            uuid.UUID('ffffffff-ffff-ffff-ffff-ffffffffffff')
+        )
+
+    def test_to_python_int_too_large(self):
+        # Fails for integers larger than 128 bits.
+        with self.assertRaises(exceptions.ValidationError):
+            models.UUIDField().to_python(2 ** 128)
+
 
 class TestQuerying(TestCase):
-    def setUp(self):
-        self.objs = [
+    @classmethod
+    def setUpTestData(cls):
+        cls.objs = [
             NullableUUIDModel.objects.create(field=uuid.uuid4()),
             NullableUUIDModel.objects.create(field='550e8400e29b41d4a716446655440000'),
             NullableUUIDModel.objects.create(field=None),
@@ -88,6 +108,10 @@ class TestSerialization(SimpleTestCase):
         '[{"fields": {"field": "550e8400-e29b-41d4-a716-446655440000"}, '
         '"model": "model_fields.uuidmodel", "pk": null}]'
     )
+    nullable_test_data = (
+        '[{"fields": {"field": null}, '
+        '"model": "model_fields.nullableuuidmodel", "pk": null}]'
+    )
 
     def test_dumping(self):
         instance = UUIDModel(field=uuid.UUID('550e8400e29b41d4a716446655440000'))
@@ -97,6 +121,10 @@ class TestSerialization(SimpleTestCase):
     def test_loading(self):
         instance = list(serializers.deserialize('json', self.test_data))[0].object
         self.assertEqual(instance.field, uuid.UUID('550e8400-e29b-41d4-a716-446655440000'))
+
+    def test_nullable_loading(self):
+        instance = list(serializers.deserialize('json', self.nullable_test_data))[0].object
+        self.assertIsNone(instance.field)
 
 
 class TestValidation(SimpleTestCase):
@@ -128,7 +156,7 @@ class TestAsPrimaryKey(TestCase):
         u1 = PrimaryKeyUUIDModel()
         u2 = PrimaryKeyUUIDModel(id=None)
         PrimaryKeyUUIDModel.objects.bulk_create([u1, u2])
-        # Check that the two objects were correctly created.
+        # The two objects were correctly created.
         u1_found = PrimaryKeyUUIDModel.objects.filter(id=u1.id).exists()
         u2_found = PrimaryKeyUUIDModel.objects.exclude(id=u1.id).exists()
         self.assertTrue(u1_found)
@@ -159,8 +187,12 @@ class TestAsPrimaryKey(TestCase):
         self.assertEqual(r.uuid_fk, u2)
 
     def test_two_level_foreign_keys(self):
+        gc = UUIDGrandchild()
         # exercises ForeignKey.get_db_prep_value()
-        UUIDGrandchild().save()
+        gc.save()
+        self.assertIsInstance(gc.uuidchild_ptr_id, uuid.UUID)
+        gc.refresh_from_db()
+        self.assertIsInstance(gc.uuidchild_ptr_id, uuid.UUID)
 
 
 class TestAsPrimaryKeyTransactionTests(TransactionTestCase):

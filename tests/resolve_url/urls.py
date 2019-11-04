@@ -1,6 +1,10 @@
-from django.conf.urls import url
-from django.contrib.auth import views
+from django.urls import path
+
+
+def some_view(request):
+    pass
+
 
 urlpatterns = [
-    url(r'^accounts/logout/$', views.logout, name='logout'),
+    path('some-url/', some_view, name='some-view'),
 ]

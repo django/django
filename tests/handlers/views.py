@@ -1,4 +1,4 @@
-from __future__ import unicode_literals
+from http import HTTPStatus
 
 from django.core.exceptions import SuspiciousOperation
 from django.db import connection, transaction
@@ -8,6 +8,15 @@ from django.views.decorators.csrf import csrf_exempt
 
 def regular(request):
     return HttpResponse(b"regular content")
+
+
+def no_response(request):
+    pass
+
+
+class NoResponse:
+    def __call__(self, request):
+        pass
 
 
 def streaming(request):
@@ -31,3 +40,7 @@ def suspicious(request):
 def malformed_post(request):
     request.POST
     return HttpResponse()
+
+
+def httpstatus_enum(request):
+    return HttpResponse(status=HTTPStatus.OK)

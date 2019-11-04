@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 from django.contrib import admin
 from django.contrib.auth.models import User as AuthUser
 from django.contrib.contenttypes.models import ContentType
@@ -13,9 +11,9 @@ from django.urls import reverse
 from .admin import admin as force_admin_model_registration  # NOQA
 from .models import (
     Abstract, BaseUser, Bug, Country, Improvement, Issue, LowerStatusPerson,
-    MyPerson, MyPersonProxy, OtherPerson, Person, ProxyBug, ProxyImprovement,
-    ProxyProxyBug, ProxyTrackerUser, State, StateProxy, StatusPerson,
-    TrackerUser, User, UserProxy, UserProxyProxy,
+    MultiUserProxy, MyPerson, MyPersonProxy, OtherPerson, Person, ProxyBug,
+    ProxyImprovement, ProxyProxyBug, ProxyTrackerUser, State, StateProxy,
+    StatusPerson, TrackerUser, User, UserProxy, UserProxyProxy,
 )
 
 
@@ -105,37 +103,26 @@ class ProxyModelTests(TestCase):
         with self.assertRaises(Person.MultipleObjectsReturned):
             StatusPerson.objects.get(id__lt=max_id + 1)
 
-    def test_abc(self):
-        """
-        All base classes must be non-abstract
-        """
-        def build_abc():
+    def test_abstract_base_with_model_fields(self):
+        msg = "Abstract base class containing model fields not permitted for proxy model 'NoAbstract'."
+        with self.assertRaisesMessage(TypeError, msg):
             class NoAbstract(Abstract):
                 class Meta:
                     proxy = True
-        with self.assertRaises(TypeError):
-            build_abc()
 
-    @isolate_apps('proxy_models')
-    def test_no_cbc(self):
-        """
-        The proxy must actually have one concrete base class
-        """
-        def build_no_cbc():
-            class TooManyBases(Person, Abstract):
+    def test_too_many_concrete_classes(self):
+        msg = "Proxy model 'TooManyBases' has more than one non-abstract model base class."
+        with self.assertRaisesMessage(TypeError, msg):
+            class TooManyBases(User, Person):
                 class Meta:
                     proxy = True
-        with self.assertRaises(TypeError):
-            build_no_cbc()
 
-    @isolate_apps('proxy_models')
     def test_no_base_classes(self):
-        def build_no_base_classes():
+        msg = "Proxy model 'NoBaseClasses' has no non-abstract model base class."
+        with self.assertRaisesMessage(TypeError, msg):
             class NoBaseClasses(models.Model):
                 class Meta:
                     proxy = True
-        with self.assertRaises(TypeError):
-            build_no_base_classes()
 
     @isolate_apps('proxy_models')
     def test_new_fields(self):
@@ -149,8 +136,6 @@ class ProxyModelTests(TestCase):
         expected = [
             checks.Error(
                 "Proxy model 'NoNewFields' contains model fields.",
-                hint=None,
-                obj=None,
                 id='models.E017',
             )
         ]
@@ -201,10 +186,7 @@ class ProxyModelTests(TestCase):
 
     def test_permissions_created(self):
         from django.contrib.auth.models import Permission
-        try:
-            Permission.objects.get(name="May display users information")
-        except Permission.DoesNotExist:
-            self.fail("The permission 'May display users information' has not been created")
+        Permission.objects.get(name="May display users information")
 
     def test_proxy_model_signals(self):
         """
@@ -259,7 +241,7 @@ class ProxyModelTests(TestCase):
         ctype = ContentType.objects.get_for_model
         self.assertIs(ctype(Person), ctype(OtherPerson))
 
-    def test_user_userproxy_userproxyproxy(self):
+    def test_user_proxy_models(self):
         User.objects.create(name='Bruce')
 
         resp = [u.name for u in User.objects.all()]
@@ -270,6 +252,8 @@ class ProxyModelTests(TestCase):
 
         resp = [u.name for u in UserProxyProxy.objects.all()]
         self.assertEqual(resp, ['Bruce'])
+
+        self.assertEqual([u.name for u in MultiUserProxy.objects.all()], ['Bruce'])
 
     def test_proxy_for_model(self):
         self.assertEqual(UserProxy, UserProxyProxy._meta.proxy_for_model)
@@ -292,6 +276,13 @@ class ProxyModelTests(TestCase):
         resp = [u.name for u in UserProxy.objects.all()]
         self.assertEqual(resp, ['Bruce'])
 
+    def test_proxy_update(self):
+        user = User.objects.create(name='Bruce')
+        with self.assertNumQueries(1):
+            UserProxy.objects.filter(id=user.id).update(name='George')
+        user.refresh_from_db()
+        self.assertEqual(user.name, 'George')
+
     def test_select_related(self):
         """
         We can still use `select_related()` to include related models in our
@@ -306,8 +297,7 @@ class ProxyModelTests(TestCase):
         resp = [s.name for s in StateProxy.objects.select_related()]
         self.assertEqual(resp, ['New South Wales'])
 
-        self.assertEqual(StateProxy.objects.get(name='New South Wales').name,
-            'New South Wales')
+        self.assertEqual(StateProxy.objects.get(name='New South Wales').name, 'New South Wales')
 
         resp = StateProxy.objects.select_related().get(name='New South Wales')
         self.assertEqual(resp.name, 'New South Wales')
@@ -318,26 +308,19 @@ class ProxyModelTests(TestCase):
         issue = Issue.objects.create(assignee=tu)
         self.assertEqual(tu.issues.get(), issue)
         self.assertEqual(ptu.issues.get(), issue)
-        self.assertQuerysetEqual(
-            TrackerUser.objects.filter(issues=issue),
-            [tu], lambda x: x
-        )
-        self.assertQuerysetEqual(
-            ProxyTrackerUser.objects.filter(issues=issue),
-            [ptu], lambda x: x
-        )
+        self.assertSequenceEqual(TrackerUser.objects.filter(issues=issue), [tu])
+        self.assertSequenceEqual(ProxyTrackerUser.objects.filter(issues=issue), [ptu])
 
     def test_proxy_bug(self):
-        contributor = ProxyTrackerUser.objects.create(name='Contributor',
-            status='contrib')
+        contributor = ProxyTrackerUser.objects.create(name='Contributor', status='contrib')
         someone = BaseUser.objects.create(name='Someone')
-        Bug.objects.create(summary='fix this', version='1.1beta',
-            assignee=contributor, reporter=someone)
-        pcontributor = ProxyTrackerUser.objects.create(name='OtherContributor',
-            status='proxy')
-        Improvement.objects.create(summary='improve that', version='1.1beta',
+        Bug.objects.create(summary='fix this', version='1.1beta', assignee=contributor, reporter=someone)
+        pcontributor = ProxyTrackerUser.objects.create(name='OtherContributor', status='proxy')
+        Improvement.objects.create(
+            summary='improve that', version='1.1beta',
             assignee=contributor, reporter=pcontributor,
-            associated_bug=ProxyProxyBug.objects.all()[0])
+            associated_bug=ProxyProxyBug.objects.all()[0],
+        )
 
         # Related field filter on proxy
         resp = ProxyBug.objects.get(version__icontains='beta')
@@ -397,7 +380,7 @@ class ProxyModelAdminTests(TestCase):
         tracker_user = TrackerUser.objects.all()[0]
         base_user = BaseUser.objects.all()[0]
         issue = Issue.objects.all()[0]
-        with self.assertNumQueries(7):
+        with self.assertNumQueries(6):
             collector = admin.utils.NestedObjects('default')
             collector.collect(ProxyTrackerUser.objects.all())
         self.assertIn(tracker_user, collector.edges.get(None, ()))

@@ -4,28 +4,34 @@
 # Oleksandr Chernihov <o.chernihov@gmail.com>, 2014
 # Andriy Sokolovskiy <me@asokolovskiy.com>, 2015
 # Boryslav Larin <brabadu@gmail.com>, 2011
-# Igor Melnyk, 2014
+# Денис Подлесный <haos616@gmail.com>, 2016
+# Igor Melnyk, 2014,2017
+# Ivan Dmytrenko <dmitrenko.ivan@gmail.com>, 2019
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Kirill Gagarski <gagarin.gtn@gmail.com>, 2015
 # Max V. Stotsky <transifex@ms.pereslavl.ru>, 2014
 # Mikhail Kolesnik <mike@openbunker.org>, 2015
 # Mykola Zamkovoi <nickzam@gmail.com>, 2014
 # Sergiy Kuzmenko <s.kuzmenko@gmail.com>, 2011
+# tarasyyyk <taras.korzhak96@gmail.com>, 2018
+# Zoriana Zaiats, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-11-15 11:06+0100\n"
-"PO-Revision-Date: 2015-12-01 21:41+0000\n"
-"Last-Translator: Mikhail Kolesnik <mike@openbunker.org>\n"
+"POT-Creation-Date: 2019-01-16 20:42+0100\n"
+"PO-Revision-Date: 2019-02-18 21:37+0000\n"
+"Last-Translator: Ivan Dmytrenko <dmitrenko.ivan@gmail.com>\n"
 "Language-Team: Ukrainian (http://www.transifex.com/django/django/language/"
 "uk/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: uk\n"
-"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
-"%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"Plural-Forms: nplurals=4; plural=(n % 1 == 0 && n % 10 == 1 && n % 100 != "
+"11 ? 0 : n % 1 == 0 && n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 12 || n % "
+"100 > 14) ? 1 : n % 1 == 0 && (n % 10 ==0 || (n % 10 >=5 && n % 10 <=9) || "
+"(n % 100 >=11 && n % 100 <=14 )) ? 2: 3);\n"
 
 #, python-format
 msgid "Successfully deleted %(count)d %(items)s."
@@ -72,6 +78,12 @@ msgstr "Цього місяця"
 msgid "This year"
 msgstr "Цього року"
 
+msgid "No date"
+msgstr "Без дати"
+
+msgid "Has date"
+msgstr "Має дату"
+
 #, python-format
 msgid ""
 "Please enter the correct %(username)s and password for a staff account. Note "
@@ -82,6 +94,22 @@ msgstr ""
 
 msgid "Action:"
 msgstr "Дія:"
+
+#, python-format
+msgid "Add another %(verbose_name)s"
+msgstr "Додати ще %(verbose_name)s"
+
+msgid "Remove"
+msgstr "Видалити"
+
+msgid "Addition"
+msgstr "Додавання"
+
+msgid "Change"
+msgstr "Змінити"
+
+msgid "Deletion"
+msgstr "Видалення"
 
 msgid "action time"
 msgstr "час дії"
@@ -95,6 +123,8 @@ msgstr "тип вмісту"
 msgid "object id"
 msgstr "id об'єкта"
 
+#. Translators: 'repr' means representation
+#. (https://docs.python.org/library/functions.html#repr)
 msgid "object repr"
 msgstr "представлення об'єкта (repr)"
 
@@ -125,6 +155,31 @@ msgstr "Видалено \"%(object)s.\""
 msgid "LogEntry Object"
 msgstr "Об'єкт журнального запису"
 
+#, python-brace-format
+msgid "Added {name} \"{object}\"."
+msgstr "Додано {name} \"{object}\"."
+
+msgid "Added."
+msgstr "Додано."
+
+msgid "and"
+msgstr "та"
+
+#, python-brace-format
+msgid "Changed {fields} for {name} \"{object}\"."
+msgstr "Змінені {fields} для {name} \"{object}\"."
+
+#, python-brace-format
+msgid "Changed {fields}."
+msgstr "Змінені {fields}."
+
+#, python-brace-format
+msgid "Deleted {name} \"{object}\"."
+msgstr "Видалено {name} \"{object}\"."
+
+msgid "No fields changed."
+msgstr "Поля не змінені."
+
 msgid "None"
 msgstr "Ніщо"
 
@@ -134,69 +189,42 @@ msgstr ""
 "Затисніть клавішу \"Control\", або \"Command\" на Mac, щоб обрати більше "
 "однієї опції."
 
-msgid "Added."
-msgstr "Додано."
+#, python-brace-format
+msgid "The {name} \"{obj}\" was added successfully."
+msgstr "{name} \"{obj}\" було додано успішно."
 
-#, python-format
-msgid "Changed %s."
-msgstr "Змінено %s."
+msgid "You may edit it again below."
+msgstr "Ви можете відредагувати це знову."
 
-msgid "and"
-msgstr "та"
-
-#, python-format
-msgid "Added %(name)s \"%(object)s\"."
-msgstr "Додано %(name)s \"%(object)s\"."
-
-#, python-format
-msgid "Changed %(list)s for %(name)s \"%(object)s\"."
-msgstr "Змінено %(list)s для %(name)s \"%(object)s\"."
-
-#, python-format
-msgid "Deleted %(name)s \"%(object)s\"."
-msgstr "Видалено %(name)s \"%(object)s\"."
-
-msgid "No fields changed."
-msgstr "Поля не змінені."
-
-#, python-format
+#, python-brace-format
 msgid ""
-"The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
-msgstr ""
-"%(name)s \"%(obj)s\"  був успішно доданий. Нижче, Ви можете редагувати його "
-"знову."
-
-#, python-format
-msgid ""
-"The %(name)s \"%(obj)s\" was added successfully. You may add another "
-"%(name)s below."
-msgstr ""
-"%(name)s \"%(obj)s\" було успішно додано. Ви можете додати ще одну %(name)s "
-"нижче."
-
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was added successfully."
-msgstr "%(name)s \"%(obj)s\" було додано успішно."
-
-#, python-format
-msgid ""
-"The %(name)s \"%(obj)s\" was changed successfully. You may edit it again "
+"The {name} \"{obj}\" was added successfully. You may add another {name} "
 "below."
 msgstr ""
-"%(name)s \"%(obj)s\" було успішно змінено. Ви можете знову відредагувати її "
-"нижче."
+"{name} \"{obj}\" було додано успішно. Нижче Ви можете додати інше {name}."
 
-#, python-format
+#, python-brace-format
 msgid ""
-"The %(name)s \"%(obj)s\" was changed successfully. You may add another "
-"%(name)s below."
+"The {name} \"{obj}\" was changed successfully. You may edit it again below."
 msgstr ""
-"%(name)s \"%(obj)s\" було успішно змінено. Ви можете додати ще одну %(name)s "
-"нижче."
+"{name} \"{obj}\" було змінено успішно. Нижче Ви можете редагувати його знову."
 
-#, python-format
-msgid "The %(name)s \"%(obj)s\" was changed successfully."
-msgstr "%(name)s \"%(obj)s\" був успішно змінений."
+#, python-brace-format
+msgid ""
+"The {name} \"{obj}\" was added successfully. You may edit it again below."
+msgstr ""
+"{name} \"{obj}\" було додано успішно. Нижче Ви можете редагувати його знову."
+
+#, python-brace-format
+msgid ""
+"The {name} \"{obj}\" was changed successfully. You may add another {name} "
+"below."
+msgstr ""
+"{name} \"{obj}\" було змінено успішно. Нижче Ви можете додати інше {name}."
+
+#, python-brace-format
+msgid "The {name} \"{obj}\" was changed successfully."
+msgstr "{name} \"{obj}\" було змінено успішно."
 
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
@@ -212,8 +240,8 @@ msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "%(name)s \"%(obj)s\" був видалений успішно."
 
 #, python-format
-msgid "%(name)s object with primary key %(key)r does not exist."
-msgstr "%(name)s об'єкт з первинним ключем %(key)r не існує."
+msgid "%(name)s with ID \"%(key)s\" doesn't exist. Perhaps it was deleted?"
+msgstr "%(name)s з ID \"%(key)s\" не існує. Можливо воно було видалене?"
 
 #, python-format
 msgid "Add %s"
@@ -222,6 +250,10 @@ msgstr "Додати %s"
 #, python-format
 msgid "Change %s"
 msgstr "Змінити %s"
+
+#, python-format
+msgid "View %s"
+msgstr "Переглянути %s"
 
 msgid "Database error"
 msgstr "Помилка бази даних"
@@ -232,6 +264,7 @@ msgid_plural "%(count)s %(name)s were changed successfully."
 msgstr[0] "%(count)s %(name)s був успішно змінений."
 msgstr[1] "%(count)s %(name)s були успішно змінені."
 msgstr[2] "%(count)s %(name)s було успішно змінено."
+msgstr[3] "%(count)s %(name)s було успішно змінено."
 
 #, python-format
 msgid "%(total_count)s selected"
@@ -239,6 +272,7 @@ msgid_plural "All %(total_count)s selected"
 msgstr[0] "%(total_count)s обраний"
 msgstr[1] "%(total_count)s обрані"
 msgstr[2] "Усі %(total_count)s обрано"
+msgstr[3] "Усі %(total_count)s обрано"
 
 #, python-format
 msgid "0 of %(cnt)s selected"
@@ -333,7 +367,7 @@ msgid "Change password"
 msgstr "Змінити пароль"
 
 msgid "Please correct the error below."
-msgstr "Будь ласка, виправте помилку, вказану нижче."
+msgstr "Будь ласка, виправіть помилку нижче."
 
 msgid "Please correct the errors below."
 msgstr "Будь ласка, виправте помилки, вказані нижче."
@@ -354,18 +388,15 @@ msgstr "Документація"
 msgid "Log out"
 msgstr "Вийти"
 
-msgid "Add"
-msgstr "Додати"
+#, python-format
+msgid "Add %(name)s"
+msgstr "Додати %(name)s"
 
 msgid "History"
 msgstr "Історія"
 
 msgid "View on site"
 msgstr "Дивитися на сайті"
-
-#, python-format
-msgid "Add %(name)s"
-msgstr "Додати %(name)s"
 
 msgid "Filter"
 msgstr "Відфільтрувати"
@@ -446,15 +477,8 @@ msgstr ""
 "Ви впевнені, що хочете видалити вибрані %(objects_name)s? Всі вказані "
 "об'єкти та пов'язані з ними елементи будуть видалені:"
 
-msgid "Change"
-msgstr "Змінити"
-
-msgid "Remove"
-msgstr "Видалити"
-
-#, python-format
-msgid "Add another %(verbose_name)s"
-msgstr "Додати ще %(verbose_name)s"
+msgid "View"
+msgstr "Переглянути"
 
 msgid "Delete?"
 msgstr "Видалити?"
@@ -470,13 +494,16 @@ msgstr "Резюме"
 msgid "Models in the %(name)s application"
 msgstr "Моделі у %(name)s додатку"
 
-msgid "You don't have permission to edit anything."
-msgstr "У вас немає дозволу на редагування будь-чого."
+msgid "Add"
+msgstr "Додати"
 
-msgid "Recent Actions"
+msgid "You don't have permission to view or edit anything."
+msgstr "У вас немає дозволу на перегляд чи редагування чого-небудь."
+
+msgid "Recent actions"
 msgstr "Недавні дії"
 
-msgid "My Actions"
+msgid "My actions"
 msgstr "Мої дії"
 
 msgid "None available"
@@ -527,20 +554,8 @@ msgstr "Показати всі"
 msgid "Save"
 msgstr "Зберегти"
 
-msgid "Popup closing..."
-msgstr "Закриття спливаючого вікна..."
-
-#, python-format
-msgid "Change selected %(model)s"
-msgstr "Змінити обрану %(model)s"
-
-#, python-format
-msgid "Add another %(model)s"
-msgstr "Додати ще одну %(model)s"
-
-#, python-format
-msgid "Delete selected %(model)s"
-msgstr "Видалити обрану %(model)s"
+msgid "Popup closing…"
+msgstr "Закриття спливаючого вікна"
 
 msgid "Search"
 msgstr "Пошук"
@@ -551,6 +566,7 @@ msgid_plural "%(counter)s results"
 msgstr[0] "%(counter)s результат"
 msgstr[1] "%(counter)s результати"
 msgstr[2] "%(counter)s результатів"
+msgstr[3] "%(counter)s результатів"
 
 #, python-format
 msgid "%(full_result_count)s total"
@@ -564,6 +580,24 @@ msgstr "Зберегти і додати інше"
 
 msgid "Save and continue editing"
 msgstr "Зберегти і продовжити редагування"
+
+msgid "Save and view"
+msgstr "Зберегти і переглянути"
+
+msgid "Close"
+msgstr "Закрити"
+
+#, python-format
+msgid "Change selected %(model)s"
+msgstr "Змінити обрану %(model)s"
+
+#, python-format
+msgid "Add another %(model)s"
+msgstr "Додати ще одну %(model)s"
+
+#, python-format
+msgid "Delete selected %(model)s"
+msgstr "Видалити обрану %(model)s"
 
 msgid "Thanks for spending some quality time with the Web site today."
 msgstr "Дякуємо за час, проведений сьогодні на сайті."
@@ -675,6 +709,10 @@ msgstr "Вибрати %s"
 #, python-format
 msgid "Select %s to change"
 msgstr "Виберіть %s щоб змінити"
+
+#, python-format
+msgid "Select %s to view"
+msgstr "Вибрати %s для перегляду"
 
 msgid "Date:"
 msgstr "Дата:"

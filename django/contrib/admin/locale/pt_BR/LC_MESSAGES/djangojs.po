@@ -2,17 +2,19 @@
 #
 # Translators:
 # Allisson Azevedo <allisson@gmail.com>, 2014
-# Eduardo Carvalho <eduardocereto@gmail.com>, 2011
-# Guilherme Gondim, 2012
+# andrewsmedina <andrewsmedina@gmail.com>, 2016
+# Eduardo Cereto Carvalho, 2011
+# semente, 2012
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Lucas Infante <maccinza@gmail.com>, 2015
+# Renata Barbosa Almeida <renata-rj000@hotmail.com>, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2015-10-27 17:27+0000\n"
-"Last-Translator: Lucas Infante <maccinza@gmail.com>\n"
+"POT-Creation-Date: 2018-05-17 11:50+0200\n"
+"PO-Revision-Date: 2017-09-23 18:54+0000\n"
+"Last-Translator: Tarsis Azevedo <tarsis.azevedo@gmail.com>\n"
 "Language-Team: Portuguese (Brazil) (http://www.transifex.com/django/django/"
 "language/pt_BR/)\n"
 "MIME-Version: 1.0\n"
@@ -98,28 +100,10 @@ msgid ""
 "button."
 msgstr ""
 "Você selecionou uma ação, e você não fez alterações em campos individuais. "
-"Você provavelmente está procurando o botão Ir ao invés do botão \"Salvar\"."
-
-#, javascript-format
-msgid "Note: You are %s hour ahead of server time."
-msgid_plural "Note: You are %s hours ahead of server time."
-msgstr[0] "Nota: Você está %s hora à frente do horário do servidor."
-msgstr[1] "Nota: Você está %s horas à frente do horário do servidor."
-
-#, javascript-format
-msgid "Note: You are %s hour behind server time."
-msgid_plural "Note: You are %s hours behind server time."
-msgstr[0] "Nota: Você está %s hora atrás do tempo do servidor."
-msgstr[1] "Nota: Você está %s horas atrás do tempo do servidor."
+"Você provavelmente está procurando o botão Ir ao invés do botão Salvar."
 
 msgid "Now"
 msgstr "Agora"
-
-msgid "Choose a Time"
-msgstr "Escolha um Horário"
-
-msgid "Choose a time"
-msgstr "Escolha uma hora"
 
 msgid "Midnight"
 msgstr "Meia-noite"
@@ -133,6 +117,24 @@ msgstr "Meio-dia"
 msgid "6 p.m."
 msgstr "6 da tarde"
 
+#, javascript-format
+msgid "Note: You are %s hour ahead of server time."
+msgid_plural "Note: You are %s hours ahead of server time."
+msgstr[0] "Nota: Você está %s hora à frente do horário do servidor."
+msgstr[1] "Nota: Você está %s horas à frente do horário do servidor."
+
+#, javascript-format
+msgid "Note: You are %s hour behind server time."
+msgid_plural "Note: You are %s hours behind server time."
+msgstr[0] "Nota: Você está %s hora atrás do tempo do servidor."
+msgstr[1] "Nota: Você está %s horas atrás do horário do servidor."
+
+msgid "Choose a Time"
+msgstr "Escolha um horário"
+
+msgid "Choose a time"
+msgstr "Escolha uma hora"
+
 msgid "Cancel"
 msgstr "Cancelar"
 
@@ -140,7 +142,7 @@ msgid "Today"
 msgstr "Hoje"
 
 msgid "Choose a Date"
-msgstr "Escolha uma Data"
+msgstr "Escolha uma data"
 
 msgid "Yesterday"
 msgstr "Ontem"
@@ -148,15 +150,69 @@ msgstr "Ontem"
 msgid "Tomorrow"
 msgstr "Amanhã"
 
-msgid ""
-"January February March April May June July August September October November "
-"December"
-msgstr ""
-"Janeiro Fevereiro Março Abril Maio Junho Julho Agosto Setembro Outubro "
-"Novembro Dezembro"
+msgid "January"
+msgstr "Janeiro"
 
-msgid "S M T W T F S"
-msgstr "D S T Q Q S S"
+msgid "February"
+msgstr "Fevereiro"
+
+msgid "March"
+msgstr "Março"
+
+msgid "April"
+msgstr "Abril"
+
+msgid "May"
+msgstr "Maio"
+
+msgid "June"
+msgstr "Junho"
+
+msgid "July"
+msgstr "Julho"
+
+msgid "August"
+msgstr "Agosto"
+
+msgid "September"
+msgstr "Setembro"
+
+msgid "October"
+msgstr "Outubro"
+
+msgid "November"
+msgstr "Novembro"
+
+msgid "December"
+msgstr "Dezembro"
+
+msgctxt "one letter Sunday"
+msgid "S"
+msgstr "D"
+
+msgctxt "one letter Monday"
+msgid "M"
+msgstr "S"
+
+msgctxt "one letter Tuesday"
+msgid "T"
+msgstr "T"
+
+msgctxt "one letter Wednesday"
+msgid "W"
+msgstr "Q"
+
+msgctxt "one letter Thursday"
+msgid "T"
+msgstr "Q"
+
+msgctxt "one letter Friday"
+msgid "F"
+msgstr "S"
+
+msgctxt "one letter Saturday"
+msgid "S"
+msgstr "S"
 
 msgid "Show"
 msgstr "Mostrar"

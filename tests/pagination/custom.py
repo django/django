@@ -6,12 +6,12 @@ class ValidAdjacentNumsPage(Page):
     def next_page_number(self):
         if not self.has_next():
             return None
-        return super(ValidAdjacentNumsPage, self).next_page_number()
+        return super().next_page_number()
 
     def previous_page_number(self):
         if not self.has_previous():
             return None
-        return super(ValidAdjacentNumsPage, self).previous_page_number()
+        return super().previous_page_number()
 
 
 class ValidAdjacentNumsPaginator(Paginator):

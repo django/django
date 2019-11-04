@@ -28,7 +28,7 @@ or Jinja2_, you should feel right at home with Django's templates.
     </howto/custom-template-tags>` to the template language as needed).
 
 .. _`The Django template language: For Python programmers`: ../templates_python/
-.. _Smarty: http://www.smarty.net/
+.. _Smarty: https://www.smarty.net/
 .. _Jinja2: http://jinja.pocoo.org/
 
 Templates
@@ -82,10 +82,10 @@ Variables
 Variables look like this: ``{{ variable }}``. When the template engine
 encounters a variable, it evaluates that variable and replaces it with the
 result. Variable names consist of any combination of alphanumeric characters
-and the underscore (``"_"``). The dot (``"."``) also appears in variable
-sections, although that has a special meaning, as indicated below.
-Importantly, *you cannot have spaces or punctuation characters in variable
-names.*
+and the underscore (``"_"``) but may not start with an underscore. The dot
+(``"."``) also appears in variable sections, although that has a special
+meaning, as indicated below. Importantly, *you cannot have spaces or
+punctuation characters in variable names.*
 
 Use a dot (``.``) to access attributes of a variable.
 
@@ -105,13 +105,13 @@ Use a dot (``.``) to access attributes of a variable.
     override dictionary lookup. For example, consider the following code snippet
     that attempts to loop over a ``collections.defaultdict``::
 
-        {% for k, v in defaultdict.iteritems %}
+        {% for k, v in defaultdict.items %}
             Do something with k and v here...
         {% endfor %}
 
     Because dictionary lookup happens first, that behavior kicks in and provides
-    a default value instead of using the intended ``.iteritems()``
-    method. In this case, consider converting to a dictionary first.
+    a default value instead of using the intended ``.items()`` method. In this
+    case, consider converting to a dictionary first.
 
 In the above example, ``{{ section.title }}`` will be replaced with the
 ``title`` attribute of the ``section`` object.
@@ -123,6 +123,9 @@ string) by default.
 Note that "bar" in a template expression like ``{{ foo.bar }}`` will be
 interpreted as a literal string and not using the value of the variable "bar",
 if one exists in the template context.
+
+Variable attributes that begin with an underscore may not be accessed as
+they're generally considered private.
 
 Filters
 =======
@@ -291,7 +294,7 @@ It's easiest to understand template inheritance by starting with an example::
     <!DOCTYPE html>
     <html lang="en">
     <head>
-        <link rel="stylesheet" href="style.css" />
+        <link rel="stylesheet" href="style.css">
         <title>{% block title %}My amazing site{% endblock %}</title>
     </head>
 
@@ -344,7 +347,7 @@ like::
     <!DOCTYPE html>
     <html lang="en">
     <head>
-        <link rel="stylesheet" href="style.css" />
+        <link rel="stylesheet" href="style.css">
         <title>My amazing blog</title>
     </head>
 
@@ -406,6 +409,13 @@ Here are some tips for working with inheritance:
   completely overriding it. Data inserted using ``{{ block.super }}`` will
   not be automatically escaped (see the `next section`_), since it was
   already escaped, if necessary, in the parent template.
+
+* Variables created outside of a :ttag:`{% block %}<block>` using the template
+  tag ``as`` syntax can't be used inside the block. For example, this template
+  doesn't render anything::
+
+      {% trans "Title" as title %}
+      {% block content %}{{ title }}{% endblock %}
 
 * For extra readability, you can optionally give a *name* to your
   ``{% endblock %}`` tag. For example::
@@ -549,8 +559,8 @@ The auto-escaping tag passes its effect onto templates that extend the
 current one as well as templates included via the :ttag:`include` tag,
 just like all block tags. For example:
 
-.. snippet::
-    :filename: base.html
+.. code-block:: html+django
+    :caption: base.html
 
     {% autoescape off %}
     <h1>{% block title %}{% endblock %}</h1>
@@ -558,8 +568,8 @@ just like all block tags. For example:
     {% endblock %}
     {% endautoescape %}
 
-.. snippet::
-    :filename: child.html
+.. code-block:: html+django
+    :caption: child.html
 
     {% extends "base.html" %}
     {% block title %}This &amp; that{% endblock %}
@@ -639,15 +649,15 @@ of all comments related to the current task with::
 And of course you can easily access methods you've explicitly defined on your
 own models:
 
-.. snippet::
-    :filename: models.py
+.. code-block:: python
+    :caption: models.py
 
     class Task(models.Model):
         def foo(self):
             return "bar"
 
-.. snippet::
-    :filename: template.html
+.. code-block:: html+django
+    :caption: template.html
 
     {{ task.foo }}
 

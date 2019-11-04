@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 from django.test import TestCase
 
 from .models import Article, Car, Driver, Reporter
@@ -34,40 +32,35 @@ class ManyToOneNullTests(TestCase):
 
     def test_related_set(self):
         # Reporter objects have access to their related Article objects.
-        self.assertQuerysetEqual(self.r.article_set.all(),
-                                 ['<Article: First>', '<Article: Second>'])
-        self.assertQuerysetEqual(self.r.article_set.filter(headline__startswith='Fir'),
-                                 ['<Article: First>'])
+        self.assertQuerysetEqual(self.r.article_set.all(), ['<Article: First>', '<Article: Second>'])
+        self.assertQuerysetEqual(self.r.article_set.filter(headline__startswith='Fir'), ['<Article: First>'])
         self.assertEqual(self.r.article_set.count(), 2)
 
     def test_created_without_related(self):
-        self.assertEqual(self.a3.reporter, None)
+        self.assertIsNone(self.a3.reporter)
         # Need to reget a3 to refresh the cache
         a3 = Article.objects.get(pk=self.a3.pk)
         with self.assertRaises(AttributeError):
             getattr(a3.reporter, 'id')
         # Accessing an article's 'reporter' attribute returns None
         # if the reporter is set to None.
-        self.assertEqual(a3.reporter, None)
+        self.assertIsNone(a3.reporter)
         # To retrieve the articles with no reporters set, use "reporter__isnull=True".
-        self.assertQuerysetEqual(Article.objects.filter(reporter__isnull=True),
-                                 ['<Article: Third>'])
+        self.assertQuerysetEqual(Article.objects.filter(reporter__isnull=True), ['<Article: Third>'])
         # We can achieve the same thing by filtering for the case where the
         # reporter is None.
-        self.assertQuerysetEqual(Article.objects.filter(reporter=None),
-                                 ['<Article: Third>'])
+        self.assertQuerysetEqual(Article.objects.filter(reporter=None), ['<Article: Third>'])
         # Set the reporter for the Third article
-        self.assertQuerysetEqual(self.r.article_set.all(),
-            ['<Article: First>', '<Article: Second>'])
+        self.assertQuerysetEqual(self.r.article_set.all(), ['<Article: First>', '<Article: Second>'])
         self.r.article_set.add(a3)
-        self.assertQuerysetEqual(self.r.article_set.all(),
-            ['<Article: First>', '<Article: Second>', '<Article: Third>'])
+        self.assertQuerysetEqual(
+            self.r.article_set.all(),
+            ['<Article: First>', '<Article: Second>', '<Article: Third>']
+        )
         # Remove an article from the set, and check that it was removed.
         self.r.article_set.remove(a3)
-        self.assertQuerysetEqual(self.r.article_set.all(),
-                                 ['<Article: First>', '<Article: Second>'])
-        self.assertQuerysetEqual(Article.objects.filter(reporter__isnull=True),
-                                 ['<Article: Third>'])
+        self.assertQuerysetEqual(self.r.article_set.all(), ['<Article: First>', '<Article: Second>'])
+        self.assertQuerysetEqual(Article.objects.filter(reporter__isnull=True), ['<Article: Third>'])
 
     def test_remove_from_wrong_set(self):
         self.assertQuerysetEqual(self.r2.article_set.all(), ['<Article: Fourth>'])
@@ -80,33 +73,39 @@ class ManyToOneNullTests(TestCase):
         # Use manager.set() to allocate ForeignKey. Null is legal, so existing
         # members of the set that are not in the assignment set are set to null.
         self.r2.article_set.set([self.a2, self.a3])
-        self.assertQuerysetEqual(self.r2.article_set.all(),
-                                 ['<Article: Second>', '<Article: Third>'])
+        self.assertQuerysetEqual(self.r2.article_set.all(), ['<Article: Second>', '<Article: Third>'])
         # Use manager.set(clear=True)
         self.r2.article_set.set([self.a3, self.a4], clear=True)
-        self.assertQuerysetEqual(self.r2.article_set.all(),
-                                 ['<Article: Fourth>', '<Article: Third>'])
+        self.assertQuerysetEqual(self.r2.article_set.all(), ['<Article: Fourth>', '<Article: Third>'])
         # Clear the rest of the set
         self.r2.article_set.set([])
         self.assertQuerysetEqual(self.r2.article_set.all(), [])
-        self.assertQuerysetEqual(Article.objects.filter(reporter__isnull=True),
-                                 ['<Article: Fourth>', '<Article: Second>', '<Article: Third>'])
+        self.assertQuerysetEqual(
+            Article.objects.filter(reporter__isnull=True),
+            ['<Article: Fourth>', '<Article: Second>', '<Article: Third>']
+        )
+
+    def test_set_clear_non_bulk(self):
+        # 2 queries for clear(), 1 for add(), and 1 to select objects.
+        with self.assertNumQueries(4):
+            self.r.article_set.set([self.a], bulk=False, clear=True)
 
     def test_assign_clear_related_set(self):
         # Use descriptor assignment to allocate ForeignKey. Null is legal, so
         # existing members of the set that are not in the assignment set are
         # set to null.
         self.r2.article_set.set([self.a2, self.a3])
-        self.assertQuerysetEqual(self.r2.article_set.all(),
-                                 ['<Article: Second>', '<Article: Third>'])
+        self.assertQuerysetEqual(self.r2.article_set.all(), ['<Article: Second>', '<Article: Third>'])
         # Clear the rest of the set
         self.r.article_set.clear()
         self.assertQuerysetEqual(self.r.article_set.all(), [])
-        self.assertQuerysetEqual(Article.objects.filter(reporter__isnull=True),
-                                 ['<Article: First>', '<Article: Fourth>'])
+        self.assertQuerysetEqual(
+            Article.objects.filter(reporter__isnull=True),
+            ['<Article: First>', '<Article: Fourth>']
+        )
 
     def test_assign_with_queryset(self):
-        # Ensure that querysets used in reverse FK assignments are pre-evaluated
+        # Querysets used in reverse FK assignments are pre-evaluated
         # so their value isn't affected by the clearing operation in
         # RelatedManager.set() (#19816).
         self.r2.article_set.set([self.a2, self.a3])

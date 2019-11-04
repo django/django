@@ -1,30 +1,17 @@
-from __future__ import unicode_literals
-
-from django.apps import apps
-from django.contrib.auth import get_user_model
+from django.contrib.auth import get_user, get_user_model
 from django.contrib.auth.models import AnonymousUser, User
 from django.core.exceptions import ImproperlyConfigured
-from django.dispatch import receiver
+from django.db import IntegrityError
+from django.http import HttpRequest
 from django.test import TestCase, override_settings
-from django.test.signals import setting_changed
 from django.utils import translation
 
 from .models import CustomUser
 
 
-@receiver(setting_changed)
-def user_model_swapped(**kwargs):
-    if kwargs['setting'] == 'AUTH_USER_MODEL':
-        from django.db.models.manager import ensure_default_manager
-        # Reset User manager
-        setattr(User, 'objects', User._default_manager)
-        ensure_default_manager(User)
-        apps.clear_cache()
-
-
 class BasicTestCase(TestCase):
     def test_user(self):
-        "Check that users can be created and can set their password"
+        "Users can be created and can set their password"
         u = User.objects.create_user('testuser', 'test@example.com', 'testpw')
         self.assertTrue(u.has_usable_password())
         self.assertFalse(u.check_password('bad'))
@@ -44,7 +31,8 @@ class BasicTestCase(TestCase):
         self.assertEqual(u.get_username(), 'testuser')
 
         # Check authentication/permissions
-        self.assertTrue(u.is_authenticated())
+        self.assertFalse(u.is_anonymous)
+        self.assertTrue(u.is_authenticated)
         self.assertFalse(u.is_staff)
         self.assertTrue(u.is_active)
         self.assertFalse(u.is_superuser)
@@ -53,8 +41,18 @@ class BasicTestCase(TestCase):
         u2 = User.objects.create_user('testuser2', 'test2@example.com')
         self.assertFalse(u2.has_usable_password())
 
+    def test_unicode_username(self):
+        User.objects.create_user('jörg')
+        User.objects.create_user('Григорий')
+        # Two equivalent unicode normalized usernames should be duplicates
+        omega_username = 'iamtheΩ'  # U+03A9 GREEK CAPITAL LETTER OMEGA
+        ohm_username = 'iamtheΩ'  # U+2126 OHM SIGN
+        User.objects.create_user(ohm_username)
+        with self.assertRaises(IntegrityError):
+            User.objects.create_user(omega_username)
+
     def test_user_no_email(self):
-        "Check that users can be created without an email"
+        "Users can be created without an email"
         u = User.objects.create_user('testuser1')
         self.assertEqual(u.email, '')
 
@@ -63,19 +61,6 @@ class BasicTestCase(TestCase):
 
         u3 = User.objects.create_user('testuser3', email=None)
         self.assertEqual(u3.email, '')
-
-    def test_anonymous_user(self):
-        "Check the properties of the anonymous user"
-        a = AnonymousUser()
-        self.assertEqual(a.pk, None)
-        self.assertEqual(a.username, '')
-        self.assertEqual(a.get_username(), '')
-        self.assertFalse(a.is_authenticated())
-        self.assertFalse(a.is_staff)
-        self.assertFalse(a.is_active)
-        self.assertFalse(a.is_superuser)
-        self.assertEqual(a.groups.all().count(), 0)
-        self.assertEqual(a.user_permissions.all().count(), 0)
 
     def test_superuser(self):
         "Check the creation and properties of a superuser"
@@ -98,13 +83,18 @@ class BasicTestCase(TestCase):
     @override_settings(AUTH_USER_MODEL='badsetting')
     def test_swappable_user_bad_setting(self):
         "The alternate user setting must point to something in the format app.model"
-        with self.assertRaises(ImproperlyConfigured):
+        msg = "AUTH_USER_MODEL must be of the form 'app_label.model_name'"
+        with self.assertRaisesMessage(ImproperlyConfigured, msg):
             get_user_model()
 
     @override_settings(AUTH_USER_MODEL='thismodel.doesntexist')
     def test_swappable_user_nonexistent_model(self):
         "The current user model must point to an installed model"
-        with self.assertRaises(ImproperlyConfigured):
+        msg = (
+            "AUTH_USER_MODEL refers to model 'thismodel.doesntexist' "
+            "that has not been installed"
+        )
+        with self.assertRaisesMessage(ImproperlyConfigured, msg):
             get_user_model()
 
     def test_user_verbose_names_translatable(self):
@@ -115,3 +105,21 @@ class BasicTestCase(TestCase):
         with translation.override('es'):
             self.assertEqual(User._meta.verbose_name, 'usuario')
             self.assertEqual(User._meta.verbose_name_plural, 'usuarios')
+
+
+class TestGetUser(TestCase):
+
+    def test_get_user_anonymous(self):
+        request = HttpRequest()
+        request.session = self.client.session
+        user = get_user(request)
+        self.assertIsInstance(user, AnonymousUser)
+
+    def test_get_user(self):
+        created_user = User.objects.create_user('testuser', 'test@example.com', 'testpw')
+        self.client.login(username='testuser', password='testpw')
+        request = HttpRequest()
+        request.session = self.client.session
+        user = get_user(request)
+        self.assertIsInstance(user, User)
+        self.assertEqual(user.username, created_user.username)

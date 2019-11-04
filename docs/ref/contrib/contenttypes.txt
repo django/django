@@ -67,8 +67,8 @@ The ``ContentType`` model
         The name of the application the model is part of. This is taken from
         the :attr:`app_label` attribute of the model, and includes only the
         *last* part of the application's Python import path;
-        "django.contrib.contenttypes", for example, becomes an
-        :attr:`app_label` of "contenttypes".
+        ``django.contrib.contenttypes``, for example, becomes an
+        :attr:`app_label` of ``contenttypes``.
 
     .. attribute:: model
 
@@ -93,7 +93,7 @@ created with the following values:
 
 * :attr:`~django.contrib.contenttypes.models.ContentType.app_label`
   will be set to ``'sites'`` (the last part of the Python
-  path "django.contrib.sites").
+  path ``django.contrib.sites``).
 
 * :attr:`~django.contrib.contenttypes.models.ContentType.model`
   will be set to ``'site'``.
@@ -124,7 +124,8 @@ For example, we could look up the
 :class:`~django.contrib.auth.models.User` model::
 
     >>> from django.contrib.contenttypes.models import ContentType
-    >>> ContentType.objects.get(app_label="auth", model="user")
+    >>> user_type = ContentType.objects.get(app_label='auth', model='user')
+    >>> user_type
     <ContentType: user>
 
 And then use it to query for a particular
@@ -241,9 +242,9 @@ generic (sometimes called "polymorphic") relationships between models.
 
 A simple example is a tagging system, which might look like this::
 
-    from django.db import models
     from django.contrib.contenttypes.fields import GenericForeignKey
     from django.contrib.contenttypes.models import ContentType
+    from django.db import models
 
     class TaggedItem(models.Model):
         tag = models.SlugField()
@@ -251,7 +252,7 @@ A simple example is a tagging system, which might look like this::
         object_id = models.PositiveIntegerField()
         content_object = GenericForeignKey('content_type', 'object_id')
 
-        def __str__(self):              # __unicode__ on Python 2
+        def __str__(self):
             return self.tag
 
 A normal :class:`~django.db.models.ForeignKey` can only "point
@@ -335,6 +336,13 @@ creating a ``TaggedItem``::
     >>> t.content_object
     <User: Guido>
 
+If the related object is deleted, the ``content_type`` and ``object_id`` fields
+remain set to their original values and the ``GenericForeignKey`` returns
+``None``::
+
+    >>> guido.delete()
+    >>> t.content_object  # returns None
+
 Due to the way :class:`~django.contrib.contenttypes.fields.GenericForeignKey`
 is implemented, you cannot use such fields directly with filters (``filter()``
 and ``exclude()``, for example) via the database API. Because a
@@ -364,8 +372,8 @@ Reverse generic relations
 If you know which models you'll be using most often, you can also add
 a "reverse" generic relationship to enable an additional API. For example::
 
-    from django.db import models
     from django.contrib.contenttypes.fields import GenericRelation
+    from django.db import models
 
     class Bookmark(models.Model):
         url = models.URLField()
@@ -386,13 +394,21 @@ be used to retrieve their associated ``TaggedItems``::
 Defining :class:`~django.contrib.contenttypes.fields.GenericRelation` with
 ``related_query_name`` set allows querying from the related object::
 
-    tags = GenericRelation(TaggedItem, related_query_name='bookmarks')
+    tags = GenericRelation(TaggedItem, related_query_name='bookmark')
 
 This enables filtering, ordering, and other query operations on ``Bookmark``
 from ``TaggedItem``::
 
-    >>> # Get all tags belonging to books containing `django` in the url
-    >>> TaggedItem.objects.filter(bookmarks__url__contains='django')
+    >>> # Get all tags belonging to bookmarks containing `django` in the url
+    >>> TaggedItem.objects.filter(bookmark__url__contains='django')
+    <QuerySet [<TaggedItem: django>, <TaggedItem: python>]>
+
+Of course, if you don't add the ``related_query_name``, you can do the
+same types of lookups manually::
+
+    >>> bookmarks = Bookmark.objects.filter(url__contains='django')
+    >>> bookmark_type = ContentType.objects.get_for_model(Bookmark)
+    >>> TaggedItem.objects.filter(content_type__pk=bookmark_type.id, object_id__in=bookmarks)
     <QuerySet [<TaggedItem: django>, <TaggedItem: python>]>
 
 Just as :class:`~django.contrib.contenttypes.fields.GenericForeignKey`
@@ -406,30 +422,11 @@ referred to above used fields named ``content_type_fk`` and
 ``object_primary_key`` to create its generic foreign key, then a
 :class:`.GenericRelation` back to it would need to be defined like so::
 
-    tags = GenericRelation(TaggedItem,
-                           content_type_field='content_type_fk',
-                           object_id_field='object_primary_key')
-
-Of course, if you don't add the reverse relationship, you can do the
-same types of lookups manually::
-
-    >>> b = Bookmark.objects.get(url='https://www.djangoproject.com/')
-    >>> bookmark_type = ContentType.objects.get_for_model(b)
-    >>> TaggedItem.objects.filter(content_type__pk=bookmark_type.id,
-    ...                           object_id=b.id)
-    <QuerySet [<TaggedItem: django>, <TaggedItem: python>]>
-
-Note that if the model in a
-:class:`~django.contrib.contenttypes.fields.GenericRelation` uses a
-non-default value for ``ct_field`` or ``fk_field`` in its
-:class:`~django.contrib.contenttypes.fields.GenericForeignKey` (for example, if
-you had a ``Comment`` model that uses ``ct_field="object_pk"``),
-you'll need to set ``content_type_field`` and/or ``object_id_field`` in
-the :class:`~django.contrib.contenttypes.fields.GenericRelation` to
-match the ``ct_field`` and ``fk_field``, respectively, in the
-:class:`~django.contrib.contenttypes.fields.GenericForeignKey`::
-
-    comments = fields.GenericRelation(Comment, object_id_field="object_pk")
+    tags = GenericRelation(
+        TaggedItem,
+        content_type_field='content_type_fk',
+        object_id_field='object_primary_key',
+    )
 
 Note also, that if you delete an object that has a
 :class:`~django.contrib.contenttypes.fields.GenericRelation`, any objects

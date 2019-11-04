@@ -2,9 +2,6 @@
 Creating forms from models
 ==========================
 
-.. module:: django.forms.models
-   :synopsis: ModelForm and ModelFormset.
-
 .. currentmodule:: django.forms
 
 ``ModelForm``
@@ -62,13 +59,20 @@ Model field                         Form field
                                     ``min_value`` set to -9223372036854775808
                                     and ``max_value`` set to 9223372036854775807.
 
-:class:`BooleanField`               :class:`~django.forms.BooleanField`
+:class:`BinaryField`                :class:`~django.forms.CharField`, if
+                                    :attr:`~.Field.editable` is set to
+                                    ``True`` on the model field, otherwise not
+                                    represented in the form.
+
+:class:`BooleanField`               :class:`~django.forms.BooleanField`, or
+                                    :class:`~django.forms.NullBooleanField` if
+                                    ``null=True``.
 
 :class:`CharField`                  :class:`~django.forms.CharField` with
                                     ``max_length`` set to the model field's
-                                    ``max_length``
-
-:class:`CommaSeparatedIntegerField` :class:`~django.forms.CharField`
+                                    ``max_length`` and
+                                    :attr:`~django.forms.CharField.empty_value`
+                                    set to ``None`` if ``null=True``.
 
 :class:`DateField`                  :class:`~django.forms.DateField`
 
@@ -158,18 +162,18 @@ Consider this set of models::
     from django.db import models
     from django.forms import ModelForm
 
-    TITLE_CHOICES = (
+    TITLE_CHOICES = [
         ('MR', 'Mr.'),
         ('MRS', 'Mrs.'),
         ('MS', 'Ms.'),
-    )
+    ]
 
     class Author(models.Model):
         name = models.CharField(max_length=100)
         title = models.CharField(max_length=3, choices=TITLE_CHOICES)
         birth_date = models.DateField(blank=True, null=True)
 
-        def __str__(self):              # __unicode__ on Python 2
+        def __str__(self):
             return self.name
 
     class Book(models.Model):
@@ -195,8 +199,10 @@ we'll discuss in a moment.)::
 
     class AuthorForm(forms.Form):
         name = forms.CharField(max_length=100)
-        title = forms.CharField(max_length=3,
-                    widget=forms.Select(choices=TITLE_CHOICES))
+        title = forms.CharField(
+            max_length=3,
+            widget=forms.Select(choices=TITLE_CHOICES),
+        )
         birth_date = forms.DateField(required=False)
 
     class BookForm(forms.Form):
@@ -286,8 +292,8 @@ You can override the error messages from ``NON_FIELD_ERRORS`` raised by model
 validation by adding the :data:`~django.core.exceptions.NON_FIELD_ERRORS` key
 to the ``error_messages`` dictionary of the ``ModelForm``’s inner ``Meta`` class::
 
-    from django.forms import ModelForm
     from django.core.exceptions import NON_FIELD_ERRORS
+    from django.forms import ModelForm
 
     class ArticleForm(ModelForm):
         class Meta:
@@ -296,6 +302,8 @@ to the ``error_messages`` dictionary of the ``ModelForm``’s inner ``Meta`` cla
                     'unique_together': "%(model_name)s's %(field_labels)s are not unique.",
                 }
             }
+
+.. _topics-modelform-save:
 
 The ``save()`` method
 ---------------------
@@ -327,6 +335,18 @@ Note that if the form :ref:`hasn't been validated
 <validation-on-modelform>`, calling ``save()`` will do so by checking
 ``form.errors``. A ``ValueError`` will be raised if the data in the form
 doesn't validate -- i.e., if ``form.errors`` evaluates to ``True``.
+
+If an optional field doesn't appear in the form's data, the resulting model
+instance uses the model field :attr:`~django.db.models.Field.default`, if
+there is one, for that field. This behavior doesn't apply to fields that use
+:class:`~django.forms.CheckboxInput`,
+:class:`~django.forms.CheckboxSelectMultiple`, or
+:class:`~django.forms.SelectMultiple` (or any custom widget whose
+:meth:`~django.forms.Widget.value_omitted_from_data` method always returns
+``False``) since an unchecked checkbox and unselected ``<select multiple>``
+don't appear in the data of an HTML form submission. Use a custom form field or
+widget if you're designing an API and want the default fallback behavior for a
+field that uses one of these widgets.
 
 This ``save()`` method accepts an optional ``commit`` keyword argument, which
 accepts either ``True`` or ``False``. If you call ``save()`` with
@@ -499,7 +519,9 @@ For example, if you want the ``CharField`` for the ``name`` attribute of
             }
 
 The ``widgets`` dictionary accepts either widget instances (e.g.,
-``Textarea(...)``) or classes (e.g., ``Textarea``).
+``Textarea(...)``) or classes (e.g., ``Textarea``). Note that the ``widgets``
+dictionary is ignored for a model field with a non-empty ``choices`` attribute.
+In this case, you must override the form field to use a different widget.
 
 Similarly, you can specify the ``labels``, ``help_texts`` and ``error_messages``
 attributes of the inner ``Meta`` class if you want to further customize a field.
@@ -507,7 +529,7 @@ attributes of the inner ``Meta`` class if you want to further customize a field.
 For example if you wanted to customize the wording of all user facing strings for
 the ``name`` field::
 
-    from django.utils.translation import ugettext_lazy as _
+    from django.utils.translation import gettext_lazy as _
 
     class AuthorForm(ModelForm):
         class Meta:
@@ -550,7 +572,7 @@ fields like you would in a regular ``Form``.
 If you want to specify a field's validators, you can do so by defining
 the field declaratively and setting its ``validators`` parameter::
 
-    from django.forms import ModelForm, CharField
+    from django.forms import CharField, ModelForm
     from myapp.models import Article
 
     class ArticleForm(ModelForm):
@@ -559,10 +581,6 @@ the field declaratively and setting its ``validators`` parameter::
         class Meta:
             model = Article
             fields = ['pub_date', 'headline', 'content', 'reporter', 'slug']
-
-.. versionadded:: 1.9
-
-    The ``Meta.field_classes`` attribute was added.
 
 .. note::
 
@@ -589,8 +607,12 @@ the field declaratively and setting its ``validators`` parameter::
     For example, if the ``Article`` model looks like this::
 
         class Article(models.Model):
-            headline = models.CharField(max_length=200, null=True, blank=True,
-                                        help_text="Use puns liberally")
+            headline = models.CharField(
+                max_length=200,
+                null=True,
+                blank=True,
+                help_text='Use puns liberally',
+            )
             content = models.TextField()
 
     and you want to do some custom validation for ``headline``, while keeping
@@ -598,8 +620,11 @@ the field declaratively and setting its ``validators`` parameter::
     ``ArticleForm`` like this::
 
         class ArticleForm(ModelForm):
-            headline = MyFormField(max_length=200, required=False,
-                                   help_text="Use puns liberally")
+            headline = MyFormField(
+                max_length=200,
+                required=False,
+                help_text='Use puns liberally',
+            )
 
             class Meta:
                 model = Article
@@ -646,7 +671,7 @@ This creates a form that behaves identically to ``ArticleForm``, except there's
 some extra validation and cleaning for the ``pub_date`` field.
 
 You can also subclass the parent's ``Meta`` inner class if you want to change
-the ``Meta.fields`` or ``Meta.excludes`` lists::
+the ``Meta.fields`` or ``Meta.exclude`` lists::
 
     >>> class RestrictedArticleForm(EnhancedArticleForm):
     ...     class Meta(ArticleForm.Meta):
@@ -746,14 +771,14 @@ with the ``Author`` model. It works just like a regular formset::
 
     >>> formset = AuthorFormSet()
     >>> print(formset)
-    <input type="hidden" name="form-TOTAL_FORMS" value="1" id="id_form-TOTAL_FORMS" /><input type="hidden" name="form-INITIAL_FORMS" value="0" id="id_form-INITIAL_FORMS" /><input type="hidden" name="form-MAX_NUM_FORMS" id="id_form-MAX_NUM_FORMS" />
-    <tr><th><label for="id_form-0-name">Name:</label></th><td><input id="id_form-0-name" type="text" name="form-0-name" maxlength="100" /></td></tr>
+    <input type="hidden" name="form-TOTAL_FORMS" value="1" id="id_form-TOTAL_FORMS"><input type="hidden" name="form-INITIAL_FORMS" value="0" id="id_form-INITIAL_FORMS"><input type="hidden" name="form-MAX_NUM_FORMS" id="id_form-MAX_NUM_FORMS">
+    <tr><th><label for="id_form-0-name">Name:</label></th><td><input id="id_form-0-name" type="text" name="form-0-name" maxlength="100"></td></tr>
     <tr><th><label for="id_form-0-title">Title:</label></th><td><select name="form-0-title" id="id_form-0-title">
-    <option value="" selected="selected">---------</option>
+    <option value="" selected>---------</option>
     <option value="MR">Mr.</option>
     <option value="MRS">Mrs.</option>
     <option value="MS">Ms.</option>
-    </select><input type="hidden" name="form-0-id" id="id_form-0-id" /></td></tr>
+    </select><input type="hidden" name="form-0-id" id="id_form-0-id"></td></tr>
 
 .. note::
 
@@ -761,6 +786,12 @@ with the ``Author`` model. It works just like a regular formset::
     :func:`~django.forms.formsets.formset_factory` to generate formsets. This
     means that a model formset is just an extension of a basic formset that
     knows how to interact with a particular model.
+
+.. note::
+
+    When using :ref:`multi-table inheritance <multi-table-inheritance>`, forms
+    generated by a formset factory will contain a parent link field (by default
+    ``<parent_model_name>_ptr``) instead of an ``id`` field.
 
 Changing the queryset
 ---------------------
@@ -780,7 +811,7 @@ Alternatively, you can create a subclass that sets ``self.queryset`` in
 
     class BaseAuthorFormSet(BaseModelFormSet):
         def __init__(self, *args, **kwargs):
-            super(BaseAuthorFormSet, self).__init__(*args, **kwargs)
+            super().__init__(*args, **kwargs)
             self.queryset = Author.objects.filter(name__startswith='O')
 
 Then, pass your ``BaseAuthorFormSet`` class to the factory function::
@@ -851,8 +882,10 @@ As with regular formsets, it's possible to :ref:`specify initial data
 parameter when instantiating the model formset class returned by
 :func:`~django.forms.models.modelformset_factory`. However, with model
 formsets, the initial values only apply to extra forms, those that aren't
-attached to an existing model instance. If the extra forms with initial data
-aren't changed by the user, they won't be validated or saved.
+attached to an existing model instance. If the length of ``initial`` exceeds
+the number of extra forms, the excess initial data is ignored. If the extra
+forms with initial data aren't changed by the user, they won't be validated or
+saved.
 
 .. _saving-objects-in-the-formset:
 
@@ -935,10 +968,10 @@ so long as the total number of forms does not exceed ``max_num``::
     >>> formset = AuthorFormSet(queryset=Author.objects.order_by('name'))
     >>> for form in formset:
     ...     print(form.as_table())
-    <tr><th><label for="id_form-0-name">Name:</label></th><td><input id="id_form-0-name" type="text" name="form-0-name" value="Charles Baudelaire" maxlength="100" /><input type="hidden" name="form-0-id" value="1" id="id_form-0-id" /></td></tr>
-    <tr><th><label for="id_form-1-name">Name:</label></th><td><input id="id_form-1-name" type="text" name="form-1-name" value="Paul Verlaine" maxlength="100" /><input type="hidden" name="form-1-id" value="3" id="id_form-1-id" /></td></tr>
-    <tr><th><label for="id_form-2-name">Name:</label></th><td><input id="id_form-2-name" type="text" name="form-2-name" value="Walt Whitman" maxlength="100" /><input type="hidden" name="form-2-id" value="2" id="id_form-2-id" /></td></tr>
-    <tr><th><label for="id_form-3-name">Name:</label></th><td><input id="id_form-3-name" type="text" name="form-3-name" maxlength="100" /><input type="hidden" name="form-3-id" id="id_form-3-id" /></td></tr>
+    <tr><th><label for="id_form-0-name">Name:</label></th><td><input id="id_form-0-name" type="text" name="form-0-name" value="Charles Baudelaire" maxlength="100"><input type="hidden" name="form-0-id" value="1" id="id_form-0-id"></td></tr>
+    <tr><th><label for="id_form-1-name">Name:</label></th><td><input id="id_form-1-name" type="text" name="form-1-name" value="Paul Verlaine" maxlength="100"><input type="hidden" name="form-1-id" value="3" id="id_form-1-id"></td></tr>
+    <tr><th><label for="id_form-2-name">Name:</label></th><td><input id="id_form-2-name" type="text" name="form-2-name" value="Walt Whitman" maxlength="100"><input type="hidden" name="form-2-id" value="2" id="id_form-2-id"></td></tr>
+    <tr><th><label for="id_form-3-name">Name:</label></th><td><input id="id_form-3-name" type="text" name="form-3-name" maxlength="100"><input type="hidden" name="form-3-id" id="id_form-3-id"></td></tr>
 
 A ``max_num`` value of ``None`` (the default) puts a high limit on the number
 of forms displayed (1000). In practice this is equivalent to no limit.
@@ -985,7 +1018,7 @@ class's ``clean`` method::
 
     class MyModelFormSet(BaseModelFormSet):
         def clean(self):
-            super(MyModelFormSet, self).clean()
+            super().clean()
             # example custom validation across forms in the formset
             for form in self.forms:
                 # your custom formset validation
@@ -1001,7 +1034,7 @@ to modify a value in ``ModelFormSet.clean()`` you must modify
 
     class MyModelFormSet(BaseModelFormSet):
         def clean(self):
-            super(MyModelFormSet, self).clean()
+            super().clean()
 
             for form in self.forms:
                 name = form.cleaned_data['name'].upper()
@@ -1022,8 +1055,10 @@ formset::
     def manage_authors(request):
         AuthorFormSet = modelformset_factory(Author, fields=('name', 'title'))
         if request.method == "POST":
-            formset = AuthorFormSet(request.POST, request.FILES,
-                                    queryset=Author.objects.filter(name__startswith='O'))
+            formset = AuthorFormSet(
+                request.POST, request.FILES,
+                queryset=Author.objects.filter(name__startswith='O'),
+            )
             if formset.is_valid():
                 formset.save()
                 # Do something.
@@ -1043,14 +1078,14 @@ There are three ways to render a formset in a Django template.
 
 First, you can let the formset do most of the work::
 
-    <form method="post" action="">
+    <form method="post">
         {{ formset }}
     </form>
 
 Second, you can manually render the formset, but let the form deal with
 itself::
 
-    <form method="post" action="">
+    <form method="post">
         {{ formset.management_form }}
         {% for form in formset %}
             {{ form }}
@@ -1063,7 +1098,7 @@ form as shown above. See the :ref:`management form documentation
 
 Third, you can manually render each field::
 
-    <form method="post" action="">
+    <form method="post">
         {{ formset.management_form }}
         {% for form in formset %}
             {% for field in form %}
@@ -1076,7 +1111,7 @@ If you opt to use this third method and you don't iterate over the fields with
 a ``{% for %}`` loop, you'll need to render the primary key field. For example,
 if you were rendering the ``name`` and ``age`` fields of a model::
 
-    <form method="post" action="">
+    <form method="post">
         {{ formset.management_form }}
         {% for form in formset %}
             {{ form.id }}
@@ -1122,6 +1157,10 @@ a particular author, you could do this::
     >>> author = Author.objects.get(name='Mike Royko')
     >>> formset = BookFormSet(instance=author)
 
+``BookFormSet``'s :ref:`prefix <formset-prefix>` is ``'book_set'``
+(``<model name>_set`` ). If ``Book``'s ``ForeignKey`` to ``Author`` has a
+:attr:`~django.db.models.ForeignKey.related_name`, that's used instead.
+
 .. note::
 
     :func:`~django.forms.models.inlineformset_factory` uses
@@ -1145,7 +1184,7 @@ For example, if you want to override ``clean()``::
 
     class CustomInlineFormSet(BaseInlineFormSet):
         def clean(self):
-            super(CustomInlineFormSet, self).clean()
+            super().clean()
             # example custom validation across forms in the formset
             for form in self.forms:
                 # your custom formset validation
