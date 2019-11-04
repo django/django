@@ -1128,11 +1128,17 @@ class OrderBy(BaseExpression):
         return [self.expression]
 
     def as_sql(self, compiler, connection, template=None, **extra_context):
-        if not template:
+        template = template or self.template
+        if connection.features.supports_order_by_nulls_modifier:
             if self.nulls_last:
-                template = '%s NULLS LAST' % self.template
+                template = '%s NULLS LAST' % template
             elif self.nulls_first:
-                template = '%s NULLS FIRST' % self.template
+                template = '%s NULLS FIRST' % template
+        else:
+            if self.nulls_last:
+                template = '%%(expression)s IS NULL, %s' % template
+            elif self.nulls_first:
+                template = '%%(expression)s IS NOT NULL, %s' % template
         connection.ops.check_expression_support(self)
         expression_sql, params = compiler.compile(self.expression)
         placeholders = {
@@ -1143,23 +1149,6 @@ class OrderBy(BaseExpression):
         template = template or self.template
         params *= template.count('%(expression)s')
         return (template % placeholders).rstrip(), params
-
-    def as_sqlite(self, compiler, connection):
-        template = None
-        if connection.Database.sqlite_version_info < (3, 30, 0):
-            if self.nulls_last:
-                template = '%(expression)s IS NULL, %(expression)s %(ordering)s'
-            elif self.nulls_first:
-                template = '%(expression)s IS NOT NULL, %(expression)s %(ordering)s'
-        return self.as_sql(compiler, connection, template=template)
-
-    def as_mysql(self, compiler, connection):
-        template = None
-        if self.nulls_last:
-            template = 'ISNULL(%(expression)s), %(expression)s %(ordering)s '
-        elif self.nulls_first:
-            template = 'IF(ISNULL(%(expression)s),0,1), %(expression)s %(ordering)s '
-        return self.as_sql(compiler, connection, template=template)
 
     def as_oracle(self, compiler, connection):
         # Oracle doesn't allow ORDER BY EXISTS() unless it's wrapped in
