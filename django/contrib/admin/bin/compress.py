@@ -11,7 +11,7 @@ except ImportError:
 else:
     closure_compiler = closure.get_jar_filename()
 
-js_path = Path(__file__).parent.parent / 'static' / 'admin' / 'js'
+js_path = Path(__file__).parents[1] / 'static' / 'admin' / 'js'
 
 
 def main():
