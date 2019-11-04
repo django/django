@@ -236,14 +236,16 @@ you'd want to let the user choose a format, and possibly a list of fields to
 include in the export. The best thing to do would be to write a small action
 that redirects to your custom export view::
 
-    from django.contrib import admin
     from django.contrib.contenttypes.models import ContentType
     from django.http import HttpResponseRedirect
 
     def export_selected_objects(modeladmin, request, queryset):
-        selected = request.POST.getlist(admin.ACTION_CHECKBOX_NAME)
+        selected = queryset.values_list('pk', flat=True)
         ct = ContentType.objects.get_for_model(queryset.model)
-        return HttpResponseRedirect("/export/?ct=%s&ids=%s" % (ct.pk, ",".join(selected)))
+        return HttpResponseRedirect('/export/?ct=%s&ids=%s' % (
+            ct.pk,
+            ','.join(str(pk) for pk in selected),
+        ))
 
 As you can see, the action is rather short; all the complex logic would belong
 in your export view. This would need to deal with objects of any type, hence
