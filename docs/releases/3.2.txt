@@ -481,6 +481,9 @@ Miscellaneous
 * Keyword arguments to :func:`~django.test.utils.setup_databases` are now
   keyword-only.
 
+* The undocumented ``django.utils.http.limited_parse_qsl()`` function is
+  removed. Please use :func:`urllib.parse.parse_qsl` instead.
+
 .. _deprecated-features-3.2:
 
 Features deprecated in 3.2
