@@ -1,6 +1,6 @@
 .\" Man page generated from reStructuredText.
 .
-.TH "DJANGO-ADMIN" "1" "September 02, 2019" "2.2" "Django"
+.TH "DJANGO-ADMIN" "1" "November 04, 2019" "2.2" "Django"
 .SH NAME
 django-admin \- Utility script for the Django Web framework
 .
@@ -1095,8 +1095,19 @@ to dependencies.
 \fB<app_label> <migrationname>\fP: Brings the database schema to a state where
 the named migration is applied, but no later migrations in the same app are
 applied. This may involve unapplying migrations if you have previously
-migrated past the named migration. Use the name \fBzero\fP to unapply all
+migrated past the named migration. You can use a prefix of the migration
+name, e.g. \fB0001\fP, as long as it\(aqs unique for the given app name. Use the
+name \fBzero\fP to migrate all the way back i.e. to revert all applied
 migrations for an app.
+.UNINDENT
+.sp
+\fBWARNING:\fP
+.INDENT 0.0
+.INDENT 3.5
+When unapplying migrations, all dependent migrations will also be
+unapplied, regardless of \fB<app_label>\fP\&. You can use \fB\-\-plan\fP to check
+which migrations will be unapplied.
+.UNINDENT
 .UNINDENT
 .INDENT 0.0
 .TP
@@ -1916,6 +1927,15 @@ will reduce the number of processes accordingly.
 Each process gets its own database. You must ensure that different test cases
 don\(aqt access the same resources. For instance, test cases that touch the
 filesystem should create a temporary directory for their own use.
+.sp
+\fBNOTE:\fP
+.INDENT 0.0
+.INDENT 3.5
+If you have test classes that cannot be run in parallel, you can use
+\fBSerializeMixin\fP to run them sequentially. See Enforce running test
+classes sequentially\&.
+.UNINDENT
+.UNINDENT
 .sp
 This option requires the third\-party \fBtblib\fP package to display tracebacks
 correctly:
