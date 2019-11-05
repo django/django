@@ -218,14 +218,14 @@ different template directories (:setting:`DIRS <TEMPLATES-DIRS>`), you could
 farm out to the template system like so::
 
     from django.core.mail import send_mail
-    from django.template import Context, loader
+    from django.template import loader
 
     def register_for_newsletter(request):
         # Check form values, etc., and subscribe the user.
         # ...
 
-        subject = loader.get_template('alerts/subject.txt').render(Context({}))
-        message = loader.get_template('alerts/message.txt').render(Context({}))
+        subject = loader.get_template('alerts/subject.txt').render({})
+        message = loader.get_template('alerts/message.txt').render({})
         send_mail(subject, message, 'editor@ljworld.com', [user.email])
 
         # ...
