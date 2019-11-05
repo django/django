@@ -192,5 +192,5 @@ that should be called in case of server errors. Server errors happen when you
 have runtime errors in view code.
 
 By default, this is :func:`django.views.defaults.server_error`. If you
-implement a custom view, be sure it returns an
-:class:`~django.http.HttpResponseServerError`.
+implement a custom view, be sure it accepts a ``request`` argument and returns
+an :class:`~django.http.HttpResponseServerError`.
