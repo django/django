@@ -23,21 +23,21 @@ class DefaultsTests(TestCase):
 
     @classmethod
     def setUpTestData(cls):
-        Author.objects.create(name='Boris')
+        author = Author.objects.create(name='Boris')
         Article.objects.create(
-            title='Old Article', slug='old_article', author_id=1,
+            title='Old Article', slug='old_article', author=author,
             date_created=datetime.datetime(2001, 1, 1, 21, 22, 23)
         )
         Article.objects.create(
-            title='Current Article', slug='current_article', author_id=1,
+            title='Current Article', slug='current_article', author=author,
             date_created=datetime.datetime(2007, 9, 17, 21, 22, 23)
         )
         Article.objects.create(
-            title='Future Article', slug='future_article', author_id=1,
+            title='Future Article', slug='future_article', author=author,
             date_created=datetime.datetime(3000, 1, 1, 21, 22, 23)
         )
-        UrlArticle.objects.create(
-            title='Old Article', slug='old_article', author_id=1,
+        cls.urlarticle = UrlArticle.objects.create(
+            title='Old Article', slug='old_article', author=author,
             date_created=datetime.datetime(2001, 1, 1, 21, 22, 23)
         )
         Site(id=1, domain='testserver', name='testserver').save()
@@ -111,7 +111,7 @@ class DefaultsTests(TestCase):
         "A model can set attributes on the get_absolute_url method"
         self.assertTrue(getattr(UrlArticle.get_absolute_url, 'purge', False),
                         'The attributes of the original get_absolute_url must be added.')
-        article = UrlArticle.objects.get(pk=1)
+        article = UrlArticle.objects.get(pk=self.urlarticle.pk)
         self.assertTrue(getattr(article.get_absolute_url, 'purge', False),
                         'The attributes of the original get_absolute_url must be added.')
 
