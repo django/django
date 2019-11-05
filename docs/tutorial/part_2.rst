@@ -149,7 +149,7 @@ echos it back to the same WebSocket.
     Note that for smaller sites you can use a simpler deployment strategy where
     Daphne serves all requests - HTTP and WebSocket - rather than having a
     separate WSGI server. In this deployment configuration no common path prefix
-    like is ``/ws/`` is necessary.
+    like ``/ws/`` is necessary.
 
 Create a new file ``chat/consumers.py``. Your app directory should now look like::
 
