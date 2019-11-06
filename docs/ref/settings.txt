@@ -1282,6 +1282,10 @@ Default: Not defined
 
 The directory used by the ``file`` email backend to store output files.
 
+.. versionchanged:: 3.1
+
+    Support for :class:`pathlib.Path` was added.
+
 .. setting:: EMAIL_HOST
 
 ``EMAIL_HOST``
