@@ -569,7 +569,10 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
                 filebased.EmailBackend
             )
 
-        msg = 'expected str, bytes or os.PathLike object, not object'
+        if sys.platform == 'win32':
+            msg = '_getfullpathname: path should be string, bytes or os.PathLike, not object'
+        else:
+            msg = 'expected str, bytes or os.PathLike object, not object'
         with self.assertRaisesMessage(TypeError, msg):
             mail.get_connection('django.core.mail.backends.filebased.EmailBackend', file_path=object())
         self.assertIsInstance(mail.get_connection(), locmem.EmailBackend)
