@@ -268,6 +268,10 @@ Miscellaneous
 * The compatibility imports of ``Context``, ``ContextPopException``, and
   ``RequestContext`` in ``django.template.base`` are removed.
 
+* The compatibility import of
+  ``django.contrib.admin.helpers.ACTION_CHECKBOX_NAME`` in
+  ``django.contrib.admin`` is removed.
+
 * The :setting:`STATIC_URL` and :setting:`MEDIA_URL` settings set to relative
   paths are now prefixed by the server-provided value of ``SCRIPT_NAME`` (or
   ``/`` if not set). This change should not affect settings set to valid URLs
