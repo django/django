@@ -71,7 +71,7 @@ setup(
     description=('A high-level Python Web framework that encourages '
                  'rapid development and clean, pragmatic design.'),
     long_description=read('README.rst'),
-    license='BSD',
+    license='BSD-3-Clause',
     packages=find_packages(),
     include_package_data=True,
     scripts=['django/bin/django-admin.py'],
