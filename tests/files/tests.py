@@ -5,6 +5,7 @@ import struct
 import tempfile
 import unittest
 from io import BytesIO, StringIO, TextIOWrapper
+from pathlib import Path
 from unittest import mock
 
 from django.core.files import File
@@ -15,6 +16,7 @@ from django.core.files.uploadedfile import (
     InMemoryUploadedFile, SimpleUploadedFile, TemporaryUploadedFile,
     UploadedFile,
 )
+from django.test import override_settings
 
 try:
     from PIL import Image
@@ -230,6 +232,12 @@ class TemporaryUploadedFileTests(unittest.TestCase):
         """The temporary file name has the same suffix as the original file."""
         with TemporaryUploadedFile('test.txt', 'text/plain', 1, 'utf8') as temp_file:
             self.assertTrue(temp_file.file.name.endswith('.upload.txt'))
+
+    def test_file_upload_temp_dir_pathlib(self):
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            with override_settings(FILE_UPLOAD_TEMP_DIR=Path(tmp_dir)):
+                with TemporaryUploadedFile('test.txt', 'text/plain', 1, 'utf-8') as temp_file:
+                    self.assertTrue(os.path.exists(temp_file.file.name))
 
 
 class DimensionClosingBug(unittest.TestCase):
