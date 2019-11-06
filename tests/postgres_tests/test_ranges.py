@@ -293,14 +293,14 @@ class TestQueryingWithRanges(PostgreSQLTestCase):
             [objs[0]],
         )
 
-    def test_date_range_lower_isfinite(self):
+    def test_date_range_isfinite_startswith(self):
         now = timezone.now()
         objs = [
             RangesModel.objects.create(dates=DateRange(None, now.date())),
             RangesModel.objects.create(dates=DateRange(now.date() - datetime.timedelta(days=1), now.date()),
         ]
         self.assertSequenceEqual(
-            RangesModel.objects.filter(dates__lower__isfinite=True),
+            RangesModel.objects.filter(dates__startswith__isfinite=True),
             [objs[0]]
         )
 
@@ -316,14 +316,14 @@ class TestQueryingWithRanges(PostgreSQLTestCase):
             [objs[0]],
         )
 
-    def test_datetime_range_upper_isfinite(self):
+    def test_datetime_range_isfinite_endswith(self):
         now = timezone.now()
         objs = [
             RangesModel.objects.create(timestamps=DateTimeTZRange(now - datetime.timedelta(hours=1), now)),
             RangesModel.objects.create(timestamps=DateTimeTZRange(now - datetime.timedelta(hours=1), None)),
         ]
         self.assertSequenceEqual(
-            RangesModel.objects.filter(timestamps__upper__isfinite=False),
+            RangesModel.objects.filter(timestamps__endswith__isfinite=False),
             [objs[0]],
         )
 
