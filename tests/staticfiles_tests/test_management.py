@@ -4,6 +4,7 @@ import shutil
 import tempfile
 import unittest
 from io import StringIO
+from pathlib import Path
 from unittest import mock
 
 from admin_scripts.tests import AdminScriptTestCase
@@ -102,6 +103,7 @@ class TestFindStatic(TestDefaults, CollectionTestCase):
         # FileSystemFinder searched locations
         self.assertIn(TEST_SETTINGS['STATICFILES_DIRS'][1][1], searched_locations)
         self.assertIn(TEST_SETTINGS['STATICFILES_DIRS'][0], searched_locations)
+        self.assertIn(str(TEST_SETTINGS['STATICFILES_DIRS'][2]), searched_locations)
         # DefaultStorageFinder searched locations
         self.assertIn(
             os.path.join('staticfiles_tests', 'project', 'site_media', 'media'),
@@ -173,6 +175,15 @@ class TestCollection(TestDefaults, CollectionTestCase):
         self.assertFileNotFound('test/.hidden')
         self.assertFileNotFound('test/backup~')
         self.assertFileNotFound('test/CVS')
+
+    def test_pathlib(self):
+        self.assertFileContains('pathlib.txt', 'pathlib')
+
+
+class TestCollectionPathLib(TestCollection):
+    def mkdtemp(self):
+        tmp_dir = super().mkdtemp()
+        return Path(tmp_dir)
 
 
 class TestCollectionVerbosity(CollectionTestCase):

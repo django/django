@@ -96,7 +96,7 @@ Minor features
 :mod:`django.contrib.staticfiles`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* The :setting:`STATICFILES_DIRS` setting now supports :class:`pathlib.Path`.
 
 :mod:`django.contrib.syndication`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -225,6 +225,12 @@ Validators
 ~~~~~~~~~~
 
 * ...
+
+Miscellaneous
+~~~~~~~~~~~~~
+
+* The SQLite backend now supports :class:`pathlib.Path` for the ``NAME``
+  setting.
 
 .. _backwards-incompatible-3.1:
 

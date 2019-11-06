@@ -174,7 +174,9 @@ class DatabaseWrapper(BaseDatabaseWrapper):
                 "settings.DATABASES is improperly configured. "
                 "Please supply the NAME value.")
         kwargs = {
-            'database': settings_dict['NAME'],
+            # TODO: Remove str() when dropping support for PY36.
+            # https://bugs.python.org/issue33496
+            'database': str(settings_dict['NAME']),
             'detect_types': Database.PARSE_DECLTYPES | Database.PARSE_COLNAMES,
             **settings_dict['OPTIONS'],
         }
