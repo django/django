@@ -284,3 +284,31 @@ class IsEmpty(models.Transform):
     lookup_name = 'isempty'
     function = 'isempty'
     output_field = models.BooleanField()
+
+
+@RangeField.register_lookup
+class LowerInclusive(models.Transform):
+    lookup_name = 'lower_inc'
+    function = 'LOWER_INC'
+    output_field = models.BooleanField()
+
+
+@RangeField.register_lookup
+class LowerInfinite(models.Transform):
+    lookup_name = 'lower_inf'
+    function = 'LOWER_INF'
+    output_field = models.BooleanField()
+
+
+@RangeField.register_lookup
+class UpperInclusive(models.Transform):
+    lookup_name = 'upper_inc'
+    function = 'UPPER_INC'
+    output_field = models.BooleanField()
+
+
+@RangeField.register_lookup
+class UpperInfinite(models.Transform):
+    lookup_name = 'upper_inf'
+    function = 'UPPER_INF'
+    output_field = models.BooleanField()

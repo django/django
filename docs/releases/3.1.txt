@@ -80,6 +80,10 @@ Minor features
   :class:`~django.contrib.postgres.fields.ArrayField` and
   :class:`~django.contrib.postgres.fields.RangeField`.
 
+* The new :lookup:`rangefield.lower_inc`, :lookup:`rangefield.lower_inf`,
+  :lookup:`rangefield.upper_inc`, and :lookup:`rangefield.upper_inf` allows
+  querying :class:`~django.contrib.postgres.fields.RangeField` by a bound type.
+
 :mod:`django.contrib.redirects`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

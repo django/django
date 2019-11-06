@@ -864,6 +864,62 @@ Returned objects are empty ranges. Can be chained to valid lookups for a
     >>> Event.objects.filter(ages__isempty=True)
     <QuerySet []>
 
+.. fieldlookup:: rangefield.lower_inc
+
+``lower_inc``
+^^^^^^^^^^^^^
+
+.. versionadded:: 3.1
+
+Returns objects that have inclusive or exclusive lower bounds, depending on the
+boolean value passed. Can be chained to valid lookups for a
+:class:`~django.db.models.BooleanField`.
+
+    >>> Event.objects.filter(ages__lower_inc=True)
+    <QuerySet [<Event: Soft play>, <Event: Pub trip>]>
+
+.. fieldlookup:: rangefield.lower_inf
+
+``lower_inf``
+^^^^^^^^^^^^^
+
+.. versionadded:: 3.1
+
+Returns objects that have unbounded (infinite) or bounded lower bound,
+depending on the boolean value passed. Can be chained to valid lookups for a
+:class:`~django.db.models.BooleanField`.
+
+    >>> Event.objects.filter(ages__lower_inf=True)
+    <QuerySet []>
+
+.. fieldlookup:: rangefield.upper_inc
+
+``upper_inc``
+^^^^^^^^^^^^^
+
+.. versionadded:: 3.1
+
+Returns objects that have inclusive or exclusive upper bounds, depending on the
+boolean value passed. Can be chained to valid lookups for a
+:class:`~django.db.models.BooleanField`.
+
+    >>> Event.objects.filter(ages__upper_inc=True)
+    <QuerySet []>
+
+.. fieldlookup:: rangefield.upper_inf
+
+``upper_inf``
+^^^^^^^^^^^^^
+
+.. versionadded:: 3.1
+
+Returns objects that have unbounded (infinite) or bounded upper bound,
+depending on the boolean value passed. Can be chained to valid lookups for a
+:class:`~django.db.models.BooleanField`.
+
+    >>> Event.objects.filter(ages__upper_inf=True)
+    <QuerySet [<Event: Pub trip>]>
+
 Defining your own range types
 -----------------------------
 
