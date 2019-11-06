@@ -771,7 +771,7 @@ class FileFieldStorageTests(TestCase):
                 o.delete()
 
     @unittest.skipIf(
-        sys.platform.startswith('win'),
+        sys.platform == 'win32',
         "Windows supports at most 260 characters in a path.",
     )
     def test_extended_length_storage(self):
@@ -897,7 +897,7 @@ class FileSaveRaceConditionTest(SimpleTestCase):
         self.assertRegex(files[1], 'conflict_%s' % FILE_SUFFIX_REGEX)
 
 
-@unittest.skipIf(sys.platform.startswith('win'), "Windows only partially supports umasks and chmod.")
+@unittest.skipIf(sys.platform == 'win32', "Windows only partially supports umasks and chmod.")
 class FileStoragePermissions(unittest.TestCase):
     def setUp(self):
         self.umask = 0o027

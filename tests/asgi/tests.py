@@ -78,7 +78,7 @@ class ASGITest(SimpleTestCase):
             set(response_start['headers']),
             {
                 (b'Content-Length', str(len(test_file_contents)).encode('ascii')),
-                (b'Content-Type', b'text/plain' if sys.platform.startswith('win') else b'text/x-python'),
+                (b'Content-Type', b'text/plain' if sys.platform == 'win32' else b'text/x-python'),
                 (b'Content-Disposition', b'inline; filename="urls.py"'),
             },
         )

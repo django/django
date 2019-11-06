@@ -72,7 +72,7 @@ class FileFieldTests(TestCase):
         with self.assertRaises(IntegrityError):
             Document.objects.create(myfile='something.txt')
 
-    @unittest.skipIf(sys.platform.startswith('win'), "Windows doesn't support moving open files.")
+    @unittest.skipIf(sys.platform == 'win32', "Windows doesn't support moving open files.")
     # The file's source and destination must be on the same filesystem.
     @override_settings(MEDIA_ROOT=temp.gettempdir())
     def test_move_temporary_file(self):

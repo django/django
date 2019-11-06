@@ -420,7 +420,7 @@ class CustomStaticFilesStorage(storage.StaticFilesStorage):
         super().__init__(*args, **kwargs)
 
 
-@unittest.skipIf(sys.platform.startswith('win'), "Windows only partially supports chmod.")
+@unittest.skipIf(sys.platform == 'win32', "Windows only partially supports chmod.")
 class TestStaticFilePermissions(CollectionTestCase):
 
     command_params = {
