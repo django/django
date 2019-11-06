@@ -460,7 +460,7 @@ class ListFiltersTests(TestCase):
         self.assertEqual(choice['query_string'], '?date_registered__isnull=False')
 
     @unittest.skipIf(
-        sys.platform.startswith('win'),
+        sys.platform == 'win32',
         "Windows doesn't support setting a timezone that differs from the "
         "system timezone."
     )

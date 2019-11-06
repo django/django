@@ -969,7 +969,7 @@ class TemplateTests(SimpleTestCase):
         with self.assertRaises(pytz.UnknownTimeZoneError):
             Template("{% load tz %}{% timezone tz %}{% endtimezone %}").render(Context({'tz': 'foobar'}))
 
-    @skipIf(sys.platform.startswith('win'), "Windows uses non-standard time zone names")
+    @skipIf(sys.platform == 'win32', "Windows uses non-standard time zone names")
     def test_get_current_timezone_templatetag(self):
         """
         Test the {% get_current_timezone %} templatetag.
@@ -1009,7 +1009,7 @@ class TemplateTests(SimpleTestCase):
         with self.assertRaisesMessage(TemplateSyntaxError, msg):
             Template("{% load tz %}{% get_current_timezone %}").render()
 
-    @skipIf(sys.platform.startswith('win'), "Windows uses non-standard time zone names")
+    @skipIf(sys.platform == 'win32', "Windows uses non-standard time zone names")
     def test_tz_template_context_processor(self):
         """
         Test the django.template.context_processors.tz template context processor.
