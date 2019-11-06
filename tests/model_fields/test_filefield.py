@@ -1,6 +1,8 @@
 import os
 import sys
+import tempfile
 import unittest
+from pathlib import Path
 
 from django.core.files import temp
 from django.core.files.base import ContentFile
@@ -94,3 +96,10 @@ class FileFieldTests(TestCase):
         # open() doesn't write to disk.
         d.myfile.file = ContentFile(b'', name='bla')
         self.assertEqual(d.myfile, d.myfile.open())
+
+    def test_media_root_pathlib(self):
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            with override_settings(MEDIA_ROOT=Path(tmp_dir)):
+                with TemporaryUploadedFile('foo.txt', 'text/plain', 1, 'utf-8') as tmp_file:
+                    Document.objects.create(myfile=tmp_file)
+                    self.assertTrue(os.path.exists(os.path.join(tmp_dir, 'unused', 'foo.txt')))
