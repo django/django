@@ -46,6 +46,11 @@ class HasAnyKeys(HasKeys):
     operator = '?|'
 
 
+class IsFinite(Transform):
+    lookup_name = 'isfinite'
+    function = 'ISFINITE'
+
+
 class Unaccent(Transform):
     bilateral = True
     lookup_name = 'unaccent'

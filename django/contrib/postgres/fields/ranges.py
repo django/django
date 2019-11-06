@@ -158,7 +158,11 @@ class DateRangeField(RangeField):
 
 RangeField.register_lookup(lookups.DataContains)
 RangeField.register_lookup(lookups.ContainedBy)
+RangeField.register_lookup(lookups.Lower)
 RangeField.register_lookup(lookups.Overlap)
+RangeField.register_lookup(lookups.Upper)
+DateRangeField.register_lookup(lookups.IsFinite)
+DateTimeRangeField.register.register_lookup(lookups.IsFinite)
 
 
 class DateTimeRangeContains(lookups.PostgresSimpleLookup):
