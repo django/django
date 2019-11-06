@@ -550,6 +550,8 @@ Miscellaneous
 * ``alias=None`` is added to the signature of
   :meth:`.Expression.get_group_by_cols`.
 
+* Support for ``sqlparse`` < 0.2.2 is removed.
+
 .. _deprecated-features-3.0:
 
 Features deprecated in 3.0
