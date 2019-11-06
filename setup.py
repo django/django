@@ -78,7 +78,7 @@ setup(
     entry_points={'console_scripts': [
         'django-admin = django.core.management:execute_from_command_line',
     ]},
-    install_requires=['pytz', 'sqlparse', 'asgiref'],
+    install_requires=['pytz', 'sqlparse >= 0.2.2', 'asgiref'],
     extras_require={
         "bcrypt": ["bcrypt"],
         "argon2": ["argon2-cffi >= 16.1.0"],
