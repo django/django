@@ -1283,6 +1283,10 @@ Default: Not defined
 The directory used by the :ref:`file email backend <topic-email-file-backend>`
 to store output files.
 
+.. versionchanged:: 3.1
+
+    Support for :class:`pathlib.Path` was added.
+
 .. setting:: EMAIL_HOST
 
 ``EMAIL_HOST``
