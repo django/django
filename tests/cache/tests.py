@@ -10,6 +10,7 @@ import tempfile
 import threading
 import time
 import unittest
+from pathlib import Path
 from unittest import mock
 
 from django.conf import settings
@@ -1422,18 +1423,21 @@ class FileBasedCacheTests(BaseCacheTests, TestCase):
 
     def setUp(self):
         super().setUp()
-        self.dirname = tempfile.mkdtemp()
+        self.dirname = self.mkdtemp()
         # Caches location cannot be modified through override_settings / modify_settings,
         # hence settings are manipulated directly here and the setting_changed signal
         # is triggered manually.
         for cache_params in settings.CACHES.values():
-            cache_params.update({'LOCATION': self.dirname})
+            cache_params['LOCATION'] = self.dirname
         setting_changed.send(self.__class__, setting='CACHES', enter=False)
 
     def tearDown(self):
         super().tearDown()
         # Call parent first, as cache.clear() may recreate cache base directory
         shutil.rmtree(self.dirname)
+
+    def mkdtemp(self):
+        return tempfile.mkdtemp()
 
     def test_ignores_non_cache_files(self):
         fname = os.path.join(self.dirname, 'not-a-cache-file')
@@ -1471,6 +1475,12 @@ class FileBasedCacheTests(BaseCacheTests, TestCase):
             fh.write(b'')
         with open(cache_file, 'rb') as fh:
             self.assertIs(cache._is_expired(fh), True)
+
+
+class FileBasedCachePathLibTests(FileBasedCacheTests):
+    def mkdtemp(self):
+        tmp_dir = super().mkdtemp()
+        return Path(tmp_dir)
 
 
 @override_settings(CACHES={
