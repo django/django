@@ -227,3 +227,12 @@ class AppCompilationTest(ProjectAndAppTests):
         call_command('compilemessages', locale=[self.LOCALE], stdout=StringIO())
         self.assertTrue(os.path.exists(self.PROJECT_MO_FILE))
         self.assertTrue(os.path.exists(self.APP_MO_FILE))
+
+
+class PathLibLocaleCompilationTests(MessageCompilationTests):
+    work_subdir = 'exclude'
+
+    def test_locale_paths_pathlib(self):
+        with override_settings(LOCALE_PATHS=[Path(self.test_dir) / 'canned_locale']):
+            call_command('compilemessages', locale=['fr'], stdout=StringIO())
+            self.assertTrue(os.path.exists('canned_locale/fr/LC_MESSAGES/django.mo'))
