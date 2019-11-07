@@ -429,7 +429,7 @@ class BaseExpression:
             identity.append((arg, value))
         return tuple(identity)
 
-    def ___eq__(self, other):
+    def __eq__(self, other):
         if not isinstance(other, BaseExpression):
             return NotImplemented
         return other.identity == self.identity
