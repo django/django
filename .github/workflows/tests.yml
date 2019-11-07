@@ -1,0 +1,38 @@
+name: Tests
+on: [push, pull_request]
+jobs:
+
+  flake8:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v1
+    - uses: actions/setup-python@v1.1.1
+    - run: python -m pip install --upgrade pip setuptools flake8
+    - run: flake8
+
+  isort:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v1
+    - uses: actions/setup-python@v1.1.1
+    - run: python -m pip install --upgrade pip setuptools isort
+    - run: isort --recursive --check-only --diff django tests scripts
+
+  sqlite:
+    runs-on: ${{ matrix.os }}
+    needs: [flake8, isort]
+    strategy:
+      matrix:
+        python-version: [3.6, 3.7, 3.8]
+        os: [macos-latest, windows-latest, ubuntu-latest]
+    steps:
+    - uses: actions/checkout@v1
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v1.1.1
+      with:
+          python-version: ${{ matrix.python-version }}
+    - run: |
+        python -m pip install --upgrade pip setuptools
+        python -m pip install -e .
+        python -m pip install -r tests/requirements/py3.txt
+    - run: tests/runtests.py
