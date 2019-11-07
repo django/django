@@ -75,6 +75,14 @@ class SchemaIndexesTests(TestCase):
         index_sql = connection.schema_editor()._model_indexes_sql(IndexTogetherSingleList)
         self.assertEqual(len(index_sql), 1)
 
+    def test_columns_list_sql(self):
+        index = Index(fields=['headline'], name='whitespace_idx')
+        editor = connection.schema_editor()
+        self.assertIn(
+            '(%s)' % editor.quote_name('headline'),
+            str(index.create_sql(Article, editor)),
+        )
+
 
 @skipIf(connection.vendor == 'postgresql', 'opclasses are PostgreSQL only')
 class SchemaIndexesNotPostgreSQLTests(TransactionTestCase):
@@ -222,6 +230,18 @@ class SchemaIndexesPostgreSQLTests(TransactionTestCase):
         with editor.connection.cursor() as cursor:
             cursor.execute(self.get_opclass_query % indexname)
             self.assertCountEqual(cursor.fetchall(), [('text_pattern_ops', indexname)])
+
+    def test_ops_class_descending_columns_list_sql(self):
+        index = Index(
+            fields=['-headline'],
+            name='whitespace_idx',
+            opclasses=['text_pattern_ops'],
+        )
+        with connection.schema_editor() as editor:
+            self.assertIn(
+                '(%s text_pattern_ops DESC)' % editor.quote_name('headline'),
+                str(index.create_sql(Article, editor)),
+            )
 
 
 @skipUnless(connection.vendor == 'mysql', 'MySQL tests')
