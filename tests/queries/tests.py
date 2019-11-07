@@ -295,6 +295,14 @@ class Queries1Tests(TestCase):
             Author.objects.order_by('name').get(pk=self.a1.pk)
         self.assertNotIn('order by', captured_queries[0]['sql'].lower())
 
+    def test_get_or_none_returns_object(self):
+        item = Item.objects.get_or_none(name='one')
+        self.assertEqual(item, self.i1)
+
+    def test_get_or_none_returns_none(self):
+        item = Item.objects.get_or_none(name='foobar')
+        self.assertIsNone(item)
+
     def test_tickets_4088_4306(self):
         self.assertQuerysetEqual(
             Report.objects.filter(creator=1001),

@@ -434,6 +434,16 @@ class QuerySet:
             )
         )
 
+    def get_or_none(self, *args, **kwargs):
+        """
+        Perform the query and return a single object matching the given
+        keyword arguments. If no object is found a None is returned.
+        """
+        try:
+            return self.get(*args, **kwargs)
+        except self.model.DoesNotExist:
+            return None
+
     def create(self, **kwargs):
         """
         Create a new object with the given kwargs, saving it to the database
