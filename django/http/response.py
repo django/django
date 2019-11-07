@@ -95,7 +95,7 @@ class HttpResponseBase:
 
         headers = [
             (to_bytes(key, 'ascii') + b': ' + to_bytes(value, 'latin-1'))
-            for key, value in self._headers.values()
+            for key, value in self._headers.items()
         ]
         return b'\r\n'.join(headers)
 
