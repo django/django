@@ -52,7 +52,15 @@ class Combinable:
     BITLEFTSHIFT = '<<'
     BITRIGHTSHIFT = '>>'
 
-    def _combine(self, other, connector, reversed):
+    # Comparison operators
+    EQ = '='
+    GT = '>'
+    GE = '>='
+    LT = '<'
+    LE = '<='
+    NE = '!='
+
+    def _combine(self, other, connector, reversed, output_field=None):
         if not hasattr(other, 'resolve_expression'):
             # everything must be resolvable to an expression
             if isinstance(other, datetime.timedelta):
@@ -60,9 +68,12 @@ class Combinable:
             else:
                 other = Value(other)
 
+        if connector in [self.EQ, self.GT, self.GT, self.LT, self.LE, self.NE]:
+            output_field = fields.BooleanField()
+
         if reversed:
-            return CombinedExpression(other, connector, self)
-        return CombinedExpression(self, connector, other)
+            return CombinedExpression(other, connector, self, output_field=output_field)
+        return CombinedExpression(self, connector, other, output_field=output_field)
 
     #############
     # OPERATORS #
@@ -95,6 +106,24 @@ class Combinable:
         raise NotImplementedError(
             "Use .bitand() and .bitor() for bitwise logical operations."
         )
+
+    def __eq__(self, other):
+        return self._combine(other, self.EQ, False)
+
+    def __ne__(self, other):
+        return self._combine(other, self.NE, False)
+
+    def __lt__(self, other):
+        return self._combine(other, self.LT, False)
+
+    def __le__(self, other):
+        return self._combine(other, self.LE, False)
+
+    def __gt__(self, other):
+        return self._combine(other, self.GT, False)
+
+    def __ge__(self, other):
+        return self._combine(other, self.GT, False)
 
     def bitand(self, other):
         return self._combine(other, self.BITAND, False)
@@ -400,7 +429,7 @@ class BaseExpression:
             identity.append((arg, value))
         return tuple(identity)
 
-    def __eq__(self, other):
+    def ___eq__(self, other):
         if not isinstance(other, BaseExpression):
             return NotImplemented
         return other.identity == self.identity

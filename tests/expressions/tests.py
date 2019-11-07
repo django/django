@@ -701,6 +701,22 @@ class BasicExpressionsTests(TestCase):
             [self.example_inc.ceo, self.max],
         )
 
+    def test_comparison_expressions(self):
+        self.assertSequenceEqual(
+            Employee.objects.filter(Lower('firstname') == 'max'),
+            [self.max]
+        )
+
+        # Contrived example for now.
+        self.assertFalse(
+            Employee.objects.filter(Lower('firstname') != 'max').filter(pk=self.max.pk).exists()
+        )
+
+        Employee.objects.filter(Lower('firstname') < 'max')
+        Employee.objects.filter(Lower('firstname') <= 'max')
+        Employee.objects.filter(Lower('firstname') > 'max')
+        Employee.objects.filter(Lower('firstname') >= 'max')
+
 
 class IterableLookupInnerExpressionsTests(TestCase):
     @classmethod
