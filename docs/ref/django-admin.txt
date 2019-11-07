@@ -11,8 +11,8 @@ does the same thing as ``django-admin`` but also sets the
 project's ``settings.py`` file.
 
 The ``django-admin`` script should be on your system path if you installed
-Django via its ``setup.py`` utility. If it's not on your path, you can find it
-in ``site-packages/django/bin`` within your Python installation. Consider
+Django via ``pip``. If it's not on your path, you can find it in
+``site-packages/django/bin`` within your Python installation. Consider
 symlinking it from some place on your path, such as ``/usr/local/bin``.
 
 For Windows users, who do not have symlinking functionality available, you can
