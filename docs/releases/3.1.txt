@@ -76,6 +76,10 @@ Minor features
   :class:`~django.contrib.postgres.operations.BloomExtension` migration
   operation installs the ``bloom`` extension to add support for this index.
 
+* :meth:`~django.db.models.Model.get_FOO_display` now supports
+  :class:`~django.contrib.postgres.fields.ArrayField` and
+  :class:`~django.contrib.postgres.fields.RangeField`.
+
 :mod:`django.contrib.redirects`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
