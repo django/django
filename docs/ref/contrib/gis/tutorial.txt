@@ -320,14 +320,12 @@ First, invoke the Django shell:
 
     $ python manage.py shell
 
-If you downloaded the :ref:`worldborders` data earlier in the
-tutorial, then you can determine its path using Python's built-in
-``os`` module::
+If you downloaded the :ref:`worldborders` data earlier in the tutorial, then
+you can determine its path using Python's :class:`pathlib.Path`::
 
-    >>> import os
+    >>> from pathlib import Path
     >>> import world
-    >>> world_shp = os.path.abspath(os.path.join(os.path.dirname(world.__file__),
-    ...                             'data', 'TM_WORLD_BORDERS-0.3.shp'))
+    >>> world_shp = Path(world.__file__).resolve().parent / 'data' / 'TM_WORLD_BORDERS-0.3.shp'
 
 Now, open the world borders shapefile using GeoDjango's
 :class:`~django.contrib.gis.gdal.DataSource` interface::
@@ -433,7 +431,7 @@ To import the data, use a LayerMapping in a Python script.
 Create a file called ``load.py`` inside the ``world`` application,
 with the following code::
 
-    import os
+    from pathlib import Path
     from django.contrib.gis.utils import LayerMapping
     from .models import WorldBorder
 
@@ -452,9 +450,7 @@ with the following code::
         'mpoly' : 'MULTIPOLYGON',
     }
 
-    world_shp = os.path.abspath(
-        os.path.join(os.path.dirname(__file__), 'data', 'TM_WORLD_BORDERS-0.3.shp'),
-    )
+    world_shp = Path(__file__).resolve().parent / 'data' / 'TM_WORLD_BORDERS-0.3.shp'
 
     def run(verbose=True):
         lm = LayerMapping(WorldBorder, world_shp, world_mapping, transform=False)
