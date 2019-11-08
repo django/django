@@ -1,4 +1,3 @@
-from django.core.serializers.json import DjangoJSONEncoder
 from django.db import migrations, models
 
 from ..fields import (
@@ -253,18 +252,6 @@ class Migration(migrations.Migration):
                 ('date', models.DateField(blank=True, null=True)),
                 ('small_integer', models.SmallIntegerField(blank=True, null=True)),
                 ('decimal_field', models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True)),
-            ],
-            options={
-                'required_db_vendor': 'postgresql',
-            },
-            bases=(models.Model,),
-        ),
-        migrations.CreateModel(
-            name='JSONModel',
-            fields=[
-                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('field', models.JSONField(null=True, blank=True)),
-                ('field_custom', models.JSONField(null=True, blank=True, encoder=DjangoJSONEncoder)),
             ],
             options={
                 'required_db_vendor': 'postgresql',

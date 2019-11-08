@@ -1,4 +1,3 @@
-from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
 
 from .fields import (
@@ -162,15 +161,6 @@ class RangeLookupsModel(PostgreSQLModel):
     date = models.DateField(blank=True, null=True)
     small_integer = models.SmallIntegerField(blank=True, null=True)
     decimal_field = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True)
-
-
-class JSONModel(models.Model):
-    field = models.JSONField(blank=True, null=True)
-    field_custom = models.JSONField(blank=True, null=True, encoder=DjangoJSONEncoder)
-
-    class Meta:
-        required_db_features = {'supports_json_field'}
-        required_db_vendor = 'postgresql'
 
 
 class ArrayFieldSubclass(ArrayField):
