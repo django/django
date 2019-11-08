@@ -412,11 +412,11 @@ classes will need to be kept around for as long as there is a migration
 referencing them. Any :doc:`custom model fields </howto/custom-model-fields>`
 will also need to be kept, since these are imported directly by migrations.
 
-In addition, the base classes of the model are stored as pointers, so you must
-always keep base classes around for as long as there is a migration that
-contains a reference to them. On the plus side, methods and managers from these
-base classes inherit normally, so if you absolutely need access to these you
-can opt to move them into a superclass.
+In addition, the concrete base classes of the model are stored as pointers, so
+you must always keep base classes around for as long as there is a migration
+that contains a reference to them. On the plus side, methods and managers from
+these base classes inherit normally, so if you absolutely need access to these
+you can opt to move them into a superclass.
 
 To remove old references, you can :ref:`squash migrations <migration-squashing>`
 or, if there aren't many references, copy them into the migration files.
