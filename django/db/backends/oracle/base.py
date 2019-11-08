@@ -115,6 +115,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         'FilePathField': 'NVARCHAR2(%(max_length)s)',
         'FloatField': 'DOUBLE PRECISION',
         'IntegerField': 'NUMBER(11)',
+        'JSONField': 'NCLOB',
         'BigIntegerField': 'NUMBER(19)',
         'IPAddressField': 'VARCHAR2(15)',
         'GenericIPAddressField': 'VARCHAR2(39)',
