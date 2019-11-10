@@ -39,10 +39,12 @@ Usage example::
 
     >>> from django.db.models import FloatField
     >>> from django.db.models.functions import Cast
-    >>> Value.objects.create(integer=4)
-    >>> value = Value.objects.annotate(as_float=Cast('integer', FloatField())).get()
-    >>> print(value.as_float)
-    4.0
+    >>> Author.objects.create(age=25, name='Margaret Smith')
+    >>> author = Author.objects.annotate(
+    ...    age_as_float=Cast('age', output_field=FloatField()),
+    ... ).get()
+    >>> print(author.age_as_float)
+    25.0
 
 ``Coalesce``
 ------------
