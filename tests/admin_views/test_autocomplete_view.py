@@ -1,5 +1,4 @@
 import json
-import time
 
 from django.contrib import admin
 from django.contrib.admin.tests import AdminSeleniumTestCase
@@ -185,20 +184,27 @@ class SeleniumTests(AdminSeleniumTestCase):
         # Load next page of results by scrolling to the bottom of the list.
         for _ in range(len(results)):
             search.send_keys(Keys.ARROW_DOWN)
-        results = result_container.find_elements_by_css_selector('.select2-results__option')
         # All objects and "Loading more results".
-        self.assertEqual(len(results), PAGINATOR_SIZE + 11)
+        self.wait_until(
+            lambda s: len(
+                result_container.find_elements_by_css_selector('.select2-results__option')
+            ) == PAGINATOR_SIZE + 11
+        )
         # Limit the results with the search field.
         search.send_keys('Who')
         # Ajax request is delayed.
-        self.assertTrue(result_container.is_displayed())
-        results = result_container.find_elements_by_css_selector('.select2-results__option')
-        self.assertEqual(len(results), PAGINATOR_SIZE + 12)
-        # Wait for ajax delay.
-        time.sleep(0.25)
-        self.assertTrue(result_container.is_displayed())
-        results = result_container.find_elements_by_css_selector('.select2-results__option')
-        self.assertEqual(len(results), 1)
+        self.wait_until(lambda s: result_container.is_displayed())
+        self.wait_until(
+            lambda s: len(
+                result_container.find_elements_by_css_selector('.select2-results__option')
+            ) == PAGINATOR_SIZE + 12
+        )
+        self.wait_until(lambda s: result_container.is_displayed())
+        self.wait_until(
+            lambda s: len(
+                result_container.find_elements_by_css_selector('.select2-results__option')
+            ) == 1
+        )
         # Select the result.
         search.send_keys(Keys.RETURN)
         select = Select(self.selenium.find_element_by_id('id_question'))
@@ -210,35 +216,45 @@ class SeleniumTests(AdminSeleniumTestCase):
         self.selenium.get(self.live_server_url + reverse('autocomplete_admin:admin_views_question_add'))
         elem = self.selenium.find_element_by_css_selector('.select2-selection')
         elem.click()  # Open the autocomplete dropdown.
-        results = self.selenium.find_element_by_css_selector('.select2-results')
-        self.assertTrue(results.is_displayed())
-        option = self.selenium.find_element_by_css_selector('.select2-results__option')
-        self.assertEqual(option.text, 'No results found')
+        self.wait_until(
+            lambda selenium:
+                selenium.find_element_by_css_selector('.select2-results').is_displayed()
+        )
+        self.wait_until(
+            lambda selenium:
+                selenium.find_element_by_css_selector('.select2-results__option').text == 'No results found'
+        )
         elem.click()  # Close the autocomplete dropdown.
         Question.objects.create(question='Who am I?')
         Question.objects.bulk_create(Question(question=str(i)) for i in range(PAGINATOR_SIZE + 10))
         elem.click()  # Reopen the dropdown now that some objects exist.
         result_container = self.selenium.find_element_by_css_selector('.select2-results')
-        self.assertTrue(result_container.is_displayed())
-        results = result_container.find_elements_by_css_selector('.select2-results__option')
-        self.assertEqual(len(results), PAGINATOR_SIZE + 1)
+        self.wait_until(
+            lambda selenium:
+                result_container.is_displayed()
+        )
+        self.wait_until(
+            lambda selenium:
+                len(result_container.find_elements_by_css_selector('.select2-results__option')) == PAGINATOR_SIZE + 1
+        )
         search = self.selenium.find_element_by_css_selector('.select2-search__field')
         # Load next page of results by scrolling to the bottom of the list.
-        for _ in range(len(results)):
+        for _ in range(PAGINATOR_SIZE + 1):
             search.send_keys(Keys.ARROW_DOWN)
-        results = result_container.find_elements_by_css_selector('.select2-results__option')
-        self.assertEqual(len(results), 31)
+        self.wait_until(
+            lambda s: len(result_container.find_elements_by_css_selector('.select2-results__option')) == 31
+        )
         # Limit the results with the search field.
         search.send_keys('Who')
         # Ajax request is delayed.
-        self.assertTrue(result_container.is_displayed())
-        results = result_container.find_elements_by_css_selector('.select2-results__option')
-        self.assertEqual(len(results), 32)
-        # Wait for ajax delay.
-        time.sleep(0.25)
-        self.assertTrue(result_container.is_displayed())
-        results = result_container.find_elements_by_css_selector('.select2-results__option')
-        self.assertEqual(len(results), 1)
+        self.wait_until(lambda s: result_container.is_displayed())
+        self.wait_until(
+            lambda s: len(result_container.find_elements_by_css_selector('.select2-results__option')) == 32
+        )
+        self.wait_until(lambda s: result_container.is_displayed())
+        self.wait_until(
+            lambda s: len(result_container.find_elements_by_css_selector('.select2-results__option')) == 1
+        )
         # Select the result.
         search.send_keys(Keys.RETURN)
         # Reopen the dropdown and add the first result to the selection.
@@ -246,24 +262,36 @@ class SeleniumTests(AdminSeleniumTestCase):
         search.send_keys(Keys.ARROW_DOWN)
         search.send_keys(Keys.RETURN)
         select = Select(self.selenium.find_element_by_id('id_related_questions'))
-        self.assertEqual(len(select.all_selected_options), 2)
+        self.wait_until(
+            lambda s: len(select.all_selected_options) == 2
+        )
 
     def test_inline_add_another_widgets(self):
         def assertNoResults(row):
             elem = row.find_element_by_css_selector('.select2-selection')
             elem.click()  # Open the autocomplete dropdown.
-            results = self.selenium.find_element_by_css_selector('.select2-results')
-            self.assertTrue(results.is_displayed())
-            option = self.selenium.find_element_by_css_selector('.select2-results__option')
-            self.assertEqual(option.text, 'No results found')
+            self.wait_until(
+                lambda selenium:
+                    selenium.find_element_by_css_selector('.select2-results').is_displayed()
+            )
+            self.wait_until(
+                lambda selenium:
+                    selenium.find_element_by_css_selector('.select2-results__option').text == 'No results found'
+            )
 
         # Autocomplete works in rows present when the page loads.
         self.selenium.get(self.live_server_url + reverse('autocomplete_admin:admin_views_book_add'))
         rows = self.selenium.find_elements_by_css_selector('.dynamic-authorship_set')
-        self.assertEqual(len(rows), 3)
+        self.wait_until(
+            lambda selenium:
+                len(selenium.find_elements_by_css_selector('.dynamic-authorship_set')) == 3
+        )
         assertNoResults(rows[0])
         # Autocomplete works in rows added using the "Add another" button.
         self.selenium.find_element_by_link_text('Add another Authorship').click()
         rows = self.selenium.find_elements_by_css_selector('.dynamic-authorship_set')
-        self.assertEqual(len(rows), 4)
+        self.wait_until(
+            lambda selenium:
+            len(selenium.find_elements_by_css_selector('.dynamic-authorship_set')) == 4
+        )
         assertNoResults(rows[-1])

@@ -4637,9 +4637,9 @@ class SeleniumTests(AdminSeleniumTestCase):
         # First form field has a single widget
         self.admin_login(username='super', password='secret', login_url=reverse('admin:index'))
         self.selenium.get(self.live_server_url + reverse('admin:admin_views_picture_add'))
-        self.assertEqual(
-            self.selenium.switch_to.active_element,
-            self.selenium.find_element_by_id('id_name')
+        self.wait_until(
+            lambda selenium:
+                selenium.switch_to.active_element == selenium.find_element_by_id('id_name')
         )
 
         # First form field has a MultiWidget
