@@ -204,7 +204,11 @@ class DataContains(SimpleFunctionOperatorMixin, Lookup):
 
     def as_oracle(self, compiler, connection):
         lhs, lhs_params = self.process_lhs(compiler, connection)
-        rhs = json.loads(self.rhs)
+        if isinstance(self.rhs, KeyTransform):
+            _, _, key_transforms = self.rhs.preprocess_lhs(compiler, connection)
+            return "JSON_EXISTS(%s, '%s')" % (lhs, compile_json_path(key_transforms)), []
+        else:
+            rhs = json.loads(self.rhs)
         if isinstance(rhs, dict):
             if not rhs:
                 return "DBMS_LOB.SUBSTR(%s) LIKE '{%%%%}'" % lhs, []

@@ -681,6 +681,9 @@ class TestQuerying(TestCase):
             ),
             ('value__has_key', KeyTextTransform('foo', 'value')),
         )
+        if connection.vendor == 'oracle':
+            # contained_by is not supported in Oracle.
+            tests = tests[0:1] + tests[2:6] + tests[7:]
         for lookup, value in tests:
             with self.subTest(lookup=lookup):
                 self.assertTrue(NullableJSONModel.objects.filter(
