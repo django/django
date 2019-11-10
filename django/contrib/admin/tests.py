@@ -1,3 +1,5 @@
+from contextlib import contextmanager
+
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from django.test import modify_settings
 from django.test.selenium import SeleniumTestCase
@@ -97,19 +99,26 @@ class AdminSeleniumTestCase(SeleniumTestCase, StaticLiveServerTestCase):
             timeout
         )
 
-    def wait_page_loaded(self):
+    def wait_page_ready(self, timeout=10):
         """
-        Block until page has started to load.
+        Block until the  page is ready.
         """
-        from selenium.common.exceptions import TimeoutException
-        try:
-            # Wait for the next page to be loaded
-            self.wait_for('body')
-        except TimeoutException:
-            # IE7 occasionally returns an error "Internet Explorer cannot
-            # display the webpage" and doesn't load the next page. We just
-            # ignore it.
-            pass
+        self.wait_until(
+            lambda driver: driver.execute_script('return document.readyState;') == 'complete',
+            timeout,
+        )
+
+    @contextmanager
+    def wait_page_loaded(self, timeout=10):
+        """
+        Block until a new page has loaded and is ready.
+        """
+        from selenium.webdriver.support import expected_conditions as ec
+        old_page = self.selenium.find_element_by_tag_name('html')
+        yield
+        # Wait for the next page to be loaded
+        self.wait_until(ec.staleness_of(old_page), timeout=timeout)
+        self.wait_page_ready(timeout=timeout)
 
     def admin_login(self, username, password, login_url='/admin/'):
         """
@@ -121,9 +130,8 @@ class AdminSeleniumTestCase(SeleniumTestCase, StaticLiveServerTestCase):
         password_input = self.selenium.find_element_by_name('password')
         password_input.send_keys(password)
         login_text = _('Log in')
-        self.selenium.find_element_by_xpath(
-            '//input[@value="%s"]' % login_text).click()
-        self.wait_page_loaded()
+        with self.wait_page_loaded():
+            self.selenium.find_element_by_xpath('//input[@value="%s"]' % login_text).click()
 
     def get_css_value(self, selector, attribute):
         """

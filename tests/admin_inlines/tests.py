@@ -934,8 +934,8 @@ class SeleniumTests(AdminSeleniumTestCase):
         self.selenium.find_element_by_name('inner4stacked_set-2-dummy').send_keys('222')
         self.selenium.find_element_by_name('inner4stacked_set-3-dummy').send_keys('103')
         self.selenium.find_element_by_name('inner4stacked_set-4-dummy').send_keys('222')
-        self.selenium.find_element_by_xpath('//input[@value="Save"]').click()
-        self.wait_page_loaded()
+        with self.wait_page_loaded():
+            self.selenium.find_element_by_xpath('//input[@value="Save"]').click()
 
         self.assertEqual(rows_length(), 5, msg="sanity check")
         errorlist = self.selenium.find_element_by_css_selector(
@@ -948,8 +948,8 @@ class SeleniumTests(AdminSeleniumTestCase):
         with self.disable_implicit_wait(), self.assertRaises(NoSuchElementException):
             self.selenium.find_element_by_css_selector('%s .dynamic-inner4stacked_set .errorlist li' % inline_id)
 
-        self.selenium.find_element_by_xpath('//input[@value="Save"]').click()
-        self.wait_page_loaded()
+        with self.wait_page_loaded():
+            self.selenium.find_element_by_xpath('//input[@value="Save"]').click()
 
         # The objects have been created in the database.
         self.assertEqual(Inner4Stacked.objects.all().count(), 4)
@@ -978,8 +978,8 @@ class SeleniumTests(AdminSeleniumTestCase):
         self.selenium.find_element_by_name('inner4tabular_set-2-dummy').send_keys('222')
         self.selenium.find_element_by_name('inner4tabular_set-3-dummy').send_keys('103')
         self.selenium.find_element_by_name('inner4tabular_set-4-dummy').send_keys('222')
-        self.selenium.find_element_by_xpath('//input[@value="Save"]').click()
-        self.wait_page_loaded()
+        with self.wait_page_loaded():
+            self.selenium.find_element_by_xpath('//input[@value="Save"]').click()
 
         self.assertEqual(rows_length(), 5, msg="sanity check")
 
@@ -995,8 +995,8 @@ class SeleniumTests(AdminSeleniumTestCase):
         with self.disable_implicit_wait(), self.assertRaises(NoSuchElementException):
             self.selenium.find_element_by_css_selector('%s .dynamic-inner4tabular_set .errorlist li' % inline_id)
 
-        self.selenium.find_element_by_xpath('//input[@value="Save"]').click()
-        self.wait_page_loaded()
+        with self.wait_page_loaded():
+            self.selenium.find_element_by_xpath('//input[@value="Save"]').click()
 
         # The objects have been created in the database.
         self.assertEqual(Inner4Tabular.objects.all().count(), 4)
@@ -1050,8 +1050,8 @@ class SeleniumTests(AdminSeleniumTestCase):
         self.selenium.find_element_by_name('profile_set-2-first_name').send_keys('2 first name 1')
         self.selenium.find_element_by_name('profile_set-2-last_name').send_keys('2 last name 2')
 
-        self.selenium.find_element_by_xpath('//input[@value="Save"]').click()
-        self.wait_page_loaded()
+        with self.wait_page_loaded():
+            self.selenium.find_element_by_xpath('//input[@value="Save"]').click()
 
         # The objects have been created in the database
         self.assertEqual(ProfileCollection.objects.all().count(), 1)
