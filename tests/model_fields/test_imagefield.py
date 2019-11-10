@@ -178,9 +178,6 @@ class ImageFieldTests(ImageFieldTestMixin, TestCase):
         p.mugshot.save("mug", self.file1)
         dump = pickle.dumps(p)
 
-        p2 = Person(name="Bob")
-        p2.mugshot = self.file1
-
         loaded_p = pickle.loads(dump)
         self.assertEqual(p.mugshot, loaded_p.mugshot)
 
