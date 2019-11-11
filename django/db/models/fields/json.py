@@ -489,7 +489,7 @@ class KeyTransformRegex(KeyTransformTextLookupMixin, lookups.Regex):
 
 
 @KeyTransform.register_lookup
-class KeyTransformIRegex(KeyTransformTextLookupMixin, lookups.IRegex):
+class KeyTransformIRegex(CaseInsensitiveMixin, KeyTransformTextLookupMixin, lookups.IRegex):
     pass
 
 
