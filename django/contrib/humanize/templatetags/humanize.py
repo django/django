@@ -72,7 +72,8 @@ def intcomma(value, use_l10n=True):
         else:
             return number_format(value, force_grouping=True)
     orig = str(value)
-    new = re.sub(r"^(-?\d+)(\d{3})", r'\g<1>,\g<2>', orig)
+    sep = (',','.')[settings.USE_L10N]
+    new = re.sub(r"^(-?\d+)(\d{3})", r'\g<1>' + sep + r'\g<2>', orig)
     if orig == new:
         return new
     else:
