@@ -355,6 +355,11 @@ class KeyTransformNumericLookupMixin:
 
 
 class CaseInsensitiveMixin:
+    """
+    Mixin to allow case-insensitive comparison of JSON values on MySQL.
+    MySQL handles strings used in JSON context using the utf8mb4_bin collation.
+    Because utf8mb4_bin is a binary collation, comparison of JSON values is case-sensitive.
+    """
     def process_lhs(self, compiler, connection):
         lhs, lhs_params = super().process_lhs(compiler, connection)
         if connection.vendor == 'mysql':
