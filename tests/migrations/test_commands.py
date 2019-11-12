@@ -889,6 +889,16 @@ class MigrateTests(MigrationTestBase):
         applied_migrations = recorder.applied_migrations()
         self.assertNotIn(("migrations", "0001_initial"), applied_migrations)
 
+    @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrate_change_foreing_key"})
+    def test_migrate_change_foreing_key(self):
+        out = io.StringIO()
+        with mock.patch('django.core.management.color.supports_color', lambda *args: False):
+            call_command('migrate', 'migrations', '0002', stdout=out, verbosity=1)
+        value = out.getvalue().lower()
+        self.assertIn('target specific migration: 0002_alter_user_id, from migrations', value)
+        self.assertIn('applying migrations.0001_initial... ok', value)
+        self.assertIn('applying migrations.0002_alter_user_id... ok', value)
+
 
 class MakeMigrationsTests(MigrationTestBase):
     """
