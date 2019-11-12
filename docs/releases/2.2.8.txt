@@ -1,0 +1,12 @@
+==========================
+Django 2.2.8 release notes
+==========================
+
+*Expected December 2, 2019*
+
+Django 2.2.8 fixes several bugs in 2.2.7.
+
+Bugfixes
+========
+
+* ...
