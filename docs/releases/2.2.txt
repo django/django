@@ -22,8 +22,9 @@ for the previous LTS, Django 1.11, will end in April 2020.
 Python compatibility
 ====================
 
-Django 2.2 supports Python 3.5, 3.6, and 3.7. We **highly recommend** and only
-officially support the latest release of each series.
+Django 2.2 supports Python 3.5, 3.6, 3.7, and 3.8 (as of 2.2.8). We
+**highly recommend** and only officially support the latest release of each
+series.
 
 .. _whats-new-2.2:
 
