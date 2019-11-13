@@ -237,6 +237,9 @@ Tests
   allow running a test without collecting the result and catching exceptions.
   This can be used to support running tests under a debugger.
 
+* The new :setting:`MIGRATE <TEST_MIGRATE>` test database setting allows
+  disabling of migrations during a test database creation.
+
 URLs
 ~~~~
 

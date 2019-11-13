@@ -1371,8 +1371,9 @@ Preserves the test database between test runs. This has the advantage of
 skipping both the create and destroy actions which can greatly decrease the
 time to run tests, especially those in a large test suite. If the test database
 does not exist, it will be created on the first run and then preserved for each
-subsequent run. Any unapplied migrations will also be applied to the test
-database before running the test suite.
+subsequent run. Unless the :setting:`MIGRATE <TEST_MIGRATE>` test setting is
+``False``, any unapplied migrations will also be applied to the test database
+before running the test suite.
 
 .. django-admin-option:: --reverse, -r
 

@@ -739,6 +739,17 @@ The creation-order dependencies of the database. See the documentation
 on :ref:`controlling the creation order of test databases
 <topics-testing-creation-dependencies>` for details.
 
+.. setting:: TEST_MIGRATE
+
+``MIGRATE``
+^^^^^^^^^^^
+
+.. versionadded:: 3.1
+
+Default: ``True``
+
+When set to ``False``, migrations won't run when creating the test database.
+
 .. setting:: TEST_MIRROR
 
 ``MIRROR``
@@ -2034,9 +2045,11 @@ automatically create the package if it doesn't already exist.
 When you supply ``None`` as a value for an app, Django will consider the app as
 an app without migrations regardless of an existing ``migrations`` submodule.
 This can be used, for example, in a test settings file to skip migrations while
-testing (tables will still be created for the apps' models). If this is used in
-your general project settings, remember to use the :option:`migrate
---run-syncdb` option if you want to create tables for the app.
+testing (tables will still be created for the apps' models). To disable
+migrations for all apps during tests, you can set the
+:setting:`MIGRATE <TEST_MIGRATE>` to ``True`` instead. If ``MIGRATION_MODULES``
+is used in your general project settings, remember to use the
+:option:`migrate --run-syncdb` option if you want to create tables for the app.
 
 .. setting:: MONTH_DAY_FORMAT
 

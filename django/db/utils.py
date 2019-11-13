@@ -194,8 +194,15 @@ class ConnectionHandler:
             raise ConnectionDoesNotExist("The connection %s doesn't exist" % alias)
 
         test_settings = conn.setdefault('TEST', {})
-        for key in ['CHARSET', 'COLLATION', 'NAME', 'MIRROR']:
-            test_settings.setdefault(key, None)
+        default_test_settings = [
+            ('CHARSET', None),
+            ('COLLATION', None),
+            ('MIGRATE', True),
+            ('MIRROR', None),
+            ('NAME', None),
+        ]
+        for key, value in default_test_settings:
+            test_settings.setdefault(key, value)
 
     def __getitem__(self, alias):
         if hasattr(self._connections, alias):
