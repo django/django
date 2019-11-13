@@ -93,7 +93,7 @@ class AdminScriptTestCase(SimpleTestCase):
                 paths.append(os.path.dirname(backend_dir))
         return paths
 
-    def run_test(self, script, args, settings_file=None, apps=None):
+    def run_test(self, args, settings_file=None, apps=None):
         base_dir = os.path.dirname(self.test_dir)
         # The base dir for Django's tests is one level up.
         tests_dir = os.path.dirname(os.path.dirname(__file__))
@@ -117,7 +117,7 @@ class AdminScriptTestCase(SimpleTestCase):
         test_environ['PYTHONWARNINGS'] = ''
 
         p = subprocess.run(
-            [sys.executable, script] + args,
+            [sys.executable, *args],
             stdout=subprocess.PIPE, stderr=subprocess.PIPE,
             cwd=self.test_dir,
             env=test_environ, universal_newlines=True,
@@ -126,7 +126,7 @@ class AdminScriptTestCase(SimpleTestCase):
 
     def run_django_admin(self, args, settings_file=None):
         script_dir = os.path.abspath(os.path.join(os.path.dirname(django.__file__), 'bin'))
-        return self.run_test(os.path.join(script_dir, 'django-admin.py'), args, settings_file)
+        return self.run_test([os.path.join(script_dir, 'django-admin.py'), *args], settings_file)
 
     def run_manage(self, args, settings_file=None, manage_py=None):
         template_manage_py = (
@@ -144,7 +144,7 @@ class AdminScriptTestCase(SimpleTestCase):
         with open(test_manage_py, 'w') as fp:
             fp.write(manage_py_contents)
 
-        return self.run_test('./manage.py', args, settings_file)
+        return self.run_test(['./manage.py', *args], settings_file)
 
     def assertNoOutput(self, stream):
         "Utility assertion: assert that the given stream is empty"
@@ -2263,11 +2263,11 @@ class MainModule(AdminScriptTestCase):
 
     def test_runs_django_admin(self):
         cmd_out, _ = self.run_django_admin(['--version'])
-        mod_out, _ = self.run_test('-m', ['django', '--version'])
+        mod_out, _ = self.run_test(['-m', 'django', '--version'])
         self.assertEqual(mod_out, cmd_out)
 
     def test_program_name_in_help(self):
-        out, err = self.run_test('-m', ['django', 'help'])
+        out, err = self.run_test(['-m', 'django', 'help'])
         self.assertOutput(out, "Type 'python -m django help <subcommand>' for help on a specific subcommand.")
 
 
