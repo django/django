@@ -46,8 +46,6 @@ class AdminScriptTestCase(SimpleTestCase):
         # where `/var` is a symlink to `/private/var`.
         self.test_dir = os.path.realpath(os.path.join(tmpdir.name, 'test_project'))
         os.mkdir(self.test_dir)
-        with open(os.path.join(self.test_dir, '__init__.py'), 'w'):
-            pass
 
     def write_settings(self, filename, apps=None, is_dir=False, sdict=None, extra=None):
         if is_dir:
