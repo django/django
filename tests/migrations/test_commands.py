@@ -14,7 +14,7 @@ from django.db.backends.base.schema import BaseDatabaseSchemaEditor
 from django.db.backends.utils import truncate_name
 from django.db.migrations.exceptions import InconsistentMigrationHistory
 from django.db.migrations.recorder import MigrationRecorder
-from django.test import TestCase, override_settings
+from django.test import TestCase, override_settings, skipUnlessDBFeature
 
 from .models import UnicodeModel, UnserializableModel
 from .routers import TestRouter
@@ -196,6 +196,32 @@ class MigrateTests(MigrationTestBase):
             self.assertTableNotExists("migrations_author", using=db)
             self.assertTableNotExists("migrations_tribble", using=db)
             self.assertTableNotExists("migrations_book", using=db)
+
+    @skipUnlessDBFeature('ignores_table_name_case')
+    def test_migrate_fake_initial_case_insensitive(self):
+        with override_settings(MIGRATION_MODULES={
+            'migrations': 'migrations.test_fake_initial_case_insensitive.initial',
+        }):
+            call_command('migrate', 'migrations', '0001', verbosity=0)
+            call_command('migrate', 'migrations', 'zero', fake=True, verbosity=0)
+
+        with override_settings(MIGRATION_MODULES={
+            'migrations': 'migrations.test_fake_initial_case_insensitive.fake_initial',
+        }):
+            out = io.StringIO()
+            call_command(
+                'migrate',
+                'migrations',
+                '0001',
+                fake_initial=True,
+                stdout=out,
+                verbosity=1,
+                no_color=True,
+            )
+            self.assertIn(
+                'migrations.0001_initial... faked',
+                out.getvalue().lower(),
+            )
 
     @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations_fake_split_initial"})
     def test_migrate_fake_split_initial(self):
