@@ -330,7 +330,7 @@ class MigrationExecutor:
         found_create_model_migration = False
         found_add_field_migration = False
         with self.connection.cursor() as cursor:
-            existing_table_names = self.connection.introspection.table_names(cursor)
+            existing_table_names = set(self.connection.introspection.table_names(cursor))
         # Make sure all create model and add field operations are done
         for operation in migration.operations:
             if isinstance(operation, migrations.CreateModel):
@@ -363,14 +363,16 @@ class MigrationExecutor:
                     else:
                         found_add_field_migration = True
                         continue
-
-                column_names = [
-                    column.name for column in
-                    self.connection.introspection.get_table_description(self.connection.cursor(), table)
-                ]
-                if field.column not in column_names:
+                columns = self.connection.introspection.get_table_description(
+                    self.connection.cursor(),
+                    table,
+                )
+                for column in columns:
+                    if column.name == field.column:
+                        found_add_field_migration = True
+                        break
+                else:
                     return False, project_state
-                found_add_field_migration = True
         # If we get this far and we found at least one CreateModel or AddField migration,
         # the migration is considered implicitly applied.
         return (found_create_model_migration or found_add_field_migration), after_state
