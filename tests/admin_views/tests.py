@@ -1811,8 +1811,7 @@ class AdminViewPermissionsTest(TestCase):
         self.assertEqual(post.status_code, 403)
         self.client.get(reverse('admin:logout'))
 
-        # view user should be able to view the article but not change any of them
-        # (the POST can be sent, but no modification occurs)
+        # view user can view articles but not make changes.
         self.client.force_login(self.viewuser)
         response = self.client.get(article_changelist_url)
         self.assertEqual(response.status_code, 200)
@@ -1823,7 +1822,7 @@ class AdminViewPermissionsTest(TestCase):
         self.assertContains(response, '<label>Extra form field:</label>')
         self.assertContains(response, '<a href="/test_admin/admin/admin_views/article/" class="closelink">Close</a>')
         post = self.client.post(article_change_url, change_dict)
-        self.assertEqual(post.status_code, 302)
+        self.assertEqual(post.status_code, 403)
         self.assertEqual(Article.objects.get(pk=self.a1.pk).content, '<p>Middle content</p>')
         self.client.get(reverse('admin:logout'))
 
@@ -1881,7 +1880,7 @@ class AdminViewPermissionsTest(TestCase):
                 response = self.client.get(change_url_3)
                 self.assertEqual(response.status_code, 200)
                 response = self.client.post(change_url_3, {'name': 'changed'})
-                self.assertRedirects(response, self.index_url)
+                self.assertEqual(response.status_code, 403)
                 self.assertEqual(RowLevelChangePermissionModel.objects.get(id=3).name, 'odd id mult 3')
                 response = self.client.get(change_url_6)
                 self.assertEqual(response.status_code, 200)
@@ -1917,21 +1916,6 @@ class AdminViewPermissionsTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context['title'], 'View article')
         self.assertContains(response, '<a href="/test_admin/admin9/admin_views/article/" class="closelink">Close</a>')
-
-    def test_change_view_post_without_object_change_permission(self):
-        """A POST redirects to changelist without modifications."""
-        change_dict = {
-            'title': 'Ikke fordømt',
-            'content': '<p>edited article</p>',
-            'date_0': '2008-03-18', 'date_1': '10:54:39',
-            'section': self.s1.pk,
-        }
-        change_url = reverse('admin10:admin_views_article_change', args=(self.a1.pk,))
-        changelist_url = reverse('admin10:admin_views_article_changelist')
-        self.client.force_login(self.viewuser)
-        response = self.client.post(change_url, change_dict)
-        self.assertRedirects(response, changelist_url)
-        self.assertEqual(Article.objects.get(pk=self.a1.pk).content, '<p>Middle content</p>')
 
     def test_change_view_save_as_new(self):
         """
@@ -4115,52 +4099,6 @@ class AdminInlineTests(TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertEqual(Widget.objects.count(), 1)
         self.assertEqual(Widget.objects.all()[0].name, "Widget 1 Updated")
-
-    def test_simple_inline_permissions(self):
-        """
-        Changes aren't allowed without change permissions for the inline object.
-        """
-        # User who can view Articles
-        permissionuser = User.objects.create_user(
-            username='permissionuser', password='secret',
-            email='vuser@example.com', is_staff=True,
-        )
-        permissionuser.user_permissions.add(get_perm(Collector, get_permission_codename('view', Collector._meta)))
-        permissionuser.user_permissions.add(get_perm(Widget, get_permission_codename('view', Widget._meta)))
-        self.client.force_login(permissionuser)
-        # Without add permission, a new inline can't be added.
-        self.post_data['widget_set-0-name'] = 'Widget 1'
-        collector_url = reverse('admin:admin_views_collector_change', args=(self.collector.pk,))
-        response = self.client.post(collector_url, self.post_data)
-        self.assertEqual(response.status_code, 302)
-        self.assertEqual(Widget.objects.count(), 0)
-        # But after adding the permission it can.
-        permissionuser.user_permissions.add(get_perm(Widget, get_permission_codename('add', Widget._meta)))
-        self.post_data['widget_set-0-name'] = "Widget 1"
-        collector_url = reverse('admin:admin_views_collector_change', args=(self.collector.pk,))
-        response = self.client.post(collector_url, self.post_data)
-        self.assertEqual(response.status_code, 302)
-        self.assertEqual(Widget.objects.count(), 1)
-        self.assertEqual(Widget.objects.first().name, 'Widget 1')
-        widget_id = Widget.objects.first().id
-        # Without the change permission, a POST doesn't change the object.
-        self.post_data['widget_set-INITIAL_FORMS'] = '1'
-        self.post_data['widget_set-0-id'] = str(widget_id)
-        self.post_data['widget_set-0-name'] = 'Widget 1 Updated'
-        response = self.client.post(collector_url, self.post_data)
-        self.assertEqual(response.status_code, 302)
-        self.assertEqual(Widget.objects.count(), 1)
-        self.assertEqual(Widget.objects.first().name, 'Widget 1')
-        # Now adding the change permission and editing works.
-        permissionuser.user_permissions.remove(get_perm(Widget, get_permission_codename('add', Widget._meta)))
-        permissionuser.user_permissions.add(get_perm(Widget, get_permission_codename('change', Widget._meta)))
-        self.post_data['widget_set-INITIAL_FORMS'] = '1'
-        self.post_data['widget_set-0-id'] = str(widget_id)
-        self.post_data['widget_set-0-name'] = 'Widget 1 Updated'
-        response = self.client.post(collector_url, self.post_data)
-        self.assertEqual(response.status_code, 302)
-        self.assertEqual(Widget.objects.count(), 1)
-        self.assertEqual(Widget.objects.first().name, 'Widget 1 Updated')
 
     def test_explicit_autofield_inline(self):
         "A model with an explicit autofield primary key can be saved as inlines. Regression for #8093"

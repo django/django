@@ -1262,7 +1262,7 @@ class ChangelistTests(AuthViewsTestCase):
         data['password'] = 'shouldnotchange'
         change_url = reverse('auth_test_admin:auth_user_change', args=(u.pk,))
         response = self.client.post(change_url, data)
-        self.assertRedirects(response, reverse('auth_test_admin:auth_user_changelist'))
+        self.assertEqual(response.status_code, 403)
         u.refresh_from_db()
         self.assertEqual(u.password, original_password)
 
