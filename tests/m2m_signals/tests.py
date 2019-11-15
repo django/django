@@ -92,7 +92,7 @@ class ManyToManySignalsTest(TestCase):
         self.vw.default_parts.remove(self.wheelset)
         self.vw.default_parts.remove(self.wheelset)
 
-        expected_pk_sets = [{1}, set(), {1}, {1}]
+        expected_pk_sets = [{self.wheelset.pk}, set(), {self.wheelset.pk}, {self.wheelset.pk}]
         self.assertEqual(pk_sets_sent, expected_pk_sets)
 
         models.signals.m2m_changed.disconnect(handler, Car.default_parts.through)
