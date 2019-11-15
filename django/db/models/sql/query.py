@@ -1230,7 +1230,9 @@ class Query(BaseExpression):
                 allow_joins=allow_joins,
                 split_subq=split_subq,
             )
-        if hasattr(filter_expr, 'resolve_expression') and getattr(filter_expr, 'conditional', False):
+        if hasattr(filter_expr, 'resolve_expression'):
+            if not getattr(filter_expr, 'conditional', False):
+                raise TypeError('Cannot filter against a non-conditional expression.')
             condition = self.build_lookup(
                 ['exact'], filter_expr.resolve_expression(self, allow_joins=allow_joins), True
             )
