@@ -12,7 +12,7 @@ class Migration(migrations.Migration):
                 ('field', models.CharField(max_length=20)),
             ],
             options={
-                'db_table': 'migrations_mIxEd_cAsE_iNiTiAl_mOdEl',
+                'db_table': 'migrations_mIxEd_cAsE_mOdEl',
             },
         ),
         migrations.AddField(

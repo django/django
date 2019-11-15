@@ -17,7 +17,7 @@ class Migration(migrations.Migration):
                 ),
             ],
             options={
-                'db_table': 'migrations_MiXeD_CaSe_InItIaL_MoDel',
+                'db_table': 'migrations_MiXeD_CaSe_MoDel',
             },
         ),
     ]
