@@ -30,6 +30,11 @@ class BaseConstraint:
 class CheckConstraint(BaseConstraint):
     def __init__(self, *, check, name):
         self.check = check
+        if not getattr(check, 'conditional', False):
+            raise TypeError(
+                'CheckConstraint.check must be a Q instance or boolean '
+                'expression.'
+            )
         super().__init__(name)
 
     def _get_check_sql(self, model, schema_editor):

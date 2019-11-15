@@ -1,8 +1,8 @@
 from datetime import datetime
 
 from django.core.exceptions import FieldError
-from django.db.models import CharField, F, Q
-from django.db.models.expressions import Col
+from django.db.models import BooleanField, CharField, F, Q
+from django.db.models.expressions import Col, Func
 from django.db.models.fields.related_lookups import RelatedIsNull
 from django.db.models.functions import Lower
 from django.db.models.lookups import Exact, GreaterThan, IsNull, LessThan
@@ -129,3 +129,18 @@ class TestQuery(SimpleTestCase):
         name_exact = where.children[0]
         self.assertIsInstance(name_exact, Exact)
         self.assertEqual(name_exact.rhs, "['a', 'b']")
+
+    def test_filter_conditional(self):
+        query = Query(Item)
+        where = query.build_where(Func(output_field=BooleanField()))
+        exact = where.children[0]
+        self.assertIsInstance(exact, Exact)
+        self.assertIsInstance(exact.lhs, Func)
+        self.assertIs(exact.rhs, True)
+
+    def test_filter_conditional_join(self):
+        query = Query(Item)
+        filter_expr = Func('note__note', output_field=BooleanField())
+        msg = 'Joined field references are not permitted in this query'
+        with self.assertRaisesMessage(FieldError, msg):
+            query.build_where(filter_expr)

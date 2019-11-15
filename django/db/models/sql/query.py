@@ -1221,8 +1221,19 @@ class Query(BaseExpression):
         """
         if isinstance(filter_expr, dict):
             raise FieldError("Cannot parse keyword query as dict")
+        if isinstance(filter_expr, Q):
+            return self._add_q(
+                filter_expr,
+                branch_negated=branch_negated,
+                current_negated=current_negated,
+                used_aliases=can_reuse,
+                allow_joins=allow_joins,
+                split_subq=split_subq,
+            )
         if hasattr(filter_expr, 'resolve_expression') and getattr(filter_expr, 'conditional', False):
-            condition = self.build_lookup(['exact'], filter_expr.resolve_expression(self), True)
+            condition = self.build_lookup(
+                ['exact'], filter_expr.resolve_expression(self, allow_joins=allow_joins), True
+            )
             clause = self.where_class()
             clause.add(condition, AND)
             return clause, []
@@ -1332,8 +1343,8 @@ class Query(BaseExpression):
             self.where.add(clause, AND)
         self.demote_joins(existing_inner)
 
-    def build_where(self, q_object):
-        return self._add_q(q_object, used_aliases=set(), allow_joins=False)[0]
+    def build_where(self, filter_expr):
+        return self.build_filter(filter_expr, allow_joins=False)[0]
 
     def _add_q(self, q_object, used_aliases, branch_negated=False,
                current_negated=False, allow_joins=True, split_subq=True):
@@ -1345,18 +1356,12 @@ class Query(BaseExpression):
                                          negated=q_object.negated)
         joinpromoter = JoinPromoter(q_object.connector, len(q_object.children), current_negated)
         for child in q_object.children:
-            if isinstance(child, Node):
-                child_clause, needed_inner = self._add_q(
-                    child, used_aliases, branch_negated,
-                    current_negated, allow_joins, split_subq)
-                joinpromoter.add_votes(needed_inner)
-            else:
-                child_clause, needed_inner = self.build_filter(
-                    child, can_reuse=used_aliases, branch_negated=branch_negated,
-                    current_negated=current_negated, allow_joins=allow_joins,
-                    split_subq=split_subq,
-                )
-                joinpromoter.add_votes(needed_inner)
+            child_clause, needed_inner = self.build_filter(
+                child, can_reuse=used_aliases, branch_negated=branch_negated,
+                current_negated=current_negated, allow_joins=allow_joins,
+                split_subq=split_subq,
+            )
+            joinpromoter.add_votes(needed_inner)
             if child_clause:
                 target_clause.add(child_clause, connector)
         needed_inner = joinpromoter.update_join_types(self)

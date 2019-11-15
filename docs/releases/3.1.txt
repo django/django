@@ -204,6 +204,8 @@ Models
   ``OneToOneField`` emulates the behavior of the SQL constraint ``ON DELETE
   RESTRICT``.
 
+* :attr:`.CheckConstraint.check` now supports boolean expressions.
+
 Pagination
 ~~~~~~~~~~
 
