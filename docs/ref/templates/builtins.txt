@@ -1352,7 +1352,7 @@ Format character  Description                               Example output
                   month, 2 characters.
 ``w``             Day of the week, digits without           ``'0'`` (Sunday) to ``'6'`` (Saturday)
                   leading zeros.
-``z``             Day of the year.                          ``0`` to ``365``
+``z``             Day of the year.                          ``1`` to ``366``
 **Week**
 ``W``             ISO-8601 week number of year, with        ``1``, ``53``
                   weeks starting on Monday.
