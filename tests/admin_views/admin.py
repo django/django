@@ -105,6 +105,7 @@ class ArticleAdmin(admin.ModelAdmin):
         'content', 'date', callable_year, 'model_year', 'modeladmin_year',
         'model_year_reversed', 'section', lambda obj: obj.title,
         'order_by_expression', 'model_property_year', 'model_month',
+        'order_by_f_expression', 'order_by_orderby_expression',
     )
     list_editable = ('section',)
     list_filter = ('date', 'section')
@@ -122,11 +123,19 @@ class ArticleAdmin(admin.ModelAdmin):
         })
     )
 
+    # These orderings aren't particularly useful but show that expressions can
+    # be used for admin_order_field.
     def order_by_expression(self, obj):
         return obj.model_year
-    # This ordering isn't particularly useful but shows that expressions can
-    # be used for admin_order_field.
     order_by_expression.admin_order_field = models.F('date') + datetime.timedelta(days=3)
+
+    def order_by_f_expression(self, obj):
+        return obj.model_year
+    order_by_f_expression.admin_order_field = models.F('date')
+
+    def order_by_orderby_expression(self, obj):
+        return obj.model_year
+    order_by_orderby_expression.admin_order_field = models.F('date').asc(nulls_last=True)
 
     def changelist_view(self, request):
         return super().changelist_view(request, extra_context={'extra_var': 'Hello!'})
