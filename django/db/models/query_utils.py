@@ -30,20 +30,6 @@ def subclasses(cls):
         yield from subclasses(subclass)
 
 
-class QueryWrapper:
-    """
-    A type that indicates the contents are an SQL fragment and the associate
-    parameters. Can be used to pass opaque data to a where-clause, for example.
-    """
-    contains_aggregate = False
-
-    def __init__(self, sql, params):
-        self.data = sql, list(params)
-
-    def as_sql(self, compiler=None, connection=None):
-        return self.data
-
-
 class Q(tree.Node):
     """
     Encapsulate filters as objects that can then be combined logically (using
