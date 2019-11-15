@@ -209,7 +209,7 @@ class NonAggregateAnnotationTestCase(TestCase):
         lengths = Employee.objects.annotate(
             name_len=Length('first_name'),
         ).distinct('name_len').values_list('name_len', flat=True)
-        self.assertSequenceEqual(lengths, [3, 7, 8])
+        self.assertCountEqual(lengths, [3, 7, 8])
 
     def test_filter_annotation(self):
         books = Book.objects.annotate(
