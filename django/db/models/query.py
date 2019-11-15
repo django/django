@@ -21,7 +21,7 @@ from django.db.models.deletion import Collector
 from django.db.models.expressions import Case, Expression, F, Value, When
 from django.db.models.fields import AutoField
 from django.db.models.functions import Cast, Trunc
-from django.db.models.query_utils import FilteredRelation, InvalidQuery, Q
+from django.db.models.query_utils import FilteredRelation, Q
 from django.db.models.sql.constants import CURSOR, GET_ITERATOR_CHUNK_SIZE
 from django.db.utils import NotSupportedError
 from django.utils import timezone
@@ -1455,7 +1455,9 @@ class RawQuerySet:
         try:
             model_init_names, model_init_pos, annotation_fields = self.resolve_model_init_order()
             if self.model._meta.pk.attname not in model_init_names:
-                raise InvalidQuery('Raw query must include the primary key')
+                raise exceptions.FieldDoesNotExist(
+                    'Raw query must include the primary key'
+                )
             model_cls = self.model
             fields = [self.model_fields.get(c) for c in self.columns]
             converters = compiler.get_converters([

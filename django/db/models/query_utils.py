@@ -8,10 +8,13 @@ circular import difficulties.
 import copy
 import functools
 import inspect
+import warnings
 from collections import namedtuple
 
+from django.core.exceptions import FieldDoesNotExist, FieldError
 from django.db.models.constants import LOOKUP_SEP
 from django.utils import tree
+from django.utils.deprecation import RemovedInDjango40Warning
 
 # PathInfo is used when converting lookups (fk__somecol). The contents
 # describe the relation in Model terms (model Options and Fields for both
@@ -19,8 +22,29 @@ from django.utils import tree
 PathInfo = namedtuple('PathInfo', 'from_opts to_opts target_fields join_field m2m direct filtered_relation')
 
 
-class InvalidQuery(Exception):
-    """The query passed to raw() isn't a safe query to use with raw()."""
+class InvalidQueryType(type):
+    @property
+    def _subclasses(self):
+        return (FieldDoesNotExist, FieldError)
+
+    def __warn(self):
+        warnings.warn(
+            'The InvalidQuery exception class is deprecated. Use '
+            'FieldDoesNotExist or FieldError instead.',
+            category=RemovedInDjango40Warning,
+            stacklevel=4,
+        )
+
+    def __instancecheck__(self, instance):
+        self.__warn()
+        return isinstance(instance, self._subclasses) or super().__instancecheck__(instance)
+
+    def __subclasscheck__(self, subclass):
+        self.__warn()
+        return issubclass(subclass, self._subclasses) or super().__subclasscheck__(subclass)
+
+
+class InvalidQuery(Exception, metaclass=InvalidQueryType):
     pass
 
 
@@ -233,10 +257,11 @@ def select_related_descend(field, restricted, requested, load_fields, reverse=Fa
     if load_fields:
         if field.attname not in load_fields:
             if restricted and field.name in requested:
-                raise InvalidQuery("Field %s.%s cannot be both deferred"
-                                   " and traversed using select_related"
-                                   " at the same time." %
-                                   (field.model._meta.object_name, field.name))
+                msg = (
+                    'Field %s.%s cannot be both deferred and traversed using '
+                    'select_related at the same time.'
+                ) % (field.model._meta.object_name, field.name)
+                raise FieldError(msg)
     return True
 
 

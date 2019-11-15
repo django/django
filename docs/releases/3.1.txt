@@ -330,6 +330,11 @@ Miscellaneous
 * The undocumented usage of the :lookup:`isnull` lookup with non-boolean values
   as the right-hand side is deprecated, use ``True`` or ``False`` instead.
 
+* The barely documented ``django.db.models.query_utils.InvalidQuery`` exception
+  class is deprecated in favor of
+  :class:`~django.core.exceptions.FieldDoesNotExist` and
+  :class:`~django.core.exceptions.FieldError`.
+
 .. _removed-features-3.1:
 
 Features removed in 3.1

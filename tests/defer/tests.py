@@ -1,4 +1,4 @@
-from django.db.models.query_utils import InvalidQuery
+from django.core.exceptions import FieldError
 from django.test import TestCase
 
 from .models import (
@@ -113,7 +113,7 @@ class DeferTests(AssertionMixin, TestCase):
             'Field Primary.related cannot be both deferred and traversed '
             'using select_related at the same time.'
         )
-        with self.assertRaisesMessage(InvalidQuery, msg):
+        with self.assertRaisesMessage(FieldError, msg):
             Primary.objects.defer("related").select_related("related")[0]
 
     def test_only_select_related_raises_invalid_query(self):
@@ -121,7 +121,7 @@ class DeferTests(AssertionMixin, TestCase):
             'Field Primary.related cannot be both deferred and traversed using '
             'select_related at the same time.'
         )
-        with self.assertRaisesMessage(InvalidQuery, msg):
+        with self.assertRaisesMessage(FieldError, msg):
             Primary.objects.only("name").select_related("related")[0]
 
     def test_defer_foreign_keys_are_deferred_and_not_traversed(self):
