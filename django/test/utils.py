@@ -170,7 +170,7 @@ def setup_databases(verbosity, interactive, keepdb=False, debug_sql=False, paral
                     verbosity=verbosity,
                     autoclobber=not interactive,
                     keepdb=keepdb,
-                    serialize=connection.settings_dict.get('TEST', {}).get('SERIALIZE', True),
+                    serialize=connection.settings_dict['TEST'].get('SERIALIZE', True),
                 )
                 if parallel > 1:
                     for index in range(parallel):
