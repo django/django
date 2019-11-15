@@ -104,6 +104,17 @@ class DateFormatTests(SimpleTestCase):
         self.assertEqual(dateformat.format(my_birthday, 'y'), '79')
         self.assertEqual(dateformat.format(my_birthday, 'Y'), '1979')
         self.assertEqual(dateformat.format(my_birthday, 'z'), '189')
+        self.assertEqual(dateformat.format(my_birthday, 'B'), '916')
+
+    def test_swatch_time(self):
+        for *timeargs, expected in [
+            (23, 0, 0, '000'),
+            (0, 0, 0, '041'),
+            (22, 59, 59, '999'),
+        ]:
+            with self.subTest(timeargs=timeargs, expected=expected):
+                dt = datetime(1979, 7, 8, *timeargs, tzinfo=utc)
+                self.assertEqual(dateformat.format(dt, 'B'), expected)
 
     def test_dateformat(self):
         my_birthday = datetime(1979, 7, 8, 22, 00)

@@ -1399,6 +1399,7 @@ Format character  Description                               Example output
                   if they're zero and the special-case
                   strings 'midnight' and 'noon' if
                   appropriate. Proprietary extension.
+``B``             `Swatch Internet Time`_                   ``'000'`` to ``'999'``
 **Timezone**
 ``e``             Timezone name. Could be in any format,
                   or might return an empty string,          ``''``, ``'GMT'``, ``'-500'``, ``'US/Eastern'``, etc.
@@ -1421,6 +1422,8 @@ Format character  Description                               Example output
 ``U``             Seconds since the Unix Epoch
                   (January 1 1970 00:00:00 UTC).
 ================  ========================================  =====================
+
+.. _Swatch Internet Time: https://en.wikipedia.org/wiki/Swatch_Internet_Time
 
 For example::
 

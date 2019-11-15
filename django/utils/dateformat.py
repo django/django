@@ -18,7 +18,9 @@ from django.utils.dates import (
     MONTHS, MONTHS_3, MONTHS_ALT, MONTHS_AP, WEEKDAYS, WEEKDAYS_ABBR,
 )
 from django.utils.regex_helper import _lazy_re_compile
-from django.utils.timezone import get_default_timezone, is_aware, is_naive
+from django.utils.timezone import (
+    get_default_timezone, get_fixed_timezone, is_aware, is_naive,
+)
 from django.utils.translation import gettext as _
 
 re_formatchars = _lazy_re_compile(r'(?<!\\)([aAbBcdDeEfFgGhHiIjlLmMnNoOPrsStTUuwWyYzZ])')
@@ -70,7 +72,12 @@ class TimeFormat(Formatter):
 
     def B(self):
         "Swatch Internet time"
-        raise NotImplementedError('may be implemented in a future release')
+        # https://en.wikipedia.org/wiki/Swatch_Internet_Time#Calculation_from_UTC+1
+        # (UTC+1seconds + (UTC+1minutes * 60) + (UTC+1hours * 3600)) / 86.4
+        if not self.timezone:
+            return ""
+        as_utc1 = self.data.astimezone(get_fixed_timezone(datetime.timedelta(hours=+1)))
+        return '%03d' % ((as_utc1.second + as_utc1.minute * 60 + as_utc1.hour * 3600) / 86.4)
 
     def e(self):
         """
