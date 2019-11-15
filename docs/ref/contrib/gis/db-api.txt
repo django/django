@@ -364,6 +364,8 @@ Function                              PostGIS  Oracle         MariaDB      MySQL
 :class:`AsGML`                        X        X                                       X
 :class:`AsKML`                        X                                                X
 :class:`AsSVG`                        X                                                X
+:class:`AsWKB`                        X        X              X            X           X
+:class:`AsWKT`                        X        X              X            X           X
 :class:`Azimuth`                      X                                                X (LWGEOM)
 :class:`BoundingCircle`               X        X
 :class:`Centroid`                     X        X              X            X           X

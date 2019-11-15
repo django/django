@@ -5,7 +5,7 @@ from django.contrib.gis.db.models.sql import AreaField, DistanceField
 from django.contrib.gis.geos import GEOSGeometry
 from django.core.exceptions import FieldError
 from django.db.models import (
-    BooleanField, FloatField, IntegerField, TextField, Transform,
+    BinaryField, BooleanField, FloatField, IntegerField, TextField, Transform,
 )
 from django.db.models.expressions import Func, Value
 from django.db.models.functions import Cast
@@ -207,6 +207,16 @@ class AsSVG(GeoFunc):
             self._handle_param(precision, 'precision', int),
         ]
         super().__init__(*expressions, **extra)
+
+
+class AsWKB(GeoFunc):
+    output_field = BinaryField()
+    arity = 1
+
+
+class AsWKT(GeoFunc):
+    output_field = TextField()
+    arity = 1
 
 
 class BoundingCircle(OracleToleranceMixin, GeoFunc):

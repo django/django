@@ -147,6 +147,29 @@ class GISFunctionsTests(FuncTestMixin, TestCase):
         self.assertEqual(svg1, City.objects.annotate(svg=functions.AsSVG('point')).get(name='Pueblo').svg)
         self.assertEqual(svg2, City.objects.annotate(svg=functions.AsSVG('point', relative=5)).get(name='Pueblo').svg)
 
+    @skipUnlessDBFeature('has_AsWKB_function')
+    def test_aswkb(self):
+        wkb = City.objects.annotate(
+            wkb=functions.AsWKB(Point(1, 2, srid=4326)),
+        ).first().wkb
+        # WKB is either XDR or NDR encoded.
+        self.assertIn(
+            bytes(wkb),
+            (
+                b'\x00\x00\x00\x00\x01?\xf0\x00\x00\x00\x00\x00\x00@\x00\x00'
+                b'\x00\x00\x00\x00\x00',
+                b'\x01\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\xf0?\x00\x00'
+                b'\x00\x00\x00\x00\x00@',
+            ),
+        )
+
+    @skipUnlessDBFeature('has_AsWKT_function')
+    def test_aswkt(self):
+        wkt = City.objects.annotate(
+            wkt=functions.AsWKT(Point(1, 2, srid=4326)),
+        ).first().wkt
+        self.assertEqual(wkt, 'POINT (1.0 2.0)' if oracle else 'POINT(1 2)')
+
     @skipUnlessDBFeature("has_Azimuth_function")
     def test_azimuth(self):
         # Returns the azimuth in radians.

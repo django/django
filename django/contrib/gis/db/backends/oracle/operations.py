@@ -65,6 +65,8 @@ class OracleOperations(BaseSpatialOperations, DatabaseOperations):
     function_names = {
         'Area': 'SDO_GEOM.SDO_AREA',
         'AsGeoJSON': 'SDO_UTIL.TO_GEOJSON',
+        'AsWKB': 'SDO_UTIL.TO_WKBGEOMETRY',
+        'AsWKT': 'SDO_UTIL.TO_WKTGEOMETRY',
         'BoundingCircle': 'SDO_GEOM.SDO_MBC',
         'Centroid': 'SDO_GEOM.SDO_CENTROID',
         'Difference': 'SDO_GEOM.SDO_DIFFERENCE',

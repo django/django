@@ -148,6 +148,8 @@ class PostGISOperations(BaseSpatialOperations, DatabaseOperations):
     @cached_property
     def function_names(self):
         function_names = {
+            'AsWKB': 'ST_AsBinary',
+            'AsWKT': 'ST_AsText',
             'BoundingCircle': 'ST_MinimumBoundingCircle',
             'NumPoints': 'ST_NPoints',
         }

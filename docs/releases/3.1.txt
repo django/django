@@ -66,6 +66,9 @@ Minor features
 * :class:`~django.contrib.gis.db.models.functions.AsGeoJSON` is now supported
   on Oracle.
 
+* Added the :class:`~django.contrib.gis.db.models.functions.AsWKB` and
+  :class:`~django.contrib.gis.db.models.functions.AsWKT` functions.
+
 :mod:`django.contrib.messages`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
