@@ -5,7 +5,7 @@ from functools import lru_cache
 from django.conf import settings
 from django.db.backends.base.operations import BaseDatabaseOperations
 from django.db.backends.utils import strip_quotes, truncate_name
-from django.db.models.expressions import Exists, ExpressionWrapper
+from django.db.models.expressions import Exists, ExpressionWrapper, RawSQL
 from django.db.models.query_utils import Q
 from django.db.utils import DatabaseError
 from django.utils import timezone
@@ -635,5 +635,7 @@ END;
         if isinstance(expression, Exists):
             return True
         if isinstance(expression, ExpressionWrapper) and isinstance(expression.expression, Q):
+            return True
+        if isinstance(expression, RawSQL) and expression.conditional:
             return True
         return False

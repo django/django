@@ -92,6 +92,14 @@ class BasicExpressionsTests(TestCase):
             2,
         )
 
+    def test_filtering_on_rawsql_that_is_boolean(self):
+        self.assertEqual(
+            Company.objects.filter(
+                RawSQL('num_employees > %s', (3,), output_field=models.BooleanField()),
+            ).count(),
+            2,
+        )
+
     def test_filter_inter_attribute(self):
         # We can filter on attribute relationships on same model obj, e.g.
         # find companies where the number of employees is greater
