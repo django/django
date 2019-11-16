@@ -54,7 +54,7 @@ geographic SRSes.
 
 *Availability*: MariaDB (≥ 10.2.4), `MySQL
 <https://dev.mysql.com/doc/refman/en/spatial-geojson-functions.html#function_st-asgeojson>`__ (≥ 5.7.5),
-`PostGIS <https://postgis.net/docs/ST_AsGeoJSON.html>`__, SpatiaLite
+Oracle, `PostGIS <https://postgis.net/docs/ST_AsGeoJSON.html>`__, SpatiaLite
 
 Accepts a single geographic field or expression and returns a `GeoJSON
 <http://geojson.org/>`_ representation of the geometry. Note that the result is
@@ -70,16 +70,22 @@ Example::
 Keyword Argument       Description
 =====================  =====================================================
 ``bbox``               Set this to ``True`` if you want the bounding box
-                       to be included in the returned GeoJSON.
+                       to be included in the returned GeoJSON. Ignored on
+                       Oracle.
 
 ``crs``                Set this to ``True`` if you want the coordinate
                        reference system to be included in the returned
-                       GeoJSON. Ignored on MySQL.
+                       GeoJSON. Ignored on MySQL and Oracle.
 
 ``precision``          It may be used to specify the number of significant
                        digits for the coordinates in the GeoJSON
-                       representation -- the default value is 8.
+                       representation -- the default value is 8. Ignored on
+                       Oracle.
 =====================  =====================================================
+
+.. versionchanged:: 3.1
+
+    Oracle support was added.
 
 ``AsGML``
 =========

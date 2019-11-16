@@ -63,6 +63,9 @@ Minor features
 
 * Added the :attr:`.LinearRing.is_counterclockwise` property.
 
+* :class:`~django.contrib.gis.db.models.functions.AsGeoJSON` is now supported
+  on Oracle.
+
 :mod:`django.contrib.messages`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
