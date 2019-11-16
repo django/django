@@ -557,7 +557,7 @@ class QuerySet:
                 self.filter(pk__in=pks).update(**update_kwargs)
     bulk_update.alters_data = True
 
-    def get_or_create(self, defaults=None, **kwargs):
+    def get_or_create(self, defaults=None, raw=False, **kwargs):
         """
         Look up an object with the given kwargs, creating one if necessary.
         Return a tuple of (object, created), where created is a boolean
@@ -570,7 +570,12 @@ class QuerySet:
             return self.get(**kwargs), False
         except self.model.DoesNotExist:
             params = self._extract_model_params(defaults, **kwargs)
-            return self._create_object_from_params(kwargs, params)
+            if raw:
+                # When raw == True, an atomic block will not be opened and
+                # there will be no additional SELECT query in case of an IntegrityError
+                return self._create_object_from_params(params)
+            else:
+                return self._try_create(kwargs, params)
 
     def update_or_create(self, defaults=None, **kwargs):
         """
@@ -588,7 +593,7 @@ class QuerySet:
                 params = self._extract_model_params(defaults, **kwargs)
                 # Lock the row so that a concurrent update is blocked until
                 # after update_or_create() has performed its save.
-                obj, created = self._create_object_from_params(kwargs, params, lock=True)
+                obj, created = self._try_create(kwargs, params, lock=True)
                 if created:
                     return obj, created
             for k, v in defaults.items():
@@ -596,16 +601,23 @@ class QuerySet:
             obj.save(using=self.db)
         return obj, False
 
-    def _create_object_from_params(self, lookup, params, lock=False):
+    def _create_object_from_params(self, params):
+        """
+        Actual creation of an object using params.
+        """
+        params = {k: v() if callable(v) else v for k, v in params.items()}
+        obj = self.create(**params)
+        return obj, True
+
+    def _try_create(self, lookup, params, lock=False):
         """
         Try to create an object using passed params. Used by get_or_create()
         and update_or_create().
         """
         try:
             with transaction.atomic(using=self.db):
-                params = {k: v() if callable(v) else v for k, v in params.items()}
-                obj = self.create(**params)
-            return obj, True
+                obj, created = self._create_object_from_params(params)
+            return obj, created
         except IntegrityError as e:
             try:
                 qs = self.select_for_update() if lock else self
