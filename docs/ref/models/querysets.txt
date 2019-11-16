@@ -1690,7 +1690,14 @@ query. For example, rows of related objects specified in :meth:`select_related`
 are locked in addition to rows of the queryset's model. If this isn't desired,
 specify the related objects you want to lock in ``select_for_update(of=(...))``
 using the same fields syntax as :meth:`select_related`. Use the value ``'self'``
-to refer to the queryset's model.
+to refer to the queryset's model. To lock the parent models of the queryset's
+model, specify the child models link to the parent. Consider the example models
+specified under :ref:`multi-table-inheritance`. The following queryset locks
+the rows for both the ``Place`` as well as ``Restaurant`` models::
+
+
+    Restaurant.objects.all().select_for_update(of=('self', 'place_ptr'))
+
 
 You can't use ``select_for_update()`` on nullable relations::
 

@@ -10,4 +10,5 @@ Django 2.2.8 fixes several bugs in 2.2.7 and adds compatibility with Python
 Bugfixes
 ========
 
-* ...
+* Fixed only parent models of specified models being locked when ``of``
+  argument is specified in ``select_for_update``` (:ticket:`30953`)

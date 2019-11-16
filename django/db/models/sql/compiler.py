@@ -955,7 +955,7 @@ class SQLCompiler:
         Return a quoted list of arguments for the SELECT FOR UPDATE OF part of
         the query.
         """
-        def _get_field_choices():
+        def _get_field_choices(ancestor_pointers):
             """Yield all allowed field paths in breadth-first search order."""
             queue = collections.deque([(None, self.klass_info)])
             while queue:
@@ -973,6 +973,21 @@ class SQLCompiler:
                     (path, klass_info)
                     for klass_info in klass_info.get('related_klass_infos', [])
                 )
+            for p in ancestor_pointers:
+                yield p.target.name
+
+        def _get_model_ancestor_pointers():
+            """
+            Return a list of OneToOneField relations that are pointers to
+            ancestors of the base 'model'
+            """
+            from django.db.models import OneToOneField
+            ancestors = self.query.get_meta().get_parent_list()
+            cols = [c[0] for c in self.select if isinstance(c[0].target, OneToOneField) and
+                    c[0].target.related_model in ancestors and c[0].target.remote_field.parent_link]
+            return cols
+
+        ancestor_pointers = _get_model_ancestor_pointers()
         result = []
         invalid_names = []
         for name in self.query.select_for_update_of:
@@ -987,24 +1002,33 @@ class SQLCompiler:
                         klass_info = related_klass_info
                         break
                 else:
-                    klass_info = None
-                    break
+                    for col in ancestor_pointers:
+                        if part == col.target.name:
+                            # We create a temporary klass_info structure to
+                            # represent model of the pointer
+                            klass_info = {'model': col.target.related_model}
+                            break
+                    else:
+                        klass_info = None
+                        break
             if klass_info is None:
                 invalid_names.append(name)
                 continue
-            select_index = klass_info['select_fields'][0]
-            col = self.select[select_index][0]
+            opts = klass_info['model']._meta
             if self.connection.features.select_for_update_of_column:
+                # Certain databases take column names instead of table names.
+                # For such tables, find the first selected column of the model
+                col = next(cols[0] for cols in self.select if cols[0].alias == opts.db_table)
                 result.append(self.compile(col)[0])
             else:
-                result.append(self.quote_name_unless_alias(col.alias))
+                result.append(self.quote_name_unless_alias(opts.db_table))
         if invalid_names:
             raise FieldError(
                 'Invalid field name(s) given in select_for_update(of=(...)): %s. '
                 'Only relational fields followed in the query are allowed. '
                 'Choices are: %s.' % (
                     ', '.join(invalid_names),
-                    ', '.join(_get_field_choices()),
+                    ', '.join(_get_field_choices(ancestor_pointers)),
                 )
             )
         return result
