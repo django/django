@@ -282,6 +282,9 @@ Requests and Responses
   now allow using ``samesite='None'`` (string) to explicitly state that the
   cookie is sent with all same-site and cross-site requests.
 
+* The new :meth:`.HttpRequest.accepts` method returns whether the request
+  accepts the given MIME type according to the ``Accept`` HTTP header.
+
 Serialization
 ~~~~~~~~~~~~~
 

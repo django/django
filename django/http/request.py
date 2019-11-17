@@ -20,6 +20,8 @@ from django.utils.functional import cached_property
 from django.utils.http import is_same_domain, limited_parse_qsl
 from django.utils.regex_helper import _lazy_re_compile
 
+from .multipartparser import parse_header
+
 RAISE_ERROR = object()
 host_validation_re = _lazy_re_compile(r"^([a-z0-9.-]+|\[[a-f0-9]*:[a-f0-9\.:]+\])(:\d+)?$")
 
@@ -70,6 +72,17 @@ class HttpRequest:
     @cached_property
     def headers(self):
         return HttpHeaders(self.META)
+
+    @cached_property
+    def accepted_types(self):
+        """Return a list of MediaType instances."""
+        return parse_accept_header(self.headers.get('Accept', '*/*'))
+
+    def accepts(self, media_type):
+        return any(
+            accepted_type.match(media_type)
+            for accepted_type in self.accepted_types
+        )
 
     def _set_content_type_params(self, meta):
         """Set content_type, content_params, and encoding."""
@@ -557,6 +570,40 @@ class QueryDict(MultiValueDict):
         return '&'.join(output)
 
 
+class MediaType:
+    def __init__(self, media_type_raw_line):
+        full_type, self.params = parse_header(
+            media_type_raw_line.encode('ascii') if media_type_raw_line else b''
+        )
+        self.main_type, _, self.sub_type = full_type.partition('/')
+
+    def __str__(self):
+        params_str = ''.join(
+            '; %s=%s' % (k, v.decode('ascii'))
+            for k, v in self.params.items()
+        )
+        return '%s%s%s' % (
+            self.main_type,
+            ('/%s' % self.sub_type) if self.sub_type else '',
+            params_str,
+        )
+
+    def __repr__(self):
+        return '<%s: %s>' % (self.__class__.__qualname__, self)
+
+    @property
+    def is_all_types(self):
+        return self.main_type == '*' and self.sub_type == '*'
+
+    def match(self, other):
+        if self.is_all_types:
+            return True
+        other = MediaType(other)
+        if self.main_type == other.main_type and self.sub_type in {'*', other.sub_type}:
+            return True
+        return False
+
+
 # It's neither necessary nor appropriate to use
 # django.utils.encoding.force_str() for parsing URLs and form inputs. Thus,
 # this slightly more restricted function, used by QueryDict.
@@ -612,3 +659,7 @@ def validate_host(host, allowed_hosts):
     Return ``True`` for a valid host, ``False`` otherwise.
     """
     return any(pattern == '*' or is_same_domain(host, pattern) for pattern in allowed_hosts)
+
+
+def parse_accept_header(header):
+    return [MediaType(token) for token in header.split(',') if token.strip()]
