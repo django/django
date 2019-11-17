@@ -1144,7 +1144,7 @@ method::
 
 Both ``ModelChoiceField`` and ``ModelMultipleChoiceField`` have an ``iterator``
 attribute which specifies the class used to iterate over the queryset when
-generating choices.
+generating choices. See :ref:`iterating-relationship-choices` for details.
 
 ``ModelChoiceField``
 --------------------
@@ -1285,8 +1285,73 @@ generating choices.
 
         Same as :class:`ModelChoiceField.iterator`.
 
+.. _iterating-relationship-choices:
+
+Iterating relationship choices
+------------------------------
+
+By default, :class:`ModelChoiceField` and :class:`ModelMultipleChoiceField` use
+:class:`ModelChoiceIterator` to generate their field ``choices``.
+
+When iterated, ``ModelChoiceIterator`` yields 2-tuple choices containing
+:class:`ModelChoiceIteratorValue` instances as the first ``value`` element in
+each choice. ``ModelChoiceIteratorValue`` wraps the choice value whilst
+maintaining a reference to the source model instance that can be used in custom
+widget implementations, for example, to add `data-* attributes`_ to
+``<option>`` elements.
+
+.. _`data-* attributes`: https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/data-*
+
+For example, consider the following models::
+
+    from django.db import models
+
+    class Topping(models.Model):
+        name = models.CharField(max_length=100)
+        price = models.DecimalField(decimal_places=2, max_digits=6)
+
+        def __str__(self):
+            return self.name
+
+    class Pizza(models.Model):
+        topping = models.ForeignKey(Topping, on_delete=models.CASCADE)
+
+You can use a :class:`~django.forms.Select` widget subclass to include
+the value of ``Topping.price`` as the HTML attribute ``data-price`` for each
+``<option>`` element::
+
+    from django import forms
+
+    class ToppingSelect(forms.Select):
+        def create_option(self, name, value, label, selected, index, subindex=None, attrs=None):
+            option = super().create_option(name, value, label, selected, index, subindex, attrs)
+            if value:
+                option['attrs']['data-price'] = value.instance.price
+            return option
+
+    class PizzaForm(forms.ModelForm):
+        class Meta:
+            model = Pizza
+            fields = ['topping']
+            widgets = {'topping': ToppingSelect}
+
+This will render the ``Pizza.topping`` select as:
+
+.. code-block:: html
+
+    <select id="id_topping" name="topping" required>
+    <option value="" selected>---------</option>
+    <option value="1" data-price="1.50">mushrooms</option>
+    <option value="2" data-price="1.25">onions</option>
+    <option value="3" data-price="1.75">peppers</option>
+    <option value="4" data-price="2.00">pineapple</option>
+    </select>
+
+For more advanced usage you may subclass ``ModelChoiceIterator`` in order to
+customize the yielded 2-tuple choices.
+
 ``ModelChoiceIterator``
------------------------
+~~~~~~~~~~~~~~~~~~~~~~~
 
 .. class:: ModelChoiceIterator(field)
 
@@ -1305,8 +1370,41 @@ generating choices.
 
     .. method:: __iter__()
 
-        Yield 2-tuple choices in the same format as used by
-        :attr:`ChoiceField.choices`.
+        Yields 2-tuple choices, in the ``(value, label)`` format used by
+        :attr:`ChoiceField.choices`. The first ``value`` element is a
+        :class:`ModelChoiceIteratorValue` instance.
+
+        .. versionchanged:: 3.1
+
+            In older versions, the first ``value`` element in the choice tuple
+            is the ``field`` value itself, rather than a
+            ``ModelChoiceIteratorValue`` instance.
+
+``ModelChoiceIteratorValue``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. class:: ModelChoiceIteratorValue(value, instance)
+
+    .. versionadded:: 3.1
+
+    Two arguments are required:
+
+    .. attribute:: value
+
+        The value of the choice. This value is used to render the ``value``
+        attribute of an HTML ``<option>`` element.
+
+    .. attribute:: instance
+
+        The model instance from the queryset. The instance can be accessed in
+        custom ``ChoiceWidget.create_option()`` implementations to adjust the
+        rendered HTML.
+
+    ``ModelChoiceIteratorValue`` has the following method:
+
+    .. method:: __str__()
+
+        Return ``value`` as a string to be rendered in HTML.
 
 Creating custom fields
 ======================

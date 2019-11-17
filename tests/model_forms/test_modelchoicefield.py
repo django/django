@@ -260,6 +260,32 @@ class ModelChoiceFieldTests(TestCase):
         self.assertIsInstance(field.choices, CustomModelChoiceIterator)
 
     def test_choice_iterator_passes_model_to_widget(self):
+        class CustomCheckboxSelectMultiple(CheckboxSelectMultiple):
+            def create_option(self, name, value, label, selected, index, subindex=None, attrs=None):
+                option = super().create_option(name, value, label, selected, index, subindex, attrs)
+                # Modify the HTML based on the object being rendered.
+                c = value.instance
+                option['attrs']['data-slug'] = c.slug
+                return option
+
+        class CustomModelMultipleChoiceField(forms.ModelMultipleChoiceField):
+            widget = CustomCheckboxSelectMultiple
+
+        field = CustomModelMultipleChoiceField(Category.objects.all())
+        self.assertHTMLEqual(
+            field.widget.render('name', []), (
+                '<ul>'
+                '<li><label><input type="checkbox" name="name" value="%d" '
+                'data-slug="entertainment">Entertainment</label></li>'
+                '<li><label><input type="checkbox" name="name" value="%d" '
+                'data-slug="test">A test</label></li>'
+                '<li><label><input type="checkbox" name="name" value="%d" '
+                'data-slug="third-test">Third</label></li>'
+                '</ul>'
+            ) % (self.c1.pk, self.c2.pk, self.c3.pk),
+        )
+
+    def test_custom_choice_iterator_passes_model_to_widget(self):
         class CustomModelChoiceValue:
             def __init__(self, value, obj):
                 self.value = value

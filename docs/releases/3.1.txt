@@ -170,7 +170,12 @@ File Uploads
 Forms
 ~~~~~
 
-* ...
+* :class:`~django.forms.ModelChoiceIterator`, used by
+  :class:`~django.forms.ModelChoiceField` and
+  :class:`~django.forms.ModelMultipleChoiceField`, now uses
+  :class:`~django.forms.ModelChoiceIteratorValue` that can be used by widgets
+  to access model instances. See :ref:`iterating-relationship-choices` for
+  details.
 
 Generic Views
 ~~~~~~~~~~~~~

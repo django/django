@@ -1126,6 +1126,20 @@ class InlineForeignKeyField(Field):
         return False
 
 
+class ModelChoiceIteratorValue:
+    def __init__(self, value, instance):
+        self.value = value
+        self.instance = instance
+
+    def __str__(self):
+        return str(self.value)
+
+    def __eq__(self, other):
+        if isinstance(other, ModelChoiceIteratorValue):
+            other = other.value
+        return self.value == other
+
+
 class ModelChoiceIterator:
     def __init__(self, field):
         self.field = field
@@ -1151,7 +1165,10 @@ class ModelChoiceIterator:
         return self.field.empty_label is not None or self.queryset.exists()
 
     def choice(self, obj):
-        return (self.field.prepare_value(obj), self.field.label_from_instance(obj))
+        return (
+            ModelChoiceIteratorValue(self.field.prepare_value(obj), obj),
+            self.field.label_from_instance(obj),
+        )
 
 
 class ModelChoiceField(ChoiceField):
