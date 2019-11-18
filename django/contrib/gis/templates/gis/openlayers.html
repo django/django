@@ -3,7 +3,7 @@
     #{{ id }}_map { width: {{ map_width }}px; height: {{ map_height }}px; }
     #{{ id }}_map .aligned label { float: inherit; }
     #{{ id }}_div_map { position: relative; vertical-align: top; float: {{ LANGUAGE_BIDI|yesno:"right,left" }}; }
-    {% if not display_raw %}#{{ id }} { display: none; }{% endif %}
+    {% if not display_raw %}#{{ id }} { display: none !important; }{% endif %}
     {% endblock %}
 </style>
 
