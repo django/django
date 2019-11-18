@@ -1812,6 +1812,18 @@ templates used by the :class:`ModelAdmin` views:
     This uses the ``HttpRequest`` instance to filter the ``Car`` foreign key
     field to only display the cars owned by the ``User`` instance.
 
+    For more complex filters, you can use ``ModelForm.__init__()`` method to
+    filter based on an ``instance`` of your model (see
+    :ref:`fields-which-handle-relationships`). For example::
+
+        class CountryAdminForm(forms.ModelForm):
+            def __init__(self, *args, **kwargs):
+                super().__init__(*args, **kwargs)
+                self.fields['capital'].queryset = self.instance.cities.all()
+
+        class CountryAdmin(admin.ModelAdmin):
+            form = CountryAdminForm
+
 .. method:: ModelAdmin.formfield_for_manytomany(db_field, request, **kwargs)
 
     Like the ``formfield_for_foreignkey`` method, the
