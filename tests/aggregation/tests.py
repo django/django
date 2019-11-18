@@ -440,7 +440,7 @@ class AggregateTestCase(TestCase):
     def test_fkey_aggregate(self):
         explicit = list(Author.objects.annotate(Count('book__id')))
         implicit = list(Author.objects.annotate(Count('book')))
-        self.assertEqual(explicit, implicit)
+        self.assertCountEqual(explicit, implicit)
 
     def test_annotate_ordering(self):
         books = Book.objects.values('rating').annotate(oldest=Max('authors__age')).order_by('oldest', 'rating')
