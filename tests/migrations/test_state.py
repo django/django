@@ -657,7 +657,7 @@ class StateTests(SimpleTestCase):
             return [mod for mod in state.apps.get_models() if mod._meta.model_name == 'a'][0]
 
         project_state = ProjectState()
-        project_state.add_model((ModelState.from_model(A)))
+        project_state.add_model(ModelState.from_model(A))
         self.assertEqual(len(get_model_a(project_state)._meta.related_objects), 1)
         old_state = project_state.clone()
 

@@ -126,7 +126,7 @@ class ViewIndexView(BaseAdminDocsView):
                 'full_name': get_view_name(func),
                 'url': simplify_regex(regex),
                 'url_name': ':'.join((namespace or []) + (name and [name] or [])),
-                'namespace': ':'.join((namespace or [])),
+                'namespace': ':'.join(namespace or []),
                 'name': name,
             })
         return super().get_context_data(**{**kwargs, 'views': views})
