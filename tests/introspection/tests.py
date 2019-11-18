@@ -292,3 +292,14 @@ class IntrospectionTests(TransactionTestCase):
                 field_constraints.add(name)
         # All constraints are accounted for.
         self.assertEqual(constraints.keys() ^ (custom_constraints | field_constraints), set())
+
+    @skipUnless(connection.vendor == 'mysql', 'MySQL tests')
+    def test_unique_together_index_order(self):
+        with connection.cursor() as cursor:
+            constraints = connection.introspection.get_constraints(cursor, Reporter._meta.db_table)
+            index_found = False
+            for val in constraints.values():
+                if val['columns'] == ['first_name', 'last_name']:
+                    index_found = True
+                    break
+            self.assertTrue(index_found)
