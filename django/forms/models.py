@@ -214,7 +214,7 @@ class ModelFormMetaclass(DeclarativeFieldsMetaclass):
 
         formfield_callback = attrs.pop('formfield_callback', base_formfield_callback)
 
-        new_class = super(ModelFormMetaclass, mcs).__new__(mcs, name, bases, attrs)
+        new_class = super().__new__(mcs, name, bases, attrs)
 
         if bases == (BaseModelForm,):
             return new_class

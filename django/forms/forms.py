@@ -30,7 +30,7 @@ class DeclarativeFieldsMetaclass(MediaDefiningClass):
                 attrs.pop(key)
         attrs['declared_fields'] = dict(current_fields)
 
-        new_class = super(DeclarativeFieldsMetaclass, mcs).__new__(mcs, name, bases, attrs)
+        new_class = super().__new__(mcs, name, bases, attrs)
 
         # Walk through the MRO.
         declared_fields = {}

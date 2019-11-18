@@ -183,7 +183,7 @@ class MediaDefiningClass(type):
     Metaclass for classes that can have media definitions.
     """
     def __new__(mcs, name, bases, attrs):
-        new_class = super(MediaDefiningClass, mcs).__new__(mcs, name, bases, attrs)
+        new_class = super().__new__(mcs, name, bases, attrs)
 
         if 'media' not in attrs:
             new_class.media = media_property(new_class)
