@@ -116,7 +116,7 @@ class SpatiaLiteOperations(BaseSpatialOperations, DatabaseOperations):
         Return None because geometry columns are added via the
         `AddGeometryColumn` stored procedure on SpatiaLite.
         """
-        return None
+        return f.geom_type
 
     def get_distance(self, f, value, lookup_type):
         """
