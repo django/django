@@ -116,6 +116,9 @@ class DateFormatTests(SimpleTestCase):
         the_future = datetime(2100, 10, 25, 0, 00)
         self.assertEqual(dateformat.format(the_future, r'Y'), '2100')
 
+    def test_day_of_year_leap(self):
+        self.assertEqual(dateformat.format(datetime(2000, 12, 31), 'z'), '366')
+
     def test_timezones(self):
         my_birthday = datetime(1979, 7, 8, 22, 00)
         summertime = datetime(2005, 10, 30, 1, 00)
