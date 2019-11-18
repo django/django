@@ -1,6 +1,6 @@
 .\" Man page generated from reStructuredText.
 .
-.TH "DJANGO-ADMIN" "1" "October 14, 2019" "3.0" "Django"
+.TH "DJANGO-ADMIN" "1" "November 18, 2019" "3.0" "Django"
 .SH NAME
 django-admin \- Utility script for the Django Web framework
 .
@@ -40,8 +40,8 @@ does the same thing as \fBdjango\-admin\fP but also sets the
 project\(aqs \fBsettings.py\fP file.
 .sp
 The \fBdjango\-admin\fP script should be on your system path if you installed
-Django via its \fBsetup.py\fP utility. If it\(aqs not on your path, you can find it
-in \fBsite\-packages/django/bin\fP within your Python installation. Consider
+Django via \fBpip\fP\&. If it\(aqs not on your path, you can find it in
+\fBsite\-packages/django/bin\fP within your Python installation. Consider
 symlinking it from some place on your path, such as \fB/usr/local/bin\fP\&.
 .sp
 For Windows users, who do not have symlinking functionality available, you can
@@ -321,6 +321,15 @@ program manually.
 .UNINDENT
 .sp
 Specifies the database onto which to open a shell. Defaults to \fBdefault\fP\&.
+.sp
+\fBNOTE:\fP
+.INDENT 0.0
+.INDENT 3.5
+Be aware that not all options set it in the \fBOPTIONS\fP part of your
+database configuration in \fBDATABASES\fP are passed to the
+command\-line client, e.g. \fB\(aqisolation_level\(aq\fP\&.
+.UNINDENT
+.UNINDENT
 .SS \fBdiffsettings\fP
 .INDENT 0.0
 .TP
