@@ -1174,6 +1174,8 @@ Slightly complex built-in ``Field`` classes
     If no ``input_time_formats`` argument is provided, the default input formats
     for :class:`TimeField` are used.
 
+.. _fields-which-handle-relationships:
+
 Fields which handle relationships
 =================================
 
