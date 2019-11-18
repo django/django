@@ -656,7 +656,7 @@ class Client(RequestFactory):
         if not hasattr(response, '_json'):
             if not JSON_CONTENT_TYPE_RE.match(response.get('Content-Type')):
                 raise ValueError(
-                    'Content-Type header is "{0}", not "application/json"'
+                    'Content-Type header is "{}", not "application/json"'
                     .format(response.get('Content-Type'))
                 )
             response._json = json.loads(response.content.decode(response.charset), **extra)
