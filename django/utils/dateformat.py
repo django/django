@@ -21,7 +21,7 @@ from django.utils.regex_helper import _lazy_re_compile
 from django.utils.timezone import get_default_timezone, is_aware, is_naive
 from django.utils.translation import gettext as _
 
-re_formatchars = _lazy_re_compile(r'(?<!\\)([aAbBcdDeEfFgGhHiIjlLmMnNoOPrsStTUuwWyYzZ])')
+re_formatchars = _lazy_re_compile(r'(?<!\\)([aAbcdDeEfFgGhHiIjlLmMnNoOPrsStTUuwWyYzZ])')
 re_escaped = _lazy_re_compile(r'\\(.)')
 
 
@@ -67,10 +67,6 @@ class TimeFormat(Formatter):
         if self.data.hour > 11:
             return _('PM')
         return _('AM')
-
-    def B(self):
-        "Swatch Internet time"
-        raise NotImplementedError('may be implemented in a future release')
 
     def e(self):
         """
