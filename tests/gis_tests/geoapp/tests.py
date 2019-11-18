@@ -2,6 +2,7 @@ import tempfile
 from io import StringIO
 
 from django.contrib.gis import gdal
+from django.contrib.gis.db import models
 from django.contrib.gis.db.models import Extent, MakeLine, Union, functions
 from django.contrib.gis.geos import (
     GeometryCollection, GEOSGeometry, LinearRing, LineString, MultiLineString,
@@ -219,6 +220,10 @@ class GeoModelTest(TestCase):
                 g = LineString(srid=4326)
             self.assertEqual(feature.geom, g)
             self.assertEqual(feature.geom.srid, g.srid)
+
+    def test_round_trip(self):
+        g = City.objects.values_list(models.Value(Point(-87.650175, 41.850385), models.PointField()), flat=True)[0]
+        self.assertEqual(g.wkt, 'POINT (-87.650175 41.850385)')
 
 
 class GeoLookupTest(TestCase):
