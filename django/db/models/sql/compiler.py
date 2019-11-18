@@ -7,9 +7,7 @@ from django.core.exceptions import EmptyResultSet, FieldError
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.expressions import OrderBy, Random, RawSQL, Ref, Value
 from django.db.models.functions import Cast
-from django.db.models.query_utils import (
-    Q, QueryWrapper, select_related_descend,
-)
+from django.db.models.query_utils import Q, select_related_descend
 from django.db.models.sql.constants import (
     CURSOR, GET_ITERATOR_CHUNK_SIZE, MULTI, NO_RESULTS, ORDER_DIR, SINGLE,
 )
@@ -1139,7 +1137,7 @@ class SQLCompiler:
             lhs_sql, lhs_params = self.compile(select_col)
             rhs = '%s.%s' % (qn(alias), qn2(columns[index]))
             self.query.where.add(
-                QueryWrapper('%s = %s' % (lhs_sql, rhs), lhs_params), 'AND')
+                RawSQL('%s = %s' % (lhs_sql, rhs), lhs_params), 'AND')
 
         sql, params = self.as_sql()
         return 'EXISTS (%s)' % sql, params
