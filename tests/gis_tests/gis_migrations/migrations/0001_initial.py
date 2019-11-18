@@ -46,7 +46,12 @@ ops = [
         name='family',
         field=models.ForeignKey('gis_migrations.Family', models.SET_NULL, blank=True, null=True),
         preserve_default=True,
-    )
+    ),
+    migrations.AlterField(
+        model_name='household',
+        name='geom',
+        field=models.PointField(srid=4326, verbose_name='Geoms'),
+    ),
 ]
 
 if connection.features.supports_raster:

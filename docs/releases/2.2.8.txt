@@ -10,4 +10,4 @@ Django 2.2.8 fixes several bugs in 2.2.7 and adds compatibility with Python
 Bugfixes
 ========
 
-* ...
+* Fixed migration crash when a GeoDjango model field is altered when using Spatialite backend. (:ticket:`29058`)
