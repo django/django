@@ -250,7 +250,7 @@ class LiveServerPort(LiveServerBase):
 
     def test_specified_port_bind(self):
         """LiveServerTestCase.port customizes the server's port."""
-        TestCase = type(str('TestCase'), (LiveServerBase,), {})
+        TestCase = type('TestCase', (LiveServerBase,), {})
         # Find an open port and tell TestCase to use it.
         s = socket.socket()
         s.bind(('', 0))
