@@ -1782,6 +1782,9 @@ templates used by the :class:`ModelAdmin` views:
     This uses the ``HttpRequest`` instance to filter the ``Car`` foreign key
     field to only display the cars owned by the ``User`` instance.
 
+    If you need to create a filter based on the ``instance``, please refer to the
+    section :ref:`admin-filtering-fields-based-on-the-instance`.
+
 .. method:: ModelAdmin.formfield_for_manytomany(db_field, request, **kwargs)
 
     Like the ``formfield_for_foreignkey`` method, the
@@ -2185,6 +2188,27 @@ the :doc:`forms </ref/forms/index>` documentation on :doc:`custom validation
 </ref/forms/validation>` and, more specifically, the
 :ref:`model form validation notes <overriding-modelform-clean-method>` for more
 information.
+
+.. _admin-filtering-fields-based-on-the-instance:
+
+Filtering fields based on the instance in the admin
+---------------------------------------------------
+
+Using :attr:`~django.contrib.admin.ModelAdmin.formfield_for_foreignkey` may be
+enough if you are filtering options based on the ``request``. For more complex
+filters, you may want to access the ``instance`` object, which can be done by
+using the :attr:`~django.contrib.admin.ModelAdmin.form` attribute to define a
+custom :class:`~django.forms.ModelForm` as follows::
+
+    class CarAdmin(admin.ModelAdmin):
+        form = MyCarAdminForm
+
+``MyCarAdminForm`` can be defined anywhere as long as you import where needed::
+
+    class MyCarAdminForm(forms.ModelForm):
+        def __init__(self, *args, **kwargs):
+            super().__init__(*args, **kwargs)
+            self.fields["garage"].queryset = self.instance.owner.garage_set.all()
 
 .. _admin-inlines:
 
