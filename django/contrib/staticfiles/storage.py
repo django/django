@@ -172,6 +172,11 @@ class HashedFilesMixin:
             if url.startswith('/') and not url.startswith(settings.STATIC_URL):
                 return matched
 
+            # Ignore css statement, rule which is inside css comment /* */
+            inside_comment = re.compile(r"""(\/\*.*?({}).*?\*\/)""".format(re.escape(matched)), re.DOTALL)
+            if re.search(inside_comment, matchobj.string):
+                return matched
+
             # Strip off the fragment so a path-like fragment won't interfere.
             url_path, fragment = urldefrag(url)
 

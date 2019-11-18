@@ -46,14 +46,14 @@ class TestHashedFiles:
         self.assertStaticRaises(ValueError, "does/not/exist.png", "/static/does/not/exist.png")
         self.assertStaticRenders("test/file.txt", "/static/test/file.dad0999e4f8f.txt")
         self.assertStaticRenders("test/file.txt", "/static/test/file.dad0999e4f8f.txt", asvar=True)
-        self.assertStaticRenders("cached/styles.css", "/static/cached/styles.5e0040571e1a.css")
+        self.assertStaticRenders("cached/styles.css", "/static/cached/styles.a88516f58ef8.css")
         self.assertStaticRenders("path/", "/static/path/")
         self.assertStaticRenders("path/?query", "/static/path/?query")
         self.assertPostCondition()
 
     def test_template_tag_simple_content(self):
         relpath = self.hashed_file_path("cached/styles.css")
-        self.assertEqual(relpath, "cached/styles.5e0040571e1a.css")
+        self.assertEqual(relpath, "cached/styles.a88516f58ef8.css")
         with storage.staticfiles_storage.open(relpath) as relfile:
             content = relfile.read()
             self.assertNotIn(b"cached/other.css", content)
@@ -75,8 +75,8 @@ class TestHashedFiles:
 
     def test_path_with_querystring(self):
         relpath = self.hashed_file_path("cached/styles.css?spam=eggs")
-        self.assertEqual(relpath, "cached/styles.5e0040571e1a.css?spam=eggs")
-        with storage.staticfiles_storage.open("cached/styles.5e0040571e1a.css") as relfile:
+        self.assertEqual(relpath, "cached/styles.a88516f58ef8.css?spam=eggs")
+        with storage.staticfiles_storage.open("cached/styles.a88516f58ef8.css") as relfile:
             content = relfile.read()
             self.assertNotIn(b"cached/other.css", content)
             self.assertIn(b"other.d41d8cd98f00.css", content)
@@ -84,8 +84,8 @@ class TestHashedFiles:
 
     def test_path_with_fragment(self):
         relpath = self.hashed_file_path("cached/styles.css#eggs")
-        self.assertEqual(relpath, "cached/styles.5e0040571e1a.css#eggs")
-        with storage.staticfiles_storage.open("cached/styles.5e0040571e1a.css") as relfile:
+        self.assertEqual(relpath, "cached/styles.a88516f58ef8.css#eggs")
+        with storage.staticfiles_storage.open("cached/styles.a88516f58ef8.css") as relfile:
             content = relfile.read()
             self.assertNotIn(b"cached/other.css", content)
             self.assertIn(b"other.d41d8cd98f00.css", content)
@@ -105,11 +105,11 @@ class TestHashedFiles:
 
     def test_template_tag_absolute(self):
         relpath = self.hashed_file_path("cached/absolute.css")
-        self.assertEqual(relpath, "cached/absolute.eb04def9f9a4.css")
+        self.assertEqual(relpath, "cached/absolute.41d947a842c7.css")
         with storage.staticfiles_storage.open(relpath) as relfile:
             content = relfile.read()
             self.assertNotIn(b"/static/cached/styles.css", content)
-            self.assertIn(b"/static/cached/styles.5e0040571e1a.css", content)
+            self.assertIn(b"/static/cached/styles.a88516f58ef8.css", content)
             self.assertNotIn(b"/static/styles_root.css", content)
             self.assertIn(b"/static/styles_root.401f2509a628.css", content)
             self.assertIn(b'/static/cached/img/relative.acae32e4532b.png', content)
@@ -129,22 +129,22 @@ class TestHashedFiles:
 
     def test_template_tag_relative(self):
         relpath = self.hashed_file_path("cached/relative.css")
-        self.assertEqual(relpath, "cached/relative.c3e9e1ea6f2e.css")
+        self.assertEqual(relpath, "cached/relative.e1497e65a128.css")
         with storage.staticfiles_storage.open(relpath) as relfile:
             content = relfile.read()
             self.assertNotIn(b"../cached/styles.css", content)
             self.assertNotIn(b'@import "styles.css"', content)
             self.assertNotIn(b'url(img/relative.png)', content)
             self.assertIn(b'url("img/relative.acae32e4532b.png")', content)
-            self.assertIn(b"../cached/styles.5e0040571e1a.css", content)
+            self.assertIn(b"../cached/styles.a88516f58ef8.css", content)
         self.assertPostCondition()
 
     def test_import_replacement(self):
         "See #18050"
         relpath = self.hashed_file_path("cached/import.css")
-        self.assertEqual(relpath, "cached/import.f53576679e5a.css")
+        self.assertEqual(relpath, "cached/import.6af98751e6f4.css")
         with storage.staticfiles_storage.open(relpath) as relfile:
-            self.assertIn(b"""import url("styles.5e0040571e1a.css")""", relfile.read())
+            self.assertIn(b"""import url("styles.a88516f58ef8.css")""", relfile.read())
         self.assertPostCondition()
 
     def test_template_tag_deep_relative(self):
@@ -248,15 +248,15 @@ class TestExtraPatternsStorage(CollectionTestCase):
         """
         # CSS files shouldn't be touched by JS patterns.
         relpath = self.cached_file_path("cached/import.css")
-        self.assertEqual(relpath, "cached/import.f53576679e5a.css")
+        self.assertEqual(relpath, "cached/import.6af98751e6f4.css")
         with storage.staticfiles_storage.open(relpath) as relfile:
-            self.assertIn(b'import url("styles.5e0040571e1a.css")', relfile.read())
+            self.assertIn(b'import url("styles.a88516f58ef8.css")', relfile.read())
 
         # Confirm JS patterns have been applied to JS files.
         relpath = self.cached_file_path("cached/test.js")
-        self.assertEqual(relpath, "cached/test.388d7a790d46.js")
+        self.assertEqual(relpath, "cached/test.bd002cb92b25.js")
         with storage.staticfiles_storage.open(relpath) as relfile:
-            self.assertIn(b'JS_URL("import.f53576679e5a.css")', relfile.read())
+            self.assertIn(b'JS_URL("import.6af98751e6f4.css")', relfile.read())
 
 
 @override_settings(

@@ -1,1 +1,15 @@
 @import url("other.css");
+
+/* Ignore @import rule and url() statement inside comment */
+
+/* @import url("non_exist.css") */
+
+/* url("non_exist.png") */
+
+/*
+
+@import url("non_exist.css")
+
+url("non_exist.png")
+
+*/
