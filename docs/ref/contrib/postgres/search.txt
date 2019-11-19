@@ -132,6 +132,60 @@ order by relevancy::
 See :ref:`postgresql-fts-weighting-queries` for an explanation of the
 ``weights`` parameter.
 
+``SearchHeadline``
+==================
+
+.. versionadded:: 3.1
+
+.. class:: SearchHeadline(expression, query, config=None, start_sel=None, stop_sel=None, max_words=None, min_words=None, short_word=None, highlight_all=None, max_fragments=None, fragment_delimiter=None)
+
+Accepts a single text field or an expression, a query, a config, and a set of
+options. Returns highlighted search results.
+
+Set the ``start_sel`` and ``stop_sel`` parameters to the string values to be
+used to wrap highlighted query terms in the document. PostgreSQL's defaults are
+``<b>`` and ``</b>``.
+
+Provide integer values to the ``max_words`` and ``min_words`` parameters to
+determine the longest and shortest headlines. PostgreSQL's defaults are 35 and
+15.
+
+Provide an integer value to the ``short_word`` parameter to discard words of
+this length or less in each headline. PostgreSQL's default is 3.
+
+Set the ``highlight_all`` parameter to ``True`` to use the whole document in
+place of a fragment and ignore ``max_words``, ``min_words``, and ``short_word``
+parameters. That's disabled by default in PostgreSQL.
+
+Provide a non-zero integer value to the ``max_fragments`` to set the maximum
+number of fragments to display. That's disabled by default in PostgreSQL.
+
+Set the ``fragment_delimiter`` string parameter to configure the delimiter
+between fragments. PostgreSQL's default is ``" ... "``.
+
+The PostgreSQL documentation has more details on `highlighting search
+results`_.
+
+Usage example::
+
+    >>> from django.contrib.postgres.search import SearchHeadline, SearchQuery
+    >>> query = SearchQuery('red tomato')
+    >>> entry = Entry.objects.annotate(
+    ...     headline=SearchHeadline(
+    ...         'body_text',
+    ...         query,
+    ...         start_sel='<span>',
+    ...         stop_sel='</span>',
+    ...     ),
+    ... ).get()
+    >>> print(entry.headline)
+    Sandwich with <span>tomato</span> and <span>red</span> cheese.
+
+See :ref:`postgresql-fts-search-configuration` for an explanation of the
+``config`` parameter.
+
+.. _highlighting search results: https://www.postgresql.org/docs/current/textsearch-controls.html#TEXTSEARCH-HEADLINE
+
 .. _postgresql-fts-search-configuration:
 
 Changing the search configuration

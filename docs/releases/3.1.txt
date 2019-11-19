@@ -108,6 +108,9 @@ Minor features
 * :class:`~django.contrib.postgres.search.SearchQuery` now supports
   ``'websearch'`` search type on PostgreSQL 11+.
 
+* The new :class:`~django.contrib.postgres.search.SearchHeadline` class allows
+  highlighting search results.
+
 :mod:`django.contrib.redirects`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
