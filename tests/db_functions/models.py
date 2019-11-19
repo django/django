@@ -49,7 +49,7 @@ class DTModel(models.Model):
     duration = models.DurationField(null=True, blank=True)
 
     def __str__(self):
-        return 'DTModel({0})'.format(self.name)
+        return 'DTModel({})'.format(self.name)
 
 
 class DecimalModel(models.Model):

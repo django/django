@@ -319,7 +319,7 @@ class GDALRasterTests(SimpleTestCase):
             return
         gdalinfo = """
         Driver: GTiff/GeoTIFF
-        Files: {0}
+        Files: {}
         Size is 163, 174
         Coordinate System is:
         PROJCS["NAD83 / Florida GDL Albers",
