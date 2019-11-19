@@ -87,6 +87,11 @@ Minor features
   :lookup:`rangefield.upper_inc`, and :lookup:`rangefield.upper_inf` allows
   querying :class:`~django.contrib.postgres.fields.RangeField` by a bound type.
 
+* :class:`~django.contrib.postgres.fields.CICharField`,
+  :class:`~django.contrib.postgres.fields.CIEmailField` and
+  :class:`~django.contrib.postgres.fields.CITextField` now return case
+  insensitive string values.
+
 :mod:`django.contrib.redirects`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

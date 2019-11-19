@@ -280,6 +280,19 @@ transform do not change. For example::
     :class:`~django.db.models.EmailField`, and
     :class:`~django.db.models.TextField`, respectively.
 
+    Comparison of ``CIText`` field values in python is also done case
+    insensitively::
+
+        from django.contrib.postgres.fields import CICharField
+        from django.db import models
+
+        class Post(models.Model):
+            name = CICharField(max_length=255)
+
+        >>> post = Post.objects.create(name="New Post")
+        >>> post.name == "NEW POST"
+        True
+
     ``max_length`` won't be enforced in the database since ``citext`` behaves
     similar to PostgreSQL's ``text`` type.
 

@@ -31,6 +31,36 @@ class CITextTestCase(PostgreSQLTestCase):
         self.assertEqual(CITestModel.objects.filter(email=self.john.email.lower()).count(), 1)
         self.assertEqual(CITestModel.objects.filter(description=self.john.description.lower()).count(), 1)
 
+    def test_assigned_field_value_comparison_is_case_insensitive(self):
+        self.assertEqual(self.john.name, 'JOHN')
+        self.assertEqual('JOHN@JOHN.COM', self.john.email)
+        self.assertEqual('average joe named john', self.john.description)
+
+    def test_comparison_of_field_value_from_db_is_case_insensitive(self):
+        john = CITestModel.objects.get(name='john')
+
+        self.assertEqual(john.name, 'JOHn')
+        self.assertEqual('JOHN@john.COM', john.email)
+        self.assertEqual('average JOE named JOHN', john.description)
+
+    def test_comparison_of_field_values_from_values_call_is_case_insensitive(self):
+        self.assertEqual(
+            CITestModel.objects.filter(name='john').values().first(),
+            {
+                'name': 'JOHN',
+                'array_field': ['joe', 'john'],
+                'description': 'AVERAGE Joe NAMED John',
+                'email': 'john@JOHN.cOm',
+            }
+        )
+
+    def test_comparison_of_field_values_from_values_list_is_case_insensitive(self):
+        values = CITestModel.objects.filter(name='john').values_list('name', 'email', 'description').first()
+        self.assertEqual(
+            values,
+            ('joHN', 'JOHN@john.COM', 'AVERAGE Joe NAMED John')
+        )
+
     def test_fail_citext_primary_key(self):
         """
         Creating an entry for a citext field used as a primary key which
