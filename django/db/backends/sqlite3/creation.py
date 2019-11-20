@@ -98,4 +98,6 @@ class DatabaseCreation(BaseDatabaseCreation):
         sig = [self.connection.settings_dict['NAME']]
         if self.is_in_memory_db(test_database_name):
             sig.append(self.connection.alias)
+        else:
+            sig.append(test_database_name)
         return tuple(sig)
