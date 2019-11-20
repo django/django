@@ -359,6 +359,8 @@ Function                              PostGIS  Oracle         MariaDB      MySQL
 :class:`Distance`                     X        X              X            X           X
 :class:`Envelope`                     X        X              X            X           X
 :class:`ForcePolygonCW`               X                                                X
+:class:`FromWKB`                      X        X              X            X           X
+:class:`FromWKT`                      X        X              X            X           X
 :class:`GeoHash`                      X                                    X           X (LWGEOM/RTTOPO)
 :class:`Intersection`                 X        X              X            X           X
 :class:`IsValid`                      X        X                           X           X
