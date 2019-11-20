@@ -8,7 +8,7 @@ from django.contrib.gis.geos import (
     GEOSGeometry, LineString, Point, Polygon, fromstr,
 )
 from django.contrib.gis.measure import Area
-from django.db import NotSupportedError, connection
+from django.db import NotSupportedError, connection, models
 from django.db.models import Sum
 from django.test import TestCase, skipUnlessDBFeature
 
@@ -256,6 +256,29 @@ class GISFunctionsTests(FuncTestMixin, TestCase):
         State.objects.create(name='Foo', poly=Polygon(*rings))
         st = State.objects.annotate(force_polygon_cw=functions.ForcePolygonCW('poly')).get(name='Foo')
         self.assertEqual(rhr_rings, st.force_polygon_cw.coords)
+
+    @skipUnlessDBFeature("has_FromWKB_function")
+    def test_fromwkb(self):
+        g = Point(56.811078, 60.608647)
+        g2 = City.objects.values_list(
+            functions.FromWKB(
+                models.Value(
+                    bytes(g.wkb),
+                    output_field=models.BinaryField(),
+                )
+            ),
+            flat=True,
+        )[0]
+        self.assertEqual(g, g2)
+
+    @skipUnlessDBFeature("has_FromWKT_function")
+    def test_fromwkt(self):
+        g = Point(56.811078, 60.608647)
+        g2 = City.objects.values_list(
+            functions.FromWKT(models.Value(g.wkt)),
+            flat=True,
+        )[0]
+        self.assertEqual(g, g2)
 
     @skipUnlessDBFeature("has_GeoHash_function")
     def test_geohash(self):

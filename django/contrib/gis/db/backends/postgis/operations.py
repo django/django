@@ -150,6 +150,8 @@ class PostGISOperations(BaseSpatialOperations, DatabaseOperations):
         function_names = {
             'AsWKB': 'ST_AsBinary',
             'AsWKT': 'ST_AsText',
+            'FromWKB': 'ST_GeomFromWKB',
+            'FromWKT': 'ST_GeomFromText',
             'BoundingCircle': 'ST_MinimumBoundingCircle',
             'NumPoints': 'ST_NPoints',
         }
