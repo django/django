@@ -3,6 +3,7 @@ import json
 import os
 import posixpath
 import re
+from collections import namedtuple
 from urllib.parse import unquote, urldefrag, urlsplit, urlunsplit
 
 from django.conf import settings
@@ -154,6 +155,8 @@ class HashedFilesMixin:
         if template is None:
             template = self.default_template
 
+        Position = namedtuple('Position', 'start end')
+
         def converter(matchobj):
             """
             Convert the matched URL to a normalized and hashed URL.
@@ -171,6 +174,24 @@ class HashedFilesMixin:
             # CSS / JS?). Note that STATIC_URL cannot be empty.
             if url.startswith('/') and not url.startswith(settings.STATIC_URL):
                 return matched
+
+            # Ignore css statement, rule which is inside css comment
+            comment_regex = re.compile('/\\*[^*]*\\*+(?:[^/*][^*]*\\*+)*/')
+            comments = re.finditer(comment_regex, matchobj.string)
+
+            for comment in comments:
+                if matched in comment.group(0):
+                    comment_position = Position(*comment.span())
+                    matched_inside_comment = re.search(re.escape(matched), comment.group(0))
+
+                    matched_position_inside_comment = Position(*matched_inside_comment.span())
+
+                    comment_position = comment_position._replace(
+                        start=comment_position.start + matched_position_inside_comment.start,
+                    )
+
+                    if matchobj.span()[0] == comment_position.start:
+                        return matched
 
             # Strip off the fragment so a path-like fragment won't interfere.
             url_path, fragment = urldefrag(url)
