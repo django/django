@@ -4,6 +4,7 @@
 
 /* url("non_exist.png") */
 
+@import url("other.css")
 
 /*
 
@@ -11,4 +12,8 @@
 
 url("non_exist.png")
 
+@import url("other.css")
+
 */
+
+@import url("other.css")
