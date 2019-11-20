@@ -326,6 +326,24 @@ class GISFunctionsTests(FuncTestMixin, TestCase):
         ).get(name="Foo")
         self.assertEqual(rhr_rings, st.force_polygon_cw.coords)
 
+    @skipUnlessDBFeature("has_FromWKB_function")
+    def test_fromwkb(self):
+        g = Point(56.811078, 60.608647)
+        g2 = City.objects.values_list(
+            functions.FromWKB(Value(g.wkb.tobytes())),
+            flat=True,
+        )[0]
+        self.assertIs(g.equals_exact(g2, 0.00001), True)
+
+    @skipUnlessDBFeature("has_FromWKT_function")
+    def test_fromwkt(self):
+        g = Point(56.811078, 60.608647)
+        g2 = City.objects.values_list(
+            functions.FromWKT(Value(g.wkt)),
+            flat=True,
+        )[0]
+        self.assertIs(g.equals_exact(g2, 0.00001), True)
+
     @skipUnlessDBFeature("has_GeoHash_function")
     def test_geohash(self):
         # Reference query:
