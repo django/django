@@ -106,7 +106,7 @@ Minor features
   <django.contrib.admin.ModelAdmin.get_inlines>` method allows specifying the
   inlines based on the request or model instance.
 
-* Select2 library is upgraded from version 4.0.3 to 4.0.7.
+* Select2 library is upgraded from version 4.0.3 to 4.0.12.
 
 * jQuery is upgraded from version 3.3.1 to 3.4.1.
 
