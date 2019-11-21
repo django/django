@@ -13,12 +13,15 @@ Usage:
 import calendar
 import datetime
 import time
+from email.utils import format_datetime as format_datetime_rfc5322
 
 from django.utils.dates import (
     MONTHS, MONTHS_3, MONTHS_ALT, MONTHS_AP, WEEKDAYS, WEEKDAYS_ABBR,
 )
 from django.utils.regex_helper import _lazy_re_compile
-from django.utils.timezone import get_default_timezone, is_aware, is_naive
+from django.utils.timezone import (
+    get_default_timezone, is_aware, is_naive, make_aware,
+)
 from django.utils.translation import gettext as _
 
 re_formatchars = _lazy_re_compile(r'(?<!\\)([aAbcdDeEfFgGhHiIjlLmMnNoOPrsStTUuwWyYzZ])')
@@ -283,7 +286,11 @@ class DateFormat(TimeFormat):
                 "The format for date objects may not contain time-related "
                 "format specifiers (found 'r')."
             )
-        return self.format('D, j M Y H:i:s O')
+        if is_naive(self.data):
+            dt = make_aware(self.data, timezone=self.timezone)
+        else:
+            dt = self.data
+        return format_datetime_rfc5322(dt)
 
     def S(self):
         "English ordinal suffix for the day of the month, 2 characters; i.e. 'st', 'nd', 'rd' or 'th'"

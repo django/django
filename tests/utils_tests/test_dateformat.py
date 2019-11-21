@@ -131,7 +131,7 @@ class DateFormatTests(SimpleTestCase):
 
         if TZ_SUPPORT:
             self.assertEqual(dateformat.format(my_birthday, 'O'), '+0100')
-            self.assertEqual(dateformat.format(my_birthday, 'r'), 'Sun, 8 Jul 1979 22:00:00 +0100')
+            self.assertEqual(dateformat.format(my_birthday, 'r'), 'Sun, 08 Jul 1979 22:00:00 +0100')
             self.assertEqual(dateformat.format(my_birthday, 'T'), 'CET')
             self.assertEqual(dateformat.format(my_birthday, 'e'), '')
             self.assertEqual(dateformat.format(aware_dt, 'e'), '-0330')
@@ -156,3 +156,12 @@ class DateFormatTests(SimpleTestCase):
             )
             with self.assertRaisesMessage(TypeError, msg):
                 dateformat.format(my_birthday, specifier)
+
+    def test_r_format_with_non_en_locale(self):
+        # Changing the locale doesn't change the "r" format.
+        dt = datetime(1979, 7, 8, 22, 00)
+        with translation.override('fr'):
+            self.assertEqual(
+                dateformat.format(dt, 'r'),
+                'Sun, 08 Jul 1979 22:00:00 +0100',
+            )
