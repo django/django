@@ -1,4 +1,4 @@
-(function($) {
+(function() {
     'use strict';
     var SelectBox = {
         cache: {},
@@ -18,8 +18,7 @@
             // Repopulate HTML select box from cache
             var box = document.getElementById(id);
             var node;
-            $(box).empty(); // clear all options
-            var new_options = box.outerHTML.slice(0, -9); // grab just the opening tag
+            box.innerHTML = '';
             var cache = SelectBox.cache[id];
             for (var i = 0, j = cache.length; i < j; i++) {
                 node = cache[i];
@@ -27,11 +26,9 @@
                     var new_option = new Option(node.text, node.value, false, false);
                     // Shows a tooltip when hovering over the option
                     new_option.setAttribute("title", node.text);
-                    new_options += new_option.outerHTML;
+                    box.appendChild(new_option);
                 }
             }
-            new_options += '</select>';
-            box.outerHTML = new_options;
         },
         filter: function(id, text) {
             // Redisplay the HTML select box, displaying only the choices containing ALL
@@ -141,4 +138,4 @@
         }
     };
     window.SelectBox = SelectBox;
-})(django.jQuery);
+})();
