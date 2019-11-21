@@ -471,6 +471,9 @@ Miscellaneous
   with several third-party apps that had models in tests without migrations.
   You must add migrations for such models.
 
+* Providing an integer in the ``key`` argument of the :meth:`.cache.delete` or
+  :meth:`.cache.get` now raises :exc:`ValueError`.
+
 .. _deprecated-features-2.2:
 
 Features deprecated in 2.2
