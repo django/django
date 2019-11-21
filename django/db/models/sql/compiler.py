@@ -981,10 +981,11 @@ class SQLCompiler:
             Return a list of OneToOneField relations that are pointers to
             ancestors of the base 'model'
             """
-            from django.db.models import OneToOneField
-            ancestors = self.query.get_meta().get_parent_list()
-            cols = [c[0] for c in self.select if isinstance(c[0].target, OneToOneField) and
-                    c[0].target.related_model in ancestors and c[0].target.remote_field.parent_link]
+            parents = set(self.query.get_meta().get_parent_list())
+            cols = [
+                c[0] for c in self.select
+                if c[0].target.related_model in parents and c[0].target.remote_field.parent_link
+            ]
             return cols
 
         ancestor_pointers = _get_model_ancestor_pointers()
