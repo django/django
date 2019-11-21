@@ -976,39 +976,42 @@ class SelectDateWidget(Widget):
         if not self.is_required:
             year_choices.insert(0, self.year_none_value)
         year_name = self.year_field % name
-        date_context['year'] = self.select_widget(attrs, choices=year_choices).get_context(
+        year_widget = self.select_widget(attrs, choices=year_choices)
+        year_widget.is_required = self.is_required
+        date_context['year'] = year_widget.get_context(
             name=year_name,
             value=context['widget']['value']['year'],
             attrs={
                 **context['widget']['attrs'],
                 'id': 'id_%s' % year_name,
-                'placeholder': _('Year') if self.is_required else False,
             },
         )
         month_choices = list(self.months.items())
         if not self.is_required:
             month_choices.insert(0, self.month_none_value)
         month_name = self.month_field % name
-        date_context['month'] = self.select_widget(attrs, choices=month_choices).get_context(
+        month_widget = self.select_widget(attrs, choices=month_choices)
+        month_widget.is_required = self.is_required
+        date_context['month'] = month_widget.get_context(
             name=month_name,
             value=context['widget']['value']['month'],
             attrs={
                 **context['widget']['attrs'],
                 'id': 'id_%s' % month_name,
-                'placeholder': _('Month') if self.is_required else False,
             },
         )
         day_choices = [(i, i) for i in range(1, 32)]
         if not self.is_required:
             day_choices.insert(0, self.day_none_value)
         day_name = self.day_field % name
-        date_context['day'] = self.select_widget(attrs, choices=day_choices,).get_context(
+        day_widget = self.select_widget(attrs, choices=day_choices)
+        day_widget.is_required = self.is_required
+        date_context['day'] = day_widget.get_context(
             name=day_name,
             value=context['widget']['value']['day'],
             attrs={
                 **context['widget']['attrs'],
                 'id': 'id_%s' % day_name,
-                'placeholder': _('Day') if self.is_required else False,
             },
         )
         subwidgets = []

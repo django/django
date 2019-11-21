@@ -319,7 +319,7 @@ class SelectDateWidgetTest(WidgetTest):
             field = DateField(widget=SelectDateWidget(years=('2018', '2019')), required=required)
             self.check_html(field.widget, 'my_date', '', html=(
                 """
-                <select name="my_date_month" id="id_my_date_month" %(m_placeholder)s>
+                <select name="my_date_month" id="id_my_date_month">
                     %(empty)s
                     <option value="1">January</option>
                     <option value="2">February</option>
@@ -334,11 +334,11 @@ class SelectDateWidgetTest(WidgetTest):
                     <option value="11">November</option>
                     <option value="12">December</option>
                 </select>
-                <select name="my_date_day" id="id_my_date_day" %(d_placeholder)s>
+                <select name="my_date_day" id="id_my_date_day">
                     %(empty)s
                     %(days_options)s
                 </select>
-                <select name="my_date_year" id="id_my_date_year" %(y_placeholder)s>
+                <select name="my_date_year" id="id_my_date_year">
                     %(empty)s
                     <option value="2018">2018</option>
                     <option value="2019">2019</option>
@@ -347,9 +347,6 @@ class SelectDateWidgetTest(WidgetTest):
                     'days_options': '\n'.join(
                         '<option value="%s">%s</option>' % (i, i) for i in range(1, 32)
                     ),
-                    'm_placeholder': 'placeholder="Month"' if required else '',
-                    'd_placeholder': 'placeholder="Day"' if required else '',
-                    'y_placeholder': 'placeholder="Year"' if required else '',
                     'empty': '' if required else '<option selected value="">---</option>',
                 }
             ))
