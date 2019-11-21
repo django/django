@@ -330,8 +330,7 @@ class TemplateDetailView(BaseAdminDocsView):
             for index, directory in enumerate(default_engine.dirs):
                 template_file = Path(directory) / template
                 if template_file.exists():
-                    with template_file.open() as f:
-                        template_contents = f.read()
+                    template_contents = template_file.read_text()
                 else:
                     template_contents = ''
                 templates.append({
