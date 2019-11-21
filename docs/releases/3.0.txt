@@ -524,10 +524,6 @@ Miscellaneous
 
 * Support for ``pywatchman`` < 1.2.0 is removed.
 
-* HTML rendered by :class:`~django.forms.SelectDateWidget` for required fields
-  now have the ``placeholder`` attribute, which, mainly, may require some
-  adjustments in tests that compare HTML.
-
 * :func:`~django.utils.http.urlencode` now encodes iterable values as they are
   when ``doseq=False``, rather than iterating them, bringing it into line with
   the standard library :func:`urllib.parse.urlencode` function.

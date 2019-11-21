@@ -979,11 +979,7 @@ class SelectDateWidget(Widget):
         date_context['year'] = self.select_widget(attrs, choices=year_choices).get_context(
             name=year_name,
             value=context['widget']['value']['year'],
-            attrs={
-                **context['widget']['attrs'],
-                'id': 'id_%s' % year_name,
-                'placeholder': _('Year') if self.is_required else False,
-            },
+            attrs={**context['widget']['attrs'], 'id': 'id_%s' % year_name},
         )
         month_choices = list(self.months.items())
         if not self.is_required:
@@ -992,11 +988,7 @@ class SelectDateWidget(Widget):
         date_context['month'] = self.select_widget(attrs, choices=month_choices).get_context(
             name=month_name,
             value=context['widget']['value']['month'],
-            attrs={
-                **context['widget']['attrs'],
-                'id': 'id_%s' % month_name,
-                'placeholder': _('Month') if self.is_required else False,
-            },
+            attrs={**context['widget']['attrs'], 'id': 'id_%s' % month_name},
         )
         day_choices = [(i, i) for i in range(1, 32)]
         if not self.is_required:
@@ -1005,11 +997,7 @@ class SelectDateWidget(Widget):
         date_context['day'] = self.select_widget(attrs, choices=day_choices,).get_context(
             name=day_name,
             value=context['widget']['value']['day'],
-            attrs={
-                **context['widget']['attrs'],
-                'id': 'id_%s' % day_name,
-                'placeholder': _('Day') if self.is_required else False,
-            },
+            attrs={**context['widget']['attrs'], 'id': 'id_%s' % day_name},
         )
         subwidgets = []
         for field in self._parse_date_fmt():
