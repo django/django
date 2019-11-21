@@ -86,6 +86,7 @@ class BaseDatabaseSchemaEditor:
 
     sql_create_index = "CREATE INDEX %(name)s ON %(table)s (%(columns)s)%(extra)s%(condition)s"
     sql_create_unique_index = "CREATE UNIQUE INDEX %(name)s ON %(table)s (%(columns)s)%(condition)s"
+    sql_create_unique_no_condition = "CREATE UNIQUE INDEX %(name)s ON %(table)s (%(columns)s)"
     sql_delete_index = "DROP INDEX %(name)s"
 
     sql_create_pk = "ALTER TABLE %(table)s ADD CONSTRAINT %(name)s PRIMARY KEY (%(columns)s)"
@@ -1077,7 +1078,7 @@ class BaseDatabaseSchemaEditor:
             'constraint': constraint,
         }
 
-    def _create_unique_sql(self, model, columns, name=None, condition=None):
+    def _create_unique_sql(self, model, columns, name=None, condition=None, case_insensitive=False):
         def create_unique_name(*args, **kwargs):
             return self.quote_name(self._create_index_name(*args, **kwargs))
 
@@ -1086,7 +1087,7 @@ class BaseDatabaseSchemaEditor:
             name = IndexName(model._meta.db_table, columns, '_uniq', create_unique_name)
         else:
             name = self.quote_name(name)
-        columns = Columns(table, columns, self.quote_name)
+        columns = Columns(table, columns, self.quote_name, case_insensitive=case_insensitive)
         if condition:
             return Statement(
                 self.sql_create_unique_index,
@@ -1096,6 +1097,13 @@ class BaseDatabaseSchemaEditor:
                 condition=' WHERE ' + condition,
             ) if self.connection.features.supports_partial_indexes else None
         else:
+            if case_insensitive:
+                return Statement(
+                    self.sql_create_unique_no_condition,
+                    table=table,
+                    name=name,
+                    columns=columns,
+                )
             return Statement(
                 self.sql_create_unique,
                 table=table,

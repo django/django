@@ -65,13 +65,14 @@ class CheckConstraint(BaseConstraint):
 
 
 class UniqueConstraint(BaseConstraint):
-    def __init__(self, *, fields, name, condition=None):
+    def __init__(self, *, fields, name, condition=None, case_insensitive=False):
         if not fields:
             raise ValueError('At least one field is required to define a unique constraint.')
         if not isinstance(condition, (type(None), Q)):
             raise ValueError('UniqueConstraint.condition must be a Q instance.')
         self.fields = tuple(fields)
         self.condition = condition
+        self.case_insensitive = case_insensitive
         super().__init__(name)
 
     def _get_condition_sql(self, model, schema_editor):
@@ -91,7 +92,7 @@ class UniqueConstraint(BaseConstraint):
     def create_sql(self, model, schema_editor):
         fields = [model._meta.get_field(field_name).column for field_name in self.fields]
         condition = self._get_condition_sql(model, schema_editor)
-        return schema_editor._create_unique_sql(model, fields, self.name, condition=condition)
+        return schema_editor._create_unique_sql(model, fields, self.name, condition=condition, case_insensitive=self.case_insensitive)
 
     def remove_sql(self, model, schema_editor):
         condition = self._get_condition_sql(model, schema_editor)
@@ -108,13 +109,15 @@ class UniqueConstraint(BaseConstraint):
             return (
                 self.name == other.name and
                 self.fields == other.fields and
-                self.condition == other.condition
+                self.condition == other.condition and
+                self.case_insensitive == other.case_insensitive
             )
         return super().__eq__(other)
 
     def deconstruct(self):
         path, args, kwargs = super().deconstruct()
         kwargs['fields'] = self.fields
+        kwargs['case_insensitive'] = self.case_insensitive
         if self.condition:
             kwargs['condition'] = self.condition
         return path, args, kwargs
