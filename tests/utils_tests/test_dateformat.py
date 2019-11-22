@@ -149,7 +149,7 @@ class DateFormatTests(SimpleTestCase):
     def test_invalid_time_format_specifiers(self):
         my_birthday = date(1984, 8, 7)
 
-        for specifier in ['a', 'A', 'f', 'g', 'G', 'h', 'H', 'i', 'P', 's', 'u']:
+        for specifier in ['a', 'A', 'f', 'g', 'G', 'h', 'H', 'i', 'P', 'r', 's', 'u']:
             msg = (
                 "The format for date objects may not contain time-related "
                 "format specifiers (found '%s')." % specifier

@@ -278,6 +278,11 @@ class DateFormat(TimeFormat):
 
     def r(self):
         "RFC 5322 formatted date; e.g. 'Thu, 21 Dec 2000 16:01:07 +0200'"
+        if type(self.data) is datetime.date:
+            raise TypeError(
+                "The format for date objects may not contain time-related "
+                "format specifiers (found 'r')."
+            )
         return self.format('D, j M Y H:i:s O')
 
     def S(self):
