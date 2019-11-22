@@ -193,6 +193,10 @@ class WriterTests(SimpleTestCase):
         A = 1
         B = 2
 
+    class NestedChoices(models.TextChoices):
+        X = 'X', 'X value'
+        Y = 'Y', 'Y value'
+
     def safe_exec(self, string, value=None):
         d = {}
         try:
@@ -387,6 +391,18 @@ class WriterTests(SimpleTestCase):
             "(datetime.date(1969, 11, 19), 'Second date')], "
             "default=datetime.date(1969, 11, 19))"
         )
+
+    def test_serialize_nested_class(self):
+        for nested_cls in [self.NestedEnum, self.NestedChoices]:
+            cls_name = nested_cls.__name__
+            with self.subTest(cls_name):
+                self.assertSerializedResultEqual(
+                    nested_cls,
+                    (
+                        "migrations.test_writer.WriterTests.%s" % cls_name,
+                        {'import migrations.test_writer'},
+                    ),
+                )
 
     def test_serialize_uuid(self):
         self.assertSerializedEqual(uuid.uuid1())
