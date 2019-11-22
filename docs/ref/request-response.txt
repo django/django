@@ -766,6 +766,8 @@ Methods
     :setting:`DEFAULT_CHARSET` settings, by default: "`text/html; charset=utf-8`".
 
     ``status`` is the :rfc:`HTTP status code <7231#section-6>` for the response.
+    You can use Python's :py:class:`http.HTTPStatus` for meaningful aliases,
+    such as ``HTTPStatus.NO_CONTENT``.
 
     ``reason`` is the HTTP response phrase. If not provided, a default phrase
     will be used.
@@ -968,6 +970,18 @@ types of HTTP responses. Like ``HttpResponse``, these subclasses live in
     method, Django will treat it as emulating a
     :class:`~django.template.response.SimpleTemplateResponse`, and the
     ``render`` method must itself return a valid response object.
+
+Custom response classes
+~~~~~~~~~~~~~~~~~~~~~~~
+
+If you find yourself needing a response class that Django doesn't provide, you
+can create it with the help of :py:class:`http.HTTPStatus`. For example::
+
+    from http import HTTPStatus
+    from django.http import HttpResponse
+
+    class HttpResponseNoContent(HttpResponse):
+        status_code = HTTPStatus.NO_CONTENT
 
 ``JsonResponse`` objects
 ========================
