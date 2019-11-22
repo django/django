@@ -254,10 +254,7 @@ def visit_console_html(self, node):
         self.body.append('<section class="c-content-win" id="c-content-%(id)s-win">\n' % {'id': uid})
         win_text = node['win_console_text']
         highlight_args = {'force': True}
-        if 'linenos' in node:
-            linenos = node['linenos']
-        else:
-            linenos = win_text.count('\n') >= self.highlightlinenothreshold - 1
+        linenos = node.get('linenos', False)
 
         def warner(msg):
             self.builder.warn(msg, (self.builder.current_docname, node.line))
