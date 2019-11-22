@@ -1064,7 +1064,7 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
                         (self.model._meta.object_name, obj)
                     )
                 else:
-                    target_ids.add(obj)
+                    target_ids.add(target_field.get_prep_value(obj))
             return target_ids
 
         def _get_missing_target_ids(self, source_field_name, target_field_name, db, target_ids):
