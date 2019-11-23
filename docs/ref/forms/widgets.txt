@@ -410,57 +410,51 @@ foundation for custom widgets.
     :meth:`~Widget.value_from_datadict`::
 
         from datetime import date
-        from django.forms import widgets
+        from django import forms
 
-        class DateSelectorWidget(widgets.MultiWidget):
+        class DateSelectorWidget(forms.MultiWidget):
             def __init__(self, attrs=None):
-                # create choices for days, months, years
-                # example below, the rest snipped for brevity.
-                years = [(year, year) for year in (2011, 2012, 2013)]
-                _widgets = (
-                    widgets.Select(attrs=attrs, choices=days),
-                    widgets.Select(attrs=attrs, choices=months),
-                    widgets.Select(attrs=attrs, choices=years),
-                )
-                super().__init__(_widgets, attrs)
+                days = [(day, day) for day in range(1, 32)]
+                months = [(month, month) for month in range(1, 13)]
+                years = [(year, year) for year in [2018, 2019, 2020]]
+                widgets = [
+                    forms.Select(attrs=attrs, choices=days),
+                    forms.Select(attrs=attrs, choices=months),
+                    forms.Select(attrs=attrs, choices=years),
+                ]
+                super().__init__(widgets, attrs)
 
             def decompress(self, value):
-                if value:
+                if isinstance(value, date):
                     return [value.day, value.month, value.year]
+                elif isinstance(value, str):
+                    year, month, day = value.split('-')
+                    return [day, month, year]
                 return [None, None, None]
 
             def value_from_datadict(self, data, files, name):
-                datelist = [
-                    widget.value_from_datadict(data, files, name + '_%s' % i)
-                    for i, widget in enumerate(self.widgets)]
-                try:
-                    D = date(
-                        day=int(datelist[0]),
-                        month=int(datelist[1]),
-                        year=int(datelist[2]),
-                    )
-                except ValueError:
-                    return ''
-                else:
-                    return str(D)
+                day, month, year = super().value_from_datadict(data, files, name)
+                # DateField expects a single string that it can parse into a date.
+                return '{}-{}-{}'.format(year, month, day)
 
-    The constructor creates several :class:`Select` widgets in a tuple. The
-    ``super`` class uses this tuple to setup the widget.
+    The constructor creates several :class:`Select` widgets in a list. The
+    ``super()`` method uses this list to setup the widget.
 
     The required method :meth:`~MultiWidget.decompress` breaks up a
     ``datetime.date`` value into the day, month, and year values corresponding
-    to each widget. Note how the method handles the case where ``value`` is
-    ``None``.
+    to each widget. If an invalid date was selected, such as the non-existent
+    30th February, the :class:`~django.forms.DateField` passes this method a
+    string instead, so that needs parsing. The final ``return`` handles when
+    ``value`` is ``None``, meaning we don't have any defaults for our
+    subwidgets.
 
-    The default implementation of :meth:`~Widget.value_from_datadict` returns
-    a list of values corresponding to each ``Widget``.  This is appropriate
-    when using a ``MultiWidget`` with a :class:`~django.forms.MultiValueField`,
-    but since we want to use this widget with a :class:`~django.forms.DateField`
-    which takes a single value, we have overridden this method to combine the
-    data of all the subwidgets into a ``datetime.date``. The method extracts
-    data from the ``POST`` dictionary and constructs and validates the date.
-    If it is valid, we return the string, otherwise, we return an empty string
-    which will cause ``form.is_valid`` to return ``False``.
+    The default implementation of :meth:`~Widget.value_from_datadict` returns a
+    list of values corresponding to each ``Widget``. This is appropriate when
+    using a ``MultiWidget`` with a :class:`~django.forms.MultiValueField`. But
+    since we want to use this widget with a :class:`~django.forms.DateField`,
+    which takes a single value, we have overridden this method. The
+    implementation here combines the data from the subwidgets into a string in
+    the format that :class:`~django.forms.DateField` expects.
 
 .. _built-in widgets:
 
