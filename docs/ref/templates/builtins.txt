@@ -1417,7 +1417,8 @@ Format character  Description                               Example output
                   the "c" formatter will not add timezone
                   offset if value is a naive datetime
                   (see :class:`datetime.tzinfo`).
-``r``             :rfc:`5322` formatted date.               ``'Thu, 21 Dec 2000 16:01:07 +0200'``
+``r``             :rfc:`RFC 5322 <5322#section-3.3>`        ``'Thu, 21 Dec 2000 16:01:07 +0200'``
+                  formatted date.
 ``U``             Seconds since the Unix Epoch
                   (January 1 1970 00:00:00 UTC).
 ================  ========================================  =====================

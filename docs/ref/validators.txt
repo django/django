@@ -154,7 +154,8 @@ to, or in lieu of custom ``field.clean()`` methods.
     an error code of ``'invalid'`` if it doesn't.
 
     Loopback addresses and reserved IP spaces are considered valid. Literal
-    IPv6 addresses (:rfc:`2732`) and unicode domains are both supported.
+    IPv6 addresses (:rfc:`3986#section-3.2.2`) and unicode domains are both
+    supported.
 
     In addition to the optional arguments of its parent :class:`RegexValidator`
     class, ``URLValidator`` accepts an extra optional attribute:

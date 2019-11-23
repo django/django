@@ -298,10 +298,11 @@ This ensures that only forms that have originated from trusted domains can be
 used to POST data back.
 
 It deliberately ignores GET requests (and other requests that are defined as
-'safe' by :rfc:`7231`). These requests ought never to have any potentially
-dangerous side effects , and so a CSRF attack with a GET request ought to be
-harmless. :rfc:`7231` defines POST, PUT, and DELETE as 'unsafe', and all other
-methods are also assumed to be unsafe, for maximum protection.
+'safe' by :rfc:`7231#section-4.2.1`). These requests ought never to have any
+potentially dangerous side effects, and so a CSRF attack with a GET request
+ought to be harmless. :rfc:`7231#section-4.2.1` defines POST, PUT, and DELETE
+as 'unsafe', and all other methods are also assumed to be unsafe, for maximum
+protection.
 
 The CSRF protection cannot protect against man-in-the-middle attacks, so use
 :ref:`HTTPS <security-recommendation-ssl>` with
