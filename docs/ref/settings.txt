@@ -2759,7 +2759,7 @@ preference to the ``Host`` header. This should only be enabled if a proxy
 which sets this header is in use.
 
 This setting takes priority over :setting:`USE_X_FORWARDED_PORT`. Per
-:rfc:`7239#page-7`, the ``X-Forwarded-Host`` header can include the port
+:rfc:`7239#section-5.3`, the ``X-Forwarded-Host`` header can include the port
 number, in which case you shouldn't use :setting:`USE_X_FORWARDED_PORT`.
 
 .. setting:: USE_X_FORWARDED_PORT
@@ -3108,8 +3108,8 @@ Whether to use ``HttpOnly`` flag on the session cookie. If this is set to
 cookie.
 
 HttpOnly_ is a flag included in a Set-Cookie HTTP response header. It's part of
-the :rfc:`6265` standard for cookies and can be a useful way to mitigate the
-risk of a client-side script accessing the protected cookie data.
+the :rfc:`6265#section-4.1.2.6` standard for cookies and can be a useful way to
+mitigate the risk of a client-side script accessing the protected cookie data.
 
 This makes it less trivial for an attacker to escalate a cross-site scripting
 vulnerability into full hijacking of a user's session. There aren't many good

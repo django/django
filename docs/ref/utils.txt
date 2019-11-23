@@ -713,8 +713,8 @@ escaping HTML.
 
 .. function:: http_date(epoch_seconds=None)
 
-    Formats the time to match the :rfc:`1123` date format as specified by HTTP
-    :rfc:`7231#section-7.1.1.1`.
+    Formats the time to match the :rfc:`1123#section-5.2.14` date format as
+    specified by HTTP :rfc:`7231#section-7.1.1.1`.
 
     Accepts a floating point number expressed in seconds since the epoch in
     UTC--such as that outputted by ``time.time()``. If set to ``None``,

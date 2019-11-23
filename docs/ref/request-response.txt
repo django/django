@@ -823,9 +823,9 @@ Methods
       JavaScript from having access to the cookie.
 
       HttpOnly_ is a flag included in a Set-Cookie HTTP response header. It's
-      part of the :rfc:`6265` standard for cookies and can be a useful way to
-      mitigate the risk of a client-side script accessing the protected cookie
-      data.
+      part of the :rfc:`RFC 6265 <6265#section-4.1.2.6>` standard for cookies
+      and can be a useful way to mitigate the risk of a client-side script
+      accessing the protected cookie data.
     * Use ``samesite='Strict'`` or ``samesite='Lax'`` to tell the browser not
       to send this cookie when performing a cross-origin request. `SameSite`_
       isn't supported by all browsers, so it's not a replacement for Django's
@@ -836,11 +836,11 @@ Methods
 
     .. warning::
 
-        :rfc:`6265` states that user agents should support cookies of at least
-        4096 bytes. For many browsers this is also the maximum size. Django
-        will not raise an exception if there's an attempt to store a cookie of
-        more than 4096 bytes, but many browsers will not set the cookie
-        correctly.
+        :rfc:`RFC 6265 <6265#section-6.1>` states that user agents should
+        support cookies of at least 4096 bytes. For many browsers this is also
+        the maximum size. Django will not raise an exception if there's an
+        attempt to store a cookie of more than 4096 bytes, but many browsers
+        will not set the cookie correctly.
 
 .. method:: HttpResponse.set_signed_cookie(key, value, salt='', max_age=None, expires=None, path='/', domain=None, secure=None, httponly=False, samesite=None)
 
