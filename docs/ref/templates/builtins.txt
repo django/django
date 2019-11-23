@@ -1451,7 +1451,9 @@ used. Assuming the same settings as the previous example::
     {{ value|date }}
 
 outputs ``9 de Enero de 2008`` (the ``DATE_FORMAT`` format specifier for the
-``es`` locale is ``r'j \d\e F \d\e Y'``.
+``es`` locale is ``r'j \d\e F \d\e Y'``). Both "d" and "e" are
+backslash-escaped, because otherwise each is a format string that displays the
+day and the timezone name, respectively.
 
 You can combine ``date`` with the :tfilter:`time` filter to render a full
 representation of a ``datetime`` value. E.g.::
@@ -2176,6 +2178,15 @@ For example::
 
 If ``value`` is equivalent to ``datetime.datetime.now()``, the output will be
 the string ``"01:23"``.
+
+Note that you can backslash-escape a format string if you want to use the
+"raw" value. In this example, both "h" and "m" are backslash-escaped, because
+otherwise each is a format string that displays the hour and the month,
+respectively::
+
+    {% value|time:"H\h i\m" %}
+
+This would display as "01h 23m".
 
 Another example:
 
