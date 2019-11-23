@@ -175,6 +175,7 @@ class CreateExtensionTests(PostgreSQLTestCase):
 
     def test_allow_migrate(self):
         operation = CreateExtension('tablefunc')
+        self.assertEqual(operation.migration_name_fragment, 'create_extension_tablefunc')
         project_state = ProjectState()
         new_state = project_state.clone()
         # Create an extension.
@@ -192,6 +193,7 @@ class CreateExtensionTests(PostgreSQLTestCase):
 
     def test_create_existing_extension(self):
         operation = BloomExtension()
+        self.assertEqual(operation.migration_name_fragment, 'create_extension_bloom')
         project_state = ProjectState()
         new_state = project_state.clone()
         # Don't create an existing extension.

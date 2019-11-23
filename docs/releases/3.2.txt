@@ -171,7 +171,9 @@ Management Commands
 Migrations
 ~~~~~~~~~~
 
-* ...
+* The new ``Operation.migration_name_fragment`` property allows providing a
+  filename fragment that will be used to name a migration containing only that
+  operation.
 
 Models
 ~~~~~~

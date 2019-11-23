@@ -1313,19 +1313,14 @@ class MigrationAutodetector:
         represent. Names are not guaranteed to be unique, but put some effort
         into the fallback name to avoid VCS conflicts if possible.
         """
+        name = None
         if len(ops) == 1:
-            if isinstance(ops[0], operations.CreateModel):
-                return ops[0].name_lower
-            elif isinstance(ops[0], operations.DeleteModel):
-                return "delete_%s" % ops[0].name_lower
-            elif isinstance(ops[0], operations.AddField):
-                return "%s_%s" % (ops[0].model_name_lower, ops[0].name_lower)
-            elif isinstance(ops[0], operations.RemoveField):
-                return "remove_%s_%s" % (ops[0].model_name_lower, ops[0].name_lower)
-        elif ops:
-            if all(isinstance(o, operations.CreateModel) for o in ops):
-                return "_".join(sorted(o.name_lower for o in ops))
-        return "auto_%s" % get_migration_name_timestamp()
+            name = ops[0].migration_name_fragment
+        elif len(ops) > 1 and all(isinstance(o, operations.CreateModel) for o in ops):
+            name = '_'.join(sorted(o.migration_name_fragment for o in ops))
+        if name is None:
+            name = 'auto_%s' % get_migration_name_timestamp()
+        return name
 
     @classmethod
     def parse_number(cls, name):

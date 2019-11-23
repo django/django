@@ -55,6 +55,10 @@ class CreateExtension(Operation):
     def describe(self):
         return "Creates extension %s" % self.name
 
+    @property
+    def migration_name_fragment(self):
+        return 'create_extension_%s' % self.name
+
 
 class BloomExtension(CreateExtension):
 

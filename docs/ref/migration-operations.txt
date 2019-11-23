@@ -484,6 +484,16 @@ structure of an ``Operation`` looks like this::
             # This is used to describe what the operation does in console output.
             return "Custom Operation"
 
+        @property
+        def migration_name_fragment(self):
+            # Optional. A filename part suitable for automatically naming a
+            # migration containing this operation, or None if not applicable.
+            return "custom_operation_%s_%s" % (self.arg1, self.arg2)
+
+.. versionadded:: 3.2
+
+    The ``migration_name_fragment`` property was added.
+
 You can take this template and work from it, though we suggest looking at the
 built-in Django operations in ``django.db.migrations.operations`` - they cover
 a lot of the example usage of semi-internal aspects of the migration framework
@@ -553,3 +563,7 @@ state changes, all it does is run one command::
 
         def describe(self):
             return "Creates extension %s" % self.name
+
+        @property
+        def migration_name_fragment(self):
+            return "create_extension_%s" % self.name

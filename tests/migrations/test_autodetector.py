@@ -2495,6 +2495,11 @@ class AutodetectorSuggestNameTests(SimpleTestCase):
         ]
         self.assertEqual(MigrationAutodetector.suggest_name(ops), 'animal_person')
 
+    def test_none_name(self):
+        ops = [migrations.RunSQL('SELECT 1 FROM person;')]
+        suggest_name = MigrationAutodetector.suggest_name(ops)
+        self.assertIs(suggest_name.startswith('auto_'), True)
+
     def test_auto(self):
         suggest_name = MigrationAutodetector.suggest_name([])
         self.assertIs(suggest_name.startswith('auto_'), True)
