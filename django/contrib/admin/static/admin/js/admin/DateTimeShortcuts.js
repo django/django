@@ -38,11 +38,11 @@
             var inputs = document.getElementsByTagName('input');
             for (var i = 0; i < inputs.length; i++) {
                 var inp = inputs[i];
-                if (inp.type === 'text' && inp.className.match(/vTimeField/)) {
+                if (inp.type === 'text' && inp.classList.contains('vTimeField')) {
                     DateTimeShortcuts.addClock(inp);
                     DateTimeShortcuts.addTimezoneWarning(inp);
                 }
-                else if (inp.type === 'text' && inp.className.match(/vDateField/)) {
+                else if (inp.type === 'text' && inp.classList.contains('vDateField')) {
                     DateTimeShortcuts.addCalendar(inp);
                     DateTimeShortcuts.addTimezoneWarning(inp);
                 }

@@ -44,7 +44,7 @@
     function dismissRelatedLookupPopup(win, chosenId) {
         var name = windowname_to_id(win.name);
         var elem = document.getElementById(name);
-        if (elem.className.indexOf('vManyToManyRawIdAdminField') !== -1 && elem.value) {
+        if (elem.classList.contains('vManyToManyRawIdAdminField') && elem.value) {
             elem.value += ',' + chosenId;
         } else {
             document.getElementById(name).value = chosenId;
@@ -81,7 +81,7 @@
             if (elemName === 'SELECT') {
                 elem.options[elem.options.length] = new Option(newRepr, newId, true, true);
             } else if (elemName === 'INPUT') {
-                if (elem.className.indexOf('vManyToManyRawIdAdminField') !== -1 && elem.value) {
+                if (elem.classList.contains('vManyToManyRawIdAdminField') && elem.value) {
                     elem.value += ',' + newId;
                 } else {
                     elem.value = newId;
