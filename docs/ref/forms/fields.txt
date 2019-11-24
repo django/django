@@ -1142,6 +1142,10 @@ method::
             super().__init__(*args, **kwargs)
             self.fields['foo_select'].queryset = ...
 
+Both ``ModelChoiceField`` and ``ModelMultipleChoiceField`` have an ``iterator``
+attribute which specifies the class used to iterate over the queryset when
+generating choices.
+
 ``ModelChoiceField``
 --------------------
 
@@ -1222,6 +1226,13 @@ method::
             ...
             </select>
 
+    ``ModelChoiceField`` also has the attribute:
+
+    .. attribute:: iterator
+
+        The iterator class used to generate field choices from ``queryset``. By
+        default, :class:`ModelChoiceIterator`.
+
     The ``__str__()`` method of the model will be called to generate string
     representations of the objects for use in the field's choices. To provide
     customized representations, subclass ``ModelChoiceField`` and override
@@ -1267,6 +1278,35 @@ method::
     .. attribute:: to_field_name
 
         Same as :class:`ModelChoiceField.to_field_name`.
+
+    ``ModelMultipleChoiceField`` also has the attribute:
+
+    .. attribute:: iterator
+
+        Same as :class:`ModelChoiceField.iterator`.
+
+``ModelChoiceIterator``
+-----------------------
+
+.. class:: ModelChoiceIterator(field)
+
+    The default class assigned to the ``iterator`` attribute of
+    :class:`ModelChoiceField` and :class:`ModelMultipleChoiceField`. An
+    iterable that yields 2-tuple choices from the queryset.
+
+    A single argument is required:
+
+    .. attribute:: field
+
+        The instance of ``ModelChoiceField`` or ``ModelMultipleChoiceField`` to
+        iterator and yield choice.
+
+    ``ModelChoiceIterator`` has the following method:
+
+    .. method:: __iter__()
+
+        Yield 2-tuple choices in the same format as used by
+        :attr:`ChoiceField.choices`.
 
 Creating custom fields
 ======================
