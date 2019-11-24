@@ -2047,9 +2047,10 @@ an app without migrations regardless of an existing ``migrations`` submodule.
 This can be used, for example, in a test settings file to skip migrations while
 testing (tables will still be created for the apps' models). To disable
 migrations for all apps during tests, you can set the
-:setting:`MIGRATE <TEST_MIGRATE>` to ``True`` instead. If ``MIGRATION_MODULES``
-is used in your general project settings, remember to use the
-:option:`migrate --run-syncdb` option if you want to create tables for the app.
+:setting:`MIGRATE <TEST_MIGRATE>` to ``False`` instead. If
+``MIGRATION_MODULES`` is used in your general project settings, remember to use
+the :option:`migrate --run-syncdb` option if you want to create tables for the
+app.
 
 .. setting:: MONTH_DAY_FORMAT
 
