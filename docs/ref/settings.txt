@@ -90,7 +90,7 @@ list, the :meth:`django.http.HttpRequest.get_host()` method will raise
 :exc:`~django.core.exceptions.SuspiciousOperation`.
 
 When :setting:`DEBUG` is ``True`` and ``ALLOWED_HOSTS`` is empty, the host
-is validated against ``['localhost', '127.0.0.1', '[::1]']``.
+is validated against ``['.localhost', '127.0.0.1', '[::1]']``.
 
 ``ALLOWED_HOSTS`` is also :ref:`checked when running tests
 <topics-testing-advanced-multiple-hosts>`.
@@ -98,6 +98,11 @@ is validated against ``['localhost', '127.0.0.1', '[::1]']``.
 This validation only applies via :meth:`~django.http.HttpRequest.get_host()`;
 if your code accesses the ``Host`` header directly from ``request.META`` you
 are bypassing this security protection.
+
+.. versionchanged:: 3.1
+
+    If ``ALLOWED_HOSTS`` is empty and ``DEBUG=True``, subdomains of localhost
+    were allowed.
 
 .. setting:: APPEND_SLASH
 

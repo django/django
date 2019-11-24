@@ -222,7 +222,8 @@ Pagination
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* If :setting:`ALLOWED_HOSTS` is empty and ``DEBUG=True``, subdomains of
+  localhost are now allowed in the ``Host`` header, e.g. ``static.localhost``.
 
 Serialization
 ~~~~~~~~~~~~~
