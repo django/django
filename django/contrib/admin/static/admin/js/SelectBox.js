@@ -25,7 +25,7 @@
                 if (node.displayed) {
                     var new_option = new Option(node.text, node.value, false, false);
                     // Shows a tooltip when hovering over the option
-                    new_option.setAttribute("title", node.text);
+                    new_option.title = node.text;
                     box.appendChild(new_option);
                 }
             }

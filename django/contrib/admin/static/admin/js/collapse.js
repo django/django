@@ -21,9 +21,9 @@
                 elem.classList.add('collapsed');
                 var h2 = elem.querySelector('h2');
                 var link = document.createElement('a');
-                link.setAttribute('id', 'fieldsetcollapser' + i);
-                link.setAttribute('class', 'collapse-toggle');
-                link.setAttribute('href', '#');
+                link.id = 'fieldsetcollapser' + i;
+                link.className = 'collapse-toggle';
+                link.href = '#';
                 link.textContent = gettext('Show');
                 h2.appendChild(document.createTextNode(' ('));
                 h2.appendChild(link);

@@ -103,12 +103,12 @@ Requires jQuery, core.js, and SelectBox.js.
                 )
             );
 
-            var to_box = quickElement('select', selector_chosen, '', 'id', field_id + '_to', 'multiple', 'multiple', 'size', from_box.size, 'name', from_box.getAttribute('name'));
+            var to_box = quickElement('select', selector_chosen, '', 'id', field_id + '_to', 'multiple', 'multiple', 'size', from_box.size, 'name', from_box.name);
             to_box.className = 'filtered';
             var clear_all = quickElement('a', selector_chosen, gettext('Remove all'), 'title', interpolate(gettext('Click to remove all chosen %s at once.'), [field_name]), 'href', '#', 'id', field_id + '_remove_all_link');
             clear_all.className = 'selector-clearall';
 
-            from_box.setAttribute('name', from_box.getAttribute('name') + '_old');
+            from_box.name = from_box.name + '_old';
 
             // Set up the JavaScript event handlers for the select box filter interface
             var move_selection = function(e, elem, move_func, from, to) {

@@ -29,7 +29,7 @@
         timezoneOffset: 0,
         init: function() {
             var body = document.getElementsByTagName('body')[0];
-            var serverOffset = body.getAttribute('data-admin-utc-offset');
+            var serverOffset = body.dataset.adminUtcOffset;
             if (serverOffset) {
                 var localOffset = new Date().getTimezoneOffset() * -60;
                 DateTimeShortcuts.timezoneOffset = localOffset - serverOffset;
@@ -38,11 +38,11 @@
             var inputs = document.getElementsByTagName('input');
             for (var i = 0; i < inputs.length; i++) {
                 var inp = inputs[i];
-                if (inp.getAttribute('type') === 'text' && inp.className.match(/vTimeField/)) {
+                if (inp.type === 'text' && inp.className.match(/vTimeField/)) {
                     DateTimeShortcuts.addClock(inp);
                     DateTimeShortcuts.addTimezoneWarning(inp);
                 }
-                else if (inp.getAttribute('type') === 'text' && inp.className.match(/vDateField/)) {
+                else if (inp.type === 'text' && inp.className.match(/vDateField/)) {
                     DateTimeShortcuts.addCalendar(inp);
                     DateTimeShortcuts.addTimezoneWarning(inp);
                 }
@@ -51,7 +51,7 @@
         // Return the current time while accounting for the server timezone.
         now: function() {
             var body = document.getElementsByTagName('body')[0];
-            var serverOffset = body.getAttribute('data-admin-utc-offset');
+            var serverOffset = body.dataset.adminUtcOffset;
             if (serverOffset) {
                 var localNow = new Date();
                 var localOffset = localNow.getTimezoneOffset() * -60;
@@ -111,14 +111,14 @@
             shortcuts_span.className = DateTimeShortcuts.shortCutsClass;
             inp.parentNode.insertBefore(shortcuts_span, inp.nextSibling);
             var now_link = document.createElement('a');
-            now_link.setAttribute('href', "#");
+            now_link.href = "#";
             now_link.textContent = gettext('Now');
             now_link.addEventListener('click', function(e) {
                 e.preventDefault();
                 DateTimeShortcuts.handleClockQuicklink(num, -1);
             });
             var clock_link = document.createElement('a');
-            clock_link.setAttribute('href', '#');
+            clock_link.href = '#';
             clock_link.id = DateTimeShortcuts.clockLinkName + num;
             clock_link.addEventListener('click', function(e) {
                 e.preventDefault();
@@ -156,7 +156,7 @@
             clock_box.style.display = 'none';
             clock_box.style.position = 'absolute';
             clock_box.className = 'clockbox module';
-            clock_box.setAttribute('id', DateTimeShortcuts.clockDivName + num);
+            clock_box.id = DateTimeShortcuts.clockDivName + num;
             document.body.appendChild(clock_box);
             clock_box.addEventListener('click', function(e) { e.stopPropagation(); });
 
@@ -241,14 +241,14 @@
             shortcuts_span.className = DateTimeShortcuts.shortCutsClass;
             inp.parentNode.insertBefore(shortcuts_span, inp.nextSibling);
             var today_link = document.createElement('a');
-            today_link.setAttribute('href', '#');
+            today_link.href = '#';
             today_link.appendChild(document.createTextNode(gettext('Today')));
             today_link.addEventListener('click', function(e) {
                 e.preventDefault();
                 DateTimeShortcuts.handleCalendarQuickLink(num, 0);
             });
             var cal_link = document.createElement('a');
-            cal_link.setAttribute('href', '#');
+            cal_link.href = '#';
             cal_link.id = DateTimeShortcuts.calendarLinkName + num;
             cal_link.addEventListener('click', function(e) {
                 e.preventDefault();
@@ -287,7 +287,7 @@
             cal_box.style.display = 'none';
             cal_box.style.position = 'absolute';
             cal_box.className = 'calendarbox module';
-            cal_box.setAttribute('id', DateTimeShortcuts.calendarDivName1 + num);
+            cal_box.id = DateTimeShortcuts.calendarDivName1 + num;
             document.body.appendChild(cal_box);
             cal_box.addEventListener('click', function(e) { e.stopPropagation(); });
 
