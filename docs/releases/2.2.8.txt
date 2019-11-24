@@ -10,4 +10,6 @@ Django 2.2.8 fixes several bugs in 2.2.7 and adds compatibility with Python
 Bugfixes
 ========
 
-* ...
+* Fixed a data loss possibility in the admin changelist view when a custom
+  :ref:`formset's prefix <formset-prefix>` contains regular expression special
+  characters, e.g. `'$'` (:ticket:`31031`).
