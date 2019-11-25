@@ -22,7 +22,6 @@ WRAPPING_PUNCTUATION = [('(', ')'), ('[', ']')]
 # List of possible strings used for bullets in bulleted lists.
 DOTS = ['&middot;', '*', '\u2022', '&#149;', '&bull;', '&#8226;']
 
-unencoded_ampersands_re = _lazy_re_compile(r'&(?!(\w+|#\d+);)')
 word_split_re = _lazy_re_compile(r'''([\s<>"']+)''')
 simple_url_re = _lazy_re_compile(r'^https?://\[?\w', re.IGNORECASE)
 simple_url_2_re = _lazy_re_compile(
