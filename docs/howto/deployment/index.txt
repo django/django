@@ -19,6 +19,4 @@ they are developed.
 
    wsgi/index
    asgi/index
-   ../static-files/deployment
-   ../error-reporting
    checklist
