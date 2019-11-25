@@ -497,6 +497,19 @@ Although ``<table>`` output is the default output style when you ``print`` a
 form, other output styles are available. Each style is available as a method on
 a form object, and each rendering method returns a string.
 
+``template_name``
+-----------------
+
+.. attribute:: Form.template_name
+
+.. versionadded:: 4.0
+
+Template that is going to going to be rendered if the form is case into a
+string, e.g. via ``print(form)`` or in a template via ``{{ form }}``.
+The template can be changed per form by overwriting the ``template_name``
+attribute or by overriding the default template, see also
+:ref:`Overriding built-in form templates <overriding-built-in-form-templates>`.
+
 ``as_p()``
 ----------
 
@@ -550,6 +563,38 @@ it calls its ``as_table()`` method behind the scenes::
     <tr><th><label for="id_message">Message:</label></th><td><input type="text" name="message" id="id_message" required></td></tr>
     <tr><th><label for="id_sender">Sender:</label></th><td><input type="email" name="sender" id="id_sender" required></td></tr>
     <tr><th><label for="id_cc_myself">Cc myself:</label></th><td><input type="checkbox" name="cc_myself" id="id_cc_myself"></td></tr>
+
+
+``get_context()``
+-----------------
+
+.. method:: Form.get_context()
+
+.. versionadded:: 4.0
+
+Return context text for form rendering.
+
+The available context is:
+
+* ``form``: The bound form.
+* ``fields``: All bound fields, except the hidden fields.
+* ``hidden_fields``: All hidden bound fields.
+* ``errors``: All non field related or hidden field related form errors.
+
+``render(template_name=None, context=None, renderer=None)``
+-----------------------------------------------------------
+
+.. method:: Form.render()
+
+.. versionadded:: 4.0
+
+The render method is is called by the ``__str__`` as well as the
+:meth:`.Form.as_table`, :meth:`.Form.as_p` and :meth:`.Form.as_ul` methods.
+All arguments are optional and will default to:
+
+* ``template_name``: :attr:`.Form.template_name`
+* ``context``: :meth:`.Form.get_context`
+* ``renderer``: :attr:`.Form.default_renderer`
 
 .. _ref-forms-api-styling-form-rows:
 

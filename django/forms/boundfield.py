@@ -1,10 +1,10 @@
 import datetime
 import re
 
-from django.forms.utils import flatatt, pretty_name
+from django.forms.utils import pretty_name
 from django.forms.widgets import Textarea, TextInput
 from django.utils.functional import cached_property
-from django.utils.html import conditional_escape, format_html, html_safe
+from django.utils.html import format_html, html_safe
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
 
@@ -161,11 +161,14 @@ class BoundField:
                     attrs['class'] += ' ' + self.form.required_css_class
                 else:
                     attrs['class'] = self.form.required_css_class
-            attrs = flatatt(attrs) if attrs else ''
-            contents = format_html('<label{}>{}</label>', attrs, contents)
-        else:
-            contents = conditional_escape(contents)
-        return mark_safe(contents)
+
+        return mark_safe(self.form.renderer.render(self.form.template_name_label, {
+            'form': self.form,
+            'field': self,
+            'label': contents,
+            'attrs': attrs,
+            'use_tag': bool(id_),
+        }))
 
     def css_classes(self, extra_classes=None):
         """

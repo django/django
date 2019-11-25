@@ -3,8 +3,10 @@ from collections import UserList
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
+from django.forms.renderers import get_default_renderer
 from django.utils import timezone
 from django.utils.html import escape, format_html, format_html_join, html_safe
+from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
 
 
@@ -81,6 +83,10 @@ class ErrorList(UserList, list):
     """
     A collection of errors that knows how to display itself in various formats.
     """
+
+    template_name = 'django/forms/errors/default.html'
+    template_name_ul = 'django/forms/errors/ul.html'
+
     def __init__(self, initlist=None, error_class=None):
         super().__init__(initlist)
 
@@ -110,21 +116,26 @@ class ErrorList(UserList, list):
     def as_json(self, escape_html=False):
         return json.dumps(self.get_json_data(escape_html))
 
-    def as_ul(self):
-        if not self.data:
-            return ''
+    def get_context(self):
+        return {
+            'errors': self,
+            'error_class': self.error_class,
+        }
 
-        return format_html(
-            '<ul class="{}">{}</ul>',
-            self.error_class,
-            format_html_join('', '<li>{}</li>', ((e,) for e in self))
-        )
+    def render(self, template_name=None, context=None, renderer=None):
+        return mark_safe((renderer or get_default_renderer()).render(
+            template_name or self.template_name,
+            context or self.get_context(),
+        ))
+
+    def as_ul(self):
+        return self.render(self.template_name_ul)
 
     def as_text(self):
         return '\n'.join('* %s' % e for e in self)
 
     def __str__(self):
-        return self.as_ul()
+        return self.render()
 
     def __repr__(self):
         return repr(list(self))

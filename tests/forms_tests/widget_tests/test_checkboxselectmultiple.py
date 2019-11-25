@@ -205,4 +205,4 @@ class CheckboxSelectMultipleTest(WidgetTest):
 
         bound_field = TestForm()['f']
         self.assertEqual(bound_field.field.widget.id_for_label('id'), '')
-        self.assertEqual(bound_field.label_tag(), '<label>F:</label>')
+        self.assertHTMLEqual(bound_field.label_tag(), '<label>F:</label>')

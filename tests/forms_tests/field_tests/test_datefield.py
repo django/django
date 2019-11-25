@@ -35,7 +35,7 @@ class DateFieldTest(SimpleTestCase):
 
         # label tag is correctly associated with month dropdown
         d = GetDate({'mydate_month': '1', 'mydate_day': '1', 'mydate_year': '2010'})
-        self.assertIn('<label for="id_mydate_month">', d.as_p())
+        self.assertIn('<label for="id_mydate_month"', d.as_p())
 
     @override_settings(USE_L10N=True)
     @translation.override('nl')
@@ -109,7 +109,7 @@ class DateFieldTest(SimpleTestCase):
     def test_form_label_association(self):
         # label tag is correctly associated with first rendered dropdown
         a = GetDate({'mydate_month': '1', 'mydate_day': '1', 'mydate_year': '2010'})
-        self.assertIn('<label for="id_mydate_day">', a.as_p())
+        self.assertIn('<label for="id_mydate_day"', a.as_p())
 
     def test_datefield_1(self):
         f = DateField()

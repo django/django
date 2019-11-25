@@ -1,6 +1,7 @@
 from django.core.exceptions import ValidationError
 from django.forms import Form
 from django.forms.fields import BooleanField, IntegerField
+from django.forms.renderers import get_default_renderer
 from django.forms.utils import ErrorList
 from django.forms.widgets import HiddenInput, NumberInput
 from django.utils.functional import cached_property
@@ -62,6 +63,10 @@ class BaseFormSet:
             '%(field_names)s. You may need to file a bug report if the issue persists.'
         ),
     }
+    template_name = 'django/forms/formsets/default.html'
+    template_name_p = 'django/forms/formsets/p.html'
+    template_name_table = 'django/forms/formsets/table.html'
+    template_name_ul = 'django/forms/formsets/ul.html'
 
     def __init__(self, data=None, files=None, auto_id='id_%s', prefix=None,
                  initial=None, error_class=ErrorList, form_kwargs=None,
@@ -85,7 +90,7 @@ class BaseFormSet:
         self.error_messages = messages
 
     def __str__(self):
-        return self.as_table()
+        return self.render()
 
     def __iter__(self):
         """Yield the forms in the order they should be rendered."""
@@ -438,23 +443,28 @@ class BaseFormSet:
         else:
             return self.empty_form.media
 
+    def get_context(self):
+        return {
+            'formset': self,
+        }
+
+    def render(self, template_name=None, context=None, renderer=None):
+        return mark_safe((renderer or get_default_renderer()).render(
+            template_name or self.template_name,
+            context or self.get_context(),
+        ))
+
     def as_table(self):
-        "Return this formset rendered as HTML <tr>s -- excluding the <table></table>."
-        # XXX: there is no semantic division between forms here, there
-        # probably should be. It might make sense to render each form as a
-        # table row with each field as a td.
-        forms = ' '.join(form.as_table() for form in self)
-        return mark_safe(str(self.management_form) + '\n' + forms)
+        """Return this formset rendered as HTML <tr>s -- excluding the <table></table>."""
+        return self.render(self.template_name_table)
 
     def as_p(self):
-        "Return this formset rendered as HTML <p>s."
-        forms = ' '.join(form.as_p() for form in self)
-        return mark_safe(str(self.management_form) + '\n' + forms)
+        """Return this formset rendered as HTML <p>s."""
+        return self.render(self.template_name_p)
 
     def as_ul(self):
-        "Return this formset rendered as HTML <li>s."
-        forms = ' '.join(form.as_ul() for form in self)
-        return mark_safe(str(self.management_form) + '\n' + forms)
+        """Return this formset rendered as HTML <li>s."""
+        return self.render(self.template_name_ul)
 
 
 def formset_factory(form, formset=BaseFormSet, extra=1, can_order=False,
