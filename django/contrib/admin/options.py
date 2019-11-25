@@ -1464,13 +1464,20 @@ class ModelAdmin(BaseModelAdmin):
         )
 
     def get_inline_formsets(self, request, formsets, inline_instances, obj=None):
+        # Edit permissions on parent model are required for editable inlines.
+        can_edit_parent = self.has_change_permission(request, obj) if obj else self.has_add_permission(request)
         inline_admin_formsets = []
         for inline, formset in zip(inline_instances, formsets):
             fieldsets = list(inline.get_fieldsets(request, obj))
             readonly = list(inline.get_readonly_fields(request, obj))
-            has_add_permission = inline.has_add_permission(request, obj)
-            has_change_permission = inline.has_change_permission(request, obj)
-            has_delete_permission = inline.has_delete_permission(request, obj)
+            if can_edit_parent:
+                has_add_permission = inline.has_add_permission(request, obj)
+                has_change_permission = inline.has_change_permission(request, obj)
+                has_delete_permission = inline.has_delete_permission(request, obj)
+            else:
+                # Disable all edit-permissions, and overide formset settings.
+                has_add_permission = has_change_permission = has_delete_permission = False
+                formset.extra = formset.max_num = 0
             has_view_permission = inline.has_view_permission(request, obj)
             prepopulated = dict(inline.get_prepopulated_fields(request, obj))
             inline_admin_formset = helpers.InlineAdminFormSet(
@@ -1535,8 +1542,12 @@ class ModelAdmin(BaseModelAdmin):
         else:
             obj = self.get_object(request, unquote(object_id), to_field)
 
-            if not self.has_view_or_change_permission(request, obj):
-                raise PermissionDenied
+            if request.method == 'POST':
+                if not self.has_change_permission(request, obj):
+                    raise PermissionDenied
+            else:
+                if not self.has_view_or_change_permission(request, obj):
+                    raise PermissionDenied
 
             if obj is None:
                 return self._get_obj_does_not_exist_redirect(request, opts, object_id)
