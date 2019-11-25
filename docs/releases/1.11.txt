@@ -449,8 +449,8 @@ Backwards incompatible changes in 1.11
   dependency for GeoDjango. In older versions, it's only required for SQLite.
 
 * ``contrib.gis.maps`` is removed as it interfaces with a retired version of
-  the Google Maps API and seems to be unmaintained. If you're using it, `let
-  us know <https://code.djangoproject.com/ticket/14284>`_.
+  the Google Maps API and seems to be unmaintained. If you're using it,
+  :ticket:`let us know <14284>`.
 
 * The ``GEOSGeometry`` equality operator now also compares SRID.
 

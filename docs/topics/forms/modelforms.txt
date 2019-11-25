@@ -963,9 +963,8 @@ extra forms displayed.
 
 Also, ``extra=0`` doesn't prevent creation of new model instances as you can
 :ref:`add additional forms with JavaScript <understanding-the-managementform>`
-or send additional POST data. Formsets `don't yet provide functionality
-<https://code.djangoproject.com/ticket/26142>`_ for an "edit only" view that
-prevents creation of new instances.
+or send additional POST data. Formsets :ticket:`don't yet provide functionality
+<26142>` for an "edit only" view that prevents creation of new instances.
 
 If the value of ``max_num`` is greater than the number of existing related
 objects, up to ``extra`` additional blank forms will be added to the formset,
