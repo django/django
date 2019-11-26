@@ -351,6 +351,10 @@ Models
   SQL on MySQL by using ``DELETE`` instead of ``TRUNCATE`` statements for
   tables which don't require resetting sequences.
 
+* SQLite functions are now marked as :py:meth:`deterministic
+  <sqlite3.Connection.create_function>` on Python 3.8+. This allows using them
+  in check constraints and partial indexes.
+
 Pagination
 ~~~~~~~~~~
 
