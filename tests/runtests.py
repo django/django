@@ -130,6 +130,10 @@ def setup(verbosity, test_labels, parallel):
     TransactionTestCase.available_apps = property(no_available_apps)
     TestCase.available_apps = None
 
+    if settings.DATABASES['default']['ENGINE'] == 'django_spanner':
+        # Monkey-patch AutoField before configuring INSTALLED_APPS
+        import django_spanner  # noqa
+
     state = {
         'INSTALLED_APPS': settings.INSTALLED_APPS,
         'ROOT_URLCONF': getattr(settings, "ROOT_URLCONF", ""),
