@@ -1,5 +1,4 @@
 import json
-import time
 
 from django.contrib import admin
 from django.contrib.admin.tests import AdminSeleniumTestCase
@@ -185,20 +184,16 @@ class SeleniumTests(AdminSeleniumTestCase):
         # Load next page of results by scrolling to the bottom of the list.
         for _ in range(len(results)):
             search.send_keys(Keys.ARROW_DOWN)
-        results = result_container.find_elements_by_css_selector('.select2-results__option')
         # All objects and "Loading more results".
-        self.assertEqual(len(results), PAGINATOR_SIZE + 11)
+        self.wait_for_number_of_elements('.select2-results__option', PAGINATOR_SIZE + 11)
         # Limit the results with the search field.
         search.send_keys('Who')
         # Ajax request is delayed.
         self.assertTrue(result_container.is_displayed())
         results = result_container.find_elements_by_css_selector('.select2-results__option')
         self.assertEqual(len(results), PAGINATOR_SIZE + 12)
-        # Wait for ajax delay.
-        time.sleep(0.25)
+        self.wait_for_number_of_elements('.select2-results__option', 1)
         self.assertTrue(result_container.is_displayed())
-        results = result_container.find_elements_by_css_selector('.select2-results__option')
-        self.assertEqual(len(results), 1)
         # Select the result.
         search.send_keys(Keys.RETURN)
         select = Select(self.selenium.find_element_by_id('id_question'))
@@ -226,19 +221,15 @@ class SeleniumTests(AdminSeleniumTestCase):
         # Load next page of results by scrolling to the bottom of the list.
         for _ in range(len(results)):
             search.send_keys(Keys.ARROW_DOWN)
-        results = result_container.find_elements_by_css_selector('.select2-results__option')
-        self.assertEqual(len(results), 31)
+        self.wait_for_number_of_elements('.select2-results__option', 31)
         # Limit the results with the search field.
         search.send_keys('Who')
         # Ajax request is delayed.
         self.assertTrue(result_container.is_displayed())
         results = result_container.find_elements_by_css_selector('.select2-results__option')
         self.assertEqual(len(results), 32)
-        # Wait for ajax delay.
-        time.sleep(0.25)
+        self.wait_for_number_of_elements('.select2-results__option', 1)
         self.assertTrue(result_container.is_displayed())
-        results = result_container.find_elements_by_css_selector('.select2-results__option')
-        self.assertEqual(len(results), 1)
         # Select the result.
         search.send_keys(Keys.RETURN)
         # Reopen the dropdown and add the first result to the selection.

@@ -99,6 +99,12 @@ class AdminSeleniumTestCase(SeleniumTestCase, StaticLiveServerTestCase):
             timeout
         )
 
+    def wait_for_number_of_elements(self, css_selector, number, timeout=10):
+        self.wait_until(
+            lambda d: len(d.find_elements_by_css_selector(css_selector)) == number,
+            timeout,
+        )
+
     def wait_page_ready(self, timeout=10):
         """
         Block until the  page is ready.
