@@ -235,6 +235,10 @@ documentation:
     Five
     ^^^^
 
+* Use :rst:role:`:rfc:<rfc>` to reference RFC and and try to link to the
+  relevant section if possible. For example, use ``:rfc:`2324#section-2.3.2```
+  or ``:rfc:`Custom link text <2324#section-2.3.2>```.
+
 Django-specific markup
 ======================
 
