@@ -940,8 +940,8 @@ class DateTimePickerShortcutsSeleniumTests(AdminWidgetSeleniumTestCase):
         self.selenium.find_elements_by_css_selector('.field-birthdate .timezonewarning')
 
         # Submit the form.
-        self.selenium.find_element_by_tag_name('form').submit()
-        self.wait_page_loaded()
+        with self.wait_page_loaded():
+            self.selenium.find_element_by_tag_name('form').submit()
 
         # Make sure that "now" in javascript is within 10 seconds
         # from "now" on the server side.
@@ -1128,13 +1128,13 @@ class HorizontalVerticalFilterSeleniumTests(AdminWidgetSeleniumTestCase):
         self.admin_login(username='super', password='secret', login_url='/')
         self.selenium.get(self.live_server_url + reverse('admin:admin_widgets_school_change', args=(self.school.id,)))
 
-        self.wait_page_loaded()
+        self.wait_page_ready()
         self.execute_basic_operations('vertical', 'students')
         self.execute_basic_operations('horizontal', 'alumni')
 
         # Save and check that everything is properly stored in the database ---
         self.selenium.find_element_by_xpath('//input[@value="Save"]').click()
-        self.wait_page_loaded()
+        self.wait_page_ready()
         self.school = School.objects.get(id=self.school.id)  # Reload from database
         self.assertEqual(list(self.school.students.all()), [self.arthur, self.cliff, self.jason, self.john])
         self.assertEqual(list(self.school.alumni.all()), [self.arthur, self.cliff, self.jason, self.john])
@@ -1218,8 +1218,8 @@ class HorizontalVerticalFilterSeleniumTests(AdminWidgetSeleniumTestCase):
             input.send_keys([Keys.BACK_SPACE, Keys.BACK_SPACE])
 
         # Save and check that everything is properly stored in the database ---
-        self.selenium.find_element_by_xpath('//input[@value="Save"]').click()
-        self.wait_page_loaded()
+        with self.wait_page_loaded():
+            self.selenium.find_element_by_xpath('//input[@value="Save"]').click()
         self.school = School.objects.get(id=self.school.id)  # Reload from database
         self.assertEqual(list(self.school.students.all()), [self.jason, self.peter])
         self.assertEqual(list(self.school.alumni.all()), [self.jason, self.peter])
@@ -1267,8 +1267,8 @@ class HorizontalVerticalFilterSeleniumTests(AdminWidgetSeleniumTestCase):
         # self.selenium.refresh() or send_keys(Keys.F5) does hard reload and
         # doesn't replicate what happens when a user clicks the browser's
         # 'Refresh' button.
-        self.selenium.execute_script("location.reload()")
-        self.wait_page_loaded()
+        with self.wait_page_loaded():
+            self.selenium.execute_script("location.reload()")
 
         options_len = len(self.selenium.find_elements_by_css_selector('#id_students_to > option'))
         self.assertEqual(options_len, 2)
