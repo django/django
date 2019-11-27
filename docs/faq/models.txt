@@ -68,13 +68,12 @@ Does Django support NoSQL databases?
 ====================================
 
 NoSQL databases are not officially supported by Django itself. There are,
-however, a number of side project and forks which allow NoSQL functionality in
-Django, like `Django non-rel`_.
+however, a number of side projects and forks which allow NoSQL functionality in
+Django.
 
-You can also take a look on `the wiki page`_ which discusses some alternatives.
+You can take a look on `the wiki page`_ which discusses some projects.
 
-.. _`Django non-rel`: http://django-nonrel.org/
-.. _`the wiki page`: https://code.djangoproject.com/wiki/NoSqlSupport
+.. _the wiki page: https://code.djangoproject.com/wiki/NoSqlSupport
 
 How do I add database-specific options to my CREATE TABLE statements, such as specifying MyISAM as the table type?
 ==================================================================================================================
