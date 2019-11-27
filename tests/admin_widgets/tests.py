@@ -1038,15 +1038,17 @@ class HorizontalVerticalFilterSeleniumTests(AdminWidgetSeleniumTestCase):
         self.assertActiveButtons(mode, field_name, False, False, True, False)
 
         # Choose some options ------------------------------------------------
-        from_lisa_select_option = self.get_select_option(from_box, str(self.lisa.id))
+        from_lisa_select_option = self.selenium.find_element_by_css_selector(
+            '{} > option[value="{}"]'.format(from_box, self.lisa.id)
+        )
 
         # Check the title attribute is there for tool tips: ticket #20821
         self.assertEqual(from_lisa_select_option.get_attribute('title'), from_lisa_select_option.get_attribute('text'))
 
-        from_lisa_select_option.click()
-        self.get_select_option(from_box, str(self.jason.id)).click()
-        self.get_select_option(from_box, str(self.bob.id)).click()
-        self.get_select_option(from_box, str(self.john.id)).click()
+        self.select_option(from_box, str(self.lisa.id))
+        self.select_option(from_box, str(self.jason.id))
+        self.select_option(from_box, str(self.bob.id))
+        self.select_option(from_box, str(self.john.id))
         self.assertActiveButtons(mode, field_name, True, False, True, False)
         self.selenium.find_element_by_id(choose_link).click()
         self.assertActiveButtons(mode, field_name, False, False, True, True)
@@ -1061,12 +1063,14 @@ class HorizontalVerticalFilterSeleniumTests(AdminWidgetSeleniumTestCase):
         ])
 
         # Check the tooltip is still there after moving: ticket #20821
-        to_lisa_select_option = self.get_select_option(to_box, str(self.lisa.id))
+        to_lisa_select_option = self.selenium.find_element_by_css_selector(
+            '{} > option[value="{}"]'.format(to_box, self.lisa.id)
+        )
         self.assertEqual(to_lisa_select_option.get_attribute('title'), to_lisa_select_option.get_attribute('text'))
 
         # Remove some options -------------------------------------------------
-        self.get_select_option(to_box, str(self.lisa.id)).click()
-        self.get_select_option(to_box, str(self.bob.id)).click()
+        self.select_option(to_box, str(self.lisa.id))
+        self.select_option(to_box, str(self.bob.id))
         self.assertActiveButtons(mode, field_name, False, True, True, True)
         self.selenium.find_element_by_id(remove_link).click()
         self.assertActiveButtons(mode, field_name, False, False, True, True)
@@ -1079,8 +1083,8 @@ class HorizontalVerticalFilterSeleniumTests(AdminWidgetSeleniumTestCase):
         self.assertSelectOptions(to_box, [str(self.jason.id), str(self.john.id)])
 
         # Choose some more options --------------------------------------------
-        self.get_select_option(from_box, str(self.arthur.id)).click()
-        self.get_select_option(from_box, str(self.cliff.id)).click()
+        self.select_option(from_box, str(self.arthur.id))
+        self.select_option(from_box, str(self.cliff.id))
         self.selenium.find_element_by_id(choose_link).click()
 
         self.assertSelectOptions(from_box, [
@@ -1093,8 +1097,8 @@ class HorizontalVerticalFilterSeleniumTests(AdminWidgetSeleniumTestCase):
         ])
 
         # Choose some more options --------------------------------------------
-        self.get_select_option(from_box, str(self.peter.id)).click()
-        self.get_select_option(from_box, str(self.lisa.id)).click()
+        self.select_option(from_box, str(self.peter.id))
+        self.select_option(from_box, str(self.lisa.id))
 
         # Confirm they're selected after clicking inactive buttons: ticket #26575
         self.assertSelectedOptions(from_box, [str(self.peter.id), str(self.lisa.id)])
@@ -1102,12 +1106,12 @@ class HorizontalVerticalFilterSeleniumTests(AdminWidgetSeleniumTestCase):
         self.assertSelectedOptions(from_box, [str(self.peter.id), str(self.lisa.id)])
 
         # Unselect the options ------------------------------------------------
-        self.get_select_option(from_box, str(self.peter.id)).click()
-        self.get_select_option(from_box, str(self.lisa.id)).click()
+        self.deselect_option(from_box, str(self.peter.id))
+        self.deselect_option(from_box, str(self.lisa.id))
 
         # Choose some more options --------------------------------------------
-        self.get_select_option(to_box, str(self.jason.id)).click()
-        self.get_select_option(to_box, str(self.john.id)).click()
+        self.select_option(to_box, str(self.jason.id))
+        self.select_option(to_box, str(self.john.id))
 
         # Confirm they're selected after clicking inactive buttons: ticket #26575
         self.assertSelectedOptions(to_box, [str(self.jason.id), str(self.john.id)])
@@ -1115,8 +1119,8 @@ class HorizontalVerticalFilterSeleniumTests(AdminWidgetSeleniumTestCase):
         self.assertSelectedOptions(to_box, [str(self.jason.id), str(self.john.id)])
 
         # Unselect the options ------------------------------------------------
-        self.get_select_option(to_box, str(self.jason.id)).click()
-        self.get_select_option(to_box, str(self.john.id)).click()
+        self.deselect_option(to_box, str(self.jason.id))
+        self.deselect_option(to_box, str(self.john.id))
 
         # Pressing buttons shouldn't change the URL.
         self.assertEqual(self.selenium.current_url, original_url)
@@ -1186,14 +1190,14 @@ class HorizontalVerticalFilterSeleniumTests(AdminWidgetSeleniumTestCase):
             # Choosing a filtered option sends it properly to the 'to' box.
             input.send_keys('a')
             self.assertSelectOptions(from_box, [str(self.arthur.id), str(self.jason.id)])
-            self.get_select_option(from_box, str(self.jason.id)).click()
+            self.select_option(from_box, str(self.jason.id))
             self.selenium.find_element_by_id(choose_link).click()
             self.assertSelectOptions(from_box, [str(self.arthur.id)])
             self.assertSelectOptions(to_box, [
                 str(self.lisa.id), str(self.peter.id), str(self.jason.id),
             ])
 
-            self.get_select_option(to_box, str(self.lisa.id)).click()
+            self.select_option(to_box, str(self.lisa.id))
             self.selenium.find_element_by_id(remove_link).click()
             self.assertSelectOptions(from_box, [str(self.arthur.id), str(self.lisa.id)])
             self.assertSelectOptions(to_box, [str(self.peter.id), str(self.jason.id)])
@@ -1209,7 +1213,7 @@ class HorizontalVerticalFilterSeleniumTests(AdminWidgetSeleniumTestCase):
             # -----------------------------------------------------------------
             # Pressing enter on a filtered option sends it properly to
             # the 'to' box.
-            self.get_select_option(to_box, str(self.jason.id)).click()
+            self.select_option(to_box, str(self.jason.id))
             self.selenium.find_element_by_id(remove_link).click()
             input.send_keys('ja')
             self.assertSelectOptions(from_box, [str(self.jason.id)])
