@@ -131,10 +131,12 @@ class DurationParseTests(unittest.TestCase):
             ('P4W', None),
             ('P4D', timedelta(days=4)),
             ('P0.5D', timedelta(hours=12)),
+            ('P0,5D', timedelta(hours=12)),
             ('PT5H', timedelta(hours=5)),
             ('PT5M', timedelta(minutes=5)),
             ('PT5S', timedelta(seconds=5)),
             ('PT0.000005S', timedelta(microseconds=5)),
+            ('PT0,000005S', timedelta(microseconds=5)),
         )
         for source, expected in test_values:
             with self.subTest(source=source):

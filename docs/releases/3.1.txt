@@ -256,6 +256,9 @@ Utilities
 * :func:`~django.utils.encoding.filepath_to_uri` now supports
   :class:`pathlib.Path`.
 
+* :func:`~django.utils.dateparse.parse_duration` now supports comma separators
+  for decimal fractions in the ISO 8601 format.
+
 Validators
 ~~~~~~~~~~
 
