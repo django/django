@@ -880,3 +880,13 @@ class TestWidget(PostgreSQLSimpleTestCase):
             '<input type="text" name="datetimerange_0" value="2006-01-10 07:30:00">'
             '<input type="text" name="datetimerange_1" value="2006-02-12 09:50:00">'
         )
+
+
+class TestRepresentation(PostgreSQLTestCase):
+
+    def test_numeric_range(self):
+        self.assertTrue(
+            str(
+                RangesModel.objects.filter(ints__overlap=NumericRange(1, 5)).query
+            ).endswith('WHERE "postgres_tests_rangesmodel"."ints" && \'[1,5)\'')
+        )

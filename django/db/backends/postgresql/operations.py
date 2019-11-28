@@ -1,3 +1,4 @@
+from psycopg2.extensions import adapt
 from psycopg2.extras import Inet
 
 from django.conf import settings
@@ -114,6 +115,9 @@ class DatabaseOperations(BaseDatabaseOperations):
         if name.startswith('"') and name.endswith('"'):
             return name  # Quoting once is enough.
         return '"%s"' % name
+
+    def adapt_param(self, param):
+        return adapt(param).getquoted().decode()
 
     def set_time_zone_sql(self):
         return "SET TIME ZONE %s"
