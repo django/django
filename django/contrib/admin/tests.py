@@ -133,14 +133,6 @@ class AdminSeleniumTestCase(SeleniumTestCase, StaticLiveServerTestCase):
         with self.wait_page_loaded():
             self.selenium.find_element_by_xpath('//input[@value="%s"]' % login_text).click()
 
-    def get_css_value(self, selector, attribute):
-        """
-        Return the value for the CSS attribute of a DOM element specified by
-        the given selector. Uses the jQuery that ships with Django.
-        """
-        return self.selenium.execute_script(
-            'return django.jQuery("%s").css("%s")' % (selector, attribute))
-
     def select_option(self, selector, value):
         """
         Select the <OPTION> with the value `value` inside the <SELECT> widget
