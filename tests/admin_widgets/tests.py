@@ -941,7 +941,7 @@ class DateTimePickerShortcutsSeleniumTests(AdminWidgetSeleniumTestCase):
 
         # Submit the form.
         with self.wait_page_loaded():
-            self.selenium.find_element_by_tag_name('form').submit()
+            self.selenium.find_element_by_name('_save').click()
 
         # Make sure that "now" in javascript is within 10 seconds
         # from "now" on the server side.
