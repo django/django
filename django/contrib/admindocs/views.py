@@ -1,5 +1,6 @@
 import inspect
 from importlib import import_module
+from inspect import cleandoc
 from pathlib import Path
 
 from django.apps import apps
@@ -256,7 +257,7 @@ class ModelDetailView(BaseAdminDocsView):
                     continue
                 verbose = func.__doc__
                 verbose = verbose and (
-                    utils.parse_rst(utils.trim_docstring(verbose), 'model', _('model:') + opts.model_name)
+                    utils.parse_rst(cleandoc(verbose), 'model', _('model:') + opts.model_name)
                 )
                 # Show properties and methods without arguments as fields.
                 # Otherwise, show as a 'method with arguments'.
