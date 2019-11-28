@@ -26,10 +26,10 @@ Requires jQuery, core.js, and SelectBox.js.
 
             var ps = from_box.parentNode.getElementsByTagName('p');
             for (var i = 0; i < ps.length; i++) {
-                if (ps[i].className.indexOf("info") !== -1) {
+                if (ps[i].classList.contains("info")) {
                     // Remove <p class="info">, because it just gets in the way.
                     from_box.parentNode.removeChild(ps[i]);
-                } else if (ps[i].className.indexOf("help") !== -1) {
+                } else if (ps[i].classList.contains("help")) {
                     // Move help text up to the top so it isn't below the select
                     // boxes or wrapped off on the side to the right of the add
                     // button:
@@ -112,7 +112,7 @@ Requires jQuery, core.js, and SelectBox.js.
 
             // Set up the JavaScript event handlers for the select box filter interface
             var move_selection = function(e, elem, move_func, from, to) {
-                if (elem.className.indexOf('active') !== -1) {
+                if (elem.classList.contains('active')) {
                     move_func(from, to);
                     SelectFilter.refresh_icons(field_id);
                 }
