@@ -7,12 +7,12 @@
 # Mattias Hansson <mattias.gothenburg@gmail.com>, 2016
 # Mattias Benjaminsson <mattias@colourandcode.se>, 2011
 # Samuel Linde <samuel@linde.im>, 2011
-# Thomas Lundqvist <thomas@biljettshop.se>, 2016
+# Thomas Lundqvist, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
+"POT-Creation-Date: 2018-05-17 11:50+0200\n"
 "PO-Revision-Date: 2017-09-19 16:41+0000\n"
 "Last-Translator: Mattias Hansson <mattias.gothenburg@gmail.com>\n"
 "Language-Team: Swedish (http://www.transifex.com/django/django/language/"
@@ -104,26 +104,8 @@ msgstr ""
 "Du har markerat en operation och du har inte gjort några ändringar i "
 "enskilda fält. Du letar antagligen efter Utför-knappen snarare än Spara."
 
-#, javascript-format
-msgid "Note: You are %s hour ahead of server time."
-msgid_plural "Note: You are %s hours ahead of server time."
-msgstr[0] "Notera: Du är %s timme före serverns tid."
-msgstr[1] "Notera: Du är %s timmar före serverns tid."
-
-#, javascript-format
-msgid "Note: You are %s hour behind server time."
-msgid_plural "Note: You are %s hours behind server time."
-msgstr[0] "Notera: Du är %s timme efter serverns tid."
-msgstr[1] "Notera: Du är %s timmar efter serverns tid."
-
 msgid "Now"
 msgstr "Nu"
-
-msgid "Choose a Time"
-msgstr "Välj en tidpunkt"
-
-msgid "Choose a time"
-msgstr "Välj en tidpunkt"
 
 msgid "Midnight"
 msgstr "Midnatt"
@@ -136,6 +118,24 @@ msgstr "Middag"
 
 msgid "6 p.m."
 msgstr "6 p.m."
+
+#, javascript-format
+msgid "Note: You are %s hour ahead of server time."
+msgid_plural "Note: You are %s hours ahead of server time."
+msgstr[0] "Notera: Du är %s timme före serverns tid."
+msgstr[1] "Notera: Du är %s timmar före serverns tid."
+
+#, javascript-format
+msgid "Note: You are %s hour behind server time."
+msgid_plural "Note: You are %s hours behind server time."
+msgstr[0] "Notera: Du är %s timme efter serverns tid."
+msgstr[1] "Notera: Du är %s timmar efter serverns tid."
+
+msgid "Choose a Time"
+msgstr "Välj en tidpunkt"
+
+msgid "Choose a time"
+msgstr "Välj en tidpunkt"
 
 msgid "Cancel"
 msgstr "Avbryt"

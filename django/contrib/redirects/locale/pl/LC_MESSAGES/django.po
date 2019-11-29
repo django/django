@@ -2,15 +2,16 @@
 #
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011
-# Janusz Harkot <jh@blueice.pl>, 2014-2015
+# Janusz Harkot <jh@trilab.pl>, 2014-2015
+# m_aciek <maciej.olko@gmail.com>, 2019
 # Tomasz Kajtoch <tomekkaj@tomekkaj.pl>, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2017-09-23 18:54+0000\n"
-"Last-Translator: Tomasz Kajtoch <tomekkaj@tomekkaj.pl>\n"
+"POT-Creation-Date: 2019-09-08 17:27+0200\n"
+"PO-Revision-Date: 2019-11-11 14:54+0000\n"
+"Last-Translator: m_aciek <maciej.olko@gmail.com>\n"
 "Language-Team: Polish (http://www.transifex.com/django/django/language/pl/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -30,21 +31,21 @@ msgid "redirect from"
 msgstr "przekieruj z"
 
 msgid ""
-"This should be an absolute path, excluding the domain name. Example: '/"
-"events/search/'."
+"This should be an absolute path, excluding the domain name. Example: “/"
+"events/search/”."
 msgstr ""
-"Podaj ścieżkę bezwzględną wykluczając nazwę domeny. Na przykład '/events/"
-"search/'."
+"Podaj ścieżkę bezwzględną pomijając nazwę domeny. Na przykład „/events/"
+"search/”."
 
 msgid "redirect to"
 msgstr "przekieruj na"
 
 msgid ""
 "This can be either an absolute path (as above) or a full URL starting with "
-"'http://'."
+"“http://”."
 msgstr ""
-"Podaj ścieżkę bezwzględną (jak powyżej) lub pełen URL rozpoczynający się od "
-"'http://'."
+"Podaj ścieżkę bezwzględną (jak powyżej) lub pełen URL rozpoczynający się od "
+"„http://”."
 
 msgid "redirect"
 msgstr "przekieruj"

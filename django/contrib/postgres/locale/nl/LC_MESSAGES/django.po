@@ -9,8 +9,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-05-17 11:49+0200\n"
-"PO-Revision-Date: 2019-02-19 08:36+0000\n"
+"POT-Creation-Date: 2019-09-08 17:27+0200\n"
+"PO-Revision-Date: 2019-09-17 07:18+0000\n"
 "Last-Translator: Tonnes <tonnes.mb@gmail.com>\n"
 "Language-Team: Dutch (http://www.transifex.com/django/django/language/nl/)\n"
 "MIME-Version: 1.0\n"
@@ -33,8 +33,8 @@ msgid "Map of strings to strings/nulls"
 msgstr "Toewijzing van tekenreeksen naar tekenreeksen/nulwaarden"
 
 #, python-format
-msgid "The value of \"%(key)s\" is not a string or null."
-msgstr "De waarde van '%(key)s' is geen tekenreeks of nul."
+msgid "The value of “%(key)s” is not a string or null."
+msgstr "De waarde van ‘%(key)s’ is geen tekenreeks of nul."
 
 msgid "A JSON object"
 msgstr "Een JSON-object"
@@ -49,8 +49,8 @@ msgid "Input must be a JSON dictionary."
 msgstr "Invoer moet een JSON-bibliotheek zijn."
 
 #, python-format
-msgid "'%(value)s' value must be valid JSON."
-msgstr "Waarde '%(value)s' moet geldige JSON zijn."
+msgid "“%(value)s” value must be valid JSON."
+msgstr "Waarde van ‘%(value)s’ moet geldige JSON zijn."
 
 msgid "Enter two valid values."
 msgstr "Voer twee geldige waarden in."
