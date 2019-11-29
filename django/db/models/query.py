@@ -23,6 +23,7 @@ from django.db.models.fields import AutoField
 from django.db.models.functions import Cast, Trunc
 from django.db.models.query_utils import FilteredRelation, Q
 from django.db.models.sql.constants import CURSOR, GET_ITERATOR_CHUNK_SIZE
+from django.db.models.utils import resolve_callables
 from django.db.utils import NotSupportedError
 from django.utils import timezone
 from django.utils.functional import cached_property, partition
@@ -591,8 +592,8 @@ class QuerySet:
                 obj, created = self._create_object_from_params(kwargs, params, lock=True)
                 if created:
                     return obj, created
-            for k, v in defaults.items():
-                setattr(obj, k, v() if callable(v) else v)
+            for k, v in resolve_callables(defaults):
+                setattr(obj, k, v)
             obj.save(using=self.db)
         return obj, False
 
@@ -603,7 +604,7 @@ class QuerySet:
         """
         try:
             with transaction.atomic(using=self.db):
-                params = {k: v() if callable(v) else v for k, v in params.items()}
+                params = dict(resolve_callables(params))
                 obj = self.create(**params)
             return obj, True
         except IntegrityError as e:
