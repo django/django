@@ -209,6 +209,10 @@ Models
 
 * :attr:`.CheckConstraint.check` now supports boolean expressions.
 
+* The :meth:`.RelatedManager.add`, :meth:`~.RelatedManager.create`, and
+  :meth:`~.RelatedManager.set` methods now accept callables as values in the
+  ``through_defaults`` argument.
+
 Pagination
 ~~~~~~~~~~
 

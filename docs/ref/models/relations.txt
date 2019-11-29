@@ -71,7 +71,13 @@ Related objects reference
 
         Use the ``through_defaults`` argument to specify values for the new
         :ref:`intermediate model <intermediary-manytomany>` instance(s), if
-        needed.
+        needed. You can use callables as values in the ``through_defaults``
+        dictionary and they will be evaluated once before creating any
+        intermediate instance(s).
+
+        .. versionchanged:: 3.1
+
+            ``through_defaults`` values can now be callables.
 
     .. method:: create(through_defaults=None, **kwargs)
 
@@ -105,7 +111,12 @@ Related objects reference
 
         Use the ``through_defaults`` argument to specify values for the new
         :ref:`intermediate model <intermediary-manytomany>` instance, if
-        needed.
+        needed. You can use callables as values in the ``through_defaults``
+        dictionary.
+
+        .. versionchanged:: 3.1
+
+            ``through_defaults`` values can now be callables.
 
     .. method:: remove(*objs, bulk=True)
 
@@ -193,7 +204,13 @@ Related objects reference
 
         Use the ``through_defaults`` argument to specify values for the new
         :ref:`intermediate model <intermediary-manytomany>` instance(s), if
-        needed.
+        needed. You can use callables as values in the ``through_defaults``
+        dictionary and they will be evaluated once before creating any
+        intermediate instance(s).
+
+        .. versionchanged:: 3.1
+
+            ``through_defaults`` values can now be callables.
 
     .. note::
 

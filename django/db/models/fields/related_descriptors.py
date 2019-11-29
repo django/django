@@ -68,6 +68,7 @@ from django.db import connections, router, transaction
 from django.db.models import Q, signals
 from django.db.models.query import QuerySet
 from django.db.models.query_utils import DeferredAttribute
+from django.db.models.utils import resolve_callables
 from django.utils.functional import cached_property
 
 
@@ -1116,7 +1117,7 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
             if not objs:
                 return
 
-            through_defaults = through_defaults or {}
+            through_defaults = dict(resolve_callables(through_defaults or {}))
             target_ids = self._get_target_ids(target_field_name, objs)
             db = router.db_for_write(self.through, instance=self.instance)
             can_ignore_conflicts, must_send_signals, can_fast_add = self._get_add_plan(db, source_field_name)
