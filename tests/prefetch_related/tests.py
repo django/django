@@ -1,8 +1,11 @@
+from unittest import mock
+
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import connection
 from django.db.models import Prefetch, QuerySet
 from django.db.models.query import get_prefetcher, prefetch_related_objects
+from django.db.models.sql import Query
 from django.test import TestCase, override_settings
 from django.test.utils import CaptureQueriesContext
 
@@ -239,6 +242,13 @@ class PrefetchRelatedTests(TestDataMixin, TestCase):
         self.assertIn('prefetch_related', str(cm.exception))
         self.assertIn("name", str(cm.exception))
 
+    def test_prefetch_eq(self):
+        prefetch_1 = Prefetch('authors', queryset=Author.objects.all())
+        prefetch_2 = Prefetch('books', queryset=Book.objects.all())
+        self.assertEqual(prefetch_1, prefetch_1)
+        self.assertEqual(prefetch_1, mock.ANY)
+        self.assertNotEqual(prefetch_1, prefetch_2)
+
     def test_forward_m2m_to_attr_conflict(self):
         msg = 'to_attr=authors conflicts with a field on the Book model.'
         authors = Author.objects.all()
@@ -281,6 +291,20 @@ class PrefetchRelatedTests(TestDataMixin, TestCase):
 
         sql = queries[-1]['sql']
         self.assertWhereContains(sql, self.author1.id)
+
+    def test_filter_deferred(self):
+        """
+        Related filtering of prefetched querysets is deferred until necessary.
+        """
+        add_q = Query.add_q
+        with mock.patch.object(
+            Query,
+            'add_q',
+            autospec=True,
+            side_effect=lambda self, q: add_q(self, q),
+        ) as add_q_mock:
+            list(Book.objects.prefetch_related('authors'))
+            self.assertEqual(add_q_mock.call_count, 1)
 
 
 class RawQuerySetTests(TestDataMixin, TestCase):
@@ -813,6 +837,22 @@ class CustomPrefetchTests(TestCase):
             all_houses = list(House.objects.filter(occupants=person))
             with self.assertNumQueries(0):
                 self.assertEqual(person.cached_all_houses, all_houses)
+
+    def test_filter_deferred(self):
+        """
+        Related filtering of prefetched querysets is deferred until necessary.
+        """
+        add_q = Query.add_q
+        with mock.patch.object(
+            Query,
+            'add_q',
+            autospec=True,
+            side_effect=lambda self, q: add_q(self, q),
+        ) as add_q_mock:
+            list(House.objects.prefetch_related(
+                Prefetch('occupants', queryset=Person.objects.all())
+            ))
+            self.assertEqual(add_q_mock.call_count, 1)
 
 
 class DefaultManagerTests(TestCase):

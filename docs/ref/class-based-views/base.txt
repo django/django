@@ -79,12 +79,9 @@ MRO is an acronym for Method Resolution Order.
 
     .. method:: setup(request, *args, **kwargs)
 
-        Initializes view instance attributes: ``self.request``, ``self.args``,
-        and ``self.kwargs`` prior to :meth:`dispatch`.
+        Performs key view initialization prior to :meth:`dispatch`.
 
-        Overriding this method allows mixins to setup instance attributes for
-        reuse in child classes. When overriding this method, you must call
-        ``super()``.
+        If overriding this method, you must call ``super()``.
 
     .. method:: dispatch(request, *args, **kwargs)
 

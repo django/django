@@ -37,6 +37,12 @@ class CreateExtension(Operation):
         return "Creates extension %s" % self.name
 
 
+class BloomExtension(CreateExtension):
+
+    def __init__(self):
+        self.name = 'bloom'
+
+
 class BtreeGinExtension(CreateExtension):
 
     def __init__(self):

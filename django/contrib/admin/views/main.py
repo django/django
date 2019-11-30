@@ -173,8 +173,6 @@ class ChangeList:
                     )
                 except ValueError as e:
                     raise IncorrectLookupParameters(e) from e
-                if settings.USE_TZ:
-                    from_date = make_aware(from_date)
                 if day:
                     to_date = from_date + timedelta(days=1)
                 elif month:
@@ -183,6 +181,9 @@ class ChangeList:
                     to_date = (from_date + timedelta(days=32)).replace(day=1)
                 else:
                     to_date = from_date.replace(year=from_date.year + 1)
+                if settings.USE_TZ:
+                    from_date = make_aware(from_date)
+                    to_date = make_aware(to_date)
                 lookup_params.update({
                     '%s__gte' % self.date_hierarchy: from_date,
                     '%s__lt' % self.date_hierarchy: to_date,
@@ -307,7 +308,12 @@ class ChangeList:
                     order_field = self.get_ordering_field(field_name)
                     if not order_field:
                         continue  # No 'admin_order_field', skip it
-                    if hasattr(order_field, 'as_sql'):
+                    if isinstance(order_field, OrderBy):
+                        if pfx == '-':
+                            order_field = order_field.copy()
+                            order_field.reverse_ordering()
+                        ordering.append(order_field)
+                    elif hasattr(order_field, 'resolve_expression'):
                         # order_field is an expression.
                         ordering.append(order_field.desc() if pfx == '-' else order_field.asc())
                     # reverse order if order_field has already "-" as prefix

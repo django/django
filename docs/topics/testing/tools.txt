@@ -775,6 +775,11 @@ If your tests make any database queries, use subclasses
     :exc:`unittest.SkipTest` in ``setUpClass()``, be sure to do it before
     calling ``super()`` to avoid this.
 
+.. versionchanged:: 3.1
+
+    The ``debug()`` method was implemented to allow running a test without
+    collecting the result and catching exceptions.
+
 ``TransactionTestCase``
 -----------------------
 

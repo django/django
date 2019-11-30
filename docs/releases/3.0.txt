@@ -192,8 +192,8 @@ Cache
 ~~~~~
 
 * :func:`~django.utils.cache.add_never_cache_headers` and
-  :func:`~django.views.decorators.cache.never_cache` now adds ``private``
-  directive to a ``Cache-Control`` header.
+  :func:`~django.views.decorators.cache.never_cache` now add the ``private``
+  directive to ``Cache-Control`` headers.
 
 File Storage
 ~~~~~~~~~~~~
@@ -218,6 +218,8 @@ Internationalization
   settings to set the ``HttpOnly``, ``SameSite``, and ``Secure`` flags on
   language cookies. The default values of these settings preserve the previous
   behavior.
+
+* Added support and translations for the Uzbek language.
 
 Logging
 ~~~~~~~
@@ -522,10 +524,6 @@ Miscellaneous
 
 * Support for ``pywatchman`` < 1.2.0 is removed.
 
-* HTML rendered by :class:`~django.forms.SelectDateWidget` for required fields
-  now have the ``placeholder`` attribute, which, mainly, may require some
-  adjustments in tests that compare HTML.
-
 * :func:`~django.utils.http.urlencode` now encodes iterable values as they are
   when ``doseq=False``, rather than iterating them, bringing it into line with
   the standard library :func:`urllib.parse.urlencode` function.
@@ -547,6 +545,8 @@ Miscellaneous
 
 * ``alias=None`` is added to the signature of
   :meth:`.Expression.get_group_by_cols`.
+
+* Support for ``sqlparse`` < 0.2.2 is removed.
 
 .. _deprecated-features-3.0:
 

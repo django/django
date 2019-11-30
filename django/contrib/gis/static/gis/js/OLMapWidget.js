@@ -8,7 +8,7 @@ var GeometryTypeControl = function(opt_options) {
     var element = document.createElement('div');
     element.className = 'switch-type type-' + options.type + ' ol-control ol-unselectable';
     if (options.active) {
-        element.className += " type-active";
+        element.classList.add("type-active");
     }
 
     var self = this;
@@ -21,10 +21,9 @@ var GeometryTypeControl = function(opt_options) {
                 type: options.type
             });
             options.widget.map.addInteraction(options.widget.interactions.draw);
-            var className = options.widget.currentGeometryType.element.className.replace(/ type-active/g, '');
-            options.widget.currentGeometryType.element.className = className;
+            options.widget.currentGeometryType.element.classList.remove('type-active');
             options.widget.currentGeometryType = self;
-            element.className += " type-active";
+            element.classList.add("type-active");
         }
     };
 

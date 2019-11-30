@@ -60,6 +60,10 @@ class RangeField(models.Field):
         self.__dict__['model'] = model
         self.base_field.model = model
 
+    @classmethod
+    def _choices_is_value(cls, value):
+        return isinstance(value, (list, tuple)) or super()._choices_is_value(value)
+
     def get_prep_value(self, value):
         if value is None:
             return None
@@ -279,4 +283,32 @@ class RangeEndsWith(models.Transform):
 class IsEmpty(models.Transform):
     lookup_name = 'isempty'
     function = 'isempty'
+    output_field = models.BooleanField()
+
+
+@RangeField.register_lookup
+class LowerInclusive(models.Transform):
+    lookup_name = 'lower_inc'
+    function = 'LOWER_INC'
+    output_field = models.BooleanField()
+
+
+@RangeField.register_lookup
+class LowerInfinite(models.Transform):
+    lookup_name = 'lower_inf'
+    function = 'LOWER_INF'
+    output_field = models.BooleanField()
+
+
+@RangeField.register_lookup
+class UpperInclusive(models.Transform):
+    lookup_name = 'upper_inc'
+    function = 'UPPER_INC'
+    output_field = models.BooleanField()
+
+
+@RangeField.register_lookup
+class UpperInfinite(models.Transform):
+    lookup_name = 'upper_inf'
+    function = 'UPPER_INF'
     output_field = models.BooleanField()

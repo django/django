@@ -176,3 +176,11 @@ class LineString(LinearGeometryMixin, GEOSGeometry):
 class LinearRing(LineString):
     _minlength = 4
     _init_func = capi.create_linearring
+
+    @property
+    def is_counterclockwise(self):
+        if self.empty:
+            raise ValueError(
+                'Orientation of an empty LinearRing cannot be determined.'
+            )
+        return self._cs.is_counterclockwise

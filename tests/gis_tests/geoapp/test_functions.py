@@ -12,7 +12,7 @@ from django.db import NotSupportedError, connection
 from django.db.models import Sum
 from django.test import TestCase, skipUnlessDBFeature
 
-from ..utils import FuncTestMixin, mysql, oracle, postgis, spatialite
+from ..utils import FuncTestMixin, mariadb, mysql, oracle, postgis, spatialite
 from .models import City, Country, CountryWebMercator, State, Track
 
 
@@ -32,24 +32,27 @@ class GISFunctionsTests(FuncTestMixin, TestCase):
             return
 
         pueblo_json = '{"type":"Point","coordinates":[-104.609252,38.255001]}'
-        houston_json = (
+        houston_json = json.loads(
             '{"type":"Point","crs":{"type":"name","properties":'
             '{"name":"EPSG:4326"}},"coordinates":[-95.363151,29.763374]}'
         )
-        victoria_json = (
+        victoria_json = json.loads(
             '{"type":"Point","bbox":[-123.30519600,48.46261100,-123.30519600,48.46261100],'
             '"coordinates":[-123.305196,48.462611]}'
         )
-        chicago_json = (
+        chicago_json = json.loads(
             '{"type":"Point","crs":{"type":"name","properties":{"name":"EPSG:4326"}},'
             '"bbox":[-87.65018,41.85039,-87.65018,41.85039],"coordinates":[-87.65018,41.85039]}'
         )
-        # MySQL ignores the crs option.
-        if mysql:
-            houston_json = json.loads(houston_json)
+        # MySQL and Oracle ignore the crs option.
+        if mysql or oracle:
             del houston_json['crs']
-            chicago_json = json.loads(chicago_json)
             del chicago_json['crs']
+        # Oracle ignores also the bbox and precision options.
+        if oracle:
+            del chicago_json['bbox']
+            del victoria_json['bbox']
+            chicago_json['coordinates'] = [-87.650175, 41.850385]
 
         # Precision argument should only be an integer
         with self.assertRaises(TypeError):
@@ -75,17 +78,17 @@ class GISFunctionsTests(FuncTestMixin, TestCase):
         # WHERE "geoapp_city"."name" = 'Houston';
         # This time we include the bounding box by using the `bbox` keyword.
         self.assertJSONEqual(
-            victoria_json,
             City.objects.annotate(
                 geojson=functions.AsGeoJSON('point', bbox=True)
-            ).get(name='Victoria').geojson
+            ).get(name='Victoria').geojson,
+            victoria_json,
         )
 
         # SELECT ST_AsGeoJson("geoapp_city"."point", 5, 3) FROM "geoapp_city"
         # WHERE "geoapp_city"."name" = 'Chicago';
         # Finally, we set every available keyword.
         # MariaDB doesn't limit the number of decimals in bbox.
-        if mysql and connection.mysql_is_mariadb:
+        if mariadb:
             chicago_json['bbox'] = [-87.650175, 41.850385, -87.650175, 41.850385]
         self.assertJSONEqual(
             City.objects.annotate(
@@ -143,6 +146,29 @@ class GISFunctionsTests(FuncTestMixin, TestCase):
         svg2 = svg1.replace('c', '')
         self.assertEqual(svg1, City.objects.annotate(svg=functions.AsSVG('point')).get(name='Pueblo').svg)
         self.assertEqual(svg2, City.objects.annotate(svg=functions.AsSVG('point', relative=5)).get(name='Pueblo').svg)
+
+    @skipUnlessDBFeature('has_AsWKB_function')
+    def test_aswkb(self):
+        wkb = City.objects.annotate(
+            wkb=functions.AsWKB(Point(1, 2, srid=4326)),
+        ).first().wkb
+        # WKB is either XDR or NDR encoded.
+        self.assertIn(
+            bytes(wkb),
+            (
+                b'\x00\x00\x00\x00\x01?\xf0\x00\x00\x00\x00\x00\x00@\x00\x00'
+                b'\x00\x00\x00\x00\x00',
+                b'\x01\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\xf0?\x00\x00'
+                b'\x00\x00\x00\x00\x00@',
+            ),
+        )
+
+    @skipUnlessDBFeature('has_AsWKT_function')
+    def test_aswkt(self):
+        wkt = City.objects.annotate(
+            wkt=functions.AsWKT(Point(1, 2, srid=4326)),
+        ).first().wkt
+        self.assertEqual(wkt, 'POINT (1.0 2.0)' if oracle else 'POINT(1 2)')
 
     @skipUnlessDBFeature("has_Azimuth_function")
     def test_azimuth(self):

@@ -1,0 +1,26 @@
+==========================
+Django 2.2.7 release notes
+==========================
+
+*November 4, 2019*
+
+Django 2.2.7 fixes several bugs in 2.2.6.
+
+Bugfixes
+========
+
+* Fixed a crash when using a ``contains``, ``contained_by``, ``has_key``,
+  ``has_keys``, or ``has_any_keys`` lookup on
+  :class:`~django.contrib.postgres.fields.JSONField`, if the right or left hand
+  side of an expression is a key transform (:ticket:`30826`).
+
+* Prevented :option:`migrate --plan` from showing that ``RunPython`` operations
+  are irreversible when ``reverse_code`` callables don't have docstrings or
+  when showing a forward migration plan (:ticket:`30870`).
+
+* Fixed migrations crash on PostgreSQL when adding an
+  :class:`~django.db.models.Index` with fields ordering and
+  :attr:`~.Index.opclasses` (:ticket:`30903`).
+
+* Restored the ability to override
+  :meth:`~django.db.models.Model.get_FOO_display` (:ticket:`30931`).

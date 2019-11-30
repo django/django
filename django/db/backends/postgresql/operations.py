@@ -32,6 +32,8 @@ class DatabaseOperations(BaseDatabaseOperations):
         if lookup_type == 'week_day':
             # For consistency across backends, we return Sunday=1, Saturday=7.
             return "EXTRACT('dow' FROM %s) + 1" % field_name
+        elif lookup_type == 'iso_week_day':
+            return "EXTRACT('isodow' FROM %s)" % field_name
         elif lookup_type == 'iso_year':
             return "EXTRACT('isoyear' FROM %s)" % field_name
         else:

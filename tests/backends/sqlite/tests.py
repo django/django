@@ -1,11 +1,14 @@
+import os
 import re
+import tempfile
 import threading
 import unittest
+from pathlib import Path
 from sqlite3 import dbapi2
 from unittest import mock
 
 from django.core.exceptions import ImproperlyConfigured
-from django.db import connection, transaction
+from django.db import ConnectionHandler, connection, transaction
 from django.db.models import Avg, StdDev, Sum, Variance
 from django.db.models.aggregates import Aggregate
 from django.db.models.fields import CharField
@@ -88,6 +91,19 @@ class Tests(TestCase):
                     value = cursor.fetchone()[0]
                 value = bool(value) if value in {0, 1} else value
                 self.assertIs(value, expected)
+
+    def test_pathlib_name(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            settings_dict = {
+                'default': {
+                    'ENGINE': 'django.db.backends.sqlite3',
+                    'NAME': Path(tmp) / 'test.db',
+                },
+            }
+            connections = ConnectionHandler(settings_dict)
+            connections['default'].ensure_connection()
+            connections['default'].close()
+            self.assertTrue(os.path.isfile(os.path.join(tmp, 'test.db')))
 
 
 @unittest.skipUnless(connection.vendor == 'sqlite', 'SQLite tests')

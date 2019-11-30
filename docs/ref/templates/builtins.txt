@@ -1352,7 +1352,7 @@ Format character  Description                               Example output
                   month, 2 characters.
 ``w``             Day of the week, digits without           ``'0'`` (Sunday) to ``'6'`` (Saturday)
                   leading zeros.
-``z``             Day of the year.                          ``0`` to ``365``
+``z``             Day of the year.                          ``1`` to ``366``
 **Week**
 ``W``             ISO-8601 week number of year, with        ``1``, ``53``
                   weeks starting on Monday.
@@ -1417,7 +1417,8 @@ Format character  Description                               Example output
                   the "c" formatter will not add timezone
                   offset if value is a naive datetime
                   (see :class:`datetime.tzinfo`).
-``r``             :rfc:`5322` formatted date.               ``'Thu, 21 Dec 2000 16:01:07 +0200'``
+``r``             :rfc:`RFC 5322 <5322#section-3.3>`        ``'Thu, 21 Dec 2000 16:01:07 +0200'``
+                  formatted date.
 ``U``             Seconds since the Unix Epoch
                   (January 1 1970 00:00:00 UTC).
 ================  ========================================  =====================
@@ -1721,6 +1722,11 @@ displayed. For example:
 
 Using ``floatformat`` with no argument is equivalent to using ``floatformat``
 with an argument of ``-1``.
+
+.. versionchanged:: 3.1
+
+    In older versions, a negative zero ``-0`` was returned for negative numbers
+    which round to zero.
 
 .. templatefilter:: force_escape
 

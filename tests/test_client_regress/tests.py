@@ -508,6 +508,27 @@ class AssertRedirectsTests(SimpleTestCase):
             with self.assertRaises(AssertionError):
                 self.assertRedirects(response, 'http://testserver/secure_view/', status_code=302)
 
+    def test_redirect_fetch_redirect_response(self):
+        """Preserve extra headers of requests made with django.test.Client."""
+        methods = (
+            'get', 'post', 'head', 'options', 'put', 'patch', 'delete', 'trace',
+        )
+        for method in methods:
+            with self.subTest(method=method):
+                req_method = getattr(self.client, method)
+                response = req_method(
+                    '/redirect_based_on_extra_headers_1/',
+                    follow=False,
+                    HTTP_REDIRECT='val',
+                )
+                self.assertRedirects(
+                    response,
+                    '/redirect_based_on_extra_headers_2/',
+                    fetch_redirect_response=True,
+                    status_code=302,
+                    target_status_code=302,
+                )
+
 
 @override_settings(ROOT_URLCONF='test_client_regress.urls')
 class AssertFormErrorTests(SimpleTestCase):

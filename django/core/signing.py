@@ -36,7 +36,6 @@ These functions make use of all of them.
 import base64
 import datetime
 import json
-import re
 import time
 import zlib
 
@@ -45,8 +44,9 @@ from django.utils import baseconv
 from django.utils.crypto import constant_time_compare, salted_hmac
 from django.utils.encoding import force_bytes
 from django.utils.module_loading import import_string
+from django.utils.regex_helper import _lazy_re_compile
 
-_SEP_UNSAFE = re.compile(r'^[A-z0-9-_=]*$')
+_SEP_UNSAFE = _lazy_re_compile(r'^[A-z0-9-_=]*$')
 
 
 class BadSignature(Exception):

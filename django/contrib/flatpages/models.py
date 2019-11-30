@@ -30,7 +30,7 @@ class FlatPage(models.Model):
         db_table = 'django_flatpage'
         verbose_name = _('flat page')
         verbose_name_plural = _('flat pages')
-        ordering = ('url',)
+        ordering = ['url']
 
     def __str__(self):
         return "%s -- %s" % (self.url, self.title)

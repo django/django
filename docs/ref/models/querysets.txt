@@ -126,7 +126,7 @@ described here.
 
 Here's the formal declaration of a ``QuerySet``:
 
-.. class:: QuerySet(model=None, query=None, using=None)
+.. class:: QuerySet(model=None, query=None, using=None, hints=None)
 
     Usually when you'll interact with a ``QuerySet`` you'll use it by
     :ref:`chaining filters <chaining-filters>`. To make this work, most
@@ -1706,8 +1706,9 @@ them::
     <QuerySet [<Person: ...)>, ...]>
 
 Currently, the ``postgresql``, ``oracle``, and ``mysql`` database
-backends support ``select_for_update()``. However, MySQL doesn't support the
-``nowait``, ``skip_locked``, and ``of`` arguments.
+backends support ``select_for_update()``. However, MariaDB 10.3+ supports only
+the ``nowait`` argument and MySQL 8.0.1+ supports the ``nowait`` and
+``skip_locked`` arguments. MySQL and MariaDB don't support the ``of`` argument.
 
 Passing ``nowait=True``, ``skip_locked=True``, or ``of`` to
 ``select_for_update()`` using database backends that do not support these
@@ -2569,10 +2570,12 @@ The output differs significantly between databases.
 ``explain()`` is supported by all built-in database backends except Oracle
 because an implementation there isn't straightforward.
 
-The ``format`` parameter changes the output format from the databases's default,
-usually text-based. PostgreSQL supports ``'TEXT'``, ``'JSON'``, ``'YAML'``, and
-``'XML'``. MySQL supports ``'TEXT'`` (also called ``'TRADITIONAL'``) and
-``'JSON'``.
+The ``format`` parameter changes the output format from the databases's
+default, which is usually text-based. PostgreSQL supports ``'TEXT'``,
+``'JSON'``, ``'YAML'``, and ``'XML'`` formats. MariaDB and MySQL support
+``'TEXT'`` (also called ``'TRADITIONAL'``) and ``'JSON'`` formats. MySQL
+8.0.16+ also supports an improved ``'TREE'`` format, which is similar to
+PostgreSQL's ``'TEXT'`` output and is used by default, if supported.
 
 Some databases accept flags that can return more information about the query.
 Pass these flags as keyword arguments. For example, when using PostgreSQL::
@@ -2585,9 +2588,14 @@ Pass these flags as keyword arguments. For example, when using PostgreSQL::
     Execution time: 0.058 ms
 
 On some databases, flags may cause the query to be executed which could have
-adverse effects on your database. For example, PostgreSQL's ``ANALYZE`` flag
-could result in changes to data if there are triggers or if a function is
-called, even for a ``SELECT`` query.
+adverse effects on your database. For example, the ``ANALYZE`` flag supported
+by MariaDB, MySQL 8.0.18+, and PostgreSQL could result in changes to data if
+there are triggers or if a function is called, even for a ``SELECT`` query.
+
+.. versionchanged:: 3.1
+
+    Support for the ``'TREE'`` format on MySQL 8.0.16+ and ``analyze`` option
+    on MariaDB and MySQL 8.0.18+ were added.
 
 .. _field-lookups:
 
@@ -3110,6 +3118,35 @@ When :setting:`USE_TZ` is ``True``, datetime fields are converted to the
 current time zone before filtering. This requires :ref:`time zone definitions
 in the database <database-time-zone-definitions>`.
 
+.. fieldlookup:: iso_week_day
+
+``iso_week_day``
+~~~~~~~~~~~~~~~~
+
+.. versionadded:: 3.1
+
+For date and datetime fields, an exact ISO 8601 day of the week match. Allows
+chaining additional field lookups.
+
+Takes an integer value representing the day of the week from 1 (Monday) to 7
+(Sunday).
+
+Example::
+
+    Entry.objects.filter(pub_date__iso_week_day=1)
+    Entry.objects.filter(pub_date__iso_week_day__gte=1)
+
+(No equivalent SQL code fragment is included for this lookup because
+implementation of the relevant query varies among different database engines.)
+
+Note this will match any record with a ``pub_date`` that falls on a Monday (day
+1 of the week), regardless of the month or year in which it occurs. Week days
+are indexed with day 1 being Monday and day 7 being Sunday.
+
+When :setting:`USE_TZ` is ``True``, datetime fields are converted to the
+current time zone before filtering. This requires :ref:`time zone definitions
+in the database <database-time-zone-definitions>`.
+
 .. fieldlookup:: quarter
 
 ``quarter``
@@ -3251,6 +3288,11 @@ SQL equivalent:
 .. code-block:: sql
 
     SELECT ... WHERE pub_date IS NULL;
+
+.. deprecated:: 3.1
+
+    Using non-boolean values as the right-hand side is deprecated, use ``True``
+    or ``False`` instead. In Django 4.0, the exception will be raised.
 
 .. fieldlookup:: regex
 

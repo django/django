@@ -1,17 +1,17 @@
 import datetime
-import re
 import uuid
 from functools import lru_cache
 
 from django.conf import settings
 from django.db.backends.base.operations import BaseDatabaseOperations
 from django.db.backends.utils import strip_quotes, truncate_name
-from django.db.models.expressions import Exists, ExpressionWrapper
-from django.db.models.query_utils import Q
+from django.db.models.expressions import Exists, ExpressionWrapper, RawSQL
+from django.db.models.sql.where import WhereNode
 from django.db.utils import DatabaseError
 from django.utils import timezone
 from django.utils.encoding import force_bytes, force_str
 from django.utils.functional import cached_property
+from django.utils.regex_helper import _lazy_re_compile
 
 from .base import Database
 from .utils import BulkInsertMapper, InsertVar, Oracle_datetime
@@ -25,6 +25,7 @@ class DatabaseOperations(BaseDatabaseOperations):
         'SmallIntegerField': (-99999999999, 99999999999),
         'IntegerField': (-99999999999, 99999999999),
         'BigIntegerField': (-9999999999999999999, 9999999999999999999),
+        'PositiveBigIntegerField': (0, 9999999999999999999),
         'PositiveSmallIntegerField': (0, 99999999999),
         'PositiveIntegerField': (0, 99999999999),
         'SmallAutoField': (-99999, 99999),
@@ -74,6 +75,8 @@ END;
         if lookup_type == 'week_day':
             # TO_CHAR(field, 'D') returns an integer from 1-7, where 1=Sunday.
             return "TO_CHAR(%s, 'D')" % field_name
+        elif lookup_type == 'iso_week_day':
+            return "TO_CHAR(%s - 1, 'D')" % field_name
         elif lookup_type == 'week':
             # IW = ISO week number
             return "TO_CHAR(%s, 'IW')" % field_name
@@ -100,7 +103,7 @@ END;
     # if the time zone name is passed in parameter. Use interpolation instead.
     # https://groups.google.com/forum/#!msg/django-developers/zwQju7hbG78/9l934yelwfsJ
     # This regexp matches all time zone names from the zoneinfo database.
-    _tzname_re = re.compile(r'^[\w/:+-]+$')
+    _tzname_re = _lazy_re_compile(r'^[\w/:+-]+$')
 
     def _prepare_tzname_delta(self, tzname):
         if '+' in tzname:
@@ -630,8 +633,10 @@ END;
         Oracle supports only EXISTS(...) or filters in the WHERE clause, others
         must be compared with True.
         """
-        if isinstance(expression, Exists):
+        if isinstance(expression, (Exists, WhereNode)):
             return True
-        if isinstance(expression, ExpressionWrapper) and isinstance(expression.expression, Q):
+        if isinstance(expression, ExpressionWrapper) and expression.conditional:
+            return self.conditional_expression_supported_in_where_clause(expression.expression)
+        if isinstance(expression, RawSQL) and expression.conditional:
             return True
         return False

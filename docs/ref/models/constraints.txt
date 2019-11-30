@@ -52,11 +52,15 @@ option.
 
 .. attribute:: CheckConstraint.check
 
-A :class:`Q` object that specifies the check you want the constraint to
-enforce.
+A :class:`Q` object or boolean :class:`~django.db.models.Expression` that
+specifies the check you want the constraint to enforce.
 
 For example, ``CheckConstraint(check=Q(age__gte=18), name='age_gte_18')``
 ensures the age field is never less than 18.
+
+.. versionchanged:: 3.1
+
+    Support for boolean :class:`~django.db.models.Expression` was added.
 
 ``name``
 --------

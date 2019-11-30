@@ -1,6 +1,7 @@
 import copy
+from unittest import mock
 
-from django.db import DEFAULT_DB_ALIAS, connections
+from django.db import DEFAULT_DB_ALIAS, connection, connections
 from django.db.backends.base.creation import (
     TEST_DATABASE_PREFIX, BaseDatabaseCreation,
 )
@@ -40,3 +41,29 @@ class TestDbSignatureTests(SimpleTestCase):
         test_connection.settings_dict['TEST'] = {'NAME': test_name}
         signature = BaseDatabaseCreation(test_connection).test_db_signature()
         self.assertEqual(signature[3], test_name)
+
+
+@mock.patch.object(connection, 'ensure_connection')
+@mock.patch('django.core.management.commands.migrate.Command.handle', return_value=None)
+class TestDbCreationTests(SimpleTestCase):
+    def test_migrate_test_setting_false(self, mocked_migrate, mocked_ensure_connection):
+        creation = connection.creation_class(connection)
+        saved_settings = copy.deepcopy(connection.settings_dict)
+        try:
+            connection.settings_dict['TEST']['MIGRATE'] = False
+            with mock.patch.object(creation, '_create_test_db'):
+                creation.create_test_db(verbosity=0, autoclobber=True, serialize=False)
+            mocked_migrate.assert_not_called()
+        finally:
+            connection.settings_dict = saved_settings
+
+    def test_migrate_test_setting_true(self, mocked_migrate, mocked_ensure_connection):
+        creation = connection.creation_class(connection)
+        saved_settings = copy.deepcopy(connection.settings_dict)
+        try:
+            connection.settings_dict['TEST']['MIGRATE'] = True
+            with mock.patch.object(creation, '_create_test_db'):
+                creation.create_test_db(verbosity=0, autoclobber=True, serialize=False)
+            mocked_migrate.assert_called_once()
+        finally:
+            connection.settings_dict = saved_settings

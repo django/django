@@ -150,6 +150,21 @@ a default value to put into existing rows. It does not affect the behavior
 of setting defaults in the database directly - Django never sets database
 defaults and always applies them in the Django ORM code.
 
+.. warning::
+
+    On older databases, adding a field with a default value may cause a full
+    rewrite of the table. This happens even for nullable fields and may have a
+    negative performance impact. To avoid that, the following steps should be
+    taken.
+
+    * Add the nullable field without the default value and run the
+      :djadmin:`makemigrations` command. This should generate a migration with
+      an ``AddField`` operation.
+
+    * Add the default value to your field and run the :djadmin:`makemigrations`
+      command. This should generate a migration with an ``AlterField``
+      operation.
+
 ``RemoveField``
 ---------------
 

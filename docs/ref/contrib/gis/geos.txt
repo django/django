@@ -730,6 +730,12 @@ Other Properties & Methods
     Notice that ``(0, 0)`` is the first and last coordinate -- if they were not
     equal, an error would be raised.
 
+    .. attribute:: is_counterclockwise
+
+        .. versionadded:: 3.1
+
+        Returns whether this ``LinearRing`` is counterclockwise.
+
 ``Polygon``
 -----------
 

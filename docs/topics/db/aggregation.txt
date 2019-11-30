@@ -199,9 +199,8 @@ modified using any other ``QuerySet`` operation, including ``filter()``,
 Combining multiple aggregations
 -------------------------------
 
-Combining multiple aggregations with ``annotate()`` will `yield the wrong
-results <https://code.djangoproject.com/ticket/10060>`_ because joins are used
-instead of subqueries:
+Combining multiple aggregations with ``annotate()`` will :ticket:`yield the
+wrong results <10060>` because joins are used instead of subqueries:
 
     >>> book = Book.objects.first()
     >>> book.authors.count()

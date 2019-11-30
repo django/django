@@ -689,6 +689,7 @@ class IntegerFieldTests(SimpleTestCase):
             biginteger = models.BigIntegerField(max_length=2)
             smallinteger = models.SmallIntegerField(max_length=2)
             positiveinteger = models.PositiveIntegerField(max_length=2)
+            positivebiginteger = models.PositiveBigIntegerField(max_length=2)
             positivesmallinteger = models.PositiveSmallIntegerField(max_length=2)
 
         for field in Model._meta.get_fields():

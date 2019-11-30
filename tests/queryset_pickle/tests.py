@@ -212,6 +212,12 @@ class PickleabilityTestCase(TestCase):
         qs = Happening.objects.annotate(latest_time=models.Max('when'))
         self.assert_pickles(qs)
 
+    def test_filter_deferred(self):
+        qs = Happening.objects.all()
+        qs._defer_next_filter = True
+        qs = qs.filter(id=0)
+        self.assert_pickles(qs)
+
     def test_missing_django_version_unpickling(self):
         """
         #21430 -- Verifies a warning is raised for querysets that are

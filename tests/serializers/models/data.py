@@ -72,6 +72,10 @@ class NullBooleanData(models.Model):
     data = models.NullBooleanField(null=True)
 
 
+class PositiveBigIntegerData(models.Model):
+    data = models.PositiveBigIntegerField(null=True)
+
+
 class PositiveIntegerData(models.Model):
     data = models.PositiveIntegerField(null=True)
 

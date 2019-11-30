@@ -250,7 +250,7 @@ class TestUtilsText(SimpleTestCase):
         actual_length = len(b''.join(seq))
         out = text.compress_sequence(seq)
         compressed_length = len(b''.join(out))
-        self.assertTrue(compressed_length < actual_length)
+        self.assertLess(compressed_length, actual_length)
 
     def test_format_lazy(self):
         self.assertEqual('django/test', format_lazy('{}/{}', 'django', lazystr('test')))

@@ -153,6 +153,7 @@ class LegacyDatabaseTests(TestCase):
         self.assertEqual(Event.objects.filter(dt__month=1).count(), 2)
         self.assertEqual(Event.objects.filter(dt__day=1).count(), 2)
         self.assertEqual(Event.objects.filter(dt__week_day=7).count(), 2)
+        self.assertEqual(Event.objects.filter(dt__iso_week_day=6).count(), 2)
         self.assertEqual(Event.objects.filter(dt__hour=1).count(), 1)
         self.assertEqual(Event.objects.filter(dt__minute=30).count(), 2)
         self.assertEqual(Event.objects.filter(dt__second=0).count(), 2)
@@ -366,6 +367,7 @@ class NewDatabaseTests(TestCase):
         self.assertEqual(Event.objects.filter(dt__month=1).count(), 2)
         self.assertEqual(Event.objects.filter(dt__day=1).count(), 2)
         self.assertEqual(Event.objects.filter(dt__week_day=7).count(), 2)
+        self.assertEqual(Event.objects.filter(dt__iso_week_day=6).count(), 2)
         self.assertEqual(Event.objects.filter(dt__hour=1).count(), 1)
         self.assertEqual(Event.objects.filter(dt__minute=30).count(), 2)
         self.assertEqual(Event.objects.filter(dt__second=0).count(), 2)
@@ -381,6 +383,7 @@ class NewDatabaseTests(TestCase):
             self.assertEqual(Event.objects.filter(dt__month=1).count(), 1)
             self.assertEqual(Event.objects.filter(dt__day=1).count(), 1)
             self.assertEqual(Event.objects.filter(dt__week_day=7).count(), 1)
+            self.assertEqual(Event.objects.filter(dt__iso_week_day=6).count(), 1)
             self.assertEqual(Event.objects.filter(dt__hour=22).count(), 1)
             self.assertEqual(Event.objects.filter(dt__minute=30).count(), 2)
             self.assertEqual(Event.objects.filter(dt__second=0).count(), 2)
@@ -966,7 +969,7 @@ class TemplateTests(SimpleTestCase):
         with self.assertRaises(pytz.UnknownTimeZoneError):
             Template("{% load tz %}{% timezone tz %}{% endtimezone %}").render(Context({'tz': 'foobar'}))
 
-    @skipIf(sys.platform.startswith('win'), "Windows uses non-standard time zone names")
+    @skipIf(sys.platform == 'win32', "Windows uses non-standard time zone names")
     def test_get_current_timezone_templatetag(self):
         """
         Test the {% get_current_timezone %} templatetag.
@@ -1006,7 +1009,7 @@ class TemplateTests(SimpleTestCase):
         with self.assertRaisesMessage(TemplateSyntaxError, msg):
             Template("{% load tz %}{% get_current_timezone %}").render()
 
-    @skipIf(sys.platform.startswith('win'), "Windows uses non-standard time zone names")
+    @skipIf(sys.platform == 'win32', "Windows uses non-standard time zone names")
     def test_tz_template_context_processor(self):
         """
         Test the django.template.context_processors.tz template context processor.

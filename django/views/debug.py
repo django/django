@@ -13,6 +13,7 @@ from django.utils import timezone
 from django.utils.datastructures import MultiValueDict
 from django.utils.encoding import force_str
 from django.utils.module_loading import import_string
+from django.utils.regex_helper import _lazy_re_compile
 from django.utils.version import get_docs_version
 
 # Minimal Django templates engine to render the error templates
@@ -24,7 +25,7 @@ DEBUG_ENGINE = Engine(
     libraries={'i18n': 'django.templatetags.i18n'},
 )
 
-HIDDEN_SETTINGS = re.compile('API|TOKEN|KEY|SECRET|PASS|SIGNATURE', flags=re.IGNORECASE)
+HIDDEN_SETTINGS = _lazy_re_compile('API|TOKEN|KEY|SECRET|PASS|SIGNATURE', flags=re.IGNORECASE)
 
 CLEANSED_SUBSTITUTE = '********************'
 
@@ -340,11 +341,7 @@ class ExceptionReporter:
         c = Context(self.get_traceback_data(), autoescape=False, use_l10n=False)
         return t.render(c)
 
-    def _get_lines_from_file(self, filename, lineno, context_lines, loader=None, module_name=None):
-        """
-        Return context_lines before and after lineno from file.
-        Return (pre_context_lineno, pre_context, context_line, post_context).
-        """
+    def _get_source(self, filename, loader, module_name):
         source = None
         if hasattr(loader, 'get_source'):
             try:
@@ -359,6 +356,14 @@ class ExceptionReporter:
                     source = fp.read().splitlines()
             except OSError:
                 pass
+        return source
+
+    def _get_lines_from_file(self, filename, lineno, context_lines, loader=None, module_name=None):
+        """
+        Return context_lines before and after lineno from file.
+        Return (pre_context_lineno, pre_context, context_line, post_context).
+        """
+        source = self._get_source(filename, loader, module_name)
         if source is None:
             return None, [], None, []
 
@@ -379,10 +384,12 @@ class ExceptionReporter:
         lower_bound = max(0, lineno - context_lines)
         upper_bound = lineno + context_lines
 
-        pre_context = source[lower_bound:lineno]
-        context_line = source[lineno]
-        post_context = source[lineno + 1:upper_bound]
-
+        try:
+            pre_context = source[lower_bound:lineno]
+            context_line = source[lineno]
+            post_context = source[lineno + 1:upper_bound]
+        except IndexError:
+            return None, [], None, []
         return lower_bound, pre_context, context_line, post_context
 
     def get_traceback_frames(self):

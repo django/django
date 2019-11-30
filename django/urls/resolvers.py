@@ -21,7 +21,7 @@ from django.core.exceptions import ImproperlyConfigured, ViewDoesNotExist
 from django.utils.datastructures import MultiValueDict
 from django.utils.functional import cached_property
 from django.utils.http import RFC3986_SUBDELIMS, escape_leading_slashes
-from django.utils.regex_helper import normalize
+from django.utils.regex_helper import _lazy_re_compile, normalize
 from django.utils.translation import get_language
 
 from .converters import get_converter
@@ -195,7 +195,7 @@ class RegexPattern(CheckURLMixin):
         return str(self._regex)
 
 
-_PATH_PARAMETER_COMPONENT_RE = re.compile(
+_PATH_PARAMETER_COMPONENT_RE = _lazy_re_compile(
     r'<(?:(?P<converter>[^>:]+):)?(?P<parameter>\w+)>'
 )
 

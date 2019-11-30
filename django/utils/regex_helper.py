@@ -5,6 +5,10 @@ Used internally by Django and not intended for external use.
 This is not, and is not intended to be, a complete reg-exp decompiler. It
 should be good enough for a large class of URLS, however.
 """
+import re
+
+from django.utils.functional import SimpleLazyObject
+
 # Mapping of an escape character to a representative of that class. So, e.g.,
 # "\w" is replaced by "x" in a reverse URL. A value of None means to ignore
 # this sequence. Any missing key is mapped to itself.
@@ -331,3 +335,17 @@ def flatten_result(source):
         for i in range(len(result)):
             result[i] += piece
     return result, result_args
+
+
+def _lazy_re_compile(regex, flags=0):
+    """Lazily compile a regex with flags."""
+    def _compile():
+        # Compile the regex if it was not passed pre-compiled.
+        if isinstance(regex, (str, bytes)):
+            return re.compile(regex, flags)
+        else:
+            assert not flags, (
+                'flags must be empty if regex is passed pre-compiled'
+            )
+            return regex
+    return SimpleLazyObject(_compile)

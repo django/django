@@ -163,7 +163,7 @@ class CsrfViewMiddleware(MiddlewareMixin):
                 raise ImproperlyConfigured(
                     'CSRF_USE_SESSIONS is enabled, but request.session is not '
                     'set. SessionMiddleware must appear before CsrfViewMiddleware '
-                    'in MIDDLEWARE%s.' % ('_CLASSES' if settings.MIDDLEWARE is None else '')
+                    'in MIDDLEWARE.'
                 )
         else:
             try:

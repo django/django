@@ -5,6 +5,7 @@ import tempfile
 import time
 import warnings
 from io import StringIO
+from pathlib import Path
 from unittest import mock, skipIf, skipUnless
 
 from admin_scripts.tests import AdminScriptTestCase
@@ -735,11 +736,17 @@ class CustomLayoutExtractionTests(ExtractorTests):
             management.call_command('makemessages', locale=LOCALE, verbosity=0)
 
     def test_project_locale_paths(self):
+        self._test_project_locale_paths(os.path.join(self.test_dir, 'project_locale'))
+
+    def test_project_locale_paths_pathlib(self):
+        self._test_project_locale_paths(Path(self.test_dir) / 'project_locale')
+
+    def _test_project_locale_paths(self, locale_path):
         """
         * translations for an app containing a locale folder are stored in that folder
         * translations outside of that app are in LOCALE_PATHS[0]
         """
-        with override_settings(LOCALE_PATHS=[os.path.join(self.test_dir, 'project_locale')]):
+        with override_settings(LOCALE_PATHS=[locale_path]):
             management.call_command('makemessages', locale=[LOCALE], verbosity=0)
             project_de_locale = os.path.join(
                 self.test_dir, 'project_locale', 'de', 'LC_MESSAGES', 'django.po')

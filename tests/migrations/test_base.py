@@ -50,10 +50,10 @@ class MigrationTestBase(TransactionTestCase):
         return [c.null_ok for c in self.get_table_description(table, using=using) if c.name == column][0]
 
     def assertColumnNull(self, table, column, using='default'):
-        self.assertEqual(self._get_column_allows_null(table, column, using), True)
+        self.assertTrue(self._get_column_allows_null(table, column, using))
 
     def assertColumnNotNull(self, table, column, using='default'):
-        self.assertEqual(self._get_column_allows_null(table, column, using), False)
+        self.assertFalse(self._get_column_allows_null(table, column, using))
 
     def assertIndexExists(self, table, columns, value=True, using='default', index_type=None):
         with connections[using].cursor() as cursor:

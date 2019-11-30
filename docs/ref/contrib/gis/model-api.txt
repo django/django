@@ -205,7 +205,7 @@ three-dimensional support.
 
 .. note::
 
-    At this time 3D support is limited to the PostGIS spatial backend.
+    At this time 3D support is limited to the PostGIS and SpatiaLite backends.
 
 ``geography``
 -------------

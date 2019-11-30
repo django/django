@@ -229,8 +229,8 @@ class CallbackFilterTest(SimpleTestCase):
         f_false = CallbackFilter(lambda r: False)
         f_true = CallbackFilter(lambda r: True)
 
-        self.assertEqual(f_false.filter("record"), False)
-        self.assertEqual(f_true.filter("record"), True)
+        self.assertFalse(f_false.filter('record'))
+        self.assertTrue(f_true.filter('record'))
 
     def test_passes_on_record(self):
         collector = []

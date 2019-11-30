@@ -124,14 +124,17 @@ def lang_stats(resources=None, languages=None):
             p = run(
                 ['msgfmt', '-vc', '-o', '/dev/null', po_path],
                 stdout=PIPE, stderr=PIPE,
-                env={'LANG': 'C'}
+                env={'LANG': 'C'},
+                encoding='utf-8',
             )
             if p.returncode == 0:
                 # msgfmt output stats on stderr
-                print("%s: %s" % (lang, p.stderr.decode().strip()))
+                print('%s: %s' % (lang, p.stderr.strip()))
             else:
-                print("Errors happened when checking %s translation for %s:\n%s" % (
-                    lang, name, p.stderr.decode()))
+                print(
+                    'Errors happened when checking %s translation for %s:\n%s'
+                    % (lang, name, p.stderr)
+                )
 
 
 def fetch(resources=None, languages=None):

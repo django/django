@@ -12,17 +12,20 @@ Usage:
 """
 import calendar
 import datetime
-import re
 import time
+from email.utils import format_datetime as format_datetime_rfc5322
 
 from django.utils.dates import (
     MONTHS, MONTHS_3, MONTHS_ALT, MONTHS_AP, WEEKDAYS, WEEKDAYS_ABBR,
 )
-from django.utils.timezone import get_default_timezone, is_aware, is_naive
+from django.utils.regex_helper import _lazy_re_compile
+from django.utils.timezone import (
+    get_default_timezone, is_aware, is_naive, make_aware,
+)
 from django.utils.translation import gettext as _
 
-re_formatchars = re.compile(r'(?<!\\)([aAbBcdDeEfFgGhHiIjlLmMnNoOPrsStTUuwWyYzZ])')
-re_escaped = re.compile(r'\\(.)')
+re_formatchars = _lazy_re_compile(r'(?<!\\)([aAbcdDeEfFgGhHiIjlLmMnNoOPrsStTUuwWyYzZ])')
+re_escaped = _lazy_re_compile(r'\\(.)')
 
 
 class Formatter:
@@ -67,10 +70,6 @@ class TimeFormat(Formatter):
         if self.data.hour > 11:
             return _('PM')
         return _('AM')
-
-    def B(self):
-        "Swatch Internet time"
-        raise NotImplementedError('may be implemented in a future release')
 
     def e(self):
         """
@@ -208,8 +207,6 @@ class TimeFormat(Formatter):
 
 
 class DateFormat(TimeFormat):
-    year_days = [None, 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334]
-
     def b(self):
         "Month, textual, 3 letters, lowercase; e.g. 'jan'"
         return MONTHS_3[self.data.month]
@@ -284,7 +281,16 @@ class DateFormat(TimeFormat):
 
     def r(self):
         "RFC 5322 formatted date; e.g. 'Thu, 21 Dec 2000 16:01:07 +0200'"
-        return self.format('D, j M Y H:i:s O')
+        if type(self.data) is datetime.date:
+            raise TypeError(
+                "The format for date objects may not contain time-related "
+                "format specifiers (found 'r')."
+            )
+        if is_naive(self.data):
+            dt = make_aware(self.data, timezone=self.timezone)
+        else:
+            dt = self.data
+        return format_datetime_rfc5322(dt)
 
     def S(self):
         "English ordinal suffix for the day of the month, 2 characters; i.e. 'st', 'nd', 'rd' or 'th'"
@@ -316,28 +322,7 @@ class DateFormat(TimeFormat):
 
     def W(self):
         "ISO-8601 week number of year, weeks starting on Monday"
-        # Algorithm from http://www.personal.ecu.edu/mccartyr/ISOwdALG.txt
-        jan1_weekday = self.data.replace(month=1, day=1).weekday() + 1
-        weekday = self.data.weekday() + 1
-        day_of_year = self.z()
-        if day_of_year <= (8 - jan1_weekday) and jan1_weekday > 4:
-            if jan1_weekday == 5 or (jan1_weekday == 6 and calendar.isleap(self.data.year - 1)):
-                week_number = 53
-            else:
-                week_number = 52
-        else:
-            if calendar.isleap(self.data.year):
-                i = 366
-            else:
-                i = 365
-            if (i - day_of_year) < (4 - weekday):
-                week_number = 1
-            else:
-                j = day_of_year + (7 - weekday) + (jan1_weekday - 1)
-                week_number = j // 7
-                if jan1_weekday > 4:
-                    week_number -= 1
-        return week_number
+        return self.data.isocalendar()[1]
 
     def y(self):
         "Year, 2 digits; e.g. '99'"
@@ -348,11 +333,8 @@ class DateFormat(TimeFormat):
         return self.data.year
 
     def z(self):
-        "Day of the year; i.e. '0' to '365'"
-        doy = self.year_days[self.data.month] + self.data.day
-        if self.L() and self.data.month > 2:
-            doy += 1
-        return doy
+        """Day of the year, i.e. 1 to 366."""
+        return self.data.timetuple().tm_yday
 
 
 def format(value, format_string):

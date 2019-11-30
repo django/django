@@ -139,7 +139,7 @@ class ContentType(models.Model):
         verbose_name = _('content type')
         verbose_name_plural = _('content types')
         db_table = 'django_content_type'
-        unique_together = (('app_label', 'model'),)
+        unique_together = [['app_label', 'model']]
 
     def __str__(self):
         return self.app_labeled_name

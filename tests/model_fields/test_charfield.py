@@ -40,8 +40,8 @@ class TestCharField(TestCase):
         self.assertEqual(p1.title, Event.C)
         self.assertEqual(p1.body, Event.F)
         p2 = Post.objects.get(title='Carnival!')
-        self.assertEquals(p1, p2)
-        self.assertEquals(p2.title, Event.C)
+        self.assertEqual(p1, p2)
+        self.assertEqual(p2.title, Event.C)
 
 
 class ValidationTests(SimpleTestCase):

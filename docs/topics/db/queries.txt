@@ -40,8 +40,8 @@ models, which comprise a Weblog application:
         pub_date = models.DateField()
         mod_date = models.DateField()
         authors = models.ManyToManyField(Author)
-        n_comments = models.IntegerField()
-        n_pingbacks = models.IntegerField()
+        number_of_comments = models.IntegerField()
+        number_of_pingbacks = models.IntegerField()
         rating = models.IntegerField()
 
         def __str__(self):
@@ -625,20 +625,20 @@ than pingbacks, we construct an ``F()`` object to reference the pingback count,
 and use that ``F()`` object in the query::
 
     >>> from django.db.models import F
-    >>> Entry.objects.filter(n_comments__gt=F('n_pingbacks'))
+    >>> Entry.objects.filter(number_of_comments__gt=F('number_of_pingbacks'))
 
 Django supports the use of addition, subtraction, multiplication,
 division, modulo, and power arithmetic with ``F()`` objects, both with constants
 and with other ``F()`` objects. To find all the blog entries with more than
 *twice* as many comments as pingbacks, we modify the query::
 
-    >>> Entry.objects.filter(n_comments__gt=F('n_pingbacks') * 2)
+    >>> Entry.objects.filter(number_of_comments__gt=F('number_of_pingbacks') * 2)
 
 To find all the entries where the rating of the entry is less than the
 sum of the pingback count and comment count, we would issue the
 query::
 
-    >>> Entry.objects.filter(rating__lt=F('n_comments') + F('n_pingbacks'))
+    >>> Entry.objects.filter(rating__lt=F('number_of_comments') + F('number_of_pingbacks'))
 
 You can also use the double underscore notation to span relationships in
 an ``F()`` object. An ``F()`` object with a double underscore will introduce
@@ -1051,7 +1051,7 @@ update one field based on the value of another field in the model. This is
 especially useful for incrementing counters based upon their current value. For
 example, to increment the pingback count for every entry in the blog::
 
-    >>> Entry.objects.all().update(n_pingbacks=F('n_pingbacks') + 1)
+    >>> Entry.objects.all().update(number_of_pingbacks=F('number_of_pingbacks') + 1)
 
 However, unlike ``F()`` objects in filter and exclude clauses, you can't
 introduce joins when you use ``F()`` objects in an update -- you can only

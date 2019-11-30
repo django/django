@@ -22,8 +22,9 @@ for the previous LTS, Django 1.11, will end in April 2020.
 Python compatibility
 ====================
 
-Django 2.2 supports Python 3.5, 3.6, and 3.7. We **highly recommend** and only
-officially support the latest release of each series.
+Django 2.2 supports Python 3.5, 3.6, 3.7, and 3.8 (as of 2.2.8). We
+**highly recommend** and only officially support the latest release of each
+series.
 
 .. _whats-new-2.2:
 
@@ -469,6 +470,9 @@ Miscellaneous
   with errors like ``no such table: <app_label>_<model>``. This was observed
   with several third-party apps that had models in tests without migrations.
   You must add migrations for such models.
+
+* Providing an integer in the ``key`` argument of the :meth:`.cache.delete` or
+  :meth:`.cache.get` now raises :exc:`ValueError`.
 
 .. _deprecated-features-2.2:
 

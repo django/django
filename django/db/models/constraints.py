@@ -30,10 +30,15 @@ class BaseConstraint:
 class CheckConstraint(BaseConstraint):
     def __init__(self, *, check, name):
         self.check = check
+        if not getattr(check, 'conditional', False):
+            raise TypeError(
+                'CheckConstraint.check must be a Q instance or boolean '
+                'expression.'
+            )
         super().__init__(name)
 
     def _get_check_sql(self, model, schema_editor):
-        query = Query(model=model)
+        query = Query(model=model, alias_cols=False)
         where = query.build_where(self.check)
         compiler = query.get_compiler(connection=schema_editor.connection)
         sql, params = where.as_sql(compiler, schema_editor.connection)
@@ -54,11 +59,9 @@ class CheckConstraint(BaseConstraint):
         return "<%s: check='%s' name=%r>" % (self.__class__.__name__, self.check, self.name)
 
     def __eq__(self, other):
-        return (
-            isinstance(other, CheckConstraint) and
-            self.name == other.name and
-            self.check == other.check
-        )
+        if isinstance(other, CheckConstraint):
+            return self.name == other.name and self.check == other.check
+        return super().__eq__(other)
 
     def deconstruct(self):
         path, args, kwargs = super().deconstruct()
@@ -79,7 +82,7 @@ class UniqueConstraint(BaseConstraint):
     def _get_condition_sql(self, model, schema_editor):
         if self.condition is None:
             return None
-        query = Query(model=model)
+        query = Query(model=model, alias_cols=False)
         where = query.build_where(self.condition)
         compiler = query.get_compiler(connection=schema_editor.connection)
         sql, params = where.as_sql(compiler, schema_editor.connection)
@@ -106,12 +109,13 @@ class UniqueConstraint(BaseConstraint):
         )
 
     def __eq__(self, other):
-        return (
-            isinstance(other, UniqueConstraint) and
-            self.name == other.name and
-            self.fields == other.fields and
-            self.condition == other.condition
-        )
+        if isinstance(other, UniqueConstraint):
+            return (
+                self.name == other.name and
+                self.fields == other.fields and
+                self.condition == other.condition
+            )
+        return super().__eq__(other)
 
     def deconstruct(self):
         path, args, kwargs = super().deconstruct()

@@ -739,6 +739,17 @@ The creation-order dependencies of the database. See the documentation
 on :ref:`controlling the creation order of test databases
 <topics-testing-creation-dependencies>` for details.
 
+.. setting:: TEST_MIGRATE
+
+``MIGRATE``
+^^^^^^^^^^^
+
+.. versionadded:: 3.1
+
+Default: ``True``
+
+When set to ``False``, migrations won't run when creating the test database.
+
 .. setting:: TEST_MIRROR
 
 ``MIRROR``
@@ -1280,7 +1291,12 @@ The backend to use for sending emails. For the list of available backends see
 
 Default: Not defined
 
-The directory used by the ``file`` email backend to store output files.
+The directory used by the :ref:`file email backend <topic-email-file-backend>`
+to store output files.
+
+.. versionchanged:: 3.1
+
+    Support for :class:`pathlib.Path` was added.
 
 .. setting:: EMAIL_HOST
 
@@ -2029,9 +2045,12 @@ automatically create the package if it doesn't already exist.
 When you supply ``None`` as a value for an app, Django will consider the app as
 an app without migrations regardless of an existing ``migrations`` submodule.
 This can be used, for example, in a test settings file to skip migrations while
-testing (tables will still be created for the apps' models). If this is used in
-your general project settings, remember to use the :option:`migrate
---run-syncdb` option if you want to create tables for the app.
+testing (tables will still be created for the apps' models). To disable
+migrations for all apps during tests, you can set the
+:setting:`MIGRATE <TEST_MIGRATE>` to ``False`` instead. If
+``MIGRATION_MODULES`` is used in your general project settings, remember to use
+the :option:`migrate --run-syncdb` option if you want to create tables for the
+app.
 
 .. setting:: MONTH_DAY_FORMAT
 
@@ -2306,8 +2325,11 @@ available in ``request.META``.)
 Default: ``[]`` (Empty list)
 
 If a URL path matches a regular expression in this list, the request will not be
-redirected to HTTPS. If :setting:`SECURE_SSL_REDIRECT` is ``False``, this
-setting has no effect.
+redirected to HTTPS. The
+:class:`~django.middleware.security.SecurityMiddleware` strips leading slashes
+from URL paths, so patterns shouldn't include them, e.g.
+``SECURE_REDIRECT_EXEMPT = [r'^no-ssl/$', …]``. If
+:setting:`SECURE_SSL_REDIRECT` is ``False``, this setting has no effect.
 
 .. setting:: SECURE_REFERRER_POLICY
 
@@ -2737,7 +2759,7 @@ preference to the ``Host`` header. This should only be enabled if a proxy
 which sets this header is in use.
 
 This setting takes priority over :setting:`USE_X_FORWARDED_PORT`. Per
-:rfc:`7239#page-7`, the ``X-Forwarded-Host`` header can include the port
+:rfc:`7239#section-5.3`, the ``X-Forwarded-Host`` header can include the port
 number, in which case you shouldn't use :setting:`USE_X_FORWARDED_PORT`.
 
 .. setting:: USE_X_FORWARDED_PORT
@@ -3086,8 +3108,8 @@ Whether to use ``HttpOnly`` flag on the session cookie. If this is set to
 cookie.
 
 HttpOnly_ is a flag included in a Set-Cookie HTTP response header. It's part of
-the :rfc:`6265` standard for cookies and can be a useful way to mitigate the
-risk of a client-side script accessing the protected cookie data.
+the :rfc:`6265#section-4.1.2.6` standard for cookies and can be a useful way to
+mitigate the risk of a client-side script accessing the protected cookie data.
 
 This makes it less trivial for an attacker to escalate a cross-site scripting
 vulnerability into full hijacking of a user's session. There aren't many good

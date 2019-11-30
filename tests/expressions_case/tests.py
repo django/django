@@ -833,6 +833,19 @@ class CaseExpressionTests(TestCase):
             transform=attrgetter('integer', 'null_boolean_old')
         )
 
+    def test_update_positive_big_integer(self):
+        CaseTestModel.objects.update(
+            positive_big_integer=Case(
+                When(integer=1, then=1),
+                When(integer=2, then=2),
+            ),
+        )
+        self.assertQuerysetEqual(
+            CaseTestModel.objects.all().order_by('pk'),
+            [(1, 1), (2, 2), (3, None), (2, 2), (3, None), (3, None), (4, None)],
+            transform=attrgetter('integer', 'positive_big_integer')
+        )
+
     def test_update_positive_integer(self):
         CaseTestModel.objects.update(
             positive_integer=Case(

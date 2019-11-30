@@ -43,6 +43,11 @@ need to distinguish caches by the ``Accept-language`` header.
     * All other parameters are added with their value, after applying
       ``str()`` to it.
 
+    .. versionchanged:: 3.1
+
+        Support for multiple field names in the ``no-cache`` directive was
+        added.
+
 .. function:: get_max_age(response)
 
     Returns the max-age from the response Cache-Control header as an integer
@@ -134,6 +139,10 @@ The functions defined in this module share the following properties:
     UTC offsets aren't supported; if ``value`` describes one, the result is
     ``None``.
 
+    .. versionchanged:: 3.1
+
+        Support for comma separators for milliseconds was added.
+
 .. function:: parse_datetime(value)
 
     Parses a string and returns a :class:`datetime.datetime`.
@@ -141,13 +150,23 @@ The functions defined in this module share the following properties:
     UTC offsets are supported; if ``value`` describes one, the result's
     ``tzinfo`` attribute is a :class:`datetime.timezone` instance.
 
+    .. versionchanged:: 3.1
+
+        Support for comma separators for milliseconds was added.
+
 .. function:: parse_duration(value)
 
     Parses a string and returns a :class:`datetime.timedelta`.
 
-    Expects data in the format ``"DD HH:MM:SS.uuuuuu"`` or as specified by ISO
-    8601 (e.g. ``P4DT1H15M20S`` which is equivalent to ``4 1:15:20``) or
-    PostgreSQL's day-time interval format (e.g. ``3 days 04:05:06``).
+    Expects data in the format ``"DD HH:MM:SS.uuuuuu"``,
+    ``"DD HH:MM:SS,uuuuuu"``,  or as specified by ISO 8601 (e.g.
+    ``P4DT1H15M20S`` which is equivalent to ``4 1:15:20``) or PostgreSQL's
+    day-time interval format (e.g. ``3 days 04:05:06``).
+
+    .. versionchanged:: 3.1
+
+        Support for comma separators for decimal fractions in the ISO 8601
+        format and for the format ``"DD HH:MM:SS,uuuuuu"`` was added.
 
 ``django.utils.decorators``
 ===========================
@@ -275,7 +294,8 @@ The functions defined in this module share the following properties:
 .. function:: filepath_to_uri(path)
 
     Convert a file system path to a URI portion that is suitable for inclusion
-    in a URL. The path is assumed to be either UTF-8 bytes or string.
+    in a URL. The path is assumed to be either UTF-8 bytes, string, or a
+    :class:`~pathlib.Path`.
 
     This method will encode certain characters that would normally be
     recognized as special characters for URIs.  Note that this method does not
@@ -283,6 +303,10 @@ The functions defined in this module share the following properties:
     ``encodeURIComponent()`` JavaScript function for more details.
 
     Returns an ASCII string containing the encoded result.
+
+    .. versionchanged:: 3.1
+
+        Support for :class:`pathlib.Path` ``path`` was added.
 
 .. function:: escape_uri_path(path)
 
@@ -689,8 +713,8 @@ escaping HTML.
 
 .. function:: http_date(epoch_seconds=None)
 
-    Formats the time to match the :rfc:`1123` date format as specified by HTTP
-    :rfc:`7231#section-7.1.1.1`.
+    Formats the time to match the :rfc:`1123#section-5.2.14` date format as
+    specified by HTTP :rfc:`7231#section-7.1.1.1`.
 
     Accepts a floating point number expressed in seconds since the epoch in
     UTC--such as that outputted by ``time.time()``. If set to ``None``,
@@ -945,11 +969,14 @@ appropriate entities.
     post-transition respectively.
 
     The ``pytz.NonExistentTimeError`` exception is raised if you try to make
-    ``value`` aware during a DST transition such that the time never occurred
-    (when entering into DST). Setting ``is_dst`` to ``True`` or ``False`` will
-    avoid the exception by moving the hour backwards or forwards by 1
-    respectively. For example, ``is_dst=True`` would change a nonexistent
-    time of 2:30 to 1:30 and ``is_dst=False`` would change the time to 3:30.
+    ``value`` aware during a DST transition such that the time never occurred.
+    For example, if the 2:00 hour is skipped during a DST transition, trying to
+    make 2:30 aware in that time zone will raise an exception. To avoid that
+    you can use ``is_dst`` to specify how ``make_aware()`` should interpret
+    such a nonexistent time. If ``is_dst=True`` then the above time would be
+    interpreted as 2:30 DST time (equivalent to 1:30 local time). Conversely,
+    if ``is_dst=False`` the time would be interpreted as 2:30 standard time
+    (equivalent to 3:30 local time).
 
 .. function:: make_naive(value, timezone=None)
 

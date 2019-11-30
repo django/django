@@ -235,7 +235,7 @@ class SpecializedFieldTest(SimpleTestCase):
         ogr.transform(3857)
         self.assertIn(escape(ogr.json), rendered)
 
-    # map_srid in operlayers.html template must not be localized.
+    # map_srid in openlayers.html template must not be localized.
     @override_settings(USE_L10N=True, USE_THOUSAND_SEPARATOR=True)
     def test_pointfield(self):
         class PointForm(forms.Form):

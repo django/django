@@ -11,8 +11,8 @@ does the same thing as ``django-admin`` but also sets the
 project's ``settings.py`` file.
 
 The ``django-admin`` script should be on your system path if you installed
-Django via its ``setup.py`` utility. If it's not on your path, you can find it
-in ``site-packages/django/bin`` within your Python installation. Consider
+Django via ``pip``. If it's not on your path, you can find it in
+``site-packages/django/bin`` within your Python installation. Consider
 symlinking it from some place on your path, such as ``/usr/local/bin``.
 
 For Windows users, who do not have symlinking functionality available, you can
@@ -221,6 +221,12 @@ program manually.
 .. django-admin-option:: --database DATABASE
 
 Specifies the database onto which to open a shell. Defaults to ``default``.
+
+.. note::
+
+    Be aware that not all options set it in the :setting:`OPTIONS` part of your
+    database configuration in :setting:`DATABASES` are passed to the
+    command-line client, e.g. ``'isolation_level'``.
 
 ``diffsettings``
 ----------------
@@ -802,8 +808,16 @@ The behavior of this command changes depending on the arguments provided:
 * ``<app_label> <migrationname>``: Brings the database schema to a state where
   the named migration is applied, but no later migrations in the same app are
   applied. This may involve unapplying migrations if you have previously
-  migrated past the named migration. Use the name ``zero`` to unapply all
+  migrated past the named migration. You can use a prefix of the migration
+  name, e.g. ``0001``, as long as it's unique for the given app name. Use the
+  name ``zero`` to migrate all the way back i.e. to revert all applied
   migrations for an app.
+
+.. warning::
+
+    When unapplying migrations, all dependent migrations will also be
+    unapplied, regardless of ``<app_label>``. You can use ``--plan`` to check
+    which migrations will be unapplied.
 
 .. django-admin-option:: --database DATABASE
 
@@ -1357,8 +1371,9 @@ Preserves the test database between test runs. This has the advantage of
 skipping both the create and destroy actions which can greatly decrease the
 time to run tests, especially those in a large test suite. If the test database
 does not exist, it will be created on the first run and then preserved for each
-subsequent run. Any unapplied migrations will also be applied to the test
-database before running the test suite.
+subsequent run. Unless the :setting:`MIGRATE <TEST_MIGRATE>` test setting is
+``False``, any unapplied migrations will also be applied to the test database
+before running the test suite.
 
 .. django-admin-option:: --reverse, -r
 
@@ -1393,6 +1408,12 @@ will reduce the number of processes accordingly.
 Each process gets its own database. You must ensure that different test cases
 don't access the same resources. For instance, test cases that touch the
 filesystem should create a temporary directory for their own use.
+
+.. note::
+
+    If you have test classes that cannot be run in parallel, you can use
+    ``SerializeMixin`` to run them sequentially. See :ref:`Enforce running test
+    classes sequentially <topics-testing-enforce-run-sequentially>`.
 
 This option requires the third-party ``tblib`` package to display tracebacks
 correctly:

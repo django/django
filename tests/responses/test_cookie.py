@@ -114,4 +114,4 @@ class DeleteCookieTests(SimpleTestCase):
             with self.subTest(prefix=prefix):
                 cookie_name = '__%s-c' % prefix
                 response.delete_cookie(cookie_name)
-                self.assertEqual(response.cookies[cookie_name]['secure'], True)
+                self.assertIs(response.cookies[cookie_name]['secure'], True)

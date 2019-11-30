@@ -10,6 +10,7 @@ import tempfile
 import threading
 import time
 import unittest
+from pathlib import Path
 from unittest import mock
 
 from django.conf import settings
@@ -104,7 +105,7 @@ class DummyCacheTests(SimpleTestCase):
         "Cache deletion is transparently ignored on the dummy cache backend"
         cache.set_many({'key1': 'spam', 'key2': 'eggs'})
         self.assertIsNone(cache.get("key1"))
-        cache.delete("key1")
+        self.assertFalse(cache.delete("key1"))
         self.assertIsNone(cache.get("key1"))
         self.assertIsNone(cache.get("key2"))
 
@@ -219,7 +220,7 @@ class DummyCacheTests(SimpleTestCase):
 
     def test_get_or_set(self):
         self.assertEqual(cache.get_or_set('mykey', 'default'), 'default')
-        self.assertEqual(cache.get_or_set('mykey', None), None)
+        self.assertIsNone(cache.get_or_set('mykey', None))
 
     def test_get_or_set_callable(self):
         def my_callable():
@@ -314,9 +315,12 @@ class BaseCacheTests:
         # Cache keys can be deleted
         cache.set_many({'key1': 'spam', 'key2': 'eggs'})
         self.assertEqual(cache.get("key1"), "spam")
-        cache.delete("key1")
+        self.assertTrue(cache.delete("key1"))
         self.assertIsNone(cache.get("key1"))
         self.assertEqual(cache.get("key2"), "eggs")
+
+    def test_delete_nonexistent(self):
+        self.assertFalse(cache.delete('nonexistent_key'))
 
     def test_has_key(self):
         # The cache can be inspected for cache keys
@@ -740,25 +744,25 @@ class BaseCacheTests:
     def test_cache_versioning_delete(self):
         cache.set('answer1', 37, version=1)
         cache.set('answer1', 42, version=2)
-        cache.delete('answer1')
+        self.assertTrue(cache.delete('answer1'))
         self.assertIsNone(cache.get('answer1', version=1))
         self.assertEqual(cache.get('answer1', version=2), 42)
 
         cache.set('answer2', 37, version=1)
         cache.set('answer2', 42, version=2)
-        cache.delete('answer2', version=2)
+        self.assertTrue(cache.delete('answer2', version=2))
         self.assertEqual(cache.get('answer2', version=1), 37)
         self.assertIsNone(cache.get('answer2', version=2))
 
         cache.set('answer3', 37, version=1)
         cache.set('answer3', 42, version=2)
-        caches['v2'].delete('answer3')
+        self.assertTrue(caches['v2'].delete('answer3'))
         self.assertEqual(cache.get('answer3', version=1), 37)
         self.assertIsNone(cache.get('answer3', version=2))
 
         cache.set('answer4', 37, version=1)
         cache.set('answer4', 42, version=2)
-        caches['v2'].delete('answer4', version=1)
+        self.assertTrue(caches['v2'].delete('answer4', version=1))
         self.assertIsNone(cache.get('answer4', version=1))
         self.assertEqual(cache.get('answer4', version=2), 42)
 
@@ -947,7 +951,7 @@ class BaseCacheTests:
         self.assertIsNone(cache.get('projector'))
         self.assertEqual(cache.get_or_set('projector', 42), 42)
         self.assertEqual(cache.get('projector'), 42)
-        self.assertEqual(cache.get_or_set('null', None), None)
+        self.assertIsNone(cache.get_or_set('null', None))
 
     def test_get_or_set_callable(self):
         def my_callable():
@@ -1422,18 +1426,21 @@ class FileBasedCacheTests(BaseCacheTests, TestCase):
 
     def setUp(self):
         super().setUp()
-        self.dirname = tempfile.mkdtemp()
+        self.dirname = self.mkdtemp()
         # Caches location cannot be modified through override_settings / modify_settings,
         # hence settings are manipulated directly here and the setting_changed signal
         # is triggered manually.
         for cache_params in settings.CACHES.values():
-            cache_params.update({'LOCATION': self.dirname})
+            cache_params['LOCATION'] = self.dirname
         setting_changed.send(self.__class__, setting='CACHES', enter=False)
 
     def tearDown(self):
         super().tearDown()
         # Call parent first, as cache.clear() may recreate cache base directory
         shutil.rmtree(self.dirname)
+
+    def mkdtemp(self):
+        return tempfile.mkdtemp()
 
     def test_ignores_non_cache_files(self):
         fname = os.path.join(self.dirname, 'not-a-cache-file')
@@ -1471,6 +1478,12 @@ class FileBasedCacheTests(BaseCacheTests, TestCase):
             fh.write(b'')
         with open(cache_file, 'rb') as fh:
             self.assertIs(cache._is_expired(fh), True)
+
+
+class FileBasedCachePathLibTests(FileBasedCacheTests):
+    def mkdtemp(self):
+        tmp_dir = super().mkdtemp()
+        return Path(tmp_dir)
 
 
 @override_settings(CACHES={
@@ -1700,7 +1713,17 @@ class CacheUtils(SimpleTestCase):
             # Initial Cache-Control, kwargs to patch_cache_control, expected Cache-Control parts
             (None, {'private': True}, {'private'}),
             ('', {'private': True}, {'private'}),
-
+            # no-cache.
+            ('', {'no_cache': 'Set-Cookie'}, {'no-cache=Set-Cookie'}),
+            ('', {'no-cache': 'Set-Cookie'}, {'no-cache=Set-Cookie'}),
+            ('no-cache=Set-Cookie', {'no_cache': True}, {'no-cache'}),
+            ('no-cache=Set-Cookie,no-cache=Link', {'no_cache': True}, {'no-cache'}),
+            ('no-cache=Set-Cookie', {'no_cache': 'Link'}, {'no-cache=Set-Cookie', 'no-cache=Link'}),
+            (
+                'no-cache=Set-Cookie,no-cache=Link',
+                {'no_cache': 'Custom'},
+                {'no-cache=Set-Cookie', 'no-cache=Link', 'no-cache=Custom'},
+            ),
             # Test whether private/public attributes are mutually exclusive
             ('private', {'private': True}, {'private'}),
             ('private', {'public': True}, {'public'}),

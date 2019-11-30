@@ -1,7 +1,7 @@
 from unittest import mock
 
 from django.db import transaction
-from django.test import TestCase, skipUnlessDBFeature
+from django.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
 
 from .models import (
     Article, InheritedArticleA, InheritedArticleB, Publication, User,
@@ -104,6 +104,12 @@ class ManyToManyTests(TestCase):
         a5.authors.remove(user_2.username)
         self.assertQuerysetEqual(a5.authors.all(), [])
 
+    def test_add_remove_invalid_type(self):
+        msg = "Field 'id' expected a number but got 'invalid'."
+        for method in ['add', 'remove']:
+            with self.subTest(method), self.assertRaisesMessage(ValueError, msg):
+                getattr(self.a1.publications, method)('invalid')
+
     def test_reverse_add(self):
         # Adding via the 'other' end of an m2m
         a5 = Article(headline='NASA finds intelligent life on Mars')
@@ -151,6 +157,14 @@ class ManyToManyTests(TestCase):
         """
         with self.assertNumQueries(1):
             self.a1.publications.add(self.p1, self.p2)
+
+    @skipIfDBFeature('supports_ignore_conflicts')
+    def test_add_existing_different_type(self):
+        # A single SELECT query is necessary to compare existing values to the
+        # provided one; no INSERT should be attempted.
+        with self.assertNumQueries(1):
+            self.a1.publications.add(str(self.p1.pk))
+        self.assertEqual(self.a1.publications.get(), self.p1)
 
     @skipUnlessDBFeature('supports_ignore_conflicts')
     def test_slow_add_ignore_conflicts(self):

@@ -282,9 +282,9 @@ class BaseDatabaseSchemaEditor:
             default = field.get_default()
         elif not field.null and field.blank and field.empty_strings_allowed:
             if field.get_internal_type() == "BinaryField":
-                default = bytes()
+                default = b''
             else:
-                default = str()
+                default = ''
         elif getattr(field, 'auto_now', False) or getattr(field, 'auto_now_add', False):
             default = datetime.now()
             internal_type = field.get_internal_type()

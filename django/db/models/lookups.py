@@ -1,5 +1,6 @@
 import itertools
 import math
+import warnings
 from copy import copy
 
 from django.core.exceptions import EmptyResultSet
@@ -9,6 +10,7 @@ from django.db.models.fields import (
 )
 from django.db.models.query_utils import RegisterLookupMixin
 from django.utils.datastructures import OrderedSet
+from django.utils.deprecation import RemovedInDjango40Warning
 from django.utils.functional import cached_property
 
 
@@ -272,6 +274,20 @@ class Exact(FieldGetDbPrepValueMixin, BuiltinLookup):
                 )
         return super().process_rhs(compiler, connection)
 
+    def as_sql(self, compiler, connection):
+        # Avoid comparison against direct rhs if lhs is a boolean value. That
+        # turns "boolfield__exact=True" into "WHERE boolean_field" instead of
+        # "WHERE boolean_field = True" when allowed.
+        if (
+            isinstance(self.rhs, bool) and
+            getattr(self.lhs, 'conditional', False) and
+            connection.ops.conditional_expression_supported_in_where_clause(self.lhs)
+        ):
+            lhs_sql, params = self.process_lhs(compiler, connection)
+            template = '%s' if self.rhs else 'NOT %s'
+            return template % lhs_sql, params
+        return super().as_sql(compiler, connection)
+
 
 @Field.register_lookup
 class IExact(BuiltinLookup):
@@ -463,6 +479,17 @@ class IsNull(BuiltinLookup):
     prepare_rhs = False
 
     def as_sql(self, compiler, connection):
+        if not isinstance(self.rhs, bool):
+            # When the deprecation ends, replace with:
+            # raise ValueError(
+            #     'The QuerySet value for an isnull lookup must be True or '
+            #     'False.'
+            # )
+            warnings.warn(
+                'Using a non-boolean value for an isnull lookup is '
+                'deprecated, use True or False instead.',
+                RemovedInDjango40Warning,
+            )
         sql, params = compiler.compile(self.lhs)
         if self.rhs:
             return "%s IS NULL" % sql, params

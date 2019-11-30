@@ -170,8 +170,9 @@ last names were both retrieved on demand when they were printed.
 
 There is only one field that you can't leave out - the primary key
 field. Django uses the primary key to identify model instances, so it
-must always be included in a raw query. An ``InvalidQuery`` exception
-will be raised if you forget to include the primary key.
+must always be included in a raw query. A
+:class:`~django.core.exceptions.FieldDoesNotExist` exception will be raised if
+you forget to include the primary key.
 
 Adding annotations
 ------------------

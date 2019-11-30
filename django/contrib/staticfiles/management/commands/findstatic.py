@@ -21,7 +21,7 @@ class Command(LabelCommand):
         if verbosity >= 2:
             searched_locations = (
                 "\nLooking in the following locations:\n  %s" %
-                "\n  ".join(finders.searched_locations)
+                "\n  ".join([str(loc) for loc in finders.searched_locations])
             )
         else:
             searched_locations = ''

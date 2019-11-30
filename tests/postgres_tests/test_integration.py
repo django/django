@@ -16,7 +16,7 @@ class PostgresIntegrationTests(PostgreSQLSimpleTestCase):
             stdout=subprocess.DEVNULL,
             stderr=subprocess.PIPE,
             cwd=os.path.dirname(__file__),
-            env=test_environ
+            env=test_environ,
+            encoding='utf-8',
         )
-        stderr = '\n'.join([e.decode() for e in result.stderr.splitlines()])
-        self.assertEqual(result.returncode, 0, msg=stderr)
+        self.assertEqual(result.returncode, 0, msg=result.stderr)

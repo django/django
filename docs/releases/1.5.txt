@@ -505,7 +505,8 @@ between other versions of ``simplejson``:
 - ``simplejson.JSONEncoder`` gained a ``namedtuple_as_object`` keyword
   argument in version 2.2.
 
-More information on these incompatibilities is available in `ticket #18023`_.
+More information on these incompatibilities is available in
+:ticket:`ticket #18023 <18023#comment:10>`.
 
 The net result is that, if you have installed ``simplejson`` and your code
 uses Django's serialization internals directly -- for instance
@@ -516,8 +517,6 @@ internals aren't documented; we're making an exception here.)
 At this point, the maintainers of Django believe that using :mod:`json` from
 the standard library offers the strongest guarantee of backwards-compatibility.
 They recommend to use it from now on.
-
-.. _ticket #18023: https://code.djangoproject.com/ticket/18023#comment:10
 
 String types of hasher method parameters
 ----------------------------------------

@@ -66,9 +66,8 @@ class Permission(models.Model):
     class Meta:
         verbose_name = _('permission')
         verbose_name_plural = _('permissions')
-        unique_together = (('content_type', 'codename'),)
-        ordering = ('content_type__app_label', 'content_type__model',
-                    'codename')
+        unique_together = [['content_type', 'codename']]
+        ordering = ['content_type__app_label', 'content_type__model', 'codename']
 
     def __str__(self):
         return '%s | %s' % (self.content_type, self.name)

@@ -18,6 +18,19 @@ class Product(models.Model):
                 check=models.Q(price__gt=0),
                 name='%(app_label)s_%(class)s_price_gt_0',
             ),
+            models.CheckConstraint(
+                check=models.expressions.RawSQL(
+                    'price < %s', (1000,), output_field=models.BooleanField()
+                ),
+                name='%(app_label)s_price_lt_1000_raw',
+            ),
+            models.CheckConstraint(
+                check=models.expressions.ExpressionWrapper(
+                    models.Q(price__gt=500) | models.Q(price__lt=500),
+                    output_field=models.BooleanField()
+                ),
+                name='%(app_label)s_price_neq_500_wrap',
+            ),
         ]
 
 

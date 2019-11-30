@@ -1973,7 +1973,7 @@ Password: <input type="password" name="password" required></li>
             occupation = CharField(initial=lambda: 'Unknown')
 
         form = PersonForm(initial={'first_name': 'Jane'})
-        self.assertEqual(form.get_initial_for_field(form.fields['age'], 'age'), None)
+        self.assertIsNone(form.get_initial_for_field(form.fields['age'], 'age'))
         self.assertEqual(form.get_initial_for_field(form.fields['last_name'], 'last_name'), 'Doe')
         # Form.initial overrides Field.initial.
         self.assertEqual(form.get_initial_for_field(form.fields['first_name'], 'first_name'), 'Jane')
@@ -3685,6 +3685,17 @@ Good luck picking a username that doesn&#x27;t already exist.</p>
         self.assertIsInstance(p.data, MultiValueDict)
         self.assertIsInstance(p.files, MultiValueDict)
 
+    def test_field_deep_copy_error_messages(self):
+        class CustomCharField(CharField):
+            def __init__(self, **kwargs):
+                kwargs['error_messages'] = {'invalid': 'Form custom error message.'}
+                super().__init__(**kwargs)
+
+        field = CustomCharField()
+        field_copy = copy.deepcopy(field)
+        self.assertIsInstance(field_copy, CustomCharField)
+        self.assertIsNot(field_copy.error_messages, field.error_messages)
+
 
 class CustomRenderer(DjangoTemplates):
     pass
@@ -3718,7 +3729,7 @@ class RendererTests(SimpleTestCase):
             default_renderer = CustomRenderer
 
         form = CustomForm()
-        self.assertTrue(isinstance(form.renderer, CustomForm.default_renderer))
+        self.assertIsInstance(form.renderer, CustomForm.default_renderer)
 
     def test_attribute_override(self):
         class CustomForm(Form):

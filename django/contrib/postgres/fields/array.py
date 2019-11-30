@@ -5,11 +5,11 @@ from django.contrib.postgres.forms import SimpleArrayField
 from django.contrib.postgres.validators import ArrayMaxLengthValidator
 from django.core import checks, exceptions
 from django.db.models import Field, IntegerField, Transform
+from django.db.models.fields.mixins import CheckFieldDefaultMixin
 from django.db.models.lookups import Exact, In
 from django.utils.translation import gettext_lazy as _
 
 from ..utils import prefix_validation_error
-from .mixins import CheckFieldDefaultMixin
 from .utils import AttributeSetter
 
 __all__ = ['ArrayField']
@@ -45,6 +45,10 @@ class ArrayField(CheckFieldDefaultMixin, Field):
     def model(self, model):
         self.__dict__['model'] = model
         self.base_field.model = model
+
+    @classmethod
+    def _choices_is_value(cls, value):
+        return isinstance(value, (list, tuple)) or super()._choices_is_value(value)
 
     def check(self, **kwargs):
         errors = super().check(**kwargs)

@@ -135,7 +135,12 @@ class TestQuerying(PostgreSQLTestCase):
                 'k': True,
                 'l': False,
             }),
-            JSONModel(field={'foo': 'bar'}),
+            JSONModel(field={
+                'foo': 'bar',
+                'baz': {'a': 'b', 'c': 'd'},
+                'bar': ['foo', 'bar'],
+                'bax': {'foo': 'bar'},
+            }),
         ])
 
     def test_exact(self):
@@ -386,6 +391,26 @@ class TestQuerying(PostgreSQLTestCase):
             queries[0]['sql'],
         )
 
+    def test_lookups_with_key_transform(self):
+        tests = (
+            ('field__d__contains', 'e'),
+            ('field__baz__contained_by', {'a': 'b', 'c': 'd', 'e': 'f'}),
+            ('field__baz__has_key', 'c'),
+            ('field__baz__has_keys', ['a', 'c']),
+            ('field__baz__has_any_keys', ['a', 'x']),
+            ('field__contains', KeyTransform('bax', 'field')),
+            (
+                'field__contained_by',
+                KeyTransform('x', RawSQL('%s::jsonb', ['{"x": {"a": "b", "c": 1, "d": "e"}}'])),
+            ),
+            ('field__has_key', KeyTextTransform('foo', 'field')),
+        )
+        for lookup, value in tests:
+            with self.subTest(lookup=lookup):
+                self.assertTrue(JSONModel.objects.filter(
+                    **{lookup: value},
+                ).exists())
+
 
 @isolate_apps('postgres_tests')
 class TestChecks(PostgreSQLSimpleTestCase):
@@ -404,7 +429,7 @@ class TestChecks(PostgreSQLSimpleTestCase):
                 ),
                 hint='Use a callable instead, e.g., use `dict` instead of `{}`.',
                 obj=MyModel._meta.get_field('field'),
-                id='postgres.E003',
+                id='fields.E010',
             )
         ])
 

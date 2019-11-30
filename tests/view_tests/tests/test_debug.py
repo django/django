@@ -435,6 +435,40 @@ class ExceptionReporterTests(SimpleTestCase):
             text,
         )
 
+    def test_reporting_frames_source_not_match(self):
+        try:
+            source = "def funcName():\n    raise Error('Whoops')\nfuncName()"
+            namespace = {}
+            code = compile(source, 'generated', 'exec')
+            exec(code, namespace)
+        except Exception:
+            exc_type, exc_value, tb = sys.exc_info()
+        with mock.patch(
+            'django.views.debug.ExceptionReporter._get_source',
+            return_value=['wrong source'],
+        ):
+            request = self.rf.get('/test_view/')
+            reporter = ExceptionReporter(request, exc_type, exc_value, tb)
+            frames = reporter.get_traceback_frames()
+            last_frame = frames[-1]
+            self.assertEqual(last_frame['context_line'], '<source code not available>')
+            self.assertEqual(last_frame['filename'], 'generated')
+            self.assertEqual(last_frame['function'], 'funcName')
+            self.assertEqual(last_frame['lineno'], 2)
+            html = reporter.get_traceback_html()
+            self.assertIn('generated in funcName, line 2', html)
+            self.assertIn(
+                '"generated", line 2, in funcName\n'
+                '    &lt;source code not available&gt;',
+                html,
+            )
+            text = reporter.get_traceback_text()
+            self.assertIn(
+                '"generated", line 2, in funcName\n'
+                '    <source code not available>',
+                text,
+            )
+
     def test_reporting_frames_for_cyclic_reference(self):
         try:
             def test_func():
@@ -757,7 +791,7 @@ class PlainTextReportTests(SimpleTestCase):
             exc_type, exc_value, tb = sys.exc_info()
         reporter = ExceptionReporter(request, exc_type, exc_value, tb)
         text = reporter.get_traceback_text()
-        templ_path = Path(Path(__file__).parent.parent, 'templates', 'debug', 'template_error.html')
+        templ_path = Path(Path(__file__).parents[1], 'templates', 'debug', 'template_error.html')
         self.assertIn(
             'Template error:\n'
             'In template %(path)s, error at line 2\n'

@@ -16,6 +16,7 @@ class InsertVar:
         'IntegerField': int,
         'BigIntegerField': int,
         'SmallIntegerField': int,
+        'PositiveBigIntegerField': int,
         'PositiveSmallIntegerField': int,
         'PositiveIntegerField': int,
         'FloatField': Database.NATIVE_FLOAT,
@@ -54,6 +55,7 @@ class Oracle_datetime(datetime.datetime):
 
 class BulkInsertMapper:
     BLOB = 'TO_BLOB(%s)'
+    CLOB = 'TO_CLOB(%s)'
     DATE = 'TO_DATE(%s)'
     INTERVAL = 'CAST(%s as INTERVAL DAY(9) TO SECOND(6))'
     NUMBER = 'TO_NUMBER(%s)'
@@ -70,8 +72,10 @@ class BulkInsertMapper:
         'FloatField': NUMBER,
         'IntegerField': NUMBER,
         'NullBooleanField': NUMBER,
+        'PositiveBigIntegerField': NUMBER,
         'PositiveIntegerField': NUMBER,
         'PositiveSmallIntegerField': NUMBER,
         'SmallIntegerField': NUMBER,
+        'TextField': CLOB,
         'TimeField': TIMESTAMP,
     }
