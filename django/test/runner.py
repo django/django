@@ -434,7 +434,7 @@ class DiscoverRunner:
                  interactive=True, failfast=False, keepdb=False,
                  reverse=False, debug_mode=False, debug_sql=False, parallel=0,
                  tags=None, exclude_tags=None, test_name_patterns=None,
-                 pdb=False, **kwargs):
+                 pdb=False, buffer=False, **kwargs):
 
         self.pattern = pattern
         self.top_level = top_level
@@ -451,6 +451,12 @@ class DiscoverRunner:
         self.pdb = pdb
         if self.pdb and self.parallel > 1:
             raise ValueError('You cannot use --pdb with parallel tests; pass --parallel=1 to use it.')
+        self.buffer = buffer
+        if self.buffer and self.parallel > 1:
+            raise ValueError(
+                'You cannot use -b/--buffer with parallel tests; pass '
+                '--parallel=1 to use it.'
+            )
         self.test_name_patterns = None
         if test_name_patterns:
             # unittest does not export the _convert_select_pattern function
@@ -502,6 +508,10 @@ class DiscoverRunner:
         parser.add_argument(
             '--pdb', action='store_true',
             help='Runs a debugger (pdb, or ipdb if installed) on error or failure.'
+        )
+        parser.add_argument(
+            '-b', '--buffer', action='store_true',
+            help='Discard output from passing tests.',
         )
         if PY37:
             parser.add_argument(
@@ -617,6 +627,7 @@ class DiscoverRunner:
             'failfast': self.failfast,
             'resultclass': self.get_resultclass(),
             'verbosity': self.verbosity,
+            'buffer': self.buffer,
         }
 
     def run_checks(self):

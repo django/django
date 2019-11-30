@@ -1462,6 +1462,13 @@ Runs test methods and classes matching test name patterns, in the same way as
 Spawns a ``pdb`` debugger at each test error or failure. If you have it
 installed, ``ipdb`` is used instead.
 
+.. django-admin-option:: --buffer, -b
+
+.. versionadded:: 3.1
+
+Discards output (``stdout`` and ``stderr``) for passing tests, in the same way
+as :option:`unittest's --buffer option<unittest.-b>`.
+
 ``testserver``
 --------------
 
