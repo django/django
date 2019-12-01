@@ -6,6 +6,7 @@ from django.apps import apps
 from django.conf import settings
 from django.core import serializers
 from django.db import router
+from django.db.transaction import atomic
 
 # The prefix to put on the default database name when creating
 # the test database.
@@ -126,8 +127,15 @@ class BaseDatabaseCreation:
         the serialize_db_to_string() method.
         """
         data = StringIO(data)
-        for obj in serializers.deserialize("json", data, using=self.connection.alias):
-            obj.save()
+        # Run without constraint checks (which requires a transaction), so any forward references or even loops in the
+        # data can be loaded without problems.
+        with atomic(using=self.connection.alias):
+            with self.connection.constraint_checks_disabled():
+                for obj in serializers.deserialize("json", data, using=self.connection.alias):
+                    obj.save()
+            # Since we disabled constraint checks, we must manually check for
+            # any invalid keys that might have been added
+            self.connection.check_constraints()
 
     def _get_database_display_str(self, verbosity, database_name):
         """
