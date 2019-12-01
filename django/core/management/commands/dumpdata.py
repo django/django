@@ -145,7 +145,7 @@ class Command(BaseCommand):
             count the number of objects to be serialized.
             """
             if use_natural_foreign_keys:
-                models = serializers.sort_dependencies(app_list.items())
+                models = serializers.sort_dependencies(app_list.items(), allow_cycles=True)
 
             else:
                 models = []

@@ -156,12 +156,17 @@ def _load_serializers():
     _serializers = serializers
 
 
-def sort_dependencies(app_list):
+def sort_dependencies(app_list, allow_cycles=False):
     """Sort a list of (app_config, models) pairs into a single list of models.
 
     The single list of models is sorted so that any model with a natural key
     is serialized before a normal model, and any model with a natural key
     dependency has it's dependencies serialized first.
+
+    When allow_cycles is false, if any dependency cycles occur, a RuntimeError
+    is thrown. When allow_cycles is True and cycles exist, this will return a
+    best-effort ordering, that will respect most dependencies but ignore some
+    to break the cycles.
     """
     # Process the list of models, and get the list of dependencies
     model_dependencies = []
@@ -222,13 +227,19 @@ def sort_dependencies(app_list):
             else:
                 skipped.append((model, deps))
         if not changed:
-            raise RuntimeError(
-                "Can't resolve dependencies for %s in serialized app list." %
-                ', '.join(
-                    model._meta.label
-                    for model, deps in sorted(skipped, key=lambda obj: obj[0].__name__)
+            if allow_cycles:
+                # If cycles are allowed, just add one model, ignoring its dependencies.
+                # This could be improved by some graph analysis to figure out how to do this while ignoring as few
+                # dependencies as possible, but just picking the first model is fine for now.
+                model_list.append(skipped.pop()[0])
+            else:
+                raise RuntimeError(
+                    "Can't resolve dependencies for %s in serialized app list." %
+                    ', '.join(
+                        model._meta.label
+                        for model, deps in sorted(skipped, key=lambda obj: obj[0].__name__)
+                    )
                 )
-            )
         model_dependencies = skipped
 
     return model_list
