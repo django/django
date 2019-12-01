@@ -16,7 +16,7 @@ from django.forms.models import (
 from django.template import engines
 from django.template.backends.django import DjangoTemplates
 from django.utils.module_loading import import_string
-
+import collections
 
 def _issubclass(cls, classinfo):
     """
@@ -987,9 +987,13 @@ class ModelAdminChecks(BaseModelAdminChecks):
         """Check that every action has a unique __name__."""
         names = [name for _, name, _ in obj._get_base_actions()]
         if len(names) != len(set(names)):
+            for item,count in collections.Counter(names).items():
+            	if count>1:
+            		duplicate=str(item)
+            		break
             return [checks.Error(
-                '__name__ attributes of actions defined in %s must be '
-                'unique.' % obj.__class__,
+                '__name__ attribute of action "%s" defined in %s must be '
+                'unique.' %(duplicate,obj.__class__),
                 obj=obj.__class__,
                 id='admin.E130',
             )]
