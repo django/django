@@ -144,7 +144,7 @@ class Command(BaseCommand):
             Collate the objects to be serialized. If count_only is True, just
             count the number of objects to be serialized.
             """
-            models = serializers.sort_dependencies(app_list.items())
+            models = serializers.sort_dependencies(app_list.items(), allow_cycles=True)
             for model in models:
                 if model in excluded_models:
                     continue
