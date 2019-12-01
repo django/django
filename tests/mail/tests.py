@@ -1493,7 +1493,7 @@ class SMTPBackendTests(BaseEmailBackendTests, SMTPBackendTestsBase):
     def test_reopen_connection(self):
         backend = smtp.EmailBackend()
         # Simulate an already open connection.
-        backend.connection = True
+        backend.connection = mock.Mock(spec=object())
         self.assertIs(backend.open(), False)
 
     def test_server_login(self):
@@ -1653,20 +1653,20 @@ class SMTPBackendTests(BaseEmailBackendTests, SMTPBackendTestsBase):
         backend = smtp.EmailBackend()
         # Simulate connection initialization success and a subsequent
         # connection exception.
-        backend.connection = True
+        backend.connection = mock.Mock(spec=object())
         backend.open = lambda: None
         email = EmailMessage('Subject', 'Content', 'from@example.com', ['to@example.com'])
         self.assertEqual(backend.send_messages([email]), 0)
 
     def test_send_messages_empty_list(self):
         backend = smtp.EmailBackend()
-        backend.connection = True
+        backend.connection = mock.Mock(spec=object())
         self.assertEqual(backend.send_messages([]), 0)
 
     def test_send_messages_zero_sent(self):
         """A message isn't sent if it doesn't have any recipients."""
         backend = smtp.EmailBackend()
-        backend.connection = True
+        backend.connection = mock.Mock(spec=object())
         email = EmailMessage('Subject', 'Content', 'from@example.com', to=[])
         sent = backend.send_messages([email])
         self.assertEqual(sent, 0)
