@@ -255,7 +255,9 @@ class Query(BaseExpression):
         """
         sql, params = self.sql_with_params()
 
-        return sql % params
+        # FIXME: How do we call query_sql() from operations.py accounting
+        # for the different backends?
+        return self.query_sql(sql, params)
 
     def sql_with_params(self):
         """

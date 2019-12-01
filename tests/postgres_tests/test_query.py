@@ -16,7 +16,7 @@ class QuerySetQueryTests(PostgreSQLTestCase):
             end=datetime.datetime(2005, 9, 28),
         )
         self.assertEqual(
-            a.query_sql(),
+            a.query.__str__(),
             'SELECT "postgres_tests_hotelreservation"."id", '
             '"postgres_tests_hotelreservation"."room_id", '
             '"postgres_tests_hotelreservation"."datespan", '
@@ -32,9 +32,8 @@ class QuerySetQueryTests(PostgreSQLTestCase):
 
     def test_queryset_query_empty(self):
         a = HotelReservation.objects.all()
-        print(a.query_sql())
         self.assertEqual(
-            a.query_sql(),
+            a.query.__str__(),
             'SELECT "postgres_tests_hotelreservation"."id", '
             '"postgres_tests_hotelreservation"."room_id", '
             '"postgres_tests_hotelreservation"."datespan", '
