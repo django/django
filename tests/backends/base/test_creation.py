@@ -7,6 +7,8 @@ from django.db.backends.base.creation import (
 )
 from django.test import SimpleTestCase
 
+from ..models import Object, ObjectReference
+
 
 def get_connection_copy():
     # Get a copy of the default connection. (Can't use django.db.connection
@@ -73,3 +75,29 @@ class TestDbCreationTests(SimpleTestCase):
         finally:
             with mock.patch.object(creation, '_destroy_test_db'):
                 creation.destroy_test_db(old_database_name, verbosity=0)
+
+
+class TestDeserializeDbFromString(SimpleTestCase):
+    databases = {'default'}
+
+    def test_circular_reference(self):
+        # deserialize_db_from_string() handles circular references.
+        data = """
+        [
+            {
+                "model": "backends.object",
+                "pk": 1,
+                "fields": {"obj_ref": 1, "related_objects": []}
+            },
+            {
+                "model": "backends.objectreference",
+                "pk": 1,
+                "fields": {"obj": 1}
+            }
+        ]
+        """
+        connection.creation.deserialize_db_from_string(data)
+        obj = Object.objects.get()
+        obj_ref = ObjectReference.objects.get()
+        self.assertEqual(obj.obj_ref, obj_ref)
+        self.assertEqual(obj_ref.obj, obj)
