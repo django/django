@@ -680,3 +680,6 @@ class BaseDatabaseOperations:
 
     def ignore_conflicts_suffix_sql(self, ignore_conflicts=None):
         return ''
+
+    def query_sql(self, sql, params):
+        return sql % params

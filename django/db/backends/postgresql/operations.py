@@ -299,3 +299,8 @@ class DatabaseOperations(BaseDatabaseOperations):
 
     def ignore_conflicts_suffix_sql(self, ignore_conflicts=None):
         return 'ON CONFLICT DO NOTHING' if ignore_conflicts else super().ignore_conflicts_suffix_sql(ignore_conflicts)
+
+    def query_sql(self, sql, params):
+        """PostgreSQL will give us the actual SQL returned by a query."""
+        with self.connection.cursor() as cursor:
+            return cursor.mogrify(sql, params).decode()
