@@ -193,25 +193,25 @@ class EmailMessage:
         if to:
             if isinstance(to, str):
                 raise TypeError('"to" argument must be a list or tuple')
-            self.to = list(to)
+            self.to = [email for email in to if email]
         else:
             self.to = []
         if cc:
             if isinstance(cc, str):
                 raise TypeError('"cc" argument must be a list or tuple')
-            self.cc = list(cc)
+            self.cc = [email for email in cc if email]
         else:
             self.cc = []
         if bcc:
             if isinstance(bcc, str):
                 raise TypeError('"bcc" argument must be a list or tuple')
-            self.bcc = list(bcc)
+            self.bcc = [email for email in bcc if email]
         else:
             self.bcc = []
         if reply_to:
             if isinstance(reply_to, str):
                 raise TypeError('"reply_to" argument must be a list or tuple')
-            self.reply_to = list(reply_to)
+            self.reply_to = [email for email in reply_to if email]
         else:
             self.reply_to = []
         self.from_email = from_email or settings.DEFAULT_FROM_EMAIL
@@ -265,7 +265,7 @@ class EmailMessage:
         Return a list of all recipients of the email (includes direct
         addressees as well as Cc and Bcc entries).
         """
-        return [email for email in (self.to + self.cc + self.bcc) if email]
+        return self.to + self.cc + self.bcc
 
     def send(self, fail_silently=False):
         """Send the email message."""

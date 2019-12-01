@@ -98,12 +98,16 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
             'Subject', 'Content', 'from@example.com', ['to@example.com', ''],
             cc=['cc@example.com', ''],
             bcc=['', 'bcc@example.com'],
-            reply_to=['', None],
+            reply_to=[''],
         )
         self.assertEqual(
             email.recipients(),
             ['to@example.com', 'cc@example.com', 'bcc@example.com']
         )
+        msg = email.message()
+        self.assertEqual(msg['To'], 'to@example.com')
+        self.assertEqual(msg['Cc'], 'cc@example.com')
+        self.assertNotIn('Reply-To', msg)
 
     def test_cc(self):
         """Regression test for #7722"""
