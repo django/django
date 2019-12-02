@@ -97,21 +97,21 @@ class BaseDatabaseCreation:
         Designed only for test runner usage; will not handle large
         amounts of data.
         """
-        # Build list of all apps to serialize
+        # Build list of all models to serialize.
         from django.db.migrations.loader import MigrationLoader
         loader = MigrationLoader(self.connection)
-        app_list = []
+        model_list = []
         for app_config in apps.get_app_configs():
             if (
                 app_config.models_module is not None and
                 app_config.label in loader.migrated_apps and
                 app_config.name not in settings.TEST_NON_SERIALIZED_APPS
             ):
-                app_list.append((app_config, None))
+                model_list.extend(app_config.get_models())
 
         # Make a function to iteratively return every object
         def get_objects():
-            for model in serializers.sort_dependencies(app_list):
+            for model in model_list:
                 if (model._meta.can_migrate(self.connection) and
                         router.allow_migrate_model(self.connection.alias, model)):
                     queryset = model._default_manager.using(self.connection.alias).order_by(model._meta.pk.name)
