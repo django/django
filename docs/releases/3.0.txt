@@ -2,7 +2,7 @@
 Django 3.0 release notes - UNDER DEVELOPMENT
 ============================================
 
-*Expected December 2019*
+*December 2, 2019*
 
 Welcome to Django 3.0!
 
