@@ -267,7 +267,10 @@ Utilities
 Validators
 ~~~~~~~~~~
 
-* ...
+* The :attr:`~django.core.validators.URLValidator.schemes` attribute of
+  :class:`~django.core.validators.URLValidator` now accepts the special value
+  ``'__all__'`` to skip validation of the URL's scheme (Django will still check
+  that the scheme is well-formed if present).
 
 Miscellaneous
 ~~~~~~~~~~~~~

@@ -229,6 +229,13 @@ TEST_DATA = [
     (URLValidator(), 'http://www.asdasdasdasdsadfm.com.br ', ValidationError),
     (URLValidator(), 'http://www.asdasdasdasdsadfm.com.br z', ValidationError),
 
+    (URLValidator(schemes='__all__'), 'foo://hello.com', None),
+    (URLValidator(schemes='__all__'), 'ht-tp://example.com', None),
+    (URLValidator(schemes='__all__'), 'ht+tp://example.com', None),
+    (URLValidator(schemes='__all__'), 'ht.tp://example.com', None),
+    (URLValidator(schemes='__all__'), 'foo\n://hello.com', ValidationError),
+    (URLValidator(schemes='__all__'), '\nfoo://hello.com', ValidationError),
+
     (BaseValidator(True), True, None),
     (BaseValidator(True), False, ValidationError),
 
@@ -308,6 +315,13 @@ with open(create_path('valid_urls.txt'), encoding='utf8') as f:
 with open(create_path('invalid_urls.txt'), encoding='utf8') as f:
     for url in f:
         TEST_DATA.append((URLValidator(), url.strip(), ValidationError))
+with open(create_path('IANA_schemes.txt')) as f:
+    # List built from https://www.iana.org/assignments/uri-schemes/uri-schemes-1.csv
+    validator = URLValidator(schemes='__all__')
+    TEST_DATA.extend((validator, '{}://hello.com'.format(scheme.strip()), None) for scheme in f)
+with open(create_path('invalid_schemes.txt')) as f:
+    validator = URLValidator(schemes='__all__')
+    TEST_DATA.extend((validator, '{}://hello.com'.format(scheme.strip()), ValidationError) for scheme in f)
 
 
 class TestValidators(SimpleTestCase):
