@@ -2,7 +2,7 @@
 Django 2.2.8 release notes
 ==========================
 
-*Expected December 2, 2019*
+*December 2, 2019*
 
 Django 2.2.8 fixes a security issue, several bugs in 2.2.7, and adds
 compatibility with Python 3.8.
