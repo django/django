@@ -29,9 +29,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-01-16 20:42+0100\n"
-"PO-Revision-Date: 2019-05-26 11:53+0000\n"
-"Last-Translator: jamin M <lxxmbyx@163.com>\n"
+"POT-Creation-Date: 2019-09-27 22:40+0200\n"
+"PO-Revision-Date: 2019-11-05 00:38+0000\n"
+"Last-Translator: Ramiro Morales\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/django/django/"
 "language/zh_CN/)\n"
 "MIME-Version: 1.0\n"
@@ -301,6 +301,9 @@ msgstr "乌克兰语"
 msgid "Urdu"
 msgstr "乌尔都语"
 
+msgid "Uzbek"
+msgstr ""
+
 msgid "Vietnamese"
 msgstr "越南语"
 
@@ -345,13 +348,13 @@ msgstr "输入一个有效的 Email 地址。"
 
 #. Translators: "letters" means latin letters: a-z and A-Z.
 msgid ""
-"Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
-msgstr "输入一个有效的 'slug'，由字母、数字、下划线或横线组成。"
+"Enter a valid “slug” consisting of letters, numbers, underscores or hyphens."
+msgstr ""
 
 msgid ""
-"Enter a valid 'slug' consisting of Unicode letters, numbers, underscores, or "
+"Enter a valid “slug” consisting of Unicode letters, numbers, underscores, or "
 "hyphens."
-msgstr "输入一个有效的 'slug'，由 Unicode 字母、数字、下划线或横线组成。"
+msgstr ""
 
 msgid "Enter a valid IPv4 address."
 msgstr "输入一个有效的 IPv4 地址。"
@@ -419,11 +422,9 @@ msgstr[0] "确认小数点前不超过 %(max)s 位。"
 
 #, python-format
 msgid ""
-"File extension '%(extension)s' is not allowed. Allowed extensions are: "
-"'%(allowed_extensions)s'."
+"File extension “%(extension)s” is not allowed. Allowed extensions are: "
+"%(allowed_extensions)s."
 msgstr ""
-"文件后缀名 '%(extension)s' 不被允许.。可用的文件后缀"
-"名：'%(allowed_extensions)s'。"
 
 msgid "Null characters are not allowed."
 msgstr "不允许是用空字符串。"
@@ -462,23 +463,13 @@ msgstr ""
 msgid "Field of type: %(field_type)s"
 msgstr "字段类型：%(field_type)s"
 
-msgid "Integer"
-msgstr "整数"
+#, python-format
+msgid "“%(value)s” value must be either True or False."
+msgstr ""
 
 #, python-format
-msgid "'%(value)s' value must be an integer."
-msgstr "’%(value)s‘ 必须为整数。"
-
-msgid "Big (8 byte) integer"
-msgstr "大整数(8字节)"
-
-#, python-format
-msgid "'%(value)s' value must be either True or False."
-msgstr "’%(value)s‘ 的值必须为 True 或者 False。"
-
-#, python-format
-msgid "'%(value)s' value must be either True, False, or None."
-msgstr "'%(value)s' 的值必须是 True ,  False 或 None 之一。"
+msgid "“%(value)s” value must be either True, False, or None."
+msgstr ""
 
 msgid "Boolean (Either True or False)"
 msgstr "布尔值( True或False )"
@@ -492,50 +483,46 @@ msgstr "逗号分隔的整数"
 
 #, python-format
 msgid ""
-"'%(value)s' value has an invalid date format. It must be in YYYY-MM-DD "
+"“%(value)s” value has an invalid date format. It must be in YYYY-MM-DD "
 "format."
-msgstr "’%(value)s‘ 必须为合法的日期格式，请使用 YYYY-MM-DD 格式。"
+msgstr ""
 
 #, python-format
 msgid ""
-"'%(value)s' value has the correct format (YYYY-MM-DD) but it is an invalid "
+"“%(value)s” value has the correct format (YYYY-MM-DD) but it is an invalid "
 "date."
-msgstr "’%(value)s‘ 值的格式正确(YYYY-MM-DD)，但是日期无效。"
+msgstr ""
 
 msgid "Date (without time)"
 msgstr "日期（不带时分）"
 
 #, python-format
 msgid ""
-"'%(value)s' value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[."
+"“%(value)s” value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[."
 "uuuuuu]][TZ] format."
 msgstr ""
-"’%(value)s‘ 必须为合法的日期时间格式，请使用 YYYY-MM-DD HH:MM[:ss[.uuuuuu]]"
-"[TZ] 格式。"
 
 #, python-format
 msgid ""
-"'%(value)s' value has the correct format (YYYY-MM-DD HH:MM[:ss[.uuuuuu]]"
+"“%(value)s” value has the correct format (YYYY-MM-DD HH:MM[:ss[.uuuuuu]]"
 "[TZ]) but it is an invalid date/time."
 msgstr ""
-"’%(value)s‘ 值的格式正确(YYYY-MM-DD HH:MM[:ss[.uuuuuu]][TZ])，但是日期/时间无"
-"效。"
 
 msgid "Date (with time)"
 msgstr "日期（带时分）"
 
 #, python-format
-msgid "'%(value)s' value must be a decimal number."
-msgstr "’%(value)s‘ 必须为十进制数字。"
+msgid "“%(value)s” value must be a decimal number."
+msgstr ""
 
 msgid "Decimal number"
 msgstr "小数"
 
 #, python-format
 msgid ""
-"'%(value)s' value has an invalid format. It must be in [DD] [HH:[MM:]]ss[."
+"“%(value)s” value has an invalid format. It must be in [DD] [[HH:]MM:]ss[."
 "uuuuuu] format."
-msgstr "’%(value)s‘ 值格式错误，必须为 [DD] [HH:[MM:]]ss[.uuuuuu] 格式。"
+msgstr ""
 
 msgid "Duration"
 msgstr "时长"
@@ -547,11 +534,21 @@ msgid "File path"
 msgstr "文件路径"
 
 #, python-format
-msgid "'%(value)s' value must be a float."
-msgstr "’%(value)s‘ 必须为浮点数字。"
+msgid "“%(value)s” value must be a float."
+msgstr ""
 
 msgid "Floating point number"
 msgstr "浮点数"
+
+#, python-format
+msgid "“%(value)s” value must be an integer."
+msgstr ""
+
+msgid "Integer"
+msgstr "整数"
+
+msgid "Big (8 byte) integer"
+msgstr "大整数(8字节)"
 
 msgid "IPv4 address"
 msgstr "IPv4 地址"
@@ -560,8 +557,8 @@ msgid "IP address"
 msgstr "IP 地址"
 
 #, python-format
-msgid "'%(value)s' value must be either None, True or False."
-msgstr "’%(value)s‘ 必须为None，True或者False。"
+msgid "“%(value)s” value must be either None, True or False."
+msgstr ""
 
 msgid "Boolean (Either True, False or None)"
 msgstr "布尔值(True、False或None)"
@@ -584,15 +581,15 @@ msgstr "文本"
 
 #, python-format
 msgid ""
-"'%(value)s' value has an invalid format. It must be in HH:MM[:ss[.uuuuuu]] "
+"“%(value)s” value has an invalid format. It must be in HH:MM[:ss[.uuuuuu]] "
 "format."
-msgstr "’%(value)s‘ 值格式错误，必须为 HH:MM[:ss[.uuuuuu]] 格式。"
+msgstr ""
 
 #, python-format
 msgid ""
-"'%(value)s' value has the correct format (HH:MM[:ss[.uuuuuu]]) but it is an "
+"“%(value)s” value has the correct format (HH:MM[:ss[.uuuuuu]]) but it is an "
 "invalid time."
-msgstr "’%(value)s‘ 值的格式正确(HH:MM[:ss[.uuuuuu]])，但是时间无效。"
+msgstr ""
 
 msgid "Time"
 msgstr "时间"
@@ -604,8 +601,8 @@ msgid "Raw binary data"
 msgstr "原始二进制数据"
 
 #, python-format
-msgid "'%(value)s' is not a valid UUID."
-msgstr "‘%(value)s’不是有效UUID。"
+msgid "“%(value)s” is not a valid UUID."
+msgstr ""
 
 msgid "Universally unique identifier"
 msgstr "通用唯一识别码"
@@ -754,16 +751,14 @@ msgid "Select a valid choice. That choice is not one of the available choices."
 msgstr "选择一个有效的选项： 该选择不在可用的选项中。"
 
 #, python-format
-msgid "\"%(pk)s\" is not a valid value."
-msgstr "\"%(pk)s\" 不是一个有效值."
+msgid "“%(pk)s” is not a valid value."
+msgstr ""
 
 #, python-format
 msgid ""
-"%(datetime)s couldn't be interpreted in time zone %(current_timezone)s; it "
+"%(datetime)s couldn’t be interpreted in time zone %(current_timezone)s; it "
 "may be ambiguous or it may not exist."
 msgstr ""
-"%(datetime)s 不能在时区 %(current_timezone)s正确解读; 可能时间有歧义或者不存"
-"在."
 
 msgid "Clear"
 msgstr "清除"
@@ -782,6 +777,15 @@ msgstr "是"
 
 msgid "No"
 msgstr "否"
+
+msgid "Year"
+msgstr ""
+
+msgid "Month"
+msgstr ""
+
+msgid "Day"
+msgstr ""
 
 msgid "yes,no,maybe"
 msgstr "是、否、也许"
@@ -1094,34 +1098,25 @@ msgid "CSRF verification failed. Request aborted."
 msgstr "CSRF验证失败. 请求被中断."
 
 msgid ""
-"You are seeing this message because this HTTPS site requires a 'Referer "
-"header' to be sent by your Web browser, but none was sent. This header is "
+"You are seeing this message because this HTTPS site requires a “Referer "
+"header” to be sent by your Web browser, but none was sent. This header is "
 "required for security reasons, to ensure that your browser is not being "
 "hijacked by third parties."
 msgstr ""
-"您看到此消息是由于HTTPS站点需要您的浏览器发送的 'Referer header'信息，但是该"
-"信息并未被发送。该header信息的确认是出于安全问题的考虑，以确认您的浏览器并未"
-"被第三方劫持。"
 
 msgid ""
-"If you have configured your browser to disable 'Referer' headers, please re-"
-"enable them, at least for this site, or for HTTPS connections, or for 'same-"
-"origin' requests."
+"If you have configured your browser to disable “Referer” headers, please re-"
+"enable them, at least for this site, or for HTTPS connections, or for “same-"
+"origin” requests."
 msgstr ""
-"如果您已经设置您的浏览器禁用 'Referer' 头部信息，请重新启用它们，至少要针对这"
-"个站点，或者针对全部HTTPS连接，或者针对 'same-origin' 请求来启用。"
 
 msgid ""
 "If you are using the <meta name=\"referrer\" content=\"no-referrer\"> tag or "
-"including the 'Referrer-Policy: no-referrer' header, please remove them. The "
-"CSRF protection requires the 'Referer' header to do strict referer checking. "
-"If you're concerned about privacy, use alternatives like <a rel=\"noreferrer"
-"\" ...> for links to third-party sites."
+"including the “Referrer-Policy: no-referrer” header, please remove them. The "
+"CSRF protection requires the “Referer” header to do strict referer checking. "
+"If you’re concerned about privacy, use alternatives like <a rel=\"noreferrer"
+"\" …> for links to third-party sites."
 msgstr ""
-"如果您正在使用 <meta name=\"referrer\" content=\"no-referrer\"> tag 或 包含"
-"了“Referrer-Policy: no-referrer”的头部， 请移除它们。CSRF保护机制要"
-"求“Referer”头部进行严格的referer检查.如果您关心隐私问题，请使用其它替代方式，"
-"如 <a rel=\"noreferrer\" ...> 到第三方站点的链接。"
 
 msgid ""
 "You are seeing this message because this site requires a CSRF cookie when "
@@ -1133,10 +1128,8 @@ msgstr ""
 
 msgid ""
 "If you have configured your browser to disable cookies, please re-enable "
-"them, at least for this site, or for 'same-origin' requests."
+"them, at least for this site, or for “same-origin” requests."
 msgstr ""
-"如果您已经设置您的浏览器禁用cookies，请重新启用它们，至少要针对这个站点，或者"
-"针对 'same-origin' 请求来启用。"
 
 msgid "More information is available with DEBUG=True."
 msgstr "更多可用信息请设置选项DEBUG＝True。"
@@ -1169,30 +1162,30 @@ msgstr ""
 "%(verbose_name_plural)s 不可用。"
 
 #, python-format
-msgid "Invalid date string '%(datestr)s' given format '%(format)s'"
-msgstr "日期字符串 '%(datestr)s' 与格式 '%(format)s' 不匹配"
+msgid "Invalid date string “%(datestr)s” given format “%(format)s”"
+msgstr ""
 
 #, python-format
 msgid "No %(verbose_name)s found matching the query"
 msgstr "没有找到符合查询的 %(verbose_name)s"
 
-msgid "Page is not 'last', nor can it be converted to an int."
-msgstr "页码既不为'last'，也不能被转为数字。"
+msgid "Page is not “last”, nor can it be converted to an int."
+msgstr ""
 
 #, python-format
 msgid "Invalid page (%(page_number)s): %(message)s"
 msgstr "非法页面 (%(page_number)s): %(message)s"
 
 #, python-format
-msgid "Empty list and '%(class_name)s.allow_empty' is False."
-msgstr "列表是空的并且'%(class_name)s.allow_empty 设置为 False'"
+msgid "Empty list and “%(class_name)s.allow_empty” is False."
+msgstr ""
 
 msgid "Directory indexes are not allowed here."
 msgstr "这里不允许目录索引"
 
 #, python-format
-msgid "\"%(path)s\" does not exist"
-msgstr "\"%(path)s\" 不存在"
+msgid "“%(path)s” does not exist"
+msgstr ""
 
 #, python-format
 msgid "Index of %(directory)s"
@@ -1228,8 +1221,8 @@ msgstr ""
 msgid "Django Documentation"
 msgstr "Django 文档"
 
-msgid "Topics, references, &amp; how-to's"
-msgstr "主题，参考和指南"
+msgid "Topics, references, &amp; how-to’s"
+msgstr ""
 
 msgid "Tutorial: A Polling App"
 msgstr "教程：投票应用"

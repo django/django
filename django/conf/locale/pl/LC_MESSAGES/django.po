@@ -30,8 +30,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-01-16 20:42+0100\n"
-"PO-Revision-Date: 2019-01-26 20:41+0000\n"
+"POT-Creation-Date: 2019-09-27 22:40+0200\n"
+"PO-Revision-Date: 2019-11-06 19:58+0000\n"
 "Last-Translator: m_aciek <maciej.olko@gmail.com>\n"
 "Language-Team: Polish (http://www.transifex.com/django/django/language/pl/)\n"
 "MIME-Version: 1.0\n"
@@ -303,6 +303,9 @@ msgstr "ukraiński"
 msgid "Urdu"
 msgstr "urdu"
 
+msgid "Uzbek"
+msgstr "uzbecki"
+
 msgid "Vietnamese"
 msgstr "wietnamski"
 
@@ -347,17 +350,16 @@ msgstr "Wprowadź poprawny adres email."
 
 #. Translators: "letters" means latin letters: a-z and A-Z.
 msgid ""
-"Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
+"Enter a valid “slug” consisting of letters, numbers, underscores or hyphens."
 msgstr ""
-"Wpisz poprawną uproszczoną nazwę zawierającą jedynie litery, cyfry, "
-"podkreślenia i myślniki."
+"Wpisz poprawny „slug” zawierający litery, cyfry, podkreślenia i myślniki."
 
 msgid ""
-"Enter a valid 'slug' consisting of Unicode letters, numbers, underscores, or "
+"Enter a valid “slug” consisting of Unicode letters, numbers, underscores, or "
 "hyphens."
 msgstr ""
-"Wpisz poprawną uproszczoną nazwę zawierającą jedynie litery Unicode, cyfry, "
-"podkreślenia i myślniki."
+"Wpisz poprawny „slug” zawierający litery Unicode, cyfry, podkreślenia i "
+"myślniki."
 
 msgid "Enter a valid IPv4 address."
 msgstr "Wprowadź poprawny adres IPv4."
@@ -460,11 +462,11 @@ msgstr[3] ""
 
 #, python-format
 msgid ""
-"File extension '%(extension)s' is not allowed. Allowed extensions are: "
-"'%(allowed_extensions)s'."
+"File extension “%(extension)s” is not allowed. Allowed extensions are: "
+"%(allowed_extensions)s."
 msgstr ""
-"Rozszerzenie pliku '%(extension)s' jest niedozwolone. Dozwolone rozszerzenia "
-"to: '%(allowed_extensions)s'."
+"Rozszerzenie pliku „%(extension)s” jest niedozwolone. Dozwolone rozszerzenia "
+"to: %(allowed_extensions)s."
 
 msgid "Null characters are not allowed."
 msgstr "Znaki null są niedozwolone."
@@ -503,23 +505,13 @@ msgstr ""
 msgid "Field of type: %(field_type)s"
 msgstr "Pole typu: %(field_type)s"
 
-msgid "Integer"
-msgstr "Liczba całkowita"
+#, python-format
+msgid "“%(value)s” value must be either True or False."
+msgstr "Wartością „%(value)s” musi być True albo False."
 
 #, python-format
-msgid "'%(value)s' value must be an integer."
-msgstr "wartość '%(value)s' musi być liczbą całkowitą."
-
-msgid "Big (8 byte) integer"
-msgstr "Duża liczba całkowita (8 bajtów)"
-
-#, python-format
-msgid "'%(value)s' value must be either True or False."
-msgstr "wartość '%(value)s' musi być True lub False."
-
-#, python-format
-msgid "'%(value)s' value must be either True, False, or None."
-msgstr "Wartość „%(value)s” musi być True, False lub None."
+msgid "“%(value)s” value must be either True, False, or None."
+msgstr "Wartością „%(value)s” musi być True, False lub None."
 
 msgid "Boolean (Either True or False)"
 msgstr "Wartość logiczna (True lub False – prawda lub fałsz)"
@@ -533,18 +525,18 @@ msgstr "Liczby całkowite rozdzielone przecinkami"
 
 #, python-format
 msgid ""
-"'%(value)s' value has an invalid date format. It must be in YYYY-MM-DD "
+"“%(value)s” value has an invalid date format. It must be in YYYY-MM-DD "
 "format."
 msgstr ""
-"Wartość '%(value)s' ma nieprawidłowy format daty. Musi być ona w formacie "
+"Wartość „%(value)s” ma nieprawidłowy format daty. Musi być ona w formacie "
 "YYYY-MM-DD."
 
 #, python-format
 msgid ""
-"'%(value)s' value has the correct format (YYYY-MM-DD) but it is an invalid "
+"“%(value)s” value has the correct format (YYYY-MM-DD) but it is an invalid "
 "date."
 msgstr ""
-"Wartość '%(value)s' ma prawidłowy format (YYYY-MM-DD), ale jest "
+"Wartość „%(value)s” ma prawidłowy format (YYYY-MM-DD), ale jest "
 "nieprawidłową datą."
 
 msgid "Date (without time)"
@@ -552,36 +544,36 @@ msgstr "Data (bez godziny)"
 
 #, python-format
 msgid ""
-"'%(value)s' value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[."
+"“%(value)s” value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[."
 "uuuuuu]][TZ] format."
 msgstr ""
-"Wartość '%(value)s' ma nieprawidłowy format. Musi być ona w formacie YYYY-MM-"
+"Wartość „%(value)s” ma nieprawidłowy format. Musi być ona w formacie YYYY-MM-"
 "DD HH:MM[:ss[.uuuuuu]][TZ]."
 
 #, python-format
 msgid ""
-"'%(value)s' value has the correct format (YYYY-MM-DD HH:MM[:ss[.uuuuuu]]"
+"“%(value)s” value has the correct format (YYYY-MM-DD HH:MM[:ss[.uuuuuu]]"
 "[TZ]) but it is an invalid date/time."
 msgstr ""
-"Wartość '%(value)s' ma prawidłowy format (YYYY-MM-DD HH:MM[:ss[.uuuuuu]]"
+"Wartość „%(value)s” ma prawidłowy format (YYYY-MM-DD HH:MM[:ss[.uuuuuu]]"
 "[TZ]), ale jest nieprawidłową datą/godziną."
 
 msgid "Date (with time)"
 msgstr "Data (z godziną)"
 
 #, python-format
-msgid "'%(value)s' value must be a decimal number."
-msgstr "wartość '%(value)s' musi być liczbą dziesiętną."
+msgid "“%(value)s” value must be a decimal number."
+msgstr "Wartością „%(value)s” musi być liczba dziesiętna."
 
 msgid "Decimal number"
 msgstr "Liczba dziesiętna"
 
 #, python-format
 msgid ""
-"'%(value)s' value has an invalid format. It must be in [DD] [HH:[MM:]]ss[."
+"“%(value)s” value has an invalid format. It must be in [DD] [[HH:]MM:]ss[."
 "uuuuuu] format."
 msgstr ""
-"Wartość '%(value)s' ma błędny format. Poprawny format to [DD] [HH:[MM:]]ss[."
+"Wartość „%(value)s” ma błędny format. Poprawny format to [DD] [HH:[MM:]]ss[."
 "uuuuuu]."
 
 msgid "Duration"
@@ -594,11 +586,21 @@ msgid "File path"
 msgstr "Ścieżka do pliku"
 
 #, python-format
-msgid "'%(value)s' value must be a float."
-msgstr "wartość '%(value)s' musi być liczbą zmiennoprzecinkową."
+msgid "“%(value)s” value must be a float."
+msgstr "Wartością „%(value)s” musi być liczba zmiennoprzecinkowa."
 
 msgid "Floating point number"
 msgstr "Liczba zmiennoprzecinkowa"
+
+#, python-format
+msgid "“%(value)s” value must be an integer."
+msgstr "Wartością „%(value)s” musi być liczba całkowita."
+
+msgid "Integer"
+msgstr "Liczba całkowita"
+
+msgid "Big (8 byte) integer"
+msgstr "Duża liczba całkowita (8 bajtów)"
 
 msgid "IPv4 address"
 msgstr "adres IPv4"
@@ -607,8 +609,8 @@ msgid "IP address"
 msgstr "Adres IP"
 
 #, python-format
-msgid "'%(value)s' value must be either None, True or False."
-msgstr "Wartość '%(value)s' musi być None, True lub False."
+msgid "“%(value)s” value must be either None, True or False."
+msgstr "Wartością „%(value)s” musi być None, True lub False."
 
 msgid "Boolean (Either True, False or None)"
 msgstr "Wartość logiczna (True, False, None – prawda, fałsz lub nic)"
@@ -631,19 +633,19 @@ msgstr "Tekst"
 
 #, python-format
 msgid ""
-"'%(value)s' value has an invalid format. It must be in HH:MM[:ss[.uuuuuu]] "
+"“%(value)s” value has an invalid format. It must be in HH:MM[:ss[.uuuuuu]] "
 "format."
 msgstr ""
-"Wartość '%(value)s' ma nieprawidłowy format. Musi być ona w formacie HH:MM[:"
+"Wartość „%(value)s” ma nieprawidłowy format. Musi być ona w formacie HH:MM[:"
 "ss[.uuuuuu]]."
 
 #, python-format
 msgid ""
-"'%(value)s' value has the correct format (HH:MM[:ss[.uuuuuu]]) but it is an "
+"“%(value)s” value has the correct format (HH:MM[:ss[.uuuuuu]]) but it is an "
 "invalid time."
 msgstr ""
-"Wartość '%(value)s' ma prawidłowy format (HH:MM[:ss[.uuuuuu]]), ale jest "
-"nieprawidłową godziną."
+"Wartość „%(value)s” ma prawidłowy format (HH:MM[:ss[.uuuuuu]]), ale jest "
+"nieprawidłową wartością czasu."
 
 msgid "Time"
 msgstr "Czas"
@@ -655,8 +657,8 @@ msgid "Raw binary data"
 msgstr "Dane w postaci binarnej"
 
 #, python-format
-msgid "'%(value)s' is not a valid UUID."
-msgstr "Wartość '%(value)s' nie jest poprawnym UUID."
+msgid "“%(value)s” is not a valid UUID."
+msgstr "Wartość „%(value)s” nie jest poprawnym UUID-em."
 
 msgid "Universally unique identifier"
 msgstr "Uniwersalnie unikalny identyfikator"
@@ -824,16 +826,16 @@ msgid "Select a valid choice. That choice is not one of the available choices."
 msgstr "Wybierz poprawną wartość. Podana nie jest jednym z dostępnych wyborów."
 
 #, python-format
-msgid "\"%(pk)s\" is not a valid value."
+msgid "“%(pk)s” is not a valid value."
 msgstr "„%(pk)s” nie jest poprawną wartością."
 
 #, python-format
 msgid ""
-"%(datetime)s couldn't be interpreted in time zone %(current_timezone)s; it "
+"%(datetime)s couldn’t be interpreted in time zone %(current_timezone)s; it "
 "may be ambiguous or it may not exist."
 msgstr ""
-"%(datetime)s nie może być interpretowany w strefie czasowej "
-"%(current_timezone)s; może być niejednoznaczne lub nie istnieć."
+"%(datetime)s nie mógł zostać zinterpretowany w strefie czasowej "
+"%(current_timezone)s; może być niejednoznaczny lub może nie istnieć."
 
 msgid "Clear"
 msgstr "Wyczyść"
@@ -852,6 +854,15 @@ msgstr "Tak"
 
 msgid "No"
 msgstr "Nie"
+
+msgid "Year"
+msgstr "Rok"
+
+msgid "Month"
+msgstr "Miesiąc"
+
+msgid "Day"
+msgstr "Dzień"
 
 msgid "yes,no,maybe"
 msgstr "tak,nie,może"
@@ -1185,20 +1196,20 @@ msgid "CSRF verification failed. Request aborted."
 msgstr "Weryfikacja CSRF nie powiodła się. Żądanie zostało przerwane."
 
 msgid ""
-"You are seeing this message because this HTTPS site requires a 'Referer "
-"header' to be sent by your Web browser, but none was sent. This header is "
+"You are seeing this message because this HTTPS site requires a “Referer "
+"header” to be sent by your Web browser, but none was sent. This header is "
 "required for security reasons, to ensure that your browser is not being "
 "hijacked by third parties."
 msgstr ""
-"Widzisz tą wiadomość, ponieważ ta witryna HTTPS wymaga aby przeglądarka "
-"wysłała nagłówek 'Referer header', a żaden nie został wysłany. Nagłówek ten "
-"jest wymagane ze względów bezpieczeństwa, aby upewnić się, że Twoja "
+"Widzisz tę wiadomość, ponieważ ta witryna HTTPS wymaga, aby przeglądarka "
+"wysłała nagłówek „Referer header”, a żaden nie został wysłany. Nagłówek ten "
+"jest wymagany ze względów bezpieczeństwa, aby upewnić się, że Twoja "
 "przeglądarka nie została przechwycona przez osoby trzecie."
 
 msgid ""
-"If you have configured your browser to disable 'Referer' headers, please re-"
-"enable them, at least for this site, or for HTTPS connections, or for 'same-"
-"origin' requests."
+"If you have configured your browser to disable “Referer” headers, please re-"
+"enable them, at least for this site, or for HTTPS connections, or for “same-"
+"origin” requests."
 msgstr ""
 "Jeżeli nagłówki „Referer” w Twojej przeglądarce są wyłączone, to proszę "
 "włącz je ponownie. Przynajmniej dla tej strony, połączeń HTTPS lub zapytań "
@@ -1206,16 +1217,16 @@ msgstr ""
 
 msgid ""
 "If you are using the <meta name=\"referrer\" content=\"no-referrer\"> tag or "
-"including the 'Referrer-Policy: no-referrer' header, please remove them. The "
-"CSRF protection requires the 'Referer' header to do strict referer checking. "
-"If you're concerned about privacy, use alternatives like <a rel=\"noreferrer"
-"\" ...> for links to third-party sites."
+"including the “Referrer-Policy: no-referrer” header, please remove them. The "
+"CSRF protection requires the “Referer” header to do strict referer checking. "
+"If you’re concerned about privacy, use alternatives like <a rel=\"noreferrer"
+"\" …> for links to third-party sites."
 msgstr ""
 "Jeśli używasz taga <meta name=\"referrer\" content=\"no-referrer\"> lub "
 "umieszczasz nagłówek „Referrer-Policy: no-referrer”, prosimy je usunąć. "
 "Ochrona przed atakami CSRF wymaga nagłówka „Referer”, aby wykonać ścisłe "
 "sprawdzenie referera HTTP. Jeśli zależy ci na prywatności, użyj alternatyw "
-"takich jak <a rel=\"noreferrer\" ...>dla linków do stron osób trzecich."
+"takich jak <a rel=\"noreferrer\" …> dla linków do stron osób trzecich."
 
 msgid ""
 "You are seeing this message because this site requires a CSRF cookie when "
@@ -1229,10 +1240,10 @@ msgstr ""
 
 msgid ""
 "If you have configured your browser to disable cookies, please re-enable "
-"them, at least for this site, or for 'same-origin' requests."
+"them, at least for this site, or for “same-origin” requests."
 msgstr ""
 "Jeżeli ciasteczka w Twojej przeglądarce są wyłączone, to proszę włącz je "
-"ponownie. Przynajmniej dla tej strony lub żadań typu „same-origin”."
+"ponownie. Przynajmniej dla tej strony lub żądań typu „same-origin”."
 
 msgid "More information is available with DEBUG=True."
 msgstr "Więcej informacji jest dostępnych po ustawieniu DEBUG=True."
@@ -1265,18 +1276,18 @@ msgstr ""
 "atrybut '%(class_name)s.allow_future' ma wartość 'False'."
 
 #, python-format
-msgid "Invalid date string '%(datestr)s' given format '%(format)s'"
+msgid "Invalid date string “%(datestr)s” given format “%(format)s”"
 msgstr ""
-"Ciąg znaków '%(datestr)s' jest niezgodny z podanym formatem daty '%(format)s'"
+"Ciąg znaków „%(datestr)s” jest niezgodny z podanym formatem daty „%(format)s”"
 
 #, python-format
 msgid "No %(verbose_name)s found matching the query"
 msgstr "Nie znaleziono %(verbose_name)s spełniających wybrane kryteria"
 
-msgid "Page is not 'last', nor can it be converted to an int."
+msgid "Page is not “last”, nor can it be converted to an int."
 msgstr ""
 "Podanego numeru strony nie można przekształcić na liczbę całkowitą, nie "
-"przyjął on również wartości 'last' oznaczającej ostatnią stronę z dostępnego "
+"przyjął on również wartości „last” oznaczającej ostatnią stronę z dostępnego "
 "zakresu."
 
 #, python-format
@@ -1284,17 +1295,17 @@ msgid "Invalid page (%(page_number)s): %(message)s"
 msgstr "Nieprawidłowy numer strony (%(page_number)s): %(message)s "
 
 #, python-format
-msgid "Empty list and '%(class_name)s.allow_empty' is False."
+msgid "Empty list and “%(class_name)s.allow_empty” is False."
 msgstr ""
-"Lista nie zawiera żadnych elementów, a atrybut '%(class_name)s.allow_empty' "
-"ma wartość 'False'."
+"Lista nie zawiera żadnych elementów, a atrybut „%(class_name)s.allow_empty” "
+"ma wartość False."
 
 msgid "Directory indexes are not allowed here."
 msgstr "Wyświetlanie zawartości katalogu jest tu niedozwolone."
 
 #, python-format
-msgid "\"%(path)s\" does not exist"
-msgstr "\" %(path)s \" nie istnieje"
+msgid "“%(path)s” does not exist"
+msgstr "„%(path)s” nie istnieje"
 
 #, python-format
 msgid "Index of %(directory)s"
@@ -1329,7 +1340,7 @@ msgstr ""
 msgid "Django Documentation"
 msgstr "Dokumentacja Django"
 
-msgid "Topics, references, &amp; how-to's"
+msgid "Topics, references, &amp; how-to’s"
 msgstr "Przewodniki tematyczne, podręczniki i przewodniki „jak to zrobić”"
 
 msgid "Tutorial: A Polling App"
