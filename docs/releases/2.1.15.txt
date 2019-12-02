@@ -2,7 +2,7 @@
 Django 2.1.15 release notes
 ===========================
 
-*Expected December 2, 2019*
+*December 2, 2019*
 
 Django 2.1.15 fixes a security issue and a data loss bug in 2.1.14.
 
