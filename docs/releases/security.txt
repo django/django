@@ -1029,3 +1029,16 @@ Versions affected
 * Django 2.2 :commit:`(patch) <cf694e6852b0da7799f8b53f1fb2f7d20cf17534>`
 * Django 2.1 :commit:`(patch) <5d50a2e5fa36ad23ab532fc54cf4073de84b3306>`
 * Django 1.11 :commit:`(patch) <869b34e9b3be3a4cfcb3a145f218ffd3f5e3fd79>`
+
+December 2, 2019 - :cve:`2019-19118`
+------------------------------------
+
+Privilege escalation in the Django admin. `Full description
+<https://www.djangoproject.com/weblog/2019/dec/02/security-releases/>`__
+
+Versions affected
+~~~~~~~~~~~~~~~~~
+
+* Django 3.0 :commit:`(patch) <092cd66cf3c3e175acce698d6ca2012068d878fa>`
+* Django 2.2 :commit:`(patch) <36f580a17f0b3cb087deadf3b65eea024f479c21>`
+* Django 2.1 :commit:`(patch) <103ebe2b5ff1b2614b85a52c239f471904d26244>`
