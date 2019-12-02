@@ -1692,6 +1692,14 @@ specify the related objects you want to lock in ``select_for_update(of=(...))``
 using the same fields syntax as :meth:`select_related`. Use the value ``'self'``
 to refer to the queryset's model.
 
+.. admonition:: Lock parents models in ``select_for_update(of=(...))``
+
+    If you want to lock parents models when using :ref:`multi-table inheritance
+    <multi-table-inheritance>`, you must specify parent link fields (by default
+    ``<parent_model_name>_ptr``) in the ``of`` argument. For example::
+
+        Restaurant.objects.select_for_update(of=('self', 'place_ptr'))
+
 You can't use ``select_for_update()`` on nullable relations::
 
     >>> Person.objects.select_related('hometown').select_for_update()
