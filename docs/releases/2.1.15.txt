@@ -43,8 +43,6 @@ adding a documented, supported, and properly-tested mechanism for
 partially-editable multi-model forms to the admin interface may occur in Django
 itself.
 
-Thank you to Shen Ying for reporting this issue.
-
 Bugfixes
 ========
 
