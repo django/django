@@ -1,14 +1,14 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Claude Paroz <claude@2xlibre.net>, 2013-2016,2018
+# Claude Paroz <claude@2xlibre.net>, 2013-2016,2018-2019
 # Jannis Leidel <jannis@leidel.info>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2018-10-19 16:29+0000\n"
+"POT-Creation-Date: 2019-09-08 17:27+0200\n"
+"PO-Revision-Date: 2019-09-18 15:49+0000\n"
 "Last-Translator: Claude Paroz <claude@2xlibre.net>\n"
 "Language-Team: French (http://www.transifex.com/django/django/language/fr/)\n"
 "MIME-Version: 1.0\n"
@@ -156,13 +156,13 @@ msgid "Template: %(name)s"
 msgstr "Gabarit : %(name)s"
 
 #, python-format
-msgid "Template: \"%(name)s\""
-msgstr "Gabarit : « %(name)s »"
+msgid "Template: <q>%(name)s</q>"
+msgstr "Gabarit : <q>%(name)s</q>"
 
 #. Translators: Search is not a verb here, it qualifies path (a search path)
 #, python-format
-msgid "Search path for template \"%(name)s\":"
-msgstr "Chemin de recherche du gabarit « %(name)s » :"
+msgid "Search path for template <q>%(name)s</q>:"
+msgstr "Chemin de recherche du gabarit <q>%(name)s</q> :"
 
 msgid "(does not exist)"
 msgstr "(n'existe pas)"

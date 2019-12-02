@@ -3,13 +3,14 @@
 # Translators:
 # NullIsNot0 <nullisnot0@inbox.lv>, 2017
 # NullIsNot0 <nullisnot0@inbox.lv>, 2018
+# NullIsNot0 <nullisnot0@inbox.lv>, 2019
 # peterisb <pb@sungis.lv>, 2016-2017
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-05-17 11:49+0200\n"
-"PO-Revision-Date: 2018-05-23 16:49+0000\n"
+"POT-Creation-Date: 2019-09-08 17:27+0200\n"
+"PO-Revision-Date: 2019-11-07 05:18+0000\n"
 "Last-Translator: NullIsNot0 <nullisnot0@inbox.lv>\n"
 "Language-Team: Latvian (http://www.transifex.com/django/django/language/"
 "lv/)\n"
@@ -34,7 +35,7 @@ msgid "Map of strings to strings/nulls"
 msgstr "Virkņu karte uz virknēm/tukšumiem"
 
 #, python-format
-msgid "The value of \"%(key)s\" is not a string or null."
+msgid "The value of “%(key)s” is not a string or null."
 msgstr "\"%(key)s\" vērtība nav teksta rinda vai nulles simbols."
 
 msgid "A JSON object"
@@ -50,8 +51,8 @@ msgid "Input must be a JSON dictionary."
 msgstr "Ieejošajiem datiem ir jābūt JSON vārdnīcai."
 
 #, python-format
-msgid "'%(value)s' value must be valid JSON."
-msgstr "'%(value)s' vērtībai jābūt korektam JSON."
+msgid "“%(value)s” value must be valid JSON."
+msgstr "\"%(value)s\" vērtībai jābūt korektam JSON."
 
 msgid "Enter two valid values."
 msgstr "Ievadi divas derīgas vērtības."

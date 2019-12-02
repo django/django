@@ -2,7 +2,7 @@
 #
 # Translators:
 # Ahmet Emre Aladağ <emre.aladag@isik.edu.tr>, 2013
-# BouRock, 2015-2017
+# BouRock, 2015-2017,2019
 # BouRock, 2014-2015
 # Caner Başaran <basaran.caner@protonmail.com>, 2013
 # Cihad GÜNDOĞDU <cihadgundogdu@gmail.com>, 2014
@@ -15,8 +15,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-09-24 13:46+0200\n"
-"PO-Revision-Date: 2017-09-24 15:49+0000\n"
+"POT-Creation-Date: 2019-09-08 17:27+0200\n"
+"PO-Revision-Date: 2019-09-17 07:59+0000\n"
 "Last-Translator: BouRock\n"
 "Language-Team: Turkish (http://www.transifex.com/django/django/language/"
 "tr/)\n"
@@ -61,8 +61,8 @@ msgstr "Ayarlı parola yok."
 msgid "Invalid password format or unknown hashing algorithm."
 msgstr "Geçersiz parola biçimi veya bilinmeyen adresleme algoritması."
 
-msgid "The two password fields didn't match."
-msgstr "İki parola alanı uyuşmadı."
+msgid "The two password fields didn’t match."
+msgstr "İki parola alanı eşleşmedi."
 
 msgid "Password"
 msgstr "Parola"
@@ -74,7 +74,7 @@ msgid "Enter the same password as before, for verification."
 msgstr "Doğrulama için önceki gibi aynı parolayı girin."
 
 msgid ""
-"Raw passwords are not stored, so there is no way to see this user's "
+"Raw passwords are not stored, so there is no way to see this user’s "
 "password, but you can change the password using <a href=\"{}\">this form</a>."
 msgstr ""
 "Ham parolalar saklanmaz, bu yüzden bu kullanıcının parolasını görmenin yolu "
@@ -252,19 +252,19 @@ msgstr[1] "Parolanız en az %(min_length)d karakter içermek zorunda."
 msgid "The password is too similar to the %(verbose_name)s."
 msgstr "Parolanız %(verbose_name)s ile çok benzerdir."
 
-msgid "Your password can't be too similar to your other personal information."
+msgid "Your password can’t be too similar to your other personal information."
 msgstr "Parolanız diğer kişisel bilgileriniz ile çok benzer olamaz."
 
 msgid "This password is too common."
 msgstr "Bu parola çok geneldir."
 
-msgid "Your password can't be a commonly used password."
-msgstr "Parolanız genellikle kullanılan bir parola olamaz."
+msgid "Your password can’t be a commonly used password."
+msgstr "Parolanız genelde kullanılan bir parola olamaz."
 
 msgid "This password is entirely numeric."
 msgstr "Bu parola tamamıyla sayısaldır."
 
-msgid "Your password can't be entirely numeric."
+msgid "Your password can’t be entirely numeric."
 msgstr "Parolanız tamamıyla sayısal olamaz."
 
 #, python-format

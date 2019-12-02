@@ -4,13 +4,14 @@
 # NullIsNot0 <nullisnot0@inbox.lv>, 2017
 # NullIsNot0 <nullisnot0@inbox.lv>, 2017
 # Jannis Leidel <jannis@leidel.info>, 2011
+# NullIsNot0 <nullisnot0@inbox.lv>, 2019
 # peterisb <pb@sungis.lv>, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-09-24 13:46+0200\n"
-"PO-Revision-Date: 2017-12-10 19:29+0000\n"
+"POT-Creation-Date: 2019-09-08 17:27+0200\n"
+"PO-Revision-Date: 2019-11-07 07:27+0000\n"
 "Last-Translator: NullIsNot0 <nullisnot0@inbox.lv>\n"
 "Language-Team: Latvian (http://www.transifex.com/django/django/language/"
 "lv/)\n"
@@ -56,7 +57,7 @@ msgstr "Nav norādīta parole"
 msgid "Invalid password format or unknown hashing algorithm."
 msgstr "Nederīgs paroles formāts vai nezināms hash algoritms."
 
-msgid "The two password fields didn't match."
+msgid "The two password fields didn’t match."
 msgstr "Paroles lauki nesakrita."
 
 msgid "Password"
@@ -69,12 +70,11 @@ msgid "Enter the same password as before, for verification."
 msgstr "Ievadi iepriekš norādīto paroli verifikācijai."
 
 msgid ""
-"Raw passwords are not stored, so there is no way to see this user's "
+"Raw passwords are not stored, so there is no way to see this user’s "
 "password, but you can change the password using <a href=\"{}\">this form</a>."
 msgstr ""
-"Neapstrādātas paroles netiek glabātas, tāpēc nav iespējams apskatīt "
-"lietotāja paroli, bet jūs variet to nomainīt, izmantojot <a href=\"{}\">šo "
-"formu</a>."
+"Paroles netiek glabātas brīvā tekstā, tāpēc nav iespējams apskatīt lietotāja "
+"paroli, bet jūs varat to nomainīt, izmantojot <a href=\"{}\">šo formu</a>."
 
 #, python-format
 msgid ""
@@ -248,19 +248,19 @@ msgstr[2] "Parolei ir jābūt vismaz %(min_length)d zīmēm garai."
 msgid "The password is too similar to the %(verbose_name)s."
 msgstr "Parole ir pārāk līdzīga %(verbose_name)s."
 
-msgid "Your password can't be too similar to your other personal information."
-msgstr "Tava parole nedrīkst būt pārāk līdzīga pārējiem personālajiem datiem."
+msgid "Your password can’t be too similar to your other personal information."
+msgstr "Parole nedrīkst būt pārāk līdzīga pārējai personīgajai informācijai."
 
 msgid "This password is too common."
 msgstr "Parole ir pārāk bieži lietota."
 
-msgid "Your password can't be a commonly used password."
-msgstr "Tava parole nedrīkst būt bieži lietota."
+msgid "Your password can’t be a commonly used password."
+msgstr "Parole nedrīkst būt no bieži lietotu paroļu saraksta."
 
 msgid "This password is entirely numeric."
 msgstr "Parole sastāv tikai no cipariem."
 
-msgid "Your password can't be entirely numeric."
+msgid "Your password can’t be entirely numeric."
 msgstr "Parole nedrīkst sastāvēt tikai no cipariem."
 
 #, python-format

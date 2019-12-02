@@ -2,13 +2,13 @@
 #
 # Translators:
 # Viktar Palstsiuk <vipals@gmail.com>, 2015
-# znotdead <zhirafchik@gmail.com>, 2016-2017
+# znotdead <zhirafchik@gmail.com>, 2016-2017,2019
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-09-19 16:41+0000\n"
+"POT-Creation-Date: 2019-09-08 17:27+0200\n"
+"PO-Revision-Date: 2019-10-16 19:04+0000\n"
 "Last-Translator: znotdead <zhirafchik@gmail.com>\n"
 "Language-Team: Belarusian (http://www.transifex.com/django/django/language/"
 "be/)\n"
@@ -89,6 +89,15 @@ msgstr "Дадаць яшчэ %(verbose_name)s"
 msgid "Remove"
 msgstr "Прыбраць"
 
+msgid "Addition"
+msgstr "Дапаўненьне"
+
+msgid "Change"
+msgstr "Зьмяніць"
+
+msgid "Deletion"
+msgstr "Выдалленне"
+
 msgid "action time"
 msgstr "час дзеяньня"
 
@@ -102,7 +111,7 @@ msgid "object id"
 msgstr "нумар аб’екта"
 
 #. Translators: 'repr' means representation
-#. (https://docs.python.org/3/library/functions.html#repr)
+#. (https://docs.python.org/library/functions.html#repr)
 msgid "object repr"
 msgstr "прадстаўленьне аб’екта"
 
@@ -119,23 +128,23 @@ msgid "log entries"
 msgstr "запісы ў справаздачы"
 
 #, python-format
-msgid "Added \"%(object)s\"."
-msgstr "Дадалі «%(object)s»."
+msgid "Added “%(object)s”."
+msgstr "Дадалі “%(object)s”."
 
 #, python-format
-msgid "Changed \"%(object)s\" - %(changes)s"
+msgid "Changed “%(object)s” — %(changes)s"
 msgstr "Зьмянілі «%(object)s» — %(changes)s"
 
 #, python-format
-msgid "Deleted \"%(object)s.\""
+msgid "Deleted “%(object)s.”"
 msgstr "Выдалілі «%(object)s»."
 
 msgid "LogEntry Object"
 msgstr "Запіс у справаздачы"
 
 #, python-brace-format
-msgid "Added {name} \"{object}\"."
-msgstr "Дадалі {name} \"{object}\"."
+msgid "Added {name} “{object}”."
+msgstr "Дадалі {name} “{object}”."
 
 msgid "Added."
 msgstr "Дадалі."
@@ -144,16 +153,16 @@ msgid "and"
 msgstr "і"
 
 #, python-brace-format
-msgid "Changed {fields} for {name} \"{object}\"."
-msgstr "Змянілі {fields} для {name} \"{object}\"."
+msgid "Changed {fields} for {name} “{object}”."
+msgstr "Змянілі {fields} для {name} “{object}”."
 
 #, python-brace-format
 msgid "Changed {fields}."
 msgstr "Зьмянілі {fields}."
 
 #, python-brace-format
-msgid "Deleted {name} \"{object}\"."
-msgstr "Выдалілі {name} \"{object}\"."
+msgid "Deleted {name} “{object}”."
+msgstr "Выдалілі {name} “{object}”."
 
 msgid "No fields changed."
 msgstr "Палі не зьмяняліся."
@@ -161,41 +170,41 @@ msgstr "Палі не зьмяняліся."
 msgid "None"
 msgstr "Няма"
 
-msgid ""
-"Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
+msgid "Hold down “Control”, or “Command” on a Mac, to select more than one."
 msgstr ""
-"Утрымлівайце націснутай кнопку \"Control\", або \"Command\" на Mac, каб "
-"вылучыць больш за адзін."
+"Утрымлівайце націснутай кнопку“Control”, або “Command” на Mac, каб вылучыць "
+"больш за адзін."
+
+#, python-brace-format
+msgid "The {name} “{obj}” was added successfully."
+msgstr "Пасьпяхова дадалі {name} “{obj}”."
+
+msgid "You may edit it again below."
+msgstr "Вы можаце зноўку правіць гэта ніжэй."
 
 #, python-brace-format
 msgid ""
-"The {name} \"{obj}\" was added successfully. You may edit it again below."
-msgstr "Дадалі {name} \"{obj}\". Ніжэй яго можна зноўку правіць."
+"The {name} “{obj}” was added successfully. You may add another {name} below."
+msgstr "Пасьпяхова дадалі {name} \"{obj}\". Ніжэй можна дадаць іншы {name}."
 
 #, python-brace-format
 msgid ""
-"The {name} \"{obj}\" was added successfully. You may add another {name} "
+"The {name} “{obj}” was changed successfully. You may edit it again below."
+msgstr "Пасьпяхова зьмянілі {name} \"{obj}\". Ніжэй яго можна зноўку правіць."
+
+#, python-brace-format
+msgid "The {name} “{obj}” was added successfully. You may edit it again below."
+msgstr "Пасьпяхова дадалі {name} \"{obj}\". Ніжэй яго можна зноўку правіць."
+
+#, python-brace-format
+msgid ""
+"The {name} “{obj}” was changed successfully. You may add another {name} "
 "below."
-msgstr "Дадалі {name} \"{obj}\". Ніжэй можна дадаць іншы {name}."
+msgstr "Пасьпяхова зьмянілі {name} \"{obj}\". Ніжэй можна дадаць іншы {name}."
 
 #, python-brace-format
-msgid "The {name} \"{obj}\" was added successfully."
-msgstr "Дадалі {name} \"{obj}\"."
-
-#, python-brace-format
-msgid ""
-"The {name} \"{obj}\" was changed successfully. You may edit it again below."
-msgstr "Змянілі {name} \"{obj}\". Ніжэй яго можна зноўку правіць."
-
-#, python-brace-format
-msgid ""
-"The {name} \"{obj}\" was changed successfully. You may add another {name} "
-"below."
-msgstr "Змянілі {name} \"{obj}\". Ніжэй можна дадаць іншы {name}."
-
-#, python-brace-format
-msgid "The {name} \"{obj}\" was changed successfully."
-msgstr "Змянілі {name} \"{obj}\"."
+msgid "The {name} “{obj}” was changed successfully."
+msgstr "Пасьпяхова зьмянілі {name} \"{obj}\"."
 
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
@@ -208,12 +217,12 @@ msgid "No action selected."
 msgstr "Не абралі дзеяньняў."
 
 #, python-format
-msgid "The %(name)s \"%(obj)s\" was deleted successfully."
-msgstr "Сьцерлі %(name)s «%(obj)s»."
+msgid "The %(name)s “%(obj)s” was deleted successfully."
+msgstr "Пасьпяхова выдалілі %(name)s «%(obj)s»."
 
 #, python-format
-msgid "%(name)s with ID \"%(key)s\" doesn't exist. Perhaps it was deleted?"
-msgstr "%(name)s з ID \"%(key)s\" не існуе. Магчыма гэта было выдалена."
+msgid "%(name)s with ID “%(key)s” doesn’t exist. Perhaps it was deleted?"
+msgstr "%(name)s з ID \"%(key)s\" не існуе. Магчыма гэта было выдалена раней?"
 
 #, python-format
 msgid "Add %s"
@@ -222,6 +231,10 @@ msgstr "Дадаць %s"
 #, python-format
 msgid "Change %s"
 msgstr "Зьмяніць %s"
+
+#, python-format
+msgid "View %s"
+msgstr "Праглядзець %s"
 
 msgid "Database error"
 msgstr "База зьвестак дала хібу"
@@ -283,7 +296,7 @@ msgstr "Адміністрацыя %(app)s"
 msgid "Page not found"
 msgstr "Бачыну не знайшлі"
 
-msgid "We're sorry, but the requested page could not be found."
+msgid "We’re sorry, but the requested page could not be found."
 msgstr "На жаль, запытаную бачыну немагчыма знайсьці."
 
 msgid "Home"
@@ -299,7 +312,7 @@ msgid "Server Error <em>(500)</em>"
 msgstr "Паслужнік даў хібу <em>(памылка 500)</em>"
 
 msgid ""
-"There's been an error. It's been reported to the site administrators via "
+"There’s been an error. It’s been reported to the site administrators via "
 "email and should be fixed shortly. Thanks for your patience."
 msgstr ""
 "Адбылася памылка. Паведамленне пра памылку было адаслана адміністратарам "
@@ -323,7 +336,7 @@ msgid "Clear selection"
 msgstr "Не абіраць нічога"
 
 msgid ""
-"First, enter a username and password. Then, you'll be able to edit more user "
+"First, enter a username and password. Then, you’ll be able to edit more user "
 "options."
 msgstr ""
 "Спачатку пазначце імя карыстальніка ды пароль. Потым можна будзе наставіць "
@@ -336,7 +349,7 @@ msgid "Change password"
 msgstr "Зьмяніць пароль"
 
 msgid "Please correct the error below."
-msgstr "Выпраўце хібы, апісаныя ніжэй."
+msgstr "Калі ласка, выпраўце памылкі, адзначаныя ніжэй."
 
 msgid "Please correct the errors below."
 msgstr "Калі ласка, выпраўце памылкі, адзначаныя ніжэй."
@@ -411,8 +424,8 @@ msgstr ""
 msgid "Objects"
 msgstr "Аб'екты"
 
-msgid "Yes, I'm sure"
-msgstr "Так, дакладна"
+msgid "Yes, I’m sure"
+msgstr "Так, я ўпэўнены"
 
 msgid "No, take me back"
 msgstr "Не, вярнуцца назад"
@@ -445,8 +458,8 @@ msgstr ""
 "Ці выдаліць абранае (%(objects_name)s)? Усе наступныя аб’екты ды зьвязаныя "
 "зь імі складнікі выдаляцца:"
 
-msgid "Change"
-msgstr "Зьмяніць"
+msgid "View"
+msgstr "Праглядзець"
 
 msgid "Delete?"
 msgstr "Ці выдаліць?"
@@ -465,8 +478,8 @@ msgstr "Мадэлі ў %(name)s праграме"
 msgid "Add"
 msgstr "Дадаць"
 
-msgid "You don't have permission to edit anything."
-msgstr "Вы ня маеце дазволу нешта зьмяняць."
+msgid "You don’t have permission to view or edit anything."
+msgstr "Вы ня маеце дазволу праглядаць ці нешта зьмяняць."
 
 msgid "Recent actions"
 msgstr "Нядаўнія дзеянні"
@@ -481,7 +494,7 @@ msgid "Unknown content"
 msgstr "Невядомае зьмесьціва"
 
 msgid ""
-"Something's wrong with your database installation. Make sure the appropriate "
+"Something’s wrong with your database installation. Make sure the appropriate "
 "database tables have been created, and make sure the database is readable by "
 "the appropriate user."
 msgstr ""
@@ -509,7 +522,7 @@ msgid "Action"
 msgstr "Дзеяньне"
 
 msgid ""
-"This object doesn't have a change history. It probably wasn't added via this "
+"This object doesn’t have a change history. It probably wasn’t added via this "
 "admin site."
 msgstr ""
 "Аб’ект ня мае гісторыі зьменаў. Мажліва, яго дадавалі не праз кіраўнічую "
@@ -521,20 +534,8 @@ msgstr "Паказаць усё"
 msgid "Save"
 msgstr "Захаваць"
 
-msgid "Popup closing..."
+msgid "Popup closing…"
 msgstr "Усплывальнае акно зачыняецца..."
-
-#, python-format
-msgid "Change selected %(model)s"
-msgstr "Змяніць абраныя %(model)s"
-
-#, python-format
-msgid "Add another %(model)s"
-msgstr "Дадаць яшчэ %(model)s"
-
-#, python-format
-msgid "Delete selected %(model)s"
-msgstr "Выдаліць абраныя %(model)s"
 
 msgid "Search"
 msgstr "Шукаць"
@@ -560,6 +561,24 @@ msgstr "Захаваць і дадаць іншы"
 msgid "Save and continue editing"
 msgstr "Захаваць і працягваць правіць"
 
+msgid "Save and view"
+msgstr "Захаваць і праглядзець"
+
+msgid "Close"
+msgstr "Закрыць"
+
+#, python-format
+msgid "Change selected %(model)s"
+msgstr "Змяніць абраныя %(model)s"
+
+#, python-format
+msgid "Add another %(model)s"
+msgstr "Дадаць яшчэ %(model)s"
+
+#, python-format
+msgid "Delete selected %(model)s"
+msgstr "Выдаліць абраныя %(model)s"
+
 msgid "Thanks for spending some quality time with the Web site today."
 msgstr "Дзякуем за час, які вы сёньня правялі на гэтай пляцоўцы."
 
@@ -573,11 +592,11 @@ msgid "Your password was changed."
 msgstr "Ваш пароль зьмяніўся."
 
 msgid ""
-"Please enter your old password, for security's sake, and then enter your new "
+"Please enter your old password, for security’s sake, and then enter your new "
 "password twice so we can verify you typed it in correctly."
 msgstr ""
-"Дзеля бясьпекі пазначце стары пароль, а потым набярыце новы пароль двойчы "
-"— каб упэўніцца, што набралі без памылак."
+"Дзеля бясьпекі пазначце стары пароль, а потым набярыце новы пароль двойчы — "
+"каб упэўніцца, што набралі без памылак."
 
 msgid "Change my password"
 msgstr "Зьмяніць пароль"
@@ -610,7 +629,7 @@ msgstr ""
 "Запытайцеся ўзнавіць пароль яшчэ раз."
 
 msgid ""
-"We've emailed you instructions for setting your password, if an account "
+"We’ve emailed you instructions for setting your password, if an account "
 "exists with the email you entered. You should receive them shortly."
 msgstr ""
 "Мы адаслалі па электроннай пошце інструкцыі па ўстаноўцы пароля. Калі існуе "
@@ -618,7 +637,7 @@ msgstr ""
 "бліжэйшы час."
 
 msgid ""
-"If you don't receive an email, please make sure you've entered the address "
+"If you don’t receive an email, please make sure you’ve entered the address "
 "you registered with, and check your spam folder."
 msgstr ""
 "Калі вы не атрымліваеце электронную пошту, калі ласка, пераканайцеся, што вы "
@@ -635,7 +654,7 @@ msgstr ""
 msgid "Please go to the following page and choose a new password:"
 msgstr "Перайдзіце да наступнае бачыны ды абярыце новы пароль:"
 
-msgid "Your username, in case you've forgotten:"
+msgid "Your username, in case you’ve forgotten:"
 msgstr "Імя карыстальніка, калі раптам вы забыліся:"
 
 msgid "Thanks for using our site!"
@@ -646,7 +665,7 @@ msgid "The %(site_name)s team"
 msgstr "Каманда «%(site_name)s»"
 
 msgid ""
-"Forgotten your password? Enter your email address below, and we'll email "
+"Forgotten your password? Enter your email address below, and we’ll email "
 "instructions for setting a new one."
 msgstr ""
 "Забыліся пароль? Калі ласка, увядзіце свой адрас электроннай пошты ніжэй, і "
@@ -668,6 +687,10 @@ msgstr "Абраць %s"
 #, python-format
 msgid "Select %s to change"
 msgstr "Абярыце %s, каб зьмяніць"
+
+#, python-format
+msgid "Select %s to view"
+msgstr "Абярыце %s, каб праглядзець"
 
 msgid "Date:"
 msgstr "Дата:"

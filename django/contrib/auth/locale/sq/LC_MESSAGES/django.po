@@ -2,13 +2,13 @@
 #
 # Translators:
 # Besnik <besnik@programeshqip.org>, 2011,2015
-# Besnik <besnik@programeshqip.org>, 2015,2017
+# Besnik <besnik@programeshqip.org>, 2015,2017,2019
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-09-24 13:46+0200\n"
-"PO-Revision-Date: 2017-11-29 22:24+0000\n"
+"POT-Creation-Date: 2019-09-08 17:27+0200\n"
+"PO-Revision-Date: 2019-09-17 08:36+0000\n"
 "Last-Translator: Besnik <besnik@programeshqip.org>\n"
 "Language-Team: Albanian (http://www.transifex.com/django/django/language/"
 "sq/)\n"
@@ -53,7 +53,7 @@ msgstr "S’ka fjalëkalim të caktuar."
 msgid "Invalid password format or unknown hashing algorithm."
 msgstr "Format i pavlefshëm fjalëkalimi ose algoritëm i panjohur hashi."
 
-msgid "The two password fields didn't match."
+msgid "The two password fields didn’t match."
 msgstr "Dy fushat për fjalëkalim s’u përputhën."
 
 msgid "Password"
@@ -66,12 +66,12 @@ msgid "Enter the same password as before, for verification."
 msgstr "Jepni, për verifikim, të njëjtin fjalëkalim si më parë."
 
 msgid ""
-"Raw passwords are not stored, so there is no way to see this user's "
+"Raw passwords are not stored, so there is no way to see this user’s "
 "password, but you can change the password using <a href=\"{}\">this form</a>."
 msgstr ""
 "Nuk depozitohen fjalëkalime të papërpunuar, ndaj s’ka ndonjë mënyrë për të "
 "parë fjalëkalimin e këtij përdoruesi, por mund ta ndryshoni fjalëkalimin "
-"duke përdorur <a href=\"{}\">këtë fjalëkalim</a>."
+"duke përdorur <a href=\"{}\">këtë formular</a>."
 
 #, python-format
 msgid ""
@@ -248,21 +248,21 @@ msgstr[1] "Fjalëkalimi juaj duhet të përmbajë të paktën %(min_length)d she
 msgid "The password is too similar to the %(verbose_name)s."
 msgstr "Fjalëkalimi është shumë i ngjashëm me %(verbose_name)s."
 
-msgid "Your password can't be too similar to your other personal information."
+msgid "Your password can’t be too similar to your other personal information."
 msgstr ""
-"Fjalëkalimi juaj s’mund të jetë shumë i ngjashëm me të tjera të dhëna "
-"personale tuajat."
+"Fjalëkalimi juaj s’mund të jetë shumë i ngjashëm me të dhëna të tjera tuajat "
+"personale."
 
 msgid "This password is too common."
 msgstr "Ky fjalëkalim është shumë i rëndomtë."
 
-msgid "Your password can't be a commonly used password."
-msgstr "Fjalëkalim juaj s’mund të jetë një fjalëkalim i përdorur rëndom."
+msgid "Your password can’t be a commonly used password."
+msgstr "Fjalëkalimi juaj s’mund të jetë një fjalëkalim i përdorur rëndom."
 
 msgid "This password is entirely numeric."
 msgstr "Ky fjalëkalim është tërësisht numerik."
 
-msgid "Your password can't be entirely numeric."
+msgid "Your password can’t be entirely numeric."
 msgstr "Fjalëkalimi juaj s’mund të jetë tërësisht numerik."
 
 #, python-format

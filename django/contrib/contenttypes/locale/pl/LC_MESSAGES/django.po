@@ -4,14 +4,15 @@
 # sidewinder <adam.klosiu@gmail.com>, 2014
 # angularcircle, 2012
 # Jannis Leidel <jannis@leidel.info>, 2011
+# m_aciek <maciej.olko@gmail.com>, 2019
 # Tomasz Kajtoch <tomekkaj@tomekkaj.pl>, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-01-17 11:07+0100\n"
-"PO-Revision-Date: 2017-09-23 18:54+0000\n"
-"Last-Translator: Tomasz Kajtoch <tomekkaj@tomekkaj.pl>\n"
+"POT-Creation-Date: 2019-09-08 17:27+0200\n"
+"PO-Revision-Date: 2019-11-11 14:09+0000\n"
+"Last-Translator: m_aciek <maciej.olko@gmail.com>\n"
 "Language-Team: Polish (http://www.transifex.com/django/django/language/pl/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -38,9 +39,9 @@ msgid "Content type %(ct_id)s object has no associated model"
 msgstr "Obiekt typu zawartości %(ct_id)s nie posiada przypisanego modelu"
 
 #, python-format
-msgid "Content type %(ct_id)s object %(obj_id)s doesn't exist"
+msgid "Content type %(ct_id)s object %(obj_id)s doesn’t exist"
 msgstr "Obiekt %(obj_id)s typu zawartości %(ct_id)s nie istnieje"
 
 #, python-format
-msgid "%(ct_name)s objects don't have a get_absolute_url() method"
+msgid "%(ct_name)s objects don’t have a get_absolute_url() method"
 msgstr "Obiekty %(ct_name)s nie posiadają metody get_absolute_url()"
