@@ -9,4 +9,7 @@ Django 3.0.1 fixes several bugs in 3.0.
 Bugfixes
 ========
 
-* ...
+* Fixed a regression in Django 3.0 by restoring the ability to use Django
+  inside Jupyter and other environments that force an async context, by adding
+  and option to disable :ref:`async-safety` mechanism with
+  ``DJANGO_ALLOW_ASYNC_UNSAFE`` environment variable (:ticket:`31056`).

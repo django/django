@@ -1,5 +1,6 @@
+import os
 import sys
-from unittest import skipIf
+from unittest import mock, skipIf
 
 from asgiref.sync import async_to_sync
 
@@ -39,3 +40,13 @@ class AsyncUnsafeTest(SimpleTestCase):
         )
         with self.assertRaisesMessage(SynchronousOnlyOperation, msg):
             self.dangerous_method()
+
+    @mock.patch.dict(os.environ, {'DJANGO_ALLOW_ASYNC_UNSAFE': 'true'})
+    @async_to_sync
+    async def test_async_unsafe_suppressed(self):
+        # Decorator doesn't trigger check when the environment variable to
+        # suppress it is set.
+        try:
+            self.dangerous_method()
+        except SynchronousOnlyOperation:
+            self.fail('SynchronousOnlyOperation should not be raised.')
