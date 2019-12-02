@@ -5,6 +5,11 @@ from django.contrib.contenttypes.models import ContentType
 from django.db import models
 
 
+class ByNameManager(models.Manager):
+    def get_by_natural_key(self, key):
+        return self.get(key=key)
+
+
 class Square(models.Model):
     root = models.IntegerField()
     square = models.PositiveIntegerField()
@@ -111,3 +116,36 @@ class Author(models.Model):
 
 class Book(models.Model):
     author = models.ForeignKey(Author, models.CASCADE, to_field='name')
+
+
+# Module with a circular reference through CircularRefB, and with natural keys
+class CircularRefThingA(models.Model):
+    key = models.CharField(max_length=100, unique=True)
+    other_thing = models.ForeignKey('CircularRefThingB', on_delete=models.CASCADE, null=True)
+
+    objects = ByNameManager()
+
+    def natural_key(self):
+        return (self.key,)
+
+
+# Module with a circular reference through CircularRefA, and with natural keys
+class CircularRefThingB(models.Model):
+    key = models.CharField(max_length=100, unique=True)
+    other_thing = models.ForeignKey('CircularRefThingA', on_delete=models.CASCADE, null=True)
+
+    objects = ByNameManager()
+
+    def natural_key(self):
+        return (self.key,)
+
+
+# Module containing a self-reference, and with natural keys
+class SelfRefThing(models.Model):
+    key = models.CharField(max_length=100, unique=True)
+    other_thing = models.ForeignKey('SelfRefThing', on_delete=models.SET_NULL, null=True)
+
+    objects = ByNameManager()
+
+    def natural_key(self):
+        return (self.key,)

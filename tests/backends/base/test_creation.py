@@ -1,13 +1,16 @@
 import copy
 from unittest import mock
 
+from django.core.management import call_command
 from django.db import DEFAULT_DB_ALIAS, connection, connections
 from django.db.backends.base.creation import (
     TEST_DATABASE_PREFIX, BaseDatabaseCreation,
 )
 from django.test import SimpleTestCase
 
-from ..models import Author, Book
+from ..models import (
+    Author, Book, CircularRefThingA, CircularRefThingB, SelfRefThing,
+)
 
 
 def get_connection_copy():
@@ -99,3 +102,41 @@ class TestDeserializeDbFromString(SimpleTestCase):
         a = Author.objects.get()
         b = Book.objects.get()
         self.assertEqual(b.author, a)
+
+    def test_serialize_circular_ref(self):
+        """ This serializes and deserializes circular and self-referencing models (regression test for #31051). """
+
+        # Add some self-referencing data
+        a = CircularRefThingA.objects.create(key="X")
+        b = CircularRefThingB.objects.create(key="Y", other_thing=a)
+        a.other_thing = b
+        a.save()
+
+        t1 = SelfRefThing.objects.create(key="X")
+        t2 = SelfRefThing.objects.create(key="Y", other_thing=t1)
+        t1.other_thing = t2
+        t1.save()
+
+        # This mimics parts of the test runner process, which serializes during db creation, flush after each testcase,
+        # deserialize before the next testcase.
+        creation = connection.creation_class(connection)
+
+        with mock.patch('django.db.migrations.loader.MigrationLoader') as loader:
+            # serialize_db_to_string only serializes apps that have migrations, so pretend that (only) we do
+            loader_instance = loader.return_value
+            loader_instance.migrated_apps = set(['backends'])
+            serialized = creation.serialize_db_to_string()
+
+        call_command('flush', verbosity=0, interactive=False, database=DEFAULT_DB_ALIAS, reset_sequences=False,
+                     inhibit_post_migrate=True)
+
+        creation.deserialize_db_from_string(serialized)
+
+        # Check that deserialization actually worked for the objects we're interested in
+        a = CircularRefThingA.objects.get()
+        b = CircularRefThingB.objects.get()
+        self1, self2 = SelfRefThing.objects.all()
+        self.assertEqual(a.other_thing, b)
+        self.assertEqual(b.other_thing, a)
+        self.assertEqual(self1.other_thing, self2)
+        self.assertEqual(self2.other_thing, self1)
