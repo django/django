@@ -1,0 +1,18 @@
+[
+  {
+    "model": "fixtures.circularrefthinga",
+    "pk": 1,
+    "fields": {
+      "key": "t1",
+      "other_thing": 1
+    }
+  },
+  {
+    "model": "fixtures.circularrefthingb",
+    "pk": 1,
+    "fields": {
+      "key": "t2",
+      "other_thing": 1
+    }
+  }
+]

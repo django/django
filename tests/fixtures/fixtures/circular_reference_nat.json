@@ -1,23 +1,19 @@
 [
   {
-    "model": "fixtures.naturalkeything",
+    "model": "fixtures.circularrefthinga",
     "fields": {
       "key": "t1",
       "other_thing": [
         "t2"
-      ],
-      "other_things" : [
       ]
     }
   },
   {
-    "model": "fixtures.naturalkeything",
+    "model": "fixtures.circularrefthingb",
     "fields": {
       "key": "t2",
       "other_thing": [
         "t1"
-      ],
-      "other_things" : [
       ]
     }
   }

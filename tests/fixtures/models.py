@@ -119,7 +119,7 @@ class PrimaryKeyUUIDModel(models.Model):
 
 
 class NaturalKeyThing(models.Model):
-    key = models.CharField(max_length=100)
+    key = models.CharField(max_length=100, unique=True)
     other_thing = models.ForeignKey('NaturalKeyThing', on_delete=models.CASCADE, null=True)
     other_things = models.ManyToManyField('NaturalKeyThing', related_name='thing_m2m_set')
 
@@ -134,3 +134,30 @@ class NaturalKeyThing(models.Model):
 
     def __str__(self):
         return self.key
+
+
+class ByNameManager(models.Manager):
+    def get_by_natural_key(self, key):
+        return self.get(key=key)
+
+
+# Module with a circular reference through CircularRefB, and with natural keys
+class CircularRefThingA(models.Model):
+    key = models.CharField(max_length=100, unique=True)
+    other_thing = models.ForeignKey('CircularRefThingB', on_delete=models.CASCADE, null=True)
+
+    objects = ByNameManager()
+
+    def natural_key(self):
+        return (self.key,)
+
+
+# Module with a circular reference through CircularRefA, and with natural keys
+class CircularRefThingB(models.Model):
+    key = models.CharField(max_length=100, unique=True)
+    other_thing = models.ForeignKey('CircularRefThingA', on_delete=models.CASCADE, null=True)
+
+    objects = ByNameManager()
+
+    def natural_key(self):
+        return (self.key,)

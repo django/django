@@ -17,8 +17,8 @@ from django.db import IntegrityError, connection
 from django.test import TestCase, TransactionTestCase, skipUnlessDBFeature
 
 from .models import (
-    Article, Category, NaturalKeyThing, PrimaryKeyUUIDModel, ProxySpy, Spy,
-    Tag, Visa,
+    Article, Category, CircularRefThingA, CircularRefThingB, NaturalKeyThing,
+    PrimaryKeyUUIDModel, ProxySpy, Spy, Tag, Visa,
 )
 
 
@@ -788,13 +788,29 @@ class FixtureTransactionTests(DumpDataAssertMixin, TransactionTestCase):
         ])
 
 
-class ForwardReferenceTests(TestCase):
+class ForwardReferenceTests(DumpDataAssertMixin, TestCase):
+
+    def _dumpdata_assert(self, args, output_file, **kwargs):
+        fixture = os.path.join(os.path.dirname(__file__), 'fixtures', output_file)
+        with open(fixture) as f:
+            super()._dumpdata_assert(args, f.read(), **kwargs)
+
     def test_forward_reference_fk(self):
         management.call_command('loaddata', 'forward_reference_fk.json', verbosity=0)
         self.assertEqual(NaturalKeyThing.objects.count(), 2)
         t1, t2 = NaturalKeyThing.objects.all()
         self.assertEqual(t1.other_thing, t2)
         self.assertEqual(t2.other_thing, t1)
+        self._dumpdata_assert(['fixtures'], 'forward_reference_fk.json',
+                              natural_primary_keys=True, natural_foreign_keys=True)
+
+    def test_forward_reference_fk_num(self):
+        management.call_command('loaddata', 'forward_reference_fk_num.json', verbosity=0)
+        self.assertEqual(NaturalKeyThing.objects.count(), 2)
+        t1, t2 = NaturalKeyThing.objects.all()
+        self.assertEqual(t1.other_thing, t2)
+        self.assertEqual(t2.other_thing, t1)
+        self._dumpdata_assert(['fixtures'], 'forward_reference_fk_num.json')
 
     def test_forward_reference_m2m(self):
         management.call_command('loaddata', 'forward_reference_m2m.json', verbosity=0)
@@ -804,3 +820,39 @@ class ForwardReferenceTests(TestCase):
             t1.other_things.order_by('key'),
             ['<NaturalKeyThing: t2>', '<NaturalKeyThing: t3>']
         )
+        self._dumpdata_assert(['fixtures'], 'forward_reference_m2m.json',
+                              natural_primary_keys=True, natural_foreign_keys=True)
+
+    def test_forward_reference_m2m_num(self):
+        management.call_command('loaddata', 'forward_reference_m2m_num.json', verbosity=0)
+        self.assertEqual(NaturalKeyThing.objects.count(), 3)
+        t1 = NaturalKeyThing.objects.get_by_natural_key('t1')
+        self.assertQuerysetEqual(
+            t1.other_things.order_by('key'),
+            ['<NaturalKeyThing: t2>', '<NaturalKeyThing: t3>']
+        )
+        self._dumpdata_assert(['fixtures'], 'forward_reference_m2m_num.json')
+
+
+class CircularReferenceTests(DumpDataAssertMixin, TestCase):
+    def _dumpdata_assert(self, args, output_file, **kwargs):
+        fixture = os.path.join(os.path.dirname(__file__), 'fixtures', output_file)
+        with open(fixture) as f:
+            super()._dumpdata_assert(args, f.read(), **kwargs)
+
+    def test_circular_reference_num(self):
+        management.call_command('loaddata', 'circular_reference_num.json', verbosity=0)
+        a = CircularRefThingA.objects.get()
+        b = CircularRefThingB.objects.get()
+        self.assertEqual(a.other_thing, b)
+        self.assertEqual(b.other_thing, a)
+        self._dumpdata_assert(['fixtures'], 'circular_reference_num.json')
+
+    def test_circular_reference_nat(self):
+        management.call_command('loaddata', 'circular_reference_nat.json', verbosity=0)
+        a = CircularRefThingA.objects.get()
+        b = CircularRefThingB.objects.get()
+        self.assertEqual(a.other_thing, b)
+        self.assertEqual(b.other_thing, a)
+        self._dumpdata_assert(['fixtures'], 'circular_reference_nat.json',
+                              natural_primary_keys=True, natural_foreign_keys=True)
