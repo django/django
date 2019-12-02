@@ -102,6 +102,11 @@ class ObjectReference(models.Model):
         return str(self.obj_id)
 
 
+class ObjectSelfReference(models.Model):
+    key = models.CharField(max_length=3, unique=True)
+    obj = models.ForeignKey('ObjectSelfReference', models.SET_NULL, null=True)
+
+
 class RawData(models.Model):
     raw_data = models.BinaryField()
 
