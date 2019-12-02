@@ -4,7 +4,7 @@ from django.contrib.sessions.backends.base import (
 )
 from django.core.cache import caches
 
-KEY_PREFIX = "django.contrib.sessions.cache"
+KEY_PREFIX = settings.SESSION_CACHE_KEY_PREFIX if settings.SESSION_CACHE_KEY_PREFIX else "django.contrib.sessions.cache"
 
 
 class SessionStore(SessionBase):
