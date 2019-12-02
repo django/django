@@ -166,7 +166,7 @@ to, or in lieu of custom ``field.clean()`` methods.
         list is ``['http', 'https', 'ftp', 'ftps']``. As a reference, the IANA
         website provides a full list of `valid URI schemes`_.
 
-        .. versionadded:: 3.1
+        .. versionchanged:: 3.1
 
         You can pass the special value ``'__all__'`` to accept all schemes.
         In that case, Django will only check that the scheme matches the format
