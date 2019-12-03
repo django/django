@@ -110,7 +110,8 @@ manipulating the data of your Web application. Learn more about it below:
   :doc:`Custom lookups <howto/custom-lookups>` |
   :doc:`Query Expressions <ref/models/expressions>` |
   :doc:`Conditional Expressions <ref/models/conditional-expressions>` |
-  :doc:`Database Functions <ref/models/database-functions>`
+  :doc:`Database Functions <ref/models/database-functions>` |
+  :doc:`Asynchronous Support <topics/async>`
 
 * **Other:**
   :doc:`Supported databases <ref/databases>` |

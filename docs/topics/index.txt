@@ -31,3 +31,4 @@ Introductions to all the key parts of Django you'll need to know:
    signals
    checks
    external-packages
+   async
