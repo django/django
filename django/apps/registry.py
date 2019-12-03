@@ -2,7 +2,7 @@ import functools
 import sys
 import threading
 import warnings
-from collections import Counter, defaultdict
+from collections import Counter, defaultdict, OrderedDict
 from functools import partial
 
 from django.core.exceptions import AppRegistryNotReady, ImproperlyConfigured
@@ -34,7 +34,7 @@ class Apps:
         self.all_models = defaultdict(dict)
 
         # Mapping of labels to AppConfig instances for installed apps.
-        self.app_configs = {}
+        self.app_configs = OrderedDict()
 
         # Stack of app_configs. Used to store the current state in
         # set_available_apps and set_installed_apps.
