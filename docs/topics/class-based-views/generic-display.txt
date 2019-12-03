@@ -139,7 +139,7 @@ bit is the lowercased version of the model's name.
 
 This template will be rendered against a context containing a variable called
 ``object_list`` that contains all the publisher objects. A template might look
-like the this:
+like this:
 
 .. code-block:: html+django
 
