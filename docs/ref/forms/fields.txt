@@ -1260,13 +1260,47 @@ method::
 
     .. attribute:: queryset
 
-        Same as :class:`ModelChoiceField.queryset`.
+        A ``QuerySet`` of model objects from which the choices for the field
+        are derived and which is used to validate the user's selection. It's
+        evaluated when the form is rendered.
 
     Takes one optional argument:
 
     .. attribute:: to_field_name
 
-        Same as :class:`ModelChoiceField.to_field_name`.
+        This optional argument is used to specify the field to use as the value
+        of the choices in the field's widget. Be sure it's a unique field for
+        the model, otherwise the selected value could match more than one
+        object. By default it is set to ``None``, in which case the primary key
+        of each object will be used. For example::
+
+            # No custom to_field_name
+            field1 = forms.ModelMultipleChoiceField(queryset=...)
+
+        would yield:
+
+        .. code-block:: html
+
+            <select id="id_field1" name="field1" multiple>
+            <option value="obj1.pk">Object1</option>
+            <option value="obj2.pk">Object2</option>
+            ...
+            </select>
+
+        and::
+
+            # to_field_name provided
+            field2 = forms.ModelMultipleChoiceField(queryset=..., to_field_name="name")
+
+        would yield:
+
+        .. code-block:: html
+
+            <select id="id_field2" name="field2" multiple>
+            <option value="obj1.name">Object1</option>
+            <option value="obj2.name">Object2</option>
+            ...
+            </select>
 
 Creating custom fields
 ======================
