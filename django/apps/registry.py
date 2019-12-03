@@ -2,7 +2,7 @@ import functools
 import sys
 import threading
 import warnings
-from collections import Counter, defaultdict, OrderedDict
+from collections import Counter, OrderedDict, defaultdict
 from functools import partial
 
 from django.core.exceptions import AppRegistryNotReady, ImproperlyConfigured
