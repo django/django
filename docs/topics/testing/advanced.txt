@@ -67,6 +67,48 @@ The following is a unit test using the request factory::
             response = MyView.as_view()(request)
             self.assertEqual(response.status_code, 200)
 
+Testing class-based views
+=========================
+
+In order to test class-based views outside of the request/response cycle you
+must ensure that they are configured correctly, by calling
+:meth:`~django.views.generic.base.View.setup` after instantiation.
+
+For example, assuming the following class-based view:
+
+.. code-block:: python
+    :caption: views.py
+
+    from django.views.generic import TemplateView
+
+
+    class HomeView(TemplateView):
+        template_name = 'myapp/home.html'
+
+        def get_context_data(self, **kwargs):
+            kwargs['environment'] = 'Production'
+            return super().get_context_data(**kwargs)
+
+You may directly test the ``get_context_data()`` method by first instantiating
+the view, then passing a ``request`` to ``setup()``, before proceeding with
+your test's code:
+
+.. code-block:: python
+    :caption: tests.py
+
+    from django.test import RequestFactory, TestCase
+    from .views import HomeView
+
+
+    class HomePageTest(TestCase):
+        def test_environment_set_in_context(self):
+            request = RequestFactory().get('/')
+            view = HomeView()
+            view.setup(request)
+
+            context = view.get_context_data()
+            self.assertIn('environment', context)
+
 .. _topics-testing-advanced-multiple-hosts:
 
 Tests and multiple host names
