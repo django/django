@@ -498,6 +498,9 @@ The following checks are performed on your URL configuration:
   take the correct number of arguments (…).
 * **urls.E008**: The custom ``handlerXXX`` view ``'path.to.view'`` could not be
   imported.
+* **urls.W009**: Your URL pattern ``<pattern>`` has a route containing both
+  named and unnamed regexp capture groups. Use a non-capturing group
+  (`(?:...)`) for the unnamed groups instead.
 
 ``contrib`` app checks
 ======================

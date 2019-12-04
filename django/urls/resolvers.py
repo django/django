@@ -167,6 +167,7 @@ class RegexPattern(CheckURLMixin):
     def check(self):
         warnings = []
         warnings.extend(self._check_pattern_startswith_slash())
+        warnings.extend(self._check_mixed_capture_groups())
         if not self._is_endpoint:
             warnings.extend(self._check_include_trailing_dollar())
         return warnings
@@ -183,6 +184,18 @@ class RegexPattern(CheckURLMixin):
         else:
             return []
 
+    def _check_mixed_capture_groups(self):
+        named_groups, unnamed_groups = len(self.regex.groupindex), self.regex.groups
+        if named_groups and unnamed_groups > named_groups:
+            return [Warning(
+                "Your URL pattern {} mixes named and unnamed capture groups. "
+                "Use non-capturing groups for the unnamed ones instead:\n"
+                "{}".format(self.describe(), _replace_unnamed_group_with_non_captured(self.regex.pattern)),
+                id='urls.W009',
+            )]
+        else:
+            return []
+
     def _compile(self, regex):
         """Compile and return the given regular expression."""
         try:
@@ -194,6 +207,17 @@ class RegexPattern(CheckURLMixin):
 
     def __str__(self):
         return str(self._regex)
+
+
+_UNNAMED_CAPTURE_GROUP_OPEN_PAREN = _lazy_re_compile(r'''
+    (?<!\\)  # not preceded by a backslash
+    \(       # opening parentesis
+    (?!\?)   # not followed by a question mark
+''', re.VERBOSE)
+
+
+def _replace_unnamed_group_with_non_captured(pattern):
+    return _UNNAMED_CAPTURE_GROUP_OPEN_PAREN.sub('(?:', pattern)
 
 
 _PATH_PARAMETER_COMPONENT_RE = _lazy_re_compile(

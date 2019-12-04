@@ -260,7 +260,9 @@ Tests
 URLs
 ~~~~
 
-* ...
+* The new `urls.W009` check will warn you if you define regexp paths in your
+  URLConf that mix named and unnamed capture groups, suggesting instead that
+  you use non-capturing unnamed groups.
 
 Utilities
 ~~~~~~~~~

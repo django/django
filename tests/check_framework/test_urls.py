@@ -134,6 +134,14 @@ class CheckUrlConfigTests(SimpleTestCase):
         result = check_url_namespaces_unique(None)
         self.assertEqual(result, [])
 
+    @override_settings(ROOT_URLCONF='check_framework.urls.warning_mixed_capture')
+    def test_check_mixed_capture_groups(self):
+        result = check_url_config(None)
+        self.assertEqual(len(result), 1)
+        warning = result[0]
+        self.assertEqual(warning.id, 'urls.W009')
+        self.assertIn(r'^(?P<year>\d+)/(?:\d+)/$', warning.msg)
+
 
 class UpdatedToPathTests(SimpleTestCase):
 
