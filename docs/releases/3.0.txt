@@ -327,7 +327,7 @@ Security
 
 * :setting:`X_FRAME_OPTIONS` now defaults to ``'DENY'``. In older versions, the
   :setting:`X_FRAME_OPTIONS` setting defaults to ``'SAMEORIGIN'``. If your site
-  uses frames of itself, you will need to explicitly set ``X_FRAME_ORIGINS =
+  uses frames of itself, you will need to explicitly set ``X_FRAME_OPTIONS =
   'SAMEORIGIN'`` for them to continue working.
 
 * :setting:`SECURE_CONTENT_TYPE_NOSNIFF` setting now defaults to ``True``. With
