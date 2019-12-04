@@ -474,9 +474,9 @@ Our new ``AuthorDetail`` looks like this::
             # passed in form.cleaned_data['message']
             return super().form_valid(form)
 
-``get_success_url()`` is provides somewhere to redirect to,
-which gets used in the default implementation of
-``form_valid()``. We have to provide our own ``post()`` as noted earlier.
+``get_success_url()`` provides somewhere to redirect to, which gets used
+in the default implementation of ``form_valid()``. We have to provide our
+own ``post()`` as noted earlier.
 
 A better solution
 -----------------
