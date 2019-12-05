@@ -4,8 +4,8 @@ from unittest import mock, skipIf, skipUnless
 from django.core.exceptions import FieldError
 from django.db import NotSupportedError, connection
 from django.db.models import (
-    F, Func, OuterRef, Q, RowRange, Subquery, Value, ValueRange, Window,
-    WindowFrame,
+    BooleanField, Case, F, Func, OuterRef, Q, RowRange, Subquery, Value,
+    ValueRange, When, Window, WindowFrame,
 )
 from django.db.models.aggregates import Avg, Max, Min, Sum
 from django.db.models.functions import (
@@ -845,6 +845,22 @@ class NonQueryWindowTests(SimpleTestCase):
             qs.filter(id=Func('dense_rank', 2, function='div'))
         with self.assertRaisesMessage(NotSupportedError, msg):
             qs.annotate(total=Sum('dense_rank', filter=Q(name='Jones'))).filter(total=1)
+
+    def test_conditional_annotation(self):
+        qs = Employee.objects.annotate(
+            dense_rank=Window(expression=DenseRank()),
+        ).annotate(
+            equal=Case(
+                When(id=F('dense_rank'), then=Value(True)),
+                default=Value(False),
+                output_field=BooleanField(),
+            ),
+        )
+        # The SQL standard disallows referencing window functions in the WHERE
+        # clause.
+        msg = 'Window is disallowed in the filter clause'
+        with self.assertRaisesMessage(NotSupportedError, msg):
+            qs.filter(equal=True)
 
     def test_invalid_order_by(self):
         msg = 'order_by must be either an Expression or a sequence of expressions'

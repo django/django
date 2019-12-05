@@ -17,3 +17,8 @@ Bugfixes
 * Fixed a regression in Django 3.0 where ``RegexPattern``, used by
   :func:`~django.urls.re_path`, returned positional arguments to be passed to
   the view when all optional named groups were missing (:ticket:`31061`).
+
+* Reallowed, following a regression in Django 3.0,
+  :class:`~django.db.models.expressions.Window` expressions to be used in
+  conditions outside of queryset filters, e.g. in
+  :class:`~django.db.models.expressions.When` conditions (:ticket:`31060`).
