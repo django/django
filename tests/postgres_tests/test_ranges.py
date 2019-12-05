@@ -882,11 +882,33 @@ class TestWidget(PostgreSQLSimpleTestCase):
         )
 
 
-class TestRepresentation(PostgreSQLTestCase):
-
+class TestQuerySetQuery(PostgreSQLTestCase):
     def test_numeric_range(self):
-        self.assertTrue(
-            str(
-                RangesModel.objects.filter(ints__overlap=NumericRange(1, 5)).query
-            ).endswith('WHERE "postgres_tests_rangesmodel"."ints" && \'[1,5)\'')
+        self.assertIn(
+            'WHERE "postgres_tests_rangesmodel"."ints" && \'[1,5)\'',
+            str(RangesModel.objects.filter(
+                ints__overlap=NumericRange(1, 5),
+            ).query),
+        )
+
+    def test_date_range(self):
+        self.assertIn(
+            'WHERE ("postgres_tests_rangelookupsmodel"."timestamp")::date <@ '
+            'daterange(\'2015-01-01\', \'2015-05-04\', \'[)\')::daterange',
+            str(RangeLookupsModel.objects.filter(
+                timestamp__date__contained_by=DateRange('2015-01-01', '2015-05-04'),
+            ).query),
+        )
+
+    def test_datetime_range(self):
+        self.assertIn(
+            'WHERE "postgres_tests_rangelookupsmodel"."timestamp" <@ '
+            'tstzrange(\'2015-01-01T09:00\', \'2015-05-04T23:55\', \'[)\')'
+            '::tstzrange',
+            str(RangeLookupsModel.objects.filter(
+                timestamp__contained_by=DateTimeTZRange(
+                    '2015-01-01T09:00',
+                    '2015-05-04T23:55',
+                ),
+            ).query),
         )
