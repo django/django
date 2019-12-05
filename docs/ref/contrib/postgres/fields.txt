@@ -738,10 +738,14 @@ operators ``@>``, ``<@``, and ``&&`` respectively.
     <QuerySet [<Event: Soft play>]>
 
 The ``contained_by`` lookup is also available on the non-range field types:
+:class:`~django.db.models.SmallAutoField`,
+:class:`~django.db.models.AutoField`, :class:`~django.db.models.BigAutoField`,
+:class:`~django.db.models.SmallIntegerField`,
 :class:`~django.db.models.IntegerField`,
 :class:`~django.db.models.BigIntegerField`,
-:class:`~django.db.models.FloatField`, :class:`~django.db.models.DateField`,
-and :class:`~django.db.models.DateTimeField`. For example::
+:class:`~django.db.models.DecimalField`, :class:`~django.db.models.FloatField`,
+:class:`~django.db.models.DateField`, and
+:class:`~django.db.models.DateTimeField`. For example::
 
     >>> from psycopg2.extras import DateTimeTZRange
     >>> Event.objects.filter(start__contained_by=DateTimeTZRange(
@@ -749,6 +753,14 @@ and :class:`~django.db.models.DateTimeField`. For example::
     ...     timezone.now() + datetime.timedelta(hours=1),
     ... )
     <QuerySet [<Event: Soft play>]>
+
+.. versionchanged:: 3.1
+
+    Support for :class:`~django.db.models.SmallAutoField`,
+    :class:`~django.db.models.AutoField`,
+    :class:`~django.db.models.BigAutoField`,
+    :class:`~django.db.models.SmallIntegerField`, and
+    :class:`~django.db.models.DecimalField` was added.
 
 .. fieldlookup:: rangefield.overlap
 

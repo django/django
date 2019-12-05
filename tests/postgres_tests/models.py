@@ -93,6 +93,14 @@ class TextFieldModel(models.Model):
         return self.field
 
 
+class SmallAutoFieldModel(models.Model):
+    id = models.SmallAutoField(primary_key=True)
+
+
+class BigAutoFieldModel(models.Model):
+    id = models.BigAutoField(primary_key=True)
+
+
 # Scene/Character/Line models are used to test full text search. They're
 # populated with content from Monty Python and the Holy Grail.
 class Scene(models.Model):
@@ -148,6 +156,8 @@ class RangeLookupsModel(PostgreSQLModel):
     float = models.FloatField(blank=True, null=True)
     timestamp = models.DateTimeField(blank=True, null=True)
     date = models.DateField(blank=True, null=True)
+    small_integer = models.SmallIntegerField(blank=True, null=True)
+    decimal_field = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True)
 
 
 class JSONModel(PostgreSQLModel):

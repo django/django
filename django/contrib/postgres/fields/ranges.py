@@ -199,9 +199,11 @@ DateTimeRangeField.register_lookup(DateTimeRangeContains)
 class RangeContainedBy(lookups.PostgresSimpleLookup):
     lookup_name = 'contained_by'
     type_mapping = {
+        'smallint': 'int4range',
         'integer': 'int4range',
         'bigint': 'int8range',
         'double precision': 'numrange',
+        'numeric': 'numrange',
         'date': 'daterange',
         'timestamp with time zone': 'tstzrange',
     }
@@ -209,13 +211,17 @@ class RangeContainedBy(lookups.PostgresSimpleLookup):
 
     def process_rhs(self, compiler, connection):
         rhs, rhs_params = super().process_rhs(compiler, connection)
-        cast_type = self.type_mapping[self.lhs.output_field.db_type(connection)]
+        # Ignore precision for DecimalFields.
+        db_type = self.lhs.output_field.cast_db_type(connection).split('(')[0]
+        cast_type = self.type_mapping[db_type]
         return '%s::%s' % (rhs, cast_type), rhs_params
 
     def process_lhs(self, compiler, connection):
         lhs, lhs_params = super().process_lhs(compiler, connection)
         if isinstance(self.lhs.output_field, models.FloatField):
             lhs = '%s::numeric' % lhs
+        elif isinstance(self.lhs.output_field, models.SmallIntegerField):
+            lhs = '%s::integer' % lhs
         return lhs, lhs_params
 
     def get_prep_lookup(self):
@@ -226,6 +232,7 @@ models.DateField.register_lookup(RangeContainedBy)
 models.DateTimeField.register_lookup(RangeContainedBy)
 models.IntegerField.register_lookup(RangeContainedBy)
 models.FloatField.register_lookup(RangeContainedBy)
+models.DecimalField.register_lookup(RangeContainedBy)
 
 
 @RangeField.register_lookup

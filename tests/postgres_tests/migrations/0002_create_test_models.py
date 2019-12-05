@@ -125,6 +125,20 @@ class Migration(migrations.Migration):
             bases=None,
         ),
         migrations.CreateModel(
+            name='SmallAutoFieldModel',
+            fields=[
+                ('id', models.SmallAutoField(verbose_name='ID', serialize=False, primary_key=True)),
+            ],
+            options=None,
+        ),
+        migrations.CreateModel(
+            name='BigAutoFieldModel',
+            fields=[
+                ('id', models.BigAutoField(verbose_name='ID', serialize=False, primary_key=True)),
+            ],
+            options=None,
+        ),
+        migrations.CreateModel(
             name='Scene',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
@@ -237,6 +251,8 @@ class Migration(migrations.Migration):
                 ('float', models.FloatField(blank=True, null=True)),
                 ('timestamp', models.DateTimeField(blank=True, null=True)),
                 ('date', models.DateField(blank=True, null=True)),
+                ('small_integer', models.SmallIntegerField(blank=True, null=True)),
+                ('decimal_field', models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True)),
             ],
             options={
                 'required_db_vendor': 'postgresql',

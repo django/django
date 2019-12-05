@@ -90,6 +90,13 @@ Minor features
   :lookup:`rangefield.upper_inc`, and :lookup:`rangefield.upper_inf` allows
   querying :class:`~django.contrib.postgres.fields.RangeField` by a bound type.
 
+* :lookup:`rangefield.contained_by` now supports
+  :class:`~django.db.models.SmallAutoField`,
+  :class:`~django.db.models.AutoField`,
+  :class:`~django.db.models.BigAutoField`,
+  :class:`~django.db.models.SmallIntegerField`, and
+  :class:`~django.db.models.DecimalField`.
+
 :mod:`django.contrib.redirects`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
