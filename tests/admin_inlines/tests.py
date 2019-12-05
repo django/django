@@ -1,5 +1,3 @@
-from selenium.common.exceptions import NoSuchElementException
-
 from django.contrib.admin import ModelAdmin, TabularInline
 from django.contrib.admin.helpers import InlineAdminForm
 from django.contrib.admin.tests import AdminSeleniumTestCase
@@ -1152,6 +1150,7 @@ class SeleniumTests(AdminSeleniumTestCase):
         self.assertEqual(Profile.objects.all().count(), 3)
 
     def test_add_inline_link_absent_for_view_only_parent_model(self):
+        from selenium.common.exceptions import NoSuchElementException
         user = User.objects.create_user('testing', password='password', is_staff=True)
         user.user_permissions.add(
             Permission.objects.get(codename='view_poll', content_type=ContentType.objects.get_for_model(Poll))
