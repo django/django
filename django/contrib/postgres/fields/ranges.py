@@ -225,7 +225,6 @@ class RangeContainedBy(lookups.PostgresSimpleLookup):
 models.DateField.register_lookup(RangeContainedBy)
 models.DateTimeField.register_lookup(RangeContainedBy)
 models.IntegerField.register_lookup(RangeContainedBy)
-models.BigIntegerField.register_lookup(RangeContainedBy)
 models.FloatField.register_lookup(RangeContainedBy)
 
 
