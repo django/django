@@ -508,7 +508,7 @@ Miscellaneous
 -------------
 
 * ``ContentType.__str__()`` now includes the model's ``app_label`` to
-  disambiguate model's with the same name in different apps.
+  disambiguate models with the same name in different apps.
 
 * Because accessing the language in the session rather than in the cookie is
   deprecated, ``LocaleMiddleware`` no longer looks for the user's language in
