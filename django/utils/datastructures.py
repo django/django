@@ -323,7 +323,7 @@ class CaseInsensitiveMapping(Mapping):
         return len(self._store)
 
     def __eq__(self, other):
-        return isinstance(other, Mapping) and {
+        return isinstance(other, Mapping) and len(self) == len(other) and {
             k.lower(): v for k, v in self.items()
         } == {
             k.lower(): v for k, v in other.items()
