@@ -1192,7 +1192,8 @@ class Query(BaseExpression):
 
     def build_filter(self, filter_expr, branch_negated=False, current_negated=False,
                      can_reuse=None, allow_joins=True, split_subq=True,
-                     reuse_with_filtered_relation=False, simple_col=False):
+                     reuse_with_filtered_relation=False, simple_col=False,
+                     check_filterable=True):
         """
         Build a WhereNode for a single filter clause but don't add it
         to this Query. Query.add_q() will then add this filter to the where
@@ -1238,7 +1239,8 @@ class Query(BaseExpression):
             raise FieldError("Cannot parse keyword query %r" % arg)
         lookups, parts, reffed_expression = self.solve_lookup_type(arg)
 
-        self.check_filterable(reffed_expression)
+        if check_filterable:
+            self.check_filterable(reffed_expression)
 
         if not allow_joins and len(parts) > 1:
             raise FieldError("Joined field references are not permitted in this query")
@@ -1247,7 +1249,8 @@ class Query(BaseExpression):
         value = self.resolve_lookup_value(value, can_reuse, allow_joins, simple_col)
         used_joins = {k for k, v in self.alias_refcount.items() if v > pre_joins.get(k, 0)}
 
-        self.check_filterable(value)
+        if check_filterable:
+            self.check_filterable(value)
 
         clause = self.where_class()
         if reffed_expression:
@@ -1344,7 +1347,7 @@ class Query(BaseExpression):
 
     def _add_q(self, q_object, used_aliases, branch_negated=False,
                current_negated=False, allow_joins=True, split_subq=True,
-               simple_col=False):
+               simple_col=False, check_filterable=True):
         """Add a Q-object to the current filter."""
         connector = q_object.connector
         current_negated = current_negated ^ q_object.negated
@@ -1356,13 +1359,16 @@ class Query(BaseExpression):
             if isinstance(child, Node):
                 child_clause, needed_inner = self._add_q(
                     child, used_aliases, branch_negated,
-                    current_negated, allow_joins, split_subq, simple_col)
+                    current_negated, allow_joins, split_subq, simple_col,
+                    check_filterable,
+                )
                 joinpromoter.add_votes(needed_inner)
             else:
                 child_clause, needed_inner = self.build_filter(
                     child, can_reuse=used_aliases, branch_negated=branch_negated,
                     current_negated=current_negated, allow_joins=allow_joins,
                     split_subq=split_subq, simple_col=simple_col,
+                    check_filterable=check_filterable,
                 )
                 joinpromoter.add_votes(needed_inner)
             if child_clause:
