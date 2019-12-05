@@ -22,9 +22,9 @@ The term **project** describes a Django web application. The project Python
 package is defined primarily by a settings module, but it usually contains
 other things. For example, when you run  ``django-admin startproject mysite``
 you'll get a ``mysite`` project directory that contains a ``mysite`` Python
-package with ``settings.py``, ``urls.py``, and ``wsgi.py``. The project package
-is often extended to include things like fixtures, CSS, and templates which
-aren't tied to a particular application.
+package with ``settings.py``, ``urls.py``, ``asgi.py`` and ``wsgi.py``. The
+project package is often extended to include things like fixtures, CSS, and
+templates which aren't tied to a particular application.
 
 A **project's root directory** (the one that contains ``manage.py``) is usually
 the container for all of a project's applications which aren't installed

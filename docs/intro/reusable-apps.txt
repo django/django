@@ -61,6 +61,7 @@ After the previous tutorials, our project should look like this::
             __init__.py
             settings.py
             urls.py
+            asgi.py
             wsgi.py
         polls/
             __init__.py

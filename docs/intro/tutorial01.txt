@@ -86,6 +86,7 @@ Let's look at what :djadmin:`startproject` created::
             __init__.py
             settings.py
             urls.py
+            asgi.py
             wsgi.py
 
 These files are:
@@ -112,6 +113,9 @@ These files are:
 * :file:`mysite/urls.py`: The URL declarations for this Django project; a
   "table of contents" of your Django-powered site. You can read more about
   URLs in :doc:`/topics/http/urls`.
+
+* :file:`mysite/asgi.py`: An entry-point for ASGI-compatible web servers to
+  serve your project. See :doc:`/howto/deployment/asgi/index` for more details.
 
 * :file:`mysite/wsgi.py`: An entry-point for WSGI-compatible web servers to
   serve your project. See :doc:`/howto/deployment/wsgi/index` for more details.
