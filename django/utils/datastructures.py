@@ -336,4 +336,4 @@ class CaseInsensitiveMapping(Mapping):
         return repr({key: value for key, value in self._store.values()})
 
     def copy(self):
-        return self
+        return self.__class__(self._store.values())
