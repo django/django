@@ -53,7 +53,7 @@ algorithm the system follows to determine which Python code to execute:
    arguments:
 
    * An instance of :class:`~django.http.HttpRequest`.
-   * If the matched URL pattern returned no named groups, then the
+   * If the matched URL pattern contained no named groups, then the
      matches from the regular expression are provided as positional arguments.
    * The keyword arguments are made up of any named parts matched by the
      path expression, overridden by any arguments specified in the optional
