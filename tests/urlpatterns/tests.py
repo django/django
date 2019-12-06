@@ -68,6 +68,16 @@ class SimplifiedURLTests(SimpleTestCase):
                     r'^regex_optional/(?P<arg1>\d+)/(?:(?P<arg2>\d+)/)?',
                 )
 
+    def test_re_path_with_missing_optional_parameter(self):
+        match = resolve('/regex_only_optional/')
+        self.assertEqual(match.url_name, 'regex_only_optional')
+        self.assertEqual(match.kwargs, {})
+        self.assertEqual(match.args, ())
+        self.assertEqual(
+            match.route,
+            r'^regex_only_optional/(?:(?P<arg1>\d+)/)?',
+        )
+
     def test_path_lookup_with_inclusion(self):
         match = resolve('/included_urls/extra/something/')
         self.assertEqual(match.url_name, 'inner-extra')
