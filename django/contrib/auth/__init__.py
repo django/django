@@ -63,8 +63,9 @@ def authenticate(request=None, **credentials):
     If the given credentials are valid, return a User object.
     """
     for backend, backend_path in _get_backends(return_tuples=True):
+        backend_signature = inspect.signature(backend.authenticate)
         try:
-            inspect.getcallargs(backend.authenticate, request, **credentials)
+            backend_signature.bind(request, **credentials)
         except TypeError:
             # This backend doesn't accept these credentials as arguments. Try the next one.
             continue
