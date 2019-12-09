@@ -508,6 +508,8 @@ class CheckboxInput(Input):
         if self.check_test(value):
             if attrs is None:
                 attrs = {}
+            else:
+                attrs = attrs.copy()
             attrs['checked'] = True
         return super(CheckboxInput, self).get_context(name, value, attrs)
 
