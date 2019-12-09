@@ -261,6 +261,14 @@ class DiscoverRunnerTests(SimpleTestCase):
             runner.build_suite(['test_runner_apps.tagged.tests'])
             self.assertIn('Excluding test tag(s): bar, foo.\n', stdout.getvalue())
 
+    def test_pdb_with_parallel(self):
+        msg = (
+            'You cannot use --pdb with parallel tests; pass --parallel=1 to '
+            'use it.'
+        )
+        with self.assertRaisesMessage(ValueError, msg):
+            DiscoverRunner(pdb=True, parallel=2)
+
 
 class DiscoverRunnerGetDatabasesTests(SimpleTestCase):
     runner = DiscoverRunner(verbosity=2)
