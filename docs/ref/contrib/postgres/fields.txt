@@ -517,10 +517,10 @@ using in conjunction with lookups on
     of the JSON which allows indexing. The trade-off is a small additional cost
     on writing to the ``jsonb`` field. ``JSONField`` uses ``jsonb``.
 
-.. deprecated:: 3.0
+.. deprecated:: 3.1
 
     A new :class:`~django.db.models.JSONField` that works on all supported
-    database backends is available starting with Django 3.0. It is advised to
+    database backends is available starting with Django 3.1. It is advised to
     migrate and use the new ``JSONField``. For now, this PostgreSQL-only
     ``JSONField`` is left as a reference to the new one and is deprecated as of
     this release.
