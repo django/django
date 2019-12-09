@@ -26,6 +26,9 @@ from django.views.debug import (
     Path as DebugPath, cleanse_setting, default_urlconf,
     technical_404_response, technical_500_response,
 )
+from django.views.decorators.debug import (
+    sensitive_post_parameters, sensitive_variables,
+)
 
 from ..views import (
     custom_exception_reporter_filter_view, index_page,
@@ -1272,3 +1275,26 @@ class HelperFunctionTests(SimpleTestCase):
         initial = {'login': 'cooper', 'password': 'secret'}
         expected = {'login': 'cooper', 'password': CLEANSED_SUBSTITUTE}
         self.assertEqual(cleanse_setting('SETTING_NAME', initial), expected)
+
+
+class DecoratorsTests(SimpleTestCase):
+    def test_sensitive_variables_not_called(self):
+        msg = (
+            'sensitive_variables() must be called to use it as a decorator, '
+            'e.g., use @sensitive_variables(), not @sensitive_variables.'
+        )
+        with self.assertRaisesMessage(TypeError, msg):
+            @sensitive_variables
+            def test_func(password):
+                pass
+
+    def test_sensitive_post_parameters_not_called(self):
+        msg = (
+            'sensitive_post_parameters() must be called to use it as a '
+            'decorator, e.g., use @sensitive_post_parameters(), not '
+            '@sensitive_post_parameters.'
+        )
+        with self.assertRaisesMessage(TypeError, msg):
+            @sensitive_post_parameters
+            def test_func(request):
+                return index_page(request)
