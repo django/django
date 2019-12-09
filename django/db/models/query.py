@@ -1541,7 +1541,8 @@ class Prefetch:
             )
         ):
             raise ValueError(
-                'Prefetch querysets cannot use raw() and values().'
+                'Prefetch querysets cannot use raw(), values(), and '
+                'values_list().'
             )
         if to_attr:
             self.prefetch_to = LOOKUP_SEP.join(lookup.split(LOOKUP_SEP)[:-1] + [to_attr])
