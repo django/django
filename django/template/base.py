@@ -857,8 +857,9 @@ class Variable:
                         try:  # method call (assuming no args required)
                             current = current()
                         except TypeError:
+                            signature = inspect.signature(current)
                             try:
-                                inspect.getcallargs(current)
+                                signature.bind()
                             except TypeError:  # arguments *were* required
                                 current = context.template.engine.string_if_invalid  # invalid method call
                             else:

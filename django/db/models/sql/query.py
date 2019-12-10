@@ -1916,9 +1916,8 @@ class Query(BaseExpression):
         group_by = list(self.select)
         if self.annotation_select:
             for alias, annotation in self.annotation_select.items():
-                try:
-                    inspect.getcallargs(annotation.get_group_by_cols, alias=alias)
-                except TypeError:
+                signature = inspect.signature(annotation.get_group_by_cols)
+                if 'alias' not in signature.parameters:
                     annotation_class = annotation.__class__
                     msg = (
                         '`alias=None` must be added to the signature of '
