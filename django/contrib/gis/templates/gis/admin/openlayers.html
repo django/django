@@ -25,7 +25,7 @@
 <![endif]-->
 {% endblock %}
 <span id="{{ id }}_admin_map">
-<script type="text/javascript">
+<script>
 //<![CDATA[
 {% block openlayers %}{% include "gis/admin/openlayers.js" %}{% endblock %}
 //]]>
@@ -36,5 +36,5 @@
 {% endif %}
 {% if display_wkt %}<p>{% trans "WKT debugging window:" %} </p>{% endif %}
 <textarea id="{{ id }}" class="vWKTField required" cols="150" rows="10" name="{{ name }}">{{ wkt }}</textarea>
-<script type="text/javascript">{% block init_function %}{{ module }}.init();{% endblock %}</script>
+<script>{% block init_function %}{{ module }}.init();{% endblock %}</script>
 </span>
