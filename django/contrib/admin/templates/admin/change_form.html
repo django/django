@@ -2,7 +2,7 @@
 {% load i18n admin_urls static admin_modify %}
 
 {% block extrahead %}{{ block.super }}
-<script type="text/javascript" src="{% url 'admin:jsi18n' %}"></script>
+<script src="{% url 'admin:jsi18n' %}"></script>
 {{ media }}
 {% endblock %}
 
@@ -64,8 +64,7 @@
 {% block submit_buttons_bottom %}{% submit_row %}{% endblock %}
 
 {% block admin_change_form_document_ready %}
-    <script type="text/javascript"
-            id="django-admin-form-add-constants"
+    <script id="django-admin-form-add-constants"
             src="{% static 'admin/js/change_form.js' %}"
             {% if adminform and add %}
                 data-model-name="{{ opts.model_name }}"

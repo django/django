@@ -136,7 +136,7 @@ and read the token from the DOM with JavaScript:
 .. code-block:: html+django
 
     {% csrf_token %}
-    <script type="text/javascript">
+    <script>
     // using jQuery
     var csrftoken = jQuery("[name=csrfmiddlewaretoken]").val();
     </script>

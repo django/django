@@ -80,7 +80,7 @@ class Media:
     def render_js(self):
         return [
             format_html(
-                '<script type="text/javascript" src="{}"></script>',
+                '<script src="{}"></script>',
                 self.absolute_path(path)
             ) for path in self._js
         ]
