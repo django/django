@@ -5,13 +5,9 @@ import importlib
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.urls.exceptions import Resolver404
+from django.urls.resolvers import URLResolver
 
 from channels.http import AsgiHandler
-
-try:
-    from django.urls.resolvers import URLResolver
-except ImportError:  # Django 1.11
-    from django.urls import RegexURLResolver as URLResolver
 
 
 """

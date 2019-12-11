@@ -3,13 +3,13 @@ dist: xenial
 language: python
 
 python:
+  - "3.8"
+  - "3.7"
   - "3.6"
-  - "3.5"
 
 env:
-  - DJANGO="Django==1.11.*"
-  - DJANGO="Django==2.1.*"
-  - DJANGO="Django==2.2.*"
+  - DJANGO="Django~=2.2.8"
+  - DJANGO="Django==3.0.*"
 
 install:
   - pip install -U pip wheel setuptools
@@ -27,11 +27,7 @@ stages:
 
 jobs:
   include:
-    - python: "3.7"
-      env: DJANGO="Django==2.1.*"
-    - python: "3.7"
-      env: DJANGO="Django==2.2.*"
-    - python: "3.8"
+    - python: "3.5"
       env: DJANGO="Django==2.2.*"
 
     - stage: lint

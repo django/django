@@ -198,7 +198,7 @@ class SessionMiddlewareInstance:
                 and message.get("status", 200) != 500
                 and (modified or settings.SESSION_SAVE_EVERY_REQUEST)
             ):
-                self.save_session()
+                await database_sync_to_async(self.save_session)()
                 # If this is a message type that can transport cookies back to the
                 # client, then do so.
                 if message["type"] in self.middleware.cookie_response_message_types:

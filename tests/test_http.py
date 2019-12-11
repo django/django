@@ -10,6 +10,7 @@ from django.test import override_settings
 
 from asgiref.testing import ApplicationCommunicator
 from channels.consumer import AsyncConsumer
+from channels.db import database_sync_to_async
 from channels.http import AsgiHandler, AsgiRequest
 from channels.sessions import SessionMiddlewareStack
 from channels.testing import HttpCommunicator
@@ -335,7 +336,7 @@ async def test_sessions():
         """
 
         async def http_request(self, event):
-            self.scope["session"].save()
+            await database_sync_to_async(self.scope["session"].save)()
             assert self.scope["path"] == "/test/"
             assert self.scope["method"] == "GET"
             await self.send(

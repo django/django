@@ -284,11 +284,6 @@ class AsgiHandler(base.BaseHandler):
             )
             self._exception_middleware = self.__class__._exception_middleware
 
-            # Support additional arguments for Django 1.11 and 2.0.
-            if hasattr(self.__class__, "_request_middleware"):
-                self._request_middleware = self.__class__._request_middleware
-                self._response_middleware = self.__class__._response_middleware
-
         else:
             super(AsgiHandler, self).load_middleware()
             self.__class__._middleware_chain = self._middleware_chain
@@ -297,11 +292,6 @@ class AsgiHandler(base.BaseHandler):
                 self._template_response_middleware
             )
             self.__class__._exception_middleware = self._exception_middleware
-
-            # Support additional arguments for Django 1.11 and 2.0.
-            if hasattr(self, "_request_middleware"):
-                self.__class__._request_middleware = self._request_middleware
-                self.__class__._response_middleware = self._response_middleware
 
     @classmethod
     def encode_response(cls, response):
