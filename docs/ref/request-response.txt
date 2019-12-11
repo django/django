@@ -204,7 +204,7 @@ All attributes should be considered read-only, unless stated otherwise.
 
     .. versionchanged:: 3.0
 
-        Support for look ups using underscores was added.
+        Support for lookups using underscores was added.
 
 .. attribute:: HttpRequest.resolver_match
 
