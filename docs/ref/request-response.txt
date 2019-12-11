@@ -819,6 +819,8 @@ Methods
       ``domain="example.com"`` will set a cookie that is readable by the
       domains www.example.com, blog.example.com, etc. Otherwise, a cookie will
       only be readable by the domain that set it.
+    * Use ``secure=True`` if you want the cookie to be only sent to the server
+      when a request is made with the ``https`` scheme.
     * Use ``httponly=True`` if you want to prevent client-side
       JavaScript from having access to the cookie.
 
