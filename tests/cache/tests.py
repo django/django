@@ -81,9 +81,8 @@ class DummyCacheTests(SimpleTestCase):
 
     def test_add(self):
         "Add doesn't do anything in dummy cache backend"
-        cache.add("addkey1", "value")
-        result = cache.add("addkey1", "newvalue")
-        self.assertTrue(result)
+        self.assertIs(cache.add("addkey1", "value"), True)
+        self.assertIs(cache.add("addkey1", "newvalue"), True)
         self.assertIsNone(cache.get("addkey1"))
 
     def test_non_existent(self):
@@ -105,15 +104,15 @@ class DummyCacheTests(SimpleTestCase):
         "Cache deletion is transparently ignored on the dummy cache backend"
         cache.set_many({'key1': 'spam', 'key2': 'eggs'})
         self.assertIsNone(cache.get("key1"))
-        self.assertFalse(cache.delete("key1"))
+        self.assertIs(cache.delete("key1"), False)
         self.assertIsNone(cache.get("key1"))
         self.assertIsNone(cache.get("key2"))
 
     def test_has_key(self):
         "The has_key method doesn't ever return True for the dummy cache backend"
         cache.set("hello1", "goodbye1")
-        self.assertFalse(cache.has_key("hello1"))
-        self.assertFalse(cache.has_key("goodbye1"))
+        self.assertIs(cache.has_key("hello1"), False)
+        self.assertIs(cache.has_key("goodbye1"), False)
 
     def test_in(self):
         "The in operator doesn't ever return True for the dummy cache backend"
@@ -164,9 +163,9 @@ class DummyCacheTests(SimpleTestCase):
         time.sleep(2)
         self.assertIsNone(cache.get("expire1"))
 
-        cache.add("expire2", "newvalue")
+        self.assertIs(cache.add("expire2", "newvalue"), True)
         self.assertIsNone(cache.get("expire2"))
-        self.assertFalse(cache.has_key("expire3"))
+        self.assertIs(cache.has_key("expire3"), False)
 
     def test_unicode(self):
         "Unicode values are ignored by the dummy cache"
@@ -282,9 +281,8 @@ class BaseCacheTests:
 
     def test_add(self):
         # A key can be added to a cache
-        cache.add("addkey1", "value")
-        result = cache.add("addkey1", "newvalue")
-        self.assertFalse(result)
+        self.assertIs(cache.add("addkey1", "value"), True)
+        self.assertIs(cache.add("addkey1", "newvalue"), False)
         self.assertEqual(cache.get("addkey1"), "value")
 
     def test_prefix(self):
@@ -292,7 +290,7 @@ class BaseCacheTests:
         cache.set('somekey', 'value')
 
         # should not be set in the prefixed cache
-        self.assertFalse(caches['prefix'].has_key('somekey'))
+        self.assertIs(caches['prefix'].has_key('somekey'), False)
 
         caches['prefix'].set('somekey', 'value2')
 
@@ -315,20 +313,20 @@ class BaseCacheTests:
         # Cache keys can be deleted
         cache.set_many({'key1': 'spam', 'key2': 'eggs'})
         self.assertEqual(cache.get("key1"), "spam")
-        self.assertTrue(cache.delete("key1"))
+        self.assertIs(cache.delete("key1"), True)
         self.assertIsNone(cache.get("key1"))
         self.assertEqual(cache.get("key2"), "eggs")
 
     def test_delete_nonexistent(self):
-        self.assertFalse(cache.delete('nonexistent_key'))
+        self.assertIs(cache.delete('nonexistent_key'), False)
 
     def test_has_key(self):
         # The cache can be inspected for cache keys
         cache.set("hello1", "goodbye1")
-        self.assertTrue(cache.has_key("hello1"))
-        self.assertFalse(cache.has_key("goodbye1"))
+        self.assertIs(cache.has_key("hello1"), True)
+        self.assertIs(cache.has_key("goodbye1"), False)
         cache.set("no_expiry", "here", None)
-        self.assertTrue(cache.has_key("no_expiry"))
+        self.assertIs(cache.has_key("no_expiry"), True)
 
     def test_in(self):
         # The in operator can be used to inspect cache contents
@@ -426,24 +424,23 @@ class BaseCacheTests:
         time.sleep(2)
         self.assertIsNone(cache.get("expire1"))
 
-        cache.add("expire2", "newvalue")
+        self.assertIs(cache.add("expire2", "newvalue"), True)
         self.assertEqual(cache.get("expire2"), "newvalue")
-        self.assertFalse(cache.has_key("expire3"))
+        self.assertIs(cache.has_key("expire3"), False)
 
     def test_touch(self):
         # cache.touch() updates the timeout.
         cache.set('expire1', 'very quickly', timeout=1)
         self.assertIs(cache.touch('expire1', timeout=4), True)
         time.sleep(2)
-        self.assertTrue(cache.has_key('expire1'))
+        self.assertIs(cache.has_key('expire1'), True)
         time.sleep(3)
-        self.assertFalse(cache.has_key('expire1'))
-
+        self.assertIs(cache.has_key('expire1'), False)
         # cache.touch() works without the timeout argument.
         cache.set('expire1', 'very quickly', timeout=1)
         self.assertIs(cache.touch('expire1'), True)
         time.sleep(2)
-        self.assertTrue(cache.has_key('expire1'))
+        self.assertIs(cache.has_key('expire1'), True)
 
         self.assertIs(cache.touch('nonexistent'), False)
 
@@ -464,13 +461,13 @@ class BaseCacheTests:
         # Test `add`
         for (key, value) in stuff.items():
             with self.subTest(key=key):
-                cache.delete(key)
-                cache.add(key, value)
+                self.assertIs(cache.delete(key), True)
+                self.assertIs(cache.add(key, value), True)
                 self.assertEqual(cache.get(key), value)
 
         # Test `set_many`
         for (key, value) in stuff.items():
-            cache.delete(key)
+            self.assertIs(cache.delete(key), True)
         cache.set_many(stuff)
         for (key, value) in stuff.items():
             with self.subTest(key=key):
@@ -489,7 +486,7 @@ class BaseCacheTests:
         self.assertEqual(value, decompress(compressed_result).decode())
 
         # Test add
-        cache.add('binary1-add', compressed_value)
+        self.assertIs(cache.add('binary1-add', compressed_value), True)
         compressed_result = cache.get('binary1-add')
         self.assertEqual(compressed_value, compressed_result)
         self.assertEqual(value, decompress(compressed_result).decode())
@@ -542,7 +539,7 @@ class BaseCacheTests:
         cache.set('key1', 'eggs', 60 * 60 * 24 * 30 + 1)  # 30 days + 1 second
         self.assertEqual(cache.get('key1'), 'eggs')
 
-        cache.add('key2', 'ham', 60 * 60 * 24 * 30 + 1)
+        self.assertIs(cache.add('key2', 'ham', 60 * 60 * 24 * 30 + 1), True)
         self.assertEqual(cache.get('key2'), 'ham')
 
         cache.set_many({'key3': 'sausage', 'key4': 'lobster bisque'}, 60 * 60 * 24 * 30 + 1)
@@ -556,10 +553,9 @@ class BaseCacheTests:
         cache.set('key1', 'eggs', None)
         self.assertEqual(cache.get('key1'), 'eggs')
 
-        cache.add('key2', 'ham', None)
+        self.assertIs(cache.add('key2', 'ham', None), True)
         self.assertEqual(cache.get('key2'), 'ham')
-        added = cache.add('key1', 'new eggs', None)
-        self.assertIs(added, False)
+        self.assertIs(cache.add('key1', 'new eggs', None), False)
         self.assertEqual(cache.get('key1'), 'eggs')
 
         cache.set_many({'key3': 'sausage', 'key4': 'lobster bisque'}, None)
@@ -567,7 +563,7 @@ class BaseCacheTests:
         self.assertEqual(cache.get('key4'), 'lobster bisque')
 
         cache.set('key5', 'belgian fries', timeout=1)
-        cache.touch('key5', timeout=None)
+        self.assertIs(cache.touch('key5', timeout=None), True)
         time.sleep(2)
         self.assertEqual(cache.get('key5'), 'belgian fries')
 
@@ -578,7 +574,7 @@ class BaseCacheTests:
         cache.set('key1', 'eggs', 0)
         self.assertIsNone(cache.get('key1'))
 
-        cache.add('key2', 'ham', 0)
+        self.assertIs(cache.add('key2', 'ham', 0), True)
         self.assertIsNone(cache.get('key2'))
 
         cache.set_many({'key3': 'sausage', 'key4': 'lobster bisque'}, 0)
@@ -586,7 +582,7 @@ class BaseCacheTests:
         self.assertIsNone(cache.get('key4'))
 
         cache.set('key5', 'belgian fries', timeout=5)
-        cache.touch('key5', timeout=0)
+        self.assertIs(cache.touch('key5', timeout=0), True)
         self.assertIsNone(cache.get('key5'))
 
     def test_float_timeout(self):
@@ -691,41 +687,41 @@ class BaseCacheTests:
     def test_cache_versioning_add(self):
 
         # add, default version = 1, but manually override version = 2
-        cache.add('answer1', 42, version=2)
+        self.assertIs(cache.add('answer1', 42, version=2), True)
         self.assertIsNone(cache.get('answer1', version=1))
         self.assertEqual(cache.get('answer1', version=2), 42)
 
-        cache.add('answer1', 37, version=2)
+        self.assertIs(cache.add('answer1', 37, version=2), False)
         self.assertIsNone(cache.get('answer1', version=1))
         self.assertEqual(cache.get('answer1', version=2), 42)
 
-        cache.add('answer1', 37, version=1)
+        self.assertIs(cache.add('answer1', 37, version=1), True)
         self.assertEqual(cache.get('answer1', version=1), 37)
         self.assertEqual(cache.get('answer1', version=2), 42)
 
         # v2 add, using default version = 2
-        caches['v2'].add('answer2', 42)
+        self.assertIs(caches['v2'].add('answer2', 42), True)
         self.assertIsNone(cache.get('answer2', version=1))
         self.assertEqual(cache.get('answer2', version=2), 42)
 
-        caches['v2'].add('answer2', 37)
+        self.assertIs(caches['v2'].add('answer2', 37), False)
         self.assertIsNone(cache.get('answer2', version=1))
         self.assertEqual(cache.get('answer2', version=2), 42)
 
-        caches['v2'].add('answer2', 37, version=1)
+        self.assertIs(caches['v2'].add('answer2', 37, version=1), True)
         self.assertEqual(cache.get('answer2', version=1), 37)
         self.assertEqual(cache.get('answer2', version=2), 42)
 
         # v2 add, default version = 2, but manually override version = 1
-        caches['v2'].add('answer3', 42, version=1)
+        self.assertIs(caches['v2'].add('answer3', 42, version=1), True)
         self.assertEqual(cache.get('answer3', version=1), 42)
         self.assertIsNone(cache.get('answer3', version=2))
 
-        caches['v2'].add('answer3', 37, version=1)
+        self.assertIs(caches['v2'].add('answer3', 37, version=1), False)
         self.assertEqual(cache.get('answer3', version=1), 42)
         self.assertIsNone(cache.get('answer3', version=2))
 
-        caches['v2'].add('answer3', 37)
+        self.assertIs(caches['v2'].add('answer3', 37), True)
         self.assertEqual(cache.get('answer3', version=1), 42)
         self.assertEqual(cache.get('answer3', version=2), 37)
 
@@ -733,73 +729,73 @@ class BaseCacheTests:
         cache.set('answer1', 42)
 
         # has_key
-        self.assertTrue(cache.has_key('answer1'))
-        self.assertTrue(cache.has_key('answer1', version=1))
-        self.assertFalse(cache.has_key('answer1', version=2))
+        self.assertIs(cache.has_key('answer1'), True)
+        self.assertIs(cache.has_key('answer1', version=1), True)
+        self.assertIs(cache.has_key('answer1', version=2), False)
 
-        self.assertFalse(caches['v2'].has_key('answer1'))
-        self.assertTrue(caches['v2'].has_key('answer1', version=1))
-        self.assertFalse(caches['v2'].has_key('answer1', version=2))
+        self.assertIs(caches['v2'].has_key('answer1'), False)
+        self.assertIs(caches['v2'].has_key('answer1', version=1), True)
+        self.assertIs(caches['v2'].has_key('answer1', version=2), False)
 
     def test_cache_versioning_delete(self):
         cache.set('answer1', 37, version=1)
         cache.set('answer1', 42, version=2)
-        self.assertTrue(cache.delete('answer1'))
+        self.assertIs(cache.delete('answer1'), True)
         self.assertIsNone(cache.get('answer1', version=1))
         self.assertEqual(cache.get('answer1', version=2), 42)
 
         cache.set('answer2', 37, version=1)
         cache.set('answer2', 42, version=2)
-        self.assertTrue(cache.delete('answer2', version=2))
+        self.assertIs(cache.delete('answer2', version=2), True)
         self.assertEqual(cache.get('answer2', version=1), 37)
         self.assertIsNone(cache.get('answer2', version=2))
 
         cache.set('answer3', 37, version=1)
         cache.set('answer3', 42, version=2)
-        self.assertTrue(caches['v2'].delete('answer3'))
+        self.assertIs(caches['v2'].delete('answer3'), True)
         self.assertEqual(cache.get('answer3', version=1), 37)
         self.assertIsNone(cache.get('answer3', version=2))
 
         cache.set('answer4', 37, version=1)
         cache.set('answer4', 42, version=2)
-        self.assertTrue(caches['v2'].delete('answer4', version=1))
+        self.assertIs(caches['v2'].delete('answer4', version=1), True)
         self.assertIsNone(cache.get('answer4', version=1))
         self.assertEqual(cache.get('answer4', version=2), 42)
 
     def test_cache_versioning_incr_decr(self):
         cache.set('answer1', 37, version=1)
         cache.set('answer1', 42, version=2)
-        cache.incr('answer1')
+        self.assertEqual(cache.incr('answer1'), 38)
         self.assertEqual(cache.get('answer1', version=1), 38)
         self.assertEqual(cache.get('answer1', version=2), 42)
-        cache.decr('answer1')
+        self.assertEqual(cache.decr('answer1'), 37)
         self.assertEqual(cache.get('answer1', version=1), 37)
         self.assertEqual(cache.get('answer1', version=2), 42)
 
         cache.set('answer2', 37, version=1)
         cache.set('answer2', 42, version=2)
-        cache.incr('answer2', version=2)
+        self.assertEqual(cache.incr('answer2', version=2), 43)
         self.assertEqual(cache.get('answer2', version=1), 37)
         self.assertEqual(cache.get('answer2', version=2), 43)
-        cache.decr('answer2', version=2)
+        self.assertEqual(cache.decr('answer2', version=2), 42)
         self.assertEqual(cache.get('answer2', version=1), 37)
         self.assertEqual(cache.get('answer2', version=2), 42)
 
         cache.set('answer3', 37, version=1)
         cache.set('answer3', 42, version=2)
-        caches['v2'].incr('answer3')
+        self.assertEqual(caches['v2'].incr('answer3'), 43)
         self.assertEqual(cache.get('answer3', version=1), 37)
         self.assertEqual(cache.get('answer3', version=2), 43)
-        caches['v2'].decr('answer3')
+        self.assertEqual(caches['v2'].decr('answer3'), 42)
         self.assertEqual(cache.get('answer3', version=1), 37)
         self.assertEqual(cache.get('answer3', version=2), 42)
 
         cache.set('answer4', 37, version=1)
         cache.set('answer4', 42, version=2)
-        caches['v2'].incr('answer4', version=1)
+        self.assertEqual(caches['v2'].incr('answer4', version=1), 38)
         self.assertEqual(cache.get('answer4', version=1), 38)
         self.assertEqual(cache.get('answer4', version=2), 42)
-        caches['v2'].decr('answer4', version=1)
+        self.assertEqual(caches['v2'].decr('answer4', version=1), 37)
         self.assertEqual(cache.get('answer4', version=1), 37)
         self.assertEqual(cache.get('answer4', version=2), 42)
 
@@ -967,7 +963,7 @@ class BaseCacheTests:
 
     def test_get_or_set_version(self):
         msg = "get_or_set() missing 1 required positional argument: 'default'"
-        cache.get_or_set('brian', 1979, version=2)
+        self.assertEqual(cache.get_or_set('brian', 1979, version=2), 1979)
         with self.assertRaisesMessage(TypeError, msg):
             cache.get_or_set('brian')
         with self.assertRaisesMessage(TypeError, msg):
@@ -1171,7 +1167,7 @@ class LocMemCacheTests(BaseCacheTests, TestCase):
         cache.set('set', bad_obj)
         self.assertFalse(bad_obj.locked, "Cache was locked during pickling")
 
-        cache.add('add', bad_obj)
+        self.assertIs(cache.add('add', bad_obj), True)
         self.assertFalse(bad_obj.locked, "Cache was locked during pickling")
 
     def test_incr_decr_timeout(self):
@@ -1180,9 +1176,9 @@ class LocMemCacheTests(BaseCacheTests, TestCase):
         _key = cache.make_key(key)
         cache.set(key, 1, timeout=cache.default_timeout * 10)
         expire = cache._expire_info[_key]
-        cache.incr(key)
+        self.assertEqual(cache.incr(key), 2)
         self.assertEqual(expire, cache._expire_info[_key])
-        cache.decr(key)
+        self.assertEqual(cache.decr(key), 1)
         self.assertEqual(expire, cache._expire_info[_key])
 
     @limit_locmem_entries
@@ -1218,7 +1214,7 @@ class LocMemCacheTests(BaseCacheTests, TestCase):
         for key in range(9):
             cache.set(key, key, timeout=None)
         for key in range(6):
-            cache.incr(key)
+            self.assertEqual(cache.incr(key), key + 1)
         cache.set(9, 9, timeout=None)
         for key in range(6):
             self.assertEqual(cache.get(key), key + 1)
