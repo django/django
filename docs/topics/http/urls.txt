@@ -56,9 +56,14 @@ algorithm the system follows to determine which Python code to execute:
    * If the matched URL pattern contained no named groups, then the
      matches from the regular expression are provided as positional arguments.
    * The keyword arguments are made up of any named parts matched by the
-     path expression, overridden by any arguments specified in the optional
-     ``kwargs`` argument to :func:`django.urls.path` or
+     path expression that are provided, overridden by any arguments specified
+     in the optional ``kwargs`` argument to :func:`django.urls.path` or
      :func:`django.urls.re_path`.
+
+     .. versionchanged:: 3.0
+
+          In older versions, the keyword arguments with ``None`` values are
+          made up also for not provided named parts.
 
 #. If no URL pattern matches, or if an exception is raised during any
    point in this process, Django invokes an appropriate
