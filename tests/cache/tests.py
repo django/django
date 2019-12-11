@@ -535,7 +535,7 @@ class BaseCacheTests:
 
     def test_long_timeout(self):
         """
-        Followe memcached's convention where a timeout greater than 30 days is
+        Follow memcached's convention where a timeout greater than 30 days is
         treated as an absolute expiration timestamp instead of a relative
         offset (#12399).
         """
