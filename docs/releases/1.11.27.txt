@@ -1,0 +1,15 @@
+============================
+Django 1.11.27 release notes
+============================
+
+*Expected January 2, 2020*
+
+Django 1.11.27 fixes a data loss bug in 1.11.26.
+
+Bugfixes
+========
+
+* Fixed a data loss possibility in
+  :class:`~django.contrib.postgres.forms.SplitArrayField`. When using with
+  ``ArrayField(BooleanField())``, all values after the first ``True`` value
+  were marked as checked instead of preserving passed values (:ticket:`31073`).

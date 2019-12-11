@@ -22,3 +22,8 @@ Bugfixes
   :class:`~django.db.models.expressions.Window` expressions to be used in
   conditions outside of queryset filters, e.g. in
   :class:`~django.db.models.expressions.When` conditions (:ticket:`31060`).
+
+* Fixed a data loss possibility in
+  :class:`~django.contrib.postgres.forms.SplitArrayField`. When using with
+  ``ArrayField(BooleanField())``, all values after the first ``True`` value
+  were marked as checked instead of preserving passed values (:ticket:`31073`).
