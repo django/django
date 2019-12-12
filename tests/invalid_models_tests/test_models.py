@@ -2,12 +2,13 @@ import unittest
 
 from django.conf import settings
 from django.core.checks import Error, Warning
+from django.core.checks.database import check_database_backends
 from django.core.checks.model_checks import _check_lazy_references
 from django.core.exceptions import ImproperlyConfigured
 from django.db import connection, connections, models
 from django.db.models.functions import Lower
 from django.db.models.signals import post_init
-from django.test import SimpleTestCase
+from django.test import SimpleTestCase, TestCase
 from django.test.utils import isolate_apps, override_settings, register_lookup
 
 
@@ -1202,18 +1203,22 @@ class OtherModelTests(SimpleTestCase):
         ])
 
 
-@isolate_apps('invalid_models_tests')
-class ConstraintsTests(SimpleTestCase):
+@isolate_apps('invalid_models_tests', attr_name='apps')
+class ConstraintsTests(TestCase):
+    databases = {'default', 'other'}
+
     def test_check_constraints(self):
+        constraint = models.CheckConstraint(check=models.Q(age__gte=18), name='is_adult')
+
         class Model(models.Model):
             age = models.IntegerField()
 
             class Meta:
-                constraints = [models.CheckConstraint(check=models.Q(age__gte=18), name='is_adult')]
+                constraints = [constraint]
 
-        errors = Model.check()
+        errors = check_database_backends(app_configs=self.apps.get_app_configs())
         warn = Warning(
-            '%s does not support check constraints.' % connection.display_name,
+            '%s does not support %r.' % (connection.display_name, constraint),
             hint=(
                 "A constraint won't be created. Silence this warning if you "
                 "don't care about it."
@@ -1221,7 +1226,7 @@ class ConstraintsTests(SimpleTestCase):
             obj=Model,
             id='models.W027',
         )
-        expected = [] if connection.features.supports_table_check_constraints else [warn, warn]
+        expected = [] if connection.features.supports_table_check_constraints else [warn]
         self.assertCountEqual(errors, expected)
 
     def test_check_constraints_required_db_features(self):
@@ -1232,4 +1237,5 @@ class ConstraintsTests(SimpleTestCase):
                 required_db_features = {'supports_table_check_constraints'}
                 constraints = [models.CheckConstraint(check=models.Q(age__gte=18), name='is_adult')]
 
-        self.assertEqual(Model.check(), [])
+        errors = check_database_backends(app_configs=self.apps.get_app_configs())
+        self.assertEqual(errors, [])

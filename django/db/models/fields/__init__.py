@@ -12,7 +12,7 @@ from django import forms
 from django.apps import apps
 from django.conf import settings
 from django.core import checks, exceptions, validators
-from django.db import connection, connections, router
+from django.db import connection
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.query_utils import DeferredAttribute, RegisterLookupMixin
 from django.utils import timezone

@@ -26,6 +26,9 @@ class BaseConstraint:
         _, args, kwargs = self.deconstruct()
         return self.__class__(*args, **kwargs)
 
+    def supported(self, connection):
+        return True
+
 
 class CheckConstraint(BaseConstraint):
     def __init__(self, *, check, name):
@@ -67,6 +70,9 @@ class CheckConstraint(BaseConstraint):
         path, args, kwargs = super().deconstruct()
         kwargs['check'] = self.check
         return path, args, kwargs
+
+    def supported(self, connection):
+        return connection.features.supports_table_check_constraints
 
 
 class UniqueConstraint(BaseConstraint):
