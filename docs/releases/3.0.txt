@@ -318,7 +318,7 @@ Requests and Responses
   :class:`memoryview` content.
 
 * For use in, for example, Django templates, :attr:`.HttpRequest.headers` now
-  allows look ups using underscores (e.g. ``user_agent``) in place of hyphens.
+  allows lookups using underscores (e.g. ``user_agent``) in place of hyphens.
 
 .. _whats-new-security-3.0:
 
