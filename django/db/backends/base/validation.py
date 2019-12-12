@@ -6,20 +6,26 @@ class BaseDatabaseValidation:
     def check(self, **kwargs):
         return []
 
-    def check_field(self, field, **kwargs):
+    def check_model(self, model, **kwargs):
         errors = []
-        # Backends may implement a check_field_type() method.
-        if (hasattr(self, 'check_field_type') and
-                # Ignore any related fields.
-                not getattr(field, 'remote_field', None)):
-            # Ignore fields with unsupported features.
-            db_supports_all_required_features = all(
-                getattr(self.connection.features, feature, False)
-                for feature in field.model._meta.required_db_features
-            )
-            if db_supports_all_required_features:
-                field_type = field.db_type(self.connection)
-                # Ignore non-concrete fields.
-                if field_type is not None:
-                    errors.extend(self.check_field_type(field, field_type))
+        db_supports_all_required_features = all(
+            getattr(self.connection.features, feature, False)
+            for feature in model._meta.required_db_features
+        )
+        if not db_supports_all_required_features:
+            return errors
+        for field in model._meta.local_fields:
+            errors.extend(self.check_field(field, **kwargs))
+        for field in model._meta.local_many_to_many:
+            errors.extend(self.check_field(field, from_model=model, **kwargs))
         return errors
+
+    def check_field(self, field, **kwargs):
+        field_type = field.db_type(self.connection)
+        # Ignore non-concrete fields.
+        if field_type is not None:
+            return self.check_field_type(field, field_type)
+        return []
+
+    def check_field_type(self, field, field_type):
+        return []
