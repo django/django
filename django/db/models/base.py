@@ -848,6 +848,7 @@ class Model(metaclass=ModelBase):
         updated = False
         # Skip an UPDATE when adding an instance and primary key has a default.
         if (
+            not raw and
             not force_insert and
             self._state.adding and
             self._meta.pk.default and
