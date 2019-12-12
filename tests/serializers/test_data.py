@@ -26,7 +26,7 @@ from .models import (
     ModifyingSaveData, NullBooleanData, O2OData, PositiveBigIntegerData,
     PositiveIntegerData, PositiveIntegerPKData, PositiveSmallIntegerData,
     PositiveSmallIntegerPKData, SlugData, SlugPKData, SmallData, SmallPKData,
-    Tag, TextData, TimeData, UniqueAnchor, UUIDData,
+    Tag, TextData, TimeData, UniqueAnchor, UUIDData, UUIDDefaultData,
 )
 from .tests import register_tests
 
@@ -351,6 +351,7 @@ The end."""),
     # (pk_obj, 790, XMLPKData, "<foo></foo>"),
     (pk_obj, 791, UUIDData, uuid_obj),
     (fk_obj, 792, FKToUUID, uuid_obj),
+    (pk_obj, 793, UUIDDefaultData, uuid_obj),
 
     (data_obj, 800, AutoNowDateTimeData, datetime.datetime(2006, 6, 16, 10, 42, 37)),
     (data_obj, 810, ModifyingSaveData, 42),
