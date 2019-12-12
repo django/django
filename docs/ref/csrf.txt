@@ -137,39 +137,29 @@ and read the token from the DOM with JavaScript:
 
     {% csrf_token %}
     <script>
-    // using jQuery
-    var csrftoken = jQuery("[name=csrfmiddlewaretoken]").val();
+    var csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
     </script>
 
 Setting the token on the AJAX request
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Finally, you'll have to actually set the header on your AJAX request, while
-protecting the CSRF token from being sent to other domains using
-`settings.crossDomain <https://api.jquery.com/jQuery.ajax/>`_ in jQuery 1.5.1
-and newer:
+Finally, you'll need to set the header on your AJAX request. Using the
+`fetch()`_ API:
 
 .. code-block:: javascript
 
-    function csrfSafeMethod(method) {
-        // these HTTP methods do not require CSRF protection
-        return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
-    }
-    $.ajaxSetup({
-        beforeSend: function(xhr, settings) {
-            if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
-                xhr.setRequestHeader("X-CSRFToken", csrftoken);
-            }
-        }
+    var request = new Request(
+        /* URL */,
+        {headers: {'X-CSRFToken': csrftoken}}
+    );
+    fetch(request, {
+        method: 'POST',
+        mode: 'same-origin'  // Do not send CSRF token to another domain.
+    }).then(function(response) {
+        // ...
     });
 
-If you're using AngularJS 1.1.3 and newer, it's sufficient to configure the
-``$http`` provider with the cookie and header names:
-
-.. code-block:: javascript
-
-    $httpProvider.defaults.xsrfCookieName = 'csrftoken';
-    $httpProvider.defaults.xsrfHeaderName = 'X-CSRFToken';
+.. _fetch(): https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope/fetch
 
 Using CSRF in Jinja2 templates
 ------------------------------
