@@ -102,3 +102,6 @@ class ExclusionConstraint(BaseConstraint):
             self.expressions,
             '' if self.condition is None else ', condition=%s' % self.condition,
         )
+
+    def supported(self, connection):
+        return connection.vendor == 'postgresql'
