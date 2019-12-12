@@ -240,8 +240,10 @@ def patch_response_headers(response, cache_timeout=None):
         cache_timeout = settings.CACHE_MIDDLEWARE_SECONDS
     if cache_timeout < 0:
         cache_timeout = 0  # Can't have max-age negative
-    if not response.has_header('Expires'):
-        response['Expires'] = http_date(time.time() + cache_timeout)
+    #avoid throwing exceptions on bad input data
+    if response is not None:
+        if not response.has_header('Expires'):
+            response['Expires'] = http_date(time.time() + cache_timeout)
     patch_cache_control(response, max_age=cache_timeout)
 
 
