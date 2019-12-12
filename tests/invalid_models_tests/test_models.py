@@ -1205,8 +1205,6 @@ class OtherModelTests(SimpleTestCase):
 
 @isolate_apps('invalid_models_tests', attr_name='apps')
 class ConstraintsTests(TestCase):
-    databases = {'default', 'other'}
-
     def test_check_constraints(self):
         constraint = models.CheckConstraint(check=models.Q(age__gte=18), name='is_adult')
 
@@ -1216,7 +1214,9 @@ class ConstraintsTests(TestCase):
             class Meta:
                 constraints = [constraint]
 
-        errors = check_database_backends(app_configs=self.apps.get_app_configs())
+        errors = check_database_backends(
+            app_configs=self.apps.get_app_configs(), database='default',
+        )
         warn = Warning(
             '%s does not support %r.' % (connection.display_name, constraint),
             hint=(
@@ -1237,5 +1237,7 @@ class ConstraintsTests(TestCase):
                 required_db_features = {'supports_table_check_constraints'}
                 constraints = [models.CheckConstraint(check=models.Q(age__gte=18), name='is_adult')]
 
-        errors = check_database_backends(app_configs=self.apps.get_app_configs())
+        errors = check_database_backends(
+            app_configs=self.apps.get_app_configs(), database='default',
+        )
         self.assertEqual(errors, [])

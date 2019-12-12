@@ -61,7 +61,7 @@ class Command(BaseCommand):
 
     def _run_checks(self, **kwargs):
         issues = run_checks(tags=[Tags.database])
-        issues.extend(super()._run_checks(**kwargs))
+        issues.extend(super()._run_checks(database=self.database, **kwargs))
         return issues
 
     @no_translations
@@ -69,6 +69,7 @@ class Command(BaseCommand):
 
         self.verbosity = options['verbosity']
         self.interactive = options['interactive']
+        self.database = options['database']
 
         # Import the 'management' module within each installed app, to register
         # dispatcher events.
@@ -77,8 +78,7 @@ class Command(BaseCommand):
                 import_module('.management', app_config.name)
 
         # Get the database we're operating from
-        db = options['database']
-        connection = connections[db]
+        connection = connections[self.database]
 
         # Hook for backends needing any database preparation
         connection.prepare_database()
