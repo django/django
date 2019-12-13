@@ -80,8 +80,11 @@ looks for matches for all of the resulting terms.
 If ``search_type`` is ``'plain'``, which is the default, the terms are treated
 as separate keywords. If ``search_type`` is ``'phrase'``, the terms are treated
 as a single phrase. If ``search_type`` is ``'raw'``, then you can provide a
-formatted search query with terms and operators. Read PostgreSQL's `Full Text
-Search docs`_ to learn about differences and syntax. Examples:
+formatted search query with terms and operators. If ``search_type`` is
+``'websearch'``, then you can provide a formatted search query, similar to the
+one used by web search engines. ``'websearch'`` requires PostgreSQL ≥ 11. Read
+PostgreSQL's `Full Text Search docs`_ to learn about differences and syntax.
+Examples:
 
 .. _Full Text Search docs: https://www.postgresql.org/docs/current/textsearch-controls.html#TEXTSEARCH-PARSING-QUERIES
 
@@ -91,6 +94,7 @@ Search docs`_ to learn about differences and syntax. Examples:
     >>> SearchQuery('red tomato', search_type='phrase')  # a phrase
     >>> SearchQuery('tomato red', search_type='phrase')  # a different phrase
     >>> SearchQuery("'tomato' & ('red' | 'green')", search_type='raw')  # boolean operators
+    >>> SearchQuery("'tomato' ('red' OR 'green')", search_type='websearch')  # websearch operators
 
 ``SearchQuery`` terms can be combined logically to provide more flexibility::
 
@@ -101,6 +105,10 @@ Search docs`_ to learn about differences and syntax. Examples:
 
 See :ref:`postgresql-fts-search-configuration` for an explanation of the
 ``config`` parameter.
+
+.. versionchanged:: 3.1
+
+    Support for ``'websearch'`` search type was added.
 
 ``SearchRank``
 ==============

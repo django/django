@@ -202,6 +202,45 @@ class MultipleFieldsTest(GrailTestData, PostgreSQLTestCase):
         )
         self.assertSequenceEqual(searched, [self.french])
 
+    @skipUnlessDBFeature('has_websearch_to_tsquery')
+    def test_web_search(self):
+        line_qs = Line.objects.annotate(search=SearchVector('dialogue'))
+        searched = line_qs.filter(
+            search=SearchQuery(
+                '"burned body" "split kneecaps"',
+                search_type='websearch',
+            ),
+        )
+        self.assertSequenceEqual(searched, [])
+        searched = line_qs.filter(
+            search=SearchQuery(
+                '"body burned" "kneecaps split" -"nostrils"',
+                search_type='websearch',
+            ),
+        )
+        self.assertSequenceEqual(searched, [self.verse1])
+        searched = line_qs.filter(
+            search=SearchQuery(
+                '"Sir Robin" ("kneecaps" OR "Camelot")',
+                search_type='websearch',
+            ),
+        )
+        self.assertSequenceEqual(searched, [self.verse0, self.verse1])
+
+    @skipUnlessDBFeature('has_websearch_to_tsquery')
+    def test_web_search_with_config(self):
+        line_qs = Line.objects.annotate(
+            search=SearchVector('scene__setting', 'dialogue', config='french'),
+        )
+        searched = line_qs.filter(
+            search=SearchQuery('cadeau -beau', search_type='websearch', config='french'),
+        )
+        self.assertSequenceEqual(searched, [])
+        searched = line_qs.filter(
+            search=SearchQuery('beau cadeau', search_type='websearch', config='french'),
+        )
+        self.assertSequenceEqual(searched, [self.french])
+
     def test_bad_search_type(self):
         with self.assertRaisesMessage(ValueError, "Unknown search_type argument 'foo'."):
             SearchQuery('kneecaps', search_type='foo')

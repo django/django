@@ -97,6 +97,9 @@ Minor features
   :class:`~django.db.models.SmallIntegerField`, and
   :class:`~django.db.models.DecimalField`.
 
+* :class:`~django.contrib.postgres.search.SearchQuery` now supports
+  ``'websearch'`` search type on PostgreSQL 11+.
+
 :mod:`django.contrib.redirects`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
