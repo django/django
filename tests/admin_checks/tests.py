@@ -654,6 +654,18 @@ class SystemChecksTestCase(SimpleTestCase):
         errors = MyAdmin(Album, AdminSite()).check()
         self.assertEqual(errors, [])
 
+    def test_inlines_property(self):
+        class CitiesInline(admin.TabularInline):
+            model = City
+
+        class StateAdmin(admin.ModelAdmin):
+            @property
+            def inlines(self):
+                return [CitiesInline]
+
+        errors = StateAdmin(State, AdminSite()).check()
+        self.assertEqual(errors, [])
+
     def test_readonly(self):
         class SongAdmin(admin.ModelAdmin):
             readonly_fields = ("title",)
