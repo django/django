@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-27 22:40+0200\n"
+"POT-Creation-Date: 2019-12-13 09:47+0200\n"
 "PO-Revision-Date: 2010-05-13 15:35+0200\n"
 "Last-Translator: Django team\n"
 "Language-Team: English <en@li.org>\n"
@@ -20,6 +20,10 @@ msgstr ""
 
 #: conf/global_settings.py:53
 msgid "Arabic"
+msgstr ""
+
+#: conf/global_settings.py:53
+msgid "Algerian Arabic"
 msgstr ""
 
 #: conf/global_settings.py:54

@@ -20,6 +20,12 @@ LANG_INFO = {
         'name': 'Arabic',
         'name_local': 'العربيّة',
     },
+    'ar-dz': {
+        'bidi': True,
+        'code': 'ar-dz',
+        'name': 'Algerian Arabic',
+        'name_local': 'العربية الجزائرية',
+    },
     'ast': {
         'bidi': False,
         'code': 'ast',

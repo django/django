@@ -51,6 +51,7 @@ LANGUAGE_CODE = 'en-us'
 LANGUAGES = [
     ('af', gettext_noop('Afrikaans')),
     ('ar', gettext_noop('Arabic')),
+    ('ar-dz', gettext_noop('Algerian Arabic')),
     ('ast', gettext_noop('Asturian')),
     ('az', gettext_noop('Azerbaijani')),
     ('bg', gettext_noop('Bulgarian')),
@@ -143,7 +144,7 @@ LANGUAGES = [
 ]
 
 # Languages using BiDi (right-to-left) layout
-LANGUAGES_BIDI = ["he", "ar", "fa", "ur"]
+LANGUAGES_BIDI = ["he", "ar", "ar-dz", "fa", "ur"]
 
 # If you set this to False, Django will make some optimizations so as not
 # to load the internationalization machinery.
