@@ -762,8 +762,20 @@ class RelatedPrepopulatedInline3(admin.TabularInline):
     autocomplete_fields = ['fk', 'm2m']
 
 
+class RelatedPrepopulatedInlineStackInlineWithoutFieldSet(admin.StackedInline):
+    model = RelatedPrepopulated
+    extra = 1
+    fields = ['slug1', 'name']
+    prepopulated_fields = {'slug1': ['name']}
+
+
 class MainPrepopulatedAdmin(admin.ModelAdmin):
-    inlines = [RelatedPrepopulatedInline1, RelatedPrepopulatedInline2, RelatedPrepopulatedInline3]
+    inlines = [
+        RelatedPrepopulatedInline1,
+        RelatedPrepopulatedInline2,
+        RelatedPrepopulatedInline3,
+        RelatedPrepopulatedInlineStackInlineWithoutFieldSet,
+    ]
     fieldsets = (
         (None, {
             'fields': (('pubdate', 'status'), ('name', 'slug1', 'slug2', 'slug3'))

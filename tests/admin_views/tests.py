@@ -4521,6 +4521,14 @@ class SeleniumTests(AdminSeleniumTestCase):
             len(self.selenium.find_elements_by_class_name('select2-selection')),
             num_initial_select2_inputs + 6
         )
+        # Stack inline without fieldset.
+        self.selenium.find_elements_by_link_text('Add another Related prepopulated')[3].click()
+        prefix = 'id_relatedprepopulated_set-4-1-'
+        self.selenium.find_element_by_id(prefix + 'name').send_keys(
+            'stack inline with a single field in each line.'
+        )
+        slug1 = self.selenium.find_element_by_id(prefix + 'slug1').get_attribute('value')
+        self.assertEqual(slug1, 'stack-inline-single-field-each-line')
         # Save and check that everything is properly stored in the database
         with self.wait_page_loaded():
             self.selenium.find_element_by_xpath('//input[@value="Save"]').click()
