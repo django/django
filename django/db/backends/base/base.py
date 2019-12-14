@@ -1,5 +1,6 @@
 import _thread
 import copy
+import logging
 import threading
 import time
 import warnings
@@ -21,6 +22,8 @@ from django.utils.asyncio import async_unsafe
 from django.utils.functional import cached_property
 
 NO_DB_ALIAS = '__no_db__'
+
+logger = logging.getLogger('django.db.backends')
 
 
 class BaseDatabaseWrapper:
@@ -238,11 +241,15 @@ class BaseDatabaseWrapper:
 
     def _commit(self):
         if self.connection is not None:
+            if self.queries_logged:
+                logger.debug("COMMIT")
             with self.wrap_database_errors:
                 return self.connection.commit()
 
     def _rollback(self):
         if self.connection is not None:
+            if self.queries_logged:
+                logger.debug("ROLLBACK")
             with self.wrap_database_errors:
                 return self.connection.rollback()
 

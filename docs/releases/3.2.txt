@@ -451,6 +451,9 @@ Miscellaneous
 
 * Instantiating an abstract model now raises ``TypeError``.
 
+* The database debug log now also logs when transactions are committed and 
+  rolled back.
+
 .. _deprecated-features-3.2:
 
 Features deprecated in 3.2

@@ -1,5 +1,7 @@
+import unittest.mock
 from unittest.mock import MagicMock
 
+import django.db.backends.base.base
 from django.db import DEFAULT_DB_ALIAS, connection, connections
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.test import SimpleTestCase, TestCase
@@ -34,6 +36,37 @@ class DatabaseWrapperTests(SimpleTestCase):
     def test_initialization_display_name(self):
         self.assertEqual(BaseDatabaseWrapper.display_name, 'unknown')
         self.assertNotEqual(connection.display_name, 'unknown')
+
+    @classmethod
+    def _get_wrapper(cls):
+        class FakeWrapperClass:
+            def __init__(self, wrapper):
+                pass
+
+        class MyWrapper(BaseDatabaseWrapper):
+            client_class = FakeWrapperClass
+            creation_class = FakeWrapperClass
+            features_class = FakeWrapperClass
+            introspection_class = FakeWrapperClass
+            ops_class = FakeWrapperClass
+        wrapper = MyWrapper({})
+        wrapper.force_debug_cursor = True
+        wrapper.connection = MagicMock()
+        return wrapper
+
+    @unittest.mock.patch.object(django.db.backends.base.base, "logger")
+    def test_commit_logs_in_debug_mode(self, logger):
+        wrapper = self._get_wrapper()
+        wrapper.commit()
+
+        logger.debug.assert_called_once_with("COMMIT")
+
+    @unittest.mock.patch.object(django.db.backends.base.base, "logger")
+    def test_rollback_logs_in_debug_mode(self, logger):
+        wrapper = self._get_wrapper()
+        wrapper.rollback()
+
+        logger.debug.assert_called_once_with("ROLLBACK")
 
 
 class ExecuteWrapperTests(TestCase):
