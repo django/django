@@ -1247,7 +1247,7 @@ class ExceptionReporterFilterTests(ExceptionReportTestMixin, LoggingCaptureMixin
         response = self.client.get(
             '/raises500/',
             HTTP_SECRET_HEADER='super_secret',
-            HTTP_X_REQUESTED_WITH='XMLHttpRequest',
+            HTTP_ACCEPT='application/json',
         )
         self.assertNotIn(b'super_secret', response.content)
 
@@ -1289,17 +1289,17 @@ class CustomExceptionReporterFilterTests(SimpleTestCase):
         )
 
 
-class AjaxResponseExceptionReporterFilter(ExceptionReportTestMixin, LoggingCaptureMixin, SimpleTestCase):
+class NonHTMLResponseExceptionReporterFilter(ExceptionReportTestMixin, LoggingCaptureMixin, SimpleTestCase):
     """
     Sensitive information can be filtered out of error reports.
 
-    Here we specifically test the plain text 500 debug-only error page served
-    when it has been detected the request was sent by JS code. We don't check
-    for (non)existence of frames vars in the traceback information section of
-    the response content because we don't include them in these error pages.
+    The plain text 500 debug-only error page is served when it has been
+    detected the request doesn't accept HTML content. Don't check for
+    (non)existence of frames vars in the traceback information section of the
+    response content because they're not included in these error pages.
     Refs #14614.
     """
-    rf = RequestFactory(HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+    rf = RequestFactory(HTTP_ACCEPT='application/json')
 
     def test_non_sensitive_request(self):
         """
@@ -1346,8 +1346,8 @@ class AjaxResponseExceptionReporterFilter(ExceptionReportTestMixin, LoggingCaptu
             self.verify_unsafe_response(custom_exception_reporter_filter_view, check_for_vars=False)
 
     @override_settings(DEBUG=True, ROOT_URLCONF='view_tests.urls')
-    def test_ajax_response_encoding(self):
-        response = self.client.get('/raises500/', HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+    def test_non_html_response_encoding(self):
+        response = self.client.get('/raises500/', HTTP_ACCEPT='application/json')
         self.assertEqual(response['Content-Type'], 'text/plain; charset=utf-8')
 
 

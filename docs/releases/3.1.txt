@@ -388,6 +388,11 @@ Miscellaneous
   Django 3.1, the first request to any previously cached template fragment will
   be a cache miss.
 
+* The logic behind the decision to return a redirection fallback or a 204 HTTP
+  response from the :func:`~django.views.i18n.set_language` view is now based
+  on the ``Accept`` HTTP header instead of the ``X-Requested-With`` HTTP header
+  presence.
+
 * The compatibility imports of ``django.core.exceptions.EmptyResultSet`` in
   ``django.db.models.query``, ``django.db.models.sql``, and
   ``django.db.models.sql.datastructures`` are removed.

@@ -159,11 +159,11 @@ Use the ``django.test.Client`` class to make requests.
 
             >>> c = Client()
             >>> c.get('/customers/details/', {'name': 'fred', 'age': 7},
-            ...       HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+            ...       HTTP_ACCEPT='application/json')
 
-        ...will send the HTTP header ``HTTP_X_REQUESTED_WITH`` to the
-        details view, which is a good way to test code paths that use the
-        :meth:`django.http.HttpRequest.is_ajax()` method.
+        ...will send the HTTP header ``HTTP_ACCEPT`` to the details view, which
+        is a good way to test code paths that use the
+        :meth:`django.http.HttpRequest.accepts()` method.
 
         .. admonition:: CGI specification
 

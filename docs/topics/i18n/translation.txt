@@ -1803,9 +1803,18 @@ redirect to that URL will be performed. Otherwise, Django may fall back to
 redirecting the user to the URL from the ``Referer`` header or, if it is not
 set, to ``/``, depending on the nature of the request:
 
-* For AJAX requests, the fallback will be performed only if the ``next``
-  parameter was set. Otherwise a 204 status code (No Content) will be returned.
-* For non-AJAX requests, the fallback will always be performed.
+* If the request accepts HTML content (based on its ``Accept`` HTTP header),
+  the fallback will always be performed.
+
+* If the request doesn't accept HTML, the fallback will be performed only if
+  the ``next`` parameter was set. Otherwise a 204 status code (No Content) will
+  be returned.
+
+.. versionchanged:: 3.1
+
+    In older versions, the distinction for the fallback is based on whether the
+    ``X-Requested-With`` header is set to the value ``XMLHttpRequest``. This is
+    set by the jQuery ``ajax()`` method.
 
 Here's example HTML template code:
 
