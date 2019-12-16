@@ -1032,7 +1032,8 @@ def _get_foreign_key(parent_model, model, fk_name=None, can_fail=False):
             )
         else:
             raise ValueError(
-                "'%s' has more than one ForeignKey to '%s'." % (
+                "'%s' has more than one ForeignKey to '%s'. You must specify "
+                "a 'fk_name' attribute." % (
                     model._meta.label,
                     parent_model._meta.label,
                 )

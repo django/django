@@ -645,7 +645,8 @@ inline on a :class:`~django.contrib.admin.ModelAdmin`.
 * **admin.E201**: Cannot exclude the field ``<field name>``, because it is the
   foreign key to the parent model ``<app_label>.<model>``.
 * **admin.E202**: ``<model>`` has no ``ForeignKey`` to ``<parent model>``./
-  ``<model>`` has more than one ``ForeignKey`` to ``<parent model>``.
+  ``<model>`` has more than one ``ForeignKey`` to ``<parent model>``. You must
+  specify a ``fk_name`` attribute.
 * **admin.E203**: The value of ``extra`` must be an integer.
 * **admin.E204**: The value of ``max_num`` must be an integer.
 * **admin.E205**: The value of ``min_num`` must be an integer.
