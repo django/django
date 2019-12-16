@@ -1031,10 +1031,13 @@ def _get_foreign_key(parent_model, model, fk_name=None, can_fail=False):
                 )
             )
         else:
+            fks_name = [fk.name for fk in fks_to_parent]
             raise ValueError(
-                "'%s' has more than one ForeignKey to '%s'." % (
+                "'%s' has more than one ForeignKey to '%s'. "
+                "Choices for ForeignKey are: %s." % (
                     model._meta.label,
                     parent_model._meta.label,
+                    ", ".join(fks_name),
                 )
             )
     return fk
