@@ -1068,7 +1068,7 @@ class Subquery(Expression):
     def get_group_by_cols(self, alias=None):
         if alias:
             return [Ref(alias, self)]
-        return []
+        return self.query.get_external_cols()
 
 
 class Exists(Subquery):

@@ -110,7 +110,14 @@ class SQLCompiler:
         # Note that even if the group_by is set, it is only the minimal
         # set to group by. So, we need to add cols in select, order_by, and
         # having into the select in any case.
+        ref_sources = {
+            expr.source for expr in expressions if isinstance(expr, Ref)
+        }
         for expr, _, _ in select:
+            # Skip members of the select clause that are already included
+            # by reference.
+            if expr in ref_sources:
+                continue
             cols = expr.get_group_by_cols()
             for col in cols:
                 expressions.append(col)
@@ -400,7 +407,7 @@ class SQLCompiler:
             return self.quote_cache[name]
         if ((name in self.query.alias_map and name not in self.query.table_map) or
                 name in self.query.extra_select or (
-                    name in self.query.external_aliases and name not in self.query.table_map)):
+                    self.query.external_aliases.get(name) and name not in self.query.table_map)):
             self.quote_cache[name] = name
             return name
         r = self.connection.ops.quote_name(name)

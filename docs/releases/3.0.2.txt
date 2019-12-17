@@ -9,4 +9,5 @@ Django 3.0.2 fixes several bugs in 3.0.1.
 Bugfixes
 ========
 
-* ...
+* Fixed a regression in Django 3.0 that didn't include columns referenced by a
+  ``Subquery()`` in the ``GROUP BY`` clause (:ticket:`31094`).
