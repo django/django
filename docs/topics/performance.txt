@@ -86,7 +86,7 @@ Get things right from the start
 -------------------------------
 
 Some work in optimization involves tackling performance shortcomings, but some
-of the work can be built in to what you'd do anyway, as part of the good
+of the work can be built-in to what you'd do anyway, as part of the good
 practices you should adopt even before you start thinking about improving
 performance.
 
