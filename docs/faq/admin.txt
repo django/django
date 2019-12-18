@@ -97,8 +97,8 @@ like to make should be possible by editing the stylesheet.
 What browsers are supported for using the admin?
 ================================================
 
-The admin provides a fully-functional experience to `YUI's A-grade`_ browsers,
-with the notable exception of IE6, which is not supported.
+The admin provides a fully-functional experience to most of the `YUI's A-grade`_ browsers,
+with some exceptions, i.e, IE6, which is not supported.
 
 There *may* be minor stylistic differences between supported browsers—for
 example, some browsers may not support rounded corners. These are considered
