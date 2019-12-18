@@ -1029,3 +1029,16 @@ Versions affected
 * Django 2.2 :commit:`(patch) <cf694e6852b0da7799f8b53f1fb2f7d20cf17534>`
 * Django 2.1 :commit:`(patch) <5d50a2e5fa36ad23ab532fc54cf4073de84b3306>`
 * Django 1.11 :commit:`(patch) <869b34e9b3be3a4cfcb3a145f218ffd3f5e3fd79>`
+
+December 18, 2019 - :cve:`2019-19844`
+-------------------------------------
+
+Potential account hijack via password reset form. `Full description
+<https://www.djangoproject.com/weblog/2019/dec/18/security-releases/>`__
+
+Versions affected
+~~~~~~~~~~~~~~~~~
+
+* Django 3.0 :commit:`(patch) <302a4ff1e8b1c798aab97673909c7a3dfda42c26>`
+* Django 2.2 :commit:`(patch) <4d334bea06cac63dc1272abcec545b85136cca0e>`
+* Django 1.11 :commit:`(patch) <f4cff43bf921fcea6a29b726eb66767f67753fa2>`
