@@ -1,0 +1,16 @@
+2.4.0 Release Notes
+===================
+
+Channels 2.4 brings compatibility with Django 3.0s ``async_unsafe()`` checks.
+(Specifically we ensure session save calls are made inside an asgiref
+``database_sync_to_async()``.)
+
+If you are using Daphne, it is recommended that you install Daphne version
+2.4.1 or later for full compatibility with Django 3.0.
+
+Backwards Incompatible Changes
+------------------------------
+
+In line with the guidance provided by Django's supported versions policy we now
+also drop support for all Django versions before 2.2, which is the current LTS.
+

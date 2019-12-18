@@ -1,6 +1,14 @@
 Full release notes, with more details and upgrade information, are available at:
 https://channels.readthedocs.io/en/latest/releases
 
+2.4.0 (2019-12-18)
+------------------
+
+* Wraps session save calls in ``database_sync_to_async()``, for compatibility
+  with Django 3.0's ``async_unsafe()`` checks.
+
+* Drops compatibility with all Django versions lower than 2.2.
+
 2.3.1 (2019-10-23)
 ------------------
 
