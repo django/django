@@ -2,7 +2,6 @@ import time
 from importlib import import_module
 
 from django.apps import apps
-from django.core.checks import Tags, run_checks
 from django.core.management.base import (
     BaseCommand, CommandError, no_translations,
 )
@@ -20,6 +19,7 @@ from django.utils.text import Truncator
 
 class Command(BaseCommand):
     help = "Updates database schema. Manages both apps with migrations and those without."
+    requires_system_checks = False
 
     def add_arguments(self, parser):
         parser.add_argument(
@@ -58,18 +58,20 @@ class Command(BaseCommand):
             '--run-syncdb', action='store_true',
             help='Creates tables for apps without migrations.',
         )
-
-    def _run_checks(self, **kwargs):
-        issues = run_checks(tags=[Tags.database])
-        issues.extend(super()._run_checks(database=self.database, **kwargs))
-        return issues
+        parser.add_argument(
+            '--skip-checks', action='store_true',
+            help='Skip system checks.',
+        )
 
     @no_translations
     def handle(self, *args, **options):
+        self.database = options['database']
+
+        if not options['skip_checks']:
+            self.check(databases=[self.database])
 
         self.verbosity = options['verbosity']
         self.interactive = options['interactive']
-        self.database = options['database']
 
         # Import the 'management' module within each installed app, to register
         # dispatcher events.

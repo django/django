@@ -17,16 +17,17 @@ def dummy_allow_migrate(db, app_label, **hints):
 class BackendSpecificChecksTests(SimpleTestCase):
 
     @mock.patch('django.db.router.allow_migrate', new=dummy_allow_migrate)
-    def test_check_field(self):
+    def test_validation_check(self):
         """ Test if backend specific checks are performed. """
         error = Error('an error')
 
         class Model(models.Model):
             pass
 
-        with mock.patch.object(connections['default'].validation, 'check_field', return_value=[error]):
+        with mock.patch.object(connections['default'].validation, 'check', return_value=[error]):
             self.assertEqual(
                 check_database_backends(
                     app_configs=self.apps.get_app_configs(),
+                    databases=['default'],
                 ), [error]
             )

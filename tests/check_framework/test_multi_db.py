@@ -28,7 +28,9 @@ class TestMultiDBChecks(TestCase):
 
         with self._patch_check_field_on('default') as mock_check_field_default:
             with self._patch_check_field_on('other') as mock_check_field_other:
-                check_database_backends(app_configs=self.apps.get_app_configs())
+                check_database_backends(
+                    app_configs=self.apps.get_app_configs(), databases=self.databases,
+                )
                 self.assertTrue(mock_check_field_default.called)
                 self.assertFalse(mock_check_field_other.called)
 
@@ -39,18 +41,20 @@ class TestMultiDBChecks(TestCase):
 
         with self._patch_check_field_on('other') as mock_check_field_other:
             with self._patch_check_field_on('default') as mock_check_field_default:
-                check_database_backends(app_configs=self.apps.get_app_configs())
+                check_database_backends(
+                    app_configs=self.apps.get_app_configs(), databases=self.databases,
+                )
                 self.assertTrue(mock_check_field_other.called)
                 self.assertFalse(mock_check_field_default.called)
 
-    def test_database_kwarg(self):
+    def test_databases_kwarg(self):
         class Model(models.Model):
             field = models.CharField(max_length=100)
 
         with self._patch_check_field_on('other') as mock_check_field_other:
             with self._patch_check_field_on('default') as mock_check_field_default:
                 check_database_backends(
-                    app_configs=self.apps.get_app_configs(), database='other',
+                    app_configs=self.apps.get_app_configs(), databases=['other'],
                 )
                 self.assertTrue(mock_check_field_other.called)
                 self.assertFalse(mock_check_field_default.called)

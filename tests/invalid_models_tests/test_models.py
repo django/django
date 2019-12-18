@@ -1215,7 +1215,7 @@ class ConstraintsTests(TestCase):
                 constraints = [constraint]
 
         errors = check_database_backends(
-            app_configs=self.apps.get_app_configs(), database='default',
+            app_configs=self.apps.get_app_configs(), databases=['default'],
         )
         warn = Warning(
             '%s does not support %r.' % (connection.display_name, constraint),
@@ -1238,6 +1238,6 @@ class ConstraintsTests(TestCase):
                 constraints = [models.CheckConstraint(check=models.Q(age__gte=18), name='is_adult')]
 
         errors = check_database_backends(
-            app_configs=self.apps.get_app_configs(), database='default',
+            app_configs=self.apps.get_app_configs(), databases=['default'],
         )
         self.assertEqual(errors, [])

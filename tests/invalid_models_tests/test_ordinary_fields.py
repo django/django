@@ -1,6 +1,7 @@
 import unittest
 
 from django.core.checks import Error, Warning as DjangoWarning
+from django.core.checks.database import check_database_backends
 from django.db import connection, models
 from django.test import SimpleTestCase, TestCase, skipIfDBFeature
 from django.test.utils import isolate_apps, override_settings
@@ -748,7 +749,7 @@ class TimeFieldTests(SimpleTestCase):
         self.test_fix_default_value()
 
 
-@isolate_apps('invalid_models_tests')
+@isolate_apps('invalid_models_tests', attr_name='apps')
 class TextFieldTests(TestCase):
 
     @skipIfDBFeature('supports_index_on_text_field')
@@ -757,7 +758,10 @@ class TextFieldTests(TestCase):
             value = models.TextField(db_index=True)
         field = Model._meta.get_field('value')
         field_type = field.db_type(connection)
-        self.assertEqual(field.check(), [
+        errors = check_database_backends(
+            app_configs=self.apps.get_app_configs(), databases=['default']
+        )
+        self.assertEqual(errors, [
             DjangoWarning(
                 '%s does not support a database index on %s columns.'
                 % (connection.display_name, field_type),
