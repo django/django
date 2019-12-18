@@ -1,0 +1,12 @@
+==========================
+Django 3.0.2 release notes
+==========================
+
+*Expected January 2, 2020*
+
+Django 3.0.2 fixes several bugs in 3.0.1.
+
+Bugfixes
+========
+
+* ...
