@@ -1138,6 +1138,8 @@ class AggregateTestCase(TestCase):
         with self.assertNumQueries(1) as ctx:
             list(publisher_qs)
         self.assertEqual(ctx[0]['sql'].count('SELECT'), 2)
+        # The GROUP BY should not be by alias either.
+        self.assertEqual(ctx[0]['sql'].lower().count('latest_book_pubdate'), 1)
 
     @skipUnlessDBFeature('supports_subqueries_in_group_by')
     def test_group_by_subquery_annotation(self):
