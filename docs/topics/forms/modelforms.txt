@@ -320,9 +320,7 @@ Every ``ModelForm`` also has a ``save()`` method. This method creates and saves
 a database object from the data bound to the form. A subclass of ``ModelForm``
 can accept an existing model instance as the keyword argument ``instance``; if
 this is supplied, ``save()`` will update that instance. If it's not supplied,
-``save()`` will create a new instance of the specified model:
-
-.. code-block:: python
+``save()`` will create a new instance of the specified model::
 
     >>> from myapp.models import Article
     >>> from myapp.forms import ArticleForm
@@ -375,9 +373,7 @@ exists in the database.
 To work around this problem, every time you save a form using ``commit=False``,
 Django adds a ``save_m2m()`` method to your ``ModelForm`` subclass. After
 you've manually saved the instance produced by the form, you can invoke
-``save_m2m()`` to save the many-to-many form data. For example:
-
-.. code-block:: python
+``save_m2m()`` to save the many-to-many form data. For example::
 
     # Create a form instance with POST data.
     >>> f = AuthorForm(request.POST)
@@ -396,9 +392,7 @@ you've manually saved the instance produced by the form, you can invoke
 
 Calling ``save_m2m()`` is only required if you use ``save(commit=False)``.
 When you use a ``save()`` on a form, all data -- including many-to-many data --
-is saved without the need for any additional method calls.  For example:
-
-.. code-block:: python
+is saved without the need for any additional method calls.  For example::
 
     # Create a form instance with POST data.
     >>> a = Author()
@@ -900,9 +894,7 @@ Saving objects in the formset
 -----------------------------
 
 As with a ``ModelForm``, you can save the data as a model object. This is done
-with the formset's ``save()`` method:
-
-.. code-block:: python
+with the formset's ``save()`` method::
 
     # Create a formset instance with POST data.
     >>> formset = AuthorFormSet(request.POST)
@@ -920,9 +912,7 @@ excluded), these fields will not be set by the ``save()`` method. You can find
 more information about this restriction, which also holds for regular
 ``ModelForms``, in `Selecting the fields to use`_.
 
-Pass ``commit=False`` to return the unsaved model instances:
-
-.. code-block:: python
+Pass ``commit=False`` to return the unsaved model instances::
 
     # don't save to the database
     >>> instances = formset.save(commit=False)
