@@ -1239,7 +1239,7 @@ class QuerySet:
         inserted_rows = []
         bulk_return = connections[self.db].features.can_return_rows_from_bulk_insert
         for item in [objs[i:i + batch_size] for i in range(0, len(objs), batch_size)]:
-            if bulk_return and not ignore_conflicts:
+            if bulk_return:
                 inserted_columns = self._insert(
                     item, fields=fields, using=self.db,
                     returning_fields=self.model._meta.db_returning_fields,

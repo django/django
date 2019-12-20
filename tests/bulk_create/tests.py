@@ -314,3 +314,17 @@ class BulkCreateTests(TestCase):
         # Without ignore_conflicts=True, there's a problem.
         with self.assertRaises(IntegrityError):
             TwoFields.objects.bulk_create(conflicting_objects)
+
+    @skipUnlessDBFeature('can_return_rows_from_bulk_insert')
+    def test_set_pk_ignore_conflicts_ignore(self):
+        data = [
+            TwoFields(f1=1, f2=1),
+            TwoFields(f1=2, f2=2),
+            TwoFields(f1=3, f2=3),
+        ]
+        TwoFields.objects.bulk_create(data)
+        new_object = TwoFields(f1=4, f2=4)
+        new_instances = TwoFields.objects.bulk_create([new_object], ignore_conflicts=True)
+        self.assertEqual(TwoFields.objects.count(), 4)
+        self.assertIsNotNone(new_object.pk)
+        self.assertIsNotNone(new_instances[0].pk)

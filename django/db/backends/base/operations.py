@@ -182,7 +182,8 @@ class BaseDatabaseOperations:
         Given a cursor object that has just performed an INSERT...RETURNING
         statement into a table, return the newly created data.
         """
-        return cursor.fetchone()
+        results = cursor.fetchone()
+        return (None, ) if results is None else results
 
     def field_cast_sql(self, db_type, internal_type):
         """
