@@ -1952,6 +1952,31 @@ Example::
 Django will look within each of these paths for the ``<locale_code>/LC_MESSAGES``
 directories containing the actual translation files.
 
+.. setting:: LOCALE_ROOT
+
+``LOCALE_ROOT``
+----------------
+
+.. versionadded:: 3.1
+
+Default: ``None``
+
+Absolute filesystem path to the directory that will hold the main po files of
+translations.
+
+Example::
+
+    LOCALE_ROOT = BASEDIR / 'locale'
+
+Django will use the files contained in ``<locale_code>/LC_MESSAGES`` under this
+directory as the main po file of a translation for a domain.
+
+Note that using this setting requires compiled catalog(s) for your
+locale(s), you may use
+:option:`django-admin makemessages --collect-base-catalogs<makemessages --collect-base-catalogs>`
+for collecting the bundled ones with Django and then
+:djadmin:`django-admin compilemessages <compilemessages>` to provide them.
+
 .. setting:: LOGGING
 
 ``LOGGING``
@@ -3576,6 +3601,7 @@ Globalization (``i18n``/``l10n``)
 * :setting:`LANGUAGES`
 * :setting:`LANGUAGES_BIDI`
 * :setting:`LOCALE_PATHS`
+* :setting:`LOCALE_ROOT`
 * :setting:`MONTH_DAY_FORMAT`
 * :setting:`NUMBER_GROUPING`
 * :setting:`SHORT_DATE_FORMAT`

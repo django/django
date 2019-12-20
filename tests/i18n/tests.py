@@ -1,6 +1,7 @@
 import datetime
 import decimal
 import gettext as gettext_module
+import glob
 import os
 import pickle
 import re
@@ -12,6 +13,7 @@ from unittest import mock
 
 from asgiref.local import Local
 
+import django
 from django import forms
 from django.apps import AppConfig
 from django.conf import settings
@@ -1779,6 +1781,78 @@ class TranslationFilesMissing(SimpleTestCase):
         trans_real._translations = {}
         with self.assertRaises(OSError):
             activate('en')
+
+    def test_failure_finding_mo_files_with_locale_root(self):
+        """
+        Only a warning is raised if no .mo files are found when
+        setting.LOCALE_ROOT is set.
+        """
+        with override_settings(LOCALE_ROOT=os.path.join(here, 'locale_root/')):
+            trans_real._translations = {}
+            msg = (
+                'LOCALE_ROOT has been set and no translation files found for '
+                'default language'
+            )
+            with self.assertWarnsMessage(RuntimeWarning, msg):
+                activate('en')
+
+
+class LocaleRootTests(SimpleTestCase):
+    """
+    Test the functioning of the LOCALE_ROOT setting.
+    """
+    @override_settings(
+        USE_I18N=True,
+        LANGUAGE_CODE='es',
+        LOCALE_ROOT=os.path.join(here, 'locale_root/')
+    )
+    def test_correct_functioning(self):
+        self.assertEqual(gettext("Do you like icecream?"), "¿Os gusta el helado?")
+        self.assertEqual(gettext("password"), "password")
+
+
+class CatalogMergingTests(SimpleTestCase):
+    """
+    Test the functioning of catalog merging in translations
+    """
+
+    def test_django_bundled_catalogs_consistency(self):
+        app_configs = []
+        django_dir = os.path.normpath(os.path.join(os.path.dirname(django.__file__)))
+        contrib_apps_dirs = glob.glob(django_dir + '/contrib/*')
+        for contrib_app_dir in contrib_apps_dirs:
+            app_configs.append(
+                AppConfig(contrib_app_dir, AppModuleStub(__path__=[contrib_app_dir]))
+            )
+        with mock.patch('django.apps.apps.get_app_configs', return_value=app_configs):
+            for lang in LANG_INFO:
+                activate(lang)
+        # If it gets up to here, no warning have been issued and all catalogs
+        # have been merged correctly (any warning will make this test fail).
+
+    @override_settings(LOCALE_PATHS=extended_locale_paths)
+    def test_catalog_with_plural_forms_merged(self):
+        activate('sk')
+        self.assertEqual(gettext("a test string"), "translated into sk")
+
+    @override_settings(
+        LANGUAGE_CODE='es',
+        LOCALE_ROOT=os.path.join(here, 'locale_root/'),
+        LOCALE_PATHS=extended_locale_paths
+    )
+    def test_catalog_with_plural_forms_not_merged(self):
+        msg = 'Catalog **NOT MERGED** to prevent inconsistencies'
+        with self.assertWarnsMessage(RuntimeWarning, msg):
+            activate('cs')
+
+    @override_settings(
+        LANGUAGE_CODE='es',
+        LOCALE_PATHS=extended_locale_paths
+    )
+    def test_catalog_without_plural_forms_not_merged(self):
+        msg = 'Catalog **NOT MERGED** to prevent inconsistencies'
+        with self.assertWarnsMessage(RuntimeWarning, msg):
+            activate('lt')
 
 
 class NonDjangoLanguageTests(SimpleTestCase):

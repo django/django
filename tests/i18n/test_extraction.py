@@ -515,6 +515,7 @@ class SymlinkExtractorTests(ExtractorTests):
 class CopyPluralFormsExtractorTests(ExtractorTests):
 
     PO_FILE_ES = 'locale/es/LC_MESSAGES/django.po'
+    PO_FILE_RU = 'locale/ru/LC_MESSAGES/django.po'
 
     def test_copy_plural_forms(self):
         management.call_command('makemessages', locale=[LOCALE], verbosity=0)
@@ -545,6 +546,283 @@ class CopyPluralFormsExtractorTests(ExtractorTests):
             self.assertNotIn("#-#-#-#-#  django.pot (PACKAGE VERSION)  #-#-#-#-#\\n", po_contents)
             self.assertMsgId('First `translate`, then `blocktranslate` with a plural', po_contents)
             self.assertMsgIdPlural('Plural for a `translate` and `blocktranslate` collision case', po_contents)
+
+
+class CollectBaseCatalogsTests(ExtractorTests):
+
+    PO_FILE = 'locale_root/%s/LC_MESSAGES/django.po'
+    BUNDLED_LOCALES = ['cs', 'es', 'lt', 'mk', 'ru', 'sl', 'tt']
+
+    def test_single_locale(self):
+        with override_settings(LOCALE_ROOT=os.path.join(self.test_dir, 'locale_root')):
+            with mock.patch('django.core.management.commands.makemessages.Command.django_dir',
+                            os.path.join(self.test_dir, 'django_dir')):
+                out = StringIO()
+                management.call_command(
+                    'makemessages', locale=['es'], collect_base_catalogs='settings',
+                    stdout=out, verbosity=1
+                )
+                with open(self.PO_FILE % 'es', encoding='utf-8') as fp:
+                    po_contents = fp.read()
+                    should_contain = """
+                    msgid "Afrikaans"
+                    msgstr "Africano"
+                    msgid "Arabic"
+                    msgstr "Árabe"
+                    msgid "Asturian"
+                    msgstr "Asturiano"
+                    """
+                    for line in should_contain.splitlines():
+                        self.assertIn(line.strip(), po_contents)
+
+    def test_translators_string(self):
+        with override_settings(LOCALE_ROOT=os.path.join(self.test_dir, 'locale_root')):
+            with mock.patch('django.core.management.commands.makemessages.Command.django_dir',
+                            os.path.join(self.test_dir, 'django_dir')):
+                management.call_command('makemessages', locale=['cs'], collect_base_catalogs='settings', verbosity=0)
+                with open(self.PO_FILE % 'cs', encoding='utf-8') as fp:
+                    po_contents = fp.read()
+                    should_contain = "Contributors to this catalog are listed in"
+                    self.assertIn(should_contain, po_contents)
+
+    def test_all_bundled(self):
+        with override_settings(LOCALE_ROOT=os.path.join(self.test_dir, 'locale_root')):
+            with mock.patch('django.core.management.commands.makemessages.Command.django_dir',
+                            os.path.join(self.test_dir, 'django_dir')):
+                management.call_command('makemessages', collect_base_catalogs='all-bundled', verbosity=0)
+                for locale in self.BUNDLED_LOCALES:
+                    self.assertTrue(os.path.exists(self.PO_FILE % locale))
+
+    def test_new_locale(self):
+        with override_settings(LOCALE_ROOT=os.path.join(self.test_dir, 'locale_root')):
+            with mock.patch('django.core.management.commands.makemessages.Command.django_dir',
+                            os.path.join(self.test_dir, 'django_dir')):
+                management.call_command('makemessages', locale=['xxx'], collect_base_catalogs='settings', verbosity=0)
+                should_contain = """
+                    "Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
+                    msgid "Love"
+                    """
+                with open(self.PO_FILE % 'xxx', encoding='utf-8') as fp:
+                    po_contents = fp.read()
+                    for line in should_contain.splitlines():
+                        self.assertIn(line.strip(), po_contents)
+
+    def test_no_locale_root_setting(self):
+        msg = ("currently makemessages only supports collecting base catalogs "
+               "with the LOCALE_ROOT setting defined.")
+        with self.assertRaisesMessage(CommandError, msg):
+            management.call_command('makemessages', collect_base_catalogs='settings', verbosity=0)
+
+
+class ComplyPluralFormsTests(ExtractorTests):
+
+    PO_FILE_NEW = 'app_with_locale/locale/%s/LC_MESSAGES/django.po.new'
+    PO_FILE = 'app_with_locale/locale/%s/LC_MESSAGES/django.po'
+
+    def test_remapping_interactive(self):
+        """
+        Test the correct functioning of form remapping by --comply-plural-forms.
+        """
+        with mock.patch('django.core.management.commands.makemessages.Command.django_dir',
+                        os.path.join(self.test_dir, 'django_dir')):
+            with mock.patch('django.core.management.commands.makemessages.Command.get_user_input',
+                            side_effect=['0', '1', '1', '9', '1', 'm', 'n']):
+                out = StringIO()
+                management.call_command(
+                    'makemessages', locale=['cs'], comply_plural_forms='interactive',
+                    stdout=out, verbosity=1
+                )
+                with open(self.PO_FILE_NEW % 'cs', encoding='utf-8') as fp:
+                    po_contents = fp.read()
+                    should_contain = """
+                    "Plural-Forms: nplurals=4; plural=(n == 1 && n % 1 == 0) ? 0 : (n >= 2 && n "
+                    "<= 4 && n % 1 == 0) ? 1: (n % 1 != 0 ) ? 2 : 3;\n"
+
+                    #, python-format
+                    msgid ""
+                    "Ensure that there are no more than %(max)s digit before the decimal point."
+                    msgid_plural ""
+                    "Ensure that there are no more than %(max)s digits before the decimal point."
+                    msgstr[0] ""
+                    "Ujistěte se, že hodnota neobsahuje více než %(max)s místo před desetinnou "
+                    "čárkou (tečkou)."
+                    msgstr[1] ""
+                    "Ujistěte se, že hodnota neobsahuje více než %(max)s místa před desetinnou "
+                    "čárkou (tečkou)."
+                    msgstr[2] ""
+                    "Ujistěte se, že hodnota neobsahuje více než %(max)s místa před desetinnou "
+                    "čárkou (tečkou)."
+                    msgstr[3] ""
+                    "Ujistěte se, že hodnota neobsahuje více než %(max)s místa před desetinnou "
+                    "čárkou (tečkou)."
+
+                    #, python-format
+                    msgid "Ensure that there are no more than %(max)s digit in total."
+                    msgid_plural "Ensure that there are no more than %(max)s digits in total."
+                    msgstr[0] "Ujistěte se, že pole neobsahuje celkem více než %(max)s číslici."
+                    msgstr[1] "Ujistěte se, že pole neobsahuje celkem více než %(max)s číslice."
+                    msgstr[2] "Ujistěte se, že pole neobsahuje celkem více než %(max)s číslice."
+                    msgstr[3] "Ujistěte se, že pole neobsahuje celkem více než %(max)s číslice."
+                    """
+                    for line in should_contain.splitlines():
+                        self.assertIn(line.strip(), po_contents)
+
+    def test_trimming(self):
+        """
+        Test the correct functioning of trimming in --comply-plural-forms ('trimming' is when the
+        main form has less plural forms than the user's forms.
+        """
+        with mock.patch('django.core.management.commands.makemessages.Command.django_dir',
+                        os.path.join(self.test_dir, 'django_dir')):
+            with mock.patch('django.core.management.commands.makemessages.Command.get_user_input',
+                            side_effect=['0', '1', 'n']):
+                out = StringIO()
+                management.call_command(
+                    'makemessages', locale=['lt'], comply_plural_forms='interactive',
+                    stdout=out, verbosity=1
+                )
+                with open(self.PO_FILE_NEW % 'lt', encoding='utf-8') as fp:
+                    po_contents = fp.read()
+                    should_contain = """
+                    "Plural-Forms:  nplurals=2; plural=(n != 1);\n"
+                    msgid "Password change"
+                    msgstr "Slaptažodžio keitimas"
+                    #, python-format
+                    msgid "%(counter)s result"
+                    msgid_plural "%(counter)s results"
+                    msgstr[0] "%(counter)s rezultatas"
+                    msgstr[1] "%(counter)s rezultatai"
+                    """
+
+                    should_not_contain = """msgstr[2] "%(counter)s rezultatai"
+                    msgstr[3] "%(counter)s rezultatai"""
+
+                    for line in should_contain.splitlines():
+                        self.assertIn(line.strip(), po_contents)
+
+                    for line in should_not_contain.splitlines():
+                        self.assertNotIn(line.strip(), po_contents)
+
+    def test_automation_remapping(self):
+        with mock.patch('django.core.management.commands.makemessages.Command.django_dir',
+                        os.path.join(self.test_dir, 'django_dir')):
+            management.call_command('makemessages', locale=['tt'], comply_plural_forms='0,0', verbosity=0)
+            with open(self.PO_FILE % 'tt', encoding='utf-8') as fp:
+                po_contents = fp.read()
+                should_contain = """
+                "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+                #, python-format
+                msgid "%d day"
+                msgid_plural "%d days"
+                msgstr[0] ""
+                msgstr[1] ""
+                """
+
+                for line in should_contain.splitlines():
+                    self.assertIn(line.strip(), po_contents)
+
+    def test_automation_bad_form_map(self):
+        with mock.patch('django.core.management.commands.makemessages.Command.django_dir',
+                        os.path.join(self.test_dir, 'django_dir')):
+            msg = ("currently the --comply-plural-forms option only supports "
+                   "'interactive', 'copy' or comma-separated digits as a parameter.")
+            with self.assertRaisesMessage(CommandError, msg):
+                management.call_command('makemessages', locale=['tt'], comply_plural_forms='0,b', verbosity=0)
+
+    def test_copy_interactive(self):
+        with mock.patch('django.core.management.commands.makemessages.Command.get_user_input',
+                        side_effect=['u', 'y', 'm', 'n']):
+            out = StringIO()
+            management.call_command(
+                'makemessages', locale=['es_XX'], comply_plural_forms='interactive',
+                stdout=out, verbosity=1
+            )
+            with open(self.PO_FILE_NEW % 'es_XX', encoding='utf-8') as fp:
+                po_contents = fp.read()
+                should_contain = "Plural-Forms: nplurals=2; plural=(n != 1);\\n"
+                self.assertIn(should_contain, po_contents)
+
+    def test_automation_copy(self):
+        management.call_command('makemessages', locale=['en'], comply_plural_forms='copy', verbosity=0)
+        with open(self.PO_FILE % 'en', encoding='utf-8') as fp:
+            po_contents = fp.read()
+            should_contain = "Plural-Forms: nplurals=2; plural=(n != 1);\\n"
+            self.assertIn(should_contain, po_contents)
+
+    def test_locale_root(self):
+        with override_settings(LOCALE_ROOT=os.path.join(self.test_dir, 'locale_root')):
+            management.call_command('makemessages', locale=['sk'], comply_plural_forms='2,3', verbosity=0)
+            with open(self.PO_FILE % 'sk', encoding='utf-8') as fp:
+                po_contents = fp.read()
+                should_contain = """
+                "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+                msgid "Please submit %d or fewer forms."
+                msgid_plural "Please submit %d or fewer forms."
+                msgstr[0] "Prosím odošlite %d alebo menej formulárov. -2-"
+                msgstr[1] "Prosím odošlite %d alebo menej formulárov. -3-"
+                """
+
+                should_not_contain = """msgstr[2] "Prosím odošlite %d alebo menej formulárov. -2-"
+                msgstr[3] "Prosím odošlite %d alebo menej formulárov. -3-" """
+
+                for line in should_contain.splitlines():
+                    self.assertIn(line.strip(), po_contents)
+
+                for line in should_not_contain.splitlines():
+                    self.assertNotIn(line.strip(), po_contents)
+
+    def test_msgfmt_check_main_form(self):
+        with mock.patch('django.core.management.commands.makemessages.Command.django_dir',
+                        os.path.join(self.test_dir, 'django_dir')):
+            with override_settings(LOCALE_ROOT=os.path.join(self.test_dir, 'locale_root')):
+                msg = "invalid plural"
+                with self.assertRaisesMessage(CommandError, msg):
+                    management.call_command(
+                        'makemessages', locale=['mk'], comply_plural_forms='interactive', verbosity=0
+                    )
+
+    def test_msgfmt_check_user_form(self):
+        with mock.patch('django.core.management.commands.makemessages.Command.django_dir',
+                        os.path.join(self.test_dir, 'django_dir')):
+            msg = "invalid nplurals value"
+            with self.assertRaisesMessage(CommandError, msg):
+                management.call_command('makemessages', locale=['mk'], comply_plural_forms='interactive', verbosity=0)
+
+    def test_plural_forms_check_main_form(self):
+        """
+        In some cases, msgfmt --check deems the plural forms as valid if
+        they not contain either 'nplurals' or 'plural' (bug in msgfmt).
+        """
+        with mock.patch('django.core.management.commands.makemessages.Command.django_dir',
+                        os.path.join(self.test_dir, 'django_dir')):
+            with override_settings(LOCALE_ROOT=os.path.join(self.test_dir, 'locale_root')):
+                msg = "unable to parse"
+                with self.assertRaisesMessage(CommandError, msg):
+                    management.call_command(
+                        'makemessages', locale=['sl'], comply_plural_forms='interactive', verbosity=0
+                    )
+
+    def test_plural_forms_check_user_form(self):
+        with mock.patch('django.core.management.commands.makemessages.Command.django_dir',
+                        os.path.join(self.test_dir, 'django_dir')):
+            msg = "unable to parse"
+            with self.assertRaisesMessage(CommandError, msg):
+                management.call_command('makemessages', locale=['sl'], comply_plural_forms='interactive', verbosity=0)
+
+    def test_incompatible_form_map(self):
+        with override_settings(LOCALE_ROOT=os.path.join(self.test_dir, 'locale_root')):
+            msg = "The provided form map is not compatible"
+            with self.assertRaisesMessage(CommandError, msg):
+                management.call_command('makemessages', locale=['sk'], comply_plural_forms='4,5', verbosity=0)
+
+    def test_no_main_po(self):
+        with override_settings(LOCALE_ROOT=os.path.join(self.test_dir, 'locale_root')):
+            msg = "unable to find the main .po file"
+            with self.assertRaisesMessage(CommandError, msg):
+                management.call_command(
+                    'makemessages', locale=['xxx'], domain='djangojs', comply_plural_forms='4,5',
+                    verbosity=0
+                )
 
 
 class NoWrapExtractorTests(ExtractorTests):

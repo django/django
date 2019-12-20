@@ -629,7 +629,8 @@ the :ref:`i18n documentation <how-to-create-language-files>` for details.
 
 This command doesn't require configured settings. However, when settings aren't
 configured, the command can't ignore the :setting:`MEDIA_ROOT` and
-:setting:`STATIC_ROOT` directories or include :setting:`LOCALE_PATHS`.
+:setting:`STATIC_ROOT` directories, include :setting:`LOCALE_PATHS` or collect
+to :setting:`LOCALE_ROOT`.
 
 .. django-admin-option:: --all, -a
 
@@ -726,6 +727,49 @@ Requires ``gettext`` 0.19 or newer.
 Prevents deleting the temporary ``.pot`` files generated before creating the
 ``.po`` file. This is useful for debugging errors which may prevent the final
 language files from being created.
+
+.. django-admin-option:: --collect-base-catalogs [{settings, all-bundled}] -cbc
+
+Collects all catalogs bundled with Django and merges them into
+:setting:`LOCALE_ROOT` (required setting).
+
+Defaults to the locales defined in ``settings``, use ``all-bundled`` for
+collecting all locales bundled with Django.
+
+Specific locale(s) to collect can be set with the ``--locale`` option (or 
+ignored with ``--exclude``). If the specified locale does not exists, an
+untranslated catalog will be created for it.
+
+Example usage::
+
+    django-admin makemessages --collect-base-catalogs --locale=en --locale=pt
+    django-admin makemessages --collect-base-catalogs all-bundled --exclude=fr
+    django-admin makemessages -cbc -l xx_yy -d djangojs
+
+.. django-admin-option:: --comply-plural-forms [{interactive, copy, form_map}] -cpf
+
+Checks or aligns all project or application catalogs' plural forms for the
+locale(s) with the main plural form (see :ref:`plural-forms`).
+
+If a divergence is found and the option is set to ``interactive`` (default),
+the user will be prompted to map the main plural forms to the ones found in
+the catalog. With the form map provided, the catalog will be reorganized
+accordingly and the plural forms will be updated.
+
+If no plural forms is found in the catalog, the user will be prompted to copy
+them from the main po file. No remapping will be done, it is assumed that is
+already aligned. If it is not the case, use a plural form with the number of
+plurals matching the catalog and then re-run the command to perform form
+mapping.
+
+Automation can be done only for a specific locale by using the values ``copy``
+or the ``form_map`` in comma-separated digits, i.e. ``0,1,1,1``. 
+
+Example usage::
+
+    django-admin makemessages --comply-plural-forms
+    django-admin makemessages --comply-plural-forms copy --locale=en
+    django-admin makemessages -cpf 0,1,1,1 -l he
 
 .. seealso::
 

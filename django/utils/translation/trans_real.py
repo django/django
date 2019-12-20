@@ -18,6 +18,7 @@ from django.utils.regex_helper import _lazy_re_compile
 from django.utils.safestring import SafeData, mark_safe
 
 from . import to_language, to_locale
+from .plural_forms import PluralForms
 
 # Translations are cached in a dictionary for every language.
 # The active translations are stored by threadid to make them thread local.
@@ -99,8 +100,15 @@ class DjangoTranslation(gettext_module.GNUTranslations):
 
         self._add_local_translations()
         if self.__language == settings.LANGUAGE_CODE and self.domain == 'django' and self._catalog is None:
-            # default lang should have at least one translation file available.
-            raise OSError('No translation files found for default language %s.' % settings.LANGUAGE_CODE)
+            if not hasattr(settings, 'LOCALE_ROOT'):
+                # default lang should have at least one translation file available if not using LOCALE_ROOT.
+                raise OSError('No translation files found for default language %s.' % settings.LANGUAGE_CODE)
+            else:
+                msg = ('LOCALE_ROOT has been set and no translation files found for default language %s. '
+                       'Make sure that the base catalogs have been collected with '
+                       '`makemessages --collect-base-catalogs` and/or they have been compiled with '
+                       '`compilemessages`.' % settings.LANGUAGE_CODE)
+                warnings.warn(msg, RuntimeWarning)
         self._add_fallback(localedirs)
         if self._catalog is None:
             # No catalogs found for this language, set an empty catalog.
@@ -111,23 +119,28 @@ class DjangoTranslation(gettext_module.GNUTranslations):
 
     def _new_gnu_trans(self, localedir, use_null_fallback=True):
         """
-        Return a mergeable gettext.GNUTranslations instance.
+        Return an annotated mergeable gettext.GNUTranslations instance.
 
         A convenience wrapper. By default gettext uses 'fallback=False'.
         Using param `use_null_fallback` to avoid confusion with any other
-        references to 'fallback'.
+        references to 'fallback'. Also annotates the localedir in the object.
         """
-        return gettext_module.translation(
+        annotated_gnu_trans = gettext_module.translation(
             domain=self.domain,
             localedir=localedir,
             languages=[self.__locale],
             fallback=use_null_fallback,
         )
+        annotated_gnu_trans.localedir = localedir
+        return annotated_gnu_trans
 
     def _init_translation_catalog(self):
         """Create a base catalog using global django translations."""
-        settingsfile = sys.modules[settings.__module__].__file__
-        localedir = os.path.join(os.path.dirname(settingsfile), 'locale')
+        if not hasattr(settings, 'LOCALE_ROOT'):
+            settingsfile = sys.modules[settings.__module__].__file__
+            localedir = os.path.join(os.path.dirname(settingsfile), 'locale')
+        else:
+            localedir = settings.LOCALE_ROOT
         translation = self._new_gnu_trans(localedir)
         self.merge(translation)
 
@@ -142,9 +155,13 @@ class DjangoTranslation(gettext_module.GNUTranslations):
                 "gettext calls at import time.")
         for app_config in app_configs:
             localedir = os.path.join(app_config.path, 'locale')
-            if os.path.exists(localedir):
-                translation = self._new_gnu_trans(localedir)
-                self.merge(translation)
+            if (hasattr(settings, 'LOCALE_ROOT') and
+                    os.path.join('django', 'contrib') in os.path.dirname(localedir)):
+                continue
+            else:
+                if os.path.exists(localedir):
+                    translation = self._new_gnu_trans(localedir)
+                    self.merge(translation)
 
     def _add_local_translations(self):
         """Merge translations defined in LOCALE_PATHS."""
@@ -177,7 +194,34 @@ class DjangoTranslation(gettext_module.GNUTranslations):
             self._info = other._info.copy()
             self._catalog = other._catalog.copy()
         else:
-            self._catalog.update(other._catalog)
+            if 'plural-forms' in self.info():
+                current_plural_forms = PluralForms(self.info()['plural-forms'])
+                if 'plural-forms' not in other.info():
+                    other._info['MISSING PLURAL FORMS'] = "MISSING PLURAL FORMS"
+                    other_plural_forms = None
+                else:
+                    other_plural_forms = PluralForms(other.info()['plural-forms'])
+                if current_plural_forms == other_plural_forms:
+                    self._catalog.update(other._catalog)
+                else:
+                    from pprint import pformat
+                    msg = (
+                        "\nCatalog **NOT MERGED** to prevent inconsistencies "
+                        "due to different plural forms.\n"
+                        "Locale: %s\n"
+                        "Not-merged catalog localedir: %s\n"
+                        "Not-merged catalog info: \n%s\n"
+                        "MAIN PLURAL FORM: \n%s\n"
+                        "See https://docs.djangoproject.com/en/dev/topics/i18n/translation/#plural-forms"
+                        % (self.__language,
+                           other.localedir,
+                           pformat(other.info(), indent=4),
+                           pformat(self.info()['plural-forms'], indent=4), )
+                    )
+                    warnings.warn(msg, RuntimeWarning)
+            else:
+                self._catalog.update(other._catalog)
+
         if other._fallback:
             self.add_fallback(other._fallback)
 

@@ -15,7 +15,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: kn\n"
-"Plural-Forms: nplurals=1; plural=0;\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
 #, python-format
 msgid "Successfully deleted %(count)d %(items)s."
@@ -221,11 +221,13 @@ msgstr "ದತ್ತಸಂಚಯದ ದೋಷ"
 msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
 msgstr[0] ""
+msgstr[1] ""
 
 #, python-format
 msgid "%(total_count)s selected"
 msgid_plural "All %(total_count)s selected"
 msgstr[0] ""
+msgstr[1] ""
 
 #, python-format
 msgid "0 of %(cnt)s selected"
@@ -511,6 +513,7 @@ msgstr ""
 msgid "%(counter)s result"
 msgid_plural "%(counter)s results"
 msgstr[0] ""
+msgstr[1] ""
 
 #, python-format
 msgid "%(full_result_count)s total"
