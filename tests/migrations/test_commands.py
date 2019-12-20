@@ -129,7 +129,7 @@ class MigrateTests(MigrationTestBase):
         that check.
         """
         # Make sure no tables are created
-        for db in connections:
+        for db in self.databases:
             self.assertTableNotExists("migrations_author", using=db)
             self.assertTableNotExists("migrations_tribble", using=db)
         # Run the migrations to 0001 only
@@ -192,7 +192,7 @@ class MigrateTests(MigrationTestBase):
         call_command("migrate", "migrations", "zero", verbosity=0)
         call_command("migrate", "migrations", "zero", verbosity=0, database="other")
         # Make sure it's all gone
-        for db in connections:
+        for db in self.databases:
             self.assertTableNotExists("migrations_author", using=db)
             self.assertTableNotExists("migrations_tribble", using=db)
             self.assertTableNotExists("migrations_book", using=db)
@@ -931,7 +931,7 @@ class MakeMigrationsTests(MigrationTestBase):
 
                 # With a router that doesn't prohibit migrating 'other',
                 # consistency is checked.
-                with self.settings(DATABASE_ROUTERS=['migrations.routers.EmptyRouter']):
+                with self.settings(DATABASE_ROUTERS=['migrations.routers.DefaultOtherRouter']):
                     with self.assertRaisesMessage(Exception, 'Other connection'):
                         call_command('makemigrations', 'migrations', verbosity=0)
                 self.assertEqual(has_table.call_count, 4)  # 'default' and 'other'
@@ -944,12 +944,14 @@ class MakeMigrationsTests(MigrationTestBase):
                 allow_migrate.assert_any_call('other', 'migrations', model_name='UnicodeModel')
                 # allow_migrate() is called with the correct arguments.
                 self.assertGreater(len(allow_migrate.mock_calls), 0)
+                called_aliases = set()
                 for mock_call in allow_migrate.mock_calls:
                     _, call_args, call_kwargs = mock_call
                     connection_alias, app_name = call_args
-                    self.assertIn(connection_alias, ['default', 'other'])
+                    called_aliases.add(connection_alias)
                     # Raises an error if invalid app_name/model_name occurs.
                     apps.get_app_config(app_name).get_model(call_kwargs['model_name'])
+                self.assertEqual(called_aliases, set(connections))
                 self.assertEqual(has_table.call_count, 4)
 
     def test_failing_migration(self):
