@@ -3,7 +3,7 @@ import uuid
 from django.core.exceptions import ImproperlyConfigured
 from django.test import SimpleTestCase
 from django.test.utils import override_settings
-from django.urls import Resolver404, path, resolve, reverse
+from django.urls import NoReverseMatch, Resolver404, path, resolve, reverse
 
 from .converters import DynamicConverter
 from .views import empty_view
@@ -203,6 +203,12 @@ class ConverterTests(SimpleTestCase):
 @override_settings(ROOT_URLCONF='urlpatterns.path_same_name_urls')
 class SameNameTests(SimpleTestCase):
     def test_matching_urls_same_name(self):
+        @DynamicConverter.register_to_url
+        def requires_tiny_int(value):
+            if value > 5:
+                raise ValueError
+            return value
+
         tests = [
             ('number_of_args', [
                 ([], {}, '0/'),
@@ -226,6 +232,10 @@ class SameNameTests(SimpleTestCase):
             ('regex', [
                 (['ABC'], {}, 'uppercase/ABC/'),
                 (['abc'], {}, 'lowercase/abc/'),
+            ]),
+            ('converter_to_url', [
+                ([6], {}, 'int/6/'),
+                ([1], {}, 'tiny_int/1/'),
             ]),
         ]
         for url_name, cases in tests:
@@ -272,9 +282,16 @@ class ConversionExceptionTests(SimpleTestCase):
         with self.assertRaisesMessage(TypeError, 'This type error propagates.'):
             resolve('/dynamic/abc/')
 
-    def test_reverse_value_error_propagates(self):
+    def test_reverse_value_error_means_no_match(self):
         @DynamicConverter.register_to_url
         def raises_value_error(value):
-            raise ValueError('This value error propagates.')
-        with self.assertRaisesMessage(ValueError, 'This value error propagates.'):
+            raise ValueError
+        with self.assertRaises(NoReverseMatch):
+            reverse('dynamic', kwargs={'value': object()})
+
+    def test_reverse_type_error_propagates(self):
+        @DynamicConverter.register_to_url
+        def raises_type_error(value):
+            raise TypeError('This type error propagates.')
+        with self.assertRaisesMessage(TypeError, 'This type error propagates.'):
             reverse('dynamic', kwargs={'value': object()})

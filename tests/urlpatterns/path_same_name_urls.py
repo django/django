@@ -1,6 +1,8 @@
-from django.urls import path, re_path
+from django.urls import path, re_path, register_converter
 
-from . import views
+from . import converters, views
+
+register_converter(converters.DynamicConverter, 'to_url_value_error')
 
 urlpatterns = [
     # Different number of arguments.
@@ -18,4 +20,15 @@ urlpatterns = [
     # Different regular expressions.
     re_path(r'^regex/uppercase/([A-Z]+)/', views.empty_view, name='regex'),
     re_path(r'^regex/lowercase/([a-z]+)/', views.empty_view, name='regex'),
+    # converter.to_url() raises ValueError (no match).
+    path(
+        'converter_to_url/int/<value>/',
+        views.empty_view,
+        name='converter_to_url',
+    ),
+    path(
+        'converter_to_url/tiny_int/<to_url_value_error:value>/',
+        views.empty_view,
+        name='converter_to_url',
+    ),
 ]

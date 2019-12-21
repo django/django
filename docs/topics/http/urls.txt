@@ -156,7 +156,14 @@ A converter is a class that includes the following:
   user unless another URL pattern matches.
 
 * A ``to_url(self, value)`` method, which handles converting the Python type
-  into a string to be used in the URL.
+  into a string to be used in the URL. It should raise ``ValueError`` if it
+  can't convert the given value. A ``ValueError`` is interpreted as no match
+  and as a consequence :func:`~django.urls.reverse` will raise
+  :class:`~django.urls.NoReverseMatch` unless another URL pattern matches.
+
+  .. versionchanged:: 3.1
+
+    Support for raising ``ValueError`` to indicate no match was added.
 
 For example::
 
@@ -666,7 +673,9 @@ included at all).
 
 You may also use the same name for multiple URL patterns if they differ in
 their arguments. In addition to the URL name, :func:`~django.urls.reverse()`
-matches the number of arguments and the names of the keyword arguments.
+matches the number of arguments and the names of the keyword arguments. Path
+converters can also raise ``ValueError`` to indicate no match, see
+:ref:`registering-custom-path-converters` for details.
 
 .. _topics-http-defining-url-namespaces:
 

@@ -294,7 +294,8 @@ Tests
 URLs
 ~~~~
 
-* ...
+* :ref:`Path converters <registering-custom-path-converters>` can now raise
+  ``ValueError`` in ``to_url()`` to indicate no match when reversing URLs.
 
 Utilities
 ~~~~~~~~~
