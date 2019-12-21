@@ -153,7 +153,7 @@ A converter is a class that includes the following:
   string into the type that should be passed to the view function. It should
   raise ``ValueError`` if it can't convert the given value. A ``ValueError`` is
   interpreted as no match and as a consequence a 404 response is sent to the
-  user.
+  user unless another URL pattern matches.
 
 * A ``to_url(self, value)`` method, which handles converting the Python type
   into a string to be used in the URL.
