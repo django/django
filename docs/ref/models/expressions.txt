@@ -1074,7 +1074,7 @@ Next, we write the method responsible for generating the SQL::
             sql_params.extend(params)
         template = template or self.template
         data = {'expressions': ','.join(sql_expressions)}
-        return template % data, params
+        return template % data, sql_params
 
     def as_oracle(self, compiler, connection):
         """
