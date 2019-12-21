@@ -196,6 +196,7 @@ class TestUtilsText(SimpleTestCase):
             ('foo ıç bar', 'foo-ıç-bar', True),
             ('    foo ıç bar', 'foo-ıç-bar', True),
             ('你好', '你好', True),
+            ('İstanbul', 'istanbul', True),
         )
         for value, output, is_unicode in items:
             self.assertEqual(text.slugify(value, allow_unicode=is_unicode), output)

@@ -830,10 +830,10 @@ appropriate entities.
     Converts a string to a URL slug by:
 
     #. Converting to ASCII if ``allow_unicode`` is ``False`` (the default).
+    #. Converting to lowercase.
     #. Removing characters that aren't alphanumerics, underscores, hyphens, or
        whitespace.
     #. Removing leading and trailing whitespace.
-    #. Converting to lowercase.
     #. Replacing any whitespace or repeated dashes with single dashes.
 
     For example::

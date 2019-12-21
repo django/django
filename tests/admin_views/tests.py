@@ -4442,13 +4442,13 @@ class SeleniumTests(AdminSeleniumTestCase):
         # Main form ----------------------------------------------------------
         self.selenium.find_element_by_id('id_pubdate').send_keys('2012-02-18')
         self.select_option('#id_status', 'option two')
-        self.selenium.find_element_by_id('id_name').send_keys(' this is the mAin nÀMë and it\'s awεšomeııı')
+        self.selenium.find_element_by_id('id_name').send_keys(' this is the mAin nÀMë and it\'s awεšomeıııİ')
         slug1 = self.selenium.find_element_by_id('id_slug1').get_attribute('value')
         slug2 = self.selenium.find_element_by_id('id_slug2').get_attribute('value')
         slug3 = self.selenium.find_element_by_id('id_slug3').get_attribute('value')
-        self.assertEqual(slug1, 'main-name-and-its-awesomeiii-2012-02-18')
-        self.assertEqual(slug2, 'option-two-main-name-and-its-awesomeiii')
-        self.assertEqual(slug3, 'this-is-the-main-n\xe0m\xeb-and-its-aw\u03b5\u0161ome\u0131\u0131\u0131')
+        self.assertEqual(slug1, 'main-name-and-its-awesomeiiii-2012-02-18')
+        self.assertEqual(slug2, 'option-two-main-name-and-its-awesomeiiii')
+        self.assertEqual(slug3, 'this-is-the-main-n\xe0m\xeb-and-its-aw\u03b5\u0161ome\u0131\u0131\u0131i')
 
         # Stacked inlines ----------------------------------------------------
         # Initial inline
@@ -4526,11 +4526,12 @@ class SeleniumTests(AdminSeleniumTestCase):
             self.selenium.find_element_by_xpath('//input[@value="Save"]').click()
         self.assertEqual(MainPrepopulated.objects.all().count(), 1)
         MainPrepopulated.objects.get(
-            name=' this is the mAin nÀMë and it\'s awεšomeııı',
+            name=' this is the mAin nÀMë and it\'s awεšomeıııİ',
             pubdate='2012-02-18',
             status='option two',
-            slug1='main-name-and-its-awesomeiii-2012-02-18',
-            slug2='option-two-main-name-and-its-awesomeiii',
+            slug1='main-name-and-its-awesomeiiii-2012-02-18',
+            slug2='option-two-main-name-and-its-awesomeiiii',
+            slug3='this-is-the-main-nàmë-and-its-awεšomeıııi',
         )
         self.assertEqual(RelatedPrepopulated.objects.all().count(), 4)
         RelatedPrepopulated.objects.get(
