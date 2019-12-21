@@ -6,6 +6,11 @@ This tutorial begins where :doc:`Tutorial 3 </intro/tutorial03>` left off. We're
 continuing the Web-poll application and will focus on form processing and
 cutting down our code.
 
+.. admonition:: Where to get help:
+
+    If you're having trouble going through this tutorial, please head over to
+    the :doc:`Getting Help</faq/help>` section of the FAQ.
+
 Write a minimal form
 ====================
 

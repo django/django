@@ -7,6 +7,11 @@ continuing the Web-poll application and will focus on customizing Django's
 automatically-generated admin site that we first explored in :doc:`Tutorial 2
 </intro/tutorial02>`.
 
+.. admonition:: Where to get help:
+
+    If you're having trouble going through this tutorial, please head over to
+    the :doc:`Getting Help</faq/help>` section of the FAQ.
+
 Customize the admin form
 ========================
 
