@@ -526,7 +526,9 @@ class Query(BaseExpression):
         if not q.distinct:
             if q.group_by is True:
                 q.add_fields((f.attname for f in self.model._meta.concrete_fields), False)
-                q.set_group_by()
+                # Disable GROUP BY aliases to avoid orphaning references to the
+                # SELECT clause which is about to be cleared.
+                q.set_group_by(allow_aliases=False)
             q.clear_select_clause()
         q.clear_ordering(True)
         q.set_limits(high=1)
@@ -1916,7 +1918,7 @@ class Query(BaseExpression):
         if force_empty:
             self.default_ordering = False
 
-    def set_group_by(self):
+    def set_group_by(self, allow_aliases=True):
         """
         Expand the GROUP BY clause required by the query.
 
@@ -1938,6 +1940,8 @@ class Query(BaseExpression):
                     warnings.warn(msg, category=RemovedInDjango40Warning)
                     group_by_cols = annotation.get_group_by_cols()
                 else:
+                    if not allow_aliases:
+                        alias = None
                     group_by_cols = annotation.get_group_by_cols(alias=alias)
                 group_by.extend(group_by_cols)
         self.group_by = tuple(group_by)
