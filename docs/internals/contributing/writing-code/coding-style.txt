@@ -71,6 +71,11 @@ Python style
   and :meth:`~unittest.TestCase.assertWarnsRegex` only if you need regular
   expression matching.
 
+  Use :meth:`assertIs(…, True/False)<unittest.TestCase.assertIs>` for testing
+  boolean values, rather than :meth:`~unittest.TestCase.assertTrue` and
+  :meth:`~unittest.TestCase.assertFalse`, so you can check the actual boolean
+  value, not the truthiness of the expression.
+
 * In test docstrings, state the expected behavior that each test demonstrates.
   Don't include preambles such as "Tests that" or "Ensures that".
 
