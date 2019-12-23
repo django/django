@@ -73,9 +73,7 @@ Here are some useful attributes of ``UploadedFile``:
 .. note::
 
     Like regular Python files, you can read the file line-by-line by iterating
-    over the uploaded file:
-
-    .. code-block:: python
+    over the uploaded file::
 
         for line in uploadedfile:
             do_something_with(line)
