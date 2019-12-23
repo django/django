@@ -191,6 +191,9 @@ class HttpRequest:
             # Make it an absolute url (but schemeless and domainless) for the
             # edge case that the path starts with '//'.
             location = '//%s' % self.get_full_path()
+        else:
+            # Coerce lazy locations.
+            location = str(location)
         bits = urlsplit(location)
         if not (bits.scheme and bits.netloc):
             # Handle the simple, most common case. If the location is absolute
