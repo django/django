@@ -538,6 +538,21 @@ class BasicExpressionsTests(TestCase):
         )
         self.assertCountEqual(contrived.values_list(), outer.values_list())
 
+    def test_nested_subquery_join_outer_ref(self):
+        inner = Employee.objects.filter(pk=OuterRef('ceo__pk')).values('pk')
+        qs = Employee.objects.annotate(
+            ceo_company=Subquery(
+                Company.objects.filter(
+                    ceo__in=inner,
+                    ceo__pk=OuterRef('pk'),
+                ).values('pk'),
+            ),
+        )
+        self.assertSequenceEqual(
+            qs.values_list('ceo_company', flat=True),
+            [self.example_inc.pk, self.foobar_ltd.pk, self.gmbh.pk],
+        )
+
     def test_nested_subquery_outer_ref_2(self):
         first = Time.objects.create(time='09:00')
         second = Time.objects.create(time='17:00')
