@@ -19,7 +19,12 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
     sql_delete_index = "DROP INDEX IF EXISTS %(name)s"
     sql_delete_index_concurrently = "DROP INDEX CONCURRENTLY IF EXISTS %(name)s"
 
-    sql_create_column_inline_fk = 'REFERENCES %(to_table)s(%(to_column)s)%(deferrable)s'
+    # Setting the constraint to IMMEDIATE to allow changing data in the same
+    # transaction.
+    sql_create_column_inline_fk = (
+        'CONSTRAINT %(name)s REFERENCES %(to_table)s(%(to_column)s)%(deferrable)s'
+        '; SET CONSTRAINTS %(name)s IMMEDIATE'
+    )
     # Setting the constraint to IMMEDIATE runs any deferred checks to allow
     # dropping it in the same transaction.
     sql_delete_fk = "SET CONSTRAINTS %(name)s IMMEDIATE; ALTER TABLE %(table)s DROP CONSTRAINT %(name)s"
