@@ -14,3 +14,7 @@ Bugfixes
 
 * Fixed a regression in Django 3.0 where ``QuerySet.exists()`` crashed if a
   queryset contained an aggregation over a ``Subquery()`` (:ticket:`31109`).
+
+* Fixed a regression in Django 3.0 that caused a migration crash on PostgreSQL
+  10+ when adding a foreign key and changing data in the same migration
+  (:ticket:`31106`).
