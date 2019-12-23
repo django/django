@@ -559,9 +559,7 @@ to a ``SuspiciousOperation`` will not be logged to the ``django.request``
 logger, but only to the ``django.security`` logger.
 
 To silence a particular type of ``SuspiciousOperation``, you can override that
-specific logger following this example:
-
-.. code-block:: python
+specific logger following this example::
 
     'handlers': {
         'null': {
@@ -613,9 +611,7 @@ Python logging module.
     containing the full content of the debug Web page that would have been
     produced if :setting:`DEBUG` were ``True``. To set this value in your
     configuration, include it in the handler definition for
-    ``django.utils.log.AdminEmailHandler``, like this:
-
-    .. code-block:: python
+    ``django.utils.log.AdminEmailHandler``, like this::
 
         'handlers': {
             'mail_admins': {
@@ -637,9 +633,7 @@ Python logging module.
 
     By setting the ``email_backend`` argument of ``AdminEmailHandler``, the
     :ref:`email backend <topic-email-backends>` that is being used by the
-    handler can be overridden, like this:
-
-    .. code-block:: python
+    handler can be overridden, like this::
 
         'handlers': {
             'mail_admins': {
@@ -655,9 +649,7 @@ Python logging module.
     The ``reporter_class`` argument of ``AdminEmailHandler`` allows providing
     an ``django.views.debug.ExceptionReporter`` subclass to customize the
     traceback text sent in the email body. You provide a string import path to
-    the class you wish to use, like this:
-
-    .. code-block:: python
+    the class you wish to use, like this::
 
         'handlers': {
             'mail_admins': {
@@ -706,9 +698,7 @@ logging module.
                     return False
             return True
 
-    and then add it to your logging config:
-
-    .. code-block:: python
+    and then add it to your logging config::
 
         'filters': {
             'skip_unreadable_posts': {
@@ -730,9 +720,7 @@ logging module.
 
     This filter is used as follows in the default :setting:`LOGGING`
     configuration to ensure that the :class:`AdminEmailHandler` only sends
-    error emails to admins when :setting:`DEBUG` is ``False``:
-
-    .. code-block:: python
+    error emails to admins when :setting:`DEBUG` is ``False``::
 
         'filters': {
             'require_debug_false': {

@@ -66,9 +66,7 @@ Enjoy the free API
 
 With that, you've got a free, and rich, :doc:`Python API </topics/db/queries>`
 to access your data. The API is created on the fly, no code generation
-necessary:
-
-.. code-block:: python
+necessary::
 
     # Import the models we created from our "news" app
     >>> from news.models import Article, Reporter
