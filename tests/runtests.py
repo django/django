@@ -410,6 +410,8 @@ def paired_tests(paired_test, options, test_labels, parallel, start_at, start_af
 
 
 if __name__ == "__main__":
+    if not sys.version.startswith('3.7'):
+        sys.exit(1)
     parser = argparse.ArgumentParser(description="Run the Django test suite.")
     parser.add_argument(
         'modules', nargs='*', metavar='module',
