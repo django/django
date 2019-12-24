@@ -649,7 +649,9 @@ class DiscoverRunner:
 
     def run_suite(self, suite, **kwargs):
         kwargs = self.get_test_runner_kwargs()
-        print("Runner kwargs: ", kwargs)
+        import sys
+        print("Runner kwargs: ", kwargs, file=sys.stdout)
+        print("Runner kwargs err: ", kwargs, file=sys.stderr)
         runner = self.test_runner(**kwargs)
         return runner.run(suite)
 
