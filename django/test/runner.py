@@ -35,9 +35,9 @@ import django
 
 class FooResult(unittest.TextTestResult):
     def startTest(self, test):
-        print(id(connections['default'].settings_dict), connections['default'].settings_dict)
-        print(id(connections.databases['default']), connections.databases['default'])
-        print(id(django.conf.settings.DATABASES['default']), django.conf.settings.DATABASES['default'])
+        print(id(connections['default'].settings_dict), connections['default'].settings_dict, file=self.stream)
+        print(id(connections.databases['default']), connections.databases['default'], file=self.stream)
+        print(id(django.conf.settings.DATABASES['default']), django.conf.settings.DATABASES['default'], file=self.stream)
         super().startTest(test)
 
 
