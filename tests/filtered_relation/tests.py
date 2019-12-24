@@ -41,26 +41,26 @@ class FilteredRelationTests(TestCase):
     def test_select_related(self):
         qs = Author.objects.annotate(
             book_join=FilteredRelation('book'),
-        ).select_related('book_join__editor').order_by('pk', 'book_join__pk')
+        ).select_related('book_join__editor')
         with self.assertNumQueries(1):
             self.assertQuerysetEqual(qs, [
                 (self.author1, self.book1, self.editor_a, self.author1),
                 (self.author1, self.book4, self.editor_a, self.author1),
                 (self.author2, self.book2, self.editor_b, self.author2),
                 (self.author2, self.book3, self.editor_b, self.author2),
-            ], lambda x: (x, x.book_join, x.book_join.editor, x.book_join.author))
+            ], lambda x: (x, x.book_join, x.book_join.editor, x.book_join.author), ordered=False)
 
     def test_select_related_foreign_key(self):
         qs = Book.objects.annotate(
             author_join=FilteredRelation('author'),
-        ).select_related('author_join').order_by('pk')
+        ).select_related('author_join')
         with self.assertNumQueries(1):
             self.assertQuerysetEqual(qs, [
                 (self.book1, self.author1),
                 (self.book2, self.author2),
                 (self.book3, self.author2),
                 (self.book4, self.author1),
-            ], lambda x: (x, x.author_join))
+            ], lambda x: (x, x.author_join), ordered=False)
 
     @skipUnlessDBFeature('has_select_for_update', 'has_select_for_update_of')
     def test_select_related_foreign_key_for_update_of(self):
@@ -77,7 +77,7 @@ class FilteredRelationTests(TestCase):
                 ], lambda x: (x, x.author_join))
 
     def test_without_join(self):
-        self.assertSequenceEqual(
+        self.assertCountEqual(
             Author.objects.annotate(
                 book_alice=FilteredRelation('book', condition=Q(book__title__iexact='poem by alice')),
             ),
