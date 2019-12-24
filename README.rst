@@ -14,7 +14,7 @@ here's how we recommend you read the docs:
 * Next, work through the tutorials in order (``docs/intro/tutorial01.txt``,
   ``docs/intro/tutorial02.txt``, etc.).
 
-* If you want to set up an actual deployment server, read
+* If you want to set up a real deployment server, read
   ``docs/howto/deployment/index.txt`` for instructions.
 
 * You'll probably want to read through the topical guides (in ``docs/topics``)
