@@ -33,14 +33,6 @@ except ImportError:
 import django
 
 
-class FooResult(unittest.TextTestResult):
-    def startTest(self, test):
-        print(id(connections['default'].settings_dict), connections['default'].settings_dict, file=self.stream)
-        print(id(connections.databases['default']), connections.databases['default'], file=self.stream)
-        print(id(django.conf.settings.DATABASES['default']), django.conf.settings.DATABASES['default'], file=self.stream)
-        super().startTest(test)
-
-
 class DebugSQLTextTestResult(unittest.TextTestResult):
     def __init__(self, stream, descriptions, verbosity):
         self.logger = logging.getLogger('django.db.backends')
@@ -633,7 +625,6 @@ class DiscoverRunner:
             return DebugSQLTextTestResult
         elif self.pdb:
             return PDBDebugResult
-        return FooResult
 
     def get_test_runner_kwargs(self):
         return {
@@ -711,12 +702,19 @@ class DiscoverRunner:
         databases = self.get_databases(suite)
         old_config = self.setup_databases(aliases=databases)
         run_failed = False
+        original = unittest.suite._isnotsuite
+
+        def wrapper(test):
+            print(id(connections['default'].settings_dict), connections['default'].settings_dict)
+            print(id(connections.databases['default']), connections.databases['default'])
+            print(id(django.conf.settings.DATABASES['default']), django.conf.settings.DATABASES['default'])
+            print(str(test))
+            return original(test)
+        unittest.suite._isnotsuite = wrapper
+
         try:
-            print("Pre-check")
             self.run_checks()
-            print("Post-check")
             result = self.run_suite(suite)
-            print("Post-run")
         except Exception:
             run_failed = True
             raise
