@@ -447,6 +447,7 @@ class DiscoverRunner:
                  tags=None, exclude_tags=None, test_name_patterns=None,
                  pdb=False, buffer=False, **kwargs):
 
+        print("DiscoverRunner.__init__", id(self))
         self.pattern = pattern
         self.top_level = top_level
         self.verbosity = verbosity
@@ -704,14 +705,18 @@ class DiscoverRunner:
 
         Return the number of tests that failed.
         """
+        print("run_tests", self.__class__, id(self))
         self.setup_test_environment()
         suite = self.build_suite(test_labels, extra_tests)
         databases = self.get_databases(suite)
         old_config = self.setup_databases(aliases=databases)
         run_failed = False
         try:
+            print("Pre-check")
             self.run_checks()
+            print("Post-check")
             result = self.run_suite(suite)
+            print("Post-run")
         except Exception:
             run_failed = True
             raise
