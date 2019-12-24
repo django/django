@@ -30,6 +30,17 @@ except ImportError:
     tblib = None
 
 
+import django
+
+
+class FooResult(unittest.TextTestResult):
+    def startTest(self, test):
+        print(id(connections['default'].settings_dict), connections['default'].settings_dict)
+        print(id(connections.databases['default']), connections.databases['default'])
+        print(id(django.conf.settings.DATABASES['default']), django.conf.settings.DATABASES['default'])
+        super().startTest(test)
+
+
 class DebugSQLTextTestResult(unittest.TextTestResult):
     def __init__(self, stream, descriptions, verbosity):
         self.logger = logging.getLogger('django.db.backends')
@@ -621,6 +632,7 @@ class DiscoverRunner:
             return DebugSQLTextTestResult
         elif self.pdb:
             return PDBDebugResult
+        return FooResult
 
     def get_test_runner_kwargs(self):
         return {
