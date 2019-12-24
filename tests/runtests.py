@@ -514,7 +514,6 @@ if __name__ == "__main__":
         )
 
     options = parser.parse_args()
-    options.modules = ['apps.tests']
 
     using_selenium_hub = options.selenium and options.selenium_hub
     if options.selenium_hub and not options.selenium:
