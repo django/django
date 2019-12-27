@@ -1518,7 +1518,7 @@ class Query(BaseExpression):
         return path, final_field, targets, names[pos + 1:]
 
     def setup_joins(self, names, opts, alias, can_reuse=None, allow_many=True,
-                    reuse_with_filtered_relation=False):
+                    reuse_with_filtered_relation=False, allow_transforms=True):
         """
         Compute the necessary table joins for the passage through the fields
         given in 'names'. 'opts' is the Options class for the current model
@@ -1578,6 +1578,8 @@ class Query(BaseExpression):
                 # resolved into fields.
                 transforms = names[pivot:]
                 break
+        if transforms and not allow_transforms:
+            raise FieldError('Invalid field name given: %s' % transforms[0])
         for name in transforms:
             def transform(field, alias, *, name, previous):
                 try:

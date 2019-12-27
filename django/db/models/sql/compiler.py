@@ -549,9 +549,11 @@ class SQLCompiler:
                     raise NotSupportedError('{} is not supported on this database backend.'.format(combinator))
                 result, params = self.get_combinator_sql(combinator, self.query.combinator_all)
             else:
+                # Calculate the update part - it might alter the joins.
+                for_update_part = self.get_for_update_sql(with_limit_offset)
                 distinct_fields, distinct_params = self.get_distinct()
-                # This must come after 'select', 'ordering', and 'distinct'
-                # (see docstring of get_from_clause() for details).
+                # This must come after 'select', 'ordering', 'for_update', and
+                # 'distinct' (see docstring of get_from_clause() for details).
                 from_, f_params = self.get_from_clause()
                 where, w_params = self.compile(self.where) if self.where is not None else ("", [])
                 having, h_params = self.compile(self.having) if self.having is not None else ("", [])
@@ -580,7 +582,6 @@ class SQLCompiler:
                 result += [', '.join(out_cols), 'FROM', *from_]
                 params.extend(f_params)
 
-                for_update_part = self.get_for_update_sql(with_limit_offset)
                 if for_update_part and self.connection.features.for_update_after_from:
                     result.append(for_update_part)
 
@@ -785,7 +786,7 @@ class SQLCompiler:
 
         This should only be called after any SQL construction methods that
         might change the tables that are needed. This means the select columns,
-        ordering, and distinct must be done first.
+        ordering, OF for update, and distinct must be done first.
         """
         result = []
         params = []
@@ -1043,46 +1044,44 @@ class SQLCompiler:
                     (path, klass_info)
                     for klass_info in klass_info.get('related_klass_infos', [])
                 )
+
+        def _is_allowed_field(field, name):
+            # There is no technical reason from SQL perspective to prevent
+            # many_to_many and one_to_many, but the queries might produce
+            # the same object multiple times and that seems a bit
+            # counterintutive for the users.
+            return name == 'self' or (field.is_relation and (field.many_to_one or field.one_to_one))
+
         result = []
-        invalid_names = []
         for name in self.query.select_for_update_of:
-            klass_info = self.klass_info
-            if name == 'self':
-                col = _get_first_selected_col_from_model(klass_info)
-            else:
-                for part in name.split(LOOKUP_SEP):
-                    klass_infos = (
-                        *klass_info.get('related_klass_infos', []),
-                        *_get_parent_klass_info(klass_info),
-                    )
-                    for related_klass_info in klass_infos:
-                        field = related_klass_info['field']
-                        if related_klass_info['reverse']:
-                            field = field.remote_field
-                        if field.name == part:
-                            klass_info = related_klass_info
-                            break
-                    else:
-                        klass_info = None
-                        break
-                if klass_info is None:
-                    invalid_names.append(name)
-                    continue
-                col = _get_first_selected_col_from_model(klass_info)
-            if col is not None:
-                if self.connection.features.select_for_update_of_column:
-                    result.append(self.compile(col)[0])
-                else:
-                    result.append(self.quote_name_unless_alias(col.alias))
-        if invalid_names:
-            raise FieldError(
-                'Invalid field name(s) given in select_for_update(of=(...)): %s. '
-                'Only relational fields followed in the query are allowed. '
-                'Choices are: %s.' % (
-                    ', '.join(invalid_names),
-                    ', '.join(_get_field_choices()),
+            parts = ['pk'] if name == 'self' else name.split(LOOKUP_SEP)
+            try:
+                join_info = self.query.setup_joins(
+                    parts, self.query.get_meta(),
+                    self.query.get_initial_alias(),
+                    allow_transforms=False,
+                    allow_many=False
                 )
-            )
+            except FieldError:
+                # Reword the message and included available choices.
+                raise FieldError(
+                    'Invalid field name given in select_for_update(of=(...)): %s. '
+                    'The relation does not exist. '
+                    'Choices are: %s' % (name, ', '.join(_get_field_choices()))
+                )
+            if not _is_allowed_field(join_info.final_field, name):
+                raise FieldError(
+                    'Invalid field name given in select_for_update(of=(...)): %s. '
+                    'The field is not a one to one or many to one relation. '
+                    'Choices are: %s' % (name, ', '.join(_get_field_choices()))
+                )
+            targets = join_info.targets
+            alias = join_info.joins[0] if name == 'self' else join_info.joins[-1]
+            if self.connection.features.select_for_update_of_column:
+                for target in targets:
+                    result.append(self.compile(target.get_col(alias))[0])
+            else:
+                result.append(self.quote_name_unless_alias(alias))
         return result
 
     def deferred_to_columns(self):

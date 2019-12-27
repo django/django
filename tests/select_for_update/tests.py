@@ -67,6 +67,15 @@ class SelectForUpdateTests(TransactionTestCase):
         for_update_sql = connection.ops.for_update_sql(**kwargs)
         return any(for_update_sql in query['sql'] for query in queries)
 
+    @skipUnlessDBFeature('has_select_for_update', 'has_select_for_update_of')
+    def test_ticket_28944(self):
+        with transaction.atomic():
+            qs = City.objects.all().select_related('country').select_for_update(
+                of=(
+                    'self', 'country'
+                )).values_list('country__name',)
+            self.assertEqual(list(qs), [('Belgium',), ('France',)])
+
     @skipUnlessDBFeature('has_select_for_update')
     def test_for_update_sql_generated(self):
         """
@@ -319,49 +328,47 @@ class SelectForUpdateTests(TransactionTestCase):
         FieldError is raised if a non-relation field is specified in of=(...).
         """
         msg = (
-            'Invalid field name(s) given in select_for_update(of=(...)): %s. '
-            'Only relational fields followed in the query are allowed. '
-            'Choices are: self, born, born__country, '
-            'born__country__entity_ptr.'
+            'Invalid field name given in select_for_update(of=(...)): %s. '
+            'The relation does not exist. '
+            'Choices are: self, born, born__country'
         )
         invalid_of = [
             ('nonexistent',),
-            ('name',),
             ('born__nonexistent',),
-            ('born__name',),
             ('born__nonexistent', 'born__name'),
         ]
         for of in invalid_of:
             with self.subTest(of=of):
-                with self.assertRaisesMessage(FieldError, msg % ', '.join(of)):
+                with self.assertRaisesMessage(FieldError, msg % of[0]):
                     with transaction.atomic():
                         Person.objects.select_related('born__country').select_for_update(of=of).get()
 
     @skipUnlessDBFeature('has_select_for_update', 'has_select_for_update_of')
-    def test_related_but_unselected_of_argument_raises_error(self):
+    def test_m2m_and_o2m_of_argument_raises_error(self):
         """
-        FieldError is raised if a relation field that is not followed in the
-        query is specified in of=(...).
+        FieldError is raised if a non-relation field is specified in of=(...).
         """
         msg = (
-            'Invalid field name(s) given in select_for_update(of=(...)): %s. '
-            'Only relational fields followed in the query are allowed. '
-            'Choices are: self, born, profile.'
+            'Invalid field name given in select_for_update(of=(...)): %s. '
+            'The field is not a one to one or many to one relation. '
+            'Choices are: self, born, born__country'
         )
-        for name in ['born__country', 'died', 'died__country']:
-            with self.subTest(name=name):
-                with self.assertRaisesMessage(FieldError, msg % name):
+        invalid_of = [
+            ('name',),
+            ('born__name',),
+        ]
+        for of in invalid_of:
+            with self.subTest(of=of):
+                with self.assertRaisesMessage(FieldError, msg % of):
                     with transaction.atomic():
-                        Person.objects.select_related(
-                            'born', 'profile',
-                        ).exclude(profile=None).select_for_update(of=(name,)).get()
+                        Person.objects.select_related('born__country').select_for_update(of=of).get()
 
     @skipUnlessDBFeature('has_select_for_update', 'has_select_for_update_of')
     def test_model_inheritance_of_argument_raises_error_ptr_in_choices(self):
         msg = (
-            'Invalid field name(s) given in select_for_update(of=(...)): '
-            'name. Only relational fields followed in the query are allowed. '
-            'Choices are: self, %s.'
+            'Invalid field name given in select_for_update(of=(...)): name. '
+            'The field is not a one to one or many to one relation. '
+            'Choices are: self, %s'
         )
         with self.assertRaisesMessage(
             FieldError,
