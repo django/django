@@ -12,8 +12,6 @@ from .models import ModelWithNullFKToSite, Post
 
 @modify_settings(INSTALLED_APPS={'append': ['no_models']})
 class RemoveStaleContentTypesTests(TestCase):
-    # Speed up tests by avoiding retrieving ContentTypes for all test apps.
-    available_apps = ['contenttypes_tests', 'no_models', 'django.contrib.contenttypes']
 
     def setUp(self):
         self.before_count = ContentType.objects.count()
@@ -70,4 +68,11 @@ class RemoveStaleContentTypesTests(TestCase):
         with mock.patch('builtins.input', return_value='yes'), captured_stdout() as stdout:
             call_command('remove_stale_contenttypes', verbosity=2)
         self.assertIn("Deleting stale content type 'no_models | Fake'", stdout.getvalue())
+        self.assertEqual(ContentType.objects.count(), self.before_count)
+
+    def test_contenttypes_removed_for_apps_not_in_installed_apps(self):
+        ContentType.objects.create(app_label='stale_app', model='Fake')
+        with mock.patch('builtins.input', return_value='yes'), captured_stdout() as stdout:
+            call_command('remove_stale_contenttypes', verbosity=2)
+        self.assertIn("Deleting stale content type 'stale_app | Fake'", stdout.getvalue())
         self.assertEqual(ContentType.objects.count(), self.before_count)
