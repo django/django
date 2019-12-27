@@ -25,6 +25,9 @@ class SitesFrameworkTests(TestCase):
         cls.site = Site(id=settings.SITE_ID, domain='example.com', name='example.com')
         cls.site.save()
 
+    def setUp(self):
+        Site.objects.clear_cache()
+
     def tearDown(self):
         Site.objects.clear_cache()
 
