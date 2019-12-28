@@ -47,7 +47,8 @@ class ExtraRegressTests(TestCase):
 
         self.assertQuerysetEqual(
             qs, [('Second Revision', 'First Revision')],
-            transform=lambda r: (r.title, r.base.title)
+            transform=lambda r: (r.title, r.base.title),
+            ordered=False,
         )
 
         # Queryset to search for string in title:
