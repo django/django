@@ -3869,7 +3869,7 @@ class TestTicket24605(TestCase):
         i4 = Individual.objects.create(alive=False)
 
         self.assertSequenceEqual(Individual.objects.filter(Q(alive=False), Q(related_individual__isnull=True)), [i4])
-        self.assertSequenceEqual(
+        self.assertCountEqual(
             Individual.objects.exclude(Q(alive=False), Q(related_individual__isnull=True)).order_by('pk'),
             [i1, i2, i3]
         )
