@@ -6,7 +6,7 @@ from .models import Empty
 class EmptyModelTests(TestCase):
     def test_empty(self):
         m = Empty()
-        self.assertIsNone(m.id)
+        self.assertIsNotNone(m.id)
         m.save()
         Empty.objects.create()
         self.assertEqual(len(Empty.objects.all()), 2)
