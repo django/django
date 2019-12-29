@@ -484,14 +484,6 @@ class Queries1Tests(TestCase):
             ['<Item: one>', '<Item: three>', '<Item: two>', '<Item: four>']
         )
 
-        # Ordering by a many-valued attribute (e.g. a many-to-many or reverse
-        # ForeignKey) is legal, but the results might not make sense. That
-        # isn't Django's problem. Garbage in, garbage out.
-        self.assertQuerysetEqual(
-            Item.objects.filter(tags__isnull=False).order_by('tags', 'id'),
-            ['<Item: one>', '<Item: two>', '<Item: one>', '<Item: two>', '<Item: four>']
-        )
-
         # If we replace the default ordering, Django adjusts the required
         # tables automatically. Item normally requires a join with Note to do
         # the default ordering, but that isn't needed here.
@@ -1475,7 +1467,7 @@ class Queries4Tests(TestCase):
         CategoryItem.objects.create(category=c1)
         CategoryItem.objects.create(category=c2)
         CategoryItem.objects.create(category=c1)
-        self.assertSequenceEqual(SimpleCategory.objects.order_by('categoryitem', 'pk'), [c1, c2, c1])
+        self.assertCountEqual(SimpleCategory.objects.order_by('categoryitem', 'pk'), [c1, c2, c1])
 
     def test_ticket10181(self):
         # Avoid raising an EmptyResultSet if an inner query is probably
@@ -1496,7 +1488,7 @@ class Queries4Tests(TestCase):
 
         qs = CategoryItem.objects.filter(category__specialcategory__isnull=False)
         self.assertEqual(qs.count(), 2)
-        self.assertSequenceEqual(qs, [ci2, ci3])
+        self.assertCountEqual(qs, [ci2, ci3])
 
     def test_ticket15316_exclude_false(self):
         c1 = SimpleCategory.objects.create(name="category1")
@@ -1535,7 +1527,7 @@ class Queries4Tests(TestCase):
 
         qs = CategoryItem.objects.exclude(category__specialcategory__isnull=True)
         self.assertEqual(qs.count(), 2)
-        self.assertSequenceEqual(qs, [ci2, ci3])
+        self.assertCountEqual(qs, [ci2, ci3])
 
     def test_ticket15316_one2one_filter_false(self):
         c = SimpleCategory.objects.create(name="cat")
@@ -1551,7 +1543,7 @@ class Queries4Tests(TestCase):
 
         qs = CategoryItem.objects.filter(category__onetoonecategory__isnull=False).order_by('pk')
         self.assertEqual(qs.count(), 2)
-        self.assertSequenceEqual(qs, [ci2, ci3])
+        self.assertCountEqual(qs, [ci2, ci3])
 
     def test_ticket15316_one2one_exclude_false(self):
         c = SimpleCategory.objects.create(name="cat")
@@ -1599,7 +1591,7 @@ class Queries4Tests(TestCase):
 
         qs = CategoryItem.objects.exclude(category__onetoonecategory__isnull=True).order_by('pk')
         self.assertEqual(qs.count(), 2)
-        self.assertSequenceEqual(qs, [ci2, ci3])
+        self.assertCountEqual(qs, [ci2, ci3])
 
 
 class Queries5Tests(TestCase):
@@ -1644,13 +1636,14 @@ class Queries5Tests(TestCase):
         )
         self.assertQuerysetEqual(
             qs.extra(order_by=('-good', 'id')),
-            ['<Ranking: 3: a1>', '<Ranking: 2: a2>', '<Ranking: 1: a3>']
+            ['<Ranking: 3: a1>', '<Ranking: 2: a2>', '<Ranking: 1: a3>'],
+            ordered=False,
         )
 
         # Despite having some extra aliases in the query, we can still omit
         # them in a values() query.
         dicts = qs.values('id', 'rank').order_by('id')
-        self.assertEqual(
+        self.assertCountEqual(
             [d['rank'] for d in dicts],
             [2, 1, 3]
         )
@@ -2924,13 +2917,13 @@ class NullInExcludeTest(TestCase):
         none_val = '' if connection.features.interprets_empty_strings_as_nulls else None
         self.assertQuerysetEqual(
             NullableName.objects.exclude(name__in=[]),
-            ['i1', none_val], attrgetter('name'))
+            ['i1', none_val], attrgetter('name'), ordered=False)
         self.assertQuerysetEqual(
             NullableName.objects.exclude(name__in=['i1']),
             [none_val], attrgetter('name'))
         self.assertQuerysetEqual(
             NullableName.objects.exclude(name__in=['i3']),
-            ['i1', none_val], attrgetter('name'))
+            ['i1', none_val], attrgetter('name'), ordered=False)
         inner_qs = NullableName.objects.filter(name='i1').values_list('name')
         self.assertQuerysetEqual(
             NullableName.objects.exclude(name__in=inner_qs),
