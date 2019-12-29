@@ -717,7 +717,10 @@ class QueryTestCase(TestCase):
         bob_profile.save()
         new_bob_profile.save()
         self.assertEqual(list(User.objects.using('default').values_list('username', flat=True)), ['alice'])
-        self.assertEqual(list(User.objects.using('other').values_list('username', flat=True)), ['bob', 'charlie'])
+        self.assertCountEqual(
+            list(User.objects.using('other').values_list('username', flat=True)),
+            ['bob', 'charlie']
+        )
         self.assertEqual(list(UserProfile.objects.using('default').values_list('flavor', flat=True)), ['chocolate'])
         self.assertEqual(
             list(UserProfile.objects.using('other').values_list('flavor', flat=True)),
