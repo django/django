@@ -29,7 +29,7 @@ class NullQueriesTests(TestCase):
         self.assertSequenceEqual(Choice.objects.filter(choice__iexact=None), [])
 
         # Excluding the previous result returns everything.
-        self.assertSequenceEqual(Choice.objects.exclude(choice=None).order_by('id'), [c1, c2])
+        self.assertCountEqual(Choice.objects.exclude(choice=None).order_by('id'), [c1, c2])
 
         # Valid query, but fails because foo isn't a keyword
         msg = "Cannot resolve keyword 'foo' into field. Choices are: choice, id, poll, poll_id"
