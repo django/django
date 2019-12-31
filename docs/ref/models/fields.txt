@@ -1215,7 +1215,7 @@ databases supported by Django.
 containing only letters, numbers, underscores or hyphens. They're generally used
 in URLs.
 
-Like a CharField, you can specify :attr:`~CharField.max_length` (read the note
+Like a :class:`CharField`, you can specify :attr:`~CharField.max_length` (read the note
 about database portability and :attr:`~CharField.max_length` in that section,
 too). If :attr:`~CharField.max_length` is not specified, Django will use a
 default length of 50.
