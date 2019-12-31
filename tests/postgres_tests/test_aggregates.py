@@ -1,6 +1,6 @@
 import json
 
-from django.db.models import CharField
+from django.db.models import CharField, Q
 from django.db.models.expressions import F, OuterRef, Subquery, Value
 from django.db.models.functions import Cast, Concat, Substr
 from django.test.utils import Approximate
@@ -79,6 +79,12 @@ class TestGeneralAggregate(PostgreSQLTestCase):
                     arrayagg=ArrayAgg('boolean_field', ordering=ordering)
                 )
                 self.assertEqual(values, {'arrayagg': expected_output})
+
+    def test_array_agg_filter(self):
+        values = AggregateTestModel.objects.aggregate(
+            arrayagg=ArrayAgg('integer_field', filter=Q(integer_field__gt=0)),
+        )
+        self.assertEqual(values, {'arrayagg': [1, 2]})
 
     def test_array_agg_empty_result(self):
         AggregateTestModel.objects.all().delete()
@@ -183,6 +189,16 @@ class TestGeneralAggregate(PostgreSQLTestCase):
                     stringagg=StringAgg('char_field', delimiter=';', ordering=ordering)
                 )
                 self.assertEqual(values, {'stringagg': expected_output})
+
+    def test_string_agg_filter(self):
+        values = AggregateTestModel.objects.aggregate(
+            stringagg=StringAgg(
+                'char_field',
+                delimiter=';',
+                filter=Q(char_field__endswith='3') | Q(char_field__endswith='1'),
+            )
+        )
+        self.assertEqual(values, {'stringagg': 'Foo1;Foo3'})
 
     def test_string_agg_empty_result(self):
         AggregateTestModel.objects.all().delete()
