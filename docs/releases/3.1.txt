@@ -194,7 +194,8 @@ Internationalization
 Logging
 ~~~~~~~
 
-* ...
+* Included database context ``alias`` to the ``django.db.backends`` logger
+  output.
 
 Management Commands
 ~~~~~~~~~~~~~~~~~~~
