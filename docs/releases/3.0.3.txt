@@ -4,7 +4,13 @@ Django 3.0.3 release notes
 
 *Expected February 3, 2020*
 
-Django 3.0.3 fixes several bugs in 3.0.2.
+Django 3.0.3 fixes a security issue and several bugs in 3.0.2.
+
+CVE-2020-7471: Potential SQL injection via ``StringAgg(delimiter)``
+===================================================================
+
+:class:`~django.contrib.postgres.aggregates.StringAgg` aggregation function was
+subject to SQL injection, using a suitably crafted ``delimiter``.
 
 Bugfixes
 ========
