@@ -28,6 +28,7 @@ BUILTIN_SERIALIZERS = {
     "python": "django.core.serializers.python",
     "json": "django.core.serializers.json",
     "yaml": "django.core.serializers.pyyaml",
+    "jsonl": "django.core.serializers.jsonl",
 }
 
 _serializers = {}
