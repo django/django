@@ -4,7 +4,7 @@ from django.core.exceptions import ValidationError
 from django.db import connection, models
 from django.test import SimpleTestCase, TestCase
 
-from .models import Post
+from .models import Post, FooChoicesChild
 
 
 class TestCharField(TestCase):
@@ -43,6 +43,16 @@ class TestCharField(TestCase):
         self.assertEqual(p1, p2)
         self.assertEqual(p2.title, Event.C)
 
+    def test_charfield_overrides_parent_choices(self):
+        expected_values = {"A": "output1", "B": "output2", "C": "output3"}
+        fields = [
+            FooChoicesChild.objects.create(foo=foo_value) for foo_value in
+            ["A", "B", "C"]]
+
+        self.assertEqual(fields[0].get_foo_display(), expected_values["A"])
+        self.assertEqual(fields[1].get_foo_display(), expected_values["B"])
+        self.assertEqual(fields[2].get_foo_display(), expected_values["C"])
+
 
 class ValidationTests(SimpleTestCase):
 
@@ -80,3 +90,4 @@ class ValidationTests(SimpleTestCase):
         f = models.CharField(null=False)
         with self.assertRaises(ValidationError):
             f.clean(None, None)
+

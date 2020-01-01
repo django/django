@@ -98,6 +98,7 @@ class ModelBase(type):
                 new_attrs[obj_name] = obj
         new_class = super_new(cls, name, bases, new_attrs, **kwargs)
 
+
         abstract = getattr(attr_meta, 'abstract', False)
         meta = attr_meta or getattr(new_class, 'Meta', None)
         base_meta = getattr(new_class, '_meta', None)
@@ -286,6 +287,7 @@ class ModelBase(type):
                 # Pass any non-abstract parent classes onto child.
                 new_class._meta.parents.update(base_parents)
 
+
             # Inherit private fields (like GenericForeignKey) from the parent
             # class
             for field in base._meta.private_fields:
@@ -316,6 +318,7 @@ class ModelBase(type):
             attr_meta.abstract = False
             new_class.Meta = attr_meta
             return new_class
+
 
         new_class._prepare()
         new_class._meta.apps.register_model(new_class._meta.app_label, new_class)
@@ -399,7 +402,6 @@ class ModelState:
     # on the actual save.
     adding = True
     fields_cache = ModelStateFieldsCacheDescriptor()
-
 
 class Model(metaclass=ModelBase):
 
@@ -940,8 +942,12 @@ class Model(metaclass=ModelBase):
     delete.alters_data = True
 
     def _get_FIELD_display(self, field):
+        # some how, the field.choices are getting overwritten by it's abstract parent
+        # so we need to find the proper choices of the field in the models._meta and use
+        # them insteead.
+        _field = next((_f for _f in self._meta.fields if _f.name == field.name))
         value = getattr(self, field.attname)
-        choices_dict = dict(make_hashable(field.flatchoices))
+        choices_dict = dict(make_hashable(_field.flatchoices))
         # force_str() to coerce lazy strings.
         return force_str(choices_dict.get(make_hashable(value), value), strings_only=True)
 

@@ -409,3 +409,15 @@ class UUIDChild(PrimaryKeyUUIDModel):
 
 class UUIDGrandchild(UUIDChild):
     pass
+
+
+class FooChoicesAbstract(models.Model):
+    choices = [("A", "output1"), ("B", "output2")]
+    foo = models.CharField(max_length=254, choices=choices)
+    class Meta:
+       abstract = True
+
+
+class FooChoicesChild(FooChoicesAbstract):
+    choices = [("A", "output1"), ("B", "output2"), ("C", "output3")]
+    foo = models.CharField(max_length=254, choices=choices)
