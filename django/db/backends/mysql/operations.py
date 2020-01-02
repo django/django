@@ -282,13 +282,13 @@ class DatabaseOperations(BaseDatabaseOperations):
                 # a decimal. MySQL returns an integer without microseconds.
                 return 'CAST((TIME_TO_SEC(%(lhs)s) - TIME_TO_SEC(%(rhs)s)) * 1000000 AS SIGNED)' % {
                     'lhs': lhs_sql, 'rhs': rhs_sql
-                }, lhs_params + rhs_params
+                }, (*lhs_params, *rhs_params)
             return (
                 "((TIME_TO_SEC(%(lhs)s) * 1000000 + MICROSECOND(%(lhs)s)) -"
                 " (TIME_TO_SEC(%(rhs)s) * 1000000 + MICROSECOND(%(rhs)s)))"
-            ) % {'lhs': lhs_sql, 'rhs': rhs_sql}, lhs_params * 2 + rhs_params * 2
-        else:
-            return "TIMESTAMPDIFF(MICROSECOND, %s, %s)" % (rhs_sql, lhs_sql), rhs_params + lhs_params
+            ) % {'lhs': lhs_sql, 'rhs': rhs_sql}, tuple(lhs_params) * 2 + tuple(rhs_params) * 2
+        params = (*lhs_params, *rhs_params)
+        return "TIMESTAMPDIFF(MICROSECOND, %s, %s)" % (rhs_sql, lhs_sql), params
 
     def explain_query_prefix(self, format=None, **options):
         # Alias MySQL's TRADITIONAL to TEXT for consistency with other backends.

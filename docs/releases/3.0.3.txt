@@ -9,4 +9,6 @@ Django 3.0.3 fixes several bugs in 3.0.2.
 Bugfixes
 ========
 
-* ...
+* Fixed a regression in Django 3.0 that caused a crash when subtracting
+  ``DateField``, ``DateTimeField``, or ``TimeField`` from a ``Subquery()``
+  annotation (:ticket:`31133`).
