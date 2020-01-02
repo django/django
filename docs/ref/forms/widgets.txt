@@ -326,7 +326,7 @@ foundation for custom widgets.
 
         By default, returns ``False`` for hidden widgets and ``True``
         otherwise. Special cases are :class:`~django.forms.ClearableFileInput`,
-        which returns ``False`` when ``initial`` is not set, and
+        which returns ``False`` when ``initial`` is set, and
         :class:`~django.forms.CheckboxSelectMultiple`, which always returns
         ``False`` because browser validation would require all checkboxes to be
         checked instead of at least one.
