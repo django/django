@@ -1095,8 +1095,8 @@ class DateField(DateTimeCheckMixin, Field):
                  auto_now_add=False, **kwargs):
         self.auto_now, self.auto_now_add = auto_now, auto_now_add
         if auto_now or auto_now_add:
-            kwargs['editable'] = False
-            kwargs['blank'] = True
+            kwargs.setdefault('editable', False)
+            kwargs.setdefault('blank', True)
         super().__init__(verbose_name, name, **kwargs)
 
     def _check_fix_default_value(self):
@@ -1146,8 +1146,14 @@ class DateField(DateTimeCheckMixin, Field):
         if self.auto_now_add:
             kwargs['auto_now_add'] = True
         if self.auto_now or self.auto_now_add:
-            del kwargs['editable']
-            del kwargs['blank']
+            if self.editable:
+                kwargs['editable'] = True
+            else:
+                del kwargs['editable']
+            if not self.blank:
+                kwargs['blank'] = False
+            else:
+                del kwargs['blank']
         return name, path, args, kwargs
 
     def get_internal_type(self):
@@ -2074,8 +2080,8 @@ class TimeField(DateTimeCheckMixin, Field):
                  auto_now_add=False, **kwargs):
         self.auto_now, self.auto_now_add = auto_now, auto_now_add
         if auto_now or auto_now_add:
-            kwargs['editable'] = False
-            kwargs['blank'] = True
+            kwargs.setdefault('editable', False)
+            kwargs.setdefault('blank', True)
         super().__init__(verbose_name, name, **kwargs)
 
     def _check_fix_default_value(self):
@@ -2128,8 +2134,14 @@ class TimeField(DateTimeCheckMixin, Field):
         if self.auto_now_add is not False:
             kwargs["auto_now_add"] = self.auto_now_add
         if self.auto_now or self.auto_now_add:
-            del kwargs['blank']
-            del kwargs['editable']
+            if self.editable:
+                kwargs['editable'] = True
+            else:
+                del kwargs['editable']
+            if not self.blank:
+                kwargs['blank'] = False
+            else:
+                del kwargs['blank']
         return name, path, args, kwargs
 
     def get_internal_type(self):
