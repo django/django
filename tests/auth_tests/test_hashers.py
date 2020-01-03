@@ -16,7 +16,7 @@ except ImportError:
     crypt = None
 else:
     # On some platforms (e.g. OpenBSD), crypt.crypt() always return None.
-    if crypt.crypt('', '') is None:
+    if crypt.crypt('') is None:
         crypt = None
 
 try:
