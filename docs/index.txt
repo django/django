@@ -58,7 +58,7 @@ will help you know where to look for certain things:
 
 * :doc:`Tutorials </intro/index>` take you by the hand through a series of
   steps to create a Web application. Start here if you're new to Django or Web
-  application development. Also look at the ":ref:`index-first-steps`" below.
+  application development. Also look at the ":ref:`index-first-steps`".
 
 * :doc:`Topic guides </topics/index>` discuss key topics and concepts at a
   fairly high level and provide useful background information and explanation.
