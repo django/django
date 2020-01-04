@@ -435,9 +435,15 @@ class TimeField(BaseTemporalField):
         return datetime.datetime.strptime(value, format).time()
 
 
+class DateTimeFormatsIterator:
+    def __iter__(self):
+        yield from formats.get_format('DATETIME_INPUT_FORMATS')
+        yield from formats.get_format('DATE_INPUT_FORMATS')
+
+
 class DateTimeField(BaseTemporalField):
     widget = DateTimeInput
-    input_formats = formats.get_format_lazy('DATETIME_INPUT_FORMATS')
+    input_formats = DateTimeFormatsIterator()
     default_error_messages = {
         'invalid': _('Enter a valid date/time.'),
     }
