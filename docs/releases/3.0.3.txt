@@ -12,3 +12,7 @@ Bugfixes
 * Fixed a regression in Django 3.0 that caused a crash when subtracting
   ``DateField``, ``DateTimeField``, or ``TimeField`` from a ``Subquery()``
   annotation (:ticket:`31133`).
+
+* Fixed a regression in Django 3.0 where ``QuerySet.values()`` and
+  ``values_list()`` crashed if a queryset contained an aggregation and
+  ``Exists()`` annotation (:ticket:`31136`).

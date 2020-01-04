@@ -2095,7 +2095,9 @@ class Query(BaseExpression):
 
         if self.group_by is True:
             self.add_fields((f.attname for f in self.model._meta.concrete_fields), False)
-            self.set_group_by()
+            # Disable GROUP BY aliases to avoid orphaning references to the
+            # SELECT clause which is about to be cleared.
+            self.set_group_by(allow_aliases=False)
             self.clear_select_fields()
 
         if fields:
