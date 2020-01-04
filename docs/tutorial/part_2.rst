@@ -38,7 +38,7 @@ Create the view template for the room view in ``chat/templates/chat/room.html``:
         <input id="chat-message-submit" type="button" value="Send"/>
     </body>
     <script>
-        var roomName = {{ room_name|escapejs }};
+        var roomName = "{{ room_name|escapejs }}";
 
         var chatSocket = new WebSocket(
             'ws://' + window.location.host +
