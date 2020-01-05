@@ -406,6 +406,9 @@ Miscellaneous
 * Date-only formats are removed from the default list for
   :setting:`DATETIME_INPUT_FORMATS`.
 
+* The :class:`~django.forms.FileInput` widget no longer renders with the
+  ``required`` HTML attribute when initial data exists.
+
 .. _deprecated-features-3.1:
 
 Features deprecated in 3.1
