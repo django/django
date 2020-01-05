@@ -495,10 +495,11 @@ Setup
    datetimes safely, their representation should include the UTC offset, or
    their values should be in UTC (or both!).
 
-   Finally, our calendar system contains interesting traps for computers::
+   Finally, our calendar system contains interesting edge cases. For example,
+   you can't always subtract one year directly from a given date::
 
        >>> import datetime
-       >>> def one_year_before(value):       # DON'T DO THAT!
+       >>> def one_year_before(value):  # Wrong example.
        ...     return value.replace(year=value.year - 1)
        >>> one_year_before(datetime.datetime(2012, 3, 1, 10, 0))
        datetime.datetime(2011, 3, 1, 10, 0)
@@ -507,9 +508,9 @@ Setup
        ...
        ValueError: day is out of range for month
 
-   (To implement this function, you must decide whether 2012-02-29 minus
-   one year is 2011-02-28 or 2011-03-01, which depends on your business
-   requirements.)
+   To implement such a function correctly, you must decide whether 2012-02-29
+   minus one year is 2011-02-28 or 2011-03-01, which depends on your business
+   requirements.
 
 #. **How do I interact with a database that stores datetimes in local time?**
 

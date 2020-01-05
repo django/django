@@ -50,9 +50,10 @@ class View:
         """Main entry point for a request-response process."""
         for key in initkwargs:
             if key in cls.http_method_names:
-                raise TypeError("You tried to pass in the %s method name as a "
-                                "keyword argument to %s(). Don't do that."
-                                % (key, cls.__name__))
+                raise TypeError(
+                    'The method name %s is not accepted as a keyword argument '
+                    'to %s().' % (key, cls.__name__)
+                )
             if not hasattr(cls, key):
                 raise TypeError("%s() received an invalid keyword %r. as_view "
                                 "only accepts arguments that are already "
