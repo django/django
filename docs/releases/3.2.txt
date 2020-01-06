@@ -227,6 +227,9 @@ Models
 * The :meth:`.QuerySet.update` method now respects the ``order_by()`` clause on
   MySQL and MariaDB.
 
+* :class:`FilteredRelation() <django.db.models.FilteredRelation>` now supports
+  nested relations.
+
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 

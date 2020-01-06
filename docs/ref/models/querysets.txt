@@ -3707,17 +3707,10 @@ operate on vegetarian pizzas.
 
 ``FilteredRelation`` doesn't support:
 
-* Conditions that span relational fields. For example::
-
-    >>> Restaurant.objects.annotate(
-    ...    pizzas_with_toppings_startswith_n=FilteredRelation(
-    ...        'pizzas__toppings',
-    ...        condition=Q(pizzas__toppings__name__startswith='n'),
-    ...    ),
-    ... )
-    Traceback (most recent call last):
-    ...
-    ValueError: FilteredRelation's condition doesn't support nested relations (got 'pizzas__toppings__name__startswith').
 * :meth:`.QuerySet.only` and :meth:`~.QuerySet.prefetch_related`.
 * A :class:`~django.contrib.contenttypes.fields.GenericForeignKey`
   inherited from a parent model.
+
+.. versionchanged:: 3.2
+
+    Support for nested relations was added.
