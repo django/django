@@ -633,7 +633,7 @@ with the admin site:
 * **admin.E129**: ``<modeladmin>`` must define a ``has_<foo>_permission()``
   method for the ``<action>`` action.
 * **admin.E130**: ``__name__`` attributes of actions defined in
-  ``<modeladmin>`` must be unique.
+  ``<modeladmin>`` must be unique. Name ``<name>`` is not unique.
 
 ``InlineModelAdmin``
 ~~~~~~~~~~~~~~~~~~~~
