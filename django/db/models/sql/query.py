@@ -968,7 +968,6 @@ class Query(BaseExpression):
                 reuse_alias = reuse_aliases[-1]
             self.ref_alias(reuse_alias)
             return reuse_alias
-
         # No reuse is possible, so we need a new alias.
         alias, _ = self.table_alias(join.table_name, create=True, filtered_relation=join.filtered_relation)
         if join.join_type:
@@ -1408,13 +1407,23 @@ class Query(BaseExpression):
     def add_filtered_relation(self, filtered_relation, alias):
         filtered_relation.alias = alias
         lookups = dict(get_children_from_q(filtered_relation.condition))
-        for lookup in chain((filtered_relation.relation_name,), lookups):
+        relation_lookup_parts, relation_field_parts, _ = self.solve_lookup_type(filtered_relation.relation_name)
+        if relation_lookup_parts:
+            raise ValueError(
+                "FilteredRelation's relation_name doesn't support lookups "
+                "(got %r)." % filtered_relation.relation_name
+            )
+        for lookup in chain(lookups):
             lookup_parts, field_parts, _ = self.solve_lookup_type(lookup)
             shift = 2 if not lookup_parts else 1
-            if len(field_parts) > (shift + len(lookup_parts)):
+            lookup_path = field_parts[:-shift]
+            for _ in relation_field_parts:
+                if lookup_path:
+                    lookup_path = lookup_path[1:]
+            if lookup_path:
                 raise ValueError(
                     "FilteredRelation's condition doesn't support nested "
-                    "relations (got %r)." % lookup
+                    "on clauses deeper than the relation (got %r for %r)." % (lookup, filtered_relation.relation_name)
                 )
         self._filtered_relations[filtered_relation.alias] = filtered_relation
 
@@ -1448,7 +1457,14 @@ class Query(BaseExpression):
                     field = self.annotation_select[name].output_field
                 elif name in self._filtered_relations and pos == 0:
                     filtered_relation = self._filtered_relations[name]
-                    field = opts.get_field(filtered_relation.relation_name)
+                    if LOOKUP_SEP in filtered_relation.relation_name:
+                        parts = filtered_relation.relation_name.split(LOOKUP_SEP)
+                        filtered_relation_path, field, _, _ = self.names_to_path(
+                            parts, opts, allow_many, fail_on_missing
+                        )
+                        path.extend(filtered_relation_path[:-1])
+                    else:
+                        field = opts.get_field(filtered_relation.relation_name)
             if field is not None:
                 # Fields that contain one-to-many relations with a generic
                 # model (like a GenericForeignKey) cannot generate reverse
