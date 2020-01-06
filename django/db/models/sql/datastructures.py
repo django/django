@@ -98,6 +98,7 @@ class Join:
                 "Join generated an empty ON clause. %s did not yield either "
                 "joining columns or extra restrictions." % declared_field.__class__
             )
+        # TODO - on clause aliases specified here. too deep to change alias though
         on_clause_sql = ' AND '.join(join_conditions)
         alias_str = '' if self.table_alias == self.table_name else (' %s' % self.table_alias)
         sql = '%s %s%s ON (%s)' % (self.join_type, qn(self.table_name), alias_str, on_clause_sql)
@@ -122,6 +123,8 @@ class Join:
             self.table_name == other.table_name and
             self.parent_alias == other.parent_alias and
             self.join_field == other.join_field and
+            # TODO - do any of these checks need changing?
+            # Like comparing the parent alias with a filtered relation
             (not with_filtered_relation or self.filtered_relation == other.filtered_relation)
         )
 

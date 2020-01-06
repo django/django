@@ -60,8 +60,8 @@ class Extract(TimezoneMixin, Transform):
             assert False, "Tried to Extract from an invalid type."
         return sql, params
 
-    def resolve_expression(self, query=None, allow_joins=True, reuse=None, summarize=False, for_save=False):
-        copy = super().resolve_expression(query, allow_joins, reuse, summarize, for_save)
+    def resolve_expression(self, query=None, allow_joins=True, reuse=None, summarize=False, for_save=False, reuse_with_filtered_relation=False):
+        copy = super().resolve_expression(query, allow_joins, reuse, summarize, for_save, reuse_with_filtered_relation)
         field = copy.lhs.output_field
         if not isinstance(field, (DateField, DateTimeField, TimeField, DurationField)):
             raise ValueError(
@@ -187,8 +187,8 @@ class TruncBase(TimezoneMixin, Transform):
             raise ValueError('Trunc only valid on DateField, TimeField, or DateTimeField.')
         return sql, inner_params
 
-    def resolve_expression(self, query=None, allow_joins=True, reuse=None, summarize=False, for_save=False):
-        copy = super().resolve_expression(query, allow_joins, reuse, summarize, for_save)
+    def resolve_expression(self, query=None, allow_joins=True, reuse=None, summarize=False, for_save=False, reuse_with_filtered_relation=False):
+        copy = super().resolve_expression(query, allow_joins, reuse, summarize, for_save, reuse_with_filtered_relation)
         field = copy.lhs.output_field
         # DateTimeField is a subclass of DateField so this works for both.
         assert isinstance(field, (DateField, TimeField)), (

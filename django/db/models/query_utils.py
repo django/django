@@ -87,7 +87,7 @@ class Q(tree.Node):
         obj.negate()
         return obj
 
-    def resolve_expression(self, query=None, allow_joins=True, reuse=None, summarize=False, for_save=False):
+    def resolve_expression(self, query=None, allow_joins=True, reuse=None, summarize=False, for_save=False, reuse_with_filtered_relation=False):
         # We must promote any new joins to left outer joins so that when Q is
         # used as an expression, rows aren't filtered due to joins.
         clause, joins = query._add_q(self, reuse, allow_joins=allow_joins, split_subq=False)
@@ -332,5 +332,9 @@ class FilteredRelation:
     def as_sql(self, compiler, connection):
         # Resolve the condition in Join.filtered_relation.
         query = compiler.query
-        where = query.build_filtered_relation_q(self.condition, reuse=set(self.path))
+        # Add other usable aliases in the query to the reuse set.
+        # Check for if it can be used is in Query.join
+        reusable_aliases = self.path
+        reusable_aliases += list(query.alias_map.keys())
+        where = query.build_filtered_relation_q(self.condition, reuse=set(reusable_aliases))
         return compiler.compile(where)

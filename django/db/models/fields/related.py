@@ -699,7 +699,7 @@ class ForeignObject(RelatedField):
         """Get path from this field to the related model."""
         opts = self.remote_field.model._meta
         from_opts = self.model._meta
-        return [PathInfo(
+        pinfo = [PathInfo(
             from_opts=from_opts,
             to_opts=opts,
             target_fields=self.foreign_related_fields,
@@ -708,6 +708,10 @@ class ForeignObject(RelatedField):
             direct=True,
             filtered_relation=filtered_relation,
         )]
+        # TODO Add paths for filtered relation here?
+        # if filtered_relation:
+        #     import pdb; pdb.set_trace()
+        return pinfo
 
     def get_reverse_path_info(self, filtered_relation=None):
         """Get path from the related model to this field's model."""

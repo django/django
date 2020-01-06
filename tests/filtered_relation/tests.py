@@ -1,5 +1,6 @@
 from django.db import connection, transaction
-from django.db.models import Case, Count, F, FilteredRelation, Q, When
+from django.db.models import Case, Count, F, FilteredRelation, Q, When, Value
+from django.db.models.functions import Concat, Coalesce
 from django.test import TestCase
 from django.test.testcases import skipUnlessDBFeature
 
@@ -147,6 +148,7 @@ class FilteredRelationTests(TestCase):
                 'favorite_books', condition=Q(favorite_books__in=[self.book2]),
             ),
         ).filter(favorite_books_written_by_jane__isnull=False)
+        print(qs.query)
         self.assertSequenceEqual(qs, [self.author1])
 
     def test_with_m2m_deep(self):
@@ -220,10 +222,12 @@ class FilteredRelationTests(TestCase):
         self.assertSequenceEqual(qs1.difference(qs2), [self.author1])
 
     def test_select_for_update(self):
+        qs = Author.objects.annotate(
+            book_jane=FilteredRelation('book', condition=Q(book__title__iexact='the book by jane a')),
+        ).filter(book_jane__isnull=False).select_for_update()
+        print(qs.query)
         self.assertSequenceEqual(
-            Author.objects.annotate(
-                book_jane=FilteredRelation('book', condition=Q(book__title__iexact='the book by jane a')),
-            ).filter(book_jane__isnull=False).select_for_update(),
+            qs,
             [self.author2]
         )
 
@@ -252,27 +256,53 @@ class FilteredRelationTests(TestCase):
         self.assertSequenceEqual(qs, [self.author1])
 
     def test_with_foreign_key_error(self):
-        msg = (
-            "FilteredRelation's condition doesn't support nested relations "
-            "(got 'author__favorite_books__author')."
+        print("\n\n\ntest_with_foreign_key_error")
+        qs = Book.objects.annotate(
+            alice_favorite_books=FilteredRelation(
+                'author__favorite_books',
+                condition=Q(author__favorite_books__author=self.author1),
+            )
+        ).filter(alice_favorite_books__isnull=False)
+        print(qs.query)
+        print(list(qs))
+        # self.assertSequenceEqual(qs, [self.book1, self.book2, self.book3, self.book4])
+
+    def test_with_multiple_relations_interacting(self):
+        qs = Author.objects.annotate(
+            my_books=FilteredRelation(
+                'book',
+                condition=Q(book__title__icontains='book')
+            )
         )
-        with self.assertRaisesMessage(ValueError, msg):
-            list(Book.objects.annotate(
-                alice_favorite_books=FilteredRelation(
-                    'author__favorite_books',
-                    condition=Q(author__favorite_books__author=self.author1),
-                )
-            ))
+        qs = qs.annotate(
+            favorite_books_same_editor=FilteredRelation(
+                'favorite_books',
+                condition=Q(favorite_books__editor=F('my_books__editor'))
+            )
+        )
+        qs = qs.annotate(
+            author=F('name'),
+            b=F("my_books__title"),
+            editor_name=F('favorite_books_same_editor__editor__name'),
+            author_title=Concat(
+                Coalesce("name", "favorite_books_same_editor__editor__name"),
+                Value(" - "),
+                F("favorite_books_same_editor__title"),
+            ),
+        )
+        qs = qs.values('author', 'b', 'editor_name', 'author_title')
+        print(qs.query)
+        print(list(qs))
+        # self.assertSequenceEqual(qs, [self.book1, self.book2, self.book3, self.book4])
 
     def test_with_foreign_key_on_condition_error(self):
-        msg = (
-            "FilteredRelation's condition doesn't support nested relations "
-            "(got 'book__editor__name__icontains')."
-        )
-        with self.assertRaisesMessage(ValueError, msg):
-            list(Author.objects.annotate(
-                book_edited_by_b=FilteredRelation('book', condition=Q(book__editor__name__icontains='b')),
-            ))
+        print("\n\n\ntest_with_foreign_key_on_condition_error")
+        qs = Author.objects.annotate(
+            book_edited_by_b=FilteredRelation('book', condition=Q(book__editor__name__icontains='b')),
+        ).filter(book_edited_by_b__isnull=False)
+        print(qs.query)
+        print(list(qs))
+        # self.assertSequenceEqual(qs, [self.author2])
 
     def test_with_empty_relation_name_error(self):
         with self.assertRaisesMessage(ValueError, 'relation_name cannot be empty.'):

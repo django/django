@@ -31,8 +31,8 @@ class GeoAggregate(Aggregate):
         template = None if self.is_extent else '%(function)s(SDOAGGRTYPE(%(expressions)s,%(tolerance)s))'
         return self.as_sql(compiler, connection, template=template, tolerance=tolerance, **extra_context)
 
-    def resolve_expression(self, query=None, allow_joins=True, reuse=None, summarize=False, for_save=False):
-        c = super().resolve_expression(query, allow_joins, reuse, summarize, for_save)
+    def resolve_expression(self, query=None, allow_joins=True, reuse=None, summarize=False, for_save=False, reuse_with_filtered_relation=False):
+        c = super().resolve_expression(query, allow_joins, reuse, summarize, for_save, reuse_with_filtered_relation)
         for expr in c.get_source_expressions():
             if not hasattr(expr.field, 'geom_type'):
                 raise ValueError('Geospatial aggregates only allowed on geometry fields.')
