@@ -132,8 +132,8 @@ class URLValidator(RegexValidator):
 
         # The maximum length of a full host name is 253 characters per RFC 1034
         # section 3.1. It's defined to be 255 bytes or less, but this includes
-        # one byte for the length of the name and one byte for the trailing dot
-        # that's used to indicate absolute names in DNS.
+        # one byte for the length of the most specific (leftmost) label and one
+        # byte of zero for the length of the root (rightmost, null) label.
         if len(urlsplit(value).netloc) > 253:
             raise ValidationError(self.message, code=self.code)
 
