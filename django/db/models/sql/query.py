@@ -1603,7 +1603,10 @@ class Query:
                 return self.annotations[name]
         else:
             field_list = name.split(LOOKUP_SEP)
-            join_info = self.setup_joins(field_list, self.get_meta(), self.get_initial_alias(), can_reuse=reuse, reuse_with_filtered_relation=reuse_with_filtered_relation)
+            join_info = self.setup_joins(
+                field_list, self.get_meta(), self.get_initial_alias(),
+                can_reuse=reuse, reuse_with_filtered_relation=reuse_with_filtered_relation
+            )
             targets, final_alias, join_list = self.trim_joins(join_info.targets, join_info.joins, join_info.path)
             if not allow_joins and len(join_list) > 1:
                 raise FieldError('Joined field references are not permitted in this query')
