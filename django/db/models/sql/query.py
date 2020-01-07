@@ -1350,15 +1350,6 @@ class Query:
 
     def add_filtered_relation(self, filtered_relation, alias):
         filtered_relation.alias = alias
-        lookups = dict(get_children_from_q(filtered_relation.condition))
-        for lookup in chain((filtered_relation.relation_name,), lookups):
-            lookup_parts, field_parts, _ = self.solve_lookup_type(lookup)
-            shift = 2 if not lookup_parts else 1
-            if len(field_parts) > (shift + len(lookup_parts)):
-                print(
-                    "OLD: FilteredRelation's condition doesn't support nested "
-                    "relations (got %r)." % lookup
-                )
         self._filtered_relations[filtered_relation.alias] = filtered_relation
 
     def names_to_path(self, names, opts, allow_many=True, fail_on_missing=False):
@@ -1391,7 +1382,13 @@ class Query:
                     field = self.annotation_select[name].output_field
                 elif name in self._filtered_relations and pos == 0:
                     filtered_relation = self._filtered_relations[name]
-                    field = opts.get_field(filtered_relation.relation_name)
+                    if LOOKUP_SEP in filtered_relation.relation_name:
+                        parts = filtered_relation.relation_name.split(LOOKUP_SEP)
+                        filtered_relation_path, field, filtered_relation_targets, filtered_relation_lookup_parts = self.names_to_path(parts, opts, allow_many, fail_on_missing)
+                        # don't want the last one, because that one gets added on below and would be duplicate
+                        path.extend(filtered_relation_path[:-1])
+                    else:
+                        field = opts.get_field(filtered_relation.relation_name)
             if field is not None:
                 # Fields that contain one-to-many relations with a generic
                 # model (like a GenericForeignKey) cannot generate reverse

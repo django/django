@@ -232,6 +232,7 @@ class BaseExpression:
          * reuse: a set of reusable joins for multijoins
          * summarize: a terminal aggregate clause
          * for_save: whether this expression about to be used in a save or update
+         * reuse_with_filtered_relation: if the reuse param should be used with FilteredRelations
 
         Return: an Expression to be added to the query.
         """
