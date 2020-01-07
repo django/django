@@ -1971,11 +1971,19 @@ Example::
 Django will use the files contained in ``<locale_code>/LC_MESSAGES`` under this
 directory as the main po file of a translation for a domain.
 
-Note that using this setting requires compiled catalog(s) for your
-locale(s), you may use
+.. note::
+
+Using this setting requires compiled catalog(s) for your locale(s), you may use
 :option:`django-admin makemessages --collect-base-catalogs<makemessages --collect-base-catalogs>`
 for collecting the bundled ones with Django and then
 :djadmin:`django-admin compilemessages <compilemessages>` to provide them.
+
+.. warning::
+
+This setting will make Django not take into account the bundled catalogs, is up
+to the user to run
+:option:`django-admin makemessages --collect-base-catalogs<makemessages --collect-base-catalogs>`
+after an upgrade to collect any new messages.
 
 .. setting:: LOGGING
 

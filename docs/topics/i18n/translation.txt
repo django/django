@@ -286,8 +286,8 @@ Plural Forms
 
 Django does not support multiple plural forms in catalogs. As all translation
 catalogs are merged, only the plural form in the main Django po file (located
-by default in ``django/conf/locale/<lang_code>/LC_MESSAGES/django.po``) is
-considered.
+by default in ``django/conf/locale/<lang_code>/LC_MESSAGES/django.po``,
+customized with :setting:`LOCALE_ROOT`) is considered.
 
 To prevent inconsistencies and undesired results in translations, Django will
 not merge any catalog that contains a different plural form than the main one
@@ -310,20 +310,10 @@ standard may have changed or a bug has been fixed.
 For aligning with the new version of the standard (or addressing the bug),
 you may use
 :option:`django-admin makemessages --comply-plural-forms<makemessages --comply-plural-forms>`
-to reorganize your catalogs so they are aligned with the main plural form
+to update your catalogs so they are aligned with the main plural form
 and avoid unexpected behavior.
 
-The script will ask you to map each plural form in the main forms to your
-catalog's forms. After this, the messages in your catalog will be reorganized
-accordingly and the plural forms will be updated.
-
-In the case of an increase in the number of plurals, it will fill
-those with the previously chosen forms so you avoid having translation results
-in the fallback language or the original string - this will produce the same
-results as before though you may want to update those later for a
-better expression of the language if it corresponds.
-
-In the cases where you want to use a custom plural form, define the
+In the cases where you want to use custom plural forms, define the
 :setting:`LOCALE_ROOT` setting and use
 :option:`django-admin makemessages --collect-base-catalogs<makemessages --collect-base-catalogs>`.
 This will merge all the locale catalogs bundled with Django into your

@@ -730,8 +730,8 @@ language files from being created.
 
 .. django-admin-option:: --collect-base-catalogs [{settings, all-bundled}] -cbc
 
-Collects all catalogs bundled with Django and merges them into
-:setting:`LOCALE_ROOT` (required setting).
+Collects all catalogs bundled with Django and merges them into the
+corresponding main po file in :setting:`LOCALE_ROOT` (required setting).
 
 Defaults to the locales defined in ``settings``, use ``all-bundled`` for
 collecting all locales bundled with Django.
@@ -755,6 +755,12 @@ If a divergence is found and the option is set to ``interactive`` (default),
 the user will be prompted to map the main plural forms to the ones found in
 the catalog. With the form map provided, the catalog will be reorganized
 accordingly and the plural forms will be updated.
+
+In the case of an increase in the number of plurals, it will fill
+those with the previously chosen forms so you avoid having translation results
+in the fallback language or the original string - this will produce the same
+results as before though you may want to update those later for a
+better expression of the language if it corresponds.
 
 If no plural forms is found in the catalog, the user will be prompted to copy
 them from the main po file. No remapping will be done, it is assumed that is
