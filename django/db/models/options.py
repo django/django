@@ -1,6 +1,6 @@
+import bisect
 import copy
 import inspect
-from bisect import bisect
 from collections import defaultdict
 
 from django.apps import apps
@@ -271,9 +271,9 @@ class Options:
         if private:
             self.private_fields.append(field)
         elif field.is_relation and field.many_to_many:
-            self.local_many_to_many.insert(bisect(self.local_many_to_many, field), field)
+            bisect.insort(self.local_many_to_many, field)
         else:
-            self.local_fields.insert(bisect(self.local_fields, field), field)
+            bisect.insort(self.local_fields, field)
             self.setup_pk(field)
 
         # If the field being added is a relation to another known field,
