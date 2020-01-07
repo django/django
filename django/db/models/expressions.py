@@ -220,7 +220,10 @@ class BaseExpression:
     def contains_column_references(self):
         return any(expr and expr.contains_column_references for expr in self.get_source_expressions())
 
-    def resolve_expression(self, query=None, allow_joins=True, reuse=None, summarize=False, for_save=False, reuse_with_filtered_relation=False):
+    def resolve_expression(
+        self, query=None, allow_joins=True, reuse=None,
+        summarize=False, for_save=False, reuse_with_filtered_relation=False
+    ):
         """
         Provide the chance to do any preprocessing or validation before being
         added to the query.
@@ -239,7 +242,9 @@ class BaseExpression:
         c = self.copy()
         c.is_summary = summarize
         c.set_source_expressions([
-            expr.resolve_expression(query, allow_joins, reuse, summarize, reuse_with_filtered_relation=reuse_with_filtered_relation)
+            expr.resolve_expression(
+                query, allow_joins, reuse, summarize, reuse_with_filtered_relation=reuse_with_filtered_relation
+            )
             if expr else None
             for expr in c.get_source_expressions()
         ])
@@ -444,7 +449,10 @@ class CombinedExpression(SQLiteNumericMixin, Expression):
         sql = connection.ops.combine_expression(self.connector, expressions)
         return expression_wrapper % sql, expression_params
 
-    def resolve_expression(self, query=None, allow_joins=True, reuse=None, summarize=False, for_save=False, reuse_with_filtered_relation=False):
+    def resolve_expression(
+        self, query=None, allow_joins=True, reuse=None,
+        summarize=False, for_save=False, reuse_with_filtered_relation=False
+    ):
         c = self.copy()
         c.is_summary = summarize
         c.lhs = c.lhs.resolve_expression(query, allow_joins, reuse, summarize, for_save, reuse_with_filtered_relation)
@@ -598,11 +606,16 @@ class Func(SQLiteNumericMixin, Expression):
     def set_source_expressions(self, exprs):
         self.source_expressions = exprs
 
-    def resolve_expression(self, query=None, allow_joins=True, reuse=None, summarize=False, for_save=False, reuse_with_filtered_relation=False):
+    def resolve_expression(
+        self, query=None, allow_joins=True, reuse=None,
+        summarize=False, for_save=False, reuse_with_filtered_relation=False
+    ):
         c = self.copy()
         c.is_summary = summarize
         for pos, arg in enumerate(c.source_expressions):
-            c.source_expressions[pos] = arg.resolve_expression(query, allow_joins, reuse, summarize, for_save, reuse_with_filtered_relation)
+            c.source_expressions[pos] = arg.resolve_expression(
+                query, allow_joins, reuse, summarize, for_save, reuse_with_filtered_relation
+            )
         return c
 
     def as_sql(self, compiler, connection, function=None, template=None, arg_joiner=None, **extra_context):
@@ -668,7 +681,10 @@ class Value(Expression):
             return 'NULL', []
         return '%s', [val]
 
-    def resolve_expression(self, query=None, allow_joins=True, reuse=None, summarize=False, for_save=False, reuse_with_filtered_relation=False):
+    def resolve_expression(
+        self, query=None, allow_joins=True, reuse=None,
+        summarize=False, for_save=False, reuse_with_filtered_relation=False
+    ):
         c = super().resolve_expression(query, allow_joins, reuse, summarize, for_save, reuse_with_filtered_relation)
         c.for_save = for_save
         return c
@@ -803,7 +819,10 @@ class Ref(Expression):
     def set_source_expressions(self, exprs):
         self.source, = exprs
 
-    def resolve_expression(self, query=None, allow_joins=True, reuse=None, summarize=False, for_save=False, reuse_with_filtered_relation=False):
+    def resolve_expression(
+        self, query=None, allow_joins=True, reuse=None,
+        summarize=False, for_save=False, reuse_with_filtered_relation=False
+    ):
         # The sub-expression `source` has already been resolved, as this is
         # just a reference to the name of `source`.
         return self
@@ -888,12 +907,19 @@ class When(Expression):
         # We're only interested in the fields of the result expressions.
         return [self.result._output_field_or_none]
 
-    def resolve_expression(self, query=None, allow_joins=True, reuse=None, summarize=False, for_save=False, reuse_with_filtered_relation=False):
+    def resolve_expression(
+        self, query=None, allow_joins=True, reuse=None,
+        summarize=False, for_save=False, reuse_with_filtered_relation=False
+    ):
         c = self.copy()
         c.is_summary = summarize
         if hasattr(c.condition, 'resolve_expression'):
-            c.condition = c.condition.resolve_expression(query, allow_joins, reuse, summarize, False, reuse_with_filtered_relation)
-        c.result = c.result.resolve_expression(query, allow_joins, reuse, summarize, for_save, reuse_with_filtered_relation)
+            c.condition = c.condition.resolve_expression(
+                query, allow_joins, reuse, summarize, False, reuse_with_filtered_relation
+            )
+        c.result = c.result.resolve_expression(
+            query, allow_joins, reuse, summarize, for_save, reuse_with_filtered_relation
+        )
         return c
 
     def as_sql(self, compiler, connection, template=None, **extra_context):
@@ -952,12 +978,19 @@ class Case(Expression):
     def set_source_expressions(self, exprs):
         *self.cases, self.default = exprs
 
-    def resolve_expression(self, query=None, allow_joins=True, reuse=None, summarize=False, for_save=False, reuse_with_filtered_relation=False):
+    def resolve_expression(
+        self, query=None, allow_joins=True, reuse=None,
+        summarize=False, for_save=False, reuse_with_filtered_relation=False
+    ):
         c = self.copy()
         c.is_summary = summarize
         for pos, case in enumerate(c.cases):
-            c.cases[pos] = case.resolve_expression(query, allow_joins, reuse, summarize, for_save, reuse_with_filtered_relation)
-        c.default = c.default.resolve_expression(query, allow_joins, reuse, summarize, for_save, reuse_with_filtered_relation)
+            c.cases[pos] = case.resolve_expression(
+                query, allow_joins, reuse, summarize, for_save, reuse_with_filtered_relation
+            )
+        c.default = c.default.resolve_expression(
+            query, allow_joins, reuse, summarize, for_save, reuse_with_filtered_relation
+        )
         return c
 
     def copy(self):
@@ -1016,7 +1049,10 @@ class Subquery(Expression):
         clone.queryset = clone.queryset.all()
         return clone
 
-    def resolve_expression(self, query=None, allow_joins=True, reuse=None, summarize=False, for_save=False, reuse_with_filtered_relation=False):
+    def resolve_expression(
+        self, query=None, allow_joins=True, reuse=None,
+        summarize=False, for_save=False, reuse_with_filtered_relation=False
+    ):
         clone = self.copy()
         clone.is_summary = summarize
         clone.queryset.query.bump_prefix(query)

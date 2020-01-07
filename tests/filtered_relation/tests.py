@@ -1,6 +1,7 @@
 from django.db import connection, transaction
-from django.db.models import Case, Count, F, FilteredRelation, Q, When, Value, BooleanField
-from django.db.models.functions import Concat, Coalesce
+from django.db.models import (
+    BooleanField, Case, Count, F, FilteredRelation, Q, When,
+)
 from django.test import TestCase
 from django.test.testcases import skipUnlessDBFeature
 
@@ -338,13 +339,13 @@ class FilteredRelationTests(TestCase):
                 'favorite_by_worked_with_editor': False
             },
             {
-                'book__title':  self.book2.title,
+                'book__title': self.book2.title,
                 'author': self.author2.name,
                 'book_editor_name': self.editor_b.name,
                 'favorite_by_worked_with_editor': False
             },
             {
-                'book__title':  self.book3.title,
+                'book__title': self.book3.title,
                 'author': self.author2.name,
                 'book_editor_name': self.editor_b.name,
                 'favorite_by_worked_with_editor': False

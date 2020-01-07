@@ -1384,7 +1384,9 @@ class Query:
                     filtered_relation = self._filtered_relations[name]
                     if LOOKUP_SEP in filtered_relation.relation_name:
                         parts = filtered_relation.relation_name.split(LOOKUP_SEP)
-                        filtered_relation_path, field, filtered_relation_targets, filtered_relation_lookup_parts = self.names_to_path(parts, opts, allow_many, fail_on_missing)
+                        filtered_relation_path, field, _, _ = self.names_to_path(
+                            parts, opts, allow_many, fail_on_missing
+                        )
                         # don't want the last one, because that one gets added on below and would be duplicate
                         path.extend(filtered_relation_path[:-1])
                     else:
@@ -1584,7 +1586,10 @@ class Query:
             self.unref_alias(joins.pop())
         return targets, joins[-1], joins
 
-    def resolve_ref(self, name, allow_joins=True, reuse=None, summarize=False, simple_col=False, reuse_with_filtered_relation=False):
+    def resolve_ref(
+        self, name, allow_joins=True, reuse=None,
+        summarize=False, simple_col=False, reuse_with_filtered_relation=False
+    ):
         if not allow_joins and LOOKUP_SEP in name:
             raise FieldError("Joined field references are not permitted in this query")
         if name in self.annotations:
