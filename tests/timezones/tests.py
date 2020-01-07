@@ -32,6 +32,12 @@ from .models import (
     AllDayEvent, Event, MaybeEvent, Session, SessionEvent, Timestamp,
 )
 
+try:
+    import yaml
+    HAS_YAML = True
+except ImportError:
+    HAS_YAML = False
+
 # These tests use the EAT (Eastern Africa Time) and ICT (Indochina Time)
 # who don't have Daylight Saving Time, so we can represent them easily
 # with fixed offset timezones and use them directly as tzinfo in the
@@ -607,9 +613,10 @@ class SerializationTests(SimpleTestCase):
 
     # Backend-specific notes:
     # - JSON supports only milliseconds, microseconds will be truncated.
-    # - PyYAML dumps the UTC offset correctly for timezone-aware datetimes,
-    #   but when it loads this representation, it subtracts the offset and
-    #   returns a naive datetime object in UTC. See ticket #18867.
+    # - PyYAML dumps the UTC offset correctly for timezone-aware datetimes.
+    #   When PyYAML < 5.3 loads this representation, it subtracts the offset
+    #   and returns a naive datetime object in UTC. PyYAML 5.3+ loads timezones
+    #   correctly.
     # Tests are adapted to take these quirks into account.
 
     def assert_python_contains_datetime(self, objects, dt):
@@ -696,7 +703,10 @@ class SerializationTests(SimpleTestCase):
             data = serializers.serialize('yaml', [Event(dt=dt)], default_flow_style=None)
             self.assert_yaml_contains_datetime(data, "2011-09-01 17:20:30.405060+07:00")
             obj = next(serializers.deserialize('yaml', data)).object
-            self.assertEqual(obj.dt.replace(tzinfo=UTC), dt)
+            if HAS_YAML and yaml.__version__ < '5.3':
+                self.assertEqual(obj.dt.replace(tzinfo=UTC), dt)
+            else:
+                self.assertEqual(obj.dt, dt)
 
     def test_aware_datetime_in_utc(self):
         dt = datetime.datetime(2011, 9, 1, 10, 20, 30, tzinfo=UTC)
@@ -744,7 +754,10 @@ class SerializationTests(SimpleTestCase):
             data = serializers.serialize('yaml', [Event(dt=dt)], default_flow_style=None)
             self.assert_yaml_contains_datetime(data, "2011-09-01 13:20:30+03:00")
             obj = next(serializers.deserialize('yaml', data)).object
-            self.assertEqual(obj.dt.replace(tzinfo=UTC), dt)
+            if HAS_YAML and yaml.__version__ < '5.3':
+                self.assertEqual(obj.dt.replace(tzinfo=UTC), dt)
+            else:
+                self.assertEqual(obj.dt, dt)
 
     def test_aware_datetime_in_other_timezone(self):
         dt = datetime.datetime(2011, 9, 1, 17, 20, 30, tzinfo=ICT)
@@ -768,7 +781,10 @@ class SerializationTests(SimpleTestCase):
             data = serializers.serialize('yaml', [Event(dt=dt)], default_flow_style=None)
             self.assert_yaml_contains_datetime(data, "2011-09-01 17:20:30+07:00")
             obj = next(serializers.deserialize('yaml', data)).object
-            self.assertEqual(obj.dt.replace(tzinfo=UTC), dt)
+            if HAS_YAML and yaml.__version__ < '5.3':
+                self.assertEqual(obj.dt.replace(tzinfo=UTC), dt)
+            else:
+                self.assertEqual(obj.dt, dt)
 
 
 @override_settings(DATETIME_FORMAT='c', TIME_ZONE='Africa/Nairobi', USE_L10N=False, USE_TZ=True)
