@@ -1973,17 +1973,17 @@ directory as the main po file of a translation for a domain.
 
 .. note::
 
-Using this setting requires compiled catalog(s) for your locale(s), you may use
-:option:`django-admin makemessages --collect-base-catalogs<makemessages --collect-base-catalogs>`
-for collecting the bundled ones with Django and then
-:djadmin:`django-admin compilemessages <compilemessages>` to provide them.
+    Using this setting requires compiled catalog(s) for your locale(s), you may use
+    :option:`django-admin makemessages --collect-base-catalogs<makemessages --collect-base-catalogs>`
+    for collecting the bundled ones with Django and then
+    :djadmin:`django-admin compilemessages <compilemessages>` to provide them.
 
 .. warning::
 
-This setting will make Django not take into account the bundled catalogs, is up
-to the user to run
-:option:`django-admin makemessages --collect-base-catalogs<makemessages --collect-base-catalogs>`
-after an upgrade to collect any new messages.
+    This setting will make Django not take into account the bundled catalogs, is up
+    to the user to run
+    :option:`django-admin makemessages --collect-base-catalogs<makemessages --collect-base-catalogs>`
+    after an upgrade to collect any new messages.
 
 .. setting:: LOGGING
 
