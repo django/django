@@ -764,7 +764,11 @@ class Field(RegisterLookupMixin):
             if not getattr(cls, self.attname, None):
                 setattr(cls, self.attname, self.descriptor_class(self))
         if self.choices is not None:
-            if not hasattr(cls, 'get_%s_display' % self.name):
+            # Don't override a get_FOO_display() method defined explicitly on
+            # this class, but don't check methods derived from inheritance, to
+            # allow overriding inherited choices. For more complex inheritance
+            # structures users should override contribute_to_class().
+            if 'get_%s_display' % self.name not in cls.__dict__:
                 setattr(
                     cls,
                     'get_%s_display' % self.name,
