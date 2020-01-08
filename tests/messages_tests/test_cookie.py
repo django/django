@@ -95,6 +95,20 @@ class CookieTests(BaseTests, SimpleTestCase):
         # The message actually contains what we expect.
         self.assertEqual(list(storage), [])
 
+    def test_decode_older_encoding_format(self):
+        """
+        Before Django 3.1, the cookie content was hashed with 'sha1' and was
+        not prefixed with the algorithm name.
+        """
+        request = self.get_request()
+        storage = self.storage_class(request)
+        storage.hash_algorithm = 'sha1'
+        example_messages = ['test', 'me']
+        encoded_data = storage._encode(example_messages)
+        # Strip 'sha1$' prefix from the data
+        storage.request.COOKIES = {CookieStorage.cookie_name: encoded_data[5:]}
+        self.assertEqual(list(storage), example_messages)
+
     def test_max_cookie_length(self):
         """
         If the data exceeds what is allowed in a cookie, older messages are

@@ -3,7 +3,9 @@ import json
 from django.conf import settings
 from django.contrib.messages.storage.base import BaseStorage, Message
 from django.http import SimpleCookie
-from django.utils.crypto import constant_time_compare, salted_hmac
+from django.utils.crypto import (
+    InvalidAlgorithm, constant_time_compare, salted_hmac,
+)
 from django.utils.safestring import SafeData, mark_safe
 
 
@@ -59,6 +61,7 @@ class CookieStorage(BaseStorage):
     # restrict the session cookie to 1/2 of 4kb. See #18781.
     max_cookie_size = 2048
     not_finished = '__messagesnotfinished__'
+    hash_algorithm = 'blake2b'
 
     def _get(self, *args, **kwargs):
         """
@@ -120,13 +123,13 @@ class CookieStorage(BaseStorage):
         self._update_cookie(encoded_data, response)
         return unstored_messages
 
-    def _hash(self, value):
+    def _hash(self, value, algorithm=None):
         """
         Create an HMAC/SHA1 hash based on the value and the project setting's
         SECRET_KEY, modified to make it unique for the present purpose.
         """
         key_salt = 'django.contrib.messages'
-        return salted_hmac(key_salt, value).hexdigest()
+        return salted_hmac(key_salt, value, algorithm=algorithm or self.hash_algorithm).hexdigest()
 
     def _encode(self, messages, encode_empty=False):
         """
@@ -139,7 +142,7 @@ class CookieStorage(BaseStorage):
         if messages or encode_empty:
             encoder = MessageEncoder(separators=(',', ':'))
             value = encoder.encode(messages)
-            return '%s$%s' % (self._hash(value), value)
+            return '%s$%s$%s' % (self.hash_algorithm, self._hash(value), value)
 
     def _decode(self, data):
         """
@@ -150,16 +153,23 @@ class CookieStorage(BaseStorage):
         """
         if not data:
             return None
-        bits = data.split('$', 1)
-        if len(bits) == 2:
-            hash, value = bits
-            if constant_time_compare(hash, self._hash(value)):
-                try:
-                    # If we get here (and the JSON decode works), everything is
-                    # good. In any other case, drop back and return None.
-                    return json.loads(value, cls=MessageDecoder)
-                except json.JSONDecodeError:
-                    pass
+        bits = data.split('$', 2)
+        if len(bits) >= 2:
+            # Before Django 3.1, no algorithm prefix was set.
+            hash_algorithm = bits[0] if len(bits) == 3 else 'sha1'
+            _hash, value = bits[-2:]
+            try:
+                equals = constant_time_compare(_hash, self._hash(value, algorithm=hash_algorithm))
+            except InvalidAlgorithm:
+                pass
+            else:
+                if equals:
+                    try:
+                        # If we get here (and the JSON decode works), everything is
+                        # good. In any other case, drop back and return None.
+                        return json.loads(value, cls=MessageDecoder)
+                    except json.JSONDecodeError:
+                        pass
         # Mark the data as used (so it gets removed) since something was wrong
         # with the data.
         self.used = True
