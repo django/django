@@ -1,10 +1,13 @@
 import hashlib
 import unittest
 
-from django.utils.crypto import constant_time_compare, pbkdf2, salted_hmac
+from django.test import SimpleTestCase
+from django.utils.crypto import (
+    InvalidAlgorithm, constant_time_compare, pbkdf2, salted_hmac,
+)
 
 
-class TestUtilsCryptoMisc(unittest.TestCase):
+class TestUtilsCryptoMisc(SimpleTestCase):
 
     def test_constant_time_compare(self):
         # It's hard to test for constant time, just test the result.
@@ -27,10 +30,30 @@ class TestUtilsCryptoMisc(unittest.TestCase):
                 {'secret': 'x' * hashlib.sha1().block_size},
                 'bd3749347b412b1b0a9ea65220e55767ac8e96b0',
             ),
+            (
+                ('salt', 'value'),
+                {'algorithm': 'sha256'},
+                'ee0bf789e4e009371a5372c90f73fcf17695a8439c9108b0480f14e347b3f9ec',
+            ),
+            (
+                ('salt', 'value'),
+                {
+                    'algorithm': 'blake2b',
+                    'secret': 'x' * hashlib.blake2b().block_size,
+                },
+                'fc6b9800a584d40732a07fa33fb69c35211269441823bca431a143853c32f'
+                'e836cf19ab881689528ede647dac412170cd5d3407b44c6d0f44630690c54'
+                'ad3d58',
+            ),
         ]
         for args, kwargs, digest in tests:
             with self.subTest(args=args, kwargs=kwargs):
                 self.assertEqual(salted_hmac(*args, **kwargs).hexdigest(), digest)
+
+    def test_invalid_algorithm(self):
+        msg = "'whatever' is not an algorithm accepted by the hashlib module."
+        with self.assertRaisesMessage(InvalidAlgorithm, msg):
+            salted_hmac('salt', 'value', algorithm='whatever')
 
 
 class TestUtilsCryptoPBKDF2(unittest.TestCase):
