@@ -1140,13 +1140,12 @@ cache of all one-to-many relationships ahead of time. Example::
 Following relationships "backward"
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-If a model has a :class:`~django.db.models.ForeignKey`, instances of the
-foreign-key model will have access to a :class:`~django.db.models.Manager` that
-returns all instances of the first model. By default, this
-:class:`~django.db.models.Manager` is named ``FOO_set``, where ``FOO`` is the
-source model name, lowercased. This :class:`~django.db.models.Manager` returns
-``QuerySets``, which can be filtered and manipulated as described in the
-"Retrieving objects" section above.
+If model Foo has a :class:`~django.db.models.ForeignKey`, which points to model Bar, 
+instances of model Bar will have access to a :class:`~django.db.models.Manager` that
+manages all related instances of model Foo. By default, this :class:`~django.db.models.Manager` 
+is named ``Foo_set``, where ``Foo`` is the name of model Foo, lowercased. 
+This :class:`~django.db.models.Manager` returns ``QuerySets``, which can be filtered and 
+manipulated as described in the "Retrieving objects" section above.
 
 Example::
 
