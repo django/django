@@ -16,3 +16,7 @@ Bugfixes
 * Fixed a regression in Django 3.0 where ``QuerySet.values()`` and
   ``values_list()`` crashed if a queryset contained an aggregation and
   ``Exists()`` annotation (:ticket:`31136`).
+
+* Relaxed the system check added in Django 3.0 to reallow use of a sublanguage
+  in the :setting:`LANGUAGE_CODE` setting, when a base language is available in
+  Django but the sublanguage is not (:ticket:`31141`).
