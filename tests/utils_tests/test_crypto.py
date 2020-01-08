@@ -1,7 +1,9 @@
 import hashlib
 import unittest
 
-from django.utils.crypto import constant_time_compare, pbkdf2, salted_hmac
+from django.utils.crypto import (
+    InvalidAlgorithm, constant_time_compare, pbkdf2, salted_hmac,
+)
 
 
 class TestUtilsCryptoMisc(unittest.TestCase):
@@ -27,10 +29,18 @@ class TestUtilsCryptoMisc(unittest.TestCase):
                 {'secret': 'x' * hashlib.sha1().block_size},
                 'bd3749347b412b1b0a9ea65220e55767ac8e96b0',
             ),
+            (
+                ('salt', 'value'),
+                {'algorithm': 'sha256'},
+                'ee0bf789e4e009371a5372c90f73fcf17695a8439c9108b0480f14e347b3f9ec'
+            ),
         ]
         for args, kwargs, digest in tests:
             with self.subTest(args=args, kwargs=kwargs):
                 self.assertEqual(salted_hmac(*args, **kwargs).hexdigest(), digest)
+
+        with self.assertRaises(InvalidAlgorithm):
+            salted_hmac('salt', 'value', algorithm='whatever')
 
 
 class TestUtilsCryptoPBKDF2(unittest.TestCase):
