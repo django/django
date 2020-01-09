@@ -222,7 +222,7 @@ class DatabaseCreation(BaseDatabaseCreation):
             self.log('_create_test_user(): username = %s' % parameters['user'])
         statements = [
             """
-				ALTER SESSION set "_ORACLE_SCRIPT"=true
+               ALTER SESSION set "_ORACLE_SCRIPT"=true
             """,
             """CREATE USER %(user)s
                IDENTIFIED BY "%(password)s"
