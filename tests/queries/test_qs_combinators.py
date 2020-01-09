@@ -272,12 +272,14 @@ class QuerySetSetOperationTests(TestCase):
             for operation in (
                 'annotate',
                 'defer',
+                'delete',
                 'exclude',
                 'extra',
                 'filter',
                 'only',
                 'prefetch_related',
                 'select_related',
+                'update',
             ):
                 with self.subTest(combinator=combinator, operation=operation):
                     with self.assertRaisesMessage(
