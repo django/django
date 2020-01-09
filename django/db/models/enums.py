@@ -31,6 +31,7 @@ class ChoicesMeta(enum.EnumMeta):
         # that is passed in as "self" as the value to use when looking up the
         # label in the choices.
         cls.label = property(lambda self: cls._value2label_map_.get(self.value))
+        cls.do_not_call_in_templates = True
         return enum.unique(cls)
 
     def __contains__(cls, member):

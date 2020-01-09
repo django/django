@@ -20,3 +20,6 @@ Bugfixes
 * Relaxed the system check added in Django 3.0 to reallow use of a sublanguage
   in the :setting:`LANGUAGE_CODE` setting, when a base language is available in
   Django but the sublanguage is not (:ticket:`31141`).
+
+* Added support for using enumeration types ``TextChoices``,
+  ``IntegerChoices``, and ``Choices`` in templates (:ticket:`31154`).
