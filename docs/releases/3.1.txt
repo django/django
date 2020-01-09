@@ -158,6 +158,17 @@ Email
 * The :setting:`EMAIL_FILE_PATH` setting, used by the :ref:`file email backend
   <topic-email-file-backend>`, now supports :class:`pathlib.Path`.
 
+Error Reporting
+~~~~~~~~~~~~~~~
+
+* The new :attr:`.SafeExceptionReporterFilter.cleansed_substitute` and
+  :attr:`.SafeExceptionReporterFilter.hidden_settings` attributes allow
+  customization of sensitive settings filtering in exception reports.
+
+* The technical 404 debug view now respects
+  :setting:`DEFAULT_EXCEPTION_REPORTER_FILTER` when applying settings
+  filtering.
+
 File Storage
 ~~~~~~~~~~~~
 

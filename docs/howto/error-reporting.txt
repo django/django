@@ -262,25 +262,46 @@ attribute::
 
 Your custom filter class needs to inherit from
 :class:`django.views.debug.SafeExceptionReporterFilter` and may override the
-following methods:
+following attributes and methods:
 
 .. class:: SafeExceptionReporterFilter
 
-.. method:: SafeExceptionReporterFilter.is_active(request)
+    .. attribute:: cleansed_substitute
 
-    Returns ``True`` to activate the filtering operated in the other methods.
-    By default the filter is active if :setting:`DEBUG` is ``False``.
+        .. versionadded:: 3.1
 
-.. method:: SafeExceptionReporterFilter.get_post_parameters(request)
+        The string value to replace sensitive value with. By default it
+        replaces the values of sensitive variables with stars (`**********`).
 
-    Returns the filtered dictionary of POST parameters. By default it replaces
-    the values of sensitive parameters with stars (`**********`).
+    .. attribute:: hidden_settings
 
-.. method:: SafeExceptionReporterFilter.get_traceback_frame_variables(request, tb_frame)
+        .. versionadded:: 3.1
 
-    Returns the filtered dictionary of local variables for the given traceback
-    frame. By default it replaces the values of sensitive variables with stars
-    (`**********`).
+        A compiled regular expression object used to match settings considered
+        as sensitive. By default equivalent to::
+
+            import re
+
+            re.compile(r'API|TOKEN|KEY|SECRET|PASS|SIGNATURE', flags=re.IGNORECASE)
+
+    .. method:: is_active(request)
+
+        Returns ``True`` to activate the filtering in
+        :meth:`get_post_parameters` and :meth:`get_traceback_frame_variables`.
+        By default the filter is active if :setting:`DEBUG` is ``False``. Note
+        that sensitive settings are always filtered, as described in the
+        :setting:`DEBUG` documentation.
+
+    .. method:: get_post_parameters(request)
+
+        Returns the filtered dictionary of POST parameters. Sensitive values
+        are replaced with :attr:`cleansed_substitute`.
+
+    .. method:: get_traceback_frame_variables(request, tb_frame)
+
+        Returns the filtered dictionary of local variables for the given
+        traceback frame. Sensitive values are replaced with
+        :attr:`cleansed_substitute`.
 
 .. seealso::
 
