@@ -221,6 +221,9 @@ class DatabaseCreation(BaseDatabaseCreation):
         if verbosity >= 2:
             self.log('_create_test_user(): username = %s' % parameters['user'])
         statements = [
+            """
+				ALTER SESSION set "_ORACLE_SCRIPT"=true
+            """,
             """CREATE USER %(user)s
                IDENTIFIED BY "%(password)s"
                DEFAULT TABLESPACE %(tblspace)s
