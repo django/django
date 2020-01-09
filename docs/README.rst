@@ -13,6 +13,6 @@ To create an HTML version of the docs:
 
 The documentation in ``_build/html/index.html`` can then be viewed in a web browser.
 
-[1] http://docutils.sourceforge.net/rst.html
+.. [1] http://docutils.sourceforge.net/rst.html
 
-[2] http://sphinx-doc.org
+.. [2] http://sphinx-doc.org
