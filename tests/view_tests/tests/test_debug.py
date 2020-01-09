@@ -1224,6 +1224,24 @@ class ExceptionReporterFilterTests(ExceptionReportTestMixin, LoggingCaptureMixin
             {'login': 'cooper', 'password': reporter_filter.cleansed_substitute},
         )
 
+    def test_request_meta_filtering(self):
+        request = self.rf.get('/', HTTP_SECRET_HEADER='super_secret')
+        reporter_filter = SafeExceptionReporterFilter()
+        self.assertEqual(
+            reporter_filter.get_safe_request_meta(request)['HTTP_SECRET_HEADER'],
+            reporter_filter.cleansed_substitute,
+        )
+
+    def test_exception_report_uses_meta_filtering(self):
+        response = self.client.get('/raises500/', HTTP_SECRET_HEADER='super_secret')
+        self.assertNotIn(b'super_secret', response.content)
+        response = self.client.get(
+            '/raises500/',
+            HTTP_SECRET_HEADER='super_secret',
+            HTTP_X_REQUESTED_WITH='XMLHttpRequest',
+        )
+        self.assertNotIn(b'super_secret', response.content)
+
 
 class CustomExceptionReporterFilter(SafeExceptionReporterFilter):
     cleansed_substitute = 'XXXXXXXXXXXXXXXXXXXX'

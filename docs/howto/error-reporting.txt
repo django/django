@@ -277,8 +277,9 @@ following attributes and methods:
 
         .. versionadded:: 3.1
 
-        A compiled regular expression object used to match settings considered
-        as sensitive. By default equivalent to::
+        A compiled regular expression object used to match settings and
+        ``request.META`` values considered as sensitive. By default equivalent
+        to::
 
             import re
 
@@ -289,8 +290,9 @@ following attributes and methods:
         Returns ``True`` to activate the filtering in
         :meth:`get_post_parameters` and :meth:`get_traceback_frame_variables`.
         By default the filter is active if :setting:`DEBUG` is ``False``. Note
-        that sensitive settings are always filtered, as described in the
-        :setting:`DEBUG` documentation.
+        that sensitive ``request.META`` values are always filtered along with
+        sensitive setting values, as described in the :setting:`DEBUG`
+        documentation.
 
     .. method:: get_post_parameters(request)
 

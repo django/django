@@ -123,6 +123,14 @@ class SafeExceptionReporterFilter(ExceptionReporterFilter):
                 settings_dict[k] = self.cleanse_setting(k, getattr(settings, k))
         return settings_dict
 
+    def get_safe_request_meta(self, request):
+        """
+        Return a dictionary of request.META with sensitive values redacted.
+        """
+        if not hasattr(request, 'META'):
+            return {}
+        return {k: self.cleanse_setting(k, v) for k, v in request.META.items()}
+
     def is_active(self, request):
         """
         This filter is to add safety in production environments (i.e. DEBUG
@@ -296,6 +304,7 @@ class ExceptionReporter:
             'unicode_hint': unicode_hint,
             'frames': frames,
             'request': self.request,
+            'request_meta': self.filter.get_safe_request_meta(self.request),
             'user_str': user_str,
             'filtered_POST_items': list(self.filter.get_post_parameters(self.request).items()),
             'settings': self.filter.get_safe_settings(),

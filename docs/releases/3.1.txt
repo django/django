@@ -161,9 +161,13 @@ Email
 Error Reporting
 ~~~~~~~~~~~~~~~
 
+* :class:`django.views.debug.SafeExceptionReporterFilter` now filters sensitive
+  values from ``request.META`` in exception reports.
+
 * The new :attr:`.SafeExceptionReporterFilter.cleansed_substitute` and
   :attr:`.SafeExceptionReporterFilter.hidden_settings` attributes allow
-  customization of sensitive settings filtering in exception reports.
+  customization of sensitive settings and ``request.META`` filtering in
+  exception reports.
 
 * The technical 404 debug view now respects
   :setting:`DEFAULT_EXCEPTION_REPORTER_FILTER` when applying settings
