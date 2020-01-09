@@ -180,6 +180,14 @@ class ImageFieldTests(ImageFieldTestMixin, TestCase):
 
         loaded_p = pickle.loads(dump)
         self.assertEqual(p.mugshot, loaded_p.mugshot)
+        self.assertEqual(p.mugshot.url, loaded_p.mugshot.url)
+        self.assertEqual(p.mugshot.storage, loaded_p.mugshot.storage)
+        self.assertEqual(p.mugshot.instance, loaded_p.mugshot.instance)
+        self.assertEqual(p.mugshot.field, loaded_p.mugshot.field)
+
+        mugshot_dump = pickle.dumps(p.mugshot)
+        loaded_mugshot = pickle.loads(mugshot_dump)
+        self.assertEqual(p.mugshot, loaded_mugshot)
 
     def test_defer(self):
         self.PersonModel.objects.create(name='Joe', mugshot=self.file1)
