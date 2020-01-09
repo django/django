@@ -67,23 +67,7 @@ def get_exception_reporter_filter(request):
     return getattr(request, 'exception_reporter_filter', default_filter)
 
 
-class ExceptionReporterFilter:
-    """
-    Base for all exception reporter filter classes. All overridable hooks
-    contain lenient default behaviors.
-    """
-
-    def get_post_parameters(self, request):
-        if request is None:
-            return {}
-        else:
-            return request.POST
-
-    def get_traceback_frame_variables(self, request, tb_frame):
-        return list(tb_frame.f_locals.items())
-
-
-class SafeExceptionReporterFilter(ExceptionReporterFilter):
+class SafeExceptionReporterFilter:
     """
     Use annotations made by the sensitive_post_parameters and
     sensitive_variables decorators to filter out sensitive information.
