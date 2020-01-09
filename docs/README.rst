@@ -11,7 +11,8 @@ To create an HTML version of the docs:
 * In this docs/ directory, type ``make html`` (or ``make.bat html`` on
   Windows) at a shell prompt.
 
-The documentation in ``_build/html/index.html`` can then be viewed in a web browser.
+The documentation in ``_build/html/index.html`` can then be viewed in a web
+browser.
 
-.. _ReST: http://docutils.sourceforge.net/rst.html
-.. _Sphinx: http://sphinx-doc.org
+.. _ReST: https://docutils.sourceforge.io/rst.html
+.. _Sphinx: https://sphinx-doc.org
