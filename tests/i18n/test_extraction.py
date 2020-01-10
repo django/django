@@ -559,7 +559,7 @@ class CollectBaseCatalogsTests(ExtractorTests):
                             os.path.join(self.test_dir, 'django_dir')):
                 out = StringIO()
                 management.call_command(
-                    'makemessages', locale=['es'], collect_base_catalogs='settings',
+                    'makemessages', locale=['es'], collect_base_catalogs='default-path',
                     stdout=out, verbosity=1
                 )
                 with open(self.PO_FILE % 'es', encoding='utf-8') as fp:
@@ -579,7 +579,10 @@ class CollectBaseCatalogsTests(ExtractorTests):
         with override_settings(LOCALE_ROOT=os.path.join(self.test_dir, 'locale_root')):
             with mock.patch('django.core.management.commands.makemessages.Command.django_dir',
                             os.path.join(self.test_dir, 'django_dir')):
-                management.call_command('makemessages', locale=['cs'], collect_base_catalogs='settings', verbosity=0)
+                management.call_command(
+                    'makemessages', locale=['cs'], collect_base_catalogs='default-path',
+                    verbosity=0
+                )
                 with open(self.PO_FILE % 'cs', encoding='utf-8') as fp:
                     po_contents = fp.read()
                     should_contain = "Contributors to this catalog are listed in"
@@ -597,7 +600,10 @@ class CollectBaseCatalogsTests(ExtractorTests):
         with override_settings(LOCALE_ROOT=os.path.join(self.test_dir, 'locale_root')):
             with mock.patch('django.core.management.commands.makemessages.Command.django_dir',
                             os.path.join(self.test_dir, 'django_dir')):
-                management.call_command('makemessages', locale=['xxx'], collect_base_catalogs='settings', verbosity=0)
+                management.call_command(
+                    'makemessages', locale=['xxx'], collect_base_catalogs='default-path',
+                    verbosity=0
+                )
                 should_contain = """
                     "Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
                     msgid "Love"
@@ -611,7 +617,7 @@ class CollectBaseCatalogsTests(ExtractorTests):
         msg = ("currently makemessages only supports collecting base catalogs "
                "with the LOCALE_ROOT setting defined.")
         with self.assertRaisesMessage(CommandError, msg):
-            management.call_command('makemessages', collect_base_catalogs='settings', verbosity=0)
+            management.call_command('makemessages', collect_base_catalogs='default-path', verbosity=0)
 
 
 class ComplyPluralFormsTests(ExtractorTests):
