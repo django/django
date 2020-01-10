@@ -1,7 +1,12 @@
-from django.conf import settings
-from django.utils.translation.trans_real import language_code_re
+import re
+import warnings
 
-from . import Error, Tags, register
+from django.conf import settings
+from django.utils.translation.trans_real import (
+    activate, deactivate, get_language, reset_translations_cache, language_code_re,
+)
+
+from . import Error, Tags, Warning, register
 
 E001 = Error(
     'You have provided an invalid value for the LANGUAGE_CODE setting: {!r}.',
@@ -22,6 +27,11 @@ E004 = Error(
     'You have provided a value for the LANGUAGE_CODE setting that is not in '
     'the LANGUAGES setting.',
     id='translation.E004',
+)
+
+W005 = Warning(
+    'Inconsistent plural forms across catalogs for language {!r} (unmerged catalogs).',
+    id='translation.W005',
 )
 
 
@@ -58,4 +68,36 @@ def check_language_settings_consistent(app_configs, **kwargs):
     available_tags = {i for i, _ in settings.LANGUAGES} | {'en-us'}
     if settings.LANGUAGE_CODE not in available_tags:
         return [E004]
+    return []
+
+
+@register(Tags.translation)
+def check_plural_forms_consistency(app_configs, **kwargs):
+    """
+    Warns if plural forms are not consistent for languages in the LANGUAGES setting.
+    """
+    if settings.USE_I18N:
+        with warnings.catch_warnings(record=True) as ws:
+            warnings.simplefilter("always")
+            saved_locale = get_language()
+            try:
+                warns = []
+                deactivate()
+                reset_translations_cache()
+                if settings.LANGUAGES:
+                    for lang, _ in settings.LANGUAGES:
+                        activate(lang)
+                else:
+                    activate(settings.LANGUAGE_CODE)
+                if len(ws) > 0:
+                    for warn in ws:
+                        m = re.search(r'(?<=Locale: )(.*)(?=\n)', str(warn.message))
+                        if m:
+                            tag = m.group(0)
+                            warns.append(Warning(W005.msg.format(tag), id=W005.id))
+                    return warns
+            finally:
+                reset_translations_cache()
+                if saved_locale:
+                    activate(saved_locale)
     return []

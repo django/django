@@ -244,6 +244,15 @@ def translation(language):
     return _translations[language]
 
 
+def reset_translations_cache():
+    """
+    Clears the translations cache dict.
+    """
+    global _translations
+    if _translations:
+        _translations.clear()
+
+
 def activate(language):
     """
     Fetch the translation object for a given language and install it as the

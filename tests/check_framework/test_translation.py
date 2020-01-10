@@ -1,9 +1,14 @@
-from django.core.checks import Error
+import os
+
+from django.core.checks import Error, Warning
 from django.core.checks.translation import (
     check_language_settings_consistent, check_setting_language_code,
     check_setting_languages, check_setting_languages_bidi,
+    check_plural_forms_consistency
 )
 from django.test import SimpleTestCase
+
+here = os.path.dirname(os.path.abspath(__file__))
 
 
 class TranslationCheckTests(SimpleTestCase):
@@ -84,3 +89,30 @@ class TranslationCheckTests(SimpleTestCase):
             self.assertEqual(check_language_settings_consistent(None), [
                 Error(msg, id='translation.E004'),
             ])
+
+    def test_inconsistent_plural_forms_in_languages(self):
+        languages = [('cs', 'Czech'), ('fr', 'French'), ('sk', 'Slovak')]
+        msg = 'Inconsistent plural forms across catalogs for language {!r} (unmerged catalogs).'
+        with self.settings(
+                LANGUAGE_CODE='cs',
+                LANGUAGES=languages,
+                LOCALE_PATHS=[os.path.join(here, 'locale_dir'), ]):
+            expected_warnings = [
+                Warning(msg.format(lang), id='translation.W005') for lang in ['cs', 'fr']
+            ]
+            received_warnings = check_plural_forms_consistency(None)
+            for warn in received_warnings:
+                self.assertIn(warn, expected_warnings)
+                expected_warnings.remove(warn)
+                received_warnings.remove(warn)
+            self.assertEqual(expected_warnings, received_warnings, [])
+
+    def test_inconsistent_plural_forms_in_language_code(self):
+        msg = 'Inconsistent plural forms across catalogs for language {!r} (unmerged catalogs).'
+        with self.settings(
+                LANGUAGE_CODE='cs',
+                LANGUAGES=None,
+                LOCALE_PATHS=[os.path.join(here, 'locale_dir'), ]):
+            expected_warnings = [Warning(msg.format('cs'), id='translation.W005'), ]
+            received_warnings = check_plural_forms_consistency(None)
+            self.assertEqual(expected_warnings, received_warnings)
