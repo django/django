@@ -199,39 +199,42 @@ class Settings(BaseSettings):
     def __init__(self, settings_module):
         super().__init__(global_settings)
         self.SETTINGS_MODULE = settings_module
-
-        mod = importlib.import_module(self.SETTINGS_MODULE)
-
-        tuple_settings = (
-            "INSTALLED_APPS",
-            "TEMPLATE_DIRS",
-            "LOCALE_PATHS",
-        )
-        for setting in dir(mod):
+        module = importlib.import_module(settings_module)
+        for setting in dir(module):
             if setting.isupper():
-                setting_value = getattr(mod, setting)
+                setattr(self, setting, getattr(module, setting))
+        self._check_tuple_settings()
+        self._check_secret_key()
+        self._check_password_reset_timeout_days()
+        self._check_time_zone()
 
-                if (setting in tuple_settings and
-                        not isinstance(setting_value, (list, tuple))):
-                    raise ImproperlyConfigured("The %s setting must be a list or a tuple. " % setting)
-                setattr(self, setting, setting_value)
+    def _check_tuple_settings(self):
+        for setting in ('INSTALLED_APPS', 'TEMPLATE_DIRS', 'LOCALE_PATHS'):
+            if not self.is_overridden(setting):
+                continue
+            value = getattr(self, setting)
+            if not isinstance(value, (list, tuple)):
+                raise ImproperlyConfigured("The {} setting must be a list or a tuple.".format(setting))
 
+    def _check_secret_key(self):
         if not self.SECRET_KEY:
             raise ImproperlyConfigured("The SECRET_KEY setting must not be empty.")
 
+    def _check_password_reset_timeout_days(self):
         if self.is_overridden('PASSWORD_RESET_TIMEOUT_DAYS') and self.is_overridden('PASSWORD_RESET_TIMEOUT'):
             raise ImproperlyConfigured(
-                'PASSWORD_RESET_TIMEOUT_DAYS/PASSWORD_RESET_TIMEOUT are '
-                'mutually exclusive.'
+                "PASSWORD_RESET_TIMEOUT_DAYS/PASSWORD_RESET_TIMEOUT are "
+                "mutually exclusive."
             )
 
+    def _check_time_zone(self):
         if hasattr(time, 'tzset') and self.TIME_ZONE:
             # When we can, attempt to validate the timezone. If we can't find
             # this file, no check happens and it's harmless.
             zoneinfo_root = Path('/usr/share/zoneinfo')
-            zone_info_file = zoneinfo_root.joinpath(*self.TIME_ZONE.split('/'))
-            if zoneinfo_root.exists() and not zone_info_file.exists():
-                raise ValueError("Incorrect timezone setting: %s" % self.TIME_ZONE)
+            zoneinfo_file = zoneinfo_root.joinpath(*self.TIME_ZONE.split('/'))
+            if zoneinfo_root.exists() and not zoneinfo_file.exists():
+                raise ValueError("Incorrect timezone setting: {}".format(self.TIME_ZONE))
             # Move the time zone info into os.environ. See ticket #2315 for why
             # we don't do this unconditionally (breaks Windows).
             os.environ['TZ'] = self.TIME_ZONE
