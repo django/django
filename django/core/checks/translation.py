@@ -4,9 +4,8 @@ import warnings
 from django.conf import settings
 from django.utils.translation.trans_real import (
     activate, deactivate, get_language, get_supported_language_variant,
-  reset_translations_cache, language_code_re,
+    language_code_re, reset_translations_cache,
 )
-from django.utils.translation.trans_real import language_code_re
 
 from . import Error, Tags, Warning, register
 

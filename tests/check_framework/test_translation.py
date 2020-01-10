@@ -2,9 +2,9 @@ import os
 
 from django.core.checks import Error, Warning
 from django.core.checks.translation import (
-    check_language_settings_consistent, check_setting_language_code,
-    check_setting_languages, check_setting_languages_bidi,
-    check_plural_forms_consistency
+    check_language_settings_consistent, check_plural_forms_consistency,
+    check_setting_language_code, check_setting_languages,
+    check_setting_languages_bidi,
 )
 from django.test import SimpleTestCase, override_settings
 

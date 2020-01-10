@@ -285,7 +285,7 @@ class Command(BaseCommand):
         parser.add_argument(
             '--collect-base-catalogs', '-cbc',
             choices=('default-path', 'all-bundled'), nargs='?',
-            const='default-path', 
+            const='default-path',
             help="Collects Django's base catalogs into LOCALE_ROOT."
         )
         parser.add_argument(
