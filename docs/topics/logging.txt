@@ -164,10 +164,9 @@ is a parent of the ``project.interesting`` logger.
 Why is the hierarchy important? Well, because loggers can be set to
 *propagate* their logging calls to their parents. In this way, you can
 define a single set of handlers at the root of a logger tree, and
-capture all logging calls in the subtree of loggers. A logging handler
-defined in the ``project`` namespace will catch all logging messages
-issued on the ``project.interesting`` and
-``project.interesting.stuff`` loggers.
+capture all logging calls in the subtree of loggers. A logger defined
+in the ``project`` namespace will catch all logging messages issued on
+the ``project.interesting`` and ``project.interesting.stuff`` loggers.
 
 This propagation can be controlled on a per-logger basis. If
 you don't want a particular logger to propagate to its parents, you

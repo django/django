@@ -228,9 +228,8 @@ model. In those situations, Django has to be able to see all the objects for
 the model it is fetching, so that *anything* which is referred to can be
 retrieved.
 
-If you override the ``get_queryset()`` method and filter out any rows, Django
-will return incorrect results. Don't do that. A manager that filters results
-in ``get_queryset()`` is not appropriate for use as a base manager.
+Therefore, you should not override ``get_queryset()`` to filter out any rows.
+If you do so, Django will return incomplete results.
 
 .. _calling-custom-queryset-methods-from-manager:
 

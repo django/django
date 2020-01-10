@@ -21,11 +21,9 @@ DATETIME_INPUT_FORMATS = [
     '%d.%m.%Y %H:%M:%S',     # '25.10.2006 14:30:59'
     '%d.%m.%Y %H:%M:%S.%f',  # '25.10.2006 14:30:59.000200'
     '%d.%m.%Y %H:%M',        # '25.10.2006 14:30'
-    '%d.%m.%Y',              # '25.10.2006'
     '%d-%B, %Y-yil %H:%M:%S',     # '25-Oktabr, 2006-yil 14:30:59'
     '%d-%B, %Y-yil %H:%M:%S.%f',  # '25-Oktabr, 2006-yil 14:30:59.000200'
     '%d-%B, %Y-yil %H:%M',        # '25-Oktabr, 2006-yil 14:30'
-    '%d-%B, %Y-yil',              # '25-Oktabr, 2006-yil'
 ]
 DECIMAL_SEPARATOR = ','
 THOUSAND_SEPARATOR = '\xa0'  # non-breaking space

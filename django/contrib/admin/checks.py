@@ -1,3 +1,4 @@
+import collections
 from itertools import chain
 
 from django.apps import apps
@@ -985,15 +986,20 @@ class ModelAdminChecks(BaseModelAdminChecks):
 
     def _check_actions_uniqueness(self, obj):
         """Check that every action has a unique __name__."""
-        names = [name for _, name, _ in obj._get_base_actions()]
-        if len(names) != len(set(names)):
-            return [checks.Error(
-                '__name__ attributes of actions defined in %s must be '
-                'unique.' % obj.__class__,
-                obj=obj.__class__,
-                id='admin.E130',
-            )]
-        return []
+        errors = []
+        names = collections.Counter(name for _, name, _ in obj._get_base_actions())
+        for name, count in names.items():
+            if count > 1:
+                errors.append(checks.Error(
+                    '__name__ attributes of actions defined in %s must be '
+                    'unique. Name %r is not unique.' % (
+                        obj.__class__.__name__,
+                        name,
+                    ),
+                    obj=obj.__class__,
+                    id='admin.E130',
+                ))
+        return errors
 
 
 class InlineModelAdminChecks(BaseModelAdminChecks):

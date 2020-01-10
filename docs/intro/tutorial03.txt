@@ -125,13 +125,6 @@ view function. The ``:question_id>`` part of the string defines the name that
 will be used to identify the matched pattern, and the ``<int:`` part is a
 converter that determines what patterns should match this part of the URL path.
 
-There's no need to add URL cruft such as ``.html`` -- unless you want to, in
-which case you can do something like this::
-
-    path('polls/latest.html', views.index),
-
-But, don't do that. It's silly.
-
 Write views that actually do something
 ======================================
 

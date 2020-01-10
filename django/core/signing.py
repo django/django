@@ -145,7 +145,6 @@ def loads(s, key=None, salt='django.core.signing', serializer=JSONSerializer, ma
 class Signer:
 
     def __init__(self, key=None, sep=':', salt=None):
-        # Use of native strings in all versions of Python
         self.key = key or settings.SECRET_KEY
         self.sep = sep
         if _SEP_UNSAFE.match(self.sep):

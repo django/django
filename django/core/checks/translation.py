@@ -3,8 +3,10 @@ import warnings
 
 from django.conf import settings
 from django.utils.translation.trans_real import (
-    activate, deactivate, get_language, reset_translations_cache, language_code_re,
+    activate, deactivate, get_language, get_supported_language_variant,
+  reset_translations_cache, language_code_re,
 )
+from django.utils.translation.trans_real import language_code_re
 
 from . import Error, Tags, Warning, register
 
@@ -65,8 +67,9 @@ def check_setting_languages_bidi(app_configs, **kwargs):
 @register(Tags.translation)
 def check_language_settings_consistent(app_configs, **kwargs):
     """Error if language settings are not consistent with each other."""
-    available_tags = {i for i, _ in settings.LANGUAGES} | {'en-us'}
-    if settings.LANGUAGE_CODE not in available_tags:
+    try:
+        get_supported_language_variant(settings.LANGUAGE_CODE)
+    except LookupError:
         return [E004]
     return []
 

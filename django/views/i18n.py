@@ -31,26 +31,31 @@ def set_language(request):
     redirect to the page in the request (the 'next' parameter) without changing
     any state.
     """
-    next = request.POST.get('next', request.GET.get('next'))
+    next_url = request.POST.get('next', request.GET.get('next'))
     if (
-        (next or not request.is_ajax()) and
+        (next_url or not request.is_ajax()) and
         not url_has_allowed_host_and_scheme(
-            url=next, allowed_hosts={request.get_host()}, require_https=request.is_secure(),
+            url=next_url,
+            allowed_hosts={request.get_host()},
+            require_https=request.is_secure(),
         )
     ):
-        next = request.META.get('HTTP_REFERER')
-        next = next and unquote(next)  # HTTP_REFERER may be encoded.
+        next_url = request.META.get('HTTP_REFERER')
+        # HTTP_REFERER may be encoded.
+        next_url = next_url and unquote(next_url)
         if not url_has_allowed_host_and_scheme(
-            url=next, allowed_hosts={request.get_host()}, require_https=request.is_secure(),
+            url=next_url,
+            allowed_hosts={request.get_host()},
+            require_https=request.is_secure(),
         ):
-            next = '/'
-    response = HttpResponseRedirect(next) if next else HttpResponse(status=204)
+            next_url = '/'
+    response = HttpResponseRedirect(next_url) if next_url else HttpResponse(status=204)
     if request.method == 'POST':
         lang_code = request.POST.get(LANGUAGE_QUERY_PARAMETER)
         if lang_code and check_for_language(lang_code):
-            if next:
-                next_trans = translate_url(next, lang_code)
-                if next_trans != next:
+            if next_url:
+                next_trans = translate_url(next_url, lang_code)
+                if next_trans != next_url:
                     response = HttpResponseRedirect(next_trans)
             if hasattr(request, 'session'):
                 # Storing the language in the session is deprecated.

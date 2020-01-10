@@ -143,8 +143,8 @@ class ViewTest(SimpleTestCase):
         be named like a HTTP method.
         """
         msg = (
-            "You tried to pass in the %s method name as a keyword argument "
-            "to SimpleView(). Don't do that."
+            'The method name %s is not accepted as a keyword argument to '
+            'SimpleView().'
         )
         # Check each of the allowed method names
         for method in SimpleView.http_method_names:

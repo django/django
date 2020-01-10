@@ -158,6 +158,21 @@ Email
 * The :setting:`EMAIL_FILE_PATH` setting, used by the :ref:`file email backend
   <topic-email-file-backend>`, now supports :class:`pathlib.Path`.
 
+Error Reporting
+~~~~~~~~~~~~~~~
+
+* :class:`django.views.debug.SafeExceptionReporterFilter` now filters sensitive
+  values from ``request.META`` in exception reports.
+
+* The new :attr:`.SafeExceptionReporterFilter.cleansed_substitute` and
+  :attr:`.SafeExceptionReporterFilter.hidden_settings` attributes allow
+  customization of sensitive settings and ``request.META`` filtering in
+  exception reports.
+
+* The technical 404 debug view now respects
+  :setting:`DEFAULT_EXCEPTION_REPORTER_FILTER` when applying settings
+  filtering.
+
 File Storage
 ~~~~~~~~~~~~
 
@@ -178,6 +193,12 @@ Forms
   :class:`~django.forms.ModelChoiceIteratorValue` that can be used by widgets
   to access model instances. See :ref:`iterating-relationship-choices` for
   details.
+
+* :class:`django.forms.DateTimeField` now accepts dates in a subset of ISO 8601
+  datetime formats, including optional timezone (e.g. ``2019-10-10T06:47``,
+  ``2019-10-10T06:47:23+04:00``, or ``2019-10-10T06:47:23Z``). Additionally, it
+  now uses ``DATE_INPUT_FORMATS`` in addition to ``DATETIME_INPUT_FORMATS``
+  when converting a field input to a ``datetime`` value.
 
 Generic Views
 ~~~~~~~~~~~~~
@@ -288,7 +309,8 @@ Tests
 URLs
 ~~~~
 
-* ...
+* :ref:`Path converters <registering-custom-path-converters>` can now raise
+  ``ValueError`` in ``to_url()`` to indicate no match when reversing URLs.
 
 Utilities
 ~~~~~~~~~
@@ -396,6 +418,12 @@ Miscellaneous
 * The admin calendar widget now handles two-digit years according to the Open
   Group Specification, i.e. values between 69 and 99 are mapped to the previous
   century, and values between 0 and 68 are mapped to the current century.
+
+* Date-only formats are removed from the default list for
+  :setting:`DATETIME_INPUT_FORMATS`.
+
+* The :class:`~django.forms.FileInput` widget no longer renders with the
+  ``required`` HTML attribute when initial data exists.
 
 .. _deprecated-features-3.1:
 
