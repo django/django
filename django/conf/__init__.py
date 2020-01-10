@@ -105,8 +105,6 @@ class LazySettings(LazyObject):
             raise RuntimeError('Settings already configured.')
         holder = UserSettingsHolder(default_settings)
         for name, value in options.items():
-            if not name.isupper():
-                raise TypeError('Setting %r must be uppercase.' % name)
             setattr(holder, name, value)
         self._wrapped = holder
 
@@ -158,14 +156,48 @@ class LazySettings(LazyObject):
         return self._add_script_prefix(self.__getattr__('MEDIA_URL'))
 
 
-class Settings:
-    def __init__(self, settings_module):
-        # update this dict from global settings (but only for ALL_CAPS settings)
-        for setting in dir(global_settings):
-            if setting.isupper():
-                setattr(self, setting, getattr(global_settings, setting))
+class BaseSettings:
+    SETTINGS_MODULE = None
 
-        # store the settings module in case someone later cares
+    def __init__(self, default_settings):
+        self.__dict__['_explicit_settings'] = set()
+        self.__dict__['default_settings'] = default_settings
+        for setting in dir(default_settings):
+            if setting.isupper():
+                super().__setattr__(setting, getattr(default_settings, setting))
+
+    def __setattr__(self, name, value):
+        if not name.isupper():
+            raise AttributeError("Can't set non-upper setting {}".format(name))
+        if name == 'PASSWORD_RESET_TIMEOUT_DAYS':
+            self.PASSWORD_RESET_TIMEOUT = value * 60 * 60 * 24
+            warnings.warn(PASSWORD_RESET_TIMEOUT_DAYS_DEPRECATED_MSG, RemovedInDjango40Warning)
+        super().__setattr__(name, value)
+        self._explicit_settings.add(name)
+
+    def __delattr__(self, name):
+        if not name.isupper():
+            raise AttributeError("Can't delete non-upper setting {}".format(name))
+        super().__delattr__(name)
+        self._explicit_settings.discard(name)
+
+    def __repr__(self):
+        class_name = self.__class__.__name__
+        settings_module = self.SETTINGS_MODULE
+        if settings_module:
+            return '<{} "{}">'.format(class_name, settings_module)
+        else:
+            return '<{}>'.format(class_name)
+
+    def is_overridden(self, setting):
+        set_explicitly = setting in self._explicit_settings
+        set_on_default = getattr(self.default_settings, 'is_overridden', lambda s: False)(setting)
+        return set_explicitly or set_on_default
+
+
+class Settings(BaseSettings):
+    def __init__(self, settings_module):
+        super().__init__(global_settings)
         self.SETTINGS_MODULE = settings_module
 
         mod = importlib.import_module(self.SETTINGS_MODULE)
@@ -175,7 +207,6 @@ class Settings:
             "TEMPLATE_DIRS",
             "LOCALE_PATHS",
         )
-        self._explicit_settings = set()
         for setting in dir(mod):
             if setting.isupper():
                 setting_value = getattr(mod, setting)
@@ -184,19 +215,15 @@ class Settings:
                         not isinstance(setting_value, (list, tuple))):
                     raise ImproperlyConfigured("The %s setting must be a list or a tuple. " % setting)
                 setattr(self, setting, setting_value)
-                self._explicit_settings.add(setting)
 
         if not self.SECRET_KEY:
             raise ImproperlyConfigured("The SECRET_KEY setting must not be empty.")
 
-        if self.is_overridden('PASSWORD_RESET_TIMEOUT_DAYS'):
-            if self.is_overridden('PASSWORD_RESET_TIMEOUT'):
-                raise ImproperlyConfigured(
-                    'PASSWORD_RESET_TIMEOUT_DAYS/PASSWORD_RESET_TIMEOUT are '
-                    'mutually exclusive.'
-                )
-            setattr(self, 'PASSWORD_RESET_TIMEOUT', self.PASSWORD_RESET_TIMEOUT_DAYS * 60 * 60 * 24)
-            warnings.warn(PASSWORD_RESET_TIMEOUT_DAYS_DEPRECATED_MSG, RemovedInDjango40Warning)
+        if self.is_overridden('PASSWORD_RESET_TIMEOUT_DAYS') and self.is_overridden('PASSWORD_RESET_TIMEOUT'):
+            raise ImproperlyConfigured(
+                'PASSWORD_RESET_TIMEOUT_DAYS/PASSWORD_RESET_TIMEOUT are '
+                'mutually exclusive.'
+            )
 
         if hasattr(time, 'tzset') and self.TIME_ZONE:
             # When we can, attempt to validate the timezone. If we can't find
@@ -210,63 +237,9 @@ class Settings:
             os.environ['TZ'] = self.TIME_ZONE
             time.tzset()
 
-    def is_overridden(self, setting):
-        return setting in self._explicit_settings
 
-    def __repr__(self):
-        return '<%(cls)s "%(settings_module)s">' % {
-            'cls': self.__class__.__name__,
-            'settings_module': self.SETTINGS_MODULE,
-        }
-
-
-class UserSettingsHolder:
+class UserSettingsHolder(BaseSettings):
     """Holder for user configured settings."""
-    # SETTINGS_MODULE doesn't make much sense in the manually configured
-    # (standalone) case.
-    SETTINGS_MODULE = None
-
-    def __init__(self, default_settings):
-        """
-        Requests for configuration variables not in this class are satisfied
-        from the module specified in default_settings (if possible).
-        """
-        self.__dict__['_deleted'] = set()
-        self.default_settings = default_settings
-
-    def __getattr__(self, name):
-        if not name.isupper() or name in self._deleted:
-            raise AttributeError
-        return getattr(self.default_settings, name)
-
-    def __setattr__(self, name, value):
-        self._deleted.discard(name)
-        if name == 'PASSWORD_RESET_TIMEOUT_DAYS':
-            setattr(self, 'PASSWORD_RESET_TIMEOUT', value * 60 * 60 * 24)
-            warnings.warn(PASSWORD_RESET_TIMEOUT_DAYS_DEPRECATED_MSG, RemovedInDjango40Warning)
-        super().__setattr__(name, value)
-
-    def __delattr__(self, name):
-        self._deleted.add(name)
-        if hasattr(self, name):
-            super().__delattr__(name)
-
-    def __dir__(self):
-        return sorted(
-            s for s in [*self.__dict__, *dir(self.default_settings)]
-            if s not in self._deleted
-        )
-
-    def is_overridden(self, setting):
-        deleted = (setting in self._deleted)
-        set_locally = (setting in self.__dict__)
-        set_on_default = getattr(self.default_settings, 'is_overridden', lambda s: False)(setting)
-        return deleted or set_locally or set_on_default
-
-    def __repr__(self):
-        return '<%(cls)s>' % {
-            'cls': self.__class__.__name__,
-        }
 
 
 settings = LazySettings()
