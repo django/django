@@ -23,3 +23,6 @@ Bugfixes
 
 * Added support for using enumeration types ``TextChoices``,
   ``IntegerChoices``, and ``Choices`` in templates (:ticket:`31154`).
+
+* Fixed a system check to ensure the ``max_length`` attribute fits the longest
+  choice, when a named group contains only non-string values (:ticket:`31155`).
