@@ -457,7 +457,7 @@ configured:
   :setting:`OPTIONS <TEMPLATES-OPTIONS>` must be a string but got: ``{value}``
   (``{type}``).
 
-.. _translation-checks::
+.. _translation-checks:
 
 Translation
 -----------
