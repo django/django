@@ -94,7 +94,7 @@ h5 {
     letter-spacing: 1px;
 }
 
-ul li {
+ul > li {
     list-style-type: square;
     padding: 1px 0;
 }
