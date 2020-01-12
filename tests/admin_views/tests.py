@@ -1006,26 +1006,26 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
         )
         response = self.client.get(reverse('admin6:admin_views_article_changelist'))
         for field_name in expected_sortable_fields:
-            self.assertContains(response, '<th scope="col"  class="sortable column-%s">' % field_name)
+            self.assertContains(response, '<th scope="col" class="sortable column-%s">' % field_name)
         for field_name in expected_not_sortable_fields:
-            self.assertContains(response, '<th scope="col"  class="column-%s">' % field_name)
+            self.assertContains(response, '<th scope="col" class="column-%s">' % field_name)
 
     def test_get_sortable_by_columns_subset(self):
         response = self.client.get(reverse('admin6:admin_views_actor_changelist'))
-        self.assertContains(response, '<th scope="col"  class="sortable column-age">')
-        self.assertContains(response, '<th scope="col"  class="column-name">')
+        self.assertContains(response, '<th scope="col" class="sortable column-age">')
+        self.assertContains(response, '<th scope="col" class="column-name">')
 
     def test_sortable_by_no_column(self):
         expected_not_sortable_fields = ('title', 'book')
         response = self.client.get(reverse('admin6:admin_views_chapter_changelist'))
         for field_name in expected_not_sortable_fields:
-            self.assertContains(response, '<th scope="col"  class="column-%s">' % field_name)
-        self.assertNotContains(response, '<th scope="col"  class="sortable column')
+            self.assertContains(response, '<th scope="col" class="column-%s">' % field_name)
+        self.assertNotContains(response, '<th scope="col" class="sortable column')
 
     def test_get_sortable_by_no_column(self):
         response = self.client.get(reverse('admin6:admin_views_color_changelist'))
-        self.assertContains(response, '<th scope="col"  class="column-value">')
-        self.assertNotContains(response, '<th scope="col"  class="sortable column')
+        self.assertContains(response, '<th scope="col" class="column-value">')
+        self.assertNotContains(response, '<th scope="col" class="sortable column')
 
 
 @override_settings(TEMPLATES=[{

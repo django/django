@@ -10,7 +10,7 @@
 <thead>
 <tr>
 {% for header in result_headers %}
-<th scope="col" {{ header.class_attrib }}>
+<th scope="col"{{ header.class_attrib }}>
    {% if header.sortable %}
      {% if header.sort_priority > 0 %}
        <div class="sortoptions">
