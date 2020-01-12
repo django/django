@@ -365,12 +365,27 @@ def label_for_field(name, model, model_admin=None, return_attr=False, form=None)
         return label
 
 
-def help_text_for_field(name, model):
+def help_text_for_field(name, model, model_admin=None):
     help_text = ""
     try:
         field = _get_non_gfk_field(model._meta, name)
     except (FieldDoesNotExist, FieldIsAForeignKeyColumnName):
-        pass
+        attr = None
+        if callable(name):
+            attr = name
+        elif hasattr(model_admin, name):
+            attr = getattr(model_admin, name)
+        elif hasattr(model, name):
+            attr = getattr(model, name)
+
+        if hasattr(attr, 'help_text'):
+            help_text = attr.help_text
+        elif (
+            isinstance(attr, property) and
+            hasattr(attr, 'fget') and
+            hasattr(attr.fget, 'help_text')
+        ):
+            help_text = attr.fget.help_text
     else:
         if hasattr(field, 'help_text'):
             help_text = field.help_text

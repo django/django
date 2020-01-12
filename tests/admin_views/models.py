@@ -470,6 +470,14 @@ class Post(models.Model):
     def awesomeness_level(self):
         return "Very awesome."
 
+    awesomeness_level.help_text = 'Some help text for awesomeness level'
+
+    def post_posted_year(self):
+        return self.posted.year
+
+    post_posted_year.help_text = 'Some help text for posted year'
+    posted_year = property(post_posted_year)
+
 
 # Proxy model to test overridden fields attrs on Post model so as not to
 # interfere with other tests.

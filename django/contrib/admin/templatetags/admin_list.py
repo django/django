@@ -3,7 +3,7 @@ import datetime
 from django.contrib.admin.templatetags.admin_urls import add_preserved_filters
 from django.contrib.admin.utils import (
     display_for_field, display_for_value, get_fields_from_path,
-    label_for_field, lookup_field,
+    help_text_for_field, label_for_field, lookup_field,
 )
 from django.contrib.admin.views.main import (
     ALL_VAR, ORDER_VAR, PAGE_VAR, SEARCH_VAR,
@@ -114,6 +114,7 @@ def result_headers(cl):
             model_admin=cl.model_admin,
             return_attr=True
         )
+        help_text = help_text_for_field(field_name, cl.model, cl.model_admin)
         is_field_sortable = cl.sortable_by is None or field_name in cl.sortable_by
         if attr:
             field_name = _coerce_field_name(field_name, i)
@@ -123,6 +124,7 @@ def result_headers(cl):
             if field_name == 'action_checkbox':
                 yield {
                     "text": text,
+                    "help_text": help_text,
                     "class_attrib": mark_safe(' class="action-checkbox-column"'),
                     "sortable": False,
                 }
@@ -139,6 +141,7 @@ def result_headers(cl):
             # Not sortable
             yield {
                 'text': text,
+                'help_text': help_text,
                 'class_attrib': format_html(' class="column-{}"', field_name),
                 'sortable': False,
             }
@@ -184,6 +187,7 @@ def result_headers(cl):
 
         yield {
             "text": text,
+            "help_text": help_text,
             "sortable": True,
             "sorted": is_sorted,
             "ascending": order_type == "asc",

@@ -684,6 +684,11 @@ subclass::
           class PersonAdmin(admin.ModelAdmin):
               list_display = ('name', 'born_in_fifties')
 
+    * Django displays the :attr:`~django.forms.Field.help_text` of the model
+      field as a column tooltip in the changelist view. When using a callable,
+      a model method, or a ``ModelAdmin`` method, you can customize the column
+      tooltip by adding a ``help_text`` attribute to the callable.
+
     * The ``__str__()`` method is just as valid in ``list_display`` as any
       other model method, so it's perfectly OK to do this::
 
@@ -760,9 +765,9 @@ subclass::
 
     * Elements of ``list_display`` can also be properties. Please note however,
       that due to the way properties work in Python, setting
-      ``short_description`` or ``admin_order_field`` on a property is only
-      possible when using the ``property()`` function and **not** with the
-      ``@property`` decorator.
+      ``short_description``, ``help_text``, or ``admin_order_field`` on a
+      property is only possible when using the ``property()`` function and
+      **not** with the ``@property`` decorator.
 
       For example::
 
@@ -773,6 +778,7 @@ subclass::
               def my_property(self):
                   return self.first_name + ' ' + self.last_name
               my_property.short_description = "Full name of the person"
+              my_property.help_text = 'First name and last name'
               my_property.admin_order_field = 'last_name'
 
               full_name = property(my_property)
@@ -796,6 +802,9 @@ subclass::
       For example if you have ``first_name`` as a model field and
       as a ``ModelAdmin`` attribute, the model field will be used.
 
+    .. versionadded:: 3.2
+
+        Support for setting ``help_text`` was added.
 
 .. attribute:: ModelAdmin.list_display_links
 

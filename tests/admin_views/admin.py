@@ -56,6 +56,7 @@ def callable_year(dt_value):
 
 
 callable_year.admin_order_field = 'date'
+callable_year.help_text = 'Some help text for callable year'
 
 
 class ArticleInline(admin.TabularInline):
@@ -477,11 +478,13 @@ class PrePopulatedPostReadOnlyAdmin(admin.ModelAdmin):
 
 
 class PostAdmin(admin.ModelAdmin):
-    list_display = ['title', 'public']
+    list_display = [
+        'title', 'public', 'awesomeness_level', callable_year, 'posted_year',
+    ]
     readonly_fields = (
         'posted', 'awesomeness_level', 'coolness', 'value',
         'multiline', 'multiline_html', lambda obj: "foo",
-        'readonly_content',
+        'readonly_content', callable_year, 'posted_year',
     )
 
     inlines = [

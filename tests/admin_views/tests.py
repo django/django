@@ -744,6 +744,30 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
         response = self.client.get(reverse('admin:admin_views_post_changelist'))
         self.assertContains(response, 'icon-unknown.svg')
 
+    def test_change_list_help_text(self):
+        Post.objects.create(public=None)
+        response = self.client.get(reverse('admin:admin_views_post_changelist'))
+        self.assertContains(
+            response,
+            '<th scope="col" class="sortable column-title" '
+            'title="Some help text for the title (with Unicode ŠĐĆŽćžšđ)"',
+        )
+        self.assertContains(
+            response,
+            '<th scope="col" class="column-awesomeness_level" '
+            'title="Some help text for awesomeness level"',
+        )
+        self.assertContains(
+            response,
+            '<th scope="col" class="column-posted_year" '
+            'title="Some help text for posted year"',
+        )
+        self.assertContains(
+            response,
+            '<th scope="col" class="sortable column-callable_year" '
+            'title="Some help text for callable year"',
+        )
+
     def test_i18n_language_non_english_default(self):
         """
         Check if the JavaScript i18n view returns an empty language catalog
@@ -4858,7 +4882,7 @@ class ReadonlyTest(AdminFieldExtractionMixin, TestCase):
         self.assertContains(response, '<div class="form-row field-posted">')
         self.assertContains(response, '<div class="form-row field-value">')
         self.assertContains(response, '<div class="form-row">')
-        self.assertContains(response, '<div class="help">', 3)
+        self.assertContains(response, '<div class="help">', 6)
         self.assertContains(
             response,
             '<div class="help">Some help text for the title (with Unicode ŠĐĆŽćžšđ)</div>',
@@ -4874,7 +4898,21 @@ class ReadonlyTest(AdminFieldExtractionMixin, TestCase):
             '<div class="help">Some help text for the date (with Unicode ŠĐĆŽćžšđ)</div>',
             html=True
         )
-
+        self.assertContains(
+            response,
+            '<div class="help">Some help text for awesomeness level</div>',
+            html=True
+        )
+        self.assertContains(
+            response,
+            '<div class="help">Some help text for posted year</div>',
+            html=True
+        )
+        self.assertContains(
+            response,
+            '<div class="help">Some help text for callable year</div>',
+            html=True
+        )
         p = Post.objects.create(title="I worked on readonly_fields", content="Its good stuff")
         response = self.client.get(reverse('admin:admin_views_post_change', args=(p.pk,)))
         self.assertContains(response, "%d amount of cool" % p.pk)

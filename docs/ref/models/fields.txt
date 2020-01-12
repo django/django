@@ -394,7 +394,12 @@ These error messages often don't propagate to forms. See
 .. attribute:: Field.help_text
 
 Extra "help" text to be displayed with the form widget. It's useful for
-documentation even if your field isn't used on a form.
+documentation even if your field isn't used on a form. This property will be
+displayed as a tooltip in the admin changelist view.
+
+.. versionadded:: 3.2
+
+Display as a tooltip in the admin changelist view was added.
 
 Note that this value is *not* HTML-escaped in automatically-generated
 forms. This lets you include HTML in :attr:`~Field.help_text` if you so

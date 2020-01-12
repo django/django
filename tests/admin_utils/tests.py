@@ -340,10 +340,34 @@ class UtilsTests(SimpleTestCase):
             ('article', ''),
             ('unknown', ''),
             ('hist', 'History help text'),
+            ('test_from_model_with_override', 'Callable help text'),
+            ('test_from_model_property', 'Property help text'),
         ]
         for name, help_text in tests:
             with self.subTest(name=name):
                 self.assertEqual(help_text_for_field(name, Article), help_text)
+
+    def test_help_text_for_field_modeladmin(self):
+        class MockModelAdmin:
+            def my_property(self):
+                return 'admin property'
+
+            my_property.help_text = 'Admin property help text'
+            admin_property = property(my_property)
+
+            def admin_callable(self):
+                return 'admin callable'
+
+            admin_callable.help_text = 'Admin callable help text'
+
+        self.assertEqual(
+            help_text_for_field('admin_property', Article, model_admin=MockModelAdmin),
+            'Admin property help text',
+        )
+        self.assertEqual(
+            help_text_for_field('admin_callable', Article, model_admin=MockModelAdmin),
+            'Admin callable help text',
+        )
 
     def test_related_name(self):
         """

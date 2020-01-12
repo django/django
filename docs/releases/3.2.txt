@@ -40,6 +40,11 @@ Minor features
 * :attr:`.ModelAdmin.search_fields` now allows searching against quoted phrases
   with spaces.
 
+* The admin changelist now displays :attr:`~django.forms.Field.help_text` as a
+  column tooltip. You can specify it also for :attr:`.ModelAdmin.list_display`
+  value when using a callable, a model method, or a ``ModelAdmin`` method by
+  adding a ``help_text`` attribute to the callable.
+
 :mod:`django.contrib.admindocs`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

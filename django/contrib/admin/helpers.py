@@ -165,7 +165,7 @@ class AdminReadonlyField:
         if form._meta.help_texts and class_name in form._meta.help_texts:
             help_text = form._meta.help_texts[class_name]
         else:
-            help_text = help_text_for_field(class_name, form._meta.model)
+            help_text = help_text_for_field(field, form._meta.model, model_admin)
 
         self.field = {
             'name': class_name,

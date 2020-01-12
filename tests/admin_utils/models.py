@@ -31,6 +31,13 @@ class Article(models.Model):
     def test_from_model_with_override(self):
         return "nothing"
     test_from_model_with_override.short_description = "not What you Expect"
+    test_from_model_with_override.help_text = 'Callable help text'
+
+    def article_property(self):
+        return 'property'
+
+    article_property.help_text = 'Property help text'
+    test_from_model_property = property(article_property)
 
 
 class ArticleProxy(Article):
