@@ -430,6 +430,12 @@ class GeoLookupTest(TestCase):
             with self.subTest(lookup=lookup):
                 self.assertNotIn(null, State.objects.filter(**{'poly__%s' % lookup: geom}))
 
+    def test_wkt_string_in_lookup(self):
+        # Valid WKT strings don't emit error logs.
+        with self.assertRaisesMessage(AssertionError, 'no logs'):
+            with self.assertLogs('django.contrib.gis', 'ERROR'):
+                State.objects.filter(poly__intersects='LINESTRING(0 0, 1 1, 5 5)')
+
     @skipUnlessDBFeature("supports_relate_lookup")
     def test_relate_lookup(self):
         "Testing the 'relate' lookup type."
