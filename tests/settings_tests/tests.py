@@ -321,7 +321,7 @@ class SettingsTests(SimpleTestCase):
 
     def test_nonupper_settings_prohibited_in_configure(self):
         s = LazySettings()
-        with self.assertRaisesMessage(TypeError, "Setting 'foo' must be uppercase."):
+        with self.assertRaisesMessage(AttributeError, "Can't set non-upper setting foo"):
             s.configure(foo='bar')
 
     def test_nonupper_settings_ignored_in_default_settings(self):
@@ -412,9 +412,11 @@ class IsOverriddenTest(SimpleTestCase):
             del sys.modules['fake_settings_module']
 
     def test_override(self):
-        self.assertFalse(settings.is_overridden('ALLOWED_HOSTS'))
-        with override_settings(ALLOWED_HOSTS=[]):
-            self.assertTrue(settings.is_overridden('ALLOWED_HOSTS'))
+        lazy_settings = LazySettings()
+        lazy_settings.configure()
+        self.assertFalse(lazy_settings.is_overridden('ALLOWED_HOSTS'))
+        lazy_settings.ALLOWED_HOSTS = []
+        self.assertTrue(lazy_settings.is_overridden('ALLOWED_HOSTS'))
 
     def test_unevaluated_lazysettings_repr(self):
         lazy_settings = LazySettings()
