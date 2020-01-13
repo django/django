@@ -1,6 +1,7 @@
 import errno
 import os
 import re
+import signal
 import socket
 import sys
 from datetime import datetime
@@ -12,6 +13,11 @@ from django.core.servers.basehttp import (
 )
 from django.utils import autoreload
 from django.utils.regex_helper import _lazy_re_compile
+
+try:
+    import termios
+except ImportError:
+    termios = None
 
 naiveip_re = _lazy_re_compile(r"""^(?:
 (?P<addr>
@@ -33,6 +39,8 @@ class Command(BaseCommand):
     default_port = '8000'
     protocol = 'http'
     server_cls = WSGIServer
+
+    _orig_term_attrs = None
 
     def add_arguments(self, parser):
         parser.add_argument(
@@ -104,6 +112,33 @@ class Command(BaseCommand):
         else:
             self.inner_run(None, **options)
 
+    def _handle_term_state(self):
+        """
+        Save/restore initial terminal state, which is important for echo mode
+        (PDB), and Ctrl-C (pdb++ with pyrepl).
+
+        Disables SIGTTOU during restoring to avoid "suspended (tty output)"
+        with backgrounded process (#15880).
+        """
+        if not termios or not sys.stdin.isatty():
+            return
+
+        if not self._orig_term_attrs:
+            import atexit
+
+            self._orig_term_attrs = termios.tcgetattr(sys.stdin)
+            atexit.register(self._handle_term_state)
+            return
+
+        # Restore.
+        if hasattr(signal, 'SIGTTOU'):
+            old_handler = signal.signal(signal.SIGTTOU, signal.SIG_IGN)
+        else:
+            old_handler = None
+        termios.tcsetattr(sys.stdin, termios.TCSANOW, self._orig_term_attrs)
+        if old_handler is not None:
+            signal.signal(signal.SIGTTOU, old_handler)
+
     def inner_run(self, *args, **options):
         # If an exception was silenced in ManagementUtility.execute in order
         # to be raised in the child process, raise it now.
@@ -134,6 +169,7 @@ class Command(BaseCommand):
             "quit_command": quit_command,
         })
 
+        self._handle_term_state()
         try:
             handler = self.get_handler(*args, **options)
             run(self.addr, int(self.port), handler,

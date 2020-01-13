@@ -33,11 +33,6 @@ logger = logging.getLogger('django.utils.autoreload')
 _error_files = []
 _exception = None
 
-try:
-    import termios
-except ImportError:
-    termios = None
-
 
 try:
     import pywatchman
@@ -204,39 +199,11 @@ def trigger_reload(filename):
     sys.exit(3)
 
 
-def _save_termstate():
-    if termios and sys.stdin.isatty():
-        return termios.tcgetattr(sys.stdin)
-
-
-def _restore_termstate(old_term_attr):
-    """
-    Restore initial terminal state, which is important for echo mode (PDB),
-    and Ctrl-C (pdb++ with pyrepl).
-
-    Disables SIGTTOU during restoring to avoid "suspended (tty output)"
-    with backgrounded process (#15880).
-    """
-    if hasattr(signal, 'SIGTTOU'):
-        old_handler = signal.signal(signal.SIGTTOU, signal.SIG_IGN)
-    else:
-        old_handler = None
-    termios.tcsetattr(sys.stdin, termios.TCSANOW, old_term_attr)
-    if old_handler is not None:
-        signal.signal(signal.SIGTTOU, old_handler)
-
-
 def restart_with_reloader():
-    old_term_attr = _save_termstate()
-
     new_environ = {**os.environ, DJANGO_AUTORELOAD_ENV: 'true'}
     args = get_child_arguments()
     while True:
         p = subprocess.run(args, env=new_environ, close_fds=False)
-
-        if old_term_attr:
-            _restore_termstate(old_term_attr)
-
         if p.returncode != 3:
             return p.returncode
 
