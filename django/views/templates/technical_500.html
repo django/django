@@ -138,7 +138,7 @@
 {% if lastframe %}
     <tr>
       <th>Exception Location:</th>
-      <td><span class="fpos">{{ lastframe.filename }}:{{ lastframe.lineno }}</span> (in {{ lastframe.function }})</td>
+      <td><span class="fpos">{{ lastframe.filename }}</span> in {{ lastframe.function }}, line {{ lastframe.lineno }}</td>
     </tr>
 {% endif %}
     <tr>
