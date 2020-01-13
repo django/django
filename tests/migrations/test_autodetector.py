@@ -1014,7 +1014,7 @@ class AutodetectorTests(TestCase):
             'renamed_foo',
             'django.db.models.ForeignKey',
             [],
-            {'to': 'app.Foo', 'on_delete': models.CASCADE, 'db_column': 'foo_id'},
+            {'to': 'app.foo', 'on_delete': models.CASCADE, 'db_column': 'foo_id'},
         ))
 
     def test_rename_model(self):
@@ -1030,6 +1030,22 @@ class AutodetectorTests(TestCase):
         self.assertOperationAttributes(changes, 'testapp', 0, 0, old_name="Author", new_name="Writer")
         # Now that RenameModel handles related fields too, there should be
         # no AlterField for the related field.
+        self.assertNumberMigrations(changes, 'otherapp', 0)
+
+    def test_rename_model_case(self):
+        """
+        Model name is case-insensitive. Changing case doesn't lead to any
+        autodetected operations.
+        """
+        author_renamed = ModelState('testapp', 'author', [
+            ('id', models.AutoField(primary_key=True)),
+        ])
+        changes = self.get_changes(
+            [self.author_empty, self.book],
+            [author_renamed, self.book],
+            questioner=MigrationQuestioner({'ask_rename_model': True}),
+        )
+        self.assertNumberMigrations(changes, 'testapp', 0)
         self.assertNumberMigrations(changes, 'otherapp', 0)
 
     def test_rename_m2m_through_model(self):
