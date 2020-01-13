@@ -208,7 +208,7 @@
 {% endif %}
 {% if frames %}
 <div id="traceback">
-  <h2>Traceback <span class="commands">{% if not is_email %}<a href="#" onclick="return switchPastebinFriendly(this);">
+  <h2>Traceback{% if not is_email %} <span class="commands"><a href="#" onclick="return switchPastebinFriendly(this);">
     Switch to copy-and-paste view</a></span>{% endif %}
   </h2>
   <div id="browserTraceback">
