@@ -218,7 +218,7 @@ Specifies the database onto which to open a shell. Defaults to ``default``.
 
 .. note::
 
-    Be aware that not all options set it in the :setting:`OPTIONS` part of your
+    Be aware that not all options set in the :setting:`OPTIONS` part of your
     database configuration in :setting:`DATABASES` are passed to the
     command-line client, e.g. ``'isolation_level'``.
 
