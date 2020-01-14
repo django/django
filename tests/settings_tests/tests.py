@@ -242,6 +242,13 @@ class SettingsTests(SimpleTestCase):
         with self.assertRaisesMessage(TypeError, "can't delete _wrapped."):
             delattr(settings, '_wrapped')
 
+    def test_settings_multiple_delattr(self):
+        s = LazySettings()
+        s.configure(SimpleNamespace(TEST='test'))
+        del s.TEST
+        with self.assertRaises(AttributeError):
+            del s.TEST
+
     def test_override_settings_delete(self):
         """
         Allow deletion of a setting in an overridden settings set (#18824)
@@ -330,6 +337,12 @@ class SettingsTests(SimpleTestCase):
         with self.assertRaises(AttributeError):
             getattr(s, 'foo')
 
+    def test_nonupper_settings_setattr(self):
+        s = LazySettings()
+        s.configure()
+        with self.assertRaises(AttributeError):
+            s.foo = 'bar'
+
     @requires_tz_support
     @mock.patch('django.conf.global_settings.TIME_ZONE', 'test')
     def test_incorrect_timezone(self):
@@ -408,6 +421,10 @@ class IsOverriddenTest(SimpleTestCase):
 
             self.assertTrue(s.is_overridden('SECRET_KEY'))
             self.assertFalse(s.is_overridden('ALLOWED_HOSTS'))
+            s.TEST = 'test'
+            self.assertTrue(s.is_overridden('TEST'))
+            del s.TEST
+            self.assertFalse(s.is_overridden('TEST'))
         finally:
             del sys.modules['fake_settings_module']
 
