@@ -344,10 +344,16 @@ class SettingsTests(SimpleTestCase):
             s.foo = 'bar'
 
     @requires_tz_support
-    @mock.patch('django.conf.global_settings.TIME_ZONE', 'test')
     def test_incorrect_timezone(self):
-        with self.assertRaisesMessage(ValueError, 'Incorrect timezone setting: test'):
-            settings._setup()
+        settings_module = ModuleType('fake_settings_module')
+        settings_module.SECRET_KEY = 'foo'
+        settings_module.TIME_ZONE = 'test'
+        sys.modules['fake_settings_module'] = settings_module
+        try:
+            with self.assertRaisesMessage(ValueError, 'Incorrect timezone setting: test'):
+                Settings('fake_settings_module')
+        finally:
+            del sys.modules['fake_settings_module']
 
 
 class TestComplexSettingOverride(SimpleTestCase):
