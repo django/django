@@ -26,3 +26,8 @@ Bugfixes
 
 * Fixed a system check to ensure the ``max_length`` attribute fits the longest
   choice, when a named group contains only non-string values (:ticket:`31155`).
+
+* Fixed a regression in Django 2.2 that caused a crash of
+  :class:`~django.contrib.postgres.aggregates.ArrayAgg` and
+  :class:`~django.contrib.postgres.aggregates.StringAgg` with ``filter``
+  argument when used in a ``Subquery`` (:ticket:`31097`).
