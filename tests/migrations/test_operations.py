@@ -1137,6 +1137,28 @@ class OperationTests(OperationTestBase):
         self.assertEqual(definition[1], [])
         self.assertEqual(definition[2], {'model_name': "Pony", 'name': 'pink'})
 
+    def test_remove_field_without_old_field_invalid(self):
+        """
+        Tests the RemoveField with failed database operation as old_field does not exist..
+        """
+        project_state = self.set_up_test_model("test_rmfl")
+        # Test the state alteration with old field "foo"
+        operation = migrations.RemoveField("Pony", "foo")
+        self.assertEqual(operation.describe(), "Remove field foo from Pony")
+        new_state = project_state.clone()
+        operation.state_forwards("test_rmfl", new_state)
+        # Test the database alteration
+        self.assertEqual(len(new_state.models["test_rmfl", "pony"].fields), 3)
+        with connection.schema_editor() as editor:
+            with self.assertRaisesMessage(FieldDoesNotExist, "Pony has no field named 'foo'"):
+                operation.database_forwards("test_rmfl", editor, project_state, new_state)
+        self.assertColumnNotExists("test_rmfl_pony", "foo")
+        # And deconstruction
+        definition = operation.deconstruct()
+        self.assertEqual(definition[0], "RemoveField")
+        self.assertEqual(definition[1], [])
+        self.assertEqual(definition[2], {'model_name': "Pony", 'name': 'foo'})
+
     def test_remove_fk(self):
         """
         Tests the RemoveField operation on a foreign key.
