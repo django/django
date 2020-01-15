@@ -166,6 +166,19 @@ class BaseDatabaseOperations:
         """
         return ''
 
+    def fk_on_delete_sql(self, operation):
+        """
+        Return the SQL to make an ON DELETE statement during a CREATE TABLE
+        statement.
+        """
+        on_delete = ' ON DELETE %s '
+        if operation in ['CASCADE', 'NO ACTION', 'SET NULL', 'RESTRICT']:
+            return on_delete % (operation)
+        elif operation == '':
+            return ''
+        else:
+            raise NotImplementedError('ON DELETE %s is not supported.' % (operation))
+
     def distinct_sql(self, fields, params):
         """
         Return an SQL DISTINCT clause which removes duplicate rows from the

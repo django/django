@@ -20,7 +20,21 @@ class RestrictedError(IntegrityError):
         super().__init__(msg, restricted_objects)
 
 
-def CASCADE(collector, field, sub_objs, using):
+class OnDelete:
+    with_db = False
+
+    def __init__(self, name, operation, value=None):
+        self.name = name
+        self.operation = operation
+        self.value = value
+        if not self.with_db and not callable(self.operation):
+            raise TypeError('operation should be callable')
+
+    def __call__(self, *args, **kwargs):
+        return self.operation(*args, **kwargs)
+
+
+def application_cascade(collector, field, sub_objs, using):
     collector.collect(
         sub_objs, source=field.remote_field.model, source_attr=field.name,
         nullable=field.null, fail_on_restricted=False,
@@ -29,7 +43,7 @@ def CASCADE(collector, field, sub_objs, using):
         collector.add_field_update(field, None, sub_objs)
 
 
-def PROTECT(collector, field, sub_objs, using):
+def application_protect(collector, field, sub_objs, using):
     raise ProtectedError(
         "Cannot delete some instances of model '%s' because they are "
         "referenced through a protected foreign key: '%s.%s'" % (
@@ -39,12 +53,7 @@ def PROTECT(collector, field, sub_objs, using):
     )
 
 
-def RESTRICT(collector, field, sub_objs, using):
-    collector.add_restricted_objects(field, sub_objs)
-    collector.add_dependency(field.remote_field.model, field.model)
-
-
-def SET(value):
+def application_set(value):
     if callable(value):
         def set_on_delete(collector, field, sub_objs, using):
             collector.add_field_update(field, value(), sub_objs)
@@ -52,19 +61,50 @@ def SET(value):
         def set_on_delete(collector, field, sub_objs, using):
             collector.add_field_update(field, value, sub_objs)
     set_on_delete.deconstruct = lambda: ('django.db.models.SET', (value,), {})
-    return set_on_delete
+    return OnDelete('SET', set_on_delete, value)
 
 
-def SET_NULL(collector, field, sub_objs, using):
+def application_restrict(collector, field, sub_objs, using):
+    collector.add_restricted_objects(field, sub_objs)
+    collector.add_dependency(field.remote_field.model, field.model)
+
+
+def application_set_null(collector, field, sub_objs, using):
     collector.add_field_update(field, None, sub_objs)
 
 
-def SET_DEFAULT(collector, field, sub_objs, using):
+def application_set_default(collector, field, sub_objs, using):
     collector.add_field_update(field, field.get_default(), sub_objs)
 
 
-def DO_NOTHING(collector, field, sub_objs, using):
-    pass
+CASCADE = OnDelete('CASCADE', application_cascade)
+PROTECT = OnDelete('PROTECT', application_protect)
+RESTRICT = OnDelete('RESTRICT', application_restrict)
+SET = OnDelete('SET', application_set)
+SET_NULL = OnDelete('SET_NULL', application_set_null)
+SET_DEFAULT = OnDelete('SET_DEFAULT', application_set_default)
+
+
+class DatabaseOnDelete(OnDelete):
+    with_db = True
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self.with_db and callable(self.operation):
+            raise TypeError('operation should be string not callable')
+
+    def __call__(self, collector, field, sub_objs, using):
+        raise TypeError('operation should be string not callable')
+
+    def as_sql(self, connection):
+        return connection.ops.fk_on_delete_sql(self.operation)
+
+
+DO_NOTHING = DatabaseOnDelete('DO_NOTHING', '')
+DB_NO_ACTION = DatabaseOnDelete('DB_NO_ACTION', 'NO ACTION')
+DB_SET_NULL = DatabaseOnDelete('DB_SET_NULL', 'SET NULL')
+DB_RESTRICT = DatabaseOnDelete('DB_RESTRICT', 'RESTRICT')
+DB_CASCADE = DatabaseOnDelete('DB_CASCADE', 'CASCADE')
 
 
 def get_candidate_relations_to_delete(opts):
@@ -190,7 +230,7 @@ class Collector:
             all(link == from_field for link in opts.concrete_model._meta.parents.values()) and
             # Foreign keys pointing to this model.
             all(
-                related.field.remote_field.on_delete is DO_NOTHING
+                related.field.remote_field.on_delete.with_db
                 for related in get_candidate_relations_to_delete(opts)
             ) and (
                 # Something like generic foreign key.
@@ -270,7 +310,7 @@ class Collector:
             if keep_parents and related.model in parents:
                 continue
             field = related.field
-            if field.remote_field.on_delete == DO_NOTHING:
+            if field.remote_field.on_delete.with_db:
                 continue
             related_model = related.related_model
             if self.can_fast_delete(related_model, from_field=field):

@@ -2617,6 +2617,7 @@ class SchemaTests(TransactionTestCase):
                         "to_table": editor.quote_name(table),
                         "to_column": editor.quote_name(model._meta.auto_field.column),
                         "deferrable": connection.ops.deferrable_sql(),
+                        "on_delete": editor._create_on_delete_sql(model, field, None),
                     }
                 )
                 self.assertIn(expected_constraint_name, self.get_constraints(model._meta.db_table))

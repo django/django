@@ -1,5 +1,7 @@
 from unittest import mock
 
+from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.models import ContentType
 from django.core.checks import Error, Warning as DjangoWarning
 from django.db import connection, models
 from django.db.models.fields.related import ForeignObject
@@ -405,6 +407,51 @@ class RelativeFieldTests(SimpleTestCase):
             )
         ])
 
+    def test_on_delete_db_cascade_multi_inheritance(self):
+        class Category(models.Model):
+            pass
+
+        class Person(models.Model):
+            pass
+
+        class PersonExtra(Person):
+            category = models.ForeignKey(Category, on_delete=models.DB_CASCADE)
+
+        field = PersonExtra._meta.get_field('category')
+        self.assertEqual(field.check(), [
+            DjangoWarning(
+                'Field specifies unsupported DB_CASCADE on Multi-table '
+                'inherited model.',
+                hint='Change the on_delete rule.',
+                obj=field,
+                id='fields.W344'
+            )
+        ])
+
+    def test_on_delete_db_cascade_propagate_cascade(self):
+        class C(models.Model):
+            pass
+
+        class B(models.Model):
+            c = models.ForeignKey(C, on_delete=models.CASCADE)
+
+        class A(models.Model):
+            b = models.ForeignKey(B, on_delete=models.DB_CASCADE)
+
+        field = A._meta.get_field('b')
+        self.assertEqual(field.check(), [
+            DjangoWarning(
+                'Field specifies DB_CASCADE relation to model using '
+                'unsupported CASCADE, SET_NULL, SET_VALUE or other '
+                'relation to another model.',
+                hint='Change the on_delete rule so that DB_CASCADE '
+                'relations point to models using DB_CASCADE or '
+                'DO_NOTHING relations.',
+                obj=field,
+                id='fields.W346'
+            )
+        ])
+
     def test_on_delete_set_null_on_non_nullable_field(self):
         class Person(models.Model):
             pass
@@ -674,6 +721,25 @@ class RelativeFieldTests(SimpleTestCase):
                 obj=Model._meta.get_field('second'),
                 id='fields.E308',
             ),
+        ])
+
+
+class ContentTypeFieldTests(SimpleTestCase):
+    def test_on_delete_db_cascade_generic_fk(self):
+        class Model(models.Model):
+            content_type = models.ForeignKey(ContentType, on_delete=models.DB_CASCADE, related_name='model_test')
+            object_id = models.PositiveIntegerField()
+            content_object = GenericForeignKey('content_type', 'object_id')
+
+        field = Model._meta.get_field('content_type')
+        self.assertEqual(field.check(), [
+            DjangoWarning(
+                'Field specifies unsupported DB_CASCADE on model '
+                'declaring a GenericForeignKey.',
+                hint='Change the on_delete rule.',
+                obj=field,
+                id='fields.W345'
+            )
         ])
 
 

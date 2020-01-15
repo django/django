@@ -1547,6 +1547,38 @@ The possible values for :attr:`~ForeignKey.on_delete` are found in
     integrity, this will cause an :exc:`~django.db.IntegrityError` unless
     you manually add an SQL ``ON DELETE`` constraint to the database field.
 
+* .. attribute:: DB_CASCADE
+
+    .. versionadded:: 3.1
+
+    Django takes no direct action, behaves exactly like DO_NOTHING,
+    but also sets ON DELETE CASCADE as a SQL constraint. The cascade
+    deletion then happens at the database level.
+
+* .. attribute:: DB_NO_ACTION
+
+    .. versionadded:: 3.1
+
+    Django takes no direct action, behaves exactly like DO_NOTHING, but
+    also explicitly sets ON DELETE NO ACTION as a SQL constraint.
+
+* .. attribute:: DB_SET_NULL
+
+    .. versionadded:: 3.1
+
+    Django takes no direct action, behaves exactly like DO_NOTHING, but
+    also adds ON DELETE SET NULL as a SQL constraint. The setting of
+    a null value then happens at the database level.
+
+* .. attribute:: DB_RESTRICT
+
+    .. versionadded:: 3.1
+
+    Django takes no direct action, behaves exactly like DO_NOTHING, but
+    also adds ON DELETE RESTRICT as a SQL constraint. The immediate
+    check of referential integrity (e.g. no longer deferred)
+    happens at the database level.
+
 .. attribute:: ForeignKey.limit_choices_to
 
     Sets a limit to the available choices for this field when this field is

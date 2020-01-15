@@ -55,6 +55,7 @@ class A(models.Model):
     )
     cascade = models.ForeignKey(R, models.CASCADE, related_name='cascade_set')
     cascade_nullable = models.ForeignKey(R, models.CASCADE, null=True, related_name='cascade_nullable_set')
+    db_cascade = models.ForeignKey(R, models.DB_CASCADE, related_name='db_cascade_set')
     protect = models.ForeignKey(R, models.PROTECT, null=True, related_name='protect_set')
     restrict = models.ForeignKey(R, models.RESTRICT, null=True, related_name='restrict_set')
     donothing = models.ForeignKey(R, models.DO_NOTHING, null=True, related_name='donothing_set')
@@ -72,7 +73,7 @@ def create_a(name):
     a = A(name=name)
     for name in ('auto', 'auto_nullable', 'setvalue', 'setnull', 'setdefault',
                  'setdefault_none', 'cascade', 'cascade_nullable', 'protect',
-                 'restrict', 'donothing', 'o2o_setnull'):
+                 'restrict', 'db_cascade', 'donothing', 'o2o_setnull'):
         r = R.objects.create()
         setattr(a, name, r)
     a.child = RChild.objects.create()
@@ -158,6 +159,14 @@ class SecondReferrer(models.Model):
     other_referrer = models.ForeignKey(
         Referrer, models.CASCADE, to_field='unique_field', related_name='+'
     )
+
+
+class BaseDbCascade(models.Model):
+    pass
+
+
+class RelToBaseDbCascade(models.Model):
+    base = models.ForeignKey(BaseDbCascade, models.DB_CASCADE)
 
 
 class DeleteTop(models.Model):

@@ -10,7 +10,9 @@ from django.db import connection, router
 from django.db.backends import utils
 from django.db.models import Q
 from django.db.models.constants import LOOKUP_SEP
-from django.db.models.deletion import CASCADE, SET_DEFAULT, SET_NULL
+from django.db.models.deletion import (
+    CASCADE, DB_CASCADE, DO_NOTHING, SET_DEFAULT, SET_NULL,
+)
 from django.db.models.query_utils import PathInfo
 from django.db.models.utils import make_model_tuple
 from django.utils.functional import cached_property
@@ -839,6 +841,59 @@ class ForeignKey(ForeignObject):
                     hint='Set a default value, or change the on_delete rule.',
                     obj=self,
                     id='fields.E321',
+                )
+            ]
+        elif on_delete == DB_CASCADE and (
+            any(  # generic relation
+                hasattr(field, 'bulk_related_objects') for field in
+                self.model._meta.private_fields
+            ) or
+            any(  # generic foreign key
+                hasattr(field, 'get_content_type') for field in
+                self.model._meta.private_fields
+            )
+        ):
+            return [
+                checks.Warning(
+                    'Field specifies unsupported DB_CASCADE on model '
+                    'declaring a GenericForeignKey.',
+                    hint='Change the on_delete rule.',
+                    obj=self,
+                    id='fields.W345'
+                )
+            ]
+        elif on_delete == DB_CASCADE and len(
+            # multi table inheritance
+            self.model._meta.concrete_model._meta.parents.values()
+        ):
+            return [
+                checks.Warning(
+                    'Field specifies unsupported DB_CASCADE on Multi-table '
+                    'inherited model.',
+                    hint='Change the on_delete rule.',
+                    obj=self,
+                    id='fields.W344'
+                )
+            ]
+        elif on_delete == DB_CASCADE and (
+            any(  # field_A -> db_cascade -> field_B -> cascade -> field_C
+                getattr(field_B.remote_field, 'on_delete', None) and
+                getattr(field_B.remote_field, 'on_delete') not in [
+                    DB_CASCADE, DO_NOTHING
+                ]
+                for field_B in self.remote_field.model._meta.fields
+            )
+        ):
+            return [
+                checks.Warning(
+                    'Field specifies DB_CASCADE relation to model using '
+                    'unsupported CASCADE, SET_NULL, SET_VALUE or other '
+                    'relation to another model.',
+                    hint='Change the on_delete rule so that DB_CASCADE '
+                    'relations point to models using DB_CASCADE or '
+                    'DO_NOTHING relations.',
+                    obj=self,
+                    id='fields.W346'
                 )
             ]
         else:

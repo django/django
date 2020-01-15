@@ -255,6 +255,13 @@ Related fields
   effect as using a ``OneToOneField``.
 * **fields.W343**: ``limit_choices_to`` has no effect on ``ManyToManyField``
   with a ``through`` model.
+* **fields.W344**: Field specifies unsupported ``DB_CASCADE`` on Multi-table
+  inherited model.
+* **fields.W345**: Field specifies unsupported ``DB_CASCADE`` on model
+  declaring a ``GenericForeignKey``.
+* **fields.W346**: Field specifies ``DB_CASCADE`` relation to model using
+  unsupported ``CASCADE``, ``SET_NULL``, ``SET_VALUE`` or other relation
+  to another model.
 
 Models
 ------
