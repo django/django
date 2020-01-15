@@ -120,7 +120,7 @@ To run Daphne, it just needs to be supplied with an application, much like
 a WSGI server would need to be. Make sure you have an ``asgi.py`` file as
 outlined above.
 
-Then, you can run Daphne and supply the channel layer as the argument::
+Then, you can run Daphne and supply the ASGI application as the argument::
 
     daphne myproject.asgi:application
 
