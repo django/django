@@ -287,6 +287,7 @@ verbose as it includes all database queries:
         'handlers': {
             'console': {
                 'class': 'logging.StreamHandler',
+                'stream': 'ext://sys.stdout',
             },
         },
         'loggers': {
@@ -330,7 +331,7 @@ Finally, here's an example of a fairly complex logging setup:
                 'filters': ['require_debug_true'],
                 'class': 'logging.StreamHandler',
                 'formatter': 'simple',
-                'stream': 'ext://sys.stdout'
+                'stream': 'ext://sys.stdout',
             },
             'mail_admins': {
                 'level': 'ERROR',
