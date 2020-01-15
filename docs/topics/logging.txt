@@ -329,7 +329,8 @@ Finally, here's an example of a fairly complex logging setup:
                 'level': 'INFO',
                 'filters': ['require_debug_true'],
                 'class': 'logging.StreamHandler',
-                'formatter': 'simple'
+                'formatter': 'simple',
+                'stream': 'ext://sys.stdout'
             },
             'mail_admins': {
                 'level': 'ERROR',
