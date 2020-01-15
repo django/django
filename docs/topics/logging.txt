@@ -390,7 +390,7 @@ This logging configuration does the following things:
 * Defines two handlers:
 
   * ``console``, a :class:`~logging.StreamHandler`, which prints any ``INFO``
-    (or higher) message to ``sys.stderr``. This handler uses the ``simple``
+    (or higher) message to ``sys.stdout``. This handler uses the ``simple``
     output format.
 
   * ``mail_admins``, an :class:`AdminEmailHandler`, which emails any ``ERROR``
