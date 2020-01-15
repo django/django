@@ -9,8 +9,8 @@ class TestSigner(SimpleTestCase):
 
     def test_signature(self):
         "signature() method should generate a signature"
-        signer = signing.Signer('predictable-secret')
-        signer2 = signing.Signer('predictable-secret2')
+        signer = signing.Signer('predictable-secret', algorithm='sha1')
+        signer2 = signing.Signer('predictable-secret2', algorithm='sha1')
         for s in (
             b'hello',
             b'3098247:529:087:',
@@ -24,7 +24,7 @@ class TestSigner(SimpleTestCase):
 
     def test_signature_with_salt(self):
         "signature(value, salt=...) should work"
-        signer = signing.Signer('predictable-secret', salt='extra-salt')
+        signer = signing.Signer('predictable-secret', salt='extra-salt', algorithm='sha1')
         self.assertEqual(
             signer.signature('hello'),
             signing.base64_hmac('extra-salt' + 'signer', 'hello', 'predictable-secret')
@@ -65,6 +65,12 @@ class TestSigner(SimpleTestCase):
             with self.assertRaises(signing.BadSignature):
                 signer.unsign(transform(signed_value))
 
+    def test_invalid_algorithm(self):
+        signer = signing.Signer('predictable-secret')
+        msg = 'The signature algorithm "md5" is not supported.'
+        with self.assertRaisesMessage(signing.BadSignature, msg):
+            signer.unsign('foo:md5:asdj*+Vcfd7==fDsj')
+
     def test_dumps_loads(self):
         "dumps and loads be reversible for any JSON serializable object"
         objects = [
@@ -100,13 +106,21 @@ class TestSigner(SimpleTestCase):
         binary_key = b'\xe7'  # Set some binary (non-ASCII key)
 
         s = signing.Signer(binary_key)
-        self.assertEqual('foo:6NB0fssLW5RQvZ3Y-MTerq2rX7w', s.sign('foo'))
+        self.assertEqual(
+            'foo:blake2b:mNILqGpg-VOoLx5NwQHWoMRcwLo6r66KOf1HVzrnCnQtzTVCjzAFx8'
+            'B6Trug8f3iCmqUhx7jRLH4R6oyJlimwA',
+            s.sign('foo')
+        )
 
     def test_valid_sep(self):
         separators = ['/', '*sep*', ',']
         for sep in separators:
             signer = signing.Signer('predictable-secret', sep=sep)
-            self.assertEqual('foo%ssH9B01cZcJ9FoT_jEVkRkNULrl8' % sep, signer.sign('foo'))
+            self.assertEqual(
+                'foo{sep}blake2b{sep}xyU6Jtu428RBakSkDumWwGOrOJtaqe9MHZZ7h_VotL'
+                'gQbPv_kGpAfxsznsF-ixM2vHiY3-BM3bvbaR6gbnwOqw'.format(sep=sep),
+                signer.sign('foo')
+            )
 
     def test_invalid_sep(self):
         """should warn on invalid separator"""
@@ -133,3 +147,11 @@ class TestTimestampSigner(SimpleTestCase):
             self.assertEqual(signer.unsign(ts, max_age=datetime.timedelta(seconds=11)), value)
             with self.assertRaises(signing.SignatureExpired):
                 signer.unsign(ts, max_age=10)
+
+    def test_legacy_format_unsign(self):
+        """
+        During a deprecation period, Django accepts the legacy signed value
+        without any specified algorithm.
+        """
+        signer = signing.TimestampSigner('predictable-key')
+        self.assertEqual(signer.unsign('hello:1iroxj:SmBeiMT9ltZ4inOu1S_JVlz8PT8'), 'hello')

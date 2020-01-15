@@ -38,10 +38,13 @@ import datetime
 import json
 import time
 import zlib
+from hashlib import algorithms_available
 
 from django.conf import settings
 from django.utils import baseconv
-from django.utils.crypto import constant_time_compare, salted_hmac
+from django.utils.crypto import (
+    InvalidAlgorithm, constant_time_compare, salted_hmac,
+)
 from django.utils.encoding import force_bytes
 from django.utils.module_loading import import_string
 from django.utils.regex_helper import _lazy_re_compile
@@ -68,8 +71,8 @@ def b64_decode(s):
     return base64.urlsafe_b64decode(s + pad)
 
 
-def base64_hmac(salt, value, key):
-    return b64_encode(salted_hmac(salt, value, key).digest()).decode()
+def base64_hmac(salt, value, key, algorithm='sha1'):
+    return b64_encode(salted_hmac(salt, value, key, algorithm=algorithm).digest()).decode()
 
 
 def get_cookie_signer(salt='django.core.signing.get_cookie_signer'):
@@ -143,8 +146,9 @@ def loads(s, key=None, salt='django.core.signing', serializer=JSONSerializer, ma
 
 
 class Signer:
+    valid_algorithms = algorithms_available - {'md5'}
 
-    def __init__(self, key=None, sep=':', salt=None):
+    def __init__(self, key=None, sep=':', salt=None, algorithm='blake2b'):
         self.key = key or settings.SECRET_KEY
         self.sep = sep
         if _SEP_UNSAFE.match(self.sep):
@@ -153,20 +157,38 @@ class Signer:
                 'only A-z0-9-_=)' % sep,
             )
         self.salt = salt or '%s.%s' % (self.__class__.__module__, self.__class__.__name__)
+        self.algorithm = algorithm
 
-    def signature(self, value):
-        return base64_hmac(self.salt + 'signer', value, self.key)
+    def signature(self, value, algorithm=None):
+        return base64_hmac(self.salt + 'signer', value, self.key, algorithm=algorithm or self.algorithm)
 
     def sign(self, value):
-        return '%s%s%s' % (value, self.sep, self.signature(value))
+        return f'{value}{self.sep}{self.algorithm}{self.sep}{self.signature(value)}'
+
+    def _split(self, signed_value):
+        bits = signed_value.rsplit(self.sep, 2)
+        if len(bits) == 3:
+            return bits
+        elif len(bits) == 2:
+            # Backwards compatibility with old format without algorithm bit.
+            return bits[:-1], 'sha1', bits[-1]
+        else:
+            raise BadSignature('Too few "%s" found in value' % self.sep)
 
     def unsign(self, signed_value):
         if self.sep not in signed_value:
             raise BadSignature('No "%s" found in value' % self.sep)
-        value, sig = signed_value.rsplit(self.sep, 1)
-        if constant_time_compare(sig, self.signature(value)):
-            return value
-        raise BadSignature('Signature "%s" does not match' % sig)
+        value, algorithm, signature = self._split(signed_value)
+        if algorithm not in self.valid_algorithms:
+            raise BadSignature('The signature algorithm "%s" is not supported.' % algorithm)
+        try:
+            equals = constant_time_compare(signature, self.signature(value, algorithm=algorithm))
+        except InvalidAlgorithm:
+            pass
+        else:
+            if equals:
+                return value
+        raise BadSignature('Signature "%s" does not match' % signature)
 
 
 class TimestampSigner(Signer):
@@ -177,6 +199,16 @@ class TimestampSigner(Signer):
     def sign(self, value):
         value = '%s%s%s' % (value, self.sep, self.timestamp())
         return super().sign(value)
+
+    def _split(self, signed_value):
+        bits = signed_value.rsplit(self.sep, 3)
+        if len(bits) == 4:  # value/timestamp/algorithm/signature
+            return self.sep.join(bits[:2]), bits[2], bits[3]
+        elif len(bits) == 3:
+            # Backwards compatibility with old format without algorithm bit.
+            return self.sep.join(bits[:2]), 'sha1', bits[-1]
+        else:
+            raise BadSignature('Too few "%s" found in value' % self.sep)
 
     def unsign(self, value, max_age=None):
         """
