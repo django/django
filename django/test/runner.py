@@ -9,6 +9,7 @@ import unittest
 from importlib import import_module
 from io import StringIO
 
+import django
 from django.core.management import call_command
 from django.db import connections
 from django.test import SimpleTestCase, TestCase
@@ -300,13 +301,15 @@ _worker_id = 0
 
 def _init_worker(counter):
     """
-    Switch to databases dedicated to this worker.
+    Setup django and switch to databases dedicated to this worker.
 
     This helper lives at module-level because of the multiprocessing module's
     requirements.
     """
 
     global _worker_id
+
+    django.setup()
 
     with counter.get_lock():
         counter.value += 1
@@ -319,7 +322,10 @@ def _init_worker(counter):
         # reflected in django.db.connections. If the following line assigned
         # connection.settings_dict = settings_dict, new threads would connect
         # to the default database instead of the appropriate clone.
-        connection.settings_dict.update(settings_dict)
+        connection.settings_dict.update({
+            **settings_dict,
+            'NAME': connection.creation._get_test_db_name()
+        })
         connection.close()
 
 
