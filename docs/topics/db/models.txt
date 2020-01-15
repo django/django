@@ -1092,6 +1092,7 @@ The automatically-created :class:`~django.db.models.OneToOneField` on
     place_ptr = models.OneToOneField(
         Place, on_delete=models.CASCADE,
         parent_link=True,
+        primary_key=True,
     )
 
 You can override that field by declaring your own
