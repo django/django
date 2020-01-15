@@ -2093,13 +2093,6 @@ class Query(BaseExpression):
         self.clear_deferred_loading()
         self.clear_select_fields()
 
-        if self.group_by is True:
-            self.add_fields((f.attname for f in self.model._meta.concrete_fields), False)
-            # Disable GROUP BY aliases to avoid orphaning references to the
-            # SELECT clause which is about to be cleared.
-            self.set_group_by(allow_aliases=False)
-            self.clear_select_fields()
-
         if fields:
             field_names = []
             extra_names = []
@@ -2121,6 +2114,14 @@ class Query(BaseExpression):
             self.set_annotation_mask(annotation_names)
         else:
             field_names = [f.attname for f in self.model._meta.concrete_fields]
+        # Selected annotations must be known before setting the GROUP BY
+        # clause.
+        if self.group_by is True:
+            self.add_fields((f.attname for f in self.model._meta.concrete_fields), False)
+            # Disable GROUP BY aliases to avoid orphaning references to the
+            # SELECT clause which is about to be cleared.
+            self.set_group_by(allow_aliases=False)
+            self.clear_select_fields()
 
         self.values_select = tuple(field_names)
         self.add_fields(field_names, True)
