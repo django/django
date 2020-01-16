@@ -227,7 +227,7 @@ class GDALRaster(GDALRasterBase):
 
     @cached_property
     def is_vsi_based(self):
-        return self.name.startswith(VSI_FILESYSTEM_BASE_PATH)
+        return self._ptr and self.name.startswith(VSI_FILESYSTEM_BASE_PATH)
 
     @property
     def name(self):
