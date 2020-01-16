@@ -66,6 +66,7 @@ After the previous tutorials, our project should look like this::
         polls/
             __init__.py
             admin.py
+            apps.py
             migrations/
                 __init__.py
                 0001_initial.py
