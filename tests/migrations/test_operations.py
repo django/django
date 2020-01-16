@@ -1137,7 +1137,7 @@ class OperationTests(OperationTestBase):
         self.assertEqual(definition[1], [])
         self.assertEqual(definition[2], {'model_name': "Pony", 'name': 'pink'})
 
-    def test_remove_field_without_old_field_invalid(self):
+    def test_remove_field_with_non_existent_field_invalid(self):
         """
         Tests the RemoveField with failed database operation as old_field does not exist..
         """

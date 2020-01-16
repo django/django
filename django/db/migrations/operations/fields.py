@@ -133,15 +133,14 @@ class RemoveField(FieldOperation):
 
     def state_forwards(self, app_label, state):
         new_fields = []
-        old_field = None
+        delay = False
         for name, instance in state.models[app_label, self.model_name_lower].fields:
             if name != self.name:
                 new_fields.append((name, instance))
             else:
-                old_field = instance
+                # Delay rendering of relationships if it's not a relational field
+                delay = not instance.is_relation
         state.models[app_label, self.model_name_lower].fields = new_fields
-        # Delay rendering of relationships if it's not a relational field
-        delay = not old_field.is_relation if old_field else False
         state.reload_model(app_label, self.model_name_lower, delay=delay)
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
