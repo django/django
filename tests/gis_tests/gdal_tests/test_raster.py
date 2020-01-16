@@ -750,3 +750,7 @@ class GDALBandTests(SimpleTestCase):
                 numpy.testing.assert_equal(band.data(), numpy.array(combo[2]).reshape(3, 3))
             else:
                 self.assertEqual(band.data(), list(combo[2]))
+
+    def test_path_not_exists(self):
+        with self.assertRaises(GDALException, 'Unable to read raster source input /path/not/exist'):
+            p = GDALRaster('/path/not/exist')
