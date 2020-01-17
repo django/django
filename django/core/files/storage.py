@@ -246,8 +246,8 @@ class FileSystemStorage(Storage):
                     os.umask(old_umask)
             else:
                 os.makedirs(directory, exist_ok=True)
-        except FileExistsError:
-            raise FileExistsError('%s exists and is not a directory.' % directory)
+        except FileExistsError as e:
+            raise FileExistsError('%s exists and is not a directory.' % directory) from e
 
         # There's a potential race condition between get_available_name and
         # saving the file; it's possible that two threads might return the

@@ -111,7 +111,7 @@ class Command(BaseCommand):
             try:
                 apps.get_app_config(app_label)
             except LookupError as err:
-                raise CommandError(str(err))
+                raise CommandError(str(err)) from err
             if run_syncdb:
                 if app_label in executor.loader.migrated_apps:
                     raise CommandError("Can't use run_syncdb with app '%s' as it has migrations." % app_label)
@@ -125,15 +125,15 @@ class Command(BaseCommand):
             else:
                 try:
                     migration = executor.loader.get_migration_by_prefix(app_label, migration_name)
-                except AmbiguityError:
+                except AmbiguityError as e:
                     raise CommandError(
                         "More than one migration matches '%s' in app '%s'. "
                         "Please be more specific." %
                         (migration_name, app_label)
-                    )
-                except KeyError:
+                    ) from e
+                except KeyError as e:
                     raise CommandError("Cannot find a migration matching '%s' from app '%s'." % (
-                        migration_name, app_label))
+                        migration_name, app_label)) from e
                 targets = [(app_label, migration.name)]
             target_app_labels_only = False
         elif options['app_label']:

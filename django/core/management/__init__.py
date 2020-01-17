@@ -101,8 +101,8 @@ def call_command(command_name, *args, **options):
         # Load the command object by name.
         try:
             app_name = get_commands()[command_name]
-        except KeyError:
-            raise CommandError("Unknown command: %r" % command_name)
+        except KeyError as e:
+            raise CommandError("Unknown command: %r" % command_name) from e
 
         if isinstance(app_name, BaseCommand):
             # If the command is already loaded, use it directly.

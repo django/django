@@ -15,17 +15,17 @@ def include(arg, namespace=None):
         # Callable returning a namespace hint.
         try:
             urlconf_module, app_name = arg
-        except ValueError:
+        except ValueError as e:
             if namespace:
                 raise ImproperlyConfigured(
                     'Cannot override the namespace for a dynamic module that '
                     'provides a namespace.'
-                )
+                ) from e
             raise ImproperlyConfigured(
                 'Passing a %d-tuple to include() is not supported. Pass a '
                 '2-tuple containing the list of patterns and app_name, and '
                 'provide the namespace argument to include() instead.' % len(arg)
-            )
+            ) from e
     else:
         # No namespace hint - use manually provided namespace.
         urlconf_module = arg

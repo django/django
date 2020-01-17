@@ -100,7 +100,7 @@ class Command(BaseCommand):
                 except DatabaseError as e:
                     raise CommandError(
                         "Cache table '%s' could not be created.\nThe error was: %s." %
-                        (tablename, e))
+                        (tablename, e)) from e
                 for statement in index_output:
                     curs.execute(statement)
 

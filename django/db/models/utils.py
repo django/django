@@ -14,11 +14,11 @@ def make_model_tuple(model):
             model_tuple = model._meta.app_label, model._meta.model_name
         assert len(model_tuple) == 2
         return model_tuple
-    except (ValueError, AssertionError):
+    except (ValueError, AssertionError) as e:
         raise ValueError(
             "Invalid model reference '%s'. String model references "
             "must be of the form 'app_label.ModelName'." % model
-        )
+        ) from e
 
 
 def resolve_callables(mapping):

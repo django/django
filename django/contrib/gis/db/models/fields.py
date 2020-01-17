@@ -162,8 +162,8 @@ class BaseSpatialField(Field):
         elif isinstance(value, dict):
             try:
                 return gdal.GDALRaster(value)
-            except GDALException:
-                raise ValueError("Couldn't create spatial object from lookup value '%s'." % value)
+            except GDALException as e:
+                raise ValueError("Couldn't create spatial object from lookup value '%s'." % value) from e
 
     def get_prep_value(self, value):
         obj = super().get_prep_value(value)
@@ -184,8 +184,8 @@ class BaseSpatialField(Field):
             elif is_candidate:
                 try:
                     obj = GEOSGeometry(obj)
-                except (GEOSException, GDALException):
-                    raise ValueError("Couldn't create spatial object from lookup value '%s'." % obj)
+                except (GEOSException, GDALException) as e:
+                    raise ValueError("Couldn't create spatial object from lookup value '%s'." % obj) from e
             else:
                 raise ValueError('Cannot use object with type %s for a spatial lookup parameter.' % type(obj).__name__)
 

@@ -446,14 +446,14 @@ class Parser:
                 try:
                     filter_expression = self.compile_filter(token.contents)
                 except TemplateSyntaxError as e:
-                    raise self.error(token, e)
+                    raise self.error(token, e) from e
                 var_node = VariableNode(filter_expression)
                 self.extend_nodelist(nodelist, var_node, token)
             elif token.token_type.value == 2:  # TokenType.BLOCK
                 try:
                     command = token.contents.split()[0]
-                except IndexError:
-                    raise self.error(token, 'Empty block tag on line %d' % token.lineno)
+                except IndexError as e:
+                    raise self.error(token, 'Empty block tag on line %d' % token.lineno) from e
                 if command in parse_until:
                     # A matching token has been reached. Return control to
                     # the caller. Put the token back on the token list so the
@@ -475,7 +475,7 @@ class Parser:
                 try:
                     compiled_result = compile_func(self, token)
                 except Exception as e:
-                    raise self.error(token, e)
+                    raise self.error(token, e) from e
                 self.extend_nodelist(nodelist, compiled_result, token)
                 # Compile success. Remove the token from the command stack.
                 self.command_stack.pop()

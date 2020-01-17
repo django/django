@@ -274,8 +274,9 @@ class ActionSelenium(argparse.Action):
         for browser in browsers:
             try:
                 SeleniumTestCaseBase.import_webdriver(browser)
-            except ImportError:
-                raise argparse.ArgumentError(self, "Selenium browser specification '%s' is not valid." % browser)
+            except ImportError as e:
+                raise argparse.ArgumentError(self, "Selenium browser specification '%s' is not valid." %
+                                             browser) from e
         setattr(namespace, self.dest, browsers)
 
 

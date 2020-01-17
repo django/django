@@ -64,9 +64,9 @@ class Archive:
         else:
             try:
                 filename = file.name
-            except AttributeError:
+            except AttributeError as e:
                 raise UnrecognizedArchiveFormat(
-                    "File object not a recognized archive format.")
+                    "File object not a recognized archive format.") from e
         base, tail_ext = os.path.splitext(filename.lower())
         cls = extension_map.get(tail_ext)
         if not cls:

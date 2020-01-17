@@ -77,9 +77,9 @@ class Serializer(base.Serializer):
         if getattr(obj, field.name) is not None:
             try:
                 self.xml.characters(field.value_to_string(obj))
-            except UnserializableContentError:
+            except UnserializableContentError as e:
                 raise ValueError("%s.%s (pk:%s) contains unserializable characters" % (
-                    obj.__class__.__name__, field.name, obj.pk))
+                    obj.__class__.__name__, field.name, obj.pk)) from e
         else:
             self.xml.addQuickElement("None")
 
@@ -314,10 +314,10 @@ class Deserializer(base.Deserializer):
                 % (node.nodeName, attr))
         try:
             return apps.get_model(model_identifier)
-        except (LookupError, TypeError):
+        except (LookupError, TypeError) as e:
             raise base.DeserializationError(
                 "<%s> node has invalid model identifier: '%s'"
-                % (node.nodeName, model_identifier))
+                % (node.nodeName, model_identifier)) from e
 
 
 def getInnerText(node):

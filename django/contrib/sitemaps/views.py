@@ -79,10 +79,10 @@ def sitemap(request, sitemaps, section=None,
                     lastmod = site_lastmod if lastmod is None else max(lastmod, site_lastmod)
                 else:
                     all_sites_lastmod = False
-        except EmptyPage:
-            raise Http404("Page %s empty" % page)
-        except PageNotAnInteger:
-            raise Http404("No page '%s'" % page)
+        except EmptyPage as e:
+            raise Http404("Page %s empty" % page) from e
+        except PageNotAnInteger as e:
+            raise Http404("No page '%s'" % page) from e
     response = TemplateResponse(request, template_name, {'urlset': urls},
                                 content_type=content_type)
     if all_sites_lastmod and lastmod is not None:

@@ -38,8 +38,8 @@ class ArrayField(CheckFieldDefaultMixin, Field):
     def model(self):
         try:
             return self.__dict__['model']
-        except KeyError:
-            raise AttributeError("'%s' object has no attribute 'model'" % self.__class__.__name__)
+        except KeyError as e:
+            raise AttributeError("'%s' object has no attribute 'model'" % self.__class__.__name__) from e
 
     @model.setter
     def model(self, model):
@@ -168,7 +168,7 @@ class ArrayField(CheckFieldDefaultMixin, Field):
                     prefix=self.error_messages['item_invalid'],
                     code='item_invalid',
                     params={'nth': index + 1},
-                )
+                ) from error
         if isinstance(self.base_field, ArrayField):
             if len({len(i) for i in value}) > 1:
                 raise exceptions.ValidationError(
@@ -187,7 +187,7 @@ class ArrayField(CheckFieldDefaultMixin, Field):
                     prefix=self.error_messages['item_invalid'],
                     code='item_invalid',
                     params={'nth': index + 1},
-                )
+                ) from error
 
     def formfield(self, **kwargs):
         return super().formfield(**{

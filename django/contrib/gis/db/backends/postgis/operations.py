@@ -176,14 +176,14 @@ class PostGISOperations(BaseSpatialOperations, DatabaseOperations):
 
             try:
                 vtup = self.postgis_version_tuple()
-            except ProgrammingError:
+            except ProgrammingError as e:
                 raise ImproperlyConfigured(
                     'Cannot determine PostGIS version for database "%s" '
                     'using command "SELECT postgis_lib_version()". '
                     'GeoDjango requires at least PostGIS version 2.2. '
                     'Was the database created from a spatial database '
                     'template?' % self.connection.settings_dict['NAME']
-                )
+                ) from e
             version = vtup[1:]
         return version
 

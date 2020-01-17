@@ -138,7 +138,7 @@ class FieldListFilter(ListFilter):
         except (ValueError, ValidationError) as e:
             # Fields may raise a ValueError or ValidationError when converting
             # the parameters to the correct type.
-            raise IncorrectLookupParameters(e)
+            raise IncorrectLookupParameters(e) from e
 
     @classmethod
     def register(cls, test, list_filter_class, take_priority=False):

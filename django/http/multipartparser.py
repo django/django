@@ -69,8 +69,9 @@ class MultiPartParser:
         # Parse the header to get the boundary to split the parts.
         try:
             ctypes, opts = parse_header(content_type.encode('ascii'))
-        except UnicodeEncodeError:
-            raise MultiPartParserError('Invalid non-ASCII Content-Type in multipart: %s' % force_str(content_type))
+        except UnicodeEncodeError as e:
+            raise MultiPartParserError('Invalid non-ASCII Content-Type in multipart: %s' %
+                                       force_str(content_type)) from e
         boundary = opts.get('boundary')
         if not boundary or not cgi.valid_boundary(boundary):
             raise MultiPartParserError('Invalid boundary in multipart: %s' % force_str(boundary))
@@ -437,8 +438,8 @@ class ChunkIter:
     def __next__(self):
         try:
             data = self.flo.read(self.chunk_size)
-        except InputStreamExhausted:
-            raise StopIteration()
+        except InputStreamExhausted as e:
+            raise StopIteration() from e
         if data:
             return data
         else:
@@ -462,8 +463,8 @@ class InterBoundaryIter:
     def __next__(self):
         try:
             return LazyStream(BoundaryIter(self._stream, self._boundary))
-        except InputStreamExhausted:
-            raise StopIteration()
+        except InputStreamExhausted as e:
+            raise StopIteration() from e
 
 
 class BoundaryIter:
@@ -589,8 +590,8 @@ def parse_boundary_stream(stream, max_header_size):
         main_value_pair, params = parse_header(line)
         try:
             name, value = main_value_pair.split(':', 1)
-        except ValueError:
-            raise ValueError("Invalid header: %r" % line)
+        except ValueError as e:
+            raise ValueError("Invalid header: %r" % line) from e
         return name, (value, params)
 
     if header_end == -1:

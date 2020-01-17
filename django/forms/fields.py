@@ -271,8 +271,8 @@ class IntegerField(Field):
         # Strip trailing decimal and zeros.
         try:
             value = int(self.re_decimal.sub('', str(value)))
-        except (ValueError, TypeError):
-            raise ValidationError(self.error_messages['invalid'], code='invalid')
+        except (ValueError, TypeError) as e:
+            raise ValidationError(self.error_messages['invalid'], code='invalid') from e
         return value
 
     def widget_attrs(self, widget):
@@ -302,8 +302,8 @@ class FloatField(IntegerField):
             value = formats.sanitize_separators(value)
         try:
             value = float(value)
-        except (ValueError, TypeError):
-            raise ValidationError(self.error_messages['invalid'], code='invalid')
+        except (ValueError, TypeError) as e:
+            raise ValidationError(self.error_messages['invalid'], code='invalid') from e
         return value
 
     def validate(self, value):
@@ -344,8 +344,8 @@ class DecimalField(IntegerField):
         value = str(value).strip()
         try:
             value = Decimal(value)
-        except DecimalException:
-            raise ValidationError(self.error_messages['invalid'], code='invalid')
+        except DecimalException as e:
+            raise ValidationError(self.error_messages['invalid'], code='invalid') from e
         return value
 
     def validate(self, value):
@@ -467,8 +467,8 @@ class DateTimeField(BaseTemporalField):
             return from_current_timezone(result)
         try:
             result = parse_datetime(value.strip())
-        except ValueError:
-            raise ValidationError(self.error_messages['invalid'], code='invalid')
+        except ValueError as e:
+            raise ValidationError(self.error_messages['invalid'], code='invalid') from e
         if not result:
             result = super().to_python(value)
         return from_current_timezone(result)
@@ -495,11 +495,11 @@ class DurationField(Field):
             return value
         try:
             value = parse_duration(str(value))
-        except OverflowError:
+        except OverflowError as e:
             raise ValidationError(self.error_messages['overflow'].format(
                 min_days=datetime.timedelta.min.days,
                 max_days=datetime.timedelta.max.days,
-            ), code='overflow')
+            ), code='overflow') from e
         if value is None:
             raise ValidationError(self.error_messages['invalid'], code='invalid')
         return value
@@ -563,8 +563,8 @@ class FileField(Field):
         try:
             file_name = data.name
             file_size = data.size
-        except AttributeError:
-            raise ValidationError(self.error_messages['invalid'], code='invalid')
+        except AttributeError as e:
+            raise ValidationError(self.error_messages['invalid'], code='invalid') from e
 
         if self.max_length is not None and len(file_name) > self.max_length:
             params = {'max': self.max_length, 'length': len(file_name)}
@@ -682,10 +682,10 @@ class URLField(CharField):
             """
             try:
                 return list(urlsplit(url))
-            except ValueError:
+            except ValueError as e:
                 # urlparse.urlsplit can raise a ValueError with some
                 # misformatted URLs.
-                raise ValidationError(self.error_messages['invalid'], code='invalid')
+                raise ValidationError(self.error_messages['invalid'], code='invalid') from e
 
         value = super().to_python(value)
         if value:
@@ -843,12 +843,12 @@ class TypedChoiceField(ChoiceField):
             return self.empty_value
         try:
             value = self.coerce(value)
-        except (ValueError, TypeError, ValidationError):
+        except (ValueError, TypeError, ValidationError) as e:
             raise ValidationError(
                 self.error_messages['invalid_choice'],
                 code='invalid_choice',
                 params={'value': value},
-            )
+            ) from e
         return value
 
     def clean(self, value):
@@ -915,12 +915,12 @@ class TypedMultipleChoiceField(MultipleChoiceField):
         for choice in value:
             try:
                 new_value.append(self.coerce(choice))
-            except (ValueError, TypeError, ValidationError):
+            except (ValueError, TypeError, ValidationError) as e:
                 raise ValidationError(
                     self.error_messages['invalid_choice'],
                     code='invalid_choice',
                     params={'value': choice},
-                )
+                ) from e
         return new_value
 
     def clean(self, value):
@@ -1208,6 +1208,6 @@ class UUIDField(CharField):
         if not isinstance(value, uuid.UUID):
             try:
                 value = uuid.UUID(value)
-            except ValueError:
-                raise ValidationError(self.error_messages['invalid'], code='invalid')
+            except ValueError as e:
+                raise ValidationError(self.error_messages['invalid'], code='invalid') from e
         return value

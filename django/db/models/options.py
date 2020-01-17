@@ -229,8 +229,8 @@ class Options:
                     f for f in self._get_fields(reverse=False)
                     if f.name == query or f.attname == query
                 )
-            except StopIteration:
-                raise FieldDoesNotExist("%s has no field named '%s'" % (self.object_name, query))
+            except StopIteration as e:
+                raise FieldDoesNotExist("%s has no field named '%s'" % (self.object_name, query)) from e
 
             self.ordering = ('_order',)
             if not any(isinstance(field, OrderWrt) for field in model._meta.local_fields):
@@ -394,13 +394,13 @@ class Options:
         if base_manager_name:
             try:
                 return self.managers_map[base_manager_name]
-            except KeyError:
+            except KeyError as e:
                 raise ValueError(
                     "%s has no manager named %r" % (
                         self.object_name,
                         base_manager_name,
                     )
-                )
+                ) from e
 
         manager = Manager()
         manager.name = '_base_manager'
@@ -421,13 +421,13 @@ class Options:
         if default_manager_name:
             try:
                 return self.managers_map[default_manager_name]
-            except KeyError:
+            except KeyError as e:
                 raise ValueError(
                     "%s has no manager named %r" % (
                         self.object_name,
                         default_manager_name,
                     )
-                )
+                ) from e
 
         if self.managers:
             return self.managers[0]
@@ -575,8 +575,8 @@ class Options:
             # Retrieve field instance by name from cached or just-computed
             # field map.
             return self.fields_map[field_name]
-        except KeyError:
-            raise FieldDoesNotExist("%s has no field named '%s'" % (self.object_name, field_name))
+        except KeyError as e:
+            raise FieldDoesNotExist("%s has no field named '%s'" % (self.object_name, field_name)) from e
 
     def get_base_chain(self, model):
         """

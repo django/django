@@ -10,8 +10,8 @@ def feed(request, url, feed_dict=None):
     slug = url.partition('/')[0]
     try:
         f = feed_dict[slug]
-    except KeyError:
-        raise Http404(_('Slug %r isn’t registered.') % slug)
+    except KeyError as e:
+        raise Http404(_('Slug %r isn’t registered.') % slug) from e
 
     instance = f()
     instance.feed_url = getattr(f, 'feed_url', None) or request.path

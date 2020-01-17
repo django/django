@@ -22,8 +22,8 @@ class Loader(BaseLoader):
         try:
             with open(origin.name, encoding=self.engine.file_charset) as fp:
                 return fp.read()
-        except FileNotFoundError:
-            raise TemplateDoesNotExist(origin)
+        except FileNotFoundError as e:
+            raise TemplateDoesNotExist(origin) from e
 
     def get_template_sources(self, template_name):
         """

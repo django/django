@@ -243,8 +243,8 @@ class ListMixin:
         "Assign values to a slice of the object"
         try:
             valueList = list(values)
-        except TypeError:
-            raise TypeError('can only assign an iterable to a slice')
+        except TypeError as e:
+            raise TypeError('can only assign an iterable to a slice') from e
 
         self._check_allowed(valueList)
 

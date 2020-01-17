@@ -119,10 +119,10 @@ def get_hasher(algorithm='default'):
         hashers = get_hashers_by_algorithm()
         try:
             return hashers[algorithm]
-        except KeyError:
+        except KeyError as e:
             raise ValueError("Unknown password hashing algorithm '%s'. "
                              "Did you specify it in the PASSWORD_HASHERS "
-                             "setting?" % algorithm)
+                             "setting?" % algorithm) from e
 
 
 def identify_hasher(encoded):
@@ -178,7 +178,7 @@ class BasePasswordHasher:
                 module = importlib.import_module(mod_path)
             except ImportError as e:
                 raise ValueError("Couldn't load %r algorithm library: %s" %
-                                 (self.__class__.__name__, e))
+                                 (self.__class__.__name__, e)) from e
             return module
         raise ValueError("Hasher %r doesn't specify a library attribute" %
                          self.__class__.__name__)

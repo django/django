@@ -40,21 +40,21 @@ class DatabaseWrapper(SQLiteDatabaseWrapper):
         # Enabling extension loading on the SQLite connection.
         try:
             conn.enable_load_extension(True)
-        except AttributeError:
+        except AttributeError as e:
             raise ImproperlyConfigured(
                 'SpatiaLite requires SQLite to be configured to allow '
                 'extension loading.'
-            )
+            ) from e
         # Load the SpatiaLite library extension on the connection.
         for path in self.lib_spatialite_paths:
             try:
                 conn.load_extension(path)
-            except Exception:
+            except Exception as e:
                 if getattr(settings, 'SPATIALITE_LIBRARY_PATH', None):
                     raise ImproperlyConfigured(
                         'Unable to load the SpatiaLite library extension '
                         'as specified in your SPATIALITE_LIBRARY_PATH setting.'
-                    )
+                    ) from e
                 continue
             else:
                 break

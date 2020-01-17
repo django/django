@@ -170,8 +170,8 @@ class ConnectionHandler:
         """
         try:
             conn = self.databases[alias]
-        except KeyError:
-            raise ConnectionDoesNotExist("The connection %s doesn't exist" % alias)
+        except KeyError as e:
+            raise ConnectionDoesNotExist("The connection %s doesn't exist" % alias) from e
 
         conn.setdefault('ATOMIC_REQUESTS', False)
         conn.setdefault('AUTOCOMMIT', True)
@@ -190,8 +190,8 @@ class ConnectionHandler:
         """
         try:
             conn = self.databases[alias]
-        except KeyError:
-            raise ConnectionDoesNotExist("The connection %s doesn't exist" % alias)
+        except KeyError as e:
+            raise ConnectionDoesNotExist("The connection %s doesn't exist" % alias) from e
 
         test_settings = conn.setdefault('TEST', {})
         default_test_settings = [

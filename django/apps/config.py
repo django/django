@@ -147,19 +147,19 @@ class AppConfig:
         # all error checking for entries in INSTALLED_APPS in one place.
         try:
             app_name = cls.name
-        except AttributeError:
+        except AttributeError as e:
             raise ImproperlyConfigured(
-                "'%s' must supply a name attribute." % entry)
+                "'%s' must supply a name attribute." % entry) from e
 
         # Ensure app_name points to a valid module.
         try:
             app_module = import_module(app_name)
-        except ImportError:
+        except ImportError as e:
             raise ImproperlyConfigured(
                 "Cannot import '%s'. Check that '%s.%s.name' is correct." % (
                     app_name, mod_path, cls_name,
                 )
-            )
+            ) from e
 
         # Entry is a path to an app config class.
         return cls(app_name, app_module)
@@ -176,9 +176,9 @@ class AppConfig:
             self.apps.check_apps_ready()
         try:
             return self.models[model_name.lower()]
-        except KeyError:
+        except KeyError as e:
             raise LookupError(
-                "App '%s' doesn't have a '%s' model." % (self.label, model_name))
+                "App '%s' doesn't have a '%s' model." % (self.label, model_name)) from e
 
     def get_models(self, include_auto_created=False, include_swapped=False):
         """

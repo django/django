@@ -34,11 +34,11 @@ class EngineHandler:
                 # This will raise an exception if 'BACKEND' doesn't exist or
                 # isn't a string containing at least one dot.
                 default_name = tpl['BACKEND'].rsplit('.', 2)[-2]
-            except Exception:
+            except Exception as e:
                 invalid_backend = tpl.get('BACKEND', '<not defined>')
                 raise ImproperlyConfigured(
                     "Invalid BACKEND for a template engine: {}. Check "
-                    "your TEMPLATES setting.".format(invalid_backend))
+                    "your TEMPLATES setting.".format(invalid_backend)) from e
 
             tpl = {
                 'NAME': default_name,
@@ -67,10 +67,10 @@ class EngineHandler:
         except KeyError:
             try:
                 params = self.templates[alias]
-            except KeyError:
+            except KeyError as e:
                 raise InvalidTemplateEngineError(
                     "Could not find config for '{}' "
-                    "in settings.TEMPLATES".format(alias))
+                    "in settings.TEMPLATES".format(alias)) from e
 
             # If importing or initializing the backend raises an exception,
             # self._engines[alias] isn't set and this code may get executed

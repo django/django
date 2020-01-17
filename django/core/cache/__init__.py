@@ -40,7 +40,7 @@ def _create_cache(backend, **kwargs):
                 import_string(backend)
             except ImportError as e:
                 raise InvalidCacheBackendError("Could not find backend '%s': %s" % (
-                    backend, e))
+                    backend, e)) from e
             location = kwargs.pop('LOCATION', '')
             params = kwargs
         else:
@@ -50,7 +50,7 @@ def _create_cache(backend, **kwargs):
         backend_cls = import_string(backend)
     except ImportError as e:
         raise InvalidCacheBackendError(
-            "Could not find backend '%s': %s" % (backend, e))
+            "Could not find backend '%s': %s" % (backend, e)) from e
     return backend_cls(location, params)
 
 

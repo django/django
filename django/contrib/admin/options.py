@@ -704,7 +704,7 @@ class ModelAdmin(BaseModelAdmin):
             raise FieldError(
                 '%s. Check fields/fieldsets/exclude attributes of class %s.'
                 % (e, self.__class__.__name__)
-            )
+            ) from e
 
     def get_changelist(self, request, **kwargs):
         """

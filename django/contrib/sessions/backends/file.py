@@ -125,12 +125,12 @@ class SessionStore(SessionBase):
                 flags |= os.O_EXCL | os.O_CREAT
             fd = os.open(session_file_name, flags)
             os.close(fd)
-        except FileNotFoundError:
+        except FileNotFoundError as e:
             if not must_create:
-                raise UpdateError
-        except FileExistsError:
+                raise UpdateError from e
+        except FileExistsError as e:
             if must_create:
-                raise CreateError
+                raise CreateError from e
 
         # Write the session file without interfering with other threads
         # or processes.  By writing to an atomically generated temporary

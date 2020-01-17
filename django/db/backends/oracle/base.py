@@ -27,7 +27,7 @@ def _setup_environment(environ):
         except ImportError as e:
             raise ImproperlyConfigured("Error loading ctypes: %s; "
                                        "the Oracle backend requires ctypes to "
-                                       "operate correctly under Cygwin." % e)
+                                       "operate correctly under Cygwin." % e) from e
         kernel32 = ctypes.CDLL('kernel32')
         for name, value in environ:
             kernel32.SetEnvironmentVariableA(name, value)
@@ -47,7 +47,7 @@ _setup_environment([
 try:
     import cx_Oracle as Database
 except ImportError as e:
-    raise ImproperlyConfigured("Error loading cx_Oracle module: %s" % e)
+    raise ImproperlyConfigured("Error loading cx_Oracle module: %s" % e) from e
 
 # Some of these import cx_Oracle, so import them after checking if it's installed.
 from .client import DatabaseClient                          # NOQA isort:skip
@@ -74,7 +74,7 @@ def wrap_oracle_errors():
         # Convert that case to Django's IntegrityError exception.
         x = e.args[0]
         if hasattr(x, 'code') and hasattr(x, 'message') and x.code == 2091 and 'ORA-02291' in x.message:
-            raise utils.IntegrityError(*tuple(e.args))
+            raise utils.IntegrityError(*tuple(e.args)) from e
         raise
 
 

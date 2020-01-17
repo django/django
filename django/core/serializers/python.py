@@ -99,7 +99,7 @@ def Deserializer(object_list, *, using=DEFAULT_DB_ALIAS, ignorenonexistent=False
             try:
                 data[Model._meta.pk.attname] = Model._meta.pk.to_python(d.get('pk'))
             except Exception as e:
-                raise base.DeserializationError.WithData(e, d['model'], d.get('pk'), None)
+                raise base.DeserializationError.WithData(e, d['model'], d.get('pk'), None) from e
         m2m_data = {}
         deferred_fields = {}
 
@@ -121,7 +121,7 @@ def Deserializer(object_list, *, using=DEFAULT_DB_ALIAS, ignorenonexistent=False
                 try:
                     values = base.deserialize_m2m_values(field, field_value, using, handle_forward_references)
                 except base.M2MDeserializationError as e:
-                    raise base.DeserializationError.WithData(e.original_exc, d['model'], d.get('pk'), e.pk)
+                    raise base.DeserializationError.WithData(e.original_exc, d['model'], d.get('pk'), e.pk) from e
                 if values == base.DEFER_FIELD:
                     deferred_fields[field] = field_value
                 else:
@@ -131,7 +131,7 @@ def Deserializer(object_list, *, using=DEFAULT_DB_ALIAS, ignorenonexistent=False
                 try:
                     value = base.deserialize_fk_value(field, field_value, using, handle_forward_references)
                 except Exception as e:
-                    raise base.DeserializationError.WithData(e, d['model'], d.get('pk'), field_value)
+                    raise base.DeserializationError.WithData(e, d['model'], d.get('pk'), field_value) from e
                 if value == base.DEFER_FIELD:
                     deferred_fields[field] = field_value
                 else:
@@ -141,7 +141,7 @@ def Deserializer(object_list, *, using=DEFAULT_DB_ALIAS, ignorenonexistent=False
                 try:
                     data[field.name] = field.to_python(field_value)
                 except Exception as e:
-                    raise base.DeserializationError.WithData(e, d['model'], d.get('pk'), field_value)
+                    raise base.DeserializationError.WithData(e, d['model'], d.get('pk'), field_value) from e
 
         obj = base.build_instance(Model, data, using)
         yield base.DeserializedObject(obj, m2m_data, deferred_fields)
@@ -151,5 +151,5 @@ def _get_model(model_identifier):
     """Look up a model from an "app_label.model_name" string."""
     try:
         return apps.get_model(model_identifier)
-    except (LookupError, TypeError):
-        raise base.DeserializationError("Invalid model identifier: '%s'" % model_identifier)
+    except (LookupError, TypeError) as e:
+        raise base.DeserializationError("Invalid model identifier: '%s'" % model_identifier) from e

@@ -16,8 +16,8 @@ class Loader(BaseLoader):
     def get_contents(self, origin):
         try:
             return self.templates_dict[origin.name]
-        except KeyError:
-            raise TemplateDoesNotExist(origin)
+        except KeyError as e:
+            raise TemplateDoesNotExist(origin) from e
 
     def get_template_sources(self, template_name):
         yield Origin(

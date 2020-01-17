@@ -56,7 +56,7 @@ class Command(BaseCommand):
         try:
             apps.get_app_config(app_label)
         except LookupError as err:
-            raise CommandError(str(err))
+            raise CommandError(str(err)) from err
         # Load the current graph state, check the app and migration they asked for exists
         loader = MigrationLoader(connections[DEFAULT_DB_ALIAS])
         if app_label not in loader.migrated_apps:
@@ -80,14 +80,14 @@ class Command(BaseCommand):
             try:
                 start_index = migrations_to_squash.index(start)
                 migrations_to_squash = migrations_to_squash[start_index:]
-            except ValueError:
+            except ValueError as e:
                 raise CommandError(
                     "The migration '%s' cannot be found. Maybe it comes after "
                     "the migration '%s'?\n"
                     "Have a look at:\n"
                     "  python manage.py showmigrations %s\n"
                     "to debug this issue." % (start_migration, migration, app_label)
-                )
+                ) from e
 
         # Tell them what we're doing and optionally ask if we should proceed
         if self.verbosity > 0 or self.interactive:
@@ -202,13 +202,13 @@ class Command(BaseCommand):
     def find_migration(self, loader, app_label, name):
         try:
             return loader.get_migration_by_prefix(app_label, name)
-        except AmbiguityError:
+        except AmbiguityError as e:
             raise CommandError(
                 "More than one migration matches '%s' in app '%s'. Please be "
                 "more specific." % (name, app_label)
-            )
-        except KeyError:
+            ) from e
+        except KeyError as e:
             raise CommandError(
                 "Cannot find a migration matching '%s' from app '%s'." %
                 (name, app_label)
-            )
+            ) from e

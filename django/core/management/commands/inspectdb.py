@@ -32,8 +32,9 @@ class Command(BaseCommand):
         try:
             for line in self.handle_inspection(options):
                 self.stdout.write("%s\n" % line)
-        except NotImplementedError:
-            raise CommandError("Database inspection isn't supported for the currently selected database backend.")
+        except NotImplementedError as e:
+            raise CommandError("Database inspection isn't supported for the "
+                               "currently selected database backend.") from e
 
     def handle_inspection(self, options):
         connection = connections[options['database']]

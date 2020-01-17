@@ -1174,12 +1174,12 @@ class DateField(DateTimeCheckMixin, Field):
             parsed = parse_date(value)
             if parsed is not None:
                 return parsed
-        except ValueError:
+        except ValueError as e:
             raise exceptions.ValidationError(
                 self.error_messages['invalid_date'],
                 code='invalid_date',
                 params={'value': value},
-            )
+            ) from e
 
         raise exceptions.ValidationError(
             self.error_messages['invalid'],
@@ -1313,23 +1313,23 @@ class DateTimeField(DateField):
             parsed = parse_datetime(value)
             if parsed is not None:
                 return parsed
-        except ValueError:
+        except ValueError as e:
             raise exceptions.ValidationError(
                 self.error_messages['invalid_datetime'],
                 code='invalid_datetime',
                 params={'value': value},
-            )
+            ) from e
 
         try:
             parsed = parse_date(value)
             if parsed is not None:
                 return datetime.datetime(parsed.year, parsed.month, parsed.day)
-        except ValueError:
+        except ValueError as e:
             raise exceptions.ValidationError(
                 self.error_messages['invalid_date'],
                 code='invalid_date',
                 params={'value': value},
-            )
+            ) from e
 
         raise exceptions.ValidationError(
             self.error_messages['invalid'],
@@ -1496,12 +1496,12 @@ class DecimalField(Field):
             return self.context.create_decimal_from_float(value)
         try:
             return decimal.Decimal(value)
-        except decimal.InvalidOperation:
+        except decimal.InvalidOperation as e:
             raise exceptions.ValidationError(
                 self.error_messages['invalid'],
                 code='invalid',
                 params={'value': value},
-            )
+            ) from e
 
     def get_db_prep_save(self, value, connection):
         return connection.ops.adapt_decimalfield_value(self.to_python(value), self.max_digits, self.decimal_places)
@@ -1693,12 +1693,12 @@ class FloatField(Field):
             return value
         try:
             return float(value)
-        except (TypeError, ValueError):
+        except (TypeError, ValueError) as e:
             raise exceptions.ValidationError(
                 self.error_messages['invalid'],
                 code='invalid',
                 params={'value': value},
-            )
+            ) from e
 
     def formfield(self, **kwargs):
         return super().formfield(**{
@@ -1780,12 +1780,12 @@ class IntegerField(Field):
             return value
         try:
             return int(value)
-        except (TypeError, ValueError):
+        except (TypeError, ValueError) as e:
             raise exceptions.ValidationError(
                 self.error_messages['invalid'],
                 code='invalid',
                 params={'value': value},
-            )
+            ) from e
 
     def formfield(self, **kwargs):
         return super().formfield(**{
@@ -2154,12 +2154,12 @@ class TimeField(DateTimeCheckMixin, Field):
             parsed = parse_time(value)
             if parsed is not None:
                 return parsed
-        except ValueError:
+        except ValueError as e:
             raise exceptions.ValidationError(
                 self.error_messages['invalid_time'],
                 code='invalid_time',
                 params={'value': value},
-            )
+            ) from e
 
         raise exceptions.ValidationError(
             self.error_messages['invalid'],
@@ -2321,12 +2321,12 @@ class UUIDField(Field):
             input_form = 'int' if isinstance(value, int) else 'hex'
             try:
                 return uuid.UUID(**{input_form: value})
-            except (AttributeError, ValueError):
+            except (AttributeError, ValueError) as e:
                 raise exceptions.ValidationError(
                     self.error_messages['invalid'],
                     code='invalid',
                     params={'value': value},
-                )
+                ) from e
         return value
 
     def formfield(self, **kwargs):

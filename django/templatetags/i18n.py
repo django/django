@@ -380,10 +380,10 @@ def do_translate(parser, token):
         elif option == 'context':
             try:
                 value = remaining.pop(0)
-            except IndexError:
+            except IndexError as e:
                 raise TemplateSyntaxError(
                     "No argument provided to the '%s' tag for the context option." % bits[0]
-                )
+                ) from e
             if value in invalid_context:
                 raise TemplateSyntaxError(
                     "Invalid argument '%s' provided to the '%s' tag for the context option" % (value, bits[0]),
@@ -392,10 +392,10 @@ def do_translate(parser, token):
         elif option == 'as':
             try:
                 value = remaining.pop(0)
-            except IndexError:
+            except IndexError as e:
                 raise TemplateSyntaxError(
                     "No argument provided to the '%s' tag for the as option." % bits[0]
-                )
+                ) from e
             asvar = value
         else:
             raise TemplateSyntaxError(
@@ -476,19 +476,19 @@ def do_block_translate(parser, token):
             try:
                 value = remaining_bits.pop(0)
                 value = parser.compile_filter(value)
-            except Exception:
+            except Exception as e:
                 raise TemplateSyntaxError(
                     '"context" in %r tag expected exactly one argument.' % bits[0]
-                )
+                ) from e
         elif option == "trimmed":
             value = True
         elif option == "asvar":
             try:
                 value = remaining_bits.pop(0)
-            except IndexError:
+            except IndexError as e:
                 raise TemplateSyntaxError(
                     "No argument provided to the '%s' tag for the asvar option." % bits[0]
-                )
+                ) from e
             asvar = value
         else:
             raise TemplateSyntaxError('Unknown argument for %r tag: %r.' %

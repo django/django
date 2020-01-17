@@ -96,14 +96,14 @@ def parse_apps_and_model_labels(labels):
         if '.' in label:
             try:
                 model = installed_apps.get_model(label)
-            except LookupError:
-                raise CommandError('Unknown model: %s' % label)
+            except LookupError as e:
+                raise CommandError('Unknown model: %s' % label) from e
             models.add(model)
         else:
             try:
                 app_config = installed_apps.get_app_config(label)
             except LookupError as e:
-                raise CommandError(str(e))
+                raise CommandError(str(e)) from e
             apps.add(app_config)
 
     return models, apps

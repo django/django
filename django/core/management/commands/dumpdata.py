@@ -100,13 +100,13 @@ class Command(BaseCommand):
                     try:
                         app_config = apps.get_app_config(app_label)
                     except LookupError as e:
-                        raise CommandError(str(e))
+                        raise CommandError(str(e)) from e
                     if app_config.models_module is None or app_config in excluded_apps:
                         continue
                     try:
                         model = app_config.get_model(model_label)
-                    except LookupError:
-                        raise CommandError("Unknown model: %s.%s" % (app_label, model_label))
+                    except LookupError as e:
+                        raise CommandError("Unknown model: %s.%s" % (app_label, model_label)) from e
 
                     app_list_value = app_list.setdefault(app_config, [])
 
@@ -116,15 +116,15 @@ class Command(BaseCommand):
                     if app_list_value is not None:
                         if model not in app_list_value:
                             app_list_value.append(model)
-                except ValueError:
+                except ValueError as value_error:
                     if primary_keys:
-                        raise CommandError("You can only use --pks option with one model")
+                        raise CommandError("You can only use --pks option with one model") from value_error
                     # This is just an app - no model qualifier
                     app_label = label
                     try:
                         app_config = apps.get_app_config(app_label)
-                    except LookupError as e:
-                        raise CommandError(str(e))
+                    except LookupError as lookup_error:
+                        raise CommandError(str(lookup_error)) from lookup_error
                     if app_config.models_module is None or app_config in excluded_apps:
                         continue
                     app_list[app_config] = None
@@ -190,4 +190,4 @@ class Command(BaseCommand):
         except Exception as e:
             if show_traceback:
                 raise
-            raise CommandError("Unable to serialize database: %s" % e)
+            raise CommandError("Unable to serialize database: %s" % e) from e

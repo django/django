@@ -238,13 +238,13 @@ class DeserializedObject:
                 try:
                     values = deserialize_m2m_values(field, field_value, using, handle_forward_references=False)
                 except M2MDeserializationError as e:
-                    raise DeserializationError.WithData(e.original_exc, label, self.object.pk, e.pk)
+                    raise DeserializationError.WithData(e.original_exc, label, self.object.pk, e.pk) from e
                 self.m2m_data[field.name] = values
             elif isinstance(field.remote_field, models.ManyToOneRel):
                 try:
                     value = deserialize_fk_value(field, field_value, using, handle_forward_references=False)
                 except Exception as e:
-                    raise DeserializationError.WithData(e, label, self.object.pk, field_value)
+                    raise DeserializationError.WithData(e, label, self.object.pk, field_value) from e
                 setattr(self.object, field.attname, value)
         self.save()
 
@@ -285,7 +285,7 @@ def deserialize_m2m_values(field, field_value, using, handle_forward_references)
     try:
         pks_iter = iter(field_value)
     except TypeError as e:
-        raise M2MDeserializationError(e, field_value)
+        raise M2MDeserializationError(e, field_value) from e
     try:
         values = []
         for pk in pks_iter:

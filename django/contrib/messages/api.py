@@ -19,17 +19,17 @@ def add_message(request, level, message, extra_tags='', fail_silently=False):
     """
     try:
         messages = request._messages
-    except AttributeError:
+    except AttributeError as e:
         if not hasattr(request, 'META'):
             raise TypeError(
                 "add_message() argument must be an HttpRequest object, not "
                 "'%s'." % request.__class__.__name__
-            )
+            ) from e
         if not fail_silently:
             raise MessageFailure(
                 'You cannot add messages without installing '
                 'django.contrib.messages.middleware.MessageMiddleware'
-            )
+            ) from e
     else:
         return messages.add(level, message, extra_tags)
 

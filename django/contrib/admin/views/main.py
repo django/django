@@ -240,8 +240,8 @@ class ChangeList:
         else:
             try:
                 result_list = paginator.page(self.page_num + 1).object_list
-            except InvalidPage:
-                raise IncorrectLookupParameters
+            except InvalidPage as e:
+                raise IncorrectLookupParameters from e
 
         self.result_count = result_count
         self.show_full_result_count = self.model_admin.show_full_result_count

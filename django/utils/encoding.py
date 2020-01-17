@@ -63,7 +63,7 @@ def force_str(s, encoding='utf-8', strings_only=False, errors='strict'):
         else:
             s = str(s)
     except UnicodeDecodeError as e:
-        raise DjangoUnicodeDecodeError(s, *e.args)
+        raise DjangoUnicodeDecodeError(s, *e.args) from e
     return s
 
 

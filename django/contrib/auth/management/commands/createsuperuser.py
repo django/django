@@ -193,7 +193,7 @@ class Command(BaseCommand):
             self.stderr.write('\nOperation cancelled.')
             sys.exit(1)
         except exceptions.ValidationError as e:
-            raise CommandError('; '.join(e.messages))
+            raise CommandError('; '.join(e.messages)) from e
         except NotRunningInTTYException:
             self.stdout.write(
                 'Superuser creation skipped due to not running in a TTY. '

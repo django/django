@@ -106,8 +106,8 @@ class Polygon(GEOSGeometry):
         try:
             ring = LinearRing(param)
             return ring
-        except TypeError:
-            raise TypeError(msg)
+        except TypeError as e:
+            raise TypeError(msg) from e
 
     def _set_list(self, length, items):
         # Getting the current pointer, replacing with the newly constructed

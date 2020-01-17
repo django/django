@@ -72,7 +72,7 @@ class MultipleObjectMixin(ContextMixin):
             raise Http404(_('Invalid page (%(page_number)s): %(message)s') % {
                 'page_number': page_number,
                 'message': str(e)
-            })
+            }) from e
 
     def get_paginate_by(self, queryset):
         """

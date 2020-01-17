@@ -384,8 +384,8 @@ class QuerySet:
             # attribute.
             try:
                 arg.default_alias
-            except (AttributeError, TypeError):
-                raise TypeError("Complex aggregates require an alias")
+            except (AttributeError, TypeError) as e:
+                raise TypeError("Complex aggregates require an alias") from e
             kwargs[arg.default_alias] = arg
 
         query = self.query.chain()
@@ -1072,8 +1072,8 @@ class QuerySet:
                     raise ValueError("The named annotation '%s' conflicts with the "
                                      "default name for another annotation."
                                      % arg.default_alias)
-            except TypeError:
-                raise TypeError("Complex annotations require an alias")
+            except TypeError as e:
+                raise TypeError("Complex annotations require an alias") from e
             annotations[arg.default_alias] = arg
         annotations.update(kwargs)
 

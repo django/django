@@ -84,7 +84,7 @@ class GDALRaster(GDALRasterBase):
                 # GDALOpen will auto-detect the data source type.
                 self._ptr = capi.open_ds(force_bytes(ds_input), self._write)
             except GDALException as err:
-                raise GDALException('Could not open the datasource at "{}" ({}).'.format(ds_input, err))
+                raise GDALException('Could not open the datasource at "{}" ({}).'.format(ds_input, err)) from err
         elif isinstance(ds_input, bytes):
             # Create a new raster in write mode.
             self._write = 1

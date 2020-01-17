@@ -187,8 +187,8 @@ class LayerMapping:
         def check_ogr_fld(ogr_map_fld):
             try:
                 idx = ogr_fields.index(ogr_map_fld)
-            except ValueError:
-                raise LayerMapError('Given mapping OGR field "%s" not found in OGR Layer.' % ogr_map_fld)
+            except ValueError as e:
+                raise LayerMapError('Given mapping OGR field "%s" not found in OGR Layer.' % ogr_map_fld) from e
             return idx
 
         # No need to increment through each feature in the model, simply check
@@ -198,8 +198,8 @@ class LayerMapping:
             # for the given field name in the mapping.
             try:
                 model_field = self.model._meta.get_field(field_name)
-            except FieldDoesNotExist:
-                raise LayerMapError('Given mapping field "%s" not in given Model fields.' % field_name)
+            except FieldDoesNotExist as e:
+                raise LayerMapError('Given mapping field "%s" not in given Model fields.' % field_name) from e
 
             # Getting the string name for the Django field class (e.g., 'PointField').
             fld_name = model_field.__class__.__name__
@@ -216,8 +216,8 @@ class LayerMapping:
                         gtype = OGRGeomType(ogr_name + '25D')
                     else:
                         gtype = OGRGeomType(ogr_name)
-                except GDALException:
-                    raise LayerMapError('Invalid mapping for GeometryField "%s".' % field_name)
+                except GDALException as e:
+                    raise LayerMapError('Invalid mapping for GeometryField "%s".' % field_name) from e
 
                 # Making sure that the OGR Layer's Geometry is compatible.
                 ltype = self.layer.geom_type
@@ -240,9 +240,9 @@ class LayerMapping:
                         idx = check_ogr_fld(ogr_field)
                         try:
                             rel_model._meta.get_field(rel_name)
-                        except FieldDoesNotExist:
+                        except FieldDoesNotExist as e:
                             raise LayerMapError('ForeignKey mapping field "%s" not in %s fields.' %
-                                                (rel_name, rel_model.__class__.__name__))
+                                                (rel_name, rel_model.__class__.__name__)) from e
                     fields_val = rel_model
                 else:
                     raise TypeError('ForeignKey mapping must be of dictionary type.')
@@ -313,8 +313,8 @@ class LayerMapping:
                 # Verify OGR geometry.
                 try:
                     val = self.verify_geom(feat.geom, model_field)
-                except GDALException:
-                    raise LayerMapError('Could not retrieve geometry from feature.')
+                except GDALException as e:
+                    raise LayerMapError('Could not retrieve geometry from feature.') from e
             elif isinstance(model_field, models.base.ModelBase):
                 # The related _model_, not a field was passed in -- indicating
                 # another mapping for the related Model.
@@ -361,8 +361,8 @@ class LayerMapping:
             try:
                 # Creating an instance of the Decimal value to use.
                 d = Decimal(str(ogr_field.value))
-            except DecimalInvalidOperation:
-                raise InvalidDecimal('Could not construct decimal from: %s' % ogr_field.value)
+            except DecimalInvalidOperation as e:
+                raise InvalidDecimal('Could not construct decimal from: %s' % ogr_field.value) from e
 
             # Getting the decimal value as a tuple.
             dtup = d.as_tuple()
@@ -392,8 +392,8 @@ class LayerMapping:
             # Attempt to convert any OFTReal and OFTString value to an OFTInteger.
             try:
                 val = int(ogr_field.value)
-            except ValueError:
-                raise InvalidInteger('Could not construct integer from: %s' % ogr_field.value)
+            except ValueError as e:
+                raise InvalidInteger('Could not construct integer from: %s' % ogr_field.value) from e
         else:
             val = ogr_field.value
         return val
@@ -415,11 +415,11 @@ class LayerMapping:
         # Attempting to retrieve and return the related model.
         try:
             return rel_model.objects.using(self.using).get(**fk_kwargs)
-        except ObjectDoesNotExist:
+        except ObjectDoesNotExist as e:
             raise MissingForeignKey(
                 'No ForeignKey %s model found with keyword arguments: %s' %
                 (rel_model.__name__, fk_kwargs)
-            )
+            ) from e
 
     def verify_geom(self, geom, model_field):
         """

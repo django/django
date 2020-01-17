@@ -68,10 +68,10 @@ class TemplateCommand(BaseCommand):
             top_dir = os.path.join(os.getcwd(), name)
             try:
                 os.makedirs(top_dir)
-            except FileExistsError:
-                raise CommandError("'%s' already exists" % top_dir)
+            except FileExistsError as e:
+                raise CommandError("'%s' already exists" % top_dir) from e
             except OSError as e:
-                raise CommandError(e)
+                raise CommandError(e) from e
         else:
             if app_or_project == 'app':
                 self.validate_name(os.path.basename(target), 'directory')
@@ -264,7 +264,7 @@ class TemplateCommand(BaseCommand):
             the_path, info = urlretrieve(url, os.path.join(tempdir, filename))
         except OSError as e:
             raise CommandError("couldn't download URL %s to %s: %s" %
-                               (url, filename, e))
+                               (url, filename, e)) from e
 
         used_name = the_path.split('/')[-1]
 
@@ -319,7 +319,7 @@ class TemplateCommand(BaseCommand):
             return tempdir
         except (archive.ArchiveException, OSError) as e:
             raise CommandError("couldn't extract file %s to %s: %s" %
-                               (filename, tempdir, e))
+                               (filename, tempdir, e)) from e
 
     def is_url(self, template):
         """Return True if the name looks like a URL."""

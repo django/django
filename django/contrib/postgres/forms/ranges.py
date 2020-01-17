@@ -69,11 +69,11 @@ class BaseRangeField(forms.MultiValueField):
             )
         try:
             range_value = self.range_type(lower, upper)
-        except TypeError:
+        except TypeError as e:
             raise exceptions.ValidationError(
                 self.error_messages['invalid'],
                 code='invalid',
-            )
+            ) from e
         else:
             return range_value
 

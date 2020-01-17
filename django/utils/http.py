@@ -252,7 +252,7 @@ def urlsafe_base64_decode(s):
     try:
         return base64.urlsafe_b64decode(s.ljust(len(s) + len(s) % 4, b'='))
     except (LookupError, BinasciiError) as e:
-        raise ValueError(e)
+        raise ValueError(e) from e
 
 
 def parse_etags(etag_str):

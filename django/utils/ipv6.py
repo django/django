@@ -24,8 +24,8 @@ def clean_ipv6_address(ip_str, unpack_ipv4=False,
     """
     try:
         addr = ipaddress.IPv6Address(int(ipaddress.IPv6Address(ip_str)))
-    except ValueError:
-        raise ValidationError(error_message, code='invalid')
+    except ValueError as e:
+        raise ValidationError(error_message, code='invalid') from e
 
     if unpack_ipv4 and addr.ipv4_mapped:
         return str(addr.ipv4_mapped)

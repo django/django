@@ -477,8 +477,8 @@ class WidthRatioNode(Node):
             max_width = int(self.max_width.resolve(context))
         except VariableDoesNotExist:
             return ''
-        except (ValueError, TypeError):
-            raise TemplateSyntaxError("widthratio final argument must be a number")
+        except (ValueError, TypeError) as e:
+            raise TemplateSyntaxError("widthratio final argument must be a number") from e
         try:
             value = float(value)
             max_value = float(max_value)
@@ -1020,12 +1020,12 @@ def ifchanged(parser, token):
 def find_library(parser, name):
     try:
         return parser.libraries[name]
-    except KeyError:
+    except KeyError as e:
         raise TemplateSyntaxError(
             "'%s' is not a registered tag library. Must be one of:\n%s" % (
                 name, "\n".join(sorted(parser.libraries)),
             ),
-        )
+        ) from e
 
 
 def load_from_library(library, label, names):
@@ -1238,12 +1238,12 @@ def resetcycle(parser, token):
         name = args[1]
         try:
             return ResetCycleNode(parser._named_cycle_nodes[name])
-        except (AttributeError, KeyError):
-            raise TemplateSyntaxError("Named cycle '%s' does not exist." % name)
+        except (AttributeError, KeyError) as e:
+            raise TemplateSyntaxError("Named cycle '%s' does not exist." % name) from e
     try:
         return ResetCycleNode(parser._last_cycle_node)
-    except AttributeError:
-        raise TemplateSyntaxError("No cycles in template.")
+    except AttributeError as e:
+        raise TemplateSyntaxError("No cycles in template.") from e
 
 
 @register.tag

@@ -37,8 +37,8 @@ class YearMixin:
             except KeyError:
                 try:
                     year = self.request.GET['year']
-                except KeyError:
-                    raise Http404(_("No year specified"))
+                except KeyError as e:
+                    raise Http404(_("No year specified")) from e
         return year
 
     def get_next_year(self, date):
@@ -57,8 +57,8 @@ class YearMixin:
         """
         try:
             return date.replace(year=date.year + 1, month=1, day=1)
-        except ValueError:
-            raise Http404(_("Date out of range"))
+        except ValueError as e:
+            raise Http404(_("Date out of range")) from e
 
     def _get_current_year(self, date):
         """Return the start date of the current interval."""
@@ -86,8 +86,8 @@ class MonthMixin:
             except KeyError:
                 try:
                     month = self.request.GET['month']
-                except KeyError:
-                    raise Http404(_("No month specified"))
+                except KeyError as e:
+                    raise Http404(_("No month specified")) from e
         return month
 
     def get_next_month(self, date):
@@ -107,8 +107,8 @@ class MonthMixin:
         if date.month == 12:
             try:
                 return date.replace(year=date.year + 1, month=1, day=1)
-            except ValueError:
-                raise Http404(_("Date out of range"))
+            except ValueError as e:
+                raise Http404(_("Date out of range")) from e
         else:
             return date.replace(month=date.month + 1, day=1)
 
@@ -138,8 +138,8 @@ class DayMixin:
             except KeyError:
                 try:
                     day = self.request.GET['day']
-                except KeyError:
-                    raise Http404(_("No day specified"))
+                except KeyError as e:
+                    raise Http404(_("No day specified")) from e
         return day
 
     def get_next_day(self, date):
@@ -184,8 +184,8 @@ class WeekMixin:
             except KeyError:
                 try:
                     week = self.request.GET['week']
-                except KeyError:
-                    raise Http404(_("No week specified"))
+                except KeyError as e:
+                    raise Http404(_("No week specified")) from e
         return week
 
     def get_next_week(self, date):
@@ -204,8 +204,8 @@ class WeekMixin:
         """
         try:
             return date + datetime.timedelta(days=7 - self._get_weekday(date))
-        except OverflowError:
-            raise Http404(_("Date out of range"))
+        except OverflowError as e:
+            raise Http404(_("Date out of range")) from e
 
     def _get_current_week(self, date):
         """Return the start date of the current interval."""
@@ -488,11 +488,11 @@ class BaseWeekArchiveView(YearMixin, WeekMixin, BaseDateListView):
         week_choices = {'%W': '1', '%U': '0'}
         try:
             week_start = week_choices[week_format]
-        except KeyError:
+        except KeyError as e:
             raise ValueError('Unknown week format %r. Choices are: %s' % (
                 week_format,
                 ', '.join(sorted(week_choices)),
-            ))
+            )) from e
         date = _date_from_string(year, self.get_year_format(),
                                  week_start, '%w',
                                  week, week_format)
@@ -619,11 +619,11 @@ def _date_from_string(year, year_format, month='', month_format='', day='', day_
     datestr = str(year) + delim + str(month) + delim + str(day)
     try:
         return datetime.datetime.strptime(datestr, format).date()
-    except ValueError:
+    except ValueError as e:
         raise Http404(_('Invalid date string “%(datestr)s” given format “%(format)s”') % {
             'datestr': datestr,
             'format': format,
-        })
+        }) from e
 
 
 def _get_next_prev(generic_view, date, is_previous, period):

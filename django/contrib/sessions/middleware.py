@@ -56,12 +56,12 @@ class SessionMiddleware(MiddlewareMixin):
                 if response.status_code != 500:
                     try:
                         request.session.save()
-                    except UpdateError:
+                    except UpdateError as e:
                         raise SuspiciousOperation(
                             "The request's session was deleted before the "
                             "request completed. The user may have logged "
                             "out in a concurrent request, for example."
-                        )
+                        ) from e
                     response.set_cookie(
                         settings.SESSION_COOKIE_NAME,
                         request.session.session_key, max_age=max_age,

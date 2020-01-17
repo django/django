@@ -416,7 +416,7 @@ class ModelState:
                     name,
                     model._meta.label,
                     e,
-                ))
+                )) from e
         if not exclude_rels:
             for field in model._meta.local_many_to_many:
                 name = field.name
@@ -427,7 +427,7 @@ class ModelState:
                         name,
                         model._meta.object_name,
                         e,
-                    ))
+                    )) from e
         # Extract the options
         options = {}
         for name in DEFAULT_NAMES:
@@ -565,8 +565,8 @@ class ModelState:
                 (apps.get_model(base) if isinstance(base, str) else base)
                 for base in self.bases
             )
-        except LookupError:
-            raise InvalidBasesError("Cannot resolve one or more bases from %r" % (self.bases,))
+        except LookupError as e:
+            raise InvalidBasesError("Cannot resolve one or more bases from %r" % (self.bases,)) from e
         # Turn fields into a dict for the body, add other bits
         body = {name: field.clone() for name, field in self.fields}
         body['Meta'] = meta

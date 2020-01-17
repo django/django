@@ -159,12 +159,12 @@ class CsrfViewMiddleware(MiddlewareMixin):
         if settings.CSRF_USE_SESSIONS:
             try:
                 return request.session.get(CSRF_SESSION_KEY)
-            except AttributeError:
+            except AttributeError as e:
                 raise ImproperlyConfigured(
                     'CSRF_USE_SESSIONS is enabled, but request.session is not '
                     'set. SessionMiddleware must appear before CsrfViewMiddleware '
                     'in MIDDLEWARE.'
-                )
+                ) from e
         else:
             try:
                 cookie_token = request.COOKIES[settings.CSRF_COOKIE_NAME]

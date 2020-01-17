@@ -314,16 +314,16 @@ class Command(BaseCommand):
                 if os.path.lexists(full_path):
                     os.unlink(full_path)
                 os.symlink(source_path, full_path)
-            except AttributeError:
+            except AttributeError as e:
                 import platform
                 raise CommandError("Symlinking is not supported by Python %s." %
-                                   platform.python_version())
-            except NotImplementedError:
+                                   platform.python_version()) from e
+            except NotImplementedError as e:
                 import platform
                 raise CommandError("Symlinking is not supported in this "
-                                   "platform (%s)." % platform.platform())
+                                   "platform (%s)." % platform.platform()) from e
             except OSError as e:
-                raise CommandError(e)
+                raise CommandError(e) from e
         if prefixed_path not in self.symlinked_files:
             self.symlinked_files.append(prefixed_path)
 

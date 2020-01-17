@@ -26,7 +26,7 @@ try:
     import psycopg2.extensions
     import psycopg2.extras
 except ImportError as e:
-    raise ImproperlyConfigured("Error loading psycopg2 module: %s" % e)
+    raise ImproperlyConfigured("Error loading psycopg2 module: %s" % e) from e
 
 
 def psycopg2_version():

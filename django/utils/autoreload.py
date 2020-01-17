@@ -551,9 +551,9 @@ class WatchmanReloader(BaseReloader):
         client = pywatchman.client(timeout=0.1)
         try:
             result = client.capabilityCheck()
-        except Exception:
+        except Exception as e:
             # The service is down?
-            raise WatchmanUnavailable('Cannot connect to the watchman service.')
+            raise WatchmanUnavailable('Cannot connect to the watchman service.') from e
         version = get_version_tuple(result['version'])
         # Watchman 4.9 includes multiple improvements to watching project
         # directories as well as case insensitive filesystems.

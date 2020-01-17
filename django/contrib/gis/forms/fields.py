@@ -77,9 +77,9 @@ class GeometryField(forms.Field):
         if self.srid and self.srid != -1 and self.srid != geom.srid:
             try:
                 geom.transform(self.srid)
-            except GEOSException:
+            except GEOSException as e:
                 raise forms.ValidationError(
-                    self.error_messages['transform_error'], code='transform_error')
+                    self.error_messages['transform_error'], code='transform_error') from e
 
         return geom
 

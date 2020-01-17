@@ -20,14 +20,14 @@ class EmailBackend(ConsoleEmailBackend):
         self.file_path = os.path.abspath(self.file_path)
         try:
             os.makedirs(self.file_path, exist_ok=True)
-        except FileExistsError:
+        except FileExistsError as e:
             raise ImproperlyConfigured(
                 'Path for saving email messages exists, but is not a directory: %s' % self.file_path
-            )
+            ) from e
         except OSError as err:
             raise ImproperlyConfigured(
                 'Could not create directory for saving email messages: %s (%s)' % (self.file_path, err)
-            )
+            ) from err
         # Make sure that self.file_path is writable.
         if not os.access(self.file_path, os.W_OK):
             raise ImproperlyConfigured('Could not write to directory: %s' % self.file_path)

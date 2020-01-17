@@ -292,11 +292,11 @@ def parse_bits(parser, bits, params, varargs, varkw, defaults,
                 try:
                     # Consume from the list of expected positional arguments
                     unhandled_params.pop(0)
-                except IndexError:
+                except IndexError as e:
                     if varargs is None:
                         raise TemplateSyntaxError(
                             "'%s' received too many positional arguments" %
-                            name)
+                            name) from e
     if defaults is not None:
         # Consider the last n params handled, where n is the
         # number of defaults.
@@ -319,10 +319,10 @@ def import_library(name):
         raise InvalidTemplateLibrary(
             "Invalid template library specified. ImportError raised when "
             "trying to load '%s': %s" % (name, e)
-        )
+        ) from e
     try:
         return module.register
-    except AttributeError:
+    except AttributeError as e:
         raise InvalidTemplateLibrary(
             "Module  %s does not have a variable named 'register'" % name,
-        )
+        ) from e

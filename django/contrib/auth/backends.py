@@ -124,11 +124,11 @@ class ModelBackend(BaseBackend):
         if isinstance(perm, str):
             try:
                 app_label, codename = perm.split('.')
-            except ValueError:
+            except ValueError as e:
                 raise ValueError(
                     'Permission name should be in the form '
                     'app_label.permission_codename.'
-                )
+                ) from e
         elif not isinstance(perm, Permission):
             raise TypeError(
                 'The `perm` argument must be a string or a permission instance.'

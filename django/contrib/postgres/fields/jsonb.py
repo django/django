@@ -65,12 +65,12 @@ class JSONField(CheckFieldDefaultMixin, Field):
         options = {'cls': self.encoder} if self.encoder else {}
         try:
             json.dumps(value, **options)
-        except TypeError:
+        except TypeError as e:
             raise exceptions.ValidationError(
                 self.error_messages['invalid'],
                 code='invalid',
                 params={'value': value},
-            )
+            ) from e
 
     def value_to_string(self, obj):
         return self.value_from_object(obj)

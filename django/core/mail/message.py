@@ -80,8 +80,8 @@ def sanitize_address(addr, encoding):
         addr = force_str(addr)
         try:
             token, rest = parser.get_mailbox(addr)
-        except (HeaderParseError, ValueError, IndexError):
-            raise ValueError('Invalid address "%s"' % addr)
+        except (HeaderParseError, ValueError, IndexError) as e:
+            raise ValueError('Invalid address "%s"' % addr) from e
         else:
             if rest:
                 # The entire email address must be parsed.

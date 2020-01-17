@@ -66,7 +66,7 @@ class MigrationRecorder:
             with self.connection.schema_editor() as editor:
                 editor.create_model(self.Migration)
         except DatabaseError as exc:
-            raise MigrationSchemaMissing("Unable to create the django_migrations table (%s)" % exc)
+            raise MigrationSchemaMissing("Unable to create the django_migrations table (%s)" % exc) from exc
 
     def applied_migrations(self):
         """

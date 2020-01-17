@@ -85,13 +85,13 @@ class SessionStore(SessionBase):
         try:
             with transaction.atomic(using=using):
                 obj.save(force_insert=must_create, force_update=not must_create, using=using)
-        except IntegrityError:
+        except IntegrityError as e:
             if must_create:
-                raise CreateError
+                raise CreateError from e
             raise
-        except DatabaseError:
+        except DatabaseError as e:
             if not must_create:
-                raise UpdateError
+                raise UpdateError from e
             raise
 
     def delete(self, session_key=None):

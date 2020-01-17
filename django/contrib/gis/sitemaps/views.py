@@ -16,16 +16,16 @@ def kml(request, label, model, field_name=None, compress=False, using=DEFAULT_DB
     placemarks = []
     try:
         klass = apps.get_model(label, model)
-    except LookupError:
-        raise Http404('You must supply a valid app label and module name.  Got "%s.%s"' % (label, model))
+    except LookupError as e:
+        raise Http404('You must supply a valid app label and module name.  Got "%s.%s"' % (label, model)) from e
 
     if field_name:
         try:
             field = klass._meta.get_field(field_name)
             if not isinstance(field, GeometryField):
                 raise FieldDoesNotExist
-        except FieldDoesNotExist:
-            raise Http404('Invalid geometry field.')
+        except FieldDoesNotExist as e:
+            raise Http404('Invalid geometry field.') from e
 
     connection = connections[using]
 

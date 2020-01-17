@@ -501,7 +501,7 @@ class AppCommand(BaseCommand):
         try:
             app_configs = [apps.get_app_config(app_label) for app_label in app_labels]
         except (LookupError, ImportError) as e:
-            raise CommandError("%s. Are you sure your INSTALLED_APPS setting is correct?" % e)
+            raise CommandError("%s. Are you sure your INSTALLED_APPS setting is correct?" % e) from e
         output = []
         for app_config in app_configs:
             app_output = self.handle_app_config(app_config, **options)

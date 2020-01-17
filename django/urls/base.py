@@ -73,14 +73,14 @@ def reverse(viewname, urlconf=None, args=None, kwargs=None, current_app=None):
                 resolved_path.append(ns)
                 ns_pattern = ns_pattern + extra
                 ns_converters.update(resolver.pattern.converters)
-            except KeyError as key:
+            except KeyError as key_error:
                 if resolved_path:
                     raise NoReverseMatch(
                         "%s is not a registered namespace inside '%s'" %
-                        (key, ':'.join(resolved_path))
-                    )
+                        (key_error, ':'.join(resolved_path))
+                    ) from key_error
                 else:
-                    raise NoReverseMatch("%s is not a registered namespace" % key)
+                    raise NoReverseMatch("%s is not a registered namespace" % key_error)
         if ns_pattern:
             resolver = get_ns_resolver(ns_pattern, resolver, tuple(ns_converters.items()))
 

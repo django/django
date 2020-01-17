@@ -38,11 +38,11 @@ def get_callable(lookup_view):
     else:
         try:
             view_func = getattr(mod, func_name)
-        except AttributeError:
+        except AttributeError as e:
             raise ViewDoesNotExist(
                 "Could not import '%s'. View does not exist in module %s." %
                 (lookup_view, mod_name)
-            )
+            ) from e
         else:
             if not callable(view_func):
                 raise ViewDoesNotExist(

@@ -101,8 +101,8 @@ class Command(BaseCommand):
         # Getting the OGR DataSource from the string parameter.
         try:
             ds = gdal.DataSource(data_source)
-        except gdal.GDALException as msg:
-            raise CommandError(msg)
+        except gdal.GDALException as e:
+            raise CommandError(e) from e
 
         # Returning the output of ogrinspect with the given arguments
         # and options.

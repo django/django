@@ -1269,8 +1269,8 @@ class ModelChoiceField(ChoiceField):
             if isinstance(value, self.queryset.model):
                 value = getattr(value, key)
             value = self.queryset.get(**{key: value})
-        except (ValueError, TypeError, self.queryset.model.DoesNotExist):
-            raise ValidationError(self.error_messages['invalid_choice'], code='invalid_choice')
+        except (ValueError, TypeError, self.queryset.model.DoesNotExist) as e:
+            raise ValidationError(self.error_messages['invalid_choice'], code='invalid_choice') from e
         return value
 
     def validate(self, value):
@@ -1328,21 +1328,21 @@ class ModelMultipleChoiceField(ModelChoiceField):
         # requiring the database backend deduplicate efficiently.
         try:
             value = frozenset(value)
-        except TypeError:
+        except TypeError as e:
             # list of lists isn't hashable, for example
             raise ValidationError(
                 self.error_messages['list'],
                 code='list',
-            )
+            ) from e
         for pk in value:
             try:
                 self.queryset.filter(**{key: pk})
-            except (ValueError, TypeError):
+            except (ValueError, TypeError) as e:
                 raise ValidationError(
                     self.error_messages['invalid_pk_value'],
                     code='invalid_pk_value',
                     params={'pk': pk},
-                )
+                ) from e
         qs = self.queryset.filter(**{'%s__in' % key: value})
         pks = {str(getattr(o, key)) for o in qs}
         for val in value:

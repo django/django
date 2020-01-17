@@ -1868,9 +1868,9 @@ class Query(BaseExpression):
                     cols.append(join_info.transform_function(target, final_alias))
             if cols:
                 self.set_select(cols)
-        except MultiJoin:
-            raise FieldError("Invalid field name: '%s'" % name)
-        except FieldError:
+        except MultiJoin as e:
+            raise FieldError("Invalid field name: '%s'" % name) from e
+        except FieldError as e:
             if LOOKUP_SEP in name:
                 # For lookups spanning over relationships, show the error
                 # from the model on which the lookup failed.
@@ -1881,7 +1881,7 @@ class Query(BaseExpression):
                     *self.annotation_select, *self._filtered_relations
                 ])
                 raise FieldError("Cannot resolve keyword %r into field. "
-                                 "Choices are: %s" % (name, ", ".join(names)))
+                                 "Choices are: %s" % (name, ", ".join(names))) from e
 
     def add_ordering(self, *ordering):
         """

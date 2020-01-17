@@ -52,8 +52,8 @@ class RangeField(models.Field):
     def model(self):
         try:
             return self.__dict__['model']
-        except KeyError:
-            raise AttributeError("'%s' object has no attribute 'model'" % self.__class__.__name__)
+        except KeyError as e:
+            raise AttributeError("'%s' object has no attribute 'model'" % self.__class__.__name__) from e
 
     @model.setter
     def model(self, model):

@@ -155,12 +155,12 @@ def get_user_model():
     """
     try:
         return django_apps.get_model(settings.AUTH_USER_MODEL, require_ready=False)
-    except ValueError:
-        raise ImproperlyConfigured("AUTH_USER_MODEL must be of the form 'app_label.model_name'")
-    except LookupError:
+    except ValueError as value_error:
+        raise ImproperlyConfigured("AUTH_USER_MODEL must be of the form 'app_label.model_name'") from value_error
+    except LookupError as lookup_error:
         raise ImproperlyConfigured(
             "AUTH_USER_MODEL refers to model '%s' that has not been installed" % settings.AUTH_USER_MODEL
-        )
+        ) from lookup_error
 
 
 def get_user(request):

@@ -35,8 +35,8 @@ class Feed:
     def __call__(self, request, *args, **kwargs):
         try:
             obj = self.get_object(request, *args, **kwargs)
-        except ObjectDoesNotExist:
-            raise Http404('Feed object does not exist.')
+        except ObjectDoesNotExist as e:
+            raise Http404('Feed object does not exist.') from e
         feedgen = self.get_feed(obj, request)
         response = HttpResponse(content_type=feedgen.content_type)
         if hasattr(self, 'item_pubdate') or hasattr(self, 'item_updateddate'):
@@ -57,11 +57,11 @@ class Feed:
     def item_link(self, item):
         try:
             return item.get_absolute_url()
-        except AttributeError:
+        except AttributeError as e:
             raise ImproperlyConfigured(
                 'Give your %s class a get_absolute_url() method, or define an '
                 'item_link() method in your Feed class.' % item.__class__.__name__
-            )
+            ) from e
 
     def item_enclosures(self, item):
         enc_url = self._get_dynamic_attr('item_enclosure_url', item)

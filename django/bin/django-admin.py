@@ -6,12 +6,12 @@ from django.core import management
 
 try:
     from django.utils.deprecation import RemovedInDjango40Warning
-except ImportError:
+except ImportError as e:
     raise ImportError(
         'django-admin.py was deprecated in Django 3.1 and removed in Django '
         '4.0. Please manually remove this script from your virtual environment '
         'and use django-admin instead.'
-    )
+    ) from e
 
 if __name__ == "__main__":
     warnings.warn(

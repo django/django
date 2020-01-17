@@ -29,12 +29,12 @@ class JSONField(forms.CharField):
             return value
         try:
             converted = json.loads(value)
-        except json.JSONDecodeError:
+        except json.JSONDecodeError as e:
             raise forms.ValidationError(
                 self.error_messages['invalid'],
                 code='invalid',
                 params={'value': value},
-            )
+            ) from e
         if isinstance(converted, str):
             return JSONString(converted)
         else:

@@ -74,8 +74,8 @@ class MultiValueDict(dict):
         """
         try:
             list_ = super().__getitem__(key)
-        except KeyError:
-            raise MultiValueDictKeyError(key)
+        except KeyError as e:
+            raise MultiValueDictKeyError(key) from e
         try:
             return list_[-1]
         except IndexError:
@@ -202,8 +202,8 @@ class MultiValueDict(dict):
                 try:
                     for key, value in other_dict.items():
                         self.setlistdefault(key).append(value)
-                except TypeError:
-                    raise ValueError("MultiValueDict.update() takes either a MultiValueDict or dictionary")
+                except TypeError as e:
+                    raise ValueError("MultiValueDict.update() takes either a MultiValueDict or dictionary") from e
         for key, value in kwargs.items():
             self.setlistdefault(key).append(value)
 

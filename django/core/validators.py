@@ -110,8 +110,8 @@ class URLValidator(RegexValidator):
             if value:
                 try:
                     scheme, netloc, path, query, fragment = urlsplit(value)
-                except ValueError:  # for example, "Invalid IPv6 URL"
-                    raise ValidationError(self.message, code=self.code)
+                except ValueError as e:  # for example, "Invalid IPv6 URL"
+                    raise ValidationError(self.message, code=self.code) from e
                 try:
                     netloc = punycode(netloc)  # IDN -> ACE
                 except UnicodeError:  # invalid domain part
@@ -127,8 +127,8 @@ class URLValidator(RegexValidator):
                 potential_ip = host_match.groups()[0]
                 try:
                     validate_ipv6_address(potential_ip)
-                except ValidationError:
-                    raise ValidationError(self.message, code=self.code)
+                except ValidationError as e:
+                    raise ValidationError(self.message, code=self.code) from e
 
         # The maximum length of a full host name is 253 characters per RFC 1034
         # section 3.1. It's defined to be 255 bytes or less, but this includes
@@ -240,8 +240,8 @@ validate_unicode_slug = RegexValidator(
 def validate_ipv4_address(value):
     try:
         ipaddress.IPv4Address(value)
-    except ValueError:
-        raise ValidationError(_('Enter a valid IPv4 address.'), code='invalid')
+    except ValueError as e:
+        raise ValidationError(_('Enter a valid IPv4 address.'), code='invalid') from e
 
 
 def validate_ipv6_address(value):
@@ -255,8 +255,8 @@ def validate_ipv46_address(value):
     except ValidationError:
         try:
             validate_ipv6_address(value)
-        except ValidationError:
-            raise ValidationError(_('Enter a valid IPv4 or IPv6 address.'), code='invalid')
+        except ValidationError as e:
+            raise ValidationError(_('Enter a valid IPv4 or IPv6 address.'), code='invalid') from e
 
 
 ip_address_validator_map = {
@@ -276,9 +276,9 @@ def ip_address_validators(protocol, unpack_ipv4):
             "You can only use `unpack_ipv4` if `protocol` is set to 'both'")
     try:
         return ip_address_validator_map[protocol.lower()]
-    except KeyError:
+    except KeyError as e:
         raise ValueError("The protocol '%s' is unknown. Supported: %s"
-                         % (protocol, list(ip_address_validator_map)))
+                         % (protocol, list(ip_address_validator_map))) from e
 
 
 def int_list_validator(sep=',', message=None, code='invalid', allow_negative=False):
