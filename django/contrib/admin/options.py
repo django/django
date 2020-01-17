@@ -1552,7 +1552,10 @@ class ModelAdmin(BaseModelAdmin):
             if obj is None:
                 return self._get_obj_does_not_exist_redirect(request, opts, object_id)
 
-        ModelForm = self.get_form(request, obj, change=not add)
+        fieldsets = self.get_fieldsets(request, obj)
+        ModelForm = self.get_form(
+            request, obj, change=not add, fields=flatten_fieldsets(fieldsets)
+        )
         if request.method == 'POST':
             form = ModelForm(request.POST, request.FILES, instance=obj)
             form_validated = form.is_valid()
@@ -1583,12 +1586,12 @@ class ModelAdmin(BaseModelAdmin):
                 formsets, inline_instances = self._create_formsets(request, obj, change=True)
 
         if not add and not self.has_change_permission(request, obj):
-            readonly_fields = flatten_fieldsets(self.get_fieldsets(request, obj))
+            readonly_fields = flatten_fieldsets(fieldsets)
         else:
             readonly_fields = self.get_readonly_fields(request, obj)
         adminForm = helpers.AdminForm(
             form,
-            list(self.get_fieldsets(request, obj)),
+            list(fieldsets),
             # Clear prepopulated fields on a view-only form to avoid a crash.
             self.get_prepopulated_fields(request, obj) if add or self.has_change_permission(request, obj) else {},
             readonly_fields,
