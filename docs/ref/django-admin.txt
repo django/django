@@ -731,32 +731,35 @@ language files from being created.
 .. django-admin-option:: --collect-base-catalogs [{default-path, all-bundled}] -cbc
 
 Pulls out all strings marked for translation in Django for a domain (defaults
-to 'django'), collects all catalogs bundled and merges them into the
-corresponding main po file in :setting:`LOCALE_ROOT` (required setting).
+to 'django'), collects all catalogs (message files) bundled for the locale(s)
+and merges them into the corresponding main po file(s) in
+:setting:`LOCALE_ROOT` (required setting).
 
-Defaults to the locales defined in the default locale path (``default-path``), 
-use ``all-bundled`` for collecting all locales bundled with Django.
+Defaults to the locales defined in the default locale path that the command
+considers (``default-path``),  use ``all-bundled`` for collecting all locales
+bundled with Django.
 
 Specific locale(s) to collect can be set with the ``--locale`` option (or 
 ignored with ``--exclude``). If the specified locale does not exists, an
-untranslated catalog will be created for it.
+untranslated message file will be created for it.
 
 Example usage::
 
     django-admin makemessages --collect-base-catalogs --locale=en --locale=pt
     django-admin makemessages --collect-base-catalogs all-bundled --exclude=fr
+    django-admin makemessages --collect-base-catalogs --domain djangojs
     django-admin makemessages -cbc -l xx_yy -d djangojs
 
 .. django-admin-option:: --comply-plural-forms [{interactive, copy, form_map}] -cpf
 
-Checks or aligns all project or application catalogs' plural forms for the
-locale(s) with the main plural form (see :ref:`plural-forms`) for a domain
-(defaults to ``django``).
+Checks or aligns all project or application message files' plural forms for the
+locale(s) (detected or specified) in a domain (defaults to ``django``) with the
+main plural forms (see :ref:`plural-forms`).
 
 If a divergence is found and the option is set to ``interactive`` (default),
 the user will be prompted to map the main plural forms to the ones found in
-the catalog. With the form map provided, the catalog will be reorganized
-accordingly and the plural forms will be updated.
+the message file. With the form map provided, the message file will be
+reorganized accordingly and the plural forms will be updated.
 
 In the case of an increase in the number of plurals, it will fill
 those with the previously chosen forms so you avoid having translation results
@@ -768,14 +771,18 @@ In a decrease of the forms, it will reorganize and trim the exceeding ones.
 
 When only the equation differs, only reorganization will occur.
 
-If no plural forms is found in the catalog, the user will be prompted to copy
-them from the main po file. No remapping will be done, it is assumed that is
-already aligned. If it is not the case, use a plural form with the number of
-plurals matching the catalog and then re-run the command to perform form
+If no plural forms is found in the message file, the user will be prompted to
+copy them from the main po file. No remapping will be done, it is assumed that
+is already aligned. If it is not the case, use a plural form with the number of
+plurals matching the message file's and then re-run the command to perform form
 mapping.
 
+Specific locale(s) to consider can be set with the ``--locale`` option (or 
+ignored with ``--exclude``).
+
 Automation can be done only for a specific locale by using the values ``copy``
-or the ``form_map`` in comma-separated digits, i.e. ``0,1,1,1``. 
+for only copying the plural forms or the ``form_map`` in comma-separated digits
+- i.e. ``0,1,1,1`` - for perform form mapping.
 
 Example usage::
 

@@ -198,10 +198,10 @@ plural translation string and the number of objects.
 
 This function is useful when you need your Django application to be localizable
 to languages where the number and complexity of `plural forms
-<https://www.gnu.org/software/gettext/manual/gettext.html#Plural-forms>`_ is
-greater than the two forms used in English ('object' for the singular and
-'objects' for all the cases where ``count`` is different from one, irrespective
-of its value.)
+<https://www.gnu.org/software/gettext/manual/gettext.html#Plural-forms>`_
+(and :ref:`see below <plural-forms>`) greater than the two forms used in English
+('object' for the singular and 'objects' for all the cases where ``count`` is
+different from one, irrespective of its value.)
 
 For example::
 
@@ -284,41 +284,41 @@ In a case like this, consider something like the following::
 Plural Forms
 ~~~~~~~~~~~~
 
-Django does not support multiple plural forms in catalogs. As all translation
-catalogs are merged, only the plural form in the main Django po file (located
-by default in ``django/conf/locale/<lang_code>/LC_MESSAGES/django.po``,
-customized with :setting:`LOCALE_ROOT`) is considered.
+Django does not support multiple plural forms in message files. As all
+translation files are merged, only the plural form in the main Django po
+file (located by default in ``django/conf/locale/<lang_code>/LC_MESSAGES/django.po``,
+customized with the :setting:`LOCALE_ROOT` setting) is considered.
 
 To prevent inconsistencies and undesired results in translations, Django will
-not merge any catalog that contains a different plural form than the main one
-and will issue a warning about the situation at a
-:ref:`system check level <translation-checks>` and at runtime.
+not merge any message file that contains different plural forms than the main
+Django po file and will issue a warning about the situation, both at a
+:ref:`system check level <translation-checks>` (``translation.W005``) and at
+run-time.
 
 This conflict may arise mostly in two situations:
 
-* when the main plural form for a language is updated in Django and your po
-  files were generated with a previous one, or
+* when the main plural forms for a language is updated in Django and your po
+  files were created with a previous one, or
 
-* when including third-party translations with a different plural form.
+* when including third-party translations with different plural forms.
 
-Django follows the standards provided by `Unicode
-<http://www.unicode.org/cldr/charts/latest/supplemental/language_plural_rules.html>`_
-for plural equations for each language and encourages to align with it.
-
-If you had generated your catalog with a previous version of Django, the
-standard may have changed or a bug has been fixed.
+If you had created your message file with a previous version of Django, the
+standard may have changed or a bug has been fixed in the release.
 
 For aligning with the new version of the standard (or addressing the bug),
 you may use
 :option:`django-admin makemessages --comply-plural-forms<makemessages --comply-plural-forms>`
-to update your catalogs so they are aligned with the main plural form
+to update your message files so they are aligned with the main plural forms
 and avoid unexpected behavior.
 
-In the cases where you want to use custom plural forms, i.e. for using another
-implementation of the standard, define the :setting:`LOCALE_ROOT` setting and use
-:option:`django-admin makemessages --collect-base-catalogs<makemessages --collect-base-catalogs>`.
-This will merge all the locale catalogs bundled with Django into your
-:setting:`LOCALE_ROOT` and use them as main po files for translations.
+Customization of the plural forms for a language is done via the
+:setting:`LOCALE_ROOT` setting.
+
+Once the setting is defined, Django will use the files under this directory as
+the main Django po files for translations.
+
+You may use :option:`django-admin makemessages --collect-base-catalogs<makemessages --collect-base-catalogs>`
+for collecting the bundled ones with Django and then customize them.
 
 .. versionchanged:: 3.1
 

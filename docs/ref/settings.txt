@@ -1971,11 +1971,11 @@ Example::
     LOCALE_ROOT = BASEDIR / 'locale'
 
 Django will use the files contained in ``<locale_code>/LC_MESSAGES`` under this
-directory as the main po file of a translation for a domain.
+directory as the main Django po file of a translation for a domain.
 
 .. note::
 
-    Using this setting requires compiled catalog(s) for your locale(s), you may use
+    Using this setting requires compiled message file(s) for your locale(s), you may use
     :option:`django-admin makemessages --collect-base-catalogs<makemessages --collect-base-catalogs>`
     for collecting the bundled ones with Django (for both ``django`` and ``djangojs`` domains)
     and then
@@ -1983,7 +1983,7 @@ directory as the main po file of a translation for a domain.
 
 .. note::
 
-    This setting will make Django not take into account the bundled catalogs,
+    This setting will make Django not take into account the bundled message files,
     is up to the user to run
     :option:`django-admin makemessages --collect-base-catalogs<makemessages --collect-base-catalogs>`
     after an upgrade to collect any new messages.
