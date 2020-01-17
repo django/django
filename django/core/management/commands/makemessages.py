@@ -289,9 +289,13 @@ class Command(BaseCommand):
             help="Collects Django's bundled message files into LOCALE_ROOT."
         )
         parser.add_argument(
-            '--comply-plural-forms', '-cpf', action='store', nargs='?',
+            '--update-plural-forms', '-upf', action='store', nargs='?',
             const='interactive',
-            help="Align catalogs with different plural than the main one."
+            help=(
+                "Checks or aligns all project or application message files' "
+                "plural forms for the locale(s) with the main plural forms "
+                "in a domain (see --domain)."
+            )
         )
 
     def handle(self, *args, **options):
@@ -303,7 +307,7 @@ class Command(BaseCommand):
         extensions = options['extensions']
         self.symlinks = options['symlinks']
         self.collect_bundled = options['collect_bundled']
-        self.comply_pf = options['comply_plural_forms']
+        self.update_pfs = options['update_plural_forms']
 
         ignore_patterns = options['ignore_patterns']
         if options['use_default_ignore_patterns']:
@@ -360,11 +364,11 @@ class Command(BaseCommand):
                 "with the LOCALE_ROOT setting defined."
             )
 
-        if self.comply_pf and self.comply_pf not in ['interactive', 'copy']:
-            comply_pf_regex = r'(\d,)*\d'
-            if not re.fullmatch(comply_pf_regex, self.comply_pf):
+        if self.update_pfs and self.update_pfs not in ['interactive', 'copy']:
+            update_pfs_regex = r'(\d,)*\d'
+            if not re.fullmatch(update_pfs_regex, self.update_pfs):
                 raise CommandError(
-                    "currently the --comply-plural-forms option only supports "
+                    "currently the --update-plural-forms option only supports "
                     "'interactive', 'copy' or comma-separated digits as a parameter."
                 )
 
@@ -411,7 +415,7 @@ class Command(BaseCommand):
         if self.collect_bundled:
             check_programs('msgcat')
 
-        if self.comply_pf:
+        if self.update_pfs:
             check_programs('msgfmt')
 
         check_programs('xgettext')
@@ -443,8 +447,8 @@ class Command(BaseCommand):
             for locale in locales:
                 if self.verbosity > 0:
                     self.stdout.write("processing locale %s\n" % locale)
-                if self.comply_pf:
-                    self.comply_plural_forms(locale)
+                if self.update_pfs:
+                    self.update_plural_forms(locale)
                 else:
                     for potfile in potfiles:
                         self.write_po_file(potfile, locale)
@@ -855,13 +859,12 @@ class Command(BaseCommand):
                                 plural_form_to_update, plural_form_line)
         return msgs
 
-    def comply_plural_forms(self, locale):
+    def update_plural_forms(self, locale):
         """
-        Examines the user's .po files of a locale for a divergence in the plural
-        forms with the main forms. If one is found (mismatch) and no form map is
-        given in the argument, i.e. --comply-plural-forms=0,1,1,1', prompts the
-        user to map the main form to the user's form and outputs a compliant .po
-        file.
+        Examines the user's .po files of a locale for a divergence in the
+        plural forms with the main forms. If one is found (mismatch) and no
+        action or form map is given in the argument, prompts the user to map
+        the main form to the user's form and outputs a compliant .po file.
         """
         # For the 'djangojs' domain, fallback to 'django' if not exists
         main_po = (self.get_main_po(locale, self.domain) or
@@ -915,11 +918,11 @@ class Command(BaseCommand):
                                     ":: Aligning plural forms in %s for %s "
                                     "with the main form ::" % (locale_path, locale)
                                 )
-                            if self.comply_pf == 'interactive':
+                            if self.update_pfs == 'interactive':
                                 form_map = []
                                 overwrite = None  # will be set by user input
                             else:
-                                form_map = [int(d) for d in self.comply_pf.split(",")]
+                                form_map = [int(d) for d in self.update_pfs.split(",")]
                                 overwrite = 'y'
                             if main_plural_forms.nplurals < user_plural_forms.nplurals:
                                 if self.verbosity > 0:
@@ -966,7 +969,7 @@ class Command(BaseCommand):
                                     "Remapped plural forms have been written to %s." % filename
                                 )
                     else:
-                        copy_pf, overwrite = ('y', 'y') if self.comply_pf == 'copy' else (None, None)
+                        copy_pf, overwrite = ('y', 'y') if self.update_pfs == 'copy' else (None, None)
                         copy_pf_msg = (
                             "Catalog in %s does not contain plural forms while the main catalog "
                             "has, copy plural forms from the main one? (no remapping will be "

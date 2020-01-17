@@ -620,14 +620,14 @@ class CollectBundledTests(ExtractorTests):
             management.call_command('makemessages', collect_bundled='default-path', verbosity=0)
 
 
-class ComplyPluralFormsTests(ExtractorTests):
+class UpdatePluralFormsTests(ExtractorTests):
 
     PO_FILE_NEW = 'app_with_locale/locale/%s/LC_MESSAGES/django.po.new'
     PO_FILE = 'app_with_locale/locale/%s/LC_MESSAGES/django.po'
 
     def test_remapping_interactive(self):
         """
-        Test the correct functioning of form remapping by --comply-plural-forms.
+        Test the correct functioning of form remapping by --update-plural-forms.
         """
         with mock.patch('django.core.management.commands.makemessages.Command.django_dir',
                         os.path.join(self.test_dir, 'django_dir')):
@@ -635,7 +635,7 @@ class ComplyPluralFormsTests(ExtractorTests):
                             side_effect=['0', '1', '1', '9', '1', 'm', 'n']):
                 out = StringIO()
                 management.call_command(
-                    'makemessages', locale=['cs'], comply_plural_forms='interactive',
+                    'makemessages', locale=['cs'], update_plural_forms='interactive',
                     stdout=out, verbosity=1
                 )
                 with open(self.PO_FILE_NEW % 'cs', encoding='utf-8') as fp:
@@ -675,7 +675,7 @@ class ComplyPluralFormsTests(ExtractorTests):
 
     def test_trimming(self):
         """
-        Test the correct functioning of trimming in --comply-plural-forms ('trimming' is when the
+        Test the correct functioning of trimming in --update-plural-forms ('trimming' is when the
         main form has less plural forms than the user's forms.
         """
         with mock.patch('django.core.management.commands.makemessages.Command.django_dir',
@@ -684,7 +684,7 @@ class ComplyPluralFormsTests(ExtractorTests):
                             side_effect=['0', '1', 'n']):
                 out = StringIO()
                 management.call_command(
-                    'makemessages', locale=['lt'], comply_plural_forms='interactive',
+                    'makemessages', locale=['lt'], update_plural_forms='interactive',
                     stdout=out, verbosity=1
                 )
                 with open(self.PO_FILE_NEW % 'lt', encoding='utf-8') as fp:
@@ -712,7 +712,7 @@ class ComplyPluralFormsTests(ExtractorTests):
     def test_automation_remapping(self):
         with mock.patch('django.core.management.commands.makemessages.Command.django_dir',
                         os.path.join(self.test_dir, 'django_dir')):
-            management.call_command('makemessages', locale=['tt'], comply_plural_forms='0,0', verbosity=0)
+            management.call_command('makemessages', locale=['tt'], update_plural_forms='0,0', verbosity=0)
             with open(self.PO_FILE % 'tt', encoding='utf-8') as fp:
                 po_contents = fp.read()
                 should_contain = """
@@ -730,17 +730,17 @@ class ComplyPluralFormsTests(ExtractorTests):
     def test_automation_bad_form_map(self):
         with mock.patch('django.core.management.commands.makemessages.Command.django_dir',
                         os.path.join(self.test_dir, 'django_dir')):
-            msg = ("currently the --comply-plural-forms option only supports "
+            msg = ("currently the --update-plural-forms option only supports "
                    "'interactive', 'copy' or comma-separated digits as a parameter.")
             with self.assertRaisesMessage(CommandError, msg):
-                management.call_command('makemessages', locale=['tt'], comply_plural_forms='0,b', verbosity=0)
+                management.call_command('makemessages', locale=['tt'], update_plural_forms='0,b', verbosity=0)
 
     def test_copy_interactive(self):
         with mock.patch('django.core.management.commands.makemessages.Command.get_user_input',
                         side_effect=['u', 'y', 'm', 'n']):
             out = StringIO()
             management.call_command(
-                'makemessages', locale=['es_XX'], comply_plural_forms='interactive',
+                'makemessages', locale=['es_XX'], update_plural_forms='interactive',
                 stdout=out, verbosity=1
             )
             with open(self.PO_FILE_NEW % 'es_XX', encoding='utf-8') as fp:
@@ -749,7 +749,7 @@ class ComplyPluralFormsTests(ExtractorTests):
                 self.assertIn(should_contain, po_contents)
 
     def test_automation_copy(self):
-        management.call_command('makemessages', locale=['en'], comply_plural_forms='copy', verbosity=0)
+        management.call_command('makemessages', locale=['en'], update_plural_forms='copy', verbosity=0)
         with open(self.PO_FILE % 'en', encoding='utf-8') as fp:
             po_contents = fp.read()
             should_contain = "Plural-Forms: nplurals=2; plural=(n != 1);\\n"
@@ -757,7 +757,7 @@ class ComplyPluralFormsTests(ExtractorTests):
 
     def test_locale_root(self):
         with override_settings(LOCALE_ROOT=os.path.join(self.test_dir, 'locale_root')):
-            management.call_command('makemessages', locale=['sk'], comply_plural_forms='2,3', verbosity=0)
+            management.call_command('makemessages', locale=['sk'], update_plural_forms='2,3', verbosity=0)
             with open(self.PO_FILE % 'sk', encoding='utf-8') as fp:
                 po_contents = fp.read()
                 should_contain = """
@@ -784,7 +784,7 @@ class ComplyPluralFormsTests(ExtractorTests):
                 msg = "invalid plural"
                 with self.assertRaisesMessage(CommandError, msg):
                     management.call_command(
-                        'makemessages', locale=['mk'], comply_plural_forms='interactive', verbosity=0
+                        'makemessages', locale=['mk'], update_plural_forms='interactive', verbosity=0
                     )
 
     def test_msgfmt_check_user_form(self):
@@ -792,7 +792,7 @@ class ComplyPluralFormsTests(ExtractorTests):
                         os.path.join(self.test_dir, 'django_dir')):
             msg = "invalid nplurals value"
             with self.assertRaisesMessage(CommandError, msg):
-                management.call_command('makemessages', locale=['mk'], comply_plural_forms='interactive', verbosity=0)
+                management.call_command('makemessages', locale=['mk'], update_plural_forms='interactive', verbosity=0)
 
     def test_plural_forms_check_main_form(self):
         """
@@ -805,7 +805,7 @@ class ComplyPluralFormsTests(ExtractorTests):
                 msg = "unable to parse"
                 with self.assertRaisesMessage(CommandError, msg):
                     management.call_command(
-                        'makemessages', locale=['sl'], comply_plural_forms='interactive', verbosity=0
+                        'makemessages', locale=['sl'], update_plural_forms='interactive', verbosity=0
                     )
 
     def test_plural_forms_check_user_form(self):
@@ -813,20 +813,20 @@ class ComplyPluralFormsTests(ExtractorTests):
                         os.path.join(self.test_dir, 'django_dir')):
             msg = "unable to parse"
             with self.assertRaisesMessage(CommandError, msg):
-                management.call_command('makemessages', locale=['sl'], comply_plural_forms='interactive', verbosity=0)
+                management.call_command('makemessages', locale=['sl'], update_plural_forms='interactive', verbosity=0)
 
     def test_incompatible_form_map(self):
         with override_settings(LOCALE_ROOT=os.path.join(self.test_dir, 'locale_root')):
             msg = "The provided form map is not compatible"
             with self.assertRaisesMessage(CommandError, msg):
-                management.call_command('makemessages', locale=['sk'], comply_plural_forms='4,5', verbosity=0)
+                management.call_command('makemessages', locale=['sk'], update_plural_forms='4,5', verbosity=0)
 
     def test_no_main_po(self):
         with override_settings(LOCALE_ROOT=os.path.join(self.test_dir, 'locale_root')):
             msg = "unable to find the main .po file"
             with self.assertRaisesMessage(CommandError, msg):
                 management.call_command(
-                    'makemessages', locale=['xxx'], domain='djangojs', comply_plural_forms='4,5',
+                    'makemessages', locale=['xxx'], domain='djangojs', update_plural_forms='4,5',
                     verbosity=0
                 )
 

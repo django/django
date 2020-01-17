@@ -750,7 +750,7 @@ Example usage::
     django-admin makemessages --collect-bundled --domain djangojs
     django-admin makemessages -cb -l xx_yy -d djangojs
 
-.. django-admin-option:: --comply-plural-forms [{interactive, copy, form_map}] -cpf
+.. django-admin-option:: --update-plural-forms [{interactive, copy, form_map}] -cpf
 
 Checks or aligns all project or application message files' plural forms for the
 locale(s) (detected or specified) in a domain (defaults to ``django``) with the
@@ -786,9 +786,9 @@ for only copying the plural forms or the ``form_map`` in comma-separated digits
 
 Example usage::
 
-    django-admin makemessages --comply-plural-forms
-    django-admin makemessages --comply-plural-forms copy --locale=en
-    django-admin makemessages -cpf 0,1,1,1 -l he -d djangojs
+    django-admin makemessages --update-plural-forms
+    django-admin makemessages --update-plural-forms copy --locale=en
+    django-admin makemessages -upf 0,1,1,1 -l he -d djangojs
 
 .. seealso::
 
