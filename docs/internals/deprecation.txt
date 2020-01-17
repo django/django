@@ -49,6 +49,9 @@ details on these changes.
 * Support for the pre-Django 3.1 encoding format of cookies values used by
   ``django.contrib.messages.storage.cookie.CookieStorage`` will be removed.
 
+* Support for the pre-Django 3.1 password reset tokens in the admin site (that
+  use the SHA-1 hashing algorithm) will be removed.
+
 See the :ref:`Django 3.1 release notes <deprecated-features-3.1>` for more
 details on these changes.
 

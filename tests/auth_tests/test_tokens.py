@@ -86,3 +86,14 @@ class TokenGeneratorTest(TestCase):
         # Tokens created with a different secret don't validate.
         self.assertIs(p0.check_token(user, tk1), False)
         self.assertIs(p1.check_token(user, tk0), False)
+
+    def test_legacy_token_validation(self):
+        # RemovedInDjango40Warning: pre-Django 3.1 tokens will be invalid.
+        user = User.objects.create_user('tokentestuser', 'test2@example.com', 'testpw')
+        p_old_generator = PasswordResetTokenGenerator()
+        p_old_generator.algorithm = 'sha1'
+        p_new_generator = PasswordResetTokenGenerator()
+
+        legacy_token = p_old_generator.make_token(user)
+        self.assertIs(p_old_generator.check_token(user, legacy_token), True)
+        self.assertIs(p_new_generator.check_token(user, legacy_token), True)

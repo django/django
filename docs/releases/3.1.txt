@@ -56,6 +56,9 @@ Minor features
   instead of deprecated ``PASSWORD_RESET_TIMEOUT_DAYS``, which will be removed
   in Django 4.0.
 
+* The password reset mechanism now uses the SHA-256 hashing algorithm. Support
+  for tokens that use the old hashing algorithm remains until Django 4.0.
+
 :mod:`django.contrib.contenttypes`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
