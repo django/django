@@ -116,7 +116,7 @@ class TranslationCheckTests(SimpleTestCase):
 
     def test_inconsistent_plural_forms_in_languages(self):
         languages = [('cs', 'Czech'), ('fr', 'French'), ('sk', 'Slovak')]
-        msg = 'Inconsistent plural forms across catalogs for language {!r} (unmerged catalogs).'
+        msg = 'Inconsistent plural forms across catalogs for language {!r}.'
         with self.settings(
                 LANGUAGE_CODE='cs',
                 LANGUAGES=languages,
@@ -132,7 +132,7 @@ class TranslationCheckTests(SimpleTestCase):
             self.assertEqual(expected_warnings, received_warnings, [])
 
     def test_inconsistent_plural_forms_in_language_code(self):
-        msg = 'Inconsistent plural forms across catalogs for language {!r} (unmerged catalogs).'
+        msg = 'Inconsistent plural forms across catalogs for language {!r}.'
         with self.settings(
                 LANGUAGE_CODE='cs',
                 LANGUAGES=None,

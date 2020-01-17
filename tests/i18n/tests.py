@@ -1840,8 +1840,8 @@ class CatalogMergingTests(SimpleTestCase):
         LOCALE_ROOT=os.path.join(here, 'locale_root/'),
         LOCALE_PATHS=extended_locale_paths
     )
-    def test_catalog_with_plural_forms_not_merged(self):
-        msg = 'Catalog **NOT MERGED** to prevent inconsistencies'
+    def test_catalog_with_different_plural_forms(self):
+        msg = 'Posible inconsistencies and undesired behavior detected'
         with self.assertWarnsMessage(RuntimeWarning, msg):
             activate('cs')
 
@@ -1849,8 +1849,8 @@ class CatalogMergingTests(SimpleTestCase):
         LANGUAGE_CODE='es',
         LOCALE_PATHS=extended_locale_paths
     )
-    def test_catalog_without_plural_forms_not_merged(self):
-        msg = 'Catalog **NOT MERGED** to prevent inconsistencies'
+    def test_catalog_without_plural_forms(self):
+        msg = 'Posible inconsistencies and undesired behavior detected'
         with self.assertWarnsMessage(RuntimeWarning, msg):
             activate('lt')
 

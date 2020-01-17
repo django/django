@@ -31,7 +31,7 @@ E004 = Error(
 )
 
 W005 = Warning(
-    'Inconsistent plural forms across catalogs for language {!r} (unmerged catalogs).',
+    'Inconsistent plural forms across catalogs for language {!r}.',
     id='translation.W005',
 )
 

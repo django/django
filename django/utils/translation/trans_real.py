@@ -206,11 +206,11 @@ class DjangoTranslation(gettext_module.GNUTranslations):
                 else:
                     from pprint import pformat
                     msg = (
-                        "\nCatalog **NOT MERGED** to prevent inconsistencies "
-                        "due to different plural forms.\n"
+                        "\nPosible inconsistencies and undesired behavior detected "
+                        "due to different plural forms in message file.\n"
                         "Locale: %s\n"
-                        "Not-merged catalog localedir: %s\n"
-                        "Not-merged catalog info: \n%s\n"
+                        "Unconsistent message file localedir: %s\n"
+                        "Unconsistent message file info: \n%s\n"
                         "MAIN PLURAL FORM: \n%s\n"
                         "See https://docs.djangoproject.com/en/dev/topics/i18n/translation/#plural-forms"
                         % (self.__language,
@@ -219,8 +219,7 @@ class DjangoTranslation(gettext_module.GNUTranslations):
                            pformat(self.info()['plural-forms'], indent=4), )
                     )
                     warnings.warn(msg, RuntimeWarning)
-            else:
-                self._catalog.update(other._catalog)
+            self._catalog.update(other._catalog)
 
         if other._fallback:
             self.add_fallback(other._fallback)

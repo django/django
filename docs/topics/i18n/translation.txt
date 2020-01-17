@@ -290,12 +290,12 @@ file (located by default in ``django/conf/locale/<lang_code>/LC_MESSAGES/django.
 customized with the :setting:`LOCALE_ROOT` setting) is considered.
 
 To prevent inconsistencies and undesired results in translations, Django will
-not merge any message file that contains different plural forms than the main
-Django po file and will issue a warning about the situation, both at a
-:ref:`system check level <translation-checks>` (``translation.W005``) and at
+issue a warning when merging any message file that contains different plural
+forms than the main Django po file, both at a
+:ref:`system check level <translation-checks>` (``translation.W005``) and
 run-time.
 
-This conflict may arise mostly in two situations:
+This issue may arise mostly in two situations:
 
 * when the main plural forms for a language is updated in Django and your po
   files were created with a previous one, or
