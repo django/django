@@ -117,6 +117,17 @@ All attributes should be considered read-only, unless stated otherwise.
 
     ``POST`` does *not* include file-upload information. See :attr:`FILES`.
 
+    .. note:: This is only populated if you have done a full page submit to
+        the server or set `contentType` as `application/x-www-form-urlencoded`
+        in your headers. If the dictionary is blank (like when submitting data
+        with a frontend framework) you can try retrieving the values with:
+
+        import json
+
+        def my_view(request):
+            data = json.loads(request.body.decode('utf-8'))
+            ...
+
 .. attribute:: HttpRequest.COOKIES
 
     A dictionary containing all cookies. Keys and values are strings.
