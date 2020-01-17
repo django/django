@@ -234,6 +234,16 @@ application.
     ``urlconf`` can be set to ``None`` to revert any changes made by previous
     middleware and return to using the :setting:`ROOT_URLCONF`.
 
+.. attribute:: HttpRequest.exception_reporter_filter
+
+    This will be used instead of :setting:`DEFAULT_EXCEPTION_REPORTER_FILTER`
+    for the current request. See :ref:`custom-error-reports` for details.
+
+.. attribute:: HttpRequest.exception_reporter_class
+
+    This will be used instead of :setting:`DEFAULT_EXCEPTION_REPORTER` for the
+    current request. See :ref:`custom-error-reports` for details.
+
 Attributes set by middleware
 ----------------------------
 
