@@ -1,6 +1,6 @@
 import json
 
-from django.db.models import CharField
+from django.db.models import CharField, Q
 from django.db.models.expressions import F, OuterRef, Subquery, Value
 from django.db.models.functions import Cast, Concat, Substr
 from django.test.utils import Approximate
