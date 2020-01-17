@@ -1976,7 +1976,7 @@ directory as the main Django po file of a translation for a domain.
 .. note::
 
     Using this setting requires compiled message file(s) for your locale(s), you may use
-    :option:`django-admin makemessages --collect-base-catalogs<makemessages --collect-base-catalogs>`
+    :option:`django-admin makemessages --collect-bundled<makemessages --collect-bundled>`
     for collecting the bundled ones with Django (for both ``django`` and ``djangojs`` domains)
     and then
     :djadmin:`django-admin compilemessages <compilemessages>` to provide them.
@@ -1985,7 +1985,7 @@ directory as the main Django po file of a translation for a domain.
 
     This setting will make Django not take into account the bundled message files,
     is up to the user to run
-    :option:`django-admin makemessages --collect-base-catalogs<makemessages --collect-base-catalogs>`
+    :option:`django-admin makemessages --collect-bundled<makemessages --collect-bundled>`
     after an upgrade to collect any new messages.
 
 .. setting:: LOGGING

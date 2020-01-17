@@ -105,8 +105,8 @@ class DjangoTranslation(gettext_module.GNUTranslations):
                 raise OSError('No translation files found for default language %s.' % settings.LANGUAGE_CODE)
             else:
                 msg = ('LOCALE_ROOT has been set and no translation files found for default language %s. '
-                       'Make sure that the base catalogs have been collected with '
-                       '`makemessages --collect-base-catalogs` and/or they have been compiled with '
+                       'Make sure that the bundled message files have been collected with '
+                       '`makemessages --collect-bundled` and/or they have been compiled with '
                        '`compilemessages`.' % settings.LANGUAGE_CODE)
                 warnings.warn(msg, RuntimeWarning)
         self._add_fallback(localedirs)

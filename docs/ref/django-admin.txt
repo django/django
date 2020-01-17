@@ -728,7 +728,7 @@ Prevents deleting the temporary ``.pot`` files generated before creating the
 ``.po`` file. This is useful for debugging errors which may prevent the final
 language files from being created.
 
-.. django-admin-option:: --collect-base-catalogs [{default-path, all-bundled}] -cbc
+.. django-admin-option:: --collect-bundled [{default-path, all-bundled}] -cb
 
 Pulls out all strings marked for translation in Django for a domain (defaults
 to 'django'), collects all catalogs (message files) bundled for the locale(s)
@@ -745,10 +745,10 @@ untranslated message file will be created for it.
 
 Example usage::
 
-    django-admin makemessages --collect-base-catalogs --locale=en --locale=pt
-    django-admin makemessages --collect-base-catalogs all-bundled --exclude=fr
-    django-admin makemessages --collect-base-catalogs --domain djangojs
-    django-admin makemessages -cbc -l xx_yy -d djangojs
+    django-admin makemessages --collect-bundled --locale=en --locale=pt
+    django-admin makemessages --collect-bundled all-bundled --exclude=fr
+    django-admin makemessages --collect-bundled --domain djangojs
+    django-admin makemessages -cb -l xx_yy -d djangojs
 
 .. django-admin-option:: --comply-plural-forms [{interactive, copy, form_map}] -cpf
 

@@ -283,10 +283,10 @@ class Command(BaseCommand):
             help="Keep .pot file after making messages. Useful when debugging.",
         )
         parser.add_argument(
-            '--collect-base-catalogs', '-cbc',
+            '--collect-bundled', '-cb',
             choices=('default-path', 'all-bundled'), nargs='?',
             const='default-path',
-            help="Collects Django's base catalogs into LOCALE_ROOT."
+            help="Collects Django's bundled message files into LOCALE_ROOT."
         )
         parser.add_argument(
             '--comply-plural-forms', '-cpf', action='store', nargs='?',
@@ -302,7 +302,7 @@ class Command(BaseCommand):
         process_all = options['all']
         extensions = options['extensions']
         self.symlinks = options['symlinks']
-        self.base_catalogs = options['collect_base_catalogs']
+        self.collect_bundled = options['collect_bundled']
         self.comply_pf = options['comply_plural_forms']
 
         ignore_patterns = options['ignore_patterns']
@@ -354,9 +354,9 @@ class Command(BaseCommand):
                 % (os.path.basename(sys.argv[0]), sys.argv[1])
             )
 
-        if (self.base_catalogs) and self.settings_available and not hasattr(settings, 'LOCALE_ROOT'):
+        if (self.collect_bundled) and self.settings_available and not hasattr(settings, 'LOCALE_ROOT'):
             raise CommandError(
-                "currently makemessages only supports collecting base catalogs "
+                "currently makemessages only supports collecting bundled message files "
                 "with the LOCALE_ROOT setting defined."
             )
 
@@ -408,7 +408,7 @@ class Command(BaseCommand):
         if locales:
             check_programs('msguniq', 'msgmerge', 'msgattrib')
 
-        if self.base_catalogs:
+        if self.collect_bundled:
             check_programs('msgcat')
 
         if self.comply_pf:
@@ -419,7 +419,7 @@ class Command(BaseCommand):
         try:
             potfiles = self.build_potfiles()
 
-            if self.base_catalogs:
+            if self.collect_bundled:
                 main_po_ph = os.path.join(
                     self.django_dir, 'conf', 'locale', '%s', 'LC_MESSAGES', 'django.po'
                 )
@@ -430,14 +430,14 @@ class Command(BaseCommand):
                 ]
                 locales_to_collect = (
                     set(locales_with_catalogs + self.locale_list_from_path(settings.LOCALE_ROOT))
-                    if self.base_catalogs == 'all-bundled' else locales
+                    if self.collect_bundled == 'all-bundled' else locales
                 )
                 for locale in locales_to_collect:
                     if self.verbosity > 0:
                         self.stdout.write(
-                            "collecting base catalogs for locale %s\n" % locale
+                            "collecting bundled messages for locale %s\n" % locale
                         )
-                    self.collect_base_catalogs(locale)
+                    self.collect_bundled_messages(locale)
 
             # Build po files for each selected locale
             for locale in locales:
@@ -524,7 +524,7 @@ class Command(BaseCommand):
         Build pot files and apply msguniq to them.
         """
         file_list = self.find_files(".")
-        if self.base_catalogs:
+        if self.collect_bundled:
             file_list.extend(self.find_files(self.django_dir))
         self.remove_potfiles()
         self.process_files(file_list)
@@ -581,7 +581,7 @@ class Command(BaseCommand):
                 else:
                     locale_dir = None
                     for path in self.locale_paths:
-                        if self.base_catalogs:
+                        if self.collect_bundled:
                             if self.django_dir < os.path.abspath(path):
                                 locale_dir = settings.LOCALE_ROOT
                                 break
@@ -740,10 +740,11 @@ class Command(BaseCommand):
                 elif self.verbosity > 0:
                     self.stdout.write(errors)
 
-    def collect_base_catalogs(self, locale):
+    def collect_bundled_messages(self, locale):
         """
-        Collects all the base catalogs bundled with Django for a `locale` and
-        creates or updates the corresponding catalog in LOCALE_ROOT.
+        Extract all the literals and collects all the translation strings in
+        message files bundled with Django, for a `locale` and creates or
+        updates the corresponding message file in LOCALE_ROOT.
 
         Use msgcat GNU gettext utility.
         """
@@ -772,7 +773,7 @@ class Command(BaseCommand):
             msgs = normalize_eols(msgs)
             if not msgs:
                 # msgcat will not output the header if there is only a null
-                # msgid in the catalog, keep the header for the plural forms
+                # msgid in the file, keep the header for the plural forms
                 with open(django_pos[0], encoding='utf-8') as fp:
                     msgs = fp.read()
         else:

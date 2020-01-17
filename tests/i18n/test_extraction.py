@@ -548,7 +548,7 @@ class CopyPluralFormsExtractorTests(ExtractorTests):
             self.assertMsgIdPlural('Plural for a `translate` and `blocktranslate` collision case', po_contents)
 
 
-class CollectBaseCatalogsTests(ExtractorTests):
+class CollectBundledTests(ExtractorTests):
 
     PO_FILE = 'locale_root/%s/LC_MESSAGES/django.po'
     BUNDLED_LOCALES = ['cs', 'es', 'lt', 'mk', 'ru', 'sl', 'tt']
@@ -559,7 +559,7 @@ class CollectBaseCatalogsTests(ExtractorTests):
                             os.path.join(self.test_dir, 'django_dir')):
                 out = StringIO()
                 management.call_command(
-                    'makemessages', locale=['es'], collect_base_catalogs='default-path',
+                    'makemessages', locale=['es'], collect_bundled='default-path',
                     stdout=out, verbosity=1
                 )
                 with open(self.PO_FILE % 'es', encoding='utf-8') as fp:
@@ -580,7 +580,7 @@ class CollectBaseCatalogsTests(ExtractorTests):
             with mock.patch('django.core.management.commands.makemessages.Command.django_dir',
                             os.path.join(self.test_dir, 'django_dir')):
                 management.call_command(
-                    'makemessages', locale=['cs'], collect_base_catalogs='default-path',
+                    'makemessages', locale=['cs'], collect_bundled='default-path',
                     verbosity=0
                 )
                 with open(self.PO_FILE % 'cs', encoding='utf-8') as fp:
@@ -592,7 +592,7 @@ class CollectBaseCatalogsTests(ExtractorTests):
         with override_settings(LOCALE_ROOT=os.path.join(self.test_dir, 'locale_root')):
             with mock.patch('django.core.management.commands.makemessages.Command.django_dir',
                             os.path.join(self.test_dir, 'django_dir')):
-                management.call_command('makemessages', collect_base_catalogs='all-bundled', verbosity=0)
+                management.call_command('makemessages', collect_bundled='all-bundled', verbosity=0)
                 for locale in self.BUNDLED_LOCALES:
                     self.assertTrue(os.path.exists(self.PO_FILE % locale))
 
@@ -601,7 +601,7 @@ class CollectBaseCatalogsTests(ExtractorTests):
             with mock.patch('django.core.management.commands.makemessages.Command.django_dir',
                             os.path.join(self.test_dir, 'django_dir')):
                 management.call_command(
-                    'makemessages', locale=['xxx'], collect_base_catalogs='default-path',
+                    'makemessages', locale=['xxx'], collect_bundled='default-path',
                     verbosity=0
                 )
                 should_contain = """
@@ -614,10 +614,10 @@ class CollectBaseCatalogsTests(ExtractorTests):
                         self.assertIn(line.strip(), po_contents)
 
     def test_no_locale_root_setting(self):
-        msg = ("currently makemessages only supports collecting base catalogs "
+        msg = ("currently makemessages only supports collecting bundled message files "
                "with the LOCALE_ROOT setting defined.")
         with self.assertRaisesMessage(CommandError, msg):
-            management.call_command('makemessages', collect_base_catalogs='default-path', verbosity=0)
+            management.call_command('makemessages', collect_bundled='default-path', verbosity=0)
 
 
 class ComplyPluralFormsTests(ExtractorTests):
