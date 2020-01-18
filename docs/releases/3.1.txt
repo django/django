@@ -27,6 +27,41 @@ officially support the latest release of each series.
 What's new in Django 3.1
 ========================
 
+Plural forms consistency and customization
+------------------------------------------
+
+Django does not support multiple plural forms in message files. As all
+translation files are merged, only the plural forms in the main Django po
+file is considered.
+
+This led to inconsistencies and undesired results in users' translations
+mostly when Django updated the plural forms of a locale and the users
+did not re-organize their message files to be in line with the new plural
+forms (:ref:`more details <plural-forms>`).
+
+To avoid this undesired result, the :setting:`PLURAL_FORMS_CONSISTENCY`
+setting has been introduced.
+
+When enabled (disabled by default), Django will issue a warning when merging
+any message file that contains different plural forms than the main Django po
+file, both at a
+:ref:`system check level <translation-checks>` (``translation.W005``)
+and run-time.
+
+As fixing this issue can be automated in most scenarios, the tool used for
+ensuring plural forms consistency in all Django bundled message files is
+provided in the
+:option:`django-admin makemessages --update-plural-forms<makemessages --update-plural-forms>`.
+option.
+
+Also, customization of the plural forms was not possible previously without
+modifying Django source files.
+
+The :setting:`LOCALE_ROOT` setting and the
+:option:`django-admin makemessages --collect-bundled<makemessages --collect-bundled>`
+option has been introduced for enabling the feature.
+
+
 Minor features
 --------------
 
