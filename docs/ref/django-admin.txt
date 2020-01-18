@@ -790,6 +790,13 @@ Example usage::
     django-admin makemessages --update-plural-forms copy --locale=en
     django-admin makemessages -upf 0,1,1,1 -l he -d djangojs
 
+.. note::
+
+    Be aware that while this tool can handle most of the regular cases,  
+    it may be an unlikely situation where a linear mapping is not adequate.
+    It is recommended not to overwrite and check the results if the form 
+    map is not "obvious".
+
 .. seealso::
 
     See :ref:`customizing-makemessages` for instructions on how to customize
