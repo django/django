@@ -49,23 +49,27 @@ class TestDbSignatureTests(SimpleTestCase):
 @mock.patch('django.core.management.commands.migrate.Command.handle', return_value=None)
 class TestDbCreationTests(SimpleTestCase):
     def test_migrate_test_setting_false(self, mocked_migrate, mocked_ensure_connection):
-        creation = connection.creation_class(connection)
-        saved_settings = copy.deepcopy(connection.settings_dict)
+        test_connection = get_connection_copy()
+        test_connection.settings_dict['TEST']['MIGRATE'] = False
+        creation = test_connection.creation_class(test_connection)
+        old_database_name = test_connection.settings_dict['NAME']
         try:
-            connection.settings_dict['TEST']['MIGRATE'] = False
             with mock.patch.object(creation, '_create_test_db'):
                 creation.create_test_db(verbosity=0, autoclobber=True, serialize=False)
             mocked_migrate.assert_not_called()
         finally:
-            connection.settings_dict = saved_settings
+            with mock.patch.object(creation, '_destroy_test_db'):
+                creation.destroy_test_db(old_database_name, verbosity=0)
 
     def test_migrate_test_setting_true(self, mocked_migrate, mocked_ensure_connection):
-        creation = connection.creation_class(connection)
-        saved_settings = copy.deepcopy(connection.settings_dict)
+        test_connection = get_connection_copy()
+        test_connection.settings_dict['TEST']['MIGRATE'] = True
+        creation = test_connection.creation_class(test_connection)
+        old_database_name = test_connection.settings_dict['NAME']
         try:
-            connection.settings_dict['TEST']['MIGRATE'] = True
             with mock.patch.object(creation, '_create_test_db'):
                 creation.create_test_db(verbosity=0, autoclobber=True, serialize=False)
             mocked_migrate.assert_called_once()
         finally:
-            connection.settings_dict = saved_settings
+            with mock.patch.object(creation, '_destroy_test_db'):
+                creation.destroy_test_db(old_database_name, verbosity=0)
