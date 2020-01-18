@@ -376,7 +376,7 @@ class LineLocatePoint(GeoFunc):
     geom_param_pos = (0, 1)
 
 
-class MakeValid(GeoFunc):
+class MakeValid(GeomOutputGeoFunc):
     pass
 
 
