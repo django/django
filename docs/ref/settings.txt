@@ -1988,6 +1988,23 @@ directory as the main Django po file of a translation for a domain.
     :option:`django-admin makemessages --collect-bundled<makemessages --collect-bundled>`
     after an upgrade to collect any new messages.
 
+.. setting:: PLURAL_FORMS_CONSISTENCY
+
+``PLURAL_FORMS_CONSISTENCY``
+----------------------------
+
+.. versionadded:: 3.1
+
+Default: ``False``
+
+When ``True``, Django will issue a warning when merging any message file for
+translations that contains different plural forms than the main Django po file,
+both at
+:ref:`system check level <translation-checks>` (``translation.W005``)
+and run-time.
+
+See also :ref:`plural-forms`.
+
 .. setting:: LOGGING
 
 ``LOGGING``
@@ -3615,6 +3632,7 @@ Globalization (``i18n``/``l10n``)
 * :setting:`LOCALE_ROOT`
 * :setting:`MONTH_DAY_FORMAT`
 * :setting:`NUMBER_GROUPING`
+* :setting:`PLURAL_FORMS_CONSISTENCY`
 * :setting:`SHORT_DATE_FORMAT`
 * :setting:`SHORT_DATETIME_FORMAT`
 * :setting:`THOUSAND_SEPARATOR`

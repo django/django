@@ -78,7 +78,7 @@ def check_plural_forms_consistency(app_configs, **kwargs):
     """
     Warns if plural forms are not consistent for languages in the LANGUAGES setting.
     """
-    if settings.USE_I18N:
+    if settings.USE_I18N and settings.PLURAL_FORMS_CONSISTENCY:
         with warnings.catch_warnings(record=True) as ws:
             warnings.simplefilter("always")
             saved_locale = get_language()

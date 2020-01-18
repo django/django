@@ -289,9 +289,11 @@ translation files are merged, only the plural form in the main Django po
 file (located by default in ``django/conf/locale/<lang_code>/LC_MESSAGES/django.po``,
 customized with the :setting:`LOCALE_ROOT` setting) is considered.
 
-To prevent inconsistencies and undesired results in translations, Django will
-issue a warning when merging any message file that contains different plural
-forms than the main Django po file, both at a
+To prevent inconsistencies and undesired results in translations, Django
+provides the :setting:`PLURAL_FORMS_CONSISTENCY` setting (disabled by default).
+
+If enabled, Django will issue a warning when merging any message file that
+contains different plural forms than the main Django po file, both at a
 :ref:`system check level <translation-checks>` (``translation.W005``) and
 run-time.
 

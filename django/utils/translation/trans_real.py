@@ -194,31 +194,30 @@ class DjangoTranslation(gettext_module.GNUTranslations):
             self._info = other._info.copy()
             self._catalog = other._catalog.copy()
         else:
-            if 'plural-forms' in self.info():
-                current_plural_forms = PluralForms(self.info()['plural-forms'])
-                if 'plural-forms' not in other.info():
-                    other._info['MISSING PLURAL FORMS'] = "MISSING PLURAL FORMS"
-                    other_plural_forms = None
-                else:
-                    other_plural_forms = PluralForms(other.info()['plural-forms'])
-                if current_plural_forms == other_plural_forms:
-                    self._catalog.update(other._catalog)
-                else:
-                    from pprint import pformat
-                    msg = (
-                        "\nPosible inconsistencies and undesired behavior detected "
-                        "due to different plural forms in message file.\n"
-                        "Locale: %s\n"
-                        "Unconsistent message file localedir: %s\n"
-                        "Unconsistent message file info: \n%s\n"
-                        "MAIN PLURAL FORM: \n%s\n"
-                        "See https://docs.djangoproject.com/en/dev/topics/i18n/translation/#plural-forms"
-                        % (self.__language,
-                           other.localedir,
-                           pformat(other.info(), indent=4),
-                           pformat(self.info()['plural-forms'], indent=4), )
-                    )
-                    warnings.warn(msg, RuntimeWarning)
+            if settings.PLURAL_FORMS_CONSISTENCY:
+                if 'plural-forms' in self.info():
+                    current_plural_forms = PluralForms(self.info()['plural-forms'])
+                    if 'plural-forms' not in other.info():
+                        other._info['MISSING PLURAL FORMS'] = "MISSING PLURAL FORMS"
+                        other_plural_forms = None
+                    else:
+                        other_plural_forms = PluralForms(other.info()['plural-forms'])
+                    if current_plural_forms != other_plural_forms:
+                        from pprint import pformat
+                        msg = (
+                            "\nPosible inconsistencies and undesired behavior detected "
+                            "due to different plural forms in message file.\n"
+                            "Locale: %s\n"
+                            "Unconsistent message file localedir: %s\n"
+                            "Unconsistent message file info: \n%s\n"
+                            "MAIN PLURAL FORM: \n%s\n"
+                            "See https://docs.djangoproject.com/en/dev/topics/i18n/translation/#plural-forms"
+                            % (self.__language,
+                               other.localedir,
+                               pformat(other.info(), indent=4),
+                               pformat(self.info()['plural-forms'], indent=4), )
+                        )
+                        warnings.warn(msg, RuntimeWarning)
             self._catalog.update(other._catalog)
 
         if other._fallback:

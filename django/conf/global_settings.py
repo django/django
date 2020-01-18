@@ -151,6 +151,11 @@ LANGUAGES_BIDI = ["he", "ar", "ar-dz", "fa", "ur"]
 USE_I18N = True
 LOCALE_PATHS = []
 
+# If you set this to True, Django will issue a warning when merging a message
+# file for translations with different plural forms than the main ones of the
+# locale.
+PLURAL_FORMS_CONSISTENCY = False
+
 # Settings for language cookie
 LANGUAGE_COOKIE_NAME = 'django_language'
 LANGUAGE_COOKIE_AGE = None

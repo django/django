@@ -1816,6 +1816,9 @@ class CatalogMergingTests(SimpleTestCase):
     Test the functioning of catalog merging in translations
     """
 
+    @override_settings(
+        PLURAL_FORMS_CONSISTENCY=True
+    )
     def test_django_bundled_catalogs_consistency(self):
         app_configs = []
         django_dir = os.path.normpath(os.path.join(os.path.dirname(django.__file__)))
@@ -1830,12 +1833,16 @@ class CatalogMergingTests(SimpleTestCase):
         # If it gets up to here, no warning have been issued and all catalogs
         # have been merged correctly (any warning will make this test fail).
 
-    @override_settings(LOCALE_PATHS=extended_locale_paths)
+    @override_settings(
+        PLURAL_FORMS_CONSISTENCY=True,
+        LOCALE_PATHS=extended_locale_paths
+    )
     def test_catalog_with_plural_forms_merged(self):
         activate('sk')
         self.assertEqual(gettext("a test string"), "translated into sk")
 
     @override_settings(
+        PLURAL_FORMS_CONSISTENCY=True,
         LANGUAGE_CODE='es',
         LOCALE_ROOT=os.path.join(here, 'locale_root/'),
         LOCALE_PATHS=extended_locale_paths
@@ -1846,6 +1853,7 @@ class CatalogMergingTests(SimpleTestCase):
             activate('cs')
 
     @override_settings(
+        PLURAL_FORMS_CONSISTENCY=True,
         LANGUAGE_CODE='es',
         LOCALE_PATHS=extended_locale_paths
     )
@@ -1853,6 +1861,18 @@ class CatalogMergingTests(SimpleTestCase):
         msg = 'Posible inconsistencies and undesired behavior detected'
         with self.assertWarnsMessage(RuntimeWarning, msg):
             activate('lt')
+
+    @override_settings(
+        PLURAL_FORMS_CONSISTENCY=False,
+        LANGUAGE_CODE='es',
+        LOCALE_PATHS=extended_locale_paths
+    )
+    def test_inconsistent_catalog_merging(self):
+        trans_real.reset_translations_cache()
+        activate('cs')
+        activate('lt')
+        # If it gets up to here, no warning have been issued and all catalogs
+        # have been merged correctly (any warning will make this test fail).
 
 
 class NonDjangoLanguageTests(SimpleTestCase):

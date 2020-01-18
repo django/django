@@ -118,6 +118,7 @@ class TranslationCheckTests(SimpleTestCase):
         languages = [('cs', 'Czech'), ('fr', 'French'), ('sk', 'Slovak')]
         msg = 'Inconsistent plural forms across catalogs for language {!r}.'
         with self.settings(
+                PLURAL_FORMS_CONSISTENCY=True,
                 LANGUAGE_CODE='cs',
                 LANGUAGES=languages,
                 LOCALE_PATHS=[os.path.join(here, 'locale_dir'), ]):
@@ -134,9 +135,20 @@ class TranslationCheckTests(SimpleTestCase):
     def test_inconsistent_plural_forms_in_language_code(self):
         msg = 'Inconsistent plural forms across catalogs for language {!r}.'
         with self.settings(
+                PLURAL_FORMS_CONSISTENCY=True,
                 LANGUAGE_CODE='cs',
                 LANGUAGES=None,
                 LOCALE_PATHS=[os.path.join(here, 'locale_dir'), ]):
             expected_warnings = [Warning(msg.format('cs'), id='translation.W005'), ]
             received_warnings = check_plural_forms_consistency(None)
             self.assertEqual(expected_warnings, received_warnings)
+
+    def test_inconsistent_plural_forms_in_languages_disabled_setting(self):
+        languages = [('cs', 'Czech'), ('fr', 'French'), ('sk', 'Slovak')]
+        with self.settings(
+                PLURAL_FORMS_CONSISTENCY=False,
+                LANGUAGE_CODE='cs',
+                LANGUAGES=languages,
+                LOCALE_PATHS=[os.path.join(here, 'locale_dir'), ]):
+            received_warnings = check_plural_forms_consistency(None)
+            self.assertEqual(received_warnings, [])
