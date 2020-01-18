@@ -48,12 +48,12 @@ from .models import (
     Parent, ParentWithDependentChildren, ParentWithUUIDPK, Person, Persona,
     Picture, Pizza, Plot, PlotDetails, PluggableSearchPerson, Podcast, Post,
     PrePopulatedPost, Promo, Question, ReadablePizza, ReadOnlyPizza,
-    Recommendation, Recommender, RelatedPrepopulated, RelatedWithUUIDPKModel,
-    Report, Restaurant, RowLevelChangePermissionModel, SecretHideout, Section,
-    ShortMessage, Simple, Song, State, Story, SuperSecretHideout, SuperVillain,
-    Telegram, TitleTranslation, Topping, UnchangeableObject, UndeletableObject,
-    UnorderedObject, UserProxy, Villain, Vodcast, Whatsit, Widget, Worker,
-    WorkHour,
+    ReadOnlyRelatedField, Recommendation, Recommender, RelatedPrepopulated,
+    RelatedWithUUIDPKModel, Report, Restaurant, RowLevelChangePermissionModel,
+    SecretHideout, Section, ShortMessage, Simple, Song, State, Story,
+    SuperSecretHideout, SuperVillain, Telegram, TitleTranslation, Topping,
+    UnchangeableObject, UndeletableObject, UnorderedObject, UserProxy, Villain,
+    Vodcast, Whatsit, Widget, Worker, WorkHour,
 )
 
 ERROR_MESSAGE = "Please enter the correct username and password \
@@ -5042,6 +5042,45 @@ class ReadonlyTest(AdminFieldExtractionMixin, TestCase):
         response = self.client.get(reverse('admin:admin_views_choice_change', args=(choice.pk,)))
         self.assertContains(response, '<div class="readonly">No opinion</div>', html=True)
 
+    def test_readonly_foreignkey_links(self):
+        """
+        ForeignKey readonly fields render as links if the target model is
+        registered in admin.
+        """
+        chapter = Chapter.objects.create(
+            title='Chapter 1',
+            content='content',
+            book=Book.objects.create(name='Book 1'),
+        )
+        language = Language.objects.create(iso='_40', name='Test')
+        obj = ReadOnlyRelatedField.objects.create(
+            chapter=chapter,
+            language=language,
+            user=self.superuser,
+        )
+        response = self.client.get(
+            reverse('admin:admin_views_readonlyrelatedfield_change', args=(obj.pk,)),
+        )
+        # Related ForeignKey object registered in admin.
+        user_url = reverse('admin:auth_user_change', args=(self.superuser.pk,))
+        self.assertContains(
+            response,
+            '<div class="readonly"><a href="%s">super</a></div>' % user_url,
+            html=True,
+        )
+        # Related ForeignKey with the string primary key registered in admin.
+        language_url = reverse(
+            'admin:admin_views_language_change',
+            args=(quote(language.pk),),
+        )
+        self.assertContains(
+            response,
+            '<div class="readonly"><a href="%s">_40</a></div>' % language_url,
+            html=True,
+        )
+        # Related ForeignKey object not registered in admin.
+        self.assertContains(response, '<div class="readonly">Chapter 1</div>', html=True)
+
     def test_readonly_manytomany_backwards_ref(self):
         """
         Regression test for #16433 - backwards references for related objects
@@ -5071,7 +5110,8 @@ class ReadonlyTest(AdminFieldExtractionMixin, TestCase):
 
         response = self.client.get(reverse('admin:admin_views_plotproxy_change', args=(pl.pk,)))
         field = self.get_admin_readonly_field(response, 'plotdetails')
-        self.assertEqual(field.contents(), 'Brand New Plot')
+        pd_url = reverse('admin:admin_views_plotdetails_change', args=(pd.pk,))
+        self.assertEqual(field.contents(), '<a href="%s">Brand New Plot</a>' % pd_url)
 
         # The reverse relation also works if the OneToOneField is null.
         pd.plot = None

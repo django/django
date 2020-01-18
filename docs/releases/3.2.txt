@@ -72,6 +72,9 @@ Minor features
 * :attr:`.ModelAdmin.search_fields` now allows searching against quoted phrases
   with spaces.
 
+* Read-only related fields are now rendered as navigable links if target models
+  are registered in the admin.
+
 :mod:`django.contrib.admindocs`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

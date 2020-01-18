@@ -37,8 +37,8 @@ from .models import (
     Person, Persona, Picture, Pizza, Plot, PlotDetails, PlotProxy,
     PluggableSearchPerson, Podcast, Post, PrePopulatedPost,
     PrePopulatedPostLargeSlug, PrePopulatedSubPost, Promo, Question,
-    ReadablePizza, ReadOnlyPizza, Recipe, Recommendation, Recommender,
-    ReferencedByGenRel, ReferencedByInline, ReferencedByParent,
+    ReadablePizza, ReadOnlyPizza, ReadOnlyRelatedField, Recipe, Recommendation,
+    Recommender, ReferencedByGenRel, ReferencedByInline, ReferencedByParent,
     RelatedPrepopulated, RelatedWithUUIDPKModel, Report, Reservation,
     Restaurant, RowLevelChangePermissionModel, Section, ShortMessage, Simple,
     Sketch, Song, State, Story, StumpJoke, Subscriber, SuperVillain, Telegram,
@@ -537,6 +537,10 @@ class ToppingAdmin(admin.ModelAdmin):
 
 class PizzaAdmin(admin.ModelAdmin):
     readonly_fields = ('toppings',)
+
+
+class ReadOnlyRelatedFieldAdmin(admin.ModelAdmin):
+    readonly_fields = ('chapter', 'language', 'user')
 
 
 class StudentAdmin(admin.ModelAdmin):
@@ -1061,6 +1065,7 @@ site.register(GenRelReference)
 site.register(ParentWithUUIDPK)
 site.register(RelatedPrepopulated, search_fields=['name'])
 site.register(RelatedWithUUIDPKModel)
+site.register(ReadOnlyRelatedField, ReadOnlyRelatedFieldAdmin)
 
 # We intentionally register Promo and ChapterXtra1 but not Chapter nor ChapterXtra2.
 # That way we cover all four cases:
