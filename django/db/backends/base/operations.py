@@ -658,7 +658,16 @@ class BaseDatabaseOperations:
         return self.window_frame_start(start), self.window_frame_end(end)
 
     def window_frame_range_start_end(self, start=None, end=None):
-        return self.window_frame_rows_start_end(start, end)
+        start_, end_ = self.window_frame_rows_start_end(start, end)
+        if (
+            self.connection.features.only_supports_unbounded_with_preceding_and_following and
+            ((start and start < 0) or (end and end > 0))
+        ):
+            raise NotSupportedError(
+                '%s only supports UNBOUNDED together with PRECEDING and '
+                'FOLLOWING.' % self.connection.display_name
+            )
+        return start_, end_
 
     def explain_query_prefix(self, format=None, **options):
         if not self.connection.features.supports_explaining_query_execution:

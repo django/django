@@ -1,5 +1,5 @@
 import datetime
-from unittest import mock, skipIf, skipUnless
+from unittest import mock, skipIf
 
 from django.core.exceptions import FieldError
 from django.db import NotSupportedError, connection
@@ -750,9 +750,9 @@ class WindowFunctionTests(TestCase):
                 frame=RowRange(end='a'),
             )))
 
-    @skipUnless(connection.vendor == 'postgresql', 'Frame construction not allowed on PostgreSQL')
-    def test_postgresql_illegal_range_frame_start(self):
-        msg = 'PostgreSQL only supports UNBOUNDED together with PRECEDING and FOLLOWING.'
+    @skipUnlessDBFeature('only_supports_unbounded_with_preceding_and_following')
+    def test_unsupported_range_frame_start(self):
+        msg = '%s only supports UNBOUNDED together with PRECEDING and FOLLOWING.' % connection.display_name
         with self.assertRaisesMessage(NotSupportedError, msg):
             list(Employee.objects.annotate(test=Window(
                 expression=Sum('salary'),
@@ -760,9 +760,9 @@ class WindowFunctionTests(TestCase):
                 frame=ValueRange(start=-1),
             )))
 
-    @skipUnless(connection.vendor == 'postgresql', 'Frame construction not allowed on PostgreSQL')
-    def test_postgresql_illegal_range_frame_end(self):
-        msg = 'PostgreSQL only supports UNBOUNDED together with PRECEDING and FOLLOWING.'
+    @skipUnlessDBFeature('only_supports_unbounded_with_preceding_and_following')
+    def test_unsupported_range_frame_end(self):
+        msg = '%s only supports UNBOUNDED together with PRECEDING and FOLLOWING.' % connection.display_name
         with self.assertRaisesMessage(NotSupportedError, msg):
             list(Employee.objects.annotate(test=Window(
                 expression=Sum('salary'),

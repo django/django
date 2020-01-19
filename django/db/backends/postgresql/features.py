@@ -52,6 +52,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     $$ LANGUAGE plpgsql;"""
     requires_casted_case_in_updates = True
     supports_over_clause = True
+    only_supports_unbounded_with_preceding_and_following = True
     supports_aggregate_filter_clause = True
     supported_explain_formats = {'JSON', 'TEXT', 'XML', 'YAML'}
     validates_explain_options = False  # A query will error on invalid options.
