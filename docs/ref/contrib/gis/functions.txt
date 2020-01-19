@@ -144,6 +144,10 @@ Keyword Argument       Description
 
 __ https://developers.google.com/kml/documentation/
 
+.. versionchanged:: 3.1
+
+    The undocumented ``version`` parameter was removed.
+
 ``AsSVG``
 =========
 

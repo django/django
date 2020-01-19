@@ -116,6 +116,8 @@ Minor features
 * Added the :class:`~django.contrib.gis.db.models.functions.AsWKB` and
   :class:`~django.contrib.gis.db.models.functions.AsWKT` functions.
 
+* Added support for PostGIS 3.
+
 :mod:`django.contrib.humanize`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -628,6 +630,9 @@ Miscellaneous
 * The :func:`~django.contrib.auth.hashers.make_password` now requires its
   argument to be a string or bytes. Other types should be explicitly cast to
   one of these.
+
+* The undocumented ``version`` parameter to the
+  :class:`~django.contrib.gis.db.models.functions.AsKML` function is removed.
 
 .. _deprecated-features-3.1:
 
