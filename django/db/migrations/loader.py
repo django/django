@@ -269,7 +269,7 @@ class MigrationLoader:
                         ),
                         exc.node
                     ) from exc
-            raise exc
+            raise
         self.graph.ensure_not_cyclic()
 
     def check_consistent_history(self, connection):

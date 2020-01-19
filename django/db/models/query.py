@@ -607,13 +607,13 @@ class QuerySet:
                 params = dict(resolve_callables(params))
                 obj = self.create(**params)
             return obj, True
-        except IntegrityError as e:
+        except IntegrityError:
             try:
                 qs = self.select_for_update() if lock else self
                 return qs.get(**lookup), False
             except self.model.DoesNotExist:
                 pass
-            raise e
+            raise
 
     def _extract_model_params(self, defaults, **kwargs):
         """

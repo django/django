@@ -48,7 +48,7 @@ class DatabaseCreation(BaseDatabaseCreation):
             elif not keepdb:
                 # If the database should be kept, ignore "database already
                 # exists".
-                raise e
+                raise
 
     def _clone_test_db(self, suffix, verbosity, keepdb=False):
         # CREATE DATABASE ... WITH TEMPLATE ... requires closing connections
