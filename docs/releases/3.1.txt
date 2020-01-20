@@ -303,6 +303,7 @@ Tests
 * Added the :setting:`TEST_PASSWORD_HASHER` setting to define a faster
   password algorithm when running tests. It uses a plain hasher by default.
   It's possible to opt-out from this behavior by setting its value to ``None``.
+
 * :class:`~django.test.SimpleTestCase` now implements the ``debug()`` method to
   allow running a test without collecting the result and catching exceptions.
   This can be used to support running tests under a debugger.
