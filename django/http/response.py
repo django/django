@@ -17,8 +17,9 @@ from django.http.cookie import SimpleCookie
 from django.utils import timezone
 from django.utils.encoding import iri_to_uri
 from django.utils.http import http_date
+from django.utils.regex_helper import _lazy_re_compile
 
-_charset_from_content_type_re = re.compile(r';\s*charset=(?P<charset>[^\s;]+)', re.I)
+_charset_from_content_type_re = _lazy_re_compile(r';\s*charset=(?P<charset>[^\s;]+)', re.I)
 
 
 class BadHeaderError(ValueError):
@@ -196,8 +197,8 @@ class HttpResponseBase:
         if httponly:
             self.cookies[key]['httponly'] = True
         if samesite:
-            if samesite.lower() not in ('lax', 'strict'):
-                raise ValueError('samesite must be "lax" or "strict".')
+            if samesite.lower() not in ('lax', 'none', 'strict'):
+                raise ValueError('samesite must be "lax", "none", or "strict".')
             self.cookies[key]['samesite'] = samesite
 
     def setdefault(self, key, value):

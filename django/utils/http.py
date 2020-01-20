@@ -16,9 +16,10 @@ from django.core.exceptions import TooManyFieldsSent
 from django.utils.datastructures import MultiValueDict
 from django.utils.deprecation import RemovedInDjango40Warning
 from django.utils.functional import keep_lazy_text
+from django.utils.regex_helper import _lazy_re_compile
 
 # based on RFC 7232, Appendix C
-ETAG_MATCH = re.compile(r'''
+ETAG_MATCH = _lazy_re_compile(r'''
     \A(      # start of string and capture group
     (?:W/)?  # optional weak indicator
     "        # opening quote
@@ -34,14 +35,14 @@ __M = r'(?P<mon>\w{3})'
 __Y = r'(?P<year>\d{4})'
 __Y2 = r'(?P<year>\d{2})'
 __T = r'(?P<hour>\d{2}):(?P<min>\d{2}):(?P<sec>\d{2})'
-RFC1123_DATE = re.compile(r'^\w{3}, %s %s %s %s GMT$' % (__D, __M, __Y, __T))
-RFC850_DATE = re.compile(r'^\w{6,9}, %s-%s-%s %s GMT$' % (__D, __M, __Y2, __T))
-ASCTIME_DATE = re.compile(r'^\w{3} %s %s %s %s$' % (__M, __D2, __T, __Y))
+RFC1123_DATE = _lazy_re_compile(r'^\w{3}, %s %s %s %s GMT$' % (__D, __M, __Y, __T))
+RFC850_DATE = _lazy_re_compile(r'^\w{6,9}, %s-%s-%s %s GMT$' % (__D, __M, __Y2, __T))
+ASCTIME_DATE = _lazy_re_compile(r'^\w{3} %s %s %s %s$' % (__M, __D2, __T, __Y))
 
 RFC3986_GENDELIMS = ":/?#[]@"
 RFC3986_SUBDELIMS = "!$&'()*+,;="
 
-FIELDS_MATCH = re.compile('[&;]')
+FIELDS_MATCH = _lazy_re_compile('[&;]')
 
 
 @keep_lazy_text

@@ -126,7 +126,7 @@ described here.
 
 Here's the formal declaration of a ``QuerySet``:
 
-.. class:: QuerySet(model=None, query=None, using=None)
+.. class:: QuerySet(model=None, query=None, using=None, hints=None)
 
     Usually when you'll interact with a ``QuerySet`` you'll use it by
     :ref:`chaining filters <chaining-filters>`. To make this work, most
@@ -1692,6 +1692,14 @@ specify the related objects you want to lock in ``select_for_update(of=(...))``
 using the same fields syntax as :meth:`select_related`. Use the value ``'self'``
 to refer to the queryset's model.
 
+.. admonition:: Lock parents models in ``select_for_update(of=(...))``
+
+    If you want to lock parents models when using :ref:`multi-table inheritance
+    <multi-table-inheritance>`, you must specify parent link fields (by default
+    ``<parent_model_name>_ptr``) in the ``of`` argument. For example::
+
+        Restaurant.objects.select_for_update(of=('self', 'place_ptr'))
+
 You can't use ``select_for_update()`` on nullable relations::
 
     >>> Person.objects.select_related('hometown').select_for_update()
@@ -1706,8 +1714,9 @@ them::
     <QuerySet [<Person: ...)>, ...]>
 
 Currently, the ``postgresql``, ``oracle``, and ``mysql`` database
-backends support ``select_for_update()``. However, MySQL doesn't support the
-``nowait``, ``skip_locked``, and ``of`` arguments.
+backends support ``select_for_update()``. However, MariaDB 10.3+ supports only
+the ``nowait`` argument and MySQL 8.0.1+ supports the ``nowait`` and
+``skip_locked`` arguments. MySQL and MariaDB don't support the ``of`` argument.
 
 Passing ``nowait=True``, ``skip_locked=True``, or ``of`` to
 ``select_for_update()`` using database backends that do not support these
@@ -2569,10 +2578,12 @@ The output differs significantly between databases.
 ``explain()`` is supported by all built-in database backends except Oracle
 because an implementation there isn't straightforward.
 
-The ``format`` parameter changes the output format from the databases's default,
-usually text-based. PostgreSQL supports ``'TEXT'``, ``'JSON'``, ``'YAML'``, and
-``'XML'``. MySQL supports ``'TEXT'`` (also called ``'TRADITIONAL'``) and
-``'JSON'``.
+The ``format`` parameter changes the output format from the databases's
+default, which is usually text-based. PostgreSQL supports ``'TEXT'``,
+``'JSON'``, ``'YAML'``, and ``'XML'`` formats. MariaDB and MySQL support
+``'TEXT'`` (also called ``'TRADITIONAL'``) and ``'JSON'`` formats. MySQL
+8.0.16+ also supports an improved ``'TREE'`` format, which is similar to
+PostgreSQL's ``'TEXT'`` output and is used by default, if supported.
 
 Some databases accept flags that can return more information about the query.
 Pass these flags as keyword arguments. For example, when using PostgreSQL::
@@ -2585,9 +2596,14 @@ Pass these flags as keyword arguments. For example, when using PostgreSQL::
     Execution time: 0.058 ms
 
 On some databases, flags may cause the query to be executed which could have
-adverse effects on your database. For example, PostgreSQL's ``ANALYZE`` flag
-could result in changes to data if there are triggers or if a function is
-called, even for a ``SELECT`` query.
+adverse effects on your database. For example, the ``ANALYZE`` flag supported
+by MariaDB, MySQL 8.0.18+, and PostgreSQL could result in changes to data if
+there are triggers or if a function is called, even for a ``SELECT`` query.
+
+.. versionchanged:: 3.1
+
+    Support for the ``'TREE'`` format on MySQL 8.0.16+ and ``analyze`` option
+    on MariaDB and MySQL 8.0.18+ were added.
 
 .. _field-lookups:
 
@@ -3280,6 +3296,11 @@ SQL equivalent:
 .. code-block:: sql
 
     SELECT ... WHERE pub_date IS NULL;
+
+.. deprecated:: 3.1
+
+    Using non-boolean values as the right-hand side is deprecated, use ``True``
+    or ``False`` instead. In Django 4.0, the exception will be raised.
 
 .. fieldlookup:: regex
 

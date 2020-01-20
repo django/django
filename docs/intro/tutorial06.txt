@@ -20,6 +20,11 @@ That's what ``django.contrib.staticfiles`` is for: it collects static files
 from each of your applications (and any other places you specify) into a
 single location that can easily be served in production.
 
+.. admonition:: Where to get help:
+
+    If you're having trouble going through this tutorial, please head over to
+    the :doc:`Getting Help</faq/help>` section of the FAQ.
+
 Customize your *app's* look and feel
 ====================================
 

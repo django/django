@@ -5,7 +5,7 @@ from django.utils import timezone
 class Article(models.Model):
     title = models.CharField(max_length=100)
     pub_date = models.DateField()
-    pub_datetime = models.DateTimeField(default=timezone.now())
+    pub_datetime = models.DateTimeField(default=timezone.now)
 
     categories = models.ManyToManyField("Category", related_name="articles")
 

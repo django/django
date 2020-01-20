@@ -2,7 +2,7 @@
 #
 # Translators:
 # Ahmet Emre Aladağ <emre.aladag@isik.edu.tr>, 2013
-# BouRock, 2015-2016
+# BouRock, 2015-2016,2019
 # BouRock, 2014
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Murat Çorlu <muratcorlu@gmail.com>, 2012
@@ -10,8 +10,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-09-23 18:54+0000\n"
+"POT-Creation-Date: 2019-09-08 17:27+0200\n"
+"PO-Revision-Date: 2019-09-17 08:21+0000\n"
 "Last-Translator: BouRock\n"
 "Language-Team: Turkish (http://www.transifex.com/django/django/language/"
 "tr/)\n"
@@ -31,19 +31,19 @@ msgid "Documentation"
 msgstr "Belgeler"
 
 msgid "Bookmarklets"
-msgstr "Bookmarklet'ler"
+msgstr "Kod içeren yer işaretşeri"
 
 msgid "Documentation bookmarklets"
-msgstr "Belge bookmarklet'leri"
+msgstr "Belge kod içeren yer işaretleri"
 
 msgid ""
 "To install bookmarklets, drag the link to your bookmarks toolbar, or right-"
 "click the link and add it to your bookmarks. Now you can select the "
 "bookmarklet from any page in the site."
 msgstr ""
-"Bookmarklet'leri yüklemek için, bağlantıyı yer imleri araç çubuğuna "
-"sürükleyin ya da bağlantıya sağ tıklayın ve yer imlerinize ekleyin. Artık "
-"sitedeki herhangi bir sayfadan bookmarklet seçebilirsiniz."
+"Kod içeren yer işaretlerini yüklemek için bağlantıyı yer imleri araç "
+"çubuğuna sürükleyin ya da bağlantıya sağ tıklayın ve yer imlerinize ekleyin. "
+"Artık sitedeki herhangi bir sayfadan kod içeren yer işaretini seçebilirsiniz."
 
 msgid "Documentation for this page"
 msgstr "Bu sayfa için belgeler"
@@ -100,14 +100,14 @@ msgstr ""
 "Tarayıcınızın yönetici işlevselliğine hızlıca erişebilmesi için araçlar"
 
 msgid "Please install docutils"
-msgstr "Lütfen docutils'i yükleyin"
+msgstr "Lütfen docutils’i yükleyin"
 
 #, python-format
 msgid ""
 "The admin documentation system requires Python's <a href=\"%(link)s"
 "\">docutils</a> library."
 msgstr ""
-"Yönetici belge sistemi, Python'un <a href=\"%(link)s\">docutils</a> "
+"Yönetici belge sistemi, Python’un <a href=\"%(link)s\">docutils</a> "
 "kütüphanesini gerektirir."
 
 #, python-format
@@ -159,13 +159,13 @@ msgid "Template: %(name)s"
 msgstr "Şablon: %(name)s"
 
 #, python-format
-msgid "Template: \"%(name)s\""
-msgstr "Şablon: \"%(name)s\""
+msgid "Template: <q>%(name)s</q>"
+msgstr "Şablon: <q>%(name)s</q>"
 
 #. Translators: Search is not a verb here, it qualifies path (a search path)
 #, python-format
-msgid "Search path for template \"%(name)s\":"
-msgstr "\"%(name)s\" şablonu için arama yolu:"
+msgid "Search path for template <q>%(name)s</q>:"
+msgstr "<q>%(name)s</q> şablonu için arama yolu:"
 
 msgid "(does not exist)"
 msgstr "(mevcut değil)"

@@ -570,6 +570,9 @@ minutes. (Note that we've written it as ``60 * 15`` for the purpose of
 readability. ``60 * 15`` will be evaluated to ``900`` -- that is, 15 minutes
 multiplied by 60 seconds per minute.)
 
+The cache timeout set by ``cache_page`` takes precedence over the ``max-age``
+directive from the ``Cache-Control`` header.
+
 The per-view cache, like the per-site cache, is keyed off of the URL. If
 multiple URLs point at the same view, each URL will be cached separately.
 Continuing the ``my_view`` example, if your URLconf looks like this::
@@ -604,6 +607,11 @@ setting for the middleware.  It can be used like this::
 The ``key_prefix`` and ``cache`` arguments may be specified together. The
 ``key_prefix`` argument and the :setting:`KEY_PREFIX <CACHES-KEY_PREFIX>`
 specified under :setting:`CACHES` will be concatenated.
+
+.. versionchanged:: 3.1
+
+    In older versions, the ``max-age`` directive from the ``Cache-Control``
+    header had precedence over the cache timeout set by ``cache_page``.
 
 Specifying per-view cache in the URLconf
 ----------------------------------------
@@ -682,7 +690,7 @@ templates to achieve the same result:
     {% get_current_language as LANGUAGE_CODE %}
 
     {% cache 600 welcome LANGUAGE_CODE %}
-        {% trans "Welcome to example.com" %}
+        {% translate "Welcome to example.com" %}
     {% endcache %}
 
 The cache timeout can be a template variable, as long as the template variable
@@ -724,6 +732,7 @@ a cached item, for example:
     # cache key for {% cache 500 sidebar username %}
     >>> key = make_template_fragment_key('sidebar', [username])
     >>> cache.delete(key) # invalidates cached template fragment
+    True
 
 .. _low-level-cache-api:
 
@@ -884,6 +893,14 @@ You can delete keys explicitly with ``delete()`` to clear the cache for a
 particular object::
 
     >>> cache.delete('a')
+    True
+
+``delete()`` returns ``True`` if the key was successfully deleted, ``False``
+otherwise.
+
+.. versionchanged:: 3.1
+
+    The boolean return value was added.
 
 .. method:: cache.delete_many(keys, version=None)
 
@@ -1277,6 +1294,7 @@ Here are some more examples:
 * ``no_transform=True``
 * ``must_revalidate=True``
 * ``stale_while_revalidate=num_seconds``
+* ``no_cache=True``
 
 The full list of known directives can be found in the `IANA registry`_
 (note that not all of them apply to responses).

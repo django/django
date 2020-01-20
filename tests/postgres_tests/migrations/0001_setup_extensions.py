@@ -4,11 +4,12 @@ from django.db import migrations
 
 try:
     from django.contrib.postgres.operations import (
-        BtreeGinExtension, BtreeGistExtension, CITextExtension,
+        BloomExtension, BtreeGinExtension, BtreeGistExtension, CITextExtension,
         CreateExtension, CryptoExtension, HStoreExtension, TrigramExtension,
         UnaccentExtension,
     )
 except ImportError:
+    BloomExtension = mock.Mock()
     BtreeGinExtension = mock.Mock()
     BtreeGistExtension = mock.Mock()
     CITextExtension = mock.Mock()
@@ -22,6 +23,7 @@ except ImportError:
 class Migration(migrations.Migration):
 
     operations = [
+        BloomExtension(),
         BtreeGinExtension(),
         BtreeGistExtension(),
         CITextExtension(),

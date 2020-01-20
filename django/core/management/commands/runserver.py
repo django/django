@@ -11,8 +11,9 @@ from django.core.servers.basehttp import (
     WSGIServer, get_internal_wsgi_application, run,
 )
 from django.utils import autoreload
+from django.utils.regex_helper import _lazy_re_compile
 
-naiveip_re = re.compile(r"""^(?:
+naiveip_re = _lazy_re_compile(r"""^(?:
 (?P<addr>
     (?P<ipv4>\d{1,3}(?:\.\d{1,3}){3}) |         # IPv4 address
     (?P<ipv6>\[[a-fA-F0-9:]+\]) |               # IPv6 address

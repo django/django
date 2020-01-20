@@ -214,7 +214,7 @@ class ModelFormMetaclass(DeclarativeFieldsMetaclass):
 
         formfield_callback = attrs.pop('formfield_callback', base_formfield_callback)
 
-        new_class = super(ModelFormMetaclass, mcs).__new__(mcs, name, bases, attrs)
+        new_class = super().__new__(mcs, name, bases, attrs)
 
         if bases == (BaseModelForm,):
             return new_class
@@ -1032,7 +1032,8 @@ def _get_foreign_key(parent_model, model, fk_name=None, can_fail=False):
             )
         else:
             raise ValueError(
-                "'%s' has more than one ForeignKey to '%s'." % (
+                "'%s' has more than one ForeignKey to '%s'. You must specify "
+                "a 'fk_name' attribute." % (
                     model._meta.label,
                     parent_model._meta.label,
                 )
@@ -1125,6 +1126,20 @@ class InlineForeignKeyField(Field):
         return False
 
 
+class ModelChoiceIteratorValue:
+    def __init__(self, value, instance):
+        self.value = value
+        self.instance = instance
+
+    def __str__(self):
+        return str(self.value)
+
+    def __eq__(self, other):
+        if isinstance(other, ModelChoiceIteratorValue):
+            other = other.value
+        return self.value == other
+
+
 class ModelChoiceIterator:
     def __init__(self, field):
         self.field = field
@@ -1150,7 +1165,10 @@ class ModelChoiceIterator:
         return self.field.empty_label is not None or self.queryset.exists()
 
     def choice(self, obj):
-        return (self.field.prepare_value(obj), self.field.label_from_instance(obj))
+        return (
+            ModelChoiceIteratorValue(self.field.prepare_value(obj), obj),
+            self.field.label_from_instance(obj),
+        )
 
 
 class ModelChoiceField(ChoiceField):
@@ -1248,6 +1266,8 @@ class ModelChoiceField(ChoiceField):
             return None
         try:
             key = self.to_field_name or 'pk'
+            if isinstance(value, self.queryset.model):
+                value = getattr(value, key)
             value = self.queryset.get(**{key: value})
         except (ValueError, TypeError, self.queryset.model.DoesNotExist):
             raise ValidationError(self.error_messages['invalid_choice'], code='invalid_choice')

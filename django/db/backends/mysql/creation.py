@@ -26,7 +26,7 @@ class DatabaseCreation(BaseDatabaseCreation):
                 self.log('Got an error creating the test database: %s' % e)
                 sys.exit(2)
             else:
-                raise e
+                raise
 
     def _clone_test_db(self, suffix, verbosity, keepdb=False):
         source_database_name = self.connection.settings_dict['NAME']

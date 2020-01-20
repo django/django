@@ -7,10 +7,14 @@ from django.core import exceptions, serializers
 from django.db.models import DateField, DateTimeField, F, Func, Value
 from django.http import QueryDict
 from django.test import override_settings
+from django.test.utils import isolate_apps
 from django.utils import timezone
 
 from . import PostgreSQLSimpleTestCase, PostgreSQLTestCase
-from .models import RangeLookupsModel, RangesModel
+from .models import (
+    BigAutoFieldModel, PostgreSQLModel, RangeLookupsModel, RangesModel,
+    SmallAutoFieldModel,
+)
 
 try:
     from psycopg2.extras import DateRange, DateTimeTZRange, NumericRange
@@ -20,6 +24,30 @@ try:
     )
 except ImportError:
     pass
+
+
+@isolate_apps('postgres_tests')
+class BasicTests(PostgreSQLSimpleTestCase):
+    def test_get_field_display(self):
+        class Model(PostgreSQLModel):
+            field = pg_fields.IntegerRangeField(
+                choices=[
+                    ['1-50', [((1, 25), '1-25'), ([26, 50], '26-50')]],
+                    ((51, 100), '51-100'),
+                ],
+            )
+
+        tests = (
+            ((1, 25), '1-25'),
+            ([26, 50], '26-50'),
+            ((51, 100), '51-100'),
+            ((1, 2), '(1, 2)'),
+            ([1, 2], '[1, 2]'),
+        )
+        for value, display in tests:
+            with self.subTest(value=value, display=display):
+                instance = Model(field=value)
+                self.assertEqual(instance.get_field_display(), display)
 
 
 class TestSaveLoad(PostgreSQLTestCase):
@@ -271,6 +299,30 @@ class TestQuerying(PostgreSQLTestCase):
             [self.objs[0], self.objs[1]],
         )
 
+    def test_bound_type(self):
+        decimals = RangesModel.objects.bulk_create([
+            RangesModel(decimals=NumericRange(None, 10)),
+            RangesModel(decimals=NumericRange(10, None)),
+            RangesModel(decimals=NumericRange(5, 15)),
+            RangesModel(decimals=NumericRange(5, 15, '(]')),
+        ])
+        tests = [
+            ('lower_inc', True, [decimals[1], decimals[2]]),
+            ('lower_inc', False, [decimals[0], decimals[3]]),
+            ('lower_inf', True, [decimals[0]]),
+            ('lower_inf', False, [decimals[1], decimals[2], decimals[3]]),
+            ('upper_inc', True, [decimals[3]]),
+            ('upper_inc', False, [decimals[0], decimals[1], decimals[2]]),
+            ('upper_inf', True, [decimals[1]]),
+            ('upper_inf', False, [decimals[0], decimals[2], decimals[3]]),
+        ]
+        for lookup, filter_arg, excepted_result in tests:
+            with self.subTest(lookup=lookup, filter_arg=filter_arg):
+                self.assertSequenceEqual(
+                    RangesModel.objects.filter(**{'decimals__%s' % lookup: filter_arg}),
+                    excepted_result,
+                )
+
 
 class TestQueryingWithRanges(PostgreSQLTestCase):
     def test_date_range(self):
@@ -305,6 +357,17 @@ class TestQueryingWithRanges(PostgreSQLTestCase):
             [objs[0]],
         )
 
+    def test_small_integer_field_contained_by(self):
+        objs = [
+            RangeLookupsModel.objects.create(small_integer=8),
+            RangeLookupsModel.objects.create(small_integer=4),
+            RangeLookupsModel.objects.create(small_integer=-1),
+        ]
+        self.assertSequenceEqual(
+            RangeLookupsModel.objects.filter(small_integer__contained_by=NumericRange(4, 6)),
+            [objs[1]],
+        )
+
     def test_integer_range(self):
         objs = [
             RangeLookupsModel.objects.create(integer=5),
@@ -327,6 +390,19 @@ class TestQueryingWithRanges(PostgreSQLTestCase):
             [objs[0]]
         )
 
+    def test_decimal_field_contained_by(self):
+        objs = [
+            RangeLookupsModel.objects.create(decimal_field=Decimal('1.33')),
+            RangeLookupsModel.objects.create(decimal_field=Decimal('2.88')),
+            RangeLookupsModel.objects.create(decimal_field=Decimal('99.17')),
+        ]
+        self.assertSequenceEqual(
+            RangeLookupsModel.objects.filter(
+                decimal_field__contained_by=NumericRange(Decimal('1.89'), Decimal('7.91')),
+            ),
+            [objs[1]],
+        )
+
     def test_float_range(self):
         objs = [
             RangeLookupsModel.objects.create(float=5),
@@ -336,6 +412,39 @@ class TestQueryingWithRanges(PostgreSQLTestCase):
         self.assertSequenceEqual(
             RangeLookupsModel.objects.filter(float__contained_by=NumericRange(1, 98)),
             [objs[0]]
+        )
+
+    def test_small_auto_field_contained_by(self):
+        objs = SmallAutoFieldModel.objects.bulk_create([
+            SmallAutoFieldModel() for i in range(1, 5)
+        ])
+        self.assertSequenceEqual(
+            SmallAutoFieldModel.objects.filter(
+                id__contained_by=NumericRange(objs[1].pk, objs[3].pk),
+            ),
+            objs[1:3],
+        )
+
+    def test_auto_field_contained_by(self):
+        objs = RangeLookupsModel.objects.bulk_create([
+            RangeLookupsModel() for i in range(1, 5)
+        ])
+        self.assertSequenceEqual(
+            RangeLookupsModel.objects.filter(
+                id__contained_by=NumericRange(objs[1].pk, objs[3].pk),
+            ),
+            objs[1:3],
+        )
+
+    def test_big_auto_field_contained_by(self):
+        objs = BigAutoFieldModel.objects.bulk_create([
+            BigAutoFieldModel() for i in range(1, 5)
+        ])
+        self.assertSequenceEqual(
+            BigAutoFieldModel.objects.filter(
+                id__contained_by=NumericRange(objs[1].pk, objs[3].pk),
+            ),
+            objs[1:3],
         )
 
     def test_f_ranges(self):
@@ -411,6 +520,18 @@ class TestSerialization(PostgreSQLSimpleTestCase):
         data = serializers.serialize('json', [instance])
         new_instance = list(serializers.deserialize('json', data))[0].object
         self.assertEqual(new_instance.ints, NumericRange(10, None))
+
+
+class TestChecks(PostgreSQLSimpleTestCase):
+    def test_choices_tuple_list(self):
+        class Model(PostgreSQLModel):
+            field = pg_fields.IntegerRangeField(
+                choices=[
+                    ['1-50', [((1, 25), '1-25'), ([26, 50], '26-50')]],
+                    ((51, 100), '51-100'),
+                ],
+            )
+        self.assertEqual(Model._meta.get_field('field').check(), [])
 
 
 class TestValidators(PostgreSQLSimpleTestCase):

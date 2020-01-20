@@ -235,6 +235,10 @@ documentation:
     Five
     ^^^^
 
+* Use :rst:role:`:rfc:<rfc>` to reference RFC and try to link to the relevant
+  section if possible. For example, use ``:rfc:`2324#section-2.3.2``` or
+  ``:rfc:`Custom link text <2324#section-2.3.2>```.
+
 Django-specific markup
 ======================
 
@@ -283,7 +287,7 @@ define some extra description units:
         :ticket:`12345`
 
 Django's documentation uses a custom ``console`` directive for documenting
-command-line examples involving ``django-admin.py``, ``manage.py``, ``python``,
+command-line examples involving ``django-admin``, ``manage.py``, ``python``,
 etc.). In the HTML documentation, it renders a two-tab UI, with one tab showing
 a Unix-style command prompt and a second tab showing a Windows prompt.
 

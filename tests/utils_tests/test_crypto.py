@@ -1,7 +1,7 @@
 import hashlib
 import unittest
 
-from django.utils.crypto import constant_time_compare, pbkdf2
+from django.utils.crypto import constant_time_compare, pbkdf2, salted_hmac
 
 
 class TestUtilsCryptoMisc(unittest.TestCase):
@@ -12,6 +12,25 @@ class TestUtilsCryptoMisc(unittest.TestCase):
         self.assertFalse(constant_time_compare(b'spam', b'eggs'))
         self.assertTrue(constant_time_compare('spam', 'spam'))
         self.assertFalse(constant_time_compare('spam', 'eggs'))
+
+    def test_salted_hmac(self):
+        tests = [
+            ((b'salt', b'value'), {}, 'b51a2e619c43b1ca4f91d15c57455521d71d61eb'),
+            (('salt', 'value'), {}, 'b51a2e619c43b1ca4f91d15c57455521d71d61eb'),
+            (
+                ('salt', 'value'),
+                {'secret': 'abcdefg'},
+                '8bbee04ccddfa24772d1423a0ba43bd0c0e24b76',
+            ),
+            (
+                ('salt', 'value'),
+                {'secret': 'x' * hashlib.sha1().block_size},
+                'bd3749347b412b1b0a9ea65220e55767ac8e96b0',
+            ),
+        ]
+        for args, kwargs, digest in tests:
+            with self.subTest(args=args, kwargs=kwargs):
+                self.assertEqual(salted_hmac(*args, **kwargs).hexdigest(), digest)
 
 
 class TestUtilsCryptoPBKDF2(unittest.TestCase):

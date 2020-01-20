@@ -145,7 +145,7 @@ class TestInline(TestDataMixin, TestCase):
         # Here colspan is "4": two fields (title1 and title2), one hidden field and the delete checkbox.
         self.assertContains(
             response,
-            '<tr><td colspan="4"><ul class="errorlist nonfield">'
+            '<tr class="row-form-errors"><td colspan="4"><ul class="errorlist nonfield">'
             '<li>The two titles must be the same</li></ul></td></tr>'
         )
 
@@ -863,6 +863,98 @@ class TestInlinePermissions(TestCase):
 
 
 @override_settings(ROOT_URLCONF='admin_inlines.urls')
+class TestReadOnlyChangeViewInlinePermissions(TestCase):
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.user = User.objects.create_user('testing', password='password', is_staff=True)
+        cls.user.user_permissions.add(
+            Permission.objects.get(codename='view_poll', content_type=ContentType.objects.get_for_model(Poll))
+        )
+        cls.user.user_permissions.add(
+            *Permission.objects.filter(
+                codename__endswith="question", content_type=ContentType.objects.get_for_model(Question)
+            ).values_list('pk', flat=True)
+        )
+
+        cls.poll = Poll.objects.create(name="Survey")
+        cls.add_url = reverse('admin:admin_inlines_poll_add')
+        cls.change_url = reverse('admin:admin_inlines_poll_change', args=(cls.poll.id,))
+
+    def setUp(self):
+        self.client.force_login(self.user)
+
+    def test_add_url_not_allowed(self):
+        response = self.client.get(self.add_url)
+        self.assertEqual(response.status_code, 403)
+
+        response = self.client.post(self.add_url, {})
+        self.assertEqual(response.status_code, 403)
+
+    def test_post_to_change_url_not_allowed(self):
+        response = self.client.post(self.change_url, {})
+        self.assertEqual(response.status_code, 403)
+
+    def test_get_to_change_url_is_allowed(self):
+        response = self.client.get(self.change_url)
+        self.assertEqual(response.status_code, 200)
+
+    def test_main_model_is_rendered_as_read_only(self):
+        response = self.client.get(self.change_url)
+        self.assertContains(
+            response,
+            '<div class="readonly">%s</div>' % self.poll.name,
+            html=True
+        )
+        input = '<input type="text" name="name" value="%s" class="vTextField" maxlength="40" required id="id_name">'
+        self.assertNotContains(
+            response,
+            input % self.poll.name,
+            html=True
+        )
+
+    def test_inlines_are_rendered_as_read_only(self):
+        question = Question.objects.create(text="How will this be rendered?", poll=self.poll)
+        response = self.client.get(self.change_url)
+        self.assertContains(
+            response,
+            '<td class="field-text"><p>%s</p></td>' % question.text,
+            html=True
+        )
+        self.assertNotContains(response, 'id="id_question_set-0-text"')
+        self.assertNotContains(response, 'id="id_related_objs-0-DELETE"')
+
+    def test_submit_line_shows_only_close_button(self):
+        response = self.client.get(self.change_url)
+        self.assertContains(
+            response,
+            '<a href="/admin/admin_inlines/poll/" class="closelink">Close</a>',
+            html=True
+        )
+        delete_link = '<p class="deletelink-box"><a href="/admin/admin_inlines/poll/%s/delete/" class="deletelink">Delete</a></p>'  # noqa
+        self.assertNotContains(
+            response,
+            delete_link % self.poll.id,
+            html=True
+        )
+        self.assertNotContains(response, '<input type="submit" value="Save and add another" name="_addanother">')
+        self.assertNotContains(response, '<input type="submit" value="Save and continue editing" name="_continue">')
+
+    def test_inline_delete_buttons_are_not_shown(self):
+        Question.objects.create(text="How will this be rendered?", poll=self.poll)
+        response = self.client.get(self.change_url)
+        self.assertNotContains(
+            response,
+            '<input type="checkbox" name="question_set-0-DELETE" id="id_question_set-0-DELETE">',
+            html=True
+        )
+
+    def test_extra_inlines_are_not_shown(self):
+        response = self.client.get(self.change_url)
+        self.assertNotContains(response, 'id="id_question_set-0-text"')
+
+
+@override_settings(ROOT_URLCONF='admin_inlines.urls')
 class SeleniumTests(AdminSeleniumTestCase):
 
     available_apps = ['admin_inlines'] + AdminSeleniumTestCase.available_apps
@@ -907,7 +999,99 @@ class SeleniumTests(AdminSeleniumTestCase):
         self.assertEqual(rows_length(), 5, msg="sanity check")
         for delete_link in self.selenium.find_elements_by_css_selector('%s .inline-deletelink' % inline_id):
             delete_link.click()
+        with self.disable_implicit_wait():
+            self.assertEqual(rows_length(), 0)
+
+    def test_delete_invalid_stacked_inlines(self):
+        from selenium.common.exceptions import NoSuchElementException
+        self.admin_login(username='super', password='secret')
+        self.selenium.get(self.live_server_url + reverse('admin:admin_inlines_holder4_add'))
+
+        inline_id = '#inner4stacked_set-group'
+
+        def rows_length():
+            return len(self.selenium.find_elements_by_css_selector('%s .dynamic-inner4stacked_set' % inline_id))
         self.assertEqual(rows_length(), 3)
+
+        add_button = self.selenium.find_element_by_link_text(
+            'Add another Inner4 stacked')
+        add_button.click()
+        add_button.click()
+        self.assertEqual(len(self.selenium.find_elements_by_css_selector('#id_inner4stacked_set-4-dummy')), 1)
+
+        # Enter some data and click 'Save'.
+        self.selenium.find_element_by_name('dummy').send_keys('1')
+        self.selenium.find_element_by_name('inner4stacked_set-0-dummy').send_keys('100')
+        self.selenium.find_element_by_name('inner4stacked_set-1-dummy').send_keys('101')
+        self.selenium.find_element_by_name('inner4stacked_set-2-dummy').send_keys('222')
+        self.selenium.find_element_by_name('inner4stacked_set-3-dummy').send_keys('103')
+        self.selenium.find_element_by_name('inner4stacked_set-4-dummy').send_keys('222')
+        with self.wait_page_loaded():
+            self.selenium.find_element_by_xpath('//input[@value="Save"]').click()
+
+        self.assertEqual(rows_length(), 5, msg="sanity check")
+        errorlist = self.selenium.find_element_by_css_selector(
+            '%s .dynamic-inner4stacked_set .errorlist li' % inline_id
+        )
+        self.assertEqual('Please correct the duplicate values below.', errorlist.text)
+        delete_link = self.selenium.find_element_by_css_selector('#inner4stacked_set-4 .inline-deletelink')
+        delete_link.click()
+        self.assertEqual(rows_length(), 4)
+        with self.disable_implicit_wait(), self.assertRaises(NoSuchElementException):
+            self.selenium.find_element_by_css_selector('%s .dynamic-inner4stacked_set .errorlist li' % inline_id)
+
+        with self.wait_page_loaded():
+            self.selenium.find_element_by_xpath('//input[@value="Save"]').click()
+
+        # The objects have been created in the database.
+        self.assertEqual(Inner4Stacked.objects.all().count(), 4)
+
+    def test_delete_invalid_tabular_inlines(self):
+        from selenium.common.exceptions import NoSuchElementException
+        self.admin_login(username='super', password='secret')
+        self.selenium.get(self.live_server_url + reverse('admin:admin_inlines_holder4_add'))
+
+        inline_id = '#inner4tabular_set-group'
+
+        def rows_length():
+            return len(self.selenium.find_elements_by_css_selector('%s .dynamic-inner4tabular_set' % inline_id))
+        self.assertEqual(rows_length(), 3)
+
+        add_button = self.selenium.find_element_by_link_text(
+            'Add another Inner4 tabular')
+        add_button.click()
+        add_button.click()
+        self.assertEqual(len(self.selenium.find_elements_by_css_selector('#id_inner4tabular_set-4-dummy')), 1)
+
+        # Enter some data and click 'Save'.
+        self.selenium.find_element_by_name('dummy').send_keys('1')
+        self.selenium.find_element_by_name('inner4tabular_set-0-dummy').send_keys('100')
+        self.selenium.find_element_by_name('inner4tabular_set-1-dummy').send_keys('101')
+        self.selenium.find_element_by_name('inner4tabular_set-2-dummy').send_keys('222')
+        self.selenium.find_element_by_name('inner4tabular_set-3-dummy').send_keys('103')
+        self.selenium.find_element_by_name('inner4tabular_set-4-dummy').send_keys('222')
+        with self.wait_page_loaded():
+            self.selenium.find_element_by_xpath('//input[@value="Save"]').click()
+
+        self.assertEqual(rows_length(), 5, msg="sanity check")
+
+        # Non-field errorlist is in its own <tr> just before
+        # tr#inner4tabular_set-3:
+        errorlist = self.selenium.find_element_by_css_selector(
+            '%s #inner4tabular_set-3 + .row-form-errors .errorlist li' % inline_id
+        )
+        self.assertEqual('Please correct the duplicate values below.', errorlist.text)
+        delete_link = self.selenium.find_element_by_css_selector('#inner4tabular_set-4 .inline-deletelink')
+        delete_link.click()
+        self.assertEqual(rows_length(), 4)
+        with self.disable_implicit_wait(), self.assertRaises(NoSuchElementException):
+            self.selenium.find_element_by_css_selector('%s .dynamic-inner4tabular_set .errorlist li' % inline_id)
+
+        with self.wait_page_loaded():
+            self.selenium.find_element_by_xpath('//input[@value="Save"]').click()
+
+        # The objects have been created in the database.
+        self.assertEqual(Inner4Tabular.objects.all().count(), 4)
 
     def test_add_inlines(self):
         """
@@ -958,12 +1142,31 @@ class SeleniumTests(AdminSeleniumTestCase):
         self.selenium.find_element_by_name('profile_set-2-first_name').send_keys('2 first name 1')
         self.selenium.find_element_by_name('profile_set-2-last_name').send_keys('2 last name 2')
 
-        self.selenium.find_element_by_xpath('//input[@value="Save"]').click()
-        self.wait_page_loaded()
+        with self.wait_page_loaded():
+            self.selenium.find_element_by_xpath('//input[@value="Save"]').click()
 
         # The objects have been created in the database
         self.assertEqual(ProfileCollection.objects.all().count(), 1)
         self.assertEqual(Profile.objects.all().count(), 3)
+
+    def test_add_inline_link_absent_for_view_only_parent_model(self):
+        from selenium.common.exceptions import NoSuchElementException
+        user = User.objects.create_user('testing', password='password', is_staff=True)
+        user.user_permissions.add(
+            Permission.objects.get(codename='view_poll', content_type=ContentType.objects.get_for_model(Poll))
+        )
+        user.user_permissions.add(
+            *Permission.objects.filter(
+                codename__endswith="question", content_type=ContentType.objects.get_for_model(Question)
+            ).values_list('pk', flat=True)
+        )
+        self.admin_login(username='testing', password='password')
+        poll = Poll.objects.create(name="Survey")
+        change_url = reverse('admin:admin_inlines_poll_change', args=(poll.id,))
+        self.selenium.get(self.live_server_url + change_url)
+        with self.disable_implicit_wait():
+            with self.assertRaises(NoSuchElementException):
+                self.selenium.find_element_by_link_text('Add another Question')
 
     def test_delete_inlines(self):
         self.admin_login(username='super', password='secret')

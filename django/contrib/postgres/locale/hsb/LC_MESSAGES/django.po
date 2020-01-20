@@ -1,13 +1,13 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Michael Wolf <milupo@sorbzilla.de>, 2016-2018
+# Michael Wolf <milupo@sorbzilla.de>, 2016-2019
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-05-17 11:49+0200\n"
-"PO-Revision-Date: 2018-05-26 10:59+0000\n"
+"POT-Creation-Date: 2019-09-08 17:27+0200\n"
+"PO-Revision-Date: 2019-09-21 19:31+0000\n"
 "Last-Translator: Michael Wolf <milupo@sorbzilla.de>\n"
 "Language-Team: Upper Sorbian (http://www.transifex.com/django/django/"
 "language/hsb/)\n"
@@ -32,7 +32,7 @@ msgid "Map of strings to strings/nulls"
 msgstr "Konwertowanje znamješkowych rjećazkow do znamješkowych rjećazkow/nulow"
 
 #, python-format
-msgid "The value of \"%(key)s\" is not a string or null."
+msgid "The value of “%(key)s” is not a string or null."
 msgstr "Hódnota \" %(key)s\" znamješkowy rjećazk abo null njeje."
 
 msgid "A JSON object"
@@ -48,7 +48,7 @@ msgid "Input must be a JSON dictionary."
 msgstr "Zapodaće dyrbi JSON-słownik być."
 
 #, python-format
-msgid "'%(value)s' value must be valid JSON."
+msgid "“%(value)s” value must be valid JSON."
 msgstr "Hódnota '%(value)s' dyrbi płaćiwy JSON być."
 
 msgid "Enter two valid values."

@@ -452,6 +452,12 @@ class ConditionalGetMiddlewareTest(SimpleTestCase):
         res = StreamingHttpResponse(['content'])
         self.assertFalse(ConditionalGetMiddleware().process_response(self.req, res).has_header('ETag'))
 
+    def test_no_etag_response_empty_content(self):
+        res = HttpResponse()
+        self.assertFalse(
+            ConditionalGetMiddleware().process_response(self.req, res).has_header('ETag')
+        )
+
     def test_no_etag_no_store_cache(self):
         self.resp['Cache-Control'] = 'No-Cache, No-Store, Max-age=0'
         self.assertFalse(ConditionalGetMiddleware().process_response(self.req, self.resp).has_header('ETag'))

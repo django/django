@@ -1,0 +1,56 @@
+====================
+Asynchronous support
+====================
+
+.. versionadded:: 3.0
+
+Django has developing support for asynchronous ("async") Python, but does not
+yet support asynchronous views or middleware; they will be coming in a future
+release.
+
+There is limited support for other parts of the async ecosystem; namely, Django
+can natively talk :doc:`ASGI </howto/deployment/asgi/index>`, and some async
+safety support.
+
+.. _async-safety:
+
+Async-safety
+------------
+
+Certain key parts of Django are not able to operate safely in an asynchronous
+environment, as they have global state that is not coroutine-aware. These parts
+of Django are classified as "async-unsafe", and are protected from execution in
+an asynchronous environment. The ORM is the main example, but there are other
+parts that are also protected in this way.
+
+If you try to run any of these parts from a thread where there is a *running
+event loop*, you will get a
+:exc:`~django.core.exceptions.SynchronousOnlyOperation` error. Note that you
+don't have to be inside an async function directly to have this error occur. If
+you have called a synchronous function directly from an asynchronous function
+without going through something like ``sync_to_async`` or a threadpool, then it
+can also occur, as your code is still running in an asynchronous context.
+
+If you encounter this error, you should fix your code to not call the offending
+code from an async context; instead, write your code that talks to async-unsafe
+in its own, synchronous function, and call that using
+``asgiref.sync.async_to_sync``, or any other preferred way of running
+synchronous code in its own thread.
+
+If you are *absolutely* in dire need to run this code from an asynchronous
+context - for example, it is being forced on you by an external environment,
+and you are sure there is no chance of it being run concurrently (e.g. you are
+in a Jupyter_ notebook), then you can disable the warning with the
+``DJANGO_ALLOW_ASYNC_UNSAFE`` environment variable.
+
+.. warning::
+
+    If you enable this option and there is concurrent access to the
+    async-unsafe parts of Django, you may suffer data loss or corruption. Be
+    very careful and do not use this in production environments.
+
+If you need to do this from within Python, do that with ``os.environ``::
+
+    os.environ["DJANGO_ALLOW_ASYNC_UNSAFE"] = "true"
+
+.. _Jupyter: https://jupyter.org/

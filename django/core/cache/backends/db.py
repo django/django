@@ -197,7 +197,8 @@ class DatabaseCache(BaseDatabaseCache):
                 return True
 
     def delete(self, key, version=None):
-        self.delete_many([key], version)
+        self.validate_key(key)
+        return self._base_delete_many([self.make_key(key, version)])
 
     def delete_many(self, keys, version=None):
         key_list = []
@@ -208,7 +209,7 @@ class DatabaseCache(BaseDatabaseCache):
 
     def _base_delete_many(self, keys):
         if not keys:
-            return
+            return False
 
         db = router.db_for_write(self.cache_model_class)
         connection = connections[db]
@@ -224,6 +225,7 @@ class DatabaseCache(BaseDatabaseCache):
                 ),
                 keys,
             )
+        return bool(cursor.rowcount)
 
     def has_key(self, key, version=None):
         key = self.make_key(key, version=version)

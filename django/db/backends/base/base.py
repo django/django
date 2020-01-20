@@ -117,17 +117,20 @@ class BaseDatabaseWrapper:
     @cached_property
     def timezone(self):
         """
-        Time zone for datetimes stored as naive values in the database.
+        Return a tzinfo of the database connection time zone.
 
-        Return a tzinfo object or None.
+        This is only used when time zone support is enabled. When a datetime is
+        read from the database, it is always returned in this time zone.
 
-        This is only needed when time zone support is enabled and the database
-        doesn't support time zones. (When the database supports time zones,
-        the adapter handles aware datetimes so Django doesn't need to.)
+        When the database backend supports time zones, it doesn't matter which
+        time zone Django uses, as long as aware datetimes are used everywhere.
+        Other users connecting to the database can choose their own time zone.
+
+        When the database backend doesn't support time zones, the time zone
+        Django uses may be constrained by the requirements of other users of
+        the database.
         """
         if not settings.USE_TZ:
-            return None
-        elif self.features.supports_timezones:
             return None
         elif self.settings_dict['TIME_ZONE'] is None:
             return timezone.utc
@@ -202,15 +205,11 @@ class BaseDatabaseWrapper:
         self.run_on_commit = []
 
     def check_settings(self):
-        if self.settings_dict['TIME_ZONE'] is not None:
-            if not settings.USE_TZ:
-                raise ImproperlyConfigured(
-                    "Connection '%s' cannot set TIME_ZONE because USE_TZ is "
-                    "False." % self.alias)
-            elif self.features.supports_timezones:
-                raise ImproperlyConfigured(
-                    "Connection '%s' cannot set TIME_ZONE because its engine "
-                    "handles time zones conversions natively." % self.alias)
+        if self.settings_dict['TIME_ZONE'] is not None and not settings.USE_TZ:
+            raise ImproperlyConfigured(
+                "Connection '%s' cannot set TIME_ZONE because USE_TZ is False."
+                % self.alias
+            )
 
     @async_unsafe
     def ensure_connection(self):

@@ -6,9 +6,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-01-16 20:42+0100\n"
-"PO-Revision-Date: 2019-03-04 13:50+0000\n"
-"Last-Translator: Michael Wolf <milupo@sorbzilla.de>\n"
+"POT-Creation-Date: 2019-09-27 22:40+0200\n"
+"PO-Revision-Date: 2019-11-05 00:38+0000\n"
+"Last-Translator: Ramiro Morales\n"
 "Language-Team: Upper Sorbian (http://www.transifex.com/django/django/"
 "language/hsb/)\n"
 "MIME-Version: 1.0\n"
@@ -279,6 +279,9 @@ msgstr "Ukrainšćina"
 msgid "Urdu"
 msgstr "Urdušćina"
 
+msgid "Uzbek"
+msgstr ""
+
 msgid "Vietnamese"
 msgstr "Vietnamšćina"
 
@@ -323,17 +326,17 @@ msgstr "Zapodajće płaćiwu e-mejlowu adresu."
 
 #. Translators: "letters" means latin letters: a-z and A-Z.
 msgid ""
-"Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
+"Enter a valid “slug” consisting of letters, numbers, underscores or hyphens."
 msgstr ""
 "Zapodajće płaćiwe adresowe mjeno, kotrež jenož pismiki, ličby, podsmužki abo "
 "wjazawki wobsahuje."
 
 msgid ""
-"Enter a valid 'slug' consisting of Unicode letters, numbers, underscores, or "
+"Enter a valid “slug” consisting of Unicode letters, numbers, underscores, or "
 "hyphens."
 msgstr ""
-"Zapodajće płaćiwe adresowe mjeno, kotrež jenož unikodowe pismiki, ličby, "
-"podsmužki abo wjazawki wobsahuje."
+"Zapodajće płaćiwe „adresowe mjeno“, kotrež jenož pismiki, ličby, podsmužki "
+"abo wjazawki wobsahuje."
 
 msgid "Enter a valid IPv4 address."
 msgstr "Zapodajće płaćiwu IPv4-adresu."
@@ -430,11 +433,11 @@ msgstr[3] "Zawěsćće, zo njeje wjace hač %(max)s cyfrow před decimalnej komu
 
 #, python-format
 msgid ""
-"File extension '%(extension)s' is not allowed. Allowed extensions are: "
-"'%(allowed_extensions)s'."
+"File extension “%(extension)s” is not allowed. Allowed extensions are: "
+"%(allowed_extensions)s."
 msgstr ""
-"Datajowy sufiks ' %(extension)s' dowoleny njeje. Dowolene sufiksy su: ' "
-"%(allowed_extensions)s'."
+"Datajowy sufiks ' %(extension)s' dowoleny njeje. Dowolene sufiksy su: "
+"%(allowed_extensions)s."
 
 msgid "Null characters are not allowed."
 msgstr "Prózdne znamješka dowolene njejsu."
@@ -472,23 +475,13 @@ msgstr ""
 msgid "Field of type: %(field_type)s"
 msgstr "Polo typa: %(field_type)s"
 
-msgid "Integer"
-msgstr "Integer"
+#, python-format
+msgid "“%(value)s” value must be either True or False."
+msgstr "Hódnota „%(value)s“ dyrbi pak True pak False być."
 
 #, python-format
-msgid "'%(value)s' value must be an integer."
-msgstr "Hódnota '%(value)s' dyrbi integer być."
-
-msgid "Big (8 byte) integer"
-msgstr "Big (8 byte) integer"
-
-#, python-format
-msgid "'%(value)s' value must be either True or False."
-msgstr "Hódnota '%(value)s' dyrbi pak True pak False być."
-
-#, python-format
-msgid "'%(value)s' value must be either True, False, or None."
-msgstr "Hódnota '%(value)s' dyrbi pak True, False pak None być."
+msgid "“%(value)s” value must be either True, False, or None."
+msgstr "Hódnota „%(value)s“ dyrbi pak True, False pak None być."
 
 msgid "Boolean (Either True or False)"
 msgstr "Boolean (pak True pak False)"
@@ -502,54 +495,54 @@ msgstr "Cyłe ličby dźělene přez komu"
 
 #, python-format
 msgid ""
-"'%(value)s' value has an invalid date format. It must be in YYYY-MM-DD "
+"“%(value)s” value has an invalid date format. It must be in YYYY-MM-DD "
 "format."
 msgstr ""
-"Hódnota '%(value)s' ma njepłaćiwy datowy format. Dyrbi we formaće w DD.MM."
+"Hódnota „%(value)s“ ma njepłaćiwy datumowy format. Dyrbi we formaće DD.MM."
 "YYYY być."
 
 #, python-format
 msgid ""
-"'%(value)s' value has the correct format (YYYY-MM-DD) but it is an invalid "
+"“%(value)s” value has the correct format (YYYY-MM-DD) but it is an invalid "
 "date."
 msgstr ""
-"Hódnota '%(value)s' ma korektny format (DD.MM.YYYY), ale je njepłaćiwy datum."
+"Hódnota „%(value)s“ ma korektny format (DD.MM.YYYY), ale je njepłaćiwy datum."
 
 msgid "Date (without time)"
 msgstr "Datum (bjez časa)"
 
 #, python-format
 msgid ""
-"'%(value)s' value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[."
+"“%(value)s” value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[."
 "uuuuuu]][TZ] format."
 msgstr ""
-"Hódnota '%(value)s' ma njepłaćiwy format. Dyrbi we formaće w DD.MM.YYYY HH:"
-"MM[:ss[.uuuuuu]][TZ] być."
+"Hódnota „%(value)s“ ma njepłaćiwy format. Dyrbi we formaće DD.MM.YYYY HH:MM[:"
+"ss[.uuuuuu]][TZ] być."
 
 #, python-format
 msgid ""
-"'%(value)s' value has the correct format (YYYY-MM-DD HH:MM[:ss[.uuuuuu]]"
+"“%(value)s” value has the correct format (YYYY-MM-DD HH:MM[:ss[.uuuuuu]]"
 "[TZ]) but it is an invalid date/time."
 msgstr ""
-"Hódnota '%(value)s' ma korektny format (DD.MM.YYYY HH:MM[:ss[.uuuuuu]][TZ]), "
+"Hódnota „%(value)s“ ma korektny format (DD.MM.YYYY HH:MM[:ss[.uuuuuu]][TZ]), "
 "ale je njepłaćiwy datum/čas."
 
 msgid "Date (with time)"
 msgstr "Datum (z časom)"
 
 #, python-format
-msgid "'%(value)s' value must be a decimal number."
-msgstr "Hódnota '%(value)s' dyrbi decimalna ličba być."
+msgid "“%(value)s” value must be a decimal number."
+msgstr "Hódnota „%(value)s“ dyrbi decimalna ličba być."
 
 msgid "Decimal number"
 msgstr "Decimalna ličba"
 
 #, python-format
 msgid ""
-"'%(value)s' value has an invalid format. It must be in [DD] [HH:[MM:]]ss[."
+"“%(value)s” value has an invalid format. It must be in [DD] [[HH:]MM:]ss[."
 "uuuuuu] format."
 msgstr ""
-"Hódnota '%(value)s' ma njepłaćiwy format. Dyrbi w formaće [DD] [HH:[MM:]]ss[."
+"Hódnota „%(value)s“ ma njepłaćiwy format. Dyrbi w formaće [DD] [HH:[MM:]]ss[."
 "uuuuuu] być."
 
 msgid "Duration"
@@ -562,11 +555,21 @@ msgid "File path"
 msgstr "Datajowa šćežka"
 
 #, python-format
-msgid "'%(value)s' value must be a float."
-msgstr "Hódnota '%(value)s' dyrbi typ float měć."
+msgid "“%(value)s” value must be a float."
+msgstr ""
 
 msgid "Floating point number"
 msgstr "Komowa ličba typa float"
+
+#, python-format
+msgid "“%(value)s” value must be an integer."
+msgstr ""
+
+msgid "Integer"
+msgstr "Integer"
+
+msgid "Big (8 byte) integer"
+msgstr "Big (8 byte) integer"
 
 msgid "IPv4 address"
 msgstr "IPv4-adresa"
@@ -575,8 +578,8 @@ msgid "IP address"
 msgstr "IP-adresa"
 
 #, python-format
-msgid "'%(value)s' value must be either None, True or False."
-msgstr "Hódnota '%(value)s' dyrbi pak None, True pak False być."
+msgid "“%(value)s” value must be either None, True or False."
+msgstr ""
 
 msgid "Boolean (Either True, False or None)"
 msgstr "Boolean (pak True, False pak None)"
@@ -599,19 +602,15 @@ msgstr "Tekst"
 
 #, python-format
 msgid ""
-"'%(value)s' value has an invalid format. It must be in HH:MM[:ss[.uuuuuu]] "
+"“%(value)s” value has an invalid format. It must be in HH:MM[:ss[.uuuuuu]] "
 "format."
 msgstr ""
-"Hódnota '%(value)s' ma njepłaćiwy format. Dyrbi we formaće HH:MM[:ss[."
-"uuuuuu]] być."
 
 #, python-format
 msgid ""
-"'%(value)s' value has the correct format (HH:MM[:ss[.uuuuuu]]) but it is an "
+"“%(value)s” value has the correct format (HH:MM[:ss[.uuuuuu]]) but it is an "
 "invalid time."
 msgstr ""
-"Hódnota '%(value)s' ma korektny format (HH:MM[:ss[.uuuuuu]]), ale je "
-"njepłaćiwy čas."
 
 msgid "Time"
 msgstr "Čas"
@@ -623,8 +622,8 @@ msgid "Raw binary data"
 msgstr "Hrube binarne daty"
 
 #, python-format
-msgid "'%(value)s' is not a valid UUID."
-msgstr "'%(value)s' płaćiwy UUID njeje."
+msgid "“%(value)s” is not a valid UUID."
+msgstr ""
 
 msgid "Universally unique identifier"
 msgstr "Uniwerselnje jónkróćny identifikator"
@@ -797,16 +796,14 @@ msgstr ""
 "dispoziciji stejacych wolenskich móžnosćow njeje."
 
 #, python-format
-msgid "\"%(pk)s\" is not a valid value."
-msgstr "\"%(pk)s\" płaćiwa hódnota njeje."
+msgid "“%(pk)s” is not a valid value."
+msgstr ""
 
 #, python-format
 msgid ""
-"%(datetime)s couldn't be interpreted in time zone %(current_timezone)s; it "
+"%(datetime)s couldn’t be interpreted in time zone %(current_timezone)s; it "
 "may be ambiguous or it may not exist."
 msgstr ""
-"%(datetime)s njeda so w časowym pasmje %(current_timezone)s interpretować; "
-"je snano dwuzmyslny abo njeeksistuje."
 
 msgid "Clear"
 msgstr "Zhašeć"
@@ -825,6 +822,15 @@ msgstr "Haj"
 
 msgid "No"
 msgstr "Ně"
+
+msgid "Year"
+msgstr ""
+
+msgid "Month"
+msgstr ""
+
+msgid "Day"
+msgstr ""
 
 msgid "yes,no,maybe"
 msgstr "haj,ně,snano"
@@ -1158,37 +1164,25 @@ msgid "CSRF verification failed. Request aborted."
 msgstr "CSRF-přepruwowanje je so nimokuliło.  Naprašowanje je so přetorhnyło."
 
 msgid ""
-"You are seeing this message because this HTTPS site requires a 'Referer "
-"header' to be sent by your Web browser, but none was sent. This header is "
+"You are seeing this message because this HTTPS site requires a “Referer "
+"header” to be sent by your Web browser, but none was sent. This header is "
 "required for security reasons, to ensure that your browser is not being "
 "hijacked by third parties."
 msgstr ""
-"Widźiće tutu zdźělenku, dokelž HTTPS-sydło 'hłowu Referer' trjeba, zo by so "
-"do webwobhladowaka słało, ale njeje so pósłała. Tuta hłowa je z přičinow "
-"wěstoty trěbna, zo by so zawěsćiło, zo waš wobhladowak so wot třećich "
-"njekapruje."
 
 msgid ""
-"If you have configured your browser to disable 'Referer' headers, please re-"
-"enable them, at least for this site, or for HTTPS connections, or for 'same-"
-"origin' requests."
+"If you have configured your browser to disable “Referer” headers, please re-"
+"enable them, at least for this site, or for HTTPS connections, or for “same-"
+"origin” requests."
 msgstr ""
-"Jei sće swój wobhladowak tak konfigurował, zo su hłowy 'Referer' "
-"znjemóžnjene, zmóžńće je, znajmjeńša za tute sydło abo za HTTPS-zwiski abo "
-"za naprašowanja 'sameorigin'."
 
 msgid ""
 "If you are using the <meta name=\"referrer\" content=\"no-referrer\"> tag or "
-"including the 'Referrer-Policy: no-referrer' header, please remove them. The "
-"CSRF protection requires the 'Referer' header to do strict referer checking. "
-"If you're concerned about privacy, use alternatives like <a rel=\"noreferrer"
-"\" ...> for links to third-party sites."
+"including the “Referrer-Policy: no-referrer” header, please remove them. The "
+"CSRF protection requires the “Referer” header to do strict referer checking. "
+"If you’re concerned about privacy, use alternatives like <a rel=\"noreferrer"
+"\" …> for links to third-party sites."
 msgstr ""
-"Jeli značku <meta name=\"referrer\" content=\"no-referrer\"> wužiwaće abo "
-"hłowu 'Referrer-Policy: no-referrer' zapřijimaće, wotstrońće je prošu. CSRF-"
-"škit trjeba hłowu 'Referer' , zo by striktnu kontrolu referer přewjedźe. "
-"Jeli so wo priwatnosć staraće, wužiwajće alternatiwy kaž  <a rel=\"noreferrer"
-"\" ...> za wotkazy k sydłam třećich."
 
 msgid ""
 "You are seeing this message because this site requires a CSRF cookie when "
@@ -1201,10 +1195,8 @@ msgstr ""
 
 msgid ""
 "If you have configured your browser to disable cookies, please re-enable "
-"them, at least for this site, or for 'same-origin' requests."
+"them, at least for this site, or for “same-origin” requests."
 msgstr ""
-"Jeli sće swój wobhladowak tak konfigurował, zo su placki znjemóžnjene, "
-"zmóžńće je zaso, znajmjeńša za tute sydło abo za naprašowanja 'same-origin'."
 
 msgid "More information is available with DEBUG=True."
 msgstr "Z DEBUG=True su dalše informacije k dispoziciji."
@@ -1237,31 +1229,30 @@ msgstr ""
 "%(class_name)s.allow_future je False."
 
 #, python-format
-msgid "Invalid date string '%(datestr)s' given format '%(format)s'"
+msgid "Invalid date string “%(datestr)s” given format “%(format)s”"
 msgstr ""
-"Njepłaćiwy '%(format)s' za datumowy znamješkowy rjaćazk '%(datestr)s' podaty"
 
 #, python-format
 msgid "No %(verbose_name)s found matching the query"
 msgstr "Žane %(verbose_name)s namakane, kotrež naprašowanju wotpowěduje"
 
-msgid "Page is not 'last', nor can it be converted to an int."
-msgstr "Strona 'last' njeje, ani njeda so do int konwertować."
+msgid "Page is not “last”, nor can it be converted to an int."
+msgstr ""
 
 #, python-format
 msgid "Invalid page (%(page_number)s): %(message)s"
 msgstr "Njepłaćiwa strona (%(page_number)s): %(message)s"
 
 #, python-format
-msgid "Empty list and '%(class_name)s.allow_empty' is False."
-msgstr "Prózdna lisćina a '%(class_name)s.allow_empty' je False."
+msgid "Empty list and “%(class_name)s.allow_empty” is False."
+msgstr ""
 
 msgid "Directory indexes are not allowed here."
 msgstr "Zapisowe indeksy tu dowolone njejsu."
 
 #, python-format
-msgid "\"%(path)s\" does not exist"
-msgstr "\"%(path)s\" njeeksistuje"
+msgid "“%(path)s” does not exist"
+msgstr ""
 
 #, python-format
 msgid "Index of %(directory)s"
@@ -1296,8 +1287,8 @@ msgstr ""
 msgid "Django Documentation"
 msgstr "Dokumentacija Django"
 
-msgid "Topics, references, &amp; how-to's"
-msgstr "Temy, referency a nawody"
+msgid "Topics, references, &amp; how-to’s"
+msgstr ""
 
 msgid "Tutorial: A Polling App"
 msgstr "Nawod: Naprašowanske nałoženje"

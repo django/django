@@ -190,9 +190,9 @@ class SetLanguageTests(TestCase):
             self.assertEqual(language_cookie['domain'], '.example.com')
             self.assertEqual(language_cookie['path'], '/test/')
             self.assertEqual(language_cookie['max-age'], 3600 * 7 * 2)
-            self.assertEqual(language_cookie['httponly'], True)
+            self.assertIs(language_cookie['httponly'], True)
             self.assertEqual(language_cookie['samesite'], 'Strict')
-            self.assertEqual(language_cookie['secure'], True)
+            self.assertIs(language_cookie['secure'], True)
 
     def test_setlang_decodes_http_referer_url(self):
         """

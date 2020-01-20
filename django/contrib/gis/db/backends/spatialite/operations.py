@@ -67,6 +67,7 @@ class SpatiaLiteOperations(BaseSpatialOperations, DatabaseOperations):
     select = 'CAST (AsEWKB(%s) AS BLOB)'
 
     function_names = {
+        'AsWKB': 'St_AsBinary',
         'ForcePolygonCW': 'ST_ForceLHR',
         'Length': 'ST_Length',
         'LineLocatePoint': 'ST_Line_Locate_Point',

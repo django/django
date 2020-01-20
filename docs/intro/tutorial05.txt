@@ -6,6 +6,11 @@ This tutorial begins where :doc:`Tutorial 4 </intro/tutorial04>` left off.
 We've built a Web-poll application, and we'll now create some automated tests
 for it.
 
+.. admonition:: Where to get help:
+
+    If you're having trouble going through this tutorial, please head over to
+    the :doc:`Getting Help</faq/help>` section of the FAQ.
+
 Introducing automated testing
 =============================
 

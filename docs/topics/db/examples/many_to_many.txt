@@ -18,7 +18,7 @@ objects, and a ``Publication`` has multiple ``Article`` objects:
         title = models.CharField(max_length=30)
 
         class Meta:
-            ordering = ('title',)
+            ordering = ['title']
 
         def __str__(self):
             return self.title
@@ -28,7 +28,7 @@ objects, and a ``Publication`` has multiple ``Article`` objects:
         publications = models.ManyToManyField(Publication)
 
         class Meta:
-            ordering = ('headline',)
+            ordering = ['headline']
 
         def __str__(self):
             return self.headline
@@ -54,7 +54,7 @@ You can't associate it with a ``Publication`` until it's been saved::
     >>> a1.publications.add(p1)
     Traceback (most recent call last):
     ...
-    ValueError: 'Article' instance needs to have a primary key value before a many-to-many relationship can be used.
+    ValueError: "<Article: Django lets you build Web apps easily>" needs to have a value for field "id" before this many-to-many relationship can be used.
 
 Save it!
 ::

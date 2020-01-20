@@ -26,8 +26,7 @@ def salted_hmac(key_salt, value, secret=None):
     # passing the key_salt and our base key through a pseudo-random function and
     # SHA1 works nicely.
     key = hashlib.sha1(key_salt + secret).digest()
-
-    # If len(key_salt + secret) > sha_constructor().block_size, the above
+    # If len(key_salt + secret) > block size of the hash algorithm, the above
     # line is redundant and could be replaced by key = key_salt + secret, since
     # the hmac module does the same thing for keys longer than the block size.
     # However, we need to ensure that we *always* do this.

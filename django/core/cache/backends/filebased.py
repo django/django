@@ -76,16 +76,17 @@ class FileBasedCache(BaseCache):
             return False
 
     def delete(self, key, version=None):
-        self._delete(self._key_to_file(key, version))
+        return self._delete(self._key_to_file(key, version))
 
     def _delete(self, fname):
         if not fname.startswith(self._dir) or not os.path.exists(fname):
-            return
+            return False
         try:
             os.remove(fname)
         except FileNotFoundError:
             # The file may have been removed by another process.
-            pass
+            return False
+        return True
 
     def has_key(self, key, version=None):
         fname = self._key_to_file(key, version)

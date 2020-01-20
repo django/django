@@ -775,6 +775,11 @@ If your tests make any database queries, use subclasses
     :exc:`unittest.SkipTest` in ``setUpClass()``, be sure to do it before
     calling ``super()`` to avoid this.
 
+.. versionchanged:: 3.1
+
+    The ``debug()`` method was implemented to allow running a test without
+    collecting the result and catching exceptions.
+
 ``TransactionTestCase``
 -----------------------
 
@@ -1670,9 +1675,12 @@ your test suite.
     ``num`` database queries are executed.
 
     If a ``"using"`` key is present in ``kwargs`` it is used as the database
-    alias for which to check the number of queries.  If you wish to call a
-    function with a ``using`` parameter you can do it by wrapping the call with
-    a ``lambda`` to add an extra parameter::
+    alias for which to check the number of queries::
+
+        self.assertNumQueries(7, using='non_default_db')
+
+    If you wish to call a function with a ``using`` parameter you can do it by
+    wrapping the call with a ``lambda`` to add an extra parameter::
 
         self.assertNumQueries(7, lambda: my_function(using=7))
 

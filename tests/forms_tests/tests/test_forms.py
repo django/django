@@ -8,11 +8,11 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.validators import MaxValueValidator, RegexValidator
 from django.forms import (
     BooleanField, CharField, CheckboxSelectMultiple, ChoiceField, DateField,
-    DateTimeField, EmailField, FileField, FloatField, Form, HiddenInput,
-    ImageField, IntegerField, MultipleChoiceField, MultipleHiddenInput,
-    MultiValueField, NullBooleanField, PasswordInput, RadioSelect, Select,
-    SplitDateTimeField, SplitHiddenDateTimeWidget, Textarea, TextInput,
-    TimeField, ValidationError, forms,
+    DateTimeField, EmailField, FileField, FileInput, FloatField, Form,
+    HiddenInput, ImageField, IntegerField, MultipleChoiceField,
+    MultipleHiddenInput, MultiValueField, NullBooleanField, PasswordInput,
+    RadioSelect, Select, SplitDateTimeField, SplitHiddenDateTimeWidget,
+    Textarea, TextInput, TimeField, ValidationError, forms,
 )
 from django.forms.renderers import DjangoTemplates, get_default_renderer
 from django.forms.utils import ErrorList
@@ -1973,7 +1973,7 @@ Password: <input type="password" name="password" required></li>
             occupation = CharField(initial=lambda: 'Unknown')
 
         form = PersonForm(initial={'first_name': 'Jane'})
-        self.assertEqual(form.get_initial_for_field(form.fields['age'], 'age'), None)
+        self.assertIsNone(form.get_initial_for_field(form.fields['age'], 'age'))
         self.assertEqual(form.get_initial_for_field(form.fields['last_name'], 'last_name'), 'Doe')
         # Form.initial overrides Field.initial.
         self.assertEqual(form.get_initial_for_field(form.fields['first_name'], 'first_name'), 'Jane')
@@ -2485,6 +2485,25 @@ Password: <input type="password" name="password" required>
         f = FileForm({})
         self.assertEqual(f.errors, {})
         self.assertEqual(f.cleaned_data['file1'], 'resume.txt')
+
+    def test_filefield_with_fileinput_required(self):
+        class FileForm(Form):
+            file1 = forms.FileField(widget=FileInput)
+
+        f = FileForm(auto_id=False)
+        self.assertHTMLEqual(
+            f.as_table(),
+            '<tr><th>File1:</th><td>'
+            '<input type="file" name="file1" required></td></tr>',
+        )
+        # A required file field with initial data doesn't contain the required
+        # HTML attribute. The file input is left blank by the user to keep the
+        # existing, initial value.
+        f = FileForm(initial={'file1': 'resume.txt'}, auto_id=False)
+        self.assertHTMLEqual(
+            f.as_table(),
+            '<tr><th>File1:</th><td><input type="file" name="file1"></td></tr>',
+        )
 
     def test_basic_processing_in_view(self):
         class UserRegistration(Form):
@@ -3685,6 +3704,17 @@ Good luck picking a username that doesn&#x27;t already exist.</p>
         self.assertIsInstance(p.data, MultiValueDict)
         self.assertIsInstance(p.files, MultiValueDict)
 
+    def test_field_deep_copy_error_messages(self):
+        class CustomCharField(CharField):
+            def __init__(self, **kwargs):
+                kwargs['error_messages'] = {'invalid': 'Form custom error message.'}
+                super().__init__(**kwargs)
+
+        field = CustomCharField()
+        field_copy = copy.deepcopy(field)
+        self.assertIsInstance(field_copy, CustomCharField)
+        self.assertIsNot(field_copy.error_messages, field.error_messages)
+
 
 class CustomRenderer(DjangoTemplates):
     pass
@@ -3718,7 +3748,7 @@ class RendererTests(SimpleTestCase):
             default_renderer = CustomRenderer
 
         form = CustomForm()
-        self.assertTrue(isinstance(form.renderer, CustomForm.default_renderer))
+        self.assertIsInstance(form.renderer, CustomForm.default_renderer)
 
     def test_attribute_override(self):
         class CustomForm(Form):

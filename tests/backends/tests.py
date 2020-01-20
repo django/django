@@ -687,11 +687,15 @@ class ThreadTests(TransactionTestCase):
                 conn.inc_thread_sharing()
                 connections_dict[id(conn)] = conn
         try:
-            for x in range(2):
+            num_new_threads = 2
+            for x in range(num_new_threads):
                 t = threading.Thread(target=runner)
                 t.start()
                 t.join()
-            self.assertEqual(len(connections_dict), 6)
+            self.assertEqual(
+                len(connections_dict),
+                len(connections.all()) * (num_new_threads + 1),
+            )
         finally:
             # Finish by closing the connections opened by the other threads
             # (the connection opened in the main thread will automatically be

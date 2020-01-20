@@ -11,6 +11,7 @@ from urllib.parse import (
 from django.utils.encoding import punycode
 from django.utils.functional import Promise, keep_lazy, keep_lazy_text
 from django.utils.http import RFC3986_GENDELIMS, RFC3986_SUBDELIMS
+from django.utils.regex_helper import _lazy_re_compile
 from django.utils.safestring import SafeData, SafeString, mark_safe
 from django.utils.text import normalize_newlines
 
@@ -21,10 +22,12 @@ WRAPPING_PUNCTUATION = [('(', ')'), ('[', ']')]
 # List of possible strings used for bullets in bulleted lists.
 DOTS = ['&middot;', '*', '\u2022', '&#149;', '&bull;', '&#8226;']
 
-unencoded_ampersands_re = re.compile(r'&(?!(\w+|#\d+);)')
-word_split_re = re.compile(r'''([\s<>"']+)''')
-simple_url_re = re.compile(r'^https?://\[?\w', re.IGNORECASE)
-simple_url_2_re = re.compile(r'^www\.|^(?!http)\w[^@]+\.(com|edu|gov|int|mil|net|org)($|/.*)$', re.IGNORECASE)
+word_split_re = _lazy_re_compile(r'''([\s<>"']+)''')
+simple_url_re = _lazy_re_compile(r'^https?://\[?\w', re.IGNORECASE)
+simple_url_2_re = _lazy_re_compile(
+    r'^www\.|^(?!http)\w[^@]+\.(com|edu|gov|int|mil|net|org)($|/.*)$',
+    re.IGNORECASE
+)
 
 
 @keep_lazy(str, SafeString)

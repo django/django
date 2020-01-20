@@ -13,7 +13,9 @@ from django.http import (
     HttpRequest, HttpResponsePermanentRedirect, HttpResponseRedirect,
 )
 from django.shortcuts import redirect
-from django.test import SimpleTestCase, TestCase, override_settings
+from django.test import (
+    RequestFactory, SimpleTestCase, TestCase, override_settings,
+)
 from django.test.utils import override_script_prefix
 from django.urls import (
     NoReverseMatch, Resolver404, ResolverMatch, URLPattern, URLResolver,
@@ -527,6 +529,14 @@ class ReverseLazyTest(TestCase):
         self.assertEqual(
             'Some URL: %s' % reverse_lazy('some-login-page'),
             'Some URL: /login/'
+        )
+
+    def test_build_absolute_uri(self):
+        factory = RequestFactory()
+        request = factory.get('/')
+        self.assertEqual(
+            request.build_absolute_uri(reverse_lazy('some-login-page')),
+            'http://testserver/login/',
         )
 
 

@@ -6,8 +6,8 @@ from django.db import IntegrityError, connection, models
 from django.test import SimpleTestCase, TestCase
 
 from .models import (
-    BigIntegerModel, IntegerModel, PositiveIntegerModel,
-    PositiveSmallIntegerModel, SmallIntegerModel,
+    BigIntegerModel, IntegerModel, PositiveBigIntegerModel,
+    PositiveIntegerModel, PositiveSmallIntegerModel, SmallIntegerModel,
 )
 
 
@@ -180,6 +180,11 @@ class PositiveIntegerFieldTests(IntegerFieldTests):
         p.value = models.F('value') - 1
         with self.assertRaises(IntegrityError):
             p.save()
+
+
+class PositiveBigIntegerFieldTests(IntegerFieldTests):
+    model = PositiveBigIntegerModel
+    documented_range = (0, 9223372036854775807)
 
 
 class ValidationTests(SimpleTestCase):

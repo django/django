@@ -47,11 +47,10 @@ Why would you use sites? It's best explained through examples.
 Associating content with multiple sites
 ---------------------------------------
 
-The Django-powered sites LJWorld.com_ and Lawrence.com_ are operated by the
-same news organization -- the Lawrence Journal-World newspaper in Lawrence,
-Kansas. LJWorld.com focuses on news, while Lawrence.com focuses on local
-entertainment. But sometimes editors want to publish an article on *both*
-sites.
+The LJWorld.com_ and Lawrence.com_ sites are operated by the same news
+organization -- the Lawrence Journal-World newspaper in Lawrence, Kansas.
+LJWorld.com focused on news, while Lawrence.com focused on local entertainment.
+But sometimes editors wanted to publish an article on *both* sites.
 
 The naive way of solving the problem would be to require site producers to
 publish the same story twice: once for LJWorld.com and again for Lawrence.com.
@@ -218,14 +217,14 @@ different template directories (:setting:`DIRS <TEMPLATES-DIRS>`), you could
 farm out to the template system like so::
 
     from django.core.mail import send_mail
-    from django.template import Context, loader
+    from django.template import loader
 
     def register_for_newsletter(request):
         # Check form values, etc., and subscribe the user.
         # ...
 
-        subject = loader.get_template('alerts/subject.txt').render(Context({}))
-        message = loader.get_template('alerts/message.txt').render(Context({}))
+        subject = loader.get_template('alerts/subject.txt').render({})
+        message = loader.get_template('alerts/message.txt').render({})
         send_mail(subject, message, 'editor@ljworld.com', [user.email])
 
         # ...

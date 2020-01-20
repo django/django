@@ -55,6 +55,7 @@ QUnit.test('String.strptime', function(assert) {
     assert.equal(firstParsedDate.getUTCMonth(), 1);
     assert.equal(firstParsedDate.getUTCFullYear(), 1988);
 
+    // A %y value in the range of [69, 99] is in the previous century.
     var secondParsedDate = '26/02/88'.strptime('%d/%m/%y');
     assert.equal(secondParsedDate.getUTCDate(), 26);
     assert.equal(secondParsedDate.getUTCMonth(), 1);
@@ -66,6 +67,12 @@ QUnit.test('String.strptime', function(assert) {
     assert.equal(thirdParsedDate.getUTCDate(), 20);
     assert.equal(thirdParsedDate.getUTCMonth(), 10);
     assert.equal(thirdParsedDate.getUTCFullYear(), 1983);
+
+    // A %y value in the range of [00, 68] is in the current century.
+    var fourthParsedDate = '27/09/68'.strptime('%d/%m/%y');
+    assert.equal(fourthParsedDate.getUTCDate(), 27);
+    assert.equal(fourthParsedDate.getUTCMonth(), 8);
+    assert.equal(fourthParsedDate.getUTCFullYear(), 2068);
 
     // Extracting from a Date object with local time must give the correct
     // result. Without proper conversion, timezones from GMT+0100 to GMT+1200

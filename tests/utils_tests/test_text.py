@@ -196,6 +196,7 @@ class TestUtilsText(SimpleTestCase):
             ('foo ıç bar', 'foo-ıç-bar', True),
             ('    foo ıç bar', 'foo-ıç-bar', True),
             ('你好', '你好', True),
+            ('İstanbul', 'istanbul', True),
         )
         for value, output, is_unicode in items:
             self.assertEqual(text.slugify(value, allow_unicode=is_unicode), output)
@@ -250,7 +251,7 @@ class TestUtilsText(SimpleTestCase):
         actual_length = len(b''.join(seq))
         out = text.compress_sequence(seq)
         compressed_length = len(b''.join(out))
-        self.assertTrue(compressed_length < actual_length)
+        self.assertLess(compressed_length, actual_length)
 
     def test_format_lazy(self):
         self.assertEqual('django/test', format_lazy('{}/{}', 'django', lazystr('test')))

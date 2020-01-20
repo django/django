@@ -21,7 +21,7 @@ from django.core.exceptions import ImproperlyConfigured, ViewDoesNotExist
 from django.utils.datastructures import MultiValueDict
 from django.utils.functional import cached_property
 from django.utils.http import RFC3986_SUBDELIMS, escape_leading_slashes
-from django.utils.regex_helper import normalize
+from django.utils.regex_helper import _lazy_re_compile, normalize
 from django.utils.translation import get_language
 
 from .converters import get_converter
@@ -158,8 +158,9 @@ class RegexPattern(CheckURLMixin):
             # If there are any named groups, use those as kwargs, ignoring
             # non-named groups. Otherwise, pass all non-named arguments as
             # positional arguments.
-            kwargs = {k: v for k, v in match.groupdict().items() if v is not None}
+            kwargs = match.groupdict()
             args = () if kwargs else match.groups()
+            kwargs = {k: v for k, v in kwargs.items() if v is not None}
             return path[match.end():], args, kwargs
         return None
 
@@ -189,13 +190,13 @@ class RegexPattern(CheckURLMixin):
         except re.error as e:
             raise ImproperlyConfigured(
                 '"%s" is not a valid regular expression: %s' % (regex, e)
-            )
+            ) from e
 
     def __str__(self):
         return str(self._regex)
 
 
-_PATH_PARAMETER_COMPONENT_RE = re.compile(
+_PATH_PARAMETER_COMPONENT_RE = _lazy_re_compile(
     r'<(?:(?P<converter>[^>:]+):)?(?P<parameter>\w+)>'
 )
 
@@ -233,8 +234,9 @@ def _route_to_regex(route, is_endpoint=False):
             converter = get_converter(raw_converter)
         except KeyError as e:
             raise ImproperlyConfigured(
-                "URL route '%s' uses invalid converter %s." % (original_route, e)
-            )
+                'URL route %r uses invalid converter %r.'
+                % (original_route, raw_converter)
+            ) from e
         converters[parameter] = converter
         parts.append('(?P<' + parameter + '>' + converter.regex + ')')
     if is_endpoint:
@@ -587,13 +589,13 @@ class URLResolver:
         patterns = getattr(self.urlconf_module, "urlpatterns", self.urlconf_module)
         try:
             iter(patterns)
-        except TypeError:
+        except TypeError as e:
             msg = (
                 "The included URLconf '{name}' does not appear to have any "
                 "patterns in it. If you see valid patterns in the file then "
                 "the issue is probably caused by a circular import."
             )
-            raise ImproperlyConfigured(msg.format(name=self.urlconf_name))
+            raise ImproperlyConfigured(msg.format(name=self.urlconf_name)) from e
         return patterns
 
     def resolve_error_handler(self, view_type):
@@ -631,11 +633,18 @@ class URLResolver:
                     candidate_subs = kwargs
                 # Convert the candidate subs to text using Converter.to_url().
                 text_candidate_subs = {}
+                match = True
                 for k, v in candidate_subs.items():
                     if k in converters:
-                        text_candidate_subs[k] = converters[k].to_url(v)
+                        try:
+                            text_candidate_subs[k] = converters[k].to_url(v)
+                        except ValueError:
+                            match = False
+                            break
                     else:
                         text_candidate_subs[k] = str(v)
+                if not match:
+                    continue
                 # WSGI provides decoded URLs, without %xx escapes, and the URL
                 # resolver operates on such URLs. First substitute arguments
                 # without quoting to build a decoded URL and look for a match.

@@ -6,6 +6,11 @@ This tutorial begins where :doc:`Tutorial 2 </intro/tutorial02>` left off. We're
 continuing the Web-poll application and will focus on creating the public
 interface -- "views."
 
+.. admonition:: Where to get help:
+
+    If you're having trouble going through this tutorial, please head over to
+    the :doc:`Getting Help</faq/help>` section of the FAQ.
+
 Overview
 ========
 
@@ -120,13 +125,6 @@ view function. The ``:question_id>`` part of the string defines the name that
 will be used to identify the matched pattern, and the ``<int:`` part is a
 converter that determines what patterns should match this part of the URL path.
 
-There's no need to add URL cruft such as ``.html`` -- unless you want to, in
-which case you can do something like this::
-
-    path('polls/latest.html', views.index),
-
-But, don't do that. It's silly.
-
 Write views that actually do something
 ======================================
 
@@ -208,6 +206,13 @@ Put the following code in that template:
     {% else %}
         <p>No polls are available.</p>
     {% endif %}
+
+.. note::
+
+    To make the tutorial shorter, all template examples use incomplete HTML. In
+    your own projects you should use `complete HTML documents`__.
+
+__ https://developer.mozilla.org/en-US/docs/Learn/HTML/Introduction_to_HTML/Getting_started#Anatomy_of_an_HTML_document
 
 Now let's update our ``index`` view in ``polls/views.py`` to use the template:
 

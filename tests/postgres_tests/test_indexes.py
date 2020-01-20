@@ -1,7 +1,8 @@
 from unittest import mock
 
 from django.contrib.postgres.indexes import (
-    BrinIndex, BTreeIndex, GinIndex, GistIndex, HashIndex, SpGistIndex,
+    BloomIndex, BrinIndex, BTreeIndex, GinIndex, GistIndex, HashIndex,
+    SpGistIndex,
 )
 from django.db import connection
 from django.db.models import CharField
@@ -28,6 +29,50 @@ class IndexTestMixin:
         self.assertEqual(path, 'django.contrib.postgres.indexes.%s' % self.index_class.__name__)
         self.assertEqual(args, ())
         self.assertEqual(kwargs, {'fields': ['title'], 'name': 'test_title_%s' % self.index_class.suffix})
+
+
+class BloomIndexTests(IndexTestMixin, PostgreSQLSimpleTestCase):
+    index_class = BloomIndex
+
+    def test_suffix(self):
+        self.assertEqual(BloomIndex.suffix, 'bloom')
+
+    def test_deconstruction(self):
+        index = BloomIndex(fields=['title'], name='test_bloom', length=80, columns=[4])
+        path, args, kwargs = index.deconstruct()
+        self.assertEqual(path, 'django.contrib.postgres.indexes.BloomIndex')
+        self.assertEqual(args, ())
+        self.assertEqual(kwargs, {
+            'fields': ['title'],
+            'name': 'test_bloom',
+            'length': 80,
+            'columns': [4],
+        })
+
+    def test_invalid_fields(self):
+        msg = 'Bloom indexes support a maximum of 32 fields.'
+        with self.assertRaisesMessage(ValueError, msg):
+            BloomIndex(fields=['title'] * 33, name='test_bloom')
+
+    def test_invalid_columns(self):
+        msg = 'BloomIndex.columns must be a list or tuple.'
+        with self.assertRaisesMessage(ValueError, msg):
+            BloomIndex(fields=['title'], name='test_bloom', columns='x')
+        msg = 'BloomIndex.columns cannot have more values than fields.'
+        with self.assertRaisesMessage(ValueError, msg):
+            BloomIndex(fields=['title'], name='test_bloom', columns=[4, 3])
+
+    def test_invalid_columns_value(self):
+        msg = 'BloomIndex.columns must contain integers from 1 to 4095.'
+        for length in (0, 4096):
+            with self.subTest(length), self.assertRaisesMessage(ValueError, msg):
+                BloomIndex(fields=['title'], name='test_bloom', columns=[length])
+
+    def test_invalid_length(self):
+        msg = 'BloomIndex.length must be None or an integer from 1 to 4096.'
+        for length in (0, 4097):
+            with self.subTest(length), self.assertRaisesMessage(ValueError, msg):
+                BloomIndex(fields=['title'], name='test_bloom', length=length)
 
 
 class BrinIndexTests(IndexTestMixin, PostgreSQLSimpleTestCase):
@@ -216,6 +261,41 @@ class SchemaTests(PostgreSQLTestCase):
         with connection.schema_editor() as editor:
             editor.remove_index(IntegerArrayModel, index)
         self.assertNotIn(index_name, self.get_constraints(IntegerArrayModel._meta.db_table))
+
+    @skipUnlessDBFeature('has_bloom_index')
+    def test_bloom_index(self):
+        index_name = 'char_field_model_field_bloom'
+        index = BloomIndex(fields=['field'], name=index_name)
+        with connection.schema_editor() as editor:
+            editor.add_index(CharFieldModel, index)
+        constraints = self.get_constraints(CharFieldModel._meta.db_table)
+        self.assertEqual(constraints[index_name]['type'], BloomIndex.suffix)
+        with connection.schema_editor() as editor:
+            editor.remove_index(CharFieldModel, index)
+        self.assertNotIn(index_name, self.get_constraints(CharFieldModel._meta.db_table))
+
+    @skipUnlessDBFeature('has_bloom_index')
+    def test_bloom_parameters(self):
+        index_name = 'char_field_model_field_bloom_params'
+        index = BloomIndex(fields=['field'], name=index_name, length=512, columns=[3])
+        with connection.schema_editor() as editor:
+            editor.add_index(CharFieldModel, index)
+        constraints = self.get_constraints(CharFieldModel._meta.db_table)
+        self.assertEqual(constraints[index_name]['type'], BloomIndex.suffix)
+        self.assertEqual(constraints[index_name]['options'], ['length=512', 'col1=3'])
+        with connection.schema_editor() as editor:
+            editor.remove_index(CharFieldModel, index)
+        self.assertNotIn(index_name, self.get_constraints(CharFieldModel._meta.db_table))
+
+    def test_bloom_index_not_supported(self):
+        index_name = 'bloom_index_exception'
+        index = BloomIndex(fields=['field'], name=index_name)
+        msg = 'Bloom indexes require PostgreSQL 9.6+.'
+        with self.assertRaisesMessage(NotSupportedError, msg):
+            with mock.patch('django.db.backends.postgresql.features.DatabaseFeatures.has_bloom_index', False):
+                with connection.schema_editor() as editor:
+                    editor.add_index(CharFieldModel, index)
+        self.assertNotIn(index_name, self.get_constraints(CharFieldModel._meta.db_table))
 
     def test_brin_index(self):
         index_name = 'char_field_model_field_brin'

@@ -1,12 +1,12 @@
-import re
 import warnings
 from io import StringIO
 
 from django.template.base import TRANSLATOR_COMMENT_MARK, Lexer, TokenType
+from django.utils.regex_helper import _lazy_re_compile
 
 from . import TranslatorCommentWarning, trim_whitespace
 
-dot_re = re.compile(r'\S')
+dot_re = _lazy_re_compile(r'\S')
 
 
 def blankout(src, char):
@@ -17,19 +17,19 @@ def blankout(src, char):
     return dot_re.sub(char, src)
 
 
-context_re = re.compile(r"""^\s+.*context\s+((?:"[^"]*?")|(?:'[^']*?'))\s*""")
-inline_re = re.compile(
-    # Match the trans 'some text' part
-    r"""^\s*trans\s+((?:"[^"]*?")|(?:'[^']*?'))"""
+context_re = _lazy_re_compile(r"""^\s+.*context\s+((?:"[^"]*?")|(?:'[^']*?'))\s*""")
+inline_re = _lazy_re_compile(
+    # Match the trans/translate 'some text' part.
+    r"""^\s*trans(?:late)?\s+((?:"[^"]*?")|(?:'[^']*?'))"""
     # Match and ignore optional filters
     r"""(?:\s*\|\s*[^\s:]+(?::(?:[^\s'":]+|(?:"[^"]*?")|(?:'[^']*?')))?)*"""
     # Match the optional context part
     r"""(\s+.*context\s+((?:"[^"]*?")|(?:'[^']*?')))?\s*"""
 )
-block_re = re.compile(r"""^\s*blocktrans(\s+.*context\s+((?:"[^"]*?")|(?:'[^']*?')))?(?:\s+|$)""")
-endblock_re = re.compile(r"""^\s*endblocktrans$""")
-plural_re = re.compile(r"""^\s*plural$""")
-constant_re = re.compile(r"""_\(((?:".*?")|(?:'.*?'))\)""")
+block_re = _lazy_re_compile(r"""^\s*blocktrans(?:late)?(\s+.*context\s+((?:"[^"]*?")|(?:'[^']*?')))?(?:\s+|$)""")
+endblock_re = _lazy_re_compile(r"""^\s*endblocktrans(?:late)?$""")
+plural_re = _lazy_re_compile(r"""^\s*plural$""")
+constant_re = _lazy_re_compile(r"""_\(((?:".*?")|(?:'.*?'))\)""")
 
 
 def templatize(src, origin=None):

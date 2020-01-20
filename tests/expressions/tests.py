@@ -92,6 +92,14 @@ class BasicExpressionsTests(TestCase):
             2,
         )
 
+    def test_filtering_on_rawsql_that_is_boolean(self):
+        self.assertEqual(
+            Company.objects.filter(
+                RawSQL('num_employees > %s', (3,), output_field=models.BooleanField()),
+            ).count(),
+            2,
+        )
+
     def test_filter_inter_attribute(self):
         # We can filter on attribute relationships on same model obj, e.g.
         # find companies where the number of employees is greater
@@ -529,6 +537,21 @@ class BasicExpressionsTests(TestCase):
             ),
         )
         self.assertCountEqual(contrived.values_list(), outer.values_list())
+
+    def test_nested_subquery_join_outer_ref(self):
+        inner = Employee.objects.filter(pk=OuterRef('ceo__pk')).values('pk')
+        qs = Employee.objects.annotate(
+            ceo_company=Subquery(
+                Company.objects.filter(
+                    ceo__in=inner,
+                    ceo__pk=OuterRef('pk'),
+                ).values('pk'),
+            ),
+        )
+        self.assertSequenceEqual(
+            qs.values_list('ceo_company', flat=True),
+            [self.example_inc.pk, self.foobar_ltd.pk, self.gmbh.pk],
+        )
 
     def test_nested_subquery_outer_ref_2(self):
         first = Time.objects.create(time='09:00')
@@ -1404,6 +1427,16 @@ class FTimeDeltaTests(TestCase):
         self.assertIsNone(queryset.first().shifted)
 
     @skipUnlessDBFeature('supports_temporal_subtraction')
+    def test_date_subquery_subtraction(self):
+        subquery = Experiment.objects.filter(pk=OuterRef('pk')).values('completed')
+        queryset = Experiment.objects.annotate(
+            difference=ExpressionWrapper(
+                subquery - F('completed'), output_field=models.DurationField(),
+            ),
+        ).filter(difference=datetime.timedelta())
+        self.assertTrue(queryset.exists())
+
+    @skipUnlessDBFeature('supports_temporal_subtraction')
     def test_time_subtraction(self):
         Time.objects.create(time=datetime.time(12, 30, 15, 2345))
         queryset = Time.objects.annotate(
@@ -1430,6 +1463,17 @@ class FTimeDeltaTests(TestCase):
         self.assertIsNone(queryset.first().shifted)
 
     @skipUnlessDBFeature('supports_temporal_subtraction')
+    def test_time_subquery_subtraction(self):
+        Time.objects.create(time=datetime.time(12, 30, 15, 2345))
+        subquery = Time.objects.filter(pk=OuterRef('pk')).values('time')
+        queryset = Time.objects.annotate(
+            difference=ExpressionWrapper(
+                subquery - F('time'), output_field=models.DurationField(),
+            ),
+        ).filter(difference=datetime.timedelta())
+        self.assertTrue(queryset.exists())
+
+    @skipUnlessDBFeature('supports_temporal_subtraction')
     def test_datetime_subtraction(self):
         under_estimate = [
             e.name for e in Experiment.objects.filter(estimated_time__gt=F('end') - F('start'))
@@ -1452,6 +1496,16 @@ class FTimeDeltaTests(TestCase):
             output_field=models.DateTimeField(),
         ))
         self.assertIsNone(queryset.first().shifted)
+
+    @skipUnlessDBFeature('supports_temporal_subtraction')
+    def test_datetime_subquery_subtraction(self):
+        subquery = Experiment.objects.filter(pk=OuterRef('pk')).values('start')
+        queryset = Experiment.objects.annotate(
+            difference=ExpressionWrapper(
+                subquery - F('start'), output_field=models.DurationField(),
+            ),
+        ).filter(difference=datetime.timedelta())
+        self.assertTrue(queryset.exists())
 
     @skipUnlessDBFeature('supports_temporal_subtraction')
     def test_datetime_subtraction_microseconds(self):

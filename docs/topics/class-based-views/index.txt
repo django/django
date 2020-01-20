@@ -24,7 +24,7 @@ Basic examples
 
 Django provides base view classes which will suit a wide range of applications.
 All views inherit from the :class:`~django.views.generic.base.View` class, which
-handles linking the view in to the URLs, HTTP method dispatching and other
+handles linking the view into the URLs, HTTP method dispatching and other
 common features. :class:`~django.views.generic.base.RedirectView` provides a
 HTTP redirect, and :class:`~django.views.generic.base.TemplateView` extends the
 base class to make it also render a template.

@@ -5,6 +5,7 @@ import tempfile
 import time
 import warnings
 from io import StringIO
+from pathlib import Path
 from unittest import mock, skipIf, skipUnless
 
 from admin_scripts.tests import AdminScriptTestCase
@@ -181,7 +182,7 @@ class BasicExtractorTests(ExtractorTests):
             po_contents = fp.read()
             self.assertMsgId("Non-breaking space\u00a0:", po_contents)
 
-    def test_blocktrans_trimmed(self):
+    def test_blocktranslate_trimmed(self):
         management.call_command('makemessages', locale=[LOCALE], verbosity=0)
         self.assertTrue(os.path.exists(self.PO_FILE))
         with open(self.PO_FILE) as fp:
@@ -196,7 +197,7 @@ class BasicExtractorTests(ExtractorTests):
 
     def test_extraction_error(self):
         msg = (
-            'Translation blocks must not include other block tags: blocktrans '
+            'Translation blocks must not include other block tags: blocktranslate '
             '(file %s, line 3)' % os.path.join('templates', 'template_with_error.tpl')
         )
         with self.assertRaisesMessage(SyntaxError, msg):
@@ -223,14 +224,14 @@ class BasicExtractorTests(ExtractorTests):
 
     def test_template_message_context_extractor(self):
         """
-        Message contexts are correctly extracted for the {% trans %} and
-        {% blocktrans %} template tags (#14806).
+        Message contexts are correctly extracted for the {% translate %} and
+        {% blocktranslate %} template tags (#14806).
         """
         management.call_command('makemessages', locale=[LOCALE], verbosity=0)
         self.assertTrue(os.path.exists(self.PO_FILE))
         with open(self.PO_FILE) as fp:
             po_contents = fp.read()
-            # {% trans %}
+            # {% translate %}
             self.assertIn('msgctxt "Special trans context #1"', po_contents)
             self.assertMsgId("Translatable literal #7a", po_contents)
             self.assertIn('msgctxt "Special trans context #2"', po_contents)
@@ -238,35 +239,39 @@ class BasicExtractorTests(ExtractorTests):
             self.assertIn('msgctxt "Special trans context #3"', po_contents)
             self.assertMsgId("Translatable literal #7c", po_contents)
 
-            # {% trans %} with a filter
+            # {% translate %} with a filter
             for minor_part in 'abcdefgh':  # Iterate from #7.1a to #7.1h template markers
                 self.assertIn('msgctxt "context #7.1{}"'.format(minor_part), po_contents)
                 self.assertMsgId('Translatable literal #7.1{}'.format(minor_part), po_contents)
 
-            # {% blocktrans %}
-            self.assertIn('msgctxt "Special blocktrans context #1"', po_contents)
+            # {% blocktranslate %}
+            self.assertIn('msgctxt "Special blocktranslate context #1"', po_contents)
             self.assertMsgId("Translatable literal #8a", po_contents)
-            self.assertIn('msgctxt "Special blocktrans context #2"', po_contents)
+            self.assertIn('msgctxt "Special blocktranslate context #2"', po_contents)
             self.assertMsgId("Translatable literal #8b-singular", po_contents)
             self.assertIn("Translatable literal #8b-plural", po_contents)
-            self.assertIn('msgctxt "Special blocktrans context #3"', po_contents)
+            self.assertIn('msgctxt "Special blocktranslate context #3"', po_contents)
             self.assertMsgId("Translatable literal #8c-singular", po_contents)
             self.assertIn("Translatable literal #8c-plural", po_contents)
-            self.assertIn('msgctxt "Special blocktrans context #4"', po_contents)
+            self.assertIn('msgctxt "Special blocktranslate context #4"', po_contents)
             self.assertMsgId("Translatable literal #8d %(a)s", po_contents)
+
+            # {% trans %} and {% blocktrans %}
+            self.assertMsgId('trans text', po_contents)
+            self.assertMsgId('blocktrans text', po_contents)
 
     def test_context_in_single_quotes(self):
         management.call_command('makemessages', locale=[LOCALE], verbosity=0)
         self.assertTrue(os.path.exists(self.PO_FILE))
         with open(self.PO_FILE) as fp:
             po_contents = fp.read()
-            # {% trans %}
+            # {% translate %}
             self.assertIn('msgctxt "Context wrapped in double quotes"', po_contents)
             self.assertIn('msgctxt "Context wrapped in single quotes"', po_contents)
 
-            # {% blocktrans %}
-            self.assertIn('msgctxt "Special blocktrans context wrapped in double quotes"', po_contents)
-            self.assertIn('msgctxt "Special blocktrans context wrapped in single quotes"', po_contents)
+            # {% blocktranslate %}
+            self.assertIn('msgctxt "Special blocktranslate context wrapped in double quotes"', po_contents)
+            self.assertIn('msgctxt "Special blocktranslate context wrapped in single quotes"', po_contents)
 
     def test_template_comments(self):
         """Template comment tags on the same line of other constructs (#19552)"""
@@ -527,19 +532,19 @@ class CopyPluralFormsExtractorTests(ExtractorTests):
             found = re.findall(r'^(?P<value>"Plural-Forms.+?\\n")\s*$', po_contents, re.MULTILINE | re.DOTALL)
             self.assertEqual(1, len(found))
 
-    def test_trans_and_plural_blocktrans_collision(self):
+    def test_translate_and_plural_blocktranslate_collision(self):
         """
         Ensures a correct workaround for the gettext bug when handling a literal
-        found inside a {% trans %} tag and also in another file inside a
-        {% blocktrans %} with a plural (#17375).
+        found inside a {% translate %} tag and also in another file inside a
+        {% blocktranslate %} with a plural (#17375).
         """
         management.call_command('makemessages', locale=[LOCALE], extensions=['html', 'djtpl'], verbosity=0)
         self.assertTrue(os.path.exists(self.PO_FILE))
         with open(self.PO_FILE) as fp:
             po_contents = fp.read()
             self.assertNotIn("#-#-#-#-#  django.pot (PACKAGE VERSION)  #-#-#-#-#\\n", po_contents)
-            self.assertMsgId('First `trans`, then `blocktrans` with a plural', po_contents)
-            self.assertMsgIdPlural('Plural for a `trans` and `blocktrans` collision case', po_contents)
+            self.assertMsgId('First `translate`, then `blocktranslate` with a plural', po_contents)
+            self.assertMsgIdPlural('Plural for a `translate` and `blocktranslate` collision case', po_contents)
 
 
 class NoWrapExtractorTests(ExtractorTests):
@@ -735,11 +740,17 @@ class CustomLayoutExtractionTests(ExtractorTests):
             management.call_command('makemessages', locale=LOCALE, verbosity=0)
 
     def test_project_locale_paths(self):
+        self._test_project_locale_paths(os.path.join(self.test_dir, 'project_locale'))
+
+    def test_project_locale_paths_pathlib(self):
+        self._test_project_locale_paths(Path(self.test_dir) / 'project_locale')
+
+    def _test_project_locale_paths(self, locale_path):
         """
         * translations for an app containing a locale folder are stored in that folder
         * translations outside of that app are in LOCALE_PATHS[0]
         """
-        with override_settings(LOCALE_PATHS=[os.path.join(self.test_dir, 'project_locale')]):
+        with override_settings(LOCALE_PATHS=[locale_path]):
             management.call_command('makemessages', locale=[LOCALE], verbosity=0)
             project_de_locale = os.path.join(
                 self.test_dir, 'project_locale', 'de', 'LC_MESSAGES', 'django.po')

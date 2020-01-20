@@ -275,6 +275,43 @@ class SchemaTests(TransactionTestCase):
             if sql.startswith('ALTER TABLE') and 'ADD CONSTRAINT' in sql
         ])
 
+    @skipUnlessDBFeature('can_create_inline_fk')
+    def test_add_inline_fk_update_data(self):
+        with connection.schema_editor() as editor:
+            editor.create_model(Node)
+        # Add an inline foreign key and update data in the same transaction.
+        new_field = ForeignKey(Node, CASCADE, related_name='new_fk', null=True)
+        new_field.set_attributes_from_name('new_parent_fk')
+        parent = Node.objects.create()
+        with connection.schema_editor() as editor:
+            editor.add_field(Node, new_field)
+            editor.execute('UPDATE schema_node SET new_parent_fk_id = %s;', [parent.pk])
+        self.assertIn('new_parent_fk_id', self.get_indexes(Node._meta.db_table))
+
+    @skipUnlessDBFeature(
+        'can_create_inline_fk',
+        'allows_multiple_constraints_on_same_fields',
+    )
+    @isolate_apps('schema')
+    def test_add_inline_fk_index_update_data(self):
+        class Node(Model):
+            class Meta:
+                app_label = 'schema'
+
+        with connection.schema_editor() as editor:
+            editor.create_model(Node)
+        # Add an inline foreign key, update data, and an index in the same
+        # transaction.
+        new_field = ForeignKey(Node, CASCADE, related_name='new_fk', null=True)
+        new_field.set_attributes_from_name('new_parent_fk')
+        parent = Node.objects.create()
+        with connection.schema_editor() as editor:
+            editor.add_field(Node, new_field)
+            Node._meta.add_field(new_field)
+            editor.execute('UPDATE schema_node SET new_parent_fk_id = %s;', [parent.pk])
+            editor.add_index(Node, Index(fields=['new_parent_fk'], name='new_parent_inline_fk_idx'))
+        self.assertIn('new_parent_fk_id', self.get_indexes(Node._meta.db_table))
+
     @skipUnlessDBFeature('supports_foreign_keys')
     def test_char_field_with_db_index_to_fk(self):
         # Create the table
@@ -468,7 +505,7 @@ class SchemaTests(TransactionTestCase):
         # Ensure the field is right afterwards
         columns = self.column_classes(Author)
         self.assertEqual(columns['age'][0], "IntegerField")
-        self.assertEqual(columns['age'][1][6], True)
+        self.assertTrue(columns['age'][1][6])
 
     def test_add_field_remove_field(self):
         """
@@ -620,7 +657,7 @@ class SchemaTests(TransactionTestCase):
         # Ensure the field is right afterwards
         columns = self.column_classes(Author)
         self.assertEqual(columns['name'][0], "TextField")
-        self.assertEqual(columns['name'][1][6], True)
+        self.assertTrue(columns['name'][1][6])
         # Change nullability again
         new_field2 = TextField(null=False)
         new_field2.set_attributes_from_name("name")
@@ -894,6 +931,54 @@ class SchemaTests(TransactionTestCase):
         new_field.model = Foo
         with connection.schema_editor() as editor:
             editor.alter_field(Foo, old_field, new_field, strict=True)
+
+    @isolate_apps('schema')
+    @unittest.skipUnless(connection.vendor == 'postgresql', 'PostgreSQL specific')
+    def test_alter_array_field_decrease_base_field_length(self):
+        from django.contrib.postgres.fields import ArrayField
+
+        class ArrayModel(Model):
+            field = ArrayField(CharField(max_length=16))
+
+            class Meta:
+                app_label = 'schema'
+
+        with connection.schema_editor() as editor:
+            editor.create_model(ArrayModel)
+        self.isolated_local_models = [ArrayModel]
+        ArrayModel.objects.create(field=['x' * 16])
+        old_field = ArrayModel._meta.get_field('field')
+        new_field = ArrayField(CharField(max_length=15))
+        new_field.set_attributes_from_name('field')
+        new_field.model = ArrayModel
+        with connection.schema_editor() as editor:
+            msg = 'value too long for type character varying(15)'
+            with self.assertRaisesMessage(DataError, msg):
+                editor.alter_field(ArrayModel, old_field, new_field, strict=True)
+
+    @isolate_apps('schema')
+    @unittest.skipUnless(connection.vendor == 'postgresql', 'PostgreSQL specific')
+    def test_alter_array_field_decrease_nested_base_field_length(self):
+        from django.contrib.postgres.fields import ArrayField
+
+        class ArrayModel(Model):
+            field = ArrayField(ArrayField(CharField(max_length=16)))
+
+            class Meta:
+                app_label = 'schema'
+
+        with connection.schema_editor() as editor:
+            editor.create_model(ArrayModel)
+        self.isolated_local_models = [ArrayModel]
+        ArrayModel.objects.create(field=[['x' * 16]])
+        old_field = ArrayModel._meta.get_field('field')
+        new_field = ArrayField(ArrayField(CharField(max_length=15)))
+        new_field.set_attributes_from_name('field')
+        new_field.model = ArrayModel
+        with connection.schema_editor() as editor:
+            msg = 'value too long for type character varying(15)'
+            with self.assertRaisesMessage(DataError, msg):
+                editor.alter_field(ArrayModel, old_field, new_field, strict=True)
 
     def test_alter_textfield_to_null(self):
         """
@@ -2052,25 +2137,25 @@ class SchemaTests(TransactionTestCase):
         with connection.schema_editor() as editor:
             editor.create_model(Tag)
         # Ensure there's no index on the year/slug columns first
-        self.assertEqual(
-            False,
+        self.assertIs(
             any(
                 c["index"]
                 for c in self.get_constraints("schema_tag").values()
                 if c['columns'] == ["slug", "title"]
             ),
+            False,
         )
         # Alter the model to add an index
         with connection.schema_editor() as editor:
             editor.alter_index_together(Tag, [], [("slug", "title")])
         # Ensure there is now an index
-        self.assertEqual(
-            True,
+        self.assertIs(
             any(
                 c["index"]
                 for c in self.get_constraints("schema_tag").values()
                 if c['columns'] == ["slug", "title"]
             ),
+            True,
         )
         # Alter it back
         new_field2 = SlugField(unique=True)
@@ -2078,13 +2163,13 @@ class SchemaTests(TransactionTestCase):
         with connection.schema_editor() as editor:
             editor.alter_index_together(Tag, [("slug", "title")], [])
         # Ensure there's no index
-        self.assertEqual(
-            False,
+        self.assertIs(
             any(
                 c["index"]
                 for c in self.get_constraints("schema_tag").values()
                 if c['columns'] == ["slug", "title"]
             ),
+            False,
         )
 
     def test_index_together_with_fk(self):
@@ -2113,13 +2198,13 @@ class SchemaTests(TransactionTestCase):
         with connection.schema_editor() as editor:
             editor.create_model(TagIndexed)
         # Ensure there is an index
-        self.assertEqual(
-            True,
+        self.assertIs(
             any(
                 c["index"]
                 for c in self.get_constraints("schema_tagindexed").values()
                 if c['columns'] == ["slug", "title"]
             ),
+            True,
         )
 
     @skipUnlessDBFeature('allows_multiple_constraints_on_same_fields')

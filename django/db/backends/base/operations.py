@@ -24,6 +24,7 @@ class BaseDatabaseOperations:
         'SmallIntegerField': (-32768, 32767),
         'IntegerField': (-2147483648, 2147483647),
         'BigIntegerField': (-9223372036854775808, 9223372036854775807),
+        'PositiveBigIntegerField': (0, 9223372036854775807),
         'PositiveSmallIntegerField': (0, 32767),
         'PositiveIntegerField': (0, 2147483647),
         'SmallAutoField': (-32768, 32767),
@@ -625,7 +626,7 @@ class BaseDatabaseOperations:
         if self.connection.features.supports_temporal_subtraction:
             lhs_sql, lhs_params = lhs
             rhs_sql, rhs_params = rhs
-            return "(%s - %s)" % (lhs_sql, rhs_sql), lhs_params + rhs_params
+            return '(%s - %s)' % (lhs_sql, rhs_sql), (*lhs_params, *rhs_params)
         raise NotSupportedError("This backend does not support %s subtraction." % internal_type)
 
     def window_frame_start(self, start):

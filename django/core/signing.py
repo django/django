@@ -36,7 +36,6 @@ These functions make use of all of them.
 import base64
 import datetime
 import json
-import re
 import time
 import zlib
 
@@ -45,8 +44,9 @@ from django.utils import baseconv
 from django.utils.crypto import constant_time_compare, salted_hmac
 from django.utils.encoding import force_bytes
 from django.utils.module_loading import import_string
+from django.utils.regex_helper import _lazy_re_compile
 
-_SEP_UNSAFE = re.compile(r'^[A-z0-9-_=]*$')
+_SEP_UNSAFE = _lazy_re_compile(r'^[A-z0-9-_=]*$')
 
 
 class BadSignature(Exception):
@@ -145,7 +145,6 @@ def loads(s, key=None, salt='django.core.signing', serializer=JSONSerializer, ma
 class Signer:
 
     def __init__(self, key=None, sep=':', salt=None):
-        # Use of native strings in all versions of Python
         self.key = key or settings.SECRET_KEY
         self.sep = sep
         if _SEP_UNSAFE.match(self.sep):

@@ -1,4 +1,5 @@
 import unittest
+import uuid
 
 from django.core.checks import Error, Warning as DjangoWarning
 from django.db import connection, models
@@ -689,6 +690,7 @@ class IntegerFieldTests(SimpleTestCase):
             biginteger = models.BigIntegerField(max_length=2)
             smallinteger = models.SmallIntegerField(max_length=2)
             positiveinteger = models.PositiveIntegerField(max_length=2)
+            positivebiginteger = models.PositiveBigIntegerField(max_length=2)
             positivesmallinteger = models.PositiveSmallIntegerField(max_length=2)
 
         for field in Model._meta.get_fields():
@@ -768,3 +770,20 @@ class TextFieldTests(TestCase):
                 id='fields.W162',
             )
         ])
+
+
+@isolate_apps('invalid_models_tests')
+class UUIDFieldTests(TestCase):
+    def test_choices_named_group(self):
+        class Model(models.Model):
+            field = models.UUIDField(
+                choices=[
+                    ['knights', [
+                        [uuid.UUID('5c859437-d061-4847-b3f7-e6b78852f8c8'), 'Lancelot'],
+                        [uuid.UUID('c7853ec1-2ea3-4359-b02d-b54e8f1bcee2'), 'Galahad'],
+                    ]],
+                    [uuid.UUID('25d405be-4895-4d50-9b2e-d6695359ce47'), 'Other'],
+                ],
+            )
+
+        self.assertEqual(Model._meta.get_field('field').check(), [])

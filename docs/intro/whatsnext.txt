@@ -24,8 +24,8 @@ Finding documentation
 =====================
 
 Django's got a *lot* of documentation -- almost 450,000 words and counting --
-so finding what you need can sometimes be tricky. A few good places to start
-are the :ref:`search` and the :ref:`genindex`.
+so finding what you need can sometimes be tricky. A good place to start
+is the :ref:`genindex`. We also recommend using the builtin search feature.
 
 Or you can just browse around!
 

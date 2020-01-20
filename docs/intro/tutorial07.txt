@@ -7,6 +7,11 @@ continuing the Web-poll application and will focus on customizing Django's
 automatically-generated admin site that we first explored in :doc:`Tutorial 2
 </intro/tutorial02>`.
 
+.. admonition:: Where to get help:
+
+    If you're having trouble going through this tutorial, please head over to
+    the :doc:`Getting Help</faq/help>` section of the FAQ.
+
 Customize the admin form
 ========================
 
@@ -306,7 +311,7 @@ Open your settings file (:file:`mysite/settings.py`, remember) and add a
     TEMPLATES = [
         {
             'BACKEND': 'django.template.backends.django.DjangoTemplates',
-            'DIRS': [os.path.join(BASE_DIR, 'templates')],
+            'DIRS': [BASE_DIR / 'templates'],
             'APP_DIRS': True,
             'OPTIONS': {
                 'context_processors': [

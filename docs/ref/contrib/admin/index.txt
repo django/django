@@ -971,10 +971,23 @@ subclass::
       limit the ``list_filter`` choices to the users who have written a book
       instead of listing all users.
 
+      You can filter empty values using ``EmptyFieldListFilter``, which can
+      filter on both empty strings and nulls, depending on what the field
+      allows to store::
+
+          class BookAdmin(admin.ModelAdmin):
+              list_filter = (
+                  ('title', admin.EmptyFieldListFilter),
+              )
+
       .. note::
 
         The ``FieldListFilter`` API is considered internal and might be
         changed.
+
+      .. versionadded:: 3.1
+
+          The ``EmptyFieldListFilter`` class was added.
 
     List filter's typically appear only if the filter has more than one choice.
     A filter's ``has_output()`` method controls whether or not it appears.
@@ -1025,6 +1038,12 @@ subclass::
 
     If you need to specify a dynamic value based on the request, you can
     implement a :meth:`~ModelAdmin.get_list_select_related` method.
+
+    .. note::
+
+        ``ModelAdmin`` ignores this attribute when
+        :meth:`~django.db.models.query.QuerySet.select_related` was already
+        called on the changelist's ``QuerySet``.
 
 .. attribute:: ModelAdmin.ordering
 
@@ -2689,14 +2708,14 @@ Therefore here is our new ``change_form.html`` :
     {% load i18n admin_urls %}
     {% block object-tools-items %}
         <li>
-            <a href="{% url opts|admin_urlname:'history' original.pk|admin_urlquote %}" class="historylink">{% trans "History" %}</a>
+            <a href="{% url opts|admin_urlname:'history' original.pk|admin_urlquote %}" class="historylink">{% translate "History" %}</a>
         </li>
         <li>
             <a href="mylink/" class="historylink">My Link</a>
         </li>
         {% if has_absolute_url %}
             <li>
-                <a href="{% url 'admin:view_on_site' content_type_id original.pk %}" class="viewsitelink">{% trans "View on site" %}</a>
+                <a href="{% url 'admin:view_on_site' content_type_id original.pk %}" class="viewsitelink">{% translate "View on site" %}</a>
             </li>
         {% endif %}
     {% endblock %}

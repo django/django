@@ -135,9 +135,7 @@ a more persistent way than providing the ``--ignore`` command option at each
 ``collectstatic`` invocation. Provide a custom :class:`~django.apps.AppConfig`
 class, override the ``ignore_patterns`` attribute of this class and replace
 ``'django.contrib.staticfiles'`` with that class path in your
-:setting:`INSTALLED_APPS` setting:
-
-.. code-block:: python
+:setting:`INSTALLED_APPS` setting::
 
     from django.contrib.staticfiles.apps import StaticFilesConfig
 

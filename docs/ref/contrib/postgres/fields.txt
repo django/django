@@ -738,10 +738,14 @@ operators ``@>``, ``<@``, and ``&&`` respectively.
     <QuerySet [<Event: Soft play>]>
 
 The ``contained_by`` lookup is also available on the non-range field types:
+:class:`~django.db.models.SmallAutoField`,
+:class:`~django.db.models.AutoField`, :class:`~django.db.models.BigAutoField`,
+:class:`~django.db.models.SmallIntegerField`,
 :class:`~django.db.models.IntegerField`,
 :class:`~django.db.models.BigIntegerField`,
-:class:`~django.db.models.FloatField`, :class:`~django.db.models.DateField`,
-and :class:`~django.db.models.DateTimeField`. For example::
+:class:`~django.db.models.DecimalField`, :class:`~django.db.models.FloatField`,
+:class:`~django.db.models.DateField`, and
+:class:`~django.db.models.DateTimeField`. For example::
 
     >>> from psycopg2.extras import DateTimeTZRange
     >>> Event.objects.filter(start__contained_by=DateTimeTZRange(
@@ -749,6 +753,14 @@ and :class:`~django.db.models.DateTimeField`. For example::
     ...     timezone.now() + datetime.timedelta(hours=1),
     ... )
     <QuerySet [<Event: Soft play>]>
+
+.. versionchanged:: 3.1
+
+    Support for :class:`~django.db.models.SmallAutoField`,
+    :class:`~django.db.models.AutoField`,
+    :class:`~django.db.models.BigAutoField`,
+    :class:`~django.db.models.SmallIntegerField`, and
+    :class:`~django.db.models.DecimalField` was added.
 
 .. fieldlookup:: rangefield.overlap
 
@@ -863,6 +875,62 @@ Returned objects are empty ranges. Can be chained to valid lookups for a
 
     >>> Event.objects.filter(ages__isempty=True)
     <QuerySet []>
+
+.. fieldlookup:: rangefield.lower_inc
+
+``lower_inc``
+^^^^^^^^^^^^^
+
+.. versionadded:: 3.1
+
+Returns objects that have inclusive or exclusive lower bounds, depending on the
+boolean value passed. Can be chained to valid lookups for a
+:class:`~django.db.models.BooleanField`.
+
+    >>> Event.objects.filter(ages__lower_inc=True)
+    <QuerySet [<Event: Soft play>, <Event: Pub trip>]>
+
+.. fieldlookup:: rangefield.lower_inf
+
+``lower_inf``
+^^^^^^^^^^^^^
+
+.. versionadded:: 3.1
+
+Returns objects that have unbounded (infinite) or bounded lower bound,
+depending on the boolean value passed. Can be chained to valid lookups for a
+:class:`~django.db.models.BooleanField`.
+
+    >>> Event.objects.filter(ages__lower_inf=True)
+    <QuerySet []>
+
+.. fieldlookup:: rangefield.upper_inc
+
+``upper_inc``
+^^^^^^^^^^^^^
+
+.. versionadded:: 3.1
+
+Returns objects that have inclusive or exclusive upper bounds, depending on the
+boolean value passed. Can be chained to valid lookups for a
+:class:`~django.db.models.BooleanField`.
+
+    >>> Event.objects.filter(ages__upper_inc=True)
+    <QuerySet []>
+
+.. fieldlookup:: rangefield.upper_inf
+
+``upper_inf``
+^^^^^^^^^^^^^
+
+.. versionadded:: 3.1
+
+Returns objects that have unbounded (infinite) or bounded upper bound,
+depending on the boolean value passed. Can be chained to valid lookups for a
+:class:`~django.db.models.BooleanField`.
+
+    >>> Event.objects.filter(ages__upper_inf=True)
+    <QuerySet [<Event: Pub trip>]>
 
 Defining your own range types
 -----------------------------

@@ -13,13 +13,6 @@ details.
 Get the latest version of Python at https://www.python.org/downloads/ or with
 your operating system's package manager.
 
-.. admonition:: Django on Jython
-
-    Jython_ (a Python implementation for the Java platform) is not compatible
-    with Python 3, so Django ≥ 2.0 cannot run on Jython.
-
-.. _jython: http://www.jython.org/
-
 .. admonition:: Python on Windows
 
     If you are just starting with Django and using Windows, you may find

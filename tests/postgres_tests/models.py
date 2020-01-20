@@ -46,6 +46,7 @@ class IntegerArrayModel(PostgreSQLModel):
 
 class NullableIntegerArrayModel(PostgreSQLModel):
     field = ArrayField(models.IntegerField(), blank=True, null=True)
+    field_nested = ArrayField(ArrayField(models.IntegerField(null=True)), null=True)
 
 
 class CharArrayModel(PostgreSQLModel):
@@ -90,6 +91,14 @@ class TextFieldModel(models.Model):
 
     def __str__(self):
         return self.field
+
+
+class SmallAutoFieldModel(models.Model):
+    id = models.SmallAutoField(primary_key=True)
+
+
+class BigAutoFieldModel(models.Model):
+    id = models.BigAutoField(primary_key=True)
 
 
 # Scene/Character/Line models are used to test full text search. They're
@@ -147,6 +156,8 @@ class RangeLookupsModel(PostgreSQLModel):
     float = models.FloatField(blank=True, null=True)
     timestamp = models.DateTimeField(blank=True, null=True)
     date = models.DateField(blank=True, null=True)
+    small_integer = models.SmallIntegerField(blank=True, null=True)
+    decimal_field = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True)
 
 
 class JSONModel(PostgreSQLModel):

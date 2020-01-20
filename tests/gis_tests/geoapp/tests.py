@@ -10,14 +10,16 @@ from django.contrib.gis.geos import (
 )
 from django.core.management import call_command
 from django.db import NotSupportedError, connection
+from django.db.models import F, OuterRef, Subquery
 from django.test import TestCase, skipUnlessDBFeature
 
 from ..utils import (
-    mysql, no_oracle, oracle, postgis, skipUnlessGISLookup, spatialite,
+    mariadb, mysql, no_oracle, oracle, postgis, skipUnlessGISLookup,
+    spatialite,
 )
 from .models import (
-    City, Country, Feature, MinusOneSRID, NonConcreteModel, PennsylvaniaCity,
-    State, Track,
+    City, Country, Feature, MinusOneSRID, MultiFields, NonConcreteModel,
+    PennsylvaniaCity, State, Track,
 )
 
 
@@ -227,8 +229,7 @@ class GeoLookupTest(TestCase):
 
     def test_disjoint_lookup(self):
         "Testing the `disjoint` lookup type."
-        if (connection.vendor == 'mysql' and not connection.mysql_is_mariadb and
-                connection.mysql_version < (8, 0, 0)):
+        if mysql and not mariadb and connection.mysql_version < (8, 0, 0):
             raise unittest.SkipTest('MySQL < 8 gives different results.')
         ptown = City.objects.get(name='Pueblo')
         qs1 = City.objects.filter(point__disjoint=ptown.point)
@@ -429,6 +430,12 @@ class GeoLookupTest(TestCase):
             with self.subTest(lookup=lookup):
                 self.assertNotIn(null, State.objects.filter(**{'poly__%s' % lookup: geom}))
 
+    def test_wkt_string_in_lookup(self):
+        # Valid WKT strings don't emit error logs.
+        with self.assertRaisesMessage(AssertionError, 'no logs'):
+            with self.assertLogs('django.contrib.gis', 'ERROR'):
+                State.objects.filter(poly__intersects='LINESTRING(0 0, 1 1, 5 5)')
+
     @skipUnlessDBFeature("supports_relate_lookup")
     def test_relate_lookup(self):
         "Testing the 'relate' lookup type."
@@ -450,7 +457,7 @@ class GeoLookupTest(TestCase):
                 qs.count()
 
         # Relate works differently for the different backends.
-        if postgis or spatialite:
+        if postgis or spatialite or mariadb:
             contains_mask = 'T*T***FF*'
             within_mask = 'T*F**F***'
             intersects_mask = 'T********'
@@ -461,7 +468,11 @@ class GeoLookupTest(TestCase):
             intersects_mask = 'overlapbdyintersect'
 
         # Testing contains relation mask.
-        self.assertEqual('Texas', Country.objects.get(mpoly__relate=(pnt1, contains_mask)).name)
+        if connection.features.supports_transform:
+            self.assertEqual(
+                Country.objects.get(mpoly__relate=(pnt1, contains_mask)).name,
+                'Texas',
+            )
         self.assertEqual('Texas', Country.objects.get(mpoly__relate=(pnt2, contains_mask)).name)
 
         # Testing within relation mask.
@@ -470,7 +481,11 @@ class GeoLookupTest(TestCase):
 
         # Testing intersection relation mask.
         if not oracle:
-            self.assertEqual('Texas', Country.objects.get(mpoly__relate=(pnt1, intersects_mask)).name)
+            if connection.features.supports_transform:
+                self.assertEqual(
+                    Country.objects.get(mpoly__relate=(pnt1, intersects_mask)).name,
+                    'Texas',
+                )
             self.assertEqual('Texas', Country.objects.get(mpoly__relate=(pnt2, intersects_mask)).name)
             self.assertEqual('Lawrence', City.objects.get(point__relate=(ks.poly, intersects_mask)).name)
 
@@ -485,6 +500,21 @@ class GeoLookupTest(TestCase):
         for lookup in lookups:
             with self.subTest(lookup):
                 City.objects.filter(**{'point__' + lookup: functions.Union('point', 'point')}).exists()
+
+    def test_subquery_annotation(self):
+        multifields = MultiFields.objects.create(
+            city=City.objects.create(point=Point(1, 1)),
+            point=Point(2, 2),
+            poly=Polygon.from_bbox((0, 0, 2, 2)),
+        )
+        qs = MultiFields.objects.annotate(
+            city_point=Subquery(City.objects.filter(
+                id=OuterRef('city'),
+            ).values('point')),
+        ).filter(
+            city_point__within=F('poly'),
+        )
+        self.assertEqual(qs.get(), multifields)
 
 
 class GeoQuerySetTest(TestCase):

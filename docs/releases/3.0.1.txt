@@ -1,0 +1,45 @@
+==========================
+Django 3.0.1 release notes
+==========================
+
+*December 18, 2019*
+
+Django 3.0.1 fixes a security issue and several bugs in 3.0.
+
+CVE-2019-19844: Potential account hijack via password reset form
+================================================================
+
+By submitting a suitably crafted email address making use of Unicode
+characters, that compared equal to an existing user email when lower-cased for
+comparison, an attacker could be sent a password reset token for the matched
+account.
+
+In order to avoid this vulnerability, password reset requests now compare the
+submitted email using the stricter, recommended algorithm for case-insensitive
+comparison of two identifiers from `Unicode Technical Report 36, section
+2.11.2(B)(2)`__. Upon a match, the email containing the reset token will be
+sent to the email address on record rather than the submitted address.
+
+.. __: https://www.unicode.org/reports/tr36/#Recommendations_General
+
+Bugfixes
+========
+
+* Fixed a regression in Django 3.0 by restoring the ability to use Django
+  inside Jupyter and other environments that force an async context, by adding
+  an option to disable :ref:`async-safety` mechanism with
+  ``DJANGO_ALLOW_ASYNC_UNSAFE`` environment variable (:ticket:`31056`).
+
+* Fixed a regression in Django 3.0 where ``RegexPattern``, used by
+  :func:`~django.urls.re_path`, returned positional arguments to be passed to
+  the view when all optional named groups were missing (:ticket:`31061`).
+
+* Reallowed, following a regression in Django 3.0,
+  :class:`~django.db.models.expressions.Window` expressions to be used in
+  conditions outside of queryset filters, e.g. in
+  :class:`~django.db.models.expressions.When` conditions (:ticket:`31060`).
+
+* Fixed a data loss possibility in
+  :class:`~django.contrib.postgres.forms.SplitArrayField`. When using with
+  ``ArrayField(BooleanField())``, all values after the first ``True`` value
+  were marked as checked instead of preserving passed values (:ticket:`31073`).

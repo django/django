@@ -12,6 +12,7 @@ from email.header import Header
 from email.mime.text import MIMEText
 from email.utils import parseaddr
 from io import StringIO
+from pathlib import Path
 from smtplib import SMTP, SMTPAuthenticationError, SMTPException
 from ssl import SSLError
 from unittest import mock
@@ -567,6 +568,13 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
                 mail.get_connection('django.core.mail.backends.filebased.EmailBackend', file_path=tmp_dir),
                 filebased.EmailBackend
             )
+
+        if sys.platform == 'win32':
+            msg = '_getfullpathname: path should be string, bytes or os.PathLike, not object'
+        else:
+            msg = 'expected str, bytes or os.PathLike object, not object'
+        with self.assertRaisesMessage(TypeError, msg):
+            mail.get_connection('django.core.mail.backends.filebased.EmailBackend', file_path=object())
         self.assertIsInstance(mail.get_connection(), locmem.EmailBackend)
 
     @override_settings(
@@ -1154,7 +1162,7 @@ class FileBackendTests(BaseEmailBackendTests, SimpleTestCase):
 
     def setUp(self):
         super().setUp()
-        self.tmp_dir = tempfile.mkdtemp()
+        self.tmp_dir = self.mkdtemp()
         self.addCleanup(shutil.rmtree, self.tmp_dir)
         self._settings_override = override_settings(EMAIL_FILE_PATH=self.tmp_dir)
         self._settings_override.enable()
@@ -1162,6 +1170,9 @@ class FileBackendTests(BaseEmailBackendTests, SimpleTestCase):
     def tearDown(self):
         self._settings_override.disable()
         super().tearDown()
+
+    def mkdtemp(self):
+        return tempfile.mkdtemp()
 
     def flush_mailbox(self):
         for filename in os.listdir(self.tmp_dir):
@@ -1207,6 +1218,12 @@ class FileBackendTests(BaseEmailBackendTests, SimpleTestCase):
         self.assertEqual(len(os.listdir(self.tmp_dir)), 3)
 
         connection.close()
+
+
+class FileBackendPathLibTests(FileBackendTests):
+    def mkdtemp(self):
+        tmp_dir = super().mkdtemp()
+        return Path(tmp_dir)
 
 
 class ConsoleBackendTests(BaseEmailBackendTests, SimpleTestCase):

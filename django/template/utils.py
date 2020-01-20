@@ -99,7 +99,7 @@ def get_app_template_dirs(dirname):
     installed applications.
     """
     template_dirs = [
-        str(Path(app_config.path) / dirname)
+        Path(app_config.path) / dirname
         for app_config in apps.get_app_configs()
         if app_config.path and (Path(app_config.path) / dirname).is_dir()
     ]

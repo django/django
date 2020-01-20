@@ -121,7 +121,7 @@ class EnumSerializer(BaseSerializer):
         enum_class = self.value.__class__
         module = enum_class.__module__
         return (
-            '%s.%s[%r]' % (module, enum_class.__name__, self.value.name),
+            '%s.%s[%r]' % (module, enum_class.__qualname__, self.value.name),
             {'import %s' % module},
         )
 
@@ -269,7 +269,7 @@ class TypeSerializer(BaseSerializer):
             if module == builtins.__name__:
                 return self.value.__name__, set()
             else:
-                return "%s.%s" % (module, self.value.__name__), {"import %s" % module}
+                return "%s.%s" % (module, self.value.__qualname__), {"import %s" % module}
 
 
 class UUIDSerializer(BaseSerializer):

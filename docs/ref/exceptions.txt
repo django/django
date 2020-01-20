@@ -255,6 +255,12 @@ Raised to prevent deletion of referenced objects when using
 :attr:`django.db.models.PROTECT`. :exc:`models.ProtectedError` is a subclass
 of :exc:`IntegrityError`.
 
+.. exception:: models.RestrictedError
+
+Raised to prevent deletion of referenced objects when using
+:attr:`django.db.models.RESTRICT`. :exc:`models.RestrictedError` is a subclass
+of :exc:`IntegrityError`.
+
 .. currentmodule:: django.http
 
 Http Exceptions

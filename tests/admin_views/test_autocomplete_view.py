@@ -1,5 +1,5 @@
 import json
-import time
+from contextlib import contextmanager
 
 from django.contrib import admin
 from django.contrib.admin.tests import AdminSeleniumTestCase
@@ -162,6 +162,21 @@ class SeleniumTests(AdminSeleniumTestCase):
         )
         self.admin_login(username='super', password='secret', login_url=reverse('autocomplete_admin:index'))
 
+    @contextmanager
+    def select2_ajax_wait(self, timeout=10):
+        from selenium.common.exceptions import NoSuchElementException
+        from selenium.webdriver.support import expected_conditions as ec
+        yield
+        with self.disable_implicit_wait():
+            try:
+                loading_element = self.selenium.find_element_by_css_selector(
+                    'li.select2-results__option.loading-results'
+                )
+            except NoSuchElementException:
+                pass
+            else:
+                self.wait_until(ec.staleness_of(loading_element), timeout=timeout)
+
     def test_select(self):
         from selenium.webdriver.common.keys import Keys
         from selenium.webdriver.support.ui import Select
@@ -183,19 +198,19 @@ class SeleniumTests(AdminSeleniumTestCase):
         self.assertEqual(len(results), PAGINATOR_SIZE + 1)
         search = self.selenium.find_element_by_css_selector('.select2-search__field')
         # Load next page of results by scrolling to the bottom of the list.
-        for _ in range(len(results)):
-            search.send_keys(Keys.ARROW_DOWN)
+        with self.select2_ajax_wait():
+            for _ in range(len(results)):
+                search.send_keys(Keys.ARROW_DOWN)
         results = result_container.find_elements_by_css_selector('.select2-results__option')
-        # All objects and "Loading more results".
+        # All objects are now loaded.
         self.assertEqual(len(results), PAGINATOR_SIZE + 11)
         # Limit the results with the search field.
-        search.send_keys('Who')
-        # Ajax request is delayed.
-        self.assertTrue(result_container.is_displayed())
-        results = result_container.find_elements_by_css_selector('.select2-results__option')
-        self.assertEqual(len(results), PAGINATOR_SIZE + 12)
-        # Wait for ajax delay.
-        time.sleep(0.25)
+        with self.select2_ajax_wait():
+            search.send_keys('Who')
+            # Ajax request is delayed.
+            self.assertTrue(result_container.is_displayed())
+            results = result_container.find_elements_by_css_selector('.select2-results__option')
+            self.assertEqual(len(results), PAGINATOR_SIZE + 12)
         self.assertTrue(result_container.is_displayed())
         results = result_container.find_elements_by_css_selector('.select2-results__option')
         self.assertEqual(len(results), 1)
@@ -224,18 +239,18 @@ class SeleniumTests(AdminSeleniumTestCase):
         self.assertEqual(len(results), PAGINATOR_SIZE + 1)
         search = self.selenium.find_element_by_css_selector('.select2-search__field')
         # Load next page of results by scrolling to the bottom of the list.
-        for _ in range(len(results)):
-            search.send_keys(Keys.ARROW_DOWN)
+        with self.select2_ajax_wait():
+            for _ in range(len(results)):
+                search.send_keys(Keys.ARROW_DOWN)
         results = result_container.find_elements_by_css_selector('.select2-results__option')
         self.assertEqual(len(results), 31)
         # Limit the results with the search field.
-        search.send_keys('Who')
-        # Ajax request is delayed.
-        self.assertTrue(result_container.is_displayed())
-        results = result_container.find_elements_by_css_selector('.select2-results__option')
-        self.assertEqual(len(results), 32)
-        # Wait for ajax delay.
-        time.sleep(0.25)
+        with self.select2_ajax_wait():
+            search.send_keys('Who')
+            # Ajax request is delayed.
+            self.assertTrue(result_container.is_displayed())
+            results = result_container.find_elements_by_css_selector('.select2-results__option')
+            self.assertEqual(len(results), 32)
         self.assertTrue(result_container.is_displayed())
         results = result_container.find_elements_by_css_selector('.select2-results__option')
         self.assertEqual(len(results), 1)

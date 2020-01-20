@@ -88,6 +88,9 @@ class BaseDatabaseFeatures:
     # Does the backend order NULL values as largest or smallest?
     nulls_order_largest = False
 
+    # Does the backend support NULLS FIRST and NULLS LAST in ORDER BY?
+    supports_order_by_nulls_modifier = True
+
     # The database's limit on the number of query parameters.
     max_query_params = None
 

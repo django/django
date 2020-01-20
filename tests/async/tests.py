@@ -1,3 +1,7 @@
+import os
+import sys
+from unittest import mock, skipIf
+
 from asgiref.sync import async_to_sync
 
 from django.core.exceptions import SynchronousOnlyOperation
@@ -7,6 +11,7 @@ from django.utils.asyncio import async_unsafe
 from .models import SimpleModel
 
 
+@skipIf(sys.platform == 'win32' and (3, 8, 0) < sys.version_info < (3, 8, 1), 'https://bugs.python.org/issue38563')
 class DatabaseConnectionTest(SimpleTestCase):
     """A database connection cannot be used in an async context."""
     @async_to_sync
@@ -15,6 +20,7 @@ class DatabaseConnectionTest(SimpleTestCase):
             list(SimpleModel.objects.all())
 
 
+@skipIf(sys.platform == 'win32' and (3, 8, 0) < sys.version_info < (3, 8, 1), 'https://bugs.python.org/issue38563')
 class AsyncUnsafeTest(SimpleTestCase):
     """
     async_unsafe decorator should work correctly and returns the correct
@@ -34,3 +40,13 @@ class AsyncUnsafeTest(SimpleTestCase):
         )
         with self.assertRaisesMessage(SynchronousOnlyOperation, msg):
             self.dangerous_method()
+
+    @mock.patch.dict(os.environ, {'DJANGO_ALLOW_ASYNC_UNSAFE': 'true'})
+    @async_to_sync
+    async def test_async_unsafe_suppressed(self):
+        # Decorator doesn't trigger check when the environment variable to
+        # suppress it is set.
+        try:
+            self.dangerous_method()
+        except SynchronousOnlyOperation:
+            self.fail('SynchronousOnlyOperation should not be raised.')

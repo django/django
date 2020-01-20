@@ -7,11 +7,12 @@
 # >>> datetime_safe.date(10, 8, 2).strftime("%Y/%m/%d was a %A")
 # '0010/08/02 was a Monday'
 
-import re
 import time as ttime
 from datetime import (
     date as real_date, datetime as real_datetime, time as real_time,
 )
+
+from django.utils.regex_helper import _lazy_re_compile
 
 
 class date(real_date):
@@ -54,7 +55,7 @@ def new_datetime(d):
 
 # This library does not support strftime's "%s" or "%y" format strings.
 # Allowed if there's an even number of "%"s because they are escaped.
-_illegal_formatting = re.compile(r"((^|[^%])(%%)*%[sy])")
+_illegal_formatting = _lazy_re_compile(r"((^|[^%])(%%)*%[sy])")
 
 
 def _findall(text, substr):

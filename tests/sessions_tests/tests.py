@@ -6,6 +6,7 @@ import tempfile
 import unittest
 from datetime import timedelta
 from http import cookies
+from pathlib import Path
 
 from django.conf import settings
 from django.contrib.sessions.backends.base import UpdateError
@@ -521,7 +522,7 @@ class FileSessionTests(SessionTestsMixin, unittest.TestCase):
     def setUp(self):
         # Do file session tests in an isolated directory, and kill it after we're done.
         self.original_session_file_path = settings.SESSION_FILE_PATH
-        self.temp_session_store = settings.SESSION_FILE_PATH = tempfile.mkdtemp()
+        self.temp_session_store = settings.SESSION_FILE_PATH = self.mkdtemp()
         # Reset the file session backend's internal caches
         if hasattr(self.backend, '_storage_path'):
             del self.backend._storage_path
@@ -531,6 +532,9 @@ class FileSessionTests(SessionTestsMixin, unittest.TestCase):
         super().tearDown()
         settings.SESSION_FILE_PATH = self.original_session_file_path
         shutil.rmtree(self.temp_session_store)
+
+    def mkdtemp(self):
+        return tempfile.mkdtemp()
 
     @override_settings(
         SESSION_FILE_PATH='/if/this/directory/exists/you/have/a/weird/computer',
@@ -596,6 +600,12 @@ class FileSessionTests(SessionTestsMixin, unittest.TestCase):
         management.call_command('clearsessions')
         # ... and two are deleted.
         self.assertEqual(1, count_sessions())
+
+
+class FileSessionPathLibTests(FileSessionTests):
+    def mkdtemp(self):
+        tmp_dir = super().mkdtemp()
+        return Path(tmp_dir)
 
 
 class CacheSessionTests(SessionTestsMixin, unittest.TestCase):

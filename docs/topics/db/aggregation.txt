@@ -43,9 +43,8 @@ used to track the inventory for a series of online bookstores:
 Cheat sheet
 ===========
 
-In a hurry? Here's how to do common aggregate queries, assuming the models above:
-
-.. code-block:: python
+In a hurry? Here's how to do common aggregate queries, assuming the models
+above::
 
     # Total number of books.
     >>> Book.objects.count()
@@ -160,9 +159,7 @@ specified values.
 The syntax for these annotations is identical to that used for the
 :meth:`~.QuerySet.aggregate` clause. Each argument to ``annotate()`` describes
 an aggregate that is to be calculated. For example, to annotate books with the
-number of authors:
-
-.. code-block:: python
+number of authors::
 
     # Build an annotated queryset
     >>> from django.db.models import Count
@@ -199,9 +196,8 @@ modified using any other ``QuerySet`` operation, including ``filter()``,
 Combining multiple aggregations
 -------------------------------
 
-Combining multiple aggregations with ``annotate()`` will `yield the wrong
-results <https://code.djangoproject.com/ticket/10060>`_ because joins are used
-instead of subqueries:
+Combining multiple aggregations with ``annotate()`` will :ticket:`yield the
+wrong results <10060>` because joins are used instead of subqueries:
 
     >>> book = Book.objects.first()
     >>> book.authors.count()

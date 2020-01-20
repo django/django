@@ -345,6 +345,7 @@ class StateTests(SimpleTestCase):
                     'migrations.Tag',
                     models.CASCADE,
                     auto_created=True,
+                    parent_link=True,
                     primary_key=True,
                     to_field='id',
                     serialize=False,
@@ -657,7 +658,7 @@ class StateTests(SimpleTestCase):
             return [mod for mod in state.apps.get_models() if mod._meta.model_name == 'a'][0]
 
         project_state = ProjectState()
-        project_state.add_model((ModelState.from_model(A)))
+        project_state.add_model(ModelState.from_model(A))
         self.assertEqual(len(get_model_a(project_state)._meta.related_objects), 1)
         old_state = project_state.clone()
 
@@ -1052,7 +1053,7 @@ class ModelStateTests(SimpleTestCase):
             ['searchablelocation_ptr', 'name', 'bus_routes', 'inbound']
         )
         self.assertEqual(station_state.fields[1][1].max_length, 128)
-        self.assertEqual(station_state.fields[2][1].null, False)
+        self.assertIs(station_state.fields[2][1].null, False)
         self.assertEqual(
             station_state.options,
             {'abstract': False, 'swappable': 'TEST_SWAPPABLE_MODEL', 'indexes': [], 'constraints': []}

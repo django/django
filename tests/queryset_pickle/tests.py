@@ -5,7 +5,7 @@ from django.db import models
 from django.test import TestCase
 from django.utils.version import get_version
 
-from .models import Container, Event, Group, Happening, M2MModel
+from .models import Container, Event, Group, Happening, M2MModel, MyEvent
 
 
 class PickleabilityTestCase(TestCase):
@@ -212,6 +212,12 @@ class PickleabilityTestCase(TestCase):
         qs = Happening.objects.annotate(latest_time=models.Max('when'))
         self.assert_pickles(qs)
 
+    def test_filter_deferred(self):
+        qs = Happening.objects.all()
+        qs._defer_next_filter = True
+        qs = qs.filter(id=0)
+        self.assert_pickles(qs)
+
     def test_missing_django_version_unpickling(self):
         """
         #21430 -- Verifies a warning is raised for querysets that are
@@ -231,6 +237,12 @@ class PickleabilityTestCase(TestCase):
         msg = "Pickled queryset instance's Django version 1.0 does not match the current version %s." % get_version()
         with self.assertRaisesMessage(RuntimeWarning, msg):
             pickle.loads(pickle.dumps(qs))
+
+    def test_order_by_model_with_abstract_inheritance_and_meta_ordering(self):
+        group = Group.objects.create(name='test')
+        event = MyEvent.objects.create(title='test event', group=group)
+        event.edition_set.create()
+        self.assert_pickles(event.edition_set.order_by('event'))
 
 
 class InLookupTests(TestCase):

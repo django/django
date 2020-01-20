@@ -14,7 +14,7 @@ from django.db.backends.base.schema import BaseDatabaseSchemaEditor
 from django.db.backends.utils import truncate_name
 from django.db.migrations.exceptions import InconsistentMigrationHistory
 from django.db.migrations.recorder import MigrationRecorder
-from django.test import TestCase, override_settings
+from django.test import TestCase, override_settings, skipUnlessDBFeature
 
 from .models import UnicodeModel, UnserializableModel
 from .routers import TestRouter
@@ -129,7 +129,7 @@ class MigrateTests(MigrationTestBase):
         that check.
         """
         # Make sure no tables are created
-        for db in connections:
+        for db in self.databases:
             self.assertTableNotExists("migrations_author", using=db)
             self.assertTableNotExists("migrations_tribble", using=db)
         # Run the migrations to 0001 only
@@ -192,10 +192,36 @@ class MigrateTests(MigrationTestBase):
         call_command("migrate", "migrations", "zero", verbosity=0)
         call_command("migrate", "migrations", "zero", verbosity=0, database="other")
         # Make sure it's all gone
-        for db in connections:
+        for db in self.databases:
             self.assertTableNotExists("migrations_author", using=db)
             self.assertTableNotExists("migrations_tribble", using=db)
             self.assertTableNotExists("migrations_book", using=db)
+
+    @skipUnlessDBFeature('ignores_table_name_case')
+    def test_migrate_fake_initial_case_insensitive(self):
+        with override_settings(MIGRATION_MODULES={
+            'migrations': 'migrations.test_fake_initial_case_insensitive.initial',
+        }):
+            call_command('migrate', 'migrations', '0001', verbosity=0)
+            call_command('migrate', 'migrations', 'zero', fake=True, verbosity=0)
+
+        with override_settings(MIGRATION_MODULES={
+            'migrations': 'migrations.test_fake_initial_case_insensitive.fake_initial',
+        }):
+            out = io.StringIO()
+            call_command(
+                'migrate',
+                'migrations',
+                '0001',
+                fake_initial=True,
+                stdout=out,
+                verbosity=1,
+                no_color=True,
+            )
+            self.assertIn(
+                'migrations.0001_initial... faked',
+                out.getvalue().lower(),
+            )
 
     @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations_fake_split_initial"})
     def test_migrate_fake_split_initial(self):
@@ -327,53 +353,77 @@ class MigrateTests(MigrationTestBase):
             "    Raw SQL operation -> ['SELECT * FROM migrations_author']\n",
             out.getvalue()
         )
-        # Migrate to the third migration.
-        call_command('migrate', 'migrations', '0003', verbosity=0)
-        out = io.StringIO()
-        # Show the plan for when there is nothing to apply.
-        call_command('migrate', 'migrations', '0003', plan=True, stdout=out, no_color=True)
-        self.assertEqual(
-            'Planned operations:\n'
-            '  No planned migration operations.\n',
-            out.getvalue()
-        )
-        out = io.StringIO()
-        # Show the plan for reverse migration back to 0001.
-        call_command('migrate', 'migrations', '0001', plan=True, stdout=out, no_color=True)
-        self.assertEqual(
-            'Planned operations:\n'
-            'migrations.0003_third\n'
-            '    Undo Create model Author\n'
-            "    Raw SQL operation -> ['SELECT * FROM migrations_book']\n"
-            'migrations.0002_second\n'
-            '    Undo Create model Book\n'
-            "    Raw SQL operation -> ['SELECT * FROM migrations_salamand…\n",
-            out.getvalue()
-        )
-        out = io.StringIO()
-        # Show the migration plan to fourth, with truncated details.
-        call_command('migrate', 'migrations', '0004', plan=True, stdout=out, no_color=True)
-        self.assertEqual(
-            'Planned operations:\n'
-            'migrations.0004_fourth\n'
-            '    Raw SQL operation -> SELECT * FROM migrations_author WHE…\n',
-            out.getvalue()
-        )
-        # Show the plan when an operation is irreversible.
-        # Migrate to the fourth migration.
-        call_command('migrate', 'migrations', '0004', verbosity=0)
-        out = io.StringIO()
-        call_command('migrate', 'migrations', '0003', plan=True, stdout=out, no_color=True)
-        self.assertEqual(
-            'Planned operations:\n'
-            'migrations.0004_fourth\n'
-            '    Raw SQL operation -> IRREVERSIBLE\n',
-            out.getvalue()
-        )
-        # Cleanup by unmigrating everything: fake the irreversible, then
-        # migrate all to zero.
-        call_command('migrate', 'migrations', '0003', fake=True, verbosity=0)
-        call_command('migrate', 'migrations', 'zero', verbosity=0)
+        try:
+            # Migrate to the third migration.
+            call_command('migrate', 'migrations', '0003', verbosity=0)
+            out = io.StringIO()
+            # Show the plan for when there is nothing to apply.
+            call_command('migrate', 'migrations', '0003', plan=True, stdout=out, no_color=True)
+            self.assertEqual(
+                'Planned operations:\n'
+                '  No planned migration operations.\n',
+                out.getvalue()
+            )
+            out = io.StringIO()
+            # Show the plan for reverse migration back to 0001.
+            call_command('migrate', 'migrations', '0001', plan=True, stdout=out, no_color=True)
+            self.assertEqual(
+                'Planned operations:\n'
+                'migrations.0003_third\n'
+                '    Undo Create model Author\n'
+                "    Raw SQL operation -> ['SELECT * FROM migrations_book']\n"
+                'migrations.0002_second\n'
+                '    Undo Create model Book\n'
+                "    Raw SQL operation -> ['SELECT * FROM migrations_salamand…\n",
+                out.getvalue()
+            )
+            out = io.StringIO()
+            # Show the migration plan to fourth, with truncated details.
+            call_command('migrate', 'migrations', '0004', plan=True, stdout=out, no_color=True)
+            self.assertEqual(
+                'Planned operations:\n'
+                'migrations.0004_fourth\n'
+                '    Raw SQL operation -> SELECT * FROM migrations_author WHE…\n',
+                out.getvalue()
+            )
+            # Show the plan when an operation is irreversible.
+            # Migrate to the fourth migration.
+            call_command('migrate', 'migrations', '0004', verbosity=0)
+            out = io.StringIO()
+            call_command('migrate', 'migrations', '0003', plan=True, stdout=out, no_color=True)
+            self.assertEqual(
+                'Planned operations:\n'
+                'migrations.0004_fourth\n'
+                '    Raw SQL operation -> IRREVERSIBLE\n',
+                out.getvalue()
+            )
+            out = io.StringIO()
+            call_command('migrate', 'migrations', '0005', plan=True, stdout=out, no_color=True)
+            # Operation is marked as irreversible only in the revert plan.
+            self.assertEqual(
+                'Planned operations:\n'
+                'migrations.0005_fifth\n'
+                '    Raw Python operation\n'
+                '    Raw Python operation\n'
+                '    Raw Python operation -> Feed salamander.\n',
+                out.getvalue()
+            )
+            call_command('migrate', 'migrations', '0005', verbosity=0)
+            out = io.StringIO()
+            call_command('migrate', 'migrations', '0004', plan=True, stdout=out, no_color=True)
+            self.assertEqual(
+                'Planned operations:\n'
+                'migrations.0005_fifth\n'
+                '    Raw Python operation -> IRREVERSIBLE\n'
+                '    Raw Python operation -> IRREVERSIBLE\n'
+                '    Raw Python operation\n',
+                out.getvalue()
+            )
+        finally:
+            # Cleanup by unmigrating everything: fake the irreversible, then
+            # migrate all to zero.
+            call_command('migrate', 'migrations', '0003', fake=True, verbosity=0)
+            call_command('migrate', 'migrations', 'zero', verbosity=0)
 
     @override_settings(MIGRATION_MODULES={'migrations': 'migrations.test_migrations_empty'})
     def test_showmigrations_no_migrations(self):
@@ -881,7 +931,7 @@ class MakeMigrationsTests(MigrationTestBase):
 
                 # With a router that doesn't prohibit migrating 'other',
                 # consistency is checked.
-                with self.settings(DATABASE_ROUTERS=['migrations.routers.EmptyRouter']):
+                with self.settings(DATABASE_ROUTERS=['migrations.routers.DefaultOtherRouter']):
                     with self.assertRaisesMessage(Exception, 'Other connection'):
                         call_command('makemigrations', 'migrations', verbosity=0)
                 self.assertEqual(has_table.call_count, 4)  # 'default' and 'other'
@@ -894,12 +944,14 @@ class MakeMigrationsTests(MigrationTestBase):
                 allow_migrate.assert_any_call('other', 'migrations', model_name='UnicodeModel')
                 # allow_migrate() is called with the correct arguments.
                 self.assertGreater(len(allow_migrate.mock_calls), 0)
+                called_aliases = set()
                 for mock_call in allow_migrate.mock_calls:
                     _, call_args, call_kwargs = mock_call
                     connection_alias, app_name = call_args
-                    self.assertIn(connection_alias, ['default', 'other'])
+                    called_aliases.add(connection_alias)
                     # Raises an error if invalid app_name/model_name occurs.
                     apps.get_app_config(app_name).get_model(call_kwargs['model_name'])
+                self.assertEqual(called_aliases, set(connections))
                 self.assertEqual(has_table.call_count, 4)
 
     def test_failing_migration(self):

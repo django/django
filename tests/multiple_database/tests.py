@@ -7,7 +7,7 @@ from unittest.mock import Mock
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.core import management
-from django.db import DEFAULT_DB_ALIAS, connections, router, transaction
+from django.db import DEFAULT_DB_ALIAS, router, transaction
 from django.db.models import signals
 from django.db.utils import ConnectionRouter
 from django.test import SimpleTestCase, TestCase, override_settings
@@ -1632,7 +1632,7 @@ class PickleQuerySetTestCase(TestCase):
     databases = {'default', 'other'}
 
     def test_pickling(self):
-        for db in connections:
+        for db in self.databases:
             Book.objects.using(db).create(title='Dive into Python', published=datetime.date(2009, 5, 4))
             qs = Book.objects.all()
             self.assertEqual(qs.db, pickle.loads(pickle.dumps(qs)).db)

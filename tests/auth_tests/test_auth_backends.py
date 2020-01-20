@@ -13,6 +13,7 @@ from django.http import HttpRequest
 from django.test import (
     SimpleTestCase, TestCase, modify_settings, override_settings,
 )
+from django.views.decorators.debug import sensitive_variables
 
 from .models import (
     CustomPermissionsUser, CustomUser, CustomUserWithoutIsActiveField,
@@ -642,6 +643,12 @@ class SkippedBackend:
         pass
 
 
+class SkippedBackendWithDecoratedMethod:
+    @sensitive_variables()
+    def authenticate(self):
+        pass
+
+
 class AuthenticateTests(TestCase):
     @classmethod
     def setUpTestData(cls):
@@ -662,6 +669,13 @@ class AuthenticateTests(TestCase):
         A backend (SkippedBackend) is ignored if it doesn't accept the
         credentials as arguments.
         """
+        self.assertEqual(authenticate(username='test', password='test'), self.user1)
+
+    @override_settings(AUTHENTICATION_BACKENDS=(
+        'auth_tests.test_auth_backends.SkippedBackendWithDecoratedMethod',
+        'django.contrib.auth.backends.ModelBackend',
+    ))
+    def test_skips_backends_with_decorated_method(self):
         self.assertEqual(authenticate(username='test', password='test'), self.user1)
 
 

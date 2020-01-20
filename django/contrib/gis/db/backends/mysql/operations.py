@@ -29,7 +29,7 @@ class MySQLOperations(BaseSpatialOperations, DatabaseOperations):
 
     @cached_property
     def gis_operators(self):
-        return {
+        operators = {
             'bbcontains': SpatialOperator(func='MBRContains'),  # For consistency w/PostGIS API
             'bboverlaps': SpatialOperator(func='MBROverlaps'),  # ...
             'contained': SpatialOperator(func='MBRWithin'),  # ...
@@ -44,6 +44,9 @@ class MySQLOperations(BaseSpatialOperations, DatabaseOperations):
             'touches': SpatialOperator(func='ST_Touches'),
             'within': SpatialOperator(func='ST_Within'),
         }
+        if self.connection.mysql_is_mariadb:
+            operators['relate'] = SpatialOperator(func='ST_Relate')
+        return operators
 
     disallowed_aggregates = (
         aggregates.Collect, aggregates.Extent, aggregates.Extent3D,

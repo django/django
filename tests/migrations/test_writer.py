@@ -26,6 +26,11 @@ from django.utils.translation import gettext_lazy as _
 from .models import FoodManager, FoodQuerySet
 
 
+class DeconstructibleInstances:
+    def deconstruct(self):
+        return ('DeconstructibleInstances', [], {})
+
+
 class Money(decimal.Decimal):
     def deconstruct(self):
         return (
@@ -39,6 +44,26 @@ class TestModel1:
     def upload_to(self):
         return '/somewhere/dynamic/'
     thing = models.FileField(upload_to=upload_to)
+
+
+class TextEnum(enum.Enum):
+    A = 'a-value'
+    B = 'value-b'
+
+
+class TextTranslatedEnum(enum.Enum):
+    A = _('a-value')
+    B = _('value-b')
+
+
+class BinaryEnum(enum.Enum):
+    A = b'a-value'
+    B = b'value-b'
+
+
+class IntEnum(enum.IntEnum):
+    A = 1
+    B = 2
 
 
 class OperationWriterTests(SimpleTestCase):
@@ -164,6 +189,13 @@ class WriterTests(SimpleTestCase):
     """
     Tests the migration writer (makes migration files from Migration instances)
     """
+    class NestedEnum(enum.IntEnum):
+        A = 1
+        B = 2
+
+    class NestedChoices(models.TextChoices):
+        X = 'X', 'X value'
+        Y = 'Y', 'Y value'
 
     def safe_exec(self, string, value=None):
         d = {}
@@ -253,22 +285,6 @@ class WriterTests(SimpleTestCase):
         self.assertEqual(self.serialize_round_trip(lazy_pattern), pattern)
 
     def test_serialize_enums(self):
-        class TextEnum(enum.Enum):
-            A = 'a-value'
-            B = 'value-b'
-
-        class TextTranslatedEnum(enum.Enum):
-            A = _('a-value')
-            B = _('value-b')
-
-        class BinaryEnum(enum.Enum):
-            A = b'a-value'
-            B = b'value-b'
-
-        class IntEnum(enum.IntEnum):
-            A = 1
-            B = 2
-
         self.assertSerializedResultEqual(
             TextEnum.A,
             ("migrations.test_writer.TextEnum['A']", {'import migrations.test_writer'})
@@ -285,6 +301,14 @@ class WriterTests(SimpleTestCase):
             IntEnum.B,
             ("migrations.test_writer.IntEnum['B']", {'import migrations.test_writer'})
         )
+        self.assertSerializedResultEqual(
+            self.NestedEnum.A,
+            (
+                "migrations.test_writer.WriterTests.NestedEnum['A']",
+                {'import migrations.test_writer'},
+            ),
+        )
+        self.assertSerializedEqual(self.NestedEnum.A)
 
         field = models.CharField(default=TextEnum.B, choices=[(m.value, m) for m in TextEnum])
         string = MigrationWriter.serialize(field)[0]
@@ -367,6 +391,18 @@ class WriterTests(SimpleTestCase):
             "(datetime.date(1969, 11, 19), 'Second date')], "
             "default=datetime.date(1969, 11, 19))"
         )
+
+    def test_serialize_nested_class(self):
+        for nested_cls in [self.NestedEnum, self.NestedChoices]:
+            cls_name = nested_cls.__name__
+            with self.subTest(cls_name):
+                self.assertSerializedResultEqual(
+                    nested_cls,
+                    (
+                        "migrations.test_writer.WriterTests.%s" % cls_name,
+                        {'import migrations.test_writer'},
+                    ),
+                )
 
     def test_serialize_uuid(self):
         self.assertSerializedEqual(uuid.uuid1())
@@ -711,10 +747,6 @@ class WriterTests(SimpleTestCase):
         # Yes, it doesn't make sense to use a class as a default for a
         # CharField. It does make sense for custom fields though, for example
         # an enumfield that takes the enum class as an argument.
-        class DeconstructibleInstances:
-            def deconstruct(self):
-                return ('DeconstructibleInstances', [], {})
-
         string = MigrationWriter.serialize(models.CharField(default=DeconstructibleInstances))[0]
         self.assertEqual(string, "models.CharField(default=migrations.test_writer.DeconstructibleInstances)")
 

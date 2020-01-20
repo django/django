@@ -31,9 +31,57 @@ try:
     from django.contrib.postgres.forms import (
         SimpleArrayField, SplitArrayField, SplitArrayWidget,
     )
+    from django.db.backends.postgresql.base import PSYCOPG2_VERSION
     from psycopg2.extras import NumericRange
 except ImportError:
     pass
+
+
+@isolate_apps('postgres_tests')
+class BasicTests(PostgreSQLSimpleTestCase):
+    def test_get_field_display(self):
+        class MyModel(PostgreSQLModel):
+            field = ArrayField(
+                models.CharField(max_length=16),
+                choices=[
+                    ['Media', [(['vinyl', 'cd'], 'Audio')]],
+                    (('mp3', 'mp4'), 'Digital'),
+                ],
+            )
+
+        tests = (
+            (['vinyl', 'cd'], 'Audio'),
+            (('mp3', 'mp4'), 'Digital'),
+            (('a', 'b'), "('a', 'b')"),
+            (['c', 'd'], "['c', 'd']"),
+        )
+        for value, display in tests:
+            with self.subTest(value=value, display=display):
+                instance = MyModel(field=value)
+                self.assertEqual(instance.get_field_display(), display)
+
+    def test_get_field_display_nested_array(self):
+        class MyModel(PostgreSQLModel):
+            field = ArrayField(
+                ArrayField(models.CharField(max_length=16)),
+                choices=[
+                    [
+                        'Media',
+                        [([['vinyl', 'cd'], ('x',)], 'Audio')],
+                    ],
+                    ((['mp3'], ('mp4',)), 'Digital'),
+                ],
+            )
+        tests = (
+            ([['vinyl', 'cd'], ('x',)], 'Audio'),
+            ((['mp3'], ('mp4',)), 'Digital'),
+            ((('a', 'b'), ('c',)), "(('a', 'b'), ('c',))"),
+            ([['a', 'b'], ['c']], "[['a', 'b'], ['c']]"),
+        )
+        for value, display in tests:
+            with self.subTest(value=value, display=display):
+                instance = MyModel(field=value)
+                self.assertEqual(instance.get_field_display(), display)
 
 
 class TestSaveLoad(PostgreSQLTestCase):
@@ -139,6 +187,14 @@ class TestSaveLoad(PostgreSQLTestCase):
         field = instance._meta.get_field('field')
         self.assertEqual(field.model, IntegerArrayModel)
         self.assertEqual(field.base_field.model, IntegerArrayModel)
+
+    def test_nested_nullable_base_field(self):
+        if PSYCOPG2_VERSION < (2, 7, 5):
+            self.skipTest('See https://github.com/psycopg/psycopg2/issues/325')
+        instance = NullableIntegerArrayModel.objects.create(
+            field_nested=[[None, None], [None, None]],
+        )
+        self.assertEqual(instance.field_nested, [[None, None], [None, None]])
 
 
 class TestQuerying(PostgreSQLTestCase):
@@ -551,7 +607,7 @@ class TestChecks(PostgreSQLSimpleTestCase):
                 ),
                 hint='Use a callable instead, e.g., use `list` instead of `[]`.',
                 obj=MyModel._meta.get_field('field'),
-                id='postgres.E003',
+                id='fields.E010',
             )
         ])
 
@@ -582,6 +638,20 @@ class TestChecks(PostgreSQLSimpleTestCase):
         # The inner CharField is missing a max_length.
         self.assertEqual(errors[0].id, 'postgres.E001')
         self.assertIn('max_length', errors[0].msg)
+
+    def test_choices_tuple_list(self):
+        class MyModel(PostgreSQLModel):
+            field = ArrayField(
+                models.CharField(max_length=16),
+                choices=[
+                    [
+                        'Media',
+                        [(['vinyl', 'cd'], 'Audio'), (('vhs', 'dvd'), 'Video')],
+                    ],
+                    (['mp3', 'mp4'], 'Digital'),
+                ],
+            )
+        self.assertEqual(MyModel._meta.get_field('field').check(), [])
 
 
 @unittest.skipUnless(connection.vendor == 'postgresql', "PostgreSQL specific tests")
@@ -961,9 +1031,39 @@ class TestSplitFormField(PostgreSQLSimpleTestCase):
                 model = IntegerArrayModel
                 fields = ('field',)
 
-        obj = IntegerArrayModel(field=[1, 2])
-        form = Form({'field_0': '1', 'field_1': '2'}, instance=obj)
-        self.assertFalse(form.has_changed())
+        tests = [
+            ({}, {'field_0': '', 'field_1': ''}, True),
+            ({'field': None}, {'field_0': '', 'field_1': ''}, True),
+            ({'field': [1]}, {'field_0': '', 'field_1': ''}, True),
+            ({'field': [1]}, {'field_0': '1', 'field_1': '0'}, True),
+            ({'field': [1, 2]}, {'field_0': '1', 'field_1': '2'}, False),
+            ({'field': [1, 2]}, {'field_0': 'a', 'field_1': 'b'}, True),
+        ]
+        for initial, data, expected_result in tests:
+            with self.subTest(initial=initial, data=data):
+                obj = IntegerArrayModel(**initial)
+                form = Form(data, instance=obj)
+                self.assertIs(form.has_changed(), expected_result)
+
+    def test_splitarrayfield_remove_trailing_nulls_has_changed(self):
+        class Form(forms.ModelForm):
+            field = SplitArrayField(forms.IntegerField(), required=False, size=2, remove_trailing_nulls=True)
+
+            class Meta:
+                model = IntegerArrayModel
+                fields = ('field',)
+
+        tests = [
+            ({}, {'field_0': '', 'field_1': ''}, False),
+            ({'field': None}, {'field_0': '', 'field_1': ''}, False),
+            ({'field': []}, {'field_0': '', 'field_1': ''}, False),
+            ({'field': [1]}, {'field_0': '1', 'field_1': ''}, False),
+        ]
+        for initial, data, expected_result in tests:
+            with self.subTest(initial=initial, data=data):
+                obj = IntegerArrayModel(**initial)
+                form = Form(data, instance=obj)
+                self.assertIs(form.has_changed(), expected_result)
 
 
 class TestSplitFormWidget(PostgreSQLWidgetTestCase):
@@ -1001,6 +1101,17 @@ class TestSplitFormWidget(PostgreSQLWidgetTestCase):
                     ]
                 }
             }
+        )
+
+    def test_checkbox_get_context_attrs(self):
+        context = SplitArrayWidget(
+            forms.CheckboxInput(),
+            size=2,
+        ).get_context('name', [True, False])
+        self.assertEqual(context['widget']['value'], '[True, False]')
+        self.assertEqual(
+            [subwidget['attrs'] for subwidget in context['widget']['subwidgets']],
+            [{'checked': True}, {}]
         )
 
     def test_render(self):

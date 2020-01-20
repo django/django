@@ -47,7 +47,6 @@ from .features import DatabaseFeatures                      # NOQA isort:skip
 from .introspection import DatabaseIntrospection            # NOQA isort:skip
 from .operations import DatabaseOperations                  # NOQA isort:skip
 from .schema import DatabaseSchemaEditor                    # NOQA isort:skip
-from .utils import utc_tzinfo_factory                       # NOQA isort:skip
 
 psycopg2.extensions.register_adapter(SafeString, psycopg2.extensions.QuotedString)
 psycopg2.extras.register_uuid()
@@ -89,6 +88,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         'GenericIPAddressField': 'inet',
         'NullBooleanField': 'boolean',
         'OneToOneField': 'integer',
+        'PositiveBigIntegerField': 'bigint',
         'PositiveIntegerField': 'integer',
         'PositiveSmallIntegerField': 'smallint',
         'SlugField': 'varchar(%(max_length)s)',
@@ -99,6 +99,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         'UUIDField': 'uuid',
     }
     data_type_check_constraints = {
+        'PositiveBigIntegerField': '"%(column)s" >= 0',
         'PositiveIntegerField': '"%(column)s" >= 0',
         'PositiveSmallIntegerField': '"%(column)s" >= 0',
     }
@@ -229,8 +230,11 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             cursor = self.connection.cursor(name, scrollable=False, withhold=self.connection.autocommit)
         else:
             cursor = self.connection.cursor()
-        cursor.tzinfo_factory = utc_tzinfo_factory if settings.USE_TZ else None
+        cursor.tzinfo_factory = self.tzinfo_factory if settings.USE_TZ else None
         return cursor
+
+    def tzinfo_factory(self, offset):
+        return self.timezone
 
     @async_unsafe
     def chunked_cursor(self):

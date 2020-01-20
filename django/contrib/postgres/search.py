@@ -134,6 +134,7 @@ class SearchQuery(SearchQueryCombinable, Value):
         'plain': 'plainto_tsquery',
         'phrase': 'phraseto_tsquery',
         'raw': 'to_tsquery',
+        'websearch': 'websearch_to_tsquery',
     }
 
     def __init__(self, value, output_field=None, *, config=None, invert=False, search_type='plain'):

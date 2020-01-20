@@ -140,6 +140,8 @@ Model fields
 * **fields.E008**: All ``validators`` must be callable.
 * **fields.E009**: ``max_length`` is too small to fit the longest value in
   ``choices`` (``<count>`` characters).
+* **fields.E010**: ``<field>`` default should be a callable instead of an
+  instance so that it's not shared between all field instances.
 * **fields.E100**: ``AutoField``\s must set primary_key=True.
 * **fields.E110**: ``BooleanField``\s do not accept null values. *This check
   appeared before support for null values was added in Django 2.1.*
@@ -631,7 +633,7 @@ with the admin site:
 * **admin.E129**: ``<modeladmin>`` must define a ``has_<foo>_permission()``
   method for the ``<action>`` action.
 * **admin.E130**: ``__name__`` attributes of actions defined in
-  ``<modeladmin>`` must be unique.
+  ``<modeladmin>`` must be unique. Name ``<name>`` is not unique.
 
 ``InlineModelAdmin``
 ~~~~~~~~~~~~~~~~~~~~
@@ -643,7 +645,8 @@ inline on a :class:`~django.contrib.admin.ModelAdmin`.
 * **admin.E201**: Cannot exclude the field ``<field name>``, because it is the
   foreign key to the parent model ``<app_label>.<model>``.
 * **admin.E202**: ``<model>`` has no ``ForeignKey`` to ``<parent model>``./
-  ``<model>`` has more than one ``ForeignKey`` to ``<parent model>``.
+  ``<model>`` has more than one ``ForeignKey`` to ``<parent model>``. You must
+  specify a ``fk_name`` attribute.
 * **admin.E203**: The value of ``extra`` must be an integer.
 * **admin.E204**: The value of ``max_num`` must be an integer.
 * **admin.E205**: The value of ``min_num`` must be an integer.
@@ -747,7 +750,8 @@ fields:
 * **postgres.E001**: Base field for array has errors: ...
 * **postgres.E002**: Base field for array cannot be a related field.
 * **postgres.E003**: ``<field>`` default should be a callable instead of an
-  instance so that it's not shared between all field instances.
+  instance so that it's not shared between all field instances. *This check was
+  changed to* ``fields.E010`` *in Django 3.1*.
 
 ``sites``
 ---------

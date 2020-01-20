@@ -3,7 +3,7 @@ import uuid
 from django.core.exceptions import ImproperlyConfigured
 from django.test import SimpleTestCase
 from django.test.utils import override_settings
-from django.urls import Resolver404, path, resolve, reverse
+from django.urls import NoReverseMatch, Resolver404, path, resolve, reverse
 
 from .converters import DynamicConverter
 from .views import empty_view
@@ -67,6 +67,16 @@ class SimplifiedURLTests(SimpleTestCase):
                     match.route,
                     r'^regex_optional/(?P<arg1>\d+)/(?:(?P<arg2>\d+)/)?',
                 )
+
+    def test_re_path_with_missing_optional_parameter(self):
+        match = resolve('/regex_only_optional/')
+        self.assertEqual(match.url_name, 'regex_only_optional')
+        self.assertEqual(match.kwargs, {})
+        self.assertEqual(match.args, ())
+        self.assertEqual(
+            match.route,
+            r'^regex_only_optional/(?:(?P<arg1>\d+)/)?',
+        )
 
     def test_path_lookup_with_inclusion(self):
         match = resolve('/included_urls/extra/something/')
@@ -190,6 +200,54 @@ class ConverterTests(SimpleTestCase):
                     resolve(url)
 
 
+@override_settings(ROOT_URLCONF='urlpatterns.path_same_name_urls')
+class SameNameTests(SimpleTestCase):
+    def test_matching_urls_same_name(self):
+        @DynamicConverter.register_to_url
+        def requires_tiny_int(value):
+            if value > 5:
+                raise ValueError
+            return value
+
+        tests = [
+            ('number_of_args', [
+                ([], {}, '0/'),
+                ([1], {}, '1/1/'),
+            ]),
+            ('kwargs_names', [
+                ([], {'a': 1}, 'a/1/'),
+                ([], {'b': 1}, 'b/1/'),
+            ]),
+            ('converter', [
+                (['a/b'], {}, 'path/a/b/'),
+                (['a b'], {}, 'str/a%20b/'),
+                (['a-b'], {}, 'slug/a-b/'),
+                (['2'], {}, 'int/2/'),
+                (
+                    ['39da9369-838e-4750-91a5-f7805cd82839'],
+                    {},
+                    'uuid/39da9369-838e-4750-91a5-f7805cd82839/'
+                ),
+            ]),
+            ('regex', [
+                (['ABC'], {}, 'uppercase/ABC/'),
+                (['abc'], {}, 'lowercase/abc/'),
+            ]),
+            ('converter_to_url', [
+                ([6], {}, 'int/6/'),
+                ([1], {}, 'tiny_int/1/'),
+            ]),
+        ]
+        for url_name, cases in tests:
+            for args, kwargs, url_suffix in cases:
+                expected_url = '/%s/%s' % (url_name, url_suffix)
+                with self.subTest(url=expected_url):
+                    self.assertEqual(
+                        reverse(url_name, args=args, kwargs=kwargs),
+                        expected_url,
+                    )
+
+
 class ParameterRestrictionTests(SimpleTestCase):
     def test_non_identifier_parameter_name_causes_exception(self):
         msg = (
@@ -224,9 +282,16 @@ class ConversionExceptionTests(SimpleTestCase):
         with self.assertRaisesMessage(TypeError, 'This type error propagates.'):
             resolve('/dynamic/abc/')
 
-    def test_reverse_value_error_propagates(self):
+    def test_reverse_value_error_means_no_match(self):
         @DynamicConverter.register_to_url
         def raises_value_error(value):
-            raise ValueError('This value error propagates.')
-        with self.assertRaisesMessage(ValueError, 'This value error propagates.'):
+            raise ValueError
+        with self.assertRaises(NoReverseMatch):
+            reverse('dynamic', kwargs={'value': object()})
+
+    def test_reverse_type_error_propagates(self):
+        @DynamicConverter.register_to_url
+        def raises_type_error(value):
+            raise TypeError('This type error propagates.')
+        with self.assertRaisesMessage(TypeError, 'This type error propagates.'):
             reverse('dynamic', kwargs={'value': object()})

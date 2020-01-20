@@ -33,7 +33,9 @@ Minor features
 :mod:`django.contrib.admin`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* The new ``django.contrib.admin.EmptyFieldListFilter`` for
+  :attr:`.ModelAdmin.list_filter` allows filtering on empty values (empty
+  strings and nulls) in the admin changelist view.
 
 :mod:`django.contrib.admindocs`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -59,7 +61,15 @@ Minor features
 :mod:`django.contrib.gis`
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* :lookup:`relate` lookup is now supported on MariaDB.
+
+* Added the :attr:`.LinearRing.is_counterclockwise` property.
+
+* :class:`~django.contrib.gis.db.models.functions.AsGeoJSON` is now supported
+  on Oracle.
+
+* Added the :class:`~django.contrib.gis.db.models.functions.AsWKB` and
+  :class:`~django.contrib.gis.db.models.functions.AsWKT` functions.
 
 :mod:`django.contrib.messages`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -69,7 +79,28 @@ Minor features
 :mod:`django.contrib.postgres`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* The new :class:`~django.contrib.postgres.indexes.BloomIndex` class allows
+  creating ``bloom`` indexes in the database. The new
+  :class:`~django.contrib.postgres.operations.BloomExtension` migration
+  operation installs the ``bloom`` extension to add support for this index.
+
+* :meth:`~django.db.models.Model.get_FOO_display` now supports
+  :class:`~django.contrib.postgres.fields.ArrayField` and
+  :class:`~django.contrib.postgres.fields.RangeField`.
+
+* The new :lookup:`rangefield.lower_inc`, :lookup:`rangefield.lower_inf`,
+  :lookup:`rangefield.upper_inc`, and :lookup:`rangefield.upper_inf` allows
+  querying :class:`~django.contrib.postgres.fields.RangeField` by a bound type.
+
+* :lookup:`rangefield.contained_by` now supports
+  :class:`~django.db.models.SmallAutoField`,
+  :class:`~django.db.models.AutoField`,
+  :class:`~django.db.models.BigAutoField`,
+  :class:`~django.db.models.SmallIntegerField`, and
+  :class:`~django.db.models.DecimalField`.
+
+* :class:`~django.contrib.postgres.search.SearchQuery` now supports
+  ``'websearch'`` search type on PostgreSQL 11+.
 
 :mod:`django.contrib.redirects`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -79,7 +110,9 @@ Minor features
 :mod:`django.contrib.sessions`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* The :setting:`SESSION_COOKIE_SAMESITE` setting now allows ``'None'`` (string)
+  value to explicitly state that the cookie is sent with all same-site and
+  cross-site requests.
 
 :mod:`django.contrib.sitemaps`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -94,7 +127,7 @@ Minor features
 :mod:`django.contrib.staticfiles`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* The :setting:`STATICFILES_DIRS` setting now supports :class:`pathlib.Path`.
 
 :mod:`django.contrib.syndication`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -104,22 +137,50 @@ Minor features
 Cache
 ~~~~~
 
-* ...
+* The :func:`~django.views.decorators.cache.cache_control` decorator and
+  :func:`~django.utils.cache.patch_cache_control` method now support multiple
+  field names in the ``no-cache`` directive for the ``Cache-Control`` header,
+  according to :rfc:`7234#section-5.2.2.2`.
+
+* :meth:`~django.core.caches.cache.delete` now returns ``True`` if the key was
+  successfully deleted, ``False`` otherwise.
 
 CSRF
 ~~~~
 
-* ...
+* The :setting:`CSRF_COOKIE_SAMESITE` setting now allows ``'None'`` (string)
+  value to explicitly state that the cookie is sent with all same-site and
+  cross-site requests.
 
 Email
 ~~~~~
 
-* ...
+* The :setting:`EMAIL_FILE_PATH` setting, used by the :ref:`file email backend
+  <topic-email-file-backend>`, now supports :class:`pathlib.Path`.
+
+Error Reporting
+~~~~~~~~~~~~~~~
+
+* :class:`django.views.debug.SafeExceptionReporterFilter` now filters sensitive
+  values from ``request.META`` in exception reports.
+
+* The new :attr:`.SafeExceptionReporterFilter.cleansed_substitute` and
+  :attr:`.SafeExceptionReporterFilter.hidden_settings` attributes allow
+  customization of sensitive settings and ``request.META`` filtering in
+  exception reports.
+
+* The technical 404 debug view now respects
+  :setting:`DEFAULT_EXCEPTION_REPORTER_FILTER` when applying settings
+  filtering.
+
+* The new :setting:`DEFAULT_EXCEPTION_REPORTER` allows providing a
+  :class:`django.views.debug.ExceptionReporter` subclass to customize exception
+  report generation. See :ref:`custom-error-reports` for details.
 
 File Storage
 ~~~~~~~~~~~~
 
-* ...
+* ``FileSystemStorage.save()`` method now supports :class:`pathlib.Path`.
 
 File Uploads
 ~~~~~~~~~~~~
@@ -130,7 +191,18 @@ File Uploads
 Forms
 ~~~~~
 
-* ...
+* :class:`~django.forms.ModelChoiceIterator`, used by
+  :class:`~django.forms.ModelChoiceField` and
+  :class:`~django.forms.ModelMultipleChoiceField`, now uses
+  :class:`~django.forms.ModelChoiceIteratorValue` that can be used by widgets
+  to access model instances. See :ref:`iterating-relationship-choices` for
+  details.
+
+* :class:`django.forms.DateTimeField` now accepts dates in a subset of ISO 8601
+  datetime formats, including optional timezone (e.g. ``2019-10-10T06:47``,
+  ``2019-10-10T06:47:23+04:00``, or ``2019-10-10T06:47:23Z``). Additionally, it
+  now uses ``DATE_INPUT_FORMATS`` in addition to ``DATETIME_INPUT_FORMATS``
+  when converting a field input to a ``datetime`` value.
 
 Generic Views
 ~~~~~~~~~~~~~
@@ -140,7 +212,11 @@ Generic Views
 Internationalization
 ~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* The :setting:`LANGUAGE_COOKIE_SAMESITE` setting now allows ``'None'``
+  (string) value to explicitly state that the cookie is sent with all same-site
+  and cross-site requests.
+
+* Added support and translations for the Algerian Arabic language.
 
 Logging
 ~~~~~~~
@@ -155,7 +231,8 @@ Management Commands
 Migrations
 ~~~~~~~~~~
 
-* ...
+* Migrations are now loaded also from directories without ``__init__.py``
+  files.
 
 Models
 ~~~~~~
@@ -165,15 +242,42 @@ Models
   :class:`~django.db.models.DateTimeField`, and the new :lookup:`iso_week_day`
   lookup allows querying by an ISO-8601 day of week.
 
+* :meth:`.QuerySet.explain` now supports:
+
+  * ``TREE`` format on MySQL 8.0.16+,
+  * ``analyze`` option on MySQL 8.0.18+ and MariaDB.
+
+* Added :class:`~django.db.models.PositiveBigIntegerField` which acts much like
+  a :class:`~django.db.models.PositiveIntegerField` except that it only allows
+  values under a certain (database-dependent) limit. Values from ``0`` to
+  ``9223372036854775807`` are safe in all databases supported by Django.
+
+* The new :class:`~django.db.models.RESTRICT` option for
+  :attr:`~django.db.models.ForeignKey.on_delete` argument of ``ForeignKey`` and
+  ``OneToOneField`` emulates the behavior of the SQL constraint ``ON DELETE
+  RESTRICT``.
+
+* :attr:`.CheckConstraint.check` now supports boolean expressions.
+
+* The :meth:`.RelatedManager.add`, :meth:`~.RelatedManager.create`, and
+  :meth:`~.RelatedManager.set` methods now accept callables as values in the
+  ``through_defaults`` argument.
+
 Pagination
 ~~~~~~~~~~
 
-* Support for iterating over ``Paginator`` was added.
+* :class:`~django.core.paginator.Paginator` can now be iterated over to yield
+  its pages.
 
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* If :setting:`ALLOWED_HOSTS` is empty and ``DEBUG=True``, subdomains of
+  localhost are now allowed in the ``Host`` header, e.g. ``static.localhost``.
+
+* :meth:`.HttpResponse.set_cookie` and :meth:`.HttpResponse.set_signed_cookie`
+  now allow using ``samesite='None'`` (string) to explicitly state that the
+  cookie is sent with all same-site and cross-site requests.
 
 Serialization
 ~~~~~~~~~~~~~
@@ -188,7 +292,10 @@ Signals
 Templates
 ~~~~~~~~~
 
-* ...
+* The renamed :ttag:`translate` and :ttag:`blocktranslate` template tags are
+  introduced for internationalization in template code. The older :ttag:`trans`
+  and :ttag:`blocktrans` template tags aliases continue to work, and will be
+  retained for the foreseeable future.
 
 Tests
 ~~~~~
@@ -196,16 +303,53 @@ Tests
 * Added the :setting:`TEST_PASSWORD_HASHER` setting to define a faster
   password algorithm when running tests. It uses a plain hasher by default.
   It's possible to opt-out from this behavior by setting its value to ``None``.
+* :class:`~django.test.SimpleTestCase` now implements the ``debug()`` method to
+  allow running a test without collecting the result and catching exceptions.
+  This can be used to support running tests under a debugger.
+
+* The new :setting:`MIGRATE <TEST_MIGRATE>` test database setting allows
+  disabling of migrations during a test database creation.
+
+* Django test runner now supports a :option:`test --buffer` option to discard
+  output for passing tests.
 
 URLs
 ~~~~
 
-* ...
+* :ref:`Path converters <registering-custom-path-converters>` can now raise
+  ``ValueError`` in ``to_url()`` to indicate no match when reversing URLs.
+
+Utilities
+~~~~~~~~~
+
+* :func:`~django.utils.encoding.filepath_to_uri` now supports
+  :class:`pathlib.Path`.
+
+* :func:`~django.utils.dateparse.parse_duration` now supports comma separators
+  for decimal fractions in the ISO 8601 format.
+
+* :func:`~django.utils.dateparse.parse_datetime`,
+  :func:`~django.utils.dateparse.parse_duration`, and
+  :func:`~django.utils.dateparse.parse_time` now support comma separators for
+  milliseconds.
 
 Validators
 ~~~~~~~~~~
 
 * ...
+
+Miscellaneous
+~~~~~~~~~~~~~
+
+* The SQLite backend now supports :class:`pathlib.Path` for the ``NAME``
+  setting.
+
+* The ``settings.py`` generated by the :djadmin:`startproject` command now uses
+  :class:`pathlib.Path` instead of :mod:`os.path` for building filesystem
+  paths.
+
+* The :setting:`TIME_ZONE <DATABASE-TIME_ZONE>` setting is now allowed on
+  databases that support time zones.
 
 .. _backwards-incompatible-3.1:
 
@@ -220,6 +364,17 @@ backends.
 
 * ``DatabaseOperations.fetch_returned_insert_columns()`` now requires an
   additional ``returning_params`` argument.
+
+* ``connection.timezone`` property is now ``'UTC'`` by default, or the
+  :setting:`TIME_ZONE <DATABASE-TIME_ZONE>` when :setting:`USE_TZ` is ``True``
+  on databases that support time zones. Previously, it was ``None`` on
+  databases that support time zones.
+
+Dropped support for MariaDB 10.1
+--------------------------------
+
+Upstream support for MariaDB 10.1 ends in October 2020. Django 3.1 supports
+MariaDB 10.2 and higher.
 
 Miscellaneous
 -------------
@@ -243,10 +398,48 @@ Miscellaneous
 * The compatibility imports of ``Context``, ``ContextPopException``, and
   ``RequestContext`` in ``django.template.base`` are removed.
 
+* The compatibility import of
+  ``django.contrib.admin.helpers.ACTION_CHECKBOX_NAME`` in
+  ``django.contrib.admin`` is removed.
+
 * The :setting:`STATIC_URL` and :setting:`MEDIA_URL` settings set to relative
   paths are now prefixed by the server-provided value of ``SCRIPT_NAME`` (or
   ``/`` if not set). This change should not affect settings set to valid URLs
   or absolute paths.
+
+* :class:`~django.middleware.http.ConditionalGetMiddleware` no longer adds the
+  ``ETag`` header to responses with an empty
+  :attr:`~django.http.HttpResponse.content`.
+
+* ``django.utils.decorators.classproperty()`` decorator is moved to
+  ``django.utils.functional.classproperty()``.
+
+* :tfilter:`floatformat` template filter now outputs (positive) ``0`` for
+  negative numbers which round to zero.
+
+* :attr:`Meta.ordering <django.db.models.Options.ordering>` and
+  :attr:`Meta.unique_together <django.db.models.Options.unique_together>`
+  options on models in ``django.contrib`` modules that were formerly tuples are
+  now lists.
+
+* The admin calendar widget now handles two-digit years according to the Open
+  Group Specification, i.e. values between 69 and 99 are mapped to the previous
+  century, and values between 0 and 68 are mapped to the current century.
+
+* Date-only formats are removed from the default list for
+  :setting:`DATETIME_INPUT_FORMATS`.
+
+* The :class:`~django.forms.FileInput` widget no longer renders with the
+  ``required`` HTML attribute when initial data exists.
+
+* The undocumented ``django.views.debug.ExceptionReporterFilter`` class is
+  removed. As per the :ref:`custom-error-reports` documentation, classes to be
+  used with :setting:`DEFAULT_EXCEPTION_REPORTER_FILTER` needs to inherit from
+  :class:`django.views.debug.SafeExceptionReporterFilter`.
+
+* The cache timeout set by :func:`~django.views.decorators.cache.cache_page`
+  decorator now takes precedence over the ``max-age`` directive from the
+  ``Cache-Control`` header.
 
 .. _deprecated-features-3.1:
 
@@ -258,6 +451,17 @@ Miscellaneous
 
 * ``PASSWORD_RESET_TIMEOUT_DAYS`` setting is deprecated in favor of
   :setting:`PASSWORD_RESET_TIMEOUT`.
+
+* The undocumented usage of the :lookup:`isnull` lookup with non-boolean values
+  as the right-hand side is deprecated, use ``True`` or ``False`` instead.
+
+* The barely documented ``django.db.models.query_utils.InvalidQuery`` exception
+  class is deprecated in favor of
+  :class:`~django.core.exceptions.FieldDoesNotExist` and
+  :class:`~django.core.exceptions.FieldError`.
+
+* The ``django-admin.py`` entry point is deprecated in favor of
+  ``django-admin``.
 
 .. _removed-features-3.1:
 

@@ -440,7 +440,7 @@ class AggregateTestCase(TestCase):
     def test_fkey_aggregate(self):
         explicit = list(Author.objects.annotate(Count('book__id')))
         implicit = list(Author.objects.annotate(Count('book')))
-        self.assertEqual(explicit, implicit)
+        self.assertCountEqual(explicit, implicit)
 
     def test_annotate_ordering(self):
         books = Book.objects.values('rating').annotate(oldest=Max('authors__age')).order_by('oldest', 'rating')
@@ -1138,6 +1138,57 @@ class AggregateTestCase(TestCase):
         with self.assertNumQueries(1) as ctx:
             list(publisher_qs)
         self.assertEqual(ctx[0]['sql'].count('SELECT'), 2)
+        # The GROUP BY should not be by alias either.
+        self.assertEqual(ctx[0]['sql'].lower().count('latest_book_pubdate'), 1)
+
+    def test_aggregation_subquery_annotation_exists(self):
+        latest_book_pubdate_qs = Book.objects.filter(
+            publisher=OuterRef('pk')
+        ).order_by('-pubdate').values('pubdate')[:1]
+        publisher_qs = Publisher.objects.annotate(
+            latest_book_pubdate=Subquery(latest_book_pubdate_qs),
+            count=Count('book'),
+        )
+        self.assertTrue(publisher_qs.exists())
+
+    def test_aggregation_exists_annotation(self):
+        published_books = Book.objects.filter(publisher=OuterRef('pk'))
+        publisher_qs = Publisher.objects.annotate(
+            published_book=Exists(published_books),
+            count=Count('book'),
+        ).values_list('name', flat=True)
+        self.assertCountEqual(list(publisher_qs), [
+            'Apress',
+            'Morgan Kaufmann',
+            "Jonno's House of Books",
+            'Prentice Hall',
+            'Sams',
+        ])
+
+    def test_aggregation_subquery_annotation_values(self):
+        """
+        Subquery annotations and external aliases are excluded from the GROUP
+        BY if they are not selected.
+        """
+        books_qs = Book.objects.annotate(
+            first_author_the_same_age=Subquery(
+                Author.objects.filter(
+                    age=OuterRef('contact__friends__age'),
+                ).order_by('age').values('id')[:1],
+            )
+        ).filter(
+            publisher=self.p1,
+            first_author_the_same_age__isnull=False,
+        ).annotate(
+            min_age=Min('contact__friends__age'),
+        ).values('name', 'min_age').order_by('name')
+        self.assertEqual(list(books_qs), [
+            {'name': 'Practical Django Projects', 'min_age': 34},
+            {
+                'name': 'The Definitive Guide to Django: Web Development Done Right',
+                'min_age': 29,
+            },
+        ])
 
     @skipUnlessDBFeature('supports_subqueries_in_group_by')
     def test_group_by_subquery_annotation(self):
@@ -1170,3 +1221,23 @@ class AggregateTestCase(TestCase):
             Exists(long_books_qs),
         ).annotate(total=Count('*'))
         self.assertEqual(dict(has_long_books_breakdown), {True: 2, False: 3})
+
+    def test_aggregation_subquery_annotation_related_field(self):
+        publisher = Publisher.objects.create(name=self.a9.name, num_awards=2)
+        book = Book.objects.create(
+            isbn='159059999', name='Test book.', pages=819, rating=2.5,
+            price=Decimal('14.44'), contact=self.a9, publisher=publisher,
+            pubdate=datetime.date(2019, 12, 6),
+        )
+        book.authors.add(self.a5, self.a6, self.a7)
+        books_qs = Book.objects.annotate(
+            contact_publisher=Subquery(
+                Publisher.objects.filter(
+                    pk=OuterRef('publisher'),
+                    name=OuterRef('contact__name'),
+                ).values('name')[:1],
+            )
+        ).filter(
+            contact_publisher__isnull=False,
+        ).annotate(count=Count('authors'))
+        self.assertSequenceEqual(books_qs, [book])

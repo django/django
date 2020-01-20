@@ -118,11 +118,19 @@ class InspectDBTestCase(TestCase):
             assertFieldType('pos_int_field', "models.IntegerField()")
 
         if connection.features.can_introspect_positive_integer_field:
+            if connection.features.can_introspect_big_integer_field:
+                assertFieldType('pos_big_int_field', 'models.PositiveBigIntegerField()')
+            else:
+                assertFieldType('pos_big_int_field', 'models.PositiveIntegerField()')
             if connection.features.can_introspect_small_integer_field:
                 assertFieldType('pos_small_int_field', "models.PositiveSmallIntegerField()")
             else:
                 assertFieldType('pos_small_int_field', "models.PositiveIntegerField()")
         else:
+            if connection.features.can_introspect_big_integer_field:
+                assertFieldType('pos_big_int_field', 'models.BigIntegerField()')
+            else:
+                assertFieldType('pos_big_int_field', 'models.IntegerField()')
             if connection.features.can_introspect_small_integer_field:
                 assertFieldType('pos_small_int_field', "models.SmallIntegerField()")
             else:

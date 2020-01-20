@@ -14,15 +14,9 @@ Problems running ``django-admin``
 -----------------------------------
 
 :doc:`django-admin </ref/django-admin>` should be on your system path if you
-installed Django via ``python setup.py``. If it's not on your path, you can
-find it in ``site-packages/django/bin``, where ``site-packages`` is a directory
-within your Python installation. Consider symlinking to :doc:`django-admin
-</ref/django-admin>` from some place on your path, such as
-:file:`/usr/local/bin`.
-
-If ``django-admin`` doesn't work but ``django-admin.py`` does, you're probably
-using a version of Django that doesn't match the version of this documentation.
-``django-admin`` is new in Django 1.7.
+installed Django via ``pip``. If it's not in your path, ensure you have your
+virtual environment activated and you can try running the equivalent command
+``python -m django``.
 
 macOS permissions
 -----------------

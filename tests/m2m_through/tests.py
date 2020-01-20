@@ -62,6 +62,40 @@ class M2mThroughTests(TestCase):
         self.assertSequenceEqual(self.rock.members.all(), [self.bob])
         self.assertEqual(self.rock.membership_set.get().invite_reason, 'He is good.')
 
+    def test_add_on_m2m_with_intermediate_model_callable_through_default(self):
+        def invite_reason_callable():
+            return 'They were good at %s' % datetime.now()
+
+        self.rock.members.add(
+            self.bob, self.jane,
+            through_defaults={'invite_reason': invite_reason_callable},
+        )
+        self.assertSequenceEqual(self.rock.members.all(), [self.bob, self.jane])
+        self.assertEqual(
+            self.rock.membership_set.filter(
+                invite_reason__startswith='They were good at ',
+            ).count(),
+            2,
+        )
+        # invite_reason_callable() is called once.
+        self.assertEqual(
+            self.bob.membership_set.get().invite_reason,
+            self.jane.membership_set.get().invite_reason,
+        )
+
+    def test_set_on_m2m_with_intermediate_model_callable_through_default(self):
+        self.rock.members.set(
+            [self.bob, self.jane],
+            through_defaults={'invite_reason': lambda: 'Why not?'},
+        )
+        self.assertSequenceEqual(self.rock.members.all(), [self.bob, self.jane])
+        self.assertEqual(
+            self.rock.membership_set.filter(
+                invite_reason__startswith='Why not?',
+            ).count(),
+            2,
+        )
+
     def test_add_on_m2m_with_intermediate_model_value_required(self):
         self.rock.nodefaultsnonulls.add(self.jim, through_defaults={'nodefaultnonull': 1})
         self.assertEqual(self.rock.testnodefaultsornulls_set.get().nodefaultnonull, 1)
@@ -74,6 +108,17 @@ class M2mThroughTests(TestCase):
         annie = self.rock.members.create(name='Annie', through_defaults={'invite_reason': 'She was just awesome.'})
         self.assertSequenceEqual(self.rock.members.all(), [annie])
         self.assertEqual(self.rock.membership_set.get().invite_reason, 'She was just awesome.')
+
+    def test_create_on_m2m_with_intermediate_model_callable_through_default(self):
+        annie = self.rock.members.create(
+            name='Annie',
+            through_defaults={'invite_reason': lambda: 'She was just awesome.'},
+        )
+        self.assertSequenceEqual(self.rock.members.all(), [annie])
+        self.assertEqual(
+            self.rock.membership_set.get().invite_reason,
+            'She was just awesome.',
+        )
 
     def test_create_on_m2m_with_intermediate_model_value_required(self):
         self.rock.nodefaultsnonulls.create(name='Test', through_defaults={'nodefaultnonull': 1})

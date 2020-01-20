@@ -67,6 +67,48 @@ The following is a unit test using the request factory::
             response = MyView.as_view()(request)
             self.assertEqual(response.status_code, 200)
 
+Testing class-based views
+=========================
+
+In order to test class-based views outside of the request/response cycle you
+must ensure that they are configured correctly, by calling
+:meth:`~django.views.generic.base.View.setup` after instantiation.
+
+For example, assuming the following class-based view:
+
+.. code-block:: python
+    :caption: views.py
+
+    from django.views.generic import TemplateView
+
+
+    class HomeView(TemplateView):
+        template_name = 'myapp/home.html'
+
+        def get_context_data(self, **kwargs):
+            kwargs['environment'] = 'Production'
+            return super().get_context_data(**kwargs)
+
+You may directly test the ``get_context_data()`` method by first instantiating
+the view, then passing a ``request`` to ``setup()``, before proceeding with
+your test's code:
+
+.. code-block:: python
+    :caption: tests.py
+
+    from django.test import RequestFactory, TestCase
+    from .views import HomeView
+
+
+    class HomePageTest(TestCase):
+        def test_environment_set_in_context(self):
+            request = RequestFactory().get('/')
+            view = HomeView()
+            view.setup(request)
+
+            context = view.get_context_data()
+            self.assertIn('environment', context)
+
 .. _topics-testing-advanced-multiple-hosts:
 
 Tests and multiple host names
@@ -298,6 +340,40 @@ Advanced features of ``TransactionTestCase``
 
     Using ``reset_sequences = True`` will slow down the test, since the primary
     key reset is a relatively expensive database operation.
+
+.. _topics-testing-enforce-run-sequentially:
+
+Enforce running test classes sequentially
+=========================================
+
+If you have test classes that cannot be run in parallel (e.g. because they
+share a common resource), you can use ``django.test.testcases.SerializeMixin``
+to run them sequentially. This mixin uses a filesystem ``lockfile``.
+
+For example, you can use ``__file__`` to determine that all test classes in the
+same file that inherit from ``SerializeMixin`` will run sequentially::
+
+    import os
+
+    from django.test import TestCase
+    from django.test.testcases import SerializeMixin
+
+    class ImageTestCaseMixin(SerializeMixin):
+        lockfile = __file__
+
+        def setUp(self):
+            self.filename = os.path.join(temp_storage_dir, 'my_file.png')
+            self.file = create_file(self.filename)
+
+    class RemoveImageTests(ImageTestCaseMixin, TestCase):
+        def test_remove_image(self):
+            os.remove(self.filename)
+            self.assertFalse(os.path.exists(self.filename))
+
+    class ResizeImageTests(ImageTestCaseMixin, TestCase):
+        def test_resize_image(self):
+            resize_image(self.file, (48, 48))
+            self.assertEqual(get_image_size(self.file), (48, 48))
 
 .. _testing-reusable-applications:
 

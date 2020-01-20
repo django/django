@@ -152,12 +152,13 @@ def floatformat(text, arg=-1):
 
     # Avoid conversion to scientific notation by accessing `sign`, `digits`,
     # and `exponent` from Decimal.as_tuple() directly.
-    sign, digits, exponent = d.quantize(exp, ROUND_HALF_UP, Context(prec=prec)).as_tuple()
+    rounded_d = d.quantize(exp, ROUND_HALF_UP, Context(prec=prec))
+    sign, digits, exponent = rounded_d.as_tuple()
     digits = [str(digit) for digit in reversed(digits)]
     while len(digits) <= abs(exponent):
         digits.append('0')
     digits.insert(-exponent, '.')
-    if sign:
+    if sign and rounded_d:
         digits.append('-')
     number = ''.join(reversed(digits))
     return mark_safe(formats.number_format(number, abs(p)))

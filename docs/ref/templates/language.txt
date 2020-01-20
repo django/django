@@ -414,7 +414,7 @@ Here are some tips for working with inheritance:
   tag ``as`` syntax can't be used inside the block. For example, this template
   doesn't render anything::
 
-      {% trans "Title" as title %}
+      {% translate "Title" as title %}
       {% block content %}{{ title }}{% endblock %}
 
 * For extra readability, you can optionally give a *name* to your

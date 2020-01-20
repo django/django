@@ -20,10 +20,11 @@ Server errors
 
 When :setting:`DEBUG` is ``False``, Django will email the users listed in the
 :setting:`ADMINS` setting whenever your code raises an unhandled exception and
-results in an internal server error (HTTP status code 500). This gives the
-administrators immediate notification of any errors. The :setting:`ADMINS` will
-get a description of the error, a complete Python traceback, and details about
-the HTTP request that caused the error.
+results in an internal server error (strictly speaking, for any response with
+an HTTP status code of 500 or greater). This gives the administrators immediate
+notification of any errors. The :setting:`ADMINS` will get a description of the
+error, a complete Python traceback, and details about the HTTP request that
+caused the error.
 
 .. note::
 
@@ -261,25 +262,104 @@ attribute::
 
 Your custom filter class needs to inherit from
 :class:`django.views.debug.SafeExceptionReporterFilter` and may override the
-following methods:
+following attributes and methods:
 
 .. class:: SafeExceptionReporterFilter
 
-.. method:: SafeExceptionReporterFilter.is_active(request)
+    .. attribute:: cleansed_substitute
 
-    Returns ``True`` to activate the filtering operated in the other methods.
-    By default the filter is active if :setting:`DEBUG` is ``False``.
+        .. versionadded:: 3.1
 
-.. method:: SafeExceptionReporterFilter.get_post_parameters(request)
+        The string value to replace sensitive value with. By default it
+        replaces the values of sensitive variables with stars (`**********`).
 
-    Returns the filtered dictionary of POST parameters. By default it replaces
-    the values of sensitive parameters with stars (`**********`).
+    .. attribute:: hidden_settings
 
-.. method:: SafeExceptionReporterFilter.get_traceback_frame_variables(request, tb_frame)
+        .. versionadded:: 3.1
 
-    Returns the filtered dictionary of local variables for the given traceback
-    frame. By default it replaces the values of sensitive variables with stars
-    (`**********`).
+        A compiled regular expression object used to match settings and
+        ``request.META`` values considered as sensitive. By default equivalent
+        to::
+
+            import re
+
+            re.compile(r'API|TOKEN|KEY|SECRET|PASS|SIGNATURE', flags=re.IGNORECASE)
+
+    .. method:: is_active(request)
+
+        Returns ``True`` to activate the filtering in
+        :meth:`get_post_parameters` and :meth:`get_traceback_frame_variables`.
+        By default the filter is active if :setting:`DEBUG` is ``False``. Note
+        that sensitive ``request.META`` values are always filtered along with
+        sensitive setting values, as described in the :setting:`DEBUG`
+        documentation.
+
+    .. method:: get_post_parameters(request)
+
+        Returns the filtered dictionary of POST parameters. Sensitive values
+        are replaced with :attr:`cleansed_substitute`.
+
+    .. method:: get_traceback_frame_variables(request, tb_frame)
+
+        Returns the filtered dictionary of local variables for the given
+        traceback frame. Sensitive values are replaced with
+        :attr:`cleansed_substitute`.
+
+.. versionadded:: 3.1
+
+If you need to customize error reports beyond filtering you may specify a
+custom error reporter class by defining the
+:setting:`DEFAULT_EXCEPTION_REPORTER` setting::
+
+    DEFAULT_EXCEPTION_REPORTER = 'path.to.your.CustomExceptionReporter'
+
+The exception reporter is responsible for compiling the exception report data,
+and formatting it as text or HTML appropriately. (The exception reporter uses
+:setting:`DEFAULT_EXCEPTION_REPORTER_FILTER` when preparing the exception
+report data.)
+
+Your custom reporter class needs to inherit from
+:class:`django.views.debug.ExceptionReporter`.
+
+.. class:: ExceptionReporter
+
+    .. method:: get_traceback_data()
+
+        Return a dictionary containing traceback information.
+
+        This is the main extension point for customizing exception reports, for
+        example::
+
+            from django.views.debug import ExceptionReporter
+
+
+            class CustomExceptionReporter(ExceptionReporter):
+                def get_traceback_data(self):
+                    data = super().get_traceback_data()
+                    # ... remove/add something here ...
+                    return data
+
+    .. method:: get_traceback_html()
+
+        Return HTML version of exception report.
+
+        Used for HTML version of debug 500 HTTP error page.
+
+    .. method:: get_traceback_text()
+
+        Return plain text version of exception report.
+
+        Used for plain text version of debug 500 HTTP error page and email
+        reports.
+
+As with the filter class, you may control which exception reporter class to use
+within any given view by setting the ``HttpRequest``’s
+``exception_reporter_class`` attribute::
+
+    def my_view(request):
+        if request.user.is_authenticated:
+            request.exception_reporter_class = CustomExceptionReporter()
+        ...
 
 .. seealso::
 

@@ -64,7 +64,7 @@ class CollectionTestCase(BaseStaticFilesMixin, SimpleTestCase):
 
     def setUp(self):
         super().setUp()
-        temp_dir = tempfile.mkdtemp()
+        temp_dir = self.mkdtemp()
         # Override the STATIC_ROOT for all tests from setUp to tearDown
         # rather than as a context manager
         self.patched_settings = self.settings(STATIC_ROOT=temp_dir)
@@ -77,6 +77,9 @@ class CollectionTestCase(BaseStaticFilesMixin, SimpleTestCase):
     def tearDown(self):
         self.patched_settings.disable()
         super().tearDown()
+
+    def mkdtemp(self):
+        return tempfile.mkdtemp()
 
     def run_collectstatic(self, *, verbosity=0, **kwargs):
         call_command('collectstatic', interactive=False, verbosity=verbosity,

@@ -4,9 +4,8 @@ from django.contrib.postgres import forms, lookups
 from django.contrib.postgres.fields.array import ArrayField
 from django.core import exceptions
 from django.db.models import Field, TextField, Transform
+from django.db.models.fields.mixins import CheckFieldDefaultMixin
 from django.utils.translation import gettext_lazy as _
-
-from .mixins import CheckFieldDefaultMixin
 
 __all__ = ['HStoreField']
 

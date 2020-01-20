@@ -1,7 +1,7 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# BouRock, 2015-2016
+# BouRock, 2015-2016,2019
 # BouRock, 2014
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Metin Amiroff <amiroff@gmail.com>, 2011
@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-05-17 11:50+0200\n"
-"PO-Revision-Date: 2017-09-23 18:54+0000\n"
+"PO-Revision-Date: 2019-09-17 07:46+0000\n"
 "Last-Translator: BouRock\n"
 "Language-Team: Turkish (http://www.transifex.com/django/django/language/"
 "tr/)\n"
@@ -192,7 +192,7 @@ msgstr "P"
 
 msgctxt "one letter Monday"
 msgid "M"
-msgstr "P"
+msgstr "Pt"
 
 msgctxt "one letter Tuesday"
 msgid "T"
@@ -204,7 +204,7 @@ msgstr "Ç"
 
 msgctxt "one letter Thursday"
 msgid "T"
-msgstr "P"
+msgstr "Pe"
 
 msgctxt "one letter Friday"
 msgid "F"
@@ -212,7 +212,7 @@ msgstr "C"
 
 msgctxt "one letter Saturday"
 msgid "S"
-msgstr "C"
+msgstr "Ct"
 
 msgid "Show"
 msgstr "Göster"

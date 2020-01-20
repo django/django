@@ -606,8 +606,11 @@ class ForeignObject(RelatedField):
         for index in range(len(self.from_fields)):
             from_field_name = self.from_fields[index]
             to_field_name = self.to_fields[index]
-            from_field = (self if from_field_name == 'self'
-                          else self.opts.get_field(from_field_name))
+            from_field = (
+                self
+                if from_field_name == RECURSIVE_RELATIONSHIP_CONSTANT
+                else self.opts.get_field(from_field_name)
+            )
             to_field = (self.remote_field.model._meta.pk if to_field_name is None
                         else self.remote_field.model._meta.get_field(to_field_name))
             related_fields.append((from_field, to_field))
@@ -810,8 +813,13 @@ class ForeignKey(ForeignObject):
         )
         kwargs.setdefault('db_index', True)
 
-        super().__init__(to, on_delete, from_fields=['self'], to_fields=[to_field], **kwargs)
-
+        super().__init__(
+            to,
+            on_delete,
+            from_fields=[RECURSIVE_RELATIONSHIP_CONSTANT],
+            to_fields=[to_field],
+            **kwargs,
+        )
         self.db_constraint = db_constraint
 
     def check(self, **kwargs):
@@ -1276,8 +1284,11 @@ class ManyToManyField(RelatedField):
                              "through_fields keyword argument.") % (self, from_model_name),
                             hint=(
                                 'If you want to create a recursive relationship, '
-                                'use ForeignKey("self", symmetrical=False, through="%s").'
-                            ) % relationship_model_name,
+                                'use ForeignKey("%s", symmetrical=False, through="%s").'
+                            ) % (
+                                RECURSIVE_RELATIONSHIP_CONSTANT,
+                                relationship_model_name,
+                            ),
                             obj=self,
                             id='fields.E334',
                         )
@@ -1293,8 +1304,11 @@ class ManyToManyField(RelatedField):
                             "through_fields keyword argument." % (self, to_model_name),
                             hint=(
                                 'If you want to create a recursive relationship, '
-                                'use ForeignKey("self", symmetrical=False, through="%s").'
-                            ) % relationship_model_name,
+                                'use ForeignKey("%s", symmetrical=False, through="%s").'
+                            ) % (
+                                RECURSIVE_RELATIONSHIP_CONSTANT,
+                                relationship_model_name,
+                            ),
                             obj=self,
                             id='fields.E335',
                         )
@@ -1561,7 +1575,9 @@ class ManyToManyField(RelatedField):
         # automatically. The funky name reduces the chance of an accidental
         # clash.
         if self.remote_field.symmetrical and (
-                self.remote_field.model == "self" or self.remote_field.model == cls._meta.object_name):
+            self.remote_field.model == RECURSIVE_RELATIONSHIP_CONSTANT or
+            self.remote_field.model == cls._meta.object_name
+        ):
             self.remote_field.related_name = "%s_rel_+" % name
         elif self.remote_field.is_hidden():
             # If the backwards relation is disabled, replace the original

@@ -6,24 +6,12 @@ from urllib.parse import urlsplit, urlunsplit
 from django.core.exceptions import ValidationError
 from django.utils.deconstruct import deconstructible
 from django.utils.encoding import punycode
-from django.utils.functional import SimpleLazyObject
 from django.utils.ipv6 import is_valid_ipv6_address
+from django.utils.regex_helper import _lazy_re_compile
 from django.utils.translation import gettext_lazy as _, ngettext_lazy
 
 # These values, if given to validate(), will trigger the self.required check.
 EMPTY_VALUES = (None, '', [], (), {})
-
-
-def _lazy_re_compile(regex, flags=0):
-    """Lazily compile a regex with flags."""
-    def _compile():
-        # Compile the regex if it was not passed pre-compiled.
-        if isinstance(regex, str):
-            return re.compile(regex, flags)
-        else:
-            assert not flags, "flags must be empty if regex is passed pre-compiled"
-            return regex
-    return SimpleLazyObject(_compile)
 
 
 @deconstructible

@@ -46,7 +46,7 @@ class DatabaseOperations(BaseDatabaseOperations):
             for expr in expression.get_source_expressions():
                 try:
                     output_field = expr.output_field
-                except FieldError:
+                except (AttributeError, FieldError):
                     # Not every subexpression has an output_field which is fine
                     # to ignore.
                     pass
@@ -326,9 +326,10 @@ class DatabaseOperations(BaseDatabaseOperations):
     def subtract_temporals(self, internal_type, lhs, rhs):
         lhs_sql, lhs_params = lhs
         rhs_sql, rhs_params = rhs
+        params = (*lhs_params, *rhs_params)
         if internal_type == 'TimeField':
-            return "django_time_diff(%s, %s)" % (lhs_sql, rhs_sql), lhs_params + rhs_params
-        return "django_timestamp_diff(%s, %s)" % (lhs_sql, rhs_sql), lhs_params + rhs_params
+            return 'django_time_diff(%s, %s)' % (lhs_sql, rhs_sql), params
+        return 'django_timestamp_diff(%s, %s)' % (lhs_sql, rhs_sql), params
 
     def insert_statement(self, ignore_conflicts=False):
         return 'INSERT OR IGNORE INTO' if ignore_conflicts else super().insert_statement(ignore_conflicts)

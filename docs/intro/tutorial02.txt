@@ -6,6 +6,11 @@ This tutorial begins where :doc:`Tutorial 1 </intro/tutorial01>` left off.
 We'll setup the database, create your first model, and get a quick introduction
 to Django's automatically-generated admin site.
 
+.. admonition:: Where to get help:
+
+    If you're having trouble going through this tutorial, please head over to
+    the :doc:`Getting Help</faq/help>` section of the FAQ.
+
 Database setup
 ==============
 
@@ -34,8 +39,8 @@ settings:
 * :setting:`NAME` -- The name of your database. If you're using SQLite, the
   database will be a file on your computer; in that case, :setting:`NAME`
   should be the full absolute path, including filename, of that file. The
-  default value, ``os.path.join(BASE_DIR, 'db.sqlite3')``, will store the file
-  in your project directory.
+  default value, ``BASE_DIR / 'db.sqlite3'``, will store the file in your
+  project directory.
 
 If you are not using SQLite as your database, additional settings such as
 :setting:`USER`, :setting:`PASSWORD`, and :setting:`HOST` must be added.

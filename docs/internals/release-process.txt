@@ -141,7 +141,8 @@ page for the current state of support for each version.
 
   * Major functionality bugs in new features of the latest stable release.
 
-  * Regressions from older versions of Django.
+  * Regressions from older versions of Django introduced in the current release
+    series.
 
   The rule of thumb is that fixes will be backported to the last feature
   release for bugs that would have prevented a release in the first place

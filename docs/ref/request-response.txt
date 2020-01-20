@@ -204,7 +204,7 @@ All attributes should be considered read-only, unless stated otherwise.
 
     .. versionchanged:: 3.0
 
-        Support for look ups using underscores was added.
+        Support for lookups using underscores was added.
 
 .. attribute:: HttpRequest.resolver_match
 
@@ -233,6 +233,16 @@ application.
 
     ``urlconf`` can be set to ``None`` to revert any changes made by previous
     middleware and return to using the :setting:`ROOT_URLCONF`.
+
+.. attribute:: HttpRequest.exception_reporter_filter
+
+    This will be used instead of :setting:`DEFAULT_EXCEPTION_REPORTER_FILTER`
+    for the current request. See :ref:`custom-error-reports` for details.
+
+.. attribute:: HttpRequest.exception_reporter_class
+
+    This will be used instead of :setting:`DEFAULT_EXCEPTION_REPORTER` for the
+    current request. See :ref:`custom-error-reports` for details.
 
 Attributes set by middleware
 ----------------------------
@@ -766,6 +776,8 @@ Methods
     :setting:`DEFAULT_CHARSET` settings, by default: "`text/html; charset=utf-8`".
 
     ``status`` is the :rfc:`HTTP status code <7231#section-6>` for the response.
+    You can use Python's :py:class:`http.HTTPStatus` for meaningful aliases,
+    such as ``HTTPStatus.NO_CONTENT``.
 
     ``reason`` is the HTTP response phrase. If not provided, a default phrase
     will be used.
@@ -801,7 +813,7 @@ Methods
 
     Sets a header unless it has already been set.
 
-.. method:: HttpResponse.set_cookie(key, value='', max_age=None, expires=None, path='/', domain=None, secure=None, httponly=False, samesite=None)
+.. method:: HttpResponse.set_cookie(key, value='', max_age=None, expires=None, path='/', domain=None, secure=False, httponly=False, samesite=None)
 
     Sets a cookie. The parameters are the same as in the
     :class:`~http.cookies.Morsel` cookie object in the Python standard library.
@@ -817,30 +829,39 @@ Methods
       ``domain="example.com"`` will set a cookie that is readable by the
       domains www.example.com, blog.example.com, etc. Otherwise, a cookie will
       only be readable by the domain that set it.
+    * Use ``secure=True`` if you want the cookie to be only sent to the server
+      when a request is made with the ``https`` scheme.
     * Use ``httponly=True`` if you want to prevent client-side
       JavaScript from having access to the cookie.
 
       HttpOnly_ is a flag included in a Set-Cookie HTTP response header. It's
-      part of the :rfc:`6265` standard for cookies and can be a useful way to
-      mitigate the risk of a client-side script accessing the protected cookie
-      data.
+      part of the :rfc:`RFC 6265 <6265#section-4.1.2.6>` standard for cookies
+      and can be a useful way to mitigate the risk of a client-side script
+      accessing the protected cookie data.
     * Use ``samesite='Strict'`` or ``samesite='Lax'`` to tell the browser not
       to send this cookie when performing a cross-origin request. `SameSite`_
       isn't supported by all browsers, so it's not a replacement for Django's
       CSRF protection, but rather a defense in depth measure.
 
+      Use ``samesite='None'`` (string) to explicitly state that this cookie is
+      sent with all same-site and cross-site requests.
+
     .. _HttpOnly: https://www.owasp.org/index.php/HttpOnly
     .. _SameSite: https://www.owasp.org/index.php/SameSite
 
+    .. versionchanged:: 3.1
+
+        Using ``samesite='None'`` (string) was allowed.
+
     .. warning::
 
-        :rfc:`6265` states that user agents should support cookies of at least
-        4096 bytes. For many browsers this is also the maximum size. Django
-        will not raise an exception if there's an attempt to store a cookie of
-        more than 4096 bytes, but many browsers will not set the cookie
-        correctly.
+        :rfc:`RFC 6265 <6265#section-6.1>` states that user agents should
+        support cookies of at least 4096 bytes. For many browsers this is also
+        the maximum size. Django will not raise an exception if there's an
+        attempt to store a cookie of more than 4096 bytes, but many browsers
+        will not set the cookie correctly.
 
-.. method:: HttpResponse.set_signed_cookie(key, value, salt='', max_age=None, expires=None, path='/', domain=None, secure=None, httponly=False, samesite=None)
+.. method:: HttpResponse.set_signed_cookie(key, value, salt='', max_age=None, expires=None, path='/', domain=None, secure=False, httponly=False, samesite=None)
 
     Like :meth:`~HttpResponse.set_cookie()`, but
     :doc:`cryptographic signing </topics/signing>` the cookie before setting
@@ -848,6 +869,10 @@ Methods
     You can use the optional ``salt`` argument for added key strength, but
     you will need to remember to pass it to the corresponding
     :meth:`HttpRequest.get_signed_cookie` call.
+
+    .. versionchanged:: 3.1
+
+        Using ``samesite='None'`` (string) was allowed.
 
 .. method:: HttpResponse.delete_cookie(key, path='/', domain=None)
 
@@ -968,6 +993,18 @@ types of HTTP responses. Like ``HttpResponse``, these subclasses live in
     method, Django will treat it as emulating a
     :class:`~django.template.response.SimpleTemplateResponse`, and the
     ``render`` method must itself return a valid response object.
+
+Custom response classes
+~~~~~~~~~~~~~~~~~~~~~~~
+
+If you find yourself needing a response class that Django doesn't provide, you
+can create it with the help of :py:class:`http.HTTPStatus`. For example::
+
+    from http import HTTPStatus
+    from django.http import HttpResponse
+
+    class HttpResponseNoContent(HttpResponse):
+        status_code = HTTPStatus.NO_CONTENT
 
 ``JsonResponse`` objects
 ========================

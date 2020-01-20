@@ -3,6 +3,7 @@ import json
 import os
 import re
 from io import StringIO
+from pathlib import Path
 
 from django.core import management, serializers
 from django.core.exceptions import ImproperlyConfigured
@@ -516,6 +517,11 @@ class TestFixtures(TestCase):
             'absolute.json',
             verbosity=0,
         )
+
+    @override_settings(FIXTURE_DIRS=[Path(_cur_dir) / 'fixtures_1'])
+    def test_fixtures_dir_pathlib(self):
+        management.call_command('loaddata', 'inner/absolute.json', verbosity=0)
+        self.assertQuerysetEqual(Absolute.objects.all(), [1], transform=lambda o: o.pk)
 
 
 class NaturalKeyFixtureTests(TestCase):

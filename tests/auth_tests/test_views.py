@@ -444,7 +444,7 @@ class UUIDUserPasswordResetTest(CustomUserPasswordResetTest):
     def test_confirm_invalid_uuid(self):
         """A uidb64 that decodes to a non-UUID doesn't crash."""
         _, path = self._test_confirm_start()
-        invalid_uidb64 = urlsafe_base64_encode('INVALID_UUID'.encode())
+        invalid_uidb64 = urlsafe_base64_encode(b'INVALID_UUID')
         first, _uuidb64_, second = path.strip('/').split('/')
         response = self.client.get('/' + '/'.join((first, invalid_uidb64, second)) + '/')
         self.assertContains(response, 'The password reset link was invalid')
@@ -1262,7 +1262,7 @@ class ChangelistTests(AuthViewsTestCase):
         data['password'] = 'shouldnotchange'
         change_url = reverse('auth_test_admin:auth_user_change', args=(u.pk,))
         response = self.client.post(change_url, data)
-        self.assertRedirects(response, reverse('auth_test_admin:auth_user_changelist'))
+        self.assertEqual(response.status_code, 403)
         u.refresh_from_db()
         self.assertEqual(u.password, original_password)
 
