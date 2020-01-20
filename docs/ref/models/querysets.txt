@@ -2100,6 +2100,8 @@ that fail constraints such as duplicate unique values. Enabling this parameter
 disables setting the primary key on each model instance (if the database
 normally supports it).
 
+Returns ``objs`` as cast to a list, in the same order as provided.
+
 ``bulk_update()``
 ~~~~~~~~~~~~~~~~~
 
