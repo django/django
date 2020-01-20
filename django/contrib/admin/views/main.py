@@ -367,8 +367,16 @@ class ChangeList:
                     break
                 ordering_fields.add(field.attname)
         else:
-            # No single total ordering field, try unique_together.
-            for field_names in self.lookup_opts.unique_together:
+            # No single total ordering field, try unique_together and total
+            # unique constraints.
+            constraint_field_names = (
+                *self.lookup_opts.unique_together,
+                *(
+                    constraint.fields
+                    for constraint in self.lookup_opts.total_unique_constraints
+                ),
+            )
+            for field_names in constraint_field_names:
                 # Normalize attname references by using get_field().
                 fields = [self.lookup_opts.get_field(field_name) for field_name in field_names]
                 # Composite unique constraints containing a nullable column
