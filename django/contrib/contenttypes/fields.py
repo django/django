@@ -583,11 +583,12 @@ def create_generic_related_manager(superclass, rel):
             # We (possibly) need to convert object IDs to the type of the
             # instances' PK in order to match up instances:
             object_id_converter = instances[0]._meta.pk.to_python
+            content_type_id_field_name = '%s_id' % self.content_type_field_name
             return (
                 queryset.filter(query),
                 lambda relobj: (
                     object_id_converter(getattr(relobj, self.object_id_field_name)),
-                    relobj.content_type_id
+                    getattr(relobj, content_type_id_field_name),
                 ),
                 lambda obj: (obj.pk, self.get_content_type(obj).pk),
                 False,
