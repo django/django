@@ -537,6 +537,14 @@ class WindowFunctionTests(TestCase):
             ('Brown', 53000, 'Sales', datetime.date(2009, 9, 1), 108000),
         ], transform=lambda row: (row.name, row.salary, row.department, row.hire_date, row.sum))
 
+    def test_related_ordering_with_count(self):
+        qs = Employee.objects.annotate(department_sum=Window(
+            expression=Sum('salary'),
+            partition_by=F('department'),
+            order_by=['classification__code'],
+        ))
+        self.assertEqual(qs.count(), 12)
+
     @skipUnlessDBFeature('supports_frame_range_fixed_distance')
     def test_range_n_preceding_and_following(self):
         qs = Employee.objects.annotate(sum=Window(
