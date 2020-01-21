@@ -35,3 +35,7 @@ Bugfixes
 * Fixed a regression in Django 2.2.7 that caused
   :meth:`~django.db.models.Model.get_FOO_display` to work incorrectly when
   overriding inherited choices (:ticket:`31124`).
+
+* Fixed a regression in Django 3.0 that caused a crash of
+  ``QuerySet.prefetch_related()`` for ``GenericForeignKey`` with a custom
+  ``ContentType`` foreign key (:ticket:`31190`).
