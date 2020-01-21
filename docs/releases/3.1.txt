@@ -37,6 +37,9 @@ Minor features
   :attr:`.ModelAdmin.list_filter` allows filtering on empty values (empty
   strings and nulls) in the admin changelist view.
 
+* Filters in the right sidebar of the admin changelist view now contains a link
+  to clear all filters.
+
 :mod:`django.contrib.admindocs`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

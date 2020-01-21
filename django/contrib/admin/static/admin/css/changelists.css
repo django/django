@@ -187,6 +187,12 @@
     color: #036;
 }
 
+#changelist-filter #changelist-filter-clear a {
+    font-size: 13px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #eaeaea;
+}
+
 /* DATE DRILLDOWN */
 
 .change-list ul.toplinks {

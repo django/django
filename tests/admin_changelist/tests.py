@@ -707,6 +707,18 @@ class ChangeListTests(TestCase):
         link = reverse('admin:admin_changelist_parent_change', args=(p.pk,))
         self.assertNotContains(response, '<a href="%s">' % link)
 
+    def test_clear_all_filters_link(self):
+        self.client.force_login(self.superuser)
+        link = '<a href="?">&#10006; Clear all filters</a>'
+        response = self.client.get(reverse('admin:auth_user_changelist'))
+        self.assertNotContains(response, link)
+        for data in (
+            {SEARCH_VAR: 'test'},
+            {'is_staff__exact': '0'},
+        ):
+            response = self.client.get(reverse('admin:auth_user_changelist'), data=data)
+            self.assertContains(response, link)
+
     def test_tuple_list_display(self):
         swallow = Swallow.objects.create(origin='Africa', load='12.34', speed='22.2')
         swallow2 = Swallow.objects.create(origin='Africa', load='12.34', speed='22.2')
