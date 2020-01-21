@@ -89,6 +89,19 @@ Python style
         """
         ...
 
+* When chaining exceptions, use the ``from`` variant of the :py:ref:`the raise
+  statement <raise>`, marking the raised exception's cause, like this::
+
+    try:
+        iter(patterns)
+    except TypeError as e:
+        msg = (
+            "The included URLconf '{name}' does not appear to have any "
+            "patterns in it. If you see valid patterns in the file then "
+            "the issue is probably caused by a circular import."
+        )
+        raise ImproperlyConfigured(msg.format(name=self.urlconf_name)) from e
+
 .. _coding-style-imports:
 
 Imports
