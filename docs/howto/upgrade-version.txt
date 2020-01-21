@@ -33,10 +33,11 @@ the new Django version(s):
 Pay particular attention to backwards incompatible changes to get a clear idea
 of what will be needed for a successful upgrade.
 
-If you're upgrading through more than one feature version (e.g. A.B to A.B+2),
+If you're upgrading through more than one feature version (e.g. 2.0 to 2.2),
 it's usually easier to upgrade through each feature release incrementally
-(A.B to A.B+1 to A.B+2) rather than to make all the changes for each feature
-release at once. For each feature release, use the latest patch release (A.B.C).
+(2.0 to 2.1 to 2.2) rather than to make all the changes for each feature
+release at once. For each feature release, use the latest patch release (e.g.
+for 2.1, use 2.1.15).
 
 The same incremental upgrade approach is recommended when upgrading from one
 LTS to the next.
