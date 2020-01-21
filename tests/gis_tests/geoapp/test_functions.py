@@ -272,7 +272,7 @@ class GISFunctionsTests(FuncTestMixin, TestCase):
     def test_geometry_distance(self):
         point = Point(-90, 40, srid=4326)
         qs = City.objects.annotate(distance=functions.GeometryDistance('point', point)).order_by('distance')
-        self.assertEqual([city.distance for city in qs], [
+        distances = (
             2.99091995527296,
             5.33507274054713,
             9.33852187483721,
@@ -281,7 +281,10 @@ class GISFunctionsTests(FuncTestMixin, TestCase):
             14.713098433352,
             34.3635252198568,
             276.987855073372,
-        ])
+        )
+        for city, expected_distance in zip(qs, distances):
+            with self.subTest(city=city):
+                self.assertAlmostEqual(city.distance, expected_distance)
 
     @skipUnlessDBFeature("has_Intersection_function")
     def test_intersection(self):
