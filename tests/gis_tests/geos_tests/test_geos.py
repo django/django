@@ -1434,3 +1434,12 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
         self.assertEqual(p.transform(2774, clone=True), Point(srid=2774))
         p.transform(2774)
         self.assertEqual(p, Point(srid=2774))
+
+    def test_linestring_iter(self):
+        ls = LineString((0, 0), (1, 1))
+        it = iter(ls)
+        # Step into CoordSeq iterator.
+        next(it)
+        ls[:] = []
+        with self.assertRaises(IndexError):
+            next(it)
