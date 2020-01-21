@@ -313,6 +313,12 @@ you may use
 to update your message files so they are aligned with the main plural forms
 and avoid unexpected behavior.
 
+Customization of the plural forms for a language is done via the
+:setting:`LOCALE_ROOT` setting.
+
+Once the setting is defined, Django will use the files under this directory as
+the main Django po files for translations.
+
 .. versionchanged:: 3.1
 
     Handling plural forms as described above was added.

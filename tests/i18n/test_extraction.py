@@ -735,6 +735,28 @@ class UpdatePluralFormsTests(ExtractorTests):
                     verbosity=0
                 )
 
+    def test_locale_root(self):
+        with override_settings(LOCALE_ROOT=os.path.join(self.test_dir, 'locale_root')):
+            management.call_command('makemessages', locale=['sk'], update_plural_forms='2,3', verbosity=0)
+            with open(self.PO_FILE % 'sk', encoding='utf-8') as fp:
+                po_contents = fp.read()
+                should_contain = """
+                "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+                msgid "Please submit %d or fewer forms."
+                msgid_plural "Please submit %d or fewer forms."
+                msgstr[0] "Prosím odošlite %d alebo menej formulárov. -2-"
+                msgstr[1] "Prosím odošlite %d alebo menej formulárov. -3-"
+                """
+
+                should_not_contain = """msgstr[2] "Prosím odošlite %d alebo menej formulárov. -2-"
+                msgstr[3] "Prosím odošlite %d alebo menej formulárov. -3-" """
+
+                for line in should_contain.splitlines():
+                    self.assertIn(line.strip(), po_contents)
+
+                for line in should_not_contain.splitlines():
+                    self.assertNotIn(line.strip(), po_contents)
+
 
 class NoWrapExtractorTests(ExtractorTests):
 

@@ -1782,6 +1782,34 @@ class TranslationFilesMissing(SimpleTestCase):
         with self.assertRaises(OSError):
             activate('en')
 
+    def test_failure_finding_mo_files_with_locale_root(self):
+        """
+        Only a warning is raised if no .mo files are found when
+        setting.LOCALE_ROOT is set.
+        """
+        with override_settings(LOCALE_ROOT=os.path.join(here, 'locale_root/')):
+            trans_real._translations = {}
+            msg = (
+                'LOCALE_ROOT has been set and no translation files found for '
+                'default language'
+            )
+            with self.assertWarnsMessage(RuntimeWarning, msg):
+                activate('en')
+
+
+class LocaleRootTests(SimpleTestCase):
+    """
+    Test the functioning of the LOCALE_ROOT setting.
+    """
+    @override_settings(
+        USE_I18N=True,
+        LANGUAGE_CODE='es',
+        LOCALE_ROOT=os.path.join(here, 'locale_root/')
+    )
+    def test_correct_functioning(self):
+        self.assertEqual(gettext("Do you like icecream?"), "¿Os gusta el helado?")
+        self.assertEqual(gettext("password"), "password")
+
 
 class CatalogMergingTests(SimpleTestCase):
     """

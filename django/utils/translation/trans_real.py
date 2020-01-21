@@ -100,8 +100,13 @@ class DjangoTranslation(gettext_module.GNUTranslations):
 
         self._add_local_translations()
         if self.__language == settings.LANGUAGE_CODE and self.domain == 'django' and self._catalog is None:
-            # default lang should have at least one translation file available.
-            raise OSError('No translation files found for default language %s.' % settings.LANGUAGE_CODE)
+            if not hasattr(settings, 'LOCALE_ROOT'):
+                # default lang should have at least one translation file available if not using LOCALE_ROOT.
+                raise OSError('No translation files found for default language %s.' % settings.LANGUAGE_CODE)
+            else:
+                msg = ('LOCALE_ROOT has been set and no translation files found for default language %s. '
+                       % settings.LANGUAGE_CODE)
+                warnings.warn(msg, RuntimeWarning)
         self._add_fallback(localedirs)
         if self._catalog is None:
             # No catalogs found for this language, set an empty catalog.
@@ -129,8 +134,11 @@ class DjangoTranslation(gettext_module.GNUTranslations):
 
     def _init_translation_catalog(self):
         """Create a base catalog using global django translations."""
-        settingsfile = sys.modules[settings.__module__].__file__
-        localedir = os.path.join(os.path.dirname(settingsfile), 'locale')
+        if not hasattr(settings, 'LOCALE_ROOT'):
+            settingsfile = sys.modules[settings.__module__].__file__
+            localedir = os.path.join(os.path.dirname(settingsfile), 'locale')
+        else:
+            localedir = settings.LOCALE_ROOT
         translation = self._new_gnu_trans(localedir)
         self.merge(translation)
 
@@ -145,9 +153,13 @@ class DjangoTranslation(gettext_module.GNUTranslations):
                 "gettext calls at import time.")
         for app_config in app_configs:
             localedir = os.path.join(app_config.path, 'locale')
-            if os.path.exists(localedir):
-                translation = self._new_gnu_trans(localedir)
-                self.merge(translation)
+            if (hasattr(settings, 'LOCALE_ROOT') and
+                    os.path.join('django', 'contrib') in os.path.dirname(localedir)):
+                continue
+            else:
+                if os.path.exists(localedir):
+                    translation = self._new_gnu_trans(localedir)
+                    self.merge(translation)
 
     def _add_local_translations(self):
         """Merge translations defined in LOCALE_PATHS."""

@@ -54,6 +54,12 @@ provided in the
 :option:`django-admin makemessages --update-plural-forms<makemessages --update-plural-forms>`.
 option.
 
+Also, customization of the plural forms was not possible previously without
+modifying Django source files.
+
+The :setting:`LOCALE_ROOT` setting has been introduced for enabling the
+feature.
+
 Minor features
 --------------
 

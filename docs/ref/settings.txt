@@ -1984,6 +1984,35 @@ and run-time.
 
 See also :ref:`plural-forms`.
 
+.. setting:: LOCALE_ROOT
+
+``LOCALE_ROOT``
+----------------
+
+.. versionadded:: 3.1
+
+Default: ``None``
+
+Absolute filesystem path to the directory that will hold the main po files of
+translations.
+
+Example::
+
+    LOCALE_ROOT = BASEDIR / 'locale'
+
+Django will use the files contained in ``<locale_code>/LC_MESSAGES`` under this
+directory as the main Django po file of a translation for a domain.
+
+.. note::
+
+    Using this setting requires compiled message file(s) for your locale(s),
+    you have to provide them.
+
+.. note::
+
+    This setting will make Django not take into account the bundled message files,
+    is up to the user to collect any new messages after an upgrade.
+
 .. setting:: LOGGING
 
 ``LOGGING``

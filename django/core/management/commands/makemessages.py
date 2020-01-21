@@ -453,9 +453,12 @@ class Command(BaseCommand):
         exists. If it doesn't exists for a language variant, return the main
         language main po.
         """
-        main_po_dir = os.path.join(
-            self.django_dir, 'conf', 'locale', '%s', 'LC_MESSAGES'
-        )
+        if self.settings_available and hasattr(settings, 'LOCALE_ROOT'):
+            main_po_dir = os.path.join(settings.LOCALE_ROOT, '%s', 'LC_MESSAGES')
+        else:
+            main_po_dir = os.path.join(
+                self.django_dir, 'conf', 'locale', '%s', 'LC_MESSAGES'
+            )
         main_po_ph = os.path.join(main_po_dir, '%s.po')
         if os.path.exists(main_po_ph % (locale, domain)):
             return main_po_ph % (locale, domain)
@@ -748,8 +751,8 @@ class Command(BaseCommand):
                 )
 
             locale_paths_to_check = set(self.locale_paths)
-            # if self.settings_available and hasattr(settings, 'LOCALE_ROOT'):
-            #     locale_paths_to_check = locale_paths_to_check - set([settings.LOCALE_ROOT])
+            if self.settings_available and hasattr(settings, 'LOCALE_ROOT'):
+                locale_paths_to_check = locale_paths_to_check - set([settings.LOCALE_ROOT])
             for locale_path in locale_paths_to_check:
                 user_po = os.path.join(locale_path, locale, 'LC_MESSAGES',
                                        '%s.po' % self.domain)
