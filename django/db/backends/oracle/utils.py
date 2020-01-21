@@ -53,6 +53,6 @@ class BulkInsertMapper:
         'PositiveIntegerField': NUMBER,
         'PositiveSmallIntegerField': NUMBER,
         'SmallIntegerField': NUMBER,
-        'TextField': CLOB,
+        #  'TextField': CLOB,
         'TimeField': TIMESTAMP,
     }
