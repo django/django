@@ -19,6 +19,7 @@ from django.utils.jslex import prepare_js_for_gettext
 from django.utils.regex_helper import _lazy_re_compile
 from django.utils.text import get_text_list
 from django.utils.translation import templatize
+from django.utils.translation.plural_forms import PluralForms
 
 plural_forms_re = _lazy_re_compile(r'^(?P<value>"Plural-Forms.+?\\n")\s*$', re.MULTILINE | re.DOTALL)
 STATUS_OK = 0
@@ -205,6 +206,7 @@ class Command(BaseCommand):
 
     translatable_file_class = TranslatableFile
     build_file_class = BuildFile
+    plural_forms_class = PluralForms
 
     requires_system_checks = False
 
@@ -279,6 +281,15 @@ class Command(BaseCommand):
             '--keep-pot', action='store_true',
             help="Keep .pot file after making messages. Useful when debugging.",
         )
+        parser.add_argument(
+            '--update-plural-forms', '-upf', action='store', nargs='?',
+            const='interactive',
+            help=(
+                "Checks or aligns all project or application message files' "
+                "plural forms for the locale(s) with the main plural forms "
+                "in a domain (see --domain)."
+            )
+        )
 
     def handle(self, *args, **options):
         locale = options['locale']
@@ -288,6 +299,7 @@ class Command(BaseCommand):
         process_all = options['all']
         extensions = options['extensions']
         self.symlinks = options['symlinks']
+        self.update_pfs = options['update_plural_forms']
 
         ignore_patterns = options['ignore_patterns']
         if options['use_default_ignore_patterns']:
@@ -335,6 +347,14 @@ class Command(BaseCommand):
                 % (os.path.basename(sys.argv[0]), sys.argv[1])
             )
 
+        if self.update_pfs and self.update_pfs not in ['interactive', 'copy']:
+            update_pfs_regex = r'(\d,)*\d'
+            if not re.fullmatch(update_pfs_regex, self.update_pfs):
+                raise CommandError(
+                    "currently the --update-plural-forms option only supports "
+                    "'interactive', 'copy' or comma-separated digits as a parameter."
+                )
+
         if self.verbosity > 1:
             self.stdout.write(
                 'examining files with the extensions: %s\n'
@@ -376,6 +396,9 @@ class Command(BaseCommand):
         if locales:
             check_programs('msguniq', 'msgmerge', 'msgattrib')
 
+        if self.update_pfs:
+            check_programs('msgfmt')
+
         check_programs('xgettext')
 
         try:
@@ -385,8 +408,13 @@ class Command(BaseCommand):
             for locale in locales:
                 if self.verbosity > 0:
                     self.stdout.write("processing locale %s\n" % locale)
-                for potfile in potfiles:
-                    self.write_po_file(potfile, locale)
+
+                if self.update_pfs:
+                    self.update_plural_forms(locale)
+                else:
+                    for potfile in potfiles:
+                        self.write_po_file(potfile, locale)
+
         finally:
             if not self.keep_pot:
                 self.remove_potfiles()
@@ -414,6 +442,30 @@ class Command(BaseCommand):
                 self.stderr.write("Running without configured settings.")
             return False
         return True
+
+    @cached_property
+    def django_dir(self):
+        return os.path.normpath(os.path.join(os.path.dirname(django.__file__)))
+
+    def get_main_po(self, locale, domain):
+        """
+        Returns a string with the path to main po for the locale and domain if
+        exists. If it doesn't exists for a language variant, return the main
+        language main po.
+        """
+        main_po_dir = os.path.join(
+            self.django_dir, 'conf', 'locale', '%s', 'LC_MESSAGES'
+        )
+        main_po_ph = os.path.join(main_po_dir, '%s.po')
+        if os.path.exists(main_po_ph % (locale, domain)):
+            return main_po_ph % (locale, domain)
+        else:
+            if "_" in locale:
+                # Use the main language instead of the variant
+                lang_locale = locale.split("_")[0]
+                if os.path.exists(main_po_ph % (lang_locale, domain)):
+                    return main_po_ph % (lang_locale, domain)
+        return None
 
     def build_potfiles(self):
         """
@@ -630,21 +682,21 @@ class Command(BaseCommand):
                 elif self.verbosity > 0:
                     self.stdout.write(errors)
 
-    def copy_plural_forms(self, msgs, locale):
+    def copy_plural_forms(self, msgs, locale, update=False):
         """
-        Copy plural forms header contents from a Django catalog of locale to
+        Copy plural forms header contents from a main catalog of a locale to
         the msgs string, inserting it at the right place. msgs should be the
-        contents of a newly created .po file.
+        contents of a newly created .po file or the contents of an already
+        created .po if update is True.
         """
-        django_dir = os.path.normpath(os.path.join(os.path.dirname(django.__file__)))
         if self.domain == 'djangojs':
             domains = ('djangojs', 'django')
         else:
             domains = ('django',)
         for domain in domains:
-            django_po = os.path.join(django_dir, 'conf', 'locale', locale, 'LC_MESSAGES', '%s.po' % domain)
-            if os.path.exists(django_po):
-                with open(django_po, encoding='utf-8') as fp:
+            main_po = self.get_main_po(locale, domain) or self.get_main_po(locale, 'django')
+            if main_po:
+                with open(main_po, encoding='utf-8') as fp:
                     m = plural_forms_re.search(fp.read())
                 if m:
                     plural_form_line = m.group('value')
@@ -652,11 +704,247 @@ class Command(BaseCommand):
                         self.stdout.write("copying plural forms: %s\n" % plural_form_line)
                     lines = []
                     found = False
-                    for line in msgs.splitlines():
-                        if not found and (not line or plural_forms_re.search(line)):
-                            line = plural_form_line
-                            found = True
-                        lines.append(line)
-                    msgs = '\n'.join(lines)
-                    break
+                    if not update:
+                        for line in msgs.splitlines():
+                            if not found and (not line or plural_forms_re.search(line)):
+                                line = plural_form_line + '\n'
+                                found = True
+                            lines.append(line)
+                        msgs = '\n'.join(lines)
+                        break
+                    else:
+                        o = plural_forms_re.search(msgs)
+                        if o:
+                            plural_form_to_update = o.group('value')
+                            msgs = msgs.replace(
+                                plural_form_to_update, plural_form_line)
         return msgs
+
+    def update_plural_forms(self, locale):
+        """
+        Examines the user's .po files of a locale for a divergence in the
+        plural forms with the main forms. If one is found (mismatch) and no
+        action or form map is given in the argument, prompts the user to map
+        the main form to the user's form and outputs a compliant .po file.
+        """
+        # For the 'djangojs' domain, fallback to 'django' if not exists
+        main_po = (self.get_main_po(locale, self.domain) or
+                   self.get_main_po(locale, 'django'))
+        if not main_po:
+            raise CommandError(
+                "unable to find the main .po file for '%s' (or fallback)" %
+                (locale, )
+            )
+
+        self.check_po_header_validity(main_po)
+        with open(main_po, encoding='utf-8') as fp:
+            m = plural_forms_re.search(fp.read())
+        if m:
+            try:
+                main_plural_forms = self.plural_forms_class(m.group('value'))
+            except ValueError:
+                raise CommandError(
+                    'plural forms in %s seems incomplete  or unset - unable to parse.' % main_po
+                )
+
+            locale_paths_to_check = set(self.locale_paths)
+            # if self.settings_available and hasattr(settings, 'LOCALE_ROOT'):
+            #     locale_paths_to_check = locale_paths_to_check - set([settings.LOCALE_ROOT])
+            for locale_path in locale_paths_to_check:
+                user_po = os.path.join(locale_path, locale, 'LC_MESSAGES',
+                                       '%s.po' % self.domain)
+                if os.path.exists(user_po):
+                    self.check_po_header_validity(user_po)
+                    with open(user_po, encoding='utf-8') as fp:
+                        o = plural_forms_re.search(fp.read())
+                    if o:
+                        try:
+                            user_plural_forms = self.plural_forms_class(o.group('value'))
+                        except ValueError:
+                            raise CommandError(
+                                'plural forms in %s seems incomplete or unset - unable to parse.' % user_po
+                            )
+
+                        if user_plural_forms == main_plural_forms:
+                            if self.verbosity > 0:
+                                self.stdout.write(
+                                    "Plural forms in %s for %s are compliant "
+                                    "with the main forms." % (locale_path, locale)
+                                )
+                        else:
+                            if self.verbosity > 0:
+                                self.stdout.write(
+                                    ":: Aligning plural forms in %s for %s "
+                                    "with the main form ::" % (locale_path, locale)
+                                )
+                            if self.update_pfs == 'interactive':
+                                form_map = []
+                                overwrite = None  # will be set by user input
+                            else:
+                                form_map = [int(d) for d in self.update_pfs.split(",")]
+                                overwrite = 'y'
+                            if main_plural_forms.nplurals < user_plural_forms.nplurals:
+                                if self.verbosity > 0:
+                                    self.stdout.write(
+                                        "WARNING: Main form plurals are less than "
+                                        "user's, trimming will occur."
+                                    )
+                            m_forms = main_plural_forms.forms
+                            u_forms = user_plural_forms.forms
+                            if not form_map:
+                                if self.verbosity > 0:
+                                    self.stdout.write("Main Plural Forms:")
+                                    for f_number in m_forms:
+                                        self.stdout.write(
+                                            "%s: %s" % (f_number, m_forms[f_number]))
+                                    self.stdout.write("User Plural Forms:")
+                                    for f_number in u_forms:
+                                        self.stdout.write(
+                                            "%s: %s" % (f_number, u_forms[f_number]))
+                                for form_number in m_forms:
+                                    input_message = "Main form %s: %s maps to [%s] in User form: " % (
+                                        form_number, m_forms[form_number],
+                                        ("|").join(map(str, range(len(u_forms))))
+                                    )
+                                    user_input = int(self.get_user_input(input_message))
+                                    while user_input not in u_forms:
+                                        self.stdout.write("Form not available in User catalog.")
+                                        user_input = int(self.get_user_input(input_message))
+                                    form_map.append(user_input)
+                            msgs = self.remap_plural_forms(user_po, form_map)
+                            msgs = self.copy_plural_forms('\n'.join(msgs), locale, update=True)
+                            overwrite_msg = "Overwrite user's catalog? [y/n]: "
+                            if not overwrite:
+                                overwrite = self.get_user_input(overwrite_msg)
+                            while overwrite not in ['y', 'yes', 'n', 'no']:
+                                self.stdout.write("Please answer 'y'/'yes' or 'n'/'no'.")
+                                overwrite = self.get_user_input(overwrite_msg)
+                            filename = user_po if overwrite in ['y', 'yes'] else user_po + '.new'
+                            with open(filename, 'w', encoding="utf-8") as fp:
+                                msgs = normalize_eols(msgs)
+                                fp.write(msgs)
+                            if self.verbosity > 0:
+                                self.stdout.write(
+                                    "Remapped plural forms have been written to %s." % filename
+                                )
+                    else:
+                        copy_pf, overwrite = ('y', 'y') if self.update_pfs == 'copy' else (None, None)
+                        copy_pf_msg = (
+                            "Catalog in %s does not contain plural forms while the main catalog "
+                            "has, copy plural forms from the main one? (no remapping will be "
+                            "done) [y/n]:" % user_po
+
+                        )
+                        if not copy_pf:
+                            copy_pf = self.get_user_input(copy_pf_msg)
+                        while copy_pf not in ['y', 'yes', 'n', 'no']:
+                            self.stdout.write("Please answer 'y'/'yes' or 'n'/'no'.")
+                            copy_pf = self.get_user_input(copy_pf_msg)
+                        overwrite_msg = "Overwrite user's catalog? [y/n]: "
+                        if not overwrite:
+                            overwrite = self.get_user_input(overwrite_msg)
+                        while overwrite not in ['y', 'yes', 'n', 'no']:
+                            self.stdout.write("Please answer 'y'/'yes' or 'n'/'no'.")
+                            overwrite = self.get_user_input(overwrite_msg)
+                        filename = user_po if overwrite in ['y', 'yes'] else user_po + '.new'
+                        with open(user_po, encoding='utf-8') as fp:
+                            msgs = fp.read()
+                        msgs = self.copy_plural_forms(msgs, locale)
+                        msgs = normalize_eols(msgs)
+                        with open(filename, 'w', encoding='utf-8') as fp:
+                            fp.write(msgs)
+                        if self.verbosity > 0:
+                            self.stdout.write(
+                                "Plural forms have been written to %s." % filename
+                            )
+
+    def remap_plural_forms(self, pofile, form_map):
+        """
+        Performs the remapping of the .po file with the given form map.
+        """
+        with open(pofile, encoding='utf-8') as fp:
+            msgs = fp.read()
+        msgs = msgs.splitlines()
+        groups, groups_msgs, groups_forms, groups_new_msgs = [], [], [], []
+        group_start, group_end = None, None
+        # Find the groups of pluralized msgs in msgs
+        for i, line in enumerate(msgs):
+            if line.startswith("msgstr[0]"):
+                group_start = i
+            elif line == "" and group_start:
+                group_end = i
+            if i == len(msgs) - 1 and group_start:
+                # Last empty line is stripped by splitlines()
+                group_end = i + 1
+            if group_start and group_end:
+                groups.append([group_start, group_end])
+                group_start, group_end = None, None
+        # Collect all msgs in groups
+        for group in groups:
+            groups_msgs.append(msgs[group[0]:group[1]])
+        # Process the msgs in groups
+        for group_index, group_msgs in enumerate(groups_msgs):
+            group_forms = {}
+            for k, msg in enumerate(group_msgs):
+                m = re.search(r'(?<=msgstr\[)\d(?=\])', msg)
+                if m:
+                    group_number = int(m.group(0))
+                    group_forms[group_number] = [msg]
+                else:
+                    group_forms[group_number].append(msg)
+            groups_forms.append(group_forms)
+
+            new_msgs = []
+            for main_form, user_form in enumerate(form_map):
+                try:
+                    msgs_to_append = groups_forms[group_index][user_form]
+                    msgs_to_append[0] = "msgstr[%d]" % main_form + msgs_to_append[0][9:]
+                except KeyError:
+                    raise CommandError(
+                        "The provided form map is not compatible with the main "
+                        "and user plural forms."
+                    )
+                new_msgs.extend(msgs_to_append)
+            groups_new_msgs.append(new_msgs)
+        # It's needed to go again through msgs because replacing msgs may
+        # change groups locations and the index
+        i, group_number = 0, 0
+        group_start, group_end = None, None
+        while i < len(msgs):
+            line = msgs[i]
+            if line.startswith("msgstr[0]"):
+                group_start = i
+            elif line == "" and group_start:
+                group_end = i
+            if i == len(msgs) - 1 and group_start:
+                group_end = i + 1
+            if group_start and group_end:
+                del msgs[group_start:group_end]
+                msgs[group_start:group_start] = groups_new_msgs[group_number]
+                i += len(groups_new_msgs[group_number]) - (group_end - group_start) - 1
+                group_number += 1
+                group_start, group_end = None, None
+            i += 1
+
+        return msgs
+
+    def get_user_input(self, message):
+        """
+        Wraps input() to make it testable.
+        """
+        return(input(message))
+
+    def check_po_header_validity(self, pofile):
+        """
+        Check the validity the header (including plural forms) of a .po file
+        using msgfmt.
+        """
+        args = ['msgfmt', '--check-header', pofile]
+        msgs, errors, status = popen_wrapper(args)
+        if errors:
+            if status != STATUS_OK:
+                raise CommandError(
+                    "errors happened while checking po validity\n%s" % errors)
+            elif self.verbosity > 0:
+                self.stdout.write(errors)
+        return True

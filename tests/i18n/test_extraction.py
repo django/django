@@ -547,6 +547,195 @@ class CopyPluralFormsExtractorTests(ExtractorTests):
             self.assertMsgIdPlural('Plural for a `translate` and `blocktranslate` collision case', po_contents)
 
 
+class UpdatePluralFormsTests(ExtractorTests):
+
+    PO_FILE_NEW = 'app_with_locale/locale/%s/LC_MESSAGES/django.po.new'
+    PO_FILE = 'app_with_locale/locale/%s/LC_MESSAGES/django.po'
+
+    def test_remapping_interactive(self):
+        """
+        Test the correct functioning of form remapping by --update-plural-forms.
+        """
+        with mock.patch('django.core.management.commands.makemessages.Command.django_dir',
+                        os.path.join(self.test_dir, 'django_dir')):
+            with mock.patch('django.core.management.commands.makemessages.Command.get_user_input',
+                            side_effect=['0', '1', '1', '9', '1', 'm', 'n']):
+                out = StringIO()
+                management.call_command(
+                    'makemessages', locale=['cs'], update_plural_forms='interactive',
+                    stdout=out, verbosity=1
+                )
+                with open(self.PO_FILE_NEW % 'cs', encoding='utf-8') as fp:
+                    po_contents = fp.read()
+                    should_contain = """
+                    "Plural-Forms: nplurals=4; plural=(n == 1 && n % 1 == 0) ? 0 : (n >= 2 && n "
+                    "<= 4 && n % 1 == 0) ? 1: (n % 1 != 0 ) ? 2 : 3;\n"
+
+                    #, python-format
+                    msgid ""
+                    "Ensure that there are no more than %(max)s digit before the decimal point."
+                    msgid_plural ""
+                    "Ensure that there are no more than %(max)s digits before the decimal point."
+                    msgstr[0] ""
+                    "Ujistěte se, že hodnota neobsahuje více než %(max)s místo před desetinnou "
+                    "čárkou (tečkou)."
+                    msgstr[1] ""
+                    "Ujistěte se, že hodnota neobsahuje více než %(max)s místa před desetinnou "
+                    "čárkou (tečkou)."
+                    msgstr[2] ""
+                    "Ujistěte se, že hodnota neobsahuje více než %(max)s místa před desetinnou "
+                    "čárkou (tečkou)."
+                    msgstr[3] ""
+                    "Ujistěte se, že hodnota neobsahuje více než %(max)s místa před desetinnou "
+                    "čárkou (tečkou)."
+
+                    #, python-format
+                    msgid "Ensure that there are no more than %(max)s digit in total."
+                    msgid_plural "Ensure that there are no more than %(max)s digits in total."
+                    msgstr[0] "Ujistěte se, že pole neobsahuje celkem více než %(max)s číslici."
+                    msgstr[1] "Ujistěte se, že pole neobsahuje celkem více než %(max)s číslice."
+                    msgstr[2] "Ujistěte se, že pole neobsahuje celkem více než %(max)s číslice."
+                    msgstr[3] "Ujistěte se, že pole neobsahuje celkem více než %(max)s číslice."
+                    """
+                    for line in should_contain.splitlines():
+                        self.assertIn(line.strip(), po_contents)
+
+    def test_trimming(self):
+        """
+        Test the correct functioning of trimming in --update-plural-forms ('trimming' is when the
+        main form has less plural forms than the user's forms.
+        """
+        with mock.patch('django.core.management.commands.makemessages.Command.django_dir',
+                        os.path.join(self.test_dir, 'django_dir')):
+            with mock.patch('django.core.management.commands.makemessages.Command.get_user_input',
+                            side_effect=['0', '1', 'n']):
+                out = StringIO()
+                management.call_command(
+                    'makemessages', locale=['lt'], update_plural_forms='interactive',
+                    stdout=out, verbosity=1
+                )
+                with open(self.PO_FILE_NEW % 'lt', encoding='utf-8') as fp:
+                    po_contents = fp.read()
+                    should_contain = """
+                    "Plural-Forms:  nplurals=2; plural=(n != 1);\n"
+                    msgid "Password change"
+                    msgstr "Slaptažodžio keitimas"
+                    #, python-format
+                    msgid "%(counter)s result"
+                    msgid_plural "%(counter)s results"
+                    msgstr[0] "%(counter)s rezultatas"
+                    msgstr[1] "%(counter)s rezultatai"
+                    """
+
+                    should_not_contain = """msgstr[2] "%(counter)s rezultatai"
+                    msgstr[3] "%(counter)s rezultatai"""
+
+                    for line in should_contain.splitlines():
+                        self.assertIn(line.strip(), po_contents)
+
+                    for line in should_not_contain.splitlines():
+                        self.assertNotIn(line.strip(), po_contents)
+
+    def test_automation_remapping(self):
+        with mock.patch('django.core.management.commands.makemessages.Command.django_dir',
+                        os.path.join(self.test_dir, 'django_dir')):
+            management.call_command('makemessages', locale=['tt'], update_plural_forms='0,0', verbosity=0)
+            with open(self.PO_FILE % 'tt', encoding='utf-8') as fp:
+                po_contents = fp.read()
+                should_contain = """
+                "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+                #, python-format
+                msgid "%d day"
+                msgid_plural "%d days"
+                msgstr[0] ""
+                msgstr[1] ""
+                """
+
+                for line in should_contain.splitlines():
+                    self.assertIn(line.strip(), po_contents)
+
+    def test_automation_bad_form_map(self):
+        with mock.patch('django.core.management.commands.makemessages.Command.django_dir',
+                        os.path.join(self.test_dir, 'django_dir')):
+            msg = ("currently the --update-plural-forms option only supports "
+                   "'interactive', 'copy' or comma-separated digits as a parameter.")
+            with self.assertRaisesMessage(CommandError, msg):
+                management.call_command('makemessages', locale=['tt'], update_plural_forms='0,b', verbosity=0)
+
+    def test_copy_interactive(self):
+        with mock.patch('django.core.management.commands.makemessages.Command.get_user_input',
+                        side_effect=['u', 'y', 'm', 'n']):
+            out = StringIO()
+            management.call_command(
+                'makemessages', locale=['es_XX'], update_plural_forms='interactive',
+                stdout=out, verbosity=1
+            )
+            with open(self.PO_FILE_NEW % 'es_XX', encoding='utf-8') as fp:
+                po_contents = fp.read()
+                should_contain = "Plural-Forms: nplurals=2; plural=(n != 1);\\n"
+                self.assertIn(should_contain, po_contents)
+
+    def test_automation_copy(self):
+        management.call_command('makemessages', locale=['en'], update_plural_forms='copy', verbosity=0)
+        with open(self.PO_FILE % 'en', encoding='utf-8') as fp:
+            po_contents = fp.read()
+            should_contain = "Plural-Forms: nplurals=2; plural=(n != 1);\\n"
+            self.assertIn(should_contain, po_contents)
+
+    def test_msgfmt_check_main_form(self):
+        with mock.patch('django.core.management.commands.makemessages.Command.django_dir',
+                        os.path.join(self.test_dir, 'django_dir')):
+            msg = "invalid plural"
+            with self.assertRaisesMessage(CommandError, msg):
+                management.call_command(
+                    'makemessages', locale=['mk'], update_plural_forms='interactive', verbosity=0
+                )
+
+    def test_msgfmt_check_user_form(self):
+        with mock.patch('django.core.management.commands.makemessages.Command.django_dir',
+                        os.path.join(self.test_dir, 'django_dir')):
+            msg = "invalid nplurals value"
+            with self.assertRaisesMessage(CommandError, msg):
+                management.call_command('makemessages', locale=['mko'], update_plural_forms='interactive', verbosity=0)
+
+    def test_plural_forms_check_main_form(self):
+        """
+        In some cases, msgfmt --check deems the plural forms as valid if
+        they not contain either 'nplurals' or 'plural' (bug in msgfmt).
+        """
+        with mock.patch('django.core.management.commands.makemessages.Command.django_dir',
+                        os.path.join(self.test_dir, 'django_dir')):
+            msg = "unable to parse"
+            with self.assertRaisesMessage(CommandError, msg):
+                management.call_command(
+                    'makemessages', locale=['sl'], update_plural_forms='interactive', verbosity=0
+                )
+
+    def test_plural_forms_check_user_form(self):
+        with mock.patch('django.core.management.commands.makemessages.Command.django_dir',
+                        os.path.join(self.test_dir, 'django_dir')):
+            msg = "unable to parse"
+            with self.assertRaisesMessage(CommandError, msg):
+                management.call_command('makemessages', locale=['sl'], update_plural_forms='interactive', verbosity=0)
+
+    def test_incompatible_form_map(self):
+        with mock.patch('django.core.management.commands.makemessages.Command.django_dir',
+                        os.path.join(self.test_dir, 'django_dir')):
+            msg = "The provided form map is not compatible"
+            with self.assertRaisesMessage(CommandError, msg):
+                management.call_command('makemessages', locale=['sk'], update_plural_forms='4,5', verbosity=0)
+
+    def test_no_main_po(self):
+        with mock.patch('django.core.management.commands.makemessages.Command.django_dir',
+                        os.path.join(self.test_dir, 'django_dir')):
+            msg = "unable to find the main .po file"
+            with self.assertRaisesMessage(CommandError, msg):
+                management.call_command(
+                    'makemessages', locale=['xxx'], domain='djangojs', update_plural_forms='4,5',
+                    verbosity=0
+                )
+
+
 class NoWrapExtractorTests(ExtractorTests):
 
     def test_no_wrap_enabled(self):

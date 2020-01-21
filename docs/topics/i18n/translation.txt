@@ -307,6 +307,12 @@ This issue may arise mostly in two situations:
 If you had created your message file with a previous version of Django, the
 standard may have changed or a bug has been fixed in the release.
 
+For aligning with the new version of the standard (or addressing the bug),
+you may use
+:option:`django-admin makemessages --update-plural-forms<makemessages --update-plural-forms>`
+to update your message files so they are aligned with the main plural forms
+and avoid unexpected behavior.
+
 .. versionchanged:: 3.1
 
     Handling plural forms as described above was added.

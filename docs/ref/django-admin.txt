@@ -727,6 +727,53 @@ Prevents deleting the temporary ``.pot`` files generated before creating the
 ``.po`` file. This is useful for debugging errors which may prevent the final
 language files from being created.
 
+.. django-admin-option:: --update-plural-forms [{interactive, copy, form_map}] -cpf
+
+Checks or aligns all project or application message files' plural forms for the
+locale(s) (detected or specified) in a domain (defaults to ``django``) with the
+main plural forms (see :ref:`plural-forms`).
+
+If a divergence is found and the option is set to ``interactive`` (default),
+the user will be prompted to map the main plural forms to the ones found in
+the message file. With the form map provided, the message file will be
+reorganized accordingly and the plural forms will be updated.
+
+In the case of an increase in the number of plurals, it will fill
+those with the previously chosen forms so you avoid having translation results
+in the fallback language or the original string - this will produce the same
+results as before though you may want to update those later for a
+better expression of the language if it corresponds.
+
+In a decrease of the forms, it will reorganize and trim the exceeding ones.
+
+When only the equation differs, only reorganization will occur.
+
+If no plural forms is found in the message file, the user will be prompted to
+copy them from the main po file. No remapping will be done, it is assumed that
+is already aligned. If it is not the case, use a plural form with the number of
+plurals matching the message file's and then re-run the command to perform form
+mapping.
+
+Specific locale(s) to consider can be set with the ``--locale`` option (or 
+ignored with ``--exclude``).
+
+Automation can be done only for a specific locale by using the values ``copy``
+for only copying the plural forms or the ``form_map`` in comma-separated digits
+- i.e. ``0,1,1,1`` - for perform form mapping.
+
+Example usage::
+
+    django-admin makemessages --update-plural-forms
+    django-admin makemessages --update-plural-forms copy --locale=en
+    django-admin makemessages -upf 0,1,1,1 -l he -d djangojs
+
+.. note::
+
+    Be aware that while this tool can handle most of the regular cases,  
+    it may be an unlikely situation where a linear mapping is not adequate.
+    It is recommended not to overwrite and check the results if the form 
+    map is not "obvious".
+
 .. seealso::
 
     See :ref:`customizing-makemessages` for instructions on how to customize

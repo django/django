@@ -48,6 +48,11 @@ file, both at a
 :ref:`system check level <translation-checks>` (``translation.W005``)
 and run-time.
 
+As fixing this issue can be automated in most scenarios, the tool used for
+ensuring plural forms consistency in all Django bundled message files is
+provided in the
+:option:`django-admin makemessages --update-plural-forms<makemessages --update-plural-forms>`.
+option.
 
 Minor features
 --------------
