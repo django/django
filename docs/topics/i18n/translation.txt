@@ -319,6 +319,9 @@ Customization of the plural forms for a language is done via the
 Once the setting is defined, Django will use the files under this directory as
 the main Django po files for translations.
 
+You may use :option:`django-admin makemessages --collect-bundled<makemessages --collect-bundled>`
+for collecting the bundled ones with Django and then customize them.
+
 .. versionchanged:: 3.1
 
     Handling plural forms as described above was added.

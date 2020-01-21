@@ -213,6 +213,7 @@ class Command(BaseCommand):
     msgmerge_options = ['-q', '--previous']
     msguniq_options = ['--to-code=utf-8']
     msgattrib_options = ['--no-obsolete']
+    msgcat_options = ['--use-first', '--to-code=UTF-8']
     xgettext_options = ['--from-code=UTF-8', '--add-comments=Translators']
 
     def add_arguments(self, parser):
@@ -290,6 +291,12 @@ class Command(BaseCommand):
                 "in a domain (see --domain)."
             )
         )
+        parser.add_argument(
+            '--collect-bundled', '-cb',
+            choices=('default-path', 'all-bundled'), nargs='?',
+            const='default-path',
+            help="Collects Django's bundled message files into LOCALE_ROOT."
+        )
 
     def handle(self, *args, **options):
         locale = options['locale']
@@ -300,6 +307,7 @@ class Command(BaseCommand):
         extensions = options['extensions']
         self.symlinks = options['symlinks']
         self.update_pfs = options['update_plural_forms']
+        self.collect_bundled = options['collect_bundled']
 
         ignore_patterns = options['ignore_patterns']
         if options['use_default_ignore_patterns']:
@@ -311,11 +319,13 @@ class Command(BaseCommand):
             self.msgmerge_options = self.msgmerge_options[:] + ['--no-wrap']
             self.msguniq_options = self.msguniq_options[:] + ['--no-wrap']
             self.msgattrib_options = self.msgattrib_options[:] + ['--no-wrap']
+            self.msgcat_options = self.msgcat_options[:] + ['--no-wrap']
             self.xgettext_options = self.xgettext_options[:] + ['--no-wrap']
         if options['no_location']:
             self.msgmerge_options = self.msgmerge_options[:] + ['--no-location']
             self.msguniq_options = self.msguniq_options[:] + ['--no-location']
             self.msgattrib_options = self.msgattrib_options[:] + ['--no-location']
+            self.msgcat_options = self.msgcat_options[:] + ['--no-location']
             self.xgettext_options = self.xgettext_options[:] + ['--no-location']
         if options['add_location']:
             if self.gettext_version < (0, 19):
@@ -327,6 +337,7 @@ class Command(BaseCommand):
             self.msgmerge_options = self.msgmerge_options[:] + [arg_add_location]
             self.msguniq_options = self.msguniq_options[:] + [arg_add_location]
             self.msgattrib_options = self.msgattrib_options[:] + [arg_add_location]
+            self.msgcat_options = self.msgcat_options[:] + [arg_add_location]
             self.xgettext_options = self.xgettext_options[:] + [arg_add_location]
 
         self.no_obsolete = options['no_obsolete']
@@ -345,6 +356,12 @@ class Command(BaseCommand):
             raise CommandError(
                 "Type '%s help %s' for usage information."
                 % (os.path.basename(sys.argv[0]), sys.argv[1])
+            )
+
+        if (self.collect_bundled) and self.settings_available and not hasattr(settings, 'LOCALE_ROOT'):
+            raise CommandError(
+                "currently makemessages only supports collecting bundled message files "
+                "with the LOCALE_ROOT setting defined."
             )
 
         if self.update_pfs and self.update_pfs not in ['interactive', 'copy']:
@@ -366,6 +383,7 @@ class Command(BaseCommand):
         self.default_locale_path = None
         if os.path.isdir(os.path.join('conf', 'locale')):
             self.locale_paths = [os.path.abspath(os.path.join('conf', 'locale'))]
+            self.locale_paths.extend(self.contrib_apps_locale_dirs)
             self.default_locale_path = self.locale_paths[0]
             self.invoked_for_django = True
         else:
@@ -396,6 +414,9 @@ class Command(BaseCommand):
         if locales:
             check_programs('msguniq', 'msgmerge', 'msgattrib')
 
+        if self.collect_bundled:
+            check_programs('msgcat')
+
         if self.update_pfs:
             check_programs('msgfmt')
 
@@ -403,6 +424,26 @@ class Command(BaseCommand):
 
         try:
             potfiles = self.build_potfiles()
+
+            if self.collect_bundled:
+                main_po_ph = os.path.join(
+                    self.django_dir, 'conf', 'locale', '%s', 'LC_MESSAGES', 'django.po'
+                )
+                locales_with_catalogs = [
+                    lang_code for lang_code in
+                    self.locale_list_from_path(self.django_conf_locale_dir)
+                    if os.path.exists(main_po_ph % lang_code)
+                ]
+                locales_to_collect = (
+                    set(locales_with_catalogs + self.locale_list_from_path(settings.LOCALE_ROOT))
+                    if self.collect_bundled == 'all-bundled' else locales
+                )
+                for locale in locales_to_collect:
+                    if self.verbosity > 0:
+                        self.stdout.write(
+                            "collecting bundled messages for locale %s\n" % locale
+                        )
+                    self.collect_bundled_messages(locale)
 
             # Build po files for each selected locale
             for locale in locales:
@@ -447,6 +488,22 @@ class Command(BaseCommand):
     def django_dir(self):
         return os.path.normpath(os.path.join(os.path.dirname(django.__file__)))
 
+    @cached_property
+    def django_conf_locale_dir(self):
+        return os.path.join(self.django_dir, 'conf', 'locale')
+
+    @cached_property
+    def contrib_apps_locale_dirs(self):
+        return glob.glob(self.django_dir + '/contrib/*/locale')
+
+    def locale_list_from_path(self, path):
+        looks_like_locale = re.compile(r'[a-z]{2}')
+        locale_dirs = filter(os.path.isdir, glob.glob('%s/*' % path))
+        return [
+            lang_code for lang_code in map(os.path.basename, locale_dirs)
+            if looks_like_locale.match(lang_code)
+        ]
+
     def get_main_po(self, locale, domain):
         """
         Returns a string with the path to main po for the locale and domain if
@@ -475,6 +532,8 @@ class Command(BaseCommand):
         Build pot files and apply msguniq to them.
         """
         file_list = self.find_files(".")
+        if self.collect_bundled:
+            file_list.extend(self.find_files(self.django_dir))
         self.remove_potfiles()
         self.process_files(file_list)
         potfiles = []
@@ -530,6 +589,10 @@ class Command(BaseCommand):
                 else:
                     locale_dir = None
                     for path in self.locale_paths:
+                        if self.collect_bundled:
+                            if self.django_dir < os.path.abspath(path):
+                                locale_dir = settings.LOCALE_ROOT
+                                break
                         if os.path.abspath(dirpath).startswith(os.path.dirname(path)):
                             locale_dir = path
                             break
@@ -735,8 +798,10 @@ class Command(BaseCommand):
                    self.get_main_po(locale, 'django'))
         if not main_po:
             raise CommandError(
-                "unable to find the main .po file for '%s' (or fallback)" %
-                (locale, )
+                "unable to find the main .po file for '%s' (or fallback), if "
+                "you're using settings.LOCALE_ROOT, make sure you have already "
+                "run `makemessages --collect-bundled --locale=%s`." %
+                (locale, locale)
             )
 
         self.check_po_header_validity(main_po)
@@ -951,3 +1016,80 @@ class Command(BaseCommand):
             elif self.verbosity > 0:
                 self.stdout.write(errors)
         return True
+
+    def collect_bundled_messages(self, locale):
+        """
+        Extract all the literals and collects all the translation strings in
+        message files bundled with Django, for a `locale` and creates or
+        updates the corresponding message file in LOCALE_ROOT.
+
+        Use msgcat GNU gettext utility.
+        """
+        django_main_po = [
+            os.path.join(self.django_dir, 'conf', 'locale', locale,
+                         'LC_MESSAGES', '%s.po')
+        ]
+        django_contrib_pos = [
+            os.path.join(dirname, locale, 'LC_MESSAGES', '%s.po')
+            for dirname in self.contrib_apps_locale_dirs
+        ]
+
+        django_pos = [
+            po % self.domain for po in django_main_po + django_contrib_pos
+            if os.path.exists(po % self.domain)
+        ]
+        if len(django_pos) > 0:
+            args = ['msgcat'] + self.msgcat_options + django_pos
+            msgs, errors, status = popen_wrapper(args)
+            if errors:
+                if status != STATUS_OK:
+                    raise CommandError(
+                        "errors happened while running msgcat\n%s" % errors)
+                elif self.verbosity > 0:
+                    self.stdout.write(errors)
+            msgs = normalize_eols(msgs)
+            if not msgs:
+                # msgcat will not output the header if there is only a null
+                # msgid in the file, keep the header for the plural forms
+                with open(django_pos[0], encoding='utf-8') as fp:
+                    msgs = fp.read()
+        else:
+            # No catalogs were bundled for the locale (adding a new locale)
+            potfile = os.path.join(settings.LOCALE_ROOT, '%s.pot' % self.domain)
+            with open(potfile, encoding='utf-8') as fp:
+                msgs = fp.read()
+
+        translators_re = r'(?<=# Translators:\n)(.*?)(?=msgid)'
+        m = re.search(translators_re, msgs, flags=re.DOTALL)
+        if m:
+            new_translators_strs = [
+                "# Contributors to this catalog are listed in:",
+            ]
+            new_translators_strs += [
+                "# " + django_po for django_po in django_pos
+            ]
+            new_translators_strs = '\n'.join(new_translators_strs) + '\n'
+            i, j = m.span()
+            msgs = msgs[:i] + new_translators_strs + msgs[j:]
+
+        basedir = os.path.join(settings.LOCALE_ROOT, locale, 'LC_MESSAGES')
+        os.makedirs(basedir, exist_ok=True)
+        pofile = os.path.join(basedir, '%s.po' % self.domain)
+
+        if os.path.exists(pofile):
+            tempfile = NamedTemporaryFile(mode='w+b')
+            tempfile.file.write(bytes(msgs, encoding='utf-8'))
+            tempfile.file.flush()
+            args = ['msgcat'] + self.msgcat_options + [pofile, tempfile.name]
+            msgs, errors, status = popen_wrapper(args)
+            if errors:
+                if status != STATUS_OK:
+                    raise CommandError(
+                        "errors happened while running msgcat\n%s" % errors)
+                elif self.verbosity > 0:
+                    self.stdout.write(errors)
+            msgs = normalize_eols(msgs)
+            tempfile.close()
+
+        with open(pofile, 'w', encoding='utf-8') as fp:
+            fp.write(msgs)

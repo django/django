@@ -758,6 +758,78 @@ class UpdatePluralFormsTests(ExtractorTests):
                     self.assertNotIn(line.strip(), po_contents)
 
 
+class CollectBundledTests(ExtractorTests):
+
+    PO_FILE = 'locale_root/%s/LC_MESSAGES/django.po'
+    BUNDLED_LOCALES = ['cs', 'es', 'lt', 'mk', 'ru', 'sl', 'tt']
+
+    def test_single_locale(self):
+        with override_settings(LOCALE_ROOT=os.path.join(self.test_dir, 'locale_root')):
+            with mock.patch('django.core.management.commands.makemessages.Command.django_dir',
+                            os.path.join(self.test_dir, 'django_dir')):
+                out = StringIO()
+                management.call_command(
+                    'makemessages', locale=['es'], collect_bundled='default-path',
+                    stdout=out, verbosity=1
+                )
+                with open(self.PO_FILE % 'es', encoding='utf-8') as fp:
+                    po_contents = fp.read()
+                    should_contain = """
+                    msgid "Afrikaans"
+                    msgstr "Africano"
+                    msgid "Arabic"
+                    msgstr "Árabe"
+                    msgid "Asturian"
+                    msgstr "Asturiano"
+                    """
+                    for line in should_contain.splitlines():
+                        self.assertIn(line.strip(), po_contents)
+
+    def test_translators_string(self):
+        with override_settings(LOCALE_ROOT=os.path.join(self.test_dir, 'locale_root')):
+            with mock.patch('django.core.management.commands.makemessages.Command.django_dir',
+                            os.path.join(self.test_dir, 'django_dir')):
+                management.call_command(
+                    'makemessages', locale=['cs'], collect_bundled='default-path',
+                    verbosity=0
+                )
+                with open(self.PO_FILE % 'cs', encoding='utf-8') as fp:
+                    po_contents = fp.read()
+                    should_contain = "Contributors to this catalog are listed in"
+                    self.assertIn(should_contain, po_contents)
+
+    def test_all_bundled(self):
+        with override_settings(LOCALE_ROOT=os.path.join(self.test_dir, 'locale_root')):
+            with mock.patch('django.core.management.commands.makemessages.Command.django_dir',
+                            os.path.join(self.test_dir, 'django_dir')):
+                management.call_command('makemessages', collect_bundled='all-bundled', verbosity=0)
+                for locale in self.BUNDLED_LOCALES:
+                    self.assertTrue(os.path.exists(self.PO_FILE % locale))
+
+    def test_new_locale(self):
+        with override_settings(LOCALE_ROOT=os.path.join(self.test_dir, 'locale_root')):
+            with mock.patch('django.core.management.commands.makemessages.Command.django_dir',
+                            os.path.join(self.test_dir, 'django_dir')):
+                management.call_command(
+                    'makemessages', locale=['xxx'], collect_bundled='default-path',
+                    verbosity=0
+                )
+                should_contain = """
+                    "Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
+                    msgid "Love"
+                    """
+                with open(self.PO_FILE % 'xxx', encoding='utf-8') as fp:
+                    po_contents = fp.read()
+                    for line in should_contain.splitlines():
+                        self.assertIn(line.strip(), po_contents)
+
+    def test_no_locale_root_setting(self):
+        msg = ("currently makemessages only supports collecting bundled message files "
+               "with the LOCALE_ROOT setting defined.")
+        with self.assertRaisesMessage(CommandError, msg):
+            management.call_command('makemessages', collect_bundled='default-path', verbosity=0)
+
+
 class NoWrapExtractorTests(ExtractorTests):
 
     def test_no_wrap_enabled(self):

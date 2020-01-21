@@ -2006,12 +2006,18 @@ directory as the main Django po file of a translation for a domain.
 .. note::
 
     Using this setting requires compiled message file(s) for your locale(s),
-    you have to provide them.
+    you have to provide them. You may use
+    :option:`django-admin makemessages --collect-bundled<makemessages --collect-bundled>`
+    for collecting the bundled ones with Django (for both ``django`` and ``djangojs`` domains)
+    and then
+    :djadmin:`django-admin compilemessages <compilemessages>` to provide them.
 
 .. note::
 
     This setting will make Django not take into account the bundled message files,
-    is up to the user to collect any new messages after an upgrade.
+    is up to the user to collect any new messages after an upgrade. You may run
+    :option:`django-admin makemessages --collect-bundled<makemessages --collect-bundled>`
+    for collect any new messages at any moment.
 
 .. setting:: LOGGING
 

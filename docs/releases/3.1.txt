@@ -57,8 +57,9 @@ option.
 Also, customization of the plural forms was not possible previously without
 modifying Django source files.
 
-The :setting:`LOCALE_ROOT` setting has been introduced for enabling the
-feature.
+The :setting:`LOCALE_ROOT` setting and the
+:option:`django-admin makemessages --collect-bundled<makemessages --collect-bundled>`
+option has been introduced for enabling the feature.
 
 Minor features
 --------------

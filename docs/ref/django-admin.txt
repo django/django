@@ -774,6 +774,28 @@ Example usage::
     It is recommended not to overwrite and check the results if the form 
     map is not "obvious".
 
+.. django-admin-option:: --collect-bundled [{default-path, all-bundled}] -cb
+
+Pulls out all strings marked for translation in Django for a domain (defaults
+to 'django'), collects all catalogs (message files) bundled for the locale(s)
+and merges them into the corresponding main po file(s) in
+:setting:`LOCALE_ROOT` (required setting).
+
+Defaults to the locales defined in the default locale path that the command
+considers (``default-path``),  use ``all-bundled`` for collecting all locales
+bundled with Django.
+
+Specific locale(s) to collect can be set with the ``--locale`` option (or 
+ignored with ``--exclude``). If the specified locale does not exists, an
+untranslated message file will be created for it.
+
+Example usage::
+
+    django-admin makemessages --collect-bundled --locale=en --locale=pt
+    django-admin makemessages --collect-bundled all-bundled --exclude=fr
+    django-admin makemessages --collect-bundled --domain djangojs
+    django-admin makemessages -cb -l xx_yy -d djangojs
+
 .. seealso::
 
     See :ref:`customizing-makemessages` for instructions on how to customize
