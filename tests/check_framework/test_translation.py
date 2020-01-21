@@ -1,9 +1,14 @@
-from django.core.checks import Error
+import os
+
+from django.core.checks import Error, Warning
 from django.core.checks.translation import (
-    check_language_settings_consistent, check_setting_language_code,
-    check_setting_languages, check_setting_languages_bidi,
+    check_language_settings_consistent, check_plural_forms_consistency,
+    check_setting_language_code, check_setting_languages,
+    check_setting_languages_bidi,
 )
 from django.test import SimpleTestCase, override_settings
+
+here = os.path.dirname(os.path.abspath(__file__))
 
 
 class TranslationCheckTests(SimpleTestCase):
@@ -108,3 +113,42 @@ class TranslationCheckTests(SimpleTestCase):
         for tag in tests:
             with self.subTest(tag), self.settings(LANGUAGE_CODE=tag):
                 self.assertEqual(check_language_settings_consistent(None), [])
+
+    def test_inconsistent_plural_forms_in_languages(self):
+        languages = [('cs', 'Czech'), ('fr', 'French'), ('pt', 'Portuguese')]
+        msg = 'Inconsistent plural forms across catalogs for language {!r}.'
+        with self.settings(
+                PLURAL_FORMS_CONSISTENCY=True,
+                LANGUAGE_CODE='cs',
+                LANGUAGES=languages,
+                LOCALE_PATHS=[os.path.join(here, 'locale_dir'), ]):
+            expected_warnings = [
+                Warning(msg.format(lang), id='translation.W005') for lang in ['cs', 'fr']
+            ]
+            received_warnings = check_plural_forms_consistency(None)
+            for warn in received_warnings:
+                self.assertIn(warn, expected_warnings)
+                expected_warnings.remove(warn)
+                received_warnings.remove(warn)
+            self.assertEqual(expected_warnings, received_warnings, [])
+
+    def test_inconsistent_plural_forms_in_language_code(self):
+        msg = 'Inconsistent plural forms across catalogs for language {!r}.'
+        with self.settings(
+                PLURAL_FORMS_CONSISTENCY=True,
+                LANGUAGE_CODE='cs',
+                LANGUAGES=None,
+                LOCALE_PATHS=[os.path.join(here, 'locale_dir'), ]):
+            expected_warnings = [Warning(msg.format('cs'), id='translation.W005'), ]
+            received_warnings = check_plural_forms_consistency(None)
+            self.assertEqual(expected_warnings, received_warnings)
+
+    def test_inconsistent_plural_forms_in_languages_disabled_setting(self):
+        languages = [('cs', 'Czech'), ('fr', 'French'), ('sk', 'Slovak')]
+        with self.settings(
+                PLURAL_FORMS_CONSISTENCY=False,
+                LANGUAGE_CODE='cs',
+                LANGUAGES=languages,
+                LOCALE_PATHS=[os.path.join(here, 'locale_dir'), ]):
+            received_warnings = check_plural_forms_consistency(None)
+            self.assertEqual(received_warnings, [])

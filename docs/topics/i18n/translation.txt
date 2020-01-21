@@ -279,14 +279,37 @@ In a case like this, consider something like the following::
 
         a format specification for argument 'name', as in 'msgstr[0]', doesn't exist in 'msgid'
 
-.. note:: Plural form and po files
+.. _plural-forms:
 
-    Django does not support custom plural equations in po files. As all
-    translation catalogs are merged, only the plural form for the main Django po
-    file (in ``django/conf/locale/<lang_code>/LC_MESSAGES/django.po``) is
-    considered. Plural forms in all other po files are ignored. Therefore, you
-    should not use different plural equations in your project or application po
-    files.
+Plural Forms
+~~~~~~~~~~~~
+
+Django does not support custom plural forms in message files. As all
+translation files are merged, only the plural form in the main Django po
+file (located in ``django/conf/locale/<lang_code>/LC_MESSAGES/django.po``)
+is considered.
+
+To prevent inconsistencies and undesired results in translations, Django
+provides the :setting:`PLURAL_FORMS_CONSISTENCY` setting (disabled by default).
+
+If enabled, Django will issue a warning when merging any message file that
+contains different plural forms than the main Django po file, both at a
+:ref:`system check level <translation-checks>` (``translation.W005``) and
+run-time.
+
+This issue may arise mostly in two situations:
+
+* when the main plural forms for a language is updated in Django and your po
+  files were created with a previous one, or
+
+* when including third-party translations with different plural forms.
+
+If you had created your message file with a previous version of Django, the
+standard may have changed or a bug has been fixed in the release.
+
+.. versionchanged:: 3.1
+
+    Handling plural forms as described above was added.
 
 .. _contextual-markers:
 

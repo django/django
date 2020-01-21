@@ -1967,6 +1967,23 @@ Example::
 Django will look within each of these paths for the ``<locale_code>/LC_MESSAGES``
 directories containing the actual translation files.
 
+.. setting:: PLURAL_FORMS_CONSISTENCY
+
+``PLURAL_FORMS_CONSISTENCY``
+----------------------------
+
+.. versionadded:: 3.1
+
+Default: ``False``
+
+When ``True``, Django will issue a warning when merging any message file for
+translations that contains different plural forms than the main Django po file,
+both at
+:ref:`system check level <translation-checks>` (``translation.W005``)
+and run-time.
+
+See also :ref:`plural-forms`.
+
 .. setting:: LOGGING
 
 ``LOGGING``
@@ -3594,6 +3611,7 @@ Globalization (``i18n``/``l10n``)
 * :setting:`LOCALE_PATHS`
 * :setting:`MONTH_DAY_FORMAT`
 * :setting:`NUMBER_GROUPING`
+* :setting:`PLURAL_FORMS_CONSISTENCY`
 * :setting:`SHORT_DATE_FORMAT`
 * :setting:`SHORT_DATETIME_FORMAT`
 * :setting:`THOUSAND_SEPARATOR`

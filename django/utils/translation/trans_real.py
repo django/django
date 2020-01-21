@@ -18,6 +18,7 @@ from django.utils.regex_helper import _lazy_re_compile
 from django.utils.safestring import SafeData, mark_safe
 
 from . import to_language, to_locale
+from .plural_forms import PluralForms
 
 # Translations are cached in a dictionary for every language.
 # The active translations are stored by threadid to make them thread local.
@@ -111,18 +112,20 @@ class DjangoTranslation(gettext_module.GNUTranslations):
 
     def _new_gnu_trans(self, localedir, use_null_fallback=True):
         """
-        Return a mergeable gettext.GNUTranslations instance.
+        Return an annotated mergeable gettext.GNUTranslations instance.
 
         A convenience wrapper. By default gettext uses 'fallback=False'.
         Using param `use_null_fallback` to avoid confusion with any other
-        references to 'fallback'.
+        references to 'fallback'. Also annotates the localedir in the object.
         """
-        return gettext_module.translation(
+        annotated_gnu_trans = gettext_module.translation(
             domain=self.domain,
             localedir=localedir,
             languages=[self.__locale],
             fallback=use_null_fallback,
         )
+        annotated_gnu_trans.localedir = localedir
+        return annotated_gnu_trans
 
     def _init_translation_catalog(self):
         """Create a base catalog using global django translations."""
@@ -177,6 +180,30 @@ class DjangoTranslation(gettext_module.GNUTranslations):
             self._info = other._info.copy()
             self._catalog = other._catalog.copy()
         else:
+            if settings.PLURAL_FORMS_CONSISTENCY:
+                if 'plural-forms' in self.info():
+                    current_plural_forms = PluralForms(self.info()['plural-forms'])
+                    if 'plural-forms' not in other.info():
+                        other._info['MISSING PLURAL FORMS'] = "MISSING PLURAL FORMS"
+                        other_plural_forms = None
+                    else:
+                        other_plural_forms = PluralForms(other.info()['plural-forms'])
+                    if current_plural_forms != other_plural_forms:
+                        from pprint import pformat
+                        msg = (
+                            "\nPosible inconsistencies and undesired behavior detected "
+                            "due to different plural forms in message file.\n"
+                            "Locale: %s\n"
+                            "Unconsistent message file localedir: %s\n"
+                            "Unconsistent message file info: \n%s\n"
+                            "MAIN PLURAL FORM: \n%s\n"
+                            "See https://docs.djangoproject.com/en/dev/topics/i18n/translation/#plural-forms"
+                            % (self.__language,
+                               other.localedir,
+                               pformat(other.info(), indent=4),
+                               pformat(self.info()['plural-forms'], indent=4), )
+                        )
+                        warnings.warn(msg, RuntimeWarning)
             self._catalog.update(other._catalog)
         if other._fallback:
             self.add_fallback(other._fallback)
@@ -198,6 +225,15 @@ def translation(language):
     if language not in _translations:
         _translations[language] = DjangoTranslation(language)
     return _translations[language]
+
+
+def reset_translations_cache():
+    """
+    Clears the translations cache dict.
+    """
+    global _translations
+    if _translations:
+        _translations.clear()
 
 
 def activate(language):
