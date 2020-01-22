@@ -16,7 +16,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: kn\n"
-"Plural-Forms: nplurals=1; plural=0;\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
 #, javascript-format
 msgid "Available %s"
@@ -68,6 +68,7 @@ msgstr ""
 msgid "%(sel)s of %(cnt)s selected"
 msgid_plural "%(sel)s of %(cnt)s selected"
 msgstr[0] ""
+msgstr[1] ""
 
 msgid ""
 "You have unsaved changes on individual editable fields. If you run an "
@@ -92,11 +93,13 @@ msgstr ""
 msgid "Note: You are %s hour ahead of server time."
 msgid_plural "Note: You are %s hours ahead of server time."
 msgstr[0] ""
+msgstr[1] ""
 
 #, javascript-format
 msgid "Note: You are %s hour behind server time."
 msgid_plural "Note: You are %s hours behind server time."
 msgstr[0] ""
+msgstr[1] ""
 
 msgid "Now"
 msgstr "ಈಗ"

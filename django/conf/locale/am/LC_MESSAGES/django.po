@@ -1,0 +1,385 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2020-01-22 00:35-0500\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: Amharic (http://www.transifex.com/django/django/language/"
+"am/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: am\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+#: global_settings.py:52
+msgid "Afrikaans"
+msgstr ""
+
+#: global_settings.py:53
+msgid "Arabic"
+msgstr ""
+
+#: global_settings.py:54
+msgid "Algerian Arabic"
+msgstr ""
+
+#: global_settings.py:55
+msgid "Asturian"
+msgstr ""
+
+#: global_settings.py:56
+msgid "Azerbaijani"
+msgstr ""
+
+#: global_settings.py:57
+msgid "Bulgarian"
+msgstr ""
+
+#: global_settings.py:58
+msgid "Belarusian"
+msgstr ""
+
+#: global_settings.py:59
+msgid "Bengali"
+msgstr ""
+
+#: global_settings.py:60
+msgid "Breton"
+msgstr ""
+
+#: global_settings.py:61
+msgid "Bosnian"
+msgstr ""
+
+#: global_settings.py:62
+msgid "Catalan"
+msgstr ""
+
+#: global_settings.py:63
+msgid "Czech"
+msgstr ""
+
+#: global_settings.py:64
+msgid "Welsh"
+msgstr ""
+
+#: global_settings.py:65
+msgid "Danish"
+msgstr ""
+
+#: global_settings.py:66
+msgid "German"
+msgstr ""
+
+#: global_settings.py:67
+msgid "Lower Sorbian"
+msgstr ""
+
+#: global_settings.py:68
+msgid "Greek"
+msgstr ""
+
+#: global_settings.py:69
+msgid "English"
+msgstr ""
+
+#: global_settings.py:70
+msgid "Australian English"
+msgstr ""
+
+#: global_settings.py:71
+msgid "British English"
+msgstr ""
+
+#: global_settings.py:72
+msgid "Esperanto"
+msgstr ""
+
+#: global_settings.py:73
+msgid "Spanish"
+msgstr ""
+
+#: global_settings.py:74
+msgid "Argentinian Spanish"
+msgstr ""
+
+#: global_settings.py:75
+msgid "Colombian Spanish"
+msgstr ""
+
+#: global_settings.py:76
+msgid "Mexican Spanish"
+msgstr ""
+
+#: global_settings.py:77
+msgid "Nicaraguan Spanish"
+msgstr ""
+
+#: global_settings.py:78
+msgid "Venezuelan Spanish"
+msgstr ""
+
+#: global_settings.py:79
+msgid "Estonian"
+msgstr ""
+
+#: global_settings.py:80
+msgid "Basque"
+msgstr ""
+
+#: global_settings.py:81
+msgid "Persian"
+msgstr ""
+
+#: global_settings.py:82
+msgid "Finnish"
+msgstr ""
+
+#: global_settings.py:83
+msgid "French"
+msgstr ""
+
+#: global_settings.py:84
+msgid "Frisian"
+msgstr ""
+
+#: global_settings.py:85
+msgid "Irish"
+msgstr ""
+
+#: global_settings.py:86
+msgid "Scottish Gaelic"
+msgstr ""
+
+#: global_settings.py:87
+msgid "Galician"
+msgstr ""
+
+#: global_settings.py:88
+msgid "Hebrew"
+msgstr ""
+
+#: global_settings.py:89
+msgid "Hindi"
+msgstr ""
+
+#: global_settings.py:90
+msgid "Croatian"
+msgstr ""
+
+#: global_settings.py:91
+msgid "Upper Sorbian"
+msgstr ""
+
+#: global_settings.py:92
+msgid "Hungarian"
+msgstr ""
+
+#: global_settings.py:93
+msgid "Armenian"
+msgstr ""
+
+#: global_settings.py:94
+msgid "Interlingua"
+msgstr ""
+
+#: global_settings.py:95
+msgid "Indonesian"
+msgstr ""
+
+#: global_settings.py:96
+msgid "Ido"
+msgstr ""
+
+#: global_settings.py:97
+msgid "Icelandic"
+msgstr ""
+
+#: global_settings.py:98
+msgid "Italian"
+msgstr ""
+
+#: global_settings.py:99
+msgid "Japanese"
+msgstr ""
+
+#: global_settings.py:100
+msgid "Georgian"
+msgstr ""
+
+#: global_settings.py:101
+msgid "Kabyle"
+msgstr ""
+
+#: global_settings.py:102
+msgid "Kazakh"
+msgstr ""
+
+#: global_settings.py:103
+msgid "Khmer"
+msgstr ""
+
+#: global_settings.py:104
+msgid "Kannada"
+msgstr ""
+
+#: global_settings.py:105
+msgid "Korean"
+msgstr ""
+
+#: global_settings.py:106
+msgid "Luxembourgish"
+msgstr ""
+
+#: global_settings.py:107
+msgid "Lithuanian"
+msgstr ""
+
+#: global_settings.py:108
+msgid "Latvian"
+msgstr ""
+
+#: global_settings.py:109
+msgid "Macedonian"
+msgstr ""
+
+#: global_settings.py:110
+msgid "Malayalam"
+msgstr ""
+
+#: global_settings.py:111
+msgid "Mongolian"
+msgstr ""
+
+#: global_settings.py:112
+msgid "Marathi"
+msgstr ""
+
+#: global_settings.py:113
+msgid "Burmese"
+msgstr ""
+
+#: global_settings.py:114
+msgid "Norwegian Bokmål"
+msgstr ""
+
+#: global_settings.py:115
+msgid "Nepali"
+msgstr ""
+
+#: global_settings.py:116
+msgid "Dutch"
+msgstr ""
+
+#: global_settings.py:117
+msgid "Norwegian Nynorsk"
+msgstr ""
+
+#: global_settings.py:118
+msgid "Ossetic"
+msgstr ""
+
+#: global_settings.py:119
+msgid "Punjabi"
+msgstr ""
+
+#: global_settings.py:120
+msgid "Polish"
+msgstr ""
+
+#: global_settings.py:121
+msgid "Portuguese"
+msgstr ""
+
+#: global_settings.py:122
+msgid "Brazilian Portuguese"
+msgstr ""
+
+#: global_settings.py:123
+msgid "Romanian"
+msgstr ""
+
+#: global_settings.py:124
+msgid "Russian"
+msgstr ""
+
+#: global_settings.py:125
+msgid "Slovak"
+msgstr ""
+
+#: global_settings.py:126
+msgid "Slovenian"
+msgstr ""
+
+#: global_settings.py:127
+msgid "Albanian"
+msgstr ""
+
+#: global_settings.py:128
+msgid "Serbian"
+msgstr ""
+
+#: global_settings.py:129
+msgid "Serbian Latin"
+msgstr ""
+
+#: global_settings.py:130
+msgid "Swedish"
+msgstr ""
+
+#: global_settings.py:131
+msgid "Swahili"
+msgstr ""
+
+#: global_settings.py:132
+msgid "Tamil"
+msgstr ""
+
+#: global_settings.py:133
+msgid "Telugu"
+msgstr ""
+
+#: global_settings.py:134
+msgid "Thai"
+msgstr ""
+
+#: global_settings.py:135
+msgid "Turkish"
+msgstr ""
+
+#: global_settings.py:136
+msgid "Tatar"
+msgstr ""
+
+#: global_settings.py:137
+msgid "Udmurt"
+msgstr ""
+
+#: global_settings.py:138
+msgid "Ukrainian"
+msgstr ""
+
+#: global_settings.py:139
+msgid "Urdu"
+msgstr ""
+
+#: global_settings.py:140
+msgid "Uzbek"
+msgstr ""
+
+#: global_settings.py:141
+msgid "Vietnamese"
+msgstr ""
+
+#: global_settings.py:142
+msgid "Simplified Chinese"
+msgstr ""
+
+#: global_settings.py:143
+msgid "Traditional Chinese"
+msgstr ""
