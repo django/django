@@ -78,6 +78,11 @@ accessing the items for each page::
     objects such as Django's ``QuerySet`` to use a more efficient ``count()``
     method when available.
 
+    When custom paginator is used be careful with it's ``count()`` method.
+    Occasion zero count value paired with QuerySet will generate selector
+    without limit and max memory limit could be exceeded. Always use limit,
+    there is a good candidate for this -- ``per_page`` attribute.
+
 Paginating a ``ListView``
 =========================
 
