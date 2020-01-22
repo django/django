@@ -6,16 +6,10 @@ class Author(models.Model):
     age = models.IntegerField()
     friends = models.ManyToManyField('self', blank=True)
 
-    def __str__(self):
-        return self.name
-
 
 class Publisher(models.Model):
     name = models.CharField(max_length=255)
     num_awards = models.IntegerField()
-
-    def __str__(self):
-        return self.name
 
 
 class Book(models.Model):
@@ -29,9 +23,6 @@ class Book(models.Model):
     publisher = models.ForeignKey(Publisher, models.CASCADE)
     pubdate = models.DateField()
 
-    def __str__(self):
-        return self.name
-
 
 class Store(models.Model):
     name = models.CharField(max_length=255)
@@ -40,15 +31,9 @@ class Store(models.Model):
     friday_night_closing = models.TimeField()
     area = models.IntegerField(null=True, db_column='surface')
 
-    def __str__(self):
-        return self.name
-
 
 class DepartmentStore(Store):
     chain = models.CharField(max_length=255)
-
-    def __str__(self):
-        return '%s - %s ' % (self.chain, self.name)
 
 
 class Employee(models.Model):
@@ -61,9 +46,6 @@ class Employee(models.Model):
     store = models.ForeignKey(Store, models.CASCADE)
     age = models.IntegerField()
     salary = models.DecimalField(max_digits=8, decimal_places=2)
-
-    def __str__(self):
-        return '%s %s' % (self.first_name, self.last_name)
 
 
 class Company(models.Model):
@@ -81,6 +63,3 @@ class Company(models.Model):
 class Ticket(models.Model):
     active_at = models.DateTimeField()
     duration = models.DurationField()
-
-    def __str__(self):
-        return '{} - {}'.format(self.active_at, self.duration)

@@ -94,9 +94,6 @@ class Post(models.Model):
     subtitle = models.CharField(max_length=50, unique_for_month='posted', blank=True)
     posted = models.DateField()
 
-    def __str__(self):
-        return self.name
-
 
 class FlexibleDatePost(models.Model):
     title = models.CharField(max_length=50, unique_for_date='posted', blank=True)
