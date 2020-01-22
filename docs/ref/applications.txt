@@ -256,15 +256,20 @@ Methods
 
     Example::
 
+        from django.apps import AppConfig
         from django.db.models.signals import pre_save
 
-        def ready(self):
-            # importing model classes
-            from .models import MyModel  # or...
-            MyModel = self.get_model('MyModel')
 
-            # registering signals with the model's string label
-            pre_save.connect(receiver, sender='app_label.MyModel')
+        class RockNRollConfig(AppConfig):
+            # ...
+
+            def ready(self):
+                # importing model classes
+                from .models import MyModel  # or...
+                MyModel = self.get_model('MyModel')
+
+                # registering signals with the model's string label
+                pre_save.connect(receiver, sender='app_label.MyModel')
 
     .. warning::
 
