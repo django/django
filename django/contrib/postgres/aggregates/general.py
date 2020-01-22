@@ -1,4 +1,5 @@
 from django.contrib.postgres.fields import JSONField
+from django.db.models import Value
 from django.db.models.aggregates import Aggregate
 
 __all__ = [
@@ -43,11 +44,12 @@ class JSONBAgg(Aggregate):
 
 class StringAgg(Aggregate):
     function = 'STRING_AGG'
-    template = "%(function)s(%(distinct)s%(expressions)s, '%(delimiter)s')"
+    template = '%(function)s(%(distinct)s%(expressions)s)'
 
     def __init__(self, expression, delimiter, distinct=False, **extra):
         distinct = 'DISTINCT ' if distinct else ''
-        super(StringAgg, self).__init__(expression, delimiter=delimiter, distinct=distinct, **extra)
+        delimiter_expr = Value(str(delimiter))
+        super(StringAgg, self).__init__(expression, delimiter_expr, distinct=distinct, **extra)
 
     def convert_value(self, value, expression, connection, context):
         if not value:

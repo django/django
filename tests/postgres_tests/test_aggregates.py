@@ -108,6 +108,10 @@ class TestGeneralAggregate(PostgreSQLTestCase):
         with self.assertRaises(TypeError):
             AggregateTestModel.objects.aggregate(stringagg=StringAgg('char_field'))
 
+    def test_string_agg_delimiter_escaping(self):
+        values = AggregateTestModel.objects.aggregate(stringagg=StringAgg('char_field', delimiter="'"))
+        self.assertEqual(values, {'stringagg': "Foo1'Foo2'Foo3'Foo4"})
+
     def test_string_agg_charfield(self):
         values = AggregateTestModel.objects.aggregate(stringagg=StringAgg('char_field', delimiter=';'))
         self.assertEqual(values, {'stringagg': 'Foo1;Foo2;Foo3;Foo4'})
