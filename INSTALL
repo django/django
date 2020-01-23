@@ -4,5 +4,7 @@ To install it, make sure you have Python 3.6 or greater installed. Then run
 this command from the command prompt:
 
     python -m pip install .
+To install it using jupyter notebook:
+     !python -m pip install .
 
 For more detailed instructions, see docs/intro/install.txt.
