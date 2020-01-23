@@ -176,6 +176,20 @@ class ModelsPermissionsChecksTests(SimpleTestCase):
             ),
         ])
 
+    def test_model_name_max_length(self):
+        model_name = 'X' * 94
+        model = type(model_name, (models.Model,), {'__module__': self.__module__})
+        errors = checks.run_checks(self.apps.get_app_configs())
+        self.assertEqual(errors, [
+            checks.Error(
+                "The name of model 'auth_tests.%s' must be at most 93 "
+                "characters for its builtin permission codenames to be at "
+                "most 100 characters." % model_name,
+                obj=model,
+                id='auth.E011',
+            ),
+        ])
+
     def test_custom_permission_name_max_length(self):
         custom_permission_name = 'some ridiculously long verbose name that is out of control' * 5
 
@@ -191,6 +205,25 @@ class ModelsPermissionsChecksTests(SimpleTestCase):
                 "than 255 characters." % custom_permission_name,
                 obj=Checked,
                 id='auth.E008',
+            ),
+        ])
+
+    def test_custom_permission_codename_max_length(self):
+        custom_permission_codename = 'x' * 101
+
+        class Checked(models.Model):
+            class Meta:
+                permissions = [
+                    (custom_permission_codename, 'Custom permission'),
+                ]
+
+        errors = checks.run_checks(self.apps.get_app_configs())
+        self.assertEqual(errors, [
+            checks.Error(
+                "The permission codenamed '%s' of model 'auth_tests.Checked' "
+                "is longer than 100 characters." % custom_permission_codename,
+                obj=Checked,
+                id='auth.E012',
             ),
         ])
 

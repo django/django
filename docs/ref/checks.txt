@@ -724,6 +724,10 @@ The following checks are performed on the default
 * **auth.C010**: ``<User model>.is_authenticated`` must be an attribute or
   property rather than a method. Ignoring this is a security issue as anonymous
   users will be treated as authenticated!
+* **auth.E011**: The name of model ``<model>`` must be at most 93 characters
+  for its builtin permission names to be at most 100 characters.
+* **auth.E012**: The permission codenamed ``<codename>`` of model ``<model>``
+  is longer than 100 characters.
 
 ``contenttypes``
 ----------------
