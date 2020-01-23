@@ -609,7 +609,7 @@ Django 1.4 also includes several smaller improvements worth noting:
 * A new, plain-text, version of the HTTP 500 status code internal error page
   served when :setting:`DEBUG` is ``True`` is now sent to the client when
   Django detects that the request has originated in JavaScript code.
-  (:meth:`~django.http.HttpRequest.is_ajax` is used for this.)
+  (``is_ajax()`` is used for this.)
 
   Like its HTML counterpart, it contains a collection of different
   pieces of information about the state of the application.

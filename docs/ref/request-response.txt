@@ -431,6 +431,8 @@ Methods
 
 .. method:: HttpRequest.is_ajax()
 
+    .. deprecated:: 3.1
+
     Returns ``True`` if the request was made via an ``XMLHttpRequest``, by
     checking the ``HTTP_X_REQUESTED_WITH`` header for the string
     ``'XMLHttpRequest'``. Most modern JavaScript libraries send this header.

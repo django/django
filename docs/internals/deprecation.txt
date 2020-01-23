@@ -44,6 +44,8 @@ details on these changes.
 
 * The ``django-admin.py`` entry point will be removed.
 
+* The ``HttpRequest.is_ajax()`` method will be removed.
+
 See the :ref:`Django 3.1 release notes <deprecated-features-3.1>` for more
 details on these changes.
 
