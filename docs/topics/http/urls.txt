@@ -45,7 +45,8 @@ algorithm the system follows to determine which Python code to execute:
    :func:`django.urls.path` and/or :func:`django.urls.re_path` instances.
 
 #. Django runs through each URL pattern, in order, and stops at the first
-   one that matches the requested URL.
+   one that matches the requested URL, matching against
+   :attr:`~django.http.HttpRequest.path_info`.
 
 #. Once one of the URL patterns matches, Django imports and calls the given
    view, which is a Python function (or a :doc:`class-based view
