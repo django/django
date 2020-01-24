@@ -307,7 +307,7 @@ class Options:
         return '<Options for %s>' % self.object_name
 
     def __str__(self):
-        return "%s.%s" % (self.app_label, self.model_name)
+        return self.label_lower
 
     def can_migrate(self, connection):
         """

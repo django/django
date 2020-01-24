@@ -607,8 +607,9 @@ class BaseModelAdminChecks:
             except FieldDoesNotExist:
                 return [
                     checks.Error(
-                        "The value of '%s' is not a callable, an attribute of '%s', or an attribute of '%s.%s'." % (
-                            label, obj.__class__.__name__, obj.model._meta.app_label, obj.model._meta.object_name
+                        "The value of '%s' is not a callable, an attribute of "
+                        "'%s', or an attribute of '%s'." % (
+                            label, obj.__class__.__name__, obj.model._meta.label,
                         ),
                         obj=obj.__class__,
                         id='admin.E035',
@@ -731,9 +732,9 @@ class ModelAdminChecks(BaseModelAdminChecks):
                     checks.Error(
                         "The value of '%s' refers to '%s', which is not a "
                         "callable, an attribute of '%s', or an attribute or "
-                        "method on '%s.%s'." % (
+                        "method on '%s'." % (
                             label, item, obj.__class__.__name__,
-                            obj.model._meta.app_label, obj.model._meta.object_name,
+                            obj.model._meta.label,
                         ),
                         obj=obj.__class__,
                         id='admin.E108',
@@ -1035,8 +1036,8 @@ class InlineModelAdminChecks(BaseModelAdminChecks):
             return [
                 checks.Error(
                     "Cannot exclude the field '%s', because it is the foreign key "
-                    "to the parent model '%s.%s'." % (
-                        fk.name, parent_model._meta.app_label, parent_model._meta.object_name
+                    "to the parent model '%s'." % (
+                        fk.name, parent_model._meta.label,
                     ),
                     obj=obj.__class__,
                     id='admin.E201',
@@ -1113,9 +1114,8 @@ def must_inherit_from(parent, option, obj, id):
 def refer_to_missing_field(field, option, obj, id):
     return [
         checks.Error(
-            "The value of '%s' refers to '%s', which is not an attribute of '%s.%s'." % (
-                option, field, obj.model._meta.app_label, obj.model._meta.object_name
-            ),
+            "The value of '%s' refers to '%s', which is not an attribute of "
+            "'%s'." % (option, field, obj.model._meta.label),
             obj=obj.__class__,
             id=id,
         ),
