@@ -38,7 +38,10 @@ class SearchVectorCombinable:
 
     def _combine(self, other, connector, reversed):
         if not isinstance(other, SearchVectorCombinable) or not self.config == other.config:
-            raise TypeError('SearchVector can only be combined with other SearchVectors')
+            raise TypeError(
+                'SearchVector can only be combined with other SearchVector '
+                'instances, got %s.' % type(other).__name__
+            )
         if reversed:
             return CombinedSearchVector(other, connector, self, self.config)
         return CombinedSearchVector(self, connector, other, self.config)
@@ -105,8 +108,8 @@ class SearchQueryCombinable:
     def _combine(self, other, connector, reversed):
         if not isinstance(other, SearchQueryCombinable):
             raise TypeError(
-                'SearchQuery can only be combined with other SearchQuerys, '
-                'got {}.'.format(type(other))
+                'SearchQuery can only be combined with other SearchQuery '
+                'instances, got %s.' % type(other).__name__
             )
         if reversed:
             return CombinedSearchQuery(other, connector, self, self.config)

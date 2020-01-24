@@ -289,6 +289,14 @@ class TestCombinations(GrailTestData, PostgreSQLTestCase):
         ).filter(search='bedemir')
         self.assertCountEqual(searched, [self.bedemir0, self.bedemir1, self.crowd, self.witch, self.duck])
 
+    def test_vector_combined_mismatch(self):
+        msg = (
+            'SearchVector can only be combined with other SearchVector '
+            'instances, got NoneType.'
+        )
+        with self.assertRaisesMessage(TypeError, msg):
+            Line.objects.filter(dialogue__search=None + SearchVector('character__name'))
+
     def test_query_and(self):
         searched = Line.objects.annotate(
             search=SearchVector('scene__setting', 'dialogue'),
@@ -340,7 +348,10 @@ class TestCombinations(GrailTestData, PostgreSQLTestCase):
         self.assertCountEqual(searched, [self.verse0, self.verse1, self.verse2])
 
     def test_query_combined_mismatch(self):
-        msg = "SearchQuery can only be combined with other SearchQuerys, got"
+        msg = (
+            'SearchQuery can only be combined with other SearchQuery '
+            'instances, got NoneType.'
+        )
         with self.assertRaisesMessage(TypeError, msg):
             Line.objects.filter(dialogue__search=None | SearchQuery('kneecaps'))
 
