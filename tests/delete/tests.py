@@ -1,12 +1,14 @@
 from math import ceil
 
 from django.db import IntegrityError, connection, models
-from django.db.models.deletion import Collector, RestrictedError
+from django.db.models.deletion import (
+    Collector, ProtectedError, RestrictedError,
+)
 from django.db.models.sql.constants import GET_ITERATOR_CHUNK_SIZE
 from django.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
 
 from .models import (
-    B1, B2, MR, A, Avatar, Base, Child, DeleteBottom, DeleteTop, GenericB1,
+    B1, B2, MR, A, Avatar, B, Base, Child, DeleteBottom, DeleteTop, GenericB1,
     GenericB2, GenericDeleteBottom, HiddenUser, HiddenUserProfile, M, M2MFrom,
     M2MTo, MRNull, Origin, P, Parent, R, RChild, RChildChild, Referrer, S, T,
     User, create_a, get_default_r,
@@ -72,9 +74,20 @@ class OnDeleteTests(TestCase):
         a = create_a('protect')
         msg = (
             "Cannot delete some instances of model 'R' because they are "
-            "referenced through a protected foreign key: 'A.protect'"
+            "referenced through protected foreign keys: 'A.protect'."
         )
         with self.assertRaisesMessage(IntegrityError, msg):
+            a.protect.delete()
+
+    def test_protect_multiple(self):
+        a = create_a('protect')
+        B.objects.create(protect=a.protect)
+        msg = (
+            "Cannot delete some instances of model 'R' because they are "
+            "referenced through protected foreign keys: 'A.protect', "
+            "'B.protect'."
+        )
+        with self.assertRaisesMessage(ProtectedError, msg):
             a.protect.delete()
 
     def test_do_nothing(self):

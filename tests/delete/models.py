@@ -68,6 +68,10 @@ class A(models.Model):
     o2o_setnull = models.ForeignKey(R, models.SET_NULL, null=True, related_name="o2o_nullable_set")
 
 
+class B(models.Model):
+    protect = models.ForeignKey(R, models.PROTECT)
+
+
 def create_a(name):
     a = A(name=name)
     for name in ('auto', 'auto_nullable', 'setvalue', 'setnull', 'setdefault',
