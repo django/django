@@ -2,7 +2,11 @@
 Useful auxiliary data structures for query construction. Not useful outside
 the SQL domain.
 """
-from django.db.models.sql.constants import INNER, LOUTER
+#from django.db.models.sql.constants import INNER, LOUTER
+
+INNER = 'INNER JOIN'
+LOUTER = 'LEFT OUTER JOIN'
+
 
 
 class MultiJoin(Exception):
