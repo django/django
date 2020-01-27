@@ -1,6 +1,6 @@
 from math import ceil
 
-from django.db import IntegrityError, connection, models
+from django.db import connection, models
 from django.db.models.deletion import (
     Collector, ProtectedError, RestrictedError,
 )
@@ -76,7 +76,7 @@ class OnDeleteTests(TestCase):
             "Cannot delete some instances of model 'R' because they are "
             "referenced through protected foreign keys: 'A.protect'."
         )
-        with self.assertRaisesMessage(IntegrityError, msg):
+        with self.assertRaisesMessage(ProtectedError, msg):
             a.protect.delete()
 
     def test_protect_multiple(self):
