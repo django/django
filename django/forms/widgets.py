@@ -661,7 +661,7 @@ class ChoiceWidget(Widget):
         """Return selected values as a list."""
         if value is None and self.allow_multiple_selected:
             return []
-        if not isinstance(value, (tuple, list)):
+        if not isinstance(value, (tuple, list, set)):
             value = [value]
         return [str(v) if v is not None else '' for v in value]
 
