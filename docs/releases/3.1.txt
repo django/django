@@ -473,10 +473,11 @@ Miscellaneous
 
 * The ``HttpRequest.is_ajax()`` method is deprecated as it relied on a
   jQuery-specific way of signifying AJAX calls, while the current usage tends
-  to use the ``fetch()`` JavaScript API. Depending on your use case, you can
-  either write your own AJAX detection method, or use the new
-  :meth:`.HttpRequest.accepts` method if your code depends on the client
-  ``Accept`` HTTP header.
+  to use the JavaScript `Fetch API
+  <https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API>`_. Depending on
+  your use case, you can either write your own AJAX detection method, or use
+  the new :meth:`.HttpRequest.accepts` method if your code depends on the
+  client ``Accept`` HTTP header.
 
 .. _removed-features-3.1:
 
