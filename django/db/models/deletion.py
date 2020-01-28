@@ -324,8 +324,8 @@ class Collector:
         if fail_on_restricted:
             # Raise an error if collected restricted objects (RESTRICT) aren't
             # candidates for deletion also collected via CASCADE.
-            for model, instances in self.data.items():
-                self.clear_restricted_objects_from_set(model, instances)
+            for related_model, instances in self.data.items():
+                self.clear_restricted_objects_from_set(related_model, instances)
             for qs in self.fast_deletes:
                 self.clear_restricted_objects_from_queryset(qs.model, qs)
             for model, fields in self.restricted_objects.items():
