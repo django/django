@@ -1,5 +1,6 @@
 try:
     from django.contrib.postgres.fields import JSONField as ModelJSONField
+    from django.contrib.postgres.fields.jsonb import KeyTransform, KeyTextTransform
     from django.contrib.postgres.forms import JSONField as FormJSONField
 except ImportError:
     pass
@@ -35,3 +36,19 @@ class DeprecationTests(PostgreSQLSimpleTestCase):
         )
         with self.assertWarnsMessage(RemovedInDjango40Warning, msg):
             FormJSONField()
+
+    def test_key_transform_deprecation_message(self):
+        msg = (
+            'django.contrib.postgres.fields.jsonb.KeyTransform is deprecated in favor of '
+            'django.db.models.fields.json.KeyTransform'
+        )
+        with self.assertWarnsMessage(RemovedInDjango40Warning, msg):
+            KeyTransform('foo', 'bar')
+
+    def test_key_text_transform_deprecation_message(self):
+        msg = (
+            'django.contrib.postgres.fields.jsonb.KeyTextTransform is deprecated in favor of '
+            'django.db.models.fields.json.KeyTextTransform'
+        )
+        with self.assertWarnsMessage(RemovedInDjango40Warning, msg):
+            KeyTextTransform('foo', 'bar')
