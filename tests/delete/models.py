@@ -177,6 +177,10 @@ class B2(models.Model):
     delete_top = models.ForeignKey(DeleteTop, models.CASCADE)
 
 
+class B3(models.Model):
+    restrict = models.ForeignKey(R, models.RESTRICT)
+
+
 class DeleteBottom(models.Model):
     b1 = models.ForeignKey(B1, models.RESTRICT)
     b2 = models.ForeignKey(B2, models.CASCADE)

@@ -8,10 +8,10 @@ from django.db.models.sql.constants import GET_ITERATOR_CHUNK_SIZE
 from django.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
 
 from .models import (
-    B1, B2, MR, A, Avatar, B, Base, Child, DeleteBottom, DeleteTop, GenericB1,
-    GenericB2, GenericDeleteBottom, HiddenUser, HiddenUserProfile, M, M2MFrom,
-    M2MTo, MRNull, Origin, P, Parent, R, RChild, RChildChild, Referrer, S, T,
-    User, create_a, get_default_r,
+    B1, B2, B3, MR, A, Avatar, B, Base, Child, DeleteBottom, DeleteTop,
+    GenericB1, GenericB2, GenericDeleteBottom, HiddenUser, HiddenUserProfile,
+    M, M2MFrom, M2MTo, MRNull, Origin, P, Parent, R, RChild, RChildChild,
+    Referrer, S, T, User, create_a, get_default_r,
 )
 
 
@@ -164,7 +164,18 @@ class OnDeleteTests(TestCase):
         a = create_a('restrict')
         msg = (
             "Cannot delete some instances of model 'R' because they are "
-            "referenced through a restricted foreign key: 'A.restrict'."
+            "referenced through restricted foreign keys: 'A.restrict'."
+        )
+        with self.assertRaisesMessage(RestrictedError, msg):
+            a.restrict.delete()
+
+    def test_restrict_multiple(self):
+        a = create_a('restrict')
+        B3.objects.create(restrict=a.restrict)
+        msg = (
+            "Cannot delete some instances of model 'R' because they are "
+            "referenced through restricted foreign keys: 'A.restrict', "
+            "'B3.restrict'."
         )
         with self.assertRaisesMessage(RestrictedError, msg):
             a.restrict.delete()
@@ -174,8 +185,8 @@ class OnDeleteTests(TestCase):
         a.restrict.p = P.objects.create()
         a.restrict.save()
         msg = (
-            "Cannot delete some instances of model 'R' because they are "
-            "referenced through a restricted foreign key: 'A.restrict'."
+            "Cannot delete some instances of model 'P' because they are "
+            "referenced through restricted foreign keys: 'A.restrict'."
         )
         with self.assertRaisesMessage(RestrictedError, msg):
             a.restrict.p.delete()
@@ -203,7 +214,7 @@ class OnDeleteTests(TestCase):
         DeleteBottom.objects.create(b1=b1, b2=b2)
         msg = (
             "Cannot delete some instances of model 'B1' because they are "
-            "referenced through a restricted foreign key: 'DeleteBottom.b1'."
+            "referenced through restricted foreign keys: 'DeleteBottom.b1'."
         )
         with self.assertRaisesMessage(RestrictedError, msg):
             b1.delete()
@@ -225,7 +236,7 @@ class OnDeleteTests(TestCase):
         GenericDeleteBottom.objects.create(generic_b1=generic_b1, generic_b2=generic_b2)
         msg = (
             "Cannot delete some instances of model 'GenericB1' because they "
-            "are referenced through a restricted foreign key: "
+            "are referenced through restricted foreign keys: "
             "'GenericDeleteBottom.generic_b1'."
         )
         with self.assertRaisesMessage(RestrictedError, msg):
