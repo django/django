@@ -4,7 +4,6 @@ import re
 from django.apps import apps as django_apps
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured, PermissionDenied
-from django.middleware.csrf import rotate_token
 from django.utils.crypto import constant_time_compare
 from django.utils.module_loading import import_string
 
@@ -128,7 +127,8 @@ def login(request, user, backend=None):
     request.session[HASH_SESSION_KEY] = session_auth_hash
     if hasattr(request, 'user'):
         request.user = user
-    rotate_token(request)
+    # Persist the action in the request for further processing, i.e. (CSRF) middleware
+    request.new_user_login = True
     user_logged_in.send(sender=user.__class__, request=request, user=user)
 
 

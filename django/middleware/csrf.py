@@ -90,18 +90,6 @@ def get_token(request):
     return _salt_cipher_secret(csrf_secret)
 
 
-def rotate_token(request):
-    """
-    Change the CSRF token in use for a request - should be done on login
-    for security purposes.
-    """
-    request.META.update({
-        "CSRF_COOKIE_USED": True,
-        "CSRF_COOKIE": _get_new_csrf_token(),
-    })
-    request.csrf_cookie_needs_reset = True
-
-
 def _sanitize_token(token):
     # Allow only ASCII alphanumerics
     if re.search('[^a-zA-Z0-9]', token):
@@ -312,12 +300,16 @@ class CsrfViewMiddleware(MiddlewareMixin):
         return self._accept(request)
 
     def process_response(self, request, response):
-        if not getattr(request, 'csrf_cookie_needs_reset', False):
-            if getattr(response, 'csrf_cookie_set', False):
-                return response
+        if not getattr(request, 'new_user_login', False):
+            if not getattr(request, 'csrf_cookie_needs_reset', False):
+                if getattr(response, 'csrf_cookie_set', False):
+                    return response
 
-        if not request.META.get("CSRF_COOKIE_USED", False):
-            return response
+            if not request.META.get("CSRF_COOKIE_USED", False):
+                return response
+        else:
+            # Perform token rotation
+            request.META["CSRF_COOKIE"] = _get_new_csrf_token()
 
         # Set the CSRF cookie even if it's already set, so we renew
         # the expiry timer.
