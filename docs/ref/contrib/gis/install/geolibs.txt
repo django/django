@@ -231,7 +231,7 @@ the GDAL library.  For example::
 .. [#] The datum shifting files are needed for converting data to and from
        certain projections.
        For example, the PROJ.4 string for the `Google projection (900913 or 3857)
-       <http://spatialreference.org/ref/sr-org/6864/prj/>`_ requires the
+       <https://spatialreference.org/ref/sr-org/6864/prj/>`_ requires the
        ``null`` grid file only included in the extra datum shifting files.
        It is easier to install the shifting files now, then to have debug a
        problem caused by their absence later.

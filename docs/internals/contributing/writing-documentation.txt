@@ -43,7 +43,7 @@ is based on docutils__. The basic idea is that lightly-formatted plain-text
 documentation is transformed into HTML, PDF, and any other output format.
 
 __ https://www.sphinx-doc.org/
-__ http://docutils.sourceforge.net/
+__ https://docutils.sourceforge.io/
 
 To build the documentation locally, install Sphinx:
 

@@ -29,7 +29,7 @@ or Jinja2_, you should feel right at home with Django's templates.
 
 .. _`The Django template language: For Python programmers`: ../templates_python/
 .. _Smarty: https://www.smarty.net/
-.. _Jinja2: http://jinja.pocoo.org/
+.. _Jinja2: https://palletsprojects.com/p/jinja/
 
 Templates
 =========
