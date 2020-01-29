@@ -154,7 +154,7 @@ Django's codebase has been refactored to remove incompatibilities with
 on the Java Virtual Machine. Django is now compatible with the forthcoming
 Jython 2.5 release.
 
-.. _Jython: http://www.jython.org/
+.. _Jython: https://www.jython.org/
 
 Generic relations in forms and admin
 ------------------------------------
