@@ -3430,6 +3430,8 @@ your additional files directory(ies) e.g.::
 Note that these paths should use Unix-style forward slashes, even on Windows
 (e.g. ``"C:/Users/user/mysite/extra_static_content"``).
 
+.. _staticfiles-dirs-prefixes:
+
 Prefixes (optional)
 ~~~~~~~~~~~~~~~~~~~
 
