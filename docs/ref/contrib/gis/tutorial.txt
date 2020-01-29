@@ -633,7 +633,7 @@ of abstraction::
     >>> qs # printing evaluates the queryset
     <QuerySet [<WorldBorder: United States>]>
 
-__ http://spatialreference.org/ref/epsg/32140/
+__ https://spatialreference.org/ref/epsg/32140/
 
 .. _gis-raw-sql:
 
@@ -737,7 +737,7 @@ position.
 
 .. _OpenLayers: https://openlayers.org/
 .. _Open Street Map: https://www.openstreetmap.org/
-.. _Vector Map Level 0: http://earth-info.nga.mil/publications/vmap0.html
+.. _Vector Map Level 0: https://earth-info.nga.mil/publications/vmap0.html
 .. _OSGeo: https://www.osgeo.org/
 
 .. _osmgeoadmin-intro:
