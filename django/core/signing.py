@@ -143,6 +143,7 @@ def loads(s, key=None, salt='django.core.signing', serializer=JSONSerializer, ma
 
 
 class Signer:
+    valid_algorithms = {'sha1'}
 
     def __init__(self, key=None, sep=':', salt=None):
         self.key = key or settings.SECRET_KEY
@@ -158,15 +159,27 @@ class Signer:
         return base64_hmac(self.salt + 'signer', value, self.key)
 
     def sign(self, value):
-        return '%s%s%s' % (value, self.sep, self.signature(value))
+        return self.sep.join([str(value), 'sha1', self.signature(value)])
+
+    def _split(self, signed_value):
+        bits = signed_value.rsplit(self.sep, 2)
+        if len(bits) == 3:
+            return bits
+        elif len(bits) == 2:
+            # Backwards compatibility with old format without algorithm bit.
+            return bits[0], 'sha1', bits[-1]
+        else:
+            raise BadSignature('Too few "%s" found in value' % self.sep)
 
     def unsign(self, signed_value):
         if self.sep not in signed_value:
             raise BadSignature('No "%s" found in value' % self.sep)
-        value, sig = signed_value.rsplit(self.sep, 1)
-        if constant_time_compare(sig, self.signature(value)):
+        value, algorithm, signature = self._split(signed_value)
+        if algorithm not in self.valid_algorithms:
+            raise BadSignature('The signature algorithm "%s" is not supported.' % algorithm)
+        if constant_time_compare(signature, self.signature(value)):
             return value
-        raise BadSignature('Signature "%s" does not match' % sig)
+        raise BadSignature('Signature "%s" does not match' % signature)
 
 
 class TimestampSigner(Signer):
@@ -177,6 +190,16 @@ class TimestampSigner(Signer):
     def sign(self, value):
         value = '%s%s%s' % (value, self.sep, self.timestamp())
         return super().sign(value)
+
+    def _split(self, signed_value):
+        bits = signed_value.rsplit(self.sep, 3)
+        if len(bits) == 4:  # value/timestamp/algorithm/signature
+            return self.sep.join(bits[:2]), bits[2], bits[3]
+        elif len(bits) == 3:
+            # Backwards compatibility with old format without algorithm bit.
+            return self.sep.join(bits[:2]), 'sha1', bits[-1]
+        else:
+            raise BadSignature('Too few "%s" found in value' % self.sep)
 
     def unsign(self, value, max_age=None):
         """

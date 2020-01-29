@@ -100,13 +100,13 @@ class TestSigner(SimpleTestCase):
         binary_key = b'\xe7'  # Set some binary (non-ASCII key)
 
         s = signing.Signer(binary_key)
-        self.assertEqual('foo:6NB0fssLW5RQvZ3Y-MTerq2rX7w', s.sign('foo'))
+        self.assertEqual('foo:sha1:6NB0fssLW5RQvZ3Y-MTerq2rX7w', s.sign('foo'))
 
     def test_valid_sep(self):
         separators = ['/', '*sep*', ',']
         for sep in separators:
             signer = signing.Signer('predictable-secret', sep=sep)
-            self.assertEqual('foo%ssH9B01cZcJ9FoT_jEVkRkNULrl8' % sep, signer.sign('foo'))
+            self.assertEqual('foo%ssha1%ssH9B01cZcJ9FoT_jEVkRkNULrl8' % (sep, sep), signer.sign('foo'))
 
     def test_invalid_sep(self):
         """should warn on invalid separator"""
@@ -115,6 +115,20 @@ class TestSigner(SimpleTestCase):
         for sep in separators:
             with self.assertRaisesMessage(ValueError, msg % sep):
                 signing.Signer(sep=sep)
+
+    def test_invalid_algorithm(self):
+        signer = signing.Signer('some-key')
+        msg = 'The signature algorithm "sha999" is not supported.'
+        with self.assertRaisesMessage(signing.BadSignature, msg):
+            signer.unsign('hello:sha999:_lpTYxg_FpdEqaZ-6TBloqe1k0A')
+
+    def test_legacy_format_unsign(self):
+        """
+        During a deprecation period, Django accepts the legacy signed value
+        without any specified algorithm.
+        """
+        signer = signing.Signer('some-key')
+        self.assertEqual(signer.unsign('hello:_lpTYxg_FpdEqaZ-6TBloqe1k0A'), 'hello')
 
 
 class TestTimestampSigner(SimpleTestCase):
@@ -125,6 +139,7 @@ class TestTimestampSigner(SimpleTestCase):
             signer = signing.TimestampSigner('predictable-key')
             ts = signer.sign(value)
             self.assertNotEqual(ts, signing.Signer('predictable-key').sign(value))
+            self.assertEqual(ts, 'hello:8M0kX:sha1:J5TclO9Xdc89L03KAGDLr1ed014')
             self.assertEqual(signer.unsign(ts), value)
 
         with freeze_time(123456800):
@@ -133,3 +148,11 @@ class TestTimestampSigner(SimpleTestCase):
             self.assertEqual(signer.unsign(ts, max_age=datetime.timedelta(seconds=11)), value)
             with self.assertRaises(signing.SignatureExpired):
                 signer.unsign(ts, max_age=10)
+
+    def test_legacy_format_unsign(self):
+        """
+        During a deprecation period, Django accepts the legacy signed value
+        without any specified algorithm.
+        """
+        signer = signing.TimestampSigner('predictable-key')
+        self.assertEqual(signer.unsign('hello:1iroxj:SmBeiMT9ltZ4inOu1S_JVlz8PT8'), 'hello')

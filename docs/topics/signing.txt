@@ -44,10 +44,11 @@ To sign a value, first instantiate a ``Signer`` instance::
     >>> signer = Signer()
     >>> value = signer.sign('My string')
     >>> value
-    'My string:GdMGD6HNQ_qdgxYP8yBZAdAIV1w'
+    'My string:sha1:R_t3xGau2tfXS6fhcZqjLRsem2w'
 
-The signature is appended to the end of the string, following the colon.
-You can retrieve the original value using the ``unsign`` method::
+The signature prefixed by the hashing algorithm is appended to the end of the
+string, following the first colon. You can retrieve the original value using
+the ``unsign`` method::
 
     >>> original = signer.unsign(value)
     >>> original
@@ -70,7 +71,7 @@ generate signatures. You can use a different secret by passing it to the
     >>> signer = Signer('my-other-secret')
     >>> value = signer.sign('My string')
     >>> value
-    'My string:EkfQJafvGyiofrdGnuthdxImIJw'
+    'My string:sha1:BWOmaSAaEEq6u4L5Wtib0jYA_tw'
 
 .. class:: Signer(key=None, sep=':', salt=None)
 
@@ -89,11 +90,11 @@ your :setting:`SECRET_KEY`::
 
     >>> signer = Signer()
     >>> signer.sign('My string')
-    'My string:GdMGD6HNQ_qdgxYP8yBZAdAIV1w'
+    'My string:sha1:R_t3xGau2tfXS6fhcZqjLRsem2w'
     >>> signer = Signer(salt='extra')
     >>> signer.sign('My string')
-    'My string:Ee7vGi-ING6n02gkcJ-QLHg6vFw'
-    >>> signer.unsign('My string:Ee7vGi-ING6n02gkcJ-QLHg6vFw')
+    'My string:sha1:KKL2hPX_JJyMLbQ2Cg-B_OYodIc'
+    >>> signer.unsign('My string:sha1:KKL2hPX_JJyMLbQ2Cg-B_OYodIc')
     'My string'
 
 Using salt in this way puts the different signatures into different
@@ -119,7 +120,7 @@ created within a specified period of time::
     >>> signer = TimestampSigner()
     >>> value = signer.sign('hello')
     >>> value
-    'hello:1NMg5H:oPVuCqlJWmChm1rA2lyTUtelC-c'
+    'hello:1NMg5H:sha1:oPVuCqlJWmChm1rA2lyTUtelC-c'
     >>> signer.unsign(value)
     'hello'
     >>> signer.unsign(value, max_age=10)
@@ -154,7 +155,7 @@ to execute arbitrary commands by exploiting the pickle format::
     >>> from django.core import signing
     >>> value = signing.dumps({"foo": "bar"})
     >>> value
-    'eyJmb28iOiJiYXIifQ:1NMg1b:zGcDE4-TCkaeGzLeW9UQwZesciI'
+    'eyJmb28iOiJiYXIifQ:1NMg1b:sha1:zGcDE4-TCkaeGzLeW9UQwZesciI'
     >>> signing.loads(value)
     {'foo': 'bar'}
 
