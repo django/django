@@ -110,6 +110,7 @@ codec
 codename
 codenamed
 coercible
+colorama
 commenters
 committer
 committers
@@ -476,6 +477,7 @@ postfix
 postgis
 postgres
 postgresql
+PowerShell
 pq
 pre
 precisions
