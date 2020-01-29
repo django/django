@@ -17,7 +17,7 @@ Alternately, you can `build from source`_. Consult the platform-specific
 instructions if you are on :ref:`macos` or :ref:`windows`.
 
 .. _PostGIS: https://postgis.net/
-.. _psycopg2: http://initd.org/psycopg/
+.. _psycopg2: https://www.psycopg.org/
 .. _PostGIS requirements: https://postgis.net/docs/postgis_installation.html#install_requirements
 .. _build from source: https://postgis.net/docs/postgis_installation.html#install_short_version
 

@@ -368,9 +368,9 @@ the transaction. For the intended use cases (mail notifications, Celery tasks,
 etc.), this should be fine. If it's not (if your follow-up action is so
 critical that its failure should mean the failure of the transaction itself),
 then you don't want to use the :func:`on_commit` hook. Instead, you may want
-`two-phase commit`_ such as the `psycopg Two-Phase Commit protocol support`_
-and the `optional Two-Phase Commit Extensions in the Python DB-API
-specification`_.
+`two-phase commit`_ such as the :ref:`psycopg Two-Phase Commit protocol support
+<psycopg2:tpc>` and the `optional Two-Phase Commit Extensions in the Python
+DB-API specification`_.
 
 Callbacks are not run until autocommit is restored on the connection following
 the commit (because otherwise any queries done in a callback would open an
@@ -387,7 +387,6 @@ autocommit is disabled and you are not within an atomic block will result in an
 error.
 
 .. _two-phase commit: https://en.wikipedia.org/wiki/Two-phase_commit_protocol
-.. _psycopg Two-Phase Commit protocol support: http://initd.org/psycopg/docs/usage.html#tpc
 .. _optional Two-Phase Commit Extensions in the Python DB-API specification: https://www.python.org/dev/peps/pep-0249/#optional-two-phase-commit-extensions
 
 Use in tests
