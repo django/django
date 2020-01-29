@@ -71,6 +71,9 @@ details on how ``staticfiles`` finds your files.
     by putting those static files inside *another* directory named for the
     application itself.
 
+    You can namespace static assets in :setting:`STATICFILES_DIRS` by
+    specifying :ref:`prefixes <staticfiles-dirs-prefixes>`.
+
 .. _serving-static-files-in-development:
 
 Serving static files during development
