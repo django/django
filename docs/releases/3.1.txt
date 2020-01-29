@@ -449,6 +449,9 @@ Miscellaneous
   decorator now takes precedence over the ``max-age`` directive from the
   ``Cache-Control`` header.
 
+* Providing a non-local remote field in the :attr:`.ForeignKey.to_field`
+  argument now raises :class:`~django.core.exceptions.FieldError`.
+
 .. _deprecated-features-3.1:
 
 Features deprecated in 3.1
