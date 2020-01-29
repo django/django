@@ -183,7 +183,7 @@ You can get a local copy of the HTML documentation following a few steps:
 
 * The HTML documentation will be placed in ``docs/_build/html``.
 
-__ http://sphinx-doc.org/
+__ https://www.sphinx-doc.org/
 __ https://www.gnu.org/software/make/
 
 .. _differences-between-doc-versions:
