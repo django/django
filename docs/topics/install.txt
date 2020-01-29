@@ -111,7 +111,7 @@ database queries, Django will need permission to create a test database.
 .. _PostgreSQL: https://www.postgresql.org/
 .. _MariaDB: https://mariadb.org/
 .. _MySQL: https://www.mysql.com/
-.. _psycopg2: http://initd.org/psycopg/
+.. _psycopg2: https://www.psycopg.org/
 .. _SQLite: https://www.sqlite.org/
 .. _cx_Oracle: https://oracle.github.io/python-cx_Oracle/
 .. _Oracle: https://www.oracle.com/

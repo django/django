@@ -106,7 +106,7 @@ PostgreSQL notes
 Django supports PostgreSQL 9.5 and higher. `psycopg2`_ 2.5.4 or higher is
 required, though the latest release is recommended.
 
-.. _psycopg2: http://initd.org/psycopg/
+.. _psycopg2: https://www.psycopg.org/
 
 PostgreSQL connection settings
 -------------------------------

@@ -141,7 +141,7 @@ pygments_style = 'trac'
 intersphinx_mapping = {
     'python': ('https://docs.python.org/3/', None),
     'sphinx': ('https://www.sphinx-doc.org/en/master/', None),
-    'psycopg2': ('http://initd.org/psycopg/docs/', None),
+    'psycopg2': ('https://www.psycopg.org/docs/', None),
 }
 
 # Python's docs don't change every week.
