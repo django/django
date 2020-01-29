@@ -186,7 +186,7 @@ the user's name. You'd need something like this in your template:
 
 .. code-block:: html+django
 
-    <form action="/your-name/" method="post">
+    <form action="/your-name/" method="post"> {% csrf_token %}
         <label for="your_name">Your name: </label>
         <input id="your_name" type="text" name="your_name" value="{{ current_name }}">
         <input type="submit" value="OK">
