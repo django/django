@@ -300,7 +300,10 @@ class BaseDatabaseSchemaEditor:
 
     def effective_default(self, field):
         """Return a field's effective database default value."""
-        return field.get_db_prep_save(self._effective_default(field), self.connection)
+        default = self._effective_default(field)
+        if hasattr(default, 'as_sql'):
+            return default
+        return field.get_db_prep_save(default, self.connection)
 
     def quote_value(self, value):
         """

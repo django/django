@@ -20,6 +20,7 @@ from django.db.models.fields import (
 from django.db.models.fields.related import (
     ForeignKey, ForeignObject, ManyToManyField, OneToOneField,
 )
+from django.db.models.functions import Now, TruncDay
 from django.db.transaction import TransactionManagementError, atomic
 from django.db.utils import DataError
 from django.test import (
@@ -2646,6 +2647,17 @@ class SchemaTests(TransactionTestCase):
             cursor.execute("SELECT surname FROM schema_author;")
             item = cursor.fetchall()[0]
             self.assertEqual(item[0], None if connection.features.interprets_empty_strings_as_nulls else '')
+
+    def test_effective_default_db_default(self):
+        """#31206 - effective_default() should be handle database defaults"""
+        new_field = DateTimeField(default=TruncDay(Now()))
+        new_field.set_attributes_from_name('date_of_birth')
+        with connection.schema_editor() as editor:
+            editor.create_model(Author)
+            # unit test
+            editor.effective_default(DateTimeField(default=Now()))
+            # integration test
+            editor.alter_field(Author, Author._meta.get_field('date_of_birth'), new_field)
 
     def test_add_field_default_dropped(self):
         # Create the table

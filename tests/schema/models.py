@@ -1,5 +1,6 @@
 from django.apps.registry import Apps
 from django.db import models
+from django.db.models.functions import Now
 
 # Because we want to test creation and deletion of these as separate things,
 # these models are all inserted into a separate Apps so the main test
@@ -8,11 +9,16 @@ from django.db import models
 new_apps = Apps()
 
 
+class DBRetruningDateTimeField(models.DateTimeField):
+    db_returning = True
+
+
 class Author(models.Model):
     name = models.CharField(max_length=255)
     height = models.PositiveIntegerField(null=True, blank=True)
     weight = models.IntegerField(null=True, blank=True)
     uuid = models.UUIDField(null=True)
+    date_of_birth = DBRetruningDateTimeField(default=Now)
 
     class Meta:
         apps = new_apps
