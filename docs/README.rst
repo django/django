@@ -15,4 +15,4 @@ The documentation in ``_build/html/index.html`` can then be viewed in a web
 browser.
 
 .. _ReST: https://docutils.sourceforge.io/rst.html
-.. _Sphinx: http://sphinx-doc.org
+.. _Sphinx: https://www.sphinx-doc.org/
