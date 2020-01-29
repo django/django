@@ -41,7 +41,14 @@ extensions = [
     'sphinx.ext.extlinks',
     "sphinx.ext.intersphinx",
     "sphinx.ext.viewcode",
+    "sphinx.ext.autosectionlabel",
 ]
+
+# AutosectionLabel settings.
+# Uses a <page>:<label> schema which doesn't work for duplicate sub-section
+# labels, so set max depth.
+autosectionlabel_prefix_document = True
+autosectionlabel_maxdepth = 2
 
 # Spelling check needs an additional module that is not installed by default.
 # Add it only if spelling check is requested so docs can be generated without it.
