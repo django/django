@@ -97,7 +97,8 @@ class DummyCacheTests(SimpleTestCase):
         self.assertEqual(cache.get_many(['a', 'b', 'e']), {})
 
     def test_get_many_invalid_key(self):
-        with self.assertWarns(CacheKeyWarning, msg=KEY_ERRORS_WITH_MEMCACHED_MSG % 'key with spaces'):
+        msg = KEY_ERRORS_WITH_MEMCACHED_MSG % ':1:key with spaces'
+        with self.assertWarnsMessage(CacheKeyWarning, msg):
             cache.get_many(['key with spaces'])
 
     def test_delete(self):
@@ -186,7 +187,8 @@ class DummyCacheTests(SimpleTestCase):
         self.assertEqual(cache.set_many({'a': 1, 'b': 2}, timeout=2, version='1'), [])
 
     def test_set_many_invalid_key(self):
-        with self.assertWarns(CacheKeyWarning, msg=KEY_ERRORS_WITH_MEMCACHED_MSG % 'key with spaces'):
+        msg = KEY_ERRORS_WITH_MEMCACHED_MSG % ':1:key with spaces'
+        with self.assertWarnsMessage(CacheKeyWarning, msg):
             cache.set_many({'key with spaces': 'foo'})
 
     def test_delete_many(self):
@@ -194,7 +196,8 @@ class DummyCacheTests(SimpleTestCase):
         cache.delete_many(['a', 'b'])
 
     def test_delete_many_invalid_key(self):
-        with self.assertWarns(CacheKeyWarning, msg=KEY_ERRORS_WITH_MEMCACHED_MSG % 'key with spaces'):
+        msg = KEY_ERRORS_WITH_MEMCACHED_MSG % ':1:key with spaces'
+        with self.assertWarnsMessage(CacheKeyWarning, msg):
             cache.delete_many({'key with spaces': 'foo'})
 
     def test_clear(self):

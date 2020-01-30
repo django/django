@@ -462,7 +462,7 @@ class BasePasswordHasherTests(SimpleTestCase):
 
     def test_harden_runtime(self):
         msg = 'subclasses of BasePasswordHasher should provide a harden_runtime() method'
-        with self.assertWarns(Warning, msg=msg):
+        with self.assertWarnsMessage(Warning, msg):
             self.hasher.harden_runtime('password', 'encoded')
 
     def test_must_update(self):
