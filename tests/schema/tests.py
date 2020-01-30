@@ -2648,6 +2648,42 @@ class SchemaTests(TransactionTestCase):
             item = cursor.fetchall()[0]
             self.assertEqual(item[0], None if connection.features.interprets_empty_strings_as_nulls else '')
 
+    def test_add_field_default_db_returning(self):
+        class CreatedDateTimeField(DateTimeField):
+            db_returning = True
+
+        # Create the table.
+        with connection.schema_editor() as editor:
+            editor.create_model(Author)
+        # Add new field with database default.
+        Author.objects.create(name='author 1')
+        new_field = CreatedDateTimeField(default=Now)
+        new_field.set_attributes_from_name('db_returning')
+        with connection.schema_editor() as editor:
+            editor.add_field(Author, new_field)
+        # Field was added with the right default.
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT db_returning FROM schema_author;")
+            item = cursor.fetchall()[0]
+            self.assertIsNotNone(item[0])
+
+    def test_alter_field_default_db_returning(self):
+        class PubDateTimeField(DateTimeField):
+            db_returning = True
+
+        # Create the table.
+        with connection.schema_editor() as editor:
+            editor.create_model(BookWithoutAuthor)
+        BookWithoutAuthor.objects.create(title='book 1', pub_date=datetime.datetime.now())
+        # Alter to add field with database default.
+        old_field = BookWithoutAuthor._meta.get_field('pub_date')
+        new_field = PubDateTimeField(default=Now)
+        new_field.set_attributes_from_name('pub_date')
+        with connection.schema_editor() as editor:
+            editor.alter_field(BookWithoutAuthor, old_field, new_field, strict=True)
+        book = BookWithoutAuthor.objects.create(title='book 2')
+        self.assertIsInstance(book.pub_date, datetime.datetime)
+
     def test_effective_default_db_default(self):
         """#31206 - effective_default() should be handle database defaults"""
         new_field = DateTimeField(default=TruncDay(Now()))
