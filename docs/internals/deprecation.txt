@@ -79,6 +79,8 @@ details on these changes.
   ``SimpleTestCase.assertFormError()`` and ``assertFormsetError()`` will be
   removed.
 
+* ``django.contrib.sessions.serializers.PickleSerializer`` will be removed.
+
 .. _deprecation-removed-in-4.1:
 
 4.1

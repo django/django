@@ -403,6 +403,9 @@ Miscellaneous
 * The ``exc_info`` argument of the undocumented
   ``django.utils.log.log_response()`` function is replaced by ``exception``.
 
+* ``django.contrib.sessions.serializers.PickleSerializer`` is deprecated due to
+  the risk of remote code execution.
+
 Features removed in 4.1
 =======================
 

@@ -1,3 +1,4 @@
+# RemovedInDjango50Warning.
 from django.core.serializers.base import (
     PickleSerializer as BasePickleSerializer,
 )

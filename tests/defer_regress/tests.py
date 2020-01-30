@@ -4,7 +4,8 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.sessions.backends.db import SessionStore
 from django.db import models
 from django.db.models import Count
-from django.test import TestCase, override_settings
+from django.test import TestCase, ignore_warnings, override_settings
+from django.utils.deprecation import RemovedInDjango50Warning
 
 from .models import (
     Base, Child, Derived, Feature, Item, ItemAndSimpleItem, Leaf, Location,
@@ -91,6 +92,7 @@ class DeferRegressionTest(TestCase):
             list(SimpleItem.objects.annotate(Count('feature')).only('name')),
             list)
 
+    @ignore_warnings(category=RemovedInDjango50Warning)
     @override_settings(SESSION_SERIALIZER='django.contrib.sessions.serializers.PickleSerializer')
     def test_ticket_12163(self):
         # Test for #12163 - Pickling error saving session with unsaved model
