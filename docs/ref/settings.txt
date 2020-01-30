@@ -3318,8 +3318,8 @@ Default: ``'django.contrib.sessions.serializers.JSONSerializer'``
 Full import path of a serializer class to use for serializing session data.
 Included serializers are:
 
-* ``'django.contrib.sessions.serializers.PickleSerializer'``
 * ``'django.contrib.sessions.serializers.JSONSerializer'``
+* ``'django.contrib.sessions.serializers.PickleSerializer'`` (Deprecated.)
 
 See :ref:`session_serialization` for details, including a warning regarding
 possible remote code execution when using

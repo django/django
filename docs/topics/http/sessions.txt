@@ -367,6 +367,11 @@ Bundled serializers
     remote code execution vulnerability if :setting:`SECRET_KEY` becomes known
     by an attacker.
 
+    .. deprecated:: 3.1
+
+        Due to the risk of remote code execution, this serializer is deprecated
+        and will be removed in Django 4.0.
+
 .. _custom-serializers:
 
 Write your own serializer
