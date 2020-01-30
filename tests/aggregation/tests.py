@@ -9,6 +9,7 @@ from django.db.models import (
     Max, Min, Sum, Value,
 )
 from django.db.models.expressions import Case, Exists, OuterRef, Subquery, When
+from django.db.models.functions import Coalesce
 from django.test import TestCase
 from django.test.testcases import skipUnlessDBFeature
 from django.test.utils import Approximate, CaptureQueriesContext
@@ -1189,6 +1190,32 @@ class AggregateTestCase(TestCase):
                 'min_age': 29,
             },
         ])
+
+    def test_aggregation_order_by_not_selected_annotation_values(self):
+        result_asc = [
+            self.b4.pk,
+            self.b3.pk,
+            self.b1.pk,
+            self.b2.pk,
+            self.b5.pk,
+            self.b6.pk,
+        ]
+        result_desc = result_asc[::-1]
+        tests = [
+            ('min_related_age', result_asc),
+            ('-min_related_age', result_desc),
+            (F('min_related_age'), result_asc),
+            (F('min_related_age').asc(), result_asc),
+            (F('min_related_age').desc(), result_desc),
+        ]
+        for ordering, expected_result in tests:
+            with self.subTest(ordering=ordering):
+                books_qs = Book.objects.annotate(
+                    min_age=Min('authors__age'),
+                ).annotate(
+                    min_related_age=Coalesce('min_age', 'contact__age'),
+                ).order_by(ordering).values_list('pk', flat=True)
+                self.assertEqual(list(books_qs), expected_result)
 
     @skipUnlessDBFeature('supports_subqueries_in_group_by')
     def test_group_by_subquery_annotation(self):
