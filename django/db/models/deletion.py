@@ -296,10 +296,7 @@ class Collector:
                     try:
                         field.remote_field.on_delete(self, field, sub_objs, self.using)
                     except ProtectedError as error:
-                        key = "'%s.%s'" % (
-                            error.protected_objects[0].__class__.__name__,
-                            field.name,
-                        )
+                        key = "'%s.%s'" % (field.model.__name__, field.name)
                         protected_objects[key] += error.protected_objects
         if protected_objects:
             raise ProtectedError(

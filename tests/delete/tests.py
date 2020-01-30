@@ -90,6 +90,17 @@ class OnDeleteTests(TestCase):
         with self.assertRaisesMessage(ProtectedError, msg):
             a.protect.delete()
 
+    def test_protect_path(self):
+        a = create_a('protect')
+        a.protect.p = P.objects.create()
+        a.protect.save()
+        msg = (
+            "Cannot delete some instances of model 'P' because they are "
+            "referenced through protected foreign keys: 'R.p'."
+        )
+        with self.assertRaisesMessage(ProtectedError, msg):
+            a.protect.p.delete()
+
     def test_do_nothing(self):
         # Testing DO_NOTHING is a bit harder: It would raise IntegrityError for a normal model,
         # so we connect to pre_delete and set the fk to a known value.
