@@ -46,6 +46,9 @@ details on these changes.
 
 * The ``HttpRequest.is_ajax()`` method will be removed.
 
+* Support for the pre-Django 3.1 encoding format of cookies values used by
+  ``django.contrib.messages.storage.cookie.CookieStorage`` will be removed.
+
 See the :ref:`Django 3.1 release notes <deprecated-features-3.1>` for more
 details on these changes.
 
