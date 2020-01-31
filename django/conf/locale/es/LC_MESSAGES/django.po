@@ -1,7 +1,7 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Abraham Estrada, 2013
+# Abe Estrada, 2013
 # albertoalcolea <albertoalcolea@gmail.com>, 2014
 # Amanda Copete, 2017
 # Antoni Aloy <aaloy@apsl.net>, 2011-2014,2017,2019
@@ -9,7 +9,8 @@
 # Diego Schulz <dschulz@gmail.com>, 2012
 # Ernesto Avilés, 2015-2016
 # Ernesto Avilés, 2014
-# Ernesto Rico-Schmidt <e.rico.schmidt@gmail.com>, 2017
+# Ernesto Avilés, 2020
+# Ernesto Rico Schmidt <e.rico.schmidt@gmail.com>, 2017
 # franchukelly <inactive+franchukelly@transifex.com>, 2011
 # Ignacio José Lizarán Rus <ilizaran@gmail.com>, 2019
 # Igor Támara <igor@tamarapatino.org>, 2015
@@ -30,8 +31,8 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-09-27 22:40+0200\n"
-"PO-Revision-Date: 2019-11-05 00:38+0000\n"
-"Last-Translator: Ramiro Morales\n"
+"PO-Revision-Date: 2020-01-08 08:24+0000\n"
+"Last-Translator: Ernesto Avilés\n"
 "Language-Team: Spanish (http://www.transifex.com/django/django/language/"
 "es/)\n"
 "MIME-Version: 1.0\n"
@@ -350,6 +351,8 @@ msgstr "Introduzca una dirección de correo electrónico válida."
 msgid ""
 "Enter a valid “slug” consisting of letters, numbers, underscores or hyphens."
 msgstr ""
+"Introduzca un 'slug' válido, consistente en letras, números, guiones bajos o "
+"medios."
 
 msgid ""
 "Enter a valid “slug” consisting of Unicode letters, numbers, underscores, or "

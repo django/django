@@ -2,6 +2,7 @@
 #
 # Translators:
 # Allisson Azevedo <allisson@gmail.com>, 2014
+# Amanda Savluchinske <amandasavluchinske@gmail.com>, 2019
 # semente, 2013
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Lucas Infante <maccinza@gmail.com>, 2015
@@ -11,8 +12,8 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-09-08 17:27+0200\n"
-"PO-Revision-Date: 2019-10-09 20:26+0000\n"
-"Last-Translator: R.J Lelis <renatojlelis@gmail.com>\n"
+"PO-Revision-Date: 2019-12-11 00:28+0000\n"
+"Last-Translator: Amanda Savluchinske <amandasavluchinske@gmail.com>\n"
 "Language-Team: Portuguese (Brazil) (http://www.transifex.com/django/django/"
 "language/pt_BR/)\n"
 "MIME-Version: 1.0\n"
@@ -34,8 +35,8 @@ msgid ""
 "This should be an absolute path, excluding the domain name. Example: “/"
 "events/search/”."
 msgstr ""
-"Isso deve ser um caminho absoluto, excluindo o nome do domínio. Exemplo: "
-"\"events/search\"."
+"Este deve ser um caminho absoluto, excluindo o nome do domínio. Exemplo: \"/"
+"events/search/\"."
 
 msgid "redirect to"
 msgstr "redirecionar para"
@@ -44,7 +45,7 @@ msgid ""
 "This can be either an absolute path (as above) or a full URL starting with "
 "“http://”."
 msgstr ""
-"Isso pode ser um caminho absoluto (como acima) or um URL completa começando "
+"Este pode ser um caminho absoluto (como acima) ou uma URL completa começando "
 "com \"http://\"."
 
 msgid "redirect"

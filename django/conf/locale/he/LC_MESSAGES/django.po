@@ -4,13 +4,14 @@
 # Alex Gaynor <inactive+Alex@transifex.com>, 2011-2012
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Meir Kriheli <mkriheli@gmail.com>, 2011-2015,2017,2019
+# אורי רודברג <uri@speedy.net>, 2020
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-09-27 22:40+0200\n"
-"PO-Revision-Date: 2019-11-05 00:38+0000\n"
-"Last-Translator: Ramiro Morales\n"
+"PO-Revision-Date: 2020-01-19 11:47+0000\n"
+"Last-Translator: אורי רודברג <uri@speedy.net>\n"
 "Language-Team: Hebrew (http://www.transifex.com/django/django/language/he/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -541,7 +542,7 @@ msgstr "מספר עשרוני"
 
 #, python-format
 msgid "“%(value)s” value must be an integer."
-msgstr ""
+msgstr "הערך '%(value)s' חייב להיות מספר שלם."
 
 msgid "Integer"
 msgstr "מספר שלם"
@@ -763,7 +764,7 @@ msgstr "יש לבחור אפשרות חוקית; אפשרות זו אינה אח
 
 #, python-format
 msgid "“%(pk)s” is not a valid value."
-msgstr ""
+msgstr "\"%(pk)s\" אינו ערך חוקי."
 
 #, python-format
 msgid ""

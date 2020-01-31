@@ -1,6 +1,7 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Anvar Ulugov <wasatiyatm@gmail.com>, 2020
 # Bedilbek Khamidov <bedilbek@gmail.com>, 2019
 # Claude Paroz <claude@2xlibre.net>, 2019
 # Sukhrobbek Ismatov <isukhrobbek@gmail.com>, 2019
@@ -10,8 +11,8 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-09-08 17:27+0200\n"
-"PO-Revision-Date: 2019-11-29 09:01+0000\n"
-"Last-Translator: Claude Paroz <claude@2xlibre.net>\n"
+"PO-Revision-Date: 2020-01-21 09:24+0000\n"
+"Last-Translator: Anvar Ulugov <wasatiyatm@gmail.com>\n"
 "Language-Team: Uzbek (http://www.transifex.com/django/django/language/uz/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -341,16 +342,16 @@ msgid "Enter a new password for the user <strong>%(username)s</strong>."
 msgstr ""
 
 msgid "Welcome,"
-msgstr ""
+msgstr "Xush kelibsiz,"
 
 msgid "View site"
-msgstr ""
+msgstr "Saytni ko'rish"
 
 msgid "Documentation"
-msgstr ""
+msgstr "Qo'llanma"
 
 msgid "Log out"
-msgstr ""
+msgstr "Chiqish"
 
 #, python-format
 msgid "Add %(name)s"
@@ -360,13 +361,13 @@ msgid "History"
 msgstr ""
 
 msgid "View on site"
-msgstr ""
+msgstr "Saytda ko'rish"
 
 msgid "Filter"
-msgstr ""
+msgstr "Saralash"
 
 msgid "Remove from sorting"
-msgstr ""
+msgstr "Tartiblashdan chiqarish"
 
 #, python-format
 msgid "Sorting priority: %(priority_number)s"
@@ -376,7 +377,7 @@ msgid "Toggle sorting"
 msgstr ""
 
 msgid "Delete"
-msgstr ""
+msgstr "O'chirish"
 
 #, python-format
 msgid ""
@@ -429,33 +430,33 @@ msgid ""
 msgstr ""
 
 msgid "View"
-msgstr ""
+msgstr "Ko'rish"
 
 msgid "Delete?"
-msgstr ""
+msgstr "O'chirasizmi?"
 
 #, python-format
 msgid " By %(filter_title)s "
 msgstr ""
 
 msgid "Summary"
-msgstr ""
+msgstr "Xulosa"
 
 #, python-format
 msgid "Models in the %(name)s application"
 msgstr ""
 
 msgid "Add"
-msgstr ""
+msgstr "Qo'shish"
 
 msgid "You don’t have permission to view or edit anything."
 msgstr ""
 
 msgid "Recent actions"
-msgstr ""
+msgstr "So'ngi harakatlar"
 
 msgid "My actions"
-msgstr ""
+msgstr "Mening harakatlarim"
 
 msgid "None available"
 msgstr ""
@@ -496,13 +497,13 @@ msgid "Show all"
 msgstr ""
 
 msgid "Save"
-msgstr ""
+msgstr "Saqlash"
 
 msgid "Popup closing…"
 msgstr ""
 
 msgid "Search"
-msgstr ""
+msgstr "Izlash"
 
 #, python-format
 msgid "%(counter)s result"
