@@ -153,24 +153,3 @@ class CookieTests(BaseTests, SimpleTestCase):
         storage = self.get_storage()
         self.assertIsInstance(encode_decode(mark_safe("<b>Hello Django!</b>")), SafeData)
         self.assertNotIsInstance(encode_decode("<b>Hello Django!</b>"), SafeData)
-
-    def test_pre_1_5_message_format(self):
-        """
-        Messages that were set in the cookie before the addition of is_safedata
-        are decoded correctly (#22426).
-        """
-        # Encode the messages using the current encoder.
-        messages = [Message(constants.INFO, 'message %s') for x in range(5)]
-        encoder = MessageEncoder(separators=(',', ':'))
-        encoded_messages = encoder.encode(messages)
-
-        # Remove the is_safedata flag from the messages in order to imitate
-        # the behavior of before 1.5 (monkey patching).
-        encoded_messages = json.loads(encoded_messages)
-        for obj in encoded_messages:
-            obj.pop(1)
-        encoded_messages = json.dumps(encoded_messages, separators=(',', ':'))
-
-        # Decode the messages in the old format (without is_safedata)
-        decoded_messages = json.loads(encoded_messages, cls=MessageDecoder)
-        self.assertEqual(messages, decoded_messages)

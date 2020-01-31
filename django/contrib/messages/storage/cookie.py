@@ -32,9 +32,6 @@ class MessageDecoder(json.JSONDecoder):
     def process_messages(self, obj):
         if isinstance(obj, list) and obj:
             if obj[0] == MessageEncoder.message_key:
-                if len(obj) == 3:
-                    # Compatibility with previously-encoded messages
-                    return Message(*obj[1:])
                 if obj[1]:
                     obj[3] = mark_safe(obj[3])
                 return Message(*obj[2:])
