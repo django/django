@@ -6,7 +6,7 @@ from django.core.checks.model_checks import _check_lazy_references
 from django.db import connection, connections, models
 from django.db.models.functions import Lower
 from django.db.models.signals import post_init
-from django.test import SimpleTestCase
+from django.test import SimpleTestCase, TestCase
 from django.test.utils import isolate_apps, override_settings, register_lookup
 
 
@@ -1212,7 +1212,7 @@ class OtherModelTests(SimpleTestCase):
 
 
 @isolate_apps('invalid_models_tests')
-class ConstraintsTests(SimpleTestCase):
+class ConstraintsTests(TestCase):
     def test_check_constraints(self):
         class Model(models.Model):
             age = models.IntegerField()
@@ -1220,7 +1220,7 @@ class ConstraintsTests(SimpleTestCase):
             class Meta:
                 constraints = [models.CheckConstraint(check=models.Q(age__gte=18), name='is_adult')]
 
-        errors = Model.check()
+        errors = Model.check(databases=self.databases)
         warn = Warning(
             '%s does not support check constraints.' % connection.display_name,
             hint=(
@@ -1230,7 +1230,7 @@ class ConstraintsTests(SimpleTestCase):
             obj=Model,
             id='models.W027',
         )
-        expected = [] if connection.features.supports_table_check_constraints else [warn, warn]
+        expected = [] if connection.features.supports_table_check_constraints else [warn]
         self.assertCountEqual(errors, expected)
 
     def test_check_constraints_required_db_features(self):

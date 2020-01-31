@@ -1255,6 +1255,7 @@ class Model(metaclass=ModelBase):
     def check(cls, **kwargs):
         errors = [*cls._check_swappable(), *cls._check_model(), *cls._check_managers(**kwargs)]
         if not cls._meta.swapped:
+            databases = kwargs.get('databases') or []
             errors += [
                 *cls._check_fields(**kwargs),
                 *cls._check_m2m_through_same_relationship(),
@@ -1277,7 +1278,7 @@ class Model(metaclass=ModelBase):
                 *cls._check_unique_together(),
                 *cls._check_indexes(),
                 *cls._check_ordering(),
-                *cls._check_constraints(),
+                *cls._check_constraints(databases),
             ]
 
         return errors
@@ -1836,9 +1837,9 @@ class Model(metaclass=ModelBase):
         return errors
 
     @classmethod
-    def _check_constraints(cls):
+    def _check_constraints(cls, databases):
         errors = []
-        for db in settings.DATABASES:
+        for db in databases:
             if not router.allow_migrate_model(db, cls):
                 continue
             connection = connections[db]
