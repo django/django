@@ -1928,17 +1928,8 @@ class Query(BaseExpression):
         will be made automatically.
         """
         group_by = list(self.select)
-        annotations_group_by = self.annotation_select.copy()
-        # Add not selected annotations used only in the ORDER BY clause.
-        if self.order_by and self.annotations:
-            for item in self.order_by:
-                if not hasattr(item, 'resolve_expression'):
-                    alias = item[1:] if item.startswith('-') else item
-                    if alias in self.annotations and alias not in self.annotation_select:
-                        annotations_group_by[alias] = self.annotations[alias]
-        # Expand the GROUP BY clause by required columns.
-        if annotations_group_by:
-            for alias, annotation in annotations_group_by.items():
+        if self.annotation_select:
+            for alias, annotation in self.annotation_select.items():
                 signature = inspect.signature(annotation.get_group_by_cols)
                 if 'alias' not in signature.parameters:
                     annotation_class = annotation.__class__
