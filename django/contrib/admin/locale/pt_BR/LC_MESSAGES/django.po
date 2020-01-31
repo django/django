@@ -4,8 +4,8 @@
 # Allisson Azevedo <allisson@gmail.com>, 2014
 # Bruce de Sá <contato@publidex.com.br>, 2019
 # bruno.devpod <bruno.devpod@gmail.com>, 2014
-# Carlos E C Leite - Cadu <caduado@gmail.com>, 2019
-# Carlos E C Leite - Cadu <caduado@gmail.com>, 2019
+# Carlos C. Leite <caduado@gmail.com>, 2019
+# Carlos C. Leite <caduado@gmail.com>, 2019
 # Filipe Cifali Stangler <cifali.filipe@gmail.com>, 2016
 # dudanogueira <dudanogueira@gmail.com>, 2012
 # Elyézer Rezende <elyezermr@gmail.com>, 2013
@@ -26,13 +26,14 @@
 # R.J Lelis <renatojlelis@gmail.com>, 2019
 # Sergio Garcia <sergio@ginx.com.br>, 2015
 # Vinícius Damaceno <lvdamaceno@gmail.com>, 2019
+# Vinícius Muniz de Melo <viniciusdesk@icloud.com>, 2019
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-09-08 17:27+0200\n"
-"PO-Revision-Date: 2019-10-14 16:27+0000\n"
-"Last-Translator: R.J Lelis <renatojlelis@gmail.com>\n"
+"PO-Revision-Date: 2019-12-19 17:58+0000\n"
+"Last-Translator: Vinícius Muniz de Melo <viniciusdesk@icloud.com>\n"
 "Language-Team: Portuguese (Brazil) (http://www.transifex.com/django/django/"
 "language/pt_BR/)\n"
 "MIME-Version: 1.0\n"
@@ -150,7 +151,7 @@ msgstr "entradas de log"
 
 #, python-format
 msgid "Added “%(object)s”."
-msgstr "Adicionado “%(object)s”. "
+msgstr "Adicionado “%(object)s”."
 
 #, python-format
 msgid "Changed “%(object)s” — %(changes)s"

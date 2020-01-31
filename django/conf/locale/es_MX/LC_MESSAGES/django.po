@@ -1,15 +1,16 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Abraham Estrada, 2011-2013
+# Abe Estrada, 2011-2013
+# Jesús Bautista <jesbam98@gmail.com>, 2019-2020
 # zodman <zodman@gmail.com>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-09-27 22:40+0200\n"
-"PO-Revision-Date: 2019-11-05 00:38+0000\n"
-"Last-Translator: Ramiro Morales\n"
+"PO-Revision-Date: 2020-01-13 02:18+0000\n"
+"Last-Translator: Jesús Bautista <jesbam98@gmail.com>\n"
 "Language-Team: Spanish (Mexico) (http://www.transifex.com/django/django/"
 "language/es_MX/)\n"
 "MIME-Version: 1.0\n"
@@ -85,7 +86,7 @@ msgid "Argentinian Spanish"
 msgstr "Español de Argentina"
 
 msgid "Colombian Spanish"
-msgstr ""
+msgstr "Español Colombiano"
 
 msgid "Mexican Spanish"
 msgstr "Español de México"
@@ -292,13 +293,13 @@ msgid "Traditional Chinese"
 msgstr "Chino tradicional"
 
 msgid "Messages"
-msgstr ""
+msgstr "Mensajes"
 
 msgid "Site Maps"
 msgstr ""
 
 msgid "Static Files"
-msgstr ""
+msgstr "Archivos Estáticos"
 
 msgid "Syndication"
 msgstr ""
@@ -319,7 +320,7 @@ msgid "Enter a valid URL."
 msgstr "Ingrese una URL válida."
 
 msgid "Enter a valid integer."
-msgstr ""
+msgstr "Ingrese un entero válido."
 
 msgid "Enter a valid email address."
 msgstr "Introduzca una dirección de correo electrónico válida."
@@ -508,7 +509,7 @@ msgid ""
 msgstr ""
 
 msgid "Duration"
-msgstr ""
+msgstr "Duración"
 
 msgid "Email address"
 msgstr "Dirección de correo electrónico"
@@ -518,7 +519,7 @@ msgstr "Ruta de archivo"
 
 #, python-format
 msgid "“%(value)s” value must be a float."
-msgstr ""
+msgstr "El valor \"%(value)s\" debe ser flotante."
 
 msgid "Floating point number"
 msgstr "Número de punto flotante"
@@ -682,7 +683,7 @@ msgid "Enter a list of values."
 msgstr "Introduzca una lista de valores."
 
 msgid "Enter a complete value."
-msgstr ""
+msgstr "Ingrese un valor completo."
 
 msgid "Enter a valid UUID."
 msgstr ""
@@ -773,13 +774,13 @@ msgid "No"
 msgstr "No"
 
 msgid "Year"
-msgstr ""
+msgstr "Año"
 
 msgid "Month"
-msgstr ""
+msgstr "Mes"
 
 msgid "Day"
-msgstr ""
+msgstr "Día"
 
 msgid "yes,no,maybe"
 msgstr "sí, no, tal vez"
@@ -1039,7 +1040,7 @@ msgid "December"
 msgstr "Diciembre"
 
 msgid "This is not a valid IPv6 address."
-msgstr ""
+msgstr "Esta no es una dirección IPv6 válida."
 
 #, python-format
 msgctxt "String to return when truncating text"
@@ -1093,7 +1094,7 @@ msgid "0 minutes"
 msgstr "0 minutos"
 
 msgid "Forbidden"
-msgstr ""
+msgstr "Prohibido"
 
 msgid "CSRF verification failed. Request aborted."
 msgstr ""
@@ -1137,7 +1138,7 @@ msgid "No year specified"
 msgstr "No se ha especificado el valor año"
 
 msgid "Date out of range"
-msgstr ""
+msgstr "Fecha fuera de rango"
 
 msgid "No month specified"
 msgstr "No se ha especificado el valor mes"
@@ -1211,7 +1212,7 @@ msgid ""
 msgstr ""
 
 msgid "Django Documentation"
-msgstr ""
+msgstr "Documentación de Django"
 
 msgid "Topics, references, &amp; how-to’s"
 msgstr ""

@@ -5,6 +5,7 @@
 # Boryslav Larin <brabadu@gmail.com>, 2011
 # Денис Подлесный <haos616@gmail.com>, 2016
 # Igor Melnyk, 2014-2015,2017
+# Illia Volochii <illia.volochii@gmail.com>, 2019
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Kirill Gagarski <gagarin.gtn@gmail.com>, 2014
 # Max V. Stotsky <transifex@ms.pereslavl.ru>, 2014
@@ -21,8 +22,8 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-09-27 22:40+0200\n"
-"PO-Revision-Date: 2019-11-05 00:38+0000\n"
-"Last-Translator: Ramiro Morales\n"
+"PO-Revision-Date: 2019-12-26 20:22+0000\n"
+"Last-Translator: Illia Volochii <illia.volochii@gmail.com>\n"
 "Language-Team: Ukrainian (http://www.transifex.com/django/django/language/"
 "uk/)\n"
 "MIME-Version: 1.0\n"
@@ -296,7 +297,7 @@ msgid "Urdu"
 msgstr "Урду"
 
 msgid "Uzbek"
-msgstr ""
+msgstr "Узбецька"
 
 msgid "Vietnamese"
 msgstr "В'єтнамська"
@@ -835,13 +836,13 @@ msgid "No"
 msgstr "Ні"
 
 msgid "Year"
-msgstr ""
+msgstr "Рік"
 
 msgid "Month"
-msgstr ""
+msgstr "Місяць"
 
 msgid "Day"
-msgstr ""
+msgstr "День"
 
 msgid "yes,no,maybe"
 msgstr "так,ні,можливо"
@@ -1263,7 +1264,7 @@ msgstr "Перегляд вмісту каталогу не дозволено."
 
 #, python-format
 msgid "“%(path)s” does not exist"
-msgstr ""
+msgstr "\"%(path)s\" не існує"
 
 #, python-format
 msgid "Index of %(directory)s"

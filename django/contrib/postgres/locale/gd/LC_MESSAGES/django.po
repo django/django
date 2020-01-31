@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-05-17 11:49+0200\n"
-"PO-Revision-Date: 2018-05-29 09:32+0000\n"
+"POT-Creation-Date: 2019-09-08 17:27+0200\n"
+"PO-Revision-Date: 2019-12-13 12:32+0000\n"
 "Last-Translator: GunChleoc\n"
 "Language-Team: Gaelic, Scottish (http://www.transifex.com/django/django/"
 "language/gd/)\n"
@@ -34,8 +34,8 @@ msgid "Map of strings to strings/nulls"
 msgstr "Mapaichean de shreangan gu sreangan/luachan null"
 
 #, python-format
-msgid "The value of \"%(key)s\" is not a string or null."
-msgstr "Chan eil an luach air “%(key)s” ’na shreang no null."
+msgid "The value of “%(key)s” is not a string or null."
+msgstr "Chan eil an luach air %(key)s ’na shreang no null."
 
 msgid "A JSON object"
 msgstr "Oibjeact JSON"
@@ -50,8 +50,8 @@ msgid "Input must be a JSON dictionary."
 msgstr "Feumaidh an t-ion-chur a bhith 'na fhaclair JSON."
 
 #, python-format
-msgid "'%(value)s' value must be valid JSON."
-msgstr "Feumaidh “%(value)s” a bhith ’na JSON dligheach."
+msgid "“%(value)s” value must be valid JSON."
+msgstr "Feumaidh luach “%(value)s” a bhith ’na JSON dligheach."
 
 msgid "Enter two valid values."
 msgstr "Cuir a-steach dà luach dligheach."

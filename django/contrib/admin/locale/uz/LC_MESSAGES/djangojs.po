@@ -1,198 +1,195 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# eallik <eallik@gmail.com>, 2011
-# Jannis Leidel <jannis@leidel.info>, 2011
-# Janno Liivak <jannolii@gmail.com>, 2013-2015
-# Martin Pajuste <martinpajuste@gmail.com>, 2016
-# Ragnar Rebase <rrebase@gmail.com>, 2019
+# Otabek Umurzakov <umurzakov.otabek.1999@gmail.com>, 2019
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-05-17 11:50+0200\n"
-"PO-Revision-Date: 2019-12-28 01:38+0000\n"
-"Last-Translator: Ragnar Rebase <rrebase@gmail.com>\n"
-"Language-Team: Estonian (http://www.transifex.com/django/django/language/"
-"et/)\n"
+"PO-Revision-Date: 2019-12-13 21:48+0000\n"
+"Last-Translator: Otabek Umurzakov <umurzakov.otabek.1999@gmail.com>\n"
+"Language-Team: Uzbek (http://www.transifex.com/django/django/language/uz/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: et\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Language: uz\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
 
 #, javascript-format
 msgid "Available %s"
-msgstr "Saadaval %s"
+msgstr "Mavjud %s"
 
 #, javascript-format
 msgid ""
 "This is the list of available %s. You may choose some by selecting them in "
 "the box below and then clicking the \"Choose\" arrow between the two boxes."
 msgstr ""
-"Nimekiri välja \"%s\" võimalikest väärtustest. Saad valida ühe või mitu "
-"kirjet allolevast kastist ning vajutades noolt \"Vali\" liigutada neid ühest "
-"kastist teise."
+"Bu mavjud %s ro'yxati. Siz ulardan ba'zilarini quyidagi maydonchada "
+"belgilab, so'ng ikkala maydonlar orasidagi \"Tanlash\" ko'rsatkichiga bosish "
+"orqali tanlashingiz mumkin."
 
 #, javascript-format
 msgid "Type into this box to filter down the list of available %s."
-msgstr "Filtreeri selle kasti abil välja \"%s\" nimekirja."
+msgstr ""
+"Mavjud bo'lgan %s larni ro'yxatini filtrlash uchun ushbu maydonchaga "
+"kiriting."
 
 msgid "Filter"
-msgstr "Filter"
+msgstr "Filtrlash"
 
 msgid "Choose all"
-msgstr "Vali kõik"
+msgstr "Barchasini tanlash"
 
 #, javascript-format
 msgid "Click to choose all %s at once."
-msgstr "Kliki, et valida kõik %s korraga."
+msgstr "Barcha %s larni birdan tanlash uchun bosing."
 
 msgid "Choose"
-msgstr "Vali"
+msgstr "Tanlash"
 
 msgid "Remove"
-msgstr "Eemalda"
+msgstr "O'chirish"
 
 #, javascript-format
 msgid "Chosen %s"
-msgstr "Valitud %s"
+msgstr "Tanlangan %s"
 
 #, javascript-format
 msgid ""
 "This is the list of chosen %s. You may remove some by selecting them in the "
 "box below and then clicking the \"Remove\" arrow between the two boxes."
 msgstr ""
-"Nimekiri välja \"%s\" valitud väärtustest. Saad valida ühe või mitu kirjet "
-"allolevast kastist ning vajutades noolt \"Eemalda\" liigutada neid ühest "
-"kastist teise."
+"Bu tanlangan %s ro'yxati. Siz ulardan ba'zilarini quyidagi maydonchada "
+"belgilab, so'ng ikkala maydonlar orasidagi \"O'chirish\" ko'rsatkichiga "
+"bosish orqali o'chirishingiz mumkin."
 
 msgid "Remove all"
-msgstr "Eemalda kõik"
+msgstr "Barchasini o'chirish"
 
 #, javascript-format
 msgid "Click to remove all chosen %s at once."
-msgstr "Kliki, et eemaldada kõik valitud %s korraga."
+msgstr "Barcha tanlangan %s larni birdan o'chirib tashlash uchun bosing."
 
 msgid "%(sel)s of %(cnt)s selected"
 msgid_plural "%(sel)s of %(cnt)s selected"
-msgstr[0] "%(sel)s  %(cnt)sst valitud"
-msgstr[1] "%(sel)s  %(cnt)sst valitud"
+msgstr[0] "%(cnt)s dan %(sel)s tanlandi"
 
 msgid ""
 "You have unsaved changes on individual editable fields. If you run an "
 "action, your unsaved changes will be lost."
 msgstr ""
-"Muudetavates lahtrites on salvestamata muudatusi. Kui sooritate mõne "
-"toimingu, lähevad salvestamata muudatused kaotsi."
+"Siz alohida tahrirlash mumkin bo'lgan maydonlarda saqlanmagan "
+"o‘zgarishlaringiz mavjud. Agar siz harakatni ishga tushirsangiz, saqlanmagan "
+"o'zgarishlaringiz yo'qotiladi."
 
 msgid ""
 "You have selected an action, but you haven't saved your changes to "
 "individual fields yet. Please click OK to save. You'll need to re-run the "
 "action."
 msgstr ""
-"Valisite toimingu, kuid pole salvestanud muudatusi lahtrites. Salvestamiseks "
-"palun vajutage OK. Peate toimingu uuesti käivitama."
+"Siz harakatni tanladingiz, lekin hali ham o'zgartirishlaringizni alohida "
+"maydonlarga saqlamadingiz. Iltimos saqlash uchun OK ni bosing. Harakatni "
+"qayta ishga tushurishingiz kerak bo'ladi."
 
 msgid ""
 "You have selected an action, and you haven't made any changes on individual "
 "fields. You're probably looking for the Go button rather than the Save "
 "button."
 msgstr ""
-"Valisite toimingu, kuid ei muutnud ühtegi lahtrit. Tõenäoliselt otsite Mine "
-"mitte Salvesta nuppu."
+"Siz harakatni tanladingiz va alohida maydonlarda hech qanday o'zgartirishlar "
+"kiritmadingiz. Ehtimol siz Saqlash tugmasini emas, balki O'tish tugmasini "
+"qidirmoqdasiz."
 
 msgid "Now"
-msgstr "Praegu"
+msgstr "Hozir"
 
 msgid "Midnight"
-msgstr "Kesköö"
+msgstr "Yarim tun"
 
 msgid "6 a.m."
-msgstr "6 hommikul"
+msgstr "6 t.o."
 
 msgid "Noon"
-msgstr "Keskpäev"
+msgstr "Kun o'rtasi"
 
 msgid "6 p.m."
-msgstr "6 õhtul"
+msgstr "6 t.k."
 
 #, javascript-format
 msgid "Note: You are %s hour ahead of server time."
 msgid_plural "Note: You are %s hours ahead of server time."
-msgstr[0] "Märkus: Olete %s tund serveri ajast ees."
-msgstr[1] "Märkus: Olete %s tundi serveri ajast ees."
+msgstr[0] "Eslatma: Siz server vaqtidan %s soat oldindasiz."
 
 #, javascript-format
 msgid "Note: You are %s hour behind server time."
 msgid_plural "Note: You are %s hours behind server time."
-msgstr[0] "Märkus: Olete %s tund serveri ajast maas."
-msgstr[1] "Märkus: Olete %s tundi serveri ajast maas."
+msgstr[0] "Eslatma: Siz server vaqtidan %s soat orqadasiz."
 
 msgid "Choose a Time"
-msgstr "Vali aeg"
+msgstr "Vaqtni tanlang"
 
 msgid "Choose a time"
-msgstr "Vali aeg"
+msgstr "Vaqtni tanlang"
 
 msgid "Cancel"
-msgstr "Tühista"
+msgstr "Bekor qilish"
 
 msgid "Today"
-msgstr "Täna"
+msgstr "Bugun"
 
 msgid "Choose a Date"
-msgstr "Vali kuupäev"
+msgstr "Sanani tanlang"
 
 msgid "Yesterday"
-msgstr "Eile"
+msgstr "Kecha"
 
 msgid "Tomorrow"
-msgstr "Homme"
+msgstr "Ertaga"
 
 msgid "January"
-msgstr "jaanuar"
+msgstr "Yanvar"
 
 msgid "February"
-msgstr "veebruar"
+msgstr "Fevral"
 
 msgid "March"
-msgstr "märts"
+msgstr "Mart"
 
 msgid "April"
-msgstr "aprill"
+msgstr "Aprel"
 
 msgid "May"
-msgstr "mai"
+msgstr "May"
 
 msgid "June"
-msgstr "juuni"
+msgstr "Iyun"
 
 msgid "July"
-msgstr "juuli"
+msgstr "Iyul"
 
 msgid "August"
-msgstr "august"
+msgstr "Avgust"
 
 msgid "September"
-msgstr "september"
+msgstr "Sentabr"
 
 msgid "October"
-msgstr "oktoober"
+msgstr "Oktabr"
 
 msgid "November"
-msgstr "november"
+msgstr "Noyabr"
 
 msgid "December"
-msgstr "detsember"
+msgstr "Dekabr"
 
 msgctxt "one letter Sunday"
 msgid "S"
-msgstr "P"
+msgstr "S"
 
 msgctxt "one letter Monday"
 msgid "M"
-msgstr "E"
+msgstr "M"
 
 msgctxt "one letter Tuesday"
 msgid "T"
@@ -200,22 +197,22 @@ msgstr "T"
 
 msgctxt "one letter Wednesday"
 msgid "W"
-msgstr "K"
+msgstr "W"
 
 msgctxt "one letter Thursday"
 msgid "T"
-msgstr "N"
+msgstr "T"
 
 msgctxt "one letter Friday"
 msgid "F"
-msgstr "R"
+msgstr "F"
 
 msgctxt "one letter Saturday"
 msgid "S"
-msgstr "L"
+msgstr "S"
 
 msgid "Show"
-msgstr "Näita"
+msgstr "Ko'rsatish"
 
 msgid "Hide"
-msgstr "Varja"
+msgstr "Yashirish"

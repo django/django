@@ -2,14 +2,15 @@
 #
 # Translators:
 # Paras Nath Chaudhary <opnchaudhary@gmail.com>, 2012
+# Sagar Chalise <chalisesagar@gmail.com>, 2019
 # Sandesh Rana <vimmrana0@gmail.com>, 2019
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-01-16 20:42+0100\n"
-"PO-Revision-Date: 2019-09-20 19:46+0000\n"
-"Last-Translator: Sandesh Rana <vimmrana0@gmail.com>\n"
+"PO-Revision-Date: 2019-12-15 05:39+0000\n"
+"Last-Translator: Sagar Chalise <chalisesagar@gmail.com>\n"
 "Language-Team: Nepali (http://www.transifex.com/django/django/language/ne/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -355,40 +356,40 @@ msgstr[1] "%d मिनेटहरू "
 msgctxt "naturaltime-future"
 msgid "%d year"
 msgid_plural "%d years"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%d बर्ष"
+msgstr[1] "%d बर्षहरु"
 
 #, python-format
 msgctxt "naturaltime-future"
 msgid "%d month"
 msgid_plural "%d months"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%d महिना"
+msgstr[1] "%d महिनाहरु"
 
 #, python-format
 msgctxt "naturaltime-future"
 msgid "%d week"
 msgid_plural "%d weeks"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%d हप्ता"
+msgstr[1] "%d हप्ताहरु"
 
 #, python-format
 msgctxt "naturaltime-future"
 msgid "%d day"
 msgid_plural "%d days"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%d दिन"
+msgstr[1] "%d दिनहरु"
 
 #, python-format
 msgctxt "naturaltime-future"
 msgid "%d hour"
 msgid_plural "%d hours"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%d घण्टा"
+msgstr[1] "%d घण्टाहरू"
 
 #, python-format
 msgctxt "naturaltime-future"
 msgid "%d minute"
 msgid_plural "%d minutes"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%d मिनेट"
+msgstr[1] "%d मिनेटहरू "

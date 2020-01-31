@@ -1,13 +1,13 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Igor Jerosimić, 2019
+# Igor Jerosimić, 2019-2020
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-05-17 11:49+0200\n"
-"PO-Revision-Date: 2019-06-27 18:59+0000\n"
+"POT-Creation-Date: 2019-09-08 17:27+0200\n"
+"PO-Revision-Date: 2020-01-21 20:45+0000\n"
 "Last-Translator: Igor Jerosimić\n"
 "Language-Team: Serbian (Latin) (http://www.transifex.com/django/django/"
 "language/sr@latin/)\n"
@@ -29,11 +29,11 @@ msgid "Nested arrays must have the same length."
 msgstr "Ugnježdeni nizovi moraju da budu iste dužine."
 
 msgid "Map of strings to strings/nulls"
-msgstr ""
+msgstr "Mapa znakovnih niski na  znakovne niske/null-ove"
 
 #, python-format
-msgid "The value of \"%(key)s\" is not a string or null."
-msgstr ""
+msgid "The value of “%(key)s” is not a string or null."
+msgstr "Vrednost \"%(key)s\" nije znakovni niz ili null."
 
 msgid "A JSON object"
 msgstr "JSON objekat"
@@ -48,8 +48,8 @@ msgid "Input must be a JSON dictionary."
 msgstr "Ulazna vrednost mora biti JSON dict."
 
 #, python-format
-msgid "'%(value)s' value must be valid JSON."
-msgstr "'%(value)s' vrednost mora biti ispravni JSON."
+msgid "“%(value)s” value must be valid JSON."
+msgstr "\"%(value)s\" vrednost mora biti ispravan JSON."
 
 msgid "Enter two valid values."
 msgstr "Unesite dve ispravne vrednosti."

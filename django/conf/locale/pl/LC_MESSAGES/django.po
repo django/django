@@ -2,7 +2,7 @@
 #
 # Translators:
 # sidewinder <adam.klosiu@gmail.com>, 2014
-# Adam Stachowicz <saibamenppl@gmail.com>, 2015
+# Saibamen <saibamenppl@gmail.com>, 2015
 # angularcircle, 2011,2013
 # angularcircle, 2011,2013
 # angularcircle, 2014
@@ -14,7 +14,7 @@
 # konryd <inactive+konryd@transifex.com>, 2011
 # konryd <inactive+konryd@transifex.com>, 2011
 # Łukasz Rekucki (lqc) <lrekucki@gmail.com>, 2011
-# m_aciek <maciej.olko@gmail.com>, 2016-2019
+# m_aciek <maciej.olko@gmail.com>, 2016-2020
 # m_aciek <maciej.olko@gmail.com>, 2015
 # Michał Pasternak <michal.dtz@gmail.com>, 2013
 # p <inactive+poczciwiec@transifex.com>, 2012
@@ -31,7 +31,7 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-09-27 22:40+0200\n"
-"PO-Revision-Date: 2019-11-06 19:58+0000\n"
+"PO-Revision-Date: 2020-01-01 22:45+0000\n"
 "Last-Translator: m_aciek <maciej.olko@gmail.com>\n"
 "Language-Team: Polish (http://www.transifex.com/django/django/language/pl/)\n"
 "MIME-Version: 1.0\n"
@@ -623,7 +623,7 @@ msgstr "Dodatnia mała liczba całkowita"
 
 #, python-format
 msgid "Slug (up to %(max_length)s)"
-msgstr "Slug (max. %(max_length)s znaków)"
+msgstr "Slug (do %(max_length)s znaków)"
 
 msgid "Small integer"
 msgstr "Mała liczba całkowita"

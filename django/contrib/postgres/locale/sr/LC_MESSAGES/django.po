@@ -2,13 +2,14 @@
 #
 # Translators:
 # Branko Kokanovic <branko@kokanovic.org>, 2018
+# Igor Jerosimić, 2020
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-05-17 11:49+0200\n"
-"PO-Revision-Date: 2018-07-04 19:55+0000\n"
-"Last-Translator: Branko Kokanovic <branko@kokanovic.org>\n"
+"POT-Creation-Date: 2019-09-08 17:27+0200\n"
+"PO-Revision-Date: 2020-01-21 20:04+0000\n"
+"Last-Translator: Igor Jerosimić\n"
 "Language-Team: Serbian (http://www.transifex.com/django/django/language/"
 "sr/)\n"
 "MIME-Version: 1.0\n"
@@ -32,8 +33,8 @@ msgid "Map of strings to strings/nulls"
 msgstr "Мапа знаковних ниски на знаковне ниске/null-ове"
 
 #, python-format
-msgid "The value of \"%(key)s\" is not a string or null."
-msgstr "Вредност кључа \"%(key)s\" није знаковна ниска или null."
+msgid "The value of “%(key)s” is not a string or null."
+msgstr "Вредност “%(key)s” није знаковни низ или null."
 
 msgid "A JSON object"
 msgstr "JSON објекат"
@@ -48,8 +49,8 @@ msgid "Input must be a JSON dictionary."
 msgstr "Улазна вредност мора бити JSON dict."
 
 #, python-format
-msgid "'%(value)s' value must be valid JSON."
-msgstr "'%(value)s' вредност мора бити исправни JSON."
+msgid "“%(value)s” value must be valid JSON."
+msgstr "“%(value)s” вредност мора бити исправан JSON."
 
 msgid "Enter two valid values."
 msgstr "Унесите две исправне вредности."

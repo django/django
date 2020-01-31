@@ -1,7 +1,7 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Igor Jerosimić, 2019
+# Igor Jerosimić, 2019-2020
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Janos Guljas <janos@resenje.org>, 2011-2012
 msgid ""
@@ -9,8 +9,8 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-09-27 22:40+0200\n"
-"PO-Revision-Date: 2019-11-05 00:38+0000\n"
-"Last-Translator: Ramiro Morales\n"
+"PO-Revision-Date: 2020-01-23 22:15+0000\n"
+"Last-Translator: Igor Jerosimić\n"
 "Language-Team: Serbian (Latin) (http://www.transifex.com/django/django/"
 "language/sr@latin/)\n"
 "MIME-Version: 1.0\n"
@@ -63,7 +63,7 @@ msgid "German"
 msgstr "nemački"
 
 msgid "Lower Sorbian"
-msgstr ""
+msgstr "donjolužičkosrpski"
 
 msgid "Greek"
 msgstr "grčki"
@@ -135,7 +135,7 @@ msgid "Croatian"
 msgstr "hrvatski"
 
 msgid "Upper Sorbian"
-msgstr ""
+msgstr "gornjolužičkosrpski"
 
 msgid "Hungarian"
 msgstr "mađarski"
@@ -144,7 +144,7 @@ msgid "Armenian"
 msgstr "jermenski"
 
 msgid "Interlingua"
-msgstr ""
+msgstr "interlingva"
 
 msgid "Indonesian"
 msgstr "indonežanski"
@@ -165,7 +165,7 @@ msgid "Georgian"
 msgstr "gruzijski"
 
 msgid "Kabyle"
-msgstr ""
+msgstr "kabilski"
 
 msgid "Kazakh"
 msgstr "kazaški"
@@ -198,7 +198,7 @@ msgid "Mongolian"
 msgstr "mongolski"
 
 msgid "Marathi"
-msgstr ""
+msgstr "marathi"
 
 msgid "Burmese"
 msgstr "burmanski"
@@ -216,7 +216,7 @@ msgid "Norwegian Nynorsk"
 msgstr "norveški novi"
 
 msgid "Ossetic"
-msgstr ""
+msgstr "osetinski"
 
 msgid "Punjabi"
 msgstr "Pandžabi"
@@ -273,7 +273,7 @@ msgid "Tatar"
 msgstr "tatarski"
 
 msgid "Udmurt"
-msgstr ""
+msgstr "udmurtski"
 
 msgid "Ukrainian"
 msgstr "ukrajinski"
@@ -282,7 +282,7 @@ msgid "Urdu"
 msgstr "Urdu"
 
 msgid "Uzbek"
-msgstr ""
+msgstr "Uzbekistanski"
 
 msgid "Vietnamese"
 msgstr "vijetnamski"
@@ -303,7 +303,7 @@ msgid "Static Files"
 msgstr "Statičke datoteke"
 
 msgid "Syndication"
-msgstr ""
+msgstr "Udruživanje sadržaja"
 
 msgid "That page number is not an integer"
 msgstr "Zadati broj strane nije ceo broj"
@@ -330,11 +330,15 @@ msgstr "Unesite ispravnu e-mail adresu."
 msgid ""
 "Enter a valid “slug” consisting of letters, numbers, underscores or hyphens."
 msgstr ""
+"Unesite isrpavan „slag“, koji se sastoji od slova, brojki, donjih crta ili "
+"cirtica."
 
 msgid ""
 "Enter a valid “slug” consisting of Unicode letters, numbers, underscores, or "
 "hyphens."
 msgstr ""
+"Unesite ispravan \"slag\", koji se sastoji od Unikod slova, brojki, donjih "
+"crta ili crtica."
 
 msgid "Enter a valid IPv4 address."
 msgstr "Unesite ispravnu IPv4 adresu."
@@ -368,8 +372,14 @@ msgid_plural ""
 "Ensure this value has at least %(limit_value)d characters (it has "
 "%(show_value)d)."
 msgstr[0] ""
+"Ovo polje mora da ima najmanje %(limit_value)d karakter (trenutno ima "
+"%(show_value)d)."
 msgstr[1] ""
+"Ovo polje mora da ima najmanje %(limit_value)d karaktera (trenutno ima "
+"%(show_value)d)."
 msgstr[2] ""
+"Ovo polje mora da ima %(limit_value)d najmanje karaktera (trenutno ima "
+"%(show_value)d )."
 
 #, python-format
 msgid ""
@@ -415,7 +425,7 @@ msgid ""
 msgstr ""
 
 msgid "Null characters are not allowed."
-msgstr ""
+msgstr "'Null' karakteri nisu dozvoljeni."
 
 msgid "and"
 msgstr "i"
@@ -426,7 +436,7 @@ msgstr "%(model_name)ssa poljem %(field_labels)sveć postoji."
 
 #, python-format
 msgid "Value %(value)r is not a valid choice."
-msgstr ""
+msgstr "Vrednost %(value)r nije validna."
 
 msgid "This field cannot be null."
 msgstr "Ovo polje ne može da ostane prazno."
@@ -511,7 +521,7 @@ msgid ""
 msgstr ""
 
 msgid "Duration"
-msgstr ""
+msgstr "Vremenski interval"
 
 msgid "Email address"
 msgstr "Imejl adresa"
@@ -584,7 +594,7 @@ msgid "URL"
 msgstr "URL"
 
 msgid "Raw binary data"
-msgstr ""
+msgstr "Sirovi binarni podaci"
 
 #, python-format
 msgid "“%(value)s” is not a valid UUID."
@@ -684,7 +694,7 @@ msgid "Enter a list of values."
 msgstr "Unesite listu vrednosti."
 
 msgid "Enter a complete value."
-msgstr ""
+msgstr "Unesite kompletnu vrednost."
 
 msgid "Enter a valid UUID."
 msgstr "Unesite ispravan UUID."
@@ -698,7 +708,7 @@ msgid "(Hidden field %(name)s) %(error)s"
 msgstr ""
 
 msgid "ManagementForm data is missing or has been tampered with"
-msgstr ""
+msgstr "ManagementForm nedostaje ili je izmenjena na pogrešan način."
 
 #, python-format
 msgid "Please submit %d or fewer forms."
@@ -741,7 +751,7 @@ msgid "Please correct the duplicate values below."
 msgstr "Ispravite duplirane vrednosti dole."
 
 msgid "The inline value did not match the parent instance."
-msgstr ""
+msgstr "Direktno uneta vrednost ne odgovara instanci roditelja."
 
 msgid "Select a valid choice. That choice is not one of the available choices."
 msgstr "Odabrana vrednost nije među ponuđenima. Odaberite jednu od ponuđenih."
@@ -775,13 +785,13 @@ msgid "No"
 msgstr "Ne"
 
 msgid "Year"
-msgstr ""
+msgstr "Godina"
 
 msgid "Month"
-msgstr ""
+msgstr "Mesec"
 
 msgid "Day"
-msgstr ""
+msgstr "Dan"
 
 msgid "yes,no,maybe"
 msgstr "da,ne,možda"
@@ -1105,7 +1115,7 @@ msgid "Forbidden"
 msgstr "Zabranjeno"
 
 msgid "CSRF verification failed. Request aborted."
-msgstr ""
+msgstr "CSRF verifikacija nije prošla. Zahtev odbijen."
 
 msgid ""
 "You are seeing this message because this HTTPS site requires a “Referer "
@@ -1113,12 +1123,19 @@ msgid ""
 "required for security reasons, to ensure that your browser is not being "
 "hijacked by third parties."
 msgstr ""
+"Ova poruka je prikazana jer ovaj HTTPS sajt zahteva da \"Referer header\" "
+"bude poslat od strane vašeg internet pregledača, što trenutno nije slučaj. "
+"Pomenuto zaglavlje je potrebno iz bezbedonosnih razloga, da bi se osiguralo "
+"da vaš pregledač nije pod kontrolom trećih lica."
 
 msgid ""
 "If you have configured your browser to disable “Referer” headers, please re-"
 "enable them, at least for this site, or for HTTPS connections, or for “same-"
 "origin” requests."
 msgstr ""
+"Ako ste podesili internet pregledač da ne šalje \"Referer\" zaglavlja, "
+"ponovo ih uključite, barem za ovaj sajt, ili za HTTPS konekcije, ili za "
+"\"same-origin\" zahteve."
 
 msgid ""
 "If you are using the <meta name=\"referrer\" content=\"no-referrer\"> tag or "
@@ -1133,20 +1150,25 @@ msgid ""
 "submitting forms. This cookie is required for security reasons, to ensure "
 "that your browser is not being hijacked by third parties."
 msgstr ""
+"Ova poruka je prikazana jer ovaj sajt zahteva CSRF kuki kada se prosleđuju "
+"podaci iz formi. Ovaj kuki je potreban iz sigurnosnih razloga, da bi se "
+"osiguralo da vaš pretraživač nije pod kontrolom trećih lica."
 
 msgid ""
 "If you have configured your browser to disable cookies, please re-enable "
 "them, at least for this site, or for “same-origin” requests."
 msgstr ""
+"Ako je vaš internet pregedač podešen da onemogući kolačiće, molimo da ih "
+"uključite, barem za ovaj sajt, ili za \"same-origin\" zahteve."
 
 msgid "More information is available with DEBUG=True."
-msgstr ""
+msgstr "Više informacija je dostupno sa DEBUG=True."
 
 msgid "No year specified"
 msgstr "Godina nije naznačena"
 
 msgid "Date out of range"
-msgstr ""
+msgstr "Datum van opsega"
 
 msgid "No month specified"
 msgstr "Mesec nije naznačen"
@@ -1186,30 +1208,33 @@ msgstr ""
 
 #, python-format
 msgid "Empty list and “%(class_name)s.allow_empty” is False."
-msgstr ""
+msgstr "Prazna lista i „%(class_name)s.allow_empty“ ima vrednost False."
 
 msgid "Directory indexes are not allowed here."
 msgstr "Indeksi direktorijuma nisu dozvoljeni ovde."
 
 #, python-format
 msgid "“%(path)s” does not exist"
-msgstr ""
+msgstr "„%(path)s“ ne postoji"
 
 #, python-format
 msgid "Index of %(directory)s"
 msgstr "Indeks direktorijuma %(directory)s"
 
 msgid "Django: the Web framework for perfectionists with deadlines."
-msgstr ""
+msgstr "Đango: veb okruženje za perfekcioniste sa strogim rokovima."
 
 #, python-format
 msgid ""
 "View <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" "
 "target=\"_blank\" rel=\"noopener\">release notes</a> for Django %(version)s"
 msgstr ""
+"Pogledajte <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/"
+"\" target=\"_blank\" rel=\"noopener\">napomene uz izdanje</a> za Đango "
+"%(version)s"
 
 msgid "The install worked successfully! Congratulations!"
-msgstr ""
+msgstr "Instalacija je prošla uspešno. Čestitke!"
 
 #, python-format
 msgid ""
@@ -1218,21 +1243,24 @@ msgid ""
 "\">DEBUG=True</a> is in your settings file and you have not configured any "
 "URLs."
 msgstr ""
+"Ova strana je prikazana jer je <a href=\"https://docs.djangoproject.com/en/"
+"%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener"
+"\">DEBUG=True</a> u vašim podešavanjima i niste konfigurisali nijedan URL."
 
 msgid "Django Documentation"
-msgstr ""
+msgstr "Đango dokumentacija"
 
 msgid "Topics, references, &amp; how-to’s"
-msgstr ""
+msgstr "Teme, reference, &amp; kako-da"
 
 msgid "Tutorial: A Polling App"
-msgstr ""
+msgstr "Uputstvo: aplikacija za glasanje"
 
 msgid "Get started with Django"
-msgstr ""
+msgstr "Počnite sa Đangom"
 
 msgid "Django Community"
-msgstr ""
+msgstr "Đango zajednica"
 
 msgid "Connect, get help, or contribute"
-msgstr ""
+msgstr "Povežite se, potražite pomoć ili dajte doprinos"
