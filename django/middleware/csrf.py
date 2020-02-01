@@ -280,7 +280,10 @@ class CsrfViewMiddleware(MiddlewareMixin):
                     reason = REASON_BAD_REFERER % referer.geturl()
                     return self._reject(request, reason)
 
-            csrf_token = request.META.get('CSRF_COOKIE')
+            # Access csrf_token via self._get_token() as rotate_token() may
+            # have been called by an authentication middleware during the
+            # process_request() phase.
+            csrf_token = self._get_token(request)
             if csrf_token is None:
                 # No CSRF cookie. For POST requests, we insist on a CSRF cookie,
                 # and in this way we can avoid all CSRF attacks, including login
