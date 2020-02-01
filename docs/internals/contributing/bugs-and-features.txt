@@ -91,9 +91,8 @@ part of that. Here are some tips on how to make a request most effectively:
 * Make sure the feature actually requires changes in Django's core. If your
   idea can be developed as an independent application or module — for
   instance, you want to support another database engine — we'll probably
-  suggest that you to develop it independently. Then, if your project
-  gathers sufficient community support, we may consider it for inclusion in
-  Django.
+  suggest that you develop it independently. Then, if your project gathers
+  sufficient community support, we may consider it for inclusion in Django.
 
 * First request the feature on the |django-developers| list, not in the
   ticket tracker. It'll get read more closely if it's on the mailing list.
