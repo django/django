@@ -322,6 +322,8 @@ Templates
   and :ttag:`blocktrans` template tags aliases continue to work, and will be
   retained for the foreseeable future.
 
+* The :ttag:`include` template tag now accepts iterables of template names.
+
 Tests
 ~~~~~
 
