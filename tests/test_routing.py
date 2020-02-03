@@ -1,6 +1,5 @@
 from unittest.mock import MagicMock
 
-import django
 import pytest
 from django.conf.urls import url
 from django.core.exceptions import ImproperlyConfigured
@@ -141,7 +140,6 @@ def test_url_router_nesting():
     assert test_app.call_args[0][0]["url_route"] == {"args": ("foo", "3"), "kwargs": {}}
 
 
-@pytest.mark.skipif(django.VERSION[0] < 2, reason="Needs Django 2.x")
 def test_url_router_nesting_path():
     """
     Tests that nested URLRouters add their keyword captures together when used
@@ -176,7 +174,6 @@ def test_url_router_nesting_path():
         assert outer_router({"type": "http", "path": "/number/42/blub/"})
 
 
-@pytest.mark.skipif(django.VERSION[0] < 2, reason="Needs Django 2.x")
 def test_url_router_path():
     """
     Tests that URLRouter also works with path()

@@ -101,15 +101,13 @@ class URLRouter:
 
     def __init__(self, routes):
         self.routes = routes
-        # Django 2 introduced path(); older routes have no "pattern" attribute
-        if self.routes and hasattr(self.routes[0], "pattern"):
-            for route in self.routes:
-                # The inner ASGI app wants to do additional routing, route
-                # must not be an endpoint
-                if getattr(route.callback, "_path_routing", False) is True:
-                    route.pattern._is_endpoint = False
 
         for route in self.routes:
+            # The inner ASGI app wants to do additional routing, route
+            # must not be an endpoint
+            if getattr(route.callback, "_path_routing", False) is True:
+                route.pattern._is_endpoint = False
+
             if not route.callback and isinstance(route, URLResolver):
                 raise ImproperlyConfigured(
                     "%s: include() is not supported in URLRouter. Use nested"
