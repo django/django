@@ -9,10 +9,6 @@ Additionally, they can also be used in combination with a worker process
 to make a basic task queue or to offload tasks - read more in
 :doc:`/topics/worker`.
 
-Channels does not ship with any channel layers you can use out of the box, as
-each one depends on a different way of transporting data across a network. We
-would recommend you use ``channels_redis``, which is an official Django-maintained
-layer that uses Redis as a transport and what we'll focus the examples on here.
 
 .. note::
 
@@ -35,22 +31,54 @@ layer that uses Redis as a transport and what we'll focus the examples on here.
 Configuration
 -------------
 
-Channel layers are configured via the ``CHANNEL_LAYERS`` Django setting. It
-generally looks something like this::
-
-    CHANNEL_LAYERS = {
-        "default": {
-            "BACKEND": "channels_redis.core.RedisChannelLayer",
-            "CONFIG": {
-                "hosts": [("redis-server-name", 6379)],
-            },
-        },
-    }
+Channel layers are configured via the ``CHANNEL_LAYERS`` Django setting.
 
 You can get the default channel layer from a project with
 ``channels.layers.get_channel_layer()``, but if you are using consumers a copy
 is automatically provided for you on the consumer as ``self.channel_layer``.
 
+Redis Channel Layer
+**********************
+
+`channels_redis`_ is the only official Django-maintained channel layer
+supported for production use. The layer uses Redis as its backing store,
+and supports both a single-server and sharded configurations, as well as
+group support. To use this layer you'll need to install the `channels_redis`_
+package.
+
+.. _`channels_redis`: https://pypi.org/project/channels-redis/
+
+In this example, Redis is running on localhost (127.0.0.1) port 6379::
+
+    CHANNEL_LAYERS = {
+        "default": {
+            "BACKEND": "channels_redis.core.RedisChannelLayer",
+            "CONFIG": {
+                "hosts": [("127.0.0.1", 6379)],
+            },
+        },
+    }
+
+In-Memory Channel Layer
+**********************
+
+.. warning::
+
+    **Not for Production Use.** In-memory channel layers operate each
+    process as a seperate layer, which means no cross-process
+    messaging is possible. As the core value of channel layers
+    to provide distributed mesaging, in-memory usage will
+    result in sub-optimal performance and data-loss in a
+    multi-instance environment.
+
+Channels also comes packaged with an in-memory Channels Layer. This layer can
+be helpful in for :doc:`/topics/testing` or local-development purposes::
+
+    CHANNEL_LAYERS = {
+        "default": {
+            "BACKEND": "channels.layers.InMemoryChannelLayer"
+        }
+    }
 
 Synchronous Functions
 ---------------------
