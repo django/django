@@ -56,6 +56,7 @@ class CookieStorage(BaseStorage):
     # restrict the session cookie to 1/2 of 4kb. See #18781.
     max_cookie_size = 2048
     not_finished = '__messagesnotfinished__'
+    key_salt = 'django.contrib.messages'
 
     def _get(self, *args, **kwargs):
         """
@@ -122,8 +123,7 @@ class CookieStorage(BaseStorage):
         Create an HMAC/SHA1 hash based on the value and the project setting's
         SECRET_KEY, modified to make it unique for the present purpose.
         """
-        key_salt = 'django.contrib.messages'
-        return salted_hmac(key_salt, value).hexdigest()
+        return salted_hmac(self.key_salt, value).hexdigest()
 
     def _encode(self, messages, encode_empty=False):
         """
