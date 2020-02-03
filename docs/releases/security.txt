@@ -1055,3 +1055,16 @@ Versions affected
 * Django 3.0 :commit:`(patch) <302a4ff1e8b1c798aab97673909c7a3dfda42c26>`
 * Django 2.2 :commit:`(patch) <4d334bea06cac63dc1272abcec545b85136cca0e>`
 * Django 1.11 :commit:`(patch) <f4cff43bf921fcea6a29b726eb66767f67753fa2>`
+
+February 3, 2020 - :cve:`2020-7471`
+-----------------------------------
+
+Potential SQL injection via ``StringAgg(delimiter)``. `Full description
+<https://www.djangoproject.com/weblog/2020/feb/03/security-releases/>`__
+
+Versions affected
+~~~~~~~~~~~~~~~~~
+
+* Django 3.0 :commit:`(patch) <505826b469b16ab36693360da9e11fd13213421b>`
+* Django 2.2 :commit:`(patch) <c67a368c16e4680b324b4f385398d638db4d8147>`
+* Django 1.11 :commit:`(patch) <001b0634cd309e372edb6d7d95d083d02b8e37bd>`
