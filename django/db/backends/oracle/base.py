@@ -301,8 +301,9 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         Check constraints by setting them to immediate. Return them to deferred
         afterward.
         """
-        self.cursor().execute('SET CONSTRAINTS ALL IMMEDIATE')
-        self.cursor().execute('SET CONSTRAINTS ALL DEFERRED')
+        with self.cursor() as cursor:
+            cursor.execute('SET CONSTRAINTS ALL IMMEDIATE')
+            cursor.execute('SET CONSTRAINTS ALL DEFERRED')
 
     def is_usable(self):
         try:

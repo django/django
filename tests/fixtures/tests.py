@@ -564,7 +564,8 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
         # This won't affect other tests because the database connection
         # is closed at the end of each test.
         if connection.vendor == 'mysql':
-            connection.cursor().execute("SET sql_mode = 'TRADITIONAL'")
+            with connection.cursor() as cursor:
+                cursor.execute("SET sql_mode = 'TRADITIONAL'")
         with self.assertRaises(IntegrityError) as cm:
             management.call_command('loaddata', 'invalid.json', verbosity=0)
             self.assertIn("Could not load fixtures.Article(pk=1):", cm.exception.args[0])

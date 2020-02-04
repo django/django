@@ -114,8 +114,8 @@ class Tests(TestCase):
 
         try:
             # Open a database connection.
-            new_connection.cursor()
-            self.assertFalse(new_connection.get_autocommit())
+            with new_connection.cursor():
+                self.assertFalse(new_connection.get_autocommit())
         finally:
             new_connection.close()
 
@@ -149,9 +149,12 @@ class Tests(TestCase):
 
     def test_connect_no_is_usable_checks(self):
         new_connection = connection.copy()
-        with mock.patch.object(new_connection, 'is_usable') as is_usable:
-            new_connection.connect()
-        is_usable.assert_not_called()
+        try:
+            with mock.patch.object(new_connection, 'is_usable') as is_usable:
+                new_connection.connect()
+            is_usable.assert_not_called()
+        finally:
+            new_connection.close()
 
     def _select(self, val):
         with connection.cursor() as cursor:

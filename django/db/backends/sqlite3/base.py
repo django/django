@@ -296,7 +296,8 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         return not bool(enabled)
 
     def enable_constraint_checking(self):
-        self.cursor().execute('PRAGMA foreign_keys = ON')
+        with self.cursor() as cursor:
+            cursor.execute('PRAGMA foreign_keys = ON')
 
     def check_constraints(self, table_names=None):
         """
@@ -309,7 +310,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         if self.features.supports_pragma_foreign_key_check:
             with self.cursor() as cursor:
                 if table_names is None:
-                    violations = self.cursor().execute('PRAGMA foreign_key_check').fetchall()
+                    violations = cursor.execute('PRAGMA foreign_key_check').fetchall()
                 else:
                     violations = chain.from_iterable(
                         cursor.execute('PRAGMA foreign_key_check(%s)' % table_name).fetchall()

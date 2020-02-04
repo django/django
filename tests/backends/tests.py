@@ -69,8 +69,8 @@ class LastExecutedQueryTest(TestCase):
         """last_executed_query() returns a string."""
         data = RawData.objects.filter(raw_data=b'\x00\x46  \xFE').extra(select={'föö': 1})
         sql, params = data.query.sql_with_params()
-        cursor = data.query.get_compiler('default').execute_sql(CURSOR)
-        last_sql = cursor.db.ops.last_executed_query(cursor, sql, params)
+        with data.query.get_compiler('default').execute_sql(CURSOR) as cursor:
+            last_sql = cursor.db.ops.last_executed_query(cursor, sql, params)
         self.assertIsInstance(last_sql, str)
 
     def test_last_executed_query(self):
@@ -81,11 +81,11 @@ class LastExecutedQueryTest(TestCase):
             Article.objects.filter(pk__in=(1, 2), reporter__pk=3),
         ):
             sql, params = qs.query.sql_with_params()
-            cursor = qs.query.get_compiler(DEFAULT_DB_ALIAS).execute_sql(CURSOR)
-            self.assertEqual(
-                cursor.db.ops.last_executed_query(cursor, sql, params),
-                str(qs.query),
-            )
+            with qs.query.get_compiler(DEFAULT_DB_ALIAS).execute_sql(CURSOR) as cursor:
+                self.assertEqual(
+                    cursor.db.ops.last_executed_query(cursor, sql, params),
+                    str(qs.query),
+                )
 
     @skipUnlessDBFeature('supports_paramstyle_pyformat')
     def test_last_executed_query_dict(self):
@@ -205,12 +205,14 @@ class ConnectionCreatedSignalTest(TransactionTestCase):
 
         connection_created.connect(receiver)
         connection.close()
-        connection.cursor()
+        with connection.cursor():
+            pass
         self.assertIs(data["connection"].connection, connection.connection)
 
         connection_created.disconnect(receiver)
         data.clear()
-        connection.cursor()
+        with connection.cursor():
+            pass
         self.assertEqual(data, {})
 
 
@@ -345,7 +347,8 @@ class BackendTestCase(TransactionTestCase):
         old_password = connection.settings_dict['PASSWORD']
         connection.settings_dict['PASSWORD'] = "françois"
         try:
-            connection.cursor()
+            with connection.cursor():
+                pass
         except DatabaseError:
             # As password is probably wrong, a database exception is expected
             pass
@@ -639,7 +642,8 @@ class ThreadTests(TransactionTestCase):
         # Map connections by id because connections with identical aliases
         # have the same hash.
         connections_dict = {}
-        connection.cursor()
+        with connection.cursor():
+            pass
         connections_dict[id(connection)] = connection
 
         def runner():
@@ -650,7 +654,8 @@ class ThreadTests(TransactionTestCase):
             # Allow thread sharing so the connection can be closed by the
             # main thread.
             connection.inc_thread_sharing()
-            connection.cursor()
+            with connection.cursor():
+                pass
             connections_dict[id(connection)] = connection
         try:
             for x in range(2):
@@ -729,6 +734,7 @@ class ThreadTests(TransactionTestCase):
         do_thread()
         # Forbidden!
         self.assertIsInstance(exceptions[0], DatabaseError)
+        connections['default'].close()
 
         # After calling inc_thread_sharing() on the connection.
         connections['default'].inc_thread_sharing()

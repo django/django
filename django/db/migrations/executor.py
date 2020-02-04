@@ -372,10 +372,8 @@ class MigrationExecutor:
                     else:
                         found_add_field_migration = True
                         continue
-                columns = self.connection.introspection.get_table_description(
-                    self.connection.cursor(),
-                    table,
-                )
+                with self.connection.cursor() as cursor:
+                    columns = self.connection.introspection.get_table_description(cursor, table)
                 for column in columns:
                     field_column = field.column
                     column_name = column.name

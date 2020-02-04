@@ -269,7 +269,8 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         forward references. Always return True to indicate constraint checks
         need to be re-enabled.
         """
-        self.cursor().execute('SET foreign_key_checks=0')
+        with self.cursor() as cursor:
+            cursor.execute('SET foreign_key_checks=0')
         return True
 
     def enable_constraint_checking(self):
@@ -280,7 +281,8 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         # nested inside transaction.atomic.
         self.needs_rollback, needs_rollback = False, self.needs_rollback
         try:
-            self.cursor().execute('SET foreign_key_checks=1')
+            with self.cursor() as cursor:
+                cursor.execute('SET foreign_key_checks=1')
         finally:
             self.needs_rollback = needs_rollback
 

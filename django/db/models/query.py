@@ -747,7 +747,10 @@ class QuerySet:
         query = self.query.clone()
         query.__class__ = sql.DeleteQuery
         cursor = query.get_compiler(using).execute_sql(CURSOR)
-        return cursor.rowcount if cursor else 0
+        if cursor:
+            with cursor:
+                return cursor.rowcount
+        return 0
     _raw_delete.alters_data = True
 
     def update(self, **kwargs):
