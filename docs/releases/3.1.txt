@@ -475,8 +475,8 @@ Miscellaneous
   ``django-admin``.
 
 * The ``HttpRequest.is_ajax()`` method is deprecated as it relied on a
-  jQuery-specific way of signifying AJAX calls, while the current usage tends
-  to use the JavaScript `Fetch API
+  jQuery-specific way of signifying AJAX calls, while current usage tends to
+  use the JavaScript `Fetch API
   <https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API>`_. Depending on
   your use case, you can either write your own AJAX detection method, or use
   the new :meth:`.HttpRequest.accepts` method if your code depends on the
