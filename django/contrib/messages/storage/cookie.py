@@ -129,7 +129,11 @@ class CookieStorage(BaseStorage):
         Create an HMAC/SHA1 hash based on the value and the project setting's
         SECRET_KEY, modified to make it unique for the present purpose.
         """
-        return salted_hmac(self.key_salt, value).hexdigest()
+        # The class wide key salt is not reused here since older Django
+        # versions had it fixed and making it dynamic would break old hashes if
+        # self.key_salt is changed.
+        key_salt = 'django.contrib.messages'
+        return salted_hmac(key_salt, value).hexdigest()
 
     def _encode(self, messages, encode_empty=False):
         """
