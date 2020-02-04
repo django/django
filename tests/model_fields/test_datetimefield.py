@@ -61,12 +61,12 @@ class DateTimeFieldTests(TestCase):
         # In Vancouver, we expect both results.
         self.assertQuerysetEqual(
             DateTimeModel.objects.filter(dt__date=d),
-            [repr(m1), repr(m2)],
+            [m1, m2],
             ordered=False
         )
         with self.settings(TIME_ZONE='UTC'):
             # But in UTC, the __date only matches one of them.
-            self.assertQuerysetEqual(DateTimeModel.objects.filter(dt__date=d), [repr(m1)])
+            self.assertQuerysetEqual(DateTimeModel.objects.filter(dt__date=d), [m1])
 
 
 class ValidationTest(SimpleTestCase):

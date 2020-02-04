@@ -1040,11 +1040,26 @@ class TransactionTestCase(SimpleTestCase):
                          allow_cascade=self.available_apps is not None,
                          inhibit_post_migrate=inhibit_post_migrate)
 
-    def assertQuerysetEqual(self, qs, values, transform=repr, ordered=True, msg=None):
+    def assertQuerysetEqual(self, qs, values, transform=None, ordered=True, msg=None):
+        values = list(values)
+
+        if transform is None:
+            if values and isinstance(values[0], str) and qs and not isinstance(qs[0], str):
+                # Transform qs using repr() if elements of values are strs and
+                # elements of qs are not strings (which would be the case if qs
+                # was a flattened values_list).
+                warnings.warn(
+                    'In Django 4.1, the `transform` parameter will not '
+                    'default to `repr()`',
+                    category=RemovedInDjango41Warning
+                )
+                transform = repr
+            else:
+                transform = lambda o: o  # NOQA
+
         items = map(transform, qs)
         if not ordered:
             return self.assertEqual(Counter(items), Counter(values), msg=msg)
-        values = list(values)
         # For example qs.iterator() could be passed as qs, but it does not
         # have 'ordered' attribute.
         if len(values) > 1 and hasattr(qs, 'ordered') and not qs.ordered:
