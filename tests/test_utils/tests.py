@@ -374,13 +374,13 @@ class AssertNumQueriesContextManagerTests(TestCase):
             Person.objects.count()
 
     def test_failure(self):
-        with self.assertRaises(AssertionError) as exc_info:
+        msg = (
+            '1 != 2 : 1 queries executed, 2 expected\nCaptured queries were:\n'
+            '1.'
+        )
+        with self.assertRaisesMessage(AssertionError, msg):
             with self.assertNumQueries(2):
                 Person.objects.count()
-        exc_lines = str(exc_info.exception).split('\n')
-        self.assertEqual(exc_lines[0], '1 != 2 : 1 queries executed, 2 expected')
-        self.assertEqual(exc_lines[1], 'Captured queries were:')
-        self.assertTrue(exc_lines[2].startswith('1.'))  # queries are numbered
 
         with self.assertRaises(TypeError):
             with self.assertNumQueries(4000):

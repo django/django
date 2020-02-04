@@ -213,58 +213,37 @@ class AssertTemplateUsedTests(TestDataMixin, TestCase):
         except AssertionError as e:
             self.assertIn("abc: No templates used to render the response", str(e))
 
-        with self.assertRaises(AssertionError) as context:
+        msg = 'No templates used to render the response'
+        with self.assertRaisesMessage(AssertionError, msg):
             self.assertTemplateUsed(response, 'GET Template', count=2)
-        self.assertIn(
-            "No templates used to render the response",
-            str(context.exception))
 
     def test_single_context(self):
         "Template assertions work when there is a single context"
         response = self.client.get('/post_view/', {})
-
-        try:
+        msg = (
+            ": Template 'Empty GET Template' was used unexpectedly in "
+            "rendering the response"
+        )
+        with self.assertRaisesMessage(AssertionError, msg):
             self.assertTemplateNotUsed(response, 'Empty GET Template')
-        except AssertionError as e:
-            self.assertIn("Template 'Empty GET Template' was used unexpectedly in rendering the response", str(e))
-
-        try:
+        with self.assertRaisesMessage(AssertionError, 'abc' + msg):
             self.assertTemplateNotUsed(response, 'Empty GET Template', msg_prefix='abc')
-        except AssertionError as e:
-            self.assertIn("abc: Template 'Empty GET Template' was used unexpectedly in rendering the response", str(e))
-
-        try:
+        msg = (
+            ": Template 'Empty POST Template' was not a template used to "
+            "render the response. Actual template(s) used: Empty GET Template"
+        )
+        with self.assertRaisesMessage(AssertionError, msg):
             self.assertTemplateUsed(response, 'Empty POST Template')
-        except AssertionError as e:
-            self.assertIn(
-                "Template 'Empty POST Template' was not a template used to "
-                "render the response. Actual template(s) used: Empty GET Template",
-                str(e)
-            )
-
-        try:
+        with self.assertRaisesMessage(AssertionError, 'abc' + msg):
             self.assertTemplateUsed(response, 'Empty POST Template', msg_prefix='abc')
-        except AssertionError as e:
-            self.assertIn(
-                "abc: Template 'Empty POST Template' was not a template used "
-                "to render the response. Actual template(s) used: Empty GET Template",
-                str(e)
-            )
-
-        with self.assertRaises(AssertionError) as context:
+        msg = (
+            ": Template 'Empty GET Template' was expected to be rendered 2 "
+            "time(s) but was actually rendered 1 time(s)."
+        )
+        with self.assertRaisesMessage(AssertionError, msg):
             self.assertTemplateUsed(response, 'Empty GET Template', count=2)
-        self.assertIn(
-            "Template 'Empty GET Template' was expected to be rendered 2 "
-            "time(s) but was actually rendered 1 time(s).",
-            str(context.exception))
-
-        with self.assertRaises(AssertionError) as context:
-            self.assertTemplateUsed(
-                response, 'Empty GET Template', msg_prefix='abc', count=2)
-        self.assertIn(
-            "abc: Template 'Empty GET Template' was expected to be rendered 2 "
-            "time(s) but was actually rendered 1 time(s).",
-            str(context.exception))
+        with self.assertRaisesMessage(AssertionError, 'abc' + msg):
+            self.assertTemplateUsed(response, 'Empty GET Template', msg_prefix='abc', count=2)
 
     def test_multiple_context(self):
         "Template assertions work when there are multiple contexts"
@@ -277,31 +256,23 @@ class AssertTemplateUsedTests(TestDataMixin, TestCase):
         }
         response = self.client.post('/form_view_with_template/', post_data)
         self.assertContains(response, 'POST data OK')
-        try:
+        msg = "Template '%s' was used unexpectedly in rendering the response"
+        with self.assertRaisesMessage(AssertionError, msg % 'form_view.html'):
             self.assertTemplateNotUsed(response, "form_view.html")
-        except AssertionError as e:
-            self.assertIn("Template 'form_view.html' was used unexpectedly in rendering the response", str(e))
-
-        try:
+        with self.assertRaisesMessage(AssertionError, msg % 'base.html'):
             self.assertTemplateNotUsed(response, 'base.html')
-        except AssertionError as e:
-            self.assertIn("Template 'base.html' was used unexpectedly in rendering the response", str(e))
-
-        try:
+        msg = (
+            "Template 'Valid POST Template' was not a template used to render "
+            "the response. Actual template(s) used: form_view.html, base.html"
+        )
+        with self.assertRaisesMessage(AssertionError, msg):
             self.assertTemplateUsed(response, "Valid POST Template")
-        except AssertionError as e:
-            self.assertIn(
-                "Template 'Valid POST Template' was not a template used to "
-                "render the response. Actual template(s) used: form_view.html, base.html",
-                str(e)
-            )
-
-        with self.assertRaises(AssertionError) as context:
+        msg = (
+            "Template 'base.html' was expected to be rendered 2 time(s) but "
+            "was actually rendered 1 time(s)."
+        )
+        with self.assertRaisesMessage(AssertionError, msg):
             self.assertTemplateUsed(response, 'base.html', count=2)
-        self.assertIn(
-            "Template 'base.html' was expected to be rendered 2 "
-            "time(s) but was actually rendered 1 time(s).",
-            str(context.exception))
 
     def test_template_rendered_multiple_times(self):
         """Template assertions work when a template is rendered multiple times."""
@@ -947,9 +918,8 @@ class ContextTests(TestDataMixin, TestCase):
         self.assertEqual(response.context['get-foo'], 'whiz')
         self.assertEqual(response.context['data'], 'bacon')
 
-        with self.assertRaises(KeyError) as cm:
+        with self.assertRaisesMessage(KeyError, 'does-not-exist'):
             response.context['does-not-exist']
-        self.assertEqual(cm.exception.args[0], 'does-not-exist')
 
     def test_contextlist_keys(self):
         c1 = Context()

@@ -201,9 +201,8 @@ class IncludeTests(SimpleTestCase):
         """
         engine = Engine(app_dirs=True, debug=True)
         template = engine.get_template('test_include_error.html')
-        with self.assertRaises(TemplateDoesNotExist) as e:
+        with self.assertRaisesMessage(TemplateDoesNotExist, 'missing.html'):
             template.render(Context())
-        self.assertEqual(e.exception.args[0], 'missing.html')
 
     def test_extends_include_missing_baseloader(self):
         """
@@ -213,9 +212,8 @@ class IncludeTests(SimpleTestCase):
         """
         engine = Engine(app_dirs=True, debug=True)
         template = engine.get_template('test_extends_error.html')
-        with self.assertRaises(TemplateDoesNotExist) as e:
+        with self.assertRaisesMessage(TemplateDoesNotExist, 'missing.html'):
             template.render(Context())
-        self.assertEqual(e.exception.args[0], 'missing.html')
 
     def test_extends_include_missing_cachedloader(self):
         engine = Engine(debug=True, loaders=[
@@ -225,15 +223,13 @@ class IncludeTests(SimpleTestCase):
         ])
 
         template = engine.get_template('test_extends_error.html')
-        with self.assertRaises(TemplateDoesNotExist) as e:
+        with self.assertRaisesMessage(TemplateDoesNotExist, 'missing.html'):
             template.render(Context())
-        self.assertEqual(e.exception.args[0], 'missing.html')
 
         # Repeat to ensure it still works when loading from the cache
         template = engine.get_template('test_extends_error.html')
-        with self.assertRaises(TemplateDoesNotExist) as e:
+        with self.assertRaisesMessage(TemplateDoesNotExist, 'missing.html'):
             template.render(Context())
-        self.assertEqual(e.exception.args[0], 'missing.html')
 
     def test_include_template_argument(self):
         """
