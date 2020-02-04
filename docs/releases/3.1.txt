@@ -386,6 +386,11 @@ backends.
   on databases that support time zones. Previously, it was ``None`` on
   databases that support time zones.
 
+* ``connection._nodb_connection`` property is changed to the
+  ``connection._nodb_cursor()`` method and now returns a context manager that
+  yields a cursor and automatically closes the cursor and connection upon
+  exiting the ``with`` statement.
+
 Dropped support for MariaDB 10.1
 --------------------------------
 

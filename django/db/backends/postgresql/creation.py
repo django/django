@@ -61,7 +61,7 @@ class DatabaseCreation(BaseDatabaseCreation):
             'dbname': self._quote_name(target_database_name),
             'suffix': self._get_database_create_suffix(template=source_database_name),
         }
-        with self._nodb_connection.cursor() as cursor:
+        with self._nodb_cursor() as cursor:
             try:
                 self._execute_create_test_db(cursor, test_db_params, keepdb)
             except Exception:
