@@ -330,9 +330,8 @@ Security
   uses frames of itself, you will need to explicitly set ``X_FRAME_OPTIONS =
   'SAMEORIGIN'`` for them to continue working.
 
-* :setting:`SECURE_CONTENT_TYPE_NOSNIFF` setting now defaults to ``True``. With
-  the enabled :setting:`SECURE_CONTENT_TYPE_NOSNIFF`, the
-  :class:`~django.middleware.security.SecurityMiddleware` sets the
+* :setting:`SECURE_CONTENT_TYPE_NOSNIFF` now defaults to ``True``. With this
+  enabled, :class:`~django.middleware.security.SecurityMiddleware` sets the
   :ref:`x-content-type-options` header on all responses that do not already
   have it.
 
