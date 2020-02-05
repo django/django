@@ -297,6 +297,17 @@ class TestCombinations(GrailTestData, PostgreSQLTestCase):
         with self.assertRaisesMessage(TypeError, msg):
             Line.objects.filter(dialogue__search=None + SearchVector('character__name'))
 
+    def test_combine_different_vector_configs(self):
+        searched = Line.objects.annotate(
+            search=(
+                SearchVector('dialogue', config='english') +
+                SearchVector('dialogue', config='french')
+            ),
+        ).filter(
+            search=SearchQuery('cadeaux', config='french') | SearchQuery('nostrils')
+        )
+        self.assertCountEqual(searched, [self.french, self.verse2])
+
     def test_query_and(self):
         searched = Line.objects.annotate(
             search=SearchVector('scene__setting', 'dialogue'),

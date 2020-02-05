@@ -56,7 +56,7 @@ class SearchVectorCombinable:
     ADD = '||'
 
     def _combine(self, other, connector, reversed):
-        if not isinstance(other, SearchVectorCombinable) or not self.config == other.config:
+        if not isinstance(other, SearchVectorCombinable):
             raise TypeError(
                 'SearchVector can only be combined with other SearchVector '
                 'instances, got %s.' % type(other).__name__
