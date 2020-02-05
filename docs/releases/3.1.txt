@@ -285,6 +285,19 @@ Requests and Responses
 * The new :meth:`.HttpRequest.accepts` method returns whether the request
   accepts the given MIME type according to the ``Accept`` HTTP header.
 
+.. _whats-new-security-3.1:
+
+Security
+~~~~~~~~
+
+* The :setting:`SECURE_REFERRER_POLICY` setting now defaults to
+  ``'same-origin'``. With this configured,
+  :class:`~django.middleware.security.SecurityMiddleware` sets the
+  :ref:`referrer-policy` header to ``same-origin`` on all responses that do not
+  already have it. This prevents the ``Referer`` header being sent to other
+  origins. If you need the previous behavior, explicitly set
+  :setting:`SECURE_REFERRER_POLICY` to ``None``.
+
 Serialization
 ~~~~~~~~~~~~~
 
@@ -451,6 +464,10 @@ Miscellaneous
 
 * Providing a non-local remote field in the :attr:`.ForeignKey.to_field`
   argument now raises :class:`~django.core.exceptions.FieldError`.
+
+* :setting:`SECURE_REFERRER_POLICY` now defaults to ``'same-origin'``. See the
+  *What's New* :ref:`Security section <whats-new-security-3.1>` above for more
+  details.
 
 .. _deprecated-features-3.1:
 

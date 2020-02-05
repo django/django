@@ -2395,11 +2395,15 @@ from URL paths, so patterns shouldn't include them, e.g.
 
 .. versionadded:: 3.0
 
-Default: ``None``
+Default: ``'same-origin'``
 
 If configured, the :class:`~django.middleware.security.SecurityMiddleware` sets
 the :ref:`referrer-policy` header on all responses that do not already have it
 to the value provided.
+
+.. versionchanged:: 3.1
+
+    In older versions, the default value is ``None``.
 
 .. setting:: SECURE_SSL_HOST
 

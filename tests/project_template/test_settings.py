@@ -38,6 +38,7 @@ class TestStartProjectSettings(SimpleTestCase):
             self.assertEqual(headers, [
                 b'Content-Length: 0',
                 b'Content-Type: text/html; charset=utf-8',
+                b'Referrer-Policy: same-origin',
                 b'X-Content-Type-Options: nosniff',
                 b'X-Frame-Options: DENY',
             ])
