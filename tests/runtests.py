@@ -38,7 +38,9 @@ else:
 
 # Make deprecation warnings errors to ensure no usage of deprecated features.
 warnings.simplefilter("error", RemovedInDjango40Warning)
-# Make runtime warning errors to ensure no usage of error prone patterns.
+# Make resource and runtime warning errors to ensure no usage of error prone
+# patterns.
+warnings.simplefilter("error", ResourceWarning)
 warnings.simplefilter("error", RuntimeWarning)
 # Ignore known warnings in test dependencies.
 warnings.filterwarnings("ignore", "'U' mode is deprecated", DeprecationWarning, module='docutils.io')
