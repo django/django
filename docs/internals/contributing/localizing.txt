@@ -82,3 +82,9 @@ huge undertaking to complete entirely (you have been warned!). We use the same
 `Transifex tool <https://www.transifex.com/django/django-docs/>`_. The
 translations will appear at ``https://docs.djangoproject.com/<language_code>/``
 when at least the ``docs/intro/*`` files are fully translated in your language.
+
+Once translations are published, updated versions from Transifex will be
+irregularly ported to the `django/django-docs-translations
+<https://github.com/django/django-docs-translations>`_ repository and to the
+documentation website. Only translations for the latest stable Django release
+are updated.
