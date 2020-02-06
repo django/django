@@ -888,7 +888,7 @@ class Field(RegisterLookupMixin):
     def formfield(self, form_class=None, choices_form_class=None, **kwargs):
         """Return a django.forms.Field instance for this field."""
         defaults = {
-            'required': not self.blank,
+            'required': not self.blank and not self.null,
             'label': capfirst(self.verbose_name),
             'help_text': self.help_text,
         }
