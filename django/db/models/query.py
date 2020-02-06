@@ -297,7 +297,7 @@ class QuerySet:
                 'QuerySet indices must be integers or slices, not %s.'
                 % type(k).__name__
             )
-        assert ((not isinstance(k, slice) and (k >= 0)) or
+        assert ((isinstance(k, int) and (k >= 0)) or
                 (isinstance(k, slice) and (k.start is None or k.start >= 0) and
                  (k.stop is None or k.stop >= 0))), \
             "Negative indexing is not supported."
@@ -307,15 +307,7 @@ class QuerySet:
 
         if isinstance(k, slice):
             qs = self._chain()
-            if k.start is not None:
-                start = int(k.start)
-            else:
-                start = None
-            if k.stop is not None:
-                stop = int(k.stop)
-            else:
-                stop = None
-            qs.query.set_limits(start, stop)
+            qs.query.set_limits(k.start, k.stop)
             return list(qs)[::k.step] if k.step else qs
 
         qs = self._chain()
