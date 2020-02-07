@@ -4,11 +4,24 @@ from unittest import mock, skipIf
 
 from asgiref.sync import async_to_sync
 
+from django.core.cache import DEFAULT_CACHE_ALIAS, caches
 from django.core.exceptions import SynchronousOnlyOperation
 from django.test import SimpleTestCase
 from django.utils.asyncio import async_unsafe
 
 from .models import SimpleModel
+
+
+@skipIf(sys.platform == 'win32' and (3, 8, 0) < sys.version_info < (3, 8, 1), 'https://bugs.python.org/issue38563')
+class CacheTest(SimpleTestCase):
+    def test_caches_local(self):
+        @async_to_sync
+        async def async_cache():
+            return caches[DEFAULT_CACHE_ALIAS]
+
+        cache_1 = async_cache()
+        cache_2 = async_cache()
+        self.assertIs(cache_1, cache_2)
 
 
 @skipIf(sys.platform == 'win32' and (3, 8, 0) < sys.version_info < (3, 8, 1), 'https://bugs.python.org/issue38563')
