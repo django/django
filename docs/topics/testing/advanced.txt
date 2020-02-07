@@ -637,9 +637,13 @@ Methods
     Creates the test databases by calling
     :func:`~django.test.utils.setup_databases`.
 
-.. method:: DiscoverRunner.run_checks()
+.. method:: DiscoverRunner.run_checks(databases)
 
-    Runs the :doc:`system checks </topics/checks>`.
+    Runs the :doc:`system checks </topics/checks>` on the test ``databases``.
+
+    .. versionadded:: 3.1
+
+        The ``databases`` parameter was added.
 
 .. method:: DiscoverRunner.run_suite(suite, **kwargs)
 

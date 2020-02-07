@@ -332,6 +332,9 @@ Tests
 * Django test runner now supports a :option:`test --buffer` option to discard
   output for passing tests.
 
+* :class:`~django.test.runner.DiscoverRunner` now skips running the system
+  checks on databases not :ref:`referenced by tests<testing-multi-db>`.
+
 URLs
 ~~~~
 
