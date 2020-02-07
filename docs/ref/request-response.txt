@@ -911,8 +911,7 @@ Methods
 .. method:: HttpResponse.close()
 
     This method is called at the end of the request directly by the WSGI
-    server, or when the WSGI server closes the file-like object, if
-    `wsgi.file_wrapper`_ is used for the request.
+    server.
 
 .. method:: HttpResponse.write(content)
 
