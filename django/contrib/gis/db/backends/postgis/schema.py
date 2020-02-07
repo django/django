@@ -37,7 +37,7 @@ class PostGISSchemaEditor(DatabaseSchemaEditor):
             self.sql_create_index,
             name=self.quote_name('%s_%s_id' % (model._meta.db_table, field.column)),
             table=self.quote_name(model._meta.db_table),
-            using='USING %s' % self.geom_index_type,
+            using=' USING %s' % self.geom_index_type,
             columns=field_column,
             extra='',
             condition='',
