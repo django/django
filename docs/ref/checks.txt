@@ -79,7 +79,8 @@ Django's system checks are organized using the following tags:
 * ``database``: Checks database-related configuration issues. Database checks
   are not run by default because they do more than static code analysis as
   regular checks do. They are only run by the :djadmin:`migrate` command or if
-  you specify the ``database`` tag when calling the :djadmin:`check` command.
+  you specify configured database aliases using the ``--database`` option when
+  calling the :djadmin:`check` command.
 * ``models``: Checks of model, field, and manager definitions.
 * ``security``: Checks security related configuration.
 * ``signals``: Checks on signal declarations and handler registrations.
@@ -89,6 +90,11 @@ Django's system checks are organized using the following tags:
 * ``urls``: Checks URL configuration.
 
 Some checks may be registered with multiple tags.
+
+.. versionchanged:: 3.1
+
+    The ``database`` checks are now run only for database aliases specified
+    using the :option:`check --database` option.
 
 Core system checks
 ==================

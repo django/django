@@ -229,7 +229,10 @@ Logging
 Management Commands
 ~~~~~~~~~~~~~~~~~~~
 
-* ...
+* The new :option:`check --database` option allows specifying database aliases
+  for running the ``database`` system checks. Previously these checks were
+  enabled for all configured :setting:`DATABASES` by passing the ``database``
+  tag to the command.
 
 Migrations
 ~~~~~~~~~~
@@ -473,6 +476,12 @@ Miscellaneous
 * :setting:`SECURE_REFERRER_POLICY` now defaults to ``'same-origin'``. See the
   *What's New* :ref:`Security section <whats-new-security-3.1>` above for more
   details.
+
+* :djadmin:`check` management command now runs the ``database`` system checks
+  only for database aliases specified using :option:`check --database` option.
+
+* :djadmin:`migrate` management command now runs the ``database`` system checks
+  only for a database to migrate.
 
 .. _deprecated-features-3.1:
 

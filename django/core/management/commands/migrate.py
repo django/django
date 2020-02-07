@@ -2,7 +2,6 @@ import time
 from importlib import import_module
 
 from django.apps import apps
-from django.core.checks import Tags, run_checks
 from django.core.management.base import (
     BaseCommand, CommandError, no_translations,
 )
@@ -20,8 +19,13 @@ from django.utils.text import Truncator
 
 class Command(BaseCommand):
     help = "Updates database schema. Manages both apps with migrations and those without."
+    requires_system_checks = False
 
     def add_arguments(self, parser):
+        parser.add_argument(
+            '--skip-checks', action='store_true',
+            help='Skip system checks.',
+        )
         parser.add_argument(
             'app_label', nargs='?',
             help='App label of an application to synchronize the state.',
@@ -59,13 +63,11 @@ class Command(BaseCommand):
             help='Creates tables for apps without migrations.',
         )
 
-    def _run_checks(self, **kwargs):
-        issues = run_checks(tags=[Tags.database])
-        issues.extend(super()._run_checks(**kwargs))
-        return issues
-
     @no_translations
     def handle(self, *args, **options):
+        database = options['database']
+        if not options['skip_checks']:
+            self.check(databases=[database])
 
         self.verbosity = options['verbosity']
         self.interactive = options['interactive']
@@ -77,8 +79,7 @@ class Command(BaseCommand):
                 import_module('.management', app_config.name)
 
         # Get the database we're operating from
-        db = options['database']
-        connection = connections[db]
+        connection = connections[database]
 
         # Hook for backends needing any database preparation
         connection.prepare_database()

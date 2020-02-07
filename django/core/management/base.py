@@ -378,21 +378,20 @@ class BaseCommand:
             self.stdout.write(output)
         return output
 
-    def _run_checks(self, **kwargs):
-        return checks.run_checks(**kwargs)
-
     def check(self, app_configs=None, tags=None, display_num_errors=False,
-              include_deployment_checks=False, fail_level=checks.ERROR):
+              include_deployment_checks=False, fail_level=checks.ERROR,
+              databases=None):
         """
         Use the system check framework to validate entire Django project.
         Raise CommandError for any serious message (error or critical errors).
         If there are only light messages (like warnings), print them to stderr
         and don't raise an exception.
         """
-        all_issues = self._run_checks(
+        all_issues = checks.run_checks(
             app_configs=app_configs,
             tags=tags,
             include_deployment_checks=include_deployment_checks,
+            databases=databases,
         )
 
         header, body, footer = "", "", ""

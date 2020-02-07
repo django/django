@@ -106,6 +106,16 @@ For example, to perform only models and compatibility checks, run::
 
     django-admin check --tag models --tag compatibility
 
+.. django-admin-option:: --database DATABASE
+
+.. versionadded:: 3.1
+
+Specifies the database to run checks requiring database access::
+
+    django-admin check --database default --database other
+
+By default, these checks will not be run.
+
 .. django-admin-option:: --list-tags
 
 Lists all available tags.
