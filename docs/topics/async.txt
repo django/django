@@ -4,7 +4,7 @@ Asynchronous support
 
 .. versionadded:: 3.0
 
-Django has developing support for asynchronous ("async") Python, but does not
+Django has developed support for asynchronous ("async") Python, but does not
 yet support asynchronous views or middleware; they will be coming in a future
 release.
 
