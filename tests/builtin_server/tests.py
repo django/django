@@ -4,6 +4,11 @@ from io import BytesIO
 from unittest import TestCase
 from wsgiref import simple_server
 
+from django.core.servers.basehttp import get_internal_wsgi_application
+from django.test import RequestFactory, override_settings
+
+from .views import FILE_RESPONSE_HOLDER
+
 # If data is too large, socket will choke, so write chunks no larger than 32MB
 # at a time. The rationale behind the 32MB can be found in #5596#comment:4.
 MAX_SOCKET_CHUNK_SIZE = 32 * 1024 * 1024  # 32 MB
@@ -88,6 +93,27 @@ class WSGIFileWrapperTests(TestCase):
         self.assertFalse(handler._used_sendfile)
         self.assertEqual(handler.stdout.getvalue().splitlines()[-1], b'Hello World!')
         self.assertEqual(handler.stderr.getvalue(), b'')
+
+    @override_settings(ROOT_URLCONF='builtin_server.urls')
+    def test_file_response_closing(self):
+        """
+        View returning a FileResponse properly closes the file and http
+        response when file_wrapper is used.
+        """
+        env = RequestFactory().get('/fileresponse/').environ
+        handler = FileWrapperHandler(None, BytesIO(), BytesIO(), env)
+        handler.run(get_internal_wsgi_application())
+        # Sendfile is used only when file_wrapper has been used.
+        self.assertTrue(handler._used_sendfile)
+        # Fetch the original response object.
+        self.assertIn('response', FILE_RESPONSE_HOLDER)
+        response = FILE_RESPONSE_HOLDER['response']
+        # The response and file buffers are closed.
+        self.assertIs(response.closed, True)
+        buf1, buf2 = FILE_RESPONSE_HOLDER['buffers']
+        self.assertIs(buf1.closed, True)
+        self.assertIs(buf2.closed, True)
+        FILE_RESPONSE_HOLDER.clear()
 
 
 class WriteChunkCounterHandler(ServerHandler):
