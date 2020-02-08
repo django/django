@@ -7,7 +7,7 @@ System check framework
 The system check framework is a set of static checks for validating Django
 projects. It detects common problems and provides hints for how to fix them.
 The framework is extensible so you can easily add your own checks.
-
+`
 For details on how to add your own checks and integrate them with Django's
 system checks, see the :doc:`System check topic guide </topics/checks>`.
 
@@ -127,9 +127,12 @@ MySQL and MariaDB
 If you're using MySQL or MariaDB, the following checks will be performed:
 
 * **mysql.E001**: MySQL/MariaDB does not allow unique ``CharField``\s to have a
-  ``max_length`` > 255.
+  ``max_length`` > 255. *This check was changed to* ``mysql.W003`` *in Django
+  3.1 as the real maximum size depends on many factors.*
 * **mysql.W002**: MySQL/MariaDB Strict Mode is not set for database connection
   '<alias>'. See also :ref:`mysql-sql-mode`.
+* **mysql.W003**: MySQL/MariaDB may not allow unique ``CharField``\s to have a
+  ``max_length`` > 255.
 
 Model fields
 ------------
