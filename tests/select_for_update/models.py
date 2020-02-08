@@ -1,7 +1,11 @@
 from django.db import models
 
 
-class Country(models.Model):
+class Entity(models.Model):
+    pass
+
+
+class Country(Entity):
     name = models.CharField(max_length=30)
 
 
