@@ -1241,4 +1241,4 @@ class ConstraintsTests(TestCase):
                 required_db_features = {'supports_table_check_constraints'}
                 constraints = [models.CheckConstraint(check=models.Q(age__gte=18), name='is_adult')]
 
-        self.assertEqual(Model.check(), [])
+        self.assertEqual(Model.check(databases=self.databases), [])
