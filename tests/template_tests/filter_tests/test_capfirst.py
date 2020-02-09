@@ -17,8 +17,14 @@ class CapfirstTests(SimpleTestCase):
         output = self.engine.render_to_string('capfirst02', {'a': 'fred>', 'b': mark_safe('fred&gt;')})
         self.assertEqual(output, 'Fred&gt; Fred&gt;')
 
+    @setup({'capfirst03': '{{ a|capfirst }} {{ b|capfirst }}'})
+    def test_capfirst03(self):
+        output = self.engine.render_to_string('capfirst03', {'a': 'სიახლე', 'b': mark_safe('სიახლეები;')})
+        self.assertEqual(output, 'სიახლე სიახლეები;')
+
 
 class FunctionTests(SimpleTestCase):
 
     def test_capfirst(self):
         self.assertEqual(capfirst('hello world'), 'Hello world')
+        self.assertEqual(capfirst('საქართველო'), 'საქართველო')

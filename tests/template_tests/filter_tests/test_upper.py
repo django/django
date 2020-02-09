@@ -21,11 +21,17 @@ class UpperTests(SimpleTestCase):
         output = self.engine.render_to_string('upper02', {'a': 'a & b', 'b': mark_safe('a &amp; b')})
         self.assertEqual(output, 'A &amp; B A &amp;AMP; B')
 
+    @setup({'upper03': '{{ a|upper }} {{ b|upper }}'})
+    def test_upper03(self):
+        output = self.engine.render_to_string('upper03', {'a': 'სიახლე', 'b': mark_safe('სიახლეები;')})
+        self.assertEqual(output, 'სიახლე სიახლეები;')
+
 
 class FunctionTests(SimpleTestCase):
 
     def test_upper(self):
         self.assertEqual(upper('Mixed case input'), 'MIXED CASE INPUT')
+        self.assertEqual(upper('საქართველო'), 'საქართველო')
 
     def test_unicode(self):
         # lowercase e umlaut

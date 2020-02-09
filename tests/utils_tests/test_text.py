@@ -13,6 +13,13 @@ IS_WIDE_BUILD = (len('\U0001F4A9') == 1)
 
 class TestUtilsText(SimpleTestCase):
 
+    def test_capfirst(self):
+        self.assertEqual(text.capfirst('english'), 'English')
+        self.assertEqual(text.capfirst('სიახლეები'), 'სიახლეები')
+        self.assertEqual(text.capfirst('a'), 'A')
+        self.assertEqual(text.capfirst('ა'), 'ა')
+        self.assertEqual(text.capfirst(''), '')
+
     def test_get_text_list(self):
         self.assertEqual(text.get_text_list(['a', 'b', 'c', 'd']), 'a, b, c or d')
         self.assertEqual(text.get_text_list(['a', 'b', 'c'], 'and'), 'a, b and c')

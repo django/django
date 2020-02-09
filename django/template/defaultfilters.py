@@ -72,7 +72,7 @@ def addslashes(value):
 @stringfilter
 def capfirst(value):
     """Capitalize the first character of the value."""
-    return value and value[0].upper() + value[1:]
+    return value and value[0].encode('utf-8').upper().decode('utf-8') + value[1:]
 
 
 @register.filter("escapejs")
@@ -302,7 +302,7 @@ def truncatewords_html(value, arg):
 @stringfilter
 def upper(value):
     """Convert a string into all uppercase."""
-    return value.upper()
+    return value.encode('utf-8').upper().decode('utf-8')
 
 
 @register.filter(is_safe=False)
