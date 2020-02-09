@@ -27,3 +27,15 @@ class Person(models.Model):
 
 class PersonProfile(models.Model):
     person = models.OneToOneField(Person, models.CASCADE, related_name='profile')
+
+
+class GrandParent(models.Model):
+    name = models.CharField(max_length=30)
+
+
+class Parent(GrandParent):
+    pass
+
+
+class Child(Parent):
+    pass

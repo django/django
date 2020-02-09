@@ -969,7 +969,10 @@ class SQLCompiler:
                     'select_fields': [
                         select_index
                         for select_index in klass_info['select_fields']
-                        if self.select[select_index][0].target.model == parent_model
+                        if self.select[select_index][0].target.model in (
+                            parent_model,
+                            *parent_model._meta.get_parent_list(),
+                        )
                     ],
                 }
                 for parent_model, parent_link in klass_info['model']._meta.parents.items()

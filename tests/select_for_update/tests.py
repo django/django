@@ -15,7 +15,9 @@ from django.test import (
 )
 from django.test.utils import CaptureQueriesContext
 
-from .models import City, Country, EUCity, EUCountry, Person, PersonProfile
+from .models import (
+    Child, City, Country, EUCity, EUCountry, Person, PersonProfile,
+)
 
 
 class SelectForUpdateTests(TransactionTestCase):
@@ -157,6 +159,20 @@ class SelectForUpdateTests(TransactionTestCase):
             ]
         else:
             expected = ['select_for_update_eucity', 'select_for_update_country']
+        expected = [connection.ops.quote_name(value) for value in expected]
+        self.assertTrue(self.has_for_update_sql(ctx.captured_queries, of=expected))
+
+    @skipUnlessDBFeature('has_select_for_update_of')
+    def test_for_update_sql_multi_model_intehritance_ptr_generated_of(self):
+        with transaction.atomic(), CaptureQueriesContext(connection) as ctx:
+            list(Child.objects.select_for_update(of=('parent_ptr', 'parent_ptr__grandparent_ptr')))
+        if connection.features.select_for_update_of_column:
+            expected = [
+                'select_for_update_parent".".id',
+                'select_for_update_grandparent".".id',
+            ]
+        else:
+            expected = ['select_for_update_parent', 'select_for_update_grandparent']
         expected = [connection.ops.quote_name(value) for value in expected]
         self.assertTrue(self.has_for_update_sql(ctx.captured_queries, of=expected))
 
