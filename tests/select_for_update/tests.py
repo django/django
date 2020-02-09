@@ -163,7 +163,7 @@ class SelectForUpdateTests(TransactionTestCase):
         self.assertTrue(self.has_for_update_sql(ctx.captured_queries, of=expected))
 
     @skipUnlessDBFeature('has_select_for_update_of')
-    def test_for_update_sql_multi_model_intehritance_ptr_generated_of(self):
+    def test_for_update_sql_multilevel_model_intehritance_ptr_generated_of(self):
         with transaction.atomic(), CaptureQueriesContext(connection) as ctx:
             list(Child.objects.select_for_update(of=('parent_ptr', 'parent_ptr__grandparent_ptr')))
         if connection.features.select_for_update_of_column:
