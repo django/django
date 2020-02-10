@@ -3,6 +3,7 @@ Tests for stuff in django.utils.datastructures.
 """
 
 import copy
+import unittest
 
 from django.test import SimpleTestCase
 from django.utils.datastructures import (
@@ -27,6 +28,28 @@ class OrderedSetTests(SimpleTestCase):
         s.add(2)
         s.add(2)
         self.assertEqual(len(s), 2)
+
+    def test_del(self):
+        s = OrderedSet()
+        self.assertEqual(len(s), 0)
+        s.add(1)
+        s.add(2)
+        s.remove(2)
+        self.assertEqual(len(s), 1)
+        self.assertNotIn(2, s)
+
+    def test_discard(self):
+        s = OrderedSet()
+        self.assertEqual(len(s), 0)
+        s.add(1)
+        s.discard(2)
+        self.assertEqual(len(s), 1)
+
+    def test_contains(self):
+        s = OrderedSet()
+        self.assertEqual(len(s), 0)
+        s.add(1)
+        self.assertIn(1, s)
 
 
 class MultiValueDictTests(SimpleTestCase):
@@ -114,6 +137,24 @@ class MultiValueDictTests(SimpleTestCase):
         x = MultiValueDict({'a': None, 'b': []})
         self.assertIsNone(x.getlist('a'))
         self.assertEqual(x.getlist('b'), [])
+
+    def test_update_too_many_args(self):
+        a, b = 1, 2
+        msg = 'update expected at most 1 argument, got 2'
+        x = MultiValueDict({'a': None, 'b': []})
+        with self.assertRaisesMessage(TypeError, msg):
+            x.update(a, b)
+
+    def test_update_no_args(self):
+        x = MultiValueDict({'a': None, 'b': []})
+        x.update()
+
+    @unittest.skip
+    def test_update_not_mvd_dict(self):
+        x = MultiValueDict({'a': set(), 'b': []})
+        msg = "MultiValueDict.update() takes either a MultiValueDict or dictionary"
+        with self.assertRaisesMessage(ValueError, msg):
+            x.update({'a': '1'})
 
 
 class ImmutableListTests(SimpleTestCase):
