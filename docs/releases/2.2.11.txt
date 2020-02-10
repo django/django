@@ -1,0 +1,12 @@
+===========================
+Django 2.2.11 release notes
+===========================
+
+*Expected March 2, 2020*
+
+Django 2.2.11 fixes a data loss bug in 2.2.10.
+
+Bugfixes
+========
+
+* ...
