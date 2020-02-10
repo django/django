@@ -5,3 +5,8 @@ Django 3.0.4 release notes
 *Expected March 2, 2020*
 
 Django 3.0.4 fixes several bugs in 3.0.3.
+
+Bugfixes
+========
+
+* ...
