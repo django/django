@@ -2,6 +2,7 @@
 import random as random_module
 import re
 import types
+import unicodedata
 from decimal import ROUND_HALF_UP, Context, Decimal, InvalidOperation
 from functools import wraps
 from operator import itemgetter
@@ -71,8 +72,26 @@ def addslashes(value):
 @register.filter(is_safe=True)
 @stringfilter
 def capfirst(value):
-    """Capitalize the first character of the value."""
-    return value and value[0].encode('utf-8').upper().decode('utf-8') + value[1:]
+    """
+    Capitalize the first character of the value.
+
+    Georgian is that the primary orthography does not use titlecasing,
+    This is unique among bicameral systems in the Unicode Standard,
+    so casing implementations should be prepared for this exception.
+
+    See https://www.unicode.org/versions/Unicode11.0.0/#Migration
+    for documentation of Unicode 11.0 standard.
+
+    casting issue https://bugs.python.org/issue37121
+
+    >>> 'ჯანგო'.capitalize()
+    'Ლანგო'
+    >>> 'ჯანგო'.upper()
+    'ᲚᲚᲚᲚᲚ'
+    """
+    if value and unicodedata.name(value[0]).startswith('GEORGIAN LETTER'):
+        return value
+    return value and value[0].upper() + value[1:]
 
 
 @register.filter("escapejs")
@@ -301,8 +320,27 @@ def truncatewords_html(value, arg):
 @register.filter(is_safe=False)
 @stringfilter
 def upper(value):
-    """Convert a string into all uppercase."""
-    return value.encode('utf-8').upper().decode('utf-8')
+    """
+    Convert a string into all uppercase.
+
+    Georgian is that the primary orthography does not use titlecasing,
+    This is unique among bicameral systems in the Unicode Standard,
+    so casing implementations should be prepared for this exception.
+
+    See https://www.unicode.org/versions/Unicode11.0.0/#Migration
+    for documentation of Unicode 11.0 standard.
+
+    casting issue https://bugs.python.org/issue37121
+
+    >>> 'ჯანგო'.capitalize()
+    'Ლანგო'
+    >>> 'ჯანგო'.upper()
+    'ᲚᲚᲚᲚᲚ'
+    """
+    for val in value:
+        if val and unicodedata.name(val).startswith('GEORGIAN LETTER'):
+            return value
+    return value.upper()
 
 
 @register.filter(is_safe=False)

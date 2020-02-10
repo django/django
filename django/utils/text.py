@@ -13,8 +13,26 @@ from django.utils.translation import gettext as _, gettext_lazy, pgettext
 
 @keep_lazy_text
 def capfirst(x):
-    """Capitalize the first letter of a string."""
-    return x and str(x)[0].encode('utf-8').upper().decode('utf-8') + str(x)[1:]
+    """
+    Capitalize the first letter of a string.
+
+    Georgian is that the primary orthography does not use titlecasing,
+    This is unique among bicameral systems in the Unicode Standard,
+    so casing implementations should be prepared for this exception.
+
+    See https://www.unicode.org/versions/Unicode11.0.0/#Migration
+    for documentation of Unicode 11.0 standard.
+
+    casting issue https://bugs.python.org/issue37121
+
+    >>> 'ჯანგო'.capitalize()
+    'Ლანგო'
+    >>> 'ჯანგო'.upper()
+    'ᲚᲚᲚᲚᲚ'
+    """
+    if x and unicodedata.name(str(x)[0]).startswith('GEORGIAN LETTER'):
+        return x
+    return x and str(x)[0].upper() + str(x)[1:]
 
 
 # Set up regular expressions

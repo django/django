@@ -19,6 +19,7 @@ class TestUtilsText(SimpleTestCase):
         self.assertEqual(text.capfirst('a'), 'A')
         self.assertEqual(text.capfirst('ა'), 'ა')
         self.assertEqual(text.capfirst(''), '')
+        self.assertEqual(text.capfirst('\xeb'), '\xcb')
 
     def test_get_text_list(self):
         self.assertEqual(text.get_text_list(['a', 'b', 'c', 'd']), 'a, b, c or d')
