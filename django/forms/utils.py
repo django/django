@@ -92,6 +92,11 @@ class ErrorList(UserList, list):
     def as_data(self):
         return ValidationError(self.data).error_list
 
+    def copy(self):
+        copy = super().copy()
+        copy.error_class = self.error_class
+        return copy
+
     def get_json_data(self, escape_html=False):
         errors = []
         for error in self.as_data():
