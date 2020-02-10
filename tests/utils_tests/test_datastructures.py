@@ -13,6 +13,32 @@ from django.utils.datastructures import (
 
 class OrderedSetTests(SimpleTestCase):
 
+    def test_init_with_iterable(self):
+        s = OrderedSet([1, 2, 3])
+        self.assertEqual(list(s.dict.keys()), [1, 2, 3])
+
+    def test_remove(self):
+        s = OrderedSet()
+        self.assertEqual(len(s), 0)
+        s.add(1)
+        s.add(2)
+        s.remove(2)
+        self.assertEqual(len(s), 1)
+        self.assertNotIn(2, s)
+
+    def test_discard(self):
+        s = OrderedSet()
+        self.assertEqual(len(s), 0)
+        s.add(1)
+        s.discard(2)
+        self.assertEqual(len(s), 1)
+
+    def test_contains(self):
+        s = OrderedSet()
+        self.assertEqual(len(s), 0)
+        s.add(1)
+        self.assertIn(1, s)
+
     def test_bool(self):
         # Refs #23664
         s = OrderedSet()
