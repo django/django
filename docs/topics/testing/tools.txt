@@ -1613,8 +1613,8 @@ your test suite.
     syntax differences. When invalid XML is passed in any parameter, an
     ``AssertionError`` is always raised, even if both string are identical.
 
-    XML declaration, document type, and comments are ignored. Only the root
-    element and its children are compared.
+    XML declaration, document type, processing instructions, and comments are
+    ignored. Only the root element and its children are compared.
 
     Output in case of error can be customized with the ``msg`` argument.
 
