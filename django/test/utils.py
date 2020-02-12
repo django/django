@@ -537,8 +537,8 @@ def compare_xml(want, got):
     """
     Try to do a 'xml-comparison' of want and got. Plain string comparison
     doesn't always work because, for example, attribute ordering should not be
-    important. Ignore comment nodes, document type node, and leading and
-    trailing whitespaces.
+    important. Ignore comment nodes, processing instructions, document type
+    node, and leading and trailing whitespaces.
 
     Based on https://github.com/lxml/lxml/blob/master/src/lxml/doctestcompare.py
     """
@@ -576,7 +576,11 @@ def compare_xml(want, got):
 
     def first_node(document):
         for node in document.childNodes:
-            if node.nodeType not in (Node.COMMENT_NODE, Node.DOCUMENT_TYPE_NODE):
+            if node.nodeType not in (
+                Node.COMMENT_NODE,
+                Node.DOCUMENT_TYPE_NODE,
+                Node.PROCESSING_INSTRUCTION_NODE,
+            ):
                 return node
 
     want = want.strip().replace('\\n', '\n')
