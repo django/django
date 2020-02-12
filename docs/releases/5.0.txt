@@ -315,6 +315,9 @@ Models
   :ref:`Choices classes <field-choices-enum-types>` directly instead of
   requiring expansion with the ``choices`` attribute.
 
+* :attr:`.Field.choices` now accepts dictionary values as well as sequences.
+
+
 Pagination
 ~~~~~~~~~~
 

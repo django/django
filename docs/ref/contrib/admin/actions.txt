@@ -47,11 +47,11 @@ news application with an ``Article`` model::
 
     from django.db import models
 
-    STATUS_CHOICES = [
-        ("d", "Draft"),
-        ("p", "Published"),
-        ("w", "Withdrawn"),
-    ]
+    STATUS_CHOICES = {
+        "d": "Draft",
+        "p": "Published",
+        "w": "Withdrawn",
+    }
 
 
     class Article(models.Model):

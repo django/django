@@ -456,6 +456,16 @@ class WriterTests(SimpleTestCase):
             "default=datetime.date(1969, 11, 19))",
         )
 
+    def test_serialize_dictionary_choices(self):
+        for choices in ({"Group": [(2, "2"), (1, "1")]}, {"Group": {2: "2", 1: "1"}}):
+            with self.subTest(choices):
+                field = models.IntegerField(choices=choices)
+                string = MigrationWriter.serialize(field)[0]
+                self.assertEqual(
+                    string,
+                    "models.IntegerField(choices=[('Group', [(2, '2'), (1, '1')])])",
+                )
+
     def test_serialize_nested_class(self):
         for nested_cls in [self.NestedEnum, self.NestedChoices]:
             cls_name = nested_cls.__name__

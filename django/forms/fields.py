@@ -42,6 +42,7 @@ from django.forms.widgets import (
     URLInput,
 )
 from django.utils import formats
+from django.utils.choices import normalize_field_choices
 from django.utils.dateparse import parse_datetime, parse_duration
 from django.utils.deprecation import RemovedInDjango60Warning
 from django.utils.duration import duration_string
@@ -861,7 +862,7 @@ class CallableChoiceIterator:
         self.choices_func = choices_func
 
     def __iter__(self):
-        yield from self.choices_func()
+        yield from normalize_field_choices(self.choices_func())
 
 
 class ChoiceField(Field):
@@ -883,21 +884,20 @@ class ChoiceField(Field):
         result._choices = copy.deepcopy(self._choices, memo)
         return result
 
-    def _get_choices(self):
+    @property
+    def choices(self):
         return self._choices
 
-    def _set_choices(self, value):
-        # Setting choices also sets the choices on the widget.
-        # choices can be any iterable, but we call list() on it because
-        # it will be consumed more than once.
+    @choices.setter
+    def choices(self, value):
         if callable(value):
             value = CallableChoiceIterator(value)
         else:
-            value = list(value)
+            value = normalize_field_choices(value)
 
-        self._choices = self.widget.choices = value
-
-    choices = property(_get_choices, _set_choices)
+        # Setting choices on the field also sets the choices on the widget.
+        # Note that we bypass the property setter to avoid re-normalizing.
+        self._choices = self.widget._choices = value
 
     def to_python(self, value):
         """Return a string."""

@@ -12,6 +12,7 @@ from itertools import chain
 from django.forms.utils import to_current_timezone
 from django.templatetags.static import static
 from django.utils import formats
+from django.utils.choices import normalize_field_choices
 from django.utils.dates import MONTHS
 from django.utils.formats import get_format
 from django.utils.html import format_html, html_safe
@@ -620,10 +621,7 @@ class ChoiceWidget(Widget):
 
     def __init__(self, attrs=None, choices=()):
         super().__init__(attrs)
-        # choices can be any iterable, but we may need to render this widget
-        # multiple times. Thus, collapse it into a list so it can be consumed
-        # more than once.
-        self.choices = list(choices)
+        self.choices = choices
 
     def __deepcopy__(self, memo):
         obj = copy.copy(self)
@@ -740,6 +738,14 @@ class ChoiceWidget(Widget):
         if not isinstance(value, (tuple, list)):
             value = [value]
         return [str(v) if v is not None else "" for v in value]
+
+    @property
+    def choices(self):
+        return self._choices
+
+    @choices.setter
+    def choices(self, value):
+        self._choices = normalize_field_choices(value)
 
 
 class Select(ChoiceWidget):

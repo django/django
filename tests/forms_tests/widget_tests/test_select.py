@@ -16,10 +16,38 @@ class SelectTest(WidgetTest):
             ('Group "1"', (("inner1", "Inner 1"), ("inner2", "Inner 2"))),
         )
     )
+    nested_widget_dict_tuple = Select(
+        choices={
+            "outer1": "Outer 1",
+            'Group "1"': (("inner1", "Inner 1"), ("inner2", "Inner 2")),
+        }
+    )
+    nested_widget_dict = Select(
+        choices={
+            "outer1": "Outer 1",
+            'Group "1"': {"inner1": "Inner 1", "inner2": "Inner 2"},
+        }
+    )
+    nested_widgets = (nested_widget, nested_widget_dict, nested_widget_dict_tuple)
 
     def test_render(self):
         self.check_html(
             self.widget(choices=self.beatles),
+            "beatle",
+            "J",
+            html=(
+                """<select name="beatle">
+            <option value="J" selected>John</option>
+            <option value="P">Paul</option>
+            <option value="G">George</option>
+            <option value="R">Ringo</option>
+            </select>"""
+            ),
+        )
+
+    def test_render_dictionary(self):
+        self.check_html(
+            self.widget(choices=dict(self.beatles)),
             "beatle",
             "J",
             html=(
@@ -244,52 +272,58 @@ class SelectTest(WidgetTest):
         """
         Choices can be nested one level in order to create HTML optgroups.
         """
-        self.check_html(
-            self.nested_widget,
-            "nestchoice",
-            None,
-            html=(
-                """<select name="nestchoice">
-            <option value="outer1">Outer 1</option>
-            <optgroup label="Group &quot;1&quot;">
-            <option value="inner1">Inner 1</option>
-            <option value="inner2">Inner 2</option>
-            </optgroup>
-            </select>"""
-            ),
-        )
+        for widget in self.nested_widgets:
+            with self.subTest(widget):
+                self.check_html(
+                    widget,
+                    "nestchoice",
+                    None,
+                    html=(
+                        """<select name="nestchoice">
+                    <option value="outer1">Outer 1</option>
+                    <optgroup label="Group &quot;1&quot;">
+                    <option value="inner1">Inner 1</option>
+                    <option value="inner2">Inner 2</option>
+                    </optgroup>
+                    </select>"""
+                    ),
+                )
 
     def test_choices_select_outer(self):
-        self.check_html(
-            self.nested_widget,
-            "nestchoice",
-            "outer1",
-            html=(
-                """<select name="nestchoice">
-            <option value="outer1" selected>Outer 1</option>
-            <optgroup label="Group &quot;1&quot;">
-            <option value="inner1">Inner 1</option>
-            <option value="inner2">Inner 2</option>
-            </optgroup>
-            </select>"""
-            ),
-        )
+        for widget in self.nested_widgets:
+            with self.subTest(widget):
+                self.check_html(
+                    widget,
+                    "nestchoice",
+                    "outer1",
+                    html=(
+                        """<select name="nestchoice">
+                    <option value="outer1" selected>Outer 1</option>
+                    <optgroup label="Group &quot;1&quot;">
+                    <option value="inner1">Inner 1</option>
+                    <option value="inner2">Inner 2</option>
+                    </optgroup>
+                    </select>"""
+                    ),
+                )
 
     def test_choices_select_inner(self):
-        self.check_html(
-            self.nested_widget,
-            "nestchoice",
-            "inner1",
-            html=(
-                """<select name="nestchoice">
-            <option value="outer1">Outer 1</option>
-            <optgroup label="Group &quot;1&quot;">
-            <option value="inner1" selected>Inner 1</option>
-            <option value="inner2">Inner 2</option>
-            </optgroup>
-            </select>"""
-            ),
-        )
+        for widget in self.nested_widgets:
+            with self.subTest(widget):
+                self.check_html(
+                    widget,
+                    "nestchoice",
+                    "inner1",
+                    html=(
+                        """<select name="nestchoice">
+                    <option value="outer1">Outer 1</option>
+                    <optgroup label="Group &quot;1&quot;">
+                    <option value="inner1" selected>Inner 1</option>
+                    <option value="inner2">Inner 2</option>
+                    </optgroup>
+                    </select>"""
+                    ),
+                )
 
     @override_settings(USE_THOUSAND_SEPARATOR=True)
     def test_doesnt_localize_option_value(self):
@@ -341,110 +375,111 @@ class SelectTest(WidgetTest):
         self.assertIs(options[1]["selected"], False)
 
     def test_optgroups(self):
-        choices = [
-            (
-                "Audio",
-                [
-                    ("vinyl", "Vinyl"),
-                    ("cd", "CD"),
-                ],
-            ),
-            (
-                "Video",
-                [
-                    ("vhs", "VHS Tape"),
-                    ("dvd", "DVD"),
-                ],
-            ),
-            ("unknown", "Unknown"),
-        ]
-        groups = list(
-            self.widget(choices=choices).optgroups(
-                "name",
-                ["vhs"],
-                attrs={"class": "super"},
-            )
-        )
-        audio, video, unknown = groups
-        label, options, index = audio
-        self.assertEqual(label, "Audio")
-        self.assertEqual(
-            options,
-            [
-                {
-                    "value": "vinyl",
-                    "type": "select",
-                    "attrs": {},
-                    "index": "0_0",
-                    "label": "Vinyl",
-                    "template_name": "django/forms/widgets/select_option.html",
-                    "name": "name",
-                    "selected": False,
-                    "wrap_label": True,
-                },
-                {
-                    "value": "cd",
-                    "type": "select",
-                    "attrs": {},
-                    "index": "0_1",
-                    "label": "CD",
-                    "template_name": "django/forms/widgets/select_option.html",
-                    "name": "name",
-                    "selected": False,
-                    "wrap_label": True,
-                },
+        choices_dict = {
+            "Audio": [
+                ("vinyl", "Vinyl"),
+                ("cd", "CD"),
             ],
-        )
-        self.assertEqual(index, 0)
-        label, options, index = video
-        self.assertEqual(label, "Video")
-        self.assertEqual(
-            options,
-            [
-                {
-                    "value": "vhs",
-                    "template_name": "django/forms/widgets/select_option.html",
-                    "label": "VHS Tape",
-                    "attrs": {"selected": True},
-                    "index": "1_0",
-                    "name": "name",
-                    "selected": True,
-                    "type": "select",
-                    "wrap_label": True,
-                },
-                {
-                    "value": "dvd",
-                    "template_name": "django/forms/widgets/select_option.html",
-                    "label": "DVD",
-                    "attrs": {},
-                    "index": "1_1",
-                    "name": "name",
-                    "selected": False,
-                    "type": "select",
-                    "wrap_label": True,
-                },
+            "Video": [
+                ("vhs", "VHS Tape"),
+                ("dvd", "DVD"),
             ],
-        )
-        self.assertEqual(index, 1)
-        label, options, index = unknown
-        self.assertIsNone(label)
-        self.assertEqual(
-            options,
-            [
-                {
-                    "value": "unknown",
-                    "selected": False,
-                    "template_name": "django/forms/widgets/select_option.html",
-                    "label": "Unknown",
-                    "attrs": {},
-                    "index": "2",
-                    "name": "name",
-                    "type": "select",
-                    "wrap_label": True,
-                }
-            ],
-        )
-        self.assertEqual(index, 2)
+            "unknown": "Unknown",
+        }
+        choices_list = list(choices_dict.items())
+        choices_nested_dict = {
+            k: dict(v) if isinstance(v, list) else v for k, v in choices_dict.items()
+        }
+
+        for choices in (choices_dict, choices_list, choices_nested_dict):
+            with self.subTest(choices):
+                groups = list(
+                    self.widget(choices=choices).optgroups(
+                        "name",
+                        ["vhs"],
+                        attrs={"class": "super"},
+                    )
+                )
+                audio, video, unknown = groups
+                label, options, index = audio
+                self.assertEqual(label, "Audio")
+                self.assertEqual(
+                    options,
+                    [
+                        {
+                            "value": "vinyl",
+                            "type": "select",
+                            "attrs": {},
+                            "index": "0_0",
+                            "label": "Vinyl",
+                            "template_name": "django/forms/widgets/select_option.html",
+                            "name": "name",
+                            "selected": False,
+                            "wrap_label": True,
+                        },
+                        {
+                            "value": "cd",
+                            "type": "select",
+                            "attrs": {},
+                            "index": "0_1",
+                            "label": "CD",
+                            "template_name": "django/forms/widgets/select_option.html",
+                            "name": "name",
+                            "selected": False,
+                            "wrap_label": True,
+                        },
+                    ],
+                )
+                self.assertEqual(index, 0)
+                label, options, index = video
+                self.assertEqual(label, "Video")
+                self.assertEqual(
+                    options,
+                    [
+                        {
+                            "value": "vhs",
+                            "template_name": "django/forms/widgets/select_option.html",
+                            "label": "VHS Tape",
+                            "attrs": {"selected": True},
+                            "index": "1_0",
+                            "name": "name",
+                            "selected": True,
+                            "type": "select",
+                            "wrap_label": True,
+                        },
+                        {
+                            "value": "dvd",
+                            "template_name": "django/forms/widgets/select_option.html",
+                            "label": "DVD",
+                            "attrs": {},
+                            "index": "1_1",
+                            "name": "name",
+                            "selected": False,
+                            "type": "select",
+                            "wrap_label": True,
+                        },
+                    ],
+                )
+                self.assertEqual(index, 1)
+                label, options, index = unknown
+                self.assertIsNone(label)
+                self.assertEqual(
+                    options,
+                    [
+                        {
+                            "value": "unknown",
+                            "selected": False,
+                            "template_name": "django/forms/widgets/select_option.html",
+                            "label": "Unknown",
+                            "attrs": {},
+                            "index": "2",
+                            "name": "name",
+                            "type": "select",
+                            "wrap_label": True,
+                        }
+                    ],
+                )
+                self.assertEqual(index, 2)
 
     def test_optgroups_integer_choices(self):
         """The option 'value' is the same type as what's in `choices`."""

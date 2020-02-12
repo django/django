@@ -86,14 +86,26 @@ If a field has ``blank=False``, the field will be required.
 
 .. attribute:: Field.choices
 
-A :term:`sequence` consisting itself of iterables of exactly two items (e.g.
-``[(A, B), (A, B) ...]``) to use as choices for this field. If choices are
-given, they're enforced by :ref:`model validation <validating-objects>` and the
-default form widget will be a select box with these choices instead of the
-standard text field.
+A dictionary or iterable in the format described below to use as choices for
+this field. If choices are given, they're enforced by
+:ref:`model validation <validating-objects>` and the default form widget will
+be a select box with these choices instead of the standard text field.
 
-The first element in each tuple is the actual value to be set on the model,
-and the second element is the human-readable name. For example::
+The key element is the actual value to be set on the model, and the second
+element is the human readable name. For example::
+
+    YEAR_IN_SCHOOL_CHOICES = {
+        "FR": "Freshman",
+        "SO": "Sophomore",
+        "JR": "Junior",
+        "SR": "Senior",
+        "GR": "Graduate",
+    }
+
+You can also pass a :term:`sequence` consisting itself of iterables of exactly
+two items (e.g. ``[(A, B), (A, B) ...]``). The first element in each tuple is
+the actual value to be set on the model, and the second element is the
+human-readable name. For example::
 
     YEAR_IN_SCHOOL_CHOICES = [
         ("FR", "Freshman"),
@@ -102,6 +114,12 @@ and the second element is the human-readable name. For example::
         ("SR", "Senior"),
         ("GR", "Graduate"),
     ]
+
+.. versionchanged: 5.0
+
+    Dictionary support was added. Previously Django only supported lists of
+    two-tuples, but since Python 3.6+ dictionaries preserve insertion order
+    so they are just as suitable.
 
 Generally, it's best to define choices inside a model class, and to
 define a suitably-named constant for each value::
@@ -115,13 +133,13 @@ define a suitably-named constant for each value::
         JUNIOR = "JR"
         SENIOR = "SR"
         GRADUATE = "GR"
-        YEAR_IN_SCHOOL_CHOICES = [
-            (FRESHMAN, "Freshman"),
-            (SOPHOMORE, "Sophomore"),
-            (JUNIOR, "Junior"),
-            (SENIOR, "Senior"),
-            (GRADUATE, "Graduate"),
-        ]
+        YEAR_IN_SCHOOL_CHOICES = {
+            FRESHMAN: "Freshman",
+            SOPHOMORE: "Sophomore",
+            JUNIOR: "Junior",
+            SENIOR: "Senior",
+            GRADUATE: "Graduate",
+        }
         year_in_school = models.CharField(
             max_length=2,
             choices=YEAR_IN_SCHOOL_CHOICES,
@@ -142,6 +160,25 @@ will work anywhere that the ``Student`` model has been imported).
 You can also collect your available choices into named groups that can
 be used for organizational purposes::
 
+    MEDIA_CHOICES = {
+        "Audio": {
+            "vinyl": "Vinyl",
+            "cd": "CD",
+        },
+        "Video": {
+            "vhs": "VHS Tape",
+            "dvd": "DVD",
+        },
+        "unknown": "Unknown",
+    }
+
+The key of the dictionary is the name to apply to the group and the value is
+the choices inside that group, consisting of the field value and a human-readable
+name for an option. Grouped options may be combined with ungrouped options within
+a single dictionary (such as the ``"unknown"`` option in this example).
+
+You can also use a list of tuples instead of a dictionary::
+
     MEDIA_CHOICES = [
         (
             "Audio",
@@ -159,12 +196,6 @@ be used for organizational purposes::
         ),
         ("unknown", "Unknown"),
     ]
-
-The first element in each tuple is the name to apply to the group. The
-second element is an iterable of 2-tuples, with each 2-tuple containing
-a value and a human-readable name for an option. Grouped options may be
-combined with ungrouped options within a single list (such as the
-``'unknown'`` option in this example).
 
 For each model field that has :attr:`~Field.choices` set, Django will add a
 method to retrieve the human-readable name for the field's current value. See

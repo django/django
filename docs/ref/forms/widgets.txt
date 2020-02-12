@@ -58,11 +58,11 @@ widget on the field. In the following example, the
     from django import forms
 
     BIRTH_YEAR_CHOICES = ["1980", "1981", "1982"]
-    FAVORITE_COLORS_CHOICES = [
-        ("blue", "Blue"),
-        ("green", "Green"),
-        ("black", "Black"),
-    ]
+    FAVORITE_COLORS_CHOICES = {
+        "blue": "Blue",
+        "green": "Green",
+        "black": "Black",
+    }
 
 
     class SimpleForm(forms.Form):
@@ -458,9 +458,9 @@ foundation for custom widgets.
 
         class DateSelectorWidget(forms.MultiWidget):
             def __init__(self, attrs=None):
-                days = [(day, day) for day in range(1, 32)]
-                months = [(month, month) for month in range(1, 13)]
-                years = [(year, year) for year in [2018, 2019, 2020]]
+                days = {day: day for day in range(1, 32)}
+                months = {month: month for month in range(1, 13)}
+                years = {year: year for year in [2018, 2019, 2020]}
                 widgets = [
                     forms.Select(attrs=attrs, choices=days),
                     forms.Select(attrs=attrs, choices=months),

@@ -165,9 +165,11 @@ Model fields
 * **fields.E002**: Field names must not contain ``"__"``.
 * **fields.E003**: ``pk`` is a reserved word that cannot be used as a field
   name.
-* **fields.E004**: ``choices`` must be an iterable (e.g., a list or tuple).
-* **fields.E005**: ``choices`` must be an iterable containing ``(actual value,
-  human readable name)`` tuples.
+* **fields.E004**: ``choices`` must be a dictionary or an iterable
+  (e.g., a list or tuple).
+* **fields.E005**: ``choices`` must be a dictionary that maps actual choice
+  values to human readable names or a sequence of ``(actual value, human readable
+  name)`` tuples.
 * **fields.E006**: ``db_index`` must be ``None``, ``True`` or ``False``.
 * **fields.E007**: Primary keys must not have ``null=True``.
 * **fields.E008**: All ``validators`` must be callable.
