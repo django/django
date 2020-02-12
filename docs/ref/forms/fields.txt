@@ -510,8 +510,9 @@ For each field, we describe the default widget used if you don't specify
 
     .. versionchanged:: 5.0
 
-        Support for using :ref:`enumeration types <field-choices-enum-types>`
-        directly in the ``choices`` was added.
+        Support for mappings and using
+        :ref:`enumeration types <field-choices-enum-types>` directly in
+        ``choices`` was added.
 
 ``DateField``
 -------------

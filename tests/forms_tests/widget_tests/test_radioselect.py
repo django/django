@@ -13,7 +13,6 @@ class RadioSelectTest(ChoiceWidgetTest):
     widget = RadioSelect
 
     def test_render(self):
-        choices = BLANK_CHOICE_DASH + self.beatles
         html = """
         <div>
           <div>
@@ -33,7 +32,10 @@ class RadioSelectTest(ChoiceWidgetTest):
           </div>
         </div>
         """
-        self.check_html(self.widget(choices=choices), "beatle", "J", html=html)
+        beatles_with_blank = BLANK_CHOICE_DASH + self.beatles
+        for choices in (beatles_with_blank, dict(beatles_with_blank)):
+            with self.subTest(choices):
+                self.check_html(self.widget(choices=choices), "beatle", "J", html=html)
 
     def test_nested_choices(self):
         nested_choices = (
@@ -312,7 +314,9 @@ class RadioSelectTest(ChoiceWidgetTest):
           </div>
         </div>
         """
-        self.check_html(self.nested_widget, "nestchoice", None, html=html)
+        for widget in self.nested_widgets:
+            with self.subTest(widget):
+                self.check_html(widget, "nestchoice", None, html=html)
 
     def test_choices_select_outer(self):
         html = """
@@ -334,7 +338,9 @@ class RadioSelectTest(ChoiceWidgetTest):
           </div>
         </div>
         """
-        self.check_html(self.nested_widget, "nestchoice", "outer1", html=html)
+        for widget in self.nested_widgets:
+            with self.subTest(widget):
+                self.check_html(widget, "nestchoice", "outer1", html=html)
 
     def test_choices_select_inner(self):
         html = """
@@ -356,7 +362,9 @@ class RadioSelectTest(ChoiceWidgetTest):
           </div>
         </div>
         """
-        self.check_html(self.nested_widget, "nestchoice", "inner2", html=html)
+        for widget in self.nested_widgets:
+            with self.subTest(widget):
+                self.check_html(widget, "nestchoice", "inner2", html=html)
 
     def test_render_attrs(self):
         """

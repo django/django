@@ -129,6 +129,55 @@ sets a database-computed default value. For example::
         created = models.DateTimeField(db_default=Now())
         circumference = models.FloatField(db_default=2 * Pi())
 
+More options for declaring field choices
+----------------------------------------
+
+:attr:`.Field.choices` *(for model fields)* and :attr:`.ChoiceField.choices`
+*(for form fields)* allow for more flexibility when declaring their values. In
+previous versions of Django, ``choices`` should either be a list of 2-tuples,
+or an :ref:`field-choices-enum-types` subclass, but the latter required
+accessing the ``.choices`` attribute to provide the values in the expected
+form::
+
+    from django.db import models
+
+    Medal = models.TextChoices("Medal", "GOLD SILVER BRONZE")
+
+    SPORT_CHOICES = [
+        ("Martial Arts", [("judo", "Judo"), ("karate", "Karate")]),
+        ("Racket", [("badminton", "Badminton"), ("tennis", "Tennis")]),
+        ("unknown", "Unknown"),
+    ]
+
+
+    class Winners(models.Model):
+        name = models.CharField(...)
+        medal = models.CharField(..., choices=Medal.choices)
+        sport = models.CharField(..., choices=SPORT_CHOICES)
+
+Django 5.0 supports providing a mapping instead of an iterable, and also no
+longer requires ``.choices`` to be used directly to expand :ref:`enumeration
+types <field-choices-enum-types>`::
+
+    from django.db import models
+
+    Medal = models.TextChoices("Medal", "GOLD SILVER BRONZE")
+
+    SPORT_CHOICES = {  # Using a mapping instead of a list of 2-tuples.
+        "Martial Arts": {"judo": "Judo", "karate": "Karate"},
+        "Racket": {"badminton": "Badminton", "tennis": "Tennis"},
+        "unknown": "Unknown",
+    }
+
+
+    class Winners(models.Model):
+        name = models.CharField(...)
+        medal = models.CharField(..., choices=Medal)  # Using `.choices` not required.
+        sport = models.CharField(..., choices=SPORT_CHOICES)
+
+Under the hood the provided ``choices`` are normalized into a list of 2-tuples
+as the canonical form whenever the ``choices`` value is updated.
+
 Minor features
 --------------
 
@@ -304,10 +353,6 @@ File Uploads
 Forms
 ~~~~~
 
-* :attr:`.ChoiceField.choices` now accepts
-  :ref:`Choices classes <field-choices-enum-types>` directly instead of
-  requiring expansion with the ``choices`` attribute.
-
 * The new ``assume_scheme`` argument for :class:`~django.forms.URLField` allows
   specifying a default URL scheme.
 
@@ -356,10 +401,6 @@ Models
   :class:`~django.db.models.UniqueConstraint` allows customizing the ``code``
   of ``ValidationError`` raised during
   :ref:`model validation <validating-objects>`.
-
-* :attr:`.Field.choices` now accepts
-  :ref:`Choices classes <field-choices-enum-types>` directly instead of
-  requiring expansion with the ``choices`` attribute.
 
 * The :ref:`force_insert <ref-models-force-insert>` argument of
   :meth:`.Model.save` now allows specifying a tuple of parent classes that must
