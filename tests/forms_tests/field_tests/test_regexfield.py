@@ -1,6 +1,7 @@
 import re
 
-from django.forms import RegexField, ValidationError
+from django.core.exceptions import ValidationError
+from django.forms import RegexField
 from django.test import SimpleTestCase
 
 

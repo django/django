@@ -454,6 +454,7 @@ integer as the ``number`` argument. Then ``number`` will be looked up in the
 dictionary under that key during string interpolation. Here's example::
 
     from django import forms
+    from django.core.exceptions import ValidationError
     from django.utils.translation import ngettext_lazy
 
     class MyForm(forms.Form):
@@ -463,7 +464,7 @@ dictionary under that key during string interpolation. Here's example::
         def clean(self):
             # ...
             if error:
-                raise forms.ValidationError(self.error_message % {'num': number})
+                raise ValidationError(self.error_message % {'num': number})
 
 If the string contains exactly one unnamed placeholder, you can interpolate
 directly with the ``number`` argument::
@@ -477,7 +478,7 @@ directly with the ``number`` argument::
         def clean(self):
             # ...
             if error:
-                raise forms.ValidationError(self.error_message % number)
+                raise ValidationError(self.error_message % number)
 
 
 Formatting strings: ``format_lazy()``

@@ -3359,7 +3359,7 @@ Good luck picking a username that doesn&#x27;t already exist.</p>
 
         self.assertIsInstance(e, list)
         self.assertIn('Foo', e)
-        self.assertIn('Foo', forms.ValidationError(e))
+        self.assertIn('Foo', ValidationError(e))
 
         self.assertEqual(
             e.as_text(),
