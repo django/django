@@ -131,8 +131,7 @@ class AppConfig:
                 if candidates:
                     raise ImproperlyConfigured(
                         "'{0}' does not contain a class '{1}'. Choices are: {2}.".format(
-                            mod_path, cls_name, ', '.join(candidates)
-                            )
+                            mod_path, cls_name, ', '.join(candidates))
                     )
                 import_module(entry)
             else:
