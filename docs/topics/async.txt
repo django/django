@@ -6,13 +6,106 @@ Asynchronous support
 
 .. currentmodule:: asgiref.sync
 
-Django has developing support for asynchronous ("async") Python, but does not
-yet support asynchronous views or middleware; they will be coming in a future
-release.
+Django has support for writing asynchronous ("async") views, along with an
+entirely async-enabled request stack if you are running under
+:doc:`ASGI </howto/deployment/asgi/index>` rather than WSGI. Async views will
+still work under WSGI, but with performance penalties, and without the ability
+to have efficient long-running requests.
 
-There is limited support for other parts of the async ecosystem; namely, Django
-can natively talk :doc:`ASGI </howto/deployment/asgi/index>`, and some async
-safety support.
+We're still working on asynchronous support for the ORM and other parts of
+Django; you can expect to see these in future releases. For now, you can use
+the :func:`sync_to_async` adapter to interact with normal Django, as well as
+use a whole range of Python asyncio libraries natively. See below for more
+details.
+
+.. versionchanged:: 3.1
+
+    Support for async views was added.
+
+Async views
+===========
+
+.. versionadded:: 3.1
+
+Any view can be declared async by making the callable part of it return a
+coroutine - commonly, this is done using ``async def``. For a function-based
+view, this means declaring the whole view using ``async def``. For a
+class-based view, this means making its ``__call__()`` method an ``async def``
+(not its ``__init__()`` or ``as_view()``).
+
+.. note::
+
+    Django uses ``asyncio.iscoroutinefunction`` to test if your view is
+    asynchronous or not. If you implement your own method of returning a
+    coroutine, ensure you set the ``_is_coroutine`` attribute of the view
+    to ``asyncio.coroutines._is_coroutine`` so this function returns ``True``.
+
+Under a WSGI server, asynchronous views will run in their own, one-off event
+loop. This means that you can do things like parallel, async HTTP calls to APIs
+without any issues, but you will not get the benefits of an asynchronous
+request stack.
+
+If you want these benefits - which are mostly around the ability to service
+hundreds of connections without using any Python threads (enabling slow
+streaming, long-polling, and other exciting response types) - you will need to
+deploy Django using :doc:`ASGI </howto/deployment/asgi/index>` instead.
+
+.. warning::
+
+    You will only get the benefits of a fully-asynchronous request stack if you
+    have *no synchronous middleware* loaded into your site; if there is a piece
+    of synchronous middleware, then Django must use a thread per request to
+    safely emulate a synchronous environment for it.
+
+    Middleware can be built to support :ref:`both sync and async
+    <async-middleware>` contexts. Some of Django's middleware is built like
+    this, but not all. To see what middleware Django has to adapt, you can turn
+    on debug logging for the ``django.request`` logger and look for log
+    messages about *`"Synchronous middleware ... adapted"*.
+
+In either ASGI or WSGI mode, though, you can safely use asynchronous support to
+run code in parallel rather than serially, which is especially handy when
+dealing with external APIs or datastores.
+
+If you want to call a part of Django that is still synchronous (like the ORM)
+you will need to wrap it in a :func:`sync_to_async` call, like this::
+
+    from asgiref.sync import sync_to_async
+
+    results = sync_to_async(MyModel.objects.get)(pk=123)
+
+You may find it easier to move any ORM code into its own function and call that
+entire function using :func:`sync_to_async`. If you accidentally try to call
+part of Django that is still synchronous-only from an async view, you will
+trigger Django's :ref:`asynchronous safety protection <async-safety>` to
+protect your data from corruption.
+
+Performance
+-----------
+
+When running in a mode that does not match the view (e.g. an async view under
+WSGI, or a traditional sync view under ASGI), Django must emulate the other
+call style to allow your code to run. This context-switch causes a small
+performance penalty of around a millisecond.
+
+This is true of middleware as well, however. Django will attempt to minimize
+the number of context-switches. If you have an ASGI server, but all your
+middleware and views are synchronous, it will switch just once, before it
+enters the middleware stack.
+
+If, however, you put synchronous middleware between an ASGI server and an
+asynchronous view, it will have to switch into sync mode for the middleware and
+then back to asynchronous mode for the view, holding the synchronous thread
+open for middleware exception propagation. This may not be noticeable, but bear
+in mind that even adding a single piece of synchronous middleware can drag your
+whole async project down to running with one thread per request, and the
+associated performance penalties.
+
+You should do your own performance testing to see what effect ASGI vs. WSGI has
+on your code. In some cases, there may be a performance increase even for
+purely-synchronous codebase under ASGI because the request-handling code is
+still all running asynchronously. In general, though, you will only want to
+enable ASGI mode if you have asynchronous code in your site.
 
 .. _async-safety:
 

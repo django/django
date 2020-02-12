@@ -202,3 +202,28 @@ in a test view. For example::
             response = self.client.get('/403/')
             # Make assertions on the response here. For example:
             self.assertContains(response, 'Error handler content', status_code=403)
+
+.. _async-views:
+
+Asynchronous views
+==================
+
+.. versionadded:: 3.1
+
+As well as being synchronous functions, views can also be asynchronous
+functions (``async def``). Django will automatically detect these and run them
+in an asynchronous context. You will need to be using an asynchronous (ASGI)
+server to get the full power of them, however.
+
+Here's an example of an asynchronous view::
+
+    from django.http import HttpResponse
+    import datetime
+
+    async def current_datetime(request):
+        now = datetime.datetime.now()
+        html = '<html><body>It is now %s.</body></html>' % now
+        return HttpResponse(html)
+
+You can read more about Django's asynchronous support, and how to best use
+asynchronous views, in :doc:`/topics/async`.

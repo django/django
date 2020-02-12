@@ -27,6 +27,43 @@ officially support the latest release of each series.
 What's new in Django 3.1
 ========================
 
+Asynchronous views and middleware support
+-----------------------------------------
+
+Django now supports a fully asynchronous request path, including:
+
+* :ref:`Asynchronous views <async-views>`
+* :ref:`Asynchronous middleware <async-middleware>`
+* :ref:`Asynchronous tests and test client <async-tests>`
+
+To get started with async views, you need to declare a view using
+``async def``::
+
+    async def my_view(request):
+        await asyncio.sleep(0.5)
+        return HttpResponse('Hello, async world!')
+
+All asynchronous features are supported whether you are running under WSGI or
+ASGI mode. However, there will be performance penalties using async code in
+WSGI mode. You can read more about the specifics in :doc:`/topics/async`
+documentation.
+
+You are free to mix async and sync views, middleware, and tests as much as you
+want. Django will ensure that you always end up with the right execution
+context. We expect most projects will keep the majority of their views
+synchronous, and only have a select few running in async mode - but it is
+entirely your choice.
+
+Django's ORM, cache layer, and other pieces of code that do long-running
+network calls do not yet support async access. We expect to add support for
+them in upcoming releases. Async views are ideal, however, if you are doing a
+lot of API or HTTP calls inside your view, you can now natively do all those
+HTTP calls in parallel to considerably speed up your view's execution.
+
+Asynchronous support should be entirely backwards-compatible and we have tried
+to ensure that it has no speed regressions for your existing, synchronous code.
+It should have no noticeable effect on any existing Django projects.
+
 Minor features
 --------------
 

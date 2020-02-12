@@ -67,6 +67,17 @@ The following is a unit test using the request factory::
             response = MyView.as_view()(request)
             self.assertEqual(response.status_code, 200)
 
+AsyncRequestFactory
+-------------------
+
+``RequestFactory`` creates WSGI-like requests. If you want to create ASGI-like
+requests, including having a correct ASGI ``scope``, you can instead use
+``django.test.AsyncRequestFactory``.
+
+This class is directly API-compatible with ``RequestFactory``, with the only
+difference being that it returns ``ASGIRequest`` instances rather than
+``WSGIRequest`` instances. All of its methods are still synchronous callables.
+
 Testing class-based views
 =========================
 

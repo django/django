@@ -180,3 +180,162 @@ class MiddlewareNotUsedTests(SimpleTestCase):
         with self.assertRaisesMessage(AssertionError, 'no logs'):
             with self.assertLogs('django.request', 'DEBUG'):
                 self.client.get('/middleware_exceptions/view/')
+
+
+@override_settings(
+    DEBUG=True,
+    ROOT_URLCONF='middleware_exceptions.urls',
+)
+class MiddlewareSyncAsyncTests(SimpleTestCase):
+    @override_settings(MIDDLEWARE=[
+        'middleware_exceptions.middleware.TeapotMiddleware',
+    ])
+    def test_sync_teapot_middleware(self):
+        response = self.client.get('/middleware_exceptions/view/')
+        self.assertEqual(response.status_code, 418)
+
+    @override_settings(MIDDLEWARE=[
+        'middleware_exceptions.middleware.DecoratedTeapotMiddleware',
+    ])
+    def test_sync_decorated_teapot_middleware(self):
+        response = self.client.get('/middleware_exceptions/view/')
+        self.assertEqual(response.status_code, 418)
+
+    @override_settings(MIDDLEWARE=[
+        'middleware_exceptions.middleware.async_teapot_middleware',
+    ])
+    def test_async_teapot_middleware(self):
+        with self.assertLogs('django.request', 'DEBUG') as cm:
+            response = self.client.get('/middleware_exceptions/view/')
+        self.assertEqual(response.status_code, 418)
+        self.assertEqual(
+            cm.records[0].getMessage(),
+            "Synchronous middleware "
+            "middleware_exceptions.middleware.async_teapot_middleware "
+            "adapted.",
+        )
+
+    @override_settings(MIDDLEWARE=[
+        'middleware_exceptions.middleware.NotSyncOrAsyncMiddleware',
+    ])
+    def test_not_sync_or_async_middleware(self):
+        msg = (
+            'Middleware '
+            'middleware_exceptions.middleware.NotSyncOrAsyncMiddleware must '
+            'have at least one of sync_capable/async_capable set to True.'
+        )
+        with self.assertRaisesMessage(RuntimeError, msg):
+            self.client.get('/middleware_exceptions/view/')
+
+    @override_settings(MIDDLEWARE=[
+        'middleware_exceptions.middleware.TeapotMiddleware',
+    ])
+    async def test_sync_teapot_middleware_async(self):
+        with self.assertLogs('django.request', 'DEBUG') as cm:
+            response = await self.async_client.get('/middleware_exceptions/view/')
+        self.assertEqual(response.status_code, 418)
+        self.assertEqual(
+            cm.records[0].getMessage(),
+            "Asynchronous middleware "
+            "middleware_exceptions.middleware.TeapotMiddleware adapted.",
+        )
+
+    @override_settings(MIDDLEWARE=[
+        'middleware_exceptions.middleware.async_teapot_middleware',
+    ])
+    async def test_async_teapot_middleware_async(self):
+        with self.assertLogs('django.request', 'WARNING') as cm:
+            response = await self.async_client.get('/middleware_exceptions/view/')
+        self.assertEqual(response.status_code, 418)
+        self.assertEqual(
+            cm.records[0].getMessage(),
+            'Unknown Status Code: /middleware_exceptions/view/',
+        )
+
+    @override_settings(
+        DEBUG=False,
+        MIDDLEWARE=[
+            'middleware_exceptions.middleware.AsyncNoTemplateResponseMiddleware',
+        ],
+    )
+    def test_async_process_template_response_returns_none_with_sync_client(self):
+        msg = (
+            "AsyncNoTemplateResponseMiddleware.process_template_response "
+            "didn't return an HttpResponse object."
+        )
+        with self.assertRaisesMessage(ValueError, msg):
+            self.client.get('/middleware_exceptions/template_response/')
+
+    @override_settings(MIDDLEWARE=[
+        'middleware_exceptions.middleware.SyncAndAsyncMiddleware',
+    ])
+    async def test_async_and_sync_middleware_async_call(self):
+        response = await self.async_client.get('/middleware_exceptions/view/')
+        self.assertEqual(response.content, b'OK')
+        self.assertEqual(response.status_code, 200)
+
+    @override_settings(MIDDLEWARE=[
+        'middleware_exceptions.middleware.SyncAndAsyncMiddleware',
+    ])
+    def test_async_and_sync_middleware_sync_call(self):
+        response = self.client.get('/middleware_exceptions/view/')
+        self.assertEqual(response.content, b'OK')
+        self.assertEqual(response.status_code, 200)
+
+
+@override_settings(ROOT_URLCONF='middleware_exceptions.urls')
+class AsyncMiddlewareTests(SimpleTestCase):
+    @override_settings(MIDDLEWARE=[
+        'middleware_exceptions.middleware.AsyncTemplateResponseMiddleware',
+    ])
+    async def test_process_template_response(self):
+        response = await self.async_client.get(
+            '/middleware_exceptions/template_response/'
+        )
+        self.assertEqual(
+            response.content,
+            b'template_response OK\nAsyncTemplateResponseMiddleware',
+        )
+
+    @override_settings(MIDDLEWARE=[
+        'middleware_exceptions.middleware.AsyncNoTemplateResponseMiddleware',
+    ])
+    async def test_process_template_response_returns_none(self):
+        msg = (
+            "AsyncNoTemplateResponseMiddleware.process_template_response "
+            "didn't return an HttpResponse object. It returned None instead."
+        )
+        with self.assertRaisesMessage(ValueError, msg):
+            await self.async_client.get('/middleware_exceptions/template_response/')
+
+    @override_settings(MIDDLEWARE=[
+        'middleware_exceptions.middleware.AsyncProcessExceptionMiddleware',
+    ])
+    async def test_exception_in_render_passed_to_process_exception(self):
+        response = await self.async_client.get(
+            '/middleware_exceptions/exception_in_render/'
+        )
+        self.assertEqual(response.content, b'Exception caught')
+
+    @override_settings(MIDDLEWARE=[
+        'middleware_exceptions.middleware.AsyncProcessExceptionMiddleware',
+    ])
+    async def test_exception_in_async_render_passed_to_process_exception(self):
+        response = await self.async_client.get(
+            '/middleware_exceptions/async_exception_in_render/'
+        )
+        self.assertEqual(response.content, b'Exception caught')
+
+    @override_settings(MIDDLEWARE=[
+        'middleware_exceptions.middleware.AsyncProcessExceptionMiddleware',
+    ])
+    async def test_view_exception_handled_by_process_exception(self):
+        response = await self.async_client.get('/middleware_exceptions/error/')
+        self.assertEqual(response.content, b'Exception caught')
+
+    @override_settings(MIDDLEWARE=[
+        'middleware_exceptions.middleware.AsyncProcessViewMiddleware',
+    ])
+    async def test_process_view_return_response(self):
+        response = await self.async_client.get('/middleware_exceptions/view/')
+        self.assertEqual(response.content, b'Processed view normal_view')

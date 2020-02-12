@@ -210,6 +210,31 @@ The functions defined in this module share the following properties:
          def my_view(request):
              pass
 
+.. function:: sync_only_middleware(middleware)
+
+    .. versionadded:: 3.1
+
+    Marks a middleware as :ref:`synchronous-only <async-middleware>`. (The
+    default in Django, but this allows you to future-proof if the default ever
+    changes in a future release.)
+
+.. function:: async_only_middleware(middleware)
+
+    .. versionadded:: 3.1
+
+    Marks a middleware as :ref:`asynchronous-only <async-middleware>`. Django
+    will wrap it in an asynchronous event loop when it is called from the WSGI
+    request path.
+
+.. function:: sync_and_async_middleware(middleware)
+
+    .. versionadded:: 3.1
+
+    Marks a middleware as :ref:`sync and async compatible <async-middleware>`,
+    this allows to avoid converting requests. You must implement detection of
+    the current request type to use this decorator. See :ref:`asynchronous
+    middleware documentation <async-middleware>` for details.
+
 ``django.utils.encoding``
 =========================
 
