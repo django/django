@@ -7,6 +7,8 @@ from django.db.backends.base.creation import (
 )
 from django.test import SimpleTestCase
 
+from ..models import Author, Book
+
 
 def get_connection_copy():
     # Get a copy of the default connection. (Can't use django.db.connection
@@ -73,3 +75,27 @@ class TestDbCreationTests(SimpleTestCase):
         finally:
             with mock.patch.object(creation, '_destroy_test_db'):
                 creation.destroy_test_db(old_database_name, verbosity=0)
+
+
+class TestDeserializeDbFromString(SimpleTestCase):
+    databases = ['default']
+
+    def test_forward_reference(self):
+        """
+        This has the book before the author it references, to verify deserialize_db_from_string handles this properly
+        (regression test for #26552).
+        """
+
+        serialized = """
+        [
+            {"model": "backends.book", "pk": 1, "fields": {"author": "John"}},
+            {"model": "backends.author", "pk": 1, "fields": {"name": "John"}}
+        ]
+        """
+        creation = connection.creation_class(connection)
+        creation.deserialize_db_from_string(serialized)
+
+        # Check that deserialization actually worked (in addition to not failing)
+        a = Author.objects.get()
+        b = Book.objects.get()
+        self.assertEqual(b.author, a)
