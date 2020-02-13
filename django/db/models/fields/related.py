@@ -4,7 +4,7 @@ from functools import partial
 
 from django import forms
 from django.apps import apps
-from django.conf import SettingsReference
+from django.conf import SettingsReference, settings
 from django.core import checks, exceptions
 from django.db import connection, router
 from django.db.backends import utils
@@ -1436,12 +1436,23 @@ class ManyToManyField(RelatedField):
                 clashing_obj = '%s.%s' % (opts.label, _get_field_name(model))
             else:
                 clashing_obj = model._meta.label
+            if settings.DATABASE_ROUTERS:
+                error_class, error_id = checks.Warning, 'fields.W344'
+                error_hint = (
+                    'You have configured settings.DATABASE_ROUTERS. Verify '
+                    'that the table of %r is correctly routed to a separate '
+                    'database.' % clashing_obj
+                )
+            else:
+                error_class, error_id = checks.Error, 'fields.E340'
+                error_hint = None
             return [
-                checks.Error(
+                error_class(
                     "The field's intermediary table '%s' clashes with the "
                     "table name of '%s'." % (m2m_db_table, clashing_obj),
                     obj=self,
-                    id='fields.E340',
+                    hint=error_hint,
+                    id=error_id,
                 )
             ]
         return []
