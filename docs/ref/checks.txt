@@ -260,7 +260,8 @@ Related fields
 * **fields.W342**: Setting ``unique=True`` on a ``ForeignKey`` has the same
   effect as using a ``OneToOneField``.
 * **fields.W343**: ``limit_choices_to`` has no effect on ``ManyToManyField``
-  with a ``through`` model.
+* **fields.W344**: The field's intermediary table ``<table name>`` clashes with
+  the table name of ``<model>``/``<model>.<field name>``.
 
 Models
 ------
