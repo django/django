@@ -1620,11 +1620,6 @@ class CacheUtils(SimpleTestCase):
         request._cache_update_cache = True if not update_cache else update_cache
         return request
 
-    def _set_cache(self, request, msg):
-        response = HttpResponse()
-        response.content = msg
-        return UpdateCacheMiddleware().process_response(request, response)
-
     def test_patch_vary_headers(self):
         headers = (
             # Initial vary, new headers, resulting vary.
