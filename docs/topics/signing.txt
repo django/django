@@ -81,12 +81,17 @@ generate signatures. You can use a different secret by passing it to the
     >>> value
     'My string:EkfQJafvGyiofrdGnuthdxImIJw'
 
-.. class:: Signer(key=None, sep=':', salt=None)
+.. class:: Signer(key=None, sep=':', salt=None, algorithm='sha256')
 
     Returns a signer which uses ``key`` to generate signatures and ``sep`` to
     separate values. ``sep`` cannot be in the `URL safe base64 alphabet
     <https://tools.ietf.org/html/rfc4648#section-5>`_.  This alphabet contains
-    alphanumeric characters, hyphens, and underscores.
+    alphanumeric characters, hyphens, and underscores. ``algorithm`` must be an
+    algorithm supported by :py:mod:`hashlib`.
+
+    .. versionchanged:: 3.1
+
+        The ``algorithm`` parameter was added.
 
 Using the ``salt`` argument
 ---------------------------
@@ -139,7 +144,7 @@ created within a specified period of time::
     >>> signer.unsign(value, max_age=timedelta(seconds=20))
     'hello'
 
-.. class:: TimestampSigner(key=None, sep=':', salt=None)
+.. class:: TimestampSigner(key=None, sep=':', salt=None, algorithm='sha256')
 
     .. method:: sign(value)
 
@@ -150,6 +155,10 @@ created within a specified period of time::
         Checks if ``value`` was signed less than ``max_age`` seconds ago,
         otherwise raises ``SignatureExpired``. The ``max_age`` parameter can
         accept an integer or a :py:class:`datetime.timedelta` object.
+
+    .. versionchanged:: 3.1
+
+        The ``algorithm`` parameter was added.
 
 Protecting complex data structures
 ----------------------------------

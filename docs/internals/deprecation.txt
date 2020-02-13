@@ -54,6 +54,9 @@ details on these changes.
 
 * Support for the pre-Django 3.1 encoding format of sessions will be removed.
 
+* Support for the pre-Django 3.1 ``django.core.signing.Signer`` signatures
+  (encoded with the SHA-1 algorithm) will be removed.
+
 * The ``get_request`` argument for
   ``django.utils.deprecation.MiddlewareMixin.__init__()`` will be required and
   won't accept ``None``.

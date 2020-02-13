@@ -404,6 +404,14 @@ Security
   origins. If you need the previous behavior, explicitly set
   :setting:`SECURE_REFERRER_POLICY` to ``None``.
 
+* The default :class:`django.core.signing.Signer` algorithm is changed to the
+  SHA-256. Support for signatures made with the old SHA-1 algorithm remains
+  until Django 4.0.
+
+  Also, the new ``algorithm`` parameter of the
+  :class:`~django.core.signing.Signer` allows customizing the hashing
+  algorithm.
+
 Serialization
 ~~~~~~~~~~~~~
 
