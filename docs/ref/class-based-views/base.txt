@@ -260,6 +260,10 @@ MRO is an acronym for Method Resolution Order.
 
         Constructs the target URL for redirection.
 
+        The ``args`` and ``kwargs`` arguments are positional and/or keyword
+        arguments :ref:`captured from the URL pattern
+        <how-django-processes-a-request>`, respectively.
+
         The default implementation uses :attr:`url` as a starting
         string and performs expansion of ``%`` named parameters in that string
         using the named groups captured in the URL.
