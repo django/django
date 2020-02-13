@@ -799,6 +799,13 @@ class MultiWidget(Widget):
     template_name = 'django/forms/widgets/multiwidget.html'
 
     def __init__(self, widgets, attrs=None):
+        if isinstance(widgets, dict):
+            self.widgets_names = [
+                ('_%s' % name) if name else '' for name in widgets
+            ]
+            widgets = widgets.values()
+        else:
+            self.widgets_names = ['_%s' % i for i in range(len(widgets))]
         self.widgets = [w() if isinstance(w, type) else w for w in widgets]
         super().__init__(attrs)
 
@@ -820,10 +827,10 @@ class MultiWidget(Widget):
         input_type = final_attrs.pop('type', None)
         id_ = final_attrs.get('id')
         subwidgets = []
-        for i, widget in enumerate(self.widgets):
+        for i, (widget_name, widget) in enumerate(zip(self.widgets_names, self.widgets)):
             if input_type is not None:
                 widget.input_type = input_type
-            widget_name = '%s_%s' % (name, i)
+            widget_name = name + widget_name
             try:
                 widget_value = value[i]
             except IndexError:
@@ -843,12 +850,15 @@ class MultiWidget(Widget):
         return id_
 
     def value_from_datadict(self, data, files, name):
-        return [widget.value_from_datadict(data, files, name + '_%s' % i) for i, widget in enumerate(self.widgets)]
+        return [
+            widget.value_from_datadict(data, files, name + widget_name)
+            for widget_name, widget in zip(self.widgets_names, self.widgets)
+        ]
 
     def value_omitted_from_data(self, data, files, name):
         return all(
-            widget.value_omitted_from_data(data, files, name + '_%s' % i)
-            for i, widget in enumerate(self.widgets)
+            widget.value_omitted_from_data(data, files, name + widget_name)
+            for widget_name, widget in zip(self.widgets_names, self.widgets)
         )
 
     def decompress(self, value):

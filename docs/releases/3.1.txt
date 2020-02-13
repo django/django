@@ -270,6 +270,9 @@ Forms
   now uses ``DATE_INPUT_FORMATS`` in addition to ``DATETIME_INPUT_FORMATS``
   when converting a field input to a ``datetime`` value.
 
+* :attr:`.MultiWidget.widgets` now accepts a dictionary which allows
+  customizing subwidget ``name`` attributes.
+
 Generic Views
 ~~~~~~~~~~~~~
 
