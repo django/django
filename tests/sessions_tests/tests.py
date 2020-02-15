@@ -311,6 +311,18 @@ class SessionTestsMixin:
         encoded = self.session.encode(data)
         self.assertEqual(self.session.decode(encoded), data)
 
+    @override_settings(SECRET_KEY='django_tests_secret_key')
+    def test_decode_legacy(self):
+        # RemovedInDjango40Warning: pre-Django 3.1 sessions will be invalid.
+        legacy_encoded = (
+            'OWUzNTNmNWQxNTBjOWExZmM4MmQ3NzNhMDRmMjU4NmYwNDUyNGI2NDp7ImEgdGVzd'
+            'CBrZXkiOiJhIHRlc3QgdmFsdWUifQ=='
+        )
+        self.assertEqual(
+            self.session.decode(legacy_encoded),
+            {'a test key': 'a test value'},
+        )
+
     def test_decode_failure_logged_to_security(self):
         bad_encode = base64.b64encode(b'flaskdj:alkdjf').decode('ascii')
         with self.assertLogs('django.security.SuspiciousSession', 'WARNING') as cm:
