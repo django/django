@@ -19,8 +19,10 @@ documentation</ref/class-based-views/index>`.
    generic-editing
    mixins
 
-Basic examples
-==============
+.. role:: h2
+    :class: heading
+
+.. rubric:: :h2:`Basic examples`
 
 Django provides base view classes which will suit a wide range of applications.
 All views inherit from the :class:`~django.views.generic.base.View` class, which
@@ -30,8 +32,7 @@ HTTP redirect, and :class:`~django.views.generic.base.TemplateView` extends the
 base class to make it also render a template.
 
 
-Usage in your URLconf
-=====================
+.. rubric:: :h2:`Usage in your URLconf`
 
 The most direct way to use generic views is to create them directly in your
 URLconf. If you're only changing a few attributes on a class-based view, you
@@ -51,8 +52,7 @@ on the ``TemplateView``. A similar overriding pattern can be used for the
 ``url`` attribute on :class:`~django.views.generic.base.RedirectView`.
 
 
-Subclassing generic views
-=========================
+.. rubric:: :h2:`Subclassing generic views`
 
 The second, more powerful way to use generic views is to inherit from an
 existing view and override attributes (such as the ``template_name``) or
@@ -87,8 +87,7 @@ topic on :doc:`generic class-based views</topics/class-based-views/generic-displ
 
 .. _supporting-other-http-methods:
 
-Supporting other HTTP methods
------------------------------
+.. rubric:: :h2:`Supporting other HTTP methods`
 
 Suppose somebody wants to access our book library over HTTP using the views
 as an API. The API client would connect every now and then and download book

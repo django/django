@@ -34,85 +34,81 @@ those packages have.
    staticfiles
    syndication
 
-``admin``
-=========
+.. role:: h2
+    :class: heading
+
+.. rubric:: :h2:`admin`
 
 The automatic Django administrative interface. For more information, see
 :doc:`Tutorial 2 </intro/tutorial02>` and the
 :doc:`admin documentation </ref/contrib/admin/index>`.
 
-Requires the auth_ and contenttypes_ contrib packages to be installed.
+Requires the
+:doc:`auth </topics/auth/index>` and
+:doc:`contenttypes </ref/contrib/contenttypes>`
+contrib packages to be installed.
 
-``auth``
-========
+.. rubric:: :h2:`auth`
 
 Django's authentication framework.
 
 See :doc:`/topics/auth/index`.
 
-``contenttypes``
-================
+.. rubric:: :h2:`contenttypes`
 
 A light framework for hooking into "types" of content, where each installed
 Django model is a separate content type.
 
 See the :doc:`contenttypes documentation </ref/contrib/contenttypes>`.
 
-``flatpages``
-=============
+.. rubric:: :h2:`flatpages`
 
 A framework for managing "flat" HTML content in a database.
 
 See the :doc:`flatpages documentation </ref/contrib/flatpages>`.
 
-Requires the sites_ contrib package to be installed as well.
+Requires the
+:doc:`sites </ref/contrib/sites>` contrib package to be installed as well.
 
-``gis``
-=======
+.. rubric:: :h2:`gis`
 
 A world-class geospatial framework built on top of Django, that enables
 storage, manipulation and display of spatial data.
 
 See the :doc:`/ref/contrib/gis/index` documentation for more.
 
-``humanize``
-============
+.. rubric:: :h2:`humanize`
 
 A set of Django template filters useful for adding a "human touch" to data.
 
 See the :doc:`humanize documentation </ref/contrib/humanize>`.
 
-``messages``
-============
+.. rubric:: :h2:`messages`
 
 A framework for storing and retrieving temporary cookie- or session-based
 messages
 
 See the :doc:`messages documentation </ref/contrib/messages>`.
 
-``postgres``
-============
+.. rubric:: :h2:`postgres`
 
 A collection of PostgreSQL specific features.
 
 See the :doc:`contrib.postgres documentation </ref/contrib/postgres/index>`.
 
-``redirects``
-=============
+.. rubric:: :h2:`redirects`
 
 A framework for managing redirects.
 
 See the :doc:`redirects documentation </ref/contrib/redirects>`.
 
-``sessions``
-============
+.. rubric:: :h2:`sessions`
 
 A framework for storing data in anonymous sessions.
 
 See the :doc:`sessions documentation </topics/http/sessions>`.
 
-``sites``
-=========
+.. rubric:: :h2:`sites`
 
 A light framework that lets you operate multiple websites off of the same
 database and Django installation. It gives you hooks for associating objects to
@@ -120,22 +116,19 @@ one or more sites.
 
 See the :doc:`sites documentation </ref/contrib/sites>`.
 
-``sitemaps``
-============
+.. rubric:: :h2:`sitemaps`
 
 A framework for generating Google sitemap XML files.
 
 See the :doc:`sitemaps documentation </ref/contrib/sitemaps>`.
 
-``syndication``
-===============
+.. rubric:: :h2:`syndication`
 
 A framework for generating syndication feeds, in RSS and Atom, quite easily.
 
 See the :doc:`syndication documentation </ref/contrib/syndication>`.
 
-Other add-ons
-=============
+.. rubric:: :h2:`Other add-ons`
 
 If you have an idea for functionality to include in ``contrib``, let us know!
 Code it up, and post it to the |django-users| mailing list.

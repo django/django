@@ -59,6 +59,7 @@ blockquote { padding: 0 1em; margin: 1em 0; font:125%/1.2em "Trebuchet MS", sans
 strong { font-weight: bold; }
 em { font-style: italic; }
 ins { font-weight: bold; text-decoration: none; }
+.rubric > .heading { font-size:175%; margin-bottom:.6em; line-height:1.2em; color:#092e20; }
 
 /*** lists ***/
 ul { padding-left:30px; }
