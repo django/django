@@ -63,6 +63,15 @@ class Tests(TestCase):
         with self.assertRaisesMessage(NotSupportedError, msg):
             connection.ops.check_expression_support(aggregate)
 
+    def test_distinct_aggregation_multiple_args_no_distinct(self):
+        # Aggregate functions accept multiple arguments when DISTINCT isn't
+        # used, e.g. GROUP_CONCAT().
+        class DistinctAggregate(Aggregate):
+            allow_distinct = True
+
+        aggregate = DistinctAggregate('first', 'second', distinct=False)
+        connection.ops.check_expression_support(aggregate)
+
     def test_memory_db_test_name(self):
         """A named in-memory db should be allowed where supported."""
         from django.db.backends.sqlite3.base import DatabaseWrapper

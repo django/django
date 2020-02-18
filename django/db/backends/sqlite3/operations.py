@@ -56,7 +56,11 @@ class DatabaseOperations(BaseDatabaseOperations):
                             'aggregations on date/time fields in sqlite3 '
                             'since date/time is saved as text.'
                         )
-        if isinstance(expression, models.Aggregate) and len(expression.source_expressions) > 1:
+        if (
+            isinstance(expression, models.Aggregate) and
+            expression.distinct and
+            len(expression.source_expressions) > 1
+        ):
             raise NotSupportedError(
                 "SQLite doesn't support DISTINCT on aggregate functions "
                 "accepting multiple arguments."
