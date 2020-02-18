@@ -1,5 +1,7 @@
 import datetime
 
+import pytz
+
 from django.test import TestCase, override_settings
 from django.utils import timezone
 
@@ -88,6 +90,40 @@ class DateTimesTests(TestCase):
         Article.objects.create(title="First one", pub_date=now)
         qs = Article.objects.datetimes('pub_date', 'second')
         self.assertEqual(qs[0], now)
+
+    @override_settings(USE_TZ=True, TIME_ZONE='UTC')
+    def test_datetimes_ambiguous_and_invalid_times(self):
+        sao = pytz.timezone('America/Sao_Paulo')
+        utc = pytz.UTC
+        article = Article.objects.create(
+            title='Article 1',
+            pub_date=utc.localize(datetime.datetime(2016, 2, 21, 1)),
+        )
+        Comment.objects.create(
+            article=article,
+            pub_date=utc.localize(datetime.datetime(2016, 10, 16, 13)),
+        )
+        with timezone.override(sao):
+            with self.assertRaisesMessage(pytz.AmbiguousTimeError, '2016-02-20 23:00:00'):
+                Article.objects.datetimes('pub_date', 'hour').get()
+            with self.assertRaisesMessage(pytz.NonExistentTimeError, '2016-10-16 00:00:00'):
+                Comment.objects.datetimes('pub_date', 'day').get()
+            self.assertEqual(
+                Article.objects.datetimes('pub_date', 'hour', is_dst=False).get().dst(),
+                datetime.timedelta(0),
+            )
+            self.assertEqual(
+                Comment.objects.datetimes('pub_date', 'day', is_dst=False).get().dst(),
+                datetime.timedelta(0),
+            )
+            self.assertEqual(
+                Article.objects.datetimes('pub_date', 'hour', is_dst=True).get().dst(),
+                datetime.timedelta(0, 3600),
+            )
+            self.assertEqual(
+                Comment.objects.datetimes('pub_date', 'hour', is_dst=True).get().dst(),
+                datetime.timedelta(0, 3600),
+            )
 
     def test_datetimes_returns_available_dates_for_given_scope_and_given_field(self):
         pub_dates = [

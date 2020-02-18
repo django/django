@@ -324,6 +324,9 @@ Models
   :meth:`~.RelatedManager.set` methods now accept callables as values in the
   ``through_defaults`` argument.
 
+* The new ``is_dst``  parameter of the :meth:`.QuerySet.datetimes` determines
+  the treatment of nonexistent and ambiguous datetimes.
+
 Pagination
 ~~~~~~~~~~
 
