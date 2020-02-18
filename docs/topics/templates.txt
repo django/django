@@ -645,7 +645,7 @@ creating an object that specifies the following attributes:
 * ``'name'``: The full path to the template.
 
 * ``'template_name'``: The relative path to the template as passed into the
-  the template loading methods.
+  template loading methods.
 
 * ``'loader_name'``: An optional string identifying the function or class used
   to load the template, e.g. ``django.template.loaders.filesystem.Loader``.
