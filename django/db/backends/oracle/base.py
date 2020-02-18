@@ -497,7 +497,10 @@ class FormatStylePlaceholderCursor:
             # params_dict = {0.75: ':arg0', 2: ':arg1', 'sth': ':arg2'}
             # args = [':arg0', ':arg1', ':arg0', ':arg2', ':arg0']
             # params = {':arg0': 0.75, ':arg1': 2, ':arg2': 'sth'}
-            params_dict = {param: ':arg%d' % i for i, param in enumerate(set(params))}
+            params_dict = {
+                param: ':arg%d' % i
+                for i, param in enumerate(dict.fromkeys(params))
+            }
             args = [params_dict[param] for param in params]
             params = {value: key for key, value in params_dict.items()}
             query = query % tuple(args)

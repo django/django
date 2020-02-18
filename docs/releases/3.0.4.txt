@@ -20,3 +20,6 @@ Bugfixes
   related fields or parent link fields with :ref:`multi-table-inheritance` in
   the ``of`` argument, the corresponding models were not locked
   (:ticket:`31246`).
+
+* Fixed a regression in Django 3.0 that caused misplacing parameters in logged
+  SQL queries on Oracle (:ticket:`31271`).
