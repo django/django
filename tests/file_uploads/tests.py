@@ -6,12 +6,13 @@ import sys
 import tempfile as sys_tempfile
 import unittest
 from io import BytesIO, StringIO
+from unittest import mock
 from urllib.parse import quote
 
 from django.core.files import temp as tempfile
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.http.multipartparser import (
-    MultiPartParser, MultiPartParserError, parse_header,
+    FILE, MultiPartParser, MultiPartParserError, Parser, parse_header,
 )
 from django.test import SimpleTestCase, TestCase, client, override_settings
 
@@ -440,6 +441,30 @@ class FileUploadTests(TestCase):
             temp_file.write(b'a')
             temp_file.seek(0)
             response = self.client.post('/temp_file/stop_upload/', {'file': temp_file})
+            temp_path = response.json()['temp_path']
+            self.assertIs(os.path.exists(temp_path), False)
+
+    def test_upload_interrupted_temporary_file_handler(self):
+        # Simulate an interrupted upload by omitting the closing boundary.
+        class MockedParser(Parser):
+            def __iter__(self):
+                for item in super().__iter__():
+                    item_type, meta_data, field_stream = item
+                    yield item_type, meta_data, field_stream
+                    if item_type == FILE:
+                        return
+
+        with tempfile.NamedTemporaryFile() as temp_file:
+            temp_file.write(b'a')
+            temp_file.seek(0)
+            with mock.patch(
+                'django.http.multipartparser.Parser',
+                MockedParser,
+            ):
+                response = self.client.post(
+                    '/temp_file/upload_interrupted/',
+                    {'file': temp_file},
+                )
             temp_path = response.json()['temp_path']
             self.assertIs(os.path.exists(temp_path), False)
 

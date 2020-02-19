@@ -14,6 +14,7 @@ urlpatterns = [
     path('getlist_count/', views.file_upload_getlist_count),
     path('upload_errors/', views.file_upload_errors),
     path('temp_file/stop_upload/', views.file_stop_upload_temporary_file),
+    path('temp_file/upload_interrupted/', views.file_upload_interrupted_temporary_file),
     path('filename_case/', views.file_upload_filename_case_view),
     re_path(r'^fd_closing/(?P<access>t|f)/$', views.file_upload_fd_closing),
 ]

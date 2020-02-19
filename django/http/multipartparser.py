@@ -150,6 +150,8 @@ class MultiPartParser:
         num_post_keys = 0
         # To limit the amount of data read from the request.
         read_size = None
+        # Whether a file upload is finished.
+        uploaded_file = True
 
         try:
             for item_type, meta_data, field_stream in Parser(stream, self._boundary):
@@ -159,6 +161,7 @@ class MultiPartParser:
                     # we hit the next boundary/part of the multipart content.
                     self.handle_file_complete(old_field_name, counters)
                     old_field_name = None
+                    uploaded_file = True
 
                 try:
                     disposition = meta_data['content-disposition'][1]
@@ -225,6 +228,7 @@ class MultiPartParser:
                         content_length = None
 
                     counters = [0] * len(handlers)
+                    uploaded_file = False
                     try:
                         for handler in handlers:
                             try:
@@ -279,6 +283,9 @@ class MultiPartParser:
             if not e.connection_reset:
                 exhaust(self._input_data)
         else:
+            if not uploaded_file:
+                for handler in handlers:
+                    handler.upload_interrupted()
             # Make sure that the request data is all fed
             exhaust(self._input_data)
 

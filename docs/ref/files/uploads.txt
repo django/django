@@ -212,6 +212,13 @@ attributes:
 
     Callback signaling that the entire upload (all files) has completed.
 
+.. method:: FileUploadHandler.upload_interrupted()
+
+    .. versionadded:: 3.2
+
+    Callback signaling that the upload was interrupted, e.g. when the user
+    closed their browser during file upload.
+
 .. method:: FileUploadHandler.handle_raw_input(input_data, META, content_length, boundary, encoding)
 
     Allows the handler to completely override the parsing of the raw

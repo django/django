@@ -195,8 +195,9 @@ File Storage
 File Uploads
 ~~~~~~~~~~~~
 
-* ...
-
+* The new :meth:`FileUploadHandler.upload_interrupted()
+  <django.core.files.uploadhandler.FileUploadHandler.upload_interrupted>`
+  callback allows handling interrupted uploads.
 
 Forms
 ~~~~~
