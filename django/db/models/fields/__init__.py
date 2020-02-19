@@ -335,12 +335,15 @@ class Field(RegisterLookupMixin):
         else:
             return []
 
-    def _check_backend_specific_checks(self, **kwargs):
+    def _check_backend_specific_checks(self, databases=None, **kwargs):
+        if databases is None:
+            return []
         app_label = self.model._meta.app_label
-        for db in connections:
-            if router.allow_migrate(db, app_label, model_name=self.model._meta.model_name):
-                return connections[db].validation.check_field(self, **kwargs)
-        return []
+        errors = []
+        for alias in databases:
+            if router.allow_migrate(alias, app_label, model_name=self.model._meta.model_name):
+                errors.extend(connections[alias].validation.check_field(self, **kwargs))
+        return errors
 
     def _check_validators(self):
         errors = []
