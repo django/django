@@ -7,7 +7,7 @@ from django.apps import apps
 from django.conf import settings
 from django.core.exceptions import FieldDoesNotExist
 from django.db import connections
-from django.db.models import AutoField, Manager, OrderWrt
+from django.db.models import AutoField, Manager, OrderWrt, UniqueConstraint
 from django.db.models.query_utils import PathInfo
 from django.utils.datastructures import ImmutableList, OrderedSet
 from django.utils.functional import cached_property
@@ -826,6 +826,18 @@ class Options:
         # Store result into cache for later access
         self._get_fields_cache[cache_key] = fields
         return fields
+
+    @cached_property
+    def total_unique_constraints(self):
+        """
+        Return a list of total unique constraints. Useful for determining set
+        of fields guaranteed to be unique for all rows.
+        """
+        return [
+            constraint
+            for constraint in self.constraints
+            if isinstance(constraint, UniqueConstraint) and constraint.condition is None
+        ]
 
     @cached_property
     def _property_names(self):
