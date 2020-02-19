@@ -1039,10 +1039,6 @@ class ChangeListTests(TestCase):
             (['field', '-other_field'], ['field', '-other_field']),
             # Composite unique nullable.
             (['-field', 'null_field'], ['-field', 'null_field', '-pk']),
-            # Composite unique nullable.
-            (['-field', 'null_field'], ['-field', 'null_field', '-pk']),
-            # Composite unique nullable.
-            (['-field', 'null_field'], ['-field', 'null_field', '-pk']),
             # Composite unique and nullable.
             (['-field', 'null_field', 'other_field'], ['-field', 'null_field', 'other_field']),
             # Composite unique attnames.
