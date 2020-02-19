@@ -528,6 +528,10 @@ class ForeignObject(RelatedField):
             frozenset(ut)
             for ut in self.remote_field.model._meta.unique_together
         })
+        unique_foreign_fields.update({
+            frozenset(uc.fields)
+            for uc in self.remote_field.model._meta.total_unique_constraints
+        })
         foreign_fields = {f.name for f in self.foreign_related_fields}
         has_unique_constraint = any(u <= foreign_fields for u in unique_foreign_fields)
 
@@ -541,8 +545,10 @@ class ForeignObject(RelatedField):
                     "No subset of the fields %s on model '%s' is unique."
                     % (field_combination, model_name),
                     hint=(
-                        "Add unique=True on any of those fields or add at "
-                        "least a subset of them to a unique_together constraint."
+                        'Mark a single field as unique=True or add a set of '
+                        'fields to a unique constraint (via unique_together '
+                        'or a UniqueConstraint (without condition) in the '
+                        'model Meta.constraints).'
                     ),
                     obj=self,
                     id='fields.E310',
@@ -553,8 +559,13 @@ class ForeignObject(RelatedField):
             model_name = self.remote_field.model.__name__
             return [
                 checks.Error(
-                    "'%s.%s' must set unique=True because it is referenced by "
+                    "'%s.%s' must be unique because it is referenced by "
                     "a foreign key." % (model_name, field_name),
+                    hint=(
+                        'Add unique=True to this field or add a '
+                        'UniqueConstraint (without condition) in the model '
+                        'Meta.constraints.'
+                    ),
                     obj=self,
                     id='fields.E311',
                 )

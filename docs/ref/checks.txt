@@ -220,7 +220,7 @@ Related fields
   ``'__'``.
 * **fields.E310**: No subset of the fields ``<field1>``, ``<field2>``, ... on
   model ``<model>`` is unique.
-* **fields.E311**: ``<model>`` must set ``unique=True`` because it is
+* **fields.E311**: ``<model>.<field name>`` must be unique because it is
   referenced by a ``ForeignKey``.
 * **fields.E312**: The ``to_field`` ``<field name>`` doesn't exist on the
   related model ``<app label>.<model>``.
