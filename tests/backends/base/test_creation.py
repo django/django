@@ -5,7 +5,7 @@ from django.db import DEFAULT_DB_ALIAS, connection, connections
 from django.db.backends.base.creation import (
     TEST_DATABASE_PREFIX, BaseDatabaseCreation,
 )
-from django.test import SimpleTestCase
+from django.test import SimpleTestCase, TransactionTestCase
 
 from ..models import Object, ObjectReference
 
@@ -77,8 +77,8 @@ class TestDbCreationTests(SimpleTestCase):
                 creation.destroy_test_db(old_database_name, verbosity=0)
 
 
-class TestDeserializeDbFromString(SimpleTestCase):
-    databases = {'default'}
+class TestDeserializeDbFromString(TransactionTestCase):
+    available_apps = ['backends']
 
     def test_circular_reference(self):
         # deserialize_db_from_string() handles circular references.
