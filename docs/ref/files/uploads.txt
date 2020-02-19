@@ -231,3 +231,12 @@ attributes:
     Return ``None`` if you want upload handling to continue, or a tuple of
     ``(POST, FILES)`` if you want to return the new data structures suitable
     for the request directly.
+
+.. method:: FileUploadHandler.upload_stopped()
+
+    .. versionadded:: 3.2
+
+    Signals that a file upload has been interrupted. (For example: Closing the
+    browser before the upload could be completed.) Removes
+    ``TemporaryUploadedFile`` objects from the temporary folder of the device
+    upon upload interruption.

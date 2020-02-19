@@ -275,6 +275,8 @@ class MultiPartParser:
                     # If this is neither a FIELD or a FILE, just exhaust the stream.
                     exhaust(stream)
         except StopUpload as e:
+            for handler in handlers:
+                handler.upload_stopped()
             self._close_files()
             if not e.connection_reset:
                 exhaust(self._input_data)

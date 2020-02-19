@@ -1,7 +1,7 @@
 """
 Base file upload handler classes, and the built-in concrete subclasses
 """
-
+import os
 from io import BytesIO
 
 from django.conf import settings
@@ -127,6 +127,22 @@ class FileUploadHandler:
         """
         pass
 
+<<<<<<< HEAD
+<<<<<<< HEAD
+    def upload_stop(self):
+=======
+    def upload_interrupted(self):
+>>>>>>> 910d064828... Fixed #30422 -- Added a method to FileUploadHandler to signal upload interruption.
+=======
+    def upload_stopped(self):
+>>>>>>> 68a1c333b0... Changed handler name and added version in docs
+        """
+        Signal that the upload has been interrupted. (Example: The browser was closed
+        before the upload was finished). Subclasses should perform cleanup that
+        is necessary for this handler.
+        """
+        pass
+
 
 class TemporaryFileUploadHandler(FileUploadHandler):
     """
@@ -146,6 +162,14 @@ class TemporaryFileUploadHandler(FileUploadHandler):
         self.file.seek(0)
         self.file.size = file_size
         return self.file
+
+    def upload_stopped(self):
+        temp_location = self.file.temporary_file_path()
+        try:
+            self.file.close()
+            os.remove(temp_location)
+        except FileNotFoundError:
+            pass
 
 
 class MemoryFileUploadHandler(FileUploadHandler):
