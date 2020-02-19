@@ -4,6 +4,9 @@ from django.contrib.auth.backends import RemoteUserBackend
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.deprecation import MiddlewareMixin
 from django.utils.functional import SimpleLazyObject
+from django.shortcuts import redirect
+from django.urls import resolve
+from django.conf import settings
 
 
 def get_user(request):
@@ -120,3 +123,44 @@ class PersistentRemoteUserMiddleware(RemoteUserMiddleware):
     the application wants to use Django's authentication mechanism.
     """
     force_logout_if_no_header = False
+
+
+class ReplaceAuthMiddleware:
+    def __init__(self, get_response):
+        self.get_response = get_response
+        self.unauthorized_urls_for_logged_user = settings.REPLACE_URL_IF_LOGGED["replace"]
+        self.unauthorized_urls_for_unlogged_user = settings.REPLACE_URL_IF_UNLOGGED["replace"]
+        self.redirect_url_for_unauthorized_logged_user = settings.REPLACE_URL_IF_LOGGED["by"]
+        self.redirect_url_for_unauthorized_unlogged_user = settings.REPLACE_URL_IF_UNLOGGED["by"]
+
+    def __call__(self, request):
+
+        # Before the response of the view changes, checks if the url is authorized or not.
+        if self.unauthorized_url_for_logged_user(request):
+            return redirect(self.redirect_url_for_unauthorized_logged_user)
+        elif self.unauthorized_url_for_unlogged_user(request):
+            return redirect(self.redirect_url_for_unauthorized_unlogged_user)
+
+        # Get the response of the view.
+        response = self.get_response(request)
+
+        # After the response of the view changes, checks if the url is authorized or not.
+        if self.unauthorized_url_for_logged_user(request):
+            return redirect(self.redirect_url_for_unauthorized_logged_user)
+        elif self.unauthorized_url_for_unlogged_user(request):
+            return redirect(self.redirect_url_for_unauthorized_unlogged_user)
+
+        # Return the default response of the view if no redirection is needed.
+        return response
+
+    @staticmethod
+    def user_is_logged(request):
+        return hasattr(request, 'user') and request.user.is_authenticated
+
+    def unauthorized_url_for_unlogged_user(self, request):
+        return not self.user_is_logged(request) and resolve(
+            request.path_info).url_name in self.unauthorized_urls_for_unlogged_user
+
+    def unauthorized_url_for_logged_user(self, request):
+        return self.user_is_logged(request) and resolve(
+            request.path_info).url_name in self.unauthorized_urls_for_logged_user
