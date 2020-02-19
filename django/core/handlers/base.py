@@ -115,30 +115,21 @@ class BaseHandler:
                 response = self.process_exception_by_middleware(e, request)
 
         # Complain if the view returned None (a common error).
-        if response is None:
-            if isinstance(callback, types.FunctionType):    # FBV
-                view_name = callback.__name__
-            else:                                           # CBV
-                view_name = callback.__class__.__name__ + '.__call__'
-
-            raise ValueError(
-                "The view %s.%s didn't return an HttpResponse object. It "
-                "returned None instead." % (callback.__module__, view_name)
-            )
+        self.check_response(response, callback)
 
         # If the response supports deferred rendering, apply template
         # response middleware and then render the response
-        elif hasattr(response, 'render') and callable(response.render):
+        if hasattr(response, 'render') and callable(response.render):
             for middleware_method in self._template_response_middleware:
                 response = middleware_method(request, response)
                 # Complain if the template response middleware returned None (a common error).
-                if response is None:
-                    raise ValueError(
-                        "%s.process_template_response didn't return an "
-                        "HttpResponse object. It returned None instead."
-                        % (middleware_method.__self__.__class__.__name__)
+                self.check_response(
+                    response,
+                    middleware_method,
+                    name='%s.process_template_response' % (
+                        middleware_method.__self__.__class__.__name__,
                     )
-
+                )
             try:
                 response = response.render()
             except Exception as e:
@@ -156,6 +147,23 @@ class BaseHandler:
             if response:
                 return response
         raise
+
+    def check_response(self, response, callback, name=None):
+        """Raise an error if the view returned None."""
+        if response is not None:
+            return
+        if not name:
+            if isinstance(callback, types.FunctionType):  # FBV
+                name = 'The view %s.%s' % (callback.__module__, callback.__name__)
+            else:  # CBV
+                name = 'The view %s.%s.__call__' % (
+                    callback.__module__,
+                    callback.__class__.__name__,
+                )
+        raise ValueError(
+            "%s didn't return an HttpResponse object. It returned None "
+            "instead." % name
+        )
 
 
 def reset_urlconf(sender, **kwargs):
