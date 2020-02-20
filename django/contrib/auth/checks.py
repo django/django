@@ -41,6 +41,11 @@ def check_user_model(app_configs=None, **kwargs):
             checks.Error(
                 "The field named as the 'USERNAME_FIELD' "
                 "for a custom user model must not be included in 'REQUIRED_FIELDS'.",
+                hint=(
+                    "The 'USERNAME_FIELD' is currently set to '%s', you "
+                    "should remove '%s' from the 'REQUIRED_FIELDS'."
+                    % (cls.USERNAME_FIELD, cls.USERNAME_FIELD)
+                ),
                 obj=cls,
                 id='auth.E002',
             )

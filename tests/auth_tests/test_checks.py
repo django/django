@@ -49,6 +49,10 @@ class UserModelChecksTests(SimpleTestCase):
             checks.Error(
                 "The field named as the 'USERNAME_FIELD' for a custom user model "
                 "must not be included in 'REQUIRED_FIELDS'.",
+                hint=(
+                    "The 'USERNAME_FIELD' is currently set to 'username', you "
+                    "should remove 'username' from the 'REQUIRED_FIELDS'."
+                ),
                 obj=CustomUserBadRequiredFields,
                 id='auth.E002',
             ),
