@@ -54,6 +54,11 @@ This is in addition to our existing WSGI support. Django intends to support
 both for the foreseeable future. Async features will only be available to
 applications that run under ASGI, however.
 
+At this stage async support only applies to the outer ASGI application.
+Internally everything remains synchronous. Asynchronous middleware, views, etc.
+are not yet supported. You can, however, use ASGI middleware around Django's
+application, allowing you to combine Django with other ASGI frameworks.
+
 There is no need to switch your applications over unless you want to start
 experimenting with asynchronous code, but we have
 :doc:`documentation on deploying with ASGI </howto/deployment/asgi/index>` if
