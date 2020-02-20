@@ -5,6 +5,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.core.checks import Error
 from django.core.exceptions import FieldDoesNotExist, FieldError
 from django.db import models
+from django.db.models.query_utils import DeferredAttribute
 from django.test import SimpleTestCase
 from django.test.utils import isolate_apps
 
@@ -348,3 +349,33 @@ class AbstractInheritanceTests(SimpleTestCase):
                 ('name', models.CharField),
             ]
         )
+
+    def test_shadow_parent_attribute_with_field(self):
+        class Base(models.Model):
+            foo = 1
+
+        class Inherited(Base):
+            foo = models.IntegerField()
+
+        self.assertEqual(type(Inherited.foo), DeferredAttribute)
+
+    def test_shadow_parent_property_with_field(self):
+        class Base(models.Model):
+            @property
+            def foo(self):
+                pass
+
+        class Inherited(Base):
+            foo = models.IntegerField()
+
+        self.assertEqual(type(Inherited.foo), DeferredAttribute)
+
+    def test_shadow_parent_method_with_field(self):
+        class Base(models.Model):
+            def foo(self):
+                pass
+
+        class Inherited(Base):
+            foo = models.IntegerField()
+
+        self.assertEqual(type(Inherited.foo), DeferredAttribute)

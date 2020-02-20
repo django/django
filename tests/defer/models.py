@@ -23,6 +23,14 @@ class Child(Primary):
     pass
 
 
+class ShadowParent(models.Model):
+    name = 'aphrodite'
+
+
+class ShadowChild(ShadowParent):
+    name = models.CharField(default='adonis', max_length=6)
+
+
 class BigChild(Primary):
     other = models.CharField(max_length=50)
 

@@ -1089,10 +1089,8 @@ class OtherModelTests(SimpleTestCase):
         class Model(models.Model):
             fk = models.ForeignKey('self', models.CASCADE)
 
-            @property
-            def fk_id(self):
-                pass
-
+        # Override related field accessor.
+        Model.fk_id = property(lambda self: 'ERROR')
         self.assertEqual(Model.check(), [
             Error(
                 "The property 'fk_id' clashes with a related field accessor.",

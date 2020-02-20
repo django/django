@@ -3,6 +3,7 @@ from django.test import TestCase
 
 from .models import (
     BigChild, Child, ChildProxy, Primary, RefreshPrimaryProxy, Secondary,
+    ShadowChild,
 )
 
 
@@ -209,6 +210,16 @@ class BigChildDeferTests(AssertionMixin, TestCase):
         self.assertEqual(obj.name, "b1")
         self.assertEqual(obj.value, "foo")
         self.assertEqual(obj.other, "bar")
+
+
+class ShadowDeferTests(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.s1 = ShadowChild.objects.create()
+
+    def test_defer(self):
+        obj = ShadowChild.objects.defer('name').get()
+        self.assertEqual(obj.name, 'adonis')
 
 
 class TestDefer2(AssertionMixin, TestCase):
