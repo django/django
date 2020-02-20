@@ -250,12 +250,14 @@ class DebugViewTests(SimpleTestCase):
             self.assertContains(response, 'Page not found', status_code=404)
 
     def test_exception_reporter_from_request(self):
-        response = self.client.get('/custom_reporter_class_view/')
+        with self.assertLogs('django.request', 'ERROR'):
+            response = self.client.get('/custom_reporter_class_view/')
         self.assertContains(response, 'custom traceback text', status_code=500)
 
     @override_settings(DEFAULT_EXCEPTION_REPORTER='view_tests.views.CustomExceptionReporter')
     def test_exception_reporter_from_settings(self):
-        response = self.client.get('/raises500/')
+        with self.assertLogs('django.request', 'ERROR'):
+            response = self.client.get('/raises500/')
         self.assertContains(response, 'custom traceback text', status_code=500)
 
 
