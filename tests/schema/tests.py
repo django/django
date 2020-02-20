@@ -2958,7 +2958,7 @@ class SchemaTests(TransactionTestCase):
     def test_add_datefield_and_datetimefield_use_effective_default(self, mocked_datetime, mocked_tz):
         """
         effective_default() should be used for DateField, DateTimeField, and
-        TimeField if auto_now or auto_add_now is set (#25005).
+        TimeField if auto_now or auto_now_add is set (#25005).
         """
         now = datetime.datetime(month=1, day=1, year=2000, hour=1, minute=1)
         now_tz = datetime.datetime(month=1, day=1, year=2000, hour=1, minute=1, tzinfo=timezone.utc)
