@@ -251,6 +251,8 @@ Management Commands
   prior to executing the command. In previous versions, either all or none
   of the system checks were performed.
 
+* :djadmin:`flush` now supports ``skip-empty``.
+
 Migrations
 ~~~~~~~~~~
 
@@ -397,6 +399,9 @@ Tests
   functions passed to :func:`transaction.on_commit()
   <django.db.transaction.on_commit>` in a list. This allows you to test such
   callbacks without using the slower :class:`.TransactionTestCase`.
+
+* :class:`.TransactionTestCase` now uses ``--skip-empty=True`` when calling
+  :djadmin:`flush`.
 
 URLs
 ~~~~

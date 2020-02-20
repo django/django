@@ -1038,7 +1038,8 @@ class TransactionTestCase(SimpleTestCase):
             call_command('flush', verbosity=0, interactive=False,
                          database=db_name, reset_sequences=False,
                          allow_cascade=self.available_apps is not None,
-                         inhibit_post_migrate=inhibit_post_migrate)
+                         inhibit_post_migrate=inhibit_post_migrate,
+                         skip_empty=True)
 
     def assertQuerysetEqual(self, qs, values, transform=repr, ordered=True, msg=None):
         items = map(transform, qs)

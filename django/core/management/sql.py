@@ -2,11 +2,16 @@ from django.apps import apps
 from django.db import models
 
 
-def sql_flush(style, connection, reset_sequences=True, allow_cascade=False):
+def sql_flush(style, connection, reset_sequences=True, allow_cascade=False,
+              skip_empty=False):
     """
     Return a list of the SQL statements used to flush the database.
     """
-    tables = connection.introspection.django_table_names(only_existing=True, include_views=False)
+    tables = connection.introspection.django_table_names(
+        only_existing=True,
+        include_views=False,
+        skip_empty=skip_empty
+    )
     return connection.ops.sql_flush(
         style,
         tables,

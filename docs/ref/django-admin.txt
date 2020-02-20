@@ -385,6 +385,12 @@ Suppresses all user prompts.
 
 Specifies the database to flush. Defaults to ``default``.
 
+.. django-admin-option:: --skip-empty
+
+.. versionadded:: 3.2
+
+Only delete from tables containing rows.
+
 ``inspectdb``
 -------------
 

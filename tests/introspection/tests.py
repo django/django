@@ -53,6 +53,15 @@ class IntrospectionTests(TransactionTestCase):
             with connection.cursor() as cursor:
                 cursor.execute('DROP VIEW introspection_article_view')
 
+    def test_only_empty_tables_zero_rows(self):
+        tables = connection.introspection.django_table_names(skip_empty=True)
+        self.assertEqual(tables, [])
+
+    def test_skip_empty_tables_one_row(self):
+        City.objects.create(name="London")
+        tables = connection.introspection.django_table_names(skip_empty=True)
+        self.assertEqual(tables, ['introspection_city'])
+
     def test_unmanaged_through_model(self):
         tables = connection.introspection.django_table_names()
         self.assertNotIn(ArticleReporter._meta.db_table, tables)

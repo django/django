@@ -36,6 +36,20 @@ class BaseDatabaseIntrospection:
         """
         return name
 
+    def exclude_empty_tables(self, tables):
+        """Exclude tables with zero rows from the provided list of tables."""
+        if not tables:
+            return []
+        limit = self.connection.ops.limit_offset_sql(0, 1)
+        sql = ' UNION '.join([
+            "(SELECT '{}' FROM {} {})".format(
+                table, self.connection.ops.quote_name(table), limit)
+            for table in tables
+        ])
+        with self.connection.cursor() as cursor:
+            cursor.execute(sql)
+            return [row[0] for row in cursor.fetchall()]
+
     def table_names(self, cursor=None, include_views=False):
         """
         Return a list of names of all tables that exist in the database.
@@ -78,7 +92,7 @@ class BaseDatabaseIntrospection:
             if model._meta.can_migrate(self.connection)
         )
 
-    def django_table_names(self, only_existing=False, include_views=True):
+    def django_table_names(self, only_existing=False, include_views=True, skip_empty=False):
         """
         Return a list of all table names that have associated Django models and
         are in INSTALLED_APPS.
@@ -102,6 +116,8 @@ class BaseDatabaseIntrospection:
                 for t in tables
                 if self.identifier_converter(t) in existing_tables
             ]
+        if skip_empty:
+            tables = self.exclude_empty_tables(tables)
         return tables
 
     def installed_models(self, tables):

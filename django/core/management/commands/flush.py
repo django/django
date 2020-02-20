@@ -23,12 +23,17 @@ class Command(BaseCommand):
             '--database', default=DEFAULT_DB_ALIAS,
             help='Nominates a database to flush. Defaults to the "default" database.',
         )
+        parser.add_argument(
+            '--skip-empty', action='store_true',
+            help='Only delete from tables containing rows.',
+        )
 
     def handle(self, **options):
         database = options['database']
         connection = connections[database]
         verbosity = options['verbosity']
         interactive = options['interactive']
+        skip_empty = options['skip_empty']
         # The following are stealth options used by Django's internals.
         reset_sequences = options.get('reset_sequences', True)
         allow_cascade = options.get('allow_cascade', False)
@@ -46,7 +51,8 @@ class Command(BaseCommand):
 
         sql_list = sql_flush(self.style, connection,
                              reset_sequences=reset_sequences,
-                             allow_cascade=allow_cascade)
+                             allow_cascade=allow_cascade,
+                             skip_empty=skip_empty)
 
         if interactive:
             confirm = input("""You have requested a flush of the database.

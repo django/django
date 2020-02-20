@@ -29,7 +29,7 @@ class TestSerializedRollbackInhibitsPostMigrate(TransactionTestCase):
         call_command.assert_called_with(
             'flush', interactive=False, allow_cascade=False,
             reset_sequences=False, inhibit_post_migrate=True,
-            database='default', verbosity=0,
+            database='default', verbosity=0, skip_empty=True,
         )
 
 

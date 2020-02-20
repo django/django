@@ -67,6 +67,27 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
             return 'JSONField'
         return field_type
 
+    def exclude_empty_tables(self, tables):
+        """Exclude tables with zero rows from the provided list of tables."""
+        if not tables:
+            return []
+        BATCH_SIZE = 999 // 2
+        if len(tables) > BATCH_SIZE:
+            results = []
+            for index in range(0, len(tables), BATCH_SIZE):
+                chunk = tables[index:index + BATCH_SIZE]
+                results += self.exclude_empty_tables(chunk)
+            return results
+        limit = self.connection.ops.limit_offset_sql(0, 1)
+        sql = ' UNION '.join([
+            "SELECT * FROM (SELECT '{}' FROM {} {})".format(
+                table, self.connection.ops.quote_name(table), limit)
+            for table in tables
+        ])
+        with self.connection.cursor() as cursor:
+            cursor.execute(sql)
+            return [row[0] for row in cursor.fetchall()]
+
     def get_table_list(self, cursor):
         """Return a list of table and view names in the current database."""
         # Skip the sqlite_sequence system table used for autoincrement key
