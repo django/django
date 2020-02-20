@@ -47,8 +47,9 @@ class UserModelChecksTests(SimpleTestCase):
         errors = checks.run_checks(self.apps.get_app_configs())
         self.assertEqual(errors, [
             checks.Error(
-                "The field named as the 'USERNAME_FIELD' for a custom user model "
-                "must not be included in 'REQUIRED_FIELDS'.",
+                "The 'USERNAME_FIELD' in your custom user model "
+                "is currently set to '%s'. Please remove '%s' "
+                "from your 'REQUIRED_FIELDS' definition." % (CustomUserBadRequiredFields.USERNAME_FIELD, CustomUserBadRequiredFields.USERNAME_FIELD),
                 obj=CustomUserBadRequiredFields,
                 id='auth.E002',
             ),
