@@ -499,11 +499,6 @@ There are a few restrictions on the intermediate model:
   must also specify ``through_fields`` as above, or a validation error
   will be raised.
 
-* When defining a many-to-many relationship from a model to
-  itself, using an intermediary model, you *must* use
-  :attr:`symmetrical=False <ManyToManyField.symmetrical>` (see
-  :ref:`the model field reference <manytomany-arguments>`).
-
 Now that you have set up your :class:`~django.db.models.ManyToManyField` to use
 your intermediary model (``Membership``, in this case), you're ready to start
 creating some many-to-many relationships. You do this by creating instances of
