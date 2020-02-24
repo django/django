@@ -434,6 +434,37 @@ class DistanceFunctionsTests(FuncTestMixin, TestCase):
         ).filter(d=D(m=1))
         self.assertTrue(qs.exists())
 
+    @unittest.skipUnless(
+        connection.vendor == 'oracle',
+        'Oracle supports tolerance paremeter.',
+    )
+    def test_distance_function_tolerance_escaping(self):
+        qs = Interstate.objects.annotate(
+            d=Distance(
+                Point(500, 500, srid=3857),
+                Point(0, 0, srid=3857),
+                tolerance='0.05) = 1 OR 1=1 OR (1+1',
+            ),
+        ).filter(d=D(m=1)).values('pk')
+        msg = 'The tolerance parameter has the wrong type'
+        with self.assertRaisesMessage(TypeError, msg):
+            qs.exists()
+
+    @unittest.skipUnless(
+        connection.vendor == 'oracle',
+        'Oracle supports tolerance paremeter.',
+    )
+    def test_distance_function_tolerance(self):
+        # Tolerance is greater than distance.
+        qs = Interstate.objects.annotate(
+            d=Distance(
+                Point(0, 0, srid=3857),
+                Point(1, 1, srid=3857),
+                tolerance=1.5,
+            ),
+        ).filter(d=0).values('pk')
+        self.assertIs(qs.exists(), True)
+
     @skipIfDBFeature("supports_distance_geodetic")
     @skipUnlessDBFeature("has_Distance_function")
     def test_distance_function_raw_result_d_lookup(self):
