@@ -1,4 +1,5 @@
 from django.contrib.gis.db.models.fields import ExtentField
+from django.db.models import Value
 from django.db.models.aggregates import Aggregate
 
 __all__ = ['Collect', 'Extent', 'Extent3D', 'MakeLine', 'Union']
@@ -16,11 +17,14 @@ class GeoAggregate(Aggregate):
         return super(GeoAggregate, self).as_sql(compiler, connection)
 
     def as_oracle(self, compiler, connection):
-        if not hasattr(self, 'tolerance'):
-            self.tolerance = 0.05
-        self.extra['tolerance'] = self.tolerance
         if not self.is_extent:
-            self.template = '%(function)s(SDOAGGRTYPE(%(expressions)s,%(tolerance)s))'
+            tolerance = self.extra.get('tolerance') or getattr(self, 'tolerance', 0.05)
+            clone = self.copy()
+            expressions = clone.get_source_expressions()
+            expressions.append(Value(tolerance))
+            clone.set_source_expressions(expressions)
+            clone.template = '%(function)s(SDOAGGRTYPE(%(expressions)s))'
+            return clone.as_sql(compiler, connection)
         return self.as_sql(compiler, connection)
 
     def resolve_expression(self, query=None, allow_joins=True, reuse=None, summarize=False, for_save=False):

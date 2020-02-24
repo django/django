@@ -1,6 +1,6 @@
 from __future__ import unicode_literals
 
-from unittest import skipIf
+from unittest import skipIf, skipUnless
 
 from django.contrib.gis.db.models.functions import (
     Area, Distance, Length, Perimeter, Transform,
@@ -587,6 +587,37 @@ class DistanceFunctionsTests(TestCase):
             ).order_by('id')
             for i, c in enumerate(qs):
                 self.assertAlmostEqual(sphere_distances[i], c.distance.m, tol)
+
+    @skipUnless(
+        connection.vendor == 'oracle',
+        'Oracle supports tolerance paremeter.',
+    )
+    def test_distance_function_tolerance_escaping(self):
+        qs = AustraliaCity.objects.annotate(
+            d=Distance(
+                'point',
+                Point(0, 0, srid=3857),
+                tolerance='0.05) = 1 OR 1=1 OR (1+1',
+            ),
+        ).filter(d=1).values('pk')
+        msg = 'The tolerance parameter has the wrong type'
+        with self.assertRaisesMessage(TypeError, msg):
+            qs.exists()
+
+    @skipUnless(
+        connection.vendor == 'oracle',
+        'Oracle supports tolerance paremeter.',
+    )
+    def test_distance_function_tolerance(self):
+        # Tolerance is greater than distance.
+        qs = AustraliaCity.objects.annotate(
+            d=Distance(
+                'point',
+                Point(151.23, -33.95, srid=4326),
+                tolerance=340.7,
+            ),
+        ).filter(d=0).values('pk')
+        self.assertIs(qs.exists(), True)
 
     @no_oracle  # Oracle already handles geographic distance calculation.
     @skipUnlessDBFeature("has_Distance_function", 'has_Transform_function')

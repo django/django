@@ -117,7 +117,11 @@ class OracleToleranceMixin(object):
     tolerance = 0.05
 
     def as_oracle(self, compiler, connection):
-        tol = self.extra.get('tolerance', self.tolerance)
+        tol = self._handle_param(
+            self.extra.get('tolerance', self.tolerance),
+            'tolerance',
+            NUMERIC_TYPES,
+        )
         self.template = "%%(function)s(%%(expressions)s, %s)" % tol
         return super(OracleToleranceMixin, self).as_sql(compiler, connection)
 
