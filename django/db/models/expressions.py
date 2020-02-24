@@ -562,6 +562,9 @@ class ResolvedOuterRef(F):
     def relabeled_clone(self, relabels):
         return self
 
+    def get_group_by_cols(self, alias=None):
+        return []
+
 
 class OuterRef(F):
     def resolve_expression(self, *args, **kwargs):
