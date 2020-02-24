@@ -1,6 +1,7 @@
 from django.contrib.gis.db.models.fields import (
     ExtentField, GeometryCollectionField, GeometryField, LineStringField,
 )
+from django.db.models import Value
 from django.db.models.aggregates import Aggregate
 from django.utils.functional import cached_property
 
@@ -27,9 +28,16 @@ class GeoAggregate(Aggregate):
         )
 
     def as_oracle(self, compiler, connection, **extra_context):
-        tolerance = self.extra.get('tolerance') or getattr(self, 'tolerance', 0.05)
-        template = None if self.is_extent else '%(function)s(SDOAGGRTYPE(%(expressions)s,%(tolerance)s))'
-        return self.as_sql(compiler, connection, template=template, tolerance=tolerance, **extra_context)
+        if not self.is_extent:
+            tolerance = self.extra.get('tolerance') or getattr(self, 'tolerance', 0.05)
+            clone = self.copy()
+            clone.set_source_expressions([
+                *self.get_source_expressions(),
+                Value(tolerance),
+            ])
+            template = '%(function)s(SDOAGGRTYPE(%(expressions)s))'
+            return clone.as_sql(compiler, connection, template=template, **extra_context)
+        return self.as_sql(compiler, connection, **extra_context)
 
     def resolve_expression(self, query=None, allow_joins=True, reuse=None, summarize=False, for_save=False):
         c = super().resolve_expression(query, allow_joins, reuse, summarize, for_save)
