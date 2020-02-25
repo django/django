@@ -239,15 +239,15 @@ The CSRF protection is based on the following things:
    set on the request.
 
    In order to protect against `BREACH`_ attacks, the token is not simply the
-   secret; a random salt is prepended to the secret and used to scramble it.
+   secret; a random mask is prepended to the secret and used to scramble it.
 
    For security reasons, the value of the secret is changed each time a
    user logs in.
 
 #. A hidden form field with the name 'csrfmiddlewaretoken' present in all
    outgoing POST forms. The value of this field is, again, the value of the
-   secret, with a salt which is both added to it and used to scramble it. The
-   salt is regenerated on every call to ``get_token()`` so that the form field
+   secret, with a mask which is both added to it and used to scramble it. The
+   mask is regenerated on every call to ``get_token()`` so that the form field
    value is changed in every such response.
 
    This part is done by the template tag.
