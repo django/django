@@ -1,12 +1,20 @@
 from datetime import datetime
 
 from django.core.exceptions import ValidationError
+from django.core.validators import MinLengthValidator
 from django.db import models
 
 
 def validate_answer_to_universe(value):
     if value != 42:
         raise ValidationError('This is not the answer to life, universe and everything!', code='not42')
+
+
+def validate_final_message(value):
+    if value != 'We apologize for the inconvenience':
+        raise ValidationError(
+            'This is not God\'s final message to his creation'
+        )
 
 
 class ModelToValidate(models.Model):
@@ -119,6 +127,14 @@ class GenericIPAddressTestModel(models.Model):
 
 class GenericIPAddrUnpackUniqueTest(models.Model):
     generic_v4unpack_ip = models.GenericIPAddressField(null=True, blank=True, unique=True, unpack_ipv4=True)
+
+
+class MultipleValidators(models.Model):
+    final_message = models.CharField(
+        max_length=100, validators=[
+            MinLengthValidator(34), validate_final_message
+        ]
+    )
 
 
 # A model can't have multiple AutoFields
