@@ -41,6 +41,12 @@ class SearchConfig(Expression):
             config = Value(config)
         self.config = config
 
+    @classmethod
+    def from_parameter(cls, config):
+        if config is None or isinstance(config, cls):
+            return config
+        return cls(config)
+
     def get_source_expressions(self):
         return [self.config]
 
@@ -75,7 +81,7 @@ class SearchVector(SearchVectorCombinable, Func):
     def __init__(self, *expressions, **extra):
         super().__init__(*expressions, **extra)
         config = self.extra.get('config', self.config)
-        self.config = SearchConfig(config) if config else None
+        self.config = SearchConfig.from_parameter(config)
         weight = self.extra.get('weight')
         if weight is not None and not hasattr(weight, 'resolve_expression'):
             weight = Value(weight)
@@ -162,7 +168,7 @@ class SearchQuery(SearchQueryCombinable, Value):
     }
 
     def __init__(self, value, output_field=None, *, config=None, invert=False, search_type='plain'):
-        self.config = SearchConfig(config) if config else None
+        self.config = SearchConfig.from_parameter(config)
         self.invert = invert
         if search_type not in self.SEARCH_TYPES:
             raise ValueError("Unknown search_type argument '%s'." % search_type)

@@ -6,13 +6,13 @@ All text copyright Python (Monty) Pictures. Thanks to sacred-texts.com for the
 transcript.
 """
 from django.contrib.postgres.search import (
-    SearchQuery, SearchRank, SearchVector,
+    SearchConfig, SearchQuery, SearchRank, SearchVector,
 )
 from django.db import connection
 from django.db.models import F
 from django.test import SimpleTestCase, modify_settings, skipUnlessDBFeature
 
-from . import PostgreSQLTestCase
+from . import PostgreSQLSimpleTestCase, PostgreSQLTestCase
 from .models import Character, Line, Scene
 
 
@@ -116,6 +116,13 @@ class SearchVectorFieldTest(GrailTestData, PostgreSQLTestCase):
     def test_single_coalesce_expression(self):
         searched = Line.objects.annotate(search=SearchVector('dialogue')).filter(search='cadeaux')
         self.assertNotIn('COALESCE(COALESCE', str(searched.query))
+
+
+class SearchConfigTests(PostgreSQLSimpleTestCase):
+    def test_from_parameter(self):
+        self.assertIsNone(SearchConfig.from_parameter(None))
+        self.assertEqual(SearchConfig.from_parameter('foo'), SearchConfig('foo'))
+        self.assertEqual(SearchConfig.from_parameter(SearchConfig('bar')), SearchConfig('bar'))
 
 
 class MultipleFieldsTest(GrailTestData, PostgreSQLTestCase):
