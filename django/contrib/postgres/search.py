@@ -222,23 +222,12 @@ class SearchRank(Func):
             vector = SearchVector(vector)
         if not hasattr(query, 'resolve_expression'):
             query = SearchQuery(query)
-        if weights is not None and not hasattr(weights, 'resolve_expression'):
-            weights = Value(weights)
-        self.weights = weights
-        super().__init__(vector, query)
-
-    def as_sql(self, compiler, connection, function=None, template=None):
-        extra_params = []
-        extra_context = {}
-        if template is None and self.weights:
-            template = '%(function)s(%(weights)s, %(expressions)s)'
-            weight_sql, extra_params = compiler.compile(self.weights)
-            extra_context['weights'] = weight_sql
-        sql, params = super().as_sql(
-            compiler, connection,
-            function=function, template=template, **extra_context
-        )
-        return sql, extra_params + params
+        expressions = (vector, query)
+        if weights is not None:
+            if not hasattr(weights, 'resolve_expression'):
+                weights = Value(weights)
+            expressions = (weights,) + expressions
+        super().__init__(*expressions)
 
 
 SearchVectorField.register_lookup(SearchVectorExact)
