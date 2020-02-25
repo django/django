@@ -104,6 +104,12 @@ class SimpleSearchTest(GrailTestData, PostgreSQLTestCase):
         searched = Line.objects.filter(dialogue__search='Robin killed')
         self.assertSequenceEqual(searched, [self.verse0])
 
+    def test_search_query_config(self):
+        searched = Line.objects.filter(
+            dialogue__search=SearchQuery('nostrils', config='simple'),
+        )
+        self.assertSequenceEqual(searched, [self.verse2])
+
 
 @modify_settings(INSTALLED_APPS={'append': 'django.contrib.postgres'})
 class SearchVectorFieldTest(GrailTestData, PostgreSQLTestCase):
