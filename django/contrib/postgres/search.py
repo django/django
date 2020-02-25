@@ -76,13 +76,10 @@ class SearchVector(SearchVectorCombinable, Func):
     function = 'to_tsvector'
     arg_joiner = " || ' ' || "
     output_field = SearchVectorField()
-    config = None
 
-    def __init__(self, *expressions, **extra):
-        super().__init__(*expressions, **extra)
-        config = self.extra.get('config', self.config)
+    def __init__(self, *expressions, config=None, weight=None):
+        super().__init__(*expressions)
         self.config = SearchConfig.from_parameter(config)
-        weight = self.extra.get('weight')
         if weight is not None and not hasattr(weight, 'resolve_expression'):
             weight = Value(weight)
         self.weight = weight
@@ -220,25 +217,23 @@ class SearchRank(Func):
     function = 'ts_rank'
     output_field = FloatField()
 
-    def __init__(self, vector, query, **extra):
+    def __init__(self, vector, query, weights=None):
         if not hasattr(vector, 'resolve_expression'):
             vector = SearchVector(vector)
         if not hasattr(query, 'resolve_expression'):
             query = SearchQuery(query)
-        weights = extra.get('weights')
         if weights is not None and not hasattr(weights, 'resolve_expression'):
             weights = Value(weights)
         self.weights = weights
-        super().__init__(vector, query, **extra)
+        super().__init__(vector, query)
 
     def as_sql(self, compiler, connection, function=None, template=None):
         extra_params = []
         extra_context = {}
-        if template is None and self.extra.get('weights'):
-            if self.weights:
-                template = '%(function)s(%(weights)s, %(expressions)s)'
-                weight_sql, extra_params = compiler.compile(self.weights)
-                extra_context['weights'] = weight_sql
+        if template is None and self.weights:
+            template = '%(function)s(%(weights)s, %(expressions)s)'
+            weight_sql, extra_params = compiler.compile(self.weights)
+            extra_context['weights'] = weight_sql
         sql, params = super().as_sql(
             compiler, connection,
             function=function, template=template, **extra_context
