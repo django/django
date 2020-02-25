@@ -17,7 +17,9 @@ Summary
 -------
 
 An ASGI application is a callable that takes a scope and returns a coroutine
-callable, that takes receive and send methods. It's usually written as a class::
+callable, that takes receive and send methods. It's usually written as a class:
+
+.. code-block:: python
 
     class Application:
 

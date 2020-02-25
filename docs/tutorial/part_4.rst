@@ -19,14 +19,18 @@ browser. These tests will ensure that:
 
 `Install chromedriver`_.
 
-Install Selenium. Run the following command::
+Install Selenium. Run the following command:
 
-    $ pip3 install selenium
+.. code-block:: sh
+
+    $ python3 -m pip install selenium
 
 .. _Install the Chrome web browser: https://www.google.com/chrome/
 .. _Install chromedriver: https://sites.google.com/a/chromium.org/chromedriver/getting-started
 
-Create a new file ``chat/tests.py``. Your app directory should now look like::
+Create a new file ``chat/tests.py``. Your app directory should now look like:
+
+.. code-block:: text
 
     chat/
         __init__.py
@@ -40,7 +44,9 @@ Create a new file ``chat/tests.py``. Your app directory should now look like::
         urls.py
         views.py
 
-Put the following code in ``chat/tests.py``::
+Put the following code in ``chat/tests.py``:
+
+.. code-block:: python
 
     # chat/tests.py
     from channels.testing import ChannelsLiveServerTestCase
@@ -144,7 +150,9 @@ will work inside the suite.
 
 We are using ``sqlite3``, which for testing, is run as an in-memory database, and therefore, the tests will not run correctly.
 We need to tell our project that the ``sqlite3`` database need not to be in memory for run the tests. Edit the
-``mysite/settings.py`` file and add the ``TEST`` argument to the **DATABASES** setting::
+``mysite/settings.py`` file and add the ``TEST`` argument to the **DATABASES** setting:
+
+.. code-block:: python
 
     # mysite/settings.py
     DATABASES = {
@@ -157,12 +165,15 @@ We need to tell our project that the ``sqlite3`` database need not to be in memo
         }
     }
 
+To run the tests, run the following command:
 
-To run the tests, run the following command::
+.. code-block:: sh
 
     $ python3 manage.py test chat.tests
 
-You should see output that looks like::
+You should see output that looks like:
+
+.. code-block:: text
 
     Creating test database for alias 'default'...
     System check identified no issues (0 silenced).

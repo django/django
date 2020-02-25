@@ -120,7 +120,9 @@ also be short-running - after all, HTTP requests can also be served by consumers
 but they're built around the idea of living for a little while (they live for
 the duration of a *scope*, as we described above).
 
-A basic consumer looks like this::
+A basic consumer looks like this:
+
+.. code-block:: python
 
     class ChatConsumer(WebsocketConsumer):
 
@@ -146,7 +148,9 @@ all in parallel.
 
 Underneath, Channels is running on a fully asynchronous event loop, and
 if you write code like above, it will get called in a synchronous thread.
-This means you can safely do blocking operations, like calling the Django ORM::
+This means you can safely do blocking operations, like calling the Django ORM:
+
+.. code-block:: python
 
     class LogConsumer(WebsocketConsumer):
 
@@ -157,7 +161,9 @@ This means you can safely do blocking operations, like calling the Django ORM::
             )
 
 However, if you want more control and you're willing to work only in
-asynchronous functions, you can write fully asynchronous consumers::
+asynchronous functions, you can write fully asynchronous consumers:
+
+.. code-block:: python
 
     class PingConsumer(AsyncConsumer):
         async def websocket_connect(self, message):
@@ -179,7 +185,9 @@ Routing and Multiple Protocols
 ------------------------------
 
 You can combine multiple Consumers (which are, remember, their own ASGI apps)
-into one bigger app that represents your project using routing::
+into one bigger app that represents your project using routing:
+
+.. code-block:: python
 
     application = URLRouter([
         url(r"^chat/admin/$", AdminChatConsumer),
@@ -189,7 +197,9 @@ into one bigger app that represents your project using routing::
 Channels is not just built around the world of HTTP and WebSockets - it also
 allows you to build any protocol into a Django environment, by building a
 server that maps those protocols into a similar set of events. For example,
-you can build a chatbot in a similar style::
+you can build a chatbot in a similar style:
+
+.. code-block:: python
 
     class ChattyBotConsumer(SyncConsumer):
 
@@ -203,7 +213,9 @@ you can build a chatbot in a similar style::
             })
 
 And then use another router to have the one project able to serve both
-WebSockets and chat requests::
+WebSockets and chat requests:
+
+.. code-block:: python
 
     application = ProtocolTypeRouter({
 
@@ -253,7 +265,9 @@ point-to-point and broadcast messaging.
 (insert cross-process example here)
 
 You can also send messages to a dedicated process that's listening on its own,
-fixed channel name::
+fixed channel name:
+
+.. code-block:: python
 
     # In a consumer
     self.channel_layer.send(
@@ -272,7 +286,9 @@ Django Integration
 
 Channels ships with easy drop-in support for common Django features, like
 sessions and authentication. You can combine authentication with your
-WebSocket views by just adding the right middleware around them::
+WebSocket views by just adding the right middleware around them:
+
+.. code-block:: python
 
     application = ProtocolTypeRouter({
         "websocket": AuthMiddlewareStack(

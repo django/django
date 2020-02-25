@@ -27,37 +27,39 @@ be rewritten to be asynchronous without complications.
     gains however would be less than if it only used async-native libraries.
 
 Let's rewrite ``ChatConsumer`` to be asynchronous.
-Put the following code in ``chat/consumers.py``::
+Put the following code in ``chat/consumers.py``:
+
+.. code-block:: python
 
     # chat/consumers.py
     from channels.generic.websocket import AsyncWebsocketConsumer
     import json
-    
+
     class ChatConsumer(AsyncWebsocketConsumer):
         async def connect(self):
             self.room_name = self.scope['url_route']['kwargs']['room_name']
             self.room_group_name = 'chat_%s' % self.room_name
-            
+
             # Join room group
             await self.channel_layer.group_add(
                 self.room_group_name,
                 self.channel_name
             )
-            
+
             await self.accept()
-        
+
         async def disconnect(self, close_code):
             # Leave room group
             await self.channel_layer.group_discard(
                 self.room_group_name,
                 self.channel_name
             )
-        
+
         # Receive message from WebSocket
         async def receive(self, text_data):
             text_data_json = json.loads(text_data)
             message = text_data_json['message']
-            
+
             # Send message to room group
             await self.channel_layer.group_send(
                 self.room_group_name,
@@ -66,11 +68,11 @@ Put the following code in ``chat/consumers.py``::
                     'message': message
                 }
             )
-        
+
         # Receive message from room group
         async def chat_message(self, event):
             message = event['message']
-            
+
             # Send message to WebSocket
             await self.send(text_data=json.dumps({
                 'message': message
@@ -85,7 +87,9 @@ This new code is for ChatConsumer is very similar to the original code, with the
 * ``async_to_sync`` is no longer needed when calling methods on the channel layer.
 
 Let's verify that the consumer for the ``/ws/chat/ROOM_NAME/`` path still works.
-To start the Channels development server, run the following command::
+To start the Channels development server, run the following command:
+
+.. code-block:: sh
 
     $ python3 manage.py runserver
 
@@ -99,6 +103,3 @@ first browser tab.
 Now your chat server is fully asynchronous!
 
 This tutorial continues in :doc:`Tutorial 4 </tutorial/part_4>`.
-
-
-

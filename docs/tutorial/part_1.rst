@@ -10,17 +10,21 @@ The room view will use a WebSocket to communicate with the Django server and
 listen for any messages that are posted.
 
 We assume that you are familiar with basic concepts for building a Django site.
-If not we recommend you complete `the Django tutorial`_ first and then come back 
+If not we recommend you complete `the Django tutorial`_ first and then come back
 to this tutorial.
 
 We assume that you have `Django installed`_ already. You can tell Django is
 installed and which version by running the following command in a shell prompt
-(indicated by the ``$`` prefix)::
+(indicated by the ``$`` prefix):
+
+.. code-block:: sh
 
     $ python3 -m django --version
 
 We also assume that you have :doc:`Channels installed </installation>` already. You can tell
-Channels is installed by running the following command::
+Channels is installed by running the following command:
+
+.. code-block:: sh
 
     $ python3 -c 'import channels; print(channels.__version__)'
 
@@ -53,12 +57,16 @@ Creating a project
 If you don't already have a Django project, you will need to create one.
 
 From the command line, ``cd`` into a directory where you'd like to store your
-code, then run the following command::
+code, then run the following command:
+
+.. code-block:: sh
 
     $ django-admin startproject mysite
 
-This will create a ``mysite`` directory in your current directory with the 
-following contents::
+This will create a ``mysite`` directory in your current directory with the
+following contents:
+
+.. code-block:: text
 
     mysite/
         manage.py
@@ -73,11 +81,15 @@ Creating the Chat app
 
 We will put the code for the chat server in its own app.
 
-Make sure you're in the same directory as ``manage.py`` and type this command::
+Make sure you're in the same directory as ``manage.py`` and type this command:
+
+.. code-block:: sh
 
     $ python3 manage.py startapp chat
 
-That'll create a directory ``chat``, which is laid out like this::
+That'll create a directory ``chat``, which is laid out like this:
+
+.. code-block:: text
 
     chat/
         __init__.py
@@ -89,10 +101,12 @@ That'll create a directory ``chat``, which is laid out like this::
         tests.py
         views.py
 
-For the purposes of this tutorial, we will only be working with ``chat/views.py`` 
+For the purposes of this tutorial, we will only be working with ``chat/views.py``
 and ``chat/__init__.py``. So remove all other files from the ``chat`` directory.
 
-After removing unnecessary files, the ``chat`` directory should look like::
+After removing unnecessary files, the ``chat`` directory should look like:
+
+.. code-block:: text
 
     chat/
         __init__.py
@@ -100,7 +114,9 @@ After removing unnecessary files, the ``chat`` directory should look like::
 
 We need to tell our project that the ``chat`` app is installed. Edit the
 ``mysite/settings.py`` file and add ``'chat'`` to the **INSTALLED_APPS** setting.
-It'll look like this::
+It'll look like this:
+
+.. code-block:: python
 
     # mysite/settings.py
     INSTALLED_APPS = [
@@ -124,7 +140,9 @@ Create a ``templates`` directory in your ``chat`` directory. Within the
 ``chat``, and within that create a file called ``index.html`` to hold the
 template for the index view.
 
-Your chat directory should now look like::
+Your chat directory should now look like:
+
+.. code-block:: text
 
     chat/
         __init__.py
@@ -133,7 +151,9 @@ Your chat directory should now look like::
                 index.html
         views.py
 
-Put the following code in ``chat/templates/chat/index.html``::
+Put the following code in ``chat/templates/chat/index.html``:
+
+.. code-block:: html
 
     <!-- chat/templates/chat/index.html -->
     <!DOCTYPE html>
@@ -146,7 +166,7 @@ Put the following code in ``chat/templates/chat/index.html``::
         What chat room would you like to enter?<br/>
         <input id="room-name-input" type="text" size="100"/><br/>
         <input id="room-name-submit" type="button" value="Enter"/>
-        
+
         <script>
             document.querySelector('#room-name-input').focus();
             document.querySelector('#room-name-input').onkeyup = function(e) {
@@ -164,18 +184,22 @@ Put the following code in ``chat/templates/chat/index.html``::
     </html>
 
 Create the view function for the room view.
-Put the following code in ``chat/views.py``::
+Put the following code in ``chat/views.py``:
+
+.. code-block:: python
 
     # chat/views.py
     from django.shortcuts import render
-    
+
     def index(request):
         return render(request, 'chat/index.html', {})
 
 To call the view, we need to map it to a URL - and for this we need a URLconf.
 
 To create a URLconf in the chat directory, create a file called ``urls.py``.
-Your app directory should now look like::
+Your app directory should now look like:
+
+.. code-block:: text
 
     chat/
         __init__.py
@@ -185,36 +209,44 @@ Your app directory should now look like::
         urls.py
         views.py
 
-In the ``chat/urls.py`` file include the following code::
+In the ``chat/urls.py`` file include the following code:
+
+.. code-block:: python
 
     # chat/urls.py
     from django.urls import path
-    
+
     from . import views
-    
+
     urlpatterns = [
         path('', views.index, name='index'),
     ]
 
 The next step is to point the root URLconf at the **chat.urls** module.
 In ``mysite/urls.py``, add an import for **django.conf.urls.include** and
-insert an **include()** in the **urlpatterns** list, so you have::
+insert an **include()** in the **urlpatterns** list, so you have:
+
+.. code-block:: python
 
     # mysite/urls.py
     from django.conf.urls import include
     from django.urls import path
     from django.contrib import admin
-    
+
     urlpatterns = [
         path('chat/', include('chat.urls')),
         path('admin/', admin.site.urls),
     ]
 
-Let's verify that the index view works. Run the following command::
+Let's verify that the index view works. Run the following command:
+
+.. code-block:: sh
 
     $ python3 manage.py runserver
 
-You'll see the following output on the command line::
+You'll see the following output on the command line:
+
+.. code-block:: text
 
     Performing system checks...
 
@@ -250,7 +282,9 @@ Let's start by creating a root routing configuration for Channels. A Channels
 what code to run when an HTTP request is received by the Channels server.
 
 We'll start with an empty routing configuration.
-Create a file ``mysite/routing.py`` and include the following code::
+Create a file ``mysite/routing.py`` and include the following code:
+
+.. code-block:: python
 
     # mysite/routing.py
     from channels.routing import ProtocolTypeRouter
@@ -261,7 +295,9 @@ Create a file ``mysite/routing.py`` and include the following code::
 
 Now add the Channels library to the list of installed apps.
 Edit the ``mysite/settings.py`` file and add ``'channels'`` to the
-``INSTALLED_APPS`` setting. It'll look like this::
+``INSTALLED_APPS`` setting. It'll look like this:
+
+.. code-block:: python
 
     # mysite/settings.py
     INSTALLED_APPS = [
@@ -277,7 +313,9 @@ Edit the ``mysite/settings.py`` file and add ``'channels'`` to the
 
 You'll also need to point Channels at the root routing configuration.
 Edit the ``mysite/settings.py`` file again and add the following to the bottom
-of it::
+of it:
+
+.. code-block:: python
 
     # mysite/settings.py
     # Channels
@@ -298,19 +336,23 @@ the Channels development server.
 .. _whitenoise: https://github.com/evansd/whitenoise
 
 Let's ensure that the Channels development server is working correctly.
-Run the following command::
+Run the following command:
+
+.. code-block:: sh
 
     $ python3 manage.py runserver
 
-You'll see the following output on the command line::
+You'll see the following output on the command line:
+
+.. code-block:: text
 
     Performing system checks...
-    
+
     System check identified no issues (0 silenced).
-    
+
     You have 13 unapplied migration(s). Your project may not work properly until you apply the migrations for app(s): admin, auth, contenttypes, sessions.
     Run 'python manage.py migrate' to apply them.
-    
+
     February 18, 2018 - 22:16:23
     Django version 1.11.10, using settings 'mysite.settings'
     Starting ASGI/Channels development server at http://127.0.0.1:8000/
@@ -323,8 +365,8 @@ You'll see the following output on the command line::
     Ignore the warning about unapplied database migrations.
     We won't be using a database in this tutorial.
 
-Notice the line beginning with 
-``Starting ASGI/Channels development server at http://127.0.0.1:8000/``. 
+Notice the line beginning with
+``Starting ASGI/Channels development server at http://127.0.0.1:8000/``.
 This indicates that the Channels development server has taken over from the
 Django development server.
 

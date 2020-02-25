@@ -19,7 +19,9 @@ For convenience, these are also provided as a combined callable called
 ``channels.session``.
 
 To use the middleware, wrap it around the appropriate level of consumer
-in your ``routing.py``::
+in your ``routing.py``:
+
+.. code-block:: python
 
     from channels.routing import ProtocolTypeRouter, URLRouter
     from channels.sessions import SessionMiddlewareStack
@@ -39,7 +41,9 @@ in your ``routing.py``::
 ``SessionMiddleware`` will only work on protocols that provide
 HTTP headers in their ``scope`` - by default, this is HTTP and WebSocket.
 
-To access the session, use ``self.scope["session"]`` in your consumer code::
+To access the session, use ``self.scope["session"]`` in your consumer code:
+
+.. code-block:: python
 
     class ChatConsumer(WebsocketConsumer):
 

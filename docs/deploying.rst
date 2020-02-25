@@ -18,7 +18,9 @@ Channels what the *root application* of your project is. As discussed in
 (Protocol Type) router.
 
 It should be a dotted path to the instance of the router; this is generally
-going to be in a file like ``myproject/routing.py``::
+going to be in a file like ``myproject/routing.py``:
+
+.. code-block:: python
 
     ASGI_APPLICATION = "myproject.routing.application"
 
@@ -34,7 +36,9 @@ Setting up a channel backend
 Typically a channel backend will connect to one or more central servers that
 serve as the communication layer - for example, the Redis backend connects
 to a Redis server. All this goes into the ``CHANNEL_LAYERS`` setting;
-here's an example for a remote Redis server::
+here's an example for a remote Redis server:
+
+.. code-block:: python
 
     CHANNEL_LAYERS = {
         "default": {
@@ -45,7 +49,9 @@ here's an example for a remote Redis server::
         },
     }
 
-To use the Redis backend you have to install it::
+To use the Redis backend you have to install it:
+
+.. code-block:: sh
 
     pip install -U channels_redis
 
@@ -66,7 +72,9 @@ in, you can't just pass in the same variable as you configured in
 
 In your project directory, you'll already have a file called ``wsgi.py`` that
 does this to present Django as a WSGI application. Make a new file alongside it
-called ``asgi.py`` and put this in it::
+called ``asgi.py`` and put this in it:
+
+.. code-block:: python
 
     """
     ASGI entrypoint. Configures Django and then runs the application
@@ -86,7 +94,9 @@ on application start, or different ways of loading settings, you can do those
 in here as well.
 
 Now you have this file, all you need to do is pass the ``application`` object
-inside it to your protocol server as the application it should run::
+inside it to your protocol server as the application it should run:
+
+.. code-block:: sh
 
     daphne -p 8001 myproject.asgi:application
 
@@ -120,7 +130,9 @@ To run Daphne, it just needs to be supplied with an application, much like
 a WSGI server would need to be. Make sure you have an ``asgi.py`` file as
 outlined above.
 
-Then, you can run Daphne and supply the ASGI application as the argument::
+Then, you can run Daphne and supply the ASGI application as the argument:
+
+.. code-block:: sh
 
     daphne myproject.asgi:application
 
@@ -132,7 +144,9 @@ If you want to bind multiple Daphne instances to the same port on a machine,
 use a process supervisor that can listen on ports and pass the file descriptors
 to launched processes, and then pass the file descriptor with ``--fd NUM``.
 
-You can also specify the port and IP that Daphne binds to::
+You can also specify the port and IP that Daphne binds to:
+
+.. code-block:: sh
 
     daphne -b 0.0.0.0 -p 8001 myproject.asgi:application
 
@@ -169,14 +183,18 @@ Nginx/Supervisor (Ubuntu)
 This example sets up a Django site on an Ubuntu server, using Nginx as the
 main webserver and supervisord to run and manage Daphne.
 
-First, install Nginx and Supervisor::
+First, install Nginx and Supervisor:
+
+.. code-block:: sh
 
     $ sudo apt install nginx supervisor
 
 Now, you will need to create the supervisor configuration file (often located in
 ``/etc/supervisor/conf.d/`` - here, we're making Supervisor listen on the TCP
 port and then handing that socket off to the child processes so they can all
-share the same bound port::
+share the same bound port:
+
+.. code-block:: ini
 
     [fcgi-program:asgi]
     # TCP socket used by Nginx backend upstream
@@ -203,13 +221,17 @@ share the same bound port::
     stdout_logfile=/your/log/asgi.log
     redirect_stderr=true
 
-Have supervisor reread and update its jobs::
+Have supervisor reread and update its jobs:
+
+.. code-block:: sh
 
     $ sudo supervisorctl reread
     $ sudo supervisorctl update
 
 Next, Nginx has to be told to proxy traffic to the running Daphne instances.
-Setup your nginx upstream conf file for your project::
+Setup your nginx upstream conf file for your project:
+
+.. code-block:: text
 
     upstream channels-backend {
         server localhost:8000;
@@ -237,6 +259,8 @@ Setup your nginx upstream conf file for your project::
         ...
     }
 
-Reload nginx to apply the changes::
+Reload nginx to apply the changes:
+
+.. code-block:: sh
 
     $ sudo service nginx reload

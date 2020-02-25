@@ -48,7 +48,9 @@ package.
 
 .. _`channels_redis`: https://pypi.org/project/channels-redis/
 
-In this example, Redis is running on localhost (127.0.0.1) port 6379::
+In this example, Redis is running on localhost (127.0.0.1) port 6379:
+
+.. code-block:: python
 
     CHANNEL_LAYERS = {
         "default": {
@@ -72,7 +74,9 @@ In-Memory Channel Layer
     multi-instance environment.
 
 Channels also comes packaged with an in-memory Channels Layer. This layer can
-be helpful in for :doc:`/topics/testing` or local-development purposes::
+be helpful in for :doc:`/topics/testing` or local-development purposes:
+
+.. code-block:: python
 
     CHANNEL_LAYERS = {
         "default": {
@@ -86,7 +90,9 @@ Synchronous Functions
 By default the ``send()``, ``group_send()``, ``group_add()`` and other functions
 are async functions, meaning you have to ``await`` them. If you need to call
 them from synchronous code, you'll need to use the handy
-``asgiref.sync.async_to_sync`` wrapper::
+``asgiref.sync.async_to_sync`` wrapper:
+
+.. code-block:: python
 
     from asgiref.sync import async_to_sync
 
@@ -107,7 +113,9 @@ networking to their attached client.
 
 For example, the `multichat example <https://github.com/andrewgodwin/channels-examples/tree/master/multichat>`_
 in Andrew Godwin's ``channels-examples`` repository sends events like this
-over the channel layer::
+over the channel layer:
+
+.. code-block:: python
 
     await self.channel_layer.group_send(
         room.group_name,
@@ -120,7 +128,9 @@ over the channel layer::
     )
 
 And then the consumers define a handling function to receive those events
-and turn them into WebSocket frames::
+and turn them into WebSocket frames:
+
+.. code-block:: python
 
     async def chat_message(self, event):
         """
@@ -170,7 +180,9 @@ to them and run code just like they would events from their client connection.
 
 The channel name is available on a consumer as ``self.channel_name``. Here's
 an example of writing the channel name into a database upon connection,
-and then specifying a handler method for events on it::
+and then specifying a handler method for events on it:
+
+.. code-block:: python
 
     class ChatConsumer(WebsocketConsumer):
 
@@ -193,7 +205,9 @@ clash. It's recommended you prefix type names (like we did here with ``chat.``)
 to avoid clashes.
 
 To send to a single channel, just find its channel name (for the example above,
-we could crawl the database), and use ``channel_layer.send``::
+we could crawl the database), and use ``channel_layer.send``:
+
+.. code-block:: python
 
     from channels.layers import get_channel_layer
 
@@ -231,7 +245,9 @@ is connected, you should build your own system or use a suitable third-party
 one.
 
 You use groups by adding a channel to them during connection, and removing it
-during disconnection, illustrated here on the WebSocket generic consumer::
+during disconnection, illustrated here on the WebSocket generic consumer:
+
+.. code-block:: python
 
     # This example uses WebSocket consumer, which is synchronous, and so
     # needs the async channel layer functions to be converted.
@@ -247,7 +263,9 @@ during disconnection, illustrated here on the WebSocket generic consumer::
 
 Then, to send to a group, use ``group_send``, like in this small example
 which broadcasts chat messages to every connected socket when combined with
-the code above::
+the code above:
+
+.. code-block:: python
 
     class ChatConsumer(WebsocketConsumer):
 
@@ -271,14 +289,18 @@ Using Outside Of Consumers
 
 You'll often want to send to the channel layer from outside of the scope of
 a consumer, and so you won't have ``self.channel_layer``. In this case, you
-should use the ``get_channel_layer`` function to retrieve it::
+should use the ``get_channel_layer`` function to retrieve it:
+
+.. code-block:: python
 
     from channels.layers import get_channel_layer
     channel_layer = get_channel_layer()
 
 Then, once you have it, you can just call methods on it. Remember that
 **channel layers only support async methods**, so you can either call it
-from your own asynchronous context::
+from your own asynchronous context:
+
+.. code-block:: python
 
     for chat_name in chats:
         await channel_layer.group_send(
@@ -286,7 +308,9 @@ from your own asynchronous context::
             {"type": "chat.system_message", "text": announcement_text},
         )
 
-Or you'll need to use async_to_sync::
+Or you'll need to use async_to_sync:
+
+.. code-block:: python
 
     from asgiref.sync import async_to_sync
 

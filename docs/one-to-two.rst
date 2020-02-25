@@ -120,13 +120,17 @@ Function-based consumers and Routing
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Channels 1 allowed you to route by event type (e.g. ``websocket.connect``) and
-pass individual functions with routing that looked like this::
+pass individual functions with routing that looked like this:
+
+.. code-block:: python
 
     channel_routing = [
         route("websocket.connect", connect_blog, path=r'^/liveblog/(?P<slug>[^/]+)/stream/$'),
     ]
 
-And function-based consumers that looked like this::
+And function-based consumers that looked like this:
+
+.. code-block:: python
 
     def connect_blog(message, slug):
         ...
@@ -163,7 +167,9 @@ All :doc:`authentication </topics/authentication>` and
 any decorators that handled them, like ``http_session``, ``channel_session_user``
 and so on (in fact, there are no decorators in Channels 2 - it's all middleware).
 
-To get auth now, wrap your URLRouter in an ``AuthMiddlewareStack``::
+To get auth now, wrap your URLRouter in an ``AuthMiddlewareStack``:
+
+.. code-block:: python
 
     from channels.routing import ProtocolTypeRouter, URLRouter
     from channels.auth import AuthMiddlewareStack
@@ -191,7 +197,9 @@ need to provide has changed to be async. Only ``channels_redis``, formerly known
 ``asgi_redis``, has been updated to match so far.
 
 Settings are still similar to before, but there is no longer a ``ROUTING``
-key (the base routing is instead defined with ``ASGI_APPLICATION``)::
+key (the base routing is instead defined with ``ASGI_APPLICATION``):
+
+.. code-block:: python
 
     CHANNEL_LAYERS = {
         "default": {
@@ -216,7 +224,9 @@ Group objects
 
 Group objects no longer exist; instead you should use the ``group_add``,
 ``group_discard``, and ``group_send`` methods on the ``self.channel_layer``
-object inside of a consumer directly. As an example::
+object inside of a consumer directly. As an example:
+
+.. code-block:: python
 
     from asgiref.sync import async_to_sync
 
@@ -233,7 +243,9 @@ Delay server
 ~~~~~~~~~~~~
 
 If you used the delay server before to put things on hold for a few seconds,
-you can now instead use an ``AsyncConsumer`` and ``asyncio.sleep``::
+you can now instead use an ``AsyncConsumer`` and ``asyncio.sleep``:
+
+.. code-block:: python
 
     class PingConsumer(AsyncConsumer):
 

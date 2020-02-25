@@ -19,7 +19,9 @@ requires ``CookieMiddleware``. For convenience, these are also provided
 as a combined callable called ``AuthMiddlewareStack`` that includes all three.
 
 To use the middleware, wrap it around the appropriate level of consumer
-in your ``routing.py``::
+in your ``routing.py``:
+
+.. code-block:: python
 
     from django.conf.urls import url
 
@@ -45,8 +47,9 @@ like in this case the ``URLRouter``.
 Note that the ``AuthMiddleware`` will only work on protocols that provide
 HTTP headers in their ``scope`` - by default, this is HTTP and WebSocket.
 
-To access the user, just use ``self.scope["user"]`` in your consumer code::
+To access the user, just use ``self.scope["user"]`` in your consumer code:
 
+.. code-block:: python
 
     class ChatConsumer(WebsocketConsumer):
 
@@ -67,7 +70,9 @@ on the scope, so all you need to do is override the initial constructor
 that takes a scope, rather than the event-running coroutine.
 
 Here's a simple example of a middleware that just takes a user ID out of the
-query string and uses that::
+query string and uses that:
+
+.. code-block:: python
 
     from django.db import close_old_connections
 
@@ -122,7 +127,9 @@ You can logout a user with the ``logout(scope)`` async function.
 If you are in a WebSocket consumer, or logging-in after the first response
 has been sent in a http consumer, the session is populated
 **but will not be saved automatically** - you must call
-``scope["session"].save()`` after login in your consumer code::
+``scope["session"].save()`` after login in your consumer code:
+
+.. code-block:: python
 
     from channels.auth import login
 
@@ -139,7 +146,9 @@ has been sent in a http consumer, the session is populated
 
 When calling ``login(scope, user)``, ``logout(scope)`` or ``get_user(scope)``
 from a synchronous function you will need to wrap them in ``async_to_sync``,
-as we only provide async versions::
+as we only provide async versions:
+
+.. code-block:: python
 
     from asgiref.sync import async_to_sync
     from channels.auth import login

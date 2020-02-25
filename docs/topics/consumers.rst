@@ -29,7 +29,9 @@ A consumer is a subclass of either ``channels.consumer.AsyncConsumer`` or
 you to write async-capable code, while the other will run your code
 synchronously in a threadpool for you.
 
-Let's look at a basic example of a ``SyncConsumer``::
+Let's look at a basic example of a ``SyncConsumer``:
+
+.. code-block:: python
 
     from channels.consumer import SyncConsumer
 
@@ -68,7 +70,9 @@ protocol - if you read the WebSocket protocol, you'll see that the dict we
 send above is how you send a text frame to the client.
 
 The ``AsyncConsumer`` is laid out very similarly, but all the handler methods
-must be coroutines, and ``self.send`` is a coroutine::
+must be coroutines, and ``self.send`` is a coroutine:
+
+.. code-block:: python
 
     from channels.consumer import AsyncConsumer
 
@@ -149,7 +153,9 @@ Consumers will use the channel layer ``default`` unless
 the ``channel_layer_alias`` attribute is set when subclassing any
 of the provided ``Consumer`` classes.
 
-To use the channel layer ``echo_alias`` we would set it like so::
+To use the channel layer ``echo_alias`` we would set it like so:
+
+.. code-block:: python
 
     from channels.consumer import SyncConsumer
 
@@ -203,7 +209,9 @@ WebsocketConsumer
 
 Available as ``channels.generic.websocket.WebsocketConsumer``, this
 wraps the verbose plain-ASGI message sending and receiving into handling that
-just deals with text and binary frames::
+just deals with text and binary frames:
+
+.. code-block:: python
 
     from channels.generic.websocket import WebsocketConsumer
 
@@ -256,7 +264,9 @@ AsyncWebsocketConsumer
 
 Available as ``channels.generic.websocket.AsyncWebsocketConsumer``, this has
 the exact same methods and signature as ``WebsocketConsumer`` but everything
-is async, and the functions you need to write have to be as well::
+is async, and the functions you need to write have to be as well:
+
+.. code-block:: python
 
     from channels.generic.websocket import AsyncWebsocketConsumer
 
@@ -320,7 +330,9 @@ AsyncHttpConsumer
 ~~~~~~~~~~~~~~~~~
 
 Available as ``channels.generic.http.AsyncHttpConsumer``, this offers basic
-primitives to implement a HTTP endpoint::
+primitives to implement a HTTP endpoint:
+
+.. code-block:: python
 
     from channels.generic.http import AsyncHttpConsumer
 
@@ -344,7 +356,9 @@ finished running cleanly.
 If you need more control over the response, e.g. for implementing long
 polling, use the lower level ``self.send_headers`` and ``self.send_body``
 methods instead. This example already mentions channel layers which will
-be explained in detail later::
+be explained in detail later:
+
+.. code-block:: python
 
     import json
     from channels.generic.http import AsyncHttpConsumer
@@ -364,7 +378,9 @@ be explained in detail later::
             await self.send_body(json.dumps(event).encode("utf-8"))
 
 Of course you can also use those primitives to implement a HTTP endpoint for
-`Server-sent events <https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events>`_::
+`Server-sent events <https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events>`_:
+
+.. code-block:: python
 
     from datetime import datetime
     from channels.generic.http import AsyncHttpConsumer

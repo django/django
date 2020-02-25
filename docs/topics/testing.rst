@@ -18,14 +18,18 @@ Setting Up Async Tests
 
 Firstly, you need to get ``py.test`` set up with async test support, and
 presumably Django test support as well. You can do this by installing the
-``pytest-django`` and ``pytest-asyncio`` packages::
+``pytest-django`` and ``pytest-asyncio`` packages:
 
-    pip install -U pytest-django pytest-asyncio
+.. code-block:: sh
+
+    python -m pip install -U pytest-django pytest-asyncio
 
 Then, you need to decorate the tests you want to run async with
 ``pytest.mark.asyncio``. Note that you can't mix this with ``unittest.TestCase``
 subclasses; you have to write async tests as top-level test functions in the
-native ``py.test`` style::
+native ``py.test`` style:
+
+.. code-block:: python
 
     import pytest
     from channels.testing import HttpCommunicator
@@ -60,7 +64,9 @@ responses or long-polling, which aren't supported in ``HttpCommunicator`` yet.
     ``ApplicationCommunicator`` is actually provided by the base ``asgiref``
     package, but we let you import it from ``channels.testing`` for convenience.
 
-To construct it, pass it an application and a scope::
+To construct it, pass it an application and a scope:
+
+.. code-block:: python
 
     from channels.testing import ApplicationCommunicator
     communicator = ApplicationCommunicator(MyConsumer, {"type": "http", ...})
@@ -68,7 +74,9 @@ To construct it, pass it an application and a scope::
 send_input
 ~~~~~~~~~~
 
-Call it to send an event to the application::
+Call it to send an event to the application:
+
+.. code-block:: python
 
     await communicator.send_input({
         "type": "http.request",
@@ -78,7 +86,9 @@ Call it to send an event to the application::
 receive_output
 ~~~~~~~~~~~~~~
 
-Call it to receive an event from the application::
+Call it to receive an event from the application:
+
+.. code-block:: python
 
     event = await communicator.receive_output(timeout=1)
     assert event["type"] == "http.response.start"
@@ -89,7 +99,9 @@ receive_nothing
 ~~~~~~~~~~~~~~~
 
 Call it to check that there is no event waiting to be received from the
-application::
+application:
+
+.. code-block:: python
 
     assert await communicator.receive_nothing(timeout=0.1, interval=0.01) is False
     # Receive the rest of the http request from above
@@ -115,12 +127,16 @@ wait
 ~~~~
 
 Call it to wait for an application to exit (you'll need to either do this or wait for
-it to send you output before you can see what it did using mocks or inspection)::
+it to send you output before you can see what it did using mocks or inspection):
+
+.. code-block:: python
 
     await communicator.wait(timeout=1)
 
 If you're expecting your application to raise an exception, use ``pytest.raises``
-around ``wait``::
+around ``wait``:
+
+.. code-block:: python
 
     with pytest.raises(ValueError):
         await communicator.wait()
@@ -131,12 +147,16 @@ HttpCommunicator
 
 ``HttpCommunicator`` is a subclass of ``ApplicationCommunicator`` specifically
 tailored for HTTP requests. You need only instantiate it with your desired
-options::
+options:
+
+.. code-block:: python
 
     from channels.testing import HttpCommunicator
     communicator = HttpCommunicator(MyHttpConsumer, "GET", "/test/")
 
-And then wait for its response::
+And then wait for its response:
+
+.. code-block:: python
 
     response = await communicator.get_response()
     assert response["body"] == b"test response"
@@ -148,7 +168,7 @@ You can pass the following arguments to the constructor:
 * ``body``: HTTP body (bytestring, optional)
 
 The response from the ``get_response`` method will be a dict with the following
-keys::
+keys:
 
 * ``status``: HTTP status code (integer)
 * ``headers``: List of headers as (name, value) tuples (both bytestrings)
@@ -160,7 +180,9 @@ WebsocketCommunicator
 
 ``WebsocketCommunicator`` allows you to more easily test WebSocket consumers.
 It provides several convenience methods for interacting with a WebSocket
-application, as shown in this example::
+application, as shown in this example:
+
+.. code-block:: python
 
     from channels.testing import WebsocketCommunicator
     communicator = WebsocketCommunicator(SimpleWebsocketApp, "/testws/")
@@ -190,7 +212,9 @@ application, as shown in this example::
 
 You can also pass an ``application`` built with ``URLRouter`` instead of the
 plain consumer class. This lets you test applications that require positional
-or keyword arguments in the ``scope``::
+or keyword arguments in the ``scope``:
+
+.. code-block:: python
 
     from channels.testing import WebsocketCommunicator
     application = URLRouter([
@@ -227,7 +251,9 @@ send_to
 ~~~~~~~
 
 Sends a data frame to the application. Takes exactly one of ``bytes_data``
-or ``text_data`` as parameters, and returns nothing::
+or ``text_data`` as parameters, and returns nothing:
+
+.. code-block:: python
 
     await communicator.send_to(bytes_data=b"hi\0")
 
@@ -238,7 +264,9 @@ send_json_to
 ~~~~~~~~~~~~
 
 Sends a JSON payload to the application as a text frame. Call it with
-an object and it will JSON-encode it for you, and return nothing::
+an object and it will JSON-encode it for you, and return nothing:
+
+.. code-block:: python
 
     await communicator.send_json_to({"hello": "world"})
 
@@ -246,7 +274,9 @@ receive_from
 ~~~~~~~~~~~~
 
 Receives a frame from the application and gives you either ``bytes`` or
-``text`` back depending on the frame type::
+``text`` back depending on the frame type:
+
+.. code-block:: python
 
     response = await communicator.receive_from()
 
@@ -258,7 +288,9 @@ frames contain binary data.
 receive_json_from
 ~~~~~~~~~~~~~~~~~
 
-Receives a text frame from the application and decodes it for you::
+Receives a text frame from the application and decodes it for you:
+
+.. code-block:: python
 
     response = await communicator.receive_json_from()
     assert response == {"hello": "world"}
@@ -289,7 +321,9 @@ ChannelsLiveServerTestCase
 If you just want to run standard Selenium or other tests that require a
 webserver to be running for external programs, you can use
 ``ChannelsLiveServerTestCase``, which is a drop-in replacement for the
-standard Django ``LiveServerTestCase``::
+standard Django ``LiveServerTestCase``:
+
+.. code-block:: python
 
     from channels.testing import ChannelsLiveServerTestCase
 
@@ -302,7 +336,9 @@ standard Django ``LiveServerTestCase``::
 
     You can't use an in-memory database for your live tests. Therefore
     include a test database file name in your settings to tell Django to
-    use a file database if you use SQLite::
+    use a file database if you use SQLite:
+
+    .. code-block:: python
 
         DATABASES = {
             "default": {

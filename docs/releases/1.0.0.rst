@@ -62,7 +62,9 @@ if you send a message to start another consumer you're guaranteed that the
 sending consumer has finished running by the time it's acted upon.
 
 If you want to send messages immediately rather than at the end of the consumer,
-you can still do that by passing the ``immediately`` argument::
+you can still do that by passing the ``immediately`` argument:
+
+.. code-block:: python
 
     Channel("thumbnailing-tasks").send({"id": 34245}, immediately=True)
 
@@ -179,7 +181,9 @@ Now, instead, you must implement ``group_names(instance)``, which returns the
 groups that can see the instance as it is presented for you; the action
 results will be worked out for you. For example, if you want to only show
 objects marked as "admin_only" to admins, and objects without it to everyone,
-previously you would have done::
+previously you would have done:
+
+.. code-block:: python
 
     def group_names(self, instance, action):
         if instance.admin_only:
@@ -189,7 +193,9 @@ previously you would have done::
 
 Because you did nothing based on the ``action`` (and if you did, you would
 have got incomplete messages, hence this design change), you can just change
-the signature of the method like this::
+the signature of the method like this:
+
+.. code-block:: python
 
     def group_names(self, instance):
         if instance.admin_only:

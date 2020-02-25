@@ -60,7 +60,7 @@ Some sample response templates are below.
 General support request
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-::
+.. code-block:: text
 
     Sorry, but we can't help out with general support requests here - the issue tracker is for reproduceable bugs and
     concrete feature requests only! Please see our support documentation (http://channels.readthedocs.io/en/latest/support.html)
@@ -69,7 +69,7 @@ General support request
 Non-specific bug/"It doesn't work!"
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-::
+.. code-block:: text
 
     I'm afraid we can't address issues without either direct steps to reproduce, or that only happen in a production
     environment, as they may not be problems in the project itself. Our support documentation
@@ -83,7 +83,7 @@ Non-specific bug/"It doesn't work!"
 Problem in application code
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-::
+.. code-block:: text
 
     It looks like a problem in your application code rather than in Channels itself, so I'm going to close the ticket.
     If you can trace it down to a problem in Channels itself (with exact steps to reproduce on a fresh or small example

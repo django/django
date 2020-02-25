@@ -15,20 +15,28 @@ For more information, please see our `contribution guide <https://channels.readt
 Quick Setup
 -----------
 
-Fork, then clone the repo::
+Fork, then clone the repo:
+
+.. code-block:: sh
 
     git clone git@github.com:your-username/channels.git
 
-Make sure the tests pass::
+Make sure the tests pass:
 
-    pip install -e .[tests]
+.. code-block:: sh
+
+    python -m pip install -e .[tests]
     pytest
 
-Make your change. Add tests for your change. Make the tests pass::
+Make your change. Add tests for your change. Make the tests pass:
+
+.. code-block:: sh
 
     pytest
 
-Make sure your code conforms to the coding style::
+Make sure your code conforms to the coding style:
+
+.. code-block:: sh
 
     black ./channels ./tests
     isort --check-only --diff --recursive ./channels ./tests

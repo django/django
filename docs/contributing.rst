@@ -59,7 +59,9 @@ get in touch with Andrew directly at andrew@aeracode.org.
 How do I get started and run the tests?
 ---------------------------------------
 
-First, you should first clone the git repository to a local directory::
+First, you should first clone the git repository to a local directory:
+
+.. code-block:: sh
 
     git clone https://github.com/django/channels.git channels
 
@@ -68,20 +70,26 @@ in; you can use either ``virtualenvwrapper``, ``pipenv`` or just plain
 ``virtualenv`` for this.
 
 Then, ``cd`` into the ``channels`` directory and install it editable into
-your environment::
+your environment:
+
+.. code-block:: sh
 
     cd channels/
-    pip install -e .[tests]
+    python -m pip install -e .[tests]
 
 Note the ``[tests]`` section there; that tells ``pip`` that you want to install
 the ``tests`` extra, which will bring in testing dependencies like
 ``pytest-django``.
 
-Then, you can run the tests::
+Then, you can run the tests:
+
+.. code-block:: sh
 
     pytest
 
-Also, there is a tox.ini file at the root of the repository. Example commands::
+Also, there is a tox.ini file at the root of the repository. Example commands:
+
+.. code-block:: sh
 
    $ tox -l
    py36-dj11
@@ -95,7 +103,9 @@ Also, there is a tox.ini file at the root of the repository. Example commands::
    $ tox -e py37-dj22 && tox -e py37-djmaster
 
 Note that tox can also forward arguments to pytest. When using pdb with pytest,
-forward the ``-s`` option to pytest as such::
+forward the ``-s`` option to pytest as such:
+
+.. code-block:: sh
 
    tox -e py37-dj22 -- -s
 

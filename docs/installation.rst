@@ -1,12 +1,16 @@
 Installation
 ============
 
-Channels is available on PyPI - to install it, just run::
+Channels is available on PyPI - to install it, just run:
 
-    pip install -U channels
+.. code-block:: sh
+
+    python -m pip install -U channels
 
 Once that's done, you should add ``channels`` to your
-``INSTALLED_APPS`` setting::
+``INSTALLED_APPS`` setting:
+
+.. code-block:: python
 
     INSTALLED_APPS = (
         'django.contrib.auth',
@@ -17,7 +21,9 @@ Once that's done, you should add ``channels`` to your
         'channels',
     )
 
-Then, make a default routing in ``myproject/routing.py``::
+Then, make a default routing in ``myproject/routing.py``:
+
+.. code-block:: python
 
     from channels.routing import ProtocolTypeRouter
 
@@ -26,7 +32,9 @@ Then, make a default routing in ``myproject/routing.py``::
     })
 
 And finally, set your ``ASGI_APPLICATION`` setting to point to that routing
-object as your root application::
+object as your root application:
+
+.. code-block:: python
 
     ASGI_APPLICATION = "myproject.routing.application"
 
@@ -48,7 +56,9 @@ Installing the latest development version
 
 To install the latest version of Channels, clone the repo, change to the repo,
 change to the repo directory, and pip install it into your current virtual
-environment::
+environment:
+
+.. code-block:: sh
 
     $ git clone git@github.com:django/channels.git
     $ cd channels

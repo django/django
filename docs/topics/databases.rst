@@ -31,7 +31,9 @@ database_sync_to_async
 that also cleans up database connections on exit.
 
 To use it, write your ORM queries in a separate function or method, and then
-call it with ``database_sync_to_async`` like so::
+call it with ``database_sync_to_async`` like so:
+
+.. code-block:: python
 
     from channels.db import database_sync_to_async
 
@@ -41,7 +43,9 @@ call it with ``database_sync_to_async`` like so::
     def get_name(self):
         return User.objects.all()[0].name
 
-You can also use it as a decorator::
+You can also use it as a decorator:
+
+.. code-block:: python
 
     from channels.db import database_sync_to_async
 
