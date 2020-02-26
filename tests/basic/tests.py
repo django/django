@@ -12,8 +12,8 @@ from django.test import (
 from django.utils.translation import gettext_lazy
 
 from .models import (
-    Article, ArticleSelectOnSave, FeaturedArticle, PrimaryKeyWithDefault,
-    SelfRef,
+    Article, ArticleSelectOnSave, ChildPrimaryKeyWithDefault, FeaturedArticle,
+    PrimaryKeyWithDefault, SelfRef,
 )
 
 
@@ -138,6 +138,12 @@ class ModelInstanceCreationTests(TestCase):
         # An UPDATE attempt is skipped when a primary key has default.
         with self.assertNumQueries(1):
             PrimaryKeyWithDefault().save()
+
+    def test_save_parent_primary_with_default(self):
+        # An UPDATE attempt is skipped when an inherited primary key has
+        # default.
+        with self.assertNumQueries(2):
+            ChildPrimaryKeyWithDefault().save()
 
 
 class ModelTest(TestCase):

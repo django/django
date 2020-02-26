@@ -855,8 +855,8 @@ class Model(metaclass=ModelBase):
             not raw and
             not force_insert and
             self._state.adding and
-            self._meta.pk.default and
-            self._meta.pk.default is not NOT_PROVIDED
+            meta.pk.default and
+            meta.pk.default is not NOT_PROVIDED
         ):
             force_insert = True
         # If possible, try an UPDATE. If that doesn't update anything, do an INSERT.
