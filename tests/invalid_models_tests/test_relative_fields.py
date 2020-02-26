@@ -150,15 +150,14 @@ class RelativeFieldTests(SimpleTestCase):
                 "through_fields keyword argument.",
                 hint=(
                     'If you want to create a recursive relationship, use '
-                    'ForeignKey("self", symmetrical=False, '
-                    'through="AmbiguousRelationship").'
+                    'ManyToManyField("self", through="AmbiguousRelationship").'
                 ),
                 obj=field,
                 id='fields.E334',
             ),
         ])
 
-    def test_ambiguous_relationship_model(self):
+    def test_ambiguous_relationship_model_to(self):
 
         class Person(models.Model):
             pass
@@ -182,7 +181,7 @@ class RelativeFieldTests(SimpleTestCase):
                 "keyword argument.",
                 hint=(
                     'If you want to create a recursive relationship, use '
-                    'ForeignKey("self", symmetrical=False, through="AmbiguousRelationship").'
+                    'ManyToManyField("self", through="AmbiguousRelationship").'
                 ),
                 obj=field,
                 id='fields.E335',
