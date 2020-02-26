@@ -219,8 +219,7 @@ Related fields
 * **fields.E309**: Reverse query name ``<related query name>`` must not contain
   ``'__'``.
 * **fields.E310**: No subset of the fields ``<field1>``, ``<field2>``, ... on
-  model ``<model>`` is unique. Add ``unique=True`` on any of those fields or
-  add at least a subset of them to a unique_together constraint.
+  model ``<model>`` is unique.
 * **fields.E311**: ``<model>`` must set ``unique=True`` because it is
   referenced by a ``ForeignKey``.
 * **fields.E312**: The ``to_field`` ``<field name>`` doesn't exist on the
