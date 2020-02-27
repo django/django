@@ -1221,13 +1221,13 @@ class FTimeDeltaTests(TestCase):
 
         # e0: started same day as assigned, zero duration
         end = stime + delta0
-        e0 = Experiment.objects.create(
+        cls.e0 = Experiment.objects.create(
             name='e0', assigned=sday, start=stime, end=end,
             completed=end.date(), estimated_time=delta0,
         )
         cls.deltas.append(delta0)
-        cls.delays.append(e0.start - datetime.datetime.combine(e0.assigned, midnight))
-        cls.days_long.append(e0.completed - e0.assigned)
+        cls.delays.append(cls.e0.start - datetime.datetime.combine(cls.e0.assigned, midnight))
+        cls.days_long.append(cls.e0.completed - cls.e0.assigned)
 
         # e1: started one day after assigned, tiny duration, data
         # set so that end time has no fractional seconds, which
@@ -1433,6 +1433,23 @@ class FTimeDeltaTests(TestCase):
             ),
         ).filter(difference=datetime.timedelta())
         self.assertTrue(queryset.exists())
+
+    @skipUnlessDBFeature('supports_temporal_subtraction')
+    def test_date_case_subtraction(self):
+        queryset = Experiment.objects.annotate(
+            date_case=Case(
+                When(Q(name='e0'), then=F('completed')),
+                output_field=DateField(),
+            ),
+            completed_value=Value(
+                self.e0.completed,
+                output_field=DateField(),
+            ),
+            difference=ExpressionWrapper(
+                F('date_case') - F('completed_value'), output_field=DurationField(),
+            ),
+        ).filter(difference=datetime.timedelta())
+        self.assertEqual(queryset.get(), self.e0)
 
     @skipUnlessDBFeature('supports_temporal_subtraction')
     def test_time_subtraction(self):
