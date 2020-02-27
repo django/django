@@ -1439,14 +1439,14 @@ class FTimeDeltaTests(TestCase):
         queryset = Experiment.objects.annotate(
             date_case=Case(
                 When(Q(name='e0'), then=F('completed')),
-                output_field=DateField(),
+                output_field=models.DateField(),
             ),
             completed_value=Value(
                 self.e0.completed,
-                output_field=DateField(),
+                output_field=models.DateField(),
             ),
             difference=ExpressionWrapper(
-                F('date_case') - F('completed_value'), output_field=DurationField(),
+                F('date_case') - F('completed_value'), output_field=models.DurationField(),
             ),
         ).filter(difference=datetime.timedelta())
         self.assertEqual(queryset.get(), self.e0)
