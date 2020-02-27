@@ -204,7 +204,10 @@ choices in a concise way::
         )
 
         def is_upperclass(self):
-            return self.year_in_school in {YearInSchool.JUNIOR, YearInSchool.SENIOR}
+            return self.year_in_school in {
+                self.YearInSchool.JUNIOR,
+                self.YearInSchool.SENIOR,
+            }
 
 These work similar to :mod:`enum` from Python's standard library, but with some
 modifications:
