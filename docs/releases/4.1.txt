@@ -446,6 +446,36 @@ Miscellaneous
 Features deprecated in 4.1
 ==========================
 
+Log out via GET
+---------------
+
+Logging out via ``GET`` requests to the :py:class:`built-in logout view
+<django.contrib.auth.views.LogoutView>` is deprecated. Use ``POST`` requests
+instead.
+
+If you want to retain the user experience of an HTML link, you can use a form
+that is styled to appear as a link:
+
+.. code-block:: html
+
+  <form id="logout-form" method="post" action="{% url 'admin:logout' %}">
+    {% csrf_token %}
+    <button type="submit">{% translate "Log out" %}</button>
+  </form>
+
+.. code-block:: css
+
+  #logout-form {
+    display: inline;
+  }
+  #logout-form button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    text-decoration: underline;
+  }
+
 Miscellaneous
 -------------
 

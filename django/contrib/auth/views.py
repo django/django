@@ -1,3 +1,4 @@
+import warnings
 from urllib.parse import urlparse, urlunparse
 
 from django.conf import settings
@@ -21,6 +22,7 @@ from django.http import HttpResponseRedirect, QueryDict
 from django.shortcuts import resolve_url
 from django.urls import reverse_lazy
 from django.utils.decorators import method_decorator
+from django.utils.deprecation import RemovedInDjango50Warning
 from django.utils.http import url_has_allowed_host_and_scheme, urlsafe_base64_decode
 from django.utils.translation import gettext_lazy as _
 from django.views.decorators.cache import never_cache
@@ -117,23 +119,38 @@ class LogoutView(SuccessURLAllowedHostsMixin, TemplateView):
     Log out the user and display the 'You are logged out' message.
     """
 
+    # RemovedInDjango50Warning: when the deprecation ends, remove "get" and
+    # "head" from http_method_names.
+    http_method_names = ["get", "head", "post", "options"]
     next_page = None
     redirect_field_name = REDIRECT_FIELD_NAME
     template_name = "registration/logged_out.html"
     extra_context = None
 
+    # RemovedInDjango50Warning: when the deprecation ends, move
+    # @method_decorator(csrf_protect) from post() to dispatch().
     @method_decorator(never_cache)
     def dispatch(self, request, *args, **kwargs):
+        if request.method.lower() == "get":
+            warnings.warn(
+                "Log out via GET requests is deprecated and will be removed in Django "
+                "5.0. Use POST requests for logging out.",
+                RemovedInDjango50Warning,
+            )
+        return super().dispatch(request, *args, **kwargs)
+
+    @method_decorator(csrf_protect)
+    def post(self, request, *args, **kwargs):
+        """Logout may be done via POST."""
         auth_logout(request)
         next_page = self.get_next_page()
         if next_page:
             # Redirect to this page until the session has been cleared.
             return HttpResponseRedirect(next_page)
-        return super().dispatch(request, *args, **kwargs)
+        return super().get(request, *args, **kwargs)
 
-    def post(self, request, *args, **kwargs):
-        """Logout may be done via POST."""
-        return self.get(request, *args, **kwargs)
+    # RemovedInDjango50Warning.
+    get = post
 
     def get_next_page(self):
         if self.next_page is not None:

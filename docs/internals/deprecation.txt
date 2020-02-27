@@ -90,6 +90,10 @@ details on these changes.
 * ``created=True`` will be required in the signature of
   ``RemoteUserBackend.configure_user()`` subclasses.
 
+* Support for logging out via ``GET`` requests in the
+  ``django.contrib.auth.views.LogoutView`` and
+  ``django.contrib.auth.views.logout_then_login()`` will be removed.
+
 .. _deprecation-removed-in-4.1:
 
 4.1
