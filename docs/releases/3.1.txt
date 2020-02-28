@@ -408,6 +408,12 @@ Dropped support for MariaDB 10.1
 Upstream support for MariaDB 10.1 ends in October 2020. Django 3.1 supports
 MariaDB 10.2 and higher.
 
+``contrib.admin`` browser support
+---------------------------------
+
+The admin no longer supports the legacy Internet Explorer browser. See
+:ref:`the admin FAQ <admin-browser-support>` for details on supported browsers.
+
 Miscellaneous
 -------------
 
