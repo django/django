@@ -893,10 +893,26 @@ table#change-history tbody th {
     border-bottom: 1px solid rgba(255, 255, 255, 0.25);
 }
 
-#user-tools a:focus, #user-tools a:hover {
+#user-tools a:focus, #user-tools a:hover,
+#user-tools #logout-form button:focus, #user-tools #logout-form button:hover {
     text-decoration: none;
     border-bottom-color: #79aec8;
     color: #79aec8;
+}
+
+#user-tools #logout-form {
+  display: inline;
+}
+
+#user-tools #logout-form button {
+  color: #fff;
+  background: none;
+  border: none;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.25);
+  cursor: pointer;
+  font-size: 1em;
+  font-weight: inherit;
+  padding: 0;
 }
 
 /* SIDEBAR */

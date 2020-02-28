@@ -698,10 +698,16 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
         response = self.client.get(changelist_url, {'section__isnull': '1'})
         self.assertContains(response, '1 article')
 
-    def test_logout_and_password_change_URLs(self):
+    def test_password_change_URL(self):
         response = self.client.get(reverse('admin:admin_views_article_changelist'))
-        self.assertContains(response, '<a href="%s">' % reverse('admin:logout'))
         self.assertContains(response, '<a href="%s">' % reverse('admin:password_change'))
+
+    def test_logout_form(self):
+        response = self.client.get(reverse('admin:admin_views_article_changelist'))
+        self.assertContains(
+            response,
+            '<form id="logout-form" method="post" action="%s">' % reverse('admin:logout')
+        )
 
     def test_named_group_field_choices_change_list(self):
         """
@@ -3028,9 +3034,10 @@ class AdminViewListEditable(TestCase):
         # main form submit button = 1
         # search field and search submit button = 2
         # CSRF field = 1
+        # CSRF field in logout form = 1
         # field to track 'select all' across paginated views = 1
-        # 6 + 4 + 4 + 1 + 2 + 1 + 1 = 19 inputs
-        self.assertContains(response, "<input", count=19)
+        # 6 + 4 + 4 + 1 + 2 + 1 + 1 + 1 = 20 inputs
+        self.assertContains(response, "<input", count=20)
         # 1 select per object = 3 selects
         self.assertContains(response, "<select", count=4)
 
@@ -3540,7 +3547,7 @@ class AdminInheritedInlinesTest(TestCase):
         foo_user = "foo username"
         bar_user = "bar username"
 
-        name_re = re.compile(b'name="(.*?)"')
+        name_re = re.compile(b'name="(?!csrfmiddlewaretoken")(.*)"')
 
         # test the add case
         response = self.client.get(reverse('admin:admin_views_persona_add'))
@@ -4804,8 +4811,9 @@ class ReadonlyTest(AdminFieldExtractionMixin, TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertNotContains(response, 'name="posted"')
         # 3 fields + 2 submit buttons + 5 inline management form fields, + 2
-        # hidden fields for inlines + 1 field for the inline + 2 empty form
-        self.assertContains(response, "<input", count=15)
+        # hidden fields for inlines + 1 field for the inline + 2 empty form,
+        # + 1 hidden input for the CSRF token in the logout form
+        self.assertContains(response, "<input", count=16)
         self.assertContains(response, formats.localize(datetime.date.today()))
         self.assertContains(response, "<label>Awesomeness level:</label>")
         self.assertContains(response, "Very awesome.")
