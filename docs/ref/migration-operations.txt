@@ -246,8 +246,7 @@ Special Operations
 .. class:: RunSQL(sql, reverse_sql=None, state_operations=None, hints=None, elidable=False)
 
 Allows running of arbitrary SQL on the database - useful for more advanced
-features of database backends that Django doesn't support directly, like
-partial indexes.
+features of database backends that Django doesn't support directly.
 
 ``sql``, and ``reverse_sql`` if provided, should be strings of SQL to run on
 the database. On most database backends (all but PostgreSQL), Django will
