@@ -692,6 +692,7 @@ class AutodetectorTests(TestCase):
         # Right number/type of migrations?
         self.assertNumberMigrations(changes, 'testapp', 1)
         self.assertOperationTypes(changes, 'testapp', 0, ["DeleteModel"])
+        self.assertSequenceEqual(list(dict(changes["testapp"][0].operations[0].fields)), ["id"])
         self.assertOperationAttributes(changes, "testapp", 0, 0, name="Author")
 
     def test_add_field(self):
@@ -742,6 +743,7 @@ class AutodetectorTests(TestCase):
         self.assertNumberMigrations(changes, 'testapp', 1)
         self.assertOperationTypes(changes, 'testapp', 0, ["RemoveField"])
         self.assertOperationAttributes(changes, "testapp", 0, 0, name="name")
+        self.assertOperationFieldAttributes(changes, "testapp", 0, 0, max_length=200)
 
     def test_alter_field(self):
         """Tests autodetection of new fields."""
@@ -1945,6 +1947,7 @@ class AutodetectorTests(TestCase):
         # Right number/type of migrations?
         self.assertNumberMigrations(changes, 'testapp', 1)
         self.assertOperationTypes(changes, 'testapp', 0, ["RemoveField", "DeleteModel"])
+        self.assertSequenceEqual(list(dict(changes['testapp'][0].operations[1].fields)), ["id", "name"])
         self.assertOperationAttributes(changes, 'testapp', 0, 0, name="publisher")
         self.assertOperationAttributes(changes, 'testapp', 0, 1, name="Publisher")
 
@@ -2028,12 +2031,11 @@ class AutodetectorTests(TestCase):
         # Right number/type of migrations?
         self.assertNumberMigrations(changes, "testapp", 1)
         self.assertOperationTypes(changes, "testapp", 0, [
-            "RemoveField", "RemoveField", "DeleteModel", "DeleteModel"
+            "RemoveField", "DeleteModel", "DeleteModel"
         ])
-        self.assertOperationAttributes(changes, "testapp", 0, 0, name="author", model_name='contract')
-        self.assertOperationAttributes(changes, "testapp", 0, 1, name="publisher", model_name='contract')
+        self.assertOperationAttributes(changes, "testapp", 0, 0, name="publishers", model_name='author')
+        self.assertOperationAttributes(changes, "testapp", 0, 1, name="Contract")
         self.assertOperationAttributes(changes, "testapp", 0, 2, name="Author")
-        self.assertOperationAttributes(changes, "testapp", 0, 3, name="Contract")
 
     def test_concrete_field_changed_to_many_to_many(self):
         """
@@ -2071,9 +2073,9 @@ class AutodetectorTests(TestCase):
         # Right number/type of migrations?
         self.assertNumberMigrations(changes, "testapp", 1)
         self.assertOperationTypes(changes, "testapp", 0, ["RemoveField", "DeleteModel", "DeleteModel"])
-        self.assertOperationAttributes(changes, "testapp", 0, 0, name="author", model_name='publisher')
-        self.assertOperationAttributes(changes, "testapp", 0, 1, name="Author")
-        self.assertOperationAttributes(changes, "testapp", 0, 2, name="Publisher")
+        self.assertOperationAttributes(changes, "testapp", 0, 0, name="publisher", model_name='author')
+        self.assertOperationAttributes(changes, "testapp", 0, 1, name="Publisher")
+        self.assertOperationAttributes(changes, "testapp", 0, 2, name="Author")
 
     def test_alter_model_options(self):
         """Changing a model's options should make a change."""

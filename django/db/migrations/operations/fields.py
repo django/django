@@ -151,6 +151,8 @@ class RemoveField(FieldOperation):
             'model_name': self.model_name,
             'name': self.name,
         }
+        if self.field:
+            kwargs['field'] = self.field
         return (
             self.__class__.__name__,
             [],
@@ -184,8 +186,16 @@ class RemoveField(FieldOperation):
 
     def reduce(self, operation, app_label):
         from .models import DeleteModel
-        if isinstance(operation, DeleteModel) and operation.name_lower == self.model_name_lower:
-            return [operation]
+        if isinstance(operation, DeleteModel):
+            if operation.name_lower == self.model_name_lower:
+                # Operations created before RemoveField and DeleteModel started
+                # tracking removed field definitions cannot be enhanced to
+                # partially track field removal.
+                if operation.fields is None or self.field is None:
+                    return [DeleteModel(operation.name)]
+                return [DeleteModel(operation.name, operation.fields + [(self.name, self.field)])]
+            elif self.references_model(operation.name, app_label):
+                return False
         return super().reduce(operation, app_label)
 
 

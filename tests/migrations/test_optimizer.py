@@ -866,3 +866,74 @@ class OptimizerTests(SimpleTestCase):
                 migrations.CreateModel("Phou", [("name", models.CharField(max_length=255))]),
             ],
         )
+
+    def test_cyclical_models_removals(self):
+        self.assertOptimizesTo(
+            [
+                migrations.RemoveField('Foo', 'bar', models.ForeignKey('Bar', models.CASCADE)),
+                migrations.RemoveField('Bar', 'foo', models.ForeignKey('Foo', models.CASCADE)),
+                migrations.DeleteModel('Foo', fields=[]),
+                migrations.DeleteModel('Bar', fields=[]),
+            ],
+            [
+                migrations.RemoveField('Foo', 'bar', models.ForeignKey('Bar', models.CASCADE)),
+                migrations.DeleteModel('Bar', fields=[
+                    ('foo', models.ForeignKey('Foo', models.CASCADE)),
+                ]),
+                migrations.DeleteModel('Foo', fields=[])
+            ],
+        )
+
+    def test_non_cyclical_models_removals(self):
+        self.assertOptimizesTo(
+            [
+                migrations.RemoveField('Foo', 'name', models.CharField(max_length=255)),
+                migrations.RemoveField('Bar', 'size', models.IntegerField()),
+                migrations.DeleteModel('Foo', fields=[]),
+                migrations.DeleteModel('Bar', fields=[]),
+            ],
+            [
+                migrations.DeleteModel('Foo', fields=[
+                    ('name', models.CharField(max_length=255)),
+                ]),
+                migrations.DeleteModel('Bar', fields=[
+                    ('size', models.IntegerField()),
+                ])
+            ],
+        )
+
+    def test_optimize_remove_field_remove_model(self):
+        self.assertOptimizesTo(
+            [
+                migrations.RemoveField('Foo', 'bar', models.CharField(max_length=255)),
+                migrations.DeleteModel('Foo', fields=[
+                    ('id', models.AutoField(primary_key=True)),
+                ]),
+            ],
+            [
+                migrations.DeleteModel('Foo', fields=[
+                    ('id', models.AutoField(primary_key=True)),
+                    ('bar', models.CharField(max_length=255)),
+                ]),
+            ],
+        )
+        self.assertOptimizesTo(
+            [
+                migrations.RemoveField('Foo', 'bar', models.CharField(max_length=255)),
+                migrations.DeleteModel('Foo'),
+            ],
+            [
+                migrations.DeleteModel('Foo'),
+            ],
+        )
+        self.assertOptimizesTo(
+            [
+                migrations.RemoveField('Foo', 'bar'),
+                migrations.DeleteModel('Foo', fields=[
+                    ('id', models.AutoField(primary_key=True)),
+                ]),
+            ],
+            [
+                migrations.DeleteModel('Foo'),
+            ],
+        )

@@ -228,11 +228,24 @@ class MigrationAutodetector:
                 old_field = self.old_apps.get_model(app_label, old_model_name)._meta.get_field(field_name)
                 if (hasattr(old_field, "remote_field") and getattr(old_field.remote_field, "through", None) and
                         not old_field.remote_field.through._meta.auto_created):
+                    through_fields = old_field.remote_field.through_fields
+                    if through_fields is None:
+                        # If through_fields are not specified then they are
+                        # implicitly defined by the single foreign key from
+                        # and to the relationship.
+                        through_fields = [None] * 2
+                        for field in old_field.remote_field.through._meta.fields:
+                            if not isinstance(field, models.ForeignKey):
+                                continue
+                            if field.remote_field.model == old_field.model:
+                                through_fields[0] = field.name
+                            if field.remote_field.model == old_field.remote_field.model:
+                                through_fields[1] = field.name
                     through_key = (
                         old_field.remote_field.through._meta.app_label,
                         old_field.remote_field.through._meta.model_name,
                     )
-                    self.through_users[through_key] = (app_label, old_model_name, field_name)
+                    self.through_users[through_key] = (app_label, old_model_name, field_name, through_fields)
 
     @staticmethod
     def _resolve_dependency(dependency):
@@ -766,13 +779,23 @@ class MigrationAutodetector:
                     )
                 )
             # Then remove each related field
-            for name in sorted(related_fields):
+            through_user = self.through_users.get((app_label, model_state.name_lower))
+            for name, field in sorted(related_fields.items()):
+                dependencies = []
+                # If the field is involved in a through relationship its
+                # removal depends on the removal of the refering many-to-many.
+                if through_user and name in through_user[3]:
+                    dependencies.append(
+                        (through_user[0], through_user[1], through_user[2], False)
+                    )
                 self.add_operation(
                     app_label,
                     operations.RemoveField(
                         model_name=model_name,
                         name=name,
-                    )
+                        field=field,
+                    ),
+                    dependencies=dependencies,
                 )
             # Finally, remove the model.
             # This depends on both the removal/alteration of all incoming fields
@@ -789,8 +812,6 @@ class MigrationAutodetector:
 
             for name in sorted(related_fields):
                 dependencies.append((app_label, model_name, name, False))
-            # We're referenced in another field's through=
-            through_user = self.through_users.get((app_label, model_state.name_lower))
             if through_user:
                 dependencies.append((through_user[0], through_user[1], through_user[2], False))
             # Finally, make the operation, deduping any dependencies
@@ -798,6 +819,10 @@ class MigrationAutodetector:
                 app_label,
                 operations.DeleteModel(
                     name=model_state.name,
+                    fields=[
+                        (name, field) for name, field in model_state.fields.items()
+                        if name not in related_fields
+                    ],
                 ),
                 dependencies=list(set(dependencies)),
             )
@@ -812,6 +837,7 @@ class MigrationAutodetector:
                 app_label,
                 operations.DeleteModel(
                     name=model_state.name,
+                    fields=[],
                 ),
             )
 
@@ -895,11 +921,13 @@ class MigrationAutodetector:
             self._generate_removed_field(app_label, model_name, field_name)
 
     def _generate_removed_field(self, app_label, model_name, field_name):
+        field = self.old_apps.get_model(app_label, model_name)._meta.get_field(field_name)
         self.add_operation(
             app_label,
             operations.RemoveField(
                 model_name=model_name,
                 name=field_name,
+                field=field,
             ),
             # We might need to depend on the removal of an
             # order_with_respect_to or index/unique_together operation;
