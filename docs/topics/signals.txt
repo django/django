@@ -216,24 +216,17 @@ its own signals.
 Defining signals
 ----------------
 
-.. class:: Signal(providing_args=list)
+.. class:: Signal()
 
-All signals are :class:`django.dispatch.Signal` instances. The
-``providing_args`` is a list of the names of arguments the signal will provide
-to listeners. This is purely documentational, however, as there is nothing that
-checks that the signal actually provides these arguments to its listeners.
+All signals are :class:`django.dispatch.Signal` instances.
 
 For example::
 
     import django.dispatch
 
-    pizza_done = django.dispatch.Signal(providing_args=["toppings", "size"])
+    pizza_done = django.dispatch.Signal()
 
-This declares a ``pizza_done`` signal that will provide receivers with
-``toppings`` and ``size`` arguments.
-
-Remember that you're allowed to change this list of arguments at any time, so
-getting the API right on the first try isn't necessary.
+This declares a ``pizza_done`` signal.
 
 Sending signals
 ---------------

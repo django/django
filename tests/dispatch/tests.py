@@ -29,10 +29,10 @@ class Callable:
         return val
 
 
-a_signal = Signal(providing_args=["val"])
-b_signal = Signal(providing_args=["val"])
-c_signal = Signal(providing_args=["val"])
-d_signal = Signal(providing_args=["val"], use_caching=True)
+a_signal = Signal()
+b_signal = Signal()
+c_signal = Signal()
+d_signal = Signal(use_caching=True)
 
 
 class DispatcherTests(SimpleTestCase):

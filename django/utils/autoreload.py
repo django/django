@@ -21,7 +21,7 @@ from django.utils.functional import cached_property
 from django.utils.version import get_version_tuple
 
 autoreload_started = Signal()
-file_changed = Signal(providing_args=['file_path', 'kind'])
+file_changed = Signal()
 
 DJANGO_AUTORELOAD_ENV = 'RUN_MAIN'
 
