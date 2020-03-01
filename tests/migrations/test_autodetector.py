@@ -321,6 +321,11 @@ class AutodetectorTests(TestCase):
         ("author", models.ForeignKey("otherapp.Book", models.CASCADE)),
         ("name", models.CharField(max_length=100)),
     ])
+    press_with_publisher = ModelState("testapp", "Press", [
+        ("id", models.AutoField(primary_key=True)),
+        ("title", models.CharField(max_length=200)),
+        ("publisher", models.ForeignKey("testapp.Publisher", models.CASCADE))
+    ])
     other_pony = ModelState("otherapp", "Pony", [
         ("id", models.AutoField(primary_key=True)),
     ])
@@ -1992,12 +1997,11 @@ class AutodetectorTests(TestCase):
         # Right number/type of migrations?
         self.assertNumberMigrations(changes, "testapp", 1)
         self.assertOperationTypes(changes, "testapp", 0, [
-            "RemoveField", "RemoveField", "DeleteModel", "DeleteModel"
+            "RemoveField", "DeleteModel", "DeleteModel"
         ])
-        self.assertOperationAttributes(changes, "testapp", 0, 0, name="author", model_name='contract')
-        self.assertOperationAttributes(changes, "testapp", 0, 1, name="publisher", model_name='contract')
+        self.assertOperationAttributes(changes, "testapp", 0, 0, name="publishers", model_name='author')
+        self.assertOperationAttributes(changes, "testapp", 0, 1, name="Contract")
         self.assertOperationAttributes(changes, "testapp", 0, 2, name="Author")
-        self.assertOperationAttributes(changes, "testapp", 0, 3, name="Contract")
 
     def test_concrete_field_changed_to_many_to_many(self):
         """
@@ -2035,9 +2039,22 @@ class AutodetectorTests(TestCase):
         # Right number/type of migrations?
         self.assertNumberMigrations(changes, "testapp", 1)
         self.assertOperationTypes(changes, "testapp", 0, ["RemoveField", "DeleteModel", "DeleteModel"])
-        self.assertOperationAttributes(changes, "testapp", 0, 0, name="author", model_name='publisher')
-        self.assertOperationAttributes(changes, "testapp", 0, 1, name="Author")
-        self.assertOperationAttributes(changes, "testapp", 0, 2, name="Publisher")
+        self.assertOperationAttributes(changes, "testapp", 0, 0, name="publisher", model_name='author')
+        self.assertOperationAttributes(changes, "testapp", 0, 1, name="Publisher")
+        self.assertOperationAttributes(changes, "testapp", 0, 2, name="Author")
+
+    def test_same_model_multiple_foreignkey_removal(self):
+        """
+        If two models have a ForeignKey to the another model, removing both of the models, should
+        generate only two DeleteModel operations.
+        """
+        changes = self.get_changes([self.author_with_publisher, self.press_with_publisher, self.publisher],
+                                   [self.publisher])
+        # Right number/type of migrations?
+        self.assertNumberMigrations(changes, "testapp", 1)
+        self.assertOperationTypes(changes, "testapp", 0, ["DeleteModel", "DeleteModel"])
+        self.assertOperationAttributes(changes, "testapp", 0, 0, name="Author")
+        self.assertOperationAttributes(changes, "testapp", 0, 1, name="Press")
 
     def test_alter_model_options(self):
         """Changing a model's options should make a change."""

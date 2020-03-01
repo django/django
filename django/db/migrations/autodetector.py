@@ -757,12 +757,13 @@ class MigrationAutodetector:
                     )
                 )
             # Then remove each related field
-            for name in sorted(related_fields):
+            for name, field in sorted(related_fields.items()):
                 self.add_operation(
                     app_label,
                     operations.RemoveField(
                         model_name=model_name,
                         name=name,
+                        field=field,
                     )
                 )
             # Finally, remove the model.
@@ -789,6 +790,7 @@ class MigrationAutodetector:
                 app_label,
                 operations.DeleteModel(
                     name=model_state.name,
+                    fields=[]
                 ),
                 dependencies=list(set(dependencies)),
             )
@@ -803,6 +805,7 @@ class MigrationAutodetector:
                 app_label,
                 operations.DeleteModel(
                     name=model_state.name,
+                    fields=[]
                 ),
             )
 
@@ -886,11 +889,13 @@ class MigrationAutodetector:
             self._generate_removed_field(app_label, model_name, field_name)
 
     def _generate_removed_field(self, app_label, model_name, field_name):
+        field = self.old_apps.get_model(app_label, model_name)._meta.get_field(field_name)
         self.add_operation(
             app_label,
             operations.RemoveField(
                 model_name=model_name,
                 name=field_name,
+                field=field
             ),
             # We might need to depend on the removal of an
             # order_with_respect_to or index/unique_together operation;

@@ -36,7 +36,7 @@ class FieldOperation(Operation):
             return field_references_model(self.field, ModelTuple(app_label, name_lower))
         return False
 
-    def references_field(self, model_name, name, app_label=None):
+    def references_field(self, model_name, name, app_label=None, reference_through=True):
         model_name_lower = model_name.lower()
         # Check if this operation locally references the field.
         if model_name_lower == self.model_name_lower:
@@ -53,11 +53,12 @@ class FieldOperation(Operation):
                         (not hasattr(self.field, 'to_fields') or
                             name in self.field.to_fields or None in self.field.to_fields)):
                     return True
-                through = getattr(remote_field, 'through', None)
-                if (through and ModelTuple.from_model(through) == model_tuple and
-                        (getattr(remote_field, 'through_fields', None) is None or
-                            name in remote_field.through_fields)):
-                    return True
+                if reference_through:
+                    through = getattr(remote_field, 'through', None)
+                    if (through and ModelTuple.from_model(through) == model_tuple and
+                            (getattr(remote_field, 'through_fields', None) is None or
+                                name in remote_field.through_fields)):
+                        return True
         return False
 
     def reduce(self, operation, app_label=None):
@@ -186,11 +187,22 @@ class RemoveField(FieldOperation):
     def describe(self):
         return "Remove field %s from %s" % (self.name, self.model_name)
 
+    def references_field(self, model_name, name, app_label=None, reference_through=True):
+        return super().references_field(model_name, name, app_label=app_label, reference_through=False)
+
     def reduce(self, operation, app_label=None):
         from .models import DeleteModel
-        if isinstance(operation, DeleteModel) and operation.name_lower == self.model_name_lower:
-            return [operation]
-        return super().reduce(operation, app_label=app_label)
+        if isinstance(operation, DeleteModel):
+            if operation.name_lower == self.model_name_lower:
+                # DeleteModel operations created before RemoveField started
+                # tracking removed field definitions cannot be enhanced to
+                # partially track field removal.
+                if operation.fields is None:
+                    return [operation]
+                return [DeleteModel(operation.name, operation.fields + [(self.name, self.field)])]
+            elif self.references_model(operation.name, app_label):
+                return False
+        return super().reduce(operation, app_label=app_label,)
 
 
 class AlterField(FieldOperation):

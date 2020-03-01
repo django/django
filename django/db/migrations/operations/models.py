@@ -242,6 +242,10 @@ class CreateModel(ModelOperation):
 class DeleteModel(ModelOperation):
     """Drop a model's table."""
 
+    def __init__(self, name, fields=None):
+        self.fields = fields
+        super().__init__(name)
+
     def deconstruct(self):
         kwargs = {
             'name': self.name,
@@ -266,9 +270,30 @@ class DeleteModel(ModelOperation):
             schema_editor.create_model(model)
 
     def references_model(self, name, app_label=None):
-        # The deleted model could be referencing the specified model through
-        # related fields.
-        return True
+        # DeleteModel operations created before RemoveField started tracking
+        # their removed field definitions could be referencing any model.
+        if self.fields is None:
+            return True
+
+        name_lower = name.lower()
+        if name_lower == self.name_lower:
+            return True
+
+        model_tuple = ModelTuple(app_label, name_lower)
+        for _name, field in self.fields:
+            # RemoveField operations created before they started tracking their
+            # removed field definition could be referencing any model.
+            if field is None:
+                return True
+            if field_references_model(field, model_tuple):
+                return True
+
+        return False
+
+    def reduce(self, operation, app_label=None):
+        if isinstance(operation, DeleteModel) and self.references_model(operation.name, app_label):
+            return False
+        return super().reduce(operation, app_label)
 
     def describe(self):
         return "Delete model %s" % self.name

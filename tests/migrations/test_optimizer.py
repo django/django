@@ -817,3 +817,38 @@ class OptimizerTests(SimpleTestCase):
                 migrations.CreateModel("Phou", [("name", models.CharField(max_length=255))]),
             ],
         )
+
+    def test_cyclical_models_removals(self):
+        self.assertOptimizesTo(
+            [
+                migrations.RemoveField('Foo', 'bar', models.ForeignKey('Bar', models.CASCADE)),
+                migrations.RemoveField('Bar', 'foo', models.ForeignKey('Foo', models.CASCADE)),
+                migrations.DeleteModel('Foo', fields=[]),
+                migrations.DeleteModel('Bar', fields=[]),
+            ],
+            [
+                migrations.RemoveField('Foo', 'bar', models.ForeignKey('Bar', models.CASCADE)),
+                migrations.DeleteModel('Bar', fields=[
+                    ('foo', models.ForeignKey('Foo', models.CASCADE)),
+                ]),
+                migrations.DeleteModel('Foo', fields=[])
+            ],
+        )
+
+    def test_non_cyclical_models_removals(self):
+        self.assertOptimizesTo(
+            [
+                migrations.RemoveField('Foo', 'name', models.CharField(max_length=255)),
+                migrations.RemoveField('Bar', 'size', models.IntegerField()),
+                migrations.DeleteModel('Foo', fields=[]),
+                migrations.DeleteModel('Bar', fields=[]),
+            ],
+            [
+                migrations.DeleteModel('Foo', fields=[
+                    ('name', models.CharField(max_length=255)),
+                ]),
+                migrations.DeleteModel('Bar', fields=[
+                    ('size', models.IntegerField()),
+                ])
+            ],
+        )
