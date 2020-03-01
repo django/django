@@ -910,8 +910,9 @@ table#change-history tbody th {
   border: none;
   border-bottom: 1px solid rgba(255, 255, 255, 0.25);
   cursor: pointer;
-  font-size: 1em;
-  font-weight: inherit;
+  font: inherit;
+  letter-spacing: inherit;
+  text-transform: inherit;
   padding: 0;
 }
 

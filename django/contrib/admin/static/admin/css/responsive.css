@@ -56,7 +56,7 @@ input[type="submit"], button {
         text-align: left;
     }
 
-    #user-tools a {
+    #user-tools a, #user-tools #logout-form button {
         display: inline-block;
         line-height: 1.4;
     }
