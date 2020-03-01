@@ -14,7 +14,7 @@ from django.utils import timezone
 from django.utils.formats import FORMAT_SETTINGS, reset_format_cache
 from django.utils.functional import empty
 
-template_rendered = Signal(providing_args=["template", "context"])
+template_rendered = Signal()
 
 # Most setting_changed receivers are supposed to be added below,
 # except for cases where the receiver is related to a contrib app.
