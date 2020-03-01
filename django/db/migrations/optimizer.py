@@ -45,9 +45,9 @@ class MigrationOptimizer:
             right = True  # Should we reduce on the right or on the left.
             # Compare it to each operation after it
             for j, other in enumerate(operations[i + 1:]):
-                in_between = operations[i + 1:i + j + 1]
                 result = operation.reduce(other, app_label)
                 if isinstance(result, list):
+                    in_between = operations[i + 1:i + j + 1]
                     if right:
                         new_operations.extend(in_between)
                         new_operations.extend(result)
