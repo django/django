@@ -635,7 +635,7 @@ class BaseDatabaseSchemaEditor:
             for index_name in index_names:
                 # The only way to check if an index was created with
                 # db_index=True or with Index(['field'], name='foo')
-                # is to look at its name (refs #28053).
+                # is to look at its name (refs #28052).
                 self.execute(self._delete_index_sql(model, index_name))
         # Change check constraints?
         if old_db_params['check'] != new_db_params['check'] and old_db_params['check']:
