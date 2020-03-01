@@ -252,6 +252,12 @@ features of database backends that Django doesn't support directly.
 the database. On most database backends (all but PostgreSQL), Django will
 split the SQL into individual statements prior to executing them.
 
+.. warning::
+
+    On PostgreSQL and SQLite, only use ``BEGIN`` or ``COMMIT`` in your SQL in
+    :ref:`non-atomic migrations <non-atomic-migrations>`, to avoid breaking
+    Django's transaction state.
+
 You can also pass a list of strings or 2-tuples. The latter is used for passing
 queries and parameters in the same way as :ref:`cursor.execute()
 <executing-custom-sql>`. These three operations are equivalent::
@@ -275,12 +281,12 @@ insertion with a deletion::
 If ``reverse_sql`` is ``None`` (the default), the ``RunSQL`` operation is
 irreversible.
 
-The ``state_operations`` argument is so you can supply operations that are
-equivalent to the SQL in terms of project state; for example, if you are
+The ``state_operations`` argument allows you to supply operations that are
+equivalent to the SQL in terms of project state. For example, if you are
 manually creating a column, you should pass in a list containing an ``AddField``
 operation here so that the autodetector still has an up-to-date state of the
-model (otherwise, when you next run ``makemigrations``, it won't see any
-operation that adds that field and so will try to run it again). For example::
+model. If you don't, when you next run ``makemigrations``, it won't see any
+operation that adds that field and so will try to run it again. For example::
 
     migrations.RunSQL(
         "ALTER TABLE musician ADD COLUMN name varchar(255) NOT NULL;",
