@@ -245,7 +245,7 @@ just deals with text and binary frames:
 
 You can also raise ``channels.exceptions.AcceptConnection`` or
 ``channels.exceptions.DenyConnection`` from anywhere inside the ``connect``
-method in order to accept or reject a connection, if you want reuseable
+method in order to accept or reject a connection, if you want reusable
 authentication or rate-limiting code that doesn't need to use mixins.
 
 A ``WebsocketConsumer``'s channel will automatically be added to (on connect)

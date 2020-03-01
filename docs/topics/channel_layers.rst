@@ -67,9 +67,9 @@ In-Memory Channel Layer
 .. warning::
 
     **Not for Production Use.** In-memory channel layers operate each
-    process as a seperate layer, which means no cross-process
+    process as a separate layer, which means no cross-process
     messaging is possible. As the core value of channel layers
-    to provide distributed mesaging, in-memory usage will
+    to provide distributed messaging, in-memory usage will
     result in sub-optimal performance and data-loss in a
     multi-instance environment.
 

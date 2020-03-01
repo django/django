@@ -41,7 +41,7 @@ Nested URL Routing
 ``URLRouter`` instances can now be nested inside each other and, like Django's
 URL handling and ``include``, will strip off the matched part of the URL in the
 outer router and leave only the unmatched portion for the inner router, allowing
-reuseable routing files.
+reusable routing files.
 
 Note that you **cannot** use the Django ``include`` function inside of the
 ``URLRouter`` as it assumes a bit too much about what it is given as its
