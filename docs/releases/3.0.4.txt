@@ -27,3 +27,6 @@ Bugfixes
 * Fixed a regression in Django 3.0.3 that caused misplacing parameters of SQL
   queries when subtracting ``DateField`` or ``DateTimeField`` expressions on
   MySQL (:ticket:`31312`).
+
+* Fixed a regression in Django 3.0 that didn't include subqueries spanning
+  multivalued relations in the ``GROUP BY`` clause (:ticket:`31150`).
