@@ -161,6 +161,12 @@ class TestQuerying(PostgreSQLTestCase):
             [self.objs[0]]
         )
 
+    def test_eq_none(self):
+        self.assertSequenceEqual(
+            JSONModel.objects.filter(field=None),
+            [self.objs[0]]
+        )
+
     def test_ordering_by_transform(self):
         objs = [
             JSONModel.objects.create(field={'ord': 93, 'name': 'bar'}),

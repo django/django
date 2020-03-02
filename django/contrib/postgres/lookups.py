@@ -1,4 +1,5 @@
 from django.db.models import Lookup, Transform
+from django.db.models.expressions import Col
 from django.db.models.lookups import Exact, FieldGetDbPrepValueMixin
 
 from .search import SearchVector, SearchVectorExact, SearchVectorField
@@ -68,9 +69,14 @@ class TrigramSimilar(PostgresSimpleLookup):
 
 
 class JSONExact(Exact):
-    can_use_none_as_rhs = True
+    @property
+    def can_use_none_as_rhs(self):
+        # Treat None lookup values as null only in queries by json key
+        return not isinstance(self.lhs, Col)
 
     def process_rhs(self, compiler, connection):
         result = super().process_rhs(compiler, connection)
-        # Treat None lookup values as null.
-        return ("'null'", []) if result == ('%s', [None]) else result
+        if self.can_use_none_as_rhs and result == ('%s', [None]):
+            return "'null'", []
+
+        return result
