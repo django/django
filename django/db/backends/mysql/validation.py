@@ -10,11 +10,7 @@ class DatabaseValidation(BaseDatabaseValidation):
         return issues
 
     def _check_sql_mode(self, **kwargs):
-        with self.connection.cursor() as cursor:
-            cursor.execute("SELECT @@sql_mode")
-            sql_mode = cursor.fetchone()
-        modes = set(sql_mode[0].split(',') if sql_mode else ())
-        if not (modes & {'STRICT_TRANS_TABLES', 'STRICT_ALL_TABLES'}):
+        if not (self.connection.sql_mode & {'STRICT_TRANS_TABLES', 'STRICT_ALL_TABLES'}):
             return [checks.Warning(
                 "MySQL Strict Mode is not set for database connection '%s'" % self.connection.alias,
                 hint="MySQL's Strict Mode fixes many data integrity problems in MySQL, "

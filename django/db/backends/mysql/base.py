@@ -364,3 +364,10 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     @cached_property
     def mysql_is_mariadb(self):
         return 'mariadb' in self.mysql_server_info.lower()
+
+    @cached_property
+    def sql_mode(self):
+        with self.cursor() as cursor:
+            cursor.execute('SELECT @@sql_mode')
+            sql_mode = cursor.fetchone()
+        return set(sql_mode[0].split(',') if sql_mode else ())
