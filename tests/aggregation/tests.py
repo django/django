@@ -1193,7 +1193,7 @@ class AggregateTestCase(TestCase):
 
     @skipUnlessDBFeature('supports_subqueries_in_group_by')
     @skipIf(
-        connection.vendor == 'mysql',
+        connection.vendor == 'mysql' and 'ONLY_FULL_GROUP_BY' in connection.sql_mode,
         'GROUP BY optimization does not work properly when ONLY_FULL_GROUP_BY '
         'mode is enabled on MySQL, see #31331.',
     )
