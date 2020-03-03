@@ -16,6 +16,11 @@ class SimpleDatabaseIntrospectionTests(SimpleTestCase):
         with self.assertRaisesMessage(NotImplementedError, msg):
             self.introspection.get_table_list(None)
 
+    def test_get_table_description(self):
+        msg = self.may_require_msg % 'get_table_description'
+        with self.assertRaisesMessage(NotImplementedError, msg):
+            self.introspection.get_table_description(None, None)
+
     def test_get_sequences(self):
         msg = self.may_require_msg % 'get_sequences'
         with self.assertRaisesMessage(NotImplementedError, msg):
