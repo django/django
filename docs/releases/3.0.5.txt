@@ -1,0 +1,12 @@
+==========================
+Django 3.0.5 release notes
+==========================
+
+*Expected April 1, 2020*
+
+Django 3.0.5 fixes several bugs in 3.0.4.
+
+Bugfixes
+========
+
+* ...
