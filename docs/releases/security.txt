@@ -1068,3 +1068,17 @@ Versions affected
 * Django 3.0 :commit:`(patch) <505826b469b16ab36693360da9e11fd13213421b>`
 * Django 2.2 :commit:`(patch) <c67a368c16e4680b324b4f385398d638db4d8147>`
 * Django 1.11 :commit:`(patch) <001b0634cd309e372edb6d7d95d083d02b8e37bd>`
+
+March 4, 2020 - :cve:`2020-9402`
+--------------------------------
+
+Potential SQL injection via ``tolerance`` parameter in GIS functions and
+aggregates on Oracle. `Full description
+<https://www.djangoproject.com/weblog/2020/mar/04/security-releases/>`__
+
+Versions affected
+~~~~~~~~~~~~~~~~~
+
+* Django 3.0 :commit:`(patch) <26a5cf834526e291db00385dd33d319b8271fc4c>`
+* Django 2.2 :commit:`(patch) <fe886a3b58a93cfbe8864b485f93cb6d426cd1f2>`
+* Django 1.11 :commit:`(patch) <02d97f3c9a88adc890047996e5606180bd1c6166>`
