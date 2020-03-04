@@ -10,7 +10,7 @@ from django.db.models import F
 from django.test import modify_settings, skipUnlessDBFeature
 
 from . import PostgreSQLSimpleTestCase, PostgreSQLTestCase
-from .models import Character, Line, Scene
+from .models import Character, Line, LineSavedSearch, Scene
 
 try:
     from django.contrib.postgres.search import (
@@ -109,6 +109,18 @@ class SimpleSearchTest(GrailTestData, PostgreSQLTestCase):
             dialogue__search=SearchQuery('nostrils', config='simple'),
         )
         self.assertSequenceEqual(searched, [self.verse2])
+
+    def test_search_with_F_expression(self):
+        # Non-matching query.
+        LineSavedSearch.objects.create(line=self.verse1, query='hearts')
+        # Matching query.
+        match = LineSavedSearch.objects.create(line=self.verse1, query='elbows')
+        for query_expression in [F('query'), SearchQuery(F('query'))]:
+            with self.subTest(query_expression):
+                searched = LineSavedSearch.objects.filter(
+                    line__dialogue__search=query_expression,
+                )
+                self.assertSequenceEqual(searched, [match])
 
 
 @modify_settings(INSTALLED_APPS={'append': 'django.contrib.postgres'})
