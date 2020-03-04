@@ -41,3 +41,6 @@ STRUCT_SIZE = {
     'f': 4,  # Float
     'd': 8,  # Double
 }
+
+# See https://trac.osgeo.org/postgis/wiki/WKTRaster/RFC/RFC1_V0SerialFormat#Pixeltypeandstorageflag
+BANDTYPE_FLAG_HASNODATA = 1 << 6

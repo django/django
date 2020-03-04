@@ -3,8 +3,8 @@ import struct
 from django.forms import ValidationError
 
 from .const import (
-    GDAL_TO_POSTGIS, GDAL_TO_STRUCT, POSTGIS_HEADER_STRUCTURE, POSTGIS_TO_GDAL,
-    STRUCT_SIZE,
+    BANDTYPE_FLAG_HASNODATA, GDAL_TO_POSTGIS, GDAL_TO_STRUCT,
+    POSTGIS_HEADER_STRUCTURE, POSTGIS_TO_GDAL, STRUCT_SIZE,
 )
 
 
@@ -48,10 +48,10 @@ def from_pgraster(data):
         pixeltype, data = chunk(data, 2)
         pixeltype = unpack('B', pixeltype)[0]
 
-        # Subtract nodata byte from band nodata value if it exists
-        has_nodata = pixeltype >= 64
+        # Remove nodata byte from band nodata value if it exists.
+        has_nodata = pixeltype & BANDTYPE_FLAG_HASNODATA
         if has_nodata:
-            pixeltype -= 64
+            pixeltype &= ~BANDTYPE_FLAG_HASNODATA
 
         # Convert datatype from PostGIS to GDAL & get pack type and size
         pixeltype = POSTGIS_TO_GDAL[pixeltype]
@@ -116,12 +116,13 @@ def to_pgraster(rast):
         # and the nodata value.
         #
         # The 8BUI stores both the PostGIS pixel data type and a nodata flag.
-        # It is composed as the datatype integer plus 64 as a flag for existing
-        # nodata values:
-        # 8BUI_VALUE = PG_PIXEL_TYPE (0-11) + FLAG (0 or 64)
+        # It is composed as the datatype with BANDTYPE_FLAG_HASNODATA (1 << 6)
+        # for existing nodata values:
+        #   8BUI_VALUE = PG_PIXEL_TYPE (0-11) | BANDTYPE_FLAG_HASNODATA
         #
         # For example, if the byte value is 71, then the datatype is
-        # 71-64 = 7 (32BSI) and the nodata value is True.
+        #   71 & ~BANDTYPE_FLAG_HASNODATA = 7 (32BSI)
+        # and the nodata value is True.
         structure = 'B' + GDAL_TO_STRUCT[band.datatype()]
 
         # Get band pixel type in PostGIS notation
@@ -129,7 +130,7 @@ def to_pgraster(rast):
 
         # Set the nodata flag
         if band.nodata_value is not None:
-            pixeltype += 64
+            pixeltype |= BANDTYPE_FLAG_HASNODATA
 
         # Pack band header
         bandheader = pack(structure, (pixeltype, band.nodata_value or 0))
