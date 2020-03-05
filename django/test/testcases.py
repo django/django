@@ -1,3 +1,4 @@
+import asyncio
 import difflib
 import json
 import posixpath
@@ -15,6 +16,8 @@ from urllib.parse import (
     parse_qsl, unquote, urlencode, urljoin, urlparse, urlsplit, urlunparse,
 )
 from urllib.request import url2pathname
+
+from asgiref.sync import async_to_sync
 
 from django.apps import apps
 from django.conf import settings
@@ -256,6 +259,10 @@ class SimpleTestCase(unittest.TestCase):
             getattr(self.__class__, "__unittest_skip__", False) or
             getattr(testMethod, "__unittest_skip__", False)
         )
+
+        # Convert async test methods.
+        if asyncio.iscoroutinefunction(testMethod):
+            setattr(self, self._testMethodName, async_to_sync(testMethod))
 
         if not skipped:
             try:

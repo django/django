@@ -2,7 +2,6 @@ import asyncio
 import sys
 from unittest import skipIf
 
-from asgiref.sync import async_to_sync
 from asgiref.testing import ApplicationCommunicator
 
 from django.core.asgi import get_asgi_application
@@ -34,7 +33,6 @@ class ASGITest(SimpleTestCase):
     def tearDown(self):
         request_started.connect(close_old_connections)
 
-    @async_to_sync
     async def test_get_asgi_application(self):
         """
         get_asgi_application() returns a functioning ASGI callable.
@@ -58,7 +56,6 @@ class ASGITest(SimpleTestCase):
         self.assertEqual(response_body['type'], 'http.response.body')
         self.assertEqual(response_body['body'], b'Hello World!')
 
-    @async_to_sync
     async def test_file_response(self):
         """
         Makes sure that FileResponse works over ASGI.
@@ -86,7 +83,6 @@ class ASGITest(SimpleTestCase):
         self.assertEqual(response_body['type'], 'http.response.body')
         self.assertEqual(response_body['body'], test_file_contents)
 
-    @async_to_sync
     async def test_headers(self):
         application = get_asgi_application()
         communicator = ApplicationCommunicator(
@@ -116,7 +112,6 @@ class ASGITest(SimpleTestCase):
         self.assertEqual(response_body['type'], 'http.response.body')
         self.assertEqual(response_body['body'], b'From Scotland,Wales')
 
-    @async_to_sync
     async def test_get_query_string(self):
         application = get_asgi_application()
         for query_string in (b'name=Andrew', 'name=Andrew'):
@@ -133,7 +128,6 @@ class ASGITest(SimpleTestCase):
                 self.assertEqual(response_body['type'], 'http.response.body')
                 self.assertEqual(response_body['body'], b'Hello Andrew!')
 
-    @async_to_sync
     async def test_disconnect(self):
         application = get_asgi_application()
         communicator = ApplicationCommunicator(application, self._get_scope(path='/'))
@@ -141,7 +135,6 @@ class ASGITest(SimpleTestCase):
         with self.assertRaises(asyncio.TimeoutError):
             await communicator.receive_output()
 
-    @async_to_sync
     async def test_wrong_connection_type(self):
         application = get_asgi_application()
         communicator = ApplicationCommunicator(
@@ -153,7 +146,6 @@ class ASGITest(SimpleTestCase):
         with self.assertRaisesMessage(ValueError, msg):
             await communicator.receive_output()
 
-    @async_to_sync
     async def test_non_unicode_query_string(self):
         application = get_asgi_application()
         communicator = ApplicationCommunicator(
