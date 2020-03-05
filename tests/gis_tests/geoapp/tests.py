@@ -611,10 +611,11 @@ class GeoQuerySetTest(TestCase):
             srid=4326,
         )
         self.assertIs(
-            forney_houston.equals(
+            forney_houston.equals_exact(
                 City.objects.filter(point__within=tx).aggregate(
                     Union('point', tolerance=32000),
                 )['point__union'],
+                tolerance=10e-6,
             ),
             True,
         )
