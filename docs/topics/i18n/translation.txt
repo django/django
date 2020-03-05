@@ -139,11 +139,9 @@ have more than a single parameter. If you used positional interpolation,
 translations wouldn't be able to reorder placeholder text.
 
 Since string extraction is done by the ``xgettext`` command, only syntaxes
-supported by ``gettext`` are supported by Django. Python :py:ref:`f-strings
-<f-strings>` and `JavaScript template strings`_ are not yet supported by
-``xgettext``.
-
-.. _JavaScript template strings: https://savannah.gnu.org/bugs/?50920
+supported by ``gettext`` are supported by Django. In particular, Python
+:py:ref:`f-strings <f-strings>` are not yet supported by ``xgettext``, and
+JavaScript template strings need ``gettext`` 0.21+.
 
 .. _translator-comments:
 
