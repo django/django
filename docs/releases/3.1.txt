@@ -557,6 +557,9 @@ Miscellaneous
 * Calling ``django.utils.crypto.get_random_string()`` without a ``length``
   argument is deprecated.
 
+* The ``list`` message for :class:`~django.forms.ModelMultipleChoiceField` is
+  deprecated in favor of ``invalid_list``.
+
 .. _removed-features-3.1:
 
 Features removed in 3.1
