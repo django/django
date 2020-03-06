@@ -53,7 +53,7 @@ class Command(BaseCommand):
         except KeyError:
             raise CommandError("Cannot find a migration matching '%s' from app '%s'. Is it in INSTALLED_APPS?" % (
                 migration_name, app_label))
-        targets = [(app_label, migration.name)]
+        target = (app_label, migration.name)
 
         # Show begin/end around output for atomic migrations, if the database
         # supports transactional DDL.
@@ -61,7 +61,7 @@ class Command(BaseCommand):
 
         # Make a plan that represents just the requested migrations and show SQL
         # for it
-        plan = [(executor.loader.graph.nodes[targets[0]], options['backwards'])]
+        plan = [(executor.loader.graph.nodes[target], options['backwards'])]
         sql_statements = executor.collect_sql(plan)
         if not sql_statements and options['verbosity'] >= 1:
             self.stderr.write('No operations found.')
