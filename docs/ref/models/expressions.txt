@@ -314,7 +314,9 @@ The ``Func`` API is as follows:
 
     .. method:: as_sql(compiler, connection, function=None, template=None, arg_joiner=None, **extra_context)
 
-        Generates the SQL for the database function.
+        Generates the SQL fragment for the database function. Returns a tuple
+        ``(sql, params)``, where ``sql`` is the SQL string, and ``params`` is
+        the list or tuple of query parameters.
 
         The ``as_vendor()`` methods should use the ``function``, ``template``,
         ``arg_joiner``, and any other ``**extra_context`` parameters to
