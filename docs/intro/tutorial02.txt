@@ -240,10 +240,9 @@ You should see something similar to the following:
 .. code-block:: text
 
     Migrations for 'polls':
-      polls/migrations/0001_initial.py:
-        - Create model Choice
+      polls/migrations/0001_initial.py
         - Create model Question
-        - Add field question to choice
+        - Create model Choice
 
 By running ``makemigrations``, you're telling Django that you've made
 some changes to your models (in this case, you've made new ones) and that
@@ -272,14 +271,6 @@ readability):
 
     BEGIN;
     --
-    -- Create model Choice
-    --
-    CREATE TABLE "polls_choice" (
-        "id" serial NOT NULL PRIMARY KEY,
-        "choice_text" varchar(200) NOT NULL,
-        "votes" integer NOT NULL
-    );
-    --
     -- Create model Question
     --
     CREATE TABLE "polls_question" (
@@ -288,16 +279,20 @@ readability):
         "pub_date" timestamp with time zone NOT NULL
     );
     --
-    -- Add field question to choice
+    -- Create model Choice
     --
-    ALTER TABLE "polls_choice" ADD COLUMN "question_id" integer NOT NULL;
-    ALTER TABLE "polls_choice" ALTER COLUMN "question_id" DROP DEFAULT;
-    CREATE INDEX "polls_choice_7aa0f6ee" ON "polls_choice" ("question_id");
+    CREATE TABLE "polls_choice" (
+        "id" serial NOT NULL PRIMARY KEY,
+        "choice_text" varchar(200) NOT NULL,
+        "votes" integer NOT NULL,
+        "question_id" integer NOT NULL
+    );
     ALTER TABLE "polls_choice"
-      ADD CONSTRAINT "polls_choice_question_id_246c99a640fbbd72_fk_polls_question_id"
+      ADD CONSTRAINT "polls_choice_question_id_c5b4b260_fk_polls_question_id"
         FOREIGN KEY ("question_id")
         REFERENCES "polls_question" ("id")
         DEFERRABLE INITIALLY DEFERRED;
+    CREATE INDEX "polls_choice_question_id_c5b4b260" ON "polls_choice" ("question_id");
 
     COMMIT;
 
