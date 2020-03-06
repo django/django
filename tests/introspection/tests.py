@@ -20,9 +20,9 @@ class IntrospectionTests(TransactionTestCase):
 
     def test_django_table_names(self):
         with connection.cursor() as cursor:
-            cursor.execute('CREATE TABLE django_ixn_test_table (id INTEGER);')
+            cursor.execute('CREATE TABLE django_ixn_test_table (id INT64) PRIMARY KEY (id)')
             tl = connection.introspection.django_table_names()
-            cursor.execute("DROP TABLE django_ixn_test_table;")
+            cursor.execute("DROP TABLE django_ixn_test_table")
             self.assertNotIn('django_ixn_test_table', tl,
                              "django_table_names() returned a non-Django table")
 
@@ -85,7 +85,7 @@ class IntrospectionTests(TransactionTestCase):
                 'BigIntegerField' if connection.features.can_introspect_big_integer_field else 'IntegerField',
                 'BinaryField' if connection.features.can_introspect_binary_field else 'TextField',
                 'SmallIntegerField' if connection.features.can_introspect_small_integer_field else 'IntegerField',
-                'DurationField' if connection.features.can_introspect_duration_field else 'BigIntegerField',
+                'DurationField' if connection.features.can_introspect_duration_field else 'IntegerField',
             ]
         )
 
