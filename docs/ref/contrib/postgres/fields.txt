@@ -79,7 +79,7 @@ may be a good choice for the :ref:`range fields <range-fields>` and
 
 .. note::
 
-    When nesting ``ArrayField``, whether you use the `size` parameter or not,
+    When nesting ``ArrayField``, whether you use the ``size`` parameter or not,
     PostgreSQL requires that the arrays are rectangular::
 
         from django.contrib.postgres.fields import ArrayField
