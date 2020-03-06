@@ -42,7 +42,7 @@ You'll need to follow these steps:
    ``django.utils.deconstruct.deconstructible`` class decorator for this
    (that's what Django uses on FileSystemStorage).
 
-By default, the following methods raise `NotImplementedError` and will
+By default, the following methods raise ``NotImplementedError`` and will
 typically have to be overridden:
 
 * :meth:`Storage.delete`
@@ -56,7 +56,7 @@ omitted. As it happens, it is possible to leave each method unimplemented and
 still have a working Storage.
 
 By way of example, if listing the contents of certain storage backends turns
-out to be expensive, you might decide not to implement `Storage.listdir`.
+out to be expensive, you might decide not to implement ``Storage.listdir()``.
 
 Another example would be a backend that only handles writing to files. In this
 case, you would not need to implement any of the above methods.
