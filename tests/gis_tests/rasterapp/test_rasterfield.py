@@ -68,8 +68,8 @@ class RasterFieldTest(TransactionTestCase):
             rast=Func(F('rast'), function='ST_SetBandIsNoData'),
         )
         r.refresh_from_db()
-        self.assertEquals(r.rast.bands[0].data(), [[no_data]])
-        self.assertEquals(r.rast.bands[0].nodata_value, no_data)
+        self.assertEqual(r.rast.bands[0].data(), [[no_data]])
+        self.assertEqual(r.rast.bands[0].nodata_value, no_data)
 
     def test_model_creation(self):
         """
