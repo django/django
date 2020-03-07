@@ -1,7 +1,7 @@
 from django.contrib.postgres.signals import (
     get_citext_oids, get_hstore_oids, register_type_handlers,
 )
-from django.db import NotSupportedError
+from django.db import NotSupportedError, router
 from django.db.migrations import AddIndex, RemoveIndex
 from django.db.migrations.operations.base import Operation
 
@@ -16,7 +16,10 @@ class CreateExtension(Operation):
         pass
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
-        if schema_editor.connection.vendor != 'postgresql':
+        if (
+            schema_editor.connection.vendor != 'postgresql' or
+            not router.allow_migrate(schema_editor.connection.alias, app_label)
+        ):
             return
         schema_editor.execute("CREATE EXTENSION IF NOT EXISTS %s" % schema_editor.quote_name(self.name))
         # Clear cached, stale oids.
@@ -28,6 +31,8 @@ class CreateExtension(Operation):
         register_type_handlers(schema_editor.connection)
 
     def database_backwards(self, app_label, schema_editor, from_state, to_state):
+        if not router.allow_migrate(schema_editor.connection.alias, app_label):
+            return
         schema_editor.execute("DROP EXTENSION %s" % schema_editor.quote_name(self.name))
         # Clear cached, stale oids.
         get_hstore_oids.cache_clear()
