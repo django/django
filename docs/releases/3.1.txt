@@ -500,6 +500,9 @@ Miscellaneous
 * :djadmin:`migrate` management command now runs the ``database`` system checks
   only for a database to migrate.
 
+* The admin CSS classes ``row1`` and ``row2`` are removed in favor of
+  ``:nth-child(odd)`` and ``:nth-child(even)`` pseudo-classes.
+
 .. _deprecated-features-3.1:
 
 Features deprecated in 3.1

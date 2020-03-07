@@ -28,14 +28,14 @@ QUnit.test('add form', function(assert) {
     var addButton = this.table.find('.add-row a');
     assert.equal(addButton.text(), this.addText);
     addButton.click();
-    assert.ok(this.table.find('#first-1').hasClass('row2'));
+    assert.ok(this.table.find('#first-1'));
 });
 
 QUnit.test('added form has remove button', function(assert) {
     var addButton = this.table.find('.add-row a');
     assert.equal(addButton.text(), this.addText);
     addButton.click();
-    assert.equal(this.table.find('#first-1.row2 .inline-deletelink').length, 1);
+    assert.equal(this.table.find('#first-1 .inline-deletelink').length, 1);
 });
 
 QUnit.test('add/remove form events', function(assert) {
@@ -45,11 +45,11 @@ QUnit.test('add/remove form events', function(assert) {
     var addButton = this.table.find('.add-row a');
     $document.on('formset:added', function(event, $row, formsetName) {
         assert.ok(true, 'event `formset:added` triggered');
-        assert.equal(true, $row.is($('.row2')));
+        assert.equal(true, $row.is('#first-1'));
         assert.equal(formsetName, 'first');
     });
     addButton.click();
-    var deletedRow = $('.row2');
+    var deletedRow = $('#first-1');
     var deleteLink = this.table.find('.inline-deletelink');
     $document.on('formset:removed', function(event, $row, formsetName) {
         assert.ok(true, 'event `formset:removed` triggered');
@@ -74,7 +74,7 @@ QUnit.test('existing add button', function(assert) {
     });
     assert.equal(this.table.find('.add-row a').length, 0);
     addButton.click();
-    assert.ok(this.table.find('#first-1').hasClass('row2'));
+    assert.ok(this.table.find('#first-1'));
 });
 
 
@@ -124,22 +124,6 @@ QUnit.test('removing a form-row also removed related row with non-field errors',
     deleteLink.trigger($.Event('click', {target: deleteLink}));
     assert.notOk(this.table.find('.row-form-errors').length);
 });
-
-QUnit.test('removing and adding a row keeps cycling row1 and row2 classes', function(assert) {
-    var $ = django.jQuery;
-    var tr = this.inlineRows.slice(1, 2);
-    var deleteLink = tr.find('a.inline-deletelink');
-    var addLink = this.table.find('.add-row > td > a');
-    assert.ok(this.table.find('tr.form-row:even').hasClass('row1'));
-    assert.ok(this.table.find('tr.form-row:odd').hasClass('row2'));
-    deleteLink.trigger($.Event('click', {target: deleteLink}));
-    assert.ok(this.table.find('tr.form-row:even').hasClass('row1'));
-    assert.ok(this.table.find('tr.form-row:odd').hasClass('row2'));
-    addLink.trigger($.Event('click', {target: addLink}));
-    assert.ok(this.table.find('tr.form-row:even').hasClass('row1'));
-    assert.ok(this.table.find('tr.form-row:odd').hasClass('row2'));
-});
-
 
 QUnit.module('admin.inlines: tabular formsets with max_num', {
     beforeEach: function() {

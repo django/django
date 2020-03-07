@@ -40,7 +40,7 @@ from .models import (
 
 def build_tbody_html(pk, href, extra_fields):
     return (
-        '<tbody><tr class="row1">'
+        '<tbody><tr>'
         '<td class="action-checkbox">'
         '<input type="checkbox" name="_selected_action" value="{}" '
         'class="action-select"></td>'

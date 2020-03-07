@@ -1205,20 +1205,6 @@ class SeleniumTests(AdminSeleniumTestCase):
         self.assertEqual(len(self.selenium.find_elements_by_css_selector(
             'form#profilecollection_form tr.dynamic-profile_set#profile_set-2')), 1)
 
-    def test_alternating_rows(self):
-        self.admin_login(username='super', password='secret')
-        self.selenium.get(self.live_server_url + reverse('admin:admin_inlines_profilecollection_add'))
-
-        # Add a few inlines
-        self.selenium.find_element_by_link_text('Add another Profile').click()
-        self.selenium.find_element_by_link_text('Add another Profile').click()
-
-        row_selector = 'form#profilecollection_form tr.dynamic-profile_set'
-        self.assertEqual(len(self.selenium.find_elements_by_css_selector(
-            "%s.row1" % row_selector)), 2, msg="Expect two row1 styled rows")
-        self.assertEqual(len(self.selenium.find_elements_by_css_selector(
-            "%s.row2" % row_selector)), 1, msg="Expect one row2 styled row")
-
     def test_collapsed_inlines(self):
         # Collapsed inlines have SHOW/HIDE links.
         self.admin_login(username='super', password='secret')
