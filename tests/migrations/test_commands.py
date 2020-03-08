@@ -695,6 +695,24 @@ class MigrateTests(MigrationTestBase):
             self.assertNotIn(start_transaction_sql.lower(), queries)
         self.assertNotIn(connection.ops.end_transaction_sql().lower(), queries)
 
+    @override_settings(MIGRATION_MODULES={'migrations': 'migrations.test_migrations_squashed'})
+    def test_sqlmigrate_ambiguous_prefix_squashed_migrations(self):
+        msg = (
+            "More than one migration matches '0001' in app 'migrations'. "
+            "Please be more specific."
+        )
+        with self.assertRaisesMessage(CommandError, msg):
+            call_command('sqlmigrate', 'migrations', '0001')
+
+    @override_settings(MIGRATION_MODULES={'migrations': 'migrations.test_migrations_squashed'})
+    def test_sqlmigrate_squashed_migration(self):
+        out = io.StringIO()
+        call_command('sqlmigrate', 'migrations', '0001_squashed_0002', stdout=out)
+        output = out.getvalue().lower()
+        self.assertIn('-- create model author', output)
+        self.assertIn('-- create model book', output)
+        self.assertNotIn('-- create model tribble', output)
+
     @override_settings(MIGRATION_MODULES={'migrations': 'migrations.test_migrations_no_operations'})
     def test_migrations_no_operations(self):
         err = io.StringIO()
