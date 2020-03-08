@@ -62,7 +62,7 @@ class Command(BaseCommand):
         # Make a plan that represents just the requested migrations and show SQL
         # for it
         plan = [(executor.loader.graph.nodes[target], options['backwards'])]
-        sql_statements = executor.collect_sql(plan)
+        sql_statements = executor.loader.collect_sql(plan)
         if not sql_statements and options['verbosity'] >= 1:
             self.stderr.write('No operations found.')
         return '\n'.join(sql_statements)

@@ -320,3 +320,21 @@ class MigrationLoader:
         See graph.make_state() for the meaning of "nodes" and "at_end".
         """
         return self.graph.make_state(nodes=nodes, at_end=at_end, real_apps=list(self.unmigrated_apps))
+
+    def collect_sql(self, plan):
+        """
+        Take a migration plan and return a list of collected SQL statements
+        that represent the best-efforts version of that plan.
+        """
+        statements = []
+        state = None
+        for migration, backwards in plan:
+            with self.connection.schema_editor(collect_sql=True, atomic=migration.atomic) as schema_editor:
+                if state is None:
+                    state = self.project_state((migration.app_label, migration.name), at_end=False)
+                if not backwards:
+                    state = migration.apply(state, schema_editor, collect_sql=True)
+                else:
+                    state = migration.unapply(state, schema_editor, collect_sql=True)
+            statements.extend(schema_editor.collected_sql)
+        return statements
