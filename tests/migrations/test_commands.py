@@ -713,6 +713,14 @@ class MigrateTests(MigrationTestBase):
         self.assertIn('-- create model book', output)
         self.assertNotIn('-- create model tribble', output)
 
+    @override_settings(MIGRATION_MODULES={'migrations': 'migrations.test_migrations_squashed'})
+    def test_sqlmigrate_replaced_migration(self):
+        out = io.StringIO()
+        call_command('sqlmigrate', 'migrations', '0001_initial', stdout=out)
+        output = out.getvalue().lower()
+        self.assertIn('-- create model author', output)
+        self.assertIn('-- create model tribble', output)
+
     @override_settings(MIGRATION_MODULES={'migrations': 'migrations.test_migrations_no_operations'})
     def test_migrations_no_operations(self):
         err = io.StringIO()

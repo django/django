@@ -32,8 +32,9 @@ class Command(BaseCommand):
         # Get the database we're operating from
         connection = connections[options['database']]
 
-        # Load up an loader to get all the migration data
-        loader = MigrationLoader(connection)
+        # Load up an loader to get all the migration data, but don't replace
+        # migrations.
+        loader = MigrationLoader(connection, replace_migrations=False)
 
         # Resolve command-line arguments into a migration
         app_label, migration_name = options['app_label'], options['migration_name']
