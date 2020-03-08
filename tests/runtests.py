@@ -284,7 +284,8 @@ class ActionSelenium(argparse.Action):
 def django_tests(verbosity, interactive, failfast, keepdb, reverse,
                  test_labels, debug_sql, parallel, tags, exclude_tags,
                  test_name_patterns, start_at, start_after, pdb, buffer):
-    state = setup(verbosity, test_labels, parallel, start_at, start_after)
+    setup_args = (verbosity, test_labels, parallel, start_at, start_after)
+    state = setup(*setup_args)
     extra_tests = []
 
     # Run the test suite, including the extra validation tests.
@@ -309,6 +310,8 @@ def django_tests(verbosity, interactive, failfast, keepdb, reverse,
     failures = test_runner.run_tests(
         test_labels or get_installed(),
         extra_tests=extra_tests,
+        setup_callback=setup,
+        setup_args=setup_args,
     )
     teardown(state)
     return failures

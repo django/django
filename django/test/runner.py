@@ -298,7 +298,7 @@ def default_test_processes():
 _worker_id = 0
 
 
-def _init_worker(counter):
+def _init_worker(counter, setup_callback, setup_args, db_names, debug_mode):
     """
     Switch to databases dedicated to this worker.
 
@@ -312,9 +312,14 @@ def _init_worker(counter):
         counter.value += 1
         _worker_id = counter.value
 
-    for alias in connections:
+    setup_callback(*setup_args)
+    setup_test_environment(debug_mode)
+
+    for alias in db_names:
         connection = connections[alias]
-        settings_dict = connection.creation.get_test_db_clone_settings(str(_worker_id))
+        settings_dict = connection.settings_dict
+        db_name = db_names[alias]
+        settings_dict['NAME'] = "{}_{}".format(db_name, _worker_id)
         # connection.settings_dict must be updated in place for changes to be
         # reflected in django.db.connections. If the following line assigned
         # connection.settings_dict = settings_dict, new threads would connect
@@ -357,10 +362,13 @@ class ParallelTestSuite(unittest.TestSuite):
     run_subsuite = _run_subsuite
     runner_class = RemoteTestRunner
 
-    def __init__(self, suite, processes, failfast=False):
+    def __init__(self, suite, processes, failfast=False, setup_callback=None, setup_args=None, debug_mode=False):
         self.subsuites = partition_suite_by_case(suite)
         self.processes = processes
         self.failfast = failfast
+        self.setup_callback = setup_callback
+        self.setup_args = setup_args
+        self.debug_mode = debug_mode
         super().__init__()
 
     def run(self, result):
@@ -382,7 +390,7 @@ class ParallelTestSuite(unittest.TestSuite):
         pool = multiprocessing.Pool(
             processes=self.processes,
             initializer=self.init_worker.__func__,
-            initargs=[counter],
+            initargs=[counter, self.setup_callback, self.setup_args, self.db_names, self.debug_mode],
         )
         args = [
             (self.runner_class, index, subsuite, self.failfast)
@@ -416,6 +424,12 @@ class ParallelTestSuite(unittest.TestSuite):
         pool.join()
 
         return result
+
+    def set_test_db_names(self, aliases):
+        """Set the test db names from which clone names are derived"""
+        self.db_names = {
+            str(alias): connections[alias].settings_dict['NAME'] for alias in aliases
+        }
 
     def __iter__(self):
         return iter(self.subsuites)
@@ -527,7 +541,7 @@ class DiscoverRunner:
         setup_test_environment(debug=self.debug_mode)
         unittest.installHandler()
 
-    def build_suite(self, test_labels=None, extra_tests=None, **kwargs):
+    def build_suite(self, test_labels=None, extra_tests=None, setup_callback=None, setup_args=None, **kwargs):
         suite = self.test_suite()
         test_labels = test_labels or ['.']
         extra_tests = extra_tests or []
@@ -597,7 +611,8 @@ class DiscoverRunner:
         suite = reorder_suite(suite, self.reorder_by, self.reverse)
 
         if self.parallel > 1:
-            parallel_suite = self.parallel_test_suite(suite, self.parallel, self.failfast)
+            parallel_suite = self.parallel_test_suite(suite, self.parallel, self.failfast, setup_callback, setup_args,
+                                                      self.debug_mode)
 
             # Since tests are distributed across processes on a per-TestCase
             # basis, there's no need for more processes than TestCases.
@@ -677,7 +692,7 @@ class DiscoverRunner:
                 print('Skipping setup of unused database(s): %s.' % ', '.join(sorted(unused_databases)))
         return databases
 
-    def run_tests(self, test_labels, extra_tests=None, **kwargs):
+    def run_tests(self, test_labels, extra_tests=None, setup_callback=None, setup_args=None, **kwargs):
         """
         Run the unit tests for all the test labels in the provided list.
 
@@ -690,10 +705,13 @@ class DiscoverRunner:
         Return the number of tests that failed.
         """
         self.setup_test_environment()
-        suite = self.build_suite(test_labels, extra_tests)
+        suite = self.build_suite(test_labels, extra_tests, setup_callback, setup_args)
         databases = self.get_databases(suite)
         old_config = self.setup_databases(aliases=databases)
         run_failed = False
+        if self.parallel > 1:
+            suite.set_test_db_names(aliases=databases)
+
         try:
             self.run_checks(databases)
             result = self.run_suite(suite)
