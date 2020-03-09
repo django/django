@@ -88,7 +88,7 @@ def ugettext_noop(message):
     return gettext_noop(message)
 
 
-def gettext(message):
+def gettext(message: str) -> str:
     return _trans.gettext(message)
 
 
