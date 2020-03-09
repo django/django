@@ -1,4 +1,4 @@
-from unittest import skipIf
+from unittest import skipIf, skipUnless
 
 from django.contrib.gis.db.models import fields
 from django.contrib.gis.geos import MultiPolygon, Polygon
@@ -10,7 +10,7 @@ from django.test import (
     TransactionTestCase, skipIfDBFeature, skipUnlessDBFeature,
 )
 
-from ..utils import mysql, spatialite
+from ..utils import mysql, oracle, spatialite
 
 try:
     GeometryColumns = connection.ops.geometry_columns()
@@ -115,6 +115,13 @@ class OperationTests(OperationTestCase):
         # Test spatial indices when available
         if self.has_spatial_indexes:
             self.assertSpatialIndexExists('gis_neighborhood', 'path')
+
+    @skipUnless(HAS_GEOMETRY_COLUMNS, "Backend doesn't support GeometryColumns.")
+    def test_geom_col_name(self):
+        self.assertEqual(
+            GeometryColumns.geom_col_name(),
+            'column_name' if oracle else 'f_geometry_column',
+        )
 
     @skipUnlessDBFeature('supports_raster')
     def test_add_raster_field(self):
