@@ -1021,7 +1021,59 @@ class Query(BaseExpression):
         self.append_annotation_mask([alias])
         self.annotations[alias] = annotation
 
+    def resolve_subquery_outerref(self, query, lhs_name, rhs_name, *args, **kwargs):
+        '''
+        Cannot directly process the clone inside resolve_expression since
+        `allow_joins` is set False there. So we do the pre-processing here.
+
+        Arguments:
+         * query: The query from the queryset on which update is called
+         * lhs_name: Name of the lhs of Subquery expression
+         * rhs_name: Chain of joined fields as passed to the OuterRef clause
+        Returns:
+         A clone of the subquery object, resolved and modified to allow joins
+        '''
+        outer_q, inner_q = self.clone(), self.clone()
+        outer_q.subquery, inner_q.subquery = True, True
+        outer_q.bump_prefix(query)
+        inner_q.bump_prefix(query)
+
+        if (self.low_mark == 0 and self.high_mark is None and
+                not self.distinct_fields and
+                not self.select_for_update):
+            outer_q.clear_ordering(True)
+
+        # Inner subquery need not have any order/limit
+        inner_q.clear_ordering(True)
+        inner_q.clear_limits()
+
+        # resolving the inner query first
+        inner_q.where.resolve_expression(query, *args, **kwargs)
+        # Now add the link between `query` and `inner_q`
+        # Couldn't reproduce a correct WHERE clause, so linking
+        # with a JOIN instead (INNER JOIN = Cross Product + WHERE)
+        reverse_fks = [
+            k for k, v in inner_q.model._meta.fields_map.items() if
+            v.field in query.model._meta.fields
+        ]
+        # Any random expression, we will drop it later
+        filter_clause = (reverse_fks[0], 42)
+        inner_q.build_filter(Q(**{filter_clause[0]: filter_clause[1]}))
+        # dropping the extra where clause, we only need the JOIN
+        inner_q.where = inner_q.where_class()
+        inner_q.add_fields([rhs_name.split(LOOKUP_SEP)[-1]])
+
+        # resolve the outer query and push the inner query inside
+        outer_q.where.resolve_expression(query, *args, **kwargs)
+        outer_q.where = outer_q.where_class()
+        outer_q.add_filter((lhs_name + '__in', inner_q))
+
+        return outer_q
+
     def resolve_expression(self, query, *args, **kwargs):
+        # Avoid circular imports
+        from django.db.models.expressions import ResolvedOuterRef
+        from django.db.models.sql.subqueries import UpdateQuery
         clone = self.clone()
         # Subqueries need to use a different set of aliases than the outer query.
         clone.bump_prefix(query)
@@ -1032,7 +1084,17 @@ class Query(BaseExpression):
                 not self.distinct_fields and
                 not self.select_for_update):
             clone.clear_ordering(True)
-        clone.where.resolve_expression(query, *args, **kwargs)
+        # Check if it is an update with and OuterRef that contains joined fields
+        if (isinstance(query, UpdateQuery) and
+                clone.where.children and
+                hasattr(clone.where.children[0], 'rhs') and
+                isinstance(clone.where.children[0].rhs, ResolvedOuterRef) and
+                LOOKUP_SEP in clone.where.children[0].rhs.name):
+            lhs_name = clone.where.children[0].lhs.__dict__['target'].name
+            rhs_name = clone.where.children[0].rhs.name
+            clone = self.resolve_subquery_outerref(query, lhs_name, rhs_name)
+        else:
+            clone.where.resolve_expression(query, *args, **kwargs)
         for key, value in clone.annotations.items():
             resolved = value.resolve_expression(query, *args, **kwargs)
             if hasattr(resolved, 'external_aliases'):

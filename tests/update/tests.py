@@ -1,9 +1,11 @@
 from django.core.exceptions import FieldError
-from django.db.models import Count, F, Max
+from django.db.models import Count, F, Max, OuterRef, Subquery
 from django.db.models.functions import Concat, Lower
 from django.test import TestCase
 
-from .models import A, B, Bar, D, DataPoint, Foo, RelatedPoint
+from .models import (
+    A, B, Bar, Company, D, DataPoint, Employee, Foo, RelatedPoint
+)
 
 
 class SimpleTest(TestCase):
@@ -199,3 +201,39 @@ class AdvancedTests(TestCase):
             with self.subTest(annotation=annotation):
                 with self.assertRaisesMessage(FieldError, msg):
                     RelatedPoint.objects.annotate(new_name=annotation).update(name=F('new_name'))
+
+    def test_update_with_join_in_outerref(self):
+
+        e1 = Employee.objects.create(
+            firstname='A_first',
+            lastname='A_last',
+            salary=100
+        )
+        e2 = Employee.objects.create(
+            firstname='B_first',
+            lastname='B_last',
+            salary=200
+        )
+        e3 = Employee.objects.create(
+            firstname='C_first',
+            lastname='C_last',
+            salary=200
+        )
+        c1 = Company.objects.create(
+            name='ABC Corp',
+            num_employees=10,
+            num_chairs=20,
+            ceo=e3,
+        )
+        
+        inner = Employee.objects.filter(
+            salary=OuterRef('ceo__salary')
+        ).order_by('id')
+        outer = Company.objects.filter(
+            num_employees__gt=2
+        ).update(num_chairs=Subquery(inner.values('salary')[:1]))
+
+        self.assertEqual(
+            list(Company.objects.filter(id=c1.id).values_list('num_chairs', flat=True)),
+            [200]
+        )
