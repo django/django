@@ -97,7 +97,7 @@ need to distinguish caches by the ``Accept-language`` header.
     If there is no headerlist stored, the page needs to be rebuilt, so this
     function returns ``None``.
 
-.. function:: learn_cache_key(request, response, cache_timeout=None, key_prefix=None)
+.. function:: learn_cache_key(request, response, cache_timeout=None, key_prefix=None, cache=None)
 
     Learns what headers to take into account for some request path from the
     response object. It stores those headers in a global path registry so that
