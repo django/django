@@ -329,7 +329,7 @@ For advanced usage you might want both a custom ``Manager`` and a custom
 returns a *subclass* of your base ``Manager`` with a copy of the custom
 ``QuerySet`` methods::
 
-    class BaseManager(models.Manager):
+    class CustomManager(models.Manager):
         def manager_only_method(self):
             return
 
@@ -338,14 +338,14 @@ returns a *subclass* of your base ``Manager`` with a copy of the custom
             return
 
     class MyModel(models.Model):
-        objects = BaseManager.from_queryset(CustomQuerySet)()
+        objects = CustomManager.from_queryset(CustomQuerySet)()
 
 You may also store the generated class into a variable::
 
-    CustomManager = BaseManager.from_queryset(CustomQuerySet)
+    MyManager = CustomManager.from_queryset(CustomQuerySet)
 
     class MyModel(models.Model):
-        objects = CustomManager()
+        objects = MyManager()
 
 .. _custom-managers-and-inheritance:
 
