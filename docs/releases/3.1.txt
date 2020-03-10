@@ -551,9 +551,9 @@ Miscellaneous
 
 * The purely documentational ``providing_args`` argument for
   :class:`~django.dispatch.Signal` is deprecated. If you rely on this
-  argument as documentation, you can move the text to a code comment or 
+  argument as documentation, you can move the text to a code comment or
   docstring.
-  
+
 .. _removed-features-3.1:
 
 Features removed in 3.1
