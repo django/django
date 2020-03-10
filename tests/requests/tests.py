@@ -669,6 +669,17 @@ class HostValidationTests(SimpleTestCase):
         # X_FORWARDED_HOST is obeyed.
         self.assertEqual(request.get_host(), 'forward.com')
 
+        # Check if X_FORWARDED_HOST is provided with a port.
+        request = HttpRequest()
+        request.META = {
+            'HTTP_X_FORWARDED_HOST': 'forward.com:8080',
+            'HTTP_HOST': 'example.com',
+            'SERVER_NAME': 'internal.com',
+            'SERVER_PORT': 80,
+        }
+        # X_FORWARDED_HOST is obeyed.
+        self.assertEqual(request.get_host(), 'forward.com:8080')
+
         # Check if X_FORWARDED_HOST isn't provided.
         request = HttpRequest()
         request.META = {
@@ -689,15 +700,6 @@ class HostValidationTests(SimpleTestCase):
         # Check if HTTP_HOST isn't provided, and we're on a nonstandard port
         request = HttpRequest()
         request.META = {
-            'SERVER_NAME': 'internal.com',
-            'SERVER_PORT': 8042,
-        }
-        self.assertEqual(request.get_host(), 'internal.com:8042')
-
-        # Check if HTTP_HOST is provided, and we're on a nonstandard port
-        request = HttpRequest()
-        request.META = {
-            'HTTP_HOST': 'internal.com',
             'SERVER_NAME': 'internal.com',
             'SERVER_PORT': 8042,
         }
@@ -763,6 +765,20 @@ class HostValidationTests(SimpleTestCase):
         }
         self.assertEqual(request.get_port(), '8080')
 
+    @override_settings(
+        USE_X_FORWARDED_PORT=True,
+        USE_X_FORWARDED_HOST=True,
+        ALLOWED_HOSTS=['*'])
+    def test_get_host_with_x_forwarded_port(self):
+        request = HttpRequest()
+        request.META = {
+            'SERVER_PORT': '80',
+            'HTTP_X_FORWARDED_HOST': 'example.com',
+            'HTTP_X_FORWARDED_PORT': '8080',
+        }
+        # Should use the X-Forwarded-Port header
+        self.assertEqual(request.get_host(), 'example.com:8080')
+
     @override_settings(DEBUG=True, ALLOWED_HOSTS=[])
     def test_host_validation_in_debug_mode(self):
         """
@@ -795,7 +811,7 @@ class HostValidationTests(SimpleTestCase):
             'xn--4ca9at.com',  # Punycode for öäü.com
         ]:
             request = HttpRequest()
-            request.META = {'HTTP_HOST': host}
+            request.META = {'HTTP_HOST': host, 'SERVER_PORT': '80'}
             with self.assertRaisesMessage(DisallowedHost, msg_suggestion % (host, host)):
                 request.get_host()
 
@@ -806,18 +822,18 @@ class HostValidationTests(SimpleTestCase):
         ]:
             host = '%s:%s' % (domain, port)
             request = HttpRequest()
-            request.META = {'HTTP_HOST': host}
+            request.META = {'HTTP_HOST': host, 'SERVER_PORT': port}
             with self.assertRaisesMessage(DisallowedHost, msg_suggestion % (host, domain)):
                 request.get_host()
 
         for host in self.poisoned_hosts:
             request = HttpRequest()
-            request.META = {'HTTP_HOST': host}
+            request.META = {'HTTP_HOST': host, 'SERVER_PORT': '80'}
             with self.assertRaisesMessage(DisallowedHost, msg_invalid_host % host):
                 request.get_host()
 
         request = HttpRequest()
-        request.META = {'HTTP_HOST': "invalid_hostname.com"}
+        request.META = {'HTTP_HOST': "invalid_hostname.com", 'SERVER_PORT': '80'}
         with self.assertRaisesMessage(DisallowedHost, msg_suggestion2 % "invalid_hostname.com"):
             request.get_host()
 
