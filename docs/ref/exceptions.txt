@@ -194,7 +194,7 @@ list of errors.
 
     If you are trying to call code that is synchronous-only from an
     asynchronous thread, then create a synchronous thread and call it in that.
-    You can accomplish this is with ``asgiref.sync.sync_to_async``.
+    You can accomplish this is with :func:`asgiref.sync.sync_to_async`.
 
 .. currentmodule:: django.urls
 
