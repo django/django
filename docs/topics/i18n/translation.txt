@@ -277,14 +277,9 @@ In a case like this, consider something like the following::
 
         a format specification for argument 'name', as in 'msgstr[0]', doesn't exist in 'msgid'
 
-.. note:: Plural form and po files
+.. versionchanged: 2.2.12
 
-    Django does not support custom plural equations in po files. As all
-    translation catalogs are merged, only the plural form for the main Django po
-    file (in ``django/conf/locale/<lang_code>/LC_MESSAGES/django.po``) is
-    considered. Plural forms in all other po files are ignored. Therefore, you
-    should not use different plural equations in your project or application po
-    files.
+    Added support for different plural equations in ``.po`` files.
 
 .. _contextual-markers:
 

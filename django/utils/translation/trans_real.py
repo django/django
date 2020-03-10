@@ -57,6 +57,63 @@ def reset_cache(**kwargs):
         get_supported_language_variant.cache_clear()
 
 
+class TranslationCatalog:
+    """
+    Simulate a dict for DjangoTranslation._catalog so as multiple catalogs
+    with different plural equations are kept separate.
+    """
+    def __init__(self, trans=None):
+        self._catalogs = [trans._catalog.copy()] if trans else [{}]
+        self._plurals = [trans.plural] if trans else [lambda n: int(n != 1)]
+
+    def __getitem__(self, key):
+        for cat in self._catalogs:
+            try:
+                return cat[key]
+            except KeyError:
+                pass
+        raise KeyError(key)
+
+    def __setitem__(self, key, value):
+        self._catalogs[0][key] = value
+
+    def __contains__(self, key):
+        return any(key in cat for cat in self._catalogs)
+
+    def items(self):
+        for cat in self._catalogs:
+            yield from cat.items()
+
+    def keys(self):
+        for cat in self._catalogs:
+            yield from cat.keys()
+
+    def update(self, trans):
+        # Merge if plural function is the same, else prepend.
+        for cat, plural in zip(self._catalogs, self._plurals):
+            if trans.plural.__code__ == plural.__code__:
+                cat.update(trans._catalog)
+                break
+        else:
+            self._catalogs.insert(0, trans._catalog)
+            self._plurals.insert(0, trans.plural)
+
+    def get(self, key, default=None):
+        missing = object()
+        for cat in self._catalogs:
+            result = cat.get(key, missing)
+            if result is not missing:
+                return result
+        return default
+
+    def plural(self, msgid, num):
+        for cat, plural in zip(self._catalogs, self._plurals):
+            tmsg = cat.get((msgid, plural(num)))
+            if tmsg is not None:
+                return tmsg
+        raise KeyError
+
+
 class DjangoTranslation(gettext_module.GNUTranslations):
     """
     Set up the GNUTranslations context with regard to output charset.
@@ -103,7 +160,7 @@ class DjangoTranslation(gettext_module.GNUTranslations):
         self._add_fallback(localedirs)
         if self._catalog is None:
             # No catalogs found for this language, set an empty catalog.
-            self._catalog = {}
+            self._catalog = TranslationCatalog()
 
     def __repr__(self):
         return "<DjangoTranslation lang:%s>" % self.__language
@@ -174,9 +231,9 @@ class DjangoTranslation(gettext_module.GNUTranslations):
             # Take plural and _info from first catalog found (generally Django's).
             self.plural = other.plural
             self._info = other._info.copy()
-            self._catalog = other._catalog.copy()
+            self._catalog = TranslationCatalog(other)
         else:
-            self._catalog.update(other._catalog)
+            self._catalog.update(other)
         if other._fallback:
             self.add_fallback(other._fallback)
 
@@ -187,6 +244,18 @@ class DjangoTranslation(gettext_module.GNUTranslations):
     def to_language(self):
         """Return the translation language name."""
         return self.__to_language
+
+    def ngettext(self, msgid1, msgid2, n):
+        try:
+            tmsg = self._catalog.plural(msgid1, n)
+        except KeyError:
+            if self._fallback:
+                return self._fallback.ngettext(msgid1, msgid2, n)
+            if n == 1:
+                tmsg = msgid1
+            else:
+                tmsg = msgid2
+        return tmsg
 
 
 def translation(language):
