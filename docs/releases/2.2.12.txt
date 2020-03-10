@@ -1,0 +1,12 @@
+===========================
+Django 2.2.12 release notes
+===========================
+
+*Expected April 1, 2020*
+
+Django 2.2.12 fixes several bugs in 2.2.11.
+
+Bugfixes
+========
+
+* ...
