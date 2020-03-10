@@ -694,6 +694,15 @@ class HostValidationTests(SimpleTestCase):
         }
         self.assertEqual(request.get_host(), 'internal.com:8042')
 
+        # Check if HTTP_HOST is provided, and we're on a nonstandard port
+        request = HttpRequest()
+        request.META = {
+            'HTTP_HOST': 'internal.com',
+            'SERVER_NAME': 'internal.com',
+            'SERVER_PORT': 8042,
+        }
+        self.assertEqual(request.get_host(), 'internal.com:8042')
+
         # Poisoned host headers are rejected as suspicious
         legit_hosts = [
             'example.com',
@@ -709,6 +718,7 @@ class HostValidationTests(SimpleTestCase):
             request = HttpRequest()
             request.META = {
                 'HTTP_HOST': host,
+                'SERVER_PORT': 80,
             }
             request.get_host()
 
@@ -717,6 +727,7 @@ class HostValidationTests(SimpleTestCase):
                 request = HttpRequest()
                 request.META = {
                     'HTTP_HOST': host,
+                    'SERVER_PORT': 80,
                 }
                 request.get_host()
 

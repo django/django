@@ -111,9 +111,9 @@ class HttpRequest:
         else:
             # Reconstruct the host using the algorithm from PEP 333.
             host = self.META['SERVER_NAME']
-            server_port = self.get_port()
-            if server_port != ('443' if self.is_secure() else '80'):
-                host = '%s:%s' % (host, server_port)
+        server_port = self.get_port()
+        if server_port != ('443' if self.is_secure() else '80'):
+            host = '%s:%s' % (host, server_port)
         return host
 
     def get_host(self):
