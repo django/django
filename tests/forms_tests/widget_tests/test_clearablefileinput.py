@@ -55,7 +55,7 @@ class ClearableFileInputTest(WidgetTest):
 
     def test_clear_input_renders_only_if_not_required(self):
         """
-        A ClearableFileInput with is_required=False does not render a clear
+        A ClearableFileInput with is_required=True does not render a clear
         checkbox.
         """
         widget = ClearableFileInput()
