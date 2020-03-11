@@ -172,7 +172,10 @@ class MiddlewareNotUsedTests(SimpleTestCase):
             "MiddlewareNotUsed('middleware_exceptions.tests.MyMiddlewareWithExceptionMessage'): spam eggs"
         )
 
-    @override_settings(DEBUG=False)
+    @override_settings(
+        DEBUG=False,
+        MIDDLEWARE=['middleware_exceptions.tests.MyMiddleware'],
+    )
     def test_do_not_log_when_debug_is_false(self):
         with self.assertRaisesMessage(AssertionError, 'no logs'):
             with self.assertLogs('django.request', 'DEBUG'):
