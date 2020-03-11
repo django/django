@@ -349,6 +349,9 @@ Models
   ``<max_length>`` characters.
 * **models.W035**: ``db_table`` ``<db_table>`` is used by multiple models:
   ``<model list>``.
+* **models.W036**: ``<database>`` does not support unique constraints with
+  conditions.
+* **models.W037**: ``<database>`` does not support indexes with conditions.
 
 Security
 --------

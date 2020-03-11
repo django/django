@@ -234,7 +234,7 @@ class UniqueTogetherTests(SimpleTestCase):
 
 
 @isolate_apps('invalid_models_tests')
-class IndexesTests(SimpleTestCase):
+class IndexesTests(TestCase):
 
     def test_pointing_to_missing_field(self):
         class Model(models.Model):
@@ -330,6 +330,50 @@ class IndexesTests(SimpleTestCase):
                 id='models.E034',
             ),
         ])
+
+    def test_index_with_condition(self):
+        class Model(models.Model):
+            age = models.IntegerField()
+
+            class Meta:
+                indexes = [
+                    models.Index(
+                        fields=['age'],
+                        name='index_age_gte_10',
+                        condition=models.Q(age__gte=10),
+                    ),
+                ]
+
+        errors = Model.check(databases=self.databases)
+        expected = [] if connection.features.supports_partial_indexes else [
+            Warning(
+                '%s does not support indexes with conditions.'
+                % connection.display_name,
+                hint=(
+                    "Conditions will be ignored. Silence this warning if you "
+                    "don't care about it."
+                ),
+                obj=Model,
+                id='models.W037',
+            )
+        ]
+        self.assertEqual(errors, expected)
+
+    def test_index_with_condition_required_db_features(self):
+        class Model(models.Model):
+            age = models.IntegerField()
+
+            class Meta:
+                required_db_features = {'supports_partial_indexes'}
+                indexes = [
+                    models.Index(
+                        fields=['age'],
+                        name='index_age_gte_10',
+                        condition=models.Q(age__gte=10),
+                    ),
+                ]
+
+        self.assertEqual(Model.check(databases=self.databases), [])
 
 
 @isolate_apps('invalid_models_tests')
@@ -1325,5 +1369,48 @@ class ConstraintsTests(TestCase):
             class Meta:
                 required_db_features = {'supports_table_check_constraints'}
                 constraints = [models.CheckConstraint(check=models.Q(age__gte=18), name='is_adult')]
+        self.assertEqual(Model.check(databases=self.databases), [])
+
+    def test_unique_constraint_with_condition(self):
+        class Model(models.Model):
+            age = models.IntegerField()
+
+            class Meta:
+                constraints = [
+                    models.UniqueConstraint(
+                        fields=['age'],
+                        name='unique_age_gte_100',
+                        condition=models.Q(age__gte=100),
+                    ),
+                ]
+
+        errors = Model.check(databases=self.databases)
+        expected = [] if connection.features.supports_partial_indexes else [
+            Warning(
+                '%s does not support unique constraints with conditions.'
+                % connection.display_name,
+                hint=(
+                    "A constraint won't be created. Silence this warning if "
+                    "you don't care about it."
+                ),
+                obj=Model,
+                id='models.W036',
+            ),
+        ]
+        self.assertEqual(errors, expected)
+
+    def test_unique_constraint_with_condition_required_db_features(self):
+        class Model(models.Model):
+            age = models.IntegerField()
+
+            class Meta:
+                required_db_features = {'supports_partial_indexes'}
+                constraints = [
+                    models.UniqueConstraint(
+                        fields=['age'],
+                        name='unique_age_gte_100',
+                        condition=models.Q(age__gte=100),
+                    ),
+                ]
 
         self.assertEqual(Model.check(databases=self.databases), [])
