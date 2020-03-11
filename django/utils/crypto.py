@@ -50,7 +50,7 @@ NOT_PROVIDED = object()  # RemovedInDjango40Warning.
 
 
 # RemovedInDjango40Warning: when the deprecation ends, replace with:
-#   def get_random_string(self, length, allowed_chars='...'):
+#   def get_random_string(length, allowed_chars='...'):
 def get_random_string(length=NOT_PROVIDED, allowed_chars=(
     'abcdefghijklmnopqrstuvwxyz'
     'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
