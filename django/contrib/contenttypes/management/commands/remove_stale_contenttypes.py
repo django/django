@@ -1,10 +1,10 @@
+from itertools import groupby
+
 from django.apps import apps
 from django.contrib.contenttypes.models import ContentType
 from django.core.management import BaseCommand
 from django.db import DEFAULT_DB_ALIAS, router
 from django.db.models.deletion import Collector
-
-from ...management import get_contenttypes_and_models
 
 
 class Command(BaseCommand):
@@ -15,6 +15,10 @@ class Command(BaseCommand):
             help='Tells Django to NOT prompt the user for input of any kind.',
         )
         parser.add_argument(
+            '--ignore-app-config', action='store_true',
+            help="Removes all content types including the ones that are not included in installed apps.",
+        )
+        parser.add_argument(
             '--database', default=DEFAULT_DB_ALIAS,
             help='Nominates the database to use. Defaults to the "default" database.',
         )
@@ -22,13 +26,18 @@ class Command(BaseCommand):
     def handle(self, **options):
         db = options['database']
         interactive = options['interactive']
+        ignore_app_config = options['ignore_app_config']
         verbosity = options['verbosity']
 
-        for app_config in apps.get_app_configs():
-            content_types, app_models = get_contenttypes_and_models(app_config, db, ContentType)
+        content_types_by_app = groupby(ContentType.objects.using(db).order_by('app_label', 'model'),
+                                       lambda x: x.app_label)
+
+        for app_label, cts in content_types_by_app:
+            if not ignore_app_config and app_label not in apps.app_configs:
+                continue
+
             to_remove = [
-                ct for (model_name, ct) in content_types.items()
-                if model_name not in app_models
+                ct for ct in cts if ct.model_class() is None
             ]
             # Confirm that the content type is stale before deletion.
             using = router.db_for_write(ContentType)
