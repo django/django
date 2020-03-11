@@ -61,6 +61,9 @@ details on these changes.
 * The ``providing_args`` argument for ``django.dispatch.Signal`` will be
   removed.
 
+* The ``length`` argument for ``django.utils.crypto.get_random_string()`` will
+  be required.
+
 See the :ref:`Django 3.1 release notes <deprecated-features-3.1>` for more
 details on these changes.
 

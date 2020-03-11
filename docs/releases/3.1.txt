@@ -554,6 +554,9 @@ Miscellaneous
   argument as documentation, you can move the text to a code comment or
   docstring.
 
+* Calling ``django.utils.crypto.get_random_string()`` without a ``length``
+  argument is deprecated.
+
 .. _removed-features-3.1:
 
 Features removed in 3.1
