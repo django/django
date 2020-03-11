@@ -99,7 +99,9 @@ Minor features
 :mod:`django.contrib.contenttypes`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* The new :option:`remove_stale_contenttypes --include-stale-apps` option
+  allows removing stale content types from previously installed apps that have
+  been removed from :setting:`INSTALLED_APPS`.
 
 :mod:`django.contrib.gis`
 ~~~~~~~~~~~~~~~~~~~~~~~~~
