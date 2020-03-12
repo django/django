@@ -108,6 +108,11 @@ class HttpRequest:
             host = self.META['HTTP_X_FORWARDED_HOST']
             if settings.USE_X_FORWARDED_PORT and (
                     'HTTP_X_FORWARDED_PORT' in self.META):
+                if ':' in host:
+                    raise ImproperlyConfigured(
+                        'HTTP_X_FORWARDED_HOST contains a port number '
+                        'and USE_X_FORWARDED_PORT is set to True'
+                    )
                 server_port = self.META['HTTP_X_FORWARDED_PORT']
                 if server_port != ('443' if self.is_secure() else '80'):
                     host = '%s:%s' % (host, server_port)
