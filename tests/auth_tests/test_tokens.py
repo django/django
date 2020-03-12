@@ -39,23 +39,24 @@ class TokenGeneratorTest(TestCase):
         # Uses a mocked version of PasswordResetTokenGenerator so we can change
         # the value of 'now'.
         user = User.objects.create_user('tokentestuser', 'test2@example.com', 'testpw')
-        p0 = PasswordResetTokenGenerator()
+        now = datetime.now()
+        p0 = MockedPasswordResetTokenGenerator(now)
         tk1 = p0.make_token(user)
         p1 = MockedPasswordResetTokenGenerator(
-            datetime.now() + timedelta(seconds=settings.PASSWORD_RESET_TIMEOUT)
+            now + timedelta(seconds=settings.PASSWORD_RESET_TIMEOUT)
         )
         self.assertIs(p1.check_token(user, tk1), True)
         p2 = MockedPasswordResetTokenGenerator(
-            datetime.now() + timedelta(seconds=(settings.PASSWORD_RESET_TIMEOUT + 1))
+            now + timedelta(seconds=(settings.PASSWORD_RESET_TIMEOUT + 1))
         )
         self.assertIs(p2.check_token(user, tk1), False)
         with self.settings(PASSWORD_RESET_TIMEOUT=60 * 60):
             p3 = MockedPasswordResetTokenGenerator(
-                datetime.now() + timedelta(seconds=settings.PASSWORD_RESET_TIMEOUT)
+                now + timedelta(seconds=settings.PASSWORD_RESET_TIMEOUT)
             )
             self.assertIs(p3.check_token(user, tk1), True)
             p4 = MockedPasswordResetTokenGenerator(
-                datetime.now() + timedelta(seconds=(settings.PASSWORD_RESET_TIMEOUT + 1))
+                now + timedelta(seconds=(settings.PASSWORD_RESET_TIMEOUT + 1))
             )
             self.assertIs(p4.check_token(user, tk1), False)
 
