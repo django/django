@@ -7,7 +7,7 @@ class Cash(decimal.Decimal):
     currency = 'USD'
 
     def __str__(self):
-        s = super().__str__(self)
+        s = super().__str__()
         return '%s %s' % (s, self.currency)
 
 
