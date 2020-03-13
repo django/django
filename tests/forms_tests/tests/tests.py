@@ -100,16 +100,17 @@ class ModelFormCallableModelDefault(TestCase):
 <option value="1" selected>ChoiceOption 1</option>
 <option value="2">ChoiceOption 2</option>
 <option value="3">ChoiceOption 3</option>
-</select><input type="hidden" name="initial-multi_choice" value="1" id="initial-id_multi_choice_0"></p>
+</select><input type="hidden" name="initial-multi_choice_0" value="1" id="initial-id_multi_choice_0"></p>
 <p><label for="id_multi_choice_int">Multi choice int:</label>
 <select multiple name="multi_choice_int" id="id_multi_choice_int" required>
 <option value="1" selected>ChoiceOption 1</option>
 <option value="2">ChoiceOption 2</option>
 <option value="3">ChoiceOption 3</option>
-</select><input type="hidden" name="initial-multi_choice_int" value="1" id="initial-id_multi_choice_int_0"></p>"""
+</select><input type="hidden" name="initial-multi_choice_int_0" value="1" id="initial-id_multi_choice_int_0"></p>"""
         )
 
     def test_initial_instance_value(self):
+        self.maxDiff = None
         "Initial instances for model fields may also be instances (refs #7287)"
         ChoiceOptionModel.objects.create(id=1, name='default')
         obj2 = ChoiceOptionModel.objects.create(id=2, name='option 2')
@@ -136,15 +137,15 @@ class ModelFormCallableModelDefault(TestCase):
 <option value="1">ChoiceOption 1</option>
 <option value="2" selected>ChoiceOption 2</option>
 <option value="3" selected>ChoiceOption 3</option>
-</select><input type="hidden" name="initial-multi_choice" value="2" id="initial-id_multi_choice_0">
-<input type="hidden" name="initial-multi_choice" value="3" id="initial-id_multi_choice_1"></p>
+</select><input type="hidden" name="initial-multi_choice_0" value="2" id="initial-id_multi_choice_0">
+<input type="hidden" name="initial-multi_choice_1" value="3" id="initial-id_multi_choice_1"></p>
 <p><label for="id_multi_choice_int">Multi choice int:</label>
 <select multiple name="multi_choice_int" id="id_multi_choice_int" required>
 <option value="1">ChoiceOption 1</option>
 <option value="2" selected>ChoiceOption 2</option>
 <option value="3" selected>ChoiceOption 3</option>
-</select><input type="hidden" name="initial-multi_choice_int" value="2" id="initial-id_multi_choice_int_0">
-<input type="hidden" name="initial-multi_choice_int" value="3" id="initial-id_multi_choice_int_1"></p>"""
+</select><input type="hidden" name="initial-multi_choice_int_0" value="2" id="initial-id_multi_choice_int_0">
+<input type="hidden" name="initial-multi_choice_int_1" value="3" id="initial-id_multi_choice_int_1"></p>"""
         )
 
 

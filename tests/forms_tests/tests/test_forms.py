@@ -836,10 +836,10 @@ Java</label></li>
         # have multiple values, its as_hidden() renders multiple <input type="hidden">
         # tags.
         f = SongForm({'name': 'Yesterday', 'composers': ['P']}, auto_id=False)
-        self.assertHTMLEqual(f['composers'].as_hidden(), '<input type="hidden" name="composers" value="P">')
+        self.assertHTMLEqual(f['composers'].as_hidden(), '<input type="hidden" name="composers_0" value="P">')
         f = SongForm({'name': 'From Me To You', 'composers': ['P', 'J']}, auto_id=False)
-        self.assertHTMLEqual(f['composers'].as_hidden(), """<input type="hidden" name="composers" value="P">
-<input type="hidden" name="composers" value="J">""")
+        self.assertHTMLEqual(f['composers'].as_hidden(), """<input type="hidden" name="composers_0" value="P">
+<input type="hidden" name="composers_1" value="J">""")
 
         # DateTimeField rendered as_hidden() is special too
         class MessageForm(Form):
@@ -959,8 +959,8 @@ Java</label></li>
         self.assertHTMLEqual(
             f.as_ul(),
             """<li>Name: <input type="text" name="name" value="Yesterday" required>
-<input type="hidden" name="composers" value="J">
-<input type="hidden" name="composers" value="P"></li>"""
+<input type="hidden" name="composers_0" value="J">
+<input type="hidden" name="composers_1" value="P"></li>"""
         )
 
         # When using CheckboxSelectMultiple, the framework expects a list of input and

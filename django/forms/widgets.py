@@ -341,6 +341,10 @@ class MultipleHiddenInput(HiddenInput):
     """
     template_name = 'django/forms/widgets/multiple_hidden.html'
 
+    def __init__(self, attrs=None, unique_names=True):
+        self.unique_names = unique_names
+        super().__init__(attrs)
+
     def get_context(self, name, value, attrs):
         context = super().get_context(name, value, attrs)
         final_attrs = context['widget']['attrs']
@@ -353,9 +357,13 @@ class MultipleHiddenInput(HiddenInput):
                 # An ID attribute was given. Add a numeric index as a suffix
                 # so that the inputs don't all have the same ID attribute.
                 widget_attrs['id'] = '%s_%s' % (id_, index)
+            if self.unique_names:
+                widget_name = '%s_%s' % (name, index)
+            else:
+                widget_name = name
             widget = HiddenInput()
             widget.is_required = self.is_required
-            subwidgets.append(widget.get_context(name, value_, widget_attrs)['widget'])
+            subwidgets.append(widget.get_context(widget_name, value_, widget_attrs)['widget'])
 
         context['widget']['subwidgets'] = subwidgets
         return context
