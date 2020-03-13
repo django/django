@@ -5868,21 +5868,19 @@ class AdminKeepChangeListFiltersTests(TestCase):
             self.get_changelist_filters_querystring(),
         )
 
-    def get_add_url(self):
-        return '%s?%s' % (
-            reverse('admin:auth_user_add',
-                    current_app=self.admin_site.name),
-            self.get_preserved_filters_querystring(),
-        )
+    def get_add_url(self, add_preserved_filters=True):
+        url = reverse('admin:auth_user_add', current_app=self.admin_site.name)
+        if add_preserved_filters:
+            url = '%s?%s' % (url, self.get_preserved_filters_querystring())
+        return url
 
-    def get_change_url(self, user_id=None):
+    def get_change_url(self, user_id=None, add_preserved_filters=True):
         if user_id is None:
             user_id = self.get_sample_user_id()
-        return "%s?%s" % (
-            reverse('admin:auth_user_change', args=(user_id,),
-                    current_app=self.admin_site.name),
-            self.get_preserved_filters_querystring(),
-        )
+        url = reverse('admin:auth_user_change', args=(user_id,), current_app=self.admin_site.name)
+        if add_preserved_filters:
+            url = '%s?%s' % (url, self.get_preserved_filters_querystring())
+        return url
 
     def get_history_url(self, user_id=None):
         if user_id is None:
@@ -5965,6 +5963,11 @@ class AdminKeepChangeListFiltersTests(TestCase):
         self.assertRedirects(response, self.get_add_url())
         post_data.pop('_addanother')
 
+    def test_change_view_without_preserved_filters(self):
+        response = self.client.get(self.get_change_url(add_preserved_filters=False))
+        # The action attribute is omitted.
+        self.assertContains(response, '<form method="post" id="user_form" novalidate>')
+
     def test_add_view(self):
         # Get the `add_view`.
         response = self.client.get(self.get_add_url())
@@ -6002,6 +6005,11 @@ class AdminKeepChangeListFiltersTests(TestCase):
         response = self.client.post(self.get_add_url(), data=post_data)
         self.assertRedirects(response, self.get_add_url())
         post_data.pop('_addanother')
+
+    def test_add_view_without_preserved_filters(self):
+        response = self.client.get(self.get_add_url(add_preserved_filters=False))
+        # The action attribute is omitted.
+        self.assertContains(response, '<form method="post" id="user_form" novalidate>')
 
     def test_delete_view(self):
         # Test redirect on "Delete".

@@ -1284,7 +1284,8 @@ class UUIDUserTests(TestCase):
 
         password_change_url = reverse('custom_user_admin:auth_user_password_change', args=(u.pk,))
         response = self.client.get(password_change_url)
-        self.assertEqual(response.status_code, 200)
+        # The action attribute is omitted.
+        self.assertContains(response, '<form method="post" id="uuiduser_form">')
 
         # A LogEntry is created with pk=1 which breaks a FK constraint on MySQL
         with connection.constraint_checks_disabled():
