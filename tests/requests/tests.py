@@ -2,7 +2,7 @@ from io import BytesIO
 from itertools import chain
 from urllib.parse import urlencode
 
-from django.core.exceptions import DisallowedHost
+from django.core.exceptions import DisallowedHost, ImproperlyConfigured
 from django.core.handlers.wsgi import LimitedStream, WSGIRequest
 from django.http import HttpRequest, RawPostDataException, UnreadablePostError
 from django.http.multipartparser import MultiPartParserError
@@ -778,6 +778,21 @@ class HostValidationTests(SimpleTestCase):
         }
         # Should use the X-Forwarded-Port header
         self.assertEqual(request.get_host(), 'example.com:8080')
+
+    @override_settings(
+        USE_X_FORWARDED_PORT=True,
+        USE_X_FORWARDED_HOST=True,
+        ALLOWED_HOSTS=['*'])
+    def test_get_host_with_use_x_forwarded_port_and_port_in_host(self):
+        request = HttpRequest()
+        request.META = {
+            'SERVER_PORT': '80',
+            'HTTP_X_FORWARDED_HOST': 'example.com:8081',
+            'HTTP_X_FORWARDED_PORT': '8080',
+        }
+        # Should use the X-Forwarded-Port header
+        with self.assertRaises(ImproperlyConfigured):
+            request.get_host()
 
     @override_settings(DEBUG=True, ALLOWED_HOSTS=[])
     def test_host_validation_in_debug_mode(self):
