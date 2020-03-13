@@ -5920,7 +5920,7 @@ class AdminKeepChangeListFiltersTests(TestCase):
 
         # Check the form action.
         form_action = re.search(
-            '<form action="(.*?)" method="post" id="user_form".*?>',
+            '<form action="(.*?)" method="post" id="user_form" novalidate>',
             response.content.decode()
         )
         self.assertURLEqual(form_action.group(1), '?%s' % self.get_preserved_filters_querystring())
@@ -5972,7 +5972,7 @@ class AdminKeepChangeListFiltersTests(TestCase):
 
         # Check the form action.
         form_action = re.search(
-            '<form action="(.*?)" method="post" id="user_form".*?>',
+            '<form action="(.*?)" method="post" id="user_form" novalidate>',
             response.content.decode()
         )
         self.assertURLEqual(form_action.group(1), '?%s' % self.get_preserved_filters_querystring())
