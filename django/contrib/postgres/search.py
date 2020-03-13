@@ -193,11 +193,6 @@ class SearchQuery(SearchQueryCombinable, Value):
             template = '!!({})'.format(template)
         return template, params
 
-    def _combine(self, other, connector, reversed):
-        combined = super()._combine(other, connector, reversed)
-        combined.output_field = SearchQueryField()
-        return combined
-
     def __invert__(self):
         return type(self)(self.value, config=self.config, invert=not self.invert)
 
