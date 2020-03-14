@@ -77,6 +77,11 @@ Minor features
 * Added the :class:`~django.contrib.gis.db.models.functions.AsWKB` and
   :class:`~django.contrib.gis.db.models.functions.AsWKT` functions.
 
+:mod:`django.contrib.humanize`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* :tfilter:`intword` template filter now supports negative integers.
+
 :mod:`django.contrib.messages`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
