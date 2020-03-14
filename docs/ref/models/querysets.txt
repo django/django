@@ -2799,7 +2799,7 @@ extract two field values, where only one is expected::
     the first query. Without it, a nested query would be executed, because
     :ref:`querysets-are-lazy`.
 
-.. fieldlookup:: in
+.. fieldlookup:: notin
 
 ``notin``
 ~~~~~~~~~

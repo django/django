@@ -553,6 +553,19 @@ class LookupTests(TestCase):
         )
 
     def test_notin(self):
+        # using __notin with an empty list should return all records
+        self.assertQuerysetEqual(
+            Article.objects.filter(id__notin=[]),
+            [
+                '<Article: Article 5>',
+                '<Article: Article 6>',
+                '<Article: Article 4>',
+                '<Article: Article 2>',
+                '<Article: Article 3>',
+                '<Article: Article 7>',
+                '<Article: Article 1>',
+            ]
+        )
         self.assertQuerysetEqual(
             Article.objects.filter(id__notin=[4, 5, 6, 7, 999]),
             [

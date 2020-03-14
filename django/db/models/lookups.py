@@ -361,7 +361,12 @@ class In(FieldGetDbPrepValueIterableMixin, BuiltinLookup):
                 rhs = self.rhs
 
             if not rhs:
-                raise EmptyResultSet
+                if self.__class__.__name__ == "NotIn":
+                    # To stay DRY, we return empty strings for NOT IN
+                    # This lets us return all results instead of none.
+                    return("", "")
+                else:
+                    raise EmptyResultSet
 
             # rhs should be an iterable; use batch_process_rhs() to
             # prepare/transform those values.
@@ -411,6 +416,9 @@ class NotIn(In):
     lookup_name = "notin"
 
     def get_rhs_op(self, connection, rhs):
+        # If an empty list is passed to `notin`, return all.
+        if not len(rhs):
+            return ""
         return "NOT IN %s" % rhs
 
 
