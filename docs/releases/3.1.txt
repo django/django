@@ -262,6 +262,11 @@ Forms
   now uses ``DATE_INPUT_FORMATS`` in addition to ``DATETIME_INPUT_FORMATS``
   when converting a field input to a ``datetime`` value.
 
+
+* :class:`django.forms.MultipleHiddenInput` now accepts a
+  ``unique_names`` attribute. When set to True this results in index being
+  appended to the field name. Defaults to True.
+
 Generic Views
 ~~~~~~~~~~~~~
 

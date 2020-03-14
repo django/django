@@ -95,4 +95,3 @@ class MultipleHiddenInputTest(WidgetTest):
             self.no_unique_names, 'email', ['test@example.com'], attrs={'class': 'fun'},
             html='<input type="hidden" name="email" value="test@example.com" class="fun">',
         )
-
