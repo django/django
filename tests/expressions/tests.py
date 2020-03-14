@@ -216,7 +216,7 @@ class BasicExpressionsTests(TestCase):
     def test_filter_with_join(self):
         # F Expressions can also span joins
         Company.objects.update(point_of_contact=F('ceo'))
-        c = Company.objects.first()
+        c = Company.objects.get(name="Example Inc.")
         c.point_of_contact = Employee.objects.create(firstname="Guido", lastname="van Rossum")
         c.save()
 
