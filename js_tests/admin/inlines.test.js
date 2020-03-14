@@ -47,6 +47,7 @@ QUnit.test('add/remove form events', function(assert) {
         assert.ok(true, 'event `formset:added` triggered');
         assert.equal(true, $row.is('#first-1'));
         assert.equal(formsetName, 'first');
+        $document.off('formset:added');
     });
     addButton.click();
     var deletedRow = $('#first-1');
@@ -55,6 +56,7 @@ QUnit.test('add/remove form events', function(assert) {
         assert.ok(true, 'event `formset:removed` triggered');
         assert.equal(true, $row.is(deletedRow));
         assert.equal(formsetName, 'first');
+        $document.off('formset:removed');
     });
     deleteLink.trigger($.Event('click', {target: deleteLink}));
 });
