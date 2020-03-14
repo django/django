@@ -552,6 +552,16 @@ class LookupTests(TestCase):
             ]
         )
 
+    def test_notin(self):
+        self.assertQuerysetEqual(
+            Article.objects.filter(id__notin=[4, 5, 6, 7, 999]),
+            [
+                '<Article: Article 2>',
+                '<Article: Article 3>',
+                '<Article: Article 1>',
+            ]
+        )
+
     def test_in_different_database(self):
         with self.assertRaisesMessage(
             ValueError,

@@ -406,6 +406,14 @@ class In(FieldGetDbPrepValueIterableMixin, BuiltinLookup):
         return ''.join(in_clause_elements), params
 
 
+@Field.register_lookup
+class NotIn(In):
+    lookup_name = "notin"
+
+    def get_rhs_op(self, connection, rhs):
+        return "NOT IN %s" % rhs
+
+
 class PatternLookup(BuiltinLookup):
     param_pattern = '%%%s%%'
     prepare_rhs = False
