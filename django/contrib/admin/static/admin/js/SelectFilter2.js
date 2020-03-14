@@ -2,9 +2,9 @@
 /*
 SelectFilter2 - Turns a multiple-select box into a filter interface.
 
-Requires jQuery, core.js, and SelectBox.js.
+Requires core.js and SelectBox.js.
 */
-(function($) {
+(function() {
     'use strict';
     window.SelectFilter = {
         init: function(field_id, field_name, is_stacked) {
@@ -156,9 +156,20 @@ Requires jQuery, core.js, and SelectBox.js.
 
             if (!is_stacked) {
                 // In horizontal mode, give the same height to the two boxes.
-                var j_from_box = $('#' + field_id + '_from');
-                var j_to_box = $('#' + field_id + '_to');
-                j_to_box.height($(filter_p).outerHeight() + j_from_box.outerHeight());
+                var j_from_box = document.getElementById(field_id + '_from');
+                var j_to_box = document.getElementById(field_id + '_to');
+                var height = filter_p.offsetHeight + j_from_box.offsetHeight;
+
+                var j_to_box_style = window.getComputedStyle(j_to_box);
+                if (j_to_box_style.getPropertyValue('box-sizing') === 'border-box') {
+                    // Add the padding and border to the final height.
+                    height += parseInt(j_to_box_style.getPropertyValue('padding-top'), 10)
+                        + parseInt(j_to_box_style.getPropertyValue('padding-bottom'), 10)
+                        + parseInt(j_to_box_style.getPropertyValue('border-top-width'), 10)
+                        + parseInt(j_to_box_style.getPropertyValue('border-bottom-width'), 10);
+                }
+
+                j_to_box.style.height = height + 'px';
             }
 
             // Initial icon refresh
@@ -167,20 +178,20 @@ Requires jQuery, core.js, and SelectBox.js.
         any_selected: function(field) {
             var any_selected = false;
             // Temporarily add the required attribute and check validity.
-            field.attr('required', 'required');
-            any_selected = field.is(':valid');
-            field.removeAttr('required');
+            field.required = true;
+            any_selected = field.checkValidity();
+            field.required = false;
             return any_selected;
         },
         refresh_icons: function(field_id) {
-            var from = $('#' + field_id + '_from');
-            var to = $('#' + field_id + '_to');
+            var from = document.getElementById(field_id + '_from');
+            var to = document.getElementById(field_id + '_to');
             // Active if at least one item is selected
-            $('#' + field_id + '_add_link').toggleClass('active', SelectFilter.any_selected(from));
-            $('#' + field_id + '_remove_link').toggleClass('active', SelectFilter.any_selected(to));
+            document.getElementById(field_id + '_add_link').classList.toggle('active', SelectFilter.any_selected(from));
+            document.getElementById(field_id + '_remove_link').classList.toggle('active', SelectFilter.any_selected(to));
             // Active if the corresponding box isn't empty
-            $('#' + field_id + '_add_all_link').toggleClass('active', from.find('option').length > 0);
-            $('#' + field_id + '_remove_all_link').toggleClass('active', to.find('option').length > 0);
+            document.getElementById(field_id + '_add_all_link').classList.toggle('active', from.querySelector('option'));
+            document.getElementById(field_id + '_remove_all_link').classList.toggle('active', to.querySelector('option'));
         },
         filter_key_press: function(event, field_id) {
             var from = document.getElementById(field_id + '_from');
@@ -219,11 +230,9 @@ Requires jQuery, core.js, and SelectBox.js.
     };
 
     window.addEventListener('load', function(e) {
-        $('select.selectfilter, select.selectfilterstacked').each(function() {
-            var $el = $(this),
-                data = $el.data();
-            SelectFilter.init($el.attr('id'), data.fieldName, parseInt(data.isStacked, 10));
+        document.querySelectorAll('select.selectfilter, select.selectfilterstacked').forEach(function(el) {
+            var data = el.dataset;
+            SelectFilter.init(el.id, data.fieldName, parseInt(data.isStacked, 10));
         });
     });
-
-})(django.jQuery);
+})();
