@@ -6,14 +6,6 @@ Requires jQuery, core.js, and SelectBox.js.
 */
 (function($) {
     'use strict';
-    function findForm(node) {
-        // returns the node of the form containing the given node
-        if (node.tagName.toLowerCase() !== 'form') {
-            return findForm(node.parentNode);
-        }
-        return node;
-    }
-
     window.SelectFilter = {
         init: function(field_id, field_name, is_stacked) {
             if (field_id.match(/__prefix__/)) {
@@ -154,7 +146,7 @@ Requires jQuery, core.js, and SelectBox.js.
                     SelectFilter.refresh_icons(field_id);
                 }
             });
-            findForm(from_box).addEventListener('submit', function() {
+            from_box.closest('form').addEventListener('submit', function() {
                 SelectBox.select_all(field_id + '_to');
             });
             SelectBox.init(field_id + '_from');
