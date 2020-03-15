@@ -196,7 +196,6 @@ Requires jQuery, core.js, and SelectBox.js.
                 SelectBox.move(field_id + '_from', field_id + '_to');
                 from.selectedIndex = 0;
                 event.preventDefault();
-                return false;
             }
         },
         filter_key_up: function(event, field_id) {
@@ -204,7 +203,6 @@ Requires jQuery, core.js, and SelectBox.js.
             var temp = from.selectedIndex;
             SelectBox.filter(field_id + '_from', document.getElementById(field_id + '_input').value);
             from.selectedIndex = temp;
-            return true;
         },
         filter_key_down: function(event, field_id) {
             var from = document.getElementById(field_id + '_from');
@@ -213,7 +211,7 @@ Requires jQuery, core.js, and SelectBox.js.
                 var old_index = from.selectedIndex;
                 SelectBox.move(field_id + '_from', field_id + '_to');
                 from.selectedIndex = (old_index === from.length) ? from.length - 1 : old_index;
-                return false;
+                return;
             }
             // down arrow -- wrap around
             if ((event.which && event.which === 40) || (event.keyCode && event.keyCode === 40)) {
@@ -223,7 +221,6 @@ Requires jQuery, core.js, and SelectBox.js.
             if ((event.which && event.which === 38) || (event.keyCode && event.keyCode === 38)) {
                 from.selectedIndex = (from.selectedIndex === 0) ? from.length - 1 : from.selectedIndex - 1;
             }
-            return true;
         }
     };
 
