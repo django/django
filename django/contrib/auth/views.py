@@ -10,6 +10,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import (
     AuthenticationForm, PasswordChangeForm, PasswordResetForm, SetPasswordForm,
 )
+from django.contrib.auth.mixins import SuccessURLAllowedHostsMixin
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.exceptions import ValidationError
@@ -28,13 +29,6 @@ from django.views.generic.base import TemplateView
 from django.views.generic.edit import FormView
 
 UserModel = get_user_model()
-
-
-class SuccessURLAllowedHostsMixin:
-    success_url_allowed_hosts = set()
-
-    def get_success_url_allowed_hosts(self):
-        return {self.request.get_host(), *self.success_url_allowed_hosts}
 
 
 class LoginView(SuccessURLAllowedHostsMixin, FormView):
