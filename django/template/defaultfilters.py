@@ -786,6 +786,7 @@ def yesno(value, arg=None):
     ==========  ======================  ==================================
     """
     if arg is None:
+        # Translators: Please do not add spaces around commas.
         arg = gettext('yes,no,maybe')
     bits = arg.split(',')
     if len(bits) < 2:
