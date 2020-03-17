@@ -37,44 +37,47 @@ Create the view template for the room view in ``chat/templates/chat/room.html``:
         <title>Chat Room</title>
     </head>
     <body>
-        <textarea id="chat-log" cols="100" rows="20"></textarea><br/>
-        <input id="chat-message-input" type="text" size="100"/><br/>
-        <input id="chat-message-submit" type="button" value="Send"/>
+        <textarea id="chat-log" cols="100" rows="20"></textarea><br>
+        <input id="chat-message-input" type="text" size="100"><br>
+        <input id="chat-message-submit" type="button" value="Send">
+        {{ room_name|json_script:"room-name" }}
+        <script>
+            const roomName = JSON.parse(document.getElementById('room-name').textContent);
+
+            const chatSocket = new WebSocket(
+                'ws://'
+                + window.location.host
+                + '/ws/chat/'
+                + roomName
+                + '/'
+            );
+
+            chatSocket.onmessage = function(e) {
+                const data = JSON.parse(e.data);
+                document.querySelector('#chat-log').value += (data.message + '\n');
+            };
+
+            chatSocket.onclose = function(e) {
+                console.error('Chat socket closed unexpectedly');
+            };
+
+            document.querySelector('#chat-message-input').focus();
+            document.querySelector('#chat-message-input').onkeyup = function(e) {
+                if (e.keyCode === 13) {  // enter, return
+                    document.querySelector('#chat-message-submit').click();
+                }
+            };
+
+            document.querySelector('#chat-message-submit').onclick = function(e) {
+                const messageInputDom = document.querySelector('#chat-message-input');
+                const message = messageInputDom.value;
+                chatSocket.send(JSON.stringify({
+                    'message': message
+                }));
+                messageInputDom.value = '';
+            };
+        </script>
     </body>
-    <script>
-        var roomName = "{{ room_name|escapejs }}";
-
-        var chatSocket = new WebSocket(
-            'ws://' + window.location.host +
-            '/ws/chat/' + roomName + '/');
-
-        chatSocket.onmessage = function(e) {
-            var data = JSON.parse(e.data);
-            var message = data['message'];
-            document.querySelector('#chat-log').value += (message + '\n');
-        };
-
-        chatSocket.onclose = function(e) {
-            console.error('Chat socket closed unexpectedly');
-        };
-
-        document.querySelector('#chat-message-input').focus();
-        document.querySelector('#chat-message-input').onkeyup = function(e) {
-            if (e.keyCode === 13) {  // enter, return
-                document.querySelector('#chat-message-submit').click();
-            }
-        };
-
-        document.querySelector('#chat-message-submit').onclick = function(e) {
-            var messageInputDom = document.querySelector('#chat-message-input');
-            var message = messageInputDom.value;
-            chatSocket.send(JSON.stringify({
-                'message': message
-            }));
-
-            messageInputDom.value = '';
-        };
-    </script>
     </html>
 
 Create the view function for the room view in ``chat/views.py``:
@@ -179,8 +182,8 @@ Put the following code in ``chat/consumers.py``:
 .. code-block:: python
 
     # chat/consumers.py
-    from channels.generic.websocket import WebsocketConsumer
     import json
+    from channels.generic.websocket import WebsocketConsumer
 
     class ChatConsumer(WebsocketConsumer):
         def connect(self):
@@ -230,13 +233,15 @@ Put the following code in ``chat/routing.py``:
 .. code-block:: python
 
     # chat/routing.py
-    from django.urls import re_path
+    from django.urls import path
 
     from . import consumers
 
     websocket_urlpatterns = [
         re_path(r'ws/chat/(?P<room_name>\w+)/$', consumers.ChatConsumer),
     ]
+
+(Note we use ``re_path()`` due to limitations in :ref:`URLRouter <urlrouter>`.)
 
 The next step is to point the root routing configuration at the **chat.routing**
 module. In ``mysite/routing.py``, import ``AuthMiddlewareStack``, ``URLRouter``,
@@ -345,7 +350,7 @@ Redis server on port 6379, run the following command:
 
 .. code-block:: sh
 
-    $ docker run -p 6379:6379 -d redis:2.8
+    $ docker run -p 6379:6379 -d redis:5
 
 We need to install channels_redis so that Channels knows how to interface with
 Redis. Run the following command:
@@ -397,9 +402,9 @@ following code in ``chat/consumers.py``, replacing the old code:
 .. code-block:: python
 
     # chat/consumers.py
+    import json
     from asgiref.sync import async_to_sync
     from channels.generic.websocket import WebsocketConsumer
-    import json
 
     class ChatConsumer(WebsocketConsumer):
         def connect(self):

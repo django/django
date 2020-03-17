@@ -163,9 +163,9 @@ Put the following code in ``chat/templates/chat/index.html``:
         <title>Chat Rooms</title>
     </head>
     <body>
-        What chat room would you like to enter?<br/>
-        <input id="room-name-input" type="text" size="100"/><br/>
-        <input id="room-name-submit" type="button" value="Enter"/>
+        What chat room would you like to enter?<br>
+        <input id="room-name-input" type="text" size="100"><br>
+        <input id="room-name-submit" type="button" value="Enter">
 
         <script>
             document.querySelector('#room-name-input').focus();
@@ -192,7 +192,7 @@ Put the following code in ``chat/views.py``:
     from django.shortcuts import render
 
     def index(request):
-        return render(request, 'chat/index.html', {})
+        return render(request, 'chat/index.html')
 
 To call the view, we need to map it to a URL - and for this we need a URLconf.
 

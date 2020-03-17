@@ -32,8 +32,8 @@ Put the following code in ``chat/consumers.py``:
 .. code-block:: python
 
     # chat/consumers.py
-    from channels.generic.websocket import AsyncWebsocketConsumer
     import json
+    from channels.generic.websocket import AsyncWebsocketConsumer
 
     class ChatConsumer(AsyncWebsocketConsumer):
         async def connect(self):

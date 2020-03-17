@@ -91,6 +91,7 @@ If you want to split HTTP handling between long-poll handlers and Django views,
 use a URLRouter with ``channels.http.AsgiHandler`` specified as the last entry
 with a match-everything pattern.
 
+.. _urlrouter:
 
 URLRouter
 ---------
@@ -123,6 +124,7 @@ would do this:
 
 Please note that ``URLRouter`` nesting will not work properly with
 ``path()`` routes if inner routers are wrapped by additional middleware.
+See `Issue #1428 <https://github.com/django/channels/issues/1428>`__.
 
 
 ChannelNameRouter
