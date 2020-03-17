@@ -272,6 +272,8 @@ Forms
 
 * :attr:`.MultiWidget.widgets` now accepts a dictionary which allows
   customizing subwidget ``name`` attributes.
+* :class:`django.forms.MultiValueField` now raises an incomplete error when
+  only some of the subwidgets are ``required`` and a null response is received.
 
 Generic Views
 ~~~~~~~~~~~~~
