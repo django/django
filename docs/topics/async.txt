@@ -37,7 +37,7 @@ context.
 If you encounter this error, you should fix your code to not call the offending
 code from an async context; instead, write your code that talks to async-unsafe
 in its own, synchronous function, and call that using
-:func:`asgiref.sync.async_to_sync`, or any other preferred way of running
+:func:`asgiref.sync.sync_to_async`, or any other preferred way of running
 synchronous code in its own thread.
 
 If you are *absolutely* in dire need to run this code from an asynchronous
