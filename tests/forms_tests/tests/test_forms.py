@@ -3031,9 +3031,12 @@ Good luck picking a username that doesn&#x27;t already exist.</p>
         # For an optional `MultiValueField` with `require_all_fields=False`, we
         # don't get any `required` error but we still get `incomplete` errors.
         f = PhoneField(required=False, require_all_fields=False)
-        self.assertIsNone(f.clean(''))
-        self.assertIsNone(f.clean(None))
-        self.assertIsNone(f.clean([]))
+        with self.assertRaisesMessage(ValidationError, "'Enter a complete value.', 'Enter an extension.'"):
+            self.assertIsNone(f.clean(''))
+        with self.assertRaisesMessage(ValidationError, "'Enter a complete value.', 'Enter an extension.'"):
+            self.assertIsNone(f.clean(None))
+        with self.assertRaisesMessage(ValidationError, "'Enter a complete value.', 'Enter an extension.'"):
+            self.assertIsNone(f.clean([]))
         with self.assertRaisesMessage(ValidationError, "'Enter a complete value.'"):
             f.clean(['+61'])
         self.assertEqual('+61.287654321 ext. 123 (label: )', f.clean(['+61', '287654321', '123']))

@@ -1020,14 +1020,14 @@ class MultiValueField(Field):
             if not value or not [v for v in value if v not in self.empty_values]:
                 if self.required:
                     raise ValidationError(self.error_messages['required'], code='required')
-                else:
+                elif not any([field.required for field in self.fields]):
                     return self.compress([])
         else:
             raise ValidationError(self.error_messages['invalid'], code='invalid')
         for i, field in enumerate(self.fields):
             try:
                 field_value = value[i]
-            except IndexError:
+            except (IndexError, TypeError):
                 field_value = None
             if field_value in self.empty_values:
                 if self.require_all_fields:
