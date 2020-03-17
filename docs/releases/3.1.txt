@@ -427,6 +427,34 @@ MariaDB 10.2 and higher.
 The admin no longer supports the legacy Internet Explorer browser. See
 :ref:`the admin FAQ <admin-browser-support>` for details on supported browsers.
 
+:attr:`AbstractUser.first_name <django.contrib.auth.models.User.first_name>` ``max_length`` increased to 150
+------------------------------------------------------------------------------------------------------------
+
+A migration for :attr:`django.contrib.auth.models.User.first_name` is included.
+If you have a custom user model inheriting from ``AbstractUser``, you'll need
+to generate and apply a database migration for your user model.
+
+If you want to preserve the 30 character limit for first names, use a custom
+form::
+
+    from django import forms
+    from django.contrib.auth.forms import UserChangeForm
+
+    class MyUserChangeForm(UserChangeForm):
+        first_name = forms.CharField(max_length=30, required=False)
+
+If you wish to keep this restriction in the admin when editing users, set
+``UserAdmin.form`` to use this form::
+
+    from django.contrib.auth.admin import UserAdmin
+    from django.contrib.auth.models import User
+
+    class MyUserAdmin(UserAdmin):
+        form = MyUserChangeForm
+
+    admin.site.unregister(User)
+    admin.site.register(User, MyUserAdmin)
+
 Miscellaneous
 -------------
 
