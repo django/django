@@ -218,12 +218,13 @@ class BackendTestCase(TransactionTestCase):
     def create_squares(self, args, paramstyle, multiple):
         opts = Square._meta
         tbl = connection.introspection.identifier_converter(opts.db_table)
+        f0 = connection.ops.quote_name(opts.get_field('id').column)
         f1 = connection.ops.quote_name(opts.get_field('root').column)
         f2 = connection.ops.quote_name(opts.get_field('square').column)
         if paramstyle == 'format':
-            query = 'INSERT INTO %s (%s, %s) VALUES (%%s, %%s)' % (tbl, f1, f2)
+            query = 'INSERT INTO %s (%s, %s, %s) VALUES (%%s, %%s, %%s)' % (tbl, f0, f1, f2)
         elif paramstyle == 'pyformat':
-            query = 'INSERT INTO %s (%s, %s) VALUES (%%(root)s, %%(square)s)' % (tbl, f1, f2)
+            query = 'INSERT INTO %s (%s, %s, %s) VALUES (%%(id)s, %%(root)s, %%(square)s)' % (tbl, f0, f1, f2)
         else:
             raise ValueError("unsupported paramstyle in test")
         with connection.cursor() as cursor:
@@ -234,7 +235,7 @@ class BackendTestCase(TransactionTestCase):
 
     def test_cursor_executemany(self):
         # Test cursor.executemany #4896
-        args = [(i, i ** 2) for i in range(-5, 6)]
+        args = [(i, i, i ** 2) for i in range(-5, 6)]
         self.create_squares_with_executemany(args)
         self.assertEqual(Square.objects.count(), 11)
         for i in range(-5, 6):
@@ -249,11 +250,11 @@ class BackendTestCase(TransactionTestCase):
 
     def test_cursor_executemany_with_iterator(self):
         # Test executemany accepts iterators #10320
-        args = iter((i, i ** 2) for i in range(-3, 2))
+        args = iter((i, i, i ** 2) for i in range(-3, 2))
         self.create_squares_with_executemany(args)
         self.assertEqual(Square.objects.count(), 5)
 
-        args = iter((i, i ** 2) for i in range(3, 7))
+        args = iter((i, i, i ** 2) for i in range(3, 7))
         with override_settings(DEBUG=True):
             # same test for DebugCursorWrapper
             self.create_squares_with_executemany(args)
@@ -262,14 +263,14 @@ class BackendTestCase(TransactionTestCase):
     @skipUnlessDBFeature('supports_paramstyle_pyformat')
     def test_cursor_execute_with_pyformat(self):
         # Support pyformat style passing of parameters #10070
-        args = {'root': 3, 'square': 9}
+        args = {'id': 1, 'root': 3, 'square': 9}
         self.create_squares(args, 'pyformat', multiple=False)
         self.assertEqual(Square.objects.count(), 1)
 
     @skipUnlessDBFeature('supports_paramstyle_pyformat')
     def test_cursor_executemany_with_pyformat(self):
         # Support pyformat style passing of parameters #10070
-        args = [{'root': i, 'square': i ** 2} for i in range(-5, 6)]
+        args = [{'id': i + 10, 'root': i, 'square': i ** 2} for i in range(-5, 6)]
         self.create_squares(args, 'pyformat', multiple=True)
         self.assertEqual(Square.objects.count(), 11)
         for i in range(-5, 6):
@@ -278,11 +279,11 @@ class BackendTestCase(TransactionTestCase):
 
     @skipUnlessDBFeature('supports_paramstyle_pyformat')
     def test_cursor_executemany_with_pyformat_iterator(self):
-        args = iter({'root': i, 'square': i ** 2} for i in range(-3, 2))
+        args = iter({'id': i + 5, 'root': i, 'square': i ** 2} for i in range(-3, 2))
         self.create_squares(args, 'pyformat', multiple=True)
         self.assertEqual(Square.objects.count(), 5)
 
-        args = iter({'root': i, 'square': i ** 2} for i in range(3, 7))
+        args = iter({'id': i, 'root': i, 'square': i ** 2} for i in range(3, 7))
         with override_settings(DEBUG=True):
             # same test for DebugCursorWrapper
             self.create_squares(args, 'pyformat', multiple=True)
