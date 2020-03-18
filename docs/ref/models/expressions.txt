@@ -985,6 +985,8 @@ calling the appropriate methods on the wrapped expression.
         A hook allowing the expression to coerce ``value`` into a more
         appropriate type.
 
+        ``expression`` is the same as ``self``.
+
     .. method:: get_group_by_cols(alias=None)
 
         Responsible for returning the list of columns references by

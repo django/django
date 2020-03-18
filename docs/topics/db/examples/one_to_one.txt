@@ -47,7 +47,7 @@ Create a couple of Places::
     >>> p2 = Place(name='Ace Hardware', address='1013 N. Ashland')
     >>> p2.save()
 
-Create a Restaurant. Pass the ID of the "parent" object as this object's ID::
+Create a Restaurant. Pass the "parent" object as this object's primary key::
 
     >>> r = Restaurant(place=p1, serves_hot_dogs=True, serves_pizza=False)
     >>> r.save()

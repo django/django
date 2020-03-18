@@ -35,6 +35,10 @@ query and the vector.
 To use the ``search`` lookup, ``'django.contrib.postgres'`` must be in your
 :setting:`INSTALLED_APPS`.
 
+.. versionchanged:: 3.1
+
+    Support for query expressions was added.
+
 ``SearchVector``
 ================
 
@@ -108,7 +112,8 @@ See :ref:`postgresql-fts-search-configuration` for an explanation of the
 
 .. versionchanged:: 3.1
 
-    Support for ``'websearch'`` search type was added.
+    Support for ``'websearch'`` search type and query expressions in
+    ``SearchQuery.value`` were added.
 
 ``SearchRank``
 ==============

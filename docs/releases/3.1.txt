@@ -77,6 +77,11 @@ Minor features
 * Added the :class:`~django.contrib.gis.db.models.functions.AsWKB` and
   :class:`~django.contrib.gis.db.models.functions.AsWKT` functions.
 
+:mod:`django.contrib.humanize`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* :tfilter:`intword` template filter now supports negative integers.
+
 :mod:`django.contrib.messages`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -108,8 +113,13 @@ Minor features
 * :class:`~django.contrib.postgres.search.SearchQuery` now supports
   ``'websearch'`` search type on PostgreSQL 11+.
 
+* :class:`SearchQuery.value <django.contrib.postgres.search.SearchQuery>` now
+  supports query expressions.
+
 * The new :class:`~django.contrib.postgres.search.SearchHeadline` class allows
   highlighting search results.
+
+* :lookup:`search` lookup now supports query expressions.
 
 :mod:`django.contrib.redirects`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -417,6 +427,34 @@ MariaDB 10.2 and higher.
 The admin no longer supports the legacy Internet Explorer browser. See
 :ref:`the admin FAQ <admin-browser-support>` for details on supported browsers.
 
+:attr:`AbstractUser.first_name <django.contrib.auth.models.User.first_name>` ``max_length`` increased to 150
+------------------------------------------------------------------------------------------------------------
+
+A migration for :attr:`django.contrib.auth.models.User.first_name` is included.
+If you have a custom user model inheriting from ``AbstractUser``, you'll need
+to generate and apply a database migration for your user model.
+
+If you want to preserve the 30 character limit for first names, use a custom
+form::
+
+    from django import forms
+    from django.contrib.auth.forms import UserChangeForm
+
+    class MyUserChangeForm(UserChangeForm):
+        first_name = forms.CharField(max_length=30, required=False)
+
+If you wish to keep this restriction in the admin when editing users, set
+``UserAdmin.form`` to use this form::
+
+    from django.contrib.auth.admin import UserAdmin
+    from django.contrib.auth.models import User
+
+    class MyUserAdmin(UserAdmin):
+        form = MyUserChangeForm
+
+    admin.site.unregister(User)
+    admin.site.register(User, MyUserAdmin)
+
 Miscellaneous
 -------------
 
@@ -556,6 +594,9 @@ Miscellaneous
 
 * Calling ``django.utils.crypto.get_random_string()`` without a ``length``
   argument is deprecated.
+
+* The ``list`` message for :class:`~django.forms.ModelMultipleChoiceField` is
+  deprecated in favor of ``invalid_list``.
 
 .. _removed-features-3.1:
 
