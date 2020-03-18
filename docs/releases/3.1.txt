@@ -62,7 +62,9 @@ Minor features
 :mod:`django.contrib.contenttypes`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* Added `--include-stale-apps` option in management command
+  `remove_stale_contenttypes` that will remove content types that were part of
+  old app that have been deleted.
 
 :mod:`django.contrib.gis`
 ~~~~~~~~~~~~~~~~~~~~~~~~~

@@ -1651,6 +1651,11 @@ the deletion.
 
 Specifies the database to use. Defaults to ``default``.
 
+.. django-admin-option:: --include-stale-apps
+
+Deletes stale content types including ones whose app isn't installed or have
+been deleted. Defaults to ``False``.
+
 ``django.contrib.gis``
 ----------------------
 
