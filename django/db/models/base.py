@@ -1258,7 +1258,7 @@ class Model(metaclass=ModelBase):
             errors += [
                 *cls._check_fields(**kwargs),
                 *cls._check_m2m_through_same_relationship(),
-                *cls._check_long_column_names(),
+                *cls._check_long_column_names(databases),
             ]
             clash_errors = (
                 *cls._check_id_field(),
@@ -1763,17 +1763,19 @@ class Model(metaclass=ModelBase):
         return errors
 
     @classmethod
-    def _check_long_column_names(cls):
+    def _check_long_column_names(cls, databases):
         """
         Check that any auto-generated column names are shorter than the limits
         for each database in which the model will be created.
         """
+        if not databases:
+            return []
         errors = []
         allowed_len = None
         db_alias = None
 
         # Find the minimum max allowed length among all specified db_aliases.
-        for db in settings.DATABASES:
+        for db in databases:
             # skip databases where the model won't be created
             if not router.allow_migrate_model(db, cls):
                 continue
