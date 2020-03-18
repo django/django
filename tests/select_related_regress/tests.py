@@ -33,7 +33,7 @@ class SelectRelatedRegressTests(TestCase):
         c2 = Connection.objects.create(start=port2, end=port3)
 
         connections = Connection.objects.filter(start__device__building=b, end__device__building=b).order_by('id')
-        self.assertEqual(
+        self.assertCountEqual(
             [(c.id, str(c.start), str(c.end)) for c in connections],
             [(c1.id, 'router/4', 'switch/7'), (c2.id, 'switch/7', 'server/1')]
         )
@@ -44,7 +44,7 @@ class SelectRelatedRegressTests(TestCase):
             .select_related()
             .order_by('id')
         )
-        self.assertEqual(
+        self.assertCountEqual(
             [(c.id, str(c.start), str(c.end)) for c in connections],
             [(c1.id, 'router/4', 'switch/7'), (c2.id, 'switch/7', 'server/1')]
         )
