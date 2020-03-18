@@ -361,8 +361,6 @@ class FieldNamesTests(SimpleTestCase):
         #13711 -- Model check for long M2M column names when database has
         column name length limits.
         """
-        allowed_len, db_alias = get_max_column_name_length()
-
         # A model with very long name which will be used to set relations to.
         class VeryLongModelNamezzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz(models.Model):
             title = models.CharField(max_length=11)
@@ -455,8 +453,6 @@ class FieldNamesTests(SimpleTestCase):
         #13711 -- Model check for long column names
         when database does not support long names.
         """
-        allowed_len, db_alias = get_max_column_name_length()
-
         class ModelWithLongField(models.Model):
             title = models.CharField(max_length=11)
 
