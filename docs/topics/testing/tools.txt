@@ -1808,7 +1808,7 @@ creates.
 
             @mock.patch(...)
             @async_to_sync
-            def test_my_thing(self):
+            async def test_my_thing(self):
                 ...
 
 .. _topics-testing-email:
