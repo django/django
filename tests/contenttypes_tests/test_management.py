@@ -10,7 +10,7 @@ from django.test.utils import captured_stdout
 from .models import ModelWithNullFKToSite, Post
 
 
-@modify_settings(INSTALLED_APPS={'append': ['no_models']})
+@modify_settings(INSTALLED_APPS={'append': ['no_models', 'empty_models']})
 class RemoveStaleContentTypesTests(TestCase):
     # Speed up tests by avoiding retrieving ContentTypes for all test apps.
     available_apps = ['contenttypes_tests', 'no_models', 'empty_models', 'django.contrib.contenttypes']
