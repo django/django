@@ -121,14 +121,14 @@ configured:
 Database
 --------
 
-MySQL
-~~~~~
+MySQL and MariaDB
+~~~~~~~~~~~~~~~~~
 
-If you're using MySQL, the following checks will be performed:
+If you're using MySQL or MariaDB, the following checks will be performed:
 
-* **mysql.E001**: MySQL does not allow unique ``CharField``\s to have a
+* **mysql.E001**: MySQL/MariaDB does not allow unique ``CharField``\s to have a
   ``max_length`` > 255.
-* **mysql.W002**: MySQL Strict Mode is not set for database connection
+* **mysql.W002**: MySQL/MariaDB Strict Mode is not set for database connection
   '<alias>'. See also :ref:`mysql-sql-mode`.
 
 Model fields
