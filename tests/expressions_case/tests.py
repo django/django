@@ -67,9 +67,10 @@ class CaseExpressionTests(TestCase):
                 When(integer=2, then=Value('two')),
                 default=Value('other'),
                 output_field=models.CharField(),
-            )).order_by('pk'),
+            )),
             [(1, 'one'), (2, 'two'), (3, 'other'), (2, 'two'), (3, 'other'), (3, 'other'), (4, 'other')],
-            transform=attrgetter('integer', 'test')
+            transform=attrgetter('integer', 'test'),
+            ordered=False,
         )
 
     def test_annotate_without_default(self):
@@ -78,9 +79,10 @@ class CaseExpressionTests(TestCase):
                 When(integer=1, then=1),
                 When(integer=2, then=2),
                 output_field=models.IntegerField(),
-            )).order_by('pk'),
+            )),
             [(1, 1), (2, 2), (3, None), (2, 2), (3, None), (3, None), (4, None)],
-            transform=attrgetter('integer', 'test')
+            transform=attrgetter('integer', 'test'),
+            ordered=False,
         )
 
     def test_annotate_with_expression_as_value(self):
@@ -89,9 +91,10 @@ class CaseExpressionTests(TestCase):
                 When(integer=1, then=F('integer') + 1),
                 When(integer=2, then=F('integer') + 3),
                 default='integer',
-            )).order_by('pk'),
+            )),
             [(1, 2), (2, 5), (3, 3), (2, 5), (3, 3), (3, 3), (4, 4)],
-            transform=attrgetter('integer', 'f_test')
+            transform=attrgetter('integer', 'f_test'),
+            ordered=False,
         )
 
     def test_annotate_with_expression_as_condition(self):
@@ -100,9 +103,10 @@ class CaseExpressionTests(TestCase):
                 When(integer2=F('integer'), then=Value('equal')),
                 When(integer2=F('integer') + 1, then=Value('+1')),
                 output_field=models.CharField(),
-            )).order_by('pk'),
+            )),
             [(1, 'equal'), (2, '+1'), (3, '+1'), (2, 'equal'), (3, '+1'), (3, 'equal'), (4, '+1')],
-            transform=attrgetter('integer', 'f_test')
+            transform=attrgetter('integer', 'f_test'),
+            ordered=False,
         )
 
     def test_annotate_with_join_in_value(self):
@@ -111,9 +115,10 @@ class CaseExpressionTests(TestCase):
                 When(integer=1, then=F('o2o_rel__integer') + 1),
                 When(integer=2, then=F('o2o_rel__integer') + 3),
                 default='o2o_rel__integer',
-            )).order_by('pk'),
+            )),
             [(1, 2), (2, 5), (3, 3), (2, 5), (3, 3), (3, 3), (4, 1)],
-            transform=attrgetter('integer', 'join_test')
+            transform=attrgetter('integer', 'join_test'),
+            ordered=False,
         )
 
     def test_annotate_with_in_clause(self):
@@ -122,9 +127,10 @@ class CaseExpressionTests(TestCase):
             CaseTestModel.objects.only('pk', 'integer').annotate(in_test=Sum(Case(
                 When(fk_rel__in=fk_rels, then=F('fk_rel__integer')),
                 default=Value(0),
-            ))).order_by('pk'),
+            ))),
             [(1, 0), (2, 0), (3, 0), (2, 0), (3, 0), (3, 0), (4, 5)],
-            transform=attrgetter('integer', 'in_test')
+            transform=attrgetter('integer', 'in_test'),
+            ordered=False,
         )
 
     def test_annotate_with_join_in_condition(self):
@@ -134,9 +140,10 @@ class CaseExpressionTests(TestCase):
                 When(integer2=F('o2o_rel__integer') + 1, then=Value('+1')),
                 default=Value('other'),
                 output_field=models.CharField(),
-            )).order_by('pk'),
+            )),
             [(1, 'equal'), (2, '+1'), (3, '+1'), (2, 'equal'), (3, '+1'), (3, 'equal'), (4, 'other')],
-            transform=attrgetter('integer', 'join_test')
+            transform=attrgetter('integer', 'join_test'),
+            ordered=False,
         )
 
     def test_annotate_with_join_in_predicate(self):
@@ -147,9 +154,10 @@ class CaseExpressionTests(TestCase):
                 When(o2o_rel__integer=3, then=Value('three')),
                 default=Value('other'),
                 output_field=models.CharField(),
-            )).order_by('pk'),
+            )),
             [(1, 'one'), (2, 'two'), (3, 'three'), (2, 'two'), (3, 'three'), (3, 'three'), (4, 'one')],
-            transform=attrgetter('integer', 'join_test')
+            transform=attrgetter('integer', 'join_test'),
+            ordered=False,
         )
 
     def test_annotate_with_annotation_in_value(self):
@@ -163,9 +171,10 @@ class CaseExpressionTests(TestCase):
                     When(integer=2, then='f_plus_3'),
                     default='integer',
                 ),
-            ).order_by('pk'),
+            ),
             [(1, 2), (2, 5), (3, 3), (2, 5), (3, 3), (3, 3), (4, 4)],
-            transform=attrgetter('integer', 'f_test')
+            transform=attrgetter('integer', 'f_test'),
+            ordered=False,
         )
 
     def test_annotate_with_annotation_in_condition(self):
@@ -178,9 +187,10 @@ class CaseExpressionTests(TestCase):
                     When(integer2=F('f_plus_1'), then=Value('+1')),
                     output_field=models.CharField(),
                 ),
-            ).order_by('pk'),
+            ),
             [(1, 'equal'), (2, '+1'), (3, '+1'), (2, 'equal'), (3, '+1'), (3, 'equal'), (4, '+1')],
-            transform=attrgetter('integer', 'f_test')
+            transform=attrgetter('integer', 'f_test'),
+            ordered=False,
         )
 
     def test_annotate_with_annotation_in_predicate(self):
@@ -195,9 +205,10 @@ class CaseExpressionTests(TestCase):
                     default=Value('other'),
                     output_field=models.CharField(),
                 ),
-            ).order_by('pk'),
+            ),
             [(1, 'negative one'), (2, 'zero'), (3, 'one'), (2, 'zero'), (3, 'one'), (3, 'one'), (4, 'other')],
-            transform=attrgetter('integer', 'test')
+            transform=attrgetter('integer', 'test'),
+            ordered=False,
         )
 
     def test_annotate_with_aggregation_in_value(self):
@@ -210,9 +221,10 @@ class CaseExpressionTests(TestCase):
                     When(integer=2, then='min'),
                     When(integer=3, then='max'),
                 ),
-            ).order_by('pk'),
+            ),
             [(1, None, 1, 1), (2, 2, 2, 3), (3, 4, 3, 4), (2, 2, 2, 3), (3, 4, 3, 4), (3, 4, 3, 4), (4, None, 5, 5)],
-            transform=itemgetter('integer', 'test', 'min', 'max')
+            transform=itemgetter('integer', 'test', 'min', 'max'),
+            ordered=False,
         )
 
     def test_annotate_with_aggregation_in_condition(self):
@@ -226,9 +238,10 @@ class CaseExpressionTests(TestCase):
                     When(integer2=F('max'), then=Value('max')),
                     output_field=models.CharField(),
                 ),
-            ).order_by('pk'),
+            ),
             [(1, 1, 'min'), (2, 3, 'max'), (3, 4, 'max'), (2, 2, 'min'), (3, 4, 'max'), (3, 3, 'min'), (4, 5, 'min')],
-            transform=itemgetter('integer', 'integer2', 'test')
+            transform=itemgetter('integer', 'integer2', 'test'),
+            ordered=False,
         )
 
     def test_annotate_with_aggregation_in_predicate(self):
@@ -242,10 +255,11 @@ class CaseExpressionTests(TestCase):
                     default=Value(''),
                     output_field=models.CharField(),
                 ),
-            ).order_by('pk'),
+            ),
             [(1, 1, ''), (2, 3, 'max = 3'), (3, 4, 'max = 4'), (2, 3, 'max = 3'),
              (3, 4, 'max = 4'), (3, 4, 'max = 4'), (4, 5, '')],
-            transform=itemgetter('integer', 'max', 'test')
+            transform=itemgetter('integer', 'max', 'test'),
+            ordered=False,
         )
 
     def test_annotate_exclude(self):
@@ -255,9 +269,10 @@ class CaseExpressionTests(TestCase):
                 When(integer=2, then=Value('two')),
                 default=Value('other'),
                 output_field=models.CharField(),
-            )).exclude(test='other').order_by('pk'),
+            )).exclude(test='other'),
             [(1, 'one'), (2, 'two'), (2, 'two')],
-            transform=attrgetter('integer', 'test')
+            transform=attrgetter('integer', 'test'),
+            ordered=False,
         )
 
     def test_annotate_values_not_in_order_by(self):
@@ -291,9 +306,10 @@ class CaseExpressionTests(TestCase):
                     default=3,
                     output_field=models.IntegerField(),
                 ) + 1,
-            ).order_by('pk'),
+            ),
             [(1, 3), (2, 2), (3, 4), (2, 2), (3, 4), (3, 4), (4, 4)],
-            transform=attrgetter('integer', 'test')
+            transform=attrgetter('integer', 'test'),
+            ordered=False,
         )
 
     def test_in_subquery(self):
@@ -305,9 +321,10 @@ class CaseExpressionTests(TestCase):
                         When(integer=4, then='pk'),
                         output_field=models.IntegerField(),
                     ),
-                ).values('test')).order_by('pk'),
+                ).values('test')),
             [(1, 1), (2, 2), (3, 3), (4, 5)],
-            transform=attrgetter('integer', 'integer2')
+            transform=attrgetter('integer', 'integer2'),
+            ordered=False,
         )
 
     def test_case_reuse(self):
@@ -377,9 +394,10 @@ class CaseExpressionTests(TestCase):
                 When(integer=3, then=4),
                 default=1,
                 output_field=models.IntegerField(),
-            )).order_by('pk'),
+            )),
             [(1, 1), (2, 3), (3, 4), (3, 4)],
-            transform=attrgetter('integer', 'integer2')
+            transform=attrgetter('integer', 'integer2'),
+            ordered=False,
         )
 
     def test_filter_without_default(self):
@@ -388,9 +406,10 @@ class CaseExpressionTests(TestCase):
                 When(integer=2, then=3),
                 When(integer=3, then=4),
                 output_field=models.IntegerField(),
-            )).order_by('pk'),
+            )),
             [(2, 3), (3, 4), (3, 4)],
-            transform=attrgetter('integer', 'integer2')
+            transform=attrgetter('integer', 'integer2'),
+            ordered=False,
         )
 
     def test_filter_with_expression_as_value(self):
@@ -399,9 +418,10 @@ class CaseExpressionTests(TestCase):
                 When(integer=2, then=F('integer') + 1),
                 When(integer=3, then=F('integer')),
                 default='integer',
-            )).order_by('pk'),
+            )),
             [(1, 1), (2, 3), (3, 3)],
-            transform=attrgetter('integer', 'integer2')
+            transform=attrgetter('integer', 'integer2'),
+            ordered=False,
         )
 
     def test_filter_with_expression_as_condition(self):
@@ -410,9 +430,10 @@ class CaseExpressionTests(TestCase):
                 When(integer2=F('integer'), then=Value('2')),
                 When(integer2=F('integer') + 1, then=Value('3')),
                 output_field=models.CharField(),
-            )).order_by('pk'),
+            )),
             [(3, 4, '3'), (2, 2, '2'), (3, 4, '3')],
-            transform=attrgetter('integer', 'integer2', 'string')
+            transform=attrgetter('integer', 'integer2', 'string'),
+            ordered=False,
         )
 
     def test_filter_with_join_in_value(self):
@@ -421,9 +442,10 @@ class CaseExpressionTests(TestCase):
                 When(integer=2, then=F('o2o_rel__integer') + 1),
                 When(integer=3, then=F('o2o_rel__integer')),
                 default='o2o_rel__integer',
-            )).order_by('pk'),
+            )),
             [(1, 1), (2, 3), (3, 3)],
-            transform=attrgetter('integer', 'integer2')
+            transform=attrgetter('integer', 'integer2'),
+            ordered=False,
         )
 
     def test_filter_with_join_in_condition(self):
@@ -432,9 +454,10 @@ class CaseExpressionTests(TestCase):
                 When(integer2=F('o2o_rel__integer') + 1, then=2),
                 When(integer2=F('o2o_rel__integer'), then=3),
                 output_field=models.IntegerField(),
-            )).order_by('pk'),
+            )),
             [(2, 3), (3, 3)],
-            transform=attrgetter('integer', 'integer2')
+            transform=attrgetter('integer', 'integer2'),
+            ordered=False,
         )
 
     def test_filter_with_join_in_predicate(self):
@@ -444,9 +467,10 @@ class CaseExpressionTests(TestCase):
                 When(o2o_rel__integer=2, then=3),
                 When(o2o_rel__integer=3, then=4),
                 output_field=models.IntegerField(),
-            )).order_by('pk'),
+            )),
             [(1, 1), (2, 3), (3, 4), (3, 4)],
-            transform=attrgetter('integer', 'integer2')
+            transform=attrgetter('integer', 'integer2'),
+            ordered=False,
         )
 
     def test_filter_with_annotation_in_value(self):
@@ -459,9 +483,10 @@ class CaseExpressionTests(TestCase):
                     When(integer=2, then='f_plus_1'),
                     When(integer=3, then='f'),
                 ),
-            ).order_by('pk'),
+            ),
             [(2, 3), (3, 3)],
-            transform=attrgetter('integer', 'integer2')
+            transform=attrgetter('integer', 'integer2'),
+            ordered=False,
         )
 
     def test_filter_with_annotation_in_condition(self):
@@ -474,9 +499,10 @@ class CaseExpressionTests(TestCase):
                     When(integer2=F('f_plus_1'), then=3),
                     output_field=models.IntegerField(),
                 ),
-            ).order_by('pk'),
+            ),
             [(3, 4), (2, 2), (3, 4)],
-            transform=attrgetter('integer', 'integer2')
+            transform=attrgetter('integer', 'integer2'),
+            ordered=False,
         )
 
     def test_filter_with_annotation_in_predicate(self):
@@ -490,9 +516,10 @@ class CaseExpressionTests(TestCase):
                     default=1,
                     output_field=models.IntegerField(),
                 ),
-            ).order_by('pk'),
+            ),
             [(1, 1), (2, 3), (3, 4), (3, 4)],
-            transform=attrgetter('integer', 'integer2')
+            transform=attrgetter('integer', 'integer2'),
+            ordered=False,
         )
 
     def test_filter_with_aggregation_in_value(self):
@@ -505,9 +532,10 @@ class CaseExpressionTests(TestCase):
                     When(integer=2, then='min'),
                     When(integer=3, then='max'),
                 ),
-            ).order_by('pk'),
+            ),
             [(3, 4, 3, 4), (2, 2, 2, 3), (3, 4, 3, 4)],
-            transform=itemgetter('integer', 'integer2', 'min', 'max')
+            transform=itemgetter('integer', 'integer2', 'min', 'max'),
+            ordered=False,
         )
 
     def test_filter_with_aggregation_in_condition(self):
@@ -520,9 +548,10 @@ class CaseExpressionTests(TestCase):
                     When(integer2=F('min'), then=2),
                     When(integer2=F('max'), then=3),
                 ),
-            ).order_by('pk'),
+            ),
             [(3, 4, 3, 4), (2, 2, 2, 3), (3, 4, 3, 4)],
-            transform=itemgetter('integer', 'integer2', 'min', 'max')
+            transform=itemgetter('integer', 'integer2', 'min', 'max'),
+            ordered=False,
         )
 
     def test_filter_with_aggregation_in_predicate(self):
@@ -534,9 +563,10 @@ class CaseExpressionTests(TestCase):
                     When(max=3, then=2),
                     When(max=4, then=3),
                 ),
-            ).order_by('pk'),
+            ),
             [(2, 3, 3), (3, 4, 4), (2, 2, 3), (3, 4, 4), (3, 3, 4)],
-            transform=itemgetter('integer', 'integer2', 'max')
+            transform=itemgetter('integer', 'integer2', 'max'),
+            ordered=False,
         )
 
     def test_update(self):
@@ -548,9 +578,10 @@ class CaseExpressionTests(TestCase):
             ),
         )
         self.assertQuerysetEqual(
-            CaseTestModel.objects.all().order_by('pk'),
+            CaseTestModel.objects.all(),
             [(1, 'one'), (2, 'two'), (3, 'other'), (2, 'two'), (3, 'other'), (3, 'other'), (4, 'other')],
-            transform=attrgetter('integer', 'string')
+            transform=attrgetter('integer', 'string'),
+            ordered=False,
         )
 
     def test_update_without_default(self):
@@ -561,9 +592,10 @@ class CaseExpressionTests(TestCase):
             ),
         )
         self.assertQuerysetEqual(
-            CaseTestModel.objects.all().order_by('pk'),
+            CaseTestModel.objects.all(),
             [(1, 1), (2, 2), (3, None), (2, 2), (3, None), (3, None), (4, None)],
-            transform=attrgetter('integer', 'integer2')
+            transform=attrgetter('integer', 'integer2'),
+            ordered=False,
         )
 
     def test_update_with_expression_as_value(self):
@@ -575,9 +607,10 @@ class CaseExpressionTests(TestCase):
             ),
         )
         self.assertQuerysetEqual(
-            CaseTestModel.objects.all().order_by('pk'),
+            CaseTestModel.objects.all(),
             [('1', 2), ('2', 5), ('3', 3), ('2', 5), ('3', 3), ('3', 3), ('4', 4)],
-            transform=attrgetter('string', 'integer')
+            transform=attrgetter('string', 'integer'),
+            ordered=False,
         )
 
     def test_update_with_expression_as_condition(self):
@@ -588,9 +621,10 @@ class CaseExpressionTests(TestCase):
             ),
         )
         self.assertQuerysetEqual(
-            CaseTestModel.objects.all().order_by('pk'),
+            CaseTestModel.objects.all(),
             [(1, 'equal'), (2, '+1'), (3, '+1'), (2, 'equal'), (3, '+1'), (3, 'equal'), (4, '+1')],
-            transform=attrgetter('integer', 'string')
+            transform=attrgetter('integer', 'string'),
+            ordered=False,
         )
 
     def test_update_with_join_in_condition_raise_field_error(self):
@@ -623,9 +657,10 @@ class CaseExpressionTests(TestCase):
             ),
         )
         self.assertQuerysetEqual(
-            CaseTestModel.objects.all().order_by('pk'),
+            CaseTestModel.objects.all(),
             [(1, 1), (2, 2), (3, None), (2, 2), (3, None), (3, None), (4, None)],
-            transform=attrgetter('integer', 'big_integer')
+            transform=attrgetter('integer', 'big_integer'),
+            ordered=False,
         )
 
     def test_update_binary(self):
@@ -637,9 +672,10 @@ class CaseExpressionTests(TestCase):
             ),
         )
         self.assertQuerysetEqual(
-            CaseTestModel.objects.all().order_by('pk'),
+            CaseTestModel.objects.all(),
             [(1, b'one'), (2, b'two'), (3, b''), (2, b'two'), (3, b''), (3, b''), (4, b'')],
-            transform=lambda o: (o.integer, bytes(o.binary))
+            transform=lambda o: (o.integer, bytes(o.binary)),
+            ordered=False,
         )
 
     def test_update_boolean(self):
@@ -651,9 +687,10 @@ class CaseExpressionTests(TestCase):
             ),
         )
         self.assertQuerysetEqual(
-            CaseTestModel.objects.all().order_by('pk'),
+            CaseTestModel.objects.all(),
             [(1, True), (2, True), (3, False), (2, True), (3, False), (3, False), (4, False)],
-            transform=attrgetter('integer', 'boolean')
+            transform=attrgetter('integer', 'boolean'),
+            ordered=False,
         )
 
     def test_update_date(self):
@@ -664,12 +701,13 @@ class CaseExpressionTests(TestCase):
             ),
         )
         self.assertQuerysetEqual(
-            CaseTestModel.objects.all().order_by('pk'),
+            CaseTestModel.objects.all(),
             [
                 (1, date(2015, 1, 1)), (2, date(2015, 1, 2)), (3, None), (2, date(2015, 1, 2)),
                 (3, None), (3, None), (4, None)
             ],
-            transform=attrgetter('integer', 'date')
+            transform=attrgetter('integer', 'date'),
+            ordered=False,
         )
 
     def test_update_date_time(self):
@@ -680,12 +718,13 @@ class CaseExpressionTests(TestCase):
             ),
         )
         self.assertQuerysetEqual(
-            CaseTestModel.objects.all().order_by('pk'),
+            CaseTestModel.objects.all(),
             [
                 (1, datetime(2015, 1, 1)), (2, datetime(2015, 1, 2)), (3, None), (2, datetime(2015, 1, 2)),
                 (3, None), (3, None), (4, None)
             ],
-            transform=attrgetter('integer', 'date_time')
+            transform=attrgetter('integer', 'date_time'),
+            ordered=False,
         )
 
     def test_update_decimal(self):
@@ -696,7 +735,7 @@ class CaseExpressionTests(TestCase):
             ),
         )
         self.assertQuerysetEqual(
-            CaseTestModel.objects.all().order_by('pk'),
+            CaseTestModel.objects.all(),
             [
                 (1, Decimal('1.1')),
                 (2, Decimal('2.2')),
@@ -706,7 +745,8 @@ class CaseExpressionTests(TestCase):
                 (3, None),
                 (4, None)
             ],
-            transform=attrgetter('integer', 'decimal')
+            transform=attrgetter('integer', 'decimal'),
+            ordered=False,
         )
 
     def test_update_duration(self):
@@ -719,9 +759,10 @@ class CaseExpressionTests(TestCase):
             ),
         )
         self.assertQuerysetEqual(
-            CaseTestModel.objects.all().order_by('pk'),
+            CaseTestModel.objects.all(),
             [(1, timedelta(1)), (2, timedelta(2)), (3, None), (2, timedelta(2)), (3, None), (3, None), (4, None)],
-            transform=attrgetter('integer', 'duration')
+            transform=attrgetter('integer', 'duration'),
+            ordered=False,
         )
 
     def test_update_email(self):
@@ -733,9 +774,10 @@ class CaseExpressionTests(TestCase):
             ),
         )
         self.assertQuerysetEqual(
-            CaseTestModel.objects.all().order_by('pk'),
+            CaseTestModel.objects.all(),
             [(1, '1@example.com'), (2, '2@example.com'), (3, ''), (2, '2@example.com'), (3, ''), (3, ''), (4, '')],
-            transform=attrgetter('integer', 'email')
+            transform=attrgetter('integer', 'email'),
+            ordered=False,
         )
 
     def test_update_file(self):
@@ -746,9 +788,10 @@ class CaseExpressionTests(TestCase):
             ),
         )
         self.assertQuerysetEqual(
-            CaseTestModel.objects.all().order_by('pk'),
+            CaseTestModel.objects.all(),
             [(1, '~/1'), (2, '~/2'), (3, ''), (2, '~/2'), (3, ''), (3, ''), (4, '')],
-            transform=lambda o: (o.integer, str(o.file))
+            transform=lambda o: (o.integer, str(o.file)),
+            ordered=False,
         )
 
     def test_update_file_path(self):
@@ -760,9 +803,10 @@ class CaseExpressionTests(TestCase):
             ),
         )
         self.assertQuerysetEqual(
-            CaseTestModel.objects.all().order_by('pk'),
+            CaseTestModel.objects.all(),
             [(1, '~/1'), (2, '~/2'), (3, ''), (2, '~/2'), (3, ''), (3, ''), (4, '')],
-            transform=attrgetter('integer', 'file_path')
+            transform=attrgetter('integer', 'file_path'),
+            ordered=False,
         )
 
     def test_update_float(self):
@@ -773,9 +817,10 @@ class CaseExpressionTests(TestCase):
             ),
         )
         self.assertQuerysetEqual(
-            CaseTestModel.objects.all().order_by('pk'),
+            CaseTestModel.objects.all(),
             [(1, 1.1), (2, 2.2), (3, None), (2, 2.2), (3, None), (3, None), (4, None)],
-            transform=attrgetter('integer', 'float')
+            transform=attrgetter('integer', 'float'),
+            ordered=False,
         )
 
     @unittest.skipUnless(Image, "Pillow not installed")
@@ -787,9 +832,10 @@ class CaseExpressionTests(TestCase):
             ),
         )
         self.assertQuerysetEqual(
-            CaseTestModel.objects.all().order_by('pk'),
+            CaseTestModel.objects.all(),
             [(1, '~/1'), (2, '~/2'), (3, ''), (2, '~/2'), (3, ''), (3, ''), (4, '')],
-            transform=lambda o: (o.integer, str(o.image))
+            transform=lambda o: (o.integer, str(o.image)),
+            ordered=False,
         )
 
     def test_update_generic_ip_address(self):
@@ -802,9 +848,10 @@ class CaseExpressionTests(TestCase):
             ),
         )
         self.assertQuerysetEqual(
-            CaseTestModel.objects.all().order_by('pk'),
+            CaseTestModel.objects.all(),
             [(1, '1.1.1.1'), (2, '2.2.2.2'), (3, None), (2, '2.2.2.2'), (3, None), (3, None), (4, None)],
-            transform=attrgetter('integer', 'generic_ip_address')
+            transform=attrgetter('integer', 'generic_ip_address'),
+            ordered=False,
         )
 
     def test_update_null_boolean(self):
@@ -815,9 +862,10 @@ class CaseExpressionTests(TestCase):
             ),
         )
         self.assertQuerysetEqual(
-            CaseTestModel.objects.all().order_by('pk'),
+            CaseTestModel.objects.all(),
             [(1, True), (2, False), (3, None), (2, False), (3, None), (3, None), (4, None)],
-            transform=attrgetter('integer', 'null_boolean')
+            transform=attrgetter('integer', 'null_boolean'),
+            ordered=False,
         )
 
     def test_update_null_boolean_old(self):
@@ -828,9 +876,10 @@ class CaseExpressionTests(TestCase):
             ),
         )
         self.assertQuerysetEqual(
-            CaseTestModel.objects.all().order_by('pk'),
+            CaseTestModel.objects.all(),
             [(1, True), (2, False), (3, None), (2, False), (3, None), (3, None), (4, None)],
-            transform=attrgetter('integer', 'null_boolean_old')
+            transform=attrgetter('integer', 'null_boolean_old'),
+            ordered=False,
         )
 
     def test_update_positive_integer(self):
@@ -841,9 +890,10 @@ class CaseExpressionTests(TestCase):
             ),
         )
         self.assertQuerysetEqual(
-            CaseTestModel.objects.all().order_by('pk'),
+            CaseTestModel.objects.all(),
             [(1, 1), (2, 2), (3, None), (2, 2), (3, None), (3, None), (4, None)],
-            transform=attrgetter('integer', 'positive_integer')
+            transform=attrgetter('integer', 'positive_integer'),
+            ordered=False,
         )
 
     def test_update_positive_small_integer(self):
@@ -854,9 +904,10 @@ class CaseExpressionTests(TestCase):
             ),
         )
         self.assertQuerysetEqual(
-            CaseTestModel.objects.all().order_by('pk'),
+            CaseTestModel.objects.all(),
             [(1, 1), (2, 2), (3, None), (2, 2), (3, None), (3, None), (4, None)],
-            transform=attrgetter('integer', 'positive_small_integer')
+            transform=attrgetter('integer', 'positive_small_integer'),
+            ordered=False,
         )
 
     def test_update_slug(self):
@@ -868,9 +919,10 @@ class CaseExpressionTests(TestCase):
             ),
         )
         self.assertQuerysetEqual(
-            CaseTestModel.objects.all().order_by('pk'),
+            CaseTestModel.objects.all(),
             [(1, '1'), (2, '2'), (3, ''), (2, '2'), (3, ''), (3, ''), (4, '')],
-            transform=attrgetter('integer', 'slug')
+            transform=attrgetter('integer', 'slug'),
+            ordered=False,
         )
 
     def test_update_small_integer(self):
@@ -881,9 +933,10 @@ class CaseExpressionTests(TestCase):
             ),
         )
         self.assertQuerysetEqual(
-            CaseTestModel.objects.all().order_by('pk'),
+            CaseTestModel.objects.all(),
             [(1, 1), (2, 2), (3, None), (2, 2), (3, None), (3, None), (4, None)],
-            transform=attrgetter('integer', 'small_integer')
+            transform=attrgetter('integer', 'small_integer'),
+            ordered=False,
         )
 
     def test_update_string(self):
@@ -894,9 +947,10 @@ class CaseExpressionTests(TestCase):
             ),
         )
         self.assertQuerysetEqual(
-            CaseTestModel.objects.filter(string__in=['1', '2']).order_by('pk'),
+            CaseTestModel.objects.filter(string__in=['1', '2']),
             [(1, '1'), (2, '2'), (2, '2')],
-            transform=attrgetter('integer', 'string')
+            transform=attrgetter('integer', 'string'),
+            ordered=False,
         )
 
     def test_update_text(self):
@@ -908,9 +962,10 @@ class CaseExpressionTests(TestCase):
             ),
         )
         self.assertQuerysetEqual(
-            CaseTestModel.objects.all().order_by('pk'),
+            CaseTestModel.objects.all(),
             [(1, '1'), (2, '2'), (3, ''), (2, '2'), (3, ''), (3, ''), (4, '')],
-            transform=attrgetter('integer', 'text')
+            transform=attrgetter('integer', 'text'),
+            ordered=False,
         )
 
     def test_update_time(self):
@@ -923,9 +978,10 @@ class CaseExpressionTests(TestCase):
             ),
         )
         self.assertQuerysetEqual(
-            CaseTestModel.objects.all().order_by('pk'),
+            CaseTestModel.objects.all(),
             [(1, time(1)), (2, time(2)), (3, None), (2, time(2)), (3, None), (3, None), (4, None)],
-            transform=attrgetter('integer', 'time')
+            transform=attrgetter('integer', 'time'),
+            ordered=False,
         )
 
     def test_update_url(self):
@@ -937,12 +993,13 @@ class CaseExpressionTests(TestCase):
             ),
         )
         self.assertQuerysetEqual(
-            CaseTestModel.objects.all().order_by('pk'),
+            CaseTestModel.objects.all(),
             [
                 (1, 'http://1.example.com/'), (2, 'http://2.example.com/'), (3, ''), (2, 'http://2.example.com/'),
                 (3, ''), (3, ''), (4, '')
             ],
-            transform=attrgetter('integer', 'url')
+            transform=attrgetter('integer', 'url'),
+            ordered=False,
         )
 
     def test_update_uuid(self):
@@ -961,7 +1018,7 @@ class CaseExpressionTests(TestCase):
             ),
         )
         self.assertQuerysetEqual(
-            CaseTestModel.objects.all().order_by('pk'),
+            CaseTestModel.objects.all(),
             [
                 (1, UUID('11111111111111111111111111111111')),
                 (2, UUID('22222222222222222222222222222222')),
@@ -971,7 +1028,8 @@ class CaseExpressionTests(TestCase):
                 (3, None),
                 (4, None),
             ],
-            transform=attrgetter('integer', 'uuid')
+            transform=attrgetter('integer', 'uuid'),
+            ordered=False,
         )
 
     def test_update_fk(self):
@@ -984,9 +1042,10 @@ class CaseExpressionTests(TestCase):
             ),
         )
         self.assertQuerysetEqual(
-            CaseTestModel.objects.all().order_by('pk'),
+            CaseTestModel.objects.all(),
             [(1, obj1.pk), (2, obj2.pk), (3, None), (2, obj2.pk), (3, None), (3, None), (4, None)],
-            transform=attrgetter('integer', 'fk_id')
+            transform=attrgetter('integer', 'fk_id'),
+            ordered=False,
         )
 
     def test_lookup_in_condition(self):
@@ -998,12 +1057,13 @@ class CaseExpressionTests(TestCase):
                     default=Value('equal to 2'),
                     output_field=models.CharField(),
                 ),
-            ).order_by('pk'),
+            ),
             [
                 (1, 'less than 2'), (2, 'equal to 2'), (3, 'greater than 2'), (2, 'equal to 2'), (3, 'greater than 2'),
                 (3, 'greater than 2'), (4, 'greater than 2')
             ],
-            transform=attrgetter('integer', 'test')
+            transform=attrgetter('integer', 'test'),
+            ordered=False,
         )
 
     def test_lookup_different_fields(self):
@@ -1014,12 +1074,13 @@ class CaseExpressionTests(TestCase):
                     default=Value('default'),
                     output_field=models.CharField(),
                 ),
-            ).order_by('pk'),
+            ),
             [
                 (1, 1, 'default'), (2, 3, 'when'), (3, 4, 'default'), (2, 2, 'default'), (3, 4, 'default'),
                 (3, 3, 'default'), (4, 5, 'default')
             ],
-            transform=attrgetter('integer', 'integer2', 'test')
+            transform=attrgetter('integer', 'integer2', 'test'),
+            ordered=False,
         )
 
     def test_combined_q_object(self):
@@ -1030,12 +1091,13 @@ class CaseExpressionTests(TestCase):
                     default=Value('default'),
                     output_field=models.CharField(),
                 ),
-            ).order_by('pk'),
+            ),
             [
                 (1, 1, 'default'), (2, 3, 'when'), (3, 4, 'default'), (2, 2, 'when'), (3, 4, 'default'),
                 (3, 3, 'when'), (4, 5, 'default')
             ],
-            transform=attrgetter('integer', 'integer2', 'test')
+            transform=attrgetter('integer', 'integer2', 'test'),
+            ordered=False,
         )
 
     def test_order_by_conditional_implicit(self):
@@ -1207,9 +1269,10 @@ class CaseDocumentationExamples(TestCase):
                     default=Value('0%'),
                     output_field=models.CharField(),
                 ),
-            ).order_by('pk'),
+            ),
             [('Jane Doe', '0%'), ('James Smith', '5%'), ('Jack Black', '10%')],
-            transform=attrgetter('name', 'discount')
+            transform=attrgetter('name', 'discount'),
+            ordered=False,
         )
 
     def test_lookup_example(self):
@@ -1223,9 +1286,10 @@ class CaseDocumentationExamples(TestCase):
                     default=Value('0%'),
                     output_field=models.CharField(),
                 ),
-            ).order_by('pk'),
+            ),
             [('Jane Doe', '5%'), ('James Smith', '0%'), ('Jack Black', '10%')],
-            transform=attrgetter('name', 'discount')
+            transform=attrgetter('name', 'discount'),
+            ordered=False,
         )
 
     def test_conditional_update_example(self):
@@ -1239,9 +1303,10 @@ class CaseDocumentationExamples(TestCase):
             ),
         )
         self.assertQuerysetEqual(
-            Client.objects.all().order_by('pk'),
+            Client.objects.all(),
             [('Jane Doe', 'G'), ('James Smith', 'R'), ('Jack Black', 'P')],
-            transform=attrgetter('name', 'account_type')
+            transform=attrgetter('name', 'account_type'),
+            ordered=False,
         )
 
     def test_conditional_aggregation_example(self):
