@@ -5,7 +5,6 @@ from .base import WidgetTest
 
 class MultipleHiddenInputTest(WidgetTest):
     widget = MultipleHiddenInput()
-    no_unique_names = MultipleHiddenInput(unique_names=False)
 
     def test_render_single(self):
         self.check_html(
@@ -73,25 +72,4 @@ class MultipleHiddenInputTest(WidgetTest):
                 '<input type="hidden" name="letters_1" value="b" id="hideme_1">\n'
                 '<input type="hidden" name="letters_2" value="c" id="hideme_2">'
             ),
-        )
-
-    def test_unique_names_single(self):
-        self.check_html(
-            self.no_unique_names, 'email', ['test@example.com'],
-            html='<input type="hidden" name="email" value="test@example.com">',
-        )
-
-    def test_unique_names_multiple(self):
-        self.check_html(
-            self.no_unique_names, 'email', ['test@example.com', 'foo@example.com'],
-            html=(
-                '<input type="hidden" name="email" value="test@example.com">\n'
-                '<input type="hidden" name="email" value="foo@example.com">'
-            ),
-        )
-
-    def test_unique_names_render_attrs(self):
-        self.check_html(
-            self.no_unique_names, 'email', ['test@example.com'], attrs={'class': 'fun'},
-            html='<input type="hidden" name="email" value="test@example.com" class="fun">',
         )
