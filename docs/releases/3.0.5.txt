@@ -11,3 +11,7 @@ Bugfixes
 
 * Added the ability to handle ``.po`` files containing different plural
   equations for the same language (:ticket:`30439`).
+
+* Fixed a regression in Django 3.0 where ``QuerySet.values()`` and
+  ``values_list()`` crashed if a queryset contained an aggregation and
+  ``Subquery()`` annotation that collides with a field name (:ticket:`31377`).
