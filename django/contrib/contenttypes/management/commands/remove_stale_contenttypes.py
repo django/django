@@ -28,16 +28,20 @@ class Command(BaseCommand):
         interactive = options['interactive']
         include_stale_apps = options['include_stale_apps']
         verbosity = options['verbosity']
-
-        content_types_by_app = groupby(ContentType.objects.using(db).order_by('app_label', 'model'),
-                                       lambda x: x.app_label)
-
-        for app_label, cts in content_types_by_app:
+        
+        if not router.allow_migrate_model(db, ContentType):
+            return
+        ContentType.objects.clear_cache()
+        
+        apps_content_types = itertools.groupby(
+            ContentType.objects.using(db).order_by('app_label', 'model'),
+            lambda obj: obj.app_label,
+        )   
+        for app_label, content_types in apps_content_types:
             if not include_stale_apps and app_label not in apps.app_configs:
                 continue
-
             to_remove = [
-                ct for ct in cts if ct.model_class() is None
+                ct for ct in content_types if ct.model_class() is None
             ]
             # Confirm that the content type is stale before deletion.
             using = router.db_for_write(ContentType)
