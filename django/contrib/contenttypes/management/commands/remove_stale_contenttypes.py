@@ -1,4 +1,4 @@
-from itertools import groupby
+import itertools
 
 from django.apps import apps
 from django.contrib.contenttypes.models import ContentType
@@ -28,15 +28,15 @@ class Command(BaseCommand):
         interactive = options['interactive']
         include_stale_apps = options['include_stale_apps']
         verbosity = options['verbosity']
-        
+
         if not router.allow_migrate_model(db, ContentType):
             return
         ContentType.objects.clear_cache()
-        
+
         apps_content_types = itertools.groupby(
             ContentType.objects.using(db).order_by('app_label', 'model'),
             lambda obj: obj.app_label,
-        )   
+        )
         for app_label, content_types in apps_content_types:
             if not include_stale_apps and app_label not in apps.app_configs:
                 continue
