@@ -691,6 +691,14 @@ These extra lookups may not be portable to different database engines (because
 you're explicitly writing SQL code) and violate the DRY principle, so you
 should avoid them if possible.
 
+The expression may refer to the table(s) referred to by the queryset, i.e.
+for using ``RawSQL`` with e.g. the default ``django.contrib.auth.models.User`` model,
+an example expression might be
+
+    >>> from django.db.models.expressions import RawSQL
+    >>> from django.contrib.auth.models import User
+    >>> User.objects.all().annotate(val=RawSQL("select count(*) from sometable where othercol = auth_user.id"))
+
 .. warning::
 
     To protect against `SQL injection attacks
