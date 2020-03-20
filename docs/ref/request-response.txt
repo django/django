@@ -285,7 +285,8 @@ Methods
 .. method:: HttpRequest.get_host()
 
     Returns the originating host of the request using information from the
-    ``HTTP_X_FORWARDED_HOST`` (if :setting:`USE_X_FORWARDED_HOST` is enabled)
+    ``HTTP_X_FORWARDED_HOST`` (if :setting:`USE_X_FORWARDED_HOST` is enabled),
+    ``HTTP_X_FORWARDED_PORT`` (if :setting:`USE_X_FORWARDED_PORT` is enabled),
     and ``HTTP_HOST`` headers, in that order. If they don't provide a value,
     the method uses a combination of ``SERVER_NAME`` and ``SERVER_PORT`` as
     detailed in :pep:`3333`.
@@ -322,6 +323,10 @@ Methods
         relies on the value of :meth:`~HttpRequest.get_host()` -- for instance,
         :class:`~django.middleware.common.CommonMiddleware` or
         :class:`~django.middleware.csrf.CsrfViewMiddleware`.
+
+.. versionchanged:: 3.0.5
+
+   Take the port number from ``HTTP_X_FORWARDED_PORT`` when :setting:`USE_X_FORWARDED_PORT` is enabled.
 
 .. method:: HttpRequest.get_port()
 
