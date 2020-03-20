@@ -51,6 +51,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     # Neither MySQL nor MariaDB support partial indexes.
     supports_partial_indexes = False
     supports_order_by_nulls_modifier = False
+    order_by_nulls_first = True
 
     @cached_property
     def _mysql_storage_engine(self):

@@ -87,7 +87,7 @@ need to distinguish caches by the ``Accept-language`` header.
         Handling an asterisk ``'*'`` according to :rfc:`7231#section-7.1.4` was
         added.
 
-.. function:: get_cache_key(request, key_prefix=None)
+.. function:: get_cache_key(request, key_prefix=None, method='GET', cache=None)
 
     Returns a cache key based on the request path. It can be used in the
     request phase because it pulls the list of headers to take into account
@@ -97,7 +97,7 @@ need to distinguish caches by the ``Accept-language`` header.
     If there is no headerlist stored, the page needs to be rebuilt, so this
     function returns ``None``.
 
-.. function:: learn_cache_key(request, response, cache_timeout=None, key_prefix=None)
+.. function:: learn_cache_key(request, response, cache_timeout=None, key_prefix=None, cache=None)
 
     Learns what headers to take into account for some request path from the
     response object. It stores those headers in a global path registry so that
@@ -209,6 +209,31 @@ The functions defined in this module share the following properties:
          @cache_page(3600)
          def my_view(request):
              pass
+
+.. function:: sync_only_middleware(middleware)
+
+    .. versionadded:: 3.1
+
+    Marks a middleware as :ref:`synchronous-only <async-middleware>`. (The
+    default in Django, but this allows you to future-proof if the default ever
+    changes in a future release.)
+
+.. function:: async_only_middleware(middleware)
+
+    .. versionadded:: 3.1
+
+    Marks a middleware as :ref:`asynchronous-only <async-middleware>`. Django
+    will wrap it in an asynchronous event loop when it is called from the WSGI
+    request path.
+
+.. function:: sync_and_async_middleware(middleware)
+
+    .. versionadded:: 3.1
+
+    Marks a middleware as :ref:`sync and async compatible <async-middleware>`,
+    this allows to avoid converting requests. You must implement detection of
+    the current request type to use this decorator. See :ref:`asynchronous
+    middleware documentation <async-middleware>` for details.
 
 ``django.utils.encoding``
 =========================

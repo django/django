@@ -846,12 +846,6 @@ Composite widgets
     A widget that handles multiple hidden widgets for fields that have a list
     of values.
 
-    .. attribute:: MultipleHiddenInput.choices
-
-        This attribute is optional when the form field does not have a
-        ``choices`` attribute. If it does, it will override anything you set
-        here when the attribute is updated on the :class:`Field`.
-
 ``SplitDateTimeWidget``
 ~~~~~~~~~~~~~~~~~~~~~~~
 

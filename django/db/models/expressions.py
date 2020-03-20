@@ -1120,9 +1120,13 @@ class OrderBy(BaseExpression):
             elif self.nulls_first:
                 template = '%s NULLS FIRST' % template
         else:
-            if self.nulls_last:
+            if self.nulls_last and not (
+                self.descending and connection.features.order_by_nulls_first
+            ):
                 template = '%%(expression)s IS NULL, %s' % template
-            elif self.nulls_first:
+            elif self.nulls_first and not (
+                not self.descending and connection.features.order_by_nulls_first
+            ):
                 template = '%%(expression)s IS NOT NULL, %s' % template
         connection.ops.check_expression_support(self)
         expression_sql, params = compiler.compile(self.expression)

@@ -1,6 +1,6 @@
 /* global QUnit, id_to_windowname,
    windowname_to_id */
-/* eslint global-strict: 0, strict: 0 */
+/* eslint strict: 0 */
 'use strict';
 
 QUnit.module('admin.RelatedObjectLookups');

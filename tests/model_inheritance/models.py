@@ -181,6 +181,8 @@ class GrandParent(models.Model):
     place = models.ForeignKey(Place, models.CASCADE, null=True, related_name='+')
 
     class Meta:
+        # Ordering used by test_inherited_ordering_pk_desc.
+        ordering = ['-pk']
         unique_together = ('first_name', 'last_name')
 
 

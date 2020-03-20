@@ -18,6 +18,7 @@ from django.core import management, signals
 from django.core.cache import (
     DEFAULT_CACHE_ALIAS, CacheKeyWarning, cache, caches,
 )
+from django.core.cache.backends.base import InvalidCacheBackendError
 from django.core.cache.utils import make_template_fragment_key
 from django.db import close_old_connections, connection, connections
 from django.http import (
@@ -597,7 +598,12 @@ class BaseCacheTests:
         cache.set("key1", "spam", 100.2)
         self.assertEqual(cache.get("key1"), "spam")
 
-    def _perform_cull_test(self, cull_cache, initial_count, final_count):
+    def _perform_cull_test(self, cull_cache_name, initial_count, final_count):
+        try:
+            cull_cache = caches[cull_cache_name]
+        except InvalidCacheBackendError:
+            self.skipTest("Culling isn't implemented.")
+
         # Create initial cache key entries. This will overflow the cache,
         # causing a cull.
         for i in range(1, initial_count):
@@ -610,10 +616,10 @@ class BaseCacheTests:
         self.assertEqual(count, final_count)
 
     def test_cull(self):
-        self._perform_cull_test(caches['cull'], 50, 29)
+        self._perform_cull_test('cull', 50, 29)
 
     def test_zero_cull(self):
-        self._perform_cull_test(caches['zero_cull'], 50, 19)
+        self._perform_cull_test('zero_cull', 50, 19)
 
     def _perform_invalid_key_test(self, key, expected_warning):
         """
@@ -1031,7 +1037,7 @@ class DBCacheTests(BaseCacheTests, TransactionTestCase):
             cache.delete_many(['a', 'b', 'c'])
 
     def test_zero_cull(self):
-        self._perform_cull_test(caches['zero_cull'], 50, 18)
+        self._perform_cull_test('zero_cull', 50, 18)
 
     def test_second_call_doesnt_crash(self):
         out = io.StringIO()
@@ -1301,14 +1307,6 @@ class BaseMemcachedTests(BaseCacheTests):
                 TIMEOUT=31536000)):
             cache.set('future_foo', 'bar')
             self.assertEqual(cache.get('future_foo'), 'bar')
-
-    def test_cull(self):
-        # culling isn't implemented, memcached deals with it.
-        pass
-
-    def test_zero_cull(self):
-        # culling isn't implemented, memcached deals with it.
-        pass
 
     def test_memcached_deletes_key_on_failed_set(self):
         # By default memcached allows objects up to 1MB. For the cache_db session

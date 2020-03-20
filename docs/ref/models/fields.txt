@@ -2075,6 +2075,8 @@ Field API reference
         backend already returns the correct Python type, or the backend itself
         does the conversion.
 
+        ``expression`` is the same as ``self``.
+
         See :ref:`converting-values-to-python-objects` for usage.
 
         .. note::

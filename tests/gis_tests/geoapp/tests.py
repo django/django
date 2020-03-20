@@ -596,7 +596,7 @@ class GeoQuerySetTest(TestCase):
 
     @unittest.skipUnless(
         connection.vendor == 'oracle',
-        'Oracle supports tolerance paremeter.',
+        'Oracle supports tolerance parameter.',
     )
     def test_unionagg_tolerance(self):
         City.objects.create(
@@ -622,7 +622,7 @@ class GeoQuerySetTest(TestCase):
 
     @unittest.skipUnless(
         connection.vendor == 'oracle',
-        'Oracle supports tolerance paremeter.',
+        'Oracle supports tolerance parameter.',
     )
     def test_unionagg_tolerance_escaping(self):
         tx = Country.objects.get(name='Texas').mpoly
