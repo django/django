@@ -6,7 +6,7 @@ All text copyright Python (Monty) Pictures. Thanks to sacred-texts.com for the
 transcript.
 """
 from django.db import connection
-from django.db.models import F
+from django.db.models import F, Value
 from django.test import modify_settings, skipUnlessDBFeature
 
 from . import PostgreSQLSimpleTestCase, PostgreSQLTestCase
@@ -448,6 +448,66 @@ class TestRankingAndWeights(GrailTestData, PostgreSQLTestCase):
             rank=SearchRank(SearchVector('dialogue'), SearchQuery('brave sir robin')),
         ).filter(rank__gt=0.3)
         self.assertSequenceEqual(searched, [self.verse0])
+
+    def test_cover_density_ranking(self):
+        not_dense_verse = Line.objects.create(
+            scene=self.robin,
+            character=self.minstrel,
+            dialogue=(
+                'Bravely taking to his feet, he beat a very brave retreat. '
+                'A brave retreat brave Sir Robin.'
+            )
+        )
+        searched = Line.objects.filter(character=self.minstrel).annotate(
+            rank=SearchRank(
+                SearchVector('dialogue'),
+                SearchQuery('brave robin'),
+                cover_density=True,
+            ),
+        ).order_by('rank', '-pk')
+        self.assertSequenceEqual(
+            searched,
+            [self.verse2, not_dense_verse, self.verse1, self.verse0],
+        )
+
+    def test_ranking_with_normalization(self):
+        short_verse = Line.objects.create(
+            scene=self.robin,
+            character=self.minstrel,
+            dialogue='A brave retreat brave Sir Robin.',
+        )
+        searched = Line.objects.filter(character=self.minstrel).annotate(
+            rank=SearchRank(
+                SearchVector('dialogue'),
+                SearchQuery('brave sir robin'),
+                # Divide the rank by the document length.
+                normalization=2,
+            ),
+        ).order_by('rank')
+        self.assertSequenceEqual(
+            searched,
+            [self.verse2, self.verse1, self.verse0, short_verse],
+        )
+
+    def test_ranking_with_masked_normalization(self):
+        short_verse = Line.objects.create(
+            scene=self.robin,
+            character=self.minstrel,
+            dialogue='A brave retreat brave Sir Robin.',
+        )
+        searched = Line.objects.filter(character=self.minstrel).annotate(
+            rank=SearchRank(
+                SearchVector('dialogue'),
+                SearchQuery('brave sir robin'),
+                # Divide the rank by the document length and by the number of
+                # unique words in document.
+                normalization=Value(2).bitor(Value(8)),
+            ),
+        ).order_by('rank')
+        self.assertSequenceEqual(
+            searched,
+            [self.verse2, self.verse1, self.verse0, short_verse],
+        )
 
 
 class SearchVectorIndexTests(PostgreSQLTestCase):

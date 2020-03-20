@@ -160,6 +160,14 @@ Minor features
 
 * :lookup:`search` lookup now supports query expressions.
 
+* The new ``cover_density`` parameter of
+  :class:`~django.contrib.postgres.search.SearchRank` allows ranking by cover
+  density.
+
+* The new ``normalization`` parameter of
+  :class:`~django.contrib.postgres.search.SearchRank` allows rank
+  normalization.
+
 :mod:`django.contrib.redirects`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
