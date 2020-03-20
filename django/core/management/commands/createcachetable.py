@@ -1,9 +1,10 @@
+from django.apps.registry import Apps
 from django.conf import settings
 from django.core.cache import caches
 from django.core.cache.backends.db import BaseDatabaseCache
 from django.core.management.base import BaseCommand, CommandError
 from django.db import (
-    DEFAULT_DB_ALIAS, DatabaseError, connections, models, router, transaction,
+    DEFAULT_DB_ALIAS, DatabaseError, connections, models, router,
 )
 
 
@@ -53,55 +54,33 @@ class Command(BaseCommand):
                 self.stdout.write("Cache table '%s' already exists." % tablename)
             return
 
-        fields = (
+        class CacheTable(models.Model):
             # "key" is a reserved word in MySQL, so use "cache_key" instead.
-            models.CharField(name='cache_key', max_length=255, unique=True, primary_key=True),
-            models.TextField(name='value'),
-            models.DateTimeField(name='expires', db_index=True),
-        )
-        table_output = []
-        index_output = []
-        qn = connection.ops.quote_name
-        for f in fields:
-            field_output = [
-                qn(f.name),
-                f.db_type(connection=connection),
-                '%sNULL' % ('NOT ' if not f.null else ''),
-            ]
-            if f.primary_key:
-                field_output.append("PRIMARY KEY")
-            elif f.unique:
-                field_output.append("UNIQUE")
-            if f.db_index:
-                unique = "UNIQUE " if f.unique else ""
-                index_output.append(
-                    "CREATE %sINDEX %s ON %s (%s);" %
-                    (unique, qn('%s_%s' % (tablename, f.name)), qn(tablename), qn(f.name))
-                )
-            table_output.append(" ".join(field_output))
-        full_statement = ["CREATE TABLE %s (" % qn(tablename)]
-        for i, line in enumerate(table_output):
-            full_statement.append('    %s%s' % (line, ',' if i < len(table_output) - 1 else ''))
-        full_statement.append(');')
+            cache_key = models.CharField(max_length=255, primary_key=True)
+            value = models.TextField()
+            expires = models.DateTimeField(db_index=True)
 
-        full_statement = "\n".join(full_statement)
+            class Meta:
+                apps = Apps()
+                app_label = 'cache'
+                db_table = tablename
+                # constraints = [models.UniqueConstraint(fields=['cache_key'], name=tablename + '_cache_key')]
 
         if dry_run:
-            self.stdout.write(full_statement)
-            for statement in index_output:
+            with connection.schema_editor(collect_sql=True) as editor:
+                editor.create_model(CacheTable)
+            for statement in editor.collected_sql:
                 self.stdout.write(statement)
             return
 
-        with transaction.atomic(using=database, savepoint=connection.features.can_rollback_ddl):
-            with connection.cursor() as curs:
-                try:
-                    curs.execute(full_statement)
-                except DatabaseError as e:
-                    raise CommandError(
-                        "Cache table '%s' could not be created.\nThe error was: %s." %
-                        (tablename, e))
-                for statement in index_output:
-                    curs.execute(statement)
+        try:
+            with connection.schema_editor() as editor:
+                editor.create_model(CacheTable)
+        except DatabaseError as e:
+            raise CommandError(
+                "Cache table '%s' could not be created.\nThe error was: "
+                "%s." % (tablename, e)
+            )
 
         if self.verbosity > 1:
             self.stdout.write("Cache table '%s' created." % tablename)

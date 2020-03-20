@@ -1103,7 +1103,8 @@ class DBCacheRouter:
         },
     },
 )
-class CreateCacheTableForDBCacheTests(TestCase):
+class CreateCacheTableForDBCacheTests(TransactionTestCase):
+    available_apps = ['cache']
     databases = {'default', 'other'}
 
     @override_settings(DATABASE_ROUTERS=[DBCacheRouter()])
