@@ -338,6 +338,9 @@ Models
 * The new ``is_dst``  parameter of the :meth:`.QuerySet.datetimes` determines
   the treatment of nonexistent and ambiguous datetimes.
 
+* The new :class:`~django.db.models.F` expression ``bitxor()`` method allows
+  :ref:`bitwise XOR operation <using-f-expressions-in-filters>`.
+
 Pagination
 ~~~~~~~~~~
 

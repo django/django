@@ -3,7 +3,7 @@ import uuid
 from functools import lru_cache
 
 from django.conf import settings
-from django.db import DatabaseError
+from django.db import DatabaseError, NotSupportedError
 from django.db.backends.base.operations import BaseDatabaseOperations
 from django.db.backends.utils import strip_quotes, truncate_name
 from django.db.models import AutoField, Exists, ExpressionWrapper
@@ -575,6 +575,8 @@ END;
             return 'FLOOR(%(lhs)s / POWER(2, %(rhs)s))' % {'lhs': lhs, 'rhs': rhs}
         elif connector == '^':
             return 'POWER(%s)' % ','.join(sub_expressions)
+        elif connector == '#':
+            raise NotSupportedError('Bitwise XOR is not supported in Oracle.')
         return super().combine_expression(connector, sub_expressions)
 
     def _get_no_autofield_sequence_name(self, table):

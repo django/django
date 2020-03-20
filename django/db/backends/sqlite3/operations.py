@@ -312,6 +312,8 @@ class DatabaseOperations(BaseDatabaseOperations):
         # function that's registered in connect().
         if connector == '^':
             return 'POWER(%s)' % ','.join(sub_expressions)
+        elif connector == '#':
+            return 'BITXOR(%s)' % ','.join(sub_expressions)
         return super().combine_expression(connector, sub_expressions)
 
     def combine_duration_expression(self, connector, sub_expressions):

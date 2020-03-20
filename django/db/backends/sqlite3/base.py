@@ -218,6 +218,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         conn.create_function('ASIN', 1, none_guard(math.asin))
         conn.create_function('ATAN', 1, none_guard(math.atan))
         conn.create_function('ATAN2', 2, none_guard(math.atan2))
+        conn.create_function('BITXOR', 2, none_guard(operator.xor))
         conn.create_function('CEILING', 1, none_guard(math.ceil))
         conn.create_function('COS', 1, none_guard(math.cos))
         conn.create_function('COT', 1, none_guard(lambda x: 1 / math.tan(x)))
