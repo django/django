@@ -364,15 +364,6 @@ This is generally the operation you would use to create
 custom data updates and alterations, and anything else you need access to an
 ORM and/or Python code for.
 
-If you're upgrading from South, this is basically the South pattern as an
-operation - one or two methods for forwards and backwards, with an ORM and
-schema operations available. Most of the time, you should be able to translate
-the ``orm.Model`` or ``orm["appname", "Model"]`` references from South directly
-into ``apps.get_model("appname", "Model")`` references here and leave most of
-the rest of the code unchanged for data migrations. However, ``apps`` will only
-have references to models in the current app unless migrations in other apps
-are added to the migration's dependencies.
-
 Much like :class:`RunSQL`, ensure that if you change schema inside here you're
 either doing it outside the scope of the Django model system (e.g. triggers)
 or that you use :class:`SeparateDatabaseAndState` to add in operations that will
