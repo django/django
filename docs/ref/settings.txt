@@ -2839,7 +2839,7 @@ A boolean that specifies whether to use the ``X-Forwarded-Port`` header in
 preference to the ``SERVER_PORT`` ``META`` variable. This should only be
 enabled if a proxy which sets this header is in use.
 
-:setting:`USE_X_FORWARDED_HOST` takes priority over this setting when 
+:setting:`USE_X_FORWARDED_HOST` takes priority over this setting when
 the ``X-Forwarded-Host`` header includes a port.
 
 .. versionchanged:: 3.0.5
@@ -2849,7 +2849,7 @@ header does not include a port, then enabling :setting:`USE_X_FORWARDED_PORT`
 may be enabled to use the ``X-Forwarded-Port`` port value.
 
 Enabling :setting:`USE_X_FORWARDED_HOST` and :setting:`USE_X_FORWARDED_PORT`
-when the ``X-Forwarded-Host`` header includes a port will 
+when the ``X-Forwarded-Host`` header includes a port will
 raise :exc:`~django.core.exceptions.ImproperlyConfigured`.
 
 .. setting:: WSGI_APPLICATION

@@ -765,6 +765,40 @@ class HostValidationTests(SimpleTestCase):
         }
         self.assertEqual(request.get_port(), '8080')
 
+    @override_settings(USE_X_FORWARDED_HOST=True)
+    def test_get_port_with_x_forwarded_host(self):
+        request = HttpRequest()
+        request.META = {
+            'SERVER_PORT': '8080',
+            'HTTP_X_FORWARDED_HOST': 'example.com:8000',
+        }
+        # Should use the X-Forwarded-Host header
+        self.assertEqual(request.get_port(), '8000')
+
+        request = HttpRequest()
+        request.META = {
+            'SERVER_PORT': '8080',
+        }
+        self.assertEqual(request.get_port(), '8080')
+
+    @override_settings(USE_X_FORWARDED_HOST=True,
+                       USE_X_FORWARDED_PORT=True)
+    def test_get_port_with_x_forwarded_host_and_port(self):
+        request = HttpRequest()
+        request.META = {
+            'SERVER_PORT': '8080',
+            'HTTP_X_FORWARDED_HOST': 'example.com',
+            'HTTP_X_FORWARDED_PORT': '8010',
+        }
+        # Should use the X-Forwarded-Port header
+        self.assertEqual(request.get_port(), '8010')
+
+        request = HttpRequest()
+        request.META = {
+            'SERVER_PORT': '8080',
+        }
+        self.assertEqual(request.get_port(), '8080')
+
     @override_settings(
         USE_X_FORWARDED_PORT=True,
         USE_X_FORWARDED_HOST=True,

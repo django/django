@@ -9,6 +9,6 @@ Django 3.0.5 fixes several bugs in 3.0.4.
 Bugfixes
 ========
 
-* Fixed the behavior of :meth:`~django.http.request.HttpRequest.get_host` and 
+* Fixed the behavior of :meth:`~django.http.request.HttpRequest.get_host` and
   :meth:`~django.http.request.HttpRequest.get_port` to use the forwarded port
   when :setting:``USE_X_FORWARDED_PORT`` is enabled (:ticket:`31354`).
