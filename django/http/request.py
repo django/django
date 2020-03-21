@@ -148,7 +148,7 @@ class HttpRequest:
 
     def get_port(self):
         """Return the port number for the request as a string."""
-        if (settings.USE_X_FORWARDED_HOST and ':' in self.META.get('HTTP_X_FORWARDED_HOST',"")):
+        if (settings.USE_X_FORWARDED_HOST and ':' in self.META.get('HTTP_X_FORWARDED_HOST', "")):
             port = self.META['HTTP_X_FORWARDED_HOST'].split(':')[-1]
         elif settings.USE_X_FORWARDED_PORT and 'HTTP_X_FORWARDED_PORT' in self.META:
             port = self.META['HTTP_X_FORWARDED_PORT']
