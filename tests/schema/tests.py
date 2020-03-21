@@ -1610,16 +1610,6 @@ class SchemaTests(TransactionTestCase):
         with self.assertRaises(IntegrityError):
             Tag.objects.create(title="bar", slug="foo")
         Tag.objects.all().delete()
-        # Rename the field
-        new_field3 = SlugField(unique=True)
-        new_field3.set_attributes_from_name("slug2")
-        with connection.schema_editor() as editor:
-            editor.alter_field(Tag, new_field2, new_field3, strict=True)
-        # Ensure the field is still unique
-        TagUniqueRename.objects.create(title="foo", slug2="foo")
-        with self.assertRaises(IntegrityError):
-            TagUniqueRename.objects.create(title="bar", slug2="foo")
-        Tag.objects.all().delete()
 
     def test_unique_name_quoting(self):
         old_table_name = TagUniqueRename._meta.db_table
@@ -2212,7 +2202,7 @@ class SchemaTests(TransactionTestCase):
         )
         with atomic(), connection.schema_editor() as editor:
             with self.assertRaisesMessage(TransactionManagementError, message):
-                editor.execute(editor.sql_create_table % {'table': 'foo', 'definition': ''})
+                editor.execute(editor.sql_create_table % {'table': 'foo', 'definition': '', 'primary_key': ''})
 
     @skipUnlessDBFeature('supports_foreign_keys')
     def test_foreign_key_index_long_names_regression(self):
