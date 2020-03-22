@@ -83,7 +83,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             return
         self.execute(self.sql_alter_table_comment % {
             "db_table": self.quote_name(model._meta.db_table),
-            "new_table_comment": self.quote_name(new_db_table_comment),
+            "db_table_comment": self.quote_name(new_db_table_comment),
         })
 
     def _column_default_sql(self, field):
