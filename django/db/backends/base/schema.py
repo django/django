@@ -477,7 +477,6 @@ class BaseDatabaseSchemaEditor:
         # Build the SQL and run it
         sql = self.sql_create_column % {
             "table": self.quote_name(model._meta.db_table),
-            "db_table_comment": model._meta.db_table_comment,
             "column": self.quote_name(field.column),
             "definition": definition,
         }
