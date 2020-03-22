@@ -1,9 +1,9 @@
 from .fields import AddField, AlterField, RemoveField, RenameField
 from .models import (
     AddConstraint, AddIndex, AlterIndexTogether, AlterModelManagers,
-    AlterModelOptions, AlterModelTable, AlterModelTableComment, AlterOrderWithRespectTo,
-    AlterUniqueTogether, CreateModel, DeleteModel, RemoveConstraint,
-    RemoveIndex, RenameModel,
+    AlterModelOptions, AlterModelTable, AlterModelTableComment,
+    AlterOrderWithRespectTo, AlterUniqueTogether, CreateModel,
+    DeleteModel, RemoveConstraint, RemoveIndex, RenameModel,
 )
 from .special import RunPython, RunSQL, SeparateDatabaseAndState
 
