@@ -323,10 +323,13 @@ def _init_worker(counter):
         # reflected in django.db.connections. If the following line assigned
         # connection.settings_dict = settings_dict, new threads would connect
         # to the default database instead of the appropriate clone.
-        connection.settings_dict.update({
-            **settings_dict,
-            'NAME': connection.creation._get_test_db_name()
-        })
+        if connection.vendor != 'sqlite3':
+            connection.settings_dict.update({
+                **settings_dict,
+                'NAME': connection.creation._get_test_db_name()
+            })
+        else:
+            connection.settings_dict.update(settings_dict)
         connection.close()
 
 
