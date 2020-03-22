@@ -24,7 +24,7 @@ IMMUTABLE_WARNING = (
 )
 
 DEFAULT_NAMES = (
-    'verbose_name', 'verbose_name_plural', 'db_table', 'ordering',
+    'verbose_name', 'verbose_name_plural', 'db_table', 'db_table_comment', 'ordering',
     'unique_together', 'permissions', 'get_latest_by', 'order_with_respect_to',
     'app_label', 'db_tablespace', 'abstract', 'managed', 'proxy', 'swappable',
     'auto_created', 'index_together', 'apps', 'default_permissions',
