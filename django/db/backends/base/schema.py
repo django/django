@@ -430,6 +430,9 @@ class BaseDatabaseSchemaEditor:
             if isinstance(sql, Statement):
                 sql.rename_table_references(old_db_table, new_db_table)
 
+    def alter_db_table_comment(self, model, old_db_table_comment, new_db_table_comment):
+        logger.info('option "db_table_comment" is supported only mysql ....')
+
     def alter_db_tablespace(self, model, old_db_tablespace, new_db_tablespace):
         """Move a model's table between tablespaces."""
         self.execute(self.sql_retablespace_table % {
@@ -474,6 +477,7 @@ class BaseDatabaseSchemaEditor:
         # Build the SQL and run it
         sql = self.sql_create_column % {
             "table": self.quote_name(model._meta.db_table),
+            "db_table_comment": model._meta.db_table_comment,
             "column": self.quote_name(field.column),
             "definition": definition,
         }
@@ -691,6 +695,12 @@ class BaseDatabaseSchemaEditor:
             fragment = self._alter_column_null_sql(model, old_field, new_field)
             if fragment:
                 null_actions.append(fragment)
+
+        if old_field.help_text != new_field.help_text:
+            fragment = self._alter_column_comment_sql(model, new_field, new_type, new_field.help_text)
+            if fragment:
+                null_actions.append(fragment)
+
         # Only if we have a default and there is a change from NULL to NOT NULL
         four_way_default_alteration = (
             new_field.has_default() and
@@ -881,6 +891,10 @@ class BaseDatabaseSchemaEditor:
             ),
             [],
         )
+
+    def _alter_column_comment_sql(self, model, new_field, new_type, new_db_comment):
+        logger.info('converting help_text to comment is supported only mysql....')
+        return None
 
     def _alter_many_to_many(self, model, old_field, new_field, strict):
         """Alter M2Ms to repoint their to= endpoints."""
