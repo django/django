@@ -1,12 +1,14 @@
 import os
 import shutil
 import sys
+import sqlite3
 from pathlib import Path
 
 from django.db.backends.base.creation import BaseDatabaseCreation
 
 
 class DatabaseCreation(BaseDatabaseCreation):
+    DEFAULT_TEST_DB_FILENAME = 'test.db'
 
     @staticmethod
     def is_in_memory_db(database_name):
@@ -15,10 +17,16 @@ class DatabaseCreation(BaseDatabaseCreation):
         )
 
     def _get_test_db_name(self):
-        test_database_name = self.connection.settings_dict['TEST']['NAME'] or ':memory:'
-        if test_database_name == ':memory:':
-            return 'file:memorydb_%s?mode=memory&cache=shared' % self.connection.alias
+        test_database_name = self.connection.settings_dict['TEST']['NAME'] or self.DEFAULT_TEST_DB_FILENAME
+        # Force to use file based database for parallel testing when default settings is in-memory DB
+        if self.is_in_memory_db(test_database_name):
+            return DEFAULT_TEST_DB_FILENAME
         return test_database_name
+
+    def _get_test_db_clone_name(self, suffix):
+        test_database_name = self._get_test_db_name()
+        root, ext = os.path.splitext(test_database_name)
+        return '{}_{}.{}'.format(root, suffix, ext)
 
     def _create_test_db(self, verbosity, autoclobber, keepdb=False):
         test_database_name = self._get_test_db_name()
@@ -50,17 +58,11 @@ class DatabaseCreation(BaseDatabaseCreation):
 
     def get_test_db_clone_settings(self, suffix):
         orig_settings_dict = self.connection.settings_dict
-        source_database_name = orig_settings_dict['NAME']
-        if self.is_in_memory_db(source_database_name):
-            return orig_settings_dict
-        else:
-            root, ext = os.path.splitext(orig_settings_dict['NAME'])
-            return {**orig_settings_dict, 'NAME': '{}_{}.{}'.format(root, suffix, ext)}
+        return {**orig_settings_dict, 'NAME': self._get_test_db_clone_name(suffix)}
 
     def _clone_test_db(self, suffix, verbosity, keepdb=False):
         source_database_name = self.connection.settings_dict['NAME']
         target_database_name = self.get_test_db_clone_settings(suffix)['NAME']
-        # Forking automatically makes a copy of an in-memory database.
         if not self.is_in_memory_db(source_database_name):
             # Erase the old test database
             if os.access(target_database_name, os.F_OK):
