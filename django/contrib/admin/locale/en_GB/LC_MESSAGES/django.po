@@ -416,8 +416,8 @@ msgstr ""
 msgid "Objects"
 msgstr ""
 
-msgid "Yes, I'm sure"
-msgstr "Yes, I'm sure"
+msgid "Yes, I’m sure"
+msgstr "Yes, I’m sure"
 
 msgid "No, take me back"
 msgstr ""

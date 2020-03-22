@@ -419,7 +419,7 @@ msgstr ""
 msgid "Objects"
 msgstr "ობიექტები"
 
-msgid "Yes, I'm sure"
+msgid "Yes, I’m sure"
 msgstr "კი, ნამდვილად"
 
 msgid "No, take me back"

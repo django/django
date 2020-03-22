@@ -434,7 +434,7 @@ msgstr ""
 msgid "Objects"
 msgstr "Oibiachtaí"
 
-msgid "Yes, I'm sure"
+msgid "Yes, I’m sure"
 msgstr "Táim cinnte"
 
 msgid "No, take me back"

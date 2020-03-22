@@ -388,7 +388,7 @@ msgstr ""
 msgid "Objects"
 msgstr ""
 
-msgid "Yes, I'm sure"
+msgid "Yes, I’m sure"
 msgstr "ಹೌದು,ನನಗೆ ಖಚಿತವಿದೆ"
 
 msgid "No, take me back"

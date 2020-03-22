@@ -401,7 +401,7 @@ msgstr ""
 msgid "Objects"
 msgstr ""
 
-msgid "Yes, I'm sure"
+msgid "Yes, I’m sure"
 msgstr "Ja, eg er sikker"
 
 msgid "No, take me back"

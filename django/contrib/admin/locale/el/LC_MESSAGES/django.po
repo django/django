@@ -441,7 +441,7 @@ msgstr ""
 msgid "Objects"
 msgstr "Αντικείμενα"
 
-msgid "Yes, I'm sure"
+msgid "Yes, I’m sure"
 msgstr "Ναι, είμαι βέβαιος"
 
 msgid "No, take me back"

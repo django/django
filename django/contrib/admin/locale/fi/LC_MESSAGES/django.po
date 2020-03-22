@@ -424,7 +424,7 @@ msgstr ""
 msgid "Objects"
 msgstr "Kohteet"
 
-msgid "Yes, I'm sure"
+msgid "Yes, I’m sure"
 msgstr "Kyllä, olen varma"
 
 msgid "No, take me back"

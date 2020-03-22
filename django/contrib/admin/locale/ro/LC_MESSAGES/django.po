@@ -435,7 +435,7 @@ msgstr ""
 msgid "Objects"
 msgstr "Obiecte"
 
-msgid "Yes, I'm sure"
+msgid "Yes, I’m sure"
 msgstr "Da, cu siguranță"
 
 msgid "No, take me back"

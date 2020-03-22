@@ -424,7 +424,7 @@ msgstr ""
 msgid "Objects"
 msgstr "オブジェクト"
 
-msgid "Yes, I'm sure"
+msgid "Yes, I’m sure"
 msgstr "はい"
 
 msgid "No, take me back"

@@ -428,7 +428,7 @@ msgstr ""
 msgid "Objects"
 msgstr "Бичлэгүүд"
 
-msgid "Yes, I'm sure"
+msgid "Yes, I’m sure"
 msgstr "Тийм, итгэлтэй байна."
 
 msgid "No, take me back"

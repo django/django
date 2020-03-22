@@ -406,7 +406,7 @@ msgstr ""
 msgid "Objects"
 msgstr ""
 
-msgid "Yes, I'm sure"
+msgid "Yes, I’m sure"
 msgstr "Ydw, rwy'n sicr"
 
 msgid "No, take me back"

@@ -430,7 +430,7 @@ msgstr ""
 msgid "Objects"
 msgstr "Objekte"
 
-msgid "Yes, I'm sure"
+msgid "Yes, I’m sure"
 msgstr "Ja, ek is seker"
 
 msgid "No, take me back"

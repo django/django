@@ -402,7 +402,7 @@ msgstr ""
 msgid "Objects"
 msgstr ""
 
-msgid "Yes, I'm sure"
+msgid "Yes, I’m sure"
 msgstr "ਹਾਂ, ਮੈਂ ਚਾਹੁੰਦਾ ਹਾਂ"
 
 msgid "No, take me back"

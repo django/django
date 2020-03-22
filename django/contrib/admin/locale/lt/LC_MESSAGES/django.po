@@ -433,7 +433,7 @@ msgstr ""
 msgid "Objects"
 msgstr "Objektai"
 
-msgid "Yes, I'm sure"
+msgid "Yes, I’m sure"
 msgstr "Taip, esu tikras"
 
 msgid "No, take me back"

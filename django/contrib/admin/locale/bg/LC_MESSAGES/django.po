@@ -416,7 +416,7 @@ msgstr ""
 msgid "Objects"
 msgstr "Обекти"
 
-msgid "Yes, I'm sure"
+msgid "Yes, I’m sure"
 msgstr "Да, сигурен съм"
 
 msgid "No, take me back"

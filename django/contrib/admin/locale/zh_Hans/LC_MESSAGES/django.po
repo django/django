@@ -428,7 +428,7 @@ msgstr ""
 msgid "Objects"
 msgstr "对象"
 
-msgid "Yes, I'm sure"
+msgid "Yes, I’m sure"
 msgstr "是的，我确定"
 
 msgid "No, take me back"

@@ -390,7 +390,7 @@ msgstr ""
 msgid "Objects"
 msgstr ""
 
-msgid "Yes, I'm sure"
+msgid "Yes, I’m sure"
 msgstr "ஆம், எனக்கு உறுதி"
 
 msgid "No, take me back"
