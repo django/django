@@ -1,14 +1,14 @@
 from .fields import AddField, AlterField, RemoveField, RenameField
 from .models import (
     AddConstraint, AddIndex, AlterIndexTogether, AlterModelManagers,
-    AlterModelOptions, AlterModelTable, AlterOrderWithRespectTo,
+    AlterModelOptions, AlterModelTable, AlterModelTableComment, AlterOrderWithRespectTo,
     AlterUniqueTogether, CreateModel, DeleteModel, RemoveConstraint,
     RemoveIndex, RenameModel,
 )
 from .special import RunPython, RunSQL, SeparateDatabaseAndState
 
 __all__ = [
-    'CreateModel', 'DeleteModel', 'AlterModelTable', 'AlterUniqueTogether',
+    'CreateModel', 'DeleteModel', 'AlterModelTable', 'AlterModelTableComment', 'AlterUniqueTogether',
     'RenameModel', 'AlterIndexTogether', 'AlterModelOptions', 'AddIndex',
     'RemoveIndex', 'AddField', 'RemoveField', 'AlterField', 'RenameField',
     'AddConstraint', 'RemoveConstraint',
