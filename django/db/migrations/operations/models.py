@@ -485,6 +485,46 @@ class AlterModelTable(ModelOptionOperation):
         )
 
 
+class AlterModelTableComment(ModelOptionOperation):
+
+    def __init__(self, name, db_table_comment):
+        self.db_table_comment = db_table_comment
+        super().__init__(name)
+
+    def deconstruct(self):
+        kwargs = {
+            'name': self.name,
+            'db_table_comment': self.db_table_comment,
+        }
+        return (
+            self.__class__.__qualname__,
+            [],
+            kwargs
+        )
+
+    def state_forwards(self, app_label, state):
+        state.models[app_label, self.name_lower].options["db_table_comment"] = self.db_table_comment
+        state.reload_model(app_label, self.name_lower, delay=True)
+
+    def database_forwards(self, app_label, schema_editor, from_state, to_state):
+        new_model = to_state.apps.get_model(app_label, self.name)
+        if self.allow_migrate_model(schema_editor.connection.alias, new_model):
+            old_model = from_state.apps.get_model(app_label, self.name)
+            schema_editor.alter_db_table_comment(
+                new_model,
+                old_model._meta.db_table_comment,
+                new_model._meta.db_table_comment,
+            )
+
+    def database_backwards(self, app_label, schema_editor, from_state, to_state):
+        return self.database_forwards(app_label, schema_editor, from_state, to_state)
+
+    def describe(self):
+        return "Modify Table Comment to %s" % (
+            self.db_table_comment,
+        )
+
+
 class AlterTogetherOptionOperation(ModelOptionOperation):
     option_name = None
 
