@@ -18,6 +18,7 @@ from django.test.utils import (
 )
 from django.utils.datastructures import OrderedSet
 from django.utils.version import PY37
+from django import setup as _django_setup
 
 try:
     import ipdb as pdb
@@ -300,7 +301,7 @@ _worker_id = 0
 
 def _init_worker(counter):
     """
-    Switch to databases dedicated to this worker.
+    Re-setup Django and switch to databases dedicated to this worker.
 
     This helper lives at module-level because of the multiprocessing module's
     requirements.
@@ -312,6 +313,9 @@ def _init_worker(counter):
         counter.value += 1
         _worker_id = counter.value
 
+    _django_setup()
+    setup_test_environment()
+
     for alias in connections:
         connection = connections[alias]
         settings_dict = connection.creation.get_test_db_clone_settings(str(_worker_id))
@@ -319,7 +323,10 @@ def _init_worker(counter):
         # reflected in django.db.connections. If the following line assigned
         # connection.settings_dict = settings_dict, new threads would connect
         # to the default database instead of the appropriate clone.
-        connection.settings_dict.update(settings_dict)
+        connection.settings_dict.update({
+            **settings_dict,
+            'NAME': connection.creation._get_test_db_name()
+        })
         connection.close()
 
 
@@ -334,6 +341,20 @@ def _run_subsuite(args):
     runner = runner_class(failfast=failfast)
     result = runner.run(subsuite)
     return subsuite_index, result.events
+
+
+def _get_databases(suite):
+    databases = set()
+    for test in suite:
+        if isinstance(test, unittest.TestCase):
+            test_databases = getattr(test, 'databases', None)
+            if test_databases == '__all__':
+                return set(connections)
+            if test_databases:
+                databases.update(test_databases)
+        else:
+            databases.update(_get_databases(test))
+    return databases
 
 
 class ParallelTestSuite(unittest.TestSuite):
@@ -656,21 +677,8 @@ class DiscoverRunner:
     def suite_result(self, suite, result, **kwargs):
         return len(result.failures) + len(result.errors)
 
-    def _get_databases(self, suite):
-        databases = set()
-        for test in suite:
-            if isinstance(test, unittest.TestCase):
-                test_databases = getattr(test, 'databases', None)
-                if test_databases == '__all__':
-                    return set(connections)
-                if test_databases:
-                    databases.update(test_databases)
-            else:
-                databases.update(self._get_databases(test))
-        return databases
-
     def get_databases(self, suite):
-        databases = self._get_databases(suite)
+        databases = _get_databases(suite)
         if self.verbosity >= 2:
             unused_databases = [alias for alias in connections if alias not in databases]
             if unused_databases:
