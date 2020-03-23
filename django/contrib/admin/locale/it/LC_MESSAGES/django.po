@@ -441,7 +441,7 @@ msgstr ""
 msgid "Objects"
 msgstr "Oggetti"
 
-msgid "Yes, I'm sure"
+msgid "Yes, I’m sure"
 msgstr "Sì, sono sicuro"
 
 msgid "No, take me back"

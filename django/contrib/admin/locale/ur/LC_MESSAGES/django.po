@@ -395,7 +395,7 @@ msgstr ""
 msgid "Objects"
 msgstr ""
 
-msgid "Yes, I'm sure"
+msgid "Yes, I’m sure"
 msgstr "ھاں، مجھے یقین ھے"
 
 msgid "No, take me back"

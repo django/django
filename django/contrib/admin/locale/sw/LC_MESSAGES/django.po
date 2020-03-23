@@ -404,7 +404,7 @@ msgstr ""
 msgid "Objects"
 msgstr "Viumbile"
 
-msgid "Yes, I'm sure"
+msgid "Yes, I’m sure"
 msgstr "Ndiyo, Nina uhakika"
 
 msgid "No, take me back"

@@ -428,7 +428,7 @@ msgstr ""
 msgid "Objects"
 msgstr "Objekty"
 
-msgid "Yes, I'm sure"
+msgid "Yes, I’m sure"
 msgstr "Jo, som se wěsty"
 
 msgid "No, take me back"

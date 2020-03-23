@@ -421,7 +421,7 @@ msgstr ""
 msgid "Objects"
 msgstr "Đối tượng"
 
-msgid "Yes, I'm sure"
+msgid "Yes, I’m sure"
 msgstr "Có, tôi chắc chắn."
 
 msgid "No, take me back"

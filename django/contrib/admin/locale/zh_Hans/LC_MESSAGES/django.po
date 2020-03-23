@@ -418,7 +418,7 @@ msgstr ""
 "要删除 %(object_name)s '%(escaped_object)s', 将要求删除以下受保护的相关对象:"
 
 #, python-format
-msgid ""
+msgid
 "Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
 "All of the following related items will be deleted:"
 msgstr ""
@@ -428,7 +428,7 @@ msgstr ""
 msgid "Objects"
 msgstr "对象"
 
-msgid "Yes, I'm sure"
+msgid "Yes, I’m sure"
 msgstr "是的，我确定"
 
 msgid "No, take me back"

@@ -400,7 +400,7 @@ msgstr ""
 msgid "Objects"
 msgstr ""
 
-msgid "Yes, I'm sure"
+msgid "Yes, I’m sure"
 msgstr "Yes, me esas certa"
 
 msgid "No, take me back"

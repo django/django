@@ -443,7 +443,7 @@ msgstr ""
 msgid "Objects"
 msgstr "Об'єкти"
 
-msgid "Yes, I'm sure"
+msgid "Yes, I’m sure"
 msgstr "Так, я впевнений"
 
 msgid "No, take me back"

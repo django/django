@@ -422,7 +422,7 @@ msgstr ""
 msgid "Objects"
 msgstr "വസ്തുക്കൾ"
 
-msgid "Yes, I'm sure"
+msgid "Yes, I’m sure"
 msgstr "അതെ, തീര്‍ച്ചയാണ്"
 
 msgid "No, take me back"

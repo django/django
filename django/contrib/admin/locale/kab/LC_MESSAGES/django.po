@@ -384,7 +384,7 @@ msgstr ""
 msgid "Objects"
 msgstr "Tiɣawsiwin"
 
-msgid "Yes, I'm sure"
+msgid "Yes, I’m sure"
 msgstr ""
 
 msgid "No, take me back"

@@ -440,7 +440,7 @@ msgstr ""
 msgid "Objects"
 msgstr "Объекты"
 
-msgid "Yes, I'm sure"
+msgid "Yes, I’m sure"
 msgstr "Да, я уверен"
 
 msgid "No, take me back"
