@@ -82,6 +82,7 @@ class Options:
         self.verbose_name = None
         self.verbose_name_plural = None
         self.db_table = ''
+        self.db_table_comment = ''
         self.ordering = []
         self._ordering_clash = False
         self.indexes = []
