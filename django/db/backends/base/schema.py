@@ -675,17 +675,17 @@ class BaseDatabaseSchemaEditor:
         #  3. Replace NULL constraint with NOT NULL
         #  4. Drop the default again.
         # Default change?
-        old_default = self.effective_default(old_field)
-        new_default = self.effective_default(new_field)
-        needs_database_default = (
-            old_field.null and
-            not new_field.null and
-            old_default != new_default and
-            new_default is not None and
-            not self.skip_default(new_field)
-        )
-        if needs_database_default:
-            actions.append(self._alter_column_default_sql(model, old_field, new_field))
+        needs_database_default = False
+        if old_field.null and not new_field.null:
+            old_default = self.effective_default(old_field)
+            new_default = self.effective_default(new_field)
+            if (
+                not self.skip_default(new_field) and
+                old_default != new_default and
+                new_default is not None
+            ):
+                needs_database_default = True
+                actions.append(self._alter_column_default_sql(model, old_field, new_field))
         # Nullability change?
         if old_field.null != new_field.null:
             fragment = self._alter_column_null_sql(model, old_field, new_field)
