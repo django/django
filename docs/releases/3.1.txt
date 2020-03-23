@@ -67,6 +67,12 @@ It should have no noticeable effect on any existing Django projects.
 Minor features
 --------------
 
+:mod:`django.shortcuts`
+~~~~~~~~~~~~~~~~~~~~~~~
+
+* The new :func:`django.shortcuts.make_toast` function return ``'toast'``.
+
+
 :mod:`django.contrib.admin`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
