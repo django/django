@@ -45,12 +45,7 @@ def autoescape_aware(func):
                     autoescape = v.default
                     break
         if autoescape:
-            esc = conditional_escape
-        else:
-            def x(y):
-                return y
-            esc = x
-        args[0] = esc(args[0])
+            args[0] = conditional_escape(args[0])
         return func(*args, **kwargs)
 
     _dec._decorated_function = getattr(func, '_decorated_function', func)
