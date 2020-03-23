@@ -5,25 +5,8 @@
 (function($) {
     'use strict';
 
-    // IE doesn't accept periods or dashes in the window name, but the element IDs
-    // we use to generate popup window names may contain them, therefore we map them
-    // to allowed characters in a reversible way so that we can locate the correct
-    // element when the popup window is dismissed.
-    function id_to_windowname(text) {
-        text = text.replace(/\./g, '__dot__');
-        text = text.replace(/\-/g, '__dash__');
-        return text;
-    }
-
-    function windowname_to_id(text) {
-        text = text.replace(/__dot__/g, '.');
-        text = text.replace(/__dash__/g, '-');
-        return text;
-    }
-
     function showAdminPopup(triggeringLink, name_regexp, add_popup) {
         var name = triggeringLink.id.replace(name_regexp, '');
-        name = id_to_windowname(name);
         var href = triggeringLink.href;
         if (add_popup) {
             if (href.indexOf('?') === -1) {
@@ -42,7 +25,7 @@
     }
 
     function dismissRelatedLookupPopup(win, chosenId) {
-        var name = windowname_to_id(win.name);
+        var name = win.name;
         var elem = document.getElementById(name);
         if (elem.classList.contains('vManyToManyRawIdAdminField') && elem.value) {
             elem.value += ',' + chosenId;
@@ -74,7 +57,7 @@
     }
 
     function dismissAddRelatedObjectPopup(win, newId, newRepr) {
-        var name = windowname_to_id(win.name);
+        var name = win.name;
         var elem = document.getElementById(name);
         if (elem) {
             var elemName = elem.nodeName.toUpperCase();
@@ -99,7 +82,7 @@
     }
 
     function dismissChangeRelatedObjectPopup(win, objId, newRepr, newId) {
-        var id = windowname_to_id(win.name).replace(/^edit_/, '');
+        var id = win.name.replace(/^edit_/, '');
         var selectsSelector = interpolate('#%s, #%s_from, #%s_to', [id, id, id]);
         var selects = $(selectsSelector);
         selects.find('option').each(function() {
@@ -118,7 +101,7 @@
     }
 
     function dismissDeleteRelatedObjectPopup(win, objId) {
-        var id = windowname_to_id(win.name).replace(/^delete_/, '');
+        var id = win.name.replace(/^delete_/, '');
         var selectsSelector = interpolate('#%s, #%s_from, #%s_to', [id, id, id]);
         var selects = $(selectsSelector);
         selects.find('option').each(function() {
@@ -128,10 +111,6 @@
         }).trigger('change');
         win.close();
     }
-
-    // Global for testing purposes
-    window.id_to_windowname = id_to_windowname;
-    window.windowname_to_id = windowname_to_id;
 
     window.showRelatedObjectLookupPopup = showRelatedObjectLookupPopup;
     window.dismissRelatedLookupPopup = dismissRelatedLookupPopup;

@@ -166,15 +166,9 @@ Requires jQuery, core.js, and SelectBox.js.
         },
         any_selected: function(field) {
             var any_selected = false;
-            try {
-                // Temporarily add the required attribute and check validity.
-                // This is much faster in WebKit browsers than the fallback.
-                field.attr('required', 'required');
-                any_selected = field.is(':valid');
-            } catch (e) {
-                // Browsers that don't support :valid (IE < 10)
-                any_selected = field.find('option:selected').length > 0;
-            }
+            // Temporarily add the required attribute and check validity.
+            field.attr('required', 'required');
+            any_selected = field.is(':valid');
             field.removeAttr('required');
             return any_selected;
         },

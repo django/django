@@ -114,16 +114,11 @@
             SelectBox.cache[id].sort(function(a, b) {
                 a = a.text.toLowerCase();
                 b = b.text.toLowerCase();
-                try {
-                    if (a > b) {
-                        return 1;
-                    }
-                    if (a < b) {
-                        return -1;
-                    }
+                if (a > b) {
+                    return 1;
                 }
-                catch (e) {
-                    // silently fail on IE 'unknown' exception
+                if (a < b) {
+                    return -1;
                 }
                 return 0;
             } );
