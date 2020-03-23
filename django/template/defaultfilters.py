@@ -61,6 +61,7 @@ def autoescape_aware(func):
 # STRING DECORATOR    #
 #######################
 
+
 def stringfilter(func):
     """
     Decorator for filters which should only receive strings. The object
@@ -459,8 +460,6 @@ def linebreaksbr(value, autoescape=True):
     """
     autoescape = autoescape and not isinstance(value, SafeData)
     value = normalize_newlines(value)
-    # if autoescape:
-    #     value = escape(value)
     return mark_safe(value.replace('\n', '<br>'))
 
 
