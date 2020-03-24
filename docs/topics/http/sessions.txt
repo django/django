@@ -599,6 +599,8 @@ of ``request.session`` as described above in `using sessions in views`_.
     Django applications which have the
     :setting:`SESSION_EXPIRE_AT_BROWSER_CLOSE` setting enabled.
 
+.. _clearing-the-session-store:
+
 Clearing the session store
 ==========================
 
