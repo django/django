@@ -263,13 +263,17 @@ queries and parameters in the same way as :ref:`cursor.execute()
 If you want to include literal percent signs in the query, you have to double
 them if you are passing parameters.
 
-The ``reverse_sql`` queries are executed when the migration is unapplied, so
-you can reverse the changes done in the forwards queries::
+The ``reverse_sql`` queries are executed when the migration is unapplied. They
+should undo what is done by the ``sql`` queries. For example, to undo the above
+insertion with a deletion::
 
     migrations.RunSQL(
-        [("INSERT INTO musician (name) VALUES (%s);", ['Reinhardt'])],
-        [("DELETE FROM musician where name=%s;", ['Reinhardt'])],
+        sql=[("INSERT INTO musician (name) VALUES (%s);", ['Reinhardt'])],
+        reverse_sql=[("DELETE FROM musician where name=%s;", ['Reinhardt'])],
     )
+
+If ``reverse_sql`` is ``None`` (the default), the ``RunSQL`` operation is
+irreversible.
 
 The ``state_operations`` argument is so you can supply operations that are
 equivalent to the SQL in terms of project state; for example, if you are
@@ -317,7 +321,8 @@ instance of :class:`SchemaEditor
 
 The ``reverse_code`` argument is called when unapplying migrations. This
 callable should undo what is done in the ``code`` callable so that the
-migration is reversible.
+migration is reversible. If ``reverse_code`` is ``None`` (the default), the
+``RunPython`` operation is irreversible.
 
 The optional ``hints`` argument will be passed as ``**hints`` to the
 :meth:`allow_migrate` method of database routers to assist them in making a
