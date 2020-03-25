@@ -10,9 +10,10 @@ from django.forms import (
     BooleanField, CharField, CheckboxSelectMultiple, ChoiceField, DateField,
     DateTimeField, EmailField, FileField, FileInput, FloatField, Form,
     HiddenInput, ImageField, IntegerField, MultipleChoiceField,
-    MultipleHiddenInput, MultiValueField, NullBooleanField, PasswordInput,
-    RadioSelect, Select, SplitDateTimeField, SplitHiddenDateTimeWidget,
-    Textarea, TextInput, TimeField, ValidationError, forms,
+    MultipleHiddenInput, MultiValueField, MultiWidget, NullBooleanField,
+    PasswordInput, RadioSelect, Select, SplitDateTimeField,
+    SplitHiddenDateTimeWidget, Textarea, TextInput, TimeField, ValidationError,
+    forms,
 )
 from django.forms.renderers import DjangoTemplates, get_default_renderer
 from django.forms.utils import ErrorList
@@ -2980,6 +2981,22 @@ Good luck picking a username that doesn&#x27;t already exist.</p>
                     return '%s.%s ext. %s (label: %s)' % tuple(data_list)
                 return None
 
+        class PhoneWidget(MultiWidget):
+            def __init__(self, attrs=None):
+                widgets = (
+                    TextInput(),
+                    TextInput(),
+                    TextInput(),
+                    TextInput()
+                )
+                super().__init__(widgets, attrs)
+
+            def decompress(self, value):
+                return [None, None, None, None]
+
+        class PhoneForm(Form):
+            phone = PhoneField(widget=PhoneWidget)
+
         # An empty value for any field will raise a `required` error on a
         # required `MultiValueField`.
         f = PhoneField()
@@ -2997,6 +3014,19 @@ Good luck picking a username that doesn&#x27;t already exist.</p>
         with self.assertRaisesMessage(ValidationError, "'Enter a valid country code.'"):
             f.clean(['61', '287654321', '123', 'Home'])
 
+        form = PhoneForm()
+        # When required=True & require_all_fields = True then all subwidgets are required
+        # irrespective of subwidget required attribute.
+        # Expect required on all fields
+        # Test 1 on truth table
+        self.assertHTMLEqual(form.as_p(),
+                             '<p><label for="id_phone_0">Phone:</label> '
+                             '<input type="text" name="phone_0" required id="id_phone_0">'
+                             '<input type="text" name="phone_1" required id="id_phone_1">'
+                             '<input type="text" name="phone_2" required id="id_phone_2">'
+                             '<input type="text" name="phone_3" required id="id_phone_3"></p>'
+                             )
+
         # Empty values for fields will NOT raise a `required` error on an
         # optional `MultiValueField`
         f = PhoneField(required=False)
@@ -3008,6 +3038,18 @@ Good luck picking a username that doesn&#x27;t already exist.</p>
         self.assertEqual('+61.287654321 ext. 123 (label: Home)', f.clean(['+61', '287654321', '123', 'Home']))
         with self.assertRaisesMessage(ValidationError, "'Enter a valid country code.'"):
             f.clean(['61', '287654321', '123', 'Home'])
+
+        # When required=False then all subwidgets are NOT required irrespective of subwidget required attribute.
+        # Expect NO required attribute on all fields
+        # Test 2 on truth table
+        form.fields['phone'].required = False
+        self.assertHTMLEqual(form.as_p(),
+                             '<p><label for="id_phone_0">Phone:</label> '
+                             '<input type="text" name="phone_0" id="id_phone_0">'
+                             '<input type="text" name="phone_1" id="id_phone_1">'
+                             '<input type="text" name="phone_2" id="id_phone_2">'
+                             '<input type="text" name="phone_3" id="id_phone_3"></p>'
+                             )
 
         # For a required `MultiValueField` with `require_all_fields=False`, a
         # `required` error will only be raised if all fields are empty. Fields
@@ -3028,6 +3070,19 @@ Good luck picking a username that doesn&#x27;t already exist.</p>
         with self.assertRaisesMessage(ValidationError, "'Enter a valid country code.'"):
             f.clean(['61', '287654321', '123', 'Home'])
 
+        # When required=True and require_all_fields=False then all required attribute should be same as sub widget
+        # Expect required on first three inputs only
+        # Test 3 on truth table
+        form.fields['phone'].required = True
+        form.fields['phone'].require_all_fields = False
+        self.assertHTMLEqual(form.as_p(),
+                             '<p><label for="id_phone_0">Phone:</label> '
+                             '<input type="text" name="phone_0" required id="id_phone_0">'
+                             '<input type="text" name="phone_1" required id="id_phone_1">'
+                             '<input type="text" name="phone_2" required id="id_phone_2">'
+                             '<input type="text" name="phone_3" id="id_phone_3"></p>'
+                             )
+
         # For an optional `MultiValueField` with `require_all_fields=False`, we
         # don't get any `required` error but we still get `incomplete` errors.
         f = PhoneField(required=False, require_all_fields=False)
@@ -3044,6 +3099,19 @@ Good luck picking a username that doesn&#x27;t already exist.</p>
             f.clean(['', '', '', 'Home'])
         with self.assertRaisesMessage(ValidationError, "'Enter a valid country code.'"):
             f.clean(['61', '287654321', '123', 'Home'])
+
+        # When required=False and require_all_fields=False then all required attribute should be same as sub widget
+        # Expect required on first three inputs only
+        # test 4 on truth table
+        form.fields['phone'].required = False
+        form.fields['phone'].require_all_fields = False
+        self.assertHTMLEqual(form.as_p(),
+                             '<p><label for="id_phone_0">Phone:</label> '
+                             '<input type="text" name="phone_0" required id="id_phone_0">'
+                             '<input type="text" name="phone_1" required id="id_phone_1">'
+                             '<input type="text" name="phone_2" required id="id_phone_2">'
+                             '<input type="text" name="phone_3" id="id_phone_3"></p>'
+                             )
 
     def test_custom_empty_values(self):
         """
