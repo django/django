@@ -355,7 +355,7 @@ from that ``{{ form }}`` by Django's template language.
     use the ``url``, ``email`` and ``number`` HTML5 input types. By default,
     browsers may apply their own validation on these fields, which may be
     stricter than Django's validation. If you would like to disable this
-    behavior, set the `novalidate` attribute on the ``form`` tag, or specify
+    behavior, set the ``novalidate`` attribute on the ``form`` tag, or specify
     a different widget on the field, like :class:`TextInput`.
 
 We now have a working web form, described by a Django :class:`Form`, processed

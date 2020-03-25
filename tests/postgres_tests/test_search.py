@@ -6,11 +6,11 @@ All text copyright Python (Monty) Pictures. Thanks to sacred-texts.com for the
 transcript.
 """
 from django.db import connection
-from django.db.models import F
+from django.db.models import F, Value
 from django.test import modify_settings, skipUnlessDBFeature
 
 from . import PostgreSQLSimpleTestCase, PostgreSQLTestCase
-from .models import Character, Line, Scene
+from .models import Character, Line, LineSavedSearch, Scene
 
 try:
     from django.contrib.postgres.search import (
@@ -103,6 +103,24 @@ class SimpleSearchTest(GrailTestData, PostgreSQLTestCase):
     def test_search_two_terms_with_partial_match(self):
         searched = Line.objects.filter(dialogue__search='Robin killed')
         self.assertSequenceEqual(searched, [self.verse0])
+
+    def test_search_query_config(self):
+        searched = Line.objects.filter(
+            dialogue__search=SearchQuery('nostrils', config='simple'),
+        )
+        self.assertSequenceEqual(searched, [self.verse2])
+
+    def test_search_with_F_expression(self):
+        # Non-matching query.
+        LineSavedSearch.objects.create(line=self.verse1, query='hearts')
+        # Matching query.
+        match = LineSavedSearch.objects.create(line=self.verse1, query='elbows')
+        for query_expression in [F('query'), SearchQuery(F('query'))]:
+            with self.subTest(query_expression):
+                searched = LineSavedSearch.objects.filter(
+                    line__dialogue__search=query_expression,
+                )
+                self.assertSequenceEqual(searched, [match])
 
 
 @modify_settings(INSTALLED_APPS={'append': 'django.contrib.postgres'})
@@ -359,6 +377,15 @@ class TestCombinations(GrailTestData, PostgreSQLTestCase):
         )
         self.assertCountEqual(searched, [self.french, self.verse2])
 
+    def test_combined_configs(self):
+        searched = Line.objects.filter(
+            dialogue__search=(
+                SearchQuery('nostrils', config='simple') &
+                SearchQuery('bowels', config='simple')
+            ),
+        )
+        self.assertSequenceEqual(searched, [self.verse2])
+
     @skipUnlessDBFeature('has_phraseto_tsquery')
     def test_combine_raw_phrase(self):
         searched = Line.objects.filter(
@@ -422,6 +449,66 @@ class TestRankingAndWeights(GrailTestData, PostgreSQLTestCase):
         ).filter(rank__gt=0.3)
         self.assertSequenceEqual(searched, [self.verse0])
 
+    def test_cover_density_ranking(self):
+        not_dense_verse = Line.objects.create(
+            scene=self.robin,
+            character=self.minstrel,
+            dialogue=(
+                'Bravely taking to his feet, he beat a very brave retreat. '
+                'A brave retreat brave Sir Robin.'
+            )
+        )
+        searched = Line.objects.filter(character=self.minstrel).annotate(
+            rank=SearchRank(
+                SearchVector('dialogue'),
+                SearchQuery('brave robin'),
+                cover_density=True,
+            ),
+        ).order_by('rank', '-pk')
+        self.assertSequenceEqual(
+            searched,
+            [self.verse2, not_dense_verse, self.verse1, self.verse0],
+        )
+
+    def test_ranking_with_normalization(self):
+        short_verse = Line.objects.create(
+            scene=self.robin,
+            character=self.minstrel,
+            dialogue='A brave retreat brave Sir Robin.',
+        )
+        searched = Line.objects.filter(character=self.minstrel).annotate(
+            rank=SearchRank(
+                SearchVector('dialogue'),
+                SearchQuery('brave sir robin'),
+                # Divide the rank by the document length.
+                normalization=2,
+            ),
+        ).order_by('rank')
+        self.assertSequenceEqual(
+            searched,
+            [self.verse2, self.verse1, self.verse0, short_verse],
+        )
+
+    def test_ranking_with_masked_normalization(self):
+        short_verse = Line.objects.create(
+            scene=self.robin,
+            character=self.minstrel,
+            dialogue='A brave retreat brave Sir Robin.',
+        )
+        searched = Line.objects.filter(character=self.minstrel).annotate(
+            rank=SearchRank(
+                SearchVector('dialogue'),
+                SearchQuery('brave sir robin'),
+                # Divide the rank by the document length and by the number of
+                # unique words in document.
+                normalization=Value(2).bitor(Value(8)),
+            ),
+        ).order_by('rank')
+        self.assertSequenceEqual(
+            searched,
+            [self.verse2, self.verse1, self.verse0, short_verse],
+        )
+
 
 class SearchVectorIndexTests(PostgreSQLTestCase):
     def test_search_vector_index(self):
@@ -443,22 +530,26 @@ class SearchVectorIndexTests(PostgreSQLTestCase):
 class SearchQueryTests(PostgreSQLSimpleTestCase):
     def test_str(self):
         tests = (
-            (~SearchQuery('a'), '~SearchQuery(a)'),
+            (~SearchQuery('a'), '~SearchQuery(Value(a))'),
             (
                 (SearchQuery('a') | SearchQuery('b')) & (SearchQuery('c') | SearchQuery('d')),
-                '((SearchQuery(a) || SearchQuery(b)) && (SearchQuery(c) || SearchQuery(d)))',
+                '((SearchQuery(Value(a)) || SearchQuery(Value(b))) && '
+                '(SearchQuery(Value(c)) || SearchQuery(Value(d))))',
             ),
             (
                 SearchQuery('a') & (SearchQuery('b') | SearchQuery('c')),
-                '(SearchQuery(a) && (SearchQuery(b) || SearchQuery(c)))',
+                '(SearchQuery(Value(a)) && (SearchQuery(Value(b)) || '
+                'SearchQuery(Value(c))))',
             ),
             (
                 (SearchQuery('a') | SearchQuery('b')) & SearchQuery('c'),
-                '((SearchQuery(a) || SearchQuery(b)) && SearchQuery(c))'
+                '((SearchQuery(Value(a)) || SearchQuery(Value(b))) && '
+                'SearchQuery(Value(c)))'
             ),
             (
                 SearchQuery('a') & (SearchQuery('b') & (SearchQuery('c') | SearchQuery('d'))),
-                '(SearchQuery(a) && (SearchQuery(b) && (SearchQuery(c) || SearchQuery(d))))',
+                '(SearchQuery(Value(a)) && (SearchQuery(Value(b)) && '
+                '(SearchQuery(Value(c)) || SearchQuery(Value(d)))))',
             ),
         )
         for query, expected_str in tests:

@@ -27,6 +27,43 @@ officially support the latest release of each series.
 What's new in Django 3.1
 ========================
 
+Asynchronous views and middleware support
+-----------------------------------------
+
+Django now supports a fully asynchronous request path, including:
+
+* :ref:`Asynchronous views <async-views>`
+* :ref:`Asynchronous middleware <async-middleware>`
+* :ref:`Asynchronous tests and test client <async-tests>`
+
+To get started with async views, you need to declare a view using
+``async def``::
+
+    async def my_view(request):
+        await asyncio.sleep(0.5)
+        return HttpResponse('Hello, async world!')
+
+All asynchronous features are supported whether you are running under WSGI or
+ASGI mode. However, there will be performance penalties using async code in
+WSGI mode. You can read more about the specifics in :doc:`/topics/async`
+documentation.
+
+You are free to mix async and sync views, middleware, and tests as much as you
+want. Django will ensure that you always end up with the right execution
+context. We expect most projects will keep the majority of their views
+synchronous, and only have a select few running in async mode - but it is
+entirely your choice.
+
+Django's ORM, cache layer, and other pieces of code that do long-running
+network calls do not yet support async access. We expect to add support for
+them in upcoming releases. Async views are ideal, however, if you are doing a
+lot of API or HTTP calls inside your view, you can now natively do all those
+HTTP calls in parallel to considerably speed up your view's execution.
+
+Asynchronous support should be entirely backwards-compatible and we have tried
+to ensure that it has no speed regressions for your existing, synchronous code.
+It should have no noticeable effect on any existing Django projects.
+
 Minor features
 --------------
 
@@ -62,7 +99,9 @@ Minor features
 :mod:`django.contrib.contenttypes`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* The new :option:`remove_stale_contenttypes --include-stale-apps` option
+  allows removing stale content types from previously installed apps that have
+  been removed from :setting:`INSTALLED_APPS`.
 
 :mod:`django.contrib.gis`
 ~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -76,6 +115,11 @@ Minor features
 
 * Added the :class:`~django.contrib.gis.db.models.functions.AsWKB` and
   :class:`~django.contrib.gis.db.models.functions.AsWKT` functions.
+
+:mod:`django.contrib.humanize`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* :tfilter:`intword` template filter now supports negative integers.
 
 :mod:`django.contrib.messages`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -108,8 +152,21 @@ Minor features
 * :class:`~django.contrib.postgres.search.SearchQuery` now supports
   ``'websearch'`` search type on PostgreSQL 11+.
 
+* :class:`SearchQuery.value <django.contrib.postgres.search.SearchQuery>` now
+  supports query expressions.
+
 * The new :class:`~django.contrib.postgres.search.SearchHeadline` class allows
   highlighting search results.
+
+* :lookup:`search` lookup now supports query expressions.
+
+* The new ``cover_density`` parameter of
+  :class:`~django.contrib.postgres.search.SearchRank` allows ranking by cover
+  density.
+
+* The new ``normalization`` parameter of
+  :class:`~django.contrib.postgres.search.SearchRank` allows rank
+  normalization.
 
 :mod:`django.contrib.redirects`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -213,6 +270,9 @@ Forms
   now uses ``DATE_INPUT_FORMATS`` in addition to ``DATETIME_INPUT_FORMATS``
   when converting a field input to a ``datetime`` value.
 
+* :attr:`.MultiWidget.widgets` now accepts a dictionary which allows
+  customizing subwidget ``name`` attributes.
+
 Generic Views
 ~~~~~~~~~~~~~
 
@@ -274,6 +334,12 @@ Models
 * The :meth:`.RelatedManager.add`, :meth:`~.RelatedManager.create`, and
   :meth:`~.RelatedManager.set` methods now accept callables as values in the
   ``through_defaults`` argument.
+
+* The new ``is_dst``  parameter of the :meth:`.QuerySet.datetimes` determines
+  the treatment of nonexistent and ambiguous datetimes.
+
+* The new :class:`~django.db.models.F` expression ``bitxor()`` method allows
+  :ref:`bitwise XOR operation <using-f-expressions-in-filters>`.
 
 Pagination
 ~~~~~~~~~~
@@ -417,6 +483,34 @@ MariaDB 10.2 and higher.
 The admin no longer supports the legacy Internet Explorer browser. See
 :ref:`the admin FAQ <admin-browser-support>` for details on supported browsers.
 
+:attr:`AbstractUser.first_name <django.contrib.auth.models.User.first_name>` ``max_length`` increased to 150
+------------------------------------------------------------------------------------------------------------
+
+A migration for :attr:`django.contrib.auth.models.User.first_name` is included.
+If you have a custom user model inheriting from ``AbstractUser``, you'll need
+to generate and apply a database migration for your user model.
+
+If you want to preserve the 30 character limit for first names, use a custom
+form::
+
+    from django import forms
+    from django.contrib.auth.forms import UserChangeForm
+
+    class MyUserChangeForm(UserChangeForm):
+        first_name = forms.CharField(max_length=30, required=False)
+
+If you wish to keep this restriction in the admin when editing users, set
+``UserAdmin.form`` to use this form::
+
+    from django.contrib.auth.admin import UserAdmin
+    from django.contrib.auth.models import User
+
+    class MyUserAdmin(UserAdmin):
+        form = MyUserChangeForm
+
+    admin.site.unregister(User)
+    admin.site.register(User, MyUserAdmin)
+
 Miscellaneous
 -------------
 
@@ -500,6 +594,9 @@ Miscellaneous
 * :djadmin:`migrate` management command now runs the ``database`` system checks
   only for a database to migrate.
 
+* The admin CSS classes ``row1`` and ``row2`` are removed in favor of
+  ``:nth-child(odd)`` and ``:nth-child(even)`` pseudo-classes.
+
 .. _deprecated-features-3.1:
 
 Features deprecated in 3.1
@@ -545,6 +642,21 @@ Miscellaneous
 * The encoding format of sessions is different from the format generated by
   older versions of Django. Support for the old format remains until Django
   4.0.
+
+* The purely documentational ``providing_args`` argument for
+  :class:`~django.dispatch.Signal` is deprecated. If you rely on this
+  argument as documentation, you can move the text to a code comment or
+  docstring.
+
+* Calling ``django.utils.crypto.get_random_string()`` without a ``length``
+  argument is deprecated.
+
+* The ``list`` message for :class:`~django.forms.ModelMultipleChoiceField` is
+  deprecated in favor of ``invalid_list``.
+
+* The passing of URL kwargs directly to the context by
+  :class:`~django.views.generic.base.TemplateView` is deprecated. Reference
+  them in the template with ``view.kwargs`` instead.
 
 .. _removed-features-3.1:
 

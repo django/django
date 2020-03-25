@@ -140,6 +140,17 @@ class BaseDatabaseIntrospection:
         """
         raise NotImplementedError('subclasses of BaseDatabaseIntrospection may require a get_sequences() method')
 
+    def get_relations(self, cursor, table_name):
+        """
+        Return a dictionary of
+        {field_name: (field_name_other_table, other_table)} representing all
+        relationships to the given table.
+        """
+        raise NotImplementedError(
+            'subclasses of BaseDatabaseIntrospection may require a '
+            'get_relations() method.'
+        )
+
     def get_key_columns(self, cursor, table_name):
         """
         Backends can override this to return a list of:

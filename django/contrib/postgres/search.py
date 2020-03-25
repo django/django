@@ -11,7 +11,7 @@ class SearchVectorExact(Lookup):
     lookup_name = 'exact'
 
     def process_rhs(self, qn, connection):
-        if not hasattr(self.rhs, 'resolve_expression'):
+        if not isinstance(self.rhs, (SearchQuery, CombinedSearchQuery)):
             config = getattr(self.lhs, 'config', None)
             self.rhs = SearchQuery(self.rhs, config=config)
         rhs, rhs_params = super().process_rhs(qn, connection)
@@ -157,7 +157,7 @@ class SearchQueryCombinable:
         return self._combine(other, self.BITAND, True)
 
 
-class SearchQuery(SearchQueryCombinable, Value):
+class SearchQuery(SearchQueryCombinable, Func):
     output_field = SearchQueryField()
     SEARCH_TYPES = {
         'plain': 'plainto_tsquery',
@@ -167,39 +167,28 @@ class SearchQuery(SearchQueryCombinable, Value):
     }
 
     def __init__(self, value, output_field=None, *, config=None, invert=False, search_type='plain'):
-        self.config = SearchConfig.from_parameter(config)
-        self.invert = invert
-        if search_type not in self.SEARCH_TYPES:
+        self.function = self.SEARCH_TYPES.get(search_type)
+        if self.function is None:
             raise ValueError("Unknown search_type argument '%s'." % search_type)
-        self.search_type = search_type
-        super().__init__(value, output_field=output_field)
+        if not hasattr(value, 'resolve_expression'):
+            value = Value(value)
+        expressions = (value,)
+        self.config = SearchConfig.from_parameter(config)
+        if self.config is not None:
+            expressions = (self.config,) + expressions
+        self.invert = invert
+        super().__init__(*expressions, output_field=output_field)
 
-    def resolve_expression(self, query=None, allow_joins=True, reuse=None, summarize=False, for_save=False):
-        resolved = super().resolve_expression(query, allow_joins, reuse, summarize, for_save)
-        if self.config:
-            resolved.config = self.config.resolve_expression(query, allow_joins, reuse, summarize, for_save)
-        return resolved
-
-    def as_sql(self, compiler, connection):
-        params = [self.value]
-        function = self.SEARCH_TYPES[self.search_type]
-        if self.config:
-            config_sql, config_params = compiler.compile(self.config)
-            template = '{}({}, %s)'.format(function, config_sql)
-            params = config_params + [self.value]
-        else:
-            template = '{}(%s)'.format(function)
+    def as_sql(self, compiler, connection, function=None, template=None):
+        sql, params = super().as_sql(compiler, connection, function, template)
         if self.invert:
-            template = '!!({})'.format(template)
-        return template, params
-
-    def _combine(self, other, connector, reversed):
-        combined = super()._combine(other, connector, reversed)
-        combined.output_field = SearchQueryField()
-        return combined
+            sql = '!!(%s)' % sql
+        return sql, params
 
     def __invert__(self):
-        return type(self)(self.value, config=self.config, invert=not self.invert)
+        clone = self.copy()
+        clone.invert = not self.invert
+        return clone
 
     def __str__(self):
         result = super().__str__()
@@ -219,7 +208,10 @@ class SearchRank(Func):
     function = 'ts_rank'
     output_field = FloatField()
 
-    def __init__(self, vector, query, weights=None):
+    def __init__(
+        self, vector, query, weights=None, normalization=None,
+        cover_density=False,
+    ):
         if not hasattr(vector, 'resolve_expression'):
             vector = SearchVector(vector)
         if not hasattr(query, 'resolve_expression'):
@@ -229,6 +221,12 @@ class SearchRank(Func):
             if not hasattr(weights, 'resolve_expression'):
                 weights = Value(weights)
             expressions = (weights,) + expressions
+        if normalization is not None:
+            if not hasattr(normalization, 'resolve_expression'):
+                normalization = Value(normalization)
+            expressions += (normalization,)
+        if cover_density:
+            self.function = 'ts_rank_cd'
         super().__init__(*expressions)
 
 

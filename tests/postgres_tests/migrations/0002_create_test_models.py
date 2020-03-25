@@ -186,6 +186,17 @@ class Migration(migrations.Migration):
             bases=None,
         ),
         migrations.CreateModel(
+            name='LineSavedSearch',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('line', models.ForeignKey('postgres_tests.Line', on_delete=models.CASCADE)),
+                ('query', models.CharField(max_length=100)),
+            ],
+            options={
+                'required_db_vendor': 'postgresql',
+            },
+        ),
+        migrations.CreateModel(
             name='AggregateTestModel',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),

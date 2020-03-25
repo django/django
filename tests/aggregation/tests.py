@@ -1191,6 +1191,22 @@ class AggregateTestCase(TestCase):
             },
         ])
 
+    def test_aggregation_subquery_annotation_values_collision(self):
+        books_rating_qs = Book.objects.filter(
+            publisher=OuterRef('pk'),
+            price=Decimal('29.69'),
+        ).values('rating')
+        publisher_qs = Publisher.objects.filter(
+            book__contact__age__gt=20,
+            name=self.p1.name,
+        ).annotate(
+            rating=Subquery(books_rating_qs),
+            contacts_count=Count('book__contact'),
+        ).values('rating').annotate(total_count=Count('rating'))
+        self.assertEqual(list(publisher_qs), [
+            {'rating': 4.0, 'total_count': 2},
+        ])
+
     @skipUnlessDBFeature('supports_subqueries_in_group_by')
     @skipIf(
         connection.vendor == 'mysql' and 'ONLY_FULL_GROUP_BY' in connection.sql_mode,

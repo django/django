@@ -51,6 +51,7 @@ class Combinable:
     BITOR = '|'
     BITLEFTSHIFT = '<<'
     BITRIGHTSHIFT = '>>'
+    BITXOR = '#'
 
     def _combine(self, other, connector, reversed):
         if not hasattr(other, 'resolve_expression'):
@@ -104,6 +105,9 @@ class Combinable:
 
     def bitrightshift(self, other):
         return self._combine(other, self.BITRIGHTSHIFT, False)
+
+    def bitxor(self, other):
+        return self._combine(other, self.BITXOR, False)
 
     def __or__(self, other):
         if getattr(self, 'conditional', False) and getattr(other, 'conditional', False):
@@ -1120,9 +1124,13 @@ class OrderBy(BaseExpression):
             elif self.nulls_first:
                 template = '%s NULLS FIRST' % template
         else:
-            if self.nulls_last:
+            if self.nulls_last and not (
+                self.descending and connection.features.order_by_nulls_first
+            ):
                 template = '%%(expression)s IS NULL, %s' % template
-            elif self.nulls_first:
+            elif self.nulls_first and not (
+                not self.descending and connection.features.order_by_nulls_first
+            ):
                 template = '%%(expression)s IS NOT NULL, %s' % template
         connection.ops.check_expression_support(self)
         expression_sql, params = compiler.compile(self.expression)

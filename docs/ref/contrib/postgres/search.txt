@@ -35,6 +35,10 @@ query and the vector.
 To use the ``search`` lookup, ``'django.contrib.postgres'`` must be in your
 :setting:`INSTALLED_APPS`.
 
+.. versionchanged:: 3.1
+
+    Support for query expressions was added.
+
 ``SearchVector``
 ================
 
@@ -108,12 +112,13 @@ See :ref:`postgresql-fts-search-configuration` for an explanation of the
 
 .. versionchanged:: 3.1
 
-    Support for ``'websearch'`` search type was added.
+    Support for ``'websearch'`` search type and query expressions in
+    ``SearchQuery.value`` were added.
 
 ``SearchRank``
 ==============
 
-.. class:: SearchRank(vector, query, weights=None)
+.. class:: SearchRank(vector, query, weights=None, normalization=None, cover_density=False)
 
 So far, we've returned the results for which any match between the vector and
 the query are possible. It's likely you may wish to order the results by some
@@ -131,6 +136,32 @@ order by relevancy::
 
 See :ref:`postgresql-fts-weighting-queries` for an explanation of the
 ``weights`` parameter.
+
+Set the ``cover_density`` parameter to ``True`` to enable the cover density
+ranking, which means that the proximity of matching query terms is taken into
+account.
+
+Provide an integer to the ``normalization`` parameter to control rank
+normalization. This integer is a bit mask, so you can combine multiple
+behaviors::
+
+    >>> from django.db.models import Value
+    >>> Entry.objects.annotate(
+    ...     rank=SearchRank(
+    ...         vector,
+    ...         query,
+    ...         normalization=Value(2).bitor(Value(4)),
+    ...     )
+    ... )
+
+The PostgreSQL documentation has more details about `different rank
+normalization options`_.
+
+.. _different rank normalization options: https://www.postgresql.org/docs/current/textsearch-controls.html#TEXTSEARCH-RANKING
+
+.. versionadded:: 3.1
+
+    The ``normalization`` and ``cover_density`` parameters were added.
 
 ``SearchHeadline``
 ==================

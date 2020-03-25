@@ -596,7 +596,7 @@ class GeoQuerySetTest(TestCase):
 
     @unittest.skipUnless(
         connection.vendor == 'oracle',
-        'Oracle supports tolerance paremeter.',
+        'Oracle supports tolerance parameter.',
     )
     def test_unionagg_tolerance(self):
         City.objects.create(
@@ -611,17 +611,18 @@ class GeoQuerySetTest(TestCase):
             srid=4326,
         )
         self.assertIs(
-            forney_houston.equals(
+            forney_houston.equals_exact(
                 City.objects.filter(point__within=tx).aggregate(
                     Union('point', tolerance=32000),
                 )['point__union'],
+                tolerance=10e-6,
             ),
             True,
         )
 
     @unittest.skipUnless(
         connection.vendor == 'oracle',
-        'Oracle supports tolerance paremeter.',
+        'Oracle supports tolerance parameter.',
     )
     def test_unionagg_tolerance_escaping(self):
         tx = Country.objects.get(name='Texas').mpoly

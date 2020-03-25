@@ -436,7 +436,7 @@ class DistanceFunctionsTests(FuncTestMixin, TestCase):
 
     @unittest.skipUnless(
         connection.vendor == 'oracle',
-        'Oracle supports tolerance paremeter.',
+        'Oracle supports tolerance parameter.',
     )
     def test_distance_function_tolerance_escaping(self):
         qs = Interstate.objects.annotate(
@@ -452,7 +452,7 @@ class DistanceFunctionsTests(FuncTestMixin, TestCase):
 
     @unittest.skipUnless(
         connection.vendor == 'oracle',
-        'Oracle supports tolerance paremeter.',
+        'Oracle supports tolerance parameter.',
     )
     def test_distance_function_tolerance(self):
         # Tolerance is greater than distance.

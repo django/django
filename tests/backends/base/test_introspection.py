@@ -26,6 +26,11 @@ class SimpleDatabaseIntrospectionTests(SimpleTestCase):
         with self.assertRaisesMessage(NotImplementedError, msg):
             self.introspection.get_sequences(None, None)
 
+    def test_get_relations(self):
+        msg = self.may_require_msg % 'get_relations'
+        with self.assertRaisesMessage(NotImplementedError, msg):
+            self.introspection.get_relations(None, None)
+
     def test_get_key_columns(self):
         msg = self.may_require_msg % 'get_key_columns'
         with self.assertRaisesMessage(NotImplementedError, msg):

@@ -202,39 +202,39 @@ class FieldDeconstructionTests(SimpleTestCase):
         name, path, args, kwargs = field.deconstruct()
         self.assertEqual(path, "django.db.models.ForeignKey")
         self.assertEqual(args, [])
-        self.assertEqual(kwargs, {"to": "auth.Permission", "on_delete": models.CASCADE})
+        self.assertEqual(kwargs, {"to": "auth.permission", "on_delete": models.CASCADE})
         self.assertFalse(hasattr(kwargs['to'], "setting_name"))
         # Test swap detection for swappable model
         field = models.ForeignKey("auth.User", models.CASCADE)
         name, path, args, kwargs = field.deconstruct()
         self.assertEqual(path, "django.db.models.ForeignKey")
         self.assertEqual(args, [])
-        self.assertEqual(kwargs, {"to": "auth.User", "on_delete": models.CASCADE})
+        self.assertEqual(kwargs, {"to": "auth.user", "on_delete": models.CASCADE})
         self.assertEqual(kwargs['to'].setting_name, "AUTH_USER_MODEL")
         # Test nonexistent (for now) model
         field = models.ForeignKey("something.Else", models.CASCADE)
         name, path, args, kwargs = field.deconstruct()
         self.assertEqual(path, "django.db.models.ForeignKey")
         self.assertEqual(args, [])
-        self.assertEqual(kwargs, {"to": "something.Else", "on_delete": models.CASCADE})
+        self.assertEqual(kwargs, {"to": "something.else", "on_delete": models.CASCADE})
         # Test on_delete
         field = models.ForeignKey("auth.User", models.SET_NULL)
         name, path, args, kwargs = field.deconstruct()
         self.assertEqual(path, "django.db.models.ForeignKey")
         self.assertEqual(args, [])
-        self.assertEqual(kwargs, {"to": "auth.User", "on_delete": models.SET_NULL})
+        self.assertEqual(kwargs, {"to": "auth.user", "on_delete": models.SET_NULL})
         # Test to_field preservation
         field = models.ForeignKey("auth.Permission", models.CASCADE, to_field="foobar")
         name, path, args, kwargs = field.deconstruct()
         self.assertEqual(path, "django.db.models.ForeignKey")
         self.assertEqual(args, [])
-        self.assertEqual(kwargs, {"to": "auth.Permission", "to_field": "foobar", "on_delete": models.CASCADE})
+        self.assertEqual(kwargs, {"to": "auth.permission", "to_field": "foobar", "on_delete": models.CASCADE})
         # Test related_name preservation
         field = models.ForeignKey("auth.Permission", models.CASCADE, related_name="foobar")
         name, path, args, kwargs = field.deconstruct()
         self.assertEqual(path, "django.db.models.ForeignKey")
         self.assertEqual(args, [])
-        self.assertEqual(kwargs, {"to": "auth.Permission", "related_name": "foobar", "on_delete": models.CASCADE})
+        self.assertEqual(kwargs, {"to": "auth.permission", "related_name": "foobar", "on_delete": models.CASCADE})
         # Test related_query_name
         field = models.ForeignKey("auth.Permission", models.CASCADE, related_query_name="foobar")
         name, path, args, kwargs = field.deconstruct()
@@ -242,7 +242,7 @@ class FieldDeconstructionTests(SimpleTestCase):
         self.assertEqual(args, [])
         self.assertEqual(
             kwargs,
-            {"to": "auth.Permission", "related_query_name": "foobar", "on_delete": models.CASCADE}
+            {"to": "auth.permission", "related_query_name": "foobar", "on_delete": models.CASCADE}
         )
         # Test limit_choices_to
         field = models.ForeignKey("auth.Permission", models.CASCADE, limit_choices_to={'foo': 'bar'})
@@ -251,14 +251,14 @@ class FieldDeconstructionTests(SimpleTestCase):
         self.assertEqual(args, [])
         self.assertEqual(
             kwargs,
-            {"to": "auth.Permission", "limit_choices_to": {'foo': 'bar'}, "on_delete": models.CASCADE}
+            {"to": "auth.permission", "limit_choices_to": {'foo': 'bar'}, "on_delete": models.CASCADE}
         )
         # Test unique
         field = models.ForeignKey("auth.Permission", models.CASCADE, unique=True)
         name, path, args, kwargs = field.deconstruct()
         self.assertEqual(path, "django.db.models.ForeignKey")
         self.assertEqual(args, [])
-        self.assertEqual(kwargs, {"to": "auth.Permission", "unique": True, "on_delete": models.CASCADE})
+        self.assertEqual(kwargs, {"to": "auth.permission", "unique": True, "on_delete": models.CASCADE})
 
     @override_settings(AUTH_USER_MODEL="auth.Permission")
     def test_foreign_key_swapped(self):
@@ -270,7 +270,7 @@ class FieldDeconstructionTests(SimpleTestCase):
 
         self.assertEqual(path, "django.db.models.ForeignKey")
         self.assertEqual(args, [])
-        self.assertEqual(kwargs, {"to": "auth.Permission", "on_delete": models.CASCADE})
+        self.assertEqual(kwargs, {"to": "auth.permission", "on_delete": models.CASCADE})
         self.assertEqual(kwargs['to'].setting_name, "AUTH_USER_MODEL")
 
     def test_one_to_one(self):
@@ -282,39 +282,39 @@ class FieldDeconstructionTests(SimpleTestCase):
         name, path, args, kwargs = field.deconstruct()
         self.assertEqual(path, "django.db.models.OneToOneField")
         self.assertEqual(args, [])
-        self.assertEqual(kwargs, {"to": "auth.Permission", "on_delete": models.CASCADE})
+        self.assertEqual(kwargs, {"to": "auth.permission", "on_delete": models.CASCADE})
         self.assertFalse(hasattr(kwargs['to'], "setting_name"))
         # Test swap detection for swappable model
         field = models.OneToOneField("auth.User", models.CASCADE)
         name, path, args, kwargs = field.deconstruct()
         self.assertEqual(path, "django.db.models.OneToOneField")
         self.assertEqual(args, [])
-        self.assertEqual(kwargs, {"to": "auth.User", "on_delete": models.CASCADE})
+        self.assertEqual(kwargs, {"to": "auth.user", "on_delete": models.CASCADE})
         self.assertEqual(kwargs['to'].setting_name, "AUTH_USER_MODEL")
         # Test nonexistent (for now) model
         field = models.OneToOneField("something.Else", models.CASCADE)
         name, path, args, kwargs = field.deconstruct()
         self.assertEqual(path, "django.db.models.OneToOneField")
         self.assertEqual(args, [])
-        self.assertEqual(kwargs, {"to": "something.Else", "on_delete": models.CASCADE})
+        self.assertEqual(kwargs, {"to": "something.else", "on_delete": models.CASCADE})
         # Test on_delete
         field = models.OneToOneField("auth.User", models.SET_NULL)
         name, path, args, kwargs = field.deconstruct()
         self.assertEqual(path, "django.db.models.OneToOneField")
         self.assertEqual(args, [])
-        self.assertEqual(kwargs, {"to": "auth.User", "on_delete": models.SET_NULL})
+        self.assertEqual(kwargs, {"to": "auth.user", "on_delete": models.SET_NULL})
         # Test to_field
         field = models.OneToOneField("auth.Permission", models.CASCADE, to_field="foobar")
         name, path, args, kwargs = field.deconstruct()
         self.assertEqual(path, "django.db.models.OneToOneField")
         self.assertEqual(args, [])
-        self.assertEqual(kwargs, {"to": "auth.Permission", "to_field": "foobar", "on_delete": models.CASCADE})
+        self.assertEqual(kwargs, {"to": "auth.permission", "to_field": "foobar", "on_delete": models.CASCADE})
         # Test related_name
         field = models.OneToOneField("auth.Permission", models.CASCADE, related_name="foobar")
         name, path, args, kwargs = field.deconstruct()
         self.assertEqual(path, "django.db.models.OneToOneField")
         self.assertEqual(args, [])
-        self.assertEqual(kwargs, {"to": "auth.Permission", "related_name": "foobar", "on_delete": models.CASCADE})
+        self.assertEqual(kwargs, {"to": "auth.permission", "related_name": "foobar", "on_delete": models.CASCADE})
         # Test related_query_name
         field = models.OneToOneField("auth.Permission", models.CASCADE, related_query_name="foobar")
         name, path, args, kwargs = field.deconstruct()
@@ -322,7 +322,7 @@ class FieldDeconstructionTests(SimpleTestCase):
         self.assertEqual(args, [])
         self.assertEqual(
             kwargs,
-            {"to": "auth.Permission", "related_query_name": "foobar", "on_delete": models.CASCADE}
+            {"to": "auth.permission", "related_query_name": "foobar", "on_delete": models.CASCADE}
         )
         # Test limit_choices_to
         field = models.OneToOneField("auth.Permission", models.CASCADE, limit_choices_to={'foo': 'bar'})
@@ -331,14 +331,14 @@ class FieldDeconstructionTests(SimpleTestCase):
         self.assertEqual(args, [])
         self.assertEqual(
             kwargs,
-            {"to": "auth.Permission", "limit_choices_to": {'foo': 'bar'}, "on_delete": models.CASCADE}
+            {"to": "auth.permission", "limit_choices_to": {'foo': 'bar'}, "on_delete": models.CASCADE}
         )
         # Test unique
         field = models.OneToOneField("auth.Permission", models.CASCADE, unique=True)
         name, path, args, kwargs = field.deconstruct()
         self.assertEqual(path, "django.db.models.OneToOneField")
         self.assertEqual(args, [])
-        self.assertEqual(kwargs, {"to": "auth.Permission", "on_delete": models.CASCADE})
+        self.assertEqual(kwargs, {"to": "auth.permission", "on_delete": models.CASCADE})
 
     def test_image_field(self):
         field = models.ImageField(upload_to="foo/barness", width_field="width", height_field="height")

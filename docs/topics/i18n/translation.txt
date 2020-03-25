@@ -139,11 +139,9 @@ have more than a single parameter. If you used positional interpolation,
 translations wouldn't be able to reorder placeholder text.
 
 Since string extraction is done by the ``xgettext`` command, only syntaxes
-supported by ``gettext`` are supported by Django. Python :py:ref:`f-strings
-<f-strings>` and `JavaScript template strings`_ are not yet supported by
-``xgettext``.
-
-.. _JavaScript template strings: https://savannah.gnu.org/bugs/?50920
+supported by ``gettext`` are supported by Django. In particular, Python
+:py:ref:`f-strings <f-strings>` are not yet supported by ``xgettext``, and
+JavaScript template strings need ``gettext`` 0.21+.
 
 .. _translator-comments:
 
@@ -279,14 +277,9 @@ In a case like this, consider something like the following::
 
         a format specification for argument 'name', as in 'msgstr[0]', doesn't exist in 'msgid'
 
-.. note:: Plural form and po files
+.. versionchanged: 2.2.12
 
-    Django does not support custom plural equations in po files. As all
-    translation catalogs are merged, only the plural form for the main Django po
-    file (in ``django/conf/locale/<lang_code>/LC_MESSAGES/django.po``) is
-    considered. Plural forms in all other po files are ignored. Therefore, you
-    should not use different plural equations in your project or application po
-    files.
+    Added support for different plural equations in ``.po`` files.
 
 .. _contextual-markers:
 

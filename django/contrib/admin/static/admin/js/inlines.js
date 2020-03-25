@@ -203,11 +203,6 @@
     // Tabular inlines ---------------------------------------------------------
     $.fn.tabularFormset = function(selector, options) {
         var $rows = $(this);
-        var alternatingRows = function(row) {
-            $(selector).not(".add-row").removeClass("row1 row2")
-                .filter(":even").addClass("row1").end()
-                .filter(":odd").addClass("row2");
-        };
 
         var reinitDateTimeShortCuts = function() {
             // Reinitialize the calendar and clock widgets by force
@@ -254,12 +249,10 @@
             deleteCssClass: "inline-deletelink",
             deleteText: options.deleteText,
             emptyCssClass: "empty-form",
-            removed: alternatingRows,
             added: function(row) {
                 initPrepopulatedFields(row);
                 reinitDateTimeShortCuts();
                 updateSelectFilter();
-                alternatingRows(row);
             },
             addButton: options.addButton
         });

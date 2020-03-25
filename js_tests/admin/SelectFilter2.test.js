@@ -1,5 +1,5 @@
 /* global QUnit, SelectFilter */
-/* eslint global-strict: 0, strict: 0 */
+/* eslint strict: 0 */
 'use strict';
 
 QUnit.module('admin.SelectFilter2');

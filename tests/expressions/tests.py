@@ -6,7 +6,7 @@ from copy import deepcopy
 from unittest import mock
 
 from django.core.exceptions import FieldError
-from django.db import DatabaseError, connection
+from django.db import DatabaseError, NotSupportedError, connection
 from django.db.models import (
     Avg, BooleanField, Case, CharField, Count, DateField, DateTimeField,
     DurationField, Exists, Expression, ExpressionList, ExpressionWrapper, F,
@@ -1126,9 +1126,7 @@ class ExpressionOperatorTests(TestCase):
     def test_lefthand_modulo(self):
         # LH Modulo arithmetic on integers
         Number.objects.filter(pk=self.n.pk).update(integer=F('integer') % 20)
-
         self.assertEqual(Number.objects.get(pk=self.n.pk).integer, 2)
-        self.assertEqual(Number.objects.get(pk=self.n.pk).float, Approximate(15.500, places=3))
 
     def test_lefthand_bitwise_and(self):
         # LH Bitwise ands on integers
@@ -1137,7 +1135,6 @@ class ExpressionOperatorTests(TestCase):
 
         self.assertEqual(Number.objects.get(pk=self.n.pk).integer, 40)
         self.assertEqual(Number.objects.get(pk=self.n1.pk).integer, -64)
-        self.assertEqual(Number.objects.get(pk=self.n.pk).float, Approximate(15.500, places=3))
 
     def test_lefthand_bitwise_left_shift_operator(self):
         Number.objects.update(integer=F('integer').bitleftshift(2))
@@ -1155,13 +1152,31 @@ class ExpressionOperatorTests(TestCase):
 
         self.assertEqual(Number.objects.get(pk=self.n.pk).integer, 58)
         self.assertEqual(Number.objects.get(pk=self.n1.pk).integer, -10)
-        self.assertEqual(Number.objects.get(pk=self.n.pk).float, Approximate(15.500, places=3))
 
     def test_lefthand_power(self):
         # LH Power arithmetic operation on floats and integers
         Number.objects.filter(pk=self.n.pk).update(integer=F('integer') ** 2, float=F('float') ** 1.5)
         self.assertEqual(Number.objects.get(pk=self.n.pk).integer, 1764)
         self.assertEqual(Number.objects.get(pk=self.n.pk).float, Approximate(61.02, places=2))
+
+    @unittest.skipIf(connection.vendor == 'oracle', "Oracle doesn't support bitwise XOR.")
+    def test_lefthand_bitwise_xor(self):
+        Number.objects.update(integer=F('integer').bitxor(48))
+        self.assertEqual(Number.objects.get(pk=self.n.pk).integer, 26)
+        self.assertEqual(Number.objects.get(pk=self.n1.pk).integer, -26)
+
+    @unittest.skipIf(connection.vendor == 'oracle', "Oracle doesn't support bitwise XOR.")
+    def test_lefthand_bitwise_xor_null(self):
+        employee = Employee.objects.create(firstname='John', lastname='Doe')
+        Employee.objects.update(salary=F('salary').bitxor(48))
+        employee.refresh_from_db()
+        self.assertIsNone(employee.salary)
+
+    @unittest.skipUnless(connection.vendor == 'oracle', "Oracle doesn't support bitwise XOR.")
+    def test_lefthand_bitwise_xor_not_supported(self):
+        msg = 'Bitwise XOR is not supported in Oracle.'
+        with self.assertRaisesMessage(NotSupportedError, msg):
+            Number.objects.update(integer=F('integer').bitxor(48))
 
     def test_right_hand_addition(self):
         # Right hand operators
@@ -1197,7 +1212,6 @@ class ExpressionOperatorTests(TestCase):
         Number.objects.filter(pk=self.n.pk).update(integer=69 % F('integer'))
 
         self.assertEqual(Number.objects.get(pk=self.n.pk).integer, 27)
-        self.assertEqual(Number.objects.get(pk=self.n.pk).float, Approximate(15.500, places=3))
 
     def test_righthand_power(self):
         # RH Power arithmetic operation on floats and integers

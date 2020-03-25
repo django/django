@@ -1255,7 +1255,7 @@ generating choices. See :ref:`iterating-relationship-choices` for details.
     * Normalizes to: A ``QuerySet`` of model instances.
     * Validates that every id in the given list of values exists in the
       queryset.
-    * Error message keys: ``required``, ``list``, ``invalid_choice``,
+    * Error message keys: ``required``, ``invalid_list``, ``invalid_choice``,
       ``invalid_pk_value``
 
     The ``invalid_choice`` message may contain ``%(value)s`` and the
@@ -1284,6 +1284,10 @@ generating choices. See :ref:`iterating-relationship-choices` for details.
     .. attribute:: iterator
 
         Same as :class:`ModelChoiceField.iterator`.
+
+.. deprecated:: 3.1
+
+    The ``list`` message is deprecated, use ``invalid_list`` instead.
 
 .. _iterating-relationship-choices:
 

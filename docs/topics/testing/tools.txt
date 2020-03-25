@@ -1755,6 +1755,62 @@ You can also exclude tests by tag. To run core tests if they are not slow:
 test has two tags and you select one of them and exclude the other, the test
 won't be run.
 
+.. _async-tests:
+
+Testing asynchronous code
+=========================
+
+.. versionadded:: 3.1
+
+If you merely want to test the output of your asynchronous views, the standard
+test client will run them inside their own asynchronous loop without any extra
+work needed on your part.
+
+However, if you want to write fully-asynchronous tests for a Django project,
+you will need to take several things into account.
+
+Firstly, your tests must be ``async def`` methods on the test class (in order
+to give them an asynchronous context). Django will automatically detect
+any ``async def`` tests and wrap them so they run in their own event loop.
+
+If you are testing from an asynchronous function, you must also use the
+asynchronous test client. This is available as ``django.test.AsyncClient``,
+or as ``self.async_client`` on any test.
+
+With the exception of the ``follow`` parameter, which is not supported,
+``AsyncClient`` has the same methods and signatures as the synchronous (normal)
+test client, but any method that makes a request must be awaited::
+
+    async def test_my_thing(self):
+        response = await self.async_client.get('/some-url/')
+        self.assertEqual(response.status_code, 200)
+
+The asynchronous client can also call synchronous views; it runs through
+Django's :doc:`asynchronous request path </topics/async>`, which supports both.
+Any view called through the ``AsyncClient`` will get an ``ASGIRequest`` object
+for its ``request`` rather than the ``WSGIRequest`` that the normal client
+creates.
+
+.. warning::
+
+    If you are using test decorators, they must be async-compatible to ensure
+    they work correctly. Django's built-in decorators will behave correctly, but
+    third-party ones may appear to not execute (they will "wrap" the wrong part
+    of the execution flow and not your test).
+
+    If you need to use these decorators, then you should decorate your test
+    methods with :func:`~asgiref.sync.async_to_sync` *inside* of them instead::
+
+        from asgiref.sync import async_to_sync
+        from django.test import TestCase
+
+        class MyTests(TestCase):
+
+            @mock.patch(...)
+            @async_to_sync
+            def test_my_thing(self):
+                ...
+
 .. _topics-testing-email:
 
 Email services
