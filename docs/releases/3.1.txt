@@ -344,6 +344,9 @@ Models
 * The new :class:`~django.db.models.F` expression ``bitxor()`` method allows
   :ref:`bitwise XOR operation <using-f-expressions-in-filters>`.
 
+* :meth:`.QuerySet.bulk_create` now sets the primary key on objects when using
+  MariaDB 10.5+.
+
 Pagination
 ~~~~~~~~~~
 

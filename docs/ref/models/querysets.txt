@@ -2078,9 +2078,9 @@ This has a number of caveats though:
 * The model's ``save()`` method will not be called, and the ``pre_save`` and
   ``post_save`` signals will not be sent.
 * It does not work with child models in a multi-table inheritance scenario.
-* If the model's primary key is an :class:`~django.db.models.AutoField` it
-  does not retrieve and set the primary key attribute, as ``save()`` does,
-  unless the database backend supports it (currently PostgreSQL).
+* If the model's primary key is an :class:`~django.db.models.AutoField`, the
+  primary key attribute can only be retrieved on certain databases (currently
+  PostgreSQL and MariaDB 10.5+). On other databases, it will not be set.
 * It does not work with many-to-many relationships.
 * It casts ``objs`` to a list, which fully evaluates ``objs`` if it's a
   generator. The cast allows inspecting all objects so that any objects with a
@@ -2109,6 +2109,10 @@ disables setting the primary key on each model instance (if the database
 normally supports it).
 
 Returns ``objs`` as cast to a list, in the same order as provided.
+
+.. versionchanged:: 3.1
+
+    Support for the fetching primary key attributes on MariaDB 10.5+ was added.
 
 ``bulk_update()``
 ~~~~~~~~~~~~~~~~~
