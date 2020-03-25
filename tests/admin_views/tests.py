@@ -4499,7 +4499,10 @@ class SeleniumTests(AdminSeleniumTestCase):
         self.assertEqual(slug2, 'option-two-and-now-tabular-inline')
 
         # Add an inline
-        self.selenium.find_elements_by_link_text('Add another Related prepopulated')[1].click()
+        # Button may be outside the browser frame.
+        element = self.selenium.find_elements_by_link_text('Add another Related prepopulated')[1]
+        self.selenium.execute_script('window.scrollTo(0, %s);' % element.location['y'])
+        element.click()
         self.assertEqual(
             len(self.selenium.find_elements_by_class_name('select2-selection')),
             num_initial_select2_inputs + 4
