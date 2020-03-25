@@ -233,7 +233,7 @@ Put the following code in ``chat/routing.py``:
 .. code-block:: python
 
     # chat/routing.py
-    from django.urls import path
+    from django.urls import re_path
 
     from . import consumers
 
