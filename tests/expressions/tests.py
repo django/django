@@ -1126,9 +1126,7 @@ class ExpressionOperatorTests(TestCase):
     def test_lefthand_modulo(self):
         # LH Modulo arithmetic on integers
         Number.objects.filter(pk=self.n.pk).update(integer=F('integer') % 20)
-
         self.assertEqual(Number.objects.get(pk=self.n.pk).integer, 2)
-        self.assertEqual(Number.objects.get(pk=self.n.pk).float, Approximate(15.500, places=3))
 
     def test_lefthand_bitwise_and(self):
         # LH Bitwise ands on integers
@@ -1137,7 +1135,6 @@ class ExpressionOperatorTests(TestCase):
 
         self.assertEqual(Number.objects.get(pk=self.n.pk).integer, 40)
         self.assertEqual(Number.objects.get(pk=self.n1.pk).integer, -64)
-        self.assertEqual(Number.objects.get(pk=self.n.pk).float, Approximate(15.500, places=3))
 
     def test_lefthand_bitwise_left_shift_operator(self):
         Number.objects.update(integer=F('integer').bitleftshift(2))
@@ -1155,7 +1152,6 @@ class ExpressionOperatorTests(TestCase):
 
         self.assertEqual(Number.objects.get(pk=self.n.pk).integer, 58)
         self.assertEqual(Number.objects.get(pk=self.n1.pk).integer, -10)
-        self.assertEqual(Number.objects.get(pk=self.n.pk).float, Approximate(15.500, places=3))
 
     def test_lefthand_power(self):
         # LH Power arithmetic operation on floats and integers
@@ -1216,7 +1212,6 @@ class ExpressionOperatorTests(TestCase):
         Number.objects.filter(pk=self.n.pk).update(integer=69 % F('integer'))
 
         self.assertEqual(Number.objects.get(pk=self.n.pk).integer, 27)
-        self.assertEqual(Number.objects.get(pk=self.n.pk).float, Approximate(15.500, places=3))
 
     def test_righthand_power(self):
         # RH Power arithmetic operation on floats and integers
