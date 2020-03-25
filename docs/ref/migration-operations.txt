@@ -322,7 +322,7 @@ instance of :class:`SchemaEditor
 The ``reverse_code`` argument is called when unapplying migrations. This
 callable should undo what is done in the ``code`` callable so that the
 migration is reversible. If ``reverse_code`` is ``None`` (the default), the
-``RunPython`` operation will be irreversible.
+``RunPython`` operation is irreversible.
 
 The optional ``hints`` argument will be passed as ``**hints`` to the
 :meth:`allow_migrate` method of database routers to assist them in making a
