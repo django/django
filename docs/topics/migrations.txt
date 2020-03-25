@@ -352,7 +352,7 @@ Note that this only works given two things:
 Reversing migrations
 ====================
 
-Migrations can be reversed with :djadmin:`migrate` and the number of the
+Migrations can be reversed with :djadmin:`migrate` by passing the number of the
 previous migration. For example, to reverse migration ``books.0003``:
 
 .. console::
