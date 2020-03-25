@@ -347,11 +347,15 @@ Note that this only works given two things:
   that your database doesn't match your models, you'll just get errors when
   migrations try to modify those tables.
 
-Reverting migrations
+.. _reversing-migrations:
+
+Reversing migrations
 ====================
 
-Any migration can be reverted with :djadmin:`migrate` by using the number of
-previous migrations::
+Migrations can be reversed with :djadmin:`migrate` by passing the number of the
+previous migration. For example, to reverse migration ``books.0003``:
+
+.. console::
 
     $ python manage.py migrate books 0002
     Operations to perform:
@@ -360,8 +364,10 @@ previous migrations::
       Rendering model states... DONE
       Unapplying books.0003_auto... OK
 
-If you want to revert all migrations applied for an app, use the name
-``zero``::
+If you want to reverse all migrations applied for an app, use the name
+``zero``:
+
+.. console::
 
     $ python manage.py migrate books zero
     Operations to perform:
@@ -370,6 +376,19 @@ If you want to revert all migrations applied for an app, use the name
       Rendering model states... DONE
       Unapplying books.0002_auto... OK
       Unapplying books.0001_initial... OK
+
+A migration is irreversible if it contains any irreversible operations.
+Attempting to reverse such migrations will raise ``IrreversibleError``:
+
+.. console::
+
+    $ python manage.py migrate books 0002
+    Operations to perform:
+      Target specific migration: 0002_auto, from books
+    Running migrations:
+      Rendering model states... DONE
+      Unapplying books.0003_auto...Traceback (most recent call last):
+    django.db.migrations.exceptions.IrreversibleError: Operation <RunSQL  sql='DROP TABLE demo_books'> in books.0003_auto is not reversible
 
 .. _historical-models:
 
