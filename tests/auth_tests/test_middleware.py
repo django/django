@@ -1,6 +1,11 @@
 from django.contrib.auth import HASH_SESSION_KEY
-from django.contrib.auth.middleware import AuthenticationMiddleware
-from django.contrib.auth.models import User
+from django.contrib.auth.middleware import (
+    AuthenticationMiddleware, LoginRequiredAuthenticationMiddleware,
+)
+from django.contrib.auth.models import AnonymousUser, User
+from django.contrib.auth.views import (
+    LoginView, PasswordChangeView, redirect_to_login,
+)
 from django.http import HttpRequest, HttpResponse
 from django.test import TestCase
 
@@ -51,3 +56,40 @@ class TestAuthenticationMiddleware(TestCase):
         )
         with self.assertRaisesMessage(AssertionError, msg):
             self.middleware(HttpRequest())
+
+
+class TestLoginRequiredAuthenticationMiddleware(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user('test_user', 'test@example.com', 'test_password')
+        self.middleware = LoginRequiredAuthenticationMiddleware(lambda req: HttpResponse())
+        self.request = HttpRequest()
+
+    def test_anonymous_access_to_login_no_required_view(self):
+        """
+        Middleware returns None for unauthenticated users because of
+        LoginView has LoginNotRequiredMixin.
+        """
+        self.request.user = AnonymousUser()
+        res = self.middleware.process_view(self.request, LoginView.as_view(), (), {})
+        self.assertIsNone(res)
+
+        # redirect_to_login has @login_not_required decorator so middleware returns None
+        res = self.middleware.process_view(self.request, redirect_to_login, (), {})
+        self.assertIsNone(res)
+
+    def test_anonymous_access_to_login_required_view(self):
+        """
+        Middleware redirects unauthenticated user with 302 because of
+        PasswordChangeView does NOT have LoginNotRequiredMixin.
+        """
+        self.request.user = AnonymousUser()
+        res = self.middleware.process_view(self.request, PasswordChangeView.as_view(), (), {})
+        self.assertEqual(res.status_code, 302)
+
+    def test_user_access_to_login_no_required_view(self):
+        """
+        Middleware returns None for authenticated user becuase of
+        """
+        self.request.user = self.user
+        res = self.middleware.process_view(self.request, PasswordChangeView.as_view(), (), {})
+        self.assertIsNone(res)
