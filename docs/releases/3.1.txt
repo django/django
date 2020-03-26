@@ -603,6 +603,10 @@ Miscellaneous
 * The admin CSS classes ``row1`` and ``row2`` are removed in favor of
   ``:nth-child(odd)`` and ``:nth-child(even)`` pseudo-classes.
 
+* The :func:`~django.contrib.auth.hashers.make_password` now requires its
+  argument to be a string or bytes. Other types should be explicitly cast to
+  one of these.
+
 .. _deprecated-features-3.1:
 
 Features deprecated in 3.1

@@ -56,6 +56,11 @@ class TestUtilsHashPass(SimpleTestCase):
         self.assertIs(is_password_usable(encoded), True)
         self.assertIs(check_password(b'bytes_password', encoded), True)
 
+    def test_invalid_password(self):
+        msg = 'Password must be a string or bytes, got int.'
+        with self.assertRaisesMessage(TypeError, msg):
+            make_password(1)
+
     def test_pbkdf2(self):
         encoded = make_password('lètmein', 'seasalt', 'pbkdf2_sha256')
         self.assertEqual(encoded, 'pbkdf2_sha256$216000$seasalt$youGZxOw6ZOcfrXv2i8/AhrnpZflJJ9EshS9XmUJTUg=')
