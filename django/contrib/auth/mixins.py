@@ -2,7 +2,6 @@ from urllib.parse import urlparse
 
 from django.conf import settings
 from django.contrib.auth import REDIRECT_FIELD_NAME
-from django.contrib.auth.views import redirect_to_login
 from django.core.exceptions import ImproperlyConfigured, PermissionDenied
 from django.shortcuts import resolve_url
 
@@ -56,6 +55,7 @@ class AccessMixin:
             (not login_netloc or login_netloc == current_netloc)
         ):
             path = self.request.get_full_path()
+        from django.contrib.auth.views import redirect_to_login
         return redirect_to_login(
             path,
             resolved_login_url,
