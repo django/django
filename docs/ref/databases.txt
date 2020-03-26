@@ -37,7 +37,7 @@ connection. It can be set independently for each database.
 
 The default value is ``0``, preserving the historical behavior of closing the
 database connection at the end of each request. To enable persistent
-connections, set :setting:`CONN_MAX_AGE` to a positive number of seconds. For
+connections, set :setting:`CONN_MAX_AGE` to a positive integer of seconds. For
 unlimited persistent connections, set it to ``None``.
 
 Connection management
