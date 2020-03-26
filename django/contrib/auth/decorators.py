@@ -50,6 +50,17 @@ def login_required(function=None, redirect_field_name=REDIRECT_FIELD_NAME, login
     return actual_decorator
 
 
+def login_not_required(view_func):
+    """
+    Decorator for views that marks that the view is accessible by
+    unauthenticated users.
+    """
+    def wrapped_view(*args, **kwargs):
+        return view_func(*args, **kwargs)
+    wrapped_view.login_not_required = True
+    return wraps(view_func)(wrapped_view)
+
+
 def permission_required(perm, login_url=None, raise_exception=False):
     """
     Decorator for views that checks whether a user has a particular permission

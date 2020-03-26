@@ -1,6 +1,7 @@
 from django.contrib import auth
 from django.contrib.auth import load_backend
 from django.contrib.auth.backends import RemoteUserBackend
+from django.contrib.auth.views import redirect_to_login
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.deprecation import MiddlewareMixin
 from django.utils.functional import SimpleLazyObject
@@ -21,6 +22,30 @@ class AuthenticationMiddleware(MiddlewareMixin):
             "'django.contrib.auth.middleware.AuthenticationMiddleware'."
         )
         request.user = SimpleLazyObject(lambda: get_user(request))
+
+
+class LoginRequiredAuthenticationMiddleware(AuthenticationMiddleware):
+    """
+    Middleware that force all views to require athentication by default.
+
+    Views that has @login_not_required decorator or LoginNotRequiredMixin mixin
+    will be able to pass through without this validation. Otherwise, it will
+    direct user to the login.
+    """
+    def process_view(self, request, view_func, view_args, view_kwargs):
+        # If it's authenticated user we don't have to do anything.
+        if request.user.is_authenticated:
+            return None
+
+        # In case of we have CBV
+        view_class = getattr(view_func, 'view_class', None)
+        if view_class and getattr(view_class, 'login_not_required', False):
+            return None
+
+        # If the view is FBV or CBV with login_not_required usage on dispatch method,
+        if getattr(view_func, 'login_not_required', False):
+            return None
+        return redirect_to_login(request.get_full_path())
 
 
 class RemoteUserMiddleware(MiddlewareMixin):

@@ -71,6 +71,14 @@ class LoginRequiredMixin(AccessMixin):
         return super().dispatch(request, *args, **kwargs)
 
 
+class LoginNotRequiredMixin:
+    """
+    Mixin for CBV that marks that the view is accessible by
+    unauthenticated users.
+    """
+    login_not_required = True
+
+
 class PermissionRequiredMixin(AccessMixin):
     """Verify that the current user has all specified permissions."""
     permission_required = None
