@@ -5,6 +5,7 @@ from weakref import WeakSet
 from django.apps import apps
 from django.contrib.admin import ModelAdmin, actions
 from django.contrib.auth import REDIRECT_FIELD_NAME
+from django.contrib.auth.decorators import login_not_required
 from django.core.exceptions import ImproperlyConfigured
 from django.db.models.base import ModelBase
 from django.http import Http404, HttpResponseRedirect
@@ -376,6 +377,7 @@ class AdminSite:
         return LogoutView.as_view(**defaults)(request)
 
     @never_cache
+    @login_not_required
     def login(self, request, extra_context=None):
         """
         Display the login form for the given HttpRequest.
@@ -494,6 +496,7 @@ class AdminSite:
         return app_list
 
     @never_cache
+    @login_not_required
     def index(self, request, extra_context=None):
         """
         Display the main admin index page, which lists all of the installed

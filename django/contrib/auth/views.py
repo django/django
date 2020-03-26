@@ -6,10 +6,11 @@ from django.contrib.auth import (
     REDIRECT_FIELD_NAME, get_user_model, login as auth_login,
     logout as auth_logout, update_session_auth_hash,
 )
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, login_not_required
 from django.contrib.auth.forms import (
     AuthenticationForm, PasswordChangeForm, PasswordResetForm, SetPasswordForm,
 )
+from django.contrib.auth.mixins import LoginNotRequiredMixin
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.exceptions import ValidationError
@@ -37,7 +38,7 @@ class SuccessURLAllowedHostsMixin:
         return {self.request.get_host(), *self.success_url_allowed_hosts}
 
 
-class LoginView(SuccessURLAllowedHostsMixin, FormView):
+class LoginView(SuccessURLAllowedHostsMixin, LoginNotRequiredMixin, FormView):
     """
     Display the login form and handle the login action.
     """
@@ -171,6 +172,7 @@ def logout_then_login(request, login_url=None):
     return LogoutView.as_view(next_page=login_url)(request)
 
 
+@login_not_required
 def redirect_to_login(next, login_url=None, redirect_field_name=REDIRECT_FIELD_NAME):
     """
     Redirect the user to the login page, passing the given 'next' page.
@@ -205,7 +207,7 @@ class PasswordContextMixin:
         return context
 
 
-class PasswordResetView(PasswordContextMixin, FormView):
+class PasswordResetView(PasswordContextMixin, LoginNotRequiredMixin, FormView):
     email_template_name = 'registration/password_reset_email.html'
     extra_email_context = None
     form_class = PasswordResetForm
@@ -239,12 +241,12 @@ class PasswordResetView(PasswordContextMixin, FormView):
 INTERNAL_RESET_SESSION_TOKEN = '_password_reset_token'
 
 
-class PasswordResetDoneView(PasswordContextMixin, TemplateView):
+class PasswordResetDoneView(PasswordContextMixin, LoginNotRequiredMixin, TemplateView):
     template_name = 'registration/password_reset_done.html'
     title = _('Password reset sent')
 
 
-class PasswordResetConfirmView(PasswordContextMixin, FormView):
+class PasswordResetConfirmView(PasswordContextMixin, LoginNotRequiredMixin, FormView):
     form_class = SetPasswordForm
     post_reset_login = False
     post_reset_login_backend = None
@@ -317,7 +319,7 @@ class PasswordResetConfirmView(PasswordContextMixin, FormView):
         return context
 
 
-class PasswordResetCompleteView(PasswordContextMixin, TemplateView):
+class PasswordResetCompleteView(PasswordContextMixin, LoginNotRequiredMixin, TemplateView):
     template_name = 'registration/password_reset_complete.html'
     title = _('Password reset complete')
 
