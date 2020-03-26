@@ -300,6 +300,9 @@ Management Commands
   enabled for all configured :setting:`DATABASES` by passing the ``database``
   tag to the command.
 
+* The new :option:`migrate --check` option makes the command exit with a
+  non-zero status when unapplied migrations are detected.
+
 Migrations
 ~~~~~~~~~~
 

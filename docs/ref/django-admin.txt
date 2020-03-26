@@ -865,6 +865,13 @@ with hundreds of models.
 Suppresses all user prompts. An example prompt is asking about removing stale
 content types.
 
+.. django-admin-option:: --check
+
+.. versionadded:: 3.1
+
+Makes ``migrate`` exit with a non-zero status when unapplied migrations are
+detected.
+
 ``runserver``
 -------------
 
