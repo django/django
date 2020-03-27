@@ -1,7 +1,7 @@
 import datetime
 
 from django.forms.utils import flatatt, pretty_name
-from django.forms.widgets import Textarea, TextInput
+from django.forms.widgets import MultiWidget, Textarea, TextInput
 from django.utils.functional import cached_property
 from django.utils.html import conditional_escape, format_html, html_safe
 from django.utils.safestring import mark_safe
@@ -219,12 +219,36 @@ class BoundField:
         return data
 
     def build_widget_attrs(self, attrs, widget=None):
-        widget = widget or self.field.widget
         attrs = dict(attrs)  # Copy attrs to avoid modifying the argument.
-        if widget.use_required_attribute(self.initial) and self.field.required and self.form.use_required_attribute:
-            attrs['required'] = True
+        if isinstance(widget, MultiWidget) or isinstance(self.field.widget, MultiWidget):
+            if self.form.use_required_attribute:
+                widgets = widget.widgets or self.field.widget.widgets
+                for field, widget in zip(self.field.fields, widgets):
+                    if (
+                        widget.use_required_attribute(self.initial)
+                        and (
+                            self.field.required
+                            and (self.field.require_all_fields or field.widget.is_required)
+                        )
+                        or (
+                            not self.field.required
+                            and not self.field.require_all_fields
+                            and field.widget.is_required
+                        )
+                    ):
+                        widget.attrs["required"] = True
+                    else:
+                        widget.attrs["required"] = False
+        else:
+            widget = widget or self.field.widget
+            if (
+                widget.use_required_attribute(self.initial)
+                and self.field.required
+                and self.form.use_required_attribute
+            ):
+                attrs["required"] = True
         if self.field.disabled:
-            attrs['disabled'] = True
+            attrs["disabled"] = True
         return attrs
 
 
