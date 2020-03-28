@@ -36,6 +36,19 @@ class OperationTestBase(MigrationTestBase):
         with connection.schema_editor() as editor:
             with connection.constraint_checks_disabled():
                 for table_name in table_names:
+                    class Model:
+                        pass
+
+                    class Meta:
+                        db_table = table_name
+
+                    model = Model()
+                    model._meta = Meta()
+                    # Spanner requires deleting a table's indexes before
+                    # dropping the table.
+                    index_names = editor._constraint_names(model, index=True, primary_key=False)
+                    for index_name in index_names:
+                        editor.execute(editor._delete_index_sql(model, index_name))
                     editor.execute(editor.sql_delete_table % {
                         'table': editor.quote_name(table_name),
                     })
@@ -1630,22 +1643,22 @@ class OperationTests(OperationTestBase):
         self.assertEqual(len(new_state.models["test_alunto", "pony"].options.get("unique_together", set())), 1)
         # Make sure we can insert duplicate rows
         with connection.cursor() as cursor:
-            cursor.execute("INSERT INTO test_alunto_pony (pink, weight) VALUES (1, 1)")
-            cursor.execute("INSERT INTO test_alunto_pony (pink, weight) VALUES (1, 1)")
+            cursor.execute("INSERT INTO test_alunto_pony (id, pink, weight) VALUES (1, 1, 1)")
+            cursor.execute("INSERT INTO test_alunto_pony (id, pink, weight) VALUES (2, 1, 1)")
             cursor.execute("DELETE FROM test_alunto_pony")
             # Test the database alteration
             with connection.schema_editor() as editor:
                 operation.database_forwards("test_alunto", editor, project_state, new_state)
-            cursor.execute("INSERT INTO test_alunto_pony (pink, weight) VALUES (1, 1)")
+            cursor.execute("INSERT INTO test_alunto_pony (id, pink, weight) VALUES (3, 1, 1)")
             with self.assertRaises(IntegrityError):
                 with atomic():
-                    cursor.execute("INSERT INTO test_alunto_pony (pink, weight) VALUES (1, 1)")
+                    cursor.execute("INSERT INTO test_alunto_pony (id, pink, weight) VALUES (4, 1, 1)")
             cursor.execute("DELETE FROM test_alunto_pony")
             # And test reversal
             with connection.schema_editor() as editor:
                 operation.database_backwards("test_alunto", editor, new_state, project_state)
-            cursor.execute("INSERT INTO test_alunto_pony (pink, weight) VALUES (1, 1)")
-            cursor.execute("INSERT INTO test_alunto_pony (pink, weight) VALUES (1, 1)")
+            cursor.execute("INSERT INTO test_alunto_pony (id, pink, weight) VALUES (5, 1, 1)")
+            cursor.execute("INSERT INTO test_alunto_pony (id, pink, weight) VALUES (6, 1, 1)")
             cursor.execute("DELETE FROM test_alunto_pony")
         # Test flat unique_together
         operation = migrations.AlterUniqueTogether("Pony", ("pink", "weight"))
@@ -2245,20 +2258,20 @@ class OperationTests(OperationTestBase):
         """
         project_state = self.set_up_test_model("test_runsql")
         # Create the operation
-        operation = migrations.RunSQL(
+        operation = migrations.RunSQL([
             # Use a multi-line string with a comment to test splitting on SQLite and MySQL respectively
-            "CREATE TABLE i_love_ponies (id int, special_thing varchar(15));\n"
-            "INSERT INTO i_love_ponies (id, special_thing) VALUES (1, 'i love ponies'); -- this is magic!\n"
-            "INSERT INTO i_love_ponies (id, special_thing) VALUES (2, 'i love django');\n"
-            "UPDATE i_love_ponies SET special_thing = 'Ponies' WHERE special_thing LIKE '%%ponies';"
-            "UPDATE i_love_ponies SET special_thing = 'Django' WHERE special_thing LIKE '%django';",
-
+            "CREATE TABLE i_love_ponies (id INT64, special_thing STRING(15)) PRIMARY KEY (id)",
+            "INSERT INTO i_love_ponies (id, special_thing) VALUES (1, 'i love ponies')",
+            "INSERT INTO i_love_ponies (id, special_thing) VALUES (2, 'i love django')",
+            "UPDATE i_love_ponies SET special_thing = 'Ponies' WHERE special_thing LIKE '%%ponies'",
+            "UPDATE i_love_ponies SET special_thing = 'Django' WHERE special_thing LIKE '%django'",
+        ], [
             # Run delete queries to test for parameter substitution failure
             # reported in #23426
-            "DELETE FROM i_love_ponies WHERE special_thing LIKE '%Django%';"
-            "DELETE FROM i_love_ponies WHERE special_thing LIKE '%%Ponies%%';"
+            "DELETE FROM i_love_ponies WHERE special_thing LIKE '%Django%'",
+            "DELETE FROM i_love_ponies WHERE special_thing LIKE '%%Ponies%%'",
             "DROP TABLE i_love_ponies",
-
+        ],
             state_operations=[migrations.CreateModel("SomethingElse", [("id", models.AutoField(primary_key=True))])],
         )
         self.assertEqual(operation.describe(), "Raw SQL operation")
@@ -2271,9 +2284,9 @@ class OperationTests(OperationTestBase):
         # Test SQL collection
         with connection.schema_editor(collect_sql=True) as editor:
             operation.database_forwards("test_runsql", editor, project_state, new_state)
-            self.assertIn("LIKE '%%ponies';", "\n".join(editor.collected_sql))
+            self.assertIn("LIKE '%%ponies'", "\n".join(editor.collected_sql))
             operation.database_backwards("test_runsql", editor, project_state, new_state)
-            self.assertIn("LIKE '%%Ponies%%';", "\n".join(editor.collected_sql))
+            self.assertIn("LIKE '%%Ponies%%'", "\n".join(editor.collected_sql))
         # Test the database alteration
         with connection.schema_editor() as editor:
             operation.database_forwards("test_runsql", editor, project_state, new_state)
@@ -2298,7 +2311,7 @@ class OperationTests(OperationTestBase):
         self.assertEqual(sorted(definition[2]), ["reverse_sql", "sql", "state_operations"])
         # And elidable reduction
         self.assertIs(False, operation.reduce(operation, []))
-        elidable_operation = migrations.RunSQL('SELECT 1 FROM void;', elidable=True)
+        elidable_operation = migrations.RunSQL('SELECT 1 FROM void', elidable=True)
         self.assertEqual(elidable_operation.reduce(operation, []), [operation])
 
     def test_run_sql_params(self):
@@ -2308,21 +2321,21 @@ class OperationTests(OperationTestBase):
         project_state = self.set_up_test_model("test_runsql")
         # Create the operation
         operation = migrations.RunSQL(
-            ["CREATE TABLE i_love_ponies (id int, special_thing varchar(15));"],
+            ["CREATE TABLE i_love_ponies (id INT64, special_thing STRING(15)) PRIMARY KEY (id)"],
             ["DROP TABLE i_love_ponies"],
         )
         param_operation = migrations.RunSQL(
             # forwards
             (
-                "INSERT INTO i_love_ponies (id, special_thing) VALUES (1, 'Django');",
-                ["INSERT INTO i_love_ponies (id, special_thing) VALUES (2, %s);", ['Ponies']],
-                ("INSERT INTO i_love_ponies (id, special_thing) VALUES (%s, %s);", (3, 'Python',)),
+                "INSERT INTO i_love_ponies (id, special_thing) VALUES (1, 'Django')",
+                ["INSERT INTO i_love_ponies (id, special_thing) VALUES (2, %s)", ['Ponies']],
+                ("INSERT INTO i_love_ponies (id, special_thing) VALUES (%s, %s)", (3, 'Python',)),
             ),
             # backwards
             [
-                "DELETE FROM i_love_ponies WHERE special_thing = 'Django';",
-                ["DELETE FROM i_love_ponies WHERE special_thing = 'Ponies';", None],
-                ("DELETE FROM i_love_ponies WHERE id = %s OR special_thing = %s;", [3, 'Python']),
+                "DELETE FROM i_love_ponies WHERE special_thing = 'Django'",
+                ["DELETE FROM i_love_ponies WHERE special_thing = 'Ponies'", None],
+                ("DELETE FROM i_love_ponies WHERE id = %s OR special_thing = %s", [3, 'Python']),
             ]
         )
 
@@ -2503,15 +2516,17 @@ class OperationTests(OperationTestBase):
             self.assertEqual(project_state.apps.get_model("test_runpythonatomic", "Pony").objects.count(), 0)
         # Otherwise, the non-atomic operation should leave a row there
         else:
+            # Spanner doesn't have transactions, so both atomic and non-atomic
+            # leave a row.
             self.assertEqual(project_state.apps.get_model("test_runpythonatomic", "Pony").objects.count(), 0)
             with self.assertRaises(ValueError):
                 with connection.schema_editor() as editor:
                     atomic_migration.apply(project_state, editor)
-            self.assertEqual(project_state.apps.get_model("test_runpythonatomic", "Pony").objects.count(), 0)
+            self.assertEqual(project_state.apps.get_model("test_runpythonatomic", "Pony").objects.count(), 1)
             with self.assertRaises(ValueError):
                 with connection.schema_editor() as editor:
                     non_atomic_migration.apply(project_state, editor)
-            self.assertEqual(project_state.apps.get_model("test_runpythonatomic", "Pony").objects.count(), 1)
+            self.assertEqual(project_state.apps.get_model("test_runpythonatomic", "Pony").objects.count(), 2)
         # Reset object count to zero and verify atomicity when unapplying.
         project_state.apps.get_model("test_runpythonatomic", "Pony").objects.all().delete()
         # On a fully-transactional database, both versions rollback.
@@ -2527,15 +2542,17 @@ class OperationTests(OperationTestBase):
             self.assertEqual(project_state.apps.get_model("test_runpythonatomic", "Pony").objects.count(), 0)
         # Otherwise, the non-atomic operation leaves a row there.
         else:
+            # Spanner doesn't have transactions, so both atomic and non-atomic
+            # leave a row.
             self.assertEqual(project_state.apps.get_model("test_runpythonatomic", "Pony").objects.count(), 0)
             with self.assertRaises(ValueError):
                 with connection.schema_editor() as editor:
                     atomic_migration.unapply(project_state, editor)
-            self.assertEqual(project_state.apps.get_model("test_runpythonatomic", "Pony").objects.count(), 0)
+            self.assertEqual(project_state.apps.get_model("test_runpythonatomic", "Pony").objects.count(), 1)
             with self.assertRaises(ValueError):
                 with connection.schema_editor() as editor:
                     non_atomic_migration.unapply(project_state, editor)
-            self.assertEqual(project_state.apps.get_model("test_runpythonatomic", "Pony").objects.count(), 1)
+            self.assertEqual(project_state.apps.get_model("test_runpythonatomic", "Pony").objects.count(), 2)
         # Verify deconstruction.
         definition = non_atomic_migration.operations[0].deconstruct()
         self.assertEqual(definition[0], "RunPython")
@@ -2755,8 +2772,8 @@ class OperationTests(OperationTestBase):
         project_state = self.set_up_test_model("test_separatedatabaseandstate")
         # Create the operation
         database_operation = migrations.RunSQL(
-            "CREATE TABLE i_love_ponies (id int, special_thing int);",
-            "DROP TABLE i_love_ponies;"
+            "CREATE TABLE i_love_ponies (id INT64, special_thing INT64) PRIMARY KEY (id)",
+            "DROP TABLE i_love_ponies"
         )
         state_operation = migrations.CreateModel("SomethingElse", [("id", models.AutoField(primary_key=True))])
         operation = migrations.SeparateDatabaseAndState(
