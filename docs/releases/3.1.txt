@@ -557,8 +557,8 @@ Miscellaneous
   ``ETag`` header to responses with an empty
   :attr:`~django.http.HttpResponse.content`.
 
-* ``django.utils.decorators.classproperty()`` decorator is moved to
-  ``django.utils.functional.classproperty()``.
+* ``django.utils.decorators.classproperty()`` decorator is made public and
+  moved to :class:`django.utils.functional.classproperty()`.
 
 * :tfilter:`floatformat` template filter now outputs (positive) ``0`` for
   negative numbers which round to zero.
