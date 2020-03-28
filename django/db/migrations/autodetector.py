@@ -131,28 +131,28 @@ class MigrationAutodetector:
         self.new_model_keys = set()
         self.new_proxy_keys = set()
         self.new_unmanaged_keys = set()
-        for al, mn in self.from_state.models:
-            model = self.old_apps.get_model(al, mn)
+        for app_label, model_name in self.from_state.models:
+            model = self.old_apps.get_model(app_label, model_name)
             if not model._meta.managed:
-                self.old_unmanaged_keys.add((al, mn))
-            elif al not in self.from_state.real_apps:
+                self.old_unmanaged_keys.add((app_label, model_name))
+            elif app_label not in self.from_state.real_apps:
                 if model._meta.proxy:
-                    self.old_proxy_keys.add((al, mn))
+                    self.old_proxy_keys.add((app_label, model_name))
                 else:
-                    self.old_model_keys.add((al, mn))
+                    self.old_model_keys.add((app_label, model_name))
 
-        for al, mn in self.to_state.models:
-            model = self.new_apps.get_model(al, mn)
+        for app_label, model_name in self.to_state.models:
+            model = self.new_apps.get_model(app_label, model_name)
             if not model._meta.managed:
-                self.new_unmanaged_keys.add((al, mn))
+                self.new_unmanaged_keys.add((app_label, model_name))
             elif (
-                al not in self.from_state.real_apps or
-                (convert_apps and al in convert_apps)
+                app_label not in self.from_state.real_apps or
+                (convert_apps and app_label in convert_apps)
             ):
                 if model._meta.proxy:
-                    self.new_proxy_keys.add((al, mn))
+                    self.new_proxy_keys.add((app_label, model_name))
                 else:
-                    self.new_model_keys.add((al, mn))
+                    self.new_model_keys.add((app_label, model_name))
 
         # Renames have to come first
         self.generate_renamed_models()
