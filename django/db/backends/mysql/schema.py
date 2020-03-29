@@ -46,7 +46,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         sql, params = super().column_sql(model, field, include_default)
 
         if field.help_text:
-            sql += " COMMENT '%(help_text)s' " % {'help_text': field.help_text}
+            sql += " COMMENT '%(help_text)s' " % {'help_text': field.help_text.replace('\'', '"')}
 
         return sql, params
 
