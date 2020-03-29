@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.db.backends.base.schema import BaseDatabaseSchemaEditor
 from django.db.models import NOT_PROVIDED
 
@@ -12,7 +13,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
     sql_alter_column_null = "MODIFY %(column)s %(type)s NULL"
     sql_alter_column_not_null = "MODIFY %(column)s %(type)s NOT NULL"
     sql_alter_column_type = "MODIFY %(column)s %(type)s"
-    sql_alter_column_comment = "MODIFY %(column)s %(type)s COMMENT '%(db_table_comment)s'"
+    sql_alter_column_comment = "MODIFY %(column)s %(type)s COMMENT '%(db_column_comment)s'"
 
     # No 'CASCADE' which works as a no-op in MySQL but is undocumented
     sql_delete_column = "ALTER TABLE %(table)s DROP COLUMN %(column)s"
@@ -45,8 +46,13 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
     def column_sql(self, model, field, include_default=False):
         sql, params = super().column_sql(model, field, include_default)
 
-        if field.help_text:
-            sql += " COMMENT '%(help_text)s' " % {'help_text': field.help_text.replace('\'', '"')}
+        if settings.ENABLE_DB_COMMENT_WITH_HELP_TEXT:
+            db_column_comment = field.help_text
+        else:
+            db_column_comment = field.db_column_comment
+
+        if db_column_comment:
+            sql += " COMMENT '%(db_column_comment)s' " % {'db_column_comment': db_column_comment.replace('\'', '"').replace('\n', ' ')}
 
         return sql, params
 
@@ -83,7 +89,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             return
         self.execute(self.sql_alter_table_comment % {
             "table": self.quote_name(model._meta.db_table),
-            "db_table_comment": self.quote_name(new_db_table_comment.replace('\'', '')),
+            "db_table_comment": self.quote_name(new_db_table_comment.replace('\'', '').replace('\n', ' ')),
         })
 
     def _column_default_sql(self, field):
@@ -165,7 +171,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             self.sql_alter_column_comment % {
                 'column': self.quote_name(new_field.column),
                 'type': new_type,
-                'db_table_comment': new_db_comment.replace('\'', ' ').replace('\n', ' '),
+                'db_column_comment': new_db_comment.replace('\'', ' ').replace('\n', ' '),
             },
             []
         )
