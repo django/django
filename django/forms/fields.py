@@ -988,11 +988,12 @@ class MultiValueField(Field):
                                         self.error_messages['incomplete'])
             if self.disabled:
                 f.disabled = True
-            if self.require_all_fields:
-                # Set 'required' to False on the individual fields, because the
-                # required validation will be handled by MultiValueField, not
-                # by those individual fields.
-                f.required = False
+            if (self.required and (self.require_all_fields or f.required)) or (
+                not self.required and not self.require_all_fields and f.required
+            ):
+                f.required = f.widget.is_required = True
+            else:
+                f.required = f.widget.is_required = False
         self.fields = fields
 
     def __deepcopy__(self, memo):

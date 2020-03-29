@@ -221,30 +221,22 @@ class BoundField:
     def build_widget_attrs(self, attrs, widget=None):
         attrs = dict(attrs)  # Copy attrs to avoid modifying the argument.
         if isinstance(widget, MultiWidget) or isinstance(self.field.widget, MultiWidget):
-            if self.form.use_required_attribute:
-                widgets = widget.widgets or self.field.widget.widgets
-                for field, widget in zip(self.field.fields, widgets):
-                    if (
-                        widget.use_required_attribute(self.initial)
-                        and (
-                            self.field.required
-                            and (self.field.require_all_fields or field.widget.is_required)
-                        )
-                        or (
-                            not self.field.required
-                            and not self.field.require_all_fields
-                            and field.widget.is_required
-                        )
-                    ):
-                        widget.attrs["required"] = True
-                    else:
-                        widget.attrs["required"] = False
+            widgets = widget.widgets or self.field.widget.widgets
+            for field, widget in zip(self.field.fields, widgets):
+                if (
+                    widget.use_required_attribute(self.initial) and
+                    field.required and
+                    self.form.use_required_attribute
+                ):
+                    widget.attrs["required"] = True
+                else:
+                    widget.attrs["required"] = False
         else:
             widget = widget or self.field.widget
             if (
-                widget.use_required_attribute(self.initial)
-                and self.field.required
-                and self.form.use_required_attribute
+                widget.use_required_attribute(self.initial) and
+                self.field.required and
+                self.form.use_required_attribute
             ):
                 attrs["required"] = True
         if self.field.disabled:
