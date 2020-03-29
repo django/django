@@ -192,12 +192,21 @@ class BaseDatabaseSchemaEditor:
                 if autoinc_sql:
                     self.deferred_sql.extend(autoinc_sql)
         constraints = [constraint.constraint_sql(model, self) for constraint in model._meta.constraints]
-        sql = self.sql_create_table % {
-            'table': self.quote_name(model._meta.db_table),
-            'definition': ', '.join(constraint for constraint in (*column_sqls, *constraints) if constraint),
-        }
-        if model._meta.db_table_comment:
-            sql["db_table_comment"] = model._meta.db_table_comment.replace('\'', '').replace('\n', ' ')
+
+        if model._meta.db_table_comment and getattr(self, 'sql_create_table_with_comment'):
+            sql = self.sql_create_table_with_comment % {
+                'table': self.quote_name(model._meta.db_table),
+                'definition': ', '.join(constraint for constraint in (*column_sqls, *constraints) if constraint),
+                "db_table_comment": model._meta.db_table_comment.replace('\'', '').replace('\n', ' ')
+            }
+        else:
+            if getattr(model._meta, 'db_table_comment'):
+                logger.warning('option "db_table_comment" is supported only mysql ....')
+
+            sql = self.sql_create_table % {
+                'table': self.quote_name(model._meta.db_table),
+                'definition': ', '.join(constraint for constraint in (*column_sqls, *constraints) if constraint),
+            }
 
         if model._meta.db_tablespace:
             tablespace_sql = self.connection.ops.tablespace_sql(model._meta.db_tablespace)
