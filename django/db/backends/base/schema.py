@@ -1,6 +1,7 @@
 import logging
 from datetime import datetime
 
+from django.conf import settings
 from django.db.backends.ddl_references import (
     Columns, ForeignKeyName, IndexName, Statement, Table,
 )
@@ -194,8 +195,10 @@ class BaseDatabaseSchemaEditor:
         sql = self.sql_create_table % {
             'table': self.quote_name(model._meta.db_table),
             'definition': ', '.join(constraint for constraint in (*column_sqls, *constraints) if constraint),
-            "db_table_comment": model._meta.db_table_comment.replace('\'', '')
         }
+        if model._meta.db_table_comment:
+            sql["db_table_comment"] = model._meta.db_table_comment.replace('\'', '').replace('\n', ' ')
+
         if model._meta.db_tablespace:
             tablespace_sql = self.connection.ops.tablespace_sql(model._meta.db_tablespace)
             if tablespace_sql:
@@ -696,8 +699,15 @@ class BaseDatabaseSchemaEditor:
             if fragment:
                 null_actions.append(fragment)
 
-        if old_field.help_text != new_field.help_text:
-            fragment = self._alter_column_comment_sql(model, new_field, new_type, new_field.help_text)
+        if settings.ENABLE_DB_COMMENT_WITH_HELP_TEXT:
+            old_field_db_column_comment = old_field.help_text
+            new_field_db_column_comment = new_field.help_text
+        else:
+            old_field_db_column_comment = old_field.db_column_comment
+            new_field_db_column_comment = new_field.db_column_comment
+
+        if old_field_db_column_comment != new_field_db_column_comment:
+            fragment = self._alter_column_comment_sql(model, new_field, new_type, new_field_db_column_comment)
             if fragment:
                 null_actions.append(fragment)
 
