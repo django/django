@@ -7,6 +7,7 @@ from django.core.exceptions import ImproperlyConfigured, PermissionDenied
 from django.middleware.csrf import rotate_token
 from django.utils.crypto import constant_time_compare
 from django.utils.module_loading import import_string
+from django.views.decorators.debug import sensitive_variables
 
 from .signals import user_logged_in, user_logged_out, user_login_failed
 
@@ -37,6 +38,7 @@ def get_backends():
     return _get_backends(return_tuples=False)
 
 
+@sensitive_variables('credentials')
 def _clean_credentials(credentials):
     """
     Clean a dictionary of credentials of potentially sensitive info before
@@ -58,6 +60,7 @@ def _get_user_session_key(request):
     return get_user_model()._meta.pk.to_python(request.session[SESSION_KEY])
 
 
+@sensitive_variables('credentials')
 def authenticate(request=None, **credentials):
     """
     If the given credentials are valid, return a User object.
