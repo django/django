@@ -188,6 +188,7 @@ class MigrationAutodetector:
         self.generate_altered_index_together()
         self.generate_added_indexes()
         self.generate_added_constraints()
+        self.generate_altered_db_table_comment()
         self.generate_altered_db_table()
         self.generate_altered_order_with_respect_to()
 
@@ -1127,6 +1128,7 @@ class MigrationAutodetector:
         self._generate_altered_foo_together(operations.AlterIndexTogether)
 
     def generate_altered_db_table(self):
+        print("asdfasdfasdf")
         models_to_check = self.kept_model_keys.union(self.kept_proxy_keys, self.kept_unmanaged_keys)
         for app_label, model_name in sorted(models_to_check):
             old_model_name = self.renamed_models.get((app_label, model_name), model_name)
@@ -1157,7 +1159,7 @@ class MigrationAutodetector:
                     app_label,
                     operations.AlterModelTableComment(
                         name=model_name,
-                        table_comment=new_db_table_comment,
+                        db_table_comment=new_db_table_comment,
                     )
                 )
 
