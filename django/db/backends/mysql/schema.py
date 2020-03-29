@@ -55,7 +55,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         if db_column_comment:
             sql += " COMMENT '%(db_column_comment)s' " % {
                 'db_column_comment': db_column_comment.replace('\'', '"').replace('\n', ' ')
-                }
+            }
 
         return sql, params
 
