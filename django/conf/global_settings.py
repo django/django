@@ -182,6 +182,7 @@ DATABASES = {}
 # Classes used to implement DB routing behavior.
 DATABASE_ROUTERS = []
 
+
 # The email backend to use. For possible shortcuts see django.core.mail.
 # The default is to use the SMTP backend.
 # Third-party backends can be specified by providing a Python path
@@ -409,6 +410,9 @@ THOUSAND_SEPARATOR = ','
 # The tablespaces to use for each model when not specified otherwise.
 DEFAULT_TABLESPACE = ''
 DEFAULT_INDEX_TABLESPACE = ''
+
+# Database DDL help_text overwrites db_column_comment
+ENABLE_DB_COMMENT_WITH_HELP_TEXT = False
 
 # Default X-Frame-Options header value
 X_FRAME_OPTIONS = 'DENY'
