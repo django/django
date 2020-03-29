@@ -1128,7 +1128,6 @@ class MigrationAutodetector:
         self._generate_altered_foo_together(operations.AlterIndexTogether)
 
     def generate_altered_db_table(self):
-        print("asdfasdfasdf")
         models_to_check = self.kept_model_keys.union(self.kept_proxy_keys, self.kept_unmanaged_keys)
         for app_label, model_name in sorted(models_to_check):
             old_model_name = self.renamed_models.get((app_label, model_name), model_name)
