@@ -82,8 +82,8 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         if old_db_table_comment == new_db_table_comment:
             return
         self.execute(self.sql_alter_table_comment % {
-            "db_table": self.quote_name(model._meta.db_table),
-            "db_table_comment": self.quote_name(new_db_table_comment),
+            "table": self.quote_name(model._meta.db_table),
+            "db_table_comment": self.quote_name(new_db_table_comment.replace('\'', '')),
         })
 
     def _column_default_sql(self, field):

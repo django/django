@@ -194,7 +194,7 @@ class BaseDatabaseSchemaEditor:
         sql = self.sql_create_table % {
             'table': self.quote_name(model._meta.db_table),
             'definition': ', '.join(constraint for constraint in (*column_sqls, *constraints) if constraint),
-            "db_table_comment": model._meta.db_table_comment
+            "db_table_comment": model._meta.db_table_comment.replace('\'', '')
         }
         if model._meta.db_tablespace:
             tablespace_sql = self.connection.ops.tablespace_sql(model._meta.db_tablespace)
