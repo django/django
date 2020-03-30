@@ -829,7 +829,7 @@ class Variable:
                     current = current[bit]
                     # ValueError/IndexError are for numpy.array lookup on
                     # numpy < 1.9 and 1.9+ respectively
-                except (TypeError, AttributeError, KeyError, ValueError, IndexError):
+                except (TypeError, AttributeError, LookupError, ValueError):
                     try:  # attribute lookup
                         # Don't return class attributes if the class is the context:
                         if isinstance(current, BaseContext) and getattr(type(current), bit):
@@ -841,10 +841,11 @@ class Variable:
                             raise
                         try:  # list-index lookup
                             current = current[int(bit)]
-                        except (IndexError,  # list index out of range
-                                ValueError,  # invalid literal for int()
-                                KeyError,    # current is a dict without `int(bit)` key
-                                TypeError):  # unsubscriptable object
+                        except (
+                            LookupError,  # Dict without int(bit) key.
+                            ValueError,  # Invalid literal for int().
+                            TypeError,  # Unsubscriptable object.
+                        ):
                             raise VariableDoesNotExist("Failed lookup for key "
                                                        "[%s] in %r",
                                                        (bit, current))  # missing attribute
