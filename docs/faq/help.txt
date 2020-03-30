@@ -6,13 +6,14 @@ How do I do X? Why doesn't Y work? Where can I go to get help?
 ==============================================================
 
 First, please check if your question is answered on the :doc:`FAQ <faq/index>`.
-Also, search for answers using your favorite search engine, and in `the forum`.
+Also, search for answers using your favorite search engine, and in `the
+forum`_.
 
 .. _`the forum`: https://forum.djangoproject.com/
 
 If you can't find an answer, please take a few minutes to formulate your
 question well. Explaining the problems you are facing clearly will help others
-help you. See the StackOverflow guide on `asking good questions`.
+help you. See the StackOverflow guide on `asking good questions`_.
 
 .. _`asking good questions`: https://stackoverflow.com/help/how-to-ask
 
