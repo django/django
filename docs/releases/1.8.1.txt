@@ -84,7 +84,7 @@ Bugfixes
   ``ModelAdmin.filter_horizontal`` and ``filter_vertical`` options
   (:ticket:`24676`).
 
-* Fixed `AttributeError: function 'GDALAllRegister' not found` error when
+* Fixed ``AttributeError: function 'GDALAllRegister' not found`` error when
   initializing ``contrib.gis`` on Windows.
 
 Optimizations

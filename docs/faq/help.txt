@@ -36,7 +36,7 @@ your choice of words.
 
 .. _message-does-not-appear-on-django-users:
 
-Why hasn't my message appeared on `django-users`?
+Why hasn't my message appeared on *django-users*?
 =================================================
 
 |django-users| has a lot of subscribers. This is good for the community, as

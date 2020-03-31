@@ -166,8 +166,8 @@ filtered out of error reports in a production environment (that is, where
             ...
 
     In the above example, the values for the ``user``, ``pw`` and ``cc``
-    variables will be hidden and replaced with stars (`**********`) in the
-    error reports, whereas the value of the ``name`` variable will be
+    variables will be hidden and replaced with stars (``**********``)
+    in the error reports, whereas the value of the ``name`` variable will be
     disclosed.
 
     To systematically hide all local variables of a function from error logs,
@@ -213,8 +213,9 @@ filtered out of error reports in a production environment (that is, where
 
     In the above example, the values for the ``pass_word`` and
     ``credit_card_number`` POST parameters will be hidden and replaced with
-    stars (`**********`) in the request's representation inside the error
-    reports, whereas the value of the ``name`` parameter will be disclosed.
+    stars (``**********``) in the request's representation inside the
+    error reports, whereas the value of the ``name`` parameter will be
+    disclosed.
 
     To systematically hide all POST parameters of a request in error reports,
     do not provide any argument to the ``sensitive_post_parameters`` decorator::
@@ -242,9 +243,9 @@ of reports when an error occurs. The actual filtering is done by Django's
 default error reporter filter:
 :class:`django.views.debug.SafeExceptionReporterFilter`. This filter uses the
 decorators' annotations to replace the corresponding values with stars
-(`**********`) when the error reports are produced. If you wish to override or
-customize this default behavior for your entire site, you need to define your
-own filter class and tell Django to use it via the
+(``**********``) when the error reports are produced. If you wish to
+override or customize this default behavior for your entire site, you need to
+define your own filter class and tell Django to use it via the
 :setting:`DEFAULT_EXCEPTION_REPORTER_FILTER` setting::
 
     DEFAULT_EXCEPTION_REPORTER_FILTER = 'path.to.your.CustomExceptionReporterFilter'
@@ -271,7 +272,8 @@ following attributes and methods:
         .. versionadded:: 3.1
 
         The string value to replace sensitive value with. By default it
-        replaces the values of sensitive variables with stars (`**********`).
+        replaces the values of sensitive variables with stars
+        (``**********``).
 
     .. attribute:: hidden_settings
 

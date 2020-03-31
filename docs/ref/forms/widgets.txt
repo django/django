@@ -365,7 +365,7 @@ foundation for custom widgets.
         the ``name`` attribute on each subwidget. In this case, for each
         ``(key, widget)`` pair, the key will be appended to the ``name`` of the
         widget in order to generate the attribute value. You may provide the
-        empty string (`''`) for a single key, in order to suppress the suffix
+        empty string (``''``) for a single key, in order to suppress the suffix
         for one widget. For example::
 
             >>> widget = MultiWidget(widgets={'': TextInput, 'last': TextInput})
