@@ -822,8 +822,13 @@ Has two optional arguments:
 
 .. attribute:: FileField.storage
 
-    A storage object, which handles the storage and retrieval of your
-    files. See :doc:`/topics/files` for details on how to provide this object.
+    A storage object, or a callable which returns a storage object. This
+    handles the storage and retrieval of your files. See :doc:`/topics/files`
+    for details on how to provide this object.
+
+    .. versionchanged:: 3.1
+
+        The ability to provide a callable was added.
 
 The default form widget for this field is a
 :class:`~django.forms.ClearableFileInput`.
