@@ -89,5 +89,3 @@ or one of the public mailing lists. Django has a
 :ref:`policy for handling security issues <reporting-security-issues>`;
 while a defect is outstanding, we would like to minimize any damage that
 could be inflicted through public knowledge of that defect.
-
-.. _`policy for handling security issues`: ../contributing/#reporting-security-issues
