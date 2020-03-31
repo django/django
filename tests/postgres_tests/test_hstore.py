@@ -7,7 +7,7 @@ from django.db.models.expressions import RawSQL
 from django.forms import Form
 from django.test.utils import CaptureQueriesContext, isolate_apps
 
-from . import PostgreSQLSimpleTestCase, PostgreSQLTestCase
+from . import PostgreSQLHStoreTestCase, PostgreSQLSimpleTestCase
 from .models import HStoreModel, PostgreSQLModel
 
 try:
@@ -19,7 +19,7 @@ except ImportError:
     pass
 
 
-class SimpleTests(PostgreSQLTestCase):
+class SimpleTests(PostgreSQLHStoreTestCase):
     def test_save_load_success(self):
         value = {'a': 'b'}
         instance = HStoreModel(field=value)
@@ -68,7 +68,7 @@ class SimpleTests(PostgreSQLTestCase):
         self.assertEqual(instance.array_field, expected_value)
 
 
-class TestQuerying(PostgreSQLTestCase):
+class TestQuerying(PostgreSQLHStoreTestCase):
 
     @classmethod
     def setUpTestData(cls):

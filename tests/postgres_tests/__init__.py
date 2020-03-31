@@ -21,3 +21,9 @@ class PostgreSQLTestCase(TestCase):
 @modify_settings(INSTALLED_APPS={'append': 'django.contrib.postgres'})
 class PostgreSQLWidgetTestCase(WidgetTest, PostgreSQLSimpleTestCase):
     pass
+
+
+@unittest.skipUnless(connection.vendor == 'postgresql', "PostgreSQL specific tests")
+@modify_settings(INSTALLED_APPS={'append': 'django.contrib.postgres'})
+class PostgreSQLHStoreTestCase(PostgreSQLTestCase):
+    pass

@@ -1,6 +1,8 @@
 from datetime import date
 
-from . import PostgreSQLTestCase
+from django.test import modify_settings
+
+from . import PostgreSQLHStoreTestCase
 from .models import (
     HStoreModel, IntegerArrayModel, NestedIntegerArrayModel,
     NullableIntegerArrayModel, OtherTypesArrayModel, RangesModel,
@@ -12,7 +14,8 @@ except ImportError:
     pass  # psycopg2 isn't installed.
 
 
-class BulkSaveTests(PostgreSQLTestCase):
+@modify_settings(INSTALLED_APPS={'append': 'django.contrib.postgres'})
+class BulkSaveTests(PostgreSQLHStoreTestCase):
     def test_bulk_update(self):
         test_data = [
             (IntegerArrayModel, 'field', [], [1, 2, 3]),

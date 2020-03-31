@@ -5,6 +5,7 @@ from django.db import transaction
 from django.db.backends.base.features import BaseDatabaseFeatures
 from django.db.utils import OperationalError
 from django.utils.functional import cached_property
+from django.utils.version import PY37
 
 from .base import Database
 
@@ -24,7 +25,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     can_rollback_ddl = True
     can_create_inline_fk = False
     supports_paramstyle_pyformat = False
-    can_clone_databases = True
+    can_clone_databases = PY37
     supports_temporal_subtraction = True
     ignores_table_name_case = True
     supports_cast_with_precision = False
