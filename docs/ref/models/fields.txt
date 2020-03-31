@@ -1182,8 +1182,11 @@ values are stored as null.
 
 .. class:: NullBooleanField(**options)
 
-Like :class:`BooleanField` with ``null=True``. Use that instead of this field
-as it's likely to be deprecated in a future version of Django.
+Like :class:`BooleanField` with ``null=True``.
+
+.. deprecated:: 3.1
+
+    ``NullBooleanField`` is deprecated in favor of ``BooleanField(null=True)``.
 
 ``PositiveBigIntegerField``
 ---------------------------

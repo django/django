@@ -75,6 +75,9 @@ details on these changes.
 * Support for passing raw column aliases to ``QuerySet.order_by()`` will be
   removed.
 
+* The model ``NullBooleanField`` will be removed. A stub field will remain for
+  compatibility with historical migrations.
+
 See the :ref:`Django 3.1 release notes <deprecated-features-3.1>` for more
 details on these changes.
 

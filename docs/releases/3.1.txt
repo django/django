@@ -733,6 +733,9 @@ Miscellaneous
   same result can be achieved by passing aliases in a
   :class:`~django.db.models.expressions.RawSQL` instead beforehand.
 
+* The ``NullBooleanField`` model field is deprecated in favor of
+  ``BooleanField(null=True)``.
+
 .. _removed-features-3.1:
 
 Features removed in 3.1

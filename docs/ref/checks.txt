@@ -202,6 +202,8 @@ Model fields
   in historical migrations.
 * **fields.W902**: ``FloatRangeField`` is deprecated and will be removed in
   Django 3.1. *This check appeared in Django 2.2 and 3.0*.
+* **fields.W903**: ``NullBooleanField`` is deprecated. Support for it (except
+  in historical migrations) will be removed in Django 4.0.
 
 File fields
 ~~~~~~~~~~~

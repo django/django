@@ -181,6 +181,7 @@ def setup(verbosity, test_labels, parallel, start_at, start_after):
     settings.LOGGING = log_config
     settings.SILENCED_SYSTEM_CHECKS = [
         'fields.W342',  # ForeignKey(unique=True) -> OneToOneField
+        'fields.W903',  # NullBooleanField deprecated.
     ]
 
     # Load all the ALWAYS_INSTALLED_APPS.
