@@ -736,6 +736,9 @@ Miscellaneous
 * The ``NullBooleanField`` model field is deprecated in favor of
   ``BooleanField(null=True)``.
 
+* The form field ``NullBooleanField`` is deprecated in favor of
+  ``BooleanField(null=True)``.
+
 .. _removed-features-3.1:
 
 Features removed in 3.1

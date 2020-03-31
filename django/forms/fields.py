@@ -9,6 +9,7 @@ import operator
 import os
 import re
 import uuid
+import warnings
 from decimal import Decimal, DecimalException
 from io import BytesIO
 from urllib.parse import urlsplit, urlunsplit
@@ -26,6 +27,7 @@ from django.forms.widgets import (
 )
 from django.utils import formats
 from django.utils.dateparse import parse_datetime, parse_duration
+from django.utils.deprecation import RemovedInDjango40Warning
 from django.utils.duration import duration_string
 from django.utils.ipv6 import clean_ipv6_address
 from django.utils.regex_helper import _lazy_re_compile
@@ -708,20 +710,30 @@ class URLField(CharField):
 class BooleanField(Field):
     widget = CheckboxInput
 
+    def __init__(self, *args, null=False, widget=None, **kwargs):
+        self.null = null
+        if self.null and widget is None:
+            widget = NullBooleanSelect
+        super().__init__(*args, widget=widget, **kwargs)
+
     def to_python(self, value):
         """Return a Python boolean object."""
         # Explicitly check for the string 'False', which is what a hidden field
         # will submit for False. Also check for '0', since this is what
         # RadioSelect will provide. Because bool("True") == bool('1') == True,
         # we don't need to handle that explicitly.
-        if isinstance(value, str) and value.lower() in ('false', '0'):
+        if isinstance(value, str) and value.lower() in ('false', '0') or value is False:
             value = False
-        else:
+        elif not self.null:
             value = bool(value)
+        elif isinstance(value, str) and value.lower() in ('true', '1') or value is True:
+            value = True
+        else:
+            value = None
         return super().to_python(value)
 
     def validate(self, value):
-        if not value and self.required:
+        if not self.null and not value and self.required:
             raise ValidationError(self.error_messages['required'], code='required')
 
     def has_changed(self, initial, data):
@@ -738,6 +750,14 @@ class NullBooleanField(BooleanField):
     to None.
     """
     widget = NullBooleanSelect
+
+    def __init__(self, *args, **kwargs):
+        warnings.warn(
+            'The NullBooleanField is deprecated, BooleanField(null=True) '
+            'instead.',
+            RemovedInDjango40Warning, stacklevel=2,
+        )
+        super().__init__(*args, **kwargs)
 
     def to_python(self, value):
         """

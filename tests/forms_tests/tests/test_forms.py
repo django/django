@@ -19,7 +19,9 @@ from django.forms.utils import ErrorList
 from django.http import QueryDict
 from django.template import Context, Template
 from django.test import SimpleTestCase
+from django.test.utils import ignore_warnings
 from django.utils.datastructures import MultiValueDict
+from django.utils.deprecation import RemovedInDjango40Warning
 from django.utils.safestring import mark_safe
 
 
@@ -2372,6 +2374,7 @@ Password: <input type="password" name="password" required>
         p = Person(prefix='bar')
         self.assertEqual(p.prefix, 'bar')
 
+    @ignore_warnings(category=RemovedInDjango40Warning)
     def test_forms_with_null_boolean(self):
         # NullBooleanField is a bit of a special case because its presentation (widget)
         # is different than its data. This is handled transparently, though.
@@ -2803,6 +2806,7 @@ Good luck picking a username that doesn&#x27;t already exist.</p>
             '<input type="hidden" name="initial-field1" id="initial-id_field1"></td></tr>'
         )
 
+    @ignore_warnings(category=RemovedInDjango40Warning)
     def test_error_html_required_html_classes(self):
         class Person(Form):
             name = CharField()

@@ -49,9 +49,10 @@ class BooleanFieldTests(TestCase):
 
     def test_nullbooleanfield_formfield(self):
         f = models.BooleanField(null=True)
-        self.assertIsInstance(f.formfield(), forms.NullBooleanField)
+        self.assertIsInstance(f.formfield(), forms.BooleanField)
+        self.assertIsInstance(f.formfield().widget, forms.NullBooleanSelect)
         f = models.NullBooleanField()
-        self.assertIsInstance(f.formfield(), forms.NullBooleanField)
+        self.assertIsInstance(f.formfield(), forms.BooleanField)
 
     def test_return_type(self):
         b = BooleanModel.objects.create(bfield=True)

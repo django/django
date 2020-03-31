@@ -1,11 +1,22 @@
 from django.forms import Form, HiddenInput, NullBooleanField, RadioSelect
 from django.test import SimpleTestCase
+from django.test.utils import ignore_warnings
+from django.utils.deprecation import RemovedInDjango40Warning
 
 from . import FormFieldAssertionsMixin
 
 
 class NullBooleanFieldTest(FormFieldAssertionsMixin, SimpleTestCase):
 
+    def test_nullbooleanfield_deprecation_warning(self):
+        msg = (
+            "The NullBooleanField is deprecated, BooleanField(null=True) "
+            "instead."
+        )
+        with self.assertWarnsMessage(RemovedInDjango40Warning, msg):
+            NullBooleanField()
+
+    @ignore_warnings(category=RemovedInDjango40Warning)
     def test_nullbooleanfield_clean(self):
         f = NullBooleanField()
         self.assertIsNone(f.clean(''))
@@ -20,6 +31,7 @@ class NullBooleanFieldTest(FormFieldAssertionsMixin, SimpleTestCase):
         self.assertTrue(f.clean('true'))
         self.assertFalse(f.clean('false'))
 
+    @ignore_warnings(category=RemovedInDjango40Warning)
     def test_nullbooleanfield_2(self):
         # The internal value is preserved if using HiddenInput (#7753).
         class HiddenNullBooleanForm(Form):
@@ -32,6 +44,7 @@ class NullBooleanFieldTest(FormFieldAssertionsMixin, SimpleTestCase):
             str(f)
         )
 
+    @ignore_warnings(category=RemovedInDjango40Warning)
     def test_nullbooleanfield_3(self):
         class HiddenNullBooleanForm(Form):
             hidden_nullbool1 = NullBooleanField(widget=HiddenInput, initial=True)
@@ -41,6 +54,7 @@ class NullBooleanFieldTest(FormFieldAssertionsMixin, SimpleTestCase):
         self.assertTrue(f.cleaned_data['hidden_nullbool1'])
         self.assertFalse(f.cleaned_data['hidden_nullbool2'])
 
+    @ignore_warnings(category=RemovedInDjango40Warning)
     def test_nullbooleanfield_4(self):
         # Make sure we're compatible with MySQL, which uses 0 and 1 for its
         # boolean values (#9609).
@@ -56,6 +70,7 @@ class NullBooleanFieldTest(FormFieldAssertionsMixin, SimpleTestCase):
         self.assertFalse(f.cleaned_data['nullbool1'])
         self.assertIsNone(f.cleaned_data['nullbool2'])
 
+    @ignore_warnings(category=RemovedInDjango40Warning)
     def test_nullbooleanfield_changed(self):
         f = NullBooleanField()
         self.assertTrue(f.has_changed(False, None))

@@ -344,7 +344,7 @@ For each field, we describe the default widget used if you don't specify
 
 .. class:: BooleanField(**kwargs)
 
-    * Default widget: :class:`CheckboxInput`
+    * Default widget: :class:`CheckboxInput` if ``null=False`` else :class:`NullBooleanSelect`
     * Empty value: ``False``
     * Normalizes to: A Python ``True`` or ``False`` value.
     * Validates that the value is ``True`` (e.g. the check box is checked) if
@@ -857,6 +857,10 @@ For each field, we describe the default widget used if you don't specify
     * Empty value: ``None``
     * Normalizes to: A Python ``True``, ``False`` or ``None`` value.
     * Validates nothing (i.e., it never raises a ``ValidationError``).
+
+.. deprecated:: 3.1
+
+    ``NullBooleanField`` is deprecated in favor of ``BooleanField(null=True)``.
 
 ``RegexField``
 --------------
