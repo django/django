@@ -102,8 +102,8 @@ class MultiDBOperationTests(OperationTestBase):
             project_state = self.set_up_test_model(app_label)
 
         sql = """
-        INSERT INTO {0}_pony (pink, weight) VALUES (1, 3.55);
-        INSERT INTO {0}_pony (pink, weight) VALUES (3, 5.0);
+        INSERT INTO {0}_pony (id, pink, weight) VALUES (1, 1, 3.55);
+        INSERT INTO {0}_pony (id, pink, weight) VALUES (2, 3, 5.0);
         """.format(app_label)
 
         operation = migrations.RunSQL(sql, hints=hints or {})

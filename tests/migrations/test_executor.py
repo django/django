@@ -396,6 +396,19 @@ class ExecutorTests(MigrationTestBase):
         # table should cause detect_soft_applied() to return False.
         with connection.schema_editor() as editor:
             for table in tables[2:]:
+                class Model:
+                    pass
+
+                class Meta:
+                    db_table = table
+
+                model = Model()
+                model._meta = Meta()
+                # Spanner requires deleting a table's indexes before
+                # dropping the table.
+                index_names = editor._constraint_names(model, index=True, primary_key=False)
+                for index_name in index_names:
+                    editor.execute(editor._delete_index_sql(model, index_name))
                 editor.execute(editor.sql_delete_table % {"table": table})
         migration = executor.loader.get_migration("migrations", "0001_initial")
         self.assertIs(executor.detect_soft_applied(None, migration)[0], False)
