@@ -75,8 +75,8 @@ mention:
 
 * The response will automatically set the MIME type :mimetype:`application/pdf`
   based on the filename extension. This tells browsers that the document is a
-  PDF file, rather than an HTML file or a generic `application/octet-stream`
-  binary content.
+  PDF file, rather than an HTML file or a generic
+  :mimetype:`application/octet-stream` binary content.
 
 * When ``as_attachment=True`` is passed to ``FileResponse``, it sets the
   appropriate ``Content-Disposition`` header and that tells Web browsers to

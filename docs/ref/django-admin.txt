@@ -923,7 +923,7 @@ more robust change detection, and a reduction in power usage. Django supports
 
 .. versionchanged:: 2.2
 
-   Watchman support replaced support for `pyinotify`.
+   Watchman support replaced support for ``pyinotify``.
 
 When you start the server, and each time you change Python code while the
 server is running, the system check framework will check your entire Django

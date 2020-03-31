@@ -185,8 +185,8 @@ Minor features
 
 * PostGIS migrations can now change field dimensions.
 
-* Added the ability to pass the `size`, `shape`, and `offset` parameter when
-  creating :class:`~django.contrib.gis.gdal.GDALRaster` objects.
+* Added the ability to pass the ``size``, ``shape``, and ``offset`` parameters
+  when creating :class:`~django.contrib.gis.gdal.GDALRaster` objects.
 
 * Added SpatiaLite support for the
   :class:`~django.contrib.gis.db.models.functions.IsValid` function,
@@ -644,8 +644,8 @@ Server-side cursors on PostgreSQL
 ---------------------------------
 
 The change to make :meth:`.QuerySet.iterator()` use server-side cursors on
-PostgreSQL prevents running Django with `pgBouncer` in transaction pooling
-mode. To reallow that, use the :setting:`DISABLE_SERVER_SIDE_CURSORS
+PostgreSQL prevents running Django with pgBouncer in transaction pooling mode.
+To reallow that, use the :setting:`DISABLE_SERVER_SIDE_CURSORS
 <DATABASE-DISABLE_SERVER_SIDE_CURSORS>` setting (added in Django 1.11.1) in
 :setting:`DATABASES`.
 

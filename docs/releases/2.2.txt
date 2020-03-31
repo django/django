@@ -458,7 +458,7 @@ Miscellaneous
   :func:`~django.contrib.sitemaps.ping_google` function, set the new
   ``sitemap_uses_https`` argument to ``False``.
 
-* :djadmin:`runserver` no longer supports `pyinotify` (replaced by Watchman).
+* :djadmin:`runserver` no longer supports ``pyinotify`` (replaced by Watchman).
 
 * The :class:`~django.db.models.Avg`, :class:`~django.db.models.StdDev`, and
   :class:`~django.db.models.Variance` aggregate functions now return a

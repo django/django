@@ -104,7 +104,7 @@ See :ref:`postgresql-fts-search-configuration` for an explanation of the
 
 .. versionadded:: 2.2
 
-    The `search_type` parameter was added.
+    The ``search_type`` parameter was added.
 
 ``SearchRank``
 ==============

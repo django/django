@@ -634,9 +634,9 @@ Django 1.4 also includes several smaller improvements worth noting:
   :meth:`~django.db.models.query.QuerySet.distinct`.
 
 * The admin login page will add a password reset link if you include a URL with
-  the name `'admin_password_reset'` in your urls.py, so plugging in the built-in
-  password reset mechanism and making it available is now much easier. For
-  details, see :ref:`auth_password_reset`.
+  the name ``'admin_password_reset'`` in your urls.py, so plugging in the
+  built-in password reset mechanism and making it available is now much easier.
+  For details, see :ref:`auth_password_reset`.
 
 * The MySQL database backend can now make use of the savepoint feature
   implemented by MySQL version 5.0.3 or newer with the InnoDB storage engine.
@@ -671,9 +671,9 @@ vulnerabilities. No Django site should ever be run without a
 :setting:`SECRET_KEY`.
 
 In Django 1.4, starting Django with an empty :setting:`SECRET_KEY` will raise a
-`DeprecationWarning`. In Django 1.5, it will raise an exception and Django will
-refuse to start. This is slightly accelerated from the usual deprecation path
-due to the severity of the consequences of running Django with no
+``DeprecationWarning``. In Django 1.5, it will raise an exception and Django
+will refuse to start. This is slightly accelerated from the usual deprecation
+path due to the severity of the consequences of running Django with no
 :setting:`SECRET_KEY`.
 
 ``django.contrib.admin``
@@ -909,8 +909,8 @@ doesn't make any effort to synchronize access to the underlying backend.
 Concurrency behavior is defined by the underlying backend implementation.
 Check their documentation for details.
 
-`COMMENTS_BANNED_USERS_GROUP` setting
--------------------------------------
+``COMMENTS_BANNED_USERS_GROUP`` setting
+---------------------------------------
 
 Django's comments has historically
 supported excluding the comments of a special user group, but we've never
@@ -946,8 +946,8 @@ Save this model manager in your custom comment app (e.g., in
 
         objects = BanningCommentManager()
 
-`IGNORABLE_404_STARTS` and `IGNORABLE_404_ENDS` settings
---------------------------------------------------------
+``IGNORABLE_404_STARTS`` and ``IGNORABLE_404_ENDS`` settings
+------------------------------------------------------------
 
 Until Django 1.3, it was possible to exclude some URLs from Django's
 :doc:`404 error reporting</howto/error-reporting>` by adding prefixes to
@@ -1294,8 +1294,8 @@ Now, the flags are keyword arguments of :meth:`@register.filter
 
 See :ref:`filters and auto-escaping <filters-auto-escaping>` for more information.
 
-Wildcard expansion of application names in `INSTALLED_APPS`
------------------------------------------------------------
+Wildcard expansion of application names in ``INSTALLED_APPS``
+-------------------------------------------------------------
 
 Until Django 1.3, :setting:`INSTALLED_APPS` accepted wildcards in application
 names, like ``django.contrib.*``. The expansion was performed by a

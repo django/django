@@ -753,10 +753,10 @@ in :doc:`/howto/custom-management-commands`.
 Custom test management command arguments through test runner
 ------------------------------------------------------------
 
-The method to add custom arguments to the `test` management command through the
-test runner has changed. Previously, you could provide an `option_list` class
-variable on the test runner to add more arguments (à la :py:mod:`optparse`).
-Now to implement the same behavior, you have to create an
+The method to add custom arguments to the ``test`` management command through
+the test runner has changed. Previously, you could provide an ``option_list``
+class variable on the test runner to add more arguments (à la
+:py:mod:`optparse`). Now to implement the same behavior, you have to create an
 ``add_arguments(cls, parser)`` class method on the test runner and call
 ``parser.add_argument`` to add any custom arguments, as parser is now an
 :py:class:`argparse.ArgumentParser` instance.
