@@ -248,6 +248,11 @@ File Storage
 
 * ``FileSystemStorage.save()`` method now supports :class:`pathlib.Path`.
 
+* :class:`~django.db.models.FileField` and
+  :class:`~django.db.models.ImageField` now accept a callable for ``storage``.
+  This allows you to modify the used storage at runtime, selecting different
+  storages for different environments, for example.
+
 File Uploads
 ~~~~~~~~~~~~
 
