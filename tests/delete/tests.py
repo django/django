@@ -268,6 +268,15 @@ class OnDeleteTests(TestCase):
 
 @skipUnlessDBFeature("supports_foreign_keys")
 class OnDeleteDbTests(TransactionTestCase):
+    
+    available_apps = [
+        'django.contrib.admin',
+        'django.contrib.auth',
+        'django.contrib.contenttypes',
+        'django.contrib.sessions',
+        'django.contrib.sites',
+        'delete',
+    ]
 
     def test_db_cascade(self):
         a = BaseDbCascade.objects.create()
