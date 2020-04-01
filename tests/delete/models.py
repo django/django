@@ -55,7 +55,6 @@ class A(models.Model):
     )
     cascade = models.ForeignKey(R, models.CASCADE, related_name='cascade_set')
     cascade_nullable = models.ForeignKey(R, models.CASCADE, null=True, related_name='cascade_nullable_set')
-    db_cascade = models.ForeignKey(R, models.DB_CASCADE, related_name='db_cascade_set')
     protect = models.ForeignKey(R, models.PROTECT, null=True, related_name='protect_set')
     restrict = models.ForeignKey(R, models.RESTRICT, null=True, related_name='restrict_set')
     donothing = models.ForeignKey(R, models.DO_NOTHING, null=True, related_name='donothing_set')
@@ -77,7 +76,7 @@ def create_a(name):
     a = A(name=name)
     for name in ('auto', 'auto_nullable', 'setvalue', 'setnull', 'setdefault',
                  'setdefault_none', 'cascade', 'cascade_nullable', 'protect',
-                 'restrict', 'db_cascade', 'donothing', 'o2o_setnull'):
+                 'restrict', 'donothing', 'o2o_setnull'):
         r = R.objects.create()
         setattr(a, name, r)
     a.child = RChild.objects.create()
@@ -170,7 +169,11 @@ class BaseDbCascade(models.Model):
 
 
 class RelToBaseDbCascade(models.Model):
-    base = models.ForeignKey(BaseDbCascade, models.DB_CASCADE)
+    name = models.CharField(max_length=30)
+
+    db_cascade = models.ForeignKey(BaseDbCascade, models.DB_CASCADE, null=True, related_name='db_cascade_set')
+    db_set_null = models.ForeignKey(BaseDbCascade, models.DB_SET_NULL, null=True, related_name='db_set_null_set')
+    db_restrict = models.ForeignKey(BaseDbCascade, models.DB_RESTRICT, null=True, related_name='db_restrict_set')
 
 
 class DeleteTop(models.Model):

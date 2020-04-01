@@ -1,6 +1,6 @@
 from math import ceil
 
-from django.db import connection, models
+from django.db import IntegrityError, connection, models
 from django.db.models import ProtectedError, RestrictedError
 from django.db.models.deletion import Collector
 from django.db.models.sql.constants import GET_ITERATOR_CHUNK_SIZE
@@ -9,8 +9,9 @@ from django.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
 from .models import (
     B1, B2, B3, MR, A, Avatar, Base, BaseDbCascade, Child, DeleteBottom,
     DeleteTop, GenericB1, GenericB2, GenericDeleteBottom, HiddenUser,
-    HiddenUserProfile, M, M2MFrom, M2MTo, MRNull, Origin, P, Parent, R, RChild,
-    RChildChild, Referrer, S, T, User, create_a, get_default_r,
+    HiddenUserProfile, M, M2MFrom, M2MTo, MRNull, Origin, P, Parent, R,
+    RChild, RChildChild, Referrer, RelToBaseDbCascade, S, T, User, create_a,
+    get_default_r,
 )
 
 
@@ -124,23 +125,6 @@ class OnDeleteTests(TestCase):
             # RelToBase should not be queried.
             b.delete()
         self.assertEqual(Base.objects.count(), 0)
-
-    @skipUnlessDBFeature("supports_foreign_keys")
-    def test_db_cascade(self):
-        a = create_a('db_cascade')
-        a.db_cascade.delete()
-        self.assertFalse(A.objects.filter(name='db_cascade').exists())
-
-    @skipUnlessDBFeature("supports_foreign_keys")
-    def test_db_cascade_qscount(self):
-        """
-        A models.DB_CASCADE relation doesn't trigger a query
-        """
-        b = BaseDbCascade.objects.create()
-        with self.assertNumQueries(1):
-            # RelToBaseDbCascade should not be queried.
-            b.delete()
-        self.assertEqual(BaseDbCascade.objects.count(), 0)
 
     def test_inheritance_cascade_up(self):
         child = RChild.objects.create()
@@ -278,6 +262,105 @@ class OnDeleteTests(TestCase):
         self.assertFalse(GenericB1.objects.exists())
         self.assertFalse(GenericB2.objects.exists())
         self.assertFalse(GenericDeleteBottom.objects.exists())
+
+
+@skipUnlessDBFeature("supports_foreign_keys")
+class OnDeleteDbTests(TestCase):
+    
+    def test_db_cascade(self):
+        a = BaseDbCascade.objects.create()
+        b = RelToBaseDbCascade.objects.create(
+            name='db_cascade',
+            db_cascade=a
+        )
+        b.db_cascade.delete()
+        # RelToBaseDbCascade is cascade deleted
+        self.assertFalse(
+            RelToBaseDbCascade.objects.filter(name="db_cascade").exists()
+        )
+
+    def test_db_cascade_qscount(self):
+        """
+        A models.DB_CASCADE relation doesn't trigger a query
+        """
+        a = BaseDbCascade.objects.create()
+        b = RelToBaseDbCascade.objects.create(
+            name='db_cascade',
+            db_cascade=a
+        )
+        # RelToBaseDbCascade should not be queried.
+        with self.assertNumQueries(1):
+            a.delete()
+        self.assertEqual(BaseDbCascade.objects.count(), 0)
+        self.assertEqual(RelToBaseDbCascade.objects.count(), 0)
+
+    def test_db_set_null(self):
+        a = BaseDbCascade.objects.create()
+        b = RelToBaseDbCascade.objects.create(
+            name='db_set_null',
+            db_set_null=a
+        )
+        a.db_set_null.delete()
+        # RelToBaseDbCascade is not deleted
+        # RelToBaseDbCascade.db_set_null is set to null
+        self.assertTrue(
+            RelToBaseDbCascade.objects.filter(name='db_set_null').exists()
+        )
+        self.assertEqual(
+            RelToBaseDbCascade.objects.get(name='db_set_null').db_set_null,
+            None
+        )
+
+    def test_set_null_qscount(self):
+        """
+        A models.DB_SET_NULL relation doesn't trigger a query
+        """
+        a = BaseDbCascade.objects.create()
+        b = RelToBaseDbCascade.objects.create(
+            name='db_set_null',
+            db_set_null=a
+        )
+        # RelToBaseDbCascade should not be queried.
+        with self.assertNumQueries(1):
+            a.delete()
+        self.assertEqual(BaseDbCascade.objects.count(), 0)
+        self.assertEqual(RelToBaseDbCascade.objects.count(), 1)
+
+    def test_db_restrict(self):
+        a = BaseDbCascade.objects.create()
+        b = RelToBaseDbCascade.objects.create(
+            name='db_restrict',
+            db_restrict=a
+        )
+        # RelToBaseDbCascade is not deleted.
+        with self.assertRaises(IntegrityError):
+            a.db_restrict.delete()
+        self.assertTrue(
+            RelToBaseDbCascade.objects.filter(name='db_restrict').exists()
+        )
+        # BaseDbCascade is also not deleted.
+        self.assertTrue(
+            RelToBaseDbCascade.objects.get(
+                name='db_restrict'
+            ).db_restrict != None
+        )
+
+    def test_db_restrict_qscount(self):
+        """
+        A models.DB_RESTRICT relation doesn't trigger a query
+        """
+        a = BaseDbCascade.objects.create()
+        b = RelToBaseDbCascade.objects.create(
+            name='db_restrict',
+            db_restrict=a
+        )
+        # RelToBaseDbCascade should not be queried.
+        with self.assertNumQueries(1):
+            # RelToBaseDbCascade should not be deleted.
+            with self.assertRaises(IntegrityError):
+                a.delete()
+        self.assertEqual(BaseDbCascade.objects.count(), 1)
+        self.assertEqual(RelToBaseDbCascade.objects.count(), 1)
 
 
 class DeletionTests(TestCase):
