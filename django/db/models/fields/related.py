@@ -872,7 +872,7 @@ class ForeignKey(ForeignObject):
                     'declaring a GenericForeignKey.',
                     hint='Change the on_delete rule.',
                     obj=self,
-                    id='fields.W345'
+                    id='fields.W346'
                 )
             ]
         elif on_delete == DB_CASCADE and len(
@@ -885,7 +885,7 @@ class ForeignKey(ForeignObject):
                     'inherited model.',
                     hint='Change the on_delete rule.',
                     obj=self,
-                    id='fields.W344'
+                    id='fields.W345'
                 )
             ]
         elif on_delete == DB_CASCADE and (
@@ -906,7 +906,7 @@ class ForeignKey(ForeignObject):
                     'relations point to models using DB_CASCADE or '
                     'DO_NOTHING relations.',
                     obj=self,
-                    id='fields.W346'
+                    id='fields.W347'
                 )
             ]
         else:

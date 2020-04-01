@@ -510,7 +510,7 @@ class RelativeFieldTests(SimpleTestCase):
                 'inherited model.',
                 hint='Change the on_delete rule.',
                 obj=field,
-                id='fields.W344'
+                id='fields.W345'
             )
         ])
 
@@ -534,7 +534,7 @@ class RelativeFieldTests(SimpleTestCase):
                 'relations point to models using DB_CASCADE or '
                 'DO_NOTHING relations.',
                 obj=field,
-                id='fields.W346'
+                id='fields.W347'
             )
         ])
 
@@ -890,7 +890,7 @@ class ContentTypeFieldTests(SimpleTestCase):
                 'declaring a GenericForeignKey.',
                 hint='Change the on_delete rule.',
                 obj=field,
-                id='fields.W345'
+                id='fields.W346'
             )
         ])
 
