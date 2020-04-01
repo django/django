@@ -5,7 +5,7 @@ from django.db.models import ProtectedError, RestrictedError
 from django.db.models.deletion import Collector
 from django.db.models.sql.constants import GET_ITERATOR_CHUNK_SIZE
 from django.test import (
-    TestCase, TransactionTestCase, skipIfDBFeature, skipUnlessDBFeature
+    TestCase, TransactionTestCase, skipIfDBFeature, skipUnlessDBFeature,
 )
 
 from .models import (
