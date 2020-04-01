@@ -329,8 +329,8 @@ class BasicExpressionsTests(TestCase):
             Employee.objects.filter(lastname__startswith=F('firstname')),
             [e2, e3] if connection.features.has_case_insensitive_like else [e2]
         )
-        qs = Employee.objects.filter(lastname__istartswith=F('firstname')).order_by('pk')
-        self.assertSequenceEqual(qs, [e2, e3])
+        qs = Employee.objects.filter(lastname__istartswith=F('firstname'))
+        self.assertCountEqual(qs, [e2, e3])
 
     def test_ticket_18375_join_reuse(self):
         # Reverse multijoin F() references and the lookup target the same join.
