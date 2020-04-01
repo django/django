@@ -360,8 +360,6 @@ class OnDeleteDbTests(TestCase):
             # RelToBaseDbCascade should not be deleted.
             with self.assertRaises(IntegrityError):
                 b.db_restrict.delete()
-        self.assertEqual(BaseDbCascade.objects.count(), 1)
-        self.assertEqual(RelToBaseDbCascade.objects.count(), 1)
 
 
 class DeletionTests(TestCase):
