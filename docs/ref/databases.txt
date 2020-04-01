@@ -206,7 +206,7 @@ cursor query is controlled with the `cursor_tuple_fraction`_ option.
 Transaction pooling and server-side cursors
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Using a connection pooler in transaction pooling mode (e.g. `pgBouncer`_)
+Using a connection pooler in transaction pooling mode (e.g. `PgBouncer`_)
 requires disabling server-side cursors for that connection.
 
 Server-side cursors are local to a connection and remain open at the end of a
@@ -232,7 +232,7 @@ Another option is to wrap each ``QuerySet`` using server-side cursors in an
 for the duration of the transaction. This way, the server-side cursor will only
 live for the duration of the transaction.
 
-.. _pgBouncer: https://pgbouncer.github.io/
+.. _PgBouncer: https://pgbouncer.github.io/
 
 .. _manually-specified-autoincrement-pk:
 
