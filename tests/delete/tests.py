@@ -1,12 +1,10 @@
 from math import ceil
 
-from django.db import IntegrityError, connection, models
+from django.db import IntegrityError, connection, models, transaction
 from django.db.models import ProtectedError, RestrictedError
 from django.db.models.deletion import Collector
 from django.db.models.sql.constants import GET_ITERATOR_CHUNK_SIZE
-from django.test import (
-    TestCase, TransactionTestCase, skipIfDBFeature, skipUnlessDBFeature,
-)
+from django.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
 
 from .models import (
     B1, B2, B3, MR, A, Avatar, B, Base, BaseDbCascade, Child, DeleteBottom,
@@ -267,11 +265,7 @@ class OnDeleteTests(TestCase):
 
 
 @skipUnlessDBFeature("supports_foreign_keys")
-class OnDeleteDbTests(TransactionTestCase):
-
-    available_apps = [
-        'delete',
-    ]
+class OnDeleteDbTests(TestCase):
 
     def test_db_cascade(self):
         a = BaseDbCascade.objects.create()
@@ -340,7 +334,8 @@ class OnDeleteDbTests(TransactionTestCase):
         )
         # Deletion is prevented.
         with self.assertRaises(IntegrityError):
-            b.db_restrict.delete()
+            with transaction.atomic():
+                b.db_restrict.delete()
         # RelToBaseDbCascade is not deleted.
         self.assertTrue(
             RelToBaseDbCascade.objects.filter(name='db_restrict').exists()
@@ -365,7 +360,8 @@ class OnDeleteDbTests(TransactionTestCase):
         with self.assertNumQueries(1):
             # RelToBaseDbCascade should not be deleted.
             with self.assertRaises(IntegrityError):
-                b.db_restrict.delete()
+                with transaction.atomic():
+                    b.db_restrict.delete()
 
 
 class DeletionTests(TestCase):
