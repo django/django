@@ -270,11 +270,6 @@ class OnDeleteTests(TestCase):
 class OnDeleteDbTests(TransactionTestCase):
 
     available_apps = [
-        'django.contrib.admin',
-        'django.contrib.auth',
-        'django.contrib.contenttypes',
-        'django.contrib.sessions',
-        'django.contrib.sites',
         'delete',
     ]
 
@@ -285,12 +280,16 @@ class OnDeleteDbTests(TransactionTestCase):
             db_cascade=a
         )
         b.db_cascade.delete()
+        # BaseDbCascade is deleted
+        self.assertFalse(
+            BaseDbCascade.objects.filter(pk=a.pk).exists()
+        )
         # RelToBaseDbCascade is cascade deleted
         self.assertFalse(
             RelToBaseDbCascade.objects.filter(name="db_cascade").exists()
         )
 
-    def test_db_cascade_qscount(self):
+    def test_db_cascade_query_count(self):
         """
         A models.DB_CASCADE relation doesn't trigger a query
         """
@@ -302,8 +301,6 @@ class OnDeleteDbTests(TransactionTestCase):
         # RelToBaseDbCascade should not be queried.
         with self.assertNumQueries(1):
             b.db_cascade.delete()
-        self.assertEqual(BaseDbCascade.objects.count(), 0)
-        self.assertEqual(RelToBaseDbCascade.objects.count(), 0)
 
     def test_db_set_null(self):
         a = BaseDbCascade.objects.create()
@@ -322,7 +319,7 @@ class OnDeleteDbTests(TransactionTestCase):
             None
         )
 
-    def test_set_null_qscount(self):
+    def test_set_null_query_count(self):
         """
         A models.DB_SET_NULL relation doesn't trigger a query
         """
@@ -334,8 +331,6 @@ class OnDeleteDbTests(TransactionTestCase):
         # RelToBaseDbCascade should not be queried.
         with self.assertNumQueries(1):
             b.db_set_null.delete()
-        self.assertEqual(BaseDbCascade.objects.count(), 0)
-        self.assertEqual(RelToBaseDbCascade.objects.count(), 1)
 
     def test_db_restrict(self):
         a = BaseDbCascade.objects.create()
@@ -357,7 +352,7 @@ class OnDeleteDbTests(TransactionTestCase):
             ).db_restrict is not None
         )
 
-    def test_db_restrict_qscount(self):
+    def test_db_restrict_query_count(self):
         """
         A models.DB_RESTRICT relation doesn't trigger a query
         """
