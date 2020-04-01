@@ -210,24 +210,6 @@ class MigrationExecutor:
 
         return state
 
-    def collect_sql(self, plan):
-        """
-        Take a migration plan and return a list of collected SQL statements
-        that represent the best-efforts version of that plan.
-        """
-        statements = []
-        state = None
-        for migration, backwards in plan:
-            with self.connection.schema_editor(collect_sql=True, atomic=migration.atomic) as schema_editor:
-                if state is None:
-                    state = self.loader.project_state((migration.app_label, migration.name), at_end=False)
-                if not backwards:
-                    state = migration.apply(state, schema_editor, collect_sql=True)
-                else:
-                    state = migration.unapply(state, schema_editor, collect_sql=True)
-            statements.extend(schema_editor.collected_sql)
-        return statements
-
     def apply_migration(self, state, migration, fake=False, fake_initial=False):
         """Run a migration forwards."""
         migration_recorded = False
@@ -372,10 +354,8 @@ class MigrationExecutor:
                     else:
                         found_add_field_migration = True
                         continue
-                columns = self.connection.introspection.get_table_description(
-                    self.connection.cursor(),
-                    table,
-                )
+                with self.connection.cursor() as cursor:
+                    columns = self.connection.introspection.get_table_description(cursor, table)
                 for column in columns:
                     field_column = field.column
                     column_name = column.name

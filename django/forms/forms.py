@@ -191,7 +191,8 @@ class BaseForm:
 
     def _html_output(self, normal_row, error_row, row_ender, help_text_html, errors_on_separate_row):
         "Output HTML. Used by as_table(), as_ul(), as_p()."
-        top_errors = self.non_field_errors()  # Errors that should be displayed above all fields.
+        # Errors that should be displayed above all fields.
+        top_errors = self.non_field_errors().copy()
         output, hidden_fields = [], []
 
         for name, field in self.fields.items():

@@ -165,8 +165,8 @@ Additional Resources:
 
 __ https://en.wikipedia.org/wiki/Geodesy
 __ https://en.wikipedia.org/wiki/Great_circle
-__ http://www.spatialreference.org/ref/epsg/2796/
-__ http://spatialreference.org/
+__ https://www.spatialreference.org/ref/epsg/2796/
+__ https://spatialreference.org/
 __ https://web.archive.org/web/20080302095452/http://welcome.warnercnr.colostate.edu/class_info/nr502/lg3/datums_coordinates/spcs.html
 
 ``spatial_index``

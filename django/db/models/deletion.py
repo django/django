@@ -305,6 +305,7 @@ class Collector:
         if keep_parents:
             parents = set(model._meta.get_parent_list())
         model_fast_deletes = defaultdict(list)
+        protected_objects = defaultdict(list)
         for related in get_candidate_relations_to_delete(model._meta):
             # Preserve parent reverse relationships if keep_parents=True.
             if keep_parents and related.model in parents:
@@ -332,7 +333,20 @@ class Collector:
                     ))
                     sub_objs = sub_objs.only(*tuple(referenced_fields))
                 if sub_objs:
-                    field.remote_field.on_delete(self, field, sub_objs, self.using)
+                    try:
+                        field.remote_field.on_delete(self, field, sub_objs, self.using)
+                    except ProtectedError as error:
+                        key = "'%s.%s'" % (field.model.__name__, field.name)
+                        protected_objects[key] += error.protected_objects
+        if protected_objects:
+            raise ProtectedError(
+                'Cannot delete some instances of model %r because they are '
+                'referenced through protected foreign keys: %s.' % (
+                    model.__name__,
+                    ', '.join(protected_objects),
+                ),
+                chain.from_iterable(protected_objects.values()),
+            )
         for related_model, related_fields in model_fast_deletes.items():
             batches = self.get_del_batches(new_objs, related_fields)
             for batch in batches:
@@ -347,23 +361,27 @@ class Collector:
         if fail_on_restricted:
             # Raise an error if collected restricted objects (RESTRICT) aren't
             # candidates for deletion also collected via CASCADE.
-            for model, instances in self.data.items():
-                self.clear_restricted_objects_from_set(model, instances)
+            for related_model, instances in self.data.items():
+                self.clear_restricted_objects_from_set(related_model, instances)
             for qs in self.fast_deletes:
                 self.clear_restricted_objects_from_queryset(qs.model, qs)
-            for model, fields in self.restricted_objects.items():
-                for field, objs in fields.items():
-                    for obj in objs:
-                        raise RestrictedError(
-                            "Cannot delete some instances of model '%s' "
-                            "because they are referenced through a restricted "
-                            "foreign key: '%s.%s'." % (
-                                field.remote_field.model.__name__,
-                                obj.__class__.__name__,
-                                field.name,
-                            ),
-                            objs,
-                        )
+            if self.restricted_objects.values():
+                restricted_objects = defaultdict(list)
+                for related_model, fields in self.restricted_objects.items():
+                    for field, objs in fields.items():
+                        if objs:
+                            key = "'%s.%s'" % (related_model.__name__, field.name)
+                            restricted_objects[key] += objs
+                if restricted_objects:
+                    raise RestrictedError(
+                        'Cannot delete some instances of model %r because '
+                        'they are referenced through restricted foreign keys: '
+                        '%s.' % (
+                            model.__name__,
+                            ', '.join(restricted_objects),
+                        ),
+                        chain.from_iterable(restricted_objects.values()),
+                    )
 
     def related_objects(self, related_model, related_fields, objs):
         """

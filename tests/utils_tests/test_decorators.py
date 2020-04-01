@@ -6,6 +6,9 @@ from django.utils.decorators import decorator_from_middleware
 
 
 class ProcessViewMiddleware:
+    def __init__(self, get_response):
+        self.get_response = get_response
+
     def process_view(self, request, view_func, view_args, view_kwargs):
         pass
 
@@ -27,6 +30,9 @@ class_process_view = process_view_dec(ClassProcessView())
 
 
 class FullMiddleware:
+    def __init__(self, get_response):
+        self.get_response = get_response
+
     def process_request(self, request):
         request.process_request_reached = True
 

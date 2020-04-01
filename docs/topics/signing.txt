@@ -53,6 +53,15 @@ You can retrieve the original value using the ``unsign`` method::
     >>> original
     'My string'
 
+If you pass a non-string value to ``sign``, the value will be forced to string
+before being signed, and the ``unsign`` result will give you that string
+value::
+
+    >>> signed = signer.sign(2.5)
+    >>> original = signer.unsign(signed)
+    >>> original
+    '2.5'
+
 If the signature or value have been altered in any way, a
 ``django.core.signing.BadSignature`` exception will be raised::
 

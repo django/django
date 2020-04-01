@@ -2,7 +2,6 @@ from unittest import mock
 
 from django.conf import settings
 from django.db import connection, models
-from django.db.models.query_utils import Q
 from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
 from django.test.utils import isolate_apps
 
@@ -17,7 +16,7 @@ class SimpleIndexesTests(SimpleTestCase):
     def test_repr(self):
         index = models.Index(fields=['title'])
         multi_col_index = models.Index(fields=['title', 'author'])
-        partial_index = models.Index(fields=['title'], name='long_books_idx', condition=Q(pages__gt=400))
+        partial_index = models.Index(fields=['title'], name='long_books_idx', condition=models.Q(pages__gt=400))
         self.assertEqual(repr(index), "<Index: fields='title'>")
         self.assertEqual(repr(multi_col_index), "<Index: fields='title, author'>")
         self.assertEqual(repr(partial_index), "<Index: fields='title', condition=(AND: ('pages__gt', 400))>")
@@ -60,7 +59,7 @@ class SimpleIndexesTests(SimpleTestCase):
 
     def test_condition_requires_index_name(self):
         with self.assertRaisesMessage(ValueError, 'An index must be named to use condition.'):
-            models.Index(condition=Q(pages__gt=400))
+            models.Index(condition=models.Q(pages__gt=400))
 
     def test_condition_must_be_q(self):
         with self.assertRaisesMessage(ValueError, 'Index.condition must be a Q instance.'):
@@ -114,7 +113,7 @@ class SimpleIndexesTests(SimpleTestCase):
         index = models.Index(
             name='big_book_index',
             fields=['title'],
-            condition=Q(pages__gt=400),
+            condition=models.Q(pages__gt=400),
         )
         index.set_name_with_model(Book)
         path, args, kwargs = index.deconstruct()
@@ -125,7 +124,7 @@ class SimpleIndexesTests(SimpleTestCase):
             {
                 'fields': ['title'],
                 'name': 'model_index_title_196f42_idx',
-                'condition': Q(pages__gt=400),
+                'condition': models.Q(pages__gt=400),
             }
         )
 

@@ -80,7 +80,7 @@ def gdal_version():
 
 def gdal_full_version():
     "Return the full GDAL version information."
-    return _version_info('')
+    return _version_info(b'')
 
 
 version_regex = _lazy_re_compile(r'^(?P<major>\d+)\.(?P<minor>\d+)(\.(?P<subminor>\d+))?')

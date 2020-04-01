@@ -498,7 +498,7 @@ Examples (those after the first will only work on PostgreSQL)::
 
     ...wouldn't work because the query would be ordered by ``blog__name`` thus
     mismatching the ``DISTINCT ON`` expression. You'd have to explicitly order
-    by the relation `_id` field (``blog_id`` in this case) or the referenced
+    by the relation ``_id`` field (``blog_id`` in this case) or the referenced
     one (``blog__pk``) to make sure both expressions match.
 
 ``values()``
@@ -759,7 +759,7 @@ Examples::
 ``datetimes()``
 ~~~~~~~~~~~~~~~
 
-.. method:: datetimes(field_name, kind, order='ASC', tzinfo=None)
+.. method:: datetimes(field_name, kind, order='ASC', tzinfo=None, is_dst=None)
 
 Returns a ``QuerySet`` that evaluates to a list of :class:`datetime.datetime`
 objects representing all available dates of a particular kind within the
@@ -780,6 +780,14 @@ on the time zone in use. This parameter must be a :class:`datetime.tzinfo`
 object. If it's ``None``, Django uses the :ref:`current time zone
 <default-current-time-zone>`. It has no effect when :setting:`USE_TZ` is
 ``False``.
+
+``is_dst`` indicates whether or not ``pytz`` should interpret nonexistent and
+ambiguous datetimes in daylight saving time. By default (when ``is_dst=None``),
+``pytz`` raises an exception for such datetimes.
+
+.. versionadded:: 3.1
+
+    The ``is_dst`` parameter was added.
 
 .. _database-time-zone-definitions:
 
@@ -2070,9 +2078,9 @@ This has a number of caveats though:
 * The model's ``save()`` method will not be called, and the ``pre_save`` and
   ``post_save`` signals will not be sent.
 * It does not work with child models in a multi-table inheritance scenario.
-* If the model's primary key is an :class:`~django.db.models.AutoField` it
-  does not retrieve and set the primary key attribute, as ``save()`` does,
-  unless the database backend supports it (currently PostgreSQL).
+* If the model's primary key is an :class:`~django.db.models.AutoField`, the
+  primary key attribute can only be retrieved on certain databases (currently
+  PostgreSQL and MariaDB 10.5+). On other databases, it will not be set.
 * It does not work with many-to-many relationships.
 * It casts ``objs`` to a list, which fully evaluates ``objs`` if it's a
   generator. The cast allows inspecting all objects so that any objects with a
@@ -2099,6 +2107,12 @@ parameter to ``True`` tells the database to ignore failure to insert any rows
 that fail constraints such as duplicate unique values. Enabling this parameter
 disables setting the primary key on each model instance (if the database
 normally supports it).
+
+Returns ``objs`` as cast to a list, in the same order as provided.
+
+.. versionchanged:: 3.1
+
+    Support for the fetching primary key attributes on MariaDB 10.5+ was added.
 
 ``bulk_update()``
 ~~~~~~~~~~~~~~~~~

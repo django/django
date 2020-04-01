@@ -630,10 +630,10 @@ class DiscoverRunner:
             'buffer': self.buffer,
         }
 
-    def run_checks(self):
+    def run_checks(self, databases):
         # Checks are run after database creation since some checks require
         # database access.
-        call_command('check', verbosity=self.verbosity)
+        call_command('check', verbosity=self.verbosity, databases=databases)
 
     def run_suite(self, suite, **kwargs):
         kwargs = self.get_test_runner_kwargs()
@@ -695,7 +695,7 @@ class DiscoverRunner:
         old_config = self.setup_databases(aliases=databases)
         run_failed = False
         try:
-            self.run_checks()
+            self.run_checks(databases)
             result = self.run_suite(suite)
         except Exception:
             run_failed = True

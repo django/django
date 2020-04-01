@@ -466,7 +466,7 @@ class XFrameOptionsDecoratorsTests(TestCase):
 
         # Since the real purpose of the exempt decorator is to suppress
         # the middleware's functionality, let's make sure it actually works...
-        r = XFrameOptionsMiddleware().process_response(req, resp)
+        r = XFrameOptionsMiddleware(a_view)(req)
         self.assertIsNone(r.get('X-Frame-Options', None))
 
 

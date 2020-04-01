@@ -379,7 +379,7 @@ Now you're ready to actually put the release out there. To do this:
    message body should include the vulnerability details, for example, the
    announcement blog post text. Include a link to the announcement blog post.
 
-#. Add a link to the blog post in the topic of the `#django` IRC channel:
+#. Add a link to the blog post in the topic of the ``#django`` IRC channel:
    ``/msg chanserv TOPIC #django new topic goes here``.
 
 Post-release

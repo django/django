@@ -308,6 +308,15 @@ class DiscoverRunnerGetDatabasesTests(SimpleTestCase):
             databases = self.runner.get_databases(suite)
         return databases, stdout.getvalue()
 
+    def assertSkippedDatabases(self, test_labels, expected_databases):
+        databases, output = self.get_databases(test_labels)
+        self.assertEqual(databases, expected_databases)
+        skipped_databases = set(connections) - expected_databases
+        if skipped_databases:
+            self.assertIn(self.skip_msg + ', '.join(sorted(skipped_databases)), output)
+        else:
+            self.assertNotIn(self.skip_msg, output)
+
     def test_mixed(self):
         databases, output = self.get_databases(['test_runner_apps.databases.tests'])
         self.assertEqual(databases, set(connections))
@@ -319,24 +328,22 @@ class DiscoverRunnerGetDatabasesTests(SimpleTestCase):
         self.assertNotIn(self.skip_msg, output)
 
     def test_default_and_other(self):
-        databases, output = self.get_databases([
+        self.assertSkippedDatabases([
             'test_runner_apps.databases.tests.DefaultDatabaseTests',
             'test_runner_apps.databases.tests.OtherDatabaseTests',
-        ])
-        self.assertEqual(databases, set(connections))
-        self.assertNotIn(self.skip_msg, output)
+        ], {'default', 'other'})
 
     def test_default_only(self):
-        databases, output = self.get_databases(['test_runner_apps.databases.tests.DefaultDatabaseTests'])
-        self.assertEqual(databases, {'default'})
-        self.assertIn(self.skip_msg + 'other', output)
+        self.assertSkippedDatabases([
+            'test_runner_apps.databases.tests.DefaultDatabaseTests',
+        ], {'default'})
 
     def test_other_only(self):
-        databases, output = self.get_databases(['test_runner_apps.databases.tests.OtherDatabaseTests'])
-        self.assertEqual(databases, {'other'})
-        self.assertIn(self.skip_msg + 'default', output)
+        self.assertSkippedDatabases([
+            'test_runner_apps.databases.tests.OtherDatabaseTests'
+        ], {'other'})
 
     def test_no_databases_required(self):
-        databases, output = self.get_databases(['test_runner_apps.databases.tests.NoDatabaseTests'])
-        self.assertEqual(databases, set())
-        self.assertIn(self.skip_msg + 'default, other', output)
+        self.assertSkippedDatabases([
+            'test_runner_apps.databases.tests.NoDatabaseTests'
+        ], set())

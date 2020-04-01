@@ -37,7 +37,7 @@ connection. It can be set independently for each database.
 
 The default value is ``0``, preserving the historical behavior of closing the
 database connection at the end of each request. To enable persistent
-connections, set :setting:`CONN_MAX_AGE` to a positive number of seconds. For
+connections, set :setting:`CONN_MAX_AGE` to a positive integer of seconds. For
 unlimited persistent connections, set it to ``None``.
 
 Connection management
@@ -106,7 +106,7 @@ PostgreSQL notes
 Django supports PostgreSQL 9.5 and higher. `psycopg2`_ 2.5.4 or higher is
 required, though the latest release is recommended.
 
-.. _psycopg2: http://initd.org/psycopg/
+.. _psycopg2: https://www.psycopg.org/
 
 PostgreSQL connection settings
 -------------------------------
@@ -206,7 +206,7 @@ cursor query is controlled with the `cursor_tuple_fraction`_ option.
 Transaction pooling and server-side cursors
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Using a connection pooler in transaction pooling mode (e.g. `pgBouncer`_)
+Using a connection pooler in transaction pooling mode (e.g. `PgBouncer`_)
 requires disabling server-side cursors for that connection.
 
 Server-side cursors are local to a connection and remain open at the end of a
@@ -232,7 +232,7 @@ Another option is to wrap each ``QuerySet`` using server-side cursors in an
 for the duration of the transaction. This way, the server-side cursor will only
 live for the duration of the transaction.
 
-.. _pgBouncer: https://pgbouncer.github.io/
+.. _PgBouncer: https://pgbouncer.github.io/
 
 .. _manually-specified-autoincrement-pk:
 
@@ -581,13 +581,18 @@ these methods in no-op's based in the results of such detection.
 Notes on specific fields
 ------------------------
 
+.. _mysql-character-fields:
+
 Character fields
 ~~~~~~~~~~~~~~~~
 
-Any fields that are stored with ``VARCHAR`` column types have their
+Any fields that are stored with ``VARCHAR`` column types may have their
 ``max_length`` restricted to 255 characters if you are using ``unique=True``
 for the field. This affects :class:`~django.db.models.CharField`,
-:class:`~django.db.models.SlugField`.
+:class:`~django.db.models.SlugField`. See `the MySQL documentation`_ for more
+details.
+
+.. _the MySQL documentation: https://dev.mysql.com/doc/refman/en/create-index.html#create-index-column-prefixes
 
 ``TextField`` limitations
 ~~~~~~~~~~~~~~~~~~~~~~~~~

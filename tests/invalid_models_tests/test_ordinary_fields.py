@@ -8,6 +8,7 @@ from django.test.utils import isolate_apps, override_settings
 from django.utils.functional import lazy
 from django.utils.timezone import now
 from django.utils.translation import gettext_lazy as _
+from django.utils.version import get_docs_version
 
 
 @isolate_apps('invalid_models_tests')
@@ -372,10 +373,15 @@ class CharFieldTests(SimpleTestCase):
         field = Model._meta.get_field('field')
         validator = DatabaseValidation(connection=connection)
         self.assertEqual(validator.check_field(field), [
-            Error(
-                'MySQL does not allow unique CharFields to have a max_length > 255.',
+            DjangoWarning(
+                '%s may not allow unique CharFields to have a max_length > '
+                '255.' % connection.display_name,
+                hint=(
+                    'See: https://docs.djangoproject.com/en/%s/ref/databases/'
+                    '#mysql-character-fields' % get_docs_version()
+                ),
                 obj=field,
-                id='mysql.E001',
+                id='mysql.W003',
             )
         ])
 
@@ -758,7 +764,7 @@ class TextFieldTests(TestCase):
             value = models.TextField(db_index=True)
         field = Model._meta.get_field('value')
         field_type = field.db_type(connection)
-        self.assertEqual(field.check(), [
+        self.assertEqual(field.check(databases=self.databases), [
             DjangoWarning(
                 '%s does not support a database index on %s columns.'
                 % (connection.display_name, field_type),

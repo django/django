@@ -25,6 +25,10 @@ def get_view(request):
     return HttpResponse(t.render(c))
 
 
+async def async_get_view(request):
+    return HttpResponse(b'GET content.')
+
+
 def trace_view(request):
     """
     A simple view that expects a TRACE request and echoes its status line.

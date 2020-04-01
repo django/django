@@ -66,6 +66,7 @@ After the previous tutorials, our project should look like this::
         polls/
             __init__.py
             admin.py
+            apps.py
             migrations/
                 __init__.py
                 0001_initial.py
@@ -168,7 +169,7 @@ this. For a small app like polls, this process isn't too difficult.
 
            path('polls/', include('polls.urls')),
 
-       3. Run `python manage.py migrate` to create the polls models.
+       3. Run ``python manage.py migrate`` to create the polls models.
 
        4. Start the development server and visit http://127.0.0.1:8000/admin/
           to create a poll (you'll need the Admin app enabled).

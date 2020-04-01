@@ -4,11 +4,9 @@ from django.contrib.postgres.indexes import (
     BloomIndex, BrinIndex, BTreeIndex, GinIndex, GistIndex, HashIndex,
     SpGistIndex,
 )
-from django.db import connection
-from django.db.models import CharField
+from django.db import NotSupportedError, connection
+from django.db.models import CharField, Q
 from django.db.models.functions import Length
-from django.db.models.query_utils import Q
-from django.db.utils import NotSupportedError
 from django.test import skipUnlessDBFeature
 from django.test.utils import register_lookup
 

@@ -166,8 +166,8 @@ filtered out of error reports in a production environment (that is, where
             ...
 
     In the above example, the values for the ``user``, ``pw`` and ``cc``
-    variables will be hidden and replaced with stars (`**********`) in the
-    error reports, whereas the value of the ``name`` variable will be
+    variables will be hidden and replaced with stars (``**********``)
+    in the error reports, whereas the value of the ``name`` variable will be
     disclosed.
 
     To systematically hide all local variables of a function from error logs,
@@ -213,8 +213,9 @@ filtered out of error reports in a production environment (that is, where
 
     In the above example, the values for the ``pass_word`` and
     ``credit_card_number`` POST parameters will be hidden and replaced with
-    stars (`**********`) in the request's representation inside the error
-    reports, whereas the value of the ``name`` parameter will be disclosed.
+    stars (``**********``) in the request's representation inside the
+    error reports, whereas the value of the ``name`` parameter will be
+    disclosed.
 
     To systematically hide all POST parameters of a request in error reports,
     do not provide any argument to the ``sensitive_post_parameters`` decorator::
@@ -242,9 +243,9 @@ of reports when an error occurs. The actual filtering is done by Django's
 default error reporter filter:
 :class:`django.views.debug.SafeExceptionReporterFilter`. This filter uses the
 decorators' annotations to replace the corresponding values with stars
-(`**********`) when the error reports are produced. If you wish to override or
-customize this default behavior for your entire site, you need to define your
-own filter class and tell Django to use it via the
+(``**********``) when the error reports are produced. If you wish to
+override or customize this default behavior for your entire site, you need to
+define your own filter class and tell Django to use it via the
 :setting:`DEFAULT_EXCEPTION_REPORTER_FILTER` setting::
 
     DEFAULT_EXCEPTION_REPORTER_FILTER = 'path.to.your.CustomExceptionReporterFilter'
@@ -271,7 +272,8 @@ following attributes and methods:
         .. versionadded:: 3.1
 
         The string value to replace sensitive value with. By default it
-        replaces the values of sensitive variables with stars (`**********`).
+        replaces the values of sensitive variables with stars
+        (``**********``).
 
     .. attribute:: hidden_settings
 
@@ -304,6 +306,62 @@ following attributes and methods:
         Returns the filtered dictionary of local variables for the given
         traceback frame. Sensitive values are replaced with
         :attr:`cleansed_substitute`.
+
+.. versionadded:: 3.1
+
+If you need to customize error reports beyond filtering you may specify a
+custom error reporter class by defining the
+:setting:`DEFAULT_EXCEPTION_REPORTER` setting::
+
+    DEFAULT_EXCEPTION_REPORTER = 'path.to.your.CustomExceptionReporter'
+
+The exception reporter is responsible for compiling the exception report data,
+and formatting it as text or HTML appropriately. (The exception reporter uses
+:setting:`DEFAULT_EXCEPTION_REPORTER_FILTER` when preparing the exception
+report data.)
+
+Your custom reporter class needs to inherit from
+:class:`django.views.debug.ExceptionReporter`.
+
+.. class:: ExceptionReporter
+
+    .. method:: get_traceback_data()
+
+        Return a dictionary containing traceback information.
+
+        This is the main extension point for customizing exception reports, for
+        example::
+
+            from django.views.debug import ExceptionReporter
+
+
+            class CustomExceptionReporter(ExceptionReporter):
+                def get_traceback_data(self):
+                    data = super().get_traceback_data()
+                    # ... remove/add something here ...
+                    return data
+
+    .. method:: get_traceback_html()
+
+        Return HTML version of exception report.
+
+        Used for HTML version of debug 500 HTTP error page.
+
+    .. method:: get_traceback_text()
+
+        Return plain text version of exception report.
+
+        Used for plain text version of debug 500 HTTP error page and email
+        reports.
+
+As with the filter class, you may control which exception reporter class to use
+within any given view by setting the ``HttpRequest``’s
+``exception_reporter_class`` attribute::
+
+    def my_view(request):
+        if request.user.is_authenticated:
+            request.exception_reporter_class = CustomExceptionReporter()
+        ...
 
 .. seealso::
 

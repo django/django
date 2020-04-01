@@ -1,8 +1,8 @@
 import logging
 
-from django.contrib.gis.db.models.fields import GeometryField
+from django.contrib.gis.db.models import GeometryField
+from django.db import OperationalError
 from django.db.backends.mysql.schema import DatabaseSchemaEditor
-from django.db.utils import OperationalError
 
 logger = logging.getLogger('django.contrib.gis')
 

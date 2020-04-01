@@ -143,6 +143,13 @@ class DatabaseOperations(BaseDatabaseOperations):
     def date_interval_sql(self, timedelta):
         return 'INTERVAL %s MICROSECOND' % duration_microseconds(timedelta)
 
+    def fetch_returned_insert_rows(self, cursor):
+        """
+        Given a cursor object that has just performed an INSERT...RETURNING
+        statement into a table, return the tuple of returned data.
+        """
+        return cursor.fetchall()
+
     def format_for_duration_arithmetic(self, sql):
         return 'INTERVAL %s MICROSECOND' % sql
 
@@ -172,6 +179,19 @@ class DatabaseOperations(BaseDatabaseOperations):
 
     def random_function_sql(self):
         return 'RAND()'
+
+    def return_insert_columns(self, fields):
+        # MySQL and MariaDB < 10.5.0 don't support an INSERT...RETURNING
+        # statement.
+        if not fields:
+            return '', ()
+        columns = [
+            '%s.%s' % (
+                self.quote_name(field.model._meta.db_table),
+                self.quote_name(field.column),
+            ) for field in fields
+        ]
+        return 'RETURNING %s' % ', '.join(columns), ()
 
     def sql_flush(self, style, tables, sequences, allow_cascade=False):
         # NB: The generated SQL below is specific to MySQL
@@ -240,7 +260,8 @@ class DatabaseOperations(BaseDatabaseOperations):
             return 'POW(%s)' % ','.join(sub_expressions)
         # Convert the result to a signed integer since MySQL's binary operators
         # return an unsigned integer.
-        elif connector in ('&', '|', '<<'):
+        elif connector in ('&', '|', '<<', '#'):
+            connector = '^' if connector == '#' else connector
             return 'CONVERT(%s, SIGNED)' % connector.join(sub_expressions)
         elif connector == '>>':
             lhs, rhs = sub_expressions
@@ -291,7 +312,7 @@ class DatabaseOperations(BaseDatabaseOperations):
                 "((TIME_TO_SEC(%(lhs)s) * 1000000 + MICROSECOND(%(lhs)s)) -"
                 " (TIME_TO_SEC(%(rhs)s) * 1000000 + MICROSECOND(%(rhs)s)))"
             ) % {'lhs': lhs_sql, 'rhs': rhs_sql}, tuple(lhs_params) * 2 + tuple(rhs_params) * 2
-        params = (*lhs_params, *rhs_params)
+        params = (*rhs_params, *lhs_params)
         return "TIMESTAMPDIFF(MICROSECOND, %s, %s)" % (rhs_sql, lhs_sql), params
 
     def explain_query_prefix(self, format=None, **options):

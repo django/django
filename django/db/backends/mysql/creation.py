@@ -26,7 +26,7 @@ class DatabaseCreation(BaseDatabaseCreation):
                 self.log('Got an error creating the test database: %s' % e)
                 sys.exit(2)
             else:
-                raise e
+                raise
 
     def _clone_test_db(self, suffix, verbosity, keepdb=False):
         source_database_name = self.connection.settings_dict['NAME']
@@ -35,7 +35,7 @@ class DatabaseCreation(BaseDatabaseCreation):
             'dbname': self.connection.ops.quote_name(target_database_name),
             'suffix': self.sql_table_creation_suffix(),
         }
-        with self._nodb_connection.cursor() as cursor:
+        with self._nodb_cursor() as cursor:
             try:
                 self._execute_create_test_db(cursor, test_db_params, keepdb)
             except Exception:

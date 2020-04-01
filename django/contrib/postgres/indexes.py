@@ -1,5 +1,5 @@
+from django.db import NotSupportedError
 from django.db.models import Index
-from django.db.utils import NotSupportedError
 from django.utils.functional import cached_property
 
 __all__ = [

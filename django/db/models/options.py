@@ -5,11 +5,9 @@ from collections import defaultdict
 
 from django.apps import apps
 from django.conf import settings
-from django.core.exceptions import FieldDoesNotExist, ImproperlyConfigured
+from django.core.exceptions import FieldDoesNotExist
 from django.db import connections
-from django.db.models import Manager
-from django.db.models.fields import AutoField
-from django.db.models.fields.proxy import OrderWrt
+from django.db.models import AutoField, Manager, OrderWrt, UniqueConstraint
 from django.db.models.query_utils import PathInfo
 from django.utils.datastructures import ImmutableList, OrderedSet
 from django.utils.functional import cached_property
@@ -251,10 +249,6 @@ class Options:
                     field = already_created[0]
                 field.primary_key = True
                 self.setup_pk(field)
-                if not field.remote_field.parent_link:
-                    raise ImproperlyConfigured(
-                        'Add parent_link=True to %s.' % field,
-                    )
             else:
                 auto = AutoField(verbose_name='ID', primary_key=True, auto_created=True)
                 model.add_to_class('id', auto)
@@ -311,7 +305,7 @@ class Options:
         return '<Options for %s>' % self.object_name
 
     def __str__(self):
-        return "%s.%s" % (self.app_label, self.model_name)
+        return self.label_lower
 
     def can_migrate(self, connection):
         """
@@ -832,6 +826,18 @@ class Options:
         # Store result into cache for later access
         self._get_fields_cache[cache_key] = fields
         return fields
+
+    @cached_property
+    def total_unique_constraints(self):
+        """
+        Return a list of total unique constraints. Useful for determining set
+        of fields guaranteed to be unique for all rows.
+        """
+        return [
+            constraint
+            for constraint in self.constraints
+            if isinstance(constraint, UniqueConstraint) and constraint.condition is None
+        ]
 
     @cached_property
     def _property_names(self):

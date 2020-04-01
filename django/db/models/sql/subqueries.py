@@ -21,7 +21,10 @@ class DeleteQuery(Query):
         self.alias_map = {table: self.alias_map[table]}
         self.where = where
         cursor = self.get_compiler(using).execute_sql(CURSOR)
-        return cursor.rowcount if cursor else 0
+        if cursor:
+            with cursor:
+                return cursor.rowcount
+        return 0
 
     def delete_batch(self, pk_list, using):
         """

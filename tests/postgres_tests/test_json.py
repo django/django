@@ -411,6 +411,10 @@ class TestQuerying(PostgreSQLTestCase):
                     **{lookup: value},
                 ).exists())
 
+    def test_key_escape(self):
+        obj = JSONModel.objects.create(field={'%total': 10})
+        self.assertEqual(JSONModel.objects.filter(**{'field__%total': 10}).get(), obj)
+
 
 @isolate_apps('postgres_tests')
 class TestChecks(PostgreSQLSimpleTestCase):

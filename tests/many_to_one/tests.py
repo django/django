@@ -2,8 +2,7 @@ import datetime
 from copy import deepcopy
 
 from django.core.exceptions import FieldError, MultipleObjectsReturned
-from django.db import models, transaction
-from django.db.utils import IntegrityError
+from django.db import IntegrityError, models, transaction
 from django.test import TestCase
 from django.utils.translation import gettext_lazy
 
@@ -734,3 +733,14 @@ class ManyToOneTests(TestCase):
         child = parent.to_field_children.get()
         with self.assertNumQueries(0):
             self.assertIs(child.parent, parent)
+
+    def test_add_remove_set_by_pk_raises(self):
+        usa = Country.objects.create(name='United States')
+        chicago = City.objects.create(name='Chicago')
+        msg = "'City' instance expected, got %s" % chicago.pk
+        with self.assertRaisesMessage(TypeError, msg):
+            usa.cities.add(chicago.pk)
+        with self.assertRaisesMessage(TypeError, msg):
+            usa.cities.remove(chicago.pk)
+        with self.assertRaisesMessage(TypeError, msg):
+            usa.cities.set([chicago.pk])

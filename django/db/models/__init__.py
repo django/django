@@ -13,7 +13,8 @@ from django.db.models.enums import *  # NOQA
 from django.db.models.enums import __all__ as enums_all
 from django.db.models.expressions import (
     Case, Exists, Expression, ExpressionList, ExpressionWrapper, F, Func,
-    OuterRef, RowRange, Subquery, Value, ValueRange, When, Window, WindowFrame,
+    OrderBy, OuterRef, RowRange, Subquery, Value, ValueRange, When, Window,
+    WindowFrame,
 )
 from django.db.models.fields import *  # NOQA
 from django.db.models.fields import __all__ as fields_all
@@ -23,16 +24,14 @@ from django.db.models.indexes import *  # NOQA
 from django.db.models.indexes import __all__ as indexes_all
 from django.db.models.lookups import Lookup, Transform
 from django.db.models.manager import Manager
-from django.db.models.query import (
-    Prefetch, Q, QuerySet, prefetch_related_objects,
-)
-from django.db.models.query_utils import FilteredRelation
+from django.db.models.query import Prefetch, QuerySet, prefetch_related_objects
+from django.db.models.query_utils import FilteredRelation, Q
 
 # Imports that would create circular imports if sorted
 from django.db.models.base import DEFERRED, Model  # isort:skip
 from django.db.models.fields.related import (  # isort:skip
     ForeignKey, ForeignObject, OneToOneField, ManyToManyField,
-    ManyToOneRel, ManyToManyRel, OneToOneRel,
+    ForeignObjectRel, ManyToOneRel, ManyToManyRel, OneToOneRel,
 )
 
 
@@ -43,11 +42,12 @@ __all__ += [
     'DB_CASCADE', 'DB_NO_ACTION', 'DB_RESTRICT', 'DB_SET_NULL',
     'SET_NULL', 'OnDelete', 'ProtectedError', 'RestrictedError',
     'Case', 'Exists', 'Expression', 'ExpressionList', 'ExpressionWrapper', 'F',
-    'Func', 'OuterRef', 'RowRange', 'Subquery', 'Value', 'ValueRange', 'When',
+    'Func', 'OrderBy', 'OuterRef', 'RowRange', 'Subquery', 'Value',
+    'ValueRange', 'When',
     'Window', 'WindowFrame',
     'FileField', 'ImageField', 'OrderWrt', 'Lookup', 'Transform', 'Manager',
     'Prefetch', 'Q', 'QuerySet', 'prefetch_related_objects', 'DEFERRED', 'Model',
     'FilteredRelation',
     'ForeignKey', 'ForeignObject', 'OneToOneField', 'ManyToManyField',
-    'ManyToOneRel', 'ManyToManyRel', 'OneToOneRel',
+    'ForeignObjectRel', 'ManyToOneRel', 'ManyToManyRel', 'OneToOneRel',
 ]

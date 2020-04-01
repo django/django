@@ -6,7 +6,7 @@ from MySQLdb.constants import FIELD_TYPE
 from django.db.backends.base.introspection import (
     BaseDatabaseIntrospection, FieldInfo as BaseFieldInfo, TableInfo,
 )
-from django.db.models.indexes import Index
+from django.db.models import Index
 from django.utils.datastructures import OrderedSet
 
 FieldInfo = namedtuple('FieldInfo', BaseFieldInfo._fields + ('extra', 'is_unsigned'))

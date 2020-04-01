@@ -2,9 +2,15 @@
 Django 3.0.3 release notes
 ==========================
 
-*Expected February 3, 2020*
+*February 3, 2020*
 
-Django 3.0.3 fixes several bugs in 3.0.2.
+Django 3.0.3 fixes a security issue and several bugs in 3.0.2.
+
+CVE-2020-7471: Potential SQL injection via ``StringAgg(delimiter)``
+===================================================================
+
+:class:`~django.contrib.postgres.aggregates.StringAgg` aggregation function was
+subject to SQL injection, using a suitably crafted ``delimiter``.
 
 Bugfixes
 ========
@@ -35,3 +41,7 @@ Bugfixes
 * Fixed a regression in Django 2.2.7 that caused
   :meth:`~django.db.models.Model.get_FOO_display` to work incorrectly when
   overriding inherited choices (:ticket:`31124`).
+
+* Fixed a regression in Django 3.0 that caused a crash of
+  ``QuerySet.prefetch_related()`` for ``GenericForeignKey`` with a custom
+  ``ContentType`` foreign key (:ticket:`31190`).

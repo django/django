@@ -65,7 +65,7 @@ class URLValidator(RegexValidator):
 
     # IP patterns
     ipv4_re = r'(?:25[0-5]|2[0-4]\d|[0-1]?\d?\d)(?:\.(?:25[0-5]|2[0-4]\d|[0-1]?\d?\d)){3}'
-    ipv6_re = r'\[[0-9a-f:\.]+\]'  # (simple regex, validated later)
+    ipv6_re = r'\[[0-9a-f:.]+\]'  # (simple regex, validated later)
 
     # Host patterns
     hostname_re = r'[a-z' + ul + r'0-9](?:[a-z' + ul + r'0-9-]{0,61}[a-z' + ul + r'0-9])?'
@@ -82,7 +82,7 @@ class URLValidator(RegexValidator):
     host_re = '(' + hostname_re + domain_re + tld_re + '|localhost)'
 
     regex = _lazy_re_compile(
-        r'^(?:[a-z0-9\.\-\+]*)://'  # scheme is validated separately
+        r'^(?:[a-z0-9.+-]*)://'  # scheme is validated separately
         r'(?:[^\s:@/]+(?::[^\s:@/]*)?@)?'  # user:pass authentication
         r'(?:' + ipv4_re + '|' + ipv6_re + '|' + host_re + ')'
         r'(?::\d{2,5})?'  # port
@@ -163,7 +163,7 @@ class EmailValidator:
         re.IGNORECASE)
     literal_regex = _lazy_re_compile(
         # literal form, ipv4 or ipv6 address (SMTP 4.1.3)
-        r'\[([A-f0-9:\.]+)\]\Z',
+        r'\[([A-f0-9:.]+)\]\Z',
         re.IGNORECASE)
     domain_whitelist = ['localhost']
 

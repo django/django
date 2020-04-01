@@ -19,7 +19,7 @@ from django.db.models import (
     NOT_PROVIDED, ExpressionWrapper, IntegerField, Max, Value,
 )
 from django.db.models.constants import LOOKUP_SEP
-from django.db.models.constraints import CheckConstraint, UniqueConstraint
+from django.db.models.constraints import CheckConstraint
 from django.db.models.deletion import CASCADE, Collector
 from django.db.models.fields.related import (
     ForeignObjectRel, OneToOneField, lazy_related_operation, resolve_relation,
@@ -202,7 +202,7 @@ class ModelBase(type):
                 continue
             # Locate OneToOneField instances.
             for field in base._meta.local_fields:
-                if isinstance(field, OneToOneField):
+                if isinstance(field, OneToOneField) and field.remote_field.parent_link:
                     related = resolve_relation(new_class, field.remote_field.model)
                     parent_links[make_model_tuple(related)] = field
 
@@ -855,8 +855,8 @@ class Model(metaclass=ModelBase):
             not raw and
             not force_insert and
             self._state.adding and
-            self._meta.pk.default and
-            self._meta.pk.default is not NOT_PROVIDED
+            meta.pk.default and
+            meta.pk.default is not NOT_PROVIDED
         ):
             force_insert = True
         # If possible, try an UPDATE. If that doesn't update anything, do an INSERT.
@@ -889,8 +889,9 @@ class Model(metaclass=ModelBase):
 
             returning_fields = meta.db_returning_fields
             results = self._do_insert(cls._base_manager, using, fields, returning_fields, raw)
-            for result, field in zip(results, returning_fields):
-                setattr(self, field.attname, result)
+            if results:
+                for value, field in zip(results[0], returning_fields):
+                    setattr(self, field.attname, value)
         return updated
 
     def _do_update(self, base_qs, using, pk_val, values, update_fields, forced_update):
@@ -1023,12 +1024,14 @@ class Model(metaclass=ModelBase):
         unique_checks = []
 
         unique_togethers = [(self.__class__, self._meta.unique_together)]
-        constraints = [(self.__class__, self._meta.constraints)]
+        constraints = [(self.__class__, self._meta.total_unique_constraints)]
         for parent_class in self._meta.get_parent_list():
             if parent_class._meta.unique_together:
                 unique_togethers.append((parent_class, parent_class._meta.unique_together))
-            if parent_class._meta.constraints:
-                constraints.append((parent_class, parent_class._meta.constraints))
+            if parent_class._meta.total_unique_constraints:
+                constraints.append(
+                    (parent_class, parent_class._meta.total_unique_constraints)
+                )
 
         for model_class, unique_together in unique_togethers:
             for check in unique_together:
@@ -1038,10 +1041,7 @@ class Model(metaclass=ModelBase):
 
         for model_class, model_constraints in constraints:
             for constraint in model_constraints:
-                if (isinstance(constraint, UniqueConstraint) and
-                        # Partial unique constraints can't be validated.
-                        constraint.condition is None and
-                        not any(name in exclude for name in constraint.fields)):
+                if not any(name in exclude for name in constraint.fields):
                     unique_checks.append((model_class, constraint.fields))
 
         # These are checks for the unique_for_<date/year/month>.
@@ -1255,10 +1255,11 @@ class Model(metaclass=ModelBase):
     def check(cls, **kwargs):
         errors = [*cls._check_swappable(), *cls._check_model(), *cls._check_managers(**kwargs)]
         if not cls._meta.swapped:
+            databases = kwargs.get('databases') or []
             errors += [
                 *cls._check_fields(**kwargs),
                 *cls._check_m2m_through_same_relationship(),
-                *cls._check_long_column_names(),
+                *cls._check_long_column_names(databases),
             ]
             clash_errors = (
                 *cls._check_id_field(),
@@ -1277,7 +1278,7 @@ class Model(metaclass=ModelBase):
                 *cls._check_unique_together(),
                 *cls._check_indexes(),
                 *cls._check_ordering(),
-                *cls._check_constraints(),
+                *cls._check_constraints(databases),
             ]
 
         return errors
@@ -1763,17 +1764,19 @@ class Model(metaclass=ModelBase):
         return errors
 
     @classmethod
-    def _check_long_column_names(cls):
+    def _check_long_column_names(cls, databases):
         """
         Check that any auto-generated column names are shorter than the limits
         for each database in which the model will be created.
         """
+        if not databases:
+            return []
         errors = []
         allowed_len = None
         db_alias = None
 
         # Find the minimum max allowed length among all specified db_aliases.
-        for db in settings.DATABASES:
+        for db in databases:
             # skip databases where the model won't be created
             if not router.allow_migrate_model(db, cls):
                 continue
@@ -1836,9 +1839,9 @@ class Model(metaclass=ModelBase):
         return errors
 
     @classmethod
-    def _check_constraints(cls):
+    def _check_constraints(cls, databases):
         errors = []
-        for db in settings.DATABASES:
+        for db in databases:
             if not router.allow_migrate_model(db, cls):
                 continue
             connection = connections[db]

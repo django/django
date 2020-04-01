@@ -54,6 +54,11 @@ This is in addition to our existing WSGI support. Django intends to support
 both for the foreseeable future. Async features will only be available to
 applications that run under ASGI, however.
 
+At this stage async support only applies to the outer ASGI application.
+Internally everything remains synchronous. Asynchronous middleware, views, etc.
+are not yet supported. You can, however, use ASGI middleware around Django's
+application, allowing you to combine Django with other ASGI frameworks.
+
 There is no need to switch your applications over unless you want to start
 experimenting with asynchronous code, but we have
 :doc:`documentation on deploying with ASGI </howto/deployment/asgi/index>` if
@@ -330,9 +335,8 @@ Security
   uses frames of itself, you will need to explicitly set ``X_FRAME_OPTIONS =
   'SAMEORIGIN'`` for them to continue working.
 
-* :setting:`SECURE_CONTENT_TYPE_NOSNIFF` setting now defaults to ``True``. With
-  the enabled :setting:`SECURE_CONTENT_TYPE_NOSNIFF`, the
-  :class:`~django.middleware.security.SecurityMiddleware` sets the
+* :setting:`SECURE_CONTENT_TYPE_NOSNIFF` now defaults to ``True``. With this
+  enabled, :class:`~django.middleware.security.SecurityMiddleware` sets the
   :ref:`x-content-type-options` header on all responses that do not already
   have it.
 

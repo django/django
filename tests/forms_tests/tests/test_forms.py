@@ -1245,6 +1245,22 @@ value="Should escape &lt; &amp; &gt; and &lt;script&gt;alert(&#x27;xss&#x27;)&lt
         self.assertTrue(f.has_error(NON_FIELD_ERRORS, 'password_mismatch'))
         self.assertFalse(f.has_error(NON_FIELD_ERRORS, 'anything'))
 
+    def test_html_output_with_hidden_input_field_errors(self):
+        class TestForm(Form):
+            hidden_input = CharField(widget=HiddenInput)
+
+            def clean(self):
+                self.add_error(None, 'Form error')
+
+        f = TestForm(data={})
+        error_dict = {
+            'hidden_input': ['This field is required.'],
+            '__all__': ['Form error'],
+        }
+        self.assertEqual(f.errors, error_dict)
+        f.as_table()
+        self.assertEqual(f.errors, error_dict)
+
     def test_dynamic_construction(self):
         # It's possible to construct a Form dynamically by adding to the self.fields
         # dictionary in __init__(). Don't forget to call Form.__init__() within the

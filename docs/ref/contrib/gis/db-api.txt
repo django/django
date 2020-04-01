@@ -78,9 +78,9 @@ transform procedure::
 
 Thus, geometry parameters may be passed in using the ``GEOSGeometry`` object, WKT
 (Well Known Text [#fnwkt]_), HEXEWKB (PostGIS specific -- a WKB geometry in
-hexadecimal [#fnewkb]_), and GeoJSON [#fngeojson]_. Essentially, if the input is
-not a ``GEOSGeometry`` object, the geometry field will attempt to create a
-``GEOSGeometry`` instance from the input.
+hexadecimal [#fnewkb]_), and GeoJSON (see :rfc:`7946`). Essentially, if the
+input is not a ``GEOSGeometry`` object, the geometry field will attempt to
+create a ``GEOSGeometry`` instance from the input.
 
 For more information creating :class:`~django.contrib.gis.geos.GEOSGeometry`
 objects, refer to the :ref:`GEOS tutorial <geos-tutorial>`.
@@ -415,7 +415,6 @@ Aggregate                PostGIS  Oracle  SpatiaLite
 .. rubric:: Footnotes
 .. [#fnwkt] *See* Open Geospatial Consortium, Inc., `OpenGIS Simple Feature Specification For SQL <http://www.opengis.org/docs/99-049.pdf>`_, Document 99-049 (May 5, 1999), at  Ch. 3.2.5, p. 3-11 (SQL Textual Representation of Geometry).
 .. [#fnewkb] *See* `PostGIS EWKB, EWKT and Canonical Forms <https://postgis.net/docs/using_postgis_dbmanagement.html#EWKB_EWKT>`_, PostGIS documentation at Ch. 4.1.2.
-.. [#fngeojson] *See* Howard Butler, Martin Daly, Allan Doyle, Tim Schaub, & Christopher Schmidt, `The GeoJSON Format Specification <http://geojson.org/geojson-spec.html>`_, Revision 1.0 (June 16, 2008).
 .. [#fndistsphere15] *See* `PostGIS documentation <https://postgis.net/docs/ST_DistanceSphere.html>`_ on ``ST_DistanceSphere``.
 .. [#fnmysqlidx] *See* `Creating Spatial Indexes <https://dev.mysql.com/doc/refman/en/creating-spatial-indexes.html>`_
    in the MySQL Reference Manual:

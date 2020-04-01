@@ -1,5 +1,5 @@
+from django.db import InterfaceError
 from django.db.backends.base.features import BaseDatabaseFeatures
-from django.db.utils import InterfaceError
 
 
 class DatabaseFeatures(BaseDatabaseFeatures):

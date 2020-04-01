@@ -139,11 +139,9 @@ have more than a single parameter. If you used positional interpolation,
 translations wouldn't be able to reorder placeholder text.
 
 Since string extraction is done by the ``xgettext`` command, only syntaxes
-supported by ``gettext`` are supported by Django. Python :py:ref:`f-strings
-<f-strings>` and `JavaScript template strings`_ are not yet supported by
-``xgettext``.
-
-.. _JavaScript template strings: https://savannah.gnu.org/bugs/?50920
+supported by ``gettext`` are supported by Django. In particular, Python
+:py:ref:`f-strings <f-strings>` are not yet supported by ``xgettext``, and
+JavaScript template strings need ``gettext`` 0.21+.
 
 .. _translator-comments:
 
@@ -279,14 +277,9 @@ In a case like this, consider something like the following::
 
         a format specification for argument 'name', as in 'msgstr[0]', doesn't exist in 'msgid'
 
-.. note:: Plural form and po files
+.. versionchanged: 2.2.12
 
-    Django does not support custom plural equations in po files. As all
-    translation catalogs are merged, only the plural form for the main Django po
-    file (in ``django/conf/locale/<lang_code>/LC_MESSAGES/django.po``) is
-    considered. Plural forms in all other po files are ignored. Therefore, you
-    should not use different plural equations in your project or application po
-    files.
+    Added support for different plural equations in ``.po`` files.
 
 .. _contextual-markers:
 
@@ -1803,9 +1796,18 @@ redirect to that URL will be performed. Otherwise, Django may fall back to
 redirecting the user to the URL from the ``Referer`` header or, if it is not
 set, to ``/``, depending on the nature of the request:
 
-* For AJAX requests, the fallback will be performed only if the ``next``
-  parameter was set. Otherwise a 204 status code (No Content) will be returned.
-* For non-AJAX requests, the fallback will always be performed.
+* If the request accepts HTML content (based on its ``Accept`` HTTP header),
+  the fallback will always be performed.
+
+* If the request doesn't accept HTML, the fallback will be performed only if
+  the ``next`` parameter was set. Otherwise a 204 status code (No Content) will
+  be returned.
+
+.. versionchanged:: 3.1
+
+    In older versions, the distinction for the fallback is based on whether the
+    ``X-Requested-With`` header is set to the value ``XMLHttpRequest``. This is
+    set by the jQuery ``ajax()`` method.
 
 Here's example HTML template code:
 

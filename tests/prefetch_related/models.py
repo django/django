@@ -5,7 +5,7 @@ from django.contrib.contenttypes.fields import (
 )
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
-from django.db.models.query import ModelIterable, QuerySet
+from django.db.models.query import ModelIterable
 from django.utils.functional import cached_property
 
 
@@ -104,7 +104,7 @@ class ModelIterableSubclass(ModelIterable):
     pass
 
 
-class TeacherQuerySet(QuerySet):
+class TeacherQuerySet(models.QuerySet):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._iterable_class = ModelIterableSubclass

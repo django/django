@@ -18,6 +18,7 @@ from django.core import management, signals
 from django.core.cache import (
     DEFAULT_CACHE_ALIAS, CacheKeyWarning, cache, caches,
 )
+from django.core.cache.backends.base import InvalidCacheBackendError
 from django.core.cache.utils import make_template_fragment_key
 from django.db import close_old_connections, connection, connections
 from django.http import (
@@ -59,6 +60,10 @@ class Unpicklable:
         raise pickle.PickleError()
 
 
+def empty_response(request):
+    return HttpResponse()
+
+
 KEY_ERRORS_WITH_MEMCACHED_MSG = (
     'Cache key contains characters that will cause errors if used with '
     'memcached: %r'
@@ -97,7 +102,8 @@ class DummyCacheTests(SimpleTestCase):
         self.assertEqual(cache.get_many(['a', 'b', 'e']), {})
 
     def test_get_many_invalid_key(self):
-        with self.assertWarns(CacheKeyWarning, msg=KEY_ERRORS_WITH_MEMCACHED_MSG % 'key with spaces'):
+        msg = KEY_ERRORS_WITH_MEMCACHED_MSG % ':1:key with spaces'
+        with self.assertWarnsMessage(CacheKeyWarning, msg):
             cache.get_many(['key with spaces'])
 
     def test_delete(self):
@@ -186,7 +192,8 @@ class DummyCacheTests(SimpleTestCase):
         self.assertEqual(cache.set_many({'a': 1, 'b': 2}, timeout=2, version='1'), [])
 
     def test_set_many_invalid_key(self):
-        with self.assertWarns(CacheKeyWarning, msg=KEY_ERRORS_WITH_MEMCACHED_MSG % 'key with spaces'):
+        msg = KEY_ERRORS_WITH_MEMCACHED_MSG % ':1:key with spaces'
+        with self.assertWarnsMessage(CacheKeyWarning, msg):
             cache.set_many({'key with spaces': 'foo'})
 
     def test_delete_many(self):
@@ -194,7 +201,8 @@ class DummyCacheTests(SimpleTestCase):
         cache.delete_many(['a', 'b'])
 
     def test_delete_many_invalid_key(self):
-        with self.assertWarns(CacheKeyWarning, msg=KEY_ERRORS_WITH_MEMCACHED_MSG % 'key with spaces'):
+        msg = KEY_ERRORS_WITH_MEMCACHED_MSG % ':1:key with spaces'
+        with self.assertWarnsMessage(CacheKeyWarning, msg):
             cache.delete_many({'key with spaces': 'foo'})
 
     def test_clear(self):
@@ -590,7 +598,12 @@ class BaseCacheTests:
         cache.set("key1", "spam", 100.2)
         self.assertEqual(cache.get("key1"), "spam")
 
-    def _perform_cull_test(self, cull_cache, initial_count, final_count):
+    def _perform_cull_test(self, cull_cache_name, initial_count, final_count):
+        try:
+            cull_cache = caches[cull_cache_name]
+        except InvalidCacheBackendError:
+            self.skipTest("Culling isn't implemented.")
+
         # Create initial cache key entries. This will overflow the cache,
         # causing a cull.
         for i in range(1, initial_count):
@@ -603,10 +616,10 @@ class BaseCacheTests:
         self.assertEqual(count, final_count)
 
     def test_cull(self):
-        self._perform_cull_test(caches['cull'], 50, 29)
+        self._perform_cull_test('cull', 50, 29)
 
     def test_zero_cull(self):
-        self._perform_cull_test(caches['zero_cull'], 50, 19)
+        self._perform_cull_test('zero_cull', 50, 19)
 
     def _perform_invalid_key_test(self, key, expected_warning):
         """
@@ -905,30 +918,31 @@ class BaseCacheTests:
         self.assertEqual(caches['custom_key2'].get('answer2'), 42)
 
     def test_cache_write_unpicklable_object(self):
-        update_middleware = UpdateCacheMiddleware()
-        update_middleware.cache = cache
-
-        fetch_middleware = FetchFromCacheMiddleware()
+        fetch_middleware = FetchFromCacheMiddleware(empty_response)
         fetch_middleware.cache = cache
 
         request = self.factory.get('/cache/test')
         request._cache_update_cache = True
-        get_cache_data = FetchFromCacheMiddleware().process_request(request)
+        get_cache_data = FetchFromCacheMiddleware(empty_response).process_request(request)
         self.assertIsNone(get_cache_data)
 
-        response = HttpResponse()
         content = 'Testing cookie serialization.'
-        response.content = content
-        response.set_cookie('foo', 'bar')
 
-        update_middleware.process_response(request, response)
+        def get_response(req):
+            response = HttpResponse(content)
+            response.set_cookie('foo', 'bar')
+            return response
+
+        update_middleware = UpdateCacheMiddleware(get_response)
+        update_middleware.cache = cache
+        response = update_middleware(request)
 
         get_cache_data = fetch_middleware.process_request(request)
         self.assertIsNotNone(get_cache_data)
         self.assertEqual(get_cache_data.content, content.encode())
         self.assertEqual(get_cache_data.cookies, response.cookies)
 
-        update_middleware.process_response(request, get_cache_data)
+        UpdateCacheMiddleware(lambda req: get_cache_data)(request)
         get_cache_data = fetch_middleware.process_request(request)
         self.assertIsNotNone(get_cache_data)
         self.assertEqual(get_cache_data.content, content.encode())
@@ -1023,7 +1037,7 @@ class DBCacheTests(BaseCacheTests, TransactionTestCase):
             cache.delete_many(['a', 'b', 'c'])
 
     def test_zero_cull(self):
-        self._perform_cull_test(caches['zero_cull'], 50, 18)
+        self._perform_cull_test('zero_cull', 50, 18)
 
     def test_second_call_doesnt_crash(self):
         out = io.StringIO()
@@ -1293,14 +1307,6 @@ class BaseMemcachedTests(BaseCacheTests):
                 TIMEOUT=31536000)):
             cache.set('future_foo', 'bar')
             self.assertEqual(cache.get('future_foo'), 'bar')
-
-    def test_cull(self):
-        # culling isn't implemented, memcached deals with it.
-        pass
-
-    def test_zero_cull(self):
-        # culling isn't implemented, memcached deals with it.
-        pass
 
     def test_memcached_deletes_key_on_failed_set(self):
         # By default memcached allows objects up to 1MB. For the cache_db session
@@ -1617,11 +1623,6 @@ class CacheUtils(SimpleTestCase):
         request._cache_update_cache = True if not update_cache else update_cache
         return request
 
-    def _set_cache(self, request, msg):
-        response = HttpResponse()
-        response.content = msg
-        return UpdateCacheMiddleware().process_response(request, response)
-
     def test_patch_vary_headers(self):
         headers = (
             # Initial vary, new headers, resulting vary.
@@ -1771,9 +1772,7 @@ class CacheHEADTest(SimpleTestCase):
         cache.clear()
 
     def _set_cache(self, request, msg):
-        response = HttpResponse()
-        response.content = msg
-        return UpdateCacheMiddleware().process_response(request, response)
+        return UpdateCacheMiddleware(lambda req: HttpResponse(msg))(request)
 
     def test_head_caches_correctly(self):
         test_content = 'test content'
@@ -1784,7 +1783,7 @@ class CacheHEADTest(SimpleTestCase):
 
         request = self.factory.head(self.path)
         request._cache_update_cache = True
-        get_cache_data = FetchFromCacheMiddleware().process_request(request)
+        get_cache_data = FetchFromCacheMiddleware(empty_response).process_request(request)
         self.assertIsNotNone(get_cache_data)
         self.assertEqual(test_content.encode(), get_cache_data.content)
 
@@ -1796,7 +1795,7 @@ class CacheHEADTest(SimpleTestCase):
         self._set_cache(request, test_content)
 
         request = self.factory.head(self.path)
-        get_cache_data = FetchFromCacheMiddleware().process_request(request)
+        get_cache_data = FetchFromCacheMiddleware(empty_response).process_request(request)
         self.assertIsNotNone(get_cache_data)
         self.assertEqual(test_content.encode(), get_cache_data.content)
 
@@ -1934,30 +1933,33 @@ class CacheI18nTest(SimpleTestCase):
     )
     def test_middleware(self):
         def set_cache(request, lang, msg):
+            def get_response(req):
+                return HttpResponse(msg)
+
             translation.activate(lang)
-            response = HttpResponse()
-            response.content = msg
-            return UpdateCacheMiddleware().process_response(request, response)
+            return UpdateCacheMiddleware(get_response)(request)
 
         # cache with non empty request.GET
         request = self.factory.get(self.path, {'foo': 'bar', 'other': 'true'})
         request._cache_update_cache = True
 
-        get_cache_data = FetchFromCacheMiddleware().process_request(request)
+        get_cache_data = FetchFromCacheMiddleware(empty_response).process_request(request)
         # first access, cache must return None
         self.assertIsNone(get_cache_data)
-        response = HttpResponse()
         content = 'Check for cache with QUERY_STRING'
-        response.content = content
-        UpdateCacheMiddleware().process_response(request, response)
-        get_cache_data = FetchFromCacheMiddleware().process_request(request)
+
+        def get_response(req):
+            return HttpResponse(content)
+
+        UpdateCacheMiddleware(get_response)(request)
+        get_cache_data = FetchFromCacheMiddleware(empty_response).process_request(request)
         # cache must return content
         self.assertIsNotNone(get_cache_data)
         self.assertEqual(get_cache_data.content, content.encode())
         # different QUERY_STRING, cache must be empty
         request = self.factory.get(self.path, {'foo': 'bar', 'somethingelse': 'true'})
         request._cache_update_cache = True
-        get_cache_data = FetchFromCacheMiddleware().process_request(request)
+        get_cache_data = FetchFromCacheMiddleware(empty_response).process_request(request)
         self.assertIsNone(get_cache_data)
 
         # i18n tests
@@ -1967,7 +1969,7 @@ class CacheI18nTest(SimpleTestCase):
         request = self.factory.get(self.path)
         request._cache_update_cache = True
         set_cache(request, 'en', en_message)
-        get_cache_data = FetchFromCacheMiddleware().process_request(request)
+        get_cache_data = FetchFromCacheMiddleware(empty_response).process_request(request)
         # The cache can be recovered
         self.assertIsNotNone(get_cache_data)
         self.assertEqual(get_cache_data.content, en_message.encode())
@@ -1978,11 +1980,11 @@ class CacheI18nTest(SimpleTestCase):
         # change again the language
         translation.activate('en')
         # retrieve the content from cache
-        get_cache_data = FetchFromCacheMiddleware().process_request(request)
+        get_cache_data = FetchFromCacheMiddleware(empty_response).process_request(request)
         self.assertEqual(get_cache_data.content, en_message.encode())
         # change again the language
         translation.activate('es')
-        get_cache_data = FetchFromCacheMiddleware().process_request(request)
+        get_cache_data = FetchFromCacheMiddleware(empty_response).process_request(request)
         self.assertEqual(get_cache_data.content, es_message.encode())
         # reset the language
         translation.deactivate()
@@ -1993,14 +1995,15 @@ class CacheI18nTest(SimpleTestCase):
     )
     def test_middleware_doesnt_cache_streaming_response(self):
         request = self.factory.get(self.path)
-        get_cache_data = FetchFromCacheMiddleware().process_request(request)
+        get_cache_data = FetchFromCacheMiddleware(empty_response).process_request(request)
         self.assertIsNone(get_cache_data)
 
-        content = ['Check for cache with streaming content.']
-        response = StreamingHttpResponse(content)
-        UpdateCacheMiddleware().process_response(request, response)
+        def get_stream_response(req):
+            return StreamingHttpResponse(['Check for cache with streaming content.'])
 
-        get_cache_data = FetchFromCacheMiddleware().process_request(request)
+        UpdateCacheMiddleware(get_stream_response)(request)
+
+        get_cache_data = FetchFromCacheMiddleware(empty_response).process_request(request)
         self.assertIsNone(get_cache_data)
 
 
@@ -2057,17 +2060,18 @@ class CacheMiddlewareTest(SimpleTestCase):
         Middleware vs. usage of CacheMiddleware as view decorator and setting attributes
         appropriately.
         """
-        # If no arguments are passed in construction, it's being used as middleware.
-        middleware = CacheMiddleware()
+        # If only one argument is passed in construction, it's being used as
+        # middleware.
+        middleware = CacheMiddleware(empty_response)
 
         # Now test object attributes against values defined in setUp above
         self.assertEqual(middleware.cache_timeout, 30)
         self.assertEqual(middleware.key_prefix, 'middlewareprefix')
         self.assertEqual(middleware.cache_alias, 'other')
 
-        # If arguments are being passed in construction, it's being used as a decorator.
-        # First, test with "defaults":
-        as_view_decorator = CacheMiddleware(cache_alias=None, key_prefix=None)
+        # If more arguments are being passed in construction, it's being used
+        # as a decorator. First, test with "defaults":
+        as_view_decorator = CacheMiddleware(empty_response, cache_alias=None, key_prefix=None)
 
         self.assertEqual(as_view_decorator.cache_timeout, 30)  # Timeout value for 'default' cache, i.e. 30
         self.assertEqual(as_view_decorator.key_prefix, '')
@@ -2075,16 +2079,18 @@ class CacheMiddlewareTest(SimpleTestCase):
         self.assertEqual(as_view_decorator.cache_alias, 'default')
 
         # Next, test with custom values:
-        as_view_decorator_with_custom = CacheMiddleware(cache_timeout=60, cache_alias='other', key_prefix='foo')
+        as_view_decorator_with_custom = CacheMiddleware(
+            hello_world_view, cache_timeout=60, cache_alias='other', key_prefix='foo'
+        )
 
         self.assertEqual(as_view_decorator_with_custom.cache_timeout, 60)
         self.assertEqual(as_view_decorator_with_custom.key_prefix, 'foo')
         self.assertEqual(as_view_decorator_with_custom.cache_alias, 'other')
 
     def test_middleware(self):
-        middleware = CacheMiddleware()
-        prefix_middleware = CacheMiddleware(key_prefix='prefix1')
-        timeout_middleware = CacheMiddleware(cache_timeout=1)
+        middleware = CacheMiddleware(hello_world_view)
+        prefix_middleware = CacheMiddleware(hello_world_view, key_prefix='prefix1')
+        timeout_middleware = CacheMiddleware(hello_world_view, cache_timeout=1)
 
         request = self.factory.get('/view/')
 
@@ -2188,6 +2194,29 @@ class CacheMiddlewareTest(SimpleTestCase):
         response = other_with_prefix_view(request, '16')
         self.assertEqual(response.content, b'Hello World 16')
 
+    def test_cache_page_timeout(self):
+        # Page timeout takes precedence over the "max-age" section of the
+        # "Cache-Control".
+        tests = [
+            (1, 3),  # max_age < page_timeout.
+            (3, 1),  # max_age > page_timeout.
+        ]
+        for max_age, page_timeout in tests:
+            with self.subTest(max_age=max_age, page_timeout=page_timeout):
+                view = cache_page(timeout=page_timeout)(
+                    cache_control(max_age=max_age)(hello_world_view)
+                )
+                request = self.factory.get('/view/')
+                response = view(request, '1')
+                self.assertEqual(response.content, b'Hello World 1')
+                time.sleep(1)
+                response = view(request, '2')
+                self.assertEqual(
+                    response.content,
+                    b'Hello World 1' if page_timeout > max_age else b'Hello World 2',
+                )
+            cache.clear()
+
     def test_cached_control_private_not_cached(self):
         """Responses with 'Cache-Control: private' are not cached."""
         view_with_private_cache = cache_page(3)(cache_control(private=True)(hello_world_view))
@@ -2202,18 +2231,13 @@ class CacheMiddlewareTest(SimpleTestCase):
         Django must prevent caching of responses that set a user-specific (and
         maybe security sensitive) cookie in response to a cookie-less request.
         """
-        csrf_middleware = CsrfViewMiddleware()
-        cache_middleware = CacheMiddleware()
-
         request = self.factory.get('/view/')
-        self.assertIsNone(cache_middleware.process_request(request))
-
+        csrf_middleware = CsrfViewMiddleware(csrf_view)
         csrf_middleware.process_view(request, csrf_view, (), {})
+        cache_middleware = CacheMiddleware(csrf_middleware)
 
-        response = csrf_view(request)
-
-        response = csrf_middleware.process_response(request, response)
-        response = cache_middleware.process_response(request, response)
+        self.assertIsNone(cache_middleware.process_request(request))
+        cache_middleware(request)
 
         # Inserting a CSRF cookie in a cookie-less request prevented caching.
         self.assertIsNone(cache_middleware.process_request(request))

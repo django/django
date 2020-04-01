@@ -307,7 +307,7 @@ class ModelDetailView(BaseAdminDocsView):
             })
         return super().get_context_data(**{
             **kwargs,
-            'name': '%s.%s' % (opts.app_label, opts.object_name),
+            'name': opts.label,
             'summary': title,
             'description': body,
             'fields': fields,

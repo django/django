@@ -26,6 +26,9 @@ def format(number, decimal_sep, decimal_pos=None, grouping=0, thousand_sep='',
         return mark_safe(number)
     # sign
     sign = ''
+    # Treat potentially very large/small floats as Decimals.
+    if isinstance(number, float) and 'e' in str(number).lower():
+        number = Decimal(str(number))
     if isinstance(number, Decimal):
 
         if decimal_pos is not None:

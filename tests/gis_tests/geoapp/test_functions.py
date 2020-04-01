@@ -3,13 +3,13 @@ import math
 import re
 from decimal import Decimal
 
-from django.contrib.gis.db.models import functions
+from django.contrib.gis.db.models import GeometryField, PolygonField, functions
 from django.contrib.gis.geos import (
     GEOSGeometry, LineString, Point, Polygon, fromstr,
 )
 from django.contrib.gis.measure import Area
 from django.db import NotSupportedError, connection
-from django.db.models import Sum
+from django.db.models import Sum, Value
 from django.test import TestCase, skipUnlessDBFeature
 
 from ..utils import FuncTestMixin, mariadb, mysql, oracle, postgis, spatialite
@@ -272,7 +272,7 @@ class GISFunctionsTests(FuncTestMixin, TestCase):
     def test_geometry_distance(self):
         point = Point(-90, 40, srid=4326)
         qs = City.objects.annotate(distance=functions.GeometryDistance('point', point)).order_by('distance')
-        self.assertEqual([city.distance for city in qs], [
+        distances = (
             2.99091995527296,
             5.33507274054713,
             9.33852187483721,
@@ -281,7 +281,10 @@ class GISFunctionsTests(FuncTestMixin, TestCase):
             14.713098433352,
             34.3635252198568,
             276.987855073372,
-        ])
+        )
+        for city, expected_distance in zip(qs, distances):
+            with self.subTest(city=city):
+                self.assertAlmostEqual(city.distance, expected_distance)
 
     @skipUnlessDBFeature("has_Intersection_function")
     def test_intersection(self):
@@ -347,6 +350,34 @@ class GISFunctionsTests(FuncTestMixin, TestCase):
         invalid = State.objects.filter(name='invalid').annotate(repaired=functions.MakeValid('poly')).first()
         self.assertIs(invalid.repaired.valid, True)
         self.assertEqual(invalid.repaired, fromstr('POLYGON((0 0, 0 1, 1 1, 1 0, 0 0))', srid=invalid.poly.srid))
+
+    @skipUnlessDBFeature('has_MakeValid_function')
+    def test_make_valid_multipolygon(self):
+        invalid_geom = fromstr(
+            'POLYGON((0 0, 0 1 , 1 1 , 1 0, 0 0), '
+            '(10 0, 10 1, 11 1, 11 0, 10 0))'
+        )
+        State.objects.create(name='invalid', poly=invalid_geom)
+        invalid = State.objects.filter(name='invalid').annotate(
+            repaired=functions.MakeValid('poly'),
+        ).get()
+        self.assertIs(invalid.repaired.valid, True)
+        self.assertEqual(invalid.repaired, fromstr(
+            'MULTIPOLYGON (((0 0, 0 1, 1 1, 1 0, 0 0)), '
+            '((10 0, 10 1, 11 1, 11 0, 10 0)))',
+            srid=invalid.poly.srid,
+        ))
+        self.assertEqual(len(invalid.repaired), 2)
+
+    @skipUnlessDBFeature('has_MakeValid_function')
+    def test_make_valid_output_field(self):
+        # output_field is GeometryField instance because different geometry
+        # types can be returned.
+        output_field = functions.MakeValid(
+            Value(Polygon(), PolygonField(srid=42)),
+        ).output_field
+        self.assertIs(output_field.__class__, GeometryField)
+        self.assertEqual(output_field.srid, 42)
 
     @skipUnlessDBFeature("has_MemSize_function")
     def test_memsize(self):

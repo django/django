@@ -12,19 +12,17 @@ from itertools import chain
 from django.conf import settings
 from django.core import exceptions
 from django.db import (
-    DJANGO_VERSION_PICKLE_KEY, IntegrityError, connections, router,
-    transaction,
+    DJANGO_VERSION_PICKLE_KEY, IntegrityError, NotSupportedError, connections,
+    router, transaction,
 )
-from django.db.models import DateField, DateTimeField, sql
+from django.db.models import AutoField, DateField, DateTimeField, sql
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.deletion import Collector
 from django.db.models.expressions import Case, Expression, F, Value, When
-from django.db.models.fields import AutoField
 from django.db.models.functions import Cast, Trunc
 from django.db.models.query_utils import FilteredRelation, Q
 from django.db.models.sql.constants import CURSOR, GET_ITERATOR_CHUNK_SIZE
 from django.db.models.utils import resolve_callables
-from django.db.utils import NotSupportedError
 from django.utils import timezone
 from django.utils.functional import cached_property, partition
 from django.utils.version import get_version
@@ -607,13 +605,13 @@ class QuerySet:
                 params = dict(resolve_callables(params))
                 obj = self.create(**params)
             return obj, True
-        except IntegrityError as e:
+        except IntegrityError:
             try:
                 qs = self.select_for_update() if lock else self
                 return qs.get(**lookup), False
             except self.model.DoesNotExist:
                 pass
-            raise e
+            raise
 
     def _extract_model_params(self, defaults, **kwargs):
         """
@@ -749,7 +747,10 @@ class QuerySet:
         query = self.query.clone()
         query.__class__ = sql.DeleteQuery
         cursor = query.get_compiler(using).execute_sql(CURSOR)
-        return cursor.rowcount if cursor else 0
+        if cursor:
+            with cursor:
+                return cursor.rowcount
+        return 0
     _raw_delete.alters_data = True
 
     def update(self, **kwargs):
@@ -874,7 +875,7 @@ class QuerySet:
             'datefield', flat=True
         ).distinct().filter(plain_field__isnull=False).order_by(('-' if order == 'DESC' else '') + 'datefield')
 
-    def datetimes(self, field_name, kind, order='ASC', tzinfo=None):
+    def datetimes(self, field_name, kind, order='ASC', tzinfo=None, is_dst=None):
         """
         Return a list of datetime objects representing all available
         datetimes for the given field_name, scoped to 'kind'.
@@ -889,7 +890,13 @@ class QuerySet:
         else:
             tzinfo = None
         return self.annotate(
-            datetimefield=Trunc(field_name, kind, output_field=DateTimeField(), tzinfo=tzinfo),
+            datetimefield=Trunc(
+                field_name,
+                kind,
+                output_field=DateTimeField(),
+                tzinfo=tzinfo,
+                is_dst=is_dst,
+            ),
             plain_field=F(field_name)
         ).values_list(
             'datetimefield', flat=True
@@ -1242,15 +1249,11 @@ class QuerySet:
         bulk_return = connections[self.db].features.can_return_rows_from_bulk_insert
         for item in [objs[i:i + batch_size] for i in range(0, len(objs), batch_size)]:
             if bulk_return and not ignore_conflicts:
-                inserted_columns = self._insert(
+                inserted_rows.extend(self._insert(
                     item, fields=fields, using=self.db,
                     returning_fields=self.model._meta.db_returning_fields,
                     ignore_conflicts=ignore_conflicts,
-                )
-                if isinstance(inserted_columns, list):
-                    inserted_rows.extend(inserted_columns)
-                else:
-                    inserted_rows.append(inserted_columns)
+                ))
             else:
                 self._insert(item, fields=fields, using=self.db, ignore_conflicts=ignore_conflicts)
         return inserted_rows

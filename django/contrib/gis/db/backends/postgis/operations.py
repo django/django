@@ -11,9 +11,9 @@ from django.contrib.gis.geos.geometry import GEOSGeometryBase
 from django.contrib.gis.geos.prototypes.io import wkb_r
 from django.contrib.gis.measure import Distance
 from django.core.exceptions import ImproperlyConfigured
+from django.db import NotSupportedError, ProgrammingError
 from django.db.backends.postgresql.operations import DatabaseOperations
 from django.db.models import Func, Value
-from django.db.utils import NotSupportedError, ProgrammingError
 from django.utils.functional import cached_property
 from django.utils.version import get_version_tuple
 

@@ -11,6 +11,7 @@ class PasswordResetTokenGenerator:
     reset mechanism.
     """
     key_salt = "django.contrib.auth.tokens.PasswordResetTokenGenerator"
+    algorithm = 'sha256'
     secret = settings.SECRET_KEY
 
     def make_token(self, user):
@@ -39,7 +40,14 @@ class PasswordResetTokenGenerator:
 
         # Check that the timestamp/uid has not been tampered with
         if not constant_time_compare(self._make_token_with_timestamp(user, ts), token):
-            return False
+            # RemovedInDjango40Warning: when the deprecation ends, replace
+            # with:
+            #   return False
+            if not constant_time_compare(
+                self._make_token_with_timestamp(user, ts, legacy=True),
+                token,
+            ):
+                return False
 
         # Check the timestamp is within limit.
         if (self._num_seconds(self._now()) - ts) > settings.PASSWORD_RESET_TIMEOUT:
@@ -47,7 +55,7 @@ class PasswordResetTokenGenerator:
 
         return True
 
-    def _make_token_with_timestamp(self, user, timestamp):
+    def _make_token_with_timestamp(self, user, timestamp, legacy=False):
         # timestamp is number of seconds since 2001-1-1. Converted to base 36,
         # this gives us a 6 digit string until about 2069.
         ts_b36 = int_to_base36(timestamp)
@@ -55,6 +63,10 @@ class PasswordResetTokenGenerator:
             self.key_salt,
             self._make_hash_value(user, timestamp),
             secret=self.secret,
+            # RemovedInDjango40Warning: when the deprecation ends, remove the
+            # legacy argument and replace with:
+            #   algorithm=self.algorithm,
+            algorithm='sha1' if legacy else self.algorithm,
         ).hexdigest()[::2]  # Limit to 20 characters to shorten the URL.
         return "%s-%s" % (ts_b36, hash_string)
 

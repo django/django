@@ -6,7 +6,7 @@ import logging
 import time
 from contextlib import contextmanager
 
-from django.db.utils import NotSupportedError
+from django.db import NotSupportedError
 
 logger = logging.getLogger('django.db.backends')
 

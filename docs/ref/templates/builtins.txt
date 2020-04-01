@@ -688,6 +688,10 @@ the variable ``template_name``::
 The variable may also be any object with a ``render()`` method that accepts a
 context. This allows you to reference a compiled ``Template`` in your context.
 
+Additionally, the variable may be an iterable of template names, in which case
+the first that can be loaded will be used, as per
+:func:`~django.template.loader.select_template`.
+
 An included template is rendered within the context of the template that
 includes it. This example produces the output ``"Hello, John!"``:
 
@@ -723,6 +727,10 @@ available to the included template::
     that includes blocks from another will contain blocks that have *already
     been evaluated and rendered* - not blocks that can be overridden by, for
     example, an extending template.
+
+.. versionchanged:: 3.1
+
+    Support for iterables of template names was added.
 
 .. templatetag:: load
 

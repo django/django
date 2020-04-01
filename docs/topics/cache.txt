@@ -570,6 +570,9 @@ minutes. (Note that we've written it as ``60 * 15`` for the purpose of
 readability. ``60 * 15`` will be evaluated to ``900`` -- that is, 15 minutes
 multiplied by 60 seconds per minute.)
 
+The cache timeout set by ``cache_page`` takes precedence over the ``max-age``
+directive from the ``Cache-Control`` header.
+
 The per-view cache, like the per-site cache, is keyed off of the URL. If
 multiple URLs point at the same view, each URL will be cached separately.
 Continuing the ``my_view`` example, if your URLconf looks like this::
@@ -604,6 +607,11 @@ setting for the middleware.  It can be used like this::
 The ``key_prefix`` and ``cache`` arguments may be specified together. The
 ``key_prefix`` argument and the :setting:`KEY_PREFIX <CACHES-KEY_PREFIX>`
 specified under :setting:`CACHES` will be concatenated.
+
+.. versionchanged:: 3.1
+
+    In older versions, the ``max-age`` directive from the ``Cache-Control``
+    header had precedence over the cache timeout set by ``cache_page``.
 
 Specifying per-view cache in the URLconf
 ----------------------------------------

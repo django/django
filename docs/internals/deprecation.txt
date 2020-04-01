@@ -44,6 +44,31 @@ details on these changes.
 
 * The ``django-admin.py`` entry point will be removed.
 
+* The ``HttpRequest.is_ajax()`` method will be removed.
+
+* Support for the pre-Django 3.1 encoding format of cookies values used by
+  ``django.contrib.messages.storage.cookie.CookieStorage`` will be removed.
+
+* Support for the pre-Django 3.1 password reset tokens in the admin site (that
+  use the SHA-1 hashing algorithm) will be removed.
+
+* Support for the pre-Django 3.1 encoding format of sessions will be removed.
+
+* The ``get_request`` argument for
+  ``django.utils.deprecation.MiddlewareMixin.__init__()`` will be required and
+  won't accept ``None``.
+
+* The ``providing_args`` argument for ``django.dispatch.Signal`` will be
+  removed.
+
+* The ``length`` argument for ``django.utils.crypto.get_random_string()`` will
+  be required.
+
+* The ``list`` message for ``ModelMultipleChoiceField`` will be removed.
+
+* ``django.views.generic.TemplateView`` will no longer pass URL kwargs directly
+  to the ``context``.
+
 See the :ref:`Django 3.1 release notes <deprecated-features-3.1>` for more
 details on these changes.
 
@@ -634,7 +659,7 @@ details on these changes.
 * Database test settings as independent entries in the database settings,
   prefixed by ``TEST_``, will no longer be supported.
 
-* The `cache_choices` option to :class:`~django.forms.ModelChoiceField` and
+* The ``cache_choices`` option to :class:`~django.forms.ModelChoiceField` and
   :class:`~django.forms.ModelMultipleChoiceField` will be removed.
 
 * The default value of the

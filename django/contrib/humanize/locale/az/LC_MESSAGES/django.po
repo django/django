@@ -3,14 +3,14 @@
 # Translators:
 # Ali Ismayilov <ali@ismailov.info>, 2011
 # Claude Paroz <claude@2xlibre.net>, 2013
-# Emin Mastizada <emin@linux.com>, 2018
+# Emin Mastizada <emin@linux.com>, 2018,2020
 # Emin Mastizada <emin@linux.com>, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-01-16 20:42+0100\n"
-"PO-Revision-Date: 2018-09-09 12:56+0000\n"
+"PO-Revision-Date: 2020-01-12 06:40+0000\n"
 "Last-Translator: Emin Mastizada <emin@linux.com>\n"
 "Language-Team: Azerbaijani (http://www.transifex.com/django/django/language/"
 "az/)\n"
@@ -26,12 +26,12 @@ msgstr "İnsanlaşdır"
 #. Translators: Ordinal format for 11 (11th), 12 (12th), and 13 (13th).
 msgctxt "ordinal 11, 12, 13"
 msgid "{}th"
-msgstr ""
+msgstr "{}."
 
 #. Translators: Ordinal format when value ends with 0, e.g. 80th.
 msgctxt "ordinal 0"
 msgid "{}th"
-msgstr ""
+msgstr "{}."
 
 #. Translators: Ordinal format when value ends with 1, e.g. 81st, except 11.
 msgctxt "ordinal 1"

@@ -3,8 +3,8 @@ from unittest import mock
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import connection
-from django.db.models import Prefetch, QuerySet
-from django.db.models.query import get_prefetcher, prefetch_related_objects
+from django.db.models import Prefetch, QuerySet, prefetch_related_objects
+from django.db.models.query import get_prefetcher
 from django.db.models.sql import Query
 from django.test import TestCase, override_settings
 from django.test.utils import CaptureQueriesContext

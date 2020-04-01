@@ -6,6 +6,7 @@ from django.apps import apps
 from django.conf import settings
 from django.core import serializers
 from django.db import router
+from django.db.transaction import atomic
 
 # The prefix to put on the default database name when creating
 # the test database.
@@ -20,12 +21,8 @@ class BaseDatabaseCreation:
     def __init__(self, connection):
         self.connection = connection
 
-    @property
-    def _nodb_connection(self):
-        """
-        Used to be defined here, now moved to DatabaseWrapper.
-        """
-        return self.connection._nodb_connection
+    def _nodb_cursor(self):
+        return self.connection._nodb_cursor()
 
     def log(self, msg):
         sys.stderr.write(msg + os.linesep)
@@ -130,8 +127,16 @@ class BaseDatabaseCreation:
         the serialize_db_to_string() method.
         """
         data = StringIO(data)
-        for obj in serializers.deserialize("json", data, using=self.connection.alias):
-            obj.save()
+        # Load data in a transaction to handle forward references and cycles.
+        with atomic(using=self.connection.alias):
+            # Disable constraint checks, because some databases (MySQL) doesn't
+            # support deferred checks.
+            with self.connection.constraint_checks_disabled():
+                for obj in serializers.deserialize('json', data, using=self.connection.alias):
+                    obj.save()
+            # Manually check for any invalid keys that might have been added,
+            # because constraint checks were disabled.
+            self.connection.check_constraints()
 
     def _get_database_display_str(self, verbosity, database_name):
         """
@@ -166,7 +171,7 @@ class BaseDatabaseCreation:
             'suffix': self.sql_table_creation_suffix(),
         }
         # Create the test database and connect to it.
-        with self._nodb_connection.cursor() as cursor:
+        with self._nodb_cursor() as cursor:
             try:
                 self._execute_create_test_db(cursor, test_db_params, keepdb)
             except Exception as e:
@@ -272,7 +277,7 @@ class BaseDatabaseCreation:
         # ourselves. Connect to the previous database (not the test database)
         # to do so, because it's not allowed to delete a database while being
         # connected to it.
-        with self.connection._nodb_connection.cursor() as cursor:
+        with self._nodb_cursor() as cursor:
             cursor.execute("DROP DATABASE %s"
                            % self.connection.ops.quote_name(test_database_name))
 

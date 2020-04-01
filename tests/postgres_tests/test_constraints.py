@@ -1,10 +1,8 @@
 import datetime
 from unittest import mock
 
-from django.db import connection, transaction
-from django.db.models import F, Func, Q
-from django.db.models.constraints import CheckConstraint
-from django.db.utils import IntegrityError
+from django.db import IntegrityError, connection, transaction
+from django.db.models import CheckConstraint, F, Func, Q
 from django.utils import timezone
 
 from . import PostgreSQLTestCase

@@ -141,7 +141,7 @@ class DeferredAttribute:
             return self
         data = instance.__dict__
         field_name = self.field.attname
-        if data.get(field_name, self) is self:
+        if field_name not in data:
             # Let's see if the field is part of the parent chain. If so we
             # might be able to reuse the already loaded value. Refs #18343.
             val = self._check_parent_chain(instance)

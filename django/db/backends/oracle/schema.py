@@ -2,8 +2,8 @@ import copy
 import datetime
 import re
 
+from django.db import DatabaseError
 from django.db.backends.base.schema import BaseDatabaseSchemaEditor
-from django.db.utils import DatabaseError
 
 
 class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):

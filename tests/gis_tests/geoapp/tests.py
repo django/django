@@ -9,7 +9,7 @@ from django.contrib.gis.geos import (
     MultiPoint, MultiPolygon, Point, Polygon, fromstr,
 )
 from django.core.management import call_command
-from django.db import NotSupportedError, connection
+from django.db import DatabaseError, NotSupportedError, connection
 from django.db.models import F, OuterRef, Subquery
 from django.test import TestCase, skipUnlessDBFeature
 
@@ -430,6 +430,12 @@ class GeoLookupTest(TestCase):
             with self.subTest(lookup=lookup):
                 self.assertNotIn(null, State.objects.filter(**{'poly__%s' % lookup: geom}))
 
+    def test_wkt_string_in_lookup(self):
+        # Valid WKT strings don't emit error logs.
+        with self.assertRaisesMessage(AssertionError, 'no logs'):
+            with self.assertLogs('django.contrib.gis', 'ERROR'):
+                State.objects.filter(poly__intersects='LINESTRING(0 0, 1 1, 5 5)')
+
     @skipUnlessDBFeature("supports_relate_lookup")
     def test_relate_lookup(self):
         "Testing the 'relate' lookup type."
@@ -587,6 +593,43 @@ class GeoQuerySetTest(TestCase):
         self.assertTrue(union.equals(u2))
         qs = City.objects.filter(name='NotACity')
         self.assertIsNone(qs.aggregate(Union('point'))['point__union'])
+
+    @unittest.skipUnless(
+        connection.vendor == 'oracle',
+        'Oracle supports tolerance parameter.',
+    )
+    def test_unionagg_tolerance(self):
+        City.objects.create(
+            point=fromstr('POINT(-96.467222 32.751389)', srid=4326),
+            name='Forney',
+        )
+        tx = Country.objects.get(name='Texas').mpoly
+        # Tolerance is greater than distance between Forney and Dallas, that's
+        # why Dallas is ignored.
+        forney_houston = GEOSGeometry(
+            'MULTIPOINT(-95.363151 29.763374, -96.467222 32.751389)',
+            srid=4326,
+        )
+        self.assertIs(
+            forney_houston.equals_exact(
+                City.objects.filter(point__within=tx).aggregate(
+                    Union('point', tolerance=32000),
+                )['point__union'],
+                tolerance=10e-6,
+            ),
+            True,
+        )
+
+    @unittest.skipUnless(
+        connection.vendor == 'oracle',
+        'Oracle supports tolerance parameter.',
+    )
+    def test_unionagg_tolerance_escaping(self):
+        tx = Country.objects.get(name='Texas').mpoly
+        with self.assertRaises(DatabaseError):
+            City.objects.filter(point__within=tx).aggregate(
+                Union('point', tolerance='0.05))), (((1'),
+            )
 
     def test_within_subquery(self):
         """

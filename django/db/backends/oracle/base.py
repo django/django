@@ -11,7 +11,7 @@ from contextlib import contextmanager
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
-from django.db import utils
+from django.db import IntegrityError
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.utils.asyncio import async_unsafe
 from django.utils.encoding import force_bytes, force_str
@@ -74,7 +74,7 @@ def wrap_oracle_errors():
         # Convert that case to Django's IntegrityError exception.
         x = e.args[0]
         if hasattr(x, 'code') and hasattr(x, 'message') and x.code == 2091 and 'ORA-02291' in x.message:
-            raise utils.IntegrityError(*tuple(e.args))
+            raise IntegrityError(*tuple(e.args))
         raise
 
 
@@ -301,8 +301,9 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         Check constraints by setting them to immediate. Return them to deferred
         afterward.
         """
-        self.cursor().execute('SET CONSTRAINTS ALL IMMEDIATE')
-        self.cursor().execute('SET CONSTRAINTS ALL DEFERRED')
+        with self.cursor() as cursor:
+            cursor.execute('SET CONSTRAINTS ALL IMMEDIATE')
+            cursor.execute('SET CONSTRAINTS ALL DEFERRED')
 
     def is_usable(self):
         try:
@@ -499,7 +500,10 @@ class FormatStylePlaceholderCursor:
             # params_dict = {0.75: ':arg0', 2: ':arg1', 'sth': ':arg2'}
             # args = [':arg0', ':arg1', ':arg0', ':arg2', ':arg0']
             # params = {':arg0': 0.75, ':arg1': 2, ':arg2': 'sth'}
-            params_dict = {param: ':arg%d' % i for i, param in enumerate(set(params))}
+            params_dict = {
+                param: ':arg%d' % i
+                for i, param in enumerate(dict.fromkeys(params))
+            }
             args = [params_dict[param] for param in params]
             params = {value: key for key, value in params_dict.items()}
             query = query % tuple(args)

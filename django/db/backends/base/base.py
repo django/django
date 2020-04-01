@@ -10,12 +10,12 @@ import pytz
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
-from django.db import DEFAULT_DB_ALIAS
+from django.db import DEFAULT_DB_ALIAS, DatabaseError
 from django.db.backends import utils
 from django.db.backends.base.validation import BaseDatabaseValidation
 from django.db.backends.signals import connection_created
 from django.db.transaction import TransactionManagementError
-from django.db.utils import DatabaseError, DatabaseErrorWrapper
+from django.db.utils import DatabaseErrorWrapper
 from django.utils import timezone
 from django.utils.asyncio import async_unsafe
 from django.utils.functional import cached_property
@@ -606,16 +606,21 @@ class BaseDatabaseWrapper:
             if must_close:
                 self.close()
 
-    @property
-    def _nodb_connection(self):
+    @contextmanager
+    def _nodb_cursor(self):
         """
-        Return an alternative connection to be used when there is no need to
-        access the main database, specifically for test db creation/deletion.
-        This also prevents the production database from being exposed to
-        potential child threads while (or after) the test database is destroyed.
-        Refs #10868, #17786, #16969.
+        Return a cursor from an alternative connection to be used when there is
+        no need to access the main database, specifically for test db
+        creation/deletion. This also prevents the production database from
+        being exposed to potential child threads while (or after) the test
+        database is destroyed. Refs #10868, #17786, #16969.
         """
-        return self.__class__({**self.settings_dict, 'NAME': None}, alias=NO_DB_ALIAS)
+        conn = self.__class__({**self.settings_dict, 'NAME': None}, alias=NO_DB_ALIAS)
+        try:
+            with conn.cursor() as cursor:
+                yield cursor
+        finally:
+            conn.close()
 
     def schema_editor(self, *args, **kwargs):
         """

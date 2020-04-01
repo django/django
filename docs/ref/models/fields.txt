@@ -153,7 +153,7 @@ The first element in each tuple is the name to apply to the group. The
 second element is an iterable of 2-tuples, with each 2-tuple containing
 a value and a human-readable name for an option. Grouped options may be
 combined with ungrouped options within a single list (such as the
-`unknown` option in this example).
+``'unknown'`` option in this example).
 
 For each model field that has :attr:`~Field.choices` set, Django will add a
 method to retrieve the human-readable name for the field's current value. See
@@ -204,7 +204,10 @@ choices in a concise way::
         )
 
         def is_upperclass(self):
-            return self.year_in_school in {YearInSchool.JUNIOR, YearInSchool.SENIOR}
+            return self.year_in_school in {
+                self.YearInSchool.JUNIOR,
+                self.YearInSchool.SENIOR,
+            }
 
 These work similar to :mod:`enum` from Python's standard library, but with some
 modifications:
@@ -2103,6 +2106,8 @@ Field API reference
         This method is not used for most built-in fields as the database
         backend already returns the correct Python type, or the backend itself
         does the conversion.
+
+        ``expression`` is the same as ``self``.
 
         See :ref:`converting-values-to-python-objects` for usage.
 

@@ -1,9 +1,5 @@
 // Core javascript helper functions
 
-// basic browser identification & version
-var isOpera = (navigator.userAgent.indexOf("Opera") >= 0) && parseFloat(navigator.appVersion);
-var isIE = ((document.all) && (!isOpera)) && parseFloat(navigator.appVersion.split("MSIE ")[1].split(";")[0]);
-
 // quickElement(tagType, parentReference [, textInChildNode, attribute, attributeValue ...]);
 function quickElement() {
     'use strict';
@@ -37,12 +33,8 @@ function findPosX(obj) {
     var curleft = 0;
     if (obj.offsetParent) {
         while (obj.offsetParent) {
-            curleft += obj.offsetLeft - ((isOpera) ? 0 : obj.scrollLeft);
-            obj = obj.offsetParent;
-        }
-        // IE offsetParent does not include the top-level
-        if (isIE && obj.parentElement) {
             curleft += obj.offsetLeft - obj.scrollLeft;
+            obj = obj.offsetParent;
         }
     } else if (obj.x) {
         curleft += obj.x;
@@ -55,12 +47,8 @@ function findPosY(obj) {
     var curtop = 0;
     if (obj.offsetParent) {
         while (obj.offsetParent) {
-            curtop += obj.offsetTop - ((isOpera) ? 0 : obj.scrollTop);
-            obj = obj.offsetParent;
-        }
-        // IE offsetParent does not include the top-level
-        if (isIE && obj.parentElement) {
             curtop += obj.offsetTop - obj.scrollTop;
+            obj = obj.offsetParent;
         }
     } else if (obj.y) {
         curtop += obj.y;

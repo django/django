@@ -2,10 +2,7 @@ import datetime
 from unittest import skipIf, skipUnless
 
 from django.db import connection
-from django.db.models import Index
-from django.db.models.deletion import CASCADE
-from django.db.models.fields.related import ForeignKey
-from django.db.models.query_utils import Q
+from django.db.models import CASCADE, ForeignKey, Index, Q
 from django.test import (
     TestCase, TransactionTestCase, skipIfDBFeature, skipUnlessDBFeature,
 )
@@ -273,9 +270,10 @@ class SchemaIndexesMySQLTests(TransactionTestCase):
         MySQL on InnoDB already creates indexes automatically for foreign keys.
         (#14180). An index should be created if db_constraint=False (#26171).
         """
-        storage = connection.introspection.get_storage_engine(
-            connection.cursor(), ArticleTranslation._meta.db_table
-        )
+        with connection.cursor() as cursor:
+            storage = connection.introspection.get_storage_engine(
+                cursor, ArticleTranslation._meta.db_table,
+            )
         if storage != "InnoDB":
             self.skip("This test only applies to the InnoDB storage engine")
         index_sql = [str(statement) for statement in connection.schema_editor()._model_indexes_sql(ArticleTranslation)]
@@ -329,9 +327,10 @@ class PartialIndexTests(TransactionTestCase):
                 str(index.create_sql(Article, schema_editor=editor))
             )
             editor.add_index(index=index, model=Article)
-            self.assertIn(index.name, connection.introspection.get_constraints(
-                cursor=connection.cursor(), table_name=Article._meta.db_table,
-            ))
+            with connection.cursor() as cursor:
+                self.assertIn(index.name, connection.introspection.get_constraints(
+                    cursor=cursor, table_name=Article._meta.db_table,
+                ))
             editor.remove_index(index=index, model=Article)
 
     def test_integer_restriction_partial(self):
@@ -346,9 +345,10 @@ class PartialIndexTests(TransactionTestCase):
                 str(index.create_sql(Article, schema_editor=editor))
             )
             editor.add_index(index=index, model=Article)
-            self.assertIn(index.name, connection.introspection.get_constraints(
-                cursor=connection.cursor(), table_name=Article._meta.db_table,
-            ))
+            with connection.cursor() as cursor:
+                self.assertIn(index.name, connection.introspection.get_constraints(
+                    cursor=cursor, table_name=Article._meta.db_table,
+                ))
             editor.remove_index(index=index, model=Article)
 
     def test_boolean_restriction_partial(self):
@@ -363,9 +363,10 @@ class PartialIndexTests(TransactionTestCase):
                 str(index.create_sql(Article, schema_editor=editor))
             )
             editor.add_index(index=index, model=Article)
-            self.assertIn(index.name, connection.introspection.get_constraints(
-                cursor=connection.cursor(), table_name=Article._meta.db_table,
-            ))
+            with connection.cursor() as cursor:
+                self.assertIn(index.name, connection.introspection.get_constraints(
+                    cursor=cursor, table_name=Article._meta.db_table,
+                ))
             editor.remove_index(index=index, model=Article)
 
     @skipUnlessDBFeature('supports_functions_in_partial_indexes')
@@ -393,9 +394,10 @@ class PartialIndexTests(TransactionTestCase):
             # check ONLY the occurrence of headline in the SQL.
             self.assertGreater(sql.rfind('headline'), where)
             editor.add_index(index=index, model=Article)
-            self.assertIn(index.name, connection.introspection.get_constraints(
-                cursor=connection.cursor(), table_name=Article._meta.db_table,
-            ))
+            with connection.cursor() as cursor:
+                self.assertIn(index.name, connection.introspection.get_constraints(
+                    cursor=cursor, table_name=Article._meta.db_table,
+                ))
             editor.remove_index(index=index, model=Article)
 
     def test_is_null_condition(self):
@@ -410,7 +412,8 @@ class PartialIndexTests(TransactionTestCase):
                 str(index.create_sql(Article, schema_editor=editor))
             )
             editor.add_index(index=index, model=Article)
-            self.assertIn(index.name, connection.introspection.get_constraints(
-                cursor=connection.cursor(), table_name=Article._meta.db_table,
-            ))
+            with connection.cursor() as cursor:
+                self.assertIn(index.name, connection.introspection.get_constraints(
+                    cursor=cursor, table_name=Article._meta.db_table,
+                ))
             editor.remove_index(index=index, model=Article)

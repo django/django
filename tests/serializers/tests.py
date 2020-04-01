@@ -79,9 +79,8 @@ class SerializerRegistrationTests(SimpleTestCase):
             serializers.get_serializer("nonsense")
 
         # SerializerDoesNotExist is instantiated with the nonexistent format
-        with self.assertRaises(SerializerDoesNotExist) as cm:
+        with self.assertRaisesMessage(SerializerDoesNotExist, 'nonsense'):
             serializers.get_serializer("nonsense")
-        self.assertEqual(cm.exception.args, ("nonsense",))
 
     def test_get_unknown_deserializer(self):
         with self.assertRaises(SerializerDoesNotExist):

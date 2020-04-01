@@ -129,7 +129,7 @@ class MigrateTests(MigrationTestBase):
         that check.
         """
         # Make sure no tables are created
-        for db in connections:
+        for db in self.databases:
             self.assertTableNotExists("migrations_author", using=db)
             self.assertTableNotExists("migrations_tribble", using=db)
         # Run the migrations to 0001 only
@@ -192,7 +192,7 @@ class MigrateTests(MigrationTestBase):
         call_command("migrate", "migrations", "zero", verbosity=0)
         call_command("migrate", "migrations", "zero", verbosity=0, database="other")
         # Make sure it's all gone
-        for db in connections:
+        for db in self.databases:
             self.assertTableNotExists("migrations_author", using=db)
             self.assertTableNotExists("migrations_tribble", using=db)
             self.assertTableNotExists("migrations_book", using=db)
@@ -248,6 +248,39 @@ class MigrateTests(MigrationTestBase):
         """
         with self.assertRaisesMessage(CommandError, "Conflicting migrations detected"):
             call_command("migrate", "migrations")
+
+    @override_settings(MIGRATION_MODULES={
+        'migrations': 'migrations.test_migrations',
+    })
+    def test_migrate_check(self):
+        with self.assertRaises(SystemExit):
+            call_command('migrate', 'migrations', '0001', check_unapplied=True, verbosity=0)
+        self.assertTableNotExists('migrations_author')
+        self.assertTableNotExists('migrations_tribble')
+        self.assertTableNotExists('migrations_book')
+
+    @override_settings(MIGRATION_MODULES={
+        'migrations': 'migrations.test_migrations_plan',
+    })
+    def test_migrate_check_plan(self):
+        out = io.StringIO()
+        with self.assertRaises(SystemExit):
+            call_command(
+                'migrate',
+                'migrations',
+                '0001',
+                check_unapplied=True,
+                plan=True,
+                stdout=out,
+                no_color=True,
+            )
+        self.assertEqual(
+            'Planned operations:\n'
+            'migrations.0001_initial\n'
+            '    Create model Salamander\n'
+            '    Raw Python operation -> Grow salamander tail.\n',
+            out.getvalue(),
+        )
 
     @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations"})
     def test_showmigrations_list(self):
@@ -695,6 +728,32 @@ class MigrateTests(MigrationTestBase):
             self.assertNotIn(start_transaction_sql.lower(), queries)
         self.assertNotIn(connection.ops.end_transaction_sql().lower(), queries)
 
+    @override_settings(MIGRATION_MODULES={'migrations': 'migrations.test_migrations_squashed'})
+    def test_sqlmigrate_ambiguous_prefix_squashed_migrations(self):
+        msg = (
+            "More than one migration matches '0001' in app 'migrations'. "
+            "Please be more specific."
+        )
+        with self.assertRaisesMessage(CommandError, msg):
+            call_command('sqlmigrate', 'migrations', '0001')
+
+    @override_settings(MIGRATION_MODULES={'migrations': 'migrations.test_migrations_squashed'})
+    def test_sqlmigrate_squashed_migration(self):
+        out = io.StringIO()
+        call_command('sqlmigrate', 'migrations', '0001_squashed_0002', stdout=out)
+        output = out.getvalue().lower()
+        self.assertIn('-- create model author', output)
+        self.assertIn('-- create model book', output)
+        self.assertNotIn('-- create model tribble', output)
+
+    @override_settings(MIGRATION_MODULES={'migrations': 'migrations.test_migrations_squashed'})
+    def test_sqlmigrate_replaced_migration(self):
+        out = io.StringIO()
+        call_command('sqlmigrate', 'migrations', '0001_initial', stdout=out)
+        output = out.getvalue().lower()
+        self.assertIn('-- create model author', output)
+        self.assertIn('-- create model tribble', output)
+
     @override_settings(MIGRATION_MODULES={'migrations': 'migrations.test_migrations_no_operations'})
     def test_migrations_no_operations(self):
         err = io.StringIO()
@@ -931,7 +990,7 @@ class MakeMigrationsTests(MigrationTestBase):
 
                 # With a router that doesn't prohibit migrating 'other',
                 # consistency is checked.
-                with self.settings(DATABASE_ROUTERS=['migrations.routers.EmptyRouter']):
+                with self.settings(DATABASE_ROUTERS=['migrations.routers.DefaultOtherRouter']):
                     with self.assertRaisesMessage(Exception, 'Other connection'):
                         call_command('makemigrations', 'migrations', verbosity=0)
                 self.assertEqual(has_table.call_count, 4)  # 'default' and 'other'
@@ -944,12 +1003,14 @@ class MakeMigrationsTests(MigrationTestBase):
                 allow_migrate.assert_any_call('other', 'migrations', model_name='UnicodeModel')
                 # allow_migrate() is called with the correct arguments.
                 self.assertGreater(len(allow_migrate.mock_calls), 0)
+                called_aliases = set()
                 for mock_call in allow_migrate.mock_calls:
                     _, call_args, call_kwargs = mock_call
                     connection_alias, app_name = call_args
-                    self.assertIn(connection_alias, ['default', 'other'])
+                    called_aliases.add(connection_alias)
                     # Raises an error if invalid app_name/model_name occurs.
                     apps.get_app_config(app_name).get_model(call_kwargs['model_name'])
+                self.assertEqual(called_aliases, set(connections))
                 self.assertEqual(has_table.call_count, 4)
 
     def test_failing_migration(self):

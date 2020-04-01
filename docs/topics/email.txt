@@ -549,6 +549,9 @@ To specify this backend, put the following in your settings::
 This backend is not intended for use in production -- it is provided as a
 convenience that can be used during development and testing.
 
+Django's test runner :ref:`automatically uses this backend for testing
+<topics-testing-email>`.
+
 .. _topic-email-dummy-backend:
 
 Dummy backend

@@ -106,6 +106,16 @@ For example, to perform only models and compatibility checks, run::
 
     django-admin check --tag models --tag compatibility
 
+.. django-admin-option:: --database DATABASE
+
+.. versionadded:: 3.1
+
+Specifies the database to run checks requiring database access::
+
+    django-admin check --database default --database other
+
+By default, these checks will not be run.
+
 .. django-admin-option:: --list-tags
 
 Lists all available tags.
@@ -854,6 +864,13 @@ with hundreds of models.
 
 Suppresses all user prompts. An example prompt is asking about removing stale
 content types.
+
+.. django-admin-option:: --check
+
+.. versionadded:: 3.1
+
+Makes ``migrate`` exit with a non-zero status when unapplied migrations are
+detected.
 
 ``runserver``
 -------------
@@ -1640,6 +1657,13 @@ the deletion.
 .. django-admin-option:: --database DATABASE
 
 Specifies the database to use. Defaults to ``default``.
+
+.. django-admin-option:: --include-stale-apps
+
+.. versionadded:: 3.1
+
+Deletes stale content types including ones from previously installed apps that
+have been removed from :setting:`INSTALLED_APPS`. Defaults to ``False``.
 
 ``django.contrib.gis``
 ----------------------

@@ -89,6 +89,7 @@ class Item(models.Model):
 
 class Object(models.Model):
     related_objects = models.ManyToManyField("self", db_constraint=False, symmetrical=False)
+    obj_ref = models.ForeignKey('ObjectReference', models.CASCADE, null=True)
 
     def __str__(self):
         return str(self.id)

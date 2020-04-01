@@ -3,8 +3,8 @@ import struct
 from django.forms import ValidationError
 
 from .const import (
-    GDAL_TO_POSTGIS, GDAL_TO_STRUCT, POSTGIS_HEADER_STRUCTURE, POSTGIS_TO_GDAL,
-    STRUCT_SIZE,
+    BANDTYPE_FLAG_HASNODATA, BANDTYPE_PIXTYPE_MASK, GDAL_TO_POSTGIS,
+    GDAL_TO_STRUCT, POSTGIS_HEADER_STRUCTURE, POSTGIS_TO_GDAL, STRUCT_SIZE,
 )
 
 
@@ -45,13 +45,9 @@ def from_pgraster(data):
     pixeltypes = []
     while data:
         # Get pixel type for this band
-        pixeltype, data = chunk(data, 2)
-        pixeltype = unpack('B', pixeltype)[0]
-
-        # Subtract nodata byte from band nodata value if it exists
-        has_nodata = pixeltype >= 64
-        if has_nodata:
-            pixeltype -= 64
+        pixeltype_with_flags, data = chunk(data, 2)
+        pixeltype_with_flags = unpack('B', pixeltype_with_flags)[0]
+        pixeltype = pixeltype_with_flags & BANDTYPE_PIXTYPE_MASK
 
         # Convert datatype from PostGIS to GDAL & get pack type and size
         pixeltype = POSTGIS_TO_GDAL[pixeltype]
@@ -68,8 +64,8 @@ def from_pgraster(data):
         band, data = chunk(data, pack_size * header[10] * header[11])
         band_result = {'data': bytes.fromhex(band)}
 
-        # If the nodata flag is True, set the nodata value.
-        if has_nodata:
+        # Set the nodata value if the nodata flag is set.
+        if pixeltype_with_flags & BANDTYPE_FLAG_HASNODATA:
             band_result['nodata_value'] = nodata
 
         # Append band data to band list
@@ -116,12 +112,13 @@ def to_pgraster(rast):
         # and the nodata value.
         #
         # The 8BUI stores both the PostGIS pixel data type and a nodata flag.
-        # It is composed as the datatype integer plus 64 as a flag for existing
-        # nodata values:
-        # 8BUI_VALUE = PG_PIXEL_TYPE (0-11) + FLAG (0 or 64)
+        # It is composed as the datatype with BANDTYPE_FLAG_HASNODATA (1 << 6)
+        # for existing nodata values:
+        #   8BUI_VALUE = PG_PIXEL_TYPE (0-11) | BANDTYPE_FLAG_HASNODATA
         #
         # For example, if the byte value is 71, then the datatype is
-        # 71-64 = 7 (32BSI) and the nodata value is True.
+        #   71 & ~BANDTYPE_FLAG_HASNODATA = 7 (32BSI)
+        # and the nodata value is True.
         structure = 'B' + GDAL_TO_STRUCT[band.datatype()]
 
         # Get band pixel type in PostGIS notation
@@ -129,7 +126,7 @@ def to_pgraster(rast):
 
         # Set the nodata flag
         if band.nodata_value is not None:
-            pixeltype += 64
+            pixeltype |= BANDTYPE_FLAG_HASNODATA
 
         # Pack band header
         bandheader = pack(structure, (pixeltype, band.nodata_value or 0))

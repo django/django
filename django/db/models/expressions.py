@@ -4,10 +4,10 @@ import inspect
 from decimal import Decimal
 
 from django.core.exceptions import EmptyResultSet, FieldError
-from django.db import connection
+from django.db import NotSupportedError, connection
 from django.db.models import fields
+from django.db.models.constants import LOOKUP_SEP
 from django.db.models.query_utils import Q
-from django.db.utils import NotSupportedError
 from django.utils.deconstruct import deconstructible
 from django.utils.functional import cached_property
 from django.utils.hashable import make_hashable
@@ -51,6 +51,7 @@ class Combinable:
     BITOR = '|'
     BITLEFTSHIFT = '<<'
     BITRIGHTSHIFT = '>>'
+    BITXOR = '#'
 
     def _combine(self, other, connector, reversed):
         if not hasattr(other, 'resolve_expression'):
@@ -104,6 +105,9 @@ class Combinable:
 
     def bitrightshift(self, other):
         return self._combine(other, self.BITRIGHTSHIFT, False)
+
+    def bitxor(self, other):
+        return self._combine(other, self.BITXOR, False)
 
     def __or__(self, other):
         if getattr(self, 'conditional', False) and getattr(other, 'conditional', False):
@@ -560,8 +564,19 @@ class ResolvedOuterRef(F):
             'only be used in a subquery.'
         )
 
+    def resolve_expression(self, *args, **kwargs):
+        col = super().resolve_expression(*args, **kwargs)
+        # FIXME: Rename possibly_multivalued to multivalued and fix detection
+        # for non-multivalued JOINs (e.g. foreign key fields). This should take
+        # into account only many-to-many and one-to-many relationships.
+        col.possibly_multivalued = LOOKUP_SEP in self.name
+        return col
+
     def relabeled_clone(self, relabels):
         return self
+
+    def get_group_by_cols(self, alias=None):
+        return []
 
 
 class OuterRef(F):
@@ -745,6 +760,7 @@ class Random(Expression):
 class Col(Expression):
 
     contains_column_references = True
+    possibly_multivalued = False
 
     def __init__(self, alias, target, output_field=None):
         if output_field is None:
@@ -1040,7 +1056,10 @@ class Subquery(Expression):
     def get_group_by_cols(self, alias=None):
         if alias:
             return [Ref(alias, self)]
-        return self.query.get_external_cols()
+        external_cols = self.query.get_external_cols()
+        if any(col.possibly_multivalued for col in external_cols):
+            return [self]
+        return external_cols
 
 
 class Exists(Subquery):
@@ -1105,9 +1124,13 @@ class OrderBy(BaseExpression):
             elif self.nulls_first:
                 template = '%s NULLS FIRST' % template
         else:
-            if self.nulls_last:
+            if self.nulls_last and not (
+                self.descending and connection.features.order_by_nulls_first
+            ):
                 template = '%%(expression)s IS NULL, %s' % template
-            elif self.nulls_first:
+            elif self.nulls_first and not (
+                not self.descending and connection.features.order_by_nulls_first
+            ):
                 template = '%%(expression)s IS NOT NULL, %s' % template
         connection.ops.check_expression_support(self)
         expression_sql, params = compiler.compile(self.expression)

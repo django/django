@@ -1,8 +1,8 @@
+import sys
 import time
 from importlib import import_module
 
 from django.apps import apps
-from django.core.checks import Tags, run_checks
 from django.core.management.base import (
     BaseCommand, CommandError, no_translations,
 )
@@ -20,8 +20,13 @@ from django.utils.text import Truncator
 
 class Command(BaseCommand):
     help = "Updates database schema. Manages both apps with migrations and those without."
+    requires_system_checks = False
 
     def add_arguments(self, parser):
+        parser.add_argument(
+            '--skip-checks', action='store_true',
+            help='Skip system checks.',
+        )
         parser.add_argument(
             'app_label', nargs='?',
             help='App label of an application to synchronize the state.',
@@ -58,14 +63,16 @@ class Command(BaseCommand):
             '--run-syncdb', action='store_true',
             help='Creates tables for apps without migrations.',
         )
-
-    def _run_checks(self, **kwargs):
-        issues = run_checks(tags=[Tags.database])
-        issues.extend(super()._run_checks(**kwargs))
-        return issues
+        parser.add_argument(
+            '--check', action='store_true', dest='check_unapplied',
+            help='Exits with a non-zero status if unapplied migrations exist.',
+        )
 
     @no_translations
     def handle(self, *args, **options):
+        database = options['database']
+        if not options['skip_checks']:
+            self.check(databases=[database])
 
         self.verbosity = options['verbosity']
         self.interactive = options['interactive']
@@ -77,8 +84,7 @@ class Command(BaseCommand):
                 import_module('.management', app_config.name)
 
         # Get the database we're operating from
-        db = options['database']
-        connection = connections[db]
+        connection = connections[database]
 
         # Hook for backends needing any database preparation
         connection.prepare_database()
@@ -142,6 +148,7 @@ class Command(BaseCommand):
             targets = executor.loader.graph.leaf_nodes()
 
         plan = executor.migration_plan(targets)
+        exit_dry = plan and options['check_unapplied']
 
         if options['plan']:
             self.stdout.write('Planned operations:', self.style.MIGRATE_LABEL)
@@ -153,7 +160,11 @@ class Command(BaseCommand):
                     message, is_error = self.describe_operation(operation, backwards)
                     style = self.style.WARNING if is_error else None
                     self.stdout.write('    ' + message, style)
+            if exit_dry:
+                sys.exit(1)
             return
+        if exit_dry:
+            sys.exit(1)
 
         # At this point, ignore run_syncdb if there aren't any apps to sync.
         run_syncdb = options['run_syncdb'] and executor.loader.unmigrated_apps

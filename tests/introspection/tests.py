@@ -1,8 +1,7 @@
 from unittest import mock, skipUnless
 
-from django.db import connection
+from django.db import DatabaseError, connection
 from django.db.models import Index
-from django.db.utils import DatabaseError
 from django.test import TransactionTestCase, skipUnlessDBFeature
 
 from .models import (

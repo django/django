@@ -156,6 +156,11 @@ class GDALRasterTests(SimpleTestCase):
         else:
             self.assertEqual(restored_raster.bands[0].data(), self.rs.bands[0].data())
 
+    def test_nonexistent_file(self):
+        msg = 'Unable to read raster source input "nonexistent.tif".'
+        with self.assertRaisesMessage(GDALException, msg):
+            GDALRaster('nonexistent.tif')
+
     def test_vsi_raster_creation(self):
         # Open a raster as a file object.
         with open(self.rs_path, 'rb') as dat:

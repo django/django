@@ -78,8 +78,6 @@ def login_and_permission_required_exception(request):
     pass
 
 
-uid_token = r'(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})'
-
 # special urls for auth test cases
 urlpatterns = auth_urlpatterns + [
     path('logout/custom_query/', views.LogoutView.as_view(redirect_field_name='follow')),
@@ -106,24 +104,24 @@ urlpatterns = auth_urlpatterns + [
         views.PasswordResetView.as_view(
             html_email_template_name='registration/html_password_reset_email.html'
         )),
-    re_path(
-        '^reset/custom/{}/$'.format(uid_token),
+    path(
+        'reset/custom/<uidb64>/<token>/',
         views.PasswordResetConfirmView.as_view(success_url='/custom/'),
     ),
-    re_path(
-        '^reset/custom/named/{}/$'.format(uid_token),
+    path(
+        'reset/custom/named/<uidb64>/<token>/',
         views.PasswordResetConfirmView.as_view(success_url=reverse_lazy('password_reset')),
     ),
-    re_path(
-        '^reset/custom/token/{}/$'.format(uid_token),
+    path(
+        'reset/custom/token/<uidb64>/<token>/',
         views.PasswordResetConfirmView.as_view(reset_url_token='set-passwordcustom'),
     ),
-    re_path(
-        '^reset/post_reset_login/{}/$'.format(uid_token),
+    path(
+        'reset/post_reset_login/<uidb64>/<token>/',
         views.PasswordResetConfirmView.as_view(post_reset_login=True),
     ),
-    re_path(
-        '^reset/post_reset_login_custom_backend/{}/$'.format(uid_token),
+    path(
+        'reset/post_reset_login_custom_backend/<uidb64>/<token>/',
         views.PasswordResetConfirmView.as_view(
             post_reset_login=True,
             post_reset_login_backend='django.contrib.auth.backends.AllowAllUsersModelBackend',

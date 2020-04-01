@@ -2,12 +2,12 @@
 SQL functions reference lists:
 https://www.gaia-gis.it/gaia-sins/spatialite-sql-4.3.0.html
 """
+from django.contrib.gis.db import models
 from django.contrib.gis.db.backends.base.operations import (
     BaseSpatialOperations,
 )
 from django.contrib.gis.db.backends.spatialite.adapter import SpatiaLiteAdapter
 from django.contrib.gis.db.backends.utils import SpatialOperator
-from django.contrib.gis.db.models import aggregates
 from django.contrib.gis.geos.geometry import GEOSGeometry, GEOSGeometryBase
 from django.contrib.gis.geos.prototypes.io import wkb_r
 from django.contrib.gis.measure import Distance
@@ -62,7 +62,7 @@ class SpatiaLiteOperations(BaseSpatialOperations, DatabaseOperations):
         'dwithin': SpatialOperator(func='PtDistWithin'),
     }
 
-    disallowed_aggregates = (aggregates.Extent3D,)
+    disallowed_aggregates = (models.Extent3D,)
 
     select = 'CAST (AsEWKB(%s) AS BLOB)'
 

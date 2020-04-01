@@ -2308,7 +2308,7 @@ The ``InlineModelAdmin`` class adds or customizes:
 .. attribute:: InlineModelAdmin.extra
 
     This controls the number of extra forms the formset will display in
-    addition to the initial forms. See the
+    addition to the initial forms. Defaults to 3. See the
     :doc:`formsets documentation </topics/forms/formsets>` for more
     information.
 

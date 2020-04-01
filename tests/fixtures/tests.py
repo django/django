@@ -541,10 +541,10 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
         ])
 
     def test_ambiguous_compressed_fixture(self):
-        # The name "fixture5" is ambiguous, so loading it will raise an error
-        with self.assertRaises(management.CommandError) as cm:
+        # The name "fixture5" is ambiguous, so loading raises an error.
+        msg = "Multiple fixtures named 'fixture5'"
+        with self.assertRaisesMessage(management.CommandError, msg):
             management.call_command('loaddata', 'fixture5', verbosity=0)
-            self.assertIn("Multiple fixtures named 'fixture5'", cm.exception.args[0])
 
     def test_db_loading(self):
         # Load db fixtures 1 and 2. These will load using the 'default' database identifier implicitly
@@ -564,10 +564,11 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
         # This won't affect other tests because the database connection
         # is closed at the end of each test.
         if connection.vendor == 'mysql':
-            connection.cursor().execute("SET sql_mode = 'TRADITIONAL'")
-        with self.assertRaises(IntegrityError) as cm:
+            with connection.cursor() as cursor:
+                cursor.execute("SET sql_mode = 'TRADITIONAL'")
+        msg = 'Could not load fixtures.Article(pk=1):'
+        with self.assertRaisesMessage(IntegrityError, msg):
             management.call_command('loaddata', 'invalid.json', verbosity=0)
-            self.assertIn("Could not load fixtures.Article(pk=1):", cm.exception.args[0])
 
     @unittest.skipUnless(connection.vendor == 'postgresql', 'psycopg2 prohibits null characters in data.')
     def test_loaddata_null_characters_on_postgresql(self):
@@ -759,9 +760,9 @@ class FixtureTransactionTests(DumpDataAssertMixin, TransactionTestCase):
 
         # Try to load fixture 2 using format discovery; this will fail
         # because there are two fixture2's in the fixtures directory
-        with self.assertRaises(management.CommandError) as cm:
+        msg = "Multiple fixtures named 'fixture2'"
+        with self.assertRaisesMessage(management.CommandError, msg):
             management.call_command('loaddata', 'fixture2', verbosity=0)
-            self.assertIn("Multiple fixtures named 'fixture2'", cm.exception.args[0])
 
         # object list is unaffected
         self.assertQuerysetEqual(Article.objects.all(), [

@@ -1,7 +1,6 @@
 import json
 
-from django.db.models import CharField, Q
-from django.db.models.expressions import F, OuterRef, Subquery, Value
+from django.db.models import CharField, F, OuterRef, Q, Subquery, Value
 from django.db.models.functions import Cast, Concat, Substr
 from django.test.utils import Approximate
 
@@ -168,6 +167,10 @@ class TestGeneralAggregate(PostgreSQLTestCase):
     def test_string_agg_requires_delimiter(self):
         with self.assertRaises(TypeError):
             AggregateTestModel.objects.aggregate(stringagg=StringAgg('char_field'))
+
+    def test_string_agg_delimiter_escaping(self):
+        values = AggregateTestModel.objects.aggregate(stringagg=StringAgg('char_field', delimiter="'"))
+        self.assertEqual(values, {'stringagg': "Foo1'Foo2'Foo4'Foo3"})
 
     def test_string_agg_charfield(self):
         values = AggregateTestModel.objects.aggregate(stringagg=StringAgg('char_field', delimiter=';'))

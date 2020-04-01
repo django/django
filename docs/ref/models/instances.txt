@@ -837,7 +837,7 @@ duplicated. That also means you cannot use those methods on unsaved objects.
 .. admonition:: Overriding extra instance methods
 
     In most cases overriding or inheriting ``get_FOO_display()``,
-    ``get_next_by_FOO()``, and ``get_previous_by_FOO()` should work as
+    ``get_next_by_FOO()``, and ``get_previous_by_FOO()`` should work as
     expected. Since they are added by the metaclass however, it is not
     practical to account for all possible inheritance structures. In more
     complex cases you should override ``Field.contribute_to_class()`` to set

@@ -354,7 +354,27 @@ foundation for custom widgets.
 
     .. attribute:: MultiWidget.widgets
 
-        An iterable containing the widgets needed.
+        An iterable containing the widgets needed. For example::
+
+            >>> from django.forms import MultiWidget, TextInput
+            >>> widget = MultiWidget(widgets=[TextInput, TextInput])
+            >>> widget.render('name', ['john', 'paul'])
+            '<input type="text" name="name_0" value="john"><input type="text" name="name_1" value="paul">'
+
+        You may provide a dictionary in order to specify custom suffixes for
+        the ``name`` attribute on each subwidget. In this case, for each
+        ``(key, widget)`` pair, the key will be appended to the ``name`` of the
+        widget in order to generate the attribute value. You may provide the
+        empty string (``''``) for a single key, in order to suppress the suffix
+        for one widget. For example::
+
+            >>> widget = MultiWidget(widgets={'': TextInput, 'last': TextInput})
+            >>> widget.render('name', ['john', 'lennon'])
+            '<input type="text" name="name" value="john"><input type="text" name="name_last" value="paul">'
+
+        .. versionchanged::3.1
+
+            Support for using a dictionary was added.
 
     And one required method:
 
@@ -845,12 +865,6 @@ Composite widgets
 
     A widget that handles multiple hidden widgets for fields that have a list
     of values.
-
-    .. attribute:: MultipleHiddenInput.choices
-
-        This attribute is optional when the form field does not have a
-        ``choices`` attribute. If it does, it will override anything you set
-        here when the attribute is updated on the :class:`Field`.
 
 ``SplitDateTimeWidget``
 ~~~~~~~~~~~~~~~~~~~~~~~

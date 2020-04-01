@@ -2,15 +2,16 @@
 #
 # Translators:
 # Branko Kokanovic <branko@kokanovic.org>, 2018
+# Igor Jerosimić, 2020
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Janos Guljas <janos@resenje.org>, 2012
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2018-03-13 21:32+0000\n"
-"Last-Translator: Branko Kokanovic <branko@kokanovic.org>\n"
+"POT-Creation-Date: 2019-09-08 17:27+0200\n"
+"PO-Revision-Date: 2020-01-21 20:08+0000\n"
+"Last-Translator: Igor Jerosimić\n"
 "Language-Team: Serbian (http://www.transifex.com/django/django/language/"
 "sr/)\n"
 "MIME-Version: 1.0\n"
@@ -27,7 +28,7 @@ msgid "The base GIS field."
 msgstr "Основна GIS поља."
 
 msgid ""
-"The base Geometry field -- maps to the OpenGIS Specification Geometry type."
+"The base Geometry field — maps to the OpenGIS Specification Geometry type."
 msgstr ""
 "Основно геометријско поље - мапира тип геометрије по „OpenGIS“ спецификацији."
 
@@ -53,7 +54,7 @@ msgid "Geometry collection"
 msgstr "Колекција геопметријских облика"
 
 msgid "Extent Aggregate Field"
-msgstr ""
+msgstr "Проширено збирно поље"
 
 msgid "Raster Field"
 msgstr "Растерско поље"
@@ -85,5 +86,5 @@ msgid "No feeds are registered."
 msgstr "Нема регистрованих фидова."
 
 #, python-format
-msgid "Slug %r isn't registered."
-msgstr "Слаг „%r“ није регистрован."
+msgid "Slug %r isn’t registered."
+msgstr "Слаг %r није регистрован."

@@ -11,10 +11,11 @@ from docutils.statemachine import ViewList
 from sphinx import addnodes
 from sphinx.builders.html import StandaloneHTMLBuilder
 from sphinx.directives import CodeBlock
+from sphinx.errors import SphinxError
 from sphinx.domains.std import Cmdoption
 from sphinx.errors import ExtensionError
 from sphinx.util import logging
-from sphinx.util.console import bold
+from sphinx.util.console import bold, red
 from sphinx.writers.html import HTMLTranslator
 
 logger = logging.getLogger(__name__)
@@ -67,6 +68,7 @@ def setup(app):
     )
     app.add_directive('console', ConsoleDirective)
     app.connect('html-page-context', html_page_context_hook)
+    app.add_role('default-role-error', default_role_error)
     return {'parallel_read_safe': True}
 
 
@@ -371,3 +373,14 @@ def html_page_context_hook(app, pagename, templatename, context, doctree):
     # This way it's include only from HTML files rendered from reST files where
     # the ConsoleDirective is used.
     context['include_console_assets'] = getattr(doctree, '_console_directive_used_flag', False)
+
+
+def default_role_error(
+    name, rawtext, text, lineno, inliner, options=None, content=None
+):
+    msg = (
+        "Default role used (`single backticks`) at line %s: %s. Did you mean "
+        "to use two backticks for ``code``, or miss an underscore for a "
+        "`link`_ ?" % (lineno, rawtext)
+    )
+    raise SphinxError(red(msg))

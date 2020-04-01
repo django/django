@@ -1,4 +1,4 @@
-from django.db.utils import ProgrammingError
+from django.db import ProgrammingError
 from django.utils.functional import cached_property
 
 
@@ -90,6 +90,9 @@ class BaseDatabaseFeatures:
 
     # Does the backend support NULLS FIRST and NULLS LAST in ORDER BY?
     supports_order_by_nulls_modifier = True
+
+    # Does the backend orders NULLS FIRST by default?
+    order_by_nulls_first = False
 
     # The database's limit on the number of query parameters.
     max_query_params = None
@@ -246,6 +249,7 @@ class BaseDatabaseFeatures:
     # Does the backend support window expressions (expression OVER (...))?
     supports_over_clause = False
     supports_frame_range_fixed_distance = False
+    only_supports_unbounded_with_preceding_and_following = False
 
     # Does the backend support CAST with precision?
     supports_cast_with_precision = True

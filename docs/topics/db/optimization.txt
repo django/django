@@ -386,9 +386,9 @@ The following example::
 ...is preferable to::
 
     entries[0].headline = 'This is not a test'
-    entries.save()
+    entries[0].save()
     entries[1].headline = 'This is no longer a test'
-    entries.save()
+    entries[1].save()
 
 Note that there are a number of :meth:`caveats to this method
 <django.db.models.query.QuerySet.bulk_update>`, so make sure it's appropriate

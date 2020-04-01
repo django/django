@@ -139,7 +139,7 @@ class GEOSFuncFactory:
     restype = None
     errcheck = None
 
-    def __init__(self, func_name, *args, restype=None, errcheck=None, argtypes=None, **kwargs):
+    def __init__(self, func_name, *, restype=None, errcheck=None, argtypes=None):
         self.func_name = func_name
         if restype is not None:
             self.restype = restype
@@ -147,11 +147,9 @@ class GEOSFuncFactory:
             self.errcheck = errcheck
         if argtypes is not None:
             self.argtypes = argtypes
-        self.args = args
-        self.kwargs = kwargs
 
-    def __call__(self, *args, **kwargs):
-        return self.func(*args, **kwargs)
+    def __call__(self, *args):
+        return self.func(*args)
 
     @cached_property
     def func(self):

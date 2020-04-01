@@ -139,6 +139,11 @@ class Line(PostgreSQLModel):
         return self.dialogue or ''
 
 
+class LineSavedSearch(PostgreSQLModel):
+    line = models.ForeignKey('Line', models.CASCADE)
+    query = models.CharField(max_length=100)
+
+
 class RangesModel(PostgreSQLModel):
     ints = IntegerRangeField(blank=True, null=True)
     bigints = BigIntegerRangeField(blank=True, null=True)

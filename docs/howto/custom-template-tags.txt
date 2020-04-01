@@ -772,7 +772,7 @@ auto-escaping filters (with the exception of
 are still a couple of things you should keep in mind when writing a template
 tag.
 
-If the ``render()`` function of your template stores the result in a context
+If the ``render()`` method of your template tag stores the result in a context
 variable (rather than returning the result in a string), it should take care
 to call ``mark_safe()`` if appropriate. When the variable is ultimately
 rendered, it will be affected by the auto-escape setting in effect at the

@@ -1,9 +1,8 @@
 import sys
 
 from django.core.management.color import color_style
-from django.db import migrations, transaction
+from django.db import IntegrityError, migrations, transaction
 from django.db.models import Q
-from django.db.utils import IntegrityError
 
 WARNING = """
     A problem arose migrating proxy model permissions for {old} to {new}.

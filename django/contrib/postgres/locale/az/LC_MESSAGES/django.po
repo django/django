@@ -1,13 +1,13 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Emin Mastizada <emin@linux.com>, 2018
+# Emin Mastizada <emin@linux.com>, 2018,2020
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-05-17 11:49+0200\n"
-"PO-Revision-Date: 2018-09-09 13:45+0000\n"
+"POT-Creation-Date: 2019-09-08 17:27+0200\n"
+"PO-Revision-Date: 2020-01-12 07:22+0000\n"
 "Last-Translator: Emin Mastizada <emin@linux.com>\n"
 "Language-Team: Azerbaijani (http://www.transifex.com/django/django/language/"
 "az/)\n"
@@ -31,8 +31,8 @@ msgid "Map of strings to strings/nulls"
 msgstr "String-lərin string/null-lara xəritələnmə cədvəli"
 
 #, python-format
-msgid "The value of \"%(key)s\" is not a string or null."
-msgstr "\"%(key)s\" dəyəri string və ya null deyil."
+msgid "The value of “%(key)s” is not a string or null."
+msgstr "“%(key)s” dəyəri string və ya null deyil."
 
 msgid "A JSON object"
 msgstr "JSON obyekt"
@@ -47,8 +47,8 @@ msgid "Input must be a JSON dictionary."
 msgstr "Giriş JSON lüğət olmalıdır."
 
 #, python-format
-msgid "'%(value)s' value must be valid JSON."
-msgstr "'%(value)s' dəyəri düzgün JSON olmalıdır."
+msgid "“%(value)s” value must be valid JSON."
+msgstr "“%(value)s” dəyəri düzgün JSON olmalıdır."
 
 msgid "Enter two valid values."
 msgstr "İki düzgün dəyər daxil edin."

@@ -1,21 +1,21 @@
 """
 PostgreSQL database backend for Django.
 
-Requires psycopg 2: http://initd.org/projects/psycopg2
+Requires psycopg 2: https://www.psycopg.org/
 """
 
 import asyncio
 import threading
 import warnings
+from contextlib import contextmanager
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
-from django.db import connections
+from django.db import DatabaseError as WrappedDatabaseError, connections
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.backends.utils import (
     CursorDebugWrapper as BaseCursorDebugWrapper,
 )
-from django.db.utils import DatabaseError as WrappedDatabaseError
 from django.utils.asyncio import async_unsafe
 from django.utils.functional import cached_property
 from django.utils.safestring import SafeString
@@ -277,23 +277,25 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         Check constraints by setting them to immediate. Return them to deferred
         afterward.
         """
-        self.cursor().execute('SET CONSTRAINTS ALL IMMEDIATE')
-        self.cursor().execute('SET CONSTRAINTS ALL DEFERRED')
+        with self.cursor() as cursor:
+            cursor.execute('SET CONSTRAINTS ALL IMMEDIATE')
+            cursor.execute('SET CONSTRAINTS ALL DEFERRED')
 
     def is_usable(self):
         try:
             # Use a psycopg cursor directly, bypassing Django's utilities.
-            self.connection.cursor().execute("SELECT 1")
+            with self.connection.cursor() as cursor:
+                cursor.execute('SELECT 1')
         except Database.Error:
             return False
         else:
             return True
 
-    @property
-    def _nodb_connection(self):
-        nodb_connection = super()._nodb_connection
+    @contextmanager
+    def _nodb_cursor(self):
         try:
-            nodb_connection.ensure_connection()
+            with super()._nodb_cursor() as cursor:
+                yield cursor
         except (Database.DatabaseError, WrappedDatabaseError):
             warnings.warn(
                 "Normally Django will use a connection to the 'postgres' database "
@@ -305,11 +307,15 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             )
             for connection in connections.all():
                 if connection.vendor == 'postgresql' and connection.settings_dict['NAME'] != 'postgres':
-                    return self.__class__(
+                    conn = self.__class__(
                         {**self.settings_dict, 'NAME': connection.settings_dict['NAME']},
                         alias=self.alias,
                     )
-        return nodb_connection
+                    try:
+                        with conn.cursor() as cursor:
+                            yield cursor
+                    finally:
+                        conn.close()
 
     @cached_property
     def pg_version(self):

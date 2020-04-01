@@ -1,12 +1,12 @@
 from django.core.exceptions import FieldDoesNotExist
-from django.db import connection, migrations, models, transaction
+from django.db import (
+    IntegrityError, connection, migrations, models, transaction,
+)
 from django.db.migrations.migration import Migration
 from django.db.migrations.operations import CreateModel
 from django.db.migrations.operations.fields import FieldOperation
 from django.db.migrations.state import ModelState, ProjectState
-from django.db.models.fields import NOT_PROVIDED
 from django.db.transaction import atomic
-from django.db.utils import IntegrityError
 from django.test import SimpleTestCase, override_settings, skipUnlessDBFeature
 
 from .models import FoodManager, FoodQuerySet, UnicodeModel
@@ -979,7 +979,7 @@ class OperationTests(OperationTestBase):
             f for n, f in new_state.models["test_adflpd", "pony"].fields
             if n == "height"
         ][0]
-        self.assertEqual(field.default, NOT_PROVIDED)
+        self.assertEqual(field.default, models.NOT_PROVIDED)
         # Test the database alteration
         project_state.apps.get_model("test_adflpd", "pony").objects.create(
             weight=4,
@@ -1815,6 +1815,34 @@ class OperationTests(OperationTestBase):
             Pony(pink=1, weight=-1.0),
             Pony(pink=3, weight=3.0),
         ])
+
+    @skipUnlessDBFeature('supports_table_check_constraints')
+    def test_add_constraint_combinable(self):
+        app_label = 'test_addconstraint_combinable'
+        operations = [
+            CreateModel(
+                'Book',
+                fields=[
+                    ('id', models.AutoField(primary_key=True)),
+                    ('read', models.PositiveIntegerField()),
+                    ('unread', models.PositiveIntegerField()),
+                ],
+            ),
+        ]
+        from_state = self.apply_operations(app_label, ProjectState(), operations)
+        constraint = models.CheckConstraint(
+            check=models.Q(read=(100 - models.F('unread'))),
+            name='test_addconstraint_combinable_sum_100',
+        )
+        operation = migrations.AddConstraint('Book', constraint)
+        to_state = from_state.clone()
+        operation.state_forwards(app_label, to_state)
+        with connection.schema_editor() as editor:
+            operation.database_forwards(app_label, editor, from_state, to_state)
+        Book = to_state.apps.get_model(app_label, 'Book')
+        with self.assertRaises(IntegrityError), transaction.atomic():
+            Book.objects.create(read=70, unread=10)
+        Book.objects.create(read=70, unread=30)
 
     @skipUnlessDBFeature('supports_table_check_constraints')
     def test_remove_constraint(self):

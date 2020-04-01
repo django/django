@@ -69,6 +69,10 @@ class A(models.Model):
     o2o_setnull = models.ForeignKey(R, models.SET_NULL, null=True, related_name="o2o_nullable_set")
 
 
+class B(models.Model):
+    protect = models.ForeignKey(R, models.PROTECT)
+
+
 def create_a(name):
     a = A(name=name)
     for name in ('auto', 'auto_nullable', 'setvalue', 'setnull', 'setdefault',
@@ -180,6 +184,10 @@ class B1(models.Model):
 
 class B2(models.Model):
     delete_top = models.ForeignKey(DeleteTop, models.CASCADE)
+
+
+class B3(models.Model):
+    restrict = models.ForeignKey(R, models.RESTRICT)
 
 
 class DeleteBottom(models.Model):

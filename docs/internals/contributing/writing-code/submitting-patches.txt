@@ -158,7 +158,7 @@ the ticket for opinions.
 Deprecating a feature
 =====================
 
-There are a couple reasons that code in Django might be deprecated:
+There are a couple of reasons that code in Django might be deprecated:
 
 * If a feature has been improved or modified in a backwards-incompatible way,
   the old feature or behavior will be deprecated.

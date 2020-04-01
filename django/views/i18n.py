@@ -33,7 +33,7 @@ def set_language(request):
     """
     next_url = request.POST.get('next', request.GET.get('next'))
     if (
-        (next_url or not request.is_ajax()) and
+        (next_url or request.accepts('text/html')) and
         not url_has_allowed_host_and_scheme(
             url=next_url,
             allowed_hosts={request.get_host()},

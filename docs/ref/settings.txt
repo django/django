@@ -597,9 +597,9 @@ file. When specifying the path, always use forward slashes, even on Windows
 
 Default: ``0``
 
-The lifetime of a database connection, in seconds. Use ``0`` to close database
-connections at the end of each request — Django's historical behavior — and
-``None`` for unlimited persistent connections.
+The lifetime of a database connection, as an integer of seconds. Use ``0`` to
+close database connections at the end of each request — Django's historical
+behavior — and ``None`` for unlimited persistent connections.
 
 .. setting:: OPTIONS
 
@@ -1249,6 +1249,19 @@ Default: ``'utf-8'``
 
 Default charset to use for all ``HttpResponse`` objects, if a MIME type isn't
 manually specified. Used when constructing the ``Content-Type`` header.
+
+.. setting:: DEFAULT_EXCEPTION_REPORTER
+
+``DEFAULT_EXCEPTION_REPORTER``
+------------------------------
+
+.. versionadded:: 3.1
+
+Default: ``'``:class:`django.views.debug.ExceptionReporter`\ ``'``
+
+Default exception reporter class to be used if none has been assigned to the
+:class:`~django.http.HttpRequest` instance yet. See
+:ref:`custom-error-reports`.
 
 .. setting:: DEFAULT_EXCEPTION_REPORTER_FILTER
 
@@ -2382,11 +2395,15 @@ from URL paths, so patterns shouldn't include them, e.g.
 
 .. versionadded:: 3.0
 
-Default: ``None``
+Default: ``'same-origin'``
 
 If configured, the :class:`~django.middleware.security.SecurityMiddleware` sets
 the :ref:`referrer-policy` header on all responses that do not already have it
 to the value provided.
+
+.. versionchanged:: 3.1
+
+    In older versions, the default value is ``None``.
 
 .. setting:: SECURE_SSL_HOST
 
@@ -3417,6 +3434,8 @@ your additional files directory(ies) e.g.::
 Note that these paths should use Unix-style forward slashes, even on Windows
 (e.g. ``"C:/Users/user/mysite/extra_static_content"``).
 
+.. _staticfiles-dirs-prefixes:
+
 Prefixes (optional)
 ~~~~~~~~~~~~~~~~~~~
 
@@ -3537,6 +3556,7 @@ Email
 
 Error reporting
 ---------------
+* :setting:`DEFAULT_EXCEPTION_REPORTER`
 * :setting:`DEFAULT_EXCEPTION_REPORTER_FILTER`
 * :setting:`IGNORABLE_404_URLS`
 * :setting:`MANAGERS`

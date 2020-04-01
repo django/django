@@ -4,6 +4,7 @@ from functools import partial
 from itertools import chain
 
 from django.core.exceptions import EmptyResultSet, FieldError
+from django.db import DatabaseError, NotSupportedError
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.expressions import OrderBy, Random, RawSQL, Ref, Value
 from django.db.models.functions import Cast
@@ -13,7 +14,6 @@ from django.db.models.sql.constants import (
 )
 from django.db.models.sql.query import Query, get_order_dir
 from django.db.transaction import TransactionManagementError
-from django.db.utils import DatabaseError, NotSupportedError
 from django.utils.functional import cached_property
 from django.utils.hashable import make_hashable
 
@@ -123,8 +123,8 @@ class SQLCompiler:
         for expr, (sql, params, is_ref) in order_by:
             # Skip References to the select clause, as all expressions in the
             # select clause are already part of the group by.
-            if not expr.contains_aggregate and not is_ref:
-                expressions.extend(expr.get_source_expressions())
+            if not is_ref:
+                expressions.extend(expr.get_group_by_cols())
         having_group_by = self.having.get_group_by_cols() if self.having else ()
         for expr in having_group_by:
             expressions.append(expr)
@@ -709,9 +709,9 @@ class SQLCompiler:
         field, targets, alias, joins, path, opts, transform_function = self._setup_joins(pieces, opts, alias)
 
         # If we get to this point and the field is a relation to another model,
-        # append the default ordering for that model unless the attribute name
-        # of the field is specified.
-        if field.is_relation and opts.ordering and getattr(field, 'attname', None) != name:
+        # append the default ordering for that model unless it is the pk
+        # shortcut or the attribute name of the field that is specified.
+        if field.is_relation and opts.ordering and getattr(field, 'attname', None) != name and name != 'pk':
             # Firstly, avoid infinite loops.
             already_seen = already_seen or set()
             join_tuple = tuple(getattr(self.query.alias_map[j], 'join_cols', None) for j in joins)
@@ -961,19 +961,34 @@ class SQLCompiler:
         the query.
         """
         def _get_parent_klass_info(klass_info):
-            return (
-                {
+            for parent_model, parent_link in klass_info['model']._meta.parents.items():
+                parent_list = parent_model._meta.get_parent_list()
+                yield {
                     'model': parent_model,
                     'field': parent_link,
                     'reverse': False,
                     'select_fields': [
                         select_index
                         for select_index in klass_info['select_fields']
-                        if self.select[select_index][0].target.model == parent_model
+                        # Selected columns from a model or its parents.
+                        if (
+                            self.select[select_index][0].target.model == parent_model or
+                            self.select[select_index][0].target.model in parent_list
+                        )
                     ],
                 }
-                for parent_model, parent_link in klass_info['model']._meta.parents.items()
-            )
+
+        def _get_first_selected_col_from_model(klass_info):
+            """
+            Find the first selected column from a model. If it doesn't exist,
+            don't lock a model.
+
+            select_fields is filled recursively, so it also contains fields
+            from the parent models.
+            """
+            for select_index in klass_info['select_fields']:
+                if self.select[select_index][0].target.model == klass_info['model']:
+                    return self.select[select_index][0]
 
         def _get_field_choices():
             """Yield all allowed field paths in breadth-first search order."""
@@ -1002,14 +1017,7 @@ class SQLCompiler:
         for name in self.query.select_for_update_of:
             klass_info = self.klass_info
             if name == 'self':
-                # Find the first selected column from a base model. If it
-                # doesn't exist, don't lock a base model.
-                for select_index in klass_info['select_fields']:
-                    if self.select[select_index][0].target.model == klass_info['model']:
-                        col = self.select[select_index][0]
-                        break
-                else:
-                    col = None
+                col = _get_first_selected_col_from_model(klass_info)
             else:
                 for part in name.split(LOOKUP_SEP):
                     klass_infos = (
@@ -1029,8 +1037,7 @@ class SQLCompiler:
                 if klass_info is None:
                     invalid_names.append(name)
                     continue
-                select_index = klass_info['select_fields'][0]
-                col = self.select[select_index][0]
+                col = _get_first_selected_col_from_model(klass_info)
             if col is not None:
                 if self.connection.features.select_for_update_of_column:
                     result.append(self.compile(col)[0])
@@ -1378,10 +1385,10 @@ class SQLInsertCompiler(SQLCompiler):
                 return self.connection.ops.fetch_returned_insert_rows(cursor)
             if self.connection.features.can_return_columns_from_insert:
                 assert len(self.query.objs) == 1
-                return self.connection.ops.fetch_returned_insert_columns(cursor, self.returning_params)
-            return [self.connection.ops.last_insert_id(
+                return [self.connection.ops.fetch_returned_insert_columns(cursor, self.returning_params)]
+            return [(self.connection.ops.last_insert_id(
                 cursor, self.query.get_meta().db_table, self.query.get_meta().pk.column
-            )]
+            ),)]
 
 
 class SQLDeleteCompiler(SQLCompiler):

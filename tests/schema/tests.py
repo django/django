@@ -6,22 +6,16 @@ from unittest import mock
 
 from django.core.management.color import no_style
 from django.db import (
-    DatabaseError, IntegrityError, OperationalError, connection,
+    DatabaseError, DataError, IntegrityError, OperationalError, connection,
 )
-from django.db.models import Index, Model, Q
-from django.db.models.constraints import CheckConstraint, UniqueConstraint
-from django.db.models.deletion import CASCADE, PROTECT
-from django.db.models.fields import (
-    AutoField, BigAutoField, BigIntegerField, BinaryField, BooleanField,
-    CharField, DateField, DateTimeField, IntegerField, PositiveIntegerField,
-    SlugField, SmallAutoField, SmallIntegerField, TextField, TimeField,
-    UUIDField,
-)
-from django.db.models.fields.related import (
-    ForeignKey, ForeignObject, ManyToManyField, OneToOneField,
+from django.db.models import (
+    CASCADE, PROTECT, AutoField, BigAutoField, BigIntegerField, BinaryField,
+    BooleanField, CharField, CheckConstraint, DateField, DateTimeField,
+    ForeignKey, ForeignObject, Index, IntegerField, ManyToManyField, Model,
+    OneToOneField, PositiveIntegerField, Q, SlugField, SmallAutoField,
+    SmallIntegerField, TextField, TimeField, UniqueConstraint, UUIDField,
 )
 from django.db.transaction import TransactionManagementError, atomic
-from django.db.utils import DataError
 from django.test import (
     TransactionTestCase, skipIfDBFeature, skipUnlessDBFeature,
 )
@@ -2965,7 +2959,7 @@ class SchemaTests(TransactionTestCase):
     def test_add_datefield_and_datetimefield_use_effective_default(self, mocked_datetime, mocked_tz):
         """
         effective_default() should be used for DateField, DateTimeField, and
-        TimeField if auto_now or auto_add_now is set (#25005).
+        TimeField if auto_now or auto_now_add is set (#25005).
         """
         now = datetime.datetime(month=1, day=1, year=2000, hour=1, minute=1)
         now_tz = datetime.datetime(month=1, day=1, year=2000, hour=1, minute=1, tzinfo=timezone.utc)
