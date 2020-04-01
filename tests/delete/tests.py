@@ -7,7 +7,7 @@ from django.db.models.sql.constants import GET_ITERATOR_CHUNK_SIZE
 from django.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
 
 from .models import (
-    B1, B2, B3, MR, A, Avatar, Base, BaseDbCascade, Child, DeleteBottom,
+    B1, B2, B3, MR, A, Avatar, B, Base, BaseDbCascade, Child, DeleteBottom,
     DeleteTop, GenericB1, GenericB2, GenericDeleteBottom, HiddenUser,
     HiddenUserProfile, M, M2MFrom, M2MTo, MRNull, Origin, P, Parent, R, RChild,
     RChildChild, Referrer, RelToBaseDbCascade, S, T, User, create_a,
@@ -266,10 +266,10 @@ class OnDeleteTests(TestCase):
 
 @skipUnlessDBFeature("supports_foreign_keys")
 class OnDeleteDbTests(TestCase):
-    
+
     def test_db_cascade(self):
         a = BaseDbCascade.objects.create()
-        b = RelToBaseDbCascade.objects.create(
+        RelToBaseDbCascade.objects.create(
             name='db_cascade',
             db_cascade=a
         )
@@ -284,7 +284,7 @@ class OnDeleteDbTests(TestCase):
         A models.DB_CASCADE relation doesn't trigger a query
         """
         a = BaseDbCascade.objects.create()
-        b = RelToBaseDbCascade.objects.create(
+        RelToBaseDbCascade.objects.create(
             name='db_cascade',
             db_cascade=a
         )
@@ -296,7 +296,7 @@ class OnDeleteDbTests(TestCase):
 
     def test_db_set_null(self):
         a = BaseDbCascade.objects.create()
-        b = RelToBaseDbCascade.objects.create(
+        RelToBaseDbCascade.objects.create(
             name='db_set_null',
             db_set_null=a
         )
@@ -316,7 +316,7 @@ class OnDeleteDbTests(TestCase):
         A models.DB_SET_NULL relation doesn't trigger a query
         """
         a = BaseDbCascade.objects.create()
-        b = RelToBaseDbCascade.objects.create(
+        RelToBaseDbCascade.objects.create(
             name='db_set_null',
             db_set_null=a
         )
@@ -328,7 +328,7 @@ class OnDeleteDbTests(TestCase):
 
     def test_db_restrict(self):
         a = BaseDbCascade.objects.create()
-        b = RelToBaseDbCascade.objects.create(
+        RelToBaseDbCascade.objects.create(
             name='db_restrict',
             db_restrict=a
         )
@@ -342,7 +342,7 @@ class OnDeleteDbTests(TestCase):
         self.assertTrue(
             RelToBaseDbCascade.objects.get(
                 name='db_restrict'
-            ).db_restrict != None
+            ).db_restrict is not None
         )
 
     def test_db_restrict_qscount(self):
@@ -350,7 +350,7 @@ class OnDeleteDbTests(TestCase):
         A models.DB_RESTRICT relation doesn't trigger a query
         """
         a = BaseDbCascade.objects.create()
-        b = RelToBaseDbCascade.objects.create(
+        RelToBaseDbCascade.objects.create(
             name='db_restrict',
             db_restrict=a
         )
