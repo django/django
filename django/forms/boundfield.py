@@ -228,9 +228,9 @@ class BoundField:
                     field.required and
                     self.form.use_required_attribute
                 ):
-                    widget.attrs["required"] = True
+                    widget.attrs['required'] = True
                 else:
-                    widget.attrs["required"] = False
+                    widget.attrs['required'] = False
         else:
             widget = widget or self.field.widget
             if (
@@ -238,9 +238,9 @@ class BoundField:
                 self.field.required and
                 self.form.use_required_attribute
             ):
-                attrs["required"] = True
+                attrs['required'] = True
         if self.field.disabled:
-            attrs["disabled"] = True
+            attrs['disabled'] = True
         return attrs
 
 
