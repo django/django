@@ -1558,13 +1558,6 @@ The possible values for :attr:`~ForeignKey.on_delete` are found in
     but also sets ON DELETE CASCADE as a SQL constraint. The cascade
     deletion then happens at the database level.
 
-* .. attribute:: DB_NO_ACTION
-
-    .. versionadded:: 3.1
-
-    Django takes no direct action, behaves exactly like DO_NOTHING, but
-    also explicitly sets ON DELETE NO ACTION as a SQL constraint.
-
 * .. attribute:: DB_SET_NULL
 
     .. versionadded:: 3.1

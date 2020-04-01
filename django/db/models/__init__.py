@@ -5,8 +5,8 @@ from django.db.models.aggregates import __all__ as aggregates_all
 from django.db.models.constraints import *  # NOQA
 from django.db.models.constraints import __all__ as constraints_all
 from django.db.models.deletion import (
-    CASCADE, DB_CASCADE, DB_NO_ACTION, DB_RESTRICT, DB_SET_NULL, DO_NOTHING,
-    PROTECT, RESTRICT, SET, SET_DEFAULT, SET_NULL, OnDelete, ProtectedError,
+    CASCADE, DB_CASCADE, DB_RESTRICT, DB_SET_NULL, DO_NOTHING, PROTECT, 
+    RESTRICT, SET, SET_DEFAULT, SET_NULL, OnDelete, ProtectedError,
     RestrictedError,
 )
 from django.db.models.enums import *  # NOQA
@@ -39,7 +39,7 @@ __all__ = aggregates_all + constraints_all + enums_all + fields_all + indexes_al
 __all__ += [
     'ObjectDoesNotExist', 'signals',
     'CASCADE', 'DO_NOTHING', 'PROTECT', 'RESTRICT', 'SET', 'SET_DEFAULT',
-    'DB_CASCADE', 'DB_NO_ACTION', 'DB_RESTRICT', 'DB_SET_NULL',
+    'DB_CASCADE', 'DB_RESTRICT', 'DB_SET_NULL',
     'SET_NULL', 'OnDelete', 'ProtectedError', 'RestrictedError',
     'Case', 'Exists', 'Expression', 'ExpressionList', 'ExpressionWrapper', 'F',
     'Func', 'OrderBy', 'OuterRef', 'RowRange', 'Subquery', 'Value',

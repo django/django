@@ -101,7 +101,6 @@ class DatabaseOnDelete(OnDelete):
 
 
 DO_NOTHING = DatabaseOnDelete('DO_NOTHING', '')
-DB_NO_ACTION = DatabaseOnDelete('DB_NO_ACTION', 'NO ACTION')
 DB_SET_NULL = DatabaseOnDelete('DB_SET_NULL', 'SET NULL')
 DB_RESTRICT = DatabaseOnDelete('DB_RESTRICT', 'RESTRICT')
 DB_CASCADE = DatabaseOnDelete('DB_CASCADE', 'CASCADE')
