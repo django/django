@@ -268,7 +268,7 @@ class OnDeleteTests(TestCase):
 
 @skipUnlessDBFeature("supports_foreign_keys")
 class OnDeleteDbTests(TransactionTestCase):
-    
+
     available_apps = [
         'django.contrib.admin',
         'django.contrib.auth',
