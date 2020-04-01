@@ -972,6 +972,23 @@ Attributes of ``BoundField``
         >>> print(f['message'].name)
         message
 
+.. attribute:: BoundField.widget_type
+
+    .. versionadded:: 3.1
+
+    Returns the lowercased class name of the wrapped field's widget, with any
+    trailing ``input`` or ``widget`` removed. This may be used when building
+    forms where the layout is dependent upon the widget type. For example::
+
+        {% for field in form %}
+            {% if field.widget_type == 'checkbox' %}
+                # render one way
+            {% else %}
+                # render another way
+            {% endif %}
+        {% endfor %}
+
+
 Methods of ``BoundField``
 -------------------------
 

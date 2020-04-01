@@ -278,6 +278,9 @@ Forms
 * :attr:`.MultiWidget.widgets` now accepts a dictionary which allows
   customizing subwidget ``name`` attributes.
 
+* The new :attr:`.BoundField.widget_type` property can be used to dynamically
+  adjust form rendering based upon the widget type.
+
 Generic Views
 ~~~~~~~~~~~~~
 
