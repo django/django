@@ -5,7 +5,7 @@ from django.db.models.aggregates import __all__ as aggregates_all
 from django.db.models.constraints import *  # NOQA
 from django.db.models.constraints import __all__ as constraints_all
 from django.db.models.deletion import (
-    CASCADE, DB_CASCADE, DB_RESTRICT, DB_SET_NULL, DO_NOTHING, PROTECT, 
+    CASCADE, DB_CASCADE, DB_RESTRICT, DB_SET_NULL, DO_NOTHING, PROTECT,
     RESTRICT, SET, SET_DEFAULT, SET_NULL, OnDelete, ProtectedError,
     RestrictedError,
 )
