@@ -9,8 +9,8 @@ from django.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
 from .models import (
     B1, B2, B3, MR, A, Avatar, Base, BaseDbCascade, Child, DeleteBottom,
     DeleteTop, GenericB1, GenericB2, GenericDeleteBottom, HiddenUser,
-    HiddenUserProfile, M, M2MFrom, M2MTo, MRNull, Origin, P, Parent, R,
-    RChild, RChildChild, Referrer, RelToBaseDbCascade, S, T, User, create_a,
+    HiddenUserProfile, M, M2MFrom, M2MTo, MRNull, Origin, P, Parent, R, RChild,
+    RChildChild, Referrer, RelToBaseDbCascade, S, T, User, create_a,
     get_default_r,
 )
 
