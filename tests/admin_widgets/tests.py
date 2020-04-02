@@ -1039,7 +1039,7 @@ class HorizontalVerticalFilterSeleniumTests(AdminWidgetSeleniumTestCase):
 
         # Choose some options ------------------------------------------------
         from_lisa_select_option = self.selenium.find_element_by_css_selector(
-            '{} > option[value="{}"]'.format(from_box, self.lisa.id)
+            f'{from_box} > option[value="{self.lisa.id}"]'
         )
 
         # Check the title attribute is there for tool tips: ticket #20821
@@ -1064,7 +1064,7 @@ class HorizontalVerticalFilterSeleniumTests(AdminWidgetSeleniumTestCase):
 
         # Check the tooltip is still there after moving: ticket #20821
         to_lisa_select_option = self.selenium.find_element_by_css_selector(
-            '{} > option[value="{}"]'.format(to_box, self.lisa.id)
+            f'{to_box} > option[value="{self.lisa.id}"]'
         )
         self.assertEqual(to_lisa_select_option.get_attribute('title'), to_lisa_select_option.get_attribute('text'))
 

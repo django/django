@@ -2359,7 +2359,7 @@ class QuerySetSupportsPythonIdioms(TestCase):
         some_date = datetime.datetime(2014, 5, 16, 12, 1)
         for i in range(1, 8):
             Article.objects.create(
-                name="Article {}".format(i), created=some_date)
+                name=f"Article {i}", created=some_date)
 
     def get_ordered_articles(self):
         return Article.objects.all().order_by('name')

@@ -124,7 +124,7 @@ class InteractiveMigrationQuestioner(MigrationQuestioner):
         print("Type 'exit' to exit this prompt")
         while True:
             if default:
-                prompt = "[default: {}] >>> ".format(default)
+                prompt = f"[default: {default}] >>> "
             else:
                 prompt = ">>> "
             code = input(prompt)

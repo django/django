@@ -691,7 +691,7 @@ class QuerySet:
         if id_list is not None:
             if not id_list:
                 return {}
-            filter_key = '{}__in'.format(field_name)
+            filter_key = f'{field_name}__in'
             batch_size = connections[self.db].features.max_query_params
             id_list = tuple(id_list)
             # If the database has a limit on the number of query parameters

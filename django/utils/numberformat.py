@@ -42,16 +42,16 @@ def format(number, decimal_sep, decimal_pos=None, grouping=0, thousand_sep='',
         # scientific notation to avoid high memory usage in {:f}'.format().
         _, digits, exponent = number.as_tuple()
         if abs(exponent) + len(digits) > 200:
-            number = '{:e}'.format(number)
+            number = f'{number:e}'
             coefficient, exponent = number.split('e')
             # Format the coefficient.
             coefficient = format(
                 coefficient, decimal_sep, decimal_pos, grouping,
                 thousand_sep, force_grouping, use_l10n,
             )
-            return '{}e{}'.format(coefficient, exponent)
+            return f'{coefficient}e{exponent}'
         else:
-            str_number = '{:f}'.format(number)
+            str_number = f'{number:f}'
     else:
         str_number = str(number)
     if str_number[0] == '-':

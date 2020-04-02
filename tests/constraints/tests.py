@@ -58,7 +58,7 @@ class CheckConstraintTests(TestCase):
         constraint = models.CheckConstraint(check=check, name=name)
         self.assertEqual(
             repr(constraint),
-            "<CheckConstraint: check='{}' name='{}'>".format(check, name),
+            f"<CheckConstraint: check='{check}' name='{name}'>",
         )
 
     def test_invalid_check_types(self):

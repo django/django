@@ -1079,6 +1079,6 @@ class SelectDateWidget(Widget):
 
     def value_omitted_from_data(self, data, files, name):
         return not any(
-            ('{}_{}'.format(name, interval) in data)
+            (f'{name}_{interval}' in data)
             for interval in ('year', 'month', 'day')
         )

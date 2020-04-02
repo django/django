@@ -970,7 +970,7 @@ def do_if(parser, token):
 
     # {% endif %}
     if token.contents != 'endif':
-        raise TemplateSyntaxError('Malformed template tag at line {}: "{}"'.format(token.lineno, token.contents))
+        raise TemplateSyntaxError(f'Malformed template tag at line {token.lineno}: "{token.contents}"')
 
     return IfNode(conditions_nodelists)
 

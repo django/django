@@ -251,8 +251,8 @@ class BasicExtractorTests(ExtractorTests):
 
             # {% translate %} with a filter
             for minor_part in 'abcdefgh':  # Iterate from #7.1a to #7.1h template markers
-                self.assertIn('msgctxt "context #7.1{}"'.format(minor_part), po_contents)
-                self.assertMsgId('Translatable literal #7.1{}'.format(minor_part), po_contents)
+                self.assertIn(f'msgctxt "context #7.1{minor_part}"', po_contents)
+                self.assertMsgId(f'Translatable literal #7.1{minor_part}', po_contents)
 
             # {% blocktranslate %}
             self.assertIn('msgctxt "Special blocktranslate context #1"', po_contents)

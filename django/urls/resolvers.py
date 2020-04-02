@@ -114,9 +114,9 @@ class CheckURLMixin:
         """
         Format the URL pattern for display in warning messages.
         """
-        description = "'{}'".format(self)
+        description = f"'{self}'"
         if self.name:
-            description += " [name='{}']".format(self.name)
+            description += f" [name='{self.name}']"
         return description
 
     def _check_pattern_startswith_slash(self):
@@ -315,7 +315,7 @@ class LocalePrefixPattern:
         return []
 
     def describe(self):
-        return "'{}'".format(self)
+        return f"'{self}'"
 
     def __str__(self):
         return self.language_prefix

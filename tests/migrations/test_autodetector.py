@@ -733,7 +733,7 @@ class AutodetectorTests(TestCase):
 
     def test_supports_functools_partial(self):
         def _content_file_name(instance, filename, key, **kwargs):
-            return '{}/{}'.format(instance, filename)
+            return f'{instance}/{filename}'
 
         def content_file_name(key, **kwargs):
             return functools.partial(_content_file_name, key, **kwargs)

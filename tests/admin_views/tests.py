@@ -5844,7 +5844,7 @@ class AdminKeepChangeListFiltersTests(TestCase):
             'http://testserver{}?_changelist_filters=is_staff__exact%3D0%26is_superuser__exact%3D0'.format(
                 change_user_url
             ),
-            '{}?_changelist_filters=is_staff__exact%3D0%26is_superuser__exact%3D0'.format(change_user_url)
+            f'{change_user_url}?_changelist_filters=is_staff__exact%3D0%26is_superuser__exact%3D0'
         )
 
         # Ignore ordering of querystring.
@@ -5855,8 +5855,8 @@ class AdminKeepChangeListFiltersTests(TestCase):
 
         # Ignore ordering of _changelist_filters.
         self.assertURLEqual(
-            '{}?_changelist_filters=is_staff__exact%3D0%26is_superuser__exact%3D0'.format(change_user_url),
-            '{}?_changelist_filters=is_superuser__exact%3D0%26is_staff__exact%3D0'.format(change_user_url)
+            f'{change_user_url}?_changelist_filters=is_staff__exact%3D0%26is_superuser__exact%3D0',
+            f'{change_user_url}?_changelist_filters=is_superuser__exact%3D0%26is_staff__exact%3D0'
         )
 
     def get_changelist_filters(self):
@@ -5921,7 +5921,7 @@ class AdminKeepChangeListFiltersTests(TestCase):
 
         # Check the `change_view` link has the correct querystring.
         detail_link = re.search(
-            '<a href="(.*?)">{}</a>'.format(self.joepublicuser.username),
+            f'<a href="(.*?)">{self.joepublicuser.username}</a>',
             response.content.decode()
         )
         self.assertURLEqual(detail_link.group(1), self.get_change_url())

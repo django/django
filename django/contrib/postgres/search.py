@@ -117,7 +117,7 @@ class SearchVector(SearchVectorCombinable, Func):
         extra_params = []
         if clone.weight:
             weight_sql, extra_params = compiler.compile(clone.weight)
-            sql = 'setweight({}, {})'.format(sql, weight_sql)
+            sql = f'setweight({sql}, {weight_sql})'
         return sql, config_params + params + extra_params
 
 

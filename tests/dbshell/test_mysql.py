@@ -27,7 +27,7 @@ class MySqlDbshellCommandTestCase(SimpleTestCase):
         self.assertNotEqual(settings_port, options_port, 'test pre-req')
         self.assertEqual(
             ['mysql', '--user=optionuser', '--password=optionpassword',
-             '--host=optionhost', '--port={}'.format(options_port), 'optiondbname'],
+             '--host=optionhost', f'--port={options_port}', 'optiondbname'],
             self.get_command_line_arguments({
                 'NAME': 'settingdbname',
                 'USER': 'settinguser',

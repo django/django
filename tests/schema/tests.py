@@ -155,7 +155,7 @@ class SchemaTests(TransactionTestCase):
                                   cast_function=None):
         with connection.cursor() as cursor:
             schema_editor.add_field(model, field)
-            cursor.execute("SELECT {} FROM {};".format(field_name, model._meta.db_table))
+            cursor.execute(f"SELECT {field_name} FROM {model._meta.db_table};")
             database_default = cursor.fetchall()[0][0]
             if cast_function and not type(database_default) == type(expected_default):
                 database_default = cast_function(database_default)

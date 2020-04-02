@@ -83,4 +83,4 @@ class Ticket(models.Model):
     duration = models.DurationField()
 
     def __str__(self):
-        return '{} - {}'.format(self.active_at, self.duration)
+        return f'{self.active_at} - {self.duration}'

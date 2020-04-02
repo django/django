@@ -427,10 +427,10 @@ class CombinedExpression(SQLiteNumericMixin, Expression):
         self.rhs = rhs
 
     def __repr__(self):
-        return "<{}: {}>".format(self.__class__.__name__, self)
+        return f"<{self.__class__.__name__}: {self}>"
 
     def __str__(self):
-        return "{} {} {}".format(self.lhs, self.connector, self.rhs)
+        return f"{self.lhs} {self.connector} {self.rhs}"
 
     def get_source_expressions(self):
         return [self.lhs, self.rhs]
@@ -530,7 +530,7 @@ class F(Combinable):
         self.name = name
 
     def __repr__(self):
-        return "{}({})".format(self.__class__.__name__, self.name)
+        return f"{self.__class__.__name__}({self.name})"
 
     def resolve_expression(self, query=None, allow_joins=True, reuse=None,
                            summarize=False, for_save=False):
@@ -612,8 +612,8 @@ class Func(SQLiteNumericMixin, Expression):
         extra = {**self.extra, **self._get_repr_options()}
         if extra:
             extra = ', '.join(str(key) + '=' + str(val) for key, val in sorted(extra.items()))
-            return "{}({}, {})".format(self.__class__.__name__, args, extra)
-        return "{}({})".format(self.__class__.__name__, args)
+            return f"{self.__class__.__name__}({args}, {extra})"
+        return f"{self.__class__.__name__}({args})"
 
     def _get_repr_options(self):
         """Return a dict of extra __init__() options to include in the repr."""
@@ -675,7 +675,7 @@ class Value(Expression):
         self.value = value
 
     def __repr__(self):
-        return "{}({})".format(self.__class__.__name__, self.value)
+        return f"{self.__class__.__name__}({self.value})"
 
     def as_sql(self, compiler, connection):
         connection.ops.check_expression_support(self)
@@ -720,7 +720,7 @@ class RawSQL(Expression):
         super().__init__(output_field=output_field)
 
     def __repr__(self):
-        return "{}({}, {})".format(self.__class__.__name__, self.sql, self.params)
+        return f"{self.__class__.__name__}({self.sql}, {self.params})"
 
     def as_sql(self, compiler, connection):
         return '(%s)' % self.sql, self.params
@@ -804,7 +804,7 @@ class Ref(Expression):
         self.refs, self.source = refs, source
 
     def __repr__(self):
-        return "{}({}, {})".format(self.__class__.__name__, self.refs, self.source)
+        return f"{self.__class__.__name__}({self.refs}, {self.source})"
 
     def get_source_expressions(self):
         return [self.source]
@@ -864,7 +864,7 @@ class ExpressionWrapper(Expression):
         return self.expression.as_sql(compiler, connection)
 
     def __repr__(self):
-        return "{}({})".format(self.__class__.__name__, self.expression)
+        return f"{self.__class__.__name__}({self.expression})"
 
 
 class When(Expression):
@@ -1081,14 +1081,14 @@ class Exists(Subquery):
     def as_sql(self, compiler, connection, template=None, **extra_context):
         sql, params = super().as_sql(compiler, connection, template, **extra_context)
         if self.negated:
-            sql = 'NOT {}'.format(sql)
+            sql = f'NOT {sql}'
         return sql, params
 
     def select_format(self, compiler, sql, params):
         # Wrap EXISTS() with a CASE WHEN expression if a database backend
         # (e.g. Oracle) doesn't support boolean expression in the SELECT list.
         if not compiler.connection.features.supports_boolean_expr_in_select_clause:
-            sql = 'CASE WHEN {} THEN 1 ELSE 0 END'.format(sql)
+            sql = f'CASE WHEN {sql} THEN 1 ELSE 0 END'
         return sql, params
 
 

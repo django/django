@@ -87,7 +87,7 @@ class Columns(TableColumns):
             try:
                 suffix = self.col_suffixes[idx]
                 if suffix:
-                    col = '{} {}'.format(col, suffix)
+                    col = f'{col} {suffix}'
             except IndexError:
                 pass
             return col
@@ -120,7 +120,7 @@ class IndexColumns(Columns):
             try:
                 suffix = self.col_suffixes[idx]
                 if suffix:
-                    col = '{} {}'.format(col, suffix)
+                    col = f'{col} {suffix}'
             except IndexError:
                 pass
             return col

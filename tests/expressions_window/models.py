@@ -14,4 +14,4 @@ class Employee(models.Model):
     classification = models.ForeignKey('Classification', on_delete=models.CASCADE, null=True)
 
     def __str__(self):
-        return '{}, {}, {}, {}'.format(self.name, self.department, self.salary, self.hire_date)
+        return f'{self.name}, {self.department}, {self.salary}, {self.hire_date}'

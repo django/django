@@ -105,6 +105,6 @@ def check_url_settings(app_configs, **kwargs):
 
 def E006(name):
     return Error(
-        'The {} setting must end with a slash.'.format(name),
+        f'The {name} setting must end with a slash.',
         id='urls.E006',
     )

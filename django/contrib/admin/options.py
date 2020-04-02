@@ -1455,8 +1455,8 @@ class ModelAdmin(BaseModelAdmin):
         return TemplateResponse(
             request,
             self.delete_confirmation_template or [
-                "admin/{}/{}/delete_confirmation.html".format(app_label, opts.model_name),
-                "admin/{}/delete_confirmation.html".format(app_label),
+                f"admin/{app_label}/{opts.model_name}/delete_confirmation.html",
+                f"admin/{app_label}/delete_confirmation.html",
                 "admin/delete_confirmation.html",
             ],
             context,
@@ -1959,7 +1959,7 @@ class ModelAdmin(BaseModelAdmin):
                 """Return whether or not the user deleted the form."""
                 return (
                     inline.has_delete_permission(request, obj) and
-                    '{}-{}-DELETE'.format(formset.prefix, index) in request.POST
+                    f'{formset.prefix}-{index}-DELETE' in request.POST
                 )
 
             # Bypass validation of each view-only inline form (since the form's

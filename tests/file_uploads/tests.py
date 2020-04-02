@@ -318,7 +318,7 @@ class FileUploadTests(TestCase):
         result = response.json()
         for name, _, expected in cases:
             got = result[name]
-            self.assertEqual(expected, got, 'Mismatch for {}'.format(name))
+            self.assertEqual(expected, got, f'Mismatch for {name}')
             self.assertLess(len(got), 256,
                             "Got a long file name (%s characters)." % len(got))
 

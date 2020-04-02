@@ -175,7 +175,7 @@ class SafeExceptionReporterFilter:
             # MultiValueDicts will have a return value.
             is_multivalue_dict = isinstance(value, MultiValueDict)
         except Exception as e:
-            return '{!r} while evaluating {!r}'.format(e, value)
+            return f'{e!r} while evaluating {value!r}'
 
         if is_multivalue_dict:
             # Cleanse MultiValueDicts (request.POST is the one we usually care about)

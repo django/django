@@ -87,7 +87,7 @@ class ErrorList(UserList, list):
         if error_class is None:
             self.error_class = 'errorlist'
         else:
-            self.error_class = 'errorlist {}'.format(error_class)
+            self.error_class = f'errorlist {error_class}'
 
     def as_data(self):
         return ValidationError(self.data).error_list

@@ -451,11 +451,11 @@ class SQLCompiler:
                     # Wrap in a subquery if wrapping in parentheses isn't
                     # supported.
                     if not features.supports_parentheses_in_compound:
-                        part_sql = 'SELECT * FROM ({})'.format(part_sql)
+                        part_sql = f'SELECT * FROM ({part_sql})'
                     # Add parentheses when combining with compound query if not
                     # already added for all compound queries.
                     elif not features.supports_slicing_ordering_in_compound:
-                        part_sql = '({})'.format(part_sql)
+                        part_sql = f'({part_sql})'
                 parts += ((part_sql, part_args),)
             except EmptyResultSet:
                 # Omit the empty queryset with UNION and with DIFFERENCE if the
@@ -470,7 +470,7 @@ class SQLCompiler:
             combinator_sql += ' ALL'
         braces = '({})' if features.supports_slicing_ordering_in_compound else '{}'
         sql_parts, args_parts = zip(*((braces.format(sql), args) for sql, args in parts))
-        result = [' {} '.format(combinator_sql).join(sql_parts)]
+        result = [f' {combinator_sql} '.join(sql_parts)]
         params = []
         for part in args_parts:
             params.extend(part)
@@ -493,8 +493,8 @@ class SQLCompiler:
             combinator = self.query.combinator
             features = self.connection.features
             if combinator:
-                if not getattr(features, 'supports_select_{}'.format(combinator)):
-                    raise NotSupportedError('{} is not supported on this database backend.'.format(combinator))
+                if not getattr(features, f'supports_select_{combinator}'):
+                    raise NotSupportedError(f'{combinator} is not supported on this database backend.')
                 result, params = self.get_combinator_sql(combinator, self.query.combinator_all)
             else:
                 distinct_fields, distinct_params = self.get_distinct()

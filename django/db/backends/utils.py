@@ -236,7 +236,7 @@ def format_number(value, max_digits, decimal_places):
     else:
         context.traps[decimal.Rounded] = 1
         value = context.create_decimal(value)
-    return "{:f}".format(value)
+    return f"{value:f}"
 
 
 def strip_quotes(table_name):

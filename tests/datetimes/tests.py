@@ -132,7 +132,7 @@ class DateTimesTests(TestCase):
             datetime.datetime(2005, 7, 30, 5, 15),
             datetime.datetime(2005, 7, 31, 19, 15)]
         for i, pub_date in enumerate(pub_dates):
-            Article(pub_date=pub_date, title='title #{}'.format(i)).save()
+            Article(pub_date=pub_date, title=f'title #{i}').save()
 
         self.assertQuerysetEqual(
             Article.objects.datetimes('pub_date', 'year'),
@@ -169,7 +169,7 @@ class DateTimesTests(TestCase):
             datetime.datetime(2005, 7, 30, 5, 15),
             datetime.datetime(2005, 7, 31, 19, 15)]
         for i, pub_date in enumerate(pub_dates):
-            Article(pub_date=pub_date, title='title #{}'.format(i)).save()
+            Article(pub_date=pub_date, title=f'title #{i}').save()
         # Use iterator() with datetimes() to return a generator that lazily
         # requests each result one at a time, to save memory.
         dates = []

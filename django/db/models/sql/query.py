@@ -1151,7 +1151,7 @@ class Query(BaseExpression):
         lookup_class = lhs.get_lookup(lookup_name)
         if not lookup_class:
             if lhs.field.is_relation:
-                raise FieldError('Related Field got invalid lookup: {}'.format(lookup_name))
+                raise FieldError(f'Related Field got invalid lookup: {lookup_name}')
             # A lookup wasn't found. Try to interpret the name as a transform
             # and do an Exact lookup against it.
             lhs = self.try_transform(lhs, lookup_name)
