@@ -97,25 +97,25 @@ class BaseDatabaseCreation:
         Designed only for test runner usage; will not handle large
         amounts of data.
         """
-        # Build list of all models to serialize.
-        from django.db.migrations.loader import MigrationLoader
-        loader = MigrationLoader(self.connection)
-        model_list = []
-        for app_config in apps.get_app_configs():
-            if (
-                app_config.models_module is not None and
-                app_config.label in loader.migrated_apps and
-                app_config.name not in settings.TEST_NON_SERIALIZED_APPS
-            ):
-                model_list.extend(app_config.get_models())
-
-        # Make a function to iteratively return every object
+        # Iteratively return every object for all models to serialize.
         def get_objects():
-            for model in model_list:
-                if (model._meta.can_migrate(self.connection) and
-                        router.allow_migrate_model(self.connection.alias, model)):
-                    queryset = model._default_manager.using(self.connection.alias).order_by(model._meta.pk.name)
-                    yield from queryset.iterator()
+            from django.db.migrations.loader import MigrationLoader
+            loader = MigrationLoader(self.connection)
+            for app_config in apps.get_app_configs():
+                if (
+                    app_config.models_module is not None and
+                    app_config.label in loader.migrated_apps and
+                    app_config.name not in settings.TEST_NON_SERIALIZED_APPS
+                ):
+                    for model in app_config.get_models():
+                        if (
+                            model._meta.can_migrate(self.connection) and
+                            router.allow_migrate_model(self.connection.alias, model)
+                        ):
+                            queryset = model._default_manager.using(
+                                self.connection.alias,
+                            ).order_by(model._meta.pk.name)
+                            yield from queryset.iterator()
         # Serialize to a string
         out = StringIO()
         serializers.serialize("json", get_objects(), indent=None, stream=out)
