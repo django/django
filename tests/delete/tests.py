@@ -356,11 +356,11 @@ class OnDeleteDbTests(TestCase):
             name='db_restrict',
             db_restrict=a
         )
-        # RelToBaseDbCascade should not be queried.
-        with self.assertNumQueries(1):
-            # RelToBaseDbCascade should not be deleted.
-            with self.assertRaises(IntegrityError):
-                with transaction.atomic():
+        # RelToBaseDbCascade should not be deleted.
+        with self.assertRaises(IntegrityError):
+            with transaction.atomic():
+                # RelToBaseDbCascade should not be queried.
+                with self.assertNumQueries(1):
                     b.db_restrict.delete()
 
 
