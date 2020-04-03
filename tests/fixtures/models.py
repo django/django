@@ -66,7 +66,7 @@ class PersonManager(models.Manager):
 
 class Person(models.Model):
     objects = PersonManager()
-    name = models.CharField(max_length=100)
+    name = models.CharField(max_length=100, unique=True)
 
     class Meta:
         ordering = ('name',)
@@ -119,7 +119,7 @@ class PrimaryKeyUUIDModel(models.Model):
 
 
 class NaturalKeyThing(models.Model):
-    key = models.CharField(max_length=100)
+    key = models.CharField(max_length=100, unique=True)
     other_thing = models.ForeignKey('NaturalKeyThing', on_delete=models.CASCADE, null=True)
     other_things = models.ManyToManyField('NaturalKeyThing', related_name='thing_m2m_set')
 
