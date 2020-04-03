@@ -15,7 +15,7 @@ from django.db.models import (
 )
 from django.db.models.expressions import Col, Combinable, Random, RawSQL, Ref
 from django.db.models.functions import (
-    Coalesce, Concat, Length, Lower, Substr, Upper,
+    Coalesce, Concat, Left, Length, Lower, Substr, Upper,
 )
 from django.db.models.sql import constants
 from django.db.models.sql.datastructures import Join
@@ -647,6 +647,22 @@ class BasicExpressionsTests(TestCase):
         inner = Company.objects.filter(num_employees=OuterRef('ceo__salary') + 2)
         outer = Company.objects.filter(pk__in=Subquery(inner.values('pk')))
         self.assertEqual(outer.get().name, 'Test GmbH')
+
+    def test_nested_outerref_with_function(self):
+        self.gmbh.point_of_contact = Employee.objects.get(lastname='Meyer')
+        self.gmbh.save()
+        inner = Employee.objects.filter(
+            lastname__startswith=Left(OuterRef(OuterRef('lastname')), 1),
+        )
+        qs = Employee.objects.annotate(
+            ceo_company=Subquery(
+                Company.objects.filter(
+                    point_of_contact__in=inner,
+                    ceo__pk=OuterRef('pk'),
+                ).values('name'),
+            ),
+        ).filter(ceo_company__isnull=False)
+        self.assertEqual(qs.get().ceo_company, 'Test GmbH')
 
     def test_annotation_with_outerref(self):
         gmbh_salary = Company.objects.annotate(

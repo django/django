@@ -585,6 +585,9 @@ class OuterRef(F):
             return self.name
         return ResolvedOuterRef(self.name)
 
+    def relabeled_clone(self, relabels):
+        return self
+
 
 class Func(SQLiteNumericMixin, Expression):
     """An SQL function call."""
