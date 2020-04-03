@@ -964,6 +964,34 @@ abstract base class. For example, including ``db_table`` would mean that all
 the child classes (the ones that don't specify their own :ref:`Meta <meta-options>`) would use
 the same database table, which is almost certainly not what you want.
 
+.. admonition:: Classes only inherit :ref:`Meta <meta-options>` from the first listed abstract base class
+
+    Note that if your child class inherits from multiple abstract base classes, only the
+    :ref:`Meta <meta-options>` from the first listed class will be inherited. This means
+    inheriting from multiple abstract base classes may not work as expected.
+    
+    In the example below, ``Student`` will inherit the ``ordering`` :ref:`Meta <meta-option>` from
+    ``CommonInfo``, but will not inherit ``managed = False`` from ``Unmanaged``:
+
+        from django.db import models
+
+        class CommonInfo(models.Model):
+            name = models.CharField(max_length=100)
+            age = models.PositiveIntegerField()
+
+            class Meta:
+                abstract = True
+                ordering = ['name']
+
+        class Unmanaged(models.Model):
+
+            class Meta:
+                abstract = True
+                managed = False
+
+        class Student(CommonInfo, Unmanaged):
+            home_group = models.CharField(max_length=5)
+
 .. _abstract-related-name:
 
 Be careful with ``related_name`` and ``related_query_name``
