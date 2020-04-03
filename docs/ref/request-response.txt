@@ -335,7 +335,7 @@ Methods
     ``HTTP_X_FORWARDED_PORT`` (if :setting:`USE_X_FORWARDED_PORT` is enabled)
     and ``SERVER_PORT`` ``META`` variables, in that order.
 
- .. versionchanged:: 3.0.5
+.. versionchanged:: 3.0.5
 
     Respect the port specified in ``HTTP_X_FORWARDED_HOST`` when
     :setting:`USE_X_FORWARDED_HOST` is enabled
