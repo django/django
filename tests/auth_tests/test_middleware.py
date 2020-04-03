@@ -88,7 +88,8 @@ class TestLoginRequiredAuthenticationMiddleware(TestCase):
 
     def test_user_access_to_login_no_required_view(self):
         """
-        Middleware returns None for authenticated user becuase of
+        Middleware returns None for authenticated user because of
+        PasswordChangeView does NOT have LoginNotRequiredMixin.
         """
         self.request.user = self.user
         res = self.middleware.process_view(self.request, PasswordChangeView.as_view(), (), {})
