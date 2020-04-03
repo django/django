@@ -76,7 +76,7 @@ class LoginNotRequiredMixin:
     Mixin for CBV that marks that the view is accessible by
     unauthenticated users.
     """
-    login_not_required = True
+    login_required = False
 
 
 class PermissionRequiredMixin(AccessMixin):

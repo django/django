@@ -57,7 +57,7 @@ def login_not_required(view_func):
     """
     def wrapped_view(*args, **kwargs):
         return view_func(*args, **kwargs)
-    wrapped_view.login_not_required = True
+    wrapped_view.login_required = False
     return wraps(view_func)(wrapped_view)
 
 

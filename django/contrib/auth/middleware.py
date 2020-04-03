@@ -39,11 +39,11 @@ class LoginRequiredAuthenticationMiddleware(AuthenticationMiddleware):
 
         # In case of we have CBV
         view_class = getattr(view_func, 'view_class', None)
-        if view_class and getattr(view_class, 'login_not_required', False):
+        if view_class and not getattr(view_class, 'login_required', True):
             return None
 
         # If the view is FBV or CBV with login_not_required usage on dispatch method,
-        if getattr(view_func, 'login_not_required', False):
+        if not getattr(view_func, 'login_required', True):
             return None
         return redirect_to_login(request.get_full_path())
 
