@@ -3,9 +3,7 @@ from django.db.models import NOT_PROVIDED
 from django.utils.functional import cached_property
 
 from .base import Operation
-from .utils import (
-    field_references_model, is_referenced_by_foreign_key, resolve_relation,
-)
+from .utils import field_is_referenced, field_references, get_references
 
 
 class FieldOperation(Operation):
@@ -33,9 +31,9 @@ class FieldOperation(Operation):
         if name_lower == self.model_name_lower:
             return True
         if self.field:
-            return field_references_model(
+            return bool(field_references(
                 (app_label, self.model_name_lower), self.field, (app_label, name_lower)
-            )
+            ))
         return False
 
     def references_field(self, model_name, name, app_label):
@@ -47,20 +45,14 @@ class FieldOperation(Operation):
             elif self.field and hasattr(self.field, 'from_fields') and name in self.field.from_fields:
                 return True
         # Check if this operation remotely references the field.
-        if self.field:
-            model_tuple = (app_label, model_name_lower)
-            remote_field = self.field.remote_field
-            if remote_field:
-                if (resolve_relation(remote_field.model, app_label, self.model_name_lower) == model_tuple and
-                        (not hasattr(self.field, 'to_fields') or
-                            name in self.field.to_fields or None in self.field.to_fields)):
-                    return True
-                through = getattr(remote_field, 'through', None)
-                if (through and resolve_relation(through, app_label, self.model_name_lower) == model_tuple and
-                        (getattr(remote_field, 'through_fields', None) is None or
-                            name in remote_field.through_fields)):
-                    return True
-        return False
+        if self.field is None:
+            return False
+        return bool(field_references(
+            (app_label, self.model_name_lower),
+            self.field,
+            (app_label, model_name_lower),
+            name,
+        ))
 
     def reduce(self, operation, app_label):
         return (
@@ -236,7 +228,9 @@ class AlterField(FieldOperation):
         # not referenced by a foreign key.
         delay = (
             not field.is_relation and
-            not is_referenced_by_foreign_key(state, self.model_name_lower, self.field, self.name)
+            not field_is_referenced(
+                state, (app_label, self.model_name_lower), (self.name, field),
+            )
         )
         state.reload_model(app_label, self.model_name_lower, delay=delay)
 
@@ -305,17 +299,11 @@ class RenameField(FieldOperation):
         model_state = state.models[app_label, self.model_name_lower]
         # Rename the field
         fields = model_state.fields
-        found = False
+        found = None
         for index, (name, field) in enumerate(fields):
             if not found and name == self.old_name:
                 fields[index] = (self.new_name, field)
-                found = True
-                # Delay rendering of relationships if it's not a relational
-                # field and not referenced by a foreign key.
-                delay = (
-                    not field.is_relation and
-                    not is_referenced_by_foreign_key(state, self.model_name_lower, field, self.name)
-                )
+                found = field
             # Fix from_fields to refer to the new field.
             from_fields = getattr(field, 'from_fields', None)
             if from_fields:
@@ -323,7 +311,7 @@ class RenameField(FieldOperation):
                     self.new_name if from_field_name == self.old_name else from_field_name
                     for from_field_name in from_fields
                 ])
-        if not found:
+        if found is None:
             raise FieldDoesNotExist(
                 "%s.%s has no field named '%s'" % (app_label, self.model_name, self.old_name)
             )
@@ -336,23 +324,21 @@ class RenameField(FieldOperation):
                     for together in options[option]
                 ]
         # Fix to_fields to refer to the new field.
-        model_tuple = app_label, self.model_name_lower
-        for (model_app_label, model_name), model_state in state.models.items():
-            for index, (name, field) in enumerate(model_state.fields):
-                remote_field = field.remote_field
-                if remote_field:
-                    remote_model_tuple = resolve_relation(
-                        remote_field.model, model_app_label, model_name
-                    )
-                    if remote_model_tuple == model_tuple:
-                        if getattr(remote_field, 'field_name', None) == self.old_name:
-                            remote_field.field_name = self.new_name
-                        to_fields = getattr(field, 'to_fields', None)
-                        if to_fields:
-                            field.to_fields = tuple([
-                                self.new_name if to_field_name == self.old_name else to_field_name
-                                for to_field_name in to_fields
-                            ])
+        delay = True
+        references = get_references(
+            state, (app_label, self.model_name_lower), (self.old_name, found),
+        )
+        for *_, field, reference in references:
+            delay = False
+            if reference.to:
+                remote_field, to_fields = reference.to
+                if getattr(remote_field, 'field_name', None) == self.old_name:
+                    remote_field.field_name = self.new_name
+                if to_fields:
+                    field.to_fields = tuple([
+                        self.new_name if to_field_name == self.old_name else to_field_name
+                        for to_field_name in to_fields
+                    ])
         state.reload_model(app_label, self.model_name_lower, delay=delay)
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
