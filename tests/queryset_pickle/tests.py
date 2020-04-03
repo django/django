@@ -1,9 +1,9 @@
 import datetime
 import pickle
 
+import django
 from django.db import models
 from django.test import TestCase
-from django.utils.version import get_version
 
 from .models import Container, Event, Group, Happening, M2MModel, MyEvent
 
@@ -234,7 +234,10 @@ class PickleabilityTestCase(TestCase):
         unpickled with a different Django version than the current
         """
         qs = Group.previous_django_version_objects.all()
-        msg = "Pickled queryset instance's Django version 1.0 does not match the current version %s." % get_version()
+        msg = (
+            "Pickled queryset instance's Django version 1.0 does not match "
+            "the current version %s." % django.__version__
+        )
         with self.assertRaisesMessage(RuntimeWarning, msg):
             pickle.loads(pickle.dumps(qs))
 

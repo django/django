@@ -4,6 +4,7 @@ import warnings
 from functools import partialmethod
 from itertools import chain
 
+import django
 from django.apps import apps
 from django.conf import settings
 from django.core import checks
@@ -36,7 +37,6 @@ from django.utils.encoding import force_str
 from django.utils.hashable import make_hashable
 from django.utils.text import capfirst, get_text_list
 from django.utils.translation import gettext_lazy as _
-from django.utils.version import get_version
 
 
 class Deferred:
@@ -538,7 +538,7 @@ class Model(metaclass=ModelBase):
 
     def __reduce__(self):
         data = self.__getstate__()
-        data[DJANGO_VERSION_PICKLE_KEY] = get_version()
+        data[DJANGO_VERSION_PICKLE_KEY] = django.__version__
         class_id = self._meta.app_label, self._meta.object_name
         return model_unpickle, (class_id,), data
 
@@ -547,21 +547,22 @@ class Model(metaclass=ModelBase):
         return self.__dict__
 
     def __setstate__(self, state):
-        msg = None
         pickled_version = state.get(DJANGO_VERSION_PICKLE_KEY)
         if pickled_version:
-            current_version = get_version()
-            if current_version != pickled_version:
-                msg = (
-                    "Pickled model instance's Django version %s does not match "
-                    "the current version %s." % (pickled_version, current_version)
+            if pickled_version != django.__version__:
+                warnings.warn(
+                    "Pickled model instance's Django version %s does not "
+                    "match the current version %s."
+                    % (pickled_version, django.__version__),
+                    RuntimeWarning,
+                    stacklevel=2,
                 )
         else:
-            msg = "Pickled model instance's Django version is not specified."
-
-        if msg:
-            warnings.warn(msg, RuntimeWarning, stacklevel=2)
-
+            warnings.warn(
+                "Pickled model instance's Django version is not specified.",
+                RuntimeWarning,
+                stacklevel=2,
+            )
         self.__dict__.update(state)
 
     def _get_pk_val(self, meta=None):
