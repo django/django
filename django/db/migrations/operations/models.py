@@ -28,7 +28,7 @@ class ModelOperation(Operation):
     def name_lower(self):
         return self.name.lower()
 
-    def references_model(self, name, app_label=None):
+    def references_model(self, name, app_label):
         return name.lower() == self.name_lower
 
     def reduce(self, operation, app_label):
@@ -99,7 +99,7 @@ class CreateModel(ModelOperation):
     def describe(self):
         return "Create %smodel %s" % ("proxy " if self.options.get("proxy", False) else "", self.name)
 
-    def references_model(self, name, app_label=None):
+    def references_model(self, name, app_label):
         name_lower = name.lower()
         if name_lower == self.name_lower:
             return True
@@ -265,7 +265,7 @@ class DeleteModel(ModelOperation):
         if self.allow_migrate_model(schema_editor.connection.alias, model):
             schema_editor.create_model(model)
 
-    def references_model(self, name, app_label=None):
+    def references_model(self, name, app_label):
         # The deleted model could be referencing the specified model through
         # related fields.
         return True
@@ -402,7 +402,7 @@ class RenameModel(ModelOperation):
         self.new_name_lower, self.old_name_lower = self.old_name_lower, self.new_name_lower
         self.new_name, self.old_name = self.old_name, self.new_name
 
-    def references_model(self, name, app_label=None):
+    def references_model(self, name, app_label):
         return (
             name.lower() == self.old_name_lower or
             name.lower() == self.new_name_lower
@@ -528,7 +528,7 @@ class AlterTogetherOptionOperation(ModelOptionOperation):
     def database_backwards(self, app_label, schema_editor, from_state, to_state):
         return self.database_forwards(app_label, schema_editor, from_state, to_state)
 
-    def references_field(self, model_name, name, app_label=None):
+    def references_field(self, model_name, name, app_label):
         return (
             self.references_model(model_name, app_label) and
             (
@@ -609,7 +609,7 @@ class AlterOrderWithRespectTo(ModelOptionOperation):
     def database_backwards(self, app_label, schema_editor, from_state, to_state):
         self.database_forwards(app_label, schema_editor, from_state, to_state)
 
-    def references_field(self, model_name, name, app_label=None):
+    def references_field(self, model_name, name, app_label):
         return (
             self.references_model(model_name, app_label) and
             (

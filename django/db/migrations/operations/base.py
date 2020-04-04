@@ -80,10 +80,10 @@ class Operation:
         """
         return "%s: %s" % (self.__class__.__name__, self._constructor_args)
 
-    def references_model(self, name, app_label=None):
+    def references_model(self, name, app_label):
         """
         Return True if there is a chance this operation references the given
-        model name (as a string), with an optional app label for accuracy.
+        model name (as a string), with an app label for accuracy.
 
         Used for optimization. If in doubt, return True;
         returning a false positive will merely make the optimizer a little
@@ -92,10 +92,10 @@ class Operation:
         """
         return True
 
-    def references_field(self, model_name, name, app_label=None):
+    def references_field(self, model_name, name, app_label):
         """
         Return True if there is a chance this operation references the given
-        field name, with an optional app label for accuracy.
+        field name, with an app label for accuracy.
 
         Used for optimization. If in doubt, return True.
         """

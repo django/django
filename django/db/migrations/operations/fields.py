@@ -28,7 +28,7 @@ class FieldOperation(Operation):
     def is_same_field_operation(self, operation):
         return self.is_same_model_operation(operation) and self.name_lower == operation.name_lower
 
-    def references_model(self, name, app_label=None):
+    def references_model(self, name, app_label):
         name_lower = name.lower()
         if name_lower == self.model_name_lower:
             return True
@@ -36,7 +36,7 @@ class FieldOperation(Operation):
             return field_references_model(self.field, ModelTuple(app_label, name_lower))
         return False
 
-    def references_field(self, model_name, name, app_label=None):
+    def references_field(self, model_name, name, app_label):
         model_name_lower = model_name.lower()
         # Check if this operation locally references the field.
         if model_name_lower == self.model_name_lower:
@@ -376,8 +376,8 @@ class RenameField(FieldOperation):
     def describe(self):
         return "Rename field %s on %s to %s" % (self.old_name, self.model_name, self.new_name)
 
-    def references_field(self, model_name, name, app_label=None):
-        return self.references_model(model_name) and (
+    def references_field(self, model_name, name, app_label):
+        return self.references_model(model_name, app_label) and (
             name.lower() == self.old_name_lower or
             name.lower() == self.new_name_lower
         )
