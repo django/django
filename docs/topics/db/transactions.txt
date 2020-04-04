@@ -146,10 +146,10 @@ Django provides a single API to control database transactions.
     In this example, even if ``generate_relationships()`` causes a database
     error by breaking an integrity constraint, you can execute queries in
     ``add_children()``, and the changes from ``create_parent()`` are still
-    there. Note that any operations attempted in ``generate_relationships()``
-    will already have been rolled back safely when ``handle_exception()`` is
-    called, so the exception handler can also operate on the database if
-    necessary.
+    there and bound to the same transaction. Note that any operations attempted
+    in ``generate_relationships()`` will already have been rolled back safely
+    when ``handle_exception()`` is called, so the exception handler can also
+    operate on the database if necessary.
 
     .. admonition:: Avoid catching exceptions inside ``atomic``!
 
