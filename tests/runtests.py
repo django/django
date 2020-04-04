@@ -48,8 +48,6 @@ warnings.filterwarnings("ignore", "'U' mode is deprecated", DeprecationWarning, 
 # below message is caused by handlers.tests.test_unawaited_response
 warnings.filterwarnings("ignore", "coroutine 'sleep' was never awaited", RuntimeWarning)
 
-
-
 RUNTESTS_DIR = os.path.abspath(os.path.dirname(__file__))
 
 TEMPLATE_DIR = os.path.join(RUNTESTS_DIR, 'templates')
