@@ -396,6 +396,44 @@ variable, for example::
 Or add ``export OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES`` to your shell's
 startup file (e.g. ``~/.profile``).
 
+Test suite throws errors on installing requirements
+-------------------------------------------------------
+
+Errors related to ``libmemcached/memcached.h``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+on **macOS**, you might see this message logged, after which the requirement
+installation fails::
+
+    Error when installing requirements for django tests - fatal error:
+    ‘libmemcached/memcached.h’ file not found #include <libmemcached/memcached
+    .h>
+
+To avoid this, either :ref:`install-libmemcached` or :ref:`set-libmemcached-env-variable`
+
+.. _install-libmemcached:
+
+Install ``libmemcached``
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+``libmemcached`` can be installed using homebrew::
+
+    brew install libmemcached
+
+.. _set-libmemcached-env-variable:
+
+Set environment variable
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+To set environment variable, validate memcached is available by running::
+
+    which memcached     # /usr/local/bin/memcached
+
+Add to your shell startup file (e.g. ``~/.bash_profile``) the path to ``bin``
+folder that contains ``memcached``, example::
+
+    export LIBMEMCACHED=/usr/local
+
 Many test failures with ``UnicodeEncodeError``
 ----------------------------------------------
 
