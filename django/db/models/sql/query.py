@@ -239,7 +239,8 @@ class Query(BaseExpression):
     @property
     def output_field(self):
         if len(self.select) == 1:
-            return self.select[0].field
+            select = self.select[0]
+            return getattr(select, 'target', None) or select.field
         elif len(self.annotation_select) == 1:
             return next(iter(self.annotation_select.values())).output_field
 
