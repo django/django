@@ -4,7 +4,7 @@ from django.utils.functional import cached_property
 
 from .base import Operation
 from .utils import (
-    ModelTuple, field_references_model, is_referenced_by_foreign_key,
+    field_references_model, is_referenced_by_foreign_key, resolve_relation,
 )
 
 
@@ -33,7 +33,9 @@ class FieldOperation(Operation):
         if name_lower == self.model_name_lower:
             return True
         if self.field:
-            return field_references_model(self.field, ModelTuple(app_label, name_lower))
+            return field_references_model(
+                (app_label, self.model_name_lower), self.field, (app_label, name_lower)
+            )
         return False
 
     def references_field(self, model_name, name, app_label):
@@ -46,15 +48,15 @@ class FieldOperation(Operation):
                 return True
         # Check if this operation remotely references the field.
         if self.field:
-            model_tuple = ModelTuple(app_label, model_name_lower)
+            model_tuple = (app_label, model_name_lower)
             remote_field = self.field.remote_field
             if remote_field:
-                if (ModelTuple.from_model(remote_field.model) == model_tuple and
+                if (resolve_relation(remote_field.model, app_label, self.model_name_lower) == model_tuple and
                         (not hasattr(self.field, 'to_fields') or
                             name in self.field.to_fields or None in self.field.to_fields)):
                     return True
                 through = getattr(remote_field, 'through', None)
-                if (through and ModelTuple.from_model(through) == model_tuple and
+                if (through and resolve_relation(through, app_label, self.model_name_lower) == model_tuple and
                         (getattr(remote_field, 'through_fields', None) is None or
                             name in remote_field.through_fields)):
                     return True
@@ -339,7 +341,7 @@ class RenameField(FieldOperation):
             for index, (name, field) in enumerate(model_state.fields):
                 remote_field = field.remote_field
                 if remote_field:
-                    remote_model_tuple = ModelTuple.from_model(
+                    remote_model_tuple = resolve_relation(
                         remote_field.model, model_app_label, model_name
                     )
                     if remote_model_tuple == model_tuple:

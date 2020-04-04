@@ -1,5 +1,3 @@
-from collections import namedtuple
-
 from django.db.models.fields.related import RECURSIVE_RELATIONSHIP_CONSTANT
 
 
@@ -14,40 +12,39 @@ def is_referenced_by_foreign_key(state, model_name_lower, field, field_name):
     return False
 
 
-class ModelTuple(namedtuple('ModelTupleBase', ('app_label', 'model_name'))):
-    @classmethod
-    def from_model(cls, model, app_label=None, model_name=None):
-        """
-        Take a model class or an 'app_label.ModelName' string and return a
-        ModelTuple('app_label', 'modelname'). The optional app_label and
-        model_name arguments are the defaults if "self" or "ModelName" are
-        passed.
-        """
-        if isinstance(model, str):
-            if model == RECURSIVE_RELATIONSHIP_CONSTANT:
-                return cls(app_label, model_name)
-            if '.' in model:
-                return cls(*model.lower().split('.', 1))
-            return cls(app_label, model.lower())
-        return cls(model._meta.app_label, model._meta.model_name)
+def resolve_relation(model, app_label=None, model_name=None):
+    """
+    Turn a model class or model reference string and return a model tuple.
 
-    def __eq__(self, other):
-        if isinstance(other, ModelTuple):
-            # Consider ModelTuple equal if their model_name is equal and either
-            # one of them is missing an app_label.
-            return self.model_name == other.model_name and (
-                self.app_label is None or other.app_label is None or self.app_label == other.app_label
+    app_label and model_name are used to resolve the scope of recursive and
+    unscoped model relationship.
+    """
+    if isinstance(model, str):
+        if model == RECURSIVE_RELATIONSHIP_CONSTANT:
+            if app_label is None or model_name is None:
+                raise TypeError(
+                    'app_label and model_name must be provided to resolve '
+                    'recursive relationships.'
+                )
+            return app_label, model_name
+        if '.' in model:
+            return tuple(model.lower().split('.', 1))
+        if app_label is None:
+            raise TypeError(
+                'app_label must be provided to resolve unscoped model '
+                'relationships.'
             )
-        return super().__eq__(other)
+        return app_label, model.lower()
+    return model._meta.app_label, model._meta.model_name
 
 
-def field_references_model(field, model_tuple):
-    """Return whether or not field references model_tuple."""
+def field_references_model(model_tuple, field, reference_model_tuple):
+    """Return whether or not field references reference_model_tuple."""
     remote_field = field.remote_field
     if remote_field:
-        if ModelTuple.from_model(remote_field.model) == model_tuple:
+        if resolve_relation(remote_field.model, *model_tuple) == reference_model_tuple:
             return True
         through = getattr(remote_field, 'through', None)
-        if through and ModelTuple.from_model(through) == model_tuple:
+        if through and resolve_relation(through, *model_tuple) == reference_model_tuple:
             return True
     return False

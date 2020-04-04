@@ -7,7 +7,7 @@ from django.utils.functional import cached_property
 from .fields import (
     AddField, AlterField, FieldOperation, RemoveField, RenameField,
 )
-from .utils import ModelTuple, field_references_model
+from .utils import field_references_model, resolve_relation
 
 
 def _check_for_duplicates(arg_name, objs):
@@ -105,15 +105,15 @@ class CreateModel(ModelOperation):
             return True
 
         # Check we didn't inherit from the model
-        model_tuple = ModelTuple(app_label, name_lower)
+        reference_model_tuple = (app_label, name_lower)
         for base in self.bases:
             if (base is not models.Model and isinstance(base, (models.base.ModelBase, str)) and
-                    ModelTuple.from_model(base) == model_tuple):
+                    resolve_relation(base, app_label) == reference_model_tuple):
                 return True
 
         # Check we have no FKs/M2Ms with it
         for _name, field in self.fields:
-            if field_references_model(field, model_tuple):
+            if field_references_model((app_label, self.name_lower), field, reference_model_tuple):
                 return True
         return False
 
@@ -307,7 +307,7 @@ class RenameModel(ModelOperation):
         renamed_model.name = self.new_name
         state.models[app_label, self.new_name_lower] = renamed_model
         # Repoint all fields pointing to the old model to the new one.
-        old_model_tuple = ModelTuple(app_label, self.old_name_lower)
+        old_model_tuple = (app_label, self.old_name_lower)
         new_remote_model = '%s.%s' % (app_label, self.new_name)
         to_reload = []
         for (model_app_label, model_name), model_state in state.models.items():
@@ -316,7 +316,7 @@ class RenameModel(ModelOperation):
                 changed_field = None
                 remote_field = field.remote_field
                 if remote_field:
-                    remote_model_tuple = ModelTuple.from_model(
+                    remote_model_tuple = resolve_relation(
                         remote_field.model, model_app_label, model_name
                     )
                     if remote_model_tuple == old_model_tuple:
@@ -324,7 +324,7 @@ class RenameModel(ModelOperation):
                         changed_field.remote_field.model = new_remote_model
                     through_model = getattr(remote_field, 'through', None)
                     if through_model:
-                        through_model_tuple = ModelTuple.from_model(
+                        through_model_tuple = resolve_relation(
                             through_model, model_app_label, model_name
                         )
                         if through_model_tuple == old_model_tuple:
