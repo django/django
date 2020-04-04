@@ -644,15 +644,17 @@ class HostValidationTests(SimpleTestCase):
             request = HttpRequest()
             request.META = {
                 'HTTP_HOST': host,
+                'SERVER_PORT': 80,
             }
             request.get_host()
 
         # Poisoned host headers are rejected as suspicious
         for host in chain(self.poisoned_hosts, ['other.com', 'example.com..']):
-            with self.assertRaises(DisallowedHost):
+            with self.assertRaises(DisallowedHost, msg="%s should be disallowed" % host):
                 request = HttpRequest()
                 request.META = {
                     'HTTP_HOST': host,
+                    'SERVER_PORT': 80,
                 }
                 request.get_host()
 
@@ -733,6 +735,22 @@ class HostValidationTests(SimpleTestCase):
                 }
                 request.get_host()
 
+    @override_settings(
+        USE_X_FORWARDED_PORT=True,
+        USE_X_FORWARDED_HOST=False,
+        ALLOWED_HOSTS=['*'])
+    def test_get_host_with_use_x_forwarded_port_and_http_host(self):
+        request = HttpRequest()
+        request.META = {
+            'HTTP_HOST': 'original.com',
+            'SERVER_PORT': '8000',
+            'HTTP_X_FORWARDED_HOST': 'example.com',
+            'HTTP_X_FORWARDED_PORT': '8080',
+        }
+        # Should NOT use the X-Forwarded-Port header
+        self.assertEqual(request.get_host(), 'original.com:8080')
+        self.assertEqual(request.get_port(), '8080')
+
     @override_settings(USE_X_FORWARDED_PORT=False)
     def test_get_port(self):
         request = HttpRequest()
@@ -771,6 +789,22 @@ class HostValidationTests(SimpleTestCase):
         request.META = {
             'SERVER_PORT': '8080',
             'HTTP_X_FORWARDED_HOST': 'example.com:8000',
+        }
+        # Should use the X-Forwarded-Host header
+        self.assertEqual(request.get_port(), '8000')
+
+        request = HttpRequest()
+        request.META = {
+            'SERVER_PORT': '8080',
+        }
+        self.assertEqual(request.get_port(), '8080')
+
+    @override_settings(USE_X_FORWARDED_HOST=True)
+    def test_get_port_with_x_forwarded_host_ipv6(self):
+        request = HttpRequest()
+        request.META = {
+            'SERVER_PORT': '8080',
+            'HTTP_X_FORWARDED_HOST': '[2001:19f0:feee::dead:beef:cafe]:8000',
         }
         # Should use the X-Forwarded-Host header
         self.assertEqual(request.get_port(), '8000')

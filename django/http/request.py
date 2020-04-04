@@ -25,7 +25,7 @@ from django.utils.regex_helper import _lazy_re_compile
 from .multipartparser import parse_header
 
 RAISE_ERROR = object()
-host_validation_re = _lazy_re_compile(r"^([a-z0-9.-]+|\[[a-f0-9]*:[a-f0-9\.:]+\])(:\d+)?$")
+host_validation_re = _lazy_re_compile(r"^([a-z0-9.-]+|\[[a-f0-9]*:[a-f0-9\.:]+\])(?::(\d+))?$")
 
 
 class UnreadablePostError(OSError):
@@ -102,28 +102,29 @@ class HttpRequest:
         Return the HTTP host using the environment or request headers. Skip
         allowed hosts protection, so may return an insecure host.
         """
+        server_port = '443' if self.is_secure else '80'
+        host = ''
         # We try three options, in order of decreasing preference.
         if settings.USE_X_FORWARDED_HOST and (
                 'HTTP_X_FORWARDED_HOST' in self.META):
-            host = self.META['HTTP_X_FORWARDED_HOST']
-            if settings.USE_X_FORWARDED_PORT and (
-                    'HTTP_X_FORWARDED_PORT' in self.META):
-                if ':' in host:
-                    raise ImproperlyConfigured(
-                        'HTTP_X_FORWARDED_HOST contains a port number '
-                        'and USE_X_FORWARDED_PORT is set to True'
-                    )
-                server_port = self.META['HTTP_X_FORWARDED_PORT']
-                if server_port != ('443' if self.is_secure() else '80'):
-                    host = '%s:%s' % (host, server_port)
+            host, _ = split_domain_port(self.META['HTTP_X_FORWARDED_HOST'])
+            server_port = self.get_port()
         elif 'HTTP_HOST' in self.META:
-            host = self.META['HTTP_HOST']
+            host_match = host_validation_re.match(self.META['HTTP_HOST'])
+            if host_match:
+                host, host_port = host_match.groups()
+                if host_port:
+                    # bypass normal rendering, at least one usage of request
+                    # requires 'HTTP_HOST' to be preserved
+                    return self.META['HTTP_HOST']
+                else:
+                    server_port = self.get_port()
         else:
             # Reconstruct the host using the algorithm from PEP 333.
             host = self.META['SERVER_NAME']
             server_port = self.get_port()
-            if server_port != ('443' if self.is_secure() else '80'):
-                host = '%s:%s' % (host, server_port)
+        if server_port != ('443' if self.is_secure() else '80'):
+            host = '%s:%s' % (host, server_port)
         return host
 
     def get_host(self):
@@ -139,7 +140,7 @@ class HttpRequest:
         if domain and validate_host(domain, allowed_hosts):
             return host
         else:
-            msg = "Invalid HTTP_HOST header: %r." % host
+            msg = "Invalid HTTP_HOST header: %r." % self.META['HTTP_HOST']
             if domain:
                 msg += " You may need to add %r to ALLOWED_HOSTS." % domain
             else:
@@ -148,14 +149,22 @@ class HttpRequest:
 
     def get_port(self):
         """Return the port number for the request as a string."""
-        if (settings.USE_X_FORWARDED_HOST and
-                ':' in self.META.get('HTTP_X_FORWARDED_HOST', "") and
-                self.META['HTTP_X_FORWARDED_HOST'].split(':')[-1] != ''):
-            port = self.META['HTTP_X_FORWARDED_HOST'].split(':')[-1]
-        elif settings.USE_X_FORWARDED_PORT and 'HTTP_X_FORWARDED_PORT' in self.META:
-            port = self.META['HTTP_X_FORWARDED_PORT']
+        if 'SERVER_PORT' in self.META:
+            port = self.META['SERVER_PORT']  # Default to SERVER_PORT
         else:
-            port = self.META['SERVER_PORT']
+            port = '443' if self.is_secure() else '80'  # Default to something sane
+        forwarded_port = False
+        if settings.USE_X_FORWARDED_PORT and 'HTTP_X_FORWARDED_PORT' in self.META:
+            forwarded_port = True
+            port = self.META['HTTP_X_FORWARDED_PORT']
+        if settings.USE_X_FORWARDED_HOST:
+            host, host_port = split_domain_port(self.META.get('HTTP_X_FORWARDED_HOST', ""))
+            if host_port:
+                if forwarded_port is True:
+                    raise ImproperlyConfigured(
+                        'HTTP_X_FORWARDED_HOST contains a port number '
+                        'and USE_X_FORWARDED_PORT is set to True')
+                port = host_port
         return str(port)
 
     def get_full_path(self, force_append_slash=False):
