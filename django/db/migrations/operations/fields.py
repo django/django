@@ -339,7 +339,7 @@ class RenameField(FieldOperation):
             for index, (name, field) in enumerate(model_state.fields):
                 remote_field = field.remote_field
                 if remote_field:
-                    remote_model_tuple = self._get_model_tuple(
+                    remote_model_tuple = ModelTuple.from_model(
                         remote_field.model, model_app_label, model_name
                     )
                     if remote_model_tuple == model_tuple:
