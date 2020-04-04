@@ -656,18 +656,16 @@ def split_domain_port(host):
     Return a (domain, port) tuple from a given host.
 
     Returned domain is lowercased. If the host is invalid, the domain will be
-    empty.
+    empty. If domain has a trailing dot it will be removed.
     """
     host = host.lower()
 
-    if not host_validation_re.match(host):
+    host_match = host_validation_re.match(host)
+    if not host_match:
         return '', ''
 
-    if host[-1] == ']':
-        # It's an IPv6 address without a port.
-        return host, ''
-    bits = host.rsplit(':', 1)
-    domain, port = bits if len(bits) == 2 else (bits[0], '')
+    domain, port = host_match.groups()
+    port = port if port else ''
     # Remove a trailing dot (if present) from the domain.
     domain = domain[:-1] if domain.endswith('.') else domain
     return domain, port
