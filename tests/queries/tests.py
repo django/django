@@ -3110,20 +3110,13 @@ class QuerySetExceptionTests(SimpleTestCase):
         with self.assertRaisesMessage(AttributeError, msg):
             list(qs)
 
-    def test_invalid_qs_list(self):
-        # Test for #19895 - second iteration over invalid queryset
-        # raises errors.
-        qs = Article.objects.order_by('invalid_column')
-        msg = "Cannot resolve keyword 'invalid_column' into field."
-        with self.assertRaisesMessage(FieldError, msg):
-            list(qs)
-        with self.assertRaisesMessage(FieldError, msg):
-            list(qs)
-
     def test_invalid_order_by(self):
-        msg = "Invalid order_by arguments: ['*']"
+        msg = (
+            "Cannot resolve keyword '*' into field. Choices are: created, id, "
+            "name"
+        )
         with self.assertRaisesMessage(FieldError, msg):
-            list(Article.objects.order_by('*'))
+            Article.objects.order_by('*')
 
     def test_invalid_queryset_model(self):
         msg = 'Cannot use QuerySet for "Article": Use a QuerySet for "ExtraInfo".'
