@@ -174,7 +174,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         )
         # Added an index? Create any PostgreSQL-specific indexes.
         if ((not (old_field.db_index or old_field.unique) and new_field.db_index) or
-            (not old_field.unique and new_field.unique)):
+                (not old_field.unique and new_field.unique)):
             like_index_statement = self._create_like_index_sql(model, new_field)
             if like_index_statement is not None:
                 self.execute(like_index_statement)

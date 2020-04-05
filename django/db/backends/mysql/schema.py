@@ -3,6 +3,7 @@ from django.db.models import NOT_PROVIDED
 
 
 class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
+
     sql_create_table_with_comment = "CREATE TABLE %(table)s (%(definition)s) COMMENT '%(table_comment)s'"
 
     sql_rename_table = "RENAME TABLE %(old_table)s TO %(new_table)s"
@@ -110,9 +111,9 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         # db_constraint=False because the index from that constraint won't be
         # created.
         if (storage == "InnoDB" and
-            create_index and
-            field.get_internal_type() == 'ForeignKey' and
-            field.db_constraint):
+                create_index and
+                field.get_internal_type() == 'ForeignKey' and
+                field.db_constraint):
             return False
         return not self._is_limited_data_type(field) and create_index
 
