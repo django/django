@@ -698,7 +698,8 @@ class Options:
             )
             for f in fields_with_relations:
                 if not isinstance(f.remote_field.model, str):
-                    related_objects_graph[f.remote_field.model._meta.concrete_model._meta].append(f)
+                    remote_label = f.remote_field.model._meta.concrete_model._meta.label
+                    related_objects_graph[remote_label].append(f)
 
         for model in all_models:
             # Set the relation_tree using the internal __dict__. In this way
@@ -706,7 +707,7 @@ class Options:
             # __dict__ takes precedence over a data descriptor (such as
             # @cached_property). This means that the _meta._relation_tree is
             # only called if related_objects is not in __dict__.
-            related_objects = related_objects_graph[model._meta.concrete_model._meta]
+            related_objects = related_objects_graph[model._meta.concrete_model._meta.label]
             model._meta.__dict__['_relation_tree'] = related_objects
         # It seems it is possible that self is not in all_models, so guard
         # against that with default for get().
