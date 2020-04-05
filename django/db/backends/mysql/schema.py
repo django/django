@@ -47,14 +47,9 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
     def column_sql(self, model, field, include_default=False):
         sql, params = super().column_sql(model, field, include_default)
 
-        if settings.ENABLE_DB_COMMENT_WITH_HELP_TEXT:
-            db_column_comment = field.help_text
-        else:
-            db_column_comment = field.db_column_comment
-
-        if db_column_comment:
+        if field.db_column_comment:
             sql += " COMMENT '%(db_column_comment)s' " % {
-                'db_column_comment': db_column_comment.replace('\'', '"').replace('\n', ' ')
+                'db_column_comment': field.db_column_comment.replace('\'', '"').replace('\n', ' ')
             }
 
         return sql, params

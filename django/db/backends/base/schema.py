@@ -708,15 +708,8 @@ class BaseDatabaseSchemaEditor:
             if fragment:
                 null_actions.append(fragment)
 
-        if settings.ENABLE_DB_COMMENT_WITH_HELP_TEXT:
-            old_field_db_column_comment = old_field.help_text
-            new_field_db_column_comment = new_field.help_text
-        else:
-            old_field_db_column_comment = old_field.db_column_comment
-            new_field_db_column_comment = new_field.db_column_comment
-
-        if old_field_db_column_comment != new_field_db_column_comment:
-            fragment = self._alter_column_comment_sql(model, new_field, new_type, new_field_db_column_comment)
+        if old_field.db_column_comment != new_field.db_column_comment:
+            fragment = self._alter_column_comment_sql(model, new_field, new_type, new_field.db_column_comment)
             if fragment:
                 null_actions.append(fragment)
 
