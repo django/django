@@ -3,12 +3,10 @@ from django.db.models import NOT_PROVIDED
 
 
 class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
-
-    sql_create_table = "CREATE TABLE %(table)s (%(definition)s)"
     sql_create_table_with_comment = "CREATE TABLE %(table)s (%(definition)s) COMMENT '%(db_table_comment)s'"
 
     sql_rename_table = "RENAME TABLE %(old_table)s TO %(new_table)s"
-    sql_alter_table_comment = "ALTER TABLE %(table)s COMMENT = '%(db_table_comment)s'"
+    sql_alter_table_commaent = "ALTER TABLE %(table)s COMMENT = '%(db_table_comment)s'"
 
     sql_alter_column_null = "MODIFY %(column)s %(type)s NULL"
     sql_alter_column_not_null = "MODIFY %(column)s %(type)s NOT NULL"
@@ -80,15 +78,6 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             return self.connection.mysql_version >= (10, 2, 1)
         return self.connection.mysql_version >= (8, 0, 13)
 
-    def alter_db_table_comment(self, model, old_db_table_comment, new_db_table_comment):
-        """ Modify the table comment """
-        if old_db_table_comment == new_db_table_comment:
-            return
-        self.execute(self.sql_alter_table_comment % {
-            "table": self.quote_name(model._meta.db_table),
-            "db_table_comment": self.quote_name(new_db_table_comment.replace('\'', '').replace('\n', ' ')),
-        })
-
     def _column_default_sql(self, field):
         if (
             not self.connection.mysql_is_mariadb and
@@ -121,9 +110,9 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         # db_constraint=False because the index from that constraint won't be
         # created.
         if (storage == "InnoDB" and
-                create_index and
-                field.get_internal_type() == 'ForeignKey' and
-                field.db_constraint):
+            create_index and
+            field.get_internal_type() == 'ForeignKey' and
+            field.db_constraint):
             return False
         return not self._is_limited_data_type(field) and create_index
 
@@ -161,6 +150,15 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
     def _rename_field_sql(self, table, old_field, new_field, new_type):
         new_type = self._set_field_new_type_null_status(old_field, new_type)
         return super()._rename_field_sql(table, old_field, new_field, new_type)
+
+    def alter_db_table_comment(self, model, old_db_table_comment, new_db_table_comment):
+        """ Modify the table comment """
+        if old_db_table_comment == new_db_table_comment:
+            return
+        self.execute(self.sql_alter_table_comment % {
+            "table": self.quote_name(model._meta.db_table),
+            "db_table_comment": self.quote_name(new_db_table_comment.replace('\'', '').replace('\n', ' ')),
+        })
 
     def _alter_column_comment_sql(self, model, new_field, new_type, new_db_comment):
         new_type = self._set_field_new_type_null_status(new_field, new_type)
