@@ -3,10 +3,10 @@ from django.db.models import NOT_PROVIDED
 
 
 class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
-    sql_create_table_with_comment = "CREATE TABLE %(table)s (%(definition)s) COMMENT '%(db_table_comment)s'"
+    sql_create_table_with_comment = "CREATE TABLE %(table)s (%(definition)s) COMMENT '%(table_comment)s'"
 
     sql_rename_table = "RENAME TABLE %(old_table)s TO %(new_table)s"
-    sql_alter_table_commaent = "ALTER TABLE %(table)s COMMENT = '%(db_table_comment)s'"
+    sql_alter_table_comment = "ALTER TABLE %(table)s COMMENT = '%(db_table_comment)s'"
 
     sql_alter_column_null = "MODIFY %(column)s %(type)s NULL"
     sql_alter_column_not_null = "MODIFY %(column)s %(type)s NOT NULL"
