@@ -466,7 +466,7 @@ class Field(RegisterLookupMixin):
             "choices": None,
             "help_text": '',
             "db_column": None,
-            'db_column_comment': None,
+            "db_column_comment": None,
             "db_tablespace": None,
             "auto_created": False,
             "validators": [],
