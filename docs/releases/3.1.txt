@@ -678,6 +678,10 @@ Miscellaneous
   :class:`~django.views.generic.base.TemplateView` is deprecated. Reference
   them in the template with ``view.kwargs`` instead.
 
+* Passing raw column aliases to :meth:`.QuerySet.order_by` is deprecated. The
+  same result can be achieved by passing aliases in a
+  :class:`~django.db.models.expressions.RawSQL` instead beforehand.
+
 .. _removed-features-3.1:
 
 Features removed in 3.1
