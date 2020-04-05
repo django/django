@@ -646,7 +646,7 @@ msgid "Please go to the following page and choose a new password:"
 msgstr "请访问该页面并选择一个新密码："
 
 msgid "Your username, in case you've forgotten:"
-msgstr "你的用户名，如果已忘记的话："
+msgstr "如果已忘记的话，你的用户名："
 
 msgid "Thanks for using our site!"
 msgstr "感谢使用我们的站点！"
@@ -677,11 +677,11 @@ msgstr "选择 %s"
 
 #, python-format
 msgid "Select %s to change"
-msgstr "选择 %s 来修改"
+msgstr "选择要修改的%s"
 
 #, python-format
 msgid "Select %s to view"
-msgstr "选择%s查看"
+msgstr "选择%s来查看"
 
 msgid "Date:"
 msgstr "日期："
