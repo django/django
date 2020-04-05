@@ -192,14 +192,14 @@ class BaseDatabaseSchemaEditor:
                     self.deferred_sql.extend(autoinc_sql)
         constraints = [constraint.constraint_sql(model, self) for constraint in model._meta.constraints]
 
-        if model._meta.db_table_comment and getattr(self, 'sql_create_table_with_comment'):
+        if model._meta.db_table_comment and getattr(self, 'sql_create_table_with_comment', None):
             sql = self.sql_create_table_with_comment % {
                 'table': self.quote_name(model._meta.db_table),
                 'definition': ', '.join(constraint for constraint in (*column_sqls, *constraints) if constraint),
                 "db_table_comment": model._meta.db_table_comment.replace('\'', '').replace('\n', ' ')
             }
         else:
-            if getattr(model._meta, 'db_table_comment'):
+            if getattr(model._meta, 'db_table_comment', None):
                 logger.warning('option "db_table_comment" is supported only mysql ....')
 
             sql = self.sql_create_table % {
@@ -904,7 +904,7 @@ class BaseDatabaseSchemaEditor:
         )
 
     def _alter_column_comment_sql(self, model, new_field, new_type, new_db_comment):
-        logger.info('converting help_text to comment is supported only mysql....')
+        logger.info('db_column_comment is supported only mysql....')
         return None
 
     def _alter_many_to_many(self, model, old_field, new_field, strict):
