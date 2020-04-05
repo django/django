@@ -31,6 +31,11 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
 
     sql_delete_procedure = 'DROP FUNCTION %(procedure)s(%(param_types)s)'
 
+    sql_create_table_with_comment = "CREATE TABLE %(table)s (%(definition)s); " \
+                                    "COMMENT ON TABLE %(table)s IS '%(table_comment)s'"
+    sql_create_table_comment = "COMMENT ON TABLE %(table)s IS '%(table_comment)s'"
+    sql_create_column_comment = "COMMENT ON COLUMN %(table)s.%(column)s IS '%(column_comment)s'"
+
     def quote_value(self, value):
         if isinstance(value, str):
             value = value.replace('%', '%%')
@@ -169,7 +174,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         )
         # Added an index? Create any PostgreSQL-specific indexes.
         if ((not (old_field.db_index or old_field.unique) and new_field.db_index) or
-                (not old_field.unique and new_field.unique)):
+            (not old_field.unique and new_field.unique)):
             like_index_statement = self._create_like_index_sql(model, new_field)
             if like_index_statement is not None:
                 self.execute(like_index_statement)
@@ -203,4 +208,23 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         return super()._create_index_sql(
             model, fields, name=name, suffix=suffix, using=using, db_tablespace=db_tablespace,
             col_suffixes=col_suffixes, sql=sql, opclasses=opclasses, condition=condition,
+        )
+
+    def alter_db_table_comment(self, model, old_db_table_comment, new_db_table_comment):
+        """ Modify the table comment """
+        if old_db_table_comment == new_db_table_comment:
+            return
+        self.execute(self.sql_create_table_comment % {
+            "table": self.quote_name(model._meta.db_table),
+            "table_comment": self.quote_name(new_db_table_comment.replace('\'', '').replace('\n', ' ')),
+        })
+
+    def _alter_column_comment_sql(self, model, new_field, new_type, new_db_comment):
+        return (
+            self.sql_create_column_comment % {
+                'table': model._meta.db_table,
+                'column': self.quote_name(new_field.column),
+                'column_comment': new_db_comment.replace('\'', ' ').replace('\n', ' '),
+            },
+            []
         )
