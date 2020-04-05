@@ -18,6 +18,10 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
     sql_create_column_inline_fk = 'CONSTRAINT %(name)s REFERENCES %(to_table)s(%(to_column)s)%(deferrable)s'
     sql_delete_table = "DROP TABLE %(table)s CASCADE CONSTRAINTS"
     sql_create_index = "CREATE INDEX %(name)s ON %(table)s (%(columns)s)%(extra)s"
+    sql_create_table_with_comment = "CREATE TABLE %(table)s (%(definition)s); " \
+                                    "COMMENT ON TABLE %(table)s IS '%(table_comment)s'"
+    sql_create_table_comment = "COMMENT ON TABLE %(table)s IS '%(table_comment)s'"
+    sql_create_column_comment = "COMMENT ON COLUMN %(table)s.%(column)s IS '%(column_comment)s'"
 
     def quote_value(self, value):
         if isinstance(value, (datetime.date, datetime.time, datetime.datetime)):
@@ -170,3 +174,22 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             'table': self.quote_name(table_name),
             'column': self.quote_name(column_name),
         })
+
+    def alter_db_table_comment(self, model, old_db_table_comment, new_db_table_comment):
+        """ Modify the table comment """
+        if old_db_table_comment == new_db_table_comment:
+            return
+        self.execute(self.sql_create_table_comment % {
+            "table": self.quote_name(model._meta.db_table),
+            "table_comment": self.quote_name(new_db_table_comment.replace('\'', '').replace('\n', ' ')),
+        })
+
+    def _alter_column_comment_sql(self, model, new_field, new_type, new_db_comment):
+        return (
+            self.sql_create_column_comment % {
+                'table': model._meta.db_table,
+                'column': self.quote_name(new_field.column),
+                'column_comment': new_db_comment.replace('\'', ' ').replace('\n', ' '),
+            },
+            []
+        )
