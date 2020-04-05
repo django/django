@@ -1,4 +1,3 @@
-from django.conf import settings
 from django.db.backends.base.schema import BaseDatabaseSchemaEditor
 from django.db.models import NOT_PROVIDED
 

@@ -1,7 +1,6 @@
 import logging
 from datetime import datetime
 
-from django.conf import settings
 from django.db.backends.ddl_references import (
     Columns, ForeignKeyName, IndexName, Statement, Table,
 )
