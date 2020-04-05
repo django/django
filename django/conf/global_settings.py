@@ -410,7 +410,6 @@ THOUSAND_SEPARATOR = ','
 DEFAULT_TABLESPACE = ''
 DEFAULT_INDEX_TABLESPACE = ''
 
-
 # Default X-Frame-Options header value
 X_FRAME_OPTIONS = 'DENY'
 
