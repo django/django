@@ -1,7 +1,6 @@
 import os
 import shutil
 import sys
-import sqlite3
 from pathlib import Path
 
 from django.db.backends.base.creation import BaseDatabaseCreation
@@ -20,7 +19,7 @@ class DatabaseCreation(BaseDatabaseCreation):
         test_database_name = self.connection.settings_dict['TEST']['NAME'] or self.DEFAULT_TEST_DB_FILENAME
         # Force to use file based database for parallel testing when default settings is in-memory DB
         if self.is_in_memory_db(test_database_name):
-            return DEFAULT_TEST_DB_FILENAME
+            return self.DEFAULT_TEST_DB_FILENAME
         return test_database_name
 
     def _get_test_db_clone_name(self, suffix):
