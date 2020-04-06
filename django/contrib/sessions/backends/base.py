@@ -1,4 +1,5 @@
 import base64
+import hashlib
 import logging
 import string
 import warnings
@@ -20,6 +21,12 @@ from django.utils.translation import LANGUAGE_SESSION_KEY
 # on case insensitive file systems.
 VALID_KEY_CHARS = string.ascii_lowercase + string.digits
 
+# the delimiter cannot be a member of VALID_KEY_CHARS or a file directory
+# component. It can only be a single character.
+SESSION_KEY_DELIMITER = '$'
+# this should be available in hashlib
+SESSION_HASHING_ALGORITHM = 'sha256'
+SESSION_HASHED_KEY_PREFIX = SESSION_HASHING_ALGORITHM + SESSION_KEY_DELIMITER
 
 class CreateError(Exception):
     """
@@ -35,6 +42,43 @@ class UpdateError(Exception):
     """
     pass
 
+
+class KeyHash:
+    _algorithm = getattr(hashlib, SESSION_HASHING_ALGORITHM)
+
+    @classmethod
+    def create_backend_key(cls, frontend_key):
+        if frontend_key is None:
+            return None
+        if not cls._has_hash_prefix(frontend_key):
+            return frontend_key
+        return cls._algorithm(
+            cls._get_session_key_part(frontend_key).encode('ascii')).hexdigest()
+
+    @staticmethod
+    def _get_session_key_part(frontend_key):
+        """
+        Return the key part of the frontend_key by removing the hash prefix.
+        """
+        if frontend_key.startswith(SESSION_HASHED_KEY_PREFIX):
+            return frontend_key[len(SESSION_HASHED_KEY_PREFIX):]
+        return None
+
+    @staticmethod
+    def _has_hash_prefix(frontend_key):
+        """Return True when the session_key is hashed in the backend."""
+        return str(frontend_key).startswith(SESSION_HASHED_KEY_PREFIX)
+
+    @classmethod
+    def is_valid(cls, frontend_key):
+        """
+        Key must be truthy and at least 8 characters long and
+        in the correct format if hashing is required.
+        """
+        valid = frontend_key and len(frontend_key) >= 8
+        if not settings.SESSION_REQUIRE_KEY_HASH:
+            return valid
+        return valid and cls._has_hash_prefix(frontend_key)
 
 class SessionBase:
     """
@@ -171,24 +215,32 @@ class SessionBase:
         except AttributeError:
             return True
 
+    @classmethod
+    def get_backend_key(cls, frontend_key):
+        """
+        Return backend version of the given frontend key.
+        Applies hashing if required by settings.
+        """
+        return KeyHash.create_backend_key(frontend_key)
+
     def _get_new_session_key(self):
         "Return session key that isn't being used."
         while True:
+            #TODO
+            # key_hash = KeyHash.random()
             session_key = get_random_string(32, VALID_KEY_CHARS)
-            if not self.exists(session_key):
-                return session_key
+            hashed_session_key = SESSION_HASHED_KEY_PREFIX + session_key
+            if not self.exists(session_key) and not (settings.SESSION_STORE_KEY_HASH and self.exists(hashed_session_key)):
+                break
+        if settings.SESSION_STORE_KEY_HASH:
+            return hashed_session_key
+        return session_key
 
     def _get_or_create_session_key(self):
         if self._session_key is None:
             self._session_key = self._get_new_session_key()
-        return self._session_key
+        return self.get_backend_key(self._session_key)
 
-    def _validate_session_key(self, key):
-        """
-        Key must be truthy and at least 8 characters long. 8 characters is an
-        arbitrary lower bound for some minimal key security.
-        """
-        return key and len(key) >= 8
 
     def _get_session_key(self):
         return self.__session_key
@@ -197,7 +249,7 @@ class SessionBase:
         """
         Validate session key on assignment. Invalid values will set to None.
         """
-        if self._validate_session_key(value):
+        if KeyHash.is_valid(value):
             self.__session_key = value
         else:
             self.__session_key = None

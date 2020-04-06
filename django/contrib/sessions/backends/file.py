@@ -3,6 +3,7 @@ import logging
 import os
 import shutil
 import tempfile
+from contextlib import suppress
 
 from django.conf import settings
 from django.contrib.sessions.backends.base import (
@@ -44,6 +45,8 @@ class SessionStore(SessionBase):
         """
         if session_key is None:
             session_key = self._get_or_create_session_key()
+        else:
+            session_key = self.get_backend_key(session_key)
 
         # Make sure we're not vulnerable to directory traversal. Session keys
         # should always be md5s, so they should never contain directory
@@ -54,46 +57,67 @@ class SessionStore(SessionBase):
 
         return os.path.join(self.storage_path, self.file_prefix + session_key)
 
-    def _last_modification(self):
+    @staticmethod
+    def _last_modification(file_path):
         """
         Return the modification time of the file storing the session's content.
         """
-        modification = os.stat(self._key_to_file()).st_mtime
+        modification = os.stat(file_path).st_mtime
         if settings.USE_TZ:
             modification = datetime.datetime.utcfromtimestamp(modification)
             return modification.replace(tzinfo=timezone.utc)
         return datetime.datetime.fromtimestamp(modification)
 
-    def _expiry_date(self, session_data):
+    def _expiry_date(self, session_data, file_path=None):
         """
         Return the expiry time of the file storing the session's content.
         """
         return session_data.get('_session_expiry') or (
-            self._last_modification() + datetime.timedelta(seconds=self.get_session_cookie_age())
+            self._last_modification(file_path if file_path else self._key_to_file()) + datetime.timedelta(seconds=self.get_session_cookie_age())
         )
+
+    @classmethod
+    def _load_session_data(cls, file_path):
+        """
+        Return dict with session data from specified file,
+        return empty dict if specified file doesn't exits,
+        return False if the file contains invalid content.
+        """
+        file_data = None
+
+        with open(file_path, encoding='ascii') as session_file:
+            file_data = session_file.read()
+        
+        # Don't fail if there is no data in the session file.
+        # We may have opened the empty placeholder file.
+        if not file_data:
+            return {}
+
+        try:
+            session_data = cls().decode(file_data)
+        except (EOFError, SuspiciousOperation) as e:
+            if isinstance(e, SuspiciousOperation):
+                logger = logging.getLogger('django.security.%s' % e.__class__.__name__)
+                logger.warning(str(e))
+            return False
+
+        return session_data
 
     def load(self):
         session_data = {}
         try:
-            with open(self._key_to_file(), encoding='ascii') as session_file:
-                file_data = session_file.read()
-            # Don't fail if there is no data in the session file.
-            # We may have opened the empty placeholder file.
-            if file_data:
-                try:
-                    session_data = self.decode(file_data)
-                except (EOFError, SuspiciousOperation) as e:
-                    if isinstance(e, SuspiciousOperation):
-                        logger = logging.getLogger('django.security.%s' % e.__class__.__name__)
-                        logger.warning(str(e))
-                    self.create()
+            session_data = self._load_session_data(self._key_to_file())
 
-                # Remove expired sessions.
-                expiry_age = self.get_expiry_age(expiry=self._expiry_date(session_data))
-                if expiry_age <= 0:
-                    session_data = {}
-                    self.delete()
-                    self.create()
+            if session_data == False:
+                self.create()
+                session_data = {}
+
+            # Remove expired sessions.
+            expiry_age = self.get_expiry_age(expiry=self._expiry_date(session_data))
+            if expiry_age <= 0:
+                session_data = {}
+                self.delete()
+                self.create()
         except (OSError, SuspiciousOperation):
             self._session_key = None
         return session_data
@@ -177,8 +201,16 @@ class SessionStore(SessionBase):
             if self.session_key is None:
                 return
             session_key = self.session_key
+        # try:
+        #     os.unlink(self._key_to_file(session_key))
+        # except OSError:
+        #     pass
+        SessionStore._delete_file(self._key_to_file(session_key))
+
+    @staticmethod
+    def _delete_file(file_path):
         try:
-            os.unlink(self._key_to_file(session_key))
+            os.unlink(file_path)
         except OSError:
             pass
 
@@ -193,10 +225,12 @@ class SessionStore(SessionBase):
         for session_file in os.listdir(storage_path):
             if not session_file.startswith(file_prefix):
                 continue
-            session_key = session_file[len(file_prefix):]
-            session = cls(session_key)
-            # When an expired session is loaded, its file is removed, and a
-            # new file is immediately created. Prevent this by disabling
-            # the create() method.
-            session.create = lambda: None
-            session.load()
+
+            file_path = os.path.join(storage_path, session_file)
+            session_data = cls._load_session_data(file_path)
+            if session_data != False:
+                expiry_age = cls().get_expiry_age(expiry=cls()._expiry_date(session_data, file_path=file_path))
+
+                if expiry_age <= 0:
+                    session_data = {}
+                    cls._delete_file(file_path)

@@ -29,10 +29,11 @@ class SessionStore(SessionBase):
 
     def _get_session_from_db(self):
         try:
-            return self.model.objects.get(
-                session_key=self.session_key,
+            s = self.model.objects.get(
+                session_key=self.get_backend_key(self.session_key),
                 expire_date__gt=timezone.now()
             )
+            return s
         except (self.model.DoesNotExist, SuspiciousOperation) as e:
             if isinstance(e, SuspiciousOperation):
                 logger = logging.getLogger('django.security.%s' % e.__class__.__name__)
@@ -44,7 +45,7 @@ class SessionStore(SessionBase):
         return self.decode(s.session_data) if s else {}
 
     def exists(self, session_key):
-        return self.model.objects.filter(session_key=session_key).exists()
+        return self.model.objects.filter(session_key=self.get_backend_key(session_key)).exists()
 
     def create(self):
         while True:
@@ -100,7 +101,7 @@ class SessionStore(SessionBase):
                 return
             session_key = self.session_key
         try:
-            self.model.objects.get(session_key=session_key).delete()
+            self.model.objects.get(session_key=self.get_backend_key(session_key)).delete()
         except self.model.DoesNotExist:
             pass
 

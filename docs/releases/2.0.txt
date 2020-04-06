@@ -167,6 +167,30 @@ Minor features
 
 * :djadmin:`inspectdb` can now introspect ``JSONField`` and various
   ``RangeField``\s (``django.contrib.postgres`` must be in ``INSTALLED_APPS``).
+* ...
+
+:mod:`django.contrib.sessions`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* One-way hashes of the session keys are now stored in the ``db``,
+  ``cached_db``, ``cached`` and ``file`` backends by default. Old
+  sessions should continue to work on your site. As sessions are
+  cycled, your backend will slowly move towards using one-way
+  hashed session_keys. This provides an additional layer of
+  security against compromises of a backend via a backup or
+  read only access.
+
+* The new
+  :meth:`~django.contrib.sessions.backends.base.SessionBase.get_backend_key`
+  may be needed if you directly access the session backend. For
+  example::
+
+      Session.objects.get(session_key=get_backend_key(session_key))
+
+* Added :setting:`SESSION_STORE_KEY_HASH` to determine whether the
+  session key should be stored as a one-way hash. Only set this to
+  False if you have an explicit reason.
+
 
 :mod:`django.contrib.sitemaps`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -546,6 +570,14 @@ containing these operations to be applied, you must set the
 
 Miscellaneous
 -------------
+
+* Session keys are now hashed in the backends (except for signed cookies).
+  This adds a layer of security against some attack vectors like exploiting
+  a backend backup. You may need to pass the sessionid cookie value through
+  :meth:`~django.contrib.sessions.backends.base.SessionBase.get_backend_key`
+  before querying the backend if you currently access it directly. You can
+  disable this behavior by setting :setting:`SESSION_STORE_KEY_HASH` to
+  False.
 
 * The ``SessionAuthenticationMiddleware`` class is removed. It provided no
   functionality since session authentication is unconditionally enabled in
