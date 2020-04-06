@@ -845,9 +845,7 @@ class MultiWidget(Widget):
         return context
 
     def id_for_label(self, id_):
-        if id_:
-            id_ += '_0'
-        return id_
+        return '%s_0' % id_
 
     def value_from_datadict(self, data, files, name):
         return [
