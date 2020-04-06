@@ -56,6 +56,7 @@ class JSONField(CheckFieldDefaultMixin, Field):
         return KeyTransformFactory(name)
 
     def get_prep_value(self, value):
+        value = super().get_prep_value(value)
         if value is not None:
             return JsonAdapter(value, encoder=self.encoder)
         return value
