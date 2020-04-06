@@ -206,6 +206,18 @@ class BasePasswordHasher:
         """
         raise NotImplementedError('subclasses of BasePasswordHasher must provide an encode() method')
 
+    def decode(self, encoded):
+        """
+        Return a decoded database value.
+
+        The result is a dictionary and should contain `algorithm`, `hash`, and
+        `salt`. Extra keys can be algorithm specific like `iterations` or
+        `work_factor`.
+        """
+        raise NotImplementedError(
+            'subclasses of BasePasswordHasher must provide a decode() method.'
+        )
+
     def safe_summary(self, encoded):
         """
         Return a summary of safe values.
@@ -252,31 +264,39 @@ class PBKDF2PasswordHasher(BasePasswordHasher):
         hash = base64.b64encode(hash).decode('ascii').strip()
         return "%s$%d$%s$%s" % (self.algorithm, iterations, salt, hash)
 
-    def verify(self, password, encoded):
-        algorithm, iterations, salt, hash = encoded.split('$', 3)
-        assert algorithm == self.algorithm
-        encoded_2 = self.encode(password, salt, int(iterations))
-        return constant_time_compare(encoded, encoded_2)
-
-    def safe_summary(self, encoded):
+    def decode(self, encoded):
         algorithm, iterations, salt, hash = encoded.split('$', 3)
         assert algorithm == self.algorithm
         return {
-            _('algorithm'): algorithm,
-            _('iterations'): iterations,
-            _('salt'): mask_hash(salt),
-            _('hash'): mask_hash(hash),
+            'algorithm': algorithm,
+            'hash': hash,
+            'iterations': int(iterations),
+            'salt': salt,
+        }
+
+    def verify(self, password, encoded):
+        decoded = self.decode(encoded)
+        encoded_2 = self.encode(password, decoded['salt'], decoded['iterations'])
+        return constant_time_compare(encoded, encoded_2)
+
+    def safe_summary(self, encoded):
+        decoded = self.decode(encoded)
+        return {
+            _('algorithm'): decoded['algorithm'],
+            _('iterations'): decoded['iterations'],
+            _('salt'): mask_hash(decoded['salt']),
+            _('hash'): mask_hash(decoded['hash']),
         }
 
     def must_update(self, encoded):
-        algorithm, iterations, salt, hash = encoded.split('$', 3)
-        return int(iterations) != self.iterations
+        decoded = self.decode(encoded)
+        return decoded['iterations'] != self.iterations
 
     def harden_runtime(self, password, encoded):
-        algorithm, iterations, salt, hash = encoded.split('$', 3)
-        extra_iterations = self.iterations - int(iterations)
+        decoded = self.decode(encoded)
+        extra_iterations = self.iterations - decoded['iterations']
         if extra_iterations > 0:
-            self.encode(password, salt, extra_iterations)
+            self.encode(password, decoded['salt'], extra_iterations)
 
 
 class PBKDF2SHA1PasswordHasher(PBKDF2PasswordHasher):
@@ -319,6 +339,23 @@ class Argon2PasswordHasher(BasePasswordHasher):
         )
         return self.algorithm + data.decode('ascii')
 
+    def decode(self, encoded):
+        argon2 = self._load_library()
+        algorithm, rest = encoded.split('$', 1)
+        assert algorithm == self.algorithm
+        params = argon2.extract_parameters('$' + rest)
+        variety, *_, salt, hash = rest.split('$')
+        return {
+            'algorithm': algorithm,
+            'hash': hash,
+            'memory_cost': params.memory_cost,
+            'parallelism': params.parallelism,
+            'salt': salt,
+            'time_cost': params.time_cost,
+            'variety': variety,
+            'version': params.version,
+        }
+
     def verify(self, password, encoded):
         argon2 = self._load_library()
         algorithm, rest = encoded.split('$', 1)
@@ -329,18 +366,16 @@ class Argon2PasswordHasher(BasePasswordHasher):
             return False
 
     def safe_summary(self, encoded):
-        (algorithm, variety, version, time_cost, memory_cost, parallelism,
-            salt, data) = self._decode(encoded)
-        assert algorithm == self.algorithm
+        decoded = self.decode(encoded)
         return {
-            _('algorithm'): algorithm,
-            _('variety'): variety,
-            _('version'): version,
-            _('memory cost'): memory_cost,
-            _('time cost'): time_cost,
-            _('parallelism'): parallelism,
-            _('salt'): mask_hash(salt),
-            _('hash'): mask_hash(data),
+            _('algorithm'): decoded['algorithm'],
+            _('variety'): decoded['variety'],
+            _('version'): decoded['version'],
+            _('memory cost'): decoded['memory_cost'],
+            _('time cost'): decoded['time_cost'],
+            _('parallelism'): decoded['parallelism'],
+            _('salt'): mask_hash(decoded['salt']),
+            _('hash'): mask_hash(decoded['hash']),
         }
 
     def must_update(self, encoded):
@@ -370,22 +405,6 @@ class Argon2PasswordHasher(BasePasswordHasher):
             time_cost=self.time_cost,
             memory_cost=self.memory_cost,
             parallelism=self.parallelism,
-        )
-
-    def _decode(self, encoded):
-        """
-        Split an encoded hash and return: (
-            algorithm, variety, version, time_cost, memory_cost,
-            parallelism, salt, data,
-        ).
-        """
-        argon2 = self._load_library()
-        algorithm, rest = encoded.split('$', 1)
-        params = argon2.extract_parameters('$' + rest)
-        variety, *_, salt, data = rest.split('$')
-        return (
-            algorithm, variety, params.version, params.time_cost,
-            params.memory_cost, params.parallelism, salt, data,
         )
 
 
@@ -419,6 +438,17 @@ class BCryptSHA256PasswordHasher(BasePasswordHasher):
         data = bcrypt.hashpw(password, salt)
         return "%s$%s" % (self.algorithm, data.decode('ascii'))
 
+    def decode(self, encoded):
+        algorithm, empty, algostr, work_factor, data = encoded.split('$', 4)
+        assert algorithm == self.algorithm
+        return {
+            'algorithm': algorithm,
+            'algostr': algostr,
+            'checksum': data[22:],
+            'salt': data[:22],
+            'work_factor': int(work_factor),
+        }
+
     def verify(self, password, encoded):
         algorithm, data = encoded.split('$', 1)
         assert algorithm == self.algorithm
@@ -426,19 +456,17 @@ class BCryptSHA256PasswordHasher(BasePasswordHasher):
         return constant_time_compare(encoded, encoded_2)
 
     def safe_summary(self, encoded):
-        algorithm, empty, algostr, work_factor, data = encoded.split('$', 4)
-        assert algorithm == self.algorithm
-        salt, checksum = data[:22], data[22:]
+        decoded = self.decode(encoded)
         return {
-            _('algorithm'): algorithm,
-            _('work factor'): work_factor,
-            _('salt'): mask_hash(salt),
-            _('checksum'): mask_hash(checksum),
+            _('algorithm'): decoded['algorithm'],
+            _('work factor'): decoded['work_factor'],
+            _('salt'): mask_hash(decoded['salt']),
+            _('checksum'): mask_hash(decoded['checksum']),
         }
 
     def must_update(self, encoded):
-        algorithm, empty, algostr, rounds, data = encoded.split('$', 4)
-        return int(rounds) != self.rounds
+        decoded = self.decode(encoded)
+        return decoded['work_factor'] != self.rounds
 
     def harden_runtime(self, password, encoded):
         _, data = encoded.split('$', 1)
@@ -480,19 +508,26 @@ class SHA1PasswordHasher(BasePasswordHasher):
         hash = hashlib.sha1((salt + password).encode()).hexdigest()
         return "%s$%s$%s" % (self.algorithm, salt, hash)
 
-    def verify(self, password, encoded):
-        algorithm, salt, hash = encoded.split('$', 2)
-        assert algorithm == self.algorithm
-        encoded_2 = self.encode(password, salt)
-        return constant_time_compare(encoded, encoded_2)
-
-    def safe_summary(self, encoded):
+    def decode(self, encoded):
         algorithm, salt, hash = encoded.split('$', 2)
         assert algorithm == self.algorithm
         return {
-            _('algorithm'): algorithm,
-            _('salt'): mask_hash(salt, show=2),
-            _('hash'): mask_hash(hash),
+            'algorithm': algorithm,
+            'hash': hash,
+            'salt': salt,
+        }
+
+    def verify(self, password, encoded):
+        decoded = self.decode(encoded)
+        encoded_2 = self.encode(password, decoded['salt'])
+        return constant_time_compare(encoded, encoded_2)
+
+    def safe_summary(self, encoded):
+        decoded = self.decode(encoded)
+        return {
+            _('algorithm'): decoded['algorithm'],
+            _('salt'): mask_hash(decoded['salt'], show=2),
+            _('hash'): mask_hash(decoded['hash']),
         }
 
     def harden_runtime(self, password, encoded):
@@ -511,19 +546,26 @@ class MD5PasswordHasher(BasePasswordHasher):
         hash = hashlib.md5((salt + password).encode()).hexdigest()
         return "%s$%s$%s" % (self.algorithm, salt, hash)
 
-    def verify(self, password, encoded):
-        algorithm, salt, hash = encoded.split('$', 2)
-        assert algorithm == self.algorithm
-        encoded_2 = self.encode(password, salt)
-        return constant_time_compare(encoded, encoded_2)
-
-    def safe_summary(self, encoded):
+    def decode(self, encoded):
         algorithm, salt, hash = encoded.split('$', 2)
         assert algorithm == self.algorithm
         return {
-            _('algorithm'): algorithm,
-            _('salt'): mask_hash(salt, show=2),
-            _('hash'): mask_hash(hash),
+            'algorithm': algorithm,
+            'hash': hash,
+            'salt': salt,
+        }
+
+    def verify(self, password, encoded):
+        decoded = self.decode(encoded)
+        encoded_2 = self.encode(password, decoded['salt'])
+        return constant_time_compare(encoded, encoded_2)
+
+    def safe_summary(self, encoded):
+        decoded = self.decode(encoded)
+        return {
+            _('algorithm'): decoded['algorithm'],
+            _('salt'): mask_hash(decoded['salt'], show=2),
+            _('hash'): mask_hash(decoded['hash']),
         }
 
     def harden_runtime(self, password, encoded):
@@ -549,16 +591,23 @@ class UnsaltedSHA1PasswordHasher(BasePasswordHasher):
         hash = hashlib.sha1(password.encode()).hexdigest()
         return 'sha1$$%s' % hash
 
+    def decode(self, encoded):
+        assert encoded.startswith('sha1$$')
+        return {
+            'algorithm': self.algorithm,
+            'hash': encoded[6:],
+            'salt': None,
+        }
+
     def verify(self, password, encoded):
         encoded_2 = self.encode(password, '')
         return constant_time_compare(encoded, encoded_2)
 
     def safe_summary(self, encoded):
-        assert encoded.startswith('sha1$$')
-        hash = encoded[6:]
+        decoded = self.decode(encoded)
         return {
-            _('algorithm'): self.algorithm,
-            _('hash'): mask_hash(hash),
+            _('algorithm'): decoded['algorithm'],
+            _('hash'): mask_hash(decoded['hash']),
         }
 
     def harden_runtime(self, password, encoded):
@@ -585,6 +634,13 @@ class UnsaltedMD5PasswordHasher(BasePasswordHasher):
         assert salt == ''
         return hashlib.md5(password.encode()).hexdigest()
 
+    def decode(self, encoded):
+        return {
+            'algorithm': self.algorithm,
+            'hash': encoded,
+            'salt': None,
+        }
+
     def verify(self, password, encoded):
         if len(encoded) == 37 and encoded.startswith('md5$$'):
             encoded = encoded[5:]
@@ -592,9 +648,10 @@ class UnsaltedMD5PasswordHasher(BasePasswordHasher):
         return constant_time_compare(encoded, encoded_2)
 
     def safe_summary(self, encoded):
+        decoded = self.decode(encoded)
         return {
-            _('algorithm'): self.algorithm,
-            _('hash'): mask_hash(encoded, show=3),
+            _('algorithm'): decoded['algorithm'],
+            _('hash'): mask_hash(decoded['hash'], show=3),
         }
 
     def harden_runtime(self, password, encoded):
@@ -616,24 +673,32 @@ class CryptPasswordHasher(BasePasswordHasher):
     def encode(self, password, salt):
         crypt = self._load_library()
         assert len(salt) == 2
-        data = crypt.crypt(password, salt)
-        assert data is not None  # A platform like OpenBSD with a dummy crypt module.
+        hash = crypt.crypt(password, salt)
+        assert hash is not None  # A platform like OpenBSD with a dummy crypt module.
         # we don't need to store the salt, but Django used to do this
-        return "%s$%s$%s" % (self.algorithm, '', data)
+        return '%s$%s$%s' % (self.algorithm, '', hash)
+
+    def decode(self, encoded):
+        algorithm, salt, hash = encoded.split('$', 2)
+        assert algorithm == self.algorithm
+        return {
+            'algorithm': algorithm,
+            'hash': hash,
+            'salt': salt,
+        }
 
     def verify(self, password, encoded):
         crypt = self._load_library()
-        algorithm, salt, data = encoded.split('$', 2)
-        assert algorithm == self.algorithm
-        return constant_time_compare(data, crypt.crypt(password, data))
+        decoded = self.decode(encoded)
+        data = crypt.crypt(password, decoded['hash'])
+        return constant_time_compare(decoded['hash'], data)
 
     def safe_summary(self, encoded):
-        algorithm, salt, data = encoded.split('$', 2)
-        assert algorithm == self.algorithm
+        decoded = self.decode(encoded)
         return {
-            _('algorithm'): algorithm,
-            _('salt'): salt,
-            _('hash'): mask_hash(data, show=3),
+            _('algorithm'): decoded['algorithm'],
+            _('salt'): decoded['salt'],
+            _('hash'): mask_hash(decoded['hash'], show=3),
         }
 
     def harden_runtime(self, password, encoded):

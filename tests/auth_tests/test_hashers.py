@@ -211,7 +211,7 @@ class TestUtilsHashPass(SimpleTestCase):
             hasher.rounds = 4
             encoded = make_password('letmein', hasher='bcrypt')
             rounds = hasher.safe_summary(encoded)['work factor']
-            self.assertEqual(rounds, '04')
+            self.assertEqual(rounds, 4)
 
             state = {'upgraded': False}
 
@@ -470,6 +470,11 @@ class BasePasswordHasherTests(SimpleTestCase):
         msg = self.not_implemented_msg % 'an encode'
         with self.assertRaisesMessage(NotImplementedError, msg):
             self.hasher.encode('password', 'salt')
+
+    def test_decode(self):
+        msg = self.not_implemented_msg % 'a decode'
+        with self.assertRaisesMessage(NotImplementedError, msg):
+            self.hasher.decode('encoded')
 
     def test_harden_runtime(self):
         msg = 'subclasses of BasePasswordHasher should provide a harden_runtime() method'
