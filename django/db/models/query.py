@@ -570,6 +570,11 @@ class QuerySet:
         except self.model.DoesNotExist:
             params = self._extract_model_params(defaults, **kwargs)
             return self._create_object_from_params(kwargs, params)
+        except self.model.MultipleObjectsReturned as e:
+            # This should never be happening in a healthy database, but it does when table index
+            # is corrupt and does not signal existence of a row so a duplicate is added. Provide
+            # an informative message here to help admins save time debugging this rather puzzling situation.
+            raise IntegrityError('get_or_create() returned field not unique, database index may be corrupt: {}'.format(e))
 
     def update_or_create(self, defaults=None, **kwargs):
         """
@@ -605,13 +610,14 @@ class QuerySet:
                 params = dict(resolve_callables(params))
                 obj = self.create(**params)
             return obj, True
-        except IntegrityError:
+        except IntegrityError as e:
             try:
                 qs = self.select_for_update() if lock else self
                 return qs.get(**lookup), False
             except self.model.DoesNotExist:
                 pass
-            raise
+            # Provide a more informative error message, see comment in get_or_create()
+            raise IntegrityError('get_or_create() trying to insert an identical row to an unique table, database index may be corrupt: {}'.format(e))
 
     def _extract_model_params(self, defaults, **kwargs):
         """
