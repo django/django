@@ -657,7 +657,7 @@ creating an object that specifies the following attributes:
 The Django template language
 ============================
 
-.. highlightlang:: html+django
+.. highlight:: html+django
 
 Syntax
 ------
