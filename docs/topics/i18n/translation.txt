@@ -551,7 +551,7 @@ Similar access to this information is available for template code. See below.
 Internationalization: in template code
 ======================================
 
-.. highlightlang:: html+django
+.. highlight:: html+django
 
 Translations in :doc:`Django templates </ref/templates/language>` uses two template
 tags and a slightly different syntax than in Python code. To give your template
@@ -964,7 +964,7 @@ There are also some filters available for convenience:
 Internationalization: in JavaScript code
 ========================================
 
-.. highlightlang:: python
+.. highlight:: python
 
 Adding translations to JavaScript poses some problems:
 
@@ -1051,7 +1051,7 @@ precedence.
 Using the JavaScript translation catalog
 ----------------------------------------
 
-.. highlightlang:: javascript
+.. highlight:: javascript
 
 To use the catalog, pull in the dynamically generated script like this:
 
@@ -1838,7 +1838,7 @@ redirected in the ``redirect_to`` context variable.
 Explicitly setting the active language
 --------------------------------------
 
-.. highlightlang:: python
+.. highlight:: python
 
 You may want to set the active language for the current session explicitly. Perhaps
 a user's language preference is retrieved from another system, for example.
