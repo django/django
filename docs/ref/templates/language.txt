@@ -34,7 +34,7 @@ or Jinja2_, you should feel right at home with Django's templates.
 Templates
 =========
 
-.. highlightlang:: html+django
+.. highlight:: html+django
 
 A template is a text file. It can generate any text-based format (HTML, XML,
 CSV, etc.).
