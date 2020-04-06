@@ -129,7 +129,7 @@ class Command(BaseCommand):
                     self.stderr.write("Post-processing '%s' failed!" % original_path)
                     # Add a blank line before the traceback, otherwise it's
                     # too easy to miss the relevant part of the error message.
-                    self.stderr.write("")
+                    self.stderr.write()
                     raise processed
                 if processed:
                     self.log("Post-processed '%s' as '%s'" %
