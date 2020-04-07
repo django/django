@@ -1,4 +1,5 @@
 import asyncio
+
 from django.http import Http404, HttpResponse
 from django.template import engines
 from django.template.response import TemplateResponse
@@ -131,6 +132,7 @@ class NotSyncOrAsyncMiddleware(BaseMiddleware):
 
     def __call__(self, request):
         return self.get_response(request)
+
 
 @async_only_middleware
 class AsyncAwaitUnawaitedResponse(BaseMiddleware):
