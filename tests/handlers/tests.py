@@ -267,10 +267,9 @@ class AsyncHandlerRequestTests(SimpleTestCase):
         with self.assertRaisesMessage(ValueError, msg):
             await self.async_client.get('/no_response_fbv/')
 
-    @override_settings(MIDDLEWARE=['middleware_exceptions.middleware.AsyncAwaitUnawaitedResponse'])
     async def test_unawaited_response(self):
         msg = (
-            "The view handlers.views.async_unawaited didn't return an "
+            "The view handlers.views.CoroutineClearingView.__call__ didn't return an "
             "HttpResponse object. It returned an unawaited coroutine instead. "
             "You may need to add an 'await' into your view."
         )
