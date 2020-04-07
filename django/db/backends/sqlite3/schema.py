@@ -360,9 +360,15 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         self._remake_table(model, alter_field=(old_field, new_field))
         # Rebuild tables with FKs pointing to this field if the PK type changed.
         if old_field.primary_key and new_field.primary_key and old_type != new_type:
-            for rel in new_field.model._meta.related_objects:
-                if not rel.many_to_many:
-                    self._remake_table(rel.related_model)
+            related_models = set()
+            for remote_field in new_field.model._meta.related_objects:
+                # Ignore self-relationship since the table was already rebuilt.
+                if remote_field.related_model == model:
+                    continue
+                if not remote_field.many_to_many:
+                    related_models.add(remote_field.related_model)
+            for related_model in related_models:
+                self._remake_table(related_model)
 
     def _alter_many_to_many(self, model, old_field, new_field, strict):
         """Alter M2Ms to repoint their to= endpoints."""
