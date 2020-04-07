@@ -314,6 +314,7 @@ SpatiaLite  ``Equals(poly, geom)``
     boxes.
 
 .. fieldlookup:: exact
+    :noindex:
 .. fieldlookup:: same_as
 
 ``exact``, ``same_as``

@@ -12,10 +12,13 @@ topic guide </topics/auth/index>`.
 ``User`` model
 ==============
 
+.. class:: models.User
+
 Fields
 ------
 
 .. class:: models.User
+    :noindex:
 
     :class:`~django.contrib.auth.models.User` objects have the following
     fields:
@@ -119,6 +122,7 @@ Attributes
 ----------
 
 .. class:: models.User
+    :noindex:
 
     .. attribute:: is_authenticated
 
@@ -144,6 +148,7 @@ Methods
 -------
 
 .. class:: models.User
+    :noindex:
 
     .. method:: get_username()
 
@@ -363,6 +368,7 @@ Fields
 fields:
 
 .. class:: models.Permission
+    :noindex:
 
     .. attribute:: name
 
@@ -394,6 +400,7 @@ Fields
 :class:`~django.contrib.auth.models.Group` objects have the following fields:
 
 .. class:: models.Group
+    :noindex:
 
     .. attribute:: name
 

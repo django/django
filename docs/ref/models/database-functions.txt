@@ -677,14 +677,17 @@ Usage example::
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. class:: TruncHour(expression, output_field=None, tzinfo=None, is_dst=None, **extra)
+    :noindex:
 
     .. attribute:: kind = 'hour'
 
 .. class:: TruncMinute(expression, output_field=None, tzinfo=None, is_dst=None, **extra)
+    :noindex:
 
     .. attribute:: kind = 'minute'
 
 .. class:: TruncSecond(expression, output_field=None, tzinfo=None, is_dst=None, **extra)
+    :noindex:
 
     .. attribute:: kind = 'second'
 

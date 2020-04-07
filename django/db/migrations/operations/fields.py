@@ -304,11 +304,16 @@ class RenameField(FieldOperation):
         # Rename the field
         fields = model_state.fields
         found = False
-        delay = True
         for index, (name, field) in enumerate(fields):
             if not found and name == self.old_name:
                 fields[index] = (self.new_name, field)
                 found = True
+                # Delay rendering of relationships if it's not a relational
+                # field and not referenced by a foreign key.
+                delay = (
+                    not field.is_relation and
+                    not is_referenced_by_foreign_key(state, self.model_name_lower, field, self.name)
+                )
             # Fix from_fields to refer to the new field.
             from_fields = getattr(field, 'from_fields', None)
             if from_fields:
@@ -316,12 +321,6 @@ class RenameField(FieldOperation):
                     self.new_name if from_field_name == self.old_name else from_field_name
                     for from_field_name in from_fields
                 ])
-            # Delay rendering of relationships if it's not a relational
-            # field and not referenced by a foreign key.
-            delay = delay and (
-                not field.is_relation and
-                not is_referenced_by_foreign_key(state, self.model_name_lower, field, self.name)
-            )
         if not found:
             raise FieldDoesNotExist(
                 "%s.%s has no field named '%s'" % (app_label, self.model_name, self.old_name)

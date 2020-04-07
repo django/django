@@ -855,6 +855,7 @@ must define some additional attributes and methods. These methods allow the
 admin to control access of the user to admin content:
 
 .. class:: models.CustomUser
+    :noindex:
 
 .. attribute:: is_staff
 

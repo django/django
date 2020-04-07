@@ -17,8 +17,8 @@ from django.db import IntegrityError, connection
 from django.test import TestCase, TransactionTestCase, skipUnlessDBFeature
 
 from .models import (
-    Article, Category, NaturalKeyThing, PrimaryKeyUUIDModel, ProxySpy, Spy,
-    Tag, Visa,
+    Article, Category, CircularA, CircularB, NaturalKeyThing,
+    PrimaryKeyUUIDModel, ProxySpy, Spy, Tag, Visa,
 )
 
 
@@ -788,13 +788,40 @@ class FixtureTransactionTests(DumpDataAssertMixin, TransactionTestCase):
         ])
 
 
-class ForwardReferenceTests(TestCase):
+class ForwardReferenceTests(DumpDataAssertMixin, TestCase):
     def test_forward_reference_fk(self):
         management.call_command('loaddata', 'forward_reference_fk.json', verbosity=0)
         self.assertEqual(NaturalKeyThing.objects.count(), 2)
         t1, t2 = NaturalKeyThing.objects.all()
         self.assertEqual(t1.other_thing, t2)
         self.assertEqual(t2.other_thing, t1)
+        self._dumpdata_assert(
+            ['fixtures'],
+            '[{"model": "fixtures.naturalkeything", "pk": 1, '
+            '"fields": {"key": "t1", "other_thing": 2, "other_things": []}}, '
+            '{"model": "fixtures.naturalkeything", "pk": 2, '
+            '"fields": {"key": "t2", "other_thing": 1, "other_things": []}}]',
+        )
+
+    def test_forward_reference_fk_natural_key(self):
+        management.call_command(
+            'loaddata',
+            'forward_reference_fk_natural_key.json',
+            verbosity=0,
+        )
+        self.assertEqual(NaturalKeyThing.objects.count(), 2)
+        t1, t2 = NaturalKeyThing.objects.all()
+        self.assertEqual(t1.other_thing, t2)
+        self.assertEqual(t2.other_thing, t1)
+        self._dumpdata_assert(
+            ['fixtures'],
+            '[{"model": "fixtures.naturalkeything", '
+            '"fields": {"key": "t1", "other_thing": ["t2"], "other_things": []}}, '
+            '{"model": "fixtures.naturalkeything", '
+            '"fields": {"key": "t2", "other_thing": ["t1"], "other_things": []}}]',
+            natural_primary_keys=True,
+            natural_foreign_keys=True,
+        )
 
     def test_forward_reference_m2m(self):
         management.call_command('loaddata', 'forward_reference_m2m.json', verbosity=0)
@@ -803,4 +830,53 @@ class ForwardReferenceTests(TestCase):
         self.assertQuerysetEqual(
             t1.other_things.order_by('key'),
             ['<NaturalKeyThing: t2>', '<NaturalKeyThing: t3>']
+        )
+        self._dumpdata_assert(
+            ['fixtures'],
+            '[{"model": "fixtures.naturalkeything", "pk": 1, '
+            '"fields": {"key": "t1", "other_thing": null, "other_things": [2, 3]}}, '
+            '{"model": "fixtures.naturalkeything", "pk": 2, '
+            '"fields": {"key": "t2", "other_thing": null, "other_things": []}}, '
+            '{"model": "fixtures.naturalkeything", "pk": 3, '
+            '"fields": {"key": "t3", "other_thing": null, "other_things": []}}]',
+        )
+
+    def test_forward_reference_m2m_natural_key(self):
+        management.call_command(
+            'loaddata',
+            'forward_reference_m2m_natural_key.json',
+            verbosity=0,
+        )
+        self.assertEqual(NaturalKeyThing.objects.count(), 3)
+        t1 = NaturalKeyThing.objects.get_by_natural_key('t1')
+        self.assertQuerysetEqual(
+            t1.other_things.order_by('key'),
+            ['<NaturalKeyThing: t2>', '<NaturalKeyThing: t3>']
+        )
+        self._dumpdata_assert(
+            ['fixtures'],
+            '[{"model": "fixtures.naturalkeything", '
+            '"fields": {"key": "t1", "other_thing": null, "other_things": [["t2"], ["t3"]]}}, '
+            '{"model": "fixtures.naturalkeything", '
+            '"fields": {"key": "t2", "other_thing": null, "other_things": []}}, '
+            '{"model": "fixtures.naturalkeything", '
+            '"fields": {"key": "t3", "other_thing": null, "other_things": []}}]',
+            natural_primary_keys=True,
+            natural_foreign_keys=True,
+        )
+
+
+class CircularReferenceTests(DumpDataAssertMixin, TestCase):
+    def test_circular_reference(self):
+        management.call_command('loaddata', 'circular_reference.json', verbosity=0)
+        obj_a = CircularA.objects.get()
+        obj_b = CircularB.objects.get()
+        self.assertEqual(obj_a.obj, obj_b)
+        self.assertEqual(obj_b.obj, obj_a)
+        self._dumpdata_assert(
+            ['fixtures'],
+            '[{"model": "fixtures.circulara", "pk": 1, '
+            '"fields": {"key": "x", "obj": 1}}, '
+            '{"model": "fixtures.circularb", "pk": 1, '
+            '"fields": {"key": "y", "obj": 1}}]',
         )
