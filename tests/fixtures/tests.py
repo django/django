@@ -17,8 +17,8 @@ from django.db import IntegrityError, connection
 from django.test import TestCase, TransactionTestCase, skipUnlessDBFeature
 
 from .models import (
-    Article, Category, NaturalKeyThing, PrimaryKeyUUIDModel, ProxySpy, Spy,
-    Tag, Visa,
+    Article, Category, CircularA, CircularB, NaturalKeyThing,
+    PrimaryKeyUUIDModel, ProxySpy, Spy, Tag, Visa,
 )
 
 
@@ -803,4 +803,20 @@ class ForwardReferenceTests(TestCase):
         self.assertQuerysetEqual(
             t1.other_things.order_by('key'),
             ['<NaturalKeyThing: t2>', '<NaturalKeyThing: t3>']
+        )
+
+
+class CircularReferenceTests(DumpDataAssertMixin, TestCase):
+    def test_circular_reference(self):
+        management.call_command('loaddata', 'circular_reference.json', verbosity=0)
+        obj_a = CircularA.objects.get()
+        obj_b = CircularB.objects.get()
+        self.assertEqual(obj_a.obj, obj_b)
+        self.assertEqual(obj_b.obj, obj_a)
+        self._dumpdata_assert(
+            ['fixtures'],
+            '[{"model": "fixtures.circulara", "pk": 1, '
+            '"fields": {"key": "x", "obj": 1}}, '
+            '{"model": "fixtures.circularb", "pk": 1, '
+            '"fields": {"key": "y", "obj": 1}}]',
         )

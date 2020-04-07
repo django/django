@@ -134,3 +134,13 @@ class NaturalKeyThing(models.Model):
 
     def __str__(self):
         return self.key
+
+
+class CircularA(models.Model):
+    key = models.CharField(max_length=3, unique=True)
+    obj = models.ForeignKey('CircularB', models.SET_NULL, null=True)
+
+
+class CircularB(models.Model):
+    key = models.CharField(max_length=3, unique=True)
+    obj = models.ForeignKey('CircularA', models.SET_NULL, null=True)
