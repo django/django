@@ -788,21 +788,49 @@ class FixtureTransactionTests(DumpDataAssertMixin, TransactionTestCase):
         ])
 
 
-class ForwardReferenceTests(TestCase):
-    def test_forward_reference_fk(self):
-        management.call_command('loaddata', 'forward_reference_fk.json', verbosity=0)
+class ForwardReferenceTests(DumpDataAssertMixin, TestCase):
+    def test_forward_reference_fk_natural_key(self):
+        management.call_command(
+            'loaddata',
+            'forward_reference_fk_natural_key.json',
+            verbosity=0,
+        )
         self.assertEqual(NaturalKeyThing.objects.count(), 2)
         t1, t2 = NaturalKeyThing.objects.all()
         self.assertEqual(t1.other_thing, t2)
         self.assertEqual(t2.other_thing, t1)
+        self._dumpdata_assert(
+            ['fixtures'],
+            '[{"model": "fixtures.naturalkeything", '
+            '"fields": {"key": "t1", "other_thing": ["t2"], "other_things": []}}, '
+            '{"model": "fixtures.naturalkeything", '
+            '"fields": {"key": "t2", "other_thing": ["t1"], "other_things": []}}]',
+            natural_primary_keys=True,
+            natural_foreign_keys=True,
+        )
 
-    def test_forward_reference_m2m(self):
-        management.call_command('loaddata', 'forward_reference_m2m.json', verbosity=0)
+    def test_forward_reference_m2m_natural_key(self):
+        management.call_command(
+            'loaddata',
+            'forward_reference_m2m_natural_key.json',
+            verbosity=0,
+        )
         self.assertEqual(NaturalKeyThing.objects.count(), 3)
         t1 = NaturalKeyThing.objects.get_by_natural_key('t1')
         self.assertQuerysetEqual(
             t1.other_things.order_by('key'),
             ['<NaturalKeyThing: t2>', '<NaturalKeyThing: t3>']
+        )
+        self._dumpdata_assert(
+            ['fixtures'],
+            '[{"model": "fixtures.naturalkeything", '
+            '"fields": {"key": "t1", "other_thing": null, "other_things": [["t2"], ["t3"]]}}, '
+            '{"model": "fixtures.naturalkeything", '
+            '"fields": {"key": "t2", "other_thing": null, "other_things": []}}, '
+            '{"model": "fixtures.naturalkeything", '
+            '"fields": {"key": "t3", "other_thing": null, "other_things": []}}]',
+            natural_primary_keys=True,
+            natural_foreign_keys=True,
         )
 
 
