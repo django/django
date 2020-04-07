@@ -102,45 +102,61 @@ class HttpRequest:
         Return the HTTP host using the environment or request headers. Skip
         allowed hosts protection, so may return an insecure host.
         """
-        server_port = '443' if self.is_secure else '80'
-        host = ''
         # We try three options, in order of decreasing preference.
         if settings.USE_X_FORWARDED_HOST and (
                 'HTTP_X_FORWARDED_HOST' in self.META):
-            host, _ = split_domain_port(self.META['HTTP_X_FORWARDED_HOST'])
-            server_port = self.get_port()
+            host = self.META['HTTP_X_FORWARDED_HOST']
         elif 'HTTP_HOST' in self.META:
-            host_match = host_validation_re.match(self.META['HTTP_HOST'])
-            if host_match:
-                host, host_port = host_match.groups()
-                if host_port:
-                    # bypass normal rendering, at least one usage of request
-                    # requires 'HTTP_HOST' to be preserved
-                    return self.META['HTTP_HOST']
-                else:
-                    server_port = self.get_port()
+            host = self.META['HTTP_HOST']
         else:
             # Reconstruct the host using the algorithm from PEP 333.
             host = self.META['SERVER_NAME']
             server_port = self.get_port()
-        if server_port != ('443' if self.is_secure() else '80'):
-            host = '%s:%s' % (host, server_port)
+            if server_port != ('443' if self.is_secure() else '80'):
+                host = '%s:%s' % (host, server_port)
         return host
+
+    def _get_host_and_port(self):
+        """
+        Construct the URL `authority` which is composed of:
+            [ userinfo  '@' ] host [ ':' port ]
+        Take into account Host and X-Forwarded-Host headers, fall back on
+        SERVER_NAME.
+
+        derived_hostname and derived_port will be `''` if the host is invalid.
+        Do not validate against ALLOWED_HOSTS.
+
+        return (derived_host_and_port, derived_hostname, derived_port)
+        """
+        host = ''
+        # We try three options, in order of decreasing preference.
+        if settings.USE_X_FORWARDED_HOST and (
+                'HTTP_X_FORWARDED_HOST' in self.META):
+            host = self.META['HTTP_X_FORWARDED_HOST']
+        elif 'HTTP_HOST' in self.META:
+            host = self.META['HTTP_HOST']
+        else:
+            host = self.META['SERVER_NAME']
+        derived_hostname, _ = split_domain_port(host)
+        server_port = self.get_port()
+        return (host, derived_hostname, server_port)
 
     def get_host(self):
         """Return the HTTP host using the environment or request headers."""
-        host = self._get_raw_host()
+        (host, domain, port) = self._get_host_and_port()
 
         # Allow variants of localhost if ALLOWED_HOSTS is empty and DEBUG=True.
         allowed_hosts = settings.ALLOWED_HOSTS
         if settings.DEBUG and not allowed_hosts:
             allowed_hosts = ['.localhost', '127.0.0.1', '[::1]']
 
-        domain, port = split_domain_port(host)
         if domain and validate_host(domain, allowed_hosts):
+            # Reconstruct the host using the algorithm from PEP 333.
+            if port != ('443' if self.is_secure() else '80'):
+                host = '%s:%s' % (domain, port)
             return host
         else:
-            msg = "Invalid HTTP_HOST header: %r." % self.META['HTTP_HOST']
+            msg = "Invalid HTTP_HOST header: %r." % host
             if domain:
                 msg += " You may need to add %r to ALLOWED_HOSTS." % domain
             else:
@@ -153,6 +169,10 @@ class HttpRequest:
             port = self.META['SERVER_PORT']  # Default to SERVER_PORT
         else:
             port = '443' if self.is_secure() else '80'  # Default to something sane
+        if 'HTTP_HOST' in self.META:
+            _, host_port = split_domain_port(self.META['HTTP_HOST'])
+            if host_port:
+                port = host_port
         forwarded_port = False
         if settings.USE_X_FORWARDED_PORT and 'HTTP_X_FORWARDED_PORT' in self.META:
             forwarded_port = True
