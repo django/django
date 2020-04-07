@@ -144,7 +144,6 @@ databrowse
 datafile
 dataset
 datasets
-datastores
 datatype
 datetimes
 Debian
@@ -447,6 +446,7 @@ permalink
 pessimization
 Peucker
 pgAdmin
+PgBouncer
 PGRaster
 phishing
 php

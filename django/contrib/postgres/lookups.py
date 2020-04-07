@@ -1,41 +1,33 @@
-from django.db.models import Lookup, Transform
-from django.db.models.lookups import Exact, FieldGetDbPrepValueMixin
+from django.db.models import Transform
+from django.db.models.lookups import Exact, PostgresOperatorLookup
 
 from .search import SearchVector, SearchVectorExact, SearchVectorField
 
 
-class PostgresSimpleLookup(FieldGetDbPrepValueMixin, Lookup):
-    def as_sql(self, qn, connection):
-        lhs, lhs_params = self.process_lhs(qn, connection)
-        rhs, rhs_params = self.process_rhs(qn, connection)
-        params = tuple(lhs_params) + tuple(rhs_params)
-        return '%s %s %s' % (lhs, self.operator, rhs), params
-
-
-class DataContains(PostgresSimpleLookup):
+class DataContains(PostgresOperatorLookup):
     lookup_name = 'contains'
-    operator = '@>'
+    postgres_operator = '@>'
 
 
-class ContainedBy(PostgresSimpleLookup):
+class ContainedBy(PostgresOperatorLookup):
     lookup_name = 'contained_by'
-    operator = '<@'
+    postgres_operator = '<@'
 
 
-class Overlap(PostgresSimpleLookup):
+class Overlap(PostgresOperatorLookup):
     lookup_name = 'overlap'
-    operator = '&&'
+    postgres_operator = '&&'
 
 
-class HasKey(PostgresSimpleLookup):
+class HasKey(PostgresOperatorLookup):
     lookup_name = 'has_key'
-    operator = '?'
+    postgres_operator = '?'
     prepare_rhs = False
 
 
-class HasKeys(PostgresSimpleLookup):
+class HasKeys(PostgresOperatorLookup):
     lookup_name = 'has_keys'
-    operator = '?&'
+    postgres_operator = '?&'
 
     def get_prep_lookup(self):
         return [str(item) for item in self.rhs]
@@ -43,7 +35,7 @@ class HasKeys(PostgresSimpleLookup):
 
 class HasAnyKeys(HasKeys):
     lookup_name = 'has_any_keys'
-    operator = '?|'
+    postgres_operator = '?|'
 
 
 class Unaccent(Transform):
@@ -63,9 +55,9 @@ class SearchLookup(SearchVectorExact):
         return lhs, lhs_params
 
 
-class TrigramSimilar(PostgresSimpleLookup):
+class TrigramSimilar(PostgresOperatorLookup):
     lookup_name = 'trigram_similar'
-    operator = '%%'
+    postgres_operator = '%%'
 
 
 class JSONExact(Exact):

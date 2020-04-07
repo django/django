@@ -3,7 +3,7 @@ import uuid
 from functools import lru_cache
 
 from django.conf import settings
-from django.db import DatabaseError
+from django.db import DatabaseError, NotSupportedError
 from django.db.backends.base.operations import BaseDatabaseOperations
 from django.db.backends.utils import strip_quotes, truncate_name
 from django.db.models import AutoField, Exists, ExpressionWrapper
@@ -253,6 +253,7 @@ END;
         return " DEFERRABLE INITIALLY DEFERRED"
 
     def fetch_returned_insert_columns(self, cursor, returning_params):
+        columns = []
         for param in returning_params:
             value = param.get_value()
             if value is None or value == []:
@@ -264,7 +265,8 @@ END;
                     'https://code.djangoproject.com/ticket/28859).'
                 )
             # cx_Oracle < 7 returns value, >= 7 returns list with single value.
-            yield value[0] if isinstance(value, list) else value
+            columns.append(value[0] if isinstance(value, list) else value)
+        return tuple(columns)
 
     def field_cast_sql(self, db_type, internal_type):
         if db_type and db_type.endswith('LOB'):
@@ -575,6 +577,8 @@ END;
             return 'FLOOR(%(lhs)s / POWER(2, %(rhs)s))' % {'lhs': lhs, 'rhs': rhs}
         elif connector == '^':
             return 'POWER(%s)' % ','.join(sub_expressions)
+        elif connector == '#':
+            raise NotSupportedError('Bitwise XOR is not supported in Oracle.')
         return super().combine_expression(connector, sub_expressions)
 
     def _get_no_autofield_sequence_name(self, table):

@@ -6,7 +6,7 @@ from copy import deepcopy
 from unittest import mock
 
 from django.core.exceptions import FieldError
-from django.db import DatabaseError, connection
+from django.db import DatabaseError, NotSupportedError, connection
 from django.db.models import (
     Avg, BooleanField, Case, CharField, Count, DateField, DateTimeField,
     DurationField, Exists, Expression, ExpressionList, ExpressionWrapper, F,
@@ -15,16 +15,17 @@ from django.db.models import (
 )
 from django.db.models.expressions import Col, Combinable, Random, RawSQL, Ref
 from django.db.models.functions import (
-    Coalesce, Concat, Length, Lower, Substr, Upper,
+    Coalesce, Concat, Left, Length, Lower, Substr, Upper,
 )
 from django.db.models.sql import constants
 from django.db.models.sql.datastructures import Join
 from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
 from django.test.utils import Approximate, isolate_apps
+from django.utils.functional import SimpleLazyObject
 
 from .models import (
-    UUID, UUIDPK, Company, Employee, Experiment, Number, RemoteEmployee,
-    Result, SimulationRun, Time,
+    UUID, UUIDPK, Company, Employee, Experiment, Manager, Number,
+    RemoteEmployee, Result, SimulationRun, Time,
 )
 
 
@@ -608,6 +609,21 @@ class BasicExpressionsTests(TestCase):
         )
         self.assertEqual(qs.get().float, 1.2)
 
+    def test_subquery_filter_by_lazy(self):
+        self.max.manager = Manager.objects.create(name='Manager')
+        self.max.save()
+        max_manager = SimpleLazyObject(
+            lambda: Manager.objects.get(pk=self.max.manager.pk)
+        )
+        qs = Company.objects.annotate(
+            ceo_manager=Subquery(
+                Employee.objects.filter(
+                    lastname=OuterRef('ceo__lastname'),
+                ).values('manager'),
+            ),
+        ).filter(ceo_manager=max_manager)
+        self.assertEqual(qs.get(), self.gmbh)
+
     def test_aggregate_subquery_annotation(self):
         with self.assertNumQueries(1) as ctx:
             aggregate = Company.objects.annotate(
@@ -647,6 +663,22 @@ class BasicExpressionsTests(TestCase):
         inner = Company.objects.filter(num_employees=OuterRef('ceo__salary') + 2)
         outer = Company.objects.filter(pk__in=Subquery(inner.values('pk')))
         self.assertEqual(outer.get().name, 'Test GmbH')
+
+    def test_nested_outerref_with_function(self):
+        self.gmbh.point_of_contact = Employee.objects.get(lastname='Meyer')
+        self.gmbh.save()
+        inner = Employee.objects.filter(
+            lastname__startswith=Left(OuterRef(OuterRef('lastname')), 1),
+        )
+        qs = Employee.objects.annotate(
+            ceo_company=Subquery(
+                Company.objects.filter(
+                    point_of_contact__in=inner,
+                    ceo__pk=OuterRef('pk'),
+                ).values('name'),
+            ),
+        ).filter(ceo_company__isnull=False)
+        self.assertEqual(qs.get().ceo_company, 'Test GmbH')
 
     def test_annotation_with_outerref(self):
         gmbh_salary = Company.objects.annotate(
@@ -1126,9 +1158,7 @@ class ExpressionOperatorTests(TestCase):
     def test_lefthand_modulo(self):
         # LH Modulo arithmetic on integers
         Number.objects.filter(pk=self.n.pk).update(integer=F('integer') % 20)
-
         self.assertEqual(Number.objects.get(pk=self.n.pk).integer, 2)
-        self.assertEqual(Number.objects.get(pk=self.n.pk).float, Approximate(15.500, places=3))
 
     def test_lefthand_bitwise_and(self):
         # LH Bitwise ands on integers
@@ -1137,7 +1167,6 @@ class ExpressionOperatorTests(TestCase):
 
         self.assertEqual(Number.objects.get(pk=self.n.pk).integer, 40)
         self.assertEqual(Number.objects.get(pk=self.n1.pk).integer, -64)
-        self.assertEqual(Number.objects.get(pk=self.n.pk).float, Approximate(15.500, places=3))
 
     def test_lefthand_bitwise_left_shift_operator(self):
         Number.objects.update(integer=F('integer').bitleftshift(2))
@@ -1155,13 +1184,31 @@ class ExpressionOperatorTests(TestCase):
 
         self.assertEqual(Number.objects.get(pk=self.n.pk).integer, 58)
         self.assertEqual(Number.objects.get(pk=self.n1.pk).integer, -10)
-        self.assertEqual(Number.objects.get(pk=self.n.pk).float, Approximate(15.500, places=3))
 
     def test_lefthand_power(self):
         # LH Power arithmetic operation on floats and integers
         Number.objects.filter(pk=self.n.pk).update(integer=F('integer') ** 2, float=F('float') ** 1.5)
         self.assertEqual(Number.objects.get(pk=self.n.pk).integer, 1764)
         self.assertEqual(Number.objects.get(pk=self.n.pk).float, Approximate(61.02, places=2))
+
+    @unittest.skipIf(connection.vendor == 'oracle', "Oracle doesn't support bitwise XOR.")
+    def test_lefthand_bitwise_xor(self):
+        Number.objects.update(integer=F('integer').bitxor(48))
+        self.assertEqual(Number.objects.get(pk=self.n.pk).integer, 26)
+        self.assertEqual(Number.objects.get(pk=self.n1.pk).integer, -26)
+
+    @unittest.skipIf(connection.vendor == 'oracle', "Oracle doesn't support bitwise XOR.")
+    def test_lefthand_bitwise_xor_null(self):
+        employee = Employee.objects.create(firstname='John', lastname='Doe')
+        Employee.objects.update(salary=F('salary').bitxor(48))
+        employee.refresh_from_db()
+        self.assertIsNone(employee.salary)
+
+    @unittest.skipUnless(connection.vendor == 'oracle', "Oracle doesn't support bitwise XOR.")
+    def test_lefthand_bitwise_xor_not_supported(self):
+        msg = 'Bitwise XOR is not supported in Oracle.'
+        with self.assertRaisesMessage(NotSupportedError, msg):
+            Number.objects.update(integer=F('integer').bitxor(48))
 
     def test_right_hand_addition(self):
         # Right hand operators
@@ -1197,7 +1244,6 @@ class ExpressionOperatorTests(TestCase):
         Number.objects.filter(pk=self.n.pk).update(integer=69 % F('integer'))
 
         self.assertEqual(Number.objects.get(pk=self.n.pk).integer, 27)
-        self.assertEqual(Number.objects.get(pk=self.n.pk).float, Approximate(15.500, places=3))
 
     def test_righthand_power(self):
         # RH Power arithmetic operation on floats and integers

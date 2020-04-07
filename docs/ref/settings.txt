@@ -597,9 +597,9 @@ file. When specifying the path, always use forward slashes, even on Windows
 
 Default: ``0``
 
-The lifetime of a database connection, in seconds. Use ``0`` to close database
-connections at the end of each request — Django's historical behavior — and
-``None`` for unlimited persistent connections.
+The lifetime of a database connection, as an integer of seconds. Use ``0`` to
+close database connections at the end of each request — Django's historical
+behavior — and ``None`` for unlimited persistent connections.
 
 .. setting:: OPTIONS
 

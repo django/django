@@ -38,7 +38,7 @@ Bugfixes
   adds a ``get_absolute_url()`` method to any model that appears in
   ``ABSOLUTE_URL_OVERRIDES`` but doesn't define ``get_absolute_url()``.
 
-* Avoided masking some `ImportError` exceptions during application loading
+* Avoided masking some ``ImportError`` exceptions during application loading
   (:ticket:`22920`).
 
 * Empty ``index_together`` or ``unique_together`` model options no longer

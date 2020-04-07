@@ -12,7 +12,10 @@ urlpatterns = [
     path('template/no_template/', TemplateView.as_view()),
     path('template/login_required/', login_required(TemplateView.as_view())),
     path('template/simple/<foo>/', TemplateView.as_view(template_name='generic_views/about.html')),
-    path('template/custom/<foo>/', views.CustomTemplateView.as_view(template_name='generic_views/about.html')),
+    path(
+        'template/custom/<foo1>/<foo2>/',
+        views.CustomTemplateView.as_view(template_name='generic_views/about.html'),
+    ),
     path(
         'template/content_type/',
         TemplateView.as_view(template_name='generic_views/robots.txt', content_type='text/plain'),

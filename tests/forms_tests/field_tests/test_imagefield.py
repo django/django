@@ -77,12 +77,12 @@ class ImageFieldTest(FormFieldAssertionsMixin, SimpleTestCase):
         self.assertEqual(f.widget_attrs(ClearableFileInput()), {'accept': 'image/*'})
         self.assertWidgetRendersTo(f, '<input type="file" name="f" accept="image/*" required id="id_f" />')
 
-    def test_widge_attrs_accept_specified(self):
+    def test_widget_attrs_accept_specified(self):
         f = ImageField(widget=FileInput(attrs={'accept': 'image/png'}))
         self.assertEqual(f.widget_attrs(f.widget), {})
         self.assertWidgetRendersTo(f, '<input type="file" name="f" accept="image/png" required id="id_f" />')
 
-    def test_widge_attrs_accept_false(self):
+    def test_widget_attrs_accept_false(self):
         f = ImageField(widget=FileInput(attrs={'accept': False}))
         self.assertEqual(f.widget_attrs(f.widget), {})
         self.assertWidgetRendersTo(f, '<input type="file" name="f" required id="id_f" />')

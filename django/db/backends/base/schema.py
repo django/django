@@ -569,7 +569,11 @@ class BaseDatabaseSchemaEditor:
         """Perform a "physical" (non-ManyToMany) field update."""
         # Drop any FK constraints, we'll remake them later
         fks_dropped = set()
-        if old_field.remote_field and old_field.db_constraint:
+        if (
+            self.connection.features.supports_foreign_keys and
+            old_field.remote_field and
+            old_field.db_constraint
+        ):
             fk_names = self._constraint_names(model, [old_field.column], foreign_key=True)
             if strict and len(fk_names) != 1:
                 raise ValueError("Found wrong number (%s) of foreign key constraints for %s.%s" % (
@@ -599,7 +603,7 @@ class BaseDatabaseSchemaEditor:
         # Drop incoming FK constraints if the field is a primary key or unique,
         # which might be a to_field target, and things are going to change.
         drop_foreign_keys = (
-            (
+            self.connection.features.supports_foreign_keys and (
                 (old_field.primary_key and new_field.primary_key) or
                 (old_field.unique and new_field.unique)
             ) and old_type != new_type
@@ -675,17 +679,17 @@ class BaseDatabaseSchemaEditor:
         #  3. Replace NULL constraint with NOT NULL
         #  4. Drop the default again.
         # Default change?
-        old_default = self.effective_default(old_field)
-        new_default = self.effective_default(new_field)
-        needs_database_default = (
-            old_field.null and
-            not new_field.null and
-            old_default != new_default and
-            new_default is not None and
-            not self.skip_default(new_field)
-        )
-        if needs_database_default:
-            actions.append(self._alter_column_default_sql(model, old_field, new_field))
+        needs_database_default = False
+        if old_field.null and not new_field.null:
+            old_default = self.effective_default(old_field)
+            new_default = self.effective_default(new_field)
+            if (
+                not self.skip_default(new_field) and
+                old_default != new_default and
+                new_default is not None
+            ):
+                needs_database_default = True
+                actions.append(self._alter_column_default_sql(model, old_field, new_field))
         # Nullability change?
         if old_field.null != new_field.null:
             fragment = self._alter_column_null_sql(model, old_field, new_field)
@@ -782,7 +786,7 @@ class BaseDatabaseSchemaEditor:
             for sql, params in other_actions:
                 self.execute(sql, params)
         # Does it have a foreign key?
-        if (new_field.remote_field and
+        if (self.connection.features.supports_foreign_keys and new_field.remote_field and
                 (fks_dropped or not old_field.remote_field or not old_field.db_constraint) and
                 new_field.db_constraint):
             self.execute(self._create_fk_sql(model, new_field, "_fk_%(to_table)s_%(to_column)s"))

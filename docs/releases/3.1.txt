@@ -160,6 +160,14 @@ Minor features
 
 * :lookup:`search` lookup now supports query expressions.
 
+* The new ``cover_density`` parameter of
+  :class:`~django.contrib.postgres.search.SearchRank` allows ranking by cover
+  density.
+
+* The new ``normalization`` parameter of
+  :class:`~django.contrib.postgres.search.SearchRank` allows rank
+  normalization.
+
 :mod:`django.contrib.redirects`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -262,6 +270,9 @@ Forms
   now uses ``DATE_INPUT_FORMATS`` in addition to ``DATETIME_INPUT_FORMATS``
   when converting a field input to a ``datetime`` value.
 
+* :attr:`.MultiWidget.widgets` now accepts a dictionary which allows
+  customizing subwidget ``name`` attributes.
+
 Generic Views
 ~~~~~~~~~~~~~
 
@@ -288,6 +299,9 @@ Management Commands
   for running the ``database`` system checks. Previously these checks were
   enabled for all configured :setting:`DATABASES` by passing the ``database``
   tag to the command.
+
+* The new :option:`migrate --check` option makes the command exit with a
+  non-zero status when unapplied migrations are detected.
 
 Migrations
 ~~~~~~~~~~
@@ -326,6 +340,20 @@ Models
 
 * The new ``is_dst``  parameter of the :meth:`.QuerySet.datetimes` determines
   the treatment of nonexistent and ambiguous datetimes.
+
+* The new :class:`~django.db.models.F` expression ``bitxor()`` method allows
+  :ref:`bitwise XOR operation <using-f-expressions-in-filters>`.
+
+* :meth:`.QuerySet.bulk_create` now sets the primary key on objects when using
+  MariaDB 10.5+.
+
+* The ``DatabaseOperations.sql_flush()`` method now generates more efficient
+  SQL on MySQL by using ``DELETE`` instead of ``TRUNCATE`` statements for
+  tables which don't require resetting sequences.
+
+* SQLite functions are now marked as :py:meth:`deterministic
+  <sqlite3.Connection.create_function>` on Python 3.8+. This allows using them
+  in check constraints and partial indexes.
 
 Pagination
 ~~~~~~~~~~
@@ -394,6 +422,12 @@ Tests
 
 * :class:`~django.test.runner.DiscoverRunner` now skips running the system
   checks on databases not :ref:`referenced by tests<testing-multi-db>`.
+
+* :class:`~django.test.TransactionTestCase` teardown is now faster on MySQL
+  due to :djadmin:`flush` command improvements. As a side effect the latter
+  doesn't automatically reset sequences on teardown anymore. Enable
+  :attr:`.TransactionTestCase.reset_sequences` if your tests require this
+  feature.
 
 URLs
 ~~~~
@@ -537,8 +571,8 @@ Miscellaneous
   ``ETag`` header to responses with an empty
   :attr:`~django.http.HttpResponse.content`.
 
-* ``django.utils.decorators.classproperty()`` decorator is moved to
-  ``django.utils.functional.classproperty()``.
+* ``django.utils.decorators.classproperty()`` decorator is made public and
+  moved to :class:`django.utils.functional.classproperty()`.
 
 * :tfilter:`floatformat` template filter now outputs (positive) ``0`` for
   negative numbers which round to zero.
@@ -582,6 +616,10 @@ Miscellaneous
 
 * The admin CSS classes ``row1`` and ``row2`` are removed in favor of
   ``:nth-child(odd)`` and ``:nth-child(even)`` pseudo-classes.
+
+* The :func:`~django.contrib.auth.hashers.make_password` now requires its
+  argument to be a string or bytes. Other types should be explicitly cast to
+  one of these.
 
 .. _deprecated-features-3.1:
 
@@ -639,6 +677,14 @@ Miscellaneous
 
 * The ``list`` message for :class:`~django.forms.ModelMultipleChoiceField` is
   deprecated in favor of ``invalid_list``.
+
+* The passing of URL kwargs directly to the context by
+  :class:`~django.views.generic.base.TemplateView` is deprecated. Reference
+  them in the template with ``view.kwargs`` instead.
+
+* Passing raw column aliases to :meth:`.QuerySet.order_by` is deprecated. The
+  same result can be achieved by passing aliases in a
+  :class:`~django.db.models.expressions.RawSQL` instead beforehand.
 
 .. _removed-features-3.1:
 

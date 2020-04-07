@@ -71,6 +71,12 @@ class DatabaseFeatures(BaseDatabaseFeatures):
         return self._mysql_storage_engine != 'MyISAM'
 
     @cached_property
+    def can_return_columns_from_insert(self):
+        return self.connection.mysql_is_mariadb and self.connection.mysql_version >= (10, 5, 0)
+
+    can_return_rows_from_bulk_insert = property(operator.attrgetter('can_return_columns_from_insert'))
+
+    @cached_property
     def has_zoneinfo_database(self):
         # Test if the time zone definitions are installed. CONVERT_TZ returns
         # NULL if 'UTC' timezone isn't loaded into the mysql.time_zone.

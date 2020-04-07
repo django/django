@@ -124,7 +124,7 @@ Running the JavaScript tests
 
 Django includes a set of :ref:`JavaScript unit tests <javascript-tests>` for
 functions in certain contrib apps. The JavaScript tests aren't run by default
-using ``tox`` because they require `Node.js` to be installed and aren't
+using ``tox`` because they require ``Node.js`` to be installed and aren't
 necessary for the majority of patches. To run the JavaScript tests using
 ``tox``:
 

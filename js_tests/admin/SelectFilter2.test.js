@@ -15,6 +15,7 @@ QUnit.test('init', function(assert) {
         $('.selector-available select').outerHeight() + $('.selector-filter').outerHeight(),
         $('.selector-chosen select').height()
     );
+    assert.equal($('.selector-chosen select')[0].getAttribute('multiple'), '');
     assert.equal($('.selector-chooseall').text(), "Choose all");
     assert.equal($('.selector-add').text(), "Choose");
     assert.equal($('.selector-remove').text(), "Remove");

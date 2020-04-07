@@ -656,9 +656,17 @@ that were modified more than 3 days after they were published::
     >>> Entry.objects.filter(mod_date__gt=F('pub_date') + timedelta(days=3))
 
 The ``F()`` objects support bitwise operations by ``.bitand()``, ``.bitor()``,
-``.bitrightshift()``, and ``.bitleftshift()``. For example::
+``.bitxor()``, ``.bitrightshift()``, and ``.bitleftshift()``. For example::
 
     >>> F('somefield').bitand(16)
+
+.. admonition:: Oracle
+
+    Oracle doesn't support bitwise XOR operation.
+
+.. versionchanged:: 3.1
+
+    Support for ``.bitxor()`` was added.
 
 The ``pk`` lookup shortcut
 --------------------------

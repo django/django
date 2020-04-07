@@ -66,6 +66,12 @@ details on these changes.
 
 * The ``list`` message for ``ModelMultipleChoiceField`` will be removed.
 
+* ``django.views.generic.TemplateView`` will no longer pass URL kwargs directly
+  to the ``context``.
+
+* Support for passing raw column aliases to ``QuerySet.order_by()`` will be
+  removed.
+
 See the :ref:`Django 3.1 release notes <deprecated-features-3.1>` for more
 details on these changes.
 

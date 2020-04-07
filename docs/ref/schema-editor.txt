@@ -176,7 +176,7 @@ without losing data, and so it will refuse to do it. Instead,
 If the database has the ``supports_combined_alters``, Django will try and
 do as many of these in a single database call as possible; otherwise, it will
 issue a separate ALTER statement for each change, but will not issue ALTERs
-where no change is required (as South often did).
+where no change is required.
 
 Attributes
 ==========

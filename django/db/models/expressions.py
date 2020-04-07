@@ -51,6 +51,7 @@ class Combinable:
     BITOR = '|'
     BITLEFTSHIFT = '<<'
     BITRIGHTSHIFT = '>>'
+    BITXOR = '#'
 
     def _combine(self, other, connector, reversed):
         if not hasattr(other, 'resolve_expression'):
@@ -104,6 +105,9 @@ class Combinable:
 
     def bitrightshift(self, other):
         return self._combine(other, self.BITRIGHTSHIFT, False)
+
+    def bitxor(self, other):
+        return self._combine(other, self.BITXOR, False)
 
     def __or__(self, other):
         if getattr(self, 'conditional', False) and getattr(other, 'conditional', False):
@@ -580,6 +584,9 @@ class OuterRef(F):
         if isinstance(self.name, self.__class__):
             return self.name
         return ResolvedOuterRef(self.name)
+
+    def relabeled_clone(self, relabels):
+        return self
 
 
 class Func(SQLiteNumericMixin, Expression):

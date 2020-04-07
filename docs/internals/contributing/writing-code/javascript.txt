@@ -131,8 +131,8 @@ Testing from the command line
 
 To run the tests from the command line, you need to have `Node.js`_ installed.
 
-After installing `Node.js`, install the JavaScript test dependencies by running
-the following from the root of your Django checkout:
+After installing ``Node.js``, install the JavaScript test dependencies by
+running the following from the root of your Django checkout:
 
 .. console::
 
