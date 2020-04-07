@@ -1,3 +1,4 @@
+import asyncio
 from django.http import Http404, HttpResponse
 from django.template import engines
 from django.template.response import TemplateResponse
@@ -130,3 +131,11 @@ class NotSyncOrAsyncMiddleware(BaseMiddleware):
 
     def __call__(self, request):
         return self.get_response(request)
+
+@async_only_middleware
+class AsyncAwaitUnawaitedResponse(BaseMiddleware):
+    async def process_view(self, request, view_func, view_args, view_kwargs):
+        response = await view_func(request, *view_args, **view_kwargs)
+        if asyncio.iscoroutine(response):
+            await response
+        return response
