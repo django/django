@@ -12,3 +12,7 @@ Bugfixes
 * Fixed a regression in Django 3.0 that caused a crash when filtering a
   ``Subquery()`` annotation of a queryset containing a single related field
   against a ``SimpleLazyObject`` (:ticket:`31420`).
+
+* Fixed the behavior of :meth:`~django.http.HttpRequest.get_host` and
+  :meth:`~django.http.HttpRequest.get_port` to use the forwarded port
+  when :setting:``USE_X_FORWARDED_PORT`` is enabled (:ticket:`31354`).

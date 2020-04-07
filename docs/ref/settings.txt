@@ -2823,7 +2823,7 @@ This setting may conflict with :setting:`USE_X_FORWARDED_PORT`. Per
 :rfc:`7239#section-5.3`, the ``X-Forwarded-Host`` header can include the port
 number, in which case you shouldn't use :setting:`USE_X_FORWARDED_PORT`.
 
-.. versionchanged:: 3.0.5
+.. versionchanged:: 3.0.6
 
 :setting:`USE_X_FORWARDED_PORT` may be used in conjunction with this setting
 if and only if the ``X-Forwarded-Host`` header does not contain a port.
@@ -2842,7 +2842,7 @@ enabled if a proxy which sets this header is in use.
 :setting:`USE_X_FORWARDED_HOST` takes priority over this setting when
 the ``X-Forwarded-Host`` header includes a port.
 
-.. versionchanged:: 3.0.5
+.. versionchanged:: 3.0.6
 
 When :setting:`USE_X_FORWARDED_HOST` is enabled and the ``X-Forwarded-Host``
 header does not include a port, then :setting:`USE_X_FORWARDED_PORT`
