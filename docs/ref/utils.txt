@@ -704,6 +704,18 @@ escaping HTML.
             ((u.first_name, u.last_name) for u in users)
         )
 
+    If the values yielded by ``args_generator`` are dictionaries, you can use
+    named placeholders in the format string. For example::
+
+        format_html_join(
+            '\n', "<li>{first_name} {last_name}</li>",
+            [{'first_name': "John", 'last_name': "Doe"}]
+        )
+
+    .. versionadded:: 3.1
+
+        Support for named placeholders was added.
+
 .. function:: strip_tags(value)
 
     Tries to remove anything that looks like an HTML tag from the string, that

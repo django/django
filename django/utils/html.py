@@ -130,7 +130,8 @@ def format_html_join(sep, format_string, args_generator):
                                                   for u in users))
     """
     return mark_safe(conditional_escape(sep).join(
-        format_html(format_string, *args)
+        (format_html(format_string, **args) if isinstance(args, dict)
+         else format_html(format_string, *args))
         for args in args_generator
     ))
 

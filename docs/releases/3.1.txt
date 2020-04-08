@@ -449,6 +449,8 @@ Utilities
   :func:`~django.utils.dateparse.parse_time` now support comma separators for
   milliseconds.
 
+* :func:`~django.utils.html.format_html_join` now support named placeholders.
+
 Validators
 ~~~~~~~~~~
 

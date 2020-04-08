@@ -4,8 +4,9 @@ from datetime import datetime
 from django.test import SimpleTestCase
 from django.utils.functional import lazystr
 from django.utils.html import (
-    conditional_escape, escape, escapejs, format_html, html_safe, json_script,
-    linebreaks, smart_urlquote, strip_spaces_between_tags, strip_tags, urlize,
+    conditional_escape, escape, escapejs, format_html, format_html_join,
+    html_safe, json_script, linebreaks, smart_urlquote,
+    strip_spaces_between_tags, strip_tags, urlize,
 )
 from django.utils.safestring import mark_safe
 
@@ -52,6 +53,30 @@ class TestUtilsHtml(SimpleTestCase):
                 fourth=mark_safe("<i>safe again</i>"),
             ),
             "&lt; Dangerous &gt; <b>safe</b> &lt; dangerous again <i>safe again</i>"
+        )
+
+    def test_format_html_join(self):
+        self.assertEqual(
+            format_html_join(
+                '\n',
+                "{} {}",
+                [
+                    ("< Dangerous >", mark_safe("<b>safe</b>")),
+                    (mark_safe("<i>safe again</i>"), "< dangerous again"),
+                ]
+            ),
+            "&lt; Dangerous &gt; <b>safe</b>\n<i>safe again</i> &lt; dangerous again"
+        )
+        self.assertEqual(
+            format_html_join(
+                '\n',
+                "{foo} {bar}",
+                [
+                    {'bar': mark_safe("<b>safe</b>"), 'foo': "< Dangerous >"},
+                    {'bar': "< dangerous again", 'foo': mark_safe("<i>safe again</i>"), 'baz': 'useless'},
+                ]
+            ),
+            "&lt; Dangerous &gt; <b>safe</b>\n<i>safe again</i> &lt; dangerous again"
         )
 
     def test_linebreaks(self):
