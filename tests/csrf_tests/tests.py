@@ -362,7 +362,6 @@ class CsrfViewMiddlewareTestMixin:
         req = self._get_POST_request_with_token()
         req._is_secure_override = True
         req.META['HTTP_HOST'] = 'www.example.com'
-        req.META['SERVER_PORT'] = '443'
         req.META['HTTP_REFERER'] = 'https://www.example.com/somepage'
         mw = CsrfViewMiddleware(post_form_view)
         mw.process_request(req)
@@ -379,7 +378,6 @@ class CsrfViewMiddlewareTestMixin:
         req = self._get_POST_request_with_token()
         req._is_secure_override = True
         req.META['HTTP_HOST'] = 'www.example.com'
-        req.META['SERVER_PORT'] = '443'
         req.META['HTTP_REFERER'] = 'https://www.example.com'
         mw = CsrfViewMiddleware(post_form_view)
         mw.process_request(req)
@@ -410,7 +408,6 @@ class CsrfViewMiddlewareTestMixin:
         req = self._get_POST_request_with_token()
         req._is_secure_override = True
         req.META['HTTP_HOST'] = 'www.example.com'
-        req.META['SERVER_PORT'] = '443'
         req.META['HTTP_REFERER'] = 'https://dashboard.example.com'
         mw = CsrfViewMiddleware(post_form_view)
         mw.process_request(req)
@@ -426,7 +423,6 @@ class CsrfViewMiddlewareTestMixin:
         req = self._get_POST_request_with_token()
         req._is_secure_override = True
         req.META['HTTP_HOST'] = 'www.example.com'
-        req.META['SERVER_PORT'] = '443'
         req.META['HTTP_REFERER'] = 'https://dashboard.example.com'
         mw = CsrfViewMiddleware(post_form_view)
         mw.process_request(req)

@@ -722,7 +722,6 @@ class HostValidationTests(SimpleTestCase):
             request = HttpRequest()
             request.META = {
                 'HTTP_HOST': host,
-                'SERVER_PORT': 80,
             }
             request.get_host()
 
@@ -731,7 +730,6 @@ class HostValidationTests(SimpleTestCase):
                 request = HttpRequest()
                 request.META = {
                     'HTTP_HOST': host,
-                    'SERVER_PORT': 80,
                 }
                 request.get_host()
 
@@ -904,7 +902,7 @@ class HostValidationTests(SimpleTestCase):
             'xn--4ca9at.com',  # Punycode for öäü.com
         ]:
             request = HttpRequest()
-            request.META = {'HTTP_HOST': host, 'SERVER_PORT': '80'}
+            request.META = {'HTTP_HOST': host}
             with self.assertRaisesMessage(DisallowedHost, msg_suggestion % (host, host)):
                 request.get_host()
 
@@ -915,18 +913,18 @@ class HostValidationTests(SimpleTestCase):
         ]:
             host = '%s:%s' % (domain, port)
             request = HttpRequest()
-            request.META = {'HTTP_HOST': host, 'SERVER_PORT': port}
+            request.META = {'HTTP_HOST': host}
             with self.assertRaisesMessage(DisallowedHost, msg_suggestion % (host, domain)):
                 request.get_host()
 
         for host in self.poisoned_hosts:
             request = HttpRequest()
-            request.META = {'HTTP_HOST': host, 'SERVER_PORT': '80'}
+            request.META = {'HTTP_HOST': host}
             with self.assertRaisesMessage(DisallowedHost, msg_invalid_host % host):
                 request.get_host()
 
         request = HttpRequest()
-        request.META = {'HTTP_HOST': "invalid_hostname.com", 'SERVER_PORT': '80'}
+        request.META = {'HTTP_HOST': "invalid_hostname.com"}
         with self.assertRaisesMessage(DisallowedHost, msg_suggestion2 % "invalid_hostname.com"):
             request.get_host()
 
