@@ -14,7 +14,8 @@ from django.core.cache import cache
 from django.core.exceptions import SuspiciousFileOperation
 from django.core.files.base import ContentFile, File
 from django.core.files.storage import (
-    FileSystemStorage, Storage as BaseStorage, get_storage_class,
+    FileSystemStorage, Storage as BaseStorage, default_storage,
+    get_storage_class,
 )
 from django.core.files.uploadedfile import (
     InMemoryUploadedFile, SimpleUploadedFile, TemporaryUploadedFile,
@@ -884,6 +885,9 @@ class FieldCallableFileStorageTests(SimpleTestCase):
             with self.subTest(invalid_type=invalid_type):
                 with self.assertRaisesMessage(TypeError, msg):
                     FileField(storage=invalid_type)
+
+    def test_file_field_storage_none_uses_default_storage(self):
+        self.assertEqual(FileField().storage, default_storage)
 
     def test_callable_function_storage_file_field(self):
         storage = FileSystemStorage(location=self.temp_storage_location)
