@@ -26,6 +26,8 @@ class Div3Lookup(models.Lookup):
         params.extend(rhs_params)
         return 'mod(%s, 3) = %s' % (lhs, rhs), params
 
+    as_spanner = as_oracle
+
 
 class Div3Transform(models.Transform):
     lookup_name = 'div3'
@@ -37,6 +39,8 @@ class Div3Transform(models.Transform):
     def as_oracle(self, compiler, connection, **extra_context):
         lhs, lhs_params = compiler.compile(self.lhs)
         return 'mod(%s, 3)' % lhs, lhs_params
+
+    as_spanner = as_oracle
 
 
 class Div3BilateralTransform(Div3Transform):
@@ -58,6 +62,10 @@ class LastDigitTransform(models.Transform):
     def as_sql(self, compiler, connection):
         lhs, lhs_params = compiler.compile(self.lhs)
         return 'SUBSTR(CAST(%s AS CHAR(2)), 2, 1)' % lhs, lhs_params
+
+    def as_spanner(self, compiler, connection):
+        lhs, lhs_params = compiler.compile(self.lhs)
+        return 'SUBSTR(CAST(%s AS STRING), 2, 1)' % lhs, lhs_params
 
 
 class UpperBilateralTransform(models.Transform):
