@@ -1,6 +1,4 @@
 from django.contrib import auth
-from django.contrib.auth import load_backend
-from django.contrib.auth.backends import RemoteUserBackend
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.deprecation import MiddlewareMixin
 from django.utils.functional import SimpleLazyObject
@@ -100,12 +98,14 @@ class RemoteUserMiddleware(MiddlewareMixin):
         but only if the user is authenticated via the RemoteUserBackend.
         """
         try:
-            stored_backend = load_backend(request.session.get(auth.BACKEND_SESSION_KEY, ''))
+            stored_backend = auth.load_backend(
+                request.session.get(auth.BACKEND_SESSION_KEY, '')
+            )
         except ImportError:
             # backend failed to load
             auth.logout(request)
         else:
-            if isinstance(stored_backend, RemoteUserBackend):
+            if isinstance(stored_backend, auth.backends.RemoteUserBackend):
                 auth.logout(request)
 
 
