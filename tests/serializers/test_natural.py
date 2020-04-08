@@ -64,10 +64,16 @@ def natural_key_test(self, format):
     # Deserialize and test.
     books = list(serializers.deserialize(format, string_data))
     self.assertEqual(len(books), 2)
-    self.assertEqual(books[0].object.title, book1['title'])
-    self.assertEqual(books[0].object.pk, adrian.pk)
-    self.assertEqual(books[1].object.title, book2['title'])
-    self.assertIsNone(books[1].object.pk)
+    # Ordering isn't stable due to django-spanner's random AutoField values.
+    for book in books:
+        title = book.object.title
+        if title == book1['title']:
+            self.assertEqual(book.object.pk, adrian.pk)
+        elif title == book2['title']:
+            # django-spanner's AutoField uses a default value.
+            self.assertIsNotNone(book.object.pk)
+        else:
+            self.fail('Unexpected book title %s' % title)
 
 
 def natural_pk_mti_test(self, format):

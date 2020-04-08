@@ -136,7 +136,7 @@ def data_compare(testcase, pk, klass, data):
 def generic_compare(testcase, pk, klass, data):
     instance = klass.objects.get(id=pk)
     testcase.assertEqual(data[0], instance.data)
-    testcase.assertEqual(data[1:], [t.data for t in instance.tags.order_by('id')])
+    testcase.assertCountEqual(data[1:], [t.data for t in instance.tags.order_by('id')])
 
 
 def fk_compare(testcase, pk, klass, data):
@@ -146,7 +146,7 @@ def fk_compare(testcase, pk, klass, data):
 
 def m2m_compare(testcase, pk, klass, data):
     instance = klass.objects.get(id=pk)
-    testcase.assertEqual(data, [obj.id for obj in instance.data.order_by('id')])
+    testcase.assertCountEqual(data, [obj.id for obj in instance.data.order_by('id')])
 
 
 def im2m_compare(testcase, pk, klass, data):
