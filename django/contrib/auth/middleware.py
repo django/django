@@ -28,7 +28,7 @@ class LoginRequiredAuthenticationMiddleware(AuthenticationMiddleware):
     """
     Middleware that force all views to require athentication by default.
 
-    Views that has @login_not_required decorator or LoginNotRequiredMixin mixin
+    Views that have @login_not_required decorator or LoginNotRequiredMixin mixin
     will be able to pass through without this validation. Otherwise, it will
     direct user to the login.
     """
