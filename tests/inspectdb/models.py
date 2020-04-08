@@ -37,7 +37,8 @@ class SpecialName(models.Model):
     field_field_2 = models.IntegerField(db_column='x__field')
     # Other chars
     prc_x = models.IntegerField(db_column='prcx')
-    non_ascii = models.IntegerField(db_column='tamaño')
+    # Edited as Spanner doesn't support non-ASCII columns.
+    non_ascii = models.IntegerField(db_column='tamano')
 
     class Meta:
         db_table = "inspectdb_special-table name"

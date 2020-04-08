@@ -102,7 +102,9 @@ class InspectDBTestCase(TestCase):
         assertFieldType('null_bool_field', 'models.{}(blank=True, null=True)'.format(bool_field_type))
 
         if connection.features.can_introspect_decimal_field:
-            assertFieldType('decimal_field', "models.DecimalField(max_digits=6, decimal_places=1)")
+            # django-spanner creates DecimalField as FLOAT64 until Spanner
+            # supports numeric.
+            assertFieldType('decimal_field', "models.FloatField()")
         else:       # Guessed arguments on SQLite, see #5014
             assertFieldType('decimal_field', "models.DecimalField(max_digits=10, decimal_places=5)  "
                                              "# max_digits and decimal_places have been guessed, "
@@ -167,14 +169,14 @@ class InspectDBTestCase(TestCase):
         output = out.getvalue()
         error_message = "inspectdb generated a model field name which is a number"
         self.assertNotIn("    123 = models.CharField", output, msg=error_message)
-        self.assertIn("number_123 = models.CharField", output)
+        self.assertIn("one_two_three = models.CharField", output)
 
         error_message = "inspectdb generated a model field name which starts with a digit"
         self.assertNotIn("    4extra = models.CharField", output, msg=error_message)
-        self.assertIn("number_4extra = models.CharField", output)
+        self.assertIn("four_extra = models.CharField", output)
 
         self.assertNotIn("    45extra = models.CharField", output, msg=error_message)
-        self.assertIn("number_45extra = models.CharField", output)
+        self.assertIn("five_extra = models.CharField", output)
 
     def test_special_column_name_introspection(self):
         """
@@ -188,9 +190,9 @@ class InspectDBTestCase(TestCase):
         self.assertIn("field = models.IntegerField()", output)
         self.assertIn("field_field = models.IntegerField(db_column='%s_')" % base_name, output)
         self.assertIn("field_field_0 = models.IntegerField(db_column='%s__')" % base_name, output)
-        self.assertIn("field_field_1 = models.IntegerField(db_column='__field')", output)
-        self.assertIn("prc_x = models.IntegerField(db_column='prc(%) x')", output)
-        self.assertIn("tamaño = models.IntegerField()", output)
+        self.assertIn("x_field = models.IntegerField(db_column='x__field')", output)
+        self.assertIn("prcx = models.IntegerField()", output)
+        self.assertIn("tamano = models.IntegerField()", output)
 
     def test_table_name_introspection(self):
         """
