@@ -88,6 +88,14 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
                 'column': self.quote_name(field.column),
             }, [effective_default])
 
+    def remove_index(self, model, index):
+        for field in index.fields:
+            if field.startswith("-"):
+                field = field[1:]
+            if model._meta.get_field(field).get_internal_type() == 'ForeignKey':
+                self.execute(self._create_index_sql(model, [model._meta.get_field(field)]))
+        self.execute(index.remove_sql(model, self))
+
     def _field_should_be_indexed(self, model, field):
         create_index = super()._field_should_be_indexed(model, field)
         storage = self.connection.introspection.get_storage_engine(
