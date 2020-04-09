@@ -58,5 +58,8 @@ class CoroutineClearingView:
         self._unawaited_coroutine = asyncio.sleep(0)
         return self._unawaited_coroutine
 
+    def __del__(self):
+        self._unawaited_coroutine.close()
+
 
 async_unawaited = CoroutineClearingView()
