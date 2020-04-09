@@ -128,8 +128,8 @@ your own fields if Django's built-in ones don't do the trick; see
 Field options
 -------------
 
-Each field takes a certain set of field-specific arguments (documented in the
-:ref:`model field reference <model-field-types>`). For example,
+Each field takes a certain set of common and field-specific arguments (documented
+in the :ref:`model field reference <common-model-field-options>`). For example,
 :class:`~django.db.models.CharField` (and its subclasses) require a
 :attr:`~django.db.models.CharField.max_length` argument which specifies the size
 of the ``VARCHAR`` database field used to store the data.
