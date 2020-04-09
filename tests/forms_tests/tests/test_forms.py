@@ -3151,6 +3151,14 @@ Good luck picking a username that doesn&#x27;t already exist.</p>
         self.assertEqual(f['first_name'].widget_type, 'text')
         self.assertEqual(f['birthday'].widget_type, 'splithiddendatetime')
 
+    def test_boundfield_css_classes(self):
+        form = Person()
+        field = form['first_name']
+        self.assertEqual(field.css_classes(), '')
+        self.assertEqual(field.css_classes(extra_classes=''), '')
+        self.assertEqual(field.css_classes(extra_classes='test'), 'test')
+        self.assertEqual(field.css_classes(extra_classes='test test'), 'test')
+
     def test_label_tag_override(self):
         """
         BoundField label_suffix (if provided) overrides Form label_suffix
