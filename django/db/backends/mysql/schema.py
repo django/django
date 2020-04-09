@@ -94,6 +94,15 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
                 field = field[1:]
             if model._meta.get_field(field).get_internal_type() == 'ForeignKey':
                 self.execute(self._create_index_sql(model, [model._meta.get_field(field)]))
+            else:
+                for idx in model._meta.indexes:
+                    if idx == index:
+                        continue
+                    elif idx.fields[0] == field:
+                        continue
+                    else:
+                        self.execute(self._create_index_sql(model, [model._meta.get_field(field)]))
+
         self.execute(index.remove_sql(model, self))
 
     def _field_should_be_indexed(self, model, field):
