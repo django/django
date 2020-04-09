@@ -1009,7 +1009,7 @@ Methods of ``BoundField``
     ``only_initial`` is used by Django internals and should not be set
     explicitly.
 
-.. method:: BoundField.css_classes()
+.. method:: BoundField.css_classes(extra_classes=None)
 
     When you use Django's rendering shortcuts, CSS classes are used to
     indicate required form fields or fields that contain errors. If you're
