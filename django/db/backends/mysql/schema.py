@@ -38,7 +38,12 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
 
     @property
     def sql_rename_column(self):
-        if self.connection.mysql_is_mariadb and self.connection.mysql_version >= (10, 5, 2):
+        # MariaDB >= 10.5.2 and MySQL >= 8.0.4 support an
+        # "ALTER TABLE ... RENAME COLUMN" statement.
+        if self.connection.mysql_is_mariadb:
+            if self.connection.mysql_version >= (10, 5, 2):
+                return super().sql_rename_column
+        elif self.connection.mysql_version >= (8, 0, 4):
             return super().sql_rename_column
         return 'ALTER TABLE %(table)s CHANGE %(old_column)s %(new_column)s %(type)s'
 
