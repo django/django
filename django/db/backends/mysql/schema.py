@@ -107,7 +107,9 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
                 constraint_names = self._constraint_names(model, [field.column], index=True)
                 if not constraint_names:
                     self.execute(self._create_index_sql(model, [field]))
-        self.execute(constraint.remove_sql(model, self))
+        sql = constraint.remove_sql(model, self)
+        if sql:
+            self.execute(sql)
 
     def _field_should_be_indexed(self, model, field):
         create_index = super()._field_should_be_indexed(model, field)
