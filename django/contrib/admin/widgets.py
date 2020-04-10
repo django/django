@@ -11,6 +11,7 @@ from django.core.validators import URLValidator
 from django.db.models import CASCADE
 from django.urls import reverse
 from django.urls.exceptions import NoReverseMatch
+from django.utils.http import urlencode
 from django.utils.html import smart_urlquote
 from django.utils.safestring import mark_safe
 from django.utils.text import Truncator
@@ -384,6 +385,7 @@ class AutocompleteMixin:
 
     def __init__(self, rel, admin_site, attrs=None, choices=(), using=None):
         self.rel = rel
+        self.to_field_name = getattr(self.rel, 'field_name', 'pk')
         self.admin_site = admin_site
         self.db = using
         self.choices = choices
@@ -391,7 +393,10 @@ class AutocompleteMixin:
 
     def get_url(self):
         model = self.rel.model
-        return reverse(self.url_name % (self.admin_site.name, model._meta.app_label, model._meta.model_name))
+        return "%s?%s" % (
+            reverse(self.url_name % (self.admin_site.name, model._meta.app_label, model._meta.model_name)),
+            urlencode({'to_field_name': self.to_field_name})
+        )
 
     def build_attrs(self, base_attrs, extra_attrs=None):
         """
@@ -426,9 +431,10 @@ class AutocompleteMixin:
         }
         if not self.is_required and not self.allow_multiple_selected:
             default[1].append(self.create_option(name, '', '', False, 0))
+
         choices = (
-            (obj.pk, self.choices.field.label_from_instance(obj))
-            for obj in self.choices.queryset.using(self.db).filter(pk__in=selected_choices)
+            (getattr(obj, self.to_field_name), self.choices.field.label_from_instance(obj))
+            for obj in self.choices.queryset.using(self.db).filter(**{"%s__in" % self.to_field_name: selected_choices})
         )
         for option_value, option_label in choices:
             selected = (

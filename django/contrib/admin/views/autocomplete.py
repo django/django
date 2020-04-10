@@ -25,10 +25,11 @@ class AutocompleteJsonView(BaseListView):
 
         self.term = request.GET.get('term', '')
         self.object_list = self.get_queryset()
+        to_field_name = request.GET.get('to_field_name', 'pk')
         context = self.get_context_data()
         return JsonResponse({
             'results': [
-                {'id': str(obj.pk), 'text': str(obj)}
+                {'id': str(getattr(obj, to_field_name, obj.pk)), 'text': str(obj)}
                 for obj in context['object_list']
             ],
             'pagination': {'more': context['page_obj'].has_next()},
