@@ -1241,3 +1241,40 @@ class SeleniumTests(AdminSeleniumTestCase):
             self.wait_until_visible(field_name)
             hide_links[hide_index].click()
             self.wait_until_invisible(field_name)
+
+    def test_inline_formset_error_input_border(self):
+        self.admin_login(username='super', password='secret')
+        self.selenium.get(self.live_server_url + reverse('admin:admin_inlines_holder5_add'))
+        self.wait_until_visible('#id_dummy')
+        self.selenium.find_element_by_id('id_dummy').send_keys(1)
+        fields = ['id_inner5stacked_set-0-dummy', 'id_inner5tabular_set-0-dummy']
+        show_links = self.selenium.find_elements_by_link_text('SHOW')
+        for show_index, field_name in enumerate(fields):
+            show_links[show_index].click()
+            self.wait_until_visible('#' + field_name)
+            self.selenium.find_element_by_id(field_name).send_keys(1)
+
+        # Before save all inputs have default border
+        for inline in ('stacked', 'tabular'):
+            for field_name in ('name', 'select', 'text'):
+                element_id = 'id_inner5%s_set-0-%s' % (inline, field_name)
+                self.assertEqual(
+                    self.selenium.find_element_by_id(element_id).value_of_css_property('border'),
+                    '1px solid rgb(204, 204, 204)',  # 1px solid #cccccc
+                )
+        self.selenium.find_element_by_xpath('//input[@value="Save"]').click()
+        # Test the red border around inputs by css selectors
+        stacked_selectors = ['.errors input', '.errors select', '.errors textarea']
+        for selector in stacked_selectors:
+            self.assertEqual(
+                self.selenium.find_element_by_css_selector(selector).value_of_css_property('border'),
+                '1px solid rgb(186, 33, 33)',  # 1px solid #ba2121
+            )
+        tabular_selectors = [
+            'td ul.errorlist + input', 'td ul.errorlist + select', 'td ul.errorlist + textarea'
+        ]
+        for selector in tabular_selectors:
+            self.assertEqual(
+                self.selenium.find_element_by_css_selector(selector).value_of_css_property('border'),
+                '1px solid rgb(186, 33, 33)',  # 1px solid #ba2121
+            )
