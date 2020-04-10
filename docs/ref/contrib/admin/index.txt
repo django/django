@@ -1068,6 +1068,13 @@ subclass::
         perform poorly if you have a lot of rows and don't have an index on
         ``name`` and ``pk``.
 
+.. attribute:: ModelAdmin.order_in_index
+
+    .. versionadded:: 3.1
+
+    A numeric value definining the order in which the models are listed in the
+    admin index. If left to ``None``, models are listed in alphabetical order.
+
 .. attribute:: ModelAdmin.paginator
 
     The paginator class to be used for pagination. By default,

@@ -32,7 +32,8 @@ from .models import (
     FilteredManager, FooAccount, FoodDelivery, FunkyTag, Gadget, Gallery,
     GenRelReference, Grommet, ImplicitlyGeneratedPK, Ingredient,
     InlineReference, InlineReferer, Inquisition, Language, Link,
-    MainPrepopulated, ModelWithStringPrimaryKey, NotReferenced, OldSubscriber,
+    MainPrepopulated, ModelWithStringPrimaryKey, ModelOrder1, ModelOrder2,
+    ModelOrder3, NotReferenced, OldSubscriber,
     OtherStory, Paper, Parent, ParentWithDependentChildren, ParentWithUUIDPK,
     Person, Persona, Picture, Pizza, Plot, PlotDetails, PlotProxy,
     PluggableSearchPerson, Podcast, Post, PrePopulatedPost,
@@ -1178,3 +1179,21 @@ class ArticleAdmin9(admin.ModelAdmin):
 
 site9 = admin.AdminSite(name='admin9')
 site9.register(Article, ArticleAdmin9)
+
+
+class OrderAdmin1(admin.ModelAdmin):
+    pass
+
+
+class OrderAdmin2(admin.ModelAdmin):
+    order_in_index = 2
+
+
+class OrderAdmin3(admin.ModelAdmin):
+    order_in_index = 1
+
+
+site10 = admin.AdminSite(name='admin10')
+site10.register(ModelOrder1, OrderAdmin1)
+site10.register(ModelOrder2, OrderAdmin2)
+site10.register(ModelOrder3, OrderAdmin3)

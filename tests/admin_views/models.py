@@ -999,3 +999,15 @@ class UserProxy(User):
     """Proxy a model with a different app_label."""
     class Meta:
         proxy = True
+
+
+class ModelOrder1(models.Model):
+    pass
+
+
+class ModelOrder2(models.Model):
+    pass
+
+
+class ModelOrder3(models.Model):
+    pass

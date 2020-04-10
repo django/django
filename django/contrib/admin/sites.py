@@ -442,6 +442,7 @@ class AdminSite:
                 'perms': perms,
                 'admin_url': None,
                 'add_url': None,
+                'order_in_index': model_admin.order_in_index,
             }
             if perms.get('change') or perms.get('view'):
                 model_dict['view_only'] = not perms.get('change')
@@ -470,6 +471,16 @@ class AdminSite:
                     'models': [model_dict],
                 }
 
+        # Sort the models by order_in_index then alphabetically within each app.
+        def sorter(model_dict):
+            try:
+                return (0, float(model_dict['order_in_index']), model_dict['name'])
+            except (TypeError, ValueError):
+                return (1, model_dict['name'])
+
+        for app in app_dict.values():
+            app['models'].sort(key=sorter)
+
         if label:
             return app_dict.get(label)
         return app_dict
@@ -483,10 +494,6 @@ class AdminSite:
 
         # Sort the apps alphabetically.
         app_list = sorted(app_dict.values(), key=lambda x: x['name'].lower())
-
-        # Sort the models alphabetically within each app.
-        for app in app_list:
-            app['models'].sort(key=lambda x: x['name'])
 
         return app_list
 
@@ -513,8 +520,6 @@ class AdminSite:
         app_dict = self._build_app_dict(request, app_label)
         if not app_dict:
             raise Http404('The requested admin page does not exist.')
-        # Sort the models alphabetically within each app.
-        app_dict['models'].sort(key=lambda x: x['name'])
         app_name = apps.get_app_config(app_label).verbose_name
         context = {
             **self.each_context(request),

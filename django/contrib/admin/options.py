@@ -548,6 +548,7 @@ class ModelAdmin(BaseModelAdmin):
     list_per_page = 100
     list_max_show_all = 200
     list_editable = ()
+    order_in_index = None
     search_fields = ()
     date_hierarchy = None
     save_as = False

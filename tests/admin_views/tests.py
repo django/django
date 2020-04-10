@@ -703,6 +703,21 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
         self.assertContains(response, '<a href="%s">' % reverse('admin:logout'))
         self.assertContains(response, '<a href="%s">' % reverse('admin:password_change'))
 
+    def test_order_in_index(self):
+        """
+        Ensures the order_in_index attribute is honored into account when
+        rendering the models in the admin index and the app index pages.
+        """
+        response = self.client.get(reverse('admin10:index'))
+        body = response.rendered_content
+        self.assertLess(body.index('modelorder3'), body.index('modelorder2'))
+        self.assertLess(body.index('modelorder2'), body.index('modelorder1'))
+
+        response = self.client.get(reverse('admin10:app_list', args=('admin_views',)))
+        body = response.rendered_content
+        self.assertLess(body.index('modelorder3'), body.index('modelorder2'))
+        self.assertLess(body.index('modelorder2'), body.index('modelorder1'))
+
     def test_named_group_field_choices_change_list(self):
         """
         Ensures the admin changelist shows correct values in the relevant column
