@@ -65,3 +65,12 @@ class RegexFieldTest(SimpleTestCase):
         self.assertEqual('1234', f.clean('1234'))
         with self.assertRaisesMessage(ValidationError, "'Enter a valid value.'"):
             f.clean('abcd')
+
+    def test_get_regex(self):
+        f = RegexField('^[a-z]+$')
+        self.assertEqual(f.regex, re.compile('^[a-z]+$'))
+
+    def test_regexfield_strip(self):
+        f = RegexField('^[a-z]+$', strip=True)
+        self.assertEqual(f.clean(' a'), 'a')
+        self.assertEqual(f.clean('a '), 'a')
