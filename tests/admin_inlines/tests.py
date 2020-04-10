@@ -1278,3 +1278,44 @@ class SeleniumTests(AdminSeleniumTestCase):
                 self.selenium.find_element_by_css_selector(selector).value_of_css_property('border'),
                 '1px solid rgb(186, 33, 33)',  # 1px solid #ba2121
             )
+
+    def test_inline_formset_error(self):
+        self.admin_login(username='super', password='secret')
+        self.selenium.get(self.live_server_url + reverse('admin:admin_inlines_holder5_add'))
+        stacked_inline_formset_selector = 'div#inner5stacked_set-group fieldset.module.collapse'
+        tabular_inline_formset_selector = 'div#inner5tabular_set-group fieldset.module.collapse'
+        # Inlines without errors, both inlines collapsed
+        self.selenium.find_element_by_xpath('//input[@value="Save"]').click()
+        self.assertEqual(
+            len(self.selenium.find_elements_by_css_selector(stacked_inline_formset_selector + '.collapsed')), 1
+        )
+        self.assertEqual(
+            len(self.selenium.find_elements_by_css_selector(tabular_inline_formset_selector + '.collapsed')), 1
+        )
+        show_links = self.selenium.find_elements_by_link_text('SHOW')
+        self.assertEqual(len(show_links), 2)
+
+        # Inlines with errors, both inlines expanded
+        test_fields = ['#id_inner5stacked_set-0-dummy', '#id_inner5tabular_set-0-dummy']
+        for show_index, field_name in enumerate(test_fields):
+            show_links[show_index].click()
+            self.wait_until_visible(field_name)
+            self.selenium.find_element_by_id(field_name[1:]).send_keys(1)
+        hide_links = self.selenium.find_elements_by_link_text('HIDE')
+        self.assertEqual(len(hide_links), 2)
+        for hide_index, field_name in enumerate(test_fields):
+            hide_links[hide_index].click()
+            self.wait_until_invisible(field_name)
+        self.selenium.find_element_by_xpath('//input[@value="Save"]').click()
+        self.assertEqual(
+            len(self.selenium.find_elements_by_css_selector(stacked_inline_formset_selector + '.collapsed')), 0
+        )
+        self.assertEqual(
+            len(self.selenium.find_elements_by_css_selector(tabular_inline_formset_selector + '.collapsed')), 0
+        )
+        self.assertEqual(
+            len(self.selenium.find_elements_by_css_selector(stacked_inline_formset_selector)), 1
+        )
+        self.assertEqual(
+            len(self.selenium.find_elements_by_css_selector(tabular_inline_formset_selector)), 1
+        )
