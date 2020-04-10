@@ -333,7 +333,8 @@ class IndexesTests(SimpleTestCase):
 
 
 @isolate_apps('invalid_models_tests')
-class FieldNamesTests(SimpleTestCase):
+class FieldNamesTests(TestCase):
+    databases = {'default', 'other'}
 
     def test_ending_with_underscore(self):
         class Model(models.Model):
