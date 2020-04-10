@@ -690,6 +690,9 @@ Miscellaneous
 * The auto-reloader no longer monitors changes in built-in Django translation
   files.
 
+* The minimum supported version of ``mysqlclient`` is increased from 1.3.13 to
+  1.4.0.
+
 .. _deprecated-features-3.1:
 
 Features deprecated in 3.1
