@@ -89,21 +89,25 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             }, [effective_default])
 
     def remove_index(self, model, index):
-        for field in index.fields:
-            if field.startswith("-"):
-                field = field[1:]
-            if model._meta.get_field(field).get_internal_type() == 'ForeignKey':
-                self.execute(self._create_index_sql(model, [model._meta.get_field(field)]))
-            else:
-                for idx in model._meta.indexes:
-                    if idx == index:
-                        continue
-                    elif idx.fields[0] == field:
-                        continue
-                    else:
-                        self.execute(self._create_index_sql(model, [model._meta.get_field(field)]))
-
+        field_name = index.fields[0]
+        if field_name.startswith("-"):
+            field_name = field_name[1:]
+        field = model._meta.get_field(field_name)
+        if field.get_internal_type() == 'ForeignKey':
+            constraint_names = self._constraint_names(model, [field.column], index=True)
+            if not constraint_names:
+                self.execute(self._create_index_sql(model, [field],))
         self.execute(index.remove_sql(model, self))
+
+    def remove_constraint(self, model, constraint):
+        if hasattr(constraint, "fields"):
+            field_name = constraint.fields[0]
+            field = model._meta.get_field(field_name)
+            if field.get_internal_type() == 'ForeignKey':
+                constraint_names = self._constraint_names(model, [field.column], index=True)
+                if not constraint_names:
+                    self.execute(self._create_index_sql(model, [field]))
+        self.execute(constraint.remove_sql(model, self))
 
     def _field_should_be_indexed(self, model, field):
         create_index = super()._field_should_be_indexed(model, field)

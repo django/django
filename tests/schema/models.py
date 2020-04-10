@@ -147,6 +147,17 @@ class BookForeignObj(models.Model):
         apps = new_apps
 
 
+class BookWithIndex(models.Model):
+    author = models.ForeignKey(Author, models.CASCADE)
+    title = models.CharField(max_length=100)
+
+    class Meta:
+        apps = new_apps
+        indexes = [
+            models.Index(fields=['author', 'title'], name='index_with_fk')
+        ]
+
+
 class IntegerPK(models.Model):
     i = models.IntegerField(primary_key=True)
     j = models.IntegerField(unique=True)

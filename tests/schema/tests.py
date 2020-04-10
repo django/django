@@ -30,9 +30,9 @@ from .models import (
     AuthorWithDefaultHeight, AuthorWithEvenLongerName, AuthorWithIndexedName,
     AuthorWithIndexedNameAndBirthday, AuthorWithUniqueName,
     AuthorWithUniqueNameAndBirthday, Book, BookForeignObj, BookWeak,
-    BookWithLongName, BookWithO2O, BookWithoutAuthor, BookWithSlug, IntegerPK,
-    Node, Note, NoteRename, Tag, TagIndexed, TagM2MTest, TagUniqueRename,
-    Thing, UniqueTest, new_apps,
+    BookWithIndex, BookWithLongName, BookWithO2O, BookWithoutAuthor,
+    BookWithSlug, IntegerPK, Node, Note, NoteRename, Tag, TagIndexed,
+    TagM2MTest, TagUniqueRename, Thing, UniqueTest, new_apps,
 )
 
 
@@ -334,6 +334,20 @@ class SchemaTests(TransactionTestCase):
         with connection.schema_editor() as editor:
             editor.alter_field(AuthorTextFieldWithIndex, old_field, new_field, strict=True)
         self.assertForeignKeyExists(AuthorTextFieldWithIndex, 'text_field_id', 'schema_author')
+
+    @unittest.skipUnless(connection.vendor == 'mysql', "MySQL specific")
+    def rename_fk_in_index(self):
+        with connection.schema_editor() as editor:
+            editor.create_model(Author)
+            editor.create_model(BookWithIndex)
+        old_field = BookWithIndex._meta.get_field("author")
+        new_field = ForeignKey(Author, CASCADE)
+        new_field.set_attributes_from_name("writer")
+        new_index = Index(fields=["writer", "title"], name=BookWithIndex._meta.indexes[0].name)
+        with connection.schema_editor() as editor:
+            editor.remove_index(BookWithIndex, BookWithIndex._meta.indexes[0])
+            editor.alter_field(Author, old_field, new_field, strict=True)
+            editor.add_index(BookWithIndex, new_index)
 
     @isolate_apps('schema')
     def test_char_field_pk_to_auto_field(self):
