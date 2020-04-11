@@ -17,9 +17,9 @@ See the :doc:`/howto/upgrade-version` guide if you're updating an existing
 project.
 
 Django 1.8 has been designated as Django's second :term:`long-term support
-release`. It will receive security updates for at least three years after its
-release. Support for the previous LTS, Django 1.4, will end 6 months from the
-release date of Django 1.8.
+release <Long-term support release>`. It will receive security updates for at
+least three years after its release. Support for the previous LTS, Django 1.4,
+will end 6 months from the release date of Django 1.8.
 
 Python compatibility
 ====================
