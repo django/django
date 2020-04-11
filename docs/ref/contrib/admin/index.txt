@@ -1072,7 +1072,7 @@ subclass::
 
     .. versionadded:: 3.1
 
-    A numeric value definining the order in which the models are listed in the
+    A numeric value defining the order in which the models are listed in the
     admin index. If left to ``None``, models are listed in alphabetical order.
 
 .. attribute:: ModelAdmin.paginator
