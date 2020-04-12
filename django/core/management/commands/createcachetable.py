@@ -4,7 +4,7 @@ from django.core.cache import caches
 from django.core.cache.backends.db import BaseDatabaseCache
 from django.core.management.base import BaseCommand, CommandError
 from django.db import (
-    DEFAULT_DB_ALIAS, DatabaseError, connections, models, router,
+    DEFAULT_DB_ALIAS, DatabaseError, connections, models, router, transaction,
 )
 
 
@@ -64,23 +64,31 @@ class Command(BaseCommand):
                 apps = Apps()
                 app_label = 'cache'
                 db_table = tablename
-                # constraints = [models.UniqueConstraint(fields=['cache_key'], name=tablename + '_cache_key')]
+
+        with connection.schema_editor(collect_sql=True) as editor:
+            editor.create_model(CacheTable)
+        if connection.vendor == 'postgresql':
+            # Remove the varchar_pattern_ops on the 'cache_key' field on
+            # PostgreSQL.
+            statements = (s for s in editor.collected_sql if not s.endswith(' varchar_pattern_ops);'))
+        else:
+            statements = editor.collected_sql
 
         if dry_run:
-            with connection.schema_editor(collect_sql=True) as editor:
-                editor.create_model(CacheTable)
-            for statement in editor.collected_sql:
+            for statement in statements:
                 self.stdout.write(statement)
             return
 
-        try:
-            with connection.schema_editor() as editor:
-                editor.create_model(CacheTable)
-        except DatabaseError as e:
-            raise CommandError(
-                "Cache table '%s' could not be created.\nThe error was: "
-                "%s." % (tablename, e)
-            )
+        with transaction.atomic(using=database, savepoint=connection.features.can_rollback_ddl):
+            try:
+                with connection.cursor() as cursor:
+                    for statement in statements:
+                        cursor.execute(statement)
+            except DatabaseError as e:
+                raise CommandError(
+                    "Cache table '%s' could not be created.\nThe error was: "
+                    "%s." % (tablename, e)
+                )
 
         if self.verbosity > 1:
             self.stdout.write("Cache table '%s' created." % tablename)

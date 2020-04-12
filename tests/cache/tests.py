@@ -20,7 +20,7 @@ from django.core.cache import (
 )
 from django.core.cache.backends.base import InvalidCacheBackendError
 from django.core.cache.utils import make_template_fragment_key
-from django.db import close_old_connections, connection, connections
+from django.db import close_old_connections, connection
 from django.http import (
     HttpRequest, HttpResponse, HttpResponseNotModified, StreamingHttpResponse,
 )
@@ -1115,12 +1115,32 @@ class CreateCacheTableForDBCacheTests(TransactionTestCase):
         # cache table should be created on 'other'
         # Queries:
         #   1: check table doesn't already exist
-        #   2: create savepoint (if transactional DDL is supported)
-        #   3: create the table
-        #   4: create the index
-        #   5: release savepoint (if transactional DDL is supported)
-        num = 5 if connections['other'].features.can_rollback_ddl else 3
-        with self.assertNumQueries(num, using='other'):
+        #   2: create the table
+        #   3: create the index
+        #   XXX: Due to extra queries that SchemaEditor adds, this fails on
+        # SQLite with these queries:
+        #        1. SELECT name, type FROM sqlite_master
+        #    WHERE type in ('table', 'view') AND NOT name='sqlite_sequence'
+        #    ORDER BY name
+        #    2. PRAGMA foreign_keys = OFF
+        #    3. PRAGMA foreign_keys
+        #    4. BEGIN
+        #    5. PRAGMA foreign_key_check
+        #    6. PRAGMA foreign_keys = ON
+        #    7. BEGIN
+        #    8. CREATE TABLE "my_cache_table" ("cache_key" varchar(255) NOT NULL PRIMARY KEY,
+        # "value" text NOT NULL, "expires" datetime NOT NULL);
+        #    9. CREATE INDEX "my_cache_table_expires_e6e181af" ON "my_cache_table" ("expires");
+        # and on MySQL with these queries:
+        # 1. SHOW FULL TABLES
+        # 2. SELECT engine FROM information_schema.tables WHERE table_name = 'my_cache_table'
+        # 3. SELECT ENGINE FROM INFORMATION_SCHEMA.ENGINES WHERE SUPPORT = 'DEFAULT'
+        # 4. SELECT engine FROM information_schema.tables WHERE table_name = 'my_cache_table'
+        # 5. SELECT engine FROM information_schema.tables WHERE table_name = 'my_cache_table'
+        # 6. CREATE TABLE `my_cache_table` (`cache_key` varchar(255) NOT NULL PRIMARY KEY,
+        # `value` longtext NOT NULL, `expires` datetime(6) NOT NULL);
+        # 7. CREATE INDEX `my_cache_table_expires_e6e181af` ON `my_cache_table` (`expires`);
+        with self.assertNumQueries(3, using='other'):
             management.call_command('createcachetable', database='other', verbosity=0)
 
 
