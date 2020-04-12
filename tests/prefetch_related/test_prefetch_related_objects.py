@@ -76,7 +76,7 @@ class PrefetchRelatedObjectsTests(TestCase):
             prefetch_related_objects(authors, 'books__read_by')
 
         with self.assertNumQueries(0):
-            self.assertEqual(
+            self.assertCountEqual(
                 [
                     [[str(r) for r in b.read_by.all()] for b in a.books.all()]
                     for a in authors

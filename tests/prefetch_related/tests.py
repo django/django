@@ -17,23 +17,23 @@ from .models import (
 class TestDataMixin:
     @classmethod
     def setUpTestData(cls):
-        cls.book1 = Book.objects.create(title='Poems')
-        cls.book2 = Book.objects.create(title='Jane Eyre')
-        cls.book3 = Book.objects.create(title='Wuthering Heights')
-        cls.book4 = Book.objects.create(title='Sense and Sensibility')
+        cls.book1 = Book.objects.create(title='Poems', id=1)
+        cls.book2 = Book.objects.create(title='Jane Eyre', id=2)
+        cls.book3 = Book.objects.create(title='Wuthering Heights', id=3)
+        cls.book4 = Book.objects.create(title='Sense and Sensibility', id=4)
 
-        cls.author1 = Author.objects.create(name='Charlotte', first_book=cls.book1)
-        cls.author2 = Author.objects.create(name='Anne', first_book=cls.book1)
-        cls.author3 = Author.objects.create(name='Emily', first_book=cls.book1)
-        cls.author4 = Author.objects.create(name='Jane', first_book=cls.book4)
+        cls.author1 = Author.objects.create(name='Charlotte', first_book=cls.book1, id=1)
+        cls.author2 = Author.objects.create(name='Anne', first_book=cls.book1, id=2)
+        cls.author3 = Author.objects.create(name='Emily', first_book=cls.book1, id=3)
+        cls.author4 = Author.objects.create(name='Jane', first_book=cls.book4, id=4)
 
         cls.book1.authors.add(cls.author1, cls.author2, cls.author3)
         cls.book2.authors.add(cls.author1)
         cls.book3.authors.add(cls.author3)
         cls.book4.authors.add(cls.author4)
 
-        cls.reader1 = Reader.objects.create(name='Amy')
-        cls.reader2 = Reader.objects.create(name='Belinda')
+        cls.reader1 = Reader.objects.create(name='Amy', id=1)
+        cls.reader2 = Reader.objects.create(name='Belinda', id=2)
 
         cls.reader1.books_read.add(cls.book1, cls.book4)
         cls.reader2.books_read.add(cls.book2, cls.book4)
@@ -163,7 +163,7 @@ class PrefetchRelatedTests(TestDataMixin, TestCase):
             lists = [[[str(r) for r in b.read_by.all()]
                       for b in a.books.all()]
                      for a in qs]
-            self.assertEqual(lists, [
+            self.assertCountEqual(lists, [
                 [["Amy"], ["Belinda"]],  # Charlotte - Poems, Jane Eyre
                 [["Amy"]],                # Anne - Poems
                 [["Amy"], []],            # Emily - Poems, Wuthering Heights
@@ -174,7 +174,7 @@ class PrefetchRelatedTests(TestDataMixin, TestCase):
             lists = [[[str(r) for r in b.read_by.all()]
                       for b in a.books.all()]
                      for a in qs]
-            self.assertEqual(lists, [
+            self.assertCountEqual(lists, [
                 [["Amy"], ["Belinda"]],  # Charlotte - Poems, Jane Eyre
                 [["Amy"]],                # Anne - Poems
                 [["Amy"], []],            # Emily - Poems, Wuthering Heights
@@ -189,7 +189,7 @@ class PrefetchRelatedTests(TestDataMixin, TestCase):
         with self.assertNumQueries(3):
             author = Author.objects.prefetch_related('books__read_by').get(name="Charlotte")
             lists = [[str(r) for r in b.read_by.all()] for b in author.books.all()]
-            self.assertEqual(lists, [["Amy"], ["Belinda"]])  # Poems, Jane Eyre
+            self.assertCountEqual(lists, [["Amy"], ["Belinda"]])  # Poems, Jane Eyre
 
     def test_foreign_key_then_m2m(self):
         """
@@ -837,14 +837,14 @@ class DefaultManagerTests(TestCase):
             # When we prefetch the teachers, and force the query, we don't want
             # the default manager on teachers to immediately get all the related
             # qualifications, since this will do one query per teacher.
-            qs = Department.objects.prefetch_related('teachers')
+            qs = Department.objects.prefetch_related('teachers').order_by('name')
             depts = "".join("%s department: %s\n" %
-                            (dept.name, ", ".join(str(t) for t in dept.teachers.all()))
+                            (dept.name, ", ".join(sorted([str(t) for t in dept.teachers.all()])))
                             for dept in qs)
 
             self.assertEqual(depts,
                              "English department: Mr Cleese (BA, BSci, MA, PhD), Mr Idle (BA)\n"
-                             "Physics department: Mr Cleese (BA, BSci, MA, PhD), Mr Chapman (BSci)\n")
+                             "Physics department: Mr Chapman (BSci), Mr Cleese (BA, BSci, MA, PhD)\n")
 
 
 class GenericRelationTests(TestCase):
@@ -977,13 +977,13 @@ class MultiTableInheritanceTest(TestCase):
         with self.assertNumQueries(2):
             qs = AuthorWithAge.objects.prefetch_related('addresses')
             addresses = [[str(address) for address in obj.addresses.all()] for obj in qs]
-        self.assertEqual(addresses, [[str(self.author_address)], [], []])
+        self.assertCountEqual(addresses, [[str(self.author_address)], [], []])
 
     def test_foreignkey_to_inherited(self):
         with self.assertNumQueries(2):
             qs = BookReview.objects.prefetch_related('book')
             titles = [obj.book.title for obj in qs]
-        self.assertEqual(titles, ["Poems", "More poems"])
+        self.assertCountEqual(titles, ["Poems", "More poems"])
 
     def test_m2m_to_inheriting_model(self):
         qs = AuthorWithAge.objects.prefetch_related('books_with_year')
@@ -1036,7 +1036,7 @@ class ForeignKeyToFieldTest(TestCase):
             qs = Author.objects.prefetch_related('addresses')
             addresses = [[str(address) for address in obj.addresses.all()]
                          for obj in qs]
-        self.assertEqual(addresses, [[str(self.author_address)], [], []])
+        self.assertCountEqual(addresses, [[str(self.author_address)], [], []])
 
     def test_m2m(self):
         with self.assertNumQueries(3):
@@ -1176,26 +1176,26 @@ class MultiDbTests(TestCase):
         book4.authors.add(author4)
 
         # Forward
-        qs1 = B.prefetch_related('authors')
+        qs1 = B.prefetch_related('authors').order_by('title')
         with self.assertNumQueries(2, using='other'):
             books = "".join("%s (%s)\n" %
-                            (book.title, ", ".join(a.name for a in book.authors.all()))
+                            (book.title, ", ".join(sorted([a.name for a in book.authors.all()])))
                             for book in qs1)
         self.assertEqual(books,
-                         "Poems (Charlotte, Anne, Emily)\n"
                          "Jane Eyre (Charlotte)\n"
-                         "Wuthering Heights (Emily)\n"
-                         "Sense and Sensibility (Jane)\n")
+                         "Poems (Anne, Charlotte, Emily)\n"
+                         "Sense and Sensibility (Jane)\n"
+                         "Wuthering Heights (Emily)\n")
 
         # Reverse
-        qs2 = A.prefetch_related('books')
+        qs2 = A.prefetch_related('books').order_by('name')
         with self.assertNumQueries(2, using='other'):
             authors = "".join("%s: %s\n" %
-                              (author.name, ", ".join(b.title for b in author.books.all()))
+                              (author.name, ", ".join(sorted([b.title for b in author.books.all()])))
                               for author in qs2)
         self.assertEqual(authors,
-                         "Charlotte: Poems, Jane Eyre\n"
                          "Anne: Poems\n"
+                         "Charlotte: Jane Eyre, Poems\n"
                          "Emily: Poems, Wuthering Heights\n"
                          "Jane: Sense and Sensibility\n")
 
@@ -1210,14 +1210,14 @@ class MultiDbTests(TestCase):
 
         # Forward
         with self.assertNumQueries(2, using='other'):
-            books = ", ".join(a.first_book.title for a in A.prefetch_related('first_book'))
+            books = ", ".join(a.first_book.title for a in A.prefetch_related('first_book').order_by('name'))
         self.assertEqual("Poems, Sense and Sensibility", books)
 
         # Reverse
         with self.assertNumQueries(2, using='other'):
             books = "".join("%s (%s)\n" %
                             (b.title, ", ".join(a.name for a in b.first_time_authors.all()))
-                            for b in B.prefetch_related('first_time_authors'))
+                            for b in B.prefetch_related('first_time_authors').order_by('title'))
         self.assertEqual(books,
                          "Poems (Charlotte Bronte)\n"
                          "Sense and Sensibility (Jane Austen)\n")
@@ -1232,13 +1232,13 @@ class MultiDbTests(TestCase):
 
         # parent link
         with self.assertNumQueries(2, using='other'):
-            authors = ", ".join(a.author.name for a in A.prefetch_related('author'))
+            authors = ", ".join(a.author.name for a in A.prefetch_related('author').order_by('name'))
 
         self.assertEqual(authors, "Jane, Tom")
 
         # child link
         with self.assertNumQueries(2, using='other'):
-            ages = ", ".join(str(a.authorwithage.age) for a in A.prefetch_related('authorwithage'))
+            ages = ", ".join(str(a.authorwithage.age) for a in A.prefetch_related('authorwithage').order_by('name'))
 
         self.assertEqual(ages, "50, 49")
 
@@ -1256,7 +1256,7 @@ class MultiDbTests(TestCase):
             prefetch = Prefetch('first_time_authors', queryset=Author.objects.all())
             books = "".join("%s (%s)\n" %
                             (b.title, ", ".join(a.name for a in b.first_time_authors.all()))
-                            for b in B.prefetch_related(prefetch))
+                            for b in B.prefetch_related(prefetch).order_by('title'))
         self.assertEqual(books,
                          "Poems (Charlotte Bronte)\n"
                          "Sense and Sensibility (Jane Austen)\n")
@@ -1266,7 +1266,7 @@ class MultiDbTests(TestCase):
             prefetch = Prefetch('first_time_authors', queryset=Author.objects.using('other'))
             books = "".join("%s (%s)\n" %
                             (b.title, ", ".join(a.name for a in b.first_time_authors.all()))
-                            for b in B.prefetch_related(prefetch))
+                            for b in B.prefetch_related(prefetch).order_by('title'))
         self.assertEqual(books,
                          "Poems (Charlotte Bronte)\n"
                          "Sense and Sensibility (Jane Austen)\n")
@@ -1276,7 +1276,7 @@ class MultiDbTests(TestCase):
             prefetch = Prefetch('first_time_authors', queryset=Author.objects.using('default'))
             books = "".join("%s (%s)\n" %
                             (b.title, ", ".join(a.name for a in b.first_time_authors.all()))
-                            for b in B.prefetch_related(prefetch))
+                            for b in B.prefetch_related(prefetch).order_by('title'))
         self.assertEqual(books,
                          "Poems ()\n"
                          "Sense and Sensibility ()\n")
@@ -1509,4 +1509,8 @@ class ReadPrefetchedObjectsCacheTests(TestCase):
         )
         with self.assertNumQueries(4):
             # AuthorWithAge -> Author -> FavoriteAuthors, Book
-            self.assertQuerysetEqual(authors, ['<AuthorWithAge: Rousseau>', '<AuthorWithAge: Voltaire>'])
+            self.assertQuerysetEqual(
+                authors,
+                ['<AuthorWithAge: Rousseau>', '<AuthorWithAge: Voltaire>'],
+                ordered=False,
+            )
