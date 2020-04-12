@@ -319,6 +319,8 @@ Management Commands
 
 * The new :option:`dbshell -- ARGUMENTS <dbshell -->` option allows passing
   extra arguments to the command-line client for the database.
+* The new :option:`dumpdata --allow-unicode` option allows for Unicode
+  characters in output.
 
 Migrations
 ~~~~~~~~~~

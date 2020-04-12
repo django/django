@@ -2,8 +2,10 @@ import datetime
 import decimal
 import json
 import re
+from io import StringIO
 
 from django.core import serializers
+from django.core.management import call_command
 from django.core.serializers.base import DeserializationError
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
@@ -11,7 +13,7 @@ from django.test import SimpleTestCase, TestCase, TransactionTestCase
 from django.test.utils import isolate_apps
 from django.utils.translation import gettext_lazy, override
 
-from .models import Score
+from .models import Actor, Score
 from .tests import SerializersTestBase, SerializersTransactionTestBase
 
 
@@ -69,6 +71,20 @@ class JsonSerializerTestCase(SerializersTestBase, TestCase):
         for line in json_data.splitlines():
             if re.search(r'.+,\s*$', line):
                 self.assertEqual(line, line.rstrip())
+
+    def test_ensure_ascii(self):
+        s = serializers.json.Serializer()
+        tests = (  # (allow_unicode, expected)
+            (False, '\\u05d9\\u05d5\\u05e0\\u05d9\\u05e7\\u05d5\\u05d3'),
+            (True, 'יוניקוד')
+        )
+        for allow_unicode, expected in tests:
+            with self.subTest(allow_unicode=allow_unicode, expected=expected):
+                json_data = s.serialize(
+                    [Actor(name='יוניקוד')],
+                    allow_unicode=allow_unicode,
+                )
+                self.assertIn(expected, json_data)
 
     @isolate_apps('serializers')
     def test_custom_encoder(self):
@@ -319,3 +335,23 @@ class DjangoJSONEncoderTests(SimpleTestCase):
             json.dumps({'duration': duration}, cls=DjangoJSONEncoder),
             '{"duration": "P0DT00H00M00S"}'
         )
+
+
+class DumpdataUnicodeTestCase(TestCase):
+    def test_allow_unicode(self):
+        Actor.objects.create(name='יוניקוד')
+
+        tests = (  # (allow_unicode, expected)
+            (False, '\\u05d9\\u05d5\\u05e0\\u05d9\\u05e7\\u05d5\\u05d3'),
+            (True, 'יוניקוד')
+        )
+        for allow_unicode, expected in tests:
+            with self.subTest(allow_unicode=allow_unicode, expected=expected):
+                out = StringIO()
+                call_command(
+                    'dumpdata',
+                    'serializers.actor',
+                    allow_unicode=allow_unicode,
+                    stdout=out,
+                )
+                self.assertIn(expected, out.getvalue().strip())

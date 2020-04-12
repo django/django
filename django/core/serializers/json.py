@@ -28,6 +28,7 @@ class Serializer(PythonSerializer):
         if self.options.get('indent'):
             # Prevent trailing spaces
             self.json_kwargs['separators'] = (',', ': ')
+        self.json_kwargs['ensure_ascii'] = not self.json_kwargs.pop('allow_unicode', False)
         self.json_kwargs.setdefault('cls', DjangoJSONEncoder)
 
     def start_serialization(self):

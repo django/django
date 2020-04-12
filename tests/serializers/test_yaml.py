@@ -162,3 +162,42 @@ class YamlSerializerTransactionTestCase(SerializersTransactionTestBase, Transact
   pk: 1
   fields:
     name: Agnes"""
+
+
+@unittest.skipUnless(HAS_YAML, "No yaml library detected")
+class UnicodeSerializerTestCase(SimpleTestCase):
+    def test_allow_unicode(self):
+        tests = (  # (allow_unicode, expected)
+            (False, '\\u05D9\\u05D5\\u05E0\\u05D9\\u05E7\\u05D5\\u05D3'),
+            (True, 'יוניקוד')
+        )
+        for allow_unicode, expected in tests:
+            with self.subTest(allow_unicode=allow_unicode, expected=expected):
+                yaml_string = serializers.serialize(
+                    'yaml',
+                    [Author(name='יוניקוד')],
+                    allow_unicode=allow_unicode,
+                )
+                self.assertIn(expected, yaml_string)
+
+
+@unittest.skipUnless(HAS_YAML, "No yaml library detected")
+class DumpdataUnicodeTestCase(TestCase):
+    def test_allow_unicode(self):
+        Author.objects.create(name='יוניקוד')
+
+        tests = (  # (allow_unicode, expected)
+            (False, '\\u05D9\\u05D5\\u05E0\\u05D9\\u05E7\\u05D5\\u05D3'),
+            (True, 'יוניקוד')
+        )
+        for allow_unicode, expected in tests:
+            with self.subTest(allow_unicode=allow_unicode, expected=expected):
+                out = StringIO()
+                management.call_command(
+                    'dumpdata',
+                    'serializers.author',
+                    format='yaml',
+                    allow_unicode=allow_unicode,
+                    stdout=out,
+                )
+                self.assertIn(expected, out.getvalue().strip())

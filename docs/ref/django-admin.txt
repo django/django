@@ -366,6 +366,12 @@ standard output.
 When this option is set and ``--verbosity`` is greater than 0 (the default), a
 progress bar is shown in the terminal.
 
+.. django-admin-option:: --allow-unicode
+
+.. versionadded:: 3.1
+
+Allows for Unicode characters in output.
+
 ``flush``
 ---------
 

@@ -63,6 +63,10 @@ class Command(BaseCommand):
             '-o', '--output',
             help='Specifies file to which the output is written.'
         )
+        parser.add_argument(
+            '--allow-unicode', action='store_true',
+            help="Allows for Unicode characters in output."
+        )
 
     def handle(self, *app_labels, **options):
         format = options['format']
@@ -75,6 +79,7 @@ class Command(BaseCommand):
         use_natural_primary_keys = options['use_natural_primary_keys']
         use_base_manager = options['use_base_manager']
         pks = options['primary_keys']
+        allow_unicode = options['allow_unicode']
 
         if pks:
             primary_keys = [pk.strip() for pk in pks.split(',')]
@@ -192,7 +197,7 @@ class Command(BaseCommand):
                     use_natural_foreign_keys=use_natural_foreign_keys,
                     use_natural_primary_keys=use_natural_primary_keys,
                     stream=stream or self.stdout, progress_output=progress_output,
-                    object_count=object_count,
+                    object_count=object_count, allow_unicode=allow_unicode,
                 )
             finally:
                 if stream:
