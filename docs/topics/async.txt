@@ -227,10 +227,6 @@ as either a direct wrapper or a decorator::
     def sync_function(...):
         ...
 
-    @sync_to_async(thread_sensitive=True)
-    def sensitive_sync_function(...):
-        ...
-
 Threadlocals and contextvars values are preserved across the boundary in both
 directions.
 
