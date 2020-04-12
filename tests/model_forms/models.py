@@ -54,7 +54,7 @@ class Article(models.Model):
     status = models.PositiveIntegerField(choices=ARTICLE_STATUS, blank=True, null=True)
 
     def save(self, *args, **kwargs):
-        if not self.id:
+        if self._state.adding:
             self.created = datetime.date.today()
         return super().save(*args, **kwargs)
 

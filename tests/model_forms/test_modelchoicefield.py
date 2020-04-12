@@ -19,7 +19,7 @@ class ModelChoiceFieldTests(TestCase):
 
     def test_basics(self):
         f = forms.ModelChoiceField(Category.objects.all())
-        self.assertEqual(list(f.choices), [
+        self.assertCountEqual(list(f.choices), [
             ('', '---------'),
             (self.c1.pk, 'Entertainment'),
             (self.c2.pk, 'A test'),
@@ -67,7 +67,7 @@ class ModelChoiceFieldTests(TestCase):
 
         # queryset can be changed after the field is created.
         f.queryset = Category.objects.exclude(name='Third')
-        self.assertEqual(list(f.choices), [
+        self.assertCountEqual(list(f.choices), [
             ('', '---------'),
             (self.c1.pk, 'Entertainment'),
             (self.c2.pk, 'A test'),
@@ -78,9 +78,13 @@ class ModelChoiceFieldTests(TestCase):
 
         # Choices can be iterated repeatedly.
         gen_one = list(f.choices)
-        gen_two = f.choices
-        self.assertEqual(gen_one[2], (self.c2.pk, 'A test'))
-        self.assertEqual(list(gen_two), [
+        gen_two = list(f.choices)
+        self.assertCountEqual(list(gen_one), [
+            ('', '---------'),
+            (self.c1.pk, 'Entertainment'),
+            (self.c2.pk, 'A test'),
+        ])
+        self.assertCountEqual(list(gen_two), [
             ('', '---------'),
             (self.c1.pk, 'Entertainment'),
             (self.c2.pk, 'A test'),
@@ -89,7 +93,7 @@ class ModelChoiceFieldTests(TestCase):
         # Overriding label_from_instance() to print custom labels.
         f.queryset = Category.objects.all()
         f.label_from_instance = lambda obj: 'category ' + str(obj)
-        self.assertEqual(list(f.choices), [
+        self.assertCountEqual(list(f.choices), [
             ('', '---------'),
             (self.c1.pk, 'category Entertainment'),
             (self.c2.pk, 'category A test'),
@@ -99,7 +103,7 @@ class ModelChoiceFieldTests(TestCase):
     def test_choices_freshness(self):
         f = forms.ModelChoiceField(Category.objects.all())
         self.assertEqual(len(f.choices), 4)
-        self.assertEqual(list(f.choices), [
+        self.assertCountEqual(list(f.choices), [
             ('', '---------'),
             (self.c1.pk, 'Entertainment'),
             (self.c2.pk, 'A test'),
@@ -107,7 +111,7 @@ class ModelChoiceFieldTests(TestCase):
         ])
         c4 = Category.objects.create(name='Fourth', slug='4th', url='4th')
         self.assertEqual(len(f.choices), 5)
-        self.assertEqual(list(f.choices), [
+        self.assertCountEqual(list(f.choices), [
             ('', '---------'),
             (self.c1.pk, 'Entertainment'),
             (self.c2.pk, 'A test'),
@@ -262,14 +266,14 @@ class ModelChoiceFieldTests(TestCase):
             iterator = CustomModelChoiceIterator
             widget = CustomCheckboxSelectMultiple
 
-        field = CustomModelMultipleChoiceField(Category.objects.all())
+        field = CustomModelMultipleChoiceField(Category.objects.order_by('name'))
         self.assertHTMLEqual(
             field.widget.render('name', []),
             '''<ul>
-<li><label><input type="checkbox" name="name" value="%d" data-slug="entertainment">Entertainment</label></li>
 <li><label><input type="checkbox" name="name" value="%d" data-slug="test">A test</label></li>
+<li><label><input type="checkbox" name="name" value="%d" data-slug="entertainment">Entertainment</label></li>
 <li><label><input type="checkbox" name="name" value="%d" data-slug="third-test">Third</label></li>
-</ul>''' % (self.c1.pk, self.c2.pk, self.c3.pk),
+</ul>''' % (self.c2.pk, self.c1.pk, self.c3.pk),
         )
 
     def test_choices_not_fetched_when_not_rendering(self):
@@ -280,7 +284,7 @@ class ModelChoiceFieldTests(TestCase):
     def test_queryset_manager(self):
         f = forms.ModelChoiceField(Category.objects)
         self.assertEqual(len(f.choices), 4)
-        self.assertEqual(list(f.choices), [
+        self.assertCountEqual(list(f.choices), [
             ('', '---------'),
             (self.c1.pk, 'Entertainment'),
             (self.c2.pk, 'A test'),
