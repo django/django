@@ -1,3 +1,6 @@
+import os
+
+from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError
 from django.db import DEFAULT_DB_ALIAS, connections
 
@@ -18,8 +21,14 @@ class Command(BaseCommand):
 
     def handle(self, **options):
         connection = connections[options['database']]
+
         try:
-            connection.client.runshell()
+            executable_name = getattr(settings, "DBSHELL_EXECUTABLE")
+        except AttributeError:
+            executable_name = os.environ.get("DJANGO_DBSHELL_EXECUTABLE")
+
+        try:
+            connection.client.runshell(executable_name=executable_name)
         except OSError:
             # Note that we're assuming OSError means that the client program
             # isn't installed. There's a possibility OSError would be raised

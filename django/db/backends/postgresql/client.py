@@ -8,10 +8,13 @@ from django.db.backends.base.client import BaseDatabaseClient
 class DatabaseClient(BaseDatabaseClient):
     executable_name = 'psql'
 
-    @classmethod
-    def runshell_db(cls, conn_params):
-        args = [cls.executable_name]
+    def runshell(self, executable_name=None):
+        if executable_name is not None:
+            self.executable_name = executable_name
 
+        args = [self.executable_name]
+
+        conn_params = self.connection.get_connection_params()
         host = conn_params.get('host', '')
         port = conn_params.get('port', '')
         dbname = conn_params.get('database', '')
@@ -49,6 +52,3 @@ class DatabaseClient(BaseDatabaseClient):
         finally:
             # Restore the original SIGINT handler.
             signal.signal(signal.SIGINT, sigint_handler)
-
-    def runshell(self):
-        DatabaseClient.runshell_db(self.connection.get_connection_params())
