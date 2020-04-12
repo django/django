@@ -2,7 +2,7 @@ import datetime
 from unittest import mock
 
 from django.db import IntegrityError, connection, transaction
-from django.db.models import CheckConstraint, F, Func, Q
+from django.db.models import CheckConstraint, Deferrable, F, Func, Q
 from django.utils import timezone
 
 from . import PostgreSQLTestCase
@@ -127,6 +127,25 @@ class ExclusionConstraintTests(PostgreSQLTestCase):
                     expressions=empty_expressions,
                 )
 
+    def test_invalid_deferrable(self):
+        msg = 'ExclusionConstraint.deferrable must be a Deferrable instance.'
+        with self.assertRaisesMessage(ValueError, msg):
+            ExclusionConstraint(
+                name='exclude_invalid_deferrable',
+                expressions=[(F('datespan'), RangeOperators.OVERLAPS)],
+                deferrable='invalid',
+            )
+
+    def test_deferrable_with_condition(self):
+        msg = 'ExclusionConstraint with conditions cannot be deferred.'
+        with self.assertRaisesMessage(ValueError, msg):
+            ExclusionConstraint(
+                name='exclude_invalid_condition',
+                expressions=[(F('datespan'), RangeOperators.OVERLAPS)],
+                condition=Q(cancelled=False),
+                deferrable=Deferrable.DEFERRED,
+            )
+
     def test_repr(self):
         constraint = ExclusionConstraint(
             name='exclude_overlapping',
@@ -151,6 +170,16 @@ class ExclusionConstraintTests(PostgreSQLTestCase):
             "<ExclusionConstraint: index_type=SPGiST, expressions=["
             "(F(datespan), '-|-')], condition=(AND: ('cancelled', False))>",
         )
+        constraint = ExclusionConstraint(
+            name='exclude_overlapping',
+            expressions=[(F('datespan'), RangeOperators.ADJACENT_TO)],
+            deferrable=Deferrable.IMMEDIATE,
+        )
+        self.assertEqual(
+            repr(constraint),
+            "<ExclusionConstraint: index_type=GIST, expressions=["
+            "(F(datespan), '-|-')], deferrable=Deferrable.IMMEDIATE>",
+        )
 
     def test_eq(self):
         constraint_1 = ExclusionConstraint(
@@ -173,11 +202,30 @@ class ExclusionConstraintTests(PostgreSQLTestCase):
             expressions=[('datespan', RangeOperators.OVERLAPS)],
             condition=Q(cancelled=False),
         )
+        constraint_4 = ExclusionConstraint(
+            name='exclude_overlapping',
+            expressions=[
+                ('datespan', RangeOperators.OVERLAPS),
+                ('room', RangeOperators.EQUAL),
+            ],
+            deferrable=Deferrable.DEFERRED,
+        )
+        constraint_5 = ExclusionConstraint(
+            name='exclude_overlapping',
+            expressions=[
+                ('datespan', RangeOperators.OVERLAPS),
+                ('room', RangeOperators.EQUAL),
+            ],
+            deferrable=Deferrable.IMMEDIATE,
+        )
         self.assertEqual(constraint_1, constraint_1)
         self.assertEqual(constraint_1, mock.ANY)
         self.assertNotEqual(constraint_1, constraint_2)
         self.assertNotEqual(constraint_1, constraint_3)
+        self.assertNotEqual(constraint_1, constraint_4)
         self.assertNotEqual(constraint_2, constraint_3)
+        self.assertNotEqual(constraint_2, constraint_4)
+        self.assertNotEqual(constraint_4, constraint_5)
         self.assertNotEqual(constraint_1, object())
 
     def test_deconstruct(self):
@@ -221,6 +269,21 @@ class ExclusionConstraintTests(PostgreSQLTestCase):
             'name': 'exclude_overlapping',
             'expressions': [('datespan', RangeOperators.OVERLAPS), ('room', RangeOperators.EQUAL)],
             'condition': Q(cancelled=False),
+        })
+
+    def test_deconstruct_deferrable(self):
+        constraint = ExclusionConstraint(
+            name='exclude_overlapping',
+            expressions=[('datespan', RangeOperators.OVERLAPS)],
+            deferrable=Deferrable.DEFERRED,
+        )
+        path, args, kwargs = constraint.deconstruct()
+        self.assertEqual(path, 'django.contrib.postgres.constraints.ExclusionConstraint')
+        self.assertEqual(args, ())
+        self.assertEqual(kwargs, {
+            'name': 'exclude_overlapping',
+            'expressions': [('datespan', RangeOperators.OVERLAPS)],
+            'deferrable': Deferrable.DEFERRED,
         })
 
     def _test_range_overlaps(self, constraint):
@@ -325,5 +388,28 @@ class ExclusionConstraintTests(PostgreSQLTestCase):
         RangesModel.objects.create(ints=(20, 50))
         with self.assertRaises(IntegrityError), transaction.atomic():
             RangesModel.objects.create(ints=(10, 20))
+        RangesModel.objects.create(ints=(10, 19))
+        RangesModel.objects.create(ints=(51, 60))
+
+    def test_range_adjacent_initially_deferred(self):
+        constraint_name = 'ints_adjacent_deferred'
+        self.assertNotIn(constraint_name, self.get_constraints(RangesModel._meta.db_table))
+        constraint = ExclusionConstraint(
+            name=constraint_name,
+            expressions=[('ints', RangeOperators.ADJACENT_TO)],
+            deferrable=Deferrable.DEFERRED,
+        )
+        with connection.schema_editor() as editor:
+            editor.add_constraint(RangesModel, constraint)
+        self.assertIn(constraint_name, self.get_constraints(RangesModel._meta.db_table))
+        RangesModel.objects.create(ints=(20, 50))
+        adjacent_range = RangesModel.objects.create(ints=(10, 20))
+        # Constraint behavior can be changed with SET CONSTRAINTS.
+        with self.assertRaises(IntegrityError):
+            with transaction.atomic(), connection.cursor() as cursor:
+                quoted_name = connection.ops.quote_name(constraint_name)
+                cursor.execute('SET CONSTRAINTS %s IMMEDIATE' % quoted_name)
+        # Remove adjacent range before the end of transaction.
+        adjacent_range.delete()
         RangesModel.objects.create(ints=(10, 19))
         RangesModel.objects.create(ints=(51, 60))

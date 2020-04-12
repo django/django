@@ -14,7 +14,7 @@ PostgreSQL supports additional data integrity constraints available from the
 
 .. versionadded:: 3.0
 
-.. class:: ExclusionConstraint(*, name, expressions, index_type=None, condition=None)
+.. class:: ExclusionConstraint(*, name, expressions, index_type=None, condition=None, deferrable=None)
 
     Creates an exclusion constraint in the database. Internally, PostgreSQL
     implements exclusion constraints using indexes. The default index type is
@@ -75,6 +75,38 @@ a constraint to a subset of rows. For example,
 
 These conditions have the same database restrictions as
 :attr:`django.db.models.Index.condition`.
+
+``deferrable``
+--------------
+
+.. attribute:: ExclusionConstraint.deferrable
+
+.. versionadded:: 3.1
+
+Set this parameter to create a deferrable exclusion constraint. Accepted values
+are ``Deferrable.DEFERRED`` or ``Deferrable.IMMEDIATE``. For example::
+
+    from django.contrib.postgres.constraints import ExclusionConstraint
+    from django.contrib.postgres.fields import RangeOperators
+    from django.db.models import Deferrable
+
+
+    ExclusionConstraint(
+        name='exclude_overlapping_deferred',
+        expressions=[
+            ('timespan', RangeOperators.OVERLAPS),
+        ],
+        deferrable=Deferrable.DEFERRED,
+    )
+
+By default constraints are not deferred. A deferred constraint will not be
+enforced until the end of the transaction. An immediate constraint will be
+enforced immediately after every command.
+
+.. warning::
+
+    Deferred exclusion constraints may lead to a `performance penalty
+    <https://www.postgresql.org/docs/current/sql-createtable.html#id-1.9.3.85.9.4>`_.
 
 Examples
 --------

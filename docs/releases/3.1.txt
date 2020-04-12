@@ -176,6 +176,9 @@ Minor features
   :class:`~django.contrib.postgres.search.SearchRank` allows rank
   normalization.
 
+* The new :attr:`.ExclusionConstraint.deferrable` attribute allows creating
+  deferrable exclusion constraints.
+
 :mod:`django.contrib.redirects`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
