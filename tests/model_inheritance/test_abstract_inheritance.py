@@ -1,3 +1,5 @@
+from unittest import expectedFailure
+
 from django.contrib.contenttypes.fields import (
     GenericForeignKey, GenericRelation,
 )
@@ -12,77 +14,93 @@ from django.test.utils import isolate_apps
 
 @isolate_apps('model_inheritance')
 class AbstractInheritanceTests(SimpleTestCase):
+    def setUp(self):
+        self.classes = {}
+
+    def _build_class(self, model_name, base_names=None, field_len=None, abstract=False):
+        """ Util to allow whipping up a model class in one line.
+            If `field_len` is set, adds a CharField `foo` with that
+            max_length to the class.
+        """
+        attrs = {
+            '__module__': __name__,
+            'Meta': type('Meta', (object,), {'abstract': abstract})
+        }
+        if field_len is not None:
+            attrs['foo'] = models.CharField(max_length=field_len)
+        if base_names is None:
+            bases = (models.Model,)
+        else:
+            bases = tuple(self.classes[base_name] for base_name in base_names)
+        self.classes[model_name] = type(model_name, bases, attrs)
+
+    def assertCorrectInheritance(self, model_name, field_len):
+        self.assertEqual(self.classes[model_name]._meta.get_field('foo').max_length, field_len)
+
     def test_single_parent(self):
-        class AbstractBase(models.Model):
-            name = models.CharField(max_length=30)
+        """ Test multiple levels of ancestry, but with a single parent at each level.
+            NO = non-overriding, O = overriding.
+        """
+        self._build_class('AbstractBase', None, 30, abstract=True)
+        self._build_class('AbstractDescendantNO', ['AbstractBase'], abstract=True)
+        self._build_class('AbstractDescendantO', ['AbstractBase'], 40, abstract=True)
+        self._build_class('DerivedFromBaseNO', ['AbstractBase'])
+        self._build_class('DerivedFromBaseO', ['AbstractBase'], 50)
+        self._build_class('DerivedFromDescendantNONO', ['AbstractDescendantNO'])
+        self._build_class('DerivedFromDescendantNOO', ['AbstractDescendantNO'], 50)
+        self._build_class('DerivedFromDescendantONO', ['AbstractDescendantO'])
+        self._build_class('DerivedFromDescendantOO', ['AbstractDescendantO'], 50)
 
-            class Meta:
-                abstract = True
+        self.assertCorrectInheritance('DerivedFromBaseNO', 30)
+        self.assertCorrectInheritance('DerivedFromBaseO', 50)
+        self.assertCorrectInheritance('DerivedFromDescendantNONO', 30)
+        self.assertCorrectInheritance('DerivedFromDescendantNOO', 50)
+        self.assertCorrectInheritance('DerivedFromDescendantONO', 40)
+        self.assertCorrectInheritance('DerivedFromDescendantOO', 50)
 
-        class AbstractDescendant(AbstractBase):
-            name = models.CharField(max_length=50)
+    def test_multi_parent(self):
+        """ Test mro preserved when inheriting from multiple parents at once.
+            NO = non-overriding, O = overriding.
+        """
+        self._build_class('AbstractBase1', None, 30, abstract=True)
+        self._build_class('AbstractBase2', None, 40, abstract=True)
+        self._build_class('AbstractBase3', None, None, abstract=True)
+        self._build_class('DerivedFromBases12NO', ['AbstractBase1', 'AbstractBase2'])
+        self._build_class('DerivedFromBases13NO', ['AbstractBase1', 'AbstractBase3'])
+        self._build_class('DerivedFromBases32NO', ['AbstractBase3', 'AbstractBase2'])
+        self._build_class('DerivedFromBases12O', ['AbstractBase1', 'AbstractBase2'], 50)
+        self._build_class('DerivedFromBases13O', ['AbstractBase1', 'AbstractBase3'], 50)
+        self._build_class('DerivedFromBases32O', ['AbstractBase3', 'AbstractBase2'], 50)
 
-            class Meta:
-                abstract = True
+        self.assertCorrectInheritance('DerivedFromBases12NO', 30)
+        self.assertCorrectInheritance('DerivedFromBases13NO', 30)
+        self.assertCorrectInheritance('DerivedFromBases32NO', 40)
+        self.assertCorrectInheritance('DerivedFromBases12O', 50)
+        self.assertCorrectInheritance('DerivedFromBases13O', 50)
+        self.assertCorrectInheritance('DerivedFromBases32O', 50)
 
-        class DerivedChild(AbstractBase):
-            name = models.CharField(max_length=50)
+    @expectedFailure
+    def test_multi_parent_diamond(self):
+        """ Test mro preserved when inheriting from multiple parents in diamond formation.
+            NO = non-overriding, O = overriding.
 
-        class DerivedGrandChild(AbstractDescendant):
-            pass
+            NOTE: We need a rewrite of `ModelBase.__new__()` to support this properly.
+            It's marked as expected failure for now, and because we can't control
+            the inheritance the way we'd like to, we should block users from building
+            diamond cases at all, rather than testing for the converse.
+        """
+        self._build_class('AbstractBase', None, 30, abstract=True)
+        self._build_class('AbstractDescendantNO', ['AbstractBase'], abstract=True)
+        self._build_class('AbstractDescendantO', ['AbstractBase'], 40, abstract=True)
+        self._build_class('DerivedFromDescendantsNOFirstNO', ['AbstractDescendantNO', 'AbstractDescendantO'])
+        self._build_class('DerivedFromDescendantsOFirstNO', ['AbstractDescendantO', 'AbstractDescendantNO'])
+        self._build_class('DerivedFromDescendantsNOFirstO', ['AbstractDescendantNO', 'AbstractDescendantO'], 50)
+        self._build_class('DerivedFromDescendantsOFirstO', ['AbstractDescendantO', 'AbstractDescendantNO'], 50)
 
-        self.assertEqual(AbstractDescendant._meta.get_field('name').max_length, 50)
-        self.assertEqual(DerivedChild._meta.get_field('name').max_length, 50)
-        self.assertEqual(DerivedGrandChild._meta.get_field('name').max_length, 50)
-
-    def test_diamond_inheritance_mro(self):
-        class AbstractBase(models.Model):
-            name = models.CharField(max_length=30)
-
-            class Meta:
-                abstract = True
-
-        class DescendantOne(AbstractBase):
-            class Meta:
-                abstract = True
-
-        class DescendantTwo(AbstractBase):
-            name = models.CharField(max_length=50)
-
-            class Meta:
-                abstract = True
-
-        class Derived(DescendantOne, DescendantTwo):
-            pass
-
-        self.assertEqual(DescendantOne._meta.get_field('name').max_length, 30)
-        self.assertEqual(DescendantTwo._meta.get_field('name').max_length, 50)
-        self.assertEqual(Derived._meta.get_field('name').max_length, 50)
-
-    def test_multiple_inheritance_cannot_shadow_inherited_field(self):
-        class ParentA(models.Model):
-            name = models.CharField(max_length=255)
-
-            class Meta:
-                abstract = True
-
-        class ParentB(models.Model):
-            name = models.IntegerField()
-
-            class Meta:
-                abstract = True
-
-        class Child(ParentA, ParentB):
-            pass
-
-        self.assertEqual(Child.check(), [
-            Error(
-                "The field 'name' clashes with the field 'name' from model "
-                "'model_inheritance.child'.",
-                obj=Child._meta.get_field('name'),
-                id='models.E006',
-            ),
-        ])
+        self.assertCorrectInheritance('DerivedFromDescendantsNOFirstNO', 40)
+        self.assertCorrectInheritance('DerivedFromDescendantsOFirstNO', 40)
+        self.assertCorrectInheritance('DerivedFromDescendantsNOFirstO', 50)
+        self.assertCorrectInheritance('DerivedFromDescendantsOFirstO', 50)
 
     def test_multiple_inheritance_cannot_shadow_concrete_inherited_field(self):
         class ConcreteParent(models.Model):
