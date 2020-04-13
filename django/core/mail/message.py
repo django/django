@@ -1,5 +1,5 @@
 import mimetypes
-import imaplib, time
+
 from email import (
     charset as Charset, encoders as Encoders, generator, message_from_string,
 )
@@ -397,16 +397,6 @@ class EmailMessage:
                 value = ', '.join(str(v) for v in values)
             msg[header] = value
 
-    def copy(self):
-        """
-        makes a copy of the email in sender's sent folder
-        """
-        message = str(self.message())
-        imap = imaplib.IMAP4(settings.EMAIL_HOST)
-        imap.starttls()
-        imap.login(settings.EMAIL_HOST_USER, settings.EMAIL_HOST_PASSWORD)
-        imap.append('INBOX.Sent', '\\SEEN', imaplib.Time2Internaldate(time.time()), message.encode())  
-        imap.logout() 
 
 class EmailMultiAlternatives(EmailMessage):
     """
