@@ -35,6 +35,30 @@ class AbstractInheritanceTests(SimpleTestCase):
         self.assertEqual(DerivedChild._meta.get_field('name').max_length, 50)
         self.assertEqual(DerivedGrandChild._meta.get_field('name').max_length, 50)
 
+    def test_diamond_inheritance_mro(self):
+        class AbstractBase(models.Model):
+            name = models.CharField(max_length=30)
+
+            class Meta:
+                abstract = True
+
+        class DescendantOne(AbstractBase):
+            class Meta:
+                abstract = True
+
+        class DescendantTwo(AbstractBase):
+            name = models.CharField(max_length=50)
+
+            class Meta:
+                abstract = True
+
+        class Derived(DescendantOne, DescendantTwo):
+            pass
+
+        self.assertEqual(DescendantOne._meta.get_field('name').max_length, 30)
+        self.assertEqual(DescendantTwo._meta.get_field('name').max_length, 50)
+        self.assertEqual(Derived._meta.get_field('name').max_length, 50)
+
     def test_multiple_inheritance_cannot_shadow_inherited_field(self):
         class ParentA(models.Model):
             name = models.CharField(max_length=255)
