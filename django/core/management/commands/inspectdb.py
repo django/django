@@ -378,8 +378,9 @@ class Command(BaseCommand):
         to the given database table name.
         """
         unique_together = []
+        indexes = []
         has_unsupported_constraint = False
-        for params in constraints.values():
+        for name, params in constraints.items():
             if params["unique"]:
                 columns = params["columns"]
                 if None in columns:
@@ -391,6 +392,10 @@ class Command(BaseCommand):
                     unique_together.append(
                         str(tuple(column_to_field_name[c] for c in columns))
                     )
+            elif params["index"]:
+                columns = params["columns"]
+                field_names = [column_to_field_name[c] for c in columns]
+                indexes.append(f"models.Index(fields={field_names!r}, name={name!r})")
         if is_view:
             managed_comment = "  # Created from a view. Don't remove."
         elif is_partition:
@@ -410,4 +415,6 @@ class Command(BaseCommand):
             meta += ["        unique_together = %s" % tup]
         if comment:
             meta += [f"        db_table_comment = {comment!r}"]
+        if indexes:
+            meta += [f'        indexes = ({", ".join(indexes)})']
         return meta
