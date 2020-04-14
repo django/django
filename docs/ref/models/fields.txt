@@ -351,6 +351,13 @@ looking at your Django code. For example::
 
 If ``True``, a database index will be created for this field.
 
+.. admonition:: Use the :attr:`~Options.indexes` option instead.
+
+    Where possible, use the :attr:`Meta.indexes <Options.indexes>` option
+    instead. In nearly all cases, :attr:`~Options.indexes` provides more
+    functionality than ``db_index``. ``db_index`` may be deprecated in the
+    future.
+
 ``db_tablespace``
 -----------------
 
