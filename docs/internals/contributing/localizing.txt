@@ -46,11 +46,12 @@ translating or add a language that isn't yet translated, here's what to do:
      `Transifex User Guide`_.
 
 Translations from Transifex are only integrated into the Django repository at
-the time of a new :term:`feature release`. We try to update them a second time
-during one of the following :term:`patch release`\s, but that depends on the
-translation manager's availability. So don't miss the string freeze period
-(between the release candidate and the feature release) to take the opportunity
-to complete and fix the translations for your language!
+the time of a new :term:`feature release <Feature release>`. We try to update
+them a second time during one of the following :term:`patch release
+<Patch release>`\s, but that depends on the translation manager's availability.
+So don't miss the string freeze period (between the release candidate and the
+feature release) to take the opportunity to complete and fix the translations
+for your language!
 
 Formats
 =======
