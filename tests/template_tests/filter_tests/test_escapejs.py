@@ -45,6 +45,12 @@ class FunctionTests(SimpleTestCase):
             '\\u003Cscript\\u003Eand this\\u003C/script\\u003E',
         )
 
+    def test_comments(self):
+        self.assertEqual(
+            escapejs_filter('/* some comments */'),
+            '\\u002F\\u002A some comments \\u002A\\u002F',
+        )
+
     def test_paragraph_separator(self):
         self.assertEqual(
             escapejs_filter('paragraph separator:\u2029and line separator:\u2028'),
