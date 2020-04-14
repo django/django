@@ -104,6 +104,22 @@ class PostgreSqlDbshellCommandTestCase(SimpleTestCase):
             )
         )
 
+    def test_options(self):
+        options = '-c default_text_search_config=simple'
+        self.assertEqual(
+            self._run_it({
+                'database': 'dbname',
+                'user': 'someuser',
+                'password': 'somepassword',
+                'host': 'somehost',
+                'port': '444',
+                'options': options,
+            }), (
+                ['psql', '-U', 'someuser', '-h', 'somehost', '-p', '444', 'dbname'],
+                {'PGOPTIONS': options},
+            )
+        )
+
     def test_sigint_handler(self):
         """SIGINT is ignored in Python and passed to psql to abort queries."""
         def _mock_subprocess_run(*args, **kwargs):
