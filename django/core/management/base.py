@@ -326,8 +326,8 @@ class BaseCommand:
         handle_default_options(options)
         try:
             self.execute(*args, **cmd_options)
-        except Exception as e:
-            if options.traceback or not isinstance(e, CommandError):
+        except CommandError as e:
+            if options.traceback:
                 raise
 
             # SystemCheckError takes care of its own formatting.
