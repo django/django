@@ -317,6 +317,9 @@ Management Commands
   :attr:`~django.core.management.CommandError` allows customizing the exit
   status for management commands.
 
+* The new :option:`dbshell -- ARGUMENTS <dbshell -->` option allows passing
+  extra arguments to the command-line client for the database.
+
 Migrations
 ~~~~~~~~~~
 
@@ -504,6 +507,9 @@ backends.
   ``connection._nodb_cursor()`` method and now returns a context manager that
   yields a cursor and automatically closes the cursor and connection upon
   exiting the ``with`` statement.
+
+* ``DatabaseClient.runshell()`` now requires an additional ``parameters``
+  argument as a list of extra arguments to pass on to the command-line client.
 
 Dropped support for MariaDB 10.1
 --------------------------------
