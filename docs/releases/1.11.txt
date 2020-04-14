@@ -15,9 +15,10 @@ want to be aware of when upgrading from Django 1.10 or older versions. We've
 See the :doc:`/howto/upgrade-version` guide if you're updating an existing
 project.
 
-Django 1.11 is designated as a :term:`long-term support release`. It will
-receive security updates for at least three years after its release. Support
-for the previous LTS, Django 1.8, will end in April 2018.
+Django 1.11 is designated as a :term:`long-term support release
+<Long-term support release>`. It will receive security updates for at least
+three years after its release. Support for the previous LTS, Django 1.8, will
+end in April 2018.
 
 Python compatibility
 ====================
