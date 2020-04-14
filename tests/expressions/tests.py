@@ -321,6 +321,17 @@ class BasicExpressionsTests(TestCase):
         queryset = Employee.objects.filter(firstname__iexact=F('lastname'))
         self.assertQuerysetEqual(queryset, ["<Employee: Test test>"])
 
+    def test_regex_f_expression(self):
+        e0 = Employee.objects.create(firstname="John", lastname="John")
+        e1 = Employee.objects.create(firstname="John", lastname="n$")
+        e2 = Employee.objects.create(firstname="John", lastname="^J")
+        e3 = Employee.objects.create(firstname="John", lastname="^j")
+        e4 = Employee.objects.create(firstname="Test", lastname="test")
+        queryset = Employee.objects.filter(firstname__regex=F('lastname'))
+        self.assertCountEqual(queryset, [e0, e1, e2])
+        queryset = Employee.objects.filter(firstname__iregex=F('lastname'))
+        self.assertCountEqual(queryset, [e0, e1, e2, e3, e4])
+
     def test_ticket_16731_startswith_lookup(self):
         Employee.objects.create(firstname="John", lastname="Doe")
         e2 = Employee.objects.create(firstname="Jack", lastname="Jackson")
