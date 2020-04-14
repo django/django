@@ -194,8 +194,8 @@ Differences between versions
 The text documentation in the master branch of the Git repository contains the
 "latest and greatest" changes and additions. These changes include
 documentation of new features targeted for Django's next :term:`feature
-release`. For that reason, it's worth pointing out our policy to highlight
-recent changes and additions to Django.
+release <Feature release>`. For that reason, it's worth pointing out our policy
+to highlight recent changes and additions to Django.
 
 We follow this policy:
 
