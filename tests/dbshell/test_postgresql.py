@@ -110,7 +110,6 @@ class PostgreSqlDbshellCommandTestCase(SimpleTestCase):
             self._run_it({
                 'database': 'dbname',
                 'user': 'someuser',
-                'password': 'somepassword',
                 'host': 'somehost',
                 'port': '444',
                 'options': options,
