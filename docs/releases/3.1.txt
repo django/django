@@ -313,6 +313,10 @@ Management Commands
 * The new :option:`migrate --check` option makes the command exit with a
   non-zero status when unapplied migrations are detected.
 
+* The new ``returncode`` argument for
+  :attr:`~django.core.management.CommandError` allows customizing the exit
+  status for management commands.
+
 Migrations
 ~~~~~~~~~~
 
