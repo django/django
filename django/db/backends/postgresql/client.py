@@ -15,6 +15,7 @@ class DatabaseClient(BaseDatabaseClient):
         host = conn_params.get('host', '')
         port = conn_params.get('port', '')
         dbname = conn_params.get('database', '')
+        options = conn_params.get('options', '')
         user = conn_params.get('user', '')
         passwd = conn_params.get('password', '')
         sslmode = conn_params.get('sslmode', '')
@@ -32,6 +33,8 @@ class DatabaseClient(BaseDatabaseClient):
 
         sigint_handler = signal.getsignal(signal.SIGINT)
         subprocess_env = os.environ.copy()
+        if options:
+            subprocess_env['PGOPTIONS'] = str(options)
         if passwd:
             subprocess_env['PGPASSWORD'] = str(passwd)
         if sslmode:
