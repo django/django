@@ -336,7 +336,12 @@ once::
 
 .. django-admin-option:: --database DATABASE
 
-Specifies the database from which data will be dumped. Defaults to ``default``.
+Specifies the database from which data will be dumped. Defaults to
+:meth:`db_for_read`.
+
+.. versionchanged:: 3.1
+
+    default changed from ``default`` to :meth:`db_for_read`.
 
 .. django-admin-option:: --natural-foreign
 

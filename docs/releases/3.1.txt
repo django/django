@@ -320,6 +320,8 @@ Management Commands
 * The new :option:`dbshell -- ARGUMENTS <dbshell -->` option allows passing
   extra arguments to the command-line client for the database.
 
+* The default for :option:`dumpdata --database` changed to :meth:`db_for_read`.
+
 Migrations
 ~~~~~~~~~~
 

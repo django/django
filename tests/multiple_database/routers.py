@@ -56,3 +56,8 @@ class WriteRouter:
     # A router that only expresses an opinion on writes
     def db_for_write(self, model, **hints):
         return 'writer'
+
+
+class DumpdataRouter:
+    def db_for_read(self, model, **hints):
+        return 'other'

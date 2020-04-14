@@ -13,7 +13,7 @@ from django.db.utils import ConnectionRouter
 from django.test import SimpleTestCase, TestCase, override_settings
 
 from .models import Book, Person, Pet, Review, UserProfile
-from .routers import AuthRouter, TestRouter, WriteRouter
+from .routers import AuthRouter, DumpdataRouter, TestRouter, WriteRouter
 
 
 class QueryTestCase(TestCase):
@@ -2107,3 +2107,29 @@ class RelationAssignmentTests(SimpleTestCase):
         profile = UserProfile()
         with self.assertRaisesMessage(ValueError, self.router_prevents_msg):
             user.userprofile = profile
+
+
+@override_settings(DATABASE_ROUTERS=[DumpdataRouter()])
+class DumpdataTestCase(TestCase):
+    databases = {'default', 'other'}
+
+    def test_dumpdata(self):
+        Person.objects.using('other').create(name="Mark Pilgrim")
+
+        out = StringIO()
+        management.call_command('dumpdata', 'multiple_database.person', database='default', stdout=out)
+        self.assertEqual(out.getvalue().strip(), '[]')
+
+        out = StringIO()
+        management.call_command('dumpdata', 'multiple_database.person', database='other', stdout=out)
+        self.assertEqual(
+            out.getvalue().strip(),
+            '[{"model": "multiple_database.person", "pk": 1, "fields": {"name": "Mark Pilgrim"}}]',
+        )
+
+        out = StringIO()
+        management.call_command('dumpdata', 'multiple_database.person', stdout=out)
+        self.assertEqual(
+            out.getvalue().strip(),
+            '[{"model": "multiple_database.person", "pk": 1, "fields": {"name": "Mark Pilgrim"}}]',
+        )

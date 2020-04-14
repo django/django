@@ -4,7 +4,7 @@ from django.apps import apps
 from django.core import serializers
 from django.core.management.base import BaseCommand, CommandError
 from django.core.management.utils import parse_apps_and_model_labels
-from django.db import DEFAULT_DB_ALIAS, router
+from django.db import router
 
 
 class ProxyModelWarning(Warning):
@@ -32,7 +32,7 @@ class Command(BaseCommand):
         )
         parser.add_argument(
             '--database',
-            default=DEFAULT_DB_ALIAS,
+            default=None,
             help='Nominates a specific database to dump fixtures from. '
                  'Defaults to the "default" database.',
         )
@@ -163,13 +163,16 @@ class Command(BaseCommand):
                         "%s is a proxy model and won't be serialized." % model._meta.label,
                         category=ProxyModelWarning,
                     )
-                if not model._meta.proxy and router.allow_migrate_model(using, model):
+                _using = using
+                if _using is None:
+                    _using = router.db_for_read(model)
+                if not model._meta.proxy and router.allow_migrate_model(_using, model):
                     if use_base_manager:
                         objects = model._base_manager
                     else:
                         objects = model._default_manager
 
-                    queryset = objects.using(using).order_by(model._meta.pk.name)
+                    queryset = objects.using(_using).order_by(model._meta.pk.name)
                     if primary_keys:
                         queryset = queryset.filter(pk__in=primary_keys)
                     if count_only:
