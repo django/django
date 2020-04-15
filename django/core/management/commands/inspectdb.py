@@ -406,7 +406,7 @@ class Command(BaseCommand):
                 comment = ""
                 if params["type"] not in ["btree", Index.suffix]:
                     comment = f'Index type is {params["type"]}'
-                if params["type"] == "rtree" and len(columns) == 1:
+                if params["type"] in ["rtree", "spatial"] and len(columns) == 1:
                     # assume this is a default spatial index, so let's make a note of it and
                     # continue
                     index_comments.append(
