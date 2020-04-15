@@ -124,6 +124,7 @@ form {
 
 fieldset {
     margin: 0;
+    min-width: 0;
     padding: 0;
     border: none;
     border-top: 1px solid #eee;
@@ -141,6 +142,7 @@ code, pre {
     font-family: "Bitstream Vera Sans Mono", Monaco, "Courier New", Courier, monospace;
     color: #666;
     font-size: 12px;
+    overflow-x: auto;
 }
 
 pre.literal-block {
