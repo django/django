@@ -400,7 +400,7 @@ class RawSearchQuery(SearchQueryCombinable, Expression):
         return resolved
 
     def as_sql(self, compiler, connection):
-        sql, params, = compiler.compile(self.expressions, connection)
+        sql, params, = compiler.compile(self.expressions)
         if self.config:
             config_sql, config_params = compiler.compile(self.config)
             template = 'to_tsquery({}::regconfig, {})'.format(config_sql, sql)
