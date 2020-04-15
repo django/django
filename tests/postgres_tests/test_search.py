@@ -703,10 +703,26 @@ class TestRawSearchQuery(GrailTestData, PostgreSQLTestCase):
         )
         self.assertCountEqual(searched, [self.verse1, self.verse2, self.verse0])
 
+    def test_advanced(self):
+        # Test cominbation of & and |
+        # This is mainly helpful for checking the test_advanced_invert below
+        searched = Line.objects.filter(
+            dialogue__search=RawSearchQuery(Lexeme('shall') & Lexeme('use') & Lexeme('larger') | Lexeme('nostrils'))
+        )
+        self.assertCountEqual(searched, [self.bedemir0, self.verse2])
+
     def test_invert(self):
-        # TODO `~Lexeme` syntax
-        searched = Line.objects.filter(character=self.minstrel, dialogue__search=RawSearchQuery(Lexeme('kneecaps', invert=True)))
+        searched = Line.objects.filter(character=self.minstrel, dialogue__search=RawSearchQuery(~Lexeme('kneecaps')))
         self.assertCountEqual(searched, [self.verse0, self.verse2])
+
+    def test_advanced_invert(self):
+        # Test inverting a query that uses a cominbation of & and |
+        # Should return the opposite of test_advanced
+        searched = Line.objects.filter(
+            dialogue__search=RawSearchQuery(~(Lexeme('shall') & Lexeme('use') & Lexeme('larger') | Lexeme('nostrils')))
+        )
+        expected_result = Line.objects.exclude(id__in=[self.bedemir0.id, self.verse2.id])
+        self.assertCountEqual(searched, expected_result)
 
     def test_as_sql(self):
         query = Line.objects.all().query
@@ -715,10 +731,12 @@ class TestRawSearchQuery(GrailTestData, PostgreSQLTestCase):
         tests = (
             (Lexeme('a'), '%s', ["'a'"]),
             (Lexeme('a', invert=True), '%s', ["!'a'"]),
+            (~Lexeme('a'), '%s', ["!'a'"]),
             (Lexeme('a', prefix=True), '%s', ["'a':*"]),
             (Lexeme('a', weight='D'), '%s', ["'a':D"]),
             (Lexeme('a', invert=True, prefix=True, weight='D'), '%s', ["!'a':*D"]),
-            (Lexeme('a') | Lexeme('b') & Lexeme('c'), '%s', ["('a' | ('b' & 'c'))"]),
+            (Lexeme('a') | Lexeme('b') & ~Lexeme('c'), '%s', ["('a' | ('b' & !'c'))"]),
+            (~(Lexeme('a') | Lexeme('b') & ~Lexeme('c')), '%s', ["(!'a' & (!'b' | 'c'))"]),
 
             # Some escaping tests
             (Lexeme("L'amour piqué par une abeille"), '%s', ["'L''amour piqué par une abeille'"]),

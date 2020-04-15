@@ -358,6 +358,9 @@ class Lexeme(LexemeCombinable, Value):
         params = [param]
         return template, params
 
+    def __invert__(self):
+        return type(self)(self.value, invert=not self.invert, prefix=self.prefix, weight=self.weight)
+
 
 class CombinedLexeme(LexemeCombinable):
     _output_field = SearchQueryField()
@@ -379,6 +382,11 @@ class CombinedLexeme(LexemeCombinable):
         combined_sql = '({} {} {})'.format(lsql, self.connector, rsql)
         combined_value = combined_sql % tuple(value_params)
         return '%s', [combined_value]
+
+    def __invert__(self):
+        # Swap the connector and invert the lhs and rhs.
+        # This generates a query that's equvilant to what we expect (thanks to De Morgan's theorem)
+        return type(self)(~self.lhs, self.BITAND if self.connector == self.BITOR else self.BITOR, ~self.rhs)
 
 
 class RawSearchQuery(SearchQueryCombinable, Expression):
