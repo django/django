@@ -3,6 +3,7 @@ import re
 
 from django.core.management.base import BaseCommand, CommandError
 from django.db import DEFAULT_DB_ALIAS, connections
+from django.db.models.indexes import Index
 from django.db.models.constants import LOOKUP_SEP
 
 
@@ -401,7 +402,7 @@ class Command(BaseCommand):
                     for column, order in zip(columns, orders)
                 ]
                 index_str = f"models.Index(fields={field_names!r}, name={name!r})"
-                if params["type"] != "btree":
+                if params["type"] not in ["btree", Index.suffix]:
                     index_str += f'  # Index type is {params["type"]}'
                 indexes.append(index_str)
         if is_view:
