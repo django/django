@@ -416,7 +416,7 @@ class InspectDBTestCase(TestCase):
         self.assertIn("['field2', '-from_field']", output)
 
     @skipIfDBFeature("supports_index_column_ordering")
-    def test_indexes(self):
+    def test_indexes_no_order(self):
         out = StringIO()
         call_command("inspectdb", "inspectdb_indexes", stdout=out)
         output = out.getvalue()
