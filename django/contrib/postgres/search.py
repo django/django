@@ -167,6 +167,9 @@ class SearchQuery(SearchQueryCombinable, Func):
     }
 
     def __init__(self, value, output_field=None, *, config=None, invert=False, search_type='plain'):
+        if isinstance(value, LexemeCombinable):
+            search_type = 'raw'
+
         self.function = self.SEARCH_TYPES.get(search_type)
         if self.function is None:
             raise ValueError("Unknown search_type argument '%s'." % search_type)
@@ -387,42 +390,3 @@ class CombinedLexeme(LexemeCombinable):
         # Swap the connector and invert the lhs and rhs.
         # This generates a query that's equvilant to what we expect (thanks to De Morgan's theorem)
         return type(self)(~self.lhs, self.BITAND if self.connector == self.BITOR else self.BITOR, ~self.rhs)
-
-
-class RawSearchQuery(SearchQueryCombinable, Expression):
-    _output_field = SearchQueryField()
-
-    def __init__(self, expressions, output_field=None, *, config=None, invert=False):
-        self.config = config
-        self.invert = invert
-        self.expressions = expressions
-        super().__init__(output_field=output_field)
-
-    def resolve_expression(self, query=None, allow_joins=True, reuse=None, summarize=False, for_save=False):
-        resolved = super().resolve_expression(query, allow_joins, reuse, summarize, for_save)
-        if self.config:
-            if not hasattr(self.config, 'resolve_expression'):
-                resolved.config = Value(self.config).resolve_expression(query, allow_joins, reuse, summarize, for_save)
-            else:
-                resolved.config = self.config.resolve_expression(query, allow_joins, reuse, summarize, for_save)
-        return resolved
-
-    def as_sql(self, compiler, connection):
-        sql, params, = compiler.compile(self.expressions)
-        if self.config:
-            config_sql, config_params = compiler.compile(self.config)
-            template = 'to_tsquery({}::regconfig, {})'.format(config_sql, sql)
-            params = params + config_params
-        else:
-            template = 'to_tsquery({})'.format(sql)
-        if self.invert:
-            template = '!!({})'.format(template)
-        return template, params
-
-    def _combine(self, other, connector, reversed, node=None):
-        combined = super()._combine(other, connector, reversed, node)
-        combined.output_field = SearchQueryField()
-        return combined
-
-    def __invert__(self):
-        return type(self)(self.lexeme, config=self.config, invert=not self.invert)
