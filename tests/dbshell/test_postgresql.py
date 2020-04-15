@@ -120,6 +120,7 @@ class PostgreSqlDbshellCommandTestCase(SimpleTestCase):
                 ['psql', '-U', 'someuser', '-h', 'somehost', '-p', '444', 'dbname'],
                 {'PGOPTIONS': options},
             )
+        )
 
     def test_parameters(self):
         self.assertEqual(
