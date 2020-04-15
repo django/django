@@ -137,6 +137,10 @@ class Lookup:
     def contains_over_clause(self):
         return self.lhs.contains_over_clause or getattr(self.rhs, 'contains_over_clause', False)
 
+    @cached_property
+    def contains_outer_ref(self):
+        return self.lhs.contains_outer_ref or getattr(self.rhs, 'contains_outer_ref', False)
+
     @property
     def is_summary(self):
         return self.lhs.is_summary or getattr(self.rhs, 'is_summary', False)

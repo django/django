@@ -35,7 +35,18 @@ class WhereNode(tree.Node):
         should be included in the WHERE clause and one for those parts of
         self that must be included in the HAVING clause.
         """
-        if not self.contains_aggregate:
+        return self.split_on_condition('contains_aggregate', negated)
+
+    def split_on(self):
+        """
+        Return two possibly None nodes: one for those parts of self that
+        should be included in the WHERE clause and one for those parts of
+        self that must be included in the ON clause.
+        """
+        return self.split_on_condition('contains_outer_ref')
+
+    def split_on_condition(self, condition, negated=False):
+        if not getattr(self, condition):
             return self, None
         in_negated = negated ^ self.negated
         # If the effective connector is OR and this node contains an aggregate,
@@ -43,24 +54,24 @@ class WhereNode(tree.Node):
         may_need_split = (
             (in_negated and self.connector == AND) or
             (not in_negated and self.connector == OR))
-        if may_need_split and self.contains_aggregate:
+        if may_need_split and getattr(self, condition):
             return None, self
         where_parts = []
-        having_parts = []
+        other_parts = []
         for c in self.children:
-            if hasattr(c, 'split_having'):
-                where_part, having_part = c.split_having(in_negated)
+            if hasattr(c, 'split_on_condition'):
+                where_part, other_part = c.split_on_condition(condition, in_negated)
                 if where_part is not None:
                     where_parts.append(where_part)
-                if having_part is not None:
-                    having_parts.append(having_part)
-            elif c.contains_aggregate:
-                having_parts.append(c)
+                if other_part is not None:
+                    other_parts.append(other_part)
+            elif getattr(c, condition):
+                other_parts.append(c)
             else:
                 where_parts.append(c)
-        having_node = self.__class__(having_parts, self.connector, self.negated) if having_parts else None
+        other_node = self.__class__(other_parts, self.connector, self.negated) if other_parts else None
         where_node = self.__class__(where_parts, self.connector, self.negated) if where_parts else None
-        return where_node, having_node
+        return where_node, other_node
 
     def as_sql(self, compiler, connection):
         """
@@ -178,6 +189,16 @@ class WhereNode(tree.Node):
     @cached_property
     def contains_over_clause(self):
         return self._contains_over_clause(self)
+
+    @classmethod
+    def _contains_outer_ref(cls, obj):
+        if isinstance(obj, tree.Node):
+            return any(cls._contains_outer_ref(c) for c in obj.children)
+        return obj.contains_outer_ref
+
+    @cached_property
+    def contains_outer_ref(self):
+        return self._contains_outer_ref(self)
 
     @property
     def is_summary(self):

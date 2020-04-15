@@ -23,7 +23,7 @@ from django.core.exceptions import (
 from django.db import DEFAULT_DB_ALIAS, NotSupportedError, connections
 from django.db.models.aggregates import Count
 from django.db.models.constants import LOOKUP_SEP
-from django.db.models.expressions import BaseExpression, Col, F, OuterRef, Ref
+from django.db.models.expressions import BaseExpression, Col, F, OuterRef, Ref, AliasedRef
 from django.db.models.fields import Field
 from django.db.models.fields.related_lookups import MultiColSource
 from django.db.models.lookups import Lookup
@@ -33,6 +33,7 @@ from django.db.models.query_utils import (
 from django.db.models.sql.constants import INNER, LOUTER, ORDER_DIR, SINGLE
 from django.db.models.sql.datastructures import (
     BaseTable, Empty, Join, MultiJoin,
+    SubqueryJoin,
 )
 from django.db.models.sql.where import (
     AND, OR, ExtraWhere, NothingNode, WhereNode,
@@ -1655,6 +1656,37 @@ class Query(BaseExpression):
     def _gen_col_aliases(cls, exprs):
         yield from (expr.alias for expr in cls._gen_cols(exprs))
 
+    def add_subquery_join(self, subquery, alias):
+        def resolve_all(child):
+            if hasattr(child, 'children'):
+                [resolve_all(_child) for _child in child.children]
+            if hasattr(child, 'rhs'):
+                child.rhs = resolve(child.rhs)
+            if hasattr(child, 'lhs'):
+                child.lhs = query.get_aliased_ref(child.lhs, alias)
+
+        def resolve(child):
+            if hasattr(child, 'resolve_expression'):
+                resolved = child.resolve_expression(query=self)
+                return resolved
+            return child
+
+        subquery = subquery.copy()
+        query = subquery.query
+        query.subquery = True
+
+        where_clause, on_clause = query.where.split_on()
+        query.where = where_clause or WhereNode()
+
+        if on_clause:
+            # We are going to change the on_clause, so make a copy
+            on_clause = on_clause.clone()
+            resolve_all(on_clause)
+
+        join_type = subquery.join_type or LOUTER
+        join = SubqueryJoin(subquery, self.get_initial_alias(), on_clause, join_type, alias, alias)
+        self.join(join)
+
     def resolve_ref(self, name, allow_joins=True, reuse=None, summarize=False):
         if not allow_joins and LOOKUP_SEP in name:
             raise FieldError("Joined field references are not permitted in this query")
@@ -1677,6 +1709,15 @@ class Query(BaseExpression):
                 return annotation
         else:
             field_list = name.split(LOOKUP_SEP)
+
+            # Check whether name refers to the joined Subquery
+            start, *remaining_path = field_list
+            join = self.alias_map.get(start)
+            if isinstance(join, SubqueryJoin):
+                subquery: Query = join.subquery.query
+                resolved = subquery.resolve_ref(LOOKUP_SEP.join(remaining_path))
+                return subquery.get_aliased_ref(resolved, join.table_alias)
+
             join_info = self.setup_joins(field_list, self.get_meta(), self.get_initial_alias(), can_reuse=reuse)
             targets, final_alias, join_list = self.trim_joins(join_info.targets, join_info.joins, join_info.path)
             if not allow_joins and len(join_list) > 1:
@@ -1690,6 +1731,26 @@ class Query(BaseExpression):
             if reuse is not None:
                 reuse.update(join_list)
             return self._get_col(targets[0], join_info.targets[0], join_list[-1])
+
+    def get_aliased_ref(self, expression, alias):
+        # We must make sure the joined subquery has the referred columns in it.
+        # There is no guarantee the column is in the select clause
+        # of the query. Thus we must manually add the column to the subquery.
+        if expression in self.annotation_select.values():
+            name = next(
+                name for name, annotation in self.annotation_select.items()
+                if annotation == expression
+            )
+        else:
+            col_cnt = 1
+            name = '__col%d' % col_cnt
+            while name in self.annotations:
+                col_cnt += 1
+                name = '__col%d' % col_cnt
+
+            self.add_annotation(expression, name)
+
+        return AliasedRef(name, self.annotations[name], alias)
 
     def split_exclude(self, filter_expr, can_reuse, names_with_path):
         """
@@ -1952,6 +2013,8 @@ class Query(BaseExpression):
             column_names = set()
             seen_models = set()
             for join in list(self.alias_map.values())[1:]:  # Skip base table.
+                if isinstance(join, SubqueryJoin):
+                    continue
                 model = join.join_field.related_model
                 if model not in seen_models:
                     column_names.update({

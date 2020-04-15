@@ -166,3 +166,47 @@ class BaseTable:
             self.table_name == other.table_name and
             self.table_alias == other.table_alias
         )
+
+
+class SubqueryJoin:
+    filtered_relation = None
+
+    def __init__(self, subquery, parent_alias, on_clause, join_type, table_name, table_alias):
+        self.subquery = subquery
+        self.parent_alias = parent_alias
+        self.on_clause = on_clause
+        self.join_type = join_type
+        self.table_name = table_name
+        self.table_alias = table_alias
+
+    @property
+    def nullable(self):
+        return self.join_type != INNER
+
+    def as_sql(self, compiler, connection):
+        subquery_sql, subquery_params = self.subquery.as_sql(compiler, connection)
+
+        qn = compiler.quote_name_unless_alias
+        sql = '%s %s %s' % (
+            self.join_type,
+            subquery_sql,
+            qn(self.table_alias),
+        )
+        params = list(subquery_params)
+
+        if self.on_clause:
+            on_clause_sql, on_clause_params = self.on_clause.as_sql(compiler, connection)
+            sql = '%s ON %s' % (sql, on_clause_sql)
+            params.extend(on_clause_params)
+
+        return sql, params
+
+    def relabeled_clone(self, change_map):
+        return self.__class__(
+            subquery=self.subquery.copy(),
+            parent_alias=change_map.get(self.parent_alias, self.parent_alias),
+            on_clause=self.on_clause.relabeled_clone(change_map),
+            join_type=self.join_type,
+            table_name=self.table_name,
+            table_alias=change_map.get(self.table_alias, self.table_alias),
+        )

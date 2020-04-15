@@ -18,7 +18,7 @@ from django.db import (
 from django.db.models import AutoField, DateField, DateTimeField, sql
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.deletion import Collector
-from django.db.models.expressions import Case, Expression, F, Value, When
+from django.db.models.expressions import Case, Expression, F, Value, When, Subquery
 from django.db.models.functions import Cast, Trunc
 from django.db.models.query_utils import FilteredRelation, Q
 from django.db.models.sql.constants import CURSOR, GET_ITERATOR_CHUNK_SIZE
@@ -1098,6 +1098,10 @@ class QuerySet:
                                  "the model." % alias)
             if isinstance(annotation, FilteredRelation):
                 clone.query.add_filtered_relation(annotation, alias)
+            elif isinstance(annotation, Subquery) and annotation.join:
+                if alias in clone.query.alias_map:
+                    raise ValueError("The join '%s' conflicts with the alias for existing join." % alias)
+                clone.query.add_subquery_join(annotation, alias)
             else:
                 clone.query.add_annotation(annotation, alias, is_summary=False)
 

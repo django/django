@@ -229,6 +229,10 @@ class BaseExpression:
     def contains_column_references(self):
         return any(expr and expr.contains_column_references for expr in self.get_source_expressions())
 
+    @cached_property
+    def contains_outer_ref(self):
+        return any(expr and expr.contains_outer_ref for expr in self.get_source_expressions())
+
     def resolve_expression(self, query=None, allow_joins=True, reuse=None, summarize=False, for_save=False):
         """
         Provide the chance to do any preprocessing or validation before being
@@ -557,6 +561,7 @@ class ResolvedOuterRef(F):
     the inner query has been used as a subquery.
     """
     contains_aggregate = False
+    contains_outer_ref = True
 
     def as_sql(self, *args, **kwargs):
         raise ValueError(
@@ -580,6 +585,8 @@ class ResolvedOuterRef(F):
 
 
 class OuterRef(F):
+    contains_outer_ref = True
+
     def resolve_expression(self, *args, **kwargs):
         if isinstance(self.name, self.__class__):
             return self.name
@@ -830,6 +837,24 @@ class Ref(Expression):
         return [self]
 
 
+class AliasedRef(Ref):
+    def __init__(self, refs, source, table_alias):
+        super().__init__(refs, source)
+        self.table_alias = table_alias
+
+    def as_sql(self, compiler, connection):
+        sql, params = super().as_sql(compiler, connection)
+        qn = compiler.quote_name_unless_alias
+        return '%s.%s' % (qn(self.table_alias), sql), params
+
+    def relabeled_clone(self, change_map):
+        return self.__class__(
+            refs=self.refs,
+            source=self.source,
+            table_alias=change_map.get(self.table_alias, self.table_alias)
+        )
+
+
 class ExpressionList(Func):
     """
     An expression containing multiple expressions. Can be used to provide a
@@ -1018,9 +1043,11 @@ class Subquery(Expression):
     template = '(%(subquery)s)'
     contains_aggregate = False
 
-    def __init__(self, queryset, output_field=None, **extra):
+    def __init__(self, queryset, output_field=None, join=False, join_type=None, **extra):
         self.query = queryset.query
         self.extra = extra
+        self.join = join
+        self.join_type = join_type
         super().__init__(output_field)
 
     def __getstate__(self):
