@@ -44,7 +44,7 @@ class Command(BaseCommand):
             except ImportError:
                 pass
 
-        sql_list = sql_flush(self.style, connection, only_django=True,
+        sql_list = sql_flush(self.style, connection,
                              reset_sequences=reset_sequences,
                              allow_cascade=allow_cascade)
 
