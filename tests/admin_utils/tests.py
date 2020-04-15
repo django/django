@@ -24,7 +24,7 @@ class NestedObjectsTests(TestCase):
     """
     def setUp(self):
         self.n = NestedObjects(using=DEFAULT_DB_ALIAS)
-        self.objs = [Count.objects.create(num=i) for i in range(5)]
+        self.objs = [Count.objects.create(id=i, num=i) for i in range(5)]
 
     def _check(self, target):
         self.assertEqual(self.n.nested(lambda obj: obj.num), target)
