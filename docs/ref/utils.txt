@@ -773,6 +773,48 @@ escaping HTML.
     Decodes a base64 encoded string, adding back any trailing equal signs that
     might have been stripped.
 
+``django.utils.jwt``
+=====================
+
+.. module:: django.utils.jwt
+   :synopsis: a class utility to handle HS256 JWTs.
+
+.. versionadded:: 3.1
+
+.. class:: JWTFactory
+
+    A factory class able to generate and decode ``HS256``
+    :rfc:`JSON Web Tokens <7519>` (JWT). ``HS256`` tokens are signed but *not*
+    encrypted. For any other type of JWTs which need more advanced cryptography,
+    use other third-party libraries like `PyJWT`_.
+
+    .. method:: __init__(secret=None)
+
+        Create a ``JWTFactory`` instance with an optional ``secret`` parameter.
+        If left ``None``, the secret will be the project's :setting:`SECRET_KEY`.
+
+    .. method:: make_token(payload, valid_for=None)
+
+        Create a new signed token containing the ``payload`` which should be a
+        ``dict`` containing the token claims, with keys being either standard
+        registered claims or any other custom claim of your choice.
+        If you don't provide a ``iat`` claim (Issued At), the method will use
+        the current time to automatically add that claim to the payload.
+        If you provide a ``valid_for`` parameter in the form of a ``timedelta``
+        value, this method will automatically compute and set the ``exp``
+        registered claim which set the expiration date of the token.
+
+    .. method:: decode_token(self, token)
+
+        Decode the passed ``token``, checking the signature validity and the
+        expiration date. Therefore, that method can typically raise
+        ``django.core.signing.BadSignature`` or
+        ``django.utils.jwt.ExpiredToken`` exceptions.
+        The returned value is a payload ``dict`` from which you can get the
+        claims added when the token was created.
+
+.. _PyJWT: https://pypi.org/project/PyJWT/
+
 ``django.utils.module_loading``
 ===============================
 

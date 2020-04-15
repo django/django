@@ -479,6 +479,9 @@ Utilities
   :func:`~django.utils.dateparse.parse_time` now support comma separators for
   milliseconds.
 
+* A new :class:`~django.utils.jwt.JWTFactory` class allows to generate and
+  decode ``HS256`` JSON Web Tokens.
+
 Validators
 ~~~~~~~~~~
 
