@@ -392,10 +392,18 @@ class Command(BaseCommand):
                     unique_together.append(
                         str(tuple(column_to_field_name[c] for c in columns))
                     )
-            elif params["index"]:
+            elif params["index"] and not params["primary_key"]:
                 columns = params["columns"]
-                field_names = [column_to_field_name[c] for c in columns]
-                indexes.append(f"models.Index(fields={field_names!r}, name={name!r})")
+                orders = params.get("orders", [""] * len(columns))
+
+                field_names = [
+                    f'{"-" if order.lower() == "desc" else ""}{column_to_field_name[column]}'
+                    for column, order in zip(columns, orders)
+                ]
+                index_str = f"models.Index(fields={field_names!r}, name={name!r})"
+                if params["type"] != "btree":
+                    index_str += f'  # Index type is {params["type"]}'
+                indexes.append(index_str)
         if is_view:
             managed_comment = "  # Created from a view. Don't remove."
         elif is_partition:

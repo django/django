@@ -407,7 +407,8 @@ class InspectDBTestCase(TestCase):
         # and our three column defs are in place
         self.assertIn("['from_field']", output)
         self.assertIn("['field1', 'field2']", output)
-        self.assertIn("['field2', 'from_field']", output)
+        # including descending sort
+        self.assertIn("['field2', '-from_field']", output)
 
     @skipUnless(connection.vendor == "postgresql", "PostgreSQL specific SQL")
     def test_unsupported_unique_together(self):

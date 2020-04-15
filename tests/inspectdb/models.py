@@ -157,6 +157,6 @@ class Indexes(models.Model):
     class Meta:
         indexes = [
             models.Index(fields=["field1", "field2"], name="my_index"),
-            models.Index(fields=["field2", "from_field"], name="my_other_index"),
+            models.Index(fields=["field2", "-from_field"], name="my_other_index"),
             models.Index(fields=["from_field"]),
         ]
