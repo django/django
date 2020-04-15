@@ -30,4 +30,4 @@ class Indexes(models.Model):
 
     class Meta:
         required_db_features = {"supports_3d_storage"}
-        indexes = [models.Index(fields=["name", "other"], name="my_index")]
+        indexes = [models.Index(fields=["name", "other"], name="name_plus_other")]
