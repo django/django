@@ -1,12 +1,16 @@
 import decimal
 
-from django.db import NotSupportedError, connection
+from django.core.management.color import no_style
+from django.db import NotSupportedError, connection, transaction
 from django.db.backends.base.operations import BaseDatabaseOperations
 from django.db.models import DurationField
 from django.test import (
-    SimpleTestCase, TestCase, override_settings, skipIfDBFeature,
+    SimpleTestCase, TestCase, TransactionTestCase, override_settings,
+    skipIfDBFeature,
 )
 from django.utils import timezone
+
+from ..models import Author, Book
 
 
 class SimpleDatabaseOperationTests(SimpleTestCase):
@@ -144,3 +148,40 @@ class DatabaseOperationTests(TestCase):
         )
         with self.assertRaisesMessage(NotSupportedError, msg):
             self.ops.subtract_temporals(duration_field_internal_type, None, None)
+
+
+class SqlFlushTests(TransactionTestCase):
+    available_apps = ['backends']
+
+    def test_sql_flush_no_tables(self):
+        self.assertEqual(connection.ops.sql_flush(no_style(), [], []), [])
+
+    def test_execute_sql_flush_statements(self):
+        with transaction.atomic():
+            author = Author.objects.create(name='George Orwell')
+            Book.objects.create(author=author)
+            author = Author.objects.create(name='Harper Lee')
+            Book.objects.create(author=author)
+            Book.objects.create(author=author)
+            self.assertIs(Author.objects.exists(), True)
+            self.assertIs(Book.objects.exists(), True)
+
+        sql_list = connection.ops.sql_flush(
+            no_style(),
+            [Author._meta.db_table, Book._meta.db_table],
+            [
+                {
+                    'table': Author._meta.db_table,
+                    'column': Author._meta.pk.db_column,
+                },
+            ],
+            allow_cascade=True,
+        )
+        connection.ops.execute_sql_flush(connection.alias, sql_list)
+
+        with transaction.atomic():
+            self.assertIs(Author.objects.exists(), False)
+            self.assertIs(Book.objects.exists(), False)
+            if connection.features.supports_sequence_reset:
+                author = Author.objects.create(name='F. Scott Fitzgerald')
+                self.assertEqual(author.pk, 1)
