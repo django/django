@@ -24,7 +24,7 @@ class Fields3D(models.Model):
 
 
 class Indexes(models.Model):
-    point = models.PointField(db_index=True)
+    point = models.PointField()
     name = models.CharField(max_length=5)
     other = models.IntegerField()
 
