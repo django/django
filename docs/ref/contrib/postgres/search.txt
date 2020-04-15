@@ -92,13 +92,14 @@ Examples:
 
 .. _Full Text Search docs: https://www.postgresql.org/docs/current/textsearch-controls.html#TEXTSEARCH-PARSING-QUERIES
 
-    >>> from django.contrib.postgres.search import SearchQuery
+    >>> from django.contrib.postgres.search import SearchQuery, Lexeme
     >>> SearchQuery('red tomato')  # two keywords
     >>> SearchQuery('tomato red')  # same results as above
     >>> SearchQuery('red tomato', search_type='phrase')  # a phrase
     >>> SearchQuery('tomato red', search_type='phrase')  # a different phrase
     >>> SearchQuery("'tomato' & ('red' | 'green')", search_type='raw')  # boolean operators
     >>> SearchQuery("'tomato' ('red' OR 'green')", search_type='websearch')  # websearch operators
+    >>> SearchQuery(Lexeme('tomato') & (Lexeme('red') | Lexeme('green')))  # Lexeme objects
 
 ``SearchQuery`` terms can be combined logically to provide more flexibility::
 
@@ -114,6 +115,10 @@ See :ref:`postgresql-fts-search-configuration` for an explanation of the
 
     Support for ``'websearch'`` search type and query expressions in
     ``SearchQuery.value`` were added.
+
+.. versionchanged:: 3.1
+
+    ``Lexeme`` objects were added
 
 ``SearchRank``
 ==============
@@ -260,6 +265,23 @@ floats to :class:`SearchRank` as ``weights`` in the same order above::
 
     >>> rank = SearchRank(vector, query, weights=[0.2, 0.4, 0.6, 0.8])
     >>> Entry.objects.annotate(rank=rank).filter(rank__gte=0.3).order_by('-rank')
+
+Lexeme objects
+==============
+
+Lexeme objects allow search operators to be used along with strings from an untrusted source. The contents
+of each lexeme is excaped so cannot contain any operators that PostgreSQL will recognise, but they support
+combining with other Lexemes using the & and | operators and also negation with the ~ operator.
+
+    >>> from django.contrib.postgres.search import SearchQuery, Lexeme
+    >>> SearchRank(Lexeme("The user's search query") & Lexeme("Something else") & ~Lexeme("Exclude documents that match this"))
+    >>> SearchRank(Lexeme("The user's search query") | Lexeme("Something else"))
+
+Lexeme objects also support weighting and prefixes::
+
+    >>> from django.contrib.postgres.search import SearchQuery, Lexeme
+    >>> SearchRank(Lexeme("These terms have lower weight", weight='D') & Lexeme("than these terms")
+    >>> SearchRank(Lexeme("Djan", prefix=True)
 
 Performance
 ===========
