@@ -197,6 +197,21 @@ class OGRInspectTest(SimpleTestCase):
         call_command("ogrinspect", shp_file, "--mapping", "City", stdout=out)
         self.assertIn(expected, out.getvalue())
 
+    def test_indexes(self):
+        out = StringIO()
+        call_command(
+            'inspectdb',
+            table_name_filter=lambda tn: tn.startswith('inspectapp_indexes'),
+            stdout=out,
+        )
+        output = out.getvalue()
+        self.assertIn('        indexes = ', output, msg='inspectdb should generate indexes.')
+        # there should not be an index on a single-column geo field (assumed to be default)
+        index = "models.Index(fields=['point'], name="
+        self.assertNotIn(index, output)
+        # but our manually-created one should
+        self.assertIn("models.Index(fields=['name', 'other'], name='my_index')", output)
+
 
 def get_ogr_db_string():
     """
