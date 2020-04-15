@@ -671,7 +671,69 @@ class SearchHeadlineTests(GrailTestData, PostgreSQLTestCase):
         )
 
 
-class TestPrefixMatching(GrailTestData, PostgreSQLTestCase):
+class TestRawSearchQuery(GrailTestData, PostgreSQLTestCase):
+
+    def test_simple(self):
+        pass
+
+    def test_and(self):
+        searched = Line.objects.annotate(
+            search=SearchVector('scene__setting', 'dialogue'),
+        ).filter(search=RawSearchQuery(Lexeme('bedemir') & Lexeme('scales')))
+        self.assertSequenceEqual(searched, [self.bedemir0])
+
+    def test_multiple_and(self):
+        searched = Line.objects.annotate(
+            search=SearchVector('scene__setting', 'dialogue'),
+        ).filter(search=RawSearchQuery(Lexeme('bedemir') & Lexeme('scales') & Lexeme('nostrils')))
+        self.assertSequenceEqual(searched, [])
+
+        searched = Line.objects.annotate(
+            search=SearchVector('scene__setting', 'dialogue'),
+        ).filter(search=RawSearchQuery(Lexeme('shall') & Lexeme('use') & Lexeme('larger')))
+        self.assertSequenceEqual(searched, [self.bedemir0])
+
+    def test_or(self):
+        searched = Line.objects.filter(dialogue__search=RawSearchQuery(Lexeme('kneecaps') | Lexeme('nostrils')))
+        self.assertCountEqual(searched, [self.verse1, self.verse2])
+
+    def test_multiple_or(self):
+        searched = Line.objects.filter(
+            dialogue__search=RawSearchQuery(Lexeme('kneecaps') | Lexeme('nostrils') | Lexeme('Sir Robin'))
+        )
+        self.assertCountEqual(searched, [self.verse1, self.verse2, self.verse0])
+
+    def test_invert(self):
+        # TODO `~Lexeme` syntax
+        searched = Line.objects.filter(character=self.minstrel, dialogue__search=RawSearchQuery(Lexeme('kneecaps', invert=True)))
+        self.assertCountEqual(searched, [self.verse0, self.verse2])
+
+    def test_as_sql(self):
+        query = Line.objects.all().query
+        compiler = query.get_compiler(connection.alias)
+
+        tests = (
+            (Lexeme('a'), '%s', ["'a'"]),
+            (Lexeme('a', invert=True), '%s', ["!'a'"]),
+            (Lexeme('a', prefix=True), '%s', ["'a':*"]),
+            (Lexeme('a', weight='D'), '%s', ["'a':D"]),
+            (Lexeme('a', invert=True, prefix=True, weight='D'), '%s', ["!'a':*D"]),
+            (Lexeme('a') | Lexeme('b') & Lexeme('c'), '%s', ["('a' | ('b' & 'c'))"]),
+
+            # Some escaping tests
+            (Lexeme("L'amour piqué par une abeille"), '%s', ["'L''amour piqué par une abeille'"]),
+            (Lexeme("'starting quote"), '%s', ["'''starting quote'"]),
+            (Lexeme("ending quote'"), '%s', ["'ending quote'''"]),
+            (Lexeme("double quo''te"), '%s', ["'double quo''''te'"]),
+            (Lexeme("triple quo'''te"), '%s', ["'triple quo''''''te'"]),
+            (Lexeme("backslash\\"), '%s', ["'backslash\\\\'"]),
+        )
+        for expression, expected_sql, expected_params in tests:
+            with self.subTest(expression=expression):
+                resolved = expression.resolve_expression(query)
+                sql, params = resolved.as_sql(compiler, connection)
+                self.assertEqual(sql, expected_sql)
+                self.assertEqual(params, expected_params)
 
     def test_prefix_searching(self):
         searched = Line.objects.annotate(
