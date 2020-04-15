@@ -404,6 +404,13 @@ class Command(BaseCommand):
                 index_str = f"models.Index(fields={field_names!r}, name={name!r})"
                 if params["type"] not in ["btree", Index.suffix]:
                     index_str += f'  # Index type is {params["type"]}'
+                if params['type'] == 'rtree' and len(columns) == 1:
+                    # assume this is a default spatial index, so let's make a note of it and
+                    # continue
+                    indexes.append(
+                        f'# Skipped default spatial index for {column_to_field_name[columns[0]]}'
+                    )
+                    continue
                 indexes.append(index_str)
         if is_view:
             managed_comment = "  # Created from a view. Don't remove."
