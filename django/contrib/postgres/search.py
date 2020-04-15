@@ -342,7 +342,7 @@ class Lexeme(LexemeCombinable, Value):
         super().__init__(value, output_field=output_field)
 
     def as_sql(self, compiler, connection):
-        param = self.value
+        param = "'%s'" % self.value.replace("'", "''").replace("\\", "\\\\")
         template = '%s'
 
         label = ''
@@ -376,9 +376,9 @@ class CombinedLexeme(LexemeCombinable):
         rsql, params = compiler.compile(self.rhs)
         value_params.extend(params)
 
-        combined_sql = '{} {} {}'.format(lsql, self.connector, rsql)
+        combined_sql = '({} {} {})'.format(lsql, self.connector, rsql)
         combined_value = combined_sql % tuple(value_params)
-        return '(%s)', [combined_value]
+        return '%s', [combined_value]
 
 
 class RawSearchQuery(SearchQueryCombinable, Expression):
