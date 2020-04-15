@@ -70,7 +70,7 @@ class InspectDbTests(TestCase):
         index = "models.Index(fields=['point'], name="
         self.assertNotIn(index, output)
         # but our manually-created one should
-        self.assertIn("models.Index(fields=['name', 'other'], name='my_index')", output)
+        self.assertIn("models.Index(fields=['name', 'other'], name='name_plus_other')", output)
 
 
 @modify_settings(
