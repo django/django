@@ -464,7 +464,7 @@ https://web.archive.org/web/20110718035220/http://diveintomark.org/archives/2004
 
 .. class:: Atom1Feed(SyndicationFeed)
 
-    Spec: https://tools.ietf.org/html/rfc4287
+    Spec: :rfc:`4287`
 
 ``django.utils.functional``
 ===========================

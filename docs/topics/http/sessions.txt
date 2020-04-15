@@ -144,7 +144,8 @@ and the :setting:`SECRET_KEY` setting.
     tampered with. The same invalidation happens if the client storing the
     cookie (e.g. your user's browser) can't store all of the session cookie and
     drops data. Even though Django compresses the data, it's still entirely
-    possible to exceed the `common limit of 4096 bytes`_ per cookie.
+    possible to exceed the :rfc:`common limit of 4096 bytes <2965#section-5.3>`
+    per cookie.
 
     **No freshness guarantee**
 
@@ -165,7 +166,6 @@ and the :setting:`SECRET_KEY` setting.
 
     Finally, the size of a cookie can have an impact on the `speed of your site`_.
 
-.. _`common limit of 4096 bytes`: https://tools.ietf.org/html/rfc2965#section-5.3
 .. _`replay attacks`: https://en.wikipedia.org/wiki/Replay_attack
 .. _`speed of your site`: https://yuiblog.com/blog/2007/03/01/performance-research-part-3/
 
