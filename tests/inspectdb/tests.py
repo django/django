@@ -5,7 +5,12 @@ from unittest import mock, skipUnless
 from django.core.management import call_command
 from django.db import connection
 from django.db.backends.base.introspection import TableInfo
-from django.test import TestCase, TransactionTestCase, skipUnlessDBFeature
+from django.test import (
+    TestCase,
+    TransactionTestCase,
+    skipUnlessDBFeature,
+    skipIfDBFeature,
+)
 
 from .models import PeopleMoreData, test_collation
 
@@ -392,7 +397,7 @@ class InspectDBTestCase(TestCase):
         # are given an integer suffix.
         self.assertIn("('non_unique_column', 'non_unique_column_0')", fields)
 
-    @skipUnless(connection.vendor == "postgresql", "PostgreSQL specific SQL")
+    @skipUnlessDBFeature("supports_index_column_ordering")
     def test_indexes(self):
         out = StringIO()
         call_command("inspectdb", "inspectdb_indexes", stdout=out)
@@ -409,6 +414,24 @@ class InspectDBTestCase(TestCase):
         self.assertIn("['field1', 'field2']", output)
         # including descending sort
         self.assertIn("['field2', '-from_field']", output)
+
+    @skipIfDBFeature("supports_index_column_ordering")
+    def test_indexes(self):
+        out = StringIO()
+        call_command("inspectdb", "inspectdb_indexes", stdout=out)
+        output = out.getvalue()
+        self.assertIn("    indexes = (", output)
+        # our two named indexes are there
+        self.assertIn("my_index", output)
+        self.assertIn("my_other_index", output)
+        # we have a total of three indexes
+        matches = re.findall(r"models.Index\(", output)
+        self.assertEqual(len(matches), 3)
+        # and our three column defs are in place
+        self.assertIn("['from_field']", output)
+        self.assertIn("['field1', 'field2']", output)
+        # ignoring the descending sort
+        self.assertIn("['field2', 'from_field']", output)
 
     @skipUnless(connection.vendor == "postgresql", "PostgreSQL specific SQL")
     def test_unsupported_unique_together(self):
