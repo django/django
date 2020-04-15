@@ -31,7 +31,6 @@ class OperationsTests(unittest.TestCase):
         statements = connection.ops.sql_flush(
             no_style(),
             [Person._meta.db_table, Tag._meta.db_table],
-            [],
         )
         # The tables and constraints are processed in an unordered set.
         self.assertEqual(
@@ -56,7 +55,6 @@ class OperationsTests(unittest.TestCase):
         statements = connection.ops.sql_flush(
             no_style(),
             [Person._meta.db_table, Tag._meta.db_table],
-            [],
             allow_cascade=True,
         )
         # The tables and constraints are processed in an unordered set.
@@ -83,16 +81,7 @@ class OperationsTests(unittest.TestCase):
         statements = connection.ops.sql_flush(
             no_style(),
             [Person._meta.db_table, Tag._meta.db_table],
-            [
-                {
-                    'table': Person._meta.db_table,
-                    'column': Person._meta.pk.db_column,
-                },
-                {
-                    'table': Tag._meta.db_table,
-                    'column': Tag._meta.pk.db_column,
-                },
-            ],
+            reset_sequences=True,
         )
         # The tables and constraints are processed in an unordered set.
         self.assertEqual(
@@ -121,16 +110,7 @@ class OperationsTests(unittest.TestCase):
         statements = connection.ops.sql_flush(
             no_style(),
             [Person._meta.db_table, Tag._meta.db_table],
-            [
-                {
-                    'table': Person._meta.db_table,
-                    'column': Person._meta.pk.db_column,
-                },
-                {
-                    'table': Tag._meta.db_table,
-                    'column': Tag._meta.pk.db_column,
-                },
-            ],
+            reset_sequences=True,
             allow_cascade=True,
         )
         # The tables and constraints are processed in an unordered set.
@@ -153,6 +133,7 @@ class OperationsTests(unittest.TestCase):
             '"BACKENDS__PERSON_ID_1DD5E829_F";',
         )
         # Sequences.
-        self.assertEqual(len(statements[5:]), 2)
+        self.assertEqual(len(statements[5:]), 3)
         self.assertIn('BACKENDS_PERSON_SQ', statements[5])
-        self.assertIn('BACKENDS_TAG_SQ', statements[6])
+        self.assertIn('BACKENDS_VERYLONGMODELN7BE2_SQ', statements[6])
+        self.assertIn('BACKENDS_TAG_SQ', statements[7])

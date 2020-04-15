@@ -43,7 +43,7 @@ class SimpleDatabaseOperationTests(SimpleTestCase):
     def test_sql_flush(self):
         msg = 'subclasses of BaseDatabaseOperations must provide a sql_flush() method'
         with self.assertRaisesMessage(NotImplementedError, msg):
-            self.ops.sql_flush(None, None, None)
+            self.ops.sql_flush(None, None)
 
     def test_pk_default_value(self):
         self.assertEqual(self.ops.pk_default_value(), 'DEFAULT')
@@ -154,7 +154,7 @@ class SqlFlushTests(TransactionTestCase):
     available_apps = ['backends']
 
     def test_sql_flush_no_tables(self):
-        self.assertEqual(connection.ops.sql_flush(no_style(), [], []), [])
+        self.assertEqual(connection.ops.sql_flush(no_style(), []), [])
 
     def test_execute_sql_flush_statements(self):
         with transaction.atomic():
@@ -169,12 +169,7 @@ class SqlFlushTests(TransactionTestCase):
         sql_list = connection.ops.sql_flush(
             no_style(),
             [Author._meta.db_table, Book._meta.db_table],
-            [
-                {
-                    'table': Author._meta.db_table,
-                    'column': Author._meta.pk.db_column,
-                },
-            ],
+            reset_sequences=True,
             allow_cascade=True,
         )
         connection.ops.execute_sql_flush(connection.alias, sql_list)
@@ -185,3 +180,5 @@ class SqlFlushTests(TransactionTestCase):
             if connection.features.supports_sequence_reset:
                 author = Author.objects.create(name='F. Scott Fitzgerald')
                 self.assertEqual(author.pk, 1)
+                book = Book.objects.create(author=author)
+                self.assertEqual(book.pk, 1)

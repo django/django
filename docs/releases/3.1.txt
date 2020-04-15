@@ -519,6 +519,13 @@ backends.
 * ``DatabaseClient.runshell()`` now requires an additional ``parameters``
   argument as a list of extra arguments to pass on to the command-line client.
 
+* The ``sequences`` positional argument of ``DatabaseOperations.sql_flush()``
+  is replaced by the boolean keyword-only argument ``reset_sequences``. If
+  ``True``, the sequences of the truncated tables will be reset.
+
+* The ``allow_cascade`` argument of ``DatabaseOperations.sql_flush()`` is now a
+  keyword-only argument.
+
 Dropped support for MariaDB 10.1
 --------------------------------
 

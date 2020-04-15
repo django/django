@@ -404,7 +404,7 @@ END;
         # Django's test suite.
         return lru_cache(maxsize=512)(self.__foreign_key_constraints)
 
-    def sql_flush(self, style, tables, sequences, allow_cascade=False):
+    def sql_flush(self, style, tables, *, reset_sequences=False, allow_cascade=False):
         if not tables:
             return []
 
@@ -446,9 +446,15 @@ END;
                 style.SQL_FIELD(self.quote_name(constraint)),
             ) for table, constraint in constraints
         ]
-        # Since we've just deleted all the rows, running our sequence ALTER
-        # code will reset the sequence to 0.
-        sql.extend(self.sequence_reset_by_name_sql(style, sequences))
+        if reset_sequences:
+            sequences = [
+                sequence
+                for sequence in self.connection.introspection.sequence_list()
+                if sequence['table'].upper() in truncated_tables
+            ]
+            # Since we've just deleted all the rows, running our sequence ALTER
+            # code will reset the sequence to 0.
+            sql.extend(self.sequence_reset_by_name_sql(style, sequences))
         return sql
 
     def sequence_reset_by_name_sql(self, style, sequences):

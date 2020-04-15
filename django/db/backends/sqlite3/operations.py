@@ -196,7 +196,7 @@ class DatabaseOperations(BaseDatabaseOperations):
         # Django's test suite.
         return lru_cache(maxsize=512)(self.__references_graph)
 
-    def sql_flush(self, style, tables, sequences, allow_cascade=False):
+    def sql_flush(self, style, tables, *, reset_sequences=False, allow_cascade=False):
         if tables and allow_cascade:
             # Simulate TRUNCATE CASCADE by recursively collecting the tables
             # referencing the tables to be flushed.
