@@ -1,7 +1,10 @@
 from unittest import skipUnless
 
-from django.contrib.gis.db.models import F, GeometryField, Value, functions
-from django.contrib.gis.geos import Point, Polygon
+from django.contrib.gis.db.models import (
+    F, GeometryField, LineStringField, Model, PointField, PolygonField, Value,
+    functions,
+)
+from django.contrib.gis.geos import LineString, Point, Polygon
 from django.db import connection
 from django.db.models import Count, Min
 from django.test import TestCase, skipUnlessDBFeature
@@ -66,3 +69,31 @@ class GeoExpressionsTests(TestCase):
         City.objects.filter(pk=city.pk).update(point=functions.Translate('point', 1, 1))
         city.refresh_from_db()
         self.assertEqual(city.point, Point(2, 2, srid=4326))
+
+    @skipUnless(connection.vendor == 'postgresql', 'PostgreSQL specific')
+    def test_array_contain_geometry_field(self):
+        from django.contrib.postgres.fields import ArrayField
+
+        class ArrayGeometryFieldModel(Model):
+            points = ArrayField(PointField())
+            polygons = ArrayField(PolygonField())
+            linestrings = ArrayField(LineStringField())
+
+        with connection.schema_editor() as editor:
+            editor.create_model(ArrayGeometryFieldModel)
+
+        point1 = Point(6, 24)
+        point2 = Point(5, 23)
+        polygon = Polygon(((1, 1), (1, 2), (2, 2), (2, 1), (1, 1)))
+        linestring1 = LineString((0, 0), (0, 3))
+        linestring2 = LineString((1, 1), (5, 5))
+        ArrayGeometryFieldModel.objects.create(
+            points=[point1, point2],
+            polygons=[polygon, polygon],
+            linestrings=[linestring1, linestring2],
+        )
+        x = ArrayGeometryFieldModel.objects.get()
+
+        self.assertEqual(x.points, [point1, point2])
+        self.assertEqual(x.polygons, [polygon, polygon])
+        self.assertEqual(x.linestrings, [linestring1, linestring2])

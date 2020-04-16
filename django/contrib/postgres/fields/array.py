@@ -1,5 +1,7 @@
 import json
 
+from django.contrib.gis.db.models import GeometryField
+from django.contrib.gis.geos import GEOSGeometry
 from django.contrib.postgres import lookups
 from django.contrib.postgres.forms import SimpleArrayField
 from django.contrib.postgres.validators import ArrayMaxLengthValidator
@@ -32,6 +34,8 @@ class ArrayField(CheckFieldDefaultMixin, Field):
         # implements it.
         if hasattr(self.base_field, 'from_db_value'):
             self.from_db_value = self._from_db_value
+        if isinstance(self.base_field, GeometryField):
+            self.from_db_value = self._from_db_value_geometry_field
         super().__init__(**kwargs)
 
     @property
@@ -122,6 +126,11 @@ class ArrayField(CheckFieldDefaultMixin, Field):
             self.base_field.from_db_value(item, expression, connection)
             for item in value
         ]
+
+    def _from_db_value_geometry_field(self, value, expression, connection):
+        if value is None:
+            return value
+        return [GEOSGeometry(item) for item in value[1:-1].split(':')]
 
     def value_to_string(self, obj):
         values = []
