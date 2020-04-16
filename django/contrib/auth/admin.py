@@ -65,7 +65,7 @@ class UserAdmin(admin.ModelAdmin):
     filter_horizontal = ('groups', 'user_permissions',)
 
     def get_fieldsets(self, request, obj=None):
-        if not obj:
+        if obj is None:
             return self.add_fieldsets
         return super().get_fieldsets(request, obj)
 

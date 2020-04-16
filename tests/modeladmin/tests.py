@@ -11,6 +11,7 @@ from django.contrib.admin.widgets import (
     AdminDateWidget, AdminRadioSelect, AutocompleteSelect,
     AutocompleteSelectMultiple,
 )
+from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
 from django.db import models
 from django.forms.widgets import Select
@@ -66,6 +67,36 @@ class ModelAdminTests(TestCase):
         ma = ModelAdmin(Band, self.site)
         self.assertEqual(ma.get_fieldsets(request), [(None, {'fields': ['name', 'bio', 'sign_date']})])
         self.assertEqual(ma.get_fieldsets(request, self.band), [(None, {'fields': ['name', 'bio', 'sign_date']})])
+
+    def test_default_fieldsets_useradmin(self):
+        # Here's the default case. There are no custom form_add/form_change methods,
+        # no fields argument, and no fieldsets argument.
+        class CustomUser(User):
+            is_deleted = models.BooleanField(default=False)
+
+            def __bool__(self):
+                return not self.is_deleted
+
+        ua = UserAdmin(CustomUser, self.site)
+        user = CustomUser()
+
+        add_fieldsets = ((None, {
+            'classes': ('wide',), 'fields': ('username', 'password1', 'password2')
+        }),)
+        change_fieldsets = (
+            (None, {'fields': ('username', 'password')}),
+            ('Personal info', {'fields': ('first_name', 'last_name', 'email')}),
+            ('Permissions', {'fields':
+                ('is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions')
+            }),
+            ('Important dates', {'fields': ('last_login', 'date_joined')}),
+        )
+
+        self.assertEqual(ua.get_fieldsets(request), add_fieldsets)
+        self.assertEqual(ua.get_fieldsets(request, user), change_fieldsets)
+
+        user.is_deleted = True
+        self.assertEqual(ua.get_fieldsets(request, user), change_fieldsets)
 
     def test_get_fieldsets(self):
         # get_fieldsets() is called when figuring out form fields (#18681).
