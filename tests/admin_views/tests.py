@@ -98,7 +98,7 @@ class AdminViewBasicTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.superuser = User.objects.create_superuser(username='super', password='secret', email='super@example.com')
-        cls.s1 = Section.objects.create(name='Test section')
+        cls.s1 = Section.objects.create(name='Test section', id=1)
         cls.a1 = Article.objects.create(
             content='<p>Middle content</p>', date=datetime.datetime(2008, 3, 18, 11, 54, 58), section=cls.s1
         )
@@ -1209,7 +1209,7 @@ class SaveAsTests(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.superuser = User.objects.create_superuser(username='super', password='secret', email='super@example.com')
-        cls.per1 = Person.objects.create(name='John Mauchly', gender=1, alive=True)
+        cls.per1 = Person.objects.create(name='John Mauchly', gender=1, alive=True, id=1)
 
     def setUp(self):
         self.client.force_login(self.superuser)
@@ -1395,16 +1395,16 @@ class AdminViewPermissionsTest(TestCase):
         cls.deleteuser = User.objects.create_user(username='deleteuser', password='secret', is_staff=True)
         cls.joepublicuser = User.objects.create_user(username='joepublic', password='secret')
         cls.nostaffuser = User.objects.create_user(username='nostaff', password='secret')
-        cls.s1 = Section.objects.create(name='Test section')
+        cls.s1 = Section.objects.create(name='Test section', id=1)
         cls.a1 = Article.objects.create(
             content='<p>Middle content</p>', date=datetime.datetime(2008, 3, 18, 11, 54, 58), section=cls.s1,
-            another_section=cls.s1,
+            another_section=cls.s1, id=1,
         )
         cls.a2 = Article.objects.create(
-            content='<p>Oldest content</p>', date=datetime.datetime(2000, 3, 18, 11, 54, 58), section=cls.s1
+            content='<p>Oldest content</p>', date=datetime.datetime(2000, 3, 18, 11, 54, 58), section=cls.s1, id=2,
         )
         cls.a3 = Article.objects.create(
-            content='<p>Newest content</p>', date=datetime.datetime(2009, 3, 18, 11, 54, 58), section=cls.s1
+            content='<p>Newest content</p>', date=datetime.datetime(2009, 3, 18, 11, 54, 58), section=cls.s1, id=3,
         )
         cls.p1 = PrePopulatedPost.objects.create(title='A Long Title', published=True, slug='a-long-title')
 
@@ -1910,13 +1910,14 @@ class AdminViewPermissionsTest(TestCase):
         self.assertEqual(post.status_code, 403)
         self.assertEqual(Article.objects.count(), article_count)
 
+        old_ids = list(Article.objects.values_list('id', flat=True))
         # User with both add and change permissions should be redirected to the
         # change page for the newly created object.
         article_count = Article.objects.count()
         self.client.force_login(self.superuser)
         post = self.client.post(article_change_url, change_dict_save_as_new)
         self.assertEqual(Article.objects.count(), article_count + 1)
-        new_article = Article.objects.latest('id')
+        new_article = Article.objects.exclude(id__in=old_ids).latest('id')
         self.assertRedirects(post, reverse('admin:admin_views_article_change', args=(new_article.pk,)))
 
     def test_change_view_with_view_only_inlines(self):
@@ -3292,8 +3293,13 @@ class AdminViewListEditable(TestCase):
         corresponding human-readable value is displayed instead. The hidden pk
         fields are displayed but separately (not in the table) and only once.
         """
-        story1 = Story.objects.create(title='The adventures of Guido', content='Once upon a time in Djangoland...')
+        story1 = Story.objects.create(
+            id=1,
+            title='The adventures of Guido',
+            content='Once upon a time in Djangoland...',
+        )
         story2 = Story.objects.create(
+            id=2,
             title='Crouching Tiger, Hidden Python',
             content='The Python was sneaking into...',
         )
@@ -3318,10 +3324,12 @@ class AdminViewListEditable(TestCase):
             Refs #12475.
         """
         story1 = OtherStory.objects.create(
+            id=1,
             title='The adventures of Guido',
             content='Once upon a time in Djangoland...',
         )
         story2 = OtherStory.objects.create(
+            id=2,
             title='Crouching Tiger, Hidden Python',
             content='The Python was sneaking into...',
         )
@@ -5167,7 +5175,9 @@ class UserAdminTest(TestCase):
         # Don't depend on a warm cache, see #17377.
         ContentType.objects.clear_cache()
 
-        with self.assertNumQueries(10):
+        # Expected query count decreased by two because Spanner lacks
+        # savepoints.
+        with self.assertNumQueries(8):
             response = self.client.get(reverse('admin:auth_user_change', args=(u.pk,)))
             self.assertEqual(response.status_code, 200)
 
@@ -5207,7 +5217,9 @@ class GroupAdminTest(TestCase):
         # Ensure no queries are skipped due to cached content type for Group.
         ContentType.objects.clear_cache()
 
-        with self.assertNumQueries(8):
+        # Expected query count decreased by two because Spanner lacks
+        # savepoints.
+        with self.assertNumQueries(6):
             response = self.client.get(reverse('admin:auth_group_change', args=(g.pk,)))
             self.assertEqual(response.status_code, 200)
 
