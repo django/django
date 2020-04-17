@@ -361,12 +361,21 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         # Rebuild tables with FKs pointing to this field if the PK type changed.
         if old_field.primary_key and new_field.primary_key and old_type != new_type:
             related_models = set()
-            for remote_field in new_field.model._meta.related_objects:
+            opts = new_field.model._meta
+            for remote_field in opts.related_objects:
                 # Ignore self-relationship since the table was already rebuilt.
                 if remote_field.related_model == model:
                     continue
                 if not remote_field.many_to_many:
                     related_models.add(remote_field.related_model)
+                elif remote_field.through._meta.auto_created:
+                    related_models.add(remote_field.through)
+            for many_to_many in opts.many_to_many:
+                # Ignore self-relationship since the table was already rebuilt.
+                if many_to_many.related_model == model:
+                    continue
+                if many_to_many.remote_field.through._meta.auto_created:
+                    related_models.add(many_to_many.remote_field.through)
             for related_model in related_models:
                 self._remake_table(related_model)
 
