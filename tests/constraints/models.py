@@ -41,6 +41,16 @@ class UniqueConstraintProduct(models.Model):
     class Meta:
         constraints = [
             models.UniqueConstraint(fields=['name', 'color'], name='name_color_uniq'),
+        ]
+
+
+class UniqueConstraintConditionProduct(models.Model):
+    name = models.CharField(max_length=255)
+    color = models.CharField(max_length=32, null=True)
+
+    class Meta:
+        required_db_features = {'supports_partial_indexes'}
+        constraints = [
             models.UniqueConstraint(
                 fields=['name'],
                 name='name_without_color_uniq',
