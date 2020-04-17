@@ -127,6 +127,7 @@ class BaseDatabaseCreation:
         the serialize_db_to_string() method.
         """
         data = StringIO(data)
+        table_names = set()
         # Load data in a transaction to handle forward references and cycles.
         with atomic(using=self.connection.alias):
             # Disable constraint checks, because some databases (MySQL) doesn't
@@ -134,9 +135,10 @@ class BaseDatabaseCreation:
             with self.connection.constraint_checks_disabled():
                 for obj in serializers.deserialize('json', data, using=self.connection.alias):
                     obj.save()
+                    table_names.add(obj.object.__class__._meta.db_table)
             # Manually check for any invalid keys that might have been added,
             # because constraint checks were disabled.
-            self.connection.check_constraints()
+            self.connection.check_constraints(table_names=table_names)
 
     def _get_database_display_str(self, verbosity, database_name):
         """
