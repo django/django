@@ -61,6 +61,7 @@
     span.commands a:link {color:#5E5694;}
     pre.exception_value { font-family: sans-serif; color: #575757; font-size: 1.5em; margin: 10px 0 10px 0; }
     .append-bottom { margin-bottom: 10px; }
+    .fname { user-select: all; }
   </style>
   {% if not is_email %}
   <script>
@@ -137,7 +138,7 @@
 {% if lastframe %}
     <tr>
       <th>Exception Location:</th>
-      <td>{{ lastframe.filename }} in {{ lastframe.function }}, line {{ lastframe.lineno }}</td>
+      <td><span class="fname">{{ lastframe.filename }}</span>, line {{ lastframe.lineno }}, in {{ lastframe.function }}</td>
     </tr>
 {% endif %}
     <tr>
@@ -224,7 +225,7 @@
         </h3></li>
         {% endif %}{% endifchanged %}
         <li class="frame {{ frame.type }}">
-          <code>{{ frame.filename }}</code> in <code>{{ frame.function }}</code>
+          <code class="fname">{{ frame.filename }}</code>, line {{ frame.lineno }}, in {{ frame.function }}
 
           {% if frame.context_line %}
             <div class="context" id="c{{ frame.id }}">

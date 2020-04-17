@@ -605,4 +605,4 @@ class LogFormattersTests(SimpleTestCase):
 
         with patch_django_server_logger() as logger_output:
             logger.info(log_msg)
-            self.assertRegex(logger_output.getvalue(), r'^\[[-:,.\s\d]+\] %s' % log_msg)
+            self.assertRegex(logger_output.getvalue(), r'^\[[/:,\w\s\d]+\] %s\n' % log_msg)

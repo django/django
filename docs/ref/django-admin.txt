@@ -226,6 +226,33 @@ program manually.
 
 Specifies the database onto which to open a shell. Defaults to ``default``.
 
+.. django-admin-option:: -- ARGUMENTS
+
+.. versionadded:: 3.1
+
+Any arguments following a ``--`` divider will be passed on to the underlying
+command-line client. For example, with PostgreSQL you can use the ``psql``
+command's ``-c`` flag to execute a raw SQL query directly:
+
+.. console::
+
+    $ django-admin dbshell -- -c 'select current_user'
+     current_user
+    --------------
+     postgres
+    (1 row)
+
+On MySQL/MariaDB, you can do this with the ``mysql`` command's ``-e`` flag:
+
+.. console::
+
+    $ django-admin dbshell -- -e "select user()"
+    +----------------------+
+    | user()               |
+    +----------------------+
+    | djangonaut@localhost |
+    +----------------------+
+
 .. note::
 
     Be aware that not all options set in the :setting:`OPTIONS` part of your

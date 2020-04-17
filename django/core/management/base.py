@@ -26,7 +26,9 @@ class CommandError(Exception):
     error) is the preferred way to indicate that something has gone
     wrong in the execution of a command.
     """
-    pass
+    def __init__(self, *args, returncode=1, **kwargs):
+        self.returncode = returncode
+        super().__init__(*args, **kwargs)
 
 
 class SystemCheckError(CommandError):
@@ -326,8 +328,8 @@ class BaseCommand:
         handle_default_options(options)
         try:
             self.execute(*args, **cmd_options)
-        except Exception as e:
-            if options.traceback or not isinstance(e, CommandError):
+        except CommandError as e:
+            if options.traceback:
                 raise
 
             # SystemCheckError takes care of its own formatting.
@@ -335,7 +337,7 @@ class BaseCommand:
                 self.stderr.write(str(e), lambda x: x)
             else:
                 self.stderr.write('%s: %s' % (e.__class__.__name__, e))
-            sys.exit(1)
+            sys.exit(e.returncode)
         finally:
             try:
                 connections.close_all()

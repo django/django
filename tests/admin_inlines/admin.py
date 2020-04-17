@@ -5,12 +5,12 @@ from django.db import models
 from .models import (
     Author, BinaryTree, CapoFamiglia, Chapter, Child, ChildModel1, ChildModel2,
     Consigliere, EditablePKBook, ExtraTerrestrial, Fashionista, FootNote,
-    Holder, Holder2, Holder3, Holder4, Inner, Inner2, Inner3, Inner4Stacked,
-    Inner4Tabular, NonAutoPKBook, NonAutoPKBookChild, Novel,
-    NovelReadonlyChapter, OutfitItem, ParentModelWithCustomPk, Poll, Profile,
-    ProfileCollection, Question, ReadOnlyInline, ShoppingWeakness, Sighting,
-    SomeChildModel, SomeParentModel, SottoCapo, Teacher, Title,
-    TitleCollection,
+    Holder, Holder2, Holder3, Holder4, Holder5, Inner, Inner2, Inner3,
+    Inner4Stacked, Inner4Tabular, Inner5Stacked, Inner5Tabular, NonAutoPKBook,
+    NonAutoPKBookChild, Novel, NovelReadonlyChapter, OutfitItem,
+    ParentModelWithCustomPk, Poll, Profile, ProfileCollection, Question,
+    ReadOnlyInline, ShoppingWeakness, Sighting, SomeChildModel,
+    SomeParentModel, SottoCapo, Teacher, Title, TitleCollection,
 )
 
 site = admin.AdminSite(name="admin")
@@ -124,6 +124,20 @@ class Inner4TabularInline(admin.TabularInline):
 
 class Holder4Admin(admin.ModelAdmin):
     inlines = [Inner4StackedInline, Inner4TabularInline]
+
+
+class Inner5StackedInline(admin.StackedInline):
+    model = Inner5Stacked
+    classes = ('collapse',)
+
+
+class Inner5TabularInline(admin.TabularInline):
+    model = Inner5Tabular
+    classes = ('collapse',)
+
+
+class Holder5Admin(admin.ModelAdmin):
+    inlines = [Inner5StackedInline, Inner5TabularInline]
 
 
 class InlineWeakness(admin.TabularInline):
@@ -291,6 +305,7 @@ site.register(Novel, NovelAdmin)
 site.register(NovelReadonlyChapter, NovelReadonlyChapterAdmin)
 site.register(Fashionista, inlines=[InlineWeakness])
 site.register(Holder4, Holder4Admin)
+site.register(Holder5, Holder5Admin)
 site.register(Author, AuthorAdmin)
 site.register(CapoFamiglia, inlines=[ConsigliereInline, SottoCapoInline, ReadOnlyInlineInline])
 site.register(ProfileCollection, inlines=[ProfileInline])

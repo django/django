@@ -2917,54 +2917,54 @@ class SwappableOperationTests(OperationTestBase):
 class TestCreateModel(SimpleTestCase):
 
     def test_references_model_mixin(self):
-        CreateModel('name', [], bases=(Mixin, models.Model)).references_model('other_model')
+        CreateModel('name', [], bases=(Mixin, models.Model)).references_model('other_model', 'migrations')
 
 
 class FieldOperationTests(SimpleTestCase):
     def test_references_model(self):
         operation = FieldOperation('MoDel', 'field', models.ForeignKey('Other', models.CASCADE))
         # Model name match.
-        self.assertIs(operation.references_model('mOdEl'), True)
+        self.assertIs(operation.references_model('mOdEl', 'migrations'), True)
         # Referenced field.
-        self.assertIs(operation.references_model('oTher'), True)
+        self.assertIs(operation.references_model('oTher', 'migrations'), True)
         # Doesn't reference.
-        self.assertIs(operation.references_model('Whatever'), False)
+        self.assertIs(operation.references_model('Whatever', 'migrations'), False)
 
     def test_references_field_by_name(self):
         operation = FieldOperation('MoDel', 'field', models.BooleanField(default=False))
-        self.assertIs(operation.references_field('model', 'field'), True)
+        self.assertIs(operation.references_field('model', 'field', 'migrations'), True)
 
     def test_references_field_by_remote_field_model(self):
         operation = FieldOperation('Model', 'field', models.ForeignKey('Other', models.CASCADE))
-        self.assertIs(operation.references_field('Other', 'whatever'), True)
-        self.assertIs(operation.references_field('Missing', 'whatever'), False)
+        self.assertIs(operation.references_field('Other', 'whatever', 'migrations'), True)
+        self.assertIs(operation.references_field('Missing', 'whatever', 'migrations'), False)
 
     def test_references_field_by_from_fields(self):
         operation = FieldOperation(
             'Model', 'field', models.fields.related.ForeignObject('Other', models.CASCADE, ['from'], ['to'])
         )
-        self.assertIs(operation.references_field('Model', 'from'), True)
-        self.assertIs(operation.references_field('Model', 'to'), False)
-        self.assertIs(operation.references_field('Other', 'from'), False)
-        self.assertIs(operation.references_field('Model', 'to'), False)
+        self.assertIs(operation.references_field('Model', 'from', 'migrations'), True)
+        self.assertIs(operation.references_field('Model', 'to', 'migrations'), False)
+        self.assertIs(operation.references_field('Other', 'from', 'migrations'), False)
+        self.assertIs(operation.references_field('Model', 'to', 'migrations'), False)
 
     def test_references_field_by_to_fields(self):
         operation = FieldOperation('Model', 'field', models.ForeignKey('Other', models.CASCADE, to_field='field'))
-        self.assertIs(operation.references_field('Other', 'field'), True)
-        self.assertIs(operation.references_field('Other', 'whatever'), False)
-        self.assertIs(operation.references_field('Missing', 'whatever'), False)
+        self.assertIs(operation.references_field('Other', 'field', 'migrations'), True)
+        self.assertIs(operation.references_field('Other', 'whatever', 'migrations'), False)
+        self.assertIs(operation.references_field('Missing', 'whatever', 'migrations'), False)
 
     def test_references_field_by_through(self):
         operation = FieldOperation('Model', 'field', models.ManyToManyField('Other', through='Through'))
-        self.assertIs(operation.references_field('Other', 'whatever'), True)
-        self.assertIs(operation.references_field('Through', 'whatever'), True)
-        self.assertIs(operation.references_field('Missing', 'whatever'), False)
+        self.assertIs(operation.references_field('Other', 'whatever', 'migrations'), True)
+        self.assertIs(operation.references_field('Through', 'whatever', 'migrations'), True)
+        self.assertIs(operation.references_field('Missing', 'whatever', 'migrations'), False)
 
     def test_reference_field_by_through_fields(self):
         operation = FieldOperation(
             'Model', 'field', models.ManyToManyField('Other', through='Through', through_fields=('first', 'second'))
         )
-        self.assertIs(operation.references_field('Other', 'whatever'), True)
-        self.assertIs(operation.references_field('Through', 'whatever'), False)
-        self.assertIs(operation.references_field('Through', 'first'), True)
-        self.assertIs(operation.references_field('Through', 'second'), True)
+        self.assertIs(operation.references_field('Other', 'whatever', 'migrations'), True)
+        self.assertIs(operation.references_field('Through', 'whatever', 'migrations'), False)
+        self.assertIs(operation.references_field('Through', 'first', 'migrations'), True)
+        self.assertIs(operation.references_field('Through', 'second', 'migrations'), True)

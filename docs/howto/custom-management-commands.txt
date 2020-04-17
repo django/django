@@ -340,7 +340,7 @@ Rather than implementing :meth:`~BaseCommand.handle`, subclasses must implement
 Command exceptions
 ------------------
 
-.. exception:: CommandError
+.. exception:: CommandError(returncode=1)
 
 Exception class indicating a problem while executing a management command.
 
@@ -348,8 +348,14 @@ If this exception is raised during the execution of a management command from a
 command line console, it will be caught and turned into a nicely-printed error
 message to the appropriate output stream (i.e., stderr); as a result, raising
 this exception (with a sensible description of the error) is the preferred way
-to indicate that something has gone wrong in the execution of a command.
+to indicate that something has gone wrong in the execution of a command. It
+accepts the optional ``returncode`` argument to customize the exit status for
+the management command to exit with, using :func:`sys.exit`.
 
 If a management command is called from code through
 :func:`~django.core.management.call_command`, it's up to you to catch the
 exception when needed.
+
+.. versionchanged:: 3.1
+
+    The ``returncode`` argument was added.

@@ -7,7 +7,7 @@ The syndication feed framework
               quite easily.
 
 Django comes with a high-level syndication-feed-generating framework for
-creating RSS_ and Atom_ feeds.
+creating RSS_ and :rfc:`Atom <4287>` feeds.
 
 To create any syndication feed, all you have to do is write a short
 Python class. You can create as many feeds as you want.
@@ -17,7 +17,6 @@ you want to generate feeds outside of a Web context, or in some other
 lower-level way.
 
 .. _RSS: http://www.whatisrss.com/
-.. _Atom: https://tools.ietf.org/html/rfc4287
 
 The high-level framework
 ========================

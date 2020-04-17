@@ -17,7 +17,7 @@
         for (var i = 0; i < fieldsets.length; i++) {
             var elem = fieldsets[i];
             // Don't hide if fields in this fieldset have errors
-            if (elem.querySelectorAll('div.errors').length === 0) {
+            if (elem.querySelectorAll('div.errors, ul.errorlist').length === 0) {
                 elem.classList.add('collapsed');
                 var h2 = elem.querySelector('h2');
                 var link = document.createElement('a');

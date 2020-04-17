@@ -223,8 +223,8 @@ Finally, there are a couple of updates to Django's documentation to make:
    under the appropriate version describing what code will be removed.
 
 Once you have completed these steps, you are finished with the deprecation.
-In each :term:`feature release`, all ``RemovedInDjangoXXWarning``\s matching
-the new version are removed.
+In each :term:`feature release <Feature release>`, all
+``RemovedInDjangoXXWarning``\s matching the new version are removed.
 
 JavaScript patches
 ==================

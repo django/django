@@ -89,9 +89,6 @@ class CharFieldModel(models.Model):
 class TextFieldModel(models.Model):
     field = models.TextField()
 
-    def __str__(self):
-        return self.field
-
 
 class SmallAutoFieldModel(models.Model):
     id = models.SmallAutoField(primary_key=True)
@@ -107,15 +104,9 @@ class Scene(models.Model):
     scene = models.CharField(max_length=255)
     setting = models.CharField(max_length=255)
 
-    def __str__(self):
-        return self.scene
-
 
 class Character(models.Model):
     name = models.CharField(max_length=255)
-
-    def __str__(self):
-        return self.name
 
 
 class CITestModel(PostgreSQLModel):
@@ -124,9 +115,6 @@ class CITestModel(PostgreSQLModel):
     description = CITextField()
     array_field = ArrayField(CITextField(), null=True)
 
-    def __str__(self):
-        return self.name
-
 
 class Line(PostgreSQLModel):
     scene = models.ForeignKey('Scene', models.CASCADE)
@@ -134,9 +122,6 @@ class Line(PostgreSQLModel):
     dialogue = models.TextField(blank=True, null=True)
     dialogue_search_vector = SearchVectorField(blank=True, null=True)
     dialogue_config = models.CharField(max_length=100, blank=True, null=True)
-
-    def __str__(self):
-        return self.dialogue or ''
 
 
 class LineSavedSearch(PostgreSQLModel):

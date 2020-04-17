@@ -249,13 +249,21 @@ class SameNameTests(SimpleTestCase):
 
 
 class ParameterRestrictionTests(SimpleTestCase):
-    def test_non_identifier_parameter_name_causes_exception(self):
+    def test_integer_parameter_name_causes_exception(self):
         msg = (
             "URL route 'hello/<int:1>/' uses parameter name '1' which isn't "
             "a valid Python identifier."
         )
         with self.assertRaisesMessage(ImproperlyConfigured, msg):
             path(r'hello/<int:1>/', lambda r: None)
+
+    def test_non_identifier_parameter_name_causes_exception(self):
+        msg = (
+            "URL route 'b/<int:book.id>/' uses parameter name 'book.id' which "
+            "isn't a valid Python identifier."
+        )
+        with self.assertRaisesMessage(ImproperlyConfigured, msg):
+            path(r'b/<int:book.id>/', lambda r: None)
 
     def test_allows_non_ascii_but_valid_identifiers(self):
         # \u0394 is "GREEK CAPITAL LETTER DELTA", a valid identifier.

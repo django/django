@@ -13,10 +13,14 @@ from urllib.request import urlopen
 from django.core.cache import cache
 from django.core.exceptions import SuspiciousFileOperation
 from django.core.files.base import ContentFile, File
-from django.core.files.storage import FileSystemStorage, get_storage_class
+from django.core.files.storage import (
+    FileSystemStorage, Storage as BaseStorage, default_storage,
+    get_storage_class,
+)
 from django.core.files.uploadedfile import (
     InMemoryUploadedFile, SimpleUploadedFile, TemporaryUploadedFile,
 )
+from django.db.models import FileField
 from django.db.models.fields.files import FileDescriptor
 from django.test import (
     LiveServerTestCase, SimpleTestCase, TestCase, override_settings,
@@ -864,6 +868,49 @@ class FileFieldStorageTests(TestCase):
         self.assertTrue(temp_storage.exists('tests/stringio'))
         with temp_storage.open('tests/stringio') as f:
             self.assertEqual(f.read(), b'content')
+
+
+class FieldCallableFileStorageTests(SimpleTestCase):
+    def setUp(self):
+        self.temp_storage_location = tempfile.mkdtemp(suffix='filefield_callable_storage')
+
+    def tearDown(self):
+        shutil.rmtree(self.temp_storage_location)
+
+    def test_callable_base_class_error_raises(self):
+        class NotStorage:
+            pass
+        msg = 'FileField.storage must be a subclass/instance of django.core.files.storage.Storage'
+        for invalid_type in (NotStorage, str, list, set, tuple):
+            with self.subTest(invalid_type=invalid_type):
+                with self.assertRaisesMessage(TypeError, msg):
+                    FileField(storage=invalid_type)
+
+    def test_file_field_storage_none_uses_default_storage(self):
+        self.assertEqual(FileField().storage, default_storage)
+
+    def test_callable_function_storage_file_field(self):
+        storage = FileSystemStorage(location=self.temp_storage_location)
+
+        def get_storage():
+            return storage
+
+        obj = FileField(storage=get_storage)
+        self.assertEqual(obj.storage, storage)
+        self.assertEqual(obj.storage.location, storage.location)
+
+    def test_callable_class_storage_file_field(self):
+        class GetStorage(FileSystemStorage):
+            pass
+
+        obj = FileField(storage=GetStorage)
+        self.assertIsInstance(obj.storage, BaseStorage)
+
+    def test_callable_storage_file_field_in_model(self):
+        obj = Storage()
+        self.assertEqual(obj.storage_callable.storage, temp_storage)
+        self.assertEqual(obj.storage_callable.storage.location, temp_storage_location)
+        self.assertIsInstance(obj.storage_callable_class.storage, BaseStorage)
 
 
 # Tests for a race condition on file saving (#4948).

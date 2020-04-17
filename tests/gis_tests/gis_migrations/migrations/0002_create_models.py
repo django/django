@@ -69,4 +69,7 @@ class Migration(migrations.Migration):
     """
     Used for gis-specific migration tests.
     """
+    dependencies = [
+        ('gis_migrations', '0001_setup_extensions'),
+    ]
     operations = ops

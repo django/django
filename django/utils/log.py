@@ -160,6 +160,8 @@ class RequireDebugTrue(logging.Filter):
 
 
 class ServerFormatter(logging.Formatter):
+    default_time_format = '%d/%b/%Y %H:%M:%S'
+
     def __init__(self, *args, **kwargs):
         self.style = color_style()
         super().__init__(*args, **kwargs)

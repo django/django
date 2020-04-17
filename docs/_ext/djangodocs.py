@@ -11,9 +11,8 @@ from docutils.statemachine import ViewList
 from sphinx import addnodes
 from sphinx.builders.html import StandaloneHTMLBuilder
 from sphinx.directives.code import CodeBlock
-from sphinx.errors import SphinxError
 from sphinx.domains.std import Cmdoption
-from sphinx.errors import ExtensionError
+from sphinx.errors import ExtensionError, SphinxError
 from sphinx.util import logging
 from sphinx.util.console import bold, red
 from sphinx.writers.html import HTMLTranslator

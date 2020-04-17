@@ -11,16 +11,10 @@ class DataPoint(models.Model):
     value = models.CharField(max_length=20)
     another_value = models.CharField(max_length=20, blank=True)
 
-    def __str__(self):
-        return self.name
-
 
 class RelatedPoint(models.Model):
     name = models.CharField(max_length=20)
     data = models.ForeignKey(DataPoint, models.CASCADE)
-
-    def __str__(self):
-        return self.name
 
 
 class A(models.Model):

@@ -57,12 +57,14 @@ class CommandTests(SimpleTestCase):
         """ Exception raised in a command should raise CommandError with
             call_command, but SystemExit when run from command line
         """
-        with self.assertRaises(CommandError):
+        with self.assertRaises(CommandError) as cm:
             management.call_command('dance', example="raise")
+        self.assertEqual(cm.exception.returncode, 3)
         dance.Command.requires_system_checks = False
         try:
-            with captured_stderr() as stderr, self.assertRaises(SystemExit):
+            with captured_stderr() as stderr, self.assertRaises(SystemExit) as cm:
                 management.ManagementUtility(['manage.py', 'dance', '--example=raise']).execute()
+            self.assertEqual(cm.exception.code, 3)
         finally:
             dance.Command.requires_system_checks = True
         self.assertIn("CommandError", stderr.getvalue())
