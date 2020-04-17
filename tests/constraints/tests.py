@@ -5,7 +5,10 @@ from django.db import IntegrityError, connection, models
 from django.db.models.constraints import BaseConstraint
 from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
 
-from .models import ChildModel, Product, UniqueConstraintProduct
+from .models import (
+    ChildModel, Product, UniqueConstraintConditionProduct,
+    UniqueConstraintProduct,
+)
 
 
 def get_constraints(table):
@@ -207,15 +210,25 @@ class UniqueConstraintTests(TestCase):
         with self.assertRaises(IntegrityError):
             UniqueConstraintProduct.objects.create(name=self.p1.name, color=self.p1.color)
 
+    @skipUnlessDBFeature('supports_partial_indexes')
+    def test_database_constraint_with_condition(self):
+        UniqueConstraintConditionProduct.objects.create(name='p1')
+        UniqueConstraintConditionProduct.objects.create(name='p2')
+        with self.assertRaises(IntegrityError):
+            UniqueConstraintConditionProduct.objects.create(name='p1')
+
     def test_model_validation(self):
         msg = 'Unique constraint product with this Name and Color already exists.'
         with self.assertRaisesMessage(ValidationError, msg):
             UniqueConstraintProduct(name=self.p1.name, color=self.p1.color).validate_unique()
 
+    @skipUnlessDBFeature('supports_partial_indexes')
     def test_model_validation_with_condition(self):
         """Partial unique constraints are ignored by Model.validate_unique()."""
-        UniqueConstraintProduct(name=self.p1.name, color='blue').validate_unique()
-        UniqueConstraintProduct(name=self.p2.name).validate_unique()
+        obj1 = UniqueConstraintConditionProduct.objects.create(name='p1', color='red')
+        obj2 = UniqueConstraintConditionProduct.objects.create(name='p2')
+        UniqueConstraintConditionProduct(name=obj1.name, color='blue').validate_unique()
+        UniqueConstraintConditionProduct(name=obj2.name).validate_unique()
 
     def test_name(self):
         constraints = get_constraints(UniqueConstraintProduct._meta.db_table)
