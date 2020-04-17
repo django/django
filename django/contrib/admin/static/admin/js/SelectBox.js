@@ -1,136 +1,126 @@
-(function() {
+(function($) {
     'use strict';
     var SelectBox = {
         cache: {},
         init: function(id) {
-            var box = document.getElementById(id);
-            var node;
-            SelectBox.cache[id] = [];
-            var cache = SelectBox.cache[id];
-            var boxOptions = box.options;
-            var boxOptionsLength = boxOptions.length;
-            for (var i = 0, j = boxOptionsLength; i < j; i++) {
-                node = boxOptions[i];
-                cache.push({value: node.value, text: node.text, displayed: 1});
-            }
+            var cache = [];
+            var nogroup = [];
+            $("#" + id + " > option").each(function () {
+                nogroup.push({ value: this.value, text: this.text, displayed: 1 });
+            });
+            cache.push({ 'group': null, 'items': nogroup });
+            $("#" + id + " optgroup").each(function () {
+                var group = [];
+                $("option", this).each(function () {
+                    group.push({ value: this.value, text: this.text, displayed: 1 });
+                })
+                cache.push({ 'group': $(this).attr('label'), 'items': group });
+            });
+            SelectBox.cache[id] = cache;
+            SelectBox.sort(id, false);
         },
-        redisplay: function(id) {
+        redisplay: function (id) {
             // Repopulate HTML select box from cache
-            var box = document.getElementById(id);
-            var node;
-            box.innerHTML = '';
+            var ctr = $("#" + id).empty(), ct;
             var cache = SelectBox.cache[id];
-            for (var i = 0, j = cache.length; i < j; i++) {
-                node = cache[i];
-                if (node.displayed) {
-                    var new_option = new Option(node.text, node.value, false, false);
-                    // Shows a tooltip when hovering over the option
-                    new_option.title = node.text;
-                    box.appendChild(new_option);
+            for (var i = 0; i < cache.length; i++) {
+                var gr = cache[i];
+                if (gr.items.length == 0) continue; //skip empty groups
+                if (gr.group == null) ct = ctr;
+                else ct = $("<optgroup>").attr('label', gr.group).appendTo(ctr);
+                for (var j = 0; j < gr.items.length; j++) {
+                    var itm = gr.items[j];
+                    if (itm.displayed) $("<option>").attr('value', itm.value).text(itm.text).appendTo(ct);
                 }
             }
         },
-        filter: function(id, text) {
+        filter: function (id, text) {
             // Redisplay the HTML select box, displaying only the choices containing ALL
             // the words in text. (It's an AND search.)
             var tokens = text.toLowerCase().split(/\s+/);
-            var node, token;
             var cache = SelectBox.cache[id];
-            for (var i = 0, j = cache.length; i < j; i++) {
-                node = cache[i];
-                node.displayed = 1;
-                var node_text = node.text.toLowerCase();
-                var numTokens = tokens.length;
-                for (var k = 0; k < numTokens; k++) {
-                    token = tokens[k];
-                    if (node_text.indexOf(token) === -1) {
-                        node.displayed = 0;
-                        break; // Once the first token isn't found we're done
+            for (var i = 0; i < cache.length; i++) {
+                var gr = cache[i].items;
+                for (var k = 0; k < gr.length; k++) {
+                    gr[k].displayed = 1;
+                    for (var j = 0; j < tokens.length; j++) {
+                        if (gr[k].text.toLowerCase.indexOf(tokens[j]) < 0) {
+                            gr[k].displayed = 0;
+                            break;
+                        }
                     }
                 }
             }
             SelectBox.redisplay(id);
         },
-        delete_from_cache: function(id, value) {
-            var node, delete_index = null;
+        delete_from_cache: function (id, value) {
             var cache = SelectBox.cache[id];
-            for (var i = 0, j = cache.length; i < j; i++) {
-                node = cache[i];
-                if (node.value === value) {
-                    delete_index = i;
-                    break;
+            outer:
+            for (var i = 0; i < cache.length; i++) {
+                var gr = cache[i].items;
+                for (var j = 0; j < gr.length; j++) {
+                    if (gr[j].value == value) {
+                        gr.splice(j, 1);
+                        break outer;
+                    }
                 }
             }
-            cache.splice(delete_index, 1);
         },
-        add_to_cache: function(id, option) {
-            SelectBox.cache[id].push({value: option.value, text: option.text, displayed: 1});
-        },
-        cache_contains: function(id, value) {
-            // Check if an item is contained in the cache
-            var node;
+        add_to_cache: function (id, group, option) {
             var cache = SelectBox.cache[id];
-            for (var i = 0, j = cache.length; i < j; i++) {
-                node = cache[i];
-                if (node.value === value) {
-                    return true;
+            for (var i = 0; i < cache.length; i++) {
+                if (cache[i].group == group) {
+                    cache[i].items.push({ value: option.value, text: option.text, displayed: 1 });
+                    SelectBox.sort(id, group);
+                    return;
                 }
             }
-            return false;
+            //new group
+            cache.push({ 'group': group, 'items': [{ value: option.value, text: option.text, displayed: 1 }] });
         },
-        move: function(from, to) {
-            var from_box = document.getElementById(from);
-            var option;
-            var boxOptions = from_box.options;
-            var boxOptionsLength = boxOptions.length;
-            for (var i = 0, j = boxOptionsLength; i < j; i++) {
-                option = boxOptions[i];
-                var option_value = option.value;
-                if (option.selected && SelectBox.cache_contains(from, option_value)) {
-                    SelectBox.add_to_cache(to, {value: option_value, text: option.text, displayed: 1});
-                    SelectBox.delete_from_cache(from, option_value);
-                }
-            }
+        move: function (from, to) {
+            $("#" + from + " option:selected").each(function () {
+                var group = this.parentNode.tagName.toLowerCase() == 'optgroup' ? this.parentNode.getAttribute('label') : null;
+                SelectBox.add_to_cache(to, group, { value: this.value, text: this.text, displayed: 1 });
+                SelectBox.delete_from_cache(from, this.value);
+            });
             SelectBox.redisplay(from);
             SelectBox.redisplay(to);
         },
-        move_all: function(from, to) {
-            var from_box = document.getElementById(from);
-            var option;
-            var boxOptions = from_box.options;
-            var boxOptionsLength = boxOptions.length;
-            for (var i = 0, j = boxOptionsLength; i < j; i++) {
-                option = boxOptions[i];
-                var option_value = option.value;
-                if (SelectBox.cache_contains(from, option_value)) {
-                    SelectBox.add_to_cache(to, {value: option_value, text: option.text, displayed: 1});
-                    SelectBox.delete_from_cache(from, option_value);
-                }
-            }
+        move_all: function (from, to) {
+            $("#" + from + " option").each(function () {
+                var group = this.parentNode.tagName.toLowerCase() == 'optgroup' ? this.parentNode.getAttribute('label') : null;
+                SelectBox.add_to_cache(to, group, { value: this.value, text: this.text, displayed: 1 });
+                SelectBox.delete_from_cache(from, this.value);
+            });
             SelectBox.redisplay(from);
             SelectBox.redisplay(to);
         },
-        sort: function(id) {
-            SelectBox.cache[id].sort(function(a, b) {
-                a = a.text.toLowerCase();
-                b = b.text.toLowerCase();
-                if (a > b) {
-                    return 1;
+        sort: function (id, group) {
+            var cache = SelectBox.cache[id];
+            for (var i = 0; i < cache.length; i++) {
+                if (group === false || cache[i].group == group) {
+                    cache[i].items.sort(function (a, b) {
+                        a = a.text.toLowerCase();
+                        b = b.text.toLowerCase();
+                        try {
+                            if (a > b) {
+                                return 1;
+                            }
+                            if (a < b) {
+                                return -1;
+                            }
+                        } catch (e) {
+                            // silently fail on IE 'unknown' exception
+                        }
+                        return 0;
+                    });
                 }
-                if (a < b) {
-                    return -1;
-                }
-                return 0;
-            } );
+            }
         },
         select_all: function(id) {
-            var box = document.getElementById(id);
-            var boxOptions = box.options;
-            var boxOptionsLength = boxOptions.length;
-            for (var i = 0; i < boxOptionsLength; i++) {
-                boxOptions[i].selected = 'selected';
-            }
+            $("#" + id + " option").attr('selected', 'selected');
         }
-    };
+    }
     window.SelectBox = SelectBox;
-})();
+})(django.jQuery);
