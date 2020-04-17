@@ -170,16 +170,16 @@ class HttpRequest:
         else:
             port = '443' if self.is_secure() else '80'  # Default to something sane
         if 'HTTP_HOST' in self.META:
-            _, host_port = split_domain_port(self.META['HTTP_HOST'])
-            if host_port:
+            host_port = self.META['HTTP_HOST'].split(':')[-1]
+            if host_port.isdigit():
                 port = host_port
         forwarded_port = False
         if settings.USE_X_FORWARDED_PORT and 'HTTP_X_FORWARDED_PORT' in self.META:
             forwarded_port = True
             port = self.META['HTTP_X_FORWARDED_PORT']
         if settings.USE_X_FORWARDED_HOST:
-            host, host_port = split_domain_port(self.META.get('HTTP_X_FORWARDED_HOST', ""))
-            if host_port:
+            host_port = self.META.get('HTTP_X_FORWARDED_HOST', '').split(':')[-1]
+            if host_port.isdigit():
                 if forwarded_port is True:
                     raise ImproperlyConfigured(
                         'HTTP_X_FORWARDED_HOST contains a port number '
