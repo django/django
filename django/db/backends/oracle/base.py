@@ -11,6 +11,7 @@ import os
 import platform
 import sys
 import warnings
+import types  # fork : workaround to Instant Client 18.3.0.0.0-1_x86_64 and cx-Oracle 6.4.1
 
 from django.conf import settings
 from django.db import utils
@@ -416,7 +417,10 @@ class FormatStylePlaceholderCursor(object):
     def __init__(self, connection):
         self.cursor = connection.cursor()
         # Necessary to retrieve decimal values without rounding error.
-        self.cursor.numbersAsStrings = True
+
+        # fork : workaround to Instant Client 18.3.0.0.0-1_x86_64 and cx-Oracle 6.4.1
+        # self.cursor.numbersAsStrings = True
+
         # Default arraysize of 1 is highly sub-optimal.
         self.cursor.arraysize = 100
 
@@ -557,9 +561,18 @@ class CursorIterator(six.Iterator):
 def _rowfactory(row, cursor):
     # Cast numeric values as the appropriate Python type based upon the
     # cursor description, and convert strings to unicode.
+
+    # fork : workaround to Instant Client 18.3.0.0.0-1_x86_64 and cx-Oracle 6.4.1
+    NumberTypes = (types.IntType, types.LongType, types.FloatType, types.ComplexType)
+
     casted = []
     for value, desc in zip(row, cursor.description):
+
+        # fork : workaround to Instant Client 18.3.0.0.0-1_x86_64 and cx-Oracle 6.4.1
         if value is not None and desc[1] is Database.NUMBER:
+            if isinstance(value, NumberTypes):
+                value = str(value)
+
             precision, scale = desc[4:6]
             if scale == -127:
                 if precision == 0:
