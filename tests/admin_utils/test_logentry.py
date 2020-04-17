@@ -45,6 +45,7 @@ class LogEntryTests(TestCase):
         LogEntry.change_message is stored as a dumped JSON structure to be able
         to get the message dynamically translated at display time.
         """
+        old_ids = list(LogEntry.objects.values_list('id', flat=True))
         post_data = {
             'site': self.site.pk, 'title': 'Changed', 'hist': 'Some content',
             'created_0': '2008-03-12', 'created_1': '11:54',
@@ -52,16 +53,17 @@ class LogEntryTests(TestCase):
         change_url = reverse('admin:admin_utils_article_change', args=[quote(self.a1.pk)])
         response = self.client.post(change_url, post_data)
         self.assertRedirects(response, reverse('admin:admin_utils_article_changelist'))
-        logentry = LogEntry.objects.filter(content_type__model__iexact='article').latest('id')
+        logentry = LogEntry.objects.filter(content_type__model__iexact='article').exclude(id__in=old_ids).get()
         self.assertEqual(logentry.get_change_message(), 'Changed title and hist.')
         with translation.override('fr'):
             self.assertEqual(logentry.get_change_message(), 'Modification de title et hist.')
 
+        old_ids = list(LogEntry.objects.values_list('id', flat=True))
         add_url = reverse('admin:admin_utils_article_add')
         post_data['title'] = 'New'
         response = self.client.post(add_url, post_data)
         self.assertRedirects(response, reverse('admin:admin_utils_article_changelist'))
-        logentry = LogEntry.objects.filter(content_type__model__iexact='article').latest('id')
+        logentry = LogEntry.objects.filter(content_type__model__iexact='article').exclude(id__in=old_ids).get()
         self.assertEqual(logentry.get_change_message(), 'Added.')
         with translation.override('fr'):
             self.assertEqual(logentry.get_change_message(), 'Ajout.')
@@ -76,6 +78,7 @@ class LogEntryTests(TestCase):
         """
         Localized date/time inputs shouldn't affect changed form data detection.
         """
+        old_ids = list(LogEntry.objects.values_list('id', flat=True))
         post_data = {
             'site': self.site.pk, 'title': 'Changed', 'hist': 'Some content',
             'created_0': '12/03/2008', 'created_1': '11:54',
@@ -84,7 +87,7 @@ class LogEntryTests(TestCase):
             change_url = reverse('admin:admin_utils_article_change', args=[quote(self.a1.pk)])
             response = self.client.post(change_url, post_data)
             self.assertRedirects(response, reverse('admin:admin_utils_article_changelist'))
-        logentry = LogEntry.objects.filter(content_type__model__iexact='article').latest('id')
+        logentry = LogEntry.objects.filter(content_type__model__iexact='article').exclude(id__in=old_ids).get()
         self.assertEqual(logentry.get_change_message(), 'Changed title and hist.')
 
     def test_logentry_change_message_formsets(self):
@@ -187,11 +190,12 @@ class LogEntryTests(TestCase):
 
     def test_log_action(self):
         content_type_pk = ContentType.objects.get_for_model(Article).pk
+        old_ids = list(LogEntry.objects.values_list('id', flat=True))
         log_entry = LogEntry.objects.log_action(
             self.user.pk, content_type_pk, self.a1.pk, repr(self.a1), CHANGE,
             change_message='Changed something else',
         )
-        self.assertEqual(log_entry, LogEntry.objects.latest('id'))
+        self.assertEqual(log_entry, LogEntry.objects.exclude(id__in=old_ids).get())
 
     def test_recentactions_without_content_type(self):
         """
@@ -229,28 +233,31 @@ class LogEntryTests(TestCase):
         changelist_url = reverse('admin:admin_utils_articleproxy_changelist')
 
         # add
+        old_ids = list(LogEntry.objects.values_list('id', flat=True))
         proxy_add_url = reverse('admin:admin_utils_articleproxy_add')
         response = self.client.post(proxy_add_url, post_data)
         self.assertRedirects(response, changelist_url)
-        proxy_addition_log = LogEntry.objects.latest('id')
+        proxy_addition_log = LogEntry.objects.exclude(id__in=old_ids).get()
         self.assertEqual(proxy_addition_log.action_flag, ADDITION)
         self.assertEqual(proxy_addition_log.content_type, proxy_content_type)
 
         # change
+        old_ids = list(LogEntry.objects.values_list('id', flat=True))
         article_id = proxy_addition_log.object_id
         proxy_change_url = reverse('admin:admin_utils_articleproxy_change', args=(article_id,))
         post_data['title'] = 'New'
         response = self.client.post(proxy_change_url, post_data)
         self.assertRedirects(response, changelist_url)
-        proxy_change_log = LogEntry.objects.latest('id')
+        proxy_change_log = LogEntry.objects.exclude(id__in=old_ids).get()
         self.assertEqual(proxy_change_log.action_flag, CHANGE)
         self.assertEqual(proxy_change_log.content_type, proxy_content_type)
 
         # delete
+        old_ids = list(LogEntry.objects.values_list('id', flat=True))
         proxy_delete_url = reverse('admin:admin_utils_articleproxy_delete', args=(article_id,))
         response = self.client.post(proxy_delete_url, {'post': 'yes'})
         self.assertRedirects(response, changelist_url)
-        proxy_delete_log = LogEntry.objects.latest('id')
+        proxy_delete_log = LogEntry.objects.exclude(id__in=old_ids).get()
         self.assertEqual(proxy_delete_log.action_flag, DELETION)
         self.assertEqual(proxy_delete_log.content_type, proxy_content_type)
 
