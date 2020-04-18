@@ -74,7 +74,7 @@ Admin history view information leakage
 ======================================
 
 In previous versions of Django, an admin user without change permission on a
-model could still view the unicode representation of instances via their admin
+model could still view the Unicode representation of instances via their admin
 history log. Django 1.4.4 now limits the admin history log view for an object
 to users with change permission for that model.
 

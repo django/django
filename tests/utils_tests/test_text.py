@@ -189,7 +189,7 @@ class TestUtilsText(SimpleTestCase):
 
     def test_slugify(self):
         items = (
-            # given - expected - unicode?
+            # given - expected - Unicode?
             ('Hello, World!', 'hello-world', False),
             ('spam & eggs', 'spam-eggs', False),
             ('spam & ıçüş', 'spam-ıçüş', True),

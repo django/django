@@ -38,8 +38,8 @@ def _setup_environment(environ):
 _setup_environment([
     # Oracle takes client-side character set encoding from the environment.
     ('NLS_LANG', '.AL32UTF8'),
-    # This prevents unicode from getting mangled by getting encoded into the
-    # potentially non-unicode database character set.
+    # This prevents Unicode from getting mangled by getting encoded into the
+    # potentially non-Unicode database character set.
     ('ORA_NCHAR_LITERAL_REPLACE', 'TRUE'),
 ])
 

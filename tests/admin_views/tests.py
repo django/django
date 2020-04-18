@@ -4842,17 +4842,17 @@ class ReadonlyTest(AdminFieldExtractionMixin, TestCase):
         self.assertContains(response, '<div class="help">', 3)
         self.assertContains(
             response,
-            '<div class="help">Some help text for the title (with unicode ŠĐĆŽćžšđ)</div>',
+            '<div class="help">Some help text for the title (with Unicode ŠĐĆŽćžšđ)</div>',
             html=True
         )
         self.assertContains(
             response,
-            '<div class="help">Some help text for the content (with unicode ŠĐĆŽćžšđ)</div>',
+            '<div class="help">Some help text for the content (with Unicode ŠĐĆŽćžšđ)</div>',
             html=True
         )
         self.assertContains(
             response,
-            '<div class="help">Some help text for the date (with unicode ŠĐĆŽćžšđ)</div>',
+            '<div class="help">Some help text for the date (with Unicode ŠĐĆŽćžšđ)</div>',
             html=True
         )
 
@@ -4962,7 +4962,7 @@ class ReadonlyTest(AdminFieldExtractionMixin, TestCase):
         response = self.client.get(reverse('admin:admin_views_fieldoverridepost_change', args=(p.pk,)))
         self.assertContains(response, '<div class="help">Overridden help text for the date</div>')
         self.assertContains(response, '<label for="id_public">Overridden public label:</label>', html=True)
-        self.assertNotContains(response, "Some help text for the date (with unicode ŠĐĆŽćžšđ)")
+        self.assertNotContains(response, 'Some help text for the date (with Unicode ŠĐĆŽćžšđ)')
 
     def test_correct_autoescaping(self):
         """

@@ -302,7 +302,7 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
 
     def test_unicode_address_header(self):
         """
-        Regression for #11144 - When a to/from/cc header contains unicode,
+        Regression for #11144 - When a to/from/cc header contains Unicode,
         make sure the email addresses are parsed correctly (especially with
         regards to commas)
         """

@@ -499,7 +499,7 @@ There are no known incompatibilities between Django's copy of version 2.0.7 and
 Python's copy of version 2.0.9. However, there are some incompatibilities
 between other versions of ``simplejson``:
 
-- While the ``simplejson`` API is documented as always returning unicode
+- While the ``simplejson`` API is documented as always returning Unicode
   strings, the optional C implementation can return a bytestring. This was
   fixed in Python 2.7.
 - ``simplejson.JSONEncoder`` gained a ``namedtuple_as_object`` keyword

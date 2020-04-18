@@ -570,7 +570,7 @@ class DjangoAdminSettingsDirectory(AdminScriptTestCase):
         self.assertTrue(os.path.exists(os.path.join(app_path, 'api.py')))
 
     def test_startapp_unicode_name(self):
-        "directory: startapp creates the correct directory with unicode characters"
+        """startapp creates the correct directory with Unicode characters."""
         args = ['startapp', 'こんにちは']
         app_path = os.path.join(self.test_dir, 'こんにちは')
         out, err = self.run_django_admin(args, 'test_project.settings')

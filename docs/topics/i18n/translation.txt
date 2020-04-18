@@ -418,7 +418,7 @@ arbitrary Python code. For example, the following won't work because the
 `requests <https://pypi.org/project/requests/>`_ library doesn't handle
 ``gettext_lazy`` objects::
 
-    body = gettext_lazy("I \u2764 Django")  # (unicode :heart:)
+    body = gettext_lazy("I \u2764 Django")  # (Unicode :heart:)
     requests.post('https://example.com/send', data={'body': body})
 
 You can avoid such problems by casting ``gettext_lazy()`` objects to text

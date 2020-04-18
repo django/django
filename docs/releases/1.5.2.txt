@@ -52,7 +52,7 @@ Bugfixes
 * Fixed ``geojson`` detection with SpatiaLite.
 * :meth:`~django.test.SimpleTestCase.assertContains` once again works with
   binary content (#20237).
-* Fixed :class:`~django.db.models.ManyToManyField` if it has a unicode ``name``
+* Fixed :class:`~django.db.models.ManyToManyField` if it has a Unicode ``name``
   parameter (#20207).
 * Ensured that the WSGI request's path is correctly based on the
   ``SCRIPT_NAME`` environment variable or the :setting:`FORCE_SCRIPT_NAME`
