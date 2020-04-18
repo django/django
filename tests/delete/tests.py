@@ -522,11 +522,10 @@ class DeletionTests(TestCase):
         existed_objs = {
             R._meta.label: R.objects.count(),
             HiddenUser._meta.label: HiddenUser.objects.count(),
-            A._meta.label: A.objects.count(),
-            MR._meta.label: MR.objects.count(),
             HiddenUserProfile._meta.label: HiddenUserProfile.objects.count(),
         }
         deleted, deleted_objs = R.objects.all().delete()
+        self.assertCountEqual(deleted_objs.keys(), existed_objs.keys())
         for k, v in existed_objs.items():
             self.assertEqual(deleted_objs[k], v)
 
@@ -550,13 +549,13 @@ class DeletionTests(TestCase):
         existed_objs = {
             R._meta.label: R.objects.count(),
             HiddenUser._meta.label: HiddenUser.objects.count(),
-            A._meta.label: A.objects.count(),
             MR._meta.label: MR.objects.count(),
             HiddenUserProfile._meta.label: HiddenUserProfile.objects.count(),
             M.m2m.through._meta.label: M.m2m.through.objects.count(),
         }
         deleted, deleted_objs = r.delete()
         self.assertEqual(deleted, sum(existed_objs.values()))
+        self.assertCountEqual(deleted_objs.keys(), existed_objs.keys())
         for k, v in existed_objs.items():
             self.assertEqual(deleted_objs[k], v)
 
@@ -694,7 +693,7 @@ class FastDeleteTests(TestCase):
         with self.assertNumQueries(1):
             self.assertEqual(
                 User.objects.filter(avatar__desc='missing').delete(),
-                (0, {'delete.User': 0})
+                (0, {}),
             )
 
     def test_fast_delete_combined_relationships(self):

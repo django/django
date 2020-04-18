@@ -408,7 +408,8 @@ class Collector:
             # fast deletes
             for qs in self.fast_deletes:
                 count = qs._raw_delete(using=self.using)
-                deleted_counter[qs.model._meta.label] += count
+                if count:
+                    deleted_counter[qs.model._meta.label] += count
 
             # update fields
             for model, instances_for_fieldvalues in self.field_updates.items():
@@ -426,7 +427,8 @@ class Collector:
                 query = sql.DeleteQuery(model)
                 pk_list = [obj.pk for obj in instances]
                 count = query.delete_batch(pk_list, self.using)
-                deleted_counter[model._meta.label] += count
+                if count:
+                    deleted_counter[model._meta.label] += count
 
                 if not model._meta.auto_created:
                     for obj in instances:
