@@ -1,10 +1,11 @@
 import sys
 import traceback
 from io import BytesIO
-from unittest import TestCase
+from unittest import TestCase, mock
 from wsgiref import simple_server
 
 from django.core.servers.basehttp import get_internal_wsgi_application
+from django.core.signals import request_finished
 from django.test import RequestFactory, override_settings
 
 from .views import FILE_RESPONSE_HOLDER
@@ -114,6 +115,15 @@ class WSGIFileWrapperTests(TestCase):
         self.assertIs(buf1.closed, True)
         self.assertIs(buf2.closed, True)
         FILE_RESPONSE_HOLDER.clear()
+
+    @override_settings(ROOT_URLCONF='builtin_server.urls')
+    def test_file_response_call_request_finished(self):
+        env = RequestFactory().get('/fileresponse/').environ
+        handler = FileWrapperHandler(None, BytesIO(), BytesIO(), env)
+        with mock.MagicMock() as signal_handler:
+            request_finished.connect(signal_handler)
+            handler.run(get_internal_wsgi_application())
+            self.assertEqual(signal_handler.call_count, 1)
 
 
 class WriteChunkCounterHandler(ServerHandler):
