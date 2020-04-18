@@ -201,13 +201,33 @@ class DatabaseOperations(BaseDatabaseOperations):
             # Simulate TRUNCATE CASCADE by recursively collecting the tables
             # referencing the tables to be flushed.
             tables = set(chain.from_iterable(self._references_graph(table) for table in tables))
-        # Note: No requirement for reset of auto-incremented indices (cf. other
-        # sql_flush() implementations). Just return SQL at this point
-        return ['%s %s %s;' % (
+        sql = ['%s %s %s;' % (
             style.SQL_KEYWORD('DELETE'),
             style.SQL_KEYWORD('FROM'),
             style.SQL_FIELD(self.quote_name(table))
         ) for table in tables]
+        if reset_sequences:
+            sequences = [{'table': table} for table in tables]
+            sql.extend(self.sequence_reset_by_name_sql(style, sequences))
+        return sql
+
+    def sequence_reset_by_name_sql(self, style, sequences):
+        if not sequences:
+            return []
+        return [
+            '%s %s %s %s = 0 %s %s %s (%s);' % (
+                style.SQL_KEYWORD('UPDATE'),
+                style.SQL_TABLE(self.quote_name('sqlite_sequence')),
+                style.SQL_KEYWORD('SET'),
+                style.SQL_FIELD(self.quote_name('seq')),
+                style.SQL_KEYWORD('WHERE'),
+                style.SQL_FIELD(self.quote_name('name')),
+                style.SQL_KEYWORD('IN'),
+                ', '.join([
+                    "'%s'" % sequence_info['table'] for sequence_info in sequences
+                ]),
+            ),
+        ]
 
     def adapt_datetimefield_value(self, value):
         if value is None:

@@ -40,7 +40,6 @@ class SQLiteOperationsTests(TestCase):
         )
 
     def test_sql_flush_sequences(self):
-        # sequences doesn't change statements on SQLite.
         self.assertEqual(
             connection.ops.sql_flush(
                 no_style(),
@@ -50,11 +49,12 @@ class SQLiteOperationsTests(TestCase):
             [
                 'DELETE FROM "backends_person";',
                 'DELETE FROM "backends_tag";',
+                'UPDATE "sqlite_sequence" SET "seq" = 0 WHERE "name" IN '
+                '(\'backends_person\', \'backends_tag\');',
             ],
         )
 
     def test_sql_flush_sequences_allow_cascade(self):
-        # sequences doesn't change statements on SQLite.
         statements = connection.ops.sql_flush(
             no_style(),
             [Person._meta.db_table, Tag._meta.db_table],
@@ -63,7 +63,7 @@ class SQLiteOperationsTests(TestCase):
         )
         self.assertEqual(
             # The tables are processed in an unordered set.
-            sorted(statements),
+            sorted(statements[:-1]),
             [
                 'DELETE FROM "backends_person";',
                 'DELETE FROM "backends_tag";',
@@ -71,4 +71,15 @@ class SQLiteOperationsTests(TestCase):
                 'zzzzzzzzzzzzzzzzzzzz_m2m_also_quite_long_zzzzzzzzzzzzzzzzzzzz'
                 'zzzzzzzzzzzzzzzzzzzzzzz";',
             ],
+        )
+        self.assertIs(statements[-1].startswith(
+            'UPDATE "sqlite_sequence" SET "seq" = 0 WHERE "name" IN ('
+        ), True)
+        self.assertIn("'backends_person'", statements[-1])
+        self.assertIn("'backends_tag'", statements[-1])
+        self.assertIn(
+            "'backends_verylongmodelnamezzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz"
+            "zzzz_m2m_also_quite_long_zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz"
+            "zzz'",
+            statements[-1],
         )

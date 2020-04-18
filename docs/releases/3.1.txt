@@ -320,6 +320,9 @@ Management Commands
 * The new :option:`dbshell -- ARGUMENTS <dbshell -->` option allows passing
   extra arguments to the command-line client for the database.
 
+* The :djadmin:`flush` and :djadmin:`sqlflush` commands now include SQL to
+  reset sequences on SQLite.
+
 Migrations
 ~~~~~~~~~~
 
