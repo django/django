@@ -9,6 +9,7 @@ affine
 aggregator
 Ai
 Alchin
+allowlist
 alphanumerics
 amet
 amongst
@@ -66,6 +67,7 @@ Biggs
 bitwise
 Bjørn
 blazingly
+blocklist
 blog
 blogs
 boilerplatish
@@ -782,7 +784,6 @@ virtualenvs
 virtualized
 Weblog
 whitelist
-whitelisted
 whitespace
 whitespaces
 whizbang

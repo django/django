@@ -477,7 +477,8 @@ Utilities
 Validators
 ~~~~~~~~~~
 
-* ...
+* :attr:`~django.core.validators.EmailValidator.allowlist` changed name to
+  allowlist from whitelist.
 
 Miscellaneous
 ~~~~~~~~~~~~~

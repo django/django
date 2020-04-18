@@ -165,15 +165,15 @@ class EmailValidator:
         # literal form, ipv4 or ipv6 address (SMTP 4.1.3)
         r'\[([A-f0-9:.]+)\]\Z',
         re.IGNORECASE)
-    domain_whitelist = ['localhost']
+    domain_allowlist = ['localhost']
 
-    def __init__(self, message=None, code=None, whitelist=None):
+    def __init__(self, message=None, code=None, allowlist=None):
         if message is not None:
             self.message = message
         if code is not None:
             self.code = code
-        if whitelist is not None:
-            self.domain_whitelist = whitelist
+        if allowlist is not None:
+            self.domain_allowlist = allowlist
 
     def __call__(self, value):
         if not value or '@' not in value:
@@ -184,7 +184,7 @@ class EmailValidator:
         if not self.user_regex.match(user_part):
             raise ValidationError(self.message, code=self.code)
 
-        if (domain_part not in self.domain_whitelist and
+        if (domain_part not in self.domain_allowlist and
                 not self.validate_domain_part(domain_part)):
             # Try for possible IDN domain-part
             try:
@@ -213,7 +213,7 @@ class EmailValidator:
     def __eq__(self, other):
         return (
             isinstance(other, EmailValidator) and
-            (self.domain_whitelist == other.domain_whitelist) and
+            (self.domain_allowlist == other.domain_allowlist) and
             (self.message == other.message) and
             (self.code == other.code)
         )
