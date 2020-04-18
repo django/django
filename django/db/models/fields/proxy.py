@@ -14,5 +14,8 @@ class OrderWrt(fields.IntegerField):
 
     def __init__(self, *args, **kwargs):
         kwargs['name'] = '_order'
+        # Spanner doesn't support column names starting with _. This allows
+        # the test to run.
+        kwargs['db_column'] = 'x_order'
         kwargs['editable'] = False
         super().__init__(*args, **kwargs)
