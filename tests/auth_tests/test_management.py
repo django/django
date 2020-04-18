@@ -421,8 +421,6 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
         call_command(
             command,
             stdin=sentinel,
-            stdout=StringIO(),
-            stderr=StringIO(),
             interactive=False,
             verbosity=0,
             username='janet',
@@ -433,8 +431,6 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
         command = createsuperuser.Command()
         call_command(
             command,
-            stdout=StringIO(),
-            stderr=StringIO(),
             interactive=False,
             verbosity=0,
             username='joe',
