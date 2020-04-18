@@ -43,9 +43,8 @@ class CommandTests(SimpleTestCase):
         self.assertIn("I don't feel like dancing Jive.\n", out.getvalue())
 
     def test_language_preserved(self):
-        out = StringIO()
         with translation.override('fr'):
-            management.call_command('dance', stdout=out)
+            management.call_command('dance', verbosity=0)
             self.assertEqual(translation.get_language(), 'fr')
 
     def test_explode(self):
@@ -76,7 +75,7 @@ class CommandTests(SimpleTestCase):
         """
         current_locale = translation.get_language()
         with translation.override('pl'):
-            result = management.call_command('no_translations', stdout=StringIO())
+            result = management.call_command('no_translations')
             self.assertIsNone(result)
         self.assertEqual(translation.get_language(), current_locale)
 
@@ -140,7 +139,7 @@ class CommandTests(SimpleTestCase):
 
     def test_calling_a_command_with_no_app_labels_and_parameters_should_raise_a_command_error(self):
         with self.assertRaises(CommandError):
-            management.call_command('hal', stdout=StringIO())
+            management.call_command('hal')
 
     def test_output_transaction(self):
         output = management.call_command('transaction', stdout=StringIO(), no_color=True)
