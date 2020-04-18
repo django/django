@@ -1027,10 +1027,6 @@ appropriate entities.
 For a complete discussion on the usage of the following see the
 :doc:`translation documentation </topics/i18n/translation>`.
 
-The ``u`` prefix on the functions below comes from a difference in Python 2
-between unicode and bytestrings. If your code doesn't support Python 2, use the
-functions without the ``u``.
-
 .. function:: gettext(message)
 
     Translates ``message`` and returns it as a string.

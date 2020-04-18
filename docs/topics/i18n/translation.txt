@@ -53,12 +53,6 @@ Specify a translation string by using the function
 as a shorter alias, ``_``, to save typing.
 
 .. note::
-    The ``u`` prefixing of ``gettext`` functions was originally to distinguish
-    usage between unicode strings and bytestrings on Python 2. For code that
-    supports only Python 3, they can be used interchangeably. A deprecation for
-    the prefixed functions may happen in a future Django release.
-
-.. note::
     Python's standard library ``gettext`` module installs ``_()`` into the
     global namespace, as an alias for ``gettext()``. In Django, we have chosen
     not to follow this practice, for a couple of reasons:
