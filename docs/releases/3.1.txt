@@ -683,6 +683,9 @@ Miscellaneous
   the previous behavior, pass ``ensure_ascii=True`` to JSON serializer, or
   ``allow_unicode=False`` to YAML serializer.
 
+* The auto-reloader no longer monitors changes in built-in Django translation
+  files.
+
 .. _deprecated-features-3.1:
 
 Features deprecated in 3.1
