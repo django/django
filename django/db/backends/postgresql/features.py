@@ -61,6 +61,9 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     test_collations = {
         'swedish-ci': 'sv-x-icu',
     }
+    supports_olap_grouping_sets = True
+    supports_olap_cube = True
+    supports_olap_rollup = True
 
     @cached_property
     def introspected_field_types(self):

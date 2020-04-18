@@ -16,6 +16,7 @@ from collections import Counter, namedtuple
 from collections.abc import Iterator, Mapping
 from itertools import chain, count, product
 from string import ascii_uppercase
+from typing import Any, List, Sequence
 
 from django.core.exceptions import (
     EmptyResultSet, FieldDoesNotExist, FieldError,
@@ -23,7 +24,9 @@ from django.core.exceptions import (
 from django.db import DEFAULT_DB_ALIAS, NotSupportedError, connections
 from django.db.models.aggregates import Count
 from django.db.models.constants import LOOKUP_SEP
-from django.db.models.expressions import BaseExpression, Col, F, OuterRef, Ref
+from django.db.models.expressions import (
+    BaseExpression, Col, Expression, F, OuterRef, Ref,
+)
 from django.db.models.fields import Field
 from django.db.models.fields.related_lookups import MultiColSource
 from django.db.models.lookups import Lookup
@@ -164,6 +167,7 @@ class Query(BaseExpression):
         self.used_aliases = set()
         self.filter_is_sticky = False
         self.subquery = False
+        self.custom_group_by = False
 
         # SQL-related attributes
         # Select and related select clauses are expressions to use in the
@@ -1993,6 +1997,39 @@ class Query(BaseExpression):
         self.extra_order_by = ()
         if force_empty:
             self.default_ordering = False
+
+    def get_group_by_cols(self, alias=None):
+        if not self.custom_group_by:
+            return super().get_group_by_cols(alias=alias)
+        return self.group_by
+
+    def group(self, *expressions):
+        if expressions is None:
+            raise ValueError('Please provide some expressions')
+        if (
+            expressions is not None and
+            not any(isinstance(expr, (str, F, Expression)) for expr in expressions)
+        ):
+            raise ValueError(
+                "custom_group_by requires that all expressions are either strings, F-objects or expressions"
+            )
+
+        for expression in list(expressions):
+            if isinstance(expression, Expression) and not getattr(expression, 'requires_custom_group_by', False):
+                warnings.warn(
+                    "The GROUP BY clause is handled already quite well by Django. Please use only "
+                    "this method in case you found a short-coming, e.g., grouping sets. You can use"
+                    "str(query) to evaluate if Django already translates the ORM query without the use"
+                    "of this method.",
+                    category=UserWarning,
+                    stacklevel=2,
+                )
+
+        # Start the actual work
+        self.group_by = []
+        for expr in expressions:
+            self.group_by.append(expr)
+        self.group_by = tuple(expressions)
 
     def set_group_by(self, allow_aliases=True):
         """

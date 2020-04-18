@@ -8,6 +8,7 @@ import warnings
 from collections import namedtuple
 from functools import lru_cache
 from itertools import chain
+from typing import Dict, Optional
 
 import django
 from django.conf import settings
@@ -1136,6 +1137,10 @@ class QuerySet:
                 break
 
         return clone
+
+    def group_by(self, *, expressions):
+        clone = self._chain()
+        return clone.query.group(expressions)
 
     def order_by(self, *field_names):
         """Return a new QuerySet instance with the ordering changed."""

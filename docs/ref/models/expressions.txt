@@ -708,6 +708,51 @@ should avoid them if possible.
     You can read more about how Django's :ref:`SQL injection protection
     <sql-injection-protection>` works.
 
+OLAP functionality
+------------------
+
+.. versionadded:: 3.2
+
+It's possible to combine these three expressions with
+:meth:`QuerySet.group_by()<django.db.models.query.QuerySet.group_by>`.
+to get aggregation result for different combinations of the columns and
+expressions from your query. Please note that since the group by is manually
+controlled, it's easy to get warnings from your database backend informing
+that certain expressions or columns are
+
+.. class:: Cube(expressions)
+
+    This group by modifier generates a permutation of the expressions of
+    size 0 to the length of the expressions.
+
+    .. code-block::
+
+        >>> from django.db.models import Cube, Sum
+        >>>
+        >>> Product.objects.annotate(total=Sum("types")).group_by()
+
+.. class:: RollUp(expressions)
+
+    With this modifier, this
+
+    .. admonition:: MySQL and MariaDB support
+
+        MySQL and MariaDB do not support a partial ``RollUp``.
+        MySQL <https://dev.mysql.com/doc/refman/8.0/en/group-by-modifiers.html>
+        documentation
+
+.. class:: GroupingSets(expressions)
+
+    This modifier is similar to ``Cube`` in many ways, as it's
+
+
+.. admonition:: Limited support
+
+    Django officially supports SQL databases of different vendors. SQLite does
+    not support any of the different ways to group a result set. MariaDB and
+    MySQL do not support partial roll up. Oracle and PostgreSQL are the two
+    backends with support for all of the OLAP functionality.
+
 Window functions
 ----------------
 

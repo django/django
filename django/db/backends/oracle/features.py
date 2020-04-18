@@ -61,6 +61,9 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_boolean_expr_in_select_clause = False
     supports_primitives_in_json_field = False
     supports_json_field_contains = False
+    supports_olap_grouping_sets = True
+    supports_olap_cube = True
+    supports_olap_rollup = True
     test_collations = {
         'ci': 'BINARY_CI',
         'cs': 'BINARY',

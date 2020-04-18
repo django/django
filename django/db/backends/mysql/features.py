@@ -48,6 +48,9 @@ class DatabaseFeatures(BaseDatabaseFeatures):
         'ci': 'utf8_general_ci',
         'swedish-ci': 'utf8_swedish_ci',
     }
+    # MySQL and MariaDB just support WITH ROLLUP
+    # MySQL does not support partial roll up. Just skip it in the tests.
+    supports_olap_rollup = True
 
     @cached_property
     def _mysql_storage_engine(self):

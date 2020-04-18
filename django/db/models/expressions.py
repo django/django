@@ -158,6 +158,11 @@ class BaseExpression:
     filterable = True
     # Can the expression can be used as a source expression in Window?
     window_compatible = False
+    # It's easier to let users control this manually, rather than
+    # adapting this functionality into the SQLCompiler and
+    # QuerySet/Query classes. It's used to raise warnings if users use
+    # this without
+    requires_custom_group_by = False
 
     def __init__(self, output_field=None):
         if output_field is not None:

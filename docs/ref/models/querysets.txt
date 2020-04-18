@@ -681,6 +681,59 @@ You can also refer to fields on related models with reverse relations through
    pronounced if you include multiple such fields in your ``values()`` query,
    in which case all possible combinations will be returned.
 
+``group_by``
+~~~~~~~~~~~~
+
+.. method:: group_by(expressions=None)
+
+    .. versionadded:: 3.2
+
+Django controls the logic of the group by part of the query when either
+:meth:`annotate` or :meth:`aggregate` are used. However, at times, it's
+convenient to control this yourself. A particular use case for this is when
+you'd like to use :class:`~django.db.models.expressions.RollUp` or
+:class:`~django.db.models.expressions.GroupingSets` as part of the query::
+
+    >>> from django.db.models import RollUp, Sum
+    >>> # Cars is a simple model with just one field
+    >>> Cars.objects.annotate(order_val=Sum(value)).group_by(RollUp('line'))
+    <QuerySet [{'line': 'Vintage', 'order_val': 12000},
+        {'line': 'SUV', 'order_val': 25000},
+        {'line': 'Trucks', 'order_val': 20000},
+        {'line': None, 'order_val': 32000}>
+
+Please note that the database backends may have different requirements on
+the group by part of the query. Manually controlling the group by does not
+influence the ability to filter of annotations::
+
+    >>> from django.db.models import RollUp, Sum
+    >>> Cars.objects.annotate(order_val=Sum(value)).group_by(RollUp('line'))
+    <QuerySet [{'line': 'Vintage', 'order_val': 12000},
+        {'line': 'Trucks', 'order_val': 20000},
+        {'line': None, 'order_val': 32000}>
+
+Note that the models define methods that can conveniently be used when defining
+the group by clauses. There are methods
+In addition, it may be desired to use :meth:`values_list` or :meth:`values` to
+limit the number of columns that you retrieve with your query.
+
+.. admonition:: Limited use case for SQLite
+
+The above example does not work on SQLite. If you ask yourself if you need
+to manually add a group by clause to the query, the answer is most likely no.
+It's mainly relevant when combined with
+:class:`~django.db.models.expressions.Cube`,
+:class:`~django.db.models.expressions.GroupingSets` or
+:class:`~django.db.models.expressions.RollUp`.
+
+Please note that a :py:class:`warnings.UserWarning` will be raised if you try
+to use expressions in ``group_by`` because Django generally handles this pretty
+well already. If you're certain that you run into use cases where you'd like
+to use the ``group_by`` method for expressions that aren't in the above list,
+you can use :py:meth:`logging.captureWarnings` with the settings logging
+filter. However, please ensure that you understand that you suppress
+functionality of Django that's both tested and documented well.
+
 ``values_list()``
 ~~~~~~~~~~~~~~~~~
 

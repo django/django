@@ -577,6 +577,7 @@ class ManagerTest(SimpleTestCase):
         'alias',
         'complex_filter',
         'exclude',
+        'group_by',
         'in_bulk',
         'iterator',
         'earliest',

@@ -308,6 +308,11 @@ class BaseDatabaseFeatures:
         'cs': None,  # Case-sensitive.
         'swedish-ci': None  # Swedish case-insensitive.
     }
+    # Does the backend support Cube, Roll up, Grouping sets
+    supports_olap_grouping_sets = False
+    supports_olap_cube = False
+    # Should we also introduce a feature flag for partial roll up?
+    supports_olap_rollup = False
 
     def __init__(self, connection):
         self.connection = connection

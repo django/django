@@ -26,8 +26,9 @@ class SQLCompiler:
         re.MULTILINE | re.DOTALL,
     )
 
-    def __init__(self, query, connection, using):
-        self.query = query
+    def __init__(self, query: Query, connection, using):
+        self.custom_group_by = False
+        self.query = query  # type: Query
         self.connection = connection
         self.using = using
         self.quote_cache = {'*': '*'}

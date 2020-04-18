@@ -9,7 +9,8 @@ from django.db.models.functions.mixins import (
 )
 
 __all__ = [
-    'Aggregate', 'Avg', 'Count', 'Max', 'Min', 'StdDev', 'Sum', 'Variance',
+    'Aggregate', 'Avg', 'Count', 'Grouping', 'Max', 'Min', 'StdDev', 'Sum',
+    'Variance',
 ]
 
 
@@ -117,6 +118,14 @@ class Count(Aggregate):
 
     def convert_value(self, value, expression, connection):
         return 0 if value is None else value
+
+
+class Grouping(Aggregate):
+    function = 'GROUPING'
+    name = 'Grouping'
+    # Grouping is special, and can't be used as a window expression,
+    # however, it can be used as a predicate with HAVING
+    window_compatible = False
 
 
 class Max(Aggregate):

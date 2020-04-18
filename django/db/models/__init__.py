@@ -24,6 +24,8 @@ from django.db.models.indexes import *  # NOQA
 from django.db.models.indexes import __all__ as indexes_all
 from django.db.models.lookups import Lookup, Transform
 from django.db.models.manager import Manager
+from django.db.models.olap import *  # NOQA
+from django.db.models.olap import __all__ as olap_all
 from django.db.models.query import Prefetch, QuerySet, prefetch_related_objects
 from django.db.models.query_utils import FilteredRelation, Q
 
@@ -35,7 +37,7 @@ from django.db.models.fields.related import (  # isort:skip
 )
 
 
-__all__ = aggregates_all + constraints_all + enums_all + fields_all + indexes_all
+__all__ = aggregates_all + constraints_all + enums_all + fields_all + indexes_all + olap_all
 __all__ += [
     'ObjectDoesNotExist', 'signals',
     'CASCADE', 'DO_NOTHING', 'PROTECT', 'RESTRICT', 'SET', 'SET_DEFAULT',
