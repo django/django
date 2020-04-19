@@ -696,7 +696,7 @@ inheritance list.
 .. class:: SuperuserRequired
 
     If a view is using this mixin, all requests by non-authenticated users will
-    be redirected to the login page or shown an HTTP 403 Forbidden error, if user
+    be redirected to the login page or shown an HTTP 404 Not Found error, if user
     is a regular user and depending on the
     :attr:`~django.contrib.auth.mixins.AccessMixin.raise_exception` parameter.
 

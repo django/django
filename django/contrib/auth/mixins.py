@@ -2,6 +2,7 @@ from django.conf import settings
 from django.contrib.auth import REDIRECT_FIELD_NAME
 from django.contrib.auth.views import redirect_to_login
 from django.core.exceptions import ImproperlyConfigured, PermissionDenied
+from django.http import Http404
 
 
 class AccessMixin:
@@ -56,7 +57,7 @@ class SuperuserRequiredMixin(AccessMixin):
     """Verify that the current user is superuser."""
     def dispatch(self, request, *args, **kwargs):
         if not request.user.is_superuser:
-            return self.handle_no_permission()
+            raise Http404
 
         return super().dispatch(request, *args, **kwargs)
 

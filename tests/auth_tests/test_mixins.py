@@ -7,7 +7,7 @@ from django.contrib.auth.mixins import (
 )
 from django.contrib.auth.models import AnonymousUser
 from django.core.exceptions import PermissionDenied
-from django.http import HttpResponse
+from django.http import HttpResponse, Http404
 from django.test import RequestFactory, SimpleTestCase, TestCase
 from django.views.generic import View
 
@@ -256,11 +256,11 @@ class SuperuserRequiredMixinTests(TestCase):
         response = view(request)
         self.assertEqual(response.status_code, 200)
 
-        with self.assertRaises(PermissionDenied):
+        with self.assertRaises(Http404):
             request = self.factory.get('/rand')
             request.user = self.user
             response = view(request)
-            self.assertEqual(response.status_code, 403)
+            self.assertEqual(response.status_code, 404)
 
 
 class PermissionsRequiredMixinTests(TestCase):
