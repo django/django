@@ -56,6 +56,13 @@ class LoginRequiredMixin(AccessMixin):
 class SuperuserRequiredMixin(AccessMixin):
     """Verify that the current user is superuser."""
     def dispatch(self, request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            return redirect_to_login(
+                self.request.get_full_path(),
+                self.get_login_url(),
+                self.get_redirect_field_name()
+            )
+
         if not request.user.is_superuser:
             raise Http404
 
