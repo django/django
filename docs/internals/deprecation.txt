@@ -26,6 +26,9 @@ details on these changes.
 
 * The ``default_app_config`` module variable will be removed.
 
+* Silencing exceptions raised while evaluating the ``{% if %}`` template tag
+  will be removed.
+
 .. _deprecation-removed-in-4.0:
 
 4.0

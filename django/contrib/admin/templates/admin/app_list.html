@@ -8,7 +8,7 @@
           <a href="{{ app.app_url }}" class="section" title="{% blocktranslate with name=app.name %}Models in the {{ name }} application{% endblocktranslate %}">{{ app.name }}</a>
         </caption>
         {% for model in app.models %}
-          <tr class="model-{{ model.object_name|lower }}{% if model.admin_url in request.path %} current-model{% endif %}">
+          <tr class="model-{{ model.object_name|lower }}{% if model.admin_url and model.admin_url in request.path %} current-model{% endif %}">
             {% if model.admin_url %}
               <th scope="row"><a href="{{ model.admin_url }}"{% if model.admin_url in request.path %} aria-current="page"{% endif %}>{{ model.name }}</a></th>
             {% else %}

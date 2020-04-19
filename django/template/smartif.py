@@ -7,6 +7,10 @@ Parser and utilities for the smart 'if' tag
 # 'nud' = null denotation
 # 'bp' = binding power (left = lbp, right = rbp)
 
+import warnings
+
+from django.utils.deprecation import RemovedInDjango41Warning
+
 
 class TokenBase:
     """
@@ -56,10 +60,18 @@ def infix(bp, func):
         def eval(self, context):
             try:
                 return func(context, self.first, self.second)
-            except Exception:
-                # Templates shouldn't throw exceptions when rendering.  We are
-                # most likely to get exceptions for things like {% if foo in bar
-                # %} where 'bar' does not support 'in', so default to False
+            except Exception as e:
+                exception_str = type(e).__name__
+                msg = str(e)
+                if msg:
+                    exception_str = "%s: %s" % (exception_str, msg)
+                warnings.warn(
+                    "Evaluating an {%% if %%} in a template raised an "
+                    "exception. In Django 4.1, this exception will be raised "
+                    "rather than silenced. The exception was:\n%s" %
+                    exception_str,
+                    RemovedInDjango41Warning,
+                )
                 return False
 
     return Operator
@@ -81,7 +93,18 @@ def prefix(bp, func):
         def eval(self, context):
             try:
                 return func(context, self.first)
-            except Exception:
+            except Exception as e:
+                exception_str = type(e).__name__
+                msg = str(e)
+                if msg:
+                    exception_str = "%s: %s" % (exception_str, msg)
+                warnings.warn(
+                    "Evaluating an {%% if %%} in a template raised an "
+                    "exception. In Django 4.1, this exception will be raised "
+                    "rather than silenced. The exception was:\n%s" %
+                    exception_str,
+                    RemovedInDjango41Warning,
+                )
                 return False
 
     return Operator

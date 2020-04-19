@@ -1,6 +1,7 @@
 from django.template import TemplateSyntaxError
 from django.template.defaulttags import IfNode
 from django.test import SimpleTestCase
+from django.utils.deprecation import RemovedInDjango41Warning
 
 from ..utils import TestObj, setup
 
@@ -618,6 +619,36 @@ class IfTagExceptionsTests(SimpleTestCase):
 
         with self.assertRaises(RuntimeError):
             self.engine.render_to_string('template', {'foo': _raise_exception})
+
+    @setup({'template': '{% if not foo %}yes{% else %}no{% endif %}'})
+    def test_if_prefix_operator_exception(self):
+        def _raise_runtime_error():
+            raise RuntimeError
+
+        msg = (
+            "Evaluating an {% if %} in a template raised an exception. In "
+            "Django 4.1, this exception will be raised rather than silenced. "
+            "The exception was:\nRuntimeError"
+        )
+        # TODO: Change to assertRaises after the deprecation period.
+        with self.assertWarnsMessage(RemovedInDjango41Warning, msg):
+            output = self.engine.render_to_string('template', {'foo': _raise_runtime_error})
+        self.assertEqual(output, 'no')
+
+    @setup({'template': '{% if foo == 1 %}yes{% else %}no{% endif %}'})
+    def test_if_infix_operator_exception(self):
+        def _raise_exception():
+            raise RuntimeError
+
+        msg = (
+            "Evaluating an {% if %} in a template raised an exception. In "
+            "Django 4.1, this exception will be raised rather than silenced. "
+            "The exception was:\nRuntimeError"
+        )
+        # TODO: Change to assertRaises after the deprecation period.
+        with self.assertWarnsMessage(RemovedInDjango41Warning, msg):
+            output = self.engine.render_to_string('template', {'foo': _raise_exception})
+        self.assertEqual(output, 'no')
 
 
 class IfNodeTests(SimpleTestCase):

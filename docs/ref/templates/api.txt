@@ -357,10 +357,14 @@ Filters that are applied to an invalid variable will only be applied if
 ``string_if_invalid`` is set to any other value, variable filters will be
 ignored.
 
-This behavior is slightly different for the ``if``, ``for`` and ``regroup``
-template tags. If an invalid variable is provided to one of these template
-tags, the variable will be interpreted as ``None``. Filters are always
-applied to invalid variables within these template tags.
+This behavior is slightly different for the ``for`` and ``regroup`` template
+tags. If an invalid variable is provided to one of these template tags, the
+variable will be interpreted as ``None``. Filters are always applied to invalid
+variables within these template tags.
+
+As ``if`` template tags are used to hide sensitive or private data, they too
+behave differently. For them, operations on invalid variables will raise an
+exception.
 
 If ``string_if_invalid`` contains a ``'%s'``, the format marker will be
 replaced with the name of the invalid variable.

@@ -523,3 +523,6 @@ Miscellaneous
 * The ``default_app_config`` application configuration variable is deprecated,
   due to the now automatic ``AppConfig`` discovery. See :ref:`whats-new-3.2`
   for more details.
+
+* Silencing exceptions raised while evaluating the :ttag:`{% if %}<if>`
+  template tag is deprecated.

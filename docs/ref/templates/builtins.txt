@@ -408,6 +408,11 @@ As you can see, the ``if`` tag may take one or several ``{% elif %}``
 clauses, as well as an ``{% else %}`` clause that will be displayed if all
 previous conditions fail. These clauses are optional.
 
+.. deprecated:: 3.2
+
+    Silencing exceptions raised while evaluating the ``{% if %}`` template tag
+    is deprecated. In Django 4.1, the exception will be raised.
+
 Boolean operators
 ~~~~~~~~~~~~~~~~~
 
