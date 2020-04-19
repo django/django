@@ -602,6 +602,24 @@ class IfTagTests(SimpleTestCase):
         self.assertEqual(output, 'no')
 
 
+class IfTagExceptionsTests(SimpleTestCase):
+    @setup({'template': '{% if foo %}yes{% else %}no{% endif %}'})
+    def test_if_raises_exception(self):
+        def _raise_runtime_error():
+            raise RuntimeError
+
+        with self.assertRaises(RuntimeError):
+            self.engine.render_to_string('template', {'foo': _raise_runtime_error})
+
+    @setup({'template': '{% if foo|length %}yes{% else %}no{% endif %}'})
+    def test_if_length_exception(self):
+        def _raise_exception():
+            raise RuntimeError
+
+        with self.assertRaises(RuntimeError):
+            self.engine.render_to_string('template', {'foo': _raise_exception})
+
+
 class IfNodeTests(SimpleTestCase):
     def test_repr(self):
         node = IfNode(conditions_nodelists=[])
