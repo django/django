@@ -3,7 +3,7 @@ from urllib.parse import urlparse
 
 from django.conf import settings
 from django.contrib.auth import REDIRECT_FIELD_NAME
-from django.core.exceptions import PermissionDenied
+from django.http import Http404
 from django.shortcuts import resolve_url
 
 
@@ -64,7 +64,7 @@ def superuser_required(redirect_field_name=REDIRECT_FIELD_NAME, login_url=None):
                     login_url=login_url
                 )
 
-            raise PermissionDenied
+            raise Http404
 
         return _wrapped_view
 
