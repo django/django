@@ -5,7 +5,7 @@ from django.contrib.auth.decorators import (
 )
 from django.contrib.auth.models import AnonymousUser
 from django.core.exceptions import PermissionDenied
-from django.http import HttpResponse, Http404
+from django.http import Http404, HttpResponse
 from django.test import TestCase, override_settings
 from django.test.client import RequestFactory
 
