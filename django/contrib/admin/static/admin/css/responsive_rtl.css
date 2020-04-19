@@ -71,7 +71,6 @@
         margin-left: 0;
     }
 
-    [dir="rtl"] .aligned .add-another,
     [dir="rtl"] .aligned .related-lookup,
     [dir="rtl"] .aligned .datetimeshortcuts {
         margin-left: 0;
