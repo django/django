@@ -3,7 +3,6 @@ from django.db import (
     IntegrityError, connection, migrations, models, transaction,
 )
 from django.db.migrations.migration import Migration
-from django.db.migrations.operations import CreateModel
 from django.db.migrations.operations.fields import FieldOperation
 from django.db.migrations.state import ModelState, ProjectState
 from django.db.transaction import atomic
@@ -1754,7 +1753,7 @@ class OperationTests(OperationTestBase):
     def test_add_constraint_percent_escaping(self):
         app_label = 'add_constraint_string_quoting'
         operations = [
-            CreateModel(
+            migrations.CreateModel(
                 'Author',
                 fields=[
                     ('id', models.AutoField(primary_key=True)),
@@ -1820,7 +1819,7 @@ class OperationTests(OperationTestBase):
     def test_add_constraint_combinable(self):
         app_label = 'test_addconstraint_combinable'
         operations = [
-            CreateModel(
+            migrations.CreateModel(
                 'Book',
                 fields=[
                     ('id', models.AutoField(primary_key=True)),
@@ -2917,7 +2916,11 @@ class SwappableOperationTests(OperationTestBase):
 class TestCreateModel(SimpleTestCase):
 
     def test_references_model_mixin(self):
-        CreateModel('name', [], bases=(Mixin, models.Model)).references_model('other_model', 'migrations')
+        migrations.CreateModel(
+            'name',
+            fields=[],
+            bases=(Mixin, models.Model),
+        ).references_model('other_model', 'migrations')
 
 
 class FieldOperationTests(SimpleTestCase):
