@@ -526,6 +526,10 @@ backends.
 * The ``allow_cascade`` argument of ``DatabaseOperations.sql_flush()`` is now a
   keyword-only argument.
 
+* The ``using`` positional argument of
+  ``DatabaseOperations.execute_sql_flush()`` is removed. The method now uses
+  the database of the called instance.
+
 Dropped support for MariaDB 10.1
 --------------------------------
 
