@@ -2147,13 +2147,17 @@ jQuery
 Django admin JavaScript makes use of the `jQuery`_ library.
 
 To avoid conflicts with user-supplied scripts or libraries, Django's jQuery
-(version 3.4.1) is namespaced as ``django.jQuery``. If you want to use jQuery
+(version 3.5.1) is namespaced as ``django.jQuery``. If you want to use jQuery
 in your own admin JavaScript without including a second copy, you can use the
 ``django.jQuery`` object on changelist and add/edit views.
 
 .. versionchanged:: 3.0
 
     jQuery was upgraded from 3.3.1 to 3.4.1.
+
+.. versionchanged:: 3.1
+
+    jQuery was upgraded from 3.4.1 to 3.5.1.
 
 The :class:`ModelAdmin` class requires jQuery by default, so there is no need
 to add jQuery to your ``ModelAdmin``’s list of media resources unless you have
