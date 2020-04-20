@@ -938,8 +938,6 @@ class DateTimePickerShortcutsSeleniumTests(AdminWidgetSeleniumTestCase):
         if tz_yesterday != tz_tomorrow:
             error_margin += timedelta(hours=1)
 
-        now = datetime.now()
-
         self.selenium.get(self.live_server_url + reverse('admin:admin_widgets_member_add'))
 
         self.selenium.find_element_by_id('id_name').send_keys('test')
@@ -947,6 +945,7 @@ class DateTimePickerShortcutsSeleniumTests(AdminWidgetSeleniumTestCase):
         # Click on the "today" and "now" shortcuts.
         shortcuts = self.selenium.find_elements_by_css_selector('.field-birthdate .datetimeshortcuts')
 
+        now = datetime.now()
         for shortcut in shortcuts:
             shortcut.find_element_by_tag_name('a').click()
 
