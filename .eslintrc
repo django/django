@@ -16,8 +16,10 @@
         "no-unused-vars": ["error", {"vars": "local", "args": "none"}],
         "no-script-url": ["error"],
         "no-shadow": ["error", {"hoist": "functions"}],
+        "no-var": ["error"],
         "quotes": ["off", "single"],
         "linebreak-style": ["error", "unix"],
+        "prefer-const": ["error"],
         "semi": ["error", "always"],
         "space-before-blocks": ["error", "always"],
         "space-before-function-paren": ["error", {"anonymous": "never", "named": "never"}],
@@ -25,7 +27,8 @@
         "strict": ["warn", "function"]
     },
     "env": {
-        "browser": true
+        "browser": true,
+        "es6": true
     },
     "globals": {
         "django": false

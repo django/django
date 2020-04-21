@@ -9,7 +9,7 @@ QUnit.module('admin.actions', {
         window._actions_icnt = '100';
         /* eslint-enable */
 
-        var $ = django.jQuery;
+        const $ = django.jQuery;
         $('#qunit-fixture').append($('#result-table').text());
 
         $('tr input.action-select').actions();
@@ -17,7 +17,7 @@ QUnit.module('admin.actions', {
 });
 
 QUnit.test('check', function(assert) {
-    var $ = django.jQuery;
+    const $ = django.jQuery;
     assert.notOk($('.action-select').is(':checked'));
     $('#action-toggle').click();
     assert.ok($('.action-select').is(':checked'));

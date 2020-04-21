@@ -1,7 +1,7 @@
 (function($) {
     'use strict';
-    var init = function($element, options) {
-        var settings = $.extend({
+    const init = function($element, options) {
+        const settings = $.extend({
             ajax: {
                 data: function(params) {
                     return {
@@ -15,9 +15,9 @@
     };
 
     $.fn.djangoAdminSelect2 = function(options) {
-        var settings = $.extend({}, options);
+        const settings = $.extend({}, options);
         $.each(this, function(i, element) {
-            var $element = $(element);
+            const $element = $(element);
             init($element, settings);
         });
         return this;

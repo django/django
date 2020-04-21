@@ -1,13 +1,13 @@
 /*global gettext, interpolate, ngettext*/
 (function($) {
     'use strict';
-    var lastChecked;
+    let lastChecked;
 
     $.fn.actions = function(opts) {
-        var options = $.extend({}, $.fn.actions.defaults, opts);
-        var actionCheckboxes = $(this);
-        var list_editable_changed = false;
-        var showQuestion = function() {
+        const options = $.extend({}, $.fn.actions.defaults, opts);
+        const actionCheckboxes = $(this);
+        let list_editable_changed = false;
+        const showQuestion = function() {
                 $(options.acrossClears).hide();
                 $(options.acrossQuestions).show();
                 $(options.allContainer).hide();
@@ -40,17 +40,17 @@
                     .parent().parent().toggleClass(options.selectedClass, checked);
             },
             updateCounter = function() {
-                var sel = $(actionCheckboxes).filter(":checked").length;
+                const sel = $(actionCheckboxes).filter(":checked").length;
                 // data-actions-icnt is defined in the generated HTML
                 // and contains the total amount of objects in the queryset
-                var actions_icnt = $('.action-counter').data('actionsIcnt');
+                const actions_icnt = $('.action-counter').data('actionsIcnt');
                 $(options.counterContainer).html(interpolate(
                     ngettext('%(sel)s of %(cnt)s selected', '%(sel)s of %(cnt)s selected', sel), {
                         sel: sel,
                         cnt: actions_icnt
                     }, true));
                 $(options.allToggle).prop("checked", function() {
-                    var value;
+                    let value;
                     if (sel === actionCheckboxes.length) {
                         value = true;
                         showQuestion();
@@ -90,9 +90,9 @@
         lastChecked = null;
         $(actionCheckboxes).on('click', function(event) {
             if (!event) { event = window.event; }
-            var target = event.target ? event.target : event.srcElement;
+            const target = event.target ? event.target : event.srcElement;
             if (lastChecked && $.data(lastChecked) !== $.data(target) && event.shiftKey === true) {
-                var inrange = false;
+                let inrange = false;
                 $(lastChecked).prop("checked", target.checked)
                     .parent().parent().toggleClass(options.selectedClass, target.checked);
                 $(actionCheckboxes).each(function() {
@@ -118,7 +118,7 @@
             }
         });
         $('form#changelist-form input[name="_save"]').on('click', function(event) {
-            var action_changed = false;
+            let action_changed = false;
             $('select option:selected', options.actionContainer).each(function() {
                 if ($(this).val()) {
                     action_changed = true;
@@ -145,7 +145,7 @@
         selectedClass: "selected"
     };
     $(document).ready(function() {
-        var $actionsEls = $('tr input.action-select');
+        const $actionsEls = $('tr input.action-select');
         if ($actionsEls.length > 0) {
             $actionsEls.actions();
         }
