@@ -50,7 +50,7 @@ class Command(BaseCommand):
 
         if interactive:
             confirm = input("""You have requested a flush of the database.
-This will IRREVERSIBLY DESTROY all data currently in the %r database,
+This will IRREVERSIBLY DESTROY all data currently in the "%s" database,
 and return each table to an empty state.
 Are you sure you want to do this?
 
