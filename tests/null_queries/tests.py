@@ -1,5 +1,6 @@
 from django.core.exceptions import FieldError
 from django.test import TestCase
+from django.utils.deprecation import RemovedInDjango40Warning
 
 from .models import Choice, Inner, OuterA, OuterB, Poll
 
@@ -42,7 +43,12 @@ class NullQueriesTests(TestCase):
 
         # Related managers use __exact=None implicitly if the object hasn't been saved.
         p2 = Poll(question="How?")
-        self.assertEqual(repr(p2.choice_set.all()), '<QuerySet []>')
+        # TODO: Change to assertRaises after the deprecation period.
+        with self.assertWarnsMessage(
+            RemovedInDjango40Warning,
+            'Passing an unsaved model object to related filter is deprecated.',
+        ):
+            self.assertEqual(repr(p2.choice_set.all()), '<QuerySet []>')
 
     def test_reverse_relations(self):
         """

@@ -7,6 +7,7 @@ from unittest import expectedFailure
 
 from django import forms
 from django.test import TestCase
+from django.utils.deprecation import RemovedInDjango40Warning
 
 from .models import (
     ArticleWithAuthor, BachelorParty, BirthdayParty, BusStation, Child,
@@ -186,8 +187,13 @@ class ModelInheritanceTest(TestCase):
         # Regression test for #7488. This looks a little crazy, but it's the
         # equivalent of what the admin interface has to do for the edit-inline
         # case.
-        suppliers = Supplier.objects.filter(
-            restaurant=Restaurant(name='xx', address='yy'))
+        # TODO: Change to assertRaises after the deprecation period.
+        with self.assertWarnsMessage(
+            RemovedInDjango40Warning,
+            'Passing an unsaved model object to related filter is deprecated.',
+        ):
+            suppliers = Supplier.objects.filter(
+                restaurant=Restaurant(name='xx', address='yy'))
         suppliers = list(suppliers)
         self.assertEqual(suppliers, [])
 

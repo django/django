@@ -4,6 +4,7 @@ from copy import deepcopy
 from django.core.exceptions import FieldError, MultipleObjectsReturned
 from django.db import IntegrityError, models, transaction
 from django.test import TestCase
+from django.utils.deprecation import RemovedInDjango40Warning
 from django.utils.translation import gettext_lazy
 
 from .models import (
@@ -626,8 +627,13 @@ class ManyToOneTests(TestCase):
         th = Third(name="testing")
         # The object isn't saved and thus the relation field is null - we won't even
         # execute a query in this case.
-        with self.assertNumQueries(0):
-            self.assertEqual(th.child_set.count(), 0)
+        # TODO: Change to assertRaises after the deprecation period.
+        with self.assertWarnsMessage(
+            RemovedInDjango40Warning,
+            'Passing an unsaved model object to related filter is deprecated.',
+        ):
+            with self.assertNumQueries(0):
+                self.assertEqual(th.child_set.count(), 0)
         th.save()
         # Now the model is saved, so we will need to execute a query.
         with self.assertNumQueries(1):

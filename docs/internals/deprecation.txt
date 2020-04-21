@@ -75,6 +75,8 @@ details on these changes.
 * Support for passing raw column aliases to ``QuerySet.order_by()`` will be
   removed.
 
+* Passing an unsaved model object to related filter will raise an exception.
+
 See the :ref:`Django 3.1 release notes <deprecated-features-3.1>` for more
 details on these changes.
 

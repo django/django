@@ -731,6 +731,8 @@ Miscellaneous
   same result can be achieved by passing aliases in a
   :class:`~django.db.models.expressions.RawSQL` instead beforehand.
 
+* Passing an unsaved model object to related filter is deprecated.
+
 .. _removed-features-3.1:
 
 Features removed in 3.1
