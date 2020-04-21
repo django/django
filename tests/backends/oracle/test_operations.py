@@ -2,12 +2,14 @@ import unittest
 
 from django.core.management.color import no_style
 from django.db import connection
+from django.test import TransactionTestCase
 
 from ..models import Person, Tag
 
 
 @unittest.skipUnless(connection.vendor == 'oracle', 'Oracle tests')
-class OperationsTests(unittest.TestCase):
+class OperationsTests(TransactionTestCase):
+    available_apps = ['backends']
 
     def test_sequence_name_truncation(self):
         seq_name = connection.ops._get_no_autofield_sequence_name('schema_authorwithevenlongee869')
