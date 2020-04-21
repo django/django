@@ -36,6 +36,7 @@ and Java version 7 or later."""
                 cmd.append('-q')
             cmd.extend([
                 'google-closure-compiler',
+                '--language_out=ECMASCRIPT_2015',
                 '--rewrite_polyfills=false',
                 '--js', str(to_compress),
                 '--js_output_file', str(to_compress_min),
