@@ -320,6 +320,10 @@ Management Commands
 * The new :option:`dbshell -- ARGUMENTS <dbshell -->` option allows passing
   extra arguments to the command-line client for the database.
 
+* Renamed `passwd` key to `password` to fetch database password from
+  settings dict's `OPTIONS` field for `dbshell` management command. Applicable
+  to MySql back-end only.
+
 Migrations
 ~~~~~~~~~~
 

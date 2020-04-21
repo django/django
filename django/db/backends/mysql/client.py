@@ -9,15 +9,16 @@ class DatabaseClient(BaseDatabaseClient):
     @classmethod
     def settings_to_cmd_args(cls, settings_dict, parameters):
         args = [cls.executable_name]
-        db = settings_dict['OPTIONS'].get('db', settings_dict['NAME'])
-        user = settings_dict['OPTIONS'].get('user', settings_dict['USER'])
-        passwd = settings_dict['OPTIONS'].get('password', settings_dict['PASSWORD'])
-        host = settings_dict['OPTIONS'].get('host', settings_dict['HOST'])
-        port = settings_dict['OPTIONS'].get('port', settings_dict['PORT'])
-        server_ca = settings_dict['OPTIONS'].get('ssl', {}).get('ca')
-        client_cert = settings_dict['OPTIONS'].get('ssl', {}).get('cert')
-        client_key = settings_dict['OPTIONS'].get('ssl', {}).get('key')
-        defaults_file = settings_dict['OPTIONS'].get('read_default_file')
+        conn_params = {**settings_dict, **settings_dict['OPTIONS']}
+        db = conn_params.get('db', '')
+        user = conn_params.get('user', '')
+        passwd = conn_params.get('password', '')
+        host = conn_params.get('host', '')
+        port = conn_params.get('port', '')
+        server_ca = conn_params.get('ssl', {}).get('ca')
+        client_cert = conn_params.get('ssl', {}).get('cert')
+        client_key = conn_params.get('ssl', {}).get('key')
+        defaults_file = conn_params.get('read_default_file')
         # Seems to be no good way to set sql_mode with CLI.
 
         if defaults_file:
