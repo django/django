@@ -312,6 +312,11 @@ If that hypothetical database write is instead rolled back (typically when an
 unhandled exception is raised in an :func:`atomic` block), your function will
 be discarded and never called.
 
+In testing, ``on_commit()`` will only execute callback functions within the 
+:class:`~django.test.TransactionTestCase` class.  See :ref:`use-in-tests` 
+for more information.
+
+
 Savepoints
 ----------
 
@@ -388,6 +393,8 @@ error.
 
 .. _two-phase commit: https://en.wikipedia.org/wiki/Two-phase_commit_protocol
 .. _optional Two-Phase Commit Extensions in the Python DB-API specification: https://www.python.org/dev/peps/pep-0249/#optional-two-phase-commit-extensions
+
+.. _use-in-tests:
 
 Use in tests
 ------------
