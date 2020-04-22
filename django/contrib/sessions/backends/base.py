@@ -43,43 +43,6 @@ class UpdateError(Exception):
     pass
 
 
-class KeyHash:
-    _algorithm = getattr(hashlib, SESSION_HASHING_ALGORITHM)
-
-    @classmethod
-    def create_backend_key(cls, frontend_key):
-        if frontend_key is None:
-            return None
-        if not cls._has_hash_prefix(frontend_key):
-            return frontend_key
-        return cls._algorithm(
-            cls._get_session_key_part(frontend_key).encode('ascii')).hexdigest()
-
-    @staticmethod
-    def _get_session_key_part(frontend_key):
-        """
-        Return the key part of the frontend_key by removing the hash prefix.
-        """
-        if frontend_key.startswith(SESSION_HASHED_KEY_PREFIX):
-            return frontend_key[len(SESSION_HASHED_KEY_PREFIX):]
-        return None
-
-    @staticmethod
-    def _has_hash_prefix(frontend_key):
-        """Return True when the session_key is hashed in the backend."""
-        return str(frontend_key).startswith(SESSION_HASHED_KEY_PREFIX)
-
-    @classmethod
-    def is_valid(cls, frontend_key):
-        """
-        Key must be truthy and at least 8 characters long and
-        in the correct format if hashing is required.
-        """
-        valid = frontend_key and len(frontend_key) >= 8
-        if not settings.SESSION_REQUIRE_KEY_HASH:
-            return valid
-        return valid and cls._has_hash_prefix(frontend_key)
-
 class SessionBase:
     """
     Base class for all Session classes.
@@ -215,32 +178,24 @@ class SessionBase:
         except AttributeError:
             return True
 
-    @classmethod
-    def get_backend_key(cls, frontend_key):
-        """
-        Return backend version of the given frontend key.
-        Applies hashing if required by settings.
-        """
-        return KeyHash.create_backend_key(frontend_key)
-
     def _get_new_session_key(self):
         "Return session key that isn't being used."
         while True:
-            #TODO
-            # key_hash = KeyHash.random()
             session_key = get_random_string(32, VALID_KEY_CHARS)
-            hashed_session_key = SESSION_HASHED_KEY_PREFIX + session_key
-            if not self.exists(session_key) and not (settings.SESSION_STORE_KEY_HASH and self.exists(hashed_session_key)):
-                break
-        if settings.SESSION_STORE_KEY_HASH:
-            return hashed_session_key
-        return session_key
+            if not self.exists(session_key):
+                return session_key
 
     def _get_or_create_session_key(self):
         if self._session_key is None:
             self._session_key = self._get_new_session_key()
-        return self.get_backend_key(self._session_key)
+        return self._session_key
 
+    def _validate_session_key(self, key):
+        """
+        Key must be truthy and at least 8 characters long. 8 characters is an
+        arbitrary lower bound for some minimal key security.
+        """
+        return key and len(key) >= 8
 
     def _get_session_key(self):
         return self.__session_key
@@ -249,7 +204,7 @@ class SessionBase:
         """
         Validate session key on assignment. Invalid values will set to None.
         """
-        if KeyHash.is_valid(value):
+        if self._validate_session_key(value):
             self.__session_key = value
         else:
             self.__session_key = None
@@ -427,3 +382,308 @@ class SessionBase:
         a built-in expiration mechanism, it should be a no-op.
         """
         raise NotImplementedError('This backend does not support clear_expired().')
+
+
+class HashingSessionBase(SessionBase):
+    _algorithm = getattr(hashlib, SESSION_HASHING_ALGORITHM)
+
+    """
+    Base class for all Session classes since introducing session-key hashing.
+    """
+    @classmethod
+    def get_serializer(cls):
+        return import_string(settings.SESSION_SERIALIZER)
+
+    @classmethod
+    def get_key_salt(cls):
+        return 'django.contrib.sessions.' + cls.__qualname__
+
+    @classmethod
+    def _encode(cls, session_dict):
+        "Return the given session dictionary serialized and encoded as a string."
+        return signing.dumps(
+            session_dict, salt=cls.get_key_salt(), serializer=cls.get_serializer(),
+            compress=True,
+        )
+
+    def encode(self, session_dict):
+        return self._encode(session_dict)
+
+    @classmethod
+    def __hash(cls, value):
+        # RemovedInDjango40Warning: pre-Django 3.1 format will be invalid.
+        key_salt = "django.contrib.sessions" + cls.__name__
+        return salted_hmac(key_salt, value).hexdigest()
+
+    @classmethod
+    def __legacy_decode(cls, session_data):
+        # RemovedInDjango40Warning: pre-Django 3.1 format will be invalid.
+        encoded_data = base64.b64decode(session_data.encode('ascii'))
+        try:
+            # could produce ValueError if there is no ':'
+            hash, serialized = encoded_data.split(b':', 1)
+            expected_hash = cls.__hash(serialized)
+            if not constant_time_compare(hash.decode(), expected_hash):
+                raise SuspiciousSession("Session data corrupted")
+            else:
+                ser = cls.get_serializer()
+                return ser().loads(serialized)
+        except Exception as e:
+            # ValueError, SuspiciousOperation, unpickling exceptions. If any of
+            # these happen, just return an empty dictionary (an empty session).
+            if isinstance(e, SuspiciousOperation):
+                logger = logging.getLogger('django.security.%s' % e.__class__.__name__)
+                logger.warning(str(e))
+            return {}
+
+    def _legacy_decode(self, session_data):
+        self.__legacy_decode(session_data)
+
+    @classmethod
+    def _decode(cls, session_data):
+        try:
+            return signing.loads(session_data, salt=cls.get_key_salt(), serializer=cls.get_serializer())
+        # RemovedInDjango40Warning: when the deprecation ends, handle here
+        # exceptions similar to what _legacy_decode() does now.
+        except Exception:
+            return cls.__legacy_decode(session_data)
+
+    def decode(self, session_data):
+        return self._decode(session_data)
+
+    def _get_new_session_key(self):
+        """
+        Return new unique session key. If SESSION_STORE_KEY_HASH is False, the
+        key is a 32-character string. If SESSION_STORE_KEY_HASH is True the key
+        is a frontend_key consisting of a hashing algorithm prefix followed by
+        a 32-character session key.
+        """
+        while True:
+            session_key = super()._get_new_session_key()
+
+            if not settings.SESSION_STORE_KEY_HASH: 
+                return session_key
+
+            hashed_frontend_key = SESSION_HASHED_KEY_PREFIX + session_key
+
+            if not self.exists(hashed_frontend_key):
+                return hashed_frontend_key
+
+    def _get_or_create_session_key(self):
+        """
+        Initialise current session with a new frontend key if it
+        doesn't have one yet and return corresponding backend key
+        """
+        if self._session_key is None:
+            self._session_key = self._get_new_session_key()
+        return self.get_backend_key(self._session_key)
+
+    def _validate_session_key(self, frontend_key):
+        """
+        Key must be truthy and at least 8 characters long and
+        in the correct format if hashing is required.
+        """
+        valid = super()._validate_session_key(frontend_key)
+        if settings.SESSION_REQUIRE_KEY_HASH:
+            valid = valid and self._has_hash_prefix(frontend_key)
+        return valid
+
+    @staticmethod
+    def get_session_cookie_age():
+        return settings.SESSION_COOKIE_AGE
+
+    @classmethod
+    def _get_expiry_date(cls, session_data, **kwargs):
+        """Get session the expiry date (as a datetime object).
+
+        Optionally, this function accepts `modification` and `expiry` keyword
+        arguments specifying the modification and expiry of the session.
+        """
+        try:
+            modification = kwargs['modification']
+        except KeyError:
+            modification = timezone.now()
+        # Same comment as in get_expiry_age
+        try:
+            expiry = kwargs['expiry']
+        except KeyError:
+            # expiry = self.get('_session_expiry')
+            expiry = session_data['_session_expiry'] if '_session_expiry' in session_data else None
+
+        if isinstance(expiry, datetime):
+            return expiry
+        expiry = expiry or cls.get_session_cookie_age()
+        return modification + timedelta(seconds=expiry)
+
+    @classmethod
+    def _get_expiry_age(cls, session_data, **kwargs):
+        """Get the number of seconds until the session expires.
+
+        Optionally, this function accepts `modification` and `expiry` keyword
+        arguments specifying the modification and expiry of the session.
+        """
+        try:
+            modification = kwargs['modification']
+        except KeyError:
+            modification = timezone.now()
+        # Make the difference between "expiry=None passed in kwargs" and
+        # "expiry not passed in kwargs", in order to guarantee not to trigger
+        # self.load() when expiry is provided.
+        try:
+            expiry = kwargs['expiry']
+        except KeyError:
+            expiry = session_data['_session_expiry'] if '_session_expiry' in session_data else None
+
+        if not expiry:   # Checks both None and 0 cases
+            return cls.get_session_cookie_age()
+        if not isinstance(expiry, datetime):
+            return expiry
+        delta = expiry - modification
+        return delta.days * 86400 + delta.seconds
+
+    def get_expiry_date(self, **kwargs):
+        return self._get_expiry_date(self._session, **kwargs)
+
+    def get_expiry_age(self, **kwargs):
+        return self._get_expiry_age(self._get_session(no_load=True), **kwargs)
+
+    @classmethod
+    def get_backend_key(cls, frontend_key):
+        """
+        Return backend version of the given frontend key.
+        Applies hashing if required by settings.
+        """
+        if frontend_key is None:
+            return None
+        if not cls._has_hash_prefix(frontend_key):
+            return frontend_key
+
+        hashless_key = frontend_key[len(SESSION_HASHED_KEY_PREFIX):]
+
+        return cls._algorithm(hashless_key.encode('ascii')).hexdigest()
+
+    @staticmethod
+    def _has_hash_prefix(frontend_key):
+        """Return True when the session_key is hashed in the backend."""
+        return str(frontend_key).startswith(SESSION_HASHED_KEY_PREFIX)
+
+    # SessionBase methods
+
+    def exists(self, frontend_key):
+        """
+        Return ``True`` if a session identified by the given frontend_key
+        exists. If 'frontend_key' is None, the current session's session_key
+        will be used.
+        """
+        if frontend_key is None:
+            frontend_key = self._get_or_create_session_key()
+
+        backend_key = self.get_backend_key(frontend_key)
+        return self._exists(backend_key)
+
+    def create(self):
+        """
+        Create a new session instance. Guaranteed to create a new object with
+        a unique key and will have saved the result once (with empty data)
+        before the method returns.
+        """
+        while True:
+            self._session_key = self._get_new_session_key()
+            try:
+                self.save(must_create=True)
+            except CreateError:
+                continue
+            self.modified = True
+            return
+
+    def save(self, must_create=False):
+        """
+        Save the current session. if 'must_create' is ``True``
+        or the current session does not have a session_key yet
+        it will create a new session record. Otherwise it will
+        update the existing record identified by the self.session_key.
+        """
+        if self.session_key is None:
+            return self.create()
+        session_data = self._get_session(no_load=must_create)
+        return self._save(self.get_backend_key(self.session_key), session_data, must_create=must_create)
+
+    def delete(self, frontend_key=None):
+        """
+        Delete the session data under this key. If the key is None, use the
+        current session key value.
+        """
+        if frontend_key is None and not self.session_key is None:
+            frontend_key = self.session_key
+        
+        if not frontend_key is None:
+            self._delete(self.get_backend_key(frontend_key))
+
+    def load(self):
+        """
+        Load this session's data and return a dictionary.
+        Return empty dictionary this session does not have a session
+        or the session was not found.
+        """
+        frontend_key = self.session_key
+
+        if frontend_key is None:
+            return {}
+
+        backend_key = self.get_backend_key(frontend_key)
+        data = self._load_data(backend_key)
+
+        # None is returned if session isn't found
+        if data is None:
+            self._session_key = None
+            # only return None when there is no frontend_key
+            return {}
+
+        return data
+
+    # Methods that child classes must implement.
+
+    @classmethod
+    def _exists(cls, backend_key):
+        """
+        Return True if a session for the given 'backend_key' already exists.
+        """
+        raise NotImplementedError('subclasses of SessionBase must provide a _exists() method')
+
+    @classmethod
+    def _load_data(cls, backend_key):
+        """
+        Load the session data for the session identified
+        by 'backend_key' and return a dictionary.
+        Return None if the session doesn't exists.
+        """
+        raise NotImplementedError('subclasses of SessionBase must provide a _load_data() method')
+
+    @classmethod
+    def _save(cls, backend_key, session_data, must_create=False):
+        """
+        Save the session data for the session identified by 'backend_key'.
+        If 'must_create' is True, create a new session object (or raise
+        CreateError). Otherwise, only update an existing object and don't
+        create one (raise UpdateError if needed).
+        """
+        raise NotImplementedError('subclasses of SessionBase must provide a _save() method')
+
+    @classmethod
+    def _delete(cls, backend_key):
+        """
+        Delete the session identified by 'backend_key'.
+        """
+        raise NotImplementedError('subclasses of SessionBase must provide a _delete() method')
+
+    @classmethod
+    def clear_expired(cls):
+        """
+        Remove expired sessions from the session store.
+
+        If this operation isn't possible on a given backend, it should raise
+        NotImplementedError. If it isn't necessary, because the backend has
+        a built-in expiration mechanism, it should be a no-op.
+        """
+        raise NotImplementedError('This backend does not support clear_expired().')
+

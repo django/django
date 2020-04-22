@@ -7,27 +7,25 @@ from contextlib import suppress
 
 from django.conf import settings
 from django.contrib.sessions.backends.base import (
-    VALID_KEY_CHARS, CreateError, SessionBase, UpdateError,
+    VALID_KEY_CHARS, CreateError, SessionBase, HashingSessionBase, UpdateError,
 )
 from django.contrib.sessions.exceptions import InvalidSessionKey
 from django.core.exceptions import ImproperlyConfigured, SuspiciousOperation
 from django.utils import timezone
 
 
-class SessionStore(SessionBase):
+class SessionStore(HashingSessionBase):
     """
     Implement a file based session store.
     """
-    def __init__(self, session_key=None):
-        self.storage_path = self._get_storage_path()
-        self.file_prefix = settings.SESSION_COOKIE_NAME
-        super().__init__(session_key)
+
+    @staticmethod
+    def _get_file_prefix():
+        return settings.SESSION_COOKIE_NAME
 
     @classmethod
     def _get_storage_path(cls):
-        try:
-            return cls._storage_path
-        except AttributeError:
+        if not hasattr(cls, '_storage_path'):
             storage_path = getattr(settings, 'SESSION_FILE_PATH', None) or tempfile.gettempdir()
             # Make sure the storage path is valid.
             if not os.path.isdir(storage_path):
@@ -37,25 +35,19 @@ class SessionStore(SessionBase):
                     " Django can store session data." % storage_path)
 
             cls._storage_path = storage_path
-            return storage_path
 
-    def _key_to_file(self, session_key=None):
-        """
-        Get the file associated with this session key.
-        """
-        if session_key is None:
-            session_key = self._get_or_create_session_key()
-        else:
-            session_key = self.get_backend_key(session_key)
+        return cls._storage_path
 
+    @classmethod
+    def _backend_key_to_file(cls, backend_key):
         # Make sure we're not vulnerable to directory traversal. Session keys
         # should always be md5s, so they should never contain directory
         # components.
-        if not set(session_key).issubset(VALID_KEY_CHARS):
+        if not set(backend_key).issubset(VALID_KEY_CHARS):
             raise InvalidSessionKey(
                 "Invalid characters in session key")
 
-        return os.path.join(self.storage_path, self.file_prefix + session_key)
+        return os.path.join(cls._get_storage_path(), cls._get_file_prefix() + backend_key)
 
     @staticmethod
     def _last_modification(file_path):
@@ -68,12 +60,13 @@ class SessionStore(SessionBase):
             return modification.replace(tzinfo=timezone.utc)
         return datetime.datetime.fromtimestamp(modification)
 
-    def _expiry_date(self, session_data, file_path=None):
+    @classmethod
+    def _expiry_date(cls, session_data, file_path):
         """
         Return the expiry time of the file storing the session's content.
         """
         return session_data.get('_session_expiry') or (
-            self._last_modification(file_path if file_path else self._key_to_file()) + datetime.timedelta(seconds=self.get_session_cookie_age())
+            cls._last_modification(file_path) + datetime.timedelta(seconds=cls.get_session_cookie_age())
         )
 
     @classmethod
@@ -85,9 +78,12 @@ class SessionStore(SessionBase):
         """
         file_data = None
 
-        with open(file_path, encoding='ascii') as session_file:
-            file_data = session_file.read()
-        
+        try:
+            with open(file_path, encoding='ascii') as session_file:
+                file_data = session_file.read()
+        except (OSError, SuspiciousOperation):
+            return None
+
         # Don't fail if there is no data in the session file.
         # We may have opened the empty placeholder file.
         if not file_data:
@@ -103,43 +99,62 @@ class SessionStore(SessionBase):
 
         return session_data
 
-    def load(self):
-        session_data = {}
+    @staticmethod
+    def _delete_file(file_path):
         try:
-            session_data = self._load_session_data(self._key_to_file())
+            os.unlink(file_path)
+        except OSError:
+            pass
 
-            if session_data == False:
-                self.create()
-                session_data = {}
+    # SessionBase methods
 
-            # Remove expired sessions.
-            expiry_age = self.get_expiry_age(expiry=self._expiry_date(session_data))
-            if expiry_age <= 0:
-                session_data = {}
-                self.delete()
-                self.create()
-        except (OSError, SuspiciousOperation):
-            self._session_key = None
+    def load(self):
+        """
+        Load this session's data and return a dictionary.
+        Return empty dictionary this session does not have
+        a session or the session was not found. Reset the session
+        if it has expired.
+        """
+        session_data = super().load()
+
+        # return empty session if super().load() failed
+        # and session key was reset
+        if self.session_key is None:
+            return {}
+
+        # our _load_data will return False to indicate
+        # invalid/corrupted session file. If that happens,
+        # recreate our sessions file
+        elif session_data == False:
+            self.create()
+            session_data = {}
+
+        if session_data is None:
+            session_data = {}
+        
+        # Remove expired sessions.
+        backend_key = self.get_backend_key(self._get_or_create_session_key())
+        expiry_date = self._expiry_date(session_data, self._backend_key_to_file(backend_key))
+        expiry_age = self.get_expiry_age(expiry=expiry_date)
+        if expiry_age <= 0:
+            session_data = {}
+            self.delete()
+            self.create()
+
         return session_data
 
-    def create(self):
-        while True:
-            self._session_key = self._get_new_session_key()
-            try:
-                self.save(must_create=True)
-            except CreateError:
-                continue
-            self.modified = True
-            return
+    @classmethod
+    def _load_data(cls, backend_key):
+        """
+        Return dict with session data from file corresponding to the
+        given backend_key. Return empty dict if no corresponding file
+        is found, return ``False`` if the file contains invalid content.
+        """
+        return cls._load_session_data(cls._backend_key_to_file(backend_key))
 
-    def save(self, must_create=False):
-        if self.session_key is None:
-            return self.create()
-        # Get the session data now, before we start messing
-        # with the file it is stored within.
-        session_data = self._get_session(no_load=must_create)
-
-        session_file_name = self._key_to_file()
+    @classmethod
+    def _save(cls, backend_key, session_data, must_create=False):
+        session_file_name = cls._backend_key_to_file(backend_key)
 
         try:
             # Make sure the file exists.  If it does not already exist, an
@@ -178,7 +193,7 @@ class SessionStore(SessionBase):
             renamed = False
             try:
                 try:
-                    os.write(output_file_fd, self.encode(session_data).encode())
+                    os.write(output_file_fd, cls._encode(session_data).encode())
                 finally:
                     os.close(output_file_fd)
 
@@ -192,35 +207,20 @@ class SessionStore(SessionBase):
                     os.unlink(output_file_name)
         except (EOFError, OSError):
             pass
-
-    def exists(self, session_key):
-        return os.path.exists(self._key_to_file(session_key))
-
-    def delete(self, session_key=None):
-        if session_key is None:
-            if self.session_key is None:
-                return
-            session_key = self.session_key
-        # try:
-        #     os.unlink(self._key_to_file(session_key))
-        # except OSError:
-        #     pass
-        SessionStore._delete_file(self._key_to_file(session_key))
-
-    @staticmethod
-    def _delete_file(file_path):
-        try:
-            os.unlink(file_path)
-        except OSError:
-            pass
-
-    def clean(self):
         pass
+
+    @classmethod
+    def _exists(cls, backend_key):
+        return os.path.exists(cls._backend_key_to_file(backend_key))
+
+    @classmethod
+    def _delete(cls, backend_key):
+        cls._delete_file(cls._backend_key_to_file(backend_key))
 
     @classmethod
     def clear_expired(cls):
         storage_path = cls._get_storage_path()
-        file_prefix = settings.SESSION_COOKIE_NAME
+        file_prefix = cls._get_file_prefix()
 
         for session_file in os.listdir(storage_path):
             if not session_file.startswith(file_prefix):
@@ -229,7 +229,7 @@ class SessionStore(SessionBase):
             file_path = os.path.join(storage_path, session_file)
             session_data = cls._load_session_data(file_path)
             if session_data != False:
-                expiry_age = cls().get_expiry_age(expiry=cls()._expiry_date(session_data, file_path=file_path))
+                expiry_age = cls().get_expiry_age(expiry=cls._expiry_date(session_data, file_path=file_path))
 
                 if expiry_age <= 0:
                     session_data = {}

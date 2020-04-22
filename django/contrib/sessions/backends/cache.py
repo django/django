@@ -1,13 +1,13 @@
 from django.conf import settings
 from django.contrib.sessions.backends.base import (
-    CreateError, SessionBase, UpdateError,
+    CreateError, HashingSessionBase, UpdateError,
 )
 from django.core.cache import caches
 
 KEY_PREFIX = "django.contrib.sessions.cache"
 
 
-class SessionStore(SessionBase):
+class SessionStore(HashingSessionBase):
     """
     A cache-based session store.
     """

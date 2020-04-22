@@ -850,13 +850,16 @@ to query the database for all active sessions for an account)::
         def get_model_class(cls):
             return CustomSession
 
-        def create_model_instance(self, data):
-            obj = super().create_model_instance(data)
+        @classmethod
+        def create_model_instance(cls, backend_key, session_data):
+            obj = super()._create_model_instance(backend_key, session_data)
+
             try:
-                account_id = int(data.get('_auth_user_id'))
+                account_id = int(session_data.get('_auth_user_id'))
             except (ValueError, TypeError):
                 account_id = None
             obj.account_id = account_id
+
             return obj
 
 If you are migrating from the Django's built-in ``cached_db`` session store to

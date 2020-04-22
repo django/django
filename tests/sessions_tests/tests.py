@@ -10,13 +10,13 @@ from pathlib import Path
 
 from django.conf import settings
 from django.contrib.sessions.backends.base import (
-    SESSION_HASHING_ALGORITHM, SESSION_KEY_DELIMITER, UpdateError
+    SESSION_HASHING_ALGORITHM, SESSION_KEY_DELIMITER, UpdateError, SESSION_HASHED_KEY_PREFIX
 )
 from django.contrib.sessions.backends.cache import (
     KEY_PREFIX as CACHE_KEY_PREFIX, SessionStore as CacheSession,
 )
 from django.contrib.sessions.backends.cached_db import (
-    KEY_PREFIX as CACHEDB_KEY_PREFIX, SessionStore as CacheDBSession,
+    KEY_PREFIX as CACHEDB_KEY_PREFIX, SessionStore as CacheDBSession, get_cache_store
 )
 from django.contrib.sessions.backends.db import SessionStore as DatabaseSession
 from django.contrib.sessions.backends.file import SessionStore as FileSession
@@ -676,15 +676,27 @@ class CacheDBSessionTests(SessionTestsMixin, TestCase):
     # Some backends might issue a warning
     @ignore_warnings(module="django.core.cache.backends.base")
     def test_load_overlong_key(self):
-        self.session._session_key = (string.ascii_letters + string.digits) * 20
-        self.assertEqual(self.session.load(), {})
+        s = self.backend(SESSION_HASHED_KEY_PREFIX+(string.ascii_letters + string.digits) * 20)
+        cache_key = s._get_cache_key(s.get_backend_key(s.session_key))
+        # pre-populate cache with value
+        self.backend._set_cache(cache_key, {'a': 'c'})
+        # verify pre-populated value is loaded
+        self.assertEqual(s.load(), {'a': 'c'})
+        s.delete()
 
     @override_settings(SESSION_CACHE_ALIAS='sessions')
     def test_non_default_cache(self):
         # 21000 - CacheDB backend should respect SESSION_CACHE_ALIAS.
         with self.assertRaises(InvalidCacheBackendError):
-            self.backend()
+            get_cache_store()
 
+    def test_loads_from_cache_if_present(self):
+        s = self.backend(SESSION_HASHED_KEY_PREFIX+'foobar1234')
+        cache_key = s._get_cache_key(s.get_backend_key(s.session_key))
+        self.backend._set_cache(cache_key, {'a':'b'})
+        self.assertEqual(self.backend._get_cache(cache_key), {'a': 'b'})        
+        self.assertEqual(s.load(), {'a': 'b'})
+        s.delete()
 
 class CacheDBSessionWithoutHashingTests(CacheDBSessionTests):
 
@@ -738,8 +750,8 @@ class CacheDBSessionWithHashingTests(CacheDBSessionTests):
 
         self.assertTrue(self.session.exists(self.session.session_key))
         with self.assertRaises(self.model.DoesNotExist):
-            self.session.model.objects.get(session_key=self.session.session_key)
-        self.assertTrue(self.session.model.objects.get(
+            self.session.get_model().objects.get(session_key=self.session.session_key)
+        self.assertTrue(self.session.get_model().objects.get(
             session_key=self.session.get_backend_key(self.session.session_key))
         )
         self.assertIsNotNone(caches['default'].get(self.session.cache_key))
@@ -832,27 +844,34 @@ class FileSessionTests(SessionTestsMixin, TestCase):
     def mkdtemp(self):
         return tempfile.mkdtemp()
 
+    @classmethod
+    def _frontend_key_to_file(cls, frontend_key):
+        return cls.backend._backend_key_to_file(cls.backend.get_backend_key(frontend_key))
+
     @override_settings(
         SESSION_FILE_PATH='/if/this/directory/exists/you/have/a/weird/computer',
     )
     def test_configuration_check(self):
-        del self.backend._storage_path
+        if hasattr(self.backend, '_storage_path'):
+            del self.backend._storage_path
+
+        s = self.backend()
         # Make sure the file backend checks for a good storage dir
         with self.assertRaises(ImproperlyConfigured):
-            self.backend()
+            s.save()
 
     def test_invalid_key_backslash(self):
         # Ensure we don't allow directory-traversal.
-        # This is tested directly on _key_to_file, as load() will swallow
+        # This is tested directly on _backend_key_to_file, as load() will swallow
         # a SuspiciousOperation in the same way as an OSError - by creating
         # a new session, making it unclear whether the slashes were detected.
         with self.assertRaises(InvalidSessionKey):
-            self.backend()._key_to_file("a\\b\\c")
+            self.backend._backend_key_to_file(self.backend.get_backend_key("a\\b\\c"))
 
     def test_invalid_key_forwardslash(self):
         # Ensure we don't allow directory-traversal
         with self.assertRaises(InvalidSessionKey):
-            self.backend()._key_to_file("a/b/c")
+            self._frontend_key_to_file("a/b/c")
 
     @override_settings(
         SESSION_ENGINE="django.contrib.sessions.backends.file",
@@ -903,7 +922,6 @@ class FileSessionPathLibTests(FileSessionTests):
         tmp_dir = super().mkdtemp()
         return Path(tmp_dir)
 
-
 class FileSessionWithoutHashingTests(FileSessionTests):
     def test_file_key_same_as_session_key(self):
         """
@@ -913,10 +931,9 @@ class FileSessionWithoutHashingTests(FileSessionTests):
         self.session['y'] = 1
         self.session.save()
 
-        file_path = self.backend()._key_to_file(
-            session_key=self.session.session_key)
+        file_path = self._frontend_key_to_file(self.session._get_or_create_session_key())
         file_key = file_path[(
-            len(self.backend().storage_path + self.backend().file_prefix) + 1):]
+            len(self.backend()._get_storage_path() + self.backend()._get_file_prefix()) + 1):]
         self.assertEqual(file_key, self.session.session_key)
 
 
@@ -930,10 +947,9 @@ class FileSessionWithHashingTests(FileSessionTests):
         self.session['y'] = 1
         self.session.save()
 
-        file_path = self.backend()._key_to_file(
-            session_key=self.session.session_key)
+        file_path = self._frontend_key_to_file(self.session._get_or_create_session_key())
 
-        file_path_start = os.path.join(self.backend().storage_path, self.backend().file_prefix)       
+        file_path_start = os.path.join(self.backend()._get_storage_path(), self.backend()._get_file_prefix())       
         self.assertTrue(file_path.startswith(file_path_start))
 
         file_key = file_path[len(file_path_start):]

@@ -1,8 +1,18 @@
-from django.contrib.sessions.backends.base import SessionBase
+from django.contrib.sessions.backends.base import SessionBase, HashingSessionBase
 from django.core import signing
 
+# Even though this SessionStore doesn't perform key-hashing, it still inherits
+# from HashingSessionBase (and not from SessionBase directly) because
+# backends that don't inherit from HashingSessionBase will cause deprecation
+# warnings.
+class SessionStore(HashingSessionBase):
 
-class SessionStore(SessionBase):
+    def _validate_session_key(self, frontend_key):
+        """
+        Key must be truthy and at least 8 characters long.
+        Skip HashingSessionBase's HASHING validation
+        """
+        return SessionBase._validate_session_key(self, frontend_key)
 
     def load(self):
         """
@@ -73,8 +83,7 @@ class SessionStore(SessionBase):
         return signing.dumps(
             self._session, compress=True,
             salt='django.contrib.sessions.backends.signed_cookies',
-            serializer=self.serializer,
-        )
+            serializer=self.get_serializer())
 
     @classmethod
     def clear_expired(cls):
