@@ -521,7 +521,10 @@ class OperationTests(OperationTestBase):
         self.assertNotIn(("test_rnmo", "pony"), new_state.models)
         self.assertIn(("test_rnmo", "horse"), new_state.models)
         # RenameModel also repoints all incoming FKs and M2Ms
-        self.assertEqual("test_rnmo.Horse", new_state.models["test_rnmo", "rider"].fields[1][1].remote_field.model)
+        self.assertEqual(
+            new_state.models['test_rnmo', 'rider'].fields['pony'].remote_field.model,
+            'test_rnmo.Horse',
+        )
         self.assertTableNotExists("test_rnmo_pony")
         self.assertTableExists("test_rnmo_horse")
         if connection.features.supports_foreign_keys:
@@ -532,7 +535,10 @@ class OperationTests(OperationTestBase):
         # Test original state and database
         self.assertIn(("test_rnmo", "pony"), original_state.models)
         self.assertNotIn(("test_rnmo", "horse"), original_state.models)
-        self.assertEqual("Pony", original_state.models["test_rnmo", "rider"].fields[1][1].remote_field.model)
+        self.assertEqual(
+            original_state.models['test_rnmo', 'rider'].fields['pony'].remote_field.model,
+            'Pony',
+        )
         self.assertTableExists("test_rnmo_pony")
         self.assertTableNotExists("test_rnmo_horse")
         if connection.features.supports_foreign_keys:
@@ -579,7 +585,7 @@ class OperationTests(OperationTestBase):
         # Remember, RenameModel also repoints all incoming FKs and M2Ms
         self.assertEqual(
             'self',
-            new_state.models["test_rmwsrf", "horserider"].fields[2][1].remote_field.model
+            new_state.models["test_rmwsrf", "horserider"].fields['friend'].remote_field.model
         )
         HorseRider = new_state.apps.get_model('test_rmwsrf', 'horserider')
         self.assertIs(HorseRider._meta.get_field('horserider').remote_field.model, HorseRider)
@@ -621,8 +627,8 @@ class OperationTests(OperationTestBase):
         self.assertIn(("test_rmwsc", "littlehorse"), new_state.models)
         # RenameModel shouldn't repoint the superclass's relations, only local ones
         self.assertEqual(
-            project_state.models["test_rmwsc", "rider"].fields[1][1].remote_field.model,
-            new_state.models["test_rmwsc", "rider"].fields[1][1].remote_field.model
+            project_state.models['test_rmwsc', 'rider'].fields['pony'].remote_field.model,
+            new_state.models['test_rmwsc', 'rider'].fields['pony'].remote_field.model,
         )
         # Before running the migration we have a table for Shetland Pony, not Little Horse
         self.assertTableExists("test_rmwsc_shetlandpony")
@@ -797,10 +803,7 @@ class OperationTests(OperationTestBase):
         self.assertEqual(operation.describe(), "Add field height to Pony")
         project_state, new_state = self.make_test_state("test_adfl", operation)
         self.assertEqual(len(new_state.models["test_adfl", "pony"].fields), 4)
-        field = [
-            f for n, f in new_state.models["test_adfl", "pony"].fields
-            if n == "height"
-        ][0]
+        field = new_state.models['test_adfl', 'pony'].fields['height']
         self.assertEqual(field.default, 5)
         # Test the database alteration
         self.assertColumnNotExists("test_adfl_pony", "height")
@@ -974,10 +977,7 @@ class OperationTests(OperationTestBase):
         new_state = project_state.clone()
         operation.state_forwards("test_adflpd", new_state)
         self.assertEqual(len(new_state.models["test_adflpd", "pony"].fields), 4)
-        field = [
-            f for n, f in new_state.models["test_adflpd", "pony"].fields
-            if n == "height"
-        ][0]
+        field = new_state.models['test_adflpd', 'pony'].fields['height']
         self.assertEqual(field.default, models.NOT_PROVIDED)
         # Test the database alteration
         project_state.apps.get_model("test_adflpd", "pony").objects.create(
@@ -1234,8 +1234,8 @@ class OperationTests(OperationTestBase):
         self.assertEqual(operation.describe(), "Alter field pink on Pony")
         new_state = project_state.clone()
         operation.state_forwards("test_alfl", new_state)
-        self.assertIs(project_state.models["test_alfl", "pony"].get_field_by_name("pink").null, False)
-        self.assertIs(new_state.models["test_alfl", "pony"].get_field_by_name("pink").null, True)
+        self.assertIs(project_state.models['test_alfl', 'pony'].fields['pink'].null, False)
+        self.assertIs(new_state.models['test_alfl', 'pony'].fields['pink'].null, True)
         # Test the database alteration
         self.assertColumnNotNull("test_alfl_pony", "pink")
         with connection.schema_editor() as editor:
@@ -1260,8 +1260,14 @@ class OperationTests(OperationTestBase):
         operation = migrations.AlterField("Pony", "id", models.IntegerField(primary_key=True))
         new_state = project_state.clone()
         operation.state_forwards("test_alflpk", new_state)
-        self.assertIsInstance(project_state.models["test_alflpk", "pony"].get_field_by_name("id"), models.AutoField)
-        self.assertIsInstance(new_state.models["test_alflpk", "pony"].get_field_by_name("id"), models.IntegerField)
+        self.assertIsInstance(
+            project_state.models['test_alflpk', 'pony'].fields['id'],
+            models.AutoField,
+        )
+        self.assertIsInstance(
+            new_state.models['test_alflpk', 'pony'].fields['id'],
+            models.IntegerField,
+        )
         # Test the database alteration
         with connection.schema_editor() as editor:
             operation.database_forwards("test_alflpk", editor, project_state, new_state)
@@ -1289,8 +1295,14 @@ class OperationTests(OperationTestBase):
         operation = migrations.AlterField("Pony", "id", models.FloatField(primary_key=True))
         new_state = project_state.clone()
         operation.state_forwards("test_alflpkfk", new_state)
-        self.assertIsInstance(project_state.models["test_alflpkfk", "pony"].get_field_by_name("id"), models.AutoField)
-        self.assertIsInstance(new_state.models["test_alflpkfk", "pony"].get_field_by_name("id"), models.FloatField)
+        self.assertIsInstance(
+            project_state.models['test_alflpkfk', 'pony'].fields['id'],
+            models.AutoField,
+        )
+        self.assertIsInstance(
+            new_state.models['test_alflpkfk', 'pony'].fields['id'],
+            models.FloatField,
+        )
 
         def assertIdTypeEqualsFkType():
             with connection.cursor() as cursor:
@@ -1479,8 +1491,8 @@ class OperationTests(OperationTestBase):
         self.assertEqual(operation.describe(), "Rename field pink on Pony to blue")
         new_state = project_state.clone()
         operation.state_forwards("test_rnfl", new_state)
-        self.assertIn("blue", [n for n, f in new_state.models["test_rnfl", "pony"].fields])
-        self.assertNotIn("pink", [n for n, f in new_state.models["test_rnfl", "pony"].fields])
+        self.assertIn("blue", new_state.models["test_rnfl", "pony"].fields)
+        self.assertNotIn("pink", new_state.models["test_rnfl", "pony"].fields)
         # Make sure the unique_together has the renamed column too
         self.assertIn("blue", new_state.models["test_rnfl", "pony"].options['unique_together'][0])
         self.assertNotIn("pink", new_state.models["test_rnfl", "pony"].options['unique_together'][0])
@@ -1536,19 +1548,19 @@ class OperationTests(OperationTestBase):
         operation = migrations.RenameField('Model', 'field', 'renamed')
         new_state = state.clone()
         operation.state_forwards('app', new_state)
-        self.assertEqual(new_state.models['app', 'othermodel'].fields[1][1].remote_field.field_name, 'renamed')
-        self.assertEqual(new_state.models['app', 'othermodel'].fields[1][1].from_fields, ['self'])
-        self.assertEqual(new_state.models['app', 'othermodel'].fields[1][1].to_fields, ('renamed',))
-        self.assertEqual(new_state.models['app', 'othermodel'].fields[2][1].from_fields, ('fk',))
-        self.assertEqual(new_state.models['app', 'othermodel'].fields[2][1].to_fields, ('renamed',))
+        self.assertEqual(new_state.models['app', 'othermodel'].fields['fk'].remote_field.field_name, 'renamed')
+        self.assertEqual(new_state.models['app', 'othermodel'].fields['fk'].from_fields, ['self'])
+        self.assertEqual(new_state.models['app', 'othermodel'].fields['fk'].to_fields, ('renamed',))
+        self.assertEqual(new_state.models['app', 'othermodel'].fields['fo'].from_fields, ('fk',))
+        self.assertEqual(new_state.models['app', 'othermodel'].fields['fo'].to_fields, ('renamed',))
         operation = migrations.RenameField('OtherModel', 'fk', 'renamed_fk')
         new_state = state.clone()
         operation.state_forwards('app', new_state)
-        self.assertEqual(new_state.models['app', 'othermodel'].fields[1][1].remote_field.field_name, 'renamed')
-        self.assertEqual(new_state.models['app', 'othermodel'].fields[1][1].from_fields, ('self',))
-        self.assertEqual(new_state.models['app', 'othermodel'].fields[1][1].to_fields, ('renamed',))
-        self.assertEqual(new_state.models['app', 'othermodel'].fields[2][1].from_fields, ('renamed_fk',))
-        self.assertEqual(new_state.models['app', 'othermodel'].fields[2][1].to_fields, ('renamed',))
+        self.assertEqual(new_state.models['app', 'othermodel'].fields['renamed_fk'].remote_field.field_name, 'renamed')
+        self.assertEqual(new_state.models['app', 'othermodel'].fields['renamed_fk'].from_fields, ('self',))
+        self.assertEqual(new_state.models['app', 'othermodel'].fields['renamed_fk'].to_fields, ('renamed',))
+        self.assertEqual(new_state.models['app', 'othermodel'].fields['fo'].from_fields, ('renamed_fk',))
+        self.assertEqual(new_state.models['app', 'othermodel'].fields['fo'].to_fields, ('renamed',))
 
     def test_alter_unique_together(self):
         """

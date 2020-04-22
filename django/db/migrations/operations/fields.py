@@ -89,7 +89,7 @@ class AddField(FieldOperation):
             field.default = NOT_PROVIDED
         else:
             field = self.field
-        state.models[app_label, self.model_name_lower].fields.append((self.name, field))
+        state.models[app_label, self.model_name_lower].fields[self.name] = field
         # Delay rendering of relationships if it's not a relational field
         delay = not field.is_relation
         state.reload_model(app_label, self.model_name_lower, delay=delay)
@@ -154,14 +154,8 @@ class RemoveField(FieldOperation):
         )
 
     def state_forwards(self, app_label, state):
-        new_fields = []
-        old_field = None
-        for name, instance in state.models[app_label, self.model_name_lower].fields:
-            if name != self.name:
-                new_fields.append((name, instance))
-            else:
-                old_field = instance
-        state.models[app_label, self.model_name_lower].fields = new_fields
+        model_state = state.models[app_label, self.model_name_lower]
+        old_field = model_state.fields.pop(self.name)
         # Delay rendering of relationships if it's not a relational field
         delay = not old_field.is_relation
         state.reload_model(app_label, self.model_name_lower, delay=delay)
@@ -217,11 +211,8 @@ class AlterField(FieldOperation):
             field.default = NOT_PROVIDED
         else:
             field = self.field
-        state.models[app_label, self.model_name_lower].fields = [
-            (n, field if n == self.name else f)
-            for n, f in
-            state.models[app_label, self.model_name_lower].fields
-        ]
+        model_state = state.models[app_label, self.model_name_lower]
+        model_state.fields[self.name] = field
         # TODO: investigate if old relational fields must be reloaded or if it's
         # sufficient if the new field is (#27737).
         # Delay rendering of relationships if it's not a relational field and
@@ -299,11 +290,14 @@ class RenameField(FieldOperation):
         model_state = state.models[app_label, self.model_name_lower]
         # Rename the field
         fields = model_state.fields
-        found = None
-        for index, (name, field) in enumerate(fields):
-            if not found and name == self.old_name:
-                fields[index] = (self.new_name, field)
-                found = field
+        try:
+            found = fields.pop(self.old_name)
+        except KeyError:
+            raise FieldDoesNotExist(
+                "%s.%s has no field named '%s'" % (app_label, self.model_name, self.old_name)
+            )
+        fields[self.new_name] = found
+        for field in fields.values():
             # Fix from_fields to refer to the new field.
             from_fields = getattr(field, 'from_fields', None)
             if from_fields:
@@ -311,10 +305,6 @@ class RenameField(FieldOperation):
                     self.new_name if from_field_name == self.old_name else from_field_name
                     for from_field_name in from_fields
                 ])
-        if found is None:
-            raise FieldDoesNotExist(
-                "%s.%s has no field named '%s'" % (app_label, self.model_name, self.old_name)
-            )
         # Fix index/unique_together to refer to the new field
         options = model_state.options
         for option in ('index_together', 'unique_together'):
