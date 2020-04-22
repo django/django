@@ -1,0 +1,110 @@
+=================================
+How to use Django with NGINX Unit
+=================================
+
+.. highlight:: none
+
+Unit_ is a open-source web application server from NGINX; written from scratch,
+it's dynamically configurable via a JSON-enabled RESTful API.
+
+.. _Unit: https://unit.nginx.org/
+
+.. seealso::
+
+    Unit docs offer detailed `configuration`_ guidance. The docs below are
+    focused on how to integrate Django with Unit.
+
+    .. _configuration: https://unit.nginx.org/configuration/
+
+Prerequisite: NGINX Unit
+========================
+
+Unit docs describe several `installation options`_. Available alternatives
+include official binary packages and Docker images, third-party repositories,
+and source code build, for example:
+
+.. code-block:: console
+
+   $ docker pull nginx/unit
+   $ docker run -d nginx/unit
+
+.. _installation options: https://unit.nginx.org/installation/
+
+One thing to note after installing Unit is the address of the control socket:
+
+.. code-block:: console
+
+   $ unitd --version
+
+        unit version: <version>
+        configured as ... --control=unix:/var/run/control.unit.sock ...
+
+Configuring a Django project
+============================
+
+Assume you have the following :ref:`project structure
+<django-admin-startproject>`:
+
+.. code-block:: none
+
+   /home/django/project/
+   |-- manage.py
+   |-- app1/
+   |   |-- ...
+   |-- app2/
+   |   |-- ...
+   `-- project/
+       |-- ...
+       `-- wsgi.py
+
+To run the project on Unit, add a ``listeners`` entry for an ``applications``
+entity that points to the `project’s` WSGI module; the project and its apps
+will run on the listener’s IP and port. If you use a virtual environment,
+reference it in ``home``. Finally, you can also set up some ``environment``
+variables that your project relies on:
+
+.. code-block:: json
+
+   {
+       "listeners": {
+           "127.0.0.1:8080": {
+               "pass": "applications/django_project"
+           }
+       },
+
+       "applications": {
+           "django_project": {
+               "type": "python 3",
+               "path": "/home/django/project/",
+               "home": "/home/django/venv/",
+               "module": "project.wsgi",
+               "environment": {
+                   "DJANGO_SETTINGS_MODULE": "project.settings",
+                   "DB_ENGINE": "django.db.backends.postgresql",
+                   "DB_NAME": "project",
+                   "DB_HOST": "127.0.0.1",
+                   "DB_PORT": "5432"
+               }
+           }
+       }
+   }
+
+..  admonition:: Mapping project structure to Unit configuration
+
+    Here, the top-level ``project`` directory becomes ``path``; its child
+    ``project`` and the ``wsgi.py`` in it are imported via ``module``. If you
+    reorder your directories, set up ``path`` and ``module`` accordingly.
+
+Upload the configuration to Unit's config API. Assuming the JSON above is in
+``config.json``:
+
+    # curl -X PUT --data-binary @config.json --unix-socket \
+           /path/to/control.unit.sock http://localhost/config
+
+After a successful update, your project and apps will be available on the
+listener’s IP address and port.
+
+See the Unit docs on `applications`_ for further details of fine-grained
+application management in Unit.
+
+.. _applications: https://unit.nginx.org/configuration/#applications

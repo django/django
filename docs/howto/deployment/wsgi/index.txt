@@ -18,6 +18,7 @@ Django includes getting-started documentation for the following WSGI servers:
 
    gunicorn
    uwsgi
+   nginx-unit
    modwsgi
    apache-auth
 
