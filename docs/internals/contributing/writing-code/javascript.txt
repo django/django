@@ -55,12 +55,11 @@ version. To run it:
 
 .. console::
 
-    $ python -m pip install closure
     $ python django/contrib/admin/bin/compress.py
 
 Behind the scenes, ``compress.py`` is a front-end for Google's
 `Closure Compiler`_ which is written in Java. The Closure Compiler library is
-not bundled with Django, but you can install it using pip as done above. The
+not bundled with Django, but will be installed automatically by ``npm``. The
 Closure Compiler library requires `Java`_ 7 or higher.
 
 Please don't forget to run ``compress.py`` and include the ``diff`` of the
