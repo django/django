@@ -4,8 +4,8 @@ How to use Django with NGINX Unit
 
 .. highlight:: none
 
-Unit_ is a open-source web application server from NGINX; written from scratch,
-it's dynamically configurable via a JSON-enabled RESTful API.
+Unit_ is an open-source web application server from NGINX; written from
+scratch, it's dynamically configurable via a JSON-enabled RESTful API.
 
 .. _Unit: https://unit.nginx.org/
 
@@ -42,8 +42,8 @@ One thing to note after installing Unit is the address of the control socket:
 Configuring a Django project
 ============================
 
-Assume you have the following :ref:`project structure
-<django-admin-startproject>`:
+Assume you have :doc:`created <../../../ref/django-admin>` the following
+project structure:
 
 .. code-block:: none
 
@@ -58,7 +58,7 @@ Assume you have the following :ref:`project structure
        `-- wsgi.py
 
 To run the project on Unit, add a ``listeners`` entry for an ``applications``
-entity that points to the `project’s` WSGI module; the project and its apps
+entity that points to the *project's* WSGI module; the project and its apps
 will run on the listener’s IP and port. If you use a virtual environment,
 reference it in ``home``. Finally, you can also set up some ``environment``
 variables that your project relies on:
@@ -91,18 +91,21 @@ variables that your project relies on:
 
 ..  admonition:: Mapping project structure to Unit configuration
 
-    Here, the top-level ``project`` directory becomes ``path``; its child
-    ``project`` and the ``wsgi.py`` in it are imported via ``module``. If you
-    reorder your directories, set up ``path`` and ``module`` accordingly.
+    Here, the top-level :file:`project` directory becomes ``path``; its child
+    :file:`project` and the :file:`wsgi.py` in it are imported via ``module``.
+    If you reorder your directories, set up ``path`` and ``module``
+    accordingly.
 
 Upload the configuration to Unit's config API. Assuming the JSON above is in
 ``config.json``:
+
+.. code-block:: console
 
     # curl -X PUT --data-binary @config.json --unix-socket \
            /path/to/control.unit.sock http://localhost/config
 
 After a successful update, your project and apps will be available on the
-listener’s IP address and port.
+listener's IP address and port.
 
 See the Unit docs on `applications`_ for further details of fine-grained
 application management in Unit.
