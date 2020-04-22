@@ -1,16 +1,6 @@
 /*global gettext*/
 (function() {
     'use strict';
-    var closestElem = function(elem, tagName) {
-        if (elem.nodeName === tagName.toUpperCase()) {
-            return elem;
-        }
-        if (elem.parentNode.nodeName === 'BODY') {
-            return null;
-        }
-        return elem.parentNode && closestElem(elem.parentNode, tagName);
-    };
-
     window.addEventListener('load', function() {
         // Add anchor tag for Show/Hide link
         var fieldsets = document.querySelectorAll('fieldset.collapse');
@@ -35,7 +25,7 @@
             if (ev.target.matches('.collapse-toggle')) {
                 ev.preventDefault();
                 ev.stopPropagation();
-                var fieldset = closestElem(ev.target, 'fieldset');
+                var fieldset = ev.target.closest('fieldset');
                 if (fieldset.classList.contains('collapsed')) {
                     // Show
                     ev.target.textContent = gettext('Hide');
