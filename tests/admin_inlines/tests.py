@@ -1242,6 +1242,33 @@ class SeleniumTests(AdminSeleniumTestCase):
             hide_links[hide_index].click()
             self.wait_until_invisible(field_name)
 
+    def assertBorder(self, element, border):
+        width, style, color = border.split(' ')
+        border_properties = [
+            'border-bottom-%s',
+            'border-left-%s',
+            'border-right-%s',
+            'border-top-%s',
+        ]
+        for prop in border_properties:
+            prop = prop % 'width'
+            self.assertEqual(element.value_of_css_property(prop), width)
+        for prop in border_properties:
+            prop = prop % 'style'
+            self.assertEqual(element.value_of_css_property(prop), style)
+        # Convert hex color to rgb.
+        self.assertRegex(color, '#[0-9a-f]{6}')
+        r, g, b = int(color[1:3], 16), int(color[3:5], 16), int(color[5:], 16)
+        # The value may be expressed as either rgb() or rgba() depending on the
+        # browser.
+        colors = [
+            'rgb(%d, %d, %d)' % (r, g, b),
+            'rgba(%d, %d, %d, 1)' % (r, g, b),
+        ]
+        for prop in border_properties:
+            prop = prop % 'color'
+            self.assertIn(element.value_of_css_property(prop), colors)
+
     def test_inline_formset_error_input_border(self):
         self.admin_login(username='super', password='secret')
         self.selenium.get(self.live_server_url + reverse('admin:admin_inlines_holder5_add'))
@@ -1258,25 +1285,25 @@ class SeleniumTests(AdminSeleniumTestCase):
         for inline in ('stacked', 'tabular'):
             for field_name in ('name', 'select', 'text'):
                 element_id = 'id_inner5%s_set-0-%s' % (inline, field_name)
-                self.assertEqual(
-                    self.selenium.find_element_by_id(element_id).value_of_css_property('border'),
-                    '1px solid rgb(204, 204, 204)',  # 1px solid #cccccc
+                self.assertBorder(
+                    self.selenium.find_element_by_id(element_id),
+                    '1px solid #cccccc',
                 )
         self.selenium.find_element_by_xpath('//input[@value="Save"]').click()
         # Test the red border around inputs by css selectors
         stacked_selectors = ['.errors input', '.errors select', '.errors textarea']
         for selector in stacked_selectors:
-            self.assertEqual(
-                self.selenium.find_element_by_css_selector(selector).value_of_css_property('border'),
-                '1px solid rgb(186, 33, 33)',  # 1px solid #ba2121
+            self.assertBorder(
+                self.selenium.find_element_by_css_selector(selector),
+                '1px solid #ba2121',
             )
         tabular_selectors = [
             'td ul.errorlist + input', 'td ul.errorlist + select', 'td ul.errorlist + textarea'
         ]
         for selector in tabular_selectors:
-            self.assertEqual(
-                self.selenium.find_element_by_css_selector(selector).value_of_css_property('border'),
-                '1px solid rgb(186, 33, 33)',  # 1px solid #ba2121
+            self.assertBorder(
+                self.selenium.find_element_by_css_selector(selector),
+                '1px solid #ba2121',
             )
 
     def test_inline_formset_error(self):
