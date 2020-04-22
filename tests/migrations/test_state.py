@@ -1042,6 +1042,28 @@ class ModelStateTests(SimpleTestCase):
         with self.assertRaisesMessage(InvalidBasesError, "Cannot resolve bases for [<ModelState: 'app.Model'>]"):
             project_state.apps
 
+    def test_fields_ordering_equality(self):
+        state = ModelState(
+            'migrations',
+            'Tag',
+            [
+                ('id', models.AutoField(primary_key=True)),
+                ('name', models.CharField(max_length=100)),
+                ('hidden', models.BooleanField()),
+            ],
+        )
+        reordered_state = ModelState(
+            'migrations',
+            'Tag',
+            [
+                ('id', models.AutoField(primary_key=True)),
+                # Purposedly re-ordered.
+                ('hidden', models.BooleanField()),
+                ('name', models.CharField(max_length=100)),
+            ],
+        )
+        self.assertEqual(state, reordered_state)
+
     @override_settings(TEST_SWAPPABLE_MODEL='migrations.SomeFakeModel')
     def test_create_swappable(self):
         """
