@@ -1194,7 +1194,7 @@ implementation details see :ref:`using-the-views`.
       :file:`registration/password_change_form.html` if not supplied.
 
     * ``success_url``: The URL to redirect to after a successful password
-      change.
+      change. Defaults to ``'password_change_done'``.
 
     * ``form_class``: A custom "change password" form which must accept a
       ``user`` keyword argument. The form is responsible for actually changing
@@ -1268,7 +1268,7 @@ implementation details see :ref:`using-the-views`.
       ``django.contrib.auth.tokens.PasswordResetTokenGenerator``.
 
     * ``success_url``: The URL to redirect to after a successful password reset
-      request.
+      request. Defaults to ``'password_reset_done'``.
 
     * ``from_email``: A valid email address. By default Django uses
       the :setting:`DEFAULT_FROM_EMAIL`.
