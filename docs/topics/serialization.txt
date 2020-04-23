@@ -274,6 +274,11 @@ function::
 Also note that GeoDjango provides a :doc:`customized GeoJSON serializer
 </ref/contrib/gis/serializers>`.
 
+.. versionchanged:: 3.1
+
+    All data is now dumped with Unicode. If you need the previous behavior,
+    pass ``ensure_ascii=True`` to the ``serializers.serialize()`` function.
+
 ``DjangoJSONEncoder``
 ~~~~~~~~~~~~~~~~~~~~~
 
@@ -314,6 +319,11 @@ again a mapping with the key being name of the field and the value the value::
         pk: 4b678b301dfd8a4e0dad910de3ae245b
 
 Referential fields are again represented by the PK or sequence of PKs.
+
+.. versionchanged:: 3.1
+
+    All data is now dumped with Unicode. If you need the previous behavior,
+    pass ``allow_unicode=False`` to the ``serializers.serialize()`` function.
 
 .. _topics-serialization-natural-keys:
 

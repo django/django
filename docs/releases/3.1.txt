@@ -668,6 +668,11 @@ Miscellaneous
 * The undocumented ``version`` parameter to the
   :class:`~django.contrib.gis.db.models.functions.AsKML` function is removed.
 
+* :ref:`JSON and YAML serializers <serialization-formats>`, used by
+  :djadmin:`dumpdata`, now dump all data with Unicode by default. If you need
+  the previous behavior, pass ``ensure_ascii=True`` to JSON serializer, or
+  ``allow_unicode=False`` to YAML serializer.
+
 .. _deprecated-features-3.1:
 
 Features deprecated in 3.1
