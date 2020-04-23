@@ -68,11 +68,8 @@ explained later in this document.
 
     Why use a text-based template instead of an XML-based one (like Zope's
     TAL)? We wanted Django's template language to be usable for more than
-    just XML/HTML templates. At World Online, we use it for emails,
-    JavaScript and CSV. You can use the template language for any text-based
-    format.
-
-    Oh, and one more thing: making humans edit XML is sadistic!
+    just XML/HTML templates. You can use the template language for any
+    text-based format such as emails, JavaScript and CSV.
 
 .. _template-variables:
 
