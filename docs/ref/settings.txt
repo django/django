@@ -3244,7 +3244,7 @@ Possible values for the setting are:
 
     Setting ``SESSION_COOKIE_SAMESITE = 'None'`` was allowed.
 
-.. _SameSite: https://www.owasp.org/index.php/SameSite
+.. _SameSite: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Set-Cookie/SameSite
 
 .. setting:: SESSION_COOKIE_SECURE
 

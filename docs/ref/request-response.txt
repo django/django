@@ -873,7 +873,7 @@ Methods
       sent with all same-site and cross-site requests.
 
     .. _HttpOnly: https://www.owasp.org/index.php/HttpOnly
-    .. _SameSite: https://www.owasp.org/index.php/SameSite
+    .. _SameSite: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Set-Cookie/SameSite
 
     .. versionchanged:: 3.1
 
