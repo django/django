@@ -119,7 +119,7 @@ class SessionStore(HashingSessionBase):
 
         # return empty session if super().load() failed
         # and session key was reset
-        if self.session_key is None:
+        if self.frontend_key is None:
             return {}
 
         # our _load_data will return False to indicate
@@ -133,7 +133,7 @@ class SessionStore(HashingSessionBase):
             session_data = {}
         
         # Remove expired sessions.
-        backend_key = self.get_backend_key(self._get_or_create_session_key())
+        backend_key = self.get_backend_key(self._get_or_create_frontend_key())
         expiry_date = self._expiry_date(session_data, self._backend_key_to_file(backend_key))
         expiry_age = self.get_expiry_age(expiry=expiry_date)
         if expiry_age <= 0:

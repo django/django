@@ -20,8 +20,8 @@ class SessionMiddleware(MiddlewareMixin):
         self.SessionStore = engine.SessionStore
 
     def process_request(self, request):
-        session_key = request.COOKIES.get(settings.SESSION_COOKIE_NAME)
-        request.session = self.SessionStore(session_key)
+        frontend_session_key = request.COOKIES.get(settings.SESSION_COOKIE_NAME)
+        request.session = self.SessionStore(frontend_session_key)
 
     def process_response(self, request, response):
         """
@@ -68,7 +68,7 @@ class SessionMiddleware(MiddlewareMixin):
                         )
                     response.set_cookie(
                         settings.SESSION_COOKIE_NAME,
-                        request.session.session_key, max_age=max_age,
+                        request.session.frontend_key, max_age=max_age,
                         expires=expires, domain=settings.SESSION_COOKIE_DOMAIN,
                         path=settings.SESSION_COOKIE_PATH,
                         secure=settings.SESSION_COOKIE_SECURE or None,

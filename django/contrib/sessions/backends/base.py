@@ -43,6 +43,7 @@ class UpdateError(Exception):
     pass
 
 
+
 class SessionBase:
     """
     Base class for all Session classes.
@@ -385,11 +386,21 @@ class SessionBase:
 
 
 class HashingSessionBase(SessionBase):
-    _algorithm = getattr(hashlib, SESSION_HASHING_ALGORITHM)
-
     """
     Base class for all Session classes since introducing session-key hashing.
     """
+    _algorithm = getattr(hashlib, SESSION_HASHING_ALGORITHM)
+
+    def _get_frontend_key(self):
+        return super()._get_session_key()
+    
+    def _set_frontend_key(self, key):
+        return super()._set_session_key(key)
+
+    frontend_key = property(_get_frontend_key)
+
+    _frontend_key = property(_get_frontend_key, _set_frontend_key)
+    
     @classmethod
     def get_serializer(cls):
         return import_string(settings.SESSION_SERIALIZER)
@@ -437,6 +448,7 @@ class HashingSessionBase(SessionBase):
             return {}
 
     def _legacy_decode(self, session_data):
+        # RemovedInDjango40Warning: pre-Django 3.1 format will be invalid.
         self.__legacy_decode(session_data)
 
     @classmethod
@@ -451,7 +463,7 @@ class HashingSessionBase(SessionBase):
     def decode(self, session_data):
         return self._decode(session_data)
 
-    def _get_new_session_key(self):
+    def _get_new_frontend_key(self):
         """
         Return new unique session key. If SESSION_STORE_KEY_HASH is False, the
         key is a 32-character string. If SESSION_STORE_KEY_HASH is True the key
@@ -459,34 +471,60 @@ class HashingSessionBase(SessionBase):
         a 32-character session key.
         """
         while True:
-            session_key = super()._get_new_session_key()
+            frontend_key = super()._get_new_session_key()
 
             if not settings.SESSION_STORE_KEY_HASH: 
-                return session_key
+                return frontend_key
 
-            hashed_frontend_key = SESSION_HASHED_KEY_PREFIX + session_key
+            hashed_frontend_key = SESSION_HASHED_KEY_PREFIX + frontend_key
 
             if not self.exists(hashed_frontend_key):
                 return hashed_frontend_key
 
-    def _get_or_create_session_key(self):
-        """
-        Initialise current session with a new frontend key if it
-        doesn't have one yet and return corresponding backend key
-        """
-        if self._session_key is None:
-            self._session_key = self._get_new_session_key()
-        return self.get_backend_key(self._session_key)
+    def _get_new_session_key(self):
+        warnings.warn(
+            'SessionBase._get_new_session_key() is deprecated '
+            'and will be removed in Django 4.0. Use '
+            'HashingSessionBase._get_new_frontend_key() instead.',
+            RemovedInDjango40Warning, stacklevel=2)
+        return self._get_new_frontend_key()
 
-    def _validate_session_key(self, frontend_key):
+    def _get_or_create_frontend_key(self): 
+        """
+        Initialise current session with a new frontend key
+        and return the key.
+        """
+        if self._frontend_key is None:
+            self._frontend_key = self._get_new_frontend_key()
+        return self._frontend_key
+
+    def _get_or_create_session_key(self):
+        warnings.warn(
+            'SessionBase._get_or_create_session_key() is deprecated '
+            'and will be removed in Django 4.0. Use '
+            'HashingSessionBase._get_or_create_frontend_key() instead.',
+            RemovedInDjango40Warning, stacklevel=2)
+        return self._get_or_create_frontend_key()
+
+    @classmethod
+    def _validate_frontend_key(cls, frontend_key):
         """
         Key must be truthy and at least 8 characters long and
         in the correct format if hashing is required.
         """
-        valid = super()._validate_session_key(frontend_key)
+        valid = frontend_key and len(frontend_key) >= 8
         if settings.SESSION_REQUIRE_KEY_HASH:
-            valid = valid and self._has_hash_prefix(frontend_key)
+            valid = valid and cls._has_hash_prefix(frontend_key)
         return valid
+      
+    def _validate_session_key(self, frontend_key):
+        # RemovedInDjango40Warning: use _validate_frontend_key classmethod
+        # warnings.warn(
+        #   'SessionBase._validate_session_key() is deprecated '
+        #   'and will be removed in Django 4.0. Use the classmethod '
+        #   'HashingSessionBase._validate_frontend_key() instead.',
+        #   RemovedInDjango40Warning, stacklevel=2)
+        return self._validate_frontend_key(frontend_key)
 
     @staticmethod
     def get_session_cookie_age():
@@ -564,7 +602,7 @@ class HashingSessionBase(SessionBase):
 
     @staticmethod
     def _has_hash_prefix(frontend_key):
-        """Return True when the session_key is hashed in the backend."""
+        """Return True when the frontend_key is prefixed with hashing algorithm."""
         return str(frontend_key).startswith(SESSION_HASHED_KEY_PREFIX)
 
     # SessionBase methods
@@ -572,49 +610,52 @@ class HashingSessionBase(SessionBase):
     def exists(self, frontend_key):
         """
         Return ``True`` if a session identified by the given frontend_key
-        exists. If 'frontend_key' is None, the current session's session_key
+        exists. If 'frontend_key' is None, the current session's frontend key
         will be used.
         """
         if frontend_key is None:
-            frontend_key = self._get_or_create_session_key()
+            frontend_key = self._get_or_create_frontend_key()
 
         backend_key = self.get_backend_key(frontend_key)
         return self._exists(backend_key)
 
-    def create(self):
+    def create(self, max_attempts=None):
         """
         Create a new session instance. Guaranteed to create a new object with
         a unique key and will have saved the result once (with empty data)
         before the method returns.
         """
-        while True:
-            self._session_key = self._get_new_session_key()
+        count = 0
+        while max_attempts is None or count < max_attempts:
+            self._frontend_key = self._get_new_frontend_key()
             try:
                 self.save(must_create=True)
             except CreateError:
+                count += 1
                 continue
             self.modified = True
             return
+        raise CreateError
 
     def save(self, must_create=False):
         """
         Save the current session. if 'must_create' is ``True``
-        or the current session does not have a session_key yet
+        or the current session does not have a frontend_key yet
         it will create a new session record. Otherwise it will
-        update the existing record identified by the self.session_key.
+        update the existing record identified by the self.frontend_key.
         """
-        if self.session_key is None:
+        if self.frontend_key is None:
             return self.create()
         session_data = self._get_session(no_load=must_create)
-        return self._save(self.get_backend_key(self.session_key), session_data, must_create=must_create)
+        return self._save(self.get_backend_key(self.frontend_key), session_data, must_create=must_create)
 
     def delete(self, frontend_key=None):
         """
         Delete the session data under this key. If the key is None, use the
         current session key value.
         """
-        if frontend_key is None and not self.session_key is None:
-            frontend_key = self.session_key
+        if frontend_key is None and not self.frontend_key is None:
+            frontend_key = self.frontend_key
         
         if not frontend_key is None:
             self._delete(self.get_backend_key(frontend_key))
@@ -625,7 +666,7 @@ class HashingSessionBase(SessionBase):
         Return empty dictionary this session does not have a session
         or the session was not found.
         """
-        frontend_key = self.session_key
+        frontend_key = self.frontend_key
 
         if frontend_key is None:
             return {}
@@ -635,7 +676,7 @@ class HashingSessionBase(SessionBase):
 
         # None is returned if session isn't found
         if data is None:
-            self._session_key = None
+            self._frontend_key = None
             # only return None when there is no frontend_key
             return {}
 

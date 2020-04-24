@@ -14,7 +14,7 @@ from django.contrib.sessions.backends.base import (
     SESSION_HASHING_ALGORITHM, SESSION_KEY_DELIMITER, UpdateError, SESSION_HASHED_KEY_PREFIX
 )
 from django.contrib.sessions.backends.cache import (
-    KEY_PREFIX as CACHE_KEY_PREFIX, SessionStore as CacheSession,
+    KEY_PREFIX as CACHE_KEY_PREFIX, SessionStore as CacheSession
 )
 from django.contrib.sessions.backends.cached_db import (
     KEY_PREFIX as CACHEDB_KEY_PREFIX, SessionStore as CacheDBSession, get_cache_store
@@ -163,39 +163,39 @@ class SessionTestsMixin:
 
     def test_save(self):
         self.session.save()
-        self.assertIs(self.session.exists(self.session.session_key), True)
+        self.assertIs(self.session.exists(self.session.frontend_key), True)
 
     def test_delete(self):
         self.session.save()
-        self.session.delete(self.session.session_key)
-        self.assertIs(self.session.exists(self.session.session_key), False)
+        self.session.delete(self.session.frontend_key)
+        self.assertIs(self.session.exists(self.session.frontend_key), False)
 
     def test_flush(self):
         self.session['foo'] = 'bar'
         self.session.save()
-        prev_key = self.session.session_key
+        prev_key = self.session.frontend_key
         self.session.flush()
         self.assertIs(self.session.exists(prev_key), False)
-        self.assertNotEqual(self.session.session_key, prev_key)
-        self.assertIsNone(self.session.session_key)
+        self.assertNotEqual(self.session.frontend_key, prev_key)
+        self.assertIsNone(self.session.frontend_key)
         self.assertIs(self.session.modified, True)
         self.assertIs(self.session.accessed, True)
 
     def test_cycle(self):
         self.session['a'], self.session['b'] = 'c', 'd'
         self.session.save()
-        prev_key = self.session.session_key
+        prev_key = self.session.frontend_key
         prev_data = list(self.session.items())
         self.session.cycle_key()
         self.assertIs(self.session.exists(prev_key), False)
-        self.assertNotEqual(self.session.session_key, prev_key)
+        self.assertNotEqual(self.session.frontend_key, prev_key)
         self.assertEqual(list(self.session.items()), prev_data)
 
     def test_cycle_with_no_session_cache(self):
         self.session['a'], self.session['b'] = 'c', 'd'
         self.session.save()
         prev_data = self.session.items()
-        self.session = self.backend(self.session.session_key)
+        self.session = self.backend(self.session.frontend_key)
         self.assertIs(hasattr(self.session, '_session_cache'), False)
         self.session.cycle_key()
         self.assertCountEqual(self.session.items(), prev_data)
@@ -211,7 +211,7 @@ class SessionTestsMixin:
         try:
             session = self.backend('1')
             session.save()
-            self.assertNotEqual(session.session_key, '1')
+            self.assertNotEqual(session.frontend_key, '1')
             self.assertIsNone(session.get('cat'))
             session.delete()
         finally:
@@ -219,27 +219,27 @@ class SessionTestsMixin:
             # session key; make sure that entry is manually deleted
             session.delete('1')
 
-    def test_session_key_empty_string_invalid(self):
+    def test_frontend_key_empty_string_invalid(self):
         """Falsey values (Such as an empty string) are rejected."""
-        self.session._session_key = ''
-        self.assertIsNone(self.session.session_key)
+        self.session._frontend_key = ''
+        self.assertIsNone(self.session.frontend_key)
 
-    def test_session_key_too_short_invalid(self):
+    def test_frontend_key_too_short_invalid(self):
         """Strings shorter than 8 characters are rejected."""
-        self.session._session_key = '1234567'
-        self.assertIsNone(self.session.session_key)
+        self.session._frontend_key = '1234567'
+        self.assertIsNone(self.session.frontend_key)
 
     @override_settings(SESSION_STORE_KEY_HASH=True, SESSION_REQUIRE_KEY_HASH=False)
-    def test_session_key_valid_string_saved(self):
+    def test_frontend_key_valid_string_saved(self):
         """Strings of length 8 and up are accepted and stored."""
-        self.session._session_key = '12345678'
-        self.assertEqual(self.session.session_key, '12345678')
+        self.session._frontend_key = '12345678'
+        self.assertEqual(self.session.frontend_key, '12345678')
 
-    def test_session_key_is_read_only(self):
-        def set_session_key(session):
-            session.session_key = session._get_new_session_key()
+    def test_frontend_key_is_read_only(self):
+        def set_frontend_key(session):
+            session.frontend_key = session._get_new_frontend_key()
         with self.assertRaises(AttributeError):
-            set_session_key(self.session)
+            set_frontend_key(self.session)
 
     # Custom session expiry
     def test_default_expiry(self):
@@ -350,20 +350,20 @@ class SessionTestsMixin:
             self.session = self.backend()  # reinitialize after overriding settings
 
             # Regression test for #19200
-            old_session_key = None
-            new_session_key = None
+            old_frontend_key = None
+            new_frontend_key = None
             try:
                 self.session['foo'] = 'bar'
                 self.session.set_expiry(-timedelta(seconds=10))
                 self.session.save()
-                old_session_key = self.session.session_key
+                old_frontend_key = self.session.frontend_key
                 # With an expiry date in the past, the session expires instantly.
-                new_session = self.backend(self.session.session_key)
-                new_session_key = new_session.session_key
+                new_session = self.backend(self.session.frontend_key)
+                new_frontend_key = new_session.frontend_key
                 self.assertNotIn('foo', new_session)
             finally:
-                self.session.delete(old_session_key)
-                self.session.delete(new_session_key)
+                self.session.delete(old_frontend_key)
+                self.session.delete(new_frontend_key)
 
     def test_session_load_does_not_create_record(self):
         """
@@ -374,10 +374,10 @@ class SessionTestsMixin:
         session = self.backend('someunknownkey')
         session.load()
 
-        self.assertIsNone(session.session_key)
-        self.assertIs(session.exists(session.session_key), False)
+        self.assertIsNone(session.frontend_key)
+        self.assertIs(session.exists(session.frontend_key), False)
         # provided unknown key was cycled, not reused
-        self.assertNotEqual(session.session_key, 'someunknownkey')
+        self.assertNotEqual(session.frontend_key, 'someunknownkey')
 
     def test_session_save_does_not_resurrect_session_logged_out_in_other_context(self):
         """
@@ -389,7 +389,7 @@ class SessionTestsMixin:
         s1.save(must_create=True)
 
         # Logout in another context.
-        s2 = self.backend(s1.session_key)
+        s2 = self.backend(s1.frontend_key)
         s2.delete()
 
         # Modify session in first context.
@@ -430,10 +430,10 @@ class DatabaseSessionTests(SessionTestsMixin, TestCase):
         self.session['x'] = 1
         self.session.save()
 
-        session_key = self.session.get_backend_key(self.session.session_key)
-        s = self.model.objects.get(session_key=session_key)
+        backend_key = self.session.get_backend_key(self.session.frontend_key)
+        s = self.model.objects.get(session_key=backend_key)
 
-        self.assertEqual(str(s), session_key)
+        self.assertEqual(str(s), backend_key)
 
     def test_session_get_decoded(self):
         """
@@ -443,8 +443,8 @@ class DatabaseSessionTests(SessionTestsMixin, TestCase):
         self.session['x'] = 1
         self.session.save()
 
-        session_key = self.session.get_backend_key(self.session.session_key)
-        s = self.model.objects.get(session_key=session_key)
+        backend_key = self.session.get_backend_key(self.session.frontend_key)
+        s = self.model.objects.get(session_key=backend_key)
 
         self.assertEqual(s.get_decoded(), {'x': 1})
 
@@ -456,8 +456,8 @@ class DatabaseSessionTests(SessionTestsMixin, TestCase):
         self.session['y'] = 1
         self.session.save()
 
-        session_key = self.session.get_backend_key(self.session.session_key)
-        s = self.model.objects.get(session_key=session_key)
+        backend_key = self.session.get_backend_key(self.session.frontend_key)
+        s = self.model.objects.get(session_key=backend_key)
         # Change it
         self.model.objects.save(s.session_key, {'y': 2}, s.expire_date)
         # Clear cache, so that it will be retrieved from DB
@@ -493,15 +493,15 @@ class DatabaseSessionWithoutHashingTests(DatabaseSessionTests):
 
     def test_cookie_sessionid_same_as_db_session_key(self):
         """
-        A cookie sessionid should be the same as the db session_key.
+        A frontend_key should be the same as the db session_key.
         """
         # Create a session
         self.session['y'] = 1
         self.session.save()
 
         db_session_key = self.model.objects.get(
-            session_key=self.session.session_key).session_key
-        self.assertEqual(db_session_key, self.session.session_key)
+            session_key=self.session.frontend_key).session_key
+        self.assertEqual(db_session_key, self.session.frontend_key)
 
 
 @override_settings(USE_TZ=True)
@@ -512,33 +512,33 @@ class DatabaseSessionWithTimeZoneTests(DatabaseSessionTests):
 @override_settings(SESSION_STORE_KEY_HASH=True)
 class DatabaseSessionWithHashingTests(DatabaseSessionTests):
 
-    def test_session_key_correct_format(self):
+    def test_frontend_key_correct_format(self):
         """
-        A cookie sessionid should contain the algorithm, delimiter,
-        and the unhashed session_key.
+        A frontend_key should contain the algorithm, delimiter,
+        and the unhashed frontend_key.
         """
         # Create a session
         self.session['y'] = 1
         self.session.save()
 
-        session_key = self.session.session_key
-        algorithm, key = session_key.split(SESSION_KEY_DELIMITER)
+        frontend_key = self.session.frontend_key
+        algorithm, key = frontend_key.split(SESSION_KEY_DELIMITER)
 
         self.assertEqual(algorithm, SESSION_HASHING_ALGORITHM)
         self.assertEqual(len(key), 32)
 
-    def test_cookie_sessionid_not_db_session_key(self):
+    def test_frontend_key_not_db_session_key(self):
         """
-        A cookie sessionid should differ from the db session_key.
+        A frontend_key should differ from the db session_key.
         """
         # Create a session
         self.session['y'] = 1
         self.session.save()
 
         with self.assertRaises(self.model.DoesNotExist):
-            self.model.objects.get(session_key=self.session.session_key)
+            self.model.objects.get(session_key=self.session.frontend_key)
 
-    def test_hashed_session_key_correct(self):
+    def test_backend_key_correct(self):
         """
         A session key should be stored as a sha256 hash by default.
         """
@@ -546,10 +546,10 @@ class DatabaseSessionWithHashingTests(DatabaseSessionTests):
         self.session['y'] = 1
         self.session.save()
 
-        hashed_session_key = self.session.get_backend_key(self.session.session_key)
-        self.assertEqual(len(hashed_session_key), 64)
+        backend_key = self.session.get_backend_key(self.session.frontend_key)
+        self.assertEqual(len(backend_key), 64)
 
-    def test_hashed_session_key_gets_session(self):
+    def test_backend_key_gets_session(self):
         """
         A session backend should be directly accessible via hashed lookup.
         """
@@ -557,7 +557,7 @@ class DatabaseSessionWithHashingTests(DatabaseSessionTests):
         self.session['y'] = 1
         self.session.save()
 
-        backend_key = self.session.get_backend_key(self.session.session_key)
+        backend_key = self.session.get_backend_key(self.session.frontend_key)
         results = self.model.objects.get(session_key=backend_key)
         self.assertIsNotNone(results)
 
@@ -574,8 +574,8 @@ class DatabaseSessionWithHashingNotRequiredTests(DatabaseSessionWithHashingTests
         s1.save(must_create=True)
 
         # Login with hashed value in another context.
-        hashed_session_key = s1.get_backend_key(s1.session_key)
-        s2 = self.backend(hashed_session_key)
+        backend_key = s1.get_backend_key(s1.frontend_key)
+        s2 = self.backend(backend_key)
         self.assertEqual(s2.get('test_data'), 'value1')
 
         s2['test_data'] = 'value2'
@@ -596,22 +596,22 @@ class DatabaseSessionWithHashingRequiredTests(DatabaseSessionWithHashingTests):
         s1.save(must_create=True)
 
         # Login with hashed value in another context.
-        hashed_session_key = s1.get_backend_key(s1.session_key)
-        s2 = self.backend(hashed_session_key)
+        backend_key = s1.get_backend_key(s1.frontend_key)
+        s2 = self.backend(backend_key)
         s2['test_data'] = 'value2'
         s2.save()
         del s1._session_cache
         self.assertEqual(s1.get('test_data'), 'value1')
 
-    def test_session_key_invalid(self):
+    def test_frontend_key_invalid(self):
         """Inproperly formated strings are not accepted."""
-        self.session._session_key = '123456789'
-        self.assertIsNone(self.session.session_key)
+        self.session._frontend_key = '123456789'
+        self.assertIsNone(self.session.frontend_key)
 
-    def test_session_key_valid_string_saved(self):
+    def test_frontend_key_valid_string_saved(self):
         """Properly formatted strings are accepted and stored."""
-        self.session._session_key = 'sha256$12345678912345678912345678912345'
-        self.assertEqual(self.session.session_key, 'sha256$12345678912345678912345678912345')
+        self.session._frontend_key = 'sha256$12345678912345678912345678912345'
+        self.assertEqual(self.session.frontend_key, 'sha256$12345678912345678912345678912345')
 
 
 @override_settings(USE_TZ=True, SESSION_STORE_KEY_HASH=True)
@@ -637,8 +637,8 @@ class CustomDatabaseSessionTests(DatabaseSessionTests):
         self.session.save()
 
         # Make sure that the customized create_model_instance() was called.
-        session_key = self.session.get_backend_key(self.session.session_key)
-        s = self.model.objects.get(session_key=session_key)
+        backend_key = self.session.get_backend_key(self.session.frontend_key)
+        s = self.model.objects.get(session_key=backend_key)
         self.assertEqual(s.account_id, 42)
 
         # Make the session "anonymous".
@@ -646,8 +646,8 @@ class CustomDatabaseSessionTests(DatabaseSessionTests):
         self.session.save()
 
         # Make sure that save() on an existing session did the right job.
-        session_key = self.session.get_backend_key(self.session.session_key)
-        s = self.model.objects.get(session_key=session_key)
+        backend_key = self.session.get_backend_key(self.session.frontend_key)
+        s = self.model.objects.get(session_key=backend_key)
         self.assertIsNone(s.account_id)
 
     def test_custom_expiry_reset(self):
@@ -680,13 +680,13 @@ class CacheDBSessionTests(SessionTestsMixin, TestCase):
     def test_exists_searches_cache_first(self):
         self.session.save()
         with self.assertNumQueries(0):
-            self.assertIs(self.session.exists(self.session.session_key), True)
+            self.assertIs(self.session.exists(self.session.frontend_key), True)
 
     # Some backends might issue a warning
     @ignore_warnings(module="django.core.cache.backends.base")
     def test_load_overlong_key(self):
         s = self.backend(SESSION_HASHED_KEY_PREFIX+(string.ascii_letters + string.digits) * 20)
-        cache_key = s._get_cache_key(s.get_backend_key(s.session_key))
+        cache_key = s._get_cache_key(s.get_backend_key(s.frontend_key))
         # pre-populate cache with value
         self.backend._set_cache(cache_key, {'a': 'c'})
         # verify pre-populated value is loaded
@@ -701,7 +701,7 @@ class CacheDBSessionTests(SessionTestsMixin, TestCase):
 
     def test_loads_from_cache_if_present(self):
         s = self.backend(SESSION_HASHED_KEY_PREFIX+'foobar1234')
-        cache_key = s._get_cache_key(s.get_backend_key(s.session_key))
+        cache_key = s._get_cache_key(s.get_backend_key(s.frontend_key))
         self.backend._set_cache(cache_key, {'a':'b'})
         self.assertEqual(self.backend._get_cache(cache_key), {'a': 'b'})        
         self.assertEqual(s.load(), {'a': 'b'})
@@ -711,9 +711,9 @@ class CacheDBSessionTests(SessionTestsMixin, TestCase):
 @override_settings(SESSION_REQUIRE_KEY_HASH=False)
 class CacheDBSessionWithoutHashingTests(CacheDBSessionTests):
 
-    def test_cookie_sessionid_same_as_session_key(self):
+    def test_frontend_key_same_as_session_key(self):
         """
-        A cookie sessionid should be the same as the db session_key.
+        A frontend_key should be the same as the db session_key.
         """
 
         # Create a session
@@ -721,10 +721,10 @@ class CacheDBSessionWithoutHashingTests(CacheDBSessionTests):
         self.session.save()
 
         db_session_key = self.model.objects.get(
-            session_key=self.session.session_key).session_key
-        self.assertEqual(db_session_key, self.session.session_key)
+            session_key=self.session.frontend_key).session_key
+        self.assertEqual(db_session_key, self.session.frontend_key)
         self.assertIsNotNone(caches['default'].get(self.session.cache_key))
-        self.assertEqual(self.session.session_key,
+        self.assertEqual(self.session.frontend_key,
                          self.session.cache_key[len(CACHEDB_KEY_PREFIX):])
 
 
@@ -736,37 +736,37 @@ class CacheDBSessionWithTimeZoneTests(CacheDBSessionTests):
 @override_settings(SESSION_STORE_KEY_HASH=True)
 class CacheDBSessionWithHashingTests(CacheDBSessionTests):
 
-    def test_session_key_correct_format(self):
+    def test_frontend_key_correct_format(self):
         """
-        A cookie sessionid should contain the algorithm, delimiter,
-        and the unhashed session_key.
+        A frontend_key should contain the algorithm, delimiter,
+        and the unhashed frontend_key.
         """
         # Create a session
         self.session['y'] = 1
         self.session.save()
 
-        session_key = self.session.session_key
-        algorithm, key = session_key.split(SESSION_KEY_DELIMITER)
+        frontend_key = self.session.frontend_key
+        algorithm, key = frontend_key.split(SESSION_KEY_DELIMITER)
 
         self.assertEqual(algorithm, SESSION_HASHING_ALGORITHM)
         self.assertEqual(len(key), 32)
 
-    def test_cookie_sessionid_not_db_session_key(self):
+    def test_frontend_key_not_db_session_key(self):
         """
-        A cookie sessionid should differ from the db session_key.
+        A frontend_key should differ from the db session_key.
         """
         # Create a session
         self.session['y'] = 1
         self.session.save()
 
-        self.assertTrue(self.session.exists(self.session.session_key))
+        self.assertTrue(self.session.exists(self.session.frontend_key))
         with self.assertRaises(self.model.DoesNotExist):
-            self.session.get_model().objects.get(session_key=self.session.session_key)
+            self.session.get_model().objects.get(session_key=self.session.frontend_key)
         self.assertTrue(self.session.get_model().objects.get(
-            session_key=self.session.get_backend_key(self.session.session_key))
+            session_key=self.session.get_backend_key(self.session.frontend_key))
         )
         self.assertIsNotNone(caches['default'].get(self.session.cache_key))
-        self.assertNotEqual(self.session.session_key,
+        self.assertNotEqual(self.session.frontend_key,
                             self.session.cache_key[len(CACHEDB_KEY_PREFIX):])
 
 
@@ -783,8 +783,8 @@ class CacheDBSessionWithHashingNotRequiredTests(CacheDBSessionWithHashingTests):
         s1.save(must_create=True)
 
         # Login with hashed value in another context.
-        hashed_session_key = s1.get_backend_key(s1.session_key)
-        s2 = self.backend(hashed_session_key)
+        backend_key = s1.get_backend_key(s1.frontend_key)
+        s2 = self.backend(backend_key)
         self.assertEqual(s2.get('test_data'), 'value1')
         s2['test_data'] = 'value2'
         s2.save()
@@ -805,22 +805,22 @@ class CacheDBSessionWithHashingRequiredTests(CacheDBSessionWithHashingTests):
         s1.save(must_create=True)
 
         # Login with hashed value in another context.
-        hashed_session_key = s1.get_backend_key(s1.session_key)
-        s2 = self.backend(hashed_session_key)
+        backend_key = s1.get_backend_key(s1.frontend_key)
+        s2 = self.backend(backend_key)
         s2['test_data'] = 'value2'
         s2.save()
         del s1._session_cache
         self.assertEqual(s1.get('test_data'), 'value1')
 
-    def test_session_key_invalid(self):
+    def test_frontend_key_invalid(self):
         """Inproperly formated strings are not accepted."""
-        self.session._session_key = '123456789'
-        self.assertIsNone(self.session.session_key)
+        self.session._frontend_key = '123456789'
+        self.assertIsNone(self.session.frontend_key)
 
     def test_session_key_valid_string_saved(self):
         """Properly formatted strings are accepted and stored."""
-        self.session._session_key = 'sha256$12345678912345678912345678912345'
-        self.assertEqual(self.session.session_key, 'sha256$12345678912345678912345678912345')
+        self.session._frontend_key = 'sha256$12345678912345678912345678912345'
+        self.assertEqual(self.session.frontend_key, 'sha256$12345678912345678912345678912345')
 
 
 @override_settings(SESSION_STORE_KEY_HASH=True)
@@ -939,38 +939,38 @@ class FileSessionPathLibTests(FileSessionTests):
 class FileSessionWithoutHashingTests(FileSessionTests):
     def test_file_key_same_as_backend_key(self):
         """
-        Check that session_key and file key are the same.
+        Check that frontend_key and file key are the same.
         """
         # create session
         self.session['y'] = 1
         self.session.save()
 
-        file_path = self._frontend_key_to_file(self.session._get_or_create_session_key())
+        file_path = self._frontend_key_to_file(self.session._get_or_create_frontend_key())
         path_start = os.path.join(self.backend._get_storage_path(), self.backend._get_file_prefix())
         self.assertTrue(file_path.startswith(path_start))
 
         path_rest = file_path[len(path_start):]
-        self.assertEqual(path_rest, self.session.get_backend_key(self.session.session_key))
+        self.assertEqual(path_rest, self.session.get_backend_key(self.session.frontend_key))
 
 
 @override_settings(SESSION_STORE_KEY_HASH=True)
 class FileSessionWithHashingTests(FileSessionTests):
-    def test_file_key_same_as_session_key(self):
+    def test_file_key_same_as_frontend_key(self):
         """
-        Check that session_key and file key differ.
+        Check that frontend_key and file key differ.
         """
         # create session
         self.session['y'] = 1
         self.session.save()
 
-        file_path = self._frontend_key_to_file(self.session._get_or_create_session_key())
+        file_path = self._frontend_key_to_file(self.session._get_or_create_frontend_key())
 
         file_path_start = os.path.join(self.backend()._get_storage_path(), self.backend()._get_file_prefix())       
         self.assertTrue(file_path.startswith(file_path_start))
 
         file_key = file_path[len(file_path_start):]
-        self.assertNotEqual(file_key, self.session.session_key)
-        self.assertEqual(file_key, self.session.get_backend_key(self.session.session_key))
+        self.assertNotEqual(file_key, self.session.frontend_key)
+        self.assertEqual(file_key, self.session.get_backend_key(self.session.frontend_key))
 
 
 @override_settings(SESSION_REQUIRE_KEY_HASH=False)
@@ -987,7 +987,7 @@ class FileSessionWithHashingNotRequiredTests(FileSessionWithHashingTests):
         s1.save(must_create=True)
 
         # Login with hashed value in another context.
-        backend_key = s1.get_backend_key(s1.session_key)
+        backend_key = s1.get_backend_key(s1.frontend_key)
         s2 = self.backend(backend_key)
         s2['test_data'] = 'value2'
         s2.save()
@@ -1008,22 +1008,23 @@ class FileSessionWithHashingRequiredTests(FileSessionWithHashingTests):
         s1.save(must_create=True)
 
         # Login with hashed value in another context.
-        hashed_session_key = s1.get_backend_key(s1.session_key)
-        s2 = self.backend(hashed_session_key)
+        backend_key = s1.get_backend_key(s1.frontend_key)
+        s2 = self.backend(backend_key)
         s2['test_data'] = 'value2'
         s2.save()
         del s1._session_cache
         self.assertEqual(s1.get('test_data'), 'value1')
 
-    def test_session_key_invalid(self):
+    def test_frontend_key_invalid(self):
         """Inproperly formated strings are not accepted."""
-        self.session._session_key = '123456789'
-        self.assertIsNone(self.session.session_key)
+        self.session._frontend_key = '123456789'
+        self.assertIsNone(self.session.frontend_key)
 
-    def test_session_key_valid_string_saved(self):
+    def test_frontend_key_valid_string_saved(self):
         """Properly formatted strings are accepted and stored."""
-        self.session._session_key = 'sha256$12345678912345678912345678912345'
-        self.assertEqual(self.session.session_key, 'sha256$12345678912345678912345678912345')
+        self.session._frontend_key = 'sha256$12345678912345678912345678912345'
+        self.assertEqual(self.session.frontend_key, 'sha256$12345678912345678912345678912345')
+
 
 
 @override_settings(SESSION_STORE_KEY_HASH=False)
@@ -1031,10 +1032,24 @@ class CacheSessionTests(SessionTestsMixin, TestCase):
 
     backend = CacheSession
 
+    @staticmethod
+    def temp_cache_store_overwrite(store):
+        class TempCacheStoreOverwrite:
+            def __init__(self, store):
+                self.store = store
+
+            def __enter__(self):
+                self._original_store = CacheSession._cache
+                CacheSession._cache = self.store
+
+            def __exit__(self, exc_type, exc_val, exc_tb):
+                CacheSession._cache = self._original_store
+        return TempCacheStoreOverwrite(store)
+
     # Some backends might issue a warning
     @ignore_warnings(module="django.core.cache.backends.base")
     def test_load_overlong_key(self):
-        self.session._session_key = (string.ascii_letters + string.digits) * 20
+        self.session._frontend_key = (string.ascii_letters + string.digits) * 20
         self.assertEqual(self.session.load(), {})
 
     def test_default_cache(self):
@@ -1052,11 +1067,12 @@ class CacheSessionTests(SessionTestsMixin, TestCase):
     }, SESSION_CACHE_ALIAS='sessions')
     def test_non_default_cache(self):
         # Re-initialize the session backend to make use of overridden settings.
-        self.session = self.backend()
-
-        self.session.save()
-        self.assertIsNone(caches['default'].get(self.session.cache_key))
-        self.assertIsNotNone(caches['sessions'].get(self.session.cache_key))
+        with self.temp_cache_store_overwrite(caches['sessions']):
+            self.session = self.backend()
+            self.session.save()
+            self.assertIsNone(caches['default'].get(self.session.cache_key))
+            self.assertIsNotNone(caches['sessions'].get(self.session.cache_key))
+            self.session.delete()
 
     def test_create_and_save(self):
         self.session = self.backend()
@@ -1064,52 +1080,51 @@ class CacheSessionTests(SessionTestsMixin, TestCase):
         self.session.save()
         self.assertIsNotNone(caches['default'].get(self.session.cache_key))
 
-
 @override_settings(SESSION_REQUIRE_KEY_HASH=False)
 class CacheSessionWithoutHashingTests(CacheSessionTests):
 
-    def test_cookie_sessionid_same_as_cache_key(self):
+    def test_frontend_key_same_as_cache_key(self):
         """
-        A cookie sessionid should be the same as the session_key.
+        A frontend_key should be the same as the cache key.
         """
         # Create a session
         self.session['y'] = 1
         self.session.save()
 
         self.assertIsNotNone(caches['default'].get(self.session.cache_key))
-        self.assertEqual(self.session.get_backend_key(self.session.session_key),
+        self.assertEqual(self.session.get_backend_key(self.session.frontend_key),
                          self.session.cache_key[len(CACHE_KEY_PREFIX):])
 
 
 @override_settings(SESSION_STORE_KEY_HASH=True)
 class CacheSessionWithHashingTests(CacheDBSessionTests):
 
-    def test_session_key_correct_format(self):
+    def test_frontend_key_correct_format(self):
         """
-        A cookie sessionid should contain the algorithm, delimiter,
+        A frontend_key should contain the algorithm, delimiter,
         and the unhashed session_key.
         """
         # Create a session
         self.session['y'] = 1
         self.session.save()
 
-        session_key = self.session.session_key
-        algorithm, key = session_key.split(SESSION_KEY_DELIMITER)
+        frontend_key = self.session.frontend_key
+        algorithm, key = frontend_key.split(SESSION_KEY_DELIMITER)
 
         self.assertEqual(algorithm, SESSION_HASHING_ALGORITHM)
         self.assertEqual(len(key), 32)
 
-    def test_cookie_sessionid_not_cache_session_key(self):
+    def test_fronent_key_not_cache_key(self):
         """
-        A cookie sessionid should differ from the session_key.
+        A frontend_key should differ from the cache_key.
         """
         # Create a session
         self.session['y'] = 1
         self.session.save()
 
-        self.assertTrue(self.session.exists(self.session.session_key))
-        self.assertIsNotNone(caches['default'].get(self.session.cache_key))
-        self.assertNotEqual(self.session.session_key,
+        self.assertTrue(self.session.exists(self.session.frontend_key))
+        self.assertEqual(caches['default'].get(self.session.cache_key), {'y': 1})
+        self.assertNotEqual(self.session.frontend_key,
                             self.session.cache_key[len(CACHE_KEY_PREFIX):])
 
 
@@ -1126,8 +1141,8 @@ class CacheSessionWithHashingNotRequiredTests(CacheSessionWithHashingTests):
         s1.save(must_create=True)
 
         # Login with hashed value in another context.
-        hashed_session_key = s1.get_backend_key(s1.session_key)
-        s2 = self.backend(hashed_session_key)
+        backend_key = s1.get_backend_key(s1.frontend_key)
+        s2 = self.backend(backend_key)
         s2['test_data'] = 'value2'
         s2.save()
         del s1._session_cache
@@ -1147,22 +1162,22 @@ class CacheSessionWithHashingRequiredTests(CacheSessionWithHashingTests):
         s1.save(must_create=True)
 
         # Login with hashed value in another context.
-        hashed_session_key = s1.get_backend_key(s1.session_key)
-        s2 = self.backend(hashed_session_key)
+        backend_key = s1.get_backend_key(s1.frontend_key)
+        s2 = self.backend(backend_key)
         s2['test_data'] = 'value2'
         s2.save()
         del s1._session_cache
         self.assertEqual(s1.get('test_data'), 'value1')
 
-    def test_session_key_invalid(self):
+    def test_frontend_key_invalid(self):
         """Inproperly formated strings are not accepted."""
-        self.session._session_key = '123456789'
-        self.assertIsNone(self.session.session_key)
+        self.session._frontend_key = '123456789'
+        self.assertIsNone(self.session.frontend_key)
 
-    def test_session_key_valid_string_saved(self):
+    def test_frontend_key_valid_string_saved(self):
         """Properly formatted strings are accepted and stored."""
-        self.session._session_key = 'sha256$12345678912345678912345678912345'
-        self.assertEqual(self.session.session_key, 'sha256$12345678912345678912345678912345')
+        self.session._frontend_key = 'sha256$12345678912345678912345678912345'
+        self.assertEqual(self.session.frontend_key, 'sha256$12345678912345678912345678912345')
 
 
 class SessionMiddlewareTests(TestCase):
@@ -1336,7 +1351,7 @@ class SessionMiddlewareTests(TestCase):
         self.assertEqual(tuple(request.session.items()), (('foo', 'bar'),))
         # A cookie should be set, along with Vary: Cookie.
         self.assertIn(
-            'Set-Cookie: sessionid=%s' % request.session.session_key,
+            'Set-Cookie: sessionid=%s' % request.session.frontend_key,
             str(response.cookies)
         )
         self.assertEqual(response['Vary'], 'Cookie')
@@ -1348,14 +1363,14 @@ class SessionMiddlewareTests(TestCase):
         response = middleware.process_response(request, response)
         self.assertEqual(dict(request.session.values()), {})
 
-        session_key = request.session.get_backend_key(request.session.session_key)
-        session = Session.objects.get(session_key=session_key)
+        frontend_key = request.session.get_backend_key(request.session.frontend_key)
+        session = Session.objects.get(session_key=frontend_key)
         self.assertEqual(session.get_decoded(), {})
         # While the session is empty, it hasn't been flushed so a cookie should
         # still be set, along with Vary: Cookie.
-        self.assertGreater(len(request.session.session_key), 8)
+        self.assertGreater(len(request.session.frontend_key), 8)
         self.assertIn(
-            'Set-Cookie: sessionid=%s' % request.session.session_key,
+            'Set-Cookie: sessionid=%s' % request.session.frontend_key,
             str(response.cookies)
         )
         self.assertEqual(response['Vary'], 'Cookie')

@@ -7,22 +7,27 @@ from django.core import signing
 # warnings.
 class SessionStore(HashingSessionBase):
 
-    def _validate_session_key(self, frontend_key):
+    @classmethod
+    def _validate_frontend_key(cls, frontend_key):
         """
         Key must be truthy and at least 8 characters long.
         Skip HashingSessionBase's HASHING validation
         """
-        return SessionBase._validate_session_key(self, frontend_key)
+        return frontend_key and len(frontend_key) >= 8
+
+    def _validate_session_key(self, frontend_key):
+        # RemovedInDjango40Warning
+        return self._validate_frontend_key(frontend_key)
 
     def load(self):
         """
         Load the data from the key itself instead of fetching from some
-        external data store. Opposite of _get_session_key(), raise BadSignature
-        if signature fails.
+        external data store. Opposite of _get_session_key(), raise
+        BadSignature if signature fails.
         """
         try:
             return signing.loads(
-                self.session_key,
+                self.frontend_key,
                 serializer=self.serializer,
                 # This doesn't handle non-default expiry dates, see #19201
                 max_age=self.get_session_cookie_age(),
@@ -47,10 +52,10 @@ class SessionStore(HashingSessionBase):
         the modified flag so that the cookie is set on the client for the
         current request.
         """
-        self._session_key = self._get_session_key()
+        self._frontend_key = self._get_frontend_key()
         self.modified = True
 
-    def exists(self, session_key=None):
+    def exists(self, backend_key=None):
         """
         This method makes sense when you're talking to a shared resource, but
         it doesn't matter when you're storing the information in the client's
@@ -58,13 +63,13 @@ class SessionStore(HashingSessionBase):
         """
         return False
 
-    def delete(self, session_key=None):
+    def delete(self, backend_key=None):
         """
         To delete, clear the session key and the underlying data structure
         and set the modified flag so that the cookie is set on the client for
         the current request.
         """
-        self._session_key = ''
+        self._frontend_key = ''
         self._session_cache = {}
         self.modified = True
 
@@ -76,6 +81,10 @@ class SessionStore(HashingSessionBase):
         self.save()
 
     def _get_session_key(self):
+        # RemovedInDjango40Warning
+        return self._get_frontend_key()
+
+    def _get_frontend_key(self):
         """
         Instead of generating a random string, generate a secure url-safe
         base64-encoded string of data as our session key.

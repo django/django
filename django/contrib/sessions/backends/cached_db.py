@@ -26,7 +26,7 @@ class SessionStore(DBStore):
     def cache_key(self):
         return self._get_cache_key(
             self.get_backend_key(
-                self._get_or_create_session_key()))
+                self._get_or_create_frontend_key()))
 
     @classmethod
     def _get_cache(cls, cache_key):

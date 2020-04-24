@@ -69,8 +69,6 @@ class SessionStore(HashingSessionBase):
         True, raise a database error if the saving operation doesn't create a
         new entry (as opposed to possibly updating an existing entry).
         """
-        # if self.session_key is None:
-        #     return self.create()
         data = session_data
         obj = cls.create_model_instance(backend_key, data)
         using = router.db_for_write(cls.get_model(), instance=obj)

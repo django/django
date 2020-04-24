@@ -14,8 +14,8 @@ class BaseSessionManager(models.Manager):
         session_store_class = self.model.get_session_store_class()
         return session_store_class().encode(session_dict)
 
-    def save(self, session_key, session_dict, expire_date):
-        s = self.model(session_key, self.encode(session_dict), expire_date)
+    def save(self, frontend_key, session_dict, expire_date):
+        s = self.model(frontend_key, self.encode(session_dict), expire_date)
         if session_dict:
             s.save()
         else:
