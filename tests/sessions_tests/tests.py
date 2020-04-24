@@ -414,6 +414,9 @@ class SessionTestsMixin:
         """
         self.assertEqual(len(SESSION_KEY_DELIMITER), 1)
 
+    @staticmethod
+    def _add_hash_prefix(key):
+        return SESSION_HASHED_KEY_PREFIX + str(key)
 
 @override_settings(SESSION_STORE_KEY_HASH=False)
 class DatabaseSessionTests(SessionTestsMixin, TestCase):
@@ -538,6 +541,9 @@ class DatabaseSessionWithHashingTests(DatabaseSessionTests):
         with self.assertRaises(self.model.DoesNotExist):
             self.model.objects.get(session_key=self.session.frontend_key)
 
+    def test_default_hashing_algorithm(self):
+        self.assertEqual(SESSION_HASHING_ALGORITHM, 'sha256')
+
     def test_backend_key_correct(self):
         """
         A session key should be stored as a sha256 hash by default.
@@ -547,7 +553,11 @@ class DatabaseSessionWithHashingTests(DatabaseSessionTests):
         self.session.save()
 
         backend_key = self.session.get_backend_key(self.session.frontend_key)
-        self.assertEqual(len(backend_key), 64)
+
+        if SESSION_HASHING_ALGORITHM == 'sha256':
+            self.assertEqual(len(backend_key), 64)
+        if SESSION_HASHING_ALGORITHM == 'md5':
+            self.assertEqual(len(backend_key), 32)
 
     def test_backend_key_gets_session(self):
         """
@@ -610,9 +620,9 @@ class DatabaseSessionWithHashingRequiredTests(DatabaseSessionWithHashingTests):
 
     def test_frontend_key_valid_string_saved(self):
         """Properly formatted strings are accepted and stored."""
-        self.session._frontend_key = 'sha256$12345678912345678912345678912345'
-        self.assertEqual(self.session.frontend_key, 'sha256$12345678912345678912345678912345')
-
+        key = self._add_hash_prefix('12345678912345678912345678912345')
+        self.session._frontend_key = key
+        self.assertEqual(self.session.frontend_key, key)
 
 @override_settings(USE_TZ=True, SESSION_STORE_KEY_HASH=True)
 class DatabaseSessionWithHashingWithTimeZoneTests(DatabaseSessionTests):
@@ -819,8 +829,9 @@ class CacheDBSessionWithHashingRequiredTests(CacheDBSessionWithHashingTests):
 
     def test_session_key_valid_string_saved(self):
         """Properly formatted strings are accepted and stored."""
-        self.session._frontend_key = 'sha256$12345678912345678912345678912345'
-        self.assertEqual(self.session.frontend_key, 'sha256$12345678912345678912345678912345')
+        key = self._add_hash_prefix('12345678912345678912345678912345')
+        self.session._frontend_key = key
+        self.assertEqual(self.session.frontend_key, key)
 
 
 @override_settings(SESSION_STORE_KEY_HASH=True)
@@ -1022,8 +1033,9 @@ class FileSessionWithHashingRequiredTests(FileSessionWithHashingTests):
 
     def test_frontend_key_valid_string_saved(self):
         """Properly formatted strings are accepted and stored."""
-        self.session._frontend_key = 'sha256$12345678912345678912345678912345'
-        self.assertEqual(self.session.frontend_key, 'sha256$12345678912345678912345678912345')
+        key = self._add_hash_prefix('12345678912345678912345678912345')
+        self.session._frontend_key = key
+        self.assertEqual(self.session.frontend_key, key)
 
 
 
@@ -1176,8 +1188,9 @@ class CacheSessionWithHashingRequiredTests(CacheSessionWithHashingTests):
 
     def test_frontend_key_valid_string_saved(self):
         """Properly formatted strings are accepted and stored."""
-        self.session._frontend_key = 'sha256$12345678912345678912345678912345'
-        self.assertEqual(self.session.frontend_key, 'sha256$12345678912345678912345678912345')
+        key = self._add_hash_prefix('12345678912345678912345678912345')
+        self.session._frontend_key = key
+        self.assertEqual(self.session.frontend_key, key)
 
 
 class SessionMiddlewareTests(TestCase):
