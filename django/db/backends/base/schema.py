@@ -951,6 +951,11 @@ class BaseDatabaseSchemaEditor:
             return ' ' + self.connection.ops.tablespace_sql(db_tablespace)
         return ''
 
+    def _index_condition_sql(self, condition):
+        if condition:
+            return ' WHERE ' + condition
+        return ''
+
     def _create_index_sql(self, model, fields, *, name=None, suffix='', using='',
                           db_tablespace=None, col_suffixes=(), sql=None, opclasses=(),
                           condition=None):
@@ -977,7 +982,7 @@ class BaseDatabaseSchemaEditor:
             using=using,
             columns=self._index_columns(table, columns, col_suffixes, opclasses),
             extra=tablespace_sql,
-            condition=(' WHERE ' + condition) if condition else '',
+            condition=self._index_condition_sql(condition),
         )
 
     def _delete_index_sql(self, model, name, sql=None):
@@ -1097,20 +1102,18 @@ class BaseDatabaseSchemaEditor:
             name = self.quote_name(name)
         columns = Columns(table, columns, self.quote_name)
         if condition:
-            return Statement(
-                self.sql_create_unique_index,
-                table=table,
-                name=name,
-                columns=columns,
-                condition=' WHERE ' + condition,
-            ) if self.connection.features.supports_partial_indexes else None
+            if not self.connection.features.supports_partial_indexes:
+                return None
+            sql = self.sql_create_unique_index
         else:
-            return Statement(
-                self.sql_create_unique,
-                table=table,
-                name=name,
-                columns=columns,
-            )
+            sql = self.sql_create_unique
+        return Statement(
+            sql,
+            table=table,
+            name=name,
+            columns=columns,
+            condition=self._index_condition_sql(condition),
+        )
 
     def _delete_unique_sql(self, model, name, condition=None):
         if condition:
