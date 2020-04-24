@@ -1,4 +1,5 @@
 import time
+import warnings
 from importlib import import_module
 
 from django.conf import settings
@@ -7,7 +8,8 @@ from django.core.exceptions import SuspiciousOperation
 from django.utils.cache import patch_vary_headers
 from django.utils.deprecation import MiddlewareMixin
 from django.utils.http import http_date
-
+from django.utils.deprecation import RemovedInDjango40Warning
+from django.contrib.sessions.backends.base import HashingSessionBase
 
 class SessionMiddleware(MiddlewareMixin):
     # RemovedInDjango40Warning: when the deprecation ends, replace with:
@@ -17,6 +19,14 @@ class SessionMiddleware(MiddlewareMixin):
         self.get_response = get_response
         self._async_check()
         engine = import_module(settings.SESSION_ENGINE)
+
+        if not issubclass(engine.SessionStore, HashingSessionBase):
+            warnings.warn(
+                f'The specified SESSION_ENGINE ({settings.SESSION_ENGINE}) '
+                'is not a subclass of HashingSessionBase. Please update your '
+                'sessions backend engine to support session key hashing.',
+                RemovedInDjango40Warning, stacklevel=2)
+
         self.SessionStore = engine.SessionStore
 
     def process_request(self, request):

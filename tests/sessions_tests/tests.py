@@ -39,9 +39,9 @@ from django.test import (
     RequestFactory, TestCase, ignore_warnings, override_settings,
 )
 from django.utils import timezone
+from django.utils.deprecation import RemovedInDjango40Warning
 
 from .models import SessionStore as CustomDatabaseSession
-
 
 class SettingsTests(TestCase):
     def test_store_key_hash_must_be_true_when_hashing_required(self):
@@ -1375,6 +1375,15 @@ class SessionMiddlewareTests(TestCase):
         )
         self.assertEqual(response['Vary'], 'Cookie')
 
+    def test_deprecation_warning_for_non_hashing_custom_backends(self):
+        original_engine = settings.SESSION_ENGINE
+
+        settings.SESSION_ENGINE = 'tests.sessions_tests.deprecated_engine'
+        with self.assertRaises(RemovedInDjango40Warning):
+            SessionMiddleware(self.get_response_touching_session)
+
+        settings.SESSION_ENGINE = original_engine
+
 
 # Don't need DB flushing for these tests, so can use unittest.TestCase as base class
 class CookieSessionTests(SessionTestsMixin, unittest.TestCase):
@@ -1418,3 +1427,4 @@ class CookieSessionTests(SessionTestsMixin, unittest.TestCase):
     @unittest.skip("CookieSession is stored in the client and there is no way to query it.")
     def test_session_save_does_not_resurrect_session_logged_out_in_other_context(self):
         pass
+
