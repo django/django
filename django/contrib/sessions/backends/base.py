@@ -43,7 +43,9 @@ class UpdateError(Exception):
     pass
 
 
-
+# RemovedInDjango40Warning: SessionBase is left untouched
+# for backward compatibility purposes, but should be merged
+# into HashingSessionBase.
 class SessionBase:
     """
     Base class for all Session classes.
@@ -387,7 +389,8 @@ class SessionBase:
 
 class HashingSessionBase(SessionBase):
     """
-    Base class for all Session classes since introducing session-key hashing.
+    Base class for all Session classes since introducing
+    session-key hashing.
     """
     _algorithm = getattr(hashlib, SESSION_HASHING_ALGORITHM)
 
@@ -418,6 +421,7 @@ class HashingSessionBase(SessionBase):
         )
 
     def encode(self, session_dict):
+        # RemovedInDjango40Warning: use _encode classmethod
         return self._encode(session_dict)
 
     @classmethod
@@ -461,6 +465,7 @@ class HashingSessionBase(SessionBase):
             return cls.__legacy_decode(session_data)
 
     def decode(self, session_data):
+        # RemovedInDjango40Warning: use _decode classmethod
         return self._decode(session_data)
 
     def _get_new_frontend_key(self):
@@ -499,6 +504,7 @@ class HashingSessionBase(SessionBase):
         return self._frontend_key
 
     def _get_or_create_session_key(self):
+        # RemovedInDjango40Warning: use _get_or_create_frontend_key
         warnings.warn(
             'SessionBase._get_or_create_session_key() is deprecated '
             'and will be removed in Django 4.0. Use '
@@ -580,9 +586,11 @@ class HashingSessionBase(SessionBase):
         return delta.days * 86400 + delta.seconds
 
     def get_expiry_date(self, **kwargs):
+        # RemovedInDjango40Warning: use _get_expiry_date classmethod
         return self._get_expiry_date(self._session, **kwargs)
 
     def get_expiry_age(self, **kwargs):
+        # RemovedInDjango40Warning: use _get_expiry_age classmethod
         return self._get_expiry_age(self._get_session(no_load=True), **kwargs)
 
     @classmethod

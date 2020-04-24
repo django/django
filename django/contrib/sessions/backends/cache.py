@@ -68,9 +68,7 @@ class SessionStore(HashingSessionBase):
             raise UpdateError
 
         result = func(cache_key,
-                      #cls._get_session(no_load=must_create),
                       session_data,
-                      #self.get_expiry_age())
                       cls._get_expiry_age(session_data))
 
         if must_create and not result:
