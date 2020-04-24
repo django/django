@@ -7,6 +7,7 @@ import unittest
 from datetime import timedelta
 from http import cookies
 from pathlib import Path
+from django import VERSION
 
 from django.conf import settings
 from django.contrib.sessions.backends.base import (
@@ -42,6 +43,14 @@ from django.utils import timezone
 from .models import SessionStore as CustomDatabaseSession
 
 
+class SettingsTests(TestCase):
+    def test_store_key_hash_must_be_true_when_hashing_required(self):
+        self.assertTrue(settings.SESSION_STORE_KEY_HASH or not settings.SESSION_REQUIRE_KEY_HASH)
+
+    def test_default_require_key_hash_value(self):
+        is_v4_or_later = VERSION >= (4,0)
+        self.assertEqual(settings.SESSION_REQUIRE_KEY_HASH, is_v4_or_later)
+    
 class SessionTestsMixin:
     # This does not inherit from TestCase to avoid any tests being run with this
     # class, which wouldn't work, and to allow different TestCase subclasses to
@@ -479,7 +488,7 @@ class DatabaseSessionTests(SessionTestsMixin, TestCase):
         # ... and one is deleted.
         self.assertEqual(1, self.model.objects.count())
 
-
+@override_settings(SESSION_STORE_KEY_HASH=False, SESSION_REQUIRE_KEY_HASH=False)
 class DatabaseSessionWithoutHashingTests(DatabaseSessionTests):
 
     def test_cookie_sessionid_same_as_db_session_key(self):
@@ -552,7 +561,7 @@ class DatabaseSessionWithHashingTests(DatabaseSessionTests):
         results = self.model.objects.get(session_key=backend_key)
         self.assertIsNotNone(results)
 
-
+@override_settings(SESSION_REQUIRE_KEY_HASH=False)
 class DatabaseSessionWithHashingNotRequiredTests(DatabaseSessionWithHashingTests):
 
     def test_insecure_bypass_when_hashing_not_required(self):
@@ -698,6 +707,8 @@ class CacheDBSessionTests(SessionTestsMixin, TestCase):
         self.assertEqual(s.load(), {'a': 'b'})
         s.delete()
 
+
+@override_settings(SESSION_REQUIRE_KEY_HASH=False)
 class CacheDBSessionWithoutHashingTests(CacheDBSessionTests):
 
     def test_cookie_sessionid_same_as_session_key(self):
@@ -759,6 +770,7 @@ class CacheDBSessionWithHashingTests(CacheDBSessionTests):
                             self.session.cache_key[len(CACHEDB_KEY_PREFIX):])
 
 
+@override_settings(SESSION_REQUIRE_KEY_HASH=False)
 class CacheDBSessionWithHashingNotRequiredTests(CacheDBSessionWithHashingTests):
 
     def test_insecure_bypass_when_hashing_not_required(self):
@@ -922,8 +934,10 @@ class FileSessionPathLibTests(FileSessionTests):
         tmp_dir = super().mkdtemp()
         return Path(tmp_dir)
 
+
+@override_settings(SESSION_REQUIRE_KEY_HASH=False)
 class FileSessionWithoutHashingTests(FileSessionTests):
-    def test_file_key_same_as_session_key(self):
+    def test_file_key_same_as_backend_key(self):
         """
         Check that session_key and file key are the same.
         """
@@ -932,9 +946,11 @@ class FileSessionWithoutHashingTests(FileSessionTests):
         self.session.save()
 
         file_path = self._frontend_key_to_file(self.session._get_or_create_session_key())
-        file_key = file_path[(
-            len(self.backend()._get_storage_path() + self.backend()._get_file_prefix()) + 1):]
-        self.assertEqual(file_key, self.session.session_key)
+        path_start = os.path.join(self.backend._get_storage_path(), self.backend._get_file_prefix())
+        self.assertTrue(file_path.startswith(path_start))
+
+        path_rest = file_path[len(path_start):]
+        self.assertEqual(path_rest, self.session.get_backend_key(self.session.session_key))
 
 
 @override_settings(SESSION_STORE_KEY_HASH=True)
@@ -957,8 +973,10 @@ class FileSessionWithHashingTests(FileSessionTests):
         self.assertEqual(file_key, self.session.get_backend_key(self.session.session_key))
 
 
+@override_settings(SESSION_REQUIRE_KEY_HASH=False)
 class FileSessionWithHashingNotRequiredTests(FileSessionWithHashingTests):
 
+    @override_settings(SESSION_REQUIRE_KEY_HASH=False)
     def test_insecure_bypass_when_hashing_not_required(self):
         """
         A session backend should be directly accessible via hashed lookup.
@@ -969,8 +987,8 @@ class FileSessionWithHashingNotRequiredTests(FileSessionWithHashingTests):
         s1.save(must_create=True)
 
         # Login with hashed value in another context.
-        hashed_session_key = s1.get_backend_key(s1.session_key)
-        s2 = self.backend(hashed_session_key)
+        backend_key = s1.get_backend_key(s1.session_key)
+        s2 = self.backend(backend_key)
         s2['test_data'] = 'value2'
         s2.save()
         del s1._session_cache
@@ -1047,6 +1065,7 @@ class CacheSessionTests(SessionTestsMixin, TestCase):
         self.assertIsNotNone(caches['default'].get(self.session.cache_key))
 
 
+@override_settings(SESSION_REQUIRE_KEY_HASH=False)
 class CacheSessionWithoutHashingTests(CacheSessionTests):
 
     def test_cookie_sessionid_same_as_cache_key(self):
@@ -1058,7 +1077,7 @@ class CacheSessionWithoutHashingTests(CacheSessionTests):
         self.session.save()
 
         self.assertIsNotNone(caches['default'].get(self.session.cache_key))
-        self.assertEqual(self.session.session_key,
+        self.assertEqual(self.session.get_backend_key(self.session.session_key),
                          self.session.cache_key[len(CACHE_KEY_PREFIX):])
 
 
@@ -1094,6 +1113,7 @@ class CacheSessionWithHashingTests(CacheDBSessionTests):
                             self.session.cache_key[len(CACHE_KEY_PREFIX):])
 
 
+@override_settings(SESSION_REQUIRE_KEY_HASH=False)
 class CacheSessionWithHashingNotRequiredTests(CacheSessionWithHashingTests):
 
     def test_insecure_bypass_when_hashing_not_required(self):

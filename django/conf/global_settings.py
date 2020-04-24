@@ -2,7 +2,7 @@
 Default Django settings. Override these with settings in the module pointed to
 by the DJANGO_SETTINGS_MODULE environment variable.
 """
-
+from django import VERSION
 
 # This is defined here as a do-nothing function because we can't import
 # django.utils.translation -- that module depends on the settings.
@@ -478,8 +478,9 @@ SESSION_STORE_KEY_HASH = True
 # Whether to allow non-hashed session keys to be loaded. Setting this to
 # 'False' bypasses the security benefit of hashing session keys. This
 # should be set to 'True' after moving session keys from unhashed to
-# hashed
-SESSION_REQUIRE_KEY_HASH = False #TODO
+# hashed. The default value is 'False' for version below 4.0 and True
+# starting from version 4.0
+SESSION_REQUIRE_KEY_HASH = (VERSION >= (4,0))
 
 #########
 # CACHE #
