@@ -8,8 +8,10 @@ from django.core.cache import caches
 
 KEY_PREFIX = "django.contrib.sessions.cached_db"
 
+
 def get_cache_store():
     return caches[settings.SESSION_CACHE_ALIAS]
+
 
 class SessionStore(DBStore):
     """
@@ -33,7 +35,7 @@ class SessionStore(DBStore):
         data = None
         try:
             data = cls._cache.get(cache_key)
-        except:
+        except:  # noqa: E722
             # Some backends (e.g. memcache) raise an exception on invalid
             # cache keys. If this happens, reset the session. See #17810.
             data = None
@@ -56,7 +58,7 @@ class SessionStore(DBStore):
 
         data = cls._get_cache(cache_key)
 
-        if not data is None:
+        if data is not None:
             return data
 
         s = super()._load_data(backend_key)
@@ -75,7 +77,7 @@ class SessionStore(DBStore):
             return True
 
         return super()._exists(backend_key)
-  
+
     @classmethod
     def _save(cls, backend_key, session_data, must_create=False):
         super()._save(backend_key, session_data, must_create)

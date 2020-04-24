@@ -6,7 +6,6 @@ from django.contrib.sessions.backends.base import (
 from django.core.exceptions import SuspiciousOperation
 from django.db import DatabaseError, IntegrityError, router, transaction
 from django.utils import timezone
-from django.utils.functional import cached_property
 
 
 class SessionStore(HashingSessionBase):
@@ -21,7 +20,7 @@ class SessionStore(HashingSessionBase):
 
     @classmethod
     def get_model(cls):
-        if cls._model is None: #not hasattr(cls, '_model'):
+        if cls._model is None:  # not hasattr(cls, '_model'):
             cls._model = cls.get_model_class()
         return cls._model
 

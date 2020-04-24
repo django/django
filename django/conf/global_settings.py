@@ -4,6 +4,7 @@ by the DJANGO_SETTINGS_MODULE environment variable.
 """
 from django import VERSION
 
+
 # This is defined here as a do-nothing function because we can't import
 # django.utils.translation -- that module depends on the settings.
 def gettext_noop(s):
@@ -480,7 +481,7 @@ SESSION_STORE_KEY_HASH = True
 # should be set to 'True' after moving session keys from unhashed to
 # hashed. The default value is 'False' for version below 4.0 and True
 # starting from version 4.0
-SESSION_REQUIRE_KEY_HASH = (VERSION >= (4,0))
+SESSION_REQUIRE_KEY_HASH = (VERSION >= (4, 0))
 
 #########
 # CACHE #

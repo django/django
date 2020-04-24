@@ -1,11 +1,12 @@
-from django.contrib.sessions.backends.base import SessionBase, HashingSessionBase
+from django.contrib.sessions.backends.base import HashingSessionBase
 from django.core import signing
 
-# Even though this SessionStore doesn't perform key-hashing, it still inherits
-# from HashingSessionBase (and not from SessionBase directly) because
-# backends that don't inherit from HashingSessionBase will cause deprecation
-# warnings.
+
 class SessionStore(HashingSessionBase):
+    # Even though this SessionStore doesn't perform key-hashing, it still inherits
+    # from HashingSessionBase (and not from SessionBase directly) because
+    # backends that don't inherit from HashingSessionBase will cause deprecation
+    # warnings.
 
     @classmethod
     def _validate_frontend_key(cls, frontend_key):

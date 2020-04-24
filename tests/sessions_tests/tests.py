@@ -43,14 +43,16 @@ from django.utils.deprecation import RemovedInDjango40Warning
 
 from .models import SessionStore as CustomDatabaseSession
 
+
 class SettingsTests(TestCase):
     def test_store_key_hash_must_be_true_when_hashing_required(self):
         self.assertTrue(settings.SESSION_STORE_KEY_HASH or not settings.SESSION_REQUIRE_KEY_HASH)
 
     def test_default_require_key_hash_value(self):
-        is_v4_or_later = VERSION >= (4,0)
+        is_v4_or_later = VERSION >= (4, 0)
         self.assertEqual(settings.SESSION_REQUIRE_KEY_HASH, is_v4_or_later)
-    
+
+
 class SessionTestsMixin:
     # This does not inherit from TestCase to avoid any tests being run with this
     # class, which wouldn't work, and to allow different TestCase subclasses to
@@ -418,6 +420,7 @@ class SessionTestsMixin:
     def _add_hash_prefix(key):
         return SESSION_HASHED_KEY_PREFIX + str(key)
 
+
 @override_settings(SESSION_STORE_KEY_HASH=False)
 class DatabaseSessionTests(SessionTestsMixin, TestCase):
 
@@ -490,6 +493,7 @@ class DatabaseSessionTests(SessionTestsMixin, TestCase):
             management.call_command('clearsessions')
         # ... and one is deleted.
         self.assertEqual(1, self.model.objects.count())
+
 
 @override_settings(SESSION_STORE_KEY_HASH=False, SESSION_REQUIRE_KEY_HASH=False)
 class DatabaseSessionWithoutHashingTests(DatabaseSessionTests):
@@ -571,6 +575,7 @@ class DatabaseSessionWithHashingTests(DatabaseSessionTests):
         results = self.model.objects.get(session_key=backend_key)
         self.assertIsNotNone(results)
 
+
 @override_settings(SESSION_REQUIRE_KEY_HASH=False)
 class DatabaseSessionWithHashingNotRequiredTests(DatabaseSessionWithHashingTests):
 
@@ -592,6 +597,7 @@ class DatabaseSessionWithHashingNotRequiredTests(DatabaseSessionWithHashingTests
         s2.save()
         del s1._session_cache
         self.assertEqual(s1.get('test_data'), 'value2')
+
 
 @override_settings(SESSION_REQUIRE_KEY_HASH=True)
 class DatabaseSessionWithHashingRequiredTests(DatabaseSessionWithHashingTests):
@@ -623,6 +629,7 @@ class DatabaseSessionWithHashingRequiredTests(DatabaseSessionWithHashingTests):
         key = self._add_hash_prefix('12345678912345678912345678912345')
         self.session._frontend_key = key
         self.assertEqual(self.session.frontend_key, key)
+
 
 @override_settings(USE_TZ=True, SESSION_STORE_KEY_HASH=True)
 class DatabaseSessionWithHashingWithTimeZoneTests(DatabaseSessionTests):
@@ -695,7 +702,7 @@ class CacheDBSessionTests(SessionTestsMixin, TestCase):
     # Some backends might issue a warning
     @ignore_warnings(module="django.core.cache.backends.base")
     def test_load_overlong_key(self):
-        s = self.backend(SESSION_HASHED_KEY_PREFIX+(string.ascii_letters + string.digits) * 20)
+        s = self.backend(SESSION_HASHED_KEY_PREFIX + (string.ascii_letters + string.digits) * 20)
         cache_key = s._get_cache_key(s.get_backend_key(s.frontend_key))
         # pre-populate cache with value
         self.backend._set_cache(cache_key, {'a': 'c'})
@@ -710,10 +717,10 @@ class CacheDBSessionTests(SessionTestsMixin, TestCase):
             get_cache_store()
 
     def test_loads_from_cache_if_present(self):
-        s = self.backend(SESSION_HASHED_KEY_PREFIX+'foobar1234')
+        s = self.backend(SESSION_HASHED_KEY_PREFIX + 'foobar1234')
         cache_key = s._get_cache_key(s.get_backend_key(s.frontend_key))
-        self.backend._set_cache(cache_key, {'a':'b'})
-        self.assertEqual(self.backend._get_cache(cache_key), {'a': 'b'})        
+        self.backend._set_cache(cache_key, {'a': 'b'})
+        self.assertEqual(self.backend._get_cache(cache_key), {'a': 'b'})
         self.assertEqual(s.load(), {'a': 'b'})
         s.delete()
 
@@ -976,7 +983,7 @@ class FileSessionWithHashingTests(FileSessionTests):
 
         file_path = self._frontend_key_to_file(self.session._get_or_create_frontend_key())
 
-        file_path_start = os.path.join(self.backend()._get_storage_path(), self.backend()._get_file_prefix())       
+        file_path_start = os.path.join(self.backend()._get_storage_path(), self.backend()._get_file_prefix())
         self.assertTrue(file_path.startswith(file_path_start))
 
         file_key = file_path[len(file_path_start):]
@@ -1038,7 +1045,6 @@ class FileSessionWithHashingRequiredTests(FileSessionWithHashingTests):
         self.assertEqual(self.session.frontend_key, key)
 
 
-
 @override_settings(SESSION_STORE_KEY_HASH=False)
 class CacheSessionTests(SessionTestsMixin, TestCase):
 
@@ -1091,6 +1097,7 @@ class CacheSessionTests(SessionTestsMixin, TestCase):
         self.session.create()
         self.session.save()
         self.assertIsNotNone(caches['default'].get(self.session.cache_key))
+
 
 @override_settings(SESSION_REQUIRE_KEY_HASH=False)
 class CacheSessionWithoutHashingTests(CacheSessionTests):
@@ -1440,4 +1447,3 @@ class CookieSessionTests(SessionTestsMixin, unittest.TestCase):
     @unittest.skip("CookieSession is stored in the client and there is no way to query it.")
     def test_session_save_does_not_resurrect_session_logged_out_in_other_context(self):
         pass
-

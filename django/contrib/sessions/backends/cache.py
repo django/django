@@ -6,6 +6,7 @@ from django.core.cache import caches
 
 KEY_PREFIX = "django.contrib.sessions.cache"
 
+
 class SessionStore(HashingSessionBase):
     """
     A cache-based session store.
@@ -15,7 +16,7 @@ class SessionStore(HashingSessionBase):
 
     @classmethod
     def get_cache_key(cls, backend_key):
-        return cls.cache_key_prefix + backend_key 
+        return cls.cache_key_prefix + backend_key
 
     @property
     def cache_key(self):

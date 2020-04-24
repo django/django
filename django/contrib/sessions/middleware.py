@@ -11,6 +11,7 @@ from django.utils.http import http_date
 from django.utils.deprecation import RemovedInDjango40Warning
 from django.contrib.sessions.backends.base import HashingSessionBase
 
+
 class SessionMiddleware(MiddlewareMixin):
     # RemovedInDjango40Warning: when the deprecation ends, replace with:
     #   def __init__(self, get_response):

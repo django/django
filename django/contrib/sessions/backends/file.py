@@ -3,11 +3,10 @@ import logging
 import os
 import shutil
 import tempfile
-from contextlib import suppress
 
 from django.conf import settings
 from django.contrib.sessions.backends.base import (
-    VALID_KEY_CHARS, CreateError, SessionBase, HashingSessionBase, UpdateError,
+    VALID_KEY_CHARS, CreateError, HashingSessionBase, UpdateError,
 )
 from django.contrib.sessions.exceptions import InvalidSessionKey
 from django.core.exceptions import ImproperlyConfigured, SuspiciousOperation
@@ -125,13 +124,13 @@ class SessionStore(HashingSessionBase):
         # our _load_data will return False to indicate
         # invalid/corrupted session file. If that happens,
         # recreate our sessions file
-        elif session_data == False:
+        elif session_data == False:  # noqa: E712
             self.create()
             session_data = {}
 
         if session_data is None:
             session_data = {}
-        
+
         # Remove expired sessions.
         backend_key = self.get_backend_key(self._get_or_create_frontend_key())
         expiry_date = self._expiry_date(session_data, self._backend_key_to_file(backend_key))
@@ -228,7 +227,7 @@ class SessionStore(HashingSessionBase):
 
             file_path = os.path.join(storage_path, session_file)
             session_data = cls._load_session_data(file_path)
-            if session_data != False:
+            if session_data:
                 expiry_age = cls().get_expiry_age(expiry=cls._expiry_date(session_data, file_path=file_path))
 
                 if expiry_age <= 0:

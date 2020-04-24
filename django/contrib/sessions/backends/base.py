@@ -28,6 +28,7 @@ SESSION_KEY_DELIMITER = '$'
 SESSION_HASHING_ALGORITHM = 'sha256'
 SESSION_HASHED_KEY_PREFIX = SESSION_HASHING_ALGORITHM + SESSION_KEY_DELIMITER
 
+
 class CreateError(Exception):
     """
     Used internally as a consistent exception type to catch from save (see the
@@ -396,14 +397,14 @@ class HashingSessionBase(SessionBase):
 
     def _get_frontend_key(self):
         return super()._get_session_key()
-    
+
     def _set_frontend_key(self, key):
         return super()._set_session_key(key)
 
     frontend_key = property(_get_frontend_key)
 
     _frontend_key = property(_get_frontend_key, _set_frontend_key)
-    
+
     @classmethod
     def get_serializer(cls):
         return import_string(settings.SESSION_SERIALIZER)
@@ -478,7 +479,7 @@ class HashingSessionBase(SessionBase):
         while True:
             frontend_key = super()._get_new_session_key()
 
-            if not settings.SESSION_STORE_KEY_HASH: 
+            if not settings.SESSION_STORE_KEY_HASH:
                 return frontend_key
 
             hashed_frontend_key = SESSION_HASHED_KEY_PREFIX + frontend_key
@@ -494,7 +495,7 @@ class HashingSessionBase(SessionBase):
             RemovedInDjango40Warning, stacklevel=2)
         return self._get_new_frontend_key()
 
-    def _get_or_create_frontend_key(self): 
+    def _get_or_create_frontend_key(self):
         """
         Initialise current session with a new frontend key
         and return the key.
@@ -522,7 +523,7 @@ class HashingSessionBase(SessionBase):
         if settings.SESSION_REQUIRE_KEY_HASH:
             valid = valid and cls._has_hash_prefix(frontend_key)
         return valid
-      
+
     def _validate_session_key(self, frontend_key):
         # RemovedInDjango40Warning: use _validate_frontend_key classmethod
         # warnings.warn(
@@ -662,10 +663,10 @@ class HashingSessionBase(SessionBase):
         Delete the session data under this key. If the key is None, use the
         current session key value.
         """
-        if frontend_key is None and not self.frontend_key is None:
+        if frontend_key is None and self.frontend_key is not None:
             frontend_key = self.frontend_key
-        
-        if not frontend_key is None:
+
+        if frontend_key is not None:
             self._delete(self.get_backend_key(frontend_key))
 
     def load(self):
@@ -735,4 +736,3 @@ class HashingSessionBase(SessionBase):
         a built-in expiration mechanism, it should be a no-op.
         """
         raise NotImplementedError('This backend does not support clear_expired().')
-
