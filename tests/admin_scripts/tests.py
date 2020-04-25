@@ -1366,8 +1366,7 @@ class ManageTestserver(SimpleTestCase):
     @mock.patch.object(LoaddataCommand, 'handle', return_value='')
     @mock.patch.object(RunserverCommand, 'handle', return_value='')
     def test_params_to_runserver(self, mock_runserver_handle, mock_loaddata_handle, mock_create_test_db):
-        out = StringIO()
-        call_command('testserver', 'blah.json', stdout=out)
+        call_command('testserver', 'blah.json')
         mock_runserver_handle.assert_called_with(
             addrport='',
             force_color=False,
@@ -1678,7 +1677,7 @@ class CommandTypes(AdminScriptTestCase):
         A command called from the command line should close connections after
         being executed (#21255).
         """
-        command = BaseCommand(stderr=StringIO())
+        command = BaseCommand()
         command.check = lambda: []
         command.handle = lambda *args, **kwargs: args
         with mock.patch('django.core.management.base.connections') as mock_connections:
