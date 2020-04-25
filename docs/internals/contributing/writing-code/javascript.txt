@@ -38,32 +38,6 @@ JavaScript patches
 Django's admin system leverages the jQuery framework to increase the
 capabilities of the admin interface. In conjunction, there is an emphasis on
 admin JavaScript performance and minimizing overall admin media file size.
-Serving compressed or "minified" versions of JavaScript files is considered
-best practice in this regard.
-
-To that end, patches for JavaScript files should include both the original
-code for future development (e.g. ``foo.js``), and a compressed version for
-production use (e.g. ``foo.min.js``). Any links to the file in the codebase
-should point to the compressed version.
-
-Compressing JavaScript
-----------------------
-
-To simplify the process of providing optimized JavaScript code, Django
-includes a handy Python script which should be used to create a "minified"
-version. To run it:
-
-.. console::
-
-    $ python django/contrib/admin/bin/compress.py
-
-Behind the scenes, ``compress.py`` is a front-end for Google's
-`Closure Compiler`_ which is written in Java. The Closure Compiler library is
-not bundled with Django, but will be installed automatically by ``npm``. The
-Closure Compiler library requires `Java`_ 7 or higher.
-
-Please don't forget to run ``compress.py`` and include the ``diff`` of the
-minified scripts when submitting patches for Django's JavaScript.
 
 .. _javascript-tests:
 
@@ -143,7 +117,6 @@ Then run the tests with:
 
     $ npm test
 
-.. _Closure Compiler: https://developers.google.com/closure/compiler/
 .. _EditorConfig: https://editorconfig.org/
 .. _Java: https://www.java.com
 .. _eslint: https://eslint.org/
