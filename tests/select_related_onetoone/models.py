@@ -22,7 +22,7 @@ class UserStatResult(models.Model):
     results = models.CharField(max_length=50)
 
     def __str__(self):
-        return 'UserStatResults, results = %s' % (self.results,)
+        return 'UserStatResults, results = %s' % self.results
 
 
 class UserStat(models.Model):
@@ -31,7 +31,7 @@ class UserStat(models.Model):
     results = models.ForeignKey(UserStatResult, models.CASCADE)
 
     def __str__(self):
-        return 'UserStat, posts = %s' % (self.posts,)
+        return 'UserStat, posts = %s' % self.posts
 
 
 class StatDetails(models.Model):
@@ -39,7 +39,7 @@ class StatDetails(models.Model):
     comments = models.IntegerField()
 
     def __str__(self):
-        return 'StatDetails, comments = %s' % (self.comments,)
+        return 'StatDetails, comments = %s' % self.comments
 
 
 class AdvancedUserStat(UserStat):

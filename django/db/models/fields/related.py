@@ -133,7 +133,7 @@ class RelatedField(FieldCacheMixin, Field):
             errors.append(
                 checks.Error(
                     "Reverse query name '%s' must not end with an underscore."
-                    % (rel_query_name,),
+                    % rel_query_name,
                     hint=("Add or change a related_name or related_query_name "
                           "argument for this field."),
                     obj=self,
