@@ -68,7 +68,7 @@ Are you sure you want to do this?
                     "  * At least one of the expected database tables doesn't exist.\n"
                     "  * The SQL was invalid.\n"
                     "Hint: Look at the output of 'django-admin sqlflush'. "
-                    "That's the SQL this command wasn't able to run.\n" % (
+                    "That's the SQL this command wasn't able to run." % (
                         connection.settings_dict['NAME'],
                     )
                 ) from exc
@@ -79,4 +79,4 @@ Are you sure you want to do this?
                 # respond as if the database had been migrated from scratch.
                 emit_post_migrate_signal(verbosity, interactive, database)
         else:
-            self.stdout.write("Flush cancelled.\n")
+            self.stdout.write('Flush cancelled.')

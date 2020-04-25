@@ -44,7 +44,7 @@ class Command(BaseCommand):
         except UserModel.DoesNotExist:
             raise CommandError("user '%s' does not exist" % username)
 
-        self.stdout.write("Changing password for user '%s'\n" % u)
+        self.stdout.write("Changing password for user '%s'" % u)
 
         MAX_TRIES = 3
         count = 0
@@ -54,7 +54,7 @@ class Command(BaseCommand):
             p1 = self._get_pass()
             p2 = self._get_pass("Password (again): ")
             if p1 != p2:
-                self.stdout.write("Passwords do not match. Please try again.\n")
+                self.stdout.write('Passwords do not match. Please try again.')
                 count += 1
                 # Don't validate passwords that don't match.
                 continue

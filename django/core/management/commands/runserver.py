@@ -124,7 +124,7 @@ class Command(BaseCommand):
         self.stdout.write((
             "Django version %(version)s, using settings %(settings)r\n"
             "Starting development server at %(protocol)s://%(addr)s:%(port)s/\n"
-            "Quit the server with %(quit_command)s.\n"
+            "Quit the server with %(quit_command)s."
         ) % {
             "version": self.get_version(),
             "settings": settings.SETTINGS_MODULE,
