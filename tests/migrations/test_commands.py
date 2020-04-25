@@ -779,7 +779,7 @@ class MigrateTests(MigrationTestBase):
         "B" was not included in the ProjectState that is used to detect
         soft-applied migrations (#22823).
         """
-        call_command("migrate", "migrated_unapplied_app", stdout=io.StringIO())
+        call_command('migrate', 'migrated_unapplied_app', verbosity=0)
 
         # unmigrated_app.SillyModel has a foreign key to 'migrations.Tribble',
         # but that model is only defined in a migration, so the global app
