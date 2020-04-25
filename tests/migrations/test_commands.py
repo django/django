@@ -1193,10 +1193,9 @@ class MakeMigrationsTests(MigrationTestBase):
             class Meta:
                 app_label = "migrations"
 
-        out = io.StringIO()
         with self.assertRaises(SystemExit):
             with self.temporary_migration_module(module="migrations.test_migrations_no_default"):
-                call_command("makemigrations", "migrations", interactive=False, stdout=out)
+                call_command("makemigrations", "migrations", interactive=False)
 
     def test_makemigrations_non_interactive_not_null_alteration(self):
         """
