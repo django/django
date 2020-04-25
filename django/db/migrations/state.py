@@ -1,5 +1,7 @@
 import copy
+from collections import defaultdict
 from contextlib import contextmanager
+from functools import partial
 
 from django.apps import AppConfig
 from django.apps.registry import Apps, apps as global_apps
@@ -13,6 +15,7 @@ from django.utils.module_loading import import_string
 from django.utils.version import get_docs_version
 
 from .exceptions import InvalidBasesError
+from .utils import resolve_relation
 
 
 def _get_app_label_and_model_name(model, app_label=''):
@@ -87,6 +90,8 @@ class ProjectState:
         # Apps to include from main registry, usually unmigrated ones
         self.real_apps = real_apps or []
         self.is_delayed = False
+        # {remote_model_key: {model_key: [(field_name, field)]}}
+        self.relations = None
 
     def add_model(self, model_state):
         app_label, model_name = model_state.app_label, model_state.name_lower
@@ -188,6 +193,67 @@ class ProjectState:
         # Render all models
         self.apps.render_multiple(states_to_be_rendered)
 
+    def resolve_fields_and_relations(self):
+        # Resolve fields.
+        for model_state in self.models.values():
+            for field_name, field in model_state.fields.items():
+                field.name = field_name
+        # Resolve relations.
+        # {remote_model_key: {model_key: [(field_name, field)]}}
+        self.relations = defaultdict(partial(defaultdict, list))
+        concretes, proxies = self._get_concrete_models_mapping_and_proxy_models()
+
+        real_apps = set(self.real_apps)
+        for model_key in concretes:
+            model_state = self.models[model_key]
+            for field_name, field in model_state.fields.items():
+                remote_field = field.remote_field
+                if not remote_field:
+                    continue
+                remote_model_key = resolve_relation(remote_field.model, *model_key)
+                if remote_model_key[0] not in real_apps and remote_model_key in concretes:
+                    remote_model_key = concretes[remote_model_key]
+                self.relations[remote_model_key][model_key].append((field_name, field))
+
+                through = getattr(remote_field, 'through', None)
+                if not through:
+                    continue
+                through_model_key = resolve_relation(through, *model_key)
+                if through_model_key[0] not in real_apps and through_model_key in concretes:
+                    through_model_key = concretes[through_model_key]
+                self.relations[through_model_key][model_key].append((field_name, field))
+        for model_key in proxies:
+            self.relations[model_key] = self.relations[concretes[model_key]]
+
+    def get_concrete_model_key(self, model):
+        concrete_models_mapping, _ = self._get_concrete_models_mapping_and_proxy_models()
+        model_key = make_model_tuple(model)
+        return concrete_models_mapping[model_key]
+
+    def _get_concrete_models_mapping_and_proxy_models(self):
+        concrete_models_mapping = {}
+        proxy_models = {}
+        # Split models to proxy and concrete models.
+        for model_key, model_state in self.models.items():
+            if model_state.options.get('proxy'):
+                proxy_models[model_key] = model_state
+                # Find a concrete model for the proxy.
+                concrete_models_mapping[model_key] = self._find_concrete_model_from_proxy(
+                    proxy_models, model_state,
+                )
+            else:
+                concrete_models_mapping[model_key] = model_key
+        return concrete_models_mapping, proxy_models
+
+    def _find_concrete_model_from_proxy(self, proxy_models, model_state):
+        for base in model_state.bases:
+            base_key = make_model_tuple(base)
+            base_state = proxy_models.get(base_key)
+            if not base_state:
+                # Concrete model found, stop looking at bases.
+                return base_key
+            return self._find_concrete_model_from_proxy(proxy_models, base_state)
+
     def clone(self):
         """Return an exact copy of this ProjectState."""
         new_state = ProjectState(
@@ -206,11 +272,6 @@ class ProjectState:
     @cached_property
     def apps(self):
         return StateApps(self.real_apps, self.models)
-
-    @property
-    def concrete_apps(self):
-        self.apps = StateApps(self.real_apps, self.models, ignore_swappable=True)
-        return self.apps
 
     @classmethod
     def from_apps(cls, apps):
@@ -391,6 +452,14 @@ class ModelState:
     @cached_property
     def name_lower(self):
         return self.name.lower()
+
+    def get_field(self, field_name):
+        field_name = (
+            self.options['order_with_respect_to']
+            if field_name == '_order'
+            else field_name
+        )
+        return self.fields[field_name]
 
     @classmethod
     def from_model(cls, model, exclude_rels=False):
