@@ -510,7 +510,7 @@ class TestInlineMedia(TestDataMixin, TestCase):
                 'my_awesome_inline_scripts.js',
                 'custom_number.js',
                 'admin/js/jquery.init.js',
-                'admin/js/inlines.min.js',
+                'admin/js/inlines.js',
             ]
         )
         self.assertContains(response, 'my_awesome_inline_scripts.js')
