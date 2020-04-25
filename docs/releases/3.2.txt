@@ -157,6 +157,10 @@ Management Commands
 * :djadmin:`loaddata` now supports fixtures stored in XZ archives (``.xz``) and
   LZMA archives (``.lzma``).
 
+* :djadmin:`makemigrations` can now be called without an active database
+  connection. In that case, check for a consistent migration history is
+  skipped.
+
 Migrations
 ~~~~~~~~~~
 

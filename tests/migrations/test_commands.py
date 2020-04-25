@@ -8,7 +8,8 @@ from unittest import mock
 from django.apps import apps
 from django.core.management import CommandError, call_command
 from django.db import (
-    ConnectionHandler, DatabaseError, connection, connections, models,
+    ConnectionHandler, DatabaseError, OperationalError, connection,
+    connections, models,
 )
 from django.db.backends.base.schema import BaseDatabaseSchemaEditor
 from django.db.backends.utils import truncate_name
@@ -1554,6 +1555,19 @@ class MakeMigrationsTests(MigrationTestBase):
         with self.temporary_migration_module(module="migrations.test_migrations"):
             with self.assertRaisesMessage(InconsistentMigrationHistory, msg):
                 call_command("makemigrations")
+
+    def test_makemigrations_inconsistent_history_db_failure(self):
+        msg = (
+            "Got an error checking a consistent migration history performed "
+            "for database connection 'default': could not connect to server"
+        )
+        with mock.patch(
+            'django.db.migrations.loader.MigrationLoader.check_consistent_history',
+            side_effect=OperationalError('could not connect to server'),
+        ):
+            with self.temporary_migration_module():
+                with self.assertWarnsMessage(RuntimeWarning, msg):
+                    call_command('makemigrations', verbosity=0)
 
     @mock.patch('builtins.input', return_value='1')
     @mock.patch('django.db.migrations.questioner.sys.stdin', mock.MagicMock(encoding=sys.getdefaultencoding()))

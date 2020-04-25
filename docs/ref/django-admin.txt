@@ -824,6 +824,12 @@ Generate migration files without Django version and timestamp header.
 Makes ``makemigrations`` exit with a non-zero status when model changes without
 migrations are detected.
 
+.. versionchanged:: 3.2
+
+    Support for calling ``makemigrations`` without an active database
+    connection was added. In that case, check for a consistent migration
+    history is skipped.
+
 ``migrate``
 -----------
 
