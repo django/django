@@ -317,7 +317,7 @@ class MigrationLoader:
             if app_label in seen_apps:
                 conflicting_apps.add(app_label)
             seen_apps.setdefault(app_label, set()).add(migration_name)
-        return {app_label: seen_apps[app_label] for app_label in conflicting_apps}
+        return {app_label: sorted(seen_apps[app_label]) for app_label in conflicting_apps}
 
     def project_state(self, nodes=None, at_end=True):
         """
