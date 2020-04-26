@@ -89,47 +89,20 @@ def lazy(func, *resultclasses):
         until one of the methods on the result is called.
         """
 
-        __prepared = False
-
         def __init__(self, args, kw):
-            self.__args = args
-            self.__kw = kw
-            if not self.__prepared:
-                self.__prepare_class__()
-            self.__class__.__prepared = True
-
-        @classmethod
-        def __prepare_class__(cls):
-            for resultclass in resultclasses:
-                for type_ in resultclass.mro():
-                    for method_name in type_.__dict__:
-                        # All __promise__ return the same wrapper method, they
-                        # look up the correct implementation when called.
-                        if hasattr(cls, method_name):
-                            continue
-                        meth = cls.__promise__(method_name)
-                        setattr(cls, method_name, meth)
-
-        @classmethod
-        def __promise__(cls, method_name):
-            # Builds a wrapper around some magic method
-            def __wrapper__(self, *args, **kw):
-                # Automatically triggers the evaluation of a lazy value and
-                # applies the given magic method of the result type.
-                res = func(*self.__args, **self.__kw)
-                return getattr(res, method_name)(*args, **kw)
-
-            return __wrapper__
+            self._args = args
+            self._kw = kw
 
         def __cast(self):
-            return func(*self.__args, **self.__kw)
+            return func(*self._args, **self._kw)
+
+        # Explicitly wrap methods which are defined on object and hence would
+        # not have been overloaded by the loop over resultclasses below.
 
         def __repr__(self):
             return repr(self.__cast())
 
         def __str__(self):
-            # object defines __str__(), so __prepare_class__() won't overload
-            # a __str__() method from the proxied class.
             return str(self.__cast())
 
         def __eq__(self, other):
@@ -177,7 +150,7 @@ def lazy(func, *resultclasses):
         def __reduce__(self):
             return (
                 _lazy_proxy_unpickle,
-                (func, self.__args, self.__kw) + resultclasses
+                (func, self._args, self._kw) + resultclasses,
             )
 
         def __deepcopy__(self, memo):
@@ -186,6 +159,28 @@ def lazy(func, *resultclasses):
             # complicated for copying.
             memo[id(self)] = self
             return self
+
+    def __promise__(method_name):
+        # Builds a wrapper around some method.
+        def __wrapper__(self, *args, **kw):
+            # Automatically triggers the evaluation of a lazy value and
+            # applies the given method of the result type.
+            res = func(*self._args, **self._kw)
+            return getattr(res, method_name)(*args, **kw)
+
+        return __wrapper__
+
+    # Add wrappers for all methods from resultclasses which haven't
+    # been wrapped explicitly above.
+    for resultclass in resultclasses:
+        for type_ in resultclass.mro():
+            for method_name in type_.__dict__:
+                # All __promise__ return the same wrapper method, they
+                # look up the correct implementation when called.
+                if hasattr(__proxy__, method_name):
+                    continue
+                meth = __promise__(method_name)
+                setattr(__proxy__, method_name, meth)
 
     @wraps(func)
     def __wrapper__(*args, **kw):
