@@ -1,7 +1,6 @@
 /*global gettext, interpolate, ngettext*/
 (function($) {
     'use strict';
-    var lastChecked;
 
     $.fn.actions = function(opts) {
         var options = $.extend({}, $.fn.actions.defaults, opts);
@@ -87,26 +86,10 @@
             checker(0);
             updateCounter();
         });
-        lastChecked = null;
         $(actionCheckboxes).on('click', function(event) {
             if (!event) { event = window.event; }
             var target = event.target ? event.target : event.srcElement;
-            if (lastChecked && $.data(lastChecked) !== $.data(target) && event.shiftKey === true) {
-                var inrange = false;
-                $(lastChecked).prop("checked", target.checked)
-                    .parent().parent().toggleClass(options.selectedClass, target.checked);
-                $(actionCheckboxes).each(function() {
-                    if ($.data(this) === $.data(lastChecked) || $.data(this) === $.data(target)) {
-                        inrange = (inrange) ? false : true;
-                    }
-                    if (inrange) {
-                        $(this).prop("checked", target.checked)
-                            .parent().parent().toggleClass(options.selectedClass, target.checked);
-                    }
-                });
-            }
             $(target).parent().parent().toggleClass(options.selectedClass, target.checked);
-            lastChecked = target;
             updateCounter();
         });
         $('form#changelist-form table#result_list tr').on('change', 'td:gt(0) :input', function() {
