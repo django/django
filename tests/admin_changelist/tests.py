@@ -1295,17 +1295,98 @@ class SeleniumTests(AdminSeleniumTestCase):
         rows = self.selenium.find_elements_by_css_selector(
             '%s #result_list tbody tr' % form_id)
         self.assertEqual(len(rows), 1)
+        row = rows[0]
 
-        # Test current selection
         selection_indicator = self.selenium.find_element_by_css_selector(
             '%s .action-counter' % form_id)
+        all_selector = self.selenium.find_element_by_id('action-toggle')
+        row_selector = self.selenium.find_element_by_css_selector(
+            '%s #result_list tbody tr:first-child .action-select' % form_id
+        )
+
+        # Test current selection
         self.assertEqual(selection_indicator.text, "0 of 1 selected")
+        self.assertIs(all_selector.get_property('checked'), False)
+        self.assertEqual(row.get_attribute('class'), '')
 
         # Select a row and check again
-        row_selector = self.selenium.find_element_by_css_selector(
-            '%s #result_list tbody tr:first-child .action-select' % form_id)
         row_selector.click()
         self.assertEqual(selection_indicator.text, "1 of 1 selected")
+        self.assertIs(all_selector.get_property('checked'), True)
+        self.assertEqual(row.get_attribute('class'), 'selected')
+
+        # Deselect a row and check again
+        row_selector.click()
+        self.assertEqual(selection_indicator.text, "0 of 1 selected")
+        self.assertIs(all_selector.get_property('checked'), False)
+        self.assertEqual(row.get_attribute('class'), '')
+
+    def test_select_all_across_pages(self):
+        Parent.objects.bulk_create([Parent(name='parent%d' % i) for i in range(101)])
+        self.admin_login(username='super', password='secret')
+        self.selenium.get(self.live_server_url + reverse('admin:admin_changelist_parent_changelist'))
+
+        selection_indicator = self.selenium.find_element_by_css_selector('.action-counter')
+        select_all_indicator = self.selenium.find_element_by_css_selector('.actions .all')
+        question = self.selenium.find_element_by_css_selector('.actions > .question')
+        clear = self.selenium.find_element_by_css_selector('.actions > .clear')
+        select_all = self.selenium.find_element_by_id('action-toggle')
+        select_across = self.selenium.find_element_by_name('select_across')
+
+        self.assertIs(question.is_displayed(), False)
+        self.assertIs(clear.is_displayed(), False)
+        self.assertIs(select_all.get_property('checked'), False)
+        self.assertEqual(select_across.get_property('value'), '0')
+        self.assertIs(selection_indicator.is_displayed(), True)
+        self.assertEqual(selection_indicator.text, '0 of 100 selected')
+        self.assertIs(select_all_indicator.is_displayed(), False)
+
+        select_all.click()
+        self.assertIs(question.is_displayed(), True)
+        self.assertIs(clear.is_displayed(), False)
+        self.assertIs(select_all.get_property('checked'), True)
+        self.assertEqual(select_across.get_property('value'), '0')
+        self.assertIs(selection_indicator.is_displayed(), True)
+        self.assertEqual(selection_indicator.text, '100 of 100 selected')
+        self.assertIs(select_all_indicator.is_displayed(), False)
+
+        question.click()
+        self.assertIs(question.is_displayed(), False)
+        self.assertIs(clear.is_displayed(), True)
+        self.assertIs(select_all.get_property('checked'), True)
+        self.assertEqual(select_across.get_property('value'), '1')
+        self.assertIs(selection_indicator.is_displayed(), False)
+        self.assertIs(select_all_indicator.is_displayed(), True)
+
+        clear.click()
+        self.assertIs(question.is_displayed(), False)
+        self.assertIs(clear.is_displayed(), False)
+        self.assertIs(select_all.get_property('checked'), False)
+        self.assertEqual(select_across.get_property('value'), '0')
+        self.assertIs(selection_indicator.is_displayed(), True)
+        self.assertEqual(selection_indicator.text, '0 of 100 selected')
+        self.assertIs(select_all_indicator.is_displayed(), False)
+
+    def test_actions_warn_on_pending_edits(self):
+        Parent.objects.create(name='foo')
+
+        self.admin_login(username='super', password='secret')
+        self.selenium.get(self.live_server_url + reverse('admin:admin_changelist_parent_changelist'))
+
+        name_input = self.selenium.find_element_by_id('id_form-0-name')
+        name_input.clear()
+        name_input.send_keys('bar')
+        self.selenium.find_element_by_id('action-toggle').click()
+        self.selenium.find_element_by_name('index').click()  # Go
+        alert = self.selenium.switch_to.alert
+        try:
+            self.assertEqual(
+                alert.text,
+                'You have unsaved changes on individual editable fields. If you '
+                'run an action, your unsaved changes will be lost.'
+            )
+        finally:
+            alert.dismiss()
 
     def test_save_with_changes_warns_on_pending_action(self):
         from selenium.webdriver.support.ui import Select
