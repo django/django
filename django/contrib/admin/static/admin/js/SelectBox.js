@@ -1,5 +1,5 @@
-(function() {
-    'use strict';
+'use strict';
+{
     const SelectBox = {
         cache: {},
         init: function(id) {
@@ -127,4 +127,4 @@
         }
     };
     window.SelectBox = SelectBox;
-})();
+}

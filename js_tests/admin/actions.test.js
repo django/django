@@ -1,5 +1,4 @@
 /* global QUnit */
-/* eslint strict: 0 */
 'use strict';
 
 QUnit.module('admin.actions', {

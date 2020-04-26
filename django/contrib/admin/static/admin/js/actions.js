@@ -1,6 +1,7 @@
 /*global gettext, interpolate, ngettext*/
-(function($) {
-    'use strict';
+'use strict';
+{
+    const $ = django.jQuery;
     let lastChecked;
 
     $.fn.actions = function(opts) {
@@ -150,4 +151,4 @@
             $actionsEls.actions();
         }
     });
-})(django.jQuery);
+}

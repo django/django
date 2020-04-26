@@ -1,6 +1,6 @@
 /*global gettext*/
-(function() {
-    'use strict';
+'use strict';
+{
     window.addEventListener('load', function() {
         // Add anchor tag for Show/Hide link
         const fieldsets = document.querySelectorAll('fieldset.collapse');
@@ -42,4 +42,4 @@
             inlineDivs[i].addEventListener('click', toggleFunc);
         }
     });
-})();
+}

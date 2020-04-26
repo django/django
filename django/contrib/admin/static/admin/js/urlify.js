@@ -1,7 +1,6 @@
 /*global XRegExp*/
-(function() {
-    'use strict';
-
+'use strict';
+{
     const LATIN_MAP = {
         'À': 'A', 'Á': 'A', 'Â': 'A', 'Ã': 'A', 'Ä': 'A', 'Å': 'A', 'Æ': 'AE',
         'Ç': 'C', 'È': 'E', 'É': 'E', 'Ê': 'E', 'Ë': 'E', 'Ì': 'I', 'Í': 'I',
@@ -193,4 +192,4 @@
         return s;
     }
     window.URLify = URLify;
-})();
+}

@@ -15,8 +15,9 @@
  * Licensed under the New BSD License
  * See: https://opensource.org/licenses/bsd-license.php
  */
-(function($) {
-    'use strict';
+'use strict';
+{
+    const $ = django.jQuery;
     $.fn.formset = function(opts) {
         const options = $.extend({}, $.fn.formset.defaults, opts);
         const $this = $(this);
@@ -344,4 +345,4 @@
             }
         });
     });
-})(django.jQuery);
+}

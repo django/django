@@ -1,6 +1,7 @@
 /*global URLify*/
-(function($) {
-    'use strict';
+'use strict';
+{
+    const $ = django.jQuery;
     $.fn.prepopulate = function(dependencies, maxLength, allowUnicode) {
         /*
             Depends on urlify.js
@@ -39,4 +40,4 @@
             }
         });
     };
-})(django.jQuery);
+}

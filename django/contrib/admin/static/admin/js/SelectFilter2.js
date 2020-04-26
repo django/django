@@ -4,8 +4,8 @@ SelectFilter2 - Turns a multiple-select box into a filter interface.
 
 Requires core.js and SelectBox.js.
 */
-(function() {
-    'use strict';
+'use strict';
+{
     window.SelectFilter = {
         init: function(field_id, field_name, is_stacked) {
             if (field_id.match(/__prefix__/)) {
@@ -234,4 +234,4 @@ Requires core.js and SelectBox.js.
             SelectFilter.init(el.id, data.fieldName, parseInt(data.isStacked, 10));
         });
     });
-})();
+}
