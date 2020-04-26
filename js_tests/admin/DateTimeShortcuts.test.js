@@ -1,5 +1,4 @@
 /* global QUnit, DateTimeShortcuts */
-/* eslint strict: 0 */
 'use strict';
 
 QUnit.module('admin.DateTimeShortcuts');

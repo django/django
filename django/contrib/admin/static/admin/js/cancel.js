@@ -1,6 +1,5 @@
-(function() {
-    'use strict';
-
+'use strict';
+{
     // Call function fn when the DOM is loaded and ready. If it is already
     // loaded, call the function now.
     // http://youmightnotneedjquery.com/#ready
@@ -26,4 +25,4 @@
             el.addEventListener('click', handleClick);
         });
     });
-})();
+}

@@ -1,5 +1,6 @@
-(function($) {
-    'use strict';
+'use strict';
+{
+    const $ = django.jQuery;
     const init = function($element, options) {
         const settings = $.extend({
             ajax: {
@@ -34,4 +35,4 @@
             return $newFormset.find('.admin-autocomplete').djangoAdminSelect2();
         };
     })(this));
-}(django.jQuery));
+}

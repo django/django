@@ -1,5 +1,5 @@
-(function() {
-    'use strict';
+'use strict';
+{
     const inputTags = ['BUTTON', 'INPUT', 'SELECT', 'TEXTAREA'];
     const modelName = document.getElementById('django-admin-form-add-constants').dataset.modelName;
     if (modelName) {
@@ -14,4 +14,4 @@
             }
         }
     }
-})();
+}

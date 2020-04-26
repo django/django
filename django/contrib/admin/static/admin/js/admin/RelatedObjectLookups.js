@@ -1,9 +1,9 @@
 /*global SelectBox, interpolate*/
 // Handles related-objects functionality: lookup link for raw_id_fields
 // and Add Another links.
-
-(function($) {
-    'use strict';
+'use strict';
+{
+    const $ = django.jQuery;
 
     function showAdminPopup(triggeringLink, name_regexp, add_popup) {
         const name = triggeringLink.id.replace(name_regexp, '');
@@ -156,5 +156,4 @@
             }
         });
     });
-
-})(django.jQuery);
+}

@@ -1,7 +1,6 @@
 /* global ol */
-
+'use strict';
 function GeometryTypeControl(opt_options) {
-    'use strict';
     // Map control to switch type when geometry type is unknown
     const options = opt_options || {};
 
@@ -37,8 +36,7 @@ function GeometryTypeControl(opt_options) {
 ol.inherits(GeometryTypeControl, ol.control.Control);
 
 // TODO: allow deleting individual features (#8972)
-(function() {
-    'use strict';
+{
     const jsonFormat = new ol.format.GeoJSON();
 
     function MapWidget(options) {
@@ -227,4 +225,4 @@ ol.inherits(GeometryTypeControl, ol.control.Control);
     };
 
     window.MapWidget = MapWidget;
-})();
+}

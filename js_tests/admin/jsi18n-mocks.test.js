@@ -1,5 +1,6 @@
-(function(globals) {
-    'use strict';
+'use strict';
+{
+    const globals = this;
     const django = globals.django;
 
     django.pluralidx = function(count) { return (count === 1) ? 0 : 1; };
@@ -86,5 +87,4 @@
     globals.npgettext = django.npgettext;
     globals.interpolate = django.interpolate;
     globals.get_format = django.get_format;
-
-}(this));
+};

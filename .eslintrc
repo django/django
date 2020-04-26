@@ -24,7 +24,7 @@
         "space-before-blocks": ["error", "always"],
         "space-before-function-paren": ["error", {"anonymous": "never", "named": "never"}],
         "space-infix-ops": ["error", {"int32Hint": false}],
-        "strict": ["warn", "function"]
+        "strict": ["error", "global"]
     },
     "env": {
         "browser": true,

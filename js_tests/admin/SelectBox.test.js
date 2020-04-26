@@ -1,5 +1,4 @@
 /* global QUnit, SelectBox */
-/* eslint strict: 0 */
 'use strict';
 
 QUnit.module('admin.SelectBox');

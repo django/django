@@ -3,9 +3,8 @@
 calendar.js - Calendar functions by Adrian Holovaty
 depends on core.js for utility functions like removeChildren or quickElement
 */
-
-(function() {
-    'use strict';
+'use strict';
+{
     // CalendarNamespace -- Provides a collection of HTML calendar-related helper functions
     const CalendarNamespace = {
         monthsOfYear: [
@@ -205,4 +204,4 @@ depends on core.js for utility functions like removeChildren or quickElement
     };
     window.Calendar = Calendar;
     window.CalendarNamespace = CalendarNamespace;
-})();
+}
