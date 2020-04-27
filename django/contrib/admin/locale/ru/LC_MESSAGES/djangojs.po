@@ -12,23 +12,25 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-05-17 11:50+0200\n"
+"POT-Creation-Date: 2020-04-27 10:09+0300\n"
 "PO-Revision-Date: 2017-09-23 18:54+0000\n"
 "Last-Translator: Eugene <eugene.mechanism@gmail.com>\n"
 "Language-Team: Russian (http://www.transifex.com/django/django/language/"
 "ru/)\n"
+"Language: ru\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: ru\n"
 "Plural-Forms: nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
 "%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || (n"
 "%100>=11 && n%100<=14)? 2 : 3);\n"
 
+#: static/admin/js/SelectFilter2.js:47
 #, javascript-format
 msgid "Available %s"
 msgstr "Доступные %s"
 
+#: static/admin/js/SelectFilter2.js:53
 #, javascript-format
 msgid ""
 "This is the list of available %s. You may choose some by selecting them in "
@@ -37,31 +39,39 @@ msgstr ""
 "Это список всех доступных %s. Вы можете выбрать некоторые из них, выделив их "
 "в поле ниже и кликнув \"Выбрать\", либо двойным щелчком."
 
+#: static/admin/js/SelectFilter2.js:69
 #, javascript-format
 msgid "Type into this box to filter down the list of available %s."
 msgstr ""
 "Начните вводить текст в этом поле, чтобы отфитровать список доступных %s."
 
+#: static/admin/js/SelectFilter2.js:74
 msgid "Filter"
 msgstr "Фильтр"
 
+#: static/admin/js/SelectFilter2.js:78
 msgid "Choose all"
 msgstr "Выбрать все"
 
+#: static/admin/js/SelectFilter2.js:78
 #, javascript-format
 msgid "Click to choose all %s at once."
 msgstr "Нажмите, чтобы выбрать все %s сразу."
 
+#: static/admin/js/SelectFilter2.js:84
 msgid "Choose"
 msgstr "Выбрать"
 
+#: static/admin/js/SelectFilter2.js:86
 msgid "Remove"
 msgstr "Удалить"
 
+#: static/admin/js/SelectFilter2.js:92
 #, javascript-format
 msgid "Chosen %s"
 msgstr "Выбранные %s"
 
+#: static/admin/js/SelectFilter2.js:98
 #, javascript-format
 msgid ""
 "This is the list of chosen %s. You may remove some by selecting them in the "
@@ -70,13 +80,16 @@ msgstr ""
 "Это список выбранных %s. Вы можете удалить некоторые из них, выделив их в "
 "поле ниже и кликнув \"Удалить\", либо двойным щелчком."
 
+#: static/admin/js/SelectFilter2.js:108
 msgid "Remove all"
 msgstr "Удалить все"
 
+#: static/admin/js/SelectFilter2.js:108
 #, javascript-format
 msgid "Click to remove all chosen %s at once."
 msgstr "Нажмите чтобы удалить все %s сразу."
 
+#: static/admin/js/actions.js:48 static/admin/js/actions.min.js:2
 msgid "%(sel)s of %(cnt)s selected"
 msgid_plural "%(sel)s of %(cnt)s selected"
 msgstr[0] "Выбран %(sel)s из %(cnt)s"
@@ -84,6 +97,7 @@ msgstr[1] "Выбрано %(sel)s из %(cnt)s"
 msgstr[2] "Выбрано %(sel)s из %(cnt)s"
 msgstr[3] "Выбрано %(sel)s из %(cnt)s"
 
+#: static/admin/js/actions.js:117 static/admin/js/actions.min.js:5
 msgid ""
 "You have unsaved changes on individual editable fields. If you run an "
 "action, your unsaved changes will be lost."
@@ -91,6 +105,7 @@ msgstr ""
 "Имеются несохраненные изменения в отдельных полях для редактирования. Если "
 "вы запустите действие, несохраненные изменения будут потеряны."
 
+#: static/admin/js/actions.js:129 static/admin/js/actions.min.js:5
 msgid ""
 "You have selected an action, but you haven't saved your changes to "
 "individual fields yet. Please click OK to save. You'll need to re-run the "
@@ -100,6 +115,7 @@ msgstr ""
 "полях для редактирования. Нажмите OK, чтобы сохранить изменения. После "
 "сохранения вам придется запустить действие еще раз."
 
+#: static/admin/js/actions.js:131 static/admin/js/actions.min.js:6
 msgid ""
 "You have selected an action, and you haven't made any changes on individual "
 "fields. You're probably looking for the Go button rather than the Save "
@@ -109,21 +125,28 @@ msgstr ""
 "воспользоваться кнопкой \"Выполнить\", а не кнопкой \"Сохранить\". Если это "
 "так, то нажмите \"Отмена\", чтобы вернуться в интерфейс редактирования. "
 
+#: static/admin/js/admin/DateTimeShortcuts.js:13
+#: static/admin/js/admin/DateTimeShortcuts.js:115
 msgid "Now"
 msgstr "Сейчас"
 
+#: static/admin/js/admin/DateTimeShortcuts.js:14
 msgid "Midnight"
 msgstr "Полночь"
 
+#: static/admin/js/admin/DateTimeShortcuts.js:15
 msgid "6 a.m."
 msgstr "6 утра"
 
+#: static/admin/js/admin/DateTimeShortcuts.js:16
 msgid "Noon"
 msgstr "Полдень"
 
+#: static/admin/js/admin/DateTimeShortcuts.js:17
 msgid "6 p.m."
 msgstr "6 вечера"
 
+#: static/admin/js/admin/DateTimeShortcuts.js:82
 #, javascript-format
 msgid "Note: You are %s hour ahead of server time."
 msgid_plural "Note: You are %s hours ahead of server time."
@@ -132,6 +155,7 @@ msgstr[1] "Внимание: Ваше локальное время опереж
 msgstr[2] "Внимание: Ваше локальное время опережает время сервера на %s часов."
 msgstr[3] "Внимание: Ваше локальное время опережает время сервера на %s часов."
 
+#: static/admin/js/admin/DateTimeShortcuts.js:90
 #, javascript-format
 msgid "Note: You are %s hour behind server time."
 msgid_plural "Note: You are %s hours behind server time."
@@ -144,93 +168,124 @@ msgstr[2] ""
 msgstr[3] ""
 "Внимание: Ваше локальное время отстаёт от времени сервера на %s часов."
 
+#: static/admin/js/admin/DateTimeShortcuts.js:133
 msgid "Choose a Time"
 msgstr "Выберите время"
 
+#: static/admin/js/admin/DateTimeShortcuts.js:163
 msgid "Choose a time"
 msgstr "Выберите время"
 
+#: static/admin/js/admin/DateTimeShortcuts.js:180
+#: static/admin/js/admin/DateTimeShortcuts.js:340
 msgid "Cancel"
 msgstr "Отмена"
 
+#: static/admin/js/admin/DateTimeShortcuts.js:245
+#: static/admin/js/admin/DateTimeShortcuts.js:325
 msgid "Today"
 msgstr "Сегодня"
 
+#: static/admin/js/admin/DateTimeShortcuts.js:262
 msgid "Choose a Date"
 msgstr "Выберите дату"
 
+#: static/admin/js/admin/DateTimeShortcuts.js:319
 msgid "Yesterday"
 msgstr "Вчера"
 
+#: static/admin/js/admin/DateTimeShortcuts.js:331
 msgid "Tomorrow"
 msgstr "Завтра"
 
+#: static/admin/js/calendar.js:12
 msgid "January"
 msgstr "Январь"
 
+#: static/admin/js/calendar.js:13
 msgid "February"
 msgstr "Февраль"
 
+#: static/admin/js/calendar.js:14
 msgid "March"
 msgstr "Март"
 
+#: static/admin/js/calendar.js:15
 msgid "April"
 msgstr "Апрель"
 
+#: static/admin/js/calendar.js:16
 msgid "May"
 msgstr "Май"
 
+#: static/admin/js/calendar.js:17
 msgid "June"
 msgstr "Июнь"
 
+#: static/admin/js/calendar.js:18
 msgid "July"
 msgstr "Июль"
 
+#: static/admin/js/calendar.js:19
 msgid "August"
 msgstr "Август"
 
+#: static/admin/js/calendar.js:20
 msgid "September"
 msgstr "Сентябрь"
 
+#: static/admin/js/calendar.js:21
 msgid "October"
 msgstr "Октябрь"
 
+#: static/admin/js/calendar.js:22
 msgid "November"
 msgstr "Ноябрь"
 
+#: static/admin/js/calendar.js:23
 msgid "December"
 msgstr "Декабрь"
 
+#: static/admin/js/calendar.js:26
 msgctxt "one letter Sunday"
 msgid "S"
 msgstr "В"
 
+#: static/admin/js/calendar.js:27
 msgctxt "one letter Monday"
 msgid "M"
 msgstr "П"
 
+#: static/admin/js/calendar.js:28
 msgctxt "one letter Tuesday"
 msgid "T"
 msgstr "В"
 
+#: static/admin/js/calendar.js:29
 msgctxt "one letter Wednesday"
 msgid "W"
 msgstr "С"
 
+#: static/admin/js/calendar.js:30
 msgctxt "one letter Thursday"
 msgid "T"
 msgstr "Ч"
 
+#: static/admin/js/calendar.js:31
 msgctxt "one letter Friday"
 msgid "F"
 msgstr "П"
 
+#: static/admin/js/calendar.js:32
 msgctxt "one letter Saturday"
 msgid "S"
 msgstr "С"
 
+#: static/admin/js/collapse.js:27 static/admin/js/collapse.js:45
+#: static/admin/js/collapse.min.js:2
 msgid "Show"
 msgstr "Показать"
 
+#: static/admin/js/collapse.js:41 static/admin/js/collapse.min.js:2
 msgid "Hide"
 msgstr "Скрыть"
