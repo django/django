@@ -4,6 +4,7 @@ from django.core import serializers
 from django.core.serializers.xml_serializer import DTDForbidden
 from django.test import TestCase, TransactionTestCase
 
+from .models import Author
 from .tests import SerializersTestBase, SerializersTransactionTestBase
 
 
@@ -85,6 +86,13 @@ class XmlSerializerTestCase(SerializersTestBase, TestCase):
         xml = '<?xml version="1.0" standalone="no"?><!DOCTYPE example SYSTEM "http://example.com/example.dtd">'
         with self.assertRaises(DTDForbidden):
             next(serializers.deserialize('xml', xml))
+
+    def test_unicode_serialization(self):
+        unicode_name = 'יוניקוד'
+        data = serializers.serialize('xml', [Author(name=unicode_name)])
+        self.assertIn(unicode_name, data)
+        objs = list(serializers.deserialize('xml', data))
+        self.assertEqual(objs[0].object.name, unicode_name)
 
 
 class XmlSerializerTransactionTestCase(SerializersTransactionTestBase, TransactionTestCase):
