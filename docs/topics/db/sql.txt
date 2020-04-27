@@ -24,7 +24,8 @@ __ `executing custom SQL directly`_
 
     Before using raw SQL, explore :doc:`the ORM </topics/db/index>`. Ask on
     |django-users| or the `#django IRC channel
-    <irc://irc.freenode.net/django>`_ to see if the ORM supports your use case.
+    <https://webchat.freenode.net/#django>`_ to see if the ORM supports your
+    use case.
 
 .. warning::
 

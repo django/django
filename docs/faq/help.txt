@@ -23,10 +23,12 @@ Then, please post it in one of the following channels:
   discussions.
 * The |django-users| mailing list. This is for email-based discussions.
 * The `#django IRC channel`_ on the Freenode IRC network. This is for
-  chat-based discussions.
+  chat-based discussions. If you're new to IRC, see the `Freenode
+  documentation`_ for different ways to connect.
 
 .. _`"Using Django"`: https://forum.djangoproject.com/c/users
-.. _`#django IRC channel`: irc://irc.freenode.net/django
+.. _#django IRC channel: https://webchat.freenode.net/#django
+.. _Freenode documentation: https://freenode.net/kb/answer/chat
 
 In all these channels please abide by the `Django Code of Conduct`_. In
 summary, being friendly and patient, considerate, respectful, and careful in
