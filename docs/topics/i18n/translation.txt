@@ -124,7 +124,7 @@ specified with Python's standard named-string interpolation syntax. Example::
 
 This technique lets language-specific translations reorder the placeholder
 text. For example, an English translation may be ``"Today is November 26."``,
-while a Spanish translation may be ``"Hoy es 26 de Noviembre."`` -- with the
+while a Spanish translation may be ``"Hoy es 26 de noviembre."`` -- with the
 month and the day placeholders swapped.
 
 For this reason, you should use named-string interpolation (e.g., ``%(day)s``)
