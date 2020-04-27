@@ -1238,6 +1238,16 @@ implementation details see :ref:`using-the-views`.
     :class:`~django.contrib.auth.forms.PasswordResetForm` and use the
     ``form_class`` attribute.
 
+    .. note::
+
+        Be aware that sending an email costs extra time, hence you may be
+        vulnerable to an email address enumeration timing attack due to a
+        difference between the duration of a reset request for an existing
+        email address and the duration of a reset request for a nonexistent
+        email address. To reduce the overhead, you can use a 3rd party package
+        that allows to send emails asynchronously, e.g. `django-mailer
+        <https://pypi.org/project/django-mailer/>`_.
+
     Users flagged with an unusable password (see
     :meth:`~django.contrib.auth.models.User.set_unusable_password()` aren't
     allowed to request a password reset to prevent misuse when using an
