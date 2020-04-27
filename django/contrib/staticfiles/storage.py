@@ -416,7 +416,11 @@ class ManifestFilesMixin(HashedFilesMixin):
         if cache_name is None:
             if self.manifest_strict:
                 raise ValueError("Missing staticfiles manifest entry for '%s'" % clean_name)
-            cache_name = self.clean_name(self.hashed_name(name))
+            try:
+                hashed = self.hashed_name(name)
+            except ValueError:
+                hashed = name
+            cache_name = self.clean_name(hashed)
         unparsed_name = list(parsed_name)
         unparsed_name[2] = cache_name
         # Special casing for a @font-face hack, like url(myfont.eot?#iefix")
