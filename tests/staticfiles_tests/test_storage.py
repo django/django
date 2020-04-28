@@ -354,6 +354,12 @@ class TestCollectionManifestStorage(TestHashedFiles, CollectionTestCase):
         manifest_content = storage.staticfiles_storage.load_manifest()
         self.assertNotIn(cleared_file_name, manifest_content)
 
+    def test_existing_static_path_resolves(self):
+        location = 'test/file.txt'
+        path = os.path.join(settings.STATIC_ROOT, location)
+        self.assertTrue(os.path.exists(path), 'Path "%s" did not exist' % path)
+        self.assertEqual(static(location), '/static/test/file.dad0999e4f8f.txt')
+
     def test_missing_entry(self):
         missing_file_name = 'cached/missing.css'
         configured_storage = storage.staticfiles_storage
@@ -384,12 +390,6 @@ class TestCollectionManifestStorage(TestHashedFiles, CollectionTestCase):
             ]),
             2,
         )
-
-    def test_existing_static_path_resolves(self):
-        location = 'test/file.txt'
-        path = os.path.join(settings.STATIC_ROOT, location)
-        self.assertTrue(os.path.exists(path), 'Path "%s" did not exist' % path)
-        self.assertEqual(static(location), '/static/test/file.dad0999e4f8f.txt')
 
 
 @override_settings(STATICFILES_STORAGE='staticfiles_tests.storage.SimpleStorage')
