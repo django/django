@@ -358,20 +358,23 @@ class TestCollectionManifestStorage(TestHashedFiles, CollectionTestCase):
         self.assertNotIn(missing_file_name, configured_storage.hashed_files)
 
         # File name not found in manifest
-        with self.assertRaisesMessage(ValueError, "Missing staticfiles manifest entry for '%s'" % missing_file_name):
+        msg = "Missing staticfiles manifest entry for '%s'" % missing_file_name
+        with self.assertRaisesMessage(ValueError, msg):
             self.hashed_file_path(missing_file_name)
 
         configured_storage.manifest_strict = False
         # File doesn't exist on disk
-        err_msg = "The file '%s' could not be found with %r." % (missing_file_name, configured_storage._wrapped)
-        with self.assertRaisesMessage(ValueError, err_msg):
-            self.hashed_file_path(missing_file_name)
+        with self.assertLogs('django.contrib.staticfiles', level='WARNING') as cm1:
+            self.assertEqual(self.hashed_file_path(missing_file_name), missing_file_name)
+        self.assertEqual(cm1.records[0].getMessage(), msg)
 
         content = StringIO()
         content.write('Found')
         configured_storage.save(missing_file_name, content)
         # File exists on disk
-        self.hashed_file_path(missing_file_name)
+        with self.assertLogs('django.contrib.staticfiles', level='WARNING') as cm2:
+            self.assertEqual(self.hashed_file_path(missing_file_name), missing_file_name)
+        self.assertEqual(cm2.records[0].getMessage(), msg)
 
     def test_intermediate_files(self):
         cached_files = os.listdir(os.path.join(settings.STATIC_ROOT, 'cached'))

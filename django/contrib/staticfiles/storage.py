@@ -1,5 +1,6 @@
 import hashlib
 import json
+import logging
 import os
 import posixpath
 import re
@@ -11,6 +12,8 @@ from django.core.exceptions import ImproperlyConfigured
 from django.core.files.base import ContentFile
 from django.core.files.storage import FileSystemStorage, get_storage_class
 from django.utils.functional import LazyObject
+
+logger = logging.getLogger('django.contrib.staticfiles')
 
 
 class StaticFilesStorage(FileSystemStorage):
@@ -413,9 +416,11 @@ class ManifestFilesMixin(HashedFilesMixin):
         hash_key = self.hash_key(clean_name)
         cache_name = self.hashed_files.get(hash_key)
         if cache_name is None:
+            msg = "Missing staticfiles manifest entry for '%s'" % clean_name
             if self.manifest_strict:
-                raise ValueError("Missing staticfiles manifest entry for '%s'" % clean_name)
-            cache_name = self.clean_name(self.hashed_name(name))
+                raise ValueError(msg)
+            logger.warning(msg)
+            cache_name = self.clean_name(name)
         unparsed_name = list(parsed_name)
         unparsed_name[2] = cache_name
         # Special casing for a @font-face hack, like url(myfont.eot?#iefix")
