@@ -12,6 +12,7 @@ from django.contrib.staticfiles.management.commands.collectstatic import (
     Command as CollectstaticCommand,
 )
 from django.core.management import call_command
+from django.templatetags.static import static
 from django.test import override_settings
 
 from .cases import CollectionTestCase
@@ -384,6 +385,44 @@ class TestCollectionManifestStorage(TestHashedFiles, CollectionTestCase):
             ]),
             2,
         )
+
+    def test_existing_static_path_resolves(self):
+        location = 'admin/js/vendor/jquery/jquery.js'
+        path = os.path.join(settings.STATIC_ROOT, location)
+        self.assertTrue(os.path.exists(path), 'Path "%s" did not exist' % path)
+
+        static_location = static(location)
+        static_location_parts = static_location.split('.')
+        self.assertEqual(static_location_parts[0], '/static/admin/js/vendor/jquery/jquery')
+        self.assertEqual(static_location_parts[-1], 'js')
+
+    def test_missing_static_path_resolves(self):
+        location = 'does-not-exist.txt'
+        path = os.path.join(settings.STATIC_ROOT, location)
+        self.assertFalse(os.path.exists(path), 'Path "%s" was not supposed to exist' % path)
+        self.assertEqual(static(location), '/static/does-not-exist.txt')
+
+    def test_served_static_response(self):
+        location = 'admin/js/vendor/jquery/jquery.js'
+        path = os.path.join(settings.STATIC_ROOT, location)
+        self.assertTrue(os.path.exists(path), 'Path "%s" did not exist' % path)
+
+        response = self.client.get(static(location))
+        self.assertEqual(response.status_code, 200)
+
+        self.assertTrue(response.streaming)
+        response_content = b''.join(response.streaming_content)
+        with open(path, 'rb') as fp:
+            disk_content = fp.read()
+        self.assertEqual(response_content, disk_content)
+
+    def test_missing_static_response(self):
+        location = 'does-not-exist.txt'
+        path = os.path.join(settings.STATIC_ROOT, location)
+        self.assertFalse(os.path.exists(path), 'Path "%s" was not supposed to exist' % path)
+
+        response = self.client.get(static(location))
+        self.assertEqual(response.status_code, 404)
 
 
 @override_settings(STATICFILES_STORAGE='staticfiles_tests.storage.SimpleStorage')
