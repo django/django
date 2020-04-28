@@ -388,7 +388,7 @@ class TestCollectionManifestStorage(TestHashedFiles, CollectionTestCase):
         location = 'test/file.txt'
         path = os.path.join(settings.STATIC_ROOT, location)
         self.assertTrue(os.path.exists(path), 'Path "%s" did not exist' % path)
-        self.assertEqual(static(location), '/static/test/file.1234567.txt')
+        self.assertEqual(static(location), '/static/test/file.dad0999e4f8f.txt')
 
     def test_missing_static_path_resolves(self):
         storage.staticfiles_storage.manifest_strict = False
