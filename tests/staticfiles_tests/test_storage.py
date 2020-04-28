@@ -417,18 +417,9 @@ class TestServedCollectionManifestStorage(CollectionTestCase, LiveServerTestCase
         return urlopen(self.live_server_url + url)
 
     def test_existing_static_response(self):
-        location = 'test/file.txt'
-        path = os.path.join(settings.STATIC_ROOT, location)
-        self.assertTrue(os.path.exists(path), 'Path "%s" did not exist' % path)
-
         with self.urlopen('/static/test/file.dad0999e4f8f.txt') as response:
             self.assertEqual(response.getcode(), 200)
-            response_content = response.read()
-
-        with open(path, 'rb') as fp:
-            disk_content = fp.read()
-        self.assertEqual(response_content, disk_content)
-        self.assertEqual(response_content, b'In static directory.\n')
+            self.assertEqual(response.read(), b'In static directory.\n')
 
     def test_missing_static_response(self):
         storage.staticfiles_storage.manifest_strict = False
