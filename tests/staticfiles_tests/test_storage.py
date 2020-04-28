@@ -14,7 +14,7 @@ from django.contrib.staticfiles.management.commands.collectstatic import (
 )
 from django.core.management import call_command
 from django.templatetags.static import static
-from django.test import override_settings, LiveServerTestCase
+from django.test import LiveServerTestCase, override_settings
 
 from .cases import CollectionTestCase
 from .settings import TEST_ROOT
