@@ -264,7 +264,7 @@ class TestExtraPatternsStorage(CollectionTestCase):
 @override_settings(
     STATICFILES_STORAGE='django.contrib.staticfiles.storage.ManifestStaticFilesStorage',
 )
-class TestCollectionManifestStorage(TestHashedFiles, CollectionTestCase, LiveServerTestCase):
+class TestCollectionManifestStorage(TestHashedFiles, CollectionTestCase):
     """
     Tests for the Cache busting storage
     """
@@ -398,6 +398,13 @@ class TestCollectionManifestStorage(TestHashedFiles, CollectionTestCase, LiveSer
         self.assertFalse(os.path.exists(path), 'Path "%s" was not supposed to exist' % path)
         self.assertEqual(static(location), '/static/does-not-exist.txt')
 
+
+@override_settings(
+    STATICFILES_STORAGE='django.contrib.staticfiles.storage.ManifestStaticFilesStorage',
+)
+class TestCollectionManifestStorage(CollectionTestCase, LiveServerTestCase):
+    available_apps = []
+
     def urlopen(self, url):
         return urlopen(self.live_server_url + url)
 
@@ -413,6 +420,7 @@ class TestCollectionManifestStorage(TestHashedFiles, CollectionTestCase, LiveSer
         with open(path, 'rb') as fp:
             disk_content = fp.read()
         self.assertEqual(response_content, disk_content)
+        self.assertEqual(response_content, b'In static directory.\n')
 
     def test_missing_static_response(self):
         storage.staticfiles_storage.manifest_strict = False
