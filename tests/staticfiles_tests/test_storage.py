@@ -14,7 +14,7 @@ from django.contrib.staticfiles.management.commands.collectstatic import (
 )
 from django.core.management import call_command
 from django.templatetags.static import static
-from django.test import LiveServerTestCase, override_settings
+from django.test import override_settings
 
 from .cases import CollectionTestCase
 from .settings import TEST_ROOT
@@ -397,34 +397,6 @@ class TestCollectionManifestStorage(TestHashedFiles, CollectionTestCase):
         path = os.path.join(settings.STATIC_ROOT, location)
         self.assertFalse(os.path.exists(path), 'Path "%s" was not supposed to exist' % path)
         self.assertEqual(static(location), '/static/does-not-exist.txt')
-
-
-@override_settings(
-    STATICFILES_STORAGE='django.contrib.staticfiles.storage.ManifestStaticFilesStorage',
-)
-class TestServedCollectionManifestStorage(CollectionTestCase, LiveServerTestCase):
-    available_apps = []
-
-    def setUp(self):
-        super().setUp()
-        self._manifest_strict = storage.staticfiles_storage.manifest_strict
-
-    def tearDown(self):
-        storage.staticfiles_storage.manifest_strict = self._manifest_strict
-        super().tearDown()
-
-    def urlopen(self, url):
-        return urlopen(self.live_server_url + url)
-
-    def test_existing_static_response(self):
-        with self.urlopen('/static/test/file.dad0999e4f8f.txt') as response:
-            self.assertEqual(response.getcode(), 200)
-            self.assertEqual(response.read(), b'In static directory.\n')
-
-    def test_missing_static_response(self):
-        storage.staticfiles_storage.manifest_strict = False
-        with self.urlopen('/static/does-not-exist.txt') as response:
-            self.assertEqual(response.getcode(), 404)
 
 
 @override_settings(STATICFILES_STORAGE='staticfiles_tests.storage.SimpleStorage')
