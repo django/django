@@ -402,7 +402,7 @@ class TestCollectionManifestStorage(TestHashedFiles, CollectionTestCase):
 @override_settings(
     STATICFILES_STORAGE='django.contrib.staticfiles.storage.ManifestStaticFilesStorage',
 )
-class TestCollectionManifestStorage(CollectionTestCase, LiveServerTestCase):
+class TestServedCollectionManifestStorage(CollectionTestCase, LiveServerTestCase):
     available_apps = []
 
     def urlopen(self, url):
