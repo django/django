@@ -257,9 +257,9 @@ File Storage
   This allows you to modify the used storage at runtime, selecting different
   storages for different environments, for example.
 
-* Setting ``ManifestStaticFilesStorage.manifest_strict`` to `False` suppresses the
+* Setting ``ManifestStaticFilesStorage.manifest_strict`` to ``False`` suppresses the
   ValueError raised when resolving urls for missing files. This allows templates to
-  render when {% static %} is provided an invalid file name.
+  render when ``{% static %}`` is provided an invalid file name.
 
 
 File Uploads
