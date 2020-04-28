@@ -385,14 +385,12 @@ class TestCollectionManifestStorage(TestHashedFiles, CollectionTestCase):
         )
 
     def test_existing_static_path_resolves(self):
-        location = 'admin/js/vendor/jquery/jquery.js'
+        location = 'test/file.txt'
         path = os.path.join(settings.STATIC_ROOT, location)
         self.assertTrue(os.path.exists(path), 'Path "%s" did not exist' % path)
 
         static_location = static(location)
-        static_location_parts = static_location.split('.')
-        self.assertEqual(static_location_parts[0], '/static/admin/js/vendor/jquery/jquery')
-        self.assertEqual(static_location_parts[-1], 'js')
+        self.assertEqual(static(location), '/static/test/file.1234567.txt')
 
     def test_missing_static_path_resolves(self):
         storage.staticfiles_storage.manifest_strict = False
@@ -402,7 +400,7 @@ class TestCollectionManifestStorage(TestHashedFiles, CollectionTestCase):
         self.assertEqual(static(location), '/static/does-not-exist.txt')
 
     def test_served_static_response(self):
-        location = 'admin/js/vendor/jquery/jquery.js'
+        location = 'test/file.txt'
         path = os.path.join(settings.STATIC_ROOT, location)
         self.assertTrue(os.path.exists(path), 'Path "%s" did not exist' % path)
 
