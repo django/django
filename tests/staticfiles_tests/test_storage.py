@@ -370,7 +370,7 @@ class TestCollectionManifestStorage(TestHashedFiles, CollectionTestCase):
         content.write('Found')
         configured_storage.save(missing_file_name, content)
         # File exists on disk
-        self.assertEqual(self.hashed_file_path(missing_file_name), 'cached/missing.1234567.css')
+        self.assertEqual(self.hashed_file_path(missing_file_name), 'cached/missing.5d695cc28c6a.css')
 
     def test_intermediate_files(self):
         cached_files = os.listdir(os.path.join(settings.STATIC_ROOT, 'cached'))
