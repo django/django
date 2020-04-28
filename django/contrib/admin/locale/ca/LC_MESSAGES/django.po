@@ -702,7 +702,7 @@ msgstr "Seleccioneu %s per modificar"
 
 #, python-format
 msgid "Select %s to view"
-msgstr "Selecciona %sper a veure"
+msgstr "Selecciona %s per a veure"
 
 msgid "Date:"
 msgstr "Data:"
