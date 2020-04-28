@@ -5,6 +5,7 @@ import tempfile
 import unittest
 from io import StringIO
 from unittest import mock
+from urllib.request import urlopen
 
 from django.conf import settings
 from django.contrib.staticfiles import finders, storage
@@ -13,7 +14,7 @@ from django.contrib.staticfiles.management.commands.collectstatic import (
 )
 from django.core.management import call_command
 from django.templatetags.static import static
-from django.test import override_settings
+from django.test import override_settings, LiveServerTestCase
 
 from .cases import CollectionTestCase
 from .settings import TEST_ROOT
@@ -263,7 +264,7 @@ class TestExtraPatternsStorage(CollectionTestCase):
 @override_settings(
     STATICFILES_STORAGE='django.contrib.staticfiles.storage.ManifestStaticFilesStorage',
 )
-class TestCollectionManifestStorage(TestHashedFiles, CollectionTestCase):
+class TestCollectionManifestStorage(TestHashedFiles, CollectionTestCase, LiveServerTestCase):
     """
     Tests for the Cache busting storage
     """
@@ -397,16 +398,18 @@ class TestCollectionManifestStorage(TestHashedFiles, CollectionTestCase):
         self.assertFalse(os.path.exists(path), 'Path "%s" was not supposed to exist' % path)
         self.assertEqual(static(location), '/static/does-not-exist.txt')
 
+    def urlopen(self, url):
+        return urlopen(self.live_server_url + url)
+
     def test_existing_static_response(self):
         location = 'test/file.txt'
         path = os.path.join(settings.STATIC_ROOT, location)
         self.assertTrue(os.path.exists(path), 'Path "%s" did not exist' % path)
 
-        response = self.client.get(static(location))
-        self.assertEqual(response.status_code, 200)
+        with self.urlopen(static(location)) as response:
+            self.assertEqual(response.getcode(), 200)
+            response_content = response.read()
 
-        self.assertTrue(response.streaming)
-        response_content = b''.join(response.streaming_content)
         with open(path, 'rb') as fp:
             disk_content = fp.read()
         self.assertEqual(response_content, disk_content)
@@ -417,8 +420,8 @@ class TestCollectionManifestStorage(TestHashedFiles, CollectionTestCase):
         path = os.path.join(settings.STATIC_ROOT, location)
         self.assertFalse(os.path.exists(path), 'Path "%s" was not supposed to exist' % path)
 
-        response = self.client.get(static(location))
-        self.assertEqual(response.status_code, 404)
+        with self.urlopen(static(location)) as response:
+            self.assertEqual(response.getcode(), 404)
 
 
 @override_settings(STATICFILES_STORAGE='staticfiles_tests.storage.SimpleStorage')
