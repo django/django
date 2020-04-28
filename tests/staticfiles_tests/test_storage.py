@@ -421,7 +421,7 @@ class TestServedCollectionManifestStorage(CollectionTestCase, LiveServerTestCase
         path = os.path.join(settings.STATIC_ROOT, location)
         self.assertTrue(os.path.exists(path), 'Path "%s" did not exist' % path)
 
-        with self.urlopen(static(location)) as response:
+        with self.urlopen('/static/test/file.dad0999e4f8f.txt') as response:
             self.assertEqual(response.getcode(), 200)
             response_content = response.read()
 
