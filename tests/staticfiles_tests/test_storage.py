@@ -405,6 +405,14 @@ class TestCollectionManifestStorage(TestHashedFiles, CollectionTestCase):
 class TestServedCollectionManifestStorage(CollectionTestCase, LiveServerTestCase):
     available_apps = []
 
+    def setUp(self):
+        super().setUp()
+        self._manifest_strict = storage.staticfiles_storage.manifest_strict
+
+    def tearDown(self):
+        storage.staticfiles_storage.manifest_strict = self._manifest_strict
+        super().tearDown()
+
     def urlopen(self, url):
         return urlopen(self.live_server_url + url)
 
