@@ -395,6 +395,7 @@ class TestCollectionManifestStorage(TestHashedFiles, CollectionTestCase):
         self.assertEqual(static_location_parts[-1], 'js')
 
     def test_missing_static_path_resolves(self):
+        storage.staticfiles_storage.manifest_strict = False
         location = 'does-not-exist.txt'
         path = os.path.join(settings.STATIC_ROOT, location)
         self.assertFalse(os.path.exists(path), 'Path "%s" was not supposed to exist' % path)
@@ -415,6 +416,7 @@ class TestCollectionManifestStorage(TestHashedFiles, CollectionTestCase):
         self.assertEqual(response_content, disk_content)
 
     def test_missing_static_response(self):
+        storage.staticfiles_storage.manifest_strict = False
         location = 'does-not-exist.txt'
         path = os.path.join(settings.STATIC_ROOT, location)
         self.assertFalse(os.path.exists(path), 'Path "%s" was not supposed to exist' % path)
