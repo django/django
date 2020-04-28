@@ -423,11 +423,7 @@ class TestServedCollectionManifestStorage(CollectionTestCase, LiveServerTestCase
 
     def test_missing_static_response(self):
         storage.staticfiles_storage.manifest_strict = False
-        location = 'does-not-exist.txt'
-        path = os.path.join(settings.STATIC_ROOT, location)
-        self.assertFalse(os.path.exists(path), 'Path "%s" was not supposed to exist' % path)
-
-        with self.urlopen(static(location)) as response:
+        with self.urlopen('/static/does-not-exist.txt') as response:
             self.assertEqual(response.getcode(), 404)
 
 
