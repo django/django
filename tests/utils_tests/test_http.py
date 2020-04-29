@@ -1,3 +1,4 @@
+import platform
 import unittest
 from datetime import datetime
 from unittest import mock
@@ -317,6 +318,7 @@ class HttpDateProcessingTests(unittest.TestCase):
         parsed = parse_http_date('Sun, 06 Nov 1994 08:49:37 GMT')
         self.assertEqual(datetime.utcfromtimestamp(parsed), datetime(1994, 11, 6, 8, 49, 37))
 
+    @unittest.skipIf(platform.architecture()[0] == '32bit', 'The Year 2038 problem.')
     @mock.patch('django.utils.http.datetime.datetime')
     def test_parsing_rfc850(self, mocked_datetime):
         mocked_datetime.side_effect = datetime
