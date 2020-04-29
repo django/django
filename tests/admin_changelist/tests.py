@@ -1326,9 +1326,9 @@ class SeleniumTests(AdminSeleniumTestCase):
         try:
             self.assertEqual(
                 alert.text,
-                'You have selected an action, but you haven\'t saved your '
+                'You have selected an action, but you haven’t saved your '
                 'changes to individual fields yet. Please click OK to save. '
-                'You\'ll need to re-run the action.',
+                'You’ll need to re-run the action.',
             )
         finally:
             alert.dismiss()
@@ -1349,8 +1349,8 @@ class SeleniumTests(AdminSeleniumTestCase):
         try:
             self.assertEqual(
                 alert.text,
-                'You have selected an action, and you haven\'t made any '
-                'changes on individual fields. You\'re probably looking for '
+                'You have selected an action, and you haven’t made any '
+                'changes on individual fields. You’re probably looking for '
                 'the Go button rather than the Save button.',
             )
         finally:
