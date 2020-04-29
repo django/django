@@ -100,6 +100,3 @@ class UUIDPK(models.Model):
 class UUID(models.Model):
     uuid = models.UUIDField(null=True)
     uuid_fk = models.ForeignKey(UUIDPK, models.CASCADE, null=True)
-
-    def __str__(self):
-        return "%s" % self.uuid
