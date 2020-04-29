@@ -713,6 +713,10 @@ The following attributes and methods are available on any subclass of
         Returns an HMAC of the password field. Used for
         :ref:`session-invalidation-on-password-change`.
 
+        .. versionchanged:: 3.1
+
+            The hashing algorithm was changed to the SHA-256.
+
 :class:`~models.AbstractUser` subclasses :class:`~models.AbstractBaseUser`:
 
 .. class:: models.AbstractUser

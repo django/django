@@ -98,6 +98,10 @@ Minor features
 * The password reset mechanism now uses the SHA-256 hashing algorithm. Support
   for tokens that use the old hashing algorithm remains until Django 4.0.
 
+* :meth:`.AbstractBaseUser.get_session_auth_hash` now uses the SHA-256 hashing
+  algorithm. Support for user sessions that use the old hashing algorithm
+  remains until Django 4.0.
+
 :mod:`django.contrib.contenttypes`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

@@ -10,7 +10,7 @@ from django.apps import apps
 from django.conf import settings
 from django.contrib.admin.models import LogEntry
 from django.contrib.auth import (
-    BACKEND_SESSION_KEY, REDIRECT_FIELD_NAME, SESSION_KEY,
+    BACKEND_SESSION_KEY, HASH_SESSION_KEY, REDIRECT_FIELD_NAME, SESSION_KEY,
 )
 from django.contrib.auth.forms import (
     AuthenticationForm, PasswordChangeForm, SetPasswordForm,
@@ -709,6 +709,27 @@ class LoginTest(AuthViewsTestCase):
         user.save()
 
         self.login(password='foobar')
+        self.assertNotEqual(original_session_key, self.client.session.session_key)
+
+    def test_legacy_session_key_flushed_on_login(self):
+        # RemovedInDjango40Warning.
+        user = User.objects.get(username='testclient')
+        engine = import_module(settings.SESSION_ENGINE)
+        session = engine.SessionStore()
+        session[SESSION_KEY] = user.id
+        session[HASH_SESSION_KEY] = user._legacy_get_session_auth_hash()
+        session.save()
+        original_session_key = session.session_key
+        self.client.cookies[settings.SESSION_COOKIE_NAME] = original_session_key
+        # Legacy session key is flushed on login.
+        self.login()
+        self.assertNotEqual(original_session_key, self.client.session.session_key)
+        # Legacy session key is flushed after a password change.
+        user.set_password('password_2')
+        user.save()
+        original_session_key = session.session_key
+        self.client.cookies[settings.SESSION_COOKIE_NAME] = original_session_key
+        self.login(password='password_2')
         self.assertNotEqual(original_session_key, self.client.session.session_key)
 
     def test_login_session_without_hash_session_key(self):
