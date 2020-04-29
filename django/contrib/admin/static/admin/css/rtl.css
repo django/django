@@ -257,13 +257,3 @@ form .form-row p.datetime {
     margin-left: inherit;
     margin-right: 2px;
 }
-
-/* IE7 specific bug fixes */
-
-div.colM {
-    position: relative;
-}
-
-.submit-row input {
-    float: left;
-}
