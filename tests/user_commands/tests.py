@@ -44,7 +44,7 @@ class CommandTests(SimpleTestCase):
 
     def test_language_preserved(self):
         with translation.override('fr'):
-            management.call_command('dance', verbosity=0)
+            management.call_command('dance')
             self.assertEqual(translation.get_language(), 'fr')
 
     def test_explode(self):
@@ -119,7 +119,7 @@ class CommandTests(SimpleTestCase):
         It should be possible to pass non-string arguments to call_command.
         """
         out = StringIO()
-        management.call_command('dance', 1, verbosity=0, stdout=out)
+        management.call_command('dance', 1, stdout=out)
         self.assertIn("You passed 1 as a positional argument.", out.getvalue())
 
     def test_calling_a_command_with_only_empty_parameter_should_ends_gracefully(self):
@@ -159,9 +159,9 @@ class CommandTests(SimpleTestCase):
         saved_check = BaseCommand.check
         BaseCommand.check = patched_check
         try:
-            management.call_command("dance", verbosity=0)
+            management.call_command("dance")
             self.assertEqual(self.counter, 0)
-            management.call_command("dance", verbosity=0, skip_checks=False)
+            management.call_command("dance", skip_checks=False)
             self.assertEqual(self.counter, 1)
         finally:
             BaseCommand.check = saved_check
@@ -171,10 +171,10 @@ class CommandTests(SimpleTestCase):
         self.assertIs(requires_migrations_checks, False)
         try:
             with mock.patch.object(BaseCommand, 'check_migrations') as check_migrations:
-                management.call_command('dance', verbosity=0)
+                management.call_command('dance')
                 self.assertFalse(check_migrations.called)
                 dance.Command.requires_migrations_checks = True
-                management.call_command('dance', verbosity=0)
+                management.call_command('dance')
                 self.assertTrue(check_migrations.called)
         finally:
             dance.Command.requires_migrations_checks = requires_migrations_checks
