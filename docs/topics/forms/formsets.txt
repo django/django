@@ -126,6 +126,38 @@ affect validation.  If ``validate_max=True`` is passed to the
 :func:`~django.forms.formsets.formset_factory`, then ``max_num`` will affect
 validation.  See :ref:`validate_max`.
 
+.. _formsets-absolute-max:
+
+Limiting the maximum number of instantiated forms
+=================================================
+
+.. versionadded:: 3.2
+
+The ``absolute_max`` parameter to :func:`.formset_factory` allows limiting the
+number of forms that can be instantiated when supplying ``POST`` data. This
+protects against memory exhaustion attacks using forged ``POST`` requests::
+
+    >>> from django.forms.formsets import formset_factory
+    >>> from myapp.forms import ArticleForm
+    >>> ArticleFormSet = formset_factory(ArticleForm, absolute_max=1500)
+    >>> data = {
+    ...     'form-TOTAL_FORMS': '1501',
+    ...     'form-INITIAL_FORMS': '0',
+    ...     'form-MAX_NUM_FORMS': '',
+    ... }
+    >>> formset = ArticleFormSet(data)
+    >>> len(formset.forms)
+    1500
+    >>> formset.is_valid()
+    False
+    >>> formset.non_form_errors()
+    ['Please submit 1000 or fewer forms.']
+
+When ``absolute_max`` is None, it defaults to ``max_num + 1000``. (If
+``max_num`` is ``None``, it defaults to ``2000``).
+
+If ``absolute_max`` is less than ``max_num``, a ``ValueError`` will be raised.
+
 Formset validation
 ==================
 
@@ -348,11 +380,11 @@ excessive.
 .. note::
 
     Regardless of ``validate_max``, if the number of forms in a data set
-    exceeds ``max_num`` by more than 1000, then the form will fail to validate
-    as if ``validate_max`` were set, and additionally only the first 1000
-    forms above ``max_num`` will be validated.  The remainder will be
-    truncated entirely.  This is to protect against memory exhaustion attacks
-    using forged POST requests.
+    exceeds ``absolute_max``, then the form will fail to validate as if
+    ``validate_max`` were set, and additionally only the first ``absolute_max``
+    forms will be validated. The remainder will be truncated entirely. This is
+    to protect against memory exhaustion attacks using forged POST requests.
+    See :ref:`formsets-absolute-max`.
 
 ``validate_min``
 ----------------

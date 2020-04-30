@@ -136,7 +136,10 @@ File Uploads
 Forms
 ~~~~~
 
-* ...
+* The new ``absolute_max`` argument for :func:`.formset_factory`,
+  :func:`.inlineformset_factory`, and :func:`.modelformset_factory` allows
+  customizing the maximum number of forms that can be instantiated when
+  supplying ``POST`` data. See :ref:`formsets-absolute-max` for more details.
 
 Generic Views
 ~~~~~~~~~~~~~

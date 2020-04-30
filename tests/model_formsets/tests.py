@@ -1838,3 +1838,81 @@ class TestModelFormsetOverridesTroughFormMeta(TestCase):
         form = BookFormSet.form(data={'title': 'Foo ' * 30, 'author': author.id})
         self.assertIs(Book._meta.get_field('title').__class__, models.CharField)
         self.assertIsInstance(form.fields['title'], forms.SlugField)
+
+    def test_modelformset_factory_absolute_max(self):
+        AuthorFormSet = modelformset_factory(Author, fields='__all__', absolute_max=1500)
+        data = {
+            'form-TOTAL_FORMS': '1501',
+            'form-INITIAL_FORMS': '0',
+            'form-MAX_NUM_FORMS': '0',
+        }
+        formset = AuthorFormSet(data=data)
+        self.assertIs(formset.is_valid(), False)
+        self.assertEqual(len(formset.forms), 1500)
+        self.assertEqual(
+            formset.non_form_errors(),
+            ['Please submit 1000 or fewer forms.'],
+        )
+
+    def test_modelformset_factory_absolute_max_with_max_num(self):
+        AuthorFormSet = modelformset_factory(
+            Author,
+            fields='__all__',
+            max_num=20,
+            absolute_max=100,
+        )
+        data = {
+            'form-TOTAL_FORMS': '101',
+            'form-INITIAL_FORMS': '0',
+            'form-MAX_NUM_FORMS': '0',
+        }
+        formset = AuthorFormSet(data=data)
+        self.assertIs(formset.is_valid(), False)
+        self.assertEqual(len(formset.forms), 100)
+        self.assertEqual(
+            formset.non_form_errors(),
+            ['Please submit 20 or fewer forms.'],
+        )
+
+    def test_inlineformset_factory_absolute_max(self):
+        author = Author.objects.create(name='Charles Baudelaire')
+        BookFormSet = inlineformset_factory(
+            Author,
+            Book,
+            fields='__all__',
+            absolute_max=1500,
+        )
+        data = {
+            'book_set-TOTAL_FORMS': '1501',
+            'book_set-INITIAL_FORMS': '0',
+            'book_set-MAX_NUM_FORMS': '0',
+        }
+        formset = BookFormSet(data, instance=author)
+        self.assertIs(formset.is_valid(), False)
+        self.assertEqual(len(formset.forms), 1500)
+        self.assertEqual(
+            formset.non_form_errors(),
+            ['Please submit 1000 or fewer forms.'],
+        )
+
+    def test_inlineformset_factory_absolute_max_with_max_num(self):
+        author = Author.objects.create(name='Charles Baudelaire')
+        BookFormSet = inlineformset_factory(
+            Author,
+            Book,
+            fields='__all__',
+            max_num=20,
+            absolute_max=100,
+        )
+        data = {
+            'book_set-TOTAL_FORMS': '101',
+            'book_set-INITIAL_FORMS': '0',
+            'book_set-MAX_NUM_FORMS': '0',
+        }
+        formset = BookFormSet(data, instance=author)
+        self.assertIs(formset.is_valid(), False)
+        self.assertEqual(len(formset.forms), 100)
+        self.assertEqual(
+            formset.non_form_errors(),
+            ['Please submit 20 or fewer forms.'],
+        )
