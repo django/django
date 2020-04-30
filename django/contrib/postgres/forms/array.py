@@ -1,4 +1,5 @@
 import copy
+import re
 from itertools import chain
 
 from django import forms
@@ -37,6 +38,8 @@ class SimpleArrayField(forms.CharField):
         return value
 
     def to_python(self, value):
+        delimiter_ip = re.compile(self.delimiter)
+        items = delimiter_ip.split(value)
         if isinstance(value, list):
             items = value
         elif value:
