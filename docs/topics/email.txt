@@ -341,15 +341,16 @@ The class has the following methods:
 
        message.attach('design.png', img_data, 'image/png')
 
-    If you specify a ``mimetype`` of ``message/rfc822``, it will also accept
-    :class:`django.core.mail.EmailMessage` and :py:class:`email.message.Message`.
+    If you specify a ``mimetype`` of :mimetype:`message/rfc822`, it will also
+    accept :class:`django.core.mail.EmailMessage` and
+    :py:class:`email.message.Message`.
 
-    For a ``mimetype`` starting with ``text/``, content is expected to be a
-    string. Binary data will be decoded using UTF-8, and if that fails, the
-    MIME type will be changed to ``application/octet-stream`` and the data will
-    be attached unchanged.
+    For a ``mimetype`` starting with :mimetype:`text/`, content is expected to
+    be a string. Binary data will be decoded using UTF-8, and if that fails,
+    the MIME type will be changed to :mimetype:`application/octet-stream` and
+    the data will be attached unchanged.
 
-    In addition, ``message/rfc822`` attachments will no longer be
+    In addition, :mimetype:`message/rfc822` attachments will no longer be
     base64-encoded in violation of :rfc:`2046#section-5.2.1`, which can cause
     issues with displaying the attachments in `Evolution`__ and `Thunderbird`__.
 
@@ -363,7 +364,7 @@ The class has the following methods:
 
     message.attach_file('/images/weather_map.png')
 
-  For MIME types starting with ``text/``, binary data is handled as in
+  For MIME types starting with :mimetype:`text/`, binary data is handled as in
   ``attach()``.
 
 Sending alternative content types

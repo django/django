@@ -1287,8 +1287,8 @@ implementation details see :ref:`using-the-views`.
       default context data passed to the template.
 
     * ``html_email_template_name``: The full name of a template to use
-      for generating a ``text/html`` multipart email with the password reset
-      link. By default, HTML email is not sent.
+      for generating a :mimetype:`text/html` multipart email with the password
+      reset link. By default, HTML email is not sent.
 
     * ``extra_email_context``: A dictionary of context data that will be
       available in the email template. It can be used to override default

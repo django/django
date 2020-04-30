@@ -275,8 +275,8 @@ Email
   headers in the local time zone rather than in UTC.
 
 * ``EmailMessage.attach()`` and ``attach_file()`` now fall back to MIME type
-  ``application/octet-stream`` when binary content that can't be decoded as
-  UTF-8 is specified for a ``text/*`` attachment.
+  :mimetype:`application/octet-stream` when binary content that can't be
+  decoded as UTF-8 is specified for a :mimetype:`text/*` attachment.
 
 File Storage
 ~~~~~~~~~~~~
