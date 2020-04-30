@@ -76,11 +76,9 @@ Here are some useful attributes of ``UploadedFile``:
         for line in uploadedfile:
             do_something_with(line)
 
-    Lines are split using `universal newlines`_. The following are recognized
-    as ending a line: the Unix end-of-line convention ``'\n'``, the Windows
-    convention ``'\r\n'``, and the old Macintosh convention ``'\r'``.
-
-    .. _universal newlines: https://www.python.org/dev/peps/pep-0278
+    Lines are split using :pep:`universal newlines <278>`. The following are
+    recognized as ending a line: the Unix end-of-line convention ``'\n'``, the
+    Windows convention ``'\r\n'``, and the old Macintosh convention ``'\r'``.
 
 Subclasses of ``UploadedFile`` include:
 

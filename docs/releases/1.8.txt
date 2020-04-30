@@ -1123,11 +1123,9 @@ Miscellaneous
   check framework (unless you pass it ``skip_checks=False``).
 
 * When iterating over lines, :class:`~django.core.files.File` now uses
-  `universal newlines`_. The following are recognized as ending a line: the
-  Unix end-of-line convention ``'\n'``, the Windows convention ``'\r\n'``, and
-  the old Macintosh convention ``'\r'``.
-
-  .. _universal newlines: https://www.python.org/dev/peps/pep-0278
+  :pep:`universal newlines <278>`. The following are recognized as ending a
+  line: the Unix end-of-line convention ``'\n'``, the Windows convention
+  ``'\r\n'``, and the old Macintosh convention ``'\r'``.
 
 * The Memcached cache backends ``MemcachedCache`` and ``PyLibMCCache`` will
   delete a key if ``set()`` fails. This is necessary to ensure the ``cache_db``
