@@ -283,8 +283,8 @@ at the top level (i.e. evaluated when the module is imported). The explanation
 for this is as follows:
 
 Manual configuration of settings (i.e. not relying on the
-``DJANGO_SETTINGS_MODULE`` environment variable) is allowed and possible as
-follows::
+:envvar:`DJANGO_SETTINGS_MODULE` environment variable) is allowed and possible
+as follows::
 
     from django.conf import settings
 

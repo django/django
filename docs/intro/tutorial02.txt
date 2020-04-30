@@ -378,8 +378,8 @@ API Django gives you. To invoke the Python shell, use this command:
     $ python manage.py shell
 
 We're using this instead of simply typing "python", because :file:`manage.py`
-sets the ``DJANGO_SETTINGS_MODULE`` environment variable, which gives Django
-the Python import path to your :file:`mysite/settings.py` file.
+sets the :envvar:`DJANGO_SETTINGS_MODULE` environment variable, which gives
+Django the Python import path to your :file:`mysite/settings.py` file.
 
 Once you're in the shell, explore the :doc:`database API </topics/db/queries>`::
 

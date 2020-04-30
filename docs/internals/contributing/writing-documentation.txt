@@ -246,6 +246,10 @@ documentation:
 * Use :rst:role:`:mimetype:<mimetype>` to refer to a MIME Type unless the value
   is quoted for a code example.
 
+* Use :rst:role:`:envvar:<envvar>` to refer to an environment variable. You may
+  also need to define a reference to the documentation for that environment
+  variable using :rst:dir:`.. envvar:: <envvar>`.
+
 Django-specific markup
 ======================
 

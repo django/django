@@ -111,7 +111,7 @@ Asynchronous support
 
 The following checks verify your setup for :doc:`/topics/async`:
 
-* **async.E001**: You should not set the ``DJANGO_ALLOW_ASYNC_UNSAFE``
+* **async.E001**: You should not set the :envvar:`DJANGO_ALLOW_ASYNC_UNSAFE`
   environment variable in deployment. This disables :ref:`async safety
   protection <async-safety>`.
 

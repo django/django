@@ -2,12 +2,12 @@
 FAQ: Using Django
 =================
 
-Why do I get an error about importing DJANGO_SETTINGS_MODULE?
-=============================================================
+Why do I get an error about importing :envvar:`DJANGO_SETTINGS_MODULE`?
+=======================================================================
 
 Make sure that:
 
-* The environment variable DJANGO_SETTINGS_MODULE is set to a
+* The environment variable :envvar:`DJANGO_SETTINGS_MODULE` is set to a
   fully-qualified Python module (i.e. "mysite.settings").
 
 * Said module is on ``sys.path`` (``import mysite.settings`` should work).
