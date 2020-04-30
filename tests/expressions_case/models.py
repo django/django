@@ -38,24 +38,15 @@ class CaseTestModel(models.Model):
     uuid = models.UUIDField(null=True)
     fk = models.ForeignKey('self', models.CASCADE, null=True)
 
-    def __str__(self):
-        return "%i, %s" % (self.integer, self.string)
-
 
 class O2OCaseTestModel(models.Model):
     o2o = models.OneToOneField(CaseTestModel, models.CASCADE, related_name='o2o_rel')
     integer = models.IntegerField()
 
-    def __str__(self):
-        return "%i, %s" % (self.id, self.o2o)
-
 
 class FKCaseTestModel(models.Model):
     fk = models.ForeignKey(CaseTestModel, models.CASCADE, related_name='fk_rel')
     integer = models.IntegerField()
-
-    def __str__(self):
-        return "%i, %s" % (self.id, self.fk)
 
 
 class Client(models.Model):
@@ -74,6 +65,3 @@ class Client(models.Model):
         choices=ACCOUNT_TYPE_CHOICES,
         default=REGULAR,
     )
-
-    def __str__(self):
-        return self.name

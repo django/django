@@ -81,16 +81,10 @@ class Game(models.Model):
     home = models.CharField(max_length=100)
     away = models.CharField(max_length=100)
 
-    def __str__(self):
-        return "%s at %s" % (self.away, self.home)
-
 
 class Player(models.Model):
     name = models.CharField(max_length=100)
     games = models.ManyToManyField(Game, related_name='players')
-
-    def __str__(self):
-        return self.name
 
 
 class Product(models.Model):
