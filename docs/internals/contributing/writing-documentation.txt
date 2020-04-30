@@ -239,6 +239,10 @@ documentation:
   section if possible. For example, use ``:rfc:`2324#section-2.3.2``` or
   ``:rfc:`Custom link text <2324#section-2.3.2>```.
 
+* Use :rst:role:`:pep:<pep>` to reference a Python Enhancement Proposal (PEP)
+  and try to link to the relevant section if possible. For example, use
+  ``:pep:`20#easter-egg``` or ``:pep:`Easter Egg <20#easter-egg>```.
+
 Django-specific markup
 ======================
 

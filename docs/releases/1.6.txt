@@ -173,7 +173,7 @@ Minor features
 * In addition to :lookup:`year`, :lookup:`month` and :lookup:`day`, the ORM
   now supports :lookup:`hour`, :lookup:`minute` and :lookup:`second` lookups.
 
-* Django now wraps all PEP-249 exceptions.
+* Django now wraps all :pep:`249` exceptions.
 
 * The default widgets for :class:`~django.forms.EmailField`,
   :class:`~django.forms.URLField`, :class:`~django.forms.IntegerField`,

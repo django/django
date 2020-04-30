@@ -1161,8 +1161,9 @@ Attributes
 .. class:: FileResponse(open_file, as_attachment=False, filename='', **kwargs)
 
     :class:`FileResponse` is a subclass of :class:`StreamingHttpResponse`
-    optimized for binary files. It uses `wsgi.file_wrapper`_ if provided by the
-    wsgi server, otherwise it streams the file out in small chunks.
+    optimized for binary files. It uses :pep:`wsgi.file_wrapper
+    <3333#optional-platform-specific-file-handling>` if provided by the wsgi
+    server, otherwise it streams the file out in small chunks.
 
     If ``as_attachment=True``, the ``Content-Disposition`` header is set to
     ``attachment``, which asks the browser to offer the file to the user as a
@@ -1177,8 +1178,6 @@ Attributes
 
     The ``Content-Length`` and ``Content-Type`` headers are automatically set
     when they can be guessed from contents of ``open_file``.
-
-.. _wsgi.file_wrapper: https://www.python.org/dev/peps/pep-3333/#optional-platform-specific-file-handling
 
 ``FileResponse`` accepts any file-like object with binary content, for example
 a file open in binary mode like so::
