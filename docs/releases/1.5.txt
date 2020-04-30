@@ -424,11 +424,11 @@ Non-form data in HTTP requests
 :attr:`request.POST <django.http.HttpRequest.POST>` will no longer include data
 posted via HTTP requests with non form-specific content-types in the header.
 In prior versions, data posted with content-types other than
-``multipart/form-data`` or ``application/x-www-form-urlencoded`` would still
-end up represented in the :attr:`request.POST <django.http.HttpRequest.POST>`
-attribute. Developers wishing to access the raw POST data for these cases,
-should use the :attr:`request.body <django.http.HttpRequest.body>` attribute
-instead.
+:mimetype:`multipart/form-data` or
+:mimetype:`application/x-www-form-urlencoded` would still end up represented in
+the :attr:`request.POST <django.http.HttpRequest.POST>` attribute. Developers
+wishing to access the raw POST data for these cases, should use the
+:attr:`request.body <django.http.HttpRequest.body>` attribute instead.
 
 :data:`~django.core.signals.request_finished` signal
 ----------------------------------------------------

@@ -557,7 +557,9 @@ Email
 ~~~~~
 
 * :func:`~django.core.mail.send_mail` now accepts an ``html_message``
-  parameter for sending a multipart ``text/plain`` and ``text/html`` email.
+  parameter for sending a multipart :mimetype:`text/plain` and
+  :mimetype:`text/html` email.
+
 * The SMTP :class:`~django.core.mail.backends.smtp.EmailBackend` now accepts a
   ``timeout`` parameter.
 

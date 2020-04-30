@@ -1028,7 +1028,7 @@ can create it with the help of :py:class:`http.HTTPStatus`. For example::
     response. It inherits most behavior from its superclass with a couple
     differences:
 
-    Its default ``Content-Type`` header is set to ``application/json``.
+    Its default ``Content-Type`` header is set to :mimetype:`application/json`.
 
     The first parameter, ``data``, should be a ``dict`` instance. If the
     ``safe`` parameter is set to ``False`` (see below) it can be any
