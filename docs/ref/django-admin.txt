@@ -127,8 +127,8 @@ Activates some additional checks that are only relevant in a deployment setting.
 You can use this option in your local development environment, but since your
 local development settings module may not have many of your production settings,
 you will probably want to point the ``check`` command at a different settings
-module, either by setting the ``DJANGO_SETTINGS_MODULE`` environment variable,
-or by passing the ``--settings`` option::
+module, either by setting the :envvar:`DJANGO_SETTINGS_MODULE` environment
+variable, or by passing the ``--settings`` option::
 
     django-admin check --deploy --settings=production_settings
 
@@ -940,8 +940,10 @@ more robust change detection, and a reduction in power usage. Django supports
 
 .. admonition:: Watchman timeout
 
+    .. envvar:: DJANGO_WATCHMAN_TIMEOUT
+
     The default timeout of ``Watchman`` client is 5 seconds. You can change it
-    by setting the ``DJANGO_WATCHMAN_TIMEOUT`` environment variable.
+    by setting the :envvar:`DJANGO_WATCHMAN_TIMEOUT` environment variable.
 
 .. _Watchman: https://facebook.github.io/watchman/
 .. _pywatchman: https://pypi.org/project/pywatchman/
@@ -1420,13 +1422,15 @@ Enables :ref:`SQL logging <django-db-logger>` for failing tests. If
 
 .. django-admin-option:: --parallel [N]
 
+.. envvar:: DJANGO_TEST_PROCESSES
+
 Runs tests in separate parallel processes. Since modern processors have
 multiple cores, this allows running tests significantly faster.
 
 By default ``--parallel`` runs one process per core according to
 :func:`multiprocessing.cpu_count()`. You can adjust the number of processes
 either by providing it as the option's value, e.g. ``--parallel=4``, or by
-setting the ``DJANGO_TEST_PROCESSES`` environment variable.
+setting the :envvar:`DJANGO_TEST_PROCESSES` environment variable.
 
 Django distributes test cases — :class:`unittest.TestCase` subclasses — to
 subprocesses. If there are fewer test cases than configured processes, Django
@@ -1599,6 +1603,8 @@ Example usage::
 
 .. django-admin:: createsuperuser
 
+.. envvar:: DJANGO_SUPERUSER_PASSWORD
+
 This command is only available if Django's :doc:`authentication system
 </topics/auth/index>` (``django.contrib.auth``) is installed.
 
@@ -1608,9 +1614,9 @@ programmatically generate superuser accounts for your site(s).
 
 When run interactively, this command will prompt for a password for
 the new superuser account. When run non-interactively, you can provide
-a password by setting the ``DJANGO_SUPERUSER_PASSWORD`` environment variable.
-Otherwise, no password will be set, and the superuser account will not be able
-to log in until a password has been manually set for it.
+a password by setting the :envvar:`DJANGO_SUPERUSER_PASSWORD` environment
+variable. Otherwise, no password will be set, and the superuser account will
+not be able to log in until a password has been manually set for it.
 
 In non-interactive mode, the
 :attr:`~django.contrib.auth.models.CustomUser.USERNAME_FIELD` and required
@@ -1738,7 +1744,7 @@ allows for the following options:
 .. django-admin-option:: --pythonpath PYTHONPATH
 
 Adds the given filesystem path to the Python `import search path`_. If this
-isn't provided, ``django-admin`` will use the ``PYTHONPATH`` environment
+isn't provided, ``django-admin`` will use the :envvar:`PYTHONPATH` environment
 variable.
 
 This option is unnecessary in ``manage.py``, because it takes care of setting
@@ -1754,7 +1760,8 @@ Example usage::
 
 Specifies the settings module to use. The settings module should be in Python
 package syntax, e.g. ``mysite.settings``. If this isn't provided,
-``django-admin`` will use the ``DJANGO_SETTINGS_MODULE`` environment variable.
+``django-admin`` will use the :envvar:`DJANGO_SETTINGS_MODULE` environment
+variable.
 
 This option is unnecessary in ``manage.py``, because it uses
 ``settings.py`` from the current project by default.
@@ -1822,6 +1829,8 @@ Extra niceties
 Syntax coloring
 ---------------
 
+.. envvar:: DJANGO_COLORS
+
 The ``django-admin`` / ``manage.py`` commands will use pretty
 color-coded output if your terminal supports ANSI-colored output. It
 won't use the color codes if you're piping the command's output to
@@ -1843,7 +1852,7 @@ ships with three color palettes:
 
 * ``nocolor``, which disables syntax highlighting.
 
-You select a palette by setting a ``DJANGO_COLORS`` environment
+You select a palette by setting a :envvar:`DJANGO_COLORS` environment
 variable to specify the palette you want to use. For example, to
 specify the ``light`` palette under a Unix or OS/X BASH shell, you
 would run the following at a command prompt::

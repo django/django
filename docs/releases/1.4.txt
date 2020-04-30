@@ -1257,7 +1257,7 @@ needed with the new ``manage.py`` and default project layout.
 
 This function was never documented or part of the public API, but it was widely
 recommended for use in setting up a "Django environment" for a user script.
-These uses should be replaced by setting the ``DJANGO_SETTINGS_MODULE``
+These uses should be replaced by setting the :envvar:`DJANGO_SETTINGS_MODULE`
 environment variable or using :func:`django.conf.settings.configure`.
 
 ``django.core.management.execute_manager``

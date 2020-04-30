@@ -118,6 +118,8 @@ mode if you have asynchronous code in your project.
 Async safety
 ============
 
+.. envvar:: DJANGO_ALLOW_ASYNC_UNSAFE
+
 Certain key parts of Django are not able to operate safely in an async
 environment, as they have global state that is not coroutine-aware. These parts
 of Django are classified as "async-unsafe", and are protected from execution in
@@ -144,7 +146,7 @@ if the requirement is forced on you by an external environment, such as in a
 Jupyter_ notebook. If you are sure there is no chance of the code being run
 concurrently, and you *absolutely* need to run this sync code from an async
 context, then you can disable the warning by setting the
-``DJANGO_ALLOW_ASYNC_UNSAFE`` environment variable to any value.
+:envvar:`DJANGO_ALLOW_ASYNC_UNSAFE` environment variable to any value.
 
 .. warning::
 

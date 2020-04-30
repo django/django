@@ -321,9 +321,9 @@ and calculated values can be displayed alongside editable fields.
 Customizable syntax highlighting
 --------------------------------
 
-You can now use a ``DJANGO_COLORS`` environment variable to modify or disable
-the colors used by ``django-admin.py`` to provide :ref:`syntax highlighting
-<syntax-coloring>`.
+You can now use a :envvar:`DJANGO_COLORS` environment variable to modify or
+disable the colors used by ``django-admin.py`` to provide :ref:`syntax
+highlighting <syntax-coloring>`.
 
 Syndication feeds as views
 --------------------------

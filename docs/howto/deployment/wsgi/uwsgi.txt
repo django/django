@@ -77,7 +77,7 @@ The Django-specific options here are:
   path -- i.e., the directory containing the ``mysite`` package.
 * ``module``: The WSGI module to use -- probably the ``mysite.wsgi`` module
   that :djadmin:`startproject` creates.
-* ``env``: Should probably contain at least ``DJANGO_SETTINGS_MODULE``.
+* ``env``: Should probably contain at least :envvar:`DJANGO_SETTINGS_MODULE`.
 * ``home``: Optional path to your project virtualenv.
 
 Example ini configuration file::
