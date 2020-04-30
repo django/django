@@ -3567,14 +3567,12 @@ elsewhere.
 
 .. class:: Q
 
-A ``Q()`` object, like an :class:`~django.db.models.F` object, encapsulates a
-SQL expression in a Python object that can be used in database-related
-operations.
-
-In general, ``Q() objects`` make it possible to define and reuse conditions.
-This permits the :ref:`construction of complex database queries
-<complex-lookups-with-q>` using ``|`` (``OR``) and ``&`` (``AND``) operators;
-in particular, it is not otherwise possible to use ``OR`` in ``QuerySets``.
+A ``Q()`` object represents an SQL condition that can be used in
+database-related operations. It's similar to how an
+:class:`F() <django.db.models.F>` object represents the value of a model field
+or annotation. They make it possible to define and reuse conditions, and
+combine them using operators such as ``|`` (``OR``) and ``&`` (``AND``). See
+:ref:`complex-lookups-with-q`.
 
 ``Prefetch()`` objects
 ----------------------
