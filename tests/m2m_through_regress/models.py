@@ -40,7 +40,7 @@ class Car(models.Model):
     drivers = models.ManyToManyField('Driver', through='CarDriver')
 
     def __str__(self):
-        return "%s" % self.make
+        return str(self.make)
 
 
 class Driver(models.Model):
@@ -50,7 +50,7 @@ class Driver(models.Model):
         ordering = ('name',)
 
     def __str__(self):
-        return "%s" % self.name
+        return str(self.name)
 
 
 class CarDriver(models.Model):

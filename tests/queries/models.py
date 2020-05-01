@@ -386,7 +386,7 @@ class Node(models.Model):
     parent = models.ForeignKey("self", models.SET_NULL, to_field="num", null=True)
 
     def __str__(self):
-        return "%s" % self.num
+        return str(self.num)
 
 # Bug #12252
 
@@ -604,7 +604,7 @@ class Order(models.Model):
         ordering = ('pk',)
 
     def __str__(self):
-        return '%s' % self.pk
+        return str(self.pk)
 
 
 class OrderItem(models.Model):
@@ -615,7 +615,7 @@ class OrderItem(models.Model):
         ordering = ('pk',)
 
     def __str__(self):
-        return '%s' % self.pk
+        return str(self.pk)
 
 
 class BaseUser(models.Model):

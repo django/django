@@ -237,7 +237,7 @@ class AdminForeignKeyRawIdWidget(TestDataMixin, TestCase):
         pk = band.pk
         band.delete()
         post_data = {
-            "main_band": '%s' % pk,
+            "main_band": str(pk),
         }
         # Try posting with a nonexistent pk in a raw id field: this
         # should result in an error message, not a server exception.

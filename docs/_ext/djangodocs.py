@@ -351,7 +351,7 @@ class ConsoleDirective(CodeBlock):
         if env.app.builder.name not in ('djangohtml', 'json'):
             return [lit_blk_obj]
 
-        lit_blk_obj['uid'] = '%s' % env.new_serialno('console')
+        lit_blk_obj['uid'] = str(env.new_serialno('console'))
         # Only add the tabbed UI if there is actually a Windows-specific
         # version of the CLI example.
         win_content = code_block_to_win(self.content)

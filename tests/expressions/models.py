@@ -81,7 +81,7 @@ class Time(models.Model):
     time = models.TimeField(null=True)
 
     def __str__(self):
-        return "%s" % self.time
+        return str(self.time)
 
 
 class SimulationRun(models.Model):
