@@ -99,9 +99,7 @@ input[type="submit"], button {
     }
 
     #changelist-search > div {
-        display: -webkit-flex;
         display: flex;
-        -webkit-flex-wrap: wrap;
         flex-wrap: wrap;
         max-width: 480px;
     }
@@ -111,7 +109,6 @@ input[type="submit"], button {
     }
 
     #changelist #toolbar form #searchbar {
-        -webkit-flex: 1 0 auto;
         flex: 1 0 auto;
         width: 0;
         height: 22px;
