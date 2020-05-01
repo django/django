@@ -257,9 +257,8 @@ operations to ``cache_replica``, and all write operations to
 If you don't specify routing directions for the database cache model,
 the cache backend will use the ``default`` database.
 
-Of course, if you don't use the database cache backend, you don't need
-to worry about providing routing instructions for the database cache
-model.
+And if you don't use the database cache backend, you don't need to worry about
+providing routing instructions for the database cache model.
 
 Filesystem caching
 ------------------
@@ -325,9 +324,9 @@ order to keep them separate.
 The cache uses a least-recently-used (LRU) culling strategy.
 
 Note that each process will have its own private cache instance, which means no
-cross-process caching is possible. This obviously also means the local memory
-cache isn't particularly memory-efficient, so it's probably not a good choice
-for production environments. It's nice for development.
+cross-process caching is possible. This also means the local memory cache isn't
+particularly memory-efficient, so it's probably not a good choice for
+production environments. It's nice for development.
 
 Dummy caching (for development)
 -------------------------------

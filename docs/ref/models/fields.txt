@@ -1058,8 +1058,6 @@ directory on the filesystem. Has some special arguments, of which the first is
     whether folders in the specified location should be included.  Either this
     or :attr:`~FilePathField.allow_files` must be ``True``.
 
-Of course, these arguments can be used together.
-
 The one potential gotcha is that :attr:`~FilePathField.match` applies to the
 base filename, not the full path. So, this example::
 

@@ -89,8 +89,8 @@ class MigrationAutodetector:
     def only_relation_agnostic_fields(self, fields):
         """
         Return a definition of the fields that ignores field names and
-        what related fields actually relate to. Used for detecting renames (as,
-        of course, the related fields change during renames).
+        what related fields actually relate to. Used for detecting renames (as
+        the related fields change during renames).
         """
         fields_def = []
         for name, field in sorted(fields.items()):
@@ -676,9 +676,8 @@ class MigrationAutodetector:
     def generate_created_proxies(self):
         """
         Make CreateModel statements for proxy models. Use the same statements
-        as that way there's less code duplication, but of course for proxy
-        models it's safe to skip all the pointless field stuff and just chuck
-        out an operation.
+        as that way there's less code duplication, but for proxy models it's
+        safe to skip all the pointless field stuff and chuck out an operation.
         """
         added = self.new_proxy_keys - self.old_proxy_keys
         for app_label, model_name in sorted(added):

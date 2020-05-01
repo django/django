@@ -173,10 +173,10 @@ defaults and always applies them in the Django ORM code.
 Removes a field from a model.
 
 Bear in mind that when reversed, this is actually adding a field to a model.
-The operation is reversible (apart from any data loss, which of course is
-irreversible) if the field is nullable or if it has a default value that can be
-used to populate the recreated column. If the field is not nullable and does
-not have a default value, the operation is irreversible.
+The operation is reversible (apart from any data loss, which is irreversible)
+if the field is nullable or if it has a default value that can be used to
+populate the recreated column. If the field is not nullable and does not have a
+default value, the operation is irreversible.
 
 ``AlterField``
 --------------

@@ -12,7 +12,7 @@ Make sure that:
 
 * Said module is on ``sys.path`` (``import mysite.settings`` should work).
 
-* The module doesn't contain syntax errors (of course).
+* The module doesn't contain syntax errors.
 
 I can't stand your template language. Do I have to use it?
 ==========================================================

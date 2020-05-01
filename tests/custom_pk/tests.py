@@ -191,8 +191,8 @@ class CustomPKTests(TestCase):
         Business.objects.create(name='jaźń')
 
     def test_unique_pk(self):
-        # The primary key must also obviously be unique, so trying to create a
-        # new object with the same primary key will fail.
+        # The primary key must also be unique, so trying to create a new object
+        # with the same primary key will fail.
         Employee.objects.create(
             employee_code=123, first_name="Frank", last_name="Jones"
         )

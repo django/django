@@ -352,8 +352,8 @@ reference <ref-foreignkey>` for details.
 
 It's suggested, but not required, that the name of a
 :class:`~django.db.models.ForeignKey` field (``manufacturer`` in the example
-above) be the name of the model, lowercase. You can, of course, call the field
-whatever you want. For example::
+above) be the name of the model, lowercase. You can call the field whatever you
+want. For example::
 
     class Car(models.Model):
         company_that_makes_it = models.ForeignKey(
@@ -952,12 +952,12 @@ extend the parent's :ref:`Meta <meta-options>` class, it can subclass it. For ex
         class Meta(CommonInfo.Meta):
             db_table = 'student_info'
 
-Django does make one adjustment to the :ref:`Meta <meta-options>` class of an abstract base
-class: before installing the :ref:`Meta <meta-options>` attribute, it sets ``abstract=False``.
-This means that children of abstract base classes don't automatically become
-abstract classes themselves. Of course, you can make an abstract base class
-that inherits from another abstract base class. You just need to remember to
-explicitly set ``abstract=True`` each time.
+Django does make one adjustment to the :ref:`Meta <meta-options>` class of an
+abstract base class: before installing the :ref:`Meta <meta-options>`
+attribute, it sets ``abstract=False``. This means that children of abstract
+base classes don't automatically become abstract classes themselves. To make
+an abstract base class that inherits from another abstract base class, you need
+to explicitly set ``abstract=True`` on the child.
 
 Some attributes won't make sense to include in the :ref:`Meta <meta-options>` class of an
 abstract base class. For example, including ``db_table`` would mean that all

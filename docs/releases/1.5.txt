@@ -304,9 +304,9 @@ Django 1.5 also includes several smaller improvements worth noting:
 
 * It's not required any more to have ``404.html`` and ``500.html`` templates in
   the root templates directory. Django will output some basic error messages for
-  both situations when those templates are not found. Of course, it's still
-  recommended as good practice to provide those templates in order to present
-  pretty error pages to the user.
+  both situations when those templates are not found. It's still recommended as
+  good practice to provide those templates in order to present pretty error
+  pages to the user.
 
 * :mod:`django.contrib.auth` provides a new signal that is emitted
   whenever a user fails to login successfully. See

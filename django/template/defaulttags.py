@@ -699,7 +699,7 @@ def firstof(parser, token):
             {{ var3 }}
         {% endif %}
 
-    but obviously much cleaner!
+    but much cleaner!
 
     You can also use a literal string as a fallback value in case all
     passed variables are False::

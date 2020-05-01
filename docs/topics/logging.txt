@@ -197,9 +197,9 @@ There are two other logging calls available:
 Configuring logging
 ===================
 
-Of course, it isn't enough to just put logging calls into your code.
-You also need to configure the loggers, handlers, filters and
-formatters to ensure that logging output is output in a useful way.
+It isn't enough to just put logging calls into your code. You also need to
+configure the loggers, handlers, filters, and formatters to ensure you can use
+the logging output.
 
 Python's logging library provides several techniques to configure
 logging, ranging from a programmatic interface to configuration files.

@@ -643,8 +643,7 @@ of all comments related to the current task with::
 
     {{ task.comment_set.all.count }}
 
-And of course you can easily access methods you've explicitly defined on your
-own models:
+You can also access methods you've explicitly defined on your own models:
 
 .. code-block:: python
     :caption: models.py

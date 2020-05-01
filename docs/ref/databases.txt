@@ -19,8 +19,8 @@ design decisions on which features to support and which assumptions we can make
 safely.
 
 This file describes some of the features that might be relevant to Django
-usage. Of course, it is not intended as a replacement for server-specific
-documentation or reference manuals.
+usage. It is not intended as a replacement for server-specific documentation or
+reference manuals.
 
 General notes
 =============

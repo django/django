@@ -104,10 +104,9 @@ part of that. Here are some tips on how to make a request most effectively:
   like to see it implemented. Include example code (non-functional is OK)
   if possible.
 
-* Explain *why* you'd like the feature. In some cases this is obvious, but
-  since Django is designed to help real developers get real work done,
-  you'll need to explain it, if it isn't obvious why the feature would be
-  useful.
+* Explain *why* you'd like the feature. Explaining a minimal use case will help
+  others understand where it fits in, and if there are already other ways of
+  achieving the same thing.
 
 If there's a consensus agreement on the feature, then it's appropriate to
 create a ticket. Include a link the discussion on |django-developers| in the

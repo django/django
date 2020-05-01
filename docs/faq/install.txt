@@ -78,8 +78,8 @@ better supported, the latest version of Python 3 is recommended.
 
 You don't lose anything in Django by using an older release, but you don't take
 advantage of the improvements and optimizations in newer Python releases.
-Third-party applications for use with Django are, of course, free to set their
-own version requirements.
+Third-party applications for use with Django are free to set their own version
+requirements.
 
 Should I use the stable version or development version?
 =======================================================

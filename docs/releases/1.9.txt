@@ -792,7 +792,7 @@ Consequently, the expected URLs passed to ``assertRedirects`` should generally
 no longer include the scheme and domain part of the URLs. For example,
 ``self.assertRedirects(response, 'http://testserver/some-url/')`` should be
 replaced by ``self.assertRedirects(response, '/some-url/')`` (unless the
-redirection specifically contained an absolute URL, of course).
+redirection specifically contained an absolute URL).
 
 In the rare case that you need the old behavior (discovered with an ancient
 version of Apache with ``mod_scgi`` that interprets a relative redirect as an

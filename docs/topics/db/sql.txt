@@ -64,9 +64,9 @@ You could then execute custom SQL like so::
     John Smith
     Jane Jones
 
-Of course, this example isn't very exciting -- it's exactly the same as
-running ``Person.objects.all()``. However, ``raw()`` has a bunch of other
-options that make it very powerful.
+This example isn't very exciting -- it's exactly the same as running
+``Person.objects.all()``. However, ``raw()`` has a bunch of other options that
+make it very powerful.
 
 .. admonition:: Model table names
 
@@ -206,9 +206,8 @@ argument to ``raw()``::
 ``params`` is a list or dictionary of parameters. You'll use ``%s``
 placeholders in the query string for a list, or ``%(key)s``
 placeholders for a dictionary (where ``key`` is replaced by a
-dictionary key, of course), regardless of your database engine.  Such
-placeholders will be replaced with parameters from the ``params``
-argument.
+dictionary key), regardless of your database engine. Such placeholders will be
+replaced with parameters from the ``params`` argument.
 
 .. note::
 

@@ -32,9 +32,8 @@ translating or add a language that isn't yet translated, here's what to do:
 
 * Then, click the "Join this Team" button to become a member of this team.
   Every team has at least one coordinator who is responsible to review
-  your membership request. You can of course also contact the team
-  coordinator to clarify procedural problems and handle the actual
-  translation process.
+  your membership request. You can also contact the team coordinator to clarify
+  procedural problems and handle the actual translation process.
 
 * Once you are a member of a team choose the translation resource you
   want to update on the team page. For example the "core" resource refers
