@@ -1,20 +1,23 @@
+import asyncio
 import difflib
 import json
 import posixpath
 import sys
 import threading
 import unittest
-import warnings
 from collections import Counter
 from contextlib import contextmanager
 from copy import copy
 from difflib import get_close_matches
 from functools import wraps
+from unittest.suite import _DebugResult
 from unittest.util import safe_repr
 from urllib.parse import (
     parse_qsl, unquote, urlencode, urljoin, urlparse, urlsplit, urlunparse,
 )
 from urllib.request import url2pathname
+
+from asgiref.sync import async_to_sync
 
 from django.apps import apps
 from django.conf import settings
@@ -30,15 +33,14 @@ from django.db import DEFAULT_DB_ALIAS, connection, connections, transaction
 from django.forms.fields import CharField
 from django.http import QueryDict
 from django.http.request import split_domain_port, validate_host
-from django.test.client import Client
+from django.test.client import AsyncClient, Client
 from django.test.html import HTMLParseError, parse_html
 from django.test.signals import setting_changed, template_rendered
 from django.test.utils import (
     CaptureQueriesContext, ContextList, compare_xml, modify_settings,
     override_settings,
 )
-from django.utils.decorators import classproperty
-from django.utils.deprecation import RemovedInDjango31Warning
+from django.utils.functional import classproperty
 from django.views.static import serve
 
 __all__ = ('TestCase', 'TransactionTestCase',
@@ -144,34 +146,16 @@ class _DatabaseFailure:
         raise AssertionError(self.message)
 
 
-class _SimpleTestCaseDatabasesDescriptor:
-    """Descriptor for SimpleTestCase.allow_database_queries deprecation."""
-    def __get__(self, instance, cls=None):
-        try:
-            allow_database_queries = cls.allow_database_queries
-        except AttributeError:
-            pass
-        else:
-            msg = (
-                '`SimpleTestCase.allow_database_queries` is deprecated. '
-                'Restrict the databases available during the execution of '
-                '%s.%s with the `databases` attribute instead.'
-            ) % (cls.__module__, cls.__qualname__)
-            warnings.warn(msg, RemovedInDjango31Warning)
-            if allow_database_queries:
-                return {DEFAULT_DB_ALIAS}
-        return set()
-
-
 class SimpleTestCase(unittest.TestCase):
 
     # The class we'll use for the test client self.client.
     # Can be overridden in derived classes.
     client_class = Client
+    async_client_class = AsyncClient
     _overridden_settings = None
     _modified_settings = None
 
-    databases = _SimpleTestCaseDatabasesDescriptor()
+    databases = set()
     _disallowed_database_msg = (
         'Database %(operation)s to %(alias)r are not allowed in SimpleTestCase '
         'subclasses. Either subclass TestCase or TransactionTestCase to ensure '
@@ -256,23 +240,49 @@ class SimpleTestCase(unittest.TestCase):
         set up. This means that user-defined Test Cases aren't required to
         include a call to super().setUp().
         """
+        self._setup_and_call(result)
+
+    def debug(self):
+        """Perform the same as __call__(), without catching the exception."""
+        debug_result = _DebugResult()
+        self._setup_and_call(debug_result, debug=True)
+
+    def _setup_and_call(self, result, debug=False):
+        """
+        Perform the following in order: pre-setup, run test, post-teardown,
+        skipping pre/post hooks if test is set to be skipped.
+
+        If debug=True, reraise any errors in setup and use super().debug()
+        instead of __call__() to run the test.
+        """
         testMethod = getattr(self, self._testMethodName)
         skipped = (
             getattr(self.__class__, "__unittest_skip__", False) or
             getattr(testMethod, "__unittest_skip__", False)
         )
 
+        # Convert async test methods.
+        if asyncio.iscoroutinefunction(testMethod):
+            setattr(self, self._testMethodName, async_to_sync(testMethod))
+
         if not skipped:
             try:
                 self._pre_setup()
             except Exception:
+                if debug:
+                    raise
                 result.addError(self, sys.exc_info())
                 return
-        super().__call__(result)
+        if debug:
+            super().debug()
+        else:
+            super().__call__(result)
         if not skipped:
             try:
                 self._post_teardown()
             except Exception:
+                if debug:
+                    raise
                 result.addError(self, sys.exc_info())
                 return
 
@@ -283,6 +293,7 @@ class SimpleTestCase(unittest.TestCase):
         * Clear the mail test outbox.
         """
         self.client = self.client_class()
+        self.async_client = self.async_client_class()
         mail.outbox = []
 
     def _post_teardown(self):
@@ -368,10 +379,15 @@ class SimpleTestCase(unittest.TestCase):
                         "Otherwise, use assertRedirects(..., fetch_redirect_response=False)."
                         % (url, domain)
                     )
-                redirect_response = response.client.get(path, QueryDict(query), secure=(scheme == 'https'))
-
                 # Get the redirection page, using the same client that was used
                 # to obtain the original response.
+                extra = response.client.extra or {}
+                redirect_response = response.client.get(
+                    path,
+                    QueryDict(query),
+                    secure=(scheme == 'https'),
+                    **extra,
+                )
                 self.assertEqual(
                     redirect_response.status_code, target_status_code,
                     msg_prefix + "Couldn't retrieve redirection page '%s': response code was %d (expected %d)"
@@ -870,26 +886,6 @@ class SimpleTestCase(unittest.TestCase):
                 self.fail(self._formatMessage(msg, standardMsg))
 
 
-class _TransactionTestCaseDatabasesDescriptor:
-    """Descriptor for TransactionTestCase.multi_db deprecation."""
-    msg = (
-        '`TransactionTestCase.multi_db` is deprecated. Databases available '
-        'during this test can be defined using %s.%s.databases.'
-    )
-
-    def __get__(self, instance, cls=None):
-        try:
-            multi_db = cls.multi_db
-        except AttributeError:
-            pass
-        else:
-            msg = self.msg % (cls.__module__, cls.__qualname__)
-            warnings.warn(msg, RemovedInDjango31Warning)
-            if multi_db:
-                return set(connections)
-        return {DEFAULT_DB_ALIAS}
-
-
 class TransactionTestCase(SimpleTestCase):
 
     # Subclasses can ask for resetting of auto increment sequence before each
@@ -902,7 +898,7 @@ class TransactionTestCase(SimpleTestCase):
     # Subclasses can define fixtures which will be automatically installed.
     fixtures = None
 
-    databases = _TransactionTestCaseDatabasesDescriptor()
+    databases = {DEFAULT_DB_ALIAS}
     _disallowed_database_msg = (
         'Database %(operation)s to %(alias)r are not allowed in this test. '
         'Add %(alias)r to %(test)s.databases to ensure proper test isolation '
@@ -1075,14 +1071,6 @@ def connections_support_transactions(aliases=None):
     return all(conn.features.supports_transactions for conn in conns)
 
 
-class _TestCaseDatabasesDescriptor(_TransactionTestCaseDatabasesDescriptor):
-    """Descriptor for TestCase.multi_db deprecation."""
-    msg = (
-        '`TestCase.multi_db` is deprecated. Databases available during this '
-        'test can be defined using %s.%s.databases.'
-    )
-
-
 class TestCase(TransactionTestCase):
     """
     Similar to TransactionTestCase, but use `transaction.atomic()` to achieve
@@ -1096,8 +1084,6 @@ class TestCase(TransactionTestCase):
     On database backends with no transaction support, TestCase behaves as
     TransactionTestCase.
     """
-    databases = _TestCaseDatabasesDescriptor()
-
     @classmethod
     def _enter_atomics(cls):
         """Open atomic blocks for multiple databases."""

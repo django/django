@@ -10,7 +10,7 @@ Allowed disabling server-side cursors on PostgreSQL
 ===================================================
 
 The change in Django 1.11 to make :meth:`.QuerySet.iterator()` use server-side
-cursors on PostgreSQL prevents running Django with `pgBouncer` in transaction
+cursors on PostgreSQL prevents running Django with PgBouncer in transaction
 pooling mode. To reallow that, use the :setting:`DISABLE_SERVER_SIDE_CURSORS
 <DATABASE-DISABLE_SERVER_SIDE_CURSORS>` setting in :setting:`DATABASES`.
 

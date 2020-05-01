@@ -66,9 +66,9 @@ The 404 (page not found) view
 
 When you raise :exc:`~django.http.Http404` from within a view, Django loads a
 special view devoted to handling 404 errors. By default, it's the view
-:func:`django.views.defaults.page_not_found`, which either produces a very
-simple "Not Found" message or loads and renders the template ``404.html`` if
-you created it in your root template directory.
+:func:`django.views.defaults.page_not_found`, which either produces a "Not
+Found" message or loads and renders the template ``404.html`` if you created it
+in your root template directory.
 
 The default 404 view will pass two variables to the template: ``request_path``,
 which is the URL that resulted in the error, and ``exception``, which is a
@@ -97,9 +97,9 @@ The 500 (server error) view
 
 Similarly, Django executes special-case behavior in the case of runtime errors
 in view code. If a view results in an exception, Django will, by default, call
-the view ``django.views.defaults.server_error``, which either produces a very
-simple "Server Error" message or loads and renders the template ``500.html`` if
-you created it in your root template directory.
+the view ``django.views.defaults.server_error``, which either produces a
+"Server Error" message or loads and renders the template ``500.html`` if you
+created it in your root template directory.
 
 The default 500 view passes no variables to the ``500.html`` template and is
 rendered with an empty ``Context`` to lessen the chance of additional errors.

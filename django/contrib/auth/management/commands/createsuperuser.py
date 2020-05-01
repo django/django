@@ -51,11 +51,28 @@ class Command(BaseCommand):
             default=DEFAULT_DB_ALIAS,
             help='Specifies the database to use. Default is "default".',
         )
-        for field in self.UserModel.REQUIRED_FIELDS:
-            parser.add_argument(
-                '--%s' % field,
-                help='Specifies the %s for the superuser.' % field,
-            )
+        for field_name in self.UserModel.REQUIRED_FIELDS:
+            field = self.UserModel._meta.get_field(field_name)
+            if field.many_to_many:
+                if field.remote_field.through and not field.remote_field.through._meta.auto_created:
+                    raise CommandError(
+                        "Required field '%s' specifies a many-to-many "
+                        "relation through model, which is not supported."
+                        % field_name
+                    )
+                else:
+                    parser.add_argument(
+                        '--%s' % field_name, action='append',
+                        help=(
+                            'Specifies the %s for the superuser. Can be used '
+                            'multiple times.' % field_name,
+                        ),
+                    )
+            else:
+                parser.add_argument(
+                    '--%s' % field_name,
+                    help='Specifies the %s for the superuser.' % field_name,
+                )
 
     def execute(self, *args, **options):
         self.stdin = options.get('stdin', sys.stdin)  # Used for testing
@@ -75,8 +92,8 @@ class Command(BaseCommand):
             user_data[PASSWORD_FIELD] = None
         try:
             if options['interactive']:
-                # Same as user_data but with foreign keys as fake model
-                # instances instead of raw IDs.
+                # Same as user_data but without many to many fields and with
+                # foreign keys as fake model instances instead of raw IDs.
                 fake_user_data = {}
                 if hasattr(self.stdin, 'isatty') and not self.stdin.isatty():
                     raise NotRunningInTTYException
@@ -111,10 +128,17 @@ class Command(BaseCommand):
                         message = self._get_input_message(field)
                         input_value = self.get_input_data(field, message)
                         user_data[field_name] = input_value
-                        fake_user_data[field_name] = input_value
+                        if field.many_to_many and input_value:
+                            if not input_value.strip():
+                                user_data[field_name] = None
+                                self.stderr.write('Error: This field cannot be blank.')
+                                continue
+                            user_data[field_name] = [pk.strip() for pk in input_value.split(',')]
+                        if not field.many_to_many:
+                            fake_user_data[field_name] = input_value
 
                         # Wrap any foreign keys in fake model instances
-                        if field.remote_field:
+                        if field.many_to_one:
                             fake_user_data[field_name] = field.remote_field.model(input_value)
 
                 # Prompt for a password if the model has one.
@@ -199,7 +223,7 @@ class Command(BaseCommand):
             " (leave blank to use '%s')" % default if default else '',
             ' (%s.%s)' % (
                 field.remote_field.model._meta.object_name,
-                field.remote_field.field_name,
+                field.m2m_target_field_name() if field.many_to_many else field.remote_field.field_name,
             ) if field.remote_field else '',
         )
 

@@ -1,3 +1,4 @@
+import collections
 from itertools import chain
 
 from django.apps import apps
@@ -9,7 +10,7 @@ from django.core import checks
 from django.core.exceptions import FieldDoesNotExist
 from django.db import models
 from django.db.models.constants import LOOKUP_SEP
-from django.db.models.expressions import Combinable, F, OrderBy
+from django.db.models.expressions import Combinable
 from django.forms.models import (
     BaseModelForm, BaseModelFormSet, _get_foreign_key,
 )
@@ -545,10 +546,10 @@ class BaseModelAdminChecks:
 
     def _check_ordering_item(self, obj, field_name, label):
         """ Check that `ordering` refers to existing fields. """
-        if isinstance(field_name, (Combinable, OrderBy)):
-            if not isinstance(field_name, OrderBy):
+        if isinstance(field_name, (Combinable, models.OrderBy)):
+            if not isinstance(field_name, models.OrderBy):
                 field_name = field_name.asc()
-            if isinstance(field_name.expression, F):
+            if isinstance(field_name.expression, models.F):
                 field_name = field_name.expression.name
             else:
                 return []
@@ -606,8 +607,9 @@ class BaseModelAdminChecks:
             except FieldDoesNotExist:
                 return [
                     checks.Error(
-                        "The value of '%s' is not a callable, an attribute of '%s', or an attribute of '%s.%s'." % (
-                            label, obj.__class__.__name__, obj.model._meta.app_label, obj.model._meta.object_name
+                        "The value of '%s' is not a callable, an attribute of "
+                        "'%s', or an attribute of '%s'." % (
+                            label, obj.__class__.__name__, obj.model._meta.label,
                         ),
                         obj=obj.__class__,
                         id='admin.E035',
@@ -730,9 +732,9 @@ class ModelAdminChecks(BaseModelAdminChecks):
                     checks.Error(
                         "The value of '%s' refers to '%s', which is not a "
                         "callable, an attribute of '%s', or an attribute or "
-                        "method on '%s.%s'." % (
+                        "method on '%s'." % (
                             label, item, obj.__class__.__name__,
-                            obj.model._meta.app_label, obj.model._meta.object_name,
+                            obj.model._meta.label,
                         ),
                         obj=obj.__class__,
                         id='admin.E108',
@@ -985,15 +987,20 @@ class ModelAdminChecks(BaseModelAdminChecks):
 
     def _check_actions_uniqueness(self, obj):
         """Check that every action has a unique __name__."""
-        names = [name for _, name, _ in obj._get_base_actions()]
-        if len(names) != len(set(names)):
-            return [checks.Error(
-                '__name__ attributes of actions defined in %s must be '
-                'unique.' % obj.__class__,
-                obj=obj.__class__,
-                id='admin.E130',
-            )]
-        return []
+        errors = []
+        names = collections.Counter(name for _, name, _ in obj._get_base_actions())
+        for name, count in names.items():
+            if count > 1:
+                errors.append(checks.Error(
+                    '__name__ attributes of actions defined in %s must be '
+                    'unique. Name %r is not unique.' % (
+                        obj.__class__.__name__,
+                        name,
+                    ),
+                    obj=obj.__class__,
+                    id='admin.E130',
+                ))
+        return errors
 
 
 class InlineModelAdminChecks(BaseModelAdminChecks):
@@ -1029,8 +1036,8 @@ class InlineModelAdminChecks(BaseModelAdminChecks):
             return [
                 checks.Error(
                     "Cannot exclude the field '%s', because it is the foreign key "
-                    "to the parent model '%s.%s'." % (
-                        fk.name, parent_model._meta.app_label, parent_model._meta.object_name
+                    "to the parent model '%s'." % (
+                        fk.name, parent_model._meta.label,
                     ),
                     obj=obj.__class__,
                     id='admin.E201',
@@ -1107,9 +1114,8 @@ def must_inherit_from(parent, option, obj, id):
 def refer_to_missing_field(field, option, obj, id):
     return [
         checks.Error(
-            "The value of '%s' refers to '%s', which is not an attribute of '%s.%s'." % (
-                option, field, obj.model._meta.app_label, obj.model._meta.object_name
-            ),
+            "The value of '%s' refers to '%s', which is not an attribute of "
+            "'%s'." % (option, field, obj.model._meta.label),
             obj=obj.__class__,
             id=id,
         ),

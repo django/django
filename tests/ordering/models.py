@@ -14,7 +14,6 @@ undefined -- not random, just undefined.
 """
 
 from django.db import models
-from django.db.models.expressions import OrderBy
 
 
 class Author(models.Model):
@@ -33,13 +32,10 @@ class Article(models.Model):
     class Meta:
         ordering = (
             '-pub_date',
-            'headline',
+            models.F('headline'),
             models.F('author__name').asc(),
-            OrderBy(models.F('second_author__name')),
+            models.OrderBy(models.F('second_author__name')),
         )
-
-    def __str__(self):
-        return self.headline
 
 
 class OrderedByAuthorArticle(Article):
@@ -52,6 +48,10 @@ class OrderedByFArticle(Article):
     class Meta:
         proxy = True
         ordering = (models.F('author').asc(nulls_first=True), 'id')
+
+
+class ChildArticle(Article):
+    pass
 
 
 class Reference(models.Model):

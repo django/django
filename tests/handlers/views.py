@@ -1,3 +1,4 @@
+import asyncio
 from http import HTTPStatus
 
 from django.core.exceptions import SuspiciousOperation
@@ -44,3 +45,21 @@ def malformed_post(request):
 
 def httpstatus_enum(request):
     return HttpResponse(status=HTTPStatus.OK)
+
+
+async def async_regular(request):
+    return HttpResponse(b'regular content')
+
+
+class CoroutineClearingView:
+    def __call__(self, request):
+        """Return an unawaited coroutine (common error for async views)."""
+        # Store coroutine to suppress 'unawaited' warning message
+        self._unawaited_coroutine = asyncio.sleep(0)
+        return self._unawaited_coroutine
+
+    def __del__(self):
+        self._unawaited_coroutine.close()
+
+
+async_unawaited = CoroutineClearingView()

@@ -7,6 +7,7 @@
 # Ilja Maas <iljamaas@dreamsolution.nl>, 2015
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Jeffrey Gelens <jeffrey@noppo.pro>, 2011-2012
+# Meteor0id, 2019
 # Sander Steffann <inactive+steffann@transifex.com>, 2015
 # Tonnes <tonnes.mb@gmail.com>, 2019
 # wunki <petar@wunki.org>, 2011
@@ -15,7 +16,7 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-05-17 11:50+0200\n"
-"PO-Revision-Date: 2019-02-24 20:42+0000\n"
+"PO-Revision-Date: 2019-12-09 16:09+0000\n"
 "Last-Translator: Tonnes <tonnes.mb@gmail.com>\n"
 "Language-Team: Dutch (http://www.transifex.com/django/django/language/nl/)\n"
 "MIME-Version: 1.0\n"
@@ -71,7 +72,7 @@ msgstr ""
 "twee vakken te klikken."
 
 msgid "Remove all"
-msgstr "Verwijder alles"
+msgstr "Alle verwijderen"
 
 #, javascript-format
 msgid "Click to remove all chosen %s at once."
@@ -193,7 +194,7 @@ msgstr "december"
 
 msgctxt "one letter Sunday"
 msgid "S"
-msgstr "S"
+msgstr "Z"
 
 msgctxt "one letter Monday"
 msgid "M"
@@ -201,7 +202,7 @@ msgstr "M"
 
 msgctxt "one letter Tuesday"
 msgid "T"
-msgstr "T"
+msgstr "D"
 
 msgctxt "one letter Wednesday"
 msgid "W"
@@ -209,15 +210,15 @@ msgstr "W"
 
 msgctxt "one letter Thursday"
 msgid "T"
-msgstr "T"
+msgstr "D"
 
 msgctxt "one letter Friday"
 msgid "F"
-msgstr "F"
+msgstr "V"
 
 msgctxt "one letter Saturday"
 msgid "S"
-msgstr "S"
+msgstr "Z"
 
 msgid "Show"
 msgstr "Tonen"

@@ -130,7 +130,7 @@ class Command(BaseCommand):
             sequence_sql = connection.ops.sequence_reset_sql(no_style(), self.models)
             if sequence_sql:
                 if self.verbosity >= 2:
-                    self.stdout.write("Resetting sequences\n")
+                    self.stdout.write('Resetting sequences')
                 with connection.cursor() as cursor:
                     for line in sequence_sql:
                         cursor.execute(line)
@@ -196,7 +196,7 @@ class Command(BaseCommand):
                     if obj.deferred_fields:
                         self.objs_with_deferred_fields.append(obj)
                 if objects and show_progress:
-                    self.stdout.write('')  # add a newline after progress indicator
+                    self.stdout.write()  # Add a newline after progress indicator.
                 self.loaded_object_count += loaded_objects_in_fixture
                 self.fixture_object_count += objects_in_fixture
             except Exception as e:

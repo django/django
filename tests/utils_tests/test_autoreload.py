@@ -11,6 +11,7 @@ import weakref
 import zipfile
 from importlib import import_module
 from pathlib import Path
+from subprocess import CompletedProcess
 from unittest import mock, skip, skipIf
 
 from django.apps.registry import Apps
@@ -34,7 +35,7 @@ class TestIterModulesAndFiles(SimpleTestCase):
     def assertFileFound(self, filename):
         # Some temp directories are symlinks. Python resolves these fully while
         # importing.
-        resolved_filename = filename.resolve()
+        resolved_filename = filename.resolve(strict=True)
         self.clear_autoreload_caches()
         # Test uncached access
         self.assertIn(resolved_filename, list(autoreload.iter_all_python_module_files()))
@@ -43,7 +44,7 @@ class TestIterModulesAndFiles(SimpleTestCase):
         self.assertEqual(autoreload.iter_modules_and_files.cache_info().hits, 1)
 
     def assertFileNotFound(self, filename):
-        resolved_filename = filename.resolve()
+        resolved_filename = filename.resolve(strict=True)
         self.clear_autoreload_caches()
         # Test uncached access
         self.assertNotIn(resolved_filename, list(autoreload.iter_all_python_module_files()))
@@ -140,6 +141,17 @@ class TestIterModulesAndFiles(SimpleTestCase):
         fake_main = types.ModuleType('__main__')
         self.assertEqual(autoreload.iter_modules_and_files((fake_main,), frozenset()), frozenset())
 
+    def test_path_with_embedded_null_bytes(self):
+        for path in (
+            'embedded_null_byte\x00.py',
+            'di\x00rectory/embedded_null_byte.py',
+        ):
+            with self.subTest(path=path):
+                self.assertEqual(
+                    autoreload.iter_modules_and_files((), frozenset([path])),
+                    frozenset(),
+                )
+
 
 class TestCommonRoots(SimpleTestCase):
     def test_common_roots(self):
@@ -156,7 +168,7 @@ class TestCommonRoots(SimpleTestCase):
 class TestSysPathDirectories(SimpleTestCase):
     def setUp(self):
         self._directory = tempfile.TemporaryDirectory()
-        self.directory = Path(self._directory.name).resolve().absolute()
+        self.directory = Path(self._directory.name).resolve(strict=True).absolute()
         self.file = self.directory / 'test'
         self.file.touch()
 
@@ -334,7 +346,7 @@ class RestartWithReloaderTests(SimpleTestCase):
     executable = '/usr/bin/python'
 
     def patch_autoreload(self, argv):
-        patch_call = mock.patch('django.utils.autoreload.subprocess.call', return_value=0)
+        patch_call = mock.patch('django.utils.autoreload.subprocess.run', return_value=CompletedProcess(argv, 0))
         patches = [
             mock.patch('django.utils.autoreload.sys.argv', argv),
             mock.patch('django.utils.autoreload.sys.executable', self.executable),
@@ -369,7 +381,7 @@ class ReloaderTests(SimpleTestCase):
 
     def setUp(self):
         self._tempdir = tempfile.TemporaryDirectory()
-        self.tempdir = Path(self._tempdir.name).resolve().absolute()
+        self.tempdir = Path(self._tempdir.name).resolve(strict=True).absolute()
         self.existing_file = self.ensure_file(self.tempdir / 'test.py')
         self.nonexistent_file = (self.tempdir / 'does_not_exist.py').absolute()
         self.reloader = self.RELOADER_CLS()
@@ -405,15 +417,6 @@ class ReloaderTests(SimpleTestCase):
 
 
 class IntegrationTests:
-    @mock.patch('django.utils.autoreload.BaseReloader.notify_file_changed')
-    @mock.patch('django.utils.autoreload.iter_all_python_module_files', return_value=frozenset())
-    def test_file(self, mocked_modules, notify_mock):
-        self.reloader.watch_file(self.existing_file)
-        with self.tick_twice():
-            self.increment_mtime(self.existing_file)
-        self.assertEqual(notify_mock.call_count, 1)
-        self.assertCountEqual(notify_mock.call_args[0], [self.existing_file])
-
     @mock.patch('django.utils.autoreload.BaseReloader.notify_file_changed')
     @mock.patch('django.utils.autoreload.iter_all_python_module_files', return_value=frozenset())
     def test_glob(self, mocked_modules, notify_mock):
@@ -497,14 +500,11 @@ class IntegrationTests:
 class BaseReloaderTests(ReloaderTests):
     RELOADER_CLS = autoreload.BaseReloader
 
-    def test_watch_without_absolute(self):
-        with self.assertRaisesMessage(ValueError, 'test.py must be absolute.'):
-            self.reloader.watch_file('test.py')
-
-    def test_watch_with_single_file(self):
-        self.reloader.watch_file(self.existing_file)
-        watched_files = list(self.reloader.watched_files())
-        self.assertIn(self.existing_file, watched_files)
+    def test_watch_dir_with_unresolvable_path(self):
+        path = Path('unresolvable_directory')
+        with mock.patch.object(Path, 'absolute', side_effect=FileNotFoundError):
+            self.reloader.watch_dir(path, '**/*.mo')
+        self.assertEqual(list(self.reloader.directory_globs), [])
 
     def test_watch_with_glob(self):
         self.reloader.watch_dir(self.tempdir, '*.py')
@@ -651,7 +651,7 @@ class WatchmanReloaderTests(ReloaderTests, IntegrationTests):
 
     @mock.patch.dict(os.environ, {'DJANGO_WATCHMAN_TIMEOUT': '10'})
     def test_setting_timeout_from_environment_variable(self):
-        self.assertEqual(self.RELOADER_CLS.client_timeout, 10)
+        self.assertEqual(self.RELOADER_CLS().client_timeout, 10)
 
 
 @skipIf(on_macos_with_hfs(), "These tests do not work with HFS+ as a filesystem")

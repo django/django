@@ -144,7 +144,8 @@ and the :setting:`SECRET_KEY` setting.
     tampered with. The same invalidation happens if the client storing the
     cookie (e.g. your user's browser) can't store all of the session cookie and
     drops data. Even though Django compresses the data, it's still entirely
-    possible to exceed the `common limit of 4096 bytes`_ per cookie.
+    possible to exceed the :rfc:`common limit of 4096 bytes <2965#section-5.3>`
+    per cookie.
 
     **No freshness guarantee**
 
@@ -165,7 +166,6 @@ and the :setting:`SECRET_KEY` setting.
 
     Finally, the size of a cookie can have an impact on the `speed of your site`_.
 
-.. _`common limit of 4096 bytes`: https://tools.ietf.org/html/rfc2965#section-5.3
 .. _`replay attacks`: https://en.wikipedia.org/wiki/Replay_attack
 .. _`speed of your site`: https://yuiblog.com/blog/2007/03/01/performance-research-part-3/
 
@@ -379,7 +379,7 @@ convenience and security. If you wish to store more advanced data types
 including ``datetime`` and ``Decimal`` in JSON backed sessions, you will need
 to write a custom serializer (or convert such values to a JSON serializable
 object before storing them in ``request.session``). While serializing these
-values is fairly straightforward
+values is often straightforward
 (:class:`~django.core.serializers.json.DjangoJSONEncoder` may be helpful),
 writing a decoder that can reliably get back the same thing that you put in is
 more fragile. For example, you run the risk of returning a ``datetime`` that
@@ -444,10 +444,9 @@ objects, not as a full ``logout()`` implementation.
 Setting test cookies
 ====================
 
-As a convenience, Django provides an easy way to test whether the user's
-browser accepts cookies. Just call the
-:meth:`~backends.base.SessionBase.set_test_cookie` method of
-``request.session`` in a view, and call
+As a convenience, Django provides a way to test whether the user's browser
+accepts cookies. Call the :meth:`~backends.base.SessionBase.set_test_cookie`
+method of ``request.session`` in a view, and call
 :meth:`~backends.base.SessionBase.test_cookie_worked` in a subsequent view --
 not in the same view call.
 
@@ -509,7 +508,7 @@ generating a ``session_key`` that collides with an existing one. ``create()``
 calls ``save()`` and loops until an unused ``session_key`` is generated.
 
 If you're using the ``django.contrib.sessions.backends.db`` backend, each
-session is just a normal Django model. The ``Session`` model is defined in
+session is a normal Django model. The ``Session`` model is defined in
 ``django/contrib/sessions/models.py``. Because it's a normal model, you can
 access sessions using the normal Django database API::
 
@@ -600,6 +599,8 @@ of ``request.session`` as described above in `using sessions in views`_.
     Django applications which have the
     :setting:`SESSION_EXPIRE_AT_BROWSER_CLOSE` setting enabled.
 
+.. _clearing-the-session-store:
+
 Clearing the session store
 ==========================
 
@@ -658,7 +659,7 @@ session for their account. If the attacker has control over ``bad.example.com``,
 they can use it to send their session key to you since a subdomain is permitted
 to set cookies on ``*.example.com``. When you visit ``good.example.com``,
 you'll be logged in as the attacker and might inadvertently enter your
-sensitive personal data (e.g. credit card info) into the attackers account.
+sensitive personal data (e.g. credit card info) into the attacker's account.
 
 Another possible attack would be if ``good.example.com`` sets its
 :setting:`SESSION_COOKIE_DOMAIN` to ``"example.com"`` which would cause
@@ -701,9 +702,9 @@ In order to build a custom session engine or to customize an existing one, you
 may create a new class inheriting from :class:`~backends.base.SessionBase` or
 any other existing ``SessionStore`` class.
 
-Extending most of the session engines is quite straightforward, but doing so
-with database-backed session engines generally requires some extra effort (see
-the next section for details).
+You can extend the session engines, but doing so with database-backed session
+engines generally requires some extra effort (see the next section for
+details).
 
 .. _extending-database-backed-session-engines:
 

@@ -1,16 +1,20 @@
 import threading
 from datetime import datetime, timedelta
+from unittest import mock
 
 from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
 from django.db import DEFAULT_DB_ALIAS, DatabaseError, connections, models
 from django.db.models.manager import BaseManager
-from django.db.models.query import MAX_GET_RESULTS, EmptyQuerySet, QuerySet
+from django.db.models.query import MAX_GET_RESULTS, EmptyQuerySet
 from django.test import (
     SimpleTestCase, TestCase, TransactionTestCase, skipUnlessDBFeature,
 )
 from django.utils.translation import gettext_lazy
 
-from .models import Article, ArticleSelectOnSave, FeaturedArticle, SelfRef
+from .models import (
+    Article, ArticleSelectOnSave, ChildPrimaryKeyWithDefault, FeaturedArticle,
+    PrimaryKeyWithDefault, SelfRef,
+)
 
 
 class ModelInstanceCreationTests(TestCase):
@@ -129,6 +133,17 @@ class ModelInstanceCreationTests(TestCase):
         self.assertIn(a, Article.objects.all())
         # ... but there will often be more efficient ways if that is all you need:
         self.assertTrue(Article.objects.filter(id=a.id).exists())
+
+    def test_save_primary_with_default(self):
+        # An UPDATE attempt is skipped when a primary key has default.
+        with self.assertNumQueries(1):
+            PrimaryKeyWithDefault().save()
+
+    def test_save_parent_primary_with_default(self):
+        # An UPDATE attempt is skipped when an inherited primary key has
+        # default.
+        with self.assertNumQueries(2):
+            ChildPrimaryKeyWithDefault().save()
 
 
 class ModelTest(TestCase):
@@ -307,7 +322,7 @@ class ModelTest(TestCase):
         # A hacky test for custom QuerySet subclass - refs #17271
         Article.objects.create(headline='foo', pub_date=datetime.now())
 
-        class CustomQuerySet(QuerySet):
+        class CustomQuerySet(models.QuerySet):
             def do_something(self):
                 return 'did something'
 
@@ -346,6 +361,7 @@ class ModelTest(TestCase):
         self.assertNotEqual(object(), Article(id=1))
         a = Article()
         self.assertEqual(a, a)
+        self.assertEqual(a, mock.ANY)
         self.assertNotEqual(Article(), a)
 
     def test_hash(self):
@@ -597,7 +613,7 @@ class ManagerTest(SimpleTestCase):
         `Manager` will need to be added to `ManagerTest.QUERYSET_PROXY_METHODS`.
         """
         self.assertEqual(
-            sorted(BaseManager._get_queryset_methods(QuerySet)),
+            sorted(BaseManager._get_queryset_methods(models.QuerySet)),
             sorted(self.QUERYSET_PROXY_METHODS),
         )
 
@@ -630,7 +646,7 @@ class SelectOnSaveTests(TestCase):
 
         orig_class = Article._base_manager._queryset_class
 
-        class FakeQuerySet(QuerySet):
+        class FakeQuerySet(models.QuerySet):
             # Make sure the _update method below is in fact called.
             called = False
 

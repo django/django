@@ -1,8 +1,11 @@
+from unittest import mock
+
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import connection
-from django.db.models import Prefetch, QuerySet
-from django.db.models.query import get_prefetcher, prefetch_related_objects
+from django.db.models import Prefetch, QuerySet, prefetch_related_objects
+from django.db.models.query import get_prefetcher
+from django.db.models.sql import Query
 from django.test import TestCase, override_settings
 from django.test.utils import CaptureQueriesContext
 
@@ -204,7 +207,7 @@ class PrefetchRelatedTests(TestDataMixin, TestCase):
 
     def test_reverse_one_to_one_then_m2m(self):
         """
-        A m2m relation can be followed afterr going through the select_related
+        A m2m relation can be followed after going through the select_related
         reverse of an o2o.
         """
         qs = Author.objects.prefetch_related('bio__books').select_related('bio')
@@ -238,6 +241,13 @@ class PrefetchRelatedTests(TestDataMixin, TestCase):
 
         self.assertIn('prefetch_related', str(cm.exception))
         self.assertIn("name", str(cm.exception))
+
+    def test_prefetch_eq(self):
+        prefetch_1 = Prefetch('authors', queryset=Author.objects.all())
+        prefetch_2 = Prefetch('books', queryset=Book.objects.all())
+        self.assertEqual(prefetch_1, prefetch_1)
+        self.assertEqual(prefetch_1, mock.ANY)
+        self.assertNotEqual(prefetch_1, prefetch_2)
 
     def test_forward_m2m_to_attr_conflict(self):
         msg = 'to_attr=authors conflicts with a field on the Book model.'
@@ -281,6 +291,20 @@ class PrefetchRelatedTests(TestDataMixin, TestCase):
 
         sql = queries[-1]['sql']
         self.assertWhereContains(sql, self.author1.id)
+
+    def test_filter_deferred(self):
+        """
+        Related filtering of prefetched querysets is deferred until necessary.
+        """
+        add_q = Query.add_q
+        with mock.patch.object(
+            Query,
+            'add_q',
+            autospec=True,
+            side_effect=lambda self, q: add_q(self, q),
+        ) as add_q_mock:
+            list(Book.objects.prefetch_related('authors'))
+            self.assertEqual(add_q_mock.call_count, 1)
 
 
 class RawQuerySetTests(TestDataMixin, TestCase):
@@ -791,11 +815,19 @@ class CustomPrefetchTests(TestCase):
             self.traverse_qs(list(houses), [['occupants', 'houses', 'main_room']])
 
     def test_values_queryset(self):
-        with self.assertRaisesMessage(ValueError, 'Prefetch querysets cannot use values().'):
+        msg = 'Prefetch querysets cannot use raw(), values(), and values_list().'
+        with self.assertRaisesMessage(ValueError, msg):
             Prefetch('houses', House.objects.values('pk'))
+        with self.assertRaisesMessage(ValueError, msg):
+            Prefetch('houses', House.objects.values_list('pk'))
         # That error doesn't affect managers with custom ModelIterable subclasses
         self.assertIs(Teacher.objects_custom.all()._iterable_class, ModelIterableSubclass)
         Prefetch('teachers', Teacher.objects_custom.all())
+
+    def test_raw_queryset(self):
+        msg = 'Prefetch querysets cannot use raw(), values(), and values_list().'
+        with self.assertRaisesMessage(ValueError, msg):
+            Prefetch('houses', House.objects.raw('select pk from house'))
 
     def test_to_attr_doesnt_cache_through_attr_as_list(self):
         house = House.objects.prefetch_related(
@@ -813,6 +845,22 @@ class CustomPrefetchTests(TestCase):
             all_houses = list(House.objects.filter(occupants=person))
             with self.assertNumQueries(0):
                 self.assertEqual(person.cached_all_houses, all_houses)
+
+    def test_filter_deferred(self):
+        """
+        Related filtering of prefetched querysets is deferred until necessary.
+        """
+        add_q = Query.add_q
+        with mock.patch.object(
+            Query,
+            'add_q',
+            autospec=True,
+            side_effect=lambda self, q: add_q(self, q),
+        ) as add_q_mock:
+            list(House.objects.prefetch_related(
+                Prefetch('occupants', queryset=Person.objects.all())
+            ))
+            self.assertEqual(add_q_mock.call_count, 1)
 
 
 class DefaultManagerTests(TestCase):
@@ -1363,7 +1411,7 @@ class Ticket21760Tests(TestCase):
         self.assertNotIn(' JOIN ', str(queryset.query))
 
 
-class DirectPrefechedObjectCacheReuseTests(TestCase):
+class DirectPrefetchedObjectCacheReuseTests(TestCase):
     """
     prefetch_related() reuses objects fetched in _prefetched_objects_cache.
 

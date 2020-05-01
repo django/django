@@ -11,14 +11,8 @@ does the same thing as ``django-admin`` but also sets the
 project's ``settings.py`` file.
 
 The ``django-admin`` script should be on your system path if you installed
-Django via its ``setup.py`` utility. If it's not on your path, you can find it
-in ``site-packages/django/bin`` within your Python installation. Consider
-symlinking it from some place on your path, such as ``/usr/local/bin``.
-
-For Windows users, who do not have symlinking functionality available, you can
-copy ``django-admin.exe`` to a location on your existing path or edit the
-``PATH`` settings (under ``Settings - Control Panel - System - Advanced -
-Environment...``) to point to its installed location.
+Django via ``pip``. If it's not in your path, ensure you have your virtual
+environment activated.
 
 Generally, when working on a single Django project, it's easier to use
 ``manage.py`` than ``django-admin``. If you need to switch between multiple
@@ -111,6 +105,16 @@ tags to restrict the checks performed to just those in a particular category.
 For example, to perform only models and compatibility checks, run::
 
     django-admin check --tag models --tag compatibility
+
+.. django-admin-option:: --database DATABASE
+
+.. versionadded:: 3.1
+
+Specifies the database to run checks requiring database access::
+
+    django-admin check --database default --database other
+
+By default, these checks will not be run.
 
 .. django-admin-option:: --list-tags
 
@@ -213,7 +217,7 @@ specified in your :setting:`USER`, :setting:`PASSWORD`, etc., settings.
 * For SQLite, this runs the ``sqlite3`` command-line client.
 * For Oracle, this runs the ``sqlplus`` command-line client.
 
-This command assumes the programs are on your ``PATH`` so that a simple call to
+This command assumes the programs are on your ``PATH`` so that a call to
 the program name (``psql``, ``mysql``, ``sqlite3``, ``sqlplus``) will find the
 program in the right place. There's no way to specify the location of the
 program manually.
@@ -221,6 +225,39 @@ program manually.
 .. django-admin-option:: --database DATABASE
 
 Specifies the database onto which to open a shell. Defaults to ``default``.
+
+.. django-admin-option:: -- ARGUMENTS
+
+.. versionadded:: 3.1
+
+Any arguments following a ``--`` divider will be passed on to the underlying
+command-line client. For example, with PostgreSQL you can use the ``psql``
+command's ``-c`` flag to execute a raw SQL query directly:
+
+.. console::
+
+    $ django-admin dbshell -- -c 'select current_user'
+     current_user
+    --------------
+     postgres
+    (1 row)
+
+On MySQL/MariaDB, you can do this with the ``mysql`` command's ``-e`` flag:
+
+.. console::
+
+    $ django-admin dbshell -- -e "select user()"
+    +----------------------+
+    | user()               |
+    +----------------------+
+    | djangonaut@localhost |
+    +----------------------+
+
+.. note::
+
+    Be aware that not all options set in the :setting:`OPTIONS` part of your
+    database configuration in :setting:`DATABASES` are passed to the
+    command-line client, e.g. ``'isolation_level'``.
 
 ``diffsettings``
 ----------------
@@ -400,7 +437,7 @@ By default, ``inspectdb`` creates unmanaged models. That is, ``managed = False``
 in the model's ``Meta`` class tells Django not to manage each table's creation,
 modification, and deletion. If you do want to allow Django to manage the
 table's lifecycle, you'll need to change the
-:attr:`~django.db.models.Options.managed` option to ``True`` (or simply remove
+:attr:`~django.db.models.Options.managed` option to ``True`` (or remove
 it because ``True`` is its default value).
 
 Database-specific notes
@@ -421,17 +458,11 @@ PostgreSQL
 * Models are created for partition tables if
   :option:`--include-partitions` is used.
 
-.. versionchanged:: 2.2
-
-    Support for foreign tables and materialized views was added.
-
 .. django-admin-option:: --database DATABASE
 
 Specifies the database to introspect. Defaults to ``default``.
 
 .. django-admin-option:: --include-partitions
-
-.. versionadded:: 2.2
 
 If this option is provided, models are also created for partitions.
 
@@ -537,7 +568,7 @@ raise an exception::
 
     post_save.connect(my_handler, sender=MyModel)
 
-You could also write a simple decorator to encapsulate this logic::
+You could also write a decorator to encapsulate this logic::
 
     from functools import wraps
 
@@ -783,8 +814,6 @@ name must be a valid Python :ref:`identifier <python:identifiers>`.
 
 .. django-admin-option:: --no-header
 
-.. versionadded:: 2.2
-
 Generate migration files without Django version and timestamp header.
 
 .. django-admin-option:: --check
@@ -810,8 +839,16 @@ The behavior of this command changes depending on the arguments provided:
 * ``<app_label> <migrationname>``: Brings the database schema to a state where
   the named migration is applied, but no later migrations in the same app are
   applied. This may involve unapplying migrations if you have previously
-  migrated past the named migration. Use the name ``zero`` to unapply all
+  migrated past the named migration. You can use a prefix of the migration
+  name, e.g. ``0001``, as long as it's unique for the given app name. Use the
+  name ``zero`` to migrate all the way back i.e. to revert all applied
   migrations for an app.
+
+.. warning::
+
+    When unapplying migrations, all dependent migrations will also be
+    unapplied, regardless of ``<app_label>``. You can use ``--plan`` to check
+    which migrations will be unapplied.
 
 .. django-admin-option:: --database DATABASE
 
@@ -841,8 +878,6 @@ schema matches what is recorded in your initial migration.
 
 .. django-admin-option:: --plan
 
-.. versionadded:: 2.2
-
 Shows the migration operations that will be performed for the given ``migrate``
 command.
 
@@ -856,6 +891,13 @@ with hundreds of models.
 
 Suppresses all user prompts. An example prompt is asking about removing stale
 content types.
+
+.. django-admin-option:: --check
+
+.. versionadded:: 3.1
+
+Makes ``migrate`` exit with a non-zero status when unapplied migrations are
+detected.
 
 ``runserver``
 -------------
@@ -905,11 +947,7 @@ more robust change detection, and a reduction in power usage. Django supports
 
 .. _Watchman: https://facebook.github.io/watchman/
 .. _pywatchman: https://pypi.org/project/pywatchman/
-.. _watchman documentation: https://facebook.github.io/watchman/docs/config.html#ignore_dirs
-
-.. versionchanged:: 2.2
-
-   Watchman support replaced support for `pyinotify`.
+.. _watchman documentation: https://facebook.github.io/watchman/docs/config#ignore_dirs
 
 When you start the server, and each time you change Python code while the
 server is running, the system check framework will check your entire Django
@@ -917,7 +955,7 @@ project for some common errors (see the :djadmin:`check` command). If any
 errors are found, they will be printed to standard output.
 
 You can run as many concurrent servers as you want, as long as they're on
-separate ports. Just execute ``django-admin runserver`` more than once.
+separate ports by executing ``django-admin runserver`` more than once.
 
 Note that the default IP address, ``127.0.0.1``, is not accessible from other
 machines on your network. To make your development server viewable to other
@@ -1193,8 +1231,6 @@ first and last migration, with ``_squashed_`` in between.
 
 .. django-admin-option:: --no-header
 
-.. versionadded:: 2.2
-
 Generate squashed migration file without Django version and timestamp header.
 
 ``startapp``
@@ -1221,9 +1257,10 @@ For example::
 
 .. django-admin-option:: --template TEMPLATE
 
-Provides the path to a directory with a custom app template file or a path to a
-compressed file (``.tar.gz``, ``.tar.bz2``, ``.tgz``, ``.tbz``, ``.zip``)
-containing the app template files.
+Provides the path to a directory with a custom app template file, or a path to
+an uncompressed archive (``.tar``) or a compressed archive (``.tar.gz``,
+``.tar.bz2``, ``.tar.xz``, ``.tar.lzma``, ``.tgz``, ``.tbz2``, ``.txz``,
+``.tlz``, ``.zip``) containing the app template files.
 
 For example, this would look for an app template in the given directory when
 creating the ``myapp`` app::
@@ -1238,6 +1275,11 @@ For example, taking advantage of GitHub's feature to expose repositories as
 zip files, you can use a URL like::
 
     django-admin startapp --template=https://github.com/githubuser/django-app-template/archive/master.zip myapp
+
+.. versionchanged:: 3.0
+
+    Support for XZ archives (``.tar.xz``, ``.txz``) and LZMA archives
+    (``.tar.lzma``, ``.tlz``) was added.
 
 .. django-admin-option:: --extension EXTENSIONS, -e EXTENSIONS
 
@@ -1367,8 +1409,9 @@ Preserves the test database between test runs. This has the advantage of
 skipping both the create and destroy actions which can greatly decrease the
 time to run tests, especially those in a large test suite. If the test database
 does not exist, it will be created on the first run and then preserved for each
-subsequent run. Any unapplied migrations will also be applied to the test
-database before running the test suite.
+subsequent run. Unless the :setting:`MIGRATE <TEST_MIGRATE>` test setting is
+``False``, any unapplied migrations will also be applied to the test database
+before running the test suite.
 
 .. django-admin-option:: --reverse, -r
 
@@ -1403,6 +1446,12 @@ will reduce the number of processes accordingly.
 Each process gets its own database. You must ensure that different test cases
 don't access the same resources. For instance, test cases that touch the
 filesystem should create a temporary directory for their own use.
+
+.. note::
+
+    If you have test classes that cannot be run in parallel, you can use
+    ``SerializeMixin`` to run them sequentially. See :ref:`Enforce running test
+    classes sequentially <topics-testing-enforce-run-sequentially>`.
 
 This option requires the third-party ``tblib`` package to display tracebacks
 correctly:
@@ -1450,6 +1499,19 @@ Runs test methods and classes matching test name patterns, in the same way as
 
     This feature is only available for Python 3.7 and later.
 
+.. django-admin-option:: --pdb
+
+.. versionadded:: 3.0
+
+Spawns a ``pdb`` debugger at each test error or failure. If you have it
+installed, ``ipdb`` is used instead.
+
+.. django-admin-option:: --buffer, -b
+
+.. versionadded:: 3.1
+
+Discards output (``stdout`` and ``stderr``) for passing tests, in the same way
+as :option:`unittest's --buffer option<unittest.-b>`.
 
 ``testserver``
 --------------
@@ -1623,6 +1685,13 @@ the deletion.
 
 Specifies the database to use. Defaults to ``default``.
 
+.. django-admin-option:: --include-stale-apps
+
+.. versionadded:: 3.1
+
+Deletes stale content types including ones from previously installed apps that
+have been removed from :setting:`INSTALLED_APPS`. Defaults to ``False``.
+
 ``django.contrib.gis``
 ----------------------
 
@@ -1717,7 +1786,7 @@ Example usage::
 .. django-admin-option:: --traceback
 
 Displays a full stack trace when a :exc:`~django.core.management.CommandError`
-is raised. By default, ``django-admin`` will show a simple error message when a
+is raised. By default, ``django-admin`` will show an error message when a
 ``CommandError`` occurs and a full stack trace for any other exception.
 
 Example usage::
@@ -1749,8 +1818,6 @@ Example usage::
     django-admin runserver --no-color
 
 .. django-admin-option:: --force-color
-
-.. versionadded:: 2.2
 
 Forces colorization of the command output if it would otherwise be disabled
 as discussed in :ref:`syntax-coloring`. For example, you may want to pipe

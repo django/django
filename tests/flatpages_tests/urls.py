@@ -8,6 +8,6 @@ urlpatterns = [
         {'sitemaps': {'flatpages': FlatPageSitemap}},
         name='django.contrib.sitemaps.views.sitemap'),
 
-    path('flatpage_root', include('django.contrib.flatpages.urls')),
+    path('flatpage_root/', include('django.contrib.flatpages.urls')),
     path('accounts/', include('django.contrib.auth.urls')),
 ]

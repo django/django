@@ -83,8 +83,7 @@ Other topics
 
     The ``ModelAdmin`` class is the representation of a model in the admin
     interface. Usually, these are stored in a file named ``admin.py`` in your
-    application. Let's take a look at a very simple example of
-    the ``ModelAdmin``::
+    application. Let's take a look at an example of the ``ModelAdmin``::
 
         from django.contrib import admin
         from myproject.myapp.models import Author
@@ -972,10 +971,23 @@ subclass::
       limit the ``list_filter`` choices to the users who have written a book
       instead of listing all users.
 
+      You can filter empty values using ``EmptyFieldListFilter``, which can
+      filter on both empty strings and nulls, depending on what the field
+      allows to store::
+
+          class BookAdmin(admin.ModelAdmin):
+              list_filter = (
+                  ('title', admin.EmptyFieldListFilter),
+              )
+
       .. note::
 
         The ``FieldListFilter`` API is considered internal and might be
         changed.
+
+      .. versionadded:: 3.1
+
+          The ``EmptyFieldListFilter`` class was added.
 
     List filter's typically appear only if the filter has more than one choice.
     A filter's ``has_output()`` method controls whether or not it appears.
@@ -1026,6 +1038,12 @@ subclass::
 
     If you need to specify a dynamic value based on the request, you can
     implement a :meth:`~ModelAdmin.get_list_select_related` method.
+
+    .. note::
+
+        ``ModelAdmin`` ignores this attribute when
+        :meth:`~django.db.models.query.QuerySet.select_related` was already
+        called on the changelist's ``QuerySet``.
 
 .. attribute:: ModelAdmin.ordering
 
@@ -1195,8 +1213,8 @@ subclass::
     A read-only field can not only display data from a model's field, it can
     also display the output of a model's method or a method of the
     ``ModelAdmin`` class itself. This is very similar to the way
-    :attr:`ModelAdmin.list_display` behaves. This provides an easy way to use
-    the admin interface to provide feedback on the status of the objects being
+    :attr:`ModelAdmin.list_display` behaves. This provides a way to use the
+    admin interface to provide feedback on the status of the objects being
     edited, for example::
 
         from django.contrib import admin
@@ -1742,7 +1760,7 @@ templates used by the :class:`ModelAdmin` views:
                     kwargs['form'] = MySuperuserForm
                 return super().get_form(request, obj, **kwargs)
 
-    You may also simply return a custom :class:`~django.forms.ModelForm` class
+    You may also return a custom :class:`~django.forms.ModelForm` class
     directly.
 
 .. method:: ModelAdmin.get_formsets_with_inlines(request, obj=None)
@@ -2129,9 +2147,13 @@ jQuery
 Django admin JavaScript makes use of the `jQuery`_ library.
 
 To avoid conflicts with user-supplied scripts or libraries, Django's jQuery
-(version 3.3.1) is namespaced as ``django.jQuery``. If you want to use jQuery
+(version 3.4.1) is namespaced as ``django.jQuery``. If you want to use jQuery
 in your own admin JavaScript without including a second copy, you can use the
 ``django.jQuery`` object on changelist and add/edit views.
+
+.. versionchanged:: 3.0
+
+    jQuery was upgraded from 3.3.1 to 3.4.1.
 
 The :class:`ModelAdmin` class requires jQuery by default, so there is no need
 to add jQuery to your ``ModelAdmin``’s list of media resources unless you have
@@ -2155,9 +2177,9 @@ return the uncompressed versions of the various JavaScript files, including
 Adding custom validation to the admin
 -------------------------------------
 
-Adding custom validation of data in the admin is quite easy. The automatic
-admin interface reuses :mod:`django.forms`, and the ``ModelAdmin`` class gives
-you the ability define your own form::
+You can also add custom validation of data in the admin. The automatic admin
+interface reuses :mod:`django.forms`, and the ``ModelAdmin`` class gives you
+the ability define your own form::
 
     class ArticleAdmin(admin.ModelAdmin):
         form = MyArticleAdminForm
@@ -2286,7 +2308,7 @@ The ``InlineModelAdmin`` class adds or customizes:
 .. attribute:: InlineModelAdmin.extra
 
     This controls the number of extra forms the formset will display in
-    addition to the initial forms. See the
+    addition to the initial forms. Defaults to 3. See the
     :doc:`formsets documentation </topics/forms/formsets>` for more
     information.
 
@@ -2531,8 +2553,7 @@ layout required for multiple widgets will vary depending on the intermediate
 model.
 
 However, we still want to be able to edit that information inline. Fortunately,
-this is easy to do with inline admin models. Suppose we have the following
-models::
+we can do this with inline admin models. Suppose we have the following models::
 
     from django.db import models
 
@@ -2556,7 +2577,7 @@ define an inline class for the ``Membership`` model::
         model = Membership
         extra = 1
 
-This simple example uses the default ``InlineModelAdmin`` values for the
+This example uses the default ``InlineModelAdmin`` values for the
 ``Membership`` model, and limits the extra add forms to one. This could be
 customized using any of the options available to ``InlineModelAdmin`` classes.
 
@@ -2629,9 +2650,9 @@ specific information.
 Overriding admin templates
 ==========================
 
-It is relatively easy to override many of the templates which the admin module
-uses to generate the various pages of an admin site. You can even override a
-few of these templates for a specific app, or a specific model.
+You can override many of the templates which the admin module uses to generate
+the various pages of an admin site. You can even override a few of these
+templates for a specific app, or a specific model.
 
 Set up your projects admin template directories
 -----------------------------------------------
@@ -2687,14 +2708,14 @@ Therefore here is our new ``change_form.html`` :
     {% load i18n admin_urls %}
     {% block object-tools-items %}
         <li>
-            <a href="{% url opts|admin_urlname:'history' original.pk|admin_urlquote %}" class="historylink">{% trans "History" %}</a>
+            <a href="{% url opts|admin_urlname:'history' original.pk|admin_urlquote %}" class="historylink">{% translate "History" %}</a>
         </li>
         <li>
             <a href="mylink/" class="historylink">My Link</a>
         </li>
         {% if has_absolute_url %}
             <li>
-                <a href="{% url 'admin:view_on_site' content_type_id original.pk %}" class="viewsitelink">{% trans "View on site" %}</a>
+                <a href="{% url 'admin:view_on_site' content_type_id original.pk %}" class="viewsitelink">{% translate "View on site" %}</a>
             </li>
         {% endif %}
     {% endblock %}
@@ -2728,7 +2749,7 @@ app or per model. The following can:
 * ``submit_line.html``
 
 For those templates that cannot be overridden in this way, you may still
-override them for your entire project. Just place the new version in your
+override them for your entire project by placing the new version in your
 ``templates/admin`` directory. This is particularly useful to create custom 404
 and 500 pages.
 
@@ -2919,11 +2940,11 @@ Customizing the :class:`AdminSite` class
 ----------------------------------------
 
 If you'd like to set up your own admin site with custom behavior, you're free
-to subclass ``AdminSite`` and override or add anything you like. Then, simply
-create an instance of your ``AdminSite`` subclass (the same way you'd
-instantiate any other Python class) and register your models and
-``ModelAdmin`` subclasses with it instead of with the default site. Finally,
-update :file:`myproject/urls.py` to reference your :class:`AdminSite` subclass.
+to subclass ``AdminSite`` and override or add anything you like. Then, create
+an instance of your ``AdminSite`` subclass (the same way you'd instantiate any
+other Python class) and register your models and ``ModelAdmin`` subclasses with
+it instead of with the default site. Finally, update :file:`myproject/urls.py`
+to reference your :class:`AdminSite` subclass.
 
 .. code-block:: python
     :caption: myapp/admin.py
@@ -2996,9 +3017,9 @@ returns a site instance.
 Multiple admin sites in the same URLconf
 ----------------------------------------
 
-It's easy to create multiple instances of the admin site on the same
-Django-powered website. Just create multiple instances of ``AdminSite`` and
-root each one at a different URL.
+You can create multiple instances of the admin site on the same Django-powered
+website. Create multiple instances of ``AdminSite`` and place each one at a
+different URL.
 
 In this example, the URLs ``/basic-admin/`` and ``/advanced-admin/`` feature
 separate versions of the admin site -- using the ``AdminSite`` instances

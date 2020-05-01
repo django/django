@@ -1,3 +1,5 @@
+from django.core import checks
+
 NOT_PROVIDED = object()
 
 
@@ -24,3 +26,31 @@ class FieldCacheMixin:
 
     def delete_cached_value(self, instance):
         del instance._state.fields_cache[self.get_cache_name()]
+
+
+class CheckFieldDefaultMixin:
+    _default_hint = ('<valid default>', '<invalid default>')
+
+    def _check_default(self):
+        if self.has_default() and self.default is not None and not callable(self.default):
+            return [
+                checks.Warning(
+                    "%s default should be a callable instead of an instance "
+                    "so that it's not shared between all field instances." % (
+                        self.__class__.__name__,
+                    ),
+                    hint=(
+                        'Use a callable instead, e.g., use `%s` instead of '
+                        '`%s`.' % self._default_hint
+                    ),
+                    obj=self,
+                    id='fields.E010',
+                )
+            ]
+        else:
+            return []
+
+    def check(self, **kwargs):
+        errors = super().check(**kwargs)
+        errors.extend(self._check_default())
+        return errors

@@ -187,7 +187,7 @@ class CustomPKTests(TestCase):
         Business.objects.create(pk="Tears")
 
     def test_unicode_pk(self):
-        # Primary key may be unicode string
+        # Primary key may be Unicode string.
         Business.objects.create(name='jaźń')
 
     def test_unique_pk(self):

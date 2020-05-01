@@ -38,7 +38,7 @@ from . import customadmin
 from .admin import CityAdmin, site, site2
 from .models import (
     Actor, AdminOrderedAdminMethod, AdminOrderedCallable, AdminOrderedField,
-    AdminOrderedModelMethod, Answer, Answer2, Article, BarAccount, Book,
+    AdminOrderedModelMethod, Album, Answer, Answer2, Article, BarAccount, Book,
     Bookmark, Category, Chapter, ChapterXtra1, ChapterXtra2, Character, Child,
     Choice, City, Collector, Color, ComplexSortedPerson, CoverLetter,
     CustomArticle, CyclicOne, CyclicTwo, DooHickey, Employee, EmptyModel,
@@ -50,7 +50,7 @@ from .models import (
     PrePopulatedPost, Promo, Question, ReadablePizza, ReadOnlyPizza,
     Recommendation, Recommender, RelatedPrepopulated, RelatedWithUUIDPKModel,
     Report, Restaurant, RowLevelChangePermissionModel, SecretHideout, Section,
-    ShortMessage, Simple, State, Story, SuperSecretHideout, SuperVillain,
+    ShortMessage, Simple, Song, State, Story, SuperSecretHideout, SuperVillain,
     Telegram, TitleTranslation, Topping, UnchangeableObject, UndeletableObject,
     UnorderedObject, UserProxy, Villain, Vodcast, Whatsit, Widget, Worker,
     WorkHour,
@@ -364,30 +364,47 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
         )
 
     def test_change_list_sorting_callable_query_expression(self):
-        """
-        Query expressions may be used for admin_order_field. (column 9 is
-        order_by_expression in ArticleAdmin).
-        """
-        response = self.client.get(reverse('admin:admin_views_article_changelist'), {'o': '9'})
-        self.assertContentBefore(
-            response, 'Oldest content', 'Middle content',
-            'Results of sorting on callable are out of order.'
-        )
-        self.assertContentBefore(
-            response, 'Middle content', 'Newest content',
-            'Results of sorting on callable are out of order.'
-        )
+        """Query expressions may be used for admin_order_field."""
+        tests = [
+            ('order_by_expression', 9),
+            ('order_by_f_expression', 12),
+            ('order_by_orderby_expression', 13),
+        ]
+        for admin_order_field, index in tests:
+            with self.subTest(admin_order_field):
+                response = self.client.get(
+                    reverse('admin:admin_views_article_changelist'),
+                    {'o': index},
+                )
+                self.assertContentBefore(
+                    response, 'Oldest content', 'Middle content',
+                    'Results of sorting on callable are out of order.'
+                )
+                self.assertContentBefore(
+                    response, 'Middle content', 'Newest content',
+                    'Results of sorting on callable are out of order.'
+                )
 
     def test_change_list_sorting_callable_query_expression_reverse(self):
-        response = self.client.get(reverse('admin:admin_views_article_changelist'), {'o': '-9'})
-        self.assertContentBefore(
-            response, 'Middle content', 'Oldest content',
-            'Results of sorting on callable are out of order.'
-        )
-        self.assertContentBefore(
-            response, 'Newest content', 'Middle content',
-            'Results of sorting on callable are out of order.'
-        )
+        tests = [
+            ('order_by_expression', -9),
+            ('order_by_f_expression', -12),
+            ('order_by_orderby_expression', -13),
+        ]
+        for admin_order_field, index in tests:
+            with self.subTest(admin_order_field):
+                response = self.client.get(
+                    reverse('admin:admin_views_article_changelist'),
+                    {'o': index},
+                )
+                self.assertContentBefore(
+                    response, 'Middle content', 'Oldest content',
+                    'Results of sorting on callable are out of order.'
+                )
+                self.assertContentBefore(
+                    response, 'Newest content', 'Middle content',
+                    'Results of sorting on callable are out of order.'
+                )
 
     def test_change_list_sorting_model(self):
         """
@@ -962,6 +979,18 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'question__expires__day=16')
         self.assertContains(response, 'question__expires__month=10')
+        self.assertContains(response, 'question__expires__year=2016')
+
+    @override_settings(TIME_ZONE='America/Los_Angeles', USE_TZ=True)
+    def test_date_hierarchy_local_date_differ_from_utc(self):
+        # This datetime is 2017-01-01 in UTC.
+        date = pytz.timezone('America/Los_Angeles').localize(datetime.datetime(2016, 12, 31, 16))
+        q = Question.objects.create(question='Why?', expires=date)
+        Answer2.objects.create(question=q, answer='Because.')
+        response = self.client.get(reverse('admin:admin_views_answer2_changelist'))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'question__expires__day=31')
+        self.assertContains(response, 'question__expires__month=12')
         self.assertContains(response, 'question__expires__year=2016')
 
     def test_sortable_by_columns_subset(self):
@@ -1794,8 +1823,7 @@ class AdminViewPermissionsTest(TestCase):
         self.assertEqual(post.status_code, 403)
         self.client.get(reverse('admin:logout'))
 
-        # view user should be able to view the article but not change any of them
-        # (the POST can be sent, but no modification occurs)
+        # view user can view articles but not make changes.
         self.client.force_login(self.viewuser)
         response = self.client.get(article_changelist_url)
         self.assertEqual(response.status_code, 200)
@@ -1806,7 +1834,7 @@ class AdminViewPermissionsTest(TestCase):
         self.assertContains(response, '<label>Extra form field:</label>')
         self.assertContains(response, '<a href="/test_admin/admin/admin_views/article/" class="closelink">Close</a>')
         post = self.client.post(article_change_url, change_dict)
-        self.assertEqual(post.status_code, 302)
+        self.assertEqual(post.status_code, 403)
         self.assertEqual(Article.objects.get(pk=self.a1.pk).content, '<p>Middle content</p>')
         self.client.get(reverse('admin:logout'))
 
@@ -1864,7 +1892,7 @@ class AdminViewPermissionsTest(TestCase):
                 response = self.client.get(change_url_3)
                 self.assertEqual(response.status_code, 200)
                 response = self.client.post(change_url_3, {'name': 'changed'})
-                self.assertRedirects(response, self.index_url)
+                self.assertEqual(response.status_code, 403)
                 self.assertEqual(RowLevelChangePermissionModel.objects.get(id=3).name, 'odd id mult 3')
                 response = self.client.get(change_url_6)
                 self.assertEqual(response.status_code, 200)
@@ -1900,21 +1928,6 @@ class AdminViewPermissionsTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context['title'], 'View article')
         self.assertContains(response, '<a href="/test_admin/admin9/admin_views/article/" class="closelink">Close</a>')
-
-    def test_change_view_post_without_object_change_permission(self):
-        """A POST redirects to changelist without modifications."""
-        change_dict = {
-            'title': 'Ikke fordømt',
-            'content': '<p>edited article</p>',
-            'date_0': '2008-03-18', 'date_1': '10:54:39',
-            'section': self.s1.pk,
-        }
-        change_url = reverse('admin10:admin_views_article_change', args=(self.a1.pk,))
-        changelist_url = reverse('admin10:admin_views_article_changelist')
-        self.client.force_login(self.viewuser)
-        response = self.client.post(change_url, change_dict)
-        self.assertRedirects(response, changelist_url)
-        self.assertEqual(Article.objects.get(pk=self.a1.pk).content, '<p>Middle content</p>')
 
     def test_change_view_save_as_new(self):
         """
@@ -2602,6 +2615,33 @@ class AdminViewDeletedObjectsTest(TestCase):
         response = self.client.post(reverse('admin:admin_views_question_delete', args=(q.pk,)), {'post': 'yes'})
         self.assertEqual(Question.objects.count(), 1)
         self.assertContains(response, "would require deleting the following protected related objects")
+
+    def test_restricted(self):
+        album = Album.objects.create(title='Amaryllis')
+        song = Song.objects.create(album=album, name='Unity')
+        response = self.client.get(reverse('admin:admin_views_album_delete', args=(album.pk,)))
+        self.assertContains(
+            response,
+            'would require deleting the following protected related objects',
+        )
+        self.assertContains(
+            response,
+            '<li>Song: <a href="%s">Unity</a></li>'
+            % reverse('admin:admin_views_song_change', args=(song.pk,))
+        )
+
+    def test_post_delete_restricted(self):
+        album = Album.objects.create(title='Amaryllis')
+        Song.objects.create(album=album, name='Unity')
+        response = self.client.post(
+            reverse('admin:admin_views_album_delete', args=(album.pk,)),
+            {'post': 'yes'},
+        )
+        self.assertEqual(Album.objects.count(), 1)
+        self.assertContains(
+            response,
+            'would require deleting the following protected related objects',
+        )
 
     def test_not_registered(self):
         should_contain = """<li>Secret hideout: underground bunker"""
@@ -4072,52 +4112,6 @@ class AdminInlineTests(TestCase):
         self.assertEqual(Widget.objects.count(), 1)
         self.assertEqual(Widget.objects.all()[0].name, "Widget 1 Updated")
 
-    def test_simple_inline_permissions(self):
-        """
-        Changes aren't allowed without change permissions for the inline object.
-        """
-        # User who can view Articles
-        permissionuser = User.objects.create_user(
-            username='permissionuser', password='secret',
-            email='vuser@example.com', is_staff=True,
-        )
-        permissionuser.user_permissions.add(get_perm(Collector, get_permission_codename('view', Collector._meta)))
-        permissionuser.user_permissions.add(get_perm(Widget, get_permission_codename('view', Widget._meta)))
-        self.client.force_login(permissionuser)
-        # Without add permission, a new inline can't be added.
-        self.post_data['widget_set-0-name'] = 'Widget 1'
-        collector_url = reverse('admin:admin_views_collector_change', args=(self.collector.pk,))
-        response = self.client.post(collector_url, self.post_data)
-        self.assertEqual(response.status_code, 302)
-        self.assertEqual(Widget.objects.count(), 0)
-        # But after adding the permission it can.
-        permissionuser.user_permissions.add(get_perm(Widget, get_permission_codename('add', Widget._meta)))
-        self.post_data['widget_set-0-name'] = "Widget 1"
-        collector_url = reverse('admin:admin_views_collector_change', args=(self.collector.pk,))
-        response = self.client.post(collector_url, self.post_data)
-        self.assertEqual(response.status_code, 302)
-        self.assertEqual(Widget.objects.count(), 1)
-        self.assertEqual(Widget.objects.first().name, 'Widget 1')
-        widget_id = Widget.objects.first().id
-        # Without the change permission, a POST doesn't change the object.
-        self.post_data['widget_set-INITIAL_FORMS'] = '1'
-        self.post_data['widget_set-0-id'] = str(widget_id)
-        self.post_data['widget_set-0-name'] = 'Widget 1 Updated'
-        response = self.client.post(collector_url, self.post_data)
-        self.assertEqual(response.status_code, 302)
-        self.assertEqual(Widget.objects.count(), 1)
-        self.assertEqual(Widget.objects.first().name, 'Widget 1')
-        # Now adding the change permission and editing works.
-        permissionuser.user_permissions.remove(get_perm(Widget, get_permission_codename('add', Widget._meta)))
-        permissionuser.user_permissions.add(get_perm(Widget, get_permission_codename('change', Widget._meta)))
-        self.post_data['widget_set-INITIAL_FORMS'] = '1'
-        self.post_data['widget_set-0-id'] = str(widget_id)
-        self.post_data['widget_set-0-name'] = 'Widget 1 Updated'
-        response = self.client.post(collector_url, self.post_data)
-        self.assertEqual(response.status_code, 302)
-        self.assertEqual(Widget.objects.count(), 1)
-        self.assertEqual(Widget.objects.first().name, 'Widget 1 Updated')
-
     def test_explicit_autofield_inline(self):
         "A model with an explicit autofield primary key can be saved as inlines. Regression for #8093"
         # First add a new inline
@@ -4459,19 +4453,19 @@ class SeleniumTests(AdminSeleniumTestCase):
 
         # Main form ----------------------------------------------------------
         self.selenium.find_element_by_id('id_pubdate').send_keys('2012-02-18')
-        self.get_select_option('#id_status', 'option two').click()
-        self.selenium.find_element_by_id('id_name').send_keys(' this is the mAin nÀMë and it\'s awεšomeııı')
+        self.select_option('#id_status', 'option two')
+        self.selenium.find_element_by_id('id_name').send_keys(' this is the mAin nÀMë and it\'s awεšomeıııİ')
         slug1 = self.selenium.find_element_by_id('id_slug1').get_attribute('value')
         slug2 = self.selenium.find_element_by_id('id_slug2').get_attribute('value')
         slug3 = self.selenium.find_element_by_id('id_slug3').get_attribute('value')
-        self.assertEqual(slug1, 'main-name-and-its-awesomeiii-2012-02-18')
-        self.assertEqual(slug2, 'option-two-main-name-and-its-awesomeiii')
-        self.assertEqual(slug3, 'this-is-the-main-n\xe0m\xeb-and-its-aw\u03b5\u0161ome\u0131\u0131\u0131')
+        self.assertEqual(slug1, 'main-name-and-its-awesomeiiii-2012-02-18')
+        self.assertEqual(slug2, 'option-two-main-name-and-its-awesomeiiii')
+        self.assertEqual(slug3, 'this-is-the-main-n\xe0m\xeb-and-its-aw\u03b5\u0161ome\u0131\u0131\u0131i')
 
         # Stacked inlines ----------------------------------------------------
         # Initial inline
         self.selenium.find_element_by_id('id_relatedprepopulated_set-0-pubdate').send_keys('2011-12-17')
-        self.get_select_option('#id_relatedprepopulated_set-0-status', 'option one').click()
+        self.select_option('#id_relatedprepopulated_set-0-status', 'option one')
         self.selenium.find_element_by_id('id_relatedprepopulated_set-0-name').send_keys(
             ' here is a sŤāÇkeð   inline !  '
         )
@@ -4492,7 +4486,7 @@ class SeleniumTests(AdminSeleniumTestCase):
             num_initial_select2_inputs + 2
         )
         self.selenium.find_element_by_id('id_relatedprepopulated_set-1-pubdate').send_keys('1999-01-25')
-        self.get_select_option('#id_relatedprepopulated_set-1-status', 'option two').click()
+        self.select_option('#id_relatedprepopulated_set-1-status', 'option two')
         self.selenium.find_element_by_id('id_relatedprepopulated_set-1-name').send_keys(
             ' now you haVe anöther   sŤāÇkeð  inline with a very ... '
             'loooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooog text... '
@@ -4507,7 +4501,7 @@ class SeleniumTests(AdminSeleniumTestCase):
         # Tabular inlines ----------------------------------------------------
         # Initial inline
         self.selenium.find_element_by_id('id_relatedprepopulated_set-2-0-pubdate').send_keys('1234-12-07')
-        self.get_select_option('#id_relatedprepopulated_set-2-0-status', 'option two').click()
+        self.select_option('#id_relatedprepopulated_set-2-0-status', 'option two')
         self.selenium.find_element_by_id('id_relatedprepopulated_set-2-0-name').send_keys(
             'And now, with a tÃbűlaŘ inline !!!'
         )
@@ -4517,13 +4511,16 @@ class SeleniumTests(AdminSeleniumTestCase):
         self.assertEqual(slug2, 'option-two-and-now-tabular-inline')
 
         # Add an inline
-        self.selenium.find_elements_by_link_text('Add another Related prepopulated')[1].click()
+        # Button may be outside the browser frame.
+        element = self.selenium.find_elements_by_link_text('Add another Related prepopulated')[1]
+        self.selenium.execute_script('window.scrollTo(0, %s);' % element.location['y'])
+        element.click()
         self.assertEqual(
             len(self.selenium.find_elements_by_class_name('select2-selection')),
             num_initial_select2_inputs + 4
         )
         self.selenium.find_element_by_id('id_relatedprepopulated_set-2-1-pubdate').send_keys('1981-08-22')
-        self.get_select_option('#id_relatedprepopulated_set-2-1-status', 'option one').click()
+        self.select_option('#id_relatedprepopulated_set-2-1-status', 'option one')
         self.selenium.find_element_by_id('id_relatedprepopulated_set-2-1-name').send_keys(
             r'a tÃbűlaŘ inline with ignored ;"&*^\%$#@-/`~ characters'
         )
@@ -4540,15 +4537,16 @@ class SeleniumTests(AdminSeleniumTestCase):
             num_initial_select2_inputs + 6
         )
         # Save and check that everything is properly stored in the database
-        self.selenium.find_element_by_xpath('//input[@value="Save"]').click()
-        self.wait_page_loaded()
+        with self.wait_page_loaded():
+            self.selenium.find_element_by_xpath('//input[@value="Save"]').click()
         self.assertEqual(MainPrepopulated.objects.all().count(), 1)
         MainPrepopulated.objects.get(
-            name=' this is the mAin nÀMë and it\'s awεšomeııı',
+            name=' this is the mAin nÀMë and it\'s awεšomeıııİ',
             pubdate='2012-02-18',
             status='option two',
-            slug1='main-name-and-its-awesomeiii-2012-02-18',
-            slug2='option-two-main-name-and-its-awesomeiii',
+            slug1='main-name-and-its-awesomeiiii-2012-02-18',
+            slug2='option-two-main-name-and-its-awesomeiiii',
+            slug3='this-is-the-main-nàmë-and-its-awεšomeıııi',
         )
         self.assertEqual(RelatedPrepopulated.objects.all().count(), 4)
         RelatedPrepopulated.objects.get(
@@ -4608,8 +4606,8 @@ class SeleniumTests(AdminSeleniumTestCase):
         self.assertEqual(slug2, 'option-two-main-name-best')
 
         # Save the object
-        self.selenium.find_element_by_xpath('//input[@value="Save"]').click()
-        self.wait_page_loaded()
+        with self.wait_page_loaded():
+            self.selenium.find_element_by_xpath('//input[@value="Save"]').click()
 
         self.selenium.get(object_url)
         self.selenium.find_element_by_id('id_name').send_keys(' hello')
@@ -4636,14 +4634,16 @@ class SeleniumTests(AdminSeleniumTestCase):
         """JavaScript-assisted auto-focus on first usable form field."""
         # First form field has a single widget
         self.admin_login(username='super', password='secret', login_url=reverse('admin:index'))
-        self.selenium.get(self.live_server_url + reverse('admin:admin_views_picture_add'))
+        with self.wait_page_loaded():
+            self.selenium.get(self.live_server_url + reverse('admin:admin_views_picture_add'))
         self.assertEqual(
             self.selenium.switch_to.active_element,
             self.selenium.find_element_by_id('id_name')
         )
 
         # First form field has a MultiWidget
-        self.selenium.get(self.live_server_url + reverse('admin:admin_views_reservation_add'))
+        with self.wait_page_loaded():
+            self.selenium.get(self.live_server_url + reverse('admin:admin_views_reservation_add'))
         self.assertEqual(
             self.selenium.switch_to.active_element,
             self.selenium.find_element_by_id('id_start_date_0')
@@ -4702,8 +4702,7 @@ class SeleniumTests(AdminSeleniumTestCase):
         self.selenium.get(self.live_server_url + reverse('admin:admin_views_article_changelist'))
         # Change popup
         self.selenium.find_element_by_id('change_id_form-0-section').click()
-        self.wait_for_popup()
-        self.selenium.switch_to.window(self.selenium.window_handles[-1])
+        self.wait_for_and_switch_to_popup()
         self.wait_for_text('#content h1', 'Change section')
         name_input = self.selenium.find_element_by_id('id_name')
         name_input.clear()
@@ -4719,8 +4718,7 @@ class SeleniumTests(AdminSeleniumTestCase):
 
         # Add popup
         self.selenium.find_element_by_id('add_id_form-0-section').click()
-        self.wait_for_popup()
-        self.selenium.switch_to.window(self.selenium.window_handles[-1])
+        self.wait_for_and_switch_to_popup()
         self.wait_for_text('#content h1', 'Add section')
         self.selenium.find_element_by_id('id_name').send_keys('new section')
         self.selenium.find_element_by_xpath('//input[@value="Save"]').click()
@@ -4739,8 +4737,7 @@ class SeleniumTests(AdminSeleniumTestCase):
         change_url = reverse('admin:admin_views_relatedwithuuidpkmodel_change', args=(related_with_parent.id,))
         self.selenium.get(self.live_server_url + change_url)
         self.selenium.find_element_by_id('change_id_parent').click()
-        self.wait_for_popup()
-        self.selenium.switch_to.window(self.selenium.window_handles[-1])
+        self.wait_for_and_switch_to_popup()
         self.selenium.find_element_by_xpath('//input[@value="Save"]').click()
         self.selenium.switch_to.window(self.selenium.window_handles[0])
         select = Select(self.selenium.find_element_by_id('id_parent'))
@@ -4752,8 +4749,7 @@ class SeleniumTests(AdminSeleniumTestCase):
         self.admin_login(username='super', password='secret', login_url=reverse('admin:index'))
         self.selenium.get(self.live_server_url + reverse('admin:admin_views_relatedwithuuidpkmodel_add'))
         self.selenium.find_element_by_id('add_id_parent').click()
-        self.wait_for_popup()
-        self.selenium.switch_to.window(self.selenium.window_handles[-1])
+        self.wait_for_and_switch_to_popup()
         self.selenium.find_element_by_id('id_title').send_keys('test')
         self.selenium.find_element_by_xpath('//input[@value="Save"]').click()
         self.selenium.switch_to.window(self.selenium.window_handles[0])
@@ -4770,8 +4766,7 @@ class SeleniumTests(AdminSeleniumTestCase):
         change_url = reverse('admin:admin_views_relatedwithuuidpkmodel_change', args=(related_with_parent.id,))
         self.selenium.get(self.live_server_url + change_url)
         self.selenium.find_element_by_id('delete_id_parent').click()
-        self.wait_for_popup()
-        self.selenium.switch_to.window(self.selenium.window_handles[-1])
+        self.wait_for_and_switch_to_popup()
         self.selenium.find_element_by_xpath('//input[@value="Yes, I’m sure"]').click()
         self.selenium.switch_to.window(self.selenium.window_handles[0])
         select = Select(self.selenium.find_element_by_id('id_parent'))
@@ -4787,8 +4782,7 @@ class SeleniumTests(AdminSeleniumTestCase):
         change_url = reverse('admin:admin_views_relatedwithuuidpkmodel_change', args=(related_with_parent.id,))
         self.selenium.get(self.live_server_url + change_url)
         self.selenium.find_element_by_id('delete_id_parent').click()
-        self.wait_for_popup()
-        self.selenium.switch_to.window(self.selenium.window_handles[-1])
+        self.wait_for_and_switch_to_popup()
         self.selenium.find_element_by_xpath('//a[text()="No, take me back"]').click()
         self.selenium.switch_to.window(self.selenium.window_handles[0])
         self.assertEqual(len(self.selenium.window_handles), 1)
@@ -4801,8 +4795,7 @@ class SeleniumTests(AdminSeleniumTestCase):
         change_url = reverse('admin:admin_views_relatedwithuuidpkmodel_changelist', current_app=site2.name)
         self.selenium.get(self.live_server_url + change_url)
         self.selenium.find_element_by_id('lookup_id_form-0-parent').click()
-        self.wait_for_popup()
-        self.selenium.switch_to.window(self.selenium.window_handles[-1])
+        self.wait_for_and_switch_to_popup()
         # Select "parent2" in the popup.
         self.selenium.find_element_by_link_text(str(parent2.pk)).click()
         self.selenium.switch_to.window(self.selenium.window_handles[0])
@@ -4849,17 +4842,17 @@ class ReadonlyTest(AdminFieldExtractionMixin, TestCase):
         self.assertContains(response, '<div class="help">', 3)
         self.assertContains(
             response,
-            '<div class="help">Some help text for the title (with unicode ŠĐĆŽćžšđ)</div>',
+            '<div class="help">Some help text for the title (with Unicode ŠĐĆŽćžšđ)</div>',
             html=True
         )
         self.assertContains(
             response,
-            '<div class="help">Some help text for the content (with unicode ŠĐĆŽćžšđ)</div>',
+            '<div class="help">Some help text for the content (with Unicode ŠĐĆŽćžšđ)</div>',
             html=True
         )
         self.assertContains(
             response,
-            '<div class="help">Some help text for the date (with unicode ŠĐĆŽćžšđ)</div>',
+            '<div class="help">Some help text for the date (with Unicode ŠĐĆŽćžšđ)</div>',
             html=True
         )
 
@@ -4969,7 +4962,7 @@ class ReadonlyTest(AdminFieldExtractionMixin, TestCase):
         response = self.client.get(reverse('admin:admin_views_fieldoverridepost_change', args=(p.pk,)))
         self.assertContains(response, '<div class="help">Overridden help text for the date</div>')
         self.assertContains(response, '<label for="id_public">Overridden public label:</label>', html=True)
-        self.assertNotContains(response, "Some help text for the date (with unicode ŠĐĆŽćžšđ)")
+        self.assertNotContains(response, 'Some help text for the date (with Unicode ŠĐĆŽćžšđ)')
 
     def test_correct_autoescaping(self):
         """
@@ -5509,7 +5502,7 @@ class DateHierarchyTests(TestCase):
         self.assertNotContains(response, formats.number_format(year))
 
     def assert_contains_year_link(self, response, date):
-        self.assertContains(response, '?release_date__year=%d"' % (date.year,))
+        self.assertContains(response, '?release_date__year=%d"' % date.year)
 
     def assert_contains_month_link(self, response, date):
         self.assertContains(
@@ -5626,7 +5619,7 @@ class DateHierarchyTests(TestCase):
 
         response = self.client.get(reverse('admin:admin_views_answer_changelist'))
         for date, answer_count in questions_data:
-            link = '?question__posted__year=%d"' % (date.year,)
+            link = '?question__posted__year=%d"' % date.year
             if answer_count > 0:
                 self.assertContains(response, link)
             else:
@@ -5890,21 +5883,19 @@ class AdminKeepChangeListFiltersTests(TestCase):
             self.get_changelist_filters_querystring(),
         )
 
-    def get_add_url(self):
-        return '%s?%s' % (
-            reverse('admin:auth_user_add',
-                    current_app=self.admin_site.name),
-            self.get_preserved_filters_querystring(),
-        )
+    def get_add_url(self, add_preserved_filters=True):
+        url = reverse('admin:auth_user_add', current_app=self.admin_site.name)
+        if add_preserved_filters:
+            url = '%s?%s' % (url, self.get_preserved_filters_querystring())
+        return url
 
-    def get_change_url(self, user_id=None):
+    def get_change_url(self, user_id=None, add_preserved_filters=True):
         if user_id is None:
             user_id = self.get_sample_user_id()
-        return "%s?%s" % (
-            reverse('admin:auth_user_change', args=(user_id,),
-                    current_app=self.admin_site.name),
-            self.get_preserved_filters_querystring(),
-        )
+        url = reverse('admin:auth_user_change', args=(user_id,), current_app=self.admin_site.name)
+        if add_preserved_filters:
+            url = '%s?%s' % (url, self.get_preserved_filters_querystring())
+        return url
 
     def get_history_url(self, user_id=None):
         if user_id is None:
@@ -5942,7 +5933,7 @@ class AdminKeepChangeListFiltersTests(TestCase):
 
         # Check the form action.
         form_action = re.search(
-            '<form action="(.*?)" method="post" id="user_form".*?>',
+            '<form action="(.*?)" method="post" id="user_form" novalidate>',
             response.content.decode()
         )
         self.assertURLEqual(form_action.group(1), '?%s' % self.get_preserved_filters_querystring())
@@ -5987,6 +5978,11 @@ class AdminKeepChangeListFiltersTests(TestCase):
         self.assertRedirects(response, self.get_add_url())
         post_data.pop('_addanother')
 
+    def test_change_view_without_preserved_filters(self):
+        response = self.client.get(self.get_change_url(add_preserved_filters=False))
+        # The action attribute is omitted.
+        self.assertContains(response, '<form method="post" id="user_form" novalidate>')
+
     def test_add_view(self):
         # Get the `add_view`.
         response = self.client.get(self.get_add_url())
@@ -5994,7 +5990,7 @@ class AdminKeepChangeListFiltersTests(TestCase):
 
         # Check the form action.
         form_action = re.search(
-            '<form action="(.*?)" method="post" id="user_form".*?>',
+            '<form action="(.*?)" method="post" id="user_form" novalidate>',
             response.content.decode()
         )
         self.assertURLEqual(form_action.group(1), '?%s' % self.get_preserved_filters_querystring())
@@ -6024,6 +6020,11 @@ class AdminKeepChangeListFiltersTests(TestCase):
         response = self.client.post(self.get_add_url(), data=post_data)
         self.assertRedirects(response, self.get_add_url())
         post_data.pop('_addanother')
+
+    def test_add_view_without_preserved_filters(self):
+        response = self.client.get(self.get_add_url(add_preserved_filters=False))
+        # The action attribute is omitted.
+        self.assertContains(response, '<form method="post" id="user_form" novalidate>')
 
     def test_delete_view(self):
         # Test redirect on "Delete".

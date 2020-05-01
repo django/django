@@ -6,14 +6,15 @@
 # duub qnnp, 2015
 # GerardoGa <ggarciamaristany@gmail.com>, 2018
 # Gil Obradors Via <gil.obradors@gmail.com>, 2019
+# Gil Obradors Via <gil.obradors@gmail.com>, 2019
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Roger Pons <rogerpons@gmail.com>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-01-16 20:42+0100\n"
-"PO-Revision-Date: 2019-01-28 20:40+0000\n"
+"POT-Creation-Date: 2019-09-08 17:27+0200\n"
+"PO-Revision-Date: 2019-11-03 20:46+0000\n"
 "Last-Translator: Gil Obradors Via <gil.obradors@gmail.com>\n"
 "Language-Team: Catalan (http://www.transifex.com/django/django/language/"
 "ca/)\n"
@@ -131,22 +132,22 @@ msgid "log entries"
 msgstr "entrades del registre"
 
 #, python-format
-msgid "Added \"%(object)s\"."
-msgstr "Afegit \"%(object)s\"."
+msgid "Added “%(object)s”."
+msgstr "Afegit \"1%(object)s\"."
 
 #, python-format
-msgid "Changed \"%(object)s\" - %(changes)s"
+msgid "Changed “%(object)s” — %(changes)s"
 msgstr "Modificat \"%(object)s\" - %(changes)s"
 
 #, python-format
-msgid "Deleted \"%(object)s.\""
+msgid "Deleted “%(object)s.”"
 msgstr "Eliminat \"%(object)s.\""
 
 msgid "LogEntry Object"
 msgstr "Objecte entrada del registre"
 
 #, python-brace-format
-msgid "Added {name} \"{object}\"."
+msgid "Added {name} “{object}”."
 msgstr "Afegit  {name} \"{object}\"."
 
 msgid "Added."
@@ -156,15 +157,15 @@ msgid "and"
 msgstr "i"
 
 #, python-brace-format
-msgid "Changed {fields} for {name} \"{object}\"."
-msgstr "Canviat {fields} a {name} \"{object}\"."
+msgid "Changed {fields} for {name} “{object}”."
+msgstr "Canviat {fields} per {name} \"{object}\"."
 
 #, python-brace-format
 msgid "Changed {fields}."
 msgstr "Canviats {fields}."
 
 #, python-brace-format
-msgid "Deleted {name} \"{object}\"."
+msgid "Deleted {name} “{object}”."
 msgstr "Eliminat {name} \"{object}\"."
 
 msgid "No fields changed."
@@ -173,12 +174,13 @@ msgstr "Cap camp modificat."
 msgid "None"
 msgstr "cap"
 
-msgid ""
-"Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
-msgstr "Premi \"Control\" o \"Command\" a un Mac per seleccionar-ne més d'un."
+msgid "Hold down “Control”, or “Command” on a Mac, to select more than one."
+msgstr ""
+"Premeu la tecla \"Control\", o \"Command\" en un Mac, per seleccionar més "
+"d'un valor."
 
 #, python-brace-format
-msgid "The {name} \"{obj}\" was added successfully."
+msgid "The {name} “{obj}” was added successfully."
 msgstr "El {name} \"{obj}\" fou afegit amb èxit."
 
 msgid "You may edit it again below."
@@ -186,36 +188,34 @@ msgstr "Hauria d'editar de nou a sota."
 
 #, python-brace-format
 msgid ""
-"The {name} \"{obj}\" was added successfully. You may add another {name} "
-"below."
+"The {name} “{obj}” was added successfully. You may add another {name} below."
 msgstr ""
 "El {name} \"{obj}\"  s'ha afegit amb èxit. Pots afegir un altre  {name} a "
 "sota."
 
 #, python-brace-format
 msgid ""
-"The {name} \"{obj}\" was changed successfully. You may edit it again below."
+"The {name} “{obj}” was changed successfully. You may edit it again below."
 msgstr ""
 "El {name} \"{obj}\" fou canviat amb èxit. Pots editar-ho un altra vegada a "
 "sota."
 
 #, python-brace-format
-msgid ""
-"The {name} \"{obj}\" was added successfully. You may edit it again below."
+msgid "The {name} “{obj}” was added successfully. You may edit it again below."
 msgstr ""
 "El  {name} \"{obj}\" s'ha afegit amb èxit. Pots editar-lo altra vegada a "
 "sota."
 
 #, python-brace-format
 msgid ""
-"The {name} \"{obj}\" was changed successfully. You may add another {name} "
+"The {name} “{obj}” was changed successfully. You may add another {name} "
 "below."
 msgstr ""
 "El {name} \"{obj}\" fou canviat amb èxit. Pots afegir un altre  {name} a "
 "sota."
 
 #, python-brace-format
-msgid "The {name} \"{obj}\" was changed successfully."
+msgid "The {name} “{obj}” was changed successfully."
 msgstr "El {name} \"{obj}\" fou canviat amb èxit."
 
 msgid ""
@@ -229,11 +229,11 @@ msgid "No action selected."
 msgstr "No heu seleccionat cap acció."
 
 #, python-format
-msgid "The %(name)s \"%(obj)s\" was deleted successfully."
+msgid "The %(name)s “%(obj)s” was deleted successfully."
 msgstr "El/la %(name)s \"%(obj)s\" s'ha eliminat amb èxit."
 
 #, python-format
-msgid "%(name)s with ID \"%(key)s\" doesn't exist. Perhaps it was deleted?"
+msgid "%(name)s with ID “%(key)s” doesn’t exist. Perhaps it was deleted?"
 msgstr "%(name)s amb ID \"%(key)s\" no existeix. Potser va ser eliminat?"
 
 #, python-format
@@ -304,7 +304,7 @@ msgstr "Administració de %(app)s"
 msgid "Page not found"
 msgstr "No s'ha pogut trobar la pàgina"
 
-msgid "We're sorry, but the requested page could not be found."
+msgid "We’re sorry, but the requested page could not be found."
 msgstr "Ho sentim, però no s'ha pogut trobar la pàgina sol·licitada"
 
 msgid "Home"
@@ -320,7 +320,7 @@ msgid "Server Error <em>(500)</em>"
 msgstr "Error del servidor <em>(500)</em>"
 
 msgid ""
-"There's been an error. It's been reported to the site administrators via "
+"There’s been an error. It’s been reported to the site administrators via "
 "email and should be fixed shortly. Thanks for your patience."
 msgstr ""
 "S'ha produït un error. Se n'ha informat els administradors del lloc per "
@@ -344,7 +344,7 @@ msgid "Clear selection"
 msgstr "Netejar la selecció"
 
 msgid ""
-"First, enter a username and password. Then, you'll be able to edit more user "
+"First, enter a username and password. Then, you’ll be able to edit more user "
 "options."
 msgstr ""
 "Primer, entreu un nom d'usuari i una contrasenya. Després podreu editar més "
@@ -433,7 +433,7 @@ msgstr ""
 msgid "Objects"
 msgstr "Objectes"
 
-msgid "Yes, I'm sure"
+msgid "Yes, I’m sure"
 msgstr "Sí, n'estic segur"
 
 msgid "No, take me back"
@@ -488,7 +488,7 @@ msgstr "Models en l'aplicació %(name)s"
 msgid "Add"
 msgstr "Afegir"
 
-msgid "You don't have permission to view or edit anything."
+msgid "You don’t have permission to view or edit anything."
 msgstr "No teniu permisos per veure o editar"
 
 msgid "Recent actions"
@@ -504,7 +504,7 @@ msgid "Unknown content"
 msgstr "Contingut desconegut"
 
 msgid ""
-"Something's wrong with your database installation. Make sure the appropriate "
+"Something’s wrong with your database installation. Make sure the appropriate "
 "database tables have been created, and make sure the database is readable by "
 "the appropriate user."
 msgstr ""
@@ -533,7 +533,7 @@ msgid "Action"
 msgstr "Acció"
 
 msgid ""
-"This object doesn't have a change history. It probably wasn't added via this "
+"This object doesn’t have a change history. It probably wasn’t added via this "
 "admin site."
 msgstr ""
 "Aquest objecte no té historial de canvis. Probablement no es va afegir "
@@ -601,7 +601,7 @@ msgid "Your password was changed."
 msgstr "La seva contrasenya ha estat canviada."
 
 msgid ""
-"Please enter your old password, for security's sake, and then enter your new "
+"Please enter your old password, for security’s sake, and then enter your new "
 "password twice so we can verify you typed it in correctly."
 msgstr ""
 "Si us plau, introduïu la vostra contrasenya antiga, per seguretat, i tot "
@@ -642,14 +642,14 @@ msgstr ""
 "utilitzat. Si us plau, sol·liciteu un nou reestabliment de contrasenya."
 
 msgid ""
-"We've emailed you instructions for setting your password, if an account "
+"We’ve emailed you instructions for setting your password, if an account "
 "exists with the email you entered. You should receive them shortly."
 msgstr ""
 "Li hem enviat instruccions per establir la seva contrasenya, donat que hi "
 "hagi un compte associat al correu introduït. L'hauríeu de rebre en breu."
 
 msgid ""
-"If you don't receive an email, please make sure you've entered the address "
+"If you don’t receive an email, please make sure you’ve entered the address "
 "you registered with, and check your spam folder."
 msgstr ""
 "Si no rebeu un correu, assegureu-vos que heu introduït l'adreça amb la que "
@@ -666,7 +666,7 @@ msgstr ""
 msgid "Please go to the following page and choose a new password:"
 msgstr "Si us plau, aneu a la pàgina següent i escolliu una nova contrasenya:"
 
-msgid "Your username, in case you've forgotten:"
+msgid "Your username, in case you’ve forgotten:"
 msgstr "El vostre nom d'usuari, en cas que l'hagueu oblidat:"
 
 msgid "Thanks for using our site!"
@@ -677,7 +677,7 @@ msgid "The %(site_name)s team"
 msgstr "L'equip de %(site_name)s"
 
 msgid ""
-"Forgotten your password? Enter your email address below, and we'll email "
+"Forgotten your password? Enter your email address below, and we’ll email "
 "instructions for setting a new one."
 msgstr ""
 "Heu oblidat la vostra contrasenya? Introduïu la vostra adreça de correu "

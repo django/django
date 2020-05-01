@@ -9,8 +9,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-01-17 11:07+0100\n"
-"PO-Revision-Date: 2019-02-24 16:33+0000\n"
+"POT-Creation-Date: 2019-09-08 17:27+0200\n"
+"PO-Revision-Date: 2019-09-17 08:44+0000\n"
 "Last-Translator: Tonnes <tonnes.mb@gmail.com>\n"
 "Language-Team: Dutch (http://www.transifex.com/django/django/language/nl/)\n"
 "MIME-Version: 1.0\n"
@@ -36,9 +36,9 @@ msgid "Content type %(ct_id)s object has no associated model"
 msgstr "Object van inhoudstype %(ct_id)s heeft geen bijbehorend model"
 
 #, python-format
-msgid "Content type %(ct_id)s object %(obj_id)s doesn't exist"
+msgid "Content type %(ct_id)s object %(obj_id)s doesn’t exist"
 msgstr "Object %(obj_id)s van inhoudstype %(ct_id)s bestaat niet"
 
 #, python-format
-msgid "%(ct_name)s objects don't have a get_absolute_url() method"
+msgid "%(ct_name)s objects don’t have a get_absolute_url() method"
 msgstr "%(ct_name)s-objecten hebben geen get_absolute_url()-methode"

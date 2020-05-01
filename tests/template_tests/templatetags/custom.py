@@ -153,13 +153,13 @@ simple_tag_without_context_parameter.anything = "Expected simple_tag_without_con
 @register.simple_tag(takes_context=True)
 def escape_naive(context):
     """A tag that doesn't even think about escaping issues"""
-    return "Hello {0}!".format(context['name'])
+    return "Hello {}!".format(context['name'])
 
 
 @register.simple_tag(takes_context=True)
 def escape_explicit(context):
     """A tag that uses escape explicitly"""
-    return escape("Hello {0}!".format(context['name']))
+    return escape("Hello {}!".format(context['name']))
 
 
 @register.simple_tag(takes_context=True)

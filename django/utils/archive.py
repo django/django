@@ -40,7 +40,7 @@ class UnrecognizedArchiveFormat(ArchiveException):
     """
 
 
-def extract(path, to_path=''):
+def extract(path, to_path):
     """
     Unpack the tar or zip file at the specified path to the directory
     specified by to_path.
@@ -83,7 +83,7 @@ class Archive:
     def __exit__(self, exc_type, exc_value, traceback):
         self.close()
 
-    def extract(self, to_path=''):
+    def extract(self, to_path):
         self._archive.extract(to_path)
 
     def list(self):
@@ -216,11 +216,11 @@ class ZipArchive(BaseArchive):
         self._archive.close()
 
 
-extension_map = {
-    '.tar': TarArchive,
-    '.tar.bz2': TarArchive,
-    '.tar.gz': TarArchive,
-    '.tgz': TarArchive,
-    '.tz2': TarArchive,
-    '.zip': ZipArchive,
-}
+extension_map = dict.fromkeys((
+    '.tar',
+    '.tar.bz2', '.tbz2', '.tbz', '.tz2',
+    '.tar.gz', '.tgz', '.taz',
+    '.tar.lzma', '.tlz',
+    '.tar.xz', '.txz',
+), TarArchive)
+extension_map['.zip'] = ZipArchive

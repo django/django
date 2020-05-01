@@ -86,10 +86,12 @@ following methods:
 
 .. method:: as_sql(compiler, connection)
 
-    Responsible for producing the query string and parameters for the expression.
-    The ``compiler`` is an ``SQLCompiler`` object, which has a ``compile()``
-    method that can be used to compile other expressions. The ``connection`` is
-    the connection used to execute the query.
+    Generates the SQL fragment for the expression. Returns a tuple
+    ``(sql, params)``, where ``sql`` is the SQL string, and ``params`` is the
+    list or tuple of query parameters. The ``compiler`` is an ``SQLCompiler``
+    object, which has a ``compile()`` method that can be used to compile other
+    expressions. The ``connection`` is the connection used to execute the
+    query.
 
     Calling ``expression.as_sql()`` is usually incorrect - instead
     ``compiler.compile(expression)`` should be used. The ``compiler.compile()``

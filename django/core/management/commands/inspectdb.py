@@ -31,7 +31,7 @@ class Command(BaseCommand):
     def handle(self, **options):
         try:
             for line in self.handle_inspection(options):
-                self.stdout.write("%s\n" % line)
+                self.stdout.write(line)
         except NotImplementedError:
             raise CommandError("Database inspection isn't supported for the currently selected database backend.")
 
@@ -170,8 +170,7 @@ class Command(BaseCommand):
                     yield '    %s' % field_desc
                 is_view = any(info.name == table_name and info.type == 'v' for info in table_info)
                 is_partition = any(info.name == table_name and info.type == 'p' for info in table_info)
-                for meta_line in self.get_meta(table_name, constraints, column_to_field_name, is_view, is_partition):
-                    yield meta_line
+                yield from self.get_meta(table_name, constraints, column_to_field_name, is_view, is_partition)
 
     def normalize_col_name(self, col_name, used_column_names, is_relation):
         """

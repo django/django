@@ -1,10 +1,14 @@
 from django.core import checks
-from django.core.checks import Error
+from django.core.checks import Error, Warning
 from django.db import models
 from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
 from django.test.utils import (
-    isolate_apps, modify_settings, override_system_checks,
+    isolate_apps, modify_settings, override_settings, override_system_checks,
 )
+
+
+class EmptyRouter:
+    pass
 
 
 @isolate_apps('check_framework', attr_name='apps')
@@ -28,6 +32,30 @@ class DuplicateDBTableTests(SimpleTestCase):
             )
         ])
 
+    @override_settings(DATABASE_ROUTERS=['check_framework.test_model_checks.EmptyRouter'])
+    def test_collision_in_same_app_database_routers_installed(self):
+        class Model1(models.Model):
+            class Meta:
+                db_table = 'test_table'
+
+        class Model2(models.Model):
+            class Meta:
+                db_table = 'test_table'
+
+        self.assertEqual(checks.run_checks(app_configs=self.apps.get_app_configs()), [
+            Warning(
+                "db_table 'test_table' is used by multiple models: "
+                "check_framework.Model1, check_framework.Model2.",
+                hint=(
+                    'You have configured settings.DATABASE_ROUTERS. Verify '
+                    'that check_framework.Model1, check_framework.Model2 are '
+                    'correctly routed to separate databases.'
+                ),
+                obj='test_table',
+                id='models.W035',
+            )
+        ])
+
     @modify_settings(INSTALLED_APPS={'append': 'basic'})
     @isolate_apps('basic', 'check_framework', kwarg_name='apps')
     def test_collision_across_apps(self, apps):
@@ -47,6 +75,34 @@ class DuplicateDBTableTests(SimpleTestCase):
                 "basic.Model1, check_framework.Model2.",
                 obj='test_table',
                 id='models.E028',
+            )
+        ])
+
+    @modify_settings(INSTALLED_APPS={'append': 'basic'})
+    @override_settings(DATABASE_ROUTERS=['check_framework.test_model_checks.EmptyRouter'])
+    @isolate_apps('basic', 'check_framework', kwarg_name='apps')
+    def test_collision_across_apps_database_routers_installed(self, apps):
+        class Model1(models.Model):
+            class Meta:
+                app_label = 'basic'
+                db_table = 'test_table'
+
+        class Model2(models.Model):
+            class Meta:
+                app_label = 'check_framework'
+                db_table = 'test_table'
+
+        self.assertEqual(checks.run_checks(app_configs=apps.get_app_configs()), [
+            Warning(
+                "db_table 'test_table' is used by multiple models: "
+                "basic.Model1, check_framework.Model2.",
+                hint=(
+                    'You have configured settings.DATABASE_ROUTERS. Verify '
+                    'that basic.Model1, check_framework.Model2 are correctly '
+                    'routed to separate databases.'
+                ),
+                obj='test_table',
+                id='models.W035',
             )
         ])
 

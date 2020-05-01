@@ -49,6 +49,15 @@ run the query ``CREATE EXTENSION IF NOT EXISTS hstore;``.
 
         This is a required argument. The name of the extension to be installed.
 
+``BloomExtension``
+==================
+
+.. class:: BloomExtension()
+
+    .. versionadded:: 3.1
+
+    Install the ``bloom`` extension.
+
 ``BtreeGinExtension``
 =====================
 
@@ -98,3 +107,33 @@ run the query ``CREATE EXTENSION IF NOT EXISTS hstore;``.
 .. class:: UnaccentExtension()
 
     Installs the ``unaccent`` extension.
+
+Index concurrent operations
+===========================
+
+.. versionadded:: 3.0
+
+PostgreSQL supports the ``CONCURRENTLY`` option to ``CREATE INDEX`` and
+``DROP INDEX`` statements to add and remove indexes without locking out writes.
+This option is useful for adding or removing an index in a live production
+database.
+
+.. class:: AddIndexConcurrently(model_name, index)
+
+    Like :class:`~django.db.migrations.operations.AddIndex`, but creates an
+    index with the ``CONCURRENTLY`` option. This has a few caveats to be aware
+    of when using this option, see `the PostgreSQL documentation of building
+    indexes concurrently <https://www.postgresql.org/docs/current/
+    sql-createindex.html#SQL-CREATEINDEX-CONCURRENTLY>`_.
+
+.. class:: RemoveIndexConcurrently(model_name, name)
+
+    Like :class:`~django.db.migrations.operations.RemoveIndex`, but removes the
+    index with the ``CONCURRENTLY`` option. This has a few caveats to be aware
+    of when using this option, see `the PostgreSQL documentation
+    <https://www.postgresql.org/docs/current/sql-dropindex.html>`_.
+
+.. note::
+
+    The ``CONCURRENTLY`` option is not supported inside a transaction (see
+    :ref:`non-atomic migration <non-atomic-migrations>`).

@@ -32,6 +32,58 @@ details on these changes.
 
 * ``django.utils.text.unescape_entities()`` will be removed.
 
+* ``django.utils.http.is_safe_url()`` will be removed.
+
+* The ``PASSWORD_RESET_TIMEOUT_DAYS`` setting will be removed.
+
+* The undocumented usage of the :lookup:`isnull` lookup with non-boolean values
+  as the right-hand side will no longer be allowed.
+
+* The ``django.db.models.query_utils.InvalidQuery`` exception class will be
+  removed.
+
+* The ``django-admin.py`` entry point will be removed.
+
+* The ``HttpRequest.is_ajax()`` method will be removed.
+
+* Support for the pre-Django 3.1 encoding format of cookies values used by
+  ``django.contrib.messages.storage.cookie.CookieStorage`` will be removed.
+
+* Support for the pre-Django 3.1 password reset tokens in the admin site (that
+  use the SHA-1 hashing algorithm) will be removed.
+
+* Support for the pre-Django 3.1 encoding format of sessions will be removed.
+
+* Support for the pre-Django 3.1 ``django.core.signing.Signer`` signatures
+  (encoded with the SHA-1 algorithm) will be removed.
+
+* Support for the pre-Django 3.1 user sessions (that use the SHA-1 algorithm)
+  will be removed.
+
+* The ``get_request`` argument for
+  ``django.utils.deprecation.MiddlewareMixin.__init__()`` will be required and
+  won't accept ``None``.
+
+* The ``providing_args`` argument for ``django.dispatch.Signal`` will be
+  removed.
+
+* The ``length`` argument for ``django.utils.crypto.get_random_string()`` will
+  be required.
+
+* The ``list`` message for ``ModelMultipleChoiceField`` will be removed.
+
+* ``django.views.generic.TemplateView`` will no longer pass URL kwargs directly
+  to the ``context``.
+
+* Support for passing raw column aliases to ``QuerySet.order_by()`` will be
+  removed.
+
+* The model ``NullBooleanField`` will be removed. A stub field will remain for
+  compatibility with historical migrations.
+
+See the :ref:`Django 3.1 release notes <deprecated-features-3.1>` for more
+details on these changes.
+
 .. _deprecation-removed-in-3.1:
 
 3.1
@@ -619,7 +671,7 @@ details on these changes.
 * Database test settings as independent entries in the database settings,
   prefixed by ``TEST_``, will no longer be supported.
 
-* The `cache_choices` option to :class:`~django.forms.ModelChoiceField` and
+* The ``cache_choices`` option to :class:`~django.forms.ModelChoiceField` and
   :class:`~django.forms.ModelMultipleChoiceField` will be removed.
 
 * The default value of the

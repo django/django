@@ -3,8 +3,8 @@ import sys
 import unittest
 
 from django.contrib.admin import (
-    AllValuesFieldListFilter, BooleanFieldListFilter, ModelAdmin,
-    RelatedOnlyFieldListFilter, SimpleListFilter, site,
+    AllValuesFieldListFilter, BooleanFieldListFilter, EmptyFieldListFilter,
+    ModelAdmin, RelatedOnlyFieldListFilter, SimpleListFilter, site,
 )
 from django.contrib.admin.options import IncorrectLookupParameters
 from django.contrib.auth.admin import UserAdmin
@@ -248,6 +248,17 @@ class BookmarkAdminGenericRelation(ModelAdmin):
     list_filter = ['tags__tag']
 
 
+class BookAdminWithEmptyFieldListFilter(ModelAdmin):
+    list_filter = [
+        ('author', EmptyFieldListFilter),
+        ('title', EmptyFieldListFilter),
+    ]
+
+
+class DepartmentAdminWithEmptyFieldListFilter(ModelAdmin):
+    list_filter = [('description', EmptyFieldListFilter)]
+
+
 class ListFiltersTests(TestCase):
     request_factory = RequestFactory()
 
@@ -460,7 +471,7 @@ class ListFiltersTests(TestCase):
         self.assertEqual(choice['query_string'], '?date_registered__isnull=False')
 
     @unittest.skipIf(
-        sys.platform.startswith('win'),
+        sys.platform == 'win32',
         "Windows doesn't support setting a timezone that differs from the "
         "system timezone."
     )
@@ -591,6 +602,22 @@ class ListFiltersTests(TestCase):
         expected = [(self.john.pk, 'John Blue'), (self.jack.pk, 'Jack Red')]
         self.assertEqual(filterspec.lookup_choices, expected)
 
+    def test_relatedfieldlistfilter_foreignkey_default_ordering(self):
+        """RelatedFieldListFilter ordering respects Model.ordering."""
+        class BookAdmin(ModelAdmin):
+            list_filter = ('employee',)
+
+        self.addCleanup(setattr, Employee._meta, 'ordering', Employee._meta.ordering)
+        Employee._meta.ordering = ('name',)
+        modeladmin = BookAdmin(Book, site)
+
+        request = self.request_factory.get('/')
+        request.user = self.alfred
+        changelist = modeladmin.get_changelist_instance(request)
+        filterspec = changelist.get_filters(request)[0][0]
+        expected = [(self.jack.pk, 'Jack Red'), (self.john.pk, 'John Blue')]
+        self.assertEqual(filterspec.lookup_choices, expected)
+
     def test_relatedfieldlistfilter_manytomany(self):
         modeladmin = BookAdmin(Book, site)
 
@@ -696,6 +723,23 @@ class ListFiltersTests(TestCase):
         filterspec = changelist.get_filters(request)[0]
         self.assertEqual(len(filterspec), 0)
 
+    def test_relatedfieldlistfilter_reverse_relationships_default_ordering(self):
+        self.addCleanup(setattr, Book._meta, 'ordering', Book._meta.ordering)
+        Book._meta.ordering = ('title',)
+        modeladmin = CustomUserAdmin(User, site)
+
+        request = self.request_factory.get('/')
+        request.user = self.alfred
+        changelist = modeladmin.get_changelist_instance(request)
+        filterspec = changelist.get_filters(request)[0][0]
+        expected = [
+            (self.bio_book.pk, 'Django: a biography'),
+            (self.djangonaut_book.pk, 'Djangonaut: an art of living'),
+            (self.guitar_book.pk, 'Guitar for dummies'),
+            (self.django_book.pk, 'The Django Book')
+        ]
+        self.assertEqual(filterspec.lookup_choices, expected)
+
     def test_relatedonlyfieldlistfilter_foreignkey(self):
         modeladmin = BookAdminRelatedOnlyFilter(Book, site)
 
@@ -707,6 +751,94 @@ class ListFiltersTests(TestCase):
         filterspec = changelist.get_filters(request)[0][4]
         expected = [(self.alfred.pk, 'alfred'), (self.bob.pk, 'bob')]
         self.assertEqual(sorted(filterspec.lookup_choices), sorted(expected))
+
+    def test_relatedonlyfieldlistfilter_foreignkey_reverse_relationships(self):
+        class EmployeeAdminReverseRelationship(ModelAdmin):
+            list_filter = (
+                ('book', RelatedOnlyFieldListFilter),
+            )
+
+        self.djangonaut_book.employee = self.john
+        self.djangonaut_book.save()
+        self.django_book.employee = self.jack
+        self.django_book.save()
+
+        modeladmin = EmployeeAdminReverseRelationship(Employee, site)
+        request = self.request_factory.get('/')
+        request.user = self.alfred
+        changelist = modeladmin.get_changelist_instance(request)
+        filterspec = changelist.get_filters(request)[0][0]
+        self.assertEqual(filterspec.lookup_choices, [
+            (self.djangonaut_book.pk, 'Djangonaut: an art of living'),
+            (self.django_book.pk, 'The Django Book'),
+        ])
+
+    def test_relatedonlyfieldlistfilter_manytomany_reverse_relationships(self):
+        class UserAdminReverseRelationship(ModelAdmin):
+            list_filter = (
+                ('books_contributed', RelatedOnlyFieldListFilter),
+            )
+
+        modeladmin = UserAdminReverseRelationship(User, site)
+        request = self.request_factory.get('/')
+        request.user = self.alfred
+        changelist = modeladmin.get_changelist_instance(request)
+        filterspec = changelist.get_filters(request)[0][0]
+        self.assertEqual(
+            filterspec.lookup_choices,
+            [(self.guitar_book.pk, 'Guitar for dummies')],
+        )
+
+    def test_relatedonlyfieldlistfilter_foreignkey_ordering(self):
+        """RelatedOnlyFieldListFilter ordering respects ModelAdmin.ordering."""
+        class EmployeeAdminWithOrdering(ModelAdmin):
+            ordering = ('name',)
+
+        class BookAdmin(ModelAdmin):
+            list_filter = (
+                ('employee', RelatedOnlyFieldListFilter),
+            )
+
+        albert = Employee.objects.create(name='Albert Green', department=self.dev)
+        self.djangonaut_book.employee = albert
+        self.djangonaut_book.save()
+        self.bio_book.employee = self.jack
+        self.bio_book.save()
+
+        site.register(Employee, EmployeeAdminWithOrdering)
+        self.addCleanup(lambda: site.unregister(Employee))
+        modeladmin = BookAdmin(Book, site)
+
+        request = self.request_factory.get('/')
+        request.user = self.alfred
+        changelist = modeladmin.get_changelist_instance(request)
+        filterspec = changelist.get_filters(request)[0][0]
+        expected = [(albert.pk, 'Albert Green'), (self.jack.pk, 'Jack Red')]
+        self.assertEqual(filterspec.lookup_choices, expected)
+
+    def test_relatedonlyfieldlistfilter_foreignkey_default_ordering(self):
+        """RelatedOnlyFieldListFilter ordering respects Meta.ordering."""
+        class BookAdmin(ModelAdmin):
+            list_filter = (
+                ('employee', RelatedOnlyFieldListFilter),
+            )
+
+        albert = Employee.objects.create(name='Albert Green', department=self.dev)
+        self.djangonaut_book.employee = albert
+        self.djangonaut_book.save()
+        self.bio_book.employee = self.jack
+        self.bio_book.save()
+
+        self.addCleanup(setattr, Employee._meta, 'ordering', Employee._meta.ordering)
+        Employee._meta.ordering = ('name',)
+        modeladmin = BookAdmin(Book, site)
+
+        request = self.request_factory.get('/')
+        request.user = self.alfred
+        changelist = modeladmin.get_changelist_instance(request)
+        filterspec = changelist.get_filters(request)[0][0]
+        expected = [(albert.pk, 'Albert Green'), (self.jack.pk, 'Jack Red')]
+        self.assertEqual(filterspec.lookup_choices, expected)
 
     def test_relatedonlyfieldlistfilter_underscorelookup_foreignkey(self):
         Department.objects.create(code='TEST', description='Testing')
@@ -1253,3 +1385,92 @@ class ListFiltersTests(TestCase):
         changelist = modeladmin.get_changelist_instance(request)
         changelist.get_results(request)
         self.assertEqual(changelist.full_result_count, 4)
+
+    def test_emptylistfieldfilter(self):
+        empty_description = Department.objects.create(code='EMPT', description='')
+        none_description = Department.objects.create(code='NONE', description=None)
+        empty_title = Book.objects.create(title='', author=self.alfred)
+
+        department_admin = DepartmentAdminWithEmptyFieldListFilter(Department, site)
+        book_admin = BookAdminWithEmptyFieldListFilter(Book, site)
+
+        tests = [
+            # Allows nulls and empty strings.
+            (
+                department_admin,
+                {'description__isempty': '1'},
+                [empty_description, none_description],
+            ),
+            (
+                department_admin,
+                {'description__isempty': '0'},
+                [self.dev, self.design],
+            ),
+            # Allows nulls.
+            (book_admin, {'author__isempty': '1'}, [self.guitar_book]),
+            (
+                book_admin,
+                {'author__isempty': '0'},
+                [self.django_book, self.bio_book, self.djangonaut_book, empty_title],
+            ),
+            # Allows empty strings.
+            (book_admin, {'title__isempty': '1'}, [empty_title]),
+            (
+                book_admin,
+                {'title__isempty': '0'},
+                [self.django_book, self.bio_book, self.djangonaut_book, self.guitar_book],
+            ),
+        ]
+        for modeladmin, query_string, expected_result in tests:
+            with self.subTest(
+                modeladmin=modeladmin.__class__.__name__,
+                query_string=query_string,
+            ):
+                request = self.request_factory.get('/', query_string)
+                request.user = self.alfred
+                changelist = modeladmin.get_changelist_instance(request)
+                queryset = changelist.get_queryset(request)
+                self.assertCountEqual(queryset, expected_result)
+
+    def test_emptylistfieldfilter_choices(self):
+        modeladmin = BookAdminWithEmptyFieldListFilter(Book, site)
+        request = self.request_factory.get('/')
+        request.user = self.alfred
+        changelist = modeladmin.get_changelist_instance(request)
+        filterspec = changelist.get_filters(request)[0][0]
+        self.assertEqual(filterspec.title, 'Verbose Author')
+        choices = list(filterspec.choices(changelist))
+        self.assertEqual(len(choices), 3)
+
+        self.assertEqual(choices[0]['display'], 'All')
+        self.assertIs(choices[0]['selected'], True)
+        self.assertEqual(choices[0]['query_string'], '?')
+
+        self.assertEqual(choices[1]['display'], 'Empty')
+        self.assertIs(choices[1]['selected'], False)
+        self.assertEqual(choices[1]['query_string'], '?author__isempty=1')
+
+        self.assertEqual(choices[2]['display'], 'Not empty')
+        self.assertIs(choices[2]['selected'], False)
+        self.assertEqual(choices[2]['query_string'], '?author__isempty=0')
+
+    def test_emptylistfieldfilter_non_empty_field(self):
+        class EmployeeAdminWithEmptyFieldListFilter(ModelAdmin):
+            list_filter = [('department', EmptyFieldListFilter)]
+
+        modeladmin = EmployeeAdminWithEmptyFieldListFilter(Employee, site)
+        request = self.request_factory.get('/')
+        request.user = self.alfred
+        msg = (
+            "The list filter 'EmptyFieldListFilter' cannot be used with field "
+            "'department' which doesn't allow empty strings and nulls."
+        )
+        with self.assertRaisesMessage(ImproperlyConfigured, msg):
+            modeladmin.get_changelist_instance(request)
+
+    def test_emptylistfieldfilter_invalid_lookup_parameters(self):
+        modeladmin = BookAdminWithEmptyFieldListFilter(Book, site)
+        request = self.request_factory.get('/', {'author__isempty': 42})
+        request.user = self.alfred
+        with self.assertRaises(IncorrectLookupParameters):
+            modeladmin.get_changelist_instance(request)

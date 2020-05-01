@@ -3,17 +3,17 @@
 # Translators:
 # André Hagenbruch, 2011
 # Florian Apolloner <florian@apolloner.eu>, 2012
-# Jannis, 2013
-# Jannis Leidel <jannis@leidel.info>, 2013-2017
-# Jannis, 2016
+# Jannis Vajen, 2013
+# Jannis Leidel <jannis@leidel.info>, 2013-2017,2020
+# Jannis Vajen, 2016
 # Jens Neuhaus <kontakt@jensneuhaus.de>, 2016
-# Markus Holtermann <inyoka@markusholtermann.eu>, 2013,2015
+# Markus Holtermann <info@markusholtermann.eu>, 2013,2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-09-24 13:46+0200\n"
-"PO-Revision-Date: 2017-11-27 16:17+0000\n"
+"POT-Creation-Date: 2019-09-08 17:27+0200\n"
+"PO-Revision-Date: 2020-01-17 22:44+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: German (http://www.transifex.com/django/django/language/de/)\n"
 "MIME-Version: 1.0\n"
@@ -57,7 +57,7 @@ msgstr "Kein Passwort gesetzt."
 msgid "Invalid password format or unknown hashing algorithm."
 msgstr "Ungültiges Passwortformat oder unbekannter Hashing-Algorithmus."
 
-msgid "The two password fields didn't match."
+msgid "The two password fields didn’t match."
 msgstr "Die beiden Passwörter sind nicht identisch."
 
 msgid "Password"
@@ -70,7 +70,7 @@ msgid "Enter the same password as before, for verification."
 msgstr "Bitte das selbe Passwort zur Bestätigung erneut eingeben."
 
 msgid ""
-"Raw passwords are not stored, so there is no way to see this user's "
+"Raw passwords are not stored, so there is no way to see this user’s "
 "password, but you can change the password using <a href=\"{}\">this form</a>."
 msgstr ""
 "Die Passwörter werden nicht im Klartext gespeichert und können daher nicht "
@@ -253,21 +253,21 @@ msgstr[1] "Das Passwort muss mindestens %(min_length)d Zeichen enthalten."
 msgid "The password is too similar to the %(verbose_name)s."
 msgstr "Das Passwort ist zu ähnlich zu %(verbose_name)s."
 
-msgid "Your password can't be too similar to your other personal information."
+msgid "Your password can’t be too similar to your other personal information."
 msgstr ""
-"Das Passwort darf nicht zu ähnlich zu Ihren anderen persönlichen "
-"Informationen sein."
+"Das Passwort darf nicht zu ähnlich zu anderen persönlichen Informationen "
+"sein."
 
 msgid "This password is too common."
 msgstr "Dieses Passwort ist zu üblich."
 
-msgid "Your password can't be a commonly used password."
+msgid "Your password can’t be a commonly used password."
 msgstr "Das Passwort darf nicht allgemein üblich sein."
 
 msgid "This password is entirely numeric."
 msgstr "Dieses Passwort ist komplett numerisch. "
 
-msgid "Your password can't be entirely numeric."
+msgid "Your password can’t be entirely numeric."
 msgstr "Das Passwort darf nicht komplett aus Ziffern bestehen."
 
 #, python-format

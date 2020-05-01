@@ -2,7 +2,6 @@ import datetime
 import re
 from unittest import mock
 
-from django import forms
 from django.contrib.auth.forms import (
     AdminPasswordChangeForm, AuthenticationForm, PasswordChangeForm,
     PasswordResetForm, ReadOnlyPasswordHashField, ReadOnlyPasswordHashWidget,
@@ -12,6 +11,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth.signals import user_login_failed
 from django.contrib.sites.models import Site
 from django.core import mail
+from django.core.exceptions import ValidationError
 from django.core.mail import EmailMultiAlternatives
 from django.forms.fields import CharField, Field, IntegerField
 from django.test import SimpleTestCase, TestCase, override_settings
@@ -372,13 +372,13 @@ class AuthenticationFormTest(TestDataMixin, TestCase):
         form = AuthenticationFormWithInactiveUsersOkay(None, data)
         self.assertTrue(form.is_valid())
 
-        # If we want to disallow some logins according to custom logic,
-        # we should raise a django.forms.ValidationError in the form.
+        # Raise a ValidationError in the form to disallow some logins according
+        # to custom logic.
         class PickyAuthenticationForm(AuthenticationForm):
             def confirm_login_allowed(self, user):
                 if user.username == "inactive":
-                    raise forms.ValidationError("This user is disallowed.")
-                raise forms.ValidationError("Sorry, nobody's allowed in.")
+                    raise ValidationError("This user is disallowed.")
+                raise ValidationError("Sorry, nobody's allowed in.")
 
         form = PickyAuthenticationForm(None, data)
         self.assertFalse(form.is_valid())
@@ -423,6 +423,7 @@ class AuthenticationFormTest(TestDataMixin, TestCase):
         CustomEmailField.objects.create_user(**data)
         form = AuthenticationForm(None, data)
         self.assertEqual(form.fields['username'].max_length, 255)
+        self.assertEqual(form.fields['username'].widget.attrs.get('maxlength'), 255)
         self.assertEqual(form.errors, {})
 
     @override_settings(AUTH_USER_MODEL='auth_tests.IntegerUsernameUser')
@@ -435,6 +436,7 @@ class AuthenticationFormTest(TestDataMixin, TestCase):
         IntegerUsernameUser.objects.create_user(**data)
         form = AuthenticationForm(None, data)
         self.assertEqual(form.fields['username'].max_length, 254)
+        self.assertEqual(form.fields['username'].widget.attrs.get('maxlength'), 254)
         self.assertEqual(form.errors, {})
 
     def test_username_field_label(self):
@@ -494,7 +496,7 @@ class AuthenticationFormTest(TestDataMixin, TestCase):
 
     def test_get_invalid_login_error(self):
         error = AuthenticationForm().get_invalid_login_error()
-        self.assertIsInstance(error, forms.ValidationError)
+        self.assertIsInstance(error, ValidationError)
         self.assertEqual(
             error.message,
             'Please enter a correct %(username)s and password. Note that both '
@@ -801,6 +803,42 @@ class PasswordResetFormTest(TestDataMixin, TestCase):
         form = PasswordResetForm(data)
         self.assertFalse(form.is_valid())
         self.assertEqual(form['email'].errors, [_('Enter a valid email address.')])
+
+    def test_user_email_unicode_collision(self):
+        User.objects.create_user('mike123', 'mike@example.org', 'test123')
+        User.objects.create_user('mike456', 'mıke@example.org', 'test123')
+        data = {'email': 'mıke@example.org'}
+        form = PasswordResetForm(data)
+        self.assertTrue(form.is_valid())
+        form.save()
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertEqual(mail.outbox[0].to, ['mıke@example.org'])
+
+    def test_user_email_domain_unicode_collision(self):
+        User.objects.create_user('mike123', 'mike@ixample.org', 'test123')
+        User.objects.create_user('mike456', 'mike@ıxample.org', 'test123')
+        data = {'email': 'mike@ıxample.org'}
+        form = PasswordResetForm(data)
+        self.assertTrue(form.is_valid())
+        form.save()
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertEqual(mail.outbox[0].to, ['mike@ıxample.org'])
+
+    def test_user_email_unicode_collision_nonexistent(self):
+        User.objects.create_user('mike123', 'mike@example.org', 'test123')
+        data = {'email': 'mıke@example.org'}
+        form = PasswordResetForm(data)
+        self.assertTrue(form.is_valid())
+        form.save()
+        self.assertEqual(len(mail.outbox), 0)
+
+    def test_user_email_domain_unicode_collision_nonexistent(self):
+        User.objects.create_user('mike123', 'mike@ixample.org', 'test123')
+        data = {'email': 'mike@ıxample.org'}
+        form = PasswordResetForm(data)
+        self.assertTrue(form.is_valid())
+        form.save()
+        self.assertEqual(len(mail.outbox), 0)
 
     def test_nonexistent_email(self):
         """

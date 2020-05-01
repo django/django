@@ -1,13 +1,13 @@
 {% load i18n %}
 
-{# ignored comment #1 #}{% trans "Translatable literal #9a" %}
-{# Translators: ignored i18n comment #1 #}{% trans "Translatable literal #9b" %}
-{# Translators: ignored i18n comment #2 #}{# ignored comment #2 #}{% trans "Translatable literal #9c" %}
-{# ignored comment #3 #}{# Translators: ignored i18n comment #3 #}{% trans "Translatable literal #9d" %}
-{# ignored comment #4 #}{% trans "Translatable literal #9e" %}{# ignored comment #5 #}
-{# Translators: ignored i18n comment #4 #}{% trans "Translatable literal #9f" %}{# Translators: valid i18n comment #5 #}
-{% trans "Translatable literal #9g" %}{# Translators: valid i18n comment #6 #}
-{# ignored comment #6 #}{% trans "Translatable literal #9h" %}{# Translators: valid i18n comment #7 #}
-{% trans "Translatable literal #9i" %}
+{# ignored comment #1 #}{% translate "Translatable literal #9a" %}
+{# Translators: ignored i18n comment #1 #}{% translate "Translatable literal #9b" %}
+{# Translators: ignored i18n comment #2 #}{# ignored comment #2 #}{% translate "Translatable literal #9c" %}
+{# ignored comment #3 #}{# Translators: ignored i18n comment #3 #}{% translate "Translatable literal #9d" %}
+{# ignored comment #4 #}{% translate "Translatable literal #9e" %}{# ignored comment #5 #}
+{# Translators: ignored i18n comment #4 #}{% translate "Translatable literal #9f" %}{# Translators: valid i18n comment #5 #}
+{% translate "Translatable literal #9g" %}{# Translators: valid i18n comment #6 #}
+{# ignored comment #6 #}{% translate "Translatable literal #9h" %}{# Translators: valid i18n comment #7 #}
+{% translate "Translatable literal #9i" %}
 {# Translators: valid i18n comment #8 #}{# Translators: valid i18n comment #9 #}
-{% trans "Translatable literal #9j" %}
+{% translate "Translatable literal #9j" %}

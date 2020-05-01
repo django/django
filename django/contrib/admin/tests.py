@@ -1,3 +1,5 @@
+from contextlib import contextmanager
+
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from django.test import modify_settings
 from django.test.selenium import SeleniumTestCase
@@ -33,12 +35,15 @@ class AdminSeleniumTestCase(SeleniumTestCase, StaticLiveServerTestCase):
         from selenium.webdriver.support.wait import WebDriverWait
         WebDriverWait(self.selenium, timeout).until(callback)
 
-    def wait_for_popup(self, num_windows=2, timeout=10):
+    def wait_for_and_switch_to_popup(self, num_windows=2, timeout=10):
         """
-        Block until `num_windows` are present (usually 2, but can be
-        overridden in the case of pop-ups opening other pop-ups).
+        Block until `num_windows` are present and are ready (usually 2, but can
+        be overridden in the case of pop-ups opening other pop-ups). Switch the
+        current window to the new pop-up.
         """
         self.wait_until(lambda d: len(d.window_handles) == num_windows, timeout)
+        self.selenium.switch_to.window(self.selenium.window_handles[-1])
+        self.wait_page_ready()
 
     def wait_for(self, css_selector, timeout=10):
         """
@@ -97,19 +102,26 @@ class AdminSeleniumTestCase(SeleniumTestCase, StaticLiveServerTestCase):
             timeout
         )
 
-    def wait_page_loaded(self):
+    def wait_page_ready(self, timeout=10):
         """
-        Block until page has started to load.
+        Block until the  page is ready.
         """
-        from selenium.common.exceptions import TimeoutException
-        try:
-            # Wait for the next page to be loaded
-            self.wait_for('body')
-        except TimeoutException:
-            # IE7 occasionally returns an error "Internet Explorer cannot
-            # display the webpage" and doesn't load the next page. We just
-            # ignore it.
-            pass
+        self.wait_until(
+            lambda driver: driver.execute_script('return document.readyState;') == 'complete',
+            timeout,
+        )
+
+    @contextmanager
+    def wait_page_loaded(self, timeout=10):
+        """
+        Block until a new page has loaded and is ready.
+        """
+        from selenium.webdriver.support import expected_conditions as ec
+        old_page = self.selenium.find_element_by_tag_name('html')
+        yield
+        # Wait for the next page to be loaded
+        self.wait_until(ec.staleness_of(old_page), timeout=timeout)
+        self.wait_page_ready(timeout=timeout)
 
     def admin_login(self, username, password, login_url='/admin/'):
         """
@@ -121,29 +133,26 @@ class AdminSeleniumTestCase(SeleniumTestCase, StaticLiveServerTestCase):
         password_input = self.selenium.find_element_by_name('password')
         password_input.send_keys(password)
         login_text = _('Log in')
-        self.selenium.find_element_by_xpath(
-            '//input[@value="%s"]' % login_text).click()
-        self.wait_page_loaded()
+        with self.wait_page_loaded():
+            self.selenium.find_element_by_xpath('//input[@value="%s"]' % login_text).click()
 
-    def get_css_value(self, selector, attribute):
+    def select_option(self, selector, value):
         """
-        Return the value for the CSS attribute of a DOM element specified by
-        the given selector. Uses the jQuery that ships with Django.
-        """
-        return self.selenium.execute_script(
-            'return django.jQuery("%s").css("%s")' % (selector, attribute))
-
-    def get_select_option(self, selector, value):
-        """
-        Return the <OPTION> with the value `value` inside the <SELECT> widget
+        Select the <OPTION> with the value `value` inside the <SELECT> widget
         identified by the CSS selector `selector`.
         """
-        from selenium.common.exceptions import NoSuchElementException
-        options = self.selenium.find_elements_by_css_selector('%s > option' % selector)
-        for option in options:
-            if option.get_attribute('value') == value:
-                return option
-        raise NoSuchElementException('Option "%s" not found in "%s"' % (value, selector))
+        from selenium.webdriver.support.ui import Select
+        select = Select(self.selenium.find_element_by_css_selector(selector))
+        select.select_by_value(value)
+
+    def deselect_option(self, selector, value):
+        """
+        Deselect the <OPTION> with the value `value` inside the <SELECT> widget
+        identified by the CSS selector `selector`.
+        """
+        from selenium.webdriver.support.ui import Select
+        select = Select(self.selenium.find_element_by_css_selector(selector))
+        select.deselect_by_value(value)
 
     def _assertOptionsValues(self, options_selector, values):
         if values:

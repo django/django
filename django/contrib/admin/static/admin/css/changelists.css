@@ -187,6 +187,12 @@
     color: #036;
 }
 
+#changelist-filter #changelist-filter-clear a {
+    font-size: 13px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #eaeaea;
+}
+
 /* DATE DRILLDOWN */
 
 .change-list ul.toplinks {
@@ -232,7 +238,6 @@
 }
 
 .paginator a.showall {
-    padding: 0;
     border: none;
     background: none;
     color: #5b80b2;

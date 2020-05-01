@@ -1,12 +1,16 @@
 import itertools
 import math
+import warnings
 from copy import copy
 
 from django.core.exceptions import EmptyResultSet
-from django.db.models.expressions import Func, Value
-from django.db.models.fields import DateTimeField, Field, IntegerField
+from django.db.models.expressions import Case, Exists, Func, Value, When
+from django.db.models.fields import (
+    BooleanField, CharField, DateTimeField, Field, IntegerField, UUIDField,
+)
 from django.db.models.query_utils import RegisterLookupMixin
 from django.utils.datastructures import OrderedSet
+from django.utils.deprecation import RemovedInDjango40Warning
 from django.utils.functional import cached_property
 
 
@@ -111,6 +115,19 @@ class Lookup:
 
     def as_sql(self, compiler, connection):
         raise NotImplementedError
+
+    def as_oracle(self, compiler, connection):
+        # Oracle doesn't allow EXISTS() to be compared to another expression
+        # unless it's wrapped in a CASE WHEN.
+        wrapped = False
+        exprs = []
+        for expr in (self.lhs, self.rhs):
+            if isinstance(expr, Exists):
+                expr = Case(When(expr, then=True), default=False, output_field=BooleanField())
+                wrapped = True
+            exprs.append(expr)
+        lookup = type(self)(*exprs) if wrapped else self
+        return lookup.as_sql(compiler, connection)
 
     @cached_property
     def contains_aggregate(self):
@@ -239,6 +256,17 @@ class FieldGetDbPrepValueIterableMixin(FieldGetDbPrepValueMixin):
         return sql, tuple(params)
 
 
+class PostgresOperatorLookup(FieldGetDbPrepValueMixin, Lookup):
+    """Lookup defined by operators on PostgreSQL."""
+    postgres_operator = None
+
+    def as_postgresql(self, compiler, connection):
+        lhs, lhs_params = self.process_lhs(compiler, connection)
+        rhs, rhs_params = self.process_rhs(compiler, connection)
+        params = tuple(lhs_params) + tuple(rhs_params)
+        return '%s %s %s' % (lhs, self.postgres_operator, rhs), params
+
+
 @Field.register_lookup
 class Exact(FieldGetDbPrepValueMixin, BuiltinLookup):
     lookup_name = 'exact'
@@ -247,15 +275,29 @@ class Exact(FieldGetDbPrepValueMixin, BuiltinLookup):
         from django.db.models.sql.query import Query
         if isinstance(self.rhs, Query):
             if self.rhs.has_limit_one():
-                # The subquery must select only the pk.
-                self.rhs.clear_select_clause()
-                self.rhs.add_fields(['pk'])
+                if not self.rhs.has_select_fields:
+                    self.rhs.clear_select_clause()
+                    self.rhs.add_fields(['pk'])
             else:
                 raise ValueError(
                     'The QuerySet value for an exact lookup must be limited to '
                     'one result using slicing.'
                 )
         return super().process_rhs(compiler, connection)
+
+    def as_sql(self, compiler, connection):
+        # Avoid comparison against direct rhs if lhs is a boolean value. That
+        # turns "boolfield__exact=True" into "WHERE boolean_field" instead of
+        # "WHERE boolean_field = True" when allowed.
+        if (
+            isinstance(self.rhs, bool) and
+            getattr(self.lhs, 'conditional', False) and
+            connection.ops.conditional_expression_supported_in_where_clause(self.lhs)
+        ):
+            lhs_sql, params = self.process_lhs(compiler, connection)
+            template = '%s' if self.rhs else 'NOT %s'
+            return template % lhs_sql, params
+        return super().as_sql(compiler, connection)
 
 
 @Field.register_lookup
@@ -448,6 +490,17 @@ class IsNull(BuiltinLookup):
     prepare_rhs = False
 
     def as_sql(self, compiler, connection):
+        if not isinstance(self.rhs, bool):
+            # When the deprecation ends, replace with:
+            # raise ValueError(
+            #     'The QuerySet value for an isnull lookup must be True or '
+            #     'False.'
+            # )
+            warnings.warn(
+                'Using a non-boolean value for an isnull lookup is '
+                'deprecated, use True or False instead.',
+                RemovedInDjango40Warning,
+            )
         sql, params = compiler.compile(self.lhs)
         if self.rhs:
             return "%s IS NULL" % sql, params
@@ -533,3 +586,53 @@ class YearLt(YearLookup, LessThan):
 class YearLte(YearLookup, LessThanOrEqual):
     def get_bound_params(self, start, finish):
         return (finish,)
+
+
+class UUIDTextMixin:
+    """
+    Strip hyphens from a value when filtering a UUIDField on backends without
+    a native datatype for UUID.
+    """
+    def process_rhs(self, qn, connection):
+        if not connection.features.has_native_uuid_field:
+            from django.db.models.functions import Replace
+            if self.rhs_is_direct_value():
+                self.rhs = Value(self.rhs)
+            self.rhs = Replace(self.rhs, Value('-'), Value(''), output_field=CharField())
+        rhs, params = super().process_rhs(qn, connection)
+        return rhs, params
+
+
+@UUIDField.register_lookup
+class UUIDIExact(UUIDTextMixin, IExact):
+    pass
+
+
+@UUIDField.register_lookup
+class UUIDContains(UUIDTextMixin, Contains):
+    pass
+
+
+@UUIDField.register_lookup
+class UUIDIContains(UUIDTextMixin, IContains):
+    pass
+
+
+@UUIDField.register_lookup
+class UUIDStartsWith(UUIDTextMixin, StartsWith):
+    pass
+
+
+@UUIDField.register_lookup
+class UUIDIStartsWith(UUIDTextMixin, IStartsWith):
+    pass
+
+
+@UUIDField.register_lookup
+class UUIDEndsWith(UUIDTextMixin, EndsWith):
+    pass
+
+
+@UUIDField.register_lookup
+class UUIDIEndsWith(UUIDTextMixin, IEndsWith):
+    pass

@@ -664,12 +664,12 @@ def parse_header(line):
                 if p.count(b"'") == 2:
                     has_encoding = True
             value = p[i + 1:].strip()
-            if has_encoding:
-                encoding, lang, value = value.split(b"'")
-                value = unquote(value.decode(), encoding=encoding.decode())
             if len(value) >= 2 and value[:1] == value[-1:] == b'"':
                 value = value[1:-1]
                 value = value.replace(b'\\\\', b'\\').replace(b'\\"', b'"')
+            if has_encoding:
+                encoding, lang, value = value.split(b"'")
+                value = unquote(value.decode(), encoding=encoding.decode())
             pdict[name] = value
     return key, pdict
 

@@ -61,7 +61,7 @@ See the :doc:`contenttypes documentation </ref/contrib/contenttypes>`.
 ``flatpages``
 =============
 
-A framework for managing simple "flat" HTML content in a database.
+A framework for managing "flat" HTML content in a database.
 
 See the :doc:`flatpages documentation </ref/contrib/flatpages>`.
 

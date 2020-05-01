@@ -34,7 +34,7 @@ class Migration(migrations.Migration):
                 )),
             ],
             options={
-                'ordering': ('-action_time',),
+                'ordering': ['-action_time'],
                 'db_table': 'django_admin_log',
                 'verbose_name': 'log entry',
                 'verbose_name_plural': 'log entries',

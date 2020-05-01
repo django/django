@@ -1,7 +1,7 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Bogdan Mateescu, 2018
+# Bogdan Mateescu, 2018-2019
 # Daniel Ursache-Dogariu, 2011
 # Denis Darii <denis.darii@gmail.com>, 2014
 # Jannis Leidel <jannis@leidel.info>, 2011
@@ -10,8 +10,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2018-02-28 15:16+0000\n"
+"POT-Creation-Date: 2019-09-08 17:27+0200\n"
+"PO-Revision-Date: 2019-10-11 23:52+0000\n"
 "Last-Translator: Bogdan Mateescu\n"
 "Language-Team: Romanian (http://www.transifex.com/django/django/language/"
 "ro/)\n"
@@ -125,7 +125,7 @@ msgid "Fields"
 msgstr "Câmpuri"
 
 msgid "Field"
-msgstr "Cîmp"
+msgstr "Câmp"
 
 msgid "Type"
 msgstr "Tip"
@@ -159,13 +159,13 @@ msgid "Template: %(name)s"
 msgstr "Șablonul: %(name)s"
 
 #, python-format
-msgid "Template: \"%(name)s\""
-msgstr "Șablonul: \"%(name)s\""
+msgid "Template: <q>%(name)s</q>"
+msgstr ""
 
 #. Translators: Search is not a verb here, it qualifies path (a search path)
 #, python-format
-msgid "Search path for template \"%(name)s\":"
-msgstr "Calea de căutare pentru șablonul \"%(name)s\":"
+msgid "Search path for template <q>%(name)s</q>:"
+msgstr ""
 
 msgid "(does not exist)"
 msgstr "(inexistent)"

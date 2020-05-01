@@ -154,23 +154,13 @@ class CookieTests(BaseTests, SimpleTestCase):
         self.assertIsInstance(encode_decode(mark_safe("<b>Hello Django!</b>")), SafeData)
         self.assertNotIsInstance(encode_decode("<b>Hello Django!</b>"), SafeData)
 
-    def test_pre_1_5_message_format(self):
-        """
-        Messages that were set in the cookie before the addition of is_safedata
-        are decoded correctly (#22426).
-        """
-        # Encode the messages using the current encoder.
-        messages = [Message(constants.INFO, 'message %s') for x in range(5)]
+    def test_legacy_hash_decode(self):
+        # RemovedInDjango40Warning: pre-Django 3.1 hashes will be invalid.
+        storage = self.storage_class(self.get_request())
+        messages = ['this', 'that']
+        # Encode/decode a message using the pre-Django 3.1 hash.
         encoder = MessageEncoder(separators=(',', ':'))
-        encoded_messages = encoder.encode(messages)
-
-        # Remove the is_safedata flag from the messages in order to imitate
-        # the behavior of before 1.5 (monkey patching).
-        encoded_messages = json.loads(encoded_messages)
-        for obj in encoded_messages:
-            obj.pop(1)
-        encoded_messages = json.dumps(encoded_messages, separators=(',', ':'))
-
-        # Decode the messages in the old format (without is_safedata)
-        decoded_messages = json.loads(encoded_messages, cls=MessageDecoder)
+        value = encoder.encode(messages)
+        encoded_messages = '%s$%s' % (storage._legacy_hash(value), value)
+        decoded_messages = storage._decode(encoded_messages)
         self.assertEqual(messages, decoded_messages)

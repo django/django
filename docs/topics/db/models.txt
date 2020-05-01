@@ -198,6 +198,19 @@ ones:
         >>> p.get_shirt_size_display()
         'Large'
 
+    You can also use enumeration classes to define ``choices`` in a concise
+    way::
+
+        from django.db import models
+
+        class Runner(models.Model):
+            MedalType = models.TextChoices('MedalType', 'GOLD SILVER BRONZE')
+            name = models.CharField(max_length=60)
+            medal = models.CharField(blank=True, choices=MedalType.choices, max_length=10)
+
+    Further examples are available in the :ref:`model field reference
+    <field-choices>`.
+
 :attr:`~Field.default`
     The default value for the field. This can be a value or a callable
     object. If callable it will be called every time a new object is
@@ -252,7 +265,7 @@ By default, Django gives each model the following field::
 
 This is an auto-incrementing primary key.
 
-If you'd like to specify a custom primary key, just specify
+If you'd like to specify a custom primary key, specify
 :attr:`primary_key=True <Field.primary_key>` on one of your fields. If Django
 sees you've explicitly set :attr:`Field.primary_key`, it won't add the automatic
 ``id`` column.
@@ -423,8 +436,8 @@ should work; all are optional.
 Extra fields on many-to-many relationships
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-When you're only dealing with simple many-to-many relationships such as
-mixing and matching pizzas and toppings, a standard
+When you're only dealing with many-to-many relationships such as mixing and
+matching pizzas and toppings, a standard
 :class:`~django.db.models.ManyToManyField` is all you need. However, sometimes
 you may need to associate data with the relationship between two models.
 
@@ -485,11 +498,6 @@ There are a few restrictions on the intermediate model:
   relationship. If there are *more* than two foreign keys though, you
   must also specify ``through_fields`` as above, or a validation error
   will be raised.
-
-* When defining a many-to-many relationship from a model to
-  itself, using an intermediary model, you *must* use
-  :attr:`symmetrical=False <ManyToManyField.symmetrical>` (see
-  :ref:`the model field reference <manytomany-arguments>`).
 
 Now that you have set up your :class:`~django.db.models.ManyToManyField` to use
 your intermediary model (``Membership``, in this case), you're ready to start
@@ -627,7 +635,7 @@ Models across files
 
 It's perfectly OK to relate a model to one from another app. To do this, import
 the related model at the top of the file where your model is defined. Then,
-just refer to the other model class wherever needed. For example::
+refer to the other model class wherever needed. For example::
 
     from django.db import models
     from geography.models import ZipCode
@@ -956,6 +964,33 @@ abstract base class. For example, including ``db_table`` would mean that all
 the child classes (the ones that don't specify their own :ref:`Meta <meta-options>`) would use
 the same database table, which is almost certainly not what you want.
 
+Due to the way Python inheritance works, if a child class inherits from
+multiple abstract base classes, only the :ref:`Meta <meta-options>` options
+from the first listed class will be inherited by default. To inherit :ref:`Meta
+<meta-options>` options from multiple abstract base classes, you must
+explicitly declare the :ref:`Meta <meta-options>` inheritance. For example::
+
+    from django.db import models
+
+    class CommonInfo(models.Model):
+        name = models.CharField(max_length=100)
+        age = models.PositiveIntegerField()
+
+        class Meta:
+            abstract = True
+            ordering = ['name']
+
+    class Unmanaged(models.Model):
+        class Meta:
+            abstract = True
+            managed = False
+
+    class Student(CommonInfo, Unmanaged):
+        home_group = models.CharField(max_length=5)
+
+        class Meta(CommonInfo.Meta, Unmanaged.Meta):
+            pass
+
 .. _abstract-related-name:
 
 Be careful with ``related_name`` and ``related_query_name``
@@ -1079,6 +1114,7 @@ The automatically-created :class:`~django.db.models.OneToOneField` on
     place_ptr = models.OneToOneField(
         Place, on_delete=models.CASCADE,
         parent_link=True,
+        primary_key=True,
     )
 
 You can override that field by declaring your own
@@ -1205,7 +1241,7 @@ accessible through ``MyPerson``, and vice-versa::
 
 You could also use a proxy model to define a different default ordering on
 a model. You might not always want to order the ``Person`` model, but regularly
-order by the ``last_name`` attribute when you use the proxy. This is easy::
+order by the ``last_name`` attribute when you use the proxy::
 
     class OrderedPerson(Person):
         class Meta:

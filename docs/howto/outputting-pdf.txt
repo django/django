@@ -67,6 +67,7 @@ Here's a "Hello World" example::
 
         # FileResponse sets the Content-Disposition header so that browsers
         # present the option to save the file.
+        buffer.seek(0)
         return FileResponse(buffer, as_attachment=True, filename='hello.pdf')
 
 The code and comments should be self-explanatory, but a few things deserve a
@@ -74,8 +75,8 @@ mention:
 
 * The response will automatically set the MIME type :mimetype:`application/pdf`
   based on the filename extension. This tells browsers that the document is a
-  PDF file, rather than an HTML file or a generic `application/octet-stream`
-  binary content.
+  PDF file, rather than an HTML file or a generic
+  :mimetype:`application/octet-stream` binary content.
 
 * When ``as_attachment=True`` is passed to ``FileResponse``, it sets the
   appropriate ``Content-Disposition`` header and that tells Web browsers to
@@ -87,7 +88,7 @@ mention:
 * You can provide an arbitrary ``filename`` parameter. It'll be used by browsers
   in the "Save as..." dialog.
 
-* Hooking into the ReportLab API is easy: The same buffer passed as the first
+* You can hook into the ReportLab API: The same buffer passed as the first
   argument to ``canvas.Canvas`` can be fed to the
   :class:`~django.http.FileResponse` class.
 

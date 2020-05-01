@@ -10,8 +10,9 @@ in Django that you'd like to see fixed, or maybe there's a small feature you
 want added.
 
 Contributing back to Django itself is the best way to see your own concerns
-addressed. This may seem daunting at first, but it's really pretty simple.
-We'll walk you through the entire process, so you can learn by example.
+addressed. This may seem daunting at first, but it's a well-traveled path with
+documentation, tooling, and a community to support you. We'll walk you through
+the entire process, so you can learn by example.
 
 Who's this tutorial for?
 ------------------------
@@ -43,8 +44,8 @@ so that it can be of use to the widest audience.
     to |django-developers| or drop by `#django-dev on irc.freenode.net`__ to
     chat with other Django users who might be able to help.
 
-__ https://www.diveinto.org/python3/
-__ irc://irc.freenode.net/django-dev
+__ https://diveinto.org/python3/table-of-contents.html
+__ https://webchat.freenode.net/#django-dev
 
 What does this tutorial cover?
 ------------------------------
@@ -113,7 +114,7 @@ Download the Django source code repository using the following command:
 
 .. console::
 
-    $ git clone git@github.com:YourGitHubName/django.git
+    $ git clone https://github.com/YourGitHubName/django.git
 
 .. admonition:: Low bandwidth connection?
 
@@ -176,15 +177,27 @@ command line to help you keep track of which one you are using. Anything you
 install through ``pip`` while this name is displayed will be installed in that
 virtual environment, isolated from other environments and system-wide packages.
 
+.. _intro-contributing-install-local-copy:
+
 Go ahead and install the previously cloned copy of Django:
 
 .. console::
 
     $ python -m pip install -e /path/to/your/local/clone/django/
 
-The installed version of Django is now pointing at your local copy. You will
-immediately see any changes you make to it, which is of great help when writing
-your first patch.
+The installed version of Django is now pointing at your local copy by installing
+in editable mode. You will immediately see any changes you make to it, which is
+of great help when writing your first patch.
+
+Creating projects with a local copy of Django
+---------------------------------------------
+
+It may be helpful to test your local changes with a Django project. First you
+have to create a new virtual environment, :ref:`install the previously cloned
+local copy of Django in editable mode <intro-contributing-install-local-copy>`,
+and create a new Django project outside of your local copy of Django. You will
+immediately see any changes you make to Django in your new project, which is
+of great help when writing your first patch.
 
 Running Django's test suite for the first time
 ==============================================
@@ -193,7 +206,7 @@ When contributing to Django it's very important that your code changes don't
 introduce bugs into other areas of Django. One way to check that Django still
 works after you make your changes is by running Django's test suite. If all
 the tests still pass, then you can be reasonably sure that your changes
-work and haven't broken other parts Django. If you've never run Django's test
+work and haven't broken other parts of Django. If you've never run Django's test
 suite before, it's a good idea to run it once beforehand to get familiar with
 its output.
 
@@ -217,7 +230,8 @@ some other flavor of Unix, run:
     $ ./runtests.py
 
 Now sit back and relax. Django's entire test suite has thousands of tests, and
-it takes at least a few minutes run, depending on the speed of your computer.
+it takes at least a few minutes to run, depending on the speed of your
+computer.
 
 While Django's test suite is running, you'll see a stream of characters
 representing the status of each test as it completes. ``E`` indicates that an
@@ -387,7 +401,7 @@ Running Django's test suite for the second time
 ===============================================
 
 Once you've verified that your patch and your test are working correctly, it's
-a good idea to run the entire Django test suite just to verify that your change
+a good idea to run the entire Django test suite to verify that your change
 hasn't introduced any bugs into other areas of Django. While successfully
 passing the entire test suite doesn't guarantee your code is bug free, it does
 help identify many bugs and regressions that might otherwise go unnoticed.
@@ -592,7 +606,7 @@ If you just want to get started already (and nobody would blame you!), try
 taking a look at the list of `easy tickets that need patches`__ and the
 `easy tickets that have patches which need improvement`__. If you're familiar
 with writing tests, you can also look at the list of
-`easy tickets that need tests`__. Just remember to follow the guidelines about
+`easy tickets that need tests`__. Remember to follow the guidelines about
 claiming tickets that were mentioned in the link to Django's documentation on
 :doc:`claiming tickets and submitting patches
 </internals/contributing/writing-code/submitting-patches>`.

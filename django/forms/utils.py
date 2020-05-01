@@ -2,7 +2,7 @@ import json
 from collections import UserList
 
 from django.conf import settings
-from django.core.exceptions import ValidationError  # backwards compatibility
+from django.core.exceptions import ValidationError
 from django.utils import timezone
 from django.utils.html import escape, format_html, format_html_join, html_safe
 from django.utils.translation import gettext_lazy as _
@@ -91,6 +91,11 @@ class ErrorList(UserList, list):
 
     def as_data(self):
         return ValidationError(self.data).error_list
+
+    def copy(self):
+        copy = super().copy()
+        copy.error_class = self.error_class
+        return copy
 
     def get_json_data(self, escape_html=False):
         errors = []

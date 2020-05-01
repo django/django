@@ -1,11 +1,12 @@
 from collections import namedtuple
 
+import sqlparse
 from MySQLdb.constants import FIELD_TYPE
 
 from django.db.backends.base.introspection import (
     BaseDatabaseIntrospection, FieldInfo as BaseFieldInfo, TableInfo,
 )
-from django.db.models.indexes import Index
+from django.db.models import Index
 from django.utils.datastructures import OrderedSet
 
 FieldInfo = namedtuple('FieldInfo', BaseFieldInfo._fields + ('extra', 'is_unsigned'))
@@ -43,8 +44,12 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                 return 'AutoField'
             elif field_type == 'BigIntegerField':
                 return 'BigAutoField'
+            elif field_type == 'SmallIntegerField':
+                return 'SmallAutoField'
         if description.is_unsigned:
-            if field_type == 'IntegerField':
+            if field_type == 'BigIntegerField':
+                return 'PositiveBigIntegerField'
+            elif field_type == 'IntegerField':
                 return 'PositiveIntegerField'
             elif field_type == 'SmallIntegerField':
                 return 'PositiveSmallIntegerField'
@@ -146,6 +151,19 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
             return self.connection.features._mysql_storage_engine
         return result[0]
 
+    def _parse_constraint_columns(self, check_clause, columns):
+        check_columns = OrderedSet()
+        statement = sqlparse.parse(check_clause)[0]
+        tokens = (token for token in statement.flatten() if not token.is_whitespace)
+        for token in tokens:
+            if (
+                token.ttype == sqlparse.tokens.Name and
+                self.connection.ops.quote_name(token.value) == token.value and
+                token.value[1:-1] in columns
+            ):
+                check_columns.add(token.value[1:-1])
+        return check_columns
+
     def get_constraints(self, cursor, table_name):
         """
         Retrieve any constraints or keys (unique, pk, fk, check, index) across
@@ -189,6 +207,48 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                 constraints[constraint]['unique'] = True
             elif kind.lower() == "unique":
                 constraints[constraint]['unique'] = True
+        # Add check constraints.
+        if self.connection.features.can_introspect_check_constraints:
+            unnamed_constraints_index = 0
+            columns = {info.name for info in self.get_table_description(cursor, table_name)}
+            if self.connection.mysql_is_mariadb:
+                type_query = """
+                    SELECT c.constraint_name, c.check_clause
+                    FROM information_schema.check_constraints AS c
+                    WHERE
+                        c.constraint_schema = DATABASE() AND
+                        c.table_name = %s
+                """
+            else:
+                type_query = """
+                    SELECT cc.constraint_name, cc.check_clause
+                    FROM
+                        information_schema.check_constraints AS cc,
+                        information_schema.table_constraints AS tc
+                    WHERE
+                        cc.constraint_schema = DATABASE() AND
+                        tc.table_schema = cc.constraint_schema AND
+                        cc.constraint_name = tc.constraint_name AND
+                        tc.constraint_type = 'CHECK' AND
+                        tc.table_name = %s
+                """
+            cursor.execute(type_query, [table_name])
+            for constraint, check_clause in cursor.fetchall():
+                constraint_columns = self._parse_constraint_columns(check_clause, columns)
+                # Ensure uniqueness of unnamed constraints. Unnamed unique
+                # and check columns constraints have the same name as
+                # a column.
+                if set(constraint_columns) == {constraint}:
+                    unnamed_constraints_index += 1
+                    constraint = '__unnamed_constraint_%s__' % unnamed_constraints_index
+                constraints[constraint] = {
+                    'columns': constraint_columns,
+                    'primary_key': False,
+                    'unique': False,
+                    'index': False,
+                    'check': True,
+                    'foreign_key': None,
+                }
         # Now add in the indexes
         cursor.execute("SHOW INDEX FROM %s" % self.connection.ops.quote_name(table_name))
         for table, non_unique, index, colseq, column, type_ in [x[:5] + (x[10],) for x in cursor.fetchall()]:

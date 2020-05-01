@@ -163,8 +163,8 @@ notification of security issues is not and will not be made public.
 We also aim to keep this list as small as effectively possible, in
 order to better manage the flow of confidential information prior to
 disclosure. As such, our notification list is *not* simply a list of
-users of Django, and merely being a user of Django is not sufficient
-reason to be placed on the notification list.
+users of Django, and being a user of Django is not sufficient reason
+to be placed on the notification list.
 
 In broad terms, recipients of security notifications fall into three
 groups:

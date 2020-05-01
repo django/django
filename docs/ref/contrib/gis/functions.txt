@@ -27,9 +27,9 @@ Measurement                Relationships             Operations              Edi
 :class:`Distance`          :class:`BoundingCircle`   :class:`Intersection`   :class:`MakeValid`       :class:`AsGML`      :class:`MemSize`
 :class:`GeometryDistance`  :class:`Centroid`         :class:`SymDifference`  :class:`Reverse`         :class:`AsKML`      :class:`NumGeometries`
 :class:`Length`            :class:`Envelope`         :class:`Union`          :class:`Scale`           :class:`AsSVG`      :class:`NumPoints`
-:class:`Perimeter`         :class:`LineLocatePoint`                          :class:`SnapToGrid`      :class:`GeoHash`
-..                         :class:`PointOnSurface`                           :class:`Transform`
-..                                                                           :class:`Translate`
+:class:`Perimeter`         :class:`LineLocatePoint`                          :class:`SnapToGrid`      :class:`AsWKB`
+..                         :class:`PointOnSurface`                           :class:`Transform`       :class:`AsWKT`
+..                                                                           :class:`Translate`       :class:`GeoHash`
 =========================  ========================  ======================  =======================  ==================  =====================
 
 ``Area``
@@ -38,7 +38,7 @@ Measurement                Relationships             Operations              Edi
 .. class:: Area(expression, **extra)
 
 *Availability*: MariaDB, `MySQL
-<https://dev.mysql.com/doc/refman/en/gis-polygon-property-functions.html#function_area>`__,
+<https://dev.mysql.com/doc/refman/en/gis-polygon-property-functions.html#function_st-area>`_,
 Oracle, `PostGIS <https://postgis.net/docs/ST_Area.html>`__, SpatiaLite
 
 Accepts a single geographic field or expression and returns the area of the
@@ -54,11 +54,11 @@ geographic SRSes.
 
 *Availability*: MariaDB (≥ 10.2.4), `MySQL
 <https://dev.mysql.com/doc/refman/en/spatial-geojson-functions.html#function_st-asgeojson>`__ (≥ 5.7.5),
-`PostGIS <https://postgis.net/docs/ST_AsGeoJSON.html>`__, SpatiaLite
+Oracle, `PostGIS <https://postgis.net/docs/ST_AsGeoJSON.html>`__, SpatiaLite
 
 Accepts a single geographic field or expression and returns a `GeoJSON
-<http://geojson.org/>`_ representation of the geometry. Note that the result is
-not a complete GeoJSON structure but only the ``geometry`` key content of a
+<https://geojson.org/>`_ representation of the geometry. Note that the result
+is not a complete GeoJSON structure but only the ``geometry`` key content of a
 GeoJSON structure. See also :doc:`/ref/contrib/gis/serializers`.
 
 Example::
@@ -70,16 +70,22 @@ Example::
 Keyword Argument       Description
 =====================  =====================================================
 ``bbox``               Set this to ``True`` if you want the bounding box
-                       to be included in the returned GeoJSON.
+                       to be included in the returned GeoJSON. Ignored on
+                       Oracle.
 
 ``crs``                Set this to ``True`` if you want the coordinate
                        reference system to be included in the returned
-                       GeoJSON. Ignored on MySQL.
+                       GeoJSON. Ignored on MySQL and Oracle.
 
 ``precision``          It may be used to specify the number of significant
                        digits for the coordinates in the GeoJSON
-                       representation -- the default value is 8.
+                       representation -- the default value is 8. Ignored on
+                       Oracle.
 =====================  =====================================================
+
+.. versionchanged:: 3.1
+
+    Oracle support was added.
 
 ``AsGML``
 =========
@@ -138,6 +144,10 @@ Keyword Argument       Description
 
 __ https://developers.google.com/kml/documentation/
 
+.. versionchanged:: 3.1
+
+    The undocumented ``version`` parameter was removed.
+
 ``AsSVG``
 =========
 
@@ -161,6 +171,48 @@ Keyword Argument       Description
 =====================  =====================================================
 
 __ https://www.w3.org/Graphics/SVG/
+
+``AsWKB``
+=========
+
+.. class:: AsWKB(expression, **extra)
+
+.. versionadded:: 3.1
+
+*Availability*: MariaDB, `MySQL
+<https://dev.mysql.com/doc/refman/en/gis-format-conversion-functions.html#function_st-asbinary>`__,
+Oracle, `PostGIS <https://postgis.net/docs/ST_AsBinary.html>`__, SpatiaLite
+
+Accepts a single geographic field or expression and returns a `Well-known
+binary (WKB)`__ representation of the geometry.
+
+Example::
+
+    >>> bytes(City.objects.annotate(wkb=AsWKB('point')).get(name='Chelyabinsk').wkb)
+    b'\x01\x01\x00\x00\x00]3\xf9f\x9b\x91K@\x00X\x1d9\xd2\xb9N@'
+
+__ https://en.wikipedia.org/wiki/Well-known_text_representation_of_geometry#Well-known_binary
+
+``AsWKT``
+=========
+
+.. class:: AsWKT(expression, **extra)
+
+.. versionadded:: 3.1
+
+*Availability*: MariaDB, `MySQL
+<https://dev.mysql.com/doc/refman/en/gis-format-conversion-functions.html#function_st-astext>`__,
+Oracle, `PostGIS <https://postgis.net/docs/ST_AsText.html>`__, SpatiaLite
+
+Accepts a single geographic field or expression and returns a `Well-known text
+(WKT)`__ representation of the geometry.
+
+Example::
+
+    >>> City.objects.annotate(wkt=AsWKT('point')).get(name='Chelyabinsk').wkt
+    'POINT (55.137555 61.451728)'
+
+__ https://en.wikipedia.org/wiki/Well-known_text_representation_of_geometry
 
 ``Azimuth``
 ===========
@@ -273,10 +325,6 @@ SDO_GEOM-reference.html#GUID-646638D0-2C5F-490A-AF63-DE9B7A4C97C1__CHDJCEIH>`__,
 
 Accepts a single geographic field or expression and returns the geometry
 representing the bounding box of the geometry.
-
-.. versionchanged:: 2.2
-
-    Oracle support was added.
 
 ``ForcePolygonCW``
 ==================

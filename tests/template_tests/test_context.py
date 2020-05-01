@@ -1,3 +1,5 @@
+from unittest import mock
+
 from django.http import HttpRequest
 from django.template import (
     Context, Engine, RequestContext, Template, Variable, VariableDoesNotExist,
@@ -18,6 +20,7 @@ class ContextTests(SimpleTestCase):
         self.assertEqual(c.pop(), {"a": 2})
         self.assertEqual(c["a"], 1)
         self.assertEqual(c.get("foo", 42), 42)
+        self.assertEqual(c, mock.ANY)
 
     def test_push_context_manager(self):
         c = Context({"a": 1})

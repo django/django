@@ -14,9 +14,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-01-16 20:42+0100\n"
-"PO-Revision-Date: 2019-06-07 08:56+0000\n"
-"Last-Translator: GOTO Hayato <habita.gh@gmail.com>\n"
+"POT-Creation-Date: 2019-09-27 22:40+0200\n"
+"PO-Revision-Date: 2019-11-05 00:38+0000\n"
+"Last-Translator: Ramiro Morales\n"
 "Language-Team: Japanese (http://www.transifex.com/django/django/language/"
 "ja/)\n"
 "MIME-Version: 1.0\n"
@@ -286,6 +286,9 @@ msgstr "ウクライナ語"
 msgid "Urdu"
 msgstr "ウルドゥー語"
 
+msgid "Uzbek"
+msgstr ""
+
 msgid "Vietnamese"
 msgstr "ベトナム語"
 
@@ -330,15 +333,13 @@ msgstr "有効なメールアドレスを入力してください。"
 
 #. Translators: "letters" means latin letters: a-z and A-Z.
 msgid ""
-"Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
-msgstr "スラグには半角の英数字、アンダースコア、ハイフン以外は使用できません。"
+"Enter a valid “slug” consisting of letters, numbers, underscores or hyphens."
+msgstr ""
 
 msgid ""
-"Enter a valid 'slug' consisting of Unicode letters, numbers, underscores, or "
+"Enter a valid “slug” consisting of Unicode letters, numbers, underscores, or "
 "hyphens."
 msgstr ""
-"ユニコード文字、数字、アンダースコアまたはハイフンで構成された、有効なスラグ"
-"を入力してください"
 
 msgid "Enter a valid IPv4 address."
 msgstr "有効なIPアドレス (IPv4) を入力してください。"
@@ -410,11 +411,9 @@ msgstr[0] "この値は小数点より前が合計 %(max)s 桁以内でなけれ
 
 #, python-format
 msgid ""
-"File extension '%(extension)s' is not allowed. Allowed extensions are: "
-"'%(allowed_extensions)s'."
+"File extension “%(extension)s” is not allowed. Allowed extensions are: "
+"%(allowed_extensions)s."
 msgstr ""
-"ファイル拡張子 '%(extension)s' は許可されていません。許可されている拡張子は "
-"'%(allowed_extensions)s' です。"
 
 msgid "Null characters are not allowed."
 msgstr "何か文字を入力してください。"
@@ -453,23 +452,13 @@ msgstr ""
 msgid "Field of type: %(field_type)s"
 msgstr "タイプが %(field_type)s のフィールド"
 
-msgid "Integer"
-msgstr "整数"
+#, python-format
+msgid "“%(value)s” value must be either True or False."
+msgstr ""
 
 #, python-format
-msgid "'%(value)s' value must be an integer."
-msgstr "'%(value)s' は整数値にしなければなりません。"
-
-msgid "Big (8 byte) integer"
-msgstr "大きな(8バイト)整数"
-
-#, python-format
-msgid "'%(value)s' value must be either True or False."
-msgstr "'%(value)s' は真偽値にしなければなりません。"
-
-#, python-format
-msgid "'%(value)s' value must be either True, False, or None."
-msgstr "'%(value)s' はTrue、FalseまたはNoneの値でなければなりません。"
+msgid "“%(value)s” value must be either True, False, or None."
+msgstr ""
 
 msgid "Boolean (Either True or False)"
 msgstr "ブール値 (真: True または偽: False)"
@@ -483,53 +472,46 @@ msgstr "カンマ区切りの整数"
 
 #, python-format
 msgid ""
-"'%(value)s' value has an invalid date format. It must be in YYYY-MM-DD "
+"“%(value)s” value has an invalid date format. It must be in YYYY-MM-DD "
 "format."
 msgstr ""
-"'%(value)s' は無効な日付形式です。YYYY-MM-DD形式にしなければなりません。"
 
 #, python-format
 msgid ""
-"'%(value)s' value has the correct format (YYYY-MM-DD) but it is an invalid "
+"“%(value)s” value has the correct format (YYYY-MM-DD) but it is an invalid "
 "date."
-msgstr "'%(value)s' は有効な日付形式(YYYY-MM-DD)ですが、日付が不正です。"
+msgstr ""
 
 msgid "Date (without time)"
 msgstr "日付"
 
 #, python-format
 msgid ""
-"'%(value)s' value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[."
+"“%(value)s” value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[."
 "uuuuuu]][TZ] format."
 msgstr ""
-"'%(value)s' は無効な形式の値です。 YYYY-MM-DD HH:MM[:ss[.uuuuuu]][TZ] 形式で"
-"なければなりません。"
 
 #, python-format
 msgid ""
-"'%(value)s' value has the correct format (YYYY-MM-DD HH:MM[:ss[.uuuuuu]]"
+"“%(value)s” value has the correct format (YYYY-MM-DD HH:MM[:ss[.uuuuuu]]"
 "[TZ]) but it is an invalid date/time."
 msgstr ""
-"'%(value)s' は正しい形式(YYYY-MM-DD HH:MM[:ss[.uuuuuu]][TZ])の値ですが、無効"
-"な日時です。"
 
 msgid "Date (with time)"
 msgstr "日時"
 
 #, python-format
-msgid "'%(value)s' value must be a decimal number."
-msgstr "'%(value)s' は10進浮動小数値にしなければなりません。"
+msgid "“%(value)s” value must be a decimal number."
+msgstr ""
 
 msgid "Decimal number"
 msgstr "10 進数 (小数可)"
 
 #, python-format
 msgid ""
-"'%(value)s' value has an invalid format. It must be in [DD] [HH:[MM:]]ss[."
+"“%(value)s” value has an invalid format. It must be in [DD] [[HH:]MM:]ss[."
 "uuuuuu] format."
 msgstr ""
-"'%(value)s' は無効な形式の値です。 [DD] [HH:[MM:]]ss[.uuuuuu] 形式でなければ"
-"なりません。"
 
 msgid "Duration"
 msgstr "時間差分"
@@ -541,11 +523,21 @@ msgid "File path"
 msgstr "ファイルの場所"
 
 #, python-format
-msgid "'%(value)s' value must be a float."
-msgstr "'%(value)s' は小数値にしなければなりません。"
+msgid "“%(value)s” value must be a float."
+msgstr ""
 
 msgid "Floating point number"
 msgstr "浮動小数点"
+
+#, python-format
+msgid "“%(value)s” value must be an integer."
+msgstr ""
+
+msgid "Integer"
+msgstr "整数"
+
+msgid "Big (8 byte) integer"
+msgstr "大きな(8バイト)整数"
 
 msgid "IPv4 address"
 msgstr "IPv4アドレス"
@@ -554,8 +546,8 @@ msgid "IP address"
 msgstr "IP アドレス"
 
 #, python-format
-msgid "'%(value)s' value must be either None, True or False."
-msgstr "'%(value)s' はNone、TrueまたはFalseの値でなければなりません。"
+msgid "“%(value)s” value must be either None, True or False."
+msgstr ""
 
 msgid "Boolean (Either True, False or None)"
 msgstr "ブール値 (真: True 、偽: False または None)"
@@ -578,17 +570,15 @@ msgstr "テキスト"
 
 #, python-format
 msgid ""
-"'%(value)s' value has an invalid format. It must be in HH:MM[:ss[.uuuuuu]] "
+"“%(value)s” value has an invalid format. It must be in HH:MM[:ss[.uuuuuu]] "
 "format."
 msgstr ""
-"'%(value)s' は無効な形式の値です。 HH:MM[:ss[.uuuuuu]] 形式でなければなりませ"
-"ん。"
 
 #, python-format
 msgid ""
-"'%(value)s' value has the correct format (HH:MM[:ss[.uuuuuu]]) but it is an "
+"“%(value)s” value has the correct format (HH:MM[:ss[.uuuuuu]]) but it is an "
 "invalid time."
-msgstr "'%(value)s' は正しい形式(HH:MM[:ss[.uuuuuu]])ですが、無効な時刻です。"
+msgstr ""
 
 msgid "Time"
 msgstr "時刻"
@@ -600,8 +590,8 @@ msgid "Raw binary data"
 msgstr "生のバイナリデータ"
 
 #, python-format
-msgid "'%(value)s' is not a valid UUID."
-msgstr "'%(value)s' は有効なUUIDではありません。"
+msgid "“%(value)s” is not a valid UUID."
+msgstr ""
 
 msgid "Universally unique identifier"
 msgstr "汎用一意識別子"
@@ -759,16 +749,14 @@ msgid "Select a valid choice. That choice is not one of the available choices."
 msgstr "正しく選択してください。選択したものは候補にありません。"
 
 #, python-format
-msgid "\"%(pk)s\" is not a valid value."
-msgstr "\"%(pk)s\" は無効な値です。"
+msgid "“%(pk)s” is not a valid value."
+msgstr ""
 
 #, python-format
 msgid ""
-"%(datetime)s couldn't be interpreted in time zone %(current_timezone)s; it "
+"%(datetime)s couldn’t be interpreted in time zone %(current_timezone)s; it "
 "may be ambiguous or it may not exist."
 msgstr ""
-"%(datetime)s は%(current_timezone)sのタイムゾーンでは解釈できませんでした。そ"
-"れは曖昧であるか、存在しない可能性があります。"
 
 msgid "Clear"
 msgstr "クリア"
@@ -787,6 +775,15 @@ msgstr "はい"
 
 msgid "No"
 msgstr "いいえ"
+
+msgid "Year"
+msgstr ""
+
+msgid "Month"
+msgstr ""
+
+msgid "Day"
+msgstr ""
 
 msgid "yes,no,maybe"
 msgstr "はい,いいえ,たぶん"
@@ -1099,36 +1096,25 @@ msgid "CSRF verification failed. Request aborted."
 msgstr "CSRF検証に失敗したため、リクエストは中断されました。"
 
 msgid ""
-"You are seeing this message because this HTTPS site requires a 'Referer "
-"header' to be sent by your Web browser, but none was sent. This header is "
+"You are seeing this message because this HTTPS site requires a “Referer "
+"header” to be sent by your Web browser, but none was sent. This header is "
 "required for security reasons, to ensure that your browser is not being "
 "hijacked by third parties."
 msgstr ""
-"このメッセージが表示されている理由は、このHTTPSのサイトはウェブブラウザからリ"
-"ファラーヘッダが送信されることを必須としていますが、送信されなかったためで"
-"す。このヘッダはセキュリティ上の理由(使用中のブラウザが第三者によってハイ"
-"ジャックされていないことを確認するため)で必要です。"
 
 msgid ""
-"If you have configured your browser to disable 'Referer' headers, please re-"
-"enable them, at least for this site, or for HTTPS connections, or for 'same-"
-"origin' requests."
+"If you have configured your browser to disable “Referer” headers, please re-"
+"enable them, at least for this site, or for HTTPS connections, or for “same-"
+"origin” requests."
 msgstr ""
-"もしブラウザのリファラーヘッダを無効に設定しているならば、HTTPS接続やsame-"
-"originリクエストのために、少なくともこのサイトでは再度有効にしてください。"
 
 msgid ""
 "If you are using the <meta name=\"referrer\" content=\"no-referrer\"> tag or "
-"including the 'Referrer-Policy: no-referrer' header, please remove them. The "
-"CSRF protection requires the 'Referer' header to do strict referer checking. "
-"If you're concerned about privacy, use alternatives like <a rel=\"noreferrer"
-"\" ...> for links to third-party sites."
+"including the “Referrer-Policy: no-referrer” header, please remove them. The "
+"CSRF protection requires the “Referer” header to do strict referer checking. "
+"If you’re concerned about privacy, use alternatives like <a rel=\"noreferrer"
+"\" …> for links to third-party sites."
 msgstr ""
-"もし <meta name=\"referrer\" content=\"no-referrer\">タグを使用しているか "
-"'Referrer-Policy: no-referrer' ヘッダーを含んでいる場合は、削除してください。"
-"CSRFプロテクションは、厳密に referer をチェックするために 'Referer' ヘッダー"
-"が必要です。プライバシーについて心配がある場合は、<a rel=\"noreferrer\" ...>"
-"等を用いて、外部のサイトにリンクしてください。"
 
 msgid ""
 "You are seeing this message because this site requires a CSRF cookie when "
@@ -1141,10 +1127,8 @@ msgstr ""
 
 msgid ""
 "If you have configured your browser to disable cookies, please re-enable "
-"them, at least for this site, or for 'same-origin' requests."
+"them, at least for this site, or for “same-origin” requests."
 msgstr ""
-"もしブラウザのクッキーを無効に設定しているならば、same-originリクエストのため"
-"に少なくともこのサイトでは再度有効にしてください。"
 
 msgid "More information is available with DEBUG=True."
 msgstr "詳細な情報は DEBUG=True を設定すると利用できます。"
@@ -1177,30 +1161,30 @@ msgstr ""
 "利用できません。"
 
 #, python-format
-msgid "Invalid date string '%(datestr)s' given format '%(format)s'"
-msgstr "指定された形式 '%(format)s' では '%(datestr)s' は無効な日付文字列です"
+msgid "Invalid date string “%(datestr)s” given format “%(format)s”"
+msgstr ""
 
 #, python-format
 msgid "No %(verbose_name)s found matching the query"
 msgstr "クエリーに一致する %(verbose_name)s は見つかりませんでした"
 
-msgid "Page is not 'last', nor can it be converted to an int."
-msgstr "ページは数値に変換できる値、または 'last' ではありません。"
+msgid "Page is not “last”, nor can it be converted to an int."
+msgstr ""
 
 #, python-format
 msgid "Invalid page (%(page_number)s): %(message)s"
 msgstr "無効なページです (%(page_number)s): %(message)s"
 
 #, python-format
-msgid "Empty list and '%(class_name)s.allow_empty' is False."
-msgstr "空の一覧かつ '%(class_name)s.allow_empty' がFalseです。"
+msgid "Empty list and “%(class_name)s.allow_empty” is False."
+msgstr ""
 
 msgid "Directory indexes are not allowed here."
 msgstr "ここではディレクトリインデックスが許可されていません。"
 
 #, python-format
-msgid "\"%(path)s\" does not exist"
-msgstr "\"%(path)s\" が存在しません。"
+msgid "“%(path)s” does not exist"
+msgstr ""
 
 #, python-format
 msgid "Index of %(directory)s"
@@ -1234,8 +1218,8 @@ msgstr ""
 msgid "Django Documentation"
 msgstr "Django ドキュメント"
 
-msgid "Topics, references, &amp; how-to's"
-msgstr "トピック、リファレンス、ハウツー"
+msgid "Topics, references, &amp; how-to’s"
+msgstr ""
 
 msgid "Tutorial: A Polling App"
 msgstr "チュートリアル: 投票アプリケーション"

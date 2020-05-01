@@ -1,7 +1,7 @@
 import fnmatch
 import os
 from pathlib import Path
-from subprocess import PIPE, Popen
+from subprocess import PIPE, run
 
 from django.apps import apps as installed_apps
 from django.utils.crypto import get_random_string
@@ -17,13 +17,12 @@ def popen_wrapper(args, stdout_encoding='utf-8'):
     Return stdout output, stderr output, and OS status code.
     """
     try:
-        p = Popen(args, shell=False, stdout=PIPE, stderr=PIPE, close_fds=os.name != 'nt')
+        p = run(args, stdout=PIPE, stderr=PIPE, close_fds=os.name != 'nt')
     except OSError as err:
         raise CommandError('Error executing %s' % args[0]) from err
-    output, errors = p.communicate()
     return (
-        output.decode(stdout_encoding),
-        errors.decode(DEFAULT_LOCALE_ENCODING, errors='replace'),
+        p.stdout.decode(stdout_encoding),
+        p.stderr.decode(DEFAULT_LOCALE_ENCODING, errors='replace'),
         p.returncode
     )
 
@@ -113,7 +112,7 @@ def parse_apps_and_model_labels(labels):
 def get_command_line_option(argv, option):
     """
     Return the value of a command line option (which should include leading
-    dashes, e.g. '--testrunnner') from an argument list. Return None if the
+    dashes, e.g. '--testrunner') from an argument list. Return None if the
     option wasn't passed or if the argument list couldn't be parsed.
     """
     parser = CommandParser(add_help=False, allow_abbrev=False)

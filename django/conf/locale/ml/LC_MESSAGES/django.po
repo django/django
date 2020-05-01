@@ -13,9 +13,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-01-16 20:42+0100\n"
-"PO-Revision-Date: 2019-03-10 08:55+0000\n"
-"Last-Translator: Hrishikesh <hrishi.kb@gmail.com>\n"
+"POT-Creation-Date: 2019-09-27 22:40+0200\n"
+"PO-Revision-Date: 2019-11-05 00:38+0000\n"
+"Last-Translator: Ramiro Morales\n"
 "Language-Team: Malayalam (http://www.transifex.com/django/django/language/"
 "ml/)\n"
 "MIME-Version: 1.0\n"
@@ -285,6 +285,9 @@ msgstr "യുക്രേനിയന്‍"
 msgid "Urdu"
 msgstr "ഉര്‍ദു"
 
+msgid "Uzbek"
+msgstr ""
+
 msgid "Vietnamese"
 msgstr "വിയറ്റ്നാമീസ്"
 
@@ -329,15 +332,13 @@ msgstr "ശരിയായ ഇമെയില്‍ വിലാസം നല്
 
 #. Translators: "letters" means latin letters: a-z and A-Z.
 msgid ""
-"Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
+"Enter a valid “slug” consisting of letters, numbers, underscores or hyphens."
 msgstr ""
-"അക്ഷരങ്ങള്‍, അക്കങ്ങള്‍, അണ്ടര്‍സ്കോര്‍, ഹൈഫന്‍ എന്നിവ മാത്രം അടങ്ങിയ ശരിയായ ഒരു 'സ്ലഗ്' നൽകുക. "
 
 msgid ""
-"Enter a valid 'slug' consisting of Unicode letters, numbers, underscores, or "
+"Enter a valid “slug” consisting of Unicode letters, numbers, underscores, or "
 "hyphens."
 msgstr ""
-"യൂണികോഡ് അക്ഷരങ്ങൾ, നമ്പറുകൾ, ഹൈഫൺ, അണ്ടർസ്കോർ എന്നിവ അടങ്ങിയ ശെരിയായ ‌ഒരു സ്ലഗ് എഴുതുക ."
 
 msgid "Enter a valid IPv4 address."
 msgstr "ശരിയായ IPv4 വിലാസം നൽകുക."
@@ -416,11 +417,9 @@ msgstr[1] "%(max)sഡിജിറ്റ്സ് ഡെസിമൽ പോയി
 
 #, python-format
 msgid ""
-"File extension '%(extension)s' is not allowed. Allowed extensions are: "
-"'%(allowed_extensions)s'."
+"File extension “%(extension)s” is not allowed. Allowed extensions are: "
+"%(allowed_extensions)s."
 msgstr ""
-"'%(extension)s' എന്ന ഫയൽ എക്സ്റ്റൻഷൻ അനുവദനീയമല്ല.  അനുവദനീയമായ എക്സറ്റന്ഷനുകൾ ഇവയാണ് : "
-"'%(allowed_extensions)s'"
 
 msgid "Null characters are not allowed."
 msgstr "Null  ക്യാരക്ടറുകൾ അനുവദനീയമല്ല."
@@ -458,23 +457,13 @@ msgstr ""
 msgid "Field of type: %(field_type)s"
 msgstr "%(field_type)s എന്ന തരത്തിലുള്ള കളം (ഫീല്‍ഡ്)"
 
-msgid "Integer"
-msgstr "പൂര്‍ണ്ണസംഖ്യ"
+#, python-format
+msgid "“%(value)s” value must be either True or False."
+msgstr ""
 
 #, python-format
-msgid "'%(value)s' value must be an integer."
-msgstr "'%(value)s' ന്റെ മൂല്യം ഒരു പൂർണ്ണസംഖ്യായിരിക്കണം."
-
-msgid "Big (8 byte) integer"
-msgstr "8 ബൈറ്റ് പൂര്‍ണസംഖ്യ."
-
-#, python-format
-msgid "'%(value)s' value must be either True or False."
-msgstr "'%(value)s' മൂല്യം True അഥവാ False ആയിരിക്കണം."
-
-#, python-format
-msgid "'%(value)s' value must be either True, False, or None."
-msgstr "%(value)sഎന്ന വാല്യൂ True, False, അല്ലെങ്കിൽ None എന്നിവയിൽ ഒന്നായിരിക്കണം."
+msgid "“%(value)s” value must be either True, False, or None."
+msgstr ""
 
 msgid "Boolean (Either True or False)"
 msgstr "ശരിയോ തെറ്റോ (True അഥവാ False)"
@@ -488,54 +477,46 @@ msgstr "കോമയിട്ട് വേര്‍തിരിച്ച സം�
 
 #, python-format
 msgid ""
-"'%(value)s' value has an invalid date format. It must be in YYYY-MM-DD "
+"“%(value)s” value has an invalid date format. It must be in YYYY-MM-DD "
 "format."
 msgstr ""
-"'%(value)s' മൂല്യം തെറ്റായ മാതൃകയിലാണ്. അത് YYYY-MM-DD എന്ന മാതൃകയിലാണ് നല്കേണ്ടത്."
 
 #, python-format
 msgid ""
-"'%(value)s' value has the correct format (YYYY-MM-DD) but it is an invalid "
+"“%(value)s” value has the correct format (YYYY-MM-DD) but it is an invalid "
 "date."
-msgstr "'%(value)s' മൂല്യം ശരിയായ മാതൃകയിലാണ് (YYYY-MM-DD) പക്ഷേ തീയതി തെറ്റാണ്."
+msgstr ""
 
 msgid "Date (without time)"
 msgstr "തീയതി (സമയം വേണ്ട)"
 
 #, python-format
 msgid ""
-"'%(value)s' value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[."
+"“%(value)s” value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[."
 "uuuuuu]][TZ] format."
 msgstr ""
-"%(value)sവാല്യൂ ശെരിയായ ഫോർമാറ്റിൽ അല്ല ഉള്ളത്. അതു YYYY-MM-DD HH:MM[:ss[.uuuuuu]]"
-"[TZ]        \n"
-"ഫോർമാറ്റിലായിരിക്കണം."
 
 #, python-format
 msgid ""
-"'%(value)s' value has the correct format (YYYY-MM-DD HH:MM[:ss[.uuuuuu]]"
+"“%(value)s” value has the correct format (YYYY-MM-DD HH:MM[:ss[.uuuuuu]]"
 "[TZ]) but it is an invalid date/time."
 msgstr ""
-"%(value)sശെരിയായ ഫോര്മാറ്റിലാണുള്ളത് (YYYY-MM-DD HH:MM[:ss[.uuuuuu]][TZ]) പക്ഷേ "
-"തെറ്റായ date/time ആണ്. "
 
 msgid "Date (with time)"
 msgstr "തീയതി (സമയത്തോടൊപ്പം)"
 
 #, python-format
-msgid "'%(value)s' value must be a decimal number."
-msgstr "'%(value)s' മൂല്യം ഒരു ദശാംശസംഖ്യ decimal ആയിരിക്കണം."
+msgid "“%(value)s” value must be a decimal number."
+msgstr ""
 
 msgid "Decimal number"
 msgstr "ദശാംശസംഖ്യ"
 
 #, python-format
 msgid ""
-"'%(value)s' value has an invalid format. It must be in [DD] [HH:[MM:]]ss[."
+"“%(value)s” value has an invalid format. It must be in [DD] [[HH:]MM:]ss[."
 "uuuuuu] format."
 msgstr ""
-"'%(value)s' മൂല്യം തെറ്റായ മാതൃകയിലാണ്. അത്  [DD] [HH:[MM:]]ss[.uuuuuu] എന്ന "
-"മാതൃകയിലാണ് നല്കേണ്ടത്."
 
 msgid "Duration"
 msgstr "കാലയളവ്"
@@ -547,11 +528,21 @@ msgid "File path"
 msgstr "ഫയല്‍ സ്ഥാനം"
 
 #, python-format
-msgid "'%(value)s' value must be a float."
-msgstr "'%(value)s' മൂല്യം ഒരു ദശാംശസംഖ്യ float ആയിരിക്കണം."
+msgid "“%(value)s” value must be a float."
+msgstr ""
 
 msgid "Floating point number"
 msgstr "ദശാംശസംഖ്യ"
+
+#, python-format
+msgid "“%(value)s” value must be an integer."
+msgstr ""
+
+msgid "Integer"
+msgstr "പൂര്‍ണ്ണസംഖ്യ"
+
+msgid "Big (8 byte) integer"
+msgstr "8 ബൈറ്റ് പൂര്‍ണസംഖ്യ."
 
 msgid "IPv4 address"
 msgstr "IPv4 വിലാസം"
@@ -560,8 +551,8 @@ msgid "IP address"
 msgstr "IP വിലാസം"
 
 #, python-format
-msgid "'%(value)s' value must be either None, True or False."
-msgstr "'%(value)s' മൂല്യം None, True, False എന്നിവയില്‍ ഏതെങ്കിലും ഒന്നായിരിക്കണം."
+msgid "“%(value)s” value must be either None, True or False."
+msgstr ""
 
 msgid "Boolean (Either True, False or None)"
 msgstr "ശരിയോ തെറ്റോ എന്നു മാത്രം (True, False, None എന്നിവയില്‍ ഏതെങ്കിലും ഒന്ന്)"
@@ -584,18 +575,15 @@ msgstr "ടെക്സ്റ്റ്"
 
 #, python-format
 msgid ""
-"'%(value)s' value has an invalid format. It must be in HH:MM[:ss[.uuuuuu]] "
+"“%(value)s” value has an invalid format. It must be in HH:MM[:ss[.uuuuuu]] "
 "format."
 msgstr ""
-"'%(value)s' മൂല്യം ശരിയായ മാതൃകയിലല്ല. അത് HH:MM[:ss[.uuuuuu]] എന്ന മാതൃകയിലാവണം."
 
 #, python-format
 msgid ""
-"'%(value)s' value has the correct format (HH:MM[:ss[.uuuuuu]]) but it is an "
+"“%(value)s” value has the correct format (HH:MM[:ss[.uuuuuu]]) but it is an "
 "invalid time."
 msgstr ""
-"'%(value)s' മൂല്യം ശരിയായ മാതൃകയിലാണ് (HH:MM[:ss[.uuuuuu]]) പക്ഷേ തെറ്റായ സമയത്തെ "
-"സൂചിപ്പിക്കുന്നു."
 
 msgid "Time"
 msgstr "സമയം"
@@ -607,8 +595,8 @@ msgid "Raw binary data"
 msgstr "റോ ബൈനറി ഡാറ്റ"
 
 #, python-format
-msgid "'%(value)s' is not a valid UUID."
-msgstr "'%(value)s' ഒരു സാധുവായ യു യു ഐ ഡി അല്ലാ."
+msgid "“%(value)s” is not a valid UUID."
+msgstr ""
 
 msgid "Universally unique identifier"
 msgstr "എല്ലായിടത്തും യുണീക്കായ ഐഡന്റിഫൈയർ."
@@ -766,16 +754,14 @@ msgid "Select a valid choice. That choice is not one of the available choices."
 msgstr "യോഗ്യമായത് തെരഞ്ഞെടുക്കുക. നിങ്ങള്‍ നല്കിയത് ലഭ്യമായവയില്‍ ഉള്‍പ്പെടുന്നില്ല."
 
 #, python-format
-msgid "\"%(pk)s\" is not a valid value."
-msgstr "\"%(pk)s\" ശെരിയായ ഒരു വാല്യൂ അല്ല."
+msgid "“%(pk)s” is not a valid value."
+msgstr ""
 
 #, python-format
 msgid ""
-"%(datetime)s couldn't be interpreted in time zone %(current_timezone)s; it "
+"%(datetime)s couldn’t be interpreted in time zone %(current_timezone)s; it "
 "may be ambiguous or it may not exist."
 msgstr ""
-"%(datetime)s %(current_timezone)s എന്ന സമയമേഖലയിലേക്ക് വ്യാഖ്യാനിക്കാന്‍ "
-"സാധിച്ചിട്ടില്ല; ഇത് ഒന്നുകില്‍ അവ്യക്തമാണ്, അല്ലെങ്കില്‍ നിലവിലില്ല."
 
 msgid "Clear"
 msgstr "കാലിയാക്കുക"
@@ -794,6 +780,15 @@ msgstr "അതെ"
 
 msgid "No"
 msgstr "അല്ല"
+
+msgid "Year"
+msgstr ""
+
+msgid "Month"
+msgstr ""
+
+msgid "Day"
+msgstr ""
 
 msgid "yes,no,maybe"
 msgstr "ഉണ്ട്, ഇല്ല, ഉണ്ടായേക്കാം"
@@ -1113,24 +1108,24 @@ msgid "CSRF verification failed. Request aborted."
 msgstr "സി എസ് ആർ എഫ് പരിശോധന പരാജയപ്പെട്ടു. റിക്വെസ്റ്റ് റദ്ദാക്കി."
 
 msgid ""
-"You are seeing this message because this HTTPS site requires a 'Referer "
-"header' to be sent by your Web browser, but none was sent. This header is "
+"You are seeing this message because this HTTPS site requires a “Referer "
+"header” to be sent by your Web browser, but none was sent. This header is "
 "required for security reasons, to ensure that your browser is not being "
 "hijacked by third parties."
 msgstr ""
 
 msgid ""
-"If you have configured your browser to disable 'Referer' headers, please re-"
-"enable them, at least for this site, or for HTTPS connections, or for 'same-"
-"origin' requests."
+"If you have configured your browser to disable “Referer” headers, please re-"
+"enable them, at least for this site, or for HTTPS connections, or for “same-"
+"origin” requests."
 msgstr ""
 
 msgid ""
 "If you are using the <meta name=\"referrer\" content=\"no-referrer\"> tag or "
-"including the 'Referrer-Policy: no-referrer' header, please remove them. The "
-"CSRF protection requires the 'Referer' header to do strict referer checking. "
-"If you're concerned about privacy, use alternatives like <a rel=\"noreferrer"
-"\" ...> for links to third-party sites."
+"including the “Referrer-Policy: no-referrer” header, please remove them. The "
+"CSRF protection requires the “Referer” header to do strict referer checking. "
+"If you’re concerned about privacy, use alternatives like <a rel=\"noreferrer"
+"\" …> for links to third-party sites."
 msgstr ""
 
 msgid ""
@@ -1144,7 +1139,7 @@ msgstr ""
 
 msgid ""
 "If you have configured your browser to disable cookies, please re-enable "
-"them, at least for this site, or for 'same-origin' requests."
+"them, at least for this site, or for “same-origin” requests."
 msgstr ""
 
 msgid "More information is available with DEBUG=True."
@@ -1178,31 +1173,30 @@ msgstr ""
 "%(verbose_name_plural)s ഒന്നും ലഭ്യമല്ല."
 
 #, python-format
-msgid "Invalid date string '%(datestr)s' given format '%(format)s'"
-msgstr "'%(datestr)s' എന്ന തെറ്റായ തീയതി '%(format)s' എന്ന മാതൃകയില്‍."
+msgid "Invalid date string “%(datestr)s” given format “%(format)s”"
+msgstr ""
 
 #, python-format
 msgid "No %(verbose_name)s found matching the query"
 msgstr "ചോദ്യത്തിനു ചേരുന്ന് %(verbose_name)s ഇല്ല"
 
-msgid "Page is not 'last', nor can it be converted to an int."
+msgid "Page is not “last”, nor can it be converted to an int."
 msgstr ""
-"പേജ് നമ്പറായി സംഖ്യയാക്കി മാറ്റാന്‍ കഴിയുന്ന മൂല്യമോ 'last' എന്ന മൂല്യമോ അല്ല നല്കിയിട്ടുള്ളത്."
 
 #, python-format
 msgid "Invalid page (%(page_number)s): %(message)s"
 msgstr ""
 
 #, python-format
-msgid "Empty list and '%(class_name)s.allow_empty' is False."
-msgstr "ലിസ്റ്റ് കാലിയുമാണ് %(class_name)s.allow_empty എന്നത് False എന്നു നല്കിയിട്ടുമുണ്ട്."
+msgid "Empty list and “%(class_name)s.allow_empty” is False."
+msgstr ""
 
 msgid "Directory indexes are not allowed here."
 msgstr "ഡയറക്ടറി സൂചികകള്‍ ഇവിടെ അനുവദനീയമല്ല."
 
 #, python-format
-msgid "\"%(path)s\" does not exist"
-msgstr "\"%(path)s\" നിലവിലില്ല"
+msgid "“%(path)s” does not exist"
+msgstr ""
 
 #, python-format
 msgid "Index of %(directory)s"
@@ -1231,8 +1225,8 @@ msgstr ""
 msgid "Django Documentation"
 msgstr "ജാംഗോ ഡോക്യുമെന്റേഷൻ"
 
-msgid "Topics, references, &amp; how-to's"
-msgstr "വിഷയങ്ങൾ, അനുബന്ധ വിഷയങ്ങൾ &amp; നിർദ്ദേശക്കുറിപ്പുകൾ"
+msgid "Topics, references, &amp; how-to’s"
+msgstr ""
 
 msgid "Tutorial: A Polling App"
 msgstr "പരിശീലനം: ഒരു പോളിങ്ങ് ആപ്പ്"

@@ -1,6 +1,8 @@
 from datetime import datetime, timedelta
 
+from django import forms
 from django.conf import settings
+from django.contrib import messages
 from django.contrib.admin import FieldListFilter
 from django.contrib.admin.exceptions import (
     DisallowedModelAdminLookup, DisallowedModelAdminToField,
@@ -15,8 +17,8 @@ from django.core.exceptions import (
     FieldDoesNotExist, ImproperlyConfigured, SuspiciousOperation,
 )
 from django.core.paginator import InvalidPage
-from django.db import models
-from django.db.models.expressions import Combinable, F, OrderBy
+from django.db.models import F, Field, ManyToOneRel, OrderBy
+from django.db.models.expressions import Combinable
 from django.urls import reverse
 from django.utils.http import urlencode
 from django.utils.timezone import make_aware
@@ -34,7 +36,18 @@ IGNORED_PARAMS = (
     ALL_VAR, ORDER_VAR, ORDER_TYPE_VAR, SEARCH_VAR, IS_POPUP_VAR, TO_FIELD_VAR)
 
 
+class ChangeListSearchForm(forms.Form):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Populate "fields" dynamically because SEARCH_VAR is a variable:
+        self.fields = {
+            SEARCH_VAR: forms.CharField(required=False, strip=False),
+        }
+
+
 class ChangeList:
+    search_form_class = ChangeListSearchForm
+
     def __init__(self, request, model, list_display, list_display_links,
                  list_filter, date_hierarchy, search_fields, list_select_related,
                  list_per_page, list_max_show_all, list_editable, model_admin, sortable_by):
@@ -56,6 +69,11 @@ class ChangeList:
         self.sortable_by = sortable_by
 
         # Get search parameters from the query string.
+        _search_form = self.search_form_class(request.GET)
+        if not _search_form.is_valid():
+            for error in _search_form.errors.values():
+                messages.error(request, ', '.join(error))
+        self.query = _search_form.cleaned_data.get(SEARCH_VAR) or ''
         try:
             self.page_num = int(request.GET.get(PAGE_VAR, 0))
         except ValueError:
@@ -76,7 +94,6 @@ class ChangeList:
             self.list_editable = ()
         else:
             self.list_editable = list_editable
-        self.query = request.GET.get(SEARCH_VAR, '')
         self.queryset = self.get_queryset(request)
         self.get_results(request)
         if self.is_popup:
@@ -124,7 +141,7 @@ class ChangeList:
                     # FieldListFilter class that has been registered for the
                     # type of the given field.
                     field, field_list_filter_class = list_filter, FieldListFilter.create
-                if not isinstance(field, models.Field):
+                if not isinstance(field, Field):
                     field_path = field
                     field = get_fields_from_path(self.model, field_path)[-1]
 
@@ -156,8 +173,6 @@ class ChangeList:
                     )
                 except ValueError as e:
                     raise IncorrectLookupParameters(e) from e
-                if settings.USE_TZ:
-                    from_date = make_aware(from_date)
                 if day:
                     to_date = from_date + timedelta(days=1)
                 elif month:
@@ -166,6 +181,9 @@ class ChangeList:
                     to_date = (from_date + timedelta(days=32)).replace(day=1)
                 else:
                     to_date = from_date.replace(year=from_date.year + 1)
+                if settings.USE_TZ:
+                    from_date = make_aware(from_date)
+                    to_date = make_aware(to_date)
                 lookup_params.update({
                     '%s__gte' % self.date_hierarchy: from_date,
                     '%s__lt' % self.date_hierarchy: to_date,
@@ -290,7 +308,12 @@ class ChangeList:
                     order_field = self.get_ordering_field(field_name)
                     if not order_field:
                         continue  # No 'admin_order_field', skip it
-                    if hasattr(order_field, 'as_sql'):
+                    if isinstance(order_field, OrderBy):
+                        if pfx == '-':
+                            order_field = order_field.copy()
+                            order_field.reverse_ordering()
+                        ordering.append(order_field)
+                    elif hasattr(order_field, 'resolve_expression'):
                         # order_field is an expression.
                         ordering.append(order_field.desc() if pfx == '-' else order_field.asc())
                     # reverse order if order_field has already "-" as prefix
@@ -344,8 +367,16 @@ class ChangeList:
                     break
                 ordering_fields.add(field.attname)
         else:
-            # No single total ordering field, try unique_together.
-            for field_names in self.lookup_opts.unique_together:
+            # No single total ordering field, try unique_together and total
+            # unique constraints.
+            constraint_field_names = (
+                *self.lookup_opts.unique_together,
+                *(
+                    constraint.fields
+                    for constraint in self.lookup_opts.total_unique_constraints
+                ),
+            )
+            for field_names in constraint_field_names:
                 # Normalize attname references by using get_field().
                 fields = [self.lookup_opts.get_field(field_name) for field_name in field_names]
                 # Composite unique constraints containing a nullable column
@@ -464,7 +495,7 @@ class ChangeList:
             except FieldDoesNotExist:
                 pass
             else:
-                if isinstance(field.remote_field, models.ManyToOneRel):
+                if isinstance(field.remote_field, ManyToOneRel):
                     # <FK>_id field names don't require a join.
                     if field_name != field.get_attname():
                         return True

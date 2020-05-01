@@ -39,14 +39,11 @@ The Git repository includes several `branches`_:
   They are also used for bugfix and security releases which occur as necessary
   after the initial release of a feature version.
 
-* ``soc20XX/<project>`` branches were used by students who worked on Django
-  during the 2009 and 2010 Google Summer of Code programs.
-
-* ``attic/<project>`` branches were used to develop major or experimental new
-  features without affecting the rest of Django's code.
-
 The Git repository also contains `tags`_. These are the exact revisions from
 which packaged Django releases were produced, since version 1.0.
+
+A number of tags also exist under the ``archive/`` prefix for :ref:`archived
+work<archived-feature-development-work>`.
 
 The source code for the `Djangoproject.com <https://www.djangoproject.com/>`_
 website can be found at `github.com/django/djangoproject.com
@@ -70,10 +67,10 @@ documentation, test suite, packaging scripts and other miscellaneous bits.
 Django's code will be present in your clone as a directory named
 ``django``.
 
-To try out the in-development code with your own applications, simply place
-the directory containing your clone on your Python import path. Then
-``import`` statements which look for Django will find the ``django`` module
-within your clone.
+To try out the in-development code with your own applications, place the
+directory containing your clone on your Python import path. Then ``import``
+statements which look for Django will find the ``django`` module within your
+clone.
 
 If you're going to be working on Django's code (say, to fix a bug or
 develop a new feature), you can probably stop reading here and move
@@ -81,18 +78,11 @@ over to :doc:`the documentation for contributing to Django
 </internals/contributing/index>`, which covers things like the preferred
 coding style and how to generate and submit a patch.
 
-Other branches
-==============
-
-Django uses branches to prepare for releases of Django.
-
-In the past when Django was hosted on Subversion, branches were also used for
-feature development. Now Django is hosted on Git and feature development is
-done on contributor's forks, but the Subversion feature branches remain in Git
-for historical reference.
-
 Stable branches
----------------
+===============
+
+Django uses branches to prepare for releases of Django. Each major release
+series has its own stable branch.
 
 These branches can be found in the repository as ``stable/A.B.x``
 branches and will be created right after the first alpha is tagged.
@@ -127,8 +117,19 @@ updates.
     interested community members have occasionally used them to provide
     unofficial support for old Django releases.
 
-Feature-development branches
-----------------------------
+Tags
+====
+
+Each Django release is tagged and signed by the releaser.
+
+The tags can be found on GitHub's `tags`_ page.
+
+.. _tags: https://github.com/django/django/tags
+
+.. _archived-feature-development-work:
+
+Archived feature-development work
+---------------------------------
 
 .. admonition:: Historical information
 
@@ -146,13 +147,15 @@ become part of an official release, but others do not; in either case, there
 comes a time when the branch is no longer being actively worked on by any
 developer. At this point the branch is considered closed.
 
-Unfortunately, Django used to be maintained with the Subversion revision
-control system, that has no standard way of indicating this. As a workaround,
-branches of Django which are closed and no longer maintained were moved into
-``attic``.
+Django used to be maintained with the Subversion revision control system, that
+has no standard way of indicating this. As a workaround, branches of Django
+which are closed and no longer maintained were moved into ``attic``.
 
-For reference, the following are branches whose code eventually became
-part of Django itself, and so are no longer separately maintained:
+A number of tags exist under the ``archive/`` prefix to maintain a reference to
+this and other work of historical interest.
+
+The following tags under the ``archive/attic/`` prefix reference the tip of
+branches whose code eventually became part of Django itself:
 
 * ``boulder-oracle-sprint``: Added support for Oracle databases to
   Django's object-relational mapper. This has been part of Django
@@ -192,31 +195,9 @@ part of Django itself, and so are no longer separately maintained:
   Unicode-based strings in most places within Django and Django
   applications. This became part of Django as of the 1.0 release.
 
-When Django moved from Subversion to Git, the information about branch merges
-wasn't preserved in the source code repository. This means that the ``master``
-branch of Django doesn't contain merge commits for the above branches.
-
-However, this information is `available as a grafts file`_. You can restore it
-by putting the following lines in ``.git/info/grafts`` in your local clone::
-
-  ac64e91a0cadc57f4bc5cd5d66955832320ca7a1 553a20075e6991e7a60baee51ea68c8adc520d9a 0cb8e31823b2e9f05c4ae868c19f5f38e78a5f2e
-  79e68c225b926302ebb29c808dda8afa49856f5c d0f57e7c7385a112cb9e19d314352fc5ed5b0747 aa239e3e5405933af6a29dac3cf587b59a099927
-  5cf8f684237ab5addaf3549b2347c3adf107c0a7 cb45fd0ae20597306cd1f877efc99d9bd7cbee98 e27211a0deae2f1d402537f0ebb64ad4ccf6a4da
-  f69cf70ed813a8cd7e1f963a14ae39103e8d5265 d5dbeaa9be359a4c794885c2e9f1b5a7e5e51fb8 d2fcbcf9d76d5bb8a661ee73dae976c74183098b
-  aab3a418ac9293bb4abd7670f65d930cb0426d58 4ea7a11659b8a0ab07b0d2e847975f7324664f10 adf4b9311d5d64a2bdd58da50271c121ea22e397
-  ff60c5f9de3e8690d1e86f3e9e3f7248a15397c8 7ef212af149540aa2da577a960d0d87029fd1514 45b4288bb66a3cda401b45901e85b645674c3988
-  9dda4abee1225db7a7b195b84c915fdd141a7260 4fe5c9b7ee09dc25921918a6dbb7605edb374bc9 3a7c14b583621272d4ef53061287b619ce3c290d
-  a19ed8aea395e8e07164ff7d85bd7dff2f24edca dc375fb0f3b7fbae740e8cfcd791b8bccb8a4e66 42ea7a5ce8aece67d16c6610a49560c1493d4653
-  9c52d56f6f8a9cdafb231adf9f4110473099c9b5 c91a30f00fd182faf8ca5c03cd7dbcf8b735b458 4a5c5c78f2ecd4ed8859cd5ac773ff3a01bccf96
-  953badbea5a04159adbfa970f5805c0232b6a401 4c958b15b250866b70ded7d82aa532f1e57f96ae 5664a678b29ab04cad425c15b2792f4519f43928
-  471596fc1afcb9c6258d317c619eaf5fd394e797 4e89105d64bb9e04c409139a41e9c7aac263df4c 3e9035a9625c8a8a5e88361133e87ce455c4fc13
-  9233d0426537615e06b78d28010d17d5a66adf44 6632739e94c6c38b4c5a86cf5c80c48ae50ac49f 18e151bc3f8a85f2766d64262902a9fcad44d937
-
-.. _available as a grafts file: https://github.com/ramiro/django-git-grafts
-
-Additionally, the following branches are closed, but their code was
-never merged into Django and the features they aimed to implement
-were never finished:
+Additionally, the following tags under the ``archive/attic/`` prefix reference
+the tips of branches that were closed, but whose code was never merged into
+Django, and the features they aimed to implement were never finished:
 
 * ``full-history``
 
@@ -234,16 +215,7 @@ were never finished:
 
 * ``sqlalchemy``
 
-All of the above-mentioned branches now reside in ``attic``.
-
-Finally, the repository contains ``soc2009/xxx`` and ``soc2010/xxx`` feature
-branches, used for the 2009 and 2010 Google Summer of Code projects.
-
-Tags
-====
-
-Each Django release is tagged and signed by the releaser.
-
-The tags can be found on GitHub's `tags`_ page.
-
-.. _tags: https://github.com/django/django/tags
+Finally, under the ``archive/`` prefix, the repository contains
+``soc20XX/<project>`` tags referencing the tip of branches that were used by
+students who worked on Django during the 2009 and 2010 Google Summer of Code
+programs.

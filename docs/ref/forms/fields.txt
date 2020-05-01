@@ -18,8 +18,9 @@ other hooks.
 Although the primary way you'll use ``Field`` classes is in ``Form`` classes,
 you can also instantiate them and use them directly to get a better idea of
 how they work. Each ``Field`` instance has a ``clean()`` method, which takes
-a single argument and either raises a ``django.forms.ValidationError``
-exception or returns the clean value::
+a single argument and either raises a
+``django.core.exceptions.ValidationError`` exception or returns the clean
+value::
 
     >>> from django import forms
     >>> f = forms.EmailField()
@@ -467,25 +468,11 @@ For each field, we describe the default widget used if you don't specify
         A list of formats used to attempt to convert a string to a valid
         ``datetime.date`` object.
 
-    If no ``input_formats`` argument is provided, the default input formats are::
-
-        ['%Y-%m-%d',      # '2006-10-25'
-         '%m/%d/%Y',      # '10/25/2006'
-         '%m/%d/%y']      # '10/25/06'
-
-    Additionally, if you specify :setting:`USE_L10N=False<USE_L10N>` in your settings, the
-    following will also be included in the default input formats::
-
-        ['%b %d %Y',      # 'Oct 25 2006'
-         '%b %d, %Y',     # 'Oct 25, 2006'
-         '%d %b %Y',      # '25 Oct 2006'
-         '%d %b, %Y',     # '25 Oct, 2006'
-         '%B %d %Y',      # 'October 25 2006'
-         '%B %d, %Y',     # 'October 25, 2006'
-         '%d %B %Y',      # '25 October 2006'
-         '%d %B, %Y']     # '25 October, 2006'
-
-    See also :doc:`format localization </topics/i18n/formatting>`.
+    If no ``input_formats`` argument is provided, the default input formats are
+    taken from :setting:`DATE_INPUT_FORMATS` if :setting:`USE_L10N` is
+    ``False``, or from the active locale format ``DATE_INPUT_FORMATS`` key if
+    localization is enabled. See also :doc:`format localization
+    </topics/i18n/formatting>`.
 
 ``DateTimeField``
 -----------------
@@ -504,21 +491,34 @@ For each field, we describe the default widget used if you don't specify
     .. attribute:: input_formats
 
         A list of formats used to attempt to convert a string to a valid
-        ``datetime.datetime`` object.
+        ``datetime.datetime`` object, in addition to ISO 8601 formats.
 
-    If no ``input_formats`` argument is provided, the default input formats are::
+    The field always accepts strings in ISO 8601 formatted dates or similar
+    recognized by :func:`~django.utils.dateparse.parse_datetime`. Some examples
+    are::
 
-        ['%Y-%m-%d %H:%M:%S',    # '2006-10-25 14:30:59'
-         '%Y-%m-%d %H:%M',       # '2006-10-25 14:30'
-         '%Y-%m-%d',             # '2006-10-25'
-         '%m/%d/%Y %H:%M:%S',    # '10/25/2006 14:30:59'
-         '%m/%d/%Y %H:%M',       # '10/25/2006 14:30'
-         '%m/%d/%Y',             # '10/25/2006'
-         '%m/%d/%y %H:%M:%S',    # '10/25/06 14:30:59'
-         '%m/%d/%y %H:%M',       # '10/25/06 14:30'
-         '%m/%d/%y']             # '10/25/06'
+        * '2006-10-25 14:30:59'
+        * '2006-10-25T14:30:59'
+        * '2006-10-25 14:30'
+        * '2006-10-25T14:30'
+        * '2006-10-25T14:30Z'
+        * '2006-10-25T14:30+02:00'
+        * '2006-10-25'
 
-    See also :doc:`format localization </topics/i18n/formatting>`.
+    If no ``input_formats`` argument is provided, the default input formats are
+    taken from :setting:`DATETIME_INPUT_FORMATS` and
+    :setting:`DATE_INPUT_FORMATS` if :setting:`USE_L10N` is ``False``, or from
+    the active locale format ``DATETIME_INPUT_FORMATS`` and
+    ``DATE_INPUT_FORMATS`` keys if localization is enabled. See also
+    :doc:`format localization </topics/i18n/formatting>`.
+
+    .. versionchanged:: 3.1
+
+        Support for ISO 8601 date string parsing (including optional timezone)
+        was added.
+
+        The fallback on ``DATE_INPUT_FORMATS`` in the default ``input_formats``
+        was added.
 
 ``DecimalField``
 ----------------
@@ -627,7 +627,7 @@ For each field, we describe the default widget used if you don't specify
 .. class:: FilePathField(**kwargs)
 
     * Default widget: :class:`Select`
-    * Empty value: ``None``
+    * Empty value: ``''`` (an empty string)
     * Normalizes to: A string.
     * Validates that the selected choice exists in the list of choices.
     * Error message keys: ``required``, ``invalid_choice``
@@ -710,9 +710,41 @@ For each field, we describe the default widget used if you don't specify
 
     After the field has been cleaned and validated, the ``UploadedFile``
     object will have an additional ``image`` attribute containing the Pillow
-    `Image`_ instance used to check if the file was a valid image. Also,
-    ``UploadedFile.content_type`` will be updated with the image's content type
-    if Pillow can determine it, otherwise it will be set to ``None``.
+    `Image`_ instance used to check if the file was a valid image. Pillow
+    closes the underlying file descriptor after verifying an image, so whilst
+    non-image data attributes, such as ``format``, ``height``, and ``width``,
+    are available, methods that access the underlying image data, such as
+    ``getdata()`` or ``getpixel()``, cannot be used without reopening the file.
+    For example::
+
+        >>> from PIL import Image
+        >>> from django import forms
+        >>> from django.core.files.uploadedfile import SimpleUploadedFile
+        >>> class ImageForm(forms.Form):
+        ...     img = forms.ImageField()
+        >>> file_data = {'img': SimpleUploadedFile('test.png', <file data>)}
+        >>> form = ImageForm({}, file_data)
+        # Pillow closes the underlying file descriptor.
+        >>> form.is_valid()
+        True
+        >>> image_field = form.cleaned_data['img']
+        >>> image_field.image
+        <PIL.PngImagePlugin.PngImageFile image mode=RGBA size=191x287 at 0x7F5985045C18>
+        >>> image_field.image.width
+        191
+        >>> image_field.image.height
+        287
+        >>> image_field.image.format
+        'PNG'
+        >>> image_field.image.getdata()
+        # Raises AttributeError: 'NoneType' object has no attribute 'seek'.
+        >>> image = Image.open(image_field)
+        >>> image.getdata()
+        <ImagingCore object at 0x7f5984f874b0>
+
+    Additionally, ``UploadedFile.content_type`` will be updated with the
+    image's content type if Pillow can determine it, otherwise it will be set
+    to ``None``.
 
 .. _Pillow: https://pillow.readthedocs.io/en/latest/
 .. _Image: https://pillow.readthedocs.io/en/latest/reference/Image.html
@@ -896,10 +928,11 @@ For each field, we describe the default widget used if you don't specify
         A list of formats used to attempt to convert a string to a valid
         ``datetime.time`` object.
 
-    If no ``input_formats`` argument is provided, the default input formats are::
-
-        '%H:%M:%S',     # '14:30:59'
-        '%H:%M',        # '14:30'
+    If no ``input_formats`` argument is provided, the default input formats are
+    taken from :setting:`TIME_INPUT_FORMATS` if :setting:`USE_L10N` is
+    ``False``, or from the active locale format ``TIME_INPUT_FORMATS`` key if
+    localization is enabled. See also :doc:`format localization
+    </topics/i18n/formatting>`.
 
 ``URLField``
 ------------
@@ -1110,6 +1143,10 @@ method::
             super().__init__(*args, **kwargs)
             self.fields['foo_select'].queryset = ...
 
+Both ``ModelChoiceField`` and ``ModelMultipleChoiceField`` have an ``iterator``
+attribute which specifies the class used to iterate over the queryset when
+generating choices. See :ref:`iterating-relationship-choices` for details.
+
 ``ModelChoiceField``
 --------------------
 
@@ -1190,6 +1227,13 @@ method::
             ...
             </select>
 
+    ``ModelChoiceField`` also has the attribute:
+
+    .. attribute:: iterator
+
+        The iterator class used to generate field choices from ``queryset``. By
+        default, :class:`ModelChoiceIterator`.
+
     The ``__str__()`` method of the model will be called to generate string
     representations of the objects for use in the field's choices. To provide
     customized representations, subclass ``ModelChoiceField`` and override
@@ -1212,7 +1256,7 @@ method::
     * Normalizes to: A ``QuerySet`` of model instances.
     * Validates that every id in the given list of values exists in the
       queryset.
-    * Error message keys: ``required``, ``list``, ``invalid_choice``,
+    * Error message keys: ``required``, ``invalid_list``, ``invalid_choice``,
       ``invalid_pk_value``
 
     The ``invalid_choice`` message may contain ``%(value)s`` and the
@@ -1236,15 +1280,145 @@ method::
 
         Same as :class:`ModelChoiceField.to_field_name`.
 
+    ``ModelMultipleChoiceField`` also has the attribute:
+
+    .. attribute:: iterator
+
+        Same as :class:`ModelChoiceField.iterator`.
+
+.. deprecated:: 3.1
+
+    The ``list`` message is deprecated, use ``invalid_list`` instead.
+
+.. _iterating-relationship-choices:
+
+Iterating relationship choices
+------------------------------
+
+By default, :class:`ModelChoiceField` and :class:`ModelMultipleChoiceField` use
+:class:`ModelChoiceIterator` to generate their field ``choices``.
+
+When iterated, ``ModelChoiceIterator`` yields 2-tuple choices containing
+:class:`ModelChoiceIteratorValue` instances as the first ``value`` element in
+each choice. ``ModelChoiceIteratorValue`` wraps the choice value whilst
+maintaining a reference to the source model instance that can be used in custom
+widget implementations, for example, to add `data-* attributes`_ to
+``<option>`` elements.
+
+.. _`data-* attributes`: https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/data-*
+
+For example, consider the following models::
+
+    from django.db import models
+
+    class Topping(models.Model):
+        name = models.CharField(max_length=100)
+        price = models.DecimalField(decimal_places=2, max_digits=6)
+
+        def __str__(self):
+            return self.name
+
+    class Pizza(models.Model):
+        topping = models.ForeignKey(Topping, on_delete=models.CASCADE)
+
+You can use a :class:`~django.forms.Select` widget subclass to include
+the value of ``Topping.price`` as the HTML attribute ``data-price`` for each
+``<option>`` element::
+
+    from django import forms
+
+    class ToppingSelect(forms.Select):
+        def create_option(self, name, value, label, selected, index, subindex=None, attrs=None):
+            option = super().create_option(name, value, label, selected, index, subindex, attrs)
+            if value:
+                option['attrs']['data-price'] = value.instance.price
+            return option
+
+    class PizzaForm(forms.ModelForm):
+        class Meta:
+            model = Pizza
+            fields = ['topping']
+            widgets = {'topping': ToppingSelect}
+
+This will render the ``Pizza.topping`` select as:
+
+.. code-block:: html
+
+    <select id="id_topping" name="topping" required>
+    <option value="" selected>---------</option>
+    <option value="1" data-price="1.50">mushrooms</option>
+    <option value="2" data-price="1.25">onions</option>
+    <option value="3" data-price="1.75">peppers</option>
+    <option value="4" data-price="2.00">pineapple</option>
+    </select>
+
+For more advanced usage you may subclass ``ModelChoiceIterator`` in order to
+customize the yielded 2-tuple choices.
+
+``ModelChoiceIterator``
+~~~~~~~~~~~~~~~~~~~~~~~
+
+.. class:: ModelChoiceIterator(field)
+
+    The default class assigned to the ``iterator`` attribute of
+    :class:`ModelChoiceField` and :class:`ModelMultipleChoiceField`. An
+    iterable that yields 2-tuple choices from the queryset.
+
+    A single argument is required:
+
+    .. attribute:: field
+
+        The instance of ``ModelChoiceField`` or ``ModelMultipleChoiceField`` to
+        iterator and yield choice.
+
+    ``ModelChoiceIterator`` has the following method:
+
+    .. method:: __iter__()
+
+        Yields 2-tuple choices, in the ``(value, label)`` format used by
+        :attr:`ChoiceField.choices`. The first ``value`` element is a
+        :class:`ModelChoiceIteratorValue` instance.
+
+        .. versionchanged:: 3.1
+
+            In older versions, the first ``value`` element in the choice tuple
+            is the ``field`` value itself, rather than a
+            ``ModelChoiceIteratorValue`` instance.
+
+``ModelChoiceIteratorValue``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. class:: ModelChoiceIteratorValue(value, instance)
+
+    .. versionadded:: 3.1
+
+    Two arguments are required:
+
+    .. attribute:: value
+
+        The value of the choice. This value is used to render the ``value``
+        attribute of an HTML ``<option>`` element.
+
+    .. attribute:: instance
+
+        The model instance from the queryset. The instance can be accessed in
+        custom ``ChoiceWidget.create_option()`` implementations to adjust the
+        rendered HTML.
+
+    ``ModelChoiceIteratorValue`` has the following method:
+
+    .. method:: __str__()
+
+        Return ``value`` as a string to be rendered in HTML.
+
 Creating custom fields
 ======================
 
-If the built-in ``Field`` classes don't meet your needs, you can easily create
-custom ``Field`` classes. To do this, just create a subclass of
-``django.forms.Field``. Its only requirements are that it implement a
-``clean()`` method and that its ``__init__()`` method accept the core arguments
-mentioned above (``required``, ``label``, ``initial``, ``widget``,
-``help_text``).
+If the built-in ``Field`` classes don't meet your needs, you can create custom
+``Field`` classes. To do this, create a subclass of ``django.forms.Field``. Its
+only requirements are that it implement a ``clean()`` method and that its
+``__init__()`` method accept the core arguments mentioned above (``required``,
+``label``, ``initial``, ``widget``, ``help_text``).
 
 You can also customize how a field will be accessed by overriding
 :meth:`~django.forms.Field.get_bound_field()`.

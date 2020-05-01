@@ -2,8 +2,9 @@ import datetime
 import unittest
 
 from django.test.utils import requires_tz_support
-from django.utils import timezone
+from django.utils import timezone, translation
 from django.utils.timesince import timesince, timeuntil
+from django.utils.translation import npgettext_lazy
 
 
 class TimesinceTests(unittest.TestCase):
@@ -73,6 +74,18 @@ class TimesinceTests(unittest.TestCase):
             timesince(self.t, self.t - 2 * self.oneweek - 3 * self.onehour - 4 * self.oneminute), '0\xa0minutes'
         )
         self.assertEqual(timesince(self.t, self.t - 4 * self.oneday - 5 * self.oneminute), '0\xa0minutes')
+
+    def test_second_before_equal_first_humanize_time_strings(self):
+        time_strings = {
+            'minute': npgettext_lazy('naturaltime-future', '%d minute', '%d minutes'),
+        }
+        with translation.override('cs'):
+            for now in [self.t, self.t - self.onemicrosecond, self.t - self.oneday]:
+                with self.subTest(now):
+                    self.assertEqual(
+                        timesince(self.t, now, time_strings=time_strings),
+                        '0\xa0minut',
+                    )
 
     @requires_tz_support
     def test_different_timezones(self):

@@ -21,7 +21,7 @@ from django.utils.functional import cached_property
 from django.utils.version import get_version_tuple
 
 autoreload_started = Signal()
-file_changed = Signal(providing_args=['file_path', 'kind'])
+file_changed = Signal()
 
 DJANGO_AUTORELOAD_ENV = 'RUN_MAIN'
 
@@ -143,6 +143,10 @@ def iter_modules_and_files(modules, extra_files):
             # The module could have been removed, don't fail loudly if this
             # is the case.
             continue
+        except ValueError as e:
+            # Network filesystems may return null bytes in file paths.
+            logger.debug('"%s" raised when resolving path: "%s"' % (str(e), path))
+            continue
         results.add(resolved_path)
     return frozenset(results)
 
@@ -223,9 +227,9 @@ def restart_with_reloader():
     new_environ = {**os.environ, DJANGO_AUTORELOAD_ENV: 'true'}
     args = get_child_arguments()
     while True:
-        exit_code = subprocess.call(args, env=new_environ, close_fds=False)
-        if exit_code != 3:
-            return exit_code
+        p = subprocess.run(args, env=new_environ, close_fds=False)
+        if p.returncode != 3:
+            return p.returncode
 
 
 class BaseReloader:
@@ -236,17 +240,17 @@ class BaseReloader:
 
     def watch_dir(self, path, glob):
         path = Path(path)
-        if not path.is_absolute():
-            raise ValueError('%s must be absolute.' % path)
+        try:
+            path = path.absolute()
+        except FileNotFoundError:
+            logger.debug(
+                'Unable to watch directory %s as it cannot be resolved.',
+                path,
+                exc_info=True,
+            )
+            return
         logger.debug('Watching dir %s with glob %s.', path, glob)
         self.directory_globs[path].add(glob)
-
-    def watch_file(self, path):
-        path = Path(path)
-        if not path.is_absolute():
-            raise ValueError('%s must be absolute.' % path)
-        logger.debug('Watching file %s.', path)
-        self.extra_files.add(path)
 
     def watched_files(self, include_globs=True):
         """

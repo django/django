@@ -10,7 +10,6 @@ from django.test import (
     RequestFactory, SimpleTestCase, modify_settings, override_settings,
 )
 from django.test.utils import require_jinja2
-from django.utils.deprecation import MiddlewareMixin
 
 from .utils import TEMPLATE_DIR
 
@@ -23,9 +22,11 @@ test_processor_name = 'template_tests.test_response.test_processor'
 
 
 # A test middleware that installs a temporary URLConf
-class CustomURLConfMiddleware(MiddlewareMixin):
-    def process_request(self, request):
+def custom_urlconf_middleware(get_response):
+    def middleware(request):
         request.urlconf = 'template_tests.alternate_urls'
+        return get_response(request)
+    return middleware
 
 
 class SimpleTemplateResponseTest(SimpleTestCase):
@@ -319,7 +320,7 @@ class TemplateResponseTest(SimpleTestCase):
         pickle.dumps(unpickled_response)
 
 
-@modify_settings(MIDDLEWARE={'append': ['template_tests.test_response.CustomURLConfMiddleware']})
+@modify_settings(MIDDLEWARE={'append': ['template_tests.test_response.custom_urlconf_middleware']})
 @override_settings(ROOT_URLCONF='template_tests.urls')
 class CustomURLConfTest(SimpleTestCase):
 

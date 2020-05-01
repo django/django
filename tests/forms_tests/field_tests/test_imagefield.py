@@ -1,10 +1,11 @@
 import os
 import unittest
 
-from django.core.files.uploadedfile import SimpleUploadedFile
-from django.forms import (
-    ClearableFileInput, FileInput, ImageField, ValidationError, Widget,
+from django.core.exceptions import ValidationError
+from django.core.files.uploadedfile import (
+    SimpleUploadedFile, TemporaryUploadedFile,
 )
+from django.forms import ClearableFileInput, FileInput, ImageField, Widget
 from django.test import SimpleTestCase
 
 from . import FormFieldAssertionsMixin
@@ -69,6 +70,19 @@ class ImageFieldTest(FormFieldAssertionsMixin, SimpleTestCase):
         with self.assertRaisesMessage(ValidationError, 'File extension “txt” is not allowed.'):
             f.clean(img_file)
 
+    def test_corrupted_image(self):
+        f = ImageField()
+        img_file = SimpleUploadedFile('not_an_image.jpg', b'not an image')
+        msg = (
+            'Upload a valid image. The file you uploaded was either not an '
+            'image or a corrupted image.'
+        )
+        with self.assertRaisesMessage(ValidationError, msg):
+            f.clean(img_file)
+        with TemporaryUploadedFile('not_an_image_tmp.png', 'text/plain', 1, 'utf-8') as tmp_file:
+            with self.assertRaisesMessage(ValidationError, msg):
+                f.clean(tmp_file)
+
     def test_widget_attrs_default_accept(self):
         f = ImageField()
         # Nothing added for non-FileInput widgets.
@@ -77,12 +91,12 @@ class ImageFieldTest(FormFieldAssertionsMixin, SimpleTestCase):
         self.assertEqual(f.widget_attrs(ClearableFileInput()), {'accept': 'image/*'})
         self.assertWidgetRendersTo(f, '<input type="file" name="f" accept="image/*" required id="id_f" />')
 
-    def test_widge_attrs_accept_specified(self):
+    def test_widget_attrs_accept_specified(self):
         f = ImageField(widget=FileInput(attrs={'accept': 'image/png'}))
         self.assertEqual(f.widget_attrs(f.widget), {})
         self.assertWidgetRendersTo(f, '<input type="file" name="f" accept="image/png" required id="id_f" />')
 
-    def test_widge_attrs_accept_false(self):
+    def test_widget_attrs_accept_false(self):
         f = ImageField(widget=FileInput(attrs={'accept': False}))
         self.assertEqual(f.widget_attrs(f.widget), {})
         self.assertWidgetRendersTo(f, '<input type="file" name="f" required id="id_f" />')

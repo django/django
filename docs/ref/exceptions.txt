@@ -194,7 +194,7 @@ list of errors.
 
     If you are trying to call code that is synchronous-only from an
     asynchronous thread, then create a synchronous thread and call it in that.
-    You can accomplish this is with ``asgiref.sync.sync_to_async``.
+    You can accomplish this is with :func:`asgiref.sync.sync_to_async`.
 
 .. currentmodule:: django.urls
 
@@ -253,6 +253,12 @@ information provided.
 
 Raised to prevent deletion of referenced objects when using
 :attr:`django.db.models.PROTECT`. :exc:`models.ProtectedError` is a subclass
+of :exc:`IntegrityError`.
+
+.. exception:: models.RestrictedError
+
+Raised to prevent deletion of referenced objects when using
+:attr:`django.db.models.RESTRICT`. :exc:`models.RestrictedError` is a subclass
 of :exc:`IntegrityError`.
 
 .. currentmodule:: django.http

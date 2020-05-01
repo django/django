@@ -3,16 +3,16 @@ import math
 import re
 from decimal import Decimal
 
-from django.contrib.gis.db.models import functions
+from django.contrib.gis.db.models import GeometryField, PolygonField, functions
 from django.contrib.gis.geos import (
     GEOSGeometry, LineString, Point, Polygon, fromstr,
 )
 from django.contrib.gis.measure import Area
 from django.db import NotSupportedError, connection
-from django.db.models import Sum
+from django.db.models import Sum, Value
 from django.test import TestCase, skipUnlessDBFeature
 
-from ..utils import FuncTestMixin, mysql, oracle, postgis, spatialite
+from ..utils import FuncTestMixin, mariadb, mysql, oracle, postgis, spatialite
 from .models import City, Country, CountryWebMercator, State, Track
 
 
@@ -32,24 +32,27 @@ class GISFunctionsTests(FuncTestMixin, TestCase):
             return
 
         pueblo_json = '{"type":"Point","coordinates":[-104.609252,38.255001]}'
-        houston_json = (
+        houston_json = json.loads(
             '{"type":"Point","crs":{"type":"name","properties":'
             '{"name":"EPSG:4326"}},"coordinates":[-95.363151,29.763374]}'
         )
-        victoria_json = (
+        victoria_json = json.loads(
             '{"type":"Point","bbox":[-123.30519600,48.46261100,-123.30519600,48.46261100],'
             '"coordinates":[-123.305196,48.462611]}'
         )
-        chicago_json = (
+        chicago_json = json.loads(
             '{"type":"Point","crs":{"type":"name","properties":{"name":"EPSG:4326"}},'
             '"bbox":[-87.65018,41.85039,-87.65018,41.85039],"coordinates":[-87.65018,41.85039]}'
         )
-        # MySQL ignores the crs option.
-        if mysql:
-            houston_json = json.loads(houston_json)
+        # MySQL and Oracle ignore the crs option.
+        if mysql or oracle:
             del houston_json['crs']
-            chicago_json = json.loads(chicago_json)
             del chicago_json['crs']
+        # Oracle ignores also the bbox and precision options.
+        if oracle:
+            del chicago_json['bbox']
+            del victoria_json['bbox']
+            chicago_json['coordinates'] = [-87.650175, 41.850385]
 
         # Precision argument should only be an integer
         with self.assertRaises(TypeError):
@@ -75,17 +78,17 @@ class GISFunctionsTests(FuncTestMixin, TestCase):
         # WHERE "geoapp_city"."name" = 'Houston';
         # This time we include the bounding box by using the `bbox` keyword.
         self.assertJSONEqual(
-            victoria_json,
             City.objects.annotate(
                 geojson=functions.AsGeoJSON('point', bbox=True)
-            ).get(name='Victoria').geojson
+            ).get(name='Victoria').geojson,
+            victoria_json,
         )
 
         # SELECT ST_AsGeoJson("geoapp_city"."point", 5, 3) FROM "geoapp_city"
         # WHERE "geoapp_city"."name" = 'Chicago';
         # Finally, we set every available keyword.
         # MariaDB doesn't limit the number of decimals in bbox.
-        if mysql and connection.mysql_is_mariadb:
+        if mariadb:
             chicago_json['bbox'] = [-87.650175, 41.850385, -87.650175, 41.850385]
         self.assertJSONEqual(
             City.objects.annotate(
@@ -143,6 +146,29 @@ class GISFunctionsTests(FuncTestMixin, TestCase):
         svg2 = svg1.replace('c', '')
         self.assertEqual(svg1, City.objects.annotate(svg=functions.AsSVG('point')).get(name='Pueblo').svg)
         self.assertEqual(svg2, City.objects.annotate(svg=functions.AsSVG('point', relative=5)).get(name='Pueblo').svg)
+
+    @skipUnlessDBFeature('has_AsWKB_function')
+    def test_aswkb(self):
+        wkb = City.objects.annotate(
+            wkb=functions.AsWKB(Point(1, 2, srid=4326)),
+        ).first().wkb
+        # WKB is either XDR or NDR encoded.
+        self.assertIn(
+            bytes(wkb),
+            (
+                b'\x00\x00\x00\x00\x01?\xf0\x00\x00\x00\x00\x00\x00@\x00\x00'
+                b'\x00\x00\x00\x00\x00',
+                b'\x01\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\xf0?\x00\x00'
+                b'\x00\x00\x00\x00\x00@',
+            ),
+        )
+
+    @skipUnlessDBFeature('has_AsWKT_function')
+    def test_aswkt(self):
+        wkt = City.objects.annotate(
+            wkt=functions.AsWKT(Point(1, 2, srid=4326)),
+        ).first().wkt
+        self.assertEqual(wkt, 'POINT (1.0 2.0)' if oracle else 'POINT(1 2)')
 
     @skipUnlessDBFeature("has_Azimuth_function")
     def test_azimuth(self):
@@ -246,7 +272,7 @@ class GISFunctionsTests(FuncTestMixin, TestCase):
     def test_geometry_distance(self):
         point = Point(-90, 40, srid=4326)
         qs = City.objects.annotate(distance=functions.GeometryDistance('point', point)).order_by('distance')
-        self.assertEqual([city.distance for city in qs], [
+        distances = (
             2.99091995527296,
             5.33507274054713,
             9.33852187483721,
@@ -255,7 +281,10 @@ class GISFunctionsTests(FuncTestMixin, TestCase):
             14.713098433352,
             34.3635252198568,
             276.987855073372,
-        ])
+        )
+        for city, expected_distance in zip(qs, distances):
+            with self.subTest(city=city):
+                self.assertAlmostEqual(city.distance, expected_distance)
 
     @skipUnlessDBFeature("has_Intersection_function")
     def test_intersection(self):
@@ -321,6 +350,34 @@ class GISFunctionsTests(FuncTestMixin, TestCase):
         invalid = State.objects.filter(name='invalid').annotate(repaired=functions.MakeValid('poly')).first()
         self.assertIs(invalid.repaired.valid, True)
         self.assertEqual(invalid.repaired, fromstr('POLYGON((0 0, 0 1, 1 1, 1 0, 0 0))', srid=invalid.poly.srid))
+
+    @skipUnlessDBFeature('has_MakeValid_function')
+    def test_make_valid_multipolygon(self):
+        invalid_geom = fromstr(
+            'POLYGON((0 0, 0 1 , 1 1 , 1 0, 0 0), '
+            '(10 0, 10 1, 11 1, 11 0, 10 0))'
+        )
+        State.objects.create(name='invalid', poly=invalid_geom)
+        invalid = State.objects.filter(name='invalid').annotate(
+            repaired=functions.MakeValid('poly'),
+        ).get()
+        self.assertIs(invalid.repaired.valid, True)
+        self.assertEqual(invalid.repaired, fromstr(
+            'MULTIPOLYGON (((0 0, 0 1, 1 1, 1 0, 0 0)), '
+            '((10 0, 10 1, 11 1, 11 0, 10 0)))',
+            srid=invalid.poly.srid,
+        ))
+        self.assertEqual(len(invalid.repaired), 2)
+
+    @skipUnlessDBFeature('has_MakeValid_function')
+    def test_make_valid_output_field(self):
+        # output_field is GeometryField instance because different geometry
+        # types can be returned.
+        output_field = functions.MakeValid(
+            Value(Polygon(), PolygonField(srid=42)),
+        ).output_field
+        self.assertIs(output_field.__class__, GeometryField)
+        self.assertEqual(output_field.srid, 42)
 
     @skipUnlessDBFeature("has_MemSize_function")
     def test_memsize(self):

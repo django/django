@@ -1,9 +1,9 @@
-import re
-
 from django.contrib.gis.db.models.fields import BaseSpatialField
-from django.db.models.expressions import Expression
-from django.db.models.lookups import Lookup, Transform
+from django.contrib.gis.measure import Distance
+from django.db import NotSupportedError
+from django.db.models import Expression, Lookup, Transform
 from django.db.models.sql.query import Query
+from django.utils.regex_helper import _lazy_re_compile
 
 
 class RasterBandTransform(Transform):
@@ -74,9 +74,9 @@ class GISLookup(Lookup):
         return connection.ops.gis_operators[self.lookup_name]
 
     def as_sql(self, compiler, connection):
-        lhs_sql, sql_params = self.process_lhs(compiler, connection)
+        lhs_sql, lhs_params = self.process_lhs(compiler, connection)
         rhs_sql, rhs_params = self.process_rhs(compiler, connection)
-        sql_params.extend(rhs_params)
+        sql_params = (*lhs_params, *rhs_params)
 
         template_params = {'lhs': lhs_sql, 'rhs': rhs_sql, 'value': '%s', **self.template_params}
         rhs_op = self.get_rhs_op(connection, rhs_sql)
@@ -251,7 +251,7 @@ class OverlapsLookup(GISLookup):
 class RelateLookup(GISLookup):
     lookup_name = 'relate'
     sql_template = '%(func)s(%(lhs)s, %(rhs)s, %%s)'
-    pattern_regex = re.compile(r'^[012TF\*]{9}$')
+    pattern_regex = _lazy_re_compile(r'^[012TF\*]{9}$')
 
     def process_rhs(self, compiler, connection):
         # Check the pattern argument
@@ -301,7 +301,20 @@ class DistanceLookupBase(GISLookup):
 @BaseSpatialField.register_lookup
 class DWithinLookup(DistanceLookupBase):
     lookup_name = 'dwithin'
-    sql_template = '%(func)s(%(lhs)s, %(rhs)s, %%s)'
+    sql_template = '%(func)s(%(lhs)s, %(rhs)s, %(value)s)'
+
+    def process_distance(self, compiler, connection):
+        dist_param = self.rhs_params[0]
+        if (
+            not connection.features.supports_dwithin_distance_expr and
+            hasattr(dist_param, 'resolve_expression') and
+            not isinstance(dist_param, Distance)
+        ):
+            raise NotSupportedError(
+                'This backend does not support expressions for specifying '
+                'distance in the dwithin lookup.'
+            )
+        return super().process_distance(compiler, connection)
 
     def process_rhs(self, compiler, connection):
         dist_sql, dist_params = self.process_distance(compiler, connection)

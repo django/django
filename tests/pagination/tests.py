@@ -2,11 +2,10 @@ import warnings
 from datetime import datetime
 
 from django.core.paginator import (
-    EmptyPage, InvalidPage, PageNotAnInteger, Paginator, QuerySetPaginator,
+    EmptyPage, InvalidPage, PageNotAnInteger, Paginator,
     UnorderedObjectListWarning,
 )
 from django.test import SimpleTestCase, TestCase
-from django.utils.deprecation import RemovedInDjango31Warning
 
 from .custom import ValidAdjacentNumsPaginator
 from .models import Article
@@ -157,7 +156,7 @@ class PaginationTests(SimpleTestCase):
                 raise AttributeError('abc')
 
         with self.assertRaisesMessage(AttributeError, 'abc'):
-            Paginator(AttributeErrorContainer(), 10).count()
+            Paginator(AttributeErrorContainer(), 10).count
 
     def test_count_does_not_silence_type_error(self):
         class TypeErrorContainer:
@@ -165,7 +164,7 @@ class PaginationTests(SimpleTestCase):
                 raise TypeError('abc')
 
         with self.assertRaisesMessage(TypeError, 'abc'):
-            Paginator(TypeErrorContainer(), 10).count()
+            Paginator(TypeErrorContainer(), 10).count
 
     def check_indexes(self, params, page_num, indexes):
         """
@@ -298,11 +297,12 @@ class PaginationTests(SimpleTestCase):
         with self.assertRaises(EmptyPage):
             paginator.get_page(1)
 
-    def test_querysetpaginator_deprecation(self):
-        msg = 'The QuerySetPaginator alias of Paginator is deprecated.'
-        with self.assertWarnsMessage(RemovedInDjango31Warning, msg) as cm:
-            QuerySetPaginator([], 1)
-        self.assertEqual(cm.filename, __file__)
+    def test_paginator_iteration(self):
+        paginator = Paginator([1, 2, 3], 2)
+        page_iterator = iter(paginator)
+        for page, expected in enumerate(([1, 2], [3]), start=1):
+            with self.subTest(page=page):
+                self.assertEqual(expected, list(next(page_iterator)))
 
 
 class ModelPaginationTests(TestCase):
@@ -366,7 +366,8 @@ class ModelPaginationTests(TestCase):
         # Make sure object_list queryset is not evaluated by an invalid __getitem__ call.
         # (this happens from the template engine when using eg: {% page_obj.has_previous %})
         self.assertIsNone(p.object_list._result_cache)
-        with self.assertRaises(TypeError):
+        msg = 'Page indices must be integers or slices, not str.'
+        with self.assertRaisesMessage(TypeError, msg):
             p['has_previous']
         self.assertIsNone(p.object_list._result_cache)
         self.assertNotIsInstance(p.object_list, list)

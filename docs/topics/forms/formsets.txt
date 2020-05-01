@@ -21,9 +21,9 @@ a formset out of an ``ArticleForm`` you would do::
     >>> from django.forms import formset_factory
     >>> ArticleFormSet = formset_factory(ArticleForm)
 
-You now have created a formset named ``ArticleFormSet``. The formset gives you
-the ability to iterate over the forms in the formset and display them as you
-would with a regular form::
+You now have created a formset class named ``ArticleFormSet``.
+Instantiating the formset gives you the ability to iterate over the forms 
+in the formset and display them as you would with a regular form::
 
     >>> formset = ArticleFormSet()
     >>> for form in formset:
@@ -34,11 +34,11 @@ would with a regular form::
 As you can see it only displayed one empty form. The number of empty forms
 that is displayed is controlled by the ``extra`` parameter. By default,
 :func:`~django.forms.formsets.formset_factory` defines one extra form; the
-following example will display two blank forms::
+following example will create a formset class to display two blank forms::
 
     >>> ArticleFormSet = formset_factory(ArticleForm, extra=2)
 
-Iterating over the ``formset`` will render the forms in the order they were
+Iterating over a formset will render the forms in the order they were
 created. You can change this order by providing an alternate implementation for
 the ``__iter__()`` method.
 
@@ -220,7 +220,7 @@ this management data, an exception will be raised::
     >>> formset.is_valid()
     Traceback (most recent call last):
     ...
-    django.forms.utils.ValidationError: ['ManagementForm data is missing or has been tampered with']
+    django.core.exceptions.ValidationError: ['ManagementForm data is missing or has been tampered with']
 
 It is used to keep track of how many form instances are being displayed. If
 you are adding new forms via JavaScript, you should increment the count fields
@@ -261,6 +261,7 @@ Custom formset validation
 A formset has a ``clean`` method similar to the one on a ``Form`` class. This
 is where you define your own validation that works at the formset level::
 
+    >>> from django.core.exceptions import ValidationError
     >>> from django.forms import BaseFormSet
     >>> from django.forms import formset_factory
     >>> from myapp.forms import ArticleForm
@@ -277,7 +278,7 @@ is where you define your own validation that works at the formset level::
     ...                 continue
     ...             title = form.cleaned_data.get('title')
     ...             if title in titles:
-    ...                 raise forms.ValidationError("Articles in a set must have distinct titles.")
+    ...                 raise ValidationError("Articles in a set must have distinct titles.")
     ...             titles.append(title)
 
     >>> ArticleFormSet = formset_factory(ArticleForm, formset=BaseArticleFormSet)
@@ -569,8 +570,8 @@ Adding additional fields to a formset
 
 If you need to add additional fields to the formset this can be easily
 accomplished. The formset base class provides an ``add_fields`` method. You
-can simply override this method to add your own fields or even redefine the
-default fields/attributes of the order and deletion fields::
+can override this method to add your own fields or even redefine the default
+fields/attributes of the order and deletion fields::
 
     >>> from django.forms import BaseFormSet
     >>> from django.forms import formset_factory
@@ -651,9 +652,9 @@ This is useful if you want to :ref:`use more than one formset in a view
 Using a formset in views and templates
 ======================================
 
-Using a formset inside a view is as easy as using a regular ``Form`` class.
-The only thing you will want to be aware of is making sure to use the
-management form inside the template. Let's look at a sample view::
+Using a formset inside a view is not very different from using a regular
+``Form`` class. The only thing you will want to be aware of is making sure to
+use the management form inside the template. Let's look at a sample view::
 
     from django.forms import formset_factory
     from django.shortcuts import render

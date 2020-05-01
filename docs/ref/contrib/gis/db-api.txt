@@ -78,9 +78,9 @@ transform procedure::
 
 Thus, geometry parameters may be passed in using the ``GEOSGeometry`` object, WKT
 (Well Known Text [#fnwkt]_), HEXEWKB (PostGIS specific -- a WKB geometry in
-hexadecimal [#fnewkb]_), and GeoJSON [#fngeojson]_. Essentially, if the input is
-not a ``GEOSGeometry`` object, the geometry field will attempt to create a
-``GEOSGeometry`` instance from the input.
+hexadecimal [#fnewkb]_), and GeoJSON (see :rfc:`7946`). Essentially, if the
+input is not a ``GEOSGeometry`` object, the geometry field will attempt to
+create a ``GEOSGeometry`` instance from the input.
 
 For more information creating :class:`~django.contrib.gis.geos.GEOSGeometry`
 objects, refer to the :ref:`GEOS tutorial <geos-tutorial>`.
@@ -219,7 +219,7 @@ in the :doc:`model-api` documentation for more details.
 Distance Lookups
 ----------------
 
-*Availability*: PostGIS, Oracle, SpatiaLite, PGRaster (Native)
+*Availability*: PostGIS, MariaDB, MySQL, Oracle, SpatiaLite, PGRaster (Native)
 
 The following distance lookups are available:
 
@@ -227,7 +227,7 @@ The following distance lookups are available:
 * :lookup:`distance_lte`
 * :lookup:`distance_gt`
 * :lookup:`distance_gte`
-* :lookup:`dwithin`
+* :lookup:`dwithin` (except MariaDB and MySQL)
 
 .. note::
 
@@ -284,10 +284,10 @@ Then distance queries may be performed as follows::
     >>> qs = SouthTexasCity.objects.filter(point__distance_gte=(pnt, D(mi=20)))
     >>> qs = SouthTexasCity.objects.filter(point__distance_gte=(pnt, D(chain=100)))
 
-Raster queries work the same way by simply replacing the geometry field
-``point`` with a raster field, or the ``pnt`` object with a raster object, or
-both. To specify the band index of a raster input on the right hand side, a
-3-tuple can be passed to the lookup as follows::
+Raster queries work the same way by replacing the geometry field ``point`` with
+a raster field, or the ``pnt`` object with a raster object, or both. To specify
+the band index of a raster input on the right hand side, a 3-tuple can be
+passed to the lookup as follows::
 
     >>> qs = SouthTexasCity.objects.filter(point__distance_gte=(rst, 2, D(km=7)))
 
@@ -310,41 +310,41 @@ divided into the three categories described in the :ref:`raster lookup details
 <spatial-lookup-raster>`: native support ``N``, bilateral native support ``B``,
 and geometry conversion support ``C``.
 
-=================================  =========  ========  ============ ========== ========
-Lookup Type                        PostGIS    Oracle    MySQL [#]_   SpatiaLite PGRaster
-=================================  =========  ========  ============ ========== ========
-:lookup:`bbcontains`               X                    X            X          N
-:lookup:`bboverlaps`               X                    X            X          N
-:lookup:`contained`                X                    X            X          N
-:lookup:`contains <gis-contains>`  X          X         X            X          B
-:lookup:`contains_properly`        X                                            B
-:lookup:`coveredby`                X          X                      X          B
-:lookup:`covers`                   X          X                      X          B
-:lookup:`crosses`                  X                                 X          C
-:lookup:`disjoint`                 X          X         X            X          B
-:lookup:`distance_gt`              X          X                      X          N
-:lookup:`distance_gte`             X          X                      X          N
-:lookup:`distance_lt`              X          X                      X          N
-:lookup:`distance_lte`             X          X                      X          N
-:lookup:`dwithin`                  X          X                      X          B
-:lookup:`equals`                   X          X         X            X          C
-:lookup:`exact`                    X          X         X            X          B
-:lookup:`intersects`               X          X         X            X          B
-:lookup:`isvalid`                  X          X         X (≥ 5.7.5)  X (LWGEOM)
-:lookup:`overlaps`                 X          X         X            X          B
-:lookup:`relate`                   X          X                      X          C
-:lookup:`same_as`                  X          X         X            X          B
-:lookup:`touches`                  X          X         X            X          B
-:lookup:`within`                   X          X         X            X          B
-:lookup:`left`                     X                                            C
-:lookup:`right`                    X                                            C
-:lookup:`overlaps_left`            X                                            B
-:lookup:`overlaps_right`           X                                            B
-:lookup:`overlaps_above`           X                                            C
-:lookup:`overlaps_below`           X                                            C
-:lookup:`strictly_above`           X                                            C
-:lookup:`strictly_below`           X                                            C
-=================================  =========  ========  ============ ========== ========
+=================================  =========  ======== ========= ============ ========== ========
+Lookup Type                        PostGIS    Oracle   MariaDB   MySQL [#]_   SpatiaLite PGRaster
+=================================  =========  ======== ========= ============ ========== ========
+:lookup:`bbcontains`               X                   X         X            X          N
+:lookup:`bboverlaps`               X                   X         X            X          N
+:lookup:`contained`                X                   X         X            X          N
+:lookup:`contains <gis-contains>`  X          X        X         X            X          B
+:lookup:`contains_properly`        X                                                     B
+:lookup:`coveredby`                X          X                               X          B
+:lookup:`covers`                   X          X                               X          B
+:lookup:`crosses`                  X                   X         X            X          C
+:lookup:`disjoint`                 X          X        X         X            X          B
+:lookup:`distance_gt`              X          X        X         X            X          N
+:lookup:`distance_gte`             X          X        X         X            X          N
+:lookup:`distance_lt`              X          X        X         X            X          N
+:lookup:`distance_lte`             X          X        X         X            X          N
+:lookup:`dwithin`                  X          X                               X          B
+:lookup:`equals`                   X          X        X         X            X          C
+:lookup:`exact <same_as>`          X          X        X         X            X          B
+:lookup:`intersects`               X          X        X         X            X          B
+:lookup:`isvalid`                  X          X                  X (≥ 5.7.5)  X (LWGEOM)
+:lookup:`overlaps`                 X          X        X         X            X          B
+:lookup:`relate`                   X          X        X                      X          C
+:lookup:`same_as`                  X          X        X         X            X          B
+:lookup:`touches`                  X          X        X         X            X          B
+:lookup:`within`                   X          X        X         X            X          B
+:lookup:`left`                     X                                                     C
+:lookup:`right`                    X                                                     C
+:lookup:`overlaps_left`            X                                                     B
+:lookup:`overlaps_right`           X                                                     B
+:lookup:`overlaps_above`           X                                                     C
+:lookup:`overlaps_below`           X                                                     C
+:lookup:`strictly_above`           X                                                     C
+:lookup:`strictly_below`           X                                                     C
+=================================  =========  ======== ========= ============ ========== ========
 
 .. _database-functions-compatibility:
 
@@ -360,10 +360,12 @@ functions are available on each spatial backend.
 Function                              PostGIS  Oracle         MariaDB      MySQL       SpatiaLite
 ====================================  =======  ============== ============ =========== ==========
 :class:`Area`                         X        X              X            X           X
-:class:`AsGeoJSON`                    X                       X (≥ 10.2.4) X (≥ 5.7.5) X
+:class:`AsGeoJSON`                    X        X              X (≥ 10.2.4) X (≥ 5.7.5) X
 :class:`AsGML`                        X        X                                       X
 :class:`AsKML`                        X                                                X
 :class:`AsSVG`                        X                                                X
+:class:`AsWKB`                        X        X              X            X           X
+:class:`AsWKT`                        X        X              X            X           X
 :class:`Azimuth`                      X                                                X (LWGEOM)
 :class:`BoundingCircle`               X        X
 :class:`Centroid`                     X        X              X            X           X
@@ -413,7 +415,6 @@ Aggregate                PostGIS  Oracle  SpatiaLite
 .. rubric:: Footnotes
 .. [#fnwkt] *See* Open Geospatial Consortium, Inc., `OpenGIS Simple Feature Specification For SQL <http://www.opengis.org/docs/99-049.pdf>`_, Document 99-049 (May 5, 1999), at  Ch. 3.2.5, p. 3-11 (SQL Textual Representation of Geometry).
 .. [#fnewkb] *See* `PostGIS EWKB, EWKT and Canonical Forms <https://postgis.net/docs/using_postgis_dbmanagement.html#EWKB_EWKT>`_, PostGIS documentation at Ch. 4.1.2.
-.. [#fngeojson] *See* Howard Butler, Martin Daly, Allan Doyle, Tim Schaub, & Christopher Schmidt, `The GeoJSON Format Specification <http://geojson.org/geojson-spec.html>`_, Revision 1.0 (June 16, 2008).
 .. [#fndistsphere15] *See* `PostGIS documentation <https://postgis.net/docs/ST_DistanceSphere.html>`_ on ``ST_DistanceSphere``.
 .. [#fnmysqlidx] *See* `Creating Spatial Indexes <https://dev.mysql.com/doc/refman/en/creating-spatial-indexes.html>`_
    in the MySQL Reference Manual:

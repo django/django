@@ -63,8 +63,9 @@ def authenticate(request=None, **credentials):
     If the given credentials are valid, return a User object.
     """
     for backend, backend_path in _get_backends(return_tuples=True):
+        backend_signature = inspect.signature(backend.authenticate)
         try:
-            inspect.getcallargs(backend.authenticate, request, **credentials)
+            backend_signature.bind(request, **credentials)
         except TypeError:
             # This backend doesn't accept these credentials as arguments. Try the next one.
             continue
@@ -186,8 +187,13 @@ def get_user(request):
                     user.get_session_auth_hash()
                 )
                 if not session_hash_verified:
-                    request.session.flush()
-                    user = None
+                    if not (
+                        session_hash and
+                        hasattr(user, '_legacy_get_session_auth_hash') and
+                        constant_time_compare(session_hash, user._legacy_get_session_auth_hash())
+                    ):
+                        request.session.flush()
+                        user = None
 
     return user or AnonymousUser()
 

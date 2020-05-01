@@ -16,7 +16,7 @@ processing.
 Basic forms
 ===========
 
-Given a simple contact form:
+Given a contact form:
 
 .. code-block:: python
     :caption: forms.py
@@ -85,7 +85,7 @@ You don't even need to provide a ``success_url`` for
 :meth:`~django.db.models.Model.get_absolute_url()` on the model object if available.
 
 If you want to use a custom :class:`~django.forms.ModelForm` (for instance to
-add extra validation) simply set
+add extra validation), set
 :attr:`~django.views.generic.edit.FormMixin.form_class` on your view.
 
 .. note::
@@ -132,8 +132,8 @@ here; we don't have to write any logic ourselves:
         success_url = reverse_lazy('author-list')
 
 .. note::
-    We have to use :func:`~django.urls.reverse_lazy` here, not just
-    ``reverse()`` as the urls are not loaded when the file is imported.
+    We have to use :func:`~django.urls.reverse_lazy` instead of
+    ``reverse()``, as the urls are not loaded when the file is imported.
 
 The ``fields`` attribute works the same way as the ``fields`` attribute on the
 inner ``Meta`` class on :class:`~django.forms.ModelForm`. Unless you define the
@@ -222,41 +222,43 @@ to edit, and override
 aren't logged in from accessing the form. If you omit that, you'll need to
 handle unauthorized users in :meth:`~.ModelFormMixin.form_valid()`.
 
-AJAX example
-============
+.. _content-negotiation-example:
 
-Here is a simple example showing how you might go about implementing a form that
-works for AJAX requests as well as 'normal' form POSTs::
+Content negotiation example
+===========================
+
+Here is an example showing how you might go about implementing a form that
+works with an API-based workflow as well as 'normal' form POSTs::
 
     from django.http import JsonResponse
     from django.views.generic.edit import CreateView
     from myapp.models import Author
 
-    class AjaxableResponseMixin:
+    class JsonableResponseMixin:
         """
-        Mixin to add AJAX support to a form.
+        Mixin to add JSON support to a form.
         Must be used with an object-based FormView (e.g. CreateView)
         """
         def form_invalid(self, form):
             response = super().form_invalid(form)
-            if self.request.is_ajax():
-                return JsonResponse(form.errors, status=400)
-            else:
+            if self.request.accepts('text/html'):
                 return response
+            else:
+                return JsonResponse(form.errors, status=400)
 
         def form_valid(self, form):
             # We make sure to call the parent's form_valid() method because
             # it might do some processing (in the case of CreateView, it will
             # call form.save() for example).
             response = super().form_valid(form)
-            if self.request.is_ajax():
+            if self.request.accepts('text/html'):
+                return response
+            else:
                 data = {
                     'pk': self.object.pk,
                 }
                 return JsonResponse(data)
-            else:
-                return response
 
-    class AuthorCreate(AjaxableResponseMixin, CreateView):
+    class AuthorCreate(JsonableResponseMixin, CreateView):
         model = Author
         fields = ['name']

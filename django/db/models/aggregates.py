@@ -99,6 +99,7 @@ class Aggregate(Func):
 class Avg(FixDurationInputMixin, NumericOutputFieldMixin, Aggregate):
     function = 'AVG'
     name = 'Avg'
+    allow_distinct = True
 
 
 class Count(Aggregate):
@@ -142,6 +143,7 @@ class StdDev(NumericOutputFieldMixin, Aggregate):
 class Sum(FixDurationInputMixin, Aggregate):
     function = 'SUM'
     name = 'Sum'
+    allow_distinct = True
 
 
 class Variance(NumericOutputFieldMixin, Aggregate):

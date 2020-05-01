@@ -53,7 +53,7 @@ Use standard DB optimization techniques
 
 * Appropriate use of field types.
 
-We will assume you have done the obvious things above. The rest of this document
+We will assume you have done the things listed above. The rest of this document
 focuses on how to use Django in such a way that you are not doing unnecessary
 work. This document also does not address other optimization techniques that
 apply to all expensive operations, such as :doc:`general purpose caching
@@ -217,7 +217,7 @@ Don't retrieve things you don't need
 Use ``QuerySet.values()`` and ``values_list()``
 -----------------------------------------------
 
-When you just want a ``dict`` or ``list`` of values, and don't need ORM model
+When you only want a ``dict`` or ``list`` of values, and don't need ORM model
 objects, make appropriate usage of
 :meth:`~django.db.models.query.QuerySet.values()`.
 These can be useful for replacing model objects in template code - as long as
@@ -233,14 +233,12 @@ you know that you won't need (or won't need in most cases) to avoid loading
 them. Note that if you *do* use them, the ORM will have to go and get them in
 a separate query, making this a pessimization if you use it inappropriately.
 
-Also, be aware that there is some (small extra) overhead incurred inside
-Django when constructing a model with deferred fields. Don't be too aggressive
-in deferring fields without profiling as the database has to read most of the
-non-text, non-VARCHAR data from the disk for a single row in the results, even
-if it ends up only using a few columns. The ``defer()`` and ``only()`` methods
-are most useful when you can avoid loading a lot of text data or for fields
-that might take a lot of processing to convert back to Python. As always,
-profile first, then optimize.
+Don't be too aggressive in deferring fields without profiling as the database
+has to read most of the non-text, non-VARCHAR data from the disk for a single
+row in the results, even if it ends up only using a few columns. The
+``defer()`` and ``only()`` methods are most useful when you can avoid loading a
+lot of text data or for fields that might take a lot of processing to convert
+back to Python. As always, profile first, then optimize.
 
 Use ``QuerySet.count()``
 ------------------------
@@ -260,7 +258,7 @@ But:
 Don't overuse ``count()`` and ``exists()``
 ------------------------------------------
 
-If you are going to need other data from the QuerySet, just evaluate it.
+If you are going to need other data from the QuerySet, evaluate it immediately.
 
 For example, assuming an Email model that has a ``body`` attribute and a
 many-to-many relation to User, the following template code is optimal:
@@ -341,8 +339,13 @@ it on a ``QuerySet`` by calling
 
 Adding an index to your database may help to improve ordering performance.
 
-Insert in bulk
-==============
+Use bulk methods
+================
+
+Use bulk methods to reduce the number of SQL statements.
+
+Create in bulk
+--------------
 
 When creating objects, where possible, use the
 :meth:`~django.db.models.query.QuerySet.bulk_create()` method to reduce the
@@ -362,8 +365,42 @@ Note that there are a number of :meth:`caveats to this method
 <django.db.models.query.QuerySet.bulk_create>`, so make sure it's appropriate
 for your use case.
 
-This also applies to :class:`ManyToManyFields
-<django.db.models.ManyToManyField>`, so doing::
+Update in bulk
+--------------
+
+When updating objects, where possible, use the
+:meth:`~django.db.models.query.QuerySet.bulk_update()` method to reduce the
+number of SQL queries. Given a list or queryset of objects::
+
+    entries = Entry.objects.bulk_create([
+        Entry(headline='This is a test'),
+        Entry(headline='This is only a test'),
+    ])
+
+The following example::
+
+    entries[0].headline = 'This is not a test'
+    entries[1].headline = 'This is no longer a test'
+    Entry.objects.bulk_update(entries, ['headline'])
+
+...is preferable to::
+
+    entries[0].headline = 'This is not a test'
+    entries[0].save()
+    entries[1].headline = 'This is no longer a test'
+    entries[1].save()
+
+Note that there are a number of :meth:`caveats to this method
+<django.db.models.query.QuerySet.bulk_update>`, so make sure it's appropriate
+for your use case.
+
+Insert in bulk
+--------------
+
+When inserting objects into :class:`ManyToManyFields
+<django.db.models.ManyToManyField>`, use
+:meth:`~django.db.models.fields.related.RelatedManager.add` with multiple
+objects to reduce the number of SQL queries. For example::
 
     my_band.members.add(me, my_friend)
 
@@ -373,3 +410,65 @@ This also applies to :class:`ManyToManyFields
     my_band.members.add(my_friend)
 
 ...where ``Bands`` and ``Artists`` have a many-to-many relationship.
+
+When inserting different pairs of objects into
+:class:`~django.db.models.ManyToManyField` or when the custom
+:attr:`~django.db.models.ManyToManyField.through` table is defined, use
+:meth:`~django.db.models.query.QuerySet.bulk_create()` method to reduce the
+number of SQL queries. For example::
+
+    PizzaToppingRelationship = Pizza.toppings.through
+    PizzaToppingRelationship.objects.bulk_create([
+        PizzaToppingRelationship(pizza=my_pizza, topping=pepperoni),
+        PizzaToppingRelationship(pizza=your_pizza, topping=pepperoni),
+        PizzaToppingRelationship(pizza=your_pizza, topping=mushroom),
+    ], ignore_conflicts=True)
+
+...is preferable to::
+
+    my_pizza.toppings.add(pepperoni)
+    your_pizza.toppings.add(pepperoni, mushroom)
+
+...where ``Pizza`` and ``Topping`` have a many-to-many relationship. Note that
+there are a number of :meth:`caveats to this method
+<django.db.models.query.QuerySet.bulk_create>`, so make sure it's appropriate
+for your use case.
+
+Remove in bulk
+--------------
+
+When removing objects from :class:`ManyToManyFields
+<django.db.models.ManyToManyField>`, use
+:meth:`~django.db.models.fields.related.RelatedManager.remove` with multiple
+objects to reduce the number of SQL queries. For example::
+
+    my_band.members.remove(me, my_friend)
+
+...is preferable to::
+
+    my_band.members.remove(me)
+    my_band.members.remove(my_friend)
+
+...where ``Bands`` and ``Artists`` have a many-to-many relationship.
+
+When removing different pairs of objects from :class:`ManyToManyFields
+<django.db.models.ManyToManyField>`, use
+:meth:`~django.db.models.query.QuerySet.delete` on a
+:class:`~django.db.models.Q` expression with multiple
+:attr:`~django.db.models.ManyToManyField.through`  model instances to reduce
+the number of SQL queries. For example::
+
+    from django.db.models import Q
+    PizzaToppingRelationship = Pizza.toppings.through
+    PizzaToppingRelationship.objects.filter(
+        Q(pizza=my_pizza, topping=pepperoni) |
+        Q(pizza=your_pizza, topping=pepperoni) |
+        Q(pizza=your_pizza, topping=mushroom)
+    ).delete()
+
+...is preferable to::
+
+    my_pizza.toppings.remove(pepperoni)
+    your_pizza.toppings.remove(pepperoni, mushroom)
+
+...where ``Pizza`` and ``Topping`` have a many-to-many relationship.

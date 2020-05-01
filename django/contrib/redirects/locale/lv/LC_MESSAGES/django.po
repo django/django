@@ -2,14 +2,15 @@
 #
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011
+# NullIsNot0 <nullisnot0@inbox.lv>, 2019
 # peterisb <pb@sungis.lv>, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2017-09-19 16:40+0000\n"
-"Last-Translator: peterisb <pb@sungis.lv>\n"
+"POT-Creation-Date: 2019-09-08 17:27+0200\n"
+"PO-Revision-Date: 2019-11-07 05:21+0000\n"
+"Last-Translator: NullIsNot0 <nullisnot0@inbox.lv>\n"
 "Language-Team: Latvian (http://www.transifex.com/django/django/language/"
 "lv/)\n"
 "MIME-Version: 1.0\n"
@@ -29,21 +30,21 @@ msgid "redirect from"
 msgstr "pārvirzīt(redirect) no"
 
 msgid ""
-"This should be an absolute path, excluding the domain name. Example: '/"
-"events/search/'."
+"This should be an absolute path, excluding the domain name. Example: “/"
+"events/search/”."
 msgstr ""
-"Tam jābūt absolūtajam ceļam, atskaitot domēna vārdu. Piemēram: '/notikumi/"
-"meklet/'."
+"Tam jābūt absolūtajam ceļam, atskaitot domēna vārdu. Piemēram: \"/notikumi/"
+"meklet/\"."
 
 msgid "redirect to"
 msgstr "pārvirzīt(redirect) uz"
 
 msgid ""
 "This can be either an absolute path (as above) or a full URL starting with "
-"'http://'."
+"“http://”."
 msgstr ""
-"Šis var būt vai nu absolūtais ceļš (kā augstāk) vai pilnais URL, kas sākas "
-"ar 'http://'."
+"Šis var būt vai nu absolūtais ceļš (kā augstāk), vai pilnais URL, kas sākas "
+"ar \"http://\"."
 
 msgid "redirect"
 msgstr "pārvirzīt"

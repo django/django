@@ -1,19 +1,19 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Bogdan Mateescu, 2018
+# Bogdan Mateescu, 2018-2019
 # Daniel Ursache-Dogariu, 2011
 # Denis Darii <denis.darii@gmail.com>, 2011
 # Ionel Cristian Mărieș <ionel.mc@gmail.com>, 2012
 # Jannis Leidel <jannis@leidel.info>, 2011
-# Răzvan Ionescu <ionescu77@gmail.com>, 2015
+# razvan ionescu <ionescu77@gmail.com>, 2015
 # Razvan Stefanescu <razvan.stefanescu@gmail.com>, 2016-2017
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-05-17 11:50+0200\n"
-"PO-Revision-Date: 2018-02-27 12:32+0000\n"
+"PO-Revision-Date: 2019-04-18 17:06+0000\n"
 "Last-Translator: Bogdan Mateescu\n"
 "Language-Team: Romanian (http://www.transifex.com/django/django/language/"
 "ro/)\n"
@@ -149,7 +149,7 @@ msgid "Today"
 msgstr "Astăzi"
 
 msgid "Choose a Date"
-msgstr "Alege a dată"
+msgstr "Alege o dată"
 
 msgid "Yesterday"
 msgstr "Ieri"

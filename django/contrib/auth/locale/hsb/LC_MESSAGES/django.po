@@ -1,13 +1,13 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Michael Wolf <milupo@sorbzilla.de>, 2016-2017
+# Michael Wolf <milupo@sorbzilla.de>, 2016-2017,2019
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-09-24 13:46+0200\n"
-"PO-Revision-Date: 2017-09-27 20:07+0000\n"
+"POT-Creation-Date: 2019-09-08 17:27+0200\n"
+"PO-Revision-Date: 2019-09-21 19:21+0000\n"
 "Last-Translator: Michael Wolf <milupo@sorbzilla.de>\n"
 "Language-Team: Upper Sorbian (http://www.transifex.com/django/django/"
 "language/hsb/)\n"
@@ -53,8 +53,8 @@ msgstr "Žane hesło nastajene."
 msgid "Invalid password format or unknown hashing algorithm."
 msgstr "Njepłaćiwy hesłowy format abo njeznaty kontrolny algoritmus."
 
-msgid "The two password fields didn't match."
-msgstr "Hesle jednak njejstej."
+msgid "The two password fields didn’t match."
+msgstr "Dwě heslowej poli sej njewotpowědujetej."
 
 msgid "Password"
 msgstr "Hesło"
@@ -66,11 +66,11 @@ msgid "Enter the same password as before, for verification."
 msgstr "Zapodajće samsne hesło kaž do toho, za přepruwowanje."
 
 msgid ""
-"Raw passwords are not stored, so there is no way to see this user's "
+"Raw passwords are not stored, so there is no way to see this user’s "
 "password, but you can change the password using <a href=\"{}\">this form</a>."
 msgstr ""
-"Hrube hesła so njeskładuja, tohodla njeje móžno, hesło wužiwarja widźeć, ale "
-"móžeće hesło z pomocu <a href=\"{}\">tutoho formulara</a> změnić."
+"Hrube hesła so njeskładuja, tohodla njeda so hesło tutoho wužwarja widźeć, "
+"ale móžeće hesło z pomocu <a href=\"{}\">tutoho formulara</a> změnić. "
 
 #, python-format
 msgid ""
@@ -254,19 +254,19 @@ msgstr[3] "Waše hesło dyrbi znajmjeńša %(min_length)d znamješkow měć."
 msgid "The password is too similar to the %(verbose_name)s."
 msgstr "Hesło je na %(verbose_name)s přepodobne."
 
-msgid "Your password can't be too similar to your other personal information."
-msgstr "Waše hesło njesmě wašim druhim wosobinskim datam podobne być."
+msgid "Your password can’t be too similar to your other personal information."
+msgstr "Waše hesło njemóže na waše druhe wosobinske informacije podobne być."
 
 msgid "This password is too common."
 msgstr "Tute hesło je přehuste,"
 
-msgid "Your password can't be a commonly used password."
-msgstr "Waše hesło njemóže husto wužiwane hesło być."
+msgid "Your password can’t be a commonly used password."
+msgstr "Waše hesło njemóže husto wužwane hesło być."
 
 msgid "This password is entirely numeric."
 msgstr "Tute hesło je cyle numeriske."
 
-msgid "Your password can't be entirely numeric."
+msgid "Your password can’t be entirely numeric."
 msgstr "Waše hesło njemóže cyle numeriske być."
 
 #, python-format

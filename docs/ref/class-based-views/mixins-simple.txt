@@ -12,7 +12,7 @@ Simple mixins
     .. attribute:: extra_context
 
         A dictionary to include in the context. This is a convenient way of
-        specifying some simple context in
+        specifying some context in
         :meth:`~django.views.generic.base.View.as_view`. Example usage::
 
             from django.views.generic import TemplateView

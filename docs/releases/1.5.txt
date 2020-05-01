@@ -499,13 +499,14 @@ There are no known incompatibilities between Django's copy of version 2.0.7 and
 Python's copy of version 2.0.9. However, there are some incompatibilities
 between other versions of ``simplejson``:
 
-- While the ``simplejson`` API is documented as always returning unicode
+- While the ``simplejson`` API is documented as always returning Unicode
   strings, the optional C implementation can return a bytestring. This was
   fixed in Python 2.7.
 - ``simplejson.JSONEncoder`` gained a ``namedtuple_as_object`` keyword
   argument in version 2.2.
 
-More information on these incompatibilities is available in `ticket #18023`_.
+More information on these incompatibilities is available in
+:ticket:`ticket #18023 <18023#comment:10>`.
 
 The net result is that, if you have installed ``simplejson`` and your code
 uses Django's serialization internals directly -- for instance
@@ -516,8 +517,6 @@ internals aren't documented; we're making an exception here.)
 At this point, the maintainers of Django believe that using :mod:`json` from
 the standard library offers the strongest guarantee of backwards-compatibility.
 They recommend to use it from now on.
-
-.. _ticket #18023: https://code.djangoproject.com/ticket/18023#comment:10
 
 String types of hasher method parameters
 ----------------------------------------
@@ -616,8 +615,8 @@ database state behind or unit tests that rely on some form of state being
 preserved after the execution of other tests. Such tests are already very
 fragile, and must now be changed to be able to run independently.
 
-`cleaned_data` dictionary kept for invalid forms
-------------------------------------------------
+``cleaned_data`` dictionary kept for invalid forms
+--------------------------------------------------
 
 The :attr:`~django.forms.Form.cleaned_data` dictionary is now always present
 after form validation. When the form doesn't validate, it contains only the

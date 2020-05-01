@@ -3,12 +3,12 @@
  by GEOSGeometry to house the actual coordinates of the Point,
  LineString, and LinearRing geometries.
 """
-from ctypes import byref, c_double, c_uint
+from ctypes import byref, c_byte, c_double, c_uint
 
 from django.contrib.gis.geos import prototypes as capi
 from django.contrib.gis.geos.base import GEOSBase
 from django.contrib.gis.geos.error import GEOSException
-from django.contrib.gis.geos.libgeos import CS_PTR
+from django.contrib.gis.geos.libgeos import CS_PTR, geos_version_tuple
 from django.contrib.gis.shortcuts import numpy
 
 
@@ -31,7 +31,7 @@ class GEOSCoordSeq(GEOSBase):
 
     def __len__(self):
         "Return the number of points in the coordinate sequence."
-        return int(self.size)
+        return self.size
 
     def __str__(self):
         "Return the string representation of the coordinate sequence."
@@ -194,3 +194,23 @@ class GEOSCoordSeq(GEOSBase):
         if n == 1:
             return get_point(0)
         return tuple(get_point(i) for i in range(n))
+
+    @property
+    def is_counterclockwise(self):
+        """Return whether this coordinate sequence is counterclockwise."""
+        if geos_version_tuple() < (3, 7):
+            # A modified shoelace algorithm to determine polygon orientation.
+            # See https://en.wikipedia.org/wiki/Shoelace_formula.
+            area = 0.0
+            n = len(self)
+            for i in range(n):
+                j = (i + 1) % n
+                area += self[i][0] * self[j][1]
+                area -= self[j][0] * self[i][1]
+            return area > 0.0
+        ret = c_byte()
+        if not capi.cs_is_ccw(self.ptr, byref(ret)):
+            raise GEOSException(
+                'Error encountered in GEOS C function "%s".' % capi.cs_is_ccw.func_name
+            )
+        return ret.value == 1

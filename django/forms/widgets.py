@@ -4,7 +4,6 @@ HTML Widget classes
 
 import copy
 import datetime
-import re
 import warnings
 from collections import defaultdict
 from itertools import chain
@@ -17,6 +16,7 @@ from django.utils.datastructures import OrderedSet
 from django.utils.dates import MONTHS
 from django.utils.formats import get_format
 from django.utils.html import format_html, html_safe
+from django.utils.regex_helper import _lazy_re_compile
 from django.utils.safestring import mark_safe
 from django.utils.topological_sort import (
     CyclicDependencyError, stable_topological_sort,
@@ -80,7 +80,7 @@ class Media:
     def render_js(self):
         return [
             format_html(
-                '<script type="text/javascript" src="{}"></script>',
+                '<script src="{}"></script>',
                 self.absolute_path(path)
             ) for path in self._js
         ]
@@ -183,7 +183,7 @@ class MediaDefiningClass(type):
     Metaclass for classes that can have media definitions.
     """
     def __new__(mcs, name, bases, attrs):
-        new_class = super(MediaDefiningClass, mcs).__new__(mcs, name, bases, attrs)
+        new_class = super().__new__(mcs, name, bases, attrs)
 
         if 'media' not in attrs:
             new_class.media = media_property(new_class)
@@ -387,6 +387,9 @@ class FileInput(Input):
     def value_omitted_from_data(self, data, files, name):
         return name not in files
 
+    def use_required_attribute(self, initial):
+        return super().use_required_attribute(initial) and not initial
+
 
 FILE_INPUT_CONTRADICTION = object()
 
@@ -450,9 +453,6 @@ class ClearableFileInput(FileInput):
             # False signals to clear any existing value, as opposed to just None
             return False
         return upload
-
-    def use_required_attribute(self, initial):
-        return super().use_required_attribute(initial) and not initial
 
     def value_omitted_from_data(self, data, files, name):
         return (
@@ -522,9 +522,7 @@ class CheckboxInput(Input):
 
     def get_context(self, name, value, attrs):
         if self.check_test(value):
-            if attrs is None:
-                attrs = {}
-            attrs['checked'] = True
+            attrs = {**(attrs or {}), 'checked': True}
         return super().get_context(name, value, attrs)
 
     def value_from_datadict(self, data, files, name):
@@ -801,6 +799,13 @@ class MultiWidget(Widget):
     template_name = 'django/forms/widgets/multiwidget.html'
 
     def __init__(self, widgets, attrs=None):
+        if isinstance(widgets, dict):
+            self.widgets_names = [
+                ('_%s' % name) if name else '' for name in widgets
+            ]
+            widgets = widgets.values()
+        else:
+            self.widgets_names = ['_%s' % i for i in range(len(widgets))]
         self.widgets = [w() if isinstance(w, type) else w for w in widgets]
         super().__init__(attrs)
 
@@ -822,10 +827,10 @@ class MultiWidget(Widget):
         input_type = final_attrs.pop('type', None)
         id_ = final_attrs.get('id')
         subwidgets = []
-        for i, widget in enumerate(self.widgets):
+        for i, (widget_name, widget) in enumerate(zip(self.widgets_names, self.widgets)):
             if input_type is not None:
                 widget.input_type = input_type
-            widget_name = '%s_%s' % (name, i)
+            widget_name = name + widget_name
             try:
                 widget_value = value[i]
             except IndexError:
@@ -845,12 +850,15 @@ class MultiWidget(Widget):
         return id_
 
     def value_from_datadict(self, data, files, name):
-        return [widget.value_from_datadict(data, files, name + '_%s' % i) for i, widget in enumerate(self.widgets)]
+        return [
+            widget.value_from_datadict(data, files, name + widget_name)
+            for widget_name, widget in zip(self.widgets_names, self.widgets)
+        ]
 
     def value_omitted_from_data(self, data, files, name):
         return all(
-            widget.value_omitted_from_data(data, files, name + '_%s' % i)
-            for i, widget in enumerate(self.widgets)
+            widget.value_omitted_from_data(data, files, name + widget_name)
+            for widget_name, widget in zip(self.widgets_names, self.widgets)
         )
 
     def decompress(self, value):
@@ -935,7 +943,7 @@ class SelectDateWidget(Widget):
     template_name = 'django/forms/widgets/select_date.html'
     input_type = 'select'
     select_widget = Select
-    date_re = re.compile(r'(\d{4}|0)-(\d\d?)-(\d\d?)$')
+    date_re = _lazy_re_compile(r'(\d{4}|0)-(\d\d?)-(\d\d?)$')
 
     def __init__(self, attrs=None, years=None, months=None, empty_label=None):
         self.attrs = attrs or {}
@@ -979,11 +987,7 @@ class SelectDateWidget(Widget):
         date_context['year'] = self.select_widget(attrs, choices=year_choices).get_context(
             name=year_name,
             value=context['widget']['value']['year'],
-            attrs={
-                **context['widget']['attrs'],
-                'id': 'id_%s' % year_name,
-                'placeholder': _('Year') if self.is_required else False,
-            },
+            attrs={**context['widget']['attrs'], 'id': 'id_%s' % year_name},
         )
         month_choices = list(self.months.items())
         if not self.is_required:
@@ -992,11 +996,7 @@ class SelectDateWidget(Widget):
         date_context['month'] = self.select_widget(attrs, choices=month_choices).get_context(
             name=month_name,
             value=context['widget']['value']['month'],
-            attrs={
-                **context['widget']['attrs'],
-                'id': 'id_%s' % month_name,
-                'placeholder': _('Month') if self.is_required else False,
-            },
+            attrs={**context['widget']['attrs'], 'id': 'id_%s' % month_name},
         )
         day_choices = [(i, i) for i in range(1, 32)]
         if not self.is_required:
@@ -1005,11 +1005,7 @@ class SelectDateWidget(Widget):
         date_context['day'] = self.select_widget(attrs, choices=day_choices,).get_context(
             name=day_name,
             value=context['widget']['value']['day'],
-            attrs={
-                **context['widget']['attrs'],
-                'id': 'id_%s' % day_name,
-                'placeholder': _('Day') if self.is_required else False,
-            },
+            attrs={**context['widget']['attrs'], 'id': 'id_%s' % day_name},
         )
         subwidgets = []
         for field in self._parse_date_fmt():

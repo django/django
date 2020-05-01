@@ -10,6 +10,7 @@ from django.contrib.auth.hashers import (
 from django.contrib.auth.models import User
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.sites.shortcuts import get_current_site
+from django.core.exceptions import ValidationError
 from django.core.mail import EmailMultiAlternatives
 from django.template import loader
 from django.utils.encoding import force_bytes
@@ -18,6 +19,15 @@ from django.utils.text import capfirst
 from django.utils.translation import gettext, gettext_lazy as _
 
 UserModel = get_user_model()
+
+
+def _unicode_ci_compare(s1, s2):
+    """
+    Perform case-insensitive comparison of two identifiers, using the
+    recommended algorithm from Unicode Technical Report 36, section
+    2.11.2(B)(2).
+    """
+    return unicodedata.normalize('NFKC', s1).casefold() == unicodedata.normalize('NFKC', s2).casefold()
 
 
 class ReadOnlyPasswordHashWidget(forms.Widget):
@@ -62,9 +72,11 @@ class UsernameField(forms.CharField):
         return unicodedata.normalize('NFKC', super().to_python(value))
 
     def widget_attrs(self, widget):
-        attrs = super().widget_attrs(widget)
-        attrs['autocapitalize'] = 'none'
-        return attrs
+        return {
+            **super().widget_attrs(widget),
+            'autocapitalize': 'none',
+            'autocomplete': 'username',
+        }
 
 
 class UserCreationForm(forms.ModelForm):
@@ -96,16 +108,13 @@ class UserCreationForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         if self._meta.model.USERNAME_FIELD in self.fields:
-            self.fields[self._meta.model.USERNAME_FIELD].widget.attrs.update({
-                'autocomplete': 'username',
-                'autofocus': True,
-            })
+            self.fields[self._meta.model.USERNAME_FIELD].widget.attrs['autofocus'] = True
 
     def clean_password2(self):
         password1 = self.cleaned_data.get("password1")
         password2 = self.cleaned_data.get("password2")
         if password1 and password2 and password1 != password2:
-            raise forms.ValidationError(
+            raise ValidationError(
                 self.error_messages['password_mismatch'],
                 code='password_mismatch',
             )
@@ -119,7 +128,7 @@ class UserCreationForm(forms.ModelForm):
         if password:
             try:
                 password_validation.validate_password(password, self.instance)
-            except forms.ValidationError as error:
+            except ValidationError as error:
                 self.add_error('password2', error)
 
     def save(self, commit=True):
@@ -166,7 +175,7 @@ class AuthenticationForm(forms.Form):
     Base class for authenticating users. Extend this to get a form that accepts
     username/password logins.
     """
-    username = UsernameField(widget=forms.TextInput(attrs={'autocomplete': 'username', 'autofocus': True}))
+    username = UsernameField(widget=forms.TextInput(attrs={'autofocus': True}))
     password = forms.CharField(
         label=_("Password"),
         strip=False,
@@ -192,7 +201,9 @@ class AuthenticationForm(forms.Form):
 
         # Set the max length and label for the "username" field.
         self.username_field = UserModel._meta.get_field(UserModel.USERNAME_FIELD)
-        self.fields['username'].max_length = self.username_field.max_length or 254
+        username_max_length = self.username_field.max_length or 254
+        self.fields['username'].max_length = username_max_length
+        self.fields['username'].widget.attrs['maxlength'] = username_max_length
         if self.fields['username'].label is None:
             self.fields['username'].label = capfirst(self.username_field.verbose_name)
 
@@ -216,12 +227,12 @@ class AuthenticationForm(forms.Form):
         allow login by active users, and reject login by inactive users.
 
         If the given user cannot log in, this method should raise a
-        ``forms.ValidationError``.
+        ``ValidationError``.
 
         If the given user may log in, this method should return None.
         """
         if not user.is_active:
-            raise forms.ValidationError(
+            raise ValidationError(
                 self.error_messages['inactive'],
                 code='inactive',
             )
@@ -230,7 +241,7 @@ class AuthenticationForm(forms.Form):
         return self.user_cache
 
     def get_invalid_login_error(self):
-        return forms.ValidationError(
+        return ValidationError(
             self.error_messages['invalid_login'],
             code='invalid_login',
             params={'username': self.username_field.verbose_name},
@@ -268,11 +279,16 @@ class PasswordResetForm(forms.Form):
         that prevent inactive users and users with unusable passwords from
         resetting their password.
         """
+        email_field_name = UserModel.get_email_field_name()
         active_users = UserModel._default_manager.filter(**{
-            '%s__iexact' % UserModel.get_email_field_name(): email,
+            '%s__iexact' % email_field_name: email,
             'is_active': True,
         })
-        return (u for u in active_users if u.has_usable_password())
+        return (
+            u for u in active_users
+            if u.has_usable_password() and
+            _unicode_ci_compare(email, getattr(u, email_field_name))
+        )
 
     def save(self, domain_override=None,
              subject_template_name='registration/password_reset_subject.txt',
@@ -285,15 +301,17 @@ class PasswordResetForm(forms.Form):
         user.
         """
         email = self.cleaned_data["email"]
+        if not domain_override:
+            current_site = get_current_site(request)
+            site_name = current_site.name
+            domain = current_site.domain
+        else:
+            site_name = domain = domain_override
+        email_field_name = UserModel.get_email_field_name()
         for user in self.get_users(email):
-            if not domain_override:
-                current_site = get_current_site(request)
-                site_name = current_site.name
-                domain = current_site.domain
-            else:
-                site_name = domain = domain_override
+            user_email = getattr(user, email_field_name)
             context = {
-                'email': email,
+                'email': user_email,
                 'domain': domain,
                 'site_name': site_name,
                 'uid': urlsafe_base64_encode(force_bytes(user.pk)),
@@ -304,7 +322,7 @@ class PasswordResetForm(forms.Form):
             }
             self.send_mail(
                 subject_template_name, email_template_name, context, from_email,
-                email, html_email_template_name=html_email_template_name,
+                user_email, html_email_template_name=html_email_template_name,
             )
 
 
@@ -337,7 +355,7 @@ class SetPasswordForm(forms.Form):
         password2 = self.cleaned_data.get('new_password2')
         if password1 and password2:
             if password1 != password2:
-                raise forms.ValidationError(
+                raise ValidationError(
                     self.error_messages['password_mismatch'],
                     code='password_mismatch',
                 )
@@ -375,7 +393,7 @@ class PasswordChangeForm(SetPasswordForm):
         """
         old_password = self.cleaned_data["old_password"]
         if not self.user.check_password(old_password):
-            raise forms.ValidationError(
+            raise ValidationError(
                 self.error_messages['password_incorrect'],
                 code='password_incorrect',
             )
@@ -412,7 +430,7 @@ class AdminPasswordChangeForm(forms.Form):
         password2 = self.cleaned_data.get('password2')
         if password1 and password2:
             if password1 != password2:
-                raise forms.ValidationError(
+                raise ValidationError(
                     self.error_messages['password_mismatch'],
                     code='password_mismatch',
                 )

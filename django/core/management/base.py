@@ -26,7 +26,9 @@ class CommandError(Exception):
     error) is the preferred way to indicate that something has gone
     wrong in the execution of a command.
     """
-    pass
+    def __init__(self, *args, returncode=1, **kwargs):
+        self.returncode = returncode
+        super().__init__(*args, **kwargs)
 
 
 class SystemCheckError(CommandError):
@@ -137,7 +139,7 @@ class OutputWrapper(TextIOBase):
     def isatty(self):
         return hasattr(self._out, 'isatty') and self._out.isatty()
 
-    def write(self, msg, style_func=None, ending=None):
+    def write(self, msg='', style_func=None, ending=None):
         ending = self.ending if ending is None else ending
         if ending and not msg.endswith(ending):
             msg += ending
@@ -326,8 +328,8 @@ class BaseCommand:
         handle_default_options(options)
         try:
             self.execute(*args, **cmd_options)
-        except Exception as e:
-            if options.traceback or not isinstance(e, CommandError):
+        except CommandError as e:
+            if options.traceback:
                 raise
 
             # SystemCheckError takes care of its own formatting.
@@ -335,7 +337,7 @@ class BaseCommand:
                 self.stderr.write(str(e), lambda x: x)
             else:
                 self.stderr.write('%s: %s' % (e.__class__.__name__, e))
-            sys.exit(1)
+            sys.exit(e.returncode)
         finally:
             try:
                 connections.close_all()
@@ -378,21 +380,20 @@ class BaseCommand:
             self.stdout.write(output)
         return output
 
-    def _run_checks(self, **kwargs):
-        return checks.run_checks(**kwargs)
-
     def check(self, app_configs=None, tags=None, display_num_errors=False,
-              include_deployment_checks=False, fail_level=checks.ERROR):
+              include_deployment_checks=False, fail_level=checks.ERROR,
+              databases=None):
         """
         Use the system check framework to validate entire Django project.
         Raise CommandError for any serious message (error or critical errors).
         If there are only light messages (like warnings), print them to stderr
         and don't raise an exception.
         """
-        all_issues = self._run_checks(
+        all_issues = checks.run_checks(
             app_configs=app_configs,
             tags=tags,
             include_deployment_checks=include_deployment_checks,
+            databases=databases,
         )
 
         header, body, footer = "", "", ""
@@ -465,15 +466,15 @@ class BaseCommand:
             apps_waiting_migration = sorted({migration.app_label for migration, backwards in plan})
             self.stdout.write(
                 self.style.NOTICE(
-                    "\nYou have %(unpplied_migration_count)s unapplied migration(s). "
+                    "\nYou have %(unapplied_migration_count)s unapplied migration(s). "
                     "Your project may not work properly until you apply the "
                     "migrations for app(s): %(apps_waiting_migration)s." % {
-                        "unpplied_migration_count": len(plan),
+                        "unapplied_migration_count": len(plan),
                         "apps_waiting_migration": ", ".join(apps_waiting_migration),
                     }
                 )
             )
-            self.stdout.write(self.style.NOTICE("Run 'python manage.py migrate' to apply them.\n"))
+            self.stdout.write(self.style.NOTICE("Run 'python manage.py migrate' to apply them."))
 
     def handle(self, *args, **options):
         """

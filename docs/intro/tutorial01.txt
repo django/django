@@ -35,10 +35,8 @@ older versions of Django and install a newer one.
 
 .. admonition:: Where to get help:
 
-    If you're having trouble going through this tutorial, please post a message
-    to |django-users| or drop by `#django on irc.freenode.net
-    <irc://irc.freenode.net/django>`_ to chat with other Django users who might
-    be able to help.
+    If you're having trouble going through this tutorial, please head over to
+    the :doc:`Getting Help</faq/help>` section of the FAQ.
 
 Creating a project
 ==================
@@ -86,13 +84,13 @@ Let's look at what :djadmin:`startproject` created::
             __init__.py
             settings.py
             urls.py
+            asgi.py
             wsgi.py
 
 These files are:
 
-* The outer :file:`mysite/` root directory is just a container for your
-  project. Its name doesn't matter to Django; you can rename it to anything
-  you like.
+* The outer :file:`mysite/` root directory is a container for your project. Its
+  name doesn't matter to Django; you can rename it to anything you like.
 
 * :file:`manage.py`: A command-line utility that lets you interact with this
   Django project in various ways. You can read all the details about
@@ -113,6 +111,9 @@ These files are:
 * :file:`mysite/urls.py`: The URL declarations for this Django project; a
   "table of contents" of your Django-powered site. You can read more about
   URLs in :doc:`/topics/http/urls`.
+
+* :file:`mysite/asgi.py`: An entry-point for ASGI-compatible web servers to
+  serve your project. See :doc:`/howto/deployment/asgi/index` for more details.
 
 * :file:`mysite/wsgi.py`: An entry-point for WSGI-compatible web servers to
   serve your project. See :doc:`/howto/deployment/wsgi/index` for more details.
@@ -207,14 +208,14 @@ rather than creating directories.
 
     What's the difference between a project and an app? An app is a Web
     application that does something -- e.g., a Weblog system, a database of
-    public records or a simple poll app. A project is a collection of
+    public records or a small poll app. A project is a collection of
     configuration and apps for a particular website. A project can contain
     multiple apps. An app can be in multiple projects.
 
 Your apps can live anywhere on your :ref:`Python path <tut-searchpath>`. In
-this tutorial, we'll create our poll app right next to your :file:`manage.py`
-file so that it can be imported as its own top-level module, rather than a
-submodule of ``mysite``.
+this tutorial, we'll create our poll app in the same directory as your
+:file:`manage.py` file so that it can be imported as its own top-level module,
+rather than a submodule of ``mysite``.
 
 To create your app, make sure you're in the same directory as :file:`manage.py`
 and type this command:

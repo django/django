@@ -15,16 +15,19 @@ class DatabaseOperations(BaseDatabaseOperations):
         **BaseDatabaseOperations.integer_field_ranges,
         'PositiveSmallIntegerField': (0, 65535),
         'PositiveIntegerField': (0, 4294967295),
+        'PositiveBigIntegerField': (0, 18446744073709551615),
     }
     cast_data_types = {
         'AutoField': 'signed integer',
         'BigAutoField': 'signed integer',
+        'SmallAutoField': 'signed integer',
         'CharField': 'char(%(max_length)s)',
         'DecimalField': 'decimal(%(max_digits)s, %(decimal_places)s)',
         'TextField': 'char',
         'IntegerField': 'signed integer',
         'BigIntegerField': 'signed integer',
         'SmallIntegerField': 'signed integer',
+        'PositiveBigIntegerField': 'unsigned integer',
         'PositiveIntegerField': 'unsigned integer',
         'PositiveSmallIntegerField': 'unsigned integer',
     }
@@ -35,8 +38,10 @@ class DatabaseOperations(BaseDatabaseOperations):
         # https://dev.mysql.com/doc/mysql/en/date-and-time-functions.html
         if lookup_type == 'week_day':
             # DAYOFWEEK() returns an integer, 1-7, Sunday=1.
-            # Note: WEEKDAY() returns 0-6, Monday=0.
             return "DAYOFWEEK(%s)" % field_name
+        elif lookup_type == 'iso_week_day':
+            # WEEKDAY() returns an integer, 0-6, Monday=0.
+            return "WEEKDAY(%s) + 1" % field_name
         elif lookup_type == 'week':
             # Override the value of default_week_format for consistency with
             # other database backends.
@@ -138,6 +143,13 @@ class DatabaseOperations(BaseDatabaseOperations):
     def date_interval_sql(self, timedelta):
         return 'INTERVAL %s MICROSECOND' % duration_microseconds(timedelta)
 
+    def fetch_returned_insert_rows(self, cursor):
+        """
+        Given a cursor object that has just performed an INSERT...RETURNING
+        statement into a table, return the tuple of returned data.
+        """
+        return cursor.fetchall()
+
     def format_for_duration_arithmetic(self, sql):
         return 'INTERVAL %s MICROSECOND' % sql
 
@@ -168,22 +180,55 @@ class DatabaseOperations(BaseDatabaseOperations):
     def random_function_sql(self):
         return 'RAND()'
 
-    def sql_flush(self, style, tables, sequences, allow_cascade=False):
-        # NB: The generated SQL below is specific to MySQL
-        # 'TRUNCATE x;', 'TRUNCATE y;', 'TRUNCATE z;'... style SQL statements
-        # to clear all tables of all data
-        if tables:
-            sql = ['SET FOREIGN_KEY_CHECKS = 0;']
-            for table in tables:
-                sql.append('%s %s;' % (
-                    style.SQL_KEYWORD('TRUNCATE'),
-                    style.SQL_FIELD(self.quote_name(table)),
-                ))
-            sql.append('SET FOREIGN_KEY_CHECKS = 1;')
-            sql.extend(self.sequence_reset_by_name_sql(style, sequences))
-            return sql
-        else:
+    def return_insert_columns(self, fields):
+        # MySQL and MariaDB < 10.5.0 don't support an INSERT...RETURNING
+        # statement.
+        if not fields:
+            return '', ()
+        columns = [
+            '%s.%s' % (
+                self.quote_name(field.model._meta.db_table),
+                self.quote_name(field.column),
+            ) for field in fields
+        ]
+        return 'RETURNING %s' % ', '.join(columns), ()
+
+    def sql_flush(self, style, tables, *, reset_sequences=False, allow_cascade=False):
+        if not tables:
             return []
+
+        sql = ['SET FOREIGN_KEY_CHECKS = 0;']
+        if reset_sequences:
+            # It's faster to TRUNCATE tables that require a sequence reset
+            # since ALTER TABLE AUTO_INCREMENT is slower than TRUNCATE.
+            sql.extend(
+                '%s %s;' % (
+                    style.SQL_KEYWORD('TRUNCATE'),
+                    style.SQL_FIELD(self.quote_name(table_name)),
+                ) for table_name in tables
+            )
+        else:
+            # Otherwise issue a simple DELETE since it's faster than TRUNCATE
+            # and preserves sequences.
+            sql.extend(
+                '%s %s %s;' % (
+                    style.SQL_KEYWORD('DELETE'),
+                    style.SQL_KEYWORD('FROM'),
+                    style.SQL_FIELD(self.quote_name(table_name)),
+                ) for table_name in tables
+            )
+        sql.append('SET FOREIGN_KEY_CHECKS = 1;')
+        return sql
+
+    def sequence_reset_by_name_sql(self, style, sequences):
+        return [
+            '%s %s %s %s = 1;' % (
+                style.SQL_KEYWORD('ALTER'),
+                style.SQL_KEYWORD('TABLE'),
+                style.SQL_FIELD(self.quote_name(sequence_info['table'])),
+                style.SQL_FIELD('AUTO_INCREMENT'),
+            ) for sequence_info in sequences
+        ]
 
     def validate_autopk_value(self, value):
         # MySQLism: zero in AUTO_INCREMENT field does not work. Refs #17653.
@@ -235,7 +280,8 @@ class DatabaseOperations(BaseDatabaseOperations):
             return 'POW(%s)' % ','.join(sub_expressions)
         # Convert the result to a signed integer since MySQL's binary operators
         # return an unsigned integer.
-        elif connector in ('&', '|', '<<'):
+        elif connector in ('&', '|', '<<', '#'):
+            connector = '^' if connector == '#' else connector
             return 'CONVERT(%s, SIGNED)' % connector.join(sub_expressions)
         elif connector == '>>':
             lhs, rhs = sub_expressions
@@ -281,23 +327,31 @@ class DatabaseOperations(BaseDatabaseOperations):
                 # a decimal. MySQL returns an integer without microseconds.
                 return 'CAST((TIME_TO_SEC(%(lhs)s) - TIME_TO_SEC(%(rhs)s)) * 1000000 AS SIGNED)' % {
                     'lhs': lhs_sql, 'rhs': rhs_sql
-                }, lhs_params + rhs_params
+                }, (*lhs_params, *rhs_params)
             return (
                 "((TIME_TO_SEC(%(lhs)s) * 1000000 + MICROSECOND(%(lhs)s)) -"
                 " (TIME_TO_SEC(%(rhs)s) * 1000000 + MICROSECOND(%(rhs)s)))"
-            ) % {'lhs': lhs_sql, 'rhs': rhs_sql}, lhs_params * 2 + rhs_params * 2
-        else:
-            return "TIMESTAMPDIFF(MICROSECOND, %s, %s)" % (rhs_sql, lhs_sql), rhs_params + lhs_params
+            ) % {'lhs': lhs_sql, 'rhs': rhs_sql}, tuple(lhs_params) * 2 + tuple(rhs_params) * 2
+        params = (*rhs_params, *lhs_params)
+        return "TIMESTAMPDIFF(MICROSECOND, %s, %s)" % (rhs_sql, lhs_sql), params
 
     def explain_query_prefix(self, format=None, **options):
         # Alias MySQL's TRADITIONAL to TEXT for consistency with other backends.
         if format and format.upper() == 'TEXT':
             format = 'TRADITIONAL'
+        elif not format and 'TREE' in self.connection.features.supported_explain_formats:
+            # Use TREE by default (if supported) as it's more informative.
+            format = 'TREE'
+        analyze = options.pop('analyze', False)
         prefix = super().explain_query_prefix(format, **options)
-        if format:
+        if analyze and self.connection.features.supports_explain_analyze:
+            # MariaDB uses ANALYZE instead of EXPLAIN ANALYZE.
+            prefix = 'ANALYZE' if self.connection.mysql_is_mariadb else prefix + ' ANALYZE'
+        if format and not (analyze and not self.connection.mysql_is_mariadb):
+            # Only MariaDB supports the analyze option with formats.
             prefix += ' FORMAT=%s' % format
-        if self.connection.features.needs_explain_extended and format is None:
-            # EXTENDED and FORMAT are mutually exclusive options.
+        if self.connection.features.needs_explain_extended and not analyze and format is None:
+            # ANALYZE, EXTENDED, and FORMAT are mutually exclusive options.
             prefix += ' EXTENDED'
         return prefix
 

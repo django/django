@@ -20,7 +20,7 @@ urlpatterns += [
         gis_sitemap_views.kml,
         name='django.contrib.gis.sitemaps.views.kml'),
     path(
-        'sitemaps/kml/<label>/<<model>/<field_name>.kmz',
+        'sitemaps/kml/<label>/<model>/<field_name>.kmz',
         gis_sitemap_views.kmz,
         name='django.contrib.gis.sitemaps.views.kmz'),
 ]

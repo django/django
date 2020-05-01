@@ -15,8 +15,6 @@ from urllib.parse import urlsplit, urlunsplit
 
 from django.core import validators
 from django.core.exceptions import ValidationError
-# Provide this import for backwards compatibility.
-from django.core.validators import EMPTY_VALUES  # NOQA
 from django.forms.boundfield import BoundField
 from django.forms.utils import from_current_timezone, to_current_timezone
 from django.forms.widgets import (
@@ -27,9 +25,10 @@ from django.forms.widgets import (
     URLInput,
 )
 from django.utils import formats
-from django.utils.dateparse import parse_duration
+from django.utils.dateparse import parse_datetime, parse_duration
 from django.utils.duration import duration_string
 from django.utils.ipv6 import clean_ipv6_address
+from django.utils.regex_helper import _lazy_re_compile
 from django.utils.translation import gettext_lazy as _, ngettext_lazy
 
 __all__ = (
@@ -201,6 +200,7 @@ class Field:
         result = copy.copy(self)
         memo[id(self)] = result
         result.widget = copy.deepcopy(self.widget, memo)
+        result.error_messages = self.error_messages.copy()
         result.validators = self.validators[:]
         return result
 
@@ -244,7 +244,7 @@ class IntegerField(Field):
     default_error_messages = {
         'invalid': _('Enter a whole number.'),
     }
-    re_decimal = re.compile(r'\.0*\s*$')
+    re_decimal = _lazy_re_compile(r'\.0*\s*$')
 
     def __init__(self, *, max_value=None, min_value=None, **kwargs):
         self.max_value, self.min_value = max_value, min_value
@@ -435,9 +435,15 @@ class TimeField(BaseTemporalField):
         return datetime.datetime.strptime(value, format).time()
 
 
+class DateTimeFormatsIterator:
+    def __iter__(self):
+        yield from formats.get_format('DATETIME_INPUT_FORMATS')
+        yield from formats.get_format('DATE_INPUT_FORMATS')
+
+
 class DateTimeField(BaseTemporalField):
     widget = DateTimeInput
-    input_formats = formats.get_format_lazy('DATETIME_INPUT_FORMATS')
+    input_formats = DateTimeFormatsIterator()
     default_error_messages = {
         'invalid': _('Enter a valid date/time.'),
     }
@@ -459,7 +465,12 @@ class DateTimeField(BaseTemporalField):
         if isinstance(value, datetime.date):
             result = datetime.datetime(value.year, value.month, value.day)
             return from_current_timezone(result)
-        result = super().to_python(value)
+        try:
+            result = parse_datetime(value.strip())
+        except ValueError:
+            raise ValidationError(self.error_messages['invalid'], code='invalid')
+        if not result:
+            result = super().to_python(value)
         return from_current_timezone(result)
 
     def strptime(self, value, format):

@@ -1,7 +1,6 @@
 import json
 
-from django.db.models import CharField
-from django.db.models.expressions import F, OuterRef, Subquery, Value
+from django.db.models import CharField, F, OuterRef, Q, Subquery, Value
 from django.db.models.functions import Cast, Concat, Substr
 from django.test.utils import Approximate
 
@@ -21,7 +20,7 @@ except ImportError:
 class TestGeneralAggregate(PostgreSQLTestCase):
     @classmethod
     def setUpTestData(cls):
-        AggregateTestModel.objects.create(boolean_field=True, char_field='Foo1', integer_field=0)
+        cls.agg1 = AggregateTestModel.objects.create(boolean_field=True, char_field='Foo1', integer_field=0)
         AggregateTestModel.objects.create(boolean_field=False, char_field='Foo2', integer_field=1)
         AggregateTestModel.objects.create(boolean_field=False, char_field='Foo4', integer_field=2)
         AggregateTestModel.objects.create(boolean_field=True, char_field='Foo3', integer_field=0)
@@ -79,6 +78,12 @@ class TestGeneralAggregate(PostgreSQLTestCase):
                     arrayagg=ArrayAgg('boolean_field', ordering=ordering)
                 )
                 self.assertEqual(values, {'arrayagg': expected_output})
+
+    def test_array_agg_filter(self):
+        values = AggregateTestModel.objects.aggregate(
+            arrayagg=ArrayAgg('integer_field', filter=Q(integer_field__gt=0)),
+        )
+        self.assertEqual(values, {'arrayagg': [1, 2]})
 
     def test_array_agg_empty_result(self):
         AggregateTestModel.objects.all().delete()
@@ -163,6 +168,10 @@ class TestGeneralAggregate(PostgreSQLTestCase):
         with self.assertRaises(TypeError):
             AggregateTestModel.objects.aggregate(stringagg=StringAgg('char_field'))
 
+    def test_string_agg_delimiter_escaping(self):
+        values = AggregateTestModel.objects.aggregate(stringagg=StringAgg('char_field', delimiter="'"))
+        self.assertEqual(values, {'stringagg': "Foo1'Foo2'Foo4'Foo3"})
+
     def test_string_agg_charfield(self):
         values = AggregateTestModel.objects.aggregate(stringagg=StringAgg('char_field', delimiter=';'))
         self.assertEqual(values, {'stringagg': 'Foo1;Foo2;Foo4;Foo3'})
@@ -183,6 +192,16 @@ class TestGeneralAggregate(PostgreSQLTestCase):
                     stringagg=StringAgg('char_field', delimiter=';', ordering=ordering)
                 )
                 self.assertEqual(values, {'stringagg': expected_output})
+
+    def test_string_agg_filter(self):
+        values = AggregateTestModel.objects.aggregate(
+            stringagg=StringAgg(
+                'char_field',
+                delimiter=';',
+                filter=Q(char_field__endswith='3') | Q(char_field__endswith='1'),
+            )
+        )
+        self.assertEqual(values, {'stringagg': 'Foo1;Foo3'})
 
     def test_string_agg_empty_result(self):
         AggregateTestModel.objects.all().delete()
@@ -232,6 +251,50 @@ class TestGeneralAggregate(PostgreSQLTestCase):
                     agg=Subquery(subquery),
                 ).order_by('char_field').values_list('char_field', 'agg')
                 self.assertEqual(list(values), expected_result)
+
+    def test_string_agg_array_agg_filter_in_subquery(self):
+        StatTestModel.objects.bulk_create([
+            StatTestModel(related_field=self.agg1, int1=0, int2=5),
+            StatTestModel(related_field=self.agg1, int1=1, int2=4),
+            StatTestModel(related_field=self.agg1, int1=2, int2=3),
+        ])
+        for aggregate, expected_result in (
+            (
+                ArrayAgg('stattestmodel__int1', filter=Q(stattestmodel__int2__gt=3)),
+                [('Foo1', [0, 1]), ('Foo2', None)],
+            ),
+            (
+                StringAgg(
+                    Cast('stattestmodel__int2', CharField()),
+                    delimiter=';',
+                    filter=Q(stattestmodel__int1__lt=2),
+                ),
+                [('Foo1', '5;4'), ('Foo2', None)],
+            ),
+        ):
+            with self.subTest(aggregate=aggregate.__class__.__name__):
+                subquery = AggregateTestModel.objects.filter(
+                    pk=OuterRef('pk'),
+                ).annotate(agg=aggregate).values('agg')
+                values = AggregateTestModel.objects.annotate(
+                    agg=Subquery(subquery),
+                ).filter(
+                    char_field__in=['Foo1', 'Foo2'],
+                ).order_by('char_field').values_list('char_field', 'agg')
+                self.assertEqual(list(values), expected_result)
+
+    def test_string_agg_filter_in_subquery_with_exclude(self):
+        subquery = AggregateTestModel.objects.annotate(
+            stringagg=StringAgg(
+                'char_field',
+                delimiter=';',
+                filter=Q(char_field__endswith='1'),
+            )
+        ).exclude(stringagg='').values('id')
+        self.assertSequenceEqual(
+            AggregateTestModel.objects.filter(id__in=Subquery(subquery)),
+            [self.agg1],
+        )
 
 
 class TestAggregateDistinct(PostgreSQLTestCase):

@@ -1,170 +1,19 @@
 from django.core.exceptions import FieldDoesNotExist
-from django.db import connection, migrations, models, transaction
+from django.db import (
+    IntegrityError, connection, migrations, models, transaction,
+)
 from django.db.migrations.migration import Migration
-from django.db.migrations.operations import CreateModel
 from django.db.migrations.operations.fields import FieldOperation
 from django.db.migrations.state import ModelState, ProjectState
-from django.db.models.fields import NOT_PROVIDED
 from django.db.transaction import atomic
-from django.db.utils import IntegrityError
 from django.test import SimpleTestCase, override_settings, skipUnlessDBFeature
 
 from .models import FoodManager, FoodQuerySet, UnicodeModel
-from .test_base import MigrationTestBase
+from .test_base import OperationTestBase
 
 
 class Mixin:
     pass
-
-
-class OperationTestBase(MigrationTestBase):
-    """
-    Common functions to help test operations.
-    """
-
-    @classmethod
-    def setUpClass(cls):
-        super().setUpClass()
-        cls._initial_table_names = frozenset(connection.introspection.table_names())
-
-    def tearDown(self):
-        self.cleanup_test_tables()
-        super().tearDown()
-
-    def cleanup_test_tables(self):
-        table_names = frozenset(connection.introspection.table_names()) - self._initial_table_names
-        with connection.schema_editor() as editor:
-            with connection.constraint_checks_disabled():
-                for table_name in table_names:
-                    editor.execute(editor.sql_delete_table % {
-                        'table': editor.quote_name(table_name),
-                    })
-
-    def apply_operations(self, app_label, project_state, operations, atomic=True):
-        migration = Migration('name', app_label)
-        migration.operations = operations
-        with connection.schema_editor(atomic=atomic) as editor:
-            return migration.apply(project_state, editor)
-
-    def unapply_operations(self, app_label, project_state, operations, atomic=True):
-        migration = Migration('name', app_label)
-        migration.operations = operations
-        with connection.schema_editor(atomic=atomic) as editor:
-            return migration.unapply(project_state, editor)
-
-    def make_test_state(self, app_label, operation, **kwargs):
-        """
-        Makes a test state using set_up_test_model and returns the
-        original state and the state after the migration is applied.
-        """
-        project_state = self.set_up_test_model(app_label, **kwargs)
-        new_state = project_state.clone()
-        operation.state_forwards(app_label, new_state)
-        return project_state, new_state
-
-    def set_up_test_model(
-            self, app_label, second_model=False, third_model=False, index=False, multicol_index=False,
-            related_model=False, mti_model=False, proxy_model=False, manager_model=False,
-            unique_together=False, options=False, db_table=None, index_together=False, constraints=None):
-        """
-        Creates a test model state and database table.
-        """
-        # Make the "current" state
-        model_options = {
-            "swappable": "TEST_SWAP_MODEL",
-            "index_together": [["weight", "pink"]] if index_together else [],
-            "unique_together": [["pink", "weight"]] if unique_together else [],
-        }
-        if options:
-            model_options["permissions"] = [("can_groom", "Can groom")]
-        if db_table:
-            model_options["db_table"] = db_table
-        operations = [migrations.CreateModel(
-            "Pony",
-            [
-                ("id", models.AutoField(primary_key=True)),
-                ("pink", models.IntegerField(default=3)),
-                ("weight", models.FloatField()),
-            ],
-            options=model_options,
-        )]
-        if index:
-            operations.append(migrations.AddIndex(
-                "Pony",
-                models.Index(fields=["pink"], name="pony_pink_idx")
-            ))
-        if multicol_index:
-            operations.append(migrations.AddIndex(
-                "Pony",
-                models.Index(fields=["pink", "weight"], name="pony_test_idx")
-            ))
-        if constraints:
-            for constraint in constraints:
-                operations.append(migrations.AddConstraint(
-                    "Pony",
-                    constraint,
-                ))
-        if second_model:
-            operations.append(migrations.CreateModel(
-                "Stable",
-                [
-                    ("id", models.AutoField(primary_key=True)),
-                ]
-            ))
-        if third_model:
-            operations.append(migrations.CreateModel(
-                "Van",
-                [
-                    ("id", models.AutoField(primary_key=True)),
-                ]
-            ))
-        if related_model:
-            operations.append(migrations.CreateModel(
-                "Rider",
-                [
-                    ("id", models.AutoField(primary_key=True)),
-                    ("pony", models.ForeignKey("Pony", models.CASCADE)),
-                    ("friend", models.ForeignKey("self", models.CASCADE))
-                ],
-            ))
-        if mti_model:
-            operations.append(migrations.CreateModel(
-                "ShetlandPony",
-                fields=[
-                    ('pony_ptr', models.OneToOneField(
-                        'Pony',
-                        models.CASCADE,
-                        auto_created=True,
-                        parent_link=True,
-                        primary_key=True,
-                        to_field='id',
-                        serialize=False,
-                    )),
-                    ("cuteness", models.IntegerField(default=1)),
-                ],
-                bases=['%s.Pony' % app_label],
-            ))
-        if proxy_model:
-            operations.append(migrations.CreateModel(
-                "ProxyPony",
-                fields=[],
-                options={"proxy": True},
-                bases=['%s.Pony' % app_label],
-            ))
-        if manager_model:
-            operations.append(migrations.CreateModel(
-                "Food",
-                fields=[
-                    ("id", models.AutoField(primary_key=True)),
-                ],
-                managers=[
-                    ("food_qs", FoodQuerySet.as_manager()),
-                    ("food_mgr", FoodManager("a", "b")),
-                    ("food_mgr_kwargs", FoodManager("x", "y", 3, 4)),
-                ]
-            ))
-
-        return self.apply_operations(app_label, ProjectState(), operations)
 
 
 class OperationTests(OperationTestBase):
@@ -544,6 +393,60 @@ class OperationTests(OperationTestBase):
         self.assertEqual(definition[1], [])
         self.assertEqual(definition[2]['options']['constraints'], [partial_unique_constraint])
 
+    def test_create_model_with_deferred_unique_constraint(self):
+        deferred_unique_constraint = models.UniqueConstraint(
+            fields=['pink'],
+            name='deferrable_pink_constraint',
+            deferrable=models.Deferrable.DEFERRED,
+        )
+        operation = migrations.CreateModel(
+            'Pony',
+            [
+                ('id', models.AutoField(primary_key=True)),
+                ('pink', models.IntegerField(default=3)),
+            ],
+            options={'constraints': [deferred_unique_constraint]},
+        )
+        project_state = ProjectState()
+        new_state = project_state.clone()
+        operation.state_forwards('test_crmo', new_state)
+        self.assertEqual(len(new_state.models['test_crmo', 'pony'].options['constraints']), 1)
+        self.assertTableNotExists('test_crmo_pony')
+        # Create table.
+        with connection.schema_editor() as editor:
+            operation.database_forwards('test_crmo', editor, project_state, new_state)
+        self.assertTableExists('test_crmo_pony')
+        Pony = new_state.apps.get_model('test_crmo', 'Pony')
+        Pony.objects.create(pink=1)
+        if connection.features.supports_deferrable_unique_constraints:
+            # Unique constraint is deferred.
+            with transaction.atomic():
+                obj = Pony.objects.create(pink=1)
+                obj.pink = 2
+                obj.save()
+            # Constraint behavior can be changed with SET CONSTRAINTS.
+            with self.assertRaises(IntegrityError):
+                with transaction.atomic(), connection.cursor() as cursor:
+                    quoted_name = connection.ops.quote_name(deferred_unique_constraint.name)
+                    cursor.execute('SET CONSTRAINTS %s IMMEDIATE' % quoted_name)
+                    obj = Pony.objects.create(pink=1)
+                    obj.pink = 3
+                    obj.save()
+        else:
+            Pony.objects.create(pink=1)
+        # Reversal.
+        with connection.schema_editor() as editor:
+            operation.database_backwards('test_crmo', editor, new_state, project_state)
+        self.assertTableNotExists('test_crmo_pony')
+        # Deconstruction.
+        definition = operation.deconstruct()
+        self.assertEqual(definition[0], 'CreateModel')
+        self.assertEqual(definition[1], [])
+        self.assertEqual(
+            definition[2]['options']['constraints'],
+            [deferred_unique_constraint],
+        )
+
     def test_create_model_managers(self):
         """
         The managers on a model are set.
@@ -672,7 +575,10 @@ class OperationTests(OperationTestBase):
         self.assertNotIn(("test_rnmo", "pony"), new_state.models)
         self.assertIn(("test_rnmo", "horse"), new_state.models)
         # RenameModel also repoints all incoming FKs and M2Ms
-        self.assertEqual("test_rnmo.Horse", new_state.models["test_rnmo", "rider"].fields[1][1].remote_field.model)
+        self.assertEqual(
+            new_state.models['test_rnmo', 'rider'].fields['pony'].remote_field.model,
+            'test_rnmo.Horse',
+        )
         self.assertTableNotExists("test_rnmo_pony")
         self.assertTableExists("test_rnmo_horse")
         if connection.features.supports_foreign_keys:
@@ -683,7 +589,10 @@ class OperationTests(OperationTestBase):
         # Test original state and database
         self.assertIn(("test_rnmo", "pony"), original_state.models)
         self.assertNotIn(("test_rnmo", "horse"), original_state.models)
-        self.assertEqual("Pony", original_state.models["test_rnmo", "rider"].fields[1][1].remote_field.model)
+        self.assertEqual(
+            original_state.models['test_rnmo', 'rider'].fields['pony'].remote_field.model,
+            'Pony',
+        )
         self.assertTableExists("test_rnmo_pony")
         self.assertTableNotExists("test_rnmo_horse")
         if connection.features.supports_foreign_keys:
@@ -730,7 +639,7 @@ class OperationTests(OperationTestBase):
         # Remember, RenameModel also repoints all incoming FKs and M2Ms
         self.assertEqual(
             'self',
-            new_state.models["test_rmwsrf", "horserider"].fields[2][1].remote_field.model
+            new_state.models["test_rmwsrf", "horserider"].fields['friend'].remote_field.model
         )
         HorseRider = new_state.apps.get_model('test_rmwsrf', 'horserider')
         self.assertIs(HorseRider._meta.get_field('horserider').remote_field.model, HorseRider)
@@ -772,8 +681,8 @@ class OperationTests(OperationTestBase):
         self.assertIn(("test_rmwsc", "littlehorse"), new_state.models)
         # RenameModel shouldn't repoint the superclass's relations, only local ones
         self.assertEqual(
-            project_state.models["test_rmwsc", "rider"].fields[1][1].remote_field.model,
-            new_state.models["test_rmwsc", "rider"].fields[1][1].remote_field.model
+            project_state.models['test_rmwsc', 'rider'].fields['pony'].remote_field.model,
+            new_state.models['test_rmwsc', 'rider'].fields['pony'].remote_field.model,
         )
         # Before running the migration we have a table for Shetland Pony, not Little Horse
         self.assertTableExists("test_rmwsc_shetlandpony")
@@ -948,10 +857,7 @@ class OperationTests(OperationTestBase):
         self.assertEqual(operation.describe(), "Add field height to Pony")
         project_state, new_state = self.make_test_state("test_adfl", operation)
         self.assertEqual(len(new_state.models["test_adfl", "pony"].fields), 4)
-        field = [
-            f for n, f in new_state.models["test_adfl", "pony"].fields
-            if n == "height"
-        ][0]
+        field = new_state.models['test_adfl', 'pony'].fields['height']
         self.assertEqual(field.default, 5)
         # Test the database alteration
         self.assertColumnNotExists("test_adfl_pony", "height")
@@ -1125,11 +1031,8 @@ class OperationTests(OperationTestBase):
         new_state = project_state.clone()
         operation.state_forwards("test_adflpd", new_state)
         self.assertEqual(len(new_state.models["test_adflpd", "pony"].fields), 4)
-        field = [
-            f for n, f in new_state.models["test_adflpd", "pony"].fields
-            if n == "height"
-        ][0]
-        self.assertEqual(field.default, NOT_PROVIDED)
+        field = new_state.models['test_adflpd', 'pony'].fields['height']
+        self.assertEqual(field.default, models.NOT_PROVIDED)
         # Test the database alteration
         project_state.apps.get_model("test_adflpd", "pony").objects.create(
             weight=4,
@@ -1385,8 +1288,8 @@ class OperationTests(OperationTestBase):
         self.assertEqual(operation.describe(), "Alter field pink on Pony")
         new_state = project_state.clone()
         operation.state_forwards("test_alfl", new_state)
-        self.assertIs(project_state.models["test_alfl", "pony"].get_field_by_name("pink").null, False)
-        self.assertIs(new_state.models["test_alfl", "pony"].get_field_by_name("pink").null, True)
+        self.assertIs(project_state.models['test_alfl', 'pony'].fields['pink'].null, False)
+        self.assertIs(new_state.models['test_alfl', 'pony'].fields['pink'].null, True)
         # Test the database alteration
         self.assertColumnNotNull("test_alfl_pony", "pink")
         with connection.schema_editor() as editor:
@@ -1411,8 +1314,14 @@ class OperationTests(OperationTestBase):
         operation = migrations.AlterField("Pony", "id", models.IntegerField(primary_key=True))
         new_state = project_state.clone()
         operation.state_forwards("test_alflpk", new_state)
-        self.assertIsInstance(project_state.models["test_alflpk", "pony"].get_field_by_name("id"), models.AutoField)
-        self.assertIsInstance(new_state.models["test_alflpk", "pony"].get_field_by_name("id"), models.IntegerField)
+        self.assertIsInstance(
+            project_state.models['test_alflpk', 'pony'].fields['id'],
+            models.AutoField,
+        )
+        self.assertIsInstance(
+            new_state.models['test_alflpk', 'pony'].fields['id'],
+            models.IntegerField,
+        )
         # Test the database alteration
         with connection.schema_editor() as editor:
             operation.database_forwards("test_alflpk", editor, project_state, new_state)
@@ -1426,12 +1335,28 @@ class OperationTests(OperationTestBase):
         Tests the AlterField operation on primary keys changes any FKs pointing to it.
         """
         project_state = self.set_up_test_model("test_alflpkfk", related_model=True)
+        project_state = self.apply_operations('test_alflpkfk', project_state, [
+            migrations.CreateModel('Stable', fields=[
+                ('ponies', models.ManyToManyField('Pony')),
+            ]),
+            migrations.AddField(
+                'Pony',
+                'stables',
+                models.ManyToManyField('Stable'),
+            ),
+        ])
         # Test the state alteration
         operation = migrations.AlterField("Pony", "id", models.FloatField(primary_key=True))
         new_state = project_state.clone()
         operation.state_forwards("test_alflpkfk", new_state)
-        self.assertIsInstance(project_state.models["test_alflpkfk", "pony"].get_field_by_name("id"), models.AutoField)
-        self.assertIsInstance(new_state.models["test_alflpkfk", "pony"].get_field_by_name("id"), models.FloatField)
+        self.assertIsInstance(
+            project_state.models['test_alflpkfk', 'pony'].fields['id'],
+            models.AutoField,
+        )
+        self.assertIsInstance(
+            new_state.models['test_alflpkfk', 'pony'].fields['id'],
+            models.FloatField,
+        )
 
         def assertIdTypeEqualsFkType():
             with connection.cursor() as cursor:
@@ -1445,8 +1370,26 @@ class OperationTests(OperationTestBase):
                     for c in connection.introspection.get_table_description(cursor, "test_alflpkfk_rider")
                     if c.name == "pony_id"
                 ][0]
+                m2m_fk_type, m2m_fk_null = [
+                    (c.type_code, c.null_ok)
+                    for c in connection.introspection.get_table_description(
+                        cursor,
+                        'test_alflpkfk_pony_stables',
+                    ) if c.name == 'pony_id'
+                ][0]
+                remote_m2m_fk_type, remote_m2m_fk_null = [
+                    (c.type_code, c.null_ok)
+                    for c in connection.introspection.get_table_description(
+                        cursor,
+                        'test_alflpkfk_stable_ponies',
+                    ) if c.name == 'pony_id'
+                ][0]
             self.assertEqual(id_type, fk_type)
+            self.assertEqual(id_type, m2m_fk_type)
+            self.assertEqual(id_type, remote_m2m_fk_type)
             self.assertEqual(id_null, fk_null)
+            self.assertEqual(id_null, m2m_fk_null)
+            self.assertEqual(id_null, remote_m2m_fk_null)
 
         assertIdTypeEqualsFkType()
         # Test the database alteration
@@ -1457,6 +1400,63 @@ class OperationTests(OperationTestBase):
         with connection.schema_editor() as editor:
             operation.database_backwards("test_alflpkfk", editor, new_state, project_state)
         assertIdTypeEqualsFkType()
+
+    @skipUnlessDBFeature('supports_foreign_keys')
+    def test_alter_field_reloads_state_on_fk_with_to_field_target_type_change(self):
+        app_label = 'test_alflrsfkwtflttc'
+        project_state = self.apply_operations(app_label, ProjectState(), operations=[
+            migrations.CreateModel('Rider', fields=[
+                ('id', models.AutoField(primary_key=True)),
+                ('code', models.IntegerField(unique=True)),
+            ]),
+            migrations.CreateModel('Pony', fields=[
+                ('id', models.AutoField(primary_key=True)),
+                ('rider', models.ForeignKey('%s.Rider' % app_label, models.CASCADE, to_field='code')),
+            ]),
+        ])
+        operation = migrations.AlterField(
+            'Rider',
+            'code',
+            models.CharField(max_length=100, unique=True),
+        )
+        self.apply_operations(app_label, project_state, operations=[operation])
+        id_type, id_null = [
+            (c.type_code, c.null_ok)
+            for c in self.get_table_description('%s_rider' % app_label)
+            if c.name == 'code'
+        ][0]
+        fk_type, fk_null = [
+            (c.type_code, c.null_ok)
+            for c in self.get_table_description('%s_pony' % app_label)
+            if c.name == 'rider_id'
+        ][0]
+        self.assertEqual(id_type, fk_type)
+        self.assertEqual(id_null, fk_null)
+
+    @skipUnlessDBFeature('supports_foreign_keys')
+    def test_alter_field_reloads_state_on_fk_with_to_field_related_name_target_type_change(self):
+        app_label = 'test_alflrsfkwtflrnttc'
+        project_state = self.apply_operations(app_label, ProjectState(), operations=[
+            migrations.CreateModel('Rider', fields=[
+                ('id', models.AutoField(primary_key=True)),
+                ('code', models.PositiveIntegerField(unique=True)),
+            ]),
+            migrations.CreateModel('Pony', fields=[
+                ('id', models.AutoField(primary_key=True)),
+                ('rider', models.ForeignKey(
+                    '%s.Rider' % app_label,
+                    models.CASCADE,
+                    to_field='code',
+                    related_name='+',
+                )),
+            ]),
+        ])
+        operation = migrations.AlterField(
+            'Rider',
+            'code',
+            models.CharField(max_length=100, unique=True),
+        )
+        self.apply_operations(app_label, project_state, operations=[operation])
 
     def test_alter_field_reloads_state_on_fk_target_changes(self):
         """
@@ -1545,8 +1545,8 @@ class OperationTests(OperationTestBase):
         self.assertEqual(operation.describe(), "Rename field pink on Pony to blue")
         new_state = project_state.clone()
         operation.state_forwards("test_rnfl", new_state)
-        self.assertIn("blue", [n for n, f in new_state.models["test_rnfl", "pony"].fields])
-        self.assertNotIn("pink", [n for n, f in new_state.models["test_rnfl", "pony"].fields])
+        self.assertIn("blue", new_state.models["test_rnfl", "pony"].fields)
+        self.assertNotIn("pink", new_state.models["test_rnfl", "pony"].fields)
         # Make sure the unique_together has the renamed column too
         self.assertIn("blue", new_state.models["test_rnfl", "pony"].options['unique_together'][0])
         self.assertNotIn("pink", new_state.models["test_rnfl", "pony"].options['unique_together'][0])
@@ -1602,19 +1602,19 @@ class OperationTests(OperationTestBase):
         operation = migrations.RenameField('Model', 'field', 'renamed')
         new_state = state.clone()
         operation.state_forwards('app', new_state)
-        self.assertEqual(new_state.models['app', 'othermodel'].fields[1][1].remote_field.field_name, 'renamed')
-        self.assertEqual(new_state.models['app', 'othermodel'].fields[1][1].from_fields, ['self'])
-        self.assertEqual(new_state.models['app', 'othermodel'].fields[1][1].to_fields, ('renamed',))
-        self.assertEqual(new_state.models['app', 'othermodel'].fields[2][1].from_fields, ('fk',))
-        self.assertEqual(new_state.models['app', 'othermodel'].fields[2][1].to_fields, ('renamed',))
+        self.assertEqual(new_state.models['app', 'othermodel'].fields['fk'].remote_field.field_name, 'renamed')
+        self.assertEqual(new_state.models['app', 'othermodel'].fields['fk'].from_fields, ['self'])
+        self.assertEqual(new_state.models['app', 'othermodel'].fields['fk'].to_fields, ('renamed',))
+        self.assertEqual(new_state.models['app', 'othermodel'].fields['fo'].from_fields, ('fk',))
+        self.assertEqual(new_state.models['app', 'othermodel'].fields['fo'].to_fields, ('renamed',))
         operation = migrations.RenameField('OtherModel', 'fk', 'renamed_fk')
         new_state = state.clone()
         operation.state_forwards('app', new_state)
-        self.assertEqual(new_state.models['app', 'othermodel'].fields[1][1].remote_field.field_name, 'renamed')
-        self.assertEqual(new_state.models['app', 'othermodel'].fields[1][1].from_fields, ('self',))
-        self.assertEqual(new_state.models['app', 'othermodel'].fields[1][1].to_fields, ('renamed',))
-        self.assertEqual(new_state.models['app', 'othermodel'].fields[2][1].from_fields, ('renamed_fk',))
-        self.assertEqual(new_state.models['app', 'othermodel'].fields[2][1].to_fields, ('renamed',))
+        self.assertEqual(new_state.models['app', 'othermodel'].fields['renamed_fk'].remote_field.field_name, 'renamed')
+        self.assertEqual(new_state.models['app', 'othermodel'].fields['renamed_fk'].from_fields, ('self',))
+        self.assertEqual(new_state.models['app', 'othermodel'].fields['renamed_fk'].to_fields, ('renamed',))
+        self.assertEqual(new_state.models['app', 'othermodel'].fields['fo'].from_fields, ('renamed_fk',))
+        self.assertEqual(new_state.models['app', 'othermodel'].fields['fo'].to_fields, ('renamed',))
 
     def test_alter_unique_together(self):
         """
@@ -1813,6 +1813,29 @@ class OperationTests(OperationTestBase):
         operation = migrations.AlterIndexTogether("Pony", None)
         self.assertEqual(operation.describe(), "Alter index_together for Pony (0 constraint(s))")
 
+    @skipUnlessDBFeature('allows_multiple_constraints_on_same_fields')
+    def test_alter_index_together_remove_with_unique_together(self):
+        app_label = 'test_alintoremove_wunto'
+        table_name = '%s_pony' % app_label
+        project_state = self.set_up_test_model(app_label, unique_together=True)
+        self.assertUniqueConstraintExists(table_name, ['pink', 'weight'])
+        # Add index together.
+        new_state = project_state.clone()
+        operation = migrations.AlterIndexTogether('Pony', [('pink', 'weight')])
+        operation.state_forwards(app_label, new_state)
+        with connection.schema_editor() as editor:
+            operation.database_forwards(app_label, editor, project_state, new_state)
+        self.assertIndexExists(table_name, ['pink', 'weight'])
+        # Remove index together.
+        project_state = new_state
+        new_state = project_state.clone()
+        operation = migrations.AlterIndexTogether('Pony', set())
+        operation.state_forwards(app_label, new_state)
+        with connection.schema_editor() as editor:
+            operation.database_forwards(app_label, editor, project_state, new_state)
+        self.assertIndexNotExists(table_name, ['pink', 'weight'])
+        self.assertUniqueConstraintExists(table_name, ['pink', 'weight'])
+
     @skipUnlessDBFeature('supports_table_check_constraints')
     def test_add_constraint(self):
         project_state = self.set_up_test_model("test_addconstraint")
@@ -1859,7 +1882,7 @@ class OperationTests(OperationTestBase):
     def test_add_constraint_percent_escaping(self):
         app_label = 'add_constraint_string_quoting'
         operations = [
-            CreateModel(
+            migrations.CreateModel(
                 'Author',
                 fields=[
                     ('id', models.AutoField(primary_key=True)),
@@ -1920,6 +1943,34 @@ class OperationTests(OperationTestBase):
             Pony(pink=1, weight=-1.0),
             Pony(pink=3, weight=3.0),
         ])
+
+    @skipUnlessDBFeature('supports_table_check_constraints')
+    def test_add_constraint_combinable(self):
+        app_label = 'test_addconstraint_combinable'
+        operations = [
+            migrations.CreateModel(
+                'Book',
+                fields=[
+                    ('id', models.AutoField(primary_key=True)),
+                    ('read', models.PositiveIntegerField()),
+                    ('unread', models.PositiveIntegerField()),
+                ],
+            ),
+        ]
+        from_state = self.apply_operations(app_label, ProjectState(), operations)
+        constraint = models.CheckConstraint(
+            check=models.Q(read=(100 - models.F('unread'))),
+            name='test_addconstraint_combinable_sum_100',
+        )
+        operation = migrations.AddConstraint('Book', constraint)
+        to_state = from_state.clone()
+        operation.state_forwards(app_label, to_state)
+        with connection.schema_editor() as editor:
+            operation.database_forwards(app_label, editor, from_state, to_state)
+        Book = to_state.apps.get_model(app_label, 'Book')
+        with self.assertRaises(IntegrityError), transaction.atomic():
+            Book.objects.create(read=70, unread=10)
+        Book.objects.create(read=70, unread=30)
 
     @skipUnlessDBFeature('supports_table_check_constraints')
     def test_remove_constraint(self):
@@ -2047,6 +2098,110 @@ class OperationTests(OperationTestBase):
         self.assertEqual(definition[2], {
             'model_name': 'Pony',
             'name': 'test_constraint_pony_pink_for_weight_gt_5_uniq',
+        })
+
+    def test_add_deferred_unique_constraint(self):
+        app_label = 'test_adddeferred_uc'
+        project_state = self.set_up_test_model(app_label)
+        deferred_unique_constraint = models.UniqueConstraint(
+            fields=['pink'],
+            name='deferred_pink_constraint_add',
+            deferrable=models.Deferrable.DEFERRED,
+        )
+        operation = migrations.AddConstraint('Pony', deferred_unique_constraint)
+        self.assertEqual(
+            operation.describe(),
+            'Create constraint deferred_pink_constraint_add on model Pony',
+        )
+        # Add constraint.
+        new_state = project_state.clone()
+        operation.state_forwards(app_label, new_state)
+        self.assertEqual(len(new_state.models[app_label, 'pony'].options['constraints']), 1)
+        Pony = new_state.apps.get_model(app_label, 'Pony')
+        self.assertEqual(len(Pony._meta.constraints), 1)
+        with connection.schema_editor() as editor:
+            operation.database_forwards(app_label, editor, project_state, new_state)
+        Pony.objects.create(pink=1, weight=4.0)
+        if connection.features.supports_deferrable_unique_constraints:
+            # Unique constraint is deferred.
+            with transaction.atomic():
+                obj = Pony.objects.create(pink=1, weight=4.0)
+                obj.pink = 2
+                obj.save()
+            # Constraint behavior can be changed with SET CONSTRAINTS.
+            with self.assertRaises(IntegrityError):
+                with transaction.atomic(), connection.cursor() as cursor:
+                    quoted_name = connection.ops.quote_name(deferred_unique_constraint.name)
+                    cursor.execute('SET CONSTRAINTS %s IMMEDIATE' % quoted_name)
+                    obj = Pony.objects.create(pink=1, weight=4.0)
+                    obj.pink = 3
+                    obj.save()
+        else:
+            Pony.objects.create(pink=1, weight=4.0)
+        # Reversal.
+        with connection.schema_editor() as editor:
+            operation.database_backwards(app_label, editor, new_state, project_state)
+        # Constraint doesn't work.
+        Pony.objects.create(pink=1, weight=4.0)
+        # Deconstruction.
+        definition = operation.deconstruct()
+        self.assertEqual(definition[0], 'AddConstraint')
+        self.assertEqual(definition[1], [])
+        self.assertEqual(
+            definition[2],
+            {'model_name': 'Pony', 'constraint': deferred_unique_constraint},
+        )
+
+    def test_remove_deferred_unique_constraint(self):
+        app_label = 'test_removedeferred_uc'
+        deferred_unique_constraint = models.UniqueConstraint(
+            fields=['pink'],
+            name='deferred_pink_constraint_rm',
+            deferrable=models.Deferrable.DEFERRED,
+        )
+        project_state = self.set_up_test_model(app_label, constraints=[deferred_unique_constraint])
+        operation = migrations.RemoveConstraint('Pony', deferred_unique_constraint.name)
+        self.assertEqual(
+            operation.describe(),
+            'Remove constraint deferred_pink_constraint_rm from model Pony',
+        )
+        # Remove constraint.
+        new_state = project_state.clone()
+        operation.state_forwards(app_label, new_state)
+        self.assertEqual(len(new_state.models[app_label, 'pony'].options['constraints']), 0)
+        Pony = new_state.apps.get_model(app_label, 'Pony')
+        self.assertEqual(len(Pony._meta.constraints), 0)
+        with connection.schema_editor() as editor:
+            operation.database_forwards(app_label, editor, project_state, new_state)
+        # Constraint doesn't work.
+        Pony.objects.create(pink=1, weight=4.0)
+        Pony.objects.create(pink=1, weight=4.0).delete()
+        # Reversal.
+        with connection.schema_editor() as editor:
+            operation.database_backwards(app_label, editor, new_state, project_state)
+        if connection.features.supports_deferrable_unique_constraints:
+            # Unique constraint is deferred.
+            with transaction.atomic():
+                obj = Pony.objects.create(pink=1, weight=4.0)
+                obj.pink = 2
+                obj.save()
+            # Constraint behavior can be changed with SET CONSTRAINTS.
+            with self.assertRaises(IntegrityError):
+                with transaction.atomic(), connection.cursor() as cursor:
+                    quoted_name = connection.ops.quote_name(deferred_unique_constraint.name)
+                    cursor.execute('SET CONSTRAINTS %s IMMEDIATE' % quoted_name)
+                    obj = Pony.objects.create(pink=1, weight=4.0)
+                    obj.pink = 3
+                    obj.save()
+        else:
+            Pony.objects.create(pink=1, weight=4.0)
+        # Deconstruction.
+        definition = operation.deconstruct()
+        self.assertEqual(definition[0], 'RemoveConstraint')
+        self.assertEqual(definition[1], [])
+        self.assertEqual(definition[2], {
+            'model_name': 'Pony',
+            'name': 'deferred_pink_constraint_rm',
         })
 
     def test_alter_model_options(self):
@@ -2651,9 +2806,13 @@ class OperationTests(OperationTestBase):
             fill_data.state_forwards("fill_data", new_state)
             fill_data.database_forwards("fill_data", editor, project_state, new_state)
 
-    def test_autofield_foreignfield_growth(self):
+    def _test_autofield_foreignfield_growth(self, source_field, target_field, target_value):
         """
-        A field may be migrated from AutoField to BigAutoField.
+        A field may be migrated in the following ways:
+
+        - AutoField to BigAutoField
+        - SmallAutoField to AutoField
+        - SmallAutoField to BigAutoField
         """
         def create_initial_data(models, schema_editor):
             Article = models.get_model("test_article", "Article")
@@ -2665,14 +2824,14 @@ class OperationTests(OperationTestBase):
         def create_big_data(models, schema_editor):
             Article = models.get_model("test_article", "Article")
             Blog = models.get_model("test_blog", "Blog")
-            blog2 = Blog.objects.create(name="Frameworks", id=2 ** 33)
+            blog2 = Blog.objects.create(name="Frameworks", id=target_value)
             Article.objects.create(name="Django", blog=blog2)
-            Article.objects.create(id=2 ** 33, name="Django2", blog=blog2)
+            Article.objects.create(id=target_value, name="Django2", blog=blog2)
 
         create_blog = migrations.CreateModel(
             "Blog",
             [
-                ("id", models.AutoField(primary_key=True)),
+                ("id", source_field(primary_key=True)),
                 ("name", models.CharField(max_length=100)),
             ],
             options={},
@@ -2680,7 +2839,7 @@ class OperationTests(OperationTestBase):
         create_article = migrations.CreateModel(
             "Article",
             [
-                ("id", models.AutoField(primary_key=True)),
+                ("id", source_field(primary_key=True)),
                 ("blog", models.ForeignKey(to="test_blog.Blog", on_delete=models.CASCADE)),
                 ("name", models.CharField(max_length=100)),
                 ("data", models.TextField(default="")),
@@ -2690,8 +2849,8 @@ class OperationTests(OperationTestBase):
         fill_initial_data = migrations.RunPython(create_initial_data, create_initial_data)
         fill_big_data = migrations.RunPython(create_big_data, create_big_data)
 
-        grow_article_id = migrations.AlterField("Article", "id", models.BigAutoField(primary_key=True))
-        grow_blog_id = migrations.AlterField("Blog", "id", models.BigAutoField(primary_key=True))
+        grow_article_id = migrations.AlterField('Article', 'id', target_field(primary_key=True))
+        grow_blog_id = migrations.AlterField('Blog', 'id', target_field(primary_key=True))
 
         project_state = ProjectState()
         new_state = project_state.clone()
@@ -2719,7 +2878,7 @@ class OperationTests(OperationTestBase):
 
         state = new_state.clone()
         article = state.apps.get_model("test_article.Article")
-        self.assertIsInstance(article._meta.pk, models.BigAutoField)
+        self.assertIsInstance(article._meta.pk, target_field)
 
         project_state = new_state
         new_state = new_state.clone()
@@ -2729,13 +2888,37 @@ class OperationTests(OperationTestBase):
 
         state = new_state.clone()
         blog = state.apps.get_model("test_blog.Blog")
-        self.assertIsInstance(blog._meta.pk, models.BigAutoField)
+        self.assertIsInstance(blog._meta.pk, target_field)
 
         project_state = new_state
         new_state = new_state.clone()
         with connection.schema_editor() as editor:
             fill_big_data.state_forwards("fill_big_data", new_state)
             fill_big_data.database_forwards("fill_big_data", editor, project_state, new_state)
+
+    def test_autofield__bigautofield_foreignfield_growth(self):
+        """A field may be migrated from AutoField to BigAutoField."""
+        self._test_autofield_foreignfield_growth(
+            models.AutoField,
+            models.BigAutoField,
+            2 ** 33,
+        )
+
+    def test_smallfield_autofield_foreignfield_growth(self):
+        """A field may be migrated from SmallAutoField to AutoField."""
+        self._test_autofield_foreignfield_growth(
+            models.SmallAutoField,
+            models.AutoField,
+            2 ** 22,
+        )
+
+    def test_smallfield_bigautofield_foreignfield_growth(self):
+        """A field may be migrated from SmallAutoField to BigAutoField."""
+        self._test_autofield_foreignfield_growth(
+            models.SmallAutoField,
+            models.BigAutoField,
+            2 ** 33,
+        )
 
     def test_run_python_noop(self):
         """
@@ -2966,54 +3149,58 @@ class SwappableOperationTests(OperationTestBase):
 class TestCreateModel(SimpleTestCase):
 
     def test_references_model_mixin(self):
-        CreateModel('name', [], bases=(Mixin, models.Model)).references_model('other_model')
+        migrations.CreateModel(
+            'name',
+            fields=[],
+            bases=(Mixin, models.Model),
+        ).references_model('other_model', 'migrations')
 
 
 class FieldOperationTests(SimpleTestCase):
     def test_references_model(self):
         operation = FieldOperation('MoDel', 'field', models.ForeignKey('Other', models.CASCADE))
         # Model name match.
-        self.assertIs(operation.references_model('mOdEl'), True)
+        self.assertIs(operation.references_model('mOdEl', 'migrations'), True)
         # Referenced field.
-        self.assertIs(operation.references_model('oTher'), True)
+        self.assertIs(operation.references_model('oTher', 'migrations'), True)
         # Doesn't reference.
-        self.assertIs(operation.references_model('Whatever'), False)
+        self.assertIs(operation.references_model('Whatever', 'migrations'), False)
 
     def test_references_field_by_name(self):
         operation = FieldOperation('MoDel', 'field', models.BooleanField(default=False))
-        self.assertIs(operation.references_field('model', 'field'), True)
+        self.assertIs(operation.references_field('model', 'field', 'migrations'), True)
 
     def test_references_field_by_remote_field_model(self):
         operation = FieldOperation('Model', 'field', models.ForeignKey('Other', models.CASCADE))
-        self.assertIs(operation.references_field('Other', 'whatever'), True)
-        self.assertIs(operation.references_field('Missing', 'whatever'), False)
+        self.assertIs(operation.references_field('Other', 'whatever', 'migrations'), True)
+        self.assertIs(operation.references_field('Missing', 'whatever', 'migrations'), False)
 
     def test_references_field_by_from_fields(self):
         operation = FieldOperation(
             'Model', 'field', models.fields.related.ForeignObject('Other', models.CASCADE, ['from'], ['to'])
         )
-        self.assertIs(operation.references_field('Model', 'from'), True)
-        self.assertIs(operation.references_field('Model', 'to'), False)
-        self.assertIs(operation.references_field('Other', 'from'), False)
-        self.assertIs(operation.references_field('Model', 'to'), False)
+        self.assertIs(operation.references_field('Model', 'from', 'migrations'), True)
+        self.assertIs(operation.references_field('Model', 'to', 'migrations'), False)
+        self.assertIs(operation.references_field('Other', 'from', 'migrations'), False)
+        self.assertIs(operation.references_field('Model', 'to', 'migrations'), False)
 
     def test_references_field_by_to_fields(self):
         operation = FieldOperation('Model', 'field', models.ForeignKey('Other', models.CASCADE, to_field='field'))
-        self.assertIs(operation.references_field('Other', 'field'), True)
-        self.assertIs(operation.references_field('Other', 'whatever'), False)
-        self.assertIs(operation.references_field('Missing', 'whatever'), False)
+        self.assertIs(operation.references_field('Other', 'field', 'migrations'), True)
+        self.assertIs(operation.references_field('Other', 'whatever', 'migrations'), False)
+        self.assertIs(operation.references_field('Missing', 'whatever', 'migrations'), False)
 
     def test_references_field_by_through(self):
         operation = FieldOperation('Model', 'field', models.ManyToManyField('Other', through='Through'))
-        self.assertIs(operation.references_field('Other', 'whatever'), True)
-        self.assertIs(operation.references_field('Through', 'whatever'), True)
-        self.assertIs(operation.references_field('Missing', 'whatever'), False)
+        self.assertIs(operation.references_field('Other', 'whatever', 'migrations'), True)
+        self.assertIs(operation.references_field('Through', 'whatever', 'migrations'), True)
+        self.assertIs(operation.references_field('Missing', 'whatever', 'migrations'), False)
 
     def test_reference_field_by_through_fields(self):
         operation = FieldOperation(
             'Model', 'field', models.ManyToManyField('Other', through='Through', through_fields=('first', 'second'))
         )
-        self.assertIs(operation.references_field('Other', 'whatever'), True)
-        self.assertIs(operation.references_field('Through', 'whatever'), False)
-        self.assertIs(operation.references_field('Through', 'first'), True)
-        self.assertIs(operation.references_field('Through', 'second'), True)
+        self.assertIs(operation.references_field('Other', 'whatever', 'migrations'), True)
+        self.assertIs(operation.references_field('Through', 'whatever', 'migrations'), False)
+        self.assertIs(operation.references_field('Through', 'first', 'migrations'), True)
+        self.assertIs(operation.references_field('Through', 'second', 'migrations'), True)

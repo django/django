@@ -45,20 +45,26 @@ algorithm the system follows to determine which Python code to execute:
    :func:`django.urls.path` and/or :func:`django.urls.re_path` instances.
 
 #. Django runs through each URL pattern, in order, and stops at the first
-   one that matches the requested URL.
+   one that matches the requested URL, matching against
+   :attr:`~django.http.HttpRequest.path_info`.
 
 #. Once one of the URL patterns matches, Django imports and calls the given
-   view, which is a simple Python function (or a :doc:`class-based view
+   view, which is a Python function (or a :doc:`class-based view
    </topics/class-based-views/index>`). The view gets passed the following
    arguments:
 
    * An instance of :class:`~django.http.HttpRequest`.
-   * If the matched URL pattern returned no named groups, then the
+   * If the matched URL pattern contained no named groups, then the
      matches from the regular expression are provided as positional arguments.
    * The keyword arguments are made up of any named parts matched by the
-     path expression, overridden by any arguments specified in the optional
-     ``kwargs`` argument to :func:`django.urls.path` or
+     path expression that are provided, overridden by any arguments specified
+     in the optional ``kwargs`` argument to :func:`django.urls.path` or
      :func:`django.urls.re_path`.
+
+     .. versionchanged:: 3.0
+
+          In older versions, the keyword arguments with ``None`` values are
+          made up also for not provided named parts.
 
 #. If no URL pattern matches, or if an exception is raised during any
    point in this process, Django invokes an appropriate
@@ -118,7 +124,7 @@ The following path converters are available by default:
 * ``str`` - Matches any non-empty string, excluding the path separator, ``'/'``.
   This is the default if a converter isn't included in the expression.
 
-* ``int`` - Matches zero or any positive integer. Returns an `int`.
+* ``int`` - Matches zero or any positive integer. Returns an ``int``.
 
 * ``slug`` - Matches any slug string consisting of ASCII letters or numbers,
   plus the hyphen and underscore characters. For example,
@@ -131,7 +137,7 @@ The following path converters are available by default:
 
 * ``path`` - Matches any non-empty string, including the path separator,
   ``'/'``. This allows you to match against a complete URL path rather than
-  just a segment of a URL path as with ``str``.
+  a segment of a URL path as with ``str``.
 
 .. _registering-custom-path-converters:
 
@@ -148,10 +154,17 @@ A converter is a class that includes the following:
   string into the type that should be passed to the view function. It should
   raise ``ValueError`` if it can't convert the given value. A ``ValueError`` is
   interpreted as no match and as a consequence a 404 response is sent to the
-  user.
+  user unless another URL pattern matches.
 
 * A ``to_url(self, value)`` method, which handles converting the Python type
-  into a string to be used in the URL.
+  into a string to be used in the URL. It should raise ``ValueError`` if it
+  can't convert the given value. A ``ValueError`` is interpreted as no match
+  and as a consequence :func:`~django.urls.reverse` will raise
+  :class:`~django.urls.NoReverseMatch` unless another URL pattern matches.
+
+  .. versionchanged:: 3.1
+
+    Support for raising ``ValueError`` to indicate no match was added.
 
 For example::
 
@@ -661,7 +674,9 @@ included at all).
 
 You may also use the same name for multiple URL patterns if they differ in
 their arguments. In addition to the URL name, :func:`~django.urls.reverse()`
-matches the number of arguments and the names of the keyword arguments.
+matches the number of arguments and the names of the keyword arguments. Path
+converters can also raise ``ValueError`` to indicate no match, see
+:ref:`registering-custom-path-converters` for details.
 
 .. _topics-http-defining-url-namespaces:
 
@@ -679,13 +694,13 @@ instances of an application are deployed. In other words, since multiple
 instances of a single application will share named URLs, namespaces provide a
 way to tell these named URLs apart.
 
-Django applications that make proper use of URL namespacing can be deployed more
-than once for a particular site. For example :mod:`django.contrib.admin` has an
-:class:`~django.contrib.admin.AdminSite` class which allows you to easily
-:ref:`deploy more than one instance of the admin <multiple-admin-sites>`.
-In a later example, we'll discuss the idea of deploying the polls application
-from the tutorial in two different locations so we can serve the same
-functionality to two different audiences (authors and publishers).
+Django applications that make proper use of URL namespacing can be deployed
+more than once for a particular site. For example :mod:`django.contrib.admin`
+has an :class:`~django.contrib.admin.AdminSite` class which allows you to
+:ref:`deploy more than one instance of the admin <multiple-admin-sites>`.  In a
+later example, we'll discuss the idea of deploying the polls application from
+the tutorial in two different locations so we can serve the same functionality
+to two different audiences (authors and publishers).
 
 A URL namespace comes in two parts, both of which are strings:
 

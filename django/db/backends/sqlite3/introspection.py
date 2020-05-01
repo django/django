@@ -6,11 +6,12 @@ import sqlparse
 from django.db.backends.base.introspection import (
     BaseDatabaseIntrospection, FieldInfo as BaseFieldInfo, TableInfo,
 )
-from django.db.models.indexes import Index
+from django.db.models import Index
+from django.utils.regex_helper import _lazy_re_compile
 
 FieldInfo = namedtuple('FieldInfo', BaseFieldInfo._fields + ('pk',))
 
-field_size_re = re.compile(r'^\s*(?:var)?char\s*\(\s*(\d+)\s*\)\s*$')
+field_size_re = _lazy_re_compile(r'^\s*(?:var)?char\s*\(\s*(\d+)\s*\)\s*$')
 
 
 def get_field_size(name):
@@ -36,6 +37,7 @@ class FlexibleFieldLookupDict:
         'integer': 'IntegerField',
         'bigint': 'BigIntegerField',
         'integer unsigned': 'PositiveIntegerField',
+        'bigint unsigned': 'PositiveBigIntegerField',
         'decimal': 'DecimalField',
         'real': 'FloatField',
         'text': 'TextField',
@@ -57,9 +59,9 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
 
     def get_field_type(self, data_type, description):
         field_type = super().get_field_type(data_type, description)
-        if description.pk and field_type in {'BigIntegerField', 'IntegerField'}:
-            # No support for BigAutoField as SQLite treats all integer primary
-            # keys as signed 64-bit integers.
+        if description.pk and field_type in {'BigIntegerField', 'IntegerField', 'SmallIntegerField'}:
+            # No support for BigAutoField or SmallAutoField as SQLite treats
+            # all integer primary keys as signed 64-bit integers.
             return 'AutoField'
         return field_type
 

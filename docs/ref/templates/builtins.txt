@@ -123,7 +123,7 @@ You can mix variables and strings::
 
 In some cases you might want to refer to the current value of a cycle
 without advancing to the next value. To do this,
-just give the ``{% cycle %}`` tag a name, using "as", like this::
+give the ``{% cycle %}`` tag a name, using "as", like this::
 
     {% cycle 'row1' 'row2' as rowcolors %}
 
@@ -261,8 +261,9 @@ Sample usage::
 ``firstof``
 -----------
 
-Outputs the first argument variable that is not ``False``. Outputs nothing if
-all the passed variables are ``False``.
+Outputs the first argument variable that is not "false" (i.e. exists, is not
+empty, is not a false boolean value, and is not a zero numeric value). Outputs
+nothing if all the passed variables are "false".
 
 Sample usage::
 
@@ -687,6 +688,10 @@ the variable ``template_name``::
 The variable may also be any object with a ``render()`` method that accepts a
 context. This allows you to reference a compiled ``Template`` in your context.
 
+Additionally, the variable may be an iterable of template names, in which case
+the first that can be loaded will be used, as per
+:func:`~django.template.loader.select_template`.
+
 An included template is rendered within the context of the template that
 includes it. This example produces the output ``"Hello, John!"``:
 
@@ -722,6 +727,10 @@ available to the included template::
     that includes blocks from another will contain blocks that have *already
     been evaluated and rendered* - not blocks that can be overridden by, for
     example, an extending template.
+
+.. versionchanged:: 3.1
+
+    Support for iterables of template names was added.
 
 .. templatetag:: load
 
@@ -813,10 +822,10 @@ This would display as "It is the 4th of September".
 
 You can also use the syntax ``{% now "Y" as current_year %}`` to store the
 output (as a string) inside a variable. This is useful if you want to use
-``{% now %}`` inside a template tag like :ttag:`blocktrans` for example::
+``{% now %}`` inside a template tag like :ttag:`blocktranslate` for example::
 
     {% now "Y" as current_year %}
-    {% blocktrans %}Copyright {{ current_year }}{% endblocktrans %}
+    {% blocktranslate %}Copyright {{ current_year }}{% endblocktranslate %}
 
 .. templatetag:: regroup
 
@@ -1199,10 +1208,10 @@ image in the above example will be 88 pixels wide
 (because 175/200 = .875; .875 * 100 = 87.5 which is rounded up to 88).
 
 In some cases you might want to capture the result of ``widthratio`` in a
-variable. It can be useful, for instance, in a :ttag:`blocktrans` like this::
+variable. It can be useful, for instance, in a :ttag:`blocktranslate` like this::
 
     {% widthratio this_value max_value max_width as width %}
-    {% blocktrans %}The width is: {{ width }}{% endblocktrans %}
+    {% blocktranslate %}The width is: {{ width }}{% endblocktranslate %}
 
 .. templatetag:: with
 
@@ -1352,7 +1361,7 @@ Format character  Description                               Example output
                   month, 2 characters.
 ``w``             Day of the week, digits without           ``'0'`` (Sunday) to ``'6'`` (Saturday)
                   leading zeros.
-``z``             Day of the year.                          ``0`` to ``365``
+``z``             Day of the year.                          ``1`` to ``366``
 **Week**
 ``W``             ISO-8601 week number of year, with        ``1``, ``53``
                   weeks starting on Monday.
@@ -1417,7 +1426,8 @@ Format character  Description                               Example output
                   the "c" formatter will not add timezone
                   offset if value is a naive datetime
                   (see :class:`datetime.tzinfo`).
-``r``             :rfc:`5322` formatted date.               ``'Thu, 21 Dec 2000 16:01:07 +0200'``
+``r``             :rfc:`RFC 5322 <5322#section-3.3>`        ``'Thu, 21 Dec 2000 16:01:07 +0200'``
+                  formatted date.
 ``U``             Seconds since the Unix Epoch
                   (January 1 1970 00:00:00 UTC).
 ================  ========================================  =====================
@@ -1450,7 +1460,9 @@ used. Assuming the same settings as the previous example::
     {{ value|date }}
 
 outputs ``9 de Enero de 2008`` (the ``DATE_FORMAT`` format specifier for the
-``es`` locale is ``r'j \d\e F \d\e Y'``.
+``es`` locale is ``r'j \d\e F \d\e Y'``). Both "d" and "e" are
+backslash-escaped, because otherwise each is a format string that displays the
+day and the timezone name, respectively.
 
 You can combine ``date`` with the :tfilter:`time` filter to render a full
 representation of a ``datetime`` value. E.g.::
@@ -1631,7 +1643,7 @@ For example::
 
     {{ value|escapejs }}
 
-If ``value`` is ``"testing\r\njavascript \'string" <b>escaping</b>"``,
+If ``value`` is ``"testing\r\njavascript 'string\" <b>escaping</b>"``,
 the output will be ``"testing\\u000D\\u000Ajavascript \\u0027string\\u0022 \\u003Cb\\u003Eescaping\\u003C/b\\u003E"``.
 
 .. templatefilter:: filesizeformat
@@ -1721,6 +1733,11 @@ displayed. For example:
 
 Using ``floatformat`` with no argument is equivalent to using ``floatformat``
 with an argument of ``-1``.
+
+.. versionchanged:: 3.1
+
+    In older versions, a negative zero ``-0`` was returned for negative numbers
+    which round to zero.
 
 .. templatefilter:: force_escape
 
@@ -2014,7 +2031,7 @@ Example::
 
     You have {{ num_cherries }} cherr{{ num_cherries|pluralize:"y,ies" }}.
 
-.. note:: Use :ttag:`blocktrans` to pluralize translated strings.
+.. note:: Use :ttag:`blocktranslate` to pluralize translated strings.
 
 .. templatefilter:: pprint
 
@@ -2171,6 +2188,15 @@ For example::
 If ``value`` is equivalent to ``datetime.datetime.now()``, the output will be
 the string ``"01:23"``.
 
+Note that you can backslash-escape a format string if you want to use the
+"raw" value. In this example, both "h" and "m" are backslash-escaped, because
+otherwise each is a format string that displays the hour and the month,
+respectively::
+
+    {% value|time:"H\h i\m" %}
+
+This would display as "01h 23m".
+
 Another example:
 
 Assuming that :setting:`USE_L10N` is ``True`` and :setting:`LANGUAGE_CODE` is,
@@ -2182,9 +2208,9 @@ the output will be the string ``"01:23"`` (The ``"TIME_FORMAT"`` format
 specifier for the ``de`` locale as shipped with Django is ``"H:i"``).
 
 The ``time`` filter will only accept parameters in the format string that
-relate to the time of day, not the date (for obvious reasons). If you need to
-format a ``date`` value, use the :tfilter:`date` filter instead (or along
-``time`` if you need to render a full :py:class:`~datetime.datetime` value).
+relate to the time of day, not the date. If you need to format a ``date``
+value, use the :tfilter:`date` filter instead (or along with :tfilter:`time` if
+you need to render a full :py:class:`~datetime.datetime` value).
 
 There is one exception the above rule: When passed a ``datetime`` value with
 attached timezone information (a :ref:`time-zone-aware

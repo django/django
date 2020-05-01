@@ -205,6 +205,27 @@ class OneToOneTests(TestCase):
         # reverse cache has a value of None.
         p.undergroundbar = None
 
+    def test_assign_o2o_id_value(self):
+        b = UndergroundBar.objects.create(place=self.p1)
+        b.place_id = self.p2.pk
+        b.save()
+        self.assertEqual(b.place_id, self.p2.pk)
+        self.assertFalse(UndergroundBar.place.is_cached(b))
+        self.assertEqual(b.place, self.p2)
+        self.assertTrue(UndergroundBar.place.is_cached(b))
+        # Reassigning the same value doesn't clear a cached instance.
+        b.place_id = self.p2.pk
+        self.assertTrue(UndergroundBar.place.is_cached(b))
+
+    def test_assign_o2o_id_none(self):
+        b = UndergroundBar.objects.create(place=self.p1)
+        b.place_id = None
+        b.save()
+        self.assertIsNone(b.place_id)
+        self.assertFalse(UndergroundBar.place.is_cached(b))
+        self.assertIsNone(b.place)
+        self.assertTrue(UndergroundBar.place.is_cached(b))
+
     def test_related_object_cache(self):
         """ Regression test for #6886 (the related-object cache) """
 
@@ -250,7 +271,7 @@ class OneToOneTests(TestCase):
         # Creation using keyword argument and unsaved related instance (#8070).
         p = Place()
         r = Restaurant(place=p)
-        self.assertTrue(r.place is p)
+        self.assertIs(r.place, p)
 
         # Creation using attname keyword argument and an id will cause the related
         # object to be fetched.

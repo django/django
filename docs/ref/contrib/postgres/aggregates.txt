@@ -39,8 +39,6 @@ General-purpose aggregation functions
 
     .. attribute:: ordering
 
-        .. versionadded:: 2.2
-
         An optional string of a field name (with an optional ``"-"`` prefix
         which indicates descending order) or an expression (or a tuple or list
         of strings and/or expressions) that specifies the ordering of the
@@ -110,8 +108,6 @@ General-purpose aggregation functions
         will be distinct. Defaults to ``False``.
 
     .. attribute:: ordering
-
-        .. versionadded:: 2.2
 
         An optional string of a field name (with an optional ``"-"`` prefix
         which indicates descending order) or an expression (or a tuple or list

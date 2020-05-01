@@ -1,4 +1,5 @@
 import os
+import pathlib
 from unittest import mock, skipUnless
 
 from django.conf import settings
@@ -28,8 +29,13 @@ class GeoIPTest(SimpleTestCase):
         path = settings.GEOIP_PATH
         g2 = GeoIP2(path, 0)  # Passing in data path explicitly.
         g3 = GeoIP2.open(path, 0)  # MaxMind Python API syntax.
+        # path accepts str and pathlib.Path.
+        if isinstance(path, str):
+            g4 = GeoIP2(pathlib.Path(path))
+        else:
+            g4 = GeoIP2(str(path))
 
-        for g in (g1, g2, g3):
+        for g in (g1, g2, g3, g4):
             self.assertTrue(g._country)
             self.assertTrue(g._city)
 

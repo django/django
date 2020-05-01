@@ -974,3 +974,111 @@ Versions affected
 * Django 2.2 :commit:`(patch) <77706a3e4766da5d5fb75c4db22a0a59a28e6cd6>`
 * Django 2.1 :commit:`(patch) <1e40f427bb8d0fb37cc9f830096a97c36c97af6f>`
 * Django 1.11 :commit:`(patch) <32124fc41e75074141b05f10fc55a4f01ff7f050>`
+
+August 1, 2019 - :cve:`2019-14232`
+----------------------------------
+
+Denial-of-service possibility in ``django.utils.text.Truncator``. `Full
+description <https://www.djangoproject.com/weblog/2019/aug/01/security-releases/>`__
+
+Versions affected
+~~~~~~~~~~~~~~~~~
+
+* Django 2.2 :commit:`(patch) <c3289717c6f21a8cf23daff1c78c0c014b94041f>`
+* Django 2.1 :commit:`(patch) <c23723a1551340cc7d3126f04fcfd178fa224193>`
+* Django 1.11 :commit:`(patch) <42a66e969023c00536256469f0e8b8a099ef109d>`
+
+August 1, 2019 - :cve:`2019-14233`
+----------------------------------
+
+Denial-of-service possibility in ``strip_tags()``. `Full description
+<https://www.djangoproject.com/weblog/2019/aug/01/security-releases/>`__
+
+Versions affected
+~~~~~~~~~~~~~~~~~
+
+* Django 2.2 :commit:`(patch) <e34f3c0e9ee5fc9022428fe91640638bafd4cda7>`
+* Django 2.1 :commit:`(patch) <5ff8e791148bd451180124d76a55cb2b2b9556eb>`
+* Django 1.11 :commit:`(patch) <52479acce792ad80bb0f915f20b835f919993c72>`
+
+
+August 1, 2019 - :cve:`2019-14234`
+----------------------------------
+
+SQL injection possibility in key and index lookups for
+``JSONField``/``HStoreField``. `Full description
+<https://www.djangoproject.com/weblog/2019/aug/01/security-releases/>`__
+
+Versions affected
+~~~~~~~~~~~~~~~~~
+
+* Django 2.2 :commit:`(patch) <4f5b58f5cd3c57fee9972ab074f8dc6895d8f387>`
+* Django 2.1 :commit:`(patch) <f74b3ae3628c26e1b4f8db3d13a91d52a833a975>`
+* Django 1.11 :commit:`(patch) <ed682a24fca774818542757651bfba576c3fc3ef>`
+
+August 1, 2019 - :cve:`2019-14235`
+----------------------------------
+
+Potential memory exhaustion in ``django.utils.encoding.uri_to_iri()``. `Full
+description
+<https://www.djangoproject.com/weblog/2019/aug/01/security-releases/>`__
+
+Versions affected
+~~~~~~~~~~~~~~~~~
+
+* Django 2.2 :commit:`(patch) <cf694e6852b0da7799f8b53f1fb2f7d20cf17534>`
+* Django 2.1 :commit:`(patch) <5d50a2e5fa36ad23ab532fc54cf4073de84b3306>`
+* Django 1.11 :commit:`(patch) <869b34e9b3be3a4cfcb3a145f218ffd3f5e3fd79>`
+
+December 2, 2019 - :cve:`2019-19118`
+------------------------------------
+
+Privilege escalation in the Django admin. `Full description
+<https://www.djangoproject.com/weblog/2019/dec/02/security-releases/>`__
+
+Versions affected
+~~~~~~~~~~~~~~~~~
+
+* Django 3.0 :commit:`(patch) <092cd66cf3c3e175acce698d6ca2012068d878fa>`
+* Django 2.2 :commit:`(patch) <36f580a17f0b3cb087deadf3b65eea024f479c21>`
+* Django 2.1 :commit:`(patch) <103ebe2b5ff1b2614b85a52c239f471904d26244>`
+
+December 18, 2019 - :cve:`2019-19844`
+-------------------------------------
+
+Potential account hijack via password reset form. `Full description
+<https://www.djangoproject.com/weblog/2019/dec/18/security-releases/>`__
+
+Versions affected
+~~~~~~~~~~~~~~~~~
+
+* Django 3.0 :commit:`(patch) <302a4ff1e8b1c798aab97673909c7a3dfda42c26>`
+* Django 2.2 :commit:`(patch) <4d334bea06cac63dc1272abcec545b85136cca0e>`
+* Django 1.11 :commit:`(patch) <f4cff43bf921fcea6a29b726eb66767f67753fa2>`
+
+February 3, 2020 - :cve:`2020-7471`
+-----------------------------------
+
+Potential SQL injection via ``StringAgg(delimiter)``. `Full description
+<https://www.djangoproject.com/weblog/2020/feb/03/security-releases/>`__
+
+Versions affected
+~~~~~~~~~~~~~~~~~
+
+* Django 3.0 :commit:`(patch) <505826b469b16ab36693360da9e11fd13213421b>`
+* Django 2.2 :commit:`(patch) <c67a368c16e4680b324b4f385398d638db4d8147>`
+* Django 1.11 :commit:`(patch) <001b0634cd309e372edb6d7d95d083d02b8e37bd>`
+
+March 4, 2020 - :cve:`2020-9402`
+--------------------------------
+
+Potential SQL injection via ``tolerance`` parameter in GIS functions and
+aggregates on Oracle. `Full description
+<https://www.djangoproject.com/weblog/2020/mar/04/security-releases/>`__
+
+Versions affected
+~~~~~~~~~~~~~~~~~
+
+* Django 3.0 :commit:`(patch) <26a5cf834526e291db00385dd33d319b8271fc4c>`
+* Django 2.2 :commit:`(patch) <fe886a3b58a93cfbe8864b485f93cb6d426cd1f2>`
+* Django 1.11 :commit:`(patch) <02d97f3c9a88adc890047996e5606180bd1c6166>`

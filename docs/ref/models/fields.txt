@@ -94,6 +94,7 @@ and the second element is the human-readable name. For example::
         ('SO', 'Sophomore'),
         ('JR', 'Junior'),
         ('SR', 'Senior'),
+        ('GR', 'Graduate'),
     ]
 
 Generally, it's best to define choices inside a model class, and to
@@ -106,11 +107,13 @@ define a suitably-named constant for each value::
         SOPHOMORE = 'SO'
         JUNIOR = 'JR'
         SENIOR = 'SR'
+        GRADUATE = 'GR'
         YEAR_IN_SCHOOL_CHOICES = [
             (FRESHMAN, 'Freshman'),
             (SOPHOMORE, 'Sophomore'),
             (JUNIOR, 'Junior'),
             (SENIOR, 'Senior'),
+            (GRADUATE, 'Graduate'),
         ]
         year_in_school = models.CharField(
             max_length=2,
@@ -119,13 +122,15 @@ define a suitably-named constant for each value::
         )
 
         def is_upperclass(self):
-            return self.year_in_school in (self.JUNIOR, self.SENIOR)
+            return self.year_in_school in {self.JUNIOR, self.SENIOR}
 
 Though you can define a choices list outside of a model class and then
 refer to it, defining the choices and names for each choice inside the
 model class keeps all of that information with the class that uses it,
-and makes the choices easy to reference (e.g, ``Student.SOPHOMORE``
+and helps reference the choices (e.g, ``Student.SOPHOMORE``
 will work anywhere that the ``Student`` model has been imported).
+
+.. _field-choices-named-groups:
 
 You can also collect your available choices into named groups that can
 be used for organizational purposes::
@@ -148,7 +153,7 @@ The first element in each tuple is the name to apply to the group. The
 second element is an iterable of 2-tuples, with each 2-tuple containing
 a value and a human-readable name for an option. Grouped options may be
 combined with ungrouped options within a single list (such as the
-`unknown` option in this example).
+``'unknown'`` option in this example).
 
 For each model field that has :attr:`~Field.choices` set, Django will add a
 method to retrieve the human-readable name for the field's current value. See
@@ -164,12 +169,141 @@ meant for static data that doesn't change much, if ever.
 .. note::
     A new migration is created each time the order of ``choices`` changes.
 
+.. _field-choices-blank-label:
+
 Unless :attr:`blank=False<Field.blank>` is set on the field along with a
 :attr:`~Field.default` then a label containing ``"---------"`` will be rendered
 with the select box. To override this behavior, add a tuple to ``choices``
 containing ``None``; e.g. ``(None, 'Your String For Display')``.
 Alternatively, you can use an empty string instead of ``None`` where this makes
 sense - such as on a :class:`~django.db.models.CharField`.
+
+.. _field-choices-enum-types:
+
+Enumeration types
+~~~~~~~~~~~~~~~~~
+
+In addition, Django provides enumeration types that you can subclass to define
+choices in a concise way::
+
+    from django.utils.translation import gettext_lazy as _
+
+    class Student(models.Model):
+
+        class YearInSchool(models.TextChoices):
+            FRESHMAN = 'FR', _('Freshman')
+            SOPHOMORE = 'SO', _('Sophomore')
+            JUNIOR = 'JR', _('Junior')
+            SENIOR = 'SR', _('Senior')
+            GRADUATE = 'GR', _('Graduate')
+
+        year_in_school = models.CharField(
+            max_length=2,
+            choices=YearInSchool.choices,
+            default=YearInSchool.FRESHMAN,
+        )
+
+        def is_upperclass(self):
+            return self.year_in_school in {
+                self.YearInSchool.JUNIOR,
+                self.YearInSchool.SENIOR,
+            }
+
+These work similar to :mod:`enum` from Python's standard library, but with some
+modifications:
+
+* Enum member values are a tuple of arguments to use when constructing the
+  concrete data type. Django supports adding an extra string value to the end
+  of this tuple to be used as the human-readable name, or ``label``. The
+  ``label`` can be a lazy translatable string. Thus, in most cases, the member
+  value will be a ``(value, label)`` two-tuple. See below for :ref:`an example
+  of subclassing choices <field-choices-enum-subclassing>` using a more complex
+  data type. If a tuple is not provided, or the last item is not a (lazy)
+  string, the ``label`` is :ref:`automatically generated
+  <field-choices-enum-auto-label>` from the member name.
+* A ``.label`` property is added on values, to return the human-readable name.
+* A number of custom properties are added to the enumeration classes --
+  ``.choices``, ``.labels``, ``.values``, and ``.names`` -- to make it easier
+  to access lists of those separate parts of the enumeration. Use ``.choices``
+  as a suitable value to pass to :attr:`~Field.choices` in a field definition.
+* The use of :func:`enum.unique()` is enforced to ensure that values cannot be
+  defined multiple times. This is unlikely to be expected in choices for a
+  field.
+
+Note that using ``YearInSchool.SENIOR``, ``YearInSchool['SENIOR']``, or
+``YearInSchool('SR')`` to access or lookup enum members work as expected, as do
+the ``.name`` and ``.value`` properties on the members.
+
+.. _field-choices-enum-auto-label:
+
+If you don't need to have the human-readable names translated, you can have
+them inferred from the member name (replacing underscores with spaces and using
+title-case)::
+
+    >>> class Vehicle(models.TextChoices):
+    ...     CAR = 'C'
+    ...     TRUCK = 'T'
+    ...     JET_SKI = 'J'
+    ...
+    >>> Vehicle.JET_SKI.label
+    'Jet Ski'
+
+Since the case where the enum values need to be integers is extremely common,
+Django provides an ``IntegerChoices`` class. For example::
+
+    class Card(models.Model):
+
+        class Suit(models.IntegerChoices):
+            DIAMOND = 1
+            SPADE = 2
+            HEART = 3
+            CLUB = 4
+
+        suit = models.IntegerField(choices=Suit.choices)
+
+It is also possible to make use of the `Enum Functional API
+<https://docs.python.org/3/library/enum.html#functional-api>`_ with the caveat
+that labels are automatically generated as highlighted above::
+
+    >>> MedalType = models.TextChoices('MedalType', 'GOLD SILVER BRONZE')
+    >>> MedalType.choices
+    [('GOLD', 'Gold'), ('SILVER', 'Silver'), ('BRONZE', 'Bronze')]
+    >>> Place = models.IntegerChoices('Place', 'FIRST SECOND THIRD')
+    >>> Place.choices
+    [(1, 'First'), (2, 'Second'), (3, 'Third')]
+
+.. _field-choices-enum-subclassing:
+
+If you require support for a concrete data type other than ``int`` or ``str``,
+you can subclass ``Choices`` and the required concrete data type, e.g.
+:class:`~datetime.date` for use with :class:`~django.db.models.DateField`::
+
+    class MoonLandings(datetime.date, models.Choices):
+        APOLLO_11 = 1969, 7, 20, 'Apollo 11 (Eagle)'
+        APOLLO_12 = 1969, 11, 19, 'Apollo 12 (Intrepid)'
+        APOLLO_14 = 1971, 2, 5, 'Apollo 14 (Antares)'
+        APOLLO_15 = 1971, 7, 30, 'Apollo 15 (Falcon)'
+        APOLLO_16 = 1972, 4, 21, 'Apollo 16 (Orion)'
+        APOLLO_17 = 1972, 12, 11, 'Apollo 17 (Challenger)'
+
+There are some additional caveats to be aware of:
+
+- Enumeration types do not support :ref:`named groups
+  <field-choices-named-groups>`.
+- Because an enumeration with a concrete data type requires all values to match
+  the type, overriding the :ref:`blank label <field-choices-blank-label>`
+  cannot be achieved by creating a member with a value of ``None``. Instead,
+  set the ``__empty__`` attribute on the class::
+
+    class Answer(models.IntegerChoices):
+        NO = 0, _('No')
+        YES = 1, _('Yes')
+
+        __empty__ = _('(Unknown)')
+
+.. versionadded:: 3.0
+
+   The ``TextChoices``, ``IntegerChoices``, and ``Choices`` classes were added.
 
 ``db_column``
 -------------
@@ -412,7 +546,7 @@ guaranteed to fit numbers from ``1`` to ``9223372036854775807``.
 A 64-bit integer, much like an :class:`IntegerField` except that it is
 guaranteed to fit numbers from ``-9223372036854775808`` to
 ``9223372036854775807``. The default form widget for this field is a
-:class:`~django.forms.TextInput`.
+:class:`~django.forms.NumberInput`.
 
 ``BinaryField``
 ---------------
@@ -513,7 +647,7 @@ optional arguments:
       :func:`django.utils.timezone.now`
 
 The default form widget for this field is a
-:class:`~django.forms.TextInput`. The admin adds a JavaScript calendar,
+:class:`~django.forms.DateInput`. The admin adds a JavaScript calendar,
 and a shortcut for "Today". Includes an additional ``invalid_date`` error
 message key.
 
@@ -529,10 +663,10 @@ Any combination of these options will result in an error.
     The ``auto_now`` and ``auto_now_add`` options will always use the date in
     the :ref:`default timezone <default-current-time-zone>` at the moment of
     creation or update. If you need something different, you may want to
-    consider simply using your own callable default or overriding ``save()``
-    instead of using ``auto_now`` or ``auto_now_add``; or using a
-    ``DateTimeField`` instead of a ``DateField`` and deciding how to handle the
-    conversion from datetime to date at display time.
+    consider using your own callable default or overriding ``save()`` instead
+    of using ``auto_now`` or ``auto_now_add``; or using a ``DateTimeField``
+    instead of a ``DateField`` and deciding how to handle the conversion from
+    datetime to date at display time.
 
 ``DateTimeField``
 -----------------
@@ -543,7 +677,7 @@ A date and time, represented in Python by a ``datetime.datetime`` instance.
 Takes the same extra arguments as :class:`DateField`.
 
 The default form widget for this field is a single
-:class:`~django.forms.TextInput`. The admin uses two separate
+:class:`~django.forms.DateTimeInput`. The admin uses two separate
 :class:`~django.forms.TextInput` widgets with JavaScript shortcuts.
 
 ``DecimalField``
@@ -584,7 +718,9 @@ when :attr:`~django.forms.Field.localize` is ``False`` or
 
     For more information about the differences between the
     :class:`FloatField` and :class:`DecimalField` classes, please
-    see :ref:`FloatField vs. DecimalField <floatfield_vs_decimalfield>`.
+    see :ref:`FloatField vs. DecimalField <floatfield_vs_decimalfield>`. You
+    should also be aware of :ref:`SQLite limitations <sqlite-decimal-handling>`
+    of decimal fields.
 
 ``DurationField``
 -----------------
@@ -629,9 +765,10 @@ Has two optional arguments:
     and can be set in two ways. In both cases, the value is passed to the
     :meth:`Storage.save() <django.core.files.storage.Storage.save>` method.
 
-    If you specify a string value, it may contain :func:`~time.strftime`
-    formatting, which will be replaced by the date/time of the file upload (so
-    that uploaded files don't fill up the given directory). For example::
+    If you specify a string value or a :class:`~pathlib.Path`, it may contain
+    :func:`~time.strftime` formatting, which will be replaced by the date/time
+    of the file upload (so that uploaded files don't fill up the given
+    directory). For example::
 
         class MyModel(models.Model):
             # file will be uploaded to MEDIA_ROOT/uploads
@@ -679,10 +816,19 @@ Has two optional arguments:
         class MyModel(models.Model):
             upload = models.FileField(upload_to=user_directory_path)
 
+    .. versionchanged:: 3.0
+
+        Support for :class:`pathlib.Path` was added.
+
 .. attribute:: FileField.storage
 
-    A storage object, which handles the storage and retrieval of your
-    files. See :doc:`/topics/files` for details on how to provide this object.
+    A storage object, or a callable which returns a storage object. This
+    handles the storage and retrieval of your files. See :doc:`/topics/files`
+    for details on how to provide this object.
+
+    .. versionchanged:: 3.1
+
+        The ability to provide a callable was added.
 
 The default form widget for this field is a
 :class:`~django.forms.ClearableFileInput`.
@@ -1036,8 +1182,22 @@ values are stored as null.
 
 .. class:: NullBooleanField(**options)
 
-Like :class:`BooleanField` with ``null=True``. Use that instead of this field
-as it's likely to be deprecated in a future version of Django.
+Like :class:`BooleanField` with ``null=True``.
+
+.. deprecated:: 3.1
+
+    ``NullBooleanField`` is deprecated in favor of ``BooleanField(null=True)``.
+
+``PositiveBigIntegerField``
+---------------------------
+
+.. class:: PositiveBigIntegerField(**options)
+
+.. versionadded:: 3.1
+
+Like a :class:`PositiveIntegerField`, but only allows values under a certain
+(database-dependent) point. Values from ``0`` to ``9223372036854775807`` are
+safe in all databases supported by Django.
 
 ``PositiveIntegerField``
 ------------------------
@@ -1062,7 +1222,7 @@ databases supported by Django.
 
 .. class:: SlugField(max_length=50, **options)
 
-:term:`Slug` is a newspaper term. A slug is a short label for something,
+:term:`Slug <slug>` is a newspaper term. A slug is a short label for something,
 containing only letters, numbers, underscores or hyphens. They're generally used
 in URLs.
 
@@ -1084,6 +1244,17 @@ It uses :class:`~django.core.validators.validate_slug` or
 
     If ``True``, the field accepts Unicode letters in addition to ASCII
     letters. Defaults to ``False``.
+
+``SmallAutoField``
+------------------
+
+.. class:: SmallAutoField(**options)
+
+.. versionadded:: 3.0
+
+Like an :class:`AutoField`, but only allows values under a certain
+(database-dependent) limit. Values from ``1`` to ``32767`` are safe in all
+databases supported by Django.
 
 ``SmallIntegerField``
 ---------------------
@@ -1115,7 +1286,7 @@ However it is not enforced at the model or database level. Use a
 A time, represented in Python by a ``datetime.time`` instance. Accepts the same
 auto-population options as :class:`DateField`.
 
-The default form widget for this field is a :class:`~django.forms.TextInput`.
+The default form widget for this field is a :class:`~django.forms.TimeInput`.
 The admin adds some JavaScript shortcuts.
 
 ``URLField``
@@ -1126,7 +1297,7 @@ The admin adds some JavaScript shortcuts.
 A :class:`CharField` for a URL, validated by
 :class:`~django.core.validators.URLValidator`.
 
-The default form widget for this field is a :class:`~django.forms.TextInput`.
+The default form widget for this field is a :class:`~django.forms.URLInput`.
 
 Like all :class:`CharField` subclasses, :class:`URLField` takes the optional
 :attr:`~CharField.max_length` argument. If you don't specify
@@ -1154,6 +1325,13 @@ it is recommended to use :attr:`~Field.default`::
 
 Note that a callable (with the parentheses omitted) is passed to ``default``,
 not an instance of ``UUID``.
+
+.. admonition:: Lookups on PostgreSQL
+
+    Using :lookup:`iexact`, :lookup:`contains`, :lookup:`icontains`,
+    :lookup:`startswith`, :lookup:`istartswith`, :lookup:`endswith`, or
+    :lookup:`iendswith` lookups on PostgreSQL don't work for values without
+    hyphens, because PostgreSQL stores them in a hyphenated uuid datatype type.
 
 Relationship fields
 ===================
@@ -1302,6 +1480,46 @@ The possible values for :attr:`~ForeignKey.on_delete` are found in
     Prevent deletion of the referenced object by raising
     :exc:`~django.db.models.ProtectedError`, a subclass of
     :exc:`django.db.IntegrityError`.
+
+* .. attribute:: RESTRICT
+
+    .. versionadded:: 3.1
+
+    Prevent deletion of the referenced object by raising
+    :exc:`~django.db.models.RestrictedError` (a subclass of
+    :exc:`django.db.IntegrityError`). Unlike :attr:`PROTECT`, deletion of the
+    referenced object is allowed if it also references a different object
+    that is being deleted in the same operation, but via a :attr:`CASCADE`
+    relationship.
+
+    Consider this set of models::
+
+        class Artist(models.Model):
+            name = models.CharField(max_length=10)
+
+        class Album(models.Model):
+            artist = models.ForeignKey(Artist, on_delete=models.CASCADE)
+
+        class Song(models.Model):
+            artist = models.ForeignKey(Artist, on_delete=models.CASCADE)
+            album = models.ForeignKey(Album, on_delete=models.RESTRICT)
+
+    ``Artist`` can be deleted even if that implies deleting an ``Album``
+    which is referenced by a ``Song``, because ``Song`` also references
+    ``Artist`` itself through a cascading relationship. For example::
+
+        >>> artist_one = Artist.objects.create(name='artist one')
+        >>> artist_two = Artist.objects.create(name='artist two')
+        >>> album_one = Album.objects.create(artist=artist_one)
+        >>> album_two = Album.objects.create(artist=artist_two)
+        >>> song_one = Song.objects.create(artist=artist_one, album=album_one)
+        >>> song_two = Song.objects.create(artist=artist_one, album=album_two)
+        >>> album_one.delete()
+        # Raises RestrictedError.
+        >>> artist_two.delete()
+        # Raises RestrictedError.
+        >>> artist_one.delete()
+        (4, {'Song': 2, 'Album': 1, 'Artist': 1})
 
 * .. attribute:: SET_NULL
 
@@ -1461,7 +1679,7 @@ The possible values for :attr:`~ForeignKey.on_delete` are found in
     if it is a profile model designed specifically for your custom user model.
 
     Setting it to ``False`` does not mean you can reference a swappable model
-    even if it is swapped out - ``False`` just means that the migrations made
+    even if it is swapped out - ``False`` means that the migrations made
     with this ForeignKey will always reference the exact model you specify
     (so it will fail hard if the user tries to run with a User model you don't
     support, for example).
@@ -1793,6 +2011,16 @@ Field API reference
 
         where the arguments are interpolated from the field's ``__dict__``.
 
+    .. attribute:: descriptor_class
+
+        .. versionadded:: 3.0
+
+        A class implementing the :py:ref:`descriptor protocol <descriptors>`
+        that is instantiated and assigned to the model instance attribute. The
+        constructor must accept a single argument, the ``Field`` instance.
+        Overriding this class attribute allows for customizing the get and set
+        behavior.
+
     To map a ``Field`` to a database-specific type, Django exposes several
     methods:
 
@@ -1854,6 +2082,8 @@ Field API reference
         This method is not used for most built-in fields as the database
         backend already returns the correct Python type, or the backend itself
         does the conversion.
+
+        ``expression`` is the same as ``self``.
 
         See :ref:`converting-values-to-python-objects` for usage.
 

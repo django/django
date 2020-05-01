@@ -66,16 +66,18 @@ Related objects reference
         Using ``add()`` on a relation that already exists won't duplicate the
         relation, but it will still trigger signals.
 
-        ``add()`` also accepts the field the relation points to as an argument.
-        The above example can be rewritten as ``b.entry_set.add(234)``.
+        For many-to-many relationships ``add()`` accepts either model instances
+        or field values, normally primary keys, as the ``*objs`` argument.
 
         Use the ``through_defaults`` argument to specify values for the new
         :ref:`intermediate model <intermediary-manytomany>` instance(s), if
-        needed.
+        needed. You can use callables as values in the ``through_defaults``
+        dictionary and they will be evaluated once before creating any
+        intermediate instance(s).
 
-        .. versionchanged:: 2.2
+        .. versionchanged:: 3.1
 
-            The ``through_defaults`` argument was added.
+            ``through_defaults`` values can now be callables.
 
     .. method:: create(through_defaults=None, **kwargs)
 
@@ -91,7 +93,7 @@ Related objects reference
 
             # No need to call e.save() at this point -- it's already been saved.
 
-        This is equivalent to (but much simpler than)::
+        This is equivalent to (but simpler than)::
 
             >>> b = Blog.objects.get(id=1)
             >>> e = Entry(
@@ -109,11 +111,12 @@ Related objects reference
 
         Use the ``through_defaults`` argument to specify values for the new
         :ref:`intermediate model <intermediary-manytomany>` instance, if
-        needed.
+        needed. You can use callables as values in the ``through_defaults``
+        dictionary.
 
-        .. versionchanged:: 2.2
+        .. versionchanged:: 3.1
 
-            The ``through_defaults`` argument was added.
+            ``through_defaults`` values can now be callables.
 
     .. method:: remove(*objs, bulk=True)
 
@@ -131,9 +134,9 @@ Related objects reference
         :data:`~django.db.models.signals.m2m_changed` signal if you wish to
         execute custom code when a relationship is deleted.
 
-        Similarly to :meth:`add()`, ``remove()`` also accepts the field the
-        relation points to as an argument. The above example can be rewritten
-        as ``b.entry_set.remove(234)``.
+        For many-to-many relationships ``remove()`` accepts either model
+        instances or field values, normally primary keys, as the ``*objs``
+        argument.
 
         For :class:`~django.db.models.ForeignKey` objects, this method only
         exists if ``null=True``. If the related field can't be set to ``None``
@@ -195,17 +198,19 @@ Related objects reference
         race conditions. For instance, new objects may be added to the database
         in between the call to ``clear()`` and the call to ``add()``.
 
-        Similarly to :meth:`add()`, ``set()`` also accepts the field the
-        relation points to as an argument. The above example can be rewritten
-        as ``e.related_set.set([obj1.pk, obj2.pk, obj3.pk])``.
+        For many-to-many relationships ``set()`` accepts a list of either model
+        instances or field values, normally primary keys, as the ``objs``
+        argument.
 
         Use the ``through_defaults`` argument to specify values for the new
         :ref:`intermediate model <intermediary-manytomany>` instance(s), if
-        needed.
+        needed. You can use callables as values in the ``through_defaults``
+        dictionary and they will be evaluated once before creating any
+        intermediate instance(s).
 
-        .. versionchanged:: 2.2
+        .. versionchanged:: 3.1
 
-            The ``through_defaults`` argument was added.
+            ``through_defaults`` values can now be callables.
 
     .. note::
 

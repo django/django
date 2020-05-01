@@ -10,7 +10,7 @@ from django.apps import apps
 from django.conf import settings
 from django.contrib.admin.models import LogEntry
 from django.contrib.auth import (
-    BACKEND_SESSION_KEY, REDIRECT_FIELD_NAME, SESSION_KEY,
+    BACKEND_SESSION_KEY, HASH_SESSION_KEY, REDIRECT_FIELD_NAME, SESSION_KEY,
 )
 from django.contrib.auth.forms import (
     AuthenticationForm, PasswordChangeForm, SetPasswordForm,
@@ -25,7 +25,7 @@ from django.contrib.sessions.middleware import SessionMiddleware
 from django.contrib.sites.requests import RequestSite
 from django.core import mail
 from django.db import connection
-from django.http import HttpRequest
+from django.http import HttpRequest, HttpResponse
 from django.middleware.csrf import CsrfViewMiddleware, get_token
 from django.test import Client, TestCase, override_settings
 from django.test.client import RedirectCycleError
@@ -444,7 +444,7 @@ class UUIDUserPasswordResetTest(CustomUserPasswordResetTest):
     def test_confirm_invalid_uuid(self):
         """A uidb64 that decodes to a non-UUID doesn't crash."""
         _, path = self._test_confirm_start()
-        invalid_uidb64 = urlsafe_base64_encode('INVALID_UUID'.encode())
+        invalid_uidb64 = urlsafe_base64_encode(b'INVALID_UUID')
         first, _uuidb64_, second = path.strip('/').split('/')
         response = self.client.get('/' + '/'.join((first, invalid_uidb64, second)) + '/')
         self.assertContains(response, 'The password reset link was invalid')
@@ -650,15 +650,17 @@ class LoginTest(AuthViewsTestCase):
         """
         Makes sure that a login rotates the currently-used CSRF token.
         """
+        def get_response(request):
+            return HttpResponse()
+
         # Do a GET to establish a CSRF token
         # The test client isn't used here as it's a test for middleware.
         req = HttpRequest()
-        CsrfViewMiddleware().process_view(req, LoginView.as_view(), (), {})
+        CsrfViewMiddleware(get_response).process_view(req, LoginView.as_view(), (), {})
         # get_token() triggers CSRF token inclusion in the response
         get_token(req)
-        resp = LoginView.as_view()(req)
-        resp2 = CsrfViewMiddleware().process_response(req, resp)
-        csrf_cookie = resp2.cookies.get(settings.CSRF_COOKIE_NAME, None)
+        resp = CsrfViewMiddleware(LoginView.as_view())(req)
+        csrf_cookie = resp.cookies.get(settings.CSRF_COOKIE_NAME, None)
         token1 = csrf_cookie.coded_value
 
         # Prepare the POST request
@@ -668,13 +670,12 @@ class LoginTest(AuthViewsTestCase):
         req.POST = {'username': 'testclient', 'password': 'password', 'csrfmiddlewaretoken': token1}
 
         # Use POST request to log in
-        SessionMiddleware().process_request(req)
-        CsrfViewMiddleware().process_view(req, LoginView.as_view(), (), {})
+        SessionMiddleware(get_response).process_request(req)
+        CsrfViewMiddleware(get_response).process_view(req, LoginView.as_view(), (), {})
         req.META["SERVER_NAME"] = "testserver"  # Required to have redirect work in login view
         req.META["SERVER_PORT"] = 80
-        resp = LoginView.as_view()(req)
-        resp2 = CsrfViewMiddleware().process_response(req, resp)
-        csrf_cookie = resp2.cookies.get(settings.CSRF_COOKIE_NAME, None)
+        resp = CsrfViewMiddleware(LoginView.as_view())(req)
+        csrf_cookie = resp.cookies.get(settings.CSRF_COOKIE_NAME, None)
         token2 = csrf_cookie.coded_value
 
         # Check the CSRF token switched
@@ -708,6 +709,27 @@ class LoginTest(AuthViewsTestCase):
         user.save()
 
         self.login(password='foobar')
+        self.assertNotEqual(original_session_key, self.client.session.session_key)
+
+    def test_legacy_session_key_flushed_on_login(self):
+        # RemovedInDjango40Warning.
+        user = User.objects.get(username='testclient')
+        engine = import_module(settings.SESSION_ENGINE)
+        session = engine.SessionStore()
+        session[SESSION_KEY] = user.id
+        session[HASH_SESSION_KEY] = user._legacy_get_session_auth_hash()
+        session.save()
+        original_session_key = session.session_key
+        self.client.cookies[settings.SESSION_COOKIE_NAME] = original_session_key
+        # Legacy session key is flushed on login.
+        self.login()
+        self.assertNotEqual(original_session_key, self.client.session.session_key)
+        # Legacy session key is flushed after a password change.
+        user.set_password('password_2')
+        user.save()
+        original_session_key = session.session_key
+        self.client.cookies[settings.SESSION_COOKIE_NAME] = original_session_key
+        self.login(password='password_2')
         self.assertNotEqual(original_session_key, self.client.session.session_key)
 
     def test_login_session_without_hash_session_key(self):
@@ -1262,7 +1284,7 @@ class ChangelistTests(AuthViewsTestCase):
         data['password'] = 'shouldnotchange'
         change_url = reverse('auth_test_admin:auth_user_change', args=(u.pk,))
         response = self.client.post(change_url, data)
-        self.assertRedirects(response, reverse('auth_test_admin:auth_user_changelist'))
+        self.assertEqual(response.status_code, 403)
         u.refresh_from_db()
         self.assertEqual(u.password, original_password)
 
@@ -1283,7 +1305,8 @@ class UUIDUserTests(TestCase):
 
         password_change_url = reverse('custom_user_admin:auth_user_password_change', args=(u.pk,))
         response = self.client.get(password_change_url)
-        self.assertEqual(response.status_code, 200)
+        # The action attribute is omitted.
+        self.assertContains(response, '<form method="post" id="uuiduser_form">')
 
         # A LogEntry is created with pk=1 which breaks a FK constraint on MySQL
         with connection.constraint_checks_disabled():

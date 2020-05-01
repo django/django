@@ -5,14 +5,15 @@ import types
 from pathlib import Path
 
 from django.conf import settings
-from django.http import HttpResponse, HttpResponseNotFound
+from django.http import Http404, HttpResponse, HttpResponseNotFound
 from django.template import Context, Engine, TemplateDoesNotExist
 from django.template.defaultfilters import pprint
-from django.urls import Resolver404, resolve
+from django.urls import resolve
 from django.utils import timezone
 from django.utils.datastructures import MultiValueDict
 from django.utils.encoding import force_str
 from django.utils.module_loading import import_string
+from django.utils.regex_helper import _lazy_re_compile
 from django.utils.version import get_docs_version
 
 # Minimal Django templates engine to render the error templates
@@ -23,10 +24,6 @@ DEBUG_ENGINE = Engine(
     debug=True,
     libraries={'i18n': 'django.templatetags.i18n'},
 )
-
-HIDDEN_SETTINGS = re.compile('API|TOKEN|KEY|SECRET|PASS|SIGNATURE', flags=re.IGNORECASE)
-
-CLEANSED_SUBSTITUTE = '********************'
 
 CURRENT_DIR = Path(__file__).parent
 
@@ -45,54 +42,18 @@ class CallableSettingWrapper:
         return repr(self._wrapped)
 
 
-def cleanse_setting(key, value):
-    """
-    Cleanse an individual setting key/value of sensitive content. If the value
-    is a dictionary, recursively cleanse the keys in that dictionary.
-    """
-    try:
-        if HIDDEN_SETTINGS.search(key):
-            cleansed = CLEANSED_SUBSTITUTE
-        else:
-            if isinstance(value, dict):
-                cleansed = {k: cleanse_setting(k, v) for k, v in value.items()}
-            else:
-                cleansed = value
-    except TypeError:
-        # If the key isn't regex-able, just return as-is.
-        cleansed = value
-
-    if callable(cleansed):
-        # For fixing #21345 and #23070
-        cleansed = CallableSettingWrapper(cleansed)
-
-    return cleansed
-
-
-def get_safe_settings():
-    """
-    Return a dictionary of the settings module with values of sensitive
-    settings replaced with stars (*********).
-    """
-    settings_dict = {}
-    for k in dir(settings):
-        if k.isupper():
-            settings_dict[k] = cleanse_setting(k, getattr(settings, k))
-    return settings_dict
-
-
 def technical_500_response(request, exc_type, exc_value, tb, status_code=500):
     """
     Create a technical server error response. The last three arguments are
     the values returned from sys.exc_info() and friends.
     """
-    reporter = ExceptionReporter(request, exc_type, exc_value, tb)
-    if request.is_ajax():
-        text = reporter.get_traceback_text()
-        return HttpResponse(text, status=status_code, content_type='text/plain; charset=utf-8')
-    else:
+    reporter = get_exception_reporter_class(request)(request, exc_type, exc_value, tb)
+    if request.accepts('text/html'):
         html = reporter.get_traceback_html()
         return HttpResponse(html, status=status_code, content_type='text/html')
+    else:
+        text = reporter.get_traceback_text()
+        return HttpResponse(text, status=status_code, content_type='text/plain; charset=utf-8')
 
 
 @functools.lru_cache()
@@ -106,27 +67,62 @@ def get_exception_reporter_filter(request):
     return getattr(request, 'exception_reporter_filter', default_filter)
 
 
-class ExceptionReporterFilter:
-    """
-    Base for all exception reporter filter classes. All overridable hooks
-    contain lenient default behaviors.
-    """
-
-    def get_post_parameters(self, request):
-        if request is None:
-            return {}
-        else:
-            return request.POST
-
-    def get_traceback_frame_variables(self, request, tb_frame):
-        return list(tb_frame.f_locals.items())
+def get_exception_reporter_class(request):
+    default_exception_reporter_class = import_string(settings.DEFAULT_EXCEPTION_REPORTER)
+    return getattr(request, 'exception_reporter_class', default_exception_reporter_class)
 
 
-class SafeExceptionReporterFilter(ExceptionReporterFilter):
+class SafeExceptionReporterFilter:
     """
     Use annotations made by the sensitive_post_parameters and
     sensitive_variables decorators to filter out sensitive information.
     """
+    cleansed_substitute = '********************'
+    hidden_settings = _lazy_re_compile('API|TOKEN|KEY|SECRET|PASS|SIGNATURE', flags=re.I)
+
+    def cleanse_setting(self, key, value):
+        """
+        Cleanse an individual setting key/value of sensitive content. If the
+        value is a dictionary, recursively cleanse the keys in that dictionary.
+        """
+        try:
+            if self.hidden_settings.search(key):
+                cleansed = self.cleansed_substitute
+            elif isinstance(value, dict):
+                cleansed = {k: self.cleanse_setting(k, v) for k, v in value.items()}
+            elif isinstance(value, list):
+                cleansed = [self.cleanse_setting('', v) for v in value]
+            elif isinstance(value, tuple):
+                cleansed = tuple([self.cleanse_setting('', v) for v in value])
+            else:
+                cleansed = value
+        except TypeError:
+            # If the key isn't regex-able, just return as-is.
+            cleansed = value
+
+        if callable(cleansed):
+            cleansed = CallableSettingWrapper(cleansed)
+
+        return cleansed
+
+    def get_safe_settings(self):
+        """
+        Return a dictionary of the settings module with values of sensitive
+        settings replaced with stars (*********).
+        """
+        settings_dict = {}
+        for k in dir(settings):
+            if k.isupper():
+                settings_dict[k] = self.cleanse_setting(k, getattr(settings, k))
+        return settings_dict
+
+    def get_safe_request_meta(self, request):
+        """
+        Return a dictionary of request.META with sensitive values redacted.
+        """
+        if not hasattr(request, 'META'):
+            return {}
+        return {k: self.cleanse_setting(k, v) for k, v in request.META.items()}
 
     def is_active(self, request):
         """
@@ -148,7 +144,7 @@ class SafeExceptionReporterFilter(ExceptionReporterFilter):
             multivaluedict = multivaluedict.copy()
             for param in sensitive_post_parameters:
                 if param in multivaluedict:
-                    multivaluedict[param] = CLEANSED_SUBSTITUTE
+                    multivaluedict[param] = self.cleansed_substitute
         return multivaluedict
 
     def get_post_parameters(self, request):
@@ -165,13 +161,13 @@ class SafeExceptionReporterFilter(ExceptionReporterFilter):
                 if sensitive_post_parameters == '__ALL__':
                     # Cleanse all parameters.
                     for k in cleansed:
-                        cleansed[k] = CLEANSED_SUBSTITUTE
+                        cleansed[k] = self.cleansed_substitute
                     return cleansed
                 else:
                     # Cleanse only the specified parameters.
                     for param in sensitive_post_parameters:
                         if param in cleansed:
-                            cleansed[param] = CLEANSED_SUBSTITUTE
+                            cleansed[param] = self.cleansed_substitute
                     return cleansed
             else:
                 return request.POST
@@ -214,12 +210,12 @@ class SafeExceptionReporterFilter(ExceptionReporterFilter):
             if sensitive_variables == '__ALL__':
                 # Cleanse all variables
                 for name in tb_frame.f_locals:
-                    cleansed[name] = CLEANSED_SUBSTITUTE
+                    cleansed[name] = self.cleansed_substitute
             else:
                 # Cleanse specified variables
                 for name, value in tb_frame.f_locals.items():
                     if name in sensitive_variables:
-                        value = CLEANSED_SUBSTITUTE
+                        value = self.cleansed_substitute
                     else:
                         value = self.cleanse_special_types(request, value)
                     cleansed[name] = value
@@ -235,8 +231,8 @@ class SafeExceptionReporterFilter(ExceptionReporterFilter):
             # the sensitive_variables decorator's frame, in case the variables
             # associated with those arguments were meant to be obfuscated from
             # the decorated function's frame.
-            cleansed['func_args'] = CLEANSED_SUBSTITUTE
-            cleansed['func_kwargs'] = CLEANSED_SUBSTITUTE
+            cleansed['func_args'] = self.cleansed_substitute
+            cleansed['func_kwargs'] = self.cleansed_substitute
 
         return cleansed.items()
 
@@ -301,9 +297,10 @@ class ExceptionReporter:
             'unicode_hint': unicode_hint,
             'frames': frames,
             'request': self.request,
+            'request_meta': self.filter.get_safe_request_meta(self.request),
             'user_str': user_str,
             'filtered_POST_items': list(self.filter.get_post_parameters(self.request).items()),
-            'settings': get_safe_settings(),
+            'settings': self.filter.get_safe_settings(),
             'sys_executable': sys.executable,
             'sys_version_info': '%d.%d.%d' % sys.version_info[0:3],
             'server_time': timezone.now(),
@@ -340,11 +337,7 @@ class ExceptionReporter:
         c = Context(self.get_traceback_data(), autoescape=False, use_l10n=False)
         return t.render(c)
 
-    def _get_lines_from_file(self, filename, lineno, context_lines, loader=None, module_name=None):
-        """
-        Return context_lines before and after lineno from file.
-        Return (pre_context_lineno, pre_context, context_line, post_context).
-        """
+    def _get_source(self, filename, loader, module_name):
         source = None
         if hasattr(loader, 'get_source'):
             try:
@@ -359,6 +352,14 @@ class ExceptionReporter:
                     source = fp.read().splitlines()
             except OSError:
                 pass
+        return source
+
+    def _get_lines_from_file(self, filename, lineno, context_lines, loader=None, module_name=None):
+        """
+        Return context_lines before and after lineno from file.
+        Return (pre_context_lineno, pre_context, context_line, post_context).
+        """
+        source = self._get_source(filename, loader, module_name)
         if source is None:
             return None, [], None, []
 
@@ -379,10 +380,12 @@ class ExceptionReporter:
         lower_bound = max(0, lineno - context_lines)
         upper_bound = lineno + context_lines
 
-        pre_context = source[lower_bound:lineno]
-        context_line = source[lineno]
-        post_context = source[lineno + 1:upper_bound]
-
+        try:
+            pre_context = source[lower_bound:lineno]
+            context_line = source[lineno]
+            post_context = source[lineno + 1:upper_bound]
+        except IndexError:
+            return None, [], None, []
         return lower_bound, pre_context, context_line, post_context
 
     def get_traceback_frames(self):
@@ -483,7 +486,7 @@ def technical_404_response(request, exception):
     caller = ''
     try:
         resolver_match = resolve(request.path)
-    except Resolver404:
+    except Http404:
         pass
     else:
         obj = resolver_match.func
@@ -499,6 +502,7 @@ def technical_404_response(request, exception):
 
     with Path(CURRENT_DIR, 'templates', 'technical_404.html').open(encoding='utf-8') as fh:
         t = DEBUG_ENGINE.from_string(fh.read())
+    reporter_filter = get_default_exception_reporter_filter()
     c = Context({
         'urlconf': urlconf,
         'root_urlconf': settings.ROOT_URLCONF,
@@ -506,7 +510,7 @@ def technical_404_response(request, exception):
         'urlpatterns': tried,
         'reason': str(exception),
         'request': request,
-        'settings': get_safe_settings(),
+        'settings': reporter_filter.get_safe_settings(),
         'raising_view_name': caller,
     })
     return HttpResponseNotFound(t.render(c), content_type='text/html')

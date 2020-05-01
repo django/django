@@ -172,8 +172,6 @@ All attributes should be considered read-only, unless stated otherwise.
 
 .. attribute:: HttpRequest.headers
 
-    .. versionadded:: 2.2
-
     A case insensitive, dict-like object that provides access to all
     HTTP-prefixed headers (plus ``Content-Length`` and ``Content-Type``) from
     the request.
@@ -206,7 +204,7 @@ All attributes should be considered read-only, unless stated otherwise.
 
     .. versionchanged:: 3.0
 
-        Support for look ups using underscores was added.
+        Support for lookups using underscores was added.
 
 .. attribute:: HttpRequest.resolver_match
 
@@ -235,6 +233,16 @@ application.
 
     ``urlconf`` can be set to ``None`` to revert any changes made by previous
     middleware and return to using the :setting:`ROOT_URLCONF`.
+
+.. attribute:: HttpRequest.exception_reporter_filter
+
+    This will be used instead of :setting:`DEFAULT_EXCEPTION_REPORTER_FILTER`
+    for the current request. See :ref:`custom-error-reports` for details.
+
+.. attribute:: HttpRequest.exception_reporter_class
+
+    This will be used instead of :setting:`DEFAULT_EXCEPTION_REPORTER` for the
+    current request. See :ref:`custom-error-reports` for details.
 
 Attributes set by middleware
 ----------------------------
@@ -288,16 +296,17 @@ Methods
         behind multiple proxies. One solution is to use middleware to rewrite
         the proxy headers, as in the following example::
 
-            from django.utils.deprecation import MiddlewareMixin
-
-            class MultipleProxyMiddleware(MiddlewareMixin):
+            class MultipleProxyMiddleware:
                 FORWARDED_FOR_FIELDS = [
                     'HTTP_X_FORWARDED_FOR',
                     'HTTP_X_FORWARDED_HOST',
                     'HTTP_X_FORWARDED_SERVER',
                 ]
 
-                def process_request(self, request):
+                def __init__(self, get_response):
+                    self.get_response = get_response
+
+                def __call__(self, request):
                     """
                     Rewrites the proxy headers so that only the most
                     recent proxy is used.
@@ -307,6 +316,7 @@ Methods
                             if ',' in request.META[field]:
                                 parts = request.META[field].split(',')
                                 request.META[field] = parts[-1].strip()
+                    return self.get_response(request)
 
         This middleware should be positioned before any other middleware that
         relies on the value of :meth:`~HttpRequest.get_host()` -- for instance,
@@ -396,7 +406,32 @@ Methods
     Returns ``True`` if the request is secure; that is, if it was made with
     HTTPS.
 
+.. method:: HttpRequest.accepts(mime_type)
+
+    .. versionadded:: 3.1
+
+    Returns ``True`` if the request ``Accept`` header matches the ``mime_type``
+    argument::
+
+        >>> request.accepts('text/html')
+        True
+
+    Most browsers send ``Accept: */*`` by default, so this would return
+    ``True`` for all content types. Setting an explicit ``Accept`` header in
+    API requests can be useful for returning a different content type for those
+    consumers only. See :ref:`content-negotiation-example` of using
+    ``accepts()`` to return different content to API consumers.
+
+    If a response varies depending on the content of the ``Accept`` header and
+    you are using some form of caching like Django's :mod:`cache middleware
+    <django.middleware.cache>`, you should decorate the view with
+    :func:`vary_on_headers('Accept')
+    <django.views.decorators.vary.vary_on_headers>` so that the responses are
+    properly cached.
+
 .. method:: HttpRequest.is_ajax()
+
+    .. deprecated:: 3.1
 
     Returns ``True`` if the request was made via an ``XMLHttpRequest``, by
     checking the ``HTTP_X_REQUESTED_WITH`` header for the string
@@ -763,9 +798,12 @@ Methods
     ``content_type`` is the MIME type optionally completed by a character set
     encoding and is used to fill the HTTP ``Content-Type`` header. If not
     specified, it is formed by ``'text/html'`` and the
-    :setting:`DEFAULT_CHARSET` settings, by default: "`text/html; charset=utf-8`".
+    :setting:`DEFAULT_CHARSET` settings, by default:
+    ``"text/html; charset=utf-8"``.
 
     ``status`` is the :rfc:`HTTP status code <7231#section-6>` for the response.
+    You can use Python's :py:class:`http.HTTPStatus` for meaningful aliases,
+    such as ``HTTPStatus.NO_CONTENT``.
 
     ``reason`` is the HTTP response phrase. If not provided, a default phrase
     will be used.
@@ -801,7 +839,7 @@ Methods
 
     Sets a header unless it has already been set.
 
-.. method:: HttpResponse.set_cookie(key, value='', max_age=None, expires=None, path='/', domain=None, secure=None, httponly=False, samesite=None)
+.. method:: HttpResponse.set_cookie(key, value='', max_age=None, expires=None, path='/', domain=None, secure=False, httponly=False, samesite=None)
 
     Sets a cookie. The parameters are the same as in the
     :class:`~http.cookies.Morsel` cookie object in the Python standard library.
@@ -817,30 +855,39 @@ Methods
       ``domain="example.com"`` will set a cookie that is readable by the
       domains www.example.com, blog.example.com, etc. Otherwise, a cookie will
       only be readable by the domain that set it.
+    * Use ``secure=True`` if you want the cookie to be only sent to the server
+      when a request is made with the ``https`` scheme.
     * Use ``httponly=True`` if you want to prevent client-side
       JavaScript from having access to the cookie.
 
       HttpOnly_ is a flag included in a Set-Cookie HTTP response header. It's
-      part of the :rfc:`6265` standard for cookies and can be a useful way to
-      mitigate the risk of a client-side script accessing the protected cookie
-      data.
+      part of the :rfc:`RFC 6265 <6265#section-4.1.2.6>` standard for cookies
+      and can be a useful way to mitigate the risk of a client-side script
+      accessing the protected cookie data.
     * Use ``samesite='Strict'`` or ``samesite='Lax'`` to tell the browser not
       to send this cookie when performing a cross-origin request. `SameSite`_
       isn't supported by all browsers, so it's not a replacement for Django's
       CSRF protection, but rather a defense in depth measure.
 
+      Use ``samesite='None'`` (string) to explicitly state that this cookie is
+      sent with all same-site and cross-site requests.
+
     .. _HttpOnly: https://www.owasp.org/index.php/HttpOnly
-    .. _SameSite: https://www.owasp.org/index.php/SameSite
+    .. _SameSite: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Set-Cookie/SameSite
+
+    .. versionchanged:: 3.1
+
+        Using ``samesite='None'`` (string) was allowed.
 
     .. warning::
 
-        :rfc:`6265` states that user agents should support cookies of at least
-        4096 bytes. For many browsers this is also the maximum size. Django
-        will not raise an exception if there's an attempt to store a cookie of
-        more than 4096 bytes, but many browsers will not set the cookie
-        correctly.
+        :rfc:`RFC 6265 <6265#section-6.1>` states that user agents should
+        support cookies of at least 4096 bytes. For many browsers this is also
+        the maximum size. Django will not raise an exception if there's an
+        attempt to store a cookie of more than 4096 bytes, but many browsers
+        will not set the cookie correctly.
 
-.. method:: HttpResponse.set_signed_cookie(key, value, salt='', max_age=None, expires=None, path='/', domain=None, secure=None, httponly=False, samesite=None)
+.. method:: HttpResponse.set_signed_cookie(key, value, salt='', max_age=None, expires=None, path='/', domain=None, secure=False, httponly=False, samesite=None)
 
     Like :meth:`~HttpResponse.set_cookie()`, but
     :doc:`cryptographic signing </topics/signing>` the cookie before setting
@@ -848,6 +895,10 @@ Methods
     You can use the optional ``salt`` argument for added key strength, but
     you will need to remember to pass it to the corresponding
     :meth:`HttpRequest.get_signed_cookie` call.
+
+    .. versionchanged:: 3.1
+
+        Using ``samesite='None'`` (string) was allowed.
 
 .. method:: HttpResponse.delete_cookie(key, path='/', domain=None)
 
@@ -861,8 +912,7 @@ Methods
 .. method:: HttpResponse.close()
 
     This method is called at the end of the request directly by the WSGI
-    server, or when the WSGI server closes the file-like object, if
-    `wsgi.file_wrapper`_ is used for the request.
+    server.
 
 .. method:: HttpResponse.write(content)
 
@@ -968,6 +1018,18 @@ types of HTTP responses. Like ``HttpResponse``, these subclasses live in
     method, Django will treat it as emulating a
     :class:`~django.template.response.SimpleTemplateResponse`, and the
     ``render`` method must itself return a valid response object.
+
+Custom response classes
+~~~~~~~~~~~~~~~~~~~~~~~
+
+If you find yourself needing a response class that Django doesn't provide, you
+can create it with the help of :py:class:`http.HTTPStatus`. For example::
+
+    from http import HTTPStatus
+    from django.http import HttpResponse
+
+    class HttpResponseNoContent(HttpResponse):
+        status_code = HTTPStatus.NO_CONTENT
 
 ``JsonResponse`` objects
 ========================
@@ -1082,7 +1144,8 @@ Attributes
 
 .. attribute:: StreamingHttpResponse.streaming_content
 
-    An iterator of strings representing the content.
+    An iterator of the response content, bytestring encoded according to
+    :attr:`HttpResponse.charset`.
 
 .. attribute:: StreamingHttpResponse.status_code
 
@@ -1121,6 +1184,8 @@ Attributes
 
     If ``open_file`` doesn't have a name or if the name of ``open_file`` isn't
     appropriate, provide a custom file name using the ``filename``  parameter.
+    Note that if you pass a file-like object like ``io.BytesIO``, it's your
+    task to ``seek()`` it before passing it to ``FileResponse``.
 
     The ``Content-Length`` and ``Content-Type`` headers are automatically set
     when they can be guessed from contents of ``open_file``.

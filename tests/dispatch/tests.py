@@ -1,6 +1,5 @@
 import gc
 import sys
-import time
 import weakref
 from types import TracebackType
 
@@ -8,14 +7,7 @@ from django.dispatch import Signal, receiver
 from django.test import SimpleTestCase
 from django.test.utils import override_settings
 
-if sys.platform.startswith('java'):
-    def garbage_collect():
-        # Some JVM GCs will execute finalizers in a different thread, meaning
-        # we need to wait for that to complete before we go on looking for the
-        # effects of that.
-        gc.collect()
-        time.sleep(0.1)
-elif hasattr(sys, "pypy_version_info"):
+if hasattr(sys, 'pypy_version_info'):
     def garbage_collect():
         # Collecting weakreferences can take two collections on PyPy.
         gc.collect()
@@ -37,10 +29,10 @@ class Callable:
         return val
 
 
-a_signal = Signal(providing_args=["val"])
-b_signal = Signal(providing_args=["val"])
-c_signal = Signal(providing_args=["val"])
-d_signal = Signal(providing_args=["val"], use_caching=True)
+a_signal = Signal()
+b_signal = Signal()
+c_signal = Signal()
+d_signal = Signal(use_caching=True)
 
 
 class DispatcherTests(SimpleTestCase):

@@ -4,7 +4,7 @@
 <html{% if LANGUAGE_BIDI %} dir="rtl"{% endif %}>
     <head>
         <meta charset="utf-8">
-        <title>{% trans "Django: the Web framework for perfectionists with deadlines." %}</title>
+        <title>{% translate "Django: the Web framework for perfectionists with deadlines." %}</title>
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <link rel="stylesheet" type="text/css" href="/static/admin/css/fonts.css">
         <style type="text/css">
@@ -343,7 +343,7 @@
             </a>
           </div>
           <div class="release-notes">
-            <p>{% blocktrans %}View <a href="https://docs.djangoproject.com/en/{{ version }}/releases/" target="_blank" rel="noopener">release notes</a> for Django {{ version }}{% endblocktrans %}</p>
+            <p>{% blocktranslate %}View <a href="https://docs.djangoproject.com/en/{{ version }}/releases/" target="_blank" rel="noopener">release notes</a> for Django {{ version }}{% endblocktranslate %}</p>
           </div>
       </header>
       <main>
@@ -365,8 +365,8 @@
             <path class="flame" d="M 6.7 1.14 l 2.8 4.7 s 1.3 3 -1.82 3.22 l -5.4 0 s -3.28 -.14 -1.74 -3.26 l 2.76 -4.7 s 1.7 -2.3 3.4 0 z" fill="#AA2247"></path>
           </svg>
         </div>
-        <h2>{% trans "The install worked successfully! Congratulations!" %}</h2>
-        <p>{% blocktrans %}You are seeing this page because <a href="https://docs.djangoproject.com/en/{{ version }}/ref/settings/#debug" target="_blank" rel="noopener">DEBUG=True</a> is in your settings file and you have not configured any URLs.{% endblocktrans %}</p>
+        <h2>{% translate "The install worked successfully! Congratulations!" %}</h2>
+        <p>{% blocktranslate %}You are seeing this page because <a href="https://docs.djangoproject.com/en/{{ version }}/ref/settings/#debug" target="_blank" rel="noopener">DEBUG=True</a> is in your settings file and you have not configured any URLs.{% endblocktranslate %}</p>
       </main>
       <footer class="u-clearfix">
         <a href="https://docs.djangoproject.com/en/{{ version }}/" target="_blank" rel="noopener">
@@ -381,8 +381,8 @@
                 <path clip-path="url(#b)" d="M9 21c0 .55.45 1 1 1h4c.55 0 1-.45 1-1v-1H9v1zm3-19C8.14 2 5 5.14 5 9c0 2.38 1.19 4.47 3 5.74V17c0 .55.45 1 1 1h6c.55 0 1-.45 1-1v-2.26c1.81-1.27 3-3.36 3-5.74 0-3.86-3.14-7-7-7zm2.85 11.1l-.85.6V16h-4v-2.3l-.85-.6C7.8 12.16 7 10.63 7 9c0-2.76 2.24-5 5-5s5 2.24 5 5c0 1.63-.8 3.16-2.15 4.1z"></path>
             </svg>
             <div>
-                <h4>{% trans "Django Documentation" %}</h4>
-                <p>{% trans 'Topics, references, &amp; how-to’s' %}</p>
+                <h4>{% translate "Django Documentation" %}</h4>
+                <p>{% translate 'Topics, references, &amp; how-to’s' %}</p>
             </div>
         </div>
       </a>
@@ -393,8 +393,8 @@
             <path d="M9.4 16.6L4.8 12l4.6-4.6L8 6l-6 6 6 6 1.4-1.4zm5.2 0l4.6-4.6-4.6-4.6L16 6l6 6-6 6-1.4-1.4z"></path>
           </svg>
           <div>
-            <h4>{% trans "Tutorial: A Polling App" %}</h4>
-            <p>{% trans "Get started with Django" %}</p>
+            <h4>{% translate "Tutorial: A Polling App" %}</h4>
+            <p>{% translate "Get started with Django" %}</p>
           </div>
         </div>
       </a>
@@ -405,8 +405,8 @@
             <path d="M16.5 13c-1.2 0-3.07.34-4.5 1-1.43-.67-3.3-1-4.5-1C5.33 13 1 14.08 1 16.25V19h22v-2.75c0-2.17-4.33-3.25-6.5-3.25zm-4 4.5h-10v-1.25c0-.54 2.56-1.75 5-1.75s5 1.21 5 1.75v1.25zm9 0H14v-1.25c0-.46-.2-.86-.52-1.22.88-.3 1.96-.53 3.02-.53 2.44 0 5 1.21 5 1.75v1.25zM7.5 12c1.93 0 3.5-1.57 3.5-3.5S9.43 5 7.5 5 4 6.57 4 8.5 5.57 12 7.5 12zm0-5.5c1.1 0 2 .9 2 2s-.9 2-2 2-2-.9-2-2 .9-2 2-2zm9 5.5c1.93 0 3.5-1.57 3.5-3.5S18.43 5 16.5 5 13 6.57 13 8.5s1.57 3.5 3.5 3.5zm0-5.5c1.1 0 2 .9 2 2s-.9 2-2 2-2-.9-2-2 .9-2 2-2z"></path>
           </svg>
           <div>
-            <h4>{% trans "Django Community" %}</h4>
-            <p>{% trans "Connect, get help, or contribute" %}</p>
+            <h4>{% translate "Django Community" %}</h4>
+            <p>{% translate "Connect, get help, or contribute" %}</p>
           </div>
         </div>
       </a>

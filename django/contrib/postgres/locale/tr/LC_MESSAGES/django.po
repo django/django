@@ -1,14 +1,14 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# BouRock, 2015-2018
+# BouRock, 2015-2019
 # BouRock, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-05-17 11:49+0200\n"
-"PO-Revision-Date: 2018-05-18 10:06+0000\n"
+"POT-Creation-Date: 2019-09-08 17:27+0200\n"
+"PO-Revision-Date: 2019-09-17 07:24+0000\n"
 "Last-Translator: BouRock\n"
 "Language-Team: Turkish (http://www.transifex.com/django/django/language/"
 "tr/)\n"
@@ -32,8 +32,8 @@ msgid "Map of strings to strings/nulls"
 msgstr "Dizgiler/boşlar olarak dizgilerin eşlemesi"
 
 #, python-format
-msgid "The value of \"%(key)s\" is not a string or null."
-msgstr "\"%(key)s\" değeri bir dizgi ya da boş değil."
+msgid "The value of “%(key)s” is not a string or null."
+msgstr "“%(key)s” değeri bir dizgi ya da boş değil."
 
 msgid "A JSON object"
 msgstr "JSON nesnesi"
@@ -48,8 +48,8 @@ msgid "Input must be a JSON dictionary."
 msgstr "Bir JSON dizini girilmek zorundadır."
 
 #, python-format
-msgid "'%(value)s' value must be valid JSON."
-msgstr "'%(value)s' değeri geçerli JSON olmak zorundadır."
+msgid "“%(value)s” value must be valid JSON."
+msgstr "“%(value)s” değeri geçerli JSON olmak zorundadır."
 
 msgid "Enter two valid values."
 msgstr "Iki geçerli değer girin."

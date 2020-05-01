@@ -24,7 +24,8 @@ __ `executing custom SQL directly`_
 
     Before using raw SQL, explore :doc:`the ORM </topics/db/index>`. Ask on
     |django-users| or the `#django IRC channel
-    <irc://irc.freenode.net/django>`_ to see if the ORM supports your use case.
+    <https://webchat.freenode.net/#django>`_ to see if the ORM supports your
+    use case.
 
 .. warning::
 
@@ -46,8 +47,8 @@ return model instances:
 
 This method takes a raw SQL query, executes it, and returns a
 ``django.db.models.query.RawQuerySet`` instance. This ``RawQuerySet`` instance
-can be iterated over just like a normal
-:class:`~django.db.models.query.QuerySet` to provide object instances.
+can be iterated over like a normal :class:`~django.db.models.query.QuerySet` to
+provide object instances.
 
 This is best illustrated with an example. Suppose you have the following model::
 
@@ -170,8 +171,9 @@ last names were both retrieved on demand when they were printed.
 
 There is only one field that you can't leave out - the primary key
 field. Django uses the primary key to identify model instances, so it
-must always be included in a raw query. An ``InvalidQuery`` exception
-will be raised if you forget to include the primary key.
+must always be included in a raw query. A
+:class:`~django.core.exceptions.FieldDoesNotExist` exception will be raised if
+you forget to include the primary key.
 
 Adding annotations
 ------------------

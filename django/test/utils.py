@@ -1,3 +1,4 @@
+import asyncio
 import logging
 import re
 import sys
@@ -170,7 +171,7 @@ def setup_databases(verbosity, interactive, keepdb=False, debug_sql=False, paral
                     verbosity=verbosity,
                     autoclobber=not interactive,
                     keepdb=keepdb,
-                    serialize=connection.settings_dict.get('TEST', {}).get('SERIALIZE', True),
+                    serialize=connection.settings_dict['TEST'].get('SERIALIZE', True),
                 )
                 if parallel > 1:
                     for index in range(parallel):
@@ -362,12 +363,22 @@ class TestContextDecorator:
         raise TypeError('Can only decorate subclasses of unittest.TestCase')
 
     def decorate_callable(self, func):
-        @wraps(func)
-        def inner(*args, **kwargs):
-            with self as context:
-                if self.kwarg_name:
-                    kwargs[self.kwarg_name] = context
-                return func(*args, **kwargs)
+        if asyncio.iscoroutinefunction(func):
+            # If the inner function is an async function, we must execute async
+            # as well so that the `with` statement executes at the right time.
+            @wraps(func)
+            async def inner(*args, **kwargs):
+                with self as context:
+                    if self.kwarg_name:
+                        kwargs[self.kwarg_name] = context
+                    return await func(*args, **kwargs)
+        else:
+            @wraps(func)
+            def inner(*args, **kwargs):
+                with self as context:
+                    if self.kwarg_name:
+                        kwargs[self.kwarg_name] = context
+                    return func(*args, **kwargs)
         return inner
 
     def __call__(self, decorated):
@@ -537,8 +548,8 @@ def compare_xml(want, got):
     """
     Try to do a 'xml-comparison' of want and got. Plain string comparison
     doesn't always work because, for example, attribute ordering should not be
-    important. Ignore comment nodes, document type node, and leading and
-    trailing whitespaces.
+    important. Ignore comment nodes, processing instructions, document type
+    node, and leading and trailing whitespaces.
 
     Based on https://github.com/lxml/lxml/blob/master/src/lxml/doctestcompare.py
     """
@@ -576,7 +587,11 @@ def compare_xml(want, got):
 
     def first_node(document):
         for node in document.childNodes:
-            if node.nodeType not in (Node.COMMENT_NODE, Node.DOCUMENT_TYPE_NODE):
+            if node.nodeType not in (
+                Node.COMMENT_NODE,
+                Node.DOCUMENT_TYPE_NODE,
+                Node.PROCESSING_INSTRUCTION_NODE,
+            ):
                 return node
 
     want = want.strip().replace('\\n', '\n')

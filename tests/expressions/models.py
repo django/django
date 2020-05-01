@@ -6,10 +6,15 @@ import uuid
 from django.db import models
 
 
+class Manager(models.Model):
+    name = models.CharField(max_length=50)
+
+
 class Employee(models.Model):
     firstname = models.CharField(max_length=50)
     lastname = models.CharField(max_length=50)
     salary = models.IntegerField(blank=True, null=True)
+    manager = models.ForeignKey(Manager, models.CASCADE, null=True)
 
     def __str__(self):
         return '%s %s' % (self.firstname, self.lastname)
@@ -34,6 +39,7 @@ class Company(models.Model):
         related_name='company_point_of_contact_set',
         null=True,
     )
+    based_in_eu = models.BooleanField(default=False)
 
     def __str__(self):
         return self.name
@@ -94,6 +100,3 @@ class UUIDPK(models.Model):
 class UUID(models.Model):
     uuid = models.UUIDField(null=True)
     uuid_fk = models.ForeignKey(UUIDPK, models.CASCADE, null=True)
-
-    def __str__(self):
-        return "%s" % self.uuid

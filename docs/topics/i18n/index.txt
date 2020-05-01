@@ -28,9 +28,9 @@ Essentially, Django does two things:
 * It uses these hooks to localize Web apps for particular users according to
   their preferences.
 
-Obviously, translation depends on the target language, and formatting usually
-depends on the target country. This information is provided by browsers in
-the ``Accept-Language`` header. However, the time zone isn't readily available.
+Translation depends on the target language, and formatting usually depends on
+the target country. This information is provided by browsers in the
+``Accept-Language`` header. However, the time zone isn't readily available.
 
 Definitions
 ===========

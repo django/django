@@ -41,3 +41,12 @@ STRUCT_SIZE = {
     'f': 4,  # Float
     'd': 8,  # Double
 }
+
+# Pixel type specifies type of pixel values in a band. Storage flag specifies
+# whether the band data is stored as part of the datum or is to be found on the
+# server's filesystem. There are currently 11 supported pixel value types, so 4
+# bits are enough to account for all. Reserve the upper 4 bits for generic
+# flags.
+# See https://trac.osgeo.org/postgis/wiki/WKTRaster/RFC/RFC1_V0SerialFormat#Pixeltypeandstorageflag
+BANDTYPE_PIXTYPE_MASK = 0x0F
+BANDTYPE_FLAG_HASNODATA = 1 << 6

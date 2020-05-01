@@ -28,7 +28,7 @@ Next, clone your fork, install some requirements, and run the tests:
 
 .. console::
 
-   $ git clone git@github.com:YourGitHubName/django.git django-repo
+   $ git clone https://github.com/YourGitHubName/django.git django-repo
    $ cd django-repo/tests
    $ python -m pip install -e ..
    $ python -m pip install -r requirements/py3.txt
@@ -45,10 +45,10 @@ test dependencies. If you don't have an optional dependency installed, the
 tests that require it will be skipped.
 
 Running the tests requires a Django settings module that defines the databases
-to use. To make it easy to get started, Django provides and uses a sample
-settings module that uses the SQLite database. See
-:ref:`running-unit-tests-settings` to learn how to use a different settings
-module to run the tests with a different database.
+to use. To help you get started, Django provides and uses a sample settings
+module that uses the SQLite database. See :ref:`running-unit-tests-settings` to
+learn how to use a different settings module to run the tests with a different
+database.
 
 Having problems? See :ref:`troubleshooting-unit-tests` for some common issues.
 
@@ -124,7 +124,7 @@ Running the JavaScript tests
 
 Django includes a set of :ref:`JavaScript unit tests <javascript-tests>` for
 functions in certain contrib apps. The JavaScript tests aren't run by default
-using ``tox`` because they require `Node.js` to be installed and aren't
+using ``tox`` because they require ``Node.js`` to be installed and aren't
 necessary for the majority of patches. To run the JavaScript tests using
 ``tox``:
 
@@ -134,6 +134,15 @@ necessary for the majority of patches. To run the JavaScript tests using
 
 This command runs ``npm install`` to ensure test requirements are up to
 date and then runs ``npm test``.
+
+Running tests using ``django-docker-box``
+-----------------------------------------
+
+`django-docker-box`_ allows you to run the Django's test suite across all
+supported databases and python versions. See the `django-docker-box`_ project
+page for installation and usage instructions.
+
+.. _django-docker-box: https://github.com/django/django-docker-box
 
 .. _running-unit-tests-settings:
 
@@ -199,7 +208,7 @@ internationalization, type:
 How do you find out the names of individual tests? Look in ``tests/`` — each
 directory name there is the name of a test.
 
-If you just want to run a particular class of tests, you can specify a list of
+If you want to run only a particular class of tests, you can specify a list of
 paths to individual test classes. For example, to run the ``TranslationTests``
 of the ``i18n`` module, type:
 
@@ -262,13 +271,13 @@ If you want to run the full suite of tests, you'll need to install a number of
 dependencies:
 
 *  argon2-cffi_ 16.1.0+
-*  asgiref_ (required)
+*  asgiref_ 3.2+ (required)
 *  bcrypt_
 *  docutils_
 *  geoip2_
 *  jinja2_ 2.7+
 *  numpy_
-*  Pillow_
+*  Pillow_ 6.2.0+
 *  PyYAML_
 *  pytz_ (required)
 *  pywatchman_
@@ -276,7 +285,8 @@ dependencies:
 *  memcached_, plus a :ref:`supported Python binding <memcached>`
 *  gettext_ (:ref:`gettext_on_windows`)
 *  selenium_
-*  sqlparse_ (required)
+*  sqlparse_ 0.2.2+ (required)
+*  tblib_ 1.5.0+
 
 You can find these dependencies in `pip requirements files`_ inside the
 ``tests/requirements`` directory of the Django source tree and install them
@@ -323,6 +333,7 @@ service.
 .. _selenium: https://pypi.org/project/selenium/
 .. _sqlparse: https://pypi.org/project/sqlparse/
 .. _pip requirements files: https://pip.pypa.io/en/latest/user_guide/#requirements-files
+.. _tblib: https://pypi.org/project/tblib/
 .. _Watchman: https://facebook.github.io/watchman/
 
 Code coverage
@@ -363,6 +374,27 @@ in ``tests/auth_tests``.
 
 Troubleshooting
 ===============
+
+Test suite hangs or shows failures on ``master`` branch
+-------------------------------------------------------
+
+Ensure you have the latest point release of a :ref:`supported Python version
+<faq-python-version-support>`, since there are often bugs in earlier versions
+that may cause the test suite to fail or hang.
+
+On **macOS** (High Sierra and newer versions), you might see this message
+logged, after which the tests hang::
+
+    objc[42074]: +[__NSPlaceholderDate initialize] may have been in progress in
+    another thread when fork() was called.
+
+To avoid this set a ``OBJC_DISABLE_INITIALIZE_FORK_SAFETY`` environment
+variable, for example::
+
+    $ OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES ./runtests.py
+
+Or add ``export OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES`` to your shell's
+startup file (e.g. ``~/.profile``).
 
 Many test failures with ``UnicodeEncodeError``
 ----------------------------------------------
@@ -467,12 +499,12 @@ You can also use the ``DJANGO_TEST_PROCESSES`` environment variable for this
 purpose.
 
 Tips for writing tests
-----------------------
+======================
 
 .. highlight:: python
 
 Isolating model registration
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+----------------------------
 
 To avoid polluting the global :attr:`~django.apps.apps` registry and prevent
 unnecessary table creation, models defined in a test method should be bound to

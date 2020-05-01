@@ -26,7 +26,9 @@ class FunctionTests(SimpleTestCase):
         self.assertEqual(floatformat(7.7), '7.7')
         self.assertEqual(floatformat(7.0), '7')
         self.assertEqual(floatformat(0.7), '0.7')
+        self.assertEqual(floatformat(-0.7), '-0.7')
         self.assertEqual(floatformat(0.07), '0.1')
+        self.assertEqual(floatformat(-0.07), '-0.1')
         self.assertEqual(floatformat(0.007), '0.0')
         self.assertEqual(floatformat(0.0), '0')
         self.assertEqual(floatformat(7.7, 0), '8')
@@ -61,6 +63,16 @@ class FunctionTests(SimpleTestCase):
         self.assertEqual(floatformat(0, 7), '0.0000000')
         self.assertEqual(floatformat(0, 10), '0.0000000000')
         self.assertEqual(floatformat(0.000000000000000000015, 20), '0.00000000000000000002')
+
+    def test_negative_zero_values(self):
+        tests = [
+            (-0.01, -1, '0.0'),
+            (-0.001, 2, '0.00'),
+            (-0.499, 0, '0'),
+        ]
+        for num, decimal_places, expected in tests:
+            with self.subTest(num=num, decimal_places=decimal_places):
+                self.assertEqual(floatformat(num, decimal_places), expected)
 
     def test_infinity(self):
         pos_inf = float(1e30000)

@@ -636,7 +636,9 @@ class SystemChecksTestCase(SimpleTestCase):
         errors = MyAdmin(Album, AdminSite()).check()
         expected = [
             checks.Error(
-                "'admin_checks.TwoAlbumFKAndAnE' has more than one ForeignKey to 'admin_checks.Album'.",
+                "'admin_checks.TwoAlbumFKAndAnE' has more than one ForeignKey "
+                "to 'admin_checks.Album'. You must specify a 'fk_name' "
+                "attribute.",
                 obj=TwoAlbumFKAndAnEInline,
                 id='admin.E202',
             )
@@ -652,6 +654,18 @@ class SystemChecksTestCase(SimpleTestCase):
             inlines = [TwoAlbumFKAndAnEInline]
 
         errors = MyAdmin(Album, AdminSite()).check()
+        self.assertEqual(errors, [])
+
+    def test_inlines_property(self):
+        class CitiesInline(admin.TabularInline):
+            model = City
+
+        class StateAdmin(admin.ModelAdmin):
+            @property
+            def inlines(self):
+                return [CitiesInline]
+
+        errors = StateAdmin(State, AdminSite()).check()
         self.assertEqual(errors, [])
 
     def test_readonly(self):

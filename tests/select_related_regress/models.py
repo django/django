@@ -4,16 +4,10 @@ from django.db import models
 class Building(models.Model):
     name = models.CharField(max_length=10)
 
-    def __str__(self):
-        return "Building: %s" % self.name
-
 
 class Device(models.Model):
     building = models.ForeignKey('Building', models.CASCADE)
     name = models.CharField(max_length=10)
-
-    def __str__(self):
-        return "device '%s' in building %s" % (self.name, self.building)
 
 
 class Port(models.Model):
@@ -37,9 +31,6 @@ class Connection(models.Model):
         related_name='connection_end',
         unique=True,
     )
-
-    def __str__(self):
-        return "%s to %s" % (self.start, self.end)
 
 # Another non-tree hierarchy that exercises code paths similar to the above
 # example, but in a slightly different configuration.
@@ -100,9 +91,6 @@ class SpecialClient(Client):
 class Parent(models.Model):
     name = models.CharField(max_length=10)
 
-    def __str__(self):
-        return self.name
-
 
 class Child(Parent):
     value = models.IntegerField()
@@ -120,9 +108,6 @@ class Item(models.Model):
 
 class Fowl(models.Model):
     name = models.CharField(max_length=10)
-
-    def __str__(self):
-        return self.name
 
 
 class Hen(Fowl):

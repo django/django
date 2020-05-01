@@ -1,4 +1,5 @@
-from django.forms import URLField, ValidationError
+from django.core.exceptions import ValidationError
+from django.forms import URLField
 from django.test import SimpleTestCase
 
 from . import FormFieldAssertionsMixin

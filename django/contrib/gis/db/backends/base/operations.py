@@ -3,7 +3,7 @@ from django.contrib.gis.db.models.functions import Distance
 from django.contrib.gis.measure import (
     Area as AreaMeasure, Distance as DistanceMeasure,
 )
-from django.db.utils import NotSupportedError
+from django.db import NotSupportedError
 from django.utils.functional import cached_property
 
 

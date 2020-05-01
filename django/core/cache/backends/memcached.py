@@ -78,7 +78,7 @@ class BaseMemcachedCache(BaseCache):
 
     def delete(self, key, version=None):
         key = self.make_key(key, version=version)
-        self._cache.delete(key)
+        return bool(self._cache.delete(key))
 
     def get_many(self, keys, version=None):
         key_map = {self.make_key(key, version=version): key for key in keys}
@@ -169,6 +169,13 @@ class MemcachedCache(BaseMemcachedCache):
         if val is None:
             return default
         return val
+
+    def delete(self, key, version=None):
+        # python-memcached's delete() returns True when key doesn't exist.
+        # https://github.com/linsomniac/python-memcached/issues/170
+        # Call _deletetouch() without the NOT_FOUND in expected results.
+        key = self.make_key(key, version=version)
+        return bool(self._cache._deletetouch([b'DELETED'], 'delete', key))
 
 
 class PyLibMCCache(BaseMemcachedCache):

@@ -6,8 +6,6 @@ Constraints reference
 
 .. currentmodule:: django.db.models
 
-.. versionadded:: 2.2
-
 The classes defined in this module create database constraints. They are added
 in the model :attr:`Meta.constraints <django.db.models.Options.constraints>`
 option.
@@ -35,11 +33,12 @@ option.
 
     In general constraints are **not** checked during ``full_clean()``, and do
     not raise ``ValidationError``\s. Rather you'll get a database integrity
-    error on ``save()``. ``UniqueConstraint``\s are different in this regard,
-    in that they leverage the existing ``validate_unique()`` logic, and thus
-    enable two-stage validation. In addition to ``IntegrityError`` on
-    ``save()``, ``ValidationError`` is also raised during model validation when
-    the ``UniqueConstraint`` is violated.
+    error on ``save()``. ``UniqueConstraint``\s without a
+    :attr:`~UniqueConstraint.condition` (i.e. non-partial unique constraints)
+    are different in this regard, in that they leverage the existing
+    ``validate_unique()`` logic, and thus enable two-stage validation. In
+    addition to ``IntegrityError`` on ``save()``, ``ValidationError`` is also
+    raised during model validation when the ``UniqueConstraint`` is violated.
 
 ``CheckConstraint``
 ===================
@@ -53,11 +52,15 @@ option.
 
 .. attribute:: CheckConstraint.check
 
-A :class:`Q` object that specifies the check you want the constraint to
-enforce.
+A :class:`Q` object or boolean :class:`~django.db.models.Expression` that
+specifies the check you want the constraint to enforce.
 
 For example, ``CheckConstraint(check=Q(age__gte=18), name='age_gte_18')``
 ensures the age field is never less than 18.
+
+.. versionchanged:: 3.1
+
+    Support for boolean :class:`~django.db.models.Expression` was added.
 
 ``name``
 --------
@@ -73,7 +76,7 @@ The name of the constraint.
 ``UniqueConstraint``
 ====================
 
-.. class:: UniqueConstraint(*, fields, name, condition=None)
+.. class:: UniqueConstraint(*, fields, name, condition=None, deferrable=None)
 
     Creates a unique constraint in the database.
 
@@ -116,3 +119,35 @@ ensures that each user only has one draft.
 
 These conditions have the same database restrictions as
 :attr:`Index.condition`.
+
+``deferrable``
+--------------
+
+.. attribute:: UniqueConstraint.deferrable
+
+.. versionadded:: 3.1
+
+Set this parameter to create a deferrable unique constraint. Accepted values
+are ``Deferrable.DEFERRED`` or ``Deferrable.IMMEDIATE``. For example::
+
+    from django.db.models import Deferrable, UniqueConstraint
+
+    UniqueConstraint(
+        name='unique_order',
+        fields=['order'],
+        deferrable=Deferrable.DEFERRED,
+    )
+
+By default constraints are not deferred. A deferred constraint will not be
+enforced until the end of the transaction. An immediate constraint will be
+enforced immediately after every command.
+
+.. admonition:: MySQL, MariaDB, and SQLite.
+
+    Deferrable unique constraints are ignored on MySQL, MariaDB, and SQLite as
+    neither supports them.
+
+.. warning::
+
+    Deferred unique constraints may lead to a `performance penalty
+    <https://www.postgresql.org/docs/current/sql-createtable.html#id-1.9.3.85.9.4>`_.

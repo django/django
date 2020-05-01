@@ -1,4 +1,5 @@
 import unittest
+import uuid
 
 from django.core.checks import Error, Warning as DjangoWarning
 from django.db import connection, models
@@ -7,6 +8,7 @@ from django.test.utils import isolate_apps, override_settings
 from django.utils.functional import lazy
 from django.utils.timezone import now
 from django.utils.translation import gettext_lazy as _
+from django.utils.version import get_docs_version
 
 
 @isolate_apps('invalid_models_tests')
@@ -35,6 +37,21 @@ class AutoFieldTests(SimpleTestCase):
                 'AutoFields must set primary_key=True.',
                 obj=field,
                 id='fields.E100',
+            ),
+        ])
+
+    def test_max_length_warning(self):
+        class Model(models.Model):
+            auto = models.AutoField(primary_key=True, max_length=2)
+
+        field = Model._meta.get_field('auto')
+        self.assertEqual(field.check(), [
+            DjangoWarning(
+                "'max_length' is ignored when used with %s."
+                % field.__class__.__name__,
+                hint="Remove 'max_length' from field",
+                obj=field,
+                id='fields.W122',
             ),
         ])
 
@@ -289,6 +306,32 @@ class CharFieldTests(SimpleTestCase):
 
         self.assertEqual(Model._meta.get_field('field').check(), [])
 
+    def test_choices_in_max_length(self):
+        class Model(models.Model):
+            field = models.CharField(
+                max_length=2, choices=[
+                    ('ABC', 'Value Too Long!'), ('OK', 'Good')
+                ],
+            )
+            group = models.CharField(
+                max_length=2, choices=[
+                    ('Nested', [('OK', 'Good'), ('Longer', 'Longer')]),
+                    ('Grouped', [('Bad', 'Bad')]),
+                ],
+            )
+
+        for name, choice_max_length in (('field', 3), ('group', 6)):
+            with self.subTest(name):
+                field = Model._meta.get_field(name)
+                self.assertEqual(field.check(), [
+                    Error(
+                        "'max_length' is too small to fit the longest value "
+                        "in 'choices' (%d characters)." % choice_max_length,
+                        obj=field,
+                        id='fields.E009',
+                    ),
+                ])
+
     def test_bad_db_index_value(self):
         class Model(models.Model):
             field = models.CharField(max_length=10, db_index='bad')
@@ -330,10 +373,15 @@ class CharFieldTests(SimpleTestCase):
         field = Model._meta.get_field('field')
         validator = DatabaseValidation(connection=connection)
         self.assertEqual(validator.check_field(field), [
-            Error(
-                'MySQL does not allow unique CharFields to have a max_length > 255.',
+            DjangoWarning(
+                '%s may not allow unique CharFields to have a max_length > '
+                '255.' % connection.display_name,
+                hint=(
+                    'See: https://docs.djangoproject.com/en/%s/ref/databases/'
+                    '#mysql-character-fields' % get_docs_version()
+                ),
                 obj=field,
-                id='mysql.E001',
+                id='mysql.W003',
             )
         ])
 
@@ -648,6 +696,7 @@ class IntegerFieldTests(SimpleTestCase):
             biginteger = models.BigIntegerField(max_length=2)
             smallinteger = models.SmallIntegerField(max_length=2)
             positiveinteger = models.PositiveIntegerField(max_length=2)
+            positivebiginteger = models.PositiveBigIntegerField(max_length=2)
             positivesmallinteger = models.PositiveSmallIntegerField(max_length=2)
 
         for field in Model._meta.get_fields():
@@ -715,7 +764,7 @@ class TextFieldTests(TestCase):
             value = models.TextField(db_index=True)
         field = Model._meta.get_field('value')
         field_type = field.db_type(connection)
-        self.assertEqual(field.check(), [
+        self.assertEqual(field.check(databases=self.databases), [
             DjangoWarning(
                 '%s does not support a database index on %s columns.'
                 % (connection.display_name, field_type),
@@ -727,3 +776,20 @@ class TextFieldTests(TestCase):
                 id='fields.W162',
             )
         ])
+
+
+@isolate_apps('invalid_models_tests')
+class UUIDFieldTests(TestCase):
+    def test_choices_named_group(self):
+        class Model(models.Model):
+            field = models.UUIDField(
+                choices=[
+                    ['knights', [
+                        [uuid.UUID('5c859437-d061-4847-b3f7-e6b78852f8c8'), 'Lancelot'],
+                        [uuid.UUID('c7853ec1-2ea3-4359-b02d-b54e8f1bcee2'), 'Galahad'],
+                    ]],
+                    [uuid.UUID('25d405be-4895-4d50-9b2e-d6695359ce47'), 'Other'],
+                ],
+            )
+
+        self.assertEqual(Model._meta.get_field('field').check(), [])

@@ -45,7 +45,7 @@ When you have created your GitHub account, with the nick "GitHub_nick", and
 `forked Django's repository <https://github.com/django/django/fork>`__,
 create a local copy of your fork::
 
-    git clone git@github.com:GitHub_nick/django.git
+    git clone https://github.com/GitHub_nick/django.git
 
 This will create a new directory "django", containing a clone of your GitHub
 repository. The rest of the git commands on this page need to be run within the
@@ -98,7 +98,7 @@ necessary::
 Publishing work
 ---------------
 
-You can publish your work on GitHub just by doing::
+You can publish your work on GitHub by running::
 
   git push origin ticket_xxxxx
 
@@ -186,9 +186,9 @@ the changes::
     git push -f origin ticket_xxxxx
 
 Note that this will rewrite history of ticket_xxxxx - if you check the commit
-hashes before and after the operation at GitHub you will notice that the
-commit hashes do not match anymore. This is acceptable, as the branch is merely
-a topic branch, and nobody should be basing their work on it.
+hashes before and after the operation at GitHub you will notice that the commit
+hashes do not match anymore. This is acceptable, as the branch is a topic
+branch, and nobody should be basing their work on it.
 
 After upstream has changed
 --------------------------

@@ -24,8 +24,12 @@ class BaseDatabaseOperations:
         'SmallIntegerField': (-32768, 32767),
         'IntegerField': (-2147483648, 2147483647),
         'BigIntegerField': (-9223372036854775808, 9223372036854775807),
+        'PositiveBigIntegerField': (0, 9223372036854775807),
         'PositiveSmallIntegerField': (0, 32767),
         'PositiveIntegerField': (0, 2147483647),
+        'SmallAutoField': (-32768, 32767),
+        'AutoField': (-2147483648, 2147483647),
+        'BigAutoField': (-9223372036854775808, 9223372036854775807),
     }
     set_operators = {
         'union': 'UNION',
@@ -173,13 +177,12 @@ class BaseDatabaseOperations:
         else:
             return ['DISTINCT'], []
 
-    def fetch_returned_insert_id(self, cursor):
+    def fetch_returned_insert_columns(self, cursor, returning_params):
         """
         Given a cursor object that has just performed an INSERT...RETURNING
-        statement into a table that has an auto-incrementing ID, return the
-        newly created ID.
+        statement into a table, return the newly created data.
         """
-        return cursor.fetchone()[0]
+        return cursor.fetchone()
 
     def field_cast_sql(self, db_type, internal_type):
         """
@@ -311,12 +314,11 @@ class BaseDatabaseOperations:
         """
         return value
 
-    def return_insert_id(self, field):
+    def return_insert_columns(self, fields):
         """
-        For backends that support returning the last insert ID as part of an
-        insert query, return the SQL and params to append to the INSERT query.
-        The returned fragment should contain a format string to hold the
-        appropriate column.
+        For backends that support returning columns as part of an insert query,
+        return the SQL and params to append to the INSERT query. The returned
+        fragment should contain a format string to hold the appropriate column.
         """
         pass
 
@@ -380,15 +382,17 @@ class BaseDatabaseOperations:
         """
         return ''
 
-    def sql_flush(self, style, tables, sequences, allow_cascade=False):
+    def sql_flush(self, style, tables, *, reset_sequences=False, allow_cascade=False):
         """
         Return a list of SQL statements required to remove all data from
         the given database tables (without actually removing the tables
-        themselves) and the SQL statements required to reset the sequences
-        passed in `sequences`.
+        themselves).
 
         The `style` argument is a Style object as returned by either
         color_style() or no_style() in django.core.management.color.
+
+        If `reset_sequences` is True, the list includes SQL statements required
+        to reset the sequences.
 
         The `allow_cascade` argument determines whether truncation may cascade
         to tables with foreign keys pointing the tables being truncated.
@@ -396,9 +400,12 @@ class BaseDatabaseOperations:
         """
         raise NotImplementedError('subclasses of BaseDatabaseOperations must provide a sql_flush() method')
 
-    def execute_sql_flush(self, using, sql_list):
+    def execute_sql_flush(self, sql_list):
         """Execute a list of SQL statements to flush the database."""
-        with transaction.atomic(using=using, savepoint=self.connection.features.can_rollback_ddl):
+        with transaction.atomic(
+            using=self.connection.alias,
+            savepoint=self.connection.features.can_rollback_ddl,
+        ):
             with self.connection.cursor() as cursor:
                 for sql in sql_list:
                     cursor.execute(sql)
@@ -578,6 +585,13 @@ class BaseDatabaseOperations:
         """
         pass
 
+    def conditional_expression_supported_in_where_clause(self, expression):
+        """
+        Return True, if the conditional expression is supported in the WHERE
+        clause.
+        """
+        return True
+
     def combine_expression(self, connector, sub_expressions):
         """
         Combine a list of subexpressions into a single expression, using
@@ -617,7 +631,7 @@ class BaseDatabaseOperations:
         if self.connection.features.supports_temporal_subtraction:
             lhs_sql, lhs_params = lhs
             rhs_sql, rhs_params = rhs
-            return "(%s - %s)" % (lhs_sql, rhs_sql), lhs_params + rhs_params
+            return '(%s - %s)' % (lhs_sql, rhs_sql), (*lhs_params, *rhs_params)
         raise NotSupportedError("This backend does not support %s subtraction." % internal_type)
 
     def window_frame_start(self, start):
@@ -649,7 +663,16 @@ class BaseDatabaseOperations:
         return self.window_frame_start(start), self.window_frame_end(end)
 
     def window_frame_range_start_end(self, start=None, end=None):
-        return self.window_frame_rows_start_end(start, end)
+        start_, end_ = self.window_frame_rows_start_end(start, end)
+        if (
+            self.connection.features.only_supports_unbounded_with_preceding_and_following and
+            ((start and start < 0) or (end and end > 0))
+        ):
+            raise NotSupportedError(
+                '%s only supports UNBOUNDED together with PRECEDING and '
+                'FOLLOWING.' % self.connection.display_name
+            )
+        return start_, end_
 
     def explain_query_prefix(self, format=None, **options):
         if not self.connection.features.supports_explaining_query_execution:

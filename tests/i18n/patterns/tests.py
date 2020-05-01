@@ -2,7 +2,7 @@ import os
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
-from django.http import HttpResponsePermanentRedirect
+from django.http import HttpResponse, HttpResponsePermanentRedirect
 from django.middleware.locale import LocaleMiddleware
 from django.template import Context, Template
 from django.test import SimpleTestCase, override_settings
@@ -100,7 +100,7 @@ class RequestURLConfTests(SimpleTestCase):
     def test_request_urlconf_considered(self):
         request = RequestFactory().get('/nl/')
         request.urlconf = 'i18n.patterns.urls.default'
-        middleware = LocaleMiddleware()
+        middleware = LocaleMiddleware(lambda req: HttpResponse())
         with translation.override('nl'):
             middleware.process_request(request)
         self.assertEqual(request.LANGUAGE_CODE, 'nl')

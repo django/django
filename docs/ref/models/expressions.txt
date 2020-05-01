@@ -5,10 +5,11 @@ Query Expressions
 .. currentmodule:: django.db.models
 
 Query expressions describe a value or a computation that can be used as part of
-an update, create, filter, order by, annotation, or aggregate. There are a
-number of built-in expressions (documented below) that can be used to help you
-write queries. Expressions can be combined, or in some cases nested, to form
-more complex computations.
+an update, create, filter, order by, annotation, or aggregate. When an
+expression outputs a boolean value, it may be used directly in filters. There
+are a number of built-in expressions (documented below) that can be used to
+help you write queries. Expressions can be combined, or in some cases nested,
+to form more complex computations.
 
 Supported arithmetic
 ====================
@@ -69,6 +70,12 @@ Some examples
     CharField.register_lookup(Length)
     Company.objects.order_by('name__length')
 
+    # Boolean expression can be used directly in filters.
+    from django.db.models import Exists
+    Company.objects.filter(
+        Exists(Employee.objects.filter(company=OuterRef('pk'), salary__gt=10))
+    )
+
 Built-in Expressions
 ====================
 
@@ -91,8 +98,7 @@ into Python memory.
 Instead, Django uses the ``F()`` object to generate an SQL expression that
 describes the required operation at the database level.
 
-This is easiest to understand through an example. Normally, one might do
-something like this::
+Let's try this with an example. Normally, one might do something like this::
 
     # Tintin filed a news story!
     reporter = Reporters.objects.get(name='Tintin')
@@ -160,7 +166,7 @@ Python - update a field's value avoids a *race condition*.
 If two Python threads execute the code in the first example above, one thread
 could retrieve, increment, and save a field's value after the other has
 retrieved it from the database. The value that the second thread saves will be
-based on the original value; the work of the first thread will simply be lost.
+based on the original value; the work of the first thread will be lost.
 
 If the database is responsible for updating the field, the process is more
 robust: it will only ever update the field based on the value of the field in
@@ -308,7 +314,9 @@ The ``Func`` API is as follows:
 
     .. method:: as_sql(compiler, connection, function=None, template=None, arg_joiner=None, **extra_context)
 
-        Generates the SQL for the database function.
+        Generates the SQL fragment for the database function. Returns a tuple
+        ``(sql, params)``, where ``sql`` is the SQL string, and ``params`` is
+        the list or tuple of query parameters.
 
         The ``as_vendor()`` methods should use the ``function``, ``template``,
         ``arg_joiner``, and any other ``**extra_context`` parameters to
@@ -394,8 +402,6 @@ The ``Aggregate`` API is as follows:
 
     .. attribute:: allow_distinct
 
-        .. versionadded:: 2.2
-
         A class attribute determining whether or not this aggregate function
         allows passing a ``distinct`` keyword argument. If set to ``False``
         (default), ``TypeError`` is raised if ``distinct=True`` is passed.
@@ -429,16 +435,12 @@ and :ref:`filtering-on-annotations` for example usage.
 The ``**extra`` kwargs are ``key=value`` pairs that can be interpolated
 into the ``template`` attribute.
 
-.. versionadded:: 2.2
-
-    The ``allow_distinct`` attribute and ``distinct`` argument were added.
-
 Creating your own Aggregate Functions
 -------------------------------------
 
-Creating your own aggregate is extremely easy. At a minimum, you need
-to define ``function``, but you can also completely customize the
-SQL that is generated. Here's a brief example::
+You can create your own aggregate functions, too. At a minimum, you need to
+define ``function``, but you can also completely customize the SQL that is
+generated. Here's a brief example::
 
     from django.db.models import Aggregate
 
@@ -489,8 +491,8 @@ output value.
 
 .. class:: ExpressionWrapper(expression, output_field)
 
-``ExpressionWrapper`` simply surrounds another expression and provides access
-to properties, such as ``output_field``, that may not be available on other
+``ExpressionWrapper`` surrounds another expression and provides access to
+properties, such as ``output_field``, that may not be available on other
 expressions. ``ExpressionWrapper`` is necessary when using arithmetic on
 ``F()`` expressions with different types as described in
 :ref:`using-f-with-annotations`.
@@ -626,22 +628,25 @@ degrade performance, it's automatically removed.
 
 You can query using ``NOT EXISTS`` with ``~Exists()``.
 
-Filtering on a ``Subquery`` expression
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Filtering on a ``Subquery()`` or ``Exists()`` expressions
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-It's not possible to filter directly using ``Subquery`` and ``Exists``, e.g.::
+``Subquery()`` that returns a boolean value and ``Exists()`` may be used as a
+``condition`` in :class:`~django.db.models.expressions.When` expressions, or to
+directly filter a queryset::
 
+    >>> recent_comments = Comment.objects.filter(...)  # From above
     >>> Post.objects.filter(Exists(recent_comments))
-    ...
-    TypeError: 'Exists' object is not iterable
 
+This will ensure that the subquery will not be added to the ``SELECT`` columns,
+which may result in a better performance.
 
-You must filter on a subquery expression by first annotating the queryset
-and then filtering based on that annotation::
+.. versionchanged:: 3.0
 
-    >>> Post.objects.annotate(
-    ...     recent_comment=Exists(recent_comments),
-    ... ).filter(recent_comment=True)
+    In previous versions of Django, it was necessary to first annotate and then
+    filter against the annotation. This resulted in the annotated value always
+    being present in the query result, and often resulted in a query that took
+    more time to execute.
 
 Using aggregates within a ``Subquery`` expression
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -744,8 +749,8 @@ The ``order_by`` argument accepts a sequence of expressions on which you can
 call :meth:`~django.db.models.Expression.asc` and
 :meth:`~django.db.models.Expression.desc`. The ordering controls the order in
 which the expression is applied. For example, if you sum over the rows in a
-partition, the first result is just the value of the first row, the second is
-the sum of first and second row.
+partition, the first result is the value of the first row, the second is the
+sum of first and second row.
 
 The ``frame`` parameter specifies which other rows that should be used in the
 computation. See :ref:`window-frames` for details.
@@ -763,7 +768,7 @@ the same studio in the same genre and release year::
     >>>     ),
     >>> )
 
-This makes it easy to check if a movie is rated better or worse than its peers.
+This allows you to check if a movie is rated better or worse than its peers.
 
 You may want to apply multiple expressions over the same window, i.e., the
 same partition and frame. For example, you could modify the previous example
@@ -944,6 +949,9 @@ calling the appropriate methods on the wrapped expression.
         ``summarize`` is a boolean that, when ``True``, signals that the
         query being computed is a terminal aggregate query.
 
+        ``for_save`` is a boolean that, when ``True``, signals that the query
+        being executed is performing a create or update.
+
     .. method:: get_source_expressions()
 
         Returns an ordered list of inner expressions. For example::
@@ -976,6 +984,8 @@ calling the appropriate methods on the wrapped expression.
 
         A hook allowing the expression to coerce ``value`` into a more
         appropriate type.
+
+        ``expression`` is the same as ``self``.
 
     .. method:: get_group_by_cols(alias=None)
 
@@ -1048,7 +1058,7 @@ We do some basic validation on the parameters, including requiring at least
 the eventual result to.
 
 Now we implement the pre-processing and validation. Since we do not have
-any of our own validation at this point, we just delegate to the nested
+any of our own validation at this point, we delegate to the nested
 expressions::
 
     def resolve_expression(self, query=None, allow_joins=True, reuse=None, summarize=False, for_save=False):
@@ -1068,7 +1078,7 @@ Next, we write the method responsible for generating the SQL::
             sql_params.extend(params)
         template = template or self.template
         data = {'expressions': ','.join(sql_expressions)}
-        return template % data, params
+        return template % data, sql_params
 
     def as_oracle(self, compiler, connection):
         """

@@ -1,4 +1,4 @@
-from django.db.utils import ProgrammingError
+from django.db import ProgrammingError
 from django.utils.functional import cached_property
 
 
@@ -20,6 +20,8 @@ class BaseDatabaseFeatures:
     # Does the backend allow inserting duplicate rows when a unique_together
     # constraint exists and some fields are nullable but not all of them?
     supports_partially_nullable_unique_constraints = True
+    # Does the backend support initially deferrable unique constraints?
+    supports_deferrable_unique_constraints = False
 
     can_use_chunked_reads = True
     can_return_columns_from_insert = False
@@ -88,6 +90,12 @@ class BaseDatabaseFeatures:
     # Does the backend order NULL values as largest or smallest?
     nulls_order_largest = False
 
+    # Does the backend support NULLS FIRST and NULLS LAST in ORDER BY?
+    supports_order_by_nulls_modifier = True
+
+    # Does the backend orders NULLS FIRST by default?
+    order_by_nulls_first = False
+
     # The database's limit on the number of query parameters.
     max_query_params = None
 
@@ -143,9 +151,10 @@ class BaseDatabaseFeatures:
     # Can the backend introspect a TimeField, instead of a DateTimeField?
     can_introspect_time_field = True
 
-    # Some backends may not be able to differentiate BigAutoField from other
-    # fields such as AutoField.
+    # Some backends may not be able to differentiate BigAutoField or
+    # SmallAutoField from other fields such as AutoField.
     introspected_big_auto_field_type = 'BigAutoField'
+    introspected_small_auto_field_type = 'SmallAutoField'
 
     # Some backends may not be able to differentiate BooleanField from other
     # fields such as IntegerField.
@@ -181,6 +190,8 @@ class BaseDatabaseFeatures:
     # Does it support CHECK constraints?
     supports_column_check_constraints = True
     supports_table_check_constraints = True
+    # Does the backend support introspection of CHECK constraints?
+    can_introspect_check_constraints = True
 
     # Does the backend support 'pyformat' style ("... %(name)s ...", {'name': value})
     # parameter passing? Note this can be provided by the backend even if not
@@ -240,6 +251,7 @@ class BaseDatabaseFeatures:
     # Does the backend support window expressions (expression OVER (...))?
     supports_over_clause = False
     supports_frame_range_fixed_distance = False
+    only_supports_unbounded_with_preceding_and_following = False
 
     # Does the backend support CAST with precision?
     supports_cast_with_precision = True
@@ -285,6 +297,9 @@ class BaseDatabaseFeatures:
     # field(s)?
     allows_multiple_constraints_on_same_fields = True
 
+    # Does the backend support boolean expressions in the SELECT clause?
+    supports_boolean_expr_in_select_clause = True
+
     def __init__(self, connection):
         self.connection = connection
 
@@ -306,3 +321,8 @@ class BaseDatabaseFeatures:
             count, = cursor.fetchone()
             cursor.execute('DROP TABLE ROLLBACK_TEST')
         return count == 0
+
+    def allows_group_by_selected_pks_on_model(self, model):
+        if not self.allows_group_by_selected_pks:
+            return False
+        return model._meta.managed

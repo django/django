@@ -61,9 +61,9 @@ Using a :class:`~django.db.models.FileField` or an
 How do I make a variable available to all my templates?
 =======================================================
 
-Sometimes your templates just all need the same thing. A common example would
-be dynamically-generated menus. At first glance, it seems logical to simply
-add a common dictionary to the template context.
+Sometimes your templates all need the same thing. A common example would be
+dynamically generated menus. At first glance, it seems logical to add a common
+dictionary to the template context.
 
-The correct solution is to use a ``RequestContext``. Details on how to do this
-are here: :ref:`subclassing-context-requestcontext`.
+The best way to do this in Django is to use a ``RequestContext``. Details on
+how to do this are here: :ref:`subclassing-context-requestcontext`.

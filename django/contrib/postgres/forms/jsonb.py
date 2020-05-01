@@ -1,6 +1,7 @@
 import json
 
 from django import forms
+from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 
 __all__ = ['JSONField']
@@ -30,7 +31,7 @@ class JSONField(forms.CharField):
         try:
             converted = json.loads(value)
         except json.JSONDecodeError:
-            raise forms.ValidationError(
+            raise ValidationError(
                 self.error_messages['invalid'],
                 code='invalid',
                 params={'value': value},

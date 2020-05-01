@@ -10,18 +10,22 @@ class DatabaseValidation(BaseDatabaseValidation):
         return issues
 
     def _check_sql_mode(self, **kwargs):
-        with self.connection.cursor() as cursor:
-            cursor.execute("SELECT @@sql_mode")
-            sql_mode = cursor.fetchone()
-        modes = set(sql_mode[0].split(',') if sql_mode else ())
-        if not (modes & {'STRICT_TRANS_TABLES', 'STRICT_ALL_TABLES'}):
+        if not (self.connection.sql_mode & {'STRICT_TRANS_TABLES', 'STRICT_ALL_TABLES'}):
             return [checks.Warning(
-                "MySQL Strict Mode is not set for database connection '%s'" % self.connection.alias,
-                hint="MySQL's Strict Mode fixes many data integrity problems in MySQL, "
-                     "such as data truncation upon insertion, by escalating warnings into "
-                     "errors. It is strongly recommended you activate it. See: "
-                     "https://docs.djangoproject.com/en/%s/ref/databases/#mysql-sql-mode"
-                     % (get_docs_version(),),
+                "%s Strict Mode is not set for database connection '%s'"
+                % (self.connection.display_name, self.connection.alias),
+                hint=(
+                    "%s's Strict Mode fixes many data integrity problems in "
+                    "%s, such as data truncation upon insertion, by "
+                    "escalating warnings into errors. It is strongly "
+                    "recommended you activate it. See: "
+                    "https://docs.djangoproject.com/en/%s/ref/databases/#mysql-sql-mode"
+                    % (
+                        self.connection.display_name,
+                        self.connection.display_name,
+                        get_docs_version(),
+                    ),
+                ),
                 id='mysql.W002',
             )]
         return []
@@ -37,18 +41,23 @@ class DatabaseValidation(BaseDatabaseValidation):
         if (field_type.startswith('varchar') and field.unique and
                 (field.max_length is None or int(field.max_length) > 255)):
             errors.append(
-                checks.Error(
-                    'MySQL does not allow unique CharFields to have a max_length > 255.',
+                checks.Warning(
+                    '%s may not allow unique CharFields to have a max_length '
+                    '> 255.' % self.connection.display_name,
                     obj=field,
-                    id='mysql.E001',
+                    hint=(
+                        'See: https://docs.djangoproject.com/en/%s/ref/'
+                        'databases/#mysql-character-fields' % get_docs_version()
+                    ),
+                    id='mysql.W003',
                 )
             )
 
         if field.db_index and field_type.lower() in self.connection._limited_data_types:
             errors.append(
                 checks.Warning(
-                    'MySQL does not support a database index on %s columns.'
-                    % field_type,
+                    '%s does not support a database index on %s columns.'
+                    % (self.connection.display_name, field_type),
                     hint=(
                         "An index won't be created. Silence this warning if "
                         "you don't care about it."

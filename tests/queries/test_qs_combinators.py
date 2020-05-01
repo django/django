@@ -1,5 +1,5 @@
+from django.db import DatabaseError, NotSupportedError, connection
 from django.db.models import Exists, F, IntegerField, OuterRef, Value
-from django.db.utils import DatabaseError, NotSupportedError
 from django.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
 
 from .models import Number, ReservedName
@@ -258,3 +258,31 @@ class QuerySetSetOperationTests(TestCase):
         numbers = list(range(10))
         self.assertNumbersEqual(union.order_by('num'), numbers)
         self.assertNumbersEqual(union.order_by('other_num'), reversed(numbers))
+
+    def test_unsupported_operations_on_combined_qs(self):
+        qs = Number.objects.all()
+        msg = 'Calling QuerySet.%s() after %s() is not supported.'
+        combinators = ['union']
+        if connection.features.supports_select_difference:
+            combinators.append('difference')
+        if connection.features.supports_select_intersection:
+            combinators.append('intersection')
+        for combinator in combinators:
+            for operation in (
+                'annotate',
+                'defer',
+                'delete',
+                'exclude',
+                'extra',
+                'filter',
+                'only',
+                'prefetch_related',
+                'select_related',
+                'update',
+            ):
+                with self.subTest(combinator=combinator, operation=operation):
+                    with self.assertRaisesMessage(
+                        NotSupportedError,
+                        msg % (operation, combinator),
+                    ):
+                        getattr(getattr(qs, combinator)(qs), operation)()

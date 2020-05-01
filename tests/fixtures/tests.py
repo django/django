@@ -17,8 +17,8 @@ from django.db import IntegrityError, connection
 from django.test import TestCase, TransactionTestCase, skipUnlessDBFeature
 
 from .models import (
-    Article, Category, NaturalKeyThing, PrimaryKeyUUIDModel, ProxySpy, Spy,
-    Tag, Visa,
+    Article, Category, CircularA, CircularB, NaturalKeyThing,
+    PrimaryKeyUUIDModel, ProxySpy, Spy, Tag, Visa,
 )
 
 
@@ -376,7 +376,7 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
         with self.assertRaisesMessage(management.CommandError, "Unknown model: fixtures.FooModel"):
             self._dumpdata_assert(['fixtures', 'sites'], '', exclude_list=['fixtures.FooModel'])
 
-    @unittest.skipIf(sys.platform.startswith('win'), "Windows doesn't support '?' in filenames.")
+    @unittest.skipIf(sys.platform == 'win32', "Windows doesn't support '?' in filenames.")
     def test_load_fixture_with_special_characters(self):
         management.call_command('loaddata', 'fixture_with[special]chars', verbosity=0)
         self.assertQuerysetEqual(Article.objects.all(), ['<Article: How To Deal With Special Characters>'])
@@ -541,10 +541,10 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
         ])
 
     def test_ambiguous_compressed_fixture(self):
-        # The name "fixture5" is ambiguous, so loading it will raise an error
-        with self.assertRaises(management.CommandError) as cm:
+        # The name "fixture5" is ambiguous, so loading raises an error.
+        msg = "Multiple fixtures named 'fixture5'"
+        with self.assertRaisesMessage(management.CommandError, msg):
             management.call_command('loaddata', 'fixture5', verbosity=0)
-            self.assertIn("Multiple fixtures named 'fixture5'", cm.exception.args[0])
 
     def test_db_loading(self):
         # Load db fixtures 1 and 2. These will load using the 'default' database identifier implicitly
@@ -564,10 +564,11 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
         # This won't affect other tests because the database connection
         # is closed at the end of each test.
         if connection.vendor == 'mysql':
-            connection.cursor().execute("SET sql_mode = 'TRADITIONAL'")
-        with self.assertRaises(IntegrityError) as cm:
+            with connection.cursor() as cursor:
+                cursor.execute("SET sql_mode = 'TRADITIONAL'")
+        msg = 'Could not load fixtures.Article(pk=1):'
+        with self.assertRaisesMessage(IntegrityError, msg):
             management.call_command('loaddata', 'invalid.json', verbosity=0)
-            self.assertIn("Could not load fixtures.Article(pk=1):", cm.exception.args[0])
 
     @unittest.skipUnless(connection.vendor == 'postgresql', 'psycopg2 prohibits null characters in data.')
     def test_loaddata_null_characters_on_postgresql(self):
@@ -759,9 +760,9 @@ class FixtureTransactionTests(DumpDataAssertMixin, TransactionTestCase):
 
         # Try to load fixture 2 using format discovery; this will fail
         # because there are two fixture2's in the fixtures directory
-        with self.assertRaises(management.CommandError) as cm:
+        msg = "Multiple fixtures named 'fixture2'"
+        with self.assertRaisesMessage(management.CommandError, msg):
             management.call_command('loaddata', 'fixture2', verbosity=0)
-            self.assertIn("Multiple fixtures named 'fixture2'", cm.exception.args[0])
 
         # object list is unaffected
         self.assertQuerysetEqual(Article.objects.all(), [
@@ -787,13 +788,40 @@ class FixtureTransactionTests(DumpDataAssertMixin, TransactionTestCase):
         ])
 
 
-class ForwardReferenceTests(TestCase):
+class ForwardReferenceTests(DumpDataAssertMixin, TestCase):
     def test_forward_reference_fk(self):
         management.call_command('loaddata', 'forward_reference_fk.json', verbosity=0)
         self.assertEqual(NaturalKeyThing.objects.count(), 2)
         t1, t2 = NaturalKeyThing.objects.all()
         self.assertEqual(t1.other_thing, t2)
         self.assertEqual(t2.other_thing, t1)
+        self._dumpdata_assert(
+            ['fixtures'],
+            '[{"model": "fixtures.naturalkeything", "pk": 1, '
+            '"fields": {"key": "t1", "other_thing": 2, "other_things": []}}, '
+            '{"model": "fixtures.naturalkeything", "pk": 2, '
+            '"fields": {"key": "t2", "other_thing": 1, "other_things": []}}]',
+        )
+
+    def test_forward_reference_fk_natural_key(self):
+        management.call_command(
+            'loaddata',
+            'forward_reference_fk_natural_key.json',
+            verbosity=0,
+        )
+        self.assertEqual(NaturalKeyThing.objects.count(), 2)
+        t1, t2 = NaturalKeyThing.objects.all()
+        self.assertEqual(t1.other_thing, t2)
+        self.assertEqual(t2.other_thing, t1)
+        self._dumpdata_assert(
+            ['fixtures'],
+            '[{"model": "fixtures.naturalkeything", '
+            '"fields": {"key": "t1", "other_thing": ["t2"], "other_things": []}}, '
+            '{"model": "fixtures.naturalkeything", '
+            '"fields": {"key": "t2", "other_thing": ["t1"], "other_things": []}}]',
+            natural_primary_keys=True,
+            natural_foreign_keys=True,
+        )
 
     def test_forward_reference_m2m(self):
         management.call_command('loaddata', 'forward_reference_m2m.json', verbosity=0)
@@ -802,4 +830,73 @@ class ForwardReferenceTests(TestCase):
         self.assertQuerysetEqual(
             t1.other_things.order_by('key'),
             ['<NaturalKeyThing: t2>', '<NaturalKeyThing: t3>']
+        )
+        self._dumpdata_assert(
+            ['fixtures'],
+            '[{"model": "fixtures.naturalkeything", "pk": 1, '
+            '"fields": {"key": "t1", "other_thing": null, "other_things": [2, 3]}}, '
+            '{"model": "fixtures.naturalkeything", "pk": 2, '
+            '"fields": {"key": "t2", "other_thing": null, "other_things": []}}, '
+            '{"model": "fixtures.naturalkeything", "pk": 3, '
+            '"fields": {"key": "t3", "other_thing": null, "other_things": []}}]',
+        )
+
+    def test_forward_reference_m2m_natural_key(self):
+        management.call_command(
+            'loaddata',
+            'forward_reference_m2m_natural_key.json',
+            verbosity=0,
+        )
+        self.assertEqual(NaturalKeyThing.objects.count(), 3)
+        t1 = NaturalKeyThing.objects.get_by_natural_key('t1')
+        self.assertQuerysetEqual(
+            t1.other_things.order_by('key'),
+            ['<NaturalKeyThing: t2>', '<NaturalKeyThing: t3>']
+        )
+        self._dumpdata_assert(
+            ['fixtures'],
+            '[{"model": "fixtures.naturalkeything", '
+            '"fields": {"key": "t1", "other_thing": null, "other_things": [["t2"], ["t3"]]}}, '
+            '{"model": "fixtures.naturalkeything", '
+            '"fields": {"key": "t2", "other_thing": null, "other_things": []}}, '
+            '{"model": "fixtures.naturalkeything", '
+            '"fields": {"key": "t3", "other_thing": null, "other_things": []}}]',
+            natural_primary_keys=True,
+            natural_foreign_keys=True,
+        )
+
+
+class CircularReferenceTests(DumpDataAssertMixin, TestCase):
+    def test_circular_reference(self):
+        management.call_command('loaddata', 'circular_reference.json', verbosity=0)
+        obj_a = CircularA.objects.get()
+        obj_b = CircularB.objects.get()
+        self.assertEqual(obj_a.obj, obj_b)
+        self.assertEqual(obj_b.obj, obj_a)
+        self._dumpdata_assert(
+            ['fixtures'],
+            '[{"model": "fixtures.circulara", "pk": 1, '
+            '"fields": {"key": "x", "obj": 1}}, '
+            '{"model": "fixtures.circularb", "pk": 1, '
+            '"fields": {"key": "y", "obj": 1}}]',
+        )
+
+    def test_circular_reference_natural_key(self):
+        management.call_command(
+            'loaddata',
+            'circular_reference_natural_key.json',
+            verbosity=0,
+        )
+        obj_a = CircularA.objects.get()
+        obj_b = CircularB.objects.get()
+        self.assertEqual(obj_a.obj, obj_b)
+        self.assertEqual(obj_b.obj, obj_a)
+        self._dumpdata_assert(
+            ['fixtures'],
+            '[{"model": "fixtures.circulara", '
+            '"fields": {"key": "x", "obj": ["y"]}}, '
+            '{"model": "fixtures.circularb", '
+            '"fields": {"key": "y", "obj": ["x"]}}]',
+            natural_primary_keys=True,
+            natural_foreign_keys=True,
         )

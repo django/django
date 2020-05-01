@@ -121,10 +121,10 @@ class StateTests(SimpleTestCase):
 
         self.assertEqual(author_state.app_label, "migrations")
         self.assertEqual(author_state.name, "Author")
-        self.assertEqual([x for x, y in author_state.fields], ["id", "name", "bio", "age"])
-        self.assertEqual(author_state.fields[1][1].max_length, 255)
-        self.assertIs(author_state.fields[2][1].null, False)
-        self.assertIs(author_state.fields[3][1].null, True)
+        self.assertEqual(list(author_state.fields), ["id", "name", "bio", "age"])
+        self.assertEqual(author_state.fields['name'].max_length, 255)
+        self.assertIs(author_state.fields['bio'].null, False)
+        self.assertIs(author_state.fields['age'].null, True)
         self.assertEqual(
             author_state.options,
             {
@@ -138,10 +138,10 @@ class StateTests(SimpleTestCase):
 
         self.assertEqual(book_state.app_label, "migrations")
         self.assertEqual(book_state.name, "Book")
-        self.assertEqual([x for x, y in book_state.fields], ["id", "title", "author", "contributors"])
-        self.assertEqual(book_state.fields[1][1].max_length, 1000)
-        self.assertIs(book_state.fields[2][1].null, False)
-        self.assertEqual(book_state.fields[3][1].__class__.__name__, "ManyToManyField")
+        self.assertEqual(list(book_state.fields), ["id", "title", "author", "contributors"])
+        self.assertEqual(book_state.fields['title'].max_length, 1000)
+        self.assertIs(book_state.fields['author'].null, False)
+        self.assertEqual(book_state.fields['contributors'].__class__.__name__, 'ManyToManyField')
         self.assertEqual(
             book_state.options,
             {"verbose_name": "tome", "db_table": "test_tome", "indexes": [book_index], "constraints": []},
@@ -150,7 +150,7 @@ class StateTests(SimpleTestCase):
 
         self.assertEqual(author_proxy_state.app_label, "migrations")
         self.assertEqual(author_proxy_state.name, "AuthorProxy")
-        self.assertEqual(author_proxy_state.fields, [])
+        self.assertEqual(author_proxy_state.fields, {})
         self.assertEqual(
             author_proxy_state.options,
             {"proxy": True, "ordering": ["name"], "indexes": [], "constraints": []},
@@ -345,6 +345,7 @@ class StateTests(SimpleTestCase):
                     'migrations.Tag',
                     models.CASCADE,
                     auto_created=True,
+                    parent_link=True,
                     primary_key=True,
                     to_field='id',
                     serialize=False,
@@ -531,6 +532,61 @@ class StateTests(SimpleTestCase):
         project_state.add_model(ModelState.from_model(B))
         self.assertEqual(len(project_state.apps.get_models()), 2)
 
+    def test_reload_related_model_on_non_relational_fields(self):
+        """
+        The model is reloaded even on changes that are not involved in
+        relations. Other models pointing to or from it are also reloaded.
+        """
+        project_state = ProjectState()
+        project_state.apps  # Render project state.
+        project_state.add_model(ModelState('migrations', 'A', []))
+        project_state.add_model(ModelState('migrations', 'B', [
+            ('a', models.ForeignKey('A', models.CASCADE)),
+        ]))
+        project_state.add_model(ModelState('migrations', 'C', [
+            ('b', models.ForeignKey('B', models.CASCADE)),
+            ('name', models.TextField()),
+        ]))
+        project_state.add_model(ModelState('migrations', 'D', [
+            ('a', models.ForeignKey('A', models.CASCADE)),
+        ]))
+        operation = AlterField(
+            model_name='C',
+            name='name',
+            field=models.TextField(blank=True),
+        )
+        operation.state_forwards('migrations', project_state)
+        project_state.reload_model('migrations', 'a', delay=True)
+        A = project_state.apps.get_model('migrations.A')
+        B = project_state.apps.get_model('migrations.B')
+        D = project_state.apps.get_model('migrations.D')
+        self.assertIs(B._meta.get_field('a').related_model, A)
+        self.assertIs(D._meta.get_field('a').related_model, A)
+
+    def test_reload_model_relationship_consistency(self):
+        project_state = ProjectState()
+        project_state.add_model(ModelState('migrations', 'A', []))
+        project_state.add_model(ModelState('migrations', 'B', [
+            ('a', models.ForeignKey('A', models.CASCADE)),
+        ]))
+        project_state.add_model(ModelState('migrations', 'C', [
+            ('b', models.ForeignKey('B', models.CASCADE)),
+        ]))
+        A = project_state.apps.get_model('migrations.A')
+        B = project_state.apps.get_model('migrations.B')
+        C = project_state.apps.get_model('migrations.C')
+        self.assertEqual([r.related_model for r in A._meta.related_objects], [B])
+        self.assertEqual([r.related_model for r in B._meta.related_objects], [C])
+        self.assertEqual([r.related_model for r in C._meta.related_objects], [])
+
+        project_state.reload_model('migrations', 'a', delay=True)
+        A = project_state.apps.get_model('migrations.A')
+        B = project_state.apps.get_model('migrations.B')
+        C = project_state.apps.get_model('migrations.C')
+        self.assertEqual([r.related_model for r in A._meta.related_objects], [B])
+        self.assertEqual([r.related_model for r in B._meta.related_objects], [C])
+        self.assertEqual([r.related_model for r in C._meta.related_objects], [])
+
     def test_add_relations(self):
         """
         #24573 - Adding relations to existing models should reload the
@@ -657,7 +713,7 @@ class StateTests(SimpleTestCase):
             return [mod for mod in state.apps.get_models() if mod._meta.model_name == 'a'][0]
 
         project_state = ProjectState()
-        project_state.add_model((ModelState.from_model(A)))
+        project_state.add_model(ModelState.from_model(A))
         self.assertEqual(len(get_model_a(project_state)._meta.related_objects), 1)
         old_state = project_state.clone()
 
@@ -867,7 +923,7 @@ class StateTests(SimpleTestCase):
         project_state.add_model(ModelState.from_model(Author))
         project_state.add_model(ModelState.from_model(Book))
         self.assertEqual(
-            [name for name, field in project_state.models["migrations", "book"].fields],
+            list(project_state.models['migrations', 'book'].fields),
             ["id", "author"],
         )
 
@@ -986,6 +1042,28 @@ class ModelStateTests(SimpleTestCase):
         with self.assertRaisesMessage(InvalidBasesError, "Cannot resolve bases for [<ModelState: 'app.Model'>]"):
             project_state.apps
 
+    def test_fields_ordering_equality(self):
+        state = ModelState(
+            'migrations',
+            'Tag',
+            [
+                ('id', models.AutoField(primary_key=True)),
+                ('name', models.CharField(max_length=100)),
+                ('hidden', models.BooleanField()),
+            ],
+        )
+        reordered_state = ModelState(
+            'migrations',
+            'Tag',
+            [
+                ('id', models.AutoField(primary_key=True)),
+                # Purposedly re-ordered.
+                ('hidden', models.BooleanField()),
+                ('name', models.CharField(max_length=100)),
+            ],
+        )
+        self.assertEqual(state, reordered_state)
+
     @override_settings(TEST_SWAPPABLE_MODEL='migrations.SomeFakeModel')
     def test_create_swappable(self):
         """
@@ -1006,10 +1084,10 @@ class ModelStateTests(SimpleTestCase):
         author_state = ModelState.from_model(Author)
         self.assertEqual(author_state.app_label, 'migrations')
         self.assertEqual(author_state.name, 'Author')
-        self.assertEqual([x for x, y in author_state.fields], ['id', 'name', 'bio', 'age'])
-        self.assertEqual(author_state.fields[1][1].max_length, 255)
-        self.assertIs(author_state.fields[2][1].null, False)
-        self.assertIs(author_state.fields[3][1].null, True)
+        self.assertEqual(list(author_state.fields), ['id', 'name', 'bio', 'age'])
+        self.assertEqual(author_state.fields['name'].max_length, 255)
+        self.assertIs(author_state.fields['bio'].null, False)
+        self.assertIs(author_state.fields['age'].null, True)
         self.assertEqual(author_state.options, {'swappable': 'TEST_SWAPPABLE_MODEL', 'indexes': [], "constraints": []})
         self.assertEqual(author_state.bases, (models.Model,))
         self.assertEqual(author_state.managers, [])
@@ -1048,11 +1126,11 @@ class ModelStateTests(SimpleTestCase):
         self.assertEqual(station_state.app_label, 'migrations')
         self.assertEqual(station_state.name, 'BusStation')
         self.assertEqual(
-            [x for x, y in station_state.fields],
+            list(station_state.fields),
             ['searchablelocation_ptr', 'name', 'bus_routes', 'inbound']
         )
-        self.assertEqual(station_state.fields[1][1].max_length, 128)
-        self.assertEqual(station_state.fields[2][1].null, False)
+        self.assertEqual(station_state.fields['name'].max_length, 128)
+        self.assertIs(station_state.fields['bus_routes'].null, False)
         self.assertEqual(
             station_state.options,
             {'abstract': False, 'swappable': 'TEST_SWAPPABLE_MODEL', 'indexes': [], 'constraints': []}
