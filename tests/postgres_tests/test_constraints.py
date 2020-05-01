@@ -390,6 +390,10 @@ class ExclusionConstraintTests(PostgreSQLTestCase):
             RangesModel.objects.create(ints=(10, 20))
         RangesModel.objects.create(ints=(10, 19))
         RangesModel.objects.create(ints=(51, 60))
+        # Drop the constraint.
+        with connection.schema_editor() as editor:
+            editor.remove_constraint(RangesModel, constraint)
+        self.assertNotIn(constraint_name, self.get_constraints(RangesModel._meta.db_table))
 
     def test_range_adjacent_initially_deferred(self):
         constraint_name = 'ints_adjacent_deferred'
