@@ -49,15 +49,6 @@ Minor features
 * Added a CSS class to the column headers of
   :class:`~django.contrib.admin.TabularInline`.
 
-* In :attr:`ModelAdmin.list_filter <django.contrib.admin.ModelAdmin.list_filter>`
-  you can now provide a title along with a field name which will be used in place
-  of the default title.
-
-:mod:`django.contrib.admindocs`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
-
 :mod:`django.contrib.auth`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 

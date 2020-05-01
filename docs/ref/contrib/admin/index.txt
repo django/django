@@ -952,15 +952,17 @@ subclass::
 
     * a tuple, where the first element is a field name and the second
       element is a string to use as the title, or a class inheriting from
-      ``django.contrib.admin.FieldListFilter``. For example, with a string title::
+      ``django.contrib.admin.FieldListFilter``. For example, with a string
+      title::
 
           class BookAdmin(admin.ModelAdmin):
               list_filter = (
                   ('author__name', 'Author Name'),
               )
 
-      This is useful for fields on a related model where the default title would
-      be confusing or not make sense without the context of the relationship.
+      This is useful for fields on a related model where the default title
+      would be confusing or not make sense without the context of the
+      relationship.
 
       With a ``FieldListFilter`` subclass::
 

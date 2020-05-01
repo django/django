@@ -432,7 +432,7 @@ class RelatedOnlyFieldListFilter(RelatedFieldListFilter):
 
 
 class EmptyFieldListFilter(FieldListFilter):
-    def __init__(self, field, request, params, model, model_admin, field_path):
+    def __init__(self, field, request, params, model, model_admin, field_path, title=None):
         if not field.empty_strings_allowed and not field.null:
             raise ImproperlyConfigured(
                 "The list filter '%s' cannot be used with field '%s' which "
@@ -443,7 +443,7 @@ class EmptyFieldListFilter(FieldListFilter):
             )
         self.lookup_kwarg = '%s__isempty' % field_path
         self.lookup_val = params.get(self.lookup_kwarg)
-        super().__init__(field, request, params, model, model_admin, field_path)
+        super().__init__(field, request, params, model, model_admin, field_path, title=title)
 
     def queryset(self, request, queryset):
         if self.lookup_kwarg not in self.used_parameters:
