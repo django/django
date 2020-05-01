@@ -200,6 +200,9 @@ Migrations
   filename fragment that will be used to name a migration containing only that
   operation.
 
+* Migrations now support serialization of pure and concrete path objects from
+  :mod:`pathlib`, and :class:`os.PathLike` instances.
+
 Models
 ~~~~~~
 

@@ -720,6 +720,11 @@ Django can serialize the following:
 - ``uuid.UUID`` instances
 - :func:`functools.partial` and :class:`functools.partialmethod` instances
   which have serializable ``func``, ``args``, and ``keywords`` values.
+- Pure and concrete path objects from :mod:`pathlib`. Concrete paths are
+  converted to their pure path equivalent, e.g. :class:`pathlib.PosixPath` to
+  :class:`pathlib.PurePosixPath`.
+- :class:`os.PathLike` instances, e.g. :class:`os.DirEntry`, which are
+  converted to ``str`` or ``bytes`` using :func:`os.fspath`.
 - ``LazyObject`` instances which wrap a serializable value.
 - Enumeration types (e.g. ``TextChoices`` or ``IntegerChoices``) instances.
 - Any Django field
@@ -727,6 +732,11 @@ Django can serialize the following:
 - Unbound methods used from within the class body
 - Any class reference (must be in module's top-level scope)
 - Anything with a custom ``deconstruct()`` method (:ref:`see below <custom-deconstruct-method>`)
+
+.. versionchanged:: 3.2
+
+    Serialization support for pure and concrete path objects from
+    :mod:`pathlib`, and :class:`os.PathLike` instances was added.
 
 Django cannot serialize:
 
