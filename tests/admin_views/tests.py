@@ -4822,6 +4822,23 @@ class SeleniumTests(AdminSeleniumTestCase):
         value = self.selenium.find_element_by_id('id_form-0-parent').get_attribute('value')
         self.assertEqual(value, str(parent2.pk))
 
+    def test_input_element_font(self):
+        """
+        Browsers' default stylesheets override the font of inputs. The admin
+        adds additional CSS to handle this.
+        """
+        self.selenium.get(self.live_server_url + reverse('admin:login'))
+        element = self.selenium.find_element_by_id('id_username')
+        # Some browsers quotes the fonts, some don't.
+        fonts = [
+            font.strip().strip('"')
+            for font in element.value_of_css_property('font-family').split(',')
+        ]
+        self.assertEqual(
+            fonts,
+            ['Roboto', 'Lucida Grande', 'Verdana', 'Arial', 'sans-serif'],
+        )
+
 
 @override_settings(ROOT_URLCONF='admin_views.urls')
 class ReadonlyTest(AdminFieldExtractionMixin, TestCase):

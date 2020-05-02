@@ -228,7 +228,6 @@ td, th {
     border-bottom: 1px solid #eee;
     vertical-align: top;
     padding: 8px;
-    font-family: "Roboto", "Lucida Grande", Verdana, Arial, sans-serif;
 }
 
 th {
@@ -615,7 +614,6 @@ div.breadcrumbs {
     background: #79aec8;
     padding: 10px 40px;
     border: none;
-    font-size: 14px;
     color: #c4dce8;
     text-align: left;
 }
@@ -670,14 +668,6 @@ a.deletelink:focus, a.deletelink:hover {
     margin-top: -48px;
 }
 
-.form-row .object-tools {
-    margin-top: 5px;
-    margin-bottom: 5px;
-    float: none;
-    height: 2em;
-    padding-left: 3.5em;
-}
-
 .object-tools li {
     display: block;
     float: left;
@@ -709,13 +699,13 @@ a.deletelink:focus, a.deletelink:hover {
     text-decoration: none;
 }
 
-.object-tools a.viewsitelink, .object-tools a.golink,.object-tools a.addlink {
+.object-tools a.viewsitelink, .object-tools a.addlink {
     background-repeat: no-repeat;
     background-position: right 7px center;
     padding-right: 26px;
 }
 
-.object-tools a.viewsitelink, .object-tools a.golink {
+.object-tools a.viewsitelink {
     background-image: url(../img/tooltag-arrowright.svg);
 }
 
@@ -890,7 +880,6 @@ table#change-history tbody th {
 }
 
 #content-related h3 {
-    font-size: 14px;
     color: #666;
     padding: 0 16px;
     margin: 0 0 16px;
