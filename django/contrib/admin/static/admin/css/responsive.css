@@ -907,7 +907,7 @@ input[type="submit"], button {
         padding: 15px 0 0;
     }
 
-    .login br, .login .submit-row label {
+    .login br {
         display: none;
     }
 

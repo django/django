@@ -34,10 +34,6 @@
     height: auto;
 }
 
-.login #content-main {
-    width: 100%;
-}
-
 .login .form-row {
     padding: 4px 0;
     float: left;
@@ -48,9 +44,7 @@
 .login .form-row label {
     padding-right: 0.5em;
     line-height: 2em;
-    font-size: 1em;
     clear: both;
-    color: #333;
 }
 
 .login .form-row #id_username, .login .form-row #id_password {
@@ -58,11 +52,6 @@
     padding: 8px;
     width: 100%;
     box-sizing: border-box;
-}
-
-.login span.help {
-    font-size: 10px;
-    display: block;
 }
 
 .login .submit-row {
