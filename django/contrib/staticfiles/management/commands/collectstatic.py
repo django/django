@@ -185,12 +185,12 @@ class Command(BaseCommand):
                 raise CommandError("Collecting static files cancelled.")
 
         collected = self.collect()
-        modified_count = len(collected['modified'])
-        unmodified_count = len(collected['unmodified'])
-        post_processed_count = len(collected['post_processed'])
 
         if self.verbosity >= 1:
-            summary = (
+            modified_count = len(collected['modified'])
+            unmodified_count = len(collected['unmodified'])
+            post_processed_count = len(collected['post_processed'])
+            return (
                 "\n%(modified_count)s %(identifier)s %(action)s"
                 "%(destination)s%(unmodified)s%(post_processed)s."
             ) % {
@@ -203,7 +203,6 @@ class Command(BaseCommand):
                                    ', %s post-processed'
                                    % post_processed_count or ''),
             }
-            return summary
 
     def log(self, msg, level=2):
         """
