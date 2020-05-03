@@ -1,10 +1,9 @@
-from unittest import TestCase
-
 from django.template import Context, Engine
 from django.template.base import TextNode, VariableNode
+from django.test import SimpleTestCase
 
 
-class NodelistTest(TestCase):
+class NodelistTest(SimpleTestCase):
 
     @classmethod
     def setUpClass(cls):
@@ -32,7 +31,7 @@ class NodelistTest(TestCase):
         self.assertEqual(len(vars), 1)
 
 
-class TextNodeTest(TestCase):
+class TextNodeTest(SimpleTestCase):
 
     def test_textnode_repr(self):
         engine = Engine()
@@ -45,7 +44,7 @@ class TextNodeTest(TestCase):
             self.assertEqual(repr(texts[0]), reprtext)
 
 
-class ErrorIndexTest(TestCase):
+class ErrorIndexTest(SimpleTestCase):
     """
     Checks whether index of error is calculated correctly in
     template debugger in for loops. Refs ticket #5831
