@@ -75,9 +75,9 @@ class ResetCycleTagTests(SimpleTestCase):
     @setup({'resetcycle10': "{% for i in test %}"
                             "{% cycle 'X' 'Y' 'Z' as XYZ %}"
                             "{% cycle 'a' 'b' 'c' as abc %}"
-                            "{% ifequal i 1 %}"
+                            "{% if i == 1 %}"
                             "{% resetcycle abc %}"
-                            "{% endifequal %}"
+                            "{% endif %}"
                             "{% endfor %}"})
     def test_resetcycle10(self):
         output = self.engine.render_to_string('resetcycle10', {'test': list(range(5))})
@@ -86,9 +86,9 @@ class ResetCycleTagTests(SimpleTestCase):
     @setup({'resetcycle11': "{% for i in test %}"
                             "{% cycle 'X' 'Y' 'Z' as XYZ %}"
                             "{% cycle 'a' 'b' 'c' as abc %}"
-                            "{% ifequal i 1 %}"
+                            "{% if i == 1 %}"
                             "{% resetcycle XYZ %}"
-                            "{% endifequal %}"
+                            "{% endif %}"
                             "{% endfor %}"})
     def test_resetcycle11(self):
         output = self.engine.render_to_string('resetcycle11', {'test': list(range(5))})

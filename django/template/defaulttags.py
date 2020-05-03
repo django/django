@@ -8,6 +8,7 @@ from itertools import cycle as itertools_cycle, groupby
 
 from django.conf import settings
 from django.utils import timezone
+from django.utils.deprecation import RemovedInDjango40Warning
 from django.utils.html import conditional_escape, format_html
 from django.utils.lorem_ipsum import paragraphs, words
 from django.utils.safestring import mark_safe
@@ -261,6 +262,7 @@ class IfChangedNode(Node):
 
 
 class IfEqualNode(Node):
+    # RemovedInDjango40Warning.
     child_nodelists = ('nodelist_true', 'nodelist_false')
 
     def __init__(self, var1, var2, nodelist_true, nodelist_false, negate):
@@ -820,6 +822,7 @@ def do_for(parser, token):
 
 
 def do_ifequal(parser, token, negate):
+    # RemovedInDjango40Warning.
     bits = list(token.split_contents())
     if len(bits) != 3:
         raise TemplateSyntaxError("%r takes two arguments" % bits[0])
@@ -853,6 +856,10 @@ def ifequal(parser, token):
             ...
         {% endifnotequal %}
     """
+    warnings.warn(
+        'The {% ifequal %} template tag is deprecated in favor of {% if %}.',
+        RemovedInDjango40Warning,
+    )
     return do_ifequal(parser, token, False)
 
 
@@ -862,6 +869,11 @@ def ifnotequal(parser, token):
     Output the contents of the block if the two arguments are not equal.
     See ifequal.
     """
+    warnings.warn(
+        'The {% ifnotequal %} template tag is deprecated in favor of '
+        '{% if %}.',
+        RemovedInDjango40Warning,
+    )
     return do_ifequal(parser, token, True)
 
 

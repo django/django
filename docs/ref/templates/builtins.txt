@@ -611,10 +611,11 @@ you should use::
 ``ifequal`` and ``ifnotequal``
 ------------------------------
 
+.. deprecated:: 3.1
+
 ``{% ifequal a b %} ... {% endifequal %}`` is an obsolete way to write
 ``{% if a == b %} ... {% endif %}``. Likewise, ``{% ifnotequal a b %} ...
 {% endifnotequal %}`` is superseded by ``{% if a != b %} ... {% endif %}``.
-The ``ifequal`` and ``ifnotequal`` tags will be deprecated in a future release.
 
 .. templatetag:: ifchanged
 

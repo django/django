@@ -812,6 +812,13 @@ Miscellaneous
 * ``django.conf.urls.url()`` alias of :func:`django.urls.re_path` is
   deprecated.
 
+* The ``{% ifequal %}`` and ``{% ifnotequal %}`` template tags are deprecated
+  in favor of :ttag:`{% if %}<if>`. ``{% if %}`` covers all use cases, but if
+  you need to continue using these tags, they can be extracted from Django to a
+  module and included as a built-in tag in the :class:`'builtins'
+  <django.template.backends.django.DjangoTemplates>` option in
+  :setting:`OPTIONS <TEMPLATES-OPTIONS>`.
+
 .. _removed-features-3.1:
 
 Features removed in 3.1

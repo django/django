@@ -1,6 +1,7 @@
 from django.template import Context, Engine
 from django.template.base import TextNode, VariableNode
-from django.test import SimpleTestCase
+from django.test import SimpleTestCase, ignore_warnings
+from django.utils.deprecation import RemovedInDjango40Warning
 
 
 class NodelistTest(SimpleTestCase):
@@ -20,6 +21,7 @@ class NodelistTest(SimpleTestCase):
         vars = template.nodelist.get_nodes_by_type(VariableNode)
         self.assertEqual(len(vars), 1)
 
+    @ignore_warnings(category=RemovedInDjango40Warning)
     def test_ifequal(self):
         template = self.engine.from_string('{% ifequal x y %}{{ a }}{% endifequal %}')
         vars = template.nodelist.get_nodes_by_type(VariableNode)
