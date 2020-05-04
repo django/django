@@ -1649,8 +1649,6 @@ templates used by the :class:`ModelAdmin` views:
 
 .. method:: ModelAdmin.get_inlines(request, obj)
 
-    .. versionadded:: 3.0
-
     The ``get_inlines`` method is given the ``HttpRequest`` and the
     ``obj`` being edited (or ``None`` on an add form) and is expected to return
     an iterable of inlines. You can override this method to dynamically add
@@ -2150,10 +2148,6 @@ To avoid conflicts with user-supplied scripts or libraries, Django's jQuery
 (version 3.5.1) is namespaced as ``django.jQuery``. If you want to use jQuery
 in your own admin JavaScript without including a second copy, you can use the
 ``django.jQuery`` object on changelist and add/edit views.
-
-.. versionchanged:: 3.0
-
-    jQuery was upgraded from 3.3.1 to 3.4.1.
 
 .. versionchanged:: 3.1
 

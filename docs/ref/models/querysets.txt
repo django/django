@@ -3455,10 +3455,6 @@ by the aggregate.
         This is the SQL equivalent of ``AVG(DISTINCT <field>)``. The default
         value is ``False``.
 
-    .. versionchanged:: 3.0
-
-        Support for ``distinct=True`` was added.
-
 ``Count``
 ~~~~~~~~~
 
@@ -3533,10 +3529,6 @@ by the aggregate.
         If ``distinct=True``, ``Sum`` returns the sum of unique values. This is
         the SQL equivalent of ``SUM(DISTINCT <field>)``. The default value is
         ``False``.
-
-    .. versionchanged:: 3.0
-
-        Support for ``distinct=True`` was added.
 
 ``Variance``
 ~~~~~~~~~~~~

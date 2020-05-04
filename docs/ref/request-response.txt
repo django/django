@@ -202,10 +202,6 @@ All attributes should be considered read-only, unless stated otherwise.
 
         {{ request.headers.user_agent }}
 
-    .. versionchanged:: 3.0
-
-        Support for lookups using underscores was added.
-
 .. attribute:: HttpRequest.resolver_match
 
     An instance of :class:`~django.urls.ResolverMatch` representing the
@@ -684,10 +680,6 @@ or :class:`memoryview`, to the :class:`HttpResponse` constructor::
     >>> response = HttpResponse(b'Bytestrings are also accepted.')
     >>> response = HttpResponse(memoryview(b'Memoryview as well.'))
 
-.. versionchanged:: 3.0
-
-    Support for :class:`memoryview` was added.
-
 But if you want to add content incrementally, you can use ``response`` as a
 file-like object::
 
@@ -811,10 +803,6 @@ Methods
     ``charset`` is the charset in which the response will be encoded. If not
     given it will be extracted from ``content_type``, and if that
     is unsuccessful, the :setting:`DEFAULT_CHARSET` setting will be used.
-
-    .. versionchanged:: 3.0
-
-        Support for :class:`memoryview` ``content`` was added.
 
 .. method:: HttpResponse.__setitem__(header, value)
 

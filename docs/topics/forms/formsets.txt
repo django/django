@@ -459,8 +459,6 @@ control the widget used with
 ``ordering_widget``
 ^^^^^^^^^^^^^^^^^^^
 
-.. versionadded:: 3.0
-
 .. attribute:: BaseFormSet.ordering_widget
 
 Default: :class:`~django.forms.NumberInput`
@@ -477,8 +475,6 @@ Set ``ordering_widget`` to specify the widget class to be used with
 
 ``get_ordering_widget``
 ^^^^^^^^^^^^^^^^^^^^^^^
-
-.. versionadded:: 3.0
 
 .. method:: BaseFormSet.get_ordering_widget()
 

@@ -69,10 +69,6 @@ ensures the age field is never less than 18.
 
 The name of the constraint.
 
-.. versionchanged:: 3.0
-
-   Interpolation of  ``'%(app_label)s'`` and ``'%(class)s'`` was added.
-
 ``UniqueConstraint``
 ====================
 
@@ -98,10 +94,6 @@ date.
 .. attribute:: UniqueConstraint.name
 
 The name of the constraint.
-
-.. versionchanged:: 3.0
-
-   Interpolation of  ``'%(app_label)s'`` and ``'%(class)s'`` was added.
 
 ``condition``
 -------------

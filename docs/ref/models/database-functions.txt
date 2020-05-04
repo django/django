@@ -479,10 +479,6 @@ The ``is_dst`` parameter indicates whether or not ``pytz`` should interpret
 nonexistent and ambiguous datetimes in daylight saving time. By default (when
 ``is_dst=None``), ``pytz`` raises an exception for such datetimes.
 
-.. versionadded:: 3.0
-
-    The ``is_dst`` parameter was added.
-
 Given the datetime ``2015-06-15 14:30:50.000321+00:00``, the built-in ``kind``\s
 return:
 
@@ -1120,8 +1116,6 @@ It can also be registered as a transform. For example::
 
 .. class:: Sign(expression, **extra)
 
-.. versionadded:: 3.0
-
 Returns the sign (-1, 0, 1) of a numeric field or expression.
 
 Usage example::
@@ -1357,8 +1351,6 @@ spaces.
 
 .. class:: MD5(expression, **extra)
 
-.. versionadded:: 3.0
-
 Accepts a single text field or expression and returns the MD5 hash of the
 string.
 
@@ -1488,8 +1480,6 @@ spaces.
 .. class:: SHA256(expression, **extra)
 .. class:: SHA384(expression, **extra)
 .. class:: SHA512(expression, **extra)
-
-.. versionadded:: 3.0
 
 Accepts a single text field or expression and returns the particular hash of
 the string.

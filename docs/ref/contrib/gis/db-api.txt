@@ -28,10 +28,6 @@ not conform to the OGC standard. Django supports spatial functions operating on
 real geometries available in modern MySQL versions. However, the spatial
 functions are not as rich as other backends like PostGIS.
 
-.. versionchanged:: 3.0
-
-    Support for spatial functions operating on real geometries was added.
-
 .. warning::
 
     True spatial indexes (R-trees) are only supported with

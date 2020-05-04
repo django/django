@@ -132,10 +132,6 @@ Use the ``django.test.Client`` class to make requests.
     exceptions raised during the request should also be raised in the test.
     Defaults to ``True``.
 
-    .. versionadded:: 3.0
-
-        The ``raise_request_exception`` argument was added.
-
     Once you have a ``Client`` instance, you can call any of the following
     methods:
 
@@ -480,8 +476,6 @@ Specifically, a ``Response`` object has the following attributes:
             may be a suitable alternative on responses with that attribute.
 
     .. attribute:: exc_info
-
-        .. versionadded:: 3.0
 
         A tuple of three values that provides information about the unhandled
         exception, if any, that occurred during the view.

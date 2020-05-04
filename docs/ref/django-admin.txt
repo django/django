@@ -175,8 +175,6 @@ Example usage::
 
 .. django-admin-option:: --ignore PATTERN, -i PATTERN
 
-.. versionadded:: 3.0
-
 Ignores directories matching the given :mod:`glob`-style pattern. Use
 multiple times to ignore more.
 
@@ -1131,10 +1129,6 @@ under them.
 
 This is the default output format.
 
-.. versionchanged:: 3.0
-
-    Output of the applied datetimes at verbosity 2 and above was added.
-
 .. django-admin-option:: --plan, -p
 
 Shows the migration plan Django will follow to apply migrations. Like
@@ -1275,11 +1269,6 @@ For example, taking advantage of GitHub's feature to expose repositories as
 zip files, you can use a URL like::
 
     django-admin startapp --template=https://github.com/githubuser/django-app-template/archive/master.zip myapp
-
-.. versionchanged:: 3.0
-
-    Support for XZ archives (``.tar.xz``, ``.txz``) and LZMA archives
-    (``.tar.lzma``, ``.tlz``) was added.
 
 .. django-admin-option:: --extension EXTENSIONS, -e EXTENSIONS
 
@@ -1490,8 +1479,6 @@ May be specified multiple times and combined with :option:`test --tag`.
 
 .. django-admin-option:: -k TEST_NAME_PATTERNS
 
-.. versionadded:: 3.0
-
 Runs test methods and classes matching test name patterns, in the same way as
 :option:`unittest's -k option<unittest.-k>`. Can be specified multiple times.
 
@@ -1500,8 +1487,6 @@ Runs test methods and classes matching test name patterns, in the same way as
     This feature is only available for Python 3.7 and later.
 
 .. django-admin-option:: --pdb
-
-.. versionadded:: 3.0
 
 Spawns a ``pdb`` debugger at each test error or failure. If you have it
 installed, ``ipdb`` is used instead.
@@ -1634,11 +1619,6 @@ fields (listed in
 ``DJANGO_SUPERUSER_<uppercase_field_name>`` environment variables, unless they
 are overridden by a command line argument. For example, to provide an ``email``
 field, you can use ``DJANGO_SUPERUSER_EMAIL`` environment variable.
-
-.. versionchanged:: 3.0
-
-    Support for using ``DJANGO_SUPERUSER_PASSWORD`` and
-    ``DJANGO_SUPERUSER_<uppercase_field_name>`` environment variables was added.
 
 .. django-admin-option:: --noinput, --no-input
 
@@ -1824,8 +1804,6 @@ as discussed in :ref:`syntax-coloring`. For example, you may want to pipe
 colored output to another command.
 
 .. django-admin-option:: --skip-checks
-
-.. versionadded:: 3.0
 
 Skips running system checks prior to running the command. This option is only
 available if the

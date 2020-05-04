@@ -641,13 +641,6 @@ directly filter a queryset::
 This will ensure that the subquery will not be added to the ``SELECT`` columns,
 which may result in a better performance.
 
-.. versionchanged:: 3.0
-
-    In previous versions of Django, it was necessary to first annotate and then
-    filter against the annotation. This resulted in the annotated value always
-    being present in the query result, and often resulted in a query that took
-    more time to execute.
-
 Using aggregates within a ``Subquery`` expression
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -994,10 +987,6 @@ calling the appropriate methods on the wrapped expression.
         nested expressions. ``F()`` objects, in particular, hold a reference
         to a column. The ``alias`` parameter will be ``None`` unless the
         expression has been annotated and is used for grouping.
-
-        .. versionchanged:: 3.0
-
-            The ``alias`` parameter was added.
 
     .. method:: asc(nulls_first=False, nulls_last=False)
 

@@ -1854,10 +1854,6 @@ You would typically want to use both: :func:`django.utils.translation.activate()
 changes the language for this thread, and setting the cookie makes this
 preference persist in future requests.
 
-.. versionchanged:: 3.0
-
-    In older versions, you could set the language in the current session.
-
 Using translations outside views and templates
 ----------------------------------------------
 

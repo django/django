@@ -61,10 +61,6 @@ than 30 characters and shouldn't start with a number (0-9) or underscore (_).
     concrete model. For example ``Index(fields=['title'],
     name='%(app_label)s_%(class)s_title_index')``.
 
-.. versionchanged:: 3.0
-
-    Interpolation of  ``'%(app_label)s'`` and ``'%(class)s'`` was added.
-
 ``db_tablespace``
 -----------------
 

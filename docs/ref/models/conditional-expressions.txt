@@ -48,10 +48,6 @@ objects that have an ``output_field`` that is a
 :class:`~django.db.models.BooleanField`. The result is provided using the
 ``then`` keyword.
 
-.. versionchanged:: 3.0
-
-    Support for boolean :class:`~django.db.models.Expression` was added.
-
 Some examples::
 
     >>> from django.db.models import F, Q, When
@@ -251,8 +247,6 @@ The two SQL statements are functionally equivalent but the more explicit
 
 Conditional filter
 ------------------
-
-.. versionadded:: 3.0
 
 When a conditional expression returns a boolean value, it is possible to use it
 directly in filters. This means that it will not be added to the ``SELECT``

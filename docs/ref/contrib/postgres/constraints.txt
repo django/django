@@ -12,8 +12,6 @@ PostgreSQL supports additional data integrity constraints available from the
 ``ExclusionConstraint``
 =======================
 
-.. versionadded:: 3.0
-
 .. class:: ExclusionConstraint(*, name, expressions, index_type=None, condition=None, deferrable=None)
 
     Creates an exclusion constraint in the database. Internally, PostgreSQL

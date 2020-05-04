@@ -496,12 +496,6 @@ which returns ``NULL``. In such cases it is possible to revert to the old
 algorithm by setting the :attr:`~django.db.models.Options.select_on_save`
 option to ``True``.
 
-.. versionchanged:: 3.0
-
-    ``Model.save()`` no longer attempts to find a row when saving a new
-    ``Model`` instance and a default value for the primary key is provided, and
-    always executes an ``INSERT``.
-
 .. _ref-models-force-insert:
 
 Forcing an INSERT or UPDATE

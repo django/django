@@ -287,8 +287,6 @@ non-durable <https://www.postgresql.org/docs/current/non-durability.html>`_.
 MariaDB notes
 =============
 
-.. versionadded:: 3.0
-
 Django supports MariaDB 10.2 and higher.
 
 To use MariaDB, use the MySQL backend, which is shared between the two. See the

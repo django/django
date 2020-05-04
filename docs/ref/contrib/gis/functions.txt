@@ -361,8 +361,6 @@ __ https://en.wikipedia.org/wiki/Geohash
 
 .. class:: GeometryDistance(expr1, expr2, **extra)
 
-.. versionadded:: 3.0
-
 *Availability*: `PostGIS <https://postgis.net/docs/geometry_distance_knn.html>`__
 
 Accepts two geographic fields or expressions and returns the distance between
