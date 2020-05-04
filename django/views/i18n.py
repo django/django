@@ -196,8 +196,8 @@ class JavaScriptCatalog(View):
     Return the selected language catalog as a JavaScript library.
 
     Receive the list of packages to check for translations in the `packages`
-    kwarg either from the extra dictionary passed to the url() function or as a
-    plus-sign delimited string from the request. Default is 'django.conf'.
+    kwarg either from the extra dictionary passed to the path() function or as
+    a plus-sign delimited string from the request. Default is 'django.conf'.
 
     You can override the gettext domain for this view, but usually you don't
     want to do that as JavaScript messages go to the djangojs domain. This

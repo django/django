@@ -1270,7 +1270,7 @@ Thus ``patterns()`` serves little purpose and is a burden when teaching new user
 (answering the newbie's question "why do I need this empty string as the first
 argument to ``patterns()``?"). For these reasons, we are deprecating it.
 Updating your code is as simple as ensuring that ``urlpatterns`` is a list of
-:func:`django.conf.urls.url` instances. For example::
+``django.conf.urls.url()`` instances. For example::
 
     from django.conf.urls import url
     from myapp import views
@@ -1280,8 +1280,8 @@ Updating your code is as simple as ensuring that ``urlpatterns`` is a list of
         url('^other/$', views.otherview),
     ]
 
-Passing a string as ``view`` to :func:`~django.conf.urls.url`
--------------------------------------------------------------
+Passing a string as ``view`` to ``django.conf.urls.url()``
+----------------------------------------------------------
 
 Related to the previous item, referencing views as strings in the ``url()``
 function is deprecated. Pass the callable view as described in the previous
@@ -1319,7 +1319,7 @@ instead.
 
 Related to the previous item, the ``prefix`` argument to
 :func:`django.conf.urls.i18n.i18n_patterns` has been deprecated. Simply pass a
-list of :func:`django.conf.urls.url` instances instead.
+list of ``django.conf.urls.url()`` instances instead.
 
 Using an incorrect count of unpacked values in the :ttag:`for` template tag
 ---------------------------------------------------------------------------

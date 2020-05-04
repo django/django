@@ -1289,7 +1289,7 @@ to:
 
 This change also means that the old way of including an ``AdminSite`` instance
 is deprecated. Instead, pass ``admin.site.urls`` directly to
-:func:`~django.conf.urls.url()`:
+``django.conf.urls.url()``:
 
 .. code-block:: python
     :caption: urls.py

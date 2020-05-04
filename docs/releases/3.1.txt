@@ -754,6 +754,9 @@ Miscellaneous
 * The ``NullBooleanField`` model field is deprecated in favor of
   ``BooleanField(null=True)``.
 
+* ``django.conf.urls.url()`` alias of :func:`django.urls.re_path` is
+  deprecated.
+
 .. _removed-features-3.1:
 
 Features removed in 3.1
