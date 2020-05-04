@@ -167,8 +167,6 @@ list of errors.
 
 .. exception:: RequestAborted
 
-    .. versionadded:: 3.0
-
     The :exc:`RequestAborted` exception is raised when a HTTP body being read
     in by the handler is cut off midstream and the client connection closes,
     or when the client does not send data and hits a timeout where the server
@@ -183,8 +181,6 @@ list of errors.
 ----------------------------
 
 .. exception:: SynchronousOnlyOperation
-
-    .. versionadded:: 3.0
 
     The :exc:`SynchronousOnlyOperation` exception is raised when code that
     is only allowed in synchronous Python code is called from an asynchronous

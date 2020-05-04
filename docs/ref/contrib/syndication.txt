@@ -310,11 +310,6 @@ appropriate ``<language>`` tag (RSS 2.0) or ``xml:lang`` attribute (Atom). By
 default, this is :func:`django.utils.translation.get_language()`. You can change it
 by setting the ``language`` class attribute.
 
-.. versionchanged:: 3.0
-
-    The ``language`` class attribute was added. In older versions, the behavior
-    is the same as ``language = settings.LANGUAGE_CODE``.
-
 URLs
 ----
 

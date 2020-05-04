@@ -2,8 +2,6 @@
 Asynchronous support
 ====================
 
-.. versionadded:: 3.0
-
 .. currentmodule:: asgiref.sync
 
 Django has support for writing asynchronous ("async") views, along with an

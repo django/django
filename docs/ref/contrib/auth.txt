@@ -194,8 +194,6 @@ Methods
 
     .. method:: get_user_permissions(obj=None)
 
-        .. versionadded:: 3.0
-
         Returns a set of permission strings that the user has directly.
 
         If ``obj`` is passed in, only returns the user permissions for this
@@ -288,13 +286,7 @@ Manager methods
         Same as :meth:`create_user`, but sets :attr:`~models.User.is_staff` and
         :attr:`~models.User.is_superuser` to ``True``.
 
-        .. versionchanged:: 3.0
-
-            The ``email`` and ``password`` parameters were made optional.
-
     .. method:: with_perm(perm, is_active=True, include_superusers=True, backend=None, obj=None)
-
-        .. versionadded:: 3.0
 
         Returns users that have the given permission ``perm`` either in the
         ``"<app label>.<permission codename>"`` format or as a
@@ -499,8 +491,6 @@ The following backends are available in :mod:`django.contrib.auth.backends`:
 
 .. class:: BaseBackend
 
-    .. versionadded:: 3.0
-
     A base class that provides default implementations for all required
     methods. By default, it will reject any user and provide no permissions.
 
@@ -602,8 +592,6 @@ The following backends are available in :mod:`django.contrib.auth.backends`:
         field are allowed.
 
     .. method:: with_perm(perm, is_active=True, include_superusers=True, obj=None)
-
-        .. versionadded:: 3.0
 
         Returns all active users who have the permission ``perm`` either in
         the form of ``"<app label>.<permission codename>"`` or a

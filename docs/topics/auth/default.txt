@@ -1398,10 +1398,6 @@ implementation details see :ref:`using-the-views`.
     * ``reset_url_token``: Token parameter displayed as a component of password
       reset URLs. Defaults to ``'set-password'``.
 
-      .. versionchanged:: 3.0
-
-        The ``reset_url_token`` class attribute was added.
-
     **Template context:**
 
     * ``form``: The form (see ``form_class`` above) for setting the new user's

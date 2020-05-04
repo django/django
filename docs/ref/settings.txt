@@ -1561,10 +1561,6 @@ when using the :djadmin:`collectstatic` management command. See
     way that modes must be specified. If you try to use ``644``, you'll
     get totally incorrect behavior.
 
-.. versionchanged:: 3.0
-
-    In older versions, the default value is ``None``.
-
 .. setting:: FILE_UPLOAD_TEMP_DIR
 
 ``FILE_UPLOAD_TEMP_DIR``
@@ -1823,8 +1819,6 @@ deletes the old one.
 ``LANGUAGE_COOKIE_HTTPONLY``
 ----------------------------
 
-.. versionadded:: 3.0
-
 Default: ``False``
 
 Whether to use ``HttpOnly`` flag on the language cookie. If this is set to
@@ -1872,8 +1866,6 @@ deletes the one.
 ``LANGUAGE_COOKIE_SAMESITE``
 ----------------------------
 
-.. versionadded:: 3.0
-
 Default: ``None``
 
 The value of the `SameSite`_ flag on the language cookie. This flag prevents the
@@ -1889,8 +1881,6 @@ See :setting:`SESSION_COOKIE_SAMESITE` for details about ``SameSite``.
 
 ``LANGUAGE_COOKIE_SECURE``
 --------------------------
-
-.. versionadded:: 3.0
 
 Default: ``False``
 
@@ -2263,10 +2253,6 @@ If ``True``, the :class:`~django.middleware.security.SecurityMiddleware`
 sets the :ref:`x-content-type-options` header on all responses that do not
 already have it.
 
-.. versionchanged:: 3.0
-
-    In older versions, the default value is ``False``.
-
 .. setting:: SECURE_HSTS_INCLUDE_SUBDOMAINS
 
 ``SECURE_HSTS_INCLUDE_SUBDOMAINS``
@@ -2392,8 +2378,6 @@ from URL paths, so patterns shouldn't include them, e.g.
 
 ``SECURE_REFERRER_POLICY``
 --------------------------
-
-.. versionadded:: 3.0
 
 Default: ``'same-origin'``
 
@@ -2886,10 +2870,6 @@ Default: ``'DENY'``
 The default value for the X-Frame-Options header used by
 :class:`~django.middleware.clickjacking.XFrameOptionsMiddleware`. See the
 :doc:`clickjacking protection </ref/clickjacking/>` documentation.
-
-.. versionchanged:: 3.0
-
-    In older versions, the default value is ``SAMEORIGIN``.
 
 Auth
 ====

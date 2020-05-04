@@ -301,10 +301,6 @@ There are some additional caveats to be aware of:
 
         __empty__ = _('(Unknown)')
 
-.. versionadded:: 3.0
-
-   The ``TextChoices``, ``IntegerChoices``, and ``Choices`` classes were added.
-
 ``db_column``
 -------------
 
@@ -816,10 +812,6 @@ Has two optional arguments:
         class MyModel(models.Model):
             upload = models.FileField(upload_to=user_directory_path)
 
-    .. versionchanged:: 3.0
-
-        Support for :class:`pathlib.Path` was added.
-
 .. attribute:: FileField.storage
 
     A storage object, or a callable which returns a storage object. This
@@ -1029,10 +1021,6 @@ directory on the filesystem. Has some special arguments, of which the first is
 
         class MyModel(models.Model):
             file = models.FilePathField(path=images_path)
-
-    .. versionchanged:: 3.0
-
-        ``path`` can now be a callable.
 
 .. attribute:: FilePathField.match
 
@@ -1314,8 +1302,6 @@ It uses :class:`~django.core.validators.validate_slug` or
 ------------------
 
 .. class:: SmallAutoField(**options)
-
-.. versionadded:: 3.0
 
 Like an :class:`AutoField`, but only allows values under a certain
 (database-dependent) limit. Values from ``1`` to ``32767`` are safe in all
@@ -1820,11 +1806,6 @@ that control how the relationship functions.
     add the descriptor for the reverse relationship, allowing
     :class:`ManyToManyField` relationships to be non-symmetrical.
 
-    .. versionchanged:: 3.0
-
-        Specifying ``symmetrical=True`` for recursive many-to-many
-        relationships using an intermediary model was allowed.
-
 .. attribute:: ManyToManyField.through
 
     Django will automatically generate a table to manage many-to-many
@@ -2077,8 +2058,6 @@ Field API reference
         where the arguments are interpolated from the field's ``__dict__``.
 
     .. attribute:: descriptor_class
-
-        .. versionadded:: 3.0
 
         A class implementing the :py:ref:`descriptor protocol <descriptors>`
         that is instantiated and assigned to the model instance attribute. The

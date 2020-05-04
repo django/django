@@ -889,8 +889,6 @@ types.
 Range operators
 ---------------
 
-.. versionadded:: 3.0
-
 .. class:: RangeOperators
 
 PostgreSQL provides a set of SQL operators that can be used together with the
@@ -916,8 +914,6 @@ corresponding lookups.
 
 RangeBoundary() expressions
 ---------------------------
-
-.. versionadded:: 3.0
 
 .. class:: RangeBoundary(inclusive_lower=True, inclusive_upper=False)
 

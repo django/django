@@ -693,10 +693,6 @@ Python logging module.
             }
         },
 
-    .. versionadded:: 3.0
-
-        The ``reporter_class`` argument was added.
-
     .. method:: send_mail(subject, message, *args, **kwargs)
 
         Sends emails to admin users. To customize this behavior, you can

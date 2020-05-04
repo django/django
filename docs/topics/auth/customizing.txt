@@ -577,14 +577,6 @@ password resets. You must then provide some key implementation details:
         ``REQUIRED_FIELDS`` has no effect in other parts of Django, like
         creating a user in the admin.
 
-        .. versionadded:: 3.0
-
-            :attr:`REQUIRED_FIELDS` now supports
-            :class:`~django.db.models.ManyToManyField`\s without a custom
-            through model. Since there is no way to pass model instances during
-            the :djadmin:`createsuperuser` prompt, expect the user to enter IDs
-            of existing instances of the class to which the model is related.
-
         For example, here is the partial definition for a user model that
         defines two required fields - a date of birth and height::
 
@@ -933,8 +925,6 @@ methods and attributes:
         explicitly assigning them.
 
     .. method:: models.PermissionsMixin.get_user_permissions(obj=None)
-
-        .. versionadded:: 3.0
 
         Returns a set of permission strings that the user has directly.
 

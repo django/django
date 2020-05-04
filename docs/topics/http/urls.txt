@@ -61,11 +61,6 @@ algorithm the system follows to determine which Python code to execute:
      in the optional ``kwargs`` argument to :func:`django.urls.path` or
      :func:`django.urls.re_path`.
 
-     .. versionchanged:: 3.0
-
-          In older versions, the keyword arguments with ``None`` values are
-          made up also for not provided named parts.
-
 #. If no URL pattern matches, or if an exception is raised during any
    point in this process, Django invokes an appropriate
    error-handling view. See `Error handling`_ below.

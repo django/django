@@ -247,8 +247,6 @@ __ https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Strict-Transport-Se
 Referrer Policy
 ~~~~~~~~~~~~~~~
 
-.. versionadded:: 3.0
-
 Browsers use `the Referer header`__ as a way to send information to a site
 about how users got there. When a user clicks a link, the browser will send the
 full URL of the linking page as the referrer. While this can be useful for some

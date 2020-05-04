@@ -111,8 +111,6 @@ run the query ``CREATE EXTENSION IF NOT EXISTS hstore;``.
 Index concurrent operations
 ===========================
 
-.. versionadded:: 3.0
-
 PostgreSQL supports the ``CONCURRENTLY`` option to ``CREATE INDEX`` and
 ``DROP INDEX`` statements to add and remove indexes without locking out writes.
 This option is useful for adding or removing an index in a live production

@@ -71,21 +71,13 @@ need to distinguish caches by the ``Accept-language`` header.
     private`` header to a response to indicate that a page should never be
     cached.
 
-    .. versionchanged:: 3.0
-
-        ``private`` directive was added.
-
 .. function:: patch_vary_headers(response, newheaders)
 
     Adds (or updates) the ``Vary`` header in the given ``HttpResponse`` object.
     ``newheaders`` is a list of header names that should be in ``Vary``. If
     headers contains an asterisk, then ``Vary`` header will consist of a single
-    asterisk ``'*'``. Otherwise, existing headers in ``Vary`` aren't removed.
-
-    .. versionchanged:: 3.0
-
-        Handling an asterisk ``'*'`` according to :rfc:`7231#section-7.1.4` was
-        added.
+    asterisk ``'*'``, according to :rfc:`7231#section-7.1.4`. Otherwise,
+    existing headers in ``Vary`` aren't removed.
 
 .. function:: get_cache_key(request, key_prefix=None, method='GET', cache=None)
 
@@ -642,11 +634,6 @@ escaping HTML.
     Returns the given text with ampersands, quotes and angle brackets encoded
     for use in HTML. The input is first coerced to a string and the output has
     :func:`~django.utils.safestring.mark_safe` applied.
-
-    .. versionchanged:: 3.0
-
-        In older versions, ``'`` is converted to its decimal code ``&#39;``
-        instead of the equivalent hex code ``&#x27;``.
 
 .. function:: conditional_escape(text)
 
