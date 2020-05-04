@@ -1,0 +1,12 @@
+==========================
+Django 3.0.7 release notes
+==========================
+
+*Expected June 1, 2020*
+
+Django 3.0.7 fixes several bugs in 3.0.6.
+
+Bugfixes
+========
+
+* ...
