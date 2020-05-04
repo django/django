@@ -4,7 +4,7 @@ Django 3.0.6 release notes
 
 *May 4, 2020*
 
-Django 3.0.6 fixes several bugs in 3.0.5.
+Django 3.0.6 fixes a bug in 3.0.5.
 
 Bugfixes
 ========
