@@ -2,7 +2,7 @@
 Django 3.0.6 release notes
 ==========================
 
-*Expected May 4, 2020*
+*May 4, 2020*
 
 Django 3.0.6 fixes several bugs in 3.0.5.
 
