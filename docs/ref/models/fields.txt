@@ -1006,10 +1006,10 @@ periodically via e.g. cron).
 ``FilePathField``
 -----------------
 
-.. class:: FilePathField(path=None, match=None, recursive=False, max_length=100, **options)
+.. class:: FilePathField(path='', match=None, recursive=False, allow_files=True, allow_folders=False, max_length=100, **options)
 
 A :class:`CharField` whose choices are limited to the filenames in a certain
-directory on the filesystem. Has three special arguments, of which the first is
+directory on the filesystem. Has some special arguments, of which the first is
 **required**:
 
 .. attribute:: FilePathField.path
