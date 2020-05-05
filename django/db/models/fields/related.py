@@ -903,8 +903,7 @@ class ForeignKey(ForeignObject):
                     'Field specifies unsupported on_delete relation with a '
                     'model also using an on_delete=DB_* relation.',
                     hint='Change the on_delete rule so that DB_* relations '
-                    'point to other models using DB_* or DO_NOTHING '
-                    'relations.',
+                    'point to models using DB_* or DO_NOTHING relations.',
                     obj=self,
                     id='fields.E345',
                 )
