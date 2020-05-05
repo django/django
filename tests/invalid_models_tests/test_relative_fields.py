@@ -889,7 +889,7 @@ class ContentTypeFieldTests(SimpleTestCase):
         field = ModelDbCascade._meta.get_field('content_type')
         self.assertEqual(field.check(), [
             Error(
-                'Field specifies unsupported on_delete=DB_CASCADE on model '
+                'Field specifies unsupported on_delete=DB_* on model '
                 'declaring a GenericForeignKey.',
                 hint='Change the on_delete rule.',
                 obj=field,
@@ -910,7 +910,7 @@ class ContentTypeFieldTests(SimpleTestCase):
         field = ModelDbRestrict._meta.get_field('content_type')
         self.assertEqual(field.check(), [
             Error(
-                'Field specifies unsupported on_delete=DB_RESTRICT on model '
+                'Field specifies unsupported on_delete=DB_* on model '
                 'declaring a GenericForeignKey.',
                 hint='Change the on_delete rule.',
                 obj=field,
@@ -931,7 +931,7 @@ class ContentTypeFieldTests(SimpleTestCase):
         field = ModelDbSetNull._meta.get_field('content_type')
         self.assertEqual(field.check(), [
             Error(
-                'Field specifies unsupported on_delete=DB_SET_NULL on model '
+                'Field specifies unsupported on_delete=DB_* on model '
                 'declaring a GenericForeignKey.',
                 hint='Change the on_delete rule.',
                 obj=field,
