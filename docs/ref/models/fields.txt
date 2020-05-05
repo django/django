@@ -1457,7 +1457,7 @@ relation works.
             null=True,
         )
 
-    ``on_delete`` doesn't create a SQL constraint in the database. Support for
+    ``on_delete`` doesn't create an SQL constraint in the database. Support for
     database-level cascade options :ticket:`may be implemented later <21961>`.
 
 The possible values for :attr:`~ForeignKey.on_delete` are found in
