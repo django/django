@@ -11,8 +11,8 @@ from django.db.backends import utils
 from django.db.models import Q
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.deletion import (
-    CASCADE, DB_CASCADE, DB_RESTRICT, DB_SET_NULL, DO_NOTHING, RESTRICT,
-    SET_DEFAULT, SET_NULL,
+    CASCADE, DB_CASCADE, DB_RESTRICT, DB_SET_NULL, RESTRICT, SET_DEFAULT,
+    SET_NULL,
 )
 from django.db.models.query_utils import PathInfo
 from django.db.models.utils import make_model_tuple
@@ -901,7 +901,7 @@ class ForeignKey(ForeignObject):
             return [
                 checks.Error(
                     'Field specifies unsupported on_delete=%s relation with a '
-                    'model also using an on_delete=DB_* relation.' % on_delete,
+                    'model also using an on_delete=DB_ relation.' % on_delete,
                     hint='Change the on_delete rule so that DB_* relations '
                     'point to other models using DB_* or DO_NOTHING '
                     'relations.',

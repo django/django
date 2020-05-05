@@ -268,7 +268,7 @@ class OnDeleteTests(TestCase):
 class OnDeleteDbTests(TestCase):
     def test_on_delete_type_errors(self):
         with self.assertRaises(TypeError):
-            DatabaseOnDelete('DB_NEW_THING', lambda x : x)
+            DatabaseOnDelete('DB_NEW_THING', lambda x:x)
 
         with self.assertRaises(TypeError):
             OnDelete('NEW_THING', 'SQL STRING')
