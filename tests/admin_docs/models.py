@@ -44,6 +44,13 @@ class Person(models.Model):
     def _get_full_name(self):
         return "%s %s" % (self.first_name, self.last_name)
 
+    def _get_abbreviated_name(self):
+        if self.last_name:
+            abbreviated_name = '%s %s.' % (self.first_name.title(), self.last_name.title()[0])
+            return abbreviated_name
+        else:
+            return self.first_name
+
     def rename_company(self, new_name):
         self.company.name = new_name
         self.company.save()
@@ -76,6 +83,13 @@ class Person(models.Model):
         Get the full name of the person
         """
         return self._get_full_name()
+
+    def get_abbreviated_name(self):
+        """
+        Get the abbreviated name of the person.
+        Eg. John D. for John Doe
+        """
+        return self._get_abbreviated_name()
 
     def get_status_count(self):
         return 0

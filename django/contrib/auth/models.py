@@ -371,6 +371,18 @@ class AbstractUser(AbstractBaseUser, PermissionsMixin):
         full_name = '%s %s' % (self.first_name, self.last_name)
         return full_name.strip()
 
+    def get_abbreviated_name(self):
+        """
+        Return the first_name plus the capitalised initial of the last_name,
+        with a space in between and dot(.) following it.
+        Eg John D. for John Doe
+        """
+        if self.last_name:
+            abbreviated_name = '%s %s.' % (self.first_name.title(), self.last_name.title()[0])
+            return abbreviated_name
+        else:
+            return self.first_name
+
     def get_short_name(self):
         """Return the short name for the user."""
         return self.first_name

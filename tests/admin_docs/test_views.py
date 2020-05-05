@@ -175,6 +175,8 @@ class TestModelDetailView(TestDataMixin, AdminDocsTestCase):
         """
         self.assertContains(self.response, "<td>get_full_name</td>")
         self.assertNotContains(self.response, "<td>_get_full_name</td>")
+        self.assertContains(self.response, "<td>get_abbreviated_name</td>")
+        self.assertNotContains(self.response, "<td>_get_abbreviated_name</td>")
         self.assertNotContains(self.response, "<td>add_image</td>")
         self.assertNotContains(self.response, "<td>delete_image</td>")
         self.assertNotContains(self.response, "<td>set_status</td>")
