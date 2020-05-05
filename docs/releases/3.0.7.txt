@@ -9,4 +9,5 @@ Django 3.0.7 fixes several bugs in 3.0.6.
 Bugfixes
 ========
 
-* ...
+* Fixed a regression in Django 3.0 by restoring the ability to use field
+  lookups in ``Meta.ordering`` (:ticket:`31538`).
