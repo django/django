@@ -552,7 +552,7 @@ class RelativeFieldTests(SimpleTestCase):
         self.assertEqual(field.check(), [
             Error(
                 'Field specifies unsupported on_delete=CASCADE relation with '
-                'a model also using an on_delete=DB_ relation.'
+                'a model also using an on_delete=DB_ relation.',
                 hint='Change the on_delete rule so that DB_CASCADE '
                 'relations point to models using DB_CASCADE or '
                 'DO_NOTHING relations.',
