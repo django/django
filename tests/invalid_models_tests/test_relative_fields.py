@@ -878,7 +878,11 @@ class RelativeFieldTests(SimpleTestCase):
 class ContentTypeFieldTests(SimpleTestCase):
     def test_on_delete_db_cascade_generic_fk(self):
         class ModelDbCascade(models.Model):
-            content_type = models.ForeignKey(ContentType, on_delete=models.DB_CASCADE, related_name='model_db_cascade_test')
+            content_type = models.ForeignKey(
+                ContentType,
+                on_delete=models.DB_CASCADE,
+                related_name='model_db_cascade_test'
+            )
             object_id = models.PositiveIntegerField()
             content_object = GenericForeignKey('content_type', 'object_id')
 
@@ -895,7 +899,11 @@ class ContentTypeFieldTests(SimpleTestCase):
 
     def test_on_delete_db_restrict_generic_fk(self):
         class ModelDbRestrict(models.Model):
-            content_type = models.ForeignKey(ContentType, on_delete=models.DB_RESTRICT, related_name='model_db_restrict_test')
+            content_type = models.ForeignKey(
+                ContentType,
+                on_delete=models.DB_RESTRICT,
+                related_name='model_db_restrict_test'
+            )
             object_id = models.PositiveIntegerField()
             content_object = GenericForeignKey('content_type', 'object_id')
 
@@ -912,7 +920,11 @@ class ContentTypeFieldTests(SimpleTestCase):
 
     def test_on_delete_db_set_null_generic_fk(self):
         class ModelDbSetNull(models.Model):
-            content_type = models.ForeignKey(ContentType, on_delete=models.DB_SET_NULL, related_name='model_db_set_null_test')
+            content_type = models.ForeignKey(
+                ContentType,
+                on_delete=models.DB_SET_NULL,
+                related_name='model_db_set_null_test'
+            )
             object_id = models.PositiveIntegerField()
             content_object = GenericForeignKey('content_type', 'object_id')
 
