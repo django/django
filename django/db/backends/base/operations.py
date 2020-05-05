@@ -172,12 +172,12 @@ class BaseDatabaseOperations:
         statement.
         """
         on_delete = ' ON DELETE %s '
-        if operation in ['CASCADE', 'NO ACTION', 'SET NULL', 'RESTRICT']:
-            return on_delete % (operation)
+        if operation in ['CASCADE', 'SET NULL', 'RESTRICT']:
+            return on_delete % operation
         elif operation == '':
             return ''
         else:
-            raise NotImplementedError('ON DELETE %s is not supported.' % (operation))
+            raise NotImplementedError('ON DELETE %s is not supported.' % operation)
 
     def distinct_sql(self, fields, params):
         """

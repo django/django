@@ -11,7 +11,8 @@ from django.db.backends import utils
 from django.db.models import Q
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.deletion import (
-    CASCADE, DB_CASCADE, DO_NOTHING, SET_DEFAULT, SET_NULL,
+    CASCADE, DB_CASCADE, DB_RESTRICT, DB_SET_NULL, DO_NOTHING, RESTRICT, 
+    SET_DEFAULT, SET_NULL,
 )
 from django.db.models.query_utils import PathInfo
 from django.db.models.utils import make_model_tuple
@@ -856,7 +857,7 @@ class ForeignKey(ForeignObject):
                     id='fields.E321',
                 )
             ]
-        elif on_delete == DB_CASCADE and (
+        elif on_delete in [DB_CASCADE, DB_RESTRICT, DB_SET_NULL] and (
             any(  # generic relation
                 hasattr(field, 'bulk_related_objects') for field in
                 self.model._meta.private_fields
@@ -867,46 +868,45 @@ class ForeignKey(ForeignObject):
             )
         ):
             return [
-                checks.Warning(
-                    'Field specifies unsupported DB_CASCADE on model '
-                    'declaring a GenericForeignKey.',
+                checks.Error(
+                    'Field specifies unsupported on_delete=%s on model '
+                    'declaring a GenericForeignKey.' % on_delete,
                     hint='Change the on_delete rule.',
                     obj=self,
-                    id='fields.W346'
+                    id='fields.E345',
                 )
             ]
-        elif on_delete == DB_CASCADE and len(
+        elif on_delete in [DB_CASCADE, DB_RESTRICT, DB_SET_NULL] and len(
             # multi table inheritance
             self.model._meta.concrete_model._meta.parents.values()
         ):
             return [
-                checks.Warning(
-                    'Field specifies unsupported DB_CASCADE on Multi-table '
-                    'inherited model.',
+                checks.Error(
+                    'Field specifies unsupported on_delete=%s on multi-table 
+                    ' inherited model.' % on_delete,
                     hint='Change the on_delete rule.',
                     obj=self,
-                    id='fields.W345'
+                    id='fields.E345',
                 )
             ]
-        elif on_delete == DB_CASCADE and (
-            any(  # field_A -> db_cascade -> field_B -> cascade -> field_C
+        elif on_delete in [CASCADE, RESTRICT, SET_DEFAULT, SET_NULL] and (
+            any(  # field_A <- CASCADE <- field_B <- DB_CASCADE <- field_C
                 getattr(field_B.remote_field, 'on_delete', None) and
-                getattr(field_B.remote_field, 'on_delete') not in [
-                    DB_CASCADE, DO_NOTHING
+                getattr(field_B.remote_field, 'on_delete') in [
+                    DB_CASCADE, DB_RESTRICT, DB_SET_NULL
                 ]
                 for field_B in self.remote_field.model._meta.fields
             )
         ):
             return [
-                checks.Warning(
-                    'Field specifies DB_CASCADE relation to model using '
-                    'unsupported CASCADE, SET_NULL, SET_VALUE or other '
-                    'relation to another model.',
-                    hint='Change the on_delete rule so that DB_CASCADE '
-                    'relations point to models using DB_CASCADE or '
-                    'DO_NOTHING relations.',
+                checks.Error(
+                    'Field specifies unsupported on_delete=%s relation with a '
+                    'model also using an on_delete=DB_* relation.' % on_delete,
+                    hint='Change the on_delete rule so that DB_* relations '
+                    'point to other models using DB_* or DO_NOTHING '
+                    'relations.',
                     obj=self,
-                    id='fields.W347'
+                    id='fields.E345',
                 )
             ]
         else:

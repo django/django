@@ -281,13 +281,8 @@ Related fields
   with a ``through`` model.
 * **fields.W344**: The field's intermediary table ``<table name>`` clashes with
   the table name of ``<model>``/``<model>.<field name>``.
-* **fields.W345**: Field specifies unsupported ``DB_CASCADE`` on Multi-table
-  inherited model.
-* **fields.W346**: Field specifies unsupported ``DB_CASCADE`` on model
-  declaring a ``GenericForeignKey``.
-* **fields.W347**: Field specifies ``DB_CASCADE`` relation to model using
-  unsupported ``CASCADE``, ``SET_NULL``, ``SET_VALUE`` or other relation
-  to another model.
+* **fields.E345**: Field specifies unsupported ``on_delete=<action>`` model 
+  relation. This would interfere with other expected model behaviors. 
 
 Models
 ------

@@ -220,9 +220,9 @@ class OperationSerializer(BaseSerializer):
 class OnDeleteSerializer(BaseSerializer):
     def serialize(self):
         if self.value.value is None:
-            return "models.%s" % (self.value.name), {}
+            return 'models.%s' % (self.value.name), {}
         elif self.value:
-            return "models.%s(%s)" % (self.value.name, self.value.value), {}
+            return 'models.%s(%s)' % (self.value.name, self.value.value), {}
 
 
 class RegexSerializer(BaseSerializer):

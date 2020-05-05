@@ -21,17 +21,21 @@ class RestrictedError(IntegrityError):
 
 
 class OnDelete:
-    with_db = False
-
     def __init__(self, name, operation, value=None):
         self.name = name
         self.operation = operation
         self.value = value
         if not self.with_db and not callable(self.operation):
             raise TypeError('operation should be callable')
+        if self.with_db and callable(self.operation):
+            raise TypeError('operation should be string not callable')
 
     def __call__(self, *args, **kwargs):
         return self.operation(*args, **kwargs)
+
+    @property
+    def with_db(self):
+        return hasattr(self, 'as_sql')
 
 
 def application_cascade(collector, field, sub_objs, using):
@@ -53,6 +57,11 @@ def application_protect(collector, field, sub_objs, using):
     )
 
 
+def application_restrict(collector, field, sub_objs, using):
+    collector.add_restricted_objects(field, sub_objs)
+    collector.add_dependency(field.remote_field.model, field.model)
+
+
 def application_set(value):
     if callable(value):
         def set_on_delete(collector, field, sub_objs, using):
@@ -62,11 +71,6 @@ def application_set(value):
             collector.add_field_update(field, value, sub_objs)
     set_on_delete.deconstruct = lambda: ('django.db.models.SET', (value,), {})
     return OnDelete('SET', set_on_delete, value)
-
-
-def application_restrict(collector, field, sub_objs, using):
-    collector.add_restricted_objects(field, sub_objs)
-    collector.add_dependency(field.remote_field.model, field.model)
 
 
 def application_set_null(collector, field, sub_objs, using):
@@ -86,13 +90,6 @@ SET_DEFAULT = OnDelete('SET_DEFAULT', application_set_default)
 
 
 class DatabaseOnDelete(OnDelete):
-    with_db = True
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        if self.with_db and callable(self.operation):
-            raise TypeError('operation should be string not callable')
-
     def __call__(self, collector, field, sub_objs, using):
         raise TypeError('operation should be string not callable')
 

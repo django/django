@@ -38,9 +38,9 @@ from django.db.models.fields.related import (  # isort:skip
 __all__ = aggregates_all + constraints_all + enums_all + fields_all + indexes_all
 __all__ += [
     'ObjectDoesNotExist', 'signals',
-    'CASCADE', 'DO_NOTHING', 'PROTECT', 'RESTRICT', 'SET', 'SET_DEFAULT',
-    'DB_CASCADE', 'DB_RESTRICT', 'DB_SET_NULL',
-    'SET_NULL', 'OnDelete', 'ProtectedError', 'RestrictedError',
+    'CASCADE', 'DB_CASCADE', 'DB_RESTRICT', 'DB_SET_NULL', 'DO_NOTHING', 
+    'PROTECT', 'RESTRICT', 'SET', 'SET_DEFAULT', 'SET_NULL', 'OnDelete',
+    'ProtectedError', 'RestrictedError',
     'Case', 'Exists', 'Expression', 'ExpressionList', 'ExpressionWrapper', 'F',
     'Func', 'OrderBy', 'OuterRef', 'RowRange', 'Subquery', 'Value',
     'ValueRange', 'When',

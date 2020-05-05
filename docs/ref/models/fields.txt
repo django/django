@@ -1554,24 +1554,24 @@ The possible values for :attr:`~ForeignKey.on_delete` are found in
 
     .. versionadded:: 3.1
 
-    Django takes no direct action, behaves exactly like DO_NOTHING,
-    but also sets ON DELETE CASCADE as a SQL constraint. The cascade
+    Django takes no direct action, behaves exactly like ``DO_NOTHING``,
+    but also sets ``ON DELETE CASCADE`` as a SQL constraint. The cascade
     deletion then happens at the database level.
 
 * .. attribute:: DB_SET_NULL
 
     .. versionadded:: 3.1
 
-    Django takes no direct action, behaves exactly like DO_NOTHING, but
-    also adds ON DELETE SET NULL as a SQL constraint. The setting of
-    a null value then happens at the database level.
+    Django takes no direct action, behaves exactly like ``DO_NOTHING``, but
+    also adds ``ON DELETE SET NULL`` as a SQL constraint. The setting of
+    a ``NULL`` value then happens at the database level.
 
 * .. attribute:: DB_RESTRICT
 
     .. versionadded:: 3.1
 
-    Django takes no direct action, behaves exactly like DO_NOTHING, but
-    also adds ON DELETE RESTRICT as a SQL constraint. The immediate
+    Django takes no direct action, behaves exactly like ``DO_NOTHING``, but
+    also adds ``ON DELETE RESTRICT`` as a SQL constraint. The immediate
     check of referential integrity (e.g. no longer deferred)
     happens at the database level.
 

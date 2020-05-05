@@ -493,7 +493,7 @@ class RelativeFieldTests(SimpleTestCase):
             )
         ])
 
-    def test_on_delete_db_cascade_multi_inheritance(self):
+    def test_on_delete_db_multi_inheritance(self):
         class Category(models.Model):
             pass
 
@@ -501,16 +501,40 @@ class RelativeFieldTests(SimpleTestCase):
             pass
 
         class PersonExtra(Person):
-            category = models.ForeignKey(Category, on_delete=models.DB_CASCADE)
+            category_cascade = models.ForeignKey(Category, on_delete=models.DB_CASCADE)
+            category_restrict = models.ForeignKey(Category, on_delete=models.DB_RESTRICT)
+            category_set_null = models.ForeignKey(Category, on_delete=models.DB_SET_NULL)
 
-        field = PersonExtra._meta.get_field('category')
+        field = PersonExtra._meta.get_field('category_cascade')
         self.assertEqual(field.check(), [
-            DjangoWarning(
-                'Field specifies unsupported DB_CASCADE on Multi-table '
-                'inherited model.',
+            Error(
+                'Field specifies unsupported on_delete=DB_CASCADE on '
+                'multi-table inherited model.',
                 hint='Change the on_delete rule.',
                 obj=field,
-                id='fields.W345'
+                id='fields.E345',
+            )
+        ])
+
+        field = PersonExtra._meta.get_field('category_restrict')
+        self.assertEqual(field.check(), [
+            Error(
+                'Field specifies unsupported on_delete=DB_RESTRICT on '
+                'multi-table inherited model.',
+                hint='Change the on_delete rule.',
+                obj=field,
+                id='fields.E345',
+            )
+        ])
+
+        field = PersonExtra._meta.get_field('category_set_null')
+        self.assertEqual(field.check(), [
+            Error(
+                'Field specifies unsupported on_delete=DB_SET_NULL on '
+                'multi-table inherited model.',
+                hint='Change the on_delete rule.',
+                obj=field,
+                id='fields.E345',
             )
         ])
 
@@ -519,22 +543,21 @@ class RelativeFieldTests(SimpleTestCase):
             pass
 
         class B(models.Model):
-            c = models.ForeignKey(C, on_delete=models.CASCADE)
+            c = models.ForeignKey(C, on_delete=models.DB_CASCADE)
 
         class A(models.Model):
-            b = models.ForeignKey(B, on_delete=models.DB_CASCADE)
+            b = models.ForeignKey(B, on_delete=models.CASCADE)
 
         field = A._meta.get_field('b')
         self.assertEqual(field.check(), [
-            DjangoWarning(
-                'Field specifies DB_CASCADE relation to model using '
-                'unsupported CASCADE, SET_NULL, SET_VALUE or other '
-                'relation to another model.',
+            Error(
+                'Field specifies unsupported on_delete=CASCADE relation with '
+                'a model also using an on_delete=DB_* relation.'
                 hint='Change the on_delete rule so that DB_CASCADE '
                 'relations point to models using DB_CASCADE or '
                 'DO_NOTHING relations.',
                 obj=field,
-                id='fields.W347'
+                id='fields.E345',
             )
         ])
 
@@ -885,12 +908,46 @@ class ContentTypeFieldTests(SimpleTestCase):
 
         field = Model._meta.get_field('content_type')
         self.assertEqual(field.check(), [
-            DjangoWarning(
-                'Field specifies unsupported DB_CASCADE on model '
+            Error(
+                'Field specifies unsupported on_delete=DB_CASCADE on model '
                 'declaring a GenericForeignKey.',
                 hint='Change the on_delete rule.',
                 obj=field,
-                id='fields.W346'
+                id='fields.E345',
+            )
+        ])
+
+    def test_on_delete_db_restrict_generic_fk(self):
+        class Model(models.Model):
+            content_type = models.ForeignKey(ContentType, on_delete=models.DB_RESTRICT, related_name='model_test')
+            object_id = models.PositiveIntegerField()
+            content_object = GenericForeignKey('content_type', 'object_id')
+
+        field = Model._meta.get_field('content_type')
+        self.assertEqual(field.check(), [
+            Error(
+                'Field specifies unsupported on_delete=DB_RESTRICT on model '
+                'declaring a GenericForeignKey.',
+                hint='Change the on_delete rule.',
+                obj=field,
+                id='fields.E345',
+            )
+        ])
+
+    def test_on_delete_db_set_null_generic_fk(self):
+        class Model(models.Model):
+            content_type = models.ForeignKey(ContentType, on_delete=models.DB_SET_NULL, related_name='model_test')
+            object_id = models.PositiveIntegerField()
+            content_object = GenericForeignKey('content_type', 'object_id')
+
+        field = Model._meta.get_field('content_type')
+        self.assertEqual(field.check(), [
+            Error(
+                'Field specifies unsupported on_delete=DB_SET_NULL on model '
+                'declaring a GenericForeignKey.',
+                hint='Change the on_delete rule.',
+                obj=field,
+                id='fields.E345',
             )
         ])
 

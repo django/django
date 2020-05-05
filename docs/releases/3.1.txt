@@ -321,6 +321,7 @@ Models
   ``DB_CASCADE``, ``DB_SET_NULL``, and ``DB_RESTRICT``. These
   will behave like ``DO_NOTHING`` in Django, but leverage the ``ON DELETE`` SQL
   constraint equivalents.
+
 * :meth:`.QuerySet.explain` now supports:
 
   * ``TREE`` format on MySQL 8.0.16+,

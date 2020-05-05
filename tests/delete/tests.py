@@ -2,7 +2,7 @@ from math import ceil
 
 from django.db import IntegrityError, connection, models, transaction
 from django.db.models import ProtectedError, RestrictedError
-from django.db.models.deletion import Collector
+from django.db.models.deletion import Collector, DatabaseOnDelete, OnDelete
 from django.db.models.sql.constants import GET_ITERATOR_CHUNK_SIZE
 from django.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
 
@@ -264,35 +264,31 @@ class OnDeleteTests(TestCase):
         self.assertFalse(GenericDeleteBottom.objects.exists())
 
 
-@skipUnlessDBFeature("supports_foreign_keys")
+@skipUnlessDBFeature('supports_foreign_keys')
 class OnDeleteDbTests(TestCase):
+    def test_on_delete_type_errors(self):
+        with self.assertRaises(TypeError):
+            DatabaseOnDelete('DB_NEW_THING', lambda x : x)
+
+        with self.assertRaises(TypeError):
+            OnDelete('NEW_THING', 'SQL STRING')
 
     def test_db_cascade(self):
         a = BaseDbCascade.objects.create()
-        b = RelToBaseDbCascade.objects.create(
-            name='db_cascade',
-            db_cascade=a
-        )
+        b = RelToBaseDbCascade.objects.create(name='db_cascade', db_cascade=a)
         b.db_cascade.delete()
-        # BaseDbCascade is deleted
-        self.assertFalse(
-            BaseDbCascade.objects.filter(pk=a.pk).exists()
+        self.assertIs(
+            BaseDbCascade.objects.filter(pk=a.pk).exists(), False
         )
-        # RelToBaseDbCascade is cascade deleted
-        self.assertFalse(
-            RelToBaseDbCascade.objects.filter(name="db_cascade").exists()
+        self.assertIs(
+            RelToBaseDbCascade.objects.filter(name='db_cascade').exists(),
+            False
         )
 
     def test_db_cascade_query_count(self):
-        """
-        A models.DB_CASCADE relation doesn't trigger a query
-        """
+        """A models.DB_CASCADE relation doesn't trigger a query per table."""
         a = BaseDbCascade.objects.create()
-        b = RelToBaseDbCascade.objects.create(
-            name='db_cascade',
-            db_cascade=a
-        )
-        # RelToBaseDbCascade should not be queried.
+        b = RelToBaseDbCascade.objects.create(name='db_cascade', db_cascade=a)
         with self.assertNumQueries(1):
             b.db_cascade.delete()
 
@@ -303,10 +299,9 @@ class OnDeleteDbTests(TestCase):
             db_set_null=a
         )
         b.db_set_null.delete()
-        # RelToBaseDbCascade is not deleted
-        # RelToBaseDbCascade.db_set_null is set to null
-        self.assertTrue(
-            RelToBaseDbCascade.objects.filter(name='db_set_null').exists()
+        self.assertIs(
+            RelToBaseDbCascade.objects.filter(name='db_set_null').exists(),
+            True
         )
         self.assertEqual(
             RelToBaseDbCascade.objects.get(name='db_set_null').db_set_null,
@@ -314,15 +309,12 @@ class OnDeleteDbTests(TestCase):
         )
 
     def test_set_null_query_count(self):
-        """
-        A models.DB_SET_NULL relation doesn't trigger a query
-        """
+        """A models.DB_SET_NULL relation doesn't trigger a query per table."""
         a = BaseDbCascade.objects.create()
         b = RelToBaseDbCascade.objects.create(
             name='db_set_null',
             db_set_null=a
         )
-        # RelToBaseDbCascade should not be queried.
         with self.assertNumQueries(1):
             b.db_set_null.delete()
 
@@ -332,34 +324,28 @@ class OnDeleteDbTests(TestCase):
             name='db_restrict',
             db_restrict=a
         )
-        # Deletion is prevented.
         with self.assertRaises(IntegrityError):
             with transaction.atomic():
                 b.db_restrict.delete()
-        # RelToBaseDbCascade is not deleted.
-        self.assertTrue(
-            RelToBaseDbCascade.objects.filter(name='db_restrict').exists()
+        self.assertIs(
+            RelToBaseDbCascade.objects.filter(name='db_restrict').exists(),
+            True
         )
-        # BaseDbCascade is also not deleted.
-        self.assertTrue(
+        self.assertIsNotNone(
             RelToBaseDbCascade.objects.get(
                 name='db_restrict'
-            ).db_restrict is not None
+            ).db_restrict
         )
 
     def test_db_restrict_query_count(self):
-        """
-        A models.DB_RESTRICT relation doesn't trigger a query
-        """
+        """A models.DB_RESTRICT relation doesn't trigger a query."""
         a = BaseDbCascade.objects.create()
         b = RelToBaseDbCascade.objects.create(
             name='db_restrict',
             db_restrict=a
         )
-        # RelToBaseDbCascade should not be deleted.
         with self.assertRaises(IntegrityError):
             with transaction.atomic():
-                # RelToBaseDbCascade should not be queried.
                 with self.assertNumQueries(1):
                     b.db_restrict.delete()
 
