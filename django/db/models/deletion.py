@@ -81,7 +81,12 @@ def application_set_default(collector, field, sub_objs, using):
     collector.add_field_update(field, field.get_default(), sub_objs)
 
 
+def application_do_nothing(collector, field, sub_objs, using):
+    pass
+
+
 CASCADE = OnDelete('CASCADE', application_cascade)
+DO_NOTHING = OnDelete('DO_NOTHING', application_do_nothing)
 PROTECT = OnDelete('PROTECT', application_protect)
 RESTRICT = OnDelete('RESTRICT', application_restrict)
 SET = OnDelete('SET', application_set)
@@ -97,10 +102,9 @@ class DatabaseOnDelete(OnDelete):
         return connection.ops.fk_on_delete_sql(self.operation)
 
 
-DO_NOTHING = DatabaseOnDelete('DO_NOTHING', '')
-DB_SET_NULL = DatabaseOnDelete('DB_SET_NULL', 'SET NULL')
-DB_RESTRICT = DatabaseOnDelete('DB_RESTRICT', 'RESTRICT')
 DB_CASCADE = DatabaseOnDelete('DB_CASCADE', 'CASCADE')
+DB_RESTRICT = DatabaseOnDelete('DB_RESTRICT', 'RESTRICT')
+DB_SET_NULL = DatabaseOnDelete('DB_SET_NULL', 'SET NULL')
 
 
 def get_candidate_relations_to_delete(opts):
@@ -226,7 +230,8 @@ class Collector:
             all(link == from_field for link in opts.concrete_model._meta.parents.values()) and
             # Foreign keys pointing to this model.
             all(
-                related.field.remote_field.on_delete.with_db
+                related.field.remote_field.on_delete.with_db or
+                related.field.remote_field.on_delete is DO_NOTHING
                 for related in get_candidate_relations_to_delete(opts)
             ) and (
                 # Something like generic foreign key.
@@ -307,7 +312,10 @@ class Collector:
             if keep_parents and related.model in parents:
                 continue
             field = related.field
-            if field.remote_field.on_delete.with_db:
+            if (
+                field.remote_field.on_delete.with_db or
+                field.remote_field.on_delete == DO_NOTHING
+            ):
                 continue
             related_model = related.related_model
             if self.can_fast_delete(related_model, from_field=field):

@@ -508,7 +508,7 @@ class RelativeFieldTests(SimpleTestCase):
         field = PersonExtra._meta.get_field('category_cascade')
         self.assertEqual(field.check(), [
             Error(
-                'Field specifies unsupported on_delete=DB_CASCADE on '
+                'Field specifies unsupported on_delete=DB_* on '
                 'multi-table inherited model.',
                 hint='Change the on_delete rule.',
                 obj=field,
@@ -519,7 +519,7 @@ class RelativeFieldTests(SimpleTestCase):
         field = PersonExtra._meta.get_field('category_restrict')
         self.assertEqual(field.check(), [
             Error(
-                'Field specifies unsupported on_delete=DB_RESTRICT on '
+                'Field specifies unsupported on_delete=DB_* on '
                 'multi-table inherited model.',
                 hint='Change the on_delete rule.',
                 obj=field,
@@ -530,7 +530,7 @@ class RelativeFieldTests(SimpleTestCase):
         field = PersonExtra._meta.get_field('category_set_null')
         self.assertEqual(field.check(), [
             Error(
-                'Field specifies unsupported on_delete=DB_SET_NULL on '
+                'Field specifies unsupported on_delete=DB_* on '
                 'multi-table inherited model.',
                 hint='Change the on_delete rule.',
                 obj=field,
@@ -551,8 +551,8 @@ class RelativeFieldTests(SimpleTestCase):
         field = A._meta.get_field('b')
         self.assertEqual(field.check(), [
             Error(
-                'Field specifies unsupported on_delete=CASCADE relation with '
-                'a model also using an on_delete=DB_ relation.',
+                'Field specifies unsupported on_delete relation with '
+                'a model also using an on_delete=DB_* relation.',
                 hint='Change the on_delete rule so that DB_CASCADE '
                 'relations point to models using DB_CASCADE or '
                 'DO_NOTHING relations.',
@@ -901,12 +901,12 @@ class RelativeFieldTests(SimpleTestCase):
 
 class ContentTypeFieldTests(SimpleTestCase):
     def test_on_delete_db_cascade_generic_fk(self):
-        class Model(models.Model):
+        class ModelDbCascade(models.Model):
             content_type = models.ForeignKey(ContentType, on_delete=models.DB_CASCADE, related_name='model_test')
             object_id = models.PositiveIntegerField()
             content_object = GenericForeignKey('content_type', 'object_id')
 
-        field = Model._meta.get_field('content_type')
+        field = ModelDbCascade._meta.get_field('content_type')
         self.assertEqual(field.check(), [
             Error(
                 'Field specifies unsupported on_delete=DB_CASCADE on model '
@@ -918,12 +918,12 @@ class ContentTypeFieldTests(SimpleTestCase):
         ])
 
     def test_on_delete_db_restrict_generic_fk(self):
-        class Model(models.Model):
+        class ModelDbRestrict(models.Model):
             content_type = models.ForeignKey(ContentType, on_delete=models.DB_RESTRICT, related_name='model_test')
             object_id = models.PositiveIntegerField()
             content_object = GenericForeignKey('content_type', 'object_id')
 
-        field = Model._meta.get_field('content_type')
+        field = ModelDbRestrict._meta.get_field('content_type')
         self.assertEqual(field.check(), [
             Error(
                 'Field specifies unsupported on_delete=DB_RESTRICT on model '
@@ -935,12 +935,12 @@ class ContentTypeFieldTests(SimpleTestCase):
         ])
 
     def test_on_delete_db_set_null_generic_fk(self):
-        class Model(models.Model):
+        class ModelDbSetNull(models.Model):
             content_type = models.ForeignKey(ContentType, on_delete=models.DB_SET_NULL, related_name='model_test')
             object_id = models.PositiveIntegerField()
             content_object = GenericForeignKey('content_type', 'object_id')
 
-        field = Model._meta.get_field('content_type')
+        field = ModelDbSetNull._meta.get_field('content_type')
         self.assertEqual(field.check(), [
             Error(
                 'Field specifies unsupported on_delete=DB_SET_NULL on model '
