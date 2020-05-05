@@ -870,7 +870,7 @@ class ForeignKey(ForeignObject):
             return [
                 checks.Error(
                     'Field specifies unsupported on_delete=DB_* on model '
-                    'declaring a GenericForeignKey.' % on_delete,
+                    'declaring a GenericForeignKey.',
                     hint='Change the on_delete rule.',
                     obj=self,
                     id='fields.E345',
@@ -883,7 +883,7 @@ class ForeignKey(ForeignObject):
             return [
                 checks.Error(
                     'Field specifies unsupported on_delete=DB_* on multi-table'
-                    ' inherited model.' % on_delete,
+                    ' inherited model.',
                     hint='Change the on_delete rule.',
                     obj=self,
                     id='fields.E345',
