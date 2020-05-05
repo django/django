@@ -171,13 +171,11 @@ class BaseDatabaseOperations:
         Return the SQL to make an ON DELETE statement during a CREATE TABLE
         statement.
         """
-        on_delete = ' ON DELETE %s '
         if operation in ['CASCADE', 'SET NULL', 'RESTRICT']:
-            return on_delete % operation
-        elif operation == '':
+            return ' ON DELETE %s ' % operation
+        if operation == '':
             return ''
-        else:
-            raise NotImplementedError('ON DELETE %s is not supported.' % operation)
+        raise NotImplementedError('ON DELETE %s is not supported.' % operation)
 
     def distinct_sql(self, fields, params):
         """
