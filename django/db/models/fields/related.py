@@ -882,8 +882,8 @@ class ForeignKey(ForeignObject):
         ):
             return [
                 checks.Error(
-                    'Field specifies unsupported on_delete=%s on multi-table 
-                    ' inherited model.' % on_delete,
+                    'Field specifies unsupported on_delete=%s on multi-table '
+                    'inherited model.' % on_delete,
                     hint='Change the on_delete rule.',
                     obj=self,
                     id='fields.E345',
