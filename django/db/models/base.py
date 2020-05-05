@@ -1719,7 +1719,9 @@ class Model(metaclass=ModelBase):
                     else:
                         _cls = None
                 except (FieldDoesNotExist, AttributeError):
-                    if fld is None or fld.get_transform(part) is None:
+                    if fld is None or (
+                        fld.get_transform(part) is None and fld.get_lookup(part) is None
+                    ):
                         errors.append(
                             checks.Error(
                                 "'ordering' refers to the nonexistent field, "
