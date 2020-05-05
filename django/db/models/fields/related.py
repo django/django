@@ -11,7 +11,7 @@ from django.db.backends import utils
 from django.db.models import Q
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.deletion import (
-    CASCADE, DB_CASCADE, DB_RESTRICT, DB_SET_NULL, DO_NOTHING, RESTRICT, 
+    CASCADE, DB_CASCADE, DB_RESTRICT, DB_SET_NULL, DO_NOTHING, RESTRICT,
     SET_DEFAULT, SET_NULL,
 )
 from django.db.models.query_utils import PathInfo
