@@ -90,10 +90,10 @@ Minor features
 * The default iteration count for the PBKDF2 password hasher is increased from
   180,000 to 216,000.
 
-* Added the :setting:`PASSWORD_RESET_TIMEOUT` setting to define the minimum
-  number of seconds a password reset link is valid for. This is encouraged
-  instead of deprecated ``PASSWORD_RESET_TIMEOUT_DAYS``, which will be removed
-  in Django 4.0.
+* Added the :setting:`PASSWORD_RESET_TIMEOUT` setting to define the number of
+  seconds a password reset link is valid for. This is encouraged instead of
+  deprecated ``PASSWORD_RESET_TIMEOUT_DAYS``, which will be removed in Django
+  4.0.
 
 * The password reset mechanism now uses the SHA-256 hashing algorithm. Support
   for tokens that use the old hashing algorithm remains until Django 4.0.
