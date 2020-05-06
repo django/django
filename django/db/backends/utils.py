@@ -184,7 +184,7 @@ def typecast_timestamp(s):  # does NOT store time zone information
 
 def split_identifier(identifier):
     """
-    Split a SQL identifier into a two element tuple of (namespace, name).
+    Split an SQL identifier into a two element tuple of (namespace, name).
 
     The identifier could be a table, column, or sequence name might be prefixed
     by a namespace.
@@ -198,7 +198,7 @@ def split_identifier(identifier):
 
 def truncate_name(identifier, length=None, hash_len=4):
     """
-    Shorten a SQL identifier to a repeatable mangled version with the given
+    Shorten an SQL identifier to a repeatable mangled version with the given
     length.
 
     If a quote stripped name contains a namespace, e.g. USERNAME"."TABLE,

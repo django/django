@@ -395,7 +395,7 @@ class BaseDatabaseOperations:
         to tables with foreign keys pointing the tables being truncated.
         PostgreSQL requires a cascade even if these tables are empty.
         """
-        raise NotImplementedError('subclasses of BaseDatabaseOperations must provide a sql_flush() method')
+        raise NotImplementedError('subclasses of BaseDatabaseOperations must provide an sql_flush() method')
 
     def execute_sql_flush(self, using, sql_list):
         """Execute a list of SQL statements to flush the database."""

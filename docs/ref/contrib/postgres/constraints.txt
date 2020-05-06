@@ -42,7 +42,7 @@ The name of the constraint.
 .. attribute:: ExclusionConstraint.expressions
 
 An iterable of 2-tuples. The first element is an expression or string. The
-second element is a SQL operator represented as a string. To avoid typos, you
+second element is an SQL operator represented as a string. To avoid typos, you
 may use :class:`~django.contrib.postgres.fields.RangeOperators` which maps the
 operators with strings. For example::
 
