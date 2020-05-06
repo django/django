@@ -4,8 +4,7 @@
     const modelName = document.getElementById('django-admin-form-add-constants').dataset.modelName;
     if (modelName) {
         const form = document.getElementById(modelName + '_form');
-        for (let i = 0; i < form.elements.length; i++) {
-            const element = form.elements[i];
+        for (const element of form.elements) {
             // HTMLElement.offsetParent returns null when the element is not
             // rendered.
             if (inputTags.includes(element.tagName) && !element.disabled && element.offsetParent) {

@@ -35,9 +35,7 @@
                 DateTimeShortcuts.timezoneOffset = localOffset - serverOffset;
             }
 
-            const inputs = document.getElementsByTagName('input');
-            for (let i = 0; i < inputs.length; i++) {
-                const inp = inputs[i];
+            for (const inp of document.getElementsByTagName('input')) {
                 if (inp.type === 'text' && inp.classList.contains('vTimeField')) {
                     DateTimeShortcuts.addClock(inp);
                     DateTimeShortcuts.addTimezoneWarning(inp);

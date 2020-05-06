@@ -131,20 +131,10 @@
                 return;
             }
             Downcoder.map = {};
-            Downcoder.chars = [];
-            for (let i = 0; i < ALL_DOWNCODE_MAPS.length; i++) {
-                const lookup = ALL_DOWNCODE_MAPS[i];
-                for (const c in lookup) {
-                    if (lookup.hasOwnProperty(c)) {
-                        Downcoder.map[c] = lookup[c];
-                    }
-                }
+            for (const lookup of ALL_DOWNCODE_MAPS) {
+                Object.assign(Downcoder.map, lookup);
             }
-            for (const k in Downcoder.map) {
-                if (Downcoder.map.hasOwnProperty(k)) {
-                    Downcoder.chars.push(k);
-                }
-            }
+            Downcoder.chars = Object.keys(Downcoder.map);
             Downcoder.regex = new RegExp(Downcoder.chars.join('|'), 'g');
         }
     };

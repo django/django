@@ -4,8 +4,7 @@
     window.addEventListener('load', function() {
         // Add anchor tag for Show/Hide link
         const fieldsets = document.querySelectorAll('fieldset.collapse');
-        for (let i = 0; i < fieldsets.length; i++) {
-            const elem = fieldsets[i];
+        for (const [i, elem] of fieldsets.entries()) {
             // Don't hide if fields in this fieldset have errors
             if (elem.querySelectorAll('div.errors, ul.errorlist').length === 0) {
                 elem.classList.add('collapsed');
@@ -37,9 +36,8 @@
                 }
             }
         };
-        const inlineDivs = document.querySelectorAll('fieldset.module');
-        for (let i = 0; i < inlineDivs.length; i++) {
-            inlineDivs[i].addEventListener('click', toggleFunc);
-        }
+        document.querySelectorAll('fieldset.module').forEach(function(el) {
+            el.addEventListener('click', toggleFunc);
+        });
     });
 }

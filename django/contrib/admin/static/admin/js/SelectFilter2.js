@@ -16,16 +16,15 @@ Requires core.js and SelectBox.js.
             from_box.id += '_from'; // change its ID
             from_box.className = 'filtered';
 
-            const ps = from_box.parentNode.getElementsByTagName('p');
-            for (let i = 0; i < ps.length; i++) {
-                if (ps[i].classList.contains("info")) {
+            for (const p of from_box.parentNode.getElementsByTagName('p')) {
+                if (p.classList.contains("info")) {
                     // Remove <p class="info">, because it just gets in the way.
-                    from_box.parentNode.removeChild(ps[i]);
-                } else if (ps[i].classList.contains("help")) {
+                    from_box.parentNode.removeChild(p);
+                } else if (p.classList.contains("help")) {
                     // Move help text up to the top so it isn't below the select
                     // boxes or wrapped off on the side to the right of the add
                     // button:
-                    from_box.parentNode.insertBefore(ps[i], from_box.parentNode.firstChild);
+                    from_box.parentNode.insertBefore(p, from_box.parentNode.firstChild);
                 }
             }
 
