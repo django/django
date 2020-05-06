@@ -1331,7 +1331,9 @@ class SeleniumTests(AdminSeleniumTestCase):
         hide_links = self.selenium.find_elements_by_link_text('HIDE')
         self.assertEqual(len(hide_links), 2)
         for hide_index, field_name in enumerate(test_fields):
-            hide_links[hide_index].click()
+            hide_link = hide_links[hide_index]
+            self.selenium.execute_script('window.scrollTo(0, %s);' % hide_link.location['y'])
+            hide_link.click()
             self.wait_until_invisible(field_name)
         self.selenium.find_element_by_xpath('//input[@value="Save"]').click()
         self.assertEqual(

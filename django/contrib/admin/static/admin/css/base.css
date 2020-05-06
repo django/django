@@ -4,6 +4,10 @@
 
 @import url(fonts.css);
 
+html, body {
+    height: 100%;
+}
+
 body {
     margin: 0;
     padding: 0;
@@ -732,6 +736,23 @@ table#change-history tbody th {
     width: 100%;
     min-width: 980px;
     padding: 0;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+#container > div {
+    flex-shrink: 0;
+}
+
+#container > .main {
+    display: flex;
+    flex: 1 0 auto;
+}
+
+.main > .content {
+    flex:  1 0;
+    max-width: 100%;
 }
 
 #content {

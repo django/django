@@ -5340,13 +5340,13 @@ class CSSTest(TestCase):
         """
         # General index page
         response = self.client.get(reverse('admin:index'))
-        self.assertContains(response, '<div class="app-admin_views module">')
+        self.assertContains(response, '<div class="app-admin_views module')
         self.assertContains(response, '<tr class="model-actor">')
         self.assertContains(response, '<tr class="model-album">')
 
         # App index page
         response = self.client.get(reverse('admin:app_list', args=('admin_views',)))
-        self.assertContains(response, '<div class="app-admin_views module">')
+        self.assertContains(response, '<div class="app-admin_views module')
         self.assertContains(response, '<tr class="model-actor">')
         self.assertContains(response, '<tr class="model-album">')
 
@@ -6147,7 +6147,7 @@ class AdminViewOnSiteTests(TestCase):
             response, 'inline_admin_formset', 0, None,
             ['Children must share a family name with their parents in this contrived test case']
         )
-        msg = "The formset 'inline_admin_formset' in context 10 does not contain any non-form errors."
+        msg = "The formset 'inline_admin_formset' in context 12 does not contain any non-form errors."
         with self.assertRaisesMessage(AssertionError, msg):
             self.assertFormsetError(response, 'inline_admin_formset', None, None, ['Error'])
 

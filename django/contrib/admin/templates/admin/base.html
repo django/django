@@ -4,6 +4,9 @@
 <head>
 <title>{% block title %}{% endblock %}</title>
 <link rel="stylesheet" type="text/css" href="{% block stylesheet %}{% static "admin/css/base.css" %}{% endblock %}">
+{% if not is_popup and is_nav_sidebar_enabled %}
+  <link rel="stylesheet" type="text/css" href="{% static "admin/css/nav_sidebar.css" %}">
+{% endif %}
 {% block extrastyle %}{% endblock %}
 {% if LANGUAGE_BIDI %}<link rel="stylesheet" type="text/css" href="{% block stylesheet_rtl %}{% static "admin/css/rtl.css" %}{% endblock %}">{% endif %}
 {% block extrahead %}{% endblock %}
@@ -64,6 +67,14 @@
     {% endblock %}
     {% endif %}
 
+    <div class="main shifted" id="main">
+      {% if not is_popup and is_nav_sidebar_enabled %}
+        {% block nav-sidebar %}
+          {% include "admin/nav_sidebar.html" %}
+        {% endblock %}
+      {% endif %}
+      <div class="content">
+
     {% block messages %}
         {% if messages %}
         <ul class="messagelist">{% for message in messages %}
@@ -86,8 +97,13 @@
     <!-- END Content -->
 
     {% block footer %}<div id="footer"></div>{% endblock %}
+      </div>
+    </div>
 </div>
 <!-- END Container -->
 
+{% if not is_popup and is_nav_sidebar_enabled %}
+  <script src="{% static 'admin/js/nav_sidebar.js' %}" async></script>
+{% endif %}
 </body>
 </html>

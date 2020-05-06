@@ -92,6 +92,10 @@ Minor features
 * Filters in the right sidebar of the admin changelist view now contains a link
   to clear all filters.
 
+* The admin now has a sidebar on larger screens for easier navigation. It is
+  enabled by default but can be disabled by using a custom ``AdminSite`` and
+  setting :attr:`.AdminSite.enable_nav_sidebar` to ``False``.
+
 * ``XRegExp`` is upgraded from version 2.0.0 to 3.2.0.
 
 * jQuery is upgraded from version 3.4.1 to 3.5.1.

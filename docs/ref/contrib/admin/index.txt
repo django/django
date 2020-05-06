@@ -2841,6 +2841,13 @@ Templates can override or extend base admin templates as described in
     setting an ``empty_value_display`` attribute on the field. See
     :attr:`ModelAdmin.empty_value_display` for examples.
 
+.. attribute:: AdminSite.enable_nav_sidebar
+
+    .. versionadded:: 3.1
+
+    A boolean value that determines whether to show the navigation sidebar
+    on larger screens. By default, it is set to ``True``.
+
 .. attribute:: AdminSite.login_template
 
     Path to a custom template that will be used by the admin site login view.
