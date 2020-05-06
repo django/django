@@ -16,6 +16,7 @@ from django.contrib.staticfiles.management.commands import (
 )
 from django.core.exceptions import ImproperlyConfigured
 from django.core.management import CommandError, call_command
+from django.core.management.base import SystemCheckError
 from django.test import RequestFactory, override_settings
 from django.test.utils import extend_sys_path
 from django.utils import timezone
@@ -144,6 +145,12 @@ class TestConfiguration(StaticFilesTestCase):
             staticfiles_storage._wrapped = empty
             collectstatic.staticfiles_storage = staticfiles_storage
             storage.staticfiles_storage = staticfiles_storage
+
+    @override_settings(STATICFILES_DIRS=('test'))
+    def test_collectstatis_check(self):
+        msg = 'The STATICFILES_DIRS setting is not a tuple or list.'
+        with self.assertRaisesMessage(SystemCheckError, msg):
+            call_command('collectstatic', skip_checks=False)
 
 
 class TestCollectionHelpSubcommand(AdminScriptTestCase):

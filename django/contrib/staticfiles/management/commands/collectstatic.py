@@ -3,6 +3,7 @@ import os
 from django.apps import apps
 from django.contrib.staticfiles.finders import get_finders
 from django.contrib.staticfiles.storage import staticfiles_storage
+from django.core.checks import Tags
 from django.core.files.storage import FileSystemStorage
 from django.core.management.base import BaseCommand, CommandError
 from django.core.management.color import no_style
@@ -35,6 +36,10 @@ class Command(BaseCommand):
         return True
 
     def add_arguments(self, parser):
+        parser.add_argument(
+            '--skip-checks', action='store_true',
+            help='Skip system checks.',
+        )
         parser.add_argument(
             '--noinput', '--no-input', action='store_false', dest='interactive',
             help="Do NOT prompt the user for input of any kind.",
@@ -146,6 +151,8 @@ class Command(BaseCommand):
 
     def handle(self, **options):
         self.set_options(**options)
+        if not options['skip_checks']:
+            self.check(tags=[Tags.staticfiles])
 
         message = ['\n']
         if self.dry_run:
