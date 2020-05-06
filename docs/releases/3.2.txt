@@ -266,6 +266,10 @@ Tests
   creating deep copies with :py:func:`copy.deepcopy`. Assigning objects which
   don't support ``deepcopy()`` is deprecated and will be removed in Django 4.1.
 
+* :class:`~django.test.runner.DiscoverRunner` now enables
+  :py:mod:`faulthandler` by default. This can be disabled by using the
+  :option:`test --no-faulthandler` option.
+
 * :class:`~django.test.Client` now preserves the request query string when
   following 307 and 308 redirects.
 

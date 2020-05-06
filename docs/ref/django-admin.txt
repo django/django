@@ -1515,6 +1515,14 @@ installed, ``ipdb`` is used instead.
 Discards output (``stdout`` and ``stderr``) for passing tests, in the same way
 as :option:`unittest's --buffer option<unittest.-b>`.
 
+.. django-admin-option:: --no-faulthandler
+
+.. versionadded:: 3.2
+
+Django automatically calls :func:`faulthandler.enable()` when starting the
+tests, which allows it to print a traceback if the interpreter crashes. Pass
+``--no-faulthandler`` to disable this behavior.
+
 ``testserver``
 --------------
 
