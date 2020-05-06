@@ -338,7 +338,7 @@ The ``Func`` API is as follows:
                         **extra_context
                     )
 
-        To avoid a SQL injection vulnerability, ``extra_context`` :ref:`must
+        To avoid an SQL injection vulnerability, ``extra_context`` :ref:`must
         not contain untrusted user input <avoiding-sql-injection-in-query-expressions>`
         as these values are interpolated into the SQL string rather than passed
         as query parameters, where the database driver would escape them.
@@ -353,7 +353,7 @@ assumed to be column references and will be wrapped in ``F()`` expressions
 while other values will be wrapped in ``Value()`` expressions.
 
 The ``**extra`` kwargs are ``key=value`` pairs that can be interpolated
-into the ``template`` attribute. To avoid a SQL injection vulnerability,
+into the ``template`` attribute. To avoid an SQL injection vulnerability,
 ``extra`` :ref:`must not contain untrusted user input
 <avoiding-sql-injection-in-query-expressions>` as these values are interpolated
 into the SQL string rather than passed as query parameters, where the database
@@ -1151,12 +1151,12 @@ SQL injection::
         template = "%(function)s('%(substring)s' in %(expressions)s)"
 
         def __init__(self, expression, substring):
-            # substring=substring is a SQL injection vulnerability!
+            # substring=substring is an SQL injection vulnerability!
             super().__init__(expression, substring=substring)
 
-This function generates a SQL string without any parameters. Since ``substring``
-is passed to ``super().__init__()`` as a keyword argument, it's interpolated
-into the SQL string before the query is sent to the database.
+This function generates an SQL string without any parameters. Since
+``substring`` is passed to ``super().__init__()`` as a keyword argument, it's
+interpolated into the SQL string before the query is sent to the database.
 
 Here's a corrected rewrite::
 
