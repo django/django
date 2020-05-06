@@ -310,7 +310,7 @@ class RenameModel(ModelOperation):
         old_model_tuple = (app_label, self.old_name_lower)
         new_remote_model = '%s.%s' % (app_label, self.new_name)
         to_reload = set()
-        for model_state, index, name, field, reference in get_references(state, old_model_tuple):
+        for model_state, name, field, reference in get_references(state, old_model_tuple):
             changed_field = None
             if reference.to:
                 changed_field = field.clone()
@@ -320,7 +320,7 @@ class RenameModel(ModelOperation):
                     changed_field = field.clone()
                 changed_field.remote_field.through = new_remote_model
             if changed_field:
-                model_state.fields[index] = name, changed_field
+                model_state.fields[name] = changed_field
                 to_reload.add((model_state.app_label, model_state.name_lower))
         # Reload models related to old model before removing the old model.
         state.reload_models(to_reload, delay=True)

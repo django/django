@@ -42,9 +42,6 @@ class AuthorAddress(models.Model):
     class Meta:
         ordering = ['id']
 
-    def __str__(self):
-        return self.address
-
 
 class Book(models.Model):
     title = models.CharField(max_length=255)
@@ -52,9 +49,6 @@ class Book(models.Model):
 
     class Meta:
         ordering = ['id']
-
-    def __str__(self):
-        return self.title
 
 
 class BookWithYear(Book):
@@ -168,9 +162,6 @@ class TaggedItem(models.Model):
     class Meta:
         ordering = ['id']
 
-    def __str__(self):
-        return self.tag
-
 
 class Article(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -254,9 +245,6 @@ class Employee(models.Model):
     class Meta:
         ordering = ['id']
 
-    def __str__(self):
-        return self.name
-
 
 # Ticket #19607
 
@@ -264,16 +252,10 @@ class LessonEntry(models.Model):
     name1 = models.CharField(max_length=200)
     name2 = models.CharField(max_length=200)
 
-    def __str__(self):
-        return "%s %s" % (self.name1, self.name2)
-
 
 class WordEntry(models.Model):
     lesson_entry = models.ForeignKey(LessonEntry, models.CASCADE)
     name = models.CharField(max_length=200)
-
-    def __str__(self):
-        return "%s (%s)" % (self.name, self.id)
 
 
 # Ticket #21410: Regression when related_name="+"
@@ -285,9 +267,6 @@ class Author2(models.Model):
 
     class Meta:
         ordering = ['id']
-
-    def __str__(self):
-        return self.name
 
 
 # Models for many-to-many with UUID pk test:

@@ -122,7 +122,7 @@ class Command(BaseCommand):
             futures = []
             for i, (dirpath, f) in enumerate(locations):
                 if self.verbosity > 0:
-                    self.stdout.write('processing file %s in %s\n' % (f, dirpath))
+                    self.stdout.write('processing file %s in %s' % (f, dirpath))
                 po_path = os.path.join(dirpath, f)
                 if has_bom(po_path):
                     self.stderr.write(

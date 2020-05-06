@@ -723,9 +723,9 @@ Released over 10 years ago, IE6 imposes many limitations on modern Web
 development. The practical implications of this policy are that contributors
 are free to improve the admin without consideration for these limitations.
 
-Obviously, this new policy **has no impact** on sites you develop using Django.
-It only applies to the Django admin. Feel free to develop apps compatible with
-any range of browsers.
+This new policy **has no impact** on sites you develop using Django. It only
+applies to the Django admin. Feel free to develop apps compatible with any
+range of browsers.
 
 .. _YUI's A-grade: https://github.com/yui/yui3/wiki/Graded-Browser-Support
 
@@ -1302,9 +1302,9 @@ names, like ``django.contrib.*``. The expansion was performed by a
 filesystem-based implementation of ``from <package> import *``. Unfortunately,
 this can't be done reliably.
 
-This behavior was never documented. Since it is unpythonic and not obviously
-useful, it was removed in Django 1.4. If you relied on it, you must edit your
-settings file to list all your applications explicitly.
+This behavior was never documented. Since it is unpythonic, it was removed in
+Django 1.4. If you relied on it, you must edit your settings file to list all
+your applications explicitly.
 
 ``HttpRequest.raw_post_data`` renamed to ``HttpRequest.body``
 -------------------------------------------------------------

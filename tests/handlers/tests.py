@@ -50,7 +50,7 @@ class HandlerTests(SimpleTestCase):
             environ['QUERY_STRING'] = str(raw_query_string, 'iso-8859-1')
             request = WSGIRequest(environ)
             got.append(request.GET['want'])
-        # %E9 is converted to the unicode replacement character by parse_qsl
+        # %E9 is converted to the Unicode replacement character by parse_qsl
         self.assertEqual(got, ['café', 'café', 'caf\ufffd', 'café'])
 
     def test_non_ascii_cookie(self):

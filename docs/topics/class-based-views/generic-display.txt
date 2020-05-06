@@ -277,10 +277,9 @@ with the most recent first::
         queryset = Book.objects.order_by('-publication_date')
         context_object_name = 'book_list'
 
-That's a pretty minimal example, but it illustrates the idea nicely. Of course,
-you'll usually want to do more than just reorder objects. If you want to
-present a list of books by a particular publisher, you can use the same
-technique::
+That's a pretty minimal example, but it illustrates the idea nicely. You'll
+usually want to do more than just reorder objects. If you want to present a
+list of books by a particular publisher, you can use the same technique::
 
     from django.views.generic import ListView
     from books.models import Book
@@ -390,9 +389,8 @@ using to keep track of the last time anybody looked at that author::
         headshot = models.ImageField(upload_to='author_headshots')
         last_accessed = models.DateTimeField()
 
-The generic ``DetailView`` class, of course, wouldn't know anything about this
-field, but once again we could easily write a custom view to keep that field
-updated.
+The generic ``DetailView`` class wouldn't know anything about this field, but
+once again we could write a custom view to keep that field updated.
 
 First, we'd need to add an author detail bit in the URLconf to point to a
 custom view::

@@ -77,6 +77,12 @@ Minor features
 * Filters in the right sidebar of the admin changelist view now contains a link
   to clear all filters.
 
+* ``XRegExp`` is upgraded from version 2.0.0 to 3.2.0.
+
+* jQuery is upgraded from version 3.4.1 to 3.5.1.
+
+* Select2 library is upgraded from version 4.0.7 to 4.0.13.
+
 :mod:`django.contrib.admindocs`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -88,13 +94,17 @@ Minor features
 * The default iteration count for the PBKDF2 password hasher is increased from
   180,000 to 216,000.
 
-* Added the :setting:`PASSWORD_RESET_TIMEOUT` setting to define the minimum
-  number of seconds a password reset link is valid for. This is encouraged
-  instead of deprecated ``PASSWORD_RESET_TIMEOUT_DAYS``, which will be removed
-  in Django 4.0.
+* Added the :setting:`PASSWORD_RESET_TIMEOUT` setting to define the number of
+  seconds a password reset link is valid for. This is encouraged instead of
+  deprecated ``PASSWORD_RESET_TIMEOUT_DAYS``, which will be removed in Django
+  4.0.
 
 * The password reset mechanism now uses the SHA-256 hashing algorithm. Support
   for tokens that use the old hashing algorithm remains until Django 4.0.
+
+* :meth:`.AbstractBaseUser.get_session_auth_hash` now uses the SHA-256 hashing
+  algorithm. Support for user sessions that use the old hashing algorithm
+  remains until Django 4.0.
 
 :mod:`django.contrib.contenttypes`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -169,6 +179,9 @@ Minor features
 * The new ``normalization`` parameter of
   :class:`~django.contrib.postgres.search.SearchRank` allows rank
   normalization.
+
+* The new :attr:`.ExclusionConstraint.deferrable` attribute allows creating
+  deferrable exclusion constraints.
 
 :mod:`django.contrib.redirects`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -320,6 +333,9 @@ Management Commands
 * The new :option:`dbshell -- ARGUMENTS <dbshell -->` option allows passing
   extra arguments to the command-line client for the database.
 
+* The :djadmin:`flush` and :djadmin:`sqlflush` commands now include SQL to
+  reset sequences on SQLite.
+
 Migrations
 ~~~~~~~~~~
 
@@ -371,6 +387,9 @@ Models
 * SQLite functions are now marked as :py:meth:`deterministic
   <sqlite3.Connection.create_function>` on Python 3.8+. This allows using them
   in check constraints and partial indexes.
+
+* The new :attr:`.UniqueConstraint.deferrable` attribute allows creating
+  deferrable unique constraints.
 
 Pagination
 ~~~~~~~~~~
@@ -519,6 +538,17 @@ backends.
 * ``DatabaseClient.runshell()`` now requires an additional ``parameters``
   argument as a list of extra arguments to pass on to the command-line client.
 
+* The ``sequences`` positional argument of ``DatabaseOperations.sql_flush()``
+  is replaced by the boolean keyword-only argument ``reset_sequences``. If
+  ``True``, the sequences of the truncated tables will be reset.
+
+* The ``allow_cascade`` argument of ``DatabaseOperations.sql_flush()`` is now a
+  keyword-only argument.
+
+* The ``using`` positional argument of
+  ``DatabaseOperations.execute_sql_flush()`` is removed. The method now uses
+  the database of the called instance.
+
 Dropped support for MariaDB 10.1
 --------------------------------
 
@@ -652,6 +682,14 @@ Miscellaneous
 * The undocumented ``version`` parameter to the
   :class:`~django.contrib.gis.db.models.functions.AsKML` function is removed.
 
+* :ref:`JSON and YAML serializers <serialization-formats>`, used by
+  :djadmin:`dumpdata`, now dump all data with Unicode by default. If you need
+  the previous behavior, pass ``ensure_ascii=True`` to JSON serializer, or
+  ``allow_unicode=False`` to YAML serializer.
+
+* The auto-reloader no longer monitors changes in built-in Django translation
+  files.
+
 .. _deprecated-features-3.1:
 
 Features deprecated in 3.1
@@ -716,6 +754,12 @@ Miscellaneous
 * Passing raw column aliases to :meth:`.QuerySet.order_by` is deprecated. The
   same result can be achieved by passing aliases in a
   :class:`~django.db.models.expressions.RawSQL` instead beforehand.
+
+* The ``NullBooleanField`` model field is deprecated in favor of
+  ``BooleanField(null=True)``.
+
+* ``django.conf.urls.url()`` alias of :func:`django.urls.re_path` is
+  deprecated.
 
 .. _removed-features-3.1:
 

@@ -130,4 +130,4 @@ class Command(BaseCommand):
                 rev_mapping[ogr_fld], ogr_fld) for ogr_fld in ds[options['layer_key']].fields
             )
             output.extend(["    '%s': '%s'," % (options['geom_name'], mapping_dict[options['geom_name']]), '}'])
-        return '\n'.join(output) + '\n'
+        return '\n'.join(output)

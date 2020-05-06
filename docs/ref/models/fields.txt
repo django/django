@@ -546,7 +546,7 @@ guaranteed to fit numbers from ``1`` to ``9223372036854775807``.
 A 64-bit integer, much like an :class:`IntegerField` except that it is
 guaranteed to fit numbers from ``-9223372036854775808`` to
 ``9223372036854775807``. The default form widget for this field is a
-:class:`~django.forms.TextInput`.
+:class:`~django.forms.NumberInput`.
 
 ``BinaryField``
 ---------------
@@ -647,7 +647,7 @@ optional arguments:
       :func:`django.utils.timezone.now`
 
 The default form widget for this field is a
-:class:`~django.forms.TextInput`. The admin adds a JavaScript calendar,
+:class:`~django.forms.DateInput`. The admin adds a JavaScript calendar,
 and a shortcut for "Today". Includes an additional ``invalid_date`` error
 message key.
 
@@ -677,7 +677,7 @@ A date and time, represented in Python by a ``datetime.datetime`` instance.
 Takes the same extra arguments as :class:`DateField`.
 
 The default form widget for this field is a single
-:class:`~django.forms.TextInput`. The admin uses two separate
+:class:`~django.forms.DateTimeInput`. The admin uses two separate
 :class:`~django.forms.TextInput` widgets with JavaScript shortcuts.
 
 ``DecimalField``
@@ -1006,10 +1006,10 @@ periodically via e.g. cron).
 ``FilePathField``
 -----------------
 
-.. class:: FilePathField(path=None, match=None, recursive=False, max_length=100, **options)
+.. class:: FilePathField(path='', match=None, recursive=False, allow_files=True, allow_folders=False, max_length=100, **options)
 
 A :class:`CharField` whose choices are limited to the filenames in a certain
-directory on the filesystem. Has three special arguments, of which the first is
+directory on the filesystem. Has some special arguments, of which the first is
 **required**:
 
 .. attribute:: FilePathField.path
@@ -1057,8 +1057,6 @@ directory on the filesystem. Has three special arguments, of which the first is
     Optional.  Either ``True`` or ``False``.  Default is ``False``.  Specifies
     whether folders in the specified location should be included.  Either this
     or :attr:`~FilePathField.allow_files` must be ``True``.
-
-Of course, these arguments can be used together.
 
 The one potential gotcha is that :attr:`~FilePathField.match` applies to the
 base filename, not the full path. So, this example::
@@ -1182,8 +1180,11 @@ values are stored as null.
 
 .. class:: NullBooleanField(**options)
 
-Like :class:`BooleanField` with ``null=True``. Use that instead of this field
-as it's likely to be deprecated in a future version of Django.
+Like :class:`BooleanField` with ``null=True``.
+
+.. deprecated:: 3.1
+
+    ``NullBooleanField`` is deprecated in favor of ``BooleanField(null=True)``.
 
 ``PositiveBigIntegerField``
 ---------------------------
@@ -1283,7 +1284,7 @@ However it is not enforced at the model or database level. Use a
 A time, represented in Python by a ``datetime.time`` instance. Accepts the same
 auto-population options as :class:`DateField`.
 
-The default form widget for this field is a :class:`~django.forms.TextInput`.
+The default form widget for this field is a :class:`~django.forms.TimeInput`.
 The admin adds some JavaScript shortcuts.
 
 ``URLField``
@@ -1294,7 +1295,7 @@ The admin adds some JavaScript shortcuts.
 A :class:`CharField` for a URL, validated by
 :class:`~django.core.validators.URLValidator`.
 
-The default form widget for this field is a :class:`~django.forms.TextInput`.
+The default form widget for this field is a :class:`~django.forms.URLInput`.
 
 Like all :class:`CharField` subclasses, :class:`URLField` takes the optional
 :attr:`~CharField.max_length` argument. If you don't specify
@@ -1456,7 +1457,7 @@ relation works.
             null=True,
         )
 
-    ``on_delete`` doesn't create a SQL constraint in the database. Support for
+    ``on_delete`` doesn't create an SQL constraint in the database. Support for
     database-level cascade options :ticket:`may be implemented later <21961>`.
 
 The possible values for :attr:`~ForeignKey.on_delete` are found in

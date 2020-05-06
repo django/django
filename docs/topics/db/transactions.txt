@@ -355,8 +355,8 @@ Exception handling
 
 If one on-commit function within a given transaction raises an uncaught
 exception, no later registered functions in that same transaction will run.
-This is, of course, the same behavior as if you'd executed the functions
-sequentially yourself without :func:`on_commit`.
+This is the same behavior as if you'd executed the functions sequentially
+yourself without :func:`on_commit`.
 
 Timing of execution
 -------------------

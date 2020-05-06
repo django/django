@@ -38,7 +38,7 @@ class PoFileTests(MessageCompilationTests):
     def test_bom_rejection(self):
         stderr = StringIO()
         with self.assertRaisesMessage(CommandError, 'compilemessages generated one or more errors.'):
-            call_command('compilemessages', locale=[self.LOCALE], stdout=StringIO(), stderr=stderr)
+            call_command('compilemessages', locale=[self.LOCALE], verbosity=0, stderr=stderr)
         self.assertIn('file has a BOM (Byte Order Mark)', stderr.getvalue())
         self.assertFalse(os.path.exists(self.MO_FILE))
 
@@ -63,7 +63,7 @@ class PoFileContentsTests(MessageCompilationTests):
     MO_FILE = 'locale/%s/LC_MESSAGES/django.mo' % LOCALE
 
     def test_percent_symbol_in_po_file(self):
-        call_command('compilemessages', locale=[self.LOCALE], stdout=StringIO())
+        call_command('compilemessages', locale=[self.LOCALE], verbosity=0)
         self.assertTrue(os.path.exists(self.MO_FILE))
 
 
@@ -80,13 +80,13 @@ class MultipleLocaleCompilationTests(MessageCompilationTests):
 
     def test_one_locale(self):
         with override_settings(LOCALE_PATHS=[os.path.join(self.test_dir, 'locale')]):
-            call_command('compilemessages', locale=['hr'], stdout=StringIO())
+            call_command('compilemessages', locale=['hr'], verbosity=0)
 
             self.assertTrue(os.path.exists(self.MO_FILE_HR))
 
     def test_multiple_locales(self):
         with override_settings(LOCALE_PATHS=[os.path.join(self.test_dir, 'locale')]):
-            call_command('compilemessages', locale=['hr', 'fr'], stdout=StringIO())
+            call_command('compilemessages', locale=['hr', 'fr'], verbosity=0)
 
             self.assertTrue(os.path.exists(self.MO_FILE_HR))
             self.assertTrue(os.path.exists(self.MO_FILE_FR))
@@ -110,26 +110,25 @@ class ExcludedLocaleCompilationTests(MessageCompilationTests):
             execute_from_command_line(['django-admin', 'help', 'compilemessages'])
 
     def test_one_locale_excluded(self):
-        call_command('compilemessages', exclude=['it'], stdout=StringIO())
+        call_command('compilemessages', exclude=['it'], verbosity=0)
         self.assertTrue(os.path.exists(self.MO_FILE % 'en'))
         self.assertTrue(os.path.exists(self.MO_FILE % 'fr'))
         self.assertFalse(os.path.exists(self.MO_FILE % 'it'))
 
     def test_multiple_locales_excluded(self):
-        call_command('compilemessages', exclude=['it', 'fr'], stdout=StringIO())
+        call_command('compilemessages', exclude=['it', 'fr'], verbosity=0)
         self.assertTrue(os.path.exists(self.MO_FILE % 'en'))
         self.assertFalse(os.path.exists(self.MO_FILE % 'fr'))
         self.assertFalse(os.path.exists(self.MO_FILE % 'it'))
 
     def test_one_locale_excluded_with_locale(self):
-        call_command('compilemessages', locale=['en', 'fr'], exclude=['fr'], stdout=StringIO())
+        call_command('compilemessages', locale=['en', 'fr'], exclude=['fr'], verbosity=0)
         self.assertTrue(os.path.exists(self.MO_FILE % 'en'))
         self.assertFalse(os.path.exists(self.MO_FILE % 'fr'))
         self.assertFalse(os.path.exists(self.MO_FILE % 'it'))
 
     def test_multiple_locales_excluded_with_locale(self):
-        call_command('compilemessages', locale=['en', 'fr', 'it'], exclude=['fr', 'it'],
-                     stdout=StringIO())
+        call_command('compilemessages', locale=['en', 'fr', 'it'], exclude=['fr', 'it'], verbosity=0)
         self.assertTrue(os.path.exists(self.MO_FILE % 'en'))
         self.assertFalse(os.path.exists(self.MO_FILE % 'fr'))
         self.assertFalse(os.path.exists(self.MO_FILE % 'it'))
@@ -177,7 +176,7 @@ class CompilationErrorHandling(MessageCompilationTests):
     def test_error_reported_by_msgfmt(self):
         # po file contains wrong po formatting.
         with self.assertRaises(CommandError):
-            call_command('compilemessages', locale=['ja'], verbosity=0, stderr=StringIO())
+            call_command('compilemessages', locale=['ja'], verbosity=0)
 
     def test_msgfmt_error_including_non_ascii(self):
         # po file contains invalid msgstr content (triggers non-ascii error content).
@@ -208,14 +207,14 @@ class FuzzyTranslationTest(ProjectAndAppTests):
 
     def test_nofuzzy_compiling(self):
         with override_settings(LOCALE_PATHS=[os.path.join(self.test_dir, 'locale')]):
-            call_command('compilemessages', locale=[self.LOCALE], stdout=StringIO())
+            call_command('compilemessages', locale=[self.LOCALE], verbosity=0)
             with translation.override(self.LOCALE):
                 self.assertEqual(gettext('Lenin'), 'Ленин')
                 self.assertEqual(gettext('Vodka'), 'Vodka')
 
     def test_fuzzy_compiling(self):
         with override_settings(LOCALE_PATHS=[os.path.join(self.test_dir, 'locale')]):
-            call_command('compilemessages', locale=[self.LOCALE], fuzzy=True, stdout=StringIO())
+            call_command('compilemessages', locale=[self.LOCALE], fuzzy=True, verbosity=0)
             with translation.override(self.LOCALE):
                 self.assertEqual(gettext('Lenin'), 'Ленин')
                 self.assertEqual(gettext('Vodka'), 'Водка')
@@ -224,7 +223,7 @@ class FuzzyTranslationTest(ProjectAndAppTests):
 class AppCompilationTest(ProjectAndAppTests):
 
     def test_app_locale_compiled(self):
-        call_command('compilemessages', locale=[self.LOCALE], stdout=StringIO())
+        call_command('compilemessages', locale=[self.LOCALE], verbosity=0)
         self.assertTrue(os.path.exists(self.PROJECT_MO_FILE))
         self.assertTrue(os.path.exists(self.APP_MO_FILE))
 
@@ -234,5 +233,5 @@ class PathLibLocaleCompilationTests(MessageCompilationTests):
 
     def test_locale_paths_pathlib(self):
         with override_settings(LOCALE_PATHS=[Path(self.test_dir) / 'canned_locale']):
-            call_command('compilemessages', locale=['fr'], stdout=StringIO())
+            call_command('compilemessages', locale=['fr'], verbosity=0)
             self.assertTrue(os.path.exists('canned_locale/fr/LC_MESSAGES/django.mo'))

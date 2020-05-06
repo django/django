@@ -947,7 +947,7 @@ more robust change detection, and a reduction in power usage. Django supports
 
 .. _Watchman: https://facebook.github.io/watchman/
 .. _pywatchman: https://pypi.org/project/pywatchman/
-.. _watchman documentation: https://facebook.github.io/watchman/docs/config.html#ignore_dirs
+.. _watchman documentation: https://facebook.github.io/watchman/docs/config#ignore_dirs
 
 When you start the server, and each time you change Python code while the
 server is running, the system check framework will check your entire Django

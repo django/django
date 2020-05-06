@@ -173,7 +173,8 @@ designers and how it can be extended by programmers:
 
 * **For programmers:**
   :doc:`Template API <ref/templates/api>` |
-  :doc:`Custom tags and filters <howto/custom-template-tags>`
+  :doc:`Custom tags and filters <howto/custom-template-tags>` |
+  :doc:`Custom template backend <howto/custom-template-backend>`
 
 Forms
 =====

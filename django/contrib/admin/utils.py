@@ -337,7 +337,7 @@ def label_for_field(name, model, model_admin=None, return_attr=False, form=None)
             else:
                 message = "Unable to lookup '%s' on %s" % (name, model._meta.object_name)
                 if model_admin:
-                    message += " or %s" % (model_admin.__class__.__name__,)
+                    message += " or %s" % model_admin.__class__.__name__
                 if form:
                     message += " or %s" % form.__class__.__name__
                 raise AttributeError(message)

@@ -403,8 +403,8 @@ from ``TaggedItem``::
     >>> TaggedItem.objects.filter(bookmark__url__contains='django')
     <QuerySet [<TaggedItem: django>, <TaggedItem: python>]>
 
-Of course, if you don't add the ``related_query_name``, you can do the
-same types of lookups manually::
+If you don't add the ``related_query_name``, you can do the same types of
+lookups manually::
 
     >>> bookmarks = Bookmark.objects.filter(url__contains='django')
     >>> bookmark_type = ContentType.objects.get_for_model(Bookmark)

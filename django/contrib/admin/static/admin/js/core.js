@@ -1,15 +1,15 @@
 // Core javascript helper functions
+'use strict';
 
 // quickElement(tagType, parentReference [, textInChildNode, attribute, attributeValue ...]);
 function quickElement() {
-    'use strict';
-    var obj = document.createElement(arguments[0]);
+    const obj = document.createElement(arguments[0]);
     if (arguments[2]) {
-        var textNode = document.createTextNode(arguments[2]);
+        const textNode = document.createTextNode(arguments[2]);
         obj.appendChild(textNode);
     }
-    var len = arguments.length;
-    for (var i = 3; i < len; i += 2) {
+    const len = arguments.length;
+    for (let i = 3; i < len; i += 2) {
         obj.setAttribute(arguments[i], arguments[i + 1]);
     }
     arguments[1].appendChild(obj);
@@ -18,7 +18,6 @@ function quickElement() {
 
 // "a" is reference to an object
 function removeChildren(a) {
-    'use strict';
     while (a.hasChildNodes()) {
         a.removeChild(a.lastChild);
     }
@@ -29,8 +28,7 @@ function removeChildren(a) {
 // See https://www.quirksmode.org/js/findpos.html
 // ----------------------------------------------------------------------------
 function findPosX(obj) {
-    'use strict';
-    var curleft = 0;
+    let curleft = 0;
     if (obj.offsetParent) {
         while (obj.offsetParent) {
             curleft += obj.offsetLeft - obj.scrollLeft;
@@ -43,8 +41,7 @@ function findPosX(obj) {
 }
 
 function findPosY(obj) {
-    'use strict';
-    var curtop = 0;
+    let curtop = 0;
     if (obj.offsetParent) {
         while (obj.offsetParent) {
             curtop += obj.offsetTop - obj.scrollTop;
@@ -59,8 +56,7 @@ function findPosY(obj) {
 //-----------------------------------------------------------------------------
 // Date object extensions
 // ----------------------------------------------------------------------------
-(function() {
-    'use strict';
+{
     Date.prototype.getTwelveHours = function() {
         return this.getHours() % 12 || 12;
     };
@@ -96,7 +92,7 @@ function findPosY(obj) {
     };
 
     Date.prototype.strftime = function(format) {
-        var fields = {
+        const fields = {
             B: this.getFullMonthName(),
             c: this.toString(),
             d: this.getTwoDigitDate(),
@@ -113,7 +109,7 @@ function findPosY(obj) {
             Y: '' + this.getFullYear(),
             '%': '%'
         };
-        var result = '', i = 0;
+        let result = '', i = 0;
         while (i < format.length) {
             if (format.charAt(i) === '%') {
                 result = result + fields[format.charAt(i + 1)];
@@ -131,10 +127,10 @@ function findPosY(obj) {
     // String object extensions
     // ----------------------------------------------------------------------------
     String.prototype.strptime = function(format) {
-        var split_format = format.split(/[.\-/]/);
-        var date = this.split(/[.\-/]/);
-        var i = 0;
-        var day, month, year;
+        const split_format = format.split(/[.\-/]/);
+        const date = this.split(/[.\-/]/);
+        let i = 0;
+        let day, month, year;
         while (i < split_format.length) {
             switch (split_format[i]) {
             case "%d":
@@ -164,5 +160,4 @@ function findPosY(obj) {
         // date extraction.
         return new Date(Date.UTC(year, month, day));
     };
-
-})();
+}

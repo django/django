@@ -51,7 +51,8 @@ are required.
 
 * ``subject``: A string.
 * ``message``: A string.
-* ``from_email``: A string.
+* ``from_email``: A string. If ``None``, Django will use the value of the
+  :setting:`DEFAULT_FROM_EMAIL` setting.
 * ``recipient_list``: A list of strings, each an email address. Each
   member of ``recipient_list`` will see the other recipients in the "To:"
   field of the email message.

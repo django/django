@@ -68,7 +68,8 @@
             src="{% static 'admin/js/change_form.js' %}"
             {% if adminform and add %}
                 data-model-name="{{ opts.model_name }}"
-            {% endif %}>
+            {% endif %}
+            async>
     </script>
 {% endblock %}
 

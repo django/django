@@ -1,11 +1,13 @@
 import asyncio
 import sys
+import threading
 from unittest import skipIf
 
+from asgiref.sync import SyncToAsync
 from asgiref.testing import ApplicationCommunicator
 
 from django.core.asgi import get_asgi_application
-from django.core.signals import request_started
+from django.core.signals import request_finished, request_started
 from django.db import close_old_connections
 from django.test import AsyncRequestFactory, SimpleTestCase, override_settings
 
@@ -151,3 +153,38 @@ class ASGITest(SimpleTestCase):
         response_body = await communicator.receive_output()
         self.assertEqual(response_body['type'], 'http.response.body')
         self.assertEqual(response_body['body'], b'')
+
+    async def test_request_lifecycle_signals_dispatched_with_thread_sensitive(self):
+        class SignalHandler:
+            """Track threads handler is dispatched on."""
+            threads = []
+
+            def __call__(self, **kwargs):
+                self.threads.append(threading.current_thread())
+
+        signal_handler = SignalHandler()
+        request_started.connect(signal_handler)
+        request_finished.connect(signal_handler)
+
+        # Perform a basic request.
+        application = get_asgi_application()
+        scope = self.async_request_factory._base_scope(path='/')
+        communicator = ApplicationCommunicator(application, scope)
+        await communicator.send_input({'type': 'http.request'})
+        response_start = await communicator.receive_output()
+        self.assertEqual(response_start['type'], 'http.response.start')
+        self.assertEqual(response_start['status'], 200)
+        response_body = await communicator.receive_output()
+        self.assertEqual(response_body['type'], 'http.response.body')
+        self.assertEqual(response_body['body'], b'Hello World!')
+        # Give response.close() time to finish.
+        await communicator.wait()
+
+        # At this point, AsyncToSync does not have a current executor. Thus
+        # SyncToAsync falls-back to .single_thread_executor.
+        target_thread = next(iter(SyncToAsync.single_thread_executor._threads))
+        request_started_thread, request_finished_thread = signal_handler.threads
+        self.assertEqual(request_started_thread, target_thread)
+        self.assertEqual(request_finished_thread, target_thread)
+        request_started.disconnect(signal_handler)
+        request_finished.disconnect(signal_handler)

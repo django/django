@@ -302,7 +302,8 @@ class HttpResponseTests(unittest.TestCase):
         r['key'] = 'café'
         self.assertIn('café'.encode('latin-1'), r.serialize_headers())
 
-        # Other unicode values are MIME-encoded (there's no way to pass them as bytes).
+        # Other Unicode values are MIME-encoded (there's no way to pass them as
+        # bytes).
         r['key'] = '†'
         self.assertEqual(r['key'], '=?utf-8?b?4oCg?=')
         self.assertIn(b'=?utf-8?b?4oCg?=', r.serialize_headers())

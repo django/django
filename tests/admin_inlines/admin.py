@@ -1,5 +1,6 @@
 from django import forms
 from django.contrib import admin
+from django.core.exceptions import ValidationError
 from django.db import models
 
 from .models import (
@@ -102,7 +103,7 @@ class TitleForm(forms.ModelForm):
         title1 = cleaned_data.get("title1")
         title2 = cleaned_data.get("title2")
         if title1 != title2:
-            raise forms.ValidationError("The two titles must be the same")
+            raise ValidationError("The two titles must be the same")
         return cleaned_data
 
 

@@ -254,7 +254,7 @@ class MigrateTests(MigrationTestBase):
     })
     def test_migrate_check(self):
         with self.assertRaises(SystemExit):
-            call_command('migrate', 'migrations', '0001', check_unapplied=True, verbosity=0)
+            call_command('migrate', 'migrations', '0001', check_unapplied=True)
         self.assertTableNotExists('migrations_author')
         self.assertTableNotExists('migrations_tribble')
         self.assertTableNotExists('migrations_book')
@@ -779,7 +779,7 @@ class MigrateTests(MigrationTestBase):
         "B" was not included in the ProjectState that is used to detect
         soft-applied migrations (#22823).
         """
-        call_command("migrate", "migrated_unapplied_app", stdout=io.StringIO())
+        call_command('migrate', 'migrated_unapplied_app', verbosity=0)
 
         # unmigrated_app.SillyModel has a foreign key to 'migrations.Tribble',
         # but that model is only defined in a migration, so the global app
@@ -1193,10 +1193,9 @@ class MakeMigrationsTests(MigrationTestBase):
             class Meta:
                 app_label = "migrations"
 
-        out = io.StringIO()
         with self.assertRaises(SystemExit):
             with self.temporary_migration_module(module="migrations.test_migrations_no_default"):
-                call_command("makemigrations", "migrations", interactive=False, stdout=out)
+                call_command("makemigrations", "migrations", interactive=False)
 
     def test_makemigrations_non_interactive_not_null_alteration(self):
         """
@@ -1590,11 +1589,25 @@ class SquashMigrationsTests(MigrationTestBase):
         """
         squashmigrations squashes migrations.
         """
+        out = io.StringIO()
         with self.temporary_migration_module(module="migrations.test_migrations") as migration_dir:
-            call_command("squashmigrations", "migrations", "0002", interactive=False, verbosity=0)
+            call_command('squashmigrations', 'migrations', '0002', interactive=False, stdout=out, no_color=True)
 
             squashed_migration_file = os.path.join(migration_dir, "0001_squashed_0002_second.py")
             self.assertTrue(os.path.exists(squashed_migration_file))
+        self.assertEqual(
+            out.getvalue(),
+            'Will squash the following migrations:\n'
+            ' - 0001_initial\n'
+            ' - 0002_second\n'
+            'Optimizing...\n'
+            '  Optimized from 8 operations to 2 operations.\n'
+            'Created new squashed migration %s\n'
+            '  You should commit this migration but leave the old ones in place;\n'
+            '  the new migration will be used for new installs. Once you are sure\n'
+            '  all instances of the codebase have applied the migrations you squashed,\n'
+            '  you can delete them.\n' % squashed_migration_file
+        )
 
     def test_squashmigrations_initial_attribute(self):
         with self.temporary_migration_module(module="migrations.test_migrations") as migration_dir:

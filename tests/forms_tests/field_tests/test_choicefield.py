@@ -1,4 +1,5 @@
-from django.forms import ChoiceField, Form, ValidationError
+from django.core.exceptions import ValidationError
+from django.forms import ChoiceField, Form
 from django.test import SimpleTestCase
 
 from . import FormFieldAssertionsMixin

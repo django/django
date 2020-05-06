@@ -18,8 +18,9 @@ other hooks.
 Although the primary way you'll use ``Field`` classes is in ``Form`` classes,
 you can also instantiate them and use them directly to get a better idea of
 how they work. Each ``Field`` instance has a ``clean()`` method, which takes
-a single argument and either raises a ``django.forms.ValidationError``
-exception or returns the clean value::
+a single argument and either raises a
+``django.core.exceptions.ValidationError`` exception or returns the clean
+value::
 
     >>> from django import forms
     >>> f = forms.EmailField()

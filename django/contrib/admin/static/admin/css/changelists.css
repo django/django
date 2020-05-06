@@ -155,7 +155,6 @@
 
 #changelist-filter ul:last-child {
     border-bottom: none;
-    padding-bottom: none;
 }
 
 #changelist-filter li {
@@ -238,7 +237,6 @@
 }
 
 .paginator a.showall {
-    padding: 0;
     border: none;
     background: none;
     color: #5b80b2;

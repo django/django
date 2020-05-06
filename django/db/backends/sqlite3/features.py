@@ -26,7 +26,6 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_atomic_references_rename = Database.sqlite_version_info >= (3, 26, 0)
     can_create_inline_fk = False
     supports_paramstyle_pyformat = False
-    supports_sequence_reset = False
     can_clone_databases = True
     supports_temporal_subtraction = True
     ignores_table_name_case = True

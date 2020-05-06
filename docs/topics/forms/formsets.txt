@@ -220,7 +220,7 @@ this management data, an exception will be raised::
     >>> formset.is_valid()
     Traceback (most recent call last):
     ...
-    django.forms.utils.ValidationError: ['ManagementForm data is missing or has been tampered with']
+    django.core.exceptions.ValidationError: ['ManagementForm data is missing or has been tampered with']
 
 It is used to keep track of how many form instances are being displayed. If
 you are adding new forms via JavaScript, you should increment the count fields
@@ -261,6 +261,7 @@ Custom formset validation
 A formset has a ``clean`` method similar to the one on a ``Form`` class. This
 is where you define your own validation that works at the formset level::
 
+    >>> from django.core.exceptions import ValidationError
     >>> from django.forms import BaseFormSet
     >>> from django.forms import formset_factory
     >>> from myapp.forms import ArticleForm
@@ -277,7 +278,7 @@ is where you define your own validation that works at the formset level::
     ...                 continue
     ...             title = form.cleaned_data.get('title')
     ...             if title in titles:
-    ...                 raise forms.ValidationError("Articles in a set must have distinct titles.")
+    ...                 raise ValidationError("Articles in a set must have distinct titles.")
     ...             titles.append(title)
 
     >>> ArticleFormSet = formset_factory(ArticleForm, formset=BaseArticleFormSet)

@@ -38,7 +38,7 @@ Measurement                Relationships             Operations              Edi
 .. class:: Area(expression, **extra)
 
 *Availability*: MariaDB, `MySQL
-<https://dev.mysql.com/doc/refman/en/gis-polygon-property-functions.html#function_area>`__,
+<https://dev.mysql.com/doc/refman/en/gis-polygon-property-functions.html#function_st-area>`_,
 Oracle, `PostGIS <https://postgis.net/docs/ST_Area.html>`__, SpatiaLite
 
 Accepts a single geographic field or expression and returns the area of the

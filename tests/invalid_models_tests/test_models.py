@@ -893,6 +893,15 @@ class OtherModelTests(SimpleTestCase):
         with register_lookup(models.CharField, Lower):
             self.assertEqual(Model.check(), [])
 
+    def test_ordering_pointing_to_lookup_not_transform(self):
+        class Model(models.Model):
+            test = models.CharField(max_length=100)
+
+            class Meta:
+                ordering = ('test__isnull',)
+
+        self.assertEqual(Model.check(), [])
+
     def test_ordering_pointing_to_related_model_pk(self):
         class Parent(models.Model):
             pass
@@ -1410,6 +1419,50 @@ class ConstraintsTests(TestCase):
                         fields=['age'],
                         name='unique_age_gte_100',
                         condition=models.Q(age__gte=100),
+                    ),
+                ]
+
+        self.assertEqual(Model.check(databases=self.databases), [])
+
+    def test_deferrable_unique_constraint(self):
+        class Model(models.Model):
+            age = models.IntegerField()
+
+            class Meta:
+                constraints = [
+                    models.UniqueConstraint(
+                        fields=['age'],
+                        name='unique_age_deferrable',
+                        deferrable=models.Deferrable.DEFERRED,
+                    ),
+                ]
+
+        errors = Model.check(databases=self.databases)
+        expected = [] if connection.features.supports_deferrable_unique_constraints else [
+            Warning(
+                '%s does not support deferrable unique constraints.'
+                % connection.display_name,
+                hint=(
+                    "A constraint won't be created. Silence this warning if "
+                    "you don't care about it."
+                ),
+                obj=Model,
+                id='models.W038',
+            ),
+        ]
+        self.assertEqual(errors, expected)
+
+    def test_deferrable_unique_constraint_required_db_features(self):
+        class Model(models.Model):
+            age = models.IntegerField()
+
+            class Meta:
+                required_db_features = {'supports_deferrable_unique_constraints'}
+                constraints = [
+                    models.UniqueConstraint(
+                        fields=['age'],
+                        name='unique_age_deferrable',
+                        deferrable=models.Deferrable.IMMEDIATE,
                     ),
                 ]
 

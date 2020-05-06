@@ -517,8 +517,8 @@ should typically be used instead of the more verbose equivalent,
 e.g. use ``TruncYear(...)`` rather than ``Trunc(..., kind='year')``.
 
 The subclasses are all defined as transforms, but they aren't registered with
-any fields, because the obvious lookup names are already reserved by the
-``Extract`` subclasses.
+any fields, because the lookup names are already reserved by the ``Extract``
+subclasses.
 
 Usage example::
 

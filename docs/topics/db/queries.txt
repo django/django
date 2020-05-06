@@ -1201,8 +1201,8 @@ query you can use the following syntax::
 If ``EntryManager`` performed default filtering in its ``get_queryset()``
 method, that filtering would apply to the ``all()`` call.
 
-Of course, specifying a custom reverse manager also enables you to call its
-custom methods::
+Specifying a custom reverse manager also enables you to call its custom
+methods::
 
     b.entry_set(manager='entries').is_published()
 

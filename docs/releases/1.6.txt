@@ -916,7 +916,7 @@ Miscellaneous
 * :ref:`Authentication views <built-in-auth-views>` are now reversed by name,
   not their locations in ``django.contrib.auth.views``. If you are using the
   views without a ``name``, you should update your ``urlpatterns`` to use
-  :meth:`~django.conf.urls.url` with the ``name`` parameter. For example::
+  ``django.conf.urls.url()`` with the ``name`` parameter. For example::
 
     (r'^reset/done/$', 'django.contrib.auth.views.password_reset_complete')
 

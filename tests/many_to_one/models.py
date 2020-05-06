@@ -37,9 +37,6 @@ class City(models.Model):
     country = models.ForeignKey(Country, models.CASCADE, related_name='cities', null=True)
     name = models.CharField(max_length=50)
 
-    def __str__(self):
-        return self.name
-
 
 class District(models.Model):
     city = models.ForeignKey(City, models.CASCADE, related_name='districts', null=True)

@@ -35,14 +35,6 @@ Fields
         ``max_length=191`` because MySQL can only create unique indexes with
         191 characters in that case by default.
 
-        .. admonition:: Usernames and Unicode
-
-            Django originally accepted only ASCII letters and numbers in
-            usernames. Although it wasn't a deliberate choice, Unicode
-            characters have always been accepted when using Python 3. Django
-            1.10 officially added Unicode support in usernames, keeping the
-            ASCII-only behavior on Python 2.
-
     .. attribute:: first_name
 
         Optional (:attr:`blank=True <django.db.models.Field.blank>`). 150

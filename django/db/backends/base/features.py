@@ -20,6 +20,8 @@ class BaseDatabaseFeatures:
     # Does the backend allow inserting duplicate rows when a unique_together
     # constraint exists and some fields are nullable but not all of them?
     supports_partially_nullable_unique_constraints = True
+    # Does the backend support initially deferrable unique constraints?
+    supports_deferrable_unique_constraints = False
 
     can_use_chunked_reads = True
     can_return_columns_from_insert = False

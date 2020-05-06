@@ -116,8 +116,8 @@ are loaded from the database::
         super().save(*args, **kwargs)
 
 The example above shows a full ``from_db()`` implementation to clarify how that
-is done. In this case it would of course be possible to use ``super()`` call in
-the ``from_db()`` method.
+is done. In this case it would be possible to use a ``super()`` call in the
+``from_db()`` method.
 
 Refreshing objects from database
 ================================
@@ -528,8 +528,8 @@ Updating attributes based on existing fields
 --------------------------------------------
 
 Sometimes you'll need to perform a simple arithmetic task on a field, such
-as incrementing or decrementing the current value. The obvious way to
-achieve this is to do something like::
+as incrementing or decrementing the current value. One way of achieving this is
+doing the arithmetic in Python like::
 
     >>> product = Product.objects.get(name='Venezuelan Beaver Cheese')
     >>> product.number_sold += 1

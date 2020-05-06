@@ -4,8 +4,9 @@ from xml.dom.minidom import parseString
 
 from django.contrib.auth.decorators import login_required, permission_required
 from django.core import mail
+from django.core.exceptions import ValidationError
 from django.forms import fields
-from django.forms.forms import Form, ValidationError
+from django.forms.forms import Form
 from django.forms.formsets import BaseFormSet, formset_factory
 from django.http import (
     HttpResponse, HttpResponseBadRequest, HttpResponseNotAllowed,

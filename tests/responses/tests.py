@@ -145,7 +145,7 @@ class HttpResponseTests(SimpleTestCase):
         self.assertEqual(r.content, content.encode(UTF8))
 
     def test_generator_cache(self):
-        generator = ("{}".format(i) for i in range(10))
+        generator = (str(i) for i in range(10))
         response = HttpResponse(content=generator)
         self.assertEqual(response.content, b'0123456789')
         with self.assertRaises(StopIteration):

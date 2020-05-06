@@ -1747,7 +1747,9 @@ class Model(metaclass=ModelBase):
                     else:
                         _cls = None
                 except (FieldDoesNotExist, AttributeError):
-                    if fld is None or fld.get_transform(part) is None:
+                    if fld is None or (
+                        fld.get_transform(part) is None and fld.get_lookup(part) is None
+                    ):
                         errors.append(
                             checks.Error(
                                 "'ordering' refers to the nonexistent field, "
@@ -1902,6 +1904,25 @@ class Model(metaclass=ModelBase):
                         ),
                         obj=cls,
                         id='models.W036',
+                    )
+                )
+            if not (
+                connection.features.supports_deferrable_unique_constraints or
+                'supports_deferrable_unique_constraints' in cls._meta.required_db_features
+            ) and any(
+                isinstance(constraint, UniqueConstraint) and constraint.deferrable is not None
+                for constraint in cls._meta.constraints
+            ):
+                errors.append(
+                    checks.Warning(
+                        '%s does not support deferrable unique constraints.'
+                        % connection.display_name,
+                        hint=(
+                            "A constraint won't be created. Silence this "
+                            "warning if you don't care about it."
+                        ),
+                        obj=cls,
+                        id='models.W038',
                     )
                 )
         return errors

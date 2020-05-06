@@ -305,6 +305,7 @@ don't want to put it into the general ``MultiEmailField`` class. Instead, we
 write a cleaning method that operates on the ``recipients`` field, like so::
 
     from django import forms
+    from django.core.exceptions import ValidationError
 
     class ContactForm(forms.Form):
         # Everything as before.
@@ -313,7 +314,7 @@ write a cleaning method that operates on the ``recipients`` field, like so::
         def clean_recipients(self):
             data = self.cleaned_data['recipients']
             if "fred@example.com" not in data:
-                raise forms.ValidationError("You have forgotten about Fred!")
+                raise ValidationError("You have forgotten about Fred!")
 
             # Always return a value to use as the new cleaned data, even if
             # this method didn't change it.
@@ -346,6 +347,7 @@ an error, you can raise a ``ValidationError`` from the ``clean()`` method. For
 example::
 
     from django import forms
+    from django.core.exceptions import ValidationError
 
     class ContactForm(forms.Form):
         # Everything as before.
@@ -359,7 +361,7 @@ example::
             if cc_myself and subject:
                 # Only do something if both fields are valid so far.
                 if "help" not in subject:
-                    raise forms.ValidationError(
+                    raise ValidationError(
                         "Did not send for 'help' in the subject despite "
                         "CC'ing yourself."
                     )

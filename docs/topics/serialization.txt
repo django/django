@@ -135,8 +135,8 @@ something like::
             deserialized_object.save()
 
 In other words, the usual use is to examine the deserialized objects to make
-sure that they are "appropriate" for saving before doing so.  Of course, if you
-trust your data source you can instead save the object directly and move on.
+sure that they are "appropriate" for saving before doing so. If you trust your
+data source you can instead save the object directly and move on.
 
 The Django object itself can be inspected as ``deserialized_object.object``.
 If fields in the serialized data do not exist on a model, a
@@ -274,6 +274,11 @@ function::
 Also note that GeoDjango provides a :doc:`customized GeoJSON serializer
 </ref/contrib/gis/serializers>`.
 
+.. versionchanged:: 3.1
+
+    All data is now dumped with Unicode. If you need the previous behavior,
+    pass ``ensure_ascii=True`` to the ``serializers.serialize()`` function.
+
 ``DjangoJSONEncoder``
 ~~~~~~~~~~~~~~~~~~~~~
 
@@ -314,6 +319,11 @@ again a mapping with the key being name of the field and the value the value::
         pk: 4b678b301dfd8a4e0dad910de3ae245b
 
 Referential fields are again represented by the PK or sequence of PKs.
+
+.. versionchanged:: 3.1
+
+    All data is now dumped with Unicode. If you need the previous behavior,
+    pass ``allow_unicode=False`` to the ``serializers.serialize()`` function.
 
 .. _topics-serialization-natural-keys:
 

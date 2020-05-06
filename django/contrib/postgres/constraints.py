@@ -1,5 +1,5 @@
 from django.db.backends.ddl_references import Statement, Table
-from django.db.models import F, Q
+from django.db.models import Deferrable, F, Q
 from django.db.models.constraints import BaseConstraint
 from django.db.models.sql import Query
 
@@ -7,9 +7,12 @@ __all__ = ['ExclusionConstraint']
 
 
 class ExclusionConstraint(BaseConstraint):
-    template = 'CONSTRAINT %(name)s EXCLUDE USING %(index_type)s (%(expressions)s)%(where)s'
+    template = 'CONSTRAINT %(name)s EXCLUDE USING %(index_type)s (%(expressions)s)%(where)s%(deferrable)s'
 
-    def __init__(self, *, name, expressions, index_type=None, condition=None):
+    def __init__(
+        self, *, name, expressions, index_type=None, condition=None,
+        deferrable=None,
+    ):
         if index_type and index_type.lower() not in {'gist', 'spgist'}:
             raise ValueError(
                 'Exclusion constraints only support GiST or SP-GiST indexes.'
@@ -28,9 +31,18 @@ class ExclusionConstraint(BaseConstraint):
             raise ValueError(
                 'ExclusionConstraint.condition must be a Q instance.'
             )
+        if condition and deferrable:
+            raise ValueError(
+                'ExclusionConstraint with conditions cannot be deferred.'
+            )
+        if not isinstance(deferrable, (type(None), Deferrable)):
+            raise ValueError(
+                'ExclusionConstraint.deferrable must be a Deferrable instance.'
+            )
         self.expressions = expressions
         self.index_type = index_type or 'GIST'
         self.condition = condition
+        self.deferrable = deferrable
         super().__init__(name=name)
 
     def _get_expression_sql(self, compiler, connection, query):
@@ -60,6 +72,7 @@ class ExclusionConstraint(BaseConstraint):
             'index_type': self.index_type,
             'expressions': ', '.join(expressions),
             'where': ' WHERE (%s)' % condition if condition else '',
+            'deferrable': schema_editor._deferrable_constraint_sql(self.deferrable),
         }
 
     def create_sql(self, model, schema_editor):
@@ -83,6 +96,8 @@ class ExclusionConstraint(BaseConstraint):
             kwargs['condition'] = self.condition
         if self.index_type.lower() != 'gist':
             kwargs['index_type'] = self.index_type
+        if self.deferrable:
+            kwargs['deferrable'] = self.deferrable
         return path, args, kwargs
 
     def __eq__(self, other):
@@ -91,14 +106,16 @@ class ExclusionConstraint(BaseConstraint):
                 self.name == other.name and
                 self.index_type == other.index_type and
                 self.expressions == other.expressions and
-                self.condition == other.condition
+                self.condition == other.condition and
+                self.deferrable == other.deferrable
             )
         return super().__eq__(other)
 
     def __repr__(self):
-        return '<%s: index_type=%s, expressions=%s%s>' % (
+        return '<%s: index_type=%s, expressions=%s%s%s>' % (
             self.__class__.__qualname__,
             self.index_type,
             self.expressions,
             '' if self.condition is None else ', condition=%s' % self.condition,
+            '' if self.deferrable is None else ', deferrable=%s' % self.deferrable,
         )

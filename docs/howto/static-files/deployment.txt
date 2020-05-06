@@ -21,9 +21,9 @@ manually or the :func:`post_process
 <django.contrib.staticfiles.storage.StaticFilesStorage.post_process>` method of
 the ``Storage`` class might take care of that.
 
-Of course, as with all deployment tasks, the devil's in the details. Every
-production setup will be a bit different, so you'll need to adapt the basic
-outline to fit your needs. Below are a few common patterns that might help.
+As with all deployment tasks, the devil's in the details. Every production
+setup will be a bit different, so you'll need to adapt the basic outline to fit
+your needs. Below are a few common patterns that might help.
 
 Serving the site and your static files from the same server
 -----------------------------------------------------------

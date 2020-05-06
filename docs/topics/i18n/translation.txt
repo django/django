@@ -53,12 +53,6 @@ Specify a translation string by using the function
 as a shorter alias, ``_``, to save typing.
 
 .. note::
-    The ``u`` prefixing of ``gettext`` functions was originally to distinguish
-    usage between unicode strings and bytestrings on Python 2. For code that
-    supports only Python 3, they can be used interchangeably. A deprecation for
-    the prefixed functions may happen in a future Django release.
-
-.. note::
     Python's standard library ``gettext`` module installs ``_()`` into the
     global namespace, as an alias for ``gettext()``. In Django, we have chosen
     not to follow this practice, for a couple of reasons:
@@ -130,7 +124,7 @@ specified with Python's standard named-string interpolation syntax. Example::
 
 This technique lets language-specific translations reorder the placeholder
 text. For example, an English translation may be ``"Today is November 26."``,
-while a Spanish translation may be ``"Hoy es 26 de Noviembre."`` -- with the
+while a Spanish translation may be ``"Hoy es 26 de noviembre."`` -- with the
 month and the day placeholders swapped.
 
 For this reason, you should use named-string interpolation (e.g., ``%(day)s``)
@@ -424,7 +418,7 @@ arbitrary Python code. For example, the following won't work because the
 `requests <https://pypi.org/project/requests/>`_ library doesn't handle
 ``gettext_lazy`` objects::
 
-    body = gettext_lazy("I \u2764 Django")  # (unicode :heart:)
+    body = gettext_lazy("I \u2764 Django")  # (Unicode :heart:)
     requests.post('https://example.com/send', data={'body': body})
 
 You can avoid such problems by casting ``gettext_lazy()`` objects to text
@@ -460,6 +454,7 @@ integer as the ``number`` argument. Then ``number`` will be looked up in the
 dictionary under that key during string interpolation. Here's example::
 
     from django import forms
+    from django.core.exceptions import ValidationError
     from django.utils.translation import ngettext_lazy
 
     class MyForm(forms.Form):
@@ -469,7 +464,7 @@ dictionary under that key during string interpolation. Here's example::
         def clean(self):
             # ...
             if error:
-                raise forms.ValidationError(self.error_message % {'num': number})
+                raise ValidationError(self.error_message % {'num': number})
 
 If the string contains exactly one unnamed placeholder, you can interpolate
 directly with the ``number`` argument::
@@ -483,7 +478,7 @@ directly with the ``number`` argument::
         def clean(self):
             # ...
             if error:
-                raise forms.ValidationError(self.error_message % number)
+                raise ValidationError(self.error_message % number)
 
 
 Formatting strings: ``format_lazy()``

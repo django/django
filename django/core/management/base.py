@@ -474,7 +474,7 @@ class BaseCommand:
                     }
                 )
             )
-            self.stdout.write(self.style.NOTICE("Run 'python manage.py migrate' to apply them.\n"))
+            self.stdout.write(self.style.NOTICE("Run 'python manage.py migrate' to apply them."))
 
     def handle(self, *args, **options):
         """

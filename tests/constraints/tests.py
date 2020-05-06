@@ -3,11 +3,12 @@ from unittest import mock
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError, connection, models
 from django.db.models.constraints import BaseConstraint
+from django.db.transaction import atomic
 from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
 
 from .models import (
     ChildModel, Product, UniqueConstraintConditionProduct,
-    UniqueConstraintProduct,
+    UniqueConstraintDeferrable, UniqueConstraintProduct,
 )
 
 
@@ -166,6 +167,20 @@ class UniqueConstraintTests(TestCase):
             ),
         )
 
+    def test_eq_with_deferrable(self):
+        constraint_1 = models.UniqueConstraint(
+            fields=['foo', 'bar'],
+            name='unique',
+            deferrable=models.Deferrable.DEFERRED,
+        )
+        constraint_2 = models.UniqueConstraint(
+            fields=['foo', 'bar'],
+            name='unique',
+            deferrable=models.Deferrable.IMMEDIATE,
+        )
+        self.assertEqual(constraint_1, constraint_1)
+        self.assertNotEqual(constraint_1, constraint_2)
+
     def test_repr(self):
         fields = ['foo', 'bar']
         name = 'unique_fields'
@@ -187,6 +202,18 @@ class UniqueConstraintTests(TestCase):
             "condition=(AND: ('foo', F(bar)))>",
         )
 
+    def test_repr_with_deferrable(self):
+        constraint = models.UniqueConstraint(
+            fields=['foo', 'bar'],
+            name='unique_fields',
+            deferrable=models.Deferrable.IMMEDIATE,
+        )
+        self.assertEqual(
+            repr(constraint),
+            "<UniqueConstraint: fields=('foo', 'bar') name='unique_fields' "
+            "deferrable=Deferrable.IMMEDIATE>",
+        )
+
     def test_deconstruction(self):
         fields = ['foo', 'bar']
         name = 'unique_fields'
@@ -205,6 +232,23 @@ class UniqueConstraintTests(TestCase):
         self.assertEqual(path, 'django.db.models.UniqueConstraint')
         self.assertEqual(args, ())
         self.assertEqual(kwargs, {'fields': tuple(fields), 'name': name, 'condition': condition})
+
+    def test_deconstruction_with_deferrable(self):
+        fields = ['foo']
+        name = 'unique_fields'
+        constraint = models.UniqueConstraint(
+            fields=fields,
+            name=name,
+            deferrable=models.Deferrable.DEFERRED,
+        )
+        path, args, kwargs = constraint.deconstruct()
+        self.assertEqual(path, 'django.db.models.UniqueConstraint')
+        self.assertEqual(args, ())
+        self.assertEqual(kwargs, {
+            'fields': tuple(fields),
+            'name': name,
+            'deferrable': models.Deferrable.DEFERRED,
+        })
 
     def test_database_constraint(self):
         with self.assertRaises(IntegrityError):
@@ -238,3 +282,54 @@ class UniqueConstraintTests(TestCase):
     def test_condition_must_be_q(self):
         with self.assertRaisesMessage(ValueError, 'UniqueConstraint.condition must be a Q instance.'):
             models.UniqueConstraint(name='uniq', fields=['name'], condition='invalid')
+
+    @skipUnlessDBFeature('supports_deferrable_unique_constraints')
+    def test_initially_deferred_database_constraint(self):
+        obj_1 = UniqueConstraintDeferrable.objects.create(name='p1', shelf='front')
+        obj_2 = UniqueConstraintDeferrable.objects.create(name='p2', shelf='back')
+
+        def swap():
+            obj_1.name, obj_2.name = obj_2.name, obj_1.name
+            obj_1.save()
+            obj_2.save()
+
+        swap()
+        # Behavior can be changed with SET CONSTRAINTS.
+        with self.assertRaises(IntegrityError):
+            with atomic(), connection.cursor() as cursor:
+                constraint_name = connection.ops.quote_name('name_init_deferred_uniq')
+                cursor.execute('SET CONSTRAINTS %s IMMEDIATE' % constraint_name)
+                swap()
+
+    @skipUnlessDBFeature('supports_deferrable_unique_constraints')
+    def test_initially_immediate_database_constraint(self):
+        obj_1 = UniqueConstraintDeferrable.objects.create(name='p1', shelf='front')
+        obj_2 = UniqueConstraintDeferrable.objects.create(name='p2', shelf='back')
+        obj_1.shelf, obj_2.shelf = obj_2.shelf, obj_1.shelf
+        with self.assertRaises(IntegrityError), atomic():
+            obj_1.save()
+        # Behavior can be changed with SET CONSTRAINTS.
+        with connection.cursor() as cursor:
+            constraint_name = connection.ops.quote_name('sheld_init_immediate_uniq')
+            cursor.execute('SET CONSTRAINTS %s DEFERRED' % constraint_name)
+            obj_1.save()
+            obj_2.save()
+
+    def test_deferrable_with_condition(self):
+        message = 'UniqueConstraint with conditions cannot be deferred.'
+        with self.assertRaisesMessage(ValueError, message):
+            models.UniqueConstraint(
+                fields=['name'],
+                name='name_without_color_unique',
+                condition=models.Q(color__isnull=True),
+                deferrable=models.Deferrable.DEFERRED,
+            )
+
+    def test_invalid_defer_argument(self):
+        message = 'UniqueConstraint.deferrable must be a Deferrable instance.'
+        with self.assertRaisesMessage(ValueError, message):
+            models.UniqueConstraint(
+                fields=['name'],
+                name='name_invalid',
+                deferrable='invalid',
+            )

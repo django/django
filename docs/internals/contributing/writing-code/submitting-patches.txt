@@ -82,15 +82,14 @@ As always, more communication is better than less communication!
 Which tickets should be claimed?
 --------------------------------
 
-Of course, going through the steps of claiming tickets is overkill in some
-cases.
+Going through the steps of claiming tickets is overkill in some cases.
 
 In the case of small changes, such as typos in the documentation or small bugs
 that will only take a few minutes to fix, you don't need to jump through the
 hoops of claiming tickets. Submit your patch directly and you're done!
 
-Of course, it is *always* acceptable, regardless whether someone has claimed it
-or not, to submit patches to a ticket if you happen to have a patch ready.
+It is *always* acceptable, regardless whether someone has claimed it or not, to
+submit patches to a ticket if you happen to have a patch ready.
 
 .. _patch-style:
 

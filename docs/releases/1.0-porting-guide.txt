@@ -570,7 +570,7 @@ Notes:
 
 2. In the second step you will be asked to confirm that you are prepared to
    lose the data for the application(s) in question. Say yes; we'll restore
-   this data in the third step, of course.
+   this data in the third step.
 
 3. ``DecimalField`` is not used in any of the apps shipped with Django prior
    to this change being made, so you do not need to worry about performing

@@ -79,11 +79,11 @@ class MigrationLoader:
             was_loaded = module_name in sys.modules
             try:
                 module = import_module(module_name)
-            except ImportError as e:
-                # I hate doing this, but I don't want to squash other import errors.
-                # Might be better to try a directory check directly.
-                if ((explicit and self.ignore_no_migrations) or (
-                        not explicit and "No module named" in str(e) and MIGRATIONS_MODULE_NAME in str(e))):
+            except ModuleNotFoundError as e:
+                if (
+                    (explicit and self.ignore_no_migrations) or
+                    (not explicit and MIGRATIONS_MODULE_NAME in e.name.split('.'))
+                ):
                     self.unmigrated_apps.add(app_config.label)
                     continue
                 raise

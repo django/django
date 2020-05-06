@@ -3055,14 +3055,14 @@ class AdminViewListEditable(TestCase):
             "form-MAX_NUM_FORMS": "0",
 
             "form-0-gender": "1",
-            "form-0-id": "%s" % self.per1.pk,
+            "form-0-id": str(self.per1.pk),
 
             "form-1-gender": "2",
-            "form-1-id": "%s" % self.per2.pk,
+            "form-1-id": str(self.per2.pk),
 
             "form-2-alive": "checked",
             "form-2-gender": "1",
-            "form-2-id": "%s" % self.per3.pk,
+            "form-2-id": str(self.per3.pk),
 
             "_save": "Save",
         }
@@ -3077,14 +3077,14 @@ class AdminViewListEditable(TestCase):
             "form-MAX_NUM_FORMS": "0",
 
             "form-0-gender": "1",
-            "form-0-id": "%s" % self.per1.pk,
+            "form-0-id": str(self.per1.pk),
 
             "form-1-gender": "2",
-            "form-1-id": "%s" % self.per2.pk,
+            "form-1-id": str(self.per2.pk),
 
             "form-2-alive": "checked",
             "form-2-gender": "1",
-            "form-2-id": "%s" % self.per3.pk,
+            "form-2-id": str(self.per3.pk),
 
             "_save": "Save",
         }
@@ -3099,11 +3099,11 @@ class AdminViewListEditable(TestCase):
             "form-INITIAL_FORMS": "2",
             "form-MAX_NUM_FORMS": "0",
 
-            "form-0-id": "%s" % self.per1.pk,
+            "form-0-id": str(self.per1.pk),
             "form-0-gender": "1",
             "form-0-alive": "checked",
 
-            "form-1-id": "%s" % self.per3.pk,
+            "form-1-id": str(self.per3.pk),
             "form-1-gender": "1",
             "form-1-alive": "checked",
 
@@ -3119,7 +3119,7 @@ class AdminViewListEditable(TestCase):
             "form-INITIAL_FORMS": "1",
             "form-MAX_NUM_FORMS": "0",
 
-            "form-0-id": "%s" % self.per1.pk,
+            "form-0-id": str(self.per1.pk),
             "form-0-gender": "1",
 
             "_save": "Save",
@@ -3209,7 +3209,7 @@ class AdminViewListEditable(TestCase):
             "form-INITIAL_FORMS": "1",
             "form-MAX_NUM_FORMS": "0",
 
-            "form-0-id": "%s" % self.per2.pk,
+            "form-0-id": str(self.per2.pk),
             "form-0-alive": "1",
             "form-0-gender": "2",
 
@@ -3227,7 +3227,7 @@ class AdminViewListEditable(TestCase):
             "form-INITIAL_FORMS": "1",
             "form-MAX_NUM_FORMS": "0",
 
-            "form-0-id": "%s" % self.per2.pk,
+            "form-0-id": str(self.per2.pk),
             "form-0-alive": "1",
             "form-0-gender": "2",
 
@@ -3334,14 +3334,14 @@ class AdminViewListEditable(TestCase):
             "form-MAX_NUM_FORMS": "0",
 
             "form-0-gender": "1",
-            "form-0-id": "%s" % self.per1.pk,
+            "form-0-id": str(self.per1.pk),
 
             "form-1-gender": "2",
-            "form-1-id": "%s" % self.per2.pk,
+            "form-1-id": str(self.per2.pk),
 
             "form-2-alive": "checked",
             "form-2-gender": "1",
-            "form-2-id": "%s" % self.per3.pk,
+            "form-2-id": str(self.per3.pk),
 
             "_save": "Save",
             "_selected_action": ['1'],
@@ -4842,17 +4842,17 @@ class ReadonlyTest(AdminFieldExtractionMixin, TestCase):
         self.assertContains(response, '<div class="help">', 3)
         self.assertContains(
             response,
-            '<div class="help">Some help text for the title (with unicode ŠĐĆŽćžšđ)</div>',
+            '<div class="help">Some help text for the title (with Unicode ŠĐĆŽćžšđ)</div>',
             html=True
         )
         self.assertContains(
             response,
-            '<div class="help">Some help text for the content (with unicode ŠĐĆŽćžšđ)</div>',
+            '<div class="help">Some help text for the content (with Unicode ŠĐĆŽćžšđ)</div>',
             html=True
         )
         self.assertContains(
             response,
-            '<div class="help">Some help text for the date (with unicode ŠĐĆŽćžšđ)</div>',
+            '<div class="help">Some help text for the date (with Unicode ŠĐĆŽćžšđ)</div>',
             html=True
         )
 
@@ -4962,7 +4962,7 @@ class ReadonlyTest(AdminFieldExtractionMixin, TestCase):
         response = self.client.get(reverse('admin:admin_views_fieldoverridepost_change', args=(p.pk,)))
         self.assertContains(response, '<div class="help">Overridden help text for the date</div>')
         self.assertContains(response, '<label for="id_public">Overridden public label:</label>', html=True)
-        self.assertNotContains(response, "Some help text for the date (with unicode ŠĐĆŽćžšđ)")
+        self.assertNotContains(response, 'Some help text for the date (with Unicode ŠĐĆŽćžšđ)')
 
     def test_correct_autoescaping(self):
         """
@@ -5502,7 +5502,7 @@ class DateHierarchyTests(TestCase):
         self.assertNotContains(response, formats.number_format(year))
 
     def assert_contains_year_link(self, response, date):
-        self.assertContains(response, '?release_date__year=%d"' % (date.year,))
+        self.assertContains(response, '?release_date__year=%d"' % date.year)
 
     def assert_contains_month_link(self, response, date):
         self.assertContains(
@@ -5619,7 +5619,7 @@ class DateHierarchyTests(TestCase):
 
         response = self.client.get(reverse('admin:admin_views_answer_changelist'))
         for date, answer_count in questions_data:
-            link = '?question__posted__year=%d"' % (date.year,)
+            link = '?question__posted__year=%d"' % date.year
             if answer_count > 0:
                 self.assertContains(response, link)
             else:

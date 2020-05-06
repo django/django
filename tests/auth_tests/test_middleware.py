@@ -1,3 +1,4 @@
+from django.contrib.auth import HASH_SESSION_KEY
 from django.contrib.auth.middleware import AuthenticationMiddleware
 from django.contrib.auth.models import User
 from django.http import HttpRequest, HttpResponse
@@ -14,6 +15,16 @@ class TestAuthenticationMiddleware(TestCase):
 
     def test_no_password_change_doesnt_invalidate_session(self):
         self.request.session = self.client.session
+        self.middleware(self.request)
+        self.assertIsNotNone(self.request.user)
+        self.assertFalse(self.request.user.is_anonymous)
+
+    def test_no_password_change_does_not_invalidate_legacy_session(self):
+        # RemovedInDjango40Warning: pre-Django 3.1 hashes will be invalid.
+        session = self.client.session
+        session[HASH_SESSION_KEY] = self.user._legacy_get_session_auth_hash()
+        session.save()
+        self.request.session = session
         self.middleware(self.request)
         self.assertIsNotNone(self.request.user)
         self.assertFalse(self.request.user.is_anonymous)
