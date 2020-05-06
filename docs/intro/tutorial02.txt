@@ -619,9 +619,9 @@ http://127.0.0.1:8000/admin/. You should see the admin's login screen:
 .. image:: _images/admin01.png
    :alt: Django admin login screen
 
-Since :doc:`translation </topics/i18n/translation>` is turned on by default,
-the login screen may be displayed in your own language, depending on your
-browser's settings and if Django has a translation for this language.
+Since :doc:`translation </topics/i18n/translation>` is turned on by default, if
+you set :setting:`LANGUAGE_CODE`, the login screen will be displayed in the
+given language (if Django has appropriate translations).
 
 Enter the admin site
 --------------------
