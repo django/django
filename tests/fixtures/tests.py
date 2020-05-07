@@ -21,6 +21,12 @@ from .models import (
     PrimaryKeyUUIDModel, ProxySpy, Spy, Tag, Visa,
 )
 
+try:
+    import bz2  # NOQA
+    HAS_BZ2 = True
+except ImportError:
+    HAS_BZ2 = False
+
 
 class TestCaseFixtureLoadingTests(TestCase):
     fixtures = ['fixture1.json', 'fixture2.json']
@@ -536,6 +542,19 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
     def test_compressed_loading(self):
         # Load fixture 5 (compressed), only compression specification
         management.call_command('loaddata', 'fixture5.zip', verbosity=0)
+        self.assertQuerysetEqual(Article.objects.all(), [
+            '<Article: WoW subscribers now outnumber readers>',
+        ])
+
+    def test_compressed_loading_gzip(self):
+        management.call_command('loaddata', 'fixture5.json.gz', verbosity=0)
+        self.assertQuerysetEqual(Article.objects.all(), [
+            '<Article: WoW subscribers now outnumber readers>',
+        ])
+
+    @unittest.skipUnless(HAS_BZ2, 'No bz2 library detected.')
+    def test_compressed_loading_bz2(self):
+        management.call_command('loaddata', 'fixture5.json.bz2', verbosity=0)
         self.assertQuerysetEqual(Article.objects.all(), [
             '<Article: WoW subscribers now outnumber readers>',
         ])
