@@ -21,3 +21,18 @@ QUnit.test('filter', function(assert) {
     assert.equal($('#id option').length, 1);
     assert.equal($('#id option').text(), "A");
 });
+
+QUnit.test('option with group', function(assert) {
+    const $ = django.jQuery;
+    $('<select id="id"></select>').appendTo('#qunit-fixture');
+    const a = $('<optgroup label="GroupA">').appendTo('#id');
+    const b = $('<optgroup label="GroupB">').appendTo('#id');
+    $('<option value="0">A</option>').appendTo(a);
+    $('<option value="1">B</option>').appendTo(b);
+    $('<option value="2">C</option>').appendTo(b);
+    SelectBox.init('id');
+    assert.equal($('#id optgroup').length, 2);
+    assert.equal(a.children().length, 1);
+    assert.equal(b.children().length, 2);
+});
+
