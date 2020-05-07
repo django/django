@@ -21,25 +21,6 @@ from django.views.debug import ExceptionReporter
 from . import views
 from .logconfig import MyEmailBackend
 
-# logging config prior to using filter with mail_admins
-OLD_LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'handlers': {
-        'mail_admins': {
-            'level': 'ERROR',
-            'class': 'django.utils.log.AdminEmailHandler'
-        }
-    },
-    'loggers': {
-        'django.request': {
-            'handlers': ['mail_admins'],
-            'level': 'ERROR',
-            'propagate': True,
-        },
-    }
-}
-
 
 class LoggingFiltersTest(SimpleTestCase):
     def test_require_debug_false_filter(self):
@@ -483,13 +464,16 @@ class SetupConfigureLogging(SimpleTestCase):
     """
     Calling django.setup() initializes the logging configuration.
     """
-    @override_settings(
-        LOGGING_CONFIG='logging_tests.tests.dictConfig',
-        LOGGING=OLD_LOGGING,
-    )
     def test_configure_initializes_logging(self):
         from django import setup
-        setup()
+        try:
+            with override_settings(
+                LOGGING_CONFIG='logging_tests.tests.dictConfig',
+            ):
+                setup()
+        finally:
+            # Restore logging from settings.
+            setup()
         self.assertTrue(dictConfig.called)
 
 
