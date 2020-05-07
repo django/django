@@ -6,6 +6,7 @@
 # Vasil Vangelovski <vvangelovski@gmail.com>, 2016-2017
 # Vasil Vangelovski <vvangelovski@gmail.com>, 2013-2015
 # Vasil Vangelovski <vvangelovski@gmail.com>, 2011-2013
+# Bojan Drango <bojandrango@gmail.com>, 2020
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
@@ -439,7 +440,7 @@ msgid "Value %(value)r is not a valid choice."
 msgstr "Вредноста  %(value)r не е валиден избор."
 
 msgid "This field cannot be null."
-msgstr "Оваа вредност неможе да биде null."
+msgstr "Оваа вредност не може да биде null."
 
 msgid "This field cannot be blank."
 msgstr "Ова поле не може да биде празно"
@@ -909,7 +910,7 @@ msgid "July"
 msgstr "Јули"
 
 msgid "August"
-msgstr "август"
+msgstr "Август"
 
 msgid "September"
 msgstr "Септември"
@@ -1150,6 +1151,8 @@ msgid ""
 "If you have configured your browser to disable cookies, please re-enable "
 "them, at least for this site, or for “same-origin” requests."
 msgstr ""
+"Доколку Вашиот пребарувач е прилагоден да оневозможува колачиња, Ве молиме "
+"овозможете ги повторно, барем за оваа страница или за барањата од „исто потекло.“"
 
 msgid "More information is available with DEBUG=True."
 msgstr "Повеќе информации се достапни со DEBUG = True."
@@ -1158,7 +1161,7 @@ msgid "No year specified"
 msgstr "Не е дадена година"
 
 msgid "Date out of range"
-msgstr ""
+msgstr "Датумот е надвор од опсег"
 
 msgid "No month specified"
 msgstr "Не е даден месец"
@@ -1219,9 +1222,11 @@ msgid ""
 "View <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" "
 "target=\"_blank\" rel=\"noopener\">release notes</a> for Django %(version)s"
 msgstr ""
+"Прегледај <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" "
+"target=\"_blank\" rel=\"noopener\">белешки</a> за Django %(version)s"
 
 msgid "The install worked successfully! Congratulations!"
-msgstr ""
+msgstr "Инсталацијата проработи успешно! Честитки!"
 
 #, python-format
 msgid ""
@@ -1230,21 +1235,25 @@ msgid ""
 "\">DEBUG=True</a> is in your settings file and you have not configured any "
 "URLs."
 msgstr ""
+"Ја гледате оваа страница бидејќи <a href=\"https://docs.djangoproject.com/en/"
+"%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener"
+"\">DEBUG=True</a> се наоѓа во Вашиот settings фајл и Вие немате конфигурирано "
+"било какви URL адреси"
 
 msgid "Django Documentation"
-msgstr ""
+msgstr "Django документација"
 
 msgid "Topics, references, &amp; how-to’s"
-msgstr ""
+msgstr "Теми, референци и „како да направам“ упатства"
 
 msgid "Tutorial: A Polling App"
-msgstr ""
+msgstr "Лекција: Анкетна апликација"
 
 msgid "Get started with Django"
-msgstr ""
+msgstr "Започни со Django"
 
 msgid "Django Community"
-msgstr ""
+msgstr "Django заедница"
 
 msgid "Connect, get help, or contribute"
-msgstr ""
+msgstr "Поврзи се, добиј помош или придонеси"
