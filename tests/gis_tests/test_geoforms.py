@@ -28,7 +28,7 @@ class GeometryFieldTest(SimpleTestCase):
         # Making the field in a different SRID from that of the geometry, and
         # asserting it transforms.
         fld = forms.GeometryField(srid=32140)
-        tol = 0.0000001
+        tol = 0.0001
         xform_geom = GEOSGeometry('POINT (951640.547328465 4219369.26171664)', srid=32140)
         # The cleaned geometry is transformed to 32140 (the widget map_srid is 3857).
         cleaned_geom = fld.clean('SRID=3857;POINT (-10615777.40976205 3473169.895707852)')

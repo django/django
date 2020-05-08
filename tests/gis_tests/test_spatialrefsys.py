@@ -11,7 +11,7 @@ test_srs = ({
     # Only the beginning, because there are differences depending on installed libs
     'srtext': 'GEOGCS["WGS 84",DATUM["WGS_1984",SPHEROID["WGS 84"',
     # +ellps=WGS84 has been removed in the 4326 proj string in proj-4.8
-    'proj4_re': r'\+proj=longlat (\+ellps=WGS84 )?(\+datum=WGS84 |\+towgs84=0,0,0,0,0,0,0 )\+no_defs ',
+    'proj4_re': r'\+proj=longlat (\+ellps=WGS84 )?(\+datum=WGS84 |\+towgs84=0,0,0,0,0,0,0 )\+no_defs ?',
     'spheroid': 'WGS 84', 'name': 'WGS 84',
     'geographic': True, 'projected': False, 'spatialite': True,
     # From proj's "cs2cs -le" and Wikipedia (semi-minor only)
@@ -37,9 +37,9 @@ test_srs = ({
         'PROJCS["NAD83 / Texas South Central",GEOGCS["NAD83",'
         'DATUM["North_American_Datum_1983",SPHEROID["GRS 1980"'
     ),
-    'proj4_re': r'\+proj=lcc \+lat_1=30.28333333333333 \+lat_2=28.38333333333333 \+lat_0=27.83333333333333 '
-                r'\+lon_0=-99 \+x_0=600000 \+y_0=4000000 (\+ellps=GRS80 )?'
-                r'(\+datum=NAD83 |\+towgs84=0,0,0,0,0,0,0 )?\+units=m \+no_defs ',
+    'proj4_re': r'\+proj=lcc (\+lat_1=30.28333333333333? |\+lat_2=28.38333333333333? |\+lat_0=27.83333333333333? |'
+                r'\+lon_0=-99 ){4}\+x_0=600000 \+y_0=4000000 (\+ellps=GRS80 )?'
+                r'(\+datum=NAD83 |\+towgs84=0,0,0,0,0,0,0 )?\+units=m \+no_defs ?',
     'spheroid': 'GRS 1980', 'name': 'NAD83 / Texas South Central',
     'geographic': False, 'projected': True, 'spatialite': False,
     # From proj's "cs2cs -le" and Wikipedia (semi-minor only)

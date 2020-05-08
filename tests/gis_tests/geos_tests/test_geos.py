@@ -828,8 +828,8 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
                 gdal.SpatialReference(4326))
             new_pnt = pnt.transform(c2w, clone=True)
             self.assertEqual(new_pnt.srid, 4326)
-            self.assertAlmostEqual(new_pnt.x, 1, 3)
-            self.assertAlmostEqual(new_pnt.y, 2, 3)
+            self.assertAlmostEqual(new_pnt.x, 1, 1)
+            self.assertAlmostEqual(new_pnt.y, 2, 1)
 
     def test_mutable_geometries(self):
         "Testing the mutability of Polygons and Geometry Collections."

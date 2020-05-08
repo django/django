@@ -145,7 +145,7 @@ Minor features
 * Added the :class:`~django.contrib.gis.db.models.functions.AsWKB` and
   :class:`~django.contrib.gis.db.models.functions.AsWKT` functions.
 
-* Added support for PostGIS 3.
+* Added support for PostGIS 3 and GDAL 3.
 
 :mod:`django.contrib.humanize`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

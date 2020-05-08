@@ -1,8 +1,11 @@
-import unittest
+from unittest import skipIf
 
 from django.contrib.gis.gdal import (
-    CoordTransform, GDALException, SpatialReference, SRSException,
+    GDAL_VERSION, AxisOrder, CoordTransform, GDALException, SpatialReference,
+    SRSException,
 )
+from django.contrib.gis.geos import GEOSGeometry
+from django.test import SimpleTestCase
 
 
 class TestSRS:
@@ -20,7 +23,8 @@ srlist = (
         'GEOGCS["WGS 84",DATUM["WGS_1984",SPHEROID["WGS 84",6378137,298.257223563,'
         'AUTHORITY["EPSG","7030"]],TOWGS84[0,0,0,0,0,0,0],AUTHORITY["EPSG","6326"]],'
         'PRIMEM["Greenwich",0,AUTHORITY["EPSG","8901"]],UNIT["degree",'
-        '0.01745329251994328,AUTHORITY["EPSG","9122"]],AUTHORITY["EPSG","4326"]]',
+        '0.0174532925199433,AUTHORITY["EPSG","9122"]],AXIS["Latitude",NORTH],'
+        'AXIS["Longitude",EAST],AUTHORITY["EPSG","4326"]]',
         epsg=4326, projected=False, geographic=True, local=False,
         lin_name='unknown', ang_name='degree', lin_units=1.0, ang_units=0.0174532925199,
         auth={'GEOGCS': ('EPSG', '4326'), 'spheroid': ('EPSG', '7030')},
@@ -30,14 +34,14 @@ srlist = (
         'PROJCS["NAD83 / Texas South Central",GEOGCS["NAD83",DATUM["North_American_Datum_1983",'
         'SPHEROID["GRS 1980",6378137,298.257222101,AUTHORITY["EPSG","7019"]],'
         'AUTHORITY["EPSG","6269"]],PRIMEM["Greenwich",0,AUTHORITY["EPSG","8901"]],'
-        'UNIT["degree",0.01745329251994328,AUTHORITY["EPSG","9122"]],'
+        'UNIT["degree",0.0174532925199433,AUTHORITY["EPSG","9122"]],'
         'AUTHORITY["EPSG","4269"]],PROJECTION["Lambert_Conformal_Conic_2SP"],'
-        'PARAMETER["standard_parallel_1",30.28333333333333],'
-        'PARAMETER["standard_parallel_2",28.38333333333333],'
-        'PARAMETER["latitude_of_origin",27.83333333333333],'
+        'PARAMETER["standard_parallel_1",30.2833333333333],'
+        'PARAMETER["standard_parallel_2",28.3833333333333],'
+        'PARAMETER["latitude_of_origin",27.8333333333333],'
         'PARAMETER["central_meridian",-99],PARAMETER["false_easting",600000],'
         'PARAMETER["false_northing",4000000],UNIT["metre",1,AUTHORITY["EPSG","9001"]],'
-        'AUTHORITY["EPSG","32140"]]',
+        'AXIS["Easting",EAST],AXIS["Northing",NORTH],AUTHORITY["EPSG","32140"]]',
         epsg=32140, projected=True, geographic=False, local=False,
         lin_name='metre', ang_name='degree', lin_units=1.0, ang_units=0.0174532925199,
         auth={'PROJCS': ('EPSG', '32140'), 'spheroid': ('EPSG', '7019'), 'unit': ('EPSG', '9001')},
@@ -48,25 +52,27 @@ srlist = (
         ),
     ),
     TestSRS(
-        'PROJCS["NAD_1983_StatePlane_Texas_South_Central_FIPS_4204_Feet",'
-        'GEOGCS["GCS_North_American_1983",DATUM["North_American_Datum_1983",'
-        'SPHEROID["GRS_1980",6378137.0,298.257222101]],PRIMEM["Greenwich",0.0],'
+        'PROJCS["NAD83 / Texas South Central (ftUS)",'
+        'GEOGCS["NAD83",DATUM["North_American_Datum_1983",'
+        'SPHEROID["GRS 1980",6378137,298.257222101,AUTHORITY["EPSG","7019"]],AUTHORITY["EPSG","6269"]],'
+        'PRIMEM["Greenwich",0],'
         'UNIT["Degree",0.0174532925199433]],PROJECTION["Lambert_Conformal_Conic_2SP"],'
-        'PARAMETER["False_Easting",1968500.0],PARAMETER["False_Northing",13123333.33333333],'
-        'PARAMETER["Central_Meridian",-99.0],PARAMETER["Standard_Parallel_1",28.38333333333333],'
-        'PARAMETER["Standard_Parallel_2",30.28333333333334],PARAMETER["Latitude_Of_Origin",27.83333333333333],'
-        'UNIT["Foot_US",0.3048006096012192]]',
+        'PARAMETER["false_easting",1968500],PARAMETER["false_northing",13123333.3333333],'
+        'PARAMETER["central_meridian",-99],PARAMETER["standard_parallel_1",28.3833333333333],'
+        'PARAMETER["standard_parallel_2",30.2833333333333],PARAMETER["latitude_of_origin",27.8333333333333],'
+        'UNIT["US survey foot",0.304800609601219],AXIS["Easting",EAST],AXIS["Northing",NORTH]]',
         epsg=None, projected=True, geographic=False, local=False,
-        lin_name='Foot_US', ang_name='Degree', lin_units=0.3048006096012192, ang_units=0.0174532925199,
+        lin_name='US survey foot', ang_name='Degree', lin_units=0.3048006096012192, ang_units=0.0174532925199,
         auth={'PROJCS': (None, None)},
-        attr=(('PROJCS|GeOgCs|spheroid', 'GRS_1980'), (('projcs', 9), 'UNIT'), (('projcs', 11), None),),
+        attr=(('PROJCS|GeOgCs|spheroid', 'GRS 1980'), (('projcs', 9), 'UNIT'), (('projcs', 11), 'AXIS'),),
     ),
     # This is really ESRI format, not WKT -- but the import should work the same
     TestSRS(
-        'LOCAL_CS["Non-Earth (Meter)",LOCAL_DATUM["Local Datum",0],UNIT["Meter",1.0],AXIS["X",EAST],AXIS["Y",NORTH]]',
+        'LOCAL_CS["Non-Earth (Meter)",LOCAL_DATUM["Local Datum",32767],'
+        'UNIT["Meter",1],AXIS["X",EAST],AXIS["Y",NORTH]]',
         esri=True, epsg=None, projected=False, geographic=False, local=True,
         lin_name='Meter', ang_name='degree', lin_units=1.0, ang_units=0.0174532925199,
-        attr=(('LOCAL_DATUM', 'Local Datum'), ('unit', 'Meter')),
+        attr=(('LOCAL_DATUM', 'Local Datum'),),
     ),
 )
 
@@ -146,7 +152,7 @@ bad_srlist = (
 )
 
 
-class SpatialRefTest(unittest.TestCase):
+class SpatialRefTest(SimpleTestCase):
 
     def test01_wkt(self):
         "Testing initialization on valid OGC WKT."
@@ -168,7 +174,11 @@ class SpatialRefTest(unittest.TestCase):
         "Testing getting the WKT."
         for s in srlist:
             srs = SpatialReference(s.wkt)
-            self.assertEqual(s.wkt, srs.wkt)
+            # GDAL 3 strips UNIT part in the last occurrence.
+            self.assertEqual(
+                s.wkt.replace(',UNIT["Meter",1]', ''),
+                srs.wkt.replace(',UNIT["Meter",1]', ''),
+            )
 
     def test04_proj(self):
         "Test PROJ.4 import and export."
@@ -264,11 +274,11 @@ class SpatialRefTest(unittest.TestCase):
             'GEOGCS["DHDN",DATUM["Deutsches_Hauptdreiecksnetz",'
             'SPHEROID["Bessel 1841",6377397.155,299.1528128,AUTHORITY["EPSG","7004"]],AUTHORITY["EPSG","6314"]],'
             'PRIMEM["Greenwich",0,AUTHORITY["EPSG","8901"]],'
-            'UNIT["degree",0.01745329251994328,AUTHORITY["EPSG","9122"]],'
-            'AUTHORITY["EPSG","4314"]],UNIT["metre",1,AUTHORITY["EPSG","9001"]],'
-            'PROJECTION["Cassini_Soldner"],PARAMETER["latitude_of_origin",50.66738711],'
-            'PARAMETER["central_meridian",6.28935703],PARAMETER["false_easting",0],'
-            'PARAMETER["false_northing",0],AUTHORITY["mj10777.de","187939"],AXIS["x",NORTH],AXIS["y",EAST]]'
+            'UNIT["degree",0.0174532925199433,AUTHORITY["EPSG","9122"]],'
+            'AUTHORITY["EPSG","4314"]],PROJECTION["Cassini_Soldner"],'
+            'PARAMETER["latitude_of_origin",50.66738711],PARAMETER["central_meridian",6.28935703],'
+            'PARAMETER["false_easting",0],PARAMETER["false_northing",0],'
+            'UNIT["metre",1,AUTHORITY["EPSG","9001"]],AXIS["X",NORTH],AXIS["Y",EAST],AUTHORITY["mj10777.de","187939"]]'
         )
         srs = SpatialReference(wkt)
         srs_list = [srs, srs.clone()]
@@ -279,3 +289,31 @@ class SpatialRefTest(unittest.TestCase):
             self.assertEqual(srs.wkt, wkt)
             self.assertIn('Langschoß', srs.pretty_wkt)
             self.assertIn('Langschoß', srs.xml)
+
+    @skipIf(GDAL_VERSION < (3, 0), 'GDAL >= 3.0 is required')
+    def test_axis_order(self):
+        wgs84_trad = SpatialReference(4326, axis_order=AxisOrder.TRADITIONAL)
+        wgs84_auth = SpatialReference(4326, axis_order=AxisOrder.AUTHORITY)
+        # Coordinate interpretation may depend on the srs axis predicate.
+        pt = GEOSGeometry('POINT (992385.4472045 481455.4944650)', 2774)
+        pt_trad = pt.transform(wgs84_trad, clone=True)
+        self.assertAlmostEqual(pt_trad.x, -104.609, 3)
+        self.assertAlmostEqual(pt_trad.y, 38.255, 3)
+        pt_auth = pt.transform(wgs84_auth, clone=True)
+        self.assertAlmostEqual(pt_auth.x, 38.255, 3)
+        self.assertAlmostEqual(pt_auth.y, -104.609, 3)
+        # clone() preserves the axis order.
+        pt_auth = pt.transform(wgs84_auth.clone(), clone=True)
+        self.assertAlmostEqual(pt_auth.x, 38.255, 3)
+        self.assertAlmostEqual(pt_auth.y, -104.609, 3)
+
+    def test_axis_order_invalid(self):
+        msg = 'SpatialReference.axis_order must be an AxisOrder instance.'
+        with self.assertRaisesMessage(ValueError, msg):
+            SpatialReference(4326, axis_order='other')
+
+    @skipIf(GDAL_VERSION > (3, 0), "GDAL < 3.0 doesn't support authority.")
+    def test_axis_order_non_traditional_invalid(self):
+        msg = 'AxisOrder.AUTHORITY is not supported in GDAL < 3.0.'
+        with self.assertRaisesMessage(ValueError, msg):
+            SpatialReference(4326, axis_order=AxisOrder.AUTHORITY)

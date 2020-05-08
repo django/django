@@ -434,7 +434,7 @@ class GEOSGeometryBase(GEOSBase):
         if self.srid:
             try:
                 return gdal.SpatialReference(self.srid)
-            except gdal.SRSException:
+            except (gdal.GDALException, gdal.SRSException):
                 pass
         return None
 
