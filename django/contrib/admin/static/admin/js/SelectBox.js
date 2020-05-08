@@ -102,7 +102,7 @@
         select_all: function(id) {
             const box = document.getElementById(id);
             for (const option of box.options) {
-                option.selected = 'selected';
+                option.selected = true;
             }
         }
     };
