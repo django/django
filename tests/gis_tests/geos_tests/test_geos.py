@@ -5,7 +5,7 @@ import pickle
 import random
 from binascii import a2b_hex
 from io import BytesIO
-from unittest import mock
+from unittest import mock, skipIf
 
 from django.contrib.gis import gdal
 from django.contrib.gis.gdal import GDAL_VERSION

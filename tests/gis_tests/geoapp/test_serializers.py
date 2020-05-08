@@ -1,5 +1,7 @@
 import json
+from unittest import skipIf
 
+from django.contrib.gis.gdal import GDAL_VERSION
 from django.contrib.gis.geos import LinearRing, Point, Polygon
 from django.core import serializers
 from django.test import TestCase
@@ -74,6 +76,7 @@ class GeoJSONSerializerTests(TestCase):
         self.assertNotIn('founded', geodata['features'][0]['properties'])
         self.assertNotIn('pk', geodata['features'][0]['properties'])
 
+    @skipIf(GDAL_VERSION[0] > 2, 'This use of transform is intended for GDAL < 3')
     def test_srid_option(self):
         geojson = serializers.serialize('geojson', City.objects.all().order_by('name'), srid=2847)
         geodata = json.loads(geojson)

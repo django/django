@@ -1,5 +1,7 @@
 import re
+from unittest import skipIf
 
+from django.contrib.gis.gdal import GDAL_VERSION
 from django.test import TestCase, skipUnlessDBFeature
 
 from .utils import SpatialRefSys, oracle, postgis, spatialite
@@ -79,6 +81,7 @@ class SpatialRefSysTest(TestCase):
                 self.assertTrue(srs.wkt.startswith(sd['srtext']))
                 self.assertRegex(srs.proj4text, sd['proj4_re'])
 
+    @skipIf(GDAL_VERSION[0] > 2, 'This use of transform is intended for GDAL < 3')
     def test_osr(self):
         """
         Test getting OSR objects from SpatialRefSys model objects.

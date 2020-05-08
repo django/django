@@ -1,4 +1,7 @@
+from unittest import skipIf
+
 from django.contrib.gis import admin
+from django.contrib.gis.gdal import GDAL_VERSION
 from django.contrib.gis.geos import Point
 from django.test import SimpleTestCase, override_settings
 
@@ -49,6 +52,7 @@ class GeoAdminTest(SimpleTestCase):
             """"http://vmap0.tiles.osgeo.org/wms/vmap0", {layers: 'basic', format: 'image/jpeg'});""",
             result)
 
+    @skipIf(GDAL_VERSION[0] > 2, 'This use of transform is intended for GDAL < 3')
     def test_olwidget_has_changed(self):
         """
         Changes are accurately noticed by OpenLayersWidget.

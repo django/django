@@ -2,8 +2,10 @@ import json
 import math
 import re
 from decimal import Decimal
+from unittest import skipIf
 
 from django.contrib.gis.db.models import functions
+from django.contrib.gis.gdal import GDAL_VERSION
 from django.contrib.gis.geos import (
     GEOSGeometry, LineString, Point, Polygon, fromstr,
 )
@@ -551,6 +553,7 @@ class GISFunctionsTests(FuncTestMixin, TestCase):
         self.assertTrue(geom.equals(union))
 
     @skipUnlessDBFeature("has_Union_function", "has_Transform_function")
+    @skipIf(GDAL_VERSION[0] > 2, 'This use of transform is intended for GDAL < 3')
     def test_union_mixed_srid(self):
         """The result SRID depends on the order of parameters."""
         geom = Point(61.42915, 55.15402, srid=4326)

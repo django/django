@@ -2,9 +2,10 @@ import os
 import unittest
 from copy import copy
 from decimal import Decimal
+from unittest import skipIf
 
 from django.conf import settings
-from django.contrib.gis.gdal import DataSource
+from django.contrib.gis.gdal import DataSource, GDAL_VERSION
 from django.contrib.gis.utils.layermapping import (
     InvalidDecimal, InvalidString, LayerMapError, LayerMapping,
     MissingForeignKey,
@@ -56,6 +57,7 @@ class LayerMapTest(TestCase):
         with self.assertRaises(LookupError):
             LayerMapping(City, city_shp, city_mapping, encoding='foobar')
 
+    @skipIf(GDAL_VERSION[0] > 2, 'This use of transform is intended for GDAL < 3')
     def test_simple_layermap(self):
         "Test LayerMapping import of a simple point shapefile."
         # Setting up for the LayerMapping.
@@ -80,6 +82,7 @@ class LayerMapTest(TestCase):
             self.assertAlmostEqual(pnt1.x, pnt2.x, 5)
             self.assertAlmostEqual(pnt1.y, pnt2.y, 5)
 
+    @skipIf(GDAL_VERSION[0] > 2, 'This use of transform is intended for GDAL < 3')
     def test_layermap_strict(self):
         "Testing the `strict` keyword, and import of a LineString shapefile."
         # When the `strict` keyword is set an error encountered will force

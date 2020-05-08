@@ -1,8 +1,10 @@
 import tempfile
 import unittest
+from unittest import skipIf
 from io import StringIO
 
 from django.contrib.gis import gdal
+from django.contrib.gis.gdal import GDAL_VERSION
 from django.contrib.gis.db.models import Extent, MakeLine, Union, functions
 from django.contrib.gis.geos import (
     GeometryCollection, GEOSGeometry, LinearRing, LineString, MultiLineString,
@@ -95,6 +97,7 @@ class GeoModelTest(TestCase):
         ns.delete()
 
     @skipUnlessDBFeature("supports_transform")
+    @skipIf(GDAL_VERSION[0] > 2, 'This use of transform is intended for GDAL < 3')
     def test_lookup_insert_transform(self):
         "Testing automatic transform for lookups and inserts."
         # San Antonio in 'WGS84' (SRID 4326)

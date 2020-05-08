@@ -20,6 +20,7 @@ class GeometryFieldTest(SimpleTestCase):
                 with self.assertRaises(ValidationError):
                     fld.clean(bad_default)
 
+    @skipIf(GDAL_VERSION[0] > 2, 'This use of transform is intended for GDAL < 3')
     def test_srid(self):
         "Testing GeometryField with a SRID set."
         # Input that doesn't specify the SRID is assumed to be in the SRID
