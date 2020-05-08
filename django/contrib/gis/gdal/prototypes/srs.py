@@ -78,3 +78,7 @@ isprojected = int_output(lgdal.OSRIsProjected, [c_void_p])
 # Coordinate transformation
 new_ct = srs_output(std_call('OCTNewCoordinateTransformation'), [c_void_p, c_void_p])
 destroy_ct = void_output(std_call('OCTDestroyCoordinateTransformation'), [c_void_p], errcheck=False)
+
+# Axis mapping
+get_axis_mapping_strategy = int_output(std_call('OSRGetAxisMappingStrategy'), [c_void_p])
+set_axis_mapping_strategy = void_output(std_call('OSRSetAxisMappingStrategy'), [c_void_p, c_int])

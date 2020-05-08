@@ -387,7 +387,13 @@ class OGRGeometry(GDALBase):
         # Closing the open rings.
         capi.geom_close_rings(self.ptr)
 
-    def transform(self, coord_trans, clone=False):
+    def _coord_transform(self, dst, strategy):
+        srs = self.srs
+        srs.set_axis_mapping_strategy(strategy)
+        transf = CoordTransform(srs, dst)
+        self.transform(transf)
+
+    def transform(self, coord_trans, clone=False, strategy=None):
         """
         Transform this geometry to a different spatial reference system.
         May take a CoordTransform object, a SpatialReference object, string
@@ -397,7 +403,7 @@ class OGRGeometry(GDALBase):
         """
         if clone:
             klone = self.clone()
-            klone.transform(coord_trans)
+            klone.transform(coord_trans, strategy=strategy)
             return klone
 
         # Depending on the input type, use the appropriate OGR routine
@@ -405,10 +411,15 @@ class OGRGeometry(GDALBase):
         if isinstance(coord_trans, CoordTransform):
             capi.geom_transform(self.ptr, coord_trans.ptr)
         elif isinstance(coord_trans, SpatialReference):
+            if strategy is not None:
+                self._coord_transform(coord_trans, strategy)
             capi.geom_transform_to(self.ptr, coord_trans.ptr)
         elif isinstance(coord_trans, (int, str)):
             sr = SpatialReference(coord_trans)
-            capi.geom_transform_to(self.ptr, sr.ptr)
+            if strategy is not None:
+                self._coord_transform(sr, strategy)
+            else:
+                capi.geom_transform_to(self.ptr, sr.ptr)
         else:
             raise TypeError('Transform only accepts CoordTransform, '
                             'SpatialReference, string, and integer objects.')

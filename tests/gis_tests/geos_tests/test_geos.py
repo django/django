@@ -8,6 +8,7 @@ from io import BytesIO
 from unittest import mock
 
 from django.contrib.gis import gdal
+from django.contrib.gis.gdal import GDAL_VERSION
 from django.contrib.gis.geos import (
     GeometryCollection, GEOSException, GEOSGeometry, LinearRing, LineString,
     MultiLineString, MultiPoint, MultiPolygon, Point, Polygon, fromfile,
@@ -781,6 +782,7 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
         with self.assertRaisesMessage(ValueError, 'Input geometry already has SRID: %d.' % pnt.srid):
             GEOSGeometry(pnt.ewkb, srid=1)
 
+    @skipIf(GDAL_VERSION[0] > 2, 'This use of transform is intended for GDAL < 3')
     def test_custom_srid(self):
         """Test with a null srid and a srid unknown to GDAL."""
         for srid in [None, 999999]:
@@ -1091,6 +1093,7 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
         self.assertNotEqual(poly._ptr, cpy1._ptr)
         self.assertNotEqual(poly._ptr, cpy2._ptr)
 
+    @skipIf(GDAL_VERSION[0] > 2, 'This use of transform is intended for GDAL < 3')
     def test_transform(self):
         "Testing `transform` method."
         orig = GEOSGeometry('POINT (-104.609 38.255)', 4326)
@@ -1115,11 +1118,13 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
             self.assertAlmostEqual(trans.x, p.x, prec)
             self.assertAlmostEqual(trans.y, p.y, prec)
 
+    @skipIf(GDAL_VERSION[0] > 2, 'This use of transform is intended for GDAL < 3')
     def test_transform_3d(self):
         p3d = GEOSGeometry('POINT (5 23 100)', 4326)
         p3d.transform(2774)
         self.assertAlmostEqual(p3d.z, 100, 3)
 
+    @skipIf(GDAL_VERSION[0] > 2, 'This use of transform is intended for GDAL < 3')
     def test_transform_noop(self):
         """ Testing `transform` method (SRID match) """
         # transform() should no-op if source & dest SRIDs match,
@@ -1136,6 +1141,7 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
         self.assertEqual(g1.srid, 4326)
         self.assertIsNot(g1, g, "Clone didn't happen")
 
+    @skipIf(GDAL_VERSION[0] > 2, 'This use of transform is intended for GDAL < 3')
     def test_transform_nosrid(self):
         """ Testing `transform` method (no SRID or negative SRID) """
 
@@ -1397,6 +1403,7 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
         self.assertIsNone(g.normalize())
         self.assertTrue(g.equals_exact(MultiPoint(Point(2, 2), Point(1, 1), Point(0, 0))))
 
+    @skipIf(GDAL_VERSION[0] > 2, 'This use of transform is intended for GDAL < 3')
     def test_empty_point(self):
         p = Point(srid=4326)
         self.assertEqual(p.ogr.ewkt, p.ewkt)

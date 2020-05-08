@@ -280,6 +280,7 @@ class GISFunctionsTests(FuncTestMixin, TestCase):
         self.assertIs(invalid.isvalid, False)
 
     @skipUnlessDBFeature("has_Area_function")
+    @skipIf(GDAL_VERSION[0] > 2, 'This use of transform is intended for GDAL < 3')
     def test_area_with_regular_aggregate(self):
         # Create projected country objects, for this test to work on all backends.
         for c in Country.objects.all():
@@ -296,6 +297,7 @@ class GISFunctionsTests(FuncTestMixin, TestCase):
             self.assertAlmostEqual((result - c.mpoly.area) / c.mpoly.area, 0)
 
     @skipUnlessDBFeature("has_Area_function")
+    @skipIf(GDAL_VERSION[0] > 2, 'This use of transform is intended for GDAL < 3')
     def test_area_lookups(self):
         # Create projected countries so the test works on all backends.
         CountryWebMercator.objects.bulk_create(

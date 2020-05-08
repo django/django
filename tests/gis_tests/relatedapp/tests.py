@@ -1,4 +1,7 @@
+from unittest import skipIf
+
 from django.contrib.gis.db.models import Collect, Count, Extent, F, Union
+from django.contrib.gis.gdal import GDAL_VERSION
 from django.contrib.gis.geos import GEOSGeometry, MultiPoint, Point
 from django.db import NotSupportedError, connection
 from django.test import TestCase, skipUnlessDBFeature
@@ -107,6 +110,7 @@ class RelatedGeoModelTest(TestCase):
         # Regression test for #9752.
         list(DirectoryEntry.objects.all().select_related())
 
+    @skipIf(GDAL_VERSION[0] > 2, 'This use of transform is intended for GDAL < 3')
     def test06_f_expressions(self):
         "Testing F() expressions on GeometryFields."
         # Constructing a dummy parcel border and getting the City instance for

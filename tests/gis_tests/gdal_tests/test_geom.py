@@ -1,8 +1,10 @@
 import json
 import pickle
+from unittest import skipIf
 
 from django.contrib.gis.gdal import (
     CoordTransform, GDALException, OGRGeometry, OGRGeomType, SpatialReference,
+    GDAL_VERSION
 )
 from django.template import Context
 from django.template.engine import Engine
@@ -331,6 +333,7 @@ class OGRGeomTest(SimpleTestCase, TestDataMixin):
             mpoly.srs = mpoly.srs
             mpoly.srid = mpoly.srid
 
+    @skipIf(GDAL_VERSION[0] > 2, 'This use of transform is intended for GDAL < 3')
     def test_srs_transform(self):
         "Testing transform()."
         orig = OGRGeometry('POINT (-104.609 38.255)', 4326)
@@ -355,6 +358,7 @@ class OGRGeomTest(SimpleTestCase, TestDataMixin):
             self.assertAlmostEqual(trans.x, p.x, prec)
             self.assertAlmostEqual(trans.y, p.y, prec)
 
+    @skipIf(GDAL_VERSION[0] > 2, 'This use of transform is intended for GDAL < 3')
     def test_transform_dim(self):
         "Testing coordinate dimension is the same on transformed geometries."
         ls_orig = OGRGeometry('LINESTRING(-104.609 38.255)', 4326)
@@ -471,6 +475,7 @@ class OGRGeomTest(SimpleTestCase, TestDataMixin):
         self.assertEqual(4326, g2.srs.srid)
         self.assertEqual(g1.srs.wkt, g2.srs.wkt)
 
+    @skipIf(GDAL_VERSION[0] > 2, 'This use of transform is intended for GDAL < 3')
     def test_ogrgeometry_transform_workaround(self):
         "Testing coordinate dimensions on geometries after transformation."
         # A bug in GDAL versions prior to 1.7 changes the coordinate

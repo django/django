@@ -1,7 +1,9 @@
 import re
+from unittest import skipIf
 
 from django.contrib.gis import forms
 from django.contrib.gis.forms import BaseGeometryWidget, OpenLayersWidget
+from django.contrib.gis.gdal import GDAL_VERSION
 from django.contrib.gis.geos import GEOSGeometry
 from django.forms import ValidationError
 from django.test import SimpleTestCase, override_settings
@@ -115,6 +117,7 @@ class GeometryFieldTest(SimpleTestCase):
         form = PointForm(data={'pt': 'POINT(5 23)'}, initial={'pt': point})
         self.assertFalse(form.has_changed())
 
+    @skipIf(GDAL_VERSION[0] > 2, 'This use of transform is intended for GDAL < 3')
     def test_field_string_value(self):
         """
         Initialization of a geometry field with a valid/empty/invalid string.
@@ -226,6 +229,7 @@ class SpecializedFieldTest(SimpleTestCase):
         self.assertIn('map_srid: 3857,', rendered)
         self.assertIn('gis/js/OLMapWidget.js', str(form_instance.media))
 
+    @skipIf(GDAL_VERSION[0] > 2, 'This use of transform is intended for GDAL < 3')
     def assertTextarea(self, geom, rendered):
         """Makes sure the wkt and a textarea are in the content"""
 

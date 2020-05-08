@@ -1,7 +1,9 @@
 import unittest
+from unittest import skipIf
 
 from django.contrib.gis.gdal import (
     CoordTransform, GDALException, SpatialReference, SRSException,
+    GDAL_VERSION
 )
 
 
@@ -164,6 +166,7 @@ class SpatialRefTest(unittest.TestCase):
             else:
                 self.fail('Should not have initialized on bad WKT "%s"!')
 
+    @skipIf(GDAL_VERSION[0] > 2, 'This use of transform is intended for GDAL < 3')
     def test03_get_wkt(self):
         "Testing getting the WKT."
         for s in srlist:
@@ -199,6 +202,7 @@ class SpatialRefTest(unittest.TestCase):
             self.assertEqual(s.projected, srs.projected)
             self.assertEqual(s.geographic, srs.geographic)
 
+    @skipIf(GDAL_VERSION[0] > 2, 'This use of transform is intended for GDAL < 3')
     def test08_angular_linear(self):
         "Testing the linear and angular units routines."
         for s in srlist:
@@ -217,6 +221,7 @@ class SpatialRefTest(unittest.TestCase):
                     self.assertEqual(tup[0], srs.auth_name(target))
                     self.assertEqual(tup[1], srs.auth_code(target))
 
+    @skipIf(GDAL_VERSION[0] > 2, 'This use of transform is intended for GDAL < 3')
     def test10_attributes(self):
         "Testing the attribute retrieval routines."
         for s in srlist:
@@ -258,6 +263,7 @@ class SpatialRefTest(unittest.TestCase):
         self.assertEqual(4326, int(s1['AUTHORITY', 1]))
         self.assertIsNone(s1['FOOBAR'])
 
+    @skipIf(GDAL_VERSION[0] > 2, 'This use of transform is intended for GDAL < 3')
     def test_unicode(self):
         wkt = (
             'PROJCS["DHDN / Soldner 39 Langschoß",'

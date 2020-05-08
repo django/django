@@ -443,7 +443,7 @@ class GEOSGeometryBase(GEOSBase):
         "Alias for `srs` property."
         return self.srs
 
-    def transform(self, ct, clone=False):
+    def transform(self, ct, clone=False, strategy=None):
         """
         Requires GDAL. Transform the geometry according to the given
         transformation object, which may be an integer SRID, and WKT or
@@ -451,6 +451,9 @@ class GEOSGeometryBase(GEOSBase):
         nothing. However if the `clone` keyword is set, don't modify the
         geometry and return a transformed clone instead.
         """
+        assert gdal.GDAL_VERSION[0] != 2 or strategy is None, (
+            'Strategy is only supported for gdal 3'
+        )
         srid = self.srid
 
         if ct == srid:
@@ -469,7 +472,7 @@ class GEOSGeometryBase(GEOSBase):
 
         # Creating an OGR Geometry, which is then transformed.
         g = gdal.OGRGeometry(self._ogr_ptr(), srid)
-        g.transform(ct)
+        g.transform(ct, strategy=strategy)
         # Getting a new GEOS pointer
         ptr = g._geos_ptr()
         if clone:

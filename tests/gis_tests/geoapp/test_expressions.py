@@ -1,6 +1,7 @@
-from unittest import skipUnless
+from unittest import skipUnless, skipIf
 
 from django.contrib.gis.db.models import F, GeometryField, Value, functions
+from django.contrib.gis.gdal import GDAL_VERSION
 from django.contrib.gis.geos import Point, Polygon
 from django.db import connection
 from django.db.models import Count, Min
@@ -19,6 +20,7 @@ class GeoExpressionsTests(TestCase):
         self.assertEqual(point, p)
 
     @skipUnlessDBFeature('supports_transform')
+    @skipIf(GDAL_VERSION[0] > 2, 'This use of transform is intended for GDAL < 3')
     def test_geometry_value_annotation_different_srid(self):
         p = Point(1, 1, srid=32140)
         point = City.objects.annotate(p=Value(p, GeometryField(srid=4326))).first().p
@@ -31,6 +33,7 @@ class GeoExpressionsTests(TestCase):
         area = City.objects.annotate(a=functions.Area(Value(p, GeometryField(srid=4326, geography=True)))).first().a
         self.assertAlmostEqual(area.sq_km, 12305.1, 0)
 
+    @skipIf(GDAL_VERSION[0] > 2, 'This use of transform is intended for GDAL < 3')
     def test_update_from_other_field(self):
         p1 = Point(1, 1, srid=4326)
         p2 = Point(2, 2, srid=4326)

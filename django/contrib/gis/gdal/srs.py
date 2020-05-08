@@ -160,6 +160,12 @@ class SpatialReference(GDALBase):
         "Morph this SpatialReference to ESRI's format."
         capi.morph_to_esri(self.ptr)
 
+    def get_axis_mapping_strategy(self):
+        return capi.get_axis_mapping_strategy(self.ptr)
+
+    def set_axis_mapping_strategy(self, strategy):
+        capi.set_axis_mapping_strategy(self.ptr, strategy)
+
     def validate(self):
         "Check to see if the given spatial reference is valid."
         capi.srs_validate(self.ptr)

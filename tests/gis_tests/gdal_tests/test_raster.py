@@ -2,6 +2,7 @@ import os
 import shutil
 import struct
 import tempfile
+from unittest import skipIf
 
 from django.contrib.gis.gdal import GDAL_VERSION, GDALRaster
 from django.contrib.gis.gdal.error import GDALException
@@ -122,6 +123,7 @@ class GDALRasterTests(SimpleTestCase):
         # Assert data is same as original input
         self.assertEqual(result, list(range(256)))
 
+    @skipIf(GDAL_VERSION[0] > 2, 'This use of transform is intended for GDAL < 3')
     def test_file_based_raster_creation(self):
         # Prepare tempfile
         rstfile = tempfile.NamedTemporaryFile(suffix='.tif')
@@ -311,8 +313,9 @@ class GDALRasterTests(SimpleTestCase):
         source.metadata = metadata
         self.assertNotIn('OWNER', source.metadata['DEFAULT'])
 
+    @skipIf(GDAL_VERSION[0] > 2, 'This use of transform is intended for GDAL < 3')
     def test_raster_info_accessor(self):
-        if GDAL_VERSION < (2, 1):
+        if GDAL_VERSION < (2, 1) or GDAL_VERSION > (3, 0):
             msg = 'GDAL ≥ 2.1 is required for using the info property.'
             with self.assertRaisesMessage(ValueError, msg):
                 self.rs.info
@@ -482,6 +485,7 @@ class GDALRasterTests(SimpleTestCase):
         # The result is an empty raster filled with the correct nodata value.
         self.assertEqual(result, [23] * 16)
 
+    @skipIf(GDAL_VERSION[0] > 2, 'This use of transform is intended for GDAL < 3')
     def test_raster_transform(self):
         # Prepare tempfile and nodata value
         rstfile = tempfile.NamedTemporaryFile(suffix='.tif')

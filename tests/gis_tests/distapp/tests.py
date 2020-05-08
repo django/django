@@ -1,8 +1,10 @@
 import unittest
+from unittest import skipIf
 
 from django.contrib.gis.db.models.functions import (
     Area, Distance, Length, Perimeter, Transform, Union,
 )
+from django.contrib.gis.gdal import GDAL_VERSION
 from django.contrib.gis.geos import GEOSGeometry, LineString, Point
 from django.contrib.gis.measure import D  # alias for Distance
 from django.db import NotSupportedError, connection
@@ -102,6 +104,7 @@ class DistanceTest(TestCase):
                     self.assertEqual(au_cities, self.get_names(qs.filter(point__dwithin=(self.au_pnt, dist))))
 
     @skipUnlessDBFeature("supports_distances_lookups")
+    @skipIf(GDAL_VERSION[0] > 2, 'This use of transform is intended for GDAL < 3')
     def test_distance_lookups(self):
         """
         Test the `distance_lt`, `distance_gt`, `distance_lte`, and `distance_gte` lookup types.
@@ -186,6 +189,7 @@ class DistanceTest(TestCase):
             self.assertEqual(cities, ['Adelaide', 'Hobart', 'Shellharbour', 'Thirroul'])
 
     @skipUnlessDBFeature("supports_distances_lookups")
+    @skipIf(GDAL_VERSION[0] > 2, 'This use of transform is intended for GDAL < 3')
     def test_distance_lookups_with_expression_rhs(self):
         stx_pnt = self.stx_pnt.transform(SouthTexasCity._meta.get_field('point').srid, clone=True)
         qs = SouthTexasCity.objects.filter(
@@ -443,6 +447,7 @@ class DistanceFunctionsTests(FuncTestMixin, TestCase):
 
     @no_oracle  # Oracle already handles geographic distance calculation.
     @skipUnlessDBFeature("has_Distance_function", 'has_Transform_function')
+    @skipIf(GDAL_VERSION[0] > 2, 'This use of transform is intended for GDAL < 3')
     def test_distance_transform(self):
         """
         Test the `Distance` function used with `Transform` on a geographic field.

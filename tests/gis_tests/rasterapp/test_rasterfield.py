@@ -1,9 +1,10 @@
 import json
+from unittest import skipIf
 
 from django.contrib.gis.db.models.fields import BaseSpatialField
 from django.contrib.gis.db.models.functions import Distance
 from django.contrib.gis.db.models.lookups import DistanceLookupBase, GISLookup
-from django.contrib.gis.gdal import GDALRaster
+from django.contrib.gis.gdal import GDALRaster, GDAL_VERSION
 from django.contrib.gis.geos import GEOSGeometry
 from django.contrib.gis.measure import D
 from django.contrib.gis.shortcuts import numpy
@@ -113,6 +114,7 @@ class RasterFieldTest(TransactionTestCase):
             'A Verbose Raster Name'
         )
 
+    @skipIf(GDAL_VERSION[0] > 2, 'This use of transform is intended for GDAL < 3')
     def test_all_gis_lookups_with_rasters(self):
         """
         Evaluate all possible lookups for all input combinations (i.e.
@@ -204,7 +206,8 @@ class RasterFieldTest(TransactionTestCase):
             qs = RasterModel.objects.filter(Q(**combos[0]) & Q(**combos[1]))
             self.assertIn(qs.count(), [0, 1])
 
-    def test_dwithin_gis_lookup_ouptut_with_rasters(self):
+    @skipIf(GDAL_VERSION[0] > 2, 'This use of transform is intended for GDAL < 3')
+    def test_dwithin_gis_lookup_output_with_rasters(self):
         """
         Check the logical functionality of the dwithin lookup for different
         input parameters.
