@@ -4,6 +4,7 @@ import operator
 import re
 from functools import partial, reduce, update_wrapper
 from urllib.parse import quote as urlquote
+from collections import defaultdict
 
 from django import forms
 from django.conf import settings
@@ -1505,15 +1506,26 @@ class ModelAdmin(BaseModelAdmin):
         Get the initial form data from the request's GET params.
         """
         initial = dict(request.GET.items())
+        formset_initial_data = defaultdict(lambda: defaultdict(defaultdict))
+        formset_query_regex=r'inlinemode_set-(\d+)-(\d+)-(.*)'
         for k in initial:
             try:
+                match_obj = re.match(formset_query_regex,k)
+                if match_obj:
+                    inline_model_index = int(match_obj.group(1))
+                    inline_model_form_index = int(match_obj.group(2))
+                    inline_model_form_fieldname = match_obj.group(3)
+                    formset_initial_data[inline_model_index][inline_model_form_index][inline_model_form_fieldname] = initial.get(k)
+
                 f = self.model._meta.get_field(k)
             except FieldDoesNotExist:
+                continue
+            except ValueError:
                 continue
             # We have to special-case M2Ms as a list of comma-separated PKs.
             if isinstance(f, models.ManyToManyField):
                 initial[k] = initial[k].split(",")
-        return initial
+        return initial,formset_initial_data
 
     def _get_obj_does_not_exist_redirect(self, request, opts, object_id):
         """
@@ -1590,9 +1602,14 @@ class ModelAdmin(BaseModelAdmin):
                 form_validated = False
         else:
             if add:
-                initial = self.get_changeform_initial_data(request)
+                initial,formset_initial_data = self.get_changeform_initial_data(request)
                 form = ModelForm(initial=initial)
                 formsets, inline_instances = self._create_formsets(request, form.instance, change=False)
+                formset_index=0
+                # setting the initial value of the formset
+                for a_formset in formsets:
+                    a_formset.initial=formset_initial_data[formset_index]
+                    formset_index=formset_index+1
             else:
                 form = ModelForm(instance=obj)
                 formsets, inline_instances = self._create_formsets(request, obj, change=True)
