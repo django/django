@@ -6,7 +6,6 @@ from django.contrib.contenttypes.models import ContentType
 from django.test import RequestFactory, TestCase, override_settings
 from django.urls import reverse
 
-
 from .admin import InnerInline, site as admin_site
 from .models import (
     Author, BinaryTree, Book, Chapter, Child, ChildModel1, ChildModel2,
@@ -1354,7 +1353,7 @@ class SeleniumTests(AdminSeleniumTestCase):
         Test to check whether the inline parameters are taken by the inline forms
         using the pattern inlinemode_set-[inline_model_index]-[inline_model_form_index]-fieldname for url arguments
         '''
-        self.admin_login(username = 'super', password = 'secret')
+        self.admin_login(username='super', password='secret')
         fields = ['name', 'select', 'text', 'dummy']
         values = [1, 1, 'textword1', 1]
         fieldtypes = ['string', 'select', 'string', 'string']
@@ -1362,13 +1361,17 @@ class SeleniumTests(AdminSeleniumTestCase):
         # inline models in the form
         inline_models = ['inner5stacked', 'inner5tabular']
         # indicies of the inline model form to target
-        inline_model_form_indicies = [0,1]
+        inline_model_form_indicies = [0, 1]
         count = 0
-        # creates the query string for the url. It targets both inline models and creates query for the form number 0 and 1 inside both inline model formset
+        '''
+        creates the query string for the url.
+        It targets both inline models and creates query for the form number 0 and 1 inside both inline model formset
+        '''
         for an_inline_model_indicies in range(len(inline_models)):
             for an_inline_model_form_indicies in inline_model_form_indicies:
-                for a_field,a_value in zip(fields,values):
-                    query += "inlinemode_set-"+str(an_inline_model_indicies) + "-" + str(an_inline_model_form_indicies) + "-" + a_field + "=" + str(a_value) + "&"
+                for a_field, a_value in zip(fields, values):
+                    query += "inlinemode_set-" + str(an_inline_model_indicies) + "-" + \
+                        str(an_inline_model_form_indicies) + "-" + a_field + "=" + str(a_value) + "&"
                     count = count + 1
         query = "?" + query[:-1]
         self.selenium.get(self.live_server_url + reverse('admin:admin_inlines_holder5_add') + query)
@@ -1378,24 +1381,28 @@ class SeleniumTests(AdminSeleniumTestCase):
 
         for an_inline_model_indicies in range(len(inline_models)):
             for an_inline_model_form_indicies in inline_model_form_indicies:
-                for a_field,a_value,a_type in zip(fields,values,fieldtypes):
+                for a_field, a_value, a_type in zip(fields, values, fieldtypes):
 
+                    css_selector = '#id_' + inline_models[an_inline_model_indicies] + "_set-" + \
+                        str(an_inline_model_form_indicies) + "-" + a_field
                     if(a_type == 'string'):
                         self.assertEqual(
-                            self.selenium.find_element_by_css_selector('#id_' + inline_models[an_inline_model_indicies] + "_set-" + str(an_inline_model_form_indicies) + "-" + a_field).get_attribute('value'), str(a_value)
+                            self.selenium.find_element_by_css_selector(css_selector).get_attribute('value'),
+                            str(a_value)
                         )
 
-                    if(a_type=='select'):
-                        self.assertSelectedOptions('#id_' + inline_models[an_inline_model_indicies] + "_set-" + str(an_inline_model_form_indicies) + "-" + a_field,[str(a_value)])
+                    if(a_type == 'select'):
+                        self.assertSelectedOptions(css_selector, [str(a_value)])
 
     def test_url_arguments_for_inline_extra(self):
         '''
         Test to check whether the inline parameters are taken by the inline forms.
-        Here I am giving the values for the 10th form in the field, which doesn't exists as by default only 3 forms for each inline models are shown
+        Here I am giving the values for the 10th form in the field, which doesn't exists
+        as by default only 3 forms for each inline models are shown
         so this test will fail
         using the pattern inlinemode_set-[inline_model_index]-[inline_model_form_index]-fieldname for url arguments
         '''
-        self.admin_login(username = 'super', password = 'secret')
+        self.admin_login(username='super', password='secret')
         fields = ['name', 'select', 'text', 'dummy']
         values = [1, 1, 'textword1', 1]
         fieldtypes = ['string', 'select', 'string', 'string']
@@ -1405,11 +1412,16 @@ class SeleniumTests(AdminSeleniumTestCase):
         # indicies of the inline model form to target
         inline_model_form_indicies = [10]
         count = 0
-        # creates the query string for the url. It targets both inline models and creates query for the form number 10 excluding previous form numbers inside both inline model formset
+        '''
+        creates the query string for the url.
+        It targets both inline models and creates query for the form number 10 excluding previous
+        form numbers inside both inline model formset
+        '''
         for an_inline_model_indicies in range(len(inline_models)):
             for an_inline_model_form_indicies in inline_model_form_indicies:
-                for a_field,a_value in zip(fields,values):
-                    query += "inlinemode_set-" + str(an_inline_model_indicies) + "-" + str(an_inline_model_form_indicies) + "-" + a_field + "=" + str(a_value) + "&"
+                for a_field, a_value in zip(fields, values):
+                    query += "inlinemode_set-" + str(an_inline_model_indicies) + "-" + \
+                        str(an_inline_model_form_indicies) + "-" + a_field + "=" + str(a_value) + "&"
                     count = count + 1
         query = "?" + query[:-1]
         self.selenium.get(self.live_server_url + reverse('admin:admin_inlines_holder5_add') + query)
@@ -1419,12 +1431,14 @@ class SeleniumTests(AdminSeleniumTestCase):
 
         for an_inline_model_indicies in range(len(inline_models)):
             for an_inline_model_form_indicies in inline_model_form_indicies:
-                for a_field,a_value,a_type in zip(fields,values,fieldtypes):
-
+                for a_field, a_value, a_type in zip(fields, values, fieldtypes):
+                    css_selector = '#id_' + inline_models[an_inline_model_indicies] + "_set-" + \
+                        str(an_inline_model_form_indicies) + "-" + a_field
                     if(a_type == 'string'):
                         self.assertEqual(
-                            self.selenium.find_element_by_css_selector('#id_' + inline_models[an_inline_model_indicies] + "_set-" + str(an_inline_model_form_indicies) + "-" + a_field).get_attribute('value'), str(a_value)
+                            self.selenium.find_element_by_css_selector(css_selector).get_attribute('value'),
+                            str(a_value)
                         )
 
                     if(a_type == 'select'):
-                        self.assertSelectedOptions('#id_' + inline_models[an_inline_model_indicies] + "_set-" + str(an_inline_model_form_indicies) + "-" + a_field,[str(a_value)])
+                        self.assertSelectedOptions(css_selector, [str(a_value)])

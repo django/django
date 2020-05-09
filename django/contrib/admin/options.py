@@ -2,9 +2,9 @@ import copy
 import json
 import operator
 import re
+from collections import defaultdict
 from functools import partial, reduce, update_wrapper
 from urllib.parse import quote as urlquote
-from collections import defaultdict
 
 from django import forms
 from django.conf import settings
@@ -1507,15 +1507,16 @@ class ModelAdmin(BaseModelAdmin):
         """
         initial = dict(request.GET.items())
         formset_initial_data = defaultdict(lambda: defaultdict(defaultdict))
-        formset_query_regex=r'inlinemode_set-(\d+)-(\d+)-(.*)'
+        formset_query_regex = r'inlinemode_set-(\d+)-(\d+)-(.*)'
         for k in initial:
             try:
-                match_obj = re.match(formset_query_regex,k)
+                match_obj = re.match(formset_query_regex, k)
                 if match_obj:
                     inline_model_index = int(match_obj.group(1))
                     inline_model_form_index = int(match_obj.group(2))
                     inline_model_form_fieldname = match_obj.group(3)
-                    formset_initial_data[inline_model_index][inline_model_form_index][inline_model_form_fieldname] = initial.get(k)
+                    formset_initial_data[inline_model_index][inline_model_form_index][inline_model_form_fieldname] \
+                        = initial.get(k)
 
                 f = self.model._meta.get_field(k)
             except FieldDoesNotExist:
