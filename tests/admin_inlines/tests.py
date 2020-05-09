@@ -1405,7 +1405,7 @@ class SeleniumTests(AdminSeleniumTestCase):
         # indicies of the inline model form to target
         inline_model_form_indicies=[10]
         count=0
-        # creates the query string for the url. It targets both inline models and creates query for the form number 10 inside both inline model formset
+        # creates the query string for the url. It targets both inline models and creates query for the form number 10 excluding previous form numbers inside both inline model formset
         for an_inline_model_indicies in range(len(inline_models)):
             for an_inline_model_form_indicies in inline_model_form_indicies:
                 for a_field,a_value in zip(fields,values):
