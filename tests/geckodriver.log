@@ -2101,3 +2101,14 @@ JavaScript error: resource://gre/modules/XULStore.jsm, line 66: Error: Can't fin
 1588985527690	Marionette	INFO	Listening on port 54875
 1588985527904	Marionette	WARN	TLS certificate errors will be ignored for this session
 1588985587685	Marionette	INFO	Stopped listening on port 54875
+1588987559771	mozrunner::runner	INFO	Running command: "C:\\Program Files\\Mozilla Firefox\\firefox.exe" "-marionette" "-headless" "-foreground" "-no-remote" "-profile" "C:\\Users\\gujja\\AppData\\Local\\Temp\\rust_mozprofilep3gmSn"
+*** You are running in headless mode.
+1588987560194	addons.webextension.doh-rollout@mozilla.org	WARN	Loading extension 'doh-rollout@mozilla.org': Reading manifest: Invalid extension permission: networkStatus
+1588987560683	addons.webextension.screenshots@mozilla.org	WARN	Loading extension 'screenshots@mozilla.org': Reading manifest: Invalid extension permission: mozillaAddons
+1588987560683	addons.webextension.screenshots@mozilla.org	WARN	Loading extension 'screenshots@mozilla.org': Reading manifest: Invalid extension permission: telemetry
+1588987560684	addons.webextension.screenshots@mozilla.org	WARN	Loading extension 'screenshots@mozilla.org': Reading manifest: Invalid extension permission: resource://pdf.js/
+1588987560684	addons.webextension.screenshots@mozilla.org	WARN	Loading extension 'screenshots@mozilla.org': Reading manifest: Invalid extension permission: about:reader*
+JavaScript error: resource://gre/modules/XULStore.jsm, line 66: Error: Can't find profile directory.
+1588987563740	Marionette	INFO	Listening on port 55524
+1588987563900	Marionette	WARN	TLS certificate errors will be ignored for this session
+1588987623312	Marionette	INFO	Stopped listening on port 55524

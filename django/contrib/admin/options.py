@@ -1602,14 +1602,12 @@ class ModelAdmin(BaseModelAdmin):
                 form_validated = False
         else:
             if add:
-                initial,formset_initial_data = self.get_changeform_initial_data(request)
+                initial, formset_initial_data = self.get_changeform_initial_data(request)
                 form = ModelForm(initial=initial)
                 formsets, inline_instances = self._create_formsets(request, form.instance, change=False)
-                formset_index=0
                 # setting the initial value of the formset
-                for a_formset in formsets:
-                    a_formset.initial=formset_initial_data[formset_index]
-                    formset_index=formset_index+1
+                for formset_index in range(len(formsets)):
+                    formsets[formset_index].initial = formset_initial_data[formset_index]
             else:
                 form = ModelForm(instance=obj)
                 formsets, inline_instances = self._create_formsets(request, obj, change=True)
