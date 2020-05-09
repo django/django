@@ -1526,7 +1526,7 @@ class ModelAdmin(BaseModelAdmin):
             # We have to special-case M2Ms as a list of comma-separated PKs.
             if isinstance(f, models.ManyToManyField):
                 initial[k] = initial[k].split(",")
-        return initial,formset_initial_data
+        return initial, formset_initial_data
 
     def _get_obj_does_not_exist_redirect(self, request, opts, object_id):
         """
