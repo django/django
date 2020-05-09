@@ -1352,6 +1352,7 @@ class SeleniumTests(AdminSeleniumTestCase):
     def test_url_arguments_for_inline_simple(self):
         '''
         Test to check whether the inline parameters are taken by the inline forms
+        using the pattern inlinemode_set-[inline_model_index]-[inline_model_form_index]-fieldname for url arguments
         '''
         self.admin_login(username = 'super', password = 'secret')
         fields = ['name', 'select', 'text', 'dummy']
@@ -1392,6 +1393,7 @@ class SeleniumTests(AdminSeleniumTestCase):
         Test to check whether the inline parameters are taken by the inline forms.
         Here I am giving the values for the 10th form in the field, which doesn't exists as by default only 3 forms for each inline models are shown
         so this test will fail
+        using the pattern inlinemode_set-[inline_model_index]-[inline_model_form_index]-fieldname for url arguments
         '''
         self.admin_login(username = 'super', password = 'secret')
         fields = ['name', 'select', 'text', 'dummy']
