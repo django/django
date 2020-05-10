@@ -57,7 +57,7 @@ identify_epsg = void_output(lgdal.OSRAutoIdentifyEPSG, [c_void_p])
 linear_units = units_func(lgdal.OSRGetLinearUnits)
 angular_units = units_func(lgdal.OSRGetAngularUnits)
 
-# For exporting to WKT, PROJ.4, "Pretty" WKT, and XML.
+# For exporting to WKT, PROJ, "Pretty" WKT, and XML.
 to_wkt = string_output(std_call('OSRExportToWkt'), [c_void_p, POINTER(c_char_p)], decoding='utf-8')
 to_proj = string_output(std_call('OSRExportToProj4'), [c_void_p, POINTER(c_char_p)], decoding='ascii')
 to_pretty_wkt = string_output(

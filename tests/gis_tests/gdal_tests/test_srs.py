@@ -181,7 +181,7 @@ class SpatialRefTest(SimpleTestCase):
             )
 
     def test04_proj(self):
-        "Test PROJ.4 import and export."
+        """PROJ import and export."""
         proj_parts = [
             '+proj=longlat', '+ellps=WGS84', '+towgs84=0,0,0,0,0,0,0', '+datum=WGS84', '+no_defs'
         ]

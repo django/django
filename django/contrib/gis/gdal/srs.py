@@ -53,7 +53,7 @@ class SpatialReference(GDALBase):
         """
         Create a GDAL OSR Spatial Reference object from the given input.
         The input may be string of OGC Well Known Text (WKT), an integer
-        EPSG code, a PROJ.4 string, and/or a projection "well known" shorthand
+        EPSG code, a PROJ string, and/or a projection "well known" shorthand
         string (one of 'WGS84', 'WGS72', 'NAD27', 'NAD83').
         """
         if not isinstance(axis_order, (type(None), AxisOrder)):
@@ -296,7 +296,7 @@ class SpatialReference(GDALBase):
         capi.from_epsg(self.ptr, epsg)
 
     def import_proj(self, proj):
-        "Import the Spatial Reference from a PROJ.4 string."
+        """Import the Spatial Reference from a PROJ string."""
         capi.from_proj(self.ptr, proj)
 
     def import_user_input(self, user_input):
@@ -324,7 +324,7 @@ class SpatialReference(GDALBase):
 
     @property
     def proj(self):
-        "Return the PROJ.4 representation for this Spatial Reference."
+        """Return the PROJ representation for this Spatial Reference."""
         return capi.to_proj(self.ptr, byref(c_char_p()))
 
     @property

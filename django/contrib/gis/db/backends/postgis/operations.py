@@ -314,7 +314,7 @@ class PostGISOperations(BaseSpatialOperations, DatabaseOperations):
         return self._get_postgis_func('postgis_lib_version')
 
     def postgis_proj_version(self):
-        "Return the version of the PROJ.4 library used with PostGIS."
+        """Return the version of the PROJ library used with PostGIS."""
         return self._get_postgis_func('postgis_proj_version')
 
     def postgis_version(self):
@@ -335,7 +335,7 @@ class PostGISOperations(BaseSpatialOperations, DatabaseOperations):
 
     def proj_version_tuple(self):
         """
-        Return the version of PROJ.4 used by PostGIS as a tuple of the
+        Return the version of PROJ used by PostGIS as a tuple of the
         major, minor, and subminor release numbers.
         """
         proj_regex = re.compile(r'(\d+)\.(\d+)\.(\d+)')
@@ -344,7 +344,7 @@ class PostGISOperations(BaseSpatialOperations, DatabaseOperations):
         if m:
             return tuple(map(int, m.groups()))
         else:
-            raise Exception('Could not determine PROJ.4 version from PostGIS.')
+            raise Exception('Could not determine PROJ version from PostGIS.')
 
     def spatial_aggregate_name(self, agg_name):
         if agg_name == 'Extent3D':

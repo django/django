@@ -372,7 +372,7 @@ system associated with it.  If it does, the ``srs`` attribute will return a
             SPHEROID["WGS_1984",6378137.0,298.257223563]],
         PRIMEM["Greenwich",0.0],
         UNIT["Degree",0.0174532925199433]]
-    >>> srs.proj4 # PROJ.4 representation
+    >>> srs.proj # PROJ representation
     '+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs '
 
 This shapefile is in the popular WGS84 spatial reference
@@ -751,7 +751,7 @@ This provides more context (including street and thoroughfare details) than
 available with the :class:`~django.contrib.gis.admin.GeoModelAdmin`
 (which uses the `Vector Map Level 0`_ WMS dataset hosted at `OSGeo`_).
 
-The PROJ.4 datum shifting files must be installed (see the :ref:`PROJ.4
+The PROJ datum shifting files must be installed (see the :ref:`PROJ
 installation instructions <proj4>` for more details).
 
 If you meet this requirement, then substitute the ``OSMGeoAdmin`` option class

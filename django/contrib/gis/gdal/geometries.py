@@ -383,7 +383,7 @@ class OGRGeometry(GDALBase):
         """
         Transform this geometry to a different spatial reference system.
         May take a CoordTransform object, a SpatialReference object, string
-        WKT or PROJ.4, and/or an integer SRID.  By default, return nothing
+        WKT or PROJ, and/or an integer SRID.  By default, return nothing
         and transform the geometry in-place. However, if the `clone` keyword is
         set, return a transformed clone of this geometry.
         """

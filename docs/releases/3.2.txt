@@ -227,7 +227,8 @@ backends.
 Miscellaneous
 -------------
 
-* ...
+* The undocumented ``SpatiaLiteOperations.proj4_version()`` method is renamed
+  to ``proj_version()``.
 
 .. _deprecated-features-3.2:
 

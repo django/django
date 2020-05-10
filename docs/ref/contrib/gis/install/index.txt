@@ -58,10 +58,10 @@ supported versions, and any notes for each of the supported database backends:
 ==================  ==============================  ==================  =========================================
 Database            Library Requirements            Supported Versions  Notes
 ==================  ==============================  ==================  =========================================
-PostgreSQL          GEOS, GDAL, PROJ.4, PostGIS     9.5+                Requires PostGIS.
+PostgreSQL          GEOS, GDAL, PROJ, PostGIS       9.5+                Requires PostGIS.
 MySQL               GEOS, GDAL                      5.6.1+              :ref:`Limited functionality <mysql-spatial-limitations>`.
 Oracle              GEOS, GDAL                      12.2+               XE not supported.
-SQLite              GEOS, GDAL, PROJ.4, SpatiaLite  3.8.3+              Requires SpatiaLite 4.3+
+SQLite              GEOS, GDAL, PROJ, SpatiaLite    3.8.3+              Requires SpatiaLite 4.3+
 ==================  ==============================  ==================  =========================================
 
 See also `this comparison matrix`__ on the OSGeo Wiki for
@@ -446,7 +446,7 @@ __ http://www.stickpeople.com/projects/python/win-psycopg/
 OSGeo4W
 ~~~~~~~
 
-The `OSGeo4W installer`_ helps to install the PROJ.4, GDAL, and GEOS libraries
+The `OSGeo4W installer`_ helps to install the PROJ, GDAL, and GEOS libraries
 required by GeoDjango. First, download the `OSGeo4W installer`_, and run it.
 Select :menuselection:`Express Web-GIS Install` and click next.  In the 'Select
 Packages' list, ensure that GDAL is selected; MapServer and Apache are also

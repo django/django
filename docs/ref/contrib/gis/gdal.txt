@@ -628,7 +628,7 @@ coordinate transformation::
     Transforms this geometry to a different spatial reference system. May take
     a :class:`CoordTransform` object, a :class:`SpatialReference` object, or
     any other input accepted by :class:`SpatialReference` (including spatial
-    reference WKT and PROJ.4 strings, or an integer SRID).
+    reference WKT and PROJ strings, or an integer SRID).
 
     By default nothing is returned and the geometry is transformed in-place.
     However, if the ``clone`` keyword is set to ``True`` then a transformed
@@ -881,7 +881,7 @@ Coordinate System Objects
 
     * OGC Well Known Text (WKT) (a string)
     * EPSG code (integer or string)
-    * PROJ.4 string
+    * PROJ string
     * A shorthand string for well-known standards (``'WGS84'``, ``'WGS72'``,
       ``'NAD27'``, ``'NAD83'``)
 
@@ -890,8 +890,8 @@ Coordinate System Objects
         >>> wgs84 = SpatialReference('WGS84') # shorthand string
         >>> wgs84 = SpatialReference(4326) # EPSG code
         >>> wgs84 = SpatialReference('EPSG:4326') # EPSG string
-        >>> proj4 = '+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs '
-        >>> wgs84 = SpatialReference(proj4) # PROJ.4 string
+        >>> proj = '+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs '
+        >>> wgs84 = SpatialReference(proj) # PROJ string
         >>> wgs84 = SpatialReference("""GEOGCS["WGS 84",
         DATUM["WGS_1984",
              SPHEROID["WGS 84",6378137,298.257223563,
@@ -967,7 +967,7 @@ Coordinate System Objects
 
     .. method:: import_proj(proj)
 
-    Import spatial reference from PROJ.4 string.
+    Import spatial reference from PROJ string.
 
     .. method:: import_user_input(user_input)
 
@@ -1050,7 +1050,7 @@ Coordinate System Objects
 
     .. attribute:: proj
 
-    Returns the PROJ.4 representation for this spatial reference.
+    Returns the PROJ representation for this spatial reference.
 
     .. attribute:: proj4
 

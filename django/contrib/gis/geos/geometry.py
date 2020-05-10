@@ -447,7 +447,7 @@ class GEOSGeometryBase(GEOSBase):
         """
         Requires GDAL. Transform the geometry according to the given
         transformation object, which may be an integer SRID, and WKT or
-        PROJ.4 string. By default, transform the geometry in-place and return
+        PROJ string. By default, transform the geometry in-place and return
         nothing. However if the `clone` keyword is set, don't modify the
         geometry and return a transformed clone instead.
         """

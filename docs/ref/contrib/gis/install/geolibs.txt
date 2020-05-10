@@ -9,7 +9,7 @@ geospatial libraries:
 Program                   Description                           Required                          Supported Versions
 ========================  ====================================  ================================  ===================================
 :doc:`GEOS <../geos>`     Geometry Engine Open Source           Yes                               3.8, 3.7, 3.6, 3.5
-`PROJ.4`_                 Cartographic Projections library      Yes (PostgreSQL and SQLite only)  6.3, 6.2, 6.1, 6.0, 5.x, 4.x
+`PROJ`_                   Cartographic Projections library      Yes (PostgreSQL and SQLite only)  6.x, 5.x, 4.x
 :doc:`GDAL <../gdal>`     Geospatial Data Abstraction Library   Yes                               3.1, 3.0, 2.4, 2.3, 2.2, 2.1, 2.0
 :doc:`GeoIP <../geoip2>`  IP-based geolocation library          No                                2
 `PostGIS`__               Spatial extensions for PostgreSQL     Yes (PostgreSQL only)             3.0, 2.5, 2.4, 2.3, 2.2
@@ -45,7 +45,7 @@ totally fine with GeoDjango. Your mileage may vary.
     independently of Django.  In other words, no database or settings file
     required -- import them as normal from :mod:`django.contrib.gis`.
 
-.. _PROJ.4: https://github.com/OSGeo/proj.4/wiki/
+.. _PROJ: https://proj.org/
 __ https://postgis.net/
 __ https://www.gaia-gis.it/gaia-sins/
 
@@ -146,13 +146,13 @@ See also :ref:`My logs are filled with GEOS-related errors <geos-exceptions-in-l
 
 .. _proj4:
 
-PROJ.4
-------
+PROJ
+----
 
-`PROJ.4`_ is a library for converting geospatial data to different coordinate
+`PROJ`_ is a library for converting geospatial data to different coordinate
 reference systems.
 
-First, download the PROJ.4 source code and datum shifting files [#]_::
+First, download the PROJ source code and datum shifting files [#]_::
 
     $ wget https://download.osgeo.org/proj/proj-X.Y.Z.tar.gz
     $ wget https://download.osgeo.org/proj/proj-datumgrid-X.Y.tar.gz
@@ -165,7 +165,7 @@ Next, untar the source code archive, and extract the datum shifting files in the
     $ tar xzf ../../proj-datumgrid-X.Y.tar.gz
     $ cd ..
 
-Finally, configure, make and install PROJ.4::
+Finally, configure, make and install PROJ::
 
     $ ./configure
     $ make
@@ -234,7 +234,7 @@ the GDAL library.  For example::
 .. rubric:: Footnotes
 .. [#] The datum shifting files are needed for converting data to and from
        certain projections.
-       For example, the PROJ.4 string for the `Google projection (900913 or 3857)
+       For example, the PROJ string for the `Google projection (900913 or 3857)
        <https://spatialreference.org/ref/sr-org/6864/prj/>`_ requires the
        ``null`` grid file only included in the extra datum shifting files.
        It is easier to install the shifting files now, then to have debug a
