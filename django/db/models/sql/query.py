@@ -189,6 +189,7 @@ class Query(BaseExpression):
         self.select_for_update_nowait = False
         self.select_for_update_skip_locked = False
         self.select_for_update_of = ()
+        self.select_for_no_key_update = False
 
         self.select_related = False
         # Arbitrary limit for select_related to prevents infinite recursion.

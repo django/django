@@ -640,6 +640,7 @@ Option          MariaDB   MySQL
 ``SKIP LOCKED``           X (≥8.0.1)
 ``NOWAIT``      X (≥10.3) X (≥8.0.1)
 ``OF``
+``NO KEY``
 =============== ========= ==========
 
 When using ``select_for_update()`` on MySQL, make sure you filter a queryset

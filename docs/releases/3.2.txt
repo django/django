@@ -169,7 +169,9 @@ Migrations
 Models
 ~~~~~~
 
-* ...
+* The new ``no_key`` parameter for :meth:`.QuerySet.select_for_update()`,
+  supported on PostgreSQL, allows acquiring weaker locks that don't block the
+  creation of rows that reference locked rows through a foreign key.
 
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~

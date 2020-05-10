@@ -1663,7 +1663,7 @@ For example::
 ``select_for_update()``
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-.. method:: select_for_update(nowait=False, skip_locked=False, of=())
+.. method:: select_for_update(nowait=False, skip_locked=False, of=(), no_key=False)
 
 Returns a queryset that will lock rows until the end of the transaction,
 generating a ``SELECT ... FOR UPDATE`` SQL statement on supported databases.
@@ -1708,6 +1708,12 @@ to refer to the queryset's model.
 
         Restaurant.objects.select_for_update(of=('self', 'place_ptr'))
 
+On PostgreSQL only, you can pass ``no_key=True`` in order to acquire a weaker
+lock, that still allows creating rows that merely reference locked rows
+(through a foreign key, for example) whilst the lock is in place. The
+PostgreSQL documentation has more details about `row-level lock modes
+<https://www.postgresql.org/docs/current/explicit-locking.html#LOCKING-ROWS>`_.
+
 You can't use ``select_for_update()`` on nullable relations::
 
     >>> Person.objects.select_related('hometown').select_for_update()
@@ -1725,8 +1731,9 @@ Currently, the ``postgresql``, ``oracle``, and ``mysql`` database
 backends support ``select_for_update()``. However, MariaDB 10.3+ supports only
 the ``nowait`` argument and MySQL 8.0.1+ supports the ``nowait`` and
 ``skip_locked`` arguments. MySQL and MariaDB don't support the ``of`` argument.
+The ``no_key`` argument is supported only on PostgreSQL.
 
-Passing ``nowait=True``, ``skip_locked=True``, or ``of`` to
+Passing ``nowait=True``, ``skip_locked=True``, ``no_key=True``, or ``of`` to
 ``select_for_update()`` using database backends that do not support these
 options, such as MySQL, raises a :exc:`~django.db.NotSupportedError`. This
 prevents code from unexpectedly blocking.
@@ -1757,6 +1764,10 @@ raised if ``select_for_update()`` is used in autocommit mode.
 
     PostgreSQL doesn't support ``select_for_update()`` with
     :class:`~django.db.models.expressions.Window` expressions.
+
+.. versionchanged:: 3.2
+
+    The ``no_key`` argument was added.
 
 ``raw()``
 ~~~~~~~~~
