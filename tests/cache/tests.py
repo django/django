@@ -10,6 +10,7 @@ import tempfile
 import threading
 import time
 import unittest
+import warnings
 from pathlib import Path
 from unittest import mock
 
@@ -19,6 +20,7 @@ from django.core.cache import (
     DEFAULT_CACHE_ALIAS, CacheKeyWarning, InvalidCacheKey, cache, caches,
 )
 from django.core.cache.backends.base import InvalidCacheBackendError
+from django.core.cache.backends.memcached import PyLibMCCache
 from django.core.cache.utils import make_template_fragment_key
 from django.db import close_old_connections, connection, connections
 from django.http import (
@@ -1364,7 +1366,7 @@ class BaseMemcachedTests(BaseCacheTests):
     base=MemcachedCache_params,
     exclude=memcached_excluded_caches,
 ))
-class MemcachedCacheTests(BaseMemcachedTests, TestCase):
+class MemcachedCacheIntegrationTests(BaseMemcachedTests, TestCase):
     base_params = MemcachedCache_params
     client_library_name = 'memcache'
 
@@ -1396,7 +1398,7 @@ class MemcachedCacheTests(BaseMemcachedTests, TestCase):
     base=PyLibMCCache_params,
     exclude=memcached_excluded_caches,
 ))
-class PyLibMCCacheTests(BaseMemcachedTests, TestCase):
+class PyLibMCCacheIntegrationTests(BaseMemcachedTests, TestCase):
     base_params = PyLibMCCache_params
     client_library_name = 'pylibmc'
     # libmemcached manages its own connections.
@@ -1413,6 +1415,624 @@ class PyLibMCCacheTests(BaseMemcachedTests, TestCase):
     def test_pylibmc_options(self):
         self.assertTrue(cache._cache.binary)
         self.assertEqual(cache._cache.behaviors['tcp_nodelay'], int(True))
+
+
+class PyLibMCCacheUnitTests(SimpleTestCase):
+    """
+    Unit tests for pylibmc cache backend
+    """
+    class FakePylibmcError(Exception):
+        pass
+
+    class FakePylibmcNotFound(Exception):
+        pass
+
+    def setUp(self):
+        self.fake_key1 = 'my-fake-key1'
+        self.fake_value1 = 6072
+
+        self.fake_key2 = 'my-fake-key2'
+        self.fake_value2 = 'my-fake-value2'
+
+        self.mock_pylibmc_client = mock.Mock()
+        self.mock_pylibmc_module = mock.Mock(
+            Client=mock.Mock(return_value=self.mock_pylibmc_client),
+            Error=self.FakePylibmcError,
+            NotFound=self.FakePylibmcNotFound,
+        )
+
+        self.mock_warnings = mock.create_autospec(spec=warnings)
+
+        self.cache_backend = PyLibMCCache(
+            server='',
+            params={},
+            pylibmc_module=self.mock_pylibmc_module,
+            warnings_module=self.mock_warnings,
+        )
+
+    def test_add_w_default_params(self):
+        """
+        Should successfully add a key with default parameters
+        """
+        self.mock_pylibmc_client.add.return_value = True
+
+        result = self.cache_backend.add(self.fake_key1, self.fake_value1)
+
+        self.assertIs(result, True)
+
+        self.mock_pylibmc_client.add.assert_called_once_with(
+            self._get_canonical_key(self.fake_key1),
+            self.fake_value1,
+            self.cache_backend.default_timeout,
+        )
+
+        self.mock_warnings.warn.assert_not_called()
+
+    def test_add_w_custom_params(self):
+        """
+        Should successfully add a key with custom parameters
+        """
+        self.mock_pylibmc_client.add.return_value = False
+        fake_timeout = 1111
+        fake_version = 22
+
+        result = self.cache_backend.add(
+            self.fake_key1,
+            self.fake_value1,
+            timeout=fake_timeout,
+            version=fake_version,
+        )
+
+        self.assertIs(result, False)
+
+        self.mock_pylibmc_client.add.assert_called_once_with(
+            self._get_canonical_key(self.fake_key1, version=fake_version),
+            self.fake_value1,
+            fake_timeout,
+        )
+
+        self.mock_warnings.warn.assert_not_called()
+
+    def test_add_error(self):
+        """
+        Should simply warn when a server error is encountered
+        """
+        fake_pylibmc_error = self.FakePylibmcError('my-fake-pylibmc-error')
+        self.mock_pylibmc_client.add.side_effect = fake_pylibmc_error
+
+        result = self.cache_backend.add(self.fake_key1, self.fake_value1)
+
+        self.assertIs(result, False)
+
+        self.mock_warnings.warn.assert_called_once_with(str(fake_pylibmc_error), RuntimeWarning)
+
+    def test_get_w_default_params(self):
+        """
+        Should successfully get a value with default parameters
+        """
+        self.mock_pylibmc_client.get.return_value = self.fake_value1
+
+        result = self.cache_backend.get(self.fake_key1)
+
+        self.assertEqual(result, self.fake_value1)
+
+        self.mock_pylibmc_client.get.assert_called_once_with(
+            self._get_canonical_key(self.fake_key1),
+            None,
+        )
+
+        self.mock_warnings.warn.assert_not_called()
+
+    def test_get_w_custom_params(self):
+        """
+        Should successfully get a value with custom parameters
+        """
+        fake_default = object()
+        fake_version = 321
+        self.mock_pylibmc_client.get.return_value = self.fake_value2
+
+        result = self.cache_backend.get(self.fake_key1, default=fake_default, version=fake_version)
+
+        self.assertEqual(result, self.fake_value2)
+
+        self.mock_pylibmc_client.get.assert_called_once_with(
+            self._get_canonical_key(self.fake_key1, version=fake_version),
+            fake_default,
+        )
+
+        self.mock_warnings.warn.assert_not_called()
+
+    def test_get_error(self):
+        """
+        Should simply warn when a server error is encountered
+        """
+        fake_default = object()
+
+        fake_pylibmc_error = self.FakePylibmcError('my-fake-pylibmc-error')
+        self.mock_pylibmc_client.get.side_effect = fake_pylibmc_error
+
+        result = self.cache_backend.get(self.fake_key1, default=fake_default)
+
+        self.assertEqual(result, fake_default)
+
+        self.mock_warnings.warn.assert_called_once_with(str(fake_pylibmc_error), RuntimeWarning)
+
+    def test_set_w_default_params(self):
+        """
+        Should successfully set a key with default parameters
+        """
+        self.cache_backend.set(self.fake_key1, self.fake_value1)
+
+        self.mock_pylibmc_client.set.assert_called_once_with(
+            self._get_canonical_key(self.fake_key1),
+            self.fake_value1,
+            self.cache_backend.default_timeout,
+        )
+
+        self.mock_warnings.warn.assert_not_called()
+
+    def test_set_w_custom_params(self):
+        """
+        Should successfully set a key with custom parameters
+        """
+        fake_timeout = 1337
+        fake_version = 18
+
+        self.cache_backend.set(
+            self.fake_key2,
+            self.fake_value2,
+            timeout=fake_timeout,
+            version=fake_version,
+        )
+
+        self.mock_pylibmc_client.set.assert_called_once_with(
+            self._get_canonical_key(self.fake_key2, version=fake_version),
+            self.fake_value2,
+            fake_timeout,
+        )
+
+        self.mock_warnings.warn.assert_not_called()
+
+    def test_set_error(self):
+        """
+        Should simply warn when a server error is encountered
+        """
+        fake_pylibmc_error = self.FakePylibmcError('my-fake-pylibmc-error')
+        self.mock_pylibmc_client.set.side_effect = fake_pylibmc_error
+
+        self.cache_backend.set(self.fake_key1, self.fake_value1)
+
+        self.mock_warnings.warn.assert_called_once_with(str(fake_pylibmc_error), RuntimeWarning)
+
+    def test_delete_w_default_params(self):
+        """
+        Should successfully delete a key with default parameters
+        """
+        self.mock_pylibmc_client.delete.return_value = True
+
+        result = self.cache_backend.delete(self.fake_key2)
+
+        self.assertIs(result, True)
+
+        self.mock_pylibmc_client.delete.assert_called_once_with(
+            self._get_canonical_key(self.fake_key2),
+        )
+
+        self.mock_warnings.warn.assert_not_called()
+
+    def test_delete_w_custom_params(self):
+        """
+        Should successfully delete a key with custom parameters
+        """
+        fake_version = 321
+        self.mock_pylibmc_client.delete.return_value = False
+
+        result = self.cache_backend.delete(self.fake_key1, version=fake_version)
+
+        self.assertIs(result, False)
+
+        self.mock_pylibmc_client.delete.assert_called_once_with(
+            self._get_canonical_key(self.fake_key1, version=fake_version)
+        )
+
+        self.mock_warnings.warn.assert_not_called()
+
+    def test_delete_error(self):
+        """
+        Should simply warn when a server error is encountered
+        """
+        fake_pylibmc_error = self.FakePylibmcError('my-fake-pylibmc-error')
+        self.mock_pylibmc_client.delete.side_effect = fake_pylibmc_error
+
+        result = self.cache_backend.delete(self.fake_key1)
+
+        self.assertIs(result, False)
+
+        self.mock_warnings.warn.assert_called_once_with(str(fake_pylibmc_error), RuntimeWarning)
+
+    def test_incr_w_default_params(self):
+        """
+        Should successfully increment a key with default parameters
+        """
+        self.mock_pylibmc_client.incr.return_value = self.fake_value1
+
+        result = self.cache_backend.incr(self.fake_key1)
+
+        self.assertEqual(result, self.fake_value1)
+
+        self.mock_pylibmc_client.incr.assert_called_once_with(
+            self._get_canonical_key(self.fake_key1),
+            1,
+        )
+
+        self.mock_warnings.warn.assert_not_called()
+
+    def test_incr_w_custom_params(self):
+        """
+        Should successfully increment a key with custom parameters
+        """
+        self.mock_pylibmc_client.incr.return_value = self.fake_value2
+        fake_delta = 21
+        fake_version = 42
+
+        result = self.cache_backend.incr(self.fake_key2, delta=fake_delta, version=fake_version)
+
+        self.assertEqual(result, self.fake_value2)
+
+        self.mock_pylibmc_client.incr.assert_called_once_with(
+            self._get_canonical_key(self.fake_key2, version=fake_version),
+            fake_delta,
+        )
+
+        self.mock_warnings.warn.assert_not_called()
+
+    def test_incr_pylibmc_error(self):
+        """
+        Should raise a ValueError when a pylibmc error is encountered
+        """
+        expected_canonical_key = self._get_canonical_key(self.fake_key1)
+
+        fake_pylibmc_error = self.FakePylibmcError("my-fake-pylibmc-error")
+        self.mock_pylibmc_client.incr.side_effect = fake_pylibmc_error
+
+        with self.assertRaisesMessage(ValueError, f"Key '{expected_canonical_key}' not found"):
+            self.cache_backend.incr(self.fake_key1)
+
+        self.mock_warnings.warn.assert_called_once_with(str(fake_pylibmc_error), RuntimeWarning)
+
+    def test_incr_not_found(self):
+        """
+        Should raise a ValueError when the key does not exist
+        """
+        expected_canonical_key = self._get_canonical_key(self.fake_key2)
+
+        self.mock_pylibmc_client.incr.side_effect = self.FakePylibmcNotFound("my-fake-not-found")
+
+        with self.assertRaisesMessage(ValueError, f"Key '{expected_canonical_key}' not found"):
+            self.cache_backend.incr(self.fake_key2)
+
+        self.mock_warnings.warn.assert_not_called()
+
+    def test_decr_w_default_params(self):
+        """
+        Should successfully decrement a key with default parameters
+        """
+        self.mock_pylibmc_client.decr.return_value = self.fake_value2
+
+        result = self.cache_backend.decr(self.fake_key2)
+
+        self.assertEqual(result, self.fake_value2)
+
+        self.mock_pylibmc_client.decr.assert_called_once_with(
+            self._get_canonical_key(self.fake_key2),
+            1,
+        )
+
+        self.mock_warnings.warn.assert_not_called()
+
+    def test_decr_w_custom_params(self):
+        """
+        Should successfully decrement a key with custom parameters
+        """
+        self.mock_pylibmc_client.decr.return_value = self.fake_value1
+        fake_delta = 1001
+        fake_version = 15
+
+        result = self.cache_backend.decr(self.fake_key1, delta=fake_delta, version=fake_version)
+
+        self.assertEqual(result, self.fake_value1)
+
+        self.mock_pylibmc_client.decr.assert_called_once_with(
+            self._get_canonical_key(self.fake_key1, version=fake_version),
+            fake_delta,
+        )
+
+        self.mock_warnings.warn.assert_not_called()
+
+    def test_decr_pylibmc_error(self):
+        """
+        Should raise a ValueError when a pylibmc error is encountered
+        """
+        expected_canonical_key = self._get_canonical_key(self.fake_key2)
+
+        fake_pylibmc_error = self.FakePylibmcError("my-fake-pylibmc-error")
+        self.mock_pylibmc_client.decr.side_effect = fake_pylibmc_error
+
+        with self.assertRaisesMessage(ValueError, f"Key '{expected_canonical_key}' not found"):
+            self.cache_backend.decr(self.fake_key2)
+
+        self.mock_warnings.warn.assert_called_once_with(str(fake_pylibmc_error), RuntimeWarning)
+
+    def test_decr_not_found(self):
+        """
+        Should raise a ValueError when the key does not exist
+        """
+        expected_canonical_key = self._get_canonical_key(self.fake_key1)
+
+        self.mock_pylibmc_client.decr.side_effect = self.FakePylibmcNotFound("my-fake-not-found")
+
+        with self.assertRaisesMessage(ValueError, f"Key '{expected_canonical_key}' not found"):
+            self.cache_backend.decr(self.fake_key1)
+
+        self.mock_warnings.warn.assert_not_called()
+
+    def test_get_many_w_default_params(self):
+        """
+        Should successfully get multiple keys with default parameters
+        """
+        expected_value_map = {
+            self._get_canonical_key(self.fake_key1): self.fake_value1,
+            self._get_canonical_key(self.fake_key2): self.fake_value2,
+        }
+        self.mock_pylibmc_client.get_multi.return_value = expected_value_map
+
+        result = self.cache_backend.get_many([self.fake_key1, self.fake_key2])
+
+        self.assertEqual(
+            result,
+            {self.fake_key1: self.fake_value1, self.fake_key2: self.fake_value2},
+        )
+
+        self.mock_pylibmc_client.get_multi.assert_called_once_with(expected_value_map.keys())
+
+        self.mock_warnings.warn.assert_not_called()
+
+    def test_get_many_w_custom_params(self):
+        """
+        Should successfully get multiple keys with custom parameters
+        """
+        fake_version = 404
+        expected_value_map = {
+            self._get_canonical_key(self.fake_key1, version=fake_version): self.fake_value1,
+            self._get_canonical_key(self.fake_key2, version=fake_version): self.fake_value2,
+        }
+        self.mock_pylibmc_client.get_multi.return_value = expected_value_map
+
+        result = self.cache_backend.get_many([self.fake_key2, self.fake_key1], version=fake_version)
+
+        self.assertEqual(
+            result,
+            {self.fake_key1: self.fake_value1, self.fake_key2: self.fake_value2},
+        )
+
+        self.mock_pylibmc_client.get_multi.assert_called_once_with(expected_value_map.keys())
+
+        self.mock_warnings.warn.assert_not_called()
+
+    def test_get_many_error(self):
+        """
+        Should simply warn when a server error is encountered
+        """
+        fake_pylibmc_error = self.FakePylibmcError('my-fake-pylibmc-error')
+        self.mock_pylibmc_client.get_multi.side_effect = fake_pylibmc_error
+
+        result = self.cache_backend.get_many([self.fake_key1, self.fake_key2])
+
+        self.assertEqual(result, {})
+
+        self.mock_warnings.warn.assert_called_once_with(str(fake_pylibmc_error), RuntimeWarning)
+
+    def test_set_many_w_default_params(self):
+        """
+        Should successfully set multiple keys with default parameters
+        """
+        expected_value_map = {
+            self._get_canonical_key(self.fake_key1): self.fake_value1,
+            self._get_canonical_key(self.fake_key2): self.fake_value2,
+        }
+        self.mock_pylibmc_client.set_multi.return_value = []
+
+        results = self.cache_backend.set_many(
+            {self.fake_key2: self.fake_value2, self.fake_key1: self.fake_value1},
+        )
+
+        self.assertEqual(results, [])
+
+        self.mock_pylibmc_client.set_multi.assert_called_once_with(
+            expected_value_map,
+            self.cache_backend.default_timeout,
+        )
+
+        self.mock_warnings.warn.assert_not_called()
+
+    def test_set_many_w_custom_params(self):
+        """
+        Should successfully set multiple keys with custom parameters
+        """
+        fake_timeout = 10101
+        fake_version = 500
+        expected_value_map = {
+            self._get_canonical_key(self.fake_key1, version=fake_version): self.fake_value1,
+            self._get_canonical_key(self.fake_key2, version=fake_version): self.fake_value2,
+        }
+
+        # Simulate that one of the keys couldn't be set by returning it
+        self.mock_pylibmc_client.set_multi.return_value = [
+            self._get_canonical_key(self.fake_key1, version=fake_version)
+        ]
+
+        results = self.cache_backend.set_many(
+            {self.fake_key1: self.fake_value1, self.fake_key2: self.fake_value2},
+            timeout=fake_timeout,
+            version=fake_version,
+        )
+
+        self.assertEqual(results, [self.fake_key1])
+
+        self.mock_pylibmc_client.set_multi.assert_called_once_with(expected_value_map, fake_timeout)
+
+        self.mock_warnings.warn.assert_not_called()
+
+    def test_set_many_error(self):
+        """
+        Should simply warn when a server error is encountered
+        """
+        fake_pylibmc_error = self.FakePylibmcError('my-fake-pylibmc-error')
+        self.mock_pylibmc_client.set_multi.side_effect = fake_pylibmc_error
+
+        results = self.cache_backend.set_many(
+            {self.fake_key2: self.fake_value2, self.fake_key1: self.fake_value1}
+        )
+
+        self.assertEqual(results, [self.fake_key2, self.fake_key1])
+
+        self.mock_warnings.warn.assert_called_once_with(str(fake_pylibmc_error), RuntimeWarning)
+
+    def test_del_many_w_default_params(self):
+        """
+        Should successfully delete multiple keys with default parameters
+        """
+        keys = [self.fake_key2, self.fake_key1]
+
+        self.cache_backend.delete_many(keys)
+
+        # The BaseMemcachedCache implementation passes a generator to
+        # `delete_multi`, so we have to get a bit tricky to verify its contents
+        self.assertEqual(self.mock_pylibmc_client.delete_multi.call_count, 1)
+        call_args = self.mock_pylibmc_client.delete_multi.call_args_list[0][0]
+        self.assertEqual(len(call_args), 1)
+        self.assertEqual(
+            list(call_args[0]),
+            [self._get_canonical_key(key) for key in keys],
+        )
+
+        self.mock_warnings.warn.assert_not_called()
+
+    def test_del_many_w_custom_params(self):
+        """
+        Should successfully delete multiple keys with custom parameters
+        """
+        fake_version = 321
+        keys = [self.fake_key1, self.fake_key2]
+
+        self.cache_backend.delete_many(keys, version=fake_version)
+
+        # The BaseMemcachedCache implementation passes a generator to
+        # `delete_multi`, so we have to get a bit tricky to verify its contents
+        self.assertEqual(self.mock_pylibmc_client.delete_multi.call_count, 1)
+        call_args = self.mock_pylibmc_client.delete_multi.call_args_list[0][0]
+        self.assertEqual(len(call_args), 1)
+        self.assertEqual(
+            list(call_args[0]),
+            [self._get_canonical_key(key, version=fake_version) for key in keys],
+        )
+
+        self.mock_warnings.warn.assert_not_called()
+
+    def test_delete_many_error(self):
+        """
+        Should simply warn when a server error is encountered
+        """
+        fake_pylibmc_error = self.FakePylibmcError('my-fake-pylibmc-error')
+        self.mock_pylibmc_client.delete_multi.side_effect = fake_pylibmc_error
+
+        self.cache_backend.delete_many([self.fake_key1, self.fake_key2])
+
+        self.mock_warnings.warn.assert_called_once_with(str(fake_pylibmc_error), RuntimeWarning)
+
+    def test_clear_success(self):
+        """
+        Should successfully clear the cache
+        """
+        self.cache_backend.clear()
+
+        self.mock_pylibmc_client.flush_all.assert_called_once_with()
+
+        self.mock_warnings.warn.assert_not_called()
+
+    def test_clear_error(self):
+        """
+        Should simply warn when a server error is encountered
+        """
+        fake_pylibmc_error = self.FakePylibmcError('my-fake-pylibmc-error')
+        self.mock_pylibmc_client.flush_all.side_effect = fake_pylibmc_error
+
+        self.cache_backend.clear()
+
+        self.mock_warnings.warn.assert_called_once_with(str(fake_pylibmc_error), RuntimeWarning)
+
+    def test_touch_w_default_params(self):
+        """
+        Should successfully touch a key with default parameters
+        """
+        self.mock_pylibmc_client.touch.return_value = True
+
+        result = self.cache_backend.touch(self.fake_key1)
+
+        self.assertIs(result, True)
+
+        # Since the timeout is not zero, it should have called touch and not
+        # delete
+        self.mock_pylibmc_client.touch.assert_called_once_with(
+            self._get_canonical_key(self.fake_key1),
+            self.cache_backend.default_timeout,
+        )
+        self.mock_pylibmc_client.delete.assert_not_called()
+
+        self.mock_warnings.warn.assert_not_called()
+
+    def test_touch_w_custom_params(self):
+        """
+        Should successfully touch a key with custom parameters
+        """
+        self.mock_pylibmc_client.delete.return_value = False
+        fake_timeout = 0
+        fake_version = 501
+
+        result = self.cache_backend.touch(
+            self.fake_key2, timeout=fake_timeout, version=fake_version
+        )
+
+        self.assertIs(result, False)
+
+        # The timeout is zero, which is a special case that causes the key to
+        # be deleted rather than touched
+        self.mock_pylibmc_client.touch.assert_not_called()
+        self.mock_pylibmc_client.delete.assert_called_once_with(
+            self._get_canonical_key(self.fake_key2, version=fake_version)
+        )
+
+        self.mock_warnings.warn.assert_not_called()
+
+    def test_touch_error(self):
+        """
+        Should simply warn when a server error is encountered
+        """
+        fake_pylibmc_error = self.FakePylibmcError('my-fake-pylibmc-error')
+        self.mock_pylibmc_client.touch.side_effect = fake_pylibmc_error
+
+        result = self.cache_backend.touch(self.fake_key1)
+
+        self.assertIs(result, False)
+
+        self.mock_warnings.warn.assert_called_once_with(str(fake_pylibmc_error), RuntimeWarning)
+
+    @classmethod
+    def _get_canonical_key(cls, base_key, version=1):
+        """
+        Return the canonical memcached key
+        """
+        return f':{version}:{base_key}'
 
 
 @override_settings(CACHES=caches_setting_for_tests(

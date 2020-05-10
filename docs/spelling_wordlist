@@ -503,6 +503,7 @@ Punycode
 Puthraya
 py
 pyformat
+pylibmc
 pysqlite
 pythonic
 pytz

@@ -680,6 +680,11 @@ Miscellaneous
 
 * The :ttag:`{% localize off %} <localize>` tag and :tfilter:`unlocalize`
   filter no longer respect :setting:`DECIMAL_SEPARATOR` setting.
+* The ``PyLibMCCache`` cache backend catches and generates warnings for
+  exceptions raised by pylibmc. Now that they are handled, such exceptions are
+  no longer propagated to callers of the Django cache framework in order to
+  provide consistent behavior with the ``MemcachedCache`` (python-memcached)
+  cache backend.
 
 .. _deprecated-features-3.1:
 

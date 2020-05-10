@@ -3,6 +3,7 @@
 import pickle
 import re
 import time
+import warnings
 
 from django.core.cache.backends.base import (
     DEFAULT_TIMEOUT, BaseCache, InvalidCacheKey, memcache_key_warnings,
@@ -194,20 +195,122 @@ class MemcachedCache(BaseMemcachedCache):
 
 
 class PyLibMCCache(BaseMemcachedCache):
-    "An implementation of a cache binding using pylibmc"
-    def __init__(self, server, params):
-        import pylibmc
+    """
+    An implementation of a cache binding using pylibmc
+
+    Catches and logs errors that are raised by pylibmc (i.e. subclasses of
+    pylibmc.Error) to approximate the behaviour of the python-memcached cache
+    binding (see https://code.djangoproject.com/ticket/28342).
+    """
+    def __init__(
+        self,
+        server,
+        params,
+        pylibmc_module=None,
+        warnings_module=warnings,
+    ):
+        if pylibmc_module is None:
+            import pylibmc
+        else:
+            pylibmc = pylibmc_module
+
         super().__init__(server, params, library=pylibmc, value_not_found_exception=pylibmc.NotFound)
+
+        self._warnings = warnings_module
 
     @cached_property
     def _cache(self):
         return self._lib.Client(self._servers, **self._options)
 
+    def add(self, key, value, timeout=DEFAULT_TIMEOUT, version=None):
+        try:
+            return super().add(key, value, timeout=timeout, version=version)
+        except self._lib.Error as err:
+            self._warnings.warn(str(err), RuntimeWarning)
+
+            return False
+
+    def get(self, key, default=None, version=None):
+        try:
+            return super().get(key, default=default, version=version)
+        except self._lib.Error as err:
+            self._warnings.warn(str(err), RuntimeWarning)
+
+            return default
+
+    def set(self, key, value, timeout=DEFAULT_TIMEOUT, version=None):
+        try:
+            super().set(key, value, timeout=timeout, version=version)
+        except self._lib.Error as err:
+            self._warnings.warn(str(err), RuntimeWarning)
+
+    def delete(self, key, version=None):
+        try:
+            return super().delete(key, version=version)
+        except self._lib.Error as err:
+            self._warnings.warn(str(err), RuntimeWarning)
+
+            return False
+
+    def incr(self, key, delta=1, version=None):
+        try:
+            return super().incr(key, delta=delta, version=version)
+        except self._lib.Error as err:
+            self._warnings.warn(str(err), RuntimeWarning)
+
+            canonical_key = self.make_key(key, version)
+
+            raise ValueError(f"Key '{canonical_key}' not found")
+
+    def decr(self, key, delta=1, version=None):
+        try:
+            return super().decr(key, delta=delta, version=version)
+        except self._lib.Error as err:
+            self._warnings.warn(str(err), RuntimeWarning)
+
+            canonical_key = self.make_key(key, version)
+
+            raise ValueError(f"Key '{canonical_key}' not found")
+
+    def get_many(self, keys, version=None):
+        try:
+            return super().get_many(keys, version=version)
+        except self._lib.Error as err:
+            self._warnings.warn(str(err), RuntimeWarning)
+
+            return {}
+
+    def set_many(self, data, timeout=DEFAULT_TIMEOUT, version=None):
+        try:
+            return super().set_many(data, timeout=timeout, version=version)
+        except self._lib.Error as err:
+            self._warnings.warn(str(err), RuntimeWarning)
+
+            return list(data.keys())
+
+    def delete_many(self, keys, version=None):
+        try:
+            super().delete_many(keys, version=version)
+        except self._lib.Error as err:
+            self._warnings.warn(str(err), RuntimeWarning)
+
+    def clear(self):
+        try:
+            super().clear()
+        except self._lib.Error as err:
+            self._warnings.warn(str(err), RuntimeWarning)
+
     def touch(self, key, timeout=DEFAULT_TIMEOUT, version=None):
         key = self.make_key(key, version=version)
-        if timeout == 0:
-            return self._cache.delete(key)
-        return self._cache.touch(key, self.get_backend_timeout(timeout))
+        try:
+            if timeout == 0:
+                return self._cache.delete(key)
+            else:
+                return self._cache.touch(key, self.get_backend_timeout(timeout))
+        except self._lib.Error as err:
+            self._warnings.warn(str(err), RuntimeWarning)
+
+            return False
 
     def close(self, **kwargs):
         # libmemcached manages its own connections. Don't call disconnect_all()
