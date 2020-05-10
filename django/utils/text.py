@@ -175,14 +175,14 @@ class Truncator(SimpleLazyObject):
                 # Checked through whole string
                 break
             pos = m.end(0)
-            if m.group(1):
+            if m[1]:
                 # It's an actual non-HTML word or char
                 current_len += 1
                 if current_len == truncate_len:
                     end_text_pos = pos
                 continue
             # Check for tag
-            tag = re_tag.match(m.group(0))
+            tag = re_tag.match(m[0])
             if not tag or current_len >= truncate_len:
                 # Don't worry about non tags or tags after our truncate point
                 continue
@@ -334,11 +334,11 @@ def smart_split(text):
     ['A', '"\\"funky\\" style"', 'test.']
     """
     for bit in smart_split_re.finditer(str(text)):
-        yield bit.group(0)
+        yield bit[0]
 
 
 def _replace_entity(match):
-    text = match.group(1)
+    text = match[1]
     if text[0] == '#':
         text = text[1:]
         try:
@@ -348,12 +348,12 @@ def _replace_entity(match):
                 c = int(text)
             return chr(c)
         except ValueError:
-            return match.group(0)
+            return match[0]
     else:
         try:
             return chr(html.entities.name2codepoint[text])
         except KeyError:
-            return match.group(0)
+            return match[0]
 
 
 _entity_re = _lazy_re_compile(r"&(#?[xX]?(?:[0-9a-fA-F]+|\w{1,8}));")

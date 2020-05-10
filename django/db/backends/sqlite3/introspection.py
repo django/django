@@ -17,7 +17,7 @@ field_size_re = _lazy_re_compile(r'^\s*(?:var)?char\s*\(\s*(\d+)\s*\)\s*$')
 def get_field_size(name):
     """ Extract the size number from a "varchar(11)" type name """
     m = field_size_re.search(name)
-    return int(m.group(1)) if m else None
+    return int(m[1]) if m else None
 
 
 # This light wrapper "fakes" a dictionary interface, because some SQLite data
@@ -147,7 +147,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
             if field_desc.startswith("FOREIGN KEY"):
                 # Find name of the target FK field
                 m = re.match(r'FOREIGN KEY\s*\(([^\)]*)\).*', field_desc, re.I)
-                field_name = m.groups()[0].strip('"')
+                field_name = m[1].strip('"')
             else:
                 field_name = field_desc.split()[0].strip('"')
 
@@ -218,7 +218,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
             field_desc = field_desc.strip()
             m = re.match(r'(?:(?:["`\[])(.*)(?:["`\]])|(\w+)).*PRIMARY KEY.*', field_desc)
             if m:
-                return m.group(1) if m.group(1) else m.group(2)
+                return m[1] if m[1] else m[2]
         return None
 
     def _get_foreign_key_constraints(self, cursor, table_name):

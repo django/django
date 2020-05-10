@@ -52,7 +52,7 @@ class InspectDBTestCase(TestCase):
         output = out.getvalue()
 
         def assertFieldType(name, definition):
-            out_def = re.search(r'^\s*%s = (models.*)$' % name, output, re.MULTILINE).groups()[0]
+            out_def = re.search(r'^\s*%s = (models.*)$' % name, output, re.MULTILINE)[1]
             self.assertEqual(definition, out_def)
 
         return assertFieldType

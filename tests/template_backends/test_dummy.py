@@ -84,7 +84,7 @@ class TemplateStringsTests(SimpleTestCase):
         expected = '<input type="hidden" name="csrfmiddlewaretoken" value="([^"]+)">'
         match = re.match(expected, content) or re.match(expected.replace('"', "'"), content)
         self.assertTrue(match, "hidden csrftoken field not found in output")
-        self.assertTrue(equivalent_tokens(match.group(1), get_token(request)))
+        self.assertTrue(equivalent_tokens(match[1], get_token(request)))
 
     def test_no_directory_traversal(self):
         with self.assertRaises(TemplateDoesNotExist):

@@ -201,7 +201,7 @@ class PasswordResetTest(AuthViewsTestCase):
     def _read_signup_email(self, email):
         urlmatch = re.search(r"https?://[^/]*(/.*reset/\S*)", email.body)
         self.assertIsNotNone(urlmatch, "No URL found in sent email")
-        return urlmatch.group(), urlmatch.groups()[0]
+        return urlmatch[0], urlmatch[1]
 
     def test_confirm_valid(self):
         url, path = self._test_confirm_start()
@@ -414,7 +414,7 @@ class CustomUserPasswordResetTest(AuthViewsTestCase):
     def _read_signup_email(self, email):
         urlmatch = re.search(r"https?://[^/]*(/.*reset/\S*)", email.body)
         self.assertIsNotNone(urlmatch, "No URL found in sent email")
-        return urlmatch.group(), urlmatch.groups()[0]
+        return urlmatch[0], urlmatch[1]
 
     def test_confirm_valid_custom_user(self):
         url, path = self._test_confirm_start()
@@ -1215,7 +1215,7 @@ class ChangelistTests(AuthViewsTestCase):
         rel_link = re.search(
             r'you can change the password using <a href="([^"]*)">this form</a>',
             response.content.decode()
-        ).groups()[0]
+        )[1]
         self.assertEqual(
             os.path.normpath(user_change_url + rel_link),
             os.path.normpath(password_change_url)

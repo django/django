@@ -220,13 +220,13 @@ def _route_to_regex(route, is_endpoint=False):
             break
         parts.append(re.escape(route[:match.start()]))
         route = route[match.end():]
-        parameter = match.group('parameter')
+        parameter = match['parameter']
         if not parameter.isidentifier():
             raise ImproperlyConfigured(
                 "URL route '%s' uses parameter name %r which isn't a valid "
                 "Python identifier." % (original_route, parameter)
             )
-        raw_converter = match.group('converter')
+        raw_converter = match['converter']
         if raw_converter is None:
             # If a converter isn't specified, the default is `str`.
             raw_converter = 'str'

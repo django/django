@@ -76,7 +76,7 @@ def strftime(dt, fmt):
         return super(type(dt), dt).strftime(fmt)
     illegal_formatting = _illegal_formatting.search(fmt)
     if illegal_formatting:
-        raise TypeError("strftime of dates before 1000 does not handle " + illegal_formatting.group(0))
+        raise TypeError('strftime of dates before 1000 does not handle ' + illegal_formatting[0])
 
     year = dt.year
     # For every non-leap year century, advance by

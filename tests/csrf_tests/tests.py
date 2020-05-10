@@ -64,7 +64,7 @@ class CsrfViewMiddlewareTestMixin:
         match = re.search('name="csrfmiddlewaretoken" value="(.*?)"', text)
         csrf_token = csrf_id or self._csrf_id
         self.assertTrue(
-            match and equivalent_tokens(csrf_token, match.group(1)),
+            match and equivalent_tokens(csrf_token, match[1]),
             "Could not find csrfmiddlewaretoken to match %s" % csrf_token
         )
 

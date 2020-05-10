@@ -135,7 +135,7 @@ class BuildFile:
 
         return re.sub(
             r'^(#: .*)(' + re.escape(old_path) + r')',
-            lambda match: match.group().replace(old_path, new_path),
+            lambda match: match[0].replace(old_path, new_path),
             msgs,
             flags=re.MULTILINE
         )
@@ -647,7 +647,7 @@ class Command(BaseCommand):
                 with open(django_po, encoding='utf-8') as fp:
                     m = plural_forms_re.search(fp.read())
                 if m:
-                    plural_form_line = m.group('value')
+                    plural_form_line = m['value']
                     if self.verbosity > 1:
                         self.stdout.write('copying plural forms: %s' % plural_form_line)
                     lines = []

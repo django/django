@@ -74,16 +74,16 @@ class OGRGeometry(GDALBase):
             wkt_m = wkt_regex.match(geom_input)
             json_m = json_regex.match(geom_input)
             if wkt_m:
-                if wkt_m.group('srid'):
+                if wkt_m['srid']:
                     # If there's EWKT, set the SRS w/value of the SRID.
-                    srs = int(wkt_m.group('srid'))
-                if wkt_m.group('type').upper() == 'LINEARRING':
+                    srs = int(wkt_m['srid'])
+                if wkt_m['type'].upper() == 'LINEARRING':
                     # OGR_G_CreateFromWkt doesn't work with LINEARRING WKT.
                     #  See https://trac.osgeo.org/gdal/ticket/1992.
-                    g = capi.create_geom(OGRGeomType(wkt_m.group('type')).num)
-                    capi.import_wkt(g, byref(c_char_p(wkt_m.group('wkt').encode())))
+                    g = capi.create_geom(OGRGeomType(wkt_m['type']).num)
+                    capi.import_wkt(g, byref(c_char_p(wkt_m['wkt'].encode())))
                 else:
-                    g = capi.from_wkt(byref(c_char_p(wkt_m.group('wkt').encode())), None, byref(c_void_p()))
+                    g = capi.from_wkt(byref(c_char_p(wkt_m['wkt'].encode())), None, byref(c_void_p()))
             elif json_m:
                 g = self._from_json(geom_input.encode())
             else:

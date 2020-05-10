@@ -363,7 +363,7 @@ class RequestFactory:
             # Encode the content so that the byte representation is correct.
             match = CONTENT_TYPE_RE.match(content_type)
             if match:
-                charset = match.group(1)
+                charset = match[1]
             else:
                 charset = settings.DEFAULT_CHARSET
             return force_bytes(data, encoding=charset)

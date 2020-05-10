@@ -154,7 +154,7 @@ class DebugViewTests(SimpleTestCase):
             self.assertContains(response, '<div class="context" id="', status_code=500)
             match = re.search(b'<div class="context" id="(?P<id>[^"]+)">', response.content)
             self.assertIsNotNone(match)
-            id_repr = match.group('id')
+            id_repr = match['id']
             self.assertFalse(
                 re.search(b'[^c0-9]', id_repr),
                 "Numeric IDs in debug response HTML page shouldn't be localized (value: %s)." % id_repr.decode()

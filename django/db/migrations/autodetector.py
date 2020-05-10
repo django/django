@@ -1325,5 +1325,5 @@ class MigrationAutodetector:
         """
         match = re.match(r'^\d+', name)
         if match:
-            return int(match.group())
+            return int(match[0])
         return None

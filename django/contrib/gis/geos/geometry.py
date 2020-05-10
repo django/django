@@ -122,7 +122,7 @@ class GEOSGeometryBase(GEOSBase):
             match = re.match(br'SRID=(?P<srid>\-?\d+)', srid_part)
             if not match:
                 raise ValueError('EWKT has invalid SRID part.')
-            srid = int(match.group('srid'))
+            srid = int(match['srid'])
         else:
             wkt = ewkt
         if not wkt:
@@ -700,9 +700,9 @@ class GEOSGeometry(GEOSGeometryBase, ListMixin):
             wkt_m = wkt_regex.match(geo_input)
             if wkt_m:
                 # Handle WKT input.
-                if wkt_m.group('srid'):
-                    input_srid = int(wkt_m.group('srid'))
-                g = self._from_wkt(force_bytes(wkt_m.group('wkt')))
+                if wkt_m['srid']:
+                    input_srid = int(wkt_m['srid'])
+                g = self._from_wkt(force_bytes(wkt_m['wkt']))
             elif hex_regex.match(geo_input):
                 # Handle HEXEWKB input.
                 g = wkb_r().read(force_bytes(geo_input))

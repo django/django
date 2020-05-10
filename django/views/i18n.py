@@ -237,7 +237,7 @@ class JavaScriptCatalog(View):
         """
         match = re.search(r'nplurals=\s*(\d+)', self._plural_string or '')
         if match:
-            return int(match.groups()[0])
+            return int(match[1])
         return 2
 
     @property

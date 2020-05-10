@@ -5030,7 +5030,7 @@ class RawIdFieldsTest(TestCase):
         # Find the link
         m = re.search(br'<a href="([^"]*)"[^>]* id="lookup_id_inquisition"', response.content)
         self.assertTrue(m)  # Got a match
-        popup_url = m.groups()[0].decode().replace("&amp;", "&")
+        popup_url = m[1].decode().replace('&amp;', '&')
 
         # Handle relative links
         popup_url = urljoin(response.request['PATH_INFO'], popup_url)
@@ -5053,7 +5053,7 @@ class RawIdFieldsTest(TestCase):
         # Find the link
         m = re.search(br'<a href="([^"]*)"[^>]* id="lookup_id_defendant0"', response.content)
         self.assertTrue(m)  # Got a match
-        popup_url = m.groups()[0].decode().replace("&amp;", "&")
+        popup_url = m[1].decode().replace('&amp;', '&')
 
         # Handle relative links
         popup_url = urljoin(response.request['PATH_INFO'], popup_url)
@@ -5073,7 +5073,7 @@ class RawIdFieldsTest(TestCase):
         # Find the link
         m = re.search(br'<a href="([^"]*)"[^>]* id="lookup_id_defendant1"', response.content)
         self.assertTrue(m)  # Got a match
-        popup_url = m.groups()[0].decode().replace("&amp;", "&")
+        popup_url = m[1].decode().replace('&amp;', '&')
 
         # Handle relative links
         popup_url = urljoin(response.request['PATH_INFO'], popup_url)
@@ -5924,7 +5924,7 @@ class AdminKeepChangeListFiltersTests(TestCase):
             '<a href="(.*?)">{}</a>'.format(self.joepublicuser.username),
             response.content.decode()
         )
-        self.assertURLEqual(detail_link.group(1), self.get_change_url())
+        self.assertURLEqual(detail_link[1], self.get_change_url())
 
     def test_change_view(self):
         # Get the `change_view`.
@@ -5936,21 +5936,21 @@ class AdminKeepChangeListFiltersTests(TestCase):
             '<form action="(.*?)" method="post" id="user_form" novalidate>',
             response.content.decode()
         )
-        self.assertURLEqual(form_action.group(1), '?%s' % self.get_preserved_filters_querystring())
+        self.assertURLEqual(form_action[1], '?%s' % self.get_preserved_filters_querystring())
 
         # Check the history link.
         history_link = re.search(
             '<a href="(.*?)" class="historylink">History</a>',
             response.content.decode()
         )
-        self.assertURLEqual(history_link.group(1), self.get_history_url())
+        self.assertURLEqual(history_link[1], self.get_history_url())
 
         # Check the delete link.
         delete_link = re.search(
             '<a href="(.*?)" class="deletelink">Delete</a>',
             response.content.decode()
         )
-        self.assertURLEqual(delete_link.group(1), self.get_delete_url())
+        self.assertURLEqual(delete_link[1], self.get_delete_url())
 
         # Test redirect on "Save".
         post_data = {
@@ -5993,7 +5993,7 @@ class AdminKeepChangeListFiltersTests(TestCase):
             '<form action="(.*?)" method="post" id="user_form" novalidate>',
             response.content.decode()
         )
-        self.assertURLEqual(form_action.group(1), '?%s' % self.get_preserved_filters_querystring())
+        self.assertURLEqual(form_action[1], '?%s' % self.get_preserved_filters_querystring())
 
         post_data = {
             'username': 'dummy',

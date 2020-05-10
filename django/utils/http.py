@@ -175,7 +175,7 @@ def parse_http_date(date):
     else:
         raise ValueError("%r is not in a valid HTTP date format" % date)
     try:
-        year = int(m.group('year'))
+        year = int(m['year'])
         if year < 100:
             current_year = datetime.datetime.utcnow().year
             current_century = current_year - (current_year % 100)
@@ -185,11 +185,11 @@ def parse_http_date(date):
                 year += current_century - 100
             else:
                 year += current_century
-        month = MONTHS.index(m.group('mon').lower()) + 1
-        day = int(m.group('day'))
-        hour = int(m.group('hour'))
-        min = int(m.group('min'))
-        sec = int(m.group('sec'))
+        month = MONTHS.index(m['mon'].lower()) + 1
+        day = int(m['day'])
+        hour = int(m['hour'])
+        min = int(m['min'])
+        sec = int(m['sec'])
         result = datetime.datetime(year, month, day, hour, min, sec)
         return calendar.timegm(result.utctimetuple())
     except Exception as exc:
@@ -266,7 +266,7 @@ def parse_etags(etag_str):
     else:
         # Parse each ETag individually, and return any that are valid.
         etag_matches = (ETAG_MATCH.match(etag.strip()) for etag in etag_str.split(','))
-        return [match.group(1) for match in etag_matches if match]
+        return [match[1] for match in etag_matches if match]
 
 
 def quote_etag(etag_str):

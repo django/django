@@ -136,7 +136,7 @@ class GeometryFieldTest(SimpleTestCase):
 
         # The first point can't use assertInHTML() due to non-deterministic
         # ordering of the rendered dictionary.
-        pt1_serialized = re.search(r'<textarea [^>]*>({[^<]+})<', output).groups()[0]
+        pt1_serialized = re.search(r'<textarea [^>]*>({[^<]+})<', output)[1]
         pt1_json = pt1_serialized.replace('&quot;', '"')
         pt1_expected = GEOSGeometry(form.data['pt1']).transform(3857, clone=True)
         self.assertJSONEqual(pt1_json, pt1_expected.json)

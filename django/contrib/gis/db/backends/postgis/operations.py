@@ -342,7 +342,7 @@ class PostGISOperations(BaseSpatialOperations, DatabaseOperations):
         proj_ver_str = self.postgis_proj_version()
         m = proj_regex.search(proj_ver_str)
         if m:
-            return tuple(map(int, [m.group(1), m.group(2), m.group(3)]))
+            return tuple(map(int, m.groups()))
         else:
             raise Exception('Could not determine PROJ.4 version from PostGIS.')
 

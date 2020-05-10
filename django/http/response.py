@@ -81,7 +81,7 @@ class HttpResponseBase:
         matched = _charset_from_content_type_re.search(content_type)
         if matched:
             # Extract the charset and strip its double quotes
-            return matched.group('charset').replace('"', '')
+            return matched['charset'].replace('"', '')
         return settings.DEFAULT_CHARSET
 
     @charset.setter

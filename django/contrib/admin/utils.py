@@ -74,7 +74,7 @@ def quote(s):
 
 def unquote(s):
     """Undo the effects of quote()."""
-    return UNQUOTE_RE.sub(lambda m: UNQUOTE_MAP[m.group(0)], s)
+    return UNQUOTE_RE.sub(lambda m: UNQUOTE_MAP[m[0]], s)
 
 
 def flatten(fields):

@@ -126,7 +126,7 @@ class URLValidator(RegexValidator):
             # Now verify IPv6 in the netloc part
             host_match = re.search(r'^\[(.+)\](?::\d{2,5})?$', urlsplit(value).netloc)
             if host_match:
-                potential_ip = host_match.groups()[0]
+                potential_ip = host_match[1]
                 try:
                     validate_ipv6_address(potential_ip)
                 except ValidationError:
@@ -204,7 +204,7 @@ class EmailValidator:
 
         literal_match = self.literal_regex.match(domain_part)
         if literal_match:
-            ip_address = literal_match.group(1)
+            ip_address = literal_match[1]
             try:
                 validate_ipv46_address(ip_address)
                 return True
