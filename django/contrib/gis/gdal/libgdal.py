@@ -1,11 +1,11 @@
 import logging
 import os
+import re
 from ctypes import CDLL, CFUNCTYPE, c_char_p, c_int
 from ctypes.util import find_library
 
 from django.contrib.gis.gdal.error import GDALException
 from django.core.exceptions import ImproperlyConfigured
-from django.utils.regex_helper import _lazy_re_compile
 
 logger = logging.getLogger('django.contrib.gis')
 
@@ -83,23 +83,16 @@ def gdal_full_version():
     return _version_info(b'')
 
 
-version_regex = _lazy_re_compile(r'^(?P<major>\d+)\.(?P<minor>\d+)(\.(?P<subminor>\d+))?')
-
-
 def gdal_version_info():
-    ver = gdal_version().decode()
-    m = version_regex.match(ver)
+    ver = gdal_version()
+    m = re.match(br'^(?P<major>\d+)\.(?P<minor>\d+)(?:\.(?P<subminor>\d+))?', ver)
     if not m:
         raise GDALException('Could not parse GDAL version string "%s"' % ver)
-    return {key: m.group(key) for key in ('major', 'minor', 'subminor')}
+    major, minor, subminor = m.groups()
+    return (int(major), int(minor), subminor and int(subminor))
 
 
-_verinfo = gdal_version_info()
-GDAL_MAJOR_VERSION = int(_verinfo['major'])
-GDAL_MINOR_VERSION = int(_verinfo['minor'])
-GDAL_SUBMINOR_VERSION = _verinfo['subminor'] and int(_verinfo['subminor'])
-GDAL_VERSION = (GDAL_MAJOR_VERSION, GDAL_MINOR_VERSION, GDAL_SUBMINOR_VERSION)
-del _verinfo
+GDAL_VERSION = gdal_version_info()
 
 # Set library error handling so as errors are logged
 CPLErrorHandler = CFUNCTYPE(None, c_int, c_int, c_char_p)
