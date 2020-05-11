@@ -304,3 +304,21 @@ class Profile(models.Model):
     collection = models.ForeignKey(ProfileCollection, models.SET_NULL, blank=True, null=True)
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
+
+
+# models for #9107
+class Holder6(models.Model):
+    text = models.TextField()
+
+
+class InlineOneForHolder6(models.Model):
+    inline_text = models.CharField(max_length=200)
+    primary = models.ForeignKey(Holder6, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.inline_text
+
+
+class InlineTwoForHolder6(models.Model):
+    primary = models.ForeignKey(Holder6, on_delete=models.CASCADE)
+    inline_one = models.ManyToManyField(InlineOneForHolder6)

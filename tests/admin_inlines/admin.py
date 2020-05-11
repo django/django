@@ -6,12 +6,13 @@ from django.db import models
 from .models import (
     Author, BinaryTree, CapoFamiglia, Chapter, Child, ChildModel1, ChildModel2,
     Consigliere, EditablePKBook, ExtraTerrestrial, Fashionista, FootNote,
-    Holder, Holder2, Holder3, Holder4, Holder5, Inner, Inner2, Inner3,
-    Inner4Stacked, Inner4Tabular, Inner5Stacked, Inner5Tabular, NonAutoPKBook,
-    NonAutoPKBookChild, Novel, NovelReadonlyChapter, OutfitItem,
-    ParentModelWithCustomPk, Poll, Profile, ProfileCollection, Question,
-    ReadOnlyInline, ShoppingWeakness, Sighting, SomeChildModel,
-    SomeParentModel, SottoCapo, Teacher, Title, TitleCollection,
+    Holder, Holder2, Holder3, Holder4, Holder5, Holder6, InlineOneForHolder6,
+    InlineTwoForHolder6, Inner, Inner2, Inner3, Inner4Stacked, Inner4Tabular,
+    Inner5Stacked, Inner5Tabular, NonAutoPKBook, NonAutoPKBookChild, Novel,
+    NovelReadonlyChapter, OutfitItem, ParentModelWithCustomPk, Poll, Profile,
+    ProfileCollection, Question, ReadOnlyInline, ShoppingWeakness, Sighting,
+    SomeChildModel, SomeParentModel, SottoCapo, Teacher, Title,
+    TitleCollection,
 )
 
 site = admin.AdminSite(name="admin")
@@ -292,6 +293,21 @@ class TeacherAdmin(admin.ModelAdmin):
     inlines = [StudentInline]
 
 
+# model for #9107
+class InlineOneForHolder6Admin(admin.TabularInline):
+    model = InlineOneForHolder6
+
+
+class InlineTwoForHolder6Admin(admin.StackedInline):
+    model = InlineTwoForHolder6
+
+
+class Holder6Admin(admin.ModelAdmin):
+    inlines = [InlineOneForHolder6Admin, InlineTwoForHolder6Admin]
+
+
+# register for #9107
+site.register(Holder6, Holder6Admin)
 site.register(TitleCollection, inlines=[TitleInline])
 # Test bug #12561 and #12778
 # only ModelAdmin media

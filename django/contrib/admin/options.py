@@ -1506,7 +1506,7 @@ class ModelAdmin(BaseModelAdmin):
         Get the initial form data from the request's GET params.
         """
         initial = dict(request.GET.items())
-        formset_initial_data = defaultdict(lambda: defaultdict(defaultdict))
+        formset_data = defaultdict(lambda: defaultdict(defaultdict))
         formset_query_regex = r'inlinemode_set-(\d+)-(\d+)-(.*)'
         for k in initial:
             try:
@@ -1515,18 +1515,23 @@ class ModelAdmin(BaseModelAdmin):
                     inline_model_index = int(match_obj.group(1))
                     inline_model_form_index = int(match_obj.group(2))
                     inline_model_form_fieldname = match_obj.group(3)
-                    formset_initial_data[inline_model_index][inline_model_form_index][inline_model_form_fieldname] \
-                        = initial.get(k)
+                    model_field = self.inlines[inline_model_index].model._meta.get_field(inline_model_form_fieldname)
+                    if isinstance(model_field, models.ManyToManyField):
+                        formset_data[inline_model_index][inline_model_form_index][inline_model_form_fieldname] \
+                            = initial.get(k).split(",")
+                    else:
+                        formset_data[inline_model_index][inline_model_form_index][inline_model_form_fieldname] \
+                            = initial.get(k)
 
                 f = self.model._meta.get_field(k)
             except FieldDoesNotExist:
                 continue
-            except ValueError:
+            except IndexError:
                 continue
             # We have to special-case M2Ms as a list of comma-separated PKs.
             if isinstance(f, models.ManyToManyField):
                 initial[k] = initial[k].split(",")
-        return initial, formset_initial_data
+        return initial, formset_data
 
     def _get_obj_does_not_exist_redirect(self, request, opts, object_id):
         """
@@ -1672,7 +1677,7 @@ class ModelAdmin(BaseModelAdmin):
         return self.changeform_view(request, object_id, form_url, extra_context)
 
     def _get_edited_object_pks(self, request, prefix):
-        """Return POST data values of list_editable primary keys."""
+        """Return POST data values of list_editable cmary keys."""
         pk_pattern = re.compile(
             r'{}-\d+-{}$'.format(re.escape(prefix), self.model._meta.pk.name)
         )

@@ -9,8 +9,9 @@ from django.urls import reverse
 from .admin import InnerInline, site as admin_site
 from .models import (
     Author, BinaryTree, Book, Chapter, Child, ChildModel1, ChildModel2,
-    Fashionista, FootNote, Holder, Holder2, Holder3, Holder4, Inner, Inner2,
-    Inner3, Inner4Stacked, Inner4Tabular, Novel, OutfitItem, Parent,
+    Fashionista, FootNote, Holder, Holder2, Holder3, Holder4, Holder6,
+    InlineOneForHolder6, Inner, Inner2, Inner3,
+    Inner4Stacked, Inner4Tabular, Novel, OutfitItem, Parent,
     ParentModelWithCustomPk, Person, Poll, Profile, ProfileCollection,
     Question, Sighting, SomeChildModel, SomeParentModel, Teacher,
 )
@@ -1362,7 +1363,6 @@ class SeleniumTests(AdminSeleniumTestCase):
         inline_models = ['inner5stacked', 'inner5tabular']
         # indicies of the inline model form to target
         inline_model_form_indicies = [0, 1]
-        count = 0
         '''
         creates the query string for the url.
         It targets both inline models and creates query for the form number 0 and 1 inside both inline model formset
@@ -1372,7 +1372,7 @@ class SeleniumTests(AdminSeleniumTestCase):
                 for a_field, a_value in zip(fields, values):
                     query += "inlinemode_set-" + str(an_inline_model_indicies) + "-" + \
                         str(an_inline_model_form_indicies) + "-" + a_field + "=" + str(a_value) + "&"
-                    count = count + 1
+
         query = "?" + query[:-1]
         self.selenium.get(self.live_server_url + reverse('admin:admin_inlines_holder5_add') + query)
         show_links = self.selenium.find_elements_by_link_text('SHOW')
@@ -1382,7 +1382,6 @@ class SeleniumTests(AdminSeleniumTestCase):
         for an_inline_model_indicies in range(len(inline_models)):
             for an_inline_model_form_indicies in inline_model_form_indicies:
                 for a_field, a_value, a_type in zip(fields, values, fieldtypes):
-
                     css_selector = '#id_' + inline_models[an_inline_model_indicies] + "_set-" + \
                         str(an_inline_model_form_indicies) + "-" + a_field
                     if(a_type == 'string'):
@@ -1390,7 +1389,6 @@ class SeleniumTests(AdminSeleniumTestCase):
                             self.selenium.find_element_by_css_selector(css_selector).get_attribute('value'),
                             str(a_value)
                         )
-
                     if(a_type == 'select'):
                         self.assertSelectedOptions(css_selector, [str(a_value)])
 
@@ -1405,7 +1403,7 @@ class SeleniumTests(AdminSeleniumTestCase):
         self.admin_login(username='super', password='secret')
         fields = ['name', 'select', 'text', 'dummy']
         values = [1, 1, 'textword1', 1]
-        fieldtypes = ['string', 'select', 'string', 'string']
+        field_types = ['string', 'select', 'string', 'string']
         query = ""
         # inline models in the form
         inline_models = ['inner5stacked', 'inner5tabular']
@@ -1420,6 +1418,7 @@ class SeleniumTests(AdminSeleniumTestCase):
         for an_inline_model_indicies in range(len(inline_models)):
             for an_inline_model_form_indicies in inline_model_form_indicies:
                 for a_field, a_value in zip(fields, values):
+
                     query += "inlinemode_set-" + str(an_inline_model_indicies) + "-" + \
                         str(an_inline_model_form_indicies) + "-" + a_field + "=" + str(a_value) + "&"
                     count = count + 1
@@ -1431,14 +1430,55 @@ class SeleniumTests(AdminSeleniumTestCase):
 
         for an_inline_model_indicies in range(len(inline_models)):
             for an_inline_model_form_indicies in inline_model_form_indicies:
-                for a_field, a_value, a_type in zip(fields, values, fieldtypes):
+                for a_field, a_value, a_type in zip(fields, values, field_types):
                     css_selector = '#id_' + inline_models[an_inline_model_indicies] + "_set-" + \
                         str(an_inline_model_form_indicies) + "-" + a_field
                     if(a_type == 'string'):
                         self.assertEqual(
-                            self.selenium.find_element_by_css_selector(css_selector).get_attribute('value'),
-                            str(a_value)
+                            self.selenium.find_element_by_css_selector(css_selector),
+                            None
                         )
-
                     if(a_type == 'select'):
-                        self.assertSelectedOptions(css_selector, [str(a_value)])
+                        self.assertSelectedOptions(css_selector, None)
+
+    def test_url_arguments_for_inline_manytomany(self):
+        '''
+        test to check the url argument for select tag used with manytomany field
+        '''
+        self.admin_login(username='super', password='secret')
+        primary_instance = Holder6(text='Sample Text')
+        primary_instance.save()
+        for i in range(20):
+            inline_instance = InlineOneForHolder6(primary=primary_instance, inline_text="Lorem,ipsum,test " + str(i))
+            inline_instance.save()
+
+        fields = ['inline_text', 'inline_one']
+        values = ['lorem,ipsum,sample,text', ['1', '2', '3', '4']]
+        field_types = ['string', 'select']
+        inline_models = ['InlineOneForHolder6', 'InlineTwoForHolder6']
+        inline_model_form_indicies = [0, 1, 2]
+        query_param = ""
+        # create query parameter for the url
+        for an_inline_model_indicies in range(len(inline_models)):
+            for an_inline_model_form_indicies in inline_model_form_indicies:
+                param_one = "inlinemode_set-" + str(an_inline_model_indicies) + "-" + \
+                    str(an_inline_model_form_indicies) + "-" + fields[0] + "=" + str(values[0])
+                param_two = "inlinemode_set-" + str(an_inline_model_indicies) + "-" + \
+                    str(an_inline_model_form_indicies) + "-" + fields[1] + "=" + ",".join(values[1])
+                query_param += param_one + '&' + param_two + '&'
+
+        query_param = "?" + query_param[:-1]
+        self.selenium.get(self.live_server_url + reverse("admin:admin_inlines_holder6_add") + query_param)
+
+        for an_inline_model_form_index in inline_model_form_indicies:
+            for an_inline_model, a_field, a_field_type, a_value in zip(inline_models, fields, field_types, values):
+                field_name_css_selector = "#id_" + an_inline_model.lower() + "_set-" + \
+                    str(an_inline_model_form_index) + "-" + a_field
+
+                if a_field_type == 'string':
+                    self.assertEqual(
+                        self.selenium.find_element_by_css_selector(field_name_css_selector).get_attribute('value'),
+                        a_value
+                    )
+                if a_field_type == 'select':
+                    self.assertSelectedOptions(field_name_css_selector, a_value)
