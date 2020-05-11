@@ -27,10 +27,10 @@ def topological_sort_as_sets(dependency_graph):
                 todo.items() if node not in current}
 
 
-def stable_topological_sort(l, dependency_graph):
+def stable_topological_sort(nodes, dependency_graph):
     result = []
     for layer in topological_sort_as_sets(dependency_graph):
-        for node in l:
+        for node in nodes:
             if node in layer:
                 result.append(node)
     return result
