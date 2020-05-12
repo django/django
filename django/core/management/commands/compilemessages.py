@@ -101,7 +101,7 @@ class Command(BaseCommand):
         self.has_errors = False
         for basedir in basedirs:
             if locales:
-                dirs = [os.path.join(basedir, l, 'LC_MESSAGES') for l in locales]
+                dirs = [os.path.join(basedir, locale, 'LC_MESSAGES') for locale in locales]
             else:
                 dirs = [basedir]
             locations = []

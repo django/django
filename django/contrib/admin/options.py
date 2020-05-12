@@ -1059,7 +1059,7 @@ class ModelAdmin(BaseModelAdmin):
                 level = getattr(messages.constants, level.upper())
             except AttributeError:
                 levels = messages.constants.DEFAULT_TAGS.values()
-                levels_repr = ', '.join('`%s`' % l for l in levels)
+                levels_repr = ', '.join('`%s`' % level for level in levels)
                 raise ValueError(
                     'Bad message level string: `%s`. Possible values are: %s'
                     % (level, levels_repr)

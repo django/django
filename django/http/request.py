@@ -338,7 +338,7 @@ class HttpRequest:
 
     def close(self):
         if hasattr(self, '_files'):
-            for f in chain.from_iterable(l[1] for l in self._files.lists()):
+            for f in chain.from_iterable(list_[1] for list_ in self._files.lists()):
                 f.close()
 
     # File-like and iterator interface.

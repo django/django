@@ -123,7 +123,7 @@ class TimeFormat(Formatter):
         "Minutes; i.e. '00' to '59'"
         return '%02d' % self.data.minute
 
-    def O(self):  # NOQA: E743
+    def O(self):  # NOQA: E743, E741
         """
         Difference to Greenwich time in hours; e.g. '+0200', '-0430'.
 
@@ -237,7 +237,7 @@ class DateFormat(TimeFormat):
         "Month, textual, long; e.g. 'January'"
         return MONTHS[self.data.month]
 
-    def I(self):  # NOQA: E743
+    def I(self):  # NOQA: E743, E741
         "'1' if Daylight Savings Time, '0' otherwise."
         try:
             if self.timezone and self.timezone.dst(self.data):
@@ -254,7 +254,7 @@ class DateFormat(TimeFormat):
         "Day of the month without leading zeros; i.e. '1' to '31'"
         return self.data.day
 
-    def l(self):  # NOQA: E743
+    def l(self):  # NOQA: E743, E741
         "Day of the week, textual, long; e.g. 'Friday'"
         return WEEKDAYS[self.data.weekday()]
 
