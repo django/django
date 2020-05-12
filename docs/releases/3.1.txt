@@ -67,7 +67,7 @@ It should have no noticeable effect on any existing Django projects.
 JSONField for all supported database backends
 ---------------------------------------------
 
-Django now includes the :class:`.models.JSONField` and
+Django now includes :class:`.models.JSONField` and
 :class:`forms.JSONField <django.forms.JSONField>` that can be used on all
 supported database backends. Both fields support the use of custom JSON
 encoders and decoders. The model field supports the introspection, lookups, and
@@ -89,7 +89,7 @@ Minor features
   :attr:`.ModelAdmin.list_filter` allows filtering on empty values (empty
   strings and nulls) in the admin changelist view.
 
-* Filters in the right sidebar of the admin changelist view now contains a link
+* Filters in the right sidebar of the admin changelist view now contain a link
   to clear all filters.
 
 * The admin now has a sidebar on larger screens for easier navigation. It is
@@ -108,10 +108,10 @@ Minor features
 * The default iteration count for the PBKDF2 password hasher is increased from
   180,000 to 216,000.
 
-* Added the :setting:`PASSWORD_RESET_TIMEOUT` setting to define the number of
-  seconds a password reset link is valid for. This is encouraged instead of
-  deprecated ``PASSWORD_RESET_TIMEOUT_DAYS``, which will be removed in Django
-  4.0.
+* The new :setting:`PASSWORD_RESET_TIMEOUT` setting allows defining the number
+  of seconds a password reset link is valid for. This is encouraged instead of
+  the deprecated ``PASSWORD_RESET_TIMEOUT_DAYS`` setting, which will be removed
+  in Django 4.0.
 
 * The password reset mechanism now uses the SHA-256 hashing algorithm. Support
   for tokens that use the old hashing algorithm remains until Django 4.0.
@@ -160,8 +160,9 @@ Minor features
   :class:`~django.contrib.postgres.fields.RangeField`.
 
 * The new :lookup:`rangefield.lower_inc`, :lookup:`rangefield.lower_inf`,
-  :lookup:`rangefield.upper_inc`, and :lookup:`rangefield.upper_inf` allows
-  querying :class:`~django.contrib.postgres.fields.RangeField` by a bound type.
+  :lookup:`rangefield.upper_inc`, and :lookup:`rangefield.upper_inf` lookups
+  allow querying :class:`~django.contrib.postgres.fields.RangeField` by a bound
+  type.
 
 * :lookup:`rangefield.contained_by` now supports
   :class:`~django.db.models.SmallAutoField`,
@@ -619,7 +620,7 @@ Miscellaneous
 
 * The undocumented ``django.views.debug.ExceptionReporterFilter`` class is
   removed. As per the :ref:`custom-error-reports` documentation, classes to be
-  used with :setting:`DEFAULT_EXCEPTION_REPORTER_FILTER` needs to inherit from
+  used with :setting:`DEFAULT_EXCEPTION_REPORTER_FILTER` need to inherit from
   :class:`django.views.debug.SafeExceptionReporterFilter`.
 
 * The cache timeout set by :func:`~django.views.decorators.cache.cache_page`
@@ -642,9 +643,9 @@ Miscellaneous
 * The admin CSS classes ``row1`` and ``row2`` are removed in favor of
   ``:nth-child(odd)`` and ``:nth-child(even)`` pseudo-classes.
 
-* The :func:`~django.contrib.auth.hashers.make_password` now requires its
-  argument to be a string or bytes. Other types should be explicitly cast to
-  one of these.
+* The :func:`~django.contrib.auth.hashers.make_password` function now requires
+  its argument to be a string or bytes. Other types should be explicitly cast
+  to one of these.
 
 * The undocumented ``version`` parameter to the
   :class:`~django.contrib.gis.db.models.functions.AsKML` function is removed.
