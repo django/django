@@ -71,7 +71,7 @@ class Geo3DLoadingHelper:
         # Interstate (2D / 3D and Geographic/Projected variants)
         for name, line, exp_z in interstate_data:
             line_3d = GEOSGeometry(line, srid=4269)
-            line_2d = LineString([l[:2] for l in line_3d.coords], srid=4269)
+            line_2d = LineString([coord[:2] for coord in line_3d.coords], srid=4269)
 
             # Creating a geographic and projected version of the
             # interstate in both 2D and 3D.
