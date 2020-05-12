@@ -70,12 +70,9 @@ class JSONField(CheckFieldDefaultMixin, Field):
         return name, path, args, kwargs
 
     def _from_db_value(self, value, expression, connection):
-        if value is None:
-            return value
-        try:
+        if value is not None:
             return json.loads(value, cls=self.decoder)
-        except json.JSONDecodeError:
-            return value
+        return value
 
     def get_internal_type(self):
         return 'JSONField'
