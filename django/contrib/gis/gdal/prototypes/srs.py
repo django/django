@@ -32,7 +32,7 @@ destroy_srs = void_output(std_call('OSRDestroySpatialReference'), [c_void_p], er
 srs_validate = void_output(lgdal.OSRValidate, [c_void_p])
 
 if GDAL_VERSION >= (3, 0):
-    set_axis_strategy = void_output(lgdal.OSRSetAxisMappingStrategy, [c_void_p, c_int])
+    set_axis_strategy = void_output(lgdal.OSRSetAxisMappingStrategy, [c_void_p, c_int], errcheck=False)
 
 # Getting the semi_major, semi_minor, and flattening functions.
 semi_major = srs_double(lgdal.OSRGetSemiMajor)
