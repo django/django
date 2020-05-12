@@ -102,11 +102,6 @@ Minor features
 
 * Select2 library is upgraded from version 4.0.7 to 4.0.13.
 
-:mod:`django.contrib.admindocs`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
-
 :mod:`django.contrib.auth`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -151,11 +146,6 @@ Minor features
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 * :tfilter:`intword` template filter now supports negative integers.
-
-:mod:`django.contrib.messages`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
 
 :mod:`django.contrib.postgres`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -202,11 +192,6 @@ Minor features
 * The new :attr:`.ExclusionConstraint.deferrable` attribute allows creating
   deferrable exclusion constraints.
 
-:mod:`django.contrib.redirects`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
-
 :mod:`django.contrib.sessions`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -214,25 +199,10 @@ Minor features
   value to explicitly state that the cookie is sent with all same-site and
   cross-site requests.
 
-:mod:`django.contrib.sitemaps`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
-
-:mod:`django.contrib.sites`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
-
 :mod:`django.contrib.staticfiles`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 * The :setting:`STATICFILES_DIRS` setting now supports :class:`pathlib.Path`.
-
-:mod:`django.contrib.syndication`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
 
 Cache
 ~~~~~
@@ -287,12 +257,6 @@ File Storage
   This allows you to modify the used storage at runtime, selecting different
   storages for different environments, for example.
 
-File Uploads
-~~~~~~~~~~~~
-
-* ...
-
-
 Forms
 ~~~~~
 
@@ -315,11 +279,6 @@ Forms
 * The new :attr:`.BoundField.widget_type` property can be used to dynamically
   adjust form rendering based upon the widget type.
 
-Generic Views
-~~~~~~~~~~~~~
-
-* ...
-
 Internationalization
 ~~~~~~~~~~~~~~~~~~~~
 
@@ -328,11 +287,6 @@ Internationalization
   and cross-site requests.
 
 * Added support and translations for the Algerian Arabic language.
-
-Logging
-~~~~~~~
-
-* ...
 
 Management Commands
 ~~~~~~~~~~~~~~~~~~~
@@ -450,16 +404,6 @@ Security
   :class:`~django.core.signing.Signer` allows customizing the hashing
   algorithm.
 
-Serialization
-~~~~~~~~~~~~~
-
-* ...
-
-Signals
-~~~~~~~
-
-* ...
-
 Templates
 ~~~~~~~~~
 
@@ -511,11 +455,6 @@ Utilities
   :func:`~django.utils.dateparse.parse_duration`, and
   :func:`~django.utils.dateparse.parse_time` now support comma separators for
   milliseconds.
-
-Validators
-~~~~~~~~~~
-
-* ...
 
 Miscellaneous
 ~~~~~~~~~~~~~
