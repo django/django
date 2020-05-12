@@ -504,7 +504,7 @@ class DjangoAdminMultipleSettings(AdminScriptTestCase):
     def test_builtin_with_bad_settings(self):
         "alternate: django-admin builtin commands fail if settings file (from argument) doesn't exist"
         args = ['check', '--settings=bad_settings', 'admin_scripts']
-        out, err = self.run_django_admin(args)
+        _, err = self.run_django_admin(args)
         self.assertOutput(err, "No module named '?bad_settings'?", regex=True)
 
     def test_builtin_with_bad_environment(self):
@@ -551,7 +551,7 @@ class DjangoAdminSettingsDirectory(AdminScriptTestCase):
         "directory: startapp creates the correct directory"
         args = ['startapp', 'settings_test']
         app_path = os.path.join(self.test_dir, 'settings_test')
-        out, err = self.run_django_admin(args, 'test_project.settings')
+        _, err = self.run_django_admin(args, 'test_project.settings')
         self.assertNoOutput(err)
         self.assertTrue(os.path.exists(app_path))
         with open(os.path.join(app_path, 'apps.py')) as f:
@@ -564,7 +564,7 @@ class DjangoAdminSettingsDirectory(AdminScriptTestCase):
         template_path = os.path.join(custom_templates_dir, 'app_template')
         args = ['startapp', '--template', template_path, 'custom_settings_test']
         app_path = os.path.join(self.test_dir, 'custom_settings_test')
-        out, err = self.run_django_admin(args, 'test_project.settings')
+        _, err = self.run_django_admin(args, 'test_project.settings')
         self.assertNoOutput(err)
         self.assertTrue(os.path.exists(app_path))
         self.assertTrue(os.path.exists(os.path.join(app_path, 'api.py')))
@@ -573,7 +573,7 @@ class DjangoAdminSettingsDirectory(AdminScriptTestCase):
         """startapp creates the correct directory with Unicode characters."""
         args = ['startapp', 'こんにちは']
         app_path = os.path.join(self.test_dir, 'こんにちは')
-        out, err = self.run_django_admin(args, 'test_project.settings')
+        _, err = self.run_django_admin(args, 'test_project.settings')
         self.assertNoOutput(err)
         self.assertTrue(os.path.exists(app_path))
         with open(os.path.join(app_path, 'apps.py'), encoding='utf8') as f:
@@ -591,7 +591,7 @@ class DjangoAdminSettingsDirectory(AdminScriptTestCase):
     def test_builtin_with_bad_settings(self):
         "directory: django-admin builtin commands fail if settings file (from argument) doesn't exist"
         args = ['check', '--settings=bad_settings', 'admin_scripts']
-        out, err = self.run_django_admin(args)
+        _, err = self.run_django_admin(args)
         self.assertOutput(err, "No module named '?bad_settings'?", regex=True)
 
     def test_builtin_with_bad_environment(self):
@@ -1423,7 +1423,7 @@ class CommandTypes(AdminScriptTestCase):
     def test_help(self):
         "help is handled as a special case"
         args = ['help']
-        out, err = self.run_manage(args)
+        out, _ = self.run_manage(args)
         self.assertOutput(out, "Type 'manage.py help <subcommand>' for help on a specific subcommand.")
         self.assertOutput(out, '[django]')
         self.assertOutput(out, 'startapp')
@@ -1432,7 +1432,7 @@ class CommandTypes(AdminScriptTestCase):
     def test_help_commands(self):
         "help --commands shows the list of all available commands"
         args = ['help', '--commands']
-        out, err = self.run_manage(args)
+        out, _ = self.run_manage(args)
         self.assertNotInOutput(out, 'usage:')
         self.assertNotInOutput(out, 'Options:')
         self.assertNotInOutput(out, '[django]')
@@ -1700,7 +1700,7 @@ class CommandTypes(AdminScriptTestCase):
     def test_noargs_with_args(self):
         "NoArg Commands raise an error if an argument is provided"
         args = ['noargs_command', 'argument']
-        out, err = self.run_manage(args)
+        _, err = self.run_manage(args)
         self.assertOutput(err, "error: unrecognized arguments: argument")
 
     def test_app_command(self):
@@ -1719,7 +1719,7 @@ class CommandTypes(AdminScriptTestCase):
     def test_app_command_no_apps(self):
         "User AppCommands raise an error when no app name is provided"
         args = ['app_command']
-        out, err = self.run_manage(args)
+        _, err = self.run_manage(args)
         self.assertOutput(err, 'error: Enter at least one application label.')
 
     def test_app_command_multiple_apps(self):
@@ -1745,13 +1745,13 @@ class CommandTypes(AdminScriptTestCase):
     def test_app_command_invalid_app_label(self):
         "User AppCommands can execute when a single app name is provided"
         args = ['app_command', 'NOT_AN_APP']
-        out, err = self.run_manage(args)
+        _, err = self.run_manage(args)
         self.assertOutput(err, "No installed app with label 'NOT_AN_APP'.")
 
     def test_app_command_some_invalid_app_labels(self):
         "User AppCommands can execute when some of the provided app names are invalid"
         args = ['app_command', 'auth', 'NOT_AN_APP']
-        out, err = self.run_manage(args)
+        _, err = self.run_manage(args)
         self.assertOutput(err, "No installed app with label 'NOT_AN_APP'.")
 
     def test_label_command(self):
@@ -1769,7 +1769,7 @@ class CommandTypes(AdminScriptTestCase):
     def test_label_command_no_label(self):
         "User LabelCommands raise an error if no label is provided"
         args = ['label_command']
-        out, err = self.run_manage(args)
+        _, err = self.run_manage(args)
         self.assertOutput(err, 'Enter at least one label')
 
     def test_label_command_multiple_label(self):
@@ -1909,7 +1909,7 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
                 args = ['startproject', bad_name]
                 testproject_dir = os.path.join(self.test_dir, bad_name)
 
-                out, err = self.run_django_admin(args)
+                _, err = self.run_django_admin(args)
                 self.assertOutput(
                     err,
                     "Error: '%s' is not a valid project name. Please make "
@@ -1926,7 +1926,7 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
         args = ['startproject', bad_name]
         testproject_dir = os.path.join(self.test_dir, bad_name)
 
-        out, err = self.run_django_admin(args)
+        _, err = self.run_django_admin(args)
         self.assertOutput(
             err,
             "CommandError: 'os' conflicts with the name of an existing "
@@ -1960,7 +1960,7 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
         args = ['startproject', '--template', template_path, 'customtestproject']
         testproject_dir = os.path.join(self.test_dir, 'customtestproject')
 
-        out, err = self.run_django_admin(args)
+        _, err = self.run_django_admin(args)
         self.assertNoOutput(err)
         self.assertTrue(os.path.isdir(testproject_dir))
         self.assertTrue(os.path.exists(os.path.join(testproject_dir, 'additional_dir')))
@@ -1971,7 +1971,7 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
         args = ['startproject', '--template', template_path, 'customtestproject']
         testproject_dir = os.path.join(self.test_dir, 'customtestproject')
 
-        out, err = self.run_django_admin(args)
+        _, err = self.run_django_admin(args)
         self.assertNoOutput(err)
         self.assertTrue(os.path.isdir(testproject_dir))
         self.assertTrue(os.path.exists(os.path.join(testproject_dir, 'additional_dir')))
@@ -1982,7 +1982,7 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
         args = ['startproject', '--template', template_path, 'tarballtestproject']
         testproject_dir = os.path.join(self.test_dir, 'tarballtestproject')
 
-        out, err = self.run_django_admin(args)
+        _, err = self.run_django_admin(args)
         self.assertNoOutput(err)
         self.assertTrue(os.path.isdir(testproject_dir))
         self.assertTrue(os.path.exists(os.path.join(testproject_dir, 'run.py')))
@@ -1994,7 +1994,7 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
         testproject_dir = os.path.join(self.test_dir, 'altlocation')
         os.mkdir(testproject_dir)
 
-        out, err = self.run_django_admin(args)
+        _, err = self.run_django_admin(args)
         self.assertNoOutput(err)
         self.assertTrue(os.path.isdir(testproject_dir))
         self.assertTrue(os.path.exists(os.path.join(testproject_dir, 'run.py')))
@@ -2009,7 +2009,7 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
         args = ['startproject', '--template', template_url, 'urltestproject']
         testproject_dir = os.path.join(self.test_dir, 'urltestproject')
 
-        out, err = self.run_django_admin(args)
+        _, err = self.run_django_admin(args)
         self.assertNoOutput(err)
         self.assertTrue(os.path.isdir(testproject_dir))
         self.assertTrue(os.path.exists(os.path.join(testproject_dir, 'run.py')))
@@ -2021,7 +2021,7 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
         args = ['startproject', '--template', template_url, 'urltestproject']
         testproject_dir = os.path.join(self.test_dir, 'urltestproject')
 
-        out, err = self.run_django_admin(args)
+        _, err = self.run_django_admin(args)
         self.assertNoOutput(err)
         self.assertTrue(os.path.isdir(testproject_dir))
         self.assertTrue(os.path.exists(os.path.join(testproject_dir, 'run.py')))
@@ -2032,7 +2032,7 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
         args = ['startproject', '--template', template_path, 'customtestproject', '-e', 'txt', '-n', 'Procfile']
         testproject_dir = os.path.join(self.test_dir, 'customtestproject')
 
-        out, err = self.run_django_admin(args)
+        _, err = self.run_django_admin(args)
         self.assertNoOutput(err)
         self.assertTrue(os.path.isdir(testproject_dir))
         self.assertTrue(os.path.exists(os.path.join(testproject_dir, 'additional_dir')))
@@ -2048,7 +2048,7 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
         args = ['startproject', '--template', template_path, 'another_project', 'project_dir']
         testproject_dir = os.path.join(self.test_dir, 'project_dir')
         os.mkdir(testproject_dir)
-        out, err = self.run_django_admin(args)
+        _, err = self.run_django_admin(args)
         self.assertNoOutput(err)
         test_manage_py = os.path.join(testproject_dir, 'manage.py')
         with open(test_manage_py) as fp:
@@ -2068,7 +2068,7 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
         ]
         testproject_dir = os.path.join(self.test_dir, 'project_dir')
         os.mkdir(testproject_dir)
-        out, err = self.run_manage(args)
+        _, err = self.run_manage(args)
         self.assertNoOutput(err)
         test_manage_py = os.path.join(testproject_dir, 'additional_dir', 'extra.py')
         with open(test_manage_py) as fp:
@@ -2097,7 +2097,7 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
         args = ['startproject', '--template', template_path, '--extension=txt', 'customtestproject']
         testproject_dir = os.path.join(self.test_dir, 'customtestproject')
 
-        out, err = self.run_django_admin(args)
+        _, err = self.run_django_admin(args)
         self.assertNoOutput(err)
         self.assertTrue(os.path.isdir(testproject_dir))
         path = os.path.join(testproject_dir, 'ticket-18091-non-ascii-template.txt')
@@ -2116,7 +2116,7 @@ class StartApp(AdminScriptTestCase):
                 args = ['startapp', bad_name]
                 testproject_dir = os.path.join(self.test_dir, bad_name)
 
-                out, err = self.run_django_admin(args)
+                _, err = self.run_django_admin(args)
                 self.assertOutput(
                     err,
                     "CommandError: '{}' is not a valid app name. Please make "
@@ -2133,7 +2133,7 @@ class StartApp(AdminScriptTestCase):
         args = ['startapp', bad_name]
         testproject_dir = os.path.join(self.test_dir, bad_name)
 
-        out, err = self.run_django_admin(args)
+        _, err = self.run_django_admin(args)
         self.assertOutput(
             err,
             "CommandError: 'os' conflicts with the name of an existing "
@@ -2165,7 +2165,7 @@ class StartApp(AdminScriptTestCase):
         # Use a subdirectory so it is outside the PYTHONPATH.
         os.makedirs(os.path.join(self.test_dir, 'apps/app1'))
         self.run_django_admin(['startapp', 'app1', 'apps/app1'])
-        out, err = self.run_django_admin(['startapp', 'app2', 'apps/app1'])
+        _, err = self.run_django_admin(['startapp', 'app2', 'apps/app1'])
         self.assertOutput(
             err,
             "already exists. Overlaying an app into an existing directory "
@@ -2266,7 +2266,7 @@ class MainModule(AdminScriptTestCase):
     """python -m django works like django-admin."""
 
     def test_program_name_in_help(self):
-        out, err = self.run_test(['-m', 'django', 'help'])
+        out, _ = self.run_test(['-m', 'django', 'help'])
         self.assertOutput(out, "Type 'python -m django help <subcommand>' for help on a specific subcommand.")
 
 
