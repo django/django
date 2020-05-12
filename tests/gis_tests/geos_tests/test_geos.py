@@ -310,19 +310,19 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
     def test_linestring(self):
         "Testing LineString objects."
         prev = fromstr('POINT(0 0)')
-        for l in self.geometries.linestrings:
-            ls = fromstr(l.wkt)
+        for line in self.geometries.linestrings:
+            ls = fromstr(line.wkt)
             self.assertEqual(ls.geom_type, 'LineString')
             self.assertEqual(ls.geom_typeid, 1)
             self.assertEqual(ls.dims, 1)
             self.assertIs(ls.empty, False)
             self.assertIs(ls.ring, False)
-            if hasattr(l, 'centroid'):
-                self.assertEqual(l.centroid, ls.centroid.tuple)
-            if hasattr(l, 'tup'):
-                self.assertEqual(l.tup, ls.tuple)
+            if hasattr(line, 'centroid'):
+                self.assertEqual(line.centroid, ls.centroid.tuple)
+            if hasattr(line, 'tup'):
+                self.assertEqual(line.tup, ls.tuple)
 
-            self.assertEqual(ls, fromstr(l.wkt))
+            self.assertEqual(ls, fromstr(line.wkt))
             self.assertIs(ls == prev, False)  # Use assertIs() to test __eq__.
             with self.assertRaises(IndexError):
                 ls.__getitem__(len(ls))
@@ -389,16 +389,16 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
     def test_multilinestring(self):
         "Testing MultiLineString objects."
         prev = fromstr('POINT(0 0)')
-        for l in self.geometries.multilinestrings:
-            ml = fromstr(l.wkt)
+        for line in self.geometries.multilinestrings:
+            ml = fromstr(line.wkt)
             self.assertEqual(ml.geom_type, 'MultiLineString')
             self.assertEqual(ml.geom_typeid, 5)
             self.assertEqual(ml.dims, 1)
 
-            self.assertAlmostEqual(l.centroid[0], ml.centroid.x, 9)
-            self.assertAlmostEqual(l.centroid[1], ml.centroid.y, 9)
+            self.assertAlmostEqual(line.centroid[0], ml.centroid.x, 9)
+            self.assertAlmostEqual(line.centroid[1], ml.centroid.y, 9)
 
-            self.assertEqual(ml, fromstr(l.wkt))
+            self.assertEqual(ml, fromstr(line.wkt))
             self.assertIs(ml == prev, False)  # Use assertIs() to test __eq__.
             prev = ml
 

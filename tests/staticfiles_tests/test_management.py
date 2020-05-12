@@ -72,7 +72,7 @@ class TestFindStatic(TestDefaults, CollectionTestCase):
         findstatic returns all candidate files if run without --first and -v1.
         """
         result = call_command('findstatic', 'test/file.txt', verbosity=1, stdout=StringIO())
-        lines = [l.strip() for l in result.split('\n')]
+        lines = [line.strip() for line in result.split('\n')]
         self.assertEqual(len(lines), 3)  # three because there is also the "Found <file> here" line
         self.assertIn('project', lines[1])
         self.assertIn('apps', lines[2])
@@ -82,7 +82,7 @@ class TestFindStatic(TestDefaults, CollectionTestCase):
         findstatic returns all candidate files if run without --first and -v0.
         """
         result = call_command('findstatic', 'test/file.txt', verbosity=0, stdout=StringIO())
-        lines = [l.strip() for l in result.split('\n')]
+        lines = [line.strip() for line in result.split('\n')]
         self.assertEqual(len(lines), 2)
         self.assertIn('project', lines[0])
         self.assertIn('apps', lines[1])
@@ -93,7 +93,7 @@ class TestFindStatic(TestDefaults, CollectionTestCase):
         Also, test that findstatic returns the searched locations with -v2.
         """
         result = call_command('findstatic', 'test/file.txt', verbosity=2, stdout=StringIO())
-        lines = [l.strip() for l in result.split('\n')]
+        lines = [line.strip() for line in result.split('\n')]
         self.assertIn('project', lines[1])
         self.assertIn('apps', lines[2])
         self.assertIn("Looking in the following locations:", lines[3])
