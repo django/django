@@ -99,7 +99,7 @@ else:
     release = django_release()
 
 # The "development version" of Django
-django_next_version = '3.1'
+django_next_version = '3.2'
 
 extlinks = {
     'commit': ('https://github.com/django/django/commit/%s', ''),
