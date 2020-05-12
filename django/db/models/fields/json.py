@@ -27,8 +27,10 @@ class JSONField(CheckFieldDefaultMixin, Field):
     ):
         if encoder and not callable(encoder):
             raise ValueError('The encoder parameter must be a callable object.')
-        if decoder and not callable(decoder):
-            raise ValueError('The decoder parameter must be a callable object.')
+        if decoder is not None:
+            if not callable(decoder):
+                raise ValueError("The decoder parameter must be a callable object.")
+            self.from_db_value = self._from_db_value
         self.encoder = encoder
         self.decoder = decoder
         super().__init__(verbose_name, name, **kwargs)
@@ -67,10 +69,8 @@ class JSONField(CheckFieldDefaultMixin, Field):
             kwargs['decoder'] = self.decoder
         return name, path, args, kwargs
 
-    def from_db_value(self, value, expression, connection):
+    def _from_db_value(self, value, expression, connection):
         if value is None:
-            return value
-        if connection.features.has_native_json_field and self.decoder is None:
             return value
         try:
             return json.loads(value, cls=self.decoder)
