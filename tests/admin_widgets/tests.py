@@ -880,6 +880,7 @@ class DateTimePickerSeleniumTests(AdminWidgetSeleniumTestCase):
         The calendar shows the date from the input field for every locale
         supported by Django.
         """
+        self.selenium.set_window_size(1024, 768)
         self.admin_login(username='super', password='secret', login_url='/')
 
         # Enter test data
@@ -1142,6 +1143,7 @@ class HorizontalVerticalFilterSeleniumTests(AdminWidgetSeleniumTestCase):
         self.assertEqual(self.selenium.current_url, original_url)
 
     def test_basic(self):
+        self.selenium.set_window_size(1024, 768)
         self.school.students.set([self.lisa, self.peter])
         self.school.alumni.set([self.lisa, self.peter])
 
@@ -1166,6 +1168,7 @@ class HorizontalVerticalFilterSeleniumTests(AdminWidgetSeleniumTestCase):
         """
         from selenium.webdriver.common.keys import Keys
 
+        self.selenium.set_window_size(1024, 768)
         self.school.students.set([self.lisa, self.peter])
         self.school.alumni.set([self.lisa, self.peter])
 
