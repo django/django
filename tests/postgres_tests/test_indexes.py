@@ -260,7 +260,6 @@ class SchemaTests(PostgreSQLTestCase):
             editor.remove_index(IntegerArrayModel, index)
         self.assertNotIn(index_name, self.get_constraints(IntegerArrayModel._meta.db_table))
 
-    @skipUnlessDBFeature('has_bloom_index')
     def test_bloom_index(self):
         index_name = 'char_field_model_field_bloom'
         index = BloomIndex(fields=['field'], name=index_name)
@@ -272,7 +271,6 @@ class SchemaTests(PostgreSQLTestCase):
             editor.remove_index(CharFieldModel, index)
         self.assertNotIn(index_name, self.get_constraints(CharFieldModel._meta.db_table))
 
-    @skipUnlessDBFeature('has_bloom_index')
     def test_bloom_parameters(self):
         index_name = 'char_field_model_field_bloom_params'
         index = BloomIndex(fields=['field'], name=index_name, length=512, columns=[3])
@@ -283,16 +281,6 @@ class SchemaTests(PostgreSQLTestCase):
         self.assertEqual(constraints[index_name]['options'], ['length=512', 'col1=3'])
         with connection.schema_editor() as editor:
             editor.remove_index(CharFieldModel, index)
-        self.assertNotIn(index_name, self.get_constraints(CharFieldModel._meta.db_table))
-
-    def test_bloom_index_not_supported(self):
-        index_name = 'bloom_index_exception'
-        index = BloomIndex(fields=['field'], name=index_name)
-        msg = 'Bloom indexes require PostgreSQL 9.6+.'
-        with self.assertRaisesMessage(NotSupportedError, msg):
-            with mock.patch('django.db.backends.postgresql.features.DatabaseFeatures.has_bloom_index', False):
-                with connection.schema_editor() as editor:
-                    editor.add_index(CharFieldModel, index)
         self.assertNotIn(index_name, self.get_constraints(CharFieldModel._meta.db_table))
 
     def test_brin_index(self):

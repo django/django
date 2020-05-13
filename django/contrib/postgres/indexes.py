@@ -68,10 +68,6 @@ class BloomIndex(PostgresIndex):
             kwargs['columns'] = self.columns
         return path, args, kwargs
 
-    def check_supported(self, schema_editor):
-        if not schema_editor.connection.features.has_bloom_index:
-            raise NotSupportedError('Bloom indexes require PostgreSQL 9.6+.')
-
     def get_with_params(self):
         with_params = []
         if self.length is not None:
