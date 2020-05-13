@@ -300,7 +300,7 @@ MySQL notes
 Version support
 ---------------
 
-Django supports MySQL 5.6 and higher.
+Django supports MySQL 5.7 and higher.
 
 Django's ``inspectdb`` feature uses the ``information_schema`` database, which
 contains detailed data on all database schemas.
@@ -479,11 +479,11 @@ Several other `MySQLdb connection options`_ may be useful, such as ``ssl``,
 Setting ``sql_mode``
 ~~~~~~~~~~~~~~~~~~~~
 
-From MySQL 5.7 onwards and on fresh installs of MySQL 5.6, the default value of
-the ``sql_mode`` option contains ``STRICT_TRANS_TABLES``. That option escalates
-warnings into errors when data are truncated upon insertion, so Django highly
-recommends activating a `strict mode`_ for MySQL to prevent data loss (either
-``STRICT_TRANS_TABLES`` or ``STRICT_ALL_TABLES``).
+From MySQL 5.7 onwards, the default value of the ``sql_mode`` option contains
+``STRICT_TRANS_TABLES``. That option escalates warnings into errors when data
+are truncated upon insertion, so Django highly recommends activating a
+`strict mode`_ for MySQL to prevent data loss (either ``STRICT_TRANS_TABLES``
+or ``STRICT_ALL_TABLES``).
 
 .. _strict mode: https://dev.mysql.com/doc/refman/en/sql-mode.html#sql-mode-strict
 
@@ -605,9 +605,8 @@ specification without a key length".
 Fractional seconds support for Time and DateTime fields
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-MySQL 5.6.4 and later can store fractional seconds, provided that the
-column definition includes a fractional indication (e.g. ``DATETIME(6)``).
-Earlier versions do not support them at all.
+MySQL can store fractional seconds, provided that the column definition
+includes a fractional indication (e.g. ``DATETIME(6)``).
 
 Django will not upgrade existing columns to include fractional seconds if the
 database server supports it. If you want to enable them on an existing database,
