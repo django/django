@@ -33,7 +33,6 @@ class TestCaseFixtureLoadingTests(TestCase):
 
     def test_class_fixtures(self):
         "Test case has installed 3 fixture objects"
-        self.assertEqual(Article.objects.count(), 3)
         self.assertQuerysetEqual(Article.objects.all(), [
             '<Article: Django conquers world!>',
             '<Article: Copyright is fine the way it is>',
@@ -721,7 +720,6 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
 
         with mock.patch('django.core.management.commands.loaddata.sys.stdin', open(fixture_json)):
             management.call_command('loaddata', '--format=json', '-', verbosity=0)
-            self.assertEqual(Article.objects.count(), 2)
             self.assertQuerysetEqual(Article.objects.all(), [
                 '<Article: Time to reform copyright>',
                 '<Article: Poker has no place on ESPN>',
@@ -729,7 +727,6 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
 
         with mock.patch('django.core.management.commands.loaddata.sys.stdin', open(fixture_xml)):
             management.call_command('loaddata', '--format=xml', '-', verbosity=0)
-            self.assertEqual(Article.objects.count(), 3)
             self.assertQuerysetEqual(Article.objects.all(), [
                 '<Article: XML identified as leading cause of cancer>',
                 '<Article: Time to reform copyright>',
@@ -810,7 +807,6 @@ class FixtureTransactionTests(DumpDataAssertMixin, TransactionTestCase):
 class ForwardReferenceTests(DumpDataAssertMixin, TestCase):
     def test_forward_reference_fk(self):
         management.call_command('loaddata', 'forward_reference_fk.json', verbosity=0)
-        self.assertEqual(NaturalKeyThing.objects.count(), 2)
         t1, t2 = NaturalKeyThing.objects.all()
         self.assertEqual(t1.other_thing, t2)
         self.assertEqual(t2.other_thing, t1)
@@ -828,7 +824,6 @@ class ForwardReferenceTests(DumpDataAssertMixin, TestCase):
             'forward_reference_fk_natural_key.json',
             verbosity=0,
         )
-        self.assertEqual(NaturalKeyThing.objects.count(), 2)
         t1, t2 = NaturalKeyThing.objects.all()
         self.assertEqual(t1.other_thing, t2)
         self.assertEqual(t2.other_thing, t1)
