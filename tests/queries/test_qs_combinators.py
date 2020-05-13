@@ -272,6 +272,7 @@ class QuerySetSetOperationTests(TestCase):
                 'annotate',
                 'defer',
                 'delete',
+                'distinct',
                 'exclude',
                 'extra',
                 'filter',
