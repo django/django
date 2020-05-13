@@ -310,13 +310,12 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
         self.assertFalse(u.has_usable_password())
 
     def test_email_in_username(self):
-        new_io = StringIO()
         call_command(
             "createsuperuser",
             interactive=False,
             username="joe+admin@somewhere.org",
             email="joe@somewhere.org",
-            stdout=new_io
+            verbosity=0,
         )
         u = User._default_manager.get(username="joe+admin@somewhere.org")
         self.assertEqual(u.email, 'joe@somewhere.org')
