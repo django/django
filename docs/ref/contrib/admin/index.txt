@@ -44,7 +44,7 @@ If you're not using the default project template, here are the requirements:
    :class:`django.contrib.messages.middleware.MessageMiddleware` must be
    included.
 
-5. :ref:`Hook the admin's URLs into your URLconf
+#. :ref:`Hook the admin's URLs into your URLconf
    <hooking-adminsite-to-urlconf>`.
 
 After you've taken these steps, you'll be able to use the admin site by
