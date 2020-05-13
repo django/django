@@ -161,6 +161,11 @@ Management Commands
   connection. In that case, check for a consistent migration history is
   skipped.
 
+* :attr:`.BaseCommand.requires_system_checks` now supports specifying a list of
+  tags. System checks registered in the chosen tags will be checked for errors
+  prior to executing the command. In previous versions, either all or none
+  of the system checks were performed.
+
 Migrations
 ~~~~~~~~~~
 
@@ -273,3 +278,7 @@ Miscellaneous
 * Assigning objects which don't support creating deep copies with
   :py:func:`copy.deepcopy` to class attributes in
   :meth:`.TestCase.setUpTestData` is deprecated.
+
+* Using a boolean value in :attr:`.BaseCommand.requires_system_checks` is
+  deprecated. Use ``'__all__'`` instead of ``True``, and ``[]`` (an empty list)
+  instead of ``False``.

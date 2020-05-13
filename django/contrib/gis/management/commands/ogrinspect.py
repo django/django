@@ -37,7 +37,7 @@ class Command(BaseCommand):
         ' ./manage.py ogrinspect zipcode.shp Zipcode'
     )
 
-    requires_system_checks = False
+    requires_system_checks = []
 
     def add_arguments(self, parser):
         parser.add_argument('data_source', help='Path to the data source.')

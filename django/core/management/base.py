@@ -4,6 +4,7 @@ be executed through ``django-admin`` or ``manage.py``).
 """
 import os
 import sys
+import warnings
 from argparse import ArgumentParser, HelpFormatter
 from io import TextIOBase
 
@@ -12,6 +13,9 @@ from django.core import checks
 from django.core.exceptions import ImproperlyConfigured
 from django.core.management.color import color_style, no_style
 from django.db import DEFAULT_DB_ALIAS, connections
+from django.utils.deprecation import RemovedInDjango41Warning
+
+ALL_CHECKS = '__all__'
 
 
 class CommandError(Exception):
@@ -203,8 +207,11 @@ class BaseCommand:
         migrations on disk don't match the migrations in the database.
 
     ``requires_system_checks``
-        A boolean; if ``True``, entire Django project will be checked for errors
-        prior to executing the command. Default value is ``True``.
+        A list or tuple of tags, e.g. [Tags.staticfiles, Tags.models]. System
+        checks registered in the chosen tags will be checked for errors prior
+        to executing the command. The value '__all__' can be used to specify
+        that all system checks should be performed. Default value is '__all__'.
+
         To validate an individual application's models
         rather than all applications' models, call
         ``self.check(app_configs)`` from ``handle()``, where ``app_configs``
@@ -222,7 +229,7 @@ class BaseCommand:
     _called_from_command_line = False
     output_transaction = False  # Whether to wrap the output in a "BEGIN; COMMIT;"
     requires_migrations_checks = False
-    requires_system_checks = True
+    requires_system_checks = '__all__'
     # Arguments, common to all commands, which aren't defined by the argument
     # parser.
     base_stealth_options = ('stderr', 'stdout')
@@ -239,6 +246,19 @@ class BaseCommand:
         else:
             self.style = color_style(force_color)
             self.stderr.style_func = self.style.ERROR
+        if self.requires_system_checks in [False, True]:
+            warnings.warn(
+                "Using a boolean value for requires_system_checks is "
+                "deprecated. Use '__all__' instead of True, and [] (an empty "
+                "list) instead of False.",
+                RemovedInDjango41Warning,
+            )
+            self.requires_system_checks = ALL_CHECKS if self.requires_system_checks else []
+        if (
+            not isinstance(self.requires_system_checks, (list, tuple)) and
+            self.requires_system_checks != ALL_CHECKS
+        ):
+            raise TypeError('requires_system_checks must be a list or tuple.')
 
     def get_version(self):
         """
@@ -365,7 +385,10 @@ class BaseCommand:
             self.stderr = OutputWrapper(options['stderr'])
 
         if self.requires_system_checks and not options['skip_checks']:
-            self.check()
+            if self.requires_system_checks == ALL_CHECKS:
+                self.check()
+            else:
+                self.check(tags=self.requires_system_checks)
         if self.requires_migrations_checks:
             self.check_migrations()
         output = self.handle(*args, **options)

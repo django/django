@@ -28,7 +28,7 @@ class TemplateCommand(BaseCommand):
     :param directory: The directory to which the template should be copied.
     :param options: The additional variables passed to project or app templates
     """
-    requires_system_checks = False
+    requires_system_checks = []
     # The supported URL schemes
     url_schemes = ['http', 'https', 'ftp']
     # Rewrite the following suffixes when determining the target filename.

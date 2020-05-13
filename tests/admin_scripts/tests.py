@@ -1395,7 +1395,7 @@ class ManageTestserver(SimpleTestCase):
 # the commands are correctly parsed and processed.
 ##########################################################################
 class ColorCommand(BaseCommand):
-    requires_system_checks = False
+    requires_system_checks = []
 
     def handle(self, *args, **options):
         self.stdout.write('Hello, world!', self.style.ERROR)
@@ -1541,7 +1541,7 @@ class CommandTypes(AdminScriptTestCase):
 
     def test_custom_stdout(self):
         class Command(BaseCommand):
-            requires_system_checks = False
+            requires_system_checks = []
 
             def handle(self, *args, **options):
                 self.stdout.write("Hello, World!")
@@ -1558,7 +1558,7 @@ class CommandTypes(AdminScriptTestCase):
 
     def test_custom_stderr(self):
         class Command(BaseCommand):
-            requires_system_checks = False
+            requires_system_checks = []
 
             def handle(self, *args, **options):
                 self.stderr.write("Hello, World!")

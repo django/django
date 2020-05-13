@@ -16,7 +16,7 @@ class Command(BaseCommand):
     settings.STATIC_ROOT.
     """
     help = "Collect static files in a single location."
-    requires_system_checks = False
+    requires_system_checks = [Tags.staticfiles]
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -36,10 +36,6 @@ class Command(BaseCommand):
         return True
 
     def add_arguments(self, parser):
-        parser.add_argument(
-            '--skip-checks', action='store_true',
-            help='Skip system checks.',
-        )
         parser.add_argument(
             '--noinput', '--no-input', action='store_false', dest='interactive',
             help="Do NOT prompt the user for input of any kind.",
@@ -151,9 +147,6 @@ class Command(BaseCommand):
 
     def handle(self, **options):
         self.set_options(**options)
-        if not options['skip_checks']:
-            self.check(tags=[Tags.staticfiles])
-
         message = ['\n']
         if self.dry_run:
             message.append(

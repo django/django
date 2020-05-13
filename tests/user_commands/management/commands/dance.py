@@ -4,7 +4,7 @@ from django.core.management.base import BaseCommand, CommandError
 class Command(BaseCommand):
     help = "Dance around like a madman."
     args = ''
-    requires_system_checks = True
+    requires_system_checks = '__all__'
 
     def add_arguments(self, parser):
         parser.add_argument("integer", nargs='?', type=int, default=0)

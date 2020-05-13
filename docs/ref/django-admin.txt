@@ -1826,7 +1826,7 @@ colored output to another command.
 Skips running system checks prior to running the command. This option is only
 available if the
 :attr:`~django.core.management.BaseCommand.requires_system_checks` command
-attribute is set to ``True``.
+attribute is not an empty list or tuple.
 
 Example usage::
 

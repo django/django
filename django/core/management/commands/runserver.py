@@ -25,7 +25,7 @@ class Command(BaseCommand):
     help = "Starts a lightweight Web server for development."
 
     # Validation is called explicitly each time the server is reloaded.
-    requires_system_checks = False
+    requires_system_checks = []
     stealth_options = ('shutdown_message',)
 
     default_addr = '127.0.0.1'

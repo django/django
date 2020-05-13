@@ -215,8 +215,15 @@ All attributes can be set in your derived class and can be used in
 
 .. attribute:: BaseCommand.requires_system_checks
 
-    A boolean; if ``True``, the entire Django project will be checked for
-    potential problems prior to executing the command. Default value is ``True``.
+    A list or tuple of tags, e.g. ``[Tags.staticfiles, Tags.models]``. System
+    checks registered in the chosen tags will be checked for errors prior to
+    executing the command. The value ``'__all__'`` can be used to specify
+    that all system checks should be performed. Default value is ``'__all__'``.
+
+    .. versionchanged:: 3.2
+
+        In older versions, the ``requires_system_checks`` attribute expects a
+        boolean value instead of a list or tuple of tags.
 
 .. attribute:: BaseCommand.style
 

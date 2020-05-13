@@ -19,6 +19,8 @@ details on these changes.
   ``copy.deepcopy()`` to class attributes in ``TestCase.setUpTestData()`` will
   be removed.
 
+* ``BaseCommand.requires_system_checks`` won't support boolean values.
+
 .. _deprecation-removed-in-4.0:
 
 4.0

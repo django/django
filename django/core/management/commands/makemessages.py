@@ -206,7 +206,7 @@ class Command(BaseCommand):
     translatable_file_class = TranslatableFile
     build_file_class = BuildFile
 
-    requires_system_checks = False
+    requires_system_checks = []
 
     msgmerge_options = ['-q', '--previous']
     msguniq_options = ['--to-code=utf-8']
