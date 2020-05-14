@@ -1,9 +1,7 @@
 import datetime
 from decimal import Decimal
-from unittest import skipIf
 
 from django.core.exceptions import FieldDoesNotExist, FieldError
-from django.db import connection
 from django.db.models import (
     BooleanField, CharField, Count, DateTimeField, Exists, ExpressionWrapper,
     F, Func, IntegerField, Max, NullBooleanField, OuterRef, Q, Subquery, Sum,
@@ -623,7 +621,6 @@ class NonAggregateAnnotationTestCase(TestCase):
         ).values('name')
         self.assertCountEqual(publisher_books_qs, [{'name': 'Sams'}, {'name': 'Morgan Kaufmann'}])
 
-    @skipIf(connection.vendor == 'oracle', 'See https://code.djangoproject.com/ticket/31584')
     def test_annotation_exists_aggregate_values_chaining(self):
         qs = Book.objects.values('publisher').annotate(
             has_authors=Exists(Book.authors.through.objects.filter(book=OuterRef('pk'))),

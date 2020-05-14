@@ -289,7 +289,8 @@ class BaseDatabaseFeatures:
     # field(s)?
     allows_multiple_constraints_on_same_fields = True
 
-    # Does the backend support boolean expressions in the SELECT clause?
+    # Does the backend support boolean expressions in SELECT and GROUP BY
+    # clauses?
     supports_boolean_expr_in_select_clause = True
 
     def __init__(self, connection):
