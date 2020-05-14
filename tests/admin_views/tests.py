@@ -969,6 +969,11 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
         self.assertEqual(response.context['site_url'], '/my-site-url/')
         self.assertContains(response, '<a href="/my-site-url/">View site</a>')
 
+    def test_date_hierarchy_empty_queryset(self):
+        self.assertIs(Question.objects.exists(), False)
+        response = self.client.get(reverse('admin:admin_views_answer2_changelist'))
+        self.assertEqual(response.status_code, 200)
+
     @override_settings(TIME_ZONE='America/Sao_Paulo', USE_TZ=True)
     def test_date_hierarchy_timezone_dst(self):
         # This datetime doesn't exist in this timezone due to DST.

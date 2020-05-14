@@ -380,12 +380,12 @@ def date_hierarchy(cl):
             # select appropriate start level
             date_range = cl.queryset.aggregate(first=models.Min(field_name),
                                                last=models.Max(field_name))
-            if dates_or_datetimes == 'datetimes':
-                date_range = {
-                    k: timezone.localtime(v) if timezone.is_aware(v) else v
-                    for k, v in date_range.items()
-                }
             if date_range['first'] and date_range['last']:
+                if dates_or_datetimes == 'datetimes':
+                    date_range = {
+                        k: timezone.localtime(v) if timezone.is_aware(v) else v
+                        for k, v in date_range.items()
+                    }
                 if date_range['first'].year == date_range['last'].year:
                     year_lookup = date_range['first'].year
                     if date_range['first'].month == date_range['last'].month:
