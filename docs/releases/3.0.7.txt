@@ -18,3 +18,7 @@ Bugfixes
 
 * Fixed a regression in Django 3.0 where aggregates used wrong annotations when
   a queryset has multiple subqueries annotations (:ticket:`31568`).
+
+* Fixed a regression in Django 3.0 where ``QuerySet.values()`` and
+  ``values_list()`` crashed if a queryset contained an aggregation and an
+  ``Exists()`` annotation on Oracle (:ticket:`31584`).
