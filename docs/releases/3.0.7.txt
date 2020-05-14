@@ -15,3 +15,6 @@ Bugfixes
 * Fixed a regression in Django 3.0 where ``QuerySet.values()`` and
   ``values_list()`` crashed if a queryset contained an aggregation and a
   subquery annotation (:ticket:`31566`).
+
+* Fixed a regression in Django 3.0 where aggregates used wrong annotations when
+  a queryset has multiple subqueries annotations (:ticket:`31568`).
