@@ -96,6 +96,11 @@ Minor features
   enabled by default but can be disabled by using a custom ``AdminSite`` and
   setting :attr:`.AdminSite.enable_nav_sidebar` to ``False``.
 
+  Rendering the sidebar requires access to the current request in order to set
+  CSS and ARIA role affordances. This requires using
+  ``'django.template.context_processors.request'`` in the
+  ``'context_processors'`` option of :setting:`OPTIONS <TEMPLATES-OPTIONS>`.
+
 * ``XRegExp`` is upgraded from version 2.0.0 to 3.2.0.
 
 * jQuery is upgraded from version 3.4.1 to 3.5.1.

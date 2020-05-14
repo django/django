@@ -34,10 +34,17 @@ If you're not using the default project template, here are the requirements:
 
 #. Configure a :class:`~django.template.backends.django.DjangoTemplates`
    backend in your :setting:`TEMPLATES` setting with
-   ``django.contrib.auth.context_processors.auth`` and
+   ``django.contrib.auth.context_processors.auth``,
+   ``django.contrib.messages.context_processors.request``, and
    ``django.contrib.messages.context_processors.messages`` in
    the ``'context_processors'`` option of :setting:`OPTIONS
    <TEMPLATES-OPTIONS>`.
+
+   .. versionchanged:: 3.1
+
+       ``django.contrib.messages.context_processors.request`` was added as a
+       requirement in the ``'context_processors'`` option to support the new
+       :attr:`.AdminSite.enable_nav_sidebar`.
 
 #. If you've customized the :setting:`MIDDLEWARE` setting,
    :class:`django.contrib.auth.middleware.AuthenticationMiddleware` and
