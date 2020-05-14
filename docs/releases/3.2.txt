@@ -190,6 +190,8 @@ Forms
   :func:`.inlineformset_factory`, and :func:`.modelformset_factory` allows
   removal of the option to delete extra forms. See
   :attr:`~.BaseFormSet.can_delete_extra` for more information.
+* :class:`~django.forms.NullBooleanField` now works with other widgets
+  e.g :class:`~django.forms.RadioSelect`.
 
 Generic Views
 ~~~~~~~~~~~~~

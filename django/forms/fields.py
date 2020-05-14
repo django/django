@@ -734,6 +734,15 @@ class NullBooleanField(BooleanField):
     """
     widget = NullBooleanSelect
 
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        if not isinstance(self.widget, NullBooleanSelect):
+            self.choices = self.widget.choices = [
+                ('', _('Unknown')),
+                (True, _('Yes')),
+                (False, _('No')),
+            ]
+
     def to_python(self, value):
         """
         Explicitly check for the string 'True' and 'False', which is what a

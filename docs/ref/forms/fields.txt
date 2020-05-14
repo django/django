@@ -913,6 +913,11 @@ For each field, we describe the default widget used if you don't specify
     * Normalizes to: A Python ``True``, ``False`` or ``None`` value.
     * Validates nothing (i.e., it never raises a ``ValidationError``).
 
+.. versionchanged:: 3.2
+
+    ``NullBooleanField`` can now be used with widgets other than
+    :class:`NullBooleanSelect` e.g. :class:`RadioSelect`
+
 ``RegexField``
 --------------
 

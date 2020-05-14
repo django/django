@@ -72,3 +72,30 @@ class NullBooleanFieldTest(FormFieldAssertionsMixin, SimpleTestCase):
         self.assertTrue(f.has_changed(False, 'True'))
         self.assertTrue(f.has_changed(True, 'False'))
         self.assertTrue(f.has_changed(None, 'False'))
+
+    def test_nullbooleanfield_radio_widget(self):
+        f = NullBooleanField(widget=RadioSelect)
+
+        html_output = f.widget.render('field_name', True)
+        html_expected = """
+        <ul><li><label><input type="radio" name="field_name" value="">Unknown</label></li>
+        <li><label><input type="radio" name="field_name" value="True" checked>Yes</label></li>
+        <li><label><input type="radio" name="field_name" value="False"> No</label></li></ul>
+        """
+        self.assertHTMLEqual(html_output, html_expected)
+
+        html_output = f.widget.render('field_name', 'True')
+        html_expected = """
+        <ul><li><label><input type="radio" name="field_name" value="">Unknown</label></li>
+        <li><label><input type="radio" name="field_name" value="True" checked>Yes</label></li>
+        <li><label><input type="radio" name="field_name" value="False"> No</label></li></ul>
+        """
+        self.assertHTMLEqual(html_output, html_expected)
+
+        html_output = f.widget.render('field_name', '')
+        html_expected = """
+        <ul><li><label><input checked type="radio" name="field_name" value="">Unknown</label></li>
+        <li><label><input type="radio" name="field_name" value="True">Yes</label></li>
+        <li><label><input type="radio" name="field_name" value="False"> No</label></li></ul>
+        """
+        self.assertHTMLEqual(html_output, html_expected)
