@@ -11,3 +11,7 @@ Bugfixes
 
 * Fixed a regression in Django 3.0 by restoring the ability to use field
   lookups in ``Meta.ordering`` (:ticket:`31538`).
+
+* Fixed a regression in Django 3.0 where ``QuerySet.values()`` and
+  ``values_list()`` crashed if a queryset contained an aggregation and a
+  subquery annotation (:ticket:`31566`).
