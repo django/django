@@ -734,6 +734,9 @@ The following checks are performed on the default
   must be in :setting:`MIDDLEWARE` in order to use the admin application.
 * **admin.E410**: :class:`django.contrib.sessions.middleware.SessionMiddleware`
   must be in :setting:`MIDDLEWARE` in order to use the admin application.
+* **admin.W411**: ``django.template.context_processors.request`` must be
+  enabled in :class:`~django.template.backends.django.DjangoTemplates`
+  (:setting:`TEMPLATES`) in order to use the admin navigation sidebar.
 
 ``auth``
 --------
