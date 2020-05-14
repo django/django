@@ -134,6 +134,12 @@ class SystemChecksTestCase(SimpleTestCase):
                 "be enabled in DjangoTemplates (TEMPLATES) in order to use "
                 "the admin application.",
                 id='admin.E404',
+            ),
+            checks.Warning(
+                "'django.template.context_processors.request' must be enabled "
+                "in DjangoTemplates (TEMPLATES) in order to use the admin "
+                "navigation sidebar.",
+                id='admin.W411',
             )
         ]
         self.assertEqual(admin.checks.check_dependencies(), expected)
@@ -150,7 +156,10 @@ class SystemChecksTestCase(SimpleTestCase):
             'DIRS': [],
             'APP_DIRS': True,
             'OPTIONS': {
-                'context_processors': ['django.contrib.messages.context_processors.messages'],
+                'context_processors': [
+                    'django.template.context_processors.request',
+                    'django.contrib.messages.context_processors.messages',
+                ],
             },
         }],
     )
@@ -177,6 +186,7 @@ class SystemChecksTestCase(SimpleTestCase):
                 'APP_DIRS': True,
                 'OPTIONS': {
                     'context_processors': [
+                        'django.template.context_processors.request',
                         'django.contrib.auth.context_processors.auth',
                         'django.contrib.messages.context_processors.messages',
                     ],

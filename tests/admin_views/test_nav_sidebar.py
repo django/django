@@ -51,9 +51,31 @@ class AdminSidebarTests(TestCase):
         self.assertNotContains(response, '<nav class="sticky" id="nav-sidebar">')
 
     def test_sidebar_aria_current_page(self):
-        response = self.client.get(reverse('test_with_sidebar:auth_user_changelist'))
+        url = reverse('test_with_sidebar:auth_user_changelist')
+        response = self.client.get(url)
         self.assertContains(response, '<nav class="sticky" id="nav-sidebar">')
-        self.assertContains(response, 'aria-current="page">Users</a>')
+        self.assertContains(response, '<a href="%s" aria-current="page">Users</a>' % url)
+
+    @override_settings(
+        TEMPLATES=[{
+            'BACKEND': 'django.template.backends.django.DjangoTemplates',
+            'DIRS': [],
+            'APP_DIRS': True,
+            'OPTIONS': {
+                'context_processors': [
+                    'django.contrib.auth.context_processors.auth',
+                    'django.contrib.messages.context_processors.messages',
+                ],
+            },
+        }]
+    )
+    def test_sidebar_aria_current_page_missing_without_request_context_processor(self):
+        url = reverse('test_with_sidebar:auth_user_changelist')
+        response = self.client.get(url)
+        self.assertContains(response, '<nav class="sticky" id="nav-sidebar">')
+        # Does not include aria-current attribute.
+        self.assertContains(response, '<a href="%s">Users</a>' % url)
+        self.assertNotContains(response, 'aria-current')
 
 
 @override_settings(ROOT_URLCONF='admin_views.test_nav_sidebar')
