@@ -34,9 +34,9 @@ class LoremTagTests(SimpleTestCase):
     @setup({'lorem_multiple_paragraphs': '{% lorem 2 p %}'})
     def test_lorem_multiple_paragraphs(self):
         output = self.engine.render_to_string('lorem_multiple_paragraphs')
-        assert output.count("<p>") == 2
+        assert output.count('<p>') == 2
 
     @setup({'lorem_incorrect_count': '{% lorem two p %}'})
     def test_lorem_incorrect_count(self):
         output = self.engine.render_to_string('lorem_incorrect_count')
-        assert output.count("<p>") == 1
+        assert output.count('<p>') == 1
