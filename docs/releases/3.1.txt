@@ -673,11 +673,6 @@ Miscellaneous
 * The undocumented ``django.contrib.postgres.fields.jsonb.JsonAdapter`` class
   is removed.
 
-* Minified JavaScript files are no longer included with the admin. If you
-  require these files to be minified, consider using a third party app or
-  external build tool. The minified vendored JavaScript files packaged with the
-  admin (e.g. :ref:`jquery.min.js <contrib-admin-jquery>`) are still included.
-
 .. _deprecated-features-3.1:
 
 Features deprecated in 3.1
