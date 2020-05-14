@@ -1293,12 +1293,14 @@ class SeleniumTests(AdminSeleniumTestCase):
 
         # Test amount of rows in the Changelist
         rows = self.selenium.find_elements_by_css_selector(
-            '%s #result_list tbody tr' % form_id)
+            '%s #result_list tbody tr' % form_id
+        )
         self.assertEqual(len(rows), 1)
         row = rows[0]
 
         selection_indicator = self.selenium.find_element_by_css_selector(
-            '%s .action-counter' % form_id)
+            '%s .action-counter' % form_id
+        )
         all_selector = self.selenium.find_element_by_id('action-toggle')
         row_selector = self.selenium.find_element_by_css_selector(
             '%s #result_list tbody tr:first-child .action-select' % form_id
