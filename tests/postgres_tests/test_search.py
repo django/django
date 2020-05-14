@@ -195,7 +195,6 @@ class MultipleFieldsTest(GrailTestData, PostgreSQLTestCase):
         ).filter(search=str(self.crowd.id))
         self.assertSequenceEqual(searched, [self.crowd])
 
-    @skipUnlessDBFeature('has_phraseto_tsquery')
     def test_phrase_search(self):
         line_qs = Line.objects.annotate(search=SearchVector('dialogue'))
         searched = line_qs.filter(search=SearchQuery('burned body his away', search_type='phrase'))
@@ -203,7 +202,6 @@ class MultipleFieldsTest(GrailTestData, PostgreSQLTestCase):
         searched = line_qs.filter(search=SearchQuery('his body burned away', search_type='phrase'))
         self.assertSequenceEqual(searched, [self.verse1])
 
-    @skipUnlessDBFeature('has_phraseto_tsquery')
     def test_phrase_search_with_config(self):
         line_qs = Line.objects.annotate(
             search=SearchVector('scene__setting', 'dialogue', config='french'),
@@ -386,7 +384,6 @@ class TestCombinations(GrailTestData, PostgreSQLTestCase):
         )
         self.assertSequenceEqual(searched, [self.verse2])
 
-    @skipUnlessDBFeature('has_phraseto_tsquery')
     def test_combine_raw_phrase(self):
         searched = Line.objects.filter(
             dialogue__search=(

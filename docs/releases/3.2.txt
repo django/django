@@ -224,6 +224,17 @@ backends.
 
 * ...
 
+:mod:`django.contrib.gis`
+-------------------------
+
+* Support for PostGIS 2.2 is removed.
+
+Dropped support for PostgreSQL 9.5
+----------------------------------
+
+Upstream support for PostgreSQL 9.5 ends in February 2021. Django 3.2 supports
+PostgreSQL 9.6 and higher.
+
 Miscellaneous
 -------------
 
