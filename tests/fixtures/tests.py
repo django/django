@@ -27,6 +27,12 @@ try:
 except ImportError:
     HAS_BZ2 = False
 
+try:
+    import lzma  # NOQA
+    HAS_LZMA = True
+except ImportError:
+    HAS_LZMA = False
+
 
 class TestCaseFixtureLoadingTests(TestCase):
     fixtures = ['fixture1.json', 'fixture2.json']
@@ -554,6 +560,20 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
     @unittest.skipUnless(HAS_BZ2, 'No bz2 library detected.')
     def test_compressed_loading_bz2(self):
         management.call_command('loaddata', 'fixture5.json.bz2', verbosity=0)
+        self.assertQuerysetEqual(Article.objects.all(), [
+            '<Article: WoW subscribers now outnumber readers>',
+        ])
+
+    @unittest.skipUnless(HAS_LZMA, 'No lzma library detected.')
+    def test_compressed_loading_lzma(self):
+        management.call_command('loaddata', 'fixture5.json.lzma', verbosity=0)
+        self.assertQuerysetEqual(Article.objects.all(), [
+            '<Article: WoW subscribers now outnumber readers>',
+        ])
+
+    @unittest.skipUnless(HAS_LZMA, 'No lzma library detected.')
+    def test_compressed_loading_xz(self):
+        management.call_command('loaddata', 'fixture5.json.xz', verbosity=0)
         self.assertQuerysetEqual(Article.objects.all(), [
             '<Article: WoW subscribers now outnumber readers>',
         ])

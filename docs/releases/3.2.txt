@@ -154,7 +154,8 @@ Logging
 Management Commands
 ~~~~~~~~~~~~~~~~~~~
 
-* ...
+* :djadmin:`loaddata` now supports fixtures stored in XZ archives (``.xz``) and
+  LZMA archives (``.lzma``).
 
 Migrations
 ~~~~~~~~~~

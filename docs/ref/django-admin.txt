@@ -599,13 +599,14 @@ The :djadmin:`dumpdata` command can be used to generate input for ``loaddata``.
 Compressed fixtures
 ~~~~~~~~~~~~~~~~~~~
 
-Fixtures may be compressed in ``zip``, ``gz``, or ``bz2`` format. For example::
+Fixtures may be compressed in ``zip``, ``gz``, ``bz2``, ``lzma``, or ``xz``
+format. For example::
 
     django-admin loaddata mydata.json
 
-would look for any of ``mydata.json``, ``mydata.json.zip``,
-``mydata.json.gz``, or ``mydata.json.bz2``. The first file contained within a
-zip-compressed archive is used.
+would look for any of ``mydata.json``, ``mydata.json.zip``, ``mydata.json.gz``,
+``mydata.json.bz2``, ``mydata.json.lzma``, or ``mydata.json.xz``. The first
+file contained within a compressed archive is used.
 
 Note that if two fixtures with the same name but different
 fixture type are discovered (for example, if ``mydata.json`` and
@@ -618,6 +619,10 @@ installation will be aborted, and any data installed in the call to
     The MyISAM storage engine of MySQL doesn't support transactions or
     constraints, so if you use MyISAM, you won't get validation of fixture
     data, or a rollback if multiple transaction files are found.
+
+.. versionchanged:: 3.2
+
+    Support for XZ archives (``.xz``) and LZMA archives (``.lzma``) was added.
 
 Database-specific fixtures
 ~~~~~~~~~~~~~~~~~~~~~~~~~~

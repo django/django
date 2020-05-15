@@ -26,6 +26,12 @@ try:
 except ImportError:
     has_bz2 = False
 
+try:
+    import lzma
+    has_lzma = True
+except ImportError:
+    has_lzma = False
+
 READ_STDIN = '-'
 
 
@@ -97,6 +103,9 @@ class Command(BaseCommand):
         }
         if has_bz2:
             self.compression_formats['bz2'] = (bz2.BZ2File, 'r')
+        if has_lzma:
+            self.compression_formats['lzma'] = (lzma.LZMAFile, 'r')
+            self.compression_formats['xz'] = (lzma.LZMAFile, 'r')
 
         # Django's test suite repeatedly tries to load initial_data fixtures
         # from apps that don't have any fixtures. Because disabling constraint
