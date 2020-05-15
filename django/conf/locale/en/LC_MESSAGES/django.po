@@ -346,6 +346,10 @@ msgstr ""
 msgid "Telugu"
 msgstr ""
 
+#: conf/global_settings.py:133
+msgid "Tajik"
+msgstr ""
+
 #: conf/global_settings.py:134
 msgid "Thai"
 msgstr ""

@@ -512,6 +512,12 @@ LANG_INFO = {
         'name': 'Telugu',
         'name_local': 'తెలుగు',
     },
+    'tg': {
+        'bidi': False,
+        'code': 'tg',
+        'name': 'Tajik',
+        'name_local': 'тоҷикӣ',
+    },
     'th': {
         'bidi': False,
         'code': 'th',
