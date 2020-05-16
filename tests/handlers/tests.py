@@ -1,12 +1,9 @@
-from django.contrib.staticfiles.handlers import ASGIStaticFilesHandler
 from django.core.exceptions import ImproperlyConfigured
-from django.core.handlers.asgi import ASGIHandler
 from django.core.handlers.wsgi import WSGIHandler, WSGIRequest, get_script_name
 from django.core.signals import request_finished, request_started
 from django.db import close_old_connections, connection
 from django.test import (
-    RequestFactory, SimpleTestCase, TransactionTestCase, modify_settings,
-    override_settings,
+    RequestFactory, SimpleTestCase, TransactionTestCase, override_settings,
 )
 from django.utils.version import PY37
 
@@ -89,17 +86,6 @@ class HandlerTests(SimpleTestCase):
         response = handler(environ, lambda *a, **k: None)
         # Expect "bad request" response
         self.assertEqual(response.status_code, 400)
-
-
-class TestASGIStaticFilesHandler(SimpleTestCase):
-    request_factory = RequestFactory()
-
-    @modify_settings(INSTALLED_APPS={'append': 'staticfiles_tests.apps.test'})
-    async def test_get_async_response(self):
-        request = self.request_factory.post('/static/test/file.txt')
-        handler = ASGIStaticFilesHandler(ASGIHandler())
-        response = await handler.get_response_async(request)
-        self.assertEqual(response.status_code, 200)
 
 
 @override_settings(ROOT_URLCONF='handlers.urls', MIDDLEWARE=[])
