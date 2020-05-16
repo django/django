@@ -2,7 +2,7 @@ import datetime
 
 from django.contrib import admin
 from django.contrib.admin.models import LogEntry
-from django.contrib.admin.options import IncorrectLookupParameters
+from django.contrib.admin.options import IncorrectLookupParameters, IS_POPUP_VAR, TO_FIELD_VAR
 from django.contrib.admin.templatetags.admin_list import pagination
 from django.contrib.admin.tests import AdminSeleniumTestCase
 from django.contrib.admin.views.main import ALL_VAR, SEARCH_VAR
@@ -706,17 +706,44 @@ class ChangeListTests(TestCase):
         link = reverse('admin:admin_changelist_parent_change', args=(p.pk,))
         self.assertNotContains(response, '<a href="%s">' % link)
 
-    def test_clear_all_filters_link(self):
+    def test_clear_all_filters_link_shown(self):
         self.client.force_login(self.superuser)
         link = '<a href="?">&#10006; Clear all filters</a>'
-        response = self.client.get(reverse('admin:auth_user_changelist'))
-        self.assertNotContains(response, link)
         for data in (
-            {SEARCH_VAR: 'test'},
             {'is_staff__exact': '0'},
+            {SEARCH_VAR: 'test'},
         ):
             response = self.client.get(reverse('admin:auth_user_changelist'), data=data)
             self.assertContains(response, link)
+
+    def test_clear_all_filters_link_not_shown(self):
+        self.client.force_login(self.superuser)
+        link = '<a href="?">&#10006; Clear all filters</a>'
+        for data in (
+            {},
+        ):
+            response = self.client.get(reverse('admin:auth_user_changelist'), data=data)
+            self.assertNotContains(response, link)
+
+    def test_clear_all_filters_link_shown_in_popup(self):
+        self.client.force_login(self.superuser)
+        link = '<a href="?_popup=1&amp;_to_field=id">&#10006; Clear all filters</a>'
+        for data in (
+            {IS_POPUP_VAR: '1', TO_FIELD_VAR: 'id', 'is_staff__exact': '0'},
+            {IS_POPUP_VAR: '1', TO_FIELD_VAR: 'id', SEARCH_VAR: 'test'},
+
+        ):
+            response = self.client.get(reverse('admin:auth_user_changelist'), data=data)
+            self.assertContains(response, link)
+
+    def test_clear_all_filters_link_not_shown_in_popup(self):
+        self.client.force_login(self.superuser)
+        link = '<a href="?_popup=1&amp;_to_field=id">&#10006; Clear all filters</a>'
+        for data in (
+            {IS_POPUP_VAR: '1', TO_FIELD_VAR: 'id'},
+        ):
+            response = self.client.get(reverse('admin:auth_user_changelist'), data=data)
+            self.assertNotContains(response, link)
 
     def test_tuple_list_display(self):
         swallow = Swallow.objects.create(origin='Africa', load='12.34', speed='22.2')
