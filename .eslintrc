@@ -4,6 +4,7 @@
         "comma-spacing": ["error", {"before": false, "after": true}],
         "curly": ["error", "all"],
         "dot-notation": ["error", {"allowKeywords": true}],
+        "eqeqeq": ["error"],
         "indent": ["error", 4],
         "key-spacing": ["error", {"beforeColon": false, "afterColon": true}],
         "linebreak-style": ["error", "unix"],
