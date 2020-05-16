@@ -1813,6 +1813,7 @@ class ModelAdmin(BaseModelAdmin):
             'title': cl.title,
             'is_popup': cl.is_popup,
             'to_field': cl.to_field,
+            'no_filters_params': urlencode(cl.no_filters_params),
             'cl': cl,
             'media': media,
             'has_add_permission': self.has_add_permission(request),

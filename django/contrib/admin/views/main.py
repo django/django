@@ -1,3 +1,4 @@
+from collections import OrderedDict
 from datetime import datetime, timedelta
 
 from django import forms
@@ -59,6 +60,8 @@ class ChangeList:
         self.list_display_links = list_display_links
         self.list_filter = list_filter
         self.has_filters = None
+        self.has_active_filters = None
+        self.no_filters_params = OrderedDict()
         self.date_hierarchy = date_hierarchy
         self.search_fields = search_fields
         self.list_select_related = list_select_related
@@ -85,6 +88,10 @@ class ChangeList:
             raise DisallowedModelAdminToField("The field %s cannot be referenced." % to_field)
         self.to_field = to_field
         self.params = dict(request.GET.items())
+        if self.is_popup:
+            self.no_filters_params[IS_POPUP_VAR] = self.params[IS_POPUP_VAR]
+        if self.to_field:
+            self.no_filters_params[TO_FIELD_VAR] = self.params[TO_FIELD_VAR]
         if PAGE_VAR in self.params:
             del self.params[PAGE_VAR]
         if ERROR_FLAG in self.params:
@@ -121,6 +128,7 @@ class ChangeList:
     def get_filters(self, request):
         lookup_params = self.get_filters_params()
         use_distinct = False
+        has_active_filters = False
 
         for key, value in lookup_params.items():
             if not self.model_admin.lookup_allowed(key, value):
@@ -155,6 +163,7 @@ class ChangeList:
                 # remove duplicate results.
                 if lookup_params_count > len(lookup_params):
                     use_distinct = use_distinct or lookup_needs_distinct(self.lookup_opts, field_path)
+                    has_active_filters = True
             if spec and spec.has_output():
                 filter_specs.append(spec)
 
@@ -199,7 +208,7 @@ class ChangeList:
             for key, value in lookup_params.items():
                 lookup_params[key] = prepare_lookup_value(key, value)
                 use_distinct = use_distinct or lookup_needs_distinct(self.lookup_opts, key)
-            return filter_specs, bool(filter_specs), lookup_params, use_distinct
+            return filter_specs, bool(filter_specs), lookup_params, use_distinct, has_active_filters
         except FieldDoesNotExist as e:
             raise IncorrectLookupParameters(e) from e
 
@@ -434,7 +443,7 @@ class ChangeList:
     def get_queryset(self, request):
         # First, we collect all the declared list filters.
         (self.filter_specs, self.has_filters, remaining_lookup_params,
-         filters_use_distinct) = self.get_filters(request)
+         filters_use_distinct, self.has_active_filters) = self.get_filters(request)
 
         # Then, we let every list filter modify the queryset to its liking.
         qs = self.root_queryset

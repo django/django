@@ -2,7 +2,9 @@ import datetime
 
 from django.contrib import admin
 from django.contrib.admin.models import LogEntry
-from django.contrib.admin.options import IncorrectLookupParameters, IS_POPUP_VAR, TO_FIELD_VAR
+from django.contrib.admin.options import (
+    IS_POPUP_VAR, TO_FIELD_VAR, IncorrectLookupParameters,
+)
 from django.contrib.admin.templatetags.admin_list import pagination
 from django.contrib.admin.tests import AdminSeleniumTestCase
 from django.contrib.admin.views.main import ALL_VAR, SEARCH_VAR
