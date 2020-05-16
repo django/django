@@ -17,6 +17,7 @@
     cursor: pointer;
     font-size: 20px;
     color: #447e9b;
+    padding: 0;
 }
 
 [dir="rtl"] .toggle-nav-sidebar {
