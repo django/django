@@ -8,7 +8,7 @@ from django import forms
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.validators import URLValidator
-from django.db.models import CASCADE
+from django.db.models import CASCADE, UUIDField
 from django.urls import reverse
 from django.urls.exceptions import NoReverseMatch
 from django.utils.html import smart_urlquote
@@ -150,6 +150,8 @@ class ForeignKeyRawIdWidget(forms.TextInput):
             context['link_title'] = _('Lookup')
             # The JavaScript code looks for this class.
             context['widget']['attrs'].setdefault('class', 'vForeignKeyRawIdAdminField')
+            if isinstance(rel_to._meta.pk, UUIDField):
+                context['widget']['attrs']['class'] += ' ' + 'vUUIDField'
         else:
             context['related_url'] = None
         if context['widget']['value']:
