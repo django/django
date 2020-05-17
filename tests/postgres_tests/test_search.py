@@ -31,7 +31,7 @@ class GrailTestData:
                 'Bravely bold Sir Robin, rode forth from Camelot. '
                 'He was not afraid to die, o Brave Sir Robin. '
                 'He was not at all afraid to be killed in nasty ways. '
-                'Brave, brave, brave, brave Sir Robin!'
+                'Brave, brave, brave, brave Sir Robin'
             ),
             (
                 'He was not in the least bit scared to be mashed into a pulp, '
@@ -578,7 +578,7 @@ class SearchHeadlineTests(GrailTestData, PostgreSQLTestCase):
         self.assertEqual(
             searched.headline,
             'Robin. He was not at all afraid to be <b>killed</b> in nasty '
-            'ways. Brave, brave, brave, brave Sir Robin!',
+            'ways. Brave, brave, brave, brave Sir Robin',
         )
 
     def test_headline_with_config(self):
@@ -641,13 +641,15 @@ class SearchHeadlineTests(GrailTestData, PostgreSQLTestCase):
         searched = Line.objects.annotate(
             headline=SearchHeadline(
                 'dialogue',
-                SearchQuery('brave sir robin', config='english'),
-                short_word=6,
+                SearchQuery('Camelot', config='english'),
+                short_word=5,
+                min_words=8,
             ),
         ).get(pk=self.verse0.pk)
-        self.assertIs(searched.headline.endswith(
-            '<b>Brave</b>, <b>brave</b>, <b>brave</b>, <b>brave</b> <b>Sir</b>'
-        ), True)
+        self.assertEqual(searched.headline, (
+            '<b>Camelot</b>. He was not afraid to die, o Brave Sir Robin. He '
+            'was not at all afraid'
+        ))
 
     def test_headline_fragments_words_options(self):
         searched = Line.objects.annotate(
