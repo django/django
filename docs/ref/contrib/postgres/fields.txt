@@ -538,7 +538,10 @@ suitable for.
 All of the range fields translate to :ref:`psycopg2 Range objects
 <psycopg2:adapt-range>` in Python, but also accept tuples as input if no bounds
 information is necessary. The default is lower bound included, upper bound
-excluded; that is, ``[)``.
+excluded, that is ``[)`` (see the PostgreSQL documentation for details about
+`different bounds`_).
+
+.. _different bounds: https://www.postgresql.org/docs/current/rangetypes.html#RANGETYPES-IO
 
 ``IntegerRangeField``
 ---------------------
@@ -552,7 +555,7 @@ excluded; that is, ``[)``.
 
     Regardless of the bounds specified when saving the data, PostgreSQL always
     returns a range in a canonical form that includes the lower bound and
-    excludes the upper bound; that is ``[)``.
+    excludes the upper bound, that is ``[)``.
 
 ``BigIntegerRangeField``
 ------------------------
@@ -566,7 +569,7 @@ excluded; that is, ``[)``.
 
     Regardless of the bounds specified when saving the data, PostgreSQL always
     returns a range in a canonical form that includes the lower bound and
-    excludes the upper bound; that is ``[)``.
+    excludes the upper bound, that is ``[)``.
 
 ``DecimalRangeField``
 ---------------------
@@ -599,7 +602,7 @@ excluded; that is, ``[)``.
 
     Regardless of the bounds specified when saving the data, PostgreSQL always
     returns a range in a canonical form that includes the lower bound and
-    excludes the upper bound; that is ``[)``.
+    excludes the upper bound, that is ``[)``.
 
 Querying Range Fields
 ---------------------
