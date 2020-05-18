@@ -59,6 +59,7 @@ EXCLUDE_FROM_PACKAGES = ['django.conf.project_template',
 
 # Dynamically calculate the version based on django.VERSION.
 version = __import__('django').get_version()
+nimbis_version = '1'
 
 
 def read(fname):
@@ -68,7 +69,7 @@ def read(fname):
 
 setup(
     name='Django',
-    version=version,
+    version='{}+nimbis.{}'.format(version, nimbis_version),
     python_requires='>={}.{}'.format(*REQUIRED_PYTHON),
     url='https://www.djangoproject.com/',
     author='Django Software Foundation',

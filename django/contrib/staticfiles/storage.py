@@ -76,7 +76,7 @@ class HashedFilesMixin:
         """
         if content is None:
             return None
-        md5 = hashlib.md5()
+        md5 = hashlib.md5(usedforsecurity=False)
         for chunk in content.chunks():
             md5.update(chunk)
         return md5.hexdigest()[:12]
@@ -467,7 +467,7 @@ class CachedFilesMixin(HashedFilesMixin):
             self.hashed_files = _MappingCache(default_cache)
 
     def hash_key(self, name):
-        key = hashlib.md5(self.clean_name(name).encode()).hexdigest()
+        key = hashlib.md5(self.clean_name(name).encode(), usedforsecurity=False).hexdigest()
         return 'staticfiles:%s' % key
 
 
