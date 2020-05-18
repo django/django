@@ -10,7 +10,7 @@
         main.classList.toggle('shifted', navSidebarIsOpen === 'true');
 
         toggleNavSidebar.addEventListener('click', function() {
-            if (navSidebarIsOpen == 'true') {
+            if (navSidebarIsOpen === 'true') {
                 navSidebarIsOpen = 'false';
             } else {
                 navSidebarIsOpen = 'true';
