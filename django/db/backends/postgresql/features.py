@@ -58,6 +58,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supported_explain_formats = {'JSON', 'TEXT', 'XML', 'YAML'}
     validates_explain_options = False  # A query will error on invalid options.
     supports_deferrable_unique_constraints = True
+    has_json_operators = True
 
     @cached_property
     def is_postgresql_10(self):
