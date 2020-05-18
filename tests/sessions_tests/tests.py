@@ -910,3 +910,14 @@ class CookieSessionTests(SessionTestsMixin, SimpleTestCase):
     @unittest.skip("CookieSession is stored in the client and there is no way to query it.")
     def test_session_save_does_not_resurrect_session_logged_out_in_other_context(self):
         pass
+
+
+class ClearSessionsCommandTests(SimpleTestCase):
+    def test_clearsessions_unsupported(self):
+        msg = (
+            "Session engine 'tests.sessions_tests.no_clear_expired' doesn't "
+            "support clearing expired sessions."
+        )
+        with self.settings(SESSION_ENGINE='tests.sessions_tests.no_clear_expired'):
+            with self.assertRaisesMessage(management.CommandError, msg):
+                management.call_command('clearsessions')
