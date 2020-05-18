@@ -309,6 +309,8 @@ class BaseDatabaseFeatures:
     supports_primitives_in_json_field = True
     # Is there a true datatype for JSON?
     has_native_json_field = False
+    # Does the backend use PostgreSQL-style JSON operators like '->'?
+    has_json_operators = False
 
     def __init__(self, connection):
         self.connection = connection

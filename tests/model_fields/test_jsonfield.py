@@ -17,7 +17,9 @@ from django.db.models.fields.json import (
     KeyTransformTextLookupMixin,
 )
 from django.db.models.functions import Cast
-from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
+from django.test import (
+    SimpleTestCase, TestCase, skipIfDBFeature, skipUnlessDBFeature,
+)
 from django.test.utils import CaptureQueriesContext
 
 from .models import CustomJSONDecoder, JSONModel, NullableJSONModel
@@ -607,7 +609,7 @@ class TestQuerying(TestCase):
     def test_key_iregex(self):
         self.assertIs(NullableJSONModel.objects.filter(value__foo__iregex=r'^bAr$').exists(), True)
 
-    @skipUnless(connection.vendor == 'postgresql', 'kwargs are crafted for PostgreSQL.')
+    @skipUnlessDBFeature('has_json_operators')
     def test_key_sql_injection(self):
         with CaptureQueriesContext(connection) as queries:
             self.assertIs(
@@ -621,7 +623,7 @@ class TestQuerying(TestCase):
             queries[0]['sql'],
         )
 
-    @skipIf(connection.vendor == 'postgresql', 'PostgreSQL uses operators not functions.')
+    @skipIfDBFeature('has_json_operators')
     def test_key_sql_injection_escape(self):
         query = str(JSONModel.objects.filter(**{
             """value__test") = '"a"' OR 1 = 1 OR ("d""": 'x',
