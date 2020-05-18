@@ -708,15 +708,19 @@ class ChangeListTests(TestCase):
 
     def test_clear_all_filters_link(self):
         self.client.force_login(self.superuser)
-        link = '<a href="?">&#10006; Clear all filters</a>'
-        response = self.client.get(reverse('admin:auth_user_changelist'))
-        self.assertNotContains(response, link)
-        for data in (
-            {SEARCH_VAR: 'test'},
-            {'is_staff__exact': '0'},
-        ):
-            response = self.client.get(reverse('admin:auth_user_changelist'), data=data)
-            self.assertContains(response, link)
+        link = '<a href="%s">&#10006; Clear all filters</a>'
+        tests = (  # data, link, assert_method
+            ({}, link % '?', self.assertNotContains),
+            ({'is_staff__exact': '0'}, link % '?', self.assertContains),
+            ({SEARCH_VAR: 'test'}, link % '?', self.assertNotContains),
+            ({SEARCH_VAR: 'test', 'is_staff__exact': '0'}, link % ('?' + SEARCH_VAR + '=test'), self.assertContains),
+        )
+        for data, link, assert_method in tests:
+            with self.subTest(data=data):
+                assert_method(
+                    self.client.get(reverse('admin:auth_user_changelist'), data=data),
+                    link,
+                )
 
     def test_tuple_list_display(self):
         swallow = Swallow.objects.create(origin='Africa', load='12.34', speed='22.2')

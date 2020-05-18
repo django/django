@@ -105,6 +105,10 @@ class ChangeList:
         self.title = title % self.opts.verbose_name
         self.pk_attname = self.lookup_opts.pk.attname
 
+    def get_clear_all_filters_link(self):
+        lookup_params = self.get_filters_params()
+        return urlencode({k: v for k, v in self.params.items() if k not in lookup_params})
+
     def get_filters_params(self, params=None):
         """
         Return all params except IGNORED_PARAMS.
