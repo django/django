@@ -5,7 +5,9 @@ from django.contrib.admin.models import LogEntry
 from django.contrib.admin.options import IncorrectLookupParameters
 from django.contrib.admin.templatetags.admin_list import pagination
 from django.contrib.admin.tests import AdminSeleniumTestCase
-from django.contrib.admin.views.main import ALL_VAR, SEARCH_VAR
+from django.contrib.admin.views.main import (
+    ALL_VAR, IS_POPUP_VAR, ORDER_VAR, PAGE_VAR, SEARCH_VAR, TO_FIELD_VAR,
+)
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.messages.storage.cookie import CookieStorage
@@ -708,15 +710,65 @@ class ChangeListTests(TestCase):
 
     def test_clear_all_filters_link(self):
         self.client.force_login(self.superuser)
-        link = '<a href="?">&#10006; Clear all filters</a>'
-        response = self.client.get(reverse('admin:auth_user_changelist'))
-        self.assertNotContains(response, link)
+        url = reverse('admin:auth_user_changelist')
+        response = self.client.get(url)
+        self.assertNotContains(response, '&#10006; Clear all filters')
+        link = '<a href="%s">&#10006; Clear all filters</a>'
+        for data, href in (
+            ({'is_staff__exact': '0'}, '?'),
+            (
+                {'is_staff__exact': '0', 'username__startswith': 'test'},
+                '?username__startswith=test',
+            ),
+            (
+                {'is_staff__exact': '0', SEARCH_VAR: 'test'},
+                '?%s=test' % SEARCH_VAR,
+            ),
+            (
+                {'is_staff__exact': '0', IS_POPUP_VAR: 'id'},
+                '?%s=id' % IS_POPUP_VAR,
+            ),
+        ):
+            with self.subTest(data=data):
+                response = self.client.get(url, data=data)
+                self.assertContains(response, link % href)
+
+    def test_clear_all_filters_link_callable_filter(self):
+        self.client.force_login(self.superuser)
+        url = reverse('admin:admin_changelist_band_changelist')
+        response = self.client.get(url)
+        self.assertNotContains(response, '&#10006; Clear all filters')
+        link = '<a href="%s">&#10006; Clear all filters</a>'
+        for data, href in (
+            ({'nr_of_members_partition': '5'}, '?'),
+            (
+                {'nr_of_members_partition': 'more', 'name__startswith': 'test'},
+                '?name__startswith=test',
+            ),
+            (
+                {'nr_of_members_partition': '5', IS_POPUP_VAR: 'id'},
+                '?%s=id' % IS_POPUP_VAR,
+            ),
+        ):
+            with self.subTest(data=data):
+                response = self.client.get(url, data=data)
+                self.assertContains(response, link % href)
+
+    def test_no_clear_all_filters_link(self):
+        self.client.force_login(self.superuser)
+        url = reverse('admin:auth_user_changelist')
+        link = '>&#10006; Clear all filters</a>'
         for data in (
             {SEARCH_VAR: 'test'},
-            {'is_staff__exact': '0'},
+            {ORDER_VAR: '-1'},
+            {TO_FIELD_VAR: 'id'},
+            {PAGE_VAR: '1'},
+            {IS_POPUP_VAR: '1'},
+            {'username__startswith': 'test'},
         ):
-            response = self.client.get(reverse('admin:auth_user_changelist'), data=data)
-            self.assertContains(response, link)
+            with self.subTest(data=data):
+                response = self.client.get(url, data=data)
+                self.assertNotContains(response, link)
 
     def test_tuple_list_display(self):
         swallow = Swallow.objects.create(origin='Africa', load='12.34', speed='22.2')
