@@ -243,6 +243,12 @@ Dropped support for PostgreSQL 9.5
 Upstream support for PostgreSQL 9.5 ends in February 2021. Django 3.2 supports
 PostgreSQL 9.6 and higher.
 
+Dropped support for MySQL 5.6
+-----------------------------
+
+The end of upstream support for MySQL 5.6 is April 2021. Django 3.2 supports
+MySQL 5.7 and higher.
+
 Miscellaneous
 -------------
 
