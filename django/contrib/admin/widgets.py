@@ -270,15 +270,19 @@ class RelatedFieldWidgetWrapper(forms.Widget):
         return reverse("admin:%s_%s_%s" % (info + (action,)),
                        current_app=self.admin_site.name, args=args)
 
-    def get_context(self, name, value, attrs):
+    def url_parameters(self):
         from django.contrib.admin.views.main import IS_POPUP_VAR, TO_FIELD_VAR
-        rel_opts = self.rel.model._meta
-        info = (rel_opts.app_label, rel_opts.model_name)
-        self.widget.choices = self.choices
-        url_params = '&'.join("%s=%s" % param for param in [
+        url_params = '&'.join(f"{param}={value}" for param, value in [
             (TO_FIELD_VAR, self.rel.get_related_field().name),
             (IS_POPUP_VAR, 1),
         ])
+        return url_params
+
+    def get_context(self, name, value, attrs):
+        rel_opts = self.rel.model._meta
+        info = (rel_opts.app_label, rel_opts.model_name)
+        self.widget.choices = self.choices
+        url_params = self.url_parameters()
         context = {
             'rendered_widget': self.widget.render(name, value, attrs),
             'is_hidden': self.is_hidden,
