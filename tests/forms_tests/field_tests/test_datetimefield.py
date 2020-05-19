@@ -2,8 +2,8 @@ from datetime import date, datetime
 
 from django.core.exceptions import ValidationError
 from django.forms import DateTimeField
-from django.test import SimpleTestCase
-from django.utils.timezone import get_fixed_timezone, utc
+from django.test import SimpleTestCase, override_settings
+from django.utils.timezone import get_fixed_timezone, is_aware, is_naive, utc
 
 
 class DateTimeFieldTest(SimpleTestCase):
@@ -41,11 +41,8 @@ class DateTimeFieldTest(SimpleTestCase):
             ('2014-09-23T22:34:41', datetime(2014, 9, 23, 22, 34, 41)),
             ('2014-09-23T22:34', datetime(2014, 9, 23, 22, 34)),
             ('2014-09-23', datetime(2014, 9, 23, 0, 0)),
-            ('2014-09-23T22:34Z', datetime(2014, 9, 23, 22, 34, tzinfo=utc)),
-            (
-                '2014-09-23T22:34+07:00',
-                datetime(2014, 9, 23, 22, 34, tzinfo=get_fixed_timezone(420)),
-            ),
+            ('2014-09-23T22:34Z', datetime(2014, 9, 23, 17, 34)),
+            ('2014-09-23T22:34+07:00', datetime(2014, 9, 23, 10, 34)),
             # Whitespace stripping.
             (' 2006-10-25   14:30:45 ', datetime(2006, 10, 25, 14, 30, 45)),
             (' 2006-10-25 ', datetime(2006, 10, 25, 0, 0)),
@@ -58,12 +55,33 @@ class DateTimeFieldTest(SimpleTestCase):
                 ' 2014-09-23T22:34:41.614804 ',
                 datetime(2014, 9, 23, 22, 34, 41, 614804),
             ),
+            (' 2014-09-23T22:34Z ', datetime(2014, 9, 23, 17, 34)),
+        ]
+        f = DateTimeField()
+        for value, expected_datetime in tests:
+            with self.subTest(value=value):
+                cleaned_value = f.clean(value)
+                self.assertTrue(is_naive(f.clean(cleaned_value)))
+                self.assertEqual(cleaned_value, expected_datetime)
+
+    @override_settings(USE_TZ=True)
+    def test_datetimefield_clean_with_timezone(self):
+        tests = [
+            # ISO 8601 formats.
+            ('2014-09-23T22:34Z', datetime(2014, 9, 23, 22, 34, tzinfo=utc)),
+            (
+                '2014-09-23T22:34+07:00',
+                datetime(2014, 9, 23, 22, 34, tzinfo=get_fixed_timezone(420)),
+            ),
+            # Whitespace stripping.
             (' 2014-09-23T22:34Z ', datetime(2014, 9, 23, 22, 34, tzinfo=utc)),
         ]
         f = DateTimeField()
         for value, expected_datetime in tests:
             with self.subTest(value=value):
-                self.assertEqual(f.clean(value), expected_datetime)
+                cleaned_value = f.clean(value)
+                self.assertTrue(is_aware(f.clean(cleaned_value)))
+                self.assertEqual(cleaned_value, expected_datetime)
 
     def test_datetimefield_clean_invalid(self):
         f = DateTimeField()

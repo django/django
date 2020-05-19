@@ -14,6 +14,7 @@ from decimal import Decimal, DecimalException
 from io import BytesIO
 from urllib.parse import urlsplit, urlunsplit
 
+from django.conf import settings
 from django.core import validators
 from django.core.exceptions import ValidationError
 from django.forms.boundfield import BoundField
@@ -25,7 +26,7 @@ from django.forms.widgets import (
     SplitDateTimeWidget, SplitHiddenDateTimeWidget, Textarea, TextInput,
     TimeInput, URLInput,
 )
-from django.utils import formats
+from django.utils import formats, timezone
 from django.utils.dateparse import parse_datetime, parse_duration
 from django.utils.duration import duration_string
 from django.utils.ipv6 import clean_ipv6_address
@@ -473,7 +474,11 @@ class DateTimeField(BaseTemporalField):
             raise ValidationError(self.error_messages['invalid'], code='invalid')
         if not result:
             result = super().to_python(value)
-        return from_current_timezone(result)
+        if settings.USE_TZ:
+            result = from_current_timezone(result)
+        elif not settings.USE_TZ and timezone.is_aware(result):
+            result = timezone.make_naive(result)
+        return result
 
     def strptime(self, value, format):
         return datetime.datetime.strptime(value, format)
