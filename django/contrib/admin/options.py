@@ -168,8 +168,11 @@ class BaseModelAdmin(metaclass=forms.MediaDefiningClass):
                         can_delete_related=related_modeladmin.has_delete_permission(request),
                         can_view_related=related_modeladmin.has_view_permission(request),
                     )
-                formfield.widget = widgets.RelatedFieldWidgetWrapper(
-                    formfield.widget, db_field.remote_field, self.admin_site, **wrapper_kwargs
+                formfield.widget = self.get_widget_for_related_field(
+                    db_field,
+                    formfield,
+                    request,
+                    **wrapper_kwargs
                 )
 
             return formfield
@@ -280,6 +283,15 @@ class BaseModelAdmin(metaclass=forms.MediaDefiningClass):
             help_text = form_field.help_text
             form_field.help_text = format_lazy('{} {}', help_text, msg) if help_text else msg
         return form_field
+
+    def get_widget_for_related_field(self, db_field, formfield, request, **wrapper_kwargs):
+        """
+        Return a wrapped widget instance for a related field
+        """
+
+        return widgets.RelatedFieldWidgetWrapper(
+            formfield.widget, db_field.remote_field, self.admin_site, **wrapper_kwargs
+        )
 
     def get_autocomplete_fields(self, request):
         """
