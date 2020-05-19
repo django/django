@@ -332,6 +332,12 @@ LANG_INFO = {
         'name': 'Korean',
         'name_local': '한국어',
     },
+    'ky': {
+        'bidi': False,
+        'code': 'ky',
+        'name': 'Kyrgyz',
+        'name_local': 'Кыргызча',
+    },
     'lb': {
         'bidi': False,
         'code': 'lb',

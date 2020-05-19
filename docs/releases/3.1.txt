@@ -292,7 +292,7 @@ Internationalization
   (string) value to explicitly state that the cookie is sent with all same-site
   and cross-site requests.
 
-* Added support and translations for the Algerian Arabic language.
+* Added support and translations for the Algerian Arabic and Kyrgyz languages.
 
 Management Commands
 ~~~~~~~~~~~~~~~~~~~

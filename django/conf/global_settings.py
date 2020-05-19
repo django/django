@@ -103,6 +103,7 @@ LANGUAGES = [
     ('km', gettext_noop('Khmer')),
     ('kn', gettext_noop('Kannada')),
     ('ko', gettext_noop('Korean')),
+    ('ky', gettext_noop('Kyrgyz')),
     ('lb', gettext_noop('Luxembourgish')),
     ('lt', gettext_noop('Lithuanian')),
     ('lv', gettext_noop('Latvian')),
