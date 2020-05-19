@@ -3,7 +3,7 @@ from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
 from django.core.paginator import Paginator
 
-from .models import Child, Event, Parent, Swallow
+from .models import Band, Child, Event, Parent, Swallow
 
 site = admin.AdminSite(name="admin")
 
@@ -57,6 +57,31 @@ class FilteredChildAdmin(admin.ModelAdmin):
 
 class BandAdmin(admin.ModelAdmin):
     list_filter = ['genres']
+
+
+class NrOfMembersFilter(admin.SimpleListFilter):
+    title = 'number of members'
+    parameter_name = 'nr_of_members_partition'
+
+    def lookups(self, request, model_admin):
+        return [
+            ('5', '0 - 5'),
+            ('more', 'more than 5'),
+        ]
+
+    def queryset(self, request, queryset):
+        value = self.value()
+        if value == '5':
+            return queryset.filter(nr_of_members__lte=5)
+        if value == 'more':
+            return queryset.filter(nr_of_members__gt=5)
+
+
+class BandCallableFilterAdmin(admin.ModelAdmin):
+    list_filter = [NrOfMembersFilter]
+
+
+site.register(Band, BandCallableFilterAdmin)
 
 
 class GroupAdmin(admin.ModelAdmin):

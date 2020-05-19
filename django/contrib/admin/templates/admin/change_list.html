@@ -60,8 +60,8 @@
         {% if cl.has_filters %}
           <div id="changelist-filter">
             <h2>{% translate 'Filter' %}</h2>
-            {% if cl.preserved_filters %}<h3 id="changelist-filter-clear">
-              <a href="?{% if cl.is_popup %}_popup=1{% endif %}">&#10006; {% translate "Clear all filters" %}</a>
+            {% if cl.has_active_filters %}<h3 id="changelist-filter-clear">
+              <a href="{{ cl.clear_all_filters_qs }}">&#10006; {% translate "Clear all filters" %}</a>
             </h3>{% endif %}
             {% for spec in cl.filter_specs %}{% admin_list_filter cl spec %}{% endfor %}
           </div>
