@@ -178,6 +178,9 @@ Models
   supported on PostgreSQL, allows acquiring weaker locks that don't block the
   creation of rows that reference locked rows through a foreign key.
 
+* :class:`When() <django.db.models.expressions.When>` expression now allows
+  using the ``condition`` argument with ``lookups``.
+
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 

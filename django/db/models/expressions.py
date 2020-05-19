@@ -876,8 +876,11 @@ class When(Expression):
     conditional = False
 
     def __init__(self, condition=None, then=None, **lookups):
-        if lookups and condition is None:
-            condition, lookups = Q(**lookups), None
+        if lookups:
+            if condition is None:
+                condition, lookups = Q(**lookups), None
+            elif getattr(condition, 'conditional', False):
+                condition, lookups = Q(condition, **lookups), None
         if condition is None or not getattr(condition, 'conditional', False) or lookups:
             raise TypeError(
                 'When() supports a Q object, a boolean expression, or lookups '

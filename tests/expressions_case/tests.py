@@ -6,7 +6,7 @@ from uuid import UUID
 
 from django.core.exceptions import FieldError
 from django.db.models import (
-    BinaryField, Case, CharField, Count, DurationField, F,
+    BinaryField, BooleanField, Case, CharField, Count, DurationField, F,
     GenericIPAddressField, IntegerField, Max, Min, Q, Sum, TextField,
     TimeField, UUIDField, Value, When,
 )
@@ -311,6 +311,17 @@ class CaseExpressionTests(TestCase):
             [(1, 1), (2, 2), (3, 3), (4, 5)],
             transform=attrgetter('integer', 'integer2')
         )
+
+    def test_condition_with_lookups(self):
+        qs = CaseTestModel.objects.annotate(
+            test=Case(
+                When(Q(integer2=1), string='2', then=Value(False)),
+                When(Q(integer2=1), string='1', then=Value(True)),
+                default=Value(False),
+                output_field=BooleanField(),
+            ),
+        )
+        self.assertIs(qs.get(integer=1).test, True)
 
     def test_case_reuse(self):
         SOME_CASE = Case(
@@ -1350,6 +1361,8 @@ class CaseWhenTests(SimpleTestCase):
             When(condition=object())
         with self.assertRaisesMessage(TypeError, msg):
             When(condition=Value(1, output_field=IntegerField()))
+        with self.assertRaisesMessage(TypeError, msg):
+            When(Value(1, output_field=IntegerField()), string='1')
         with self.assertRaisesMessage(TypeError, msg):
             When()
 
