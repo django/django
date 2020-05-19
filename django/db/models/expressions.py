@@ -1021,11 +1021,18 @@ class Subquery(Expression):
     def __init__(self, queryset, output_field=None, **extra):
         self.query = queryset.query
         self.extra = extra
+        # Prevent the QuerySet from being evaluated.
+        self.queryset = queryset._chain(_result_cache=[], prefetch_done=True)
         super().__init__(output_field)
 
     def __getstate__(self):
         state = super().__getstate__()
-        state.pop('_constructor_args', None)
+        args, kwargs = state['_constructor_args']
+        if args:
+            args = (self.queryset, *args[1:])
+        else:
+            kwargs['queryset'] = self.queryset
+        state['_constructor_args'] = args, kwargs
         return state
 
     def get_source_expressions(self):
