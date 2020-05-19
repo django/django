@@ -495,8 +495,9 @@ is ``'Beatles Blog'``::
 
 This spanning can be as deep as you'd like.
 
-It works backwards, too. To refer to a "reverse" relationship, use the
-lowercase name of the model.
+It works backwards, too. Whilst it :attr:`can be customized
+<.ForeignKey.related_query_name>`, by default you refer to a "reverse"
+relationship in a lookup using the lowercase name of the model.
 
 This example retrieves all ``Blog`` objects which have at least one ``Entry``
 whose ``headline`` contains ``'Lennon'``::
