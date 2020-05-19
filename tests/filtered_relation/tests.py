@@ -334,7 +334,7 @@ class FilteredRelationTests(TestCase):
 
     def test_with_foreign_key_on_condition_deeper_than_relationship_error(self):
         msg = (
-            "FilteredRelation's condition doesn't support nested "
+            "FilteredRelation's condition doesn't support nested relations"
             "on clauses deeper than the relation (got 'book__editor__name__icontains' for 'book')."
         )
         with self.assertRaisesMessage(ValueError, msg):
@@ -359,7 +359,7 @@ class FilteredRelationTests(TestCase):
 
     def test_with_foreign_key_relation_name_lookup_not_within_path(self):
         msg = (
-            "FilteredRelation's condition doesn't support nested "
+            "FilteredRelation's condition doesn't support nested relations"
             "on clauses not within the path of the relation "
             "(got 'book__author__name__icontains' for 'book__editor')."
         )
