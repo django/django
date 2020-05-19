@@ -104,7 +104,6 @@ class DateTimeFieldTest(SimpleTestCase):
                 ),
             )),
         ]
-        f = DateTimeField()
         for input_format, values in tests:
             f = DateTimeField(input_formats=[input_format])
             for value, expected_datetime in values:
