@@ -6,6 +6,14 @@ Django 3.0.7 release notes
 
 Django 3.0.7 fixes two security issues and several bugs in 3.0.6.
 
+CVE-2020-13254: Potential data leakage via malformed memcached keys
+===================================================================
+
+In cases where a memcached backend does not perform key validation, passing
+malformed cache keys could result in a key collision, and potential data
+leakage. In order to avoid this vulnerability, key validation is added to the
+memcached cache backends.
+
 CVE-2020-13596: Possible XSS via admin ``ForeignKeyRawIdWidget``
 ================================================================
 
