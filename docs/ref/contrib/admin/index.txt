@@ -1096,8 +1096,7 @@ subclass::
     automatically generate the value for ``SlugField`` fields from one or more
     other fields. The generated value is produced by concatenating the values
     of the source fields, and then by transforming that result into a valid
-    slug (e.g. substituting dashes for spaces; lowercasing ASCII letters; and
-    removing various English stop words such as 'a', 'an', 'as', and similar).
+    slug (e.g. substituting dashes for spaces and lowercasing ASCII letters).
 
     Prepopulated fields aren't modified by JavaScript after a value has been
     saved. It's usually undesired that slugs change (which would cause an
@@ -1105,6 +1104,11 @@ subclass::
 
     ``prepopulated_fields`` doesn't accept ``DateTimeField``, ``ForeignKey``,
     ``OneToOneField``, and ``ManyToManyField`` fields.
+
+    .. versionchanged:: 3.2
+
+        In older versions, various English stop words are removed from
+        generated values.
 
 .. attribute:: ModelAdmin.preserve_filters
 

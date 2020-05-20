@@ -7,8 +7,8 @@ QUnit.test('empty string', function(assert) {
     assert.strictEqual(URLify('', 8, true), '');
 });
 
-QUnit.test('strip nonessential words', function(assert) {
-    assert.strictEqual(URLify('the D is silent', 8, true), 'd-silent');
+QUnit.test('preserve nonessential words', function(assert) {
+    assert.strictEqual(URLify('the D is silent', 15, true), 'the-d-is-silent');
 });
 
 QUnit.test('strip non-URL characters', function(assert) {
@@ -23,7 +23,6 @@ QUnit.test('trim trailing hyphens', function(assert) {
     assert.strictEqual(URLify('D silent always', 9, true), 'd-silent');
 });
 
-QUnit.test('do not remove English words if the string contains non-ASCII', function(assert) {
-    // If removing English words wasn't skipped, the last 'a' would be removed.
+QUnit.test('non-ASCII string', function(assert) {
     assert.strictEqual(URLify('Kaupa-miða', 255, true), 'kaupa-miða');
 });

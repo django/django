@@ -275,6 +275,9 @@ Miscellaneous
   external build tool. The minified vendored JavaScript files packaged with the
   admin (e.g. :ref:`jquery.min.js <contrib-admin-jquery>`) are still included.
 
+* :attr:`.ModelAdmin.prepopulated_fields` no longer strips English stop words,
+  such as ``'a'`` or ``'an'``.
+
 .. _deprecated-features-3.2:
 
 Features deprecated in 3.2
