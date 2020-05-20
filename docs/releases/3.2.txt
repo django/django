@@ -276,6 +276,11 @@ Tests
 * :class:`~django.test.Client` now preserves the request query string when
   following 307 and 308 redirects.
 
+* The new :meth:`.TestCase.captureOnCommitCallbacks` method captures callback
+  functions passed to :func:`transaction.on_commit()
+  <django.db.transaction.on_commit>` in a list. This allows you to test such
+  callbacks without using the slower :class:`.TransactionTestCase`.
+
 URLs
 ~~~~
 
