@@ -16,7 +16,7 @@ from unittest import mock
 from django.conf import settings
 from django.core import management, signals
 from django.core.cache import (
-    DEFAULT_CACHE_ALIAS, CacheKeyWarning, cache, caches,
+    DEFAULT_CACHE_ALIAS, CacheKeyWarning, InvalidCacheKey, cache, caches,
 )
 from django.core.cache.backends.base import InvalidCacheBackendError
 from django.core.cache.utils import make_template_fragment_key
@@ -623,10 +623,10 @@ class BaseCacheTests:
 
     def _perform_invalid_key_test(self, key, expected_warning):
         """
-        All the builtin backends (except memcached, see below) should warn on
-        keys that would be refused by memcached. This encourages portable
-        caching code without making it too difficult to use production backends
-        with more liberal key rules. Refs #6447.
+        All the builtin backends should warn (except memcached that should
+        error) on keys that would be refused by memcached. This encourages
+        portable caching code without making it too difficult to use production
+        backends with more liberal key rules. Refs #6447.
         """
         # mimic custom ``make_key`` method being defined since the default will
         # never show the below warnings
@@ -1270,24 +1270,14 @@ class BaseMemcachedTests(BaseCacheTests):
                 with self.settings(CACHES={'default': params}):
                     self.assertEqual(cache._servers, ['server1.tld', 'server2:11211'])
 
-    def test_invalid_key_characters(self):
+    def _perform_invalid_key_test(self, key, expected_warning):
         """
-        On memcached, we don't introduce a duplicate key validation
-        step (for speed reasons), we just let the memcached API
-        library raise its own exception on bad keys. Refs #6447.
-
-        In order to be memcached-API-library agnostic, we only assert
-        that a generic exception of some kind is raised.
+        Whilst other backends merely warn, memcached should raise for an
+        invalid key.
         """
-        # memcached does not allow whitespace or control characters in keys
-        # when using the ascii protocol.
-        with self.assertRaises(Exception):
-            cache.set('key with spaces', 'value')
-
-    def test_invalid_key_length(self):
-        # memcached limits key length to 250
-        with self.assertRaises(Exception):
-            cache.set('a' * 251, 'value')
+        msg = expected_warning.replace(key, ':1:%s' % key)
+        with self.assertRaisesMessage(InvalidCacheKey, msg):
+            cache.set(key, 'value')
 
     def test_default_never_expiring_timeout(self):
         # Regression test for #22845
@@ -1395,15 +1385,6 @@ class PyLibMCCacheTests(BaseMemcachedTests, TestCase):
     client_library_name = 'pylibmc'
     # libmemcached manages its own connections.
     should_disconnect_on_close = False
-
-    # By default, pylibmc/libmemcached don't verify keys client-side and so
-    # this test triggers a server-side bug that causes later tests to fail
-    # (#19914). The `verify_keys` behavior option could be set to True (which
-    # would avoid triggering the server-side bug), however this test would
-    # still fail due to https://github.com/lericson/pylibmc/issues/219.
-    @unittest.skip("triggers a memcached-server bug, causing subsequent tests to fail")
-    def test_invalid_key_characters(self):
-        pass
 
     @override_settings(CACHES=caches_setting_for_tests(
         base=PyLibMCCache_params,
