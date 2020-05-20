@@ -2782,7 +2782,10 @@ Default: ``False``
 
 A boolean that specifies if datetimes will be timezone-aware by default or not.
 If this is set to ``True``, Django will use timezone-aware datetimes internally.
-Otherwise, Django will use naive datetimes in local time.
+
+When ``USE_TZ`` is False, Django will use naive datetimes in local time, except
+when parsing ISO 8601 formatted strings, where timezone information will always
+be retained if present.
 
 See also :setting:`TIME_ZONE`, :setting:`USE_I18N` and :setting:`USE_L10N`.
 
