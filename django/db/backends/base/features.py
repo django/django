@@ -46,13 +46,19 @@ class BaseDatabaseFeatures:
     # integer primary keys.
     related_fields_match_type = False
     allow_sliced_subqueries_with_in = True
+    has_select_for_share = False
+    has_select_for_share_nowait = False
+    has_select_for_share_skip_locked = False
+    has_select_for_share_of = False
+    has_select_for_key_share = False
     has_select_for_update = False
     has_select_for_update_nowait = False
     has_select_for_update_skip_locked = False
     has_select_for_update_of = False
     has_select_for_no_key_update = False
-    # Does the database's SELECT FOR UPDATE OF syntax require a column rather
-    # than a table?
+    # Does the database's SELECT FOR SHARE/UPDATE OF syntax require a column
+    # rather than a table?
+    select_for_share_of_column = False
     select_for_update_of_column = False
 
     # Does the default test database allow multiple connections?
@@ -227,7 +233,9 @@ class BaseDatabaseFeatures:
     # If NULL is implied on columns without needing to be explicitly specified
     implied_column_null = False
 
-    # Does the backend support "select for update" queries with limit (and offset)?
+    # Does the backend support SELECT FOR SHARE/UPDATE queries with limit (and
+    # offset)?
+    supports_select_for_share_with_limit = True
     supports_select_for_update_with_limit = True
 
     # Does the backend ignore null expressions in GREATEST and LEAST queries unless
@@ -242,7 +250,8 @@ class BaseDatabaseFeatures:
     # be equal?
     ignores_table_name_case = False
 
-    # Place FOR UPDATE right after FROM clause. Used on MSSQL.
+    # Place FOR SHARE/UPDATE right after FROM clause. Used on MSSQL.
+    for_share_after_from = False
     for_update_after_from = False
 
     # Combinatorial flags

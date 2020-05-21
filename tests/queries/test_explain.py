@@ -21,6 +21,8 @@ class ExplainTests(TestCase):
             Tag.objects.filter(name="test").values_list("name"),
             Tag.objects.order_by().union(Tag.objects.order_by().filter(name="test")),
         ]
+        if connection.features.has_select_for_share:
+            querysets.append(Tag.objects.select_for_share().filter(name="test"))
         if connection.features.has_select_for_update:
             querysets.append(Tag.objects.select_for_update().filter(name="test"))
         supported_formats = connection.features.supported_explain_formats

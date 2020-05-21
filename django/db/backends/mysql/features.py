@@ -10,6 +10,8 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     related_fields_match_type = True
     # MySQL doesn't support sliced subqueries with IN/ALL/ANY/SOME.
     allow_sliced_subqueries_with_in = False
+    has_select_for_share = True
+    has_select_for_share_nowait = True
     has_select_for_update = True
     has_select_for_update_nowait = True
     supports_forward_references = False
@@ -176,6 +178,19 @@ class DatabaseFeatures(BaseDatabaseFeatures):
         return skips
 
     @cached_property
+    def django_test_expected_failures(self):
+        expected_failures = set()
+        if self.connection.mysql_is_mariadb:
+            expected_failures |= {
+                # MariaDB uses `LOCK IN SHARE MODE`, not `FOR SHARE` and this
+                # test is only to verify that some third-party backends, e.g.
+                # for Microsoft SQL Server, will function correctly.
+                "select_for.test_for_share.SelectForShareFeatureTests."
+                "test_for_share_after_from",
+            }
+        return expected_failures
+
+    @cached_property
     def _mysql_storage_engine(self):
         "Internal method used in Django tests. Don't rely on this from your code"
         return self.connection.mysql_server_data["default_storage_engine"]
@@ -242,6 +257,16 @@ class DatabaseFeatures(BaseDatabaseFeatures):
         if self.connection.mysql_is_mariadb:
             return True
         return self.connection.mysql_version >= (8, 0, 16)
+
+    @cached_property
+    def has_select_for_share_skip_locked(self):
+        if self.connection.mysql_is_mariadb:
+            return self.connection.mysql_version >= (10, 6)
+        return True
+
+    @cached_property
+    def has_select_for_share_of(self):
+        return not self.connection.mysql_is_mariadb
 
     @cached_property
     def has_select_for_update_skip_locked(self):

@@ -168,7 +168,8 @@ Migrations
 Models
 ~~~~~~
 
-* ...
+* The new :meth:`.QuerySet.select_for_share()` method adds support for ``SELECT
+  ... FOR SHARE`` SQL queries.
 
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~

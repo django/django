@@ -635,6 +635,9 @@ class QuerySet(AltersData):
             clone = clone.order_by()
         limit = None
         if (
+            not clone.query.select_for_share
+            or connections[clone.db].features.supports_select_for_share_with_limit
+        ) and (
             not clone.query.select_for_update
             or connections[clone.db].features.supports_select_for_update_with_limit
         ):
@@ -1177,6 +1180,7 @@ class QuerySet(AltersData):
         del_query._for_write = True
 
         # Disable non-supported fields.
+        del_query.query.select_for_share = False
         del_query.query.select_for_update = False
         del_query.query.select_related = False
         del_query.query.clear_ordering(force=True)
@@ -1556,11 +1560,30 @@ class QuerySet(AltersData):
             return self
         return self._combinator_query("difference", *other_qs)
 
+    def select_for_share(self, nowait=False, skip_locked=False, of=(), key=False):
+        """
+        Return a new QuerySet instance that will select objects with a
+        FOR SHARE lock.
+        """
+        if self.query.select_for_update:
+            raise TypeError("Cannot call select_for_share() after select_for_update().")
+        if nowait and skip_locked:
+            raise ValueError("The nowait option cannot be used with skip_locked.")
+        obj = self._chain()
+        obj.query.select_for_share = True
+        obj.query.select_for_share_nowait = nowait
+        obj.query.select_for_share_skip_locked = skip_locked
+        obj.query.select_for_share_of = of
+        obj.query.select_for_key_share = key
+        return obj
+
     def select_for_update(self, nowait=False, skip_locked=False, of=(), no_key=False):
         """
         Return a new QuerySet instance that will select objects with a
         FOR UPDATE lock.
         """
+        if self.query.select_for_share:
+            raise TypeError("Cannot call select_for_update() after select_for_share().")
         if nowait and skip_locked:
             raise ValueError("The nowait option cannot be used with skip_locked.")
         obj = self._chain()
