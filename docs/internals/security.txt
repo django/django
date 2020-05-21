@@ -191,6 +191,11 @@ groups:
    demonstrated ability to responsibly receive, keep confidential and
    act on these notifications.
 
+.. admonition:: Security audit and scanning entities
+
+    As a policy, we do not add these types of entities to the notification
+    list.
+
 Requesting notifications
 ========================
 
@@ -235,3 +240,9 @@ Please also bear in mind that for any individual or organization,
 receiving security notifications is a privilege granted at the sole
 discretion of the Django development team, and that this privilege can
 be revoked at any time, with or without explanation.
+
+.. admonition:: Provide all required information
+
+    A failure to provide the required information in your initial contact
+    will count against you when making the decision on whether or not to
+    approve your request.
