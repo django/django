@@ -443,6 +443,10 @@ need to be done by the releaser.
    <https://github.com/rtfd/readthedocs.org/issues/5537>`_ requesting the new
    version.
 
+#. `Request the new classifier on PyPI
+   <https://github.com/pypa/trove-classifiers/issues/29>`_. For example
+   ``Framework :: Django :: 3.1``.
+
 Notes on setting the VERSION tuple
 ==================================
 
