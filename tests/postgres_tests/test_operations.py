@@ -173,16 +173,16 @@ class CreateExtensionTests(PostgreSQLTestCase):
         self.assertEqual(len(captured_queries), 0)
 
     def test_allow_migrate(self):
-        operation = CreateExtension('uuid-ossp')
+        operation = CreateExtension('tablefunc')
         project_state = ProjectState()
         new_state = project_state.clone()
         # Create an extension.
         with CaptureQueriesContext(connection) as captured_queries:
             with connection.schema_editor(atomic=False) as editor:
                 operation.database_forwards(self.app_label, editor, project_state, new_state)
-        self.assertIn('CREATE EXTENSION', captured_queries[0]['sql'])
+        self.assertIn('CREATE EXTENSION', captured_queries[1]['sql'])
         # Reversal.
         with CaptureQueriesContext(connection) as captured_queries:
             with connection.schema_editor(atomic=False) as editor:
                 operation.database_backwards(self.app_label, editor, new_state, project_state)
-        self.assertIn('DROP EXTENSION', captured_queries[0]['sql'])
+        self.assertIn('DROP EXTENSION', captured_queries[1]['sql'])
