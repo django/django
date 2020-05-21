@@ -1057,17 +1057,19 @@ Using a 3rd-party database backend
 In addition to the officially supported databases, there are backends provided
 by 3rd parties that allow you to use other databases with Django:
 
+* `CockroachDB`_
+* `Firebird`_
 * `IBM DB2`_
 * `Microsoft SQL Server`_
-* Firebird_
-* ODBC_
+* `ODBC`_
 
 The Django versions and ORM features supported by these unofficial backends
 vary considerably. Queries regarding the specific capabilities of these
 unofficial backends, along with any support queries, should be directed to
 the support channels provided by each 3rd party project.
 
+.. _CockroachDB: https://pypi.org/project/django-cockroachdb/
+.. _Firebird: https://pypi.org/project/django-firebird/
 .. _IBM DB2: https://pypi.org/project/ibm_db_django/
-.. _Microsoft SQL Server: https://pypi.org/project/django-pyodbc-azure/
-.. _Firebird: https://github.com/maxirobaina/django-firebird
-.. _ODBC: https://github.com/lionheart/django-pyodbc/
+.. _Microsoft SQL Server: https://pypi.org/project/django-mssql-backend/
+.. _ODBC: https://pypi.org/project/django-pyodbc/
