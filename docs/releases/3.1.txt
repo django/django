@@ -274,10 +274,14 @@ Forms
   details.
 
 * :class:`django.forms.DateTimeField` now accepts dates in a subset of ISO 8601
-  datetime formats, including optional timezone (e.g. ``2019-10-10T06:47``,
-  ``2019-10-10T06:47:23+04:00``, or ``2019-10-10T06:47:23Z``). Additionally, it
-  now uses ``DATE_INPUT_FORMATS`` in addition to ``DATETIME_INPUT_FORMATS``
-  when converting a field input to a ``datetime`` value.
+  datetime formats, including optional timezone, e.g. ``2019-10-10T06:47``,
+  ``2019-10-10T06:47:23+04:00``, or ``2019-10-10T06:47:23Z``. The timezone will
+  always be retained if provided, with timezone-aware datetimes being returned
+  even when :setting:`USE_TZ` is ``False``.
+
+  Additionally, ``DateTimeField`` now uses ``DATE_INPUT_FORMATS`` in addition
+  to ``DATETIME_INPUT_FORMATS`` when converting a field input to a ``datetime``
+  value.
 
 * :attr:`.MultiWidget.widgets` now accepts a dictionary which allows
   customizing subwidget ``name`` attributes.
