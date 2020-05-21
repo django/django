@@ -23,7 +23,7 @@ class CreateExtension(Operation):
             return
 
         # CREATE EXTENSION always requires superuser. For non-superuser cases
-        # skip the command enirely if the extension is already installed.
+        # skip the command entirely if the extension is already installed.
         if not self.extension_present(schema_editor, self.name):
             schema_editor.execute(
                 "CREATE EXTENSION IF NOT EXISTS %s" % schema_editor.quote_name(self.name)
