@@ -336,6 +336,11 @@ Miscellaneous
 
 * Support for ``argon2-cffi`` < 19.1.0 is removed.
 
+* The cache keys no longer includes the language when internationalization is
+  disabled (``USE_I18N = False``) and localization is enabled
+  (``USE_L10N = True``). After upgrading to Django 3.2 in such configurations,
+  the first request to any previously cached value will be a cache miss.
+
 .. _deprecated-features-3.2:
 
 Features deprecated in 3.2

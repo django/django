@@ -542,8 +542,7 @@ include the name of the active :term:`language<language code>` -- see also
 :ref:`how-django-discovers-language-preference`). This allows you to easily
 cache multilingual sites without having to create the cache key yourself.
 
-Cache keys also include the active :term:`language <language code>` when
-:setting:`USE_L10N` is set to ``True`` and the :ref:`current time zone
+Cache keys also include the :ref:`current time zone
 <default-current-time-zone>` when :setting:`USE_TZ` is set to ``True``.
 
 __ `Controlling cache: Using other headers`_
