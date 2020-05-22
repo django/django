@@ -364,6 +364,7 @@ Models
   non-key columns.
 * **models.W040**: ``<database>`` does not support indexes with non-key
   columns.
+* **models.E041**: ``constraints`` refers to the joined field ``<field name>``.
 
 Security
 --------
