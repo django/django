@@ -283,6 +283,9 @@ Miscellaneous
 * :func:`~django.utils.text.slugify` now removes leading and trailing dashes
   and underscores.
 
+* The :tfilter:`intcomma` and :tfilter:`intword` template filters no longer
+  depend on the :setting:`USE_L10N` setting.
+
 .. _deprecated-features-3.2:
 
 Features deprecated in 3.2
