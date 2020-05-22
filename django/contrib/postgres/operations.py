@@ -21,7 +21,10 @@ class CreateExtension(Operation):
             not router.allow_migrate(schema_editor.connection.alias, app_label)
         ):
             return
-        schema_editor.execute("CREATE EXTENSION IF NOT EXISTS %s" % schema_editor.quote_name(self.name))
+        if not self.extension_exists(schema_editor, self.name):
+            schema_editor.execute(
+                'CREATE EXTENSION %s' % schema_editor.quote_name(self.name)
+            )
         # Clear cached, stale oids.
         get_hstore_oids.cache_clear()
         get_citext_oids.cache_clear()
@@ -33,10 +36,21 @@ class CreateExtension(Operation):
     def database_backwards(self, app_label, schema_editor, from_state, to_state):
         if not router.allow_migrate(schema_editor.connection.alias, app_label):
             return
-        schema_editor.execute("DROP EXTENSION %s" % schema_editor.quote_name(self.name))
+        if self.extension_exists(schema_editor, self.name):
+            schema_editor.execute(
+                'DROP EXTENSION %s' % schema_editor.quote_name(self.name)
+            )
         # Clear cached, stale oids.
         get_hstore_oids.cache_clear()
         get_citext_oids.cache_clear()
+
+    def extension_exists(self, schema_editor, extension):
+        with schema_editor.connection.cursor() as cursor:
+            cursor.execute(
+                'SELECT 1 FROM pg_extension WHERE extname = %s',
+                [extension],
+            )
+            return bool(cursor.fetchone())
 
     def describe(self):
         return "Creates extension %s" % self.name

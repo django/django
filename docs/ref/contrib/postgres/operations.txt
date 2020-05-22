@@ -30,11 +30,18 @@ For example::
             ...
         ]
 
+Django checks that the extension already exists in the database and skips the
+migration if so.
+
 For most extensions, this requires a database user with superuser privileges.
 If the Django database user doesn't have the appropriate privileges, you'll
 have to create the extension outside of Django migrations with a user that has
 them. In that case, connect to your Django database and run the query
 ``CREATE EXTENSION IF NOT EXISTS hstore;``.
+
+.. versionchanged:: 3.2
+
+    In older versions, the existence of an extension isn't checked.
 
 .. currentmodule:: django.contrib.postgres.operations
 

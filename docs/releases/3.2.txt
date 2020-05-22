@@ -63,7 +63,9 @@ Minor features
 :mod:`django.contrib.messages`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* The :class:`~django.contrib.postgres.operations.CreateExtension` operation
+  now checks that the extension already exists in the database and skips the
+  migration if so.
 
 :mod:`django.contrib.postgres`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
