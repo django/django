@@ -17,5 +17,6 @@ def url(regex, view, kwargs=None, name=None):
         'django.conf.urls.url() is deprecated in favor of '
         'django.urls.re_path().',
         RemovedInDjango40Warning,
+        stacklevel=2,
     )
     return re_path(regex, view, kwargs, name)
