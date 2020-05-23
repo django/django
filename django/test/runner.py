@@ -1,3 +1,4 @@
+import argparse
 import ctypes
 import itertools
 import logging
@@ -283,16 +284,22 @@ class RemoteTestRunner:
         return result
 
 
-def default_test_processes():
-    """Default number of test processes when using the --parallel option."""
+def parallel_type(string):
+    """Parse value passed to the --parallel option."""
     # The current implementation of the parallel test runner requires
     # multiprocessing to start subprocesses with fork().
     if multiprocessing.get_start_method() != 'fork':
         return 1
-    try:
-        return int(os.environ['DJANGO_TEST_PROCESSES'])
-    except KeyError:
+
+    if string == "auto":
         return multiprocessing.cpu_count()
+
+    try:
+        return int(string)
+    except ValueError:
+        raise argparse.ArgumentTypeError(
+            f"{string!r} is not an integer or the string 'auto'"
+        )
 
 
 _worker_id = 0
@@ -432,10 +439,9 @@ class DiscoverRunner:
 
     def __init__(self, pattern=None, top_level=None, verbosity=1,
                  interactive=True, failfast=False, keepdb=False,
-                 reverse=False, debug_mode=False, debug_sql=False, parallel=0,
+                 reverse=False, debug_mode=False, debug_sql=False, parallel=1,
                  tags=None, exclude_tags=None, test_name_patterns=None,
                  pdb=False, buffer=False, **kwargs):
-
         self.pattern = pattern
         self.top_level = top_level
         self.verbosity = verbosity
@@ -492,9 +498,13 @@ class DiscoverRunner:
             '-d', '--debug-sql', action='store_true',
             help='Prints logged SQL queries on failure.',
         )
+        try:
+            const_parallel = int(os.environ['DJANGO_TEST_PROCESSES'])
+        except KeyError:
+            const_parallel = 'auto'
         parser.add_argument(
-            '--parallel', nargs='?', default=1, type=int,
-            const=default_test_processes(), metavar='N',
+            '--parallel', nargs='?', const=const_parallel, default=1,
+            type=parallel_type, metavar='N',
             help='Run tests using up to N parallel processes.',
         )
         parser.add_argument(

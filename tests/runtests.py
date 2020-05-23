@@ -21,7 +21,7 @@ else:
     from django.conf import settings
     from django.db import connection, connections
     from django.test import TestCase, TransactionTestCase
-    from django.test.runner import default_test_processes
+    from django.test.runner import parallel_type
     from django.test.selenium import SeleniumTestCaseBase
     from django.test.utils import get_runner
     from django.utils.deprecation import (
@@ -127,9 +127,8 @@ def setup(verbosity, test_labels, parallel, start_at, start_after):
 
     if verbosity >= 1:
         msg = "Testing against Django installed in '%s'" % os.path.dirname(django.__file__)
-        max_parallel = default_test_processes() if parallel == 0 else parallel
-        if max_parallel > 1:
-            msg += " with up to %d processes" % max_parallel
+        if parallel > 1:
+            msg += " with up to %d processes" % parallel
         print(msg)
 
     # Force declaring available_apps in TransactionTestCase for faster tests.
@@ -260,17 +259,6 @@ def teardown(state):
     _finalizer_registry.pop((-100, 0), None)
 
 
-def actual_test_processes(parallel):
-    if parallel == 0:
-        # This doesn't work before django.setup() on some databases.
-        if all(conn.features.can_clone_databases for conn in connections.all()):
-            return default_test_processes()
-        else:
-            return 1
-    else:
-        return parallel
-
-
 class ActionSelenium(argparse.Action):
     """
     Validate the comma-separated list of requested browsers.
@@ -296,6 +284,9 @@ def django_tests(verbosity, interactive, failfast, keepdb, reverse,
         settings.TEST_RUNNER = 'django.test.runner.DiscoverRunner'
     TestRunner = get_runner(settings)
 
+    if not all(conn.features.can_clone_databases for conn in connections.all()):
+        parallel = 1
+
     test_runner = TestRunner(
         verbosity=verbosity,
         interactive=interactive,
@@ -303,7 +294,7 @@ def django_tests(verbosity, interactive, failfast, keepdb, reverse,
         keepdb=keepdb,
         reverse=reverse,
         debug_sql=debug_sql,
-        parallel=actual_test_processes(parallel),
+        parallel=parallel,
         tags=tags,
         exclude_tags=exclude_tags,
         test_name_patterns=test_name_patterns,
@@ -479,9 +470,13 @@ if __name__ == "__main__":
         '--debug-sql', action='store_true',
         help='Turn on the SQL query logger within tests.',
     )
+    try:
+        const_parallel = int(os.environ['DJANGO_TEST_PROCESSES'])
+    except KeyError:
+        const_parallel = 'auto'
     parser.add_argument(
-        '--parallel', nargs='?', default=0, type=int,
-        const=default_test_processes(), metavar='N',
+        '--parallel', nargs='?', const=const_parallel, default=1,
+        type=parallel_type, metavar='N',
         help='Run tests using up to N parallel processes.',
     )
     parser.add_argument(

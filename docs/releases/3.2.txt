@@ -259,6 +259,9 @@ Tests
 * :class:`~django.test.Client` now preserves the request query string when
   following 307 and 308 redirects.
 
+* The :option:`test --parallel` option now supports the value ``auto`` to mean
+  "all CPU cores."
+
 URLs
 ~~~~
 

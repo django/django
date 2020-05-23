@@ -1,7 +1,11 @@
+import argparse
+import multiprocessing
 import os
 from argparse import ArgumentParser
 from contextlib import contextmanager
-from unittest import TestSuite, TextTestRunner, defaultTestLoader, skipUnless
+from unittest import (
+    TestSuite, TextTestRunner, defaultTestLoader, mock, skipUnless,
+)
 
 from django.db import connections
 from django.test import SimpleTestCase
@@ -20,6 +24,56 @@ def change_cwd(directory):
         yield
     finally:
         os.chdir(old_cwd)
+
+
+@mock.patch.dict(os.environ, {}, clear=True)  # Isolate from real environment
+class DiscoverRunnerArgumentsTests(SimpleTestCase):
+    def setUp(self):
+        # Python 3.8 on macOS defaults to 'spawn' mode
+        start_method_patcher = mock.patch.object(multiprocessing, "get_start_method", return_value='fork')
+        start_method_patcher.start()
+        self.addCleanup(start_method_patcher.stop)
+
+        # Mock a predictable number of CPU cores
+        cpu_count_patcher = mock.patch.object(multiprocessing, "cpu_count", return_value=12)
+        cpu_count_patcher.start()
+        self.addCleanup(cpu_count_patcher.stop)
+
+    def get_parser(self):
+        parser = argparse.ArgumentParser()
+        DiscoverRunner.add_arguments(parser)
+        return parser
+
+    def test_parallel_default(self):
+        result = self.get_parser().parse_args([])
+        self.assertEqual(result.parallel, 1)
+
+    def test_parallel_flag(self):
+        result = self.get_parser().parse_args(["--parallel"])
+        self.assertEqual(result.parallel, 12)
+
+    def test_parallel_auto(self):
+        result = self.get_parser().parse_args(["--parallel", "auto"])
+        self.assertEqual(result.parallel, 12)
+
+    def test_parallel_count(self):
+        result = self.get_parser().parse_args(["--parallel", "17"])
+        self.assertEqual(result.parallel, 17)
+
+    @mock.patch.dict(os.environ, {'DJANGO_TEST_PROCESSES': '7'})
+    def test_parallel_env_var(self):
+        result = self.get_parser().parse_args(["--parallel"])
+        self.assertEqual(result.parallel, 7)
+
+    @mock.patch.dict(os.environ, {'DJANGO_TEST_PROCESSES': 'typo'})
+    def test_parallel_env_var_non_int(self):
+        with self.assertRaises(ValueError):
+            self.get_parser().parse_args(["--parallel"])
+
+    def test_parallel_spawn(self):
+        multiprocessing.get_start_method.return_value = 'spawn'
+        result = self.get_parser().parse_args(["--parallel"])
+        self.assertEqual(result.parallel, 1)
 
 
 class DiscoverRunnerTests(SimpleTestCase):
