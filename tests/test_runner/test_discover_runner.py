@@ -50,15 +50,30 @@ class DiscoverRunnerParallelArgumentTests(SimpleTestCase):
 
     def test_parallel_default(self, *mocked_objects):
         result = self.get_parser().parse_args([])
-        self.assertEqual(result.parallel, 1)
+        self.assertEqual(result.parallel, 0)
 
     def test_parallel_flag(self, *mocked_objects):
         result = self.get_parser().parse_args(['--parallel'])
         self.assertEqual(result.parallel, 12)
 
+    def test_parallel_auto(self, *mocked_objects):
+        result = self.get_parser().parse_args(['--parallel', 'auto'])
+        self.assertEqual(result.parallel, 12)
+
     def test_parallel_count(self, *mocked_objects):
         result = self.get_parser().parse_args(['--parallel', '17'])
         self.assertEqual(result.parallel, 17)
+
+    def test_parallel_invalid(self, *mocked_objects):
+        with self.assertRaises(SystemExit), captured_stderr() as stderr:
+            self.get_parser().parse_args(['--parallel', 'unaccepted'])
+        msg = "argument --parallel: 'unaccepted' is not an integer or the string 'auto'"
+        self.assertIn(msg, stderr.getvalue())
+
+    @mock.patch.dict(os.environ, {'DJANGO_TEST_PROCESSES': '7'})
+    def test_parallel_env_var(self, *mocked_objects):
+        result = self.get_parser().parse_args([])
+        self.assertEqual(result.parallel, 7)
 
     @mock.patch.dict(os.environ, {'DJANGO_TEST_PROCESSES': 'typo'})
     def test_parallel_env_var_non_int(self, *mocked_objects):

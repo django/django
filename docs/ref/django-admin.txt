@@ -1467,10 +1467,12 @@ Enables :ref:`SQL logging <django-db-logger>` for failing tests. If
 Runs tests in separate parallel processes. Since modern processors have
 multiple cores, this allows running tests significantly faster.
 
-By default ``--parallel`` runs one process per core according to
-:func:`multiprocessing.cpu_count()`. You can adjust the number of processes
-either by providing it as the option's value, e.g. ``--parallel=4``, or by
-setting the :envvar:`DJANGO_TEST_PROCESSES` environment variable.
+Using ``--parallel`` without a value, or with the value ``auto``, runs one test
+process per core according to :func:`multiprocessing.cpu_count()`. You can
+override this by passing the desired number of processes, e.g.
+``--parallel 4``. You can also enable ``--parallel`` without passing the flag
+by setting the :envvar:`DJANGO_TEST_PROCESSES` environment variable to the
+desired number of processes.
 
 Django distributes test cases — :class:`unittest.TestCase` subclasses — to
 subprocesses. If there are fewer test cases than configured processes, Django
@@ -1510,6 +1512,10 @@ don't.
     This is a known limitation. It arises from the need to serialize objects
     in order to exchange them between processes. See
     :ref:`python:pickle-picklable` for details.
+
+.. versionchanged:: 4.0
+
+    Support for the value ``auto`` was added.
 
 .. option:: --tag TAGS
 

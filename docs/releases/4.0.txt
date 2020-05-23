@@ -350,6 +350,9 @@ Tests
 * Django test runner now supports a :option:`--shuffle <test --shuffle>` option
   to execute tests in a random order.
 
+* The :option:`test --parallel` option now supports the value ``auto`` to run
+  one test process for each processor core.
+
 URLs
 ~~~~
 

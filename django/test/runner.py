@@ -1,3 +1,4 @@
+import argparse
 import ctypes
 import faulthandler
 import hashlib
@@ -335,16 +336,20 @@ class RemoteTestRunner:
         return result
 
 
-def default_test_processes():
-    """Default number of test processes when using the --parallel option."""
+def parallel_type(value):
+    """Parse value passed to the --parallel option."""
     # The current implementation of the parallel test runner requires
     # multiprocessing to start subprocesses with fork().
     if multiprocessing.get_start_method() != 'fork':
         return 1
-    try:
-        return int(os.environ['DJANGO_TEST_PROCESSES'])
-    except KeyError:
+    if value == 'auto':
         return multiprocessing.cpu_count()
+    try:
+        return int(value)
+    except ValueError:
+        raise argparse.ArgumentTypeError(
+            f"{value!r} is not an integer or the string 'auto'"
+        )
 
 
 _worker_id = 0
@@ -611,10 +616,17 @@ class DiscoverRunner:
             '-d', '--debug-sql', action='store_true',
             help='Prints logged SQL queries on failure.',
         )
+        try:
+            default_parallel = int(os.environ['DJANGO_TEST_PROCESSES'])
+        except KeyError:
+            default_parallel = 0
         parser.add_argument(
-            '--parallel', nargs='?', default=1, type=int,
-            const=default_test_processes(), metavar='N',
-            help='Run tests using up to N parallel processes.',
+            '--parallel', nargs='?', const='auto', default=default_parallel,
+            type=parallel_type, metavar='N',
+            help=(
+                'Run tests using up to N parallel processes. Use the value '
+                '"auto" to run one test process for each processor core.'
+            ),
         )
         parser.add_argument(
             '--tag', action='append', dest='tags',
