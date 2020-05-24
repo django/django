@@ -42,12 +42,12 @@ class TestRunserver(StaticFilesTestCase):
     def test_middleware_loaded_only_once(self):
         command = runserver.Command()
         with mock.patch('django.middleware.common.CommonMiddleware') as mocked:
-            command.get_handler(use_static_handler=True, insecure_serving=True)
+            command.get_handler(use_static_handler=True, insecure_serving=True, asgi=False)
             self.assertEqual(mocked.call_count, 1)
 
     def test_404_response(self):
         command = runserver.Command()
-        handler = command.get_handler(use_static_handler=True, insecure_serving=True)
+        handler = command.get_handler(use_static_handler=True, insecure_serving=True, asgi=False)
         missing_static_file = os.path.join(settings.STATIC_URL, 'unknown.css')
         req = RequestFactory().get(missing_static_file)
         with override_settings(DEBUG=False):

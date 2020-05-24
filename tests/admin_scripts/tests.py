@@ -1234,6 +1234,16 @@ class ManageRunserver(SimpleTestCase):
         self.assertEqual(self.cmd.port, port)
         self.assertEqual(self.cmd.use_ipv6, ipv6)
         self.assertEqual(self.cmd._raw_ipv6, raw_ipv6)
+        self.assertEqual(self.cmd.server_type, 'WSGI')
+
+    def test_runserver_asgi_raises_commanderror_without_daphne(self):
+        with self.assertRaises(CommandError):
+            call_command(self.cmd, asgi=True)
+
+    @unittest.skip("Daphne must be installed to run this test")
+    def test_runserver_asgi_with_daphne(self):
+        call_command(self.cmd, asgi=True)
+        self.assertEqual(self.cmd.server_type, 'ASGI')
 
     def test_runserver_addrport(self):
         call_command(self.cmd)
@@ -1370,7 +1380,9 @@ class ManageTestserver(SimpleTestCase):
         call_command('testserver', 'blah.json')
         mock_runserver_handle.assert_called_with(
             addrport='',
+            asgi=False,
             force_color=False,
+            http_timeout=None,
             insecure_serving=False,
             no_color=False,
             pythonpath=None,

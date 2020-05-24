@@ -13,6 +13,7 @@ import socketserver
 import sys
 from wsgiref import simple_server
 
+from django.core.asgi import get_asgi_application
 from django.core.exceptions import ImproperlyConfigured
 from django.core.handlers.wsgi import LimitedStream
 from django.core.wsgi import get_wsgi_application
@@ -46,6 +47,34 @@ def get_internal_wsgi_application():
     except ImportError as err:
         raise ImproperlyConfigured(
             "WSGI application '%s' could not be loaded; "
+            "Error importing module." % app_path
+        ) from err
+
+
+def get_internal_asgi_application():
+    """
+    Load and return the ASGI application as configured by the user in
+    ``settings.ASGI_APPLICATION``. With the default ``startproject`` layout,
+    this will be the ``application`` object in ``projectname/asgi.py``.
+
+    This function, and the ``ASGI_APPLICATION`` setting itself, are only useful
+    for Django's internal server (runserver); external ASGI servers should just
+    be configured to point to the correct application object directly.
+
+    If settings.ASGI_APPLICATION is not set (is ``None``), return
+    whatever ``django.core.asgi.get_asgi_application`` returns.
+    """
+    from django.conf import settings
+
+    app_path = getattr(settings, "ASGI_APPLICATION")
+    if app_path is None:
+        return get_asgi_application()
+
+    try:
+        return import_string(app_path)
+    except ImportError as err:
+        raise ImproperlyConfigured(
+            "ASGI application '%s' could not be loaded; "
             "Error importing module." % app_path
         ) from err
 

@@ -7,6 +7,8 @@ from asgiref.sync import SyncToAsync
 from asgiref.testing import ApplicationCommunicator
 
 from django.core.asgi import get_asgi_application
+from django.core.exceptions import ImproperlyConfigured
+from django.core.servers.basehttp import get_internal_asgi_application
 from django.core.signals import request_finished, request_started
 from django.db import close_old_connections
 from django.test import AsyncRequestFactory, SimpleTestCase, override_settings
@@ -188,3 +190,51 @@ class ASGITest(SimpleTestCase):
         self.assertEqual(request_finished_thread, target_thread)
         request_started.disconnect(signal_handler)
         request_finished.disconnect(signal_handler)
+
+
+class GetInternalWSGIApplicationTest(SimpleTestCase):
+    @override_settings(ASGI_APPLICATION="asgi.asgi.application")
+    def test_success(self):
+        """
+        If ``ASGI_APPLICATION`` is a dotted path, the referenced object is
+        returned.
+        """
+        app = get_internal_asgi_application()
+
+        from .asgi import application
+
+        self.assertIs(app, application)
+
+    @override_settings(ASGI_APPLICATION=None)
+    def test_default(self):
+        """
+        If ``ASGI_APPLICATION`` is ``None``, the return value of
+        ``get_asgi_application`` is returned.
+        """
+        # Mock out get_wsgi_application so we know its return value is used
+        fake_app = object()
+
+        def mock_get_asgi_app():
+            return fake_app
+        from django.core.servers import basehttp
+        _orig_get_asgi_app = basehttp.get_asgi_application
+        basehttp.get_asgi_application = mock_get_asgi_app
+
+        try:
+            app = get_internal_asgi_application()
+
+            self.assertIs(app, fake_app)
+        finally:
+            basehttp.get_asgi_application = _orig_get_asgi_app
+
+    @override_settings(ASGI_APPLICATION="asgi.noexist.app")
+    def test_bad_module(self):
+        msg = "ASGI application 'asgi.noexist.app' could not be loaded; Error importing"
+        with self.assertRaisesMessage(ImproperlyConfigured, msg):
+            get_internal_asgi_application()
+
+    @override_settings(ASGI_APPLICATION="asgi.asgi.noexist")
+    def test_bad_name(self):
+        msg = "ASGI application 'asgi.asgi.noexist' could not be loaded; Error importing"
+        with self.assertRaisesMessage(ImproperlyConfigured, msg):
+            get_internal_asgi_application()

@@ -1,4 +1,5 @@
 import errno
+import logging
 import os
 import re
 import socket
@@ -8,10 +9,18 @@ from datetime import datetime
 from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError
 from django.core.servers.basehttp import (
-    WSGIServer, get_internal_wsgi_application, run,
+    WSGIServer, get_internal_asgi_application, get_internal_wsgi_application,
+    run,
 )
 from django.utils import autoreload
 from django.utils.regex_helper import _lazy_re_compile
+
+try:
+    from daphne.endpoints import build_endpoint_description_strings
+    from daphne.server import Server
+except ImportError:
+    build_endpoint_description_strings = None
+    Server = None
 
 naiveip_re = _lazy_re_compile(r"""^(?:
 (?P<addr>
@@ -19,6 +28,9 @@ naiveip_re = _lazy_re_compile(r"""^(?:
     (?P<ipv6>\[[a-fA-F0-9:]+\]) |               # IPv6 address
     (?P<fqdn>[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*) # FQDN
 ):)?(?P<port>\d+)$""", re.X)
+
+
+logger = logging.getLogger('django.server')
 
 
 class Command(BaseCommand):
@@ -33,6 +45,8 @@ class Command(BaseCommand):
     default_port = '8000'
     protocol = 'http'
     server_cls = WSGIServer
+    server_type = 'WSGI'
+    http_timeout = None
 
     def add_arguments(self, parser):
         parser.add_argument(
@@ -51,6 +65,21 @@ class Command(BaseCommand):
             '--noreload', action='store_false', dest='use_reloader',
             help='Tells Django to NOT use the auto-reloader.',
         )
+        parser.add_argument(
+            "--asgi",
+            action="store_true",
+            dest="asgi",
+            default=False,
+            help="Run an ASGI-based runserver rather than the WSGI-based one",
+        )
+        parser.add_argument(
+            "--http_timeout",
+            action="store",
+            dest="http_timeout",
+            type=int,
+            default=None,
+            help="Specify the daphne http_timeout interval in seconds (default: no timeout)",
+        )
 
     def execute(self, *args, **options):
         if options['no_color']:
@@ -62,11 +91,22 @@ class Command(BaseCommand):
 
     def get_handler(self, *args, **options):
         """Return the default WSGI handler for the runner."""
+        if options['asgi']:
+            return get_internal_asgi_application()
         return get_internal_wsgi_application()
 
     def handle(self, *args, **options):
         if not settings.DEBUG and not settings.ALLOWED_HOSTS:
             raise CommandError('You must set settings.ALLOWED_HOSTS if DEBUG is False.')
+
+        if options["asgi"]:
+            if Server is None:
+                raise CommandError(
+                    "Daphne must be installed to run the development server in asgi mode."
+                )
+            self.server_type = "ASGI"
+
+        self.http_timeout = options.get("http_timeout", self.http_timeout)
 
         self.use_ipv6 = options['use_ipv6']
         if self.use_ipv6 and not socket.has_ipv6:
@@ -104,6 +144,35 @@ class Command(BaseCommand):
         else:
             self.inner_run(None, **options)
 
+    def run_asgi(self, *args, **options):
+        # Launch server in 'main' thread. Signals are disabled as it's still
+        # actually a subthread under the autoreloader.
+        logger.debug("Daphne running, listening on %s:%s", self.addr, self.port)
+
+        # build the endpoint description string from host/port options
+        endpoints = build_endpoint_description_strings(host=self.addr, port=self.port)
+        Server(
+            application=self.get_handler(**options),
+            endpoints=endpoints,
+            signal_handlers=not options["use_reloader"],
+            action_logger=self.log_action,
+            http_timeout=self.http_timeout,
+            root_path=getattr(settings, "FORCE_SCRIPT_NAME", "") or "",
+        ).run()
+        logger.debug("Daphne exited")
+
+    def run_wsgi(self, *args, **options):
+        threading = options["use_threading"]
+        handler = self.get_handler(*args, **options)
+        run(
+            self.addr,
+            int(self.port),
+            handler,
+            ipv6=self.use_ipv6,
+            threading=threading,
+            server_cls=self.server_cls,
+        )
+
     def inner_run(self, *args, **options):
         # If an exception was silenced in ManagementUtility.execute in order
         # to be raised in the child process, raise it now.
@@ -123,11 +192,12 @@ class Command(BaseCommand):
         self.stdout.write(now)
         self.stdout.write((
             "Django version %(version)s, using settings %(settings)r\n"
-            "Starting development server at %(protocol)s://%(addr)s:%(port)s/\n"
+            "Starting %(server_type)s development server at %(protocol)s://%(addr)s:%(port)s/\n"
             "Quit the server with %(quit_command)s."
         ) % {
             "version": self.get_version(),
             "settings": settings.SETTINGS_MODULE,
+            "server_type": self.server_type,
             "protocol": self.protocol,
             "addr": '[%s]' % self.addr if self._raw_ipv6 else self.addr,
             "port": self.port,
@@ -136,6 +206,10 @@ class Command(BaseCommand):
 
         try:
             handler = self.get_handler(*args, **options)
+            if options["asgi"]:
+                self.run_asgi(*args, **options)
+            else:
+                self.run_wsgi(*args, **options)
             run(self.addr, int(self.port), handler,
                 ipv6=self.use_ipv6, threading=threading, server_cls=self.server_cls)
         except OSError as e:
@@ -156,3 +230,29 @@ class Command(BaseCommand):
             if shutdown_message:
                 self.stdout.write(shutdown_message)
             sys.exit(0)
+
+    def log_action(self, protocol, action, details):
+        """
+        Logs various different kinds of requests to the console.
+        """
+        # HTTP requests
+        if protocol == "http" and action == "complete":
+            msg = "HTTP %(method)s %(path)s %(status)s [%(time_taken).2f, %(client)s]"
+
+            # Utilize terminal colors, if available
+            if 200 <= details["status"] < 300:
+                # Put 2XX first, since it should be the common case
+                logger.info(self.style.HTTP_SUCCESS(msg), details)
+            elif 100 <= details["status"] < 200:
+                logger.info(self.style.HTTP_INFO(msg), details)
+            elif details["status"] == 304:
+                logger.info(self.style.HTTP_NOT_MODIFIED(msg), details)
+            elif 300 <= details["status"] < 400:
+                logger.info(self.style.HTTP_REDIRECT(msg), details)
+            elif details["status"] == 404:
+                logger.warning(self.style.HTTP_NOT_FOUND(msg), details)
+            elif 400 <= details["status"] < 500:
+                logger.warning(self.style.HTTP_BAD_REQUEST(msg), details)
+            else:
+                # Any 5XX, or any other response
+                logger.error(self.style.HTTP_SERVER_ERROR(msg), details)

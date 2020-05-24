@@ -1,8 +1,15 @@
 from django.conf import settings
-from django.contrib.staticfiles.handlers import StaticFilesHandler
+from django.contrib.staticfiles.handlers import (
+    ASGIStaticFilesHandler, StaticFilesHandler,
+)
 from django.core.management.commands.runserver import (
     Command as RunserverCommand,
 )
+
+try:
+    from daphne.cli import ASGI3Middleware
+except ImportError:
+    ASGI3Middleware = None
 
 
 class Command(RunserverCommand):
@@ -19,6 +26,11 @@ class Command(RunserverCommand):
             help='Allows serving static files even if DEBUG is False.',
         )
 
+    def get_static_handler_class(self, *args, **options):
+        if options["asgi"]:
+            return lambda handler: ASGI3Middleware(ASGIStaticFilesHandler(handler))
+        return StaticFilesHandler
+
     def get_handler(self, *args, **options):
         """
         Return the static files serving handler wrapping the default handler,
@@ -27,6 +39,7 @@ class Command(RunserverCommand):
         handler = super().get_handler(*args, **options)
         use_static_handler = options['use_static_handler']
         insecure_serving = options['insecure_serving']
+        handler_class = self.get_static_handler_class(*args, **options)
         if use_static_handler and (settings.DEBUG or insecure_serving):
-            return StaticFilesHandler(handler)
+            return handler_class(handler)
         return handler
