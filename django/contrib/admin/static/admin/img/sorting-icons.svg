@@ -11,9 +11,9 @@
     </g>
   </defs>
   <use xlink:href="#sort" x="0" y="0" fill="#999999" />
-  <use xlink:href="#sort" x="0" y="1792" fill="#447e9b" />
+  <use xlink:href="#sort" x="0" y="1792" fill="#417690" />
   <use xlink:href="#ascending" x="0" y="3584" fill="#999999" />
-  <use xlink:href="#ascending" x="0" y="5376" fill="#447e9b" />
+  <use xlink:href="#ascending" x="0" y="5376" fill="#417690" />
   <use xlink:href="#descending" x="0" y="7168" fill="#999999" />
-  <use xlink:href="#descending" x="0" y="8960" fill="#447e9b" />
+  <use xlink:href="#descending" x="0" y="8960" fill="#417690" />
 </svg>

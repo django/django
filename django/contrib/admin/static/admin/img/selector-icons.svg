@@ -20,15 +20,15 @@
     </g>
   </defs>
   <use xlink:href="#up" x="0" y="0" fill="#666666" />
-  <use xlink:href="#up" x="0" y="1792" fill="#447e9b" />
+  <use xlink:href="#up" x="0" y="1792" fill="#417690" />
   <use xlink:href="#down" x="0" y="3584" fill="#666666" />
-  <use xlink:href="#down" x="0" y="5376" fill="#447e9b" />
+  <use xlink:href="#down" x="0" y="5376" fill="#417690" />
   <use xlink:href="#left" x="0" y="7168" fill="#666666" />
-  <use xlink:href="#left" x="0" y="8960" fill="#447e9b" />
+  <use xlink:href="#left" x="0" y="8960" fill="#417690" />
   <use xlink:href="#right" x="0" y="10752" fill="#666666" />
-  <use xlink:href="#right" x="0" y="12544" fill="#447e9b" />
+  <use xlink:href="#right" x="0" y="12544" fill="#417690" />
   <use xlink:href="#clearall" x="0" y="14336" fill="#666666" />
-  <use xlink:href="#clearall" x="0" y="16128" fill="#447e9b" />
+  <use xlink:href="#clearall" x="0" y="16128" fill="#417690" />
   <use xlink:href="#chooseall" x="0" y="17920" fill="#666666" />
-  <use xlink:href="#chooseall" x="0" y="19712" fill="#447e9b" />
+  <use xlink:href="#chooseall" x="0" y="19712" fill="#417690" />
 </svg>

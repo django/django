@@ -20,7 +20,7 @@ body {
 /* LINKS */
 
 a:link, a:visited {
-    color: #447e9b;
+    color: #417690;
     text-decoration: none;
 }
 
@@ -352,7 +352,7 @@ table thead th.sorted .sortoptions a.sortremove:after {
 
 table thead th.sorted .sortoptions a.sortremove:focus:after,
 table thead th.sorted .sortoptions a.sortremove:hover:after {
-    color: #447e9b;
+    color: #417690;
 }
 
 table thead th.sorted .sortoptions a.sortremove:focus,
