@@ -25,9 +25,7 @@ Basic configuration
 ===================
 
 Once you've got mod_wsgi installed and activated, edit your Apache server's
-`httpd.conf`_ file and add the following. If you are using a version of Apache
-older than 2.4, replace ``Require all granted`` with ``Allow from all`` and
-also add the line ``Order deny,allow`` above it.
+`httpd.conf`_ file and add the following.
 
 .. _httpd.conf: https://wiki.apache.org/httpd/DistrosDefaultLayout
 
@@ -39,7 +37,13 @@ also add the line ``Order deny,allow`` above it.
 
     <Directory /path/to/mysite.com/mysite>
     <Files wsgi.py>
+    <IfVersion < 2.4>
+    Order allow,deny
+    Allow from all
+    </IfVersion>
+    <IfVersion >= 2.4>
     Require all granted
+    </IfVersion>
     </Files>
     </Directory>
 
@@ -160,24 +164,38 @@ a static file. All other URLs will be served using mod_wsgi:
     Alias /static/ /path/to/mysite.com/static/
 
     <Directory /path/to/mysite.com/static>
+    <IfVersion < 2.4>
+    Order allow,deny
+    Allow from all
+    </IfVersion>
+    <IfVersion >= 2.4>
     Require all granted
+    </IfVersion>
     </Directory>
 
     <Directory /path/to/mysite.com/media>
+    <IfVersion < 2.4>
+    Order allow,deny
+    Allow from all
+    </IfVersion>
+    <IfVersion >= 2.4>
     Require all granted
+    </IfVersion>
     </Directory>
 
     WSGIScriptAlias / /path/to/mysite.com/mysite/wsgi.py
 
     <Directory /path/to/mysite.com/mysite>
     <Files wsgi.py>
+    <IfVersion < 2.4>
+    Order allow,deny
+    Allow from all
+    </IfVersion>
+    <IfVersion >= 2.4>
     Require all granted
+    </IfVersion>
     </Files>
     </Directory>
-
-If you are using a version of Apache older than 2.4, replace
-``Require all granted`` with ``Allow from all`` and also add the line
-``Order deny,allow`` above it.
 
 .. _Nginx: https://nginx.org/en/
 .. _Apache: https://httpd.apache.org/
