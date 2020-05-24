@@ -249,7 +249,7 @@ select.admin-autocomplete {
 }
 
 .select2-container--admin-autocomplete .select2-results__option--highlighted[aria-selected] {
-    background-color: #79aec8;
+    background-color: #609ab6;
     color: white;
 }
 

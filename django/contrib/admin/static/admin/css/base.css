@@ -424,7 +424,7 @@ select[multiple] {
 /* FORM BUTTONS */
 
 .button, input[type=submit], input[type=button], .submit-row input, a.button {
-    background: #79aec8;
+    background: #609ab6;
     padding: 10px 15px;
     border: none;
     border-radius: 4px;
@@ -497,7 +497,7 @@ input[type=button][disabled].default {
     font-weight: 400;
     font-size: 13px;
     text-align: left;
-    background: #79aec8;
+    background: #609ab6;
     color: #fff;
 }
 
@@ -608,7 +608,7 @@ td ul.errorlist + input, td ul.errorlist + select, td ul.errorlist + textarea {
 /* BREADCRUMBS */
 
 div.breadcrumbs {
-    background: #79aec8;
+    background: #609ab6;
     padding: 10px 40px;
     border: none;
     font-size: 14px;
@@ -871,8 +871,8 @@ table#change-history tbody th {
 
 #user-tools a:focus, #user-tools a:hover {
     text-decoration: none;
-    border-bottom-color: #79aec8;
-    color: #79aec8;
+    border-bottom-color: #609ab6;
+    color: #609ab6;
 }
 
 /* SIDEBAR */
