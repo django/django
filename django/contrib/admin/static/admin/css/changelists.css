@@ -93,7 +93,7 @@
 }
 
 #changelist #toolbar form #searchbar:focus {
-    border-color: #999;
+    border-color: #888;
 }
 
 #changelist #toolbar form input[type="submit"] {
@@ -110,7 +110,7 @@
 
 #changelist #toolbar form input[type="submit"]:focus,
 #changelist #toolbar form input[type="submit"]:hover {
-    border-color: #999;
+    border-color: #888;
 }
 
 #changelist #changelist-search img {
@@ -165,7 +165,7 @@
 
 #changelist-filter a {
     display: block;
-    color: #999;
+    color: #888;
     text-overflow: ellipsis;
     overflow-x: hidden;
 }
@@ -210,7 +210,7 @@
 }
 
 .change-list ul.toplinks .date-back a {
-    color: #999;
+    color: #888;
 }
 
 .change-list ul.toplinks .date-back a:focus,
@@ -285,7 +285,7 @@
     border-top: none;
     border-bottom: none;
     line-height: 24px;
-    color: #999;
+    color: #888;
 }
 
 #changelist .actions.selected {
@@ -321,7 +321,7 @@
 }
 
 #changelist .actions select:focus {
-    border-color: #999;
+    border-color: #888;
 }
 
 #changelist .actions label {
@@ -345,5 +345,5 @@
 }
 
 #changelist .actions .button:focus, #changelist .actions .button:hover {
-    border-color: #999;
+    border-color: #888;
 }

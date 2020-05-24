@@ -41,7 +41,7 @@
     border: 1px solid #ccc;
     border-width: 0 1px;
     padding: 8px;
-    color: #999;
+    color: #888;
     font-size: 10px;
     margin: 0;
     text-align: left;
@@ -313,7 +313,7 @@ table p.datetime {
 
 .timezonewarning {
     font-size: 11px;
-    color: #999;
+    color: #888;
 }
 
 /* URL */
@@ -464,7 +464,7 @@ span.clearable-file-input label {
 
 .calendarnav a:link, #calendarnav a:visited,
 #calendarnav a:focus, #calendarnav a:hover {
-    color: #999;
+    color: #888;
 }
 
 .calendar-shortcuts {

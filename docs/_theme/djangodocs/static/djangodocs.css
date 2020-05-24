@@ -82,7 +82,7 @@ ol.toc li { font-size:125%; padding: .5em; line-height:1.2em; clear: right; }
 ol.toc li.b { background-color: #E0FFB8; }
 ol.toc li a:hover { background-color: transparent !important; text-decoration: underline !important; }
 ol.toc span.release-date { color:#487858; float: right; font-size: 85%; padding-right: .5em; }
-ol.toc span.comment-count { font-size: 75%; color: #999; }
+ol.toc span.comment-count { font-size: 75%; color: #888; }
 
 /*** tables ***/
 table { color:#000; margin-bottom: 1em; width: 100%; }

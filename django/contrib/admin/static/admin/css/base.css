@@ -183,7 +183,7 @@ hr {
 
 .help, p.help, form p.help, div.help, form div.help, div.help li {
     font-size: 11px;
-    color: #999;
+    color: #888;
 }
 
 div.help ul {
@@ -199,7 +199,7 @@ p img, h1 img, h2 img, h3 img, h4 img, td img {
 }
 
 .quiet, a.quiet:link, a.quiet:visited {
-    color: #999;
+    color: #888;
     font-weight: normal;
 }
 
@@ -347,7 +347,7 @@ table thead th.sorted .sortoptions a.sortremove:after {
     left: 3px;
     font-weight: 200;
     font-size: 18px;
-    color: #999;
+    color: #888;
 }
 
 table thead th.sorted .sortoptions a.sortremove:focus:after,
@@ -408,7 +408,7 @@ input[type=number], input[type=tel], textarea, select, .vTextField {
 input[type=text]:focus, input[type=password]:focus, input[type=email]:focus,
 input[type=url]:focus, input[type=number]:focus, input[type=tel]:focus,
 textarea:focus, select:focus, .vTextField:focus {
-    border-color: #999;
+    border-color: #888;
 }
 
 select {
@@ -689,7 +689,7 @@ a.deletelink:focus, a.deletelink:hover {
     display: block;
     float: left;
     padding: 3px 12px;
-    background: #999;
+    background: #888;
     font-weight: 400;
     font-size: 11px;
     text-transform: uppercase;

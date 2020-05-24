@@ -397,7 +397,7 @@ input[type="submit"], button {
     .datetime .timezonewarning {
         display: block;
         font-size: 11px;
-        color: #999;
+        color: #888;
     }
 
     .datetimeshortcuts {
