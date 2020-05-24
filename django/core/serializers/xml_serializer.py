@@ -132,7 +132,11 @@ class Serializer(base.Serializer):
                     self.xml.addQuickElement("object", attrs={
                         'pk': str(value.pk)
                     })
-            for relobj in getattr(obj, field.name).iterator():
+            m2m_iter = getattr(obj, '_prefetched_objects_cache', {}).get(
+                field.name,
+                getattr(obj, field.name).iterator(),
+            )
+            for relobj in m2m_iter:
                 handle_m2m(relobj)
 
             self.xml.endElement("field")
