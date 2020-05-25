@@ -64,7 +64,7 @@ def check_all_models(app_configs=None, **kwargs):
                 Error(
                     "index name '%s' is not unique %s %s." % (
                         index_name,
-                        'for model' if len(model_labels) == 1 else 'amongst models:',
+                        'for model' if len(model_labels) == 1 else 'among models:',
                         ', '.join(sorted(model_labels)),
                     ),
                     id='models.E029' if len(model_labels) == 1 else 'models.E030',
@@ -77,7 +77,7 @@ def check_all_models(app_configs=None, **kwargs):
                 Error(
                     "constraint name '%s' is not unique %s %s." % (
                         constraint_name,
-                        'for model' if len(model_labels) == 1 else 'amongst models:',
+                        'for model' if len(model_labels) == 1 else 'among models:',
                         ', '.join(sorted(model_labels)),
                     ),
                     id='models.E031' if len(model_labels) == 1 else 'models.E032',

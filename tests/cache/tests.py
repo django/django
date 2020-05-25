@@ -1272,8 +1272,8 @@ class BaseMemcachedTests(BaseCacheTests):
 
     def _perform_invalid_key_test(self, key, expected_warning):
         """
-        Whilst other backends merely warn, memcached should raise for an
-        invalid key.
+        While other backends merely warn, memcached should raise for an invalid
+        key.
         """
         msg = expected_warning.replace(key, cache.make_key(key))
         with self.assertRaisesMessage(InvalidCacheKey, msg):

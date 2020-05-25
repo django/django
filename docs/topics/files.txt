@@ -75,9 +75,9 @@ location (:setting:`MEDIA_ROOT` if you are using the default
 
 .. note::
 
-    Whilst :class:`~django.db.models.ImageField` non-image data attributes,
-    such as ``height``, ``width``, and ``size`` are available on the instance,
-    the underlying image data cannot be used without reopening the image. For
+    While :class:`~django.db.models.ImageField` non-image data attributes, such
+    as ``height``, ``width``, and ``size`` are available on the instance, the
+    underlying image data cannot be used without reopening the image. For
     example::
 
         >>> from PIL import Image

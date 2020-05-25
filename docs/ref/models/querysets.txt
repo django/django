@@ -1710,7 +1710,7 @@ to refer to the queryset's model.
 
 On PostgreSQL only, you can pass ``no_key=True`` in order to acquire a weaker
 lock, that still allows creating rows that merely reference locked rows
-(through a foreign key, for example) whilst the lock is in place. The
+(through a foreign key, for example) while the lock is in place. The
 PostgreSQL documentation has more details about `row-level lock modes
 <https://www.postgresql.org/docs/current/explicit-locking.html#LOCKING-ROWS>`_.
 

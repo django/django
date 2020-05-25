@@ -711,7 +711,7 @@ For each field, we describe the default widget used if you don't specify
     After the field has been cleaned and validated, the ``UploadedFile``
     object will have an additional ``image`` attribute containing the Pillow
     `Image`_ instance used to check if the file was a valid image. Pillow
-    closes the underlying file descriptor after verifying an image, so whilst
+    closes the underlying file descriptor after verifying an image, so while
     non-image data attributes, such as ``format``, ``height``, and ``width``,
     are available, methods that access the underlying image data, such as
     ``getdata()`` or ``getpixel()``, cannot be used without reopening the file.
@@ -1354,7 +1354,7 @@ By default, :class:`ModelChoiceField` and :class:`ModelMultipleChoiceField` use
 
 When iterated, ``ModelChoiceIterator`` yields 2-tuple choices containing
 :class:`ModelChoiceIteratorValue` instances as the first ``value`` element in
-each choice. ``ModelChoiceIteratorValue`` wraps the choice value whilst
+each choice. ``ModelChoiceIteratorValue`` wraps the choice value while
 maintaining a reference to the source model instance that can be used in custom
 widget implementations, for example, to add `data-* attributes`_ to
 ``<option>`` elements.

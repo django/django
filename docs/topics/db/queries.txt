@@ -495,7 +495,7 @@ is ``'Beatles Blog'``::
 
 This spanning can be as deep as you'd like.
 
-It works backwards, too. Whilst it :attr:`can be customized
+It works backwards, too. While it :attr:`can be customized
 <.ForeignKey.related_query_name>`, by default you refer to a "reverse"
 relationship in a lookup using the lowercase name of the model.
 
