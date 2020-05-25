@@ -158,7 +158,7 @@ class CreateExtensionTests(PostgreSQLTestCase):
 
     @override_settings(DATABASE_ROUTERS=[NoExtensionRouter()])
     def test_no_allow_migrate(self):
-        operation = CreateExtension('uuid-ossp')
+        operation = CreateExtension('tablefunc')
         project_state = ProjectState()
         new_state = project_state.clone()
         # Don't create an extension.
@@ -173,7 +173,7 @@ class CreateExtensionTests(PostgreSQLTestCase):
         self.assertEqual(len(captured_queries), 0)
 
     def test_allow_migrate(self):
-        operation = CreateExtension('uuid-ossp')
+        operation = CreateExtension('tablefunc')
         project_state = ProjectState()
         new_state = project_state.clone()
         # Create an extension.
