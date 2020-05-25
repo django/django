@@ -1022,7 +1022,13 @@ class ModelAdmin(BaseModelAdmin):
         if search_fields and search_term:
             orm_lookups = [construct_search(str(search_field))
                            for search_field in search_fields]
-            for bit in search_term.split():
+
+            search_words = search_term.split()
+            # If search term is surrounded with double quotes, don't split it
+            if re.match("\".*\"", search_term):
+                search_words = [search_term[1:-1]]
+
+            for bit in search_words:
                 or_queries = [models.Q(**{orm_lookup: bit})
                               for orm_lookup in orm_lookups]
                 queryset = queryset.filter(reduce(operator.or_, or_queries))
