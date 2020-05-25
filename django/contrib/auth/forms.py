@@ -85,7 +85,7 @@ class UserCreationForm(forms.ModelForm):
     password.
     """
     error_messages = {
-        'password_mismatch': _('The two password fields didn’t match.'),
+        'password_mismatch': _('The two password fields didn't match.'),
     }
     password1 = forms.CharField(
         label=_("Password"),
