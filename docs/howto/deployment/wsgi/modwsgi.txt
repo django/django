@@ -25,9 +25,7 @@ Basic configuration
 ===================
 
 Once you've got mod_wsgi installed and activated, edit your Apache server's
-`httpd.conf`_ file and add the following. If you are using a version of Apache
-older than 2.4, replace ``Require all granted`` with ``Allow from all`` and
-also add the line ``Order deny,allow`` above it.
+`httpd.conf`_ file and add the following.
 
 .. _httpd.conf: https://wiki.apache.org/httpd/DistrosDefaultLayout
 
@@ -174,10 +172,6 @@ a static file. All other URLs will be served using mod_wsgi:
     Require all granted
     </Files>
     </Directory>
-
-If you are using a version of Apache older than 2.4, replace
-``Require all granted`` with ``Allow from all`` and also add the line
-``Order deny,allow`` above it.
 
 .. _Nginx: https://nginx.org/en/
 .. _Apache: https://httpd.apache.org/
