@@ -1554,12 +1554,12 @@ when using the :djadmin:`collectstatic` management command. See
 
 .. warning::
 
-    **Always prefix the mode with a 0.**
+    **Always prefix the mode with** ``0o`` **.**
 
-    If you're not familiar with file modes, please note that the leading
-    ``0`` is very important: it indicates an octal number, which is the
-    way that modes must be specified. If you try to use ``644``, you'll
-    get totally incorrect behavior.
+    If you're not familiar with file modes, please note that the ``0o`` prefix
+    is very important: it indicates an octal number, which is the way that
+    modes must be specified. If you try to use ``644``, you'll get totally
+    incorrect behavior.
 
 .. setting:: FILE_UPLOAD_TEMP_DIR
 
