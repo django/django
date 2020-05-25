@@ -38,13 +38,10 @@ matches the version you installed by executing::
 About ``pip``
 =============
 
-`pip`_ is a package manage for Python. It makes installing and uninstalling
-Python packages (such as Django!) very easy. For the rest of the installation,
-we'll use ``pip`` to install Python packages from the command line.
-
-To install pip on your machine, go to
-https://pip.pypa.io/en/latest/installing/, and follow the ``Installing with
-get-pip.py`` instructions.
+`pip`_ is a package manager for Python and is included by default with the
+Python installer. It helps to install and uninstall Python packages
+(such as Django!). For the rest of the installation, we'll use ``pip`` to
+install Python packages from the command line.
 
 .. _pip: https://pypi.org/project/pip/
 
