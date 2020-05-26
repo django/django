@@ -392,7 +392,7 @@ class Collector:
         if len(self.data) == 1 and len(instances) == 1:
             instance = list(instances)[0]
             if self.can_fast_delete(instance):
-                with transaction.mark_for_rollback_on_error():
+                with transaction.mark_for_rollback_on_error(self.using):
                     count = sql.DeleteQuery(model).delete_batch([instance.pk], self.using)
                 setattr(instance, model._meta.pk.attname, None)
                 return count, {model._meta.label: count}
