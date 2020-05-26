@@ -947,8 +947,8 @@ docs/current/rangetypes.html#RANGETYPES-INCLUSIVITY>`_.
 
     A field similar to :class:`AutoField <django.db.models.AutoField>`
     except it does not need to be a primary key. It uses a separate postgres
-    sequence to automatically increment the integer value. It stores a 4-byte
-    integer that fits numbers from ``1`` to ``2147483647``.
+    sequence to automatically increment the integer value, starting from 1. It stores a 4-byte
+    integer that fits numbers from ``-2147483648`` to ``2147483647``.
 
     .. attribute:: unique
 
@@ -965,9 +965,9 @@ docs/current/rangetypes.html#RANGETYPES-INCLUSIVITY>`_.
 .. class:: BigSerialField(unique=True, editable=False, **options)
 
     A 8-byte integer, much like an :class:`SerialField` except that it is
-    guaranteed to fit numbers from ``1`` to ``9223372036854775807``.
+    guaranteed to fit numbers from ``-9223372036854775808`` to ``9223372036854775807``.
 
 .. class:: SmallSerialField(unique=True, editable=False, **options)
 
     A 2-byte integer, much like an :class:`SerialField` except that it is
-    guaranteed to fit numbers from ``1`` to ``32767``.
+    guaranteed to fit numbers from ``-32768`` to ``32767``.
