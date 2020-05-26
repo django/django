@@ -192,6 +192,9 @@ class TestUtilsText(SimpleTestCase):
             # given - expected - Unicode?
             ('Hello, World!', 'hello-world', False),
             ('spam & eggs', 'spam-eggs', False),
+            (' multiple---dash and  space ', 'multiple-dash-and-space', False),
+            ('\t whitespace-in-value \n', 'whitespace-in-value', False),
+            ('underscore_in-value', 'underscore_in-value', False),
             ('spam & ıçüş', 'spam-ıçüş', True),
             ('foo ıç bar', 'foo-ıç-bar', True),
             ('    foo ıç bar', 'foo-ıç-bar', True),
