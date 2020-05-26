@@ -1505,7 +1505,7 @@ relation works.
 
         user = models.ForeignKey(
             User,
-            models.SET_NULL,
+            on_delete=models.SET_NULL,
             blank=True,
             null=True,
         )
