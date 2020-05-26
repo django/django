@@ -12,7 +12,7 @@ from django.db.models.deletion import CASCADE
 from django.urls import reverse
 from django.urls.exceptions import NoReverseMatch
 from django.utils.html import smart_urlquote
-from django.utils.safestring import mark_safe
+from django.utils.http import urlencode
 from django.utils.text import Truncator
 from django.utils.translation import get_language, gettext as _
 
@@ -150,8 +150,8 @@ class ForeignKeyRawIdWidget(forms.TextInput):
 
             params = self.url_parameters()
             if params:
-                related_url += '?' + '&amp;'.join('%s=%s' % (k, v) for k, v in params.items())
-            context['related_url'] = mark_safe(related_url)
+                related_url += '?' + urlencode(params)
+            context['related_url'] = related_url
             context['link_title'] = _('Lookup')
             # The JavaScript code looks for this class.
             context['widget']['attrs'].setdefault('class', 'vForeignKeyRawIdAdminField')
