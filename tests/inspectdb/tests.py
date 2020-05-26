@@ -60,6 +60,7 @@ class InspectDBTestCase(TestCase):
     def test_field_types(self):
         """Test introspection of various Django field types"""
         assertFieldType = self.make_field_type_asserter()
+        introspected_field_types = connection.features.introspected_field_types
 
         # Inspecting Oracle DB doesn't produce correct results (#19884):
         # - it reports fields as blank=True when they aren't.
@@ -74,12 +75,11 @@ class InspectDBTestCase(TestCase):
             assertFieldType('url_field', "models.CharField(max_length=200)")
         assertFieldType('date_field', "models.DateField()")
         assertFieldType('date_time_field', "models.DateTimeField()")
-        if connection.features.can_introspect_ip_address_field:
+        if introspected_field_types['GenericIPAddressField'] == 'GenericIPAddressField':
             assertFieldType('gen_ip_address_field', "models.GenericIPAddressField()")
         elif not connection.features.interprets_empty_strings_as_nulls:
             assertFieldType('gen_ip_address_field', "models.CharField(max_length=39)")
-        if connection.features.can_introspect_time_field:
-            assertFieldType('time_field', "models.TimeField()")
+        assertFieldType('time_field', 'models.%s()' % introspected_field_types['TimeField'])
         if connection.features.has_native_uuid_field:
             assertFieldType('uuid_field', "models.UUIDField()")
         elif not connection.features.interprets_empty_strings_as_nulls:
@@ -97,20 +97,18 @@ class InspectDBTestCase(TestCase):
     def test_number_field_types(self):
         """Test introspection of various Django field types"""
         assertFieldType = self.make_field_type_asserter()
+        introspected_field_types = connection.features.introspected_field_types
 
         if not connection.features.can_introspect_autofield:
             assertFieldType('id', "models.IntegerField(primary_key=True)  # AutoField?")
 
-        if connection.features.can_introspect_big_integer_field:
-            assertFieldType('big_int_field', "models.BigIntegerField()")
-        else:
-            assertFieldType('big_int_field', "models.IntegerField()")
+        assertFieldType('big_int_field', 'models.%s()' % introspected_field_types['BigIntegerField'])
 
-        bool_field_type = connection.features.introspected_boolean_field_type
+        bool_field_type = introspected_field_types['BooleanField']
         assertFieldType('bool_field', "models.{}()".format(bool_field_type))
         assertFieldType('null_bool_field', 'models.{}(blank=True, null=True)'.format(bool_field_type))
 
-        if connection.features.can_introspect_decimal_field:
+        if connection.vendor != 'sqlite':
             assertFieldType('decimal_field', "models.DecimalField(max_digits=6, decimal_places=1)")
         else:       # Guessed arguments on SQLite, see #5014
             assertFieldType('decimal_field', "models.DecimalField(max_digits=10, decimal_places=5)  "
@@ -118,37 +116,11 @@ class InspectDBTestCase(TestCase):
                                              "as this database handles decimal fields as float")
 
         assertFieldType('float_field', "models.FloatField()")
-
         assertFieldType('int_field', "models.IntegerField()")
-
-        if connection.features.can_introspect_positive_integer_field:
-            assertFieldType('pos_int_field', "models.PositiveIntegerField()")
-        else:
-            assertFieldType('pos_int_field', "models.IntegerField()")
-
-        if connection.features.can_introspect_positive_integer_field:
-            if connection.features.can_introspect_big_integer_field:
-                assertFieldType('pos_big_int_field', 'models.PositiveBigIntegerField()')
-            else:
-                assertFieldType('pos_big_int_field', 'models.PositiveIntegerField()')
-            if connection.features.can_introspect_small_integer_field:
-                assertFieldType('pos_small_int_field', "models.PositiveSmallIntegerField()")
-            else:
-                assertFieldType('pos_small_int_field', "models.PositiveIntegerField()")
-        else:
-            if connection.features.can_introspect_big_integer_field:
-                assertFieldType('pos_big_int_field', 'models.BigIntegerField()')
-            else:
-                assertFieldType('pos_big_int_field', 'models.IntegerField()')
-            if connection.features.can_introspect_small_integer_field:
-                assertFieldType('pos_small_int_field', "models.SmallIntegerField()")
-            else:
-                assertFieldType('pos_small_int_field', "models.IntegerField()")
-
-        if connection.features.can_introspect_small_integer_field:
-            assertFieldType('small_int_field', "models.SmallIntegerField()")
-        else:
-            assertFieldType('small_int_field', "models.IntegerField()")
+        assertFieldType('pos_int_field', 'models.%s()' % introspected_field_types['PositiveIntegerField'])
+        assertFieldType('pos_big_int_field', 'models.%s()' % introspected_field_types['PositiveBigIntegerField'])
+        assertFieldType('pos_small_int_field', 'models.%s()' % introspected_field_types['PositiveSmallIntegerField'])
+        assertFieldType('small_int_field', 'models.%s()' % introspected_field_types['SmallIntegerField'])
 
     @skipUnlessDBFeature('can_introspect_foreign_keys')
     def test_attribute_name_not_python_keyword(self):

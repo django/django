@@ -19,12 +19,6 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     max_query_params = 999
     supports_mixed_date_datetime_comparisons = False
     can_introspect_autofield = True
-    can_introspect_decimal_field = False
-    can_introspect_duration_field = False
-    can_introspect_positive_integer_field = True
-    can_introspect_small_integer_field = True
-    introspected_big_auto_field_type = 'AutoField'
-    introspected_small_auto_field_type = 'AutoField'
     supports_transactions = True
     atomic_transactions = False
     can_rollback_ddl = True
@@ -50,6 +44,16 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_aggregate_filter_clause = Database.sqlite_version_info >= (3, 30, 1)
     supports_order_by_nulls_modifier = Database.sqlite_version_info >= (3, 30, 0)
     order_by_nulls_first = True
+
+    @cached_property
+    def introspected_field_types(self):
+        return{
+            **super().introspected_field_types,
+            'BigAutoField': 'AutoField',
+            'DurationField': 'BigIntegerField',
+            'GenericIPAddressField': 'CharField',
+            'SmallAutoField': 'AutoField',
+        }
 
     @cached_property
     def supports_json_field(self):

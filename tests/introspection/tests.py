@@ -84,10 +84,10 @@ class IntrospectionTests(TransactionTestCase):
                 'CharField',
                 'CharField',
                 'CharField',
-                'BigIntegerField' if connection.features.can_introspect_big_integer_field else 'IntegerField',
-                'BinaryField' if connection.features.can_introspect_binary_field else 'TextField',
-                'SmallIntegerField' if connection.features.can_introspect_small_integer_field else 'IntegerField',
-                'DurationField' if connection.features.can_introspect_duration_field else 'BigIntegerField',
+                connection.features.introspected_field_types['BigIntegerField'],
+                connection.features.introspected_field_types['BinaryField'],
+                connection.features.introspected_field_types['SmallIntegerField'],
+                connection.features.introspected_field_types['DurationField'],
             ]
         )
 
@@ -113,7 +113,7 @@ class IntrospectionTests(TransactionTestCase):
         with connection.cursor() as cursor:
             desc = connection.introspection.get_table_description(cursor, City._meta.db_table)
         self.assertIn(
-            connection.features.introspected_big_auto_field_type,
+            connection.features.introspected_field_types['BigAutoField'],
             [connection.introspection.get_field_type(r[1], r) for r in desc],
         )
 
@@ -122,7 +122,7 @@ class IntrospectionTests(TransactionTestCase):
         with connection.cursor() as cursor:
             desc = connection.introspection.get_table_description(cursor, Country._meta.db_table)
         self.assertIn(
-            connection.features.introspected_small_auto_field_type,
+            connection.features.introspected_field_types['SmallAutoField'],
             [connection.introspection.get_field_type(r[1], r) for r in desc],
         )
 

@@ -247,7 +247,20 @@ Database backend API
 This section describes changes that may be needed in third-party database
 backends.
 
-* ...
+* The new ``DatabaseFeatures.introspected_field_types`` property replaces these
+  features:
+
+  * ``can_introspect_big_integer_field``
+  * ``can_introspect_binary_field``
+  * ``can_introspect_decimal_field``
+  * ``can_introspect_duration_field``
+  * ``can_introspect_ip_address_field``
+  * ``can_introspect_positive_integer_field``
+  * ``can_introspect_small_integer_field``
+  * ``can_introspect_time_field``
+  * ``introspected_big_auto_field_type``
+  * ``introspected_small_auto_field_type``
+  * ``introspected_boolean_field_type``
 
 :mod:`django.contrib.gis`
 -------------------------

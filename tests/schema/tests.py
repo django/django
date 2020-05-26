@@ -559,7 +559,7 @@ class SchemaTests(TransactionTestCase):
         columns = self.column_classes(Author)
         # BooleanField are stored as TINYINT(1) on MySQL.
         field_type = columns['awesome'][0]
-        self.assertEqual(field_type, connection.features.introspected_boolean_field_type)
+        self.assertEqual(field_type, connection.features.introspected_field_types['BooleanField'])
 
     def test_add_field_default_transform(self):
         """

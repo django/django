@@ -22,10 +22,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     can_release_savepoints = True
     supports_tablespaces = True
     supports_transactions = True
-    can_introspect_autofield = True
-    can_introspect_ip_address_field = True
     can_introspect_materialized_views = True
-    can_introspect_small_integer_field = True
     can_distinct_on_fields = True
     can_rollback_ddl = True
     supports_combined_alters = True
@@ -60,6 +57,15 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     validates_explain_options = False  # A query will error on invalid options.
     supports_deferrable_unique_constraints = True
     has_json_operators = True
+
+    @cached_property
+    def introspected_field_types(self):
+        return {
+            **super().introspected_field_types,
+            'PositiveBigIntegerField': 'BigIntegerField',
+            'PositiveIntegerField': 'IntegerField',
+            'PositiveSmallIntegerField': 'SmallIntegerField',
+        }
 
     @cached_property
     def is_postgresql_10(self):
