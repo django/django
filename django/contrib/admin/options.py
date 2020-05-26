@@ -44,7 +44,9 @@ from django.utils.decorators import method_decorator
 from django.utils.html import format_html
 from django.utils.http import urlencode
 from django.utils.safestring import mark_safe
-from django.utils.text import capfirst, format_lazy, get_text_list
+from django.utils.text import (
+    capfirst, format_lazy, get_text_list, smart_split, unescape_string_literal,
+)
 from django.utils.translation import gettext as _, ngettext
 from django.views.decorators.csrf import csrf_protect
 from django.views.generic import RedirectView
@@ -1022,7 +1024,9 @@ class ModelAdmin(BaseModelAdmin):
         if search_fields and search_term:
             orm_lookups = [construct_search(str(search_field))
                            for search_field in search_fields]
-            for bit in search_term.split():
+            for bit in smart_split(search_term):
+                if bit.startswith(('"', "'")):
+                    bit = unescape_string_literal(bit)
                 or_queries = [models.Q(**{orm_lookup: bit})
                               for orm_lookup in orm_lookups]
                 queryset = queryset.filter(reduce(operator.or_, or_queries))

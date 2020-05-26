@@ -1309,13 +1309,17 @@ subclass::
         WHERE (first_name ILIKE '%john%' OR last_name ILIKE '%john%')
         AND (first_name ILIKE '%lennon%' OR last_name ILIKE '%lennon%')
 
+    The search query can contain quoted phrases with spaces. For example, if a
+    user searches for ``"john winston"`` or ``'john winston'``, Django will do
+    the equivalent of this SQL ``WHERE`` clause:
+
+    .. code-block:: sql
+
+        WHERE (first_name ILIKE '%john winston%' OR last_name ILIKE '%john winston%')
+
     If you don't want to use ``icontains`` as the lookup, you can use any
     lookup by appending it the field. For example, you could use :lookup:`exact`
     by setting ``search_fields`` to ``['first_name__exact']``.
-
-    Beware that because query terms are split and ANDed as described earlier,
-    searching with :lookup:`exact` only works with a single search word since
-    two or more words can't all be an exact match unless all words are the same.
 
     Some (older) shortcuts for specifying a field lookup are also available.
     You can prefix a field in ``search_fields`` with the following characters
@@ -1333,6 +1337,10 @@ subclass::
     If you need to customize search you can use
     :meth:`ModelAdmin.get_search_results` to provide additional or alternate
     search behavior.
+
+    .. versionchanged:: 3.2
+
+        Support for searching against quoted phrases with spaces was added.
 
 .. attribute:: ModelAdmin.show_full_result_count
 

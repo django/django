@@ -3439,6 +3439,8 @@ class AdminSearchTest(TestCase):
         cls.per1 = Person.objects.create(name='John Mauchly', gender=1, alive=True)
         cls.per2 = Person.objects.create(name='Grace Hopper', gender=1, alive=False)
         cls.per3 = Person.objects.create(name='Guido van Rossum', gender=1, alive=True)
+        Person.objects.create(name='John Doe', gender=1)
+        Person.objects.create(name="John O'Hara", gender=1)
 
         cls.t1 = Recommender.objects.create()
         cls.t2 = Recommendation.objects.create(the_recommender=cls.t1)
@@ -3513,7 +3515,7 @@ class AdminSearchTest(TestCase):
             response = self.client.get(reverse('admin:admin_views_person_changelist') + '?q=Gui')
         self.assertContains(
             response,
-            """<span class="small quiet">1 result (<a href="?">3 total</a>)</span>""",
+            """<span class="small quiet">1 result (<a href="?">5 total</a>)</span>""",
             html=True
         )
 
@@ -3532,6 +3534,24 @@ class AdminSearchTest(TestCase):
             html=True
         )
         self.assertTrue(response.context['cl'].show_admin_actions)
+
+    def test_search_with_spaces(self):
+        url = reverse('admin:admin_views_person_changelist') + '?q=%s'
+        tests = [
+            ('"John Doe"', 1),
+            ("'John Doe'", 1),
+            ('John Doe', 0),
+            ('"John Doe" John', 1),
+            ("'John Doe' John", 1),
+            ("John Doe John", 0),
+            ('"John Do"', 1),
+            ("'John Do'", 1),
+            ("'John O\\'Hara'", 1),
+        ]
+        for search, hits in tests:
+            with self.subTest(search=search):
+                response = self.client.get(url % search)
+                self.assertContains(response, '\n%s person' % hits)
 
 
 @override_settings(ROOT_URLCONF='admin_views.urls')
