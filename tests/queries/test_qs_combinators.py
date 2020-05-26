@@ -1,3 +1,5 @@
+import operator
+
 from django.db import DatabaseError, NotSupportedError, connection
 from django.db.models import Exists, F, IntegerField, OuterRef, Value
 from django.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
@@ -11,11 +13,8 @@ class QuerySetSetOperationTests(TestCase):
     def setUpTestData(cls):
         Number.objects.bulk_create(Number(num=i, other_num=10 - i) for i in range(10))
 
-    def number_transform(self, value):
-        return value.num
-
     def assertNumbersEqual(self, queryset, expected_numbers, ordered=True):
-        self.assertQuerysetEqual(queryset, expected_numbers, self.number_transform, ordered)
+        self.assertQuerysetEqual(queryset, expected_numbers, operator.attrgetter('num'), ordered)
 
     def test_simple_union(self):
         qs1 = Number.objects.filter(num__lte=1)
