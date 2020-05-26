@@ -280,6 +280,9 @@ Miscellaneous
 * :attr:`.ModelAdmin.prepopulated_fields` no longer strips English stop words,
   such as ``'a'`` or ``'an'``.
 
+* :func:`~django.utils.text.slugify` now removes leading and trailing dashes
+  and underscores.
+
 .. _deprecated-features-3.2:
 
 Features deprecated in 3.2
