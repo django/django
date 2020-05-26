@@ -30,11 +30,11 @@ For example::
             ...
         ]
 
-Creating the extension requires a database user with superuser privileges.
-If the Django database user doesn't have superuser privileges, you'll have
-to create the extension outside of Django migrations with a user that has
-the appropriate privileges. In that case, connect to your Django database and
-run the query ``CREATE EXTENSION IF NOT EXISTS hstore;``.
+For most extensions, this requires a database user with superuser privileges.
+If the Django database user doesn't have the appropriate privileges, you'll
+have to create the extension outside of Django migrations with a user that has
+them. In that case, connect to your Django database and run the query
+``CREATE EXTENSION IF NOT EXISTS hstore;``.
 
 .. currentmodule:: django.contrib.postgres.operations
 
