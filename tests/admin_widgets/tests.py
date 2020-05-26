@@ -24,6 +24,7 @@ from django.utils import translation
 from .models import (
     Advisor, Album, Band, Bee, Car, Company, Event, Honeycomb, Individual,
     Inventory, Member, MyFileField, Profile, School, Student,
+    UnsafeLimitChoicesTo,
 )
 from .widgetadmin import site as widget_admin_site
 
@@ -615,6 +616,16 @@ class ForeignKeyRawIdWidgetTest(TestCase):
             'class="related-lookup" id="lookup_id_test" title="Lookup"></a>'
             '&nbsp;<strong><a href="/admin_widgets/inventory/%(pk)s/change/">'
             'Hidden</a></strong>' % {'pk': hidden.pk}
+        )
+
+    def test_render_unsafe_limit_choices_to(self):
+        rel = UnsafeLimitChoicesTo._meta.get_field('band').remote_field
+        w = widgets.ForeignKeyRawIdWidget(rel, widget_admin_site)
+        self.assertHTMLEqual(
+            w.render('test', None),
+            '<input type="text" name="test" class="vForeignKeyRawIdAdminField">\n'
+            '<a href="/admin_widgets/band/?name=%22%26%3E%3Cescapeme&amp;_to_field=id" '
+            'class="related-lookup" id="lookup_id_test" title="Lookup"></a>'
         )
 
 
