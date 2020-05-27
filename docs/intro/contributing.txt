@@ -163,13 +163,6 @@ more convenient.
 
         ...\> %HOMEPATH%\.virtualenvs\djangodev\Scripts\activate.bat
 
-    or you can install :ref:`a Windows version of virtualenvwrapper
-    <virtualenvwrapper-win>` and then use:
-
-    .. code-block:: doscon
-
-        ...\> workon djangodev
-
 __ https://virtualenvwrapper.readthedocs.io/en/latest/
 
 The name of the currently activated virtual environment is displayed on the
