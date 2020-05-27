@@ -2,9 +2,9 @@
 Django 2.2.13 release notes
 ===========================
 
-*Expected June 1, 2020*
+*Expected June 3, 2020*
 
-Django 2.2.13 fixes a bug in 2.2.12.
+Django 2.2.13 fixes two security issues and a bug in 2.2.12.
 
 Bugfixes
 ========
