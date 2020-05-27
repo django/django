@@ -826,8 +826,12 @@ class Client(ClientMixin, RequestFactory):
                 path = urljoin(response.request['PATH_INFO'], path)
 
             if response.status_code in (HTTPStatus.TEMPORARY_REDIRECT, HTTPStatus.PERMANENT_REDIRECT):
-                # Preserve request method post-redirect for 307/308 responses.
-                request_method = getattr(self, response.request['REQUEST_METHOD'].lower())
+                # Preserve request method and query string (if needed)
+                # post-redirect for 307/308 responses.
+                request_method = response.request['REQUEST_METHOD'].lower()
+                if request_method not in ('get', 'head'):
+                    extra['QUERY_STRING'] = url.query
+                request_method = getattr(self, request_method)
             else:
                 request_method = self.get
                 data = QueryDict(url.query)
