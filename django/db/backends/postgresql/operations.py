@@ -164,7 +164,6 @@ class DatabaseOperations(BaseDatabaseOperations):
             return "TABLESPACE %s" % self.quote_name(tablespace)
 
     def sequence_reset_sql(self, style, model_list):
-        from django.db import models
         output = []
         qn = self.quote_name
         for model in model_list:
@@ -175,7 +174,7 @@ class DatabaseOperations(BaseDatabaseOperations):
             # and column name (available since PostgreSQL 8)
 
             for f in model._meta.local_fields:
-                if isinstance(f, models.AutoField):
+                if f.uses_sequence:
                     output.append(
                         "%s setval(pg_get_serial_sequence('%s','%s'), "
                         "coalesce(max(%s), 1), max(%s) %s null) %s %s;" % (
@@ -189,7 +188,6 @@ class DatabaseOperations(BaseDatabaseOperations):
                             style.SQL_TABLE(qn(model._meta.db_table)),
                         )
                     )
-                    break  # Only one AutoField is allowed per model, so don't bother continuing.
         return output
 
     def prep_for_iexact_query(self, x):

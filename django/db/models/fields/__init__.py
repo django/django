@@ -119,6 +119,8 @@ class Field(RegisterLookupMixin):
     one_to_one = None
     related_model = None
 
+    uses_sequence = False
+
     descriptor_class = DeferredAttribute
 
     # Generic field type description, usually overridden by subclasses
@@ -2439,6 +2441,7 @@ class UUIDField(Field):
 
 class AutoFieldMixin:
     db_returning = True
+    uses_sequence = True
 
     def __init__(self, *args, **kwargs):
         kwargs['blank'] = True

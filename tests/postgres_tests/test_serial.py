@@ -1,4 +1,5 @@
-from django.db import models
+from django.core.management.color import no_style
+from django.db import connection, models
 from django.test import skipUnlessDBFeature
 from django.test.utils import isolate_apps
 
@@ -60,3 +61,28 @@ class SerialFieldTests(PostgreSQLTestCase):
         self.assertGreater(o2.regular, o1.regular)
         self.assertGreater(o2.small, o1.small)
         self.assertGreater(o2.big, o1.big)
+
+    def test_sequnece_ops(self):
+        with connection.cursor() as cursor:
+            sequences = [
+                seq for seq in connection.introspection.get_sequences(cursor, SerialModel._meta.db_table)
+                if seq['column'] == 'regular'
+            ]
+            for command in connection.ops.sequence_reset_by_name_sql(no_style(), sequences):
+                cursor.execute(command)
+        for i in range(1, 6, 2):
+            self.assertEqual(SerialModel.objects.create(regular=i).regular, i)
+        for i in range(1, 3):
+            self.assertEqual(SerialModel.objects.create().regular, i)
+        with connection.cursor() as cursor:
+            for command in connection.ops.sequence_reset_sql(no_style(), [SerialModel]):
+                cursor.execute(command)
+        self.assertEqual(SerialModel.objects.create().regular, 6)
+        with connection.cursor() as cursor:
+            sequences = [
+                seq for seq in connection.introspection.get_sequences(cursor, SerialModel._meta.db_table)
+                if seq['column'] == 'regular'
+            ]
+            for command in connection.ops.sequence_reset_by_name_sql(no_style(), sequences):
+                cursor.execute(command)
+        self.assertEqual(SerialModel.objects.create().regular, 1)

@@ -7,6 +7,7 @@ __all__ = ('BigSerialField', 'SmallSerialField', 'SerialField')
 
 class SerialFieldMixin:
     db_returning = True
+    uses_sequence = True
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **{
