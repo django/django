@@ -146,7 +146,7 @@ If you're using MySQL or MariaDB, the following checks will be performed:
   ``max_length`` > 255. *This check was changed to* ``mysql.W003`` *in Django
   3.1 as the real maximum size depends on many factors.*
 * **mysql.W002**: MySQL/MariaDB Strict Mode is not set for database connection
-  '<alias>'. See also :ref:`mysql-sql-mode`.
+  ``<alias>``. See also :ref:`mysql-sql-mode`.
 * **mysql.W003**: MySQL/MariaDB may not allow unique ``CharField``\s to have a
   ``max_length`` > 255.
 
@@ -413,8 +413,8 @@ The following checks are run if you use the :option:`check --deploy` option:
   set to ``True``, so your pages will not be served with an
   ``'X-XSS-Protection: 1; mode=block'`` header. You should consider enabling
   this header to activate the browser's XSS filtering and help prevent XSS
-  attacks. *This check is removed in Django 3.0 as the ``X-XSS-Protection``
-  header is no longer honored by modern browsers.*
+  attacks. *This check is removed in Django 3.0 as the* ``X-XSS-Protection``
+  *header is no longer honored by modern browsers.*
 * **security.W008**: Your :setting:`SECURE_SSL_REDIRECT` setting is not set to
   ``True``. Unless your site should be available over both SSL and non-SSL
   connections, you may want to either set this setting to ``True`` or configure
