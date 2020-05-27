@@ -10,20 +10,16 @@ class SerialFieldMixin:
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **{
-            'editable': False,
             **kwargs,
             'blank': True,
             'default': Default(),
-            'unique': True,
+            'null': False,
         })
 
     def deconstruct(self):
         name, path, args, kwargs = super().deconstruct()
         kwargs.pop('blank')
-        kwargs.pop('unique')
         kwargs.pop('default')
-        if not kwargs.get('editable', True):
-            kwargs.pop('editable')
         return name, path, args, kwargs
 
 

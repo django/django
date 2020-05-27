@@ -292,9 +292,9 @@ class Migration(migrations.Migration):
             name='SerialModel',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('small', SmallSerialField()),
+                ('small', SmallSerialField(unique=True)),
                 ('regular', SerialField()),
-                ('big', BigSerialField()),
+                ('big', BigSerialField(unique=True)),
             ],
             options={
                 'required_db_vendor': 'postgresql',

@@ -9,14 +9,15 @@ from .models import SerialModel
 
 @isolate_apps('invalid_models_tests')
 class SerialFieldModelTests(PostgreSQLTestCase):
-    def test_not_unique(self):
+    def test_not_null(self):
         class Model(models.Model):
-            id = SerialField(unique=False)
+            id = SerialField(null=True)
 
         field = Model._meta.get_field('id')
         errors = field.check()
         expected = []
         self.assertEqual(errors, expected)
+        self.assertFalse(field.null)
 
     def test_primary_key(self):
         class Model(models.Model):

@@ -196,6 +196,6 @@ class HotelReservation(PostgreSQLModel):
 
 
 class SerialModel(PostgreSQLModel):
-    small = SmallSerialField()
+    small = SmallSerialField(unique=True)
     regular = SerialField()
-    big = BigSerialField()
+    big = BigSerialField(unique=True)
