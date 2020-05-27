@@ -268,6 +268,8 @@ class QuerySetSetOperationTests(TestCase):
             list(qs1.union(qs2).order_by('num'))
         with self.assertRaisesMessage(DatabaseError, msg):
             list(qs1.union(qs2).order_by(F('num')))
+        with self.assertRaisesMessage(DatabaseError, msg):
+            list(qs1.union(qs2).order_by(F('num').desc()))
         # switched order, now 'exists' again:
         list(qs2.union(qs1).order_by('num'))
 
