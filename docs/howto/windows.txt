@@ -5,11 +5,10 @@ How to install Django on Windows
 .. highlight:: doscon
 
 This document will guide you through installing Python 3.7 and Django on
-Windows. It also provides instructions for installing `virtualenv`_ and
-`virtualenvwrapper`_, which make it easier to work on Python projects. This is
-meant as a beginner's guide for users working on Django projects and does not
-reflect how Django should be installed when developing patches for Django
-itself.
+Windows. It also provides instructions for setting up a virtual environment,
+which makes it easier to work on Python projects. This is meant as a beginner's
+guide for users working on Django projects and does not reflect how Django
+should be installed when developing patches for Django itself.
 
 The steps in this guide have been tested with Windows 7, 8, and 10. In other
 versions, the steps would be similar. You will need to be familiar with using
@@ -49,30 +48,34 @@ get-pip.py`` instructions.
 
 .. _pip: https://pypi.org/project/pip/
 
-.. _virtualenvwrapper-win:
+.. _virtualenvironment:
 
-Install ``virtualenv`` and ``virtualenvwrapper``
-================================================
+Setting up a virtual environment
+================================
 
-`virtualenv`_ and `virtualenvwrapper`_ provide a dedicated environment for
-each Django project you create. While not mandatory, this is considered a best
-practice and will save you time in the future when you're ready to deploy your
-project. To do this, run::
+It is best practice to provide a dedicated environment for each Django project
+you create. There are many options to manage environments and packages within
+the Python ecosystem, some of which are recommended in the `Python
+documentation <https://packaging.python.org/guides/tool-recommendations/>`_.
+Python itself comes with `venv`_ for managing environments which we will use
+for this guide.
 
-    ...\> py -m pip install virtualenvwrapper-win
+To create a virtual environment for your project, open a new command prompt,
+navigate to the folder where you want to create your project and then enter the
+following::
 
-Then create a virtual environment for your project::
+    ...\> py -m venv project-name
 
-    ...\> mkvirtualenv myproject
+This will create a folder called 'project-name' if it does not already exist
+and setup the virtual environment. To activate the environment, run::
 
-The virtual environment will be activated automatically and you'll see
-"(myproject)" next to the command prompt to designate that. If you start a new
-command prompt, you'll need to activate the environment again using::
+    ...\> project-name\Scripts\activate.bat
 
-    ...\> workon myproject
+The virtual environment will be activated and you'll see "(project-name)" next
+to the command prompt to designate that. Each time you start a new command
+prompt, you'll need to activate the environment again.
 
-.. _virtualenv: https://pypi.org/project/virtualenv/
-.. _virtualenvwrapper: https://pypi.org/project/virtualenvwrapper-win/
+.. _venv: https://docs.python.org/3/tutorial/venv.html
 
 Install Django
 ==============
