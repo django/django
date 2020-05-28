@@ -54,7 +54,6 @@ class NowTests(TestCase):
         # Some debug printing, should not be part of the final testcase
         import django.conf
         import django.db
-        import django.db.backends.mysql.base
         a.refresh_from_db()
         print(self.id())
         print("TIME_ZONE:", django.conf.settings.TIME_ZONE, "connection:", django.db.connection.timezone_name)
