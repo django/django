@@ -1,6 +1,5 @@
 from django.core.management.color import no_style
 from django.db import connection, models
-from django.test import skipUnlessDBFeature
 from django.test.utils import isolate_apps
 
 from . import PostgreSQLTestCase
@@ -48,7 +47,6 @@ class SerialFieldModelTests(PostgreSQLTestCase):
         self.assertEqual(DatabaseWrapper.data_types[big.get_internal_type()], 'bigserial')
 
 
-@skipUnlessDBFeature('has_native_serial_field')
 class SerialFieldTests(PostgreSQLTestCase):
     def test_not_null(self):
         o = SerialModel.objects.create()
