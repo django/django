@@ -384,6 +384,51 @@ class TranslationTests(SimpleTestCase):
             self.assertIs(get_language_bidi(), True)
 
 
+class TranslationLoadingTests(SimpleTestCase):
+    def setUp(self):
+        """Clear translation state."""
+        self._old_language = get_language()
+        self._old_translations = trans_real._translations
+        deactivate()
+        trans_real._translations = {}
+
+    def tearDown(self):
+        trans_real._translations = self._old_translations
+        activate(self._old_language)
+
+    @override_settings(
+        USE_I18N=True,
+        LANGUAGE_CODE='en',
+        LANGUAGES=[
+            ('en', 'English'),
+            ('en-ca', 'English (Canada)'),
+            ('en-nz', 'English (New Zealand)'),
+            ('en-au', 'English (Australia)'),
+        ],
+        LOCALE_PATHS=[os.path.join(here, 'loading')],
+        INSTALLED_APPS=['i18n.loading_app'],
+    )
+    def test_translation_loading(self):
+        """
+        "loading_app" does not have translations for all languages provided by
+        "loading". Catalogs are merged correctly.
+        """
+        tests = [
+            ('en', 'local country person'),
+            ('en_AU', 'aussie'),
+            ('en_NZ', 'kiwi'),
+            ('en_CA', 'canuck'),
+        ]
+        # Load all relevant translations.
+        for language, _ in tests:
+            activate(language)
+        # Catalogs are merged correctly.
+        for language, nickname in tests:
+            with self.subTest(language=language):
+                activate(language)
+                self.assertEqual(gettext('local country person'), nickname)
+
+
 class TranslationThreadSafetyTests(SimpleTestCase):
 
     def setUp(self):
