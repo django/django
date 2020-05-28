@@ -179,6 +179,8 @@ class BaseHandler:
                 response = wrapped_callback(request, *callback_args, **callback_kwargs)
             except Exception as e:
                 response = self.process_exception_by_middleware(e, request)
+                if response is None:
+                    raise
 
         # Complain if the view returned None (a common error).
         self.check_response(response, callback)
@@ -200,6 +202,8 @@ class BaseHandler:
                 response = response.render()
             except Exception as e:
                 response = self.process_exception_by_middleware(e, request)
+                if response is None:
+                    raise
 
         return response
 
@@ -230,6 +234,8 @@ class BaseHandler:
                     self.process_exception_by_middleware,
                     thread_sensitive=True,
                 )(e, request)
+                if response is None:
+                    raise
 
         # Complain if the view returned None or an uncalled coroutine.
         self.check_response(response, callback)
@@ -258,6 +264,8 @@ class BaseHandler:
                     self.process_exception_by_middleware,
                     thread_sensitive=True,
                 )(e, request)
+                if response is None:
+                    raise
 
         # Make sure the response is not a coroutine
         if asyncio.iscoroutine(response):
@@ -323,13 +331,13 @@ class BaseHandler:
     def process_exception_by_middleware(self, exception, request):
         """
         Pass the exception to the exception middleware. If no middleware
-        return a response for this exception, raise it.
+        return a response for this exception, return None.
         """
         for middleware_method in self._exception_middleware:
             response = middleware_method(request, exception)
             if response:
                 return response
-        raise
+        return None
 
 
 def reset_urlconf(sender, **kwargs):
