@@ -4,20 +4,16 @@ run with a backend other than PostgreSQL.
 """
 import enum
 
-from django.core.exceptions import ImproperlyConfigured
 from django.db import models
 
 try:
-    from django.db.backends.postgresql.base import DatabaseWrapper  # NOQA
     from django.contrib.postgres.fields import (
         ArrayField, BigIntegerRangeField, BigSerialField, CICharField, CIEmailField,
         CITextField, DateRangeField, DateTimeRangeField, DecimalRangeField,
         HStoreField, IntegerRangeField, SmallSerialField, SerialField
     )
     from django.contrib.postgres.search import SearchVectorField
-except (ImportError, ImproperlyConfigured):
-    from django.db.backends.dummy.base import DatabaseWrapper  # NOQA
-
+except ImportError:
     class DummyArrayField(models.Field):
         def __init__(self, base_field, size=None, **kwargs):
             super().__init__(**kwargs)

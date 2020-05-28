@@ -1,10 +1,16 @@
+from django.core.exceptions import ImproperlyConfigured
 from django.core.management.color import no_style
 from django.db import connection, models
 from django.test.utils import isolate_apps
 
 from . import PostgreSQLTestCase
-from .fields import  BigSerialField, DatabaseWrapper, SerialField, SmallSerialField
+from .fields import BigSerialField, SerialField, SmallSerialField
 from .models import SerialModel
+
+try:
+    from django.db.backends.postgresql.base import DatabaseWrapper
+except ImproperlyConfigured:
+    from django.db.backends.dummy.base import DatabaseWrapper
 
 
 @isolate_apps('invalid_models_tests')
