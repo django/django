@@ -6,13 +6,13 @@ from django.apps import apps
 from django.conf import settings
 from django.contrib.auth.models import AbstractBaseUser
 from django.core.validators import RegexValidator, validate_slug
-from django.db import connection, models
+from django.db import connection, migrations, models
 from django.db.migrations.autodetector import MigrationAutodetector
 from django.db.migrations.graph import MigrationGraph
 from django.db.migrations.loader import MigrationLoader
 from django.db.migrations.questioner import MigrationQuestioner
 from django.db.migrations.state import ModelState, ProjectState
-from django.test import TestCase, override_settings
+from django.test import SimpleTestCase, TestCase, override_settings
 from django.test.utils import isolate_lru_cache
 
 from .models import FoodManager, FoodQuerySet
@@ -464,9 +464,9 @@ class AutodetectorTests(TestCase):
 
     def repr_changes(self, changes, include_dependencies=False):
         output = ""
-        for app_label, migrations in sorted(changes.items()):
+        for app_label, migrations_ in sorted(changes.items()):
             output += "  %s:\n" % app_label
-            for migration in migrations:
+            for migration in migrations_:
                 output += "    %s\n" % migration.name
                 for operation in migration.operations:
                     output += "      %s\n" % operation
@@ -2479,3 +2479,22 @@ class AutodetectorTests(TestCase):
         self.assertOperationTypes(changes, 'app', 0, ['RemoveField', 'CreateModel'])
         self.assertOperationAttributes(changes, 'app', 0, 0, name='title', model_name='readable')
         self.assertOperationAttributes(changes, 'app', 0, 1, name='book')
+
+
+class AutodetectorSuggestNameTests(SimpleTestCase):
+    def test_single_operation(self):
+        ops = [migrations.CreateModel('Person', fields=[])]
+        self.assertEqual(MigrationAutodetector.suggest_name(ops), 'person')
+        ops = [migrations.DeleteModel('Person')]
+        self.assertEqual(MigrationAutodetector.suggest_name(ops), 'delete_person')
+
+    def test_two_create_models(self):
+        ops = [
+            migrations.CreateModel('Person', fields=[]),
+            migrations.CreateModel('Animal', fields=[]),
+        ]
+        self.assertEqual(MigrationAutodetector.suggest_name(ops), 'animal_person')
+
+    def test_auto(self):
+        suggest_name = MigrationAutodetector.suggest_name([])
+        self.assertIs(suggest_name.startswith('auto_'), True)
