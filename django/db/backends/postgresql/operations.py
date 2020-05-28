@@ -12,12 +12,6 @@ class DatabaseOperations(BaseDatabaseOperations):
         'BigAutoField': 'bigint',
         'SmallAutoField': 'smallint',
     }
-    integer_field_ranges = {
-        **BaseDatabaseOperations.integer_field_ranges,
-        'SmallSerialField': (-32768, 32767),
-        'SerialField': (-2147483648, 2147483647),
-        'BigSerialField': (-9223372036854775808, 9223372036854775807),
-    }
 
     def unification_cast_sql(self, output_field):
         internal_type = output_field.get_internal_type()
