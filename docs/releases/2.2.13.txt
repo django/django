@@ -4,9 +4,12 @@ Django 2.2.13 release notes
 
 *Expected June 3, 2020*
 
-Django 2.2.13 fixes two security issues and a bug in 2.2.12.
+Django 2.2.13 fixes two security issues and a regression in 2.2.12.
 
 Bugfixes
 ========
 
-* ...
+* Fixed a regression in Django 2.2.12 that affected translation loading for
+  apps providing translations for territorial language variants as well as a
+  generic language, where the project has different plural equations for the
+  language (:ticket:`31570`).

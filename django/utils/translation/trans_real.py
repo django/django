@@ -95,7 +95,7 @@ class TranslationCatalog:
                 cat.update(trans._catalog)
                 break
         else:
-            self._catalogs.insert(0, trans._catalog)
+            self._catalogs.insert(0, trans._catalog.copy())
             self._plurals.insert(0, trans.plural)
 
     def get(self, key, default=None):
