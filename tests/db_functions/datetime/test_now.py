@@ -58,7 +58,7 @@ class NowTests(TestCase):
         a.refresh_from_db()
         print(self.id())
         print("TIME_ZONE:", django.conf.settings.TIME_ZONE, "connection:", django.db.connection.timezone_name)
-        if isinstance(django.db.connections['default'], django.db.backends.mysql.base.DatabaseWrapper):
+        if django.db.connection.settings_dict.get('ENGINE', False) == 'django.db.backends.mysql':
             with django.db.connection.cursor() as cursor:
                 cursor.execute("SELECT @@global.time_zone, @@session.time_zone, @@system_time_zone;")
                 row = cursor.fetchone()
