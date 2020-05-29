@@ -941,7 +941,7 @@ docs/current/rangetypes.html#RANGETYPES-INCLUSIVITY>`_.
 ``Serial`` fields
 =================
 
-.. versionadded:: 3.1
+.. versionadded:: 3.2
 
 .. class:: SerialField(**options)
 
