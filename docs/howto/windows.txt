@@ -57,8 +57,8 @@ It is best practice to provide a dedicated environment for each Django project
 you create. There are many options to manage environments and packages within
 the Python ecosystem, some of which are recommended in the `Python
 documentation <https://packaging.python.org/guides/tool-recommendations/>`_.
-Python itself comes with `venv`_ for managing environments which we will use
-for this guide.
+Python itself comes with :doc:`venv <python:tutorial/venv>` for managing
+environments which we will use for this guide.
 
 To create a virtual environment for your project, open a new command prompt,
 navigate to the folder where you want to create your project and then enter the
@@ -74,8 +74,6 @@ and setup the virtual environment. To activate the environment, run::
 The virtual environment will be activated and you'll see "(project-name)" next
 to the command prompt to designate that. Each time you start a new command
 prompt, you'll need to activate the environment again.
-
-.. _venv: https://docs.python.org/3/tutorial/venv.html
 
 Install Django
 ==============
