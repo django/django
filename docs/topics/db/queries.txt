@@ -1315,8 +1315,9 @@ Using the models at the top of this page, for example, an ``Entry`` object ``e``
 can get its associated ``Blog`` object by accessing the ``blog`` attribute:
 ``e.blog``.
 
-(Behind the scenes, this functionality is implemented by Python descriptors_.
-This shouldn't really matter to you, but we point it out here for the curious.)
+(Behind the scenes, this functionality is implemented by Python
+:doc:`descriptors <python:howto/descriptor>`. This shouldn't really matter to
+you, but we point it out here for the curious.)
 
 Django also creates API accessors for the "other" side of the relationship --
 the link from the related model to the model that defines the relationship.
@@ -1325,8 +1326,6 @@ For example, a ``Blog`` object ``b`` has access to a list of all related
 
 All examples in this section use the sample ``Blog``, ``Author`` and ``Entry``
 models defined at the top of this page.
-
-.. _descriptors: https://docs.python.org/howto/descriptor.html
 
 One-to-many relationships
 -------------------------
