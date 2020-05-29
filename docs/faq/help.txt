@@ -5,9 +5,9 @@ FAQ: Getting Help
 How do I do X? Why doesn't Y work? Where can I go to get help?
 ==============================================================
 
-First, please check if your question is answered on the :doc:`FAQ <faq/index>`.
-Also, search for answers using your favorite search engine, and in `the
-forum`_.
+First, please check if your question is answered on the :doc:`FAQ
+</faq/index>`. Also, search for answers using your favorite search engine, and
+in `the forum`_.
 
 .. _`the forum`: https://forum.djangoproject.com/
 
