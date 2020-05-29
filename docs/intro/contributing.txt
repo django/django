@@ -152,8 +152,7 @@ If the ``source`` command is not available, you can try using a dot instead:
     $ . ~/.virtualenvs/djangodev/bin/activate
 
 You have to activate the virtual environment whenever you open a new
-terminal window. virtualenvwrapper__ is a useful tool for making this
-more convenient.
+terminal window.
 
 .. admonition:: For Windows users
 
@@ -162,8 +161,6 @@ more convenient.
     .. code-block:: doscon
 
         ...\> %HOMEPATH%\.virtualenvs\djangodev\Scripts\activate.bat
-
-__ https://virtualenvwrapper.readthedocs.io/en/latest/
 
 The name of the currently activated virtual environment is displayed on the
 command line to help you keep track of which one you are using. Anything you
