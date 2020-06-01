@@ -138,7 +138,7 @@ as possible. It should not rely on importing other modules or helper objects.
 
 Joins should be performed automatically, behind the scenes, when necessary.
 
-Every object should be able to access every related object, systemwide. This
+Every object should be able to access every related object, system-wide. This
 access should work both ways.
 
 Option to drop into raw SQL easily, when needed

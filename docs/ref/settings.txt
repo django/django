@@ -1323,8 +1323,8 @@ backend supports it (see :doc:`/topics/db/tablespaces`).
 Default: ``[]`` (Empty list)
 
 List of compiled regular expression objects representing User-Agent strings
-that are not allowed to visit any page, systemwide. Use this for bots/crawlers.
-This is only used if ``CommonMiddleware`` is installed (see
+that are not allowed to visit any page, system-wide. Use this for
+bots/crawlers. This is only used if ``CommonMiddleware`` is installed (see
 :doc:`/topics/http/middleware`).
 
 .. setting:: EMAIL_BACKEND

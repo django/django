@@ -14,7 +14,7 @@ special-case pages, such as "About" or "Privacy Policy" pages, that you want to
 store in a database but for which you don't want to develop a custom Django
 application.
 
-A flatpage can use a custom template or a default, systemwide flatpage
+A flatpage can use a custom template or a default, system-wide flatpage
 template. It can be associated with one, or multiple, sites.
 
 The content field may optionally be left blank if you prefer to put your

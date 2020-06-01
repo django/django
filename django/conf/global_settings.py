@@ -233,7 +233,7 @@ PREPEND_WWW = False
 FORCE_SCRIPT_NAME = None
 
 # List of compiled regular expression objects representing User-Agent strings
-# that are not allowed to visit any page, systemwide. Use this for bad
+# that are not allowed to visit any page, system-wide. Use this for bad
 # robots/crawlers. Here are a few examples:
 #     import re
 #     DISALLOWED_USER_AGENTS = [
