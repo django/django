@@ -373,8 +373,8 @@ from::
             Relations between objects are allowed if both objects are
             in the primary/replica pool.
             """
-            db_list = ('primary', 'replica1', 'replica2')
-            if obj1._state.db in db_list and obj2._state.db in db_list:
+            db_set = {'primary', 'replica1', 'replica2'}
+            if obj1._state.db in db_set and obj2._state.db in db_set:
                 return True
             return None
 
