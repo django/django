@@ -6,6 +6,7 @@
 <link rel="stylesheet" type="text/css" href="{% block stylesheet %}{% static "admin/css/base.css" %}{% endblock %}">
 {% if not is_popup and is_nav_sidebar_enabled %}
   <link rel="stylesheet" type="text/css" href="{% static "admin/css/nav_sidebar.css" %}">
+  <script src="{% static 'admin/js/nav_sidebar.js' %}" defer></script>
 {% endif %}
 {% block extrastyle %}{% endblock %}
 {% if LANGUAGE_BIDI %}<link rel="stylesheet" type="text/css" href="{% block stylesheet_rtl %}{% static "admin/css/rtl.css" %}{% endblock %}">{% endif %}
@@ -98,9 +99,5 @@
     </div>
 </div>
 <!-- END Container -->
-
-{% if not is_popup and is_nav_sidebar_enabled %}
-  <script src="{% static 'admin/js/nav_sidebar.js' %}" async></script>
-{% endif %}
 </body>
 </html>
