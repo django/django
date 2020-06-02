@@ -20,6 +20,14 @@ def _check_for_duplicates(arg_name, objs):
         used_vals.add(val)
 
 
+def _check_bases_for_duplicates(bases):
+    _check_for_duplicates('bases', (
+        base._meta.label_lower if hasattr(base, '_meta') else
+        base.lower() if isinstance(base, str) else base
+        for base in bases
+    ))
+
+
 class ModelOperation(Operation):
     def __init__(self, name):
         self.name = name
@@ -52,11 +60,7 @@ class CreateModel(ModelOperation):
         # Sanity-check that there are no duplicated field names, bases, or
         # manager names
         _check_for_duplicates('fields', (name for name, _ in self.fields))
-        _check_for_duplicates('bases', (
-            base._meta.label_lower if hasattr(base, '_meta') else
-            base.lower() if isinstance(base, str) else base
-            for base in self.bases
-        ))
+        _check_bases_for_duplicates(bases)
         _check_for_duplicates('managers', (name for name, _ in self.managers))
 
     def deconstruct(self):
@@ -475,13 +479,14 @@ class AlterModelBases(ModelOperation):
     reduce_to_sql = False
     reversible = True
 
-    def __init__(self, model_name, bases):
-        self.model_name = model_name
+    def __init__(self, name, bases):
+        super().__init__(name)
         self.bases = bases
+        _check_bases_for_duplicates(bases)
 
     def state_forwards(self, app_label, state):
-        state.models[app_label, self.model_name].bases = self.bases
-        state.reload_model(app_label, self.model_name)
+        state.models[app_label, self.name].bases = self.bases
+        state.reload_model(app_label, self.name)
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
         pass
@@ -490,7 +495,7 @@ class AlterModelBases(ModelOperation):
         pass
 
     def describe(self):
-        return "Update %s bases to %s" % (self.model_name, self.bases)
+        return "Update %s bases to %s" % (self.name, self.bases)
 
 
 class ModelOptionOperation(ModelOperation):
