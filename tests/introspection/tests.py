@@ -80,7 +80,7 @@ class IntrospectionTests(TransactionTestCase):
         self.assertEqual(
             [connection.introspection.get_field_type(r[1], r) for r in desc],
             [
-                'AutoField' if connection.features.can_introspect_autofield else 'IntegerField',
+                connection.features.introspected_field_types['AutoField'],
                 'CharField',
                 'CharField',
                 'CharField',
@@ -108,7 +108,6 @@ class IntrospectionTests(TransactionTestCase):
             [False, nullable_by_backend, nullable_by_backend, nullable_by_backend, True, True, False, False]
         )
 
-    @skipUnlessDBFeature('can_introspect_autofield')
     def test_bigautofield(self):
         with connection.cursor() as cursor:
             desc = connection.introspection.get_table_description(cursor, City._meta.db_table)
@@ -117,7 +116,6 @@ class IntrospectionTests(TransactionTestCase):
             [connection.introspection.get_field_type(r[1], r) for r in desc],
         )
 
-    @skipUnlessDBFeature('can_introspect_autofield')
     def test_smallautofield(self):
         with connection.cursor() as cursor:
             desc = connection.introspection.get_table_description(cursor, Country._meta.db_table)

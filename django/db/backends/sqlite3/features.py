@@ -18,7 +18,6 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_timezones = False
     max_query_params = 999
     supports_mixed_date_datetime_comparisons = False
-    can_introspect_autofield = True
     supports_transactions = True
     atomic_transactions = False
     can_rollback_ddl = True

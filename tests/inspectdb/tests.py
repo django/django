@@ -99,8 +99,9 @@ class InspectDBTestCase(TestCase):
         assertFieldType = self.make_field_type_asserter()
         introspected_field_types = connection.features.introspected_field_types
 
-        if not connection.features.can_introspect_autofield:
-            assertFieldType('id', "models.IntegerField(primary_key=True)  # AutoField?")
+        auto_field_type = connection.features.introspected_field_types['AutoField']
+        if auto_field_type != 'AutoField':
+            assertFieldType('id', "models.%s(primary_key=True)  # AutoField?" % auto_field_type)
 
         assertFieldType('big_int_field', 'models.%s()' % introspected_field_types['BigIntegerField'])
 

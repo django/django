@@ -250,6 +250,7 @@ backends.
 * The new ``DatabaseFeatures.introspected_field_types`` property replaces these
   features:
 
+  * ``can_introspect_autofield``
   * ``can_introspect_big_integer_field``
   * ``can_introspect_binary_field``
   * ``can_introspect_decimal_field``

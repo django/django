@@ -125,12 +125,10 @@ class BaseDatabaseFeatures:
     # which can't do it for MyISAM tables
     can_introspect_foreign_keys = True
 
-    # Can the backend introspect an AutoField, instead of an IntegerField?
-    can_introspect_autofield = False
-
     # Map fields which some backends may not be able to differentiate to the
     # field it's introspected as.
     introspected_field_types = {
+        'AutoField': 'AutoField',
         'BigAutoField': 'BigAutoField',
         'BigIntegerField': 'BigIntegerField',
         'BinaryField': 'BinaryField',
