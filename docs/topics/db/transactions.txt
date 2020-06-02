@@ -281,7 +281,7 @@ Sometimes you need to perform an action related to the current database
 transaction, but only if the transaction successfully commits. Examples might
 include a `Celery`_ task, an email notification, or a cache invalidation.
 
-.. _Celery: http://www.celeryproject.org/
+.. _Celery: https://pypi.org/project/celery/
 
 Django provides the :func:`on_commit` function to register callback functions
 that should be executed after a transaction is successfully committed:
