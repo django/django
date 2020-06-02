@@ -2149,6 +2149,10 @@ in your own admin JavaScript without including a second copy, you can use the
 
     jQuery was upgraded from 2.2.3 to 3.3.1.
 
+.. versionchanged:: 2.2.13
+
+    jQuery was upgraded from 3.3.1 to 3.5.1.
+
 The :class:`ModelAdmin` class requires jQuery by default, so there is no need
 to add jQuery to your ``ModelAdmin``’s list of media resources unless you have
 a specific need. For example, if you require the jQuery library to be in the
