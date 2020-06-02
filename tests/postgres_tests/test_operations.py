@@ -183,13 +183,13 @@ class CreateExtensionTests(PostgreSQLTestCase):
             with connection.schema_editor(atomic=False) as editor:
                 operation.database_forwards(self.app_label, editor, project_state, new_state)
         self.assertEqual(len(captured_queries), 4)
-        self.assertIn('CREATE EXTENSION', captured_queries[1]['sql'])
+        self.assertIn('CREATE EXTENSION IF NOT EXISTS', captured_queries[1]['sql'])
         # Reversal.
         with CaptureQueriesContext(connection) as captured_queries:
             with connection.schema_editor(atomic=False) as editor:
                 operation.database_backwards(self.app_label, editor, new_state, project_state)
         self.assertEqual(len(captured_queries), 2)
-        self.assertIn('DROP EXTENSION', captured_queries[1]['sql'])
+        self.assertIn('DROP EXTENSION IF EXISTS', captured_queries[1]['sql'])
 
     def test_create_existing_extension(self):
         operation = BloomExtension()

@@ -23,7 +23,7 @@ class CreateExtension(Operation):
             return
         if not self.extension_exists(schema_editor, self.name):
             schema_editor.execute(
-                'CREATE EXTENSION %s' % schema_editor.quote_name(self.name)
+                'CREATE EXTENSION IF NOT EXISTS %s' % schema_editor.quote_name(self.name)
             )
         # Clear cached, stale oids.
         get_hstore_oids.cache_clear()
@@ -38,7 +38,7 @@ class CreateExtension(Operation):
             return
         if self.extension_exists(schema_editor, self.name):
             schema_editor.execute(
-                'DROP EXTENSION %s' % schema_editor.quote_name(self.name)
+                'DROP EXTENSION IF EXISTS %s' % schema_editor.quote_name(self.name)
             )
         # Clear cached, stale oids.
         get_hstore_oids.cache_clear()
