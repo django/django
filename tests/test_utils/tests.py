@@ -32,9 +32,11 @@ class SkippingTestCase(SimpleTestCase):
     def _assert_skipping(self, func, expected_exc, msg=None):
         try:
             if msg is not None:
-                self.assertRaisesMessage(expected_exc, msg, func)
+                with self.assertRaisesMessage(expected_exc, msg):
+                    func()
             else:
-                self.assertRaises(expected_exc, func)
+                with self.assertRaises(expected_exc):
+                    func()
         except unittest.SkipTest:
             self.fail('%s should not result in a skipped test.' % func.__name__)
 
@@ -224,7 +226,8 @@ class AssertNumQueriesUponConnectionTests(TransactionTestCase):
             if is_opening_connection:
                 # Avoid infinite recursion. Creating a cursor calls
                 # ensure_connection() which is currently mocked by this method.
-                connection.cursor().execute('SELECT 1' + connection.features.bare_select_suffix)
+                with connection.cursor() as cursor:
+                    cursor.execute('SELECT 1' + connection.features.bare_select_suffix)
 
         ensure_connection = 'django.db.backends.base.base.BaseDatabaseWrapper.ensure_connection'
         with mock.patch(ensure_connection, side_effect=make_configuration_query):
@@ -371,13 +374,13 @@ class AssertNumQueriesContextManagerTests(TestCase):
             Person.objects.count()
 
     def test_failure(self):
-        with self.assertRaises(AssertionError) as exc_info:
+        msg = (
+            '1 != 2 : 1 queries executed, 2 expected\nCaptured queries were:\n'
+            '1.'
+        )
+        with self.assertRaisesMessage(AssertionError, msg):
             with self.assertNumQueries(2):
                 Person.objects.count()
-        exc_lines = str(exc_info.exception).split('\n')
-        self.assertEqual(exc_lines[0], '1 != 2 : 1 queries executed, 2 expected')
-        self.assertEqual(exc_lines[1], 'Captured queries were:')
-        self.assertTrue(exc_lines[2].startswith('1.'))  # queries are numbered
 
         with self.assertRaises(TypeError):
             with self.assertNumQueries(4000):
@@ -535,22 +538,25 @@ class HTMLEqualTests(SimpleTestCase):
         self.assertEqual(dom.children[0], "<p>foo</p> '</scr'+'ipt>' <span>bar</span>")
 
     def test_self_closing_tags(self):
-        self_closing_tags = (
-            'br', 'hr', 'input', 'img', 'meta', 'spacer', 'link', 'frame',
-            'base', 'col',
-        )
+        self_closing_tags = [
+            'area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input', 'link',
+            'meta', 'param', 'source', 'track', 'wbr',
+            # Deprecated tags
+            'frame', 'spacer',
+        ]
         for tag in self_closing_tags:
-            dom = parse_html('<p>Hello <%s> world</p>' % tag)
-            self.assertEqual(len(dom.children), 3)
-            self.assertEqual(dom[0], 'Hello')
-            self.assertEqual(dom[1].name, tag)
-            self.assertEqual(dom[2], 'world')
+            with self.subTest(tag):
+                dom = parse_html('<p>Hello <%s> world</p>' % tag)
+                self.assertEqual(len(dom.children), 3)
+                self.assertEqual(dom[0], 'Hello')
+                self.assertEqual(dom[1].name, tag)
+                self.assertEqual(dom[2], 'world')
 
-            dom = parse_html('<p>Hello <%s /> world</p>' % tag)
-            self.assertEqual(len(dom.children), 3)
-            self.assertEqual(dom[0], 'Hello')
-            self.assertEqual(dom[1].name, tag)
-            self.assertEqual(dom[2], 'world')
+                dom = parse_html('<p>Hello <%s /> world</p>' % tag)
+                self.assertEqual(len(dom.children), 3)
+                self.assertEqual(dom[0], 'Hello')
+                self.assertEqual(dom[1].name, tag)
+                self.assertEqual(dom[2], 'world')
 
     def test_simple_equal_html(self):
         self.assertHTMLEqual('', '')
@@ -609,6 +615,45 @@ class HTMLEqualTests(SimpleTestCase):
         self.assertHTMLNotEqual(
             '<input type="text" id="id_name" />',
             '<input type="password" id="id_name" />')
+
+    def test_class_attribute(self):
+        pairs = [
+            ('<p class="foo bar"></p>', '<p class="bar foo"></p>'),
+            ('<p class=" foo bar "></p>', '<p class="bar foo"></p>'),
+            ('<p class="   foo    bar    "></p>', '<p class="bar foo"></p>'),
+            ('<p class="foo\tbar"></p>', '<p class="bar foo"></p>'),
+            ('<p class="\tfoo\tbar\t"></p>', '<p class="bar foo"></p>'),
+            ('<p class="\t\t\tfoo\t\t\tbar\t\t\t"></p>', '<p class="bar foo"></p>'),
+            ('<p class="\t \nfoo \t\nbar\n\t "></p>', '<p class="bar foo"></p>'),
+        ]
+        for html1, html2 in pairs:
+            with self.subTest(html1):
+                self.assertHTMLEqual(html1, html2)
+
+    def test_normalize_refs(self):
+        pairs = [
+            ('&#39;', '&#x27;'),
+            ('&#39;', "'"),
+            ('&#x27;', '&#39;'),
+            ('&#x27;', "'"),
+            ("'", '&#39;'),
+            ("'", '&#x27;'),
+            ('&amp;', '&#38;'),
+            ('&amp;', '&#x26;'),
+            ('&amp;', '&'),
+            ('&#38;', '&amp;'),
+            ('&#38;', '&#x26;'),
+            ('&#38;', '&'),
+            ('&#x26;', '&amp;'),
+            ('&#x26;', '&#38;'),
+            ('&#x26;', '&'),
+            ('&', '&amp;'),
+            ('&', '&#38;'),
+            ('&', '&#x26;'),
+        ]
+        for pair in pairs:
+            with self.subTest(repr(pair)):
+                self.assertHTMLEqual(*pair)
 
     def test_complex_examples(self):
         self.assertHTMLEqual(
@@ -761,10 +806,10 @@ class HTMLEqualTests(SimpleTestCase):
             self.assertContains(response, '<p "whats" that>')
 
     def test_unicode_handling(self):
-        response = HttpResponse('<p class="help">Some help text for the title (with unicode ŠĐĆŽćžšđ)</p>')
+        response = HttpResponse('<p class="help">Some help text for the title (with Unicode ŠĐĆŽćžšđ)</p>')
         self.assertContains(
             response,
-            '<p class="help">Some help text for the title (with unicode ŠĐĆŽćžšđ)</p>',
+            '<p class="help">Some help text for the title (with Unicode ŠĐĆŽćžšđ)</p>',
             html=True
         )
 
@@ -875,6 +920,26 @@ class XMLEqualTests(SimpleTestCase):
         xml1 = "<elem>foo</elem><elem>bar</elem>"
         xml2 = "<elem>foo</elem> <elem>bar</elem>"
         self.assertXMLNotEqual(xml1, xml2)
+
+    def test_doctype_root(self):
+        xml1 = '<?xml version="1.0"?><!DOCTYPE root SYSTEM "example1.dtd"><root />'
+        xml2 = '<?xml version="1.0"?><!DOCTYPE root SYSTEM "example2.dtd"><root />'
+        self.assertXMLEqual(xml1, xml2)
+
+    def test_processing_instruction(self):
+        xml1 = (
+            '<?xml version="1.0"?>'
+            '<?xml-model href="http://www.example1.com"?><root />'
+        )
+        xml2 = (
+            '<?xml version="1.0"?>'
+            '<?xml-model href="http://www.example2.com"?><root />'
+        )
+        self.assertXMLEqual(xml1, xml2)
+        self.assertXMLEqual(
+            '<?xml-stylesheet href="style1.xslt" type="text/xsl"?><root />',
+            '<?xml-stylesheet href="style2.xslt" type="text/xsl"?><root />',
+        )
 
 
 class SkippingExtraTests(TestCase):

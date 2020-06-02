@@ -152,4 +152,4 @@ Bugfixes
 * Fixed a regression in ``URLValidator`` that invalidated Punycode TLDs
   (:ticket:`25059`).
 
-* Improved `pyinotify` ``runserver`` polling (:ticket:`23882`).
+* Improved ``pyinotify`` ``runserver`` polling (:ticket:`23882`).

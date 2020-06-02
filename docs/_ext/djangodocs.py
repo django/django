@@ -10,11 +10,11 @@ from docutils.parsers.rst import Directive
 from docutils.statemachine import ViewList
 from sphinx import addnodes
 from sphinx.builders.html import StandaloneHTMLBuilder
-from sphinx.directives import CodeBlock
+from sphinx.directives.code import CodeBlock
 from sphinx.domains.std import Cmdoption
-from sphinx.errors import ExtensionError
+from sphinx.errors import ExtensionError, SphinxError
 from sphinx.util import logging
-from sphinx.util.console import bold
+from sphinx.util.console import bold, red
 from sphinx.writers.html import HTMLTranslator
 
 logger = logging.getLogger(__name__)
@@ -67,6 +67,7 @@ def setup(app):
     )
     app.add_directive('console', ConsoleDirective)
     app.connect('html-page-context', html_page_context_hook)
+    app.add_role('default-role-error', default_role_error)
     return {'parallel_read_safe': True}
 
 
@@ -153,7 +154,7 @@ class DjangoHTMLTranslator(HTMLTranslator):
         if version_text:
             title = "%s%s" % (
                 version_text % node['version'],
-                ":" if node else "."
+                ":" if len(node) else "."
             )
             self.body.append('<span class="title">%s</span> ' % title)
 
@@ -254,10 +255,7 @@ def visit_console_html(self, node):
         self.body.append('<section class="c-content-win" id="c-content-%(id)s-win">\n' % {'id': uid})
         win_text = node['win_console_text']
         highlight_args = {'force': True}
-        if 'linenos' in node:
-            linenos = node['linenos']
-        else:
-            linenos = win_text.count('\n') >= self.highlightlinenothreshold - 1
+        linenos = node.get('linenos', False)
 
         def warner(msg):
             self.builder.warn(msg, (self.builder.current_docname, node.line))
@@ -374,3 +372,14 @@ def html_page_context_hook(app, pagename, templatename, context, doctree):
     # This way it's include only from HTML files rendered from reST files where
     # the ConsoleDirective is used.
     context['include_console_assets'] = getattr(doctree, '_console_directive_used_flag', False)
+
+
+def default_role_error(
+    name, rawtext, text, lineno, inliner, options=None, content=None
+):
+    msg = (
+        "Default role used (`single backticks`) at line %s: %s. Did you mean "
+        "to use two backticks for ``code``, or miss an underscore for a "
+        "`link`_ ?" % (lineno, rawtext)
+    )
+    raise SphinxError(red(msg))

@@ -1,6 +1,6 @@
 import re
 
-from django.contrib.gis.db.models import aggregates
+from django.contrib.gis.db import models
 
 
 class BaseSpatialFeatures:
@@ -36,6 +36,9 @@ class BaseSpatialFeatures:
     # The following properties indicate if the database backend support
     # certain lookups (dwithin, left and right, relate, ...)
     supports_left_right_lookups = False
+    # Does the backend support expressions for specifying distance in the
+    # dwithin lookup?
+    supports_dwithin_distance_expr = True
 
     # Does the database have raster support?
     supports_raster = False
@@ -74,19 +77,19 @@ class BaseSpatialFeatures:
     # Is the aggregate supported by the database?
     @property
     def supports_collect_aggr(self):
-        return aggregates.Collect not in self.connection.ops.disallowed_aggregates
+        return models.Collect not in self.connection.ops.disallowed_aggregates
 
     @property
     def supports_extent_aggr(self):
-        return aggregates.Extent not in self.connection.ops.disallowed_aggregates
+        return models.Extent not in self.connection.ops.disallowed_aggregates
 
     @property
     def supports_make_line_aggr(self):
-        return aggregates.MakeLine not in self.connection.ops.disallowed_aggregates
+        return models.MakeLine not in self.connection.ops.disallowed_aggregates
 
     @property
     def supports_union_aggr(self):
-        return aggregates.Union not in self.connection.ops.disallowed_aggregates
+        return models.Union not in self.connection.ops.disallowed_aggregates
 
     def __getattr__(self, name):
         m = re.match(r'has_(\w*)_function$', name)

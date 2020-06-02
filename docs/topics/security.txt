@@ -10,7 +10,7 @@ on securing a Django-powered site.
 Cross site scripting (XSS) protection
 =====================================
 
-.. highlightlang:: html+django
+.. highlight:: html+django
 
 XSS attacks allow a user to inject client side scripts into the browsers of
 other users. This is usually achieved by storing the malicious scripts in the
@@ -66,10 +66,10 @@ this if you know what you are doing. There are other :ref:`limitations
 control.
 
 :ref:`CSRF protection works <how-csrf-works>` by checking for a secret in each
-POST request. This ensures that a malicious user cannot simply "replay" a form
-POST to your website and have another logged in user unwittingly submit that
-form. The malicious user would have to know the secret, which is user specific
-(using a cookie).
+POST request. This ensures that a malicious user cannot "replay" a form POST to
+your website and have another logged in user unwittingly submit that form. The
+malicious user would have to know the secret, which is user specific (using a
+cookie).
 
 When deployed with :ref:`HTTPS <security-recommendation-ssl>`,
 ``CsrfViewMiddleware`` will check that the HTTP referer header is set to a
@@ -204,6 +204,15 @@ Additionally, Django requires you to explicitly enable support for the
 ``X-Forwarded-Host`` header (via the :setting:`USE_X_FORWARDED_HOST` setting)
 if your configuration requires it.
 
+Referrer policy
+===============
+
+Browsers use the ``Referer`` header as a way to send information to a site
+about how users got there. By setting a *Referrer Policy* you can help to
+protect the privacy of your users, restricting under which circumstances the
+``Referer`` header is set. See :ref:`the referrer policy section of the
+security middleware reference <referrer-policy>` for details.
+
 Session security
 ================
 
@@ -281,6 +290,9 @@ security protection of the Web server, operating system and other components.
   list`_ which identifies some common vulnerabilities in web applications. While
   Django has tools to address some of the issues, other issues must be
   accounted for in the design of your project.
+* Mozilla discusses various topics regarding `web security`_. Their
+  pages also include security principles that apply to any system.
 
 .. _LimitRequestBody: https://httpd.apache.org/docs/2.4/mod/core.html#limitrequestbody
 .. _Top 10 list: https://www.owasp.org/index.php/Top_10-2017_Top_10
+.. _web security: https://infosec.mozilla.org/guidelines/web_security.html

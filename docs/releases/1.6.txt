@@ -731,7 +731,7 @@ Admin views ``_changelist_filters`` GET parameter
 -------------------------------------------------
 
 To achieve preserving and restoring list view filters, admin views now
-pass around the `_changelist_filters` GET parameter. It's important that you
+pass around the ``_changelist_filters`` GET parameter. It's important that you
 account for that change if you have custom admin templates or if your tests
 rely on the previous URLs. If you want to revert to the original behavior you
 can set the
@@ -924,7 +924,7 @@ Miscellaneous
 
     url(r'^reset/done/$', 'django.contrib.auth.views.password_reset_complete', name='password_reset_complete')
 
-* :class:`~django.views.generic.base.RedirectView` now has a `pattern_name`
+* :class:`~django.views.generic.base.RedirectView` now has a ``pattern_name``
   attribute which allows it to choose the target by reversing the URL.
 
 * In Django 1.4 and 1.5, a blank string was unintentionally not considered to

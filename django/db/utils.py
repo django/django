@@ -1,7 +1,8 @@
 import pkgutil
 from importlib import import_module
 from pathlib import Path
-from threading import local
+
+from asgiref.local import Local
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
@@ -139,7 +140,12 @@ class ConnectionHandler:
         like settings.DATABASES).
         """
         self._databases = databases
-        self._connections = local()
+        # Connections needs to still be an actual thread local, as it's truly
+        # thread-critical. Database backends should use @async_unsafe to protect
+        # their code from async contexts, but this will give those contexts
+        # separate connections in case it's needed as well. There's no cleanup
+        # after async contexts, though, so we don't allow that if we can help it.
+        self._connections = Local(thread_critical=True)
 
     @cached_property
     def databases(self):
@@ -188,8 +194,15 @@ class ConnectionHandler:
             raise ConnectionDoesNotExist("The connection %s doesn't exist" % alias)
 
         test_settings = conn.setdefault('TEST', {})
-        for key in ['CHARSET', 'COLLATION', 'NAME', 'MIRROR']:
-            test_settings.setdefault(key, None)
+        default_test_settings = [
+            ('CHARSET', None),
+            ('COLLATION', None),
+            ('MIGRATE', True),
+            ('MIRROR', None),
+            ('NAME', None),
+        ]
+        for key, value in default_test_settings:
+            test_settings.setdefault(key, value)
 
     def __getitem__(self, alias):
         if hasattr(self._connections, alias):

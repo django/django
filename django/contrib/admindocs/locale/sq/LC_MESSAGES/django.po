@@ -2,13 +2,13 @@
 #
 # Translators:
 # Besnik <besnik@programeshqip.org>, 2011,2015
-# Besnik <besnik@programeshqip.org>, 2015
+# Besnik <besnik@programeshqip.org>, 2015,2019
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-11-29 22:14+0000\n"
+"POT-Creation-Date: 2019-09-08 17:27+0200\n"
+"PO-Revision-Date: 2019-09-17 12:29+0000\n"
 "Last-Translator: Besnik <besnik@programeshqip.org>\n"
 "Language-Team: Albanian (http://www.transifex.com/django/django/language/"
 "sq/)\n"
@@ -154,13 +154,13 @@ msgid "Template: %(name)s"
 msgstr "Gjedhe: %(name)s"
 
 #, python-format
-msgid "Template: \"%(name)s\""
-msgstr "Gjedhe: \"%(name)s\""
+msgid "Template: <q>%(name)s</q>"
+msgstr "Gjedhe: <q>%(name)s</q>"
 
 #. Translators: Search is not a verb here, it qualifies path (a search path)
 #, python-format
-msgid "Search path for template \"%(name)s\":"
-msgstr "Shteg kërkimesh për gjedhen \"%(name)s\":"
+msgid "Search path for template <q>%(name)s</q>:"
+msgstr "Shteg kërkimi për gjedhen <q>%(name)s</q>:"
 
 msgid "(does not exist)"
 msgstr "(nuk ekziston)"

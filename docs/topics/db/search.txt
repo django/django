@@ -16,8 +16,8 @@ Use Cases
 Standard textual queries
 ------------------------
 
-Text-based fields have a selection of simple matching operations. For example,
-you may wish to allow lookup up an author like so::
+Text-based fields have a selection of matching operations. For example, you may
+wish to allow lookup up an author like so::
 
     >>> Author.objects.filter(name__contains='Terry')
     [<Author: Terry Gilliam>, <Author: Terry Jones>]
@@ -77,7 +77,7 @@ enter something close (by varying definitions) to the source data.
 Document-based search
 ---------------------
 
-Simple database operations are too simple an approach when you start
+Standard database operations stop being a useful approach when you start
 considering large blocks of text. Whereas the examples above can be thought of
 as operations on a string of characters, full text search looks at the actual
 words. Depending on the system used, it's likely to use some of the following
@@ -109,8 +109,8 @@ your database and so can easily be combined with other relational queries such
 as categorization.
 
 The :mod:`django.contrib.postgres` module provides some helpers to make these
-queries. For example, a simple query might be to select all the blog entries
-which mention "cheese"::
+queries. For example, a query might select all the blog entries which mention
+"cheese"::
 
     >>> Entry.objects.filter(body_text__search='cheese')
     [<Entry: Cheese on Toast recipes>, <Entry: Pizza recipes>]

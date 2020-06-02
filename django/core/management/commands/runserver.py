@@ -11,8 +11,9 @@ from django.core.servers.basehttp import (
     WSGIServer, get_internal_wsgi_application, run,
 )
 from django.utils import autoreload
+from django.utils.regex_helper import _lazy_re_compile
 
-naiveip_re = re.compile(r"""^(?:
+naiveip_re = _lazy_re_compile(r"""^(?:
 (?P<addr>
     (?P<ipv4>\d{1,3}(?:\.\d{1,3}){3}) |         # IPv4 address
     (?P<ipv6>\[[a-fA-F0-9:]+\]) |               # IPv6 address
@@ -123,7 +124,7 @@ class Command(BaseCommand):
         self.stdout.write((
             "Django version %(version)s, using settings %(settings)r\n"
             "Starting development server at %(protocol)s://%(addr)s:%(port)s/\n"
-            "Quit the server with %(quit_command)s.\n"
+            "Quit the server with %(quit_command)s."
         ) % {
             "version": self.get_version(),
             "settings": settings.SETTINGS_MODULE,
@@ -155,7 +156,3 @@ class Command(BaseCommand):
             if shutdown_message:
                 self.stdout.write(shutdown_message)
             sys.exit(0)
-
-
-# Kept for backward compatibility
-BaseRunserverCommand = Command

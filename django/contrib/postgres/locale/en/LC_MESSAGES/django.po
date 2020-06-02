@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-05-17 11:49+0200\n"
+"POT-Creation-Date: 2019-09-08 17:27+0200\n"
 "PO-Revision-Date: 2015-01-18 20:56+0100\n"
 "Last-Translator: Django team\n"
 "Language-Team: English <en@li.org>\n"
@@ -14,17 +14,17 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: contrib/postgres/apps.py:13
+#: contrib/postgres/apps.py:42
 msgid "PostgreSQL extensions"
 msgstr ""
 
-#: contrib/postgres/fields/array.py:22 contrib/postgres/forms/array.py:16
+#: contrib/postgres/fields/array.py:21 contrib/postgres/forms/array.py:16
 #: contrib/postgres/forms/array.py:170
 #, python-format
 msgid "Item %(nth)s in the array did not validate:"
 msgstr ""
 
-#: contrib/postgres/fields/array.py:23
+#: contrib/postgres/fields/array.py:22
 msgid "Nested arrays must have the same length."
 msgstr ""
 
@@ -34,7 +34,7 @@ msgstr ""
 
 #: contrib/postgres/fields/hstore.py:18
 #, python-format
-msgid "The value of \"%(key)s\" is not a string or null."
+msgid "The value of “%(key)s” is not a string or null."
 msgstr ""
 
 #: contrib/postgres/fields/jsonb.py:32
@@ -55,30 +55,30 @@ msgstr ""
 
 #: contrib/postgres/forms/jsonb.py:19
 #, python-format
-msgid "'%(value)s' value must be valid JSON."
+msgid "“%(value)s” value must be valid JSON."
 msgstr ""
 
-#: contrib/postgres/forms/ranges.py:16
+#: contrib/postgres/forms/ranges.py:19
 msgid "Enter two valid values."
 msgstr ""
 
-#: contrib/postgres/forms/ranges.py:17
+#: contrib/postgres/forms/ranges.py:20
 msgid "The start of the range must not exceed the end of the range."
 msgstr ""
 
-#: contrib/postgres/forms/ranges.py:64
+#: contrib/postgres/forms/ranges.py:67
 msgid "Enter two whole numbers."
 msgstr ""
 
-#: contrib/postgres/forms/ranges.py:70
+#: contrib/postgres/forms/ranges.py:73
 msgid "Enter two numbers."
 msgstr ""
 
-#: contrib/postgres/forms/ranges.py:76
+#: contrib/postgres/forms/ranges.py:90
 msgid "Enter two valid date/times."
 msgstr ""
 
-#: contrib/postgres/forms/ranges.py:82
+#: contrib/postgres/forms/ranges.py:96
 msgid "Enter two valid dates."
 msgstr ""
 

@@ -8,12 +8,12 @@ Django contains a registry of installed applications that stores configuration
 and provides introspection. It also maintains a list of available :doc:`models
 </topics/db/models>`.
 
-This registry is simply called :attr:`~django.apps.apps` and it's available in
+This registry is called :attr:`~django.apps.apps` and it's available in
 :mod:`django.apps`::
 
     >>> from django.apps import apps
     >>> apps.get_app_config('admin').verbose_name
-    'Admin'
+    'Administration'
 
 Projects and applications
 =========================
@@ -22,9 +22,9 @@ The term **project** describes a Django web application. The project Python
 package is defined primarily by a settings module, but it usually contains
 other things. For example, when you run  ``django-admin startproject mysite``
 you'll get a ``mysite`` project directory that contains a ``mysite`` Python
-package with ``settings.py``, ``urls.py``, and ``wsgi.py``. The project package
-is often extended to include things like fixtures, CSS, and templates which
-aren't tied to a particular application.
+package with ``settings.py``, ``urls.py``, ``asgi.py`` and ``wsgi.py``. The
+project package is often extended to include things like fixtures, CSS, and
+templates which aren't tied to a particular application.
 
 A **project's root directory** (the one that contains ``manage.py``) is usually
 the container for all of a project's applications which aren't installed
@@ -40,7 +40,7 @@ projects with the :setting:`INSTALLED_APPS` setting and optionally with other
 mechanisms such as URLconfs, the :setting:`MIDDLEWARE` setting, or template
 inheritance.
 
-It is important to understand that a Django application is just a set of code
+It is important to understand that a Django application is a set of code
 that interacts with various parts of the framework. There's no such thing as
 an ``Application`` object. However, there's a few places where Django needs to
 interact with installed applications, mainly for configuration and also for
@@ -59,9 +59,8 @@ Configuring applications
 To configure an application, subclass :class:`~django.apps.AppConfig` and put
 the dotted path to that subclass in :setting:`INSTALLED_APPS`.
 
-When :setting:`INSTALLED_APPS` simply contains the dotted path to an
-application module, Django checks for a ``default_app_config`` variable in
-that module.
+When :setting:`INSTALLED_APPS` contains the dotted path to an application
+module, Django checks for a ``default_app_config`` variable in that module.
 
 If it's defined, it's the dotted path to the :class:`~django.apps.AppConfig`
 subclass for that application.
@@ -99,11 +98,11 @@ subclass by default as follows::
     default_app_config = 'rock_n_roll.apps.RockNRollConfig'
 
 That will cause ``RockNRollConfig`` to be used when :setting:`INSTALLED_APPS`
-just contains ``'rock_n_roll'``. This allows you to make use of
-:class:`~django.apps.AppConfig` features without requiring your users to
-update their :setting:`INSTALLED_APPS` setting. Besides this use case, it's
-best to avoid using ``default_app_config`` and instead specify the app config
-class in :setting:`INSTALLED_APPS` as described next.
+contains ``'rock_n_roll'``. This allows you to make use of
+:class:`~django.apps.AppConfig` features without requiring your users to update
+their :setting:`INSTALLED_APPS` setting. Besides this use case, it's best to
+avoid using ``default_app_config`` and instead specify the app config class in
+:setting:`INSTALLED_APPS` as described next.
 
 Of course, you can also tell your users to put
 ``'rock_n_roll.apps.RockNRollConfig'`` in their :setting:`INSTALLED_APPS`
@@ -257,15 +256,20 @@ Methods
 
     Example::
 
+        from django.apps import AppConfig
         from django.db.models.signals import pre_save
 
-        def ready(self):
-            # importing model classes
-            from .models import MyModel  # or...
-            MyModel = self.get_model('MyModel')
 
-            # registering signals with the model's string label
-            pre_save.connect(receiver, sender='app_label.MyModel')
+        class RockNRollConfig(AppConfig):
+            # ...
+
+            def ready(self):
+                # importing model classes
+                from .models import MyModel  # or...
+                MyModel = self.get_model('MyModel')
+
+                # registering signals with the model's string label
+                pre_save.connect(receiver, sender='app_label.MyModel')
 
     .. warning::
 

@@ -61,9 +61,6 @@ class Attachment(models.Model):
     class Meta:
         abstract = True
 
-    def __str__(self):
-        return self.content
-
 
 class Comment(Attachment):
     is_spam = models.BooleanField(default=False)
@@ -80,16 +77,10 @@ class Link(Attachment):
 class Chef(models.Model):
     name = models.CharField(max_length=50)
 
-    def __str__(self):
-        return "%s the chef" % self.name
-
 
 class Place(models.Model):
     name = models.CharField(max_length=50)
     address = models.CharField(max_length=80)
-
-    def __str__(self):
-        return "%s the place" % self.name
 
 
 class Rating(models.Model):
@@ -108,31 +99,19 @@ class Restaurant(Place, Rating):
     class Meta(Rating.Meta):
         db_table = 'my_restaurant'
 
-    def __str__(self):
-        return "%s the restaurant" % self.name
-
 
 class ItalianRestaurant(Restaurant):
     serves_gnocchi = models.BooleanField(default=False)
 
-    def __str__(self):
-        return "%s the italian restaurant" % self.name
-
 
 class Supplier(Place):
     customers = models.ManyToManyField(Restaurant, related_name='provider')
-
-    def __str__(self):
-        return "%s the supplier" % self.name
 
 
 class ParkingLot(Place):
     # An explicit link to the parent (we can control the attribute name).
     parent = models.OneToOneField(Place, models.CASCADE, primary_key=True, parent_link=True)
     main_site = models.ForeignKey(Place, models.CASCADE, related_name='lot')
-
-    def __str__(self):
-        return "%s the parking lot" % self.name
 
 
 #
@@ -181,6 +160,8 @@ class GrandParent(models.Model):
     place = models.ForeignKey(Place, models.CASCADE, null=True, related_name='+')
 
     class Meta:
+        # Ordering used by test_inherited_ordering_pk_desc.
+        ordering = ['-pk']
         unique_together = ('first_name', 'last_name')
 
 

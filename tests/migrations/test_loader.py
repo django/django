@@ -73,15 +73,12 @@ class LoaderTests(TestCase):
 
         author_state = project_state.models["migrations", "author"]
         self.assertEqual(
-            [x for x, y in author_state.fields],
+            list(author_state.fields),
             ["id", "name", "slug", "age", "rating"]
         )
 
         book_state = project_state.models["migrations", "book"]
-        self.assertEqual(
-            [x for x, y in book_state.fields],
-            ["id", "author"]
-        )
+        self.assertEqual(list(book_state.fields), ['id', 'author'])
 
         # Ensure we've included unmigrated apps in there too
         self.assertIn("basic", project_state.real_apps)
@@ -122,10 +119,7 @@ class LoaderTests(TestCase):
         self.assertEqual(len([m for a, m in project_state.models if a == "migrations"]), 1)
 
         book_state = project_state.models["migrations", "book"]
-        self.assertEqual(
-            [x for x, y in book_state.fields],
-            ["id", "user"]
-        )
+        self.assertEqual(list(book_state.fields), ['id', 'user'])
 
     @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations_run_before"})
     def test_run_before(self):
@@ -507,6 +501,17 @@ class LoaderTests(TestCase):
         loader.load_disk()
         migrations = [name for app, name in loader.disk_migrations if app == 'migrations']
         self.assertEqual(migrations, ['0001_initial'])
+
+    @override_settings(
+        MIGRATION_MODULES={'migrations': 'migrations.test_migrations_namespace_package'},
+    )
+    def test_loading_namespace_package(self):
+        """Migration directories without an __init__.py file are loaded."""
+        migration_loader = MigrationLoader(connection)
+        self.assertEqual(
+            migration_loader.graph.forwards_plan(('migrations', '0001_initial')),
+            [('migrations', '0001_initial')],
+        )
 
 
 class PycLoaderTests(MigrationTestBase):

@@ -162,6 +162,48 @@ class FileUploadTests(TestCase):
         response = self.client.request(**r)
         self.assertEqual(response.status_code, 200)
 
+    def test_unicode_file_name_rfc2231_with_double_quotes(self):
+        payload = client.FakePayload()
+        payload.write('\r\n'.join([
+            '--' + client.BOUNDARY,
+            'Content-Disposition: form-data; name="file_unicode"; '
+            'filename*="UTF-8\'\'%s"' % quote(UNICODE_FILENAME),
+            'Content-Type: application/octet-stream',
+            '',
+            'You got pwnd.\r\n',
+            '\r\n--' + client.BOUNDARY + '--\r\n',
+        ]))
+        r = {
+            'CONTENT_LENGTH': len(payload),
+            'CONTENT_TYPE': client.MULTIPART_CONTENT,
+            'PATH_INFO': '/unicode_name/',
+            'REQUEST_METHOD': 'POST',
+            'wsgi.input': payload,
+        }
+        response = self.client.request(**r)
+        self.assertEqual(response.status_code, 200)
+
+    def test_unicode_name_rfc2231_with_double_quotes(self):
+        payload = client.FakePayload()
+        payload.write('\r\n'.join([
+            '--' + client.BOUNDARY,
+            'Content-Disposition: form-data; name*="UTF-8\'\'file_unicode"; '
+            'filename*="UTF-8\'\'%s"' % quote(UNICODE_FILENAME),
+            'Content-Type: application/octet-stream',
+            '',
+            'You got pwnd.\r\n',
+            '\r\n--' + client.BOUNDARY + '--\r\n'
+        ]))
+        r = {
+            'CONTENT_LENGTH': len(payload),
+            'CONTENT_TYPE': client.MULTIPART_CONTENT,
+            'PATH_INFO': '/unicode_name/',
+            'REQUEST_METHOD': 'POST',
+            'wsgi.input': payload,
+        }
+        response = self.client.request(**r)
+        self.assertEqual(response.status_code, 200)
+
     def test_blank_filenames(self):
         """
         Receiving file upload when filename is blank (before and after
@@ -479,8 +521,9 @@ class FileUploadTests(TestCase):
             try:
                 self.client.post('/upload_errors/', post_data)
             except reference_error.__class__ as err:
-                self.assertFalse(
-                    str(err) == str(reference_error),
+                self.assertNotEqual(
+                    str(err),
+                    str(reference_error),
                     "Caught a repeated exception that'll cause an infinite loop in file uploads."
                 )
             except Exception as err:

@@ -1,13 +1,13 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Claude Paroz <claude@2xlibre.net>, 2015-2018
+# Claude Paroz <claude@2xlibre.net>, 2015-2019
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-05-17 11:49+0200\n"
-"PO-Revision-Date: 2018-05-18 12:55+0000\n"
+"POT-Creation-Date: 2019-09-08 17:27+0200\n"
+"PO-Revision-Date: 2019-09-18 15:55+0000\n"
 "Last-Translator: Claude Paroz <claude@2xlibre.net>\n"
 "Language-Team: French (http://www.transifex.com/django/django/language/fr/)\n"
 "MIME-Version: 1.0\n"
@@ -21,7 +21,7 @@ msgstr "Extensions PostgreSQL"
 
 #, python-format
 msgid "Item %(nth)s in the array did not validate:"
-msgstr "L'élément n°%(nth)s du tableau n'est pas valide :"
+msgstr "L'élément n°%(nth)s du tableau n’est pas valide :"
 
 msgid "Nested arrays must have the same length."
 msgstr "Les tableaux imbriqués doivent être de même longueur."
@@ -30,8 +30,8 @@ msgid "Map of strings to strings/nulls"
 msgstr "Correspondances clé/valeur (chaînes ou valeurs nulles)"
 
 #, python-format
-msgid "The value of \"%(key)s\" is not a string or null."
-msgstr "La valeur de « %(key)s » n'est pas une chaîne, ni une valeur nulle."
+msgid "The value of “%(key)s” is not a string or null."
+msgstr "La valeur de « %(key)s » n’est pas une chaîne, ni une valeur nulle."
 
 msgid "A JSON object"
 msgstr "Un objet JSON"
@@ -46,14 +46,14 @@ msgid "Input must be a JSON dictionary."
 msgstr "Le contenu saisi doit être un dictionnaire JSON."
 
 #, python-format
-msgid "'%(value)s' value must be valid JSON."
+msgid "“%(value)s” value must be valid JSON."
 msgstr "La valeur « %(value)s » doit être de la syntaxe JSON valable."
 
 msgid "Enter two valid values."
 msgstr "Saisissez deux valeurs valides."
 
 msgid "The start of the range must not exceed the end of the range."
-msgstr "Le début de l'intervalle ne peut pas dépasser la fin de l'intervalle."
+msgstr "Le début de l’intervalle ne peut pas dépasser la fin de l'intervalle."
 
 msgid "Enter two whole numbers."
 msgstr "Saisissez deux nombres entiers."

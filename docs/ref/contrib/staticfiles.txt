@@ -96,10 +96,6 @@ Some commonly used options are:
     multiple times to ignore more. When specifying a path, always use forward
     slashes, even on Windows.
 
-    .. versionchanged:: 2.2
-
-        Path matching was added.
-
 .. django-admin-option:: --dry-run, -n
 
     Do everything except modify the filesystem.
@@ -139,9 +135,7 @@ a more persistent way than providing the ``--ignore`` command option at each
 ``collectstatic`` invocation. Provide a custom :class:`~django.apps.AppConfig`
 class, override the ``ignore_patterns`` attribute of this class and replace
 ``'django.contrib.staticfiles'`` with that class path in your
-:setting:`INSTALLED_APPS` setting:
-
-.. code-block:: python
+:setting:`INSTALLED_APPS` setting::
 
     from django.contrib.staticfiles.apps import StaticFilesConfig
 
@@ -209,6 +203,7 @@ the directories which were searched:
 -------------
 
 .. django-admin:: runserver [addrport]
+    :noindex:
 
 Overrides the core :djadmin:`runserver` command if the ``staticfiles`` app
 is :setting:`installed<INSTALLED_APPS>` and adds automatic serving of static
@@ -366,39 +361,6 @@ hashing algorithm.
 .. _`@import`: https://www.w3.org/TR/CSS2/cascade.html#at-import
 .. _`url()`: https://www.w3.org/TR/CSS2/syndata.html#uri
 .. _`Cascading Style Sheets`: https://www.w3.org/Style/CSS/
-
-``CachedStaticFilesStorage``
-----------------------------
-
-.. class:: storage.CachedStaticFilesStorage
-
-.. deprecated:: 2.2
-
-    ``CachedStaticFilesStorage`` is deprecated as it has some intractable
-    problems, some of which are outlined below. Use
-    :class:`~storage.ManifestStaticFilesStorage` or a third-party cloud storage
-    instead.
-
-``CachedStaticFilesStorage`` is a similar class like the
-:class:`~django.contrib.staticfiles.storage.ManifestStaticFilesStorage` class
-but uses Django's :doc:`caching framework</topics/cache>` for storing the
-hashed names of processed files instead of a static manifest file called
-``staticfiles.json``. This is mostly useful for situations in which you don't
-have access to the file system.
-
-If you want to override certain options of the cache backend the storage uses,
-simply specify a custom entry in the :setting:`CACHES` setting named
-``'staticfiles'``. It falls back to using the ``'default'`` cache backend.
-
-.. warning::
-
-    ``CachedStaticFilesStorage`` isn't recommended --  in almost all cases
-    ``ManifestStaticFilesStorage`` is a better choice. There are several
-    performance penalties when using ``CachedStaticFilesStorage`` since a cache
-    miss requires hashing files at runtime. Remote file storage require several
-    round-trips to hash a file on a cache miss, as several file accesses are
-    required to ensure that the file hash is correct in the case of nested file
-    paths.
 
 ``ManifestFilesMixin``
 ----------------------

@@ -41,7 +41,14 @@ extensions = [
     'sphinx.ext.extlinks',
     "sphinx.ext.intersphinx",
     "sphinx.ext.viewcode",
+    "sphinx.ext.autosectionlabel",
 ]
+
+# AutosectionLabel settings.
+# Uses a <page>:<label> schema which doesn't work for duplicate sub-section
+# labels, so set max depth.
+autosectionlabel_prefix_document = True
+autosectionlabel_maxdepth = 2
 
 # Spelling check needs an additional module that is not installed by default.
 # Add it only if spelling check is requested so docs can be generated without it.
@@ -76,7 +83,7 @@ copyright = 'Django Software Foundation and contributors'
 # built documents.
 #
 # The short X.Y version.
-version = '3.0'
+version = '3.1'
 # The full version, including alpha/beta/rc tags.
 try:
     from django import VERSION, get_version
@@ -92,7 +99,7 @@ else:
     release = django_release()
 
 # The "development version" of Django
-django_next_version = '3.0'
+django_next_version = '3.1'
 
 extlinks = {
     'commit': ('https://github.com/django/django/commit/%s', ''),
@@ -120,7 +127,7 @@ today_fmt = '%B %d, %Y'
 exclude_patterns = ['_build', '_theme']
 
 # The reST default role (used for this markup: `text`) to use for all documents.
-# default_role = None
+default_role = "default-role-error"
 
 # If true, '()' will be appended to :func: etc. cross-reference text.
 add_function_parentheses = True
@@ -140,8 +147,8 @@ pygments_style = 'trac'
 # branch, which is located at this URL.
 intersphinx_mapping = {
     'python': ('https://docs.python.org/3/', None),
-    'sphinx': ('http://www.sphinx-doc.org/en/master/', None),
-    'psycopg2': ('http://initd.org/psycopg/docs/', None),
+    'sphinx': ('https://www.sphinx-doc.org/en/master/', None),
+    'psycopg2': ('https://www.psycopg.org/docs/', None),
 }
 
 # Python's docs don't change every week.

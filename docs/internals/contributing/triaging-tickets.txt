@@ -17,12 +17,11 @@ community as a whole to self-manage, keep the problems to a minimum, and
 educate those coming into the community so that they can become valuable
 contributing members.
 
-Similarly, while we aim for Trac to be a perfect representation of the state
-of Django's progress, we acknowledge that this simply will not happen. By
-distributing the load of Trac maintenance to the community, we accept that
-there will be mistakes. Trac is "mostly accurate", and we give allowances for
-the fact that sometimes it will be wrong. That's okay. We're perfectionists
-with deadlines.
+Similarly, while we aim for Trac to be a perfect representation of the state of
+Django's progress, we acknowledge that this will not happen. By distributing
+the load of Trac maintenance to the community, we accept that there will be
+mistakes. Trac is "mostly accurate", and we give allowances for the fact that
+sometimes it will be wrong. That's okay. We're perfectionists with deadlines.
 
 We rely on the community to keep participating, keep tickets as accurate as
 possible, and raise issues for discussion on our mailing lists when there is
@@ -269,8 +268,8 @@ When a ticket has completed its useful lifecycle, it's time for it to be
 closed. Closing a ticket is a big responsibility, though. You have to be sure
 that the issue is really resolved, and you need to keep in mind that the
 reporter of the ticket may not be happy to have their ticket closed (unless
-it's fixed, of course). If you're not certain about closing a ticket, just
-leave a comment with your thoughts instead.
+it's fixed, of course). If you're not certain about closing a ticket, leave a
+comment with your thoughts instead.
 
 If you do close a ticket, you should always make sure of the following:
 

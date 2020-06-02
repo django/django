@@ -1,4 +1,5 @@
 import logging
+import warnings
 from functools import update_wrapper
 
 from django.core.exceptions import ImproperlyConfigured
@@ -9,6 +10,8 @@ from django.http import (
 from django.template.response import TemplateResponse
 from django.urls import reverse
 from django.utils.decorators import classonlymethod
+from django.utils.deprecation import RemovedInDjango40Warning
+from django.utils.functional import SimpleLazyObject
 
 logger = logging.getLogger('django.request')
 
@@ -50,9 +53,10 @@ class View:
         """Main entry point for a request-response process."""
         for key in initkwargs:
             if key in cls.http_method_names:
-                raise TypeError("You tried to pass in the %s method name as a "
-                                "keyword argument to %s(). Don't do that."
-                                % (key, cls.__name__))
+                raise TypeError(
+                    'The method name %s is not accepted as a keyword argument '
+                    'to %s().' % (key, cls.__name__)
+                )
             if not hasattr(cls, key):
                 raise TypeError("%s() received an invalid keyword %r. as_view "
                                 "only accepts arguments that are already "
@@ -60,8 +64,6 @@ class View:
 
         def view(request, *args, **kwargs):
             self = cls(**initkwargs)
-            if hasattr(self, 'get') and not hasattr(self, 'head'):
-                self.head = self.get
             self.setup(request, *args, **kwargs)
             if not hasattr(self, 'request'):
                 raise AttributeError(
@@ -82,6 +84,8 @@ class View:
 
     def setup(self, request, *args, **kwargs):
         """Initialize attributes shared by all view methods."""
+        if hasattr(self, 'get') and not hasattr(self, 'head'):
+            self.head = self.get
         self.request = request
         self.args = args
         self.kwargs = kwargs
@@ -151,12 +155,31 @@ class TemplateResponseMixin:
 
 
 class TemplateView(TemplateResponseMixin, ContextMixin, View):
-    """
-    Render a template. Pass keyword arguments from the URLconf to the context.
-    """
+    """Render a template."""
     def get(self, request, *args, **kwargs):
-        context = self.get_context_data(**kwargs)
+        # RemovedInDjango40Warning: when the deprecation ends, replace with:
+        #   context = self.get_context_data()
+        context_kwargs = _wrap_url_kwargs_with_deprecation_warning(kwargs)
+        context = self.get_context_data(**context_kwargs)
         return self.render_to_response(context)
+
+
+# RemovedInDjango40Warning
+def _wrap_url_kwargs_with_deprecation_warning(url_kwargs):
+    context_kwargs = {}
+    for key, value in url_kwargs.items():
+        # Bind into function closure.
+        @SimpleLazyObject
+        def access_value(key=key, value=value):
+            warnings.warn(
+                'TemplateView passing URL kwargs to the context is '
+                'deprecated. Reference %s in your template through '
+                'view.kwargs instead.' % key,
+                RemovedInDjango40Warning, stacklevel=2,
+            )
+            return value
+        context_kwargs[key] = access_value
+    return context_kwargs
 
 
 class RedirectView(View):

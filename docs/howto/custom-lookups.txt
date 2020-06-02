@@ -9,12 +9,14 @@ filtering (for example, ``exact`` and ``icontains``). This documentation
 explains how to write custom lookups and how to alter the working of existing
 lookups. For the API references of lookups, see the :doc:`/ref/models/lookups`.
 
-A simple lookup example
-=======================
+A lookup example
+================
 
-Let's start with a simple custom lookup. We will write a custom lookup ``ne``
+Let's start with a small custom lookup. We will write a custom lookup ``ne``
 which works opposite to ``exact``. ``Author.objects.filter(name__ne='Jack')``
-will translate to the SQL::
+will translate to the SQL:
+
+.. code-block:: sql
 
   "author"."name" <> 'Jack'
 
@@ -22,8 +24,7 @@ This SQL is backend independent, so we don't need to worry about different
 databases.
 
 There are two steps to making this work. Firstly we need to implement the
-lookup, then we need to tell Django about it. The implementation is quite
-straightforward::
+lookup, then we need to tell Django about it::
 
   from django.db.models import Lookup
 
@@ -36,17 +37,17 @@ straightforward::
           params = lhs_params + rhs_params
           return '%s <> %s' % (lhs, rhs), params
 
-To register the ``NotEqual`` lookup we will just need to call
-``register_lookup`` on the field class we want the lookup to be available. In
-this case, the lookup makes sense on all ``Field`` subclasses, so we register
-it with ``Field`` directly::
+To register the ``NotEqual`` lookup we will need to call ``register_lookup`` on
+the field class we want the lookup to be available for. In this case, the lookup
+makes sense on all ``Field`` subclasses, so we register it with ``Field``
+directly::
 
-  from django.db.models.fields import Field
+  from django.db.models import Field
   Field.register_lookup(NotEqual)
 
 Lookup registration can also be done using a decorator pattern::
 
-    from django.db.models.fields import Field
+    from django.db.models import Field
 
     @Field.register_lookup
     class NotEqualLookup(Lookup):
@@ -92,8 +93,8 @@ Finally we combine the parts into an SQL expression with ``<>``, and supply all
 the parameters for the query. We then return a tuple containing the generated
 SQL string and the parameters.
 
-A simple transformer example
-============================
+A transformer example
+=====================
 
 The custom lookup above is great, but in some cases you may want to be able to
 chain lookups together. For example, let's suppose we are building an
@@ -124,14 +125,18 @@ Next, let's register it for ``IntegerField``::
   IntegerField.register_lookup(AbsoluteValue)
 
 We can now run the queries we had before.
-``Experiment.objects.filter(change__abs=27)`` will generate the following SQL::
+``Experiment.objects.filter(change__abs=27)`` will generate the following SQL:
+
+.. code-block:: sql
 
     SELECT ... WHERE ABS("experiments"."change") = 27
 
 By using ``Transform`` instead of ``Lookup`` it means we are able to chain
 further lookups afterwards. So
 ``Experiment.objects.filter(change__abs__lt=27)`` will generate the following
-SQL::
+SQL:
+
+.. code-block:: sql
 
     SELECT ... WHERE ABS("experiments"."change") < 27
 
@@ -139,12 +144,16 @@ Note that in case there is no other lookup specified, Django interprets
 ``change__abs=27`` as ``change__abs__exact=27``.
 
 This also allows the result to be used in ``ORDER BY`` and ``DISTINCT ON``
-clauses. For example ``Experiment.objects.order_by('change__abs')`` generates::
+clauses. For example ``Experiment.objects.order_by('change__abs')`` generates:
+
+.. code-block:: sql
 
     SELECT ... ORDER BY ABS("experiments"."change") ASC
 
 And on databases that support distinct on fields (such as PostgreSQL),
-``Experiment.objects.distinct('change__abs')`` generates::
+``Experiment.objects.distinct('change__abs')`` generates:
+
+.. code-block:: sql
 
     SELECT ... DISTINCT ON ABS("experiments"."change")
 
@@ -178,7 +187,9 @@ indexes efficiently in some cases. In particular, when we use
 ``change__lt=27``. (For the ``lte`` case we could use the SQL ``BETWEEN``).
 
 So we would like ``Experiment.objects.filter(change__abs__lt=27)`` to generate
-the following SQL::
+the following SQL:
+
+.. code-block:: sql
 
     SELECT .. WHERE "experiments"."change" < 27 AND "experiments"."change" > -27
 
@@ -229,10 +240,10 @@ want the transformation to be applied to both the left-hand side and the
 right-hand side. For instance, if you want to filter a queryset based on the
 equality of the left and right-hand side insensitively to some SQL function.
 
-Let's examine the simple example of case-insensitive transformation here. This
-transformation isn't very useful in practice as Django already comes with a bunch
-of built-in case-insensitive lookups, but it will be a nice demonstration of
-bilateral transformations in a database-agnostic way.
+Let's examine case-insensitive transformations here. This transformation isn't
+very useful in practice as Django already comes with a bunch of built-in
+case-insensitive lookups, but it will be a nice demonstration of bilateral
+transformations in a database-agnostic way.
 
 We define an ``UpperCase`` transformer which uses the SQL function ``UPPER()`` to
 transform the values before comparison. We define
@@ -253,7 +264,9 @@ Next, let's register it::
   TextField.register_lookup(UpperCase)
 
 Now, the queryset ``Author.objects.filter(name__upper="doe")`` will generate a case
-insensitive query like this::
+insensitive query like this:
+
+.. code-block:: sql
 
     SELECT ... WHERE UPPER("author"."name") = UPPER('doe')
 

@@ -1,9 +1,10 @@
 from .comparison import Cast, Coalesce, Greatest, Least, NullIf
 from .datetime import (
-    Extract, ExtractDay, ExtractHour, ExtractIsoYear, ExtractMinute,
-    ExtractMonth, ExtractQuarter, ExtractSecond, ExtractWeek, ExtractWeekDay,
-    ExtractYear, Now, Trunc, TruncDate, TruncDay, TruncHour, TruncMinute,
-    TruncMonth, TruncQuarter, TruncSecond, TruncTime, TruncWeek, TruncYear,
+    Extract, ExtractDay, ExtractHour, ExtractIsoWeekDay, ExtractIsoYear,
+    ExtractMinute, ExtractMonth, ExtractQuarter, ExtractSecond, ExtractWeek,
+    ExtractWeekDay, ExtractYear, Now, Trunc, TruncDate, TruncDay, TruncHour,
+    TruncMinute, TruncMonth, TruncQuarter, TruncSecond, TruncTime, TruncWeek,
+    TruncYear,
 )
 from .math import (
     Abs, ACos, ASin, ATan, ATan2, Ceil, Cos, Cot, Degrees, Exp, Floor, Ln, Log,
@@ -24,11 +25,10 @@ __all__ = [
     'Cast', 'Coalesce', 'Greatest', 'Least', 'NullIf',
     # datetime
     'Extract', 'ExtractDay', 'ExtractHour', 'ExtractMinute', 'ExtractMonth',
-    'ExtractQuarter', 'ExtractSecond', 'ExtractWeek', 'ExtractWeekDay',
-    'ExtractIsoYear', 'ExtractYear', 'Now', 'Trunc', 'TruncDate', 'TruncDay',
-    'TruncHour', 'TruncMinute', 'TruncMonth', 'TruncQuarter', 'TruncSecond',
-    'TruncMinute', 'TruncMonth', 'TruncQuarter', 'TruncSecond', 'TruncTime',
-    'TruncWeek', 'TruncYear',
+    'ExtractQuarter', 'ExtractSecond', 'ExtractWeek', 'ExtractIsoWeekDay',
+    'ExtractWeekDay', 'ExtractIsoYear', 'ExtractYear', 'Now', 'Trunc',
+    'TruncDate', 'TruncDay', 'TruncHour', 'TruncMinute', 'TruncMonth',
+    'TruncQuarter', 'TruncSecond', 'TruncTime', 'TruncWeek', 'TruncYear',
     # math
     'Abs', 'ACos', 'ASin', 'ATan', 'ATan2', 'Ceil', 'Cos', 'Cot', 'Degrees',
     'Exp', 'Floor', 'Ln', 'Log', 'Mod', 'Pi', 'Power', 'Radians', 'Round',

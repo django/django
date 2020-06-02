@@ -10,7 +10,7 @@ from django.utils.safestring import mark_safe
 from django.utils.timezone import is_aware, utc
 from django.utils.translation import (
     gettext as _, gettext_lazy, ngettext, ngettext_lazy, npgettext_lazy,
-    pgettext,
+    pgettext, round_away_from_one,
 )
 
 register = template.Library()
@@ -140,7 +140,8 @@ def intword(value):
     except (TypeError, ValueError):
         return value
 
-    if value < 1000000:
+    abs_value = abs(value)
+    if abs_value < 1000000:
         return value
 
     def _check_for_i18n(value, float_formatted, string_formatted):
@@ -156,9 +157,10 @@ def intword(value):
 
     for exponent, converters in intword_converters:
         large_number = 10 ** exponent
-        if value < large_number * 1000:
+        if abs_value < large_number * 1000:
             new_value = value / large_number
-            return _check_for_i18n(new_value, *converters(new_value))
+            rounded_value = round_away_from_one(new_value)
+            return _check_for_i18n(new_value, *converters(abs(rounded_value)))
     return value
 
 

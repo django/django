@@ -99,9 +99,7 @@ input[type="submit"], button {
     }
 
     #changelist-search > div {
-        display: -webkit-flex;
         display: flex;
-        -webkit-flex-wrap: wrap;
         flex-wrap: wrap;
         max-width: 480px;
     }
@@ -111,7 +109,6 @@ input[type="submit"], button {
     }
 
     #changelist #toolbar form #searchbar {
-        -webkit-flex: 1 0 auto;
         flex: 1 0 auto;
         width: 0;
         height: 22px;
@@ -226,7 +223,6 @@ input[type="submit"], button {
         padding-top: 6px;
     }
 
-    .aligned .add-another,
     .aligned .related-lookup,
     .aligned .datetimeshortcuts,
     .aligned .related-lookup + strong {
@@ -354,6 +350,14 @@ input[type="submit"], button {
     }
 
     .stacked .active.selector-add {
+        background-position: 0 -40px;
+    }
+
+    .active.selector-add:focus, .active.selector-add:hover {
+        background-position: 0 -140px;
+    }
+
+    .stacked .active.selector-add:focus, .stacked .active.selector-add:hover {
         background-position: 0 -60px;
     }
 
@@ -362,6 +366,14 @@ input[type="submit"], button {
     }
 
     .stacked .active.selector-remove {
+        background-position: 0 0;
+    }
+
+    .active.selector-remove:focus, .active.selector-remove:hover {
+        background-position: 0 -100px;
+    }
+
+    .stacked .active.selector-remove:focus, .stacked .active.selector-remove:hover {
         background-position: 0 -20px;
     }
 
@@ -390,6 +402,10 @@ input[type="submit"], button {
 
     .datetimeshortcuts {
         color: #ccc;
+    }
+
+    .form-row .datetime input.vDateField, .form-row .datetime input.vTimeField {
+        width: 75%;
     }
 
     .inline-group {
@@ -721,8 +737,16 @@ input[type="submit"], button {
         background-position: 0 0;
     }
 
+    .active.selector-remove:focus, .active.selector-remove:hover {
+        background-position: 0 -20px;
+    }
+
     .selector-add  {
         background-position: 0 -40px;
+    }
+
+    .active.selector-add:focus, .active.selector-add:hover {
+        background-position: 0 -60px;
     }
 
     /* Inlines */

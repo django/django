@@ -2,13 +2,13 @@
 #
 # Translators:
 # Chen Chun-Chia <ccc.larc@gmail.com>, 2015
-# Tzu-ping Chung <uranusjr@gmail.com>, 2016-2017
+# Tzu-ping Chung <uranusjr@gmail.com>, 2016-2017,2019
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-09-21 22:44+0000\n"
+"POT-Creation-Date: 2019-09-08 17:27+0200\n"
+"PO-Revision-Date: 2019-09-18 08:59+0000\n"
 "Last-Translator: Tzu-ping Chung <uranusjr@gmail.com>\n"
 "Language-Team: Chinese (Taiwan) (http://www.transifex.com/django/django/"
 "language/zh_TW/)\n"
@@ -22,7 +22,7 @@ msgid "PostgreSQL extensions"
 msgstr "PostgreSQL 擴充"
 
 #, python-format
-msgid "Item %(nth)s in the array did not validate: "
+msgid "Item %(nth)s in the array did not validate:"
 msgstr "陣列中第 %(nth)s 個物件驗證失敗："
 
 msgid "Nested arrays must have the same length."
@@ -32,7 +32,7 @@ msgid "Map of strings to strings/nulls"
 msgstr "字串與字串/空值的對應"
 
 #, python-format
-msgid "The value of \"%(key)s\" is not a string or null."
+msgid "The value of “%(key)s” is not a string or null."
 msgstr "「%(key)s」並非字串或空值。"
 
 msgid "A JSON object"
@@ -48,8 +48,8 @@ msgid "Input must be a JSON dictionary."
 msgstr "必須輸入 JSON dictionary。"
 
 #, python-format
-msgid "'%(value)s' value must be valid JSON."
-msgstr "'%(value)s' 必須為合法 JSON 值。"
+msgid "“%(value)s” value must be valid JSON."
+msgstr "「%(value)s」必須為有效的 JSON 值。"
 
 msgid "Enter two valid values."
 msgstr "請輸入兩個有效的值"

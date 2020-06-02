@@ -4,13 +4,14 @@
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Jon <jon@kolonial.no>, 2015
 # Jon <jon@kolonial.no>, 2014
+# Jon <jon@kolonial.no>, 2020
 # Sigurd Gartmann <sigurdga-transifex@sigurdga.no>, 2012
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2017-09-19 16:40+0000\n"
+"POT-Creation-Date: 2019-09-08 17:27+0200\n"
+"PO-Revision-Date: 2020-01-21 12:13+0000\n"
 "Last-Translator: Jon <jon@kolonial.no>\n"
 "Language-Team: Norwegian Bokmål (http://www.transifex.com/django/django/"
 "language/nb/)\n"
@@ -30,21 +31,21 @@ msgid "redirect from"
 msgstr "omadresser fra"
 
 msgid ""
-"This should be an absolute path, excluding the domain name. Example: '/"
-"events/search/'."
+"This should be an absolute path, excluding the domain name. Example: “/"
+"events/search/”."
 msgstr ""
-"Dette bør være en fullstendig sti uten domenenavn. Eksempel: «/hendelser/"
-"finn/»"
+"Dette bør være en fullstendig sti uten domenenavn. Eksempel: \"/hendelser/"
+"finn/\"."
 
 msgid "redirect to"
 msgstr "omadresser til"
 
 msgid ""
 "This can be either an absolute path (as above) or a full URL starting with "
-"'http://'."
+"“http://”."
 msgstr ""
 "Dette kan enten være en fullstendig sti (som over), eller en fullstendig "
-"nettadresse som starter med «http://»."
+"nettadresse som starter med \"http://\"."
 
 msgid "redirect"
 msgstr "omadressering"

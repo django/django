@@ -51,6 +51,7 @@ LANGUAGE_CODE = 'en-us'
 LANGUAGES = [
     ('af', gettext_noop('Afrikaans')),
     ('ar', gettext_noop('Arabic')),
+    ('ar-dz', gettext_noop('Algerian Arabic')),
     ('ast', gettext_noop('Asturian')),
     ('az', gettext_noop('Azerbaijani')),
     ('bg', gettext_noop('Bulgarian')),
@@ -136,13 +137,14 @@ LANGUAGES = [
     ('udm', gettext_noop('Udmurt')),
     ('uk', gettext_noop('Ukrainian')),
     ('ur', gettext_noop('Urdu')),
+    ('uz', gettext_noop('Uzbek')),
     ('vi', gettext_noop('Vietnamese')),
     ('zh-hans', gettext_noop('Simplified Chinese')),
     ('zh-hant', gettext_noop('Traditional Chinese')),
 ]
 
 # Languages using BiDi (right-to-left) layout
-LANGUAGES_BIDI = ["he", "ar", "fa", "ur"]
+LANGUAGES_BIDI = ["he", "ar", "ar-dz", "fa", "ur"]
 
 # If you set this to False, Django will make some optimizations so as not
 # to load the internationalization machinery.
@@ -170,9 +172,6 @@ MANAGERS = ADMINS
 # Default charset to use for all HttpResponse objects, if a MIME type isn't
 # manually specified. It's used to construct the Content-Type header.
 DEFAULT_CHARSET = 'utf-8'
-
-# Encoding of files read from disk (template and initial SQL files).
-FILE_CHARSET = 'utf-8'
 
 # Email address that error messages come from.
 SERVER_EMAIL = 'root@localhost'
@@ -382,15 +381,12 @@ DATETIME_INPUT_FORMATS = [
     '%Y-%m-%d %H:%M:%S',     # '2006-10-25 14:30:59'
     '%Y-%m-%d %H:%M:%S.%f',  # '2006-10-25 14:30:59.000200'
     '%Y-%m-%d %H:%M',        # '2006-10-25 14:30'
-    '%Y-%m-%d',              # '2006-10-25'
     '%m/%d/%Y %H:%M:%S',     # '10/25/2006 14:30:59'
     '%m/%d/%Y %H:%M:%S.%f',  # '10/25/2006 14:30:59.000200'
     '%m/%d/%Y %H:%M',        # '10/25/2006 14:30'
-    '%m/%d/%Y',              # '10/25/2006'
     '%m/%d/%y %H:%M:%S',     # '10/25/06 14:30:59'
     '%m/%d/%y %H:%M:%S.%f',  # '10/25/06 14:30:59.000200'
     '%m/%d/%y %H:%M',        # '10/25/06 14:30'
-    '%m/%d/%y',              # '10/25/06'
 ]
 
 # First day of week, to be used on calendars
@@ -415,7 +411,7 @@ DEFAULT_TABLESPACE = ''
 DEFAULT_INDEX_TABLESPACE = ''
 
 # Default X-Frame-Options header value
-X_FRAME_OPTIONS = 'SAMEORIGIN'
+X_FRAME_OPTIONS = 'DENY'
 
 USE_X_FORWARDED_HOST = False
 USE_X_FORWARDED_PORT = False
@@ -509,6 +505,10 @@ LOGOUT_REDIRECT_URL = None
 # The number of days a password reset link is valid for
 PASSWORD_RESET_TIMEOUT_DAYS = 3
 
+# The minimum number of seconds a password reset link is valid for
+# (default: 3 days).
+PASSWORD_RESET_TIMEOUT = 60 * 60 * 24 * 3
+
 # the first hasher in this list is the preferred algorithm.  any
 # password using different algorithms will be converted automatically
 # upon login
@@ -566,6 +566,10 @@ LOGGING_CONFIG = 'logging.config.dictConfig'
 
 # Custom logging configuration.
 LOGGING = {}
+
+# Default exception reporter class used in case none has been
+# specifically assigned to the HttpRequest instance.
+DEFAULT_EXCEPTION_REPORTER = 'django.views.debug.ExceptionReporter'
 
 # Default exception reporter filter class used in case none has been
 # specifically assigned to the HttpRequest instance.
@@ -628,10 +632,11 @@ SILENCED_SYSTEM_CHECKS = []
 # SECURITY MIDDLEWARE #
 #######################
 SECURE_BROWSER_XSS_FILTER = False
-SECURE_CONTENT_TYPE_NOSNIFF = False
+SECURE_CONTENT_TYPE_NOSNIFF = True
 SECURE_HSTS_INCLUDE_SUBDOMAINS = False
 SECURE_HSTS_PRELOAD = False
 SECURE_HSTS_SECONDS = 0
 SECURE_REDIRECT_EXEMPT = []
+SECURE_REFERRER_POLICY = 'same-origin'
 SECURE_SSL_HOST = None
 SECURE_SSL_REDIRECT = False

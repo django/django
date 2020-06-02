@@ -1,6 +1,6 @@
 from django.core.exceptions import ImproperlyConfigured
 from django.core.paginator import InvalidPage, Paginator
-from django.db.models.query import QuerySet
+from django.db.models import QuerySet
 from django.http import Http404
 from django.utils.translation import gettext as _
 from django.views.generic.base import ContextMixin, TemplateResponseMixin, View
@@ -64,7 +64,7 @@ class MultipleObjectMixin(ContextMixin):
             if page == 'last':
                 page_number = paginator.num_pages
             else:
-                raise Http404(_("Page is not 'last', nor can it be converted to an int."))
+                raise Http404(_('Page is not “last”, nor can it be converted to an int.'))
         try:
             page = paginator.page(page_number)
             return (paginator, page, page.object_list, page.has_other_pages())
@@ -151,7 +151,7 @@ class BaseListView(MultipleObjectMixin, View):
             else:
                 is_empty = not self.object_list
             if is_empty:
-                raise Http404(_("Empty list and '%(class_name)s.allow_empty' is False.") % {
+                raise Http404(_('Empty list and “%(class_name)s.allow_empty” is False.') % {
                     'class_name': self.__class__.__name__,
                 })
         context = self.get_context_data()

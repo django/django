@@ -15,9 +15,6 @@ class Person(models.Model):
     gender = models.CharField(max_length=1, choices=GENDER_CHOICES)
     pid = models.IntegerField(null=True, default=None)
 
-    def __str__(self):
-        return self.name
-
 
 class Employee(Person):
     employee_num = models.IntegerField(default=0)
@@ -28,9 +25,6 @@ class Employee(Person):
 class Profile(models.Model):
     name = models.CharField(max_length=200)
     salary = models.FloatField(default=1000.0)
-
-    def __str__(self):
-        return self.name
 
 
 class ProxyEmployee(Employee):

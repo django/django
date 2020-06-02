@@ -1,6 +1,12 @@
 from django.conf import settings
 
-from .. import Tags, Warning, register
+from .. import Error, Tags, Warning, register
+
+REFERRER_POLICY_VALUES = {
+    'no-referrer', 'no-referrer-when-downgrade', 'origin',
+    'origin-when-cross-origin', 'same-origin', 'strict-origin',
+    'strict-origin-when-cross-origin', 'unsafe-url',
+}
 
 SECRET_KEY_MIN_LENGTH = 50
 SECRET_KEY_MIN_UNIQUE_CHARACTERS = 5
@@ -8,9 +14,9 @@ SECRET_KEY_MIN_UNIQUE_CHARACTERS = 5
 W001 = Warning(
     "You do not have 'django.middleware.security.SecurityMiddleware' "
     "in your MIDDLEWARE so the SECURE_HSTS_SECONDS, "
-    "SECURE_CONTENT_TYPE_NOSNIFF, "
-    "SECURE_BROWSER_XSS_FILTER, and SECURE_SSL_REDIRECT settings "
-    "will have no effect.",
+    "SECURE_CONTENT_TYPE_NOSNIFF, SECURE_BROWSER_XSS_FILTER, "
+    "SECURE_REFERRER_POLICY, and SECURE_SSL_REDIRECT settings will have no "
+    "effect.",
     id='security.W001',
 )
 
@@ -51,15 +57,6 @@ W006 = Warning(
     id='security.W006',
 )
 
-W007 = Warning(
-    "Your SECURE_BROWSER_XSS_FILTER setting is not set to True, "
-    "so your pages will not be served with an "
-    "'X-XSS-Protection: 1; mode=block' header. "
-    "You should consider enabling this header to activate the "
-    "browser's XSS filtering and help prevent XSS attacks.",
-    id='security.W007',
-)
-
 W008 = Warning(
     "Your SECURE_SSL_REDIRECT setting is not set to True. "
     "Unless your site should be available over both SSL and non-SSL "
@@ -89,9 +86,8 @@ W019 = Warning(
     "You have "
     "'django.middleware.clickjacking.XFrameOptionsMiddleware' in your "
     "MIDDLEWARE, but X_FRAME_OPTIONS is not set to 'DENY'. "
-    "The default is 'SAMEORIGIN', but unless there is a good reason for "
-    "your site to serve other parts of itself in a frame, you should "
-    "change it to 'DENY'.",
+    "Unless there is a good reason for your site to serve other parts of "
+    "itself in a frame, you should change it to 'DENY'.",
     id='security.W019',
 )
 
@@ -104,6 +100,19 @@ W021 = Warning(
     "You have not set the SECURE_HSTS_PRELOAD setting to True. Without this, "
     "your site cannot be submitted to the browser preload list.",
     id='security.W021',
+)
+
+W022 = Warning(
+    'You have not set the SECURE_REFERRER_POLICY setting. Without this, your '
+    'site will not send a Referrer-Policy header. You should consider '
+    'enabling this header to protect user privacy.',
+    id='security.W022',
+)
+
+E023 = Error(
+    'You have set the SECURE_REFERRER_POLICY setting to an invalid value.',
+    hint='Valid values are: {}.'.format(', '.join(sorted(REFERRER_POLICY_VALUES))),
+    id='security.E023',
 )
 
 
@@ -163,15 +172,6 @@ def check_content_type_nosniff(app_configs, **kwargs):
 
 
 @register(Tags.security, deploy=True)
-def check_xss_filter(app_configs, **kwargs):
-    passed_check = (
-        not _security_middleware() or
-        settings.SECURE_BROWSER_XSS_FILTER is True
-    )
-    return [] if passed_check else [W007]
-
-
-@register(Tags.security, deploy=True)
 def check_ssl_redirect(app_configs, **kwargs):
     passed_check = (
         not _security_middleware() or
@@ -208,3 +208,18 @@ def check_xframe_deny(app_configs, **kwargs):
 @register(Tags.security, deploy=True)
 def check_allowed_hosts(app_configs, **kwargs):
     return [] if settings.ALLOWED_HOSTS else [W020]
+
+
+@register(Tags.security, deploy=True)
+def check_referrer_policy(app_configs, **kwargs):
+    if _security_middleware():
+        if settings.SECURE_REFERRER_POLICY is None:
+            return [W022]
+        # Support a comma-separated string or iterable of values to allow fallback.
+        if isinstance(settings.SECURE_REFERRER_POLICY, str):
+            values = {v.strip() for v in settings.SECURE_REFERRER_POLICY.split(',')}
+        else:
+            values = set(settings.SECURE_REFERRER_POLICY)
+        if not values <= REFERRER_POLICY_VALUES:
+            return [E023]
+    return []

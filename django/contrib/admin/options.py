@@ -30,7 +30,6 @@ from django.core.exceptions import (
 from django.core.paginator import Paginator
 from django.db import models, router, transaction
 from django.db.models.constants import LOOKUP_SEP
-from django.db.models.fields import BLANK_CHOICE_DASH
 from django.forms.formsets import DELETION_FIELD_NAME, all_valid
 from django.forms.models import (
     BaseInlineFormSet, inlineformset_factory, modelform_defines_fields,
@@ -250,17 +249,25 @@ class BaseModelAdmin(metaclass=forms.MediaDefiningClass):
             return None
         db = kwargs.get('using')
 
-        autocomplete_fields = self.get_autocomplete_fields(request)
-        if db_field.name in autocomplete_fields:
-            kwargs['widget'] = AutocompleteSelectMultiple(db_field.remote_field, self.admin_site, using=db)
-        elif db_field.name in self.raw_id_fields:
-            kwargs['widget'] = widgets.ManyToManyRawIdWidget(db_field.remote_field, self.admin_site, using=db)
-        elif db_field.name in [*self.filter_vertical, *self.filter_horizontal]:
-            kwargs['widget'] = widgets.FilteredSelectMultiple(
-                db_field.verbose_name,
-                db_field.name in self.filter_vertical
-            )
-
+        if 'widget' not in kwargs:
+            autocomplete_fields = self.get_autocomplete_fields(request)
+            if db_field.name in autocomplete_fields:
+                kwargs['widget'] = AutocompleteSelectMultiple(
+                    db_field.remote_field,
+                    self.admin_site,
+                    using=db,
+                )
+            elif db_field.name in self.raw_id_fields:
+                kwargs['widget'] = widgets.ManyToManyRawIdWidget(
+                    db_field.remote_field,
+                    self.admin_site,
+                    using=db,
+                )
+            elif db_field.name in [*self.filter_vertical, *self.filter_horizontal]:
+                kwargs['widget'] = widgets.FilteredSelectMultiple(
+                    db_field.verbose_name,
+                    db_field.name in self.filter_vertical
+                )
         if 'queryset' not in kwargs:
             queryset = self.get_field_queryset(db, db_field, request)
             if queryset is not None:
@@ -269,7 +276,7 @@ class BaseModelAdmin(metaclass=forms.MediaDefiningClass):
         form_field = db_field.formfield(**kwargs)
         if (isinstance(form_field.widget, SelectMultiple) and
                 not isinstance(form_field.widget, (CheckboxSelectMultiple, AutocompleteSelectMultiple))):
-            msg = _('Hold down "Control", or "Command" on a Mac, to select more than one.')
+            msg = _('Hold down “Control”, or “Command” on a Mac, to select more than one.')
             help_text = form_field.help_text
             form_field.help_text = format_lazy('{} {}', help_text, msg) if help_text else msg
         return form_field
@@ -326,6 +333,10 @@ class BaseModelAdmin(metaclass=forms.MediaDefiningClass):
         if self.fieldsets:
             return self.fieldsets
         return [(None, {'fields': self.get_fields(request, obj)})]
+
+    def get_inlines(self, request, obj):
+        """Hook for specifying custom inlines."""
+        return self.inlines
 
     def get_ordering(self, request):
         """
@@ -582,7 +593,7 @@ class ModelAdmin(BaseModelAdmin):
 
     def get_inline_instances(self, request, obj=None):
         inline_instances = []
-        for inline_class in self.inlines:
+        for inline_class in self.get_inlines(request, obj):
             inline = inline_class(self.model, self.admin_site)
             if request:
                 if not (inline.has_view_or_change_permission(request, obj) or
@@ -606,7 +617,7 @@ class ModelAdmin(BaseModelAdmin):
 
         info = self.model._meta.app_label, self.model._meta.model_name
 
-        urlpatterns = [
+        return [
             path('', wrap(self.changelist_view), name='%s_%s_changelist' % info),
             path('add/', wrap(self.add_view), name='%s_%s_add' % info),
             path('autocomplete/', wrap(self.autocomplete_view), name='%s_%s_autocomplete' % info),
@@ -618,7 +629,6 @@ class ModelAdmin(BaseModelAdmin):
                 pattern_name='%s:%s_%s_change' % ((self.admin_site.name,) + info)
             ))),
         ]
-        return urlpatterns
 
     @property
     def urls(self):
@@ -848,15 +858,20 @@ class ModelAdmin(BaseModelAdmin):
     def _get_base_actions(self):
         """Return the list of actions, prior to any request-based filtering."""
         actions = []
+        base_actions = (self.get_action(action) for action in self.actions or [])
+        # get_action might have returned None, so filter any of those out.
+        base_actions = [action for action in base_actions if action]
+        base_action_names = {name for _, name, _ in base_actions}
 
         # Gather actions from the admin site first
         for (name, func) in self.admin_site.actions:
+            if name in base_action_names:
+                continue
             description = getattr(func, 'short_description', name.replace('_', ' '))
             actions.append((func, name, description))
         # Add actions from this ModelAdmin.
-        actions.extend(self.get_action(action) for action in self.actions or [])
-        # get_action might have returned None, so filter any of those out.
-        return filter(None, actions)
+        actions.extend(base_actions)
+        return actions
 
     def _filter_actions_by_permissions(self, request, actions):
         """Filter out any actions that the user doesn't have access to."""
@@ -886,7 +901,7 @@ class ModelAdmin(BaseModelAdmin):
         actions = self._filter_actions_by_permissions(request, self._get_base_actions())
         return {name: (func, name, desc) for func, name, desc in actions}
 
-    def get_action_choices(self, request, default_choices=BLANK_CHOICE_DASH):
+    def get_action_choices(self, request, default_choices=models.BLANK_CHOICE_DASH):
         """
         Return a list of choices for use in a form object.  Each choice is a
         tuple (name, description).
@@ -1199,7 +1214,7 @@ class ModelAdmin(BaseModelAdmin):
                 "_saveasnew" in request.POST and self.save_as_continue and
                 self.has_change_permission(request, obj)
         ):
-            msg = _('The {name} "{obj}" was added successfully.')
+            msg = _('The {name} “{obj}” was added successfully.')
             if self.has_change_permission(request, obj):
                 msg += ' ' + _('You may edit it again below.')
             self.message_user(request, format_html(msg, **msg_dict), messages.SUCCESS)
@@ -1213,7 +1228,7 @@ class ModelAdmin(BaseModelAdmin):
 
         elif "_addanother" in request.POST:
             msg = format_html(
-                _('The {name} "{obj}" was added successfully. You may add another {name} below.'),
+                _('The {name} “{obj}” was added successfully. You may add another {name} below.'),
                 **msg_dict
             )
             self.message_user(request, msg, messages.SUCCESS)
@@ -1223,7 +1238,7 @@ class ModelAdmin(BaseModelAdmin):
 
         else:
             msg = format_html(
-                _('The {name} "{obj}" was added successfully.'),
+                _('The {name} “{obj}” was added successfully.'),
                 **msg_dict
             )
             self.message_user(request, msg, messages.SUCCESS)
@@ -1263,7 +1278,7 @@ class ModelAdmin(BaseModelAdmin):
         }
         if "_continue" in request.POST:
             msg = format_html(
-                _('The {name} "{obj}" was changed successfully. You may edit it again below.'),
+                _('The {name} “{obj}” was changed successfully. You may edit it again below.'),
                 **msg_dict
             )
             self.message_user(request, msg, messages.SUCCESS)
@@ -1273,7 +1288,7 @@ class ModelAdmin(BaseModelAdmin):
 
         elif "_saveasnew" in request.POST:
             msg = format_html(
-                _('The {name} "{obj}" was added successfully. You may edit it again below.'),
+                _('The {name} “{obj}” was added successfully. You may edit it again below.'),
                 **msg_dict
             )
             self.message_user(request, msg, messages.SUCCESS)
@@ -1286,7 +1301,7 @@ class ModelAdmin(BaseModelAdmin):
 
         elif "_addanother" in request.POST:
             msg = format_html(
-                _('The {name} "{obj}" was changed successfully. You may add another {name} below.'),
+                _('The {name} “{obj}” was changed successfully. You may add another {name} below.'),
                 **msg_dict
             )
             self.message_user(request, msg, messages.SUCCESS)
@@ -1298,7 +1313,7 @@ class ModelAdmin(BaseModelAdmin):
 
         else:
             msg = format_html(
-                _('The {name} "{obj}" was changed successfully.'),
+                _('The {name} “{obj}” was changed successfully.'),
                 **msg_dict
             )
             self.message_user(request, msg, messages.SUCCESS)
@@ -1419,7 +1434,7 @@ class ModelAdmin(BaseModelAdmin):
 
         self.message_user(
             request,
-            _('The %(name)s "%(obj)s" was deleted successfully.') % {
+            _('The %(name)s “%(obj)s” was deleted successfully.') % {
                 'name': opts.verbose_name,
                 'obj': obj_display,
             },
@@ -1461,13 +1476,20 @@ class ModelAdmin(BaseModelAdmin):
         )
 
     def get_inline_formsets(self, request, formsets, inline_instances, obj=None):
+        # Edit permissions on parent model are required for editable inlines.
+        can_edit_parent = self.has_change_permission(request, obj) if obj else self.has_add_permission(request)
         inline_admin_formsets = []
         for inline, formset in zip(inline_instances, formsets):
             fieldsets = list(inline.get_fieldsets(request, obj))
             readonly = list(inline.get_readonly_fields(request, obj))
-            has_add_permission = inline.has_add_permission(request, obj)
-            has_change_permission = inline.has_change_permission(request, obj)
-            has_delete_permission = inline.has_delete_permission(request, obj)
+            if can_edit_parent:
+                has_add_permission = inline.has_add_permission(request, obj)
+                has_change_permission = inline.has_change_permission(request, obj)
+                has_delete_permission = inline.has_delete_permission(request, obj)
+            else:
+                # Disable all edit-permissions, and overide formset settings.
+                has_add_permission = has_change_permission = has_delete_permission = False
+                formset.extra = formset.max_num = 0
             has_view_permission = inline.has_view_permission(request, obj)
             prepopulated = dict(inline.get_prepopulated_fields(request, obj))
             inline_admin_formset = helpers.InlineAdminFormSet(
@@ -1498,7 +1520,7 @@ class ModelAdmin(BaseModelAdmin):
         Create a message informing the user that the object doesn't exist
         and return a redirect to the admin index page.
         """
-        msg = _("""%(name)s with ID "%(key)s" doesn't exist. Perhaps it was deleted?""") % {
+        msg = _('%(name)s with ID “%(key)s” doesn’t exist. Perhaps it was deleted?') % {
             'name': opts.verbose_name,
             'key': unquote(object_id),
         }
@@ -1532,13 +1554,20 @@ class ModelAdmin(BaseModelAdmin):
         else:
             obj = self.get_object(request, unquote(object_id), to_field)
 
-            if not self.has_view_or_change_permission(request, obj):
-                raise PermissionDenied
+            if request.method == 'POST':
+                if not self.has_change_permission(request, obj):
+                    raise PermissionDenied
+            else:
+                if not self.has_view_or_change_permission(request, obj):
+                    raise PermissionDenied
 
             if obj is None:
                 return self._get_obj_does_not_exist_redirect(request, opts, object_id)
 
-        ModelForm = self.get_form(request, obj, change=not add)
+        fieldsets = self.get_fieldsets(request, obj)
+        ModelForm = self.get_form(
+            request, obj, change=not add, fields=flatten_fieldsets(fieldsets)
+        )
         if request.method == 'POST':
             form = ModelForm(request.POST, request.FILES, instance=obj)
             form_validated = form.is_valid()
@@ -1569,12 +1598,12 @@ class ModelAdmin(BaseModelAdmin):
                 formsets, inline_instances = self._create_formsets(request, obj, change=True)
 
         if not add and not self.has_change_permission(request, obj):
-            readonly_fields = flatten_fieldsets(self.get_fieldsets(request, obj))
+            readonly_fields = flatten_fieldsets(fieldsets)
         else:
             readonly_fields = self.get_readonly_fields(request, obj)
         adminForm = helpers.AdminForm(
             form,
-            list(self.get_fieldsets(request, obj)),
+            list(fieldsets),
             # Clear prepopulated fields on a view-only form to avoid a crash.
             self.get_prepopulated_fields(request, obj) if add or self.has_change_permission(request, obj) else {},
             readonly_fields,
@@ -1628,7 +1657,9 @@ class ModelAdmin(BaseModelAdmin):
 
     def _get_edited_object_pks(self, request, prefix):
         """Return POST data values of list_editable primary keys."""
-        pk_pattern = re.compile(r'{}-\d+-{}$'.format(prefix, self.model._meta.pk.name))
+        pk_pattern = re.compile(
+            r'{}-\d+-{}$'.format(re.escape(prefix), self.model._meta.pk.name)
+        )
         return [value for key, value in request.POST.items() if pk_pattern.match(key)]
 
     def _get_list_editable_queryset(self, request, prefix):

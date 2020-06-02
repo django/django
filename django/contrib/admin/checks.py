@@ -1,3 +1,4 @@
+import collections
 from itertools import chain
 
 from django.apps import apps
@@ -9,7 +10,7 @@ from django.core import checks
 from django.core.exceptions import FieldDoesNotExist
 from django.db import models
 from django.db.models.constants import LOOKUP_SEP
-from django.db.models.expressions import Combinable, F, OrderBy
+from django.db.models.expressions import Combinable
 from django.forms.models import (
     BaseModelForm, BaseModelFormSet, _get_foreign_key,
 )
@@ -65,7 +66,6 @@ def check_dependencies(**kwargs):
         ('django.contrib.contenttypes', 401),
         ('django.contrib.auth', 405),
         ('django.contrib.messages', 406),
-        ('django.contrib.sessions', 407),
     )
     for app_name, error_code in app_dependencies:
         if not apps.is_installed(app_name):
@@ -117,6 +117,12 @@ def check_dependencies(**kwargs):
             "'django.contrib.messages.middleware.MessageMiddleware' must "
             "be in MIDDLEWARE in order to use the admin application.",
             id='admin.E409',
+        ))
+    if not _contains_subclass('django.contrib.sessions.middleware.SessionMiddleware', settings.MIDDLEWARE):
+        errors.append(checks.Error(
+            "'django.contrib.sessions.middleware.SessionMiddleware' must "
+            "be in MIDDLEWARE in order to use the admin application.",
+            id='admin.E410',
         ))
     return errors
 
@@ -540,10 +546,10 @@ class BaseModelAdminChecks:
 
     def _check_ordering_item(self, obj, field_name, label):
         """ Check that `ordering` refers to existing fields. """
-        if isinstance(field_name, (Combinable, OrderBy)):
-            if not isinstance(field_name, OrderBy):
+        if isinstance(field_name, (Combinable, models.OrderBy)):
+            if not isinstance(field_name, models.OrderBy):
                 field_name = field_name.asc()
-            if isinstance(field_name.expression, F):
+            if isinstance(field_name.expression, models.F):
                 field_name = field_name.expression.name
             else:
                 return []
@@ -601,8 +607,9 @@ class BaseModelAdminChecks:
             except FieldDoesNotExist:
                 return [
                     checks.Error(
-                        "The value of '%s' is not a callable, an attribute of '%s', or an attribute of '%s.%s'." % (
-                            label, obj.__class__.__name__, obj.model._meta.app_label, obj.model._meta.object_name
+                        "The value of '%s' is not a callable, an attribute of "
+                        "'%s', or an attribute of '%s'." % (
+                            label, obj.__class__.__name__, obj.model._meta.label,
                         ),
                         obj=obj.__class__,
                         id='admin.E035',
@@ -715,33 +722,33 @@ class ModelAdminChecks(BaseModelAdminChecks):
             return []
         elif hasattr(obj, item):
             return []
-        elif hasattr(obj.model, item):
+        try:
+            field = obj.model._meta.get_field(item)
+        except FieldDoesNotExist:
             try:
-                field = obj.model._meta.get_field(item)
-            except FieldDoesNotExist:
-                return []
-            else:
-                if isinstance(field, models.ManyToManyField):
-                    return [
-                        checks.Error(
-                            "The value of '%s' must not be a ManyToManyField." % label,
-                            obj=obj.__class__,
-                            id='admin.E109',
-                        )
-                    ]
-                return []
-        else:
+                field = getattr(obj.model, item)
+            except AttributeError:
+                return [
+                    checks.Error(
+                        "The value of '%s' refers to '%s', which is not a "
+                        "callable, an attribute of '%s', or an attribute or "
+                        "method on '%s'." % (
+                            label, item, obj.__class__.__name__,
+                            obj.model._meta.label,
+                        ),
+                        obj=obj.__class__,
+                        id='admin.E108',
+                    )
+                ]
+        if isinstance(field, models.ManyToManyField):
             return [
                 checks.Error(
-                    "The value of '%s' refers to '%s', which is not a callable, "
-                    "an attribute of '%s', or an attribute or method on '%s.%s'." % (
-                        label, item, obj.__class__.__name__,
-                        obj.model._meta.app_label, obj.model._meta.object_name,
-                    ),
+                    "The value of '%s' must not be a ManyToManyField." % label,
                     obj=obj.__class__,
-                    id='admin.E108',
+                    id='admin.E109',
                 )
             ]
+        return []
 
     def _check_list_display_links(self, obj):
         """ Check that list_display_links is a unique subset of list_display.
@@ -980,15 +987,20 @@ class ModelAdminChecks(BaseModelAdminChecks):
 
     def _check_actions_uniqueness(self, obj):
         """Check that every action has a unique __name__."""
-        names = [name for _, name, _ in obj._get_base_actions()]
-        if len(names) != len(set(names)):
-            return [checks.Error(
-                '__name__ attributes of actions defined in %s must be '
-                'unique.' % obj.__class__,
-                obj=obj.__class__,
-                id='admin.E130',
-            )]
-        return []
+        errors = []
+        names = collections.Counter(name for _, name, _ in obj._get_base_actions())
+        for name, count in names.items():
+            if count > 1:
+                errors.append(checks.Error(
+                    '__name__ attributes of actions defined in %s must be '
+                    'unique. Name %r is not unique.' % (
+                        obj.__class__.__name__,
+                        name,
+                    ),
+                    obj=obj.__class__,
+                    id='admin.E130',
+                ))
+        return errors
 
 
 class InlineModelAdminChecks(BaseModelAdminChecks):
@@ -1024,8 +1036,8 @@ class InlineModelAdminChecks(BaseModelAdminChecks):
             return [
                 checks.Error(
                     "Cannot exclude the field '%s', because it is the foreign key "
-                    "to the parent model '%s.%s'." % (
-                        fk.name, parent_model._meta.app_label, parent_model._meta.object_name
+                    "to the parent model '%s'." % (
+                        fk.name, parent_model._meta.label,
                     ),
                     obj=obj.__class__,
                     id='admin.E201',
@@ -1102,9 +1114,8 @@ def must_inherit_from(parent, option, obj, id):
 def refer_to_missing_field(field, option, obj, id):
     return [
         checks.Error(
-            "The value of '%s' refers to '%s', which is not an attribute of '%s.%s'." % (
-                option, field, obj.model._meta.app_label, obj.model._meta.object_name
-            ),
+            "The value of '%s' refers to '%s', which is not an attribute of "
+            "'%s'." % (option, field, obj.model._meta.label),
             obj=obj.__class__,
             id=id,
         ),

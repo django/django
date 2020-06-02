@@ -15,15 +15,17 @@ want to be aware of when upgrading from Django 2.1 or earlier. We've
 See the :doc:`/howto/upgrade-version` guide if you're updating an existing
 project.
 
-Django 2.2 is designated as a :term:`long-term support release`. It will
-receive security updates for at least three years after its release. Support
-for the previous LTS, Django 1.11, will end in April 2020.
+Django 2.2 is designated as a :term:`long-term support release
+<Long-term support release>`. It will receive security updates for at least
+three years after its release. Support for the previous LTS, Django 1.11, will
+end in April 2020.
 
 Python compatibility
 ====================
 
-Django 2.2 supports Python 3.5, 3.6, and 3.7. We **highly recommend** and only
-officially support the latest release of each series.
+Django 2.2 supports Python 3.5, 3.6, 3.7, and 3.8 (as of 2.2.8). We
+**highly recommend** and only officially support the latest release of each
+series.
 
 .. _whats-new-2.2:
 
@@ -457,7 +459,7 @@ Miscellaneous
   :func:`~django.contrib.sitemaps.ping_google` function, set the new
   ``sitemap_uses_https`` argument to ``False``.
 
-* :djadmin:`runserver` no longer supports `pyinotify` (replaced by Watchman).
+* :djadmin:`runserver` no longer supports ``pyinotify`` (replaced by Watchman).
 
 * The :class:`~django.db.models.Avg`, :class:`~django.db.models.StdDev`, and
   :class:`~django.db.models.Variance` aggregate functions now return a
@@ -469,6 +471,9 @@ Miscellaneous
   with errors like ``no such table: <app_label>_<model>``. This was observed
   with several third-party apps that had models in tests without migrations.
   You must add migrations for such models.
+
+* Providing an integer in the ``key`` argument of the :meth:`.cache.delete` or
+  :meth:`.cache.get` now raises :exc:`ValueError`.
 
 .. _deprecated-features-2.2:
 
@@ -508,8 +513,8 @@ Miscellaneous
   first positional argument, if it accepts it. Support for overrides that don't
   accept it will be removed in Django 3.1.
 
-* The :attr:`.SimpleTestCase.allow_database_queries`,
-  :attr:`.TransactionTestCase.multi_db`, and :attr:`.TestCase.multi_db`
+* The ``SimpleTestCase.allow_database_queries``,
+  ``TransactionTestCase.multi_db``, and ``TestCase.multi_db``
   attributes are deprecated in favor of :attr:`.SimpleTestCase.databases`,
   :attr:`.TransactionTestCase.databases`, and :attr:`.TestCase.databases`.
   These new attributes allow databases dependencies to be declared in order to

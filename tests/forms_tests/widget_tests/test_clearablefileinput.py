@@ -46,7 +46,7 @@ class ClearableFileInputTest(WidgetTest):
         self.check_html(ClearableFileInput(), 'my<div>file', StrangeFieldFile(), html=(
             """
             Currently: <a href="something?chapter=1&amp;sect=2&amp;copy=3&amp;lang=en">
-            something&lt;div onclick=&quot;alert(&#39;oops&#39;)&quot;&gt;.jpg</a>
+            something&lt;div onclick=&quot;alert(&#x27;oops&#x27;)&quot;&gt;.jpg</a>
             <input type="checkbox" name="my&lt;div&gt;file-clear" id="my&lt;div&gt;file-clear_id">
             <label for="my&lt;div&gt;file-clear_id">Clear</label><br>
             Change: <input type="file" name="my&lt;div&gt;file">
@@ -55,7 +55,7 @@ class ClearableFileInputTest(WidgetTest):
 
     def test_clear_input_renders_only_if_not_required(self):
         """
-        A ClearableFileInput with is_required=False does not render a clear
+        A ClearableFileInput with is_required=True does not render a clear
         checkbox.
         """
         widget = ClearableFileInput()

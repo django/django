@@ -79,14 +79,9 @@ MRO is an acronym for Method Resolution Order.
 
     .. method:: setup(request, *args, **kwargs)
 
-        .. versionadded:: 2.2
+        Performs key view initialization prior to :meth:`dispatch`.
 
-        Initializes view instance attributes: ``self.request``, ``self.args``,
-        and ``self.kwargs`` prior to :meth:`dispatch`.
-
-        Overriding this method allows mixins to setup instance attributes for
-        reuse in child classes. When overriding this method, you must call
-        ``super()``.
+        If overriding this method, you must call ``super()``.
 
     .. method:: dispatch(request, *args, **kwargs)
 
@@ -122,8 +117,7 @@ MRO is an acronym for Method Resolution Order.
 
 .. class:: django.views.generic.base.TemplateView
 
-    Renders a given template, with the context containing parameters captured
-    in the URL.
+    Renders a given template.
 
     **Ancestors (MRO)**
 
@@ -167,11 +161,16 @@ MRO is an acronym for Method Resolution Order.
 
     **Context**
 
-    * Populated (through :class:`~django.views.generic.base.ContextMixin`) with
-      the keyword arguments captured from the URL pattern that served the view.
+    * Populated (through :class:`~django.views.generic.base.ContextMixin`).
     * You can also add context using the
       :attr:`~django.views.generic.base.ContextMixin.extra_context` keyword
       argument for :meth:`~django.views.generic.base.View.as_view`.
+
+    .. deprecated:: 3.1
+
+        Starting in Django 4.0, the keyword arguments captured from the URL
+        pattern won't be passed to the context. Reference them with
+        ``view.kwargs`` instead.
 
 ``RedirectView``
 ================
@@ -264,6 +263,10 @@ MRO is an acronym for Method Resolution Order.
     .. method:: get_redirect_url(*args, **kwargs)
 
         Constructs the target URL for redirection.
+
+        The ``args`` and ``kwargs`` arguments are positional and/or keyword
+        arguments :ref:`captured from the URL pattern
+        <how-django-processes-a-request>`, respectively.
 
         The default implementation uses :attr:`url` as a starting
         string and performs expansion of ``%`` named parameters in that string

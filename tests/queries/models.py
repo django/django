@@ -4,6 +4,7 @@ Various complex queries that have been problematic in the past.
 import threading
 
 from django.db import models
+from django.db.models.functions import Now
 
 
 class DumbCategory(models.Model):
@@ -67,10 +68,15 @@ class Annotation(models.Model):
         return self.name
 
 
+class DateTimePK(models.Model):
+    date = models.DateTimeField(primary_key=True, auto_now_add=True)
+
+
 class ExtraInfo(models.Model):
     info = models.CharField(max_length=100)
     note = models.ForeignKey(Note, models.CASCADE, null=True)
     value = models.IntegerField(null=True)
+    date = models.ForeignKey(DateTimePK, models.SET_NULL, null=True)
 
     class Meta:
         ordering = ['info']
@@ -143,6 +149,7 @@ class Cover(models.Model):
 
 class Number(models.Model):
     num = models.IntegerField()
+    other_num = models.IntegerField(null=True)
 
     def __str__(self):
         return str(self.num)
@@ -724,3 +731,19 @@ class RelatedIndividual(models.Model):
 class CustomDbColumn(models.Model):
     custom_column = models.IntegerField(db_column='custom_name', null=True)
     ip_address = models.GenericIPAddressField(null=True)
+
+
+class CreatedField(models.DateTimeField):
+    db_returning = True
+
+    def __init__(self, *args, **kwargs):
+        kwargs.setdefault('default', Now)
+        super().__init__(*args, **kwargs)
+
+
+class ReturningModel(models.Model):
+    created = CreatedField(editable=False)
+
+
+class NonIntegerPKReturningModel(models.Model):
+    created = CreatedField(editable=False, primary_key=True)

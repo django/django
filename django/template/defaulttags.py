@@ -15,10 +15,11 @@ from django.utils.safestring import mark_safe
 from .base import (
     BLOCK_TAG_END, BLOCK_TAG_START, COMMENT_TAG_END, COMMENT_TAG_START,
     FILTER_SEPARATOR, SINGLE_BRACE_END, SINGLE_BRACE_START,
-    VARIABLE_ATTRIBUTE_SEPARATOR, VARIABLE_TAG_END, VARIABLE_TAG_START,
-    Context, Node, NodeList, TemplateSyntaxError, VariableDoesNotExist,
-    kwarg_re, render_value_in_context, token_kwargs,
+    VARIABLE_ATTRIBUTE_SEPARATOR, VARIABLE_TAG_END, VARIABLE_TAG_START, Node,
+    NodeList, TemplateSyntaxError, VariableDoesNotExist, kwarg_re,
+    render_value_in_context, token_kwargs,
 )
+from .context import Context
 from .defaultfilters import date
 from .library import Library
 from .smartif import IfParser, Literal
@@ -969,7 +970,7 @@ def do_if(parser, token):
 
     # {% endif %}
     if token.contents != 'endif':
-        raise TemplateSyntaxError('Malformed template tag at line {0}: "{1}"'.format(token.lineno, token.contents))
+        raise TemplateSyntaxError('Malformed template tag at line {}: "{}"'.format(token.lineno, token.contents))
 
     return IfNode(conditions_nodelists)
 
@@ -1417,10 +1418,10 @@ def widthratio(parser, token):
     (because 175/200 = .875; .875 * 100 = 87.5 which is rounded up to 88).
 
     In some cases you might want to capture the result of widthratio in a
-    variable. It can be useful for instance in a blocktrans like this::
+    variable. It can be useful for instance in a blocktranslate like this::
 
         {% widthratio this_value max_value max_width as width %}
-        {% blocktrans %}The width is: {{ width }}{% endblocktrans %}
+        {% blocktranslate %}The width is: {{ width }}{% endblocktranslate %}
     """
     bits = token.split_contents()
     if len(bits) == 4:

@@ -6,20 +6,15 @@ from unittest import mock
 
 from django.core.management.color import no_style
 from django.db import (
-    DatabaseError, IntegrityError, OperationalError, connection,
+    DatabaseError, DataError, IntegrityError, OperationalError, connection,
 )
-from django.db.models import Model, Q
-from django.db.models.constraints import CheckConstraint, UniqueConstraint
-from django.db.models.deletion import CASCADE, PROTECT
-from django.db.models.fields import (
-    AutoField, BigAutoField, BigIntegerField, BinaryField, BooleanField,
-    CharField, DateField, DateTimeField, IntegerField, PositiveIntegerField,
-    SlugField, TextField, TimeField, UUIDField,
+from django.db.models import (
+    CASCADE, PROTECT, AutoField, BigAutoField, BigIntegerField, BinaryField,
+    BooleanField, CharField, CheckConstraint, DateField, DateTimeField,
+    ForeignKey, ForeignObject, Index, IntegerField, ManyToManyField, Model,
+    OneToOneField, PositiveIntegerField, Q, SlugField, SmallAutoField,
+    SmallIntegerField, TextField, TimeField, UniqueConstraint, UUIDField,
 )
-from django.db.models.fields.related import (
-    ForeignKey, ForeignObject, ManyToManyField, OneToOneField,
-)
-from django.db.models.indexes import Index
 from django.db.transaction import TransactionManagementError, atomic
 from django.test import (
     TransactionTestCase, skipIfDBFeature, skipUnlessDBFeature,
@@ -274,6 +269,43 @@ class SchemaTests(TransactionTestCase):
             if sql.startswith('ALTER TABLE') and 'ADD CONSTRAINT' in sql
         ])
 
+    @skipUnlessDBFeature('can_create_inline_fk')
+    def test_add_inline_fk_update_data(self):
+        with connection.schema_editor() as editor:
+            editor.create_model(Node)
+        # Add an inline foreign key and update data in the same transaction.
+        new_field = ForeignKey(Node, CASCADE, related_name='new_fk', null=True)
+        new_field.set_attributes_from_name('new_parent_fk')
+        parent = Node.objects.create()
+        with connection.schema_editor() as editor:
+            editor.add_field(Node, new_field)
+            editor.execute('UPDATE schema_node SET new_parent_fk_id = %s;', [parent.pk])
+        self.assertIn('new_parent_fk_id', self.get_indexes(Node._meta.db_table))
+
+    @skipUnlessDBFeature(
+        'can_create_inline_fk',
+        'allows_multiple_constraints_on_same_fields',
+    )
+    @isolate_apps('schema')
+    def test_add_inline_fk_index_update_data(self):
+        class Node(Model):
+            class Meta:
+                app_label = 'schema'
+
+        with connection.schema_editor() as editor:
+            editor.create_model(Node)
+        # Add an inline foreign key, update data, and an index in the same
+        # transaction.
+        new_field = ForeignKey(Node, CASCADE, related_name='new_fk', null=True)
+        new_field.set_attributes_from_name('new_parent_fk')
+        parent = Node.objects.create()
+        with connection.schema_editor() as editor:
+            editor.add_field(Node, new_field)
+            Node._meta.add_field(new_field)
+            editor.execute('UPDATE schema_node SET new_parent_fk_id = %s;', [parent.pk])
+            editor.add_index(Node, Index(fields=['new_parent_fk'], name='new_parent_inline_fk_idx'))
+        self.assertIn('new_parent_fk_id', self.get_indexes(Node._meta.db_table))
+
     @skipUnlessDBFeature('supports_foreign_keys')
     def test_char_field_with_db_index_to_fk(self):
         # Create the table
@@ -302,6 +334,24 @@ class SchemaTests(TransactionTestCase):
         with connection.schema_editor() as editor:
             editor.alter_field(AuthorTextFieldWithIndex, old_field, new_field, strict=True)
         self.assertForeignKeyExists(AuthorTextFieldWithIndex, 'text_field_id', 'schema_author')
+
+    @isolate_apps('schema')
+    def test_char_field_pk_to_auto_field(self):
+        class Foo(Model):
+            id = CharField(max_length=255, primary_key=True)
+
+            class Meta:
+                app_label = 'schema'
+
+        with connection.schema_editor() as editor:
+            editor.create_model(Foo)
+        self.isolated_local_models = [Foo]
+        old_field = Foo._meta.get_field('id')
+        new_field = AutoField(primary_key=True)
+        new_field.set_attributes_from_name('id')
+        new_field.model = Foo
+        with connection.schema_editor() as editor:
+            editor.alter_field(Foo, old_field, new_field, strict=True)
 
     @skipUnlessDBFeature('supports_foreign_keys')
     def test_fk_to_proxy(self):
@@ -449,7 +499,7 @@ class SchemaTests(TransactionTestCase):
         # Ensure the field is right afterwards
         columns = self.column_classes(Author)
         self.assertEqual(columns['age'][0], "IntegerField")
-        self.assertEqual(columns['age'][1][6], True)
+        self.assertTrue(columns['age'][1][6])
 
     def test_add_field_remove_field(self):
         """
@@ -601,7 +651,7 @@ class SchemaTests(TransactionTestCase):
         # Ensure the field is right afterwards
         columns = self.column_classes(Author)
         self.assertEqual(columns['name'][0], "TextField")
-        self.assertEqual(columns['name'][1][6], True)
+        self.assertTrue(columns['name'][1][6])
         # Change nullability again
         new_field2 = TextField(null=False)
         new_field2.set_attributes_from_name("name")
@@ -636,6 +686,26 @@ class SchemaTests(TransactionTestCase):
         with connection.schema_editor() as editor:
             editor.alter_field(Author, old_field, new_field, strict=True)
 
+    @isolate_apps('schema')
+    def test_alter_auto_field_quoted_db_column(self):
+        class Foo(Model):
+            id = AutoField(primary_key=True, db_column='"quoted_id"')
+
+            class Meta:
+                app_label = 'schema'
+
+        with connection.schema_editor() as editor:
+            editor.create_model(Foo)
+        self.isolated_local_models = [Foo]
+        old_field = Foo._meta.get_field('id')
+        new_field = BigAutoField(primary_key=True)
+        new_field.model = Foo
+        new_field.db_column = '"quoted_id"'
+        new_field.set_attributes_from_name('id')
+        with connection.schema_editor() as editor:
+            editor.alter_field(Foo, old_field, new_field, strict=True)
+        Foo.objects.create()
+
     def test_alter_not_unique_field_to_primary_key(self):
         # Create the table.
         with connection.schema_editor() as editor:
@@ -648,6 +718,24 @@ class SchemaTests(TransactionTestCase):
         with connection.schema_editor() as editor:
             editor.remove_field(Author, Author._meta.get_field('id'))
             editor.alter_field(Author, old_field, new_field, strict=True)
+
+    @isolate_apps('schema')
+    def test_alter_primary_key_quoted_db_table(self):
+        class Foo(Model):
+            class Meta:
+                app_label = 'schema'
+                db_table = '"foo"'
+
+        with connection.schema_editor() as editor:
+            editor.create_model(Foo)
+        self.isolated_local_models = [Foo]
+        old_field = Foo._meta.get_field('id')
+        new_field = BigAutoField(primary_key=True)
+        new_field.model = Foo
+        new_field.set_attributes_from_name('id')
+        with connection.schema_editor() as editor:
+            editor.alter_field(Foo, old_field, new_field, strict=True)
+        Foo.objects.create()
 
     def test_alter_text_field(self):
         # Regression for "BLOB/TEXT column 'info' can't have a default value")
@@ -802,6 +890,89 @@ class SchemaTests(TransactionTestCase):
         new_field.null = True
         with connection.schema_editor() as editor:
             editor.alter_field(Author, old_field, new_field, strict=True)
+
+    @unittest.skipUnless(connection.vendor == 'postgresql', 'PostgreSQL specific')
+    def test_alter_char_field_decrease_length(self):
+        # Create the table.
+        with connection.schema_editor() as editor:
+            editor.create_model(Author)
+        Author.objects.create(name='x' * 255)
+        # Change max_length of CharField.
+        old_field = Author._meta.get_field('name')
+        new_field = CharField(max_length=254)
+        new_field.set_attributes_from_name('name')
+        with connection.schema_editor() as editor:
+            msg = 'value too long for type character varying(254)'
+            with self.assertRaisesMessage(DataError, msg):
+                editor.alter_field(Author, old_field, new_field, strict=True)
+
+    @unittest.skipUnless(connection.vendor == 'postgresql', 'PostgreSQL specific')
+    def test_alter_field_with_custom_db_type(self):
+        from django.contrib.postgres.fields import ArrayField
+
+        class Foo(Model):
+            field = ArrayField(CharField(max_length=255))
+
+            class Meta:
+                app_label = 'schema'
+
+        with connection.schema_editor() as editor:
+            editor.create_model(Foo)
+        self.isolated_local_models = [Foo]
+        old_field = Foo._meta.get_field('field')
+        new_field = ArrayField(CharField(max_length=16))
+        new_field.set_attributes_from_name('field')
+        new_field.model = Foo
+        with connection.schema_editor() as editor:
+            editor.alter_field(Foo, old_field, new_field, strict=True)
+
+    @isolate_apps('schema')
+    @unittest.skipUnless(connection.vendor == 'postgresql', 'PostgreSQL specific')
+    def test_alter_array_field_decrease_base_field_length(self):
+        from django.contrib.postgres.fields import ArrayField
+
+        class ArrayModel(Model):
+            field = ArrayField(CharField(max_length=16))
+
+            class Meta:
+                app_label = 'schema'
+
+        with connection.schema_editor() as editor:
+            editor.create_model(ArrayModel)
+        self.isolated_local_models = [ArrayModel]
+        ArrayModel.objects.create(field=['x' * 16])
+        old_field = ArrayModel._meta.get_field('field')
+        new_field = ArrayField(CharField(max_length=15))
+        new_field.set_attributes_from_name('field')
+        new_field.model = ArrayModel
+        with connection.schema_editor() as editor:
+            msg = 'value too long for type character varying(15)'
+            with self.assertRaisesMessage(DataError, msg):
+                editor.alter_field(ArrayModel, old_field, new_field, strict=True)
+
+    @isolate_apps('schema')
+    @unittest.skipUnless(connection.vendor == 'postgresql', 'PostgreSQL specific')
+    def test_alter_array_field_decrease_nested_base_field_length(self):
+        from django.contrib.postgres.fields import ArrayField
+
+        class ArrayModel(Model):
+            field = ArrayField(ArrayField(CharField(max_length=16)))
+
+            class Meta:
+                app_label = 'schema'
+
+        with connection.schema_editor() as editor:
+            editor.create_model(ArrayModel)
+        self.isolated_local_models = [ArrayModel]
+        ArrayModel.objects.create(field=[['x' * 16]])
+        old_field = ArrayModel._meta.get_field('field')
+        new_field = ArrayField(ArrayField(CharField(max_length=15)))
+        new_field.set_attributes_from_name('field')
+        new_field.model = ArrayModel
+        with connection.schema_editor() as editor:
+            msg = 'value too long for type character varying(15)'
+            with self.assertRaisesMessage(DataError, msg):
+                editor.alter_field(ArrayModel, old_field, new_field, strict=True)
 
     def test_alter_textfield_to_null(self):
         """
@@ -1076,6 +1247,7 @@ class SchemaTests(TransactionTestCase):
         # The unique constraint remains.
         self.assertEqual(counts, {'fks': expected_fks, 'uniques': 1, 'indexes': 0})
 
+    @skipUnlessDBFeature('ignores_table_name_case')
     def test_alter_db_table_case(self):
         # Create the table
         with connection.schema_editor() as editor:
@@ -1126,6 +1298,28 @@ class SchemaTests(TransactionTestCase):
         # Fail on PostgreSQL if sequence is missing an owner.
         self.assertIsNotNone(Author.objects.create(name='Bar'))
 
+    def test_alter_autofield_pk_to_smallautofield_pk_sequence_owner(self):
+        """
+        Converting an implicit PK to SmallAutoField(primary_key=True) should
+        keep a sequence owner on PostgreSQL.
+        """
+        with connection.schema_editor() as editor:
+            editor.create_model(Author)
+        old_field = Author._meta.get_field('id')
+        new_field = SmallAutoField(primary_key=True)
+        new_field.set_attributes_from_name('id')
+        new_field.model = Author
+        with connection.schema_editor() as editor:
+            editor.alter_field(Author, old_field, new_field, strict=True)
+
+        Author.objects.create(name='Foo', pk=1)
+        with connection.cursor() as cursor:
+            sequence_reset_sqls = connection.ops.sequence_reset_sql(no_style(), [Author])
+            if sequence_reset_sqls:
+                cursor.execute(sequence_reset_sqls[0])
+        # Fail on PostgreSQL if sequence is missing an owner.
+        self.assertIsNotNone(Author.objects.create(name='Bar'))
+
     def test_alter_int_pk_to_autofield_pk(self):
         """
         Should be able to rename an IntegerField(primary_key=True) to
@@ -1157,6 +1351,28 @@ class SchemaTests(TransactionTestCase):
 
         with connection.schema_editor() as editor:
             editor.alter_field(IntegerPK, old_field, new_field, strict=True)
+
+    @isolate_apps('schema')
+    def test_alter_smallint_pk_to_smallautofield_pk(self):
+        """
+        Should be able to rename an SmallIntegerField(primary_key=True) to
+        SmallAutoField(primary_key=True).
+        """
+        class SmallIntegerPK(Model):
+            i = SmallIntegerField(primary_key=True)
+
+            class Meta:
+                app_label = 'schema'
+
+        with connection.schema_editor() as editor:
+            editor.create_model(SmallIntegerPK)
+        self.isolated_local_models = [SmallIntegerPK]
+        old_field = SmallIntegerPK._meta.get_field('i')
+        new_field = SmallAutoField(primary_key=True)
+        new_field.model = SmallIntegerPK
+        new_field.set_attributes_from_name('i')
+        with connection.schema_editor() as editor:
+            editor.alter_field(SmallIntegerPK, old_field, new_field, strict=True)
 
     def test_alter_int_pk_to_int_unique(self):
         """
@@ -1541,7 +1757,7 @@ class SchemaTests(TransactionTestCase):
         # Ensure the m2m table is still there.
         self.assertEqual(len(self.column_classes(LocalM2M)), 1)
 
-    @skipUnlessDBFeature('supports_column_check_constraints')
+    @skipUnlessDBFeature('supports_column_check_constraints', 'can_introspect_check_constraints')
     def test_check_constraints(self):
         """
         Tests creating/deleting CHECK constraints
@@ -1571,7 +1787,7 @@ class SchemaTests(TransactionTestCase):
         if not any(details['columns'] == ['height'] and details['check'] for details in constraints.values()):
             self.fail("No check constraint for height found")
 
-    @skipUnlessDBFeature('supports_column_check_constraints')
+    @skipUnlessDBFeature('supports_column_check_constraints', 'can_introspect_check_constraints')
     def test_remove_field_check_does_not_remove_meta_constraints(self):
         with connection.schema_editor() as editor:
             editor.create_model(Author)
@@ -1915,25 +2131,25 @@ class SchemaTests(TransactionTestCase):
         with connection.schema_editor() as editor:
             editor.create_model(Tag)
         # Ensure there's no index on the year/slug columns first
-        self.assertEqual(
-            False,
+        self.assertIs(
             any(
                 c["index"]
                 for c in self.get_constraints("schema_tag").values()
                 if c['columns'] == ["slug", "title"]
             ),
+            False,
         )
         # Alter the model to add an index
         with connection.schema_editor() as editor:
             editor.alter_index_together(Tag, [], [("slug", "title")])
         # Ensure there is now an index
-        self.assertEqual(
-            True,
+        self.assertIs(
             any(
                 c["index"]
                 for c in self.get_constraints("schema_tag").values()
                 if c['columns'] == ["slug", "title"]
             ),
+            True,
         )
         # Alter it back
         new_field2 = SlugField(unique=True)
@@ -1941,13 +2157,13 @@ class SchemaTests(TransactionTestCase):
         with connection.schema_editor() as editor:
             editor.alter_index_together(Tag, [("slug", "title")], [])
         # Ensure there's no index
-        self.assertEqual(
-            False,
+        self.assertIs(
             any(
                 c["index"]
                 for c in self.get_constraints("schema_tag").values()
                 if c['columns'] == ["slug", "title"]
             ),
+            False,
         )
 
     def test_index_together_with_fk(self):
@@ -1976,13 +2192,13 @@ class SchemaTests(TransactionTestCase):
         with connection.schema_editor() as editor:
             editor.create_model(TagIndexed)
         # Ensure there is an index
-        self.assertEqual(
-            True,
+        self.assertIs(
             any(
                 c["index"]
                 for c in self.get_constraints("schema_tagindexed").values()
                 if c['columns'] == ["slug", "title"]
             ),
+            True,
         )
 
     @skipUnlessDBFeature('allows_multiple_constraints_on_same_fields')
@@ -2476,7 +2692,7 @@ class SchemaTests(TransactionTestCase):
                 self.assertIsNone(field.default)
 
     @unittest.skipIf(connection.vendor == 'sqlite', 'SQLite naively remakes the table on field alteration.')
-    def test_alter_field_default_doesnt_perfom_queries(self):
+    def test_alter_field_default_doesnt_perform_queries(self):
         """
         No queries are performed if a field default changes and the field's
         not changing from null to non-null.
@@ -2742,7 +2958,7 @@ class SchemaTests(TransactionTestCase):
     def test_add_datefield_and_datetimefield_use_effective_default(self, mocked_datetime, mocked_tz):
         """
         effective_default() should be used for DateField, DateTimeField, and
-        TimeField if auto_now or auto_add_now is set (#25005).
+        TimeField if auto_now or auto_now_add is set (#25005).
         """
         now = datetime.datetime(month=1, day=1, year=2000, hour=1, minute=1)
         now_tz = datetime.datetime(month=1, day=1, year=2000, hour=1, minute=1, tzinfo=timezone.utc)

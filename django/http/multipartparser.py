@@ -8,6 +8,7 @@ import base64
 import binascii
 import cgi
 import collections
+import html
 from urllib.parse import unquote
 
 from django.conf import settings
@@ -19,7 +20,6 @@ from django.core.files.uploadhandler import (
 )
 from django.utils.datastructures import MultiValueDict
 from django.utils.encoding import force_str
-from django.utils.text import unescape_entities
 
 __all__ = ('MultiPartParser', 'MultiPartParserError', 'InputStreamExhausted')
 
@@ -209,7 +209,7 @@ class MultiPartParser:
                     file_name = disposition.get('filename')
                     if file_name:
                         file_name = force_str(file_name, encoding, errors='replace')
-                        file_name = self.IE_sanitize(unescape_entities(file_name))
+                        file_name = self.IE_sanitize(html.unescape(file_name))
                     if not file_name:
                         continue
 
@@ -360,8 +360,7 @@ class LazyStream:
                     remaining -= len(emitting)
                     yield emitting
 
-        out = b''.join(parts())
-        return out
+        return b''.join(parts())
 
     def __next__(self):
         """
@@ -665,12 +664,12 @@ def parse_header(line):
                 if p.count(b"'") == 2:
                     has_encoding = True
             value = p[i + 1:].strip()
-            if has_encoding:
-                encoding, lang, value = value.split(b"'")
-                value = unquote(value.decode(), encoding=encoding.decode())
             if len(value) >= 2 and value[:1] == value[-1:] == b'"':
                 value = value[1:-1]
                 value = value.replace(b'\\\\', b'\\').replace(b'\\"', b'"')
+            if has_encoding:
+                encoding, lang, value = value.split(b"'")
+                value = unquote(value.decode(), encoding=encoding.decode())
             pdict[name] = value
     return key, pdict
 

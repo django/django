@@ -55,3 +55,6 @@ class UnittestCase2(TestCase):
 
     def test_2(self):
         pass
+
+    def test_3_test(self):
+        pass

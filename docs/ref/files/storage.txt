@@ -69,6 +69,11 @@ The ``FileSystemStorage`` class
         time of the last metadata change, and on others (like Windows), it's
         the creation time of the file.
 
+.. versionchanged:: 3.1
+
+    Support for :class:`pathlib.Path` was added to the
+    ``FileSystemStorage.save()`` method.
+
 The ``Storage`` class
 =====================
 
@@ -105,6 +110,14 @@ The ``Storage`` class
         If :setting:`USE_TZ` is ``True``, returns an aware ``datetime``,
         otherwise returns a naive ``datetime`` in the local timezone.
 
+    .. method:: get_alternative_name(file_root, file_ext)
+
+        .. versionadded:: 3.0
+
+        Returns an alternative filename based on the ``file_root`` and
+        ``file_ext`` parameters, an underscore plus a random 7 character
+        alphanumeric string is appended to the filename before the extension.
+
     .. method:: get_available_name(name, max_length=None)
 
         Returns a filename based on the ``name`` parameter that's free and
@@ -116,9 +129,8 @@ The ``Storage`` class
         :exc:`SuspiciousFileOperation
         <django.core.exceptions.SuspiciousOperation>` exception will be raised.
 
-        If a file with ``name`` already exists, an underscore plus a random
-        7 character alphanumeric string is appended to the filename before
-        the extension.
+        If a file with ``name`` already exists, :meth:`get_alternative_name` is
+        called to obtain an alternative name.
 
     .. method:: get_created_time(name)
 

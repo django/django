@@ -2,16 +2,17 @@
 #
 # Translators:
 # András Veres-Szentkirályi, 2016-2017
+# Istvan Farkas <istvan.farkas@gmail.com>, 2019
 # Jannis Leidel <jannis@leidel.info>, 2011
-# János R (Hangya), 2014
+# János R, 2014
 # Szilveszter Farkas <szilveszter.farkas@gmail.com>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-09-24 13:46+0200\n"
-"PO-Revision-Date: 2017-11-24 13:37+0000\n"
-"Last-Translator: András Veres-Szentkirályi\n"
+"POT-Creation-Date: 2019-09-08 17:27+0200\n"
+"PO-Revision-Date: 2019-11-18 09:27+0000\n"
+"Last-Translator: Istvan Farkas <istvan.farkas@gmail.com>\n"
 "Language-Team: Hungarian (http://www.transifex.com/django/django/language/"
 "hu/)\n"
 "MIME-Version: 1.0\n"
@@ -55,8 +56,8 @@ msgstr "Nincs jelszó beállítva."
 msgid "Invalid password format or unknown hashing algorithm."
 msgstr "Érvénytelen jelszóformátum vagy ismeretlen hash-algoritmus."
 
-msgid "The two password fields didn't match."
-msgstr "A két jelszó mező tartalma nem egyezik meg."
+msgid "The two password fields didn’t match."
+msgstr "A beírt két jelszó nem egyezik."
 
 msgid "Password"
 msgstr "Jelszó"
@@ -68,12 +69,11 @@ msgid "Enter the same password as before, for verification."
 msgstr "Írja be az előbb megadott jelszót, ellenőrzés céljából."
 
 msgid ""
-"Raw passwords are not stored, so there is no way to see this user's "
+"Raw passwords are not stored, so there is no way to see this user’s "
 "password, but you can change the password using <a href=\"{}\">this form</a>."
 msgstr ""
-"A kódolatlan jelszavakat nem tároljuk, így a felhasználó jelszavát nem lehet "
-"megtekinteni, azonban <a href=\"{}\">ezzel az űrlappal</a> a jelszó "
-"megváltoztatható."
+"A jelszavakat olvasható formában nem tároljuk, így egy felhasználó jelszavát "
+"nem lehet mgnézni, de át lehet állítani <a href=\"{}\">ezzel az űrlappal</a>."
 
 #, python-format
 msgid ""
@@ -250,20 +250,20 @@ msgstr[1] ""
 msgid "The password is too similar to the %(verbose_name)s."
 msgstr "A jelszava túlságosan hasonlít a következőhöz: %(verbose_name)s."
 
-msgid "Your password can't be too similar to your other personal information."
-msgstr "A jelszava nem lehet túlságosan hasonló egyéb személyes adataihoz."
+msgid "Your password can’t be too similar to your other personal information."
+msgstr "A jelszó nem lehet hasonló a személyes adatok egyikéhez sem."
 
 msgid "This password is too common."
 msgstr "Ez a jelszó túlságosan gyakori."
 
-msgid "Your password can't be a commonly used password."
-msgstr "A jelszava nem lehet gyakran használt jelszó."
+msgid "Your password can’t be a commonly used password."
+msgstr "A jelszó nem lehet a túl gyakran használt jelszavak közül."
 
 msgid "This password is entirely numeric."
 msgstr "A jelszava kizárólag számjegyekből áll."
 
-msgid "Your password can't be entirely numeric."
-msgstr "A jelszava nem állhat kizárólag számjegyekből."
+msgid "Your password can’t be entirely numeric."
+msgstr "A jelszó nem állhat csak számjegyekből."
 
 #, python-format
 msgid "Password reset on %(site_name)s"

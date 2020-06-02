@@ -458,7 +458,7 @@ class RequestsTests(SimpleTestCase):
         self.assertEqual(request.read(13), b'--boundary\r\nC')
         self.assertEqual(request.POST, {'name': ['value']})
 
-    def test_POST_immutable_for_mutipart(self):
+    def test_POST_immutable_for_multipart(self):
         """
         MultiPartParser.parse() leaves request.POST immutable.
         """
@@ -758,7 +758,7 @@ class HostValidationTests(SimpleTestCase):
         If ALLOWED_HOSTS is empty and DEBUG is True, variants of localhost are
         allowed.
         """
-        valid_hosts = ['localhost', '127.0.0.1', '[::1]']
+        valid_hosts = ['localhost', 'subdomain.localhost', '127.0.0.1', '[::1]']
         for host in valid_hosts:
             request = HttpRequest()
             request.META = {'HTTP_HOST': host}
@@ -896,6 +896,7 @@ class RequestHeadersTests(SimpleTestCase):
         request = WSGIRequest(self.ENVIRON)
         self.assertEqual(request.headers['User-Agent'], 'python-requests/1.2.0')
         self.assertEqual(request.headers['user-agent'], 'python-requests/1.2.0')
+        self.assertEqual(request.headers['user_agent'], 'python-requests/1.2.0')
         self.assertEqual(request.headers['Content-Type'], 'text/html')
         self.assertEqual(request.headers['Content-Length'], '100')
 

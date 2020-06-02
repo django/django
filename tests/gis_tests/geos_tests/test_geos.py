@@ -5,7 +5,7 @@ import pickle
 import random
 from binascii import a2b_hex
 from io import BytesIO
-from unittest import mock
+from unittest import mock, skipIf
 
 from django.contrib.gis import gdal
 from django.contrib.gis.geos import (
@@ -183,9 +183,9 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
         # Error shouldn't be raise on equivalence testing with
         # an invalid type.
         for g in (p, ls):
-            self.assertNotEqual(g, None)
+            self.assertIsNotNone(g)
             self.assertNotEqual(g, {'foo': 'bar'})
-            self.assertNotEqual(g, False)
+            self.assertIsNot(g, False)
 
     def test_hash(self):
         point_1 = Point(5, 23)
@@ -236,7 +236,7 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
             self.assertEqual(p.x, pnt.x)
             self.assertEqual(p.y, pnt.y)
             self.assertEqual(pnt, fromstr(p.wkt))
-            self.assertEqual(False, pnt == prev)  # Use assertEqual to test __eq__
+            self.assertIs(pnt == prev, False)  # Use assertIs() to test __eq__.
 
             # Making sure that the point's X, Y components are what we expect
             self.assertAlmostEqual(p.x, pnt.tuple[0], 9)
@@ -280,6 +280,12 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
 
             prev = pnt  # setting the previous geometry
 
+    def test_point_reverse(self):
+        point = GEOSGeometry('POINT(144.963 -37.8143)', 4326)
+        self.assertEqual(point.srid, 4326)
+        point.reverse()
+        self.assertEqual(point.ewkt, 'SRID=4326;POINT (-37.8143 144.963)')
+
     def test_multipoints(self):
         "Testing MultiPoint objects."
         for mp in self.geometries.multipoints:
@@ -317,7 +323,7 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
                 self.assertEqual(l.tup, ls.tuple)
 
             self.assertEqual(ls, fromstr(l.wkt))
-            self.assertEqual(False, ls == prev)  # Use assertEqual to test __eq__
+            self.assertIs(ls == prev, False)  # Use assertIs() to test __eq__.
             with self.assertRaises(IndexError):
                 ls.__getitem__(len(ls))
             prev = ls
@@ -348,6 +354,38 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
         # Test __iter__().
         self.assertEqual(list(LineString((0, 0), (1, 1), (2, 2))), [(0, 0), (1, 1), (2, 2)])
 
+    def test_linestring_reverse(self):
+        line = GEOSGeometry('LINESTRING(144.963 -37.8143,151.2607 -33.887)', 4326)
+        self.assertEqual(line.srid, 4326)
+        line.reverse()
+        self.assertEqual(line.ewkt, 'SRID=4326;LINESTRING (151.2607 -33.887, 144.963 -37.8143)')
+
+    def _test_is_counterclockwise(self):
+        lr = LinearRing((0, 0), (1, 0), (0, 1), (0, 0))
+        self.assertIs(lr.is_counterclockwise, True)
+        lr.reverse()
+        self.assertIs(lr.is_counterclockwise, False)
+        msg = 'Orientation of an empty LinearRing cannot be determined.'
+        with self.assertRaisesMessage(ValueError, msg):
+            LinearRing().is_counterclockwise
+
+    @skipIf(geos_version_tuple() < (3, 7), 'GEOS >= 3.7.0 is required')
+    def test_is_counterclockwise(self):
+        self._test_is_counterclockwise()
+
+    @skipIf(geos_version_tuple() < (3, 7), 'GEOS >= 3.7.0 is required')
+    def test_is_counterclockwise_geos_error(self):
+        with mock.patch('django.contrib.gis.geos.prototypes.cs_is_ccw') as mocked:
+            mocked.return_value = 0
+            mocked.func_name = 'GEOSCoordSeq_isCCW'
+            msg = 'Error encountered in GEOS C function "GEOSCoordSeq_isCCW".'
+            with self.assertRaisesMessage(GEOSException, msg):
+                LinearRing((0, 0), (1, 0), (0, 1), (0, 0)).is_counterclockwise
+
+    @mock.patch('django.contrib.gis.geos.libgeos.geos_version', lambda: b'3.6.9')
+    def test_is_counterclockwise_fallback(self):
+        self._test_is_counterclockwise()
+
     def test_multilinestring(self):
         "Testing MultiLineString objects."
         prev = fromstr('POINT(0 0)')
@@ -361,7 +399,7 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
             self.assertAlmostEqual(l.centroid[1], ml.centroid.y, 9)
 
             self.assertEqual(ml, fromstr(l.wkt))
-            self.assertEqual(False, ml == prev)  # Use assertEqual to test __eq__
+            self.assertIs(ml == prev, False)  # Use assertIs() to test __eq__.
             prev = ml
 
             for ls in ml:
@@ -445,8 +483,8 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
             # Testing the geometry equivalence
             self.assertEqual(poly, fromstr(p.wkt))
             # Should not be equal to previous geometry
-            self.assertEqual(False, poly == prev)  # Use assertEqual to test __eq__
-            self.assertNotEqual(poly, prev)  # Use assertNotEqual to test __ne__
+            self.assertIs(poly == prev, False)  # Use assertIs() to test __eq__.
+            self.assertIs(poly != prev, True)  # Use assertIs() to test __ne__.
 
             # Testing the exterior ring
             ring = poly.exterior_ring
@@ -1396,3 +1434,12 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
         self.assertEqual(p.transform(2774, clone=True), Point(srid=2774))
         p.transform(2774)
         self.assertEqual(p, Point(srid=2774))
+
+    def test_linestring_iter(self):
+        ls = LineString((0, 0), (1, 1))
+        it = iter(ls)
+        # Step into CoordSeq iterator.
+        next(it)
+        ls[:] = []
+        with self.assertRaises(IndexError):
+            next(it)

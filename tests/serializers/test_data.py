@@ -23,10 +23,10 @@ from .models import (
     GenericData, GenericIPAddressData, GenericIPAddressPKData,
     InheritAbstractModel, InheritBaseModel, IntegerData, IntegerPKData,
     Intermediate, LengthModel, M2MData, M2MIntermediateData, M2MSelfData,
-    ModifyingSaveData, NullBooleanData, O2OData, PositiveIntegerData,
-    PositiveIntegerPKData, PositiveSmallIntegerData,
+    ModifyingSaveData, NullBooleanData, O2OData, PositiveBigIntegerData,
+    PositiveIntegerData, PositiveIntegerPKData, PositiveSmallIntegerData,
     PositiveSmallIntegerPKData, SlugData, SlugPKData, SmallData, SmallPKData,
-    Tag, TextData, TimeData, UniqueAnchor, UUIDData,
+    Tag, TextData, TimeData, UniqueAnchor, UUIDData, UUIDDefaultData,
 )
 from .tests import register_tests
 
@@ -241,6 +241,8 @@ test_data = [
     (data_obj, 100, NullBooleanData, True),
     (data_obj, 101, NullBooleanData, False),
     (data_obj, 102, NullBooleanData, None),
+    (data_obj, 110, PositiveBigIntegerData, 9223372036854775807),
+    (data_obj, 111, PositiveBigIntegerData, None),
     (data_obj, 120, PositiveIntegerData, 123456789),
     (data_obj, 121, PositiveIntegerData, None),
     (data_obj, 130, PositiveSmallIntegerData, 12),
@@ -349,6 +351,7 @@ The end."""),
     # (pk_obj, 790, XMLPKData, "<foo></foo>"),
     (pk_obj, 791, UUIDData, uuid_obj),
     (fk_obj, 792, FKToUUID, uuid_obj),
+    (pk_obj, 793, UUIDDefaultData, uuid_obj),
 
     (data_obj, 800, AutoNowDateTimeData, datetime.datetime(2006, 6, 16, 10, 42, 37)),
     (data_obj, 810, ModifyingSaveData, 42),

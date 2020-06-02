@@ -1,11 +1,10 @@
 /* global QUnit, SelectFilter */
-/* eslint global-strict: 0, strict: 0 */
 'use strict';
 
 QUnit.module('admin.SelectFilter2');
 
 QUnit.test('init', function(assert) {
-    var $ = django.jQuery;
+    const $ = django.jQuery;
     $('<form><select id="id"></select></form>').appendTo('#qunit-fixture');
     $('<option value="0">A</option>').appendTo('#id');
     SelectFilter.init('id', 'things', 0);
@@ -15,6 +14,7 @@ QUnit.test('init', function(assert) {
         $('.selector-available select').outerHeight() + $('.selector-filter').outerHeight(),
         $('.selector-chosen select').height()
     );
+    assert.equal($('.selector-chosen select')[0].getAttribute('multiple'), '');
     assert.equal($('.selector-chooseall').text(), "Choose all");
     assert.equal($('.selector-add').text(), "Choose");
     assert.equal($('.selector-remove').text(), "Remove");

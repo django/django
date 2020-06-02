@@ -3,6 +3,7 @@ from django.core.servers.basehttp import get_internal_wsgi_application
 from django.core.signals import request_started
 from django.core.wsgi import get_wsgi_application
 from django.db import close_old_connections
+from django.http import FileResponse
 from django.test import SimpleTestCase, override_settings
 from django.test.client import RequestFactory
 
@@ -51,7 +52,8 @@ class WSGITest(SimpleTestCase):
         FileResponse uses wsgi.file_wrapper.
         """
         class FileWrapper:
-            def __init__(self, filelike, blksize=8192):
+            def __init__(self, filelike, block_size=None):
+                self.block_size = block_size
                 filelike.close()
         application = get_wsgi_application()
         environ = self.request_factory._base_environ(
@@ -67,6 +69,7 @@ class WSGITest(SimpleTestCase):
         response = application(environ, start_response)
         self.assertEqual(response_data['status'], '200 OK')
         self.assertIsInstance(response, FileWrapper)
+        self.assertEqual(response.block_size, FileResponse.block_size)
 
 
 class GetInternalWSGIApplicationTest(SimpleTestCase):

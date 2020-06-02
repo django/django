@@ -1,11 +1,11 @@
 import logging
 import os
-import re
 from ctypes import CDLL, CFUNCTYPE, c_char_p, c_int
 from ctypes.util import find_library
 
 from django.contrib.gis.gdal.error import GDALException
 from django.core.exceptions import ImproperlyConfigured
+from django.utils.regex_helper import _lazy_re_compile
 
 logger = logging.getLogger('django.contrib.gis')
 
@@ -80,10 +80,10 @@ def gdal_version():
 
 def gdal_full_version():
     "Return the full GDAL version information."
-    return _version_info('')
+    return _version_info(b'')
 
 
-version_regex = re.compile(r'^(?P<major>\d+)\.(?P<minor>\d+)(\.(?P<subminor>\d+))?')
+version_regex = _lazy_re_compile(r'^(?P<major>\d+)\.(?P<minor>\d+)(\.(?P<subminor>\d+))?')
 
 
 def gdal_version_info():

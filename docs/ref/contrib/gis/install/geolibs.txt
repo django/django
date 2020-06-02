@@ -12,7 +12,7 @@ Program                   Description                           Required        
 `PROJ.4`_                 Cartographic Projections library      Yes (PostgreSQL and SQLite only)  5.2, 5.1, 5.0, 4.x
 :doc:`GDAL <../gdal>`     Geospatial Data Abstraction Library   Yes                               2.4, 2.3, 2.2, 2.1, 2.0
 :doc:`GeoIP <../geoip2>`  IP-based geolocation library          No                                2
-`PostGIS`__               Spatial extensions for PostgreSQL     Yes (PostgreSQL only)             2.5, 2.4, 2.3, 2.2
+`PostGIS`__               Spatial extensions for PostgreSQL     Yes (PostgreSQL only)             3.0, 2.5, 2.4, 2.3, 2.2
 `SpatiaLite`__            Spatial extensions for SQLite         Yes (SQLite only)                 4.3
 ========================  ====================================  ================================  ===================================
 
@@ -33,13 +33,14 @@ totally fine with GeoDjango. Your mileage may vary.
     PostGIS 2.3.0 2016-09-26
     PostGIS 2.4.0 2017-09-30
     PostGIS 2.5.0 2018-09-23
+    PostGIS 3.0.0 2019-10-20
     SpatiaLite 4.3.0 2015-09-07
 
 .. note::
 
     The GeoDjango interfaces to GEOS, GDAL, and GeoIP may be used
     independently of Django.  In other words, no database or settings file
-    required -- just import them as normal from :mod:`django.contrib.gis`.
+    required -- import them as normal from :mod:`django.contrib.gis`.
 
 .. _PROJ.4: https://github.com/OSGeo/proj.4/wiki/
 __ https://postgis.net/
@@ -231,9 +232,10 @@ the GDAL library.  For example::
 .. [#] The datum shifting files are needed for converting data to and from
        certain projections.
        For example, the PROJ.4 string for the `Google projection (900913 or 3857)
-       <http://spatialreference.org/ref/sr-org/6864/prj/>`_ requires the
+       <https://spatialreference.org/ref/sr-org/6864/prj/>`_ requires the
        ``null`` grid file only included in the extra datum shifting files.
        It is easier to install the shifting files now, then to have debug a
        problem caused by their absence later.
 .. [#] Specifically, GeoDjango provides support for the `OGR
-       <https://gdal.org/ogr_arch.html>`_ library, a component of GDAL.
+       <https://gdal.org/user/vector_data_model.html>`_ library, a component of
+       GDAL.

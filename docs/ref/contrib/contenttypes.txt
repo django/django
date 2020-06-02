@@ -240,7 +240,7 @@ to go one step further and use
 :class:`~django.contrib.contenttypes.models.ContentType` to enable truly
 generic (sometimes called "polymorphic") relationships between models.
 
-A simple example is a tagging system, which might look like this::
+For example, it could be used for a tagging system like so::
 
     from django.contrib.contenttypes.fields import GenericForeignKey
     from django.contrib.contenttypes.models import ContentType
@@ -438,7 +438,7 @@ it would be deleted at the same time.
 Unlike :class:`~django.db.models.ForeignKey`,
 :class:`~django.contrib.contenttypes.fields.GenericForeignKey` does not accept
 an :attr:`~django.db.models.ForeignKey.on_delete` argument to customize this
-behavior; if desired, you can avoid the cascade-deletion simply by not using
+behavior; if desired, you can avoid the cascade-deletion by not using
 :class:`~django.contrib.contenttypes.fields.GenericRelation`, and alternate
 behavior can be provided via the :data:`~django.db.models.signals.pre_delete`
 signal.

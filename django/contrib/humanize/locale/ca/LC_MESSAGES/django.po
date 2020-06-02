@@ -1,7 +1,7 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Antoni Aloy <aaloy@apsl.net>, 2011-2012
+# Antoni Aloy <aaloy@apsl.net>, 2011-2012,2019
 # Carles Barrobés <carles@barrobes.com>, 2011,2014
 # GerardoGa <ggarciamaristany@gmail.com>, 2018
 # Gil Obradors Via <gil.obradors@gmail.com>, 2019
@@ -11,8 +11,8 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-01-16 20:42+0100\n"
-"PO-Revision-Date: 2019-03-18 19:52+0000\n"
-"Last-Translator: Gil Obradors Via <gil.obradors@gmail.com>\n"
+"PO-Revision-Date: 2019-08-30 08:19+0000\n"
+"Last-Translator: Antoni Aloy <aaloy@apsl.net>\n"
 "Language-Team: Catalan (http://www.transifex.com/django/django/language/"
 "ca/)\n"
 "MIME-Version: 1.0\n"
@@ -27,12 +27,12 @@ msgstr "Humanitzar"
 #. Translators: Ordinal format for 11 (11th), 12 (12th), and 13 (13th).
 msgctxt "ordinal 11, 12, 13"
 msgid "{}th"
-msgstr ""
+msgstr "{}è"
 
 #. Translators: Ordinal format when value ends with 0, e.g. 80th.
 msgctxt "ordinal 0"
 msgid "{}th"
-msgstr ""
+msgstr "{}è"
 
 #. Translators: Ordinal format when value ends with 1, e.g. 81st, except 11.
 msgctxt "ordinal 1"
@@ -52,32 +52,32 @@ msgstr "{}r"
 #. Translators: Ordinal format when value ends with 4, e.g. 84th.
 msgctxt "ordinal 4"
 msgid "{}th"
-msgstr ""
+msgstr "{}è"
 
 #. Translators: Ordinal format when value ends with 5, e.g. 85th.
 msgctxt "ordinal 5"
 msgid "{}th"
-msgstr ""
+msgstr "{}è"
 
 #. Translators: Ordinal format when value ends with 6, e.g. 86th.
 msgctxt "ordinal 6"
 msgid "{}th"
-msgstr ""
+msgstr "{}è"
 
 #. Translators: Ordinal format when value ends with 7, e.g. 87th.
 msgctxt "ordinal 7"
 msgid "{}th"
-msgstr ""
+msgstr "{}è"
 
 #. Translators: Ordinal format when value ends with 8, e.g. 88th.
 msgctxt "ordinal 8"
 msgid "{}th"
-msgstr ""
+msgstr "{}è"
 
 #. Translators: Ordinal format when value ends with 9, e.g. 89th.
 msgctxt "ordinal 9"
 msgid "{}th"
-msgstr ""
+msgstr "{}è"
 
 #, python-format
 msgid "%(value).1f million"
@@ -308,50 +308,50 @@ msgstr[1] "d'aquí a %(count)s hores"
 #. weeks'
 #, python-format
 msgid "%(delta)s from now"
-msgstr ""
+msgstr "fa %(delta)s"
 
 #. Translators: 'naturaltime-past' strings will be included in '%(delta)s ago'
 #, python-format
 msgctxt "naturaltime-past"
 msgid "%d year"
 msgid_plural "%d years"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%d any"
+msgstr[1] "%d anys"
 
 #, python-format
 msgctxt "naturaltime-past"
 msgid "%d month"
 msgid_plural "%d months"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%d mes"
+msgstr[1] "%d mesos"
 
 #, python-format
 msgctxt "naturaltime-past"
 msgid "%d week"
 msgid_plural "%d weeks"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%d setmana"
+msgstr[1] "%d setmanes"
 
 #, python-format
 msgctxt "naturaltime-past"
 msgid "%d day"
 msgid_plural "%d days"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%d dia"
+msgstr[1] "%d dies"
 
 #, python-format
 msgctxt "naturaltime-past"
 msgid "%d hour"
 msgid_plural "%d hours"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%d hora"
+msgstr[1] "%d hores"
 
 #, python-format
 msgctxt "naturaltime-past"
 msgid "%d minute"
 msgid_plural "%d minutes"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%d minut"
+msgstr[1] "%d minuts"
 
 #. Translators: 'naturaltime-future' strings will be included in '%(delta)s
 #. from now'
@@ -359,40 +359,40 @@ msgstr[1] ""
 msgctxt "naturaltime-future"
 msgid "%d year"
 msgid_plural "%d years"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%d any"
+msgstr[1] "%d anys"
 
 #, python-format
 msgctxt "naturaltime-future"
 msgid "%d month"
 msgid_plural "%d months"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%d mes"
+msgstr[1] "%d mesos"
 
 #, python-format
 msgctxt "naturaltime-future"
 msgid "%d week"
 msgid_plural "%d weeks"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%d setmana"
+msgstr[1] "%d setmanes"
 
 #, python-format
 msgctxt "naturaltime-future"
 msgid "%d day"
 msgid_plural "%d days"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%d dia"
+msgstr[1] "%d dies"
 
 #, python-format
 msgctxt "naturaltime-future"
 msgid "%d hour"
 msgid_plural "%d hours"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%d hora"
+msgstr[1] "%d hores"
 
 #, python-format
 msgctxt "naturaltime-future"
 msgid "%d minute"
 msgid_plural "%d minutes"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%d minut"
+msgstr[1] "%d minuts"

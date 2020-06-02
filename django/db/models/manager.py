@@ -35,6 +35,9 @@ class BaseManager:
         """Return "app_label.model_label.manager_name"."""
         return '%s.%s' % (self.model._meta.label, self.name)
 
+    def __class_getitem__(cls, *args, **kwargs):
+        return cls
+
     def deconstruct(self):
         """
         Return a 5-tuple of the form (as_manager (True), manager_class,

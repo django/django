@@ -154,7 +154,8 @@ to, or in lieu of custom ``field.clean()`` methods.
     an error code of ``'invalid'`` if it doesn't.
 
     Loopback addresses and reserved IP spaces are considered valid. Literal
-    IPv6 addresses (:rfc:`2732`) and unicode domains are both supported.
+    IPv6 addresses (:rfc:`3986#section-3.2.2`) and Unicode domains are both
+    supported.
 
     In addition to the optional arguments of its parent :class:`RegexValidator`
     class, ``URLValidator`` accepts an extra optional attribute:
@@ -239,10 +240,6 @@ to, or in lieu of custom ``field.clean()`` methods.
     ``'max_value'`` if ``value`` is greater than ``limit_value``, which may be
     a callable.
 
-    .. versionchanged:: 2.2
-
-        ``limit_value`` can now be a callable.
-
 ``MinValueValidator``
 ---------------------
 
@@ -251,10 +248,6 @@ to, or in lieu of custom ``field.clean()`` methods.
     Raises a :exc:`~django.core.exceptions.ValidationError` with a code of
     ``'min_value'`` if ``value`` is less than ``limit_value``, which may be a
     callable.
-
-    .. versionchanged:: 2.2
-
-        ``limit_value`` can now be a callable.
 
 ``MaxLengthValidator``
 ----------------------
@@ -265,10 +258,6 @@ to, or in lieu of custom ``field.clean()`` methods.
     ``'max_length'`` if the length of ``value`` is greater than
     ``limit_value``, which may be a callable.
 
-    .. versionchanged:: 2.2
-
-        ``limit_value`` can now be a callable.
-
 ``MinLengthValidator``
 ----------------------
 
@@ -277,10 +266,6 @@ to, or in lieu of custom ``field.clean()`` methods.
     Raises a :exc:`~django.core.exceptions.ValidationError` with a code of
     ``'min_length'`` if the length of ``value`` is less than ``limit_value``,
     which may be a callable.
-
-    .. versionchanged:: 2.2
-
-        ``limit_value`` can now be a callable.
 
 ``DecimalValidator``
 --------------------

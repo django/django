@@ -33,51 +33,31 @@ class Index:
             for field_name in self.fields
         ]
         self.name = name or ''
-        if self.name:
-            errors = self.check_name()
-            if len(self.name) > self.max_name_length:
-                errors.append('Index names cannot be longer than %s characters.' % self.max_name_length)
-            if errors:
-                raise ValueError(errors)
         self.db_tablespace = db_tablespace
         self.opclasses = opclasses
         self.condition = condition
 
-    def check_name(self):
-        errors = []
-        # Name can't start with an underscore on Oracle; prepend D if needed.
-        if self.name[0] == '_':
-            errors.append('Index names cannot start with an underscore (_).')
-            self.name = 'D%s' % self.name[1:]
-        # Name can't start with a number on Oracle; prepend D if needed.
-        elif self.name[0].isdigit():
-            errors.append('Index names cannot start with a number (0-9).')
-            self.name = 'D%s' % self.name[1:]
-        return errors
-
     def _get_condition_sql(self, model, schema_editor):
         if self.condition is None:
             return None
-        query = Query(model=model)
-        query.add_q(self.condition)
+        query = Query(model=model, alias_cols=False)
+        where = query.build_where(self.condition)
         compiler = query.get_compiler(connection=schema_editor.connection)
-        # Only the WhereNode is of interest for the partial index.
-        sql, params = query.where.as_sql(compiler=compiler, connection=schema_editor.connection)
-        # BaseDatabaseSchemaEditor does the same map on the params, but since
-        # it's handled outside of that class, the work is done here.
-        return sql % tuple(map(schema_editor.quote_value, params))
+        sql, params = where.as_sql(compiler, schema_editor.connection)
+        return sql % tuple(schema_editor.quote_value(p) for p in params)
 
-    def create_sql(self, model, schema_editor, using=''):
+    def create_sql(self, model, schema_editor, using='', **kwargs):
         fields = [model._meta.get_field(field_name) for field_name, _ in self.fields_orders]
         col_suffixes = [order[1] for order in self.fields_orders]
         condition = self._get_condition_sql(model, schema_editor)
         return schema_editor._create_index_sql(
             model, fields, name=self.name, using=using, db_tablespace=self.db_tablespace,
             col_suffixes=col_suffixes, opclasses=self.opclasses, condition=condition,
+            **kwargs,
         )
 
-    def remove_sql(self, model, schema_editor):
-        return schema_editor._delete_index_sql(model, self.name)
+    def remove_sql(self, model, schema_editor, **kwargs):
+        return schema_editor._delete_index_sql(model, self.name, **kwargs)
 
     def deconstruct(self):
         path = '%s.%s' % (self.__class__.__module__, self.__class__.__name__)
@@ -122,7 +102,8 @@ class Index:
             'Index too long for multiple database support. Is self.suffix '
             'longer than 3 characters?'
         )
-        self.check_name()
+        if self.name[0] == '_' or self.name[0].isdigit():
+            self.name = 'D%s' % self.name[1:]
 
     def __repr__(self):
         return "<%s: fields='%s'%s>" % (
@@ -131,4 +112,6 @@ class Index:
         )
 
     def __eq__(self, other):
-        return (self.__class__ == other.__class__) and (self.deconstruct() == other.deconstruct())
+        if self.__class__ == other.__class__:
+            return self.deconstruct() == other.deconstruct()
+        return NotImplemented

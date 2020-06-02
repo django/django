@@ -5,16 +5,15 @@ class City(models.Model):
     id = models.BigAutoField(primary_key=True)
     name = models.CharField(max_length=50)
 
-    def __str__(self):
-        return self.name
+
+class Country(models.Model):
+    id = models.SmallAutoField(primary_key=True)
+    name = models.CharField(max_length=50)
 
 
 class District(models.Model):
     city = models.ForeignKey(City, models.CASCADE, primary_key=True)
     name = models.CharField(max_length=50)
-
-    def __str__(self):
-        return self.name
 
 
 class Reporter(models.Model):
@@ -28,9 +27,6 @@ class Reporter(models.Model):
 
     class Meta:
         unique_together = ('first_name', 'last_name')
-
-    def __str__(self):
-        return "%s %s" % (self.first_name, self.last_name)
 
 
 class Article(models.Model):
@@ -48,9 +44,6 @@ class Article(models.Model):
             ['headline', 'response_to', 'pub_date', 'reporter'],
         ]
 
-    def __str__(self):
-        return self.headline
-
 
 class ArticleReporter(models.Model):
     article = models.ForeignKey(Article, models.CASCADE)
@@ -65,14 +58,25 @@ class Comment(models.Model):
     article = models.ForeignKey(Article, models.CASCADE, db_index=True)
     email = models.EmailField()
     pub_date = models.DateTimeField()
-    up_votes = models.PositiveIntegerField()
     body = models.TextField()
 
     class Meta:
         constraints = [
-            models.CheckConstraint(name='up_votes_gte_0_check', check=models.Q(up_votes__gte=0)),
             models.UniqueConstraint(fields=['article', 'email', 'pub_date'], name='article_email_pub_date_uniq'),
         ]
         indexes = [
             models.Index(fields=['email', 'pub_date'], name='email_pub_date_idx'),
+        ]
+
+
+class CheckConstraintModel(models.Model):
+    up_votes = models.PositiveIntegerField()
+    voting_number = models.PositiveIntegerField(unique=True)
+
+    class Meta:
+        required_db_features = {
+            'supports_table_check_constraints',
+        }
+        constraints = [
+            models.CheckConstraint(name='up_votes_gte_0_check', check=models.Q(up_votes__gte=0)),
         ]

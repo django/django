@@ -209,7 +209,7 @@ class NonAggregateAnnotationTestCase(TestCase):
         lengths = Employee.objects.annotate(
             name_len=Length('first_name'),
         ).distinct('name_len').values_list('name_len', flat=True)
-        self.assertSequenceEqual(lengths, [3, 7, 8])
+        self.assertCountEqual(lengths, [3, 7, 8])
 
     def test_filter_annotation(self):
         books = Book.objects.annotate(
@@ -404,6 +404,28 @@ class NonAggregateAnnotationTestCase(TestCase):
             ],
             lambda a: (a['age'], a['age_count'])
         )
+
+    def test_raw_sql_with_inherited_field(self):
+        DepartmentStore.objects.create(
+            name='Angus & Robinson',
+            original_opening=datetime.date(2014, 3, 8),
+            friday_night_closing=datetime.time(21),
+            chain='Westfield',
+            area=123,
+        )
+        tests = (
+            ('name', 'Angus & Robinson'),
+            ('surface', 123),
+            ("case when name='Angus & Robinson' then chain else name end", 'Westfield'),
+        )
+        for sql, expected_result in tests:
+            with self.subTest(sql=sql):
+                self.assertSequenceEqual(
+                    DepartmentStore.objects.annotate(
+                        annotation=RawSQL(sql, ()),
+                    ).values_list('annotation', flat=True),
+                    [expected_result],
+                )
 
     def test_annotate_exists(self):
         authors = Author.objects.annotate(c=Count('id')).filter(c__gt=1)

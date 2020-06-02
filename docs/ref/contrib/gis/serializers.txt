@@ -8,7 +8,7 @@
 GeoDjango provides a specific serializer for the `GeoJSON`__ format. See
 :doc:`/topics/serialization` for more information on serialization.
 
-__ http://geojson.org/
+__ https://geojson.org/
 
 The ``geojson`` serializer is not meant for round-tripping data, as it has no
 deserializer equivalent. For example, you cannot use :djadmin:`loaddata` to

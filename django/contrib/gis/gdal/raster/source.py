@@ -73,6 +73,13 @@ class GDALRaster(GDALRasterBase):
 
         # If input is a valid file path, try setting file as source.
         if isinstance(ds_input, str):
+            if (
+                not ds_input.startswith(VSI_FILESYSTEM_BASE_PATH) and
+                not os.path.exists(ds_input)
+            ):
+                raise GDALException(
+                    'Unable to read raster source input "%s".' % ds_input
+                )
             try:
                 # GDALOpen will auto-detect the data source type.
                 self._ptr = capi.open_ds(force_bytes(ds_input), self._write)
@@ -225,7 +232,7 @@ class GDALRaster(GDALRasterBase):
 
     @cached_property
     def is_vsi_based(self):
-        return self.name.startswith(VSI_FILESYSTEM_BASE_PATH)
+        return self._ptr and self.name.startswith(VSI_FILESYSTEM_BASE_PATH)
 
     @property
     def name(self):

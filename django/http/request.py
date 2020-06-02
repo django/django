@@ -1,5 +1,7 @@
+import cgi
+import codecs
 import copy
-import re
+import warnings
 from io import BytesIO
 from itertools import chain
 from urllib.parse import quote, urlencode, urljoin, urlsplit
@@ -14,12 +16,16 @@ from django.http.multipartparser import MultiPartParser, MultiPartParserError
 from django.utils.datastructures import (
     CaseInsensitiveMapping, ImmutableList, MultiValueDict,
 )
+from django.utils.deprecation import RemovedInDjango40Warning
 from django.utils.encoding import escape_uri_path, iri_to_uri
 from django.utils.functional import cached_property
 from django.utils.http import is_same_domain, limited_parse_qsl
+from django.utils.regex_helper import _lazy_re_compile
+
+from .multipartparser import parse_header
 
 RAISE_ERROR = object()
-host_validation_re = re.compile(r"^([a-z0-9.-]+|\[[a-f0-9]*:[a-f0-9\.:]+\])(:\d+)?$")
+host_validation_re = _lazy_re_compile(r"^([a-z0-9.-]+|\[[a-f0-9]*:[a-f0-9\.:]+\])(:\d+)?$")
 
 
 class UnreadablePostError(OSError):
@@ -69,6 +75,28 @@ class HttpRequest:
     def headers(self):
         return HttpHeaders(self.META)
 
+    @cached_property
+    def accepted_types(self):
+        """Return a list of MediaType instances."""
+        return parse_accept_header(self.headers.get('Accept', '*/*'))
+
+    def accepts(self, media_type):
+        return any(
+            accepted_type.match(media_type)
+            for accepted_type in self.accepted_types
+        )
+
+    def _set_content_type_params(self, meta):
+        """Set content_type, content_params, and encoding."""
+        self.content_type, self.content_params = cgi.parse_header(meta.get('CONTENT_TYPE', ''))
+        if 'charset' in self.content_params:
+            try:
+                codecs.lookup(self.content_params['charset'])
+            except LookupError:
+                pass
+            else:
+                self.encoding = self.content_params['charset']
+
     def _get_raw_host(self):
         """
         Return the HTTP host using the environment or request headers. Skip
@@ -95,7 +123,7 @@ class HttpRequest:
         # Allow variants of localhost if ALLOWED_HOSTS is empty and DEBUG=True.
         allowed_hosts = settings.ALLOWED_HOSTS
         if settings.DEBUG and not allowed_hosts:
-            allowed_hosts = ['localhost', '127.0.0.1', '[::1]']
+            allowed_hosts = ['.localhost', '127.0.0.1', '[::1]']
 
         domain, port = split_domain_port(host)
         if domain and validate_host(domain, allowed_hosts):
@@ -178,6 +206,9 @@ class HttpRequest:
             # Make it an absolute url (but schemeless and domainless) for the
             # edge case that the path starts with '//'.
             location = '//%s' % self.get_full_path()
+        else:
+            # Coerce lazy locations.
+            location = str(location)
         bits = urlsplit(location)
         if not (bits.scheme and bits.netloc):
             # Handle the simple, most common case. If the location is absolute
@@ -213,19 +244,25 @@ class HttpRequest:
     def scheme(self):
         if settings.SECURE_PROXY_SSL_HEADER:
             try:
-                header, value = settings.SECURE_PROXY_SSL_HEADER
+                header, secure_value = settings.SECURE_PROXY_SSL_HEADER
             except ValueError:
                 raise ImproperlyConfigured(
                     'The SECURE_PROXY_SSL_HEADER setting must be a tuple containing two values.'
                 )
-            if self.META.get(header) == value:
-                return 'https'
+            header_value = self.META.get(header)
+            if header_value is not None:
+                return 'https' if header_value == secure_value else 'http'
         return self._get_scheme()
 
     def is_secure(self):
         return self.scheme == 'https'
 
     def is_ajax(self):
+        warnings.warn(
+            'request.is_ajax() is deprecated. See Django 3.1 release notes '
+            'for more details about this deprecation.',
+            RemovedInDjango40Warning,
+        )
         return self.META.get('HTTP_X_REQUESTED_WITH') == 'XMLHttpRequest'
 
     @property
@@ -368,6 +405,10 @@ class HttpHeaders(CaseInsensitiveMapping):
             if name:
                 headers[name] = value
         super().__init__(headers)
+
+    def __getitem__(self, key):
+        """Allow header lookup using underscores in place of hyphens."""
+        return super().__getitem__(key.replace('_', '-'))
 
     @classmethod
     def parse_header_name(cls, header):
@@ -536,6 +577,40 @@ class QueryDict(MultiValueDict):
         return '&'.join(output)
 
 
+class MediaType:
+    def __init__(self, media_type_raw_line):
+        full_type, self.params = parse_header(
+            media_type_raw_line.encode('ascii') if media_type_raw_line else b''
+        )
+        self.main_type, _, self.sub_type = full_type.partition('/')
+
+    def __str__(self):
+        params_str = ''.join(
+            '; %s=%s' % (k, v.decode('ascii'))
+            for k, v in self.params.items()
+        )
+        return '%s%s%s' % (
+            self.main_type,
+            ('/%s' % self.sub_type) if self.sub_type else '',
+            params_str,
+        )
+
+    def __repr__(self):
+        return '<%s: %s>' % (self.__class__.__qualname__, self)
+
+    @property
+    def is_all_types(self):
+        return self.main_type == '*' and self.sub_type == '*'
+
+    def match(self, other):
+        if self.is_all_types:
+            return True
+        other = MediaType(other)
+        if self.main_type == other.main_type and self.sub_type in {'*', other.sub_type}:
+            return True
+        return False
+
+
 # It's neither necessary nor appropriate to use
 # django.utils.encoding.force_str() for parsing URLs and form inputs. Thus,
 # this slightly more restricted function, used by QueryDict.
@@ -591,3 +666,7 @@ def validate_host(host, allowed_hosts):
     Return ``True`` for a valid host, ``False`` otherwise.
     """
     return any(pattern == '*' or is_same_domain(host, pattern) for pattern in allowed_hosts)
+
+
+def parse_accept_header(header):
+    return [MediaType(token) for token in header.split(',') if token.strip()]

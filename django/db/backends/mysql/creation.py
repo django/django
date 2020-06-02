@@ -26,7 +26,7 @@ class DatabaseCreation(BaseDatabaseCreation):
                 self.log('Got an error creating the test database: %s' % e)
                 sys.exit(2)
             else:
-                raise e
+                raise
 
     def _clone_test_db(self, suffix, verbosity, keepdb=False):
         source_database_name = self.connection.settings_dict['NAME']
@@ -35,7 +35,7 @@ class DatabaseCreation(BaseDatabaseCreation):
             'dbname': self.connection.ops.quote_name(target_database_name),
             'suffix': self.sql_table_creation_suffix(),
         }
-        with self._nodb_connection.cursor() as cursor:
+        with self._nodb_cursor() as cursor:
             try:
                 self._execute_create_test_db(cursor, test_db_params, keepdb)
             except Exception:
@@ -55,10 +55,9 @@ class DatabaseCreation(BaseDatabaseCreation):
         self._clone_db(source_database_name, target_database_name)
 
     def _clone_db(self, source_database_name, target_database_name):
-        dump_args = DatabaseClient.settings_to_cmd_args(self.connection.settings_dict)[1:]
-        dump_args[-1] = source_database_name
-        dump_cmd = ['mysqldump', '--routines', '--events'] + dump_args
-        load_cmd = DatabaseClient.settings_to_cmd_args(self.connection.settings_dict)
+        dump_args = DatabaseClient.settings_to_cmd_args(self.connection.settings_dict, [])[1:]
+        dump_cmd = ['mysqldump', *dump_args[:-1], '--routines', '--events', source_database_name]
+        load_cmd = DatabaseClient.settings_to_cmd_args(self.connection.settings_dict, [])
         load_cmd[-1] = target_database_name
 
         with subprocess.Popen(dump_cmd, stdout=subprocess.PIPE) as dump_proc:

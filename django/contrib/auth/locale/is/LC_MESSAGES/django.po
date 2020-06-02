@@ -4,13 +4,13 @@
 # Hafsteinn Einarsson <haffi67@gmail.com>, 2011-2012
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Logi Ragnarsson <logi@belgingur.is>, 2012
-# Thordur Sigurdsson <thordur@ja.is>, 2016-2017
+# Thordur Sigurdsson <thordur@ja.is>, 2016-2017,2019
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-09-24 13:46+0200\n"
-"PO-Revision-Date: 2017-10-03 17:25+0000\n"
+"POT-Creation-Date: 2019-09-08 17:27+0200\n"
+"PO-Revision-Date: 2019-11-20 05:04+0000\n"
 "Last-Translator: Thordur Sigurdsson <thordur@ja.is>\n"
 "Language-Team: Icelandic (http://www.transifex.com/django/django/language/"
 "is/)\n"
@@ -55,7 +55,7 @@ msgstr "Ekkert lykilorð skráð."
 msgid "Invalid password format or unknown hashing algorithm."
 msgstr "Ógilt snið á lykilorði eða óþekkt hökkunaralgrím."
 
-msgid "The two password fields didn't match."
+msgid "The two password fields didn’t match."
 msgstr "Lykilorðin tvö pössuðu ekki saman."
 
 msgid "Password"
@@ -68,7 +68,7 @@ msgid "Enter the same password as before, for verification."
 msgstr "Settu inn sama lykilorð og áður til staðfestingar."
 
 msgid ""
-"Raw passwords are not stored, so there is no way to see this user's "
+"Raw passwords are not stored, so there is no way to see this user’s "
 "password, but you can change the password using <a href=\"{}\">this form</a>."
 msgstr ""
 "Lykilorð eru aðeins geymd dulkóðuð, svo ekki er hægt að sjá lykilorð þessa "
@@ -249,19 +249,19 @@ msgstr[1] "Lykilorðið verður að vera minnst %(min_length)d stafir."
 msgid "The password is too similar to the %(verbose_name)s."
 msgstr "Lykilorðið er of líkt %(verbose_name)s."
 
-msgid "Your password can't be too similar to your other personal information."
+msgid "Your password can’t be too similar to your other personal information."
 msgstr "Lykilorðið má ekki vera of líkt þínum persónuupplýsingum."
 
 msgid "This password is too common."
 msgstr "Þetta lykilorð er of algengt."
 
-msgid "Your password can't be a commonly used password."
+msgid "Your password can’t be a commonly used password."
 msgstr "Lykilorðið má ekki vera algengt lykilorð."
 
 msgid "This password is entirely numeric."
 msgstr "Þetta lykilorð er eingöngu tölustafir."
 
-msgid "Your password can't be entirely numeric."
+msgid "Your password can’t be entirely numeric."
 msgstr "Lykilorðið má ekki vera eingöngu tölustafir."
 
 #, python-format

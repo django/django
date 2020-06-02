@@ -1,7 +1,6 @@
 from django.apps.registry import Apps
-from django.db import models
-from django.db.utils import DatabaseError
-from django.utils.decorators import classproperty
+from django.db import DatabaseError, models
+from django.utils.functional import classproperty
 from django.utils.timezone import now
 
 from .exceptions import MigrationSchemaMissing
@@ -53,7 +52,9 @@ class MigrationRecorder:
 
     def has_table(self):
         """Return True if the django_migrations table exists."""
-        return self.Migration._meta.db_table in self.connection.introspection.table_names(self.connection.cursor())
+        with self.connection.cursor() as cursor:
+            tables = self.connection.introspection.table_names(cursor)
+        return self.Migration._meta.db_table in tables
 
     def ensure_schema(self):
         """Ensure the table exists and has the correct schema."""

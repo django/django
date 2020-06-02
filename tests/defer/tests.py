@@ -1,4 +1,4 @@
-from django.db.models.query_utils import InvalidQuery
+from django.core.exceptions import FieldError
 from django.test import TestCase
 
 from .models import (
@@ -40,7 +40,7 @@ class DeferTests(AssertionMixin, TestCase):
         # of them except the model's primary key see #15494
         self.assert_delayed(qs.only("pk")[0], 3)
         # You can use 'pk' with reverse foreign key lookups.
-        # The related_id is alawys set even if it's not fetched from the DB,
+        # The related_id is always set even if it's not fetched from the DB,
         # so pk and related_id are not deferred.
         self.assert_delayed(self.s1.primary_set.all().only('pk')[0], 2)
 
@@ -113,7 +113,7 @@ class DeferTests(AssertionMixin, TestCase):
             'Field Primary.related cannot be both deferred and traversed '
             'using select_related at the same time.'
         )
-        with self.assertRaisesMessage(InvalidQuery, msg):
+        with self.assertRaisesMessage(FieldError, msg):
             Primary.objects.defer("related").select_related("related")[0]
 
     def test_only_select_related_raises_invalid_query(self):
@@ -121,7 +121,7 @@ class DeferTests(AssertionMixin, TestCase):
             'Field Primary.related cannot be both deferred and traversed using '
             'select_related at the same time.'
         )
-        with self.assertRaisesMessage(InvalidQuery, msg):
+        with self.assertRaisesMessage(FieldError, msg):
             Primary.objects.only("name").select_related("related")[0]
 
     def test_defer_foreign_keys_are_deferred_and_not_traversed(self):
@@ -202,7 +202,7 @@ class BigChildDeferTests(AssertionMixin, TestCase):
         self.assertEqual(obj.value, "foo")
         self.assertEqual(obj.other, "bar")
 
-    def test_only_sublcass(self):
+    def test_only_subclass(self):
         # You can retrieve a single field on a subclass
         obj = BigChild.objects.only("other").get(name="b1")
         self.assert_delayed(obj, 4)

@@ -2,15 +2,16 @@
 #
 # Translators:
 # Branko Kokanovic <branko@kokanovic.org>, 2018
+# Igor Jerosimić, 2020
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Janos Guljas <janos@resenje.org>, 2012
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-01-17 11:07+0100\n"
-"PO-Revision-Date: 2018-01-30 10:08+0000\n"
-"Last-Translator: Branko Kokanovic <branko@kokanovic.org>\n"
+"POT-Creation-Date: 2019-09-08 17:27+0200\n"
+"PO-Revision-Date: 2020-01-21 20:40+0000\n"
+"Last-Translator: Igor Jerosimić\n"
 "Language-Team: Serbian (http://www.transifex.com/django/django/language/"
 "sr/)\n"
 "MIME-Version: 1.0\n"
@@ -37,9 +38,9 @@ msgid "Content type %(ct_id)s object has no associated model"
 msgstr "Тип садржаја %(ct_id)s нема асоцирани модел"
 
 #, python-format
-msgid "Content type %(ct_id)s object %(obj_id)s doesn't exist"
+msgid "Content type %(ct_id)s object %(obj_id)s doesn’t exist"
 msgstr "Тип садржаја %(ct_id)s објекта %(obj_id)s не постоји"
 
 #, python-format
-msgid "%(ct_name)s objects don't have a get_absolute_url() method"
-msgstr "Објекти %(ct_name)s немају метод get_absolute_url()"
+msgid "%(ct_name)s objects don’t have a get_absolute_url() method"
+msgstr "Објекти %(ct_name)s немају get_absolute_url() метод"

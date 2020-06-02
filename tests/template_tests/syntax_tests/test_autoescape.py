@@ -36,7 +36,7 @@ class AutoescapeTagTests(SimpleTestCase):
         output = self.engine.render_to_string('autoescape-tag05', {'first': '<b>first</b>'})
         self.assertEqual(output, '&lt;b&gt;first&lt;/b&gt;')
 
-    # Strings (ASCII or unicode) already marked as "safe" are not
+    # Strings (ASCII or Unicode) already marked as "safe" are not
     # auto-escaped
     @setup({'autoescape-tag06': '{{ first }}'})
     def test_autoescape_tag06(self):

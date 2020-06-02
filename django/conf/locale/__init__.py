@@ -20,6 +20,12 @@ LANG_INFO = {
         'name': 'Arabic',
         'name_local': 'العربيّة',
     },
+    'ar-dz': {
+        'bidi': True,
+        'code': 'ar-dz',
+        'name': 'Algerian Arabic',
+        'name_local': 'العربية الجزائرية',
+    },
     'ast': {
         'bidi': False,
         'code': 'ast',
@@ -228,7 +234,7 @@ LANG_INFO = {
         'bidi': False,
         'code': 'hi',
         'name': 'Hindi',
-        'name_local': 'Hindi',
+        'name_local': 'हिंदी',
     },
     'hr': {
         'bidi': False,
@@ -535,6 +541,12 @@ LANG_INFO = {
         'code': 'ur',
         'name': 'Urdu',
         'name_local': 'اردو',
+    },
+    'uz': {
+        'bidi': False,
+        'code': 'uz',
+        'name': 'Uzbek',
+        'name_local': 'oʻzbek tili',
     },
     'vi': {
         'bidi': False,

@@ -2,6 +2,7 @@
 #
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011
+# arupakan125 <koh@arupaka.net>, 2020
 # Masashi SHIBATA <contact@c-bata.link>, 2017
 # Nikita K <hiyori.amatsuki@gmail.com>, 2019
 # Shinya Okano <tokibito@gmail.com>, 2013-2016
@@ -9,9 +10,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-09-24 13:46+0200\n"
-"PO-Revision-Date: 2019-03-28 12:08+0000\n"
-"Last-Translator: Nikita K <hiyori.amatsuki@gmail.com>\n"
+"POT-Creation-Date: 2019-09-08 17:27+0200\n"
+"PO-Revision-Date: 2020-01-20 06:25+0000\n"
+"Last-Translator: arupakan125 <koh@arupaka.net>\n"
 "Language-Team: Japanese (http://www.transifex.com/django/django/language/"
 "ja/)\n"
 "MIME-Version: 1.0\n"
@@ -55,7 +56,7 @@ msgstr "パスワードは設定されませんでした。"
 msgid "Invalid password format or unknown hashing algorithm."
 msgstr "無効なパスワードか不明なハッシュアルゴリズムです。"
 
-msgid "The two password fields didn't match."
+msgid "The two password fields didn’t match."
 msgstr "確認用パスワードが一致しません。"
 
 msgid "Password"
@@ -68,7 +69,7 @@ msgid "Enter the same password as before, for verification."
 msgstr "確認のため、再度パスワードを入力してください。"
 
 msgid ""
-"Raw passwords are not stored, so there is no way to see this user's "
+"Raw passwords are not stored, so there is no way to see this user’s "
 "password, but you can change the password using <a href=\"{}\">this form</a>."
 msgstr ""
 "生のパスワードは格納されていないため、このユーザのパスワードを確認する方法は"
@@ -242,19 +243,19 @@ msgstr[0] "パスワードは最低 %(min_length)d 文字以上必要です。"
 msgid "The password is too similar to the %(verbose_name)s."
 msgstr "このパスワードは %(verbose_name)s と似すぎています。"
 
-msgid "Your password can't be too similar to your other personal information."
+msgid "Your password can’t be too similar to your other personal information."
 msgstr "あなたの他の個人情報と似ているパスワードにはできません。"
 
 msgid "This password is too common."
 msgstr "このパスワードは一般的すぎます。"
 
-msgid "Your password can't be a commonly used password."
+msgid "Your password can’t be a commonly used password."
 msgstr "よく使われるパスワードにはできません。"
 
 msgid "This password is entirely numeric."
 msgstr "このパスワードは数字しか使われていません。"
 
-msgid "Your password can't be entirely numeric."
+msgid "Your password can’t be entirely numeric."
 msgstr "数字だけのパスワードにはできません。"
 
 #, python-format

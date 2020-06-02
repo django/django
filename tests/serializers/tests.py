@@ -12,8 +12,9 @@ from django.test import SimpleTestCase, override_settings, skipUnlessDBFeature
 from django.test.utils import Approximate
 
 from .models import (
-    Actor, Article, Author, AuthorProfile, BaseModel, Category, ComplexModel,
-    Movie, Player, ProxyBaseModel, ProxyProxyBaseModel, Score, Team,
+    Actor, Article, Author, AuthorProfile, BaseModel, Category, Child,
+    ComplexModel, Movie, Player, ProxyBaseModel, ProxyProxyBaseModel, Score,
+    Team,
 )
 
 
@@ -54,7 +55,7 @@ class SerializerRegistrationTests(SimpleTestCase):
             serializers.unregister_serializer("nonsense")
 
     def test_builtin_serializers(self):
-        "Requesting a list of serializer formats popuates the registry"
+        "Requesting a list of serializer formats populates the registry"
         all_formats = set(serializers.get_serializer_formats())
         public_formats = set(serializers.get_public_serializer_formats())
 
@@ -78,9 +79,8 @@ class SerializerRegistrationTests(SimpleTestCase):
             serializers.get_serializer("nonsense")
 
         # SerializerDoesNotExist is instantiated with the nonexistent format
-        with self.assertRaises(SerializerDoesNotExist) as cm:
+        with self.assertRaisesMessage(SerializerDoesNotExist, 'nonsense'):
             serializers.get_serializer("nonsense")
-        self.assertEqual(cm.exception.args, ("nonsense",))
 
     def test_get_unknown_deserializer(self):
         with self.assertRaises(SerializerDoesNotExist):
@@ -202,7 +202,7 @@ class SerializersTestBase:
         for field_name in valid_fields:
             self.assertTrue(self._get_field_values(serial_str, field_name))
 
-    def test_serialize_unicode(self):
+    def test_serialize_unicode_roundtrip(self):
         """Unicode makes the roundtrip intact"""
         actor_name = "Za\u017c\u00f3\u0142\u0107"
         movie_title = 'G\u0119\u015bl\u0105 ja\u017a\u0144'
@@ -218,6 +218,13 @@ class SerializersTestBase:
         obj_list = list(serializers.deserialize(self.serializer_name, serial_str))
         mv_obj = obj_list[0].object
         self.assertEqual(mv_obj.title, movie_title)
+
+    def test_unicode_serialization(self):
+        unicode_name = 'יוניקוד'
+        data = serializers.serialize(self.serializer_name, [Author(name=unicode_name)])
+        self.assertIn(unicode_name, data)
+        objs = list(serializers.deserialize(self.serializer_name, data))
+        self.assertEqual(objs[0].object.name, unicode_name)
 
     def test_serialize_progressbar(self):
         fake_stdout = StringIO()
@@ -339,6 +346,14 @@ class SerializersTestBase:
         proxy_proxy_data = serializers.serialize("json", proxy_proxy_objects)
         self.assertEqual(base_data, proxy_data.replace('proxy', ''))
         self.assertEqual(base_data, proxy_proxy_data.replace('proxy', ''))
+
+    def test_serialize_inherited_fields(self):
+        child_1 = Child.objects.create(parent_data='a', child_data='b')
+        child_2 = Child.objects.create(parent_data='c', child_data='d')
+        child_1.parent_m2m.add(child_2)
+        child_data = serializers.serialize(self.serializer_name, [child_1, child_2])
+        self.assertEqual(self._get_field_values(child_data, 'parent_m2m'), [])
+        self.assertEqual(self._get_field_values(child_data, 'parent_data'), [])
 
 
 class SerializerAPITests(SimpleTestCase):

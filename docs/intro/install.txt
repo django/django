@@ -4,8 +4,8 @@ Quick install guide
 
 Before you can use Django, you'll need to get it installed. We have a
 :doc:`complete installation guide </topics/install>` that covers all the
-possibilities; this guide will guide you to a simple, minimal installation
-that'll work while you walk through the introduction.
+possibilities; this guide will guide you to a minimal installation that'll work
+while you walk through the introduction.
 
 Install Python
 ==============
@@ -31,13 +31,13 @@ Set up a database
 =================
 
 This step is only necessary if you'd like to work with a "large" database engine
-like PostgreSQL, MySQL, or Oracle. To install such a database, consult the
-:ref:`database installation information <database-installation>`.
+like PostgreSQL, MariaDB, MySQL, or Oracle. To install such a database, consult
+the :ref:`database installation information <database-installation>`.
 
 Install Django
 ==============
 
-You've got three easy options to install Django:
+You've got three options to install Django:
 
 * :ref:`Install an official release <installing-official-release>`. This
   is the best approach for most users.

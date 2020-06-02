@@ -24,7 +24,7 @@ may be a good choice for the :ref:`range fields <range-fields>` and
 
 .. class:: ArrayField(base_field, size=None, **options)
 
-    A field for storing lists of data. Most field types can be used, you simply
+    A field for storing lists of data. Most field types can be used, and you
     pass another field instance as the :attr:`base_field
     <ArrayField.base_field>`. You may also specify a :attr:`size
     <ArrayField.size>`. ``ArrayField`` can be nested to store multi-dimensional
@@ -79,7 +79,7 @@ may be a good choice for the :ref:`range fields <range-fields>` and
 
 .. note::
 
-    When nesting ``ArrayField``, whether you use the `size` parameter or not,
+    When nesting ``ArrayField``, whether you use the ``size`` parameter or not,
     PostgreSQL requires that the arrays are rectangular::
 
         from django.contrib.postgres.fields import ArrayField
@@ -284,7 +284,7 @@ transform do not change. For example::
     similar to PostgreSQL's ``text`` type.
 
     .. _citext: https://www.postgresql.org/docs/current/citext.html
-    .. _the performance considerations: https://www.postgresql.org/docs/current/citext.html#AEN178177
+    .. _the performance considerations: https://www.postgresql.org/docs/current/citext.html#id-1.11.7.17.7
 
 ``HStoreField``
 ===============
@@ -333,7 +333,7 @@ We will use the following example model::
 Key lookups
 ~~~~~~~~~~~
 
-To query based on a given key, you simply use that key as the lookup name::
+To query based on a given key, you can use that key as the lookup name::
 
     >>> Dog.objects.create(name='Rufus', data={'breed': 'labrador'})
     >>> Dog.objects.create(name='Meg', data={'breed': 'collie'})
@@ -537,8 +537,7 @@ We will use the following example model::
 Key, index, and path lookups
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-To query based on a given dictionary key, simply use that key as the lookup
-name::
+To query based on a given dictionary key, use that key as the lookup name::
 
     >>> Dog.objects.create(name='Rufus', data={
     ...     'breed': 'labrador',
@@ -657,25 +656,10 @@ excluded; that is, ``[)``.
 
 .. class:: DecimalRangeField(**options)
 
-    .. versionadded:: 2.2
-
     Stores a range of floating point values. Based on a
     :class:`~django.db.models.DecimalField`. Represented by a ``numrange`` in
     the database and a :class:`~psycopg2:psycopg2.extras.NumericRange` in
     Python.
-
-``FloatRangeField``
--------------------
-
-.. class:: FloatRangeField(**options)
-
-    Stores a range of floating point values. Based on a
-    :class:`~django.db.models.FloatField`. Represented by a ``numrange`` in the
-    database and a :class:`~psycopg2:psycopg2.extras.NumericRange` in Python.
-
-    .. deprecated:: 2.2
-
-        Use :class:`DecimalRangeField` instead.
 
 ``DateTimeRangeField``
 ----------------------
@@ -754,10 +738,14 @@ operators ``@>``, ``<@``, and ``&&`` respectively.
     <QuerySet [<Event: Soft play>]>
 
 The ``contained_by`` lookup is also available on the non-range field types:
+:class:`~django.db.models.SmallAutoField`,
+:class:`~django.db.models.AutoField`, :class:`~django.db.models.BigAutoField`,
+:class:`~django.db.models.SmallIntegerField`,
 :class:`~django.db.models.IntegerField`,
 :class:`~django.db.models.BigIntegerField`,
-:class:`~django.db.models.FloatField`, :class:`~django.db.models.DateField`,
-and :class:`~django.db.models.DateTimeField`. For example::
+:class:`~django.db.models.DecimalField`, :class:`~django.db.models.FloatField`,
+:class:`~django.db.models.DateField`, and
+:class:`~django.db.models.DateTimeField`. For example::
 
     >>> from psycopg2.extras import DateTimeTZRange
     >>> Event.objects.filter(start__contained_by=DateTimeTZRange(
@@ -765,6 +753,14 @@ and :class:`~django.db.models.DateTimeField`. For example::
     ...     timezone.now() + datetime.timedelta(hours=1),
     ... )
     <QuerySet [<Event: Soft play>]>
+
+.. versionchanged:: 3.1
+
+    Support for :class:`~django.db.models.SmallAutoField`,
+    :class:`~django.db.models.AutoField`,
+    :class:`~django.db.models.BigAutoField`,
+    :class:`~django.db.models.SmallIntegerField`, and
+    :class:`~django.db.models.DecimalField` was added.
 
 .. fieldlookup:: rangefield.overlap
 
@@ -880,8 +876,64 @@ Returned objects are empty ranges. Can be chained to valid lookups for a
     >>> Event.objects.filter(ages__isempty=True)
     <QuerySet []>
 
+.. fieldlookup:: rangefield.lower_inc
+
+``lower_inc``
+^^^^^^^^^^^^^
+
+.. versionadded:: 3.1
+
+Returns objects that have inclusive or exclusive lower bounds, depending on the
+boolean value passed. Can be chained to valid lookups for a
+:class:`~django.db.models.BooleanField`.
+
+    >>> Event.objects.filter(ages__lower_inc=True)
+    <QuerySet [<Event: Soft play>, <Event: Pub trip>]>
+
+.. fieldlookup:: rangefield.lower_inf
+
+``lower_inf``
+^^^^^^^^^^^^^
+
+.. versionadded:: 3.1
+
+Returns objects that have unbounded (infinite) or bounded lower bound,
+depending on the boolean value passed. Can be chained to valid lookups for a
+:class:`~django.db.models.BooleanField`.
+
+    >>> Event.objects.filter(ages__lower_inf=True)
+    <QuerySet []>
+
+.. fieldlookup:: rangefield.upper_inc
+
+``upper_inc``
+^^^^^^^^^^^^^
+
+.. versionadded:: 3.1
+
+Returns objects that have inclusive or exclusive upper bounds, depending on the
+boolean value passed. Can be chained to valid lookups for a
+:class:`~django.db.models.BooleanField`.
+
+    >>> Event.objects.filter(ages__upper_inc=True)
+    <QuerySet []>
+
+.. fieldlookup:: rangefield.upper_inf
+
+``upper_inf``
+^^^^^^^^^^^^^
+
+.. versionadded:: 3.1
+
+Returns objects that have unbounded (infinite) or bounded upper bound,
+depending on the boolean value passed. Can be chained to valid lookups for a
+:class:`~django.db.models.BooleanField`.
+
+    >>> Event.objects.filter(ages__upper_inf=True)
+    <QuerySet [<Event: Pub trip>]>
+
 Defining your own range types
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-----------------------------
 
 PostgreSQL allows the definition of custom range types. Django's model and form
 field implementations use base classes below, and psycopg2 provides a
@@ -916,3 +968,54 @@ types.
     .. attribute:: range_type
 
         The psycopg2 range type to use.
+
+Range operators
+---------------
+
+.. versionadded:: 3.0
+
+.. class:: RangeOperators
+
+PostgreSQL provides a set of SQL operators that can be used together with the
+range data types (see `the PostgreSQL documentation for the full details of
+range operators <https://www.postgresql.org/docs/current/
+functions-range.html#RANGE-OPERATORS-TABLE>`_). This class is meant as a
+convenient method to avoid typos. The operator names overlap with the names of
+corresponding lookups.
+
+.. code-block:: python
+
+    class RangeOperators:
+        EQUAL = '='
+        NOT_EQUAL = '<>'
+        CONTAINS = '@>'
+        CONTAINED_BY = '<@'
+        OVERLAPS = '&&'
+        FULLY_LT = '<<'
+        FULLY_GT = '>>'
+        NOT_LT = '&>'
+        NOT_GT = '&<'
+        ADJACENT_TO = '-|-'
+
+RangeBoundary() expressions
+---------------------------
+
+.. versionadded:: 3.0
+
+.. class:: RangeBoundary(inclusive_lower=True, inclusive_upper=False)
+
+    .. attribute:: inclusive_lower
+
+        If ``True`` (default), the lower bound is inclusive ``'['``, otherwise
+        it's exclusive ``'('``.
+
+    .. attribute:: inclusive_upper
+
+        If ``False`` (default), the upper bound is exclusive ``')'``, otherwise
+        it's inclusive ``']'``.
+
+A ``RangeBoundary()`` expression represents the range boundaries. It can be
+used with a custom range functions that expected boundaries, for example to
+define :class:`~django.contrib.postgres.constraints.ExclusionConstraint`. See
+`the PostgreSQL documentation for the full details <https://www.postgresql.org/
+docs/current/rangetypes.html#RANGETYPES-INCLUSIVITY>`_.

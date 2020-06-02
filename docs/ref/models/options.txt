@@ -38,8 +38,8 @@ Available ``Meta`` options
 
 .. attribute:: Options.base_manager_name
 
-    The name of the manager to use for the model's
-    :attr:`~django.db.models.Model._base_manager`.
+    The attribute name of the manager, for example, ``'objects'``, to use for
+    the model's :attr:`~django.db.models.Model._base_manager`.
 
 ``db_table``
 ------------
@@ -72,7 +72,7 @@ If your database table name is an SQL reserved word, or contains characters that
 aren't allowed in Python variable names -- notably, the hyphen -- that's OK.
 Django quotes column and table names behind the scenes.
 
-.. admonition:: Use lowercase table names for MySQL
+.. admonition:: Use lowercase table names for MariaDB and MySQL
 
     It is strongly advised that you use lowercase table names when you override
     the table name via ``db_table``, particularly if you are using the MySQL
@@ -284,10 +284,6 @@ Django quotes column and table names behind the scenes.
 
         ordering = [F('author').asc(nulls_last=True)]
 
-    Default ordering also affects :ref:`aggregation queries
-    <aggregation-ordering-interaction>` but this won't be the case starting
-    in Django 3.1.
-
 .. warning::
 
     Ordering is not a free operation. Each field you add to the ordering
@@ -309,7 +305,7 @@ Django quotes column and table names behind the scenes.
     Add, change, delete, and view permissions are automatically created for each
     model. This example specifies an extra permission, ``can_deliver_pizzas``::
 
-        permissions = (("can_deliver_pizzas", "Can deliver pizzas"),)
+        permissions = [('can_deliver_pizzas', 'Can deliver pizzas')]
 
     This is a list or tuple of 2-tuples in the format ``(permission_code,
     human_readable_permission_name)``.
@@ -408,17 +404,17 @@ Django quotes column and table names behind the scenes.
 
     Sets of field names that, taken together, must be unique::
 
-        unique_together = (("driver", "restaurant"),)
+        unique_together = [['driver', 'restaurant']]
 
-    This is a tuple of tuples that must be unique when considered together.
+    This is a list of lists that must be unique when considered together.
     It's used in the Django admin and is enforced at the database level (i.e., the
     appropriate ``UNIQUE`` statements are included in the ``CREATE TABLE``
     statement).
 
-    For convenience, unique_together can be a single tuple when dealing with a single
-    set of fields::
+    For convenience, ``unique_together`` can be a single list when dealing with
+    a single set of fields::
 
-        unique_together = ("driver", "restaurant")
+        unique_together = ['driver', 'restaurant']
 
     A :class:`~django.db.models.ManyToManyField` cannot be included in
     unique_together. (It's not clear what that would even mean!) If you
@@ -458,8 +454,6 @@ Django quotes column and table names behind the scenes.
 ---------------
 
 .. attribute:: Options.constraints
-
-    .. versionadded:: 2.2
 
     A list of :doc:`constraints </ref/models/constraints>` that you want to
     define on the model::

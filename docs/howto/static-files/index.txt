@@ -52,7 +52,7 @@ you can define a list of directories (:setting:`STATICFILES_DIRS`) in your
 settings file where Django will also look for static files. For example::
 
     STATICFILES_DIRS = [
-        os.path.join(BASE_DIR, "static"),
+        BASE_DIR / "static",
         '/var/www/static/',
     ]
 
@@ -67,9 +67,12 @@ details on how ``staticfiles`` finds your files.
     first static file it finds whose name matches, and if you had a static file
     with the same name in a *different* application, Django would be unable to
     distinguish between them. We need to be able to point Django at the right
-    one, and the easiest way to ensure this is by *namespacing* them. That is,
+    one, and the best way to ensure this is by *namespacing* them. That is,
     by putting those static files inside *another* directory named for the
     application itself.
+
+    You can namespace static assets in :setting:`STATICFILES_DIRS` by
+    specifying :ref:`prefixes <staticfiles-dirs-prefixes>`.
 
 .. _serving-static-files-in-development:
 

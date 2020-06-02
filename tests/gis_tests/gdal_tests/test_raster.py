@@ -156,6 +156,11 @@ class GDALRasterTests(SimpleTestCase):
         else:
             self.assertEqual(restored_raster.bands[0].data(), self.rs.bands[0].data())
 
+    def test_nonexistent_file(self):
+        msg = 'Unable to read raster source input "nonexistent.tif".'
+        with self.assertRaisesMessage(GDALException, msg):
+            GDALRaster('nonexistent.tif')
+
     def test_vsi_raster_creation(self):
         # Open a raster as a file object.
         with open(self.rs_path, 'rb') as dat:
@@ -274,7 +279,7 @@ class GDALRasterTests(SimpleTestCase):
         result = rast.bands[0].data()
         if numpy:
             result = result.flatten().tolist()
-        # Band data is equal to zero becaues no nodata value has been specified.
+        # Band data is equal to zero because no nodata value has been specified.
         self.assertEqual(result, [0] * 4)
 
     def test_raster_metadata_property(self):
@@ -319,7 +324,7 @@ class GDALRasterTests(SimpleTestCase):
             return
         gdalinfo = """
         Driver: GTiff/GeoTIFF
-        Files: {0}
+        Files: {}
         Size is 163, 174
         Coordinate System is:
         PROJCS["NAD83 / Florida GDL Albers",

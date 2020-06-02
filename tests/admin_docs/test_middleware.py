@@ -1,4 +1,5 @@
 from django.contrib.auth.models import User
+from django.test import override_settings
 
 from .tests import AdminDocsTestCase, TestDataMixin
 
@@ -45,3 +46,13 @@ class XViewMiddlewareTest(TestDataMixin, AdminDocsTestCase):
         self.client.force_login(self.superuser)
         response = self.client.head('/xview/callable_object/')
         self.assertEqual(response['X-View'], 'admin_docs.views.XViewCallableObject')
+
+    @override_settings(MIDDLEWARE=[])
+    def test_no_auth_middleware(self):
+        msg = (
+            "The XView middleware requires authentication middleware to be "
+            "installed. Edit your MIDDLEWARE setting to insert "
+            "'django.contrib.auth.middleware.AuthenticationMiddleware'."
+        )
+        with self.assertRaisesMessage(AssertionError, msg):
+            self.client.head('/xview/func/')

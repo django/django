@@ -466,7 +466,7 @@ class XFrameOptionsDecoratorsTests(TestCase):
 
         # Since the real purpose of the exempt decorator is to suppress
         # the middleware's functionality, let's make sure it actually works...
-        r = XFrameOptionsMiddleware().process_response(req, resp)
+        r = XFrameOptionsMiddleware(a_view)(req)
         self.assertIsNone(r.get('X-Frame-Options', None))
 
 
@@ -478,5 +478,5 @@ class NeverCacheDecoratorTest(TestCase):
         r = a_view(HttpRequest())
         self.assertEqual(
             set(r['Cache-Control'].split(', ')),
-            {'max-age=0', 'no-cache', 'no-store', 'must-revalidate'},
+            {'max-age=0', 'no-cache', 'no-store', 'must-revalidate', 'private'},
         )

@@ -22,7 +22,7 @@ to raster (image) data.
     capabilities of OGR and GDAL's raster features at this time.
 
 __ https://www.gdal.org/
-__ https://www.gdal.org/ogr_arch.html
+__ https://gdal.org/user/vector_data_model.html
 
 Overview
 ========
@@ -36,7 +36,7 @@ The GDAL/OGR tools described here are designed to help you read in
 your geospatial data, in order for most of them to be useful you have
 to have some data to work with.  If you're starting out and don't yet
 have any data of your own to use, GeoDjango tests contain a number of
-simple data sets that you can use for testing. You can download them here::
+data sets that you can use for testing. You can download them here::
 
     $ wget https://raw.githubusercontent.com/django/django/master/tests/gis_tests/data/cities/cities.{shp,prj,shx,dbf}
     $ wget https://raw.githubusercontent.com/django/django/master/tests/gis_tests/data/rasters/raster.tif
@@ -49,7 +49,7 @@ Vector Data Source Objects
 
 :class:`DataSource` is a wrapper for the OGR data source object that
 supports reading data from a variety of OGR-supported geospatial file
-formats and data sources using a simple, consistent interface.  Each
+formats and data sources using a consistent interface.  Each
 data source is represented by a :class:`DataSource` object which contains
 one or more layers of data.  Each layer, represented by a :class:`Layer`
 object, contains some number of geographic features (:class:`Feature`),
@@ -92,7 +92,7 @@ each feature in that layer.
 
     Returns the name of the data source.
 
-__ https://www.gdal.org/ogr_formats.html
+__ https://gdal.org/drivers/vector/
 
 ``Layer``
 ---------
@@ -446,7 +446,7 @@ coordinate transformation::
     :class:`Feature.geom` attribute, when reading vector data from
     :class:`Layer` (which is in turn a part of a :class:`DataSource`).
 
-    __ https://www.gdal.org/classOGRGeometry.html
+    __ https://gdal.org/api/ogrgeometry_cpp.html#ogrgeometry-class
 
     .. classmethod:: from_gml(gml_string)
 
@@ -1085,7 +1085,7 @@ Raster Data Objects
 
 :class:`GDALRaster` is a wrapper for the GDAL raster source object that
 supports reading data from a variety of GDAL-supported geospatial file
-formats and data sources using a simple, consistent interface.  Each
+formats and data sources using a consistent interface.  Each
 data source is represented by a :class:`GDALRaster` object which contains
 one or more layers of data named bands.  Each band, represented by a
 :class:`GDALBand` object, contains georeferenced image data. For example, an RGB
@@ -1172,11 +1172,11 @@ blue.
 
         The name of the GDAL driver used to handle the input file. For ``GDALRaster``\s created
         from a file, the driver type is detected automatically. The creation of rasters from
-        scratch is a in-memory raster by default (``'MEM'``), but can be altered as
-        needed. For instance, use ``GTiff`` for a ``GeoTiff`` file. For a list of file types,
-        see also the `GDAL Raster Formats`__ list.
+        scratch is an in-memory raster by default (``'MEM'``), but can be
+        altered as needed. For instance, use ``GTiff`` for a ``GeoTiff`` file.
+        For a list of file types, see also the `GDAL Raster Formats`__ list.
 
-        __ https://www.gdal.org/formats_list.html
+        __ https://gdal.org/drivers/raster/
 
         An in-memory raster is created through the following example:
 
@@ -1271,9 +1271,9 @@ blue.
 
     .. attribute:: scale
 
-        Pixel width and height used for georeferencing the raster, as a as a
-        point object with ``x`` and ``y``  members. See :attr:`geotransform`
-        for more information.
+        Pixel width and height used for georeferencing the raster, as a point
+        object with ``x`` and ``y``  members. See :attr:`geotransform` for more
+        information.
 
             >>> rst = GDALRaster({'width': 10, 'height': 20, 'srid': 4326})
             >>> rst.scale
@@ -1403,7 +1403,7 @@ blue.
         Returns a string with a summary of the raster. This is equivalent to
         the `gdalinfo`__ command line utility.
 
-        __ https://www.gdal.org/gdalinfo.html
+        __ https://gdal.org/programs/gdalinfo.html
 
     .. attribute:: metadata
 
@@ -1629,7 +1629,7 @@ Examples of using the different keys when creating rasters can be found in the
 documentation of the corresponding attributes and methods of the
 :class:`GDALRaster` and :class:`GDALBand` classes.
 
-__ http://geojson.org
+__ https://geojson.org
 
 The ``ds_input`` dictionary
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1732,7 +1732,7 @@ Key               Default  Usage
         ...    }
         ... })
 
-__ https://www.gdal.org/frmt_gtiff.html
+__ https://gdal.org/drivers/raster/gtiff.html
 
 The ``band_input`` dictionary
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

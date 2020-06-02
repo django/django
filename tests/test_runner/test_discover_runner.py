@@ -1,12 +1,13 @@
 import os
 from argparse import ArgumentParser
 from contextlib import contextmanager
-from unittest import TestSuite, TextTestRunner, defaultTestLoader
+from unittest import TestSuite, TextTestRunner, defaultTestLoader, skipUnless
 
 from django.db import connections
 from django.test import SimpleTestCase
 from django.test.runner import DiscoverRunner
-from django.test.utils import captured_stdout
+from django.test.utils import captured_stderr, captured_stdout
+from django.utils.version import PY37
 
 
 @contextmanager
@@ -22,6 +23,13 @@ def change_cwd(directory):
 
 
 class DiscoverRunnerTests(SimpleTestCase):
+
+    @staticmethod
+    def get_test_methods_names(suite):
+        return [
+            t.__class__.__name__ + '.' + t._testMethodName
+            for t in suite._tests
+        ]
 
     def test_init_debug_mode(self):
         runner = DiscoverRunner()
@@ -70,6 +78,34 @@ class DiscoverRunnerTests(SimpleTestCase):
         ).build_suite(['test_runner_apps.sample']).countTestCases()
 
         self.assertEqual(count, 1)
+
+    @skipUnless(PY37, 'unittest -k option requires Python 3.7 and later')
+    def test_name_patterns(self):
+        all_test_1 = [
+            'DjangoCase1.test_1', 'DjangoCase2.test_1',
+            'SimpleCase1.test_1', 'SimpleCase2.test_1',
+            'UnittestCase1.test_1', 'UnittestCase2.test_1',
+        ]
+        all_test_2 = [
+            'DjangoCase1.test_2', 'DjangoCase2.test_2',
+            'SimpleCase1.test_2', 'SimpleCase2.test_2',
+            'UnittestCase1.test_2', 'UnittestCase2.test_2',
+        ]
+        all_tests = sorted([*all_test_1, *all_test_2, 'UnittestCase2.test_3_test'])
+        for pattern, expected in [
+            [['test_1'], all_test_1],
+            [['UnittestCase1'], ['UnittestCase1.test_1', 'UnittestCase1.test_2']],
+            [['*test'], ['UnittestCase2.test_3_test']],
+            [['test*'], all_tests],
+            [['test'], all_tests],
+            [['test_1', 'test_2'], sorted([*all_test_1, *all_test_2])],
+            [['test*1'], all_test_1],
+        ]:
+            with self.subTest(pattern):
+                suite = DiscoverRunner(
+                    test_name_patterns=pattern
+                ).build_suite(['test_runner_apps.simple'])
+                self.assertEqual(expected, self.get_test_methods_names(suite))
 
     def test_file_path(self):
         with change_cwd(".."):
@@ -170,7 +206,7 @@ class DiscoverRunnerTests(SimpleTestCase):
                       msg="Methods of Django cases should be reversed.")
         self.assertIn('test_2', suite[4].id(),
                       msg="Methods of simple cases should be reversed.")
-        self.assertIn('test_2', suite[8].id(),
+        self.assertIn('test_2', suite[9].id(),
                       msg="Methods of unittest cases should be reversed.")
 
     def test_overridable_get_test_runner_kwargs(self):
@@ -225,6 +261,42 @@ class DiscoverRunnerTests(SimpleTestCase):
             runner.build_suite(['test_runner_apps.tagged.tests'])
             self.assertIn('Excluding test tag(s): bar, foo.\n', stdout.getvalue())
 
+    def test_pdb_with_parallel(self):
+        msg = (
+            'You cannot use --pdb with parallel tests; pass --parallel=1 to '
+            'use it.'
+        )
+        with self.assertRaisesMessage(ValueError, msg):
+            DiscoverRunner(pdb=True, parallel=2)
+
+    def test_buffer_with_parallel(self):
+        msg = (
+            'You cannot use -b/--buffer with parallel tests; pass '
+            '--parallel=1 to use it.'
+        )
+        with self.assertRaisesMessage(ValueError, msg):
+            DiscoverRunner(buffer=True, parallel=2)
+
+    def test_buffer_mode_test_pass(self):
+        runner = DiscoverRunner(buffer=True, verbose=0)
+        with captured_stdout() as stdout, captured_stderr() as stderr:
+            suite = runner.build_suite([
+                'test_runner_apps.buffer.tests_buffer.WriteToStdoutStderrTestCase.test_pass',
+            ])
+            runner.run_suite(suite)
+        self.assertNotIn('Write to stderr.', stderr.getvalue())
+        self.assertNotIn('Write to stdout.', stdout.getvalue())
+
+    def test_buffer_mode_test_fail(self):
+        runner = DiscoverRunner(buffer=True, verbose=0)
+        with captured_stdout() as stdout, captured_stderr() as stderr:
+            suite = runner.build_suite([
+                'test_runner_apps.buffer.tests_buffer.WriteToStdoutStderrTestCase.test_fail',
+            ])
+            runner.run_suite(suite)
+        self.assertIn('Write to stderr.', stderr.getvalue())
+        self.assertIn('Write to stdout.', stdout.getvalue())
+
 
 class DiscoverRunnerGetDatabasesTests(SimpleTestCase):
     runner = DiscoverRunner(verbosity=2)
@@ -235,6 +307,15 @@ class DiscoverRunnerGetDatabasesTests(SimpleTestCase):
         with captured_stdout() as stdout:
             databases = self.runner.get_databases(suite)
         return databases, stdout.getvalue()
+
+    def assertSkippedDatabases(self, test_labels, expected_databases):
+        databases, output = self.get_databases(test_labels)
+        self.assertEqual(databases, expected_databases)
+        skipped_databases = set(connections) - expected_databases
+        if skipped_databases:
+            self.assertIn(self.skip_msg + ', '.join(sorted(skipped_databases)), output)
+        else:
+            self.assertNotIn(self.skip_msg, output)
 
     def test_mixed(self):
         databases, output = self.get_databases(['test_runner_apps.databases.tests'])
@@ -247,24 +328,22 @@ class DiscoverRunnerGetDatabasesTests(SimpleTestCase):
         self.assertNotIn(self.skip_msg, output)
 
     def test_default_and_other(self):
-        databases, output = self.get_databases([
+        self.assertSkippedDatabases([
             'test_runner_apps.databases.tests.DefaultDatabaseTests',
             'test_runner_apps.databases.tests.OtherDatabaseTests',
-        ])
-        self.assertEqual(databases, set(connections))
-        self.assertNotIn(self.skip_msg, output)
+        ], {'default', 'other'})
 
     def test_default_only(self):
-        databases, output = self.get_databases(['test_runner_apps.databases.tests.DefaultDatabaseTests'])
-        self.assertEqual(databases, {'default'})
-        self.assertIn(self.skip_msg + 'other', output)
+        self.assertSkippedDatabases([
+            'test_runner_apps.databases.tests.DefaultDatabaseTests',
+        ], {'default'})
 
     def test_other_only(self):
-        databases, output = self.get_databases(['test_runner_apps.databases.tests.OtherDatabaseTests'])
-        self.assertEqual(databases, {'other'})
-        self.assertIn(self.skip_msg + 'default', output)
+        self.assertSkippedDatabases([
+            'test_runner_apps.databases.tests.OtherDatabaseTests'
+        ], {'other'})
 
     def test_no_databases_required(self):
-        databases, output = self.get_databases(['test_runner_apps.databases.tests.NoDatabaseTests'])
-        self.assertEqual(databases, set())
-        self.assertIn(self.skip_msg + 'default, other', output)
+        self.assertSkippedDatabases([
+            'test_runner_apps.databases.tests.NoDatabaseTests'
+        ], set())
