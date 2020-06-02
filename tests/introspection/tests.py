@@ -80,15 +80,12 @@ class IntrospectionTests(TransactionTestCase):
         self.assertEqual(
             [connection.introspection.get_field_type(r[1], r) for r in desc],
             [
-                connection.features.introspected_field_types['AutoField'],
-                'CharField',
-                'CharField',
-                'CharField',
-                connection.features.introspected_field_types['BigIntegerField'],
-                connection.features.introspected_field_types['BinaryField'],
-                connection.features.introspected_field_types['SmallIntegerField'],
-                connection.features.introspected_field_types['DurationField'],
-            ]
+                connection.features.introspected_field_types[field] for field in (
+                    'AutoField', 'CharField', 'CharField', 'CharField',
+                    'BigIntegerField', 'BinaryField', 'SmallIntegerField',
+                    'DurationField',
+                )
+            ],
         )
 
     def test_get_table_description_col_lengths(self):
