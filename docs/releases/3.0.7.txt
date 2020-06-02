@@ -30,3 +30,6 @@ Bugfixes
   providing translations for territorial language variants as well as a generic
   language, where the project has different plural equations for the language
   (:ticket:`31570`).
+
+* Tracking a jQuery security release, upgraded the version of jQuery used by
+  the admin from 3.4.1 to 3.5.1.
