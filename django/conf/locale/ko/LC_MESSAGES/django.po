@@ -19,6 +19,8 @@
 # Noh Seho <iam@sehonoh.kr>, 2018
 # Subin Choi <os1742@gmail.com>, 2016
 # Taesik Yoon <xotlr43@gmail.com>, 2015
+# YoungJae An <ayj412@naver.com>, 2020
+
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
@@ -343,11 +345,13 @@ msgstr "올바른 이메일 주소를 입력하세요."
 msgid ""
 "Enter a valid “slug” consisting of letters, numbers, underscores or hyphens."
 msgstr ""
+"문자, 숫자, 밑줄 또는 하이픈으로 구성된 유효한 '슬러그'를 입력하십시오."
 
 msgid ""
 "Enter a valid “slug” consisting of Unicode letters, numbers, underscores, or "
 "hyphens."
 msgstr ""
+"유니코드 문자, 숫자, 밑줄 또는 하이픈으로 구성된 유효한 '슬러그'를 입력하십시오."
 
 msgid "Enter a valid IPv4 address."
 msgstr "올바른 IPv4 주소를 입력하세요."
@@ -422,6 +426,8 @@ msgid ""
 "File extension “%(extension)s” is not allowed. Allowed extensions are: "
 "%(allowed_extensions)s."
 msgstr ""
+"파일 확장자 “%(extension)s”는 허용되지 않습니다. 허용되는 확장자: "
+"%(allowed_extensions)s."
 
 msgid "Null characters are not allowed."
 msgstr "null 문자는 사용할 수 없습니다. "
@@ -462,11 +468,11 @@ msgstr "%(field_type)s 형식 필드"
 
 #, python-format
 msgid "“%(value)s” value must be either True or False."
-msgstr ""
+msgstr "“%(value)s” 값은 반드시 True 혹은 False이어야 합니다."
 
 #, python-format
 msgid "“%(value)s” value must be either True, False, or None."
-msgstr ""
+msgstr "“%(value)s” 값은 반드시 True, False, 혹은 None이어야 합니다."
 
 msgid "Boolean (Either True or False)"
 msgstr "boolean(참 또는 거짓)"
@@ -483,12 +489,14 @@ msgid ""
 "“%(value)s” value has an invalid date format. It must be in YYYY-MM-DD "
 "format."
 msgstr ""
+"“%(value)s” 값은 유효하지 않은 데이터 형식입니다. 반드시 YYYY-MM-DD 형식이어야 합니다."
 
 #, python-format
 msgid ""
 "“%(value)s” value has the correct format (YYYY-MM-DD) but it is an invalid "
 "date."
 msgstr ""
+"“%(value)s” 값은 올바른 (YYYY-MM-DD)형식이지만, 유효하지 않은 날짜입니다."
 
 msgid "Date (without time)"
 msgstr "날짜(시간 제외)"
@@ -498,19 +506,23 @@ msgid ""
 "“%(value)s” value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[."
 "uuuuuu]][TZ] format."
 msgstr ""
+"“%(value)s” 값은 유효하지 않은 형식입니다. 반드시 YYYY-MM-DD HH:MM[:ss[."
+"uuuuuu]][TZ] 형식이어야 합니다."
 
 #, python-format
 msgid ""
 "“%(value)s” value has the correct format (YYYY-MM-DD HH:MM[:ss[.uuuuuu]]"
 "[TZ]) but it is an invalid date/time."
 msgstr ""
+"“%(value)s” 값은 올바른 (YYYY-MM-DD HH:MM[:ss[.uuuuuu]]"
+"[TZ]형식이지만, 유효하지 않은 날짜/시간입니다."
 
 msgid "Date (with time)"
 msgstr "날짜(시간 포함)"
 
 #, python-format
 msgid "“%(value)s” value must be a decimal number."
-msgstr ""
+msgstr "“%(value)s” 값은 반드시 10진수이어야 합니다."
 
 msgid "Decimal number"
 msgstr "10진수"
@@ -520,6 +532,8 @@ msgid ""
 "“%(value)s” value has an invalid format. It must be in [DD] [[HH:]MM:]ss[."
 "uuuuuu] format."
 msgstr ""
+"“%(value)s” 값은 유효하지 않은 형식입니다. 반드시 [DD] [[HH:]MM:]ss[."
+"uuuuuu] 형식이어야 합니다."
 
 msgid "Duration"
 msgstr "지속시간"
@@ -606,7 +620,7 @@ msgid "“%(value)s” is not a valid UUID."
 msgstr "\"%(value)s\"은 유효하지 않은 UUID입니다."
 
 msgid "Universally unique identifier"
-msgstr ""
+msgstr "범용 고유 식별자"
 
 msgid "File"
 msgstr "파일"
@@ -756,13 +770,15 @@ msgstr "올바르게 선택해 주세요. 선택하신 것이 선택가능항목
 
 #, python-format
 msgid "“%(pk)s” is not a valid value."
-msgstr ""
+msgstr "“%(pk)s”은/는 유효하지 않은 값입니다."
 
 #, python-format
 msgid ""
 "%(datetime)s couldn’t be interpreted in time zone %(current_timezone)s; it "
 "may be ambiguous or it may not exist."
 msgstr ""
+"%(datetime)s은/는 %(current_timezone)s으로 해석될 수 없습니다."
+"이는 모호한 값이거나 존재하지 않습니다."
 
 msgid "Clear"
 msgstr "취소"
@@ -783,13 +799,13 @@ msgid "No"
 msgstr "아니오"
 
 msgid "Year"
-msgstr ""
+msgstr "연도"
 
 msgid "Month"
-msgstr ""
+msgstr "달"
 
 msgid "Day"
-msgstr ""
+msgstr "일"
 
 msgid "yes,no,maybe"
 msgstr "예,아니오,아마도"
@@ -1190,7 +1206,7 @@ msgstr "디렉토리 인덱스는 이곳에 사용할 수 없습니다."
 
 #, python-format
 msgid "“%(path)s” does not exist"
-msgstr ""
+msgstr "“%(path)s”은/는 존재하지 않습니다."
 
 #, python-format
 msgid "Index of %(directory)s"
