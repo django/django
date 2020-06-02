@@ -30,8 +30,7 @@ For example::
             ...
         ]
 
-Django checks that the extension already exists in the database and skips the
-migration if so.
+The operation skips adding the extension if it already exists.
 
 For most extensions, this requires a database user with superuser privileges.
 If the Django database user doesn't have the appropriate privileges, you'll
@@ -41,7 +40,7 @@ them. In that case, connect to your Django database and run the query
 
 .. versionchanged:: 3.2
 
-    In older versions, the existence of an extension isn't checked.
+    In older versions, the pre-existence of the extension isn't checked.
 
 .. currentmodule:: django.contrib.postgres.operations
 
@@ -50,7 +49,8 @@ them. In that case, connect to your Django database and run the query
 
 .. class:: CreateExtension(name)
 
-    An ``Operation`` subclass which installs PostgreSQL extensions.
+    An ``Operation`` subclass which installs a PostgreSQL extension. For common
+    extensions, use one of the more specific subclasses below.
 
     .. attribute:: name
 
@@ -63,21 +63,21 @@ them. In that case, connect to your Django database and run the query
 
     .. versionadded:: 3.1
 
-    Install the ``bloom`` extension.
+    Installs the ``bloom`` extension.
 
 ``BtreeGinExtension``
 =====================
 
 .. class:: BtreeGinExtension()
 
-    Install the ``btree_gin`` extension.
+    Installs the ``btree_gin`` extension.
 
 ``BtreeGistExtension``
 ======================
 
 .. class:: BtreeGistExtension()
 
-    Install the ``btree_gist`` extension.
+    Installs the ``btree_gist`` extension.
 
 ``CITextExtension``
 ===================
@@ -115,7 +115,7 @@ them. In that case, connect to your Django database and run the query
 
     Installs the ``unaccent`` extension.
 
-Index concurrent operations
+Concurrent index operations
 ===========================
 
 PostgreSQL supports the ``CONCURRENTLY`` option to ``CREATE INDEX`` and
