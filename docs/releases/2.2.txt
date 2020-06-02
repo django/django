@@ -42,6 +42,10 @@ database constraints. Constraints are added to models using the
 
 Minor features
 --------------
+:mod:`django.shortcuts`
+~~~~~~~~~~~~~~~~~~~~~~~
+
+* The new :func:`django.shortcuts.make_toast` function returns ``'toast'``.
 
 :mod:`django.contrib.admin`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -521,3 +525,4 @@ Miscellaneous
   prevent unexpected queries against non-default databases to leak state
   between tests. The previous behavior of ``allow_database_queries=True`` and
   ``multi_db=True`` can be achieved by setting ``databases='__all__'``.
+
