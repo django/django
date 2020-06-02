@@ -14,6 +14,8 @@ The steps in this guide have been tested with Windows 10. In other
 versions, the steps would be similar. You will need to be familiar with using
 the Windows command prompt.
 
+.. _install_python_windows:
+
 Install Python
 ==============
 
