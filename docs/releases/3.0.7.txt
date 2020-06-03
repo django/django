@@ -2,7 +2,7 @@
 Django 3.0.7 release notes
 ==========================
 
-*Expected June 3, 2020*
+*June 3, 2020*
 
 Django 3.0.7 fixes two security issues and several bugs in 3.0.6.
 
