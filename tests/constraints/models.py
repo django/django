@@ -88,6 +88,7 @@ class UniqueConstraintInclude(models.Model):
     class Meta:
         required_db_features = {
             'supports_table_check_constraints',
+            'supports_covering_indexes',
         }
         constraints = [
             models.UniqueConstraint(

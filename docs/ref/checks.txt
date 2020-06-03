@@ -360,6 +360,10 @@ Models
 * **models.W037**: ``<database>`` does not support indexes with conditions.
 * **models.W038**: ``<database>`` does not support deferrable unique
   constraints.
+* **models.W039**: ``<database>`` does not support unique constraints with
+  non-key columns.
+* **models.W040**: ``<database>`` does not support indexes with non-key
+  columns.
 
 Security
 --------

@@ -375,6 +375,51 @@ class IndexesTests(TestCase):
 
         self.assertEqual(Model.check(databases=self.databases), [])
 
+    def test_index_with_include(self):
+        class Model(models.Model):
+            age = models.IntegerField()
+
+            class Meta:
+                indexes = [
+                    models.Index(
+                        fields=['age'],
+                        name='index_age_include_id',
+                        include=['id'],
+                    ),
+                ]
+
+        errors = Model.check(databases=self.databases)
+        expected = [] if connection.features.supports_covering_indexes else [
+            Warning(
+                '%s does not support indexes with non-key columns.'
+                % connection.display_name,
+                hint=(
+                    "Non-key columns will be ignored. Silence this warning if "
+                    "you don't care about it."
+                ),
+                obj=Model,
+                id='models.W040',
+            )
+        ]
+        self.assertEqual(errors, expected)
+
+    def test_index_with_include_required_db_features(self):
+        class Model(models.Model):
+            age = models.IntegerField()
+
+            class Meta:
+                required_db_features = {'supports_covering_indexes'}
+                indexes = [
+                    models.Index(
+                        fields=['age'],
+                        name='index_age_include_id',
+                        include=['id'],
+                    ),
+                ]
+
+        self.assertEqual(Model.check(databases=self.databases), [])
+
+    @skipUnlessDBFeature('supports_covering_indexes')
     def test_index_include_pointing_to_missing_field(self):
         class Model(models.Model):
             class Meta:
@@ -390,6 +435,7 @@ class IndexesTests(TestCase):
             ),
         ])
 
+    @skipUnlessDBFeature('supports_covering_indexes')
     def test_index_include_pointing_to_m2m_field(self):
         class Model(models.Model):
             m2m = models.ManyToManyField('self')
@@ -406,6 +452,7 @@ class IndexesTests(TestCase):
             ),
         ])
 
+    @skipUnlessDBFeature('supports_covering_indexes')
     def test_index_include_pointing_to_non_local_field(self):
         class Parent(models.Model):
             field1 = models.IntegerField()
@@ -428,6 +475,7 @@ class IndexesTests(TestCase):
             ),
         ])
 
+    @skipUnlessDBFeature('supports_covering_indexes')
     def test_index_include_pointing_to_fk(self):
         class Target(models.Model):
             pass
@@ -1641,6 +1689,51 @@ class ConstraintsTests(TestCase):
 
         self.assertEqual(Model.check(databases=self.databases), [])
 
+    def test_unique_constraint_with_include(self):
+        class Model(models.Model):
+            age = models.IntegerField()
+
+            class Meta:
+                constraints = [
+                    models.UniqueConstraint(
+                        fields=['age'],
+                        name='unique_age_include_id',
+                        include=['id'],
+                    ),
+                ]
+
+        errors = Model.check(databases=self.databases)
+        expected = [] if connection.features.supports_covering_indexes else [
+            Warning(
+                '%s does not support unique constraints with non-key columns.'
+                % connection.display_name,
+                hint=(
+                    "A constraint won't be created. Silence this warning if "
+                    "you don't care about it."
+                ),
+                obj=Model,
+                id='models.W039',
+            ),
+        ]
+        self.assertEqual(errors, expected)
+
+    def test_unique_constraint_with_include_required_db_features(self):
+        class Model(models.Model):
+            age = models.IntegerField()
+
+            class Meta:
+                required_db_features = {'supports_covering_indexes'}
+                constraints = [
+                    models.UniqueConstraint(
+                        fields=['age'],
+                        name='unique_age_include_id',
+                        include=['id'],
+                    ),
+                ]
+
+        self.assertEqual(Model.check(databases=self.databases), [])
+
+    @skipUnlessDBFeature('supports_covering_indexes')
     def test_unique_constraint_include_pointing_to_missing_field(self):
         class Model(models.Model):
             class Meta:
@@ -1661,6 +1754,7 @@ class ConstraintsTests(TestCase):
             ),
         ])
 
+    @skipUnlessDBFeature('supports_covering_indexes')
     def test_unique_constraint_include_pointing_to_m2m_field(self):
         class Model(models.Model):
             m2m = models.ManyToManyField('self')
@@ -1683,6 +1777,7 @@ class ConstraintsTests(TestCase):
             ),
         ])
 
+    @skipUnlessDBFeature('supports_covering_indexes')
     def test_unique_constraint_include_pointing_to_non_local_field(self):
         class Parent(models.Model):
             field1 = models.IntegerField()
@@ -1709,6 +1804,7 @@ class ConstraintsTests(TestCase):
             ),
         ])
 
+    @skipUnlessDBFeature('supports_covering_indexes')
     def test_unique_constraint_include_pointing_to_fk(self):
         class Target(models.Model):
             pass
