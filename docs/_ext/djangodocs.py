@@ -12,9 +12,9 @@ from sphinx import addnodes
 from sphinx.builders.html import StandaloneHTMLBuilder
 from sphinx.directives.code import CodeBlock
 from sphinx.domains.std import Cmdoption
-from sphinx.errors import ExtensionError, SphinxError
+from sphinx.errors import ExtensionError
 from sphinx.util import logging
-from sphinx.util.console import bold, red
+from sphinx.util.console import bold
 from sphinx.writers.html import HTMLTranslator
 
 logger = logging.getLogger(__name__)
@@ -378,8 +378,9 @@ def default_role_error(
     name, rawtext, text, lineno, inliner, options=None, content=None
 ):
     msg = (
-        "Default role used (`single backticks`) at line %s: %s. Did you mean "
-        "to use two backticks for ``code``, or miss an underscore for a "
-        "`link`_ ?" % (lineno, rawtext)
+        "Default role used (`single backticks`): %s. Did you mean to use two "
+        "backticks for ``code``, or miss an underscore for a `link`_ ?"
+        % rawtext
     )
-    raise SphinxError(red(msg))
+    logger.warning(msg, location=(inliner.document.current_source, lineno))
+    return [nodes.Text(text)], []
