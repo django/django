@@ -60,7 +60,7 @@ class CreateModel(ModelOperation):
         # Sanity-check that there are no duplicated field names, bases, or
         # manager names
         _check_for_duplicates('fields', (name for name, _ in self.fields))
-        _check_bases_for_duplicates(bases)
+        _check_bases_for_duplicates(self.bases)
         _check_for_duplicates('managers', (name for name, _ in self.managers))
 
     def deconstruct(self):
@@ -482,7 +482,7 @@ class AlterModelBases(ModelOperation):
     def __init__(self, name, bases):
         super().__init__(name)
         self.bases = bases
-        _check_bases_for_duplicates(bases)
+        _check_bases_for_duplicates(self.bases)
 
     def state_forwards(self, app_label, state):
         state.models[app_label, self.name].bases = self.bases

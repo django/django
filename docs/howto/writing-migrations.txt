@@ -413,15 +413,16 @@ If you want to change an unmanaged model (:attr:`managed=False
 changes to the model, since schema changes that appear in the migration that
 contains the operation to change ``Meta.managed`` may not be applied.
 
-Disconnecting a subclass from a concrete parent model
+Changing model bases
 =====================================================
 
-If you have a model ``Parent`` and a subclass ``Child`` and you want to make
-the ``Child`` model independent you need to write a custom migration. The key
-parts are ``AlterModelBases`` to tell django what the new model hierarchy is
-and ``AlterField`` to convert the implicit ``OneToOneField`` into an implicit
-``AutoField`` primary key. The ``RenameField` is useful to avoid needing to add
-the ``parent_ptr`` field explicitly to the updated ``Child`` model.
+If you want to change parent models with
+:ref:`multi-table inheritance <multi-table-inheritance>` you need to write a
+custom migration e.g. to rename a parent model, make a child model
+independent, or add more parents. Removing all relations from other models,
+will remove ``primary_key`` field from the child model also. You need to
+``AlterField`` and ``RenameField`` of needed ``parent_ptr`` as shown in the
+example.
 
 .. code-block:: python
     :caption: myapp/migrations/0002_disconnect_parent.py
