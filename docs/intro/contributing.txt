@@ -77,8 +77,7 @@ probably got the answers.
 
 .. admonition:: For Windows users
 
-    When installing Python on Windows, make sure you check the option "Add
-    python.exe to Path", so that it is always available on the command line.
+    See :ref:`install_python_windows` on Windows docs for additional guidance.
 
 Code of Conduct
 ===============
