@@ -67,7 +67,8 @@ ensures the age field is never less than 18.
 
 .. attribute:: CheckConstraint.name
 
-The name of the constraint.
+The name of the constraint. You must always specify a unique name for the
+constraint.
 
 ``UniqueConstraint``
 ====================
@@ -93,7 +94,8 @@ date.
 
 .. attribute:: UniqueConstraint.name
 
-The name of the constraint.
+The name of the constraint. You must always specify a unique name for the
+constraint.
 
 ``condition``
 -------------
