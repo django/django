@@ -677,6 +677,9 @@ Miscellaneous
 * The undocumented ``django.contrib.postgres.fields.jsonb.JsonAdapter`` class
   is removed.
 
+* The :ttag:`{% localize off %} <localize>` tag and :tfilter:`unlocalize`
+  filter no longer respect :setting:`DECIMAL_SEPARATOR` setting.
+
 .. _deprecated-features-3.1:
 
 Features deprecated in 3.1
