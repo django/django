@@ -52,7 +52,8 @@ class TestUtilsText(SimpleTestCase):
                 ['a', 'b', 'c', 'd']),
         ]
         for test, expected in testdata:
-            self.assertEqual(list(text.smart_split(test)), expected)
+            with self.subTest(value=test):
+                self.assertEqual(list(text.smart_split(test)), expected)
 
     def test_truncate_chars(self):
         truncator = text.Truncator('The quick brown fox jumped over the lazy dog.')
@@ -206,9 +207,11 @@ class TestUtilsText(SimpleTestCase):
             ('İstanbul', 'istanbul', True),
         )
         for value, output, is_unicode in items:
-            self.assertEqual(text.slugify(value, allow_unicode=is_unicode), output)
-        # interning the result may be useful, e.g. when fed to Path.
-        self.assertEqual(sys.intern(text.slugify('a')), 'a')
+            with self.subTest(value=value):
+                self.assertEqual(text.slugify(value, allow_unicode=is_unicode), output)
+        # Interning the result may be useful, e.g. when fed to Path.
+        with self.subTest('intern'):
+            self.assertEqual(sys.intern(text.slugify('a')), 'a')
 
     @ignore_warnings(category=RemovedInDjango40Warning)
     def test_unescape_entities(self):
@@ -224,8 +227,9 @@ class TestUtilsText(SimpleTestCase):
             ('foo & bar', 'foo & bar'),
         ]
         for value, output in items:
-            self.assertEqual(text.unescape_entities(value), output)
-            self.assertEqual(text.unescape_entities(lazystr(value)), output)
+            with self.subTest(value=value):
+                self.assertEqual(text.unescape_entities(value), output)
+                self.assertEqual(text.unescape_entities(lazystr(value)), output)
 
     def test_unescape_entities_deprecated(self):
         msg = (
@@ -243,8 +247,9 @@ class TestUtilsText(SimpleTestCase):
             ("'\'ab\' c'", "'ab' c"),
         ]
         for value, output in items:
-            self.assertEqual(text.unescape_string_literal(value), output)
-            self.assertEqual(text.unescape_string_literal(lazystr(value)), output)
+            with self.subTest(value=value):
+                self.assertEqual(text.unescape_string_literal(value), output)
+                self.assertEqual(text.unescape_string_literal(lazystr(value)), output)
 
     def test_get_valid_filename(self):
         filename = "^&'@{}[],$=!-#()%+~_123.txt"
