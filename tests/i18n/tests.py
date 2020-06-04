@@ -1206,6 +1206,24 @@ class FormattingTests(SimpleTestCase):
                 self.assertEqual(template2.render(context), output2)
                 self.assertEqual(template3.render(context), output3)
 
+    def test_localized_off_numbers(self):
+        """A string representation is returned for unlocalized numbers."""
+        template = Template(
+            '{% load l10n %}{% localize off %}'
+            '{{ int }}/{{ float }}/{{ decimal }}{% endlocalize %}'
+        )
+        context = Context(
+            {'int': 1455, 'float': 3.14, 'decimal': decimal.Decimal('24.1567')}
+        )
+        for use_l10n in [True, False]:
+            with self.subTest(use_l10n=use_l10n), self.settings(
+                USE_L10N=use_l10n,
+                USE_THOUSAND_SEPARATOR=True,
+                THOUSAND_SEPARATOR='°',
+                NUMBER_GROUPING=2,
+            ):
+                self.assertEqual(template.render(context), '1455/3.14/24.1567')
+
     def test_localized_as_text_as_hidden_input(self):
         """
         Tests if form input with 'as_hidden' or 'as_text' is correctly localized. Ticket #18777
