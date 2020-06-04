@@ -223,7 +223,7 @@ class AsWKT(GeoFunc):
     arity = 1
 
 
-class BoundingCircle(OracleToleranceMixin, GeoFunc):
+class BoundingCircle(OracleToleranceMixin, GeomOutputGeoFunc):
     def __init__(self, expression, num_seg=48, **extra):
         super().__init__(expression, num_seg, **extra)
 
