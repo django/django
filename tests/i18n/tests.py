@@ -1218,6 +1218,7 @@ class FormattingTests(SimpleTestCase):
         for use_l10n in [True, False]:
             with self.subTest(use_l10n=use_l10n), self.settings(
                 USE_L10N=use_l10n,
+                DECIMAL_SEPARATOR=',',
                 USE_THOUSAND_SEPARATOR=True,
                 THOUSAND_SEPARATOR='°',
                 NUMBER_GROUPING=2,
