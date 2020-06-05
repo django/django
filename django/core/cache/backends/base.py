@@ -287,6 +287,6 @@ def memcache_key_warnings(key):
         if ord(char) < 33 or ord(char) == 127:
             yield (
                 'Cache key contains characters that will cause errors if '
-                'used with memcached: %r' % key, CacheKeyWarning
+                'used with memcached: %r' % key
             )
             break

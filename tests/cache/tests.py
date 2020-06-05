@@ -637,8 +637,9 @@ class BaseCacheTests:
         cache.key_func = func
 
         try:
-            with self.assertWarnsMessage(CacheKeyWarning, expected_warning):
+            with self.assertWarns(CacheKeyWarning) as cm:
                 cache.set(key, 'value')
+            self.assertEqual(str(cm.warning), expected_warning)
         finally:
             cache.key_func = old_func
 
@@ -1276,8 +1277,9 @@ class BaseMemcachedTests(BaseCacheTests):
         key.
         """
         msg = expected_warning.replace(key, cache.make_key(key))
-        with self.assertRaisesMessage(InvalidCacheKey, msg):
+        with self.assertRaises(InvalidCacheKey) as cm:
             cache.set(key, 'value')
+        self.assertEqual(str(cm.exception), msg)
 
     def test_default_never_expiring_timeout(self):
         # Regression test for #22845
