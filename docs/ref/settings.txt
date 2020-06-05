@@ -3494,6 +3494,30 @@ setting.
 Static file finders are currently considered a private interface, and this
 interface is thus undocumented.
 
+Getting settings values from the environment
+============================================
+
+It's often the case that you want to define some settings in your app's
+running environment, *à la* `section III of the 12 Factor App`_. In
+fact, Django does this by default with two settings: ``SECRET_KEY`` and
+``DEBUG``. To facilitate this, Django offers a helper function:
+``from_env``. This function requires a single positional argument, the
+name of the environment variable to check for the setting value, and two
+optional arguments: ``default``, a default value if the environment variable is
+missing (otherwise ``ImproperlyConfigured`` is raised) and ``kind``, a
+callable that will convert the string value from the environment into an
+appropriate value in Python. It also provides a single helper value for
+``kind``, that will parse any value that could be interpreted as a
+boolean.
+
+For example::
+
+   from django.core.env_helpers import from_env, boolable
+
+   DEBUG = from_env("DJANGO_DEBUG", default=True, kind=boolable)
+
+.. _section III of the 12 Factor App: https://12factor.net/config
+
 Core Settings Topical Index
 ===========================
 

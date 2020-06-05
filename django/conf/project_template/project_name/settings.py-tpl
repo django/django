@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/{{ docs_version }}/ref/settings/
 """
 
 from pathlib import Path
+from django.core.env_helpers import from_env, boolable
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve(strict=True).parent.parent
@@ -20,10 +21,10 @@ BASE_DIR = Path(__file__).resolve(strict=True).parent.parent
 # See https://docs.djangoproject.com/en/{{ docs_version }}/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '{{ secret_key }}'
+SECRET_KEY = from_env("DJANGO_SECRET_KEY", default='{{ secret_key }}')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = from_env("DJANGO_DEBUG", kind=boolable, default=True)
 
 ALLOWED_HOSTS = []
 

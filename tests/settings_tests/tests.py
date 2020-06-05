@@ -5,6 +5,7 @@ from types import ModuleType, SimpleNamespace
 from unittest import mock
 
 from django.conf import ENVIRONMENT_VARIABLE, LazySettings, Settings, settings
+from django.core.env_helpers import from_env, boolable
 from django.core.exceptions import ImproperlyConfigured
 from django.http import HttpRequest
 from django.test import (
@@ -616,3 +617,21 @@ class MediaURLStaticURLPrefixTest(SimpleTestCase):
                             self.assertEqual(getattr(settings, setting), expected_path)
                         finally:
                             clear_script_prefix()
+
+
+class FromEnvTest(SimpleTestCase):
+    def test_boolable(self):
+        self.assertTrue(boolable("true"))
+        self.assertFalse(boolable("false"))
+        self.assertFalse(boolable("banana"))
+
+    def test_from_env__no_default(self):
+        with self.assertRaises(ImproperlyConfigured):
+            from_env("FROM_ENV__NO_DEFAULT")
+
+    def test_from_env__missing_but_default(self):
+        self.assertEqual(from_env("FROM_ENV__HAS_DEFAULT", default="default"), "default")
+
+    def test_from_env__happy_path(self):
+        os.environ.setdefault("FROM_ENV__HAPPY_PATH", "happy")
+        self.assertEqual(from_env("FROM_ENV__HAPPY_PATH"), "happy")
