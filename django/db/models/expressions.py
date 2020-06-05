@@ -383,7 +383,9 @@ class BaseExpression:
         Custom format for select clauses. For example, EXISTS expressions need
         to be wrapped in CASE WHEN on Oracle.
         """
-        return self.output_field.select_format(compiler, sql, params)
+        if hasattr(self.output_field, 'select_format'):
+            return self.output_field.select_format(compiler, sql, params)
+        return sql, params
 
     @cached_property
     def identity(self):
