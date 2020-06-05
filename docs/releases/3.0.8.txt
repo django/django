@@ -14,3 +14,7 @@ Bugfixes
 
 * Fixed a regression in Django 3.0.7 that caused a queryset crash when grouping
   by a many-to-one relationship (:ticket:`31660`).
+
+* Reallowed, following a regression in Django 3.0, non-expressions having a
+  ``filterable`` attribute to be used as the right-hand side in queryset
+  filters (:ticket:`31664`).
