@@ -366,10 +366,12 @@ class In(FieldGetDbPrepValueIterableMixin, BuiltinLookup):
             )
 
         if self.rhs_is_direct_value():
+            # Remove None from the list as NULL is never equal to anything.
             try:
                 rhs = OrderedSet(self.rhs)
+                rhs.discard(None)
             except TypeError:  # Unhashable items in self.rhs
-                rhs = self.rhs
+                rhs = [r for r in self.rhs if r is not None]
 
             if not rhs:
                 raise EmptyResultSet
