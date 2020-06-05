@@ -235,6 +235,15 @@ class Command(BaseCommand):
                         "migrations, and then re-run 'manage.py migrate' to "
                         "apply them."
                     ))
+                    for app_label, app_migrations in changes.items():
+                        self.stdout.write(self.style.WARNING(
+                            " Migrations for \'{}\':".format(app_label)
+                        ))
+                        for migration in app_migrations:
+                            for operation in migration.operations:
+                                self.stdout.write(self.style.WARNING(
+                                    "  - {}".format(operation.describe())
+                                ))
             fake = False
             fake_initial = False
         else:
