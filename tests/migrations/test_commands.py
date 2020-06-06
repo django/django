@@ -1566,8 +1566,9 @@ class MakeMigrationsTests(MigrationTestBase):
             side_effect=OperationalError('could not connect to server'),
         ):
             with self.temporary_migration_module():
-                with self.assertWarnsMessage(RuntimeWarning, msg):
+                with self.assertWarns(RuntimeWarning) as cm:
                     call_command('makemigrations', verbosity=0)
+                self.assertEqual(str(cm.warning), msg)
 
     @mock.patch('builtins.input', return_value='1')
     @mock.patch('django.db.migrations.questioner.sys.stdin', mock.MagicMock(encoding=sys.getdefaultencoding()))

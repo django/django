@@ -104,7 +104,7 @@ class Command(BaseCommand):
                 except OperationalError as error:
                     warnings.warn(
                         "Got an error checking a consistent migration history "
-                        "performed for database connection '%s': %s."
+                        "performed for database connection '%s': %s"
                         % (alias, error),
                         RuntimeWarning,
                     )
