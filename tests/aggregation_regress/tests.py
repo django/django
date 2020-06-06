@@ -374,7 +374,7 @@ class AggregationTests(TestCase):
         # Conditional aggregation of a grouped queryset.
         self.assertEqual(
             Book.objects.annotate(c=Count('authors')).values('pk').aggregate(test=Sum(
-                Case(When(c__gt=1, then=1), output_field=IntegerField())
+                Case(When(c__gt=1, then=1))
             ))['test'],
             3
         )
@@ -382,7 +382,7 @@ class AggregationTests(TestCase):
     def test_sliced_conditional_aggregate(self):
         self.assertEqual(
             Author.objects.all()[:5].aggregate(test=Sum(Case(
-                When(age__lte=35, then=1), output_field=IntegerField()
+                When(age__lte=35, then=1)
             )))['test'],
             3
         )

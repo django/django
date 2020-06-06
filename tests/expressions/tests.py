@@ -729,7 +729,7 @@ class BasicExpressionsTests(TestCase):
         self.assertEqual(qs.get().ceo_company, 'Test GmbH')
 
     def test_pickle_expression(self):
-        expr = Value(1, output_field=IntegerField())
+        expr = Value(1)
         expr.convert_value  # populate cached property
         self.assertEqual(pickle.loads(pickle.dumps(expr)), expr)
 
@@ -1545,7 +1545,7 @@ class FTimeDeltaTests(TestCase):
     def test_time_subtraction(self):
         Time.objects.create(time=datetime.time(12, 30, 15, 2345))
         queryset = Time.objects.annotate(
-            difference=F('time') - Value(datetime.time(11, 15, 0), output_field=TimeField()),
+            difference=F('time') - Value(datetime.time(11, 15, 0)),
         )
         self.assertEqual(
             queryset.get().difference,
@@ -1631,7 +1631,7 @@ class FTimeDeltaTests(TestCase):
 
     def test_date_minus_duration(self):
         more_than_4_days = Experiment.objects.filter(
-            assigned__lt=F('completed') - Value(datetime.timedelta(days=4), output_field=DurationField())
+            assigned__lt=F('completed') - Value(datetime.timedelta(days=4))
         )
         self.assertQuerysetEqual(more_than_4_days, ['e3', 'e4', 'e5'], lambda e: e.name)
 
