@@ -485,8 +485,8 @@ class AlterModelBases(ModelOperation):
         _check_bases_for_duplicates(self.bases)
 
     def state_forwards(self, app_label, state):
-        state.models[app_label, self.name].bases = self.bases
-        state.reload_model(app_label, self.name)
+        state.models[app_label, self.name_lower].bases = self.bases
+        state.reload_model(app_label, self.name_lower)
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
         pass

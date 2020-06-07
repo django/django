@@ -133,6 +133,8 @@ class MigrationAutodetector:
         self.new_model_keys = set()
         self.new_proxy_keys = set()
         self.new_unmanaged_keys = set()
+        self.old_bases = set()
+        self.new_bases = set()
         for al, mn in self.from_state.models:
             model = self.old_apps.get_model(al, mn)
             if not model._meta.managed:
@@ -142,6 +144,7 @@ class MigrationAutodetector:
                     self.old_proxy_keys.add((al, mn))
                 else:
                     self.old_model_keys.add((al, mn))
+            self.old_bases.add((al, mn, self.from_state.models[al, mn].bases))
 
         for al, mn in self.to_state.models:
             model = self.new_apps.get_model(al, mn)
@@ -155,6 +158,7 @@ class MigrationAutodetector:
                     self.new_proxy_keys.add((al, mn))
                 else:
                     self.new_model_keys.add((al, mn))
+            self.new_bases.add((al, mn, self.to_state.models[al, mn].bases))
 
         # Renames have to come first
         self.generate_renamed_models()
@@ -170,6 +174,7 @@ class MigrationAutodetector:
         self.generate_created_proxies()
         self.generate_altered_options()
         self.generate_altered_managers()
+        self.generate_altered_bases()
 
         # Create the altered indexes and store them in self.altered_indexes.
         # This avoids the same computation in generate_removed_indexes()
@@ -461,6 +466,39 @@ class MigrationAutodetector:
         except LookupError:
             pass
         return item
+
+    def generate_altered_bases(self):
+        changed_models = self.new_bases - self.old_bases
+        for app_label, model_name, changed_to_bases in sorted(changed_models):
+            to_model = self.to_state.models[app_label, model_name]
+            from_model = self.from_state.models.get((app_label, model_name))
+            if not from_model:
+                continue
+            self.add_operation(
+                app_label,
+                operations.AlterModelBases(
+                    name=to_model.name,
+                    bases=changed_to_bases
+                )
+            )
+            if changed_to_bases[0] is models.Model:
+                primary_key_field_name = [key for key, value in from_model.fields.items() if value.primary_key][0]
+                self.add_operation(
+                    app_label,
+                    operations.AlterField(
+                        model_name=to_model.name,
+                        name=primary_key_field_name,
+                        field=models.AutoField(
+                            auto_created=True,
+                            primary_key=True,
+                            serialize=False,
+                            verbose_name='ID',
+                        ),
+                    ),
+                )
+                self.add_operation(app_label, operations.RenameField(to_model.name, primary_key_field_name, 'id'))
+                self.new_field_keys.remove((app_label, model_name, 'id'))
+                self.old_field_keys.remove((app_label, model_name, primary_key_field_name))
 
     def generate_renamed_models(self):
         """

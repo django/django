@@ -412,36 +412,3 @@ If you want to change an unmanaged model (:attr:`managed=False
 ``managed=False`` and generate a migration before making other schema-related
 changes to the model, since schema changes that appear in the migration that
 contains the operation to change ``Meta.managed`` may not be applied.
-
-Changing model bases
-=====================================================
-
-If you want to change parent models with
-:ref:`multi-table inheritance <multi-table-inheritance>` you need to write a
-custom migration e.g. to rename a parent model, make a child model
-independent, or add more parents. Removing all relations from other models,
-will remove ``primary_key`` field from the child model also. You need to
-``AlterField`` and ``RenameField`` of needed ``parent_ptr`` as shown in the
-example.
-
-.. code-block:: python
-    :caption: myapp/migrations/0002_disconnect_parent.py
-
-    from django.db import migrations, models
-
-    class Migration(migrations.Migration):
-        dependencies = [('myapp', '0001_initial')]
-        operations = [
-            migrations.AlterModelBases('child', (models.Model,)),
-            migrations.AlterField(
-                model_name='child',
-                name='parent_ptr',
-                field=models.AutoField(
-                    auto_created=True,
-                    primary_key=True,
-                    serialize=False,
-                    verbose_name='ID',
-                ),
-            ),
-            migrations.RenameField('child', 'parent_ptr', 'id'),
-        ]
