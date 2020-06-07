@@ -353,6 +353,11 @@ class OrderingTests(TestCase):
             ['Article 2', 'Article 1'],
             attrgetter('headline'),
         )
+        self.assertQuerysetEqual(
+            Article.objects.filter(author__isnull=False).order_by('author__editor_id'),
+            ['Article 1', 'Article 2'],
+            attrgetter('headline'),
+        )
 
     def test_order_by_f_expression(self):
         self.assertQuerysetEqual(
