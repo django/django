@@ -2214,9 +2214,8 @@ class AutodetectorTests(TestCase):
         changes = self.get_changes([A, B, C], [A, B, ChangedC])
         self.assertNumberMigrations(changes, 'app', 1)
         self.assertOperationTypes(changes, 'app', 0, ["AlterModelBases"])
-        self.assertOperationAttributes(changes, 'app', 0, 0, name="B")
-        self.assertOperationAttributes(changes, 'app', 0, 1, name="C")
-        self.assertOperationAttributes(changes, 'app', 0, 1, bases=("app.B",))
+        self.assertOperationAttributes(changes, 'app', 0, 0, name="C")
+        self.assertOperationAttributes(changes, 'app', 0, 0, bases=("app.B",))
 
     def test_multiple_bases(self):
         """#23956 - Inheriting models doesn't move *_ptr fields into AddField operations."""
