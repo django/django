@@ -91,7 +91,7 @@ class ModelBase(type):
         # method to type.__new__() so that they're properly initialized
         # (i.e. __set_name__()).
         contributable_attrs = {}
-        for obj_name, obj in list(attrs.items()):
+        for obj_name, obj in attrs.items():
             if _has_contribute_to_class(obj):
                 contributable_attrs[obj_name] = obj
             else:
