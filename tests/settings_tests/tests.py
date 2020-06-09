@@ -5,7 +5,7 @@ from types import ModuleType, SimpleNamespace
 from unittest import mock
 
 from django.conf import ENVIRONMENT_VARIABLE, LazySettings, Settings, settings
-from django.core.env_helpers import from_env, boolable
+from django.core.env_helpers import boolable, from_env
 from django.core.exceptions import ImproperlyConfigured
 from django.http import HttpRequest
 from django.test import (
