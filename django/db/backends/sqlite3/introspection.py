@@ -330,7 +330,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         statement = sqlparse.parse(sql)[0]
         constraints = {}
         unnamed_constrains_index = 0
-        tokens = (token for token in statement.flatten() if not token.is_whitespace)
+        tokens = (token for token in statement.flatten() if not token.is_whitespace())
         # Go to columns and constraint definition
         for token in tokens:
             if token.match(sqlparse.tokens.Punctuation, '('):
