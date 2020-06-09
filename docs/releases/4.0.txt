@@ -216,7 +216,9 @@ Migrations
 Models
 ~~~~~~
 
-* ...
+* New :meth:`QuerySet.contains(obj) <.QuerySet.contains>` method returns
+  whether the queryset contains the given object. This tries to perform the
+  query in the simplest and fastest way possible.
 
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~

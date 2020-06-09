@@ -240,6 +240,12 @@ row in the results, even if it ends up only using a few columns. The
 lot of text data or for fields that might take a lot of processing to convert
 back to Python. As always, profile first, then optimize.
 
+Use ``QuerySet.contains(obj)``
+------------------------------
+
+...if you only want to find out if ``obj`` is in the queryset, rather than
+``if obj in queryset``.
+
 Use ``QuerySet.count()``
 ------------------------
 

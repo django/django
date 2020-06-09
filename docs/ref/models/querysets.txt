@@ -2516,24 +2516,11 @@ if not. This tries to perform the query in the simplest and fastest way
 possible, but it *does* execute nearly the same query as a normal
 :class:`.QuerySet` query.
 
-:meth:`~.QuerySet.exists` is useful for searches relating to both
-object membership in a :class:`.QuerySet` and to the existence of any objects in
-a :class:`.QuerySet`, particularly in the context of a large :class:`.QuerySet`.
+:meth:`~.QuerySet.exists` is useful for searches relating to the existence of
+any objects in a :class:`.QuerySet`, particularly in the context of a large
+:class:`.QuerySet`.
 
-The most efficient method of finding whether a model with a unique field
-(e.g. ``primary_key``) is a member of a :class:`.QuerySet` is::
-
-    entry = Entry.objects.get(pk=123)
-    if some_queryset.filter(pk=entry.pk).exists():
-        print("Entry contained in queryset")
-
-Which will be faster than the following which requires evaluating and iterating
-through the entire queryset::
-
-    if entry in some_queryset:
-       print("Entry contained in QuerySet")
-
-And to find whether a queryset contains any items::
+To find whether a queryset contains any items::
 
     if some_queryset.exists():
         print("There is at least one object in some_queryset")
@@ -2551,6 +2538,35 @@ that it will be at some point, then using ``some_queryset.exists()`` will do
 more overall work (one query for the existence check plus an extra one to later
 retrieve the results) than using ``bool(some_queryset)``, which retrieves the
 results and then checks if any were returned.
+
+``contains()``
+~~~~~~~~~~~~~~
+
+.. method:: contains(obj)
+
+.. versionadded:: 4.0
+
+Returns ``True`` if the :class:`.QuerySet` contains ``obj``, and ``False`` if
+not. This tries to perform the query in the simplest and fastest way possible.
+
+:meth:`contains` is useful for checking an object membership in a
+:class:`.QuerySet`, particularly in the context of a large :class:`.QuerySet`.
+
+To check whether a queryset contains a specific item::
+
+    if some_queryset.contains(obj):
+        print('Entry contained in queryset')
+
+This will be faster than the following which requires evaluating and iterating
+through the entire queryset::
+
+    if obj in some_queryset:
+        print('Entry contained in queryset')
+
+Like :meth:`exists`, if ``some_queryset`` has not yet been evaluated, but you
+know that it will be at some point, then using ``some_queryset.contains(obj)``
+will make an additional database query, generally resulting in slower overall
+performance.
 
 ``update()``
 ~~~~~~~~~~~~

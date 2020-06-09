@@ -404,6 +404,12 @@ class QuerySetSetOperationTests(TestCase):
                         msg % (operation, combinator),
                     ):
                         getattr(getattr(qs, combinator)(qs), operation)()
+            with self.assertRaisesMessage(
+                NotSupportedError,
+                msg % ('contains', combinator),
+            ):
+                obj = Number.objects.first()
+                getattr(qs, combinator)(qs).contains(obj)
 
     def test_get_with_filters_unsupported_on_combined_qs(self):
         qs = Number.objects.all()
