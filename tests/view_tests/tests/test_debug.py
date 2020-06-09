@@ -23,8 +23,8 @@ from django.utils.functional import SimpleLazyObject
 from django.utils.regex_helper import _lazy_re_compile
 from django.utils.safestring import mark_safe
 from django.views.debug import (
-    CallableSettingWrapper, ExceptionReporter, Path as DebugPath,
-    SafeExceptionReporterFilter, default_urlconf,
+    CallableSettingWrapper, ExceptionCycleWarning, ExceptionReporter,
+    Path as DebugPath, SafeExceptionReporterFilter, default_urlconf,
     get_default_exception_reporter_filter, technical_404_response,
     technical_500_response,
 )
@@ -518,7 +518,12 @@ class ExceptionReporterTests(SimpleTestCase):
 
         tb_frames = None
         tb_generator = threading.Thread(target=generate_traceback_frames, daemon=True)
-        tb_generator.start()
+        msg = (
+            "Cycle in the exception chain detected: exception 'inner' "
+            "encountered again."
+        )
+        with self.assertWarnsMessage(ExceptionCycleWarning, msg):
+            tb_generator.start()
         tb_generator.join(timeout=5)
         if tb_generator.is_alive():
             # tb_generator is a daemon that runs until the main thread/process
