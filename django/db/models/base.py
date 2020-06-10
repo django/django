@@ -271,9 +271,9 @@ class ModelBase(type):
 
                 # Add fields from abstract base class if it wasn't overridden.
                 for field in parent_fields:
-                    if (field.name not in field_names and
-                            field.name not in new_class.__dict__ and
-                            field.name not in inherited_attributes):
+                    if field.name not in chain(field_names,
+                                               new_class.__dict__,
+                                               inherited_attributes):
                         new_field = copy.deepcopy(field)
                         new_class.add_to_class(field.name, new_field)
                         # Replace parent links defined on this base by the new
