@@ -724,10 +724,7 @@ class Model(metaclass=ModelBase):
 
             for field in self._meta.fields:
                 if not field.primary_key:
-                    field_names.add(field.name)
-
-                    if field.name != field.attname:
-                        field_names.add(field.attname)
+                    field_names.update((field.name, field.attname))
 
             non_model_fields = update_fields.difference(field_names)
 
