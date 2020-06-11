@@ -364,7 +364,7 @@ msgid "Please correct the error below."
 msgstr "Παρακαλούμε διορθώστε το παρακάτω λάθος."
 
 msgid "Please correct the errors below."
-msgstr "Παρακαλοϋμε διορθώστε τα παρακάτω λάθη."
+msgstr "Παρακαλούμε διορθώστε τα παρακάτω λάθη."
 
 #, python-format
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
