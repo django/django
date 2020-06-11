@@ -77,7 +77,16 @@ class Deferrable(Enum):
 
 
 class UniqueConstraint(BaseConstraint):
-    def __init__(self, *, fields, name, condition=None, deferrable=None, include=None):
+    def __init__(
+        self,
+        *,
+        fields,
+        name,
+        condition=None,
+        deferrable=None,
+        include=None,
+        opclasses=(),
+    ):
         if not fields:
             raise ValueError('At least one field is required to define a unique constraint.')
         if not isinstance(condition, (type(None), Q)):
@@ -92,10 +101,18 @@ class UniqueConstraint(BaseConstraint):
             )
         if not isinstance(include, (type(None), list, tuple)):
             raise ValueError('UniqueConstraint.include must be a list or tuple.')
+        if not isinstance(opclasses, (list, tuple)):
+            raise ValueError('UniqueConstraint.opclasses must be a list or tuple.')
+        if opclasses and len(fields) != len(opclasses):
+            raise ValueError(
+                'UniqueConstraint.fields and UniqueConstraint.opclasses must '
+                'have the same number of elements.'
+            )
         self.fields = tuple(fields)
         self.condition = condition
         self.deferrable = deferrable
         self.include = tuple(include) if include else ()
+        self.opclasses = opclasses
         super().__init__(name)
 
     def _get_condition_sql(self, model, schema_editor):
@@ -114,6 +131,7 @@ class UniqueConstraint(BaseConstraint):
         return schema_editor._unique_sql(
             model, fields, self.name, condition=condition,
             deferrable=self.deferrable, include=include,
+            opclasses=self.opclasses,
         )
 
     def create_sql(self, model, schema_editor):
@@ -123,6 +141,7 @@ class UniqueConstraint(BaseConstraint):
         return schema_editor._create_unique_sql(
             model, fields, self.name, condition=condition,
             deferrable=self.deferrable, include=include,
+            opclasses=self.opclasses,
         )
 
     def remove_sql(self, model, schema_editor):
@@ -130,15 +149,16 @@ class UniqueConstraint(BaseConstraint):
         include = [model._meta.get_field(field_name).column for field_name in self.include]
         return schema_editor._delete_unique_sql(
             model, self.name, condition=condition, deferrable=self.deferrable,
-            include=include,
+            include=include, opclasses=self.opclasses,
         )
 
     def __repr__(self):
-        return '<%s: fields=%r name=%r%s%s%s>' % (
+        return '<%s: fields=%r name=%r%s%s%s%s>' % (
             self.__class__.__name__, self.fields, self.name,
             '' if self.condition is None else ' condition=%s' % self.condition,
             '' if self.deferrable is None else ' deferrable=%s' % self.deferrable,
             '' if not self.include else ' include=%s' % repr(self.include),
+            '' if not self.opclasses else ' opclasses=%s' % repr(self.opclasses),
         )
 
     def __eq__(self, other):
@@ -148,7 +168,8 @@ class UniqueConstraint(BaseConstraint):
                 self.fields == other.fields and
                 self.condition == other.condition and
                 self.deferrable == other.deferrable and
-                self.include == other.include
+                self.include == other.include and
+                self.opclasses == other.opclasses
             )
         return super().__eq__(other)
 
@@ -161,4 +182,6 @@ class UniqueConstraint(BaseConstraint):
             kwargs['deferrable'] = self.deferrable
         if self.include:
             kwargs['include'] = self.include
+        if self.opclasses:
+            kwargs['opclasses'] = self.opclasses
         return path, args, kwargs

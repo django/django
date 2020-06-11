@@ -73,7 +73,7 @@ constraint.
 ``UniqueConstraint``
 ====================
 
-.. class:: UniqueConstraint(*, fields, name, condition=None, deferrable=None, include=None)
+.. class:: UniqueConstraint(*, fields, name, condition=None, deferrable=None, include=None, opclasses=())
 
     Creates a unique constraint in the database.
 
@@ -168,3 +168,24 @@ while fetching data only from the index.
 ``include`` is supported only on PostgreSQL.
 
 Non-key columns have the same database restrictions as :attr:`Index.include`.
+
+
+``opclasses``
+-------------
+
+.. attribute:: UniqueConstraint.opclasses
+
+.. versionadded:: 3.2
+
+The names of the `PostgreSQL operator classes
+<https://www.postgresql.org/docs/current/indexes-opclass.html>`_ to use for
+this unique index. If you require a custom operator class, you must provide one
+for each field in the index.
+
+For example::
+
+    UniqueConstraint(name='unique_username', fields=['username'], opclasses=['varchar_pattern_ops'])
+
+creates a unique index on ``username`` using ``varchar_pattern_ops``.
+
+``opclasses`` are ignored for databases besides PostgreSQL.
