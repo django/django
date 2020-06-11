@@ -1,8 +1,11 @@
 import datetime
 from unittest import mock
 
-from django.db import IntegrityError, connection, transaction
+from django.db import (
+    IntegrityError, NotSupportedError, connection, transaction,
+)
 from django.db.models import CheckConstraint, Deferrable, F, Func, Q
+from django.test import skipUnlessDBFeature
 from django.utils import timezone
 
 from . import PostgreSQLTestCase
@@ -146,6 +149,25 @@ class ExclusionConstraintTests(PostgreSQLTestCase):
                 deferrable=Deferrable.DEFERRED,
             )
 
+    def test_invalid_include_type(self):
+        msg = 'ExclusionConstraint.include must be a list or tuple.'
+        with self.assertRaisesMessage(ValueError, msg):
+            ExclusionConstraint(
+                name='exclude_invalid_include',
+                expressions=[(F('datespan'), RangeOperators.OVERLAPS)],
+                include='invalid',
+            )
+
+    def test_invalid_include_index_type(self):
+        msg = 'Covering exclusion constraints only support GiST indexes.'
+        with self.assertRaisesMessage(ValueError, msg):
+            ExclusionConstraint(
+                name='exclude_invalid_index_type',
+                expressions=[(F('datespan'), RangeOperators.OVERLAPS)],
+                include=['cancelled'],
+                index_type='spgist',
+            )
+
     def test_repr(self):
         constraint = ExclusionConstraint(
             name='exclude_overlapping',
@@ -179,6 +201,16 @@ class ExclusionConstraintTests(PostgreSQLTestCase):
             repr(constraint),
             "<ExclusionConstraint: index_type=GIST, expressions=["
             "(F(datespan), '-|-')], deferrable=Deferrable.IMMEDIATE>",
+        )
+        constraint = ExclusionConstraint(
+            name='exclude_overlapping',
+            expressions=[(F('datespan'), RangeOperators.ADJACENT_TO)],
+            include=['cancelled', 'room'],
+        )
+        self.assertEqual(
+            repr(constraint),
+            "<ExclusionConstraint: index_type=GIST, expressions=["
+            "(F(datespan), '-|-')], include=('cancelled', 'room')>",
         )
 
     def test_eq(self):
@@ -218,6 +250,23 @@ class ExclusionConstraintTests(PostgreSQLTestCase):
             ],
             deferrable=Deferrable.IMMEDIATE,
         )
+        constraint_6 = ExclusionConstraint(
+            name='exclude_overlapping',
+            expressions=[
+                ('datespan', RangeOperators.OVERLAPS),
+                ('room', RangeOperators.EQUAL),
+            ],
+            deferrable=Deferrable.IMMEDIATE,
+            include=['cancelled'],
+        )
+        constraint_7 = ExclusionConstraint(
+            name='exclude_overlapping',
+            expressions=[
+                ('datespan', RangeOperators.OVERLAPS),
+                ('room', RangeOperators.EQUAL),
+            ],
+            include=['cancelled'],
+        )
         self.assertEqual(constraint_1, constraint_1)
         self.assertEqual(constraint_1, mock.ANY)
         self.assertNotEqual(constraint_1, constraint_2)
@@ -225,7 +274,9 @@ class ExclusionConstraintTests(PostgreSQLTestCase):
         self.assertNotEqual(constraint_1, constraint_4)
         self.assertNotEqual(constraint_2, constraint_3)
         self.assertNotEqual(constraint_2, constraint_4)
+        self.assertNotEqual(constraint_2, constraint_7)
         self.assertNotEqual(constraint_4, constraint_5)
+        self.assertNotEqual(constraint_5, constraint_6)
         self.assertNotEqual(constraint_1, object())
 
     def test_deconstruct(self):
@@ -284,6 +335,21 @@ class ExclusionConstraintTests(PostgreSQLTestCase):
             'name': 'exclude_overlapping',
             'expressions': [('datespan', RangeOperators.OVERLAPS)],
             'deferrable': Deferrable.DEFERRED,
+        })
+
+    def test_deconstruct_include(self):
+        constraint = ExclusionConstraint(
+            name='exclude_overlapping',
+            expressions=[('datespan', RangeOperators.OVERLAPS)],
+            include=['cancelled', 'room'],
+        )
+        path, args, kwargs = constraint.deconstruct()
+        self.assertEqual(path, 'django.contrib.postgres.constraints.ExclusionConstraint')
+        self.assertEqual(args, ())
+        self.assertEqual(kwargs, {
+            'name': 'exclude_overlapping',
+            'expressions': [('datespan', RangeOperators.OVERLAPS)],
+            'include': ('cancelled', 'room'),
         })
 
     def _test_range_overlaps(self, constraint):
@@ -417,3 +483,66 @@ class ExclusionConstraintTests(PostgreSQLTestCase):
         adjacent_range.delete()
         RangesModel.objects.create(ints=(10, 19))
         RangesModel.objects.create(ints=(51, 60))
+
+    @skipUnlessDBFeature('supports_covering_gist_indexes')
+    def test_range_adjacent_include(self):
+        constraint_name = 'ints_adjacent_include'
+        self.assertNotIn(constraint_name, self.get_constraints(RangesModel._meta.db_table))
+        constraint = ExclusionConstraint(
+            name=constraint_name,
+            expressions=[('ints', RangeOperators.ADJACENT_TO)],
+            include=['decimals', 'ints'],
+            index_type='gist',
+        )
+        with connection.schema_editor() as editor:
+            editor.add_constraint(RangesModel, constraint)
+        self.assertIn(constraint_name, self.get_constraints(RangesModel._meta.db_table))
+        RangesModel.objects.create(ints=(20, 50))
+        with self.assertRaises(IntegrityError), transaction.atomic():
+            RangesModel.objects.create(ints=(10, 20))
+        RangesModel.objects.create(ints=(10, 19))
+        RangesModel.objects.create(ints=(51, 60))
+
+    @skipUnlessDBFeature('supports_covering_gist_indexes')
+    def test_range_adjacent_include_condition(self):
+        constraint_name = 'ints_adjacent_include_condition'
+        self.assertNotIn(constraint_name, self.get_constraints(RangesModel._meta.db_table))
+        constraint = ExclusionConstraint(
+            name=constraint_name,
+            expressions=[('ints', RangeOperators.ADJACENT_TO)],
+            include=['decimals'],
+            condition=Q(id__gte=100),
+        )
+        with connection.schema_editor() as editor:
+            editor.add_constraint(RangesModel, constraint)
+        self.assertIn(constraint_name, self.get_constraints(RangesModel._meta.db_table))
+
+    @skipUnlessDBFeature('supports_covering_gist_indexes')
+    def test_range_adjacent_include_deferrable(self):
+        constraint_name = 'ints_adjacent_include_deferrable'
+        self.assertNotIn(constraint_name, self.get_constraints(RangesModel._meta.db_table))
+        constraint = ExclusionConstraint(
+            name=constraint_name,
+            expressions=[('ints', RangeOperators.ADJACENT_TO)],
+            include=['decimals'],
+            deferrable=Deferrable.DEFERRED,
+        )
+        with connection.schema_editor() as editor:
+            editor.add_constraint(RangesModel, constraint)
+        self.assertIn(constraint_name, self.get_constraints(RangesModel._meta.db_table))
+
+    def test_include_not_supported(self):
+        constraint_name = 'ints_adjacent_include_not_supported'
+        constraint = ExclusionConstraint(
+            name=constraint_name,
+            expressions=[('ints', RangeOperators.ADJACENT_TO)],
+            include=['id'],
+        )
+        msg = 'Covering exclusion constraints requires PostgreSQL 12+.'
+        with connection.schema_editor() as editor:
+            with mock.patch(
+                'django.db.backends.postgresql.features.DatabaseFeatures.supports_covering_gist_indexes',
+                False,
+            ):
+                with self.assertRaisesMessage(NotSupportedError, msg):
+                    editor.add_constraint(RangesModel, constraint)

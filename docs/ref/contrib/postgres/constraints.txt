@@ -12,7 +12,7 @@ PostgreSQL supports additional data integrity constraints available from the
 ``ExclusionConstraint``
 =======================
 
-.. class:: ExclusionConstraint(*, name, expressions, index_type=None, condition=None, deferrable=None)
+.. class:: ExclusionConstraint(*, name, expressions, index_type=None, condition=None, deferrable=None, include=None)
 
     Creates an exclusion constraint in the database. Internally, PostgreSQL
     implements exclusion constraints using indexes. The default index type is
@@ -105,6 +105,21 @@ enforced immediately after every command.
 
     Deferred exclusion constraints may lead to a `performance penalty
     <https://www.postgresql.org/docs/current/sql-createtable.html#id-1.9.3.85.9.4>`_.
+
+``include``
+-----------
+
+.. attribute:: ExclusionConstraint.include
+
+.. versionadded:: 3.2
+
+A list or tuple of the names of the fields to be included in the covering
+exclusion constraint as non-key columns. This allows index-only scans to be
+used for queries that select only included fields
+(:attr:`~ExclusionConstraint.include`) and filter only by indexed fields
+(:attr:`~ExclusionConstraint.expressions`).
+
+``include`` is supported only for GiST indexes on PostgreSQL 12+.
 
 Examples
 --------
