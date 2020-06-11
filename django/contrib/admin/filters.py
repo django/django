@@ -244,20 +244,29 @@ class BooleanFieldListFilter(FieldListFilter):
         return [self.lookup_kwarg, self.lookup_kwarg2]
 
     def choices(self, changelist):
+        choices_excluding_none = filter(
+            lambda x: x[0] is not None, self.field.flatchoices
+        )
         for lookup, title in (
-                (None, _('All')),
-                ('1', _('Yes')),
-                ('0', _('No'))):
+            (None, _('All')),
+            *choices_excluding_none
+        ):
             yield {
                 'selected': self.lookup_val == lookup and not self.lookup_val2,
                 'query_string': changelist.get_query_string({self.lookup_kwarg: lookup}, [self.lookup_kwarg2]),
                 'display': title,
             }
-        if self.field.null:
+
+        none_choice = list(filter(
+            lambda x: x[0] is None, self.field.flatchoices
+        ))
+        if self.field.null and none_choice:
+            # There will only be one choice with value None
+            none_choice, = none_choice
             yield {
                 'selected': self.lookup_val2 == 'True',
                 'query_string': changelist.get_query_string({self.lookup_kwarg2: 'True'}, [self.lookup_kwarg]),
-                'display': _('Unknown'),
+                'display': none_choice[1],
             }
 
 
