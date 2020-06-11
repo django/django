@@ -11,7 +11,10 @@ class DatabaseClient(BaseDatabaseClient):
         args = [cls.executable_name]
         db = settings_dict['OPTIONS'].get('db', settings_dict['NAME'])
         user = settings_dict['OPTIONS'].get('user', settings_dict['USER'])
-        passwd = settings_dict['OPTIONS'].get('passwd', settings_dict['PASSWORD'])
+        password = settings_dict['OPTIONS'].get(
+            'password',
+            settings_dict['OPTIONS'].get('passwd', settings_dict['PASSWORD'])
+        )
         host = settings_dict['OPTIONS'].get('host', settings_dict['HOST'])
         port = settings_dict['OPTIONS'].get('port', settings_dict['PORT'])
         server_ca = settings_dict['OPTIONS'].get('ssl', {}).get('ca')
@@ -24,8 +27,8 @@ class DatabaseClient(BaseDatabaseClient):
             args += ["--defaults-file=%s" % defaults_file]
         if user:
             args += ["--user=%s" % user]
-        if passwd:
-            args += ["--password=%s" % passwd]
+        if password:
+            args += ["--password=%s" % password]
         if host:
             if '/' in host:
                 args += ["--socket=%s" % host]
