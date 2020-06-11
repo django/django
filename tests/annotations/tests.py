@@ -636,7 +636,7 @@ class NonAggregateAnnotationTestCase(TestCase):
         ])
 
     @skipIf(
-        connection.vendor == 'mysql' and 'ONLY_FULL_GROUP_BY' in connection.sql_mode,
+        connection.vendor == 'mysql',
         'GROUP BY optimization does not work properly when ONLY_FULL_GROUP_BY '
         'mode is enabled on MySQL, see #31331.',
     )
