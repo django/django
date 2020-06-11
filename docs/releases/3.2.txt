@@ -196,6 +196,9 @@ Models
   attributes allow creating covering indexes and covering unique constraints on
   PostgreSQL 11+.
 
+* The new :attr:`.UniqueConstraint.opclasses` attribute allows setting
+  PostgreSQL operator classes.
+
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 

@@ -196,6 +196,20 @@ class UniqueConstraintTests(TestCase):
         self.assertEqual(constraint_1, constraint_1)
         self.assertNotEqual(constraint_1, constraint_2)
 
+    def test_eq_with_opclasses(self):
+        constraint_1 = models.UniqueConstraint(
+            fields=['foo', 'bar'],
+            name='opclasses',
+            opclasses=['text_pattern_ops', 'varchar_pattern_ops'],
+        )
+        constraint_2 = models.UniqueConstraint(
+            fields=['foo', 'bar'],
+            name='opclasses',
+            opclasses=['varchar_pattern_ops', 'text_pattern_ops'],
+        )
+        self.assertEqual(constraint_1, constraint_1)
+        self.assertNotEqual(constraint_1, constraint_2)
+
     def test_repr(self):
         fields = ['foo', 'bar']
         name = 'unique_fields'
@@ -239,6 +253,18 @@ class UniqueConstraintTests(TestCase):
             repr(constraint),
             "<UniqueConstraint: fields=('foo', 'bar') name='include_fields' "
             "include=('baz_1', 'baz_2')>",
+        )
+
+    def test_repr_with_opclasses(self):
+        constraint = models.UniqueConstraint(
+            fields=['foo', 'bar'],
+            name='opclasses_fields',
+            opclasses=['text_pattern_ops', 'varchar_pattern_ops'],
+        )
+        self.assertEqual(
+            repr(constraint),
+            "<UniqueConstraint: fields=('foo', 'bar') name='opclasses_fields' "
+            "opclasses=['text_pattern_ops', 'varchar_pattern_ops']>",
         )
 
     def test_deconstruction(self):
@@ -289,6 +315,20 @@ class UniqueConstraintTests(TestCase):
             'fields': tuple(fields),
             'name': name,
             'include': tuple(include),
+        })
+
+    def test_deconstruction_with_opclasses(self):
+        fields = ['foo', 'bar']
+        name = 'unique_fields'
+        opclasses = ['varchar_pattern_ops', 'text_pattern_ops']
+        constraint = models.UniqueConstraint(fields=fields, name=name, opclasses=opclasses)
+        path, args, kwargs = constraint.deconstruct()
+        self.assertEqual(path, 'django.db.models.UniqueConstraint')
+        self.assertEqual(args, ())
+        self.assertEqual(kwargs, {
+            'fields': tuple(fields),
+            'name': name,
+            'opclasses': opclasses,
         })
 
     def test_database_constraint(self):
@@ -391,4 +431,25 @@ class UniqueConstraintTests(TestCase):
                 name='uniq_include',
                 fields=['field'],
                 include='other',
+            )
+
+    def test_invalid_opclasses_argument(self):
+        msg = 'UniqueConstraint.opclasses must be a list or tuple.'
+        with self.assertRaisesMessage(ValueError, msg):
+            models.UniqueConstraint(
+                name='uniq_opclasses',
+                fields=['field'],
+                opclasses='jsonb_path_ops',
+            )
+
+    def test_opclasses_and_fields_same_length(self):
+        msg = (
+            'UniqueConstraint.fields and UniqueConstraint.opclasses must have '
+            'the same number of elements.'
+        )
+        with self.assertRaisesMessage(ValueError, msg):
+            models.UniqueConstraint(
+                name='uniq_opclasses',
+                fields=['field'],
+                opclasses=['foo', 'bar'],
             )

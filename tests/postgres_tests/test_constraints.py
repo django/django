@@ -4,12 +4,14 @@ from unittest import mock
 from django.db import (
     IntegrityError, NotSupportedError, connection, transaction,
 )
-from django.db.models import CheckConstraint, Deferrable, F, Func, Q
+from django.db.models import (
+    CheckConstraint, Deferrable, F, Func, Q, UniqueConstraint,
+)
 from django.test import skipUnlessDBFeature
 from django.utils import timezone
 
 from . import PostgreSQLTestCase
-from .models import HotelReservation, RangesModel, Room
+from .models import HotelReservation, RangesModel, Room, Scene
 
 try:
     from django.contrib.postgres.constraints import ExclusionConstraint
@@ -21,6 +23,13 @@ except ImportError:
 
 
 class SchemaTests(PostgreSQLTestCase):
+    get_opclass_query = '''
+        SELECT opcname, c.relname FROM pg_opclass AS oc
+        JOIN pg_index as i on oc.oid = ANY(i.indclass)
+        JOIN pg_class as c on c.oid = i.indexrelid
+        WHERE c.relname = %s
+    '''
+
     def get_constraints(self, table):
         """Get the constraints on the table using a new cursor."""
         with connection.cursor() as cursor:
@@ -83,6 +92,75 @@ class SchemaTests(PostgreSQLTestCase):
             timestamps=(datetime_1, datetime_2),
             timestamps_inner=(datetime_1, datetime_2),
         )
+
+    def test_opclass(self):
+        constraint = UniqueConstraint(
+            name='test_opclass',
+            fields=['scene'],
+            opclasses=['varchar_pattern_ops'],
+        )
+        with connection.schema_editor() as editor:
+            editor.add_constraint(Scene, constraint)
+        self.assertIn(constraint.name, self.get_constraints(Scene._meta.db_table))
+        with editor.connection.cursor() as cursor:
+            cursor.execute(self.get_opclass_query, [constraint.name])
+            self.assertEqual(
+                cursor.fetchall(),
+                [('varchar_pattern_ops', constraint.name)],
+            )
+        # Drop the constraint.
+        with connection.schema_editor() as editor:
+            editor.remove_constraint(Scene, constraint)
+        self.assertNotIn(constraint.name, self.get_constraints(Scene._meta.db_table))
+
+    def test_opclass_multiple_columns(self):
+        constraint = UniqueConstraint(
+            name='test_opclass_multiple',
+            fields=['scene', 'setting'],
+            opclasses=['varchar_pattern_ops', 'text_pattern_ops'],
+        )
+        with connection.schema_editor() as editor:
+            editor.add_constraint(Scene, constraint)
+        with editor.connection.cursor() as cursor:
+            cursor.execute(self.get_opclass_query, [constraint.name])
+            expected_opclasses = (
+                ('varchar_pattern_ops', constraint.name),
+                ('text_pattern_ops', constraint.name),
+            )
+            self.assertCountEqual(cursor.fetchall(), expected_opclasses)
+
+    def test_opclass_partial(self):
+        constraint = UniqueConstraint(
+            name='test_opclass_partial',
+            fields=['scene'],
+            opclasses=['varchar_pattern_ops'],
+            condition=Q(setting__contains="Sir Bedemir's Castle"),
+        )
+        with connection.schema_editor() as editor:
+            editor.add_constraint(Scene, constraint)
+        with editor.connection.cursor() as cursor:
+            cursor.execute(self.get_opclass_query, [constraint.name])
+            self.assertCountEqual(
+                cursor.fetchall(),
+                [('varchar_pattern_ops', constraint.name)],
+            )
+
+    @skipUnlessDBFeature('supports_covering_indexes')
+    def test_opclass_include(self):
+        constraint = UniqueConstraint(
+            name='test_opclass_include',
+            fields=['scene'],
+            opclasses=['varchar_pattern_ops'],
+            include=['setting'],
+        )
+        with connection.schema_editor() as editor:
+            editor.add_constraint(Scene, constraint)
+        with editor.connection.cursor() as cursor:
+            cursor.execute(self.get_opclass_query, [constraint.name])
+            self.assertCountEqual(
+                cursor.fetchall(),
+                [('varchar_pattern_ops', constraint.name)],
+            )
 
 
 class ExclusionConstraintTests(PostgreSQLTestCase):
