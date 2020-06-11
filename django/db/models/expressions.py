@@ -857,6 +857,9 @@ class ExpressionWrapper(Expression):
 
     def __init__(self, expression, output_field):
         super().__init__(output_field=output_field)
+        if getattr(expression, '_output_field_or_none', True) is None:
+            expression = expression.copy()
+            expression.output_field = output_field
         self.expression = expression
 
     def set_source_expressions(self, exprs):

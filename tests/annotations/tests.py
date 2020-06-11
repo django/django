@@ -170,6 +170,14 @@ class NonAggregateAnnotationTestCase(TestCase):
             self.assertEqual(book.is_book, 1)
             self.assertEqual(book.rating_count, 1)
 
+    def test_combined_expression_annotation_with_aggregation(self):
+        book = Book.objects.annotate(
+            combined=ExpressionWrapper(Value(3) * Value(4), output_field=IntegerField()),
+            rating_count=Count('rating'),
+        ).first()
+        self.assertEqual(book.combined, 12)
+        self.assertEqual(book.rating_count, 1)
+
     def test_aggregate_over_annotation(self):
         agg = Author.objects.annotate(other_age=F('age')).aggregate(otherage_sum=Sum('other_age'))
         other_agg = Author.objects.aggregate(age_sum=Sum('age'))
