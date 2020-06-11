@@ -1837,4 +1837,6 @@ class ExpressionWrapperTests(SimpleTestCase):
 
     def test_non_empty_group_by(self):
         expr = ExpressionWrapper(Lower(Value('f')), output_field=IntegerField())
-        self.assertEqual(expr.get_group_by_cols(alias=None), [expr.expression])
+        group_by_cols = expr.get_group_by_cols(alias=None)
+        self.assertEqual(group_by_cols, [expr.expression])
+        self.assertEqual(group_by_cols[0].output_field, expr.output_field)
