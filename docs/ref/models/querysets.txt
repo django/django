@@ -2119,6 +2119,17 @@ that fail constraints such as duplicate unique values. Enabling this parameter
 disables setting the primary key on each model instance (if the database
 normally supports it).
 
+.. warning::
+
+    On MySQL and MariaDB, setting the ``ignore_conflicts`` parameter to
+    ``True`` turns certain types of errors, other than duplicate key, into
+    warnings. Even with Strict Mode. For example: invalid values or
+    non-nullable violations. See the `MySQL documentation`_ and
+    `MariaDB documentation`_ for more details.
+
+.. _MySQL documentation: https://dev.mysql.com/doc/refman/en/sql-mode.html#ignore-strict-comparison
+.. _MariaDB documentation: https://mariadb.com/kb/en/ignore/
+
 Returns ``objs`` as cast to a list, in the same order as provided.
 
 .. versionchanged:: 3.1
