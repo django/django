@@ -1619,6 +1619,13 @@ otherwise, they'll be tacked together without whitespace!
     files are created).  This means that everybody will be using the same
     encoding, which is important when Django processes the PO files.
 
+.. admonition:: Fuzzy entries
+
+    :djadmin:`makemessages` sometimes generates translation entries marked as
+    fuzzy, e.g. when translations are inferred from previously translated
+    strings. By default, fuzzy entries are **not** processed by
+    :djadmin:`compilemessages`.
+
 To reexamine all source code and templates for new translation strings and
 update all message files for **all** languages, run this::
 
