@@ -27,7 +27,7 @@ sys.path.insert(1, dirname(dirname(abspath(__file__))))
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
-sys.path.append(abspath(join(dirname(__file__), "_ext")))
+sys.path.append(abspath(join(dirname(__file__), '_ext')))
 
 # -- General configuration -----------------------------------------------------
 
@@ -37,11 +37,11 @@ needs_sphinx = '1.6.0'
 # Add any Sphinx extension module names here, as strings. They can be extensions
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
 extensions = [
-    "djangodocs",
+    'djangodocs',
     'sphinx.ext.extlinks',
-    "sphinx.ext.intersphinx",
-    "sphinx.ext.viewcode",
-    "sphinx.ext.autosectionlabel",
+    'sphinx.ext.intersphinx',
+    'sphinx.ext.viewcode',
+    'sphinx.ext.autosectionlabel',
 ]
 
 # AutosectionLabel settings.
@@ -53,7 +53,7 @@ autosectionlabel_maxdepth = 2
 # Spelling check needs an additional module that is not installed by default.
 # Add it only if spelling check is requested so docs can be generated without it.
 if 'spelling' in sys.argv:
-    extensions.append("sphinxcontrib.spelling")
+    extensions.append('sphinxcontrib.spelling')
 
 # Spelling language.
 spelling_lang = 'en_US'
@@ -127,7 +127,7 @@ today_fmt = '%B %d, %Y'
 exclude_patterns = ['_build', '_theme']
 
 # The reST default role (used for this markup: `text`) to use for all documents.
-default_role = "default-role-error"
+default_role = 'default-role-error'
 
 # If true, '()' will be appended to :func: etc. cross-reference text.
 add_function_parentheses = True
@@ -161,7 +161,7 @@ suppress_warnings = ['app.add_directive']
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
-html_theme = "djangodocs"
+html_theme = 'djangodocs'
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
@@ -169,7 +169,7 @@ html_theme = "djangodocs"
 # html_theme_options = {}
 
 # Add any paths that contain custom themes here, relative to this directory.
-html_theme_path = ["_theme"]
+html_theme_path = ['_theme']
 
 # The name for this set of Sphinx documents.  If None, it defaults to
 # "<project> v<release> documentation".
@@ -235,7 +235,7 @@ html_additional_pages = {}
 # Output file base name for HTML help builder.
 htmlhelp_basename = 'Djangodoc'
 
-modindex_common_prefix = ["django."]
+modindex_common_prefix = ['django.']
 
 # Appended to every page
 rst_epilog = """
@@ -304,8 +304,8 @@ man_pages = [(
 # List of tuples (startdocname, targetname, title, author, dir_entry,
 # description, category, toctree_only)
 texinfo_documents = [(
-    master_doc, "django", "", "", "Django",
-    "Documentation of the Django framework", "Web development", False
+    master_doc, 'django', '', '', 'Django',
+    'Documentation of the Django framework', 'Web development', False
 )]
 
 
