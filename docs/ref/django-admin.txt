@@ -160,7 +160,7 @@ are excluded.
 
 .. django-admin-option:: --use-fuzzy, -f
 
-Includes fuzzy translations into compiled files.
+Includes `fuzzy translations`_ into compiled files.
 
 Example usage::
 
@@ -172,6 +172,8 @@ Example usage::
     django-admin compilemessages --exclude=pt_BR --exclude=fr
     django-admin compilemessages -x pt_BR
     django-admin compilemessages -x pt_BR -x fr
+
+.. _fuzzy translations: https://www.gnu.org/software/gettext/manual/html_node/Fuzzy-Entries.html
 
 .. django-admin-option:: --ignore PATTERN, -i PATTERN
 
