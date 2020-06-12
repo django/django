@@ -73,6 +73,9 @@ Minor features
 * The new :attr:`.ExclusionConstraint.include` attribute allows creating
   covering exclusion constraints on PostgreSQL 12+.
 
+* The new :attr:`.JSONBAgg.ordering` attribute determines the ordering of the
+  aggregated elements.
+
 :mod:`django.contrib.redirects`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

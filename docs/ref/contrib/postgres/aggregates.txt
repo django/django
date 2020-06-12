@@ -86,9 +86,20 @@ General-purpose aggregation functions
 ``JSONBAgg``
 ------------
 
-.. class:: JSONBAgg(expressions, filter=None, **extra)
+.. class:: JSONBAgg(expressions, filter=None, ordering=(), **extra)
 
     Returns the input values as a ``JSON`` array.
+
+    .. attribute:: ordering
+
+        .. versionadded:: 3.2
+
+        An optional string of a field name (with an optional ``"-"`` prefix
+        which indicates descending order) or an expression (or a tuple or list
+        of strings and/or expressions) that specifies the ordering of the
+        elements in the result list.
+
+        Examples are the same as for :attr:`ArrayAgg.ordering`.
 
 ``StringAgg``
 -------------

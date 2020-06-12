@@ -222,6 +222,42 @@ class TestGeneralAggregate(PostgreSQLTestCase):
         values = AggregateTestModel.objects.none().aggregate(jsonagg=JSONBAgg('integer_field'))
         self.assertEqual(values, json.loads('{"jsonagg": []}'))
 
+    def test_json_agg_charfield_ordering(self):
+        ordering_test_cases = (
+            (F('char_field').desc(), ['Foo4', 'Foo3', 'Foo2', 'Foo1']),
+            (F('char_field').asc(), ['Foo1', 'Foo2', 'Foo3', 'Foo4']),
+            (F('char_field'), ['Foo1', 'Foo2', 'Foo3', 'Foo4']),
+            ('char_field', ['Foo1', 'Foo2', 'Foo3', 'Foo4']),
+            ('-char_field', ['Foo4', 'Foo3', 'Foo2', 'Foo1']),
+            (Concat('char_field', Value('@')), ['Foo1', 'Foo2', 'Foo3', 'Foo4']),
+            (Concat('char_field', Value('@')).desc(), ['Foo4', 'Foo3', 'Foo2', 'Foo1']),
+        )
+        for ordering, expected_output in ordering_test_cases:
+            with self.subTest(ordering=ordering, expected_output=expected_output):
+                values = AggregateTestModel.objects.aggregate(
+                    jsonagg=JSONBAgg('char_field', ordering=ordering),
+                )
+                self.assertEqual(values, {'jsonagg': expected_output})
+
+    def test_json_agg_integerfield_ordering(self):
+        values = AggregateTestModel.objects.aggregate(
+            jsonagg=JSONBAgg('integer_field', ordering=F('integer_field').desc()),
+        )
+        self.assertEqual(values, {'jsonagg': [2, 1, 0, 0]})
+
+    def test_json_agg_booleanfield_ordering(self):
+        ordering_test_cases = (
+            (F('boolean_field').asc(), [False, False, True, True]),
+            (F('boolean_field').desc(), [True, True, False, False]),
+            (F('boolean_field'), [False, False, True, True]),
+        )
+        for ordering, expected_output in ordering_test_cases:
+            with self.subTest(ordering=ordering, expected_output=expected_output):
+                values = AggregateTestModel.objects.aggregate(
+                    jsonagg=JSONBAgg('boolean_field', ordering=ordering),
+                )
+                self.assertEqual(values, {'jsonagg': expected_output})
+
     def test_string_agg_array_agg_ordering_in_subquery(self):
         stats = []
         for i, agg in enumerate(AggregateTestModel.objects.order_by('char_field')):
