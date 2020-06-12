@@ -8,6 +8,7 @@ from django.core.files.images import ImageFile
 from django.core.files.storage import Storage, default_storage
 from django.db.models import signals
 from django.db.models.fields import Field
+from django.db.models.query_utils import DeferredAttribute
 from django.utils.translation import gettext_lazy as _
 
 
@@ -140,7 +141,7 @@ class FieldFile(File):
         self.storage = self.field.storage
 
 
-class FileDescriptor:
+class FileDescriptor(DeferredAttribute):
     """
     The descriptor for the file attribute on the model instance. Return a
     FieldFile when accessed so you can write code like::
@@ -154,9 +155,6 @@ class FileDescriptor:
         >>> with open('/path/to/hello.world') as f:
         ...     instance.file = File(f)
     """
-    def __init__(self, field):
-        self.field = field
-
     def __get__(self, instance, cls=None):
         if instance is None:
             return self
@@ -173,9 +171,7 @@ class FileDescriptor:
 
         # The instance dict contains whatever was originally assigned
         # in __set__.
-        if self.field.name not in instance.__dict__:
-            instance.refresh_from_db(fields=[self.field.name])
-        file = instance.__dict__[self.field.name]
+        file = super().__get__(instance, cls)
 
         # If this value is a string (instance.file = "path/to/file") or None
         # then we simply wrap it with the appropriate attribute class according
@@ -186,7 +182,7 @@ class FileDescriptor:
         # handle None.
         if isinstance(file, str) or file is None:
             attr = self.field.attr_class(instance, self.field, file)
-            instance.__dict__[self.field.name] = attr
+            instance.__dict__[self.field.attname] = attr
 
         # Other types of files may be assigned as well, but they need to have
         # the FieldFile interface added to them. Thus, we wrap any other type of
@@ -196,7 +192,7 @@ class FileDescriptor:
             file_copy = self.field.attr_class(instance, self.field, file.name)
             file_copy.file = file
             file_copy._committed = False
-            instance.__dict__[self.field.name] = file_copy
+            instance.__dict__[self.field.attname] = file_copy
 
         # Finally, because of the (some would say boneheaded) way pickle works,
         # the underlying FieldFile might not actually itself have an associated
@@ -211,10 +207,10 @@ class FileDescriptor:
             file.instance = instance
 
         # That was fun, wasn't it?
-        return instance.__dict__[self.field.name]
+        return instance.__dict__[self.field.attname]
 
     def __set__(self, instance, value):
-        instance.__dict__[self.field.name] = value
+        instance.__dict__[self.field.attname] = value
 
 
 class FileField(Field):
@@ -303,10 +299,6 @@ class FileField(Field):
             file.save(file.name, file.file, save=False)
         return file
 
-    def contribute_to_class(self, cls, name, **kwargs):
-        super().contribute_to_class(cls, name, **kwargs)
-        setattr(cls, self.name, self.descriptor_class(self))
-
     def generate_filename(self, instance, filename):
         """
         Apply (if callable) or prepend (if a string) upload_to to the filename,
@@ -345,7 +337,7 @@ class ImageFileDescriptor(FileDescriptor):
     assigning the width/height to the width_field/height_field, if appropriate.
     """
     def __set__(self, instance, value):
-        previous_file = instance.__dict__.get(self.field.name)
+        previous_file = instance.__dict__.get(self.field.attname)
         super().__set__(instance, value)
 
         # To prevent recalculating image dimensions when we are instantiating
