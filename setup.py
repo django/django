@@ -69,8 +69,8 @@ previous version that have since been removed from
 Django. This is known to cause a variety of problems. You
 should manually remove the
 
-%(existing_path)s
+{}
 
 directory and re-install Django.
 
-""" % {"existing_path": existing_path})
+""".format(existing_path)
