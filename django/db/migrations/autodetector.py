@@ -9,9 +9,7 @@ from django.db.migrations.migration import Migration
 from django.db.migrations.operations.models import AlterModelOptions
 from django.db.migrations.optimizer import MigrationOptimizer
 from django.db.migrations.questioner import MigrationQuestioner
-from django.db.migrations.utils import (
-    COMPILED_REGEX_TYPE, RegexObject, get_migration_name_timestamp,
-)
+from django.db.migrations.utils import COMPILED_REGEX_TYPE, RegexObject
 from django.utils.topological_sort import stable_topological_sort
 
 
@@ -1265,13 +1263,14 @@ class MigrationAutodetector:
             for i, migration in enumerate(migrations):
                 if i == 0 and app_leaf:
                     migration.dependencies.append(app_leaf)
-                if i == 0 and not app_leaf:
-                    new_name = "0001_%s" % migration_name if migration_name else "0001_initial"
+                new_name_parts = ['%04i' % next_number]
+                if migration_name:
+                    new_name_parts.append(migration_name)
+                elif i == 0 and not app_leaf:
+                    new_name_parts.append('initial')
                 else:
-                    new_name = "%04i_%s" % (
-                        next_number,
-                        migration_name or self.suggest_name(migration.operations)[:100],
-                    )
+                    new_name_parts.append(migration.suggest_name()[:100])
+                new_name = '_'.join(new_name_parts)
                 name_map[(app_label, migration.name)] = (app_label, new_name)
                 next_number += 1
                 migration.name = new_name
@@ -1305,22 +1304,6 @@ class MigrationAutodetector:
             if app_label not in required_apps:
                 del changes[app_label]
         return changes
-
-    @classmethod
-    def suggest_name(cls, ops):
-        """
-        Given a set of operations, suggest a name for the migration they might
-        represent. Names are not guaranteed to be unique, but put some effort
-        into the fallback name to avoid VCS conflicts if possible.
-        """
-        name = None
-        if len(ops) == 1:
-            name = ops[0].migration_name_fragment
-        elif len(ops) > 1 and all(isinstance(o, operations.CreateModel) for o in ops):
-            name = '_'.join(sorted(o.migration_name_fragment for o in ops))
-        if name is None:
-            name = 'auto_%s' % get_migration_name_timestamp()
-        return name
 
     @classmethod
     def parse_number(cls, name):

@@ -2481,25 +2481,39 @@ class AutodetectorTests(TestCase):
         self.assertOperationAttributes(changes, 'app', 0, 1, name='book')
 
 
-class AutodetectorSuggestNameTests(SimpleTestCase):
+class MigrationSuggestNameTests(SimpleTestCase):
     def test_single_operation(self):
-        ops = [migrations.CreateModel('Person', fields=[])]
-        self.assertEqual(MigrationAutodetector.suggest_name(ops), 'person')
-        ops = [migrations.DeleteModel('Person')]
-        self.assertEqual(MigrationAutodetector.suggest_name(ops), 'delete_person')
+        class Migration(migrations.Migration):
+            operations = [migrations.CreateModel('Person', fields=[])]
+
+        migration = Migration('0001_initial', 'test_app')
+        self.assertEqual(migration.suggest_name(), 'person')
+
+        class Migration(migrations.Migration):
+            operations = [migrations.DeleteModel('Person')]
+
+        migration = Migration('0002_initial', 'test_app')
+        self.assertEqual(migration.suggest_name(), 'delete_person')
 
     def test_two_create_models(self):
-        ops = [
-            migrations.CreateModel('Person', fields=[]),
-            migrations.CreateModel('Animal', fields=[]),
-        ]
-        self.assertEqual(MigrationAutodetector.suggest_name(ops), 'animal_person')
+        class Migration(migrations.Migration):
+            operations = [
+                migrations.CreateModel('Person', fields=[]),
+                migrations.CreateModel('Animal', fields=[]),
+            ]
+
+        migration = Migration('0001_initial', 'test_app')
+        self.assertEqual(migration.suggest_name(), 'animal_person')
 
     def test_none_name(self):
-        ops = [migrations.RunSQL('SELECT 1 FROM person;')]
-        suggest_name = MigrationAutodetector.suggest_name(ops)
+        class Migration(migrations.Migration):
+            operations = [migrations.RunSQL('SELECT 1 FROM person;')]
+
+        migration = Migration('0001_initial', 'test_app')
+        suggest_name = migration.suggest_name()
         self.assertIs(suggest_name.startswith('auto_'), True)
 
     def test_auto(self):
-        suggest_name = MigrationAutodetector.suggest_name([])
+        migration = migrations.Migration('0001_initial', 'test_app')
+        suggest_name = migration.suggest_name()
         self.assertIs(suggest_name.startswith('auto_'), True)
