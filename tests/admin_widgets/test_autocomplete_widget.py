@@ -14,12 +14,10 @@ class AlbumForm(forms.ModelForm):
         fields = ['band', 'featuring']
         widgets = {
             'band': AutocompleteSelect(
-                Album._meta.get_field('band').remote_field,
                 admin.site,
                 attrs={'class': 'my-class'},
             ),
             'featuring': AutocompleteSelect(
-                Album._meta.get_field('featuring').remote_field,
                 admin.site,
             )
         }
@@ -28,7 +26,7 @@ class AlbumForm(forms.ModelForm):
 class NotRequiredBandForm(forms.Form):
     band = ModelChoiceField(
         queryset=Album.objects.all(),
-        widget=AutocompleteSelect(Album._meta.get_field('band').remote_field, admin.site),
+        widget=AutocompleteSelect(admin.site),
         required=False,
     )
 
@@ -36,7 +34,7 @@ class NotRequiredBandForm(forms.Form):
 class RequiredBandForm(forms.Form):
     band = ModelChoiceField(
         queryset=Album.objects.all(),
-        widget=AutocompleteSelect(Album._meta.get_field('band').remote_field, admin.site),
+        widget=AutocompleteSelect(admin.site),
         required=True,
     )
 
@@ -76,8 +74,10 @@ class AutocompleteMixinTests(TestCase):
         self.assertJSONEqual(attrs['data-allow-clear'], False)
 
     def test_get_url(self):
-        rel = Album._meta.get_field('band').remote_field
-        w = AutocompleteSelect(rel, admin.site)
+        class FakeModelChoiceIterator:
+            queryset = Band.objects.all()
+
+        w = AutocompleteSelect(admin.site, choices=FakeModelChoiceIterator)
         url = w.get_url()
         self.assertEqual(url, '/admin_widgets/band/autocomplete/')
 
@@ -112,7 +112,6 @@ class AutocompleteMixinTests(TestCase):
         self.assertNotIn(self.empty_option, output)
 
     def test_media(self):
-        rel = Album._meta.get_field('band').remote_field
         base_files = (
             'admin/js/vendor/jquery/jquery.min.js',
             'admin/js/vendor/select2/select2.full.min.js',
@@ -140,4 +139,4 @@ class AutocompleteMixinTests(TestCase):
                 else:
                     expected_files = base_files
                 with translation.override(lang):
-                    self.assertEqual(AutocompleteSelect(rel, admin.site).media._js, list(expected_files))
+                    self.assertEqual(AutocompleteSelect(admin.site).media._js, list(expected_files))
