@@ -382,15 +382,17 @@ class AutocompleteMixin:
     """
     url_name = '%s:%s_%s_autocomplete'
 
-    def __init__(self, rel, admin_site, attrs=None, choices=(), using=None):
-        self.rel = rel
+    def __init__(self, admin_site, attrs=None, choices=(), using=None):
         self.admin_site = admin_site
         self.db = using
         self.choices = choices
         self.attrs = {} if attrs is None else attrs.copy()
 
+    def get_model(self):
+        return self.choices.queryset.model
+
     def get_url(self):
-        model = self.rel.model
+        model = self.get_model()
         return reverse(self.url_name % (self.admin_site.name, model._meta.app_label, model._meta.model_name))
 
     def build_attrs(self, base_attrs, extra_attrs=None):
