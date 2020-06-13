@@ -192,7 +192,7 @@ class Migration:
         ):
             name = '_'.join(sorted(o.migration_name_fragment for o in self.operations))
         if name is None:
-            name = 'auto_%s' % get_migration_name_timestamp()
+            name = 'initial' if self.initial else 'auto_%s' % get_migration_name_timestamp()
         return name
 
 
