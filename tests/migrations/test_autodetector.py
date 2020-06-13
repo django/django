@@ -2505,6 +2505,17 @@ class MigrationSuggestNameTests(SimpleTestCase):
         migration = Migration('0001_initial', 'test_app')
         self.assertEqual(migration.suggest_name(), 'animal_person')
 
+    def test_two_create_models_with_initial_true(self):
+        class Migration(migrations.Migration):
+            initial = True
+            operations = [
+                migrations.CreateModel('Person', fields=[]),
+                migrations.CreateModel('Animal', fields=[]),
+            ]
+
+        migration = Migration('0001_initial', 'test_app')
+        self.assertEqual(migration.suggest_name(), 'animal_person')
+
     def test_none_name(self):
         class Migration(migrations.Migration):
             operations = [migrations.RunSQL('SELECT 1 FROM person;')]
