@@ -269,6 +269,10 @@ Models
   :py:class:`datetime.time`, :py:class:`datetime.timedelta`,
   :py:class:`decimal.Decimal`, and :py:class:`uuid.UUID` instances.
 
+* The new :meth:`.QuerySet.alias` method allows creating reusable aliases for
+  expressions that don't need to be selected but are used for filtering,
+  ordering, or as a part of complex expressions.
+
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 

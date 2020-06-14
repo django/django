@@ -268,6 +268,42 @@ control the name of the annotation::
 For an in-depth discussion of aggregation, see :doc:`the topic guide on
 Aggregation </topics/db/aggregation>`.
 
+``alias()``
+~~~~~~~~~~~
+
+.. method:: alias(*args, **kwargs)
+
+.. versionadded:: 3.2
+
+Same as :meth:`annotate`, but instead of annotating objects in the
+``QuerySet``, saves the expression for later reuse with other ``QuerySet``
+methods. This is useful when the result of the expression itself is not needed
+but it is used for filtering, ordering, or as a part of a complex expression.
+Not selecting the unused value removes redundant work from the database which
+should result in better performance.
+
+For example, if you want to find blogs with more than 5 entries, but are not
+interested in the exact number of entries, you could do this::
+
+    >>> from django.db.models import Count
+    >>> blogs = Blog.objects.alias(entries=Count('entry')).filter(entries__gt=5)
+
+``alias()`` can be used in conjunction with :meth:`annotate`, :meth:`exclude`,
+:meth:`filter`, :meth:`order_by`, and :meth:`update`. To use aliased expression
+with other methods (e.g. :meth:`aggregate`), you must promote it to an
+annotation::
+
+    Blog.objects.alias(entries=Count('entry')).annotate(
+        entries=F('entries'),
+    ).aggregate(Sum('entries'))
+
+:meth:`filter` and :meth:`order_by` can take expressions directly, but
+expression construction and usage often does not happen in the same place (for
+example, ``QuerySet`` method creates expressions, for later use in views).
+``alias()`` allows building complex expressions incrementally, possibly
+spanning multiple methods and modules, refer to the expression parts by their
+aliases and only use :meth:`annotate` for the final result.
+
 ``order_by()``
 ~~~~~~~~~~~~~~
 

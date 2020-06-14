@@ -1085,6 +1085,16 @@ class QuerySet:
         with extra data or aggregations.
         """
         self._not_support_combined_queries('annotate')
+        return self._annotate(args, kwargs, select=True)
+
+    def alias(self, *args, **kwargs):
+        """
+        Return a query set with added aliases for extra data or aggregations.
+        """
+        self._not_support_combined_queries('alias')
+        return self._annotate(args, kwargs, select=False)
+
+    def _annotate(self, args, kwargs, select=True):
         self._validate_values_are_expressions(args + tuple(kwargs.values()), method_name='annotate')
         annotations = {}
         for arg in args:
@@ -1114,8 +1124,9 @@ class QuerySet:
             if isinstance(annotation, FilteredRelation):
                 clone.query.add_filtered_relation(annotation, alias)
             else:
-                clone.query.add_annotation(annotation, alias, is_summary=False)
-
+                clone.query.add_annotation(
+                    annotation, alias, is_summary=False, select=select,
+                )
         for alias, annotation in clone.query.annotations.items():
             if alias in annotations and annotation.contains_aggregate:
                 if clone._fields is None:

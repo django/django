@@ -10,7 +10,7 @@ from django.db.models import (
     Subquery, Sum, Value, When,
 )
 from django.db.models.expressions import RawSQL
-from django.db.models.functions import Length, Lower
+from django.db.models.functions import Coalesce, Length, Lower
 from django.test import TestCase, skipUnlessDBFeature
 
 from .models import (
@@ -664,3 +664,225 @@ class NonAggregateAnnotationTestCase(TestCase):
             {'name': 'Paul Bissex', 'max_pages': 0},
             {'name': 'Wesley J. Chun', 'max_pages': 0},
         ])
+
+
+class AliasTests(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.a1 = Author.objects.create(name='Adrian Holovaty', age=34)
+        cls.a2 = Author.objects.create(name='Jacob Kaplan-Moss', age=35)
+        cls.a3 = Author.objects.create(name='James Bennett', age=34)
+        cls.a4 = Author.objects.create(name='Peter Norvig', age=57)
+        cls.a5 = Author.objects.create(name='Stuart Russell', age=46)
+        p1 = Publisher.objects.create(name='Apress', num_awards=3)
+
+        cls.b1 = Book.objects.create(
+            isbn='159059725', pages=447, rating=4.5, price=Decimal('30.00'),
+            contact=cls.a1, publisher=p1, pubdate=datetime.date(2007, 12, 6),
+            name='The Definitive Guide to Django: Web Development Done Right',
+        )
+        cls.b2 = Book.objects.create(
+            isbn='159059996', pages=300, rating=4.0, price=Decimal('29.69'),
+            contact=cls.a3, publisher=p1, pubdate=datetime.date(2008, 6, 23),
+            name='Practical Django Projects',
+        )
+        cls.b3 = Book.objects.create(
+            isbn='013790395', pages=1132, rating=4.0, price=Decimal('82.80'),
+            contact=cls.a4, publisher=p1, pubdate=datetime.date(1995, 1, 15),
+            name='Artificial Intelligence: A Modern Approach',
+        )
+        cls.b4 = Book.objects.create(
+            isbn='155860191', pages=946, rating=5.0, price=Decimal('75.00'),
+            contact=cls.a4, publisher=p1, pubdate=datetime.date(1991, 10, 15),
+            name='Paradigms of Artificial Intelligence Programming: Case Studies in Common Lisp',
+        )
+        cls.b1.authors.add(cls.a1, cls.a2)
+        cls.b2.authors.add(cls.a3)
+        cls.b3.authors.add(cls.a4, cls.a5)
+        cls.b4.authors.add(cls.a4)
+
+        Store.objects.create(
+            name='Amazon.com',
+            original_opening=datetime.datetime(1994, 4, 23, 9, 17, 42),
+            friday_night_closing=datetime.time(23, 59, 59)
+        )
+        Store.objects.create(
+            name='Books.com',
+            original_opening=datetime.datetime(2001, 3, 15, 11, 23, 37),
+            friday_night_closing=datetime.time(23, 59, 59)
+        )
+
+    def test_basic_alias(self):
+        qs = Book.objects.alias(is_book=Value(1))
+        self.assertIs(hasattr(qs.first(), 'is_book'), False)
+
+    def test_basic_alias_annotation(self):
+        qs = Book.objects.alias(
+            is_book_alias=Value(1),
+        ).annotate(is_book=F('is_book_alias'))
+        self.assertIs(hasattr(qs.first(), 'is_book_alias'), False)
+        for book in qs:
+            with self.subTest(book=book):
+                self.assertEqual(book.is_book, 1)
+
+    def test_basic_alias_f_annotation(self):
+        qs = Book.objects.alias(
+            another_rating_alias=F('rating')
+        ).annotate(another_rating=F('another_rating_alias'))
+        self.assertIs(hasattr(qs.first(), 'another_rating_alias'), False)
+        for book in qs:
+            with self.subTest(book=book):
+                self.assertEqual(book.another_rating, book.rating)
+
+    def test_alias_after_annotation(self):
+        qs = Book.objects.annotate(
+            is_book=Value(1),
+        ).alias(is_book_alias=F('is_book'))
+        book = qs.first()
+        self.assertIs(hasattr(book, 'is_book'), True)
+        self.assertIs(hasattr(book, 'is_book_alias'), False)
+
+    def test_overwrite_annotation_with_alias(self):
+        qs = Book.objects.annotate(is_book=Value(1)).alias(is_book=F('is_book'))
+        self.assertIs(hasattr(qs.first(), 'is_book'), False)
+
+    def test_overwrite_alias_with_annotation(self):
+        qs = Book.objects.alias(is_book=Value(1)).annotate(is_book=F('is_book'))
+        for book in qs:
+            with self.subTest(book=book):
+                self.assertEqual(book.is_book, 1)
+
+    def test_alias_annotation_expression(self):
+        qs = Book.objects.alias(
+            is_book_alias=Value(1),
+        ).annotate(is_book=Coalesce('is_book_alias', 0))
+        self.assertIs(hasattr(qs.first(), 'is_book_alias'), False)
+        for book in qs:
+            with self.subTest(book=book):
+                self.assertEqual(book.is_book, 1)
+
+    def test_alias_default_alias_expression(self):
+        qs = Author.objects.alias(
+            Sum('book__pages'),
+        ).filter(book__pages__sum__gt=2000)
+        self.assertIs(hasattr(qs.first(), 'book__pages__sum'), False)
+        self.assertSequenceEqual(qs, [self.a4])
+
+    def test_joined_alias_annotation(self):
+        qs = Book.objects.select_related('publisher').alias(
+            num_awards_alias=F('publisher__num_awards'),
+        ).annotate(num_awards=F('num_awards_alias'))
+        self.assertIs(hasattr(qs.first(), 'num_awards_alias'), False)
+        for book in qs:
+            with self.subTest(book=book):
+                self.assertEqual(book.num_awards, book.publisher.num_awards)
+
+    def test_alias_annotate_with_aggregation(self):
+        qs = Book.objects.alias(
+            is_book_alias=Value(1),
+            rating_count_alias=Count('rating'),
+        ).annotate(
+            is_book=F('is_book_alias'),
+            rating_count=F('rating_count_alias'),
+        )
+        book = qs.first()
+        self.assertIs(hasattr(book, 'is_book_alias'), False)
+        self.assertIs(hasattr(book, 'rating_count_alias'), False)
+        for book in qs:
+            with self.subTest(book=book):
+                self.assertEqual(book.is_book, 1)
+                self.assertEqual(book.rating_count, 1)
+
+    def test_filter_alias_with_f(self):
+        qs = Book.objects.alias(
+            other_rating=F('rating'),
+        ).filter(other_rating=4.5)
+        self.assertIs(hasattr(qs.first(), 'other_rating'), False)
+        self.assertSequenceEqual(qs, [self.b1])
+
+    def test_filter_alias_with_double_f(self):
+        qs = Book.objects.alias(
+            other_rating=F('rating'),
+        ).filter(other_rating=F('rating'))
+        self.assertIs(hasattr(qs.first(), 'other_rating'), False)
+        self.assertEqual(qs.count(), Book.objects.count())
+
+    def test_filter_alias_agg_with_double_f(self):
+        qs = Book.objects.alias(
+            sum_rating=Sum('rating'),
+        ).filter(sum_rating=F('sum_rating'))
+        self.assertIs(hasattr(qs.first(), 'sum_rating'), False)
+        self.assertEqual(qs.count(), Book.objects.count())
+
+    def test_update_with_alias(self):
+        Book.objects.alias(
+            other_rating=F('rating') - 1,
+        ).update(rating=F('other_rating'))
+        self.b1.refresh_from_db()
+        self.assertEqual(self.b1.rating, 3.5)
+
+    def test_order_by_alias(self):
+        qs = Author.objects.alias(other_age=F('age')).order_by('other_age')
+        self.assertIs(hasattr(qs.first(), 'other_age'), False)
+        self.assertQuerysetEqual(qs, [34, 34, 35, 46, 57], lambda a: a.age)
+
+    def test_order_by_alias_aggregate(self):
+        qs = Author.objects.values('age').alias(age_count=Count('age')).order_by('age_count', 'age')
+        self.assertIs(hasattr(qs.first(), 'age_count'), False)
+        self.assertQuerysetEqual(qs, [35, 46, 57, 34], lambda a: a['age'])
+
+    def test_dates_alias(self):
+        qs = Book.objects.alias(
+            pubdate_alias=F('pubdate'),
+        ).dates('pubdate_alias', 'month')
+        self.assertCountEqual(qs, [
+            datetime.date(1991, 10, 1),
+            datetime.date(1995, 1, 1),
+            datetime.date(2007, 12, 1),
+            datetime.date(2008, 6, 1),
+        ])
+
+    def test_datetimes_alias(self):
+        qs = Store.objects.alias(
+            original_opening_alias=F('original_opening'),
+        ).datetimes('original_opening_alias', 'year')
+        self.assertCountEqual(qs, [
+            datetime.datetime(1994, 1, 1),
+            datetime.datetime(2001, 1, 1),
+        ])
+
+    def test_aggregate_alias(self):
+        msg = (
+            "Cannot aggregate over the 'other_age' alias. Use annotate() to "
+            "promote it."
+        )
+        with self.assertRaisesMessage(FieldError, msg):
+            Author.objects.alias(
+                other_age=F('age'),
+            ).aggregate(otherage_sum=Sum('other_age'))
+
+    def test_defer_only_alias(self):
+        qs = Book.objects.alias(rating_alias=F('rating') - 1)
+        msg = "Book has no field named 'rating_alias'"
+        for operation in ['defer', 'only']:
+            with self.subTest(operation=operation):
+                with self.assertRaisesMessage(FieldDoesNotExist, msg):
+                    getattr(qs, operation)('rating_alias').first()
+
+    @skipUnlessDBFeature('can_distinct_on_fields')
+    def test_distinct_on_alias(self):
+        qs = Book.objects.alias(rating_alias=F('rating') - 1)
+        msg = "Cannot resolve keyword 'rating_alias' into field."
+        with self.assertRaisesMessage(FieldError, msg):
+            qs.distinct('rating_alias').first()
+
+    def test_values_alias(self):
+        qs = Book.objects.alias(rating_alias=F('rating') - 1)
+        msg = (
+            "Cannot select the 'rating_alias' alias. Use annotate() to "
+            "promote it."
+        )
+        for operation in ['values', 'values_list']:
+            with self.subTest(operation=operation):
+                with self.assertRaisesMessage(FieldError, msg):
+                    getattr(qs, operation)('rating_alias')

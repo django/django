@@ -574,6 +574,7 @@ class ManagerTest(SimpleTestCase):
         'filter',
         'aggregate',
         'annotate',
+        'alias',
         'complex_filter',
         'exclude',
         'in_bulk',
