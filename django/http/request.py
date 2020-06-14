@@ -1,6 +1,7 @@
 import codecs
 import copy
-import operator
+import warnings
+from collections import namedtuple
 from io import BytesIO
 from itertools import chain
 from urllib.parse import parse_qsl, quote, urlencode, urljoin, urlsplit
@@ -31,7 +32,9 @@ from django.utils.http import is_same_domain, parse_header_parameters
 from django.utils.regex_helper import _lazy_re_compile
 
 RAISE_ERROR = object()
-host_validation_re = _lazy_re_compile(r"^([a-z0-9.-]+|\[[a-f0-9]*:[a-f0-9\.:]+\])(?::(\d+))?$")
+host_validation_re = _lazy_re_compile(r"^([a-z0-9.-]+|\[[a-f0-9]*:[a-f0-9\.:]+\])(?::([0-9]+))?$")
+
+ParsedHostHeader = namedtuple('ParsedHostHeader', ['domain', 'port', 'combined'])
 
 
 class UnreadablePostError(OSError):
@@ -159,60 +162,62 @@ class HttpRequest:
             else:
                 self.encoding = self.content_params["charset"]
 
-    @cached_property
-    def _parsed_host_header(self):
-        use_x_fw_host = settings.USE_X_FORWARDED_HOST
-        use_x_fw_port = settings.USE_X_FORWARDED_PORT
+    def _get_parsed_host_header(self, validate=True):
+        if not hasattr(self, '_parsed_host_obj'):
+            use_x_fw_host = settings.USE_X_FORWARDED_HOST
+            use_x_fw_port = settings.USE_X_FORWARDED_PORT
 
-        port_in_x_fw_host = False
-        default_port = ('443' if self.is_secure() else '80')
+            port_in_x_fw_host = False
+            default_port = ('443' if self.is_secure() else '80')
 
-        if use_x_fw_host and 'HTTP_X_FORWARDED_HOST' in self.META:
-            host, port = _parse_host_header(self.META['HTTP_X_FORWARDED_HOST'])
-            port_in_x_fw_host = port != ''
-        elif 'HTTP_HOST' in self.META:
-            host, port = _parse_host_header(self.META['HTTP_HOST'])
+            if use_x_fw_host and 'HTTP_X_FORWARDED_HOST' in self.META:
+                host, port = _parse_host_header(self.META['HTTP_X_FORWARDED_HOST'])
+                port_in_x_fw_host = port != ''
+            elif 'HTTP_HOST' in self.META:
+                host, port = _parse_host_header(self.META['HTTP_HOST'])
+            else:
+                # Reconstruct the host using the algorithm from PEP 333.
+                host, port = self.META['SERVER_NAME'], str(self.META['SERVER_PORT'])
+                if port == default_port:
+                    port = ''
+
+            if use_x_fw_port and 'HTTP_X_FORWARDED_PORT' in self.META:
+                if port_in_x_fw_host:
+                    raise ImproperlyConfigured('HTTP_X_FORWARDED_HOST contains a port number '
+                                               'and USE_X_FORWARDED_PORT is set to True')
+                port = self.META['HTTP_X_FORWARDED_PORT']
+
+            reconstructed = '%s:%s' % (host, port) if port else host
+
+            domain, port = split_domain_port(reconstructed)
+            parsed_host = self._parsed_host_obj = ParsedHostHeader(domain, port or default_port, reconstructed)
         else:
-            # Reconstruct the host using the algorithm from PEP 333.
-            host, port = self.META['SERVER_NAME'], str(self.META['SERVER_PORT'])
-            if port == default_port:
-                port = ''
-
-        if use_x_fw_port and 'HTTP_X_FORWARDED_PORT' in self.META:
-            if port_in_x_fw_host:
-                raise ImproperlyConfigured('HTTP_X_FORWARDED_HOST contains a port number '
-                                           'and USE_X_FORWARDED_PORT is set to True')
-            port = self.META['HTTP_X_FORWARDED_PORT']
-
-        reconstructed = '%s:%s' % (host, port) if port else host
-        return host, port or default_port, reconstructed
-
-    def get_host(self):
-        """Return the HTTP host using the environment or request headers."""
-        _, _, host_header = self._parsed_host_header
+            parsed_host = self._parsed_host_obj
 
         # Allow variants of localhost if ALLOWED_HOSTS is empty and DEBUG=True.
         allowed_hosts = settings.ALLOWED_HOSTS
         if settings.DEBUG and not allowed_hosts:
             allowed_hosts = [".localhost", "127.0.0.1", "[::1]"]
 
-        domain, port = split_domain_port(host_header)
-        if domain and validate_host(domain, allowed_hosts):
-            return host_header
-        else:
-            msg = "Invalid HTTP_HOST header: %r." % host_header
-            if domain:
-                msg += " You may need to add %r to ALLOWED_HOSTS." % domain
+        msg = "Invalid HTTP_HOST header: %r." % parsed_host.combined
+        if validate and not (parsed_host.domain and validate_host(parsed_host.domain, allowed_hosts)):
+            if parsed_host.domain:
+                msg += " You may need to add %r to ALLOWED_HOSTS." % parsed_host.domain
             else:
                 msg += (
                     " The domain name provided is not valid according to RFC 1034/1035."
                 )
             raise DisallowedHost(msg)
 
+        return parsed_host
+
+    def get_host(self):
+        """Return the HTTP host using the environment or request headers."""
+        return self._get_parsed_host_header().combined
+
     def get_port(self):
         """Return the port number for the request as a string."""
-        _, port, _ = self._parsed_host_header
-        return port
+        return self._get_parsed_host_header().port
 
     def get_full_path(self, force_append_slash=False):
         return self._get_full_path(self.path, force_append_slash)
@@ -262,10 +267,9 @@ class HttpRequest:
         Return an absolute URI from variables available in this request. Skip
         allowed hosts protection, so may return insecure URI.
         """
-        _, _, host_header = self._parsed_host_header
         return '{scheme}://{host}{path}'.format(
             scheme=self.scheme,
-            host=host_header,
+            host=self._get_parsed_host_header(validate=False).combined,
             path=self.get_full_path(),
         )
 
