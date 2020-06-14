@@ -173,11 +173,9 @@ class FileDescriptor:
 
         # The instance dict contains whatever was originally assigned
         # in __set__.
-        if self.field.name in instance.__dict__:
-            file = instance.__dict__[self.field.name]
-        else:
+        if self.field.name not in instance.__dict__:
             instance.refresh_from_db(fields=[self.field.name])
-            file = getattr(instance, self.field.name)
+        file = instance.__dict__[self.field.name]
 
         # If this value is a string (instance.file = "path/to/file") or None
         # then we simply wrap it with the appropriate attribute class according
