@@ -6,6 +6,7 @@ import os
 import pickle
 import textwrap
 import unittest
+import warnings
 from importlib import import_module
 from io import StringIO
 
@@ -22,6 +23,9 @@ from django.utils.version import PY37
 try:
     import ipdb as pdb
 except ImportError:
+    import pdb
+except Exception as e:
+    warnings.warn('ipdb failed: {}'.format(e))
     import pdb
 
 try:
