@@ -246,6 +246,28 @@ class ExclusionConstraintTests(PostgreSQLTestCase):
                 index_type='spgist',
             )
 
+    def test_invalid_opclasses_type(self):
+        msg = 'ExclusionConstraint.opclasses must be a list or tuple.'
+        with self.assertRaisesMessage(ValueError, msg):
+            ExclusionConstraint(
+                name='exclude_invalid_opclasses',
+                expressions=[(F('datespan'), RangeOperators.OVERLAPS)],
+                opclasses='invalid',
+            )
+
+    def test_opclasses_and_expressions_same_length(self):
+        msg = (
+            'ExclusionConstraint.expressions and '
+            'ExclusionConstraint.opclasses must have the same number of '
+            'elements.'
+        )
+        with self.assertRaisesMessage(ValueError, msg):
+            ExclusionConstraint(
+                name='exclude_invalid_expressions_opclasses_length',
+                expressions=[(F('datespan'), RangeOperators.OVERLAPS)],
+                opclasses=['foo', 'bar'],
+            )
+
     def test_repr(self):
         constraint = ExclusionConstraint(
             name='exclude_overlapping',
@@ -289,6 +311,16 @@ class ExclusionConstraintTests(PostgreSQLTestCase):
             repr(constraint),
             "<ExclusionConstraint: index_type=GIST, expressions=["
             "(F(datespan), '-|-')], include=('cancelled', 'room')>",
+        )
+        constraint = ExclusionConstraint(
+            name='exclude_overlapping',
+            expressions=[(F('datespan'), RangeOperators.ADJACENT_TO)],
+            opclasses=['range_ops'],
+        )
+        self.assertEqual(
+            repr(constraint),
+            "<ExclusionConstraint: index_type=GIST, expressions=["
+            "(F(datespan), '-|-')], opclasses=['range_ops']>",
         )
 
     def test_eq(self):
@@ -345,6 +377,23 @@ class ExclusionConstraintTests(PostgreSQLTestCase):
             ],
             include=['cancelled'],
         )
+        constraint_8 = ExclusionConstraint(
+            name='exclude_overlapping',
+            expressions=[
+                ('datespan', RangeOperators.OVERLAPS),
+                ('room', RangeOperators.EQUAL),
+            ],
+            include=['cancelled'],
+            opclasses=['range_ops', 'range_ops']
+        )
+        constraint_9 = ExclusionConstraint(
+            name='exclude_overlapping',
+            expressions=[
+                ('datespan', RangeOperators.OVERLAPS),
+                ('room', RangeOperators.EQUAL),
+            ],
+            opclasses=['range_ops', 'range_ops']
+        )
         self.assertEqual(constraint_1, constraint_1)
         self.assertEqual(constraint_1, mock.ANY)
         self.assertNotEqual(constraint_1, constraint_2)
@@ -353,8 +402,10 @@ class ExclusionConstraintTests(PostgreSQLTestCase):
         self.assertNotEqual(constraint_2, constraint_3)
         self.assertNotEqual(constraint_2, constraint_4)
         self.assertNotEqual(constraint_2, constraint_7)
+        self.assertNotEqual(constraint_2, constraint_9)
         self.assertNotEqual(constraint_4, constraint_5)
         self.assertNotEqual(constraint_5, constraint_6)
+        self.assertNotEqual(constraint_7, constraint_8)
         self.assertNotEqual(constraint_1, object())
 
     def test_deconstruct(self):
@@ -428,6 +479,21 @@ class ExclusionConstraintTests(PostgreSQLTestCase):
             'name': 'exclude_overlapping',
             'expressions': [('datespan', RangeOperators.OVERLAPS)],
             'include': ('cancelled', 'room'),
+        })
+
+    def test_deconstruct_opclasses(self):
+        constraint = ExclusionConstraint(
+            name='exclude_overlapping',
+            expressions=[('datespan', RangeOperators.OVERLAPS)],
+            opclasses=['range_ops'],
+        )
+        path, args, kwargs = constraint.deconstruct()
+        self.assertEqual(path, 'django.contrib.postgres.constraints.ExclusionConstraint')
+        self.assertEqual(args, ())
+        self.assertEqual(kwargs, {
+            'name': 'exclude_overlapping',
+            'expressions': [('datespan', RangeOperators.OVERLAPS)],
+            'opclasses': ['range_ops'],
         })
 
     def _test_range_overlaps(self, constraint):
@@ -505,6 +571,7 @@ class ExclusionConstraintTests(PostgreSQLTestCase):
                 ('room', RangeOperators.EQUAL)
             ],
             condition=Q(cancelled=False),
+            opclasses=['range_ops', 'gist_int4_ops'],
         )
         self._test_range_overlaps(constraint)
 
@@ -624,3 +691,64 @@ class ExclusionConstraintTests(PostgreSQLTestCase):
             ):
                 with self.assertRaisesMessage(NotSupportedError, msg):
                     editor.add_constraint(RangesModel, constraint)
+
+    def test_range_adjacent_opclasses(self):
+        constraint_name = 'ints_adjacent_opclasses'
+        self.assertNotIn(constraint_name, self.get_constraints(RangesModel._meta.db_table))
+        constraint = ExclusionConstraint(
+            name=constraint_name,
+            expressions=[('ints', RangeOperators.ADJACENT_TO)],
+            opclasses=['range_ops'],
+        )
+        with connection.schema_editor() as editor:
+            editor.add_constraint(RangesModel, constraint)
+        self.assertIn(constraint_name, self.get_constraints(RangesModel._meta.db_table))
+        RangesModel.objects.create(ints=(20, 50))
+        with self.assertRaises(IntegrityError), transaction.atomic():
+            RangesModel.objects.create(ints=(10, 20))
+        RangesModel.objects.create(ints=(10, 19))
+        RangesModel.objects.create(ints=(51, 60))
+        # Drop the constraint.
+        with connection.schema_editor() as editor:
+            editor.remove_constraint(RangesModel, constraint)
+        self.assertNotIn(constraint_name, self.get_constraints(RangesModel._meta.db_table))
+
+    def test_range_adjacent_opclasses_condition(self):
+        constraint_name = 'ints_adjacent_opclasses_condition'
+        self.assertNotIn(constraint_name, self.get_constraints(RangesModel._meta.db_table))
+        constraint = ExclusionConstraint(
+            name=constraint_name,
+            expressions=[('ints', RangeOperators.ADJACENT_TO)],
+            opclasses=['range_ops'],
+            condition=Q(id__gte=100),
+        )
+        with connection.schema_editor() as editor:
+            editor.add_constraint(RangesModel, constraint)
+        self.assertIn(constraint_name, self.get_constraints(RangesModel._meta.db_table))
+
+    def test_range_adjacent_opclasses_deferrable(self):
+        constraint_name = 'ints_adjacent_opclasses_deferrable'
+        self.assertNotIn(constraint_name, self.get_constraints(RangesModel._meta.db_table))
+        constraint = ExclusionConstraint(
+            name=constraint_name,
+            expressions=[('ints', RangeOperators.ADJACENT_TO)],
+            opclasses=['range_ops'],
+            deferrable=Deferrable.DEFERRED,
+        )
+        with connection.schema_editor() as editor:
+            editor.add_constraint(RangesModel, constraint)
+        self.assertIn(constraint_name, self.get_constraints(RangesModel._meta.db_table))
+
+    @skipUnlessDBFeature('supports_covering_gist_indexes')
+    def test_range_adjacent_opclasses_include(self):
+        constraint_name = 'ints_adjacent_opclasses_include'
+        self.assertNotIn(constraint_name, self.get_constraints(RangesModel._meta.db_table))
+        constraint = ExclusionConstraint(
+            name=constraint_name,
+            expressions=[('ints', RangeOperators.ADJACENT_TO)],
+            opclasses=['range_ops'],
+            include=['decimals'],
+        )
+        with connection.schema_editor() as editor:
+            editor.add_constraint(RangesModel, constraint)
+        self.assertIn(constraint_name, self.get_constraints(RangesModel._meta.db_table))
