@@ -4,6 +4,7 @@ from django.conf import settings
 from django.db.backends.base.operations import BaseDatabaseOperations
 from django.db.backends.utils import split_tzname_delta
 from django.db.models import Exists, ExpressionWrapper, Lookup
+from django.db.models.constants import OnConflict
 from django.utils import timezone
 from django.utils.encoding import force_str
 
@@ -365,8 +366,10 @@ class DatabaseOperations(BaseDatabaseOperations):
         match_option = 'c' if lookup_type == 'regex' else 'i'
         return "REGEXP_LIKE(%%s, %%s, '%s')" % match_option
 
-    def insert_statement(self, ignore_conflicts=False):
-        return 'INSERT IGNORE INTO' if ignore_conflicts else super().insert_statement(ignore_conflicts)
+    def insert_statement(self, on_conflict=None):
+        if on_conflict == OnConflict.IGNORE:
+            return 'INSERT IGNORE INTO'
+        return super().insert_statement(on_conflict=on_conflict)
 
     def lookup_cast(self, lookup_type, internal_type=None):
         lookup = '%s'
@@ -388,3 +391,27 @@ class DatabaseOperations(BaseDatabaseOperations):
         if getattr(expression, 'conditional', False):
             return False
         return super().conditional_expression_supported_in_where_clause(expression)
+
+    def on_conflict_suffix_sql(self, fields, on_conflict, update_fields, unique_fields):
+        if on_conflict == OnConflict.UPDATE:
+            conflict_suffix_sql = 'ON DUPLICATE KEY UPDATE %(fields)s'
+            field_sql = '%(field)s = VALUES(%(field)s)'
+            # The use of VALUES() is deprecated in MySQL 8.0.20+. Instead, use
+            # aliases for the new row and its columns available in MySQL
+            # 8.0.19+.
+            if not self.connection.mysql_is_mariadb:
+                if self.connection.mysql_version >= (8, 0, 19):
+                    conflict_suffix_sql = f'AS new {conflict_suffix_sql}'
+                    field_sql = '%(field)s = new.%(field)s'
+            # VALUES() was renamed to VALUE() in MariaDB 10.3.3+.
+            elif self.connection.mysql_version >= (10, 3, 3):
+                field_sql = '%(field)s = VALUE(%(field)s)'
+
+            fields = ', '.join([
+                field_sql % {'field': field}
+                for field in map(self.quote_name, update_fields)
+            ])
+            return conflict_suffix_sql % {'fields': fields}
+        return super().on_conflict_suffix_sql(
+            fields, on_conflict, update_fields, unique_fields,
+        )

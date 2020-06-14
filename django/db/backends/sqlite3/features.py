@@ -40,6 +40,8 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_order_by_nulls_modifier = Database.sqlite_version_info >= (3, 30, 0)
     order_by_nulls_first = True
     supports_json_field_contains = False
+    supports_update_conflicts = Database.sqlite_version_info >= (3, 24, 0)
+    supports_update_conflicts_with_target = supports_update_conflicts
     test_collations = {
         'ci': 'nocase',
         'cs': 'binary',

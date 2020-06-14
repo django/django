@@ -232,6 +232,10 @@ Models
   in order to reduce the number of failed requests, e.g. after database server
   restart.
 
+* :meth:`.QuerySet.bulk_create` now supports updating fields when a row
+  insertion fails uniqueness constraints. This is supported on MariaDB, MySQL,
+  PostgreSQL, and SQLite 3.24+.
+
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 
@@ -297,6 +301,14 @@ backends.
 
 * ``DatabaseIntrospection.get_key_columns()`` is removed. Use
   ``DatabaseIntrospection.get_relations()`` instead.
+
+* ``DatabaseOperations.ignore_conflicts_suffix_sql()`` method is replaced by
+  ``DatabaseOperations.on_conflict_suffix_sql()`` that accepts the ``fields``,
+  ``on_conflict``, ``update_fields``, and ``unique_fields`` arguments.
+
+* The ``ignore_conflicts`` argument of the
+  ``DatabaseOperations.insert_statement()`` method is replaced by
+  ``on_conflict`` that accepts ``django.db.models.constants.OnConflict``.
 
 Dropped support for MariaDB 10.2
 --------------------------------

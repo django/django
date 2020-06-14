@@ -8,6 +8,7 @@ from django.conf import settings
 from django.core.exceptions import FieldError
 from django.db import DatabaseError, NotSupportedError, models
 from django.db.backends.base.operations import BaseDatabaseOperations
+from django.db.models.constants import OnConflict
 from django.db.models.expressions import Col
 from django.utils import timezone
 from django.utils.dateparse import parse_date, parse_datetime, parse_time
@@ -370,8 +371,10 @@ class DatabaseOperations(BaseDatabaseOperations):
             return 'django_time_diff(%s, %s)' % (lhs_sql, rhs_sql), params
         return 'django_timestamp_diff(%s, %s)' % (lhs_sql, rhs_sql), params
 
-    def insert_statement(self, ignore_conflicts=False):
-        return 'INSERT OR IGNORE INTO' if ignore_conflicts else super().insert_statement(ignore_conflicts)
+    def insert_statement(self, on_conflict=None):
+        if on_conflict == OnConflict.IGNORE:
+            return 'INSERT OR IGNORE INTO'
+        return super().insert_statement(on_conflict=on_conflict)
 
     def return_insert_columns(self, fields):
         # SQLite < 3.35 doesn't support an INSERT...RETURNING statement.
@@ -384,3 +387,19 @@ class DatabaseOperations(BaseDatabaseOperations):
             ) for field in fields
         ]
         return 'RETURNING %s' % ', '.join(columns), ()
+
+    def on_conflict_suffix_sql(self, fields, on_conflict, update_fields, unique_fields):
+        if (
+            on_conflict == OnConflict.UPDATE and
+            self.connection.features.supports_update_conflicts_with_target
+        ):
+            return 'ON CONFLICT(%s) DO UPDATE SET %s' % (
+                ', '.join(map(self.quote_name, unique_fields)),
+                ', '.join([
+                    f'{field} = EXCLUDED.{field}'
+                    for field in map(self.quote_name, update_fields)
+                ]),
+            )
+        return super().on_conflict_suffix_sql(
+            fields, on_conflict, update_fields, unique_fields,
+        )

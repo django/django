@@ -57,6 +57,8 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_deferrable_unique_constraints = True
     has_json_operators = True
     json_key_contains_list_matching_requires_list = True
+    supports_update_conflicts = True
+    supports_update_conflicts_with_target = True
     test_collations = {
         'non_default': 'sv-x-icu',
         'swedish_ci': 'sv-x-icu',
