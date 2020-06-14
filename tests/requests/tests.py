@@ -792,7 +792,8 @@ class HostValidationTests(SimpleTestCase):
             'HTTP_X_FORWARDED_HOST': 'example.com:8000',
         }
         # Should use the X-Forwarded-Host header
-        self.assertEqual(request.get_port(), '8000')
+        with override_settings(ALLOWED_HOSTS=['example.com']):
+            self.assertEqual(request.get_port(), '8000')
 
         request = HttpRequest()
         request.META = {
@@ -810,7 +811,8 @@ class HostValidationTests(SimpleTestCase):
             'HTTP_X_FORWARDED_HOST': '[2001:19f0:feee::dead:beef:cafe]:8000',
         }
         # Should use the X-Forwarded-Host header
-        self.assertEqual(request.get_port(), '8000')
+        with override_settings(ALLOWED_HOSTS=['[2001:19f0:feee::dead:beef:cafe]']):
+            self.assertEqual(request.get_port(), '8000')
 
         request = HttpRequest()
         request.META = {
@@ -829,8 +831,9 @@ class HostValidationTests(SimpleTestCase):
             'HTTP_X_FORWARDED_HOST': 'example.com',
             'HTTP_X_FORWARDED_PORT': '8010',
         }
-        # Should use the X-Forwarded-Port header
-        self.assertEqual(request.get_port(), '8010')
+        with override_settings(ALLOWED_HOSTS=['example.com']):
+            # Should use the X-Forwarded-Port header
+            self.assertEqual(request.get_port(), '8010')
 
         request = HttpRequest()
         request.META = {

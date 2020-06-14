@@ -641,10 +641,15 @@ class CsrfViewMiddlewareTests(CsrfViewMiddlewareTestMixin, SimpleTestCase):
         self.assertEqual(len(csrf_cookie.value), CSRF_TOKEN_LENGTH)
         self._check_token_present(resp, csrf_id=csrf_cookie.value)
 
-    @override_settings(ALLOWED_HOSTS=['www.example.com'], CSRF_COOKIE_DOMAIN='.example.com', USE_X_FORWARDED_PORT=True)
+    @override_settings(
+        ALLOWED_HOSTS=['www.example.com'],
+        CSRF_COOKIE_DOMAIN='.example.com',
+        USE_X_FORWARDED_PORT=True,
+        USE_X_FORWARDED_HOST=True
+    )
     def test_https_good_referer_behind_proxy(self):
         """
-        A POST HTTPS request is accepted when USE_X_FORWARDED_PORT=True.
+        A POST HTTPS request is accepted when USE_X_FORWARDED_*=True.
         """
         self._test_https_good_referer_behind_proxy()
 
@@ -752,11 +757,12 @@ class CsrfViewMiddlewareUseSessionsTests(CsrfViewMiddlewareTestMixin, SimpleTest
         ALLOWED_HOSTS=['www.example.com'],
         SESSION_COOKIE_DOMAIN='.example.com',
         USE_X_FORWARDED_PORT=True,
+        USE_X_FORWARDED_HOST=True,
         DEBUG=True,
     )
     def test_https_good_referer_behind_proxy(self):
         """
-        A POST HTTPS request is accepted when USE_X_FORWARDED_PORT=True.
+        A POST HTTPS request is accepted when USE_X_FORWARDED_*=True.
         """
         self._test_https_good_referer_behind_proxy()
 
