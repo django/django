@@ -1,6 +1,6 @@
 .\" Man page generated from reStructuredText.
 .
-.TH "DJANGO-ADMIN" "1" "May 12, 2020" "3.1" "Django"
+.TH "DJANGO-ADMIN" "1" "June 15, 2020" "3.1" "Django"
 .SH NAME
 django-admin \- Utility script for the Django Web framework
 .
@@ -192,8 +192,8 @@ Activates some additional checks that are only relevant in a deployment setting.
 You can use this option in your local development environment, but since your
 local development settings module may not have many of your production settings,
 you will probably want to point the \fBcheck\fP command at a different settings
-module, either by setting the \fBDJANGO_SETTINGS_MODULE\fP environment variable,
-or by passing the \fB\-\-settings\fP option:
+module, either by setting the \fBDJANGO_SETTINGS_MODULE\fP environment
+variable, or by passing the \fB\-\-settings\fP option:
 .INDENT 0.0
 .INDENT 3.5
 .sp
@@ -241,7 +241,7 @@ are excluded.
 .B \-\-use\-fuzzy, \-f
 .UNINDENT
 .sp
-Includes fuzzy translations into compiled files.
+Includes \fI\%fuzzy translations\fP into compiled files.
 .sp
 Example usage:
 .INDENT 0.0
@@ -1295,9 +1295,13 @@ on how to do this.
 .INDENT 0.0
 .INDENT 3.5
 .IP "Watchman timeout"
+.INDENT 0.0
+.TP
+.B DJANGO_WATCHMAN_TIMEOUT
+.UNINDENT
 .sp
 The default timeout of \fBWatchman\fP client is 5 seconds. You can change it
-by setting the \fBDJANGO_WATCHMAN_TIMEOUT\fP environment variable.
+by setting the \fI\%DJANGO_WATCHMAN_TIMEOUT\fP environment variable.
 .UNINDENT
 .UNINDENT
 .sp
@@ -2000,6 +2004,10 @@ Enables SQL logging for failing tests. If
 .TP
 .B \-\-parallel [N]
 .UNINDENT
+.INDENT 0.0
+.TP
+.B DJANGO_TEST_PROCESSES
+.UNINDENT
 .sp
 Runs tests in separate parallel processes. Since modern processors have
 multiple cores, this allows running tests significantly faster.
@@ -2007,7 +2015,7 @@ multiple cores, this allows running tests significantly faster.
 By default \fB\-\-parallel\fP runs one process per core according to
 \fI\%multiprocessing.cpu_count()\fP\&. You can adjust the number of processes
 either by providing it as the option\(aqs value, e.g. \fB\-\-parallel=4\fP, or by
-setting the \fBDJANGO_TEST_PROCESSES\fP environment variable.
+setting the \fI\%DJANGO_TEST_PROCESSES\fP environment variable.
 .sp
 Django distributes test cases — \fI\%unittest.TestCase\fP subclasses — to
 subprocesses. If there are fewer test cases than configured processes, Django
@@ -2247,6 +2255,10 @@ django\-admin changepassword ringo
 .TP
 .B django\-admin createsuperuser
 .UNINDENT
+.INDENT 0.0
+.TP
+.B DJANGO_SUPERUSER_PASSWORD
+.UNINDENT
 .sp
 This command is only available if Django\(aqs authentication system (\fBdjango.contrib.auth\fP) is installed.
 .sp
@@ -2256,9 +2268,9 @@ programmatically generate superuser accounts for your site(s).
 .sp
 When run interactively, this command will prompt for a password for
 the new superuser account. When run non\-interactively, you can provide
-a password by setting the \fBDJANGO_SUPERUSER_PASSWORD\fP environment variable.
-Otherwise, no password will be set, and the superuser account will not be able
-to log in until a password has been manually set for it.
+a password by setting the \fI\%DJANGO_SUPERUSER_PASSWORD\fP environment
+variable. Otherwise, no password will be set, and the superuser account will
+not be able to log in until a password has been manually set for it.
 .sp
 In non\-interactive mode, the
 \fBUSERNAME_FIELD\fP and required
@@ -2378,7 +2390,7 @@ allows for the following options:
 .UNINDENT
 .sp
 Adds the given filesystem path to the Python \fI\%import search path\fP\&. If this
-isn\(aqt provided, \fBdjango\-admin\fP will use the \fBPYTHONPATH\fP environment
+isn\(aqt provided, \fBdjango\-admin\fP will use the \fI\%PYTHONPATH\fP environment
 variable.
 .sp
 This option is unnecessary in \fBmanage.py\fP, because it takes care of setting
@@ -2402,7 +2414,8 @@ django\-admin migrate \-\-pythonpath=\(aq/home/djangoprojects/myproject\(aq
 .sp
 Specifies the settings module to use. The settings module should be in Python
 package syntax, e.g. \fBmysite.settings\fP\&. If this isn\(aqt provided,
-\fBdjango\-admin\fP will use the \fBDJANGO_SETTINGS_MODULE\fP environment variable.
+\fBdjango\-admin\fP will use the \fBDJANGO_SETTINGS_MODULE\fP environment
+variable.
 .sp
 This option is unnecessary in \fBmanage.py\fP, because it uses
 \fBsettings.py\fP from the current project by default.
@@ -2520,6 +2533,10 @@ django\-admin migrate \-\-skip\-checks
 .UNINDENT
 .SH EXTRA NICETIES
 .SS Syntax coloring
+.INDENT 0.0
+.TP
+.B DJANGO_COLORS
+.UNINDENT
 .sp
 The \fBdjango\-admin\fP / \fBmanage.py\fP commands will use pretty
 color\-coded output if your terminal supports ANSI\-colored output. It
@@ -2544,7 +2561,7 @@ background.
 \fBnocolor\fP, which disables syntax highlighting.
 .UNINDENT
 .sp
-You select a palette by setting a \fBDJANGO_COLORS\fP environment
+You select a palette by setting a \fI\%DJANGO_COLORS\fP environment
 variable to specify the palette you want to use. For example, to
 specify the \fBlight\fP palette under a Unix or OS/X BASH shell, you
 would run the following at a command prompt:
