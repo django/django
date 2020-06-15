@@ -836,7 +836,7 @@ Methods
       isn't supported by all browsers, so it's not a replacement for Django's
       CSRF protection, but rather a defense in depth measure.
 
-    .. _HttpOnly: https://www.owasp.org/index.php/HttpOnly
+    .. _HttpOnly: https://owasp.org/www-community/HttpOnly
     .. _SameSite: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Set-Cookie/SameSite
 
     .. warning::
