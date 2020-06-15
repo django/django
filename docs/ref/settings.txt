@@ -3159,7 +3159,7 @@ vulnerability into full hijacking of a user's session. There aren't many good
 reasons for turning this off. Your code shouldn't read session cookies from
 JavaScript.
 
-.. _HttpOnly: https://www.owasp.org/index.php/HttpOnly
+.. _HttpOnly: https://owasp.org/www-community/HttpOnly
 
 .. setting:: SESSION_COOKIE_NAME
 
