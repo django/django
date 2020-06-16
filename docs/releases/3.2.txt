@@ -215,7 +215,10 @@ Security
 Serialization
 ~~~~~~~~~~~~~
 
-* ...
+* The new :ref:`JSONL <serialization-formats-jsonl>` serializer allows using
+  the JSON Lines format with :djadmin:`dumpdata` and :djadmin:`loaddata`. This
+  can be useful for populating large databases because data is loaded line by
+  line into memory, rather than being loaded all at once.
 
 Signals
 ~~~~~~~
