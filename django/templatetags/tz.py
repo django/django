@@ -1,6 +1,6 @@
 from datetime import datetime, tzinfo
 
-import pytz
+import pytz_deprecation_shim as pds
 
 from django.template import Library, Node, TemplateSyntaxError
 from django.utils import timezone
@@ -51,8 +51,7 @@ def do_timezone(value, arg):
         if timezone.is_naive(value):
             default_timezone = timezone.get_default_timezone()
             value = timezone.make_aware(value, default_timezone)
-    # Filters must never raise exceptions, and pytz' exceptions inherit
-    # Exception directly, not a specific subclass. So catch everything.
+    # Filters must never raise exceptions, so catch everything.
     except Exception:
         return ''
 
@@ -61,8 +60,8 @@ def do_timezone(value, arg):
         tz = arg
     elif isinstance(arg, str):
         try:
-            tz = pytz.timezone(arg)
-        except pytz.UnknownTimeZoneError:
+            tz = pds.timezone(arg)
+        except KeyError:
             return ''
     else:
         return ''

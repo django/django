@@ -14,7 +14,7 @@ import warnings
 from itertools import chain
 from sqlite3 import dbapi2 as Database
 
-import pytz
+import pytz_deprecation_shim as pds
 
 from django.core.exceptions import ImproperlyConfigured
 from django.db import IntegrityError
@@ -430,7 +430,7 @@ def _sqlite_datetime_parse(dt, tzname=None, conn_tzname=None):
     except (TypeError, ValueError):
         return None
     if conn_tzname:
-        dt = dt.replace(tzinfo=pytz.timezone(conn_tzname))
+        dt = dt.replace(tzinfo=pds.timezone(conn_tzname))
     if tzname is not None and tzname != conn_tzname:
         sign_index = tzname.find('+') + tzname.find('-') + 1
         if sign_index > -1:
@@ -440,7 +440,7 @@ def _sqlite_datetime_parse(dt, tzname=None, conn_tzname=None):
                 hours, minutes = offset.split(':')
                 offset_delta = datetime.timedelta(hours=int(hours), minutes=int(minutes))
                 dt += offset_delta if sign == '+' else -offset_delta
-        dt = timezone.localtime(dt, pytz.timezone(tzname))
+        dt = timezone.localtime(dt, pds.timezone(tzname))
     return dt
 
 

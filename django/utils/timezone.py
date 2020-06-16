@@ -6,7 +6,7 @@ import functools
 from contextlib import ContextDecorator
 from datetime import datetime, timedelta, timezone, tzinfo
 
-import pytz
+import pytz_deprecation_shim as pds
 from asgiref.local import Local
 
 from django.conf import settings
@@ -22,7 +22,7 @@ __all__ = [
 
 
 # UTC time zone as a tzinfo instance.
-utc = pytz.utc
+utc = pds.UTC
 
 
 def get_fixed_timezone(offset):
@@ -44,7 +44,7 @@ def get_default_timezone():
 
     This is the time zone defined by settings.TIME_ZONE.
     """
-    return pytz.timezone(settings.TIME_ZONE)
+    return pds.timezone(settings.TIME_ZONE)
 
 
 # This function exists for consistency with get_current_timezone_name
@@ -68,7 +68,7 @@ def get_current_timezone_name():
 
 def _get_timezone_name(timezone):
     """Return the name of ``timezone``."""
-    return timezone.tzname(None)
+    return str(timezone)
 
 # Timezone selection functions.
 
@@ -86,7 +86,7 @@ def activate(timezone):
     if isinstance(timezone, tzinfo):
         _active.value = timezone
     elif isinstance(timezone, str):
-        _active.value = pytz.timezone(timezone)
+        _active.value = pds.timezone(timezone)
     else:
         raise ValueError("Invalid timezone: %r" % timezone)
 
@@ -190,8 +190,7 @@ def now():
     Return an aware or naive datetime.datetime, depending on settings.USE_TZ.
     """
     if settings.USE_TZ:
-        # timeit shows that datetime.now(tz=utc) is 24% slower
-        return datetime.utcnow().replace(tzinfo=utc)
+        return datetime.now(utc)
     else:
         return datetime.now()
 
@@ -229,7 +228,7 @@ def make_aware(value, timezone=None, is_dst=None):
     """Make a naive datetime.datetime in a given time zone aware."""
     if timezone is None:
         timezone = get_current_timezone()
-    if hasattr(timezone, 'localize'):
+    if pds.helpers.is_pytz_zone(timezone):
         # This method is available for pytz time zones.
         return timezone.localize(value, is_dst=is_dst)
     else:
@@ -237,7 +236,6 @@ def make_aware(value, timezone=None, is_dst=None):
         if is_aware(value):
             raise ValueError(
                 "make_aware expects a naive datetime, got %s" % value)
-        # This may be wrong around DST changes!
         return value.replace(tzinfo=timezone)
 
 

@@ -543,7 +543,7 @@ class NewDatabaseTests(TestCase):
             with connection.cursor() as cursor:
                 cursor.execute('SELECT CURRENT_TIMESTAMP')
                 now = cursor.fetchone()[0]
-                self.assertEqual(now.tzinfo.zone, 'Europe/Paris')
+                self.assertEqual(str(now.tzinfo), 'Europe/Paris')
 
     @requires_tz_support
     def test_filter_date_field_with_aware_datetime(self):

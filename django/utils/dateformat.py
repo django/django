@@ -164,16 +164,11 @@ class TimeFormat(Formatter):
         if not self.timezone:
             return ""
 
-        name = None
-        try:
+        if _datetime_unambiguous(self.data, tz=self.timezone):
             name = self.timezone.tzname(self.data)
-        except Exception:
-            # pytz raises AmbiguousTimeError during the autumn DST change.
-            # This happens mainly when __init__ receives a naive datetime
-            # and sets self.timezone = get_default_timezone().
-            pass
-        if name is None:
+        else:
             name = self.format('O')
+
         return str(name)
 
     def u(self):
@@ -188,16 +183,11 @@ class TimeFormat(Formatter):
 
         If timezone information is not available, return an empty string.
         """
-        if not self.timezone:
+        if (not self.timezone or
+                not _datetime_unambiguous(self.data, self.timezone)):
             return ""
 
-        try:
-            offset = self.timezone.utcoffset(self.data)
-        except Exception:
-            # pytz raises AmbiguousTimeError during the autumn DST change.
-            # This happens mainly when __init__ receives a naive datetime
-            # and sets self.timezone = get_default_timezone().
-            return ""
+        offset = self.timezone.utcoffset(self.data)
 
         # `offset` is a datetime.timedelta. For negative values (to the west of
         # UTC) only days can be negative (days=-1) and seconds are always
@@ -236,16 +226,14 @@ class DateFormat(TimeFormat):
 
     def I(self):  # NOQA: E743, E741
         "'1' if Daylight Savings Time, '0' otherwise."
-        try:
-            if self.timezone and self.timezone.dst(self.data):
-                return '1'
-            else:
-                return '0'
-        except Exception:
-            # pytz raises AmbiguousTimeError during the autumn DST change.
-            # This happens mainly when __init__ receives a naive datetime
-            # and sets self.timezone = get_default_timezone().
+        if (not self.timezone or
+                not _datetime_unambiguous(self.data, self.timezone)):
             return ''
+
+        if self.timezone.dst(self.data):
+            return '1'
+        else:
+            return '0'
 
     def j(self):
         "Day of the month without leading zeros; i.e. '1' to '31'"
@@ -347,3 +335,8 @@ def time_format(value, format_string):
     "Convenience function"
     tf = TimeFormat(value)
     return tf.format(format_string)
+
+
+def _datetime_unambiguous(dt, tz):
+    "Returns True if the datetime value is unaffected by `fold`"
+    return tz.utcoffset(dt.replace(fold=not dt.fold)) == tz.utcoffset(dt)

@@ -6,7 +6,7 @@ from collections import deque
 from contextlib import contextmanager
 
 import _thread
-import pytz
+import pytz_deprecation_shim as pds
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
@@ -135,7 +135,7 @@ class BaseDatabaseWrapper:
         elif self.settings_dict['TIME_ZONE'] is None:
             return timezone.utc
         else:
-            return pytz.timezone(self.settings_dict['TIME_ZONE'])
+            return pds.timezone(self.settings_dict['TIME_ZONE'])
 
     @cached_property
     def timezone_name(self):
