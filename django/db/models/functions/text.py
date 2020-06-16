@@ -1,6 +1,6 @@
 from django.db import NotSupportedError
 from django.db.models.expressions import Func, Value
-from django.db.models.fields import IntegerField
+from django.db.models.fields import CharField, IntegerField
 from django.db.models.functions import Coalesce
 from django.db.models.lookups import Transform
 
@@ -135,6 +135,7 @@ class Concat(Func):
 class Left(Func):
     function = 'LEFT'
     arity = 2
+    output_field = CharField()
 
     def __init__(self, expression, length, **extra):
         """
@@ -173,6 +174,7 @@ class Lower(Transform):
 
 class LPad(BytesToCharFieldConversionMixin, Func):
     function = 'LPAD'
+    output_field = CharField()
 
     def __init__(self, expression, length, fill_text=Value(' '), **extra):
         if not hasattr(length, 'resolve_expression') and length is not None and length < 0:
@@ -204,6 +206,7 @@ class Ord(Transform):
 
 class Repeat(BytesToCharFieldConversionMixin, Func):
     function = 'REPEAT'
+    output_field = CharField()
 
     def __init__(self, expression, number, **extra):
         if not hasattr(number, 'resolve_expression') and number is not None and number < 0:
@@ -303,6 +306,7 @@ class StrIndex(Func):
 
 class Substr(Func):
     function = 'SUBSTRING'
+    output_field = CharField()
 
     def __init__(self, expression, pos, length=None, **extra):
         """
