@@ -1434,13 +1434,13 @@ class Query(BaseExpression):
                 if len(relation_field_parts) > idx:
                     if relation_field_parts[idx] != lookup_field_part:
                         raise ValueError(
-                            "FilteredRelation's condition doesn't support nested relations"
+                            "FilteredRelation's condition doesn't support nested relations "
                             "on clauses not within the path of the relation (got %r for %r)." % (
                                 lookup, filtered_relation.relation_name)
                         )
                 else:
                     raise ValueError(
-                        "FilteredRelation's condition doesn't support nested relations"
+                        "FilteredRelation's condition doesn't support nested relations "
                         "on clauses deeper than the relation (got %r for %r)." % (
                             lookup, filtered_relation.relation_name)
                     )
