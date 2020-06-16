@@ -123,10 +123,11 @@ class Index:
             self.name = 'D%s' % self.name[1:]
 
     def __repr__(self):
-        return "<%s: fields='%s'%s%s>" % (
+        return "<%s: fields='%s'%s%s%s>" % (
             self.__class__.__name__, ', '.join(self.fields),
-            '' if self.condition is None else ', condition=%s' % self.condition,
-            '' if not self.include else ", include='%s'" % ', '.join(self.include),
+            '' if self.condition is None else ' condition=%s' % self.condition,
+            '' if not self.include else " include='%s'" % ', '.join(self.include),
+            '' if not self.opclasses else " opclasses='%s'" % ', '.join(self.opclasses),
         )
 
     def __eq__(self, other):
