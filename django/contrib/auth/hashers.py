@@ -302,8 +302,8 @@ class Argon2PasswordHasher(BasePasswordHasher):
     library = 'argon2'
 
     time_cost = 2
-    memory_cost = 512
-    parallelism = 2
+    memory_cost = 102400
+    parallelism = 8
 
     def encode(self, password, salt):
         argon2 = self._load_library()
@@ -363,7 +363,7 @@ class Argon2PasswordHasher(BasePasswordHasher):
         argon2 = self._load_library()
         # salt_len is a noop, because we provide our own salt.
         return argon2.Parameters(
-            type=argon2.low_level.Type.I,
+            type=argon2.low_level.Type.ID,
             version=argon2.low_level.ARGON2_VERSION,
             salt_len=argon2.DEFAULT_RANDOM_SALT_LENGTH,
             hash_len=argon2.DEFAULT_HASH_LENGTH,

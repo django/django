@@ -50,6 +50,15 @@ Minor features
 * The default iteration count for the PBKDF2 password hasher is increased from
   216,000 to 260,000.
 
+* The default variant for the Argon2 password hasher is changed to Argon2id.
+  ``memory_cost`` and ``parallelism`` are increased to 102,400 and 8
+  respectively to match the ``argon2-cffi`` defaults.
+
+  Increasing the ``memory_cost`` pushes the required memory from 512 KB to 100
+  MB. This is still rather conservative but can lead to problems in memory
+  constrained environments. If this is the case, the existing hasher can be
+  subclassed to override the defaults.
+
 :mod:`django.contrib.contenttypes`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
