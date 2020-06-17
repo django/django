@@ -10,6 +10,7 @@ affordances
 aggregator
 Ai
 Alchin
+allowlist
 alphanumerics
 amet
 analytics
@@ -155,6 +156,7 @@ decrementing
 deduplicates
 deepcopy
 deferrable
+denylist
 deprecations
 deserialization
 deserialize
@@ -779,8 +781,6 @@ vertices
 viewable
 virtualized
 Weblog
-whitelist
-whitelisted
 whitespace
 whitespaces
 whizbang

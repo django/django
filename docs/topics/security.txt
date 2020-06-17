@@ -261,7 +261,7 @@ User-uploaded content
      from something like ``usercontent-example.com``. It's *not* sufficient to
      serve content from a subdomain like ``usercontent.example.com``.
 
-  #. Beyond this, applications may choose to define a whitelist of allowable
+  #. Beyond this, applications may choose to define a list of allowable
      file extensions for user uploaded files and configure the web server
      to only serve such files.
 

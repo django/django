@@ -791,7 +791,7 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
         self.assertEqual(response.status_code, 200)
 
         # Filters should be allowed if they involve a local field without the
-        # need to whitelist them in list_filter or date_hierarchy.
+        # need to allow them in list_filter or date_hierarchy.
         response = self.client.get("%s?age__gt=30" % reverse('admin:admin_views_person_changelist'))
         self.assertEqual(response.status_code, 200)
 
