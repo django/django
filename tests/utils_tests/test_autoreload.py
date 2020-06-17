@@ -14,6 +14,7 @@ from pathlib import Path
 from subprocess import CompletedProcess
 from unittest import mock, skip, skipIf
 
+import django.__main__
 from django.apps.registry import Apps
 from django.test import SimpleTestCase
 from django.test.utils import extend_sys_path
@@ -151,6 +152,55 @@ class TestIterModulesAndFiles(SimpleTestCase):
                     autoreload.iter_modules_and_files((), frozenset([path])),
                     frozenset(),
                 )
+
+
+class TestChildArguments(SimpleTestCase):
+    @mock.patch('sys.argv', [django.__main__.__file__, 'runserver'])
+    @mock.patch('sys.warnoptions', [])
+    def test_run_as_module(self):
+        self.assertEqual(
+            autoreload.get_child_arguments(),
+            [sys.executable, '-m', 'django', 'runserver']
+        )
+
+    @mock.patch('sys.argv', [__file__, 'runserver'])
+    @mock.patch('sys.warnoptions', ['error'])
+    def test_warnoptions(self):
+        self.assertEqual(
+            autoreload.get_child_arguments(),
+            [sys.executable, '-Werror', __file__, 'runserver']
+        )
+
+    @mock.patch('sys.warnoptions', [])
+    def test_exe_fallback(self):
+        tmpdir = tempfile.TemporaryDirectory()
+        self.addCleanup(tmpdir.cleanup)
+        exe_path = Path(tmpdir.name) / 'django-admin.exe'
+        exe_path.touch()
+        with mock.patch('sys.argv', [exe_path.with_suffix(''), 'runserver']):
+            self.assertEqual(
+                autoreload.get_child_arguments(),
+                [exe_path, 'runserver']
+            )
+
+    @mock.patch('sys.warnoptions', [])
+    def test_entrypoint_fallback(self):
+        tmpdir = tempfile.TemporaryDirectory()
+        self.addCleanup(tmpdir.cleanup)
+        script_path = Path(tmpdir.name) / 'django-admin-script.py'
+        script_path.touch()
+        with mock.patch('sys.argv', [script_path.with_name('django-admin'), 'runserver']):
+            self.assertEqual(
+                autoreload.get_child_arguments(),
+                [sys.executable, script_path, 'runserver']
+            )
+
+    @mock.patch('sys.argv', ['does-not-exist', 'runserver'])
+    @mock.patch('sys.warnoptions', [])
+    def test_raises_runtimeerror(self):
+        msg = 'Script does-not-exist does not exist.'
+        with self.assertRaisesMessage(RuntimeError, msg):
+            autoreload.get_child_arguments()
 
 
 class TestCommonRoots(SimpleTestCase):
@@ -360,6 +410,9 @@ class RestartWithReloaderTests(SimpleTestCase):
         return mock_call
 
     def test_manage_py(self):
+        script = Path('manage.py')
+        script.touch()
+        self.addCleanup(script.unlink)
         argv = ['./manage.py', 'runserver']
         mock_call = self.patch_autoreload(argv)
         autoreload.restart_with_reloader()
