@@ -22,12 +22,22 @@ class SimpleIndexesTests(SimpleTestCase):
             name='include_idx',
             include=['author', 'pages'],
         )
+        opclasses_index = models.Index(
+            fields=['headline', 'body'],
+            name='opclasses_idx',
+            opclasses=['varchar_pattern_ops', 'text_pattern_ops'],
+        )
         self.assertEqual(repr(index), "<Index: fields='title'>")
         self.assertEqual(repr(multi_col_index), "<Index: fields='title, author'>")
-        self.assertEqual(repr(partial_index), "<Index: fields='title', condition=(AND: ('pages__gt', 400))>")
+        self.assertEqual(repr(partial_index), "<Index: fields='title' condition=(AND: ('pages__gt', 400))>")
         self.assertEqual(
             repr(covering_index),
-            "<Index: fields='title', include='author, pages'>",
+            "<Index: fields='title' include='author, pages'>",
+        )
+        self.assertEqual(
+            repr(opclasses_index),
+            "<Index: fields='headline, body' "
+            "opclasses='varchar_pattern_ops, text_pattern_ops'>",
         )
 
     def test_eq(self):
