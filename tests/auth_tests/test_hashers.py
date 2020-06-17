@@ -514,6 +514,12 @@ class TestUtilsHashPassArgon2(SimpleTestCase):
         )
         self.assertTrue(check_password('secret', encoded))
         self.assertFalse(check_password('wrong', encoded))
+        # Old hashes with version attribute.
+        encoded = (
+            'argon2$argon2i$v=19$m=8,t=1,p=1$c2FsdHNhbHQ$YC9+jJCrQhs5R6db7LlN8Q'
+        )
+        self.assertIs(check_password('secret', encoded), True)
+        self.assertIs(check_password('wrong', encoded), False)
 
     def test_argon2_upgrade(self):
         self._test_argon2_upgrade('time_cost', 'time cost', 1)
