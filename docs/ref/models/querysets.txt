@@ -3710,3 +3710,7 @@ operate on vegetarian pizzas.
 * :meth:`.QuerySet.only` and :meth:`~.QuerySet.prefetch_related`.
 * A :class:`~django.contrib.contenttypes.fields.GenericForeignKey`
   inherited from a parent model.
+
+.. versionchanged:: 3.2
+
+    Support for nested relations was added.

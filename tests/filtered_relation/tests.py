@@ -341,7 +341,6 @@ class FilteredRelationTests(TestCase):
             qs = Author.objects.annotate(
                 book_edited_by_b=FilteredRelation('book', condition=Q(book__editor__name__icontains='b')),
             ).filter(book_edited_by_b__isnull=False)
-            list(qs)
 
     def test_with_foreign_key_relation_name_lookup(self):
         msg = (
@@ -355,7 +354,6 @@ class FilteredRelationTests(TestCase):
                     condition=Q(book__editor__name__icontains='b')
                 ),
             ).filter(book_edited_by_b__isnull=False)
-            list(qs)
 
     def test_with_foreign_key_relation_name_lookup_not_within_path(self):
         msg = (
