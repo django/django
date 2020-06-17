@@ -307,14 +307,15 @@ class Argon2PasswordHasher(BasePasswordHasher):
 
     def encode(self, password, salt):
         argon2 = self._load_library()
+        params = self.params()
         data = argon2.low_level.hash_secret(
             password.encode(),
             salt.encode(),
-            time_cost=self.time_cost,
-            memory_cost=self.memory_cost,
-            parallelism=self.parallelism,
-            hash_len=argon2.DEFAULT_HASH_LENGTH,
-            type=argon2.low_level.Type.I,
+            time_cost=params.time_cost,
+            memory_cost=params.memory_cost,
+            parallelism=params.parallelism,
+            hash_len=params.hash_len,
+            type=params.type,
         )
         return self.algorithm + data.decode('ascii')
 
@@ -323,11 +324,7 @@ class Argon2PasswordHasher(BasePasswordHasher):
         algorithm, rest = encoded.split('$', 1)
         assert algorithm == self.algorithm
         try:
-            return argon2.low_level.verify_secret(
-                ('$' + rest).encode('ascii'),
-                password.encode(),
-                type=argon2.low_level.Type.I,
-            )
+            return argon2.PasswordHasher().verify('$' + rest, password)
         except argon2.exceptions.VerificationError:
             return False
 
@@ -347,21 +344,33 @@ class Argon2PasswordHasher(BasePasswordHasher):
         }
 
     def must_update(self, encoded):
-        (algorithm, variety, version, time_cost, memory_cost, parallelism,
-            salt, data) = self._decode(encoded)
+        algorithm, rest = encoded.split('$', 1)
         assert algorithm == self.algorithm
         argon2 = self._load_library()
-        return (
-            argon2.low_level.ARGON2_VERSION != version or
-            self.time_cost != time_cost or
-            self.memory_cost != memory_cost or
-            self.parallelism != parallelism
-        )
+        current_params = argon2.extract_parameters('$' + rest)
+        new_params = self.params()
+        # Set salt_len to the salt_len of the current parameters because salt
+        # is explicitly passed to argon2.
+        new_params.salt_len = current_params.salt_len
+        return current_params != new_params
 
     def harden_runtime(self, password, encoded):
         # The runtime for Argon2 is too complicated to implement a sensible
         # hardening algorithm.
         pass
+
+    def params(self):
+        argon2 = self._load_library()
+        # salt_len is a noop, because we provide our own salt.
+        return argon2.Parameters(
+            type=argon2.low_level.Type.I,
+            version=argon2.low_level.ARGON2_VERSION,
+            salt_len=argon2.DEFAULT_RANDOM_SALT_LENGTH,
+            hash_len=argon2.DEFAULT_HASH_LENGTH,
+            time_cost=self.time_cost,
+            memory_cost=self.memory_cost,
+            parallelism=self.parallelism,
+        )
 
     def _decode(self, encoded):
         """
@@ -370,24 +379,13 @@ class Argon2PasswordHasher(BasePasswordHasher):
             parallelism, salt, data,
         ).
         """
-        bits = encoded.split('$')
-        if len(bits) == 5:
-            # Argon2 < 1.3
-            algorithm, variety, raw_params, salt, data = bits
-            version = 0x10
-        else:
-            assert len(bits) == 6
-            algorithm, variety, raw_version, raw_params, salt, data = bits
-            assert raw_version.startswith('v=')
-            version = int(raw_version[len('v='):])
-        params = dict(bit.split('=', 1) for bit in raw_params.split(','))
-        assert len(params) == 3 and all(x in params for x in ('t', 'm', 'p'))
-        time_cost = int(params['t'])
-        memory_cost = int(params['m'])
-        parallelism = int(params['p'])
+        argon2 = self._load_library()
+        algorithm, rest = encoded.split('$', 1)
+        params = argon2.extract_parameters('$' + rest)
+        variety, *_, salt, data = rest.split('$')
         return (
-            algorithm, variety, version, time_cost, memory_cost, parallelism,
-            salt, data,
+            algorithm, variety, params.version, params.time_cost,
+            params.memory_cost, params.parallelism, salt, data,
         )
 
 

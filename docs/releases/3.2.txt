@@ -324,6 +324,8 @@ Miscellaneous
 * The :tfilter:`intcomma` and :tfilter:`intword` template filters no longer
   depend on the :setting:`USE_L10N` setting.
 
+* Support for ``argon2-cffi`` < 19.1.0 is removed.
+
 .. _deprecated-features-3.2:
 
 Features deprecated in 3.2
