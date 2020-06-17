@@ -351,3 +351,9 @@ Miscellaneous
 * Using a boolean value in :attr:`.BaseCommand.requires_system_checks` is
   deprecated. Use ``'__all__'`` instead of ``True``, and ``[]`` (an empty list)
   instead of ``False``.
+
+* The ``whitelist`` argument and ``domain_whitelist`` attribute of
+  :class:`~django.core.validators.EmailValidator` are deprecated. Use
+  ``allowlist`` instead of ``whitelist``, and ``domain_allowlist`` instead of
+  ``domain_whitelist``. You may need to rename ``whitelist`` in existing
+  migrations.
