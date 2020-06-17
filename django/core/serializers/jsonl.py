@@ -50,7 +50,7 @@ def Deserializer(stream_or_string, **options):
         if not line.strip():
             continue
         try:
-            yield list(PythonDeserializer([json.loads(line), ], **options))[0]
+            yield from PythonDeserializer([json.loads(line)], **options)
         except (GeneratorExit, DeserializationError):
             raise
         except Exception as exc:
