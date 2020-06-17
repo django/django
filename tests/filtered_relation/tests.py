@@ -338,7 +338,7 @@ class FilteredRelationTests(TestCase):
             "on clauses deeper than the relation (got 'book__editor__name__icontains' for 'book')."
         )
         with self.assertRaisesMessage(ValueError, msg):
-            qs = Author.objects.annotate(
+            Author.objects.annotate(
                 book_edited_by_b=FilteredRelation('book', condition=Q(book__editor__name__icontains='b')),
             ).filter(book_edited_by_b__isnull=False)
 
@@ -348,7 +348,7 @@ class FilteredRelationTests(TestCase):
             "(got 'book__title__icontains')."
         )
         with self.assertRaisesMessage(ValueError, msg):
-            qs = Author.objects.annotate(
+            Author.objects.annotate(
                 book_edited_by_b=FilteredRelation(
                     'book__title__icontains',
                     condition=Q(book__editor__name__icontains='b')
