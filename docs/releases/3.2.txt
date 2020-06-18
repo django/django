@@ -68,7 +68,8 @@ Minor features
 :mod:`django.contrib.gis`
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* The :meth:`.GDALRaster.transform` method now supports
+  :class:`~django.contrib.gis.gdal.SpatialReference`.
 
 :mod:`django.contrib.messages`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
