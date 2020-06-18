@@ -849,6 +849,10 @@ class MultiWidget(Widget):
             id_ += '_0'
         return id_
 
+    def subwidgets(self, name, value, attrs=None):
+        context = self.get_context(name, value, attrs)
+        yield from context['widget']['subwidgets']
+
     def value_from_datadict(self, data, files, name):
         return [
             widget.value_from_datadict(data, files, name + widget_name)

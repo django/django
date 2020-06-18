@@ -1,5 +1,7 @@
 from datetime import datetime
 
+from template_tests.utils import setup
+
 from django.core.exceptions import ValidationError
 from django.forms import (
     CharField, Form, MultipleChoiceField, MultiValueField, MultiWidget,
@@ -172,3 +174,9 @@ class MultiValueFieldTest(SimpleTestCase):
         })
         form.is_valid()
         self.assertEqual(form.cleaned_data['field1'], 'some text,JP,2007-04-25 06:24:00')
+
+    @setup({'subwidget-tag01': '{% for subwidget in form.field1.subwidgets %}{{ forloop.counter }}{% endfor %}'})
+    def test_multiwidget_subwidgets(self):
+        form = ComplexFieldForm()
+        output = self.engine.render_to_string('subwidget-tag01', {'form': form})
+        self.assertEqual(output, '123')
