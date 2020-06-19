@@ -1916,3 +1916,57 @@ class TestModelFormsetOverridesTroughFormMeta(TestCase):
             formset.non_form_errors(),
             ['Please submit 20 or fewer forms.'],
         )
+
+    def test_modelformset_factory_can_delete_extra(self):
+        AuthorFormSet = modelformset_factory(
+            Author,
+            fields='__all__',
+            can_delete=True,
+            can_delete_extra=True,
+            extra=2,
+        )
+        formset = AuthorFormSet()
+        self.assertEqual(len(formset), 2)
+        self.assertIn('DELETE', formset.forms[0].fields)
+        self.assertIn('DELETE', formset.forms[1].fields)
+
+    def test_modelformset_factory_disable_delete_extra(self):
+        AuthorFormSet = modelformset_factory(
+            Author,
+            fields='__all__',
+            can_delete=True,
+            can_delete_extra=False,
+            extra=2,
+        )
+        formset = AuthorFormSet()
+        self.assertEqual(len(formset), 2)
+        self.assertNotIn('DELETE', formset.forms[0].fields)
+        self.assertNotIn('DELETE', formset.forms[1].fields)
+
+    def test_inlineformset_factory_can_delete_extra(self):
+        BookFormSet = inlineformset_factory(
+            Author,
+            Book,
+            fields='__all__',
+            can_delete=True,
+            can_delete_extra=True,
+            extra=2,
+        )
+        formset = BookFormSet()
+        self.assertEqual(len(formset), 2)
+        self.assertIn('DELETE', formset.forms[0].fields)
+        self.assertIn('DELETE', formset.forms[1].fields)
+
+    def test_inlineformset_factory_can_not_delete_extra(self):
+        BookFormSet = inlineformset_factory(
+            Author,
+            Book,
+            fields='__all__',
+            can_delete=True,
+            can_delete_extra=False,
+            extra=2,
+        )
+        formset = BookFormSet()
+        self.assertEqual(len(formset), 2)
+        self.assertNotIn('DELETE', formset.forms[0].fields)
+        self.assertNotIn('DELETE', formset.forms[1].fields)

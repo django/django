@@ -158,6 +158,11 @@ Forms
   customizing the maximum number of forms that can be instantiated when
   supplying ``POST`` data. See :ref:`formsets-absolute-max` for more details.
 
+* The new ``can_delete_extra`` argument for :func:`.formset_factory`,
+  :func:`.inlineformset_factory`, and :func:`.modelformset_factory` allows
+  removal of the option to delete extra forms. See
+  :attr:`~.BaseFormSet.can_delete_extra` for more information.
+
 Generic Views
 ~~~~~~~~~~~~~
 
