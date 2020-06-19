@@ -54,15 +54,18 @@ class ProxyModelWithDifferentAppLabelTests(TransactionTestCase):
         user.user_permissions.add(self.default_permission)
         user.user_permissions.add(self.custom_permission)
         for permission in [self.default_permission, self.custom_permission]:
-            self.assertTrue(user.has_perm('auth.' + permission.codename))
-            self.assertFalse(user.has_perm('auth_tests.' + permission.codename))
+            self.assertTrue(user.has_perm('auth.%s.%s' % (permission.content_type.model, permission.codename)))
+            self.assertFalse(user.has_perm('auth_tests.%s.%s' % (permission.content_type.model, permission.codename)))
         with connection.schema_editor() as editor:
             update_proxy_permissions.update_proxy_model_permissions(apps, editor)
         # Reload user to purge the _perm_cache.
         user = User._default_manager.get(pk=user.pk)
+        # Reload permissions to update related content_type obj.
+        self.default_permission.refresh_from_db()
+        self.custom_permission.refresh_from_db()
         for permission in [self.default_permission, self.custom_permission]:
-            self.assertFalse(user.has_perm('auth.' + permission.codename))
-            self.assertTrue(user.has_perm('auth_tests.' + permission.codename))
+            self.assertFalse(user.has_perm('auth.%s.%s' % (permission.content_type.model, permission.codename)))
+            self.assertTrue(user.has_perm('auth_tests.%s.%s' % (permission.content_type.model, permission.codename)))
 
     def test_migrate_backwards(self):
         with connection.schema_editor() as editor:
@@ -78,16 +81,19 @@ class ProxyModelWithDifferentAppLabelTests(TransactionTestCase):
         user.user_permissions.add(self.default_permission)
         user.user_permissions.add(self.custom_permission)
         for permission in [self.default_permission, self.custom_permission]:
-            self.assertTrue(user.has_perm('auth.' + permission.codename))
-            self.assertFalse(user.has_perm('auth_tests.' + permission.codename))
+            self.assertTrue(user.has_perm('auth.%s.%s' % (permission.content_type.model, permission.codename)))
+            self.assertFalse(user.has_perm('auth_tests.%s.%s' % (permission.content_type.model, permission.codename)))
         with connection.schema_editor() as editor:
             update_proxy_permissions.update_proxy_model_permissions(apps, editor)
             update_proxy_permissions.revert_proxy_model_permissions(apps, editor)
         # Reload user to purge the _perm_cache.
         user = User._default_manager.get(pk=user.pk)
+        # Reload permissions to update related content_type obj.
+        self.default_permission.refresh_from_db()
+        self.custom_permission.refresh_from_db()
         for permission in [self.default_permission, self.custom_permission]:
-            self.assertTrue(user.has_perm('auth.' + permission.codename))
-            self.assertFalse(user.has_perm('auth_tests.' + permission.codename))
+            self.assertTrue(user.has_perm('auth.%s.%s' % (permission.content_type.model, permission.codename)))
+            self.assertFalse(user.has_perm('auth_tests.%s.%s' % (permission.content_type.model, permission.codename)))
 
 
 class ProxyModelWithSameAppLabelTests(TransactionTestCase):
@@ -132,13 +138,16 @@ class ProxyModelWithSameAppLabelTests(TransactionTestCase):
         user.user_permissions.add(self.default_permission)
         user.user_permissions.add(self.custom_permission)
         for permission in [self.default_permission, self.custom_permission]:
-            self.assertTrue(user.has_perm('auth_tests.' + permission.codename))
+            self.assertTrue(user.has_perm('auth_tests.%s.%s' % (permission.content_type.model, permission.codename)))
         with connection.schema_editor() as editor:
             update_proxy_permissions.update_proxy_model_permissions(apps, editor)
         # Reload user to purge the _perm_cache.
         user = User._default_manager.get(pk=user.pk)
+        # Reload permissions to update related content_type obj.
+        self.default_permission.refresh_from_db()
+        self.custom_permission.refresh_from_db()
         for permission in [self.default_permission, self.custom_permission]:
-            self.assertTrue(user.has_perm('auth_tests.' + permission.codename))
+            self.assertTrue(user.has_perm('auth_tests.%s.%s' % (permission.content_type.model, permission.codename)))
 
     def test_migrate_backwards(self):
         with connection.schema_editor() as editor:
@@ -154,14 +163,17 @@ class ProxyModelWithSameAppLabelTests(TransactionTestCase):
         user.user_permissions.add(self.default_permission)
         user.user_permissions.add(self.custom_permission)
         for permission in [self.default_permission, self.custom_permission]:
-            self.assertTrue(user.has_perm('auth_tests.' + permission.codename))
+            self.assertTrue(user.has_perm('auth_tests.%s.%s' % (permission.content_type.model, permission.codename)))
         with connection.schema_editor() as editor:
             update_proxy_permissions.update_proxy_model_permissions(apps, editor)
             update_proxy_permissions.revert_proxy_model_permissions(apps, editor)
         # Reload user to purge the _perm_cache.
         user = User._default_manager.get(pk=user.pk)
+        # Reload permissions to update related content_type obj.
+        self.default_permission.refresh_from_db()
+        self.custom_permission.refresh_from_db()
         for permission in [self.default_permission, self.custom_permission]:
-            self.assertTrue(user.has_perm('auth_tests.' + permission.codename))
+            self.assertTrue(user.has_perm('auth_tests.%s.%s' % (permission.content_type.model, permission.codename)))
 
     def test_migrate_with_existing_target_permission(self):
         """

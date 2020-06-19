@@ -69,7 +69,7 @@ class PermissionsRequiredDecoratorTest(TestCase):
 
     def test_many_permissions_pass(self):
 
-        @permission_required(['auth_tests.add_customuser', 'auth_tests.change_customuser'])
+        @permission_required(['auth_tests.customuser.add_customuser', 'auth_tests.customuser.change_customuser'])
         def a_view(request):
             return HttpResponse()
         request = self.factory.get('/rand')
@@ -79,7 +79,7 @@ class PermissionsRequiredDecoratorTest(TestCase):
 
     def test_many_permissions_in_set_pass(self):
 
-        @permission_required({'auth_tests.add_customuser', 'auth_tests.change_customuser'})
+        @permission_required({'auth_tests.customuser.add_customuser', 'auth_tests.customuser.change_customuser'})
         def a_view(request):
             return HttpResponse()
         request = self.factory.get('/rand')
@@ -89,7 +89,7 @@ class PermissionsRequiredDecoratorTest(TestCase):
 
     def test_single_permission_pass(self):
 
-        @permission_required('auth_tests.add_customuser')
+        @permission_required('auth_tests.customuser.add_customuser')
         def a_view(request):
             return HttpResponse()
         request = self.factory.get('/rand')
@@ -99,7 +99,10 @@ class PermissionsRequiredDecoratorTest(TestCase):
 
     def test_permissioned_denied_redirect(self):
 
-        @permission_required(['auth_tests.add_customuser', 'auth_tests.change_customuser', 'nonexistent-permission'])
+        @permission_required([
+            'auth_tests.customuser.add_customuser', 'auth_tests.customuser.change_customuser',
+            'nonexistent-permission',
+        ])
         def a_view(request):
             return HttpResponse()
         request = self.factory.get('/rand')
@@ -110,7 +113,7 @@ class PermissionsRequiredDecoratorTest(TestCase):
     def test_permissioned_denied_exception_raised(self):
 
         @permission_required([
-            'auth_tests.add_customuser', 'auth_tests.change_customuser', 'nonexistent-permission'
+            'auth_tests.customuser.add_customuser', 'auth_tests.customuser.change_customuser', 'nonexistent-permission'
         ], raise_exception=True)
         def a_view(request):
             return HttpResponse()

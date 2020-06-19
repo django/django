@@ -64,6 +64,9 @@ class CustomUser(AbstractBaseUser):
     def has_module_perms(self, app_label):
         return True
 
+    def has_model_perms(self, app_label_model):
+        return True
+
     # Admin required fields
     @property
     def is_staff(self):

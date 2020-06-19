@@ -480,7 +480,7 @@ class BaseModelAdmin(metaclass=forms.MediaDefiningClass):
         """
         opts = self.opts
         codename = get_permission_codename('add', opts)
-        return request.user.has_perm("%s.%s" % (opts.app_label, codename))
+        return request.user.has_perm("%s.%s.%s" % (opts.app_label, opts.model_name, codename))
 
     def has_change_permission(self, request, obj=None):
         """
@@ -495,7 +495,7 @@ class BaseModelAdmin(metaclass=forms.MediaDefiningClass):
         """
         opts = self.opts
         codename = get_permission_codename('change', opts)
-        return request.user.has_perm("%s.%s" % (opts.app_label, codename))
+        return request.user.has_perm("%s.%s.%s" % (opts.app_label, opts.model_name, codename))
 
     def has_delete_permission(self, request, obj=None):
         """
@@ -510,7 +510,7 @@ class BaseModelAdmin(metaclass=forms.MediaDefiningClass):
         """
         opts = self.opts
         codename = get_permission_codename('delete', opts)
-        return request.user.has_perm("%s.%s" % (opts.app_label, codename))
+        return request.user.has_perm("%s.%s.%s" % (opts.app_label, opts.model_name, codename))
 
     def has_view_permission(self, request, obj=None):
         """
@@ -527,8 +527,8 @@ class BaseModelAdmin(metaclass=forms.MediaDefiningClass):
         codename_view = get_permission_codename('view', opts)
         codename_change = get_permission_codename('change', opts)
         return (
-            request.user.has_perm('%s.%s' % (opts.app_label, codename_view)) or
-            request.user.has_perm('%s.%s' % (opts.app_label, codename_change))
+            request.user.has_perm('%s.%s.%s' % (opts.app_label, opts.model_name, codename_view)) or
+            request.user.has_perm('%s.%s.%s' % (opts.app_label, opts.model_name, codename_change))
         )
 
     def has_view_or_change_permission(self, request, obj=None):
@@ -2159,7 +2159,7 @@ class InlineModelAdmin(BaseModelAdmin):
                 opts = field.remote_field.model._meta
                 break
         return any(
-            request.user.has_perm('%s.%s' % (opts.app_label, get_permission_codename(perm, opts)))
+            request.user.has_perm('%s.%s.%s' % (opts.app_label, opts.model_name, get_permission_codename(perm, opts)))
             for perm in perms
         )
 

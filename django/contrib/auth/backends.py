@@ -79,8 +79,8 @@ class ModelBackend(BaseBackend):
                 perms = Permission.objects.all()
             else:
                 perms = getattr(self, '_get_%s_permissions' % from_name)(user_obj)
-            perms = perms.values_list('content_type__app_label', 'codename').order_by()
-            setattr(user_obj, perm_cache_name, {"%s.%s" % (ct, name) for ct, name in perms})
+            perms = perms.values_list('content_type__app_label', 'content_type__model', 'codename').order_by()
+            setattr(user_obj, perm_cache_name, {"%s.%s.%s" % (ct, model_name, name) for ct, model_name, name in perms})
         return getattr(user_obj, perm_cache_name)
 
     def get_user_permissions(self, user_obj, obj=None):
@@ -113,6 +113,15 @@ class ModelBackend(BaseBackend):
         """
         return user_obj.is_active and any(
             perm[:perm.index('.')] == app_label
+            for perm in self.get_all_permissions(user_obj)
+        )
+
+    def has_model_perms(self, user_obj, app_label_model):
+        """
+        Return True if user_obj has any permissions in the given model from app_label.
+        """
+        return user_obj.is_active and any(
+            perm[:perm.index('.', perm.index('.') + 1)] == app_label_model
             for perm in self.get_all_permissions(user_obj)
         )
 

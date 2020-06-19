@@ -1080,6 +1080,11 @@ authentication app::
             # Simplest possible answer: Yes, always
             return True
 
+        def has_model_perms(self, app_label_model):
+            "Does the user have permissions to view the `app_label.model`?"
+            # Simplest possible answer: Yes, always
+            return True
+
         @property
         def is_staff(self):
             "Is the user a member of staff?"

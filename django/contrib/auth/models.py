@@ -223,6 +223,21 @@ def _user_has_module_perms(user, app_label):
     return False
 
 
+def _user_has_model_perms(user, app_label_model):
+    """
+    A backend can raise `PermissionDenied` to short-circuit permission checking.
+    """
+    for backend in auth.get_backends():
+        if not hasattr(backend, 'has_model_perms'):
+            continue
+        try:
+            if backend.has_model_perms(user, app_label_model):
+                return True
+        except PermissionDenied:
+            return False
+    return False
+
+
 class PermissionsMixin(models.Model):
     """
     Add the fields and methods necessary to support the Group and Permission
@@ -310,6 +325,17 @@ class PermissionsMixin(models.Model):
             return True
 
         return _user_has_module_perms(self, app_label)
+
+    def has_model_perms(self, app_label_model):
+        """
+        Return True if the user has any permissions in the given model from app_label.
+        Use similar logic as has_perm(), above.
+        """
+        # Active superusers have all permissions.
+        if self.is_active and self.is_superuser:
+            return True
+
+        return _user_has_model_perms(self, app_label_model)
 
 
 class AbstractUser(AbstractBaseUser, PermissionsMixin):
@@ -450,6 +476,9 @@ class AnonymousUser:
 
     def has_module_perms(self, module):
         return _user_has_module_perms(self, module)
+
+    def has_model_perms(self, module_model):
+        return _user_has_model_perms(self, module_model)
 
     @property
     def is_anonymous(self):

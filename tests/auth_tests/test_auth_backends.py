@@ -85,21 +85,21 @@ class BaseModelBackendTest:
 
     def test_has_perm(self):
         user = self.UserModel._default_manager.get(pk=self.user.pk)
-        self.assertIs(user.has_perm('auth.test'), False)
+        self.assertIs(user.has_perm('auth.%s.test' % self.UserModel.__name__.lower()), False)
 
         user.is_staff = True
         user.save()
-        self.assertIs(user.has_perm('auth.test'), False)
+        self.assertIs(user.has_perm('auth.%s.test' % self.UserModel.__name__.lower()), False)
 
         user.is_superuser = True
         user.save()
-        self.assertIs(user.has_perm('auth.test'), True)
+        self.assertIs(user.has_perm('auth.%s.test' % self.UserModel.__name__.lower()), True)
 
         user.is_staff = True
         user.is_superuser = True
         user.is_active = False
         user.save()
-        self.assertIs(user.has_perm('auth.test'), False)
+        self.assertIs(user.has_perm('auth.%s.test' % self.UserModel.__name__.lower()), False)
 
     def test_custom_perms(self):
         user = self.UserModel._default_manager.get(pk=self.user.pk)
@@ -109,36 +109,38 @@ class BaseModelBackendTest:
 
         # reloading user to purge the _perm_cache
         user = self.UserModel._default_manager.get(pk=self.user.pk)
-        self.assertEqual(user.get_all_permissions(), {'auth.test'})
-        self.assertEqual(user.get_user_permissions(), {'auth.test'})
+        self.assertEqual(user.get_all_permissions(), {'auth.group.test'})
+        self.assertEqual(user.get_user_permissions(), {'auth.group.test'})
         self.assertEqual(user.get_group_permissions(), set())
         self.assertIs(user.has_module_perms('Group'), False)
         self.assertIs(user.has_module_perms('auth'), True)
+        self.assertIs(user.has_model_perms('group'), False)
+        self.assertIs(user.has_model_perms('auth.group'), True)
 
         perm = Permission.objects.create(name='test2', content_type=content_type, codename='test2')
         user.user_permissions.add(perm)
         perm = Permission.objects.create(name='test3', content_type=content_type, codename='test3')
         user.user_permissions.add(perm)
         user = self.UserModel._default_manager.get(pk=self.user.pk)
-        expected_user_perms = {'auth.test2', 'auth.test', 'auth.test3'}
+        expected_user_perms = {'auth.group.test2', 'auth.group.test', 'auth.group.test3'}
         self.assertEqual(user.get_all_permissions(), expected_user_perms)
         self.assertIs(user.has_perm('test'), False)
-        self.assertIs(user.has_perm('auth.test'), True)
-        self.assertIs(user.has_perms(['auth.test2', 'auth.test3']), True)
+        self.assertIs(user.has_perm('auth.group.test'), True)
+        self.assertIs(user.has_perms(['auth.group.test2', 'auth.group.test3']), True)
 
         perm = Permission.objects.create(name='test_group', content_type=content_type, codename='test_group')
         group = Group.objects.create(name='test_group')
         group.permissions.add(perm)
         user.groups.add(group)
         user = self.UserModel._default_manager.get(pk=self.user.pk)
-        self.assertEqual(user.get_all_permissions(), {*expected_user_perms, 'auth.test_group'})
+        self.assertEqual(user.get_all_permissions(), {*expected_user_perms, 'auth.group.test_group'})
         self.assertEqual(user.get_user_permissions(), expected_user_perms)
-        self.assertEqual(user.get_group_permissions(), {'auth.test_group'})
-        self.assertIs(user.has_perms(['auth.test3', 'auth.test_group']), True)
+        self.assertEqual(user.get_group_permissions(), {'auth.group.test_group'})
+        self.assertIs(user.has_perms(['auth.group.test3', 'auth.group.test_group']), True)
 
         user = AnonymousUser()
         self.assertIs(user.has_perm('test'), False)
-        self.assertIs(user.has_perms(['auth.test2', 'auth.test3']), False)
+        self.assertIs(user.has_perms(['auth.group.test2', 'auth.group.test3']), False)
 
     def test_has_no_object_perm(self):
         """Regressiontest for #12462"""
@@ -147,10 +149,10 @@ class BaseModelBackendTest:
         perm = Permission.objects.create(name='test', content_type=content_type, codename='test')
         user.user_permissions.add(perm)
 
-        self.assertIs(user.has_perm('auth.test', 'object'), False)
+        self.assertIs(user.has_perm('auth.group.test', 'object'), False)
         self.assertEqual(user.get_all_permissions('object'), set())
-        self.assertIs(user.has_perm('auth.test'), True)
-        self.assertEqual(user.get_all_permissions(), {'auth.test'})
+        self.assertIs(user.has_perm('auth.group.test'), True)
+        self.assertEqual(user.get_all_permissions(), {'auth.group.test'})
 
     def test_anonymous_has_no_permissions(self):
         """
@@ -169,9 +171,9 @@ class BaseModelBackendTest:
         user.groups.add(group)
         group.permissions.add(group_perm)
 
-        self.assertEqual(backend.get_all_permissions(user), {'auth.test_user', 'auth.test_group'})
-        self.assertEqual(backend.get_user_permissions(user), {'auth.test_user'})
-        self.assertEqual(backend.get_group_permissions(user), {'auth.test_group'})
+        self.assertEqual(backend.get_all_permissions(user), {'auth.group.test_user', 'auth.group.test_group'})
+        self.assertEqual(backend.get_user_permissions(user), {'auth.group.test_user'})
+        self.assertEqual(backend.get_group_permissions(user), {'auth.group.test_group'})
 
         with mock.patch.object(self.UserModel, 'is_anonymous', True):
             self.assertEqual(backend.get_all_permissions(user), set())
@@ -195,9 +197,9 @@ class BaseModelBackendTest:
         user.groups.add(group)
         group.permissions.add(group_perm)
 
-        self.assertEqual(backend.get_all_permissions(user), {'auth.test_user', 'auth.test_group'})
-        self.assertEqual(backend.get_user_permissions(user), {'auth.test_user'})
-        self.assertEqual(backend.get_group_permissions(user), {'auth.test_group'})
+        self.assertEqual(backend.get_all_permissions(user), {'auth.group.test_user', 'auth.group.test_group'})
+        self.assertEqual(backend.get_user_permissions(user), {'auth.group.test_user'})
+        self.assertEqual(backend.get_group_permissions(user), {'auth.group.test_group'})
 
         user.is_active = False
         user.save()
@@ -386,6 +388,9 @@ class SimpleRowlevelBackend:
     def has_module_perms(self, user, app_label):
         return (user.is_anonymous or user.is_active) and app_label == 'app1'
 
+    def has_model_perms(self, user, app_label_model):
+        return (user.is_anonymous or user.is_active) and app_label_model == 'app1.model'
+
     def get_all_permissions(self, user, obj=None):
         if not obj:
             return []  # We only support row level perms
@@ -476,6 +481,10 @@ class AnonymousUserBackendTest(SimpleTestCase):
         self.assertIs(self.user1.has_module_perms("app1"), True)
         self.assertIs(self.user1.has_module_perms("app2"), False)
 
+    def test_has_model_perms(self):
+        self.assertIs(self.user1.has_model_perms("app1.model"), True)
+        self.assertIs(self.user1.has_model_perms("app2.model"), False)
+
     def test_get_all_permissions(self):
         self.assertEqual(self.user1.get_all_permissions(TestObj()), {'anon'})
 
@@ -518,10 +527,14 @@ class InActiveUserBackendTest(TestCase):
         self.assertIs(self.user1.has_module_perms("app1"), False)
         self.assertIs(self.user1.has_module_perms("app2"), False)
 
+    def test_has_model_perms(self):
+        self.assertIs(self.user1.has_model_perms("app1.model"), False)
+        self.assertIs(self.user1.has_model_perms("app2.model"), False)
+
 
 class PermissionDeniedBackend:
     """
-    Always raises PermissionDenied in `authenticate`, `has_perm` and `has_module_perms`.
+    Always raises PermissionDenied in `authenticate`, `has_perm`, `has_module_perms` and `has_model_perms`.
     """
 
     def authenticate(self, request, username=None, password=None):
@@ -531,6 +544,9 @@ class PermissionDeniedBackend:
         raise PermissionDenied
 
     def has_module_perms(self, user_obj, app_label):
+        raise PermissionDenied
+
+    def has_model_perms(self, user_obj, app_label_model):
         raise PermissionDenied
 
 
@@ -571,8 +587,9 @@ class PermissionDeniedBackendTest(TestCase):
         perm = Permission.objects.create(name='test', content_type=content_type, codename='test')
         self.user1.user_permissions.add(perm)
 
-        self.assertIs(self.user1.has_perm('auth.test'), False)
+        self.assertIs(self.user1.has_perm('auth.group.test'), False)
         self.assertIs(self.user1.has_module_perms('auth'), False)
+        self.assertIs(self.user1.has_model_perms('auth.group'), False)
 
     @modify_settings(AUTHENTICATION_BACKENDS={'append': backend})
     def test_has_perm(self):
@@ -580,8 +597,9 @@ class PermissionDeniedBackendTest(TestCase):
         perm = Permission.objects.create(name='test', content_type=content_type, codename='test')
         self.user1.user_permissions.add(perm)
 
-        self.assertIs(self.user1.has_perm('auth.test'), True)
+        self.assertIs(self.user1.has_perm('auth.group.test'), True)
         self.assertIs(self.user1.has_module_perms('auth'), True)
+        self.assertIs(self.user1.has_model_perms('auth.group'), True)
 
 
 class NewModelBackend(ModelBackend):

@@ -21,6 +21,9 @@ class MockSuperUser:
     def has_module_perms(self, module):
         return True
 
+    def has_model_perms(self, module_model):
+        return True
+
 
 request = MockRequest()
 request.user = MockSuperUser()

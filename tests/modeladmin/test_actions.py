@@ -31,7 +31,7 @@ class AdminActionsTests(TestCase):
                 pass
 
             def has_custom_permission(self, request):
-                return request.user.has_perm('%s.custom_band' % self.opts.app_label)
+                return request.user.has_perm('%s.%s.custom_band' % (self.opts.app_label, self.opts.model_name))
 
         ma = BandAdmin(Band, admin.AdminSite())
         mock_request = MockRequest()

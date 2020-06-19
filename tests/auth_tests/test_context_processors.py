@@ -1,5 +1,7 @@
 from django.contrib.auth import authenticate
-from django.contrib.auth.context_processors import PermLookupDict, PermWrapper
+from django.contrib.auth.context_processors import (
+    PermAppLabelWrapper, PermLookupDict, PermModelWrapper,
+)
 from django.contrib.auth.models import Permission, User
 from django.contrib.contenttypes.models import ContentType
 from django.db.models import Q
@@ -13,12 +15,15 @@ class MockUser:
         return perm == 'mockapp'
 
     def has_perm(self, perm):
-        return perm == 'mockapp.someperm'
+        return perm == 'mockapp.somemodel.someperm'
+
+    def has_model_perms(self, app_label_model):
+        return app_label_model == 'mockapp.somemodel'
 
 
-class PermWrapperTests(SimpleTestCase):
+class PermAppLabelWrapperTests(SimpleTestCase):
     """
-    Test some details of the PermWrapper implementation.
+    Test some details of the PermAppLabelWrapper implementation.
     """
     class EQLimiterObject:
         """
@@ -33,28 +38,69 @@ class PermWrapperTests(SimpleTestCase):
             self.eq_calls += 1
             return False
 
-    def test_permwrapper_in(self):
+    def test_permapplabelwrapper_in(self):
         """
-        'something' in PermWrapper works as expected.
+        'something' in PermAppLabelWrapper works as expected.
         """
-        perms = PermWrapper(MockUser())
+        perms = PermAppLabelWrapper(MockUser())
         # Works for modules and full permissions.
         self.assertIn('mockapp', perms)
         self.assertNotIn('nonexistent', perms)
-        self.assertIn('mockapp.someperm', perms)
-        self.assertNotIn('mockapp.nonexistent', perms)
+        self.assertIn('mockapp.somemodel.someperm', perms)
+        self.assertNotIn('mockapp.somemodel.nonexistent', perms)
 
     def test_permlookupdict_in(self):
         """
         No endless loops if accessed with 'in' - refs #18979.
         """
-        pldict = PermLookupDict(MockUser(), 'mockapp')
+        pldict = PermLookupDict(MockUser(), 'mockapp', 'somemodel')
         with self.assertRaises(TypeError):
             self.EQLimiterObject() in pldict
 
     def test_iter(self):
-        with self.assertRaisesMessage(TypeError, 'PermWrapper is not iterable.'):
-            iter(PermWrapper(MockUser()))
+        with self.assertRaisesMessage(TypeError, 'PermAppLabelWrapper is not iterable.'):
+            iter(PermAppLabelWrapper(MockUser()))
+
+
+class PermModelWrapperTests(SimpleTestCase):
+    """
+    Test some details of the PermModelWrapper implementation.
+    """
+    class EQLimiterObject:
+        """
+        This object makes sure __eq__ will not be called endlessly.
+        """
+        def __init__(self):
+            self.eq_calls = 0
+
+        def __eq__(self, other):
+            if self.eq_calls > 0:
+                return True
+            self.eq_calls += 1
+            return False
+
+    def test_permmodelwrapper_in(self):
+        """
+        'something' in PermAppLabelWrapper works as expected.
+        """
+        perms = PermModelWrapper(MockUser(), 'mockapp')
+        # Works for modules and full permissions.
+        self.assertIn('somemodel', perms)
+        self.assertNotIn('nonexistent', perms)
+        self.assertIn('somemodel.someperm', perms)
+        self.assertNotIn('somemodel.nonexistent', perms)
+
+    def test_permlookupdict_in(self):
+        """
+        No endless loops if accessed with 'in' - refs #18979.
+        """
+        pldict = PermLookupDict(MockUser(), 'mockapp', 'somemodel')
+        with self.assertRaises(TypeError):
+            self.EQLimiterObject() in pldict
+
+    def test_iter(self):
+        with self.assertRaisesMessage(TypeError, 'PermModelWrapper is not iterable.'):
+            iter(PermModelWrapper(MockUser(), 'mockapp'))
 
 
 @override_settings(ROOT_URLCONF='auth_tests.urls', TEMPLATES=AUTH_TEMPLATES)
@@ -94,7 +140,8 @@ class AuthContextProcessorTests(TestCase):
         self.client.force_login(u)
         response = self.client.get('/auth_processor_perms/')
         self.assertContains(response, "Has auth permissions")
-        self.assertContains(response, "Has auth.add_permission permissions")
+        self.assertContains(response, "Has auth.permission permissions")
+        self.assertContains(response, "Has auth.permission.add_permission permissions")
         self.assertNotContains(response, "nonexistent")
 
     def test_perm_in_perms_attrs(self):
@@ -106,7 +153,8 @@ class AuthContextProcessorTests(TestCase):
         self.client.login(username='normal', password='secret')
         response = self.client.get('/auth_processor_perm_in_perms/')
         self.assertContains(response, "Has auth permissions")
-        self.assertContains(response, "Has auth.add_permission permissions")
+        self.assertContains(response, "Has auth.permission permissions")
+        self.assertContains(response, "Has auth.permission.add_permission permissions")
         self.assertNotContains(response, "nonexistent")
 
     def test_message_attrs(self):

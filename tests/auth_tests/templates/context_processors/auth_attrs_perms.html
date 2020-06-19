@@ -1,4 +1,6 @@
 {% if perms.auth %}Has auth permissions{% endif %}
-{% if perms.auth.add_permission %}Has auth.add_permission permissions{% endif %}
+{% if perms.auth.permission %}Has auth.permission permissions{% endif %}
+{% if perms.auth.permission.add_permission %}Has auth.permission.add_permission permissions{% endif %}
 {% if perms.nonexistent %}nonexistent perm found{% endif %}
 {% if perms.auth.nonexistent in perms %}auth.nonexistent perm found{% endif %}
+{% if perms.auth.permission.nonexistent in perms %}auth.permission.nonexistent perm found{% endif %}
