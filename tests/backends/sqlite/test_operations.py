@@ -4,7 +4,7 @@ from django.core.management.color import no_style
 from django.db import connection
 from django.test import TestCase
 
-from ..models import Person, Tag
+from ..models import Person, Tag, Employee, Department, Project, Membership
 
 
 @unittest.skipUnless(connection.vendor == 'sqlite', 'SQLite tests.')
@@ -83,3 +83,33 @@ class SQLiteOperationsTests(TestCase):
             "zzz'",
             statements[-1],
         )
+
+    def test_sql_sequence_reset1(self):
+        statements = connection.ops.sequence_reset_sql(
+            no_style(), [Employee, Department]
+        )
+        
+        reference = [
+            'UPDATE "sqlite_sequence" SET "seq" = coalesce((SELECT max("id") '
+            'from "backends_employee"), 0) WHERE "name"="backends_employee";', 
+            'UPDATE "sqlite_sequence" SET "seq" = coalesce((SELECT max("pkey") '
+            'from "backends_department"), 0) WHERE "name"="backends_department";'
+        ]
+
+        self.assertEqual(statements, reference)
+    
+    def test_sql_sequence_reset2(self):
+        statements = connection.ops.sequence_reset_sql(
+            no_style(), [Employee, Project, Membership]
+        )
+        
+        reference = [
+            'UPDATE "sqlite_sequence" SET "seq" = coalesce((SELECT max("id") '
+            'from "backends_employee"), 0) WHERE "name"="backends_employee";', 
+            'UPDATE "sqlite_sequence" SET "seq" = coalesce((SELECT max("id") '
+            'from "backends_project"), 0) WHERE "name"="backends_project";', 
+            'UPDATE "sqlite_sequence" SET "seq" = coalesce((SELECT max("id") '
+            'from "backends_membership"), 0) WHERE "name"="backends_membership";'
+        ]
+        
+        self.assertEqual(statements, reference)

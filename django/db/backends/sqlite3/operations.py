@@ -229,6 +229,33 @@ class DatabaseOperations(BaseDatabaseOperations):
             ),
         ]
 
+    def sequence_reset_sql(self, style, model_list):
+        from django.db import models
+        output = []
+        qn = self.quote_name
+        for model in model_list:
+            # Use `coalesce` to set the sequence for each model to the max pk 
+            # value if there are records, or 0 if there are none. 
+            for f in model._meta.local_fields:
+                if isinstance(f, models.AutoField):
+                    output.append(
+                        '%s %s %s %s = coalesce((%s max(%s) from %s), 0) '
+                        '%s %s=%s;' % (
+                            style.SQL_KEYWORD('UPDATE'),
+                            style.SQL_TABLE(self.quote_name('sqlite_sequence')),
+                            style.SQL_KEYWORD('SET'),
+                            style.SQL_FIELD(self.quote_name('seq')),
+                            style.SQL_KEYWORD('SELECT'),
+                            style.SQL_FIELD(qn(f.column)),
+                            style.SQL_TABLE(qn(model._meta.db_table)),
+                            style.SQL_KEYWORD('WHERE'),
+                            style.SQL_FIELD(self.quote_name('name')),
+                            style.SQL_TABLE(qn(model._meta.db_table)),
+                        )
+                    )
+                    break  # Only one AutoField is allowed per model, so don't bother continuing.
+        return output
+
     def adapt_datetimefield_value(self, value):
         if value is None:
             return None

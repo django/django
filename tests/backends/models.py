@@ -133,3 +133,24 @@ class Author(models.Model):
 
 class Book(models.Model):
     author = models.ForeignKey(Author, models.CASCADE, to_field='name')
+
+
+class Employee(models.Model):
+    name = models.CharField(max_length=20)
+
+
+class Department(models.Model):
+    pkey = models.AutoField(primary_key=True)
+    name = models.CharField(max_length=100)
+    members = models.ManyToManyField(Employee, blank=True)
+
+
+class Project(models.Model):
+    name = models.CharField(max_length=100)
+    members = models.ManyToManyField(Employee, blank=True, through='Membership')
+
+
+class Membership(models.Model):
+    person = models.ForeignKey(Employee, on_delete=models.CASCADE)
+    group = models.ForeignKey(Project, on_delete=models.CASCADE)
+    date_joined = models.CharField(max_length=100)
