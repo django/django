@@ -224,6 +224,9 @@ Models
 * The new :attr:`.UniqueConstraint.opclasses` attribute allows setting
   PostgreSQL operator classes.
 
+* The :meth:`.QuerySet.update` method now respects the ``order_by()`` clause on
+  MySQL and MariaDB.
+
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 

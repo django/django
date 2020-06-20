@@ -2530,6 +2530,21 @@ update a bunch of records for a model that has a custom
         e.comments_on = False
         e.save()
 
+Ordered queryset
+^^^^^^^^^^^^^^^^
+
+.. versionadded:: 3.2
+
+Chaining ``order_by()`` with ``update()`` is supported only on MariaDB and
+MySQL, and is ignored for different databases. This is useful for updating a
+unique field in the order that is specified without conflicts. For example::
+
+    Entry.objects.order_by('-number').update(number=F('number') + 1)
+
+.. note::
+
+    If the ``order_by()`` clause contains annotations, it will be ignored.
+
 ``delete()``
 ~~~~~~~~~~~~
 
