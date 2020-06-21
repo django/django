@@ -184,11 +184,12 @@ class SequenceResetTest(TestCase):
         self.assertGreater(obj.pk, 10)
 
     def test_reset_sequence(self):
-        "Sequence names are correct when resetting generic relations (Ref #13941)"
-        # Create an object with a manually specified PK
-        Post.objects.create(name='1st post', text='hello world')
+        "db-agnostic test resetting the sequence"
+        Post.objects.create(name='1st post', text='aaa')
+        Post.objects.create(name='2nd post', text='bbb')
     
-        Post.objects.all().delete()
+        # Delete the most recent object
+        Post.objects.filter(text='bbb').delete()
 
         # Reset the sequences for the database
         commands = connections[DEFAULT_DB_ALIAS].ops.sequence_reset_sql(no_style(), [Post])
@@ -196,10 +197,10 @@ class SequenceResetTest(TestCase):
             for sql in commands:
                 cursor.execute(sql)
 
-        # If we create a new object now, it should have a PK greater
-        # than the PK we specified manually.
-        obj = Post.objects.create(name='New post', text='goodbye world')
-        self.assertEqual(obj.pk, 1)
+        # If we create a new object now, it should reuse the PK 
+        # of the deleted object.
+        obj = Post.objects.create(name='3rd post', text='ccc')
+        self.assertEqual(obj.pk, 2)
 
 
 # This test needs to run outside of a transaction, otherwise closing the
