@@ -221,12 +221,31 @@ share the same bound port:
     stdout_logfile=/your/log/asgi.log
     redirect_stderr=true
 
+Create the run directory for the sockets referenced in the supervisor configuration file.
+
+.. code-block:: sh
+
+    $ sudo mkdir /run/daphne/
+
+When running the supervisor fcgi-program under a different user, change the owner settings of the run directory.
+
+.. code-block:: sh
+
+    $ sudo chown <user>.<user> /run/daphne/
+
 Have supervisor reread and update its jobs:
 
 .. code-block:: sh
 
     $ sudo supervisorctl reread
     $ sudo supervisorctl update
+
+.. note::
+    Running the daphe command with ``--fd 0`` in the commandline will fail and result in *[Errno 88] Socket operation on non-socket*.
+
+    Supervisor will automatically create the socket, bind, and listen before forking the first child in a group.
+    The socket will be passed to each child on file descriptor number 0 (zero).
+    See http://supervisord.org/configuration.html#fcgi-program-x-section-settings
 
 Next, Nginx has to be told to proxy traffic to the running Daphne instances.
 Setup your nginx upstream conf file for your project:
@@ -264,3 +283,4 @@ Reload nginx to apply the changes:
 .. code-block:: sh
 
     $ sudo service nginx reload
+
