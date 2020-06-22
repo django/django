@@ -111,6 +111,23 @@ class BaseDatabaseIntrospection:
             if self.identifier_converter(m._meta.db_table) in tables
         }
 
+    def sequences_for_model(self, cursor, model):
+        """
+        Return a list of information about all DB sequences for a given model.
+        """
+        if not model._meta.managed:
+            return []
+        if model._meta.swapped:
+            return []
+        sequence_list = self.get_sequences(cursor, model._meta.db_table, model._meta.local_fields)
+        for f in model._meta.local_many_to_many:
+            # If this is an m2m using an intermediate table,
+            # we don't need to reset the sequence.
+            if f.remote_field.through._meta.auto_created:
+                sequence = self.get_sequences(cursor, f.m2m_db_table())
+                sequence_list.extend(sequence or [{'table': f.m2m_db_table(), 'column': None}])
+        return sequence_list
+
     def sequence_list(self):
         """
         Return a list of information about all DB sequences for all models in
@@ -119,17 +136,7 @@ class BaseDatabaseIntrospection:
         sequence_list = []
         with self.connection.cursor() as cursor:
             for model in self.get_migratable_models():
-                if not model._meta.managed:
-                    continue
-                if model._meta.swapped:
-                    continue
-                sequence_list.extend(self.get_sequences(cursor, model._meta.db_table, model._meta.local_fields))
-                for f in model._meta.local_many_to_many:
-                    # If this is an m2m using an intermediate table,
-                    # we don't need to reset the sequence.
-                    if f.remote_field.through._meta.auto_created:
-                        sequence = self.get_sequences(cursor, f.m2m_db_table())
-                        sequence_list.extend(sequence or [{'table': f.m2m_db_table(), 'column': None}])
+                sequence_list.extend(self.sequences_for_model(cursor, model))
         return sequence_list
 
     def get_sequences(self, cursor, table_name, table_fields=()):

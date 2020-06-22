@@ -431,7 +431,18 @@ class BaseDatabaseOperations:
     def sequence_reset_sql(self, style, model_list):
         """
         Return a list of the SQL statements required to reset sequences for
-        the given models.
+        the given models. Deprecated in favor of `sequence_refresh_sql()`
+        to avoid leaking `db.models` abstraction to the `db.backends`.
+
+        The `style` argument is a Style object as returned by either
+        color_style() or no_style() in django.core.management.color.
+        """
+        return []  # No sequence reset required by default.
+
+    def sequence_refresh_sql(self, style, sequences):
+        """
+        Return a list of the SQL statements required to refresh sequences
+        passed in `sequences` to match the max values of the corresponding pks.
 
         The `style` argument is a Style object as returned by either
         color_style() or no_style() in django.core.management.color.

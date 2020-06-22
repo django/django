@@ -1,4 +1,5 @@
 from django.core.management.base import AppCommand
+from django.core.management.sql import sql_refresh_sequences
 from django.db import DEFAULT_DB_ALIAS, connections
 
 
@@ -19,7 +20,8 @@ class Command(AppCommand):
             return
         connection = connections[options['database']]
         models = app_config.get_models(include_auto_created=True)
-        statements = connection.ops.sequence_reset_sql(self.style, models)
-        if not statements and options['verbosity'] >= 1:
+#        sql_statements = connection.ops.sequence_reset_sql(self.style, models)
+        sql_statements = sql_refresh_sequences(self.style, connection, models)
+        if not sql_statements and options['verbosity'] >= 1:
             self.stderr.write('No sequences found.')
-        return '\n'.join(statements)
+        return '\n'.join(sql_statements)

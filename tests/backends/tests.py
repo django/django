@@ -5,6 +5,7 @@ import unittest
 import warnings
 
 from django.core.management.color import no_style
+from django.core.management.sql import sql_refresh_sequences
 from django.db import (
     DEFAULT_DB_ALIAS, DatabaseError, IntegrityError, connection, connections,
     reset_queries, transaction,
@@ -173,7 +174,8 @@ class SequenceResetTest(TestCase):
         Post.objects.create(id=10, name='1st post', text='hello world')
 
         # Reset the sequences for the database
-        commands = connections[DEFAULT_DB_ALIAS].ops.sequence_reset_sql(no_style(), [Post])
+#        commands = connections[DEFAULT_DB_ALIAS].ops.sequence_reset_sql(no_style(), [Post])
+        commands = sql_refresh_sequences(no_style(), connections[DEFAULT_DB_ALIAS], [Post])
         with connection.cursor() as cursor:
             for sql in commands:
                 cursor.execute(sql)
