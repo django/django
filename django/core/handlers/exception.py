@@ -117,8 +117,8 @@ def response_for_exception(request, exc):
 
 def get_exception_response(request, resolver, status_code, exception):
     try:
-        callback, param_dict = resolver.resolve_error_handler(status_code)
-        response = callback(request, **{**param_dict, 'exception': exception})
+        callback = resolver.resolve_error_handler(status_code)
+        response = callback(request, exception=exception)
     except Exception:
         signals.got_request_exception.send(sender=None, request=request)
         response = handle_uncaught_exception(request, resolver, sys.exc_info())
@@ -138,5 +138,5 @@ def handle_uncaught_exception(request, resolver, exc_info):
         return debug.technical_500_response(request, *exc_info)
 
     # Return an HttpResponse that displays a friendly error message.
-    callback, param_dict = resolver.resolve_error_handler(500)
-    return callback(request, **param_dict)
+    callback = resolver.resolve_error_handler(500)
+    return callback(request)
