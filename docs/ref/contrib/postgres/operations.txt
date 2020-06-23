@@ -43,7 +43,8 @@ them. In that case, connect to your Django database and run the query
 
 .. class:: CreateExtension(name)
 
-    An ``Operation`` subclass which installs PostgreSQL extensions.
+    An ``Operation`` subclass which installs a PostgreSQL extension. For common
+    extensions, use one of the more specific subclasses below.
 
     .. attribute:: name
 
@@ -56,21 +57,21 @@ them. In that case, connect to your Django database and run the query
 
     .. versionadded:: 3.1
 
-    Install the ``bloom`` extension.
+    Installs the ``bloom`` extension.
 
 ``BtreeGinExtension``
 =====================
 
 .. class:: BtreeGinExtension()
 
-    Install the ``btree_gin`` extension.
+    Installs the ``btree_gin`` extension.
 
 ``BtreeGistExtension``
 ======================
 
 .. class:: BtreeGistExtension()
 
-    Install the ``btree_gist`` extension.
+    Installs the ``btree_gist`` extension.
 
 ``CITextExtension``
 ===================
@@ -108,7 +109,7 @@ them. In that case, connect to your Django database and run the query
 
     Installs the ``unaccent`` extension.
 
-Index concurrent operations
+Concurrent index operations
 ===========================
 
 .. versionadded:: 3.0
