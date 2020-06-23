@@ -14,10 +14,10 @@
     ready(function() {
         function handleClick(event) {
             event.preventDefault();
-            if (window.location.search.indexOf('&_popup=1') === -1) {
-                window.history.back(); // Go back if not a popup.
+            if (window.location.search.includes('&_popup=1')) {
+                window.close(); // Close the popup.
             } else {
-                window.close(); // Otherwise, close the popup.
+                window.history.back(); // Otherwise, go back.
             }
         }
 
