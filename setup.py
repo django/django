@@ -19,12 +19,12 @@ setup(
     ],
     extras_require={
         'tests': [
-            'pytest~=4.4',
-            "pytest-django~=3.4",
-            "pytest-asyncio~=0.10",
-            "async_generator~=1.10",
-            "async-timeout~=3.0",
-            'coverage~=4.5',
+            "pytest",
+            "pytest-django",
+            "pytest-asyncio",
+            "async_generator",
+            "async-timeout",
+            "coverage~=4.5",
         ],
     },
     classifiers=[

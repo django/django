@@ -12,6 +12,7 @@ env:
   - DJANGO="Django==3.0.*"
 
 install:
+  - pip install -U attrs pytest  # Travis comes with an old version pre-installed.
   - pip install -U pip wheel setuptools
   - pip install $DJANGO -e .[tests]
   - pip freeze
