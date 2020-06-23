@@ -1,3 +1,4 @@
+import os
 import re
 from io import StringIO
 from unittest import mock, skipUnless
@@ -397,9 +398,9 @@ class InspectDBTransactionalTests(TransactionTestCase):
                     sepal_length real,
                     sepal_width real
                 ) SERVER inspectdb_server OPTIONS (
-                    filename '/dev/null'
+                    filename %s
                 )
-            ''')
+            ''', [os.devnull])
         out = StringIO()
         foreign_table_model = 'class InspectdbIrisForeignTable(models.Model):'
         foreign_table_managed = 'managed = False'
