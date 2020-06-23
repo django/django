@@ -137,7 +137,7 @@ js_catalog_template = r"""
 
     django.pgettext = function(context, msgid) {
       var value = django.gettext(context + '\x04' + msgid);
-      if (value.indexOf('\x04') != -1) {
+      if (value.includes('\x04')) {
         value = msgid;
       }
       return value;
@@ -145,7 +145,7 @@ js_catalog_template = r"""
 
     django.npgettext = function(context, singular, plural, count) {
       var value = django.ngettext(context + '\x04' + singular, context + '\x04' + plural, count);
-      if (value.indexOf('\x04') != -1) {
+      if (value.includes('\x04')) {
         value = django.ngettext(singular, plural, count);
       }
       return value;
