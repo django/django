@@ -1,6 +1,7 @@
 import os
 import re
 from io import StringIO
+from os import devnull
 from unittest import mock, skipUnless
 
 from django.core.management import call_command
