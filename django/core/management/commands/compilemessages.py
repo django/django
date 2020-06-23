@@ -154,7 +154,9 @@ class Command(BaseCommand):
                     self.has_errors = True
                     return
 
-                args = [self.program, *self.program_options, '-o', mo_path, po_path]
+                # PY37: Remove str() when dropping support for PY37.
+                # https://bugs.python.org/issue31961
+                args = [self.program, *self.program_options, '-o', str(mo_path), str(po_path)]
                 futures.append(executor.submit(popen_wrapper, args))
 
             for future in concurrent.futures.as_completed(futures):
