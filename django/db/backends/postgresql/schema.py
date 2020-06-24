@@ -27,7 +27,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
     # transaction.
     sql_create_column_inline_fk = (
         'CONSTRAINT %(name)s REFERENCES %(to_table)s(%(to_column)s)%(deferrable)s'
-        '; SET CONSTRAINTS %(name)s IMMEDIATE'
+        '; SET CONSTRAINTS %(namespace)s%(name)s IMMEDIATE'
     )
     # Setting the constraint to IMMEDIATE runs any deferred checks to allow
     # dropping it in the same transaction.
