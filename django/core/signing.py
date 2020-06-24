@@ -84,10 +84,10 @@ class JSONSerializer:
     signing.loads.
     """
     def dumps(self, obj):
-        return json.dumps(obj, separators=(',', ':')).encode('latin-1')
+        return json.dumps(obj, separators=(',', ':')).encode('utf-8')
 
     def loads(self, data):
-        return json.loads(data.decode('latin-1'))
+        return json.loads(data.decode('utf-8'))
 
 
 def dumps(obj, key=None, salt='django.core.signing', serializer=JSONSerializer, compress=False):
