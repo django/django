@@ -300,7 +300,6 @@
 #changelist .actions span.question {
     font-size: 13px;
     margin: 0 0.5em;
-    display: none;
 }
 
 #changelist .actions:last-child {
