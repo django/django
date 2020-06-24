@@ -18,3 +18,7 @@ Bugfixes
 * Reallowed, following a regression in Django 3.0, non-expressions having a
   ``filterable`` attribute to be used as the right-hand side in queryset
   filters (:ticket:`31664`).
+
+* Fixed a regression in Django 3.0.2 that caused a migration crash on
+  PostgreSQL when adding a foreign key to a model with a namespaced
+  ``db_table`` (:ticket:`31735`).

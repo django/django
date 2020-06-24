@@ -466,8 +466,10 @@ class BaseDatabaseSchemaEditor:
             if self.sql_create_column_inline_fk:
                 to_table = field.remote_field.model._meta.db_table
                 to_column = field.remote_field.model._meta.get_field(field.remote_field.field_name).column
+                namespace, _ = split_identifier(model._meta.db_table)
                 definition += " " + self.sql_create_column_inline_fk % {
                     'name': self._fk_constraint_name(model, field, constraint_suffix),
+                    'namespace': '%s.' % self.quote_name(namespace) if namespace else '',
                     'column': self.quote_name(field.column),
                     'to_table': self.quote_name(to_table),
                     'to_column': self.quote_name(to_column),
