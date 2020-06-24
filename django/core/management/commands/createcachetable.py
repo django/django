@@ -3,15 +3,14 @@ from django.core.cache import caches
 from django.core.cache.backends.db import BaseDatabaseCache
 from django.core.management.base import BaseCommand, CommandError
 from django.db import (
-    DEFAULT_DB_ALIAS, connections, models, router, transaction,
+    DEFAULT_DB_ALIAS, DatabaseError, connections, models, router, transaction,
 )
-from django.db.utils import DatabaseError
 
 
 class Command(BaseCommand):
     help = "Creates the tables needed to use the SQL cache backend."
 
-    requires_system_checks = False
+    requires_system_checks = []
 
     def add_arguments(self, parser):
         parser.add_argument(

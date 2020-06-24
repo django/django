@@ -11,7 +11,7 @@ WSGI header spoofing via underscore/dash conflation
 
 When HTTP headers are placed into the WSGI environ, they are normalized by
 converting to uppercase, converting all dashes to underscores, and prepending
-`HTTP_`. For instance, a header ``X-Auth-User`` would become
+``HTTP_``. For instance, a header ``X-Auth-User`` would become
 ``HTTP_X_AUTH_USER`` in the WSGI environ (and thus also in Django's
 ``request.META`` dictionary).
 

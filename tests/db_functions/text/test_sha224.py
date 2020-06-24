@@ -1,9 +1,8 @@
 import unittest
 
-from django.db import connection
+from django.db import NotSupportedError, connection
 from django.db.models import CharField
 from django.db.models.functions import SHA224
-from django.db.utils import NotSupportedError
 from django.test import TestCase
 from django.test.utils import register_lookup
 

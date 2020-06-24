@@ -16,6 +16,7 @@ FIRST_DAY_OF_WEEK = 1                   # Monday (in Dutch 'maandag')
 DATE_INPUT_FORMATS = [
     '%d-%m-%Y', '%d-%m-%y',             # '20-01-2009', '20-01-09'
     '%d/%m/%Y', '%d/%m/%y',             # '20/01/2009', '20/01/09'
+    '%Y/%m/%d',                         # '2009/01/20'
     # '%d %b %Y', '%d %b %y',           # '20 jan 2009', '20 jan 09'
     # '%d %B %Y', '%d %B %y',           # '20 januari 2009', '20 januari 09'
 ]
@@ -59,11 +60,6 @@ DATETIME_INPUT_FORMATS = [
     '%d/%m/%Y %H.%M', '%d/%m/%y %H.%M',         # '20/01/2009 15.23', '20/01/09 15.23'
     # '%d %b %Y %H.%M', '%d %b %y %H.%M',         # '20 jan 2009 15.23', '20 jan 09 15.23'
     # '%d %B %Y %H.%M', '%d %B %y %H.%M',         # '20 januari 2009 15.23', '20 januari 2009 15.23'
-    # Without time :
-    '%d-%m-%Y', '%d-%m-%y', '%Y-%m-%d',         # '20-01-2009', '20-01-09', '2009-01-20'
-    '%d/%m/%Y', '%d/%m/%y', '%Y/%m/%d',         # '20/01/2009', '20/01/09', '2009/01/20'
-    # '%d %b %Y', '%d %b %y',                     # '20 jan 2009', '20 jan 09'
-    # '%d %B %Y', '%d %B %y',                     # '20 januari 2009', '20 januari 2009'
 ]
 DECIMAL_SEPARATOR = ','
 THOUSAND_SEPARATOR = '.'

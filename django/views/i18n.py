@@ -10,7 +10,7 @@ from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.template import Context, Engine
 from django.urls import translate_url
 from django.utils.formats import get_format
-from django.utils.http import is_safe_url
+from django.utils.http import url_has_allowed_host_and_scheme
 from django.utils.translation import (
     LANGUAGE_SESSION_KEY, check_for_language, get_language,
 )
@@ -31,20 +31,31 @@ def set_language(request):
     redirect to the page in the request (the 'next' parameter) without changing
     any state.
     """
-    next = request.POST.get('next', request.GET.get('next'))
-    if ((next or not request.is_ajax()) and
-            not is_safe_url(url=next, allowed_hosts={request.get_host()}, require_https=request.is_secure())):
-        next = request.META.get('HTTP_REFERER')
-        next = next and unquote(next)  # HTTP_REFERER may be encoded.
-        if not is_safe_url(url=next, allowed_hosts={request.get_host()}, require_https=request.is_secure()):
-            next = '/'
-    response = HttpResponseRedirect(next) if next else HttpResponse(status=204)
+    next_url = request.POST.get('next', request.GET.get('next'))
+    if (
+        (next_url or request.accepts('text/html')) and
+        not url_has_allowed_host_and_scheme(
+            url=next_url,
+            allowed_hosts={request.get_host()},
+            require_https=request.is_secure(),
+        )
+    ):
+        next_url = request.META.get('HTTP_REFERER')
+        # HTTP_REFERER may be encoded.
+        next_url = next_url and unquote(next_url)
+        if not url_has_allowed_host_and_scheme(
+            url=next_url,
+            allowed_hosts={request.get_host()},
+            require_https=request.is_secure(),
+        ):
+            next_url = '/'
+    response = HttpResponseRedirect(next_url) if next_url else HttpResponse(status=204)
     if request.method == 'POST':
         lang_code = request.POST.get(LANGUAGE_QUERY_PARAMETER)
         if lang_code and check_for_language(lang_code):
-            if next:
-                next_trans = translate_url(next, lang_code)
-                if next_trans != next:
+            if next_url:
+                next_trans = translate_url(next_url, lang_code)
+                if next_trans != next_url:
                     response = HttpResponseRedirect(next_trans)
             if hasattr(request, 'session'):
                 # Storing the language in the session is deprecated.
@@ -185,8 +196,8 @@ class JavaScriptCatalog(View):
     Return the selected language catalog as a JavaScript library.
 
     Receive the list of packages to check for translations in the `packages`
-    kwarg either from the extra dictionary passed to the url() function or as a
-    plus-sign delimited string from the request. Default is 'django.conf'.
+    kwarg either from the extra dictionary passed to the path() function or as
+    a plus-sign delimited string from the request. Default is 'django.conf'.
 
     You can override the gettext domain for this view, but usually you don't
     want to do that as JavaScript messages go to the djangojs domain. This
@@ -226,7 +237,7 @@ class JavaScriptCatalog(View):
         """
         match = re.search(r'nplurals=\s*(\d+)', self._plural_string or '')
         if match:
-            return int(match.groups()[0])
+            return int(match[1])
         return 2
 
     @property

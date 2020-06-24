@@ -3,8 +3,8 @@
 
 {% block form_top %}
   {% if not is_popup %}
-    <p>{% trans "First, enter a username and password. Then, you'll be able to edit more user options." %}</p>
+    <p>{% translate 'First, enter a username and password. Then, you’ll be able to edit more user options.' %}</p>
   {% else %}
-    <p>{% trans "Enter a username and password." %}</p>
+    <p>{% translate "Enter a username and password." %}</p>
   {% endif %}
 {% endblock %}

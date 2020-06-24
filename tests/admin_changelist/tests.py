@@ -5,12 +5,14 @@ from django.contrib.admin.models import LogEntry
 from django.contrib.admin.options import IncorrectLookupParameters
 from django.contrib.admin.templatetags.admin_list import pagination
 from django.contrib.admin.tests import AdminSeleniumTestCase
-from django.contrib.admin.views.main import ALL_VAR, SEARCH_VAR
+from django.contrib.admin.views.main import (
+    ALL_VAR, IS_POPUP_VAR, ORDER_VAR, PAGE_VAR, SEARCH_VAR, TO_FIELD_VAR,
+)
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
+from django.contrib.messages.storage.cookie import CookieStorage
 from django.db import connection, models
-from django.db.models import F
-from django.db.models.fields import Field, IntegerField
+from django.db.models import F, Field, IntegerField
 from django.db.models.functions import Upper
 from django.db.models.lookups import Contains, Exact
 from django.template import Context, Template, TemplateSyntaxError
@@ -40,7 +42,7 @@ from .models import (
 
 def build_tbody_html(pk, href, extra_fields):
     return (
-        '<tbody><tr class="row1">'
+        '<tbody><tr>'
         '<td class="action-checkbox">'
         '<input type="checkbox" name="_selected_action" value="{}" '
         'class="action-select"></td>'
@@ -406,6 +408,22 @@ class ChangeListTests(TestCase):
         # Make sure distinct() was called
         self.assertEqual(cl.queryset.count(), 1)
 
+    def test_changelist_search_form_validation(self):
+        m = ConcertAdmin(Concert, custom_site)
+        tests = [
+            ({SEARCH_VAR: '\x00'}, 'Null characters are not allowed.'),
+            ({SEARCH_VAR: 'some\x00thing'}, 'Null characters are not allowed.'),
+        ]
+        for case, error in tests:
+            with self.subTest(case=case):
+                request = self.factory.get('/concert/', case)
+                request.user = self.superuser
+                request._messages = CookieStorage(request)
+                m.get_changelist_instance(request)
+                messages = [m.message for m in request._messages]
+                self.assertEqual(1, len(messages))
+                self.assertEqual(error, messages[0])
+
     def test_distinct_for_non_unique_related_object_in_search_fields(self):
         """
         Regressions tests for #15819: If a field listed in search_fields
@@ -690,6 +708,68 @@ class ChangeListTests(TestCase):
         link = reverse('admin:admin_changelist_parent_change', args=(p.pk,))
         self.assertNotContains(response, '<a href="%s">' % link)
 
+    def test_clear_all_filters_link(self):
+        self.client.force_login(self.superuser)
+        url = reverse('admin:auth_user_changelist')
+        response = self.client.get(url)
+        self.assertNotContains(response, '&#10006; Clear all filters')
+        link = '<a href="%s">&#10006; Clear all filters</a>'
+        for data, href in (
+            ({'is_staff__exact': '0'}, '?'),
+            (
+                {'is_staff__exact': '0', 'username__startswith': 'test'},
+                '?username__startswith=test',
+            ),
+            (
+                {'is_staff__exact': '0', SEARCH_VAR: 'test'},
+                '?%s=test' % SEARCH_VAR,
+            ),
+            (
+                {'is_staff__exact': '0', IS_POPUP_VAR: 'id'},
+                '?%s=id' % IS_POPUP_VAR,
+            ),
+        ):
+            with self.subTest(data=data):
+                response = self.client.get(url, data=data)
+                self.assertContains(response, link % href)
+
+    def test_clear_all_filters_link_callable_filter(self):
+        self.client.force_login(self.superuser)
+        url = reverse('admin:admin_changelist_band_changelist')
+        response = self.client.get(url)
+        self.assertNotContains(response, '&#10006; Clear all filters')
+        link = '<a href="%s">&#10006; Clear all filters</a>'
+        for data, href in (
+            ({'nr_of_members_partition': '5'}, '?'),
+            (
+                {'nr_of_members_partition': 'more', 'name__startswith': 'test'},
+                '?name__startswith=test',
+            ),
+            (
+                {'nr_of_members_partition': '5', IS_POPUP_VAR: 'id'},
+                '?%s=id' % IS_POPUP_VAR,
+            ),
+        ):
+            with self.subTest(data=data):
+                response = self.client.get(url, data=data)
+                self.assertContains(response, link % href)
+
+    def test_no_clear_all_filters_link(self):
+        self.client.force_login(self.superuser)
+        url = reverse('admin:auth_user_changelist')
+        link = '>&#10006; Clear all filters</a>'
+        for data in (
+            {SEARCH_VAR: 'test'},
+            {ORDER_VAR: '-1'},
+            {TO_FIELD_VAR: 'id'},
+            {PAGE_VAR: '1'},
+            {IS_POPUP_VAR: '1'},
+            {'username__startswith': 'test'},
+        ):
+            with self.subTest(data=data):
+                response = self.client.get(url, data=data)
+                self.assertNotContains(response, link)
+
     def test_tuple_list_display(self):
         swallow = Swallow.objects.create(origin='Africa', load='12.34', speed='22.2')
         swallow2 = Swallow.objects.create(origin='Africa', load='12.34', speed='22.2')
@@ -826,6 +906,26 @@ class ChangeListTests(TestCase):
         request = self.factory.post(changelist_url, data=data)
         queryset = m._get_list_editable_queryset(request, prefix='form')
         self.assertEqual(queryset.count(), 2)
+
+    def test_get_list_editable_queryset_with_regex_chars_in_prefix(self):
+        a = Swallow.objects.create(origin='Swallow A', load=4, speed=1)
+        Swallow.objects.create(origin='Swallow B', load=2, speed=2)
+        data = {
+            'form$-TOTAL_FORMS': '2',
+            'form$-INITIAL_FORMS': '2',
+            'form$-MIN_NUM_FORMS': '0',
+            'form$-MAX_NUM_FORMS': '1000',
+            'form$-0-uuid': str(a.pk),
+            'form$-0-load': '10',
+            '_save': 'Save',
+        }
+        superuser = self._create_superuser('superuser')
+        self.client.force_login(superuser)
+        changelist_url = reverse('admin:admin_changelist_swallow_changelist')
+        m = SwallowAdmin(Swallow, custom_site)
+        request = self.factory.post(changelist_url, data=data)
+        queryset = m._get_list_editable_queryset(request, prefix='form$')
+        self.assertEqual(queryset.count(), 1)
 
     def test_changelist_view_list_editable_changed_objects_uses_filter(self):
         """list_editable edits use a filtered queryset to limit memory usage."""
@@ -991,10 +1091,6 @@ class ChangeListTests(TestCase):
             (['field', '-other_field'], ['field', '-other_field']),
             # Composite unique nullable.
             (['-field', 'null_field'], ['-field', 'null_field', '-pk']),
-            # Composite unique nullable.
-            (['-field', 'null_field'], ['-field', 'null_field', '-pk']),
-            # Composite unique nullable.
-            (['-field', 'null_field'], ['-field', 'null_field', '-pk']),
             # Composite unique and nullable.
             (['-field', 'null_field', 'other_field'], ['-field', 'null_field', 'other_field']),
             # Composite unique attnames.
@@ -1009,6 +1105,98 @@ class ChangeListTests(TestCase):
         tests += (
             (total_ordering, total_ordering),
             (non_total_ordering, non_total_ordering + ['-pk']),
+        )
+        for ordering, expected in tests:
+            with self.subTest(ordering=ordering):
+                self.assertEqual(change_list._get_deterministic_ordering(ordering), expected)
+
+    @isolate_apps('admin_changelist')
+    def test_total_ordering_optimization_meta_constraints(self):
+        class Related(models.Model):
+            unique_field = models.BooleanField(unique=True)
+
+            class Meta:
+                ordering = ('unique_field',)
+
+        class Model(models.Model):
+            field_1 = models.BooleanField()
+            field_2 = models.BooleanField()
+            field_3 = models.BooleanField()
+            field_4 = models.BooleanField()
+            field_5 = models.BooleanField()
+            field_6 = models.BooleanField()
+            nullable_1 = models.BooleanField(null=True)
+            nullable_2 = models.BooleanField(null=True)
+            related_1 = models.ForeignKey(Related, models.CASCADE)
+            related_2 = models.ForeignKey(Related, models.CASCADE)
+            related_3 = models.ForeignKey(Related, models.CASCADE)
+            related_4 = models.ForeignKey(Related, models.CASCADE)
+
+            class Meta:
+                constraints = [
+                    *[
+                        models.UniqueConstraint(fields=fields, name=''.join(fields))
+                        for fields in (
+                            ['field_1'],
+                            ['nullable_1'],
+                            ['related_1'],
+                            ['related_2_id'],
+                            ['field_2', 'field_3'],
+                            ['field_2', 'nullable_2'],
+                            ['field_2', 'related_3'],
+                            ['field_3', 'related_4_id'],
+                        )
+                    ],
+                    models.CheckConstraint(check=models.Q(id__gt=0), name='foo'),
+                    models.UniqueConstraint(
+                        fields=['field_5'],
+                        condition=models.Q(id__gt=10),
+                        name='total_ordering_1',
+                    ),
+                    models.UniqueConstraint(
+                        fields=['field_6'],
+                        condition=models.Q(),
+                        name='total_ordering',
+                    ),
+                ]
+
+        class ModelAdmin(admin.ModelAdmin):
+            def get_queryset(self, request):
+                return Model.objects.none()
+
+        request = self._mocked_authenticated_request('/', self.superuser)
+        site = admin.AdminSite(name='admin')
+        model_admin = ModelAdmin(Model, site)
+        change_list = model_admin.get_changelist_instance(request)
+        tests = (
+            # Unique non-nullable field.
+            (['field_1'], ['field_1']),
+            # Unique nullable field.
+            (['nullable_1'], ['nullable_1', '-pk']),
+            # Related attname unique.
+            (['related_1_id'], ['related_1_id']),
+            (['related_2_id'], ['related_2_id']),
+            # Related ordering introspection is not implemented.
+            (['related_1'], ['related_1', '-pk']),
+            # Composite unique.
+            (['-field_2', 'field_3'], ['-field_2', 'field_3']),
+            # Composite unique nullable.
+            (['field_2', '-nullable_2'], ['field_2', '-nullable_2', '-pk']),
+            # Composite unique and nullable.
+            (
+                ['field_2', '-nullable_2', 'field_3'],
+                ['field_2', '-nullable_2', 'field_3'],
+            ),
+            # Composite field and related field name.
+            (['field_2', '-related_3'], ['field_2', '-related_3', '-pk']),
+            (['field_3', 'related_4'], ['field_3', 'related_4', '-pk']),
+            # Composite field and related field attname.
+            (['field_2', 'related_3_id'], ['field_2', 'related_3_id']),
+            (['field_3', '-related_4_id'], ['field_3', '-related_4_id']),
+            # Partial unique constraint is ignored.
+            (['field_5'], ['field_5', '-pk']),
+            # Unique constraint with an empty condition.
+            (['field_6'], ['field_6']),
         )
         for ordering, expected in tests:
             with self.subTest(ordering=ordering):
@@ -1115,7 +1303,7 @@ class GetAdminLogTests(TestCase):
             '{{ entry|safe }}'
             '{% endfor %}'
         )
-        self.assertEqual(t.render(Context({})), 'Added "<User: jondoe>".')
+        self.assertEqual(t.render(Context({})), 'Added “<User: jondoe>”.')
 
     def test_missing_args(self):
         msg = "'get_admin_log' statements require two arguments"
@@ -1157,16 +1345,148 @@ class SeleniumTests(AdminSeleniumTestCase):
 
         # Test amount of rows in the Changelist
         rows = self.selenium.find_elements_by_css_selector(
-            '%s #result_list tbody tr' % form_id)
+            '%s #result_list tbody tr' % form_id
+        )
         self.assertEqual(len(rows), 1)
+        row = rows[0]
+
+        selection_indicator = self.selenium.find_element_by_css_selector(
+            '%s .action-counter' % form_id
+        )
+        all_selector = self.selenium.find_element_by_id('action-toggle')
+        row_selector = self.selenium.find_element_by_css_selector(
+            '%s #result_list tbody tr:first-child .action-select' % form_id
+        )
 
         # Test current selection
-        selection_indicator = self.selenium.find_element_by_css_selector(
-            '%s .action-counter' % form_id)
         self.assertEqual(selection_indicator.text, "0 of 1 selected")
+        self.assertIs(all_selector.get_property('checked'), False)
+        self.assertEqual(row.get_attribute('class'), '')
 
         # Select a row and check again
-        row_selector = self.selenium.find_element_by_css_selector(
-            '%s #result_list tbody tr:first-child .action-select' % form_id)
         row_selector.click()
         self.assertEqual(selection_indicator.text, "1 of 1 selected")
+        self.assertIs(all_selector.get_property('checked'), True)
+        self.assertEqual(row.get_attribute('class'), 'selected')
+
+        # Deselect a row and check again
+        row_selector.click()
+        self.assertEqual(selection_indicator.text, "0 of 1 selected")
+        self.assertIs(all_selector.get_property('checked'), False)
+        self.assertEqual(row.get_attribute('class'), '')
+
+    def test_select_all_across_pages(self):
+        Parent.objects.bulk_create([Parent(name='parent%d' % i) for i in range(101)])
+        self.admin_login(username='super', password='secret')
+        self.selenium.get(self.live_server_url + reverse('admin:admin_changelist_parent_changelist'))
+
+        selection_indicator = self.selenium.find_element_by_css_selector('.action-counter')
+        select_all_indicator = self.selenium.find_element_by_css_selector('.actions .all')
+        question = self.selenium.find_element_by_css_selector('.actions > .question')
+        clear = self.selenium.find_element_by_css_selector('.actions > .clear')
+        select_all = self.selenium.find_element_by_id('action-toggle')
+        select_across = self.selenium.find_element_by_name('select_across')
+
+        self.assertIs(question.is_displayed(), False)
+        self.assertIs(clear.is_displayed(), False)
+        self.assertIs(select_all.get_property('checked'), False)
+        self.assertEqual(select_across.get_property('value'), '0')
+        self.assertIs(selection_indicator.is_displayed(), True)
+        self.assertEqual(selection_indicator.text, '0 of 100 selected')
+        self.assertIs(select_all_indicator.is_displayed(), False)
+
+        select_all.click()
+        self.assertIs(question.is_displayed(), True)
+        self.assertIs(clear.is_displayed(), False)
+        self.assertIs(select_all.get_property('checked'), True)
+        self.assertEqual(select_across.get_property('value'), '0')
+        self.assertIs(selection_indicator.is_displayed(), True)
+        self.assertEqual(selection_indicator.text, '100 of 100 selected')
+        self.assertIs(select_all_indicator.is_displayed(), False)
+
+        question.click()
+        self.assertIs(question.is_displayed(), False)
+        self.assertIs(clear.is_displayed(), True)
+        self.assertIs(select_all.get_property('checked'), True)
+        self.assertEqual(select_across.get_property('value'), '1')
+        self.assertIs(selection_indicator.is_displayed(), False)
+        self.assertIs(select_all_indicator.is_displayed(), True)
+
+        clear.click()
+        self.assertIs(question.is_displayed(), False)
+        self.assertIs(clear.is_displayed(), False)
+        self.assertIs(select_all.get_property('checked'), False)
+        self.assertEqual(select_across.get_property('value'), '0')
+        self.assertIs(selection_indicator.is_displayed(), True)
+        self.assertEqual(selection_indicator.text, '0 of 100 selected')
+        self.assertIs(select_all_indicator.is_displayed(), False)
+
+    def test_actions_warn_on_pending_edits(self):
+        Parent.objects.create(name='foo')
+
+        self.admin_login(username='super', password='secret')
+        self.selenium.get(self.live_server_url + reverse('admin:admin_changelist_parent_changelist'))
+
+        name_input = self.selenium.find_element_by_id('id_form-0-name')
+        name_input.clear()
+        name_input.send_keys('bar')
+        self.selenium.find_element_by_id('action-toggle').click()
+        self.selenium.find_element_by_name('index').click()  # Go
+        alert = self.selenium.switch_to.alert
+        try:
+            self.assertEqual(
+                alert.text,
+                'You have unsaved changes on individual editable fields. If you '
+                'run an action, your unsaved changes will be lost.'
+            )
+        finally:
+            alert.dismiss()
+
+    def test_save_with_changes_warns_on_pending_action(self):
+        from selenium.webdriver.support.ui import Select
+
+        Parent.objects.create(name='parent')
+
+        self.admin_login(username='super', password='secret')
+        self.selenium.get(self.live_server_url + reverse('admin:admin_changelist_parent_changelist'))
+
+        name_input = self.selenium.find_element_by_id('id_form-0-name')
+        name_input.clear()
+        name_input.send_keys('other name')
+        Select(
+            self.selenium.find_element_by_name('action')
+        ).select_by_value('delete_selected')
+        self.selenium.find_element_by_name('_save').click()
+        alert = self.selenium.switch_to.alert
+        try:
+            self.assertEqual(
+                alert.text,
+                'You have selected an action, but you haven’t saved your '
+                'changes to individual fields yet. Please click OK to save. '
+                'You’ll need to re-run the action.',
+            )
+        finally:
+            alert.dismiss()
+
+    def test_save_without_changes_warns_on_pending_action(self):
+        from selenium.webdriver.support.ui import Select
+
+        Parent.objects.create(name='parent')
+
+        self.admin_login(username='super', password='secret')
+        self.selenium.get(self.live_server_url + reverse('admin:admin_changelist_parent_changelist'))
+
+        Select(
+            self.selenium.find_element_by_name('action')
+        ).select_by_value('delete_selected')
+        self.selenium.find_element_by_name('_save').click()
+        alert = self.selenium.switch_to.alert
+        try:
+            self.assertEqual(
+                alert.text,
+                'You have selected an action, and you haven’t made any '
+                'changes on individual fields. You’re probably looking for '
+                'the Go button rather than the Save button.',
+            )
+        finally:
+            alert.dismiss()

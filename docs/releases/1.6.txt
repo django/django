@@ -173,7 +173,7 @@ Minor features
 * In addition to :lookup:`year`, :lookup:`month` and :lookup:`day`, the ORM
   now supports :lookup:`hour`, :lookup:`minute` and :lookup:`second` lookups.
 
-* Django now wraps all PEP-249 exceptions.
+* Django now wraps all :pep:`249` exceptions.
 
 * The default widgets for :class:`~django.forms.EmailField`,
   :class:`~django.forms.URLField`, :class:`~django.forms.IntegerField`,
@@ -731,7 +731,7 @@ Admin views ``_changelist_filters`` GET parameter
 -------------------------------------------------
 
 To achieve preserving and restoring list view filters, admin views now
-pass around the `_changelist_filters` GET parameter. It's important that you
+pass around the ``_changelist_filters`` GET parameter. It's important that you
 account for that change if you have custom admin templates or if your tests
 rely on the previous URLs. If you want to revert to the original behavior you
 can set the
@@ -916,7 +916,7 @@ Miscellaneous
 * :ref:`Authentication views <built-in-auth-views>` are now reversed by name,
   not their locations in ``django.contrib.auth.views``. If you are using the
   views without a ``name``, you should update your ``urlpatterns`` to use
-  :meth:`~django.conf.urls.url` with the ``name`` parameter. For example::
+  ``django.conf.urls.url()`` with the ``name`` parameter. For example::
 
     (r'^reset/done/$', 'django.contrib.auth.views.password_reset_complete')
 
@@ -924,7 +924,7 @@ Miscellaneous
 
     url(r'^reset/done/$', 'django.contrib.auth.views.password_reset_complete', name='password_reset_complete')
 
-* :class:`~django.views.generic.base.RedirectView` now has a `pattern_name`
+* :class:`~django.views.generic.base.RedirectView` now has a ``pattern_name``
   attribute which allows it to choose the target by reversing the URL.
 
 * In Django 1.4 and 1.5, a blank string was unintentionally not considered to

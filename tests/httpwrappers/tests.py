@@ -294,7 +294,7 @@ class HttpResponseTests(unittest.TestCase):
         # ASCII strings or bytes values are converted to strings.
         r['key'] = 'test'
         self.assertEqual(r['key'], 'test')
-        r['key'] = 'test'.encode('ascii')
+        r['key'] = b'test'
         self.assertEqual(r['key'], 'test')
         self.assertIn(b'test', r.serialize_headers())
 
@@ -302,7 +302,8 @@ class HttpResponseTests(unittest.TestCase):
         r['key'] = 'café'
         self.assertIn('café'.encode('latin-1'), r.serialize_headers())
 
-        # Other unicode values are MIME-encoded (there's no way to pass them as bytes).
+        # Other Unicode values are MIME-encoded (there's no way to pass them as
+        # bytes).
         r['key'] = '†'
         self.assertEqual(r['key'], '=?utf-8?b?4oCg?=')
         self.assertIn(b'=?utf-8?b?4oCg?=', r.serialize_headers())
@@ -334,7 +335,7 @@ class HttpResponseTests(unittest.TestCase):
         # Bug #20889: long lines trigger newlines to be added to headers
         # (which is not allowed due to bug #10188)
         h = HttpResponse()
-        f = 'zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz a\xcc\x88'.encode('latin-1')
+        f = b'zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz a\xcc\x88'
         f = f.decode('utf-8')
         h['Content-Disposition'] = 'attachment; filename="%s"' % f
         # This one is triggering https://bugs.python.org/issue20747, that is Python

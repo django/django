@@ -26,6 +26,7 @@ urlpatterns = [
     path('raises403/', views.raises403),
     path('raises404/', views.raises404),
     path('raises500/', views.raises500),
+    path('custom_reporter_class_view/', views.custom_reporter_class_view),
 
     path('technical404/', views.technical404, name='my404'),
     path('classbased404/', views.Http404View.as_view()),

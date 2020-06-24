@@ -1,10 +1,9 @@
-import re
-
 from django.utils.cache import patch_vary_headers
 from django.utils.deprecation import MiddlewareMixin
+from django.utils.regex_helper import _lazy_re_compile
 from django.utils.text import compress_sequence, compress_string
 
-re_accepts_gzip = re.compile(r'\bgzip\b')
+re_accepts_gzip = _lazy_re_compile(r'\bgzip\b')
 
 
 class GZipMiddleware(MiddlewareMixin):

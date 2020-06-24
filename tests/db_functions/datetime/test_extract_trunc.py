@@ -1,16 +1,18 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone as datetime_timezone
 
 import pytz
 
 from django.conf import settings
 from django.db.models import (
-    DateField, DateTimeField, IntegerField, Max, OuterRef, Subquery, TimeField,
+    DateField, DateTimeField, F, IntegerField, Max, OuterRef, Subquery,
+    TimeField,
 )
 from django.db.models.functions import (
-    Extract, ExtractDay, ExtractHour, ExtractIsoYear, ExtractMinute,
-    ExtractMonth, ExtractQuarter, ExtractSecond, ExtractWeek, ExtractWeekDay,
-    ExtractYear, Trunc, TruncDate, TruncDay, TruncHour, TruncMinute,
-    TruncMonth, TruncQuarter, TruncSecond, TruncTime, TruncWeek, TruncYear,
+    Extract, ExtractDay, ExtractHour, ExtractIsoWeekDay, ExtractIsoYear,
+    ExtractMinute, ExtractMonth, ExtractQuarter, ExtractSecond, ExtractWeek,
+    ExtractWeekDay, ExtractYear, Trunc, TruncDate, TruncDay, TruncHour,
+    TruncMinute, TruncMonth, TruncQuarter, TruncSecond, TruncTime, TruncWeek,
+    TruncYear,
 )
 from django.test import (
     TestCase, override_settings, skipIfDBFeature, skipUnlessDBFeature,
@@ -108,6 +110,14 @@ class DateFunctionTests(TestCase):
                 query_string = str(qs.query).lower()
                 self.assertEqual(query_string.count(' between '), 1)
                 self.assertEqual(query_string.count('extract'), 0)
+                # an expression rhs cannot use the between optimization.
+                qs = DTModel.objects.annotate(
+                    start_year=ExtractYear('start_datetime'),
+                ).filter(end_datetime__year=F('start_year') + 1)
+                self.assertEqual(qs.count(), 1)
+                query_string = str(qs.query).lower()
+                self.assertEqual(query_string.count(' between '), 0)
+                self.assertEqual(query_string.count('extract'), 3)
 
     def test_extract_year_greaterthan_lookup(self):
         start_datetime = datetime(2015, 6, 15, 14, 10)
@@ -126,6 +136,11 @@ class DateFunctionTests(TestCase):
                 qs = DTModel.objects.filter(**{'start_datetime__%s__gte' % lookup: 2015})
                 self.assertEqual(qs.count(), 2)
                 self.assertEqual(str(qs.query).lower().count('extract'), 0)
+                qs = DTModel.objects.annotate(
+                    start_year=ExtractYear('start_datetime'),
+                ).filter(**{'end_datetime__%s__gte' % lookup: F('start_year')})
+                self.assertEqual(qs.count(), 1)
+                self.assertGreaterEqual(str(qs.query).lower().count('extract'), 2)
 
     def test_extract_year_lessthan_lookup(self):
         start_datetime = datetime(2015, 6, 15, 14, 10)
@@ -144,6 +159,11 @@ class DateFunctionTests(TestCase):
                 qs = DTModel.objects.filter(**{'start_datetime__%s__lte' % lookup: 2016})
                 self.assertEqual(qs.count(), 2)
                 self.assertEqual(str(qs.query).count('extract'), 0)
+                qs = DTModel.objects.annotate(
+                    end_year=ExtractYear('end_datetime'),
+                ).filter(**{'start_datetime__%s__lte' % lookup: F('end_year')})
+                self.assertEqual(qs.count(), 1)
+                self.assertGreaterEqual(str(qs.query).lower().count('extract'), 2)
 
     def test_extract_func(self):
         start_datetime = datetime(2015, 6, 15, 14, 30, 50, 321)
@@ -195,6 +215,16 @@ class DateFunctionTests(TestCase):
             [
                 (start_datetime, (start_datetime.isoweekday() % 7) + 1),
                 (end_datetime, (end_datetime.isoweekday() % 7) + 1)
+            ],
+            lambda m: (m.start_datetime, m.extracted)
+        )
+        self.assertQuerysetEqual(
+            DTModel.objects.annotate(
+                extracted=Extract('start_datetime', 'iso_week_day'),
+            ).order_by('start_datetime'),
+            [
+                (start_datetime, start_datetime.isoweekday()),
+                (end_datetime, end_datetime.isoweekday()),
             ],
             lambda m: (m.start_datetime, m.extracted)
         )
@@ -253,6 +283,16 @@ class DateFunctionTests(TestCase):
         msg = 'Extract requires native DurationField database support.'
         with self.assertRaisesMessage(ValueError, msg):
             list(DTModel.objects.annotate(extracted=Extract('duration', 'second')))
+
+    def test_extract_duration_unsupported_lookups(self):
+        msg = "Cannot extract component '%s' from DurationField 'duration'."
+        for lookup in (
+            'year', 'iso_year', 'month', 'week', 'week_day', 'iso_week_day',
+            'quarter',
+        ):
+            with self.subTest(lookup):
+                with self.assertRaisesMessage(ValueError, msg % lookup):
+                    DTModel.objects.annotate(extracted=Extract('duration', lookup))
 
     def test_extract_year_func(self):
         start_datetime = datetime(2015, 6, 15, 14, 30, 50, 321)
@@ -472,6 +512,41 @@ class DateFunctionTests(TestCase):
             lambda m: (m.start_datetime, m.extracted)
         )
         self.assertEqual(DTModel.objects.filter(start_datetime__week_day=ExtractWeekDay('start_datetime')).count(), 2)
+
+    def test_extract_iso_weekday_func(self):
+        start_datetime = datetime(2015, 6, 15, 14, 30, 50, 321)
+        end_datetime = datetime(2016, 6, 15, 14, 10, 50, 123)
+        if settings.USE_TZ:
+            start_datetime = timezone.make_aware(start_datetime, is_dst=False)
+            end_datetime = timezone.make_aware(end_datetime, is_dst=False)
+        self.create_model(start_datetime, end_datetime)
+        self.create_model(end_datetime, start_datetime)
+        self.assertQuerysetEqual(
+            DTModel.objects.annotate(
+                extracted=ExtractIsoWeekDay('start_datetime'),
+            ).order_by('start_datetime'),
+            [
+                (start_datetime, start_datetime.isoweekday()),
+                (end_datetime, end_datetime.isoweekday()),
+            ],
+            lambda m: (m.start_datetime, m.extracted)
+        )
+        self.assertQuerysetEqual(
+            DTModel.objects.annotate(
+                extracted=ExtractIsoWeekDay('start_date'),
+            ).order_by('start_datetime'),
+            [
+                (start_datetime, start_datetime.isoweekday()),
+                (end_datetime, end_datetime.isoweekday()),
+            ],
+            lambda m: (m.start_datetime, m.extracted)
+        )
+        self.assertEqual(
+            DTModel.objects.filter(
+                start_datetime__week_day=ExtractWeekDay('start_datetime'),
+            ).count(),
+            2,
+        )
 
     def test_extract_hour_func(self):
         start_datetime = datetime(2015, 6, 15, 14, 30, 50, 321)
@@ -969,6 +1044,8 @@ class DateFunctionWithTimeZoneTests(DateFunctionTests):
         end_datetime = timezone.make_aware(end_datetime, is_dst=False)
         self.create_model(start_datetime, end_datetime)
         melb = pytz.timezone('Australia/Melbourne')
+        delta_tzinfo_pos = datetime_timezone(timedelta(hours=5))
+        delta_tzinfo_neg = datetime_timezone(timedelta(hours=-5, minutes=17))
 
         qs = DTModel.objects.annotate(
             day=Extract('start_datetime', 'day'),
@@ -977,9 +1054,14 @@ class DateFunctionWithTimeZoneTests(DateFunctionTests):
             isoyear=ExtractIsoYear('start_datetime', tzinfo=melb),
             weekday=ExtractWeekDay('start_datetime'),
             weekday_melb=ExtractWeekDay('start_datetime', tzinfo=melb),
+            isoweekday=ExtractIsoWeekDay('start_datetime'),
+            isoweekday_melb=ExtractIsoWeekDay('start_datetime', tzinfo=melb),
             quarter=ExtractQuarter('start_datetime', tzinfo=melb),
             hour=ExtractHour('start_datetime'),
             hour_melb=ExtractHour('start_datetime', tzinfo=melb),
+            hour_with_delta_pos=ExtractHour('start_datetime', tzinfo=delta_tzinfo_pos),
+            hour_with_delta_neg=ExtractHour('start_datetime', tzinfo=delta_tzinfo_neg),
+            minute_with_delta_neg=ExtractMinute('start_datetime', tzinfo=delta_tzinfo_neg),
         ).order_by('start_datetime')
 
         utc_model = qs.get()
@@ -989,9 +1071,14 @@ class DateFunctionWithTimeZoneTests(DateFunctionTests):
         self.assertEqual(utc_model.isoyear, 2015)
         self.assertEqual(utc_model.weekday, 2)
         self.assertEqual(utc_model.weekday_melb, 3)
+        self.assertEqual(utc_model.isoweekday, 1)
+        self.assertEqual(utc_model.isoweekday_melb, 2)
         self.assertEqual(utc_model.quarter, 2)
         self.assertEqual(utc_model.hour, 23)
         self.assertEqual(utc_model.hour_melb, 9)
+        self.assertEqual(utc_model.hour_with_delta_pos, 4)
+        self.assertEqual(utc_model.hour_with_delta_neg, 18)
+        self.assertEqual(utc_model.minute_with_delta_neg, 47)
 
         with timezone.override(melb):
             melb_model = qs.get()
@@ -1001,8 +1088,10 @@ class DateFunctionWithTimeZoneTests(DateFunctionTests):
         self.assertEqual(melb_model.week, 25)
         self.assertEqual(melb_model.isoyear, 2015)
         self.assertEqual(melb_model.weekday, 3)
+        self.assertEqual(melb_model.isoweekday, 2)
         self.assertEqual(melb_model.quarter, 2)
         self.assertEqual(melb_model.weekday_melb, 3)
+        self.assertEqual(melb_model.isoweekday_melb, 2)
         self.assertEqual(melb_model.hour, 9)
         self.assertEqual(melb_model.hour_melb, 9)
 

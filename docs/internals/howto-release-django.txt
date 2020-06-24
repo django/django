@@ -58,7 +58,7 @@ You'll need a few things before getting started:
 
 * An install of some required Python packages::
 
-      $ pip install wheel twine
+      $ python -m pip install wheel twine
 
 * Access to Django's record on PyPI. Create a file with your credentials:
 
@@ -134,6 +134,12 @@ any time leading up to the actual release:
 
    and then commit the changed man page.
 
+#. If this is the alpha release of a new series, create a new stable branch
+   from master. For example, when releasing Django 3.1::
+
+    $ git checkout -b stable/3.1.x origin/master
+    $ git push origin -u stable/3.1.x:stable/3.1.x
+
 #. If this is the "dot zero" release of a new series, create a new branch from
    the current stable branch in the `django-docs-translations
    <https://github.com/django/django-docs-translations>`_ repository. For
@@ -172,7 +178,7 @@ OK, this is the fun part, where we actually push out a release!
 
 #. If this is a security release, merge the appropriate patches from
    ``django-security``. Rebase these patches as necessary to make each one a
-   simple commit on the release branch rather than a merge commit. To ensure
+   plain commit on the release branch rather than a merge commit. To ensure
    this, merge them with the ``--ff-only`` flag; for example::
 
         $ git checkout stable/1.5.x
@@ -200,7 +206,7 @@ OK, this is the fun part, where we actually push out a release!
    on ``VERSION``.
 
 #. If this is a pre-release package, update the "Development Status" trove
-   classifier in ``setup.py`` to reflect this. Otherwise, make sure the
+   classifier in ``setup.cfg`` to reflect this. Otherwise, make sure the
    classifier is set to ``Development Status :: 5 - Production/Stable``.
 
 #. Tag the release using ``git tag``. For example::
@@ -291,30 +297,34 @@ Now you're ready to actually put the release out there. To do this:
 
         $ scp Django-* djangoproject.com:/home/www/www/media/releases/A.B
 
+   If this is the alpha release of a new series, you will need to create the
+   directory A.B.
+
 #. Upload the checksum file(s)::
 
         $ scp Django-A.B.C.checksum.txt.asc djangoproject.com:/home/www/www/media/pgp/Django-A.B.C.checksum.txt
 
 #. Test that the release packages install correctly using ``easy_install``
-   and ``pip``. Here's one method (which requires `virtualenvwrapper`__)::
+   and ``pip``. Here's one method::
 
         $ RELEASE_VERSION='1.7.2'
         $ MAJOR_VERSION=`echo $RELEASE_VERSION| cut -c 1-3`
 
-        $ mktmpenv
+        $ python -m venv django-easy-install
+        $ . django-easy-install/bin/activate
         $ easy_install https://www.djangoproject.com/m/releases/$MAJOR_VERSION/Django-$RELEASE_VERSION.tar.gz
         $ deactivate
-        $ mktmpenv
-        $ pip install https://www.djangoproject.com/m/releases/$MAJOR_VERSION/Django-$RELEASE_VERSION.tar.gz
+        $ python -m venv django-pip
+        $ . django-pip/bin/activate
+        $ python -m pip install https://www.djangoproject.com/m/releases/$MAJOR_VERSION/Django-$RELEASE_VERSION.tar.gz
         $ deactivate
-        $ mktmpenv
-        $ pip install https://www.djangoproject.com/m/releases/$MAJOR_VERSION/Django-$RELEASE_VERSION-py3-none-any.whl
+        $ python -m venv django-pip-wheel
+        $ . django-pip-wheel/bin/activate
+        $ python -m pip install https://www.djangoproject.com/m/releases/$MAJOR_VERSION/Django-$RELEASE_VERSION-py3-none-any.whl
         $ deactivate
 
    This just tests that the tarballs are available (i.e. redirects are up) and
    that they install correctly, but it'll catch silly mistakes.
-
-   __ https://pypi.org/project/virtualenvwrapper/
 
 #. Ask a few people on IRC to verify the checksums by visiting the checksums
    file (e.g. https://www.djangoproject.com/m/pgp/Django-1.5b1.checksum.txt)
@@ -335,6 +345,11 @@ Now you're ready to actually put the release out there. To do this:
 
    __ https://www.djangoproject.com/admin/releases/release/add/
 
+   If this is the alpha release of a new series, also create a Release object
+   for the *final* release, ensuring that the *Release date* field is blank,
+   thus marking it as *unreleased*. For example, when creating the Release
+   object for ``3.1a1``, also create ``3.1`` with the Release date field blank.
+
 #. Make the blog post announcing the release live.
 
 #. For a new version release (e.g. 1.5, 1.6), update the default stable version
@@ -345,16 +360,27 @@ Now you're ready to actually put the release out there. To do this:
 
    Create new ``DocumentRelease`` objects for each language that has an entry
    for the previous release. Update djangoproject.com's `robots.docs.txt`__
-   file by copying entries from the previous release.
+   file by copying entries from ``manage_translations.py robots_txt`` from the
+   current stable branch in the ``django-docs-translations`` repository. For
+   example, when releasing Django 2.2::
+
+        $ git checkout stable/2.2.x
+        $ git pull
+        $ python manage_translations.py robots_txt
 
    __ https://github.com/django/djangoproject.com/blob/master/djangoproject/static/robots.docs.txt
 
 #. Post the release announcement to the |django-announce|, |django-developers|,
    and |django-users| mailing lists. This should include a link to the
-   announcement blog post. If this is a security release, also include
-   oss-security@lists.openwall.com.
+   announcement blog post.
 
-#. Add a link to the blog post in the topic of the `#django` IRC channel:
+#. If this is a security release, send a separate email to
+   oss-security@lists.openwall.com. Provide a descriptive subject, for example,
+   "Django" plus the issue title from the release notes (including CVE ID). The
+   message body should include the vulnerability details, for example, the
+   announcement blog post text. Include a link to the announcement blog post.
+
+#. Add a link to the blog post in the topic of the ``#django`` IRC channel:
    ``/msg chanserv TOPIC #django new topic goes here``.
 
 Post-release
@@ -368,8 +394,12 @@ You're almost done! All that's left to do now is:
    ``VERSION = (1, 5, 2, 'alpha', 0)``.
 
 #. Add the release in `Trac's versions list`_ if necessary (and make it the
-   default if it's a final release). Not all versions are declared;
-   take example on previous releases.
+   default by changing the ``default_version`` setting in the
+   code.djangoproject.com's `trac.ini`__, if it's a final release). The new X.Y
+   version should be added after the alpha release and the default version
+   should be updated after "dot zero" release.
+
+   __ https://github.com/django/code.djangoproject.com/blob/master/trac-env/conf/trac.ini
 
 #. If this was a security release, update :doc:`/releases/security` with
    details of the issues addressed.
@@ -413,6 +443,10 @@ need to be done by the releaser.
    used in Read the Docs ("A.B.x"), `create a ticket
    <https://github.com/rtfd/readthedocs.org/issues/5537>`_ requesting the new
    version.
+
+#. `Request the new classifier on PyPI
+   <https://github.com/pypa/trove-classifiers/issues/29>`_. For example
+   ``Framework :: Django :: 3.1``.
 
 Notes on setting the VERSION tuple
 ==================================

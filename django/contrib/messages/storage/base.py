@@ -25,8 +25,9 @@ class Message:
         self.extra_tags = str(self.extra_tags) if self.extra_tags is not None else None
 
     def __eq__(self, other):
-        return isinstance(other, Message) and self.level == other.level and \
-            self.message == other.message
+        if not isinstance(other, Message):
+            return NotImplemented
+        return self.level == other.level and self.message == other.message
 
     def __str__(self):
         return str(self.message)

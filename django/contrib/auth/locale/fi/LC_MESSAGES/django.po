@@ -1,7 +1,7 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Aarni Koskela, 2015,2017-2018
+# Aarni Koskela, 2015,2017-2018,2020
 # Antti Kaihola <antti.15+transifex@kaihola.fi>, 2011
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Klaus Dahlén <klaus.dahlen@gmail.com>, 2012
@@ -9,8 +9,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-09-24 13:46+0200\n"
-"PO-Revision-Date: 2018-03-04 12:14+0000\n"
+"POT-Creation-Date: 2019-09-08 17:27+0200\n"
+"PO-Revision-Date: 2020-01-21 09:33+0000\n"
 "Last-Translator: Aarni Koskela\n"
 "Language-Team: Finnish (http://www.transifex.com/django/django/language/"
 "fi/)\n"
@@ -55,8 +55,8 @@ msgstr "Salasanaa ei ole asetettu."
 msgid "Invalid password format or unknown hashing algorithm."
 msgstr "Tuntematon salasanamuoto tai tuntematon hajakoodausalgoritmi."
 
-msgid "The two password fields didn't match."
-msgstr "Salasanat eivät täsmää."
+msgid "The two password fields didn’t match."
+msgstr "Salasanakentät eivät täsmänneet."
 
 msgid "Password"
 msgstr "Salasana"
@@ -68,7 +68,7 @@ msgid "Enter the same password as before, for verification."
 msgstr "Syötä sama salasana tarkistuksen vuoksi toistamiseen."
 
 msgid ""
-"Raw passwords are not stored, so there is no way to see this user's "
+"Raw passwords are not stored, so there is no way to see this user’s "
 "password, but you can change the password using <a href=\"{}\">this form</a>."
 msgstr ""
 "Salasanoja ei tallenneta selkokielisinä, joten tämän käyttäjän salasanaa on "
@@ -249,19 +249,19 @@ msgstr[1] "Salasanasi tulee sisältää ainakin %(min_length)d merkkiä."
 msgid "The password is too similar to the %(verbose_name)s."
 msgstr "Salasana on liian lähellä kohdetta %(verbose_name)s."
 
-msgid "Your password can't be too similar to your other personal information."
+msgid "Your password can’t be too similar to your other personal information."
 msgstr "Salasanasi ei voi olla liian samankaltainen muiden tietojesi kanssa."
 
 msgid "This password is too common."
 msgstr "Tämä salasana on liian yleinen."
 
-msgid "Your password can't be a commonly used password."
+msgid "Your password can’t be a commonly used password."
 msgstr "Salasanasi ei voi olla yleisesti käytetty salasana."
 
 msgid "This password is entirely numeric."
 msgstr "Tämä salasana on kokonaan numeerinen."
 
-msgid "Your password can't be entirely numeric."
+msgid "Your password can’t be entirely numeric."
 msgstr "Salasanasi ei voi olla kokonaan numeerinen."
 
 #, python-format

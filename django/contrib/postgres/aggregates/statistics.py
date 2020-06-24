@@ -1,5 +1,4 @@
-from django.db.models import FloatField, IntegerField
-from django.db.models.aggregates import Aggregate
+from django.db.models import Aggregate, FloatField, IntegerField
 
 __all__ = [
     'CovarPop', 'Corr', 'RegrAvgX', 'RegrAvgY', 'RegrCount', 'RegrIntercept',
@@ -14,9 +13,6 @@ class StatAggregate(Aggregate):
         if not x or not y:
             raise ValueError('Both y and x must be provided.')
         super().__init__(y, x, output_field=output_field, filter=filter)
-
-    def resolve_expression(self, query=None, allow_joins=True, reuse=None, summarize=False, for_save=False):
-        return super().resolve_expression(query, allow_joins, reuse, summarize)
 
 
 class Corr(StatAggregate):

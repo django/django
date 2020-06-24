@@ -2,8 +2,6 @@
 Constants specific to the SQL storage portion of the ORM.
 """
 
-import re
-
 # Size of each "chunk" for get_iterator calls.
 # Larger values are slightly faster at the expense of more storage space.
 GET_ITERATOR_CHUNK_SIZE = 100
@@ -16,7 +14,6 @@ SINGLE = 'single'
 CURSOR = 'cursor'
 NO_RESULTS = 'no results'
 
-ORDER_PATTERN = re.compile(r'\?|[-+]?[.\w]+$')
 ORDER_DIR = {
     'ASC': ('ASC', 'DESC'),
     'DESC': ('DESC', 'ASC'),

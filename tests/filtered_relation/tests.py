@@ -1,3 +1,5 @@
+from unittest import mock
+
 from django.db import connection, transaction
 from django.db.models import Case, Count, F, FilteredRelation, Q, When
 from django.test import TestCase
@@ -50,6 +52,24 @@ class FilteredRelationTests(TestCase):
                 (self.author2, self.book3, self.editor_b, self.author2),
             ], lambda x: (x, x.book_join, x.book_join.editor, x.book_join.author))
 
+    def test_select_related_multiple(self):
+        qs = Book.objects.annotate(
+            author_join=FilteredRelation('author'),
+            editor_join=FilteredRelation('editor'),
+        ).select_related('author_join', 'editor_join').order_by('pk')
+        self.assertQuerysetEqual(qs, [
+            (self.book1, self.author1, self.editor_a),
+            (self.book2, self.author2, self.editor_b),
+            (self.book3, self.author2, self.editor_b),
+            (self.book4, self.author1, self.editor_a),
+        ], lambda x: (x, x.author_join, x.editor_join))
+
+    def test_select_related_with_empty_relation(self):
+        qs = Author.objects.annotate(
+            book_join=FilteredRelation('book', condition=Q(pk=-1)),
+        ).select_related('book_join').order_by('pk')
+        self.assertSequenceEqual(qs, [self.author1, self.author2])
+
     def test_select_related_foreign_key(self):
         qs = Book.objects.annotate(
             author_join=FilteredRelation('author'),
@@ -90,6 +110,14 @@ class FilteredRelationTests(TestCase):
                 book_alice=FilteredRelation('book', condition=Q(book__title__iexact='poem by alice')),
             ).filter(book_alice__isnull=False),
             [self.author1]
+        )
+
+    def test_with_exclude(self):
+        self.assertSequenceEqual(
+            Author.objects.annotate(
+                book_alice=FilteredRelation('book', condition=Q(book__title__iexact='poem by alice')),
+            ).exclude(book_alice__isnull=False),
+            [self.author2],
         )
 
     def test_with_join_and_complex_condition(self):
@@ -308,6 +336,9 @@ class FilteredRelationTests(TestCase):
             ).filter(generic_authored_book__isnull=False),
             [self.book1]
         )
+
+    def test_eq(self):
+        self.assertEqual(FilteredRelation('book', condition=Q(book__title='b')), mock.ANY)
 
 
 class FilteredRelationAggregationTests(TestCase):

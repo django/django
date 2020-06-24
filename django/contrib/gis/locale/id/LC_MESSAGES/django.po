@@ -6,14 +6,15 @@
 # M Asep Indrayana <me@drayanaindra.com>, 2015
 # rodin <romihardiyanto@gmail.com>, 2011-2012
 # rodin <romihardiyanto@gmail.com>, 2015-2016
+# sage <laymonage@gmail.com>, 2019
 # Sutrisno Efendi <kangfend@gmail.com>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-09-23 18:54+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2019-09-08 17:27+0200\n"
+"PO-Revision-Date: 2019-09-28 05:59+0000\n"
+"Last-Translator: sage <laymonage@gmail.com>\n"
 "Language-Team: Indonesian (http://www.transifex.com/django/django/language/"
 "id/)\n"
 "MIME-Version: 1.0\n"
@@ -29,9 +30,9 @@ msgid "The base GIS field."
 msgstr "Bidang GIS dasar."
 
 msgid ""
-"The base Geometry field -- maps to the OpenGIS Specification Geometry type."
+"The base Geometry field — maps to the OpenGIS Specification Geometry type."
 msgstr ""
-"Bidang Geometri dasar -- memetakan ke jenis OpenGIS Specification Geometry."
+"Bidang Geometri dasar — memetakan ke jenis OpenGIS Specification Geometry."
 
 msgid "Point"
 msgstr "Point"
@@ -88,5 +89,5 @@ msgid "No feeds are registered."
 msgstr "Tidak ada umpan terdaftar."
 
 #, python-format
-msgid "Slug %r isn't registered."
+msgid "Slug %r isn’t registered."
 msgstr "Slug %r tidak terdaftar."

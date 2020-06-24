@@ -1,8 +1,11 @@
 import json
 
 from django.core import checks, exceptions, serializers
+from django.db import connection
+from django.db.models import OuterRef, Subquery
+from django.db.models.expressions import RawSQL
 from django.forms import Form
-from django.test.utils import isolate_apps
+from django.test.utils import CaptureQueriesContext, isolate_apps
 
 from . import PostgreSQLSimpleTestCase, PostgreSQLTestCase
 from .models import HStoreModel, PostgreSQLModel
@@ -10,6 +13,7 @@ from .models import HStoreModel, PostgreSQLModel
 try:
     from django.contrib.postgres import forms
     from django.contrib.postgres.fields import HStoreField
+    from django.contrib.postgres.fields.hstore import KeyTransform
     from django.contrib.postgres.validators import KeysValidator
 except ImportError:
     pass
@@ -126,6 +130,13 @@ class TestQuerying(PostgreSQLTestCase):
             self.objs[:2]
         )
 
+    def test_key_transform_raw_expression(self):
+        expr = RawSQL('%s::hstore', ['x => b, y => c'])
+        self.assertSequenceEqual(
+            HStoreModel.objects.filter(field__a=KeyTransform('x', expr)),
+            self.objs[:2]
+        )
+
     def test_keys(self):
         self.assertSequenceEqual(
             HStoreModel.objects.filter(field__keys=['a']),
@@ -185,6 +196,24 @@ class TestQuerying(PostgreSQLTestCase):
             self.objs[:2]
         )
 
+    def test_key_sql_injection(self):
+        with CaptureQueriesContext(connection) as queries:
+            self.assertFalse(
+                HStoreModel.objects.filter(**{
+                    "field__test' = 'a') OR 1 = 1 OR ('d": 'x',
+                }).exists()
+            )
+        self.assertIn(
+            """."field" -> 'test'' = ''a'') OR 1 = 1 OR (''d') = 'x' """,
+            queries[0]['sql'],
+        )
+
+    def test_obj_subquery_lookup(self):
+        qs = HStoreModel.objects.annotate(
+            value=Subquery(HStoreModel.objects.filter(pk=OuterRef('pk')).values('field')),
+        ).filter(value__a='b')
+        self.assertSequenceEqual(qs, self.objs[:2])
+
 
 @isolate_apps('postgres_tests')
 class TestChecks(PostgreSQLSimpleTestCase):
@@ -203,7 +232,7 @@ class TestChecks(PostgreSQLSimpleTestCase):
                 ),
                 hint='Use a callable instead, e.g., use `dict` instead of `{}`.',
                 obj=MyModel._meta.get_field('field'),
-                id='postgres.E003',
+                id='fields.E010',
             )
         ])
 
@@ -251,7 +280,7 @@ class TestValidation(PostgreSQLSimpleTestCase):
         with self.assertRaises(exceptions.ValidationError) as cm:
             field.clean({'a': 1}, None)
         self.assertEqual(cm.exception.code, 'not_a_string')
-        self.assertEqual(cm.exception.message % cm.exception.params, 'The value of "a" is not a string or null.')
+        self.assertEqual(cm.exception.message % cm.exception.params, 'The value of “a” is not a string or null.')
 
     def test_none_allowed_as_value(self):
         field = HStoreField()

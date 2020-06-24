@@ -203,7 +203,7 @@ model to represent this data::
         name = models.CharField(max_length=50)
         area = models.IntegerField()
         pop2005 = models.IntegerField('Population 2005')
-        fips = models.CharField('FIPS Code', max_length=2)
+        fips = models.CharField('FIPS Code', max_length=2, null=True)
         iso2 = models.CharField('2 Digit ISO', max_length=2)
         iso3 = models.CharField('3 Digit ISO', max_length=3)
         un = models.IntegerField('United Nations Code')
@@ -302,7 +302,7 @@ besides the tools included within GeoDjango, you may also use the following:
 * `shp2pgsql`_: This utility included with PostGIS imports ESRI shapefiles into
   PostGIS.
 
-.. _ogr2ogr: https://www.gdal.org/ogr2ogr.html
+.. _ogr2ogr: https://gdal.org/programs/ogr2ogr.html
 .. _shp2pgsql: https://postgis.net/docs/using_postgis_dbmanagement.html#shp2pgsql_usage
 
 .. _gdalinterface:
@@ -320,14 +320,12 @@ First, invoke the Django shell:
 
     $ python manage.py shell
 
-If you downloaded the :ref:`worldborders` data earlier in the
-tutorial, then you can determine its path using Python's built-in
-``os`` module::
+If you downloaded the :ref:`worldborders` data earlier in the tutorial, then
+you can determine its path using Python's :class:`pathlib.Path`::
 
-    >>> import os
+    >>> from pathlib import Path
     >>> import world
-    >>> world_shp = os.path.abspath(os.path.join(os.path.dirname(world.__file__),
-    ...                             'data', 'TM_WORLD_BORDERS-0.3.shp'))
+    >>> world_shp = Path(world.__file__).resolve().parent / 'data' / 'TM_WORLD_BORDERS-0.3.shp'
 
 Now, open the world borders shapefile using GeoDjango's
 :class:`~django.contrib.gis.gdal.DataSource` interface::
@@ -374,7 +372,7 @@ system associated with it.  If it does, the ``srs`` attribute will return a
             SPHEROID["WGS_1984",6378137.0,298.257223563]],
         PRIMEM["Greenwich",0.0],
         UNIT["Degree",0.0174532925199433]]
-    >>> srs.proj4 # PROJ.4 representation
+    >>> srs.proj # PROJ representation
     '+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs '
 
 This shapefile is in the popular WGS84 spatial reference
@@ -433,7 +431,7 @@ To import the data, use a LayerMapping in a Python script.
 Create a file called ``load.py`` inside the ``world`` application,
 with the following code::
 
-    import os
+    from pathlib import Path
     from django.contrib.gis.utils import LayerMapping
     from .models import WorldBorder
 
@@ -452,9 +450,7 @@ with the following code::
         'mpoly' : 'MULTIPOLYGON',
     }
 
-    world_shp = os.path.abspath(
-        os.path.join(os.path.dirname(__file__), 'data', 'TM_WORLD_BORDERS-0.3.shp'),
-    )
+    world_shp = Path(__file__).resolve().parent / 'data' / 'TM_WORLD_BORDERS-0.3.shp'
 
     def run(verbose=True):
         lm = LayerMapping(WorldBorder, world_shp, world_mapping, transform=False)
@@ -637,7 +633,7 @@ of abstraction::
     >>> qs # printing evaluates the queryset
     <QuerySet [<WorldBorder: United States>]>
 
-__ http://spatialreference.org/ref/epsg/32140/
+__ https://spatialreference.org/ref/epsg/32140/
 
 .. _gis-raw-sql:
 
@@ -741,7 +737,7 @@ position.
 
 .. _OpenLayers: https://openlayers.org/
 .. _Open Street Map: https://www.openstreetmap.org/
-.. _Vector Map Level 0: http://earth-info.nga.mil/publications/vmap0.html
+.. _Vector Map Level 0: https://earth-info.nga.mil/publications/vmap0.html
 .. _OSGeo: https://www.osgeo.org/
 
 .. _osmgeoadmin-intro:
@@ -755,11 +751,11 @@ This provides more context (including street and thoroughfare details) than
 available with the :class:`~django.contrib.gis.admin.GeoModelAdmin`
 (which uses the `Vector Map Level 0`_ WMS dataset hosted at `OSGeo`_).
 
-The PROJ.4 datum shifting files must be installed (see the :ref:`PROJ.4
+The PROJ datum shifting files must be installed (see the :ref:`PROJ
 installation instructions <proj4>` for more details).
 
-If you meet this requirement, then just substitute the ``OSMGeoAdmin``
-option class in your ``admin.py`` file::
+If you meet this requirement, then substitute the ``OSMGeoAdmin`` option class
+in your ``admin.py`` file::
 
     admin.site.register(WorldBorder, admin.OSMGeoAdmin)
 

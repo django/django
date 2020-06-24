@@ -6,7 +6,7 @@ from django.db.backends.sqlite3.introspection import (
 
 class GeoFlexibleFieldLookupDict(FlexibleFieldLookupDict):
     """
-    Sublcass that includes updates the `base_data_types_reverse` dict
+    Subclass that includes updates the `base_data_types_reverse` dict
     for geometry field types.
     """
     base_data_types_reverse = {

@@ -133,7 +133,7 @@ class Exactly(models.lookups.Exact):
 
 class SQLFuncMixin:
     def as_sql(self, compiler, connection):
-        return '%s()', [self.name]
+        return '%s()' % self.name, []
 
     @property
     def output_field(self):

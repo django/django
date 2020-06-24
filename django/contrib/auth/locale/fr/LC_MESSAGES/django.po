@@ -1,7 +1,7 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Claude Paroz <claude@2xlibre.net>, 2013-2018
+# Claude Paroz <claude@2xlibre.net>, 2013-2019
 # Claude Paroz <claude@2xlibre.net>, 2013
 # Jannis Leidel <jannis@leidel.info>, 2011
 # mlorant <maxime.lorant@gmail.com>, 2014
@@ -9,8 +9,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-09-24 13:46+0200\n"
-"PO-Revision-Date: 2018-02-27 13:36+0000\n"
+"POT-Creation-Date: 2019-09-08 17:27+0200\n"
+"PO-Revision-Date: 2019-09-18 15:54+0000\n"
 "Last-Translator: Claude Paroz <claude@2xlibre.net>\n"
 "Language-Team: French (http://www.transifex.com/django/django/language/fr/)\n"
 "MIME-Version: 1.0\n"
@@ -30,7 +30,7 @@ msgstr "Dates importantes"
 
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
-msgstr "L'objet %(name)s avec la clef primaire %(key)r n'existe pas."
+msgstr "L'objet %(name)s avec la clef primaire %(key)r n’existe pas."
 
 msgid "Password changed successfully."
 msgstr "Mot de passe modifié avec succès"
@@ -55,7 +55,7 @@ msgid "Invalid password format or unknown hashing algorithm."
 msgstr ""
 "Format de mot de passe non valide ou algorithme de hachage non reconnu."
 
-msgid "The two password fields didn't match."
+msgid "The two password fields didn’t match."
 msgstr "Les deux mots de passe ne correspondent pas."
 
 msgid "Password"
@@ -68,11 +68,11 @@ msgid "Enter the same password as before, for verification."
 msgstr "Saisissez le même mot de passe que précédemment, pour vérification."
 
 msgid ""
-"Raw passwords are not stored, so there is no way to see this user's "
+"Raw passwords are not stored, so there is no way to see this user’s "
 "password, but you can change the password using <a href=\"{}\">this form</a>."
 msgstr ""
 "Les mots de passe ne sont pas enregistrés en clair, ce qui ne permet pas "
-"d'afficher le mot de passe de cet utilisateur, mais il est possible de le "
+"d’afficher le mot de passe de cet utilisateur, mais il est possible de le "
 "changer en utilisant <a href=\"{}\">ce formulaire</a>. "
 
 #, python-format
@@ -166,7 +166,7 @@ msgid ""
 "Designates that this user has all permissions without explicitly assigning "
 "them."
 msgstr ""
-"Précise que l'utilisateur possède toutes les permissions sans les assigner "
+"Précise que l’utilisateur possède toutes les permissions sans les assigner "
 "explicitement."
 
 msgid ""
@@ -177,13 +177,13 @@ msgstr ""
 "droits de tous les groupes auxquels il appartient."
 
 msgid "user permissions"
-msgstr "permissions de l'utilisateur"
+msgstr "permissions de l’utilisateur"
 
 msgid "Specific permissions for this user."
 msgstr "Permissions spécifiques à cet utilisateur."
 
 msgid "username"
-msgstr "nom d'utilisateur"
+msgstr "nom d’utilisateur"
 
 msgid "Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only."
 msgstr ""
@@ -206,7 +206,7 @@ msgid "staff status"
 msgstr "statut équipe"
 
 msgid "Designates whether the user can log into this admin site."
-msgstr "Précise si l'utilisateur peut se connecter à ce site d'administration."
+msgstr "Précise si l’utilisateur peut se connecter à ce site d'administration."
 
 msgid "active"
 msgstr "actif"
@@ -215,11 +215,11 @@ msgid ""
 "Designates whether this user should be treated as active. Unselect this "
 "instead of deleting accounts."
 msgstr ""
-"Précise si l'utilisateur doit être considéré comme actif. Décochez ceci "
+"Précise si l’utilisateur doit être considéré comme actif. Décochez ceci "
 "plutôt que de supprimer le compte."
 
 msgid "date joined"
-msgstr "date d'inscription"
+msgstr "date d’inscription"
 
 msgid "user"
 msgstr "utilisateur"
@@ -253,7 +253,7 @@ msgstr[1] ""
 msgid "The password is too similar to the %(verbose_name)s."
 msgstr "Le mot de passe est trop semblable au champ « %(verbose_name)s »."
 
-msgid "Your password can't be too similar to your other personal information."
+msgid "Your password can’t be too similar to your other personal information."
 msgstr ""
 "Votre mot de passe ne peut pas trop ressembler à vos autres informations "
 "personnelles."
@@ -261,14 +261,14 @@ msgstr ""
 msgid "This password is too common."
 msgstr "Ce mot de passe est trop courant."
 
-msgid "Your password can't be a commonly used password."
+msgid "Your password can’t be a commonly used password."
 msgstr ""
 "Votre mot de passe ne peut pas être un mot de passe couramment utilisé."
 
 msgid "This password is entirely numeric."
 msgstr "Ce mot de passe est entièrement numérique."
 
-msgid "Your password can't be entirely numeric."
+msgid "Your password can’t be entirely numeric."
 msgstr "Votre mot de passe ne peut pas être entièrement numérique."
 
 #, python-format
@@ -279,7 +279,7 @@ msgid ""
 "Enter a valid username. This value may contain only English letters, "
 "numbers, and @/./+/-/_ characters."
 msgstr ""
-"Saisissez un nom d'utilisateur valide. Il ne peut contenir que des lettres "
+"Saisissez un nom d’utilisateur valide. Il ne peut contenir que des lettres "
 "non accentuées, des nombres ou les caractères « @ », « . », « + », « - » et "
 "« _ »."
 
@@ -287,7 +287,7 @@ msgid ""
 "Enter a valid username. This value may contain only letters, numbers, and "
 "@/./+/-/_ characters."
 msgstr ""
-"Saisissez un nom d'utilisateur valide. Il ne peut contenir que des lettres, "
+"Saisissez un nom d’utilisateur valide. Il ne peut contenir que des lettres, "
 "des nombres ou les caractères « @ », « . », « + », « - » et « _ »."
 
 msgid "Logged out"

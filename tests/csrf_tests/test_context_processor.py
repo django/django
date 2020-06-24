@@ -1,5 +1,5 @@
 from django.http import HttpRequest
-from django.middleware.csrf import _compare_salted_tokens as equivalent_tokens
+from django.middleware.csrf import _compare_masked_tokens as equivalent_tokens
 from django.template.context_processors import csrf
 from django.test import SimpleTestCase
 

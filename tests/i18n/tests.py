@@ -8,10 +8,9 @@ import tempfile
 from contextlib import contextmanager
 from importlib import import_module
 from pathlib import Path
-from threading import local
 from unittest import mock
 
-import _thread
+from asgiref.local import Local
 
 from django import forms
 from django.apps import AppConfig
@@ -34,9 +33,9 @@ from django.utils.translation import (
     LANGUAGE_SESSION_KEY, activate, check_for_language, deactivate,
     get_language, get_language_bidi, get_language_from_request,
     get_language_info, gettext, gettext_lazy, ngettext, ngettext_lazy,
-    npgettext, npgettext_lazy, pgettext, to_language, to_locale, trans_null,
-    trans_real, ugettext, ugettext_lazy, ugettext_noop, ungettext,
-    ungettext_lazy,
+    npgettext, npgettext_lazy, pgettext, round_away_from_one, to_language,
+    to_locale, trans_null, trans_real, ugettext, ugettext_lazy, ugettext_noop,
+    ungettext, ungettext_lazy,
 )
 from django.utils.translation.reloader import (
     translation_file_changed, watch_for_translation_changes,
@@ -125,6 +124,22 @@ class TranslationTests(SimpleTestCase):
         self.assertEqual(g('%d year', '%d years', 0) % 0, '0 years')
         self.assertEqual(g('%d year', '%d years', 1) % 1, '1 year')
         self.assertEqual(g('%d year', '%d years', 2) % 2, '2 years')
+
+    @override_settings(LOCALE_PATHS=extended_locale_paths)
+    @translation.override('fr')
+    def test_multiple_plurals_per_language(self):
+        """
+        Normally, French has 2 plurals. As other/locale/fr/LC_MESSAGES/django.po
+        has a different plural equation with 3 plurals, this tests if those
+        plural are honored.
+        """
+        self.assertEqual(ngettext("%d singular", "%d plural", 0) % 0, "0 pluriel1")
+        self.assertEqual(ngettext("%d singular", "%d plural", 1) % 1, "1 singulier")
+        self.assertEqual(ngettext("%d singular", "%d plural", 2) % 2, "2 pluriel2")
+        french = trans_real.catalog()
+        # Internal _catalog can query subcatalogs (from different po files).
+        self.assertEqual(french._catalog[('%d singular', 0)], '%d singulier')
+        self.assertEqual(french._catalog[('%d hour', 0)], '%d heure')
 
     def test_override(self):
         activate('de')
@@ -289,7 +304,7 @@ class TranslationTests(SimpleTestCase):
 
     @override_settings(LOCALE_PATHS=extended_locale_paths)
     def test_pgettext(self):
-        trans_real._active = local()
+        trans_real._active = Local()
         trans_real._translations = {}
         with translation.override('de'):
             self.assertEqual(pgettext("unexisting", "May"), "May")
@@ -310,7 +325,7 @@ class TranslationTests(SimpleTestCase):
         Translating a string requiring no auto-escaping with gettext or pgettext
         shouldn't change the "safe" status.
         """
-        trans_real._active = local()
+        trans_real._active = Local()
         trans_real._translations = {}
         s1 = mark_safe('Password')
         s2 = mark_safe('May')
@@ -367,6 +382,51 @@ class TranslationTests(SimpleTestCase):
         self.assertIs(trans_null.get_language_bidi(), False)
         with override_settings(LANGUAGE_CODE='he'):
             self.assertIs(get_language_bidi(), True)
+
+
+class TranslationLoadingTests(SimpleTestCase):
+    def setUp(self):
+        """Clear translation state."""
+        self._old_language = get_language()
+        self._old_translations = trans_real._translations
+        deactivate()
+        trans_real._translations = {}
+
+    def tearDown(self):
+        trans_real._translations = self._old_translations
+        activate(self._old_language)
+
+    @override_settings(
+        USE_I18N=True,
+        LANGUAGE_CODE='en',
+        LANGUAGES=[
+            ('en', 'English'),
+            ('en-ca', 'English (Canada)'),
+            ('en-nz', 'English (New Zealand)'),
+            ('en-au', 'English (Australia)'),
+        ],
+        LOCALE_PATHS=[os.path.join(here, 'loading')],
+        INSTALLED_APPS=['i18n.loading_app'],
+    )
+    def test_translation_loading(self):
+        """
+        "loading_app" does not have translations for all languages provided by
+        "loading". Catalogs are merged correctly.
+        """
+        tests = [
+            ('en', 'local country person'),
+            ('en_AU', 'aussie'),
+            ('en_NZ', 'kiwi'),
+            ('en_CA', 'canuck'),
+        ]
+        # Load all relevant translations.
+        for language, _ in tests:
+            activate(language)
+        # Catalogs are merged correctly.
+        for language, nickname in tests:
+            with self.subTest(language=language):
+                activate(language)
+                self.assertEqual(gettext('local country person'), nickname)
 
 
 class TranslationThreadSafetyTests(SimpleTestCase):
@@ -1146,6 +1206,25 @@ class FormattingTests(SimpleTestCase):
                 self.assertEqual(template2.render(context), output2)
                 self.assertEqual(template3.render(context), output3)
 
+    def test_localized_off_numbers(self):
+        """A string representation is returned for unlocalized numbers."""
+        template = Template(
+            '{% load l10n %}{% localize off %}'
+            '{{ int }}/{{ float }}/{{ decimal }}{% endlocalize %}'
+        )
+        context = Context(
+            {'int': 1455, 'float': 3.14, 'decimal': decimal.Decimal('24.1567')}
+        )
+        for use_l10n in [True, False]:
+            with self.subTest(use_l10n=use_l10n), self.settings(
+                USE_L10N=use_l10n,
+                DECIMAL_SEPARATOR=',',
+                USE_THOUSAND_SEPARATOR=True,
+                THOUSAND_SEPARATOR='°',
+                NUMBER_GROUPING=2,
+            ):
+                self.assertEqual(template.render(context), '1455/3.14/24.1567')
+
     def test_localized_as_text_as_hidden_input(self):
         """
         Tests if form input with 'as_hidden' or 'as_text' is correctly localized. Ticket #18777
@@ -1678,7 +1757,7 @@ class UnprefixedDefaultLanguageTests(SimpleTestCase):
     def test_no_redirect_on_404(self):
         """
         A request for a nonexistent URL shouldn't cause a redirect to
-        /<defaut_language>/<request_url> when prefix_default_language=False and
+        /<default_language>/<request_url> when prefix_default_language=False and
         /<default_language>/<request_url> has a URL match (#27402).
         """
         # A match for /group1/group2/ must exist for this to act as a
@@ -1801,7 +1880,7 @@ class NonDjangoLanguageTests(SimpleTestCase):
         self.assertEqual(gettext("year"), "reay")
 
     @override_settings(USE_I18N=True)
-    def test_check_for_langauge(self):
+    def test_check_for_language(self):
         with tempfile.TemporaryDirectory() as app_dir:
             os.makedirs(os.path.join(app_dir, 'locale', 'dummy_Lang', 'LC_MESSAGES'))
             open(os.path.join(app_dir, 'locale', 'dummy_Lang', 'LC_MESSAGES', 'django.mo'), 'w').close()
@@ -1850,6 +1929,12 @@ class WatchForTranslationChangesTests(SimpleTestCase):
         project_dir = Path(__file__).parent / 'sampleproject' / 'locale'
         mocked_sender.watch_dir.assert_any_call(project_dir, '**/*.mo')
 
+    def test_i18n_app_dirs_ignore_django_apps(self):
+        mocked_sender = mock.MagicMock()
+        with self.settings(INSTALLED_APPS=['django.contrib.admin']):
+            watch_for_translation_changes(mocked_sender)
+        mocked_sender.watch_dir.assert_called_once_with(Path('locale'), '**/*.mo')
+
     def test_i18n_local_locale(self):
         mocked_sender = mock.MagicMock()
         watch_for_translation_changes(mocked_sender)
@@ -1882,4 +1967,32 @@ class TranslationFileChangedTests(SimpleTestCase):
         self.assertEqual(gettext_module._translations, {})
         self.assertEqual(trans_real._translations, {})
         self.assertIsNone(trans_real._default)
-        self.assertIsInstance(trans_real._active, _thread._local)
+        self.assertIsInstance(trans_real._active, Local)
+
+
+class UtilsTests(SimpleTestCase):
+    def test_round_away_from_one(self):
+        tests = [
+            (0, 0),
+            (0., 0),
+            (0.25, 0),
+            (0.5, 0),
+            (0.75, 0),
+            (1, 1),
+            (1., 1),
+            (1.25, 2),
+            (1.5, 2),
+            (1.75, 2),
+            (-0., 0),
+            (-0.25, -1),
+            (-0.5, -1),
+            (-0.75, -1),
+            (-1, -1),
+            (-1., -1),
+            (-1.25, -2),
+            (-1.5, -2),
+            (-1.75, -2),
+        ]
+        for value, expected in tests:
+            with self.subTest(value=value):
+                self.assertEqual(round_away_from_one(value), expected)

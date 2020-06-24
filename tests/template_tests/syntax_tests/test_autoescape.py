@@ -1,5 +1,6 @@
 from django.template import TemplateSyntaxError
-from django.test import SimpleTestCase
+from django.test import SimpleTestCase, ignore_warnings
+from django.utils.deprecation import RemovedInDjango40Warning
 from django.utils.safestring import mark_safe
 
 from ..utils import SafeClass, UnsafeClass, setup
@@ -36,7 +37,7 @@ class AutoescapeTagTests(SimpleTestCase):
         output = self.engine.render_to_string('autoescape-tag05', {'first': '<b>first</b>'})
         self.assertEqual(output, '&lt;b&gt;first&lt;/b&gt;')
 
-    # Strings (ASCII or unicode) already marked as "safe" are not
+    # Strings (ASCII or Unicode) already marked as "safe" are not
     # auto-escaped
     @setup({'autoescape-tag06': '{{ first }}'})
     def test_autoescape_tag06(self):
@@ -81,6 +82,7 @@ class AutoescapeTagTests(SimpleTestCase):
         with self.assertRaises(TemplateSyntaxError):
             self.engine.render_to_string('autoescape-filtertag01', {'first': '<a>'})
 
+    @ignore_warnings(category=RemovedInDjango40Warning)
     @setup({'autoescape-ifequal01': '{% ifequal var "this & that" %}yes{% endifequal %}'})
     def test_autoescape_ifequal01(self):
         """

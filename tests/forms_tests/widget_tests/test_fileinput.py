@@ -18,3 +18,9 @@ class FileInputTest(WidgetTest):
     def test_value_omitted_from_data(self):
         self.assertIs(self.widget.value_omitted_from_data({}, {}, 'field'), True)
         self.assertIs(self.widget.value_omitted_from_data({}, {'field': 'value'}, 'field'), False)
+
+    def test_use_required_attribute(self):
+        # False when initial data exists. The file input is left blank by the
+        # user to keep the existing, initial value.
+        self.assertIs(self.widget.use_required_attribute(None), True)
+        self.assertIs(self.widget.use_required_attribute('resume.txt'), False)

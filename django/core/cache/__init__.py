@@ -12,18 +12,18 @@ object.
 
 See docs/topics/cache.txt for information on the public API.
 """
-from threading import local
+from asgiref.local import Local
 
 from django.conf import settings
 from django.core import signals
 from django.core.cache.backends.base import (
-    BaseCache, CacheKeyWarning, InvalidCacheBackendError,
+    BaseCache, CacheKeyWarning, InvalidCacheBackendError, InvalidCacheKey,
 )
 from django.utils.module_loading import import_string
 
 __all__ = [
     'cache', 'caches', 'DEFAULT_CACHE_ALIAS', 'InvalidCacheBackendError',
-    'CacheKeyWarning', 'BaseCache',
+    'CacheKeyWarning', 'BaseCache', 'InvalidCacheKey',
 ]
 
 DEFAULT_CACHE_ALIAS = 'default'
@@ -61,7 +61,7 @@ class CacheHandler:
     Ensure only one instance of each alias exists per thread.
     """
     def __init__(self):
-        self._caches = local()
+        self._caches = Local()
 
     def __getitem__(self, alias):
         try:

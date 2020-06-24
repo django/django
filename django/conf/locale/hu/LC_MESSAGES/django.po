@@ -2,20 +2,21 @@
 #
 # Translators:
 # Akos Zsolt Hochrein <hoch.akos@gmail.com>, 2018
-# András Veres-Szentkirályi, 2016-2018
+# András Veres-Szentkirályi, 2016-2019
 # Attila Nagy <>, 2012
 # Dóra Szendrei <szendrgigi@gmail.com>, 2017
+# Istvan Farkas <istvan.farkas@gmail.com>, 2019
 # Jannis Leidel <jannis@leidel.info>, 2011
-# János R (Hangya), 2011-2012,2014
+# János R, 2011-2012,2014
 # Máté Őry <orymate@iit.bme.hu>, 2013
 # Szilveszter Farkas <szilveszter.farkas@gmail.com>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-05-17 11:49+0200\n"
-"PO-Revision-Date: 2018-05-26 09:24+0000\n"
-"Last-Translator: Akos Zsolt Hochrein <hoch.akos@gmail.com>\n"
+"POT-Creation-Date: 2019-09-27 22:40+0200\n"
+"PO-Revision-Date: 2019-11-18 10:10+0000\n"
+"Last-Translator: Istvan Farkas <istvan.farkas@gmail.com>\n"
 "Language-Team: Hungarian (http://www.transifex.com/django/django/language/"
 "hu/)\n"
 "MIME-Version: 1.0\n"
@@ -143,6 +144,9 @@ msgstr "Felsőszorb"
 
 msgid "Hungarian"
 msgstr "Magyar"
+
+msgid "Armenian"
+msgstr "Örmény"
 
 msgid "Interlingua"
 msgstr "Interlingua"
@@ -282,6 +286,9 @@ msgstr "Ukrán"
 msgid "Urdu"
 msgstr "urdu"
 
+msgid "Uzbek"
+msgstr "Üzbég"
+
 msgid "Vietnamese"
 msgstr "Vietnámi"
 
@@ -326,17 +333,17 @@ msgstr "Írjon be egy érvényes e-mail címet."
 
 #. Translators: "letters" means latin letters: a-z and A-Z.
 msgid ""
-"Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
+"Enter a valid “slug” consisting of letters, numbers, underscores or hyphens."
 msgstr ""
-"Az URL barát cím csak betűket, számokat, aláhúzásokat és kötőjeleket "
-"tartalmazhat."
+"Kérjük adjon meg egy érvényes \"domain-darabkát\", amely csak ékezet nélküli "
+"betűkből, számokból, aláhúzásból és kötőjelből áll."
 
 msgid ""
-"Enter a valid 'slug' consisting of Unicode letters, numbers, underscores, or "
+"Enter a valid “slug” consisting of Unicode letters, numbers, underscores, or "
 "hyphens."
 msgstr ""
-"Az URL barát cím csak Unicode betűket, számokat, aláhúzásokat és kötőjeleket "
-"tartalmazhat."
+"Kérjük adjon meg egy érvényes \"domain-darabkát\", amely csak betűkből, "
+"számokból, aláhúzásból és kötőjelből áll."
 
 msgid "Enter a valid IPv4 address."
 msgstr "Írjon be egy érvényes IPv4 címet."
@@ -423,11 +430,11 @@ msgstr[1] ""
 
 #, python-format
 msgid ""
-"File extension '%(extension)s' is not allowed. Allowed extensions are: "
-"'%(allowed_extensions)s'."
+"File extension “%(extension)s” is not allowed. Allowed extensions are: "
+"%(allowed_extensions)s."
 msgstr ""
-"'%(extension)s' kiterjesztés nem engedélyezett. Az engedélyezett "
-"kiterjesztések a következők: '%(allowed_extensions)s'."
+"A(z) \"%(extension)s\" kiterjesztés nincs engedélyezve. Az engedélyezett "
+"fájltípusok: %(allowed_extensions)s."
 
 msgid "Null characters are not allowed."
 msgstr "Null karakterek használata nem megengedett."
@@ -466,23 +473,13 @@ msgstr ""
 msgid "Field of type: %(field_type)s"
 msgstr "Mezőtípus: %(field_type)s"
 
-msgid "Integer"
-msgstr "Egész"
+#, python-format
+msgid "“%(value)s” value must be either True or False."
+msgstr "A(z) \"%(value)s\" értéke csak True vagy False lehet."
 
 #, python-format
-msgid "'%(value)s' value must be an integer."
-msgstr "'%(value)s' értéknek egész számnak kell lennie."
-
-msgid "Big (8 byte) integer"
-msgstr "Nagy egész szám (8 bájtos)"
-
-#, python-format
-msgid "'%(value)s' value must be either True or False."
-msgstr "'%(value)s' érték csak igaz (True) vagy hamis (False) lehet."
-
-#, python-format
-msgid "'%(value)s' value must be either True, False, or None."
-msgstr "'%(value)s' értéknek True, False vagy None-nak kell lennie."
+msgid "“%(value)s” value must be either True, False, or None."
+msgstr "A(z) \"%(value)s\" értéke csak True, False vagy üres lehet."
 
 msgid "Boolean (Either True or False)"
 msgstr "Logikai (True vagy False)"
@@ -496,56 +493,56 @@ msgstr "Vesszővel elválasztott egészek"
 
 #, python-format
 msgid ""
-"'%(value)s' value has an invalid date format. It must be in YYYY-MM-DD "
+"“%(value)s” value has an invalid date format. It must be in YYYY-MM-DD "
 "format."
 msgstr ""
-"'%(value)s' érték érvénytelen dátum formátumban van. A dátumnak YYYY-MM-DD "
-"formátumban kell lennie."
+"A(z) \"%(value)s\" érvénytelen dátumformátumot tartalmaz. A dátumnak ÉÉÉÉ-HH-"
+"NN formában kell lennie."
 
 #, python-format
 msgid ""
-"'%(value)s' value has the correct format (YYYY-MM-DD) but it is an invalid "
+"“%(value)s” value has the correct format (YYYY-MM-DD) but it is an invalid "
 "date."
 msgstr ""
-"'%(value)s' érték megfelelő formátumban van (YYYY-MM-DD), de a megadott "
-"dátum érvénytelen."
+"A(z) \"%(value)s\" értéke formára (ÉÉÉÉ-HH-NN) megfelel ugyan, de "
+"érvénytelen dátumot tartalmaz."
 
 msgid "Date (without time)"
 msgstr "Dátum (idő nélkül)"
 
 #, python-format
 msgid ""
-"'%(value)s' value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[."
+"“%(value)s” value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[."
 "uuuuuu]][TZ] format."
 msgstr ""
-"'%(value)s' érték érvénytelen dátum formátumban van. A dátumnak YYYY-MM-DD "
-"HH:MM[:ss[.uuuuuu]][TZ] formátumban kell lennie."
+"A(z) \"%(value)s\" érvénytelen dátumformátumot tartalmaz. A dátumnak ÉÉÉÉ-HH-"
+"NN ÓÓ:PP[:mm[.uuuuuu]][TZ] formában kell lennie."
 
 #, python-format
 msgid ""
-"'%(value)s' value has the correct format (YYYY-MM-DD HH:MM[:ss[.uuuuuu]]"
+"“%(value)s” value has the correct format (YYYY-MM-DD HH:MM[:ss[.uuuuuu]]"
 "[TZ]) but it is an invalid date/time."
 msgstr ""
-"'%(value)s' érték megfelelő formátumban van (YYYY-MM-DD HH:MM[:ss[.uuuuuu]]"
-"[TZ]), de a megadott dátum/idő érvénytelen."
+"A(z) \"%(value)s\" értéke formára (ÉÉÉÉ-HH-NN ÓÓ:PP[:mm[:uuuuuu]][TZ]) "
+"megfelel ugyan, de érvénytelen dátumot vagy időt tartalmaz."
 
 msgid "Date (with time)"
 msgstr "Dátum (idővel)"
 
 #, python-format
-msgid "'%(value)s' value must be a decimal number."
-msgstr "'%(value)s' értéknek decimálisnak kell lennie."
+msgid "“%(value)s” value must be a decimal number."
+msgstr "A(z) \"%(value)s\" értékének tizes számrendszerű számnak kell lennie."
 
 msgid "Decimal number"
 msgstr "Tizes számrendszerű (decimális) szám"
 
 #, python-format
 msgid ""
-"'%(value)s' value has an invalid format. It must be in [DD] [HH:[MM:]]ss[."
+"“%(value)s” value has an invalid format. It must be in [DD] [[HH:]MM:]ss[."
 "uuuuuu] format."
 msgstr ""
-"'%(value)s' érték érvénytelen formátumban van. Az értéknek [DD] [HH:"
-"[MM:]]ss[.uuuuuu] formátumban kell lennie."
+"A(z) \"%(value)s\" érvénytelen idő formátumot tartalmaz. Az időnek ÓÓ:PP[:"
+"mm[.uuuuuu]] formában kell lennie."
 
 msgid "Duration"
 msgstr "Időtartam"
@@ -557,11 +554,21 @@ msgid "File path"
 msgstr "Elérési út"
 
 #, python-format
-msgid "'%(value)s' value must be a float."
-msgstr "'%(value)s' értéknek lebegőpontos számnak kell lennie."
+msgid "“%(value)s” value must be a float."
+msgstr "A(z) \"%(value)s\" értékének lebegőpontos számnak kell lennie."
 
 msgid "Floating point number"
 msgstr "Lebegőpontos szám"
+
+#, python-format
+msgid "“%(value)s” value must be an integer."
+msgstr "A(z) \"%(value)s\" értékének egész számnak kell lennie."
+
+msgid "Integer"
+msgstr "Egész"
+
+msgid "Big (8 byte) integer"
+msgstr "Nagy egész szám (8 bájtos)"
 
 msgid "IPv4 address"
 msgstr "IPv4 cím"
@@ -570,9 +577,8 @@ msgid "IP address"
 msgstr "IP cím"
 
 #, python-format
-msgid "'%(value)s' value must be either None, True or False."
-msgstr ""
-"'%(value)s' érték csak semmi (None), igaz (True) vagy hamis (False) lehet."
+msgid "“%(value)s” value must be either None, True or False."
+msgstr "Az  \"%(value)s\" értéke csak üres, True, vagy False lehet."
 
 msgid "Boolean (Either True, False or None)"
 msgstr "Logikai (True, False vagy None)"
@@ -595,19 +601,19 @@ msgstr "Szöveg"
 
 #, python-format
 msgid ""
-"'%(value)s' value has an invalid format. It must be in HH:MM[:ss[.uuuuuu]] "
+"“%(value)s” value has an invalid format. It must be in HH:MM[:ss[.uuuuuu]] "
 "format."
 msgstr ""
-"'%(value)s' érték formátuma érvénytelen. Az időnek HH:MM[:ss[.uuuuuu]] "
-"formátumban kell lennie."
+"A(z) \"%(value)s\" érvénytelen idő formátumot tartalmaz. Az időnek ÓÓ:PP[:"
+"mm[.uuuuuu]] formában kell lennie."
 
 #, python-format
 msgid ""
-"'%(value)s' value has the correct format (HH:MM[:ss[.uuuuuu]]) but it is an "
+"“%(value)s” value has the correct format (HH:MM[:ss[.uuuuuu]]) but it is an "
 "invalid time."
 msgstr ""
-"'%(value)s' formátuma megfelelő (HH:MM[:ss[.uuuuuu]]), de a megadott időpont "
-"érvénytelen."
+"A(z) \"%(value)s\" értéke formára (ÓÓ:PP[:mm[:uuuuuu]][TZ]) megfelel ugyan, "
+"de érvénytelen időt tartalmaz."
 
 msgid "Time"
 msgstr "Idő"
@@ -619,8 +625,11 @@ msgid "Raw binary data"
 msgstr "Nyers bináris adat"
 
 #, python-format
-msgid "'%(value)s' is not a valid UUID."
-msgstr "'%(value)s' nem egy érvényes UUID."
+msgid "“%(value)s” is not a valid UUID."
+msgstr "A(z) \"%(value)s\" értéke nem érvényes UUID érték."
+
+msgid "Universally unique identifier"
+msgstr "Univerzálisan egyedi azonosító"
 
 msgid "File"
 msgstr "Fájl"
@@ -782,16 +791,16 @@ msgstr ""
 "között."
 
 #, python-format
-msgid "\"%(pk)s\" is not a valid value."
-msgstr "\"%(pk)s\" egy érvénytelen érték."
+msgid "“%(pk)s” is not a valid value."
+msgstr "Érvénytelen érték: \"%(pk)s\""
 
 #, python-format
 msgid ""
-"%(datetime)s couldn't be interpreted in time zone %(current_timezone)s; it "
+"%(datetime)s couldn’t be interpreted in time zone %(current_timezone)s; it "
 "may be ambiguous or it may not exist."
 msgstr ""
-"%(datetime)s értelmezhetetlen a megadott %(current_timezone)s időzónában; "
-"vagy félreérthető, vagy nem létezik."
+"A(z) %(datetime)s nem értelmezhető a(z) %(current_timezone)s időzónában; "
+"vagy bizonytalan, vagy nem létezik."
 
 msgid "Clear"
 msgstr "Törlés"
@@ -810,6 +819,15 @@ msgstr "Igen"
 
 msgid "No"
 msgstr "Nem"
+
+msgid "Year"
+msgstr "Év"
+
+msgid "Month"
+msgstr "Hónap"
+
+msgid "Day"
+msgstr "Nap"
 
 msgid "yes,no,maybe"
 msgstr "igen,nem,talán"
@@ -1073,8 +1091,8 @@ msgstr "Ez nem egy érvényes IPv6 cím."
 
 #, python-format
 msgctxt "String to return when truncating text"
-msgid "%(truncated_text)s..."
-msgstr "%(truncated_text)s..."
+msgid "%(truncated_text)s…"
+msgstr "%(truncated_text)s…"
 
 msgid "or"
 msgstr "vagy"
@@ -1129,37 +1147,38 @@ msgid "CSRF verification failed. Request aborted."
 msgstr "CSRF ellenőrzés sikertelen. Kérést kiszolgálása megszakítva."
 
 msgid ""
-"You are seeing this message because this HTTPS site requires a 'Referer "
-"header' to be sent by your Web browser, but none was sent. This header is "
+"You are seeing this message because this HTTPS site requires a “Referer "
+"header” to be sent by your Web browser, but none was sent. This header is "
 "required for security reasons, to ensure that your browser is not being "
 "hijacked by third parties."
 msgstr ""
-"Azért látja ezt az üzenetet, mert ez a HTTPS oldal elvárja a 'Referer "
-"fejléc' küldését a böngészőtől, azonban ilyen nem érkezett. Erre a fejlécre "
-"biztonsági okból van szükség annak kiszűrésére, hogy harmadik fél eltérítse "
-"az ön böngészőjét."
+"Ezt az üzenetet azért látja, mert ezen a HTTPS oldalon kötelező a \"Referer "
+"header\", amelyet a böngészőnek kellene küldenie, de nem tette. Ez az adat "
+"biztonsági okokból kötelező, ez biztosítja, hogy a böngészőt nem irányítja "
+"át egy harmadik fél."
 
 msgid ""
-"If you have configured your browser to disable 'Referer' headers, please re-"
-"enable them, at least for this site, or for HTTPS connections, or for 'same-"
-"origin' requests."
+"If you have configured your browser to disable “Referer” headers, please re-"
+"enable them, at least for this site, or for HTTPS connections, or for “same-"
+"origin” requests."
 msgstr ""
-"Ha a böngészőjében le van tiltva a 'Referer' fejléc, kérem engedélyezze "
-"azokat, legalább erre a weboldalra, vagy azonos forrásból ('same-origin') "
-"származó kérésekre."
+"Ha a böngészője úgy van beállítva, hogy letilja a \"Referer\" adatokat, "
+"kérjük engedélyezze őket ehhez az oldalhoz, vagy a HTTPS kapcsolatokhoz, "
+"vagy a \"same-origin\" kérésekhez."
 
 msgid ""
 "If you are using the <meta name=\"referrer\" content=\"no-referrer\"> tag or "
-"including the 'Referrer-Policy: no-referrer' header, please remove them. The "
-"CSRF protection requires the 'Referer' header to do strict referer checking. "
-"If you're concerned about privacy, use alternatives like <a rel=\"noreferrer"
-"\" ...> for links to third-party sites."
+"including the “Referrer-Policy: no-referrer” header, please remove them. The "
+"CSRF protection requires the “Referer” header to do strict referer checking. "
+"If you’re concerned about privacy, use alternatives like <a rel=\"noreferrer"
+"\" …> for links to third-party sites."
 msgstr ""
-"Ha a <meta name=\"referrer\" content=\"no-referrer\"> taget használod vagy "
-"'Referrer-Policy: no-referrer' fejlécet állítottál be, távolítsd el őket. A "
-"CSRF védelemnek szüksége van a 'Referer' fejlécre a szigorú referer "
-"ellenőrzéshez. Ha adatvédelmi okokból döntöttél így, a külső oldalakra "
-"mutató linkeknél egy használható alternatíva az <a rel=\"noreferrer\" ...>."
+"Ha a <meta name=\"referrer\" content=\"no-referrer\"> címkét használja, vagy "
+"a “Referrer-Policy: no-referrer” fejlécet, kérjük távolítsa el ezeket. A "
+"CSRF védelemnek szüksége van a \"Referer\" fejléc adatra a szigorú "
+"ellenőrzéshez. Ha aggódik az adatainak biztonsága miatt, használjon "
+"alternatívákat, mint például az <a rel=\"noreferrer\" …>, a külső oldalakra "
+"mutató linkek esetén. "
 
 msgid ""
 "You are seeing this message because this site requires a CSRF cookie when "
@@ -1172,10 +1191,10 @@ msgstr ""
 
 msgid ""
 "If you have configured your browser to disable cookies, please re-enable "
-"them, at least for this site, or for 'same-origin' requests."
+"them, at least for this site, or for “same-origin” requests."
 msgstr ""
-"Ha a böngészője elutasítja a cookie-kat, kérem engedélyezze azokat, legalább "
-"erre a weboldalra, vagy azonos forrásból ('same-origin') származó kérésekre."
+"Ha kikapcsolta a cookie-kat a böngészőjében, kérjük engedélyezze őket újra, "
+"legalább erre az oldalra, vagy a \"same-origin\" típusú kérésekre."
 
 msgid "More information is available with DEBUG=True."
 msgstr "További információ DEBUG=True beállítással érhető el."
@@ -1208,31 +1227,32 @@ msgstr ""
 "allow_future értéke False."
 
 #, python-format
-msgid "Invalid date string '%(datestr)s' given format '%(format)s'"
+msgid "Invalid date string “%(datestr)s” given format “%(format)s”"
 msgstr ""
-"'%(datestr)s' érvénytelen a meghatározott formátum alapján: '%(format)s'"
+"A megadott dátum \"%(datestr)s\" érvénytelen a következő formátumban: "
+"\"%(format)s\"."
 
 #, python-format
 msgid "No %(verbose_name)s found matching the query"
 msgstr "Nincs a keresési feltételeknek megfelelő %(verbose_name)s"
 
-msgid "Page is not 'last', nor can it be converted to an int."
-msgstr "Az oldal nem 'last', vagy nem lehet egésszé alakítani."
+msgid "Page is not “last”, nor can it be converted to an int."
+msgstr "Az oldalszám nem \"utolsó\", vagy nem lehet számmá alakítani."
 
 #, python-format
 msgid "Invalid page (%(page_number)s): %(message)s"
 msgstr "Érvénytelen oldal (%(page_number)s): %(message)s"
 
 #, python-format
-msgid "Empty list and '%(class_name)s.allow_empty' is False."
-msgstr "Üres lista, és '%(class_name)s.allow_empty' értéke False."
+msgid "Empty list and “%(class_name)s.allow_empty” is False."
+msgstr "Üres lista, de a \"%(class_name)s.allow_empty\" értéke hamis."
 
 msgid "Directory indexes are not allowed here."
 msgstr "A könyvtárak listázása itt nincs engedélyezve."
 
 #, python-format
-msgid "\"%(path)s\" does not exist"
-msgstr "\"%(path)s\" nem létezik"
+msgid "“%(path)s” does not exist"
+msgstr "A(z) \"%(path)s\" útvonal nem létezik"
 
 #, python-format
 msgid "Index of %(directory)s"
@@ -1269,8 +1289,8 @@ msgstr ""
 msgid "Django Documentation"
 msgstr "Django Dokumentáció"
 
-msgid "Topics, references, &amp; how-to's"
-msgstr "Témakörök, hivatkozások &amp; hogyanok"
+msgid "Topics, references, &amp; how-to’s"
+msgstr "Témák, hivatkozások, &amp; leírások"
 
 msgid "Tutorial: A Polling App"
 msgstr "Gyakorlat: egy szavazó app"

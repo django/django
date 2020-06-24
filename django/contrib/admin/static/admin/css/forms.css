@@ -501,18 +501,12 @@ body.popup .submit-row {
 
 /* RELATED FIELD ADD ONE / LOOKUP */
 
-.add-another, .related-lookup {
+.related-lookup {
     margin-left: 5px;
     display: inline-block;
     vertical-align: middle;
     background-repeat: no-repeat;
     background-size: 14px;
-}
-
-.add-another {
-    width: 16px;
-    height: 16px;
-    background-image: url(../img/icon-addlink.svg);
 }
 
 .related-lookup {

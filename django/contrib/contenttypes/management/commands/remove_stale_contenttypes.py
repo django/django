@@ -1,10 +1,10 @@
+import itertools
+
 from django.apps import apps
 from django.contrib.contenttypes.models import ContentType
 from django.core.management import BaseCommand
 from django.db import DEFAULT_DB_ALIAS, router
 from django.db.models.deletion import Collector
-
-from ...management import get_contenttypes_and_models
 
 
 class Command(BaseCommand):
@@ -18,18 +18,32 @@ class Command(BaseCommand):
             '--database', default=DEFAULT_DB_ALIAS,
             help='Nominates the database to use. Defaults to the "default" database.',
         )
+        parser.add_argument(
+            '--include-stale-apps', action='store_true', default=False,
+            help=(
+                "Deletes stale content types including ones from previously "
+                "installed apps that have been removed from INSTALLED_APPS."
+            ),
+        )
 
     def handle(self, **options):
         db = options['database']
+        include_stale_apps = options['include_stale_apps']
         interactive = options['interactive']
         verbosity = options['verbosity']
 
-        for app_config in apps.get_app_configs():
-            content_types, app_models = get_contenttypes_and_models(app_config, db, ContentType)
-            to_remove = [
-                ct for (model_name, ct) in content_types.items()
-                if model_name not in app_models
-            ]
+        if not router.allow_migrate_model(db, ContentType):
+            return
+        ContentType.objects.clear_cache()
+
+        apps_content_types = itertools.groupby(
+            ContentType.objects.using(db).order_by('app_label', 'model'),
+            lambda obj: obj.app_label,
+        )
+        for app_label, content_types in apps_content_types:
+            if not include_stale_apps and app_label not in apps.app_configs:
+                continue
+            to_remove = [ct for ct in content_types if ct.model_class() is None]
             # Confirm that the content type is stale before deletion.
             using = router.db_for_write(ContentType)
             if to_remove:
@@ -57,7 +71,7 @@ This list doesn't include any cascade deletions to data outside of Django's
 models (uncommon).
 
 Are you sure you want to delete these content types?
-If you're unsure, answer 'no'.\n""" % content_type_display)
+If you're unsure, answer 'no'.""" % content_type_display)
                     ok_to_delete = input("Type 'yes' to continue, or 'no' to cancel: ")
                 else:
                     ok_to_delete = 'yes'

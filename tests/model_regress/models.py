@@ -17,9 +17,6 @@ class Article(models.Model):
         # A utf-8 verbose name (Ångström's Articles) to test they are valid.
         verbose_name = "\xc3\x85ngstr\xc3\xb6m's Articles"
 
-    def __str__(self):
-        return self.headline
-
 
 class Movie(models.Model):
     # Test models with non-default primary keys / AutoFields #5218
@@ -38,9 +35,6 @@ class Event(models.Model):
 class Department(models.Model):
     id = models.PositiveIntegerField(primary_key=True)
     name = models.CharField(max_length=200)
-
-    def __str__(self):
-        return self.name
 
 
 class Worker(models.Model):

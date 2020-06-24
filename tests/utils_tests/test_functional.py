@@ -1,5 +1,7 @@
+from unittest import mock
+
 from django.test import SimpleTestCase
-from django.utils.functional import cached_property, lazy
+from django.utils.functional import cached_property, classproperty, lazy
 
 
 class FunctionalTests(SimpleTestCase):
@@ -207,3 +209,48 @@ class FunctionalTests(SimpleTestCase):
         original_object = b'J\xc3\xbcst a str\xc3\xadng'
         lazy_obj = lazy(lambda: original_object, bytes)
         self.assertEqual(repr(original_object), repr(lazy_obj()))
+
+    def test_lazy_class_preparation_caching(self):
+        # lazy() should prepare the proxy class only once i.e. the first time
+        # it's used.
+        lazified = lazy(lambda: 0, int)
+        __proxy__ = lazified().__class__
+        with mock.patch.object(__proxy__, '__prepare_class__') as mocked:
+            lazified()
+            mocked.assert_not_called()
+
+    def test_classproperty_getter(self):
+        class Foo:
+            foo_attr = 123
+
+            def __init__(self):
+                self.foo_attr = 456
+
+            @classproperty
+            def foo(cls):
+                return cls.foo_attr
+
+        class Bar:
+            bar = classproperty()
+
+            @bar.getter
+            def bar(cls):
+                return 123
+
+        self.assertEqual(Foo.foo, 123)
+        self.assertEqual(Foo().foo, 123)
+        self.assertEqual(Bar.bar, 123)
+        self.assertEqual(Bar().bar, 123)
+
+    def test_classproperty_override_getter(self):
+        class Foo:
+            @classproperty
+            def foo(cls):
+                return 123
+
+            @foo.getter
+            def foo(cls):
+                return 456
+
+        self.assertEqual(Foo.foo, 456)
+        self.assertEqual(Foo().foo, 456)

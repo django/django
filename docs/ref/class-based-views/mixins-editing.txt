@@ -209,8 +209,8 @@ The following mixins are used to construct Django's editing views:
 
     .. method:: put(*args, **kwargs)
 
-        The ``PUT`` action is also handled and just passes all parameters
-        through to :meth:`post`.
+        The ``PUT`` action is also handled and passes all parameters through to
+        :meth:`post`.
 
 
 ``DeletionMixin``

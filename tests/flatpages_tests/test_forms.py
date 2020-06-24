@@ -51,8 +51,8 @@ class FlatpageAdminFormTests(TestCase):
         with translation.override('en'):
             self.assertEqual(
                 form.fields['url'].help_text,
-                "Example: '/about/contact/'. Make sure to have leading and "
-                "trailing slashes."
+                'Example: “/about/contact/”. Make sure to have leading and '
+                'trailing slashes.'
             )
             self.assertFalse(form.is_valid())
             self.assertEqual(form.errors['url'], ["URL is missing a trailing slash."])
@@ -64,7 +64,7 @@ class FlatpageAdminFormTests(TestCase):
         with translation.override('en'):
             self.assertEqual(
                 form.fields['url'].help_text,
-                "Example: '/about/contact'. Make sure to have a leading slash."
+                'Example: “/about/contact”. Make sure to have a leading slash.'
             )
 
     def test_flatpage_admin_form_url_uniqueness_validation(self):

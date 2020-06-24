@@ -275,9 +275,7 @@ setting.
 Caches are not cleared after each test, and running "manage.py test fooapp" can
 insert data from the tests into the cache of a live system if you run your
 tests in production because, unlike databases, a separate "test cache" is not
-used. This behavior `may change`_ in the future.
-
-.. _may change: https://code.djangoproject.com/ticket/11505
+used. This behavior :ticket:`may change <11505>` in the future.
 
 Understanding the test output
 -----------------------------

@@ -247,7 +247,7 @@ backends.
   ``allow_sliced_subqueries_with_in``.
 
 * ``DatabaseOperations.distinct_sql()`` now requires an additional ``params``
-  argument and returns a tuple of SQL and parameters instead of a SQL string.
+  argument and returns a tuple of SQL and parameters instead of an SQL string.
 
 * ``DatabaseFeatures.introspected_boolean_field_type`` is changed from a method
   to a property.

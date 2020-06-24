@@ -27,7 +27,7 @@ class TestMultiDBChecks(SimpleTestCase):
         model = Model()
         with self._patch_check_field_on('default') as mock_check_field_default:
             with self._patch_check_field_on('other') as mock_check_field_other:
-                model.check()
+                model.check(databases={'default', 'other'})
                 self.assertTrue(mock_check_field_default.called)
                 self.assertFalse(mock_check_field_other.called)
 
@@ -38,6 +38,6 @@ class TestMultiDBChecks(SimpleTestCase):
         model = OtherModel()
         with self._patch_check_field_on('other') as mock_check_field_other:
             with self._patch_check_field_on('default') as mock_check_field_default:
-                model.check()
+                model.check(databases={'default', 'other'})
                 self.assertTrue(mock_check_field_other.called)
                 self.assertFalse(mock_check_field_default.called)

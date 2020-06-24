@@ -2,14 +2,14 @@
 #
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011
-# Ramiro Morales, 2012,2014-2015
+# Ramiro Morales, 2012,2014-2015,2019
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-09-23 18:54+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2019-09-08 17:27+0200\n"
+"PO-Revision-Date: 2019-10-01 10:26+0000\n"
+"Last-Translator: Ramiro Morales\n"
 "Language-Team: Spanish (Argentina) (http://www.transifex.com/django/django/"
 "language/es_AR/)\n"
 "MIME-Version: 1.0\n"
@@ -25,9 +25,9 @@ msgid "The base GIS field."
 msgstr "El campo GIS base"
 
 msgid ""
-"The base Geometry field -- maps to the OpenGIS Specification Geometry type."
+"The base Geometry field — maps to the OpenGIS Specification Geometry type."
 msgstr ""
-"El campo Geometry base -- corresponde al tipo Geometry de la especificación "
+"El campo Geometry base — corresponde al tipo Geometry de la especificación "
 "OpenGIS."
 
 msgid "Point"
@@ -86,5 +86,5 @@ msgid "No feeds are registered."
 msgstr "No se han registrado feeds."
 
 #, python-format
-msgid "Slug %r isn't registered."
+msgid "Slug %r isn’t registered."
 msgstr "El slug %r no está registrado."

@@ -1,20 +1,21 @@
 from django.conf import settings
+from django.utils.translation import get_supported_language_variant
 from django.utils.translation.trans_real import language_code_re
 
 from . import Error, Tags, register
 
 E001 = Error(
-    'You have provided an invalid value for the LANGUAGE_CODE setting: {}.',
+    'You have provided an invalid value for the LANGUAGE_CODE setting: {!r}.',
     id='translation.E001',
 )
 
 E002 = Error(
-    'You have provided an invalid language code in the LANGUAGES setting: {}.',
+    'You have provided an invalid language code in the LANGUAGES setting: {!r}.',
     id='translation.E002',
 )
 
 E003 = Error(
-    'You have provided an invalid language code in the LANGUAGES_BIDI setting: {}.',
+    'You have provided an invalid language code in the LANGUAGES_BIDI setting: {!r}.',
     id='translation.E003',
 )
 
@@ -22,12 +23,6 @@ E004 = Error(
     'You have provided a value for the LANGUAGE_CODE setting that is not in '
     'the LANGUAGES setting.',
     id='translation.E004',
-)
-
-E005 = Error(
-    'You have provided values in the LANGUAGES_BIDI setting that are not in '
-    'the LANGUAGES setting.',
-    id='translation.E005',
 )
 
 
@@ -61,10 +56,9 @@ def check_setting_languages_bidi(app_configs, **kwargs):
 @register(Tags.translation)
 def check_language_settings_consistent(app_configs, **kwargs):
     """Error if language settings are not consistent with each other."""
-    available_tags = {i for i, _ in settings.LANGUAGES} | {'en-us'}
-    messages = []
-    if settings.LANGUAGE_CODE not in available_tags:
-        messages.append(E004)
-    if not available_tags.issuperset(settings.LANGUAGES_BIDI):
-        messages.append(E005)
-    return messages
+    try:
+        get_supported_language_variant(settings.LANGUAGE_CODE)
+    except LookupError:
+        return [E004]
+    else:
+        return []

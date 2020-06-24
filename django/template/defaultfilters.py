@@ -152,12 +152,13 @@ def floatformat(text, arg=-1):
 
     # Avoid conversion to scientific notation by accessing `sign`, `digits`,
     # and `exponent` from Decimal.as_tuple() directly.
-    sign, digits, exponent = d.quantize(exp, ROUND_HALF_UP, Context(prec=prec)).as_tuple()
+    rounded_d = d.quantize(exp, ROUND_HALF_UP, Context(prec=prec))
+    sign, digits, exponent = rounded_d.as_tuple()
     digits = [str(digit) for digit in reversed(digits)]
     while len(digits) <= abs(exponent):
         digits.append('0')
     digits.insert(-exponent, '.')
-    if sign:
+    if sign and rounded_d:
         digits.append('-')
     number = ''.join(reversed(digits))
     return mark_safe(formats.number_format(number, abs(p)))
@@ -240,8 +241,8 @@ def stringformat(value, arg):
 @stringfilter
 def title(value):
     """Convert a string into titlecase."""
-    t = re.sub("([a-z])'([A-Z])", lambda m: m.group(0).lower(), value.title())
-    return re.sub(r"\d([A-Z])", lambda m: m.group(0).lower(), t)
+    t = re.sub("([a-z])'([A-Z])", lambda m: m[0].lower(), value.title())
+    return re.sub(r'\d([A-Z])', lambda m: m[0].lower(), t)
 
 
 @register.filter(is_safe=True)
@@ -785,6 +786,7 @@ def yesno(value, arg=None):
     ==========  ======================  ==================================
     """
     if arg is None:
+        # Translators: Please do not add spaces around commas.
         arg = gettext('yes,no,maybe')
     bits = arg.split(',')
     if len(bits) < 2:
@@ -812,7 +814,7 @@ def filesizeformat(bytes_):
     102 bytes, etc.).
     """
     try:
-        bytes_ = float(bytes_)
+        bytes_ = int(bytes_)
     except (TypeError, ValueError, UnicodeDecodeError):
         value = ngettext("%(size)d byte", "%(size)d bytes", 0) % {'size': 0}
         return avoid_wrapping(value)
@@ -851,8 +853,8 @@ def filesizeformat(bytes_):
 @register.filter(is_safe=False)
 def pluralize(value, arg='s'):
     """
-    Return a plural suffix if the value is not 1. By default, use 's' as the
-    suffix:
+    Return a plural suffix if the value is not 1, '1', or an object of
+    length 1. By default, use 's' as the suffix:
 
     * If value is 0, vote{{ value|pluralize }} display "votes".
     * If value is 1, vote{{ value|pluralize }} display "vote".
@@ -879,17 +881,15 @@ def pluralize(value, arg='s'):
     singular_suffix, plural_suffix = bits[:2]
 
     try:
-        if float(value) != 1:
-            return plural_suffix
+        return singular_suffix if float(value) == 1 else plural_suffix
     except ValueError:  # Invalid string that's not a number.
         pass
     except TypeError:  # Value isn't a string or a number; maybe it's a list?
         try:
-            if len(value) != 1:
-                return plural_suffix
+            return singular_suffix if len(value) == 1 else plural_suffix
         except TypeError:  # len() of unsized object.
             pass
-    return singular_suffix
+    return ''
 
 
 @register.filter("phone2numeric", is_safe=True)

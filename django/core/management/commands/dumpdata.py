@@ -110,7 +110,7 @@ class Command(BaseCommand):
 
                     app_list_value = app_list.setdefault(app_config, [])
 
-                    # We may have previously seen a "all-models" request for
+                    # We may have previously seen an "all-models" request for
                     # this app (no model qualifier was given). In this case
                     # there is no need adding specific models to the list.
                     if app_list_value is not None:
@@ -144,7 +144,17 @@ class Command(BaseCommand):
             Collate the objects to be serialized. If count_only is True, just
             count the number of objects to be serialized.
             """
-            models = serializers.sort_dependencies(app_list.items())
+            if use_natural_foreign_keys:
+                models = serializers.sort_dependencies(app_list.items(), allow_cycles=True)
+            else:
+                # There is no need to sort dependencies when natural foreign
+                # keys are not used.
+                models = []
+                for (app_config, model_list) in app_list.items():
+                    if model_list is None:
+                        models.extend(app_config.get_models())
+                    else:
+                        models.extend(model_list)
             for model in models:
                 if model in excluded_models:
                     continue

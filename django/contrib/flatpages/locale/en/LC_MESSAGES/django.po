@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-01-16 20:42+0100\n"
+"POT-Creation-Date: 2019-09-08 17:27+0200\n"
 "PO-Revision-Date: 2010-05-13 15:35+0200\n"
 "Last-Translator: Django team\n"
 "Language-Team: English <en@li.org>\n"
@@ -27,7 +27,7 @@ msgstr ""
 
 #: contrib/flatpages/forms.py:12
 msgid ""
-"Example: '/about/contact/'. Make sure to have leading and trailing slashes."
+"Example: “/about/contact/”. Make sure to have leading and trailing slashes."
 msgstr ""
 
 #: contrib/flatpages/forms.py:15
@@ -37,7 +37,7 @@ msgid ""
 msgstr ""
 
 #: contrib/flatpages/forms.py:29
-msgid "Example: '/about/contact'. Make sure to have a leading slash."
+msgid "Example: “/about/contact”. Make sure to have a leading slash."
 msgstr ""
 
 #: contrib/flatpages/forms.py:42
@@ -71,8 +71,8 @@ msgstr ""
 
 #: contrib/flatpages/models.py:18
 msgid ""
-"Example: 'flatpages/contact_page.html'. If this isn't provided, the system "
-"will use 'flatpages/default.html'."
+"Example: “flatpages/contact_page.html”. If this isn’t provided, the system "
+"will use “flatpages/default.html”."
 msgstr ""
 
 #: contrib/flatpages/models.py:23

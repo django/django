@@ -168,6 +168,29 @@ class GetFieldDisplayTests(SimpleTestCase):
         self.assertIsInstance(val, str)
         self.assertEqual(val, 'translated')
 
+    def test_overriding_FIELD_display(self):
+        class FooBar(models.Model):
+            foo_bar = models.IntegerField(choices=[(1, 'foo'), (2, 'bar')])
+
+            def get_foo_bar_display(self):
+                return 'something'
+
+        f = FooBar(foo_bar=1)
+        self.assertEqual(f.get_foo_bar_display(), 'something')
+
+    def test_overriding_inherited_FIELD_display(self):
+        class Base(models.Model):
+            foo = models.CharField(max_length=254, choices=[('A', 'Base A')])
+
+            class Meta:
+                abstract = True
+
+        class Child(Base):
+            foo = models.CharField(max_length=254, choices=[('A', 'Child A'), ('B', 'Child B')])
+
+        self.assertEqual(Child(foo='A').get_foo_display(), 'Child A')
+        self.assertEqual(Child(foo='B').get_foo_display(), 'Child B')
+
     def test_iterator_choices(self):
         """
         get_choices() works with Iterators.
@@ -222,9 +245,9 @@ class GetChoicesOrderingTests(TestCase):
 
     @classmethod
     def setUpTestData(cls):
-        cls.foo1 = Foo.objects.create(a='a', d='12.34')
+        cls.foo1 = Foo.objects.create(a='a', d='12.35')
         cls.foo2 = Foo.objects.create(a='b', d='12.34')
-        cls.bar1 = Bar.objects.create(a=cls.foo1, b='a')
+        cls.bar1 = Bar.objects.create(a=cls.foo1, b='b')
         cls.bar2 = Bar.objects.create(a=cls.foo2, b='a')
         cls.field = Bar._meta.get_field('a')
 
@@ -241,6 +264,14 @@ class GetChoicesOrderingTests(TestCase):
             [self.foo2, self.foo1]
         )
 
+    def test_get_choices_default_ordering(self):
+        self.addCleanup(setattr, Foo._meta, 'ordering', Foo._meta.ordering)
+        Foo._meta.ordering = ('d',)
+        self.assertChoicesEqual(
+            self.field.get_choices(include_blank=False),
+            [self.foo2, self.foo1]
+        )
+
     def test_get_choices_reverse_related_field(self):
         self.assertChoicesEqual(
             self.field.remote_field.get_choices(include_blank=False, ordering=('a',)),
@@ -249,4 +280,46 @@ class GetChoicesOrderingTests(TestCase):
         self.assertChoicesEqual(
             self.field.remote_field.get_choices(include_blank=False, ordering=('-a',)),
             [self.bar2, self.bar1]
+        )
+
+    def test_get_choices_reverse_related_field_default_ordering(self):
+        self.addCleanup(setattr, Bar._meta, 'ordering', Bar._meta.ordering)
+        Bar._meta.ordering = ('b',)
+        self.assertChoicesEqual(
+            self.field.remote_field.get_choices(include_blank=False),
+            [self.bar2, self.bar1]
+        )
+
+
+class GetChoicesLimitChoicesToTests(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.foo1 = Foo.objects.create(a='a', d='12.34')
+        cls.foo2 = Foo.objects.create(a='b', d='12.34')
+        cls.bar1 = Bar.objects.create(a=cls.foo1, b='b')
+        cls.bar2 = Bar.objects.create(a=cls.foo2, b='a')
+        cls.field = Bar._meta.get_field('a')
+
+    def assertChoicesEqual(self, choices, objs):
+        self.assertEqual(choices, [(obj.pk, str(obj)) for obj in objs])
+
+    def test_get_choices(self):
+        self.assertChoicesEqual(
+            self.field.get_choices(include_blank=False, limit_choices_to={'a': 'a'}),
+            [self.foo1],
+        )
+        self.assertChoicesEqual(
+            self.field.get_choices(include_blank=False, limit_choices_to={}),
+            [self.foo1, self.foo2],
+        )
+
+    def test_get_choices_reverse_related_field(self):
+        field = self.field.remote_field
+        self.assertChoicesEqual(
+            field.get_choices(include_blank=False, limit_choices_to={'b': 'b'}),
+            [self.bar1],
+        )
+        self.assertChoicesEqual(
+            field.get_choices(include_blank=False, limit_choices_to={}),
+            [self.bar1, self.bar2],
         )

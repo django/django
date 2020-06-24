@@ -2,17 +2,17 @@
 FAQ: Using Django
 =================
 
-Why do I get an error about importing DJANGO_SETTINGS_MODULE?
-=============================================================
+Why do I get an error about importing :envvar:`DJANGO_SETTINGS_MODULE`?
+=======================================================================
 
 Make sure that:
 
-* The environment variable DJANGO_SETTINGS_MODULE is set to a
+* The environment variable :envvar:`DJANGO_SETTINGS_MODULE` is set to a
   fully-qualified Python module (i.e. "mysite.settings").
 
 * Said module is on ``sys.path`` (``import mysite.settings`` should work).
 
-* The module doesn't contain syntax errors (of course).
+* The module doesn't contain syntax errors.
 
 I can't stand your template language. Do I have to use it?
 ==========================================================
@@ -61,9 +61,9 @@ Using a :class:`~django.db.models.FileField` or an
 How do I make a variable available to all my templates?
 =======================================================
 
-Sometimes your templates just all need the same thing. A common example would
-be dynamically-generated menus. At first glance, it seems logical to simply
-add a common dictionary to the template context.
+Sometimes your templates all need the same thing. A common example would be
+dynamically generated menus. At first glance, it seems logical to add a common
+dictionary to the template context.
 
-The correct solution is to use a ``RequestContext``. Details on how to do this
-are here: :ref:`subclassing-context-requestcontext`.
+The best way to do this in Django is to use a ``RequestContext``. Details on
+how to do this are here: :ref:`subclassing-context-requestcontext`.

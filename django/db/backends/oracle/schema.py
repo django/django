@@ -2,8 +2,8 @@ import copy
 import datetime
 import re
 
+from django.db import DatabaseError
 from django.db.backends.base.schema import BaseDatabaseSchemaEditor
-from django.db.utils import DatabaseError
 
 
 class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
@@ -23,7 +23,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         if isinstance(value, (datetime.date, datetime.time, datetime.datetime)):
             return "'%s'" % value
         elif isinstance(value, str):
-            return "'%s'" % value.replace("\'", "\'\'")
+            return "'%s'" % value.replace("\'", "\'\'").replace('%', '%%')
         elif isinstance(value, (bytes, bytearray, memoryview)):
             return "'%s'" % value.hex()
         elif isinstance(value, bool):
@@ -90,7 +90,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         # Make a new field that's like the new one but with a temporary
         # column name.
         new_temp_field = copy.deepcopy(new_field)
-        new_temp_field.null = (new_field.get_internal_type() not in ('AutoField', 'BigAutoField'))
+        new_temp_field.null = (new_field.get_internal_type() not in ('AutoField', 'BigAutoField', 'SmallAutoField'))
         new_temp_field.column = self._generate_temp_name(new_field.column)
         # Add it
         self.add_field(model, new_temp_field)

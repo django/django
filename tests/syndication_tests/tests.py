@@ -82,6 +82,7 @@ class SyndicationFeedTest(FeedTestCase):
         self.assertEqual(len(feed_elem), 1)
         feed = feed_elem[0]
         self.assertEqual(feed.getAttribute('version'), '2.0')
+        self.assertEqual(feed.getElementsByTagName('language')[0].firstChild.nodeValue, 'en')
 
         # Making sure there's only one `channel` element w/in the
         # `rss` element.
@@ -362,6 +363,11 @@ class SyndicationFeedTest(FeedTestCase):
             ])
             summary = entry.getElementsByTagName('summary')[0]
             self.assertEqual(summary.getAttribute('type'), 'html')
+
+    def test_feed_generator_language_attribute(self):
+        response = self.client.get('/syndication/language/')
+        feed = minidom.parseString(response.content).firstChild
+        self.assertEqual(feed.firstChild.getElementsByTagName('language')[0].firstChild.nodeValue, 'de')
 
     def test_title_escaping(self):
         """

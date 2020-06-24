@@ -1,5 +1,5 @@
-from django.contrib.postgres.fields import ArrayField, JSONField
-from django.db.models.aggregates import Aggregate
+from django.contrib.postgres.fields import ArrayField
+from django.db.models import Aggregate, JSONField, Value
 
 from .mixins import OrderableAggMixin
 
@@ -39,8 +39,9 @@ class BoolOr(Aggregate):
     function = 'BOOL_OR'
 
 
-class JSONBAgg(Aggregate):
+class JSONBAgg(OrderableAggMixin, Aggregate):
     function = 'JSONB_AGG'
+    template = '%(function)s(%(expressions)s %(ordering)s)'
     output_field = JSONField()
 
     def convert_value(self, value, expression, connection):
@@ -51,11 +52,12 @@ class JSONBAgg(Aggregate):
 
 class StringAgg(OrderableAggMixin, Aggregate):
     function = 'STRING_AGG'
-    template = "%(function)s(%(distinct)s%(expressions)s, '%(delimiter)s'%(ordering)s)"
+    template = '%(function)s(%(distinct)s%(expressions)s %(ordering)s)'
     allow_distinct = True
 
     def __init__(self, expression, delimiter, **extra):
-        super().__init__(expression, delimiter=delimiter, **extra)
+        delimiter_expr = Value(str(delimiter))
+        super().__init__(expression, delimiter_expr, **extra)
 
     def convert_value(self, value, expression, connection):
         if not value:

@@ -1,7 +1,7 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# BouRock, 2015
+# BouRock, 2015,2019
 # BouRock, 2014-2015
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Murat Çorlu <muratcorlu@gmail.com>, 2012
@@ -10,9 +10,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-09-23 18:54+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2019-09-08 17:27+0200\n"
+"PO-Revision-Date: 2019-09-17 08:30+0000\n"
+"Last-Translator: BouRock\n"
 "Language-Team: Turkish (http://www.transifex.com/django/django/language/"
 "tr/)\n"
 "MIME-Version: 1.0\n"
@@ -28,14 +28,14 @@ msgid "The base GIS field."
 msgstr "Temel GIS alanı."
 
 msgid ""
-"The base Geometry field -- maps to the OpenGIS Specification Geometry type."
-msgstr "Temel Geometri alanı - OpenGIS Özellikleri Geometri türüyle eşlenir."
+"The base Geometry field — maps to the OpenGIS Specification Geometry type."
+msgstr "Temel Geometri alanı — OpenGIS Özellikleri Geometri türüyle eşlenir."
 
 msgid "Point"
 msgstr "Nokta"
 
 msgid "Line string"
-msgstr "Satır dizgesi"
+msgstr "Satır dizgisi"
 
 msgid "Polygon"
 msgstr "Çokgen"
@@ -44,7 +44,7 @@ msgid "Multi-point"
 msgstr "Çok noktalı"
 
 msgid "Multi-line string"
-msgstr "Çok satırlı dizge"
+msgstr "Çok satırlı dizgi"
 
 msgid "Multi polygon"
 msgstr "Çoklu çokgen"
@@ -87,5 +87,5 @@ msgid "No feeds are registered."
 msgstr "Hiçbir besleme kayıtlı değil."
 
 #, python-format
-msgid "Slug %r isn't registered."
+msgid "Slug %r isn’t registered."
 msgstr "%r kısaltması kayıtlı değil."

@@ -2,8 +2,8 @@
 import unittest
 
 from django.core.exceptions import ImproperlyConfigured
-from django.db import DEFAULT_DB_ALIAS, connection
-from django.db.utils import ConnectionHandler, ProgrammingError, load_backend
+from django.db import DEFAULT_DB_ALIAS, ProgrammingError, connection
+from django.db.utils import ConnectionHandler, load_backend
 from django.test import SimpleTestCase, TestCase
 
 

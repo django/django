@@ -57,6 +57,7 @@ class Serializer(PythonSerializer):
             super().handle_field(obj, field)
 
     def end_serialization(self):
+        self.options.setdefault('allow_unicode', True)
         yaml.dump(self.objects, self.stream, Dumper=DjangoSafeDumper, **self.options)
 
     def getvalue(self):

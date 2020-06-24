@@ -3,7 +3,7 @@ from django.core.checks.translation import (
     check_language_settings_consistent, check_setting_language_code,
     check_setting_languages, check_setting_languages_bidi,
 )
-from django.test import SimpleTestCase
+from django.test import SimpleTestCase, override_settings
 
 
 class TranslationCheckTests(SimpleTestCase):
@@ -42,7 +42,7 @@ class TranslationCheckTests(SimpleTestCase):
                 self.assertEqual(check_setting_language_code(None), [])
 
     def test_invalid_language_code(self):
-        msg = 'You have provided an invalid value for the LANGUAGE_CODE setting: %s.'
+        msg = 'You have provided an invalid value for the LANGUAGE_CODE setting: %r.'
         for tag in self.invalid_tags:
             with self.subTest(tag), self.settings(LANGUAGE_CODE=tag):
                 self.assertEqual(check_setting_language_code(None), [
@@ -55,7 +55,7 @@ class TranslationCheckTests(SimpleTestCase):
                 self.assertEqual(check_setting_languages(None), [])
 
     def test_invalid_languages(self):
-        msg = 'You have provided an invalid language code in the LANGUAGES setting: %s.'
+        msg = 'You have provided an invalid language code in the LANGUAGES setting: %r.'
         for tag in self.invalid_tags:
             with self.subTest(tag), self.settings(LANGUAGES=[(tag, tag)]):
                 self.assertEqual(check_setting_languages(None), [
@@ -68,27 +68,43 @@ class TranslationCheckTests(SimpleTestCase):
                 self.assertEqual(check_setting_languages_bidi(None), [])
 
     def test_invalid_languages_bidi(self):
-        msg = 'You have provided an invalid language code in the LANGUAGES_BIDI setting: %s.'
+        msg = 'You have provided an invalid language code in the LANGUAGES_BIDI setting: %r.'
         for tag in self.invalid_tags:
             with self.subTest(tag), self.settings(LANGUAGES_BIDI=[tag]):
                 self.assertEqual(check_setting_languages_bidi(None), [
                     Error(msg % tag, id='translation.E003'),
                 ])
 
+    @override_settings(USE_I18N=True, LANGUAGES=[('en', 'English')])
     def test_inconsistent_language_settings(self):
         msg = (
             'You have provided a value for the LANGUAGE_CODE setting that is '
             'not in the LANGUAGES setting.'
         )
-        with self.settings(LANGUAGE_CODE='fr', LANGUAGES=[('en', 'English')], LANGUAGES_BIDI=[]):
-            self.assertEqual(check_language_settings_consistent(None), [
-                Error(msg, id='translation.E004'),
-            ])
-        msg = (
-            'You have provided values in the LANGUAGES_BIDI setting that are '
-            'not in the LANGUAGES setting.'
-        )
-        with self.settings(LANGUAGE_CODE='en', LANGUAGES=[('en', 'English')], LANGUAGES_BIDI=['he']):
-            self.assertEqual(check_language_settings_consistent(None), [
-                Error(msg, id='translation.E005'),
-            ])
+        for tag in ['fr', 'fr-CA', 'fr-357']:
+            with self.subTest(tag), self.settings(LANGUAGE_CODE=tag):
+                self.assertEqual(check_language_settings_consistent(None), [
+                    Error(msg, id='translation.E004'),
+                ])
+
+    @override_settings(
+        USE_I18N=True,
+        LANGUAGES=[
+            ('de', 'German'),
+            ('es', 'Spanish'),
+            ('fr', 'French'),
+            ('ca', 'Catalan'),
+        ],
+    )
+    def test_valid_variant_consistent_language_settings(self):
+        tests = [
+            # language + region.
+            'fr-CA',
+            'es-419',
+            'de-at',
+            # language + region + variant.
+            'ca-ES-valencia',
+        ]
+        for tag in tests:
+            with self.subTest(tag), self.settings(LANGUAGE_CODE=tag):
+                self.assertEqual(check_language_settings_consistent(None), [])

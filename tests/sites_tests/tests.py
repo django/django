@@ -25,6 +25,9 @@ class SitesFrameworkTests(TestCase):
         cls.site = Site(id=settings.SITE_ID, domain='example.com', name='example.com')
         cls.site.save()
 
+    def setUp(self):
+        Site.objects.clear_cache()
+
     def tearDown(self):
         Site.objects.clear_cache()
 
@@ -324,14 +327,6 @@ class CreateDefaultSiteTests(TestCase):
 
 
 class MiddlewareTest(TestCase):
-
-    def test_old_style_request(self):
-        """The request has correct `site` attribute."""
-        middleware = CurrentSiteMiddleware()
-        request = HttpRequest()
-        middleware.process_request(request)
-        self.assertEqual(request.site.id, settings.SITE_ID)
-
     def test_request(self):
         def get_response(request):
             return HttpResponse(str(request.site.id))

@@ -46,13 +46,13 @@ particular:
   include a clear, concise description of the problem, and a set of
   instructions for replicating it. Add as much debug information as you can:
   code snippets, test cases, exception backtraces, screenshots, etc. A nice
-  small test case is the best way to report a bug, as it gives us an easy
-  way to confirm the bug quickly.
+  small test case is the best way to report a bug, as it gives us a
+  helpful way to confirm the bug quickly.
 
-* **Don't** post to |django-developers| just to announce that you have
-  filed a bug report. All the tickets are mailed to another list,
-  |django-updates|, which is tracked by developers and interested
-  community members; we see them as they are filed.
+* **Don't** post to |django-developers| only to announce that you have filed a
+  bug report. All the tickets are mailed to another list, |django-updates|,
+  which is tracked by developers and interested community members; we see them
+  as they are filed.
 
 To understand the lifecycle of your ticket once you have created it, refer to
 :doc:`triaging-tickets`.
@@ -91,9 +91,8 @@ part of that. Here are some tips on how to make a request most effectively:
 * Make sure the feature actually requires changes in Django's core. If your
   idea can be developed as an independent application or module — for
   instance, you want to support another database engine — we'll probably
-  suggest that you to develop it independently. Then, if your project
-  gathers sufficient community support, we may consider it for inclusion in
-  Django.
+  suggest that you develop it independently. Then, if your project gathers
+  sufficient community support, we may consider it for inclusion in Django.
 
 * First request the feature on the |django-developers| list, not in the
   ticket tracker. It'll get read more closely if it's on the mailing list.
@@ -105,10 +104,9 @@ part of that. Here are some tips on how to make a request most effectively:
   like to see it implemented. Include example code (non-functional is OK)
   if possible.
 
-* Explain *why* you'd like the feature. In some cases this is obvious, but
-  since Django is designed to help real developers get real work done,
-  you'll need to explain it, if it isn't obvious why the feature would be
-  useful.
+* Explain *why* you'd like the feature. Explaining a minimal use case will help
+  others understand where it fits in, and if there are already other ways of
+  achieving the same thing.
 
 If there's a consensus agreement on the feature, then it's appropriate to
 create a ticket. Include a link the discussion on |django-developers| in the
@@ -116,8 +114,8 @@ ticket description.
 
 As with most open-source projects, code talks. If you are willing to write the
 code for the feature yourself or, even better, if you've already written it,
-it's much more likely to be accepted. Just fork Django on GitHub, create a
-feature branch, and show us your work!
+it's much more likely to be accepted. Fork Django on GitHub, create a feature
+branch, and show us your work!
 
 See also: :ref:`documenting-new-features`.
 
@@ -166,4 +164,4 @@ Votes on technical matters should be announced and held in public on the
 
 .. _searching: https://code.djangoproject.com/search
 .. _custom queries: https://code.djangoproject.com/query
-.. _#django: irc://irc.freenode.net/django
+.. _#django: https://webchat.freenode.net/#django

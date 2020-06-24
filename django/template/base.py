@@ -50,16 +50,15 @@ times with multiple contexts)
 '<html></html>'
 """
 
+import inspect
 import logging
 import re
 from enum import Enum
-from inspect import getcallargs, getfullargspec, unwrap
 
-from django.template.context import (  # NOQA: imported for backwards compatibility
-    BaseContext, Context, ContextPopException, RequestContext,
-)
+from django.template.context import BaseContext
 from django.utils.formats import localize
 from django.utils.html import conditional_escape, escape
+from django.utils.regex_helper import _lazy_re_compile
 from django.utils.safestring import SafeData, mark_safe
 from django.utils.text import (
     get_text_list, smart_split, unescape_string_literal,
@@ -89,7 +88,7 @@ UNKNOWN_SOURCE = '<unknown source>'
 
 # match a variable or block tag and capture the entire tag, including start/end
 # delimiters
-tag_re = (re.compile('(%s.*?%s|%s.*?%s|%s.*?%s)' %
+tag_re = (_lazy_re_compile('(%s.*?%s|%s.*?%s|%s.*?%s)' %
           (re.escape(BLOCK_TAG_START), re.escape(BLOCK_TAG_END),
            re.escape(VARIABLE_TAG_START), re.escape(VARIABLE_TAG_END),
            re.escape(COMMENT_TAG_START), re.escape(COMMENT_TAG_END))))
@@ -176,7 +175,7 @@ class Template:
         """
         Parse and compile the template source into a nodelist. If debug
         is True and an exception occurs during parsing, the exception is
-        is annotated with contextual line information where it occurred in the
+        annotated with contextual line information where it occurred in the
         template source.
         """
         if self.engine.debug:
@@ -395,7 +394,6 @@ class DebugLexer(Lexer):
                 token_string = self.template_string[upto:start]
                 result.append(self.create_token(token_string, (upto, start), lineno, in_tag=False))
                 lineno += token_string.count('\n')
-                upto = start
             token_string = self.template_string[start:end]
             result.append(self.create_token(token_string, (start, end), lineno, in_tag=True))
             lineno += token_string.count('\n')
@@ -408,7 +406,9 @@ class DebugLexer(Lexer):
 
 class Parser:
     def __init__(self, tokens, libraries=None, builtins=None, origin=None):
-        self.tokens = tokens
+        # Reverse the tokens so delete_first_token(), prepend_token(), and
+        # next_token() can operate at the end of the list in constant time.
+        self.tokens = list(reversed(tokens))
         self.tags = {}
         self.filters = {}
         self.command_stack = []
@@ -544,13 +544,13 @@ class Parser:
         raise self.error(token, msg)
 
     def next_token(self):
-        return self.tokens.pop(0)
+        return self.tokens.pop()
 
     def prepend_token(self, token):
-        self.tokens.insert(0, token)
+        self.tokens.append(token)
 
     def delete_first_token(self):
-        del self.tokens[0]
+        del self.tokens[-1]
 
     def add_library(self, lib):
         self.tags.update(lib.tags)
@@ -604,7 +604,7 @@ filter_raw_string = r"""
     'arg_sep': re.escape(FILTER_ARGUMENT_SEPARATOR),
 }
 
-filter_re = re.compile(filter_raw_string, re.VERBOSE)
+filter_re = _lazy_re_compile(filter_raw_string, re.VERBOSE)
 
 
 class FilterExpression:
@@ -635,7 +635,7 @@ class FilterExpression:
                                           (token[:upto], token[upto:start],
                                            token[start:]))
             if var_obj is None:
-                var, constant = match.group("var", "constant")
+                var, constant = match['var'], match['constant']
                 if constant:
                     try:
                         var_obj = Variable(constant).resolve({})
@@ -647,9 +647,9 @@ class FilterExpression:
                 else:
                     var_obj = Variable(var)
             else:
-                filter_name = match.group("filter_name")
+                filter_name = match['filter_name']
                 args = []
-                constant_arg, var_arg = match.group("constant_arg", "var_arg")
+                constant_arg, var_arg = match['constant_arg'], match['var_arg']
                 if constant_arg:
                     args.append((False, Variable(constant_arg).resolve({})))
                 elif var_arg:
@@ -707,9 +707,9 @@ class FilterExpression:
         # First argument, filter input, is implied.
         plen = len(provided) + 1
         # Check to see if a decorator is providing the real function.
-        func = unwrap(func)
+        func = inspect.unwrap(func)
 
-        args, _, _, defaults, _, _, _ = getfullargspec(func)
+        args, _, _, defaults, _, _, _ = inspect.getfullargspec(func)
         alen = len(args)
         dlen = len(defaults or [])
         # Not enough OR Too many
@@ -857,8 +857,9 @@ class Variable:
                         try:  # method call (assuming no args required)
                             current = current()
                         except TypeError:
+                            signature = inspect.signature(current)
                             try:
-                                getcallargs(current)
+                                signature.bind()
                             except TypeError:  # arguments *were* required
                                 current = context.template.engine.string_if_invalid  # invalid method call
                             else:
@@ -994,7 +995,7 @@ class VariableNode(Node):
 
 
 # Regex for token keyword arguments
-kwarg_re = re.compile(r"(?:(\w+)=)?(.+)")
+kwarg_re = _lazy_re_compile(r"(?:(\w+)=)?(.+)")
 
 
 def token_kwargs(bits, parser, support_legacy=False):
@@ -1016,7 +1017,7 @@ def token_kwargs(bits, parser, support_legacy=False):
     if not bits:
         return {}
     match = kwarg_re.match(bits[0])
-    kwarg_format = match and match.group(1)
+    kwarg_format = match and match[1]
     if not kwarg_format:
         if not support_legacy:
             return {}
@@ -1027,7 +1028,7 @@ def token_kwargs(bits, parser, support_legacy=False):
     while bits:
         if kwarg_format:
             match = kwarg_re.match(bits[0])
-            if not match or not match.group(1):
+            if not match or not match[1]:
                 return kwargs
             key, value = match.groups()
             del bits[:1]

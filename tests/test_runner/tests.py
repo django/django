@@ -292,7 +292,7 @@ class DummyBackendTest(unittest.TestCase):
 class AliasedDefaultTestSetupTest(unittest.TestCase):
     def test_setup_aliased_default_database(self):
         """
-        setup_datebases() doesn't fail when 'default' is aliased
+        setup_databases() doesn't fail when 'default' is aliased
         """
         tested_connections = db.ConnectionHandler({
             'default': {

@@ -19,3 +19,12 @@ def make_model_tuple(model):
             "Invalid model reference '%s'. String model references "
             "must be of the form 'app_label.ModelName'." % model
         )
+
+
+def resolve_callables(mapping):
+    """
+    Generate key/value pairs for the given mapping where the values are
+    evaluated if they're callable.
+    """
+    for k, v in mapping.items():
+        yield k, v() if callable(v) else v

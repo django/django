@@ -458,12 +458,12 @@ class PrePopulatedSubPost(models.Model):
 
 
 class Post(models.Model):
-    title = models.CharField(max_length=100, help_text="Some help text for the title (with unicode ŠĐĆŽćžšđ)")
-    content = models.TextField(help_text="Some help text for the content (with unicode ŠĐĆŽćžšđ)")
+    title = models.CharField(max_length=100, help_text='Some help text for the title (with Unicode ŠĐĆŽćžšđ)')
+    content = models.TextField(help_text='Some help text for the content (with Unicode ŠĐĆŽćžšđ)')
     readonly_content = models.TextField()
     posted = models.DateField(
         default=datetime.date.today,
-        help_text="Some help text for the date (with unicode ŠĐĆŽćžšđ)"
+        help_text='Some help text for the date (with Unicode ŠĐĆŽćžšđ)',
     )
     public = models.BooleanField(null=True, blank=True)
 
@@ -602,6 +602,14 @@ class ReadOnlyPizza(Pizza):
 class Album(models.Model):
     owner = models.ForeignKey(User, models.SET_NULL, null=True, blank=True)
     title = models.CharField(max_length=30)
+
+
+class Song(models.Model):
+    name = models.CharField(max_length=20)
+    album = models.ForeignKey(Album, on_delete=models.RESTRICT)
+
+    def __str__(self):
+        return self.name
 
 
 class Employee(Person):
@@ -864,12 +872,12 @@ class EmptyModelMixin(models.Model):
 
 
 class State(models.Model):
-    name = models.CharField(max_length=100)
+    name = models.CharField(max_length=100, verbose_name='State verbose_name')
 
 
 class City(models.Model):
     state = models.ForeignKey(State, models.CASCADE)
-    name = models.CharField(max_length=100)
+    name = models.CharField(max_length=100, verbose_name='City verbose_name')
 
     def get_absolute_url(self):
         return '/dummy/%s/' % self.pk

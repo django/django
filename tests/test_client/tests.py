@@ -25,9 +25,10 @@ from unittest import mock
 
 from django.contrib.auth.models import User
 from django.core import mail
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseNotAllowed
 from django.test import (
-    Client, RequestFactory, SimpleTestCase, TestCase, override_settings,
+    AsyncRequestFactory, Client, RequestFactory, SimpleTestCase, TestCase,
+    override_settings,
 )
 from django.urls import reverse_lazy
 
@@ -61,8 +62,8 @@ class ClientTest(TestCase):
 
     def test_get_data_none(self):
         msg = (
-            'Cannot encode None in a query string. Did you mean to pass an '
-            'empty string or omit the value?'
+            "Cannot encode None for key 'value' in a query string. Did you "
+            "mean to pass an empty string or omit the value?"
         )
         with self.assertRaisesMessage(TypeError, msg):
             self.client.get('/get_view/', {'value': None})
@@ -102,8 +103,8 @@ class ClientTest(TestCase):
 
     def test_post_data_none(self):
         msg = (
-            'Cannot encode None as POST data. Did you mean to pass an empty '
-            'string or omit the value?'
+            "Cannot encode None for key 'value' as POST data. Did you mean "
+            "to pass an empty string or omit the value?"
         )
         with self.assertRaisesMessage(TypeError, msg):
             self.client.post('/post_view/', {'value': None})
@@ -282,6 +283,34 @@ class ClientTest(TestCase):
                 self.assertEqual(response.status_code, 200)
                 self.assertEqual(response.request['PATH_INFO'], '/post_view/')
                 self.assertEqual(response.request['REQUEST_METHOD'], method.upper())
+
+    def test_follow_307_and_308_preserves_query_string(self):
+        methods = ('post', 'options', 'put', 'patch', 'delete', 'trace')
+        codes = (307, 308)
+        for method, code in itertools.product(methods, codes):
+            with self.subTest(method=method, code=code):
+                req_method = getattr(self.client, method)
+                response = req_method(
+                    '/redirect_view_%s_query_string/' % code,
+                    data={'value': 'test'},
+                    follow=True,
+                )
+                self.assertRedirects(response, '/post_view/?hello=world', status_code=code)
+                self.assertEqual(response.request['QUERY_STRING'], 'hello=world')
+
+    def test_follow_307_and_308_get_head_query_string(self):
+        methods = ('get', 'head')
+        codes = (307, 308)
+        for method, code in itertools.product(methods, codes):
+            with self.subTest(method=method, code=code):
+                req_method = getattr(self.client, method)
+                response = req_method(
+                    '/redirect_view_%s_query_string/' % code,
+                    data={'value': 'test'},
+                    follow=True,
+                )
+                self.assertRedirects(response, '/post_view/?hello=world', status_code=code)
+                self.assertEqual(response.request['QUERY_STRING'], 'value=test')
 
     def test_follow_307_and_308_preserves_post_data(self):
         for code in (307, 308):
@@ -918,3 +947,57 @@ class RequestFactoryTest(SimpleTestCase):
         protocol = request.META["SERVER_PROTOCOL"]
         echoed_request_line = "TRACE {} {}".format(url_path, protocol)
         self.assertContains(response, echoed_request_line)
+
+
+@override_settings(ROOT_URLCONF='test_client.urls')
+class AsyncClientTest(TestCase):
+    async def test_response_resolver_match(self):
+        response = await self.async_client.get('/async_get_view/')
+        self.assertTrue(hasattr(response, 'resolver_match'))
+        self.assertEqual(response.resolver_match.url_name, 'async_get_view')
+
+    async def test_follow_parameter_not_implemented(self):
+        msg = 'AsyncClient request methods do not accept the follow parameter.'
+        tests = (
+            'get',
+            'post',
+            'put',
+            'patch',
+            'delete',
+            'head',
+            'options',
+            'trace',
+        )
+        for method_name in tests:
+            with self.subTest(method=method_name):
+                method = getattr(self.async_client, method_name)
+                with self.assertRaisesMessage(NotImplementedError, msg):
+                    await method('/redirect_view/', follow=True)
+
+
+@override_settings(ROOT_URLCONF='test_client.urls')
+class AsyncRequestFactoryTest(SimpleTestCase):
+    request_factory = AsyncRequestFactory()
+
+    async def test_request_factory(self):
+        tests = (
+            'get',
+            'post',
+            'put',
+            'patch',
+            'delete',
+            'head',
+            'options',
+            'trace',
+        )
+        for method_name in tests:
+            with self.subTest(method=method_name):
+                async def async_generic_view(request):
+                    if request.method.lower() != method_name:
+                        return HttpResponseNotAllowed(method_name)
+                    return HttpResponse(status=200)
+
+                method = getattr(self.request_factory, method_name)
+                request = method('/somewhere/')
+                response = await async_generic_view(request)
+                self.assertEqual(response.status_code, 200)

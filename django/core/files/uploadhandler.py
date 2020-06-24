@@ -52,7 +52,7 @@ class SkipFile(UploadFileException):
 
 class StopFutureHandlers(UploadFileException):
     """
-    Upload handers that have handled a file and do not want future handlers to
+    Upload handlers that have handled a file and do not want future handlers to
     run should raise this exception instead of returning None.
     """
     pass

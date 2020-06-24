@@ -58,3 +58,17 @@ class Container:
 
 class M2MModel(models.Model):
     groups = models.ManyToManyField(Group)
+
+
+class AbstractEvent(Event):
+    class Meta:
+        abstract = True
+        ordering = ['title']
+
+
+class MyEvent(AbstractEvent):
+    pass
+
+
+class Edition(models.Model):
+    event = models.ForeignKey('MyEvent', on_delete=models.CASCADE)

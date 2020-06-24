@@ -4,9 +4,9 @@ from django.db.backends.oracle.introspection import DatabaseIntrospection
 
 
 class OracleIntrospection(DatabaseIntrospection):
-    # Associating any OBJECTVAR instances with GeometryField.  Of course,
-    # this won't work right on Oracle objects that aren't MDSYS.SDO_GEOMETRY,
-    # but it is the only object type supported within Django anyways.
+    # Associating any OBJECTVAR instances with GeometryField. This won't work
+    # right on Oracle objects that aren't MDSYS.SDO_GEOMETRY, but it is the
+    # only object type supported within Django anyways.
     data_types_reverse = DatabaseIntrospection.data_types_reverse.copy()
     data_types_reverse[cx_Oracle.OBJECT] = 'GeometryField'
 

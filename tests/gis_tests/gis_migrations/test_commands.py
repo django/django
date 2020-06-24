@@ -36,8 +36,8 @@ class MigrateTests(TransactionTestCase):
         self.assertTableExists("gis_migrations_family")
         if connection.features.supports_raster:
             self.assertTableExists("gis_migrations_heatmap")
-        # Unmigrate everything
-        call_command("migrate", "gis_migrations", "zero", verbosity=0)
+        # Unmigrate models.
+        call_command("migrate", "gis_migrations", "0001", verbosity=0)
         # All tables are gone
         self.assertTableNotExists("gis_migrations_neighborhood")
         self.assertTableNotExists("gis_migrations_household")

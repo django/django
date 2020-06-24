@@ -12,7 +12,7 @@ Simple mixins
     .. attribute:: extra_context
 
         A dictionary to include in the context. This is a convenient way of
-        specifying some simple context in
+        specifying some context in
         :meth:`~django.views.generic.base.View.as_view`. Example usage::
 
             from django.views.generic import TemplateView
@@ -102,5 +102,5 @@ Simple mixins
         Returns a list of template names to search for when rendering the
         template. The first template that is found will be used.
 
-        If :attr:`template_name` is specified, the default implementation will
-        return a list containing :attr:`template_name` (if it is specified).
+        The default implementation will return a list containing
+        :attr:`template_name` (if it is specified).

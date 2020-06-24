@@ -101,6 +101,9 @@ class ServerHandler(simple_server.ServerHandler):
         # connection.
         if 'Content-Length' not in self.headers:
             self.headers['Connection'] = 'close'
+        # Persistent connections require threading server.
+        elif not isinstance(self.request_handler.server, socketserver.ThreadingMixIn):
+            self.headers['Connection'] = 'close'
         # Mark the connection for closing if it's set as such above or if the
         # application sent the header.
         if self.headers.get('Connection') == 'close':

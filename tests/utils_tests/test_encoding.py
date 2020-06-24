@@ -1,13 +1,15 @@
 import datetime
+import sys
 import unittest
+from pathlib import Path
 from unittest import mock
 from urllib.parse import quote_plus
 
 from django.test import SimpleTestCase
 from django.utils.encoding import (
     DjangoUnicodeDecodeError, escape_uri_path, filepath_to_uri, force_bytes,
-    force_str, get_system_encoding, iri_to_uri, smart_bytes, smart_str,
-    uri_to_iri,
+    force_str, get_system_encoding, iri_to_uri, repercent_broken_unicode,
+    smart_bytes, smart_str, uri_to_iri,
 )
 from django.utils.functional import SimpleLazyObject
 from django.utils.translation import gettext_lazy
@@ -90,12 +92,23 @@ class TestEncodingUtils(SimpleTestCase):
         with mock.patch('locale.getdefaultlocale', side_effect=Exception):
             self.assertEqual(get_system_encoding(), 'ascii')
 
+    def test_repercent_broken_unicode_recursion_error(self):
+        # Prepare a string long enough to force a recursion error if the tested
+        # function uses recursion.
+        data = b'\xfc' * sys.getrecursionlimit()
+        try:
+            self.assertEqual(repercent_broken_unicode(data), b'%FC' * sys.getrecursionlimit())
+        except RecursionError:
+            self.fail('Unexpected RecursionError raised.')
+
 
 class TestRFC3987IEncodingUtils(unittest.TestCase):
 
     def test_filepath_to_uri(self):
-        self.assertEqual(filepath_to_uri(None), None)
+        self.assertIsNone(filepath_to_uri(None))
         self.assertEqual(filepath_to_uri('upload\\чубака.mp4'), 'upload/%D1%87%D1%83%D0%B1%D0%B0%D0%BA%D0%B0.mp4')
+        self.assertEqual(filepath_to_uri(Path('upload/test.png')), 'upload/test.png')
+        self.assertEqual(filepath_to_uri(Path('upload\\test.png')), 'upload/test.png')
 
     def test_iri_to_uri(self):
         cases = [
@@ -111,10 +124,11 @@ class TestRFC3987IEncodingUtils(unittest.TestCase):
         ]
 
         for iri, uri in cases:
-            self.assertEqual(iri_to_uri(iri), uri)
+            with self.subTest(iri):
+                self.assertEqual(iri_to_uri(iri), uri)
 
-            # Test idempotency.
-            self.assertEqual(iri_to_uri(iri_to_uri(iri)), uri)
+                # Test idempotency.
+                self.assertEqual(iri_to_uri(iri_to_uri(iri)), uri)
 
     def test_uri_to_iri(self):
         cases = [
@@ -134,10 +148,11 @@ class TestRFC3987IEncodingUtils(unittest.TestCase):
         ]
 
         for uri, iri in cases:
-            self.assertEqual(uri_to_iri(uri), iri)
+            with self.subTest(uri):
+                self.assertEqual(uri_to_iri(uri), iri)
 
-            # Test idempotency.
-            self.assertEqual(uri_to_iri(uri_to_iri(uri)), iri)
+                # Test idempotency.
+                self.assertEqual(uri_to_iri(uri_to_iri(uri)), iri)
 
     def test_complementarity(self):
         cases = [
@@ -155,13 +170,19 @@ class TestRFC3987IEncodingUtils(unittest.TestCase):
         ]
 
         for uri, iri in cases:
-            self.assertEqual(iri_to_uri(uri_to_iri(uri)), uri)
-            self.assertEqual(uri_to_iri(iri_to_uri(iri)), iri)
+            with self.subTest(uri):
+                self.assertEqual(iri_to_uri(uri_to_iri(uri)), uri)
+                self.assertEqual(uri_to_iri(iri_to_uri(iri)), iri)
 
     def test_escape_uri_path(self):
-        self.assertEqual(
-            escape_uri_path('/;some/=awful/?path/:with/@lots/&of/+awful/chars'),
-            '/%3Bsome/%3Dawful/%3Fpath/:with/@lots/&of/+awful/chars'
-        )
-        self.assertEqual(escape_uri_path('/foo#bar'), '/foo%23bar')
-        self.assertEqual(escape_uri_path('/foo?bar'), '/foo%3Fbar')
+        cases = [
+            (
+                '/;some/=awful/?path/:with/@lots/&of/+awful/chars',
+                '/%3Bsome/%3Dawful/%3Fpath/:with/@lots/&of/+awful/chars',
+            ),
+            ('/foo#bar', '/foo%23bar'),
+            ('/foo?bar', '/foo%3Fbar'),
+        ]
+        for uri, expected in cases:
+            with self.subTest(uri):
+                self.assertEqual(escape_uri_path(uri), expected)

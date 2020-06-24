@@ -41,17 +41,16 @@ mention:
   contains the name of the CSV file. This filename is arbitrary; call it
   whatever you want. It'll be used by browsers in the "Save as..." dialog, etc.
 
-* Hooking into the CSV-generation API is easy: Just pass ``response`` as the
-  first argument to ``csv.writer``. The ``csv.writer`` function expects a
-  file-like object, and :class:`~django.http.HttpResponse` objects fit the
-  bill.
+* You can hook into the CSV-generation API by passing ``response`` as the first
+  argument to ``csv.writer``. The ``csv.writer`` function expects a file-like
+  object, and :class:`~django.http.HttpResponse` objects fit the bill.
 
 * For each row in your CSV file, call ``writer.writerow``, passing it an
-  iterable object such as a list or tuple.
+  :term:`iterable`.
 
 * The CSV module takes care of quoting for you, so you don't have to worry
-  about escaping strings with quotes or commas in them. Just pass
-  ``writerow()`` your raw strings, and it'll do the right thing.
+  about escaping strings with quotes or commas in them. Pass ``writerow()``
+  your raw strings, and it'll do the right thing.
 
 .. _streaming-csv-files:
 
@@ -105,7 +104,7 @@ template output the commas in a :ttag:`for` loop.
 Here's an example, which generates the same CSV file as above::
 
     from django.http import HttpResponse
-    from django.template import Context, loader
+    from django.template import loader
 
     def some_view(request):
         # Create the HttpResponse object with the appropriate CSV header.
@@ -120,9 +119,7 @@ Here's an example, which generates the same CSV file as above::
         )
 
         t = loader.get_template('my_template_name.txt')
-        c = Context({
-            'data': csv_data,
-        })
+        c = {'data': csv_data}
         response.write(t.render(c))
         return response
 
@@ -137,9 +134,9 @@ Then, create the template ``my_template_name.txt``, with this template code:
     {% for row in data %}"{{ row.0|addslashes }}", "{{ row.1|addslashes }}", "{{ row.2|addslashes }}", "{{ row.3|addslashes }}", "{{ row.4|addslashes }}"
     {% endfor %}
 
-This template is quite basic. It just iterates over the given data and displays
-a line of CSV for each row. It uses the :tfilter:`addslashes` template filter to
-ensure there aren't any problems with quotes.
+This short template iterates over the given data and displays a line of CSV for
+each row. It uses the :tfilter:`addslashes` template filter to ensure there
+aren't any problems with quotes.
 
 Other text-based formats
 ========================

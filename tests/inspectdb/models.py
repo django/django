@@ -57,6 +57,7 @@ class ColumnTypes(models.Model):
     float_field = models.FloatField()
     int_field = models.IntegerField()
     gen_ip_address_field = models.GenericIPAddressField(protocol="ipv4")
+    pos_big_int_field = models.PositiveBigIntegerField()
     pos_int_field = models.PositiveIntegerField()
     pos_small_int_field = models.PositiveSmallIntegerField()
     slug_field = models.SlugField()
@@ -65,6 +66,17 @@ class ColumnTypes(models.Model):
     time_field = models.TimeField()
     url_field = models.URLField()
     uuid_field = models.UUIDField()
+
+
+class JSONFieldColumnType(models.Model):
+    json_field = models.JSONField()
+    null_json_field = models.JSONField(blank=True, null=True)
+
+    class Meta:
+        required_db_features = {
+            'can_introspect_json_field',
+            'supports_json_field',
+        }
 
 
 class UniqueTogether(models.Model):

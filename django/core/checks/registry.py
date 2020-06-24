@@ -8,12 +8,14 @@ class Tags:
     Built-in tags for internal checks.
     """
     admin = 'admin'
+    async_support = 'async_support'
     caches = 'caches'
     compatibility = 'compatibility'
     database = 'database'
     models = 'models'
     security = 'security'
     signals = 'signals'
+    staticfiles = 'staticfiles'
     templates = 'templates'
     translation = 'translation'
     urls = 'urls'
@@ -54,7 +56,7 @@ class CheckRegistry:
                 tags += (check,)
             return inner
 
-    def run_checks(self, app_configs=None, tags=None, include_deployment_checks=False):
+    def run_checks(self, app_configs=None, tags=None, include_deployment_checks=False, databases=None):
         """
         Run all registered checks and return list of Errors and Warnings.
         """
@@ -63,13 +65,9 @@ class CheckRegistry:
 
         if tags is not None:
             checks = [check for check in checks if not set(check.tags).isdisjoint(tags)]
-        else:
-            # By default, 'database'-tagged checks are not run as they do more
-            # than mere static code analysis.
-            checks = [check for check in checks if Tags.database not in check.tags]
 
         for check in checks:
-            new_errors = check(app_configs=app_configs)
+            new_errors = check(app_configs=app_configs, databases=databases)
             assert is_iterable(new_errors), (
                 "The function %r did not return a list. All functions registered "
                 "with the checks registry must return a list." % check)

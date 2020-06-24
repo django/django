@@ -2,13 +2,13 @@
 #
 # Translators:
 # Tomáš Ehrlich <tomas.ehrlich@gmail.com>, 2015
-# Vláďa Macek <macek@sandbox.cz>, 2015-2018
+# Vláďa Macek <macek@sandbox.cz>, 2015-2019
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-05-17 11:49+0200\n"
-"PO-Revision-Date: 2018-07-15 18:04+0000\n"
+"POT-Creation-Date: 2019-09-08 17:27+0200\n"
+"PO-Revision-Date: 2019-09-19 08:58+0000\n"
 "Last-Translator: Vláďa Macek <macek@sandbox.cz>\n"
 "Language-Team: Czech (http://www.transifex.com/django/django/language/cs/)\n"
 "MIME-Version: 1.0\n"
@@ -32,7 +32,7 @@ msgid "Map of strings to strings/nulls"
 msgstr "Mapování řetězců na řetězce či hodnoty NULL"
 
 #, python-format
-msgid "The value of \"%(key)s\" is not a string or null."
+msgid "The value of “%(key)s” is not a string or null."
 msgstr "Hodnota s klíčem \"%(key)s\" není řetězec ani NULL."
 
 msgid "A JSON object"
@@ -48,8 +48,8 @@ msgid "Input must be a JSON dictionary."
 msgstr "Vstup musí být slovník formátu JSON."
 
 #, python-format
-msgid "'%(value)s' value must be valid JSON."
-msgstr "Hodnota '%(value)s' musí být v platném formátu JSON."
+msgid "“%(value)s” value must be valid JSON."
+msgstr "Hodnota \"%(value)s\" musí být v platném formátu JSON."
 
 msgid "Enter two valid values."
 msgstr "Zadejte dvě platné hodnoty."

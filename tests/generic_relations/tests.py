@@ -13,25 +13,26 @@ from .models import (
 
 
 class GenericRelationsTests(TestCase):
-    def setUp(self):
-        self.lion = Animal.objects.create(
-            common_name="Lion", latin_name="Panthera leo")
-        self.platypus = Animal.objects.create(
-            common_name="Platypus", latin_name="Ornithorhynchus anatinus")
+    @classmethod
+    def setUpTestData(cls):
+        cls.lion = Animal.objects.create(common_name='Lion', latin_name='Panthera leo')
+        cls.platypus = Animal.objects.create(
+            common_name='Platypus',
+            latin_name='Ornithorhynchus anatinus',
+        )
         Vegetable.objects.create(name="Eggplant", is_yucky=True)
-        self.bacon = Vegetable.objects.create(name="Bacon", is_yucky=False)
-        self.quartz = Mineral.objects.create(name="Quartz", hardness=7)
+        cls.bacon = Vegetable.objects.create(name='Bacon', is_yucky=False)
+        cls.quartz = Mineral.objects.create(name='Quartz', hardness=7)
 
         # Tagging stuff.
-        self.bacon.tags.create(tag="fatty")
-        self.bacon.tags.create(tag="salty")
-        self.lion.tags.create(tag="yellow")
-        self.lion.tags.create(tag="hairy")
+        cls.bacon.tags.create(tag='fatty')
+        cls.bacon.tags.create(tag='salty')
+        cls.lion.tags.create(tag='yellow')
+        cls.lion.tags.create(tag='hairy')
 
+    def comp_func(self, obj):
         # Original list of tags:
-        self.comp_func = lambda obj: (
-            obj.tag, obj.content_type.model_class(), obj.object_id
-        )
+        return obj.tag, obj.content_type.model_class(), obj.object_id
 
     def test_generic_update_or_create_when_created(self):
         """
@@ -545,6 +546,37 @@ class GenericRelationsTests(TestCase):
         self.assertSequenceEqual(platypus.tags.all(), [furry_tag, weird_tag])
         platypus.tags.remove(weird_tag)
         self.assertSequenceEqual(platypus.tags.all(), [furry_tag])
+
+    def test_prefetch_related_different_content_types(self):
+        TaggedItem.objects.create(content_object=self.platypus, tag='prefetch_tag_1')
+        TaggedItem.objects.create(
+            content_object=Vegetable.objects.create(name='Broccoli'),
+            tag='prefetch_tag_2',
+        )
+        TaggedItem.objects.create(
+            content_object=Animal.objects.create(common_name='Bear'),
+            tag='prefetch_tag_3',
+        )
+        qs = TaggedItem.objects.filter(
+            tag__startswith='prefetch_tag_',
+        ).prefetch_related('content_object', 'content_object__tags')
+        with self.assertNumQueries(4):
+            tags = list(qs)
+        for tag in tags:
+            self.assertSequenceEqual(tag.content_object.tags.all(), [tag])
+
+    def test_prefetch_related_custom_object_id(self):
+        tiger = Animal.objects.create(common_name='tiger')
+        cheetah = Animal.objects.create(common_name='cheetah')
+        Comparison.objects.create(
+            first_obj=cheetah, other_obj=tiger, comparative='faster',
+        )
+        Comparison.objects.create(
+            first_obj=tiger, other_obj=cheetah, comparative='cooler',
+        )
+        qs = Comparison.objects.prefetch_related('first_obj__comparisons')
+        for comparison in qs:
+            self.assertSequenceEqual(comparison.first_obj.comparisons.all(), [comparison])
 
 
 class ProxyRelatedModelTest(TestCase):

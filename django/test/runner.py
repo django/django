@@ -17,6 +17,12 @@ from django.test.utils import (
     teardown_databases as _teardown_databases, teardown_test_environment,
 )
 from django.utils.datastructures import OrderedSet
+from django.utils.version import PY37
+
+try:
+    import ipdb as pdb
+except ImportError:
+    import pdb
 
 try:
     import tblib.pickling_support
@@ -69,6 +75,26 @@ class DebugSQLTextTestResult(unittest.TextTestResult):
             self.stream.writeln(err)
             self.stream.writeln(self.separator2)
             self.stream.writeln(sql_debug)
+
+
+class PDBDebugResult(unittest.TextTestResult):
+    """
+    Custom result class that triggers a PDB session when an error or failure
+    occurs.
+    """
+
+    def addError(self, test, err):
+        super().addError(test, err)
+        self.debug(err)
+
+    def addFailure(self, test, err):
+        super().addFailure(test, err)
+        self.debug(err)
+
+    def debug(self, error):
+        exc_type, exc_value, traceback = error
+        print("\nOpening PDB: %r" % exc_value)
+        pdb.post_mortem(traceback)
 
 
 class RemoteTestResult:
@@ -145,7 +171,7 @@ parallel test runner to handle this exception cleanly.
 
 In order to see the traceback, you should install tblib:
 
-    pip install tblib
+    python -m pip install tblib
 """.format(test, original_exc_txt))
             else:
                 print("""
@@ -407,7 +433,8 @@ class DiscoverRunner:
     def __init__(self, pattern=None, top_level=None, verbosity=1,
                  interactive=True, failfast=False, keepdb=False,
                  reverse=False, debug_mode=False, debug_sql=False, parallel=0,
-                 tags=None, exclude_tags=None, **kwargs):
+                 tags=None, exclude_tags=None, test_name_patterns=None,
+                 pdb=False, buffer=False, **kwargs):
 
         self.pattern = pattern
         self.top_level = top_level
@@ -421,6 +448,23 @@ class DiscoverRunner:
         self.parallel = parallel
         self.tags = set(tags or [])
         self.exclude_tags = set(exclude_tags or [])
+        self.pdb = pdb
+        if self.pdb and self.parallel > 1:
+            raise ValueError('You cannot use --pdb with parallel tests; pass --parallel=1 to use it.')
+        self.buffer = buffer
+        if self.buffer and self.parallel > 1:
+            raise ValueError(
+                'You cannot use -b/--buffer with parallel tests; pass '
+                '--parallel=1 to use it.'
+            )
+        self.test_name_patterns = None
+        if test_name_patterns:
+            # unittest does not export the _convert_select_pattern function
+            # that converts command-line arguments to patterns.
+            self.test_name_patterns = {
+                pattern if '*' in pattern else '*%s*' % pattern
+                for pattern in test_name_patterns
+            }
 
     @classmethod
     def add_arguments(cls, parser):
@@ -433,7 +477,7 @@ class DiscoverRunner:
             help='The test matching pattern. Defaults to test*.py.',
         )
         parser.add_argument(
-            '-k', '--keepdb', action='store_true',
+            '--keepdb', action='store_true',
             help='Preserves the test DB between runs.'
         )
         parser.add_argument(
@@ -461,6 +505,23 @@ class DiscoverRunner:
             '--exclude-tag', action='append', dest='exclude_tags',
             help='Do not run tests with the specified tag. Can be used multiple times.',
         )
+        parser.add_argument(
+            '--pdb', action='store_true',
+            help='Runs a debugger (pdb, or ipdb if installed) on error or failure.'
+        )
+        parser.add_argument(
+            '-b', '--buffer', action='store_true',
+            help='Discard output from passing tests.',
+        )
+        if PY37:
+            parser.add_argument(
+                '-k', action='append', dest='test_name_patterns',
+                help=(
+                    'Only run test methods and classes that match the pattern '
+                    'or substring. Can be used multiple times. Same as '
+                    'unittest -k option.'
+                ),
+            )
 
     def setup_test_environment(self, **kwargs):
         setup_test_environment(debug=self.debug_mode)
@@ -470,6 +531,7 @@ class DiscoverRunner:
         suite = self.test_suite()
         test_labels = test_labels or ['.']
         extra_tests = extra_tests or []
+        self.test_loader.testNamePatterns = self.test_name_patterns
 
         discover_kwargs = {}
         if self.pattern is not None:
@@ -555,19 +617,23 @@ class DiscoverRunner:
         )
 
     def get_resultclass(self):
-        return DebugSQLTextTestResult if self.debug_sql else None
+        if self.debug_sql:
+            return DebugSQLTextTestResult
+        elif self.pdb:
+            return PDBDebugResult
 
     def get_test_runner_kwargs(self):
         return {
             'failfast': self.failfast,
             'resultclass': self.get_resultclass(),
             'verbosity': self.verbosity,
+            'buffer': self.buffer,
         }
 
-    def run_checks(self):
+    def run_checks(self, databases):
         # Checks are run after database creation since some checks require
         # database access.
-        call_command('check', verbosity=self.verbosity)
+        call_command('check', verbosity=self.verbosity, databases=databases)
 
     def run_suite(self, suite, **kwargs):
         kwargs = self.get_test_runner_kwargs()
@@ -629,7 +695,7 @@ class DiscoverRunner:
         old_config = self.setup_databases(aliases=databases)
         run_failed = False
         try:
-            self.run_checks()
+            self.run_checks(databases)
             result = self.run_suite(suite)
         except Exception:
             run_failed = True

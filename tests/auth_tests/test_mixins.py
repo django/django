@@ -95,6 +95,20 @@ class AccessMixinTests(TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.url, '/accounts/login/?next=/rand')
 
+    def test_access_mixin_permission_denied_remote_login_url(self):
+        class AView(AlwaysFalseView):
+            login_url = 'https://www.remote.example.com/login'
+
+        view = AView.as_view()
+        request = self.factory.get('/rand')
+        request.user = AnonymousUser()
+        response = view(request)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(
+            response.url,
+            'https://www.remote.example.com/login?next=http%3A//testserver/rand',
+        )
+
     @mock.patch.object(models.User, 'is_authenticated', False)
     def test_stacked_mixins_not_logged_in(self):
         user = models.User.objects.create(username='joe', password='qwerty')
@@ -165,9 +179,8 @@ class UserPassesTestTests(SimpleTestCase):
         request = self.factory.get('/rand')
         request.user = AnonymousUser()
         view = AView.as_view()
-        with self.assertRaises(PermissionDenied) as cm:
+        with self.assertRaisesMessage(PermissionDenied, msg):
             view(request)
-        self.assertEqual(cm.exception.args[0], msg)
 
     def test_raise_exception_custom_message_function(self):
         msg = "You don't have access here"
@@ -181,9 +194,8 @@ class UserPassesTestTests(SimpleTestCase):
         request = self.factory.get('/rand')
         request.user = AnonymousUser()
         view = AView.as_view()
-        with self.assertRaises(PermissionDenied) as cm:
+        with self.assertRaisesMessage(PermissionDenied, msg):
             view(request)
-        self.assertEqual(cm.exception.args[0], msg)
 
     def test_user_passes(self):
         view = AlwaysTrueView.as_view()

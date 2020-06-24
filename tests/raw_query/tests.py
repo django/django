@@ -1,8 +1,8 @@
 from datetime import date
 from decimal import Decimal
 
+from django.core.exceptions import FieldDoesNotExist
 from django.db.models.query import RawQuerySet
-from django.db.models.query_utils import InvalidQuery
 from django.test import TestCase, skipUnlessDBFeature
 
 from .models import (
@@ -235,7 +235,8 @@ class RawQueryTests(TestCase):
 
     def test_missing_fields_without_PK(self):
         query = "SELECT first_name, dob FROM raw_query_author"
-        with self.assertRaisesMessage(InvalidQuery, 'Raw query must include the primary key'):
+        msg = 'Raw query must include the primary key'
+        with self.assertRaisesMessage(FieldDoesNotExist, msg):
             list(Author.objects.raw(query))
 
     def test_annotations(self):

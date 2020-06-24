@@ -3,20 +3,20 @@
 
 {% block breadcrumbs %}
 <div class="breadcrumbs">
-<a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
-&rsaquo; {% trans 'Documentation' %}
+<a href="{% url 'admin:index' %}">{% translate 'Home' %}</a>
+&rsaquo; {% translate 'Documentation' %}
 </div>
 {% endblock %}
-{% block title %}{% trans 'Please install docutils' %}{% endblock %}
+{% block title %}{% translate 'Please install docutils' %}{% endblock %}
 
 {% block content %}
 
-<h1>{% trans 'Documentation' %}</h1>
+<h1>{% translate 'Documentation' %}</h1>
 
 <div id="content-main">
-  <h3>{% blocktrans with "http://docutils.sf.net/" as link %}The admin documentation system requires Python's <a href="{{ link }}">docutils</a> library.{% endblocktrans %}</h3>
+  <h3>{% blocktranslate with "https://docutils.sourceforge.io/" as link %}The admin documentation system requires Python’s <a href="{{ link }}">docutils</a> library.{% endblocktranslate %}</h3>
 
-  <p>{% blocktrans with "http://docutils.sf.net/" as link %}Please ask your administrators to install <a href="{{ link }}">docutils</a>.{% endblocktrans %}</p>
+  <p>{% blocktranslate with "https://docutils.sourceforge.io/" as link %}Please ask your administrators to install <a href="{{ link }}">docutils</a>.{% endblocktranslate %}</p>
 </div>
 
 {% endblock %}
