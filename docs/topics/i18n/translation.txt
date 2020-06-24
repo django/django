@@ -1080,9 +1080,12 @@ interface within your Python code::
 The ``ngettext`` function provides an interface to pluralize words and
 phrases::
 
-    var object_count = 1 // or 0, or 2, or 3, ...
-    s = ngettext('literal for the singular case',
-            'literal for the plural case', object_count);
+    const objectCount = 1 // or 0, or 2, or 3, ...
+    const string = ngettext(
+        'literal for the singular case',
+        'literal for the plural case',
+        objectCount
+    );
 
 ``interpolate``
 ~~~~~~~~~~~~~~~
@@ -1096,23 +1099,29 @@ function supports both positional and named interpolation:
   corresponding ``fmt`` placeholders in the same order they appear.
   For example::
 
-    fmts = ngettext('There is %s object. Remaining: %s',
-            'There are %s objects. Remaining: %s', 11);
-    s = interpolate(fmts, [11, 20]);
-    // s is 'There are 11 objects. Remaining: 20'
+    const formats = ngettext(
+      'There is %s object. Remaining: %s',
+      'There are %s objects. Remaining: %s',
+      11
+    );
+    const string = interpolate(formats, [11, 20]);
+    // string is 'There are 11 objects. Remaining: 20'
 
 * Named interpolation: This mode is selected by passing the optional
   boolean ``named`` parameter as ``true``. ``obj`` contains a JavaScript
   object or associative array. For example::
 
-    d = {
-        count: 10,
-        total: 50
+    const data = {
+      count: 10,
+      total: 50
     };
 
-    fmts = ngettext('Total: %(total)s, there is %(count)s object',
-    'there are %(count)s of a total of %(total)s objects', d.count);
-    s = interpolate(fmts, d, true);
+    const formats = ngettext(
+        'Total: %(total)s, there is %(count)s object',
+        'there are %(count)s of a total of %(total)s objects',
+        data.count
+    );
+    const string = interpolate(formats, data, true);
 
 You shouldn't go over the top with string interpolation, though: this is still
 JavaScript, so the code has to make repeated regular-expression substitutions.
