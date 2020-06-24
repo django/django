@@ -620,10 +620,23 @@ class MediaURLStaticURLPrefixTest(SimpleTestCase):
 
 
 class FromEnvTest(SimpleTestCase):
+    env_var_name = "FROM_ENV__HAPPY_PATH"
+
+    def setUp(self):
+        self.original = os.environ.get(self.env_var_name, None)
+        os.environ[self.env_var_name] = "happy"
+
+    def tearDown(self):
+        # Teardown:
+        if self.original is not None:
+            os.environ[self.env_var_name] = self.original
+        else:
+            del os.environ[self.env_var_name]
+
     def test_boolable(self):
-        self.assertTrue(boolable("true"))
-        self.assertFalse(boolable("false"))
-        self.assertFalse(boolable("banana"))
+        self.assertIs(boolable("true"), True)
+        self.assertIs(boolable("false"), False)
+        self.assertIs(boolable("banana"), False)
 
     def test_from_env__no_default(self):
         with self.assertRaises(ImproperlyConfigured):
@@ -633,5 +646,4 @@ class FromEnvTest(SimpleTestCase):
         self.assertEqual(from_env("FROM_ENV__HAS_DEFAULT", default="default"), "default")
 
     def test_from_env__happy_path(self):
-        os.environ.setdefault("FROM_ENV__HAPPY_PATH", "happy")
-        self.assertEqual(from_env("FROM_ENV__HAPPY_PATH"), "happy")
+        self.assertEqual(from_env(self.env_var_name), "happy")

@@ -39,7 +39,7 @@ def from_env(name, default=NoDefaultValue, kind=str):
     try:
         val = os.environ[name]
     except KeyError:
-        if default == NoDefaultValue:
+        if default is NoDefaultValue:
             raise ImproperlyConfigured("Missing environment variable {}.".format(name))
         val = default
     val = kind(val)
