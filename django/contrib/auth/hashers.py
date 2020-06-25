@@ -3,6 +3,7 @@ import binascii
 import functools
 import hashlib
 import importlib
+import math
 import warnings
 
 from django.conf import settings
@@ -12,6 +13,7 @@ from django.dispatch import receiver
 from django.utils.crypto import (
     constant_time_compare, get_random_string, pbkdf2,
 )
+from django.utils.functional import cached_property
 from django.utils.module_loading import import_string
 from django.utils.translation import gettext_noop as _
 
@@ -172,6 +174,14 @@ class BasePasswordHasher:
     """
     algorithm = None
     library = None
+    salt_entropy = 71
+
+    @cached_property
+    def char_count(self):
+        # A string of length:
+        # N / log_2(26+26+10)
+        # provides N bits of entropy.
+        return math.ceil(self.salt_entropy / math.log(62, 2))
 
     def _load_library(self):
         if self.library is not None:
@@ -190,8 +200,8 @@ class BasePasswordHasher:
 
     def salt(self):
         """Generate a cryptographically secure nonce salt in ASCII."""
-        # 12 returns a 71-bit value, log_2((26+26+10)^12) =~ 71 bits
-        return get_random_string(12)
+        # Salt hash with entropy of at least salt_entropy bits
+        return get_random_string(self.char_count)
 
     def verify(self, password, encoded):
         """Check if the given password is correct."""
