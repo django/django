@@ -42,7 +42,7 @@
 }
 
 .login .form-row label {
-    padding-right: 0.5em;
+    display: block;
     line-height: 2em;
     clear: both;
 }
