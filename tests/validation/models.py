@@ -74,8 +74,17 @@ class CustomMessagesModel(models.Model):
     )
 
 
+class AuthorManager(models.Manager):
+    def get_queryset(self):
+        qs = super().get_queryset()
+        return qs.filter(archived=False)
+
+
 class Author(models.Model):
     name = models.CharField(max_length=100)
+    archived = models.BooleanField(default=False)
+
+    objects = AuthorManager()
 
 
 class Article(models.Model):
