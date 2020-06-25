@@ -74,6 +74,12 @@ class TestUtilsHashPass(SimpleTestCase):
         self.assertTrue(is_password_usable(blank_encoded))
         self.assertTrue(check_password('', blank_encoded))
         self.assertFalse(check_password(' ', blank_encoded))
+        # Salt entropy check.
+        hasher = get_hasher('pbkdf2_sha256')
+        encoded_weak_salt = make_password('lètmein', 'iodizedsalt', 'pbkdf2_sha256')
+        encoded_strong_salt = make_password('lètmein', hasher.salt(), 'pbkdf2_sha256')
+        self.assertIs(hasher.must_update(encoded_weak_salt), True)
+        self.assertIs(hasher.must_update(encoded_strong_salt), False)
 
     @override_settings(PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'])
     def test_sha1(self):
@@ -89,6 +95,12 @@ class TestUtilsHashPass(SimpleTestCase):
         self.assertTrue(is_password_usable(blank_encoded))
         self.assertTrue(check_password('', blank_encoded))
         self.assertFalse(check_password(' ', blank_encoded))
+        # Salt entropy check.
+        hasher = get_hasher('sha1')
+        encoded_weak_salt = make_password('lètmein', 'iodizedsalt', 'sha1')
+        encoded_strong_salt = make_password('lètmein', hasher.salt(), 'sha1')
+        self.assertIs(hasher.must_update(encoded_weak_salt), True)
+        self.assertIs(hasher.must_update(encoded_strong_salt), False)
 
     @override_settings(PASSWORD_HASHERS=['django.contrib.auth.hashers.MD5PasswordHasher'])
     def test_md5(self):
@@ -104,6 +116,12 @@ class TestUtilsHashPass(SimpleTestCase):
         self.assertTrue(is_password_usable(blank_encoded))
         self.assertTrue(check_password('', blank_encoded))
         self.assertFalse(check_password(' ', blank_encoded))
+        # Salt entropy check.
+        hasher = get_hasher('md5')
+        encoded_weak_salt = make_password('lètmein', 'iodizedsalt', 'md5')
+        encoded_strong_salt = make_password('lètmein', hasher.salt(), 'md5')
+        self.assertIs(hasher.must_update(encoded_weak_salt), True)
+        self.assertIs(hasher.must_update(encoded_strong_salt), False)
 
     @override_settings(PASSWORD_HASHERS=['django.contrib.auth.hashers.UnsaltedMD5PasswordHasher'])
     def test_unsalted_md5(self):
@@ -537,6 +555,12 @@ class TestUtilsHashPassArgon2(SimpleTestCase):
         )
         self.assertIs(check_password('secret', encoded), True)
         self.assertIs(check_password('wrong', encoded), False)
+        # Salt entropy check.
+        hasher = get_hasher('argon2')
+        encoded_weak_salt = make_password('lètmein', 'iodizedsalt', 'argon2')
+        encoded_strong_salt = make_password('lètmein', hasher.salt(), 'argon2')
+        self.assertIs(hasher.must_update(encoded_weak_salt), True)
+        self.assertIs(hasher.must_update(encoded_strong_salt), False)
 
     def test_argon2_decode(self):
         salt = 'abcdefghijk'

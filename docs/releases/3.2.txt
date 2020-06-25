@@ -212,6 +212,9 @@ Minor features
   constrained environments. If this is the case, the existing hasher can be
   subclassed to override the defaults.
 
+* The default salt entropy for the Argon2, MD5, PBKDF2, SHA-1 password hashers
+  is increased from 71 to 128 bits.
+
 :mod:`django.contrib.contenttypes`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
