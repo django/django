@@ -349,6 +349,11 @@ Miscellaneous
   (``USE_L10N = True``). After upgrading to Django 3.2 in such configurations,
   the first request to any previously cached value will be a cache miss.
 
+* ``ForeignKey.validate()`` now uses
+  :attr:`~django.db.models.Model._base_manager` rather than
+  :attr:`~django.db.models.Model._default_manager` to check that related
+  instances exist.
+
 .. _deprecated-features-3.2:
 
 Features deprecated in 3.2
