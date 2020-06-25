@@ -4460,6 +4460,17 @@ class SeleniumTests(AdminSeleniumTestCase):
         self.superuser = User.objects.create_superuser(username='super', password='secret', email='super@example.com')
         self.p1 = PrePopulatedPost.objects.create(title='A Long Title', published=True, slug='a-long-title')
 
+    def test_login_button_centered(self):
+        self.selenium.get(self.live_server_url + reverse('admin:login'))
+        button = self.selenium.find_element_by_css_selector('.submit-row input')
+        offset_left = button.get_property('offsetLeft')
+        offset_right = (
+            button.get_property('offsetParent').get_property('offsetWidth') -
+            (offset_left + button.get_property('offsetWidth'))
+        )
+        # Use assertAlmostEqual to avoid pixel rounding errors.
+        self.assertAlmostEqual(offset_left, offset_right, delta=3)
+
     def test_prepopulated_fields(self):
         """
         The JavaScript-automated prepopulated fields work with the main form
