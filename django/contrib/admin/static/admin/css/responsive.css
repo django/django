@@ -897,9 +897,7 @@ input[type="submit"], button {
     }
 
     .login .form-row label {
-        display: block;
         margin: 0 0 5px;
-        padding: 0;
         line-height: 1.2;
     }
 
