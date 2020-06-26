@@ -136,6 +136,10 @@ By default constraints are not deferred. A deferred constraint will not be
 enforced until the end of the transaction. An immediate constraint will be
 enforced immediately after every command.
 
+Note that only constraints can be deferred and thus can not be combined with
+options which require the usage of an explicit unique index, like
+:attr:`~UniqueConstraint.condition` and :attr:`~UniqueConstraint.include`.
+
 .. admonition:: MySQL, MariaDB, and SQLite.
 
     Deferrable unique constraints are ignored on MySQL, MariaDB, and SQLite as

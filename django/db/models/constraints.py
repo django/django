@@ -95,6 +95,14 @@ class UniqueConstraint(BaseConstraint):
             raise ValueError(
                 'UniqueConstraint with conditions cannot be deferred.'
             )
+        if include and deferrable:
+            raise ValueError(
+                'UniqueConstraint with include fields cannot be deferred.'
+            )
+        if opclasses and deferrable:
+            raise ValueError(
+                'UniqueConstraint with opclasses cannot be deferred.'
+            )
         if not isinstance(deferrable, (type(None), Deferrable)):
             raise ValueError(
                 'UniqueConstraint.deferrable must be a Deferrable instance.'
