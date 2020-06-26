@@ -36,31 +36,23 @@
 
 .login .form-row {
     padding: 4px 0;
-    float: left;
-    width: 100%;
-    border-bottom: none;
 }
 
 .login .form-row label {
     display: block;
     line-height: 2em;
-    clear: both;
 }
 
 .login .form-row #id_username, .login .form-row #id_password {
-    clear: both;
     padding: 8px;
     width: 100%;
     box-sizing: border-box;
 }
 
 .login .submit-row {
-    clear: both;
-    padding: 1em 0 0 9.4em;
+    padding: 1em 0 0 0;
     margin: 0;
-    border: none;
-    background: none;
-    text-align: left;
+    text-align: center;
 }
 
 .login .password-reset-link {
