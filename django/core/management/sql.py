@@ -14,6 +14,7 @@ def sql_flush(style, connection, reset_sequences=True, allow_cascade=False):
         allow_cascade=allow_cascade,
     )
 
+
 def sql_refresh_sequences(style, connection, models):
     """
     Update sequences to match the maximum values of the corresponding
@@ -25,25 +26,6 @@ def sql_refresh_sequences(style, connection, models):
             sequences.extend(connection.introspection.sequences_for_model(cursor, model))
     return connection.ops.sequence_refresh_sql(style, sequences)
 
-def sql_sequence_reset(style, connection, reset_sequences=True, allow_cascade=False):
-    """
-    Return a list of the SQL statements used to flush the database.
-    """
-    tables = connection.introspection.django_table_names(only_existing=True, include_views=False)
-    return connection.ops.sql_flush(
-        style,
-        tables,
-        reset_sequences=reset_sequences,
-        allow_cascade=allow_cascade,
-    )
-    if app_config.models_module is None:
-        return
-    connection = connections[options['database']]
-    models = app_config.get_models(include_auto_created=True)
-    statements = connection.ops.sequence_reset_sql(self.style, models)
-    if not statements and options['verbosity'] >= 1:
-        self.stderr.write('No sequences found.')
-    return '\n'.join(statements)
 
 def emit_pre_migrate_signal(verbosity, interactive, db, **kwargs):
     # Emit the pre_migrate signal for every application.

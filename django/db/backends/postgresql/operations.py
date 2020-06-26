@@ -160,8 +160,8 @@ class DatabaseOperations(BaseDatabaseOperations):
 
     def sequence_reset_sql(self, style, model_list):
         # Resets the sequences related to the given model_list to max(pk)
-        # Deprecated in favour of sequence_refresh_sql to avoid leaking 
-        # `db.models` abstraction to the `db.backends`, also to 
+        # Deprecated in favour of sequence_refresh_sql to avoid leaking
+        # `db.models` abstraction to the `db.backends`, also to
         # avoid ambiguity with sequence_reset_by_name_sql which resets to 0
         from django.db import models
         output = []
@@ -190,10 +190,9 @@ class DatabaseOperations(BaseDatabaseOperations):
                     )
                     break  # Only one AutoField is allowed per model, so don't bother continuing.
         return output
-    
+
     def sequence_refresh_sql(self, style, sequences):
         # Resets the sequences to max(pk)
-        from django.db import models
         output = []
         qn = self.quote_name
         for sequence_info in sequences:
