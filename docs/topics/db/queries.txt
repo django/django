@@ -9,6 +9,8 @@ automatically gives you a database-abstraction API that lets you create,
 retrieve, update and delete objects. This document explains how to use this
 API. Refer to the :doc:`data model reference </ref/models/index>` for full
 details of all the various model lookup options.
+Refer to the :doc: `QuerySet API reference </ref/models/querysets>` for
+additional details of queryset filter options.
 
 Throughout this guide (and in the reference), we'll refer to the following
 models, which comprise a Weblog application:
