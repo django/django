@@ -178,10 +178,7 @@ class Template:
         annotated with contextual line information where it occurred in the
         template source.
         """
-        if self.engine.debug:
-            lexer = DebugLexer(self.source)
-        else:
-            lexer = Lexer(self.source)
+        laxer = DebugLexer(self.source) if self.engine.debug else Lexer(self.source)
 
         tokens = lexer.tokenize()
         parser = Parser(
