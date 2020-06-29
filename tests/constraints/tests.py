@@ -406,6 +406,26 @@ class UniqueConstraintTests(TestCase):
                 deferrable=models.Deferrable.DEFERRED,
             )
 
+    def test_deferrable_with_include(self):
+        message = 'UniqueConstraint with include fields cannot be deferred.'
+        with self.assertRaisesMessage(ValueError, message):
+            models.UniqueConstraint(
+                fields=['name'],
+                name='name_inc_color_color_unique',
+                include=['color'],
+                deferrable=models.Deferrable.DEFERRED,
+            )
+
+    def test_deferrable_with_opclasses(self):
+        message = 'UniqueConstraint with opclasses cannot be deferred.'
+        with self.assertRaisesMessage(ValueError, message):
+            models.UniqueConstraint(
+                fields=['name'],
+                name='name_text_pattern_ops_unique',
+                opclasses=['text_pattern_ops'],
+                deferrable=models.Deferrable.DEFERRED,
+            )
+
     def test_invalid_defer_argument(self):
         message = 'UniqueConstraint.deferrable must be a Deferrable instance.'
         with self.assertRaisesMessage(ValueError, message):
