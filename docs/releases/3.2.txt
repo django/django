@@ -494,6 +494,10 @@ Miscellaneous
   instead of :exc:`~django.core.exceptions.SuspiciousOperation` when a session
   is destroyed in a concurrent request.
 
+* The :class:`django.db.models.Field` equality operator now correctly
+  distinguishes inherited field instances across models. Additionally, the
+  ordering of such fields is now defined.
+
 .. _deprecated-features-3.2:
 
 Features deprecated in 3.2
