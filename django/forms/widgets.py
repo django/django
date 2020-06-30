@@ -310,6 +310,11 @@ class EmailInput(Input):
     template_name = 'django/forms/widgets/email.html'
 
 
+class TelInput(Input):
+    input_type = 'tel'
+    template_name = 'django/forms/widgets/tel.html'
+
+
 class URLInput(Input):
     input_type = 'url'
     template_name = 'django/forms/widgets/url.html'
