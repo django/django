@@ -8,7 +8,7 @@ from django.utils.functional import lazy
 
 from .models import (
     Bar, Choiceful, Foo, RenamedField, VerboseNameField, Whiz, WhizDelayed,
-    WhizIter, WhizIterEmpty,
+    WhizIter, WhizIterEmpty, AbstractPersonWithHeight, PersonWithHeight,
 )
 
 
@@ -101,6 +101,13 @@ class BasicFieldTests(SimpleTestCase):
         """deconstruct() uses __qualname__ for nested class support."""
         name, path, args, kwargs = Nested.Field().deconstruct()
         self.assertEqual(path, 'model_fields.tests.Nested.Field')
+
+    def test_field_eq_considers_model(self):
+        """Field instances from abstract models compare different."""
+        self.assertNotEqual(
+            AbstractPersonWithHeight._meta.get_field('mugshot_height'),
+            PersonWithHeight._meta.get_field('mugshot_height'),
+        )
 
 
 class ChoicesTests(SimpleTestCase):
