@@ -6,28 +6,47 @@ from django.db import models
 from django.db.backends.base.introspection import (
     BaseDatabaseIntrospection, FieldInfo as BaseFieldInfo, TableInfo,
 )
+from django.utils.functional import cached_property
 
 FieldInfo = namedtuple('FieldInfo', BaseFieldInfo._fields + ('is_autofield', 'is_json'))
 
 
 class DatabaseIntrospection(BaseDatabaseIntrospection):
-    # Maps type objects to Django Field types.
-    data_types_reverse = {
-        cx_Oracle.BLOB: 'BinaryField',
-        cx_Oracle.CLOB: 'TextField',
-        cx_Oracle.DATETIME: 'DateField',
-        cx_Oracle.FIXED_CHAR: 'CharField',
-        cx_Oracle.FIXED_NCHAR: 'CharField',
-        cx_Oracle.INTERVAL: 'DurationField',
-        cx_Oracle.NATIVE_FLOAT: 'FloatField',
-        cx_Oracle.NCHAR: 'CharField',
-        cx_Oracle.NCLOB: 'TextField',
-        cx_Oracle.NUMBER: 'DecimalField',
-        cx_Oracle.STRING: 'CharField',
-        cx_Oracle.TIMESTAMP: 'DateTimeField',
-    }
-
     cache_bust_counter = 1
+
+    # Maps type objects to Django Field types.
+    @cached_property
+    def data_types_reverse(self):
+        if self.connection.cx_oracle_version < (8,):
+            return {
+                cx_Oracle.BLOB: 'BinaryField',
+                cx_Oracle.CLOB: 'TextField',
+                cx_Oracle.DATETIME: 'DateField',
+                cx_Oracle.FIXED_CHAR: 'CharField',
+                cx_Oracle.FIXED_NCHAR: 'CharField',
+                cx_Oracle.INTERVAL: 'DurationField',
+                cx_Oracle.NATIVE_FLOAT: 'FloatField',
+                cx_Oracle.NCHAR: 'CharField',
+                cx_Oracle.NCLOB: 'TextField',
+                cx_Oracle.NUMBER: 'DecimalField',
+                cx_Oracle.STRING: 'CharField',
+                cx_Oracle.TIMESTAMP: 'DateTimeField',
+            }
+        else:
+            return {
+                cx_Oracle.DB_TYPE_DATE: 'DateField',
+                cx_Oracle.DB_TYPE_BINARY_DOUBLE: 'FloatField',
+                cx_Oracle.DB_TYPE_BLOB: 'BinaryField',
+                cx_Oracle.DB_TYPE_CHAR: 'CharField',
+                cx_Oracle.DB_TYPE_CLOB: 'TextField',
+                cx_Oracle.DB_TYPE_INTERVAL_DS: 'DurationField',
+                cx_Oracle.DB_TYPE_NCHAR: 'CharField',
+                cx_Oracle.DB_TYPE_NCLOB: 'TextField',
+                cx_Oracle.DB_TYPE_NVARCHAR: 'CharField',
+                cx_Oracle.DB_TYPE_NUMBER: 'DecimalField',
+                cx_Oracle.DB_TYPE_TIMESTAMP: 'DateTimeField',
+                cx_Oracle.DB_TYPE_VARCHAR: 'CharField',
+            }
 
     def get_field_type(self, data_type, description):
         if data_type == cx_Oracle.NUMBER:
