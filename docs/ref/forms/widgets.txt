@@ -530,6 +530,15 @@ These widgets make use of the HTML elements ``input`` and ``textarea``.
     * ``template_name``: ``'django/forms/widgets/email.html'``
     * Renders as: ``<input type="email" ...>``
 
+``TelInput``
+~~~~~~~~~~~~~~
+
+.. class:: TelInput
+
+    * ``input_type``: ``'tel'``
+    * ``template_name``: ``'django/forms/widgets/tel.html'``
+    * Renders as: ``<input type="tel" ...>``
+
 ``URLInput``
 ~~~~~~~~~~~~
 
