@@ -517,9 +517,9 @@ class Field(RegisterLookupMixin):
         # Needed for @total_ordering
         if isinstance(other, Field):
             return (
-                self.creation_counter == other.creation_counter
-                and hasattr(self, 'model') == hasattr(other, 'model')
-                and getattr(self, 'model', None) == getattr(other, 'model', None)
+                self.creation_counter == other.creation_counter and
+                hasattr(self, 'model') == hasattr(other, 'model') and
+                getattr(self, 'model', None) == getattr(other, 'model', None)
             )
         return NotImplemented
 

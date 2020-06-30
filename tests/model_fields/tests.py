@@ -7,8 +7,8 @@ from django.test import SimpleTestCase, TestCase
 from django.utils.functional import lazy
 
 from .models import (
-    Bar, Choiceful, Foo, RenamedField, VerboseNameField, Whiz, WhizDelayed,
-    WhizIter, WhizIterEmpty, AbstractPersonWithHeight, PersonWithHeight,
+    AbstractPersonWithHeight, Bar, Choiceful, Foo, PersonWithHeight,
+    RenamedField, VerboseNameField, Whiz, WhizDelayed, WhizIter, WhizIterEmpty,
 )
 
 
