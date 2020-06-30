@@ -442,20 +442,20 @@ class CombinedExpression(SQLiteNumericMixin, Expression):
 
     def as_sql(self, compiler, connection):
         try:
-            lhs_output = self.lhs.output_field
+            lhs_type = self.lhs.output_field.get_internal_type()
         except FieldError:
-            lhs_output = None
+            lhs_type = None
         try:
-            rhs_output = self.rhs.output_field
+            rhs_type = self.rhs.output_field.get_internal_type()
         except FieldError:
-            rhs_output = None
-        if (not connection.features.has_native_duration_field and
-                ((lhs_output and lhs_output.get_internal_type() == 'DurationField') or
-                 (rhs_output and rhs_output.get_internal_type() == 'DurationField'))):
+            rhs_type = None
+        if (
+            not connection.features.has_native_duration_field and
+            'DurationField' in {lhs_type, rhs_type}
+        ):
             return DurationExpression(self.lhs, self.connector, self.rhs).as_sql(compiler, connection)
-        if (lhs_output and rhs_output and self.connector == self.SUB and
-            lhs_output.get_internal_type() in {'DateField', 'DateTimeField', 'TimeField'} and
-                lhs_output.get_internal_type() == rhs_output.get_internal_type()):
+        datetime_fields = {'DateField', 'DateTimeField', 'TimeField'}
+        if self.connector == self.SUB and lhs_type in datetime_fields and lhs_type == rhs_type:
             return TemporalSubtraction(self.lhs, self.rhs).as_sql(compiler, connection)
         expressions = []
         expression_params = []
