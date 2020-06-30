@@ -527,12 +527,13 @@ class Field(RegisterLookupMixin):
         # This is needed because bisect does not take a comparison function.
         # Order by creation_counter first for backward compatibility.
         if isinstance(other, Field):
-            if self.creation_counter != other.creation_counter:
+            if (
+                self.creation_counter != other.creation_counter or
+                not hasattr(self, 'model') and not hasattr(other, 'model')
+            ):
                 return self.creation_counter < other.creation_counter
             elif hasattr(self, 'model') != hasattr(other, 'model'):
                 return not hasattr(self, 'model')  # Order no-model fields first
-            elif not hasattr(self, 'model') and not hasattr(other, 'model'):
-                return self.creation_counter < other.creation_counter
             else:
                 # models are not directly orderable.
                 return (
