@@ -179,7 +179,7 @@ For all other fields in this model, the field's machine-readable name will
 suffice as its human-readable name.
 
 Some :class:`~django.db.models.Field` classes have required arguments.
-:class:`~django.db.models.CharField`, for example, requires that you give it a
+For example, :class:`~django.db.models.CharField`, requires that you give it a
 :attr:`~django.db.models.CharField.max_length`. That's used not only in the
 database schema, but in validation, as we'll soon see.
 
