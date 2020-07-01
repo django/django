@@ -223,9 +223,9 @@ Models
 * The new :attr:`.UniqueConstraint.opclasses` attribute allows setting
   PostgreSQL operator classes.
 
-* Inherited fields compare unequal when accessed from different models.
-  Field ordering now defines the order between inherited fields accessed
-  on different models.
+* Inherited model field instances, such as those obtained by
+  ``Model._meta.get_fields``, compare unequal when referencing different
+  models. The ordering of these fields is now defined.
 
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
