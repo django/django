@@ -2,7 +2,7 @@
 Django 2.2.14 release notes
 ===========================
 
-*Expected July 1, 2020*
+*July 1, 2020*
 
 Django 2.2.14 fixes a bug in 2.2.13.
 
