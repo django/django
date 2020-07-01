@@ -541,8 +541,8 @@ Converting Python objects to query values
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Since using a database requires conversion in both ways, if you override
-:meth:`~Field.to_python` you also have to override :meth:`~Field.get_prep_value`
-to convert Python objects back to query values.
+:meth:`~Field.from_db_value` you also have to override
+:meth:`~Field.get_prep_value` to convert Python objects back to query values.
 
 For example::
 
