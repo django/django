@@ -2,7 +2,7 @@
 Django 3.0.8 release notes
 ==========================
 
-*Expected July 1, 2020*
+*July 1, 2020*
 
 Django 3.0.8 fixes several bugs in 3.0.7.
 
