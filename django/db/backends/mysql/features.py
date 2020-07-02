@@ -41,7 +41,6 @@ class DatabaseFeatures(BaseDatabaseFeatures):
             SET V_I = P_I;
         END;
     """
-    db_functions_convert_bytes_to_str = True
     # Neither MySQL nor MariaDB support partial indexes.
     supports_partial_indexes = False
     supports_order_by_nulls_modifier = False
