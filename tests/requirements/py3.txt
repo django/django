@@ -7,7 +7,7 @@ jinja2 >= 2.9.2
 numpy
 Pillow >= 6.2.0
 # pylibmc/libmemcached can't be built on Windows.
-pylibmc; sys.platform != 'win32'
+pylibmc >= 1.5.2; sys.platform != 'win32'
 python-memcached >= 1.59
 pytz
 pywatchman; sys.platform != 'win32'

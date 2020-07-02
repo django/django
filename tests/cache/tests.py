@@ -1327,15 +1327,7 @@ class BaseMemcachedTests(BaseCacheTests):
         self.assertEqual(cache.get('small_value'), 'a')
 
         large_value = 'a' * (max_value_length + 1)
-        try:
-            cache.set('small_value', large_value)
-        except Exception:
-            # Some clients (e.g. pylibmc) raise when the value is too large,
-            # while others (e.g. python-memcached) intentionally return True
-            # indicating success. This test is primarily checking that the key
-            # was deleted, so the return/exception behavior for the set()
-            # itself is not important.
-            pass
+        cache.set('small_value', large_value)
         # small_value should be deleted, or set if configured to accept larger values
         value = cache.get('small_value')
         self.assertTrue(value is None or value == large_value)
