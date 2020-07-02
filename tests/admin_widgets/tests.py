@@ -590,11 +590,14 @@ class ForeignKeyRawIdWidgetTest(TestCase):
     def test_render_unsafe_limit_choices_to(self):
         rel = UnsafeLimitChoicesTo._meta.get_field('band').remote_field
         w = widgets.ForeignKeyRawIdWidget(rel, widget_admin_site)
+        parameters = w.url_parameters()
+        parameters['name'] = '%22%26%3E%3Cescapeme'
         self.assertHTMLEqual(
             w.render('test', None),
             '<input type="text" name="test" class="vForeignKeyRawIdAdminField">'
-            '<a href="/admin_widgets/band/?name=%22%26%3E%3Cescapeme&amp;_to_field=id" '
-            'class="related-lookup" id="lookup_id_test" title="Lookup"></a>'
+            '<a class="related-lookup" href="/admin_widgets/band/?%s" '
+            'id="lookup_id_test" title="Lookup"></a>'
+            % '&amp;'.join('%s=%s' % (k, v) for k, v in parameters.items())
         )
 
 
