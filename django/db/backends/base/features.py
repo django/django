@@ -253,9 +253,6 @@ class BaseDatabaseFeatures:
     # Does the backend support keyword parameters for cursor.callproc()?
     supports_callproc_kwargs = False
 
-    # Convert CharField results from bytes to str in database functions.
-    db_functions_convert_bytes_to_str = False
-
     # What formats does the backend EXPLAIN syntax support?
     supported_explain_formats = set()
 
