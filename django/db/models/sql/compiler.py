@@ -485,6 +485,49 @@ class SQLCompiler:
             params.extend(part)
         return result, params
 
+    def get_for_update_sql(self, with_limit_offset):
+        if self.query.select_for_update and self.connection.features.has_select_for_update:
+            if self.connection.get_autocommit():
+                raise TransactionManagementError(
+                    'select_for_update cannot be used outside of a transaction.'
+                )
+            if with_limit_offset and not self.connection.features.supports_select_for_update_with_limit:
+                raise NotSupportedError(
+                    'LIMIT/OFFSET is not supported with select_for_update on '
+                    'this database backend.'
+                )
+            nowait = self.query.select_for_update_nowait
+            skip_locked = self.query.select_for_update_skip_locked
+            of = self.query.select_for_update_of
+            no_key = self.query.select_for_no_key_update
+            # If it's a NOWAIT/SKIP LOCKED/OF/NO KEY query but the backend
+            # doesn't support it, raise NotSupportedError to prevent a possible
+            # deadlock.
+            if nowait and not self.connection.features.has_select_for_update_nowait:
+                raise NotSupportedError(
+                    'NOWAIT is not supported on this database backend.'
+                )
+            elif skip_locked and not self.connection.features.has_select_for_update_skip_locked:
+                raise NotSupportedError(
+                    'SKIP LOCKED is not supported on this database backend.'
+                )
+            elif of and not self.connection.features.has_select_for_update_of:
+                raise NotSupportedError(
+                    'FOR UPDATE OF is not supported on this database backend.'
+                )
+            elif no_key and not self.connection.features.has_select_for_no_key_update:
+                raise NotSupportedError(
+                    'FOR NO KEY UPDATE is not supported on this database '
+                    'backend.'
+                )
+            return self.connection.ops.for_update_sql(
+                nowait=nowait,
+                skip_locked=skip_locked,
+                of=self.get_select_for_update_of_arguments(),
+                no_key=no_key,
+            )
+        return None
+
     def as_sql(self, with_limits=True, with_col_aliases=False):
         """
         Create the SQL for this query. Return the SQL string and list of
@@ -537,40 +580,7 @@ class SQLCompiler:
                 result += [', '.join(out_cols), 'FROM', *from_]
                 params.extend(f_params)
 
-                if self.query.select_for_update and self.connection.features.has_select_for_update:
-                    if self.connection.get_autocommit():
-                        raise TransactionManagementError('select_for_update cannot be used outside of a transaction.')
-
-                    if with_limit_offset and not self.connection.features.supports_select_for_update_with_limit:
-                        raise NotSupportedError(
-                            'LIMIT/OFFSET is not supported with '
-                            'select_for_update on this database backend.'
-                        )
-                    nowait = self.query.select_for_update_nowait
-                    skip_locked = self.query.select_for_update_skip_locked
-                    of = self.query.select_for_update_of
-                    no_key = self.query.select_for_no_key_update
-                    # If it's a NOWAIT/SKIP LOCKED/OF/NO KEY query but the
-                    # backend doesn't support it, raise NotSupportedError to
-                    # prevent a possible deadlock.
-                    if nowait and not self.connection.features.has_select_for_update_nowait:
-                        raise NotSupportedError('NOWAIT is not supported on this database backend.')
-                    elif skip_locked and not self.connection.features.has_select_for_update_skip_locked:
-                        raise NotSupportedError('SKIP LOCKED is not supported on this database backend.')
-                    elif of and not self.connection.features.has_select_for_update_of:
-                        raise NotSupportedError('FOR UPDATE OF is not supported on this database backend.')
-                    elif no_key and not self.connection.features.has_select_for_no_key_update:
-                        raise NotSupportedError(
-                            'FOR NO KEY UPDATE is not supported on this '
-                            'database backend.'
-                        )
-                    for_update_part = self.connection.ops.for_update_sql(
-                        nowait=nowait,
-                        skip_locked=skip_locked,
-                        of=self.get_select_for_update_of_arguments(),
-                        no_key=no_key,
-                    )
-
+                for_update_part = self.get_for_update_sql(with_limit_offset)
                 if for_update_part and self.connection.features.for_update_after_from:
                     result.append(for_update_part)
 
