@@ -475,6 +475,14 @@ Miscellaneous
 * Providing an integer in the ``key`` argument of the :meth:`.cache.delete` or
   :meth:`.cache.get` now raises :exc:`ValueError`.
 
+* Plural equations for some languages are changed, because the latest versions
+  from Transifex are incorporated.
+
+  .. note::
+
+    The ability to handle ``.po`` files containing different plural equations
+    for the same language was added in Django 2.2.12.
+
 .. _deprecated-features-2.2:
 
 Features deprecated in 2.2
