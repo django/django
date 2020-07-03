@@ -4,6 +4,7 @@ from django.conf import settings
 from django.db.backends.base.operations import BaseDatabaseOperations
 from django.utils import timezone
 from django.utils.encoding import force_str
+from django.utils.functional import cached_property
 
 
 class DatabaseOperations(BaseDatabaseOperations):
@@ -32,6 +33,15 @@ class DatabaseOperations(BaseDatabaseOperations):
     }
     cast_char_field_without_max_length = 'char'
     explain_prefix = 'EXPLAIN'
+
+    @cached_property
+    def cast_templates(self):
+        templates = {
+            'FloatField': '(%(expressions)s + 0.0)',
+        }
+        if self.connection.mysql_is_mariadb:
+            templates['JSONField'] = "JSON_EXTRACT(%(expressions)s, '$')"
+        return templates
 
     def date_extract_sql(self, lookup_type, field_name):
         # https://dev.mysql.com/doc/mysql/en/date-and-time-functions.html

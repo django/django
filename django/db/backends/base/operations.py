@@ -40,6 +40,9 @@ class BaseDatabaseOperations:
     # name) to the data type to use for the Cast() function, if different from
     # DatabaseWrapper.data_types.
     cast_data_types = {}
+    # Like above, but some database backends may not support explicit CAST to
+    # certain fields and need specific templates for the Cast() function.
+    cast_templates = {}
     # CharField data type if the max_length argument isn't provided.
     cast_char_field_without_max_length = None
 

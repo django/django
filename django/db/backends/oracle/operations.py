@@ -68,6 +68,9 @@ END;
         'SmallAutoField': 'NUMBER(5)',
         'TextField': cast_char_field_without_max_length,
     }
+    cast_templates = {
+        'JSONField': "JSON_QUERY(%(expressions)s, '$')",
+    }
 
     def cache_key_culling_sql(self):
         return 'SELECT cache_key FROM %s ORDER BY cache_key OFFSET %%s ROWS FETCH FIRST 1 ROWS ONLY'

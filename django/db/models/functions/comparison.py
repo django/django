@@ -12,6 +12,7 @@ class Cast(Func):
 
     def as_sql(self, compiler, connection, **extra_context):
         extra_context['db_type'] = self.output_field.cast_db_type(connection)
+        extra_context['template'] = self.output_field.cast_template(connection) or extra_context.get('template')
         return super().as_sql(compiler, connection, **extra_context)
 
     def as_sqlite(self, compiler, connection, **extra_context):
@@ -28,29 +29,11 @@ class Cast(Func):
             return super().as_sql(compiler, connection, template=template, **extra_context)
         return self.as_sql(compiler, connection, **extra_context)
 
-    def as_mysql(self, compiler, connection, **extra_context):
-        template = None
-        output_type = self.output_field.get_internal_type()
-        # MySQL doesn't support explicit cast to float.
-        if output_type == 'FloatField':
-            template = '(%(expressions)s + 0.0)'
-        # MariaDB doesn't support explicit cast to JSON.
-        elif output_type == 'JSONField' and connection.mysql_is_mariadb:
-            template = "JSON_EXTRACT(%(expressions)s, '$')"
-        return self.as_sql(compiler, connection, template=template, **extra_context)
-
     def as_postgresql(self, compiler, connection, **extra_context):
         # CAST would be valid too, but the :: shortcut syntax is more readable.
         # 'expressions' is wrapped in parentheses in case it's a complex
         # expression.
         return self.as_sql(compiler, connection, template='(%(expressions)s)::%(db_type)s', **extra_context)
-
-    def as_oracle(self, compiler, connection, **extra_context):
-        if self.output_field.get_internal_type() == 'JSONField':
-            # Oracle doesn't support explicit cast to JSON.
-            template = "JSON_QUERY(%(expressions)s, '$')"
-            return super().as_sql(compiler, connection, template=template, **extra_context)
-        return self.as_sql(compiler, connection, **extra_context)
 
 
 class Coalesce(Func):

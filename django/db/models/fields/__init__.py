@@ -708,6 +708,9 @@ class Field(RegisterLookupMixin):
             return db_type % self.db_type_parameters(connection)
         return self.db_type(connection)
 
+    def cast_template(self, connection):
+        return connection.ops.cast_templates.get(self.get_internal_type())
+
     def db_parameters(self, connection):
         """
         Extension of db_type(), providing a range of different return values
