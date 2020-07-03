@@ -15,14 +15,14 @@ def sql_flush(style, connection, reset_sequences=True, allow_cascade=False):
     )
 
 
-def sql_refresh_sequences(style, connection, models):
+def sql_refresh_sequences(style, connection, models_list):
     """
     Update sequences to match the maximum values of the corresponding
     primary keys.
     """
     sequences = []
     with connection.cursor() as cursor:
-        for model in models:
+        for model in models_list:
             sequences.extend(connection.introspection.sequences_for_model(cursor, model))
     return connection.ops.sequence_refresh_sql(style, sequences)
 

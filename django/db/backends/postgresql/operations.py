@@ -1,7 +1,10 @@
+import warnings
+
 from psycopg2.extras import Inet
 
 from django.conf import settings
 from django.db.backends.base.operations import BaseDatabaseOperations
+from django.utils.deprecation import RemovedInDjango40Warning
 
 
 class DatabaseOperations(BaseDatabaseOperations):
@@ -159,10 +162,21 @@ class DatabaseOperations(BaseDatabaseOperations):
             return "TABLESPACE %s" % self.quote_name(tablespace)
 
     def sequence_reset_sql(self, style, model_list):
-        # Resets the sequences related to the given model_list to max(pk)
-        # Deprecated in favour of sequence_refresh_sql to avoid leaking
-        # `db.models` abstraction to the `db.backends`, also to
-        # avoid ambiguity with sequence_reset_by_name_sql which resets to 0
+        """
+            Return a list of the SQL statements required to reset sequences for
+            the given models to `max(pk)`.
+            Deprecated in favour of `core.management.sql.sql_refresh_sequences(style, connection, models)`
+            to avoid leaking `db.models` abstraction to the `db.backends` and to avoid ambiguity with
+            `sequence_reset_by_name_sql` which always resets to 1
+
+            The `style` argument is a Style object as returned by either
+            color_style() or no_style() in django.core.management.color.
+        """
+        warnings.warn(
+            'The connection.ops.sequence_reset_sql(style, model_list) method is deprecated in favor of '
+            'core.management.sql.sql_refresh_sequences(style, connection, models).',
+            RemovedInDjango40Warning,
+        )
         from django.db import models
         output = []
         qn = self.quote_name

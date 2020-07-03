@@ -5,6 +5,7 @@ Creates the default Site object.
 from django.apps import apps as global_apps
 from django.conf import settings
 from django.core.management.color import no_style
+from django.core.management.sql import sql_refresh_sequences
 from django.db import DEFAULT_DB_ALIAS, connections, router
 
 
@@ -29,7 +30,7 @@ def create_default_site(app_config, verbosity=2, interactive=True, using=DEFAULT
 
         # We set an explicit pk instead of relying on auto-incrementation,
         # so we need to reset the database sequence. See #17415.
-        sequence_sql = connections[using].ops.sequence_reset_sql(no_style(), [Site])
+        sequence_sql = sql_refresh_sequences(no_style(), connections[using], [Site])
         if sequence_sql:
             if verbosity >= 2:
                 print("Resetting sequence")

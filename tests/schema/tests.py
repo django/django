@@ -21,6 +21,7 @@ from django.test import (
 )
 from django.test.utils import CaptureQueriesContext, isolate_apps
 from django.utils import timezone
+from django.core.management.sql import sql_refresh_sequences
 
 from .fields import (
     CustomManyToManyField, InheritedManyToManyField, MediumBlobField,
@@ -1292,7 +1293,7 @@ class SchemaTests(TransactionTestCase):
 
         Author.objects.create(name='Foo', pk=1)
         with connection.cursor() as cursor:
-            sequence_reset_sqls = connection.ops.sequence_reset_sql(no_style(), [Author])
+            sequence_reset_sqls = sql_refresh_sequences(no_style(), connection, [Author])
             if sequence_reset_sqls:
                 cursor.execute(sequence_reset_sqls[0])
         # Fail on PostgreSQL if sequence is missing an owner.
@@ -1314,7 +1315,7 @@ class SchemaTests(TransactionTestCase):
 
         Author.objects.create(name='Foo', pk=1)
         with connection.cursor() as cursor:
-            sequence_reset_sqls = connection.ops.sequence_reset_sql(no_style(), [Author])
+            sequence_reset_sqls = sql_refresh_sequences(no_style(), connection, [Author])
             if sequence_reset_sqls:
                 cursor.execute(sequence_reset_sqls[0])
         # Fail on PostgreSQL if sequence is missing an owner.

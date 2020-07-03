@@ -14,6 +14,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.core.management.base import BaseCommand, CommandError
 from django.core.management.color import no_style
 from django.core.management.utils import parse_apps_and_model_labels
+from django.core.management.sql import sql_refresh_sequences
 from django.db import (
     DEFAULT_DB_ALIAS, DatabaseError, IntegrityError, connections, router,
     transaction,
@@ -136,7 +137,7 @@ class Command(BaseCommand):
         # If we found even one object in a fixture, we need to reset the
         # database sequences.
         if self.loaded_object_count > 0:
-            sequence_sql = connection.ops.sequence_reset_sql(no_style(), self.models)
+            sequence_sql = sql_refresh_sequences(no_style(), connection, self.models)
             if sequence_sql:
                 if self.verbosity >= 2:
                     self.stdout.write('Resetting sequences')
