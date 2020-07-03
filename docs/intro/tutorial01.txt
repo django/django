@@ -41,12 +41,6 @@ older versions of Django and install a newer one.
 Creating a project
 ==================
 
-If this is your first time using Django, you'll have to take care of some
-initial setup. Namely, you'll need to auto-generate some code that establishes a
-Django :term:`project` -- a collection of settings for an instance of Django,
-including database configuration, Django-specific options and
-application-specific settings.
-
 From the command line, ``cd`` into a directory where you'd like to store your
 code, then run the following command:
 
@@ -59,22 +53,8 @@ work, see :ref:`troubleshooting-django-admin`.
 
 .. note::
 
-    You'll need to avoid naming projects after built-in Python or Django
-    components. In particular, this means you should avoid using names like
-    ``django`` (which will conflict with Django itself) or ``test`` (which
-    conflicts with a built-in Python package).
-
-.. admonition:: Where should this code live?
-
-    If your background is in plain old PHP (with no use of modern frameworks),
-    you're probably used to putting code under the Web server's document root
-    (in a place such as ``/var/www``). With Django, you don't do that. It's
-    not a good idea to put any of this Python code within your Web server's
-    document root, because it risks the possibility that people may be able
-    to view your code over the Web. That's not good for security.
-
-    Put your code in some directory **outside** of the document root, such as
-    :file:`/home/mycode`.
+    Avoid naming projects after built-in Django or Python components like 
+    ``django`` itself, or ``test``, which is a built-in Python package.
 
 Let's look at what :djadmin:`startproject` created::
 
@@ -101,8 +81,8 @@ These files are:
   anything inside it (e.g. ``mysite.urls``).
 
 * :file:`mysite/__init__.py`: An empty file that tells Python that this
-  directory should be considered a Python package. If you're a Python beginner,
-  read :ref:`more about packages <tut-packages>` in the official Python docs.
+  directory should be considered a Python package. You can read 
+  :ref:`more about packages <tut-packages>` in the official Python docs.
 
 * :file:`mysite/settings.py`: Settings/configuration for this Django
   project.  :doc:`/topics/settings` will tell you all about how settings
@@ -121,8 +101,8 @@ These files are:
 The development server
 ======================
 
-Let's verify your Django project works. Change into the outer :file:`mysite` directory, if
-you haven't already, and run the following commands:
+To verify your Django project, change into the outer :file:`mysite` directory, and 
+run the following commands:
 
 .. console::
 
@@ -309,6 +289,9 @@ plug-and-play URLs. Since polls are in their own URLconf
 "/fun_polls/", or under "/content/polls/", or any other path root, and the
 app will still work.
 
+The path() function is used for routing URLs to the appropriate view functions within a Django application.
+For more details, read :doc:`Further reading of the path() function and its arguments </intro/path-func-arguments>`.
+
 .. admonition:: When to use :func:`~django.urls.include()`
 
     You should always use ``include()`` when you include other URL patterns.
@@ -329,45 +312,6 @@ text "*Hello, world. You're at the polls index.*", which you defined in the
 
     If you get an error page here, check that you're going to
     http://localhost:8000/polls/ and not http://localhost:8000/.
-
-The :func:`~django.urls.path` function is passed four arguments, two required:
-``route`` and ``view``, and two optional: ``kwargs``, and ``name``.
-At this point, it's worth reviewing what these arguments are for.
-
-:func:`~django.urls.path` argument: ``route``
----------------------------------------------
-
-``route`` is a string that contains a URL pattern. When processing a request,
-Django starts at the first pattern in ``urlpatterns`` and makes its way down
-the list, comparing the requested URL against each pattern until it finds one
-that matches.
-
-Patterns don't search GET and POST parameters, or the domain name. For example,
-in a request to ``https://www.example.com/myapp/``, the URLconf will look for
-``myapp/``. In a request to ``https://www.example.com/myapp/?page=3``, the
-URLconf will also look for ``myapp/``.
-
-:func:`~django.urls.path` argument: ``view``
---------------------------------------------
-
-When Django finds a matching pattern, it calls the specified view function with
-an :class:`~django.http.HttpRequest` object as the first argument and any
-"captured" values from the route as keyword arguments. We'll give an example
-of this in a bit.
-
-:func:`~django.urls.path` argument: ``kwargs``
-----------------------------------------------
-
-Arbitrary keyword arguments can be passed in a dictionary to the target view. We
-aren't going to use this feature of Django in the tutorial.
-
-:func:`~django.urls.path` argument: ``name``
---------------------------------------------
-
-Naming your URL lets you refer to it unambiguously from elsewhere in Django,
-especially from within templates. This powerful feature allows you to make
-global changes to the URL patterns of your project while only touching a single
-file.
 
 When you're comfortable with the basic request and response flow, read
 :doc:`part 2 of this tutorial </intro/tutorial02>` to start working with the

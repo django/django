@@ -20,6 +20,7 @@ place: read this material to quickly get up and running.
    reusable-apps
    whatsnext
    contributing
+   path-func-arguments
 
 .. seealso::
 
