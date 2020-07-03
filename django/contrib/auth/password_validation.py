@@ -72,6 +72,7 @@ def password_validators_help_texts(password_validators=None):
         password_validators = get_default_password_validators()
     for validator in password_validators:
         help_texts.append(validator.get_help_text())
+    help_text.append('Your password can’t be entirely alphabetic')
     return help_texts
 
 
