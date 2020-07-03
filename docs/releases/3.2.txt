@@ -298,7 +298,9 @@ URLs
 Utilities
 ~~~~~~~~~
 
-* ...
+* The new ``depth`` parameter of ``django.utils.timesince.timesince()`` and
+  ``django.utils.timesince.timeuntil()`` functions allows specifying the number
+  of adjacent time units to return.
 
 Validators
 ~~~~~~~~~~
