@@ -1651,10 +1651,11 @@ your test suite.
 
     Asserts that a queryset ``qs`` returns a particular list of values ``values``.
 
-    The comparison of the contents of ``qs`` and ``values`` is performed using
-    the function ``transform``; by default, this means that the ``repr()`` of
-    each value is compared. Any other callable can be used if ``repr()`` doesn't
-    provide a unique or helpful comparison.
+    The comparison of the contents of ``qs`` and ``values`` is performed by
+    applying ``transform`` to ``qs``. By default, this means that the
+    ``repr()`` of each value in ``qs`` is compared to the ``values``. Any other
+    callable can be used if ``repr()`` doesn't provide a unique or helpful
+    comparison.
 
     By default, the comparison is also ordering dependent. If ``qs`` doesn't
     provide an implicit ordering, you can set the ``ordered`` parameter to
