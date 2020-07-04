@@ -89,7 +89,8 @@ To specify that a field is *not* required, pass ``required=False`` to the
 
 If a ``Field`` has ``required=False`` and you pass ``clean()`` an empty value,
 then ``clean()`` will return a *normalized* empty value rather than raising
-``ValidationError``. For ``CharField``, this will be an empty string. For other
+``ValidationError``. For ``CharField``, this will return
+:attr:`~CharField.empty_value` which defaults to an empty string. For other
 ``Field`` classes, it might be ``None``. (This varies from field to field.)
 
 Widgets of required form fields have the ``required`` HTML attribute. Set the
@@ -582,16 +583,15 @@ For each field, we describe the default widget used if you don't specify
 .. class:: EmailField(**kwargs)
 
     * Default widget: :class:`EmailInput`
-    * Empty value: ``''`` (an empty string)
+    * Empty value: Whatever you've given as ``empty_value``.
     * Normalizes to: A string.
     * Uses :class:`~django.core.validators.EmailValidator` to validate that
       the given value is a valid email address, using a moderately complex
       regular expression.
     * Error message keys: ``required``, ``invalid``
 
-    Has two optional arguments for validation, ``max_length`` and ``min_length``.
-    If provided, these arguments ensure that the string is at most or at least the
-    given length.
+    Has three optional arguments ``max_length``, ``min_length``, and
+    ``empty_value`` which work just as they do for :class:`CharField`.
 
 ``FileField``
 -------------
@@ -919,7 +919,7 @@ For each field, we describe the default widget used if you don't specify
 .. class:: RegexField(**kwargs)
 
     * Default widget: :class:`TextInput`
-    * Empty value: ``''`` (an empty string)
+    * Empty value: Whatever you've given as ``empty_value``.
     * Normalizes to: A string.
     * Uses :class:`~django.core.validators.RegexValidator` to validate that
       the given value matches a certain regular expression.
@@ -932,8 +932,8 @@ For each field, we describe the default widget used if you don't specify
         A regular expression specified either as a string or a compiled regular
         expression object.
 
-    Also takes ``max_length``, ``min_length``, and ``strip``, which work just
-    as they do for :class:`CharField`.
+    Also takes ``max_length``, ``min_length``, ``strip``, and ``empty_value``
+    which work just as they do for :class:`CharField`.
 
     .. attribute:: strip
 
@@ -946,7 +946,7 @@ For each field, we describe the default widget used if you don't specify
 .. class:: SlugField(**kwargs)
 
    * Default widget: :class:`TextInput`
-   * Empty value: ``''`` (an empty string)
+   * Empty value: Whatever you've given as :attr:`empty_value`.
    * Normalizes to: A string.
    * Uses :class:`~django.core.validators.validate_slug` or
      :class:`~django.core.validators.validate_unicode_slug` to validate that
@@ -956,12 +956,16 @@ For each field, we describe the default widget used if you don't specify
    This field is intended for use in representing a model
    :class:`~django.db.models.SlugField` in forms.
 
-   Takes an optional parameter:
+   Takes two optional parameters:
 
    .. attribute:: allow_unicode
 
        A boolean instructing the field to accept Unicode letters in addition
        to ASCII letters. Defaults to ``False``.
+
+   .. attribute:: empty_value
+
+       The value to use to represent "empty". Defaults to an empty string.
 
 ``TimeField``
 -------------
@@ -994,19 +998,14 @@ For each field, we describe the default widget used if you don't specify
 .. class:: URLField(**kwargs)
 
     * Default widget: :class:`URLInput`
-    * Empty value: ``''`` (an empty string)
+    * Empty value: Whatever you've given as ``empty_value``.
     * Normalizes to: A string.
     * Uses :class:`~django.core.validators.URLValidator` to validate that the
       given value is a valid URL.
     * Error message keys: ``required``, ``invalid``
 
-    Takes the following optional arguments:
-
-    .. attribute:: max_length
-    .. attribute:: min_length
-
-        These are the same as ``CharField.max_length`` and
-        ``CharField.min_length``.
+    Has three optional arguments ``max_length``, ``min_length``, and
+    ``empty_value`` which work just as they do for :class:`CharField`.
 
 ``UUIDField``
 -------------
