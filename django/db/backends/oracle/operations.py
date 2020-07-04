@@ -36,7 +36,7 @@ class DatabaseOperations(BaseDatabaseOperations):
     set_operators = {**BaseDatabaseOperations.set_operators, 'difference': 'MINUS'}
 
     # TODO: colorize this SQL code with style.SQL_KEYWORD(), etc.
-    _sequence_reset_sql = """
+    _sequence_refresh_sql = """
 DECLARE
     table_value integer;
     seq_value integer;
@@ -477,7 +477,7 @@ END;
 
     def sequence_reset_sql(self, style, model_list):
         output = []
-        query = self._sequence_reset_sql
+        query = self._sequence_refresh_sql
         for model in model_list:
             for f in model._meta.local_fields:
                 if isinstance(f, AutoField):
@@ -506,6 +506,24 @@ END;
                         'table_name': strip_quotes(table),
                         'column_name': 'ID',
                     })
+        return output
+
+    def sequence_refresh_sql(self, style, sequences):
+        output = []
+        query = self._sequence_refresh_sql
+        for sequence_info in sequences:
+            table_name = sequence_info['table']
+            column_name = sequence_info['column'] or 'id'
+            no_autofield_sequence_name = self._get_no_autofield_sequence_name(table_name)
+            table = self.quote_name(table_name)
+            column = self.quote_name(column_name)
+            output.append(query % {
+                'no_autofield_sequence_name': no_autofield_sequence_name,
+                'table': table,
+                'column': column,
+                'table_name': strip_quotes(table),
+                'column_name': strip_quotes(column),
+            })
         return output
 
     def start_transaction_sql(self):
