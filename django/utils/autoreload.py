@@ -300,6 +300,7 @@ class BaseReloader:
         logger.debug('Waiting for apps ready_event.')
         self.wait_for_apps_ready(apps, django_main_thread)
         from django.urls import get_resolver
+
         # Prevent a race condition where URL modules aren't loaded when the
         # reloader starts by accessing the urlconf_module property.
         try:

@@ -815,7 +815,7 @@ class ModelAdminChecks(BaseModelAdminChecks):
         3. SomeListFilter - a non-field list filter class
         """
 
-        from django.contrib.admin import ListFilter, FieldListFilter
+        from django.contrib.admin import FieldListFilter, ListFilter
 
         if callable(item) and not isinstance(item, models.Field):
             # If item is option 3, it should be a ListFilter...

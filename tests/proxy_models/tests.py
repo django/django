@@ -8,13 +8,14 @@ from django.test import TestCase, override_settings
 from django.test.utils import isolate_apps
 from django.urls import reverse
 
-from .admin import admin as force_admin_model_registration  # NOQA
 from .models import (
     Abstract, BaseUser, Bug, Country, Improvement, Issue, LowerStatusPerson,
     MultiUserProxy, MyPerson, MyPersonProxy, OtherPerson, Person, ProxyBug,
     ProxyImprovement, ProxyProxyBug, ProxyTrackerUser, State, StateProxy,
     StatusPerson, TrackerUser, User, UserProxy, UserProxyProxy,
 )
+
+from .admin import admin as force_admin_model_registration  # NOQA
 
 
 class ProxyModelTests(TestCase):

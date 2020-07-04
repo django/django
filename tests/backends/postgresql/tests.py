@@ -129,6 +129,7 @@ class Tests(TestCase):
             ISOLATION_LEVEL_READ_COMMITTED as read_committed,
             ISOLATION_LEVEL_SERIALIZABLE as serializable,
         )
+
         # Since this is a django.test.TestCase, a transaction is in progress
         # and the isolation level isn't reported as 0. This test assumes that
         # PostgreSQL is configured with the default isolation level.

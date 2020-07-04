@@ -808,7 +808,7 @@ class ModelAdmin(BaseModelAdmin):
 
         The default implementation creates an admin LogEntry object.
         """
-        from django.contrib.admin.models import LogEntry, ADDITION
+        from django.contrib.admin.models import ADDITION, LogEntry
         return LogEntry.objects.log_action(
             user_id=request.user.pk,
             content_type_id=get_content_type_for_model(object).pk,
@@ -824,7 +824,7 @@ class ModelAdmin(BaseModelAdmin):
 
         The default implementation creates an admin LogEntry object.
         """
-        from django.contrib.admin.models import LogEntry, CHANGE
+        from django.contrib.admin.models import CHANGE, LogEntry
         return LogEntry.objects.log_action(
             user_id=request.user.pk,
             content_type_id=get_content_type_for_model(object).pk,
@@ -841,7 +841,7 @@ class ModelAdmin(BaseModelAdmin):
 
         The default implementation creates an admin LogEntry object.
         """
-        from django.contrib.admin.models import LogEntry, DELETION
+        from django.contrib.admin.models import DELETION, LogEntry
         return LogEntry.objects.log_action(
             user_id=request.user.pk,
             content_type_id=get_content_type_for_model(object).pk,
@@ -1910,6 +1910,7 @@ class ModelAdmin(BaseModelAdmin):
     def history_view(self, request, object_id, extra_context=None):
         "The 'history' admin view for this model."
         from django.contrib.admin.models import LogEntry
+
         # First check if the user can see this history.
         model = self.model
         obj = self.get_object(request, unquote(object_id))

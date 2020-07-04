@@ -15,7 +15,10 @@ from .models import HotelReservation, RangesModel, Room, Scene
 
 try:
     from django.contrib.postgres.constraints import ExclusionConstraint
-    from django.contrib.postgres.fields import DateTimeRangeField, RangeBoundary, RangeOperators
+    from django.contrib.postgres.fields import (
+        DateTimeRangeField, RangeBoundary, RangeOperators,
+    )
+
 
     from psycopg2.extras import DateRange, NumericRange
 except ImportError:

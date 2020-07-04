@@ -1,7 +1,9 @@
 try:
-    from django.contrib.postgres.fields import JSONField
-    from django.contrib.postgres.fields.jsonb import KeyTransform, KeyTextTransform
     from django.contrib.postgres import forms
+    from django.contrib.postgres.fields import JSONField
+    from django.contrib.postgres.fields.jsonb import (
+        KeyTextTransform, KeyTransform,
+    )
 except ImportError:
     pass
 
