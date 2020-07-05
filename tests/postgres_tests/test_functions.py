@@ -5,10 +5,17 @@ from time import sleep
 from django.contrib.postgres.functions import RandomUUID, TransactionNow
 
 from . import PostgreSQLTestCase
-from .models import NowTestModel, UUIDTestModel
+from .models import JSONBSetTestModel, NowTestModel, UUIDTestModel
 
 
 class TestTransactionNow(PostgreSQLTestCase):
+
+    def test_jsonbset(self):
+        m1 = JSONBSetTestModel.objects.create(nested={'a': {'b': 'c'}})
+        self.assertTrue(JSONBSetTestModel.objects.filter(nested__a__b='c').exists())
+
+        m1.objects.update(nested__a__b='d')
+        self.assertTrue(JSONBSetTestModel.objects.filter(nested__a__b='d').exists())
 
     def test_transaction_now(self):
         """

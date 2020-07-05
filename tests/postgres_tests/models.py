@@ -172,6 +172,10 @@ class StatTestModel(models.Model):
     related_field = models.ForeignKey(AggregateTestModel, models.SET_NULL, null=True)
 
 
+class JSONBSetTestModel(models.Model):
+    nested = models.JSONField()
+
+
 class NowTestModel(models.Model):
     when = models.DateTimeField(null=True, default=None)
 
