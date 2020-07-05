@@ -278,6 +278,12 @@ LANG_INFO = {
         'name': 'Indonesian',
         'name_local': 'Bahasa Indonesia',
     },
+    'ig': {
+        'bidi': False,
+        'code': 'ig',
+        'name': 'Igbo',
+        'name_local': 'Asụsụ Ìgbò',
+    },
     'is': {
         'bidi': False,
         'code': 'is',
