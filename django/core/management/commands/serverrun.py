@@ -42,7 +42,7 @@ class SimpleStatReloader(StatReloader):
 
     def __init__(self, *args, **kwargs):
         self.report_changes = False
-        self.state, self.previous_timestamp = {}, time.time()
+        self.state = {}
         super().__init__(*args, **kwargs)
 
     def notify_file_changed(self, path):
@@ -52,8 +52,14 @@ class SimpleStatReloader(StatReloader):
             self.report_changes = True
 
     def update_state(self):
-        self.state.update(self.loop_files(self.state, self.previous_timestamp))
-        self.previous_timestamp = time.time()
+        for filepath, mtime in self.snapshot_files():
+            old_time = self.state.get(filepath)
+            self.state[filepath] = mtime
+            if old_time is None:
+                logger.debug('File %s first seen with mtime %s', filepath, mtime)
+            elif mtime != old_time:
+                logger.debug('File %s previous mtime: %s, current mtime: %s', filepath, old_time, mtime)
+                self.notify_file_changed(filepath)
 
     def changes_detected(self):
         self.update_state()
