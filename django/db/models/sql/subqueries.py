@@ -3,6 +3,7 @@ Query subclasses which provide extra functionality beyond simple data retrieval.
 """
 
 from django.core.exceptions import FieldError
+from django.db.models.constants import LOOKUP_SEP
 from django.db.models.query_utils import Q
 from django.db.models.sql.constants import (
     CURSOR, GET_ITERATOR_CHUNK_SIZE, NO_RESULTS,
@@ -82,6 +83,16 @@ class UpdateQuery(Query):
         """
         values_seq = []
         for name, val in values.items():
+            if LOOKUP_SEP in name:
+                attributes = name.split(LOOKUP_SEP)
+                name = attributes.pop(0)
+                hierarchy = ','.join(attributes)
+                field = self.get_meta().get_field(name)
+                from django.contrib.postgres.functions import JSONBSet
+                from django.db.models import Value
+                val = JSONBSet(
+                    field.name, Value('{%s}' % hierarchy), Value('"%s"' % val), Value(False)
+                )
             field = self.get_meta().get_field(name)
             direct = not (field.auto_created and not field.concrete) or not field.concrete
             model = field.model._meta.concrete_model
