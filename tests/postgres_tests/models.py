@@ -173,7 +173,7 @@ class StatTestModel(models.Model):
 
 
 class JSONBSetTestModel(models.Model):
-    nested = models.JSONField()
+    nested = models.JSONField(default=None)
 
 
 class NowTestModel(models.Model):

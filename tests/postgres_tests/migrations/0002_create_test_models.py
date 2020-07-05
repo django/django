@@ -218,6 +218,13 @@ class Migration(migrations.Migration):
             ]
         ),
         migrations.CreateModel(
+            name='JSONBSetTestModel',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('nested', models.JSONField(default=None)),
+            ]
+        ),
+        migrations.CreateModel(
             name='NowTestModel',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
