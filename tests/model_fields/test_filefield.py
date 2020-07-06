@@ -147,3 +147,14 @@ class FileFieldTests(TestCase):
                         self.assertEqual(document.myfile.field, loaded_myfile.field)
                     finally:
                         document.myfile.delete()
+
+    def test_save_python_file(self):
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            with override_settings(MEDIA_ROOT=Path(tmp_dir)):
+                with open(__file__, 'rb') as fp:
+                    document = Document(myfile='test_file.py')
+                    document.myfile.save('test_file.py', fp)
+                    self.assertFalse(isinstance(fp, File))
+                    self.assertTrue(isinstance(document.myfile, File))
+                document.myfile.delete()
+
