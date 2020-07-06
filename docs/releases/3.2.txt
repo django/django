@@ -322,6 +322,8 @@ Tests
   functions passed to :func:`transaction.on_commit()
   <django.db.transaction.on_commit>` in a list. This allows you to test such
   callbacks without using the slower :class:`.TransactionTestCase`.
+* Added methods :meth:`~django.test.SimpleTestCase.assertFormValid` and
+  :meth:`~django.test.SimpleTestCase.assertFormNotValid`.
 
 URLs
 ~~~~

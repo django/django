@@ -1658,6 +1658,56 @@ your test suite.
 
     Output in case of error can be customized with the ``msg`` argument.
 
+.. method:: SimpleTestCase.assertFormValid(form, msg=None)
+
+    .. versionadded:: 3.2
+
+    Asserts that a form is valid. If form is not valid, displays clean output
+    with form errors.
+
+    ``form`` is the form to be validated.
+
+.. method:: SimpleTestCase.assertFormNotValid(form, expected_errors=None, allow_all_errors=True, msg=None)
+
+    .. versionadded:: 3.2
+
+   Asserts that a form is not valid and that errors are ``expected_errors``.
+
+   ``form`` is the form to be validated.
+
+   ``expected_errors`` is a dictionary of (field, code) errors that are
+   expected on the form. If multiple error codes are expected for a single
+   field a tuple of codes can be used.
+
+   ``allow_all_errors`` is a boolean that when set (by default) allows any
+   error to be raised by the form.
+
+   Examples::
+
+        # asserts that the form is not valid
+        self.assertFormNotValid(form)
+
+        # asserts that the form the form raises all expected errors, other
+        # errors are allowed.
+        self.assertFormNotValid(
+            form,
+            expected_errors={
+                'age': 'required',
+                'name': ('max_length', 'custom_validator'),
+            }
+        )
+
+        # asserts that the form the form raises all expected errors, other
+        # errors are not allowed.
+        self.assertFormNotValid(
+            form,
+            expected_errors={
+                'age': 'required',
+                'name': ('max_length', 'custom_validator'),
+            }
+            allow_all_errors=False,
+        )
+
 .. method:: SimpleTestCase.assertInHTML(needle, haystack, count=None, msg_prefix='')
 
     Asserts that the HTML fragment ``needle`` is contained in the ``haystack`` one.
