@@ -81,7 +81,7 @@ fields are present, then ``values`` are guaranteed to be in the order
 to each of the missing fields.
 
 In addition to creating the new model, the ``from_db()`` method must set the
-``adding`` and ``db`` flags in the new instance's ``_state`` attribute.
+``adding`` and ``db`` flags in the new instance's :attr:`~Model._state` attribute.
 
 Below is an example showing how to record the initial values of fields that
 are loaded from the database::
@@ -853,3 +853,21 @@ Other attributes
     class to identify the class of object that could not be found and to allow
     you to catch a particular model class with ``try/except``. The exception is
     a subclass of :exc:`django.core.exceptions.ObjectDoesNotExist`.
+
+``_state``
+----------
+
+.. attribute:: Model._state
+
+    The ``_state`` attribute refers to a ``ModelState`` object that tracks
+    the lifecycle of the model instance.
+
+    The ``ModelState`` object has two attributes: ``adding``, a flag which is
+    ``True`` if the model has not been saved to the database yet, and ``db``,
+    a string referring to the database alias the instance was loaded from or
+    saved to.
+
+    Newly instantiated instances have ``adding=True`` and ``db=None``,
+    since they are yet to be saved. Instances fetched from a ``QuerySet``
+    will have ``adding=False`` and ``db`` set to the alias of the associated
+    database.
