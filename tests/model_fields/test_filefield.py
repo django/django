@@ -157,4 +157,3 @@ class FileFieldTests(TestCase):
                     self.assertFalse(isinstance(fp, File))
                     self.assertTrue(isinstance(document.myfile, File))
                 document.myfile.delete()
-
