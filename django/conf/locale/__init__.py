@@ -524,6 +524,12 @@ LANG_INFO = {
         'name': 'Thai',
         'name_local': 'ภาษาไทย',
     },
+    'tk': {
+        'bidi': False,
+        'code': 'tk',
+        'name': 'Turkmen',
+        'name_local': 'Türkmençe',
+    },
     'tr': {
         'bidi': False,
         'code': 'tr',

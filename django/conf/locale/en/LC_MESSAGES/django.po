@@ -355,6 +355,10 @@ msgid "Thai"
 msgstr ""
 
 #: conf/global_settings.py:135
+msgid "Turkmen"
+msgstr ""
+
+#: conf/global_settings.py:135
 msgid "Turkish"
 msgstr ""
 
