@@ -113,13 +113,13 @@ class DebugViewTests(SimpleTestCase):
     def test_404(self):
         response = self.client.get('/raises404/')
         self.assertEqual(response.status_code, 404)
-        self.assertContains(response, "<code>not-in-urls</code>, didn't match", status_code=404)
+        self.assertContains(response, '<code>not-in-urls</code>, didn’t match', status_code=404)
 
     def test_404_not_in_urls(self):
         response = self.client.get('/not-in-urls')
         self.assertNotContains(response, "Raised by:", status_code=404)
         self.assertContains(response, "Django tried these URL patterns", status_code=404)
-        self.assertContains(response, "<code>not-in-urls</code>, didn't match", status_code=404)
+        self.assertContains(response, '<code>not-in-urls</code>, didn’t match', status_code=404)
         # Pattern and view name of a RegexURLPattern appear.
         self.assertContains(response, r"^regex-post/(?P&lt;pk&gt;[0-9]+)/$", status_code=404)
         self.assertContains(response, "[name='regex-post']", status_code=404)
@@ -130,7 +130,7 @@ class DebugViewTests(SimpleTestCase):
     @override_settings(ROOT_URLCONF=WithoutEmptyPathUrls)
     def test_404_empty_path_not_in_urls(self):
         response = self.client.get('/')
-        self.assertContains(response, "The empty path didn't match any of these.", status_code=404)
+        self.assertContains(response, 'The empty path didn’t match any of these.', status_code=404)
 
     def test_technical_404(self):
         response = self.client.get('/technical404/')
