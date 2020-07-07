@@ -30,12 +30,13 @@ from .utils import get_callable
 
 
 class ResolverMatch:
-    def __init__(self, func, args, kwargs, url_name=None, app_names=None, namespaces=None, route=None):
+    def __init__(self, func, args, kwargs, url_name=None, app_names=None, namespaces=None, route=None, tried=None):
         self.func = func
         self.args = args
         self.kwargs = kwargs
         self.url_name = url_name
         self.route = route
+        self.tried = tried
 
         # If a URLRegexResolver doesn't have a namespace or app_name, it passes
         # in an empty value.
@@ -526,6 +527,13 @@ class URLResolver:
         return self._app_dict[language_code]
 
     @staticmethod
+    def _extend_tried(tried, pattern, sub_tried=None):
+        if sub_tried is None:
+            tried.append([pattern])
+        else:
+            tried.extend([pattern, *t] for t in sub_tried)
+
+    @staticmethod
     def _join_route(route1, route2):
         """Join two routes, without the starting ^ in the second route."""
         if not route1:
@@ -549,11 +557,7 @@ class URLResolver:
                 try:
                     sub_match = pattern.resolve(new_path)
                 except Resolver404 as e:
-                    sub_tried = e.args[0].get('tried')
-                    if sub_tried is not None:
-                        tried.extend([pattern] + t for t in sub_tried)
-                    else:
-                        tried.append([pattern])
+                    self._extend_tried(tried, pattern, e.args[0].get('tried'))
                 else:
                     if sub_match:
                         # Merge captured arguments in match with submatch
@@ -566,6 +570,7 @@ class URLResolver:
                         if not sub_match_dict:
                             sub_match_args = args + sub_match.args
                         current_route = '' if isinstance(pattern, URLPattern) else str(pattern.pattern)
+                        self._extend_tried(tried, pattern, sub_match.tried)
                         return ResolverMatch(
                             sub_match.func,
                             sub_match_args,
@@ -574,8 +579,9 @@ class URLResolver:
                             [self.app_name] + sub_match.app_names,
                             [self.namespace] + sub_match.namespaces,
                             self._join_route(current_route, sub_match.route),
+                            tried,
                         )
-                    tried.append([pattern])
+                    self._extend_tried(tried, pattern)
             raise Resolver404({'tried': tried, 'path': new_path})
         raise Resolver404({'path': path})
 
