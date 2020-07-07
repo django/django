@@ -1,11 +1,18 @@
+from datetime import datetime
+from decimal import Decimal
 from unittest import mock
 
 from django.db import connection, transaction
-from django.db.models import Case, Count, F, FilteredRelation, Q, When
+from django.db.models import (
+    Case, Count, DecimalField, F, FilteredRelation, Q, Sum, When,
+)
 from django.test import TestCase
 from django.test.testcases import skipUnlessDBFeature
 
-from .models import Author, Book, Borrower, Editor, RentalSession, Reservation
+from .models import (
+    Author, Book, BookDailySales, BookSeller, Borrower, CurrencyCode,
+    CurrencyConversion, Editor, RentalSession, Reservation,
+)
 
 
 class FilteredRelationTests(TestCase):
@@ -578,3 +585,182 @@ class FilteredRelationAggregationTests(TestCase):
         ).distinct()
         self.assertEqual(qs.count(), 1)
         self.assertSequenceEqual(qs.annotate(total=Count('pk')).values('total'), [{'total': 1}])
+
+
+class FilteredRelationAnalyticalAggregationTests(TestCase):
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.author1 = Author.objects.create(name='Alice')
+        cls.author2 = Author.objects.create(name='Jane')
+        cls.editor_a = Editor.objects.create(name='a')
+        cls.editor_b = Editor.objects.create(name='b')
+        cls.book1 = Book.objects.create(
+            title='Poem by Alice',
+            editor=cls.editor_a,
+            author=cls.author1,
+        )
+        cls.book2 = Book.objects.create(
+            title='The book by Jane A',
+            editor=cls.editor_b,
+            author=cls.author2,
+        )
+        cls.book3 = Book.objects.create(
+            title='The book by Jane B',
+            editor=cls.editor_b,
+            author=cls.author2,
+        )
+
+        cls.seller1 = BookSeller.objects.create(name="Slamazon")
+        cls.seller2 = BookSeller.objects.create(name="Shwalmart")
+
+        cls.sales_date1 = datetime(2020, 7, 6, 0, 0)
+        cls.sales_date2 = datetime(2020, 7, 7, 0, 0)
+        cls.currency1 = CurrencyCode.objects.create(currency_name="USD")
+        cls.currency2 = CurrencyCode.objects.create(currency_name="EUR")
+
+        CurrencyConversion.objects.create(
+            date=cls.sales_date1,
+            from_currency=cls.currency1,
+            to_currency=cls.currency2,
+            rate=0.40
+        )
+        CurrencyConversion.objects.create(
+            date=cls.sales_date1,
+            from_currency=cls.currency2,
+            to_currency=cls.currency1,
+            rate=2.50
+        )
+        CurrencyConversion.objects.create(
+            date=cls.sales_date2,
+            from_currency=cls.currency1,
+            to_currency=cls.currency2,
+            rate=0.50
+        )
+        CurrencyConversion.objects.create(
+            date=cls.sales_date2,
+            from_currency=cls.currency2,
+            to_currency=cls.currency1,
+            rate=2.00
+        )
+        CurrencyConversion.objects.create(
+            date=cls.sales_date1,
+            from_currency=cls.currency1,
+            to_currency=cls.currency1,
+            rate=1.00
+        )
+        CurrencyConversion.objects.create(
+            date=cls.sales_date2,
+            from_currency=cls.currency1,
+            to_currency=cls.currency1,
+            rate=1.00
+        )
+        CurrencyConversion.objects.create(
+            date=cls.sales_date1,
+            from_currency=cls.currency2,
+            to_currency=cls.currency2,
+            rate=1.00
+        )
+        CurrencyConversion.objects.create(
+            date=cls.sales_date2,
+            from_currency=cls.currency2,
+            to_currency=cls.currency2,
+            rate=1.00
+        )
+
+        BookDailySales.objects.create(
+            book=cls.book1,
+            date=cls.sales_date1,
+            currency_code=cls.currency1,
+            sales=100.00,
+            seller=cls.seller1,
+        )
+        BookDailySales.objects.create(
+            book=cls.book2,
+            date=cls.sales_date1,
+            currency_code=cls.currency2,
+            sales=200.00,
+            seller=cls.seller1,
+        )
+        BookDailySales.objects.create(
+            book=cls.book1,
+            date=cls.sales_date2,
+            currency_code=cls.currency1,
+            sales=50.00,
+            seller=cls.seller2,
+        )
+        BookDailySales.objects.create(
+            book=cls.book2,
+            date=cls.sales_date2,
+            currency_code=cls.currency2,
+            sales=100.00,
+            seller=cls.seller2,
+        )
+
+    def test_with_summation_aggregation(self):
+        qs = Book.objects.annotate(
+            recent_sales=FilteredRelation(
+                'daily_sales',
+                condition=Q(daily_sales__date__gte='2020-07-07')
+            ),
+            recent_sales_conversions=FilteredRelation(
+                "recent_sales__currency_code__conversions_from",
+                condition=Q(
+                    recent_sales__currency_code__conversions_from__date=F("recent_sales__date"),
+                    recent_sales__currency_code__conversions_from__to_currency=self.currency1
+
+                )
+            )
+        ).annotate(
+            sales_sum=Sum(F("recent_sales__sales") * F("recent_sales_conversions__rate"), output_field=DecimalField())
+        ).values(
+            'title', 'sales_sum'
+        ).order_by(
+            F('sales_sum').desc(nulls_last=True), 'title'
+        )
+
+        self.assertSequenceEqual(qs, [
+            {
+                'title': self.book2.title, 'sales_sum': Decimal(200.00),
+            },
+            {
+                'title': self.book1.title, 'sales_sum': Decimal(50.00),
+            },
+            {
+                'title': self.book3.title, 'sales_sum': None,
+            },
+        ])
+
+    def test_with_summation_aggregation_and_negation(self):
+        qs = Book.objects.annotate(
+            recent_sales=FilteredRelation(
+                'daily_sales',
+                condition=~Q(daily_sales__seller=self.seller1)
+            ),
+            recent_sales_conversions=FilteredRelation(
+                "recent_sales__currency_code__conversions_from",
+                condition=Q(
+                    recent_sales__currency_code__conversions_from__date=F("recent_sales__date"),
+                    recent_sales__currency_code__conversions_from__to_currency=self.currency1
+
+                )
+            )
+        ).annotate(
+            sales_sum=Sum(F("recent_sales__sales") * F("recent_sales_conversions__rate"), output_field=DecimalField())
+        ).values(
+            'title', 'sales_sum'
+        ).order_by(
+            F('sales_sum').desc(nulls_last=True), 'title'
+        )
+
+        self.assertSequenceEqual(qs, [
+            {
+                'title': self.book2.title, 'sales_sum': Decimal(200.00),
+            },
+            {
+                'title': self.book1.title, 'sales_sum': Decimal(50.00),
+            },
+            {
+                'title': self.book3.title, 'sales_sum': None,
+            },
+        ])

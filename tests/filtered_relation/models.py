@@ -88,3 +88,26 @@ class RentalSession(models.Model):
         related_query_name='rental_session',
     )
     state = models.CharField(max_length=7, choices=STATES, default=NEW)
+
+
+class BookSeller(models.Model):
+    name = models.CharField(max_length=64)
+
+
+class CurrencyCode(models.Model):
+    currency_name = models.CharField(max_length=64)
+
+
+class CurrencyConversion(models.Model):
+    date = models.DateTimeField()
+    from_currency = models.ForeignKey(CurrencyCode, related_name="conversions_from", on_delete=models.CASCADE)
+    to_currency = models.ForeignKey(CurrencyCode, related_name="conversions_to", on_delete=models.CASCADE)
+    rate = models.FloatField()
+
+
+class BookDailySales(models.Model):
+    book = models.ForeignKey(Book, models.CASCADE, related_name="daily_sales")
+    date = models.DateTimeField()
+    currency_code = models.ForeignKey(CurrencyCode, models.CASCADE)
+    sales = models.DecimalField(max_digits=10, decimal_places=2, null=True)
+    seller = models.ForeignKey(BookSeller, models.CASCADE, null=True)
