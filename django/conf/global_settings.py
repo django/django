@@ -134,6 +134,7 @@ LANGUAGES = [
     ('te', gettext_noop('Telugu')),
     ('tg', gettext_noop('Tajik')),
     ('th', gettext_noop('Thai')),
+    ('tk', gettext_noop('Turkmen')),
     ('tr', gettext_noop('Turkish')),
     ('tt', gettext_noop('Tatar')),
     ('udm', gettext_noop('Udmurt')),
