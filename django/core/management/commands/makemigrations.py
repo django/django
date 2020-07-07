@@ -17,7 +17,6 @@ from django.db.migrations.questioner import (
     NonInteractiveMigrationQuestioner,
 )
 from django.db.migrations.state import ProjectState
-from django.db.migrations.utils import get_migration_name_timestamp
 from django.db.migrations.writer import MigrationWriter
 
 
@@ -295,10 +294,13 @@ class Command(BaseCommand):
                 subclass = type("Migration", (Migration,), {
                     "dependencies": [(app_label, migration.name) for migration in merge_migrations],
                 })
-                migration_name = "%04i_%s" % (
-                    biggest_number + 1,
-                    self.migration_name or ("merge_%s" % get_migration_name_timestamp())
-                )
+                parts = ['%04i' % (biggest_number + 1)]
+                if self.migration_name:
+                    parts.append(self.migration_name)
+                else:
+                    parts.append('merge')
+                    parts += sorted(migration.name for migration in merge_migrations)
+                migration_name = '_'.join(parts)
                 new_migration = subclass(migration_name, app_label)
                 writer = MigrationWriter(new_migration, self.include_header)
 
