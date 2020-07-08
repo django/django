@@ -43,8 +43,10 @@ All attributes should be considered read-only, unless stated otherwise.
     XML payload etc. For processing conventional form data, use
     :attr:`HttpRequest.POST`.
 
-    You can also read from an ``HttpRequest`` using a file-like interface. See
-    :meth:`HttpRequest.read()`.
+    You can also read from an ``HttpRequest`` using a file-like interface with
+    :meth:`HttpRequest.read` or :meth:`HttpRequest.readline`. Accessing
+    the ``body`` attribute *after* reading the request with either of these I/O
+    stream methods will produce a ``RawPostDataException``.
 
 .. attribute:: HttpRequest.path
 
