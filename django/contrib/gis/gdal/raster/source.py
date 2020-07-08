@@ -431,8 +431,9 @@ class GDALRaster(GDALRasterBase):
         Return a copy of this raster reprojected into the given spatial
         reference system.
         """
-        if srid == self.srid:
-            return self.clone()
+        if isinstance(srs, (int, str)):
+            if srs == self.srid:
+                return self.clone()
 
         # Convert the resampling algorithm name into an algorithm id
         algorithm = GDAL_RESAMPLE_ALGORITHMS[resampling]
@@ -484,4 +485,4 @@ class GDALRaster(GDALRasterBase):
         return capi.get_ds_info(self.ptr, None).decode()
 
     def clone(self):
-        return GDALRaster(capi.copy_ds(self.ptr))
+        return type(self)(capi.copy_ds(self.ptr))
