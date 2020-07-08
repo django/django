@@ -858,9 +858,6 @@ class ExpressionWrapper(Expression):
 
     def __init__(self, expression, output_field):
         super().__init__(output_field=output_field)
-        if getattr(expression, '_output_field_or_none', True) is None:
-            expression = expression.copy()
-            expression.output_field = output_field
         self.expression = expression
 
     def set_source_expressions(self, exprs):
@@ -870,7 +867,9 @@ class ExpressionWrapper(Expression):
         return [self.expression]
 
     def get_group_by_cols(self, alias=None):
-        return self.expression.get_group_by_cols(alias=alias)
+        expression = self.expression.copy()
+        expression.output_field = self.output_field
+        return expression.get_group_by_cols(alias=alias)
 
     def as_sql(self, compiler, connection):
         return self.expression.as_sql(compiler, connection)
