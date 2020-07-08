@@ -99,7 +99,17 @@ def get_max_age(response):
 
 def set_response_etag(response):
     if not response.streaming:
-        response['ETag'] = quote_etag(hashlib.md5(response.content, usedforsecurity=False).hexdigest())
+        # Current stable version of python does not have FIPS support for hashlib. Passing
+        # usedforsecurity=False only works in RHEL versions of python, and is needed to
+        # run this code on hardened RHEL machines. The try-except block will not be needed once
+        # the following issue is resolved:
+        #
+        # https://bugs.python.org/issue9216
+        try:
+            response['ETag'] = quote_etag(hashlib.md5(response.content, usedforsecurity=False).hexdigest())
+        except TypeError:
+            response['ETag'] = quote_etag(hashlib.md5(response.content).hexdigest())
+
     return response
 
 
@@ -298,12 +308,32 @@ def _i18n_cache_key_suffix(request, cache_key):
 
 def _generate_cache_key(request, method, headerlist, key_prefix):
     """Return a cache key from the headers given in the header list."""
-    ctx = hashlib.md5(usedforsecurity=False)
+    # Current stable version of python does not have FIPS support for hashlib. Passing
+    # usedforsecurity=False only works in RHEL versions of python, and is needed to
+    # run this code on hardened RHEL machines. The try-except block will not be needed once
+    # the following issue is resolved:
+    #
+    # https://bugs.python.org/issue9216
+    try:
+        ctx = hashlib.md5(usedforsecurity=False)
+    except TypeError:
+        ctx = hashlib.md5()
+
     for header in headerlist:
         value = request.META.get(header)
         if value is not None:
             ctx.update(value.encode())
-    url = hashlib.md5(iri_to_uri(request.build_absolute_uri()).encode('ascii'), usedforsecurity=False)
+
+    # Current stable version of python does not have FIPS support for hashlib. Passing
+    # usedforsecurity=False only works in RHEL versions of python, and is needed to
+    # run this code on hardened RHEL machines. The try-except block will not be needed once
+    # the following issue is resolved:
+    #
+    # https://bugs.python.org/issue9216
+    try:
+        url = hashlib.md5(iri_to_uri(request.build_absolute_uri()).encode('ascii'), usedforsecurity=False)
+    except: 
+        url = hashlib.md5(iri_to_uri(request.build_absolute_uri()).encode('ascii'))
     cache_key = 'views.decorators.cache.cache_page.%s.%s.%s.%s' % (
         key_prefix, method, url.hexdigest(), ctx.hexdigest())
     return _i18n_cache_key_suffix(request, cache_key)
@@ -311,7 +341,16 @@ def _generate_cache_key(request, method, headerlist, key_prefix):
 
 def _generate_cache_header_key(key_prefix, request):
     """Return a cache key for the header cache."""
-    url = hashlib.md5(iri_to_uri(request.build_absolute_uri()).encode('ascii'), usedforsecurity=False)
+    # Current stable version of python does not have FIPS support for hashlib. Passing
+    # usedforsecurity=False only works in RHEL versions of python, and is needed to
+    # run this code on hardened RHEL machines. The try-except block will not be needed once
+    # the following issue is resolved:
+    #
+    # https://bugs.python.org/issue9216
+    try:
+        url = hashlib.md5(iri_to_uri(request.build_absolute_uri()).encode('ascii'), usedforsecurity=False)
+    except: 
+        url = hashlib.md5(iri_to_uri(request.build_absolute_uri()).encode('ascii'))
     cache_key = 'views.decorators.cache.cache_header.%s.%s' % (
         key_prefix, url.hexdigest())
     return _i18n_cache_key_suffix(request, cache_key)

@@ -76,7 +76,16 @@ class HashedFilesMixin:
         """
         if content is None:
             return None
-        md5 = hashlib.md5(usedforsecurity=False)
+        # Current stable version of python does not have FIPS support for hashlib. Passing
+        # usedforsecurity=False only works in RHEL versions of python, and is needed to
+        # run this code on hardened RHEL machines. The try-except block will not be needed once
+        # the following issue is resolved:
+        #
+        # https://bugs.python.org/issue9216
+        try:
+            md5 = hashlib.md5(usedforsecurity=False)
+        except TypeError:
+            md5 = hashlib.md5()
         for chunk in content.chunks():
             md5.update(chunk)
         return md5.hexdigest()[:12]
@@ -467,7 +476,16 @@ class CachedFilesMixin(HashedFilesMixin):
             self.hashed_files = _MappingCache(default_cache)
 
     def hash_key(self, name):
-        key = hashlib.md5(self.clean_name(name).encode(), usedforsecurity=False).hexdigest()
+        # Current stable version of python does not have FIPS support for hashlib. Passing
+        # usedforsecurity=False only works in RHEL versions of python, and is needed to
+        # run this code on hardened RHEL machines. The try-except block will not be needed once
+        # the following issue is resolved:
+        #
+        # https://bugs.python.org/issue9216
+        try:
+            key = hashlib.md5(self.clean_name(name).encode(), usedforsecurity=False).hexdigest()
+        except TypeError:
+            key = hashlib.md5(self.clean_name(name).encode()).hexdigest()      
         return 'staticfiles:%s' % key
 
 

@@ -126,8 +126,17 @@ class FileBasedCache(BaseCache):
         """
         key = self.make_key(key, version=version)
         self.validate_key(key)
-        return os.path.join(self._dir, ''.join(
-            [hashlib.md5(key.encode(), usedforsecurity=False).hexdigest(), self.cache_suffix]))
+        # Current stable version of python does not have FIPS support for hashlib. Passing
+        # usedforsecurity=False only works in RHEL versions of python, and is needed to
+        # run this code on hardened RHEL machines. The try-except block will not be needed once
+        # the following issue is resolved:
+        #
+        # https://bugs.python.org/issue9216
+        try:
+            return os.path.join(self._dir, ''.join([hashlib.md5(key.encode(), usedforsecurity=False).hexdigest(), self.cache_suffix]))
+        except TypeError:
+            return os.path.join(self._dir, ''.join([hashlib.md5(key.encode()).hexdigest(), self.cache_suffix]))
+
 
     def clear(self):
         """

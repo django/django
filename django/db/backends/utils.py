@@ -218,7 +218,16 @@ def names_digest(*args, length):
     Generate a 32-bit digest of a set of arguments that can be used to shorten
     identifying names.
     """
-    h = hashlib.md5(usedforsecurity=False)
+    # Current stable version of python does not have FIPS support for hashlib. Passing
+    # usedforsecurity=False only works in RHEL versions of python, and is needed to
+    # run this code on hardened RHEL machines. The try-except block will not be needed once
+    # the following issue is resolved:
+    #
+    # https://bugs.python.org/issue9216
+    try:
+        h = hashlib.md5(usedforsecurity=False)
+    except:
+        h = hashlib.md5()
     for arg in args:
         h.update(arg.encode())
     return h.hexdigest()[:length]
