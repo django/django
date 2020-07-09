@@ -771,10 +771,11 @@ class BaseModelAdminChecks:
             except FieldDoesNotExist:
                 return [
                     checks.Error(
-                        "The value of '%s' is not a callable, an attribute of "
-                        "'%s', or an attribute of '%s'."
+                        "The value of '%s' refers to '%s', which is not a callable, "
+                        "an attribute of '%s', or an attribute of '%s'."
                         % (
                             label,
+                            field_name,
                             obj.__class__.__name__,
                             obj.model._meta.label,
                         ),
