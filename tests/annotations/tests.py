@@ -6,8 +6,8 @@ from django.core.exceptions import FieldDoesNotExist, FieldError
 from django.db import connection
 from django.db.models import (
     BooleanField, Case, CharField, Count, DateTimeField, Exists,
-    ExpressionWrapper, F, Func, IntegerField, Max, NullBooleanField, OuterRef,
-    Q, Subquery, Sum, Value, When,
+    ExpressionWrapper, F, FloatField, Func, IntegerField, Max,
+    NullBooleanField, OuterRef, Q, Subquery, Sum, Value, When,
 )
 from django.db.models.expressions import RawSQL
 from django.db.models.functions import Length, Lower
@@ -176,6 +176,14 @@ class NonAggregateAnnotationTestCase(TestCase):
             rating_count=Count('rating'),
         ).first()
         self.assertEqual(book.combined, 12)
+        self.assertEqual(book.rating_count, 1)
+
+    def test_combined_f_expression_annotation_with_aggregation(self):
+        book = Book.objects.filter(isbn='159059725').annotate(
+            combined=ExpressionWrapper(F('price') * F('pages'), output_field=FloatField()),
+            rating_count=Count('rating'),
+        ).first()
+        self.assertEqual(book.combined, 13410.0)
         self.assertEqual(book.rating_count, 1)
 
     def test_aggregate_over_annotation(self):
