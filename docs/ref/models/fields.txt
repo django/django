@@ -1820,6 +1820,13 @@ that control how the relationship functions.
 
     .. note::
 
+        If you don't want multiple associations between the same instances, add
+        a :class:`~django.db.models.UniqueConstraint` including the from and to
+        fields. Django's automatically generated many-to-many tables include
+        such a constraint.
+
+    .. note::
+
         Recursive relationships using an intermediary model and defined as
         symmetrical (that is, with :attr:`symmetrical=True
         <ManyToManyField.symmetrical>`, which is the default) can't determine
@@ -1851,7 +1858,9 @@ that control how the relationship functions.
       points (i.e. the target model instance).
 
     This class can be used to query associated records for a given model
-    instance like a normal model.
+    instance like a normal model::
+
+        Model.m2mfield.through.objects.all()
 
 .. attribute:: ManyToManyField.through_fields
 
