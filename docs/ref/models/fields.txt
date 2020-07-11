@@ -1174,7 +1174,7 @@ A field for storing JSON encoded data. In Python the data is represented in its
 Python native format: dictionaries, lists, strings, numbers, booleans and
 ``None``.
 
-``JSONField`` is supported on MariaDB 10.2.7+, MySQL 5.7.8+, Oracle,
+``JSONField`` is supported on MariaDB 10.2.16+, MySQL 5.7.8+, Oracle,
 PostgreSQL, and SQLite 3.9.0+ (with the :ref:`JSON1 extension enabled
 <sqlite-json1>`).
 
