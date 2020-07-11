@@ -53,7 +53,7 @@ class Engine:
         self.template_builtins = self.get_template_builtins(self.builtins)
 
     @staticmethod
-    @functools.lru_cache()
+    @functools.lru_cache(maxsize=None)
     def get_default():
         """
         Return the first DjangoTemplates backend that's configured, or raise

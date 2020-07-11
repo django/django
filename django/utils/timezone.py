@@ -37,7 +37,7 @@ def get_fixed_timezone(offset):
 
 # In order to avoid accessing settings at compile time,
 # wrap the logic in a function and cache the result.
-@functools.lru_cache()
+@functools.lru_cache(maxsize=None)
 def get_default_timezone():
     """
     Return the default time zone as a tzinfo instance.
