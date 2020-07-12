@@ -676,6 +676,10 @@ class Func(SQLiteNumericMixin, Expression):
 
 class Value(Expression):
     """Represent a wrapped value as a node within an expression."""
+    # Provide a default value for `for_save` in order to allow unresolved
+    # instances to be compiled until a decision is taken in #25425.
+    for_save = False
+
     def __init__(self, value, output_field=None):
         """
         Arguments:
