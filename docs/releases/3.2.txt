@@ -230,6 +230,9 @@ Models
 * :class:`FilteredRelation() <django.db.models.FilteredRelation>` now supports
   nested relations.
 
+* The ``of`` argument of :meth:`.QuerySet.select_for_update()` is now allowed
+  on MySQL 8.0.1+.
+
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 

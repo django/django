@@ -118,6 +118,10 @@ class DatabaseFeatures(BaseDatabaseFeatures):
         return self.connection.mysql_version >= (8, 0, 1)
 
     @cached_property
+    def has_select_for_update_of(self):
+        return not self.connection.mysql_is_mariadb and self.connection.mysql_version >= (8, 0, 1)
+
+    @cached_property
     def supports_explain_analyze(self):
         return self.connection.mysql_is_mariadb or self.connection.mysql_version >= (8, 0, 18)
 
