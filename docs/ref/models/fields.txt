@@ -415,9 +415,12 @@ cross-site scripting attack.
 If ``True``, this field is the primary key for the model.
 
 If you don't specify ``primary_key=True`` for any field in your model, Django
-will automatically add an :class:`AutoField` to hold the primary key, so you
-don't need to set ``primary_key=True`` on any of your fields unless you want to
-override the default primary-key behavior. For more, see
+will automatically add a field to hold the primary key, so you don't need to
+set ``primary_key=True`` on any of your fields unless you want to override the
+default primary-key behavior. The type of auto-created primary key fields can
+be specified per app in :attr:`AppConfig.default_auto_field
+<django.apps.AppConfig.default_auto_field>` or globally in the
+:setting:`DEFAULT_AUTO_FIELD` setting. For more, see
 :ref:`automatic-primary-key-fields`.
 
 ``primary_key=True`` implies :attr:`null=False <Field.null>` and
@@ -427,6 +430,11 @@ object.
 The primary key field is read-only. If you change the value of the primary
 key on an existing object and then save it, a new object will be created
 alongside the old one.
+
+.. versionchanged:: 3.2
+
+    In older versions, auto-created primary key fields were always
+    :class:`AutoField`\s.
 
 ``unique``
 ----------

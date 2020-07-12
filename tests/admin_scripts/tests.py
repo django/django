@@ -61,6 +61,7 @@ class AdminScriptTestCase(SimpleTestCase):
                 settings_file.write("%s\n" % extra)
             exports = [
                 'DATABASES',
+                'DEFAULT_AUTO_FIELD',
                 'ROOT_URLCONF',
                 'SECRET_KEY',
             ]
@@ -2187,6 +2188,20 @@ class StartApp(AdminScriptTestCase):
             "already exists. Overlaying an app into an existing directory "
             "won't replace conflicting files."
         )
+
+    def test_template(self):
+        out, err = self.run_django_admin(['startapp', 'new_app'])
+        self.assertNoOutput(err)
+        app_path = os.path.join(self.test_dir, 'new_app')
+        self.assertIs(os.path.exists(app_path), True)
+        with open(os.path.join(app_path, 'apps.py')) as f:
+            content = f.read()
+            self.assertIn('class NewAppConfig(AppConfig)', content)
+            self.assertIn(
+                "default_auto_field = 'django.db.models.BigAutoField'",
+                content,
+            )
+            self.assertIn("name = 'new_app'", content)
 
 
 class DiffSettings(AdminScriptTestCase):

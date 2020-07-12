@@ -5,6 +5,7 @@ from importlib import import_module
 
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.deprecation import RemovedInDjango41Warning
+from django.utils.functional import cached_property
 from django.utils.module_loading import import_string, module_has_submodule
 
 APPS_MODULE_NAME = 'apps'
@@ -54,6 +55,15 @@ class AppConfig:
 
     def __repr__(self):
         return '<%s: %s>' % (self.__class__.__name__, self.label)
+
+    @cached_property
+    def default_auto_field(self):
+        from django.conf import settings
+        return settings.DEFAULT_AUTO_FIELD
+
+    @property
+    def _is_default_auto_field_overridden(self):
+        return self.__class__.default_auto_field is not AppConfig.default_auto_field
 
     def _path_from_module(self, module):
         """Attempt to determine app's filesystem path from its module."""

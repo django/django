@@ -1,3 +1,5 @@
+from unittest import mock
+
 from django.core import checks
 from django.core.checks import Error, Warning
 from django.db import models
@@ -356,5 +358,60 @@ class ConstraintNameTests(TestCase):
             class Meta:
                 app_label = 'check_framework'
                 constraints = [constraint]
+
+        self.assertEqual(checks.run_checks(app_configs=apps.get_app_configs()), [])
+
+
+def mocked_is_overridden(self, setting):
+    # Force treating DEFAULT_AUTO_FIELD = 'django.db.models.AutoField' as a not
+    # overridden setting.
+    return (
+        setting != 'DEFAULT_AUTO_FIELD' or
+        self.DEFAULT_AUTO_FIELD != 'django.db.models.AutoField'
+    )
+
+
+@mock.patch('django.conf.UserSettingsHolder.is_overridden', mocked_is_overridden)
+@override_settings(DEFAULT_AUTO_FIELD='django.db.models.AutoField')
+@isolate_apps('check_framework.apps.CheckDefaultPKConfig', attr_name='apps')
+@override_system_checks([checks.model_checks.check_all_models])
+class ModelDefaultAutoFieldTests(SimpleTestCase):
+    def test_auto_created_pk(self):
+        class Model(models.Model):
+            pass
+
+        self.assertEqual(checks.run_checks(app_configs=self.apps.get_app_configs()), [
+            Warning(
+                "Auto-created primary key used when not defining a primary "
+                "key type, by default 'django.db.models.AutoField'.",
+                hint=(
+                    "Configure the DEFAULT_AUTO_FIELD setting or the "
+                    "CheckDefaultPKConfig.default_auto_field attribute to "
+                    "point to a subclass of AutoField, e.g. "
+                    "'django.db.models.BigAutoField'."
+                ),
+                obj=Model,
+                id='models.W042',
+            ),
+        ])
+
+    @override_settings(DEFAULT_AUTO_FIELD='django.db.models.BigAutoField')
+    def test_default_auto_field_setting(self):
+        class Model(models.Model):
+            pass
+
+        self.assertEqual(checks.run_checks(app_configs=self.apps.get_app_configs()), [])
+
+    def test_explicit_pk(self):
+        class Model(models.Model):
+            id = models.BigAutoField(primary_key=True)
+
+        self.assertEqual(checks.run_checks(app_configs=self.apps.get_app_configs()), [])
+
+    @isolate_apps('check_framework.apps.CheckPKConfig', kwarg_name='apps')
+    def test_app_default_auto_field(self, apps):
+        class ModelWithPkViaAppConfig(models.Model):
+            class Meta:
+                app_label = 'check_framework.apps.CheckPKConfig'
 
         self.assertEqual(checks.run_checks(app_configs=apps.get_app_configs()), [])

@@ -53,6 +53,48 @@ needed. As a consequence, it's deprecated.
 
 See :ref:`configuring-applications-ref` for full details.
 
+Customizing type of auto-created primary keys
+---------------------------------------------
+
+When defining a model, if no field in a model is defined with
+:attr:`primary_key=True <django.db.models.Field.primary_key>` an implicit
+primary key is added. The type of this implicit primary key can now be
+controlled via the :setting:`DEFAULT_AUTO_FIELD` setting and
+:attr:`AppConfig.default_auto_field <django.apps.AppConfig.default_auto_field>`
+attribute. No more needing to override primary keys in all models.
+
+Maintaining the historical behavior, the default value for
+:setting:`DEFAULT_AUTO_FIELD` is :class:`~django.db.models.AutoField`. Starting
+with 3.2 new projects are generated with :setting:`DEFAULT_AUTO_FIELD` set to
+:class:`~django.db.models.BigAutoField`. Also, new apps are generated with
+:attr:`AppConfig.default_auto_field <django.apps.AppConfig.default_auto_field>`
+set to :class:`~django.db.models.BigAutoField`. In a future Django release the
+default value of :setting:`DEFAULT_AUTO_FIELD` will be changed to
+:class:`~django.db.models.BigAutoField`.
+
+To avoid unwanted migrations in the future, either explicitly set
+:setting:`DEFAULT_AUTO_FIELD` to :class:`~django.db.models.AutoField`::
+
+    DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
+
+or configure it on a per-app basis::
+
+    from django.apps import AppConfig
+
+    class MyAppConfig(AppConfig):
+        default_auto_field = 'django.db.models.AutoField'
+        name = 'my_app'
+
+or on a per-model basis::
+
+    from django.db import models
+
+    class MyModel(models.Model):
+        id = models.AutoField(primary_key=True)
+
+In anticipation of the changing default, a system check will provide a warning
+if you do not have an explicit setting for :setting:`DEFAULT_AUTO_FIELD`.
+
 ``pymemcache`` support
 ----------------------
 

@@ -102,8 +102,8 @@ class AppsTests(SimpleTestCase):
     def test_no_such_app_config_with_choices(self):
         msg = (
             "Module 'apps.apps' does not contain a 'NoSuchConfig' class. "
-            "Choices are: 'BadConfig', 'MyAdmin', 'MyAuth', 'NoSuchApp', "
-            "'PlainAppsConfig', 'RelabeledAppsConfig'."
+            "Choices are: 'BadConfig', 'ModelPKAppsConfig', 'MyAdmin', "
+            "'MyAuth', 'NoSuchApp', 'PlainAppsConfig', 'RelabeledAppsConfig'."
         )
         with self.assertRaisesMessage(ImportError, msg):
             with self.settings(INSTALLED_APPS=['apps.apps.NoSuchConfig']):
@@ -435,6 +435,30 @@ class AppConfigTests(SimpleTestCase):
     def test_repr(self):
         ac = AppConfig('label', Stub(__path__=['a']))
         self.assertEqual(repr(ac), '<AppConfig: label>')
+
+    @override_settings(
+        INSTALLED_APPS=['apps.apps.ModelPKAppsConfig'],
+        DEFAULT_AUTO_FIELD='django.db.models.SmallAutoField',
+    )
+    def test_app_default_auto_field(self):
+        apps_config = apps.get_app_config('apps')
+        self.assertEqual(
+            apps_config.default_auto_field,
+            'django.db.models.BigAutoField',
+        )
+        self.assertIs(apps_config._is_default_auto_field_overridden, True)
+
+    @override_settings(
+        INSTALLED_APPS=['apps.apps.PlainAppsConfig'],
+        DEFAULT_AUTO_FIELD='django.db.models.SmallAutoField',
+    )
+    def test_default_auto_field_setting(self):
+        apps_config = apps.get_app_config('apps')
+        self.assertEqual(
+            apps_config.default_auto_field,
+            'django.db.models.SmallAutoField',
+        )
+        self.assertIs(apps_config._is_default_auto_field_overridden, False)
 
 
 class NamespacePackageAppTests(SimpleTestCase):

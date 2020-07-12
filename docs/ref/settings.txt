@@ -1245,6 +1245,17 @@ format has higher precedence and will be applied instead.
 See also :setting:`NUMBER_GROUPING`, :setting:`THOUSAND_SEPARATOR` and
 :setting:`USE_THOUSAND_SEPARATOR`.
 
+.. setting:: DEFAULT_AUTO_FIELD
+
+``DEFAULT_AUTO_FIELD``
+----------------------
+
+.. versionadded:: 3.2
+
+Default: ``'``:class:`django.db.models.AutoField`\ ``'``
+
+Default primary key field type to use for models that don't have a field with
+:attr:`primary_key=True <django.db.models.Field.primary_key>`.
 
 .. setting:: DEFAULT_CHARSET
 
