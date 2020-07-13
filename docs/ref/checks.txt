@@ -437,10 +437,11 @@ The following checks are run if you use the :option:`check --deploy` option:
   ``True``. Unless your site should be available over both SSL and non-SSL
   connections, you may want to either set this setting to ``True`` or configure
   a load balancer or reverse-proxy server  to redirect all connections to HTTPS.
-* **security.W009**: Your :setting:`SECRET_KEY` has less than 50 characters or
-  less than 5 unique characters. Please generate a long and random
-  ``SECRET_KEY``, otherwise many of Django's security-critical features will be
-  vulnerable to attack.
+* **security.W009**: Your :setting:`SECRET_KEY` has less than 50 characters,
+  less than 5 unique characters, or it's prefixed with ``'django-insecure-'``
+  indicating that it was generated automatically by Django. Please generate a
+  long and random ``SECRET_KEY``, otherwise many of Django's security-critical
+  features will be vulnerable to attack.
 * **security.W010**: You have :mod:`django.contrib.sessions` in your
   :setting:`INSTALLED_APPS` but you have not set
   :setting:`SESSION_COOKIE_SECURE` to ``True``. Using a secure-only session

@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.core.checks.security import base, csrf, sessions
+from django.core.management.utils import get_random_secret_key
 from django.test import SimpleTestCase
 from django.test.utils import override_settings
 
@@ -392,6 +393,12 @@ class CheckSecretKeyTest(SimpleTestCase):
 
     @override_settings(SECRET_KEY=None)
     def test_none_secret_key(self):
+        self.assertEqual(base.check_secret_key(None), [base.W009])
+
+    @override_settings(
+        SECRET_KEY=base.SECRET_KEY_INSECURE_PREFIX + get_random_secret_key()
+    )
+    def test_insecure_secret_key(self):
         self.assertEqual(base.check_secret_key(None), [base.W009])
 
     @override_settings(SECRET_KEY=('abcdefghijklmnopqrstuvwx' * 2) + 'a')
