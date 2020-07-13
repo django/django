@@ -389,3 +389,8 @@ Miscellaneous
   ``allowlist`` instead of ``whitelist``, and ``domain_allowlist`` instead of
   ``domain_whitelist``. You may need to rename ``whitelist`` in existing
   migrations.
+
+:mod:`django.shortcuts`
+~~~~~~~~~~~~~~~~~~~~~~~
+
+* The new :func:`django.shortcuts.make_toast` function returns ``'toast'``.
