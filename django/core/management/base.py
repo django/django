@@ -2,6 +2,8 @@
 Base classes for writing management commands (named commands which can
 be executed through ``django-admin`` or ``manage.py``).
 """
+import asyncio
+import inspect
 import os
 import sys
 import warnings
@@ -392,6 +394,10 @@ class BaseCommand:
         if self.requires_migrations_checks:
             self.check_migrations()
         output = self.handle(*args, **options)
+        if inspect.iscoroutine(output):
+            if not hasattr(asyncio, 'run'):
+                raise Exception('Python 3.7 required for async handle')
+            output = asyncio.run(output)
         if output:
             if self.output_transaction:
                 connection = connections[options.get('database', DEFAULT_DB_ALIAS)]
