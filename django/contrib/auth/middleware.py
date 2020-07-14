@@ -28,12 +28,12 @@ class LoginRequiredAuthenticationMiddleware(AuthenticationMiddleware):
     """
     Middleware that force all views to require athentication by default.
 
-    Views that have @login_not_required decorator or LoginNotRequiredMixin mixin
-    will be able to pass through without this validation. Otherwise, it will
-    direct user to the login.
+    Views that have @login_not_required decorator or LoginNotRequiredMixin
+    mixin will be able to pass through without this validation. Otherwise, it
+    will direct user to the login.
     """
     def process_view(self, request, view_func, view_args, view_kwargs):
-        # If it's authenticated user we don't have to do anything.
+        # No need to take any action if the user is already authenticated.
         if request.user.is_authenticated:
             return None
 
@@ -42,7 +42,7 @@ class LoginRequiredAuthenticationMiddleware(AuthenticationMiddleware):
         if view_class and not getattr(view_class, 'login_required', True):
             return None
 
-        # If the view is FBV or CBV with login_not_required usage on dispatch method,
+        # If the view is FBV or CBV with login_not_required usage on dispatch
         if not getattr(view_func, 'login_required', True):
             return None
         return redirect_to_login(request.get_full_path())

@@ -73,10 +73,6 @@ class TestLoginRequiredAuthenticationMiddleware(TestCase):
         res = self.middleware.process_view(self.request, LoginView.as_view(), (), {})
         self.assertIsNone(res)
 
-        # redirect_to_login has @login_not_required decorator so middleware returns None
-        res = self.middleware.process_view(self.request, redirect_to_login, (), {})
-        self.assertIsNone(res)
-
     def test_anonymous_access_to_login_required_view(self):
         """
         Middleware redirects unauthenticated user with 302 because of

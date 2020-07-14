@@ -172,7 +172,6 @@ def logout_then_login(request, login_url=None):
     return LogoutView.as_view(next_page=login_url)(request)
 
 
-@login_not_required
 def redirect_to_login(next, login_url=None, redirect_field_name=REDIRECT_FIELD_NAME):
     """
     Redirect the user to the login page, passing the given 'next' page.
