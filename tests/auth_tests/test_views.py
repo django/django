@@ -993,7 +993,7 @@ class LogoutTest(AuthViewsTestCase):
         in #25490.
         """
         response = self.client.get('/logout/')
-        self.assertIn('no-store', response['Cache-Control'])
+        self.assertIn('no-store', response.headers['Cache-Control'])
 
     def test_logout_with_overridden_redirect_url(self):
         # Bug 11223

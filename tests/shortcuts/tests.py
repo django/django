@@ -9,7 +9,7 @@ class RenderTests(SimpleTestCase):
         response = self.client.get('/render/')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.content, b'FOO.BAR../render/\n')
-        self.assertEqual(response['Content-Type'], 'text/html; charset=utf-8')
+        self.assertEqual(response.headers['Content-Type'], 'text/html; charset=utf-8')
         self.assertFalse(hasattr(response.context.request, 'current_app'))
 
     def test_render_with_multiple_templates(self):
@@ -21,7 +21,7 @@ class RenderTests(SimpleTestCase):
         response = self.client.get('/render/content_type/')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.content, b'FOO.BAR../render/content_type/\n')
-        self.assertEqual(response['Content-Type'], 'application/x-rendertest')
+        self.assertEqual(response.headers['Content-Type'], 'application/x-rendertest')
 
     def test_render_with_status(self):
         response = self.client.get('/render/status/')

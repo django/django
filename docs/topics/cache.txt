@@ -1159,10 +1159,10 @@ In this case, a caching mechanism (such as Django's own cache middleware) will
 cache a separate version of the page for each unique user-agent.
 
 The advantage to using the ``vary_on_headers`` decorator rather than manually
-setting the ``Vary`` header (using something like
-``response['Vary'] = 'user-agent'``) is that the decorator *adds* to the
-``Vary`` header (which may already exist), rather than setting it from scratch
-and potentially overriding anything that was already in there.
+setting the ``Vary`` header (using something like ``response.headers['Vary'] =
+'user-agent'``) is that the decorator *adds* to the ``Vary`` header (which may
+already exist), rather than setting it from scratch and potentially overriding
+anything that was already in there.
 
 You can pass multiple headers to ``vary_on_headers()``::
 

@@ -119,7 +119,7 @@ And the view::
             last_book = self.get_queryset().latest('publication_date')
             response = HttpResponse()
             # RFC 1123 date format
-            response['Last-Modified'] = last_book.publication_date.strftime('%a, %d %b %Y %H:%M:%S GMT')
+            response.headers['Last-Modified'] = last_book.publication_date.strftime('%a, %d %b %Y %H:%M:%S GMT')
             return response
 
 If the view is accessed from a ``GET`` request, an object list is returned in

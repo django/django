@@ -62,7 +62,7 @@ def patch_cache_control(response, **kwargs):
 
     cc = defaultdict(set)
     if response.get('Cache-Control'):
-        for field in cc_delim_re.split(response['Cache-Control']):
+        for field in cc_delim_re.split(response.headers['Cache-Control']):
             directive, value = dictitem(field)
             if directive == 'no-cache':
                 # no-cache supports multiple field names.
@@ -100,7 +100,7 @@ def patch_cache_control(response, **kwargs):
         else:
             directives.append(dictvalue(directive, values))
     cc = ', '.join(directives)
-    response['Cache-Control'] = cc
+    response.headers['Cache-Control'] = cc
 
 
 def get_max_age(response):
@@ -110,7 +110,7 @@ def get_max_age(response):
     """
     if not response.has_header('Cache-Control'):
         return
-    cc = dict(_to_tuple(el) for el in cc_delim_re.split(response['Cache-Control']))
+    cc = dict(_to_tuple(el) for el in cc_delim_re.split(response.headers['Cache-Control']))
     try:
         return int(cc['max-age'])
     except (ValueError, TypeError, KeyError):
@@ -119,7 +119,7 @@ def get_max_age(response):
 
 def set_response_etag(response):
     if not response.streaming and response.content:
-        response['ETag'] = quote_etag(hashlib.md5(response.content).hexdigest())
+        response.headers['ETag'] = quote_etag(hashlib.md5(response.content).hexdigest())
     return response
 
 
@@ -140,7 +140,7 @@ def _not_modified(request, response=None):
         # Last-Modified.
         for header in ('Cache-Control', 'Content-Location', 'Date', 'ETag', 'Expires', 'Last-Modified', 'Vary'):
             if header in response:
-                new_response[header] = response[header]
+                new_response.headers[header] = response.headers[header]
 
         # Preserve cookies as per the cookie specification: "If a proxy server
         # receives a response which contains a Set-cookie header, it should
@@ -261,7 +261,7 @@ def patch_response_headers(response, cache_timeout=None):
     if cache_timeout < 0:
         cache_timeout = 0  # Can't have max-age negative
     if not response.has_header('Expires'):
-        response['Expires'] = http_date(time.time() + cache_timeout)
+        response.headers['Expires'] = http_date(time.time() + cache_timeout)
     patch_cache_control(response, max_age=cache_timeout)
 
 
@@ -284,7 +284,7 @@ def patch_vary_headers(response, newheaders):
     # implementations may rely on the order of the Vary contents in, say,
     # computing an MD5 hash.
     if response.has_header('Vary'):
-        vary_headers = cc_delim_re.split(response['Vary'])
+        vary_headers = cc_delim_re.split(response.headers['Vary'])
     else:
         vary_headers = []
     # Use .lower() here so we treat headers as case-insensitive.
@@ -293,9 +293,9 @@ def patch_vary_headers(response, newheaders):
                           if newheader.lower() not in existing_headers]
     vary_headers += additional_headers
     if '*' in vary_headers:
-        response['Vary'] = '*'
+        response.headers['Vary'] = '*'
     else:
-        response['Vary'] = ', '.join(vary_headers)
+        response.headers['Vary'] = ', '.join(vary_headers)
 
 
 def has_vary_header(response, header_query):
@@ -304,7 +304,7 @@ def has_vary_header(response, header_query):
     """
     if not response.has_header('Vary'):
         return False
-    vary_headers = cc_delim_re.split(response['Vary'])
+    vary_headers = cc_delim_re.split(response.headers['Vary'])
     existing_headers = {header.lower() for header in vary_headers}
     return header_query.lower() in existing_headers
 
@@ -391,7 +391,7 @@ def learn_cache_key(request, response, cache_timeout=None, key_prefix=None, cach
         # in that case and would result in storing the same content under
         # multiple keys in the cache. See #18191 for details.
         headerlist = []
-        for header in cc_delim_re.split(response['Vary']):
+        for header in cc_delim_re.split(response.headers['Vary']):
             header = header.upper().replace('-', '_')
             if header != 'ACCEPT_LANGUAGE' or not is_accept_language_redundant:
                 headerlist.append('HTTP_' + header)

@@ -107,8 +107,8 @@ class View:
     def options(self, request, *args, **kwargs):
         """Handle responding to requests for the OPTIONS HTTP verb."""
         response = HttpResponse()
-        response['Allow'] = ', '.join(self._allowed_methods())
-        response['Content-Length'] = '0'
+        response.headers['Allow'] = ', '.join(self._allowed_methods())
+        response.headers['Content-Length'] = '0'
         return response
 
     def _allowed_methods(self):

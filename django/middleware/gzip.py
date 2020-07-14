@@ -31,21 +31,21 @@ class GZipMiddleware(MiddlewareMixin):
             # Delete the `Content-Length` header for streaming content, because
             # we won't know the compressed size until we stream it.
             response.streaming_content = compress_sequence(response.streaming_content)
-            del response['Content-Length']
+            del response.headers['Content-Length']
         else:
             # Return the compressed content only if it's actually shorter.
             compressed_content = compress_string(response.content)
             if len(compressed_content) >= len(response.content):
                 return response
             response.content = compressed_content
-            response['Content-Length'] = str(len(response.content))
+            response.headers['Content-Length'] = str(len(response.content))
 
         # If there is a strong ETag, make it weak to fulfill the requirements
         # of RFC 7232 section-2.1 while also allowing conditional request
         # matches on ETags.
         etag = response.get('ETag')
         if etag and etag.startswith('"'):
-            response['ETag'] = 'W/' + etag
-        response['Content-Encoding'] = 'gzip'
+            response.headers['ETag'] = 'W/' + etag
+        response.headers['Content-Encoding'] = 'gzip'
 
         return response

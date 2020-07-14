@@ -309,7 +309,10 @@ Pagination
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* Response headers are now stored in :attr:`.HttpResponse.headers`. This can be
+  used instead of the original dict-like interface of ``HttpResponse`` objects.
+  Both interfaces will continue to be supported. See
+  :ref:`setting-header-fields` for details.
 
 Security
 ~~~~~~~~

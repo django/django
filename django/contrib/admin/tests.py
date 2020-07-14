@@ -10,7 +10,7 @@ from django.utils.translation import gettext as _
 class CSPMiddleware(MiddlewareMixin):
     """The admin's JavaScript should be compatible with CSP."""
     def process_response(self, request, response):
-        response['Content-Security-Policy'] = "default-src 'self'"
+        response.headers['Content-Security-Policy'] = "default-src 'self'"
         return response
 
 

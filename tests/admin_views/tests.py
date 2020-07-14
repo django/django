@@ -2964,7 +2964,7 @@ class AdminViewStringPrimaryKeyTest(TestCase):
         )
 
         self.assertEqual(response.status_code, 302)  # temporary redirect
-        self.assertIn('/123_2Fhistory/', response['location'])  # PK is quoted
+        self.assertIn('/123_2Fhistory/', response.headers['location'])  # PK is quoted
 
 
 @override_settings(ROOT_URLCONF='admin_views.urls')

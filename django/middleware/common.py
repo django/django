@@ -110,7 +110,7 @@ class CommonMiddleware(MiddlewareMixin):
         # Add the Content-Length header to non-streaming responses if not
         # already set.
         if not response.streaming and not response.has_header('Content-Length'):
-            response['Content-Length'] = str(len(response.content))
+            response.headers['Content-Length'] = str(len(response.content))
 
         return response
 

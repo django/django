@@ -1481,7 +1481,7 @@ class NonHTMLResponseExceptionReporterFilter(ExceptionReportTestMixin, LoggingCa
     @override_settings(DEBUG=True, ROOT_URLCONF='view_tests.urls')
     def test_non_html_response_encoding(self):
         response = self.client.get('/raises500/', HTTP_ACCEPT='application/json')
-        self.assertEqual(response['Content-Type'], 'text/plain; charset=utf-8')
+        self.assertEqual(response.headers['Content-Type'], 'text/plain; charset=utf-8')
 
 
 class DecoratorsTests(SimpleTestCase):

@@ -116,14 +116,14 @@ class HTTPSitemapTests(SitemapTestsBase):
     def test_sitemap_last_modified(self):
         "Last-Modified header is set correctly"
         response = self.client.get('/lastmod/sitemap.xml')
-        self.assertEqual(response['Last-Modified'], 'Wed, 13 Mar 2013 10:00:00 GMT')
+        self.assertEqual(response.headers['Last-Modified'], 'Wed, 13 Mar 2013 10:00:00 GMT')
 
     def test_sitemap_last_modified_date(self):
         """
         The Last-Modified header should be support dates (without time).
         """
         response = self.client.get('/lastmod/date-sitemap.xml')
-        self.assertEqual(response['Last-Modified'], 'Wed, 13 Mar 2013 00:00:00 GMT')
+        self.assertEqual(response.headers['Last-Modified'], 'Wed, 13 Mar 2013 00:00:00 GMT')
 
     def test_sitemap_last_modified_tz(self):
         """
@@ -131,7 +131,7 @@ class HTTPSitemapTests(SitemapTestsBase):
         to GMT.
         """
         response = self.client.get('/lastmod/tz-sitemap.xml')
-        self.assertEqual(response['Last-Modified'], 'Wed, 13 Mar 2013 15:00:00 GMT')
+        self.assertEqual(response.headers['Last-Modified'], 'Wed, 13 Mar 2013 15:00:00 GMT')
 
     def test_sitemap_last_modified_missing(self):
         "Last-Modified header is missing when sitemap has no lastmod"
@@ -165,7 +165,7 @@ class HTTPSitemapTests(SitemapTestsBase):
         Test sitemaps are sorted by lastmod in ascending order.
         """
         response = self.client.get('/lastmod-sitemaps/ascending.xml')
-        self.assertEqual(response['Last-Modified'], 'Sat, 20 Apr 2013 05:00:00 GMT')
+        self.assertEqual(response.headers['Last-Modified'], 'Sat, 20 Apr 2013 05:00:00 GMT')
 
     def test_sitemaps_lastmod_descending(self):
         """
@@ -173,7 +173,7 @@ class HTTPSitemapTests(SitemapTestsBase):
         Test sitemaps are sorted by lastmod in descending order.
         """
         response = self.client.get('/lastmod-sitemaps/descending.xml')
-        self.assertEqual(response['Last-Modified'], 'Sat, 20 Apr 2013 05:00:00 GMT')
+        self.assertEqual(response.headers['Last-Modified'], 'Sat, 20 Apr 2013 05:00:00 GMT')
 
     @override_settings(USE_I18N=True, USE_L10N=True)
     def test_localized_priority(self):
@@ -243,10 +243,10 @@ class HTTPSitemapTests(SitemapTestsBase):
 
     def test_x_robots_sitemap(self):
         response = self.client.get('/simple/index.xml')
-        self.assertEqual(response['X-Robots-Tag'], 'noindex, noodp, noarchive')
+        self.assertEqual(response.headers['X-Robots-Tag'], 'noindex, noodp, noarchive')
 
         response = self.client.get('/simple/sitemap.xml')
-        self.assertEqual(response['X-Robots-Tag'], 'noindex, noodp, noarchive')
+        self.assertEqual(response.headers['X-Robots-Tag'], 'noindex, noodp, noarchive')
 
     def test_empty_sitemap(self):
         response = self.client.get('/empty/sitemap.xml')

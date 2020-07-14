@@ -551,9 +551,9 @@ Specifically, a ``Response`` object has the following attributes:
         If the given URL is not found, accessing this attribute will raise a
         :exc:`~django.urls.Resolver404` exception.
 
-You can also use dictionary syntax on the response object to query the value
-of any settings in the HTTP headers. For example, you could determine the
-content type of a response using ``response['Content-Type']``.
+As with a normal response, you can also access the headers through
+:attr:`.HttpResponse.headers`. For example, you could determine the content
+type of a response using ``response.headers['Content-Type']``.
 
 Exceptions
 ----------

@@ -48,9 +48,9 @@ def serve(request, path, document_root=None, show_indexes=False):
     content_type, encoding = mimetypes.guess_type(str(fullpath))
     content_type = content_type or 'application/octet-stream'
     response = FileResponse(fullpath.open('rb'), content_type=content_type)
-    response["Last-Modified"] = http_date(statobj.st_mtime)
+    response.headers["Last-Modified"] = http_date(statobj.st_mtime)
     if encoding:
-        response["Content-Encoding"] = encoding
+        response.headers["Content-Encoding"] = encoding
     return response
 
 

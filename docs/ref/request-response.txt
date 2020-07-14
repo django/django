@@ -700,17 +700,29 @@ generators are immediately closed.
 If you need the response to be streamed from the iterator to the client, you
 must use the :class:`StreamingHttpResponse` class instead.
 
+.. _setting-header-fields:
+
 Setting header fields
 ~~~~~~~~~~~~~~~~~~~~~
 
-To set or remove a header field in your response, treat it like a dictionary::
+To set or remove a header field in your response, use
+:attr:`HttpResponse.headers`::
+
+    >>> response = HttpResponse()
+    >>> response.headers['Age'] = 120
+    >>> del response.headers['Age']
+
+You can also manipulate headers by treating your response like a dictionary::
 
     >>> response = HttpResponse()
     >>> response['Age'] = 120
     >>> del response['Age']
 
-Note that unlike a dictionary, ``del`` doesn't raise ``KeyError`` if the header
-field doesn't exist.
+This proxies to ``HttpResponse.headers``, and is the original interface offered
+by ``HttpResponse``.
+
+When using this interface, unlike a dictionary, ``del`` doesn't raise
+``KeyError`` if the header field doesn't exist.
 
 For setting the ``Cache-Control`` and ``Vary`` header fields, it is recommended
 to use the :func:`~django.utils.cache.patch_cache_control` and
@@ -722,6 +734,10 @@ middleware, are not removed.
 HTTP header fields cannot contain newlines. An attempt to set a header field
 containing a newline character (CR or LF) will raise ``BadHeaderError``
 
+.. versionchanged:: 3.2
+
+    The :attr:`HttpResponse.headers` interface was added.
+
 Telling the browser to treat the response as a file attachment
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -730,7 +746,7 @@ To tell the browser to treat the response as a file attachment, use the
 this is how you might return a Microsoft Excel spreadsheet::
 
     >>> response = HttpResponse(my_data, content_type='application/vnd.ms-excel')
-    >>> response['Content-Disposition'] = 'attachment; filename="foo.xls"'
+    >>> response.headers['Content-Disposition'] = 'attachment; filename="foo.xls"'
 
 There's nothing Django-specific about the ``Content-Disposition`` header, but
 it's easy to forget the syntax, so we've included it here.
@@ -741,6 +757,13 @@ Attributes
 .. attribute:: HttpResponse.content
 
     A bytestring representing the content, encoded from a string if necessary.
+
+.. attribute:: HttpResponse.headers
+
+    .. versionadded:: 3.2
+
+    A case insensitive, dict-like object that provides an interface to all
+    HTTP headers on the response. See :ref:`setting-header-fields`.
 
 .. attribute:: HttpResponse.charset
 

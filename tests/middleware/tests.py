@@ -292,7 +292,7 @@ class CommonMiddlewareTest(SimpleTestCase):
             return response
 
         response = CommonMiddleware(get_response)(self.rf.get('/'))
-        self.assertEqual(int(response['Content-Length']), len(response.content))
+        self.assertEqual(int(response.headers['Content-Length']), len(response.content))
 
     def test_content_length_header_not_added_for_streaming_response(self):
         def get_response(req):
@@ -308,11 +308,11 @@ class CommonMiddlewareTest(SimpleTestCase):
 
         def get_response(req):
             response = HttpResponse()
-            response['Content-Length'] = bad_content_length
+            response.headers['Content-Length'] = bad_content_length
             return response
 
         response = CommonMiddleware(get_response)(self.rf.get('/'))
-        self.assertEqual(int(response['Content-Length']), bad_content_length)
+        self.assertEqual(int(response.headers['Content-Length']), bad_content_length)
 
     # Other tests
 
@@ -607,7 +607,7 @@ class ConditionalGetMiddlewareTest(SimpleTestCase):
         self.assertEqual(new_response.status_code, 304)
         base_response = get_response(self.req)
         for header in ('Cache-Control', 'Content-Location', 'Date', 'ETag', 'Expires', 'Last-Modified', 'Vary'):
-            self.assertEqual(new_response[header], base_response[header])
+            self.assertEqual(new_response.headers[header], base_response.headers[header])
         self.assertEqual(new_response.cookies, base_response.cookies)
         self.assertNotIn('Content-Language', new_response)
 
@@ -622,7 +622,7 @@ class ConditionalGetMiddlewareTest(SimpleTestCase):
             return HttpResponse(status=200)
 
         response = ConditionalGetMiddleware(self.get_response)(self.req)
-        etag = response['ETag']
+        etag = response.headers['ETag']
         put_request = self.request_factory.put('/', HTTP_IF_MATCH=etag)
         conditional_get_response = ConditionalGetMiddleware(get_200_response)(put_request)
         self.assertEqual(conditional_get_response.status_code, 200)  # should never be a 412
@@ -653,11 +653,11 @@ class XFrameOptionsMiddlewareTest(SimpleTestCase):
         """
         with override_settings(X_FRAME_OPTIONS='SAMEORIGIN'):
             r = XFrameOptionsMiddleware(get_response_empty)(HttpRequest())
-            self.assertEqual(r['X-Frame-Options'], 'SAMEORIGIN')
+            self.assertEqual(r.headers['X-Frame-Options'], 'SAMEORIGIN')
 
         with override_settings(X_FRAME_OPTIONS='sameorigin'):
             r = XFrameOptionsMiddleware(get_response_empty)(HttpRequest())
-            self.assertEqual(r['X-Frame-Options'], 'SAMEORIGIN')
+            self.assertEqual(r.headers['X-Frame-Options'], 'SAMEORIGIN')
 
     def test_deny(self):
         """
@@ -666,11 +666,11 @@ class XFrameOptionsMiddlewareTest(SimpleTestCase):
         """
         with override_settings(X_FRAME_OPTIONS='DENY'):
             r = XFrameOptionsMiddleware(get_response_empty)(HttpRequest())
-            self.assertEqual(r['X-Frame-Options'], 'DENY')
+            self.assertEqual(r.headers['X-Frame-Options'], 'DENY')
 
         with override_settings(X_FRAME_OPTIONS='deny'):
             r = XFrameOptionsMiddleware(get_response_empty)(HttpRequest())
-            self.assertEqual(r['X-Frame-Options'], 'DENY')
+            self.assertEqual(r.headers['X-Frame-Options'], 'DENY')
 
     def test_defaults_sameorigin(self):
         """
@@ -680,7 +680,7 @@ class XFrameOptionsMiddlewareTest(SimpleTestCase):
         with override_settings(X_FRAME_OPTIONS=None):
             del settings.X_FRAME_OPTIONS    # restored by override_settings
             r = XFrameOptionsMiddleware(get_response_empty)(HttpRequest())
-            self.assertEqual(r['X-Frame-Options'], 'DENY')
+            self.assertEqual(r.headers['X-Frame-Options'], 'DENY')
 
     def test_dont_set_if_set(self):
         """
@@ -689,21 +689,21 @@ class XFrameOptionsMiddlewareTest(SimpleTestCase):
         """
         def same_origin_response(request):
             response = HttpResponse()
-            response['X-Frame-Options'] = 'SAMEORIGIN'
+            response.headers['X-Frame-Options'] = 'SAMEORIGIN'
             return response
 
         def deny_response(request):
             response = HttpResponse()
-            response['X-Frame-Options'] = 'DENY'
+            response.headers['X-Frame-Options'] = 'DENY'
             return response
 
         with override_settings(X_FRAME_OPTIONS='DENY'):
             r = XFrameOptionsMiddleware(same_origin_response)(HttpRequest())
-            self.assertEqual(r['X-Frame-Options'], 'SAMEORIGIN')
+            self.assertEqual(r.headers['X-Frame-Options'], 'SAMEORIGIN')
 
         with override_settings(X_FRAME_OPTIONS='SAMEORIGIN'):
             r = XFrameOptionsMiddleware(deny_response)(HttpRequest())
-            self.assertEqual(r['X-Frame-Options'], 'DENY')
+            self.assertEqual(r.headers['X-Frame-Options'], 'DENY')
 
     def test_response_exempt(self):
         """
@@ -722,10 +722,10 @@ class XFrameOptionsMiddlewareTest(SimpleTestCase):
 
         with override_settings(X_FRAME_OPTIONS='SAMEORIGIN'):
             r = XFrameOptionsMiddleware(xframe_not_exempt_response)(HttpRequest())
-            self.assertEqual(r['X-Frame-Options'], 'SAMEORIGIN')
+            self.assertEqual(r.headers['X-Frame-Options'], 'SAMEORIGIN')
 
             r = XFrameOptionsMiddleware(xframe_exempt_response)(HttpRequest())
-            self.assertIsNone(r.get('X-Frame-Options'))
+            self.assertIsNone(r.headers.get('X-Frame-Options'))
 
     def test_is_extendable(self):
         """
@@ -749,16 +749,16 @@ class XFrameOptionsMiddlewareTest(SimpleTestCase):
 
         with override_settings(X_FRAME_OPTIONS='DENY'):
             r = OtherXFrameOptionsMiddleware(same_origin_response)(HttpRequest())
-            self.assertEqual(r['X-Frame-Options'], 'SAMEORIGIN')
+            self.assertEqual(r.headers['X-Frame-Options'], 'SAMEORIGIN')
 
             request = HttpRequest()
             request.sameorigin = True
             r = OtherXFrameOptionsMiddleware(get_response_empty)(request)
-            self.assertEqual(r['X-Frame-Options'], 'SAMEORIGIN')
+            self.assertEqual(r.headers['X-Frame-Options'], 'SAMEORIGIN')
 
         with override_settings(X_FRAME_OPTIONS='SAMEORIGIN'):
             r = OtherXFrameOptionsMiddleware(get_response_empty)(HttpRequest())
-            self.assertEqual(r['X-Frame-Options'], 'DENY')
+            self.assertEqual(r.headers['X-Frame-Options'], 'DENY')
 
 
 class GZipMiddlewareTest(SimpleTestCase):
@@ -916,12 +916,12 @@ class ETagGZipMiddlewareTest(SimpleTestCase):
         """
         def get_response(req):
             response = HttpResponse(self.compressible_string)
-            response['ETag'] = '"eggs"'
+            response.headers['ETag'] = '"eggs"'
             return response
 
         request = self.rf.get('/', HTTP_ACCEPT_ENCODING='gzip, deflate')
         gzip_response = GZipMiddleware(get_response)(request)
-        self.assertEqual(gzip_response['ETag'], 'W/"eggs"')
+        self.assertEqual(gzip_response.headers['ETag'], 'W/"eggs"')
 
     def test_weak_etag_not_modified(self):
         """
@@ -929,12 +929,12 @@ class ETagGZipMiddlewareTest(SimpleTestCase):
         """
         def get_response(req):
             response = HttpResponse(self.compressible_string)
-            response['ETag'] = 'W/"eggs"'
+            response.headers['ETag'] = 'W/"eggs"'
             return response
 
         request = self.rf.get('/', HTTP_ACCEPT_ENCODING='gzip, deflate')
         gzip_response = GZipMiddleware(get_response)(request)
-        self.assertEqual(gzip_response['ETag'], 'W/"eggs"')
+        self.assertEqual(gzip_response.headers['ETag'], 'W/"eggs"')
 
     def test_etag_match(self):
         """
@@ -949,7 +949,7 @@ class ETagGZipMiddlewareTest(SimpleTestCase):
 
         request = self.rf.get('/', HTTP_ACCEPT_ENCODING='gzip, deflate')
         response = GZipMiddleware(get_cond_response)(request)
-        gzip_etag = response['ETag']
+        gzip_etag = response.headers['ETag']
         next_request = self.rf.get('/', HTTP_ACCEPT_ENCODING='gzip, deflate', HTTP_IF_NONE_MATCH=gzip_etag)
         next_response = ConditionalGetMiddleware(get_response)(next_request)
         self.assertEqual(next_response.status_code, 304)

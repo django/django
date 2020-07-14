@@ -781,7 +781,7 @@ class SessionMiddlewareTests(TestCase):
         )
         # SessionMiddleware sets 'Vary: Cookie' to prevent the 'Set-Cookie'
         # from being cached.
-        self.assertEqual(response['Vary'], 'Cookie')
+        self.assertEqual(response.headers['Vary'], 'Cookie')
 
     @override_settings(SESSION_COOKIE_DOMAIN='.example.local', SESSION_COOKIE_PATH='/example/')
     def test_session_delete_on_end_with_custom_domain_and_path(self):
@@ -826,7 +826,7 @@ class SessionMiddlewareTests(TestCase):
         # A cookie should not be set.
         self.assertEqual(response.cookies, {})
         # The session is accessed so "Vary: Cookie" should be set.
-        self.assertEqual(response['Vary'], 'Cookie')
+        self.assertEqual(response.headers['Vary'], 'Cookie')
 
     def test_empty_session_saved(self):
         """
@@ -849,7 +849,7 @@ class SessionMiddlewareTests(TestCase):
             'Set-Cookie: sessionid=%s' % request.session.session_key,
             str(response.cookies)
         )
-        self.assertEqual(response['Vary'], 'Cookie')
+        self.assertEqual(response.headers['Vary'], 'Cookie')
 
         # Empty the session data.
         del request.session['foo']
@@ -866,7 +866,7 @@ class SessionMiddlewareTests(TestCase):
             'Set-Cookie: sessionid=%s' % request.session.session_key,
             str(response.cookies)
         )
-        self.assertEqual(response['Vary'], 'Cookie')
+        self.assertEqual(response.headers['Vary'], 'Cookie')
 
 
 class CookieSessionTests(SessionTestsMixin, SimpleTestCase):

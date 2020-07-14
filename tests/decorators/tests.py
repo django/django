@@ -438,7 +438,7 @@ class XFrameOptionsDecoratorsTests(TestCase):
         def a_view(request):
             return HttpResponse()
         r = a_view(HttpRequest())
-        self.assertEqual(r['X-Frame-Options'], 'DENY')
+        self.assertEqual(r.headers['X-Frame-Options'], 'DENY')
 
     def test_sameorigin_decorator(self):
         """
@@ -449,7 +449,7 @@ class XFrameOptionsDecoratorsTests(TestCase):
         def a_view(request):
             return HttpResponse()
         r = a_view(HttpRequest())
-        self.assertEqual(r['X-Frame-Options'], 'SAMEORIGIN')
+        self.assertEqual(r.headers['X-Frame-Options'], 'SAMEORIGIN')
 
     def test_exempt_decorator(self):
         """
@@ -477,6 +477,6 @@ class NeverCacheDecoratorTest(TestCase):
             return HttpResponse()
         r = a_view(HttpRequest())
         self.assertEqual(
-            set(r['Cache-Control'].split(', ')),
+            set(r.headers['Cache-Control'].split(', ')),
             {'max-age=0', 'no-cache', 'no-store', 'must-revalidate', 'private'},
         )

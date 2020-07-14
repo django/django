@@ -1700,9 +1700,9 @@ class CacheUtils(SimpleTestCase):
             with self.subTest(initial_vary=initial_vary, newheaders=newheaders):
                 response = HttpResponse()
                 if initial_vary is not None:
-                    response['Vary'] = initial_vary
+                    response.headers['Vary'] = initial_vary
                 patch_vary_headers(response, newheaders)
-                self.assertEqual(response['Vary'], resulting_vary)
+                self.assertEqual(response.headers['Vary'], resulting_vary)
 
     def test_get_cache_key(self):
         request = self.factory.get(self.path)
@@ -1753,7 +1753,7 @@ class CacheUtils(SimpleTestCase):
     def test_learn_cache_key(self):
         request = self.factory.head(self.path)
         response = HttpResponse()
-        response['Vary'] = 'Pony'
+        response.headers['Vary'] = 'Pony'
         # Make sure that the Vary header is added to the key hash
         learn_cache_key(request, response)
 
@@ -1795,9 +1795,9 @@ class CacheUtils(SimpleTestCase):
             with self.subTest(initial_cc=initial_cc, newheaders=newheaders):
                 response = HttpResponse()
                 if initial_cc is not None:
-                    response['Cache-Control'] = initial_cc
+                    response.headers['Cache-Control'] = initial_cc
                 patch_cache_control(response, **newheaders)
-                parts = set(cc_delim_re.split(response['Cache-Control']))
+                parts = set(cc_delim_re.split(response.headers['Cache-Control']))
                 self.assertEqual(parts, expected_cc)
 
 
@@ -1892,7 +1892,7 @@ class CacheI18nTest(SimpleTestCase):
         request.META['HTTP_ACCEPT_LANGUAGE'] = accept_language
         request.META['HTTP_ACCEPT_ENCODING'] = 'gzip;q=1.0, identity; q=0.5, *;q=0'
         response = HttpResponse()
-        response['Vary'] = vary
+        response.headers['Vary'] = vary
         key = learn_cache_key(request, response)
         key2 = get_cache_key(request)
         self.assertEqual(key, reference_key)
@@ -1905,7 +1905,7 @@ class CacheI18nTest(SimpleTestCase):
         request = self.factory.get(self.path)
         request.META['HTTP_ACCEPT_ENCODING'] = 'gzip;q=1.0, identity; q=0.5, *;q=0'
         response = HttpResponse()
-        response['Vary'] = 'accept-encoding'
+        response.headers['Vary'] = 'accept-encoding'
         key = learn_cache_key(request, response)
         self.assertIn(lang, key, "Cache keys should include the language name when translation is active")
         self.check_accept_language_vary(
@@ -2364,9 +2364,9 @@ class TestWithTemplateResponse(SimpleTestCase):
                 template = engines['django'].from_string("This is a test")
                 response = TemplateResponse(HttpRequest(), template)
                 if initial_vary is not None:
-                    response['Vary'] = initial_vary
+                    response.headers['Vary'] = initial_vary
                 patch_vary_headers(response, newheaders)
-                self.assertEqual(response['Vary'], resulting_vary)
+                self.assertEqual(response.headers['Vary'], resulting_vary)
 
     def test_get_cache_key(self):
         request = self.factory.get(self.path)

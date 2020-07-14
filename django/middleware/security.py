@@ -38,18 +38,18 @@ class SecurityMiddleware(MiddlewareMixin):
                 sts_header = sts_header + "; includeSubDomains"
             if self.sts_preload:
                 sts_header = sts_header + "; preload"
-            response['Strict-Transport-Security'] = sts_header
+            response.headers['Strict-Transport-Security'] = sts_header
 
         if self.content_type_nosniff:
-            response.setdefault('X-Content-Type-Options', 'nosniff')
+            response.headers.setdefault('X-Content-Type-Options', 'nosniff')
 
         if self.xss_filter:
-            response.setdefault('X-XSS-Protection', '1; mode=block')
+            response.headers.setdefault('X-XSS-Protection', '1; mode=block')
 
         if self.referrer_policy:
             # Support a comma-separated string or iterable of values to allow
             # fallback.
-            response.setdefault('Referrer-Policy', ','.join(
+            response.headers.setdefault('Referrer-Policy', ','.join(
                 [v.strip() for v in self.referrer_policy.split(',')]
                 if isinstance(self.referrer_policy, str) else self.referrer_policy
             ))
