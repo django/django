@@ -720,7 +720,7 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
         )
         self.assertEqual(
             sanitize_address(('A name', 'to@example.com'), 'utf-8'),
-            '=?utf-8?q?A_name?= <to@example.com>'
+            'A name <to@example.com>'
         )
 
         # Unicode characters are are supported in RFC-6532.
@@ -732,6 +732,37 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
             sanitize_address(('Tó Example', 'tó@example.com'), 'utf-8'),
             '=?utf-8?q?T=C3=B3_Example?= <=?utf-8?b?dMOz?=@example.com>'
         )
+        # Addresses with long unicode display names.
+        self.assertEqual(
+            sanitize_address('Tó Example very long' * 4 + ' <to@example.com>', 'utf-8'),
+            '=?utf-8?q?T=C3=B3_Example_very_longT=C3=B3_Example_very_longT=C3='
+            'B3_Example_?=\n'
+            ' =?utf-8?q?very_longT=C3=B3_Example_very_long?= <to@example.com>'
+        )
+        self.assertEqual(
+            sanitize_address(('Tó Example very long' * 4, 'to@example.com'), 'utf-8'),
+            '=?utf-8?q?T=C3=B3_Example_very_longT=C3=B3_Example_very_longT=C3='
+            'B3_Example_?=\n'
+            ' =?utf-8?q?very_longT=C3=B3_Example_very_long?= <to@example.com>'
+        )
+        # Address with long display name and unicode domain.
+        self.assertEqual(
+            sanitize_address(('To Example very long' * 4, 'to@exampl€.com'), 'utf-8'),
+            'To Example very longTo Example very longTo Example very longTo Ex'
+            'ample very\n'
+            ' long <to@xn--exampl-nc1c.com>'
+        )
+
+    def test_sanitize_address_header_injection(self):
+        msg = 'Invalid address; address parts cannot contain newlines.'
+        tests = [
+            ('Name\nInjection', 'to@xample.com'),
+            ('Name', 'to\ninjection@example.com'),
+        ]
+        for email_address in tests:
+            with self.subTest(email_address=email_address):
+                with self.assertRaisesMessage(ValueError, msg):
+                    sanitize_address(email_address, encoding='utf-8')
 
 
 @requires_tz_support

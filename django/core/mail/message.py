@@ -10,7 +10,9 @@ from email.mime.base import MIMEBase
 from email.mime.message import MIMEMessage
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
-from email.utils import formatdate, getaddresses, make_msgid, parseaddr
+from email.utils import (
+    formataddr, formatdate, getaddresses, make_msgid, parseaddr,
+)
 from io import BytesIO, StringIO
 from pathlib import Path
 
@@ -103,7 +105,15 @@ def sanitize_address(addr, encoding):
         addr = parseaddr(addr)
     nm, addr = addr
     localpart, domain = None, None
-    nm = Header(nm, encoding).encode()
+    if '\n' in nm or '\r' in nm:
+        raise ValueError('Invalid address; address parts cannot contain newlines.')
+
+    # Avoid UTF-8 encode, if it's possible.
+    try:
+        nm.encode('ascii')
+        nm = Header(nm).encode()
+    except UnicodeEncodeError:
+        nm = Header(nm, encoding).encode()
     try:
         addr.encode('ascii')
     except UnicodeEncodeError:  # IDN or non-ascii in the local part
@@ -112,15 +122,20 @@ def sanitize_address(addr, encoding):
     # An `email.headerregistry.Address` object is used since
     # email.utils.formataddr() naively encodes the name as ascii (see #25986).
     if localpart and domain:
-        address = Address(nm, username=localpart, domain=domain)
-        return str(address)
+        address_parts = localpart + domain
+        if '\n' in address_parts or '\r' in address_parts:
+            raise ValueError('Invalid address; address parts cannot contain newlines.')
+        address = Address(username=localpart, domain=domain)
+        return formataddr((nm, address.addr_spec))
 
     try:
-        address = Address(nm, addr_spec=addr)
+        if '\n' in addr or '\r' in addr:
+            raise ValueError('Invalid address; address parts cannot contain newlines.')
+        address = Address(addr_spec=addr)
     except (InvalidHeaderDefect, NonASCIILocalPartDefect):
         localpart, domain = split_addr(addr, encoding)
-        address = Address(nm, username=localpart, domain=domain)
-    return str(address)
+        address = Address(username=localpart, domain=domain)
+    return formataddr((nm, address.addr_spec))
 
 
 class MIMEMixin:
