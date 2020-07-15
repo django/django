@@ -890,7 +890,7 @@ Methods
 
         Using ``samesite='None'`` (string) was allowed.
 
-.. method:: HttpResponse.delete_cookie(key, path='/', domain=None)
+.. method:: HttpResponse.delete_cookie(key, path='/', domain=None, samesite=None)
 
     Deletes the cookie with the given key. Fails silently if the key doesn't
     exist.
@@ -898,6 +898,10 @@ Methods
     Due to the way cookies work, ``path`` and ``domain`` should be the same
     values you used in ``set_cookie()`` -- otherwise the cookie may not be
     deleted.
+
+    .. versionchanged:: 2.2.15
+
+        The ``samesite`` argument was added.
 
 .. method:: HttpResponse.close()
 
