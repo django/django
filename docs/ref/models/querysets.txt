@@ -1844,34 +1844,42 @@ they query the database each time they're called.
 .. method:: get(**kwargs)
 
 Returns the object matching the given lookup parameters, which should be in
-the format described in `Field lookups`_.
+the format described in `Field lookups`_. You should use lookups that are
+guaranteed unique, such as the primary key or fields in a unique constraint.
+For example::
 
-``get()`` raises :exc:`~django.core.exceptions.MultipleObjectsReturned` if more
-than one object was found. The
-:exc:`~django.core.exceptions.MultipleObjectsReturned` exception is an
-attribute of the model class.
+    Entry.objects.get(id=1)
+    Entry.objects.get(blog=blog, entry_number=1)
 
-``get()`` raises a :exc:`~django.db.models.Model.DoesNotExist` exception if an
-object wasn't found for the given parameters. This exception is an attribute
-of the model class. Example::
+If you expect a queryset to already return one row, you can use ``get()``
+without any arguments to return the object for that row::
 
-    Entry.objects.get(id='foo') # raises Entry.DoesNotExist
+    Entry.objects.filter(pk=1).get()
 
-The :exc:`~django.db.models.Model.DoesNotExist` exception inherits from
-:exc:`django.core.exceptions.ObjectDoesNotExist`, so you can target multiple
-:exc:`~django.db.models.Model.DoesNotExist` exceptions. Example::
+If ``get()`` doesn't find any object, it raises a :exc:`Model.DoesNotExist
+<django.db.models.Model.DoesNotExist>` exception::
+
+    Entry.objects.get(id=-999) # raises Entry.DoesNotExist
+
+If ``get()`` finds more than one object, it raises a
+:exc:`Model.MultipleObjectsReturned
+<django.db.models.Model.MultipleObjectsReturned>` exception::
+
+    Entry.objects.get(name='A Duplicated Name') # raises Entry.MultipleObjectsReturned
+
+Both these exception classes are attributes of the model class, and specific to
+that model. If you want to handle such exceptions from several ``get()`` calls
+for different models, you can use their generic base classes. For example, you
+can use :exc:`django.core.exceptions.ObjectDoesNotExist`  to handle
+:exc:`~django.db.models.Model.DoesNotExist` exceptions from multiple models::
 
     from django.core.exceptions import ObjectDoesNotExist
+
     try:
-        e = Entry.objects.get(id=3)
-        b = Blog.objects.get(id=1)
+        blog = Blog.objects.get(id=1)
+        entry = Entry.objects.get(blog=blog, entry_number=1)
     except ObjectDoesNotExist:
-        print("Either the entry or blog doesn't exist.")
-
-If you expect a queryset to return one row, you can use ``get()`` without any
-arguments to return the object for that row::
-
-    entry = Entry.objects.filter(...).exclude(...).get()
+        print("Either the blog or entry doesn't exist.")
 
 ``create()``
 ~~~~~~~~~~~~
