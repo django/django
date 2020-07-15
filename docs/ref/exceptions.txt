@@ -26,12 +26,12 @@ Django core exception classes are defined in ``django.core.exceptions``.
 
 .. exception:: ObjectDoesNotExist
 
-    The base class for :exc:`~django.db.models.Model.DoesNotExist` exceptions;
-    a ``try/except`` for ``ObjectDoesNotExist`` will catch
+    The base class for :exc:`Model.DoesNotExist
+    <django.db.models.Model.DoesNotExist>` exceptions. A ``try/except`` for
+    ``ObjectDoesNotExist`` will catch
     :exc:`~django.db.models.Model.DoesNotExist` exceptions for all models.
 
-    See :meth:`~django.db.models.query.QuerySet.get()` for further information
-    on :exc:`ObjectDoesNotExist` and :exc:`~django.db.models.Model.DoesNotExist`.
+    See :meth:`~django.db.models.query.QuerySet.get()`.
 
 ``EmptyResultSet``
 ------------------
@@ -56,13 +56,13 @@ Django core exception classes are defined in ``django.core.exceptions``.
 
 .. exception:: MultipleObjectsReturned
 
-    The :exc:`MultipleObjectsReturned` exception is raised by a query if only
-    one object is expected, but multiple objects are returned. A base version
-    of this exception is provided in :mod:`django.core.exceptions`; each model
-    class contains a subclassed version that can be used to identify the
-    specific object type that has returned multiple objects.
+    The base class for :exc:`Model.MultipleObjectsReturned
+    <django.db.models.Model.MultipleObjectsReturned>` exceptions. A
+    ``try/except`` for ``MultipleObjectsReturned`` will catch
+    :exc:`~django.db.models.Model.MultipleObjectsReturned` exceptions for all
+    models.
 
-    See :meth:`~django.db.models.query.QuerySet.get()` for further information.
+    See :meth:`~django.db.models.query.QuerySet.get()`.
 
 ``SuspiciousOperation``
 -----------------------
