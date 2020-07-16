@@ -188,14 +188,22 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
             EmailMessage(reply_to='reply_to@example.com')
 
     def test_header_injection(self):
+        msg = "Header values can't contain newlines "
         email = EmailMessage('Subject\nInjection Test', 'Content', 'from@example.com', ['to@example.com'])
-        with self.assertRaises(BadHeaderError):
+        with self.assertRaisesMessage(BadHeaderError, msg):
             email.message()
         email = EmailMessage(
             gettext_lazy('Subject\nInjection Test'), 'Content', 'from@example.com', ['to@example.com']
         )
-        with self.assertRaises(BadHeaderError):
+        with self.assertRaisesMessage(BadHeaderError, msg):
             email.message()
+        with self.assertRaisesMessage(BadHeaderError, msg):
+            EmailMessage(
+                'Subject',
+                'Content',
+                'from@example.com',
+                ['Name\nInjection test <to@example.com>'],
+            ).message()
 
     def test_space_continuation(self):
         """
