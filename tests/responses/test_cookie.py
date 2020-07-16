@@ -102,6 +102,7 @@ class DeleteCookieTests(SimpleTestCase):
         self.assertEqual(cookie['path'], '/')
         self.assertEqual(cookie['secure'], '')
         self.assertEqual(cookie['domain'], '')
+        self.assertEqual(cookie['samesite'], '')
 
     def test_delete_cookie_secure_prefix(self):
         """
@@ -115,3 +116,8 @@ class DeleteCookieTests(SimpleTestCase):
                 cookie_name = '__%s-c' % prefix
                 response.delete_cookie(cookie_name)
                 self.assertEqual(response.cookies[cookie_name]['secure'], True)
+
+    def test_delete_cookie_samesite(self):
+        response = HttpResponse()
+        response.delete_cookie('c', samesite='lax')
+        self.assertEqual(response.cookies['c']['samesite'], 'lax')

@@ -89,7 +89,11 @@ class CookieStorage(BaseStorage):
                 samesite=settings.SESSION_COOKIE_SAMESITE,
             )
         else:
-            response.delete_cookie(self.cookie_name, domain=settings.SESSION_COOKIE_DOMAIN)
+            response.delete_cookie(
+                self.cookie_name,
+                domain=settings.SESSION_COOKIE_DOMAIN,
+                samesite=settings.SESSION_COOKIE_SAMESITE,
+            )
 
     def _store(self, messages, response, remove_oldest=True, *args, **kwargs):
         """

@@ -1,10 +1,10 @@
-==========================
-Django 3.0.9 release notes
-==========================
+===========================
+Django 2.2.15 release notes
+===========================
 
 *Expected August 3, 2020*
 
-Django 3.0.9 fixes several bugs in 3.0.8.
+Django 2.2.15 fixes a bug in 2.2.14.
 
 Bugfixes
 ========
