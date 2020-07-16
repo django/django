@@ -1,5 +1,6 @@
 import json
 
+from django.conf import settings
 from django.contrib.messages import constants
 from django.contrib.messages.storage.base import Message
 from django.contrib.messages.storage.cookie import (
@@ -85,6 +86,10 @@ class CookieTests(BaseTests, SimpleTestCase):
         self.assertEqual(response.cookies['messages'].value, '')
         self.assertEqual(response.cookies['messages']['domain'], '.example.com')
         self.assertEqual(response.cookies['messages']['expires'], 'Thu, 01 Jan 1970 00:00:00 GMT')
+        self.assertEqual(
+            response.cookies['messages']['samesite'],
+            settings.SESSION_COOKIE_SAMESITE,
+        )
 
     def test_get_bad_cookie(self):
         request = self.get_request()
