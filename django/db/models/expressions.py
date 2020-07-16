@@ -811,16 +811,6 @@ class Star(Expression):
         return '*', []
 
 
-class Random(Expression):
-    output_field = fields.FloatField()
-
-    def __repr__(self):
-        return "Random()"
-
-    def as_sql(self, compiler, connection):
-        return connection.ops.random_function_sql(), []
-
-
 class Col(Expression):
 
     contains_column_references = True

@@ -16,7 +16,7 @@ from django.db.models import (
     UUIDField, Value, Variance, When,
 )
 from django.db.models.expressions import (
-    Col, Combinable, CombinedExpression, Random, RawSQL, Ref,
+    Col, Combinable, CombinedExpression, RawSQL, Ref,
 )
 from django.db.models.functions import (
     Coalesce, Concat, Left, Length, Lower, Substr, Upper,
@@ -1814,7 +1814,6 @@ class ReprTests(SimpleTestCase):
         )
         self.assertEqual(repr(Func('published', function='TO_CHAR')), "Func(F(published), function=TO_CHAR)")
         self.assertEqual(repr(OrderBy(Value(1))), 'OrderBy(Value(1), descending=False)')
-        self.assertEqual(repr(Random()), "Random()")
         self.assertEqual(repr(RawSQL('table.col', [])), "RawSQL(table.col, [])")
         self.assertEqual(repr(Ref('sum_cost', Sum('cost'))), "Ref(sum_cost, Sum(F(cost)))")
         self.assertEqual(repr(Value(1)), "Value(1)")

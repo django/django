@@ -314,6 +314,8 @@ Models
   :attr:`TextField <django.db.models.TextField.db_collation>` allows setting a
   database collation for the field.
 
+* Added the :class:`~django.db.models.functions.Random` database function.
+
 Pagination
 ~~~~~~~~~~
 
@@ -443,6 +445,9 @@ backends.
   ``DatabaseFeatures.supports_collation_on_textfield`` to ``False``. If
   non-deterministic collations are not supported, set
   ``supports_non_deterministic_collations`` to ``False``.
+
+* ``DatabaseOperations.random_function_sql()`` is removed in favor of the new
+  :class:`~django.db.models.functions.Random` database function.
 
 :mod:`django.contrib.admin`
 ---------------------------

@@ -1114,6 +1114,15 @@ It can also be registered as a transform. For example::
     >>> # Get vectors whose radians are less than 1
     >>> vectors = Vector.objects.filter(x__radians__lt=1, y__radians__lt=1)
 
+``Random``
+----------
+
+.. class:: Random(**extra)
+
+.. versionadded:: 3.2
+
+Returns a random value in the range ``0.0 ≤ x < 1.0``.
+
 ``Round``
 ---------
 

@@ -174,9 +174,6 @@ class DatabaseOperations(BaseDatabaseOperations):
             return name  # Quoting once is enough.
         return "`%s`" % name
 
-    def random_function_sql(self):
-        return 'RAND()'
-
     def return_insert_columns(self, fields):
         # MySQL and MariaDB < 10.5.0 don't support an INSERT...RETURNING
         # statement.
