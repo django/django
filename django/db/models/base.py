@@ -632,13 +632,12 @@ class Model(metaclass=ModelBase):
         db_instance = db_instance_qs.get()
         non_loaded_fields = db_instance.get_deferred_fields()
         for field in self._meta.concrete_fields:
-            if field.attname in non_loaded_fields:
-                # This field wasn't refreshed - skip ahead.
-                continue
-            setattr(self, field.attname, getattr(db_instance, field.attname))
-            # Clear cached foreign keys.
-            if field.is_relation and field.is_cached(self):
-                field.delete_cached_value(self)
+            if field.attname not in non_loaded_fields:
+                # If field in "non_loaded_fields" wasn't refreshed - skip ahead.
+                setattr(self, field.attname, getattr(db_instance, field.attname))
+                # Clear cached foreign keys.
+                if field.is_relation and field.is_cached(self):
+                    field.delete_cached_value(self)
 
         # Clear cached relations.
         for field in self._meta.related_objects:
@@ -776,10 +775,11 @@ class Model(metaclass=ModelBase):
                 update_fields=update_fields,
             )
         # A transaction isn't needed if one query is issued.
-        if meta.parents:
-            context_manager = transaction.atomic(using=using, savepoint=False)
-        else:
-            context_manager = transaction.mark_for_rollback_on_error(using=using)
+        context_manager = (
+            transaction.atomic(using=using, savepoint=False)
+            if meta.parents
+            else transaction.mark_for_rollback_on_error(using=using)
+        )
         with context_manager:
             parent_inserted = False
             if not raw:
@@ -837,11 +837,16 @@ class Model(metaclass=ModelBase):
         for a single table.
         """
         meta = cls._meta
-        non_pks = [f for f in meta.local_concrete_fields if not f.primary_key]
-
-        if update_fields:
-            non_pks = [f for f in non_pks
-                       if f.name in update_fields or f.attname in update_fields]
+        non_pks = (
+            [
+                f
+                for f in meta.local_concrete_fields
+                if not f.primary_key and
+                (f.name in update_fields or f.attname in update_fields)
+            ]
+            if update_fields
+            else [f for f in meta.local_concrete_fields if not f.primary_key]
+        )
 
         pk_val = self._get_pk_val(meta)
         if pk_val is None:
