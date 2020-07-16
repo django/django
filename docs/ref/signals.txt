@@ -142,6 +142,23 @@ Arguments sent with this signal:
     The set of fields to update as passed to :meth:`.Model.save`, or ``None``
     if ``update_fields`` wasn't passed to ``save()``.
 
+Alternative to the pre_save signal
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Unless the model you are targetting is provided by a library and cannot be swapped, a
+more robust and maintainable solution would be to override the model's
+:meth:`~django.db.models.Model.save` method::
+
+    class Article(models.Model):
+        ...
+        def save(self, update_fields=None, **kwargs):
+            # here goes the pre_save logic
+            self.slug = slugify(self.title)
+            if update_fields:
+                update_fields += ("slug",)
+
+            self.save(update_fields=update_fields, **kwargs)
+
 ``post_save``
 -------------
 
@@ -175,6 +192,25 @@ Arguments sent with this signal:
     The set of fields to update as passed to :meth:`.Model.save`, or ``None``
     if ``update_fields`` wasn't passed to ``save()``.
 
+Alternative to the post_save signal
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Unless the model you are targetting is provided by a library and cannot be swapped, a
+more robust and maintainable solution would be to override the model's
+:meth:`~django.db.models.Model.save` method::
+
+    class Order(models.Model):
+        ...
+        @transaction.atomic
+        def save(self, **kwargs):
+            is_new = self.pk is None
+            self.save(**kwargs)
+
+            # here goes the post_save logic
+            if is_new:
+                self.product.stock -= self.quantity
+                self.product.save(update_fields=("stock",))
+
 ``pre_delete``
 --------------
 
@@ -194,6 +230,22 @@ Arguments sent with this signal:
 
 ``using``
     The database alias being used.
+
+Alternative to the pre_delete signal
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Unless the model you are targetting is provided by a library and cannot be swapped, a
+more robust and maintainable solution would be to override the model's
+:meth:`~django.db.models.Model.delete` method::
+
+    class Order(models.Model):
+        ...
+        def delete(self, **kwargs):
+            # here goes the pre_delete logic
+            if self.status != "PENDING":
+                raise OrderError("Cannot delete processed order")
+
+            return super().delete(**kwargs)
 
 ``post_delete``
 ---------------
@@ -218,6 +270,25 @@ Arguments sent with this signal:
 
 ``using``
     The database alias being used.
+
+Alternative to the post_delete signal
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Unless the model you are targetting is provided by a library and cannot be swapped, a
+more robust and maintainable solution would be to override the model's
+:meth:`~django.db.models.Model.delete` method::
+
+    class Order(models.Model):
+        ...
+        @transaction.atomic
+        def delete(self, **kwargs):
+            result = super().delete(**kwargs)
+
+            # here goes the post_delete logic
+            self.product.stock += self.quantity
+            self.product.save(update_fields=("stock",))
+
+            return result
 
 ``m2m_changed``
 ---------------
@@ -527,6 +598,11 @@ Request/response signals
    :synopsis: Core signals sent by the request/response system.
 
 Signals sent by the core framework when processing a request.
+
+.. note::
+
+    A more robust and maintainable alternative to request/response signals is to provide
+    a :doc:`Middleware. </topics/http/middleware>`
 
 ``request_started``
 -------------------
