@@ -284,7 +284,7 @@ TEST_DATA = [
         (DecimalValidator(decimal_places=2, max_digits=10), Decimal(value), ValidationError)
         for value in (
             'NaN', '-NaN', '+NaN', 'sNaN', '-sNaN', '+sNaN',
-            'Inf', '-Inf', '+Inf', 'Infinity', '-Infinity', '-Infinity',
+            'Inf', '-Inf', '+Inf', 'Infinity', '-Infinity', '+Infinity',
         )
     ],
 
