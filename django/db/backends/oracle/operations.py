@@ -570,6 +570,9 @@ END;
         return Oracle_datetime(1900, 1, 1, value.hour, value.minute,
                                value.second, value.microsecond)
 
+    def adapt_decimalfield_value(self, value, max_digits=None, decimal_places=None):
+        return value
+
     def combine_expression(self, connector, sub_expressions):
         lhs, rhs = sub_expressions
         if connector == '%%':
