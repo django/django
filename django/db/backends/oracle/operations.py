@@ -341,9 +341,6 @@ END;
         name = name.replace('%', '%%')
         return name.upper()
 
-    def random_function_sql(self):
-        return "DBMS_RANDOM.RANDOM"
-
     def regex_lookup(self, lookup_type):
         if lookup_type == 'regex':
             match_option = "'c'"

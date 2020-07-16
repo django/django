@@ -141,6 +141,21 @@ class Radians(NumericOutputFieldMixin, Transform):
         )
 
 
+class Random(NumericOutputFieldMixin, Func):
+    function = 'RANDOM'
+    arity = 0
+
+    def as_mysql(self, compiler, connection, **extra_context):
+        return super().as_sql(compiler, connection, function='RAND', **extra_context)
+
+    def as_oracle(self, compiler, connection, **extra_context):
+        return super().as_sql(compiler, connection, function='DBMS_RANDOM.VALUE', **extra_context)
+
+    def as_sqlite(self, compiler, connection, **extra_context):
+        # Don't use built-in RANDOM function as we want value in range [0, 1).
+        return super().as_sql(compiler, connection, function='RAND', **extra_context)
+
+
 class Round(Transform):
     function = 'ROUND'
     lookup_name = 'round'

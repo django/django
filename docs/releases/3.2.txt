@@ -268,6 +268,8 @@ Models
   :py:class:`datetime.time`, :py:class:`datetime.timedelta`,
   :py:class:`decimal.Decimal`, and :py:class:`uuid.UUID` instances.
 
+* Added :class:`~django.db.models.functions.Random` database function.
+
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 
@@ -374,6 +376,9 @@ backends.
 * To enable support for covering indexes (:attr:`.Index.include`) and covering
   unique constraints (:attr:`.UniqueConstraint.include`), set
   ``DatabaseFeatures.supports_covering_indexes`` to ``True``.
+
+* ``DatabaseOperations.random_function_sql()`` has been removed in favor of use
+  of the new :class:`~django.db.models.functions.Random` database function.
 
 :mod:`django.contrib.gis`
 -------------------------

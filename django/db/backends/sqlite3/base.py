@@ -7,6 +7,7 @@ import functools
 import hashlib
 import math
 import operator
+import random
 import re
 import statistics
 import warnings
@@ -242,6 +243,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         create_deterministic_function('PI', 0, lambda: math.pi)
         create_deterministic_function('POWER', 2, none_guard(operator.pow))
         create_deterministic_function('RADIANS', 1, none_guard(math.radians))
+        create_deterministic_function('RAND', 0, random.random)  # Don't override built-in RANDOM().
         create_deterministic_function('REPEAT', 2, none_guard(operator.mul))
         create_deterministic_function('REVERSE', 1, none_guard(lambda x: x[::-1]))
         create_deterministic_function('RPAD', 3, _sqlite_rpad)
