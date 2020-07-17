@@ -11,8 +11,32 @@ signals allow certain *senders* to notify a set of *receivers* that some action
 has taken place. They're especially useful when many pieces of code may be
 interested in the same events.
 
-Django provides a :doc:`set of built-in signals </ref/signals>` that let user
-code get notified by Django itself of certain actions.
+Django provides a set of built-in signals that let user code get notified by Django
+itself of certain actions. See the :doc:`built-in signal documentation </ref/signals>`
+for a complete list, and a complete explanation of each signal. These include some
+useful notifications:
+
+* :data:`django.db.models.signals.pre_save` &
+  :data:`django.db.models.signals.post_save`
+
+  Sent before or after a model's :meth:`~django.db.models.Model.save` method
+  is called.
+
+* :data:`django.db.models.signals.pre_delete` &
+  :data:`django.db.models.signals.post_delete`
+
+  Sent before or after a model's :meth:`~django.db.models.Model.delete`
+  method or queryset's :meth:`~django.db.models.query.QuerySet.delete`
+  method is called.
+
+* :data:`django.db.models.signals.m2m_changed`
+
+  Sent when a :class:`~django.db.models.ManyToManyField` on a model is changed.
+
+* :data:`django.core.signals.request_started` &
+  :data:`django.core.signals.request_finished`
+
+  Sent when Django starts or finishes an HTTP request.
 
 This is an example of the ``setting_changed`` signal, which is used by many pluggable
 Django apps::
@@ -21,9 +45,6 @@ Django apps::
     def reload_my_app_settings(**kwargs):
         if kwargs['setting'] == 'MY_APP':
             my_app_settings.reload()
-
-See the :doc:`built-in signal documentation </ref/signals>` for a complete list,
-and a complete explanation of each signal.
 
 You can also `define and send your own custom signals`_; see below.
 

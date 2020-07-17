@@ -142,22 +142,20 @@ Arguments sent with this signal:
     The set of fields to update as passed to :meth:`.Model.save`, or ``None``
     if ``update_fields`` wasn't passed to ``save()``.
 
-Alternative to the pre_save signal
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Alternative to using ``pre_save``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Unless the model you are targetting is provided by a library and cannot be swapped, a
-more robust and maintainable solution would be to override the model's
-:meth:`~django.db.models.Model.save` method::
+If the model you are targetting is part of your project, a more robust and maintainable
+solution would be to override the model's :meth:`~django.db.models.Model.save` method::
 
     class Article(models.Model):
         ...
         def save(self, update_fields=None, **kwargs):
-            # here goes the pre_save logic
             self.slug = slugify(self.title)
             if update_fields:
-                update_fields += ("slug",)
+                update_fields = set(update_fields) | {"slug"}
 
-            self.save(update_fields=update_fields, **kwargs)
+            super().save(update_fields=update_fields, **kwargs)
 
 ``post_save``
 -------------
@@ -192,24 +190,20 @@ Arguments sent with this signal:
     The set of fields to update as passed to :meth:`.Model.save`, or ``None``
     if ``update_fields`` wasn't passed to ``save()``.
 
-Alternative to the post_save signal
+Alternative to using ``post_save``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Unless the model you are targetting is provided by a library and cannot be swapped, a
-more robust and maintainable solution would be to override the model's
-:meth:`~django.db.models.Model.save` method::
+If the model you are targetting is part of your project, a more robust and maintainable
+solution would be to override the model's :meth:`~django.db.models.Model.save` method::
 
     class Order(models.Model):
         ...
-        @transaction.atomic
         def save(self, **kwargs):
-            is_new = self.pk is None
+            is_new = self._state.adding
             self.save(**kwargs)
 
-            # here goes the post_save logic
             if is_new:
-                self.product.stock -= self.quantity
-                self.product.save(update_fields=("stock",))
+                transaction.on_commit(self.send_new_order_email)
 
 ``pre_delete``
 --------------
@@ -231,17 +225,16 @@ Arguments sent with this signal:
 ``using``
     The database alias being used.
 
-Alternative to the pre_delete signal
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Alternative to using ``pre_delete``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Unless the model you are targetting is provided by a library and cannot be swapped, a
-more robust and maintainable solution would be to override the model's
-:meth:`~django.db.models.Model.delete` method::
+If the model you are targetting is part of your project, a more robust and maintainable
+solution would be to override the model's :meth:`~django.db.models.Model.delete`
+method::
 
     class Order(models.Model):
         ...
         def delete(self, **kwargs):
-            # here goes the pre_delete logic
             if self.status != "PENDING":
                 raise OrderError("Cannot delete processed order")
 
@@ -271,22 +264,19 @@ Arguments sent with this signal:
 ``using``
     The database alias being used.
 
-Alternative to the post_delete signal
+Alternative to using ``post_delete``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Unless the model you are targetting is provided by a library and cannot be swapped, a
-more robust and maintainable solution would be to override the model's
-:meth:`~django.db.models.Model.delete` method::
+If the model you are targetting is part of your project, a more robust and maintainable
+solution would be to override the model's :meth:`~django.db.models.Model.delete`
+method::
 
     class Order(models.Model):
         ...
-        @transaction.atomic
         def delete(self, **kwargs):
             result = super().delete(**kwargs)
 
-            # here goes the post_delete logic
-            self.product.stock += self.quantity
-            self.product.save(update_fields=("stock",))
+            transaction.on_commit(self.send_order_deleted_email)
 
             return result
 
@@ -602,7 +592,7 @@ Signals sent by the core framework when processing a request.
 .. note::
 
     A more robust and maintainable alternative to request/response signals is to provide
-    a :doc:`Middleware. </topics/http/middleware>`
+    a :doc:`middleware. </topics/http/middleware>`
 
 ``request_started``
 -------------------
@@ -688,6 +678,13 @@ Arguments sent with this signal:
 
 ``enter``
     A boolean; ``True`` if the setting is applied, ``False`` if restored.
+
+Here is an example of how this signal is used by many pluggable Django apps::
+
+    @receiver(setting_changed)
+    def reload_my_app_settings(**kwargs):
+        if kwargs['setting'] == 'MY_APP':
+            my_app_settings.reload()
 
 ``template_rendered``
 ---------------------
