@@ -17,7 +17,6 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_index_column_ordering = False
     supports_timezones = False
     requires_explicit_null_ordering_when_grouping = True
-    allows_auto_pk_0 = False
     can_release_savepoints = True
     atomic_transactions = False
     can_clone_databases = True
@@ -50,6 +49,14 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     def _mysql_storage_engine(self):
         "Internal method used in Django tests. Don't rely on this from your code"
         return self.connection.mysql_server_data['default_storage_engine']
+
+    @cached_property
+    def allows_auto_pk_0(self):
+        """
+        Autoincrement primary key can be set to 0 if it doesn't generate new
+        autoincrement values.
+        """
+        return 'NO_AUTO_VALUE_ON_ZERO' in self.connection.sql_mode
 
     @cached_property
     def update_can_self_select(self):

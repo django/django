@@ -100,7 +100,7 @@ class BaseDatabaseFeatures:
     # The database's limit on the number of query parameters.
     max_query_params = None
 
-    # Can an object have an autoincrement primary key of 0? MySQL says No.
+    # Can an object have an autoincrement primary key of 0?
     allows_auto_pk_0 = True
 
     # Do we need to NULL a ForeignKey out, or can the constraint check be
