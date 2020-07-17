@@ -145,7 +145,7 @@ Arguments sent with this signal:
 Alternative to using ``pre_save``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-If the model you are targetting is part of your project, a more robust and maintainable
+If the model you are targeting is part of your project, a more robust and maintainable
 solution would be to override the model's :meth:`~django.db.models.Model.save` method::
 
     class Article(models.Model):
@@ -193,7 +193,7 @@ Arguments sent with this signal:
 Alternative to using ``post_save``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-If the model you are targetting is part of your project, a more robust and maintainable
+If the model you are targeting is part of your project, a more robust and maintainable
 solution would be to override the model's :meth:`~django.db.models.Model.save` method::
 
     class Order(models.Model):
@@ -228,7 +228,7 @@ Arguments sent with this signal:
 Alternative to using ``pre_delete``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-If the model you are targetting is part of your project, a more robust and maintainable
+If the model you are targeting is part of your project, a more robust and maintainable
 solution would be to override the model's :meth:`~django.db.models.Model.delete`
 method::
 
@@ -267,7 +267,7 @@ Arguments sent with this signal:
 Alternative to using ``post_delete``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-If the model you are targetting is part of your project, a more robust and maintainable
+If the model you are targeting is part of your project, a more robust and maintainable
 solution would be to override the model's :meth:`~django.db.models.Model.delete`
 method::
 
