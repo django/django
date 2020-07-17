@@ -698,6 +698,9 @@ Miscellaneous
 * The :ttag:`{% localize off %} <localize>` tag and :tfilter:`unlocalize`
   filter no longer respect :setting:`DECIMAL_SEPARATOR` setting.
 
+* The minimum supported version of ``asgiref`` is increased from 3.2 to
+  3.2.10.
+
 .. _deprecated-features-3.1:
 
 Features deprecated in 3.1
