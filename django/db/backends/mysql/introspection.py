@@ -10,7 +10,11 @@ from django.db.models import Index
 from django.utils.datastructures import OrderedSet
 
 FieldInfo = namedtuple('FieldInfo', BaseFieldInfo._fields + ('extra', 'is_unsigned', 'has_json_constraint'))
-InfoLine = namedtuple('InfoLine', 'col_name data_type max_len num_prec num_scale extra column_default is_unsigned')
+InfoLine = namedtuple(
+    'InfoLine',
+    'col_name data_type max_len num_prec num_scale extra column_default '
+    'collation is_unsigned'
+)
 
 
 class DatabaseIntrospection(BaseDatabaseIntrospection):
@@ -84,6 +88,15 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                     c.constraint_schema = DATABASE()
             """, [table_name])
             json_constraints = {row[0] for row in cursor.fetchall()}
+        # A default collation for the given table.
+        cursor.execute("""
+            SELECT  table_collation
+            FROM    information_schema.tables
+            WHERE   table_schema = DATABASE()
+            AND     table_name = %s
+        """, [table_name])
+        row = cursor.fetchone()
+        default_column_collation = row[0] if row else ''
         # information_schema database gives more accurate results for some figures:
         # - varchar length returned by cursor.description is an internal length,
         #   not visible length (#5725)
@@ -94,11 +107,16 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                 column_name, data_type, character_maximum_length,
                 numeric_precision, numeric_scale, extra, column_default,
                 CASE
+                    WHEN collation_name = %s THEN NULL
+                    ELSE collation_name
+                END AS collation_name,
+                CASE
                     WHEN column_type LIKE '%% unsigned' THEN 1
                     ELSE 0
                 END AS is_unsigned
             FROM information_schema.columns
-            WHERE table_name = %s AND table_schema = DATABASE()""", [table_name])
+            WHERE table_name = %s AND table_schema = DATABASE()
+        """, [default_column_collation, table_name])
         field_info = {line[0]: InfoLine(*line) for line in cursor.fetchall()}
 
         cursor.execute("SELECT * FROM %s LIMIT 1" % self.connection.ops.quote_name(table_name))
@@ -116,6 +134,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                 to_int(info.num_scale) or line[5],
                 line[6],
                 info.column_default,
+                info.collation,
                 info.extra,
                 info.is_unsigned,
                 line[0] in json_constraints,

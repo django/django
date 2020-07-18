@@ -1002,13 +1002,16 @@ class BooleanField(Field):
 class CharField(Field):
     description = _("String (up to %(max_length)s)")
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, db_collation=None, **kwargs):
         super().__init__(*args, **kwargs)
+        self.db_collation = db_collation
         self.validators.append(validators.MaxLengthValidator(self.max_length))
 
     def check(self, **kwargs):
+        databases = kwargs.get('databases') or []
         return [
             *super().check(**kwargs),
+            *self._check_db_collation(databases),
             *self._check_max_length_attribute(**kwargs),
         ]
 
@@ -1032,6 +1035,27 @@ class CharField(Field):
             ]
         else:
             return []
+
+    def _check_db_collation(self, databases):
+        errors = []
+        for db in databases:
+            if not router.allow_migrate_model(db, self.model):
+                continue
+            connection = connections[db]
+            if not (
+                self.db_collation is None or
+                'supports_collation_on_charfield' in self.model._meta.required_db_features or
+                connection.features.supports_collation_on_charfield
+            ):
+                errors.append(
+                    checks.Error(
+                        '%s does not support a database collation on '
+                        'CharFields.' % connection.display_name,
+                        obj=self,
+                        id='fields.E190',
+                    ),
+                )
+        return errors
 
     def cast_db_type(self, connection):
         if self.max_length is None:
@@ -1060,6 +1084,12 @@ class CharField(Field):
             defaults['empty_value'] = None
         defaults.update(kwargs)
         return super().formfield(**defaults)
+
+    def deconstruct(self):
+        name, path, args, kwargs = super().deconstruct()
+        if self.db_collation:
+            kwargs['db_collation'] = self.db_collation
+        return name, path, args, kwargs
 
 
 class CommaSeparatedIntegerField(CharField):
@@ -2074,6 +2104,38 @@ class SmallIntegerField(IntegerField):
 class TextField(Field):
     description = _("Text")
 
+    def __init__(self, *args, db_collation=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.db_collation = db_collation
+
+    def check(self, **kwargs):
+        databases = kwargs.get('databases') or []
+        return [
+            *super().check(**kwargs),
+            *self._check_db_collation(databases),
+        ]
+
+    def _check_db_collation(self, databases):
+        errors = []
+        for db in databases:
+            if not router.allow_migrate_model(db, self.model):
+                continue
+            connection = connections[db]
+            if not (
+                self.db_collation is None or
+                'supports_collation_on_textfield' in self.model._meta.required_db_features or
+                connection.features.supports_collation_on_textfield
+            ):
+                errors.append(
+                    checks.Error(
+                        '%s does not support a database collation on '
+                        'TextFields.' % connection.display_name,
+                        obj=self,
+                        id='fields.E190',
+                    ),
+                )
+        return errors
+
     def get_internal_type(self):
         return "TextField"
 
@@ -2095,6 +2157,12 @@ class TextField(Field):
             **({} if self.choices is not None else {'widget': forms.Textarea}),
             **kwargs,
         })
+
+    def deconstruct(self):
+        name, path, args, kwargs = super().deconstruct()
+        if self.db_collation:
+            kwargs['db_collation'] = self.db_collation
+        return name, path, args, kwargs
 
 
 class TimeField(DateTimeCheckMixin, Field):

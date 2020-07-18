@@ -44,6 +44,16 @@ class TestCharField(TestCase):
         self.assertEqual(p2.title, Event.C)
 
 
+class TestMethods(SimpleTestCase):
+    def test_deconstruct(self):
+        field = models.CharField()
+        *_, kwargs = field.deconstruct()
+        self.assertEqual(kwargs, {})
+        field = models.CharField(db_collation='utf8_esperanto_ci')
+        *_, kwargs = field.deconstruct()
+        self.assertEqual(kwargs, {'db_collation': 'utf8_esperanto_ci'})
+
+
 class ValidationTests(SimpleTestCase):
 
     class Choices(models.TextChoices):

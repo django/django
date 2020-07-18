@@ -86,7 +86,7 @@ class BinaryFieldTests(SimpleTestCase):
 
 
 @isolate_apps('invalid_models_tests')
-class CharFieldTests(SimpleTestCase):
+class CharFieldTests(TestCase):
 
     def test_valid_field(self):
         class Model(models.Model):
@@ -386,6 +386,30 @@ class CharFieldTests(SimpleTestCase):
                 id='mysql.W003',
             )
         ])
+
+    def test_db_collation(self):
+        class Model(models.Model):
+            field = models.CharField(max_length=100, db_collation='anything')
+
+        field = Model._meta.get_field('field')
+        error = Error(
+            '%s does not support a database collation on CharFields.'
+            % connection.display_name,
+            id='fields.E190',
+            obj=field,
+        )
+        expected = [] if connection.features.supports_collation_on_charfield else [error]
+        self.assertEqual(field.check(databases=self.databases), expected)
+
+    def test_db_collation_required_db_features(self):
+        class Model(models.Model):
+            field = models.CharField(max_length=100, db_collation='anything')
+
+            class Meta:
+                required_db_features = {'supports_collation_on_charfield'}
+
+        field = Model._meta.get_field('field')
+        self.assertEqual(field.check(databases=self.databases), [])
 
 
 @isolate_apps('invalid_models_tests')
@@ -778,6 +802,30 @@ class TextFieldTests(TestCase):
                 id='fields.W162',
             )
         ])
+
+    def test_db_collation(self):
+        class Model(models.Model):
+            field = models.TextField(db_collation='anything')
+
+        field = Model._meta.get_field('field')
+        error = Error(
+            '%s does not support a database collation on TextFields.'
+            % connection.display_name,
+            id='fields.E190',
+            obj=field,
+        )
+        expected = [] if connection.features.supports_collation_on_textfield else [error]
+        self.assertEqual(field.check(databases=self.databases), expected)
+
+    def test_db_collation_required_db_features(self):
+        class Model(models.Model):
+            field = models.TextField(db_collation='anything')
+
+            class Meta:
+                required_db_features = {'supports_collation_on_textfield'}
+
+        field = Model._meta.get_field('field')
+        self.assertEqual(field.check(databases=self.databases), [])
 
 
 @isolate_apps('invalid_models_tests')

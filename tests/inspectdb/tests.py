@@ -8,7 +8,7 @@ from django.db import connection
 from django.db.backends.base.introspection import TableInfo
 from django.test import TestCase, TransactionTestCase, skipUnlessDBFeature
 
-from .models import PeopleMoreData
+from .models import PeopleMoreData, test_collation
 
 
 def inspectdb_tables_only(table_name):
@@ -103,6 +103,41 @@ class InspectDBTestCase(TestCase):
         if not connection.features.interprets_empty_strings_as_nulls:
             self.assertIn('json_field = models.JSONField()', output)
         self.assertIn('null_json_field = models.JSONField(blank=True, null=True)', output)
+
+    @skipUnlessDBFeature('supports_collation_on_charfield')
+    def test_char_field_db_collation(self):
+        out = StringIO()
+        call_command('inspectdb', 'inspectdb_charfielddbcollation', stdout=out)
+        output = out.getvalue()
+        if not connection.features.interprets_empty_strings_as_nulls:
+            self.assertIn(
+                "char_field = models.CharField(max_length=10, "
+                "db_collation='%s')" % test_collation,
+                output,
+            )
+        else:
+            self.assertIn(
+                "char_field = models.CharField(max_length=10, "
+                "db_collation='%s', blank=True, null=True)" % test_collation,
+                output,
+            )
+
+    @skipUnlessDBFeature('supports_collation_on_textfield')
+    def test_text_field_db_collation(self):
+        out = StringIO()
+        call_command('inspectdb', 'inspectdb_textfielddbcollation', stdout=out)
+        output = out.getvalue()
+        if not connection.features.interprets_empty_strings_as_nulls:
+            self.assertIn(
+                "text_field = models.TextField(db_collation='%s')" % test_collation,
+                output,
+            )
+        else:
+            self.assertIn(
+                "text_field = models.TextField(db_collation='%s, blank=True, "
+                "null=True)" % test_collation,
+                output,
+            )
 
     def test_number_field_types(self):
         """Test introspection of various Django field types"""

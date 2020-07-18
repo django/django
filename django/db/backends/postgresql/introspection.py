@@ -69,9 +69,11 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
             SELECT
                 a.attname AS column_name,
                 NOT (a.attnotnull OR (t.typtype = 'd' AND t.typnotnull)) AS is_nullable,
-                pg_get_expr(ad.adbin, ad.adrelid) AS column_default
+                pg_get_expr(ad.adbin, ad.adrelid) AS column_default,
+                CASE WHEN collname = 'default' THEN NULL ELSE collname END AS collation
             FROM pg_attribute a
             LEFT JOIN pg_attrdef ad ON a.attrelid = ad.adrelid AND a.attnum = ad.adnum
+            LEFT JOIN pg_collation co ON a.attcollation = co.oid
             JOIN pg_type t ON a.atttypid = t.oid
             JOIN pg_class c ON a.attrelid = c.oid
             JOIN pg_namespace n ON c.relnamespace = n.oid

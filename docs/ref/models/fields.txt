@@ -593,20 +593,36 @@ For large amounts of text, use :class:`~django.db.models.TextField`.
 
 The default form widget for this field is a :class:`~django.forms.TextInput`.
 
-:class:`CharField` has one extra required argument:
+:class:`CharField` has two extra arguments:
 
 .. attribute:: CharField.max_length
 
-    The maximum length (in characters) of the field. The max_length is enforced
-    at the database level and in Django's validation using
+    Required. The maximum length (in characters) of the field. The max_length
+    is enforced at the database level and in Django's validation using
     :class:`~django.core.validators.MaxLengthValidator`.
 
-.. note::
+    .. note::
 
-    If you are writing an application that must be portable to multiple
-    database backends, you should be aware that there are restrictions on
-    ``max_length`` for some backends. Refer to the :doc:`database backend
-    notes </ref/databases>` for details.
+        If you are writing an application that must be portable to multiple
+        database backends, you should be aware that there are restrictions on
+        ``max_length`` for some backends. Refer to the :doc:`database backend
+        notes </ref/databases>` for details.
+
+.. attribute:: CharField.db_collation
+
+    .. versionadded:: 3.2
+
+    Optional. The database collation name of the field.
+
+    .. note::
+
+        Collation names are not standardized. As such, this will not be
+        portable across multiple database backends.
+
+    .. admonition:: Oracle
+
+        Oracle supports collations only when the ``MAX_STRING_SIZE`` database
+        initialization parameter is set to ``EXTENDED``.
 
 ``DateField``
 -------------
@@ -1328,6 +1344,21 @@ If you specify a ``max_length`` attribute, it will be reflected in the
 :class:`~django.forms.Textarea` widget of the auto-generated form field.
 However it is not enforced at the model or database level. Use a
 :class:`CharField` for that.
+
+.. attribute:: TextField.db_collation
+
+    .. versionadded:: 3.2
+
+    The database collation name of the field.
+
+    .. note::
+
+        Collation names are not standardized. As such, this will not be
+        portable across multiple database backends.
+
+    .. admonition:: Oracle
+
+        Oracle does not support collations for a ``TextField``.
 
 ``TimeField``
 -------------

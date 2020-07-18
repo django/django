@@ -185,6 +185,14 @@ class SchemaTests(TransactionTestCase):
                     counts['indexes'] += 1
         return counts
 
+    def get_column_collation(self, table, column):
+        with connection.cursor() as cursor:
+            return next(
+                f.collation
+                for f in connection.introspection.get_table_description(cursor, table)
+                if f.name == column
+            )
+
     def assertIndexOrder(self, table, index, order):
         constraints = self.get_constraints(table)
         self.assertIn(index, constraints)
@@ -3224,3 +3232,147 @@ class SchemaTests(TransactionTestCase):
         with connection.schema_editor(atomic=True) as editor:
             editor.alter_db_table(Foo, Foo._meta.db_table, 'renamed_table')
         Foo._meta.db_table = 'renamed_table'
+
+    @isolate_apps('schema')
+    @skipUnlessDBFeature('supports_collation_on_charfield')
+    def test_db_collation_charfield(self):
+        collation = connection.features.test_collations['non_default']
+
+        class Foo(Model):
+            field = CharField(max_length=255, db_collation=collation)
+
+            class Meta:
+                app_label = 'schema'
+
+        self.isolated_local_models = [Foo]
+        with connection.schema_editor() as editor:
+            editor.create_model(Foo)
+
+        self.assertEqual(
+            self.get_column_collation(Foo._meta.db_table, 'field'),
+            collation,
+        )
+
+    @isolate_apps('schema')
+    @skipUnlessDBFeature('supports_collation_on_textfield')
+    def test_db_collation_textfield(self):
+        collation = connection.features.test_collations['non_default']
+
+        class Foo(Model):
+            field = TextField(db_collation=collation)
+
+            class Meta:
+                app_label = 'schema'
+
+        self.isolated_local_models = [Foo]
+        with connection.schema_editor() as editor:
+            editor.create_model(Foo)
+
+        self.assertEqual(
+            self.get_column_collation(Foo._meta.db_table, 'field'),
+            collation,
+        )
+
+    @skipUnlessDBFeature('supports_collation_on_charfield')
+    def test_add_field_db_collation(self):
+        with connection.schema_editor() as editor:
+            editor.create_model(Author)
+
+        collation = connection.features.test_collations['non_default']
+        new_field = CharField(max_length=255, db_collation=collation)
+        new_field.set_attributes_from_name('alias')
+        with connection.schema_editor() as editor:
+            editor.add_field(Author, new_field)
+        columns = self.column_classes(Author)
+        self.assertEqual(
+            columns['alias'][0],
+            connection.features.introspected_field_types['CharField'],
+        )
+        self.assertEqual(columns['alias'][1][8], collation)
+
+    @skipUnlessDBFeature('supports_collation_on_charfield')
+    def test_alter_field_db_collation(self):
+        with connection.schema_editor() as editor:
+            editor.create_model(Author)
+
+        collation = connection.features.test_collations['non_default']
+        old_field = Author._meta.get_field('name')
+        new_field = CharField(max_length=255, db_collation=collation)
+        new_field.set_attributes_from_name('name')
+        new_field.model = Author
+        with connection.schema_editor() as editor:
+            editor.alter_field(Author, old_field, new_field, strict=True)
+        self.assertEqual(
+            self.get_column_collation(Author._meta.db_table, 'name'),
+            collation,
+        )
+        with connection.schema_editor() as editor:
+            editor.alter_field(Author, new_field, old_field, strict=True)
+        self.assertIsNone(self.get_column_collation(Author._meta.db_table, 'name'))
+
+    @skipUnlessDBFeature('supports_collation_on_charfield')
+    def test_alter_field_type_and_db_collation(self):
+        with connection.schema_editor() as editor:
+            editor.create_model(Note)
+
+        collation = connection.features.test_collations['non_default']
+        old_field = Note._meta.get_field('info')
+        new_field = CharField(max_length=255, db_collation=collation)
+        new_field.set_attributes_from_name('info')
+        new_field.model = Note
+        with connection.schema_editor() as editor:
+            editor.alter_field(Note, old_field, new_field, strict=True)
+        columns = self.column_classes(Note)
+        self.assertEqual(
+            columns['info'][0],
+            connection.features.introspected_field_types['CharField'],
+        )
+        self.assertEqual(columns['info'][1][8], collation)
+        with connection.schema_editor() as editor:
+            editor.alter_field(Note, new_field, old_field, strict=True)
+        columns = self.column_classes(Note)
+        self.assertEqual(columns['info'][0], 'TextField')
+        self.assertIsNone(columns['info'][1][8])
+
+    @skipUnlessDBFeature(
+        'supports_collation_on_charfield',
+        'supports_non_deterministic_collations',
+    )
+    def test_ci_cs_db_collation(self):
+        cs_collation = connection.features.test_collations.get('cs')
+        ci_collation = connection.features.test_collations.get('ci')
+        try:
+            if connection.vendor == 'mysql':
+                cs_collation = 'latin1_general_cs'
+            elif connection.vendor == 'postgresql':
+                cs_collation = 'en-x-icu'
+                with connection.cursor() as cursor:
+                    cursor.execute(
+                        "CREATE COLLATION IF NOT EXISTS case_insensitive "
+                        "(provider = icu, locale = 'und-u-ks-level2', "
+                        "deterministic = false)"
+                    )
+                    ci_collation = 'case_insensitive'
+            # Create the table.
+            with connection.schema_editor() as editor:
+                editor.create_model(Author)
+            # Case-insensitive collation.
+            old_field = Author._meta.get_field('name')
+            new_field_ci = CharField(max_length=255, db_collation=ci_collation)
+            new_field_ci.set_attributes_from_name('name')
+            new_field_ci.model = Author
+            with connection.schema_editor() as editor:
+                editor.alter_field(Author, old_field, new_field_ci, strict=True)
+            Author.objects.create(name='ANDREW')
+            self.assertIs(Author.objects.filter(name='Andrew').exists(), True)
+            # Case-sensitive collation.
+            new_field_cs = CharField(max_length=255, db_collation=cs_collation)
+            new_field_cs.set_attributes_from_name('name')
+            new_field_cs.model = Author
+            with connection.schema_editor() as editor:
+                editor.alter_field(Author, new_field_ci, new_field_cs, strict=True)
+            self.assertIs(Author.objects.filter(name='Andrew').exists(), False)
+        finally:
+            if connection.vendor == 'postgresql':
+                with connection.cursor() as cursor:
+                    cursor.execute('DROP COLLATION IF EXISTS case_insensitive')

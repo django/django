@@ -308,6 +308,11 @@ Models
   :class:`~django.db.models.functions.TruncTime` database functions allows
   truncating datetimes in a specific timezone.
 
+* The new ``db_collation`` argument for
+  :attr:`CharField <django.db.models.CharField.db_collation>` and
+  :attr:`TextField <django.db.models.TextField.db_collation>` allows setting a
+  database collation for the field.
+
 Pagination
 ~~~~~~~~~~
 
@@ -430,6 +435,13 @@ backends.
 * To enable support for covering indexes (:attr:`.Index.include`) and covering
   unique constraints (:attr:`.UniqueConstraint.include`), set
   ``DatabaseFeatures.supports_covering_indexes`` to ``True``.
+
+* Third-party database backends must implement support for column database
+  collations on ``CharField``\s and ``TextField``\s or set
+  ``DatabaseFeatures.supports_collation_on_charfield`` and
+  ``DatabaseFeatures.supports_collation_on_textfield`` to ``False``. If
+  non-deterministic collations are not supported, set
+  ``supports_non_deterministic_collations`` to ``False``.
 
 :mod:`django.contrib.admin`
 ---------------------------

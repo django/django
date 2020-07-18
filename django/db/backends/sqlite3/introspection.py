@@ -84,6 +84,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         """
         cursor.execute('PRAGMA table_info(%s)' % self.connection.ops.quote_name(table_name))
         table_info = cursor.fetchall()
+        collations = self._get_column_collations(cursor, table_name)
         json_columns = set()
         if self.connection.features.can_introspect_json_field:
             for line in table_info:
@@ -102,7 +103,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         return [
             FieldInfo(
                 name, data_type, None, get_field_size(data_type), None, None,
-                not notnull, default, pk == 1, name in json_columns
+                not notnull, default, collations.get(name), pk == 1, name in json_columns
             )
             for cid, name, data_type, notnull, default, pk in table_info
         ]
@@ -435,3 +436,27 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
             }
         constraints.update(self._get_foreign_key_constraints(cursor, table_name))
         return constraints
+
+    def _get_column_collations(self, cursor, table_name):
+        row = cursor.execute("""
+            SELECT sql
+            FROM sqlite_master
+            WHERE type = 'table' AND name = %s
+        """, [table_name]).fetchone()
+        if not row:
+            return {}
+
+        sql = row[0]
+        columns = str(sqlparse.parse(sql)[0][-1]).strip('()').split(', ')
+        collations = {}
+        for column in columns:
+            tokens = column[1:].split()
+            column_name = tokens[0].strip('"')
+            for index, token in enumerate(tokens):
+                if token == 'COLLATE':
+                    collation = tokens[index + 1]
+                    break
+            else:
+                collation = None
+            collations[column_name] = collation
+        return collations

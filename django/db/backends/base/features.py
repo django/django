@@ -302,10 +302,17 @@ class BaseDatabaseFeatures:
     # {'d': [{'f': 'g'}]}?
     json_key_contains_list_matching_requires_list = False
 
+    # Does the backend support column collations?
+    supports_collation_on_charfield = True
+    supports_collation_on_textfield = True
+    # Does the backend support non-deterministic collations?
+    supports_non_deterministic_collations = True
+
     # Collation names for use by the Django test suite.
     test_collations = {
         'ci': None,  # Case-insensitive.
         'cs': None,  # Case-sensitive.
+        'non_default': None,  # Non-default.
         'swedish_ci': None  # Swedish case-insensitive.
     }
 
