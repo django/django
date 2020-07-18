@@ -3,6 +3,7 @@ The main QuerySet implementation. This provides the public API for the ORM.
 """
 
 import copy
+import datetime
 import operator
 import warnings
 from collections import namedtuple
@@ -753,7 +754,7 @@ class QuerySet:
         return 0
     _raw_delete.alters_data = True
 
-    def update(self, **kwargs):
+    def update(self, _ignore_auto_now=False, **kwargs):
         """
         Update all elements in the current QuerySet, setting all the given
         fields to the appropriate values.
@@ -763,6 +764,23 @@ class QuerySet:
             "Cannot update a query once a slice has been taken."
         self._for_write = True
         query = self.query.chain(sql.UpdateQuery)
+        if not _ignore_auto_now:
+            auto_now_datetime_list = [
+                datetime_field for datetime_field in self.model._meta.fields if
+                datetime_field.get_internal_type() == (
+                    "DateTimeField" or "DateField") and getattr(datetime_field, "auto_now",
+                                                                False)
+            ]
+            kwargs.update(
+                {
+                    field.attname: (
+                        datetime.date.today() if field.get_internal_type() == "DateField" else datetime.datetime.now())
+                    for
+                    field
+                    in auto_now_datetime_list
+                }
+            )
+
         query.add_update_values(kwargs)
         # Clear any annotations so that they won't be present in subqueries.
         query.annotations = {}
