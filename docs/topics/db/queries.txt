@@ -43,6 +43,8 @@ models, which comprise a Weblog application:
         number_of_comments = models.IntegerField()
         number_of_pingbacks = models.IntegerField()
         rating = models.IntegerField()
+        log_modified_datetime = models.DateTimeField(auto_now=True)
+        log_modified_date = models.DateField(auto_now=True)
 
         def __str__(self):
             return self.headline
@@ -1006,6 +1008,7 @@ Sometimes you want to set a field to a particular value for all the objects in
 a :class:`~django.db.models.query.QuerySet`. You can do this with the
 :meth:`~django.db.models.query.QuerySet.update` method. For example::
     # Update all the headlines with pub_date in 2007.
+    # log_modified_datetime, log_modified_date are modified also with datetime.now() caused by auto_now=True
     Entry.objects.filter(pub_date__year=2007).update(headline='Everything is the same')
 
 When model has DateTimeField(auto_now=True) or DateField(auto_now=True),
@@ -1188,8 +1191,6 @@ query you can use the following syntax::
     from django.db import models
 
     class Entry(models.Model):
-        modified_datetime =  models.DateTimeField(auto_now=True)
-        modified_date =  models.DateField(auto_now=True)
         #...
         objects = models.Manager()  # Default Manager
         entries = EntryManager()    # Custom Manager
