@@ -5,9 +5,6 @@ class City(models.Model):
     id = models.BigAutoField(primary_key=True)
     name = models.CharField(max_length=50)
 
-    def __str__(self):
-        return self.name
-
 
 class Country(models.Model):
     id = models.SmallAutoField(primary_key=True)
@@ -17,9 +14,6 @@ class Country(models.Model):
 class District(models.Model):
     city = models.ForeignKey(City, models.CASCADE, primary_key=True)
     name = models.CharField(max_length=50)
-
-    def __str__(self):
-        return self.name
 
 
 class Reporter(models.Model):
@@ -33,9 +27,6 @@ class Reporter(models.Model):
 
     class Meta:
         unique_together = ('first_name', 'last_name')
-
-    def __str__(self):
-        return "%s %s" % (self.first_name, self.last_name)
 
 
 class Article(models.Model):
@@ -52,9 +43,6 @@ class Article(models.Model):
             ["headline", "pub_date"],
             ['headline', 'response_to', 'pub_date', 'reporter'],
         ]
-
-    def __str__(self):
-        return self.headline
 
 
 class ArticleReporter(models.Model):

@@ -170,12 +170,12 @@ def escape_format_html(context):
 
 @register.simple_tag(takes_context=True)
 def current_app(context):
-    return "%s" % context.current_app
+    return str(context.current_app)
 
 
 @register.simple_tag(takes_context=True)
 def use_l10n(context):
-    return "%s" % context.use_l10n
+    return str(context.use_l10n)
 
 
 @register.simple_tag(name='minustwo')

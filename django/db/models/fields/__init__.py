@@ -221,7 +221,7 @@ class Field(RegisterLookupMixin):
         elif LOOKUP_SEP in self.name:
             return [
                 checks.Error(
-                    'Field names must not contain "%s".' % (LOOKUP_SEP,),
+                    'Field names must not contain "%s".' % LOOKUP_SEP,
                     obj=self,
                     id='fields.E002',
                 )
@@ -496,6 +496,8 @@ class Field(RegisterLookupMixin):
             path = path.replace("django.db.models.fields.related", "django.db.models")
         elif path.startswith("django.db.models.fields.files"):
             path = path.replace("django.db.models.fields.files", "django.db.models")
+        elif path.startswith('django.db.models.fields.json'):
+            path = path.replace('django.db.models.fields.json', 'django.db.models')
         elif path.startswith("django.db.models.fields.proxy"):
             path = path.replace("django.db.models.fields.proxy", "django.db.models")
         elif path.startswith("django.db.models.fields"):
@@ -1499,7 +1501,7 @@ class DecimalField(Field):
             return self.context.create_decimal_from_float(value)
         try:
             return decimal.Decimal(value)
-        except decimal.InvalidOperation:
+        except (decimal.InvalidOperation, TypeError, ValueError):
             raise exceptions.ValidationError(
                 self.error_messages['invalid'],
                 code='invalid',
@@ -1929,6 +1931,14 @@ class NullBooleanField(BooleanField):
         'invalid_nullable': _('“%(value)s” value must be either None, True or False.'),
     }
     description = _("Boolean (Either True, False or None)")
+    system_check_deprecated_details = {
+        'msg': (
+            'NullBooleanField is deprecated. Support for it (except in '
+            'historical migrations) will be removed in Django 4.0.'
+        ),
+        'hint': 'Use BooleanField(null=True) instead.',
+        'id': 'fields.W903',
+    }
 
     def __init__(self, *args, **kwargs):
         kwargs['null'] = True

@@ -1,10 +1,12 @@
 import ipaddress
 import re
+import warnings
 from pathlib import Path
 from urllib.parse import urlsplit, urlunsplit
 
 from django.core.exceptions import ValidationError
 from django.utils.deconstruct import deconstructible
+from django.utils.deprecation import RemovedInDjango41Warning
 from django.utils.encoding import punycode
 from django.utils.ipv6 import is_valid_ipv6_address
 from django.utils.regex_helper import _lazy_re_compile
@@ -61,7 +63,7 @@ class RegexValidator:
 
 @deconstructible
 class URLValidator(RegexValidator):
-    ul = '\u00a1-\uffff'  # unicode letters range (must not be a raw string)
+    ul = '\u00a1-\uffff'  # Unicode letters range (must not be a raw string).
 
     # IP patterns
     ipv4_re = r'(?:25[0-5]|2[0-4]\d|[0-1]?\d?\d)(?:\.(?:25[0-5]|2[0-4]\d|[0-1]?\d?\d)){3}'
@@ -97,7 +99,9 @@ class URLValidator(RegexValidator):
             self.schemes = schemes
 
     def __call__(self, value):
-        # Check first if the scheme is valid
+        if not isinstance(value, str):
+            raise ValidationError(self.message, code=self.code)
+        # Check if the scheme is valid.
         scheme = value.split('://')[0].lower()
         if scheme not in self.schemes:
             raise ValidationError(self.message, code=self.code)
@@ -124,7 +128,7 @@ class URLValidator(RegexValidator):
             # Now verify IPv6 in the netloc part
             host_match = re.search(r'^\[(.+)\](?::\d{2,5})?$', urlsplit(value).netloc)
             if host_match:
-                potential_ip = host_match.groups()[0]
+                potential_ip = host_match[1]
                 try:
                     validate_ipv6_address(potential_ip)
                 except ValidationError:
@@ -165,15 +169,42 @@ class EmailValidator:
         # literal form, ipv4 or ipv6 address (SMTP 4.1.3)
         r'\[([A-f0-9:.]+)\]\Z',
         re.IGNORECASE)
-    domain_whitelist = ['localhost']
+    domain_allowlist = ['localhost']
 
-    def __init__(self, message=None, code=None, whitelist=None):
+    @property
+    def domain_whitelist(self):
+        warnings.warn(
+            'The domain_whitelist attribute is deprecated in favor of '
+            'domain_allowlist.',
+            RemovedInDjango41Warning,
+            stacklevel=2,
+        )
+        return self.domain_allowlist
+
+    @domain_whitelist.setter
+    def domain_whitelist(self, allowlist):
+        warnings.warn(
+            'The domain_whitelist attribute is deprecated in favor of '
+            'domain_allowlist.',
+            RemovedInDjango41Warning,
+            stacklevel=2,
+        )
+        self.domain_allowlist = allowlist
+
+    def __init__(self, message=None, code=None, allowlist=None, *, whitelist=None):
+        if whitelist is not None:
+            allowlist = whitelist
+            warnings.warn(
+                'The whitelist argument is deprecated in favor of allowlist.',
+                RemovedInDjango41Warning,
+                stacklevel=2,
+            )
         if message is not None:
             self.message = message
         if code is not None:
             self.code = code
-        if whitelist is not None:
-            self.domain_whitelist = whitelist
+        if allowlist is not None:
+            self.domain_allowlist = allowlist
 
     def __call__(self, value):
         if not value or '@' not in value:
@@ -184,7 +215,7 @@ class EmailValidator:
         if not self.user_regex.match(user_part):
             raise ValidationError(self.message, code=self.code)
 
-        if (domain_part not in self.domain_whitelist and
+        if (domain_part not in self.domain_allowlist and
                 not self.validate_domain_part(domain_part)):
             # Try for possible IDN domain-part
             try:
@@ -202,7 +233,7 @@ class EmailValidator:
 
         literal_match = self.literal_regex.match(domain_part)
         if literal_match:
-            ip_address = literal_match.group(1)
+            ip_address = literal_match[1]
             try:
                 validate_ipv46_address(ip_address)
                 return True
@@ -213,7 +244,7 @@ class EmailValidator:
     def __eq__(self, other):
         return (
             isinstance(other, EmailValidator) and
-            (self.domain_whitelist == other.domain_whitelist) and
+            (self.domain_allowlist == other.domain_allowlist) and
             (self.message == other.message) and
             (self.code == other.code)
         )

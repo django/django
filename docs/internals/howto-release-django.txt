@@ -305,25 +305,26 @@ Now you're ready to actually put the release out there. To do this:
         $ scp Django-A.B.C.checksum.txt.asc djangoproject.com:/home/www/www/media/pgp/Django-A.B.C.checksum.txt
 
 #. Test that the release packages install correctly using ``easy_install``
-   and ``pip``. Here's one method (which requires `virtualenvwrapper`__)::
+   and ``pip``. Here's one method::
 
         $ RELEASE_VERSION='1.7.2'
         $ MAJOR_VERSION=`echo $RELEASE_VERSION| cut -c 1-3`
 
-        $ mktmpenv
+        $ python -m venv django-easy-install
+        $ . django-easy-install/bin/activate
         $ easy_install https://www.djangoproject.com/m/releases/$MAJOR_VERSION/Django-$RELEASE_VERSION.tar.gz
         $ deactivate
-        $ mktmpenv
+        $ python -m venv django-pip
+        $ . django-pip/bin/activate
         $ python -m pip install https://www.djangoproject.com/m/releases/$MAJOR_VERSION/Django-$RELEASE_VERSION.tar.gz
         $ deactivate
-        $ mktmpenv
+        $ python -m venv django-pip-wheel
+        $ . django-pip-wheel/bin/activate
         $ python -m pip install https://www.djangoproject.com/m/releases/$MAJOR_VERSION/Django-$RELEASE_VERSION-py3-none-any.whl
         $ deactivate
 
    This just tests that the tarballs are available (i.e. redirects are up) and
    that they install correctly, but it'll catch silly mistakes.
-
-   __ https://pypi.org/project/virtualenvwrapper/
 
 #. Ask a few people on IRC to verify the checksums by visiting the checksums
    file (e.g. https://www.djangoproject.com/m/pgp/Django-1.5b1.checksum.txt)
@@ -379,7 +380,7 @@ Now you're ready to actually put the release out there. To do this:
    message body should include the vulnerability details, for example, the
    announcement blog post text. Include a link to the announcement blog post.
 
-#. Add a link to the blog post in the topic of the `#django` IRC channel:
+#. Add a link to the blog post in the topic of the ``#django`` IRC channel:
    ``/msg chanserv TOPIC #django new topic goes here``.
 
 Post-release
@@ -442,6 +443,10 @@ need to be done by the releaser.
    used in Read the Docs ("A.B.x"), `create a ticket
    <https://github.com/rtfd/readthedocs.org/issues/5537>`_ requesting the new
    version.
+
+#. `Request the new classifier on PyPI
+   <https://github.com/pypa/trove-classifiers/issues/29>`_. For example
+   ``Framework :: Django :: 3.1``.
 
 Notes on setting the VERSION tuple
 ==================================

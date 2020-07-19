@@ -17,9 +17,28 @@ class SimpleIndexesTests(SimpleTestCase):
         index = models.Index(fields=['title'])
         multi_col_index = models.Index(fields=['title', 'author'])
         partial_index = models.Index(fields=['title'], name='long_books_idx', condition=models.Q(pages__gt=400))
+        covering_index = models.Index(
+            fields=['title'],
+            name='include_idx',
+            include=['author', 'pages'],
+        )
+        opclasses_index = models.Index(
+            fields=['headline', 'body'],
+            name='opclasses_idx',
+            opclasses=['varchar_pattern_ops', 'text_pattern_ops'],
+        )
         self.assertEqual(repr(index), "<Index: fields='title'>")
         self.assertEqual(repr(multi_col_index), "<Index: fields='title, author'>")
-        self.assertEqual(repr(partial_index), "<Index: fields='title', condition=(AND: ('pages__gt', 400))>")
+        self.assertEqual(repr(partial_index), "<Index: fields='title' condition=(AND: ('pages__gt', 400))>")
+        self.assertEqual(
+            repr(covering_index),
+            "<Index: fields='title' include='author, pages'>",
+        )
+        self.assertEqual(
+            repr(opclasses_index),
+            "<Index: fields='headline, body' "
+            "opclasses='varchar_pattern_ops, text_pattern_ops'>",
+        )
 
     def test_eq(self):
         index = models.Index(fields=['title'])
@@ -64,6 +83,16 @@ class SimpleIndexesTests(SimpleTestCase):
     def test_condition_must_be_q(self):
         with self.assertRaisesMessage(ValueError, 'Index.condition must be a Q instance.'):
             models.Index(condition='invalid', name='long_book_idx')
+
+    def test_include_requires_list_or_tuple(self):
+        msg = 'Index.include must be a list or tuple.'
+        with self.assertRaisesMessage(ValueError, msg):
+            models.Index(name='test_include', fields=['field'], include='other')
+
+    def test_include_requires_index_name(self):
+        msg = 'A covering index must be named.'
+        with self.assertRaisesMessage(ValueError, msg):
+            models.Index(fields=['field'], include=['other'])
 
     def test_name_auto_generation(self):
         index = models.Index(fields=['author'])
@@ -126,6 +155,25 @@ class SimpleIndexesTests(SimpleTestCase):
                 'name': 'model_index_title_196f42_idx',
                 'condition': models.Q(pages__gt=400),
             }
+        )
+
+    def test_deconstruct_with_include(self):
+        index = models.Index(
+            name='book_include_idx',
+            fields=['title'],
+            include=['author'],
+        )
+        index.set_name_with_model(Book)
+        path, args, kwargs = index.deconstruct()
+        self.assertEqual(path, 'django.db.models.Index')
+        self.assertEqual(args, ())
+        self.assertEqual(
+            kwargs,
+            {
+                'fields': ['title'],
+                'name': 'model_index_title_196f42_idx',
+                'include': ('author',),
+            },
         )
 
     def test_clone(self):

@@ -715,26 +715,25 @@ class ExcludedLocaleExtractionTests(ExtractorTests):
             execute_from_command_line(['django-admin', 'help', 'makemessages'])
 
     def test_one_locale_excluded(self):
-        management.call_command('makemessages', exclude=['it'], stdout=StringIO())
+        management.call_command('makemessages', exclude=['it'], verbosity=0)
         self.assertRecentlyModified(self.PO_FILE % 'en')
         self.assertRecentlyModified(self.PO_FILE % 'fr')
         self.assertNotRecentlyModified(self.PO_FILE % 'it')
 
     def test_multiple_locales_excluded(self):
-        management.call_command('makemessages', exclude=['it', 'fr'], stdout=StringIO())
+        management.call_command('makemessages', exclude=['it', 'fr'], verbosity=0)
         self.assertRecentlyModified(self.PO_FILE % 'en')
         self.assertNotRecentlyModified(self.PO_FILE % 'fr')
         self.assertNotRecentlyModified(self.PO_FILE % 'it')
 
     def test_one_locale_excluded_with_locale(self):
-        management.call_command('makemessages', locale=['en', 'fr'], exclude=['fr'], stdout=StringIO())
+        management.call_command('makemessages', locale=['en', 'fr'], exclude=['fr'], verbosity=0)
         self.assertRecentlyModified(self.PO_FILE % 'en')
         self.assertNotRecentlyModified(self.PO_FILE % 'fr')
         self.assertNotRecentlyModified(self.PO_FILE % 'it')
 
     def test_multiple_locales_excluded_with_locale(self):
-        management.call_command('makemessages', locale=['en', 'fr', 'it'], exclude=['fr', 'it'],
-                                stdout=StringIO())
+        management.call_command('makemessages', locale=['en', 'fr', 'it'], exclude=['fr', 'it'], verbosity=0)
         self.assertRecentlyModified(self.PO_FILE % 'en')
         self.assertNotRecentlyModified(self.PO_FILE % 'fr')
         self.assertNotRecentlyModified(self.PO_FILE % 'it')

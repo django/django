@@ -6,12 +6,13 @@ admin
 admindocs
 admins
 affine
+affordances
 aggregator
 Ai
 Alchin
+allowlist
 alphanumerics
 amet
-amongst
 analytics
 apnumber
 app
@@ -144,7 +145,6 @@ databrowse
 datafile
 dataset
 datasets
-datastores
 datatype
 datetimes
 Debian
@@ -282,6 +282,7 @@ hyperlinks
 ie
 ies
 iframe
+Igbo
 inbox
 incrementing
 indexable
@@ -324,6 +325,7 @@ Koziarski
 kwarg
 kwargs
 Kyngesburye
+Kyrgyz
 latin
 lawrence
 lexer
@@ -447,6 +449,7 @@ permalink
 pessimization
 Peucker
 pgAdmin
+PgBouncer
 PGRaster
 phishing
 php
@@ -660,6 +663,7 @@ systemwide
 tablespace
 tablespaces
 tagline
+Tajik
 tarball
 tarballs
 teardown
@@ -699,6 +703,7 @@ trigram
 trigrams
 tuple
 tuples
+Turkmen
 tv
 txt
 tz
@@ -724,7 +729,6 @@ ungrouped
 unhandled
 unharmful
 unhashable
-unicode
 uninstall
 uninstalling
 unioning
@@ -777,12 +781,8 @@ versioned
 versioning
 vertices
 viewable
-virtualenv
-virtualenvs
 virtualized
 Weblog
-whitelist
-whitelisted
 whitespace
 whitespaces
 whizbang

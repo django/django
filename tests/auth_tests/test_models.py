@@ -10,8 +10,12 @@ from django.contrib.auth.models import (
 )
 from django.contrib.contenttypes.models import ContentType
 from django.core import mail
+from django.db import connection, migrations
+from django.db.migrations.state import ModelState, ProjectState
 from django.db.models.signals import post_save
-from django.test import SimpleTestCase, TestCase, override_settings
+from django.test import (
+    SimpleTestCase, TestCase, TransactionTestCase, override_settings,
+)
 
 from .models import IntegerUsernameUser
 from .models.with_custom_email_field import CustomEmailField
@@ -101,7 +105,12 @@ class LoadDataWithNaturalKeysAndMultipleDatabasesTestCase(TestCase):
         self.assertEqual(perm_other.content_type_id, other_objects[0].id)
 
 
-class UserManagerTestCase(TestCase):
+class UserManagerTestCase(TransactionTestCase):
+    available_apps = [
+        'auth_tests',
+        'django.contrib.auth',
+        'django.contrib.contenttypes',
+    ]
 
     def test_create_user(self):
         email_lowercase = 'normal@normal.com'
@@ -155,6 +164,30 @@ class UserManagerTestCase(TestCase):
         self.assertEqual(len(password), 5)
         for char in password:
             self.assertIn(char, allowed_chars)
+
+    def test_runpython_manager_methods(self):
+        def forwards(apps, schema_editor):
+            UserModel = apps.get_model('auth', 'User')
+            user = UserModel.objects.create_user('user1', password='secure')
+            self.assertIsInstance(user, UserModel)
+
+        operation = migrations.RunPython(forwards, migrations.RunPython.noop)
+        project_state = ProjectState()
+        project_state.add_model(ModelState.from_model(User))
+        project_state.add_model(ModelState.from_model(Group))
+        project_state.add_model(ModelState.from_model(Permission))
+        project_state.add_model(ModelState.from_model(ContentType))
+        new_state = project_state.clone()
+        with connection.schema_editor() as editor:
+            operation.state_forwards('test_manager_methods', new_state)
+            operation.database_forwards(
+                'test_manager_methods',
+                editor,
+                project_state,
+                new_state,
+            )
+        user = User.objects.get(username='user1')
+        self.assertTrue(user.check_password('secure'))
 
 
 class AbstractBaseUserTests(SimpleTestCase):

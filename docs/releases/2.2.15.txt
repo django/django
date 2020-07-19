@@ -1,0 +1,13 @@
+===========================
+Django 2.2.15 release notes
+===========================
+
+*Expected August 3, 2020*
+
+Django 2.2.15 fixes a bug in 2.2.14.
+
+Bugfixes
+========
+
+* Allowed setting the ``SameSite`` cookie flag in
+  :meth:`.HttpResponse.delete_cookie` (:ticket:`31790`).

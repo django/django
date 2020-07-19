@@ -78,11 +78,6 @@ e.g. with the ``'de'`` language:
 * ``1200000000`` becomes ``'1,2 Milliarden'``.
 * ``-1200000000`` becomes ``'-1,2 Milliarden'``.
 
-.. versionchanged:: 3.0
-
-    All numeric values are now translated as plural, except ``1.0`` which is
-    translated as a singular phrase. This may be incorrect for some languages.
-
 .. versionchanged:: 3.1
 
     Support for negative integers was added.

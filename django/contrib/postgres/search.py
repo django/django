@@ -208,7 +208,10 @@ class SearchRank(Func):
     function = 'ts_rank'
     output_field = FloatField()
 
-    def __init__(self, vector, query, weights=None):
+    def __init__(
+        self, vector, query, weights=None, normalization=None,
+        cover_density=False,
+    ):
         if not hasattr(vector, 'resolve_expression'):
             vector = SearchVector(vector)
         if not hasattr(query, 'resolve_expression'):
@@ -218,6 +221,12 @@ class SearchRank(Func):
             if not hasattr(weights, 'resolve_expression'):
                 weights = Value(weights)
             expressions = (weights,) + expressions
+        if normalization is not None:
+            if not hasattr(normalization, 'resolve_expression'):
+                normalization = Value(normalization)
+            expressions += (normalization,)
+        if cover_density:
+            self.function = 'ts_rank_cd'
         super().__init__(*expressions)
 
 

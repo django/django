@@ -68,6 +68,17 @@ class ColumnTypes(models.Model):
     uuid_field = models.UUIDField()
 
 
+class JSONFieldColumnType(models.Model):
+    json_field = models.JSONField()
+    null_json_field = models.JSONField(blank=True, null=True)
+
+    class Meta:
+        required_db_features = {
+            'can_introspect_json_field',
+            'supports_json_field',
+        }
+
+
 class UniqueTogether(models.Model):
     field1 = models.IntegerField()
     field2 = models.CharField(max_length=10)

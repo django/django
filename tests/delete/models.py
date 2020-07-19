@@ -13,9 +13,6 @@ class R(models.Model):
     is_default = models.BooleanField(default=False)
     p = models.ForeignKey(P, models.CASCADE, null=True)
 
-    def __str__(self):
-        return "%s" % self.pk
-
 
 def get_default_r():
     return R.objects.get_or_create(is_default=True)[0].pk

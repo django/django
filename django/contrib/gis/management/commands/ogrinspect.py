@@ -37,7 +37,7 @@ class Command(BaseCommand):
         ' ./manage.py ogrinspect zipcode.shp Zipcode'
     )
 
-    requires_system_checks = False
+    requires_system_checks = []
 
     def add_arguments(self, parser):
         parser.add_argument('data_source', help='Path to the data source.')
@@ -130,4 +130,4 @@ class Command(BaseCommand):
                 rev_mapping[ogr_fld], ogr_fld) for ogr_fld in ds[options['layer_key']].fields
             )
             output.extend(["    '%s': '%s'," % (options['geom_name'], mapping_dict[options['geom_name']]), '}'])
-        return '\n'.join(output) + '\n'
+        return '\n'.join(output)

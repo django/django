@@ -156,11 +156,6 @@ MySQL       ``ST_Contains(poly, geom)``
 SpatiaLite  ``Contains(poly, geom)``
 ==========  ============================
 
-.. versionchanged:: 3.0
-
-    In older versions, MySQL uses ``MBRContains`` and operates only on bounding
-    boxes.
-
 .. fieldlookup:: contains_properly
 
 ``contains_properly``
@@ -251,10 +246,6 @@ MySQL       ``ST_Crosses(poly, geom)``
 SpatiaLite  ``Crosses(poly, geom)``
 ==========  ==========================
 
-.. versionchanged:: 3.0
-
-    MySQL support was added.
-
 .. fieldlookup:: disjoint
 
 ``disjoint``
@@ -278,11 +269,6 @@ MariaDB     ``ST_Disjoint(poly, geom)``
 MySQL       ``ST_Disjoint(poly, geom)``
 SpatiaLite  ``Disjoint(poly, geom)``
 ==========  =================================================
-
-.. versionchanged:: 3.0
-
-    In older versions, MySQL uses ``MBRDisjoint`` and operates only on bounding
-    boxes.
 
 .. fieldlookup:: equals
 
@@ -308,12 +294,8 @@ MySQL       ``ST_Equals(poly, geom)``
 SpatiaLite  ``Equals(poly, geom)``
 ==========  =================================================
 
-.. versionchanged:: 3.0
-
-    In older versions, MySQL uses ``MBREquals`` and operates only on bounding
-    boxes.
-
 .. fieldlookup:: exact
+    :noindex:
 .. fieldlookup:: same_as
 
 ``exact``, ``same_as``
@@ -340,11 +322,6 @@ MySQL       ``ST_Equals(poly, geom)``
 SpatiaLite  ``Equals(poly, geom)``
 ==========  =================================================
 
-.. versionchanged:: 3.0
-
-    In older versions, MySQL uses ``MBREquals`` and operates only on bounding
-    boxes.
-
 .. fieldlookup:: intersects
 
 ``intersects``
@@ -368,11 +345,6 @@ MariaDB     ``ST_Intersects(poly, geom)``
 MySQL       ``ST_Intersects(poly, geom)``
 SpatiaLite  ``Intersects(poly, geom)``
 ==========  =================================================
-
-.. versionchanged:: 3.0
-
-    In older versions, MySQL uses ``MBRIntersects`` and operates only on
-    bounding boxes.
 
 .. fieldlookup:: isvalid
 
@@ -414,11 +386,6 @@ MariaDB     ``ST_Overlaps(poly, geom)``
 MySQL       ``ST_Overlaps(poly, geom)``
 SpatiaLite  ``Overlaps(poly, geom)``
 ==========  ============================
-
-.. versionchanged:: 3.0
-
-    In older versions, MySQL uses ``MBROverlaps`` and operates only on bounding
-    boxes.
 
 .. fieldlookup:: relate
 
@@ -520,11 +487,6 @@ Oracle      ``SDO_TOUCH(poly, geom)``
 SpatiaLite  ``Touches(poly, geom)``
 ==========  ==========================
 
-.. versionchanged:: 3.0
-
-    In older versions, MySQL uses ``MBRTouches`` and operates only on bounding
-    boxes.
-
 .. fieldlookup:: within
 
 ``within``
@@ -548,11 +510,6 @@ MySQL       ``ST_Within(poly, geom)``
 Oracle      ``SDO_INSIDE(poly, geom)``
 SpatiaLite  ``Within(poly, geom)``
 ==========  ==========================
-
-.. versionchanged:: 3.0
-
-    In older versions, MySQL uses ``MBRWithin`` and operates only on bounding
-    boxes.
 
 .. fieldlookup:: left
 
@@ -743,9 +700,9 @@ Distance lookups take the following form::
 The value passed into a distance lookup is a tuple; the first two
 values are mandatory, and are the geometry to calculate distances to,
 and a distance value (either a number in units of the field, a
-:class:`~django.contrib.gis.measure.Distance` object, or a `query expression
-<ref/models/expressions>`). To pass a band index to the lookup, use a 3-tuple
-where the second entry is the band index.
+:class:`~django.contrib.gis.measure.Distance` object, or a :doc:`query
+expression </ref/models/expressions>`). To pass a band index to the lookup, use
+a 3-tuple where the second entry is the band index.
 
 On every distance lookup except :lookup:`dwithin`, an optional element,
 ``'spheroid'``, may be included to use the more accurate spheroid distance

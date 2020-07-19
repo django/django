@@ -9,7 +9,7 @@ from django.db.backends.base.introspection import (
 from django.db.models import Index
 from django.utils.regex_helper import _lazy_re_compile
 
-FieldInfo = namedtuple('FieldInfo', BaseFieldInfo._fields + ('pk',))
+FieldInfo = namedtuple('FieldInfo', BaseFieldInfo._fields + ('pk', 'has_json_constraint'))
 
 field_size_re = _lazy_re_compile(r'^\s*(?:var)?char\s*\(\s*(\d+)\s*\)\s*$')
 
@@ -17,7 +17,7 @@ field_size_re = _lazy_re_compile(r'^\s*(?:var)?char\s*\(\s*(\d+)\s*\)\s*$')
 def get_field_size(name):
     """ Extract the size number from a "varchar(11)" type name """
     m = field_size_re.search(name)
-    return int(m.group(1)) if m else None
+    return int(m[1]) if m else None
 
 
 # This light wrapper "fakes" a dictionary interface, because some SQLite data
@@ -63,6 +63,8 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
             # No support for BigAutoField or SmallAutoField as SQLite treats
             # all integer primary keys as signed 64-bit integers.
             return 'AutoField'
+        if description.has_json_constraint:
+            return 'JSONField'
         return field_type
 
     def get_table_list(self, cursor):
@@ -81,12 +83,28 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         interface.
         """
         cursor.execute('PRAGMA table_info(%s)' % self.connection.ops.quote_name(table_name))
+        table_info = cursor.fetchall()
+        json_columns = set()
+        if self.connection.features.can_introspect_json_field:
+            for line in table_info:
+                column = line[1]
+                json_constraint_sql = '%%json_valid("%s")%%' % column
+                has_json_constraint = cursor.execute("""
+                    SELECT sql
+                    FROM sqlite_master
+                    WHERE
+                        type = 'table' AND
+                        name = %s AND
+                        sql LIKE %s
+                """, [table_name, json_constraint_sql]).fetchone()
+                if has_json_constraint:
+                    json_columns.add(column)
         return [
             FieldInfo(
                 name, data_type, None, get_field_size(data_type), None, None,
-                not notnull, default, pk == 1,
+                not notnull, default, pk == 1, name in json_columns
             )
-            for cid, name, data_type, notnull, default, pk in cursor.fetchall()
+            for cid, name, data_type, notnull, default, pk in table_info
         ]
 
     def get_sequences(self, cursor, table_name, table_fields=()):
@@ -129,7 +147,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
             if field_desc.startswith("FOREIGN KEY"):
                 # Find name of the target FK field
                 m = re.match(r'FOREIGN KEY\s*\(([^\)]*)\).*', field_desc, re.I)
-                field_name = m.groups()[0].strip('"')
+                field_name = m[1].strip('"')
             else:
                 field_name = field_desc.split()[0].strip('"')
 
@@ -200,7 +218,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
             field_desc = field_desc.strip()
             m = re.match(r'(?:(?:["`\[])(.*)(?:["`\]])|(\w+)).*PRIMARY KEY.*', field_desc)
             if m:
-                return m.group(1) if m.group(1) else m.group(2)
+                return m[1] if m[1] else m[2]
         return None
 
     def _get_foreign_key_constraints(self, cursor, table_name):

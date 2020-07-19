@@ -9,15 +9,17 @@ from django.test import SimpleTestCase
 
 @skipUnless(connection.vendor == 'sqlite', 'SQLite tests.')
 class SqliteDbshellCommandTestCase(SimpleTestCase):
-    def _run_dbshell(self):
+    def _run_dbshell(self, parameters=None):
         """Run runshell command and capture its arguments."""
         def _mock_subprocess_run(*args, **kwargs):
             self.subprocess_args = list(*args)
             return CompletedProcess(self.subprocess_args, 0)
 
+        if parameters is None:
+            parameters = []
         client = DatabaseClient(connection)
         with mock.patch('subprocess.run', new=_mock_subprocess_run):
-            client.runshell()
+            client.runshell(parameters)
         return self.subprocess_args
 
     def test_path_name(self):
@@ -28,4 +30,14 @@ class SqliteDbshellCommandTestCase(SimpleTestCase):
             self.assertEqual(
                 self._run_dbshell(),
                 ['sqlite3', 'test.db.sqlite3'],
+            )
+
+    def test_parameters(self):
+        with mock.patch.dict(
+            connection.settings_dict,
+            {'NAME': Path('test.db.sqlite3')},
+        ):
+            self.assertEqual(
+                self._run_dbshell(['-help']),
+                ['sqlite3', 'test.db.sqlite3', '-help'],
             )

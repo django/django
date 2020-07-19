@@ -10,7 +10,7 @@ class Command(BaseCommand):
     help = """Displays differences between the current settings.py and Django's
     default settings."""
 
-    requires_system_checks = False
+    requires_system_checks = []
 
     def add_arguments(self, parser):
         parser.add_argument(

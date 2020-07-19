@@ -26,6 +26,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         1266: 'TimeField',
         1700: 'DecimalField',
         2950: 'UUIDField',
+        3802: 'JSONField',
     }
 
     ignored_tables = []

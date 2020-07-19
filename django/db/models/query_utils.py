@@ -147,8 +147,8 @@ class DeferredAttribute:
             val = self._check_parent_chain(instance)
             if val is None:
                 instance.refresh_from_db(fields=[field_name])
-                val = getattr(instance, field_name)
-            data[field_name] = val
+            else:
+                data[field_name] = val
         return data[field_name]
 
     def _check_parent_chain(self, instance):

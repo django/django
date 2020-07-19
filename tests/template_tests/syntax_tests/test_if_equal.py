@@ -1,10 +1,12 @@
 from django.template import TemplateSyntaxError
 from django.template.defaulttags import IfEqualNode
-from django.test import SimpleTestCase
+from django.test import SimpleTestCase, ignore_warnings
+from django.utils.deprecation import RemovedInDjango40Warning
 
 from ..utils import setup
 
 
+@ignore_warnings(category=RemovedInDjango40Warning)
 class IfEqualTagTests(SimpleTestCase):
 
     @setup({'ifequal01': '{% ifequal a b %}yes{% endifequal %}'})
@@ -196,6 +198,7 @@ class IfEqualTagTests(SimpleTestCase):
         self.assertEqual(output, 'x')
 
 
+@ignore_warnings(category=RemovedInDjango40Warning)
 class IfNotEqualTagTests(SimpleTestCase):
 
     @setup({'ifnotequal01': '{% ifnotequal a b %}yes{% endifnotequal %}'})
@@ -224,7 +227,31 @@ class IfNotEqualTagTests(SimpleTestCase):
             self.engine.render_to_string('one_var', {'a': 1})
 
 
-class IfEqualTests(SimpleTestCase):
+class DeprecationTests(SimpleTestCase):
+    @setup(
+        {'ifequal_warning': '{% ifequal a b %}yes{% endifequal %}'},
+        test_once=True,
+    )
+    def test_ifequal_warning(self):
+        msg = (
+            'The {% ifequal %} template tag is deprecated in favor of '
+            '{% if %}.'
+        )
+        with self.assertRaisesMessage(RemovedInDjango40Warning, msg):
+            self.engine.render_to_string('ifequal_warning', {'a': 1, 'b': 2})
+
+    @setup(
+        {'ifnotequal_warning': '{% ifnotequal a b %}yes{% endifnoequal %}'},
+        test_once=True,
+    )
+    def test_ifnotequal_warning(self):
+        msg = (
+            'The {% ifnotequal %} template tag is deprecated in favor of '
+            '{% if %}.'
+        )
+        with self.assertRaisesMessage(RemovedInDjango40Warning, msg):
+            self.engine.render_to_string('ifnotequal_warning', {'a': 1, 'b': 2})
+
     def test_repr(self):
         node = IfEqualNode(var1='a', var2='b', nodelist_true=[], nodelist_false=[], negate=False)
         self.assertEqual(repr(node), '<IfEqualNode>')

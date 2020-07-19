@@ -67,16 +67,13 @@ ensures the age field is never less than 18.
 
 .. attribute:: CheckConstraint.name
 
-The name of the constraint.
-
-.. versionchanged:: 3.0
-
-   Interpolation of  ``'%(app_label)s'`` and ``'%(class)s'`` was added.
+The name of the constraint. You must always specify a unique name for the
+constraint.
 
 ``UniqueConstraint``
 ====================
 
-.. class:: UniqueConstraint(*, fields, name, condition=None)
+.. class:: UniqueConstraint(*, fields, name, condition=None, deferrable=None, include=None, opclasses=())
 
     Creates a unique constraint in the database.
 
@@ -97,11 +94,8 @@ date.
 
 .. attribute:: UniqueConstraint.name
 
-The name of the constraint.
-
-.. versionchanged:: 3.0
-
-   Interpolation of  ``'%(app_label)s'`` and ``'%(class)s'`` was added.
+The name of the constraint. You must always specify a unique name for the
+constraint.
 
 ``condition``
 -------------
@@ -119,3 +113,79 @@ ensures that each user only has one draft.
 
 These conditions have the same database restrictions as
 :attr:`Index.condition`.
+
+``deferrable``
+--------------
+
+.. attribute:: UniqueConstraint.deferrable
+
+.. versionadded:: 3.1
+
+Set this parameter to create a deferrable unique constraint. Accepted values
+are ``Deferrable.DEFERRED`` or ``Deferrable.IMMEDIATE``. For example::
+
+    from django.db.models import Deferrable, UniqueConstraint
+
+    UniqueConstraint(
+        name='unique_order',
+        fields=['order'],
+        deferrable=Deferrable.DEFERRED,
+    )
+
+By default constraints are not deferred. A deferred constraint will not be
+enforced until the end of the transaction. An immediate constraint will be
+enforced immediately after every command.
+
+.. admonition:: MySQL, MariaDB, and SQLite.
+
+    Deferrable unique constraints are ignored on MySQL, MariaDB, and SQLite as
+    neither supports them.
+
+.. warning::
+
+    Deferred unique constraints may lead to a `performance penalty
+    <https://www.postgresql.org/docs/current/sql-createtable.html#id-1.9.3.85.9.4>`_.
+
+``include``
+-----------
+
+.. attribute:: UniqueConstraint.include
+
+.. versionadded:: 3.2
+
+A list or tuple of the names of the fields to be included in the covering
+unique index as non-key columns. This allows index-only scans to be used for
+queries that select only included fields (:attr:`~UniqueConstraint.include`)
+and filter only by unique fields (:attr:`~UniqueConstraint.fields`).
+
+For example::
+
+    UniqueConstraint(name='unique_booking', fields=['room', 'date'], include=['full_name'])
+
+will allow filtering on ``room`` and ``date``, also selecting ``full_name``,
+while fetching data only from the index.
+
+``include`` is supported only on PostgreSQL.
+
+Non-key columns have the same database restrictions as :attr:`Index.include`.
+
+
+``opclasses``
+-------------
+
+.. attribute:: UniqueConstraint.opclasses
+
+.. versionadded:: 3.2
+
+The names of the `PostgreSQL operator classes
+<https://www.postgresql.org/docs/current/indexes-opclass.html>`_ to use for
+this unique index. If you require a custom operator class, you must provide one
+for each field in the index.
+
+For example::
+
+    UniqueConstraint(name='unique_username', fields=['username'], opclasses=['varchar_pattern_ops'])
+
+creates a unique index on ``username`` using ``varchar_pattern_ops``.
+
+``opclasses`` are ignored for databases besides PostgreSQL.

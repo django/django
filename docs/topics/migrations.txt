@@ -347,11 +347,15 @@ Note that this only works given two things:
   that your database doesn't match your models, you'll just get errors when
   migrations try to modify those tables.
 
-Reverting migrations
+.. _reversing-migrations:
+
+Reversing migrations
 ====================
 
-Any migration can be reverted with :djadmin:`migrate` by using the number of
-previous migrations::
+Migrations can be reversed with :djadmin:`migrate` by passing the number of the
+previous migration. For example, to reverse migration ``books.0003``:
+
+.. console::
 
     $ python manage.py migrate books 0002
     Operations to perform:
@@ -360,8 +364,10 @@ previous migrations::
       Rendering model states... DONE
       Unapplying books.0003_auto... OK
 
-If you want to revert all migrations applied for an app, use the name
-``zero``::
+If you want to reverse all migrations applied for an app, use the name
+``zero``:
+
+.. console::
 
     $ python manage.py migrate books zero
     Operations to perform:
@@ -370,6 +376,19 @@ If you want to revert all migrations applied for an app, use the name
       Rendering model states... DONE
       Unapplying books.0002_auto... OK
       Unapplying books.0001_initial... OK
+
+A migration is irreversible if it contains any irreversible operations.
+Attempting to reverse such migrations will raise ``IrreversibleError``:
+
+.. console::
+
+    $ python manage.py migrate books 0002
+    Operations to perform:
+      Target specific migration: 0002_auto, from books
+    Running migrations:
+      Rendering model states... DONE
+      Unapplying books.0003_auto...Traceback (most recent call last):
+    django.db.migrations.exceptions.IrreversibleError: Operation <RunSQL  sql='DROP TABLE demo_books'> in books.0003_auto is not reversible
 
 .. _historical-models:
 
@@ -701,6 +720,11 @@ Django can serialize the following:
 - ``uuid.UUID`` instances
 - :func:`functools.partial` and :class:`functools.partialmethod` instances
   which have serializable ``func``, ``args``, and ``keywords`` values.
+- Pure and concrete path objects from :mod:`pathlib`. Concrete paths are
+  converted to their pure path equivalent, e.g. :class:`pathlib.PosixPath` to
+  :class:`pathlib.PurePosixPath`.
+- :class:`os.PathLike` instances, e.g. :class:`os.DirEntry`, which are
+  converted to ``str`` or ``bytes`` using :func:`os.fspath`.
 - ``LazyObject`` instances which wrap a serializable value.
 - Enumeration types (e.g. ``TextChoices`` or ``IntegerChoices``) instances.
 - Any Django field
@@ -708,6 +732,11 @@ Django can serialize the following:
 - Unbound methods used from within the class body
 - Any class reference (must be in module's top-level scope)
 - Anything with a custom ``deconstruct()`` method (:ref:`see below <custom-deconstruct-method>`)
+
+.. versionchanged:: 3.2
+
+    Serialization support for pure and concrete path objects from
+    :mod:`pathlib`, and :class:`os.PathLike` instances was added.
 
 Django cannot serialize:
 

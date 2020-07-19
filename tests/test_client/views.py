@@ -4,8 +4,9 @@ from xml.dom.minidom import parseString
 
 from django.contrib.auth.decorators import login_required, permission_required
 from django.core import mail
+from django.core.exceptions import ValidationError
 from django.forms import fields
-from django.forms.forms import Form, ValidationError
+from django.forms.forms import Form
 from django.forms.formsets import BaseFormSet, formset_factory
 from django.http import (
     HttpResponse, HttpResponseBadRequest, HttpResponseNotAllowed,
@@ -128,6 +129,14 @@ def redirect_view(request):
     else:
         query = ''
     return HttpResponseRedirect('/get_view/' + query)
+
+
+def method_saving_307_redirect_query_string_view(request):
+    return HttpResponseRedirect('/post_view/?hello=world', status=307)
+
+
+def method_saving_308_redirect_query_string_view(request):
+    return HttpResponseRedirect('/post_view/?hello=world', status=308)
 
 
 def _post_view_redirect(request, status_code):

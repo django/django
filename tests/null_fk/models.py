@@ -34,9 +34,6 @@ class Comment(models.Model):
     class Meta:
         ordering = ('comment_text',)
 
-    def __str__(self):
-        return self.comment_text
-
 # Ticket 15823
 
 

@@ -203,6 +203,7 @@ the directories which were searched:
 -------------
 
 .. django-admin:: runserver [addrport]
+    :noindex:
 
 Overrides the core :djadmin:`runserver` command if the ``staticfiles`` app
 is :setting:`installed<INSTALLED_APPS>` and adds automatic serving of static

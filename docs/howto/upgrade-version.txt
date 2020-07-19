@@ -87,8 +87,9 @@ Installation
 ============
 
 Once you're ready, it is time to :doc:`install the new Django version
-</topics/install>`. If you are using virtualenv_ and it is a major upgrade, you
-might want to set up a new environment with all the dependencies first.
+</topics/install>`. If you are using a :mod:`virtual environment <venv>` and it
+is a major upgrade, you might want to set up a new environment with all the
+dependencies first.
 
 If you installed Django with pip_, you can use the ``--upgrade`` or ``-U`` flag:
 
@@ -97,7 +98,6 @@ If you installed Django with pip_, you can use the ``--upgrade`` or ``-U`` flag:
    $ python -m pip install -U Django
 
 .. _pip: https://pip.pypa.io/
-.. _virtualenv: https://virtualenv.pypa.io/
 
 Testing
 =======

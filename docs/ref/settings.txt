@@ -597,9 +597,9 @@ file. When specifying the path, always use forward slashes, even on Windows
 
 Default: ``0``
 
-The lifetime of a database connection, in seconds. Use ``0`` to close database
-connections at the end of each request — Django's historical behavior — and
-``None`` for unlimited persistent connections.
+The lifetime of a database connection, as an integer of seconds. Use ``0`` to
+close database connections at the end of each request — Django's historical
+behavior — and ``None`` for unlimited persistent connections.
 
 .. setting:: OPTIONS
 
@@ -1554,16 +1554,12 @@ when using the :djadmin:`collectstatic` management command. See
 
 .. warning::
 
-    **Always prefix the mode with a 0.**
+    **Always prefix the mode with** ``0o`` **.**
 
-    If you're not familiar with file modes, please note that the leading
-    ``0`` is very important: it indicates an octal number, which is the
-    way that modes must be specified. If you try to use ``644``, you'll
-    get totally incorrect behavior.
-
-.. versionchanged:: 3.0
-
-    In older versions, the default value is ``None``.
+    If you're not familiar with file modes, please note that the ``0o`` prefix
+    is very important: it indicates an octal number, which is the way that
+    modes must be specified. If you try to use ``644``, you'll get totally
+    incorrect behavior.
 
 .. setting:: FILE_UPLOAD_TEMP_DIR
 
@@ -1823,8 +1819,6 @@ deletes the old one.
 ``LANGUAGE_COOKIE_HTTPONLY``
 ----------------------------
 
-.. versionadded:: 3.0
-
 Default: ``False``
 
 Whether to use ``HttpOnly`` flag on the language cookie. If this is set to
@@ -1872,8 +1866,6 @@ deletes the one.
 ``LANGUAGE_COOKIE_SAMESITE``
 ----------------------------
 
-.. versionadded:: 3.0
-
 Default: ``None``
 
 The value of the `SameSite`_ flag on the language cookie. This flag prevents the
@@ -1889,8 +1881,6 @@ See :setting:`SESSION_COOKIE_SAMESITE` for details about ``SameSite``.
 
 ``LANGUAGE_COOKIE_SECURE``
 --------------------------
-
-.. versionadded:: 3.0
 
 Default: ``False``
 
@@ -2263,10 +2253,6 @@ If ``True``, the :class:`~django.middleware.security.SecurityMiddleware`
 sets the :ref:`x-content-type-options` header on all responses that do not
 already have it.
 
-.. versionchanged:: 3.0
-
-    In older versions, the default value is ``False``.
-
 .. setting:: SECURE_HSTS_INCLUDE_SUBDOMAINS
 
 ``SECURE_HSTS_INCLUDE_SUBDOMAINS``
@@ -2392,8 +2378,6 @@ from URL paths, so patterns shouldn't include them, e.g.
 
 ``SECURE_REFERRER_POLICY``
 --------------------------
-
-.. versionadded:: 3.0
 
 Default: ``'same-origin'``
 
@@ -2798,7 +2782,10 @@ Default: ``False``
 
 A boolean that specifies if datetimes will be timezone-aware by default or not.
 If this is set to ``True``, Django will use timezone-aware datetimes internally.
-Otherwise, Django will use naive datetimes in local time.
+
+When ``USE_TZ`` is False, Django will use naive datetimes in local time, except
+when parsing ISO 8601 formatted strings, where timezone information will always
+be retained if present.
 
 See also :setting:`TIME_ZONE`, :setting:`USE_I18N` and :setting:`USE_L10N`.
 
@@ -2887,10 +2874,6 @@ The default value for the X-Frame-Options header used by
 :class:`~django.middleware.clickjacking.XFrameOptionsMiddleware`. See the
 :doc:`clickjacking protection </ref/clickjacking/>` documentation.
 
-.. versionchanged:: 3.0
-
-    In older versions, the default value is ``SAMEORIGIN``.
-
 Auth
 ====
 
@@ -2971,7 +2954,7 @@ rendered.
 
 Default: ``259200`` (3 days, in seconds)
 
-The minimum number of seconds a password reset link is valid for.
+The number of seconds a password reset link is valid for.
 
 Used by the :class:`~django.contrib.auth.views.PasswordResetConfirmView`.
 
@@ -2992,8 +2975,7 @@ Used by the :class:`~django.contrib.auth.views.PasswordResetConfirmView`.
 
 Default: ``3``
 
-The minimum number of days a password reset link is valid for. Depending on
-when the link is generated, it will be valid for up to a day longer.
+The number of days a password reset link is valid for.
 
 Used by the :class:`~django.contrib.auth.views.PasswordResetConfirmView`.
 
@@ -3177,7 +3159,7 @@ vulnerability into full hijacking of a user's session. There aren't many good
 reasons for turning this off. Your code shouldn't read session cookies from
 JavaScript.
 
-.. _HttpOnly: https://www.owasp.org/index.php/HttpOnly
+.. _HttpOnly: https://owasp.org/www-community/HttpOnly
 
 .. setting:: SESSION_COOKIE_NAME
 
@@ -3244,7 +3226,7 @@ Possible values for the setting are:
 
     Setting ``SESSION_COOKIE_SAMESITE = 'None'`` was allowed.
 
-.. _SameSite: https://www.owasp.org/index.php/SameSite
+.. _SameSite: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Set-Cookie/SameSite
 
 .. setting:: SESSION_COOKIE_SECURE
 

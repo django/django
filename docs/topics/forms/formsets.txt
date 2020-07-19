@@ -126,6 +126,38 @@ affect validation.  If ``validate_max=True`` is passed to the
 :func:`~django.forms.formsets.formset_factory`, then ``max_num`` will affect
 validation.  See :ref:`validate_max`.
 
+.. _formsets-absolute-max:
+
+Limiting the maximum number of instantiated forms
+=================================================
+
+.. versionadded:: 3.2
+
+The ``absolute_max`` parameter to :func:`.formset_factory` allows limiting the
+number of forms that can be instantiated when supplying ``POST`` data. This
+protects against memory exhaustion attacks using forged ``POST`` requests::
+
+    >>> from django.forms.formsets import formset_factory
+    >>> from myapp.forms import ArticleForm
+    >>> ArticleFormSet = formset_factory(ArticleForm, absolute_max=1500)
+    >>> data = {
+    ...     'form-TOTAL_FORMS': '1501',
+    ...     'form-INITIAL_FORMS': '0',
+    ...     'form-MAX_NUM_FORMS': '',
+    ... }
+    >>> formset = ArticleFormSet(data)
+    >>> len(formset.forms)
+    1500
+    >>> formset.is_valid()
+    False
+    >>> formset.non_form_errors()
+    ['Please submit 1000 or fewer forms.']
+
+When ``absolute_max`` is None, it defaults to ``max_num + 1000``. (If
+``max_num`` is ``None``, it defaults to ``2000``).
+
+If ``absolute_max`` is less than ``max_num``, a ``ValueError`` will be raised.
+
 Formset validation
 ==================
 
@@ -220,7 +252,7 @@ this management data, an exception will be raised::
     >>> formset.is_valid()
     Traceback (most recent call last):
     ...
-    django.forms.utils.ValidationError: ['ManagementForm data is missing or has been tampered with']
+    django.core.exceptions.ValidationError: ['ManagementForm data is missing or has been tampered with']
 
 It is used to keep track of how many form instances are being displayed. If
 you are adding new forms via JavaScript, you should increment the count fields
@@ -261,6 +293,7 @@ Custom formset validation
 A formset has a ``clean`` method similar to the one on a ``Form`` class. This
 is where you define your own validation that works at the formset level::
 
+    >>> from django.core.exceptions import ValidationError
     >>> from django.forms import BaseFormSet
     >>> from django.forms import formset_factory
     >>> from myapp.forms import ArticleForm
@@ -277,7 +310,7 @@ is where you define your own validation that works at the formset level::
     ...                 continue
     ...             title = form.cleaned_data.get('title')
     ...             if title in titles:
-    ...                 raise forms.ValidationError("Articles in a set must have distinct titles.")
+    ...                 raise ValidationError("Articles in a set must have distinct titles.")
     ...             titles.append(title)
 
     >>> ArticleFormSet = formset_factory(ArticleForm, formset=BaseArticleFormSet)
@@ -347,11 +380,11 @@ excessive.
 .. note::
 
     Regardless of ``validate_max``, if the number of forms in a data set
-    exceeds ``max_num`` by more than 1000, then the form will fail to validate
-    as if ``validate_max`` were set, and additionally only the first 1000
-    forms above ``max_num`` will be validated.  The remainder will be
-    truncated entirely.  This is to protect against memory exhaustion attacks
-    using forged POST requests.
+    exceeds ``absolute_max``, then the form will fail to validate as if
+    ``validate_max`` were set, and additionally only the first ``absolute_max``
+    forms will be validated. The remainder will be truncated entirely. This is
+    to protect against memory exhaustion attacks using forged POST requests.
+    See :ref:`formsets-absolute-max`.
 
 ``validate_min``
 ----------------
@@ -458,8 +491,6 @@ control the widget used with
 ``ordering_widget``
 ^^^^^^^^^^^^^^^^^^^
 
-.. versionadded:: 3.0
-
 .. attribute:: BaseFormSet.ordering_widget
 
 Default: :class:`~django.forms.NumberInput`
@@ -476,8 +507,6 @@ Set ``ordering_widget`` to specify the widget class to be used with
 
 ``get_ordering_widget``
 ^^^^^^^^^^^^^^^^^^^^^^^
-
-.. versionadded:: 3.0
 
 .. method:: BaseFormSet.get_ordering_widget()
 
@@ -563,6 +592,18 @@ them::
 On the other hand, if you are using a plain ``FormSet``, it's up to you to
 handle ``formset.deleted_forms``, perhaps in your formset's ``save()`` method,
 as there's no general notion of what it means to delete a form.
+
+``can_delete_extra``
+--------------------
+
+.. versionadded:: 3.2
+
+.. attribute:: BaseFormSet.can_delete_extra
+
+Default: ``True``
+
+While setting ``can_delete=True``, specifying ``can_delete_extra=False`` will
+remove the option to delete extra forms.
 
 Adding additional fields to a formset
 =====================================

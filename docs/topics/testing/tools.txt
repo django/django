@@ -132,10 +132,6 @@ Use the ``django.test.Client`` class to make requests.
     exceptions raised during the request should also be raised in the test.
     Defaults to ``True``.
 
-    .. versionadded:: 3.0
-
-        The ``raise_request_exception`` argument was added.
-
     Once you have a ``Client`` instance, you can call any of the following
     methods:
 
@@ -480,8 +476,6 @@ Specifically, a ``Response`` object has the following attributes:
             may be a suitable alternative on responses with that attribute.
 
     .. attribute:: exc_info
-
-        .. versionadded:: 3.0
 
         A tuple of three values that provides information about the unhandled
         exception, if any, that occurred during the view.
@@ -879,11 +873,49 @@ It also provides an additional method:
     (for instance, MySQL with the MyISAM engine), ``setUpTestData()`` will be
     called before each test, negating the speed benefits.
 
-    Be careful not to modify any objects created in ``setUpTestData()`` in
-    your test methods. Modifications to in-memory objects from setup work done
-    at the class level will persist between test methods. If you do need to
-    modify them, you could reload them in the ``setUp()`` method with
-    :meth:`~django.db.models.Model.refresh_from_db`, for example.
+    .. versionchanged:: 3.2
+
+        Objects assigned to class attributes in ``setUpTestData()`` must
+        support creating deep copies with :py:func:`copy.deepcopy` in order to
+        isolate them from alterations performed by each test methods. In
+        previous versions of Django these objects were reused and changes made
+        to them were persisted between test methods.
+
+.. classmethod:: TestCase.captureOnCommitCallbacks(using=DEFAULT_DB_ALIAS, execute=False)
+
+    .. versionadded:: 3.2
+
+    Returns a context manager that captures :func:`transaction.on_commit()
+    <django.db.transaction.on_commit>` callbacks for the given database
+    connection. It returns a list that contains, on exit of the context, the
+    captured callback functions. From this list you can make assertions on the
+    callbacks or call them to invoke their side effects, emulating a commit.
+
+    ``using`` is the alias of the database connection to capture callbacks for.
+
+    If ``execute`` is ``True``, all the callbacks will be called as the context
+    manager exits, if no exception occurred. This emulates a commit after the
+    wrapped block of code.
+
+    For example::
+
+        from django.core import mail
+        from django.test import TestCase
+
+
+        class ContactTests(TestCase):
+            def test_post(self):
+                with self.captureOnCommitCallbacks(execute=True) as callbacks:
+                    response = self.client.post(
+                        '/contact/',
+                        {'message': 'I like your site'},
+                    )
+
+                self.assertEqual(response.status_code, 200)
+                self.assertEqual(len(callbacks), 1)
+                self.assertEqual(len(mail.outbox), 1)
+                self.assertEqual(mail.outbox[0].subject, 'Contact Form')
+                self.assertEqual(mail.outbox[0].body, 'I like your site')
 
 .. _live-test-server:
 
@@ -998,7 +1030,7 @@ out the `full reference`_ for more details.
     for more information.
 
     .. _Selenium FAQ: https://web.archive.org/web/20160129132110/http://code.google.com/p/selenium/wiki/FrequentlyAskedQuestions#Q:_WebDriver_fails_to_find_elements_/_Does_not_block_on_page_loa
-    .. _Selenium documentation: https://www.seleniumhq.org/docs/04_webdriver_advanced.html#explicit-waits
+    .. _Selenium documentation: https://www.selenium.dev/documentation/en/webdriver/waits/#explicit-wait
 
 Test cases features
 ===================
@@ -1655,10 +1687,11 @@ your test suite.
 
     Asserts that a queryset ``qs`` returns a particular list of values ``values``.
 
-    The comparison of the contents of ``qs`` and ``values`` is performed using
-    the function ``transform``; by default, this means that the ``repr()`` of
-    each value is compared. Any other callable can be used if ``repr()`` doesn't
-    provide a unique or helpful comparison.
+    The comparison of the contents of ``qs`` and ``values`` is performed by
+    applying ``transform`` to ``qs``. By default, this means that the
+    ``repr()`` of each value in ``qs`` is compared to the ``values``. Any other
+    callable can be used if ``repr()`` doesn't provide a unique or helpful
+    comparison.
 
     By default, the comparison is also ordering dependent. If ``qs`` doesn't
     provide an implicit ordering, you can set the ``ordered`` parameter to
@@ -1808,7 +1841,7 @@ creates.
 
             @mock.patch(...)
             @async_to_sync
-            def test_my_thing(self):
+            async def test_my_thing(self):
                 ...
 
 .. _topics-testing-email:

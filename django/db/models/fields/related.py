@@ -133,7 +133,7 @@ class RelatedField(FieldCacheMixin, Field):
             errors.append(
                 checks.Error(
                     "Reverse query name '%s' must not end with an underscore."
-                    % (rel_query_name,),
+                    % rel_query_name,
                     hint=("Add or change a related_name or related_query_name "
                           "argument for this field."),
                     obj=self,
@@ -581,14 +581,14 @@ class ForeignObject(RelatedField):
 
         if self.remote_field.parent_link:
             kwargs['parent_link'] = self.remote_field.parent_link
-        # Work out string form of "to"
         if isinstance(self.remote_field.model, str):
-            kwargs['to'] = self.remote_field.model
+            if '.' in self.remote_field.model:
+                app_label, model_name = self.remote_field.model.split('.')
+                kwargs['to'] = '%s.%s' % (app_label, model_name.lower())
+            else:
+                kwargs['to'] = self.remote_field.model.lower()
         else:
-            kwargs['to'] = "%s.%s" % (
-                self.remote_field.model._meta.app_label,
-                self.remote_field.model._meta.object_name,
-            )
+            kwargs['to'] = self.remote_field.model._meta.label_lower
         # If swappable is True, then see if we're actually pointing to the target
         # of a swap.
         swappable_setting = self.swappable_setting
@@ -918,7 +918,7 @@ class ForeignKey(ForeignObject):
             return
 
         using = router.db_for_read(self.remote_field.model, instance=model_instance)
-        qs = self.remote_field.model._default_manager.using(using).filter(
+        qs = self.remote_field.model._base_manager.using(using).filter(
             **{self.remote_field.field_name: value}
         )
         qs = qs.complex_filter(self.get_limit_choices_to())

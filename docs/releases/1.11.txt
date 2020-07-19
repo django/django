@@ -15,9 +15,10 @@ want to be aware of when upgrading from Django 1.10 or older versions. We've
 See the :doc:`/howto/upgrade-version` guide if you're updating an existing
 project.
 
-Django 1.11 is designated as a :term:`long-term support release`. It will
-receive security updates for at least three years after its release. Support
-for the previous LTS, Django 1.8, will end in April 2018.
+Django 1.11 is designated as a :term:`long-term support release
+<Long-term support release>`. It will receive security updates for at least
+three years after its release. Support for the previous LTS, Django 1.8, will
+end in April 2018.
 
 Python compatibility
 ====================
@@ -185,8 +186,8 @@ Minor features
 
 * PostGIS migrations can now change field dimensions.
 
-* Added the ability to pass the `size`, `shape`, and `offset` parameter when
-  creating :class:`~django.contrib.gis.gdal.GDALRaster` objects.
+* Added the ability to pass the ``size``, ``shape``, and ``offset`` parameters
+  when creating :class:`~django.contrib.gis.gdal.GDALRaster` objects.
 
 * Added SpatiaLite support for the
   :class:`~django.contrib.gis.db.models.functions.IsValid` function,
@@ -274,8 +275,8 @@ Email
   headers in the local time zone rather than in UTC.
 
 * ``EmailMessage.attach()`` and ``attach_file()`` now fall back to MIME type
-  ``application/octet-stream`` when binary content that can't be decoded as
-  UTF-8 is specified for a ``text/*`` attachment.
+  :mimetype:`application/octet-stream` when binary content that can't be
+  decoded as UTF-8 is specified for a :mimetype:`text/*` attachment.
 
 File Storage
 ~~~~~~~~~~~~
@@ -644,8 +645,8 @@ Server-side cursors on PostgreSQL
 ---------------------------------
 
 The change to make :meth:`.QuerySet.iterator()` use server-side cursors on
-PostgreSQL prevents running Django with `pgBouncer` in transaction pooling
-mode. To reallow that, use the :setting:`DISABLE_SERVER_SIDE_CURSORS
+PostgreSQL prevents running Django with PgBouncer in transaction pooling mode.
+To reallow that, use the :setting:`DISABLE_SERVER_SIDE_CURSORS
 <DATABASE-DISABLE_SERVER_SIDE_CURSORS>` setting (added in Django 1.11.1) in
 :setting:`DATABASES`.
 

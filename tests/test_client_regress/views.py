@@ -117,7 +117,7 @@ def return_text_file(request):
     "A view that parses and returns text as a file."
     match = CONTENT_TYPE_RE.match(request.META['CONTENT_TYPE'])
     if match:
-        charset = match.group(1)
+        charset = match[1]
     else:
         charset = settings.DEFAULT_CHARSET
 

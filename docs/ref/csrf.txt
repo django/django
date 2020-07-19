@@ -85,11 +85,11 @@ You can acquire the token like this:
 .. code-block:: javascript
 
     function getCookie(name) {
-        var cookieValue = null;
+        let cookieValue = null;
         if (document.cookie && document.cookie !== '') {
-            var cookies = document.cookie.split(';');
-            for (var i = 0; i < cookies.length; i++) {
-                var cookie = cookies[i].trim();
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
                 // Does this cookie string begin with the name we want?
                 if (cookie.substring(0, name.length + 1) === (name + '=')) {
                     cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
@@ -99,14 +99,14 @@ You can acquire the token like this:
         }
         return cookieValue;
     }
-    var csrftoken = getCookie('csrftoken');
+    const csrftoken = getCookie('csrftoken');
 
 The above code could be simplified by using the `JavaScript Cookie library
 <https://github.com/js-cookie/js-cookie/>`_ to replace ``getCookie``:
 
 .. code-block:: javascript
 
-    var csrftoken = Cookies.get('csrftoken');
+    const csrftoken = Cookies.get('csrftoken');
 
 .. note::
 
@@ -137,7 +137,7 @@ and read the token from the DOM with JavaScript:
 
     {% csrf_token %}
     <script>
-    var csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+    const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
     </script>
 
 Setting the token on the AJAX request
@@ -148,7 +148,7 @@ Finally, you'll need to set the header on your AJAX request. Using the
 
 .. code-block:: javascript
 
-    var request = new Request(
+    const request = new Request(
         /* URL */,
         {headers: {'X-CSRFToken': csrftoken}}
     );
@@ -531,7 +531,7 @@ Is it a problem that Django's CSRF protection isn't linked to a session by defau
 -----------------------------------------------------------------------------------
 
 No, this is by design. Not linking CSRF protection to a session allows using
-the protection on sites such as a `pastebin` that allow submissions from
+the protection on sites such as a *pastebin* that allow submissions from
 anonymous users which don't have a session.
 
 If you wish to store the CSRF token in the user's session, use the

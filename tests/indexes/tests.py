@@ -236,6 +236,41 @@ class SchemaIndexesPostgreSQLTests(TransactionTestCase):
             cursor.execute(self.get_opclass_query % indexname)
             self.assertCountEqual(cursor.fetchall(), [('text_pattern_ops', indexname)])
 
+    @skipUnlessDBFeature('supports_covering_indexes')
+    def test_ops_class_include(self):
+        index_name = 'test_ops_class_include'
+        index = Index(
+            name=index_name,
+            fields=['body'],
+            opclasses=['text_pattern_ops'],
+            include=['headline'],
+        )
+        with connection.schema_editor() as editor:
+            editor.add_index(IndexedArticle2, index)
+        with editor.connection.cursor() as cursor:
+            cursor.execute(self.get_opclass_query % index_name)
+            self.assertCountEqual(cursor.fetchall(), [('text_pattern_ops', index_name)])
+
+    @skipUnlessDBFeature('supports_covering_indexes')
+    def test_ops_class_include_tablespace(self):
+        index_name = 'test_ops_class_include_tblspace'
+        index = Index(
+            name=index_name,
+            fields=['body'],
+            opclasses=['text_pattern_ops'],
+            include=['headline'],
+            db_tablespace='pg_default',
+        )
+        with connection.schema_editor() as editor:
+            editor.add_index(IndexedArticle2, index)
+            self.assertIn(
+                'TABLESPACE "pg_default"',
+                str(index.create_sql(IndexedArticle2, editor)),
+            )
+        with editor.connection.cursor() as cursor:
+            cursor.execute(self.get_opclass_query % index_name)
+            self.assertCountEqual(cursor.fetchall(), [('text_pattern_ops', index_name)])
+
     def test_ops_class_columns_lists_sql(self):
         index = Index(
             fields=['headline'],
@@ -417,3 +452,89 @@ class PartialIndexTests(TransactionTestCase):
                     cursor=cursor, table_name=Article._meta.db_table,
                 ))
             editor.remove_index(index=index, model=Article)
+
+
+@skipUnlessDBFeature('supports_covering_indexes')
+class CoveringIndexTests(TransactionTestCase):
+    available_apps = ['indexes']
+
+    def test_covering_index(self):
+        index = Index(
+            name='covering_headline_idx',
+            fields=['headline'],
+            include=['pub_date', 'published'],
+        )
+        with connection.schema_editor() as editor:
+            self.assertIn(
+                '(%s) INCLUDE (%s, %s)' % (
+                    editor.quote_name('headline'),
+                    editor.quote_name('pub_date'),
+                    editor.quote_name('published'),
+                ),
+                str(index.create_sql(Article, editor)),
+            )
+            editor.add_index(Article, index)
+            with connection.cursor() as cursor:
+                constraints = connection.introspection.get_constraints(
+                    cursor=cursor, table_name=Article._meta.db_table,
+                )
+                self.assertIn(index.name, constraints)
+                self.assertEqual(
+                    constraints[index.name]['columns'],
+                    ['headline', 'pub_date', 'published'],
+                )
+            editor.remove_index(Article, index)
+            with connection.cursor() as cursor:
+                self.assertNotIn(index.name, connection.introspection.get_constraints(
+                    cursor=cursor, table_name=Article._meta.db_table,
+                ))
+
+    def test_covering_partial_index(self):
+        index = Index(
+            name='covering_partial_headline_idx',
+            fields=['headline'],
+            include=['pub_date'],
+            condition=Q(pub_date__isnull=False),
+        )
+        with connection.schema_editor() as editor:
+            self.assertIn(
+                '(%s) INCLUDE (%s) WHERE %s ' % (
+                    editor.quote_name('headline'),
+                    editor.quote_name('pub_date'),
+                    editor.quote_name('pub_date'),
+                ),
+                str(index.create_sql(Article, editor)),
+            )
+            editor.add_index(Article, index)
+            with connection.cursor() as cursor:
+                constraints = connection.introspection.get_constraints(
+                    cursor=cursor, table_name=Article._meta.db_table,
+                )
+                self.assertIn(index.name, constraints)
+                self.assertEqual(
+                    constraints[index.name]['columns'],
+                    ['headline', 'pub_date'],
+                )
+            editor.remove_index(Article, index)
+            with connection.cursor() as cursor:
+                self.assertNotIn(index.name, connection.introspection.get_constraints(
+                    cursor=cursor, table_name=Article._meta.db_table,
+                ))
+
+
+@skipIfDBFeature('supports_covering_indexes')
+class CoveringIndexIgnoredTests(TransactionTestCase):
+    available_apps = ['indexes']
+
+    def test_covering_ignored(self):
+        index = Index(
+            name='test_covering_ignored',
+            fields=['headline'],
+            include=['pub_date'],
+        )
+        with connection.schema_editor() as editor:
+            editor.add_index(Article, index)
+        self.assertNotIn(
+            'INCLUDE (%s)' % editor.quote_name('headline'),
+            str(index.create_sql(Article, editor)),
+        )

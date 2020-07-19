@@ -197,7 +197,7 @@ class RegexPattern(CheckURLMixin):
 
 
 _PATH_PARAMETER_COMPONENT_RE = _lazy_re_compile(
-    r'<(?:(?P<converter>[^>:]+):)?(?P<parameter>\w+)>'
+    r'<(?:(?P<converter>[^>:]+):)?(?P<parameter>[^>]+)>'
 )
 
 
@@ -220,13 +220,13 @@ def _route_to_regex(route, is_endpoint=False):
             break
         parts.append(re.escape(route[:match.start()]))
         route = route[match.end():]
-        parameter = match.group('parameter')
+        parameter = match['parameter']
         if not parameter.isidentifier():
             raise ImproperlyConfigured(
                 "URL route '%s' uses parameter name %r which isn't a valid "
                 "Python identifier." % (original_route, parameter)
             )
-        raw_converter = match.group('converter')
+        raw_converter = match['converter']
         if raw_converter is None:
             # If a converter isn't specified, the default is `str`.
             raw_converter = 'str'
@@ -416,7 +416,7 @@ class URLResolver:
         # which takes (request).
         for status_code, num_parameters in [(400, 2), (403, 2), (404, 2), (500, 1)]:
             try:
-                handler, param_dict = self.resolve_error_handler(status_code)
+                handler = self.resolve_error_handler(status_code)
             except (ImportError, ViewDoesNotExist) as e:
                 path = getattr(self.urlconf_module, 'handler%s' % status_code)
                 msg = (
@@ -605,7 +605,7 @@ class URLResolver:
             # django.conf.urls imports this file.
             from django.conf import urls
             callback = getattr(urls, 'handler%s' % view_type)
-        return get_callable(callback), {}
+        return get_callable(callback)
 
     def reverse(self, lookup_view, *args, **kwargs):
         return self._reverse_with_prefix(lookup_view, '', *args, **kwargs)
@@ -670,7 +670,7 @@ class URLResolver:
             if args:
                 arg_msg = "arguments '%s'" % (args,)
             elif kwargs:
-                arg_msg = "keyword arguments '%s'" % (kwargs,)
+                arg_msg = "keyword arguments '%s'" % kwargs
             else:
                 arg_msg = "no arguments"
             msg = (

@@ -99,12 +99,6 @@ class BaseDatabaseOperations:
         """
         raise NotImplementedError('subclasses of BaseDatabaseOperations may require a date_extract_sql() method')
 
-    def date_interval_sql(self, timedelta):
-        """
-        Implement the date interval functionality for expressions.
-        """
-        raise NotImplementedError('subclasses of BaseDatabaseOperations may require a date_interval_sql() method')
-
     def date_trunc_sql(self, lookup_type, field_name):
         """
         Given a lookup_type of 'year', 'month', or 'day', return the SQL that
@@ -159,6 +153,13 @@ class BaseDatabaseOperations:
         """
         return self.date_extract_sql(lookup_type, field_name)
 
+    def json_cast_text_sql(self, field_name):
+        """Return the SQL to cast a JSON value to text value."""
+        raise NotImplementedError(
+            'subclasses of BaseDatabaseOperations may require a '
+            'json_cast_text_sql() method'
+        )
+
     def deferrable_sql(self):
         """
         Return the SQL to make a constraint "initially deferred" during a
@@ -200,11 +201,12 @@ class BaseDatabaseOperations:
         """
         return []
 
-    def for_update_sql(self, nowait=False, skip_locked=False, of=()):
+    def for_update_sql(self, nowait=False, skip_locked=False, of=(), no_key=False):
         """
         Return the FOR UPDATE SQL clause to lock rows for an update operation.
         """
-        return 'FOR UPDATE%s%s%s' % (
+        return 'FOR%s UPDATE%s%s%s' % (
+            ' NO KEY' if no_key else '',
             ' OF %s' % ', '.join(of) if of else '',
             ' NOWAIT' if nowait else '',
             ' SKIP LOCKED' if skip_locked else '',
@@ -382,25 +384,30 @@ class BaseDatabaseOperations:
         """
         return ''
 
-    def sql_flush(self, style, tables, sequences, allow_cascade=False):
+    def sql_flush(self, style, tables, *, reset_sequences=False, allow_cascade=False):
         """
         Return a list of SQL statements required to remove all data from
         the given database tables (without actually removing the tables
-        themselves) and the SQL statements required to reset the sequences
-        passed in `sequences`.
+        themselves).
 
         The `style` argument is a Style object as returned by either
         color_style() or no_style() in django.core.management.color.
+
+        If `reset_sequences` is True, the list includes SQL statements required
+        to reset the sequences.
 
         The `allow_cascade` argument determines whether truncation may cascade
         to tables with foreign keys pointing the tables being truncated.
         PostgreSQL requires a cascade even if these tables are empty.
         """
-        raise NotImplementedError('subclasses of BaseDatabaseOperations must provide a sql_flush() method')
+        raise NotImplementedError('subclasses of BaseDatabaseOperations must provide an sql_flush() method')
 
-    def execute_sql_flush(self, using, sql_list):
+    def execute_sql_flush(self, sql_list):
         """Execute a list of SQL statements to flush the database."""
-        with transaction.atomic(using=using, savepoint=self.connection.features.can_rollback_ddl):
+        with transaction.atomic(
+            using=self.connection.alias,
+            savepoint=self.connection.features.can_rollback_ddl,
+        ):
             with self.connection.cursor() as cursor:
                 for sql in sql_list:
                     cursor.execute(sql)

@@ -137,11 +137,11 @@ This is the recommended way to install Django.
    it's outdated. If it's outdated, you'll know because installation won't
    work.
 
-#. Take a look at virtualenv_ and virtualenvwrapper_. These tools provide
+#. Take a look at :doc:`venv <python:tutorial/venv>`. This tool provides
    isolated Python environments, which are more practical than installing
-   packages systemwide. They also allow installing packages without
+   packages systemwide. It also allows installing packages without
    administrator privileges. The :doc:`contributing tutorial
-   </intro/contributing>` walks through how to create a virtualenv.
+   </intro/contributing>` walks through how to create a virtual environment.
 
 #. After you've created and activated a virtual environment, enter the command:
 
@@ -150,8 +150,6 @@ This is the recommended way to install Django.
         $ python -m pip install Django
 
 .. _pip: https://pip.pypa.io/
-.. _virtualenv: https://virtualenv.pypa.io/
-.. _virtualenvwrapper: https://virtualenvwrapper.readthedocs.io/en/latest/
 .. _standalone pip installer: https://pip.pypa.io/en/latest/installing/#installing-with-get-pip-py
 
 .. _installing-distribution-package:
@@ -198,11 +196,12 @@ latest bug fixes and improvements, follow these instructions:
    This will create a directory ``django`` in your current directory.
 
 #. Make sure that the Python interpreter can load Django's code. The most
-   convenient way to do this is to use virtualenv_, virtualenvwrapper_, and
-   pip_. The :doc:`contributing tutorial </intro/contributing>` walks through
-   how to create a virtualenv.
+   convenient way to do this is to use a virtual environment and pip_. The
+   :doc:`contributing tutorial </intro/contributing>` walks through how to
+   create a virtual environment.
 
-#. After setting up and activating the virtualenv, run the following command:
+#. After setting up and activating the virtual environment, run the following
+   command:
 
    .. console::
 

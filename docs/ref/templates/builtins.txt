@@ -611,10 +611,11 @@ you should use::
 ``ifequal`` and ``ifnotequal``
 ------------------------------
 
+.. deprecated:: 3.1
+
 ``{% ifequal a b %} ... {% endifequal %}`` is an obsolete way to write
 ``{% if a == b %} ... {% endif %}``. Likewise, ``{% ifnotequal a b %} ...
 {% endifnotequal %}`` is superseded by ``{% if a != b %} ... {% endif %}``.
-The ``ifequal`` and ``ifnotequal`` tags will be deprecated in a future release.
 
 .. templatetag:: ifchanged
 
@@ -1643,7 +1644,7 @@ For example::
 
     {{ value|escapejs }}
 
-If ``value`` is ``"testing\r\njavascript \'string" <b>escaping</b>"``,
+If ``value`` is ``"testing\r\njavascript 'string\" <b>escaping</b>"``,
 the output will be ``"testing\\u000D\\u000Ajavascript \\u0027string\\u0022 \\u003Cb\\u003Eescaping\\u003C/b\\u003E"``.
 
 .. templatefilter:: filesizeformat
@@ -1829,7 +1830,7 @@ The resulting data can be accessed in JavaScript like this:
 
 .. code-block:: javascript
 
-    var value = JSON.parse(document.getElementById('hello-data').textContent);
+    const value = JSON.parse(document.getElementById('hello-data').textContent);
 
 XSS attacks are mitigated by escaping the characters "<", ">" and "&". For
 example if ``value`` is ``{'hello': 'world</script>&amp;'}``, the output is:

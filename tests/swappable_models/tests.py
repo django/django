@@ -1,5 +1,3 @@
-from io import StringIO
-
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
 from django.core import management
@@ -26,8 +24,7 @@ class SwappableModelTests(TestCase):
         ContentType.objects.filter(app_label='swappable_models').delete()
 
         # Re-run migrate. This will re-build the permissions and content types.
-        new_io = StringIO()
-        management.call_command('migrate', interactive=False, stdout=new_io)
+        management.call_command('migrate', interactive=False, verbosity=0)
 
         # Content types and permissions exist for the swapped model,
         # but not for the swappable model.

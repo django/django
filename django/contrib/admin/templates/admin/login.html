@@ -11,6 +11,8 @@
 
 {% block nav-global %}{% endblock %}
 
+{% block nav-sidebar %}{% endblock %}
+
 {% block content_title %}{% endblock %}
 
 {% block breadcrumbs %}{% endblock %}
@@ -58,7 +60,7 @@
   </div>
   {% endif %}
   <div class="submit-row">
-    <label>&nbsp;</label><input type="submit" value="{% translate 'Log in' %}">
+    <input type="submit" value="{% translate 'Log in' %}">
   </div>
 </form>
 

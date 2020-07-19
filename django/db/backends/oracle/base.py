@@ -38,8 +38,8 @@ def _setup_environment(environ):
 _setup_environment([
     # Oracle takes client-side character set encoding from the environment.
     ('NLS_LANG', '.AL32UTF8'),
-    # This prevents unicode from getting mangled by getting encoded into the
-    # potentially non-unicode database character set.
+    # This prevents Unicode from getting mangled by getting encoded into the
+    # potentially non-Unicode database character set.
     ('ORA_NCHAR_LITERAL_REPLACE', 'TRUE'),
 ])
 
@@ -71,9 +71,17 @@ def wrap_oracle_errors():
         #  message = 'ORA-02091: transaction rolled back
         #            'ORA-02291: integrity constraint (TEST_DJANGOTEST.SYS
         #               _C00102056) violated - parent key not found'
+        #            or:
+        #            'ORA-00001: unique constraint (DJANGOTEST.DEFERRABLE_
+        #               PINK_CONSTRAINT) violated
         # Convert that case to Django's IntegrityError exception.
         x = e.args[0]
-        if hasattr(x, 'code') and hasattr(x, 'message') and x.code == 2091 and 'ORA-02291' in x.message:
+        if (
+            hasattr(x, 'code') and
+            hasattr(x, 'message') and
+            x.code == 2091 and
+            ('ORA-02291' in x.message or 'ORA-00001' in x.message)
+        ):
             raise IntegrityError(*tuple(e.args))
         raise
 
@@ -115,6 +123,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         'FilePathField': 'NVARCHAR2(%(max_length)s)',
         'FloatField': 'DOUBLE PRECISION',
         'IntegerField': 'NUMBER(11)',
+        'JSONField': 'NCLOB',
         'BigIntegerField': 'NUMBER(19)',
         'IPAddressField': 'VARCHAR2(15)',
         'GenericIPAddressField': 'VARCHAR2(39)',
@@ -133,6 +142,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     }
     data_type_check_constraints = {
         'BooleanField': '%(qn_column)s IN (0,1)',
+        'JSONField': '%(qn_column)s IS JSON',
         'NullBooleanField': '%(qn_column)s IN (0,1)',
         'PositiveBigIntegerField': '%(qn_column)s >= 0',
         'PositiveIntegerField': '%(qn_column)s >= 0',
@@ -312,6 +322,10 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             return False
         else:
             return True
+
+    @cached_property
+    def cx_oracle_version(self):
+        return tuple(int(x) for x in Database.version.split('.'))
 
     @cached_property
     def oracle_version(self):

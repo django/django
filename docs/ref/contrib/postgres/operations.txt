@@ -30,11 +30,17 @@ For example::
             ...
         ]
 
-Creating the extension requires a database user with superuser privileges.
-If the Django database user doesn't have superuser privileges, you'll have
-to create the extension outside of Django migrations with a user that has
-the appropriate privileges. In that case, connect to your Django database and
-run the query ``CREATE EXTENSION IF NOT EXISTS hstore;``.
+The operation skips adding the extension if it already exists.
+
+For most extensions, this requires a database user with superuser privileges.
+If the Django database user doesn't have the appropriate privileges, you'll
+have to create the extension outside of Django migrations with a user that has
+them. In that case, connect to your Django database and run the query
+``CREATE EXTENSION IF NOT EXISTS hstore;``.
+
+.. versionchanged:: 3.2
+
+    In older versions, the pre-existence of the extension isn't checked.
 
 .. currentmodule:: django.contrib.postgres.operations
 
@@ -43,7 +49,8 @@ run the query ``CREATE EXTENSION IF NOT EXISTS hstore;``.
 
 .. class:: CreateExtension(name)
 
-    An ``Operation`` subclass which installs PostgreSQL extensions.
+    An ``Operation`` subclass which installs a PostgreSQL extension. For common
+    extensions, use one of the more specific subclasses below.
 
     .. attribute:: name
 
@@ -56,21 +63,21 @@ run the query ``CREATE EXTENSION IF NOT EXISTS hstore;``.
 
     .. versionadded:: 3.1
 
-    Install the ``bloom`` extension.
+    Installs the ``bloom`` extension.
 
 ``BtreeGinExtension``
 =====================
 
 .. class:: BtreeGinExtension()
 
-    Install the ``btree_gin`` extension.
+    Installs the ``btree_gin`` extension.
 
 ``BtreeGistExtension``
 ======================
 
 .. class:: BtreeGistExtension()
 
-    Install the ``btree_gist`` extension.
+    Installs the ``btree_gist`` extension.
 
 ``CITextExtension``
 ===================
@@ -108,10 +115,8 @@ run the query ``CREATE EXTENSION IF NOT EXISTS hstore;``.
 
     Installs the ``unaccent`` extension.
 
-Index concurrent operations
+Concurrent index operations
 ===========================
-
-.. versionadded:: 3.0
 
 PostgreSQL supports the ``CONCURRENTLY`` option to ``CREATE INDEX`` and
 ``DROP INDEX`` statements to add and remove indexes without locking out writes.

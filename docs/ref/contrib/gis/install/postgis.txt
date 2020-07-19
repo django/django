@@ -50,6 +50,11 @@ process. An alternative is to use a migration operation in your project::
             ...
         ]
 
+If you plan to use PostGIS raster functionality on PostGIS 3+, you should also
+activate the ``postgis_raster`` extension. You can install the extension using
+the :class:`~django.contrib.postgres.operations.CreateExtension` migration
+operation, or directly by running ``CREATE EXTENSION postgis_raster;``.
+
 GeoDjango does not currently leverage any `PostGIS topology functionality`__.
 If you plan to use those features at some point, you can also install the
 ``postgis_topology`` extension by issuing ``CREATE EXTENSION

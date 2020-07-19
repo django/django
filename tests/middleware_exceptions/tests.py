@@ -188,30 +188,30 @@ class MiddlewareNotUsedTests(SimpleTestCase):
 )
 class MiddlewareSyncAsyncTests(SimpleTestCase):
     @override_settings(MIDDLEWARE=[
-        'middleware_exceptions.middleware.TeapotMiddleware',
+        'middleware_exceptions.middleware.PaymentMiddleware',
     ])
-    def test_sync_teapot_middleware(self):
+    def test_sync_middleware(self):
         response = self.client.get('/middleware_exceptions/view/')
-        self.assertEqual(response.status_code, 418)
+        self.assertEqual(response.status_code, 402)
 
     @override_settings(MIDDLEWARE=[
-        'middleware_exceptions.middleware.DecoratedTeapotMiddleware',
+        'middleware_exceptions.middleware.DecoratedPaymentMiddleware',
     ])
-    def test_sync_decorated_teapot_middleware(self):
+    def test_sync_decorated_middleware(self):
         response = self.client.get('/middleware_exceptions/view/')
-        self.assertEqual(response.status_code, 418)
+        self.assertEqual(response.status_code, 402)
 
     @override_settings(MIDDLEWARE=[
-        'middleware_exceptions.middleware.async_teapot_middleware',
+        'middleware_exceptions.middleware.async_payment_middleware',
     ])
-    def test_async_teapot_middleware(self):
+    def test_async_middleware(self):
         with self.assertLogs('django.request', 'DEBUG') as cm:
             response = self.client.get('/middleware_exceptions/view/')
-        self.assertEqual(response.status_code, 418)
+        self.assertEqual(response.status_code, 402)
         self.assertEqual(
             cm.records[0].getMessage(),
             "Synchronous middleware "
-            "middleware_exceptions.middleware.async_teapot_middleware "
+            "middleware_exceptions.middleware.async_payment_middleware "
             "adapted.",
         )
 
@@ -228,28 +228,28 @@ class MiddlewareSyncAsyncTests(SimpleTestCase):
             self.client.get('/middleware_exceptions/view/')
 
     @override_settings(MIDDLEWARE=[
-        'middleware_exceptions.middleware.TeapotMiddleware',
+        'middleware_exceptions.middleware.PaymentMiddleware',
     ])
-    async def test_sync_teapot_middleware_async(self):
+    async def test_sync_middleware_async(self):
         with self.assertLogs('django.request', 'DEBUG') as cm:
             response = await self.async_client.get('/middleware_exceptions/view/')
-        self.assertEqual(response.status_code, 418)
+        self.assertEqual(response.status_code, 402)
         self.assertEqual(
             cm.records[0].getMessage(),
             "Asynchronous middleware "
-            "middleware_exceptions.middleware.TeapotMiddleware adapted.",
+            "middleware_exceptions.middleware.PaymentMiddleware adapted.",
         )
 
     @override_settings(MIDDLEWARE=[
-        'middleware_exceptions.middleware.async_teapot_middleware',
+        'middleware_exceptions.middleware.async_payment_middleware',
     ])
-    async def test_async_teapot_middleware_async(self):
+    async def test_async_middleware_async(self):
         with self.assertLogs('django.request', 'WARNING') as cm:
             response = await self.async_client.get('/middleware_exceptions/view/')
-        self.assertEqual(response.status_code, 418)
+        self.assertEqual(response.status_code, 402)
         self.assertEqual(
             cm.records[0].getMessage(),
-            'Unknown Status Code: /middleware_exceptions/view/',
+            'Payment Required: /middleware_exceptions/view/',
         )
 
     @override_settings(

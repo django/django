@@ -11,7 +11,6 @@ from django.db.backends.base.operations import BaseDatabaseOperations
 from django.db.models.expressions import Col
 from django.utils import timezone
 from django.utils.dateparse import parse_date, parse_datetime, parse_time
-from django.utils.duration import duration_microseconds
 from django.utils.functional import cached_property
 
 
@@ -73,9 +72,6 @@ class DatabaseOperations(BaseDatabaseOperations):
         string and could otherwise cause a collision with a field name.
         """
         return "django_date_extract('%s', %s)" % (lookup_type.lower(), field_name)
-
-    def date_interval_sql(self, timedelta):
-        return str(duration_microseconds(timedelta))
 
     def format_for_duration_arithmetic(self, sql):
         """Do nothing since formatting is handled in the custom function."""
@@ -196,18 +192,38 @@ class DatabaseOperations(BaseDatabaseOperations):
         # Django's test suite.
         return lru_cache(maxsize=512)(self.__references_graph)
 
-    def sql_flush(self, style, tables, sequences, allow_cascade=False):
+    def sql_flush(self, style, tables, *, reset_sequences=False, allow_cascade=False):
         if tables and allow_cascade:
             # Simulate TRUNCATE CASCADE by recursively collecting the tables
             # referencing the tables to be flushed.
             tables = set(chain.from_iterable(self._references_graph(table) for table in tables))
-        # Note: No requirement for reset of auto-incremented indices (cf. other
-        # sql_flush() implementations). Just return SQL at this point
-        return ['%s %s %s;' % (
+        sql = ['%s %s %s;' % (
             style.SQL_KEYWORD('DELETE'),
             style.SQL_KEYWORD('FROM'),
             style.SQL_FIELD(self.quote_name(table))
         ) for table in tables]
+        if reset_sequences:
+            sequences = [{'table': table} for table in tables]
+            sql.extend(self.sequence_reset_by_name_sql(style, sequences))
+        return sql
+
+    def sequence_reset_by_name_sql(self, style, sequences):
+        if not sequences:
+            return []
+        return [
+            '%s %s %s %s = 0 %s %s %s (%s);' % (
+                style.SQL_KEYWORD('UPDATE'),
+                style.SQL_TABLE(self.quote_name('sqlite_sequence')),
+                style.SQL_KEYWORD('SET'),
+                style.SQL_FIELD(self.quote_name('seq')),
+                style.SQL_KEYWORD('WHERE'),
+                style.SQL_FIELD(self.quote_name('name')),
+                style.SQL_KEYWORD('IN'),
+                ', '.join([
+                    "'%s'" % sequence_info['table'] for sequence_info in sequences
+                ]),
+            ),
+        ]
 
     def adapt_datetimefield_value(self, value):
         if value is None:
@@ -312,6 +328,8 @@ class DatabaseOperations(BaseDatabaseOperations):
         # function that's registered in connect().
         if connector == '^':
             return 'POWER(%s)' % ','.join(sub_expressions)
+        elif connector == '#':
+            return 'BITXOR(%s)' % ','.join(sub_expressions)
         return super().combine_expression(connector, sub_expressions)
 
     def combine_duration_expression(self, connector, sub_expressions):

@@ -102,6 +102,27 @@ class ObjectReference(models.Model):
         return str(self.obj_id)
 
 
+class ObjectSelfReference(models.Model):
+    key = models.CharField(max_length=3, unique=True)
+    obj = models.ForeignKey('ObjectSelfReference', models.SET_NULL, null=True)
+
+
+class CircularA(models.Model):
+    key = models.CharField(max_length=3, unique=True)
+    obj = models.ForeignKey('CircularB', models.SET_NULL, null=True)
+
+    def natural_key(self):
+        return (self.key,)
+
+
+class CircularB(models.Model):
+    key = models.CharField(max_length=3, unique=True)
+    obj = models.ForeignKey('CircularA', models.SET_NULL, null=True)
+
+    def natural_key(self):
+        return (self.key,)
+
+
 class RawData(models.Model):
     raw_data = models.BinaryField()
 

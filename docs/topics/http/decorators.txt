@@ -121,7 +121,3 @@ client-side caching.
     This decorator adds a ``Cache-Control: max-age=0, no-cache, no-store,
     must-revalidate, private`` header to a response to indicate that a page
     should never be cached.
-
-    .. versionchanged:: 3.0
-
-        ``private`` directive was added.

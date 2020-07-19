@@ -1,14 +1,12 @@
 import os
 from datetime import date
-from unittest import skipUnless
 
-from django.conf import settings
 from django.contrib.sitemaps import Sitemap
 from django.contrib.sites.models import Site
 from django.core.exceptions import ImproperlyConfigured
 from django.test import modify_settings, override_settings
+from django.utils import translation
 from django.utils.formats import localize
-from django.utils.translation import activate, deactivate
 
 from .base import SitemapTestsBase
 from .models import TestModel
@@ -177,18 +175,15 @@ class HTTPSitemapTests(SitemapTestsBase):
         response = self.client.get('/lastmod-sitemaps/descending.xml')
         self.assertEqual(response['Last-Modified'], 'Sat, 20 Apr 2013 05:00:00 GMT')
 
-    @skipUnless(settings.USE_I18N, "Internationalization is not enabled")
-    @override_settings(USE_L10N=True)
+    @override_settings(USE_I18N=True, USE_L10N=True)
     def test_localized_priority(self):
-        "The priority value should not be localized (Refs #14164)"
-        activate('fr')
-        self.assertEqual('0,3', localize(0.3))
-
-        # Priorities haven't been rendered in localized format.
-        response = self.client.get('/simple/sitemap.xml')
-        self.assertContains(response, '<priority>0.5</priority>')
-        self.assertContains(response, '<lastmod>%s</lastmod>' % date.today())
-        deactivate()
+        """The priority value should not be localized."""
+        with translation.override('fr'):
+            self.assertEqual('0,3', localize(0.3))
+            # Priorities aren't rendered in localized format.
+            response = self.client.get('/simple/sitemap.xml')
+            self.assertContains(response, '<priority>0.5</priority>')
+            self.assertContains(response, '<lastmod>%s</lastmod>' % date.today())
 
     @modify_settings(INSTALLED_APPS={'remove': 'django.contrib.sites'})
     def test_requestsite_sitemap(self):

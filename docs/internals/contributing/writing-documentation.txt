@@ -239,6 +239,17 @@ documentation:
   section if possible. For example, use ``:rfc:`2324#section-2.3.2``` or
   ``:rfc:`Custom link text <2324#section-2.3.2>```.
 
+* Use :rst:role:`:pep:<pep>` to reference a Python Enhancement Proposal (PEP)
+  and try to link to the relevant section if possible. For example, use
+  ``:pep:`20#easter-egg``` or ``:pep:`Easter Egg <20#easter-egg>```.
+
+* Use :rst:role:`:mimetype:<mimetype>` to refer to a MIME Type unless the value
+  is quoted for a code example.
+
+* Use :rst:role:`:envvar:<envvar>` to refer to an environment variable. You may
+  also need to define a reference to the documentation for that environment
+  variable using :rst:dir:`.. envvar:: <envvar>`.
+
 Django-specific markup
 ======================
 
@@ -485,16 +496,10 @@ Spelling check
 ==============
 
 Before you commit your docs, it's a good idea to run the spelling checker.
-You'll need to install a couple packages first:
-
-* `pyenchant <https://pypi.org/project/pyenchant/>`_ (which requires
-  `enchant <https://www.abisource.com/projects/enchant/>`_)
-
-* `sphinxcontrib-spelling
-  <https://pypi.org/project/sphinxcontrib-spelling/>`_
-
-Then from the ``docs`` directory, run ``make spelling``. Wrong words (if any)
-along with the file and line number where they occur will be saved to
+You'll need to install `sphinxcontrib-spelling
+<https://pypi.org/project/sphinxcontrib-spelling/>`_ first. Then from the
+``docs`` directory, run ``make spelling``. Wrong words (if any) along with the
+file and line number where they occur will be saved to
 ``_build/spelling/output.txt``.
 
 If you encounter false-positives (error output that actually is correct), do

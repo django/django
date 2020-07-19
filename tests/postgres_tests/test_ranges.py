@@ -170,7 +170,7 @@ class TestRangeContainsLookup(PostgreSQLTestCase):
             self.aware_timestamps[1],
             (self.timestamps[1], self.timestamps[2]),
             (self.aware_timestamps[1], self.aware_timestamps[2]),
-            Value(self.dates[0], output_field=DateTimeField()),
+            Value(self.dates[0]),
             Func(F('dates'), function='lower', output_field=DateTimeField()),
             F('timestamps_inner'),
         )

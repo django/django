@@ -571,8 +571,6 @@ Miscellaneous
 * ``alias=None`` is added to the signature of
   :meth:`.Expression.get_group_by_cols`.
 
-* Support for ``sqlparse`` < 0.2.2 is removed.
-
 * ``RegexPattern``, used by :func:`~django.urls.re_path`, no longer returns
   keyword arguments with ``None`` values to be passed to the view for the
   optional named groups that are missing.

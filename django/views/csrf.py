@@ -60,14 +60,14 @@ CSRF_FAILURE_TEMPLATE = """
 
   <p>In general, this can occur when there is a genuine Cross Site Request Forgery, or when
   <a
-  href="https://docs.djangoproject.com/en/{{ docs_version }}/ref/csrf/">Django's
+  href="https://docs.djangoproject.com/en/{{ docs_version }}/ref/csrf/">Django’s
   CSRF mechanism</a> has not been used correctly.  For POST forms, you need to
   ensure:</p>
 
   <ul>
     <li>Your browser is accepting cookies.</li>
 
-    <li>The view function passes a <code>request</code> to the template's <a
+    <li>The view function passes a <code>request</code> to the template’s <a
     href="https://docs.djangoproject.com/en/dev/topics/templates/#django.template.backends.base.Template.render"><code>render</code></a>
     method.</li>
 
@@ -84,7 +84,7 @@ CSRF_FAILURE_TEMPLATE = """
     page with the form, because the token is rotated after a login.</li>
   </ul>
 
-  <p>You're seeing the help section of this page because you have <code>DEBUG =
+  <p>You’re seeing the help section of this page because you have <code>DEBUG =
   True</code> in your Django settings file. Change that to <code>False</code>,
   and only the initial error message will be displayed.  </p>
 

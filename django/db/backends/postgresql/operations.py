@@ -74,6 +74,9 @@ class DatabaseOperations(BaseDatabaseOperations):
     def time_trunc_sql(self, lookup_type, field_name):
         return "DATE_TRUNC('%s', %s)::time" % (lookup_type, field_name)
 
+    def json_cast_text_sql(self, field_name):
+        return '(%s)::text' % field_name
+
     def deferrable_sql(self):
         return " DEFERRABLE INITIALLY DEFERRED"
 
@@ -117,28 +120,21 @@ class DatabaseOperations(BaseDatabaseOperations):
     def set_time_zone_sql(self):
         return "SET TIME ZONE %s"
 
-    def sql_flush(self, style, tables, sequences, allow_cascade=False):
-        if tables:
-            # Perform a single SQL 'TRUNCATE x, y, z...;' statement.  It allows
-            # us to truncate tables referenced by a foreign key in any other
-            # table.
-            tables_sql = ', '.join(
-                style.SQL_FIELD(self.quote_name(table)) for table in tables)
-            if allow_cascade:
-                sql = ['%s %s %s;' % (
-                    style.SQL_KEYWORD('TRUNCATE'),
-                    tables_sql,
-                    style.SQL_KEYWORD('CASCADE'),
-                )]
-            else:
-                sql = ['%s %s;' % (
-                    style.SQL_KEYWORD('TRUNCATE'),
-                    tables_sql,
-                )]
-            sql.extend(self.sequence_reset_by_name_sql(style, sequences))
-            return sql
-        else:
+    def sql_flush(self, style, tables, *, reset_sequences=False, allow_cascade=False):
+        if not tables:
             return []
+
+        # Perform a single SQL 'TRUNCATE x, y, z...;' statement. It allows us
+        # to truncate tables referenced by a foreign key in any other table.
+        sql_parts = [
+            style.SQL_KEYWORD('TRUNCATE'),
+            ', '.join(style.SQL_FIELD(self.quote_name(table)) for table in tables),
+        ]
+        if reset_sequences:
+            sql_parts.append(style.SQL_KEYWORD('RESTART IDENTITY'))
+        if allow_cascade:
+            sql_parts.append(style.SQL_KEYWORD('CASCADE'))
+        return ['%s;' % ' '.join(sql_parts)]
 
     def sequence_reset_by_name_sql(self, style, sequences):
         # 'ALTER SEQUENCE sequence_name RESTART WITH 1;'... style SQL statements
@@ -189,21 +185,6 @@ class DatabaseOperations(BaseDatabaseOperations):
                         )
                     )
                     break  # Only one AutoField is allowed per model, so don't bother continuing.
-            for f in model._meta.many_to_many:
-                if not f.remote_field.through:
-                    output.append(
-                        "%s setval(pg_get_serial_sequence('%s','%s'), "
-                        "coalesce(max(%s), 1), max(%s) %s null) %s %s;" % (
-                            style.SQL_KEYWORD('SELECT'),
-                            style.SQL_TABLE(qn(f.m2m_db_table())),
-                            style.SQL_FIELD('id'),
-                            style.SQL_FIELD(qn('id')),
-                            style.SQL_FIELD(qn('id')),
-                            style.SQL_KEYWORD('IS NOT'),
-                            style.SQL_KEYWORD('FROM'),
-                            style.SQL_TABLE(qn(f.m2m_db_table()))
-                        )
-                    )
         return output
 
     def prep_for_iexact_query(self, x):
@@ -259,6 +240,9 @@ class DatabaseOperations(BaseDatabaseOperations):
         return value
 
     def adapt_timefield_value(self, value):
+        return value
+
+    def adapt_decimalfield_value(self, value, max_digits=None, decimal_places=None):
         return value
 
     def adapt_ipaddressfield_value(self, value):

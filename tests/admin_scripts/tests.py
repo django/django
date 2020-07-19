@@ -570,7 +570,7 @@ class DjangoAdminSettingsDirectory(AdminScriptTestCase):
         self.assertTrue(os.path.exists(os.path.join(app_path, 'api.py')))
 
     def test_startapp_unicode_name(self):
-        "directory: startapp creates the correct directory with unicode characters"
+        """startapp creates the correct directory with Unicode characters."""
         args = ['startapp', 'こんにちは']
         app_path = os.path.join(self.test_dir, 'こんにちは')
         out, err = self.run_django_admin(args, 'test_project.settings')
@@ -1124,6 +1124,7 @@ class ManageCheck(AdminScriptTestCase):
                         'APP_DIRS': True,
                         'OPTIONS': {
                             'context_processors': [
+                                'django.template.context_processors.request',
                                 'django.contrib.auth.context_processors.auth',
                                 'django.contrib.messages.context_processors.messages',
                             ],
@@ -1366,8 +1367,7 @@ class ManageTestserver(SimpleTestCase):
     @mock.patch.object(LoaddataCommand, 'handle', return_value='')
     @mock.patch.object(RunserverCommand, 'handle', return_value='')
     def test_params_to_runserver(self, mock_runserver_handle, mock_loaddata_handle, mock_create_test_db):
-        out = StringIO()
-        call_command('testserver', 'blah.json', stdout=out)
+        call_command('testserver', 'blah.json')
         mock_runserver_handle.assert_called_with(
             addrport='',
             force_color=False,
@@ -1395,7 +1395,7 @@ class ManageTestserver(SimpleTestCase):
 # the commands are correctly parsed and processed.
 ##########################################################################
 class ColorCommand(BaseCommand):
-    requires_system_checks = False
+    requires_system_checks = []
 
     def handle(self, *args, **options):
         self.stdout.write('Hello, world!', self.style.ERROR)
@@ -1541,7 +1541,7 @@ class CommandTypes(AdminScriptTestCase):
 
     def test_custom_stdout(self):
         class Command(BaseCommand):
-            requires_system_checks = False
+            requires_system_checks = []
 
             def handle(self, *args, **options):
                 self.stdout.write("Hello, World!")
@@ -1558,7 +1558,7 @@ class CommandTypes(AdminScriptTestCase):
 
     def test_custom_stderr(self):
         class Command(BaseCommand):
-            requires_system_checks = False
+            requires_system_checks = []
 
             def handle(self, *args, **options):
                 self.stderr.write("Hello, World!")
@@ -1678,7 +1678,7 @@ class CommandTypes(AdminScriptTestCase):
         A command called from the command line should close connections after
         being executed (#21255).
         """
-        command = BaseCommand(stderr=StringIO())
+        command = BaseCommand()
         command.check = lambda: []
         command.handle = lambda *args, **kwargs: args
         with mock.patch('django.core.management.base.connections') as mock_connections:

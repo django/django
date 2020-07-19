@@ -1,0 +1,13 @@
+==========================
+Django 3.0.9 release notes
+==========================
+
+*Expected August 3, 2020*
+
+Django 3.0.9 fixes several bugs in 3.0.8.
+
+Bugfixes
+========
+
+* Allowed setting the ``SameSite`` cookie flag in
+  :meth:`.HttpResponse.delete_cookie` (:ticket:`31790`).

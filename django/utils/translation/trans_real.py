@@ -96,7 +96,7 @@ class TranslationCatalog:
                 cat.update(trans._catalog)
                 break
         else:
-            self._catalogs.insert(0, trans._catalog)
+            self._catalogs.insert(0, trans._catalog.copy())
             self._plurals.insert(0, trans.plural)
 
     def get(self, key, default=None):
@@ -505,7 +505,7 @@ def get_language_from_path(path, strict=False):
     regex_match = language_code_prefix_re.match(path)
     if not regex_match:
         return None
-    lang_code = regex_match.group(1)
+    lang_code = regex_match[1]
     try:
         return get_supported_language_variant(lang_code, strict=strict)
     except LookupError:

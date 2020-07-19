@@ -26,7 +26,7 @@ __ https://www.gaia-gis.it/gaia-sins/
 Installing from source
 ======================
 
-:doc:`GEOS and PROJ.4</ref/contrib/gis/install/geolibs>` should be installed
+:doc:`GEOS and PROJ</ref/contrib/gis/install/geolibs>` should be installed
 prior to building SpatiaLite.
 
 SQLite

@@ -68,8 +68,8 @@ Browse the following sections to find out how:
    committing-code
 
 .. _posting guidelines: https://code.djangoproject.com/wiki/UsingTheMailingList
-.. _#django IRC channel: irc://irc.freenode.net/django
-.. _#django-dev IRC channel: irc://irc.freenode.net/django-dev
+.. _#django IRC channel: https://webchat.freenode.net/#django
+.. _#django-dev IRC channel: https://webchat.freenode.net/#django-dev
 .. _community page: https://www.djangoproject.com/community/
 .. _Django forum: https://forum.djangoproject.com/
 .. _register it here: https://www.djangoproject.com/community/add/blogs/

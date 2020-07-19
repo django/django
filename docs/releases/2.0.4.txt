@@ -12,8 +12,8 @@ Bugfixes
 * Fixed a crash when filtering with an ``Exists()`` annotation of a queryset
   containing a single field (:ticket:`29195`).
 
-* Fixed admin autocomplete widget's translations for `zh-hans` and `zh-hant`
-  languages (:ticket:`29213`).
+* Fixed admin autocomplete widget's translations for ``zh-hans`` and
+  ``zh-hant`` languages (:ticket:`29213`).
 
 * Corrected admin's autocomplete widget to add a space after custom classes
   (:ticket:`29221`).

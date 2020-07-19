@@ -1,3 +1,4 @@
+import sys
 import time
 from importlib import import_module
 
@@ -19,7 +20,7 @@ from django.utils.text import Truncator
 
 class Command(BaseCommand):
     help = "Updates database schema. Manages both apps with migrations and those without."
-    requires_system_checks = False
+    requires_system_checks = []
 
     def add_arguments(self, parser):
         parser.add_argument(
@@ -61,6 +62,10 @@ class Command(BaseCommand):
         parser.add_argument(
             '--run-syncdb', action='store_true',
             help='Creates tables for apps without migrations.',
+        )
+        parser.add_argument(
+            '--check', action='store_true', dest='check_unapplied',
+            help='Exits with a non-zero status if unapplied migrations exist.',
         )
 
     @no_translations
@@ -143,6 +148,7 @@ class Command(BaseCommand):
             targets = executor.loader.graph.leaf_nodes()
 
         plan = executor.migration_plan(targets)
+        exit_dry = plan and options['check_unapplied']
 
         if options['plan']:
             self.stdout.write('Planned operations:', self.style.MIGRATE_LABEL)
@@ -154,7 +160,11 @@ class Command(BaseCommand):
                     message, is_error = self.describe_operation(operation, backwards)
                     style = self.style.WARNING if is_error else None
                     self.stdout.write('    ' + message, style)
+            if exit_dry:
+                sys.exit(1)
             return
+        if exit_dry:
+            sys.exit(1)
 
         # At this point, ignore run_syncdb if there aren't any apps to sync.
         run_syncdb = options['run_syncdb'] and executor.loader.unmigrated_apps
@@ -178,8 +188,9 @@ class Command(BaseCommand):
                 )
             else:
                 if targets[0][1] is None:
-                    self.stdout.write(self.style.MIGRATE_LABEL(
-                        "  Unapply all migrations: ") + "%s" % (targets[0][0],)
+                    self.stdout.write(
+                        self.style.MIGRATE_LABEL('  Unapply all migrations: ') +
+                        str(targets[0][0])
                     )
                 else:
                     self.stdout.write(self.style.MIGRATE_LABEL(
@@ -216,8 +227,9 @@ class Command(BaseCommand):
                 changes = autodetector.changes(graph=executor.loader.graph)
                 if changes:
                     self.stdout.write(self.style.NOTICE(
-                        "  Your models have changes that are not yet reflected "
-                        "in a migration, and so won't be applied."
+                        "  Your models in app(s): %s have changes that are not "
+                        "yet reflected in a migration, and so won't be "
+                        "applied." % ", ".join(repr(app) for app in sorted(changes))
                     ))
                     self.stdout.write(self.style.NOTICE(
                         "  Run 'manage.py makemigrations' to make new "
@@ -321,7 +333,7 @@ class Command(BaseCommand):
 
         # Create the tables for each model
         if self.verbosity >= 1:
-            self.stdout.write("  Creating tables...\n")
+            self.stdout.write('  Creating tables...')
         with connection.schema_editor() as editor:
             for app_name, model_list in manifest.items():
                 for model in model_list:
@@ -330,15 +342,15 @@ class Command(BaseCommand):
                         continue
                     if self.verbosity >= 3:
                         self.stdout.write(
-                            "    Processing %s.%s model\n" % (app_name, model._meta.object_name)
+                            '    Processing %s.%s model' % (app_name, model._meta.object_name)
                         )
                     if self.verbosity >= 1:
-                        self.stdout.write("    Creating table %s\n" % model._meta.db_table)
+                        self.stdout.write('    Creating table %s' % model._meta.db_table)
                     editor.create_model(model)
 
             # Deferred SQL is executed when exiting the editor's context.
             if self.verbosity >= 1:
-                self.stdout.write("    Running deferred SQL...\n")
+                self.stdout.write('    Running deferred SQL...')
 
     @staticmethod
     def describe_operation(operation, backwards):

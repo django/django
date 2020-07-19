@@ -9,8 +9,8 @@ The :class:`GeoIP2` object is a wrapper for the `MaxMind geoip2 Python
 library`__. [#]_
 
 In order to perform IP-based geolocation, the :class:`GeoIP2` object requires
-the `geoip2 Python library`__ and the GeoIP `Country` and/or `City` `datasets
-in binary format`__ (the CSV files will not work!). Grab the
+the `geoip2 Python library`__ and the GeoIP ``Country`` and/or ``City``
+`datasets in binary format`__ (the CSV files will not work!). Grab the
 ``GeoLite2-Country.mmdb.gz`` and ``GeoLite2-City.mmdb.gz`` files and unzip them
 in a directory corresponding to the :setting:`GEOIP_PATH` setting.
 
@@ -86,10 +86,6 @@ Keyword Arguments    Description
                      the :setting:`GEOIP_CITY` setting.
 ===================  =======================================================
 
-.. versionchanged:: 3.0
-
-    Support for :class:`pathlib.Path` ``path`` was added.
-
 Methods
 =======
 
@@ -158,10 +154,6 @@ Settings
 A string or :class:`pathlib.Path` specifying the directory where the GeoIP data
 files are located. This setting is *required* unless manually specified
 with ``path`` keyword when initializing the :class:`GeoIP2` object.
-
-.. versionchanged:: 3.0
-
-    Support for :class:`pathlib.Path` was added.
 
 .. setting:: GEOIP_COUNTRY
 

@@ -50,9 +50,20 @@ class TestUtilsHashPass(SimpleTestCase):
         self.assertTrue(check_password('', blank_encoded))
         self.assertFalse(check_password(' ', blank_encoded))
 
+    def test_bytes(self):
+        encoded = make_password(b'bytes_password')
+        self.assertTrue(encoded.startswith('pbkdf2_sha256$'))
+        self.assertIs(is_password_usable(encoded), True)
+        self.assertIs(check_password(b'bytes_password', encoded), True)
+
+    def test_invalid_password(self):
+        msg = 'Password must be a string or bytes, got int.'
+        with self.assertRaisesMessage(TypeError, msg):
+            make_password(1)
+
     def test_pbkdf2(self):
         encoded = make_password('lètmein', 'seasalt', 'pbkdf2_sha256')
-        self.assertEqual(encoded, 'pbkdf2_sha256$216000$seasalt$youGZxOw6ZOcfrXv2i8/AhrnpZflJJ9EshS9XmUJTUg=')
+        self.assertEqual(encoded, 'pbkdf2_sha256$260000$seasalt$YlZ2Vggtqdc61YjArZuoApoBh9JNGYoDRBUGu6tcJQo=')
         self.assertTrue(is_password_usable(encoded))
         self.assertTrue(check_password('lètmein', encoded))
         self.assertFalse(check_password('lètmeinz', encoded))
@@ -200,7 +211,7 @@ class TestUtilsHashPass(SimpleTestCase):
             hasher.rounds = 4
             encoded = make_password('letmein', hasher='bcrypt')
             rounds = hasher.safe_summary(encoded)['work factor']
-            self.assertEqual(rounds, '04')
+            self.assertEqual(rounds, 4)
 
             state = {'upgraded': False}
 
@@ -285,13 +296,13 @@ class TestUtilsHashPass(SimpleTestCase):
     def test_low_level_pbkdf2(self):
         hasher = PBKDF2PasswordHasher()
         encoded = hasher.encode('lètmein', 'seasalt2')
-        self.assertEqual(encoded, 'pbkdf2_sha256$216000$seasalt2$gHyszNJ9lwTG5y3MQUjZe+OJmYVTBPl/y7bYq9dtk8M=')
+        self.assertEqual(encoded, 'pbkdf2_sha256$260000$seasalt2$UCGMhrOoaq1ghQPArIBK5RkI6IZLRxlIwHWA1dMy7y8=')
         self.assertTrue(hasher.verify('lètmein', encoded))
 
     def test_low_level_pbkdf2_sha1(self):
         hasher = PBKDF2SHA1PasswordHasher()
         encoded = hasher.encode('lètmein', 'seasalt2')
-        self.assertEqual(encoded, 'pbkdf2_sha1$216000$seasalt2$E1KH89wMKuPXrrQzifVcG4cBtiA=')
+        self.assertEqual(encoded, 'pbkdf2_sha1$260000$seasalt2$wAibXvW6jgvatCdONi6SMJ6q7mI=')
         self.assertTrue(hasher.verify('lètmein', encoded))
 
     @override_settings(
@@ -460,6 +471,11 @@ class BasePasswordHasherTests(SimpleTestCase):
         with self.assertRaisesMessage(NotImplementedError, msg):
             self.hasher.encode('password', 'salt')
 
+    def test_decode(self):
+        msg = self.not_implemented_msg % 'a decode'
+        with self.assertRaisesMessage(NotImplementedError, msg):
+            self.hasher.decode('encoded')
+
     def test_harden_runtime(self):
         msg = 'subclasses of BasePasswordHasher should provide a harden_runtime() method'
         with self.assertWarnsMessage(Warning, msg):
@@ -486,13 +502,13 @@ class TestUtilsHashPassArgon2(SimpleTestCase):
     def test_argon2(self):
         encoded = make_password('lètmein', hasher='argon2')
         self.assertTrue(is_password_usable(encoded))
-        self.assertTrue(encoded.startswith('argon2$'))
+        self.assertTrue(encoded.startswith('argon2$argon2id$'))
         self.assertTrue(check_password('lètmein', encoded))
         self.assertFalse(check_password('lètmeinz', encoded))
         self.assertEqual(identify_hasher(encoded).algorithm, 'argon2')
         # Blank passwords
         blank_encoded = make_password('', hasher='argon2')
-        self.assertTrue(blank_encoded.startswith('argon2$'))
+        self.assertTrue(blank_encoded.startswith('argon2$argon2id$'))
         self.assertTrue(is_password_usable(blank_encoded))
         self.assertTrue(check_password('', blank_encoded))
         self.assertFalse(check_password(' ', blank_encoded))
@@ -503,18 +519,24 @@ class TestUtilsHashPassArgon2(SimpleTestCase):
         )
         self.assertTrue(check_password('secret', encoded))
         self.assertFalse(check_password('wrong', encoded))
+        # Old hashes with version attribute.
+        encoded = (
+            'argon2$argon2i$v=19$m=8,t=1,p=1$c2FsdHNhbHQ$YC9+jJCrQhs5R6db7LlN8Q'
+        )
+        self.assertIs(check_password('secret', encoded), True)
+        self.assertIs(check_password('wrong', encoded), False)
 
     def test_argon2_upgrade(self):
         self._test_argon2_upgrade('time_cost', 'time cost', 1)
-        self._test_argon2_upgrade('memory_cost', 'memory cost', 16)
+        self._test_argon2_upgrade('memory_cost', 'memory cost', 64)
         self._test_argon2_upgrade('parallelism', 'parallelism', 1)
 
     def test_argon2_version_upgrade(self):
         hasher = get_hasher('argon2')
         state = {'upgraded': False}
         encoded = (
-            'argon2$argon2i$m=8,t=1,p=1$c29tZXNhbHQ$gwQOXSNhxiOxPOA0+PY10P9QFO'
-            '4NAYysnqRt1GSQLE55m+2GYDt9FEjPMHhP2Cuf0nOEXXMocVrsJAtNSsKyfg'
+            'argon2$argon2id$v=19$m=102400,t=2,p=8$Y041dExhNkljRUUy$TMa6A8fPJh'
+            'CAUXRhJXCXdw'
         )
 
         def setter(password):

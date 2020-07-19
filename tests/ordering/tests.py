@@ -1,7 +1,6 @@
 from datetime import datetime
 from operator import attrgetter
 
-from django.core.exceptions import FieldError
 from django.db.models import (
     CharField, DateTimeField, F, Max, OuterRef, Subquery, Value,
 )
@@ -343,6 +342,22 @@ class OrderingTests(TestCase):
             attrgetter("headline")
         )
 
+    def test_order_by_self_referential_fk(self):
+        self.a1.author = Author.objects.create(editor=self.author_1)
+        self.a1.save()
+        self.a2.author = Author.objects.create(editor=self.author_2)
+        self.a2.save()
+        self.assertQuerysetEqual(
+            Article.objects.filter(author__isnull=False).order_by('author__editor'),
+            ['Article 2', 'Article 1'],
+            attrgetter('headline'),
+        )
+        self.assertQuerysetEqual(
+            Article.objects.filter(author__isnull=False).order_by('author__editor_id'),
+            ['Article 1', 'Article 2'],
+            attrgetter('headline'),
+        )
+
     def test_order_by_f_expression(self):
         self.assertQuerysetEqual(
             Article.objects.order_by(F('headline')), [
@@ -422,17 +437,6 @@ class OrderingTests(TestCase):
         # Order by constant.
         qs = Article.objects.order_by(Value('1', output_field=CharField()), '-headline')
         self.assertSequenceEqual(qs, [self.a4, self.a3, self.a2, self.a1])
-
-    def test_order_by_constant_value_without_output_field(self):
-        msg = 'Cannot resolve expression type, unknown output_field'
-        qs = Article.objects.annotate(constant=Value('1')).order_by('constant')
-        for ordered_qs in (
-            qs,
-            qs.values('headline'),
-            Article.objects.order_by(Value('1')),
-        ):
-            with self.subTest(ordered_qs=ordered_qs), self.assertRaisesMessage(FieldError, msg):
-                ordered_qs.first()
 
     def test_related_ordering_duplicate_table_reference(self):
         """

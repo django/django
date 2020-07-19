@@ -1,5 +1,5 @@
-from django import forms
 from django.contrib.auth.forms import AuthenticationForm, PasswordChangeForm
+from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 
 
@@ -19,7 +19,7 @@ class AdminAuthenticationForm(AuthenticationForm):
     def confirm_login_allowed(self, user):
         super().confirm_login_allowed(user)
         if not user.is_staff:
-            raise forms.ValidationError(
+            raise ValidationError(
                 self.error_messages['invalid_login'],
                 code='invalid_login',
                 params={'username': self.username_field.verbose_name}

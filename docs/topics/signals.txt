@@ -188,7 +188,11 @@ Preventing duplicate signals
 
 In some circumstances, the code connecting receivers to signals may run
 multiple times. This can cause your receiver function to be registered more
-than once, and thus called multiple times for a single signal event.
+than once, and thus called as many times for a signal event. For example, the
+:meth:`~django.apps.AppConfig.ready` method may be executed more than once
+during testing. More generally, this occurs everywhere your project imports the
+module where you define the signals, because signal registration runs as many
+times as it is imported.
 
 If this behavior is problematic (such as when using signals to
 send an email whenever a model is saved), pass a unique identifier as

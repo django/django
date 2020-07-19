@@ -12,7 +12,10 @@ urlpatterns = [
     path('template/no_template/', TemplateView.as_view()),
     path('template/login_required/', login_required(TemplateView.as_view())),
     path('template/simple/<foo>/', TemplateView.as_view(template_name='generic_views/about.html')),
-    path('template/custom/<foo>/', views.CustomTemplateView.as_view(template_name='generic_views/about.html')),
+    path(
+        'template/custom/<foo1>/<foo2>/',
+        views.CustomTemplateView.as_view(template_name='generic_views/about.html'),
+    ),
     path(
         'template/content_type/',
         TemplateView.as_view(template_name='generic_views/robots.txt', content_type='text/plain'),
@@ -186,6 +189,14 @@ urlpatterns = [
     path(
         'dates/books/<int:year>/week/<int:week>/unknown_week_format/',
         views.BookWeekArchive.as_view(week_format='%T'),
+    ),
+    path(
+        'dates/books/<int:year>/week/<int:week>/iso_format/',
+        views.BookWeekArchive.as_view(year_format='%G', week_format='%V'),
+    ),
+    path(
+        'dates/books/<int:year>/week/<int:week>/invalid_iso_week_year_format/',
+        views.BookWeekArchive.as_view(week_format='%V'),
     ),
     path('dates/booksignings/<int:year>/week/<int:week>/', views.BookSigningWeekArchive.as_view()),
 

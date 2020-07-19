@@ -516,13 +516,13 @@ class ExecutorTests(MigrationTestBase):
         state = executor.migrate([
             ('mutate_state_a', '0001_initial'),
         ])
-        self.assertIn('added', dict(state.models['mutate_state_b', 'b'].fields))
+        self.assertIn('added', state.models['mutate_state_b', 'b'].fields)
         executor.loader.build_graph()
         # Migrate backward.
         state = executor.migrate([
             ('mutate_state_a', None),
         ])
-        self.assertIn('added', dict(state.models['mutate_state_b', 'b'].fields))
+        self.assertIn('added', state.models['mutate_state_b', 'b'].fields)
         executor.migrate([
             ('mutate_state_b', None),
         ])

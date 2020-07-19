@@ -262,6 +262,7 @@ class HttpRequest:
             'request.is_ajax() is deprecated. See Django 3.1 release notes '
             'for more details about this deprecation.',
             RemovedInDjango40Warning,
+            stacklevel=2,
         )
         return self.META.get('HTTP_X_REQUESTED_WITH') == 'XMLHttpRequest'
 
@@ -361,7 +362,7 @@ class HttpRequest:
 
     def close(self):
         if hasattr(self, '_files'):
-            for f in chain.from_iterable(l[1] for l in self._files.lists()):
+            for f in chain.from_iterable(list_[1] for list_ in self._files.lists()):
                 f.close()
 
     # File-like and iterator interface.

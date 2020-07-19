@@ -327,7 +327,7 @@ If you change a :class:`~django.db.models.ManyToManyField` to use a ``through``
 model, the default migration will delete the existing table and create a new
 one, losing the existing relations. To avoid this, you can use
 :class:`.SeparateDatabaseAndState` to rename the existing table to the new
-table name whilst telling the migration autodetector that the new model has
+table name while telling the migration autodetector that the new model has
 been created. You can check the existing table name through
 :djadmin:`sqlmigrate` or :djadmin:`dbshell`. You can check the new table name
 with the through model's ``_meta.db_table`` property. Your new ``through``

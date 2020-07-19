@@ -1,9 +1,11 @@
 from operator import attrgetter
+from unittest import skipUnless
 
 from django.core.exceptions import FieldError, ValidationError
 from django.db import connection, models
 from django.test import SimpleTestCase, TestCase
 from django.test.utils import CaptureQueriesContext, isolate_apps
+from django.utils.version import PY37
 
 from .models import (
     Base, Chef, CommonInfo, GrandChild, GrandParent, ItalianRestaurant,
@@ -216,6 +218,12 @@ class ModelInheritanceTests(TestCase):
         qs = Parent.objects.all()
         self.assertSequenceEqual(qs, [p2, p1])
         self.assertIn(expected_order_by_sql, str(qs.query))
+
+    @skipUnless(PY37, '__class_getitem__() was added in Python 3.7')
+    def test_queryset_class_getitem(self):
+        self.assertIs(models.QuerySet[Post], models.QuerySet)
+        self.assertIs(models.QuerySet[Post, Post], models.QuerySet)
+        self.assertIs(models.QuerySet[Post, int, str], models.QuerySet)
 
 
 class ModelInheritanceDataTests(TestCase):

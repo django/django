@@ -252,7 +252,7 @@ class I18NViewTests(SimpleTestCase):
                 self.assertEqual(response['Content-Type'], 'text/javascript; charset="utf-8"')
                 # response content must include a line like:
                 # "this is to be translated": <value of trans_txt Python variable>
-                # json.dumps() is used to be able to check unicode strings
+                # json.dumps() is used to be able to check Unicode strings.
                 self.assertContains(response, json.dumps(trans_txt), 1)
                 if lang_code == 'fr':
                     # Message with context (msgctxt)

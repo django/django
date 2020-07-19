@@ -277,8 +277,8 @@ working. We'll now fix this by installing our new ``django-polls`` package.
    users of the machine.
 
    Note that per-user installations can still affect the behavior of system
-   tools that run as that user, so ``virtualenv`` is a more robust solution
-   (see below).
+   tools that run as that user, so using a virtual environment is a more robust
+   solution (see below).
 
 #. To install the package, use pip (you already :ref:`installed it
    <installing-reusable-apps-prerequisites>`, right?)::
@@ -307,8 +307,8 @@ the world! If this wasn't just an example, you could now:
   tutorial <https://packaging.python.org/tutorials/packaging-projects/#uploading-the-distribution-archives>`_
   for doing this.
 
-Installing Python packages with virtualenv
-==========================================
+Installing Python packages with a virtual environment
+=====================================================
 
 Earlier, we installed the polls app as a user library. This has some
 disadvantages:
@@ -319,7 +319,7 @@ disadvantages:
   the same name).
 
 Typically, these situations only arise once you're maintaining several Django
-projects. When they do, the best solution is to use `virtualenv
-<https://virtualenv.pypa.io/>`_. This tool allows you to maintain multiple
-isolated Python environments, each with its own copy of the libraries and
-package namespace.
+projects. When they do, the best solution is to use :doc:`venv
+<python:tutorial/venv>`. This tool allows you to maintain multiple isolated
+Python environments, each with its own copy of the libraries and package
+namespace.

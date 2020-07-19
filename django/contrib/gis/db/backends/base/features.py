@@ -94,6 +94,6 @@ class BaseSpatialFeatures:
     def __getattr__(self, name):
         m = re.match(r'has_(\w*)_function$', name)
         if m:
-            func_name = m.group(1)
+            func_name = m[1]
             return func_name not in self.connection.ops.unsupported_functions
         raise AttributeError

@@ -1,3 +1,4 @@
+from django.core.exceptions import FieldError
 from django.db.models.sql import compiler
 
 
@@ -36,7 +37,23 @@ class SQLDeleteCompiler(compiler.SQLDeleteCompiler, SQLCompiler):
 
 
 class SQLUpdateCompiler(compiler.SQLUpdateCompiler, SQLCompiler):
-    pass
+    def as_sql(self):
+        update_query, update_params = super().as_sql()
+        # MySQL and MariaDB support UPDATE ... ORDER BY syntax.
+        if self.query.order_by:
+            order_by_sql = []
+            order_by_params = []
+            try:
+                for _, (sql, params, _) in self.get_order_by():
+                    order_by_sql.append(sql)
+                    order_by_params.extend(params)
+                update_query += ' ORDER BY ' + ', '.join(order_by_sql)
+                update_params += tuple(order_by_params)
+            except FieldError:
+                # Ignore ordering if it contains annotations, because they're
+                # removed in .update() and cannot be resolved.
+                pass
+        return update_query, update_params
 
 
 class SQLAggregateCompiler(compiler.SQLAggregateCompiler, SQLCompiler):

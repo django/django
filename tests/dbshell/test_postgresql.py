@@ -9,7 +9,7 @@ from django.test import SimpleTestCase
 
 class PostgreSqlDbshellCommandTestCase(SimpleTestCase):
 
-    def _run_it(self, dbinfo):
+    def _run_it(self, dbinfo, parameters=None):
         """
         That function invokes the runshell command, while mocking
         subprocess.run(). It returns a 2-tuple with:
@@ -21,8 +21,11 @@ class PostgreSqlDbshellCommandTestCase(SimpleTestCase):
             # PostgreSQL environment variables.
             self.pg_env = {key: env[key] for key in env if key.startswith('PG')}
             return subprocess.CompletedProcess(self.subprocess_args, 0)
+
+        if parameters is None:
+            parameters = []
         with mock.patch('subprocess.run', new=_mock_subprocess_run):
-            DatabaseClient.runshell_db(dbinfo)
+            DatabaseClient.runshell_db(dbinfo, parameters)
         return self.subprocess_args, self.pg_env
 
     def test_basic(self):
@@ -104,6 +107,12 @@ class PostgreSqlDbshellCommandTestCase(SimpleTestCase):
             )
         )
 
+    def test_parameters(self):
+        self.assertEqual(
+            self._run_it({'database': 'dbname'}, ['--help']),
+            (['psql', 'dbname', '--help'], {}),
+        )
+
     def test_sigint_handler(self):
         """SIGINT is ignored in Python and passed to psql to abort queries."""
         def _mock_subprocess_run(*args, **kwargs):
@@ -114,6 +123,6 @@ class PostgreSqlDbshellCommandTestCase(SimpleTestCase):
         # The default handler isn't SIG_IGN.
         self.assertNotEqual(sigint_handler, signal.SIG_IGN)
         with mock.patch('subprocess.run', new=_mock_subprocess_run):
-            DatabaseClient.runshell_db({})
+            DatabaseClient.runshell_db({}, [])
         # dbshell restores the original handler.
         self.assertEqual(sigint_handler, signal.getsignal(signal.SIGINT))

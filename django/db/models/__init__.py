@@ -18,6 +18,7 @@ from django.db.models.expressions import (
 from django.db.models.fields import *  # NOQA
 from django.db.models.fields import __all__ as fields_all
 from django.db.models.fields.files import FileField, ImageField
+from django.db.models.fields.json import JSONField
 from django.db.models.fields.proxy import OrderWrt
 from django.db.models.indexes import *  # NOQA
 from django.db.models.indexes import __all__ as indexes_all
@@ -43,9 +44,9 @@ __all__ += [
     'Func', 'OrderBy', 'OuterRef', 'RowRange', 'Subquery', 'Value',
     'ValueRange', 'When',
     'Window', 'WindowFrame',
-    'FileField', 'ImageField', 'OrderWrt', 'Lookup', 'Transform', 'Manager',
-    'Prefetch', 'Q', 'QuerySet', 'prefetch_related_objects', 'DEFERRED', 'Model',
-    'FilteredRelation',
+    'FileField', 'ImageField', 'JSONField', 'OrderWrt', 'Lookup', 'Transform',
+    'Manager', 'Prefetch', 'Q', 'QuerySet', 'prefetch_related_objects',
+    'DEFERRED', 'Model', 'FilteredRelation',
     'ForeignKey', 'ForeignObject', 'OneToOneField', 'ManyToManyField',
     'ForeignObjectRel', 'ManyToOneRel', 'ManyToManyRel', 'OneToOneRel',
 ]

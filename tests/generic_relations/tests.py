@@ -13,25 +13,26 @@ from .models import (
 
 
 class GenericRelationsTests(TestCase):
-    def setUp(self):
-        self.lion = Animal.objects.create(
-            common_name="Lion", latin_name="Panthera leo")
-        self.platypus = Animal.objects.create(
-            common_name="Platypus", latin_name="Ornithorhynchus anatinus")
+    @classmethod
+    def setUpTestData(cls):
+        cls.lion = Animal.objects.create(common_name='Lion', latin_name='Panthera leo')
+        cls.platypus = Animal.objects.create(
+            common_name='Platypus',
+            latin_name='Ornithorhynchus anatinus',
+        )
         Vegetable.objects.create(name="Eggplant", is_yucky=True)
-        self.bacon = Vegetable.objects.create(name="Bacon", is_yucky=False)
-        self.quartz = Mineral.objects.create(name="Quartz", hardness=7)
+        cls.bacon = Vegetable.objects.create(name='Bacon', is_yucky=False)
+        cls.quartz = Mineral.objects.create(name='Quartz', hardness=7)
 
         # Tagging stuff.
-        self.bacon.tags.create(tag="fatty")
-        self.bacon.tags.create(tag="salty")
-        self.lion.tags.create(tag="yellow")
-        self.lion.tags.create(tag="hairy")
+        cls.bacon.tags.create(tag='fatty')
+        cls.bacon.tags.create(tag='salty')
+        cls.lion.tags.create(tag='yellow')
+        cls.lion.tags.create(tag='hairy')
 
+    def comp_func(self, obj):
         # Original list of tags:
-        self.comp_func = lambda obj: (
-            obj.tag, obj.content_type.model_class(), obj.object_id
-        )
+        return obj.tag, obj.content_type.model_class(), obj.object_id
 
     def test_generic_update_or_create_when_created(self):
         """

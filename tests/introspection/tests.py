@@ -80,15 +80,12 @@ class IntrospectionTests(TransactionTestCase):
         self.assertEqual(
             [connection.introspection.get_field_type(r[1], r) for r in desc],
             [
-                'AutoField' if connection.features.can_introspect_autofield else 'IntegerField',
-                'CharField',
-                'CharField',
-                'CharField',
-                'BigIntegerField' if connection.features.can_introspect_big_integer_field else 'IntegerField',
-                'BinaryField' if connection.features.can_introspect_binary_field else 'TextField',
-                'SmallIntegerField' if connection.features.can_introspect_small_integer_field else 'IntegerField',
-                'DurationField' if connection.features.can_introspect_duration_field else 'BigIntegerField',
-            ]
+                connection.features.introspected_field_types[field] for field in (
+                    'AutoField', 'CharField', 'CharField', 'CharField',
+                    'BigIntegerField', 'BinaryField', 'SmallIntegerField',
+                    'DurationField',
+                )
+            ],
         )
 
     def test_get_table_description_col_lengths(self):
@@ -108,21 +105,19 @@ class IntrospectionTests(TransactionTestCase):
             [False, nullable_by_backend, nullable_by_backend, nullable_by_backend, True, True, False, False]
         )
 
-    @skipUnlessDBFeature('can_introspect_autofield')
     def test_bigautofield(self):
         with connection.cursor() as cursor:
             desc = connection.introspection.get_table_description(cursor, City._meta.db_table)
         self.assertIn(
-            connection.features.introspected_big_auto_field_type,
+            connection.features.introspected_field_types['BigAutoField'],
             [connection.introspection.get_field_type(r[1], r) for r in desc],
         )
 
-    @skipUnlessDBFeature('can_introspect_autofield')
     def test_smallautofield(self):
         with connection.cursor() as cursor:
             desc = connection.introspection.get_table_description(cursor, Country._meta.db_table)
         self.assertIn(
-            connection.features.introspected_small_auto_field_type,
+            connection.features.introspected_field_types['SmallAutoField'],
             [connection.introspection.get_field_type(r[1], r) for r in desc],
         )
 

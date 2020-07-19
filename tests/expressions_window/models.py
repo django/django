@@ -12,6 +12,3 @@ class Employee(models.Model):
     hire_date = models.DateField(blank=False, null=False)
     age = models.IntegerField(blank=False, null=False)
     classification = models.ForeignKey('Classification', on_delete=models.CASCADE, null=True)
-
-    def __str__(self):
-        return '{}, {}, {}, {}'.format(self.name, self.department, self.salary, self.hire_date)

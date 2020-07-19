@@ -135,9 +135,9 @@ With this sample model, ``Book.objects.all()`` will return all books in the
 database, but ``Book.dahl_objects.all()`` will only return the ones written by
 Roald Dahl.
 
-Of course, because ``get_queryset()`` returns a ``QuerySet`` object, you can
-use ``filter()``, ``exclude()`` and all the other ``QuerySet`` methods on it.
-So these statements are all legal::
+Because ``get_queryset()`` returns a ``QuerySet`` object, you can use
+``filter()``, ``exclude()`` and all the other ``QuerySet`` methods on it. So
+these statements are all legal::
 
     Book.dahl_objects.all()
     Book.dahl_objects.filter(title='Matilda')

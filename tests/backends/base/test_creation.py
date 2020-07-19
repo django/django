@@ -7,7 +7,9 @@ from django.db.backends.base.creation import (
 )
 from django.test import SimpleTestCase, TransactionTestCase
 
-from ..models import Object, ObjectReference
+from ..models import (
+    CircularA, CircularB, Object, ObjectReference, ObjectSelfReference,
+)
 
 
 def get_connection_copy():
@@ -101,3 +103,48 @@ class TestDeserializeDbFromString(TransactionTestCase):
         obj_ref = ObjectReference.objects.get()
         self.assertEqual(obj.obj_ref, obj_ref)
         self.assertEqual(obj_ref.obj, obj)
+
+    def test_self_reference(self):
+        # serialize_db_to_string() and deserialize_db_from_string() handles
+        # self references.
+        obj_1 = ObjectSelfReference.objects.create(key='X')
+        obj_2 = ObjectSelfReference.objects.create(key='Y', obj=obj_1)
+        obj_1.obj = obj_2
+        obj_1.save()
+        # Serialize objects.
+        with mock.patch('django.db.migrations.loader.MigrationLoader') as loader:
+            # serialize_db_to_string() serializes only migrated apps, so mark
+            # the backends app as migrated.
+            loader_instance = loader.return_value
+            loader_instance.migrated_apps = {'backends'}
+            data = connection.creation.serialize_db_to_string()
+        ObjectSelfReference.objects.all().delete()
+        # Deserialize objects.
+        connection.creation.deserialize_db_from_string(data)
+        obj_1 = ObjectSelfReference.objects.get(key='X')
+        obj_2 = ObjectSelfReference.objects.get(key='Y')
+        self.assertEqual(obj_1.obj, obj_2)
+        self.assertEqual(obj_2.obj, obj_1)
+
+    def test_circular_reference_with_natural_key(self):
+        # serialize_db_to_string() and deserialize_db_from_string() handles
+        # circular references for models with natural keys.
+        obj_a = CircularA.objects.create(key='A')
+        obj_b = CircularB.objects.create(key='B', obj=obj_a)
+        obj_a.obj = obj_b
+        obj_a.save()
+        # Serialize objects.
+        with mock.patch('django.db.migrations.loader.MigrationLoader') as loader:
+            # serialize_db_to_string() serializes only migrated apps, so mark
+            # the backends app as migrated.
+            loader_instance = loader.return_value
+            loader_instance.migrated_apps = {'backends'}
+            data = connection.creation.serialize_db_to_string()
+        CircularA.objects.all().delete()
+        CircularB.objects.all().delete()
+        # Deserialize objects.
+        connection.creation.deserialize_db_from_string(data)
+        obj_a = CircularA.objects.get()
+        obj_b = CircularB.objects.get()
+        self.assertEqual(obj_a.obj, obj_b)
+        self.assertEqual(obj_b.obj, obj_a)

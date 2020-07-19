@@ -105,8 +105,8 @@ The remainder of this documentation shows commands for running tests without
 ``tox``, however, any option passed to ``runtests.py`` can also be passed to
 ``tox`` by prefixing the argument list with ``--``, as above.
 
-Tox also respects the ``DJANGO_SETTINGS_MODULE`` environment variable, if set.
-For example, the following is equivalent to the command above:
+Tox also respects the :envvar:`DJANGO_SETTINGS_MODULE` environment variable, if
+set. For example, the following is equivalent to the command above:
 
 .. code-block:: console
 
@@ -124,7 +124,7 @@ Running the JavaScript tests
 
 Django includes a set of :ref:`JavaScript unit tests <javascript-tests>` for
 functions in certain contrib apps. The JavaScript tests aren't run by default
-using ``tox`` because they require `Node.js` to be installed and aren't
+using ``tox`` because they require ``Node.js`` to be installed and aren't
 necessary for the majority of patches. To run the JavaScript tests using
 ``tox``:
 
@@ -156,7 +156,7 @@ those for ``contrib.postgres``, are specific to a particular database backend
 and will be skipped if run with a different backend.
 
 To run the tests with different settings, ensure that the module is on your
-``PYTHONPATH`` and pass the module with ``--settings``.
+:envvar:`PYTHONPATH` and pass the module with ``--settings``.
 
 The :setting:`DATABASES` setting in any test settings module needs to define
 two databases:
@@ -270,8 +270,8 @@ Running all the tests
 If you want to run the full suite of tests, you'll need to install a number of
 dependencies:
 
-*  argon2-cffi_ 16.1.0+
-*  asgiref_ 3.2+ (required)
+*  argon2-cffi_ 19.1.0+
+*  asgiref_ 3.2.10+ (required)
 *  bcrypt_
 *  docutils_
 *  geoip2_
@@ -495,8 +495,8 @@ test failures. You can adjust this behavior with the ``--parallel`` option:
 
     $ ./runtests.py basic --parallel=1
 
-You can also use the ``DJANGO_TEST_PROCESSES`` environment variable for this
-purpose.
+You can also use the :envvar:`DJANGO_TEST_PROCESSES` environment variable for
+this purpose.
 
 Tips for writing tests
 ======================

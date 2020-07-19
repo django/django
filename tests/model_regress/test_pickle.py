@@ -1,8 +1,8 @@
 import pickle
 
+import django
 from django.db import DJANGO_VERSION_PICKLE_KEY, models
 from django.test import SimpleTestCase
-from django.utils.version import get_version
 
 
 class ModelPickleTests(SimpleTestCase):
@@ -40,7 +40,10 @@ class ModelPickleTests(SimpleTestCase):
                 return reduce_list
 
         p = DifferentDjangoVersion(title="FooBar")
-        msg = "Pickled model instance's Django version 1.0 does not match the current version %s." % get_version()
+        msg = (
+            "Pickled model instance's Django version 1.0 does not match the "
+            "current version %s." % django.__version__
+        )
         with self.assertRaisesMessage(RuntimeWarning, msg):
             pickle.loads(pickle.dumps(p))
 

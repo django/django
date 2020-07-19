@@ -1,6 +1,8 @@
 from urllib.parse import urlparse
 from urllib.request import url2pathname
 
+from asgiref.sync import sync_to_async
+
 from django.conf import settings
 from django.contrib.staticfiles import utils
 from django.contrib.staticfiles.views import serve
@@ -51,6 +53,12 @@ class StaticFilesHandlerMixin:
             return self.serve(request)
         except Http404 as e:
             return response_for_exception(request, e)
+
+    async def get_response_async(self, request):
+        try:
+            return await sync_to_async(self.serve)(request)
+        except Http404 as e:
+            return await sync_to_async(response_for_exception)(request, e)
 
 
 class StaticFilesHandler(StaticFilesHandlerMixin, WSGIHandler):

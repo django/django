@@ -1,4 +1,4 @@
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 from operator import attrgetter
 
 from django.db import IntegrityError
@@ -238,10 +238,12 @@ class M2mThroughTests(TestCase):
         )
 
     def test_order_by_relational_field_through_model(self):
-        CustomMembership.objects.create(person=self.jim, group=self.rock)
-        CustomMembership.objects.create(person=self.bob, group=self.rock)
-        CustomMembership.objects.create(person=self.jane, group=self.roll)
-        CustomMembership.objects.create(person=self.jim, group=self.roll)
+        today = datetime.now()
+        yesterday = today - timedelta(days=1)
+        CustomMembership.objects.create(person=self.jim, group=self.rock, date_joined=yesterday)
+        CustomMembership.objects.create(person=self.bob, group=self.rock, date_joined=today)
+        CustomMembership.objects.create(person=self.jane, group=self.roll, date_joined=yesterday)
+        CustomMembership.objects.create(person=self.jim, group=self.roll, date_joined=today)
         self.assertSequenceEqual(
             self.rock.custom_members.order_by('custom_person_related_name'),
             [self.jim, self.bob]

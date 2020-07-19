@@ -2,9 +2,10 @@ import datetime
 from collections import Counter
 from unittest import mock
 
+from django.core.exceptions import ValidationError
 from django.forms import (
     BaseForm, CharField, DateField, FileField, Form, IntegerField,
-    SplitDateTimeField, ValidationError, formsets,
+    SplitDateTimeField, formsets,
 )
 from django.forms.formsets import BaseFormSet, all_valid, formset_factory
 from django.forms.utils import ErrorList
@@ -876,6 +877,70 @@ class FormsFormsetTestCase(SimpleTestCase):
 <td><input id="id_form-2-name" name="form-2-name" type="text" value="Jack and Coke"></td></tr>"""
         )
 
+    def test_default_absolute_max(self):
+        # absolute_max defaults to 2 * DEFAULT_MAX_NUM if max_num is None.
+        data = {
+            'form-TOTAL_FORMS': 2001,
+            'form-INITIAL_FORMS': '0',
+            'form-MAX_NUM_FORMS': '0',
+        }
+        formset = FavoriteDrinksFormSet(data=data)
+        self.assertIs(formset.is_valid(), False)
+        self.assertEqual(
+            formset.non_form_errors(),
+            ['Please submit 1000 or fewer forms.'],
+        )
+        self.assertEqual(formset.absolute_max, 2000)
+
+    def test_absolute_max(self):
+        data = {
+            'form-TOTAL_FORMS': '2001',
+            'form-INITIAL_FORMS': '0',
+            'form-MAX_NUM_FORMS': '0',
+        }
+        AbsoluteMaxFavoriteDrinksFormSet = formset_factory(
+            FavoriteDrinkForm,
+            absolute_max=3000,
+        )
+        formset = AbsoluteMaxFavoriteDrinksFormSet(data=data)
+        self.assertIs(formset.is_valid(), True)
+        self.assertEqual(len(formset.forms), 2001)
+        # absolute_max provides a hard limit.
+        data['form-TOTAL_FORMS'] = '3001'
+        formset = AbsoluteMaxFavoriteDrinksFormSet(data=data)
+        self.assertIs(formset.is_valid(), False)
+        self.assertEqual(len(formset.forms), 3000)
+        self.assertEqual(
+            formset.non_form_errors(),
+            ['Please submit 1000 or fewer forms.'],
+        )
+
+    def test_absolute_max_with_max_num(self):
+        data = {
+            'form-TOTAL_FORMS': '1001',
+            'form-INITIAL_FORMS': '0',
+            'form-MAX_NUM_FORMS': '0',
+        }
+        LimitedFavoriteDrinksFormSet = formset_factory(
+            FavoriteDrinkForm,
+            max_num=30,
+            absolute_max=1000,
+        )
+        formset = LimitedFavoriteDrinksFormSet(data=data)
+        self.assertIs(formset.is_valid(), False)
+        self.assertEqual(len(formset.forms), 1000)
+        self.assertEqual(
+            formset.non_form_errors(),
+            ['Please submit 30 or fewer forms.'],
+        )
+
+    def test_absolute_max_invalid(self):
+        msg = "'absolute_max' must be greater or equal to 'max_num'."
+        for max_num in [None, 31]:
+            with self.subTest(max_num=max_num):
+                with self.assertRaisesMessage(ValueError, msg):
+                    formset_factory(FavoriteDrinkForm, max_num=max_num, absolute_max=30)
+
     def test_more_initial_form_result_in_one(self):
         """
         One form from initial and extra=3 with max_num=2 results in the one
@@ -1131,6 +1196,51 @@ class FormsFormsetTestCase(SimpleTestCase):
         formset = self.make_choiceformset()
         self.assertTrue(hasattr(formset, '__html__'))
         self.assertEqual(str(formset), formset.__html__())
+
+    def test_can_delete_extra_formset_forms(self):
+        ChoiceFormFormset = formset_factory(form=Choice, can_delete=True, extra=2)
+        formset = ChoiceFormFormset()
+        self.assertEqual(len(formset), 2)
+        self.assertIn('DELETE', formset.forms[0].fields)
+        self.assertIn('DELETE', formset.forms[1].fields)
+
+    def test_disable_delete_extra_formset_forms(self):
+        ChoiceFormFormset = formset_factory(
+            form=Choice,
+            can_delete=True,
+            can_delete_extra=False,
+            extra=2,
+        )
+        formset = ChoiceFormFormset()
+        self.assertEqual(len(formset), 2)
+        self.assertNotIn('DELETE', formset.forms[0].fields)
+        self.assertNotIn('DELETE', formset.forms[1].fields)
+
+        formset = ChoiceFormFormset(initial=[{'choice': 'Zero', 'votes': '1'}])
+        self.assertEqual(len(formset), 3)
+        self.assertIn('DELETE', formset.forms[0].fields)
+        self.assertNotIn('DELETE', formset.forms[1].fields)
+        self.assertNotIn('DELETE', formset.forms[2].fields)
+
+        formset = ChoiceFormFormset(data={
+            'form-0-choice': 'Zero',
+            'form-0-votes': '0',
+            'form-0-DELETE': 'on',
+            'form-1-choice': 'One',
+            'form-1-votes': '1',
+            'form-2-choice': '',
+            'form-2-votes': '',
+            'form-TOTAL_FORMS': '3',
+            'form-INITIAL_FORMS': '1',
+        }, initial=[{'choice': 'Zero', 'votes': '1'}])
+        self.assertEqual(formset.cleaned_data, [
+            {'choice': 'Zero', 'votes': 0, 'DELETE': True},
+            {'choice': 'One', 'votes': 1},
+            {},
+        ])
+        self.assertIs(formset._should_delete_form(formset.forms[0]), True)
+        self.assertIs(formset._should_delete_form(formset.forms[1]), False)
+        self.assertIs(formset._should_delete_form(formset.forms[2]), False)
 
 
 class FormsetAsTagTests(SimpleTestCase):

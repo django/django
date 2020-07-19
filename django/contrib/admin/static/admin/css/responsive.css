@@ -99,9 +99,7 @@ input[type="submit"], button {
     }
 
     #changelist-search > div {
-        display: -webkit-flex;
         display: flex;
-        -webkit-flex-wrap: wrap;
         flex-wrap: wrap;
         max-width: 480px;
     }
@@ -111,7 +109,6 @@ input[type="submit"], button {
     }
 
     #changelist #toolbar form #searchbar {
-        -webkit-flex: 1 0 auto;
         flex: 1 0 auto;
         width: 0;
         height: 22px;
@@ -226,7 +223,6 @@ input[type="submit"], button {
         padding-top: 6px;
     }
 
-    .aligned .add-another,
     .aligned .related-lookup,
     .aligned .datetimeshortcuts,
     .aligned .related-lookup + strong {
@@ -901,9 +897,7 @@ input[type="submit"], button {
     }
 
     .login .form-row label {
-        display: block;
         margin: 0 0 5px;
-        padding: 0;
         line-height: 1.2;
     }
 
@@ -911,7 +905,7 @@ input[type="submit"], button {
         padding: 15px 0 0;
     }
 
-    .login br, .login .submit-row label {
+    .login br {
         display: none;
     }
 

@@ -10,24 +10,25 @@ from .models import (
 
 class ManyToManyTests(TestCase):
 
-    def setUp(self):
+    @classmethod
+    def setUpTestData(cls):
         # Create a couple of Publications.
-        self.p1 = Publication.objects.create(title='The Python Journal')
-        self.p2 = Publication.objects.create(title='Science News')
-        self.p3 = Publication.objects.create(title='Science Weekly')
-        self.p4 = Publication.objects.create(title='Highlights for Children')
+        cls.p1 = Publication.objects.create(title='The Python Journal')
+        cls.p2 = Publication.objects.create(title='Science News')
+        cls.p3 = Publication.objects.create(title='Science Weekly')
+        cls.p4 = Publication.objects.create(title='Highlights for Children')
 
-        self.a1 = Article.objects.create(headline='Django lets you build Web apps easily')
-        self.a1.publications.add(self.p1)
+        cls.a1 = Article.objects.create(headline='Django lets you build Web apps easily')
+        cls.a1.publications.add(cls.p1)
 
-        self.a2 = Article.objects.create(headline='NASA uses Python')
-        self.a2.publications.add(self.p1, self.p2, self.p3, self.p4)
+        cls.a2 = Article.objects.create(headline='NASA uses Python')
+        cls.a2.publications.add(cls.p1, cls.p2, cls.p3, cls.p4)
 
-        self.a3 = Article.objects.create(headline='NASA finds intelligent life on Earth')
-        self.a3.publications.add(self.p2)
+        cls.a3 = Article.objects.create(headline='NASA finds intelligent life on Earth')
+        cls.a3.publications.add(cls.p2)
 
-        self.a4 = Article.objects.create(headline='Oxygen-free diet works wonders')
-        self.a4.publications.add(self.p2)
+        cls.a4 = Article.objects.create(headline='Oxygen-free diet works wonders')
+        cls.a4.publications.add(cls.p2)
 
     def test_add(self):
         # Create an Article.

@@ -88,8 +88,8 @@ Minor features
   initially collapsed and their header will have a small "show" link.
 
 * If a user doesn't have the add permission, the ``object-tools`` block on a
-  model's changelist will now be rendered (without the add button, of course).
-  This makes it easier to add custom tools in this case.
+  model's changelist will now be rendered (without the add button). This makes
+  it easier to add custom tools in this case.
 
 * The :class:`~django.contrib.admin.models.LogEntry` model now stores change
   messages in a JSON structure so that the message can be dynamically translated
