@@ -191,6 +191,10 @@ msgid "Indonesian"
 msgstr ""
 
 #: conf/global_settings.py:96
+msgid "Igbo"
+msgstr ""
+
+#: conf/global_settings.py:96
 msgid "Ido"
 msgstr ""
 
@@ -352,6 +356,10 @@ msgstr ""
 
 #: conf/global_settings.py:134
 msgid "Thai"
+msgstr ""
+
+#: conf/global_settings.py:135
+msgid "Turkmen"
 msgstr ""
 
 #: conf/global_settings.py:135

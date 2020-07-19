@@ -1729,9 +1729,9 @@ them::
 
 Currently, the ``postgresql``, ``oracle``, and ``mysql`` database
 backends support ``select_for_update()``. However, MariaDB 10.3+ supports only
-the ``nowait`` argument and MySQL 8.0.1+ supports the ``nowait`` and
-``skip_locked`` arguments. MySQL and MariaDB don't support the ``of`` argument.
-The ``no_key`` argument is supported only on PostgreSQL.
+the ``nowait`` argument and MySQL 8.0.1+ supports the ``nowait``,
+``skip_locked``, and ``of`` arguments. The ``no_key`` argument is supported
+only on PostgreSQL.
 
 Passing ``nowait=True``, ``skip_locked=True``, ``no_key=True``, or ``of`` to
 ``select_for_update()`` using database backends that do not support these
@@ -1768,6 +1768,8 @@ raised if ``select_for_update()`` is used in autocommit mode.
 .. versionchanged:: 3.2
 
     The ``no_key`` argument was added.
+
+    The ``of`` argument was allowed on MySQL 8.0.1+.
 
 ``raw()``
 ~~~~~~~~~
@@ -2529,6 +2531,21 @@ update a bunch of records for a model that has a custom
     for e in Entry.objects.filter(pub_date__year=2010):
         e.comments_on = False
         e.save()
+
+Ordered queryset
+^^^^^^^^^^^^^^^^
+
+.. versionadded:: 3.2
+
+Chaining ``order_by()`` with ``update()`` is supported only on MariaDB and
+MySQL, and is ignored for different databases. This is useful for updating a
+unique field in the order that is specified without conflicts. For example::
+
+    Entry.objects.order_by('-number').update(number=F('number') + 1)
+
+.. note::
+
+    If the ``order_by()`` clause contains annotations, it will be ignored.
 
 ``delete()``
 ~~~~~~~~~~~~
@@ -3692,17 +3709,10 @@ operate on vegetarian pizzas.
 
 ``FilteredRelation`` doesn't support:
 
-* Conditions that span relational fields. For example::
-
-    >>> Restaurant.objects.annotate(
-    ...    pizzas_with_toppings_startswith_n=FilteredRelation(
-    ...        'pizzas__toppings',
-    ...        condition=Q(pizzas__toppings__name__startswith='n'),
-    ...    ),
-    ... )
-    Traceback (most recent call last):
-    ...
-    ValueError: FilteredRelation's condition doesn't support nested relations (got 'pizzas__toppings__name__startswith').
 * :meth:`.QuerySet.only` and :meth:`~.QuerySet.prefetch_related`.
 * A :class:`~django.contrib.contenttypes.fields.GenericForeignKey`
   inherited from a parent model.
+
+.. versionchanged:: 3.2
+
+    Support for nested relations was added.

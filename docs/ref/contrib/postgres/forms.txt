@@ -244,4 +244,4 @@ Widgets
 
         Takes a single "compressed" value of a field, for example a
         :class:`~django.contrib.postgres.fields.DateRangeField`,
-        and returns a tuple representing and lower and upper bound.
+        and returns a tuple representing a lower and upper bound.

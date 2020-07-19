@@ -1,9 +1,12 @@
 import ctypes
+import faulthandler
+import io
 import itertools
 import logging
 import multiprocessing
 import os
 import pickle
+import sys
 import textwrap
 import unittest
 from importlib import import_module
@@ -434,7 +437,7 @@ class DiscoverRunner:
                  interactive=True, failfast=False, keepdb=False,
                  reverse=False, debug_mode=False, debug_sql=False, parallel=0,
                  tags=None, exclude_tags=None, test_name_patterns=None,
-                 pdb=False, buffer=False, **kwargs):
+                 pdb=False, buffer=False, enable_faulthandler=True, **kwargs):
 
         self.pattern = pattern
         self.top_level = top_level
@@ -448,6 +451,11 @@ class DiscoverRunner:
         self.parallel = parallel
         self.tags = set(tags or [])
         self.exclude_tags = set(exclude_tags or [])
+        if not faulthandler.is_enabled() and enable_faulthandler:
+            try:
+                faulthandler.enable(file=sys.stderr.fileno())
+            except (AttributeError, io.UnsupportedOperation):
+                faulthandler.enable(file=sys.__stderr__.fileno())
         self.pdb = pdb
         if self.pdb and self.parallel > 1:
             raise ValueError('You cannot use --pdb with parallel tests; pass --parallel=1 to use it.')
@@ -512,6 +520,10 @@ class DiscoverRunner:
         parser.add_argument(
             '-b', '--buffer', action='store_true',
             help='Discard output from passing tests.',
+        )
+        parser.add_argument(
+            '--no-faulthandler', action='store_false', dest='enable_faulthandler',
+            help='Disables the Python faulthandler module during tests.',
         )
         if PY37:
             parser.add_argument(

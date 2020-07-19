@@ -1368,14 +1368,16 @@ blue.
                    [ 19.,  21.,  23.],
                    [ 31.,  33.,  35.]], dtype=float32)
 
-    .. method:: transform(srid, driver=None, name=None, resampling='NearestNeighbour', max_error=0.0)
+    .. method:: transform(srs, driver=None, name=None, resampling='NearestNeighbour', max_error=0.0)
 
-        Returns a transformed version of this raster with the specified SRID.
+        Transforms this raster to a different spatial reference system
+        (``srs``), which may be a :class:`SpatialReference` object, or any
+        other input accepted by :class:`SpatialReference` (including spatial
+        reference WKT and PROJ strings, or an integer SRID).
 
-        This function transforms the current raster into a new spatial reference
-        system that can be specified with an ``srid``. It calculates the bounds
-        and scale of the current raster in the new spatial reference system and
-        warps the raster using the :attr:`~GDALRaster.warp` function.
+        It calculates the bounds and scale of the current raster in the new
+        spatial reference system and warps the raster using the
+        :attr:`~GDALRaster.warp` function.
 
         By default, the driver of the source raster is used and the name of the
         raster is the original name appended with
@@ -1394,9 +1396,14 @@ blue.
             ...     "scale": [100, -100],
             ...     "bands": [{"data": range(36), "nodata_value": 99}]
             ... })
-            >>> target = rst.transform(4326)
+            >>> target_srs = SpatialReference(4326)
+            >>> target = rst.transform(target_srs)
             >>> target.origin
             [-82.98492744885776, 27.601924753080144]
+
+        .. versionchanged:: 3.2
+
+            Support for :class:`SpatialReference` ``srs`` was added
 
     .. attribute:: info
 

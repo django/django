@@ -7,13 +7,9 @@
 
     function showAdminPopup(triggeringLink, name_regexp, add_popup) {
         const name = triggeringLink.id.replace(name_regexp, '');
-        let href = triggeringLink.href;
+        const href = new URL(triggeringLink.href);
         if (add_popup) {
-            if (href.indexOf('?') === -1) {
-                href += '?_popup=1';
-            } else {
-                href += '&_popup=1';
-            }
+            href.searchParams.set('_popup', 1);
         }
         const win = window.open(href, name, 'height=500,width=800,resizable=yes,scrollbars=yes');
         win.focus();

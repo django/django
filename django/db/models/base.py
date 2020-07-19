@@ -28,7 +28,7 @@ from django.db.models.fields.related import (
 from django.db.models.functions import Coalesce
 from django.db.models.manager import Manager
 from django.db.models.options import Options
-from django.db.models.query import Q
+from django.db.models.query import F, Q
 from django.db.models.signals import (
     class_prepared, post_init, post_save, pre_init, pre_save,
 )
@@ -1879,6 +1879,22 @@ class Model(metaclass=ModelBase):
         return errors
 
     @classmethod
+    def _get_expr_references(cls, expr):
+        if isinstance(expr, Q):
+            for child in expr.children:
+                if isinstance(child, tuple):
+                    lookup, value = child
+                    yield tuple(lookup.split(LOOKUP_SEP))
+                    yield from cls._get_expr_references(value)
+                else:
+                    yield from cls._get_expr_references(child)
+        elif isinstance(expr, F):
+            yield tuple(expr.name.split(LOOKUP_SEP))
+        elif hasattr(expr, 'get_source_expressions'):
+            for src_expr in expr.get_source_expressions():
+                yield from cls._get_expr_references(src_expr)
+
+    @classmethod
     def _check_constraints(cls, databases):
         errors = []
         for db in databases:
@@ -1960,10 +1976,54 @@ class Model(metaclass=ModelBase):
                         id='models.W039',
                     )
                 )
-            fields = chain.from_iterable(
+            fields = set(chain.from_iterable(
                 (*constraint.fields, *constraint.include)
                 for constraint in cls._meta.constraints if isinstance(constraint, UniqueConstraint)
-            )
+            ))
+            references = set()
+            for constraint in cls._meta.constraints:
+                if isinstance(constraint, UniqueConstraint):
+                    if (
+                        connection.features.supports_partial_indexes or
+                        'supports_partial_indexes' not in cls._meta.required_db_features
+                    ) and isinstance(constraint.condition, Q):
+                        references.update(cls._get_expr_references(constraint.condition))
+                elif isinstance(constraint, CheckConstraint):
+                    if (
+                        connection.features.supports_table_check_constraints or
+                        'supports_table_check_constraints' not in cls._meta.required_db_features
+                    ) and isinstance(constraint.check, Q):
+                        references.update(cls._get_expr_references(constraint.check))
+            for field_name, *lookups in references:
+                # pk is an alias that won't be found by opts.get_field.
+                if field_name != 'pk':
+                    fields.add(field_name)
+                if not lookups:
+                    # If it has no lookups it cannot result in a JOIN.
+                    continue
+                try:
+                    if field_name == 'pk':
+                        field = cls._meta.pk
+                    else:
+                        field = cls._meta.get_field(field_name)
+                    if not field.is_relation or field.many_to_many or field.one_to_many:
+                        continue
+                except FieldDoesNotExist:
+                    continue
+                # JOIN must happen at the first lookup.
+                first_lookup = lookups[0]
+                if (
+                    field.get_transform(first_lookup) is None and
+                    field.get_lookup(first_lookup) is None
+                ):
+                    errors.append(
+                        checks.Error(
+                            "'constraints' refers to the joined field '%s'."
+                            % LOOKUP_SEP.join([field_name] + lookups),
+                            obj=cls,
+                            id='models.E041',
+                        )
+                    )
             errors.extend(cls._check_local_fields(fields, 'constraints'))
         return errors
 

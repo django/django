@@ -83,16 +83,21 @@ to, or in lieu of custom ``field.clean()`` methods.
         :attr:`regex` must be a regular expression string, or
         :exc:`TypeError` is raised.
 
+    A :class:`RegexValidator` searches the provided ``value`` for a given
+    regular expression with :func:`re.search`. By default, raises a
+    :exc:`~django.core.exceptions.ValidationError` with :attr:`message` and
+    :attr:`code` if a match **is not** found. Its behavior can be inverted by
+    setting :attr:`inverse_match` to ``True``, in which case the
+    :exc:`~django.core.exceptions.ValidationError` is raised when a match
+    **is** found.
+
     .. attribute:: regex
 
         The regular expression pattern to search for within the provided
-        ``value``, or a pre-compiled regular expression. By default, raises a
-        :exc:`~django.core.exceptions.ValidationError` with :attr:`message`
-        and :attr:`code` if a match is not found. That standard behavior can
-        be reversed by setting :attr:`inverse_match` to ``True``, in which case
-        the :exc:`~django.core.exceptions.ValidationError` is raised when a
-        match **is** found. By default, matches any string (including an empty
-        string).
+        ``value``, using :func:`re.search`. This may be a string or a
+        pre-compiled regular expression created with :func:`re.compile`.
+        Defaults to the empty string, which will be found in every possible
+        ``value``.
 
     .. attribute:: message
 
@@ -111,10 +116,10 @@ to, or in lieu of custom ``field.clean()`` methods.
 
     .. attribute:: flags
 
-        The flags used when compiling the regular expression string
-        :attr:`regex`. If :attr:`regex` is a pre-compiled regular expression,
-        and :attr:`flags` is overridden, :exc:`TypeError` is raised. Defaults
-        to ``0``.
+        The :ref:`regex flags <python:contents-of-module-re>` used when
+        compiling the regular expression string :attr:`regex`. If :attr:`regex`
+        is a pre-compiled regular expression, and :attr:`flags` is overridden,
+        :exc:`TypeError` is raised. Defaults to ``0``.
 
 ``EmailValidator``
 ------------------
@@ -158,8 +163,8 @@ to, or in lieu of custom ``field.clean()`` methods.
 
 .. class:: URLValidator(schemes=None, regex=None, message=None, code=None)
 
-    A :class:`RegexValidator` that ensures a value looks like a URL, and raises
-    an error code of ``'invalid'`` if it doesn't.
+    A :class:`RegexValidator` subclass that ensures a value looks like a URL,
+    and raises an error code of ``'invalid'`` if it doesn't.
 
     Loopback addresses and reserved IP spaces are considered valid. Literal
     IPv6 addresses (:rfc:`3986#section-3.2.2`) and Unicode domains are both

@@ -43,8 +43,10 @@ All attributes should be considered read-only, unless stated otherwise.
     XML payload etc. For processing conventional form data, use
     :attr:`HttpRequest.POST`.
 
-    You can also read from an ``HttpRequest`` using a file-like interface. See
-    :meth:`HttpRequest.read()`.
+    You can also read from an ``HttpRequest`` using a file-like interface with
+    :meth:`HttpRequest.read` or :meth:`HttpRequest.readline`. Accessing
+    the ``body`` attribute *after* reading the request with either of these I/O
+    stream methods will produce a ``RawPostDataException``.
 
 .. attribute:: HttpRequest.path
 
@@ -888,7 +890,7 @@ Methods
 
         Using ``samesite='None'`` (string) was allowed.
 
-.. method:: HttpResponse.delete_cookie(key, path='/', domain=None)
+.. method:: HttpResponse.delete_cookie(key, path='/', domain=None, samesite=None)
 
     Deletes the cookie with the given key. Fails silently if the key doesn't
     exist.
@@ -896,6 +898,10 @@ Methods
     Due to the way cookies work, ``path`` and ``domain`` should be the same
     values you used in ``set_cookie()`` -- otherwise the cookie may not be
     deleted.
+
+    .. versionchanged:: 2.2.15
+
+        The ``samesite`` argument was added.
 
 .. method:: HttpResponse.close()
 

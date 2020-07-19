@@ -9,7 +9,7 @@ from django.contrib.gis.geos import (
 )
 from django.contrib.gis.measure import Area
 from django.db import NotSupportedError, connection
-from django.db.models import Sum, Value
+from django.db.models import IntegerField, Sum, Value
 from django.test import TestCase, skipUnlessDBFeature
 
 from ..utils import FuncTestMixin, mariadb, mysql, oracle, postgis, spatialite
@@ -194,16 +194,21 @@ class GISFunctionsTests(FuncTestMixin, TestCase):
             self.assertEqual(qs[0].circle.num_points, circle_num_points(48))
             self.assertEqual(qs[1].circle.num_points, circle_num_points(48))
 
-        qs = Country.objects.annotate(circle=functions.BoundingCircle('mpoly', num_seg=12)).order_by('name')
-        if postgis:
-            self.assertGreater(qs[0].circle.area, 168.4, 0)
-            self.assertLess(qs[0].circle.area, 169.5, 0)
-            self.assertAlmostEqual(qs[1].circle.area, 136, 0)
-            self.assertEqual(qs[0].circle.num_points, circle_num_points(12))
-            self.assertEqual(qs[1].circle.num_points, circle_num_points(12))
-        else:
-            self.assertAlmostEqual(qs[0].circle.area, expected_areas[0], 0)
-            self.assertAlmostEqual(qs[1].circle.area, expected_areas[1], 0)
+        tests = [12, Value(12, output_field=IntegerField())]
+        for num_seq in tests:
+            with self.subTest(num_seq=num_seq):
+                qs = Country.objects.annotate(
+                    circle=functions.BoundingCircle('mpoly', num_seg=num_seq),
+                ).order_by('name')
+                if postgis:
+                    self.assertGreater(qs[0].circle.area, 168.4, 0)
+                    self.assertLess(qs[0].circle.area, 169.5, 0)
+                    self.assertAlmostEqual(qs[1].circle.area, 136, 0)
+                    self.assertEqual(qs[0].circle.num_points, circle_num_points(12))
+                    self.assertEqual(qs[1].circle.num_points, circle_num_points(12))
+                else:
+                    self.assertAlmostEqual(qs[0].circle.area, expected_areas[0], 0)
+                    self.assertAlmostEqual(qs[1].circle.area, expected_areas[1], 0)
 
     @skipUnlessDBFeature("has_Centroid_function")
     def test_centroid(self):

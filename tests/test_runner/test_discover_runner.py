@@ -1,7 +1,9 @@
 import os
 from argparse import ArgumentParser
 from contextlib import contextmanager
-from unittest import TestSuite, TextTestRunner, defaultTestLoader, skipUnless
+from unittest import (
+    TestSuite, TextTestRunner, defaultTestLoader, mock, skipUnless,
+)
 
 from django.db import connections
 from django.test import SimpleTestCase
@@ -296,6 +298,31 @@ class DiscoverRunnerTests(SimpleTestCase):
             runner.run_suite(suite)
         self.assertIn('Write to stderr.', stderr.getvalue())
         self.assertIn('Write to stdout.', stdout.getvalue())
+
+    @mock.patch('faulthandler.enable')
+    def test_faulthandler_enabled(self, mocked_enable):
+        with mock.patch('faulthandler.is_enabled', return_value=False):
+            DiscoverRunner(enable_faulthandler=True)
+            mocked_enable.assert_called()
+
+    @mock.patch('faulthandler.enable')
+    def test_faulthandler_already_enabled(self, mocked_enable):
+        with mock.patch('faulthandler.is_enabled', return_value=True):
+            DiscoverRunner(enable_faulthandler=True)
+            mocked_enable.assert_not_called()
+
+    @mock.patch('faulthandler.enable')
+    def test_faulthandler_enabled_fileno(self, mocked_enable):
+        # sys.stderr that is not an actual file.
+        with mock.patch('faulthandler.is_enabled', return_value=False), captured_stderr():
+            DiscoverRunner(enable_faulthandler=True)
+            mocked_enable.assert_called()
+
+    @mock.patch('faulthandler.enable')
+    def test_faulthandler_disabled(self, mocked_enable):
+        with mock.patch('faulthandler.is_enabled', return_value=False):
+            DiscoverRunner(enable_faulthandler=False)
+            mocked_enable.assert_not_called()
 
 
 class DiscoverRunnerGetDatabasesTests(SimpleTestCase):

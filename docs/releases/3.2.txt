@@ -68,7 +68,8 @@ Minor features
 :mod:`django.contrib.gis`
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* The :meth:`.GDALRaster.transform` method now supports
+  :class:`~django.contrib.gis.gdal.SpatialReference`.
 
 :mod:`django.contrib.messages`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -223,6 +224,24 @@ Models
 * The new :attr:`.UniqueConstraint.opclasses` attribute allows setting
   PostgreSQL operator classes.
 
+* The :meth:`.QuerySet.update` method now respects the ``order_by()`` clause on
+  MySQL and MariaDB.
+
+* :class:`FilteredRelation() <django.db.models.FilteredRelation>` now supports
+  nested relations.
+
+* The ``of`` argument of :meth:`.QuerySet.select_for_update()` is now allowed
+  on MySQL 8.0.1+.
+
+* :class:`Value() <django.db.models.Value>` expression now
+  automatically resolves its ``output_field`` to the appropriate
+  :class:`Field <django.db.models.Field>` subclass based on the type of
+  it's provided ``value`` for :py:class:`bool`, :py:class:`bytes`,
+  :py:class:`float`, :py:class:`int`, :py:class:`str`,
+  :py:class:`datetime.date`, :py:class:`datetime.datetime`,
+  :py:class:`datetime.time`, :py:class:`datetime.timedelta`,
+  :py:class:`decimal.Decimal`, and :py:class:`uuid.UUID` instances.
+
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 
@@ -259,8 +278,17 @@ Tests
   creating deep copies with :py:func:`copy.deepcopy`. Assigning objects which
   don't support ``deepcopy()`` is deprecated and will be removed in Django 4.1.
 
+* :class:`~django.test.runner.DiscoverRunner` now enables
+  :py:mod:`faulthandler` by default. This can be disabled by using the
+  :option:`test --no-faulthandler` option.
+
 * :class:`~django.test.Client` now preserves the request query string when
   following 307 and 308 redirects.
+
+* The new :meth:`.TestCase.captureOnCommitCallbacks` method captures callback
+  functions passed to :func:`transaction.on_commit()
+  <django.db.transaction.on_commit>` in a list. This allows you to test such
+  callbacks without using the slower :class:`.TransactionTestCase`.
 
 URLs
 ~~~~
@@ -270,7 +298,9 @@ URLs
 Utilities
 ~~~~~~~~~
 
-* ...
+* The new ``depth`` parameter of ``django.utils.timesince.timesince()`` and
+  ``django.utils.timesince.timeuntil()`` functions allows specifying the number
+  of adjacent time units to return.
 
 Validators
 ~~~~~~~~~~

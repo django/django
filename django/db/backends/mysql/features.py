@@ -41,7 +41,6 @@ class DatabaseFeatures(BaseDatabaseFeatures):
             SET V_I = P_I;
         END;
     """
-    db_functions_convert_bytes_to_str = True
     # Neither MySQL nor MariaDB support partial indexes.
     supports_partial_indexes = False
     supports_order_by_nulls_modifier = False
@@ -117,6 +116,10 @@ class DatabaseFeatures(BaseDatabaseFeatures):
         if self.connection.mysql_is_mariadb:
             return self.connection.mysql_version >= (10, 3, 0)
         return self.connection.mysql_version >= (8, 0, 1)
+
+    @cached_property
+    def has_select_for_update_of(self):
+        return not self.connection.mysql_is_mariadb and self.connection.mysql_version >= (8, 0, 1)
 
     @cached_property
     def supports_explain_analyze(self):

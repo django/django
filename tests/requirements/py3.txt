@@ -1,4 +1,4 @@
-asgiref >= 3.2
+asgiref >= 3.2.10
 argon2-cffi >= 16.1.0
 bcrypt
 docutils

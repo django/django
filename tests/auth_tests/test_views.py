@@ -1,10 +1,9 @@
 import datetime
 import itertools
-import os
 import re
 from importlib import import_module
 from unittest import mock
-from urllib.parse import quote
+from urllib.parse import quote, urljoin
 
 from django.apps import apps
 from django.conf import settings
@@ -1216,10 +1215,7 @@ class ChangelistTests(AuthViewsTestCase):
             r'you can change the password using <a href="([^"]*)">this form</a>',
             response.content.decode()
         )[1]
-        self.assertEqual(
-            os.path.normpath(user_change_url + rel_link),
-            os.path.normpath(password_change_url)
-        )
+        self.assertEqual(urljoin(user_change_url, rel_link), password_change_url)
 
         response = self.client.post(
             password_change_url,

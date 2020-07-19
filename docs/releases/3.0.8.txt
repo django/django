@@ -2,7 +2,7 @@
 Django 3.0.8 release notes
 ==========================
 
-*Expected July 1, 2020*
+*July 1, 2020*
 
 Django 3.0.8 fixes several bugs in 3.0.7.
 
@@ -22,3 +22,5 @@ Bugfixes
 * Fixed a regression in Django 3.0.2 that caused a migration crash on
   PostgreSQL when adding a foreign key to a model with a namespaced
   ``db_table`` (:ticket:`31735`).
+
+* Added compatibility for ``cx_Oracle`` 8 (:ticket:`31751`).

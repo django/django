@@ -1112,9 +1112,9 @@ subclass::
 
 .. attribute:: ModelAdmin.preserve_filters
 
-    The admin now preserves filters on the list view after creating, editing
-    or deleting an object. You can restore the previous behavior of clearing
-    filters by setting this attribute to ``False``.
+    By default, applied filters are preserved on the list view after creating,
+    editing, or deleting an object. You can have filters cleared by setting
+    this attribute to ``False``.
 
 .. attribute:: ModelAdmin.radio_fields
 
@@ -1811,6 +1811,18 @@ templates used by the :class:`ModelAdmin` views:
 
     This uses the ``HttpRequest`` instance to filter the ``Car`` foreign key
     field to only display the cars owned by the ``User`` instance.
+
+    For more complex filters, you can use ``ModelForm.__init__()`` method to
+    filter based on an ``instance`` of your model (see
+    :ref:`fields-which-handle-relationships`). For example::
+
+        class CountryAdminForm(forms.ModelForm):
+            def __init__(self, *args, **kwargs):
+                super().__init__(*args, **kwargs)
+                self.fields['capital'].queryset = self.instance.cities.all()
+
+        class CountryAdmin(admin.ModelAdmin):
+            form = CountryAdminForm
 
 .. method:: ModelAdmin.formfield_for_manytomany(db_field, request, **kwargs)
 

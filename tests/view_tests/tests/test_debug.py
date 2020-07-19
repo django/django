@@ -113,13 +113,13 @@ class DebugViewTests(SimpleTestCase):
     def test_404(self):
         response = self.client.get('/raises404/')
         self.assertEqual(response.status_code, 404)
-        self.assertContains(response, "<code>not-in-urls</code>, didn't match", status_code=404)
+        self.assertContains(response, '<code>not-in-urls</code>, didn’t match', status_code=404)
 
     def test_404_not_in_urls(self):
         response = self.client.get('/not-in-urls')
         self.assertNotContains(response, "Raised by:", status_code=404)
         self.assertContains(response, "Django tried these URL patterns", status_code=404)
-        self.assertContains(response, "<code>not-in-urls</code>, didn't match", status_code=404)
+        self.assertContains(response, '<code>not-in-urls</code>, didn’t match', status_code=404)
         # Pattern and view name of a RegexURLPattern appear.
         self.assertContains(response, r"^regex-post/(?P&lt;pk&gt;[0-9]+)/$", status_code=404)
         self.assertContains(response, "[name='regex-post']", status_code=404)
@@ -130,7 +130,7 @@ class DebugViewTests(SimpleTestCase):
     @override_settings(ROOT_URLCONF=WithoutEmptyPathUrls)
     def test_404_empty_path_not_in_urls(self):
         response = self.client.get('/')
-        self.assertContains(response, "The empty path didn't match any of these.", status_code=404)
+        self.assertContains(response, 'The empty path didn’t match any of these.', status_code=404)
 
     def test_technical_404(self):
         response = self.client.get('/technical404/')
@@ -390,6 +390,26 @@ class ExceptionReporterTests(SimpleTestCase):
         self.assertNotIn('<h2>Traceback ', html)
         self.assertIn('<h2>Request information</h2>', html)
         self.assertNotIn('<p>Request data not supplied</p>', html)
+
+    def test_suppressed_context(self):
+        try:
+            try:
+                raise RuntimeError("Can't find my keys")
+            except RuntimeError:
+                raise ValueError("Can't find my keys") from None
+        except ValueError:
+            exc_type, exc_value, tb = sys.exc_info()
+
+        reporter = ExceptionReporter(None, exc_type, exc_value, tb)
+        html = reporter.get_traceback_html()
+        self.assertInHTML('<h1>ValueError</h1>', html)
+        self.assertIn('<pre class="exception_value">Can&#x27;t find my keys</pre>', html)
+        self.assertIn('<th>Exception Type:</th>', html)
+        self.assertIn('<th>Exception Value:</th>', html)
+        self.assertIn('<h2>Traceback ', html)
+        self.assertIn('<h2>Request information</h2>', html)
+        self.assertIn('<p>Request data not supplied</p>', html)
+        self.assertNotIn('During handling of the above exception', html)
 
     def test_reporting_of_nested_exceptions(self):
         request = self.rf.get('/test_view/')

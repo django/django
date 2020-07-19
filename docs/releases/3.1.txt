@@ -70,8 +70,25 @@ JSONField for all supported database backends
 Django now includes :class:`.models.JSONField` and
 :class:`forms.JSONField <django.forms.JSONField>` that can be used on all
 supported database backends. Both fields support the use of custom JSON
-encoders and decoders. The model field supports the introspection, lookups, and
-transforms that were previously PostgreSQL-only.
+encoders and decoders. The model field supports the introspection,
+:ref:`lookups, and transforms <querying-jsonfield>` that were previously
+PostgreSQL-only::
+
+    from django.db import models
+
+    class ContactInfo(models.Model):
+        data = models.JSONField()
+
+    ContactInfo.objects.create(data={
+        'name': 'John',
+        'cities': ['London', 'Cambridge'],
+        'pets': {'dogs': ['Rufus', 'Meg']},
+    })
+    ContactInfo.objects.filter(
+        data__name='John',
+        data__pets__has_key='dogs',
+        data__cities__contains='London',
+    ).delete()
 
 If your project uses ``django.contrib.postgres.fields.JSONField``, plus the
 related form field and transforms, you should adjust to use the new fields,
@@ -296,8 +313,8 @@ Internationalization
   (string) value to explicitly state that the cookie is sent with all same-site
   and cross-site requests.
 
-* Added support and translations for the Algerian Arabic, Kyrgyz, and Tajik
-  languages.
+* Added support and translations for the Algerian Arabic, Igbo, Kyrgyz, Tajik,
+  and Turkmen languages.
 
 Management Commands
 ~~~~~~~~~~~~~~~~~~~
@@ -680,6 +697,9 @@ Miscellaneous
 
 * The :ttag:`{% localize off %} <localize>` tag and :tfilter:`unlocalize`
   filter no longer respect :setting:`DECIMAL_SEPARATOR` setting.
+
+* The minimum supported version of ``asgiref`` is increased from 3.2 to
+  3.2.10.
 
 .. _deprecated-features-3.1:
 
