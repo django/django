@@ -82,11 +82,11 @@ General-purpose aggregation functions
             published = models.BooleanField()
             rank = models.IntegerField()
 
-        >>> from django.db.models import BooleanField, Q
+        >>> from django.db.models import Q
         >>> from django.contrib.postgres.aggregates import BoolAnd
         >>> Comment.objects.aggregate(booland=BoolAnd('published'))
         {'booland': False}
-        >>> Comment.objects.aggregate(booland=BoolAnd(Q(rank__lt=100), output_field=BooleanField()))
+        >>> Comment.objects.aggregate(booland=BoolAnd(Q(rank__lt=100)))
         {'booland': True}
 
 ``BoolOr``
@@ -104,11 +104,11 @@ General-purpose aggregation functions
             published = models.BooleanField()
             rank = models.IntegerField()
 
-        >>> from django.db.models import BooleanField, Q
+        >>> from django.db.models import Q
         >>> from django.contrib.postgres.aggregates import BoolOr
         >>> Comment.objects.aggregate(boolor=BoolOr('published'))
         {'boolor': True}
-        >>> Comment.objects.aggregate(boolor=BoolOr(Q(rank__gt=2), output_field=BooleanField()))
+        >>> Comment.objects.aggregate(boolor=BoolOr(Q(rank__gt=2)))
         {'boolor': False}
 
 ``JSONBAgg``
