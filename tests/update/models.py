@@ -10,6 +10,9 @@ class DataPoint(models.Model):
     name = models.CharField(max_length=20)
     value = models.CharField(max_length=20)
     another_value = models.CharField(max_length=20, blank=True)
+    normal_datetime = models.DateTimeField(null=True)
+    modified_datetime = models.DateTimeField(auto_now=True)
+    modified_date = models.DateField(auto_now=True)
 
     def __str__(self):
         return self.name

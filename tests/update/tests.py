@@ -1,7 +1,10 @@
+from datetime import datetime
+
 from django.core.exceptions import FieldError
 from django.db.models import Count, F, Max
 from django.db.models.functions import Concat, Lower
 from django.test import TestCase
+from django.test.utils import freeze_datetime
 
 from .models import A, B, Bar, D, DataPoint, Foo, RelatedPoint
 
@@ -89,6 +92,16 @@ class AdvancedTests(TestCase):
         resp = DataPoint.objects.filter(value='banana').update(value='pineapple')
         self.assertEqual(resp, 2)
         self.assertEqual(DataPoint.objects.get(name="d2").value, 'pineapple')
+
+    def test_update_auto_now_datetime_multi_objects(self):
+        with freeze_datetime(datetime(2020, 7, 15, 12, 59, 59)):
+            resp = DataPoint.objects.filter(value='banana').update(value='pineapple')
+
+        self.assertEqual(resp, 2)
+        for data_point in DataPoint.objects.filter(value='pineapple'):
+            self.assertEqual(data_point.modified_datetime, datetime(2020, 7, 15, 12, 59, 59))
+            self.assertEqual(data_point.modified_date, datetime(2020, 7, 15, 12, 59, 59).date())
+            self.assertIsNone(data_point.normal_datetime)
 
     def test_update_fk(self):
         """

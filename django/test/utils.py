@@ -5,6 +5,7 @@ import sys
 import time
 import warnings
 from contextlib import contextmanager
+from datetime import datetime
 from functools import wraps
 from io import StringIO
 from itertools import chain
@@ -764,6 +765,26 @@ def freeze_time(t):
         yield
     finally:
         time.time = _real_time
+
+
+@contextmanager
+def freeze_datetime(dt):
+    """
+    Context manager to temporarily freeze datetime.datetime(). This temporarily
+    modifies the time function of the time module. Modules which import the
+    time function directly (e.g. `import datetime`) won't be affected
+    This isn't meant as a public API, but helps reduce some repetitive code in
+    Django's test suite.
+    """
+    _real_datetime = datetime.datetime
+    _real_date = datetime.date
+    datetime.datetime = lambda: dt
+    datetime.date = lambda: dt.date()
+    try:
+        yield
+    finally:
+        datetime.datetime = _real_datetime
+        datetime.datetime = _real_date
 
 
 def require_jinja2(test_func):
